@@ -3,6 +3,5 @@ Release:
 - Reference docs
     - Package docs
     - Examples?
-- merge/consensus for components, at least for homologues
 - more withr wrapping? (dev, par)
 

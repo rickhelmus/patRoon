@@ -19,6 +19,13 @@ NULL
 #' @param obj,object,x The \code{component} object.
 #' @param index The index of the component that should be plotted. Can be a
 #'   numeric index or a character with its name.
+#' @param \dots For \code{plotEIC}: Further (optional) arguments passed to the
+#'   \code{plotEIC} method for the \code{\link{featureGroups}} class. Note that
+#'   the \code{colourBy}, \code{showPeakArea}, \code{showFGroupRect} and
+#'   \code{topMost} arguments cannot be set as these are set by this method. For
+#'   \code{consensus}: \code{components} objects that should be used to generate
+#'   the consensus.
+#'
 #' @export
 components <- setClass("components",
                        slots = c(components = "list", componentInfo = "data.table",
@@ -203,10 +210,6 @@ setMethod("plotSpec", "components", function(obj, index, markFGroup = NULL, useG
 #'   generate the components.
 #' @param rtWindow Retention window: see the \code{plotEIC} method for the
 #'   \code{\link{featureGroups}} class.
-#' @param \dots Further (optional) arguments passed to the \code{plotEIC} method
-#'   for the \code{\link{featureGroups}} class. Note that the \code{colourBy},
-#'   \code{showPeakArea}, \code{showFGroupRect} and \code{topMost} arguments
-#'   cannot be set as these are set by this method.
 #' @export
 setMethod("plotEIC", "components", function(obj, index, fGroups, rtWindow = 5, ...)
 {
@@ -230,6 +233,38 @@ setMethod("plotEIC", "components", function(obj, index, fGroups, rtWindow = 5, .
     if (length(fGroups) > 0)
         plotEIC(fGroups, rtWindow = rtWindow, colourBy = colourBy, showPeakArea = showPeakArea,
                 showFGroupRect = showFGroupRect, topMost = topMost, ...)
+})
+
+#' @describeIn components Generates a consensus from multiple \code{components}
+#'   objects. At this point results are simply combined an no attempt is made to
+#'   merge similar components.
+#' @return \code{consensus} returns a \code{components} object that is produced
+#'   by merging multiple specified \code{components} objects.
+#' @export
+setMethod("consensus", "components", function(obj, ...)
+{
+    allComponents <- c(list(obj), list(...))
+    
+    if (length(allComponents) == 1)
+        return(obj)
+    
+    compNames <- make.unique(sapply(allComponents, algorithm))
+    retCInfo <- copy(componentInfo(allComponents[[1]]))
+    retCInfo[, algorithm := compNames[[1]]]
+    retCTable <- componentTable(allComponents[[1]])
+    
+    for (mi in seq(2, length(allComponents)))
+    {
+        rci <- copy(componentInfo(allComponents[[mi]]))
+        rci[, algorithm := compNames[[mi]]]
+        retCInfo <- rbind(retCInfo, rci, fill = TRUE)
+        retCTable <- c(retCTable, componentTable(allComponents[[mi]]))
+    }
+    
+    retCInfo[, name := paste0(name, "-", algorithm)]
+    names(retCTable) <- retCInfo[["name"]]
+    
+    return(components(components = retCTable, componentInfo = retCInfo, algorithm = paste0(compNames, collapse = ",")))
 })
 
 #' @templateVar func generateComponents

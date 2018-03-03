@@ -1,0 +1,88 @@
+```{r echo=FALSE}
+cTable <- componentTable(rmdVars$components)
+cInfo <- componentInfo(rmdVars$components)
+cNames <- names(rmdVars$components)
+cCount <- length(rmdVars$components)
+
+message("Plotting component spectra...")
+prog <- txtProgressBar(0, length(rmdVars$components), style = 3, file = stderr())
+allPlots <- vector("character", length(rmdVars$components) * 2)
+curPlotInd <- 0
+plotPath <- getPlotPath()
+
+for (ci in seq_len(length(rmdVars$components)))
+{
+    curPlotInd <- curPlotInd + 1
+    allPlots[curPlotInd] <- file.path(plotPath, sprintf("component_spec_%d.png", ci))
+    makePlot(allPlots[curPlotInd], 6, 5, plotSpec(rmdVars$components, ci,
+                                   main = sprintf("ret: %.1f; m/z: %.4f - %.4f",
+                                                  cInfo$ret[ci], min(cTable[[ci]]$mz), max(cTable[[ci]]$mz))))
+
+    curPlotInd <- curPlotInd + 1
+    allPlots[curPlotInd] <- file.path(plotPath, sprintf("component_eic_%d.png", ci))
+    makePlot(allPlots[curPlotInd], 6, 5,
+             plotEIC(rmdVars$components, ci, rmdVars$fGroups,
+                     rtWindow = rmdVars$EICRtWindow,
+                     mzWindow = rmdVars$EICMzWindow, retMin = rmdVars$retMin,
+                     EICs = rmdVars$EICs))
+             
+    setTxtProgressBar(prog, ci)
+}
+
+close(prog)
+
+if (rmdVars$optimizePng && curPlotInd > 0)
+    optimizePngPlots(allPlots, stderr(), rmdVars$maxProcAmount)
+
+# divide into subpages to speed up page rendering: ideally cmpsPerPage per subpage, else with max maxCmpsPages subpages
+maxCmpsPages <- 20
+cmpsPerPage <- 50
+pageCount <- ceiling(cCount / cmpsPerPage)
+if (pageCount > maxCmpsPages)
+{
+    pageCount <- maxCmpsPages
+    cmpsPerPage <- as.integer(cCount / maxCmpsPages)
+}
+
+message("Generating component layout...")
+prog <- txtProgressBar(0, pageCount, style = 3, file = stderr())
+
+rmdTexts <- vector("character", length = pageCount)
+compTempl <- readAllFile(system.file("templates", "components-spectra.Rmd", package = "patRoon"))
+for (page in seq_len(pageCount))
+{
+    cmpStart <- cmpsPerPage * (page - 1) + 1
+    cmpEnd <- min(cCount, cmpStart + cmpsPerPage - 1)
+    
+    # page header
+    if (pageCount > 1)
+    {
+        rmdTexts[page] <- glue::glue("
+Components { cmpStart } - { cmpEnd } {{ data-orientation=rows data-navmenu=\"Components\" }}
+===
+", cmpStart = cmpStart, cmpEnd = cmpEnd)
+    }
+    else
+    {
+        rmdTexts[page] <- "
+Components { data-orientation=rows }
+===
+"
+    }
+    
+    # all components of this page
+    rmdTexts[page] <- paste(rmdTexts[page], knitr::knit(text = paste0(glue::glue(compTempl,
+                                                                                 ci = seq(cmpStart, cmpEnd),
+                                                                                 plotPath = plotPath),
+                                                                      collapse = "\n")),
+                            sep = "\n")
+    setTxtProgressBar(prog, page)
+}
+
+close(prog)
+
+rmdText <- paste0(rmdTexts, collapse = "\n")
+```
+
+<!-- stuff everything together: https://stackoverflow.com/a/21730473 -->
+`r rmdText`

@@ -1,0 +1,175 @@
+<style>
+.specClass {
+    display: none;
+}
+</style>
+
+<script>`r readAllFile(system.file("js", "utils-report.js", package = "patRoon"))`</script>
+
+Annotation {data-orientation=rows}
+===
+
+##
+
+### feature groups
+
+```{r echo=FALSE}
+showButton <- function(jsFunc, arg1, arg2) sprintf("<button onclick=\"%s('%s', '%s');\" style=\"padding: 0px 3px 0px 3px\">show</button>", jsFunc, arg1, arg2)
+
+compFGroups <- character(); formFGroups <- character(); componentFGroups <- character()
+if (!is.null(rmdVars$compounds))
+{
+    compTable <- compoundTable(rmdVars$compounds)
+    compFGroups <- rmdVars$groupNames[sapply(rmdVars$groupNames,
+                                             function(grp) !is.null(compTable[[grp]]) && nrow(compTable[[grp]]) > 0)]
+}
+if (!is.null(rmdVars$formConsensus))
+{
+    formTable <- formulaTable(rmdVars$formConsensus)[byMSMS == TRUE]
+    formFGroups <- unique(formTable$group)
+    formFGroups <- formFGroups[formFGroups %in% rmdVars$groupNames]
+}
+if (!is.null(rmdVars$components))
+{
+    cTable <- componentTable(rmdVars$components)
+    componentFGroups <- unique(unlist(sapply(cTable, "[[", "group")))
+    componentFGroups <- componentFGroups[componentFGroups %in% rmdVars$groupNames]
+}
+specGroups <- unique(c(compFGroups, formFGroups))
+allGroups <- unique(c(specGroups, componentFGroups))
+
+fGroupsSpecDT <- data.table(group = allGroups, rt = round(rmdVars$gInfo[allGroups, "rts"], 2),
+                            mz = round(rmdVars$gInfo[allGroups, "mzs"], 5))
+
+if (length(compFGroups))
+    fGroupsSpecDT[group %in% compFGroups, compound := showButton("showSpec", group, "comp")]
+if (length(formFGroups))
+    fGroupsSpecDT[group %in% formFGroups, formula := showButton("showSpec", group, "form")]
+if (length(componentFGroups))
+{
+    fGroupsSpecDT[group %in% componentFGroups, component := sapply(group, function(grp)
+    {
+        cmpIds <- findFGroup(rmdVars$components, grp)
+        cmpNames <- tolower(names(rmdVars$components)[cmpIds]) # NOTE: headings are automatically made lowercase
+        showButton("showComponentSpec", cmpNames[1], "feature-groups") # UNDONE: multiple indices
+    })]
+}
+
+DT::datatable(fGroupsSpecDT, options = list(paging = FALSE, scrollY = "200px"), escape = FALSE)
+```
+
+####
+
+<div id="noSpecSelected">Push a **show** button to view compound/formula spectra of a feature group.</div>
+
+```{r allCompPlots, fig.keep='none', eval=length(specGroups) > 0}
+# Generate all plots in advance, since having many code chunks will cause a lot of overhead.
+
+message("Generating spectra...")
+prog <- txtProgressBar(0, length(specGroups), style = 3, file = stderr())
+
+allPlots <- vector("character", 0)
+plotPath <- getPlotPath()
+for (grpi in seq_along(specGroups))
+{
+    plotf <- file.path(plotPath, sprintf("eic_%i.png", grpi))
+    allPlots[length(allPlots) + 1] <- plotf
+    makePlot(plotf, 8, 4.5,
+             plotEIC(rmdVars$fGroups[, specGroups[grpi]], rmdVars$EICRtWindow,
+                     rmdVars$EICMzWindow, rmdVars$retMin,
+                     rmdVars$EICTopMost, rmdVars$EICs, colourBy = "rGroup"))
+    
+    if (specGroups[grpi] %in% compFGroups)
+    {
+        allPlots <- c(allPlots, sapply(seq_len(nrow(compTable[[specGroups[grpi]]])), function(compi)
+        {
+            ret <- file.path(plotPath, sprintf("compscore_%i_%d.png", grpi, compi))
+            makePlot(ret, 3, 4.5, plotScores(rmdVars$compounds, compi, specGroups[grpi]))
+            return(ret)
+        }))
+
+        allPlots <- c(allPlots, sapply(seq_len(nrow(compTable[[specGroups[grpi]]])), function(compi)
+        {
+            ret <- file.path(plotPath, sprintf("compspec_%i_%d.png", grpi, compi))
+            makePlot(ret, 6, 4.5, plotSpec(rmdVars$compounds, compi,  specGroups[grpi],
+                                           rmdVars$MSPeakLists, rmdVars$formConsensus,
+                                           rmdVars$compoundNormalizeScores))
+            return(ret)
+        }))
+    }
+    
+    if (specGroups[grpi] %in% formFGroups)
+    {
+        precursors <- unique(formTable[group == specGroups[grpi], formula])
+        allPlots <- c(allPlots, sapply(precursors, function(prec)
+        {
+            ret <- file.path(plotPath, sprintf("formspec_%d_%s.png", grpi, prec))
+            makePlot(ret, 6, 4.5, plotSpec(rmdVars$formConsensus, prec, specGroups[grpi], rmdVars$MSPeakLists))
+            return(ret)
+        }))
+    }
+    
+    setTxtProgressBar(prog, grpi)
+}
+close(prog)
+
+if (rmdVars$optimizePng && length(allPlots > 0))
+    optimizePngPlots(allPlots, stderr(), rmdVars$maxProcAmount)
+```
+
+```{r echo=FALSE, eval=length(specGroups) > 0}
+rmdTexts <- vector("character", length = length(specGroups))
+
+message("Generating spectra layout...")
+prog <- txtProgressBar(0, length(specGroups), style = 3, file = stderr())
+compSpecTempl <- readAllFile(system.file("templates", "comp-spectra.Rmd", package = "patRoon"))
+formSpecTempl <- readAllFile(system.file("templates", "formula-spectra.Rmd", package = "patRoon"))
+
+for (grpi in seq_along(specGroups))
+{
+    rmdTexts[grpi] <- glue::glue("
+
+## { grp } {{ .specClass .EIC-{ grp } }}
+
+### EIC {{ .specClass .EIC-{ grp } }}
+
+![]({ plotPath }/eic_{ grpi }.png)
+
+", grpi = grpi, grp = specGroups[grpi], plotPath = plotPath)
+
+    if (specGroups[grpi] %in% compFGroups)
+    {
+        compsSeq <- seq_len(nrow(compTable[[specGroups[grpi]]]))
+        rmdTexts[grpi] <-
+            paste(rmdTexts[grpi],
+                  paste0(glue::glue(compSpecTempl, grpi = grpi,
+                                    grp = specGroups[grpi],
+                                    compi = compsSeq,
+                                    plotPath = plotPath,
+                                    cil = sapply(compsSeq,
+                                                 function(compi) paste0(getCompInfoList(compTable[[specGroups[grpi]]],
+                                                                                        compi, TRUE,
+                                                                                        mergedCompoundNames(rmdVars$compounds)),
+                                                                        collapse = "<br>"))), collapse = "\n"), sep = "\n")
+    }
+    
+    if (specGroups[grpi] %in% formFGroups)
+    {
+        precursors <- unique(formTable[group == specGroups[grpi], formula])
+        rmdTexts[grpi] <- paste(rmdTexts[grpi], paste0(glue::glue(formSpecTempl, grpi = grpi, grp = specGroups[grpi],
+                   precursor = precursors, plotPath = plotPath,
+                   fil = sapply(precursors,
+                                function(prec) paste0(getFormInfoList(rmdVars$formConsensus, prec, specGroups[grpi]),
+                                collapse = "<br>"))), collapse = "\n"), sep = "\n")
+    }
+    
+    # rmdTexts[grpi] <- knitr::knit(text = rmdTexts[grpi])
+    setTxtProgressBar(prog, grpi)
+}
+
+rmdText <- paste0(rmdTexts, collapse = "\n")
+close(prog)
+```
+
+<!-- stuff everything together: https://stackoverflow.com/a/21730473 -->
+`r if (length(specGroups) > 0) rmdText`

@@ -1,0 +1,74 @@
+#' @include features.R
+#' @include feature_groups.R
+NULL
+
+#' @rdname feature-grouping
+#' @export
+featureGroupsEnviMass <- setClass("featureGroupsEnviMass", contains = "featureGroups")
+
+#' @details \code{importFeatureGroupsEnviMass} imports grouped features
+#'   ('profiles') generated with \pkg{enviMass}. Please note that this
+#'   function only supports features imported by
+#'   \code{\link{importFeaturesEnviMass}} (obviously, the same project should be
+#'   used for both importing functions).
+#'
+#' @param positive Whether data from positive (\code{TRUE}) or negative
+#'   (\code{FALSE}) should be loaded.
+#'
+#' @rdname feature-grouping
+#' @export
+importFeatureGroupsEnviMass <- function(path, feat, positive)
+{
+    hash <- makeHash(feat, path, positive)
+    cachefg <- loadCacheData("featureGroupsEnviMass", hash)
+    if (!is.null(cachefg))
+        return(cachefg)
+
+    cat("Importing enviMass feature groups (profiles)...\n")
+
+    anaInfo <- analysisInfo(feat)
+    fTable <- featureTable(feat)
+    path <- file.path(path, "results")
+
+    profPeaks <- as.data.table(loadRData(file.path(path, sprintf("profpeaks_%s", if (positive) "pos" else "neg"))))
+    setorder(profPeaks, profileID)
+    gInfo <- data.frame(mzs = profPeaks$`mean_m/z`, rts = profPeaks$mean_RT)
+    rownames(gInfo) <- makeFGroupName(seq_len(nrow(gInfo)), gInfo$rts, gInfo$mzs)
+
+    profList <- loadRData(file.path(path, sprintf("profileList_%s", if (positive) "pos" else "neg")))
+    peaks <- as.data.table(profList$peaks)
+
+    groups <- as.data.table(matrix(0, nrow(anaInfo), nrow(gInfo)))
+    setnames(groups, rownames(gInfo))
+    ftind <- copy(groups)
+
+    gcount <- ncol(groups)
+    prog <- txtProgressBar(0, gcount, style = 3)
+
+    for (grpi in seq_along(groups))
+    {
+        p <- peaks[profileIDs == grpi]
+        sids <- match(as.character(p$sampleIDs), anaInfo$analysis)
+
+        set(groups, sids, grpi, p$intensity)
+
+        for (si in sids)
+            set(ftind, si, grpi, match(p[sampleIDs == as.numeric(anaInfo$analysis[si]), peakIDs],
+                                       fTable[[anaInfo$analysis[si]]]$ID))
+
+        setTxtProgressBar(prog, grpi)
+    }
+
+    setTxtProgressBar(prog, gcount)
+    close(prog)
+
+    ret <- featureGroupsEnviMass(groups = groups, groupInfo = gInfo, analysisInfo = anaInfo, features = feat, ftindex = ftind)
+
+    saveCacheData("featureGroupsEnviMass", ret, hash)
+
+    cat("Done!\n")
+
+    return(ret)
+}
+
+

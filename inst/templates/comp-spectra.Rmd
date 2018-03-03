@@ -1,0 +1,14 @@
+## {{ .specClass .comp_spectra-{ grp } }}
+
+### scoring {{ data-width=220 .specClass .comp_spectra-{ grp } }}
+
+![]({ plotPath }/compscore_{ grpi }_{ compi }.png)
+
+### Compound { compi } {{ .specClass .comp_spectra-{ grp } }}
+
+![]({ plotPath }/compspec_{ grpi }_{ compi }.png)
+
+### Info {{ data-width=220 .specClass .comp_spectra-{ grp } }}
+
+<div style="max-width: 300px; max-height: 432px; border: 1px solid black; border-style: dotted; margin: 1px; padding: 1px; overflow: auto; white-space: nowrap; }">{ cil }</div>
+

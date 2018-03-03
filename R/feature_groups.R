@@ -1,0 +1,985 @@
+#' @include main.R
+#' @include features.R
+NULL
+
+#' Base class for grouped features.
+#'
+#' This class holds all the information for grouped features.
+#'
+#' The \code{featureGroup} class is the workhorse of \pkg{patRoon}: almost all
+#' functionality operate on its instantiated objects. The class holds all
+#' information from grouped features (obtained from \code{\link{features}}).
+#' This class itself is \code{virtual}, hence, objects are not created directly
+#' from it. Instead, 'feature groupers' such as \code{\link{groupFeaturesXCMS}}
+#' and return a \code{featureGroups} derived object after performing the actual
+#' grouping of features across analyses.
+#'
+#' @param fGroups,obj,x,object \code{featureGroups} object to be accessed.
+#' @param retMin Plot retention time in minutes (instead of seconds).
+#' @param \dots Ignored for \code{"["} operator or passed to
+#'   \code{\link[graphics]{plot}} (\code{plot}, \code{plotInt} and
+#'   \code{plotEIC}), \pkg{\link{VennDiagram}} plotting functions
+#'   (\code{plotVenn}) or \code{\link{chordDiagram}} (\code{plotChord}).
+#' @param average Average data within replicate groups.
+#' @param which A character vector with replicate groups used for comparison.
+#'
+#' @slot groups Matrix (\code{\link{data.table}}) with intensities for each
+#'   feature group (columns) per analysis (rows). Access with \code{groups}
+#'   method.
+#' @slot analysisInfo,features \link[=analysis-information]{Analysis info} and
+#'   \code{\link{features}} class associated with this object. Access with
+#'   \code{analysisInfo} and \code{featureTable} methods, respectively.
+#' @slot groupInfo \code{data.frame} with retention time (\code{rts} column, in
+#'   seconds) and \emph{m/z} (\code{mzs} column) for each feature group. Access
+#'   with \code{groupInfo} method.
+#' @slot ftindex Matrix (\code{\link{data.table}}) with feature indices for each
+#'   feature group (columns) per analysis (rows). Each index corresponds to the
+#'   row within the feature table of the analysis (see
+#'   \code{\link{featureTable}}).
+#'
+#' @export
+featureGroups <- setClass("featureGroups",
+                          slots = c(groups = "data.table", analysisInfo = "data.frame", groupInfo = "data.frame",
+                                    features = "features", ftindex = "data.table"),
+                          prototype = list(groups = data.table(), analysisInfo = data.frame(), groupInfo = data.frame(),
+                                           ftindex = data.table()),
+                          contains = "VIRTUAL")
+
+#' @describeIn featureGroups Obtain feature group names.
+#' @export
+setMethod("names", "featureGroups", function(x) names(x@groups))
+
+#' @describeIn featureGroups Obtain number of feature groups.
+#' @export
+setMethod("length", "featureGroups", function(x) ncol(x@groups))
+
+#' @describeIn featureGroups Shows summary information for this object.
+#' @export
+setMethod("show", "featureGroups", function(object)
+{
+    anaInfo <- analysisInfo(object)
+    printf("A feature groups object ('%s')\n", class(object))
+    printf("Feature groups: %s (%d total)\n", getStrListWithMax(names(object), 6, ", "), ncol(groups(object)))
+    showAnaInfo(analysisInfo(object))
+    showObjectSize(object)
+})
+
+# NOTE: this method is defined for XCMS generic
+#' @describeIn featureGroups Accessor for \code{groups} slot.
+#' @export
+setMethod("groups", "featureGroups", function(object) object@groups)
+
+#' @describeIn featureGroups Obtain analysisInfo (see analysisInfo slot in \code{\link{features}}).
+#' @export
+setMethod("analysisInfo", "featureGroups", function(obj) obj@analysisInfo)
+
+#' @describeIn featureGroups Accessor for \code{groupInfo} slot.
+#' @aliases groupInfo
+#' @export
+setMethod("groupInfo", "featureGroups", function(fGroups) fGroups@groupInfo)
+
+#' @describeIn featureGroups Obtain feature information (see \code{\link{features}}).
+#' @export
+setMethod("featureTable", "featureGroups", function(obj) featureTable(obj@features))
+
+#' @describeIn featureGroups Accessor for \code{features} slot.
+#' @aliases getFeatures
+#' @export
+setMethod("getFeatures", "featureGroups", function(fGroups) fGroups@features)
+
+#' @describeIn featureGroups Accessor for \code{ftindex} slot.
+#' @aliases groupFeatIndex
+#' @export
+setMethod("groupFeatIndex", "featureGroups", function(fGroups) fGroups@ftindex)
+
+setMethod("removeAnalyses", "featureGroups", function(fGroups, indices)
+{
+    if (length(indices) > 0)
+    {
+        fGroups@groups <- fGroups@groups[-indices]
+        fGroups@ftindex <- fGroups@ftindex[-indices]
+        fGroups@analysisInfo <- fGroups@analysisInfo[-indices, ]
+    }
+    return(fGroups)
+})
+
+setMethod("removeGroups", "featureGroups", function(fGroups, indices)
+{
+    if (length(indices) > 0)
+    {
+        fGroups@groups <- fGroups@groups[, -indices, with=F]
+        fGroups@ftindex <- fGroups@ftindex[, -indices, with=F]
+        fGroups@groupInfo <- fGroups@groupInfo[-indices, ]
+    }
+    return(fGroups)
+})
+
+#' @describeIn featureGroups Operator to subset on analyses and/or feature
+#'   groups.
+#'
+#' @param i Either a numeric, character or logical \code{vector} that is used to
+#'   select analyses by their index, name (for index order/names see
+#'   \code{analysisInfo()}) and logical selection, respectively. If missing all
+#'   analyses are selected.
+#' @param j Either a numeric, character or logical \code{vector} that is used to
+#'   select feature groups by their index, name (for index order/names use
+#'   \code{groupInfo}) and logical selection, respectively. If missing all
+#'   feature groups are selected.
+#' @param drop Remove feature groups that are not present anymore in any of the
+#'   analyses after subsetting.
+#'
+#' @export
+setMethod("[", c("featureGroups", "ANY", "ANY", "ANY"), function(x, i, j, ..., drop = TRUE)
+{
+    toNumIndex <- function(ind, names)
+    {
+        if (typeof(ind) == "character")
+            return(match(ind, names))
+        if (typeof(ind) == "logical")
+            return(which(ind))
+        return(ind)
+    }
+
+    if (!missing(i))
+        x <- removeAnalyses(x, setdiff(seq_len(nrow(x@analysisInfo)), toNumIndex(i, x@analysisInfo$analysis)))
+
+    if (!missing(j))
+        x <- removeGroups(x, setdiff(seq_len(ncol(x@groups)), toNumIndex(j, colnames(x@groups))))
+
+    if (drop)
+        x <- removeEmptyGroups(x)
+
+    return(x)
+})
+
+
+setMethod("removeEmptyGroups", "featureGroups", function(fGroups)
+{
+    if (length(fGroups) > 0)
+    {
+        empty <- unlist(fGroups@groups[, lapply(.SD, function(x) sum(x) == 0)])
+
+        if (any(empty))
+            fGroups <- removeGroups(fGroups, which(empty))
+    }
+    return(fGroups)
+})
+
+setMethod("averageGroups", "featureGroups", function(fGroups)
+{
+    gTable <- copy(groups(fGroups))
+    if (nrow(gTable) == 0)
+        return()
+
+    gNames <- colnames(groups(fGroups))
+    anaInfo <- analysisInfo(fGroups)
+
+    gTable[, sgroup := anaInfo$group]
+
+    gTable[, (gNames) := lapply(.SD, function(v) { if (any(v > 0)) mean(v[v>0]) else 0 }), by = sgroup, .SDcols = gNames]
+    gTable <- unique(gTable, by = "sgroup")
+    gTable[, sgroup := NULL]
+
+    return(gTable)
+})
+
+setMethod("updateFeatIndex", "featureGroups", function(fGroups)
+{
+    # remove feature indices from feature groups that were removed later (e.g. filtered out)
+
+    gTable <- groups(fGroups)
+    fGroups@ftindex <- copy(groupFeatIndex(fGroups))
+    for (i in seq_along(gTable))
+        set(fGroups@ftindex, which(gTable[[i]] == 0), i, 0)
+    return(fGroups)
+})
+
+#' @describeIn featureGroups Exports feature groups to a \file{.csv} file that
+#'   is readable to Bruker ProfileAnalysis (a 'bucket table'), Bruker TASQ (an
+#'   analyte database) or that is suitable as input for the \verb{Targeted peak
+#'   detection} functionality of \href{http://mzmine.github.io/}{MZmine}.
+#' @param type Which file type should be exported: \code{"brukerpa"} (Bruker
+#'   ProfileAnalysis), \code{"brukertasq"} (Bruker TASQ) or \code{"mzmine"}
+#'   (MZMine).
+#' @param out The destination file for the exported data.
+#' @aliases export
+#' @export
+setMethod("export", "featureGroups", function(fGroups, type, out)
+{
+    if (type == "brukerpa")
+    {
+        # UNDONE: do we need this?
+        #files <- sapply(bucketInfo$fInfo$analysis, function(f) file.path(bucketInfo$dataPath, paste0(f, ".d")), USE.NAMES = F)
+        files <- fGroups@analysisInfo$analysis
+
+        # col.names: if NA an empty initial column is added
+        write.table(fGroups@groups, out, na="", sep="\t", quote=F, row.names = files, col.names = NA)
+    }
+    else if (type == "brukertasq")
+    {
+        hdr <- c("name", "formula", "m/z", "rt", "rn", "CAS", "Qual1", "Qual2", "Qual3", "Qual4",
+                 "Qual5", "Qual6", "quantifier ion 1 low", "quantifier ion 1 up",
+                 "quantifier ion 1 formula", "quantifier ion 2 low", "quantifier ion 2 up",
+                 "quantifier ion 2 formula", "quantifier ion 3 low", "quantifier ion 3 up",
+                 "quantifier ion 3 formula", "precursor ion MS2", "precursor ion MS2 formula",
+                 "precursor ion MS3", "precursor ion MS3 formula", "precursor ion MS4",
+                 "precursor ion MS4 formula")
+
+        df <- data.frame(matrix(ncol=length(hdr), nrow=ncol(fGroups@groups)))
+        colnames(df) <- hdr
+
+        df["name"] <- colnames(fGroups@groups)
+        df["m/z"] <- fGroups@groupInfo$mzs
+        df["rt"] <- fGroups@groupInfo$rts / 60
+
+        write.csv(df, out, row.names = FALSE, na = "")
+    }
+    else if (type == "mzmine")
+    {
+        df <- fGroups@groupInfo
+        df$name <- rownames(df)
+        df <- df[, c("mzs", "rts", "name")]
+        df$rts <- df$rts / 60
+        write.table(df, out, row.names = FALSE, col.names = FALSE, sep = ",", quote = FALSE)
+    }
+    else
+        stop("Invalid export type! Should be: brukerpa, brukertasq or mzmine")
+})
+
+#' @describeIn featureGroups Obtain summary table (a \code{\link{data.table}})
+#'   with retention, \emph{m/z} and intensity information.
+#' @aliases groupTable
+#' @export
+setMethod("groupTable", "featureGroups", function(fGroups, average)
+{
+    # UNDONE: Add formulas/idents?
+    anaInfo <- analysisInfo(fGroups)
+
+    if (average)
+    {
+        gTable <- averageGroups(fGroups)
+        snames <- unique(anaInfo$group)
+    }
+    else
+    {
+        gTable <- groups(fGroups)
+        snames <- anaInfo$analysis
+    }
+
+    ret <- transpose(gTable)
+    setnames(ret, snames)
+
+    gInfo <- groupInfo(fGroups)
+    ret <- insertDTColumn(ret, "mz", gInfo$mzs, 1)
+    ret <- insertDTColumn(ret, "ret", gInfo$rts, 1)
+    ret <- insertDTColumn(ret, "group", rownames(gInfo), 1)
+
+    return(ret)
+})
+
+#' @describeIn featureGroups Generates an \emph{m/z} \emph{vs} retention time plot
+#'   for all featue groups.
+#' @export
+setMethod("plot", "featureGroups", function(x, retMin = TRUE, ...)
+{
+    plot(if (retMin) x@groupInfo$rts / 60 else x@groupInfo$rts, x@groupInfo$mzs,
+         xlab = if (retMin) "retention (min)" else "retention (s)",
+         ylab = "m/z", ...)
+})
+
+#' @describeIn featureGroups Generates a line plot for the (averaged) intensity
+#'   of feature groups within all analyses
+#' @export
+setMethod("plotInt", "featureGroups", function(obj, average = FALSE, ...)
+{
+    anaInfo <- analysisInfo(obj)
+
+    if (average)
+    {
+        gTable <- averageGroups(obj)
+        snames <- unique(anaInfo$group)
+    }
+    else
+    {
+        gTable <- groups(obj)
+        snames <- anaInfo$analysis
+    }
+
+    nsamp <- length(snames)
+
+    plot(x = c(0, nsamp), y = c(0, max(gTable)), type = "n", xlab = "", ylab = "intensity", xaxt = "n", ...)
+    axis(1, seq_len(nsamp), snames, las = 2)
+
+    px <- seq_len(nsamp)
+    for (i in seq_along(gTable))
+        lines(x = px, y = gTable[[i]])
+})
+
+#' @describeIn featureGroups Generates a chord diagram which can be used to
+#'   visualize shared presence of feature groups between analyses or replicate
+#'   groups. In addition, analyses/replicates sharing similar properties
+#'   (\emph{e.g.} location, age, type) may be grouped to enhance visualization
+#'   between these 'outer groups'.
+#'
+#' @param outerGroups Character vector of names to be used as outer groups. The
+#'   values in the specified vector should be named by analysis names
+#'   (\code{average} set to \code{FALSE}) or replicate group names
+#'   (\code{average} set to \code{TRUE}), for instance: \code{c(analysis1 =
+#'   "group1", analysis2 = "group1", analysis3 = "group2")}. Set to \code{NULL}
+#'   to disable outer groups.
+#' @param addIntraOuterGroupLinks If \code{TRUE} then links will be added within
+#'   outer groups.
+#'
+#' @template plotChord-args
+#'
+#' @references \addCitations{circlize}{1}
+#'
+#' @export
+setMethod("plotChord", "featureGroups", function(obj, addSelfLinks = FALSE, addRetMzPlots = TRUE, average = FALSE,
+                                                 outerGroups = NULL, addIntraOuterGroupLinks = FALSE, ...)
+{
+    if (!is.null(outerGroups) && (is.null(names(outerGroups)) || length(outerGroups) < 2))
+        stop("outerGroups need to be a named vector with length >= 2")
+    hasOuter <- !is.null(outerGroups)
+
+    anaInfo <- analysisInfo(obj)
+    gInfo <- groupInfo(obj)
+
+    if (average)
+        snames <- unique(anaInfo$group)
+    else
+        snames <- anaInfo$analysis
+
+    if (length(snames) < 2)
+        stop(sprintf("Nothing to compare: need multiple %s!", if (average) "replicate groups" else "analyses"))
+
+    if (hasOuter && !all(snames %in% names(outerGroups)))
+        stop(sprintf("The following %s have no outerGroups assigned: %s", if (average) "replicate groups" else "analyses",
+             paste0(setdiff(snames, names(outerGroups)), collapse = ", ")))
+
+    nsamp <- length(snames)
+
+    chordTable <- rbindlist(lapply(seq_along(snames),
+                                   function(sni) data.table(from = snames[sni], to = snames[seq(sni, length(snames))])))
+
+    getGTable <- function(snlist = c())
+    {
+        if (average)
+        {
+            if (length(snlist) > 0)
+                fgf <- replicateGroupFilter(obj, snlist, verbose = FALSE)
+            else
+                fgf <- obj
+            if (length(fgf) == 0)
+                return(data.table())
+            return(averageGroups(fgf))
+        }
+        else
+        {
+            if (length(snlist) > 0)
+                return(groups(obj[snlist]))
+            return(groups(obj))
+        }
+    }
+
+    getLinkScore <- function(sn1, sn2)
+    {
+        if (sn1 == sn2)
+            return(0)
+
+        gTable <- getGTable(c(sn1, sn2))
+        if (nrow(gTable) == 0)
+            return(0)
+
+        # Count all feature groups that are present in both samples/groups
+        return(sum(gTable[, sapply(.SD, function(rows) all(rows > 0))]))
+    }
+
+    chordTable[, value := as.integer(Vectorize(getLinkScore)(from, to))]
+
+    if (addSelfLinks)
+    {
+        gt <- getGTable()
+        uniqueLinkCount <- sapply(seq_along(snames),
+                                  function(sni) sum(sapply(gt, function(ints) ints[sni] > 0 && all(ints[-sni] == 0))))
+        chordTable[from == to, value := uniqueLinkCount[.GRP], by = from]
+    }
+
+    if (hasOuter)
+    {
+        chordTable[, groupFrom := outerGroups[from]]
+        chordTable[, groupTo := outerGroups[to]]
+        if (!addIntraOuterGroupLinks)
+            chordTable[groupFrom == groupTo & from != to, value := 0] # clear links within same groups (except self links)
+        setorder(chordTable, groupFrom)
+
+        remainingSN <- unique(unlist(chordTable[value != 0, .(from, to)])) # assigned samples, others will be removed
+        og <- outerGroups[remainingSN] # outer groups assigned to each remaining sample
+        gaps <- rep(1, length(og)) # initialize gaps
+        gaps[cumsum(sapply(unique(og), function(x) length(og[og == x])))] <- 8 # make gap bigger after each outer group
+        circos.par(gap.after = gaps)
+    }
+
+    tracks <- NULL
+    if (hasOuter)
+        tracks <- list(list(track.height = 0.06, track.margin = c(if (addRetMzPlots) 0.02 else 0.03, 0)))
+    if (addRetMzPlots)
+        tracks = c(tracks, list(list(track.height = 0.06, track.margin = c(0.04, 0))))
+
+    maxv <- max(if (hasOuter) chordTable[groupFrom != groupTo, value] else chordTable$value)
+    colFunc <- colorRamp2(maxv * seq(0, 1, 0.25),
+                          c("blue4", "deepskyblue1", "green", "orange", "red"),
+                          transparency = 0.5)
+
+    if (hasOuter && addIntraOuterGroupLinks)
+    {
+        colFuncWithin <- colorRamp2(range(chordTable[groupFrom == groupTo, value]),
+                                    c("grey80", "grey60"), transparency = 0.7)
+        linkColors <- chordTable[, ifelse(groupFrom == groupTo, colFuncWithin(value), colFunc(value))]
+    }
+    else
+        linkColors <- chordTable[, colFunc(value)]
+
+    cdf <- chordDiagram(chordTable, annotationTrack = c("grid", "axis"),
+                        preAllocateTracks = tracks,
+                        grid.col = getBrewerPal(nsamp, "Dark2"),
+                        col = linkColors,
+                        annotationTrackHeight = c(0.06, 0.05),
+                        ...)
+
+    circos.track(track.index = length(tracks) + 1, panel.fun = function(x, y)
+    {
+        sector.index <- get.cell.meta.data("sector.index")
+        xlim <- get.cell.meta.data("xlim")
+        ylim <- get.cell.meta.data("ylim")
+        circos.text(mean(xlim), mean(ylim), sector.index, col = "white", cex = 0.6, niceFacing = TRUE)
+    }, bg.border = NA)
+
+    if (addRetMzPlots)
+    {
+        retMz <- rbindlist(sapply(unique(cdf$rn), function(sn)
+        {
+            ftgrps <- colnames(getGTable(sn))
+            return(gInfo[ftgrps, ])
+        }, simplify = FALSE), idcol = "sname")
+        retMz$rts <- retMz$rts / max(retMz$rts) # normalize
+
+        circos.track(fa = retMz$sname, x = retMz$rts, y = retMz$mzs, ylim = c(0, max(retMz$mzs)), track.index = length(tracks),
+                     panel.fun = function(x, y)
+                     {
+                         x <- x / (max(x) / get.cell.meta.data("xrange"))
+                         circos.points(x, y, cex = 0.5, col = "blue", pch = 16)
+                     })
+    }
+
+    if (hasOuter)
+    {
+        finalChordTable <- chordTable[from %in% cdf$rn]
+        finalOuterGroups <- unique(finalChordTable$groupFrom)
+
+        ogcol <- getBrewerPal(length(finalOuterGroups), "Paired")
+        for (ogi in seq_along(finalOuterGroups))
+            highlight.sector(unique(finalChordTable[groupFrom == finalOuterGroups[ogi], from]), track.index = 1, col = ogcol[ogi],
+                             text = finalOuterGroups[ogi], cex = 0.8, text.col = "white", niceFacing = TRUE)
+    }
+
+    circos.clear()
+})
+
+#' @describeIn featureGroups Plots extracted ion chromatograms (EICs) of feature
+#'   groups. This function uses the \pkg{xcms} package for loading EIC
+#'   data.
+#'
+#' @param rtWindow Retention time (in seconds) that will be subtracted/added to
+#'   respectively the minimum and maximum retention time of the plotted feature
+#'   groups. Thus, setting this value to a positive value will 'zoom out' on the
+#'   retention time axis.
+#' @param mzWindow The \emph{m/z} value (in Da) which will be subtracted/added
+#'   to a feature group \emph{m/z} value to determine the width of its EIC.
+#' @param topMost Only plot EICs from features within this number of top most
+#'   intense analyses. If \code{NULL} then all analyses are used for plotted.
+#' @param EICs Internal parameter for now and should be kept at \code{NULL}
+#'   (default).
+#' @param showPeakArea Set to \code{TRUE} to display integrated chromatographic
+#'   peak ranges by filling (shading) their areas.
+#' @param showFGroupRect Set to \code{TRUE} to mark the full retention/intensity
+#'   range of all features within a feature group by drawing a rectangle around
+#'   it.
+#' @param title Character string used for title of the plot. If \code{NULL} a
+#'   title will be automatically generated.
+#' @param colourBy How to colour different extracted ion chromatograms within
+#'   the plot: \code{"none"} for a single colour or
+#'   \code{"rGroups"}/\code{"fGroups"} for a distinct colour per
+#'   replicate/feature group.
+#' @param showLegend If \code{TRUE} a legend will be shown with either replicate
+#'   groups (\code{colourBy} == \code{"rGroups"}) or feature groups
+#'   (\code{colourBy} == \code{"fGroups"}). If \code{colourBy} is \code{"none"}
+#'   no legend will be shown.
+#' @param onlyPresent If \code{TRUE} then EICs will only be generated for
+#'   analyses in which a particular feature group was detected. Disabling this
+#'   option might be useful to see if any features were 'missed'.
+#' @param annotate If set to \code{"ret"} and/or \code{"mz"} then retention
+#'   and/or \emph{m/z} values will be drawn for each plotted feature group.
+#' @param showProgress if set to \code{TRUE} then a text progressbar will be
+#'   displayed when all EICs are being plot. Set to \code{"none"} to disable any
+#'   annotation.
+#'
+#' @export
+setMethod("plotEIC", "featureGroups", function(obj, rtWindow = 30, mzWindow = 0.005, retMin = FALSE, topMost = NULL,
+                                               EICs = NULL, showPeakArea = FALSE, showFGroupRect = TRUE,
+                                               title = NULL, colourBy = c("none", "rGroups", "fGroups"),
+                                               showLegend = TRUE, onlyPresent = TRUE,
+                                               annotate = c("none", "ret", "mz"), showProgress = FALSE, ...)
+{
+    colourBy <- match.arg(colourBy, c("none", "rGroups", "fGroups"))
+    annotate = match.arg(annotate, c("none", "ret", "mz"), several.ok = TRUE)
+
+    if (showLegend && colourBy == "none")
+        showLegend <- FALSE
+
+    fTable <- featureTable(obj)
+    gTable <- groups(obj)
+    gInfo <- groupInfo(obj)
+    gCount <- nrow(gInfo)
+    gNames <- names(obj)
+    anaInfo <- analysisInfo(obj)
+    ftind <- groupFeatIndex(obj)
+
+    rGroups <- unique(anaInfo$group)
+
+    if (is.null(EICs))
+        EICs <- loadXCMSEICForFGroups(obj, rtWindow, mzWindow, topMost, onlyPresent)
+
+    if (colourBy == "rGroups")
+    {
+        EICColors <- colorRampPalette(brewer.pal(12, "Paired"))(length(rGroups))
+        names(EICColors) <- rGroups
+    }
+    else if (colourBy == "fGroups")
+    {
+        EICColors <- colorRampPalette(brewer.pal(12, "Paired"))(gCount)
+        names(EICColors) <- gNames
+    }
+    else
+        EICColors <- "blue"
+
+    fillColors <- adjustcolor(EICColors, alpha.f = 0.35)
+    names(fillColors) <- names(EICColors)
+
+    # get overall retention/intensity limits
+    plotLimits <- list(rtRange = c(0, 0), maxInt = 0)
+
+    for (grpi in seq_len(gCount))
+    {
+        rtrs <- unlist(sapply(seq_len(nrow(anaInfo)), function(anai)
+        {
+            ana <- anaInfo$analysis[anai]
+            fti <- ftind[[grpi]][anai]
+            if (fti == 0)
+                return(NA)
+            return(unlist(fTable[[ana]][fti, .(retmin, retmax)]))
+        }))
+
+        if (any(!is.na(rtrs)))
+        {
+            rtmin <- min(rtrs, na.rm = TRUE)
+            rtmax <- max(rtrs, na.rm = TRUE)
+            if (plotLimits$rtRange[1] == 0 || plotLimits$rtRange[1] > rtmin)
+                plotLimits$rtRange[1] <- rtmin
+            if (plotLimits$rtRange[2] < rtmax)
+                plotLimits$rtRange[2] <- rtmax
+        }
+
+        plotLimits$maxInt <- max(plotLimits$maxInt, max(gTable[[grpi]]))
+    }
+
+    plotLimits$rtRange <- plotLimits$rtRange + c(-rtWindow, rtWindow)
+    if (retMin)
+        plotLimits$rtRange <- plotLimits$rtRange / 60
+
+    if (is.null(title))
+    {
+        if (gCount == 1)
+            title <- sprintf("Group '%s' - rt: %.1f - m/z: %.4f", names(gTable)[1], gInfo[1, "rts"],
+                             gInfo[1, "mzs"])
+        else
+            title <- sprintf("%d feature groups", gCount)
+    }
+
+    anaIndsToPlot <- sapply(gNames, function(grp)
+    {
+        ret <- match(names(EICs[[grp]]), anaInfo$analysis)
+        if (onlyPresent)
+            ret <- ret[gTable[[grp]][ret] != 0]
+        return(ret)
+    }, simplify = FALSE)
+
+    rGroupsInPlot <- unique(anaInfo$group[unlist(anaIndsToPlot)])
+    fGroupsInPlot <- gNames[gNames %in% names(EICs)]
+
+    oldp <- par(no.readonly = TRUE)
+    if (showLegend)
+    {
+        makeLegend <- function(x, y, ...)
+        {
+            texts <- if (colourBy == "rGroups") rGroupsInPlot else fGroupsInPlot
+            return(legend(x, y, texts, col = EICColors[texts],
+                          text.col = EICColors[texts], lty = 1,
+                          xpd = NA, ncol = 1, cex = 0.75, bty = "n", ...))
+        }
+
+        plot.new()
+        leg <- makeLegend(0, 0, plot = FALSE)
+        lw <- (grconvertX(leg$rect$w, to = "ndc") - grconvertX(0, to = "ndc"))
+        par(omd = c(0, 1 - lw, 0, 1), new = TRUE)
+    }
+
+    ymax <- plotLimits$maxInt * 1.1
+    plot(0, type = "n", main = title, xlab = sprintf("Retention time (%s)", if (retMin) "Minutes" else "Seconds"), ylab = "Intensity",
+         xlim = plotLimits$rtRange, ylim = c(0, ymax), ...)
+
+    if (showProgress)
+        prog <- txtProgressBar(0, gCount, style = 3)
+
+    for (grp in fGroupsInPlot)
+    {
+        grpi <- match(grp, fGroupsInPlot)
+
+        fts <- rbindlist(sapply(anaInfo$analysis, function(ana)
+        {
+            fti <- ftind[[grpi]][match(ana, anaInfo$analysis)]
+            if (fti == 0)
+                return(data.table(ret = NA, retmin = NA, retmax = NA, mz = NA))
+            return(fTable[[ana]][fti])
+        }, simplify = F), fill = TRUE)
+
+        rtRange <- c(min(fts[anaIndsToPlot[[grp]], retmin], na.rm = TRUE), max(fts[anaIndsToPlot[[grp]], retmax], na.rm = TRUE))
+        # rtEICRange <- rtRange + c(-rtWindow, rtWindow)
+
+        if (retMin)
+            rtRange <- rtRange / 60
+
+        for (ana in names(EICs[[grp]]))
+        {
+            anai <- match(ana, anaInfo$analysis)
+            if (is.na(anai))
+                next
+
+            if (onlyPresent && gTable[[grp]][anai] == 0)
+                next
+
+            EIC <- EICs[[grp]][[ana]]
+            # EIC <- EIC[EIC$time >= rtEICRange[1] & EIC$time <= rtEICRange[2], ]
+
+            if (colourBy == "rGroups")
+                colInd <- anaInfo$group[anai]
+            else if (colourBy == "fGroups")
+                colInd <- grp
+            else
+                colInd <- 1
+
+            points(if (retMin) EIC$time / 60 else EIC$time, EIC$intensity, type = "l", col = EICColors[colInd])
+
+            if (showPeakArea && !is.na(fts[["mz"]][anai]))
+            {
+                EICFill <- EIC[EIC$time >= fts[anai, retmin] & EIC$time <= fts[anai, retmax], ]
+                if (retMin)
+                    EICFill$time <- EICFill$time / 60
+                polygon(c(EICFill$time, rev(EICFill$time)), c(EICFill$intensity, rep(0, length(EICFill$intensity))),
+                        col = fillColors[colInd], border = NA)
+            }
+        }
+
+        if (showFGroupRect || !"none" %in% annotate)
+        {
+            mzRange <- gInfo[grpi, "mzs"] + c(-mzWindow, mzWindow)
+            intRange <- c(0, max(fts[anaIndsToPlot[[grp]], intensity], na.rm = TRUE))
+
+            if (showFGroupRect)
+                rect(rtRange[1], intRange[1], rtRange[2], intRange[2], border = "red", lty = "dotted")
+
+            if (!"none" %in% annotate)
+            {
+                antxt <- character()
+                rt <- mean(fts[anaIndsToPlot[[grp]], ret], na.rm = TRUE)
+                if (retMin)
+                    rt <- rt / 60
+
+                if ("ret" %in% annotate)
+                    antxt <- sprintf("%.1f", rt)
+                if ("mz" %in% annotate)
+                    antxt <- paste(antxt, sprintf("%.4f", gInfo[grp, "mzs"]), sep = "\n")
+
+                if (nzchar(antxt))
+                    text(rt, intRange[2] + ymax * 0.02, antxt)
+            }
+        }
+
+        if (showProgress)
+            setTxtProgressBar(prog, grpi)
+    }
+
+    if (showLegend)
+        makeLegend(par("usr")[2], par("usr")[4])
+
+    if (showProgress)
+    {
+        setTxtProgressBar(prog, gCount)
+        close(prog)
+    }
+
+    par(oldp)
+})
+
+#' @describeIn featureGroups plots a Venn diagram (using
+#'   \pkg{\link{VennDiagram}}) outlining unique and shared feature groups
+#'   between up to five replicate groups.
+#' @template plotvenn-ret
+#' @export
+setMethod("plotVenn", "featureGroups", function(obj, which, ...)
+{
+    if (is.null(which))
+        which <- unique(analysisInfo(obj)$group)
+
+    nwhich <- length(which)
+    if (nwhich > 5)
+        stop("Cannot draw more than five groups")
+
+    fill <- getBrewerPal(nwhich, "Paired")
+    vennArgs <- list(category = which, lty = rep("blank", nwhich), alpha = rep(0.5, nwhich),
+                     cex = 1.5, cat.cex = 1.5, fill = fill)
+    vennArgs <- modifyList(vennArgs, list(...))
+
+    # get list of feature groups per replicate group
+    fGroupsList <- lapply(which, function(w) replicateGroupFilter(obj, w, verbose = FALSE))
+    areas <- lengths(fGroupsList)
+    allFGNames <- lapply(fGroupsList, names)
+    getIntersectCounts <- function(inters) sapply(inters, function(i) length(Reduce(intersect, allFGNames[i])))
+
+    grid::grid.newpage() # need to clear plot region manually
+    # plot.new()
+
+    if (nwhich == 1)
+        gRet <- do.call(draw.single.venn, c(list(area = areas), vennArgs))
+    else if (nwhich == 2)
+    {
+        icounts <- getIntersectCounts(list(c(1, 2)))
+        gRet <- do.call(draw.pairwise.venn, c(areas, icounts,
+                                              list(rotation.degree = if (areas[1] < areas[2]) 180 else 0), vennArgs))
+    }
+    else if (nwhich == 3)
+    {
+        icounts <- getIntersectCounts(list(c(1, 2), c(2, 3), c(1, 3), c(1, 2, 3)))
+        gRet <- do.call(draw.triple.venn, c(areas, icounts, vennArgs))
+    }
+    else if (nwhich == 4)
+    {
+        icounts <- getIntersectCounts(list(c(1, 2), c(1, 3), c(1, 4), c(2, 3), c(2, 4), c(3, 4),
+                                           c(1, 2, 3), c(1, 2, 4), c(1, 3, 4), c(2, 3, 4), c(1, 2, 3, 4)))
+        gRet <- do.call(draw.quad.venn, c(areas, icounts, vennArgs))
+    }
+    else if (nwhich == 5)
+    {
+        icounts <- getIntersectCounts(list(c(1, 2), c(1, 3), c(1, 4), c(1, 5), c(2, 3), c(2, 4), c(2, 5), c(3, 4),
+                                           c(3, 5), c(4, 5), c(1, 2, 3), c(1, 2, 4), c(1, 2, 5), c(1, 3, 4), c(1, 3, 5),
+                                           c(1, 4, 5), c(2, 3, 4), c(2, 3, 5), c(2, 4, 5), c(3, 4, 5),
+                                           c(1, 2, 3, 4), c(1, 2, 3, 5), c(1, 2, 4, 5), c(1, 3, 4, 5), c(2, 3, 4, 5),
+                                           c(1, 2, 3, 4, 5)))
+        gRet <- do.call(draw.quintuple.venn, c(areas, icounts, vennArgs))
+    }
+
+    invisible(list(gList = gRet, areas = areas, intersectionCounts = icounts))
+})
+
+#' @describeIn featureGroups Obtain a subset with unique feature groups
+#'   present in one or more specified replicate group(s).
+#' @param relativeTo A character vector with replicate groups that should be
+#'   used for unique comparison. If \code{NULL} then all replicate groups are
+#'   used for comparison. Replicate groups specified in \code{which} are
+#'   ignored.
+#' @param outer If \code{TRUE} then only feature groups are kept which do not
+#'   overlap between the specified replicate groups for the \code{which}
+#'   parameter.
+#' @export
+setMethod("unique", "featureGroups", function(x, which, relativeTo = NULL, outer = FALSE)
+{
+    if (is.null(relativeTo))
+        relativeTo <- unique(analysisInfo(x)$group)
+    else
+    {
+        relativeTo <- union(which, relativeTo)
+        x <- replicateGroupFilter(x, relativeTo, verbose = FALSE)
+    }
+
+    anaInfo <- analysisInfo(x)
+    rGroups <- unique(anaInfo$group)
+
+    if (all(rGroups %in% which))
+        return(x) # nothing to do...
+
+    # Split by selected and other replicate groups
+    selFGroups <- replicateGroupFilter(x, which, verbose = FALSE)
+    otherFGroups <- replicateGroupFilter(x, setdiff(relativeTo, which), verbose = FALSE)
+
+    # pick out all feature groups NOT present in others
+    ret <- selFGroups[, setdiff(names(selFGroups), names(otherFGroups))]
+
+    if (outer)
+        ret <- interReplicateAbundanceFilter(ret, relThreshold = 1, negate = outer, verbose = FALSE)
+
+    return(ret)
+})
+
+#' @describeIn featureGroups Obtain a subset with feature groups that overlap
+#'   between a set of specified replicate group(s).
+#' @param exclusive If \code{TRUE} then all feature groups are removed that are
+#'   not unique to the given replicate groups.
+#' @aliases overlap
+#' @export
+setMethod("overlap", "featureGroups", function(fGroups, which, exclusive)
+{
+    anaInfo <- analysisInfo(fGroups)
+    rGroups <- unique(anaInfo$group)
+
+    if (length(which) < 2)
+        return(fGroups) # nothing to do...
+
+    if (exclusive)
+        ret <- unique(fGroups, which = which)
+    else
+        ret <- replicateGroupFilter(fGroups, which, verbose = FALSE)
+
+    ret <- interReplicateAbundanceFilter(ret, relThreshold = 1, verbose = FALSE)
+
+    return(ret)
+})
+
+#' @rdname target-screening
+#' @export
+setMethod("screenTargets", "featureGroups", function(obj, targets, rtWindow, mzWindow)
+{
+    gTable <- groups(obj)
+    gInfo <- groupInfo(obj)
+    anaInfo <- analysisInfo(obj)
+    hasConc <- "conc" %in% colnames(anaInfo)
+
+    targets$name <- as.character(targets$name) # in case factors are given
+
+    if (hasConc)
+    {
+        anaInfo$conc <- as.numeric(anaInfo$conc)
+        concs <- anaInfo$conc[!is.na(anaInfo$conc)]
+    }
+
+    retlist <- lapply(seq_len(nrow(targets)), function (ti)
+    {
+        hasRT <- !is.null(targets$rt) && !is.na(targets$rt[ti])
+
+        # find related feature group(s)
+        gi <- gInfo[(!hasRT | abs(gInfo$rts - targets$rt[ti]) <= rtWindow) & abs(gInfo$mzs - targets$mz[ti]) <= mzWindow, ]
+
+        if (nrow(gi) == 0) # no results? --> add NA result
+            return(data.table(name = targets$name[ti], rt = if (hasRT) targets$rt[ti] else NA, mz = targets$mz[ti],
+                              group = NA, exp_rt = NA, exp_mz = NA, d_rt = NA, d_mz = NA))
+
+        return(rbindlist(lapply(rownames(gi), function(g)
+        {
+            ret <- data.table(name = targets$name[ti], rt = if (hasRT) targets$rt[ti] else NA, mz = targets$mz[ti],
+                              group = g, exp_rt = gi[g, "rts"], exp_mz = gi[g, "mzs"],
+                              d_rt = if (hasRT) gi[g, "rts"] - targets$rt[ti] else NA, d_mz = gi[g, "mzs"] - targets$mz[ti])
+
+            if (hasConc && !all(is.na(anaInfo$conc)))
+            {
+                ints <- gTable[[g]][!is.na(anaInfo$conc)]
+                ret[, RSQ := summary(lm(concs ~ ints))$r.squared]
+            }
+
+            for (anai in seq_len(nrow(anaInfo)))
+                set(ret, 1L, anaInfo$analysis[anai], gTable[[g]][anai])
+
+            return(ret)
+        }), fill = TRUE))
+    })
+
+    ret <- rbindlist(retlist, fill = TRUE)
+    targetsn <- nrow(targets)
+    foundn <- targetsn - sum(is.na(ret$group))
+    printf("Found %d/%d targets (%.2f%%)\n", foundn, targetsn, foundn * 100 / targetsn)
+
+    return(ret)
+})
+
+#' @describeIn featureGroups Performs linear regression for all detected feature
+#'   groups within specified analyses. The analyses to be used (\emph{e.g.} a
+#'   set of standards) must have the \code{conc} column set in the
+#'   \link{analysis-information} that was used to generate the feature groups.
+#' @return A \code{data.frame} containing retention, \emph{m/z}, R squared,
+#'   intercepts and slopes for all feature groups.
+#' @aliases regression
+#' @export
+setMethod("regression", "featureGroups", function(fGroups)
+{
+    anaInfo <- analysisInfo(fGroups)
+    anaInfo$conc <- as.numeric(anaInfo$conc)
+    concs <- anaInfo$conc[!is.na(anaInfo$conc)]
+    ret <- groupInfo(fGroups) # UNDONE: use groupTable
+
+    regr <- lapply(groups(fGroups), function(grp)
+    {
+        ints <- grp[!is.na(anaInfo$conc)]
+        summary(lm(concs ~ ints))
+    })
+
+    ret$RSQ <- sapply(regr, "[[", "r.squared")
+    ret$intercept <- sapply(regr, function(r) r$coefficients[1, 1])
+    ret$slope <- sapply(regr, function(r) r$coefficients[2, 1])
+
+    return(ret)
+})
+
+#' @templateVar func groupFeatures
+#' @templateVar what group features
+#' @templateVar ex1 groupFeaturesOpenMS
+#' @templateVar ex2 groupFeaturesXCMS
+#' @templateVar algos openms,xcms
+#' @template generic-algo
+#'
+#' @rdname feature-grouping
+#' @aliases groupFeatures
+#' @export
+setMethod("groupFeatures", "features", function(feat, algorithm, ...)
+{
+    f <- switch(algorithm,
+                openms = groupFeaturesOpenMS,
+                xcms = groupFeaturesXCMS,
+                stop("Invalid algorithm! Should be: openms or xcms"))
+
+    f(feat, ...)
+})
+
+#' @details \code{importFeatureGroups} is a generic function to import feature
+#'   groups produced by other software. The actual functionality is provided by
+#'   specific functions such as \code{importFeatureGroupsBrukerPA} and
+#'   \code{importFeatureGroupsEnviMass}.
+#'
+#' @param path The path that should be used for importing. For
+#'   \code{importFeatureGroupsBrukerPA} an exported 'bucket table' \file{.txt}
+#'   file from Bruker ProfileAnalysis, for \code{importFeatureGroupsBrukerTASQ}
+#'   an exported global result table (converted to \file{.csv}) and for
+#'   \code{importFeatureGroupsEnviMass} the path of the enviMass project.
+#' @param type The type of data to be imported: \code{brukerpa} for Bruker
+#'   ProfileAnalysis, \code{brukertasq} for Bruker TASQ or \code{envimass} for
+#'   \pkg{enviMass}.
+#'
+#' @rdname feature-grouping
+#' @export
+importFeatureGroups <- function(path, type, ...)
+{
+    f <- switch(type,
+                brukerpa = importFeatureGroupsBrukerPA,
+                brukertasq = importFeatureGroupsBrukerTASQ,
+                envimass = importFeatureGroupsEnviMass,
+                stop("Invalid algorithm! Should be: brukerpa, brukertasq or envimass"))
+
+    f(path, ...)
+}

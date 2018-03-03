@@ -1,0 +1,144 @@
+## Script automatically generated on {{ date() }}
+
+library(patRoon)
+
+workPath <- "{{ destination }}"
+setwd(workPath)
+
+# Load analysis table
+anaInfo <- read.csv("{{ analysisTableFile }}", stringsAsFactors = FALSE, colClasses = "character")
+{{ optionalCodeBlock(dataPretreatmentOpts$DAMethod != "" || length(dataPretreatmentOpts$steps) > 0) }}
+
+# Set to FALSE to skip data pretreatment (e.g. calibration, export, ...)
+doDataPretreatment <- TRUE
+if (doDataPretreatment)
+{
+{{ endCodeBlock() }}
+    setDAMethod(anaInfo, "{{ dataPretreatmentOpts$DAMethod }}") {{ optionalLine(dataPretreatmentOpts$DAMethod != "") }}
+    recalibrarateDAFiles(anaInfo) {{ optionalLine("recalibrate" %in% dataPretreatmentOpts$steps) }}
+    exportDAFiles(anaInfo, format = "mzML") {{ optionalLine("expMzML" %in% dataPretreatmentOpts$steps) }}
+    exportDAFiles(anaInfo, format = "mzXML") {{ optionalLine("expMzXML" %in% dataPretreatmentOpts$steps) }}
+} {{ optionalLine(dataPretreatmentOpts$DAMethod != "" || length(dataPretreatmentOpts$steps) > 0) }}
+
+# Find all features.
+{{ optionalCodeBlock(featFinderOpts$algo == "OpenMS") }}
+# NOTE: see manual for many more options
+fList <- findFeatures(anaInfo, "openms")
+{{ endCodeBlock() }}
+{{ optionalCodeBlock(featFinderOpts$algo == "XCMS") }}
+# NOTE: see XCMS manual for many more options
+fList <- featureFinder(anaInfo, "xcms", method = "centWave")
+{{ endCodeBlock() }}
+{{ optionalCodeBlock(featFinderOpts$algo == "enviPick") }}
+# NOTE: see enviPickWrap manual for many more options
+fList <- featureFinder(anaInfo, "envipick")
+{{ endCodeBlock() }}
+{{ optionalCodeBlock(featFinderOpts$algo == "Bruker") }}
+fList <- featureFinder(anaInfo, "bruker", doFMF = "auto")
+{{ endCodeBlock() }}
+
+# Group and align features between analysis
+{{ optionalCodeBlock(featGrouperOpts$algo == "OpenMS") }}
+fGroups <- groupFeatures(fList, "openms")
+{{ endCodeBlock() }}
+{{ optionalCodeBlock(featGrouperOpts$algo == "XCMS") }}
+fGroups <- groupFeatures(fList, "xcms", rtalign = TRUE, retcorArgs = list(method = "obiwarp"))
+{{ endCodeBlock() }}
+
+# Basic rule based filtering
+fGroups <- filter(fGroups, intensityThreshold = {{ filterFGroupsOpts$intThr }}, intraRGroupAbundance = {{ filterFGroupsOpts$replThr }},
+                  minBlankThreshold = {{ filterFGroupsOpts$blankThr }}, repetitions = {{ filterFGroupsOpts$filterRepetitions }})
+{{ optionalCodeBlock(formulaOpts$algo != "" || identOpts$algo != "") }}
+
+# Retrieve MS peak lists
+{{ endCodeBlock() }}
+{{ optionalCodeBlock(doMSPeakFind && peakListOpts$algo == "mzR") }}
+# NOTE: please check all arguments, especially precursorMzWindow!
+plists <- generateMSPeakLists(fGroups, "mzr", avgMzWindow = 0.001, avgTopPeaks = 50,
+                              avgMinIntensity = 500,  precursorMzWindow = NULL)
+{{ endCodeBlock() }}
+{{ optionalCodeBlock(doMSPeakFind && peakListOpts$algo == "Bruker" && featFinderOpts$algo != "Bruker") }}
+plists <- generateMSPeakLists(fGroups, "bruker", bgsubtr = TRUE, MSMSType = "MSMS")
+{{ endCodeBlock() }}
+{{ optionalCodeBlock(doMSPeakFind && peakListOpts$algo == "Bruker" && featFinderOpts$algo == "Bruker") }}
+plists <- generateMSPeakLists(fGroups, "brukerfmf")
+{{ endCodeBlock() }}
+{{ optionalCodeBlock(doMSPeakFind) }}
+# uncomment and configure for extra filtering of MS peak lists
+# plists <- filter(plists, absMSIntThr = NULL, absMSMSIntThr = NULL, relMSIntThr = NULL,
+#                  relMSMSIntThr = NULL, topMSPeaks = NULL, topMSMSPeaks = NULL,
+#                  deIsotopeMS = FALSE, deIsotopeMSMS = FALSE)
+{{ endCodeBlock() }}
+{{ optionalCodeBlock(formulaOpts$algo != "") }}
+
+# Calculate all formulas
+{{ endCodeBlock() }}
+{{ optionalCodeBlock(formulaOpts$algo == "GenForm") }}
+forms <- generateFormulas(fGroups, "genform", plists, maxMzDev = 5,
+                          adduct = "{{ if (polarity == 'positive') 'M+H' else 'M-H' }}", elements = "CHNOP")
+{{ endCodeBlock() }}
+{{ optionalCodeBlock(formulaOpts$algo == "Bruker") }}
+forms <- generateFormulas(fGroups, "bruker", precursorMzSearchWindow = 0.002)
+{{ endCodeBlock() }}
+{{ optionalCodeBlock(formulaOpts$algo == "SIRIUS") }}
+forms <- generateFormulas(fGroups, "sirius", plists, maxMzDev = 5,
+                          adduct = "{{ if (polarity == 'positive') '[M+H]+' else '[M-H]-' }}", elements = "CHNOP",
+                          profile = "qtof")
+{{ endCodeBlock() }}
+{{ optionalCodeBlock(formulaOpts$algo != "") }}
+formulas <- consensus(forms, fGroups = fGroups, formAnaThreshold = 0.75,
+                      maxFormulas = 10, maxFragFormulas = 10)
+{{ endCodeBlock() }}
+{{ optionalCodeBlock(identOpts$algo != "") }}
+
+# Perform automatic compound identification
+{{ endCodeBlock() }}
+{{ optionalCodeBlock(identOpts$algo == "MetFrag") }}
+compounds <- generateCompounds(fGroups, plists, "metfrag", method = "CL", dbRelMzDev = 5,
+                               fragRelMzDev = 5, fragAbsMzDev = 0.002, isPositive = {{ if (polarity == "positive") "TRUE" else "FALSE" }},
+                               adduct = {{ if (polarity == "positive") 1 else -1 }}, database = "PubChem", maxCandidatesToStop = 2500)
+compounds <- addFormulaScoring(compounds, formulas, TRUE) {{ optionalLine(formulaOpts$algo != "") }}
+{{ endCodeBlock() }}
+{{ optionalCodeBlock(identOpts$algo == "SIRIUS") }}
+compounds <- generateCompounds(fGroups, plists, "sirius", maxMzDev = 5,
+                               adduct = "{{ if (polarity == 'positive') '[M+H]+' else '[M-H]-' }}", elements = "CHNOP", profile = "qtof",
+                               fingerIDDatabase = "pubchem")
+{{ endCodeBlock() }}
+{{ optionalCodeBlock(componentOpts$algo != "") }}
+
+# Perform automatic generation of components
+{{ endCodeBlock() }}
+{{ optionalCodeBlock(componentOpts$algo == "RAMClustR") }}
+components <- generateComponents(fGroups, "ramclustr", ionization = "{{ polarity }}")
+{{ endCodeBlock() }}
+{{ optionalCodeBlock(componentOpts$algo == "CAMERA") }}
+components <- generateComponents(fGroups, "camera", ionization = "{{ polarity }}")
+{{ endCodeBlock() }}
+{{ optionalCodeBlock(componentOpts$algo == "nontarget") }}
+components <- generateComponents(fGroups, "nontarget", ionization = "{{ polarity }}", rtRange = c(-120, 120),
+                                 mzRange = c(5, 120), elements = c("C", "H", "O"), maxRTDev = 30,
+                                 maxMzDev = 0.002)
+{{ endCodeBlock() }}
+{{ optionalCodeBlock(length(reportFormats) > 0) }}
+
+# Report & export results
+{{ endCodeBlock() }}
+{{ optionalCodeBlock("CSV" %in% reportFormats) }}
+reportCSV(fGroups, path = "report", reportFeatures = FALSE, formConsensus = {{ if (formulaOpts$algo != "") "formulas" else "NULL" }},
+          compounds = {{ if (identOpts$algo != "") "compounds" else "NULL" }}, compoundNormalizeScores = TRUE,
+          components = {{ if (identOpts$algo != "") "components" else "NULL" }})
+
+{{ endCodeBlock() }}
+{{ optionalCodeBlock("PDF" %in% reportFormats) }}
+reportPDF(fGroups, path = "report", reportFGroups = TRUE, formConsensus = {{ if (formulaOpts$algo != "") "formulas" else "NULL" }}, reportFormulaSpectra = TRUE,
+          compounds = {{ if (identOpts$algo != "") "compounds" else "NULL" }}, compoundNormalizeScores = TRUE,
+          components = {{ if (identOpts$algo != "") "components" else "NULL" }}, MSPeakLists = {{ if (formulaOpts$algo != "" || identOpts$algo != "") "plists" else "NULL" }})
+
+{{ endCodeBlock() }}
+{{ optionalCodeBlock("MD" %in% reportFormats) }}
+reportMD(fGroups, path = "report", reportFGroups = TRUE, reportChord = TRUE, formConsensus = {{ if (formulaOpts$algo != "") "formulas" else "NULL" }}, reportFormulaSpectra = TRUE,
+         compounds = {{ if (identOpts$algo != "") "compounds" else "NULL" }}, compoundNormalizeScores = TRUE,
+         components = {{ if (identOpts$algo != "") "components" else "NULL" }}, MSPeakLists = {{ if (formulaOpts$algo != "" || identOpts$algo != "") "plists" else "NULL" }},
+         selfContained = TRUE)
+
+{{ endCodeBlock() }}

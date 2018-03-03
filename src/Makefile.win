@@ -1,0 +1,13 @@
+SRC=$(wildcard GenForm-svn/*.cpp)
+OBJECTS=$(SRC:.cpp=.o)
+DEST=GenForm.exe
+
+.PHONY: all noclean inst
+
+all: GenForm
+
+GenForm: $(OBJECTS)
+	$(CXX) -o $(DEST) $(OBJECTS)
+
+noclean:
+	rm -rf $(OBJECTS) $(DEST)

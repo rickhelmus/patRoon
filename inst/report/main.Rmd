@@ -1,0 +1,122 @@
+---
+title: "report"
+author: "`r getPackageName(create = FALSE)`"
+date: "`r date()`"
+output:
+    flexdashboard::flex_dashboard:
+        vertical_layout: scroll
+        mathjax: null
+        fig_mobile: false
+        dev: png
+---
+
+```{r setup, include=FALSE}
+# knitr::knit_hooks$set(optipng = knitr::hook_pngquant)
+knitr::knit_hooks$set(pngquant = function(before, options, envir) suppressMessages(knitr::hook_pngquant(before, options, envir)))
+knitr::opts_chunk$set(echo = FALSE, fig.keep = "all", fig.retina = 1, dpi = 72)
+if (rmdVars$optimizePng)
+    knitr::opts_chunk$set(pngquant = "")
+
+# utility funcs for plotting
+getPlotPath <- function()
+{
+    ret <- if (rmdVars$selfContained) "." else file.path(rmdVars$outPath, "report_files", "plots")
+    mkdirp(ret)
+    return(ret)
+}
+
+makePlot <- function(out, w, h, expr)
+{
+    png(out, w, h, units = "in", res = 72)
+    eval(expr)
+    dev.off()
+}
+```
+
+<style>
+pre, code {
+    white-space: pre !important;
+    overflow-x: auto !important;
+    max-height: 200px;
+    overflow-y: auto;
+}
+</style>
+
+
+Summary {data-orientation=rows}
+================
+
+##
+
+### EICs
+
+```{r obj-plot, fig.width=10, fig.height=5}
+plotEIC(rmdVars$fGroups, rmdVars$EICRtWindow, rmdVars$EICMzWindow,
+        rmdVars$retMin, 1, rmdVars$EICs, TRUE, FALSE, colourBy = "fGroup", showLegend = FALSE)
+```
+
+### Retention vs m/z
+```{r}
+selectMethod("plot", class(rmdVars$fGroups))(rmdVars$fGroups)
+```
+
+```{r}
+rGroupLen <- length(unique(analysisInfo(rmdVars$fGroups)$group))
+```
+
+##
+
+### Objects
+
+```{r obj-show, fig.height=3}
+show(rmdVars$fGroups)
+
+if (!is.null(rmdVars$formConsensus))
+    show(rmdVars$formConsensus)
+if (!is.null(rmdVars$compounds))
+    show(rmdVars$compounds)
+if (!is.null(rmdVars$components))
+    show(rmdVars$components)
+if (!is.null(rmdVars$cInfo))
+    show(rmdVars$cInfo)
+```
+
+`r if (rmdVars$reportChord && rGroupLen > 1) "### Chord diagram\n"`
+```{r fig.width=6, fig.height=6, eval=rmdVars$reportChord && rGroupLen > 1}
+message("Creating chord diagram... ", appendLF = FALSE)
+plotChord(rmdVars$fGroups, average = TRUE)
+message("Done!")
+```
+
+`r if (rGroupLen > 1 && rGroupLen < 6) "### Venn diagram\n"`
+```{r eval=(rGroupLen > 1 && rGroupLen < 6)}
+plotVenn(rmdVars$fGroups)
+```
+
+
+`r if (rmdVars$reportFGroups) "EICs\n===\n"`
+```{r eval=rmdVars$reportFGroups}
+message("Plotting EICs...")
+prog <- txtProgressBar(0, length(rmdVars$fGroups), style = 3, file = stderr())
+
+for (grpi in seq_len(length(rmdVars$fGroups)))
+{
+    setTxtProgressBar(prog, grpi)
+    plotEIC(rmdVars$fGroups[, grpi], rmdVars$EICRtWindow, rmdVars$EICMzWindow,
+            rmdVars$retMin, rmdVars$EICTopMost, rmdVars$EICs, colourBy = "rGroup",
+            showLegend = TRUE)
+}
+
+close(prog)
+```
+
+
+```{r child="components.Rmd", eval=!is.null(rmdVars$components)}
+```
+
+
+```{r child="spectra.Rmd", eval=!is.null(rmdVars$compounds) || !is.null(rmdVars$formConsensus) || !is.null(rmdVars$components)}
+```
+
+```{r child="cluster.Rmd", eval=!is.null(rmdVars$cInfo)}
+```

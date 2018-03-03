@@ -1,0 +1,5 @@
+Name: New project
+Description: Generates a template processing script.
+Binding: newProject
+Interactive: true
+

@@ -1,0 +1,257 @@
+#' @include main.R
+NULL
+
+#' Component class
+#'
+#' Contains data for feature groups that are related in some way. These
+#' \emph{components} commonly include adducts, isotopes and homologues.
+#'
+#' \code{components} objects are obtained from
+#' \link[=component-generation]{component generators}.
+#'
+#' @slot components List of all components in this object. Use the
+#'   \code{componentTable} method for access.
+#' @slot componentInfo A \code{\link{data.table}} containing general information
+#'   for each component. Use the \code{componentInfo} method for access.
+#' @slot algorithm The algorithm that was used to generate the components. Use
+#'   the \code{algorithm} method for access.
+#'
+#' @param obj,object,x The \code{component} object.
+#' @param index The index of the component that should be plotted. Can be a
+#'   numeric index or a character with its name.
+#' @export
+components <- setClass("components",
+                       slots = c(components = "list", componentInfo = "data.table",
+                                 algorithm = "character"))
+
+#' @describeIn components Accessor method for the \code{components} slot of a
+#'   \code{components} class. Each component is stored as a
+#'   \code{\link{data.table}}.
+#' @aliases componentTable
+#' @export
+setMethod("componentTable", "components", function(obj) obj@components)
+
+#' @describeIn components Accessor method for the \code{componentInfo} slot of a
+#'   \code{components} class.
+#' @aliases componentInfo
+#' @export
+setMethod("componentInfo", "components", function(obj) obj@componentInfo)
+
+#' @describeIn components Retrieve the algorithm (a character string) used to
+#'   generate components.
+#' @export
+setMethod("algorithm", "components", function(obj) obj@algorithm)
+
+#' @describeIn components Obtain total number of components.
+#' @export
+setMethod("length", "components", function(x) length(x@components))
+
+#' @describeIn components Obtain the names of all components.
+#' @export
+setMethod("names", "components", function(x) names(x@components))
+
+#' @describeIn components Show summary information for this object.
+#' @export
+setMethod("show", "components", function(object)
+{
+    printf("A components object (%s)\n", class(object))
+    printf("Algorithm: %s\n", algorithm(object))
+    printf("Components: %s (%d total)\n", getStrListWithMax(names(object), 6, ", "), length(object))
+
+    gCounts <- sapply(object@components, nrow)
+
+    printf("Number of feature groups in components: %d (total), %.1f (mean), %d - %d (min - max)\n",
+           sum(gCounts), mean(gCounts), min(gCounts), max(gCounts))
+
+    showObjectSize(object)
+})
+
+#' @describeIn components Returns the component id(s) to which a feature group
+#'   belongs.
+#' @param fGroup The name (thus a character) of the feature group that should be
+#'   searched for.
+#' @aliases findFGroup
+#' @export
+setMethod("findFGroup", "components", function(obj, fGroup)
+{
+    which(sapply(componentTable(obj), function(ct) fGroup %in% ct$group))
+})
+
+#' @describeIn components Plot a \emph{pseudo} mass spectrum for a single
+#'   component.
+#'
+#' @param markFGroup If specified (\emph{i.e.} not \code{NULL}) this argument
+#'   can be used to mark a feature group in the plotted spectrum. The value
+#'   should be a character with the name of the feature group. Setting this to
+#'   \code{NULL} will not mark any peak.
+#'
+#' @template useGGplot2
+#'
+#' @export
+setMethod("plotSpec", "components", function(obj, index, markFGroup = NULL, useGGPlot2 = FALSE, ...)
+{
+    plotData <- copy(componentTable(obj)[[index]]) # UNDONE: allow multiple selection?
+
+    haveIso <- !is.null(plotData[["isogroup"]])
+    haveAdd <- !is.null(plotData[["adduct_ion"]])
+    haveHom <- !is.null(plotData[["hsnr"]])
+
+    if (haveAdd && any(!is.na(plotData[["adduct_ion"]])))
+    {
+        # merge any adduct rows
+        plotData[!is.na(adduct_ion), adduct_ion := paste0(adduct_ion, collapse = "/"), by = "group"]
+        plotData <- plotData[!duplicated(plotData, by = c("group", "adduct_ion"))]
+    }
+
+    if (haveHom)
+    {
+        # merge merged homologue entries
+        plotData[!is.na(hsnr), c("rGroup", "intensity") :=
+                     .(paste0(rGroup, collapse = "/"),
+                       max(intensity)), by = "hsnr"]
+        plotData <- plotData[!duplicated(plotData, by = c("hsnr", "rGroup"))]
+    }
+
+    plotData[, label := sapply(seq_len(nrow(plotData)), function(r)
+    {
+        if (haveIso && !is.na(isogroup[r]) && isonr[r] != 0)
+            sprintf("iso %d-[M+%d]", as.integer(isogroup[r]), as.integer(isonr[r]))
+        # adduct?
+        else if (haveAdd && !is.na(adduct_ion[r]))
+            adduct_ion[r]
+        # homologue?
+        else if (haveHom && !is.na(hsnr[r]))
+            paste0("HS #", hsnr[r])
+        else # unknown
+            ""
+    })]
+
+    plotData[, lwd := ifelse(nzchar(label), 1, 0.5)]
+
+    if (haveHom)
+        plotData[, categ := rGroup]
+    else
+        plotData[, categ := ifelse(nzchar(label), "assigned", "unassigned")]
+
+    if (!is.null(markFGroup) && markFGroup %in% plotData$group)
+    {
+        plotData[group == markFGroup, c("categ", "lwd") := .(markFGroup, 2)]
+
+        # convert to factor for sorting
+        plotData[, categ := factor(categ, levels = c(markFGroup, unique(categ[categ != markFGroup])))]
+    }
+    else if (!haveHom)
+        plotData[, categ := factor(categ, levels = c("assigned", "unassigned"))]
+
+    plotData[nzchar(label), label := paste(label, round(mz, 4), sep = "\n")]
+    plotData[!nzchar(label), label := as.character(round(mz, 4))]
+
+    if (!useGGPlot2)
+    {
+        allCateg <- unique(plotData$categ)
+        specCols <- getBrewerPal(length(allCateg), "Dark2")
+        names(specCols) <- allCateg
+
+        intMax <- max(plotData$intensity)
+        mzRange <- range(plotData$mz)
+
+        makeLegend <- function(x, y, ...) legend(x, y, allCateg, col = specCols[as.character(allCateg)],
+                                                 text.col = specCols[as.character(allCateg)], lty = 1,
+                                                 xpd = NA, ncol = 1, cex = 0.75, bty = "n", ...)
+
+        oldp <- par(no.readonly = TRUE)
+        plot.new()
+
+        leg <- makeLegend(0, 0, plot = FALSE)
+        lw <- (grconvertX(leg$rect$w, to = "ndc") - grconvertX(0, to = "ndc"))
+        par(omd = c(0, 1 - lw, 0, 1), new = TRUE)
+
+        plot(0, xlab = "m/z", ylab = "Intensity", xlim = mzRange, ylim = c(0, intMax * 1.25),
+             type = "n", bty = "l", ...)
+
+        segments(plotData$mz, 0, plotData$mz, plotData$intensity,
+                 col = specCols[as.character(plotData$categ)], lwd = plotData$lwd * 2)
+
+        tyOffset <- max(plotData$intensity * 0.02)
+        tx <- plotData$mz
+        ty <- plotData$intensity + tyOffset
+
+        text(tx, ty, plotData$label, srt = 90, adj = 0, cex = 0.75)
+
+        makeLegend(par("usr")[2], par("usr")[4])
+
+        par(oldp)
+    }
+    else
+    {
+        ret <- ggplot(plotData, aes_string(x = "mz", y = 0, label = "label")) +
+            geom_segment(aes_string(xend = "mz", yend = "intensity", colour = "categ",
+                                    size = "lwd")) + scale_size(range = range(plotData$lwd), guide = FALSE) +
+            ggrepel::geom_text_repel(aes_string(y = "intensity", angle = 0), min.segment.length = 0.1,
+                                     nudge_y = grid::convertUnit(grid::unit(5, "mm"), "npc", valueOnly = TRUE), size = 3.2) +
+
+            xlab("m/z") + ylab("Intensity") +
+            cowplot::theme_cowplot(font_size = 12) + theme(legend.position = "bottom", legend.title = element_blank())
+
+        return(ret)
+    }
+})
+
+#' @describeIn components Plot an extracted ion chromatogram (EIC) for all
+#'   feature groups within a single component.
+#' @param fGroups The \code{\link{featureGroups}} object that was used to
+#'   generate the components.
+#' @param rtWindow Retention window: see the \code{plotEIC} method for the
+#'   \code{\link{featureGroups}} class.
+#' @param \dots Further (optional) arguments passed to the \code{plotEIC} method
+#'   for the \code{\link{featureGroups}} class. Note that the \code{colourBy},
+#'   \code{showPeakArea}, \code{showFGroupRect} and \code{topMost} arguments
+#'   cannot be set as these are set by this method.
+#' @export
+setMethod("plotEIC", "components", function(obj, index, fGroups, rtWindow = 5, ...)
+{
+    comp <- componentTable(obj)[[index]]
+
+    isHom <- !is.null(comp[["hsnr"]]) # homologues?
+
+    topMost <- if (!isHom) 1 else NULL
+    showPeakArea <- isHom
+    showFGroupRect <- !isHom
+    colourBy = if (!isHom) "fGroup" else "rGroup"
+
+    if (isHom)
+    {
+        rGroups <- unique(comp$rGroup)
+        fGroups <- replicateGroupFilter(fGroups, rGroups, verbose = FALSE)
+    }
+
+    fGroups <- fGroups[, unique(comp$group)]
+
+    if (length(fGroups) > 0)
+        plotEIC(fGroups, rtWindow = rtWindow, colourBy = colourBy, showPeakArea = showPeakArea,
+                showFGroupRect = showFGroupRect, topMost = topMost, ...)
+})
+
+#' @templateVar func generateComponents
+#' @templateVar what generate components
+#' @templateVar ex1 generateComponentsRAMClustR
+#' @templateVar ex2 generateComponentsNontarget
+#' @templateVar algos ramclustr,camera,nontarget
+#' @template generic-algo
+#'
+#' @param ... Any parameters to be passed to the selected component generation
+#'   algorithm.
+#'
+#' @rdname component-generation
+#' @aliases generateComponents
+#' @export
+setMethod("generateComponents", "featureGroups", function(fGroups, algorithm, ...)
+{
+    f <- switch(algorithm,
+                ramclustr = generateComponentsRAMClustR,
+                camera = generateComponentsCAMERA,
+                nontarget = generateComponentsNontarget,
+                stop("Invalid algorithm! Should be: ramclustr, camera or nontarget"))
+
+    f(fGroups, ...)
+})

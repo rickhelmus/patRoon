@@ -11,7 +11,7 @@ NULL
 #' information from grouped features (obtained from \code{\link{features}}).
 #' This class itself is \code{virtual}, hence, objects are not created directly
 #' from it. Instead, 'feature groupers' such as \code{\link{groupFeaturesXCMS}}
-#' and return a \code{featureGroups} derived object after performing the actual
+#' return a \code{featureGroups} derived object after performing the actual
 #' grouping of features across analyses.
 #'
 #' @param fGroups,obj,x,object \code{featureGroups} object to be accessed.

@@ -65,13 +65,14 @@ processSiriusFormulas <- function(cmd, exitStatus, retries)
 #'   \href{https://bio.informatik.uni-jena.de/software/sirius/}{SIRIUS} to
 #'   generate chemical formulae. Similarity of measured and theoretical isotopic
 #'   patterns will be used for scoring candidates. Note that \command{SIRIUS}
+#'   requires availability of MS/MS data.
 #'
 #' @templateVar ident FALSE
 #' @template sirius-args
 #'
 #' @references \insertRef{Duhrkop2015}{patRoon} \cr\cr
 #'   \insertRef{Bcker2008}{patRoon}
-#' 
+#'
 #' @rdname formula-generation
 #' @export
 generateFormulasSirius <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct = "[M+H]+", elements = "CHNOP",

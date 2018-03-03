@@ -635,7 +635,7 @@ setMethod("plotEIC", "featureGroups", function(obj, rtWindow = 30, mzWindow = 0.
     }
 
     ymax <- plotLimits$maxInt * 1.1
-    plot(0, type = "n", main = title, xlab = sprintf("Retention time (%s)", if (retMin) "Minutes" else "Seconds"), ylab = "Intensity",
+    plot(0, type = "n", main = title, xlab = sprintf("Retention time (%s)", if (retMin) "min." else "sec."), ylab = "Intensity",
          xlim = plotLimits$rtRange, ylim = c(0, ymax), ...)
 
     if (showProgress)

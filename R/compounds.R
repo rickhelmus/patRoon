@@ -534,8 +534,8 @@ setMethod("mergedCompoundNames", "compoundsConsensus", function(compounds) compo
 #' @param mergeScoresFunc Function used to calculate the total score for all
 #'   (merged) score columns.
 #'
-#' @return \code{consensus} returns a \code{compounds} that is produced by
-#'   merging multiple specified \code{compounds} objects.
+#' @return \code{consensus} returns a \code{compounds} object that is produced
+#'   by merging multiple specified \code{compounds} objects.
 #'
 #' @export
 setMethod("consensus", "compounds", function(obj, ..., compThreshold = 0.0, mergeScoresFunc = sum)

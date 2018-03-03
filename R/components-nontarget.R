@@ -36,6 +36,11 @@ generateComponentsNontarget <- function(fGroups, ionization, rtRange = c(-120, 1
                                         elements = c("C", "H", "O"), maxRTDev = 30, maxMzDev = 0.002,
                                         extraOpts = NULL)
 {
+    hash <- makeHash(fGroups, ionization, rtRange, mzRange, elements, maxRTDev, maxMzDev, extraOpts)
+    cd <- loadCacheData("componentsNontarget", hash)
+    if (!is.null(cd))
+        return(cd)
+    
     gTable <- groups(fGroups)
     gInfo <- groupInfo(fGroups)
     anaInfo <- analysisInfo(fGroups)
@@ -214,10 +219,14 @@ generateComponentsNontarget <- function(fGroups, ionization, rtRange = c(-120, 1
     setnames(cInfo,
              c("m/z increment", "RT increment", "min. RT in series", "max. RT in series", "max.-min. RT"),
              c("mz_increment", "rt_increment", "rt_min", "rt_max", "rt_range"))
+    cInfo[, name := names(comps)]
 
     # convert from fgroup lists to logical presence
     for (rg in presentRGroups)
         set(cInfo, j = rg, value = !sapply(cInfo[[rg]], is.null))
 
-    return(components(componentInfo = cInfo, components = comps, algorithm = "nontarget"))
+    ret <- components(componentInfo = cInfo, components = comps, algorithm = "nontarget")
+    saveCacheData("componentsNontarget", ret, hash)
+    
+    return(ret)
 }

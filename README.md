@@ -15,10 +15,6 @@ mAss-specTROmetry nOn-target aNalysis'.
 * **Generation of components**: grouping of (chemically) related features such as isotopes, adducts and homologs ([RAMClustR], [CAMERA], [nontarget R package][nontarget]).
 * **reporting** of all workflow steps in various formats: _CSV_, _PDF_ and _HTML_.
 
-
-The table below summarizes the common non-target (NT) workflow steps that are supported, along with the external software packages that are used to implement them:
-
-
 ## Installation
 You can install patRoon from github with:
 

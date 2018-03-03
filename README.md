@@ -48,7 +48,7 @@ Note that in order to fulfill installation of the `rJava` package dependency you
 
 Depending on which functionality is used, the following (optional) external dependencies should be installed:
 
-* [OpenMS] the installer should add the binaries to the _PATH_ environment variable.
+* [OpenMS]
 * [SIRIUS]
 * [MetFrag CL][MetFrag-CL] (required if the command-line version of MetFrag is used, the default)
 * [pngquant] (required for `reportMD` with `optimizePng` argument set to `TRUE`)
@@ -67,6 +67,10 @@ options("patRoon.path.metFragCL" = "~/MetFrag2.4.2-CL.jar") # full location to t
 library(patRoon)
 newProject()
 ```
+
+...
+
+read the [reference](https://rickhelmus.github.io/patRoon/reference/index.html).
 
 ## WIP
 More documentation will folow...

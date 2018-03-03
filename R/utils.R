@@ -364,6 +364,8 @@ getBrewerPal <- function(n, name)
 #' @param overWrite Should existing destination file be overwritten
 #'   (\code{TRUE}) or not (\code{FALSE})?
 #'
+#' @references \insertRef{Rst2016}{patRoon}
+#' 
 #' @export
 convertMSFiles <- function(anaInfo, formatFrom, formatTo, outPath = anaInfo$path, overWrite = FALSE)
 {

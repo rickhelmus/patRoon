@@ -60,9 +60,12 @@ Imports:
     ggplot2,
     ggrepel,
     cowplot,
-    jsonlite
+    jsonlite,
+    Rdpack
 Suggests:
     RDCOMClient
+RdMacros:
+    Rdpack
 Collate: 
     'generics.R'
     'cache.R'

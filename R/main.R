@@ -9,6 +9,7 @@
 #' @importFrom xcms phenoData phenoData<- filepaths filepaths<- xcmsRaw peaks peaks<- groups profinfo profinfo<- groupidx xcmsSet group retcor groupval groupnames rawEIC sampnames groupidx<- groups<-
 #' @importFrom fst compress_fst decompress_fst
 #' @importFrom processx process poll
+#' @importFrom Rdpack reprompt
 #' @importClassesFrom CAMERA xsAnnotate
 #' @import data.table
 #' @import withr

@@ -72,6 +72,10 @@ processSiriusCompounds <- function(cmd, exitStatus, retries)
 #'   \code{formulaDatabase} parameter will be used or \code{"pubchem"} when that
 #'   is also \code{NULL}. Sets the \option{--fingerid-db} option.
 #'
+#' @references \insertRef{Duhrkop2015}{patRoon} \cr\cr
+#'   \insertRef{Duhrkop2015-2}{patRoon} \cr\cr
+#'   \insertRef{Bcker2008}{patRoon}
+#'
 #' @rdname compound-generation
 #' @export
 generateCompoundsSirius <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct = "[M+H]+", elements = "CHNOP",

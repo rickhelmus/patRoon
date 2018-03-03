@@ -267,6 +267,8 @@ processMFResults <- function(metf, analysis, spec, db, topMost, lfile)
 #'   \href{http://c-ruttkies.github.io/MetFrag/projects/metfragcl/}{MetFrag CL}
 #'   homepages for all available options.
 #'
+#' @references \insertRef{Ruttkies2016}{patRoon}
+#'
 #' @rdname compound-generation
 #' @export
 generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPath = file.path("log", "metfrag"),

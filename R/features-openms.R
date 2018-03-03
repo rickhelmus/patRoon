@@ -32,6 +32,8 @@ featuresOpenMS <- setClass("featuresOpenMS", contains = "features")
 #'   will override any of the above.
 #'
 #' @template multiProc-args
+#' 
+#' @references \insertRef{Rst2016}{patRoon}
 #'
 #' @rdname feature-finding
 #' @export

@@ -61,8 +61,6 @@ processSiriusFormulas <- function(cmd, exitStatus, retries)
     return(forms)
 }
 
-# UNDONE SIRIUS installation and settings of paths
-
 #' @details \code{generateFormulasSirius} uses
 #'   \href{https://bio.informatik.uni-jena.de/software/sirius/}{SIRIUS} to
 #'   generate chemical formulae. Similarity of measured and theoretical isotopic
@@ -71,6 +69,9 @@ processSiriusFormulas <- function(cmd, exitStatus, retries)
 #' @templateVar ident FALSE
 #' @template sirius-args
 #'
+#' @references \insertRef{Duhrkop2015}{patRoon} \cr\cr
+#'   \insertRef{Bcker2008}{patRoon}
+#' 
 #' @rdname formula-generation
 #' @export
 generateFormulasSirius <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct = "[M+H]+", elements = "CHNOP",

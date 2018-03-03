@@ -146,6 +146,8 @@ processGenFormResultFile <- function(file, isMSMS, adduct)
 #' @note \code{generateFormulasGenForm} always sets the \option{exist} and
 #'   \option{oei} \command{GenForm} commandline options.
 #'
+#' @references \insertRef{Meringer2011}{patRoon}
+#'
 #' @rdname formula-generation
 #' @export
 generateFormulasGenForm <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct = "M+H",

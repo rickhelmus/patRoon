@@ -64,12 +64,12 @@ library(patRoon)
 newProject()
 ```
 
-...
+read the [tutorial](articles/tutorial.html).
 
-read the [reference](https://rickhelmus.github.io/patRoon/reference/index.html).
+read the [reference](reference/index.html).
 
 ## WIP
-More documentation will folow...
+More documentation will folow..
 
 
 [XCMS]: https://github.com/sneumann/xcms

@@ -1,0 +1,102 @@
+---
+title: "patRoon tutorial"
+author: "Rick Helmus"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{patRoon tutorial}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  warning = FALSE,
+  error = FALSE,
+  message = FALSE
+)
+
+options("patRoon.cache.mode" = "none")
+```
+
+
+## Introduction
+
+The intro ...
+
+### Workflow
+
+## Data preparation
+In this tutorial we will use example data provided with patRoon. The provided analyses already have been exported to an open format (_.mzML_) and are ready to use. For your own data it may be necessary to first perform mass recalibration and data export using vendor software (`patRoon` supplies several utilities for Bruker data, see the bruker-utils reference documentation).
+
+## New project
+To start a new non-target analysis it is highly recommended to create a new directory. We will refer to this directory as the _project directory_. This directory typically contains:
+* a `R` script (or scripts) which will do the actual processing
+* an (optional) _.csv_ file with analysis information
+* an automatically generated cache file which is internally used by `patRoon` to cache (intermediate) results, therefore, preventing repeated execution of lengthy workflow steps that have been performed before.
+
+Once you have created a suitable directory in the location of your choosing, please create the following skeleton `R` script:
+
+```{r eval=-4}
+library(patRoon)
+
+workPath <- "~/my_project" # change this to the location of your project directory
+setwd(workPath)
+
+dataDir <- "~/werk/test/tut/" # UNDONE
+```
+
+Next step is to generate information ncessary for the analysis. To do so, we need to specify the names and file locations of the analyses, to which _replicate group_ they belong and which replicate group(s) should be used for blank subtraction. To do so, we can use the `generateAnalysisInfo()` utility function which automatically generates a suitable `data.frame` for us from given analyses:
+
+```{r}
+generateAnalysisInfo(dataDir)
+```
+
+As you can see the generated `data.frame` consists of four columns:
+* *path*: the path of the file directory containing the analysis
+* *analysis*: the name of the analysis. The shoud be the file name _without_ file extension.
+* *group*: to which _replicate group_ the analysis belongs. All analysis which are replicates of each other get the same name.
+* *ref*: which replicate groub should be used for blank subtraction.
+
+The latter two columns are especially important for [data cleanup](#data-cleanup).
+
+In our example, the solvents and standards should belong each to a different replicate group (`"solvent"` and `"standards"`). The solvents should also be used for blank subtraction. For this we can use the `groups` and `refs` arguments:
+```{r}
+anaInfo <- generateAnalysisInfo(dataDir,
+                                groups = c(rep("solvent", 3), rep("standard", 3)),
+                                refs = "solvent")
+anaInfo
+```
+
+Note that we set the reference for the solvents to themself. This will remove any features from the solvents, which is generally fine as we are usually not interested in the blanks anyway.
+
+Note that for larger project it may be preferred to export the `data.frame` to a _.csv_ file so it can be easily edited, for instance, with Excel. Alternatively, the `newProject()` function can be used to make this process even easier (briefly discussed [here](#newProject)).
+
+## Extract and group features
+
+## Data cleanup { #data-cleanup }
+
+## MS peak lists
+
+## Formula calculation
+
+## Compound identification
+
+## Components
+
+## Reporting
+
+## Final script
+
+## Other topics
+
+### Create new projects with `newProject()` { #newProject }
+
+### Suspect screening
+
+### Import and exporting feature groups
+
+### caching
+

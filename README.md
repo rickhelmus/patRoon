@@ -1,8 +1,8 @@
 # patRoon
 `patRoon` aims to provide a common interface to various (primarily
 open-source) software solutions for mass spectrometry based non-target analysis.
-The name is derived from a Dutch word that means 'pattern' and may also be an acronym for 'hyPhenated
-mAss-specTROmetry nOn-target aNalysis'.
+The name is derived from a Dutch word that means _pattern_ and may also be an acronym for _hyPhenated
+mAss-specTROmetry nOn-target aNalysis_.
 
 `patRoon` is developed as an `R` package and leverages other `R` based packages and external software to provide the following workflow steps that are typically used within non-target (NT) analysis:
 
@@ -24,7 +24,7 @@ devtools::install_github("rickhelmus/patRoon")
 ```
 
 ### R Dependencies
-Besides 'regular' R package dependencies, which should be installed automatically with `install_github()`, the following optional R packages may also need to be installed:
+Besides regular R package dependencies, which should be installed automatically with `install_github()`, the following optional R packages may also need to be installed:
 
 ``` r
 install.packages("RDCOMClient") # required for DataAnalysis functionality

@@ -26,8 +26,8 @@ componentsRC <- setClass("componentsRC", slots = c(RC = "hclust"), contains = "c
 #'   passed to \code{\link{ramclustR}} and \code{\link[RAMClustR]{do.findmain}}.
 #'   Set to \code{NULL} to ignore.
 #'
-#' @references \addCitations{RAMClustR}{1} \cr\cr
-#'   \addCitations{RAMClustR}{2}
+#' @references \insertRef{Broeckling2013}{patRoon} \cr\cr
+#'   \insertRef{Broeckling2014}{patRoon}
 #'
 #' @rdname component-generation
 #' @export

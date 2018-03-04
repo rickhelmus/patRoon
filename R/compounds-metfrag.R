@@ -151,7 +151,7 @@ generateMetFragRunData <- function(fGroups, MSPeakLists, mfSettings, topMost, id
     return(ret[!sapply(ret, is.null)])
 }
 
-processMFResults <- function(metf, analysis, spec, db, topMost, lfile)
+processMFResults <- function(metf, analysis, spec, db, topMost, lfile = "")
 {
     if (nrow(metf) > 0)
     {
@@ -405,7 +405,7 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
                     metf <- unFactorDF(metf)
                     metf <- as.data.table(metf)
 
-                    metf <- processMFResults(metf, rd$analysis, cmd$spec, database, topMost)
+                    metf <- processMFResults(metf, rd$analysis, rd$spec, database, topMost)
 
                     # BUG: metfRag seems to give second duplicate results where only NoExplPeaks may differ and have an incorrect value.
                     # for now, just remove all duplicates and re-assign NoExplPeaks

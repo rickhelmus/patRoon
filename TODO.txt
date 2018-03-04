@@ -4,4 +4,4 @@ Release:
     - Package docs
     - Examples?
 - more withr wrapping? (dev, par)
-- more optional dependencies (RAMClustR, metfRag)
+- re-enable cleaning for GenForm compile

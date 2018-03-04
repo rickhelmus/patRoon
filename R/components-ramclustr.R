@@ -37,6 +37,8 @@ generateComponentsRAMClustR <- function(fGroups, st = NULL, sr = NULL, maxt = 12
                                                                 instrument = list(ionization = ionization, MSlevs = 1)),
                                         extraOptsRC = NULL, extraOptsFM = NULL)
 {
+    checkPackage("RAMClustR", "cbroeckl/RAMClustR")
+    
     gTable <- groups(fGroups)
     gInfo <- groupInfo(fGroups)
     gNames <- names(fGroups)

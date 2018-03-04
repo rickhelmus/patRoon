@@ -23,7 +23,6 @@
 #' @import miniUI
 #' @import rstudioapi
 #' @import cluster
-#' @import metfRag
 #' @import templates
 #' @import circlize
 #' @import ggplot2

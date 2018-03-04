@@ -34,7 +34,6 @@ Imports:
     cluster,
     d3heatmap,
     rJava,
-    metfRag,
     rcdk,
     mzR,
     circlize,
@@ -48,7 +47,6 @@ Imports:
     CAMERA,
     enviPat,
     nontarget,
-    RAMClustR,
     knitr,
     rmarkdown,
     flexdashboard,
@@ -63,7 +61,9 @@ Imports:
     jsonlite,
     Rdpack
 Suggests:
-    RDCOMClient
+    RDCOMClient,
+    metfRag,
+    RAMClustR
 RdMacros:
     Rdpack
 Collate: 

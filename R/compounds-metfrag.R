@@ -283,7 +283,9 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
                                      maxProcAmount = getOption("patRoon.maxProcAmount"))
 {
     # UNDONE: does addTrivialNames actually work?
-    # UNDONE: make metfRag an optional dependency
+    
+    if (method == "R")
+        checkPackage("metfRag", "c-ruttkies/MetFragR")
 
     anaInfo <- analysisInfo(fGroups)
     ftind <- groupFeatIndex(fGroups)
@@ -389,7 +391,7 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
             ret <- lapply(runData, function(rd)
             {
                 rd$mfSettings$PeakList <- as.matrix(rd$spec[, c("mz", "intensity")])
-                metf <- run.metfrag(rd$mfSettings)
+                metf <- metfRag::run.metfrag(rd$mfSettings)
                 jgc() # hopefully reduce some memory usage
 
                 if (nrow(metf) > 0)

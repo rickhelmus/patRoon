@@ -114,3 +114,10 @@ Collate:
     'utils.R'
     'zzz.R'
 VignetteBuilder: knitr
+Remotes:
+    cbroeckl/RAMClustR,
+    c-ruttkies/MetFragR/metfRag,
+    bioc::xcms,
+    bioc::CAMERA,
+    bioc::mzR
+    

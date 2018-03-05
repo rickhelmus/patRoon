@@ -24,7 +24,7 @@ devtools::install_github("rickhelmus/patRoon")
 ```
 
 ### R Dependencies
-Besides regular R package dependencies, which should be installed automatically with `install_github()`, the following optional R packages may also need to be installed:
+Besides 'regular' R package dependencies, which should be installed automatically with `install_github()`, the following optional R packages may also need to be installed:
 
 ``` r
 install.packages("RDCOMClient") # required for DataAnalysis functionality

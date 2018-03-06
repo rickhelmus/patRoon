@@ -11,7 +11,7 @@ DAConstants <- list(
 )
 
 # DA needs backslashes
-getBrukerAnalysisPath <- function(analysis, path) gsub("/", "\\\\", file.path(path, paste0(analysis, ".d")))
+getBrukerAnalysisPath <- function(analysis, path) normalizePath(file.path(path, paste0(analysis, ".d")))
 
 hideDAInScope <- local_(function(x) getDAApplication()$Hide(), function(x) getDAApplication()$Show())
 
@@ -107,8 +107,9 @@ closeDAFile <- function(DA, analysis, path, save)
 setDAMethod <- function(anaInfo, method)
 {
     DA <- getDAApplication()
+    method <- normalizePath(method)
     hideDAInScope()
-
+    
     for (i in seq_len(nrow(anaInfo)))
     {
         printf("Setting DA method of analysis '%s' to %s (%d/%d)...\n", anaInfo$analysis[i], method, i, nrow(anaInfo))

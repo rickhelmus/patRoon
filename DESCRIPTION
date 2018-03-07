@@ -117,4 +117,4 @@ VignetteBuilder: knitr
 Remotes:
     cbroeckl/RAMClustR,
     c-ruttkies/MetFragR/metfRag,
-biocViews:
+

@@ -117,6 +117,4 @@ VignetteBuilder: knitr
 Remotes:
     cbroeckl/RAMClustR,
     c-ruttkies/MetFragR/metfRag,
-    bioc::release/xcms,
-    bioc::release/CAMERA,
-    bioc::release/mzR
+biocViews:

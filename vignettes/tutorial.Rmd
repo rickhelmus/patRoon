@@ -45,7 +45,7 @@ library(patRoon)
 workPath <- "~/my_project" # change this to the location of your project directory
 setwd(workPath)
 
-dataDir <- "~/werk/test/tut/" # UNDONE
+dataDir <- patRoonData::exampleDataPath()
 ```
 
 Next step is to generate information ncessary for the analysis. To do so, we need to specify the names and file locations of the analyses, to which _replicate group_ they belong and which replicate group(s) should be used for blank subtraction. To do so, we can use the `generateAnalysisInfo()` utility function which automatically generates a suitable `data.frame` for us from given analyses:
@@ -55,6 +55,7 @@ generateAnalysisInfo(dataDir)
 ```
 
 As you can see the generated `data.frame` consists of four columns:
+
 * *path*: the path of the file directory containing the analysis
 * *analysis*: the name of the analysis. The shoud be the file name _without_ file extension.
 * *group*: to which _replicate group_ the analysis belongs. All analysis which are replicates of each other get the same name.
@@ -72,7 +73,7 @@ anaInfo
 
 Note that we set the reference for the solvents to themself. This will remove any features from the solvents, which is generally fine as we are usually not interested in the blanks anyway.
 
-Note that for larger project it may be preferred to export the `data.frame` to a _.csv_ file so it can be easily edited, for instance, with Excel. Alternatively, the `newProject()` function can be used to make this process even easier (briefly discussed [here](#newProject)).
+For larger project it may be preferred to export the `data.frame` to a _.csv_ file so it can be easily edited, for instance, with Excel. Alternatively, the `newProject()` function can be used to make this process even easier (briefly discussed [here](#newProject)).
 
 ## Extract and group features
 

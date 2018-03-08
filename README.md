@@ -64,9 +64,9 @@ library(patRoon)
 newProject()
 ```
 
-read the [tutorial](articles/tutorial.html).
+read the [tutorial](docs/articles/tutorial.html).
 
-read the [reference](reference/index.html).
+read the [reference](docs/reference/index.html).
 
 ## WIP
 More documentation will folow..

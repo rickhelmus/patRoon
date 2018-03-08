@@ -47,7 +47,9 @@ setMethod("show", "formulas", function(object)
 
     printf("Total formula count: %d\n", length(object))
 
-    formCounts <- lapply(object@formulas, function(fa) sapply(fa, nrow))
+    ft <- formulaTable(object)
+    ft <- ft[lengths(ft) > 0]
+    formCounts <- lapply(ft, function(fa) sapply(fa, nrow))
     printf("Average formulas per analysis: %.1f\n", mean(sapply(formCounts, function(fc) sum(fc))))
     printf("Average formulas per feature group: %.1f\n", mean(sapply(formCounts, function(fc) mean(fc))))
 

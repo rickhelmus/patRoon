@@ -31,7 +31,7 @@ NULL
 #'   significantly reduces processing time and memory requirements, at the
 #'   (potential) cost of slightly reducing accuracy.
 #' @param precursorMzWindow The \emph{m/z} window (in Da) to find MS/MS spectra
-#'   of a precursors This is typically used for Data-Dependent like MS/MS data
+#'   of a precursor. This is typically used for Data-Dependent like MS/MS data
 #'   and should correspond to the isolation \emph{m/z} width that was used to
 #'   collect the data. For Data-Independent MS/MS experiments, where precursor
 #'   ions are not isolated prior to fragmentation (\emph{e.g.} bbCID, MSe,
@@ -116,7 +116,7 @@ generateMzRPeakLists <- function(fGroups, avgMzWindow = 0.001, maxRtMSWidth = NU
                     rtRange <- c(max(rtRange[1], ft$rt - maxRtMSWidth/2), min(rtRange[2], ft$rt + maxRtMSWidth/2))
 
                 if (is.null(spectra))
-                    spectra <- loadSpectra(fp)
+                    spectra <- loadSpectra(fp, verbose = FALSE)
 
                 results$MS <- averageSpectra(spectra, rtRange, avgMzWindow, avgTopPeaks,
                                              avgMinIntensity, avgMassFun = avgMassFun, method = avgMethod)

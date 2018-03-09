@@ -42,9 +42,9 @@ fGroupsSpecDT <- data.table(group = allGroups, rt = round(rmdVars$gInfo[allGroup
                             mz = round(rmdVars$gInfo[allGroups, "mzs"], 5))
 
 if (length(compFGroups))
-    fGroupsSpecDT[group %in% compFGroups, compound := showButton("showSpec", seq_along(group), "comp")]
+    fGroupsSpecDT[group %in% compFGroups, compound := showButton("showSpec", match(group, allGroups), "comp")]
 if (length(formFGroups))
-    fGroupsSpecDT[group %in% formFGroups, formula := showButton("showSpec", seq_along(group), "form")]
+    fGroupsSpecDT[group %in% formFGroups, formula := showButton("showSpec", match(group, allGroups), "form")]
 if (length(componentFGroups))
 {
     fGroupsSpecDT[group %in% componentFGroups, component := sapply(group, function(grp)

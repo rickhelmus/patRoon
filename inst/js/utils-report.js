@@ -11,7 +11,7 @@ function showSpec(group, type)
     var specId = type + "_" + "spectra-" + group;
     var EICId = "EIC-" + group;
     for (var i=0; i<comps.length; i++)
-        comps[i].style.display = (comps[i].className.includes(specId) || comps[i].className.includes(EICId)) ? 'flex' : 'none';
+        comps[i].style.display = (comps[i].classList.contains(specId) || comps[i].classList.contains(EICId)) ? 'flex' : 'none';
 
     document.getElementById("noSpecSelected").style.display = 'none';
 }

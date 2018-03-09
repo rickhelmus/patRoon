@@ -42,9 +42,9 @@ fGroupsSpecDT <- data.table(group = allGroups, rt = round(rmdVars$gInfo[allGroup
                             mz = round(rmdVars$gInfo[allGroups, "mzs"], 5))
 
 if (length(compFGroups))
-    fGroupsSpecDT[group %in% compFGroups, compound := showButton("showSpec", group, "comp")]
+    fGroupsSpecDT[group %in% compFGroups, compound := showButton("showSpec", seq_along(group), "comp")]
 if (length(formFGroups))
-    fGroupsSpecDT[group %in% formFGroups, formula := showButton("showSpec", group, "form")]
+    fGroupsSpecDT[group %in% formFGroups, formula := showButton("showSpec", seq_along(group), "form")]
 if (length(componentFGroups))
 {
     fGroupsSpecDT[group %in% componentFGroups, component := sapply(group, function(grp)
@@ -129,13 +129,13 @@ for (grpi in seq_along(specGroups))
 {
     rmdTexts[grpi] <- glue::glue("
 
-## { grp } {{ .specClass .EIC-{ grp } }}
+## {{ .specClass .EIC-{ grpi } }}
 
-### EIC {{ .specClass .EIC-{ grp } }}
+### EIC {{ .specClass .EIC-{ grpi } }}
 
 ![]({ plotPath }/eic_{ grpi }.png)
 
-", grpi = grpi, grp = specGroups[grpi], plotPath = plotPath)
+", grpi = grpi, plotPath = plotPath)
 
     if (specGroups[grpi] %in% compFGroups)
     {
@@ -143,7 +143,6 @@ for (grpi in seq_along(specGroups))
         rmdTexts[grpi] <-
             paste(rmdTexts[grpi],
                   paste0(glue::glue(compSpecTempl, grpi = grpi,
-                                    grp = specGroups[grpi],
                                     compi = compsSeq,
                                     plotPath = plotPath,
                                     cil = sapply(compsSeq,
@@ -156,7 +155,7 @@ for (grpi in seq_along(specGroups))
     if (specGroups[grpi] %in% formFGroups)
     {
         precursors <- unique(formTable[group == specGroups[grpi], formula])
-        rmdTexts[grpi] <- paste(rmdTexts[grpi], paste0(glue::glue(formSpecTempl, grpi = grpi, grp = specGroups[grpi],
+        rmdTexts[grpi] <- paste(rmdTexts[grpi], paste0(glue::glue(formSpecTempl, grpi = grpi,
                    precursor = precursors, plotPath = plotPath,
                    fil = sapply(precursors,
                                 function(prec) paste0(getFormInfoList(rmdVars$formConsensus, prec, specGroups[grpi]),

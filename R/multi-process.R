@@ -39,7 +39,8 @@ executeMultiProcess <- function(commandQueue, finishProc, printOutput = FALSE,
                         # execute multiple processes at once
 
                         cmdList <- sapply(commandQueue[seq(nextCommand, nextCommand + (nproc - 1))],
-                                          function(cmd) paste(cmd$command, paste0(cmd$args, collapse = " "), sep = " "))
+                                          function(cmd) paste(shQuote(cmd$command), paste0(shQuote(cmd$args), collapse = " "),
+                                                              sep = " "))
 
                         if (Sys.info()[["sysname"]] == "Windows")
                         {

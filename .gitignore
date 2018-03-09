@@ -28,5 +28,4 @@ vignettes/*.pdf
 **.o
 **/GenForm
 **/GenForm.exe
-man/*.Rd
 inst/doc

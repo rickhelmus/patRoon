@@ -77,11 +77,49 @@ For larger project it may be preferred to export the `data.frame` to a _.csv_ fi
 
 ## Extract and group features
 
+```{r features,results='hide'}
+fList <- findFeatures(anaInfo, "openms", maxlength = 60, mzppm = 5)
+```
+```{r}
+fList
+```
+
+```{r fGroups}
+fGroups <- groupFeatures(fList, "openms")
+fGroups
+```
+
 ## Data cleanup { #data-cleanup }
+
+```{r filter}
+fGroups <- filter(fGroups, intensityThreshold = 10000, intraRGroupAbundance = 1,
+                  minBlankThreshold = 5, repetitions = 2, retentionRange = c(180, -1))
+```
+
+```{r plotEIC,fig.width=7,results='hide'}
+plotEIC(fGroups, colourBy = "fGroups", showFGroupRect = FALSE, showPeakArea = TRUE, topMost = 1, showLegend = FALSE)
+```
 
 ## MS peak lists
 
+```{r MSPeakLists,results='hide'}
+plists <- generateMSPeakLists(fGroups, "mzr", avgMzWindow = 0.0005,
+                              avgMinIntensity = 500, precursorMzWindow = 8)
+```
+```{r}
+plists
+```
+
 ## Formula calculation
+
+```{r formulas,results='hide'}
+forms <- generateFormulas(fGroups, "genform", plists, maxMzDev = 5,
+                          adduct = "M+H", elements = "CHNOPSCl")
+```
+```{r}
+formulas <- consensus(forms, fGroups = fGroups)
+formulas
+```
 
 ## Compound identification
 

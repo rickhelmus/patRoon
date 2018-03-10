@@ -2,43 +2,49 @@
 `patRoon` aims to provide a common interface to various (primarily
 open-source) software solutions for mass spectrometry based non-target analysis.
 The name is derived from a Dutch word that means _pattern_ and may also be an acronym for _hyPhenated
-mAss-specTROmetry nOn-target aNalysis_.
+mAss specTROmetry nOn-target aNalysis_.
 
-`patRoon` is developed as an `R` package and leverages other `R` based packages and external software to provide the following workflow steps that are typically used within non-target (NT) analysis:
+Mass spectrometry based non-target analysis is used to screen large numbers of chemicals simultaneously. For this purpose, high resolution mass spectrometry instruments are used which are typically coupled (or _hyphenated_) with chromatography (_e.g._ LC or GC) to provide additional separation of analytes prior to mass detection. The size and complexity of resulting data makes manual processing impractical, however, many dedicated software tools were developed (and are generally still in active development) to facilitate a more automated approach. The aim of `patRoon` is to harmonize the many tools available to provide a consistent user interface without the need to know all the details of each individual software tool and remove the need for tedious conversion of data when multiple tools are used. Many of the available tools were developed using the [R language][R] or otherwise easily interface with `R`, hence, it was a straightforward decision to develop `patRoon` as an `R` package.
+
+The workflow of non-target analysis is typically highly dependent on several factors such as the analytical instrumentation used and requirements of the study. For this reason, `patRoon` does not enforce a certain workflow. Instead, most workflow steps are optional, are highly configurable and algorithms can easily be mixed or even combined.
+
+Below is an overview of the most common non-target workflow steps supported along with various software tools that were used to implement them:
 
 * **Data preparation**: conversion between and export to common open MS data formats (e.g. mzXML and mzML) ([OpenMS], [DataAnalysis]).
 * **Extraction and grouping of features** ([XCMS], [OpenMS], [enviPick], [enviMass], [ProfileAnalysis]).
 * **Data cleanup**: post filtering of data to improve its quality and aid prioritization.
-* **Automatic extraction of MS and MS/MS** ([mzR], [DataAnalysis]).
+* **Automatic extraction of MS and MS/MS** data ([mzR], [DataAnalysis]).
 * **Formula calculation**: automatic calculation of candidate formulae for detected features ([GenForm], [SIRIUS], [DataAnalysis]).
 * **Compound identification**: automatic annotation of MS/MS spectra and retrieval of candidate structures ([MetFrag], [SIRIUS with CSI:FingerID][SIRIUS]).
 * **Generation of components**: grouping of (chemically) related features such as isotopes, adducts and homologs ([RAMClustR], [CAMERA], [nontarget R package][nontarget]).
 * **reporting** of all workflow steps in various formats: _CSV_, _PDF_ and _HTML_.
 
 ## Installation
-You can install patRoon from github with:
 
-``` r
-install.packages("devtools")
-devtools::install_github("rickhelmus/patRoon")
-```
+Prior to installation you have to make several software packages dependencies are installed.
 
 ### R Dependencies
-Besides 'regular' R package dependencies, which should be installed automatically with `install_github()`, the following optional R packages may also need to be installed:
 
-``` r
-install.packages("RDCOMClient") # required for DataAnalysis functionality
-devtools::install_github("cbroeckl/RAMClustR", build_vignettes = TRUE, dependencies = TRUE)
-devtools::install_github("c-ruttkies/MetFragR/metfRag") # only when using R interface (not by default)
-```
+Most `R` package dependencies are installed automatically. However, it may be necessary to manually install the following [Bioconductor] dependencies:
 
-The following [Bioconductor] packages dependencies may need to be installed manually:
 ```r
 source("https://bioconductor.org/biocLite.R")
 biocLite(c("mzR", "xcms", "CAMERA"))
 ```
 
+In addition, the following optional `R` packages may also need to be installed:
+
+``` r
+install.packages("RDCOMClient") # required for DataAnalysis functionality
+
+install.packages("devtools") # needed only if not already installed
+devtools::install_github("cbroeckl/RAMClustR", build_vignettes = TRUE, dependencies = TRUE)
+devtools::install_github("c-ruttkies/MetFragR/metfRag") # only when using the R interface (not by default)
+```
+
 Note that in order to fulfill installation of the `rJava` package dependency you may need to setup a proper JDK (see for instance [the rJava website][rJava]).
+
+Finally, Windows users need to make sure that [Rtools] is installed.
 
 ### Other dependencies
 
@@ -49,7 +55,7 @@ Depending on which functionality is used, the following (optional) external depe
 * [MetFrag CL][MetFrag-CL] (required if the command-line version of MetFrag is used, the default)
 * [pngquant] (required for `reportMD` with `optimizePng` argument set to `TRUE`)
 
-The location of the OpenMS, SIRIUS and pngquant should either be set within the _PATH_ environment variable (the OpenMS installer will do this automatically). Alternatively, one or more of the `R` options should be set below. Note that the location of the MetFrag CL _jar_ should always be set.
+The location of the OpenMS, SIRIUS and pngquant binaries should either be set within the _PATH_ environment variable (the OpenMS installer will do this automatically). Alternatively, one or more of the `R` options should be set below.
 
 ```r
 options("patRoon.path.SIRIUS" = "~/C:/sirius-win64-3.5.1") # location where SIRIUS was extracted
@@ -58,20 +64,40 @@ options("patRoon.path.pngquant" = "~/pngquant") # directory containing pngquant 
 options("patRoon.path.metFragCL" = "~/MetFrag2.4.2-CL.jar") # full location to the jar file
 ```
 
+Please note that the location of the MetFrag CL jar file should always be set manually.
+
+
+### patRoon installation
+
+Finally, you can install patRoon from github with:
+
+``` r
+install.packages("devtools") # needed only if not already installed
+devtools::install_github("rickhelmus/patRoon")
+```
+
+In some cases this may fail with an error telling you that `SVN` is absent. In this case you may have better luck by changing to the [remotes] package:
+
+``` r
+install.packages("remotes")
+remotes::install_github("rickhelmus/patRoon")
+```
+
+
 ## Getting started
+
 ``` r
 library(patRoon)
 newProject()
 ```
 
-read the [tutorial](docs/articles/tutorial.html).
+The `newProject()` function will pop-up a dialog screen (requires [R Studio][RStudio]!) which will allow you to quickly select the analyses and common workflow options to subsequently generate a template `R` processing script.
 
-read the [reference](docs/reference/index.html).
+However, for a better guide to get started it is recommended to read the [tutorial] (work in progress).
 
-## WIP
-More documentation will folow..
+Finally, the [reference] outlines all the details of the `patRoon` package.
 
-
+[R]: https://www.r-project.org/
 [XCMS]: https://github.com/sneumann/xcms
 [OpenMS]: http://openms.de/
 [enviPick]: https://cran.r-project.org/web/packages/enviPick/index.html
@@ -89,3 +115,11 @@ More documentation will folow..
 [pngquant]: https://pngquant.org/
 [Bioconductor]: https://www.bioconductor.org
 [rJava]: http://www.rforge.net/rJava/
+[tutorial]: https://rickhelmus.github.io/patRoon/articles/tutorial.html
+[reference]: https://rickhelmus.github.io/patRoon/reference/index.html
+[remotes]: https://github.com/r-lib/remotes#readme
+[Rtools]: https://cran.r-project.org/bin/windows/Rtools/
+[RStudio]: https://www.rstudio.com/
+
+
+

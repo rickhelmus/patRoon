@@ -18,7 +18,8 @@ knitr::opts_chunk$set(
   message = FALSE
 )
 
-options("patRoon.cache.mode" = "none")
+# options("patRoon.cache.fileName" = "~/werk/tutorial_cache")
+options(patRoon.path.metFragCL = "~/werk/MetFrag2.4.3-CL.jar")
 ```
 
 
@@ -123,24 +124,57 @@ formulas
 
 ## Compound identification
 
+```{r MF_opt,eval=FALSE}
+options(patRoon.path.metFragCL = "~/MetFrag2.4.3-CL.jar")
+```
+
 ```{r compounds,results='hide'}
-compounds <- generateCompounds(fGroups, plists, "metfrag", maxMzDev = 5,
-                               adduct = 1, isPositive = TRUE)
+compounds <- generateCompounds(fGroups, plists, "metfrag", topMost = 25,
+                               adduct = 1, isPositive = TRUE,
+                               database = "ExtendedPubChem", maxCandidatesToStop = 5000,
+                               scoreTypes = c("FragmenterScore", "OfflineMetFusionScore",
+                                              "PubChemNumberPatents", "PubChemNumberPubMedReferences"))
 ```
 ```{r}
 compounds
 ```
 
+```{r,results='hide'}
+compounds <- addFormulaScoring(compounds, formulas, updateScore = TRUE)
+```
+
 ## Components
 
 ```{r components,results='hide'}
-components <- generateComponents(fGroups, "CAMERA", ionization = "positive")
+components <- generateComponents(fGroups, "camera", ionization = "positive")
 ```
 ```{r}
 components
 ```
 
 ## Reporting
+
+```{r eval=FALSE}
+reportCSV(fGroups, formConsensus = formulas, compounds = compounds, components = components)
+reportPDF(fGroups, formConsensus = formulas, compounds = compounds, components = components,
+          MSPeakLists = plists)
+reportMD(fGroups, formConsensus = formulas, compounds = compounds, components = components,
+         MSPeakLists = plists)
+```
+
+```{r echo=FALSE}
+# ugly work around for nested rmarkdown call made by reportMD; based on https://gist.github.com/jennybc/1f747c5bb84aa9be9c3c
+tempF <- tempfile(); tempScript <- tempfile(fileext = ".R")
+save(fGroups, formulas, compounds, components, plists, file = tempF)
+writeLines(sprintf('
+library(patRoon)
+setwd("%s")
+load("%s")
+reportMD(fGroups, path = "../docs/examples", formConsensus = formulas, compounds = compounds,
+         components = components, MSPeakLists = plists)
+', getwd(), tempF), con = tempScript)
+devtools::clean_source(tempScript, quiet = TRUE)
+```
 
 ## Final script
 

@@ -1,11 +1,13 @@
 ### Feature groups
 
+setGeneric("groups", function(object) standardGeneric("groups"))
 setGeneric("getFeatures", function(fGroups) standardGeneric("getFeatures"))
 setGeneric("groupFeatIndex", function(fGroups) standardGeneric("groupFeatIndex"))
 setGeneric("groupInfo", function(fGroups) standardGeneric("groupInfo"))
 setGeneric("removeAnalyses", function(fGroups, indices) standardGeneric("removeAnalyses"))
 setGeneric("removeGroups", function(fGroups, indices) standardGeneric("removeGroups"))
 setGeneric("removeEmptyGroups", function(fGroups) standardGeneric("removeEmptyGroups"))
+setGeneric("removeEmptyAnalyses", function(fGroups) standardGeneric("removeEmptyAnalyses"))
 setGeneric("averageGroups", function(fGroups) standardGeneric("averageGroups"))
 setGeneric("updateFeatIndex", function(fGroups) standardGeneric("updateFeatIndex"))
 setGeneric("export", function(fGroups, type, out) standardGeneric("export"))

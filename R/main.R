@@ -6,7 +6,7 @@
 #' @importFrom VennDiagram draw.pairwise.venn draw.single.venn draw.triple.venn draw.quad.venn draw.quintuple.venn
 #' @importFrom plotly plot_ly add_trace plotlyOutput renderPlotly ggplotly config
 #' @importFrom mzR openMSfile peaks header close
-#' @importFrom xcms phenoData phenoData<- filepaths filepaths<- xcmsRaw peaks peaks<- groups profinfo profinfo<- groupidx xcmsSet group retcor groupval groupnames rawEIC sampnames groupidx<- groups<-
+#' @importFrom xcms phenoData phenoData<- filepaths filepaths<- xcmsRaw peaks peaks<- profinfo profinfo<- groupidx xcmsSet group retcor groupval groupnames rawEIC sampnames groupidx<-
 #' @importFrom fst compress_fst decompress_fst
 #' @importFrom processx process poll
 #' @importFrom Rdpack reprompt

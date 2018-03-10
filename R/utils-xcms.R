@@ -111,7 +111,7 @@ setMethod("getXcmsSet", "featureGroups", function(obj, exportedData)
     }, simplify = FALSE), use.names = FALSE), ncol = 7, byrow = TRUE, dimnames = list(NULL, c("mzmed", "mzmin", "mzmax", "rtmed", "rtmin", "rtmax", "npeaks")))
 
     # add counts per sample group
-    groups(xs) <- cbind(grps, sapply(unique(anaInfo$group), function(sg)
+    xcms::groups(xs) <- cbind(grps, sapply(unique(anaInfo$group), function(sg)
     {
         sapply(seq_along(ftind), function(g) sum(ftind[[g]][sg == anaInfo$group] != 0))
     }))

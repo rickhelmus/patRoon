@@ -76,7 +76,7 @@ getFeatIndicesFromXS <- function(xs)
 
 importFeatureGroupsXCMSFromFeat <- function(xs, analysisInfo, feat)
 {
-    xcginfo <- groups(xs)
+    xcginfo <- xcms::groups(xs)
     gNames <- makeFGroupName(seq_len(nrow(xcginfo)), xcginfo[, "rtmed"], xcginfo[, "mzmed"])
     gInfo <- data.frame(rts = xcginfo[, "rtmed"], mzs = xcginfo[, "mzmed"], row.names = gNames, stringsAsFactors = FALSE)
 
@@ -98,7 +98,7 @@ importFeatureGroupsXCMSFromFeat <- function(xs, analysisInfo, feat)
 #' @export
 importFeatureGroupsXCMS <- function(xs, analysisInfo)
 {
-    if (length(groups(xs)) == 0)
+    if (length(xcms::groups(xs)) == 0)
         stop("Provided xcmsSet does not contain any grouped features!")
 
     feat <- importFeaturesXCMS(xs, analysisInfo)
@@ -112,7 +112,7 @@ setMethod("removeGroups", "featureGroupsXCMS", function(fGroups, indices)
     # update xcmsSet
     if (length(indices) > 0)
     {
-        groups(fGroups@xs) <- groups(fGroups@xs)[-indices, ]
+        xcms::groups(fGroups@xs) <- xcms::groups(fGroups@xs)[-indices, ]
         groupidx(fGroups@xs) <- groupidx(fGroups@xs)[-indices]
     }
 

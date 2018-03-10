@@ -64,7 +64,6 @@ setMethod("show", "featureGroups", function(object)
     showObjectSize(object)
 })
 
-# NOTE: this method is defined for XCMS generic
 #' @describeIn featureGroups Accessor for \code{groups} slot.
 #' @export
 setMethod("groups", "featureGroups", function(object) object@groups)
@@ -161,6 +160,20 @@ setMethod("removeEmptyGroups", "featureGroups", function(fGroups)
 
         if (any(empty))
             fGroups <- removeGroups(fGroups, which(empty))
+    }
+    return(fGroups)
+})
+
+# UNDONE: make this public?
+setMethod("removeEmptyAnalyses", "featureGroups", function(fGroups)
+{
+    if (length(fGroups) > 0)
+    {
+        trGT <- transpose(groups(fGroups))
+        
+        empty <- trGT[, sapply(.SD, sum) == 0]
+        if (any(empty))
+            fGroups <- removeAnalyses(fGroups, which(empty))
     }
     return(fGroups)
 })
@@ -341,6 +354,8 @@ setMethod("plotChord", "featureGroups", function(obj, addSelfLinks = FALSE, addR
     if (!is.null(outerGroups) && (is.null(names(outerGroups)) || length(outerGroups) < 2))
         stop("outerGroups need to be a named vector with length >= 2")
     hasOuter <- !is.null(outerGroups)
+    
+    obj <- removeEmptyAnalyses(obj)
 
     anaInfo <- analysisInfo(obj)
     gInfo <- groupInfo(obj)
@@ -351,7 +366,7 @@ setMethod("plotChord", "featureGroups", function(obj, addSelfLinks = FALSE, addR
         snames <- anaInfo$analysis
 
     if (length(snames) < 2)
-        stop(sprintf("Nothing to compare: need multiple %s!", if (average) "replicate groups" else "analyses"))
+        stop(sprintf("Nothing to compare: need multiple (non-empty) %s!", if (average) "replicate groups" else "analyses"))
 
     if (hasOuter && !all(snames %in% names(outerGroups)))
         stop(sprintf("The following %s have no outerGroups assigned: %s", if (average) "replicate groups" else "analyses",

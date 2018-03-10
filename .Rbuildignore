@@ -1,2 +1,7 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^docs/$
+^man-roxygen/$
+^src/GenForm$
+^src/GenForm\.exe$
+^src/GenForm-svn/*\.o$

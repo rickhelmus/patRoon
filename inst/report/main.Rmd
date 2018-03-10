@@ -61,7 +61,7 @@ selectMethod("plot", class(rmdVars$fGroups))(rmdVars$fGroups)
 ```
 
 ```{r}
-rGroupLen <- length(unique(analysisInfo(rmdVars$fGroups)$group))
+rGroupLen <- length(unique(analysisInfo(removeEmptyAnalyses(rmdVars$fGroups))$group))
 ```
 
 ##

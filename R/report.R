@@ -530,6 +530,10 @@ setMethod("reportPDF", "featureGroups", function(fGroups, path, reportFGroups,
         cat("Nothing to report...\n")
         return(NULL)
     }
+    
+    if (is.null(MSPeakLists) &&
+        ((!is.null(formConsensus) && reportFormulaSpectra) || !is.null(compounds)))
+        stop("MSPeakLists is NULL, please specify when reporting formula and/or compounds")
 
     prepareReportPath(path, clearPath)
 
@@ -611,7 +615,11 @@ setMethod("reportMD", "featureGroups", function(fGroups, path, reportChord, repo
                                                 EICRtWindow, EICMzWindow, EICTopMost, EICOnlyPresent,
                                                 selfContained, optimizePng, maxProcAmount, clearPath)
 {
-    # UNDONE: quantpng or similar support and non-standalone HTML (both also docs), mention pandoc win limits
+    # UNDONE: mention pandoc win limits
+    
+    if (is.null(MSPeakLists) &&
+        ((!is.null(formConsensus) && reportFormulaSpectra) || !is.null(compounds)))
+        stop("MSPeakLists is NULL, please specify when reporting formula and/or compounds")
 
     prepareReportPath(path, clearPath)
 

@@ -75,7 +75,7 @@
       <h1>patRoon tutorial</h1>
                         <h4 class="author">Rick Helmus</h4>
             
-            <h4 class="date">2018-03-05</h4>
+            <h4 class="date">2018-03-10</h4>
           </div>
 
     
@@ -105,60 +105,157 @@
 workPath &lt;-<span class="st"> "~/my_project"</span> <span class="co"># change this to the location of your project directory</span>
 ## setwd(workPath)
 
-dataDir &lt;-<span class="st"> "~/werk/test/tut/"</span> <span class="co"># UNDONE</span></code></pre></div>
+dataDir &lt;-<span class="st"> </span>patRoonData<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/patRoonData/topics/patRoonData">exampleDataPath</a></span>()</code></pre></div>
 <p>Next step is to generate information ncessary for the analysis. To do so, we need to specify the names and file locations of the analyses, to which <em>replicate group</em> they belong and which replicate group(s) should be used for blank subtraction. To do so, we can use the <code><a href="../reference/analysis-information.html">generateAnalysisInfo()</a></code> utility function which automatically generates a suitable <code>data.frame</code> for us from given analyses:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/analysis-information.html">generateAnalysisInfo</a></span>(dataDir)
-<span class="co">#&gt;                                    path       analysis          group ref</span>
-<span class="co">#&gt; 1 C:/Users/Rick/Documents/werk/test/tut      solvent-1      solvent-1    </span>
-<span class="co">#&gt; 2 C:/Users/Rick/Documents/werk/test/tut      solvent-2      solvent-2    </span>
-<span class="co">#&gt; 3 C:/Users/Rick/Documents/werk/test/tut      solvent-3      solvent-3    </span>
-<span class="co">#&gt; 4 C:/Users/Rick/Documents/werk/test/tut standard-mix-1 standard-mix-1    </span>
-<span class="co">#&gt; 5 C:/Users/Rick/Documents/werk/test/tut standard-mix-2 standard-mix-2    </span>
-<span class="co">#&gt; 6 C:/Users/Rick/Documents/werk/test/tut standard-mix-3 standard-mix-3</span></code></pre></div>
-<p>As you can see the generated <code>data.frame</code> consists of four columns: * <em>path</em>: the path of the file directory containing the analysis * <em>analysis</em>: the name of the analysis. The shoud be the file name <em>without</em> file extension. * <em>group</em>: to which <em>replicate group</em> the analysis belongs. All analysis which are replicates of each other get the same name. * <em>ref</em>: which replicate groub should be used for blank subtraction.</p>
+<span class="co">#&gt;                                                                 path</span>
+<span class="co">#&gt; 1 /home/rick/R/x86_64-suse-linux-gnu-library/3.4/patRoonData/extdata</span>
+<span class="co">#&gt; 2 /home/rick/R/x86_64-suse-linux-gnu-library/3.4/patRoonData/extdata</span>
+<span class="co">#&gt; 3 /home/rick/R/x86_64-suse-linux-gnu-library/3.4/patRoonData/extdata</span>
+<span class="co">#&gt; 4 /home/rick/R/x86_64-suse-linux-gnu-library/3.4/patRoonData/extdata</span>
+<span class="co">#&gt; 5 /home/rick/R/x86_64-suse-linux-gnu-library/3.4/patRoonData/extdata</span>
+<span class="co">#&gt; 6 /home/rick/R/x86_64-suse-linux-gnu-library/3.4/patRoonData/extdata</span>
+<span class="co">#&gt;     analysis      group ref</span>
+<span class="co">#&gt; 1  solvent-1  solvent-1    </span>
+<span class="co">#&gt; 2  solvent-2  solvent-2    </span>
+<span class="co">#&gt; 3  solvent-3  solvent-3    </span>
+<span class="co">#&gt; 4 standard-1 standard-1    </span>
+<span class="co">#&gt; 5 standard-2 standard-2    </span>
+<span class="co">#&gt; 6 standard-3 standard-3</span></code></pre></div>
+<p>As you can see the generated <code>data.frame</code> consists of four columns:</p>
+<ul>
+<li>
+<em>path</em>: the path of the file directory containing the analysis</li>
+<li>
+<em>analysis</em>: the name of the analysis. The shoud be the file name <em>without</em> file extension.</li>
+<li>
+<em>group</em>: to which <em>replicate group</em> the analysis belongs. All analysis which are replicates of each other get the same name.</li>
+<li>
+<em>ref</em>: which replicate groub should be used for blank subtraction.</li>
+</ul>
 <p>The latter two columns are especially important for <a href="#data-cleanup">data cleanup</a>.</p>
 <p>In our example, the solvents and standards should belong each to a different replicate group (<code>"solvent"</code> and <code>"standards"</code>). The solvents should also be used for blank subtraction. For this we can use the <code>groups</code> and <code>refs</code> arguments:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">anaInfo &lt;-<span class="st"> </span><span class="kw"><a href="../reference/analysis-information.html">generateAnalysisInfo</a></span>(dataDir,
                                 <span class="dt">groups =</span> <span class="kw">c</span>(<span class="kw">rep</span>(<span class="st">"solvent"</span>, <span class="dv">3</span>), <span class="kw">rep</span>(<span class="st">"standard"</span>, <span class="dv">3</span>)),
                                 <span class="dt">refs =</span> <span class="st">"solvent"</span>)
 anaInfo
-<span class="co">#&gt;                                    path       analysis    group     ref</span>
-<span class="co">#&gt; 1 C:/Users/Rick/Documents/werk/test/tut      solvent-1  solvent solvent</span>
-<span class="co">#&gt; 2 C:/Users/Rick/Documents/werk/test/tut      solvent-2  solvent solvent</span>
-<span class="co">#&gt; 3 C:/Users/Rick/Documents/werk/test/tut      solvent-3  solvent solvent</span>
-<span class="co">#&gt; 4 C:/Users/Rick/Documents/werk/test/tut standard-mix-1 standard solvent</span>
-<span class="co">#&gt; 5 C:/Users/Rick/Documents/werk/test/tut standard-mix-2 standard solvent</span>
-<span class="co">#&gt; 6 C:/Users/Rick/Documents/werk/test/tut standard-mix-3 standard solvent</span></code></pre></div>
+<span class="co">#&gt;                                                                 path</span>
+<span class="co">#&gt; 1 /home/rick/R/x86_64-suse-linux-gnu-library/3.4/patRoonData/extdata</span>
+<span class="co">#&gt; 2 /home/rick/R/x86_64-suse-linux-gnu-library/3.4/patRoonData/extdata</span>
+<span class="co">#&gt; 3 /home/rick/R/x86_64-suse-linux-gnu-library/3.4/patRoonData/extdata</span>
+<span class="co">#&gt; 4 /home/rick/R/x86_64-suse-linux-gnu-library/3.4/patRoonData/extdata</span>
+<span class="co">#&gt; 5 /home/rick/R/x86_64-suse-linux-gnu-library/3.4/patRoonData/extdata</span>
+<span class="co">#&gt; 6 /home/rick/R/x86_64-suse-linux-gnu-library/3.4/patRoonData/extdata</span>
+<span class="co">#&gt;     analysis    group     ref</span>
+<span class="co">#&gt; 1  solvent-1  solvent solvent</span>
+<span class="co">#&gt; 2  solvent-2  solvent solvent</span>
+<span class="co">#&gt; 3  solvent-3  solvent solvent</span>
+<span class="co">#&gt; 4 standard-1 standard solvent</span>
+<span class="co">#&gt; 5 standard-2 standard solvent</span>
+<span class="co">#&gt; 6 standard-3 standard solvent</span></code></pre></div>
 <p>Note that we set the reference for the solvents to themself. This will remove any features from the solvents, which is generally fine as we are usually not interested in the blanks anyway.</p>
-<p>Note that for larger project it may be preferred to export the <code>data.frame</code> to a <em>.csv</em> file so it can be easily edited, for instance, with Excel. Alternatively, the <code><a href="../reference/GUI-utils.html">newProject()</a></code> function can be used to make this process even easier (briefly discussed <a href="#newProject">here</a>).</p>
+<p>For larger project it may be preferred to export the <code>data.frame</code> to a <em>.csv</em> file so it can be easily edited, for instance, with Excel. Alternatively, the <code><a href="../reference/GUI-utils.html">newProject()</a></code> function can be used to make this process even easier (briefly discussed <a href="#newProject">here</a>).</p>
 </div>
 <div id="extract-and-group-features" class="section level2">
 <h2 class="hasAnchor">
 <a href="#extract-and-group-features" class="anchor"></a>Extract and group features</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fList &lt;-<span class="st"> </span><span class="kw"><a href="../reference/feature-finding.html">findFeatures</a></span>(anaInfo, <span class="st">"openms"</span>, <span class="dt">maxlength =</span> <span class="dv">60</span>, <span class="dt">mzppm =</span> <span class="dv">5</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fList
+<span class="co">#&gt; A features object ('featuresOpenMS')</span>
+<span class="co">#&gt; Total feature count: 2658</span>
+<span class="co">#&gt; Average feature count/analysis: 443</span>
+<span class="co">#&gt; Analyses: solvent-1, solvent-2, solvent-3, standard-1, standard-2, standard-3 (6 total)</span>
+<span class="co">#&gt; Replicate groups: solvent, standard (2 total)</span>
+<span class="co">#&gt; Replicate groups used as ref: solvent (1 total)</span>
+<span class="co">#&gt; Object size (indication): 401.1 kB</span></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fGroups &lt;-<span class="st"> </span><span class="kw"><a href="../reference/feature-grouping.html">groupFeatures</a></span>(fList, <span class="st">"openms"</span>)
+fGroups
+<span class="co">#&gt; A feature groups object ('featureGroupsOpenMS')</span>
+<span class="co">#&gt; Feature groups: M79_R20_1, M79_R20_2, M79_R112_3, M79_R8_4, M85_R112_5, M85_R14_6, ... (644 total)</span>
+<span class="co">#&gt; Analyses: solvent-1, solvent-2, solvent-3, standard-1, standard-2, standard-3 (6 total)</span>
+<span class="co">#&gt; Replicate groups: solvent, standard (2 total)</span>
+<span class="co">#&gt; Replicate groups used as ref: solvent (1 total)</span>
+<span class="co">#&gt; Object size (indication): 746.7 kB</span></code></pre></div>
 </div>
 <div id="data-cleanup" class="section level2">
 <h2 class="hasAnchor">
 <a href="#data-cleanup" class="anchor"></a>Data cleanup</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fGroups &lt;-<span class="st"> </span><span class="kw"><a href="../reference/generics.html">filter</a></span>(fGroups, <span class="dt">intensityThreshold =</span> <span class="dv">10000</span>, <span class="dt">intraRGroupAbundance =</span> <span class="dv">1</span>,
+                  <span class="dt">minBlankThreshold =</span> <span class="dv">5</span>, <span class="dt">repetitions =</span> <span class="dv">2</span>, <span class="dt">retentionRange =</span> <span class="kw">c</span>(<span class="dv">180</span>, <span class="op">-</span><span class="dv">1</span>))
+<span class="co">#&gt; Applying intensity filter... Done! Filtered 411 (63.82%) groups. Remaining: 233.</span>
+<span class="co">#&gt; Applying retention filter... Done! Filtered 195 (83.69%) groups. Remaining: 38.</span>
+<span class="co">#&gt; filter repetition 1/2</span>
+<span class="co">#&gt; Applying replicate filter... Done! Filtered 11 (28.95%) groups. Remaining: 27.</span>
+<span class="co">#&gt; Applying blank filter... Done! Filtered 2 (7.41%) groups. Remaining: 25.</span>
+<span class="co">#&gt; filter repetition 2/2</span>
+<span class="co">#&gt; Applying replicate filter... Done! Filtered 0 (0.00%) groups. Remaining: 25.</span>
+<span class="co">#&gt; Applying blank filter... Done! Filtered 0 (0.00%) groups. Remaining: 25.</span></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/generics.html">plotEIC</a></span>(fGroups, <span class="dt">colourBy =</span> <span class="st">"fGroups"</span>, <span class="dt">showFGroupRect =</span> <span class="ot">FALSE</span>, <span class="dt">showPeakArea =</span> <span class="ot">TRUE</span>, <span class="dt">topMost =</span> <span class="dv">1</span>, <span class="dt">showLegend =</span> <span class="ot">FALSE</span>)</code></pre></div>
+<p><img src="tutorial_files/figure-html/plotEIC-1.png" width="672"></p>
 </div>
 <div id="ms-peak-lists" class="section level2">
 <h2 class="hasAnchor">
 <a href="#ms-peak-lists" class="anchor"></a>MS peak lists</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">plists &lt;-<span class="st"> </span><span class="kw"><a href="../reference/MSPeakLists-generation.html">generateMSPeakLists</a></span>(fGroups, <span class="st">"mzr"</span>, <span class="dt">avgMzWindow =</span> <span class="fl">0.0005</span>,
+                              <span class="dt">avgMinIntensity =</span> <span class="dv">500</span>, <span class="dt">precursorMzWindow =</span> <span class="dv">8</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">plists
+<span class="co">#&gt; A MSPeakLists object ('MSPeakLists')</span>
+<span class="co">#&gt; Total peak count: 14237 (MS: 12200 - MS/MS: 2037)</span>
+<span class="co">#&gt; Average peak count/analysis: 4746 (MS: 4067 - MS/MS: 679)</span>
+<span class="co">#&gt; Total peak lists: 147 (MS: 75 - MS/MS: 72)</span>
+<span class="co">#&gt; Average peak lists/analysis: 49 (MS: 25 - MS/MS: 24)</span>
+<span class="co">#&gt; Object size (indication): 443.2 kB</span></code></pre></div>
 </div>
 <div id="formula-calculation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#formula-calculation" class="anchor"></a>Formula calculation</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">forms &lt;-<span class="st"> </span><span class="kw"><a href="../reference/formula-generation.html">generateFormulas</a></span>(fGroups, <span class="st">"genform"</span>, plists, <span class="dt">maxMzDev =</span> <span class="dv">5</span>,
+                          <span class="dt">adduct =</span> <span class="st">"M+H"</span>, <span class="dt">elements =</span> <span class="st">"CHNOPSCl"</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">formulas &lt;-<span class="st"> </span><span class="kw"><a href="../reference/generics.html">consensus</a></span>(forms, <span class="dt">fGroups =</span> fGroups)
+<span class="co">#&gt; Generating consensus for formula lists (GenForm)... Done!</span>
+formulas
+<span class="co">#&gt; A formulaConsensus object (formulaConsensus)</span>
+<span class="co">#&gt; Algorithm: GenForm</span>
+<span class="co">#&gt; Total formula count: 223 (all), 41 (MS) and 182 (MS/MS)</span>
+<span class="co">#&gt; Average formulas per feature group: 19.5 (all), 11.6 (MS), 21.3 (MS/MS)</span>
+<span class="co">#&gt; Object size (indication): 70.4 kB</span></code></pre></div>
 </div>
 <div id="compound-identification" class="section level2">
 <h2 class="hasAnchor">
 <a href="#compound-identification" class="anchor"></a>Compound identification</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">options</span>(<span class="dt">patRoon.path.metFragCL =</span> <span class="st">"~/MetFrag2.4.3-CL.jar"</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">compounds &lt;-<span class="st"> </span><span class="kw"><a href="../reference/compound-generation.html">generateCompounds</a></span>(fGroups, plists, <span class="st">"metfrag"</span>, <span class="dt">topMost =</span> <span class="dv">25</span>,
+                               <span class="dt">adduct =</span> <span class="dv">1</span>, <span class="dt">isPositive =</span> <span class="ot">TRUE</span>,
+                               <span class="dt">database =</span> <span class="st">"ExtendedPubChem"</span>, <span class="dt">maxCandidatesToStop =</span> <span class="dv">5000</span>,
+                               <span class="dt">scoreTypes =</span> <span class="kw">c</span>(<span class="st">"FragmenterScore"</span>, <span class="st">"OfflineMetFusionScore"</span>,
+                                              <span class="st">"PubChemNumberPatents"</span>, <span class="st">"PubChemNumberPubMedReferences"</span>))</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">compounds
+<span class="co">#&gt; A compounds object (compounds)</span>
+<span class="co">#&gt; Algorithm: MetFrag</span>
+<span class="co">#&gt; Number of feature groups with compounds in this object: 20</span>
+<span class="co">#&gt; Number of compounds: 490 (total), 24.5 (mean), 15 - 25 (min - max)</span>
+<span class="co">#&gt; Object size (indication): 1.4 MB</span></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">compounds &lt;-<span class="st"> </span><span class="kw"><a href="../reference/compounds-class.html">addFormulaScoring</a></span>(compounds, formulas, <span class="dt">updateScore =</span> <span class="ot">TRUE</span>)</code></pre></div>
 </div>
 <div id="components" class="section level2">
 <h2 class="hasAnchor">
 <a href="#components" class="anchor"></a>Components</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">components &lt;-<span class="st"> </span><span class="kw"><a href="../reference/component-generation.html">generateComponents</a></span>(fGroups, <span class="st">"camera"</span>, <span class="dt">ionization =</span> <span class="st">"positive"</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">components
+<span class="co">#&gt; A components object (componentsCamera)</span>
+<span class="co">#&gt; Algorithm: CAMERA</span>
+<span class="co">#&gt; Components: CMP1, CMP2, CMP3, CMP4, CMP5, CMP6, ... (18 total)</span>
+<span class="co">#&gt; Number of feature groups in components: 25 (total), 1.4 (mean), 1 - 3 (min - max)</span>
+<span class="co">#&gt; Object size (indication): 501.8 kB</span></code></pre></div>
 </div>
 <div id="reporting" class="section level2">
 <h2 class="hasAnchor">
 <a href="#reporting" class="anchor"></a>Reporting</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/reporting.html">reportCSV</a></span>(fGroups, <span class="dt">formConsensus =</span> formulas, <span class="dt">compounds =</span> compounds, <span class="dt">components =</span> components)
+<span class="kw"><a href="../reference/reporting.html">reportPDF</a></span>(fGroups, <span class="dt">formConsensus =</span> formulas, <span class="dt">compounds =</span> compounds, <span class="dt">components =</span> components,
+          <span class="dt">MSPeakLists =</span> plists)
+<span class="kw"><a href="../reference/reporting.html">reportMD</a></span>(fGroups, <span class="dt">formConsensus =</span> formulas, <span class="dt">compounds =</span> compounds, <span class="dt">components =</span> components,
+         <span class="dt">MSPeakLists =</span> plists)</code></pre></div>
 </div>
 <div id="final-script" class="section level2">
 <h2 class="hasAnchor">

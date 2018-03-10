@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>C:/Users/Rick/Documents/werk/patRoon/README.md • patRoon</title>
+<title>/mnt/nixshared2/shared/werk/patRoon/README.md • patRoon</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -27,7 +27,7 @@
 <script src="pkgdown.js"></script>
   
   
-<meta property="og:title" content="C:/Users/Rick/Documents/werk/patRoon/README.md" />
+<meta property="og:title" content="/mnt/nixshared2/shared/werk/patRoon/README.md" />
 <!-- mathjax -->
 <script src='https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
 
@@ -95,14 +95,16 @@
       <div class="row">
   <div class="contents col-md-12">
     <div class="page-header">
-      <h1>C:/Users/Rick/Documents/werk/patRoon/README.md</h1>
+      <h1>/mnt/nixshared2/shared/werk/patRoon/README.md</h1>
     </div>
 
 <div id="patroon" class="section level1">
 <h1 class="hasAnchor">
 <a href="#patroon" class="anchor"></a>patRoon</h1>
-<p><code>patRoon</code> aims to provide a common interface to various (primarily open-source) software solutions for mass spectrometry based non-target analysis. The name is derived from a Dutch word that means ‘pattern’ and may also be an acronym for ‘hyPhenated mAss-specTROmetry nOn-target aNalysis’.</p>
-<p><code>patRoon</code> is developed as an <code>R</code> package and leverages other <code>R</code> based packages and external software to provide the following workflow steps that are typically used within non-target (NT) analysis:</p>
+<p><code>patRoon</code> aims to provide a common interface to various (primarily open-source) software solutions for mass spectrometry based non-target analysis. The name is derived from a Dutch word that means <em>pattern</em> and may also be an acronym for <em>hyPhenated mAss specTROmetry nOn-target aNalysis</em>.</p>
+<p>Mass spectrometry based non-target analysis is used to screen large numbers of chemicals simultaneously. For this purpose, high resolution mass spectrometry instruments are used which are typically coupled (or <em>hyphenated</em>) with chromatography (<em>e.g.</em> LC or GC) to provide additional separation of analytes prior to mass detection. The size and complexity of resulting data makes manual processing impractical, however, many dedicated software tools were developed (and are generally still in active development) to facilitate a more automated approach. The aim of <code>patRoon</code> is to harmonize the many tools available to provide a consistent user interface without the need to know all the details of each individual software tool and remove the need for tedious conversion of data when multiple tools are used. Many of the available tools were developed using the <a href="https://www.r-project.org/">R language</a> or otherwise easily interface with <code>R</code>, hence, it was a straightforward decision to develop <code>patRoon</code> as an <code>R</code> package.</p>
+<p>The workflow of non-target analysis is typically highly dependent on several factors such as the analytical instrumentation used and requirements of the study. For this reason, <code>patRoon</code> does not enforce a certain workflow. Instead, most workflow steps are optional, are highly configurable and algorithms can easily be mixed or even combined.</p>
+<p>Below is an overview of the most common non-target workflow steps supported along with various software tools that were used to implement them:</p>
 <ul>
 <li>
 <strong>Data preparation</strong>: conversion between and export to common open MS data formats (e.g. mzXML and mzML) (<a href="http://openms.de/">OpenMS</a>, <a href="https://www.bruker.com/">DataAnalysis</a>).</li>
@@ -111,7 +113,7 @@
 <li>
 <strong>Data cleanup</strong>: post filtering of data to improve its quality and aid prioritization.</li>
 <li>
-<strong>Automatic extraction of MS and MS/MS</strong> (<a href="https://github.com/sneumann/mzR/">mzR</a>, <a href="https://www.bruker.com/">DataAnalysis</a>).</li>
+<strong>Automatic extraction of MS and MS/MS</strong> data (<a href="https://github.com/sneumann/mzR/">mzR</a>, <a href="https://www.bruker.com/">DataAnalysis</a>).</li>
 <li>
 <strong>Formula calculation</strong>: automatic calculation of candidate formulae for detected features (<a href="https://sourceforge.net/projects/genform">GenForm</a>, <a href="https://bio.informatik.uni-jena.de/software/sirius/">SIRIUS</a>, <a href="https://www.bruker.com/">DataAnalysis</a>).</li>
 <li>
@@ -124,20 +126,21 @@
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
-<p>You can install patRoon from github with:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">install.packages</span>(<span class="st">"devtools"</span>)
-devtools<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/devtools/topics/install_github">install_github</a></span>(<span class="st">"rickhelmus/patRoon"</span>)</code></pre></div>
+<p>Prior to installation you have to make several software packages dependencies are installed.</p>
 <div id="r-dependencies" class="section level3">
 <h3 class="hasAnchor">
 <a href="#r-dependencies" class="anchor"></a>R Dependencies</h3>
-<p>Besides ‘regular’ R package dependencies, which should be installed automatically with <code>install_github()</code>, the following optional R packages may also need to be installed:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">install.packages</span>(<span class="st">"RDCOMClient"</span>) <span class="co"># required for DataAnalysis functionality</span>
-devtools<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/devtools/topics/install_github">install_github</a></span>(<span class="st">"cbroeckl/RAMClustR"</span>, <span class="dt">build_vignettes =</span> <span class="ot">TRUE</span>, <span class="dt">dependencies =</span> <span class="ot">TRUE</span>)
-devtools<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/devtools/topics/install_github">install_github</a></span>(<span class="st">"c-ruttkies/MetFragR/metfRag"</span>) <span class="co"># only when using R interface (not by default)</span></code></pre></div>
-<p>The following <a href="https://www.bioconductor.org">Bioconductor</a> packages dependencies may need to be installed manually:</p>
+<p>Most <code>R</code> package dependencies are installed automatically. However, it may be necessary to manually install the following <a href="https://www.bioconductor.org">Bioconductor</a> dependencies:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">source</span>(<span class="st">"https://bioconductor.org/biocLite.R"</span>)
 <span class="kw">biocLite</span>(<span class="kw">c</span>(<span class="st">"mzR"</span>, <span class="st">"xcms"</span>, <span class="st">"CAMERA"</span>))</code></pre></div>
+<p>In addition, the following optional <code>R</code> packages may also need to be installed:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">install.packages</span>(<span class="st">"RDCOMClient"</span>) <span class="co"># required for DataAnalysis functionality</span>
+
+<span class="kw">install.packages</span>(<span class="st">"devtools"</span>) <span class="co"># needed only if not already installed</span>
+devtools<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/devtools/topics/install_github">install_github</a></span>(<span class="st">"cbroeckl/RAMClustR"</span>, <span class="dt">build_vignettes =</span> <span class="ot">TRUE</span>, <span class="dt">dependencies =</span> <span class="ot">TRUE</span>)
+devtools<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/devtools/topics/install_github">install_github</a></span>(<span class="st">"c-ruttkies/MetFragR/metfRag"</span>) <span class="co"># only when using the R interface (not by default)</span></code></pre></div>
 <p>Note that in order to fulfill installation of the <code>rJava</code> package dependency you may need to setup a proper JDK (see for instance <a href="http://www.rforge.net/rJava/">the rJava website</a>).</p>
+<p>Finally, Windows users need to make sure that <a href="https://cran.r-project.org/bin/windows/Rtools/">Rtools</a> is installed.</p>
 </div>
 <div id="other-dependencies" class="section level3">
 <h3 class="hasAnchor">
@@ -151,11 +154,22 @@ devtools<span class="op">::</span><span class="kw"><a href="http://www.rdocument
 <li>
 <a href="https://pngquant.org/">pngquant</a> (required for <code>reportMD</code> with <code>optimizePng</code> argument set to <code>TRUE</code>)</li>
 </ul>
-<p>The location of the OpenMS, SIRIUS and pngquant should either be set within the <em>PATH</em> environment variable (the OpenMS installer will do this automatically). Alternatively, one or more of the <code>R</code> options should be set below. Note that the location of the MetFrag CL <em>jar</em> should always be set.</p>
+<p>The location of the OpenMS, SIRIUS and pngquant binaries should either be set within the <em>PATH</em> environment variable (the OpenMS installer will do this automatically). Alternatively, one or more of the <code>R</code> options should be set below.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">options</span>(<span class="st">"patRoon.path.SIRIUS"</span> =<span class="st"> "~/C:/sirius-win64-3.5.1"</span>) <span class="co"># location where SIRIUS was extracted</span>
 <span class="kw">options</span>(<span class="st">"patRoon.path.OpenMS"</span> =<span class="st"> "/usr/local/bin"</span>) <span class="co"># directory with the OpenMS binaries</span>
 <span class="kw">options</span>(<span class="st">"patRoon.path.pngquant"</span> =<span class="st"> "~/pngquant"</span>) <span class="co"># directory containing pngquant binary</span>
 <span class="kw">options</span>(<span class="st">"patRoon.path.metFragCL"</span> =<span class="st"> "~/MetFrag2.4.2-CL.jar"</span>) <span class="co"># full location to the jar file</span></code></pre></div>
+<p>Please note that the location of the MetFrag CL jar file should always be set manually.</p>
+</div>
+<div id="patroon-installation" class="section level3">
+<h3 class="hasAnchor">
+<a href="#patroon-installation" class="anchor"></a>patRoon installation</h3>
+<p>Finally, you can install patRoon from github with:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">install.packages</span>(<span class="st">"devtools"</span>) <span class="co"># needed only if not already installed</span>
+devtools<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/devtools/topics/install_github">install_github</a></span>(<span class="st">"rickhelmus/patRoon"</span>)</code></pre></div>
+<p>In some cases this may fail with an error telling you that <code>SVN</code> is absent. In this case you may have better luck by changing to the <a href="https://github.com/r-lib/remotes#readme">remotes</a> package:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">install.packages</span>(<span class="st">"remotes"</span>)
+remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">"rickhelmus/patRoon"</span>)</code></pre></div>
 </div>
 </div>
 <div id="getting-started" class="section level2">
@@ -163,13 +177,9 @@ devtools<span class="op">::</span><span class="kw"><a href="http://www.rdocument
 <a href="#getting-started" class="anchor"></a>Getting started</h2>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(patRoon)
 <span class="kw"><a href="reference/GUI-utils.html">newProject</a></span>()</code></pre></div>
-<p>read the <a href="articles/tutorial.html">tutorial</a>.</p>
-<p>read the <a href="reference/index.html">reference</a>.</p>
-</div>
-<div id="wip" class="section level2">
-<h2 class="hasAnchor">
-<a href="#wip" class="anchor"></a>WIP</h2>
-<p>More documentation will folow..</p>
+<p>The <code><a href="reference/GUI-utils.html">newProject()</a></code> function will pop-up a dialog screen (requires <a href="https://www.rstudio.com/">R Studio</a>!) which will allow you to quickly select the analyses and common workflow options to subsequently generate a template <code>R</code> processing script.</p>
+<p>However, for a better guide to get started it is recommended to read the <a href="https://rickhelmus.github.io/patRoon/articles/tutorial.html">tutorial</a> (work in progress).</p>
+<p>Finally, the <a href="https://rickhelmus.github.io/patRoon/reference/index.html">reference</a> outlines all the details of the <code>patRoon</code> package.</p>
 </div>
 </div>
 

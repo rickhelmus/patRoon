@@ -6,9 +6,7 @@
 \alias{patRoon-package}
 \title{Workflow solutions for mass-spectrometry based non-target analysis.}
 \description{
-patRoon combines several open-source and vendor software solutions to
-provide a complete workflow for non-target analysis from high resolution
-mass-spectrometry data.
+\Sexpr[results=text,echo=FALSE]{packageDescription("patRoon", fields = "Description")}
 }
 \section{Package options}{
 
@@ -24,8 +22,8 @@ mass-spectrometry data.
   might be useful, for instance, to temporarily disable cached results before
   running a function.
 
-  \item \code{patRoon.cache.fileName}: a \code{character} specifying the
-  name of the cache file (default is \file{cache.sqlite}).
+  \item \code{patRoon.cache.fileName}: a \code{character} specifying the name
+  of the cache file (default is \file{cache.sqlite}).
 
   \item \code{patRoon.maxProcAmount}: The maximum number of processes that
   should be initiated in parallel. A good starting point is the number of

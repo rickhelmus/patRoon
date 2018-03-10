@@ -1,12 +1,18 @@
 Package: patRoon
 Type: Package
-Title: Workflow Solutions For Mass-Spectrometry Based Non-Target Analysis
+Title: Workflow Solutions for Mass-Spectrometry Based Non-Target Analysis
 Version: 0.1
 Authors@R: c(
     person("Rick", "Helmus", email = "r.helmus@uva.nl", role = c("aut", "cre")),
     person("Olaf", "Brock", role = "ctb"),
     person("Vittorio", "Albergamo", role = "ctb"))
-Description: TBD.
+Description: Provides a common interface to the various workflow steps that are
+    typically part of a mass spectrometry based non-target analysis. Various
+    (open-source) tools are combined which provide algorithms for extraction
+    and grouping of features, extraction of MS and MS/MS data, automatic
+    determination of formula and compound candidates and grouping related
+    features to components. In addition, various tools are provided for e.g.
+    data preparation and cleanup, plotting results and automatic reporting.
 License: GPL-3
 LazyData: TRUE
 RoxygenNote: 6.0.1

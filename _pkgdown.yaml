@@ -1,0 +1,19 @@
+title: patRoon
+url: https://rickhelmus.github.io/patRoon
+template:
+    params:
+        bootswatch: flatly
+navbar:
+    title: patRoon
+    type: default
+    left:
+      - icon: fa-home fa-lg
+        href: index.html
+      - text: Reference
+        href: reference/index.html
+      - text: Tutorial
+        href: articles/tutorial.html
+        
+    right:
+      - icon: fa-github fa-lg
+        href: https://github.com/rickhelmus/patRoon

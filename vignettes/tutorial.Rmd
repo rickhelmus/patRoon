@@ -94,7 +94,7 @@ fGroups
 
 ```{r filter}
 fGroups <- filter(fGroups, intensityThreshold = 10000, intraRGroupAbundance = 1,
-                  minBlankThreshold = 5, repetitions = 2, retentionRange = c(180, -1))
+                  minBlankThreshold = 5, repetitions = 2, retentionRange = c(110, -1))
 ```
 
 ```{r plotEIC,fig.width=7,results='hide'}
@@ -133,7 +133,8 @@ compounds <- generateCompounds(fGroups, plists, "metfrag", topMost = 25,
                                adduct = 1, isPositive = TRUE,
                                database = "ExtendedPubChem", maxCandidatesToStop = 5000,
                                scoreTypes = c("FragmenterScore", "OfflineMetFusionScore",
-                                              "PubChemNumberPatents", "PubChemNumberPubMedReferences"))
+                                              "PubChemNumberPatents",
+                                              "PubChemNumberPubMedReferences"))
 ```
 ```{r}
 compounds

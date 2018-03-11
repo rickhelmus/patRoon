@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>patRoon tutorial • patRoon</title>
-<!-- jquery --><script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<!-- jquery --><script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script><!-- Font Awesome icons --><link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js" integrity="sha384-cV+rhyOuRHc9Ub/91rihWcGmMmCXDeksTtCihMupQHSsi8GIIRDG0ThDc3HGQFJ3" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
 <script src="../jquery.sticky-kit.min.js"></script><script src="../pkgdown.js"></script><meta property="og:title" content="patRoon tutorial">
@@ -40,17 +40,8 @@
 <li>
   <a href="../reference/index.html">Reference</a>
 </li>
-<li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    Articles
-     
-    <span class="caret"></span>
-  </a>
-  <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="../articles/tutorial.html">patRoon tutorial</a>
-    </li>
-  </ul>
+  <a href="../articles/tutorial.html">Tutorial</a>
 </li>
       </ul>
 <ul class="nav navbar-nav navbar-right">
@@ -75,7 +66,7 @@
       <h1>patRoon tutorial</h1>
                         <h4 class="author">Rick Helmus</h4>
             
-            <h4 class="date">2018-03-10</h4>
+            <h4 class="date">2018-03-11</h4>
           </div>
 
     
@@ -108,20 +99,20 @@ workPath &lt;-<span class="st"> "~/my_project"</span> <span class="co"># change 
 dataDir &lt;-<span class="st"> </span>patRoonData<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/patRoonData/topics/patRoonData">exampleDataPath</a></span>()</code></pre></div>
 <p>Next step is to generate information ncessary for the analysis. To do so, we need to specify the names and file locations of the analyses, to which <em>replicate group</em> they belong and which replicate group(s) should be used for blank subtraction. To do so, we can use the <code><a href="../reference/analysis-information.html">generateAnalysisInfo()</a></code> utility function which automatically generates a suitable <code>data.frame</code> for us from given analyses:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/analysis-information.html">generateAnalysisInfo</a></span>(dataDir)
-<span class="co">#&gt;                                                                 path</span>
-<span class="co">#&gt; 1 /home/rick/R/x86_64-suse-linux-gnu-library/3.4/patRoonData/extdata</span>
-<span class="co">#&gt; 2 /home/rick/R/x86_64-suse-linux-gnu-library/3.4/patRoonData/extdata</span>
-<span class="co">#&gt; 3 /home/rick/R/x86_64-suse-linux-gnu-library/3.4/patRoonData/extdata</span>
-<span class="co">#&gt; 4 /home/rick/R/x86_64-suse-linux-gnu-library/3.4/patRoonData/extdata</span>
-<span class="co">#&gt; 5 /home/rick/R/x86_64-suse-linux-gnu-library/3.4/patRoonData/extdata</span>
-<span class="co">#&gt; 6 /home/rick/R/x86_64-suse-linux-gnu-library/3.4/patRoonData/extdata</span>
-<span class="co">#&gt;     analysis      group ref</span>
-<span class="co">#&gt; 1  solvent-1  solvent-1    </span>
-<span class="co">#&gt; 2  solvent-2  solvent-2    </span>
-<span class="co">#&gt; 3  solvent-3  solvent-3    </span>
-<span class="co">#&gt; 4 standard-1 standard-1    </span>
-<span class="co">#&gt; 5 standard-2 standard-2    </span>
-<span class="co">#&gt; 6 standard-3 standard-3</span></code></pre></div>
+<span class="co">#&gt;                                                     path   analysis</span>
+<span class="co">#&gt; 1 C:/Program Files/R/R-3.4.3/library/patRoonData/extdata  solvent-1</span>
+<span class="co">#&gt; 2 C:/Program Files/R/R-3.4.3/library/patRoonData/extdata  solvent-2</span>
+<span class="co">#&gt; 3 C:/Program Files/R/R-3.4.3/library/patRoonData/extdata  solvent-3</span>
+<span class="co">#&gt; 4 C:/Program Files/R/R-3.4.3/library/patRoonData/extdata standard-1</span>
+<span class="co">#&gt; 5 C:/Program Files/R/R-3.4.3/library/patRoonData/extdata standard-2</span>
+<span class="co">#&gt; 6 C:/Program Files/R/R-3.4.3/library/patRoonData/extdata standard-3</span>
+<span class="co">#&gt;        group ref</span>
+<span class="co">#&gt; 1  solvent-1    </span>
+<span class="co">#&gt; 2  solvent-2    </span>
+<span class="co">#&gt; 3  solvent-3    </span>
+<span class="co">#&gt; 4 standard-1    </span>
+<span class="co">#&gt; 5 standard-2    </span>
+<span class="co">#&gt; 6 standard-3</span></code></pre></div>
 <p>As you can see the generated <code>data.frame</code> consists of four columns:</p>
 <ul>
 <li>
@@ -139,20 +130,20 @@ dataDir &lt;-<span class="st"> </span>patRoonData<span class="op">::</span><span
                                 <span class="dt">groups =</span> <span class="kw">c</span>(<span class="kw">rep</span>(<span class="st">"solvent"</span>, <span class="dv">3</span>), <span class="kw">rep</span>(<span class="st">"standard"</span>, <span class="dv">3</span>)),
                                 <span class="dt">refs =</span> <span class="st">"solvent"</span>)
 anaInfo
-<span class="co">#&gt;                                                                 path</span>
-<span class="co">#&gt; 1 /home/rick/R/x86_64-suse-linux-gnu-library/3.4/patRoonData/extdata</span>
-<span class="co">#&gt; 2 /home/rick/R/x86_64-suse-linux-gnu-library/3.4/patRoonData/extdata</span>
-<span class="co">#&gt; 3 /home/rick/R/x86_64-suse-linux-gnu-library/3.4/patRoonData/extdata</span>
-<span class="co">#&gt; 4 /home/rick/R/x86_64-suse-linux-gnu-library/3.4/patRoonData/extdata</span>
-<span class="co">#&gt; 5 /home/rick/R/x86_64-suse-linux-gnu-library/3.4/patRoonData/extdata</span>
-<span class="co">#&gt; 6 /home/rick/R/x86_64-suse-linux-gnu-library/3.4/patRoonData/extdata</span>
-<span class="co">#&gt;     analysis    group     ref</span>
-<span class="co">#&gt; 1  solvent-1  solvent solvent</span>
-<span class="co">#&gt; 2  solvent-2  solvent solvent</span>
-<span class="co">#&gt; 3  solvent-3  solvent solvent</span>
-<span class="co">#&gt; 4 standard-1 standard solvent</span>
-<span class="co">#&gt; 5 standard-2 standard solvent</span>
-<span class="co">#&gt; 6 standard-3 standard solvent</span></code></pre></div>
+<span class="co">#&gt;                                                     path   analysis</span>
+<span class="co">#&gt; 1 C:/Program Files/R/R-3.4.3/library/patRoonData/extdata  solvent-1</span>
+<span class="co">#&gt; 2 C:/Program Files/R/R-3.4.3/library/patRoonData/extdata  solvent-2</span>
+<span class="co">#&gt; 3 C:/Program Files/R/R-3.4.3/library/patRoonData/extdata  solvent-3</span>
+<span class="co">#&gt; 4 C:/Program Files/R/R-3.4.3/library/patRoonData/extdata standard-1</span>
+<span class="co">#&gt; 5 C:/Program Files/R/R-3.4.3/library/patRoonData/extdata standard-2</span>
+<span class="co">#&gt; 6 C:/Program Files/R/R-3.4.3/library/patRoonData/extdata standard-3</span>
+<span class="co">#&gt;      group     ref</span>
+<span class="co">#&gt; 1  solvent solvent</span>
+<span class="co">#&gt; 2  solvent solvent</span>
+<span class="co">#&gt; 3  solvent solvent</span>
+<span class="co">#&gt; 4 standard solvent</span>
+<span class="co">#&gt; 5 standard solvent</span>
+<span class="co">#&gt; 6 standard solvent</span></code></pre></div>
 <p>Note that we set the reference for the solvents to themself. This will remove any features from the solvents, which is generally fine as we are usually not interested in the blanks anyway.</p>
 <p>For larger project it may be preferred to export the <code>data.frame</code> to a <em>.csv</em> file so it can be easily edited, for instance, with Excel. Alternatively, the <code><a href="../reference/GUI-utils.html">newProject()</a></code> function can be used to make this process even easier (briefly discussed <a href="#newProject">here</a>).</p>
 </div>
@@ -175,21 +166,21 @@ fGroups
 <span class="co">#&gt; Analyses: solvent-1, solvent-2, solvent-3, standard-1, standard-2, standard-3 (6 total)</span>
 <span class="co">#&gt; Replicate groups: solvent, standard (2 total)</span>
 <span class="co">#&gt; Replicate groups used as ref: solvent (1 total)</span>
-<span class="co">#&gt; Object size (indication): 746.7 kB</span></code></pre></div>
+<span class="co">#&gt; Object size (indication): 746.5 kB</span></code></pre></div>
 </div>
 <div id="data-cleanup" class="section level2">
 <h2 class="hasAnchor">
 <a href="#data-cleanup" class="anchor"></a>Data cleanup</h2>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fGroups &lt;-<span class="st"> </span><span class="kw"><a href="../reference/generics.html">filter</a></span>(fGroups, <span class="dt">intensityThreshold =</span> <span class="dv">10000</span>, <span class="dt">intraRGroupAbundance =</span> <span class="dv">1</span>,
-                  <span class="dt">minBlankThreshold =</span> <span class="dv">5</span>, <span class="dt">repetitions =</span> <span class="dv">2</span>, <span class="dt">retentionRange =</span> <span class="kw">c</span>(<span class="dv">180</span>, <span class="op">-</span><span class="dv">1</span>))
+                  <span class="dt">minBlankThreshold =</span> <span class="dv">5</span>, <span class="dt">repetitions =</span> <span class="dv">2</span>, <span class="dt">retentionRange =</span> <span class="kw">c</span>(<span class="dv">110</span>, <span class="op">-</span><span class="dv">1</span>))
 <span class="co">#&gt; Applying intensity filter... Done! Filtered 411 (63.82%) groups. Remaining: 233.</span>
-<span class="co">#&gt; Applying retention filter... Done! Filtered 195 (83.69%) groups. Remaining: 38.</span>
+<span class="co">#&gt; Applying retention filter... Done! Filtered 185 (79.40%) groups. Remaining: 48.</span>
 <span class="co">#&gt; filter repetition 1/2</span>
-<span class="co">#&gt; Applying replicate filter... Done! Filtered 11 (28.95%) groups. Remaining: 27.</span>
-<span class="co">#&gt; Applying blank filter... Done! Filtered 2 (7.41%) groups. Remaining: 25.</span>
+<span class="co">#&gt; Applying replicate filter... Done! Filtered 20 (41.67%) groups. Remaining: 28.</span>
+<span class="co">#&gt; Applying blank filter... Done! Filtered 2 (7.14%) groups. Remaining: 26.</span>
 <span class="co">#&gt; filter repetition 2/2</span>
-<span class="co">#&gt; Applying replicate filter... Done! Filtered 0 (0.00%) groups. Remaining: 25.</span>
-<span class="co">#&gt; Applying blank filter... Done! Filtered 0 (0.00%) groups. Remaining: 25.</span></code></pre></div>
+<span class="co">#&gt; Applying replicate filter... Done! Filtered 0 (0.00%) groups. Remaining: 26.</span>
+<span class="co">#&gt; Applying blank filter... Done! Filtered 0 (0.00%) groups. Remaining: 26.</span></code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/generics.html">plotEIC</a></span>(fGroups, <span class="dt">colourBy =</span> <span class="st">"fGroups"</span>, <span class="dt">showFGroupRect =</span> <span class="ot">FALSE</span>, <span class="dt">showPeakArea =</span> <span class="ot">TRUE</span>, <span class="dt">topMost =</span> <span class="dv">1</span>, <span class="dt">showLegend =</span> <span class="ot">FALSE</span>)</code></pre></div>
 <p><img src="tutorial_files/figure-html/plotEIC-1.png" width="672"></p>
 </div>
@@ -200,11 +191,11 @@ fGroups
                               <span class="dt">avgMinIntensity =</span> <span class="dv">500</span>, <span class="dt">precursorMzWindow =</span> <span class="dv">8</span>)</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">plists
 <span class="co">#&gt; A MSPeakLists object ('MSPeakLists')</span>
-<span class="co">#&gt; Total peak count: 14237 (MS: 12200 - MS/MS: 2037)</span>
-<span class="co">#&gt; Average peak count/analysis: 4746 (MS: 4067 - MS/MS: 679)</span>
-<span class="co">#&gt; Total peak lists: 147 (MS: 75 - MS/MS: 72)</span>
-<span class="co">#&gt; Average peak lists/analysis: 49 (MS: 25 - MS/MS: 24)</span>
-<span class="co">#&gt; Object size (indication): 443.2 kB</span></code></pre></div>
+<span class="co">#&gt; Total peak count: 14847 (MS: 12770 - MS/MS: 2077)</span>
+<span class="co">#&gt; Average peak count/analysis: 4949 (MS: 4257 - MS/MS: 692)</span>
+<span class="co">#&gt; Total peak lists: 153 (MS: 78 - MS/MS: 75)</span>
+<span class="co">#&gt; Average peak lists/analysis: 51 (MS: 26 - MS/MS: 25)</span>
+<span class="co">#&gt; Object size (indication): 461.9 kB</span></code></pre></div>
 </div>
 <div id="formula-calculation" class="section level2">
 <h2 class="hasAnchor">
@@ -216,9 +207,9 @@ fGroups
 formulas
 <span class="co">#&gt; A formulaConsensus object (formulaConsensus)</span>
 <span class="co">#&gt; Algorithm: GenForm</span>
-<span class="co">#&gt; Total formula count: 223 (all), 41 (MS) and 182 (MS/MS)</span>
-<span class="co">#&gt; Average formulas per feature group: 19.5 (all), 11.6 (MS), 21.3 (MS/MS)</span>
-<span class="co">#&gt; Object size (indication): 70.4 kB</span></code></pre></div>
+<span class="co">#&gt; Total formula count: 227 (all), 41 (MS) and 186 (MS/MS)</span>
+<span class="co">#&gt; Average formulas per feature group: 19.2 (all), 11.6 (MS), 20.9 (MS/MS)</span>
+<span class="co">#&gt; Object size (indication): 71.6 kB</span></code></pre></div>
 </div>
 <div id="compound-identification" class="section level2">
 <h2 class="hasAnchor">
@@ -228,13 +219,14 @@ formulas
                                <span class="dt">adduct =</span> <span class="dv">1</span>, <span class="dt">isPositive =</span> <span class="ot">TRUE</span>,
                                <span class="dt">database =</span> <span class="st">"ExtendedPubChem"</span>, <span class="dt">maxCandidatesToStop =</span> <span class="dv">5000</span>,
                                <span class="dt">scoreTypes =</span> <span class="kw">c</span>(<span class="st">"FragmenterScore"</span>, <span class="st">"OfflineMetFusionScore"</span>,
-                                              <span class="st">"PubChemNumberPatents"</span>, <span class="st">"PubChemNumberPubMedReferences"</span>))</code></pre></div>
+                                              <span class="st">"PubChemNumberPatents"</span>,
+                                              <span class="st">"PubChemNumberPubMedReferences"</span>))</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">compounds
 <span class="co">#&gt; A compounds object (compounds)</span>
 <span class="co">#&gt; Algorithm: MetFrag</span>
-<span class="co">#&gt; Number of feature groups with compounds in this object: 20</span>
-<span class="co">#&gt; Number of compounds: 490 (total), 24.5 (mean), 15 - 25 (min - max)</span>
-<span class="co">#&gt; Object size (indication): 1.4 MB</span></code></pre></div>
+<span class="co">#&gt; Number of feature groups with compounds in this object: 21</span>
+<span class="co">#&gt; Number of compounds: 515 (total), 24.5 (mean), 15 - 25 (min - max)</span>
+<span class="co">#&gt; Object size (indication): 1.5 MB</span></code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">compounds &lt;-<span class="st"> </span><span class="kw"><a href="../reference/compounds-class.html">addFormulaScoring</a></span>(compounds, formulas, <span class="dt">updateScore =</span> <span class="ot">TRUE</span>)</code></pre></div>
 </div>
 <div id="components" class="section level2">
@@ -244,9 +236,9 @@ formulas
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">components
 <span class="co">#&gt; A components object (componentsCamera)</span>
 <span class="co">#&gt; Algorithm: CAMERA</span>
-<span class="co">#&gt; Components: CMP1, CMP2, CMP3, CMP4, CMP5, CMP6, ... (18 total)</span>
-<span class="co">#&gt; Number of feature groups in components: 25 (total), 1.4 (mean), 1 - 3 (min - max)</span>
-<span class="co">#&gt; Object size (indication): 501.8 kB</span></code></pre></div>
+<span class="co">#&gt; Components: CMP1, CMP2, CMP3, CMP4, CMP5, CMP6, ... (19 total)</span>
+<span class="co">#&gt; Number of feature groups in components: 26 (total), 1.4 (mean), 1 - 3 (min - max)</span>
+<span class="co">#&gt; Object size (indication): 505.4 kB</span></code></pre></div>
 </div>
 <div id="reporting" class="section level2">
 <h2 class="hasAnchor">

@@ -19,6 +19,8 @@ Below is an overview of the most common non-target workflow steps supported alon
 * **Generation of components**: grouping of (chemically) related features such as isotopes, adducts and homologs ([RAMClustR], [CAMERA], [nontarget R package][nontarget]).
 * **reporting** of all workflow steps in various formats: _CSV_, _PDF_ and _HTML_.
 
+An example HTML report can viewed [here][example].
+
 ## Installation
 
 Prior to installation you have to make several software packages dependencies are installed.
@@ -120,6 +122,6 @@ Finally, the [reference] outlines all the details of the `patRoon` package.
 [remotes]: https://github.com/r-lib/remotes#readme
 [Rtools]: https://cran.r-project.org/bin/windows/Rtools/
 [RStudio]: https://www.rstudio.com/
-
+[example]: https://rickhelmus.github.io/patRoon/examples/report.html
 
 

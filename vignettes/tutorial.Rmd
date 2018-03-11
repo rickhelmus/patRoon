@@ -162,7 +162,7 @@ reportMD(fGroups, formConsensus = formulas, compounds = compounds, components = 
          MSPeakLists = plists)
 ```
 
-```{r echo=FALSE}
+```{r echo=FALSE,eval=!pkgdown::in_pkgdown()}
 # ugly work around for nested rmarkdown call made by reportMD; based on https://gist.github.com/jennybc/1f747c5bb84aa9be9c3c
 tempF <- tempfile(); tempScript <- tempfile(fileext = ".R")
 save(fGroups, formulas, compounds, components, plists, file = tempF)
@@ -170,9 +170,10 @@ writeLines(sprintf('
 library(patRoon)
 setwd("%s")
 load("%s")
+options(patRoon.path.pngquant = "~/werk/pngquant/")
 reportMD(fGroups, path = "../docs/examples", formConsensus = formulas, compounds = compounds,
-         components = components, MSPeakLists = plists)
-', getwd(), tempF), con = tempScript)
+         components = components, MSPeakLists = plists, optimizePng = TRUE)
+', gsub("\\", "/", getwd(), fixed = TRUE), gsub("\\", "/", tempF, fixed = TRUE)), con = tempScript)
 devtools::clean_source(tempScript, quiet = TRUE)
 ```
 

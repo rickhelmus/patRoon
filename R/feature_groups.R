@@ -437,10 +437,10 @@ setMethod("plotChord", "featureGroups", function(obj, addSelfLinks = FALSE, addR
 
     tracks <- NULL
     if (hasOuter)
-        tracks <- list(list(track.height = 0.06, track.margin = c(if (addRetMzPlots) 0.02 else 0.03, 0)))
+        tracks <- list(list(track.height = 0.1, track.margin = c(if (addRetMzPlots) 0.05 else 0.06, 0)))
     if (addRetMzPlots)
-        tracks = c(tracks, list(list(track.height = 0.06, track.margin = c(0.04, 0))))
-
+        tracks = c(tracks, list(list(track.height = 0.1, track.margin = c(0.08, 0))))
+    
     maxv <- max(if (hasOuter) chordTable[groupFrom != groupTo, value] else chordTable$value)
     colFunc <- colorRamp2(maxv * seq(0, 1, 0.25),
                           c("blue4", "deepskyblue1", "green", "orange", "red"),
@@ -459,7 +459,7 @@ setMethod("plotChord", "featureGroups", function(obj, addSelfLinks = FALSE, addR
                         preAllocateTracks = tracks,
                         grid.col = getBrewerPal(nsamp, "Dark2"),
                         col = linkColors,
-                        annotationTrackHeight = c(0.06, 0.05),
+                        annotationTrackHeight = c(0.1, 0.09),
                         ...)
 
     circos.track(track.index = length(tracks) + 1, panel.fun = function(x, y)
@@ -467,7 +467,7 @@ setMethod("plotChord", "featureGroups", function(obj, addSelfLinks = FALSE, addR
         sector.index <- get.cell.meta.data("sector.index")
         xlim <- get.cell.meta.data("xlim")
         ylim <- get.cell.meta.data("ylim")
-        circos.text(mean(xlim), mean(ylim), sector.index, col = "white", cex = 0.6, niceFacing = TRUE)
+        circos.text(mean(xlim), mean(ylim), sector.index, col = "white", cex = 1, niceFacing = TRUE)
     }, bg.border = NA)
 
     if (addRetMzPlots)
@@ -495,7 +495,7 @@ setMethod("plotChord", "featureGroups", function(obj, addSelfLinks = FALSE, addR
         ogcol <- getBrewerPal(length(finalOuterGroups), "Paired")
         for (ogi in seq_along(finalOuterGroups))
             highlight.sector(unique(finalChordTable[groupFrom == finalOuterGroups[ogi], from]), track.index = 1, col = ogcol[ogi],
-                             text = finalOuterGroups[ogi], cex = 0.8, text.col = "white", niceFacing = TRUE)
+                             text = finalOuterGroups[ogi], cex = 1, text.col = "white", niceFacing = TRUE)
     }
 
     circos.clear()

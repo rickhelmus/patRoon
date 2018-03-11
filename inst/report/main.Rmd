@@ -37,7 +37,7 @@ makePlot <- function(out, w, h, expr)
 pre, code {
     white-space: pre !important;
     overflow-x: auto !important;
-    max-height: 200px;
+    max-height: 275px;
     overflow-y: auto;
 }
 </style>
@@ -46,50 +46,58 @@ pre, code {
 Summary {data-orientation=rows}
 ================
 
-##
+## { data-height=350 }
 
 ### EICs
 
-```{r obj-plot, fig.width=10, fig.height=5}
+```{r obj-plot, fig.width=10, fig.height=4}
+par(mai = c(0.9, 0.8, 0.6, 0.1))
 plotEIC(rmdVars$fGroups, rmdVars$EICRtWindow, rmdVars$EICMzWindow,
         rmdVars$retMin, 1, rmdVars$EICs, TRUE, FALSE, colourBy = "fGroup", showLegend = FALSE)
 ```
 
-### Retention vs m/z
-```{r}
-selectMethod("plot", class(rmdVars$fGroups))(rmdVars$fGroups)
-```
 
-```{r}
-rGroupLen <- length(unique(analysisInfo(removeEmptyAnalyses(rmdVars$fGroups))$group))
-```
-
-##
+## { data-height=300 }
 
 ### Objects
 
-```{r obj-show, fig.height=3}
-show(rmdVars$fGroups)
-
-if (!is.null(rmdVars$formConsensus))
-    show(rmdVars$formConsensus)
-if (!is.null(rmdVars$compounds))
-    show(rmdVars$compounds)
-if (!is.null(rmdVars$components))
-    show(rmdVars$components)
-if (!is.null(rmdVars$cInfo))
-    show(rmdVars$cInfo)
+```{r obj-show}
+objToShow <- list(rmdVars$fGroups, rmdVars$MSPeakLists, rmdVars$formConsensus,
+                  rmdVars$compounds, rmdVars$components, rmdVars$cInfo)
+objToShow <- objToShow[!sapply(objToShow, is.null)]
+for (obji in seq_along(objToShow))
+{
+    show(objToShow[[obji]])
+    cat("\n")
+}
 ```
 
-`r if (rmdVars$reportChord && rGroupLen > 1) "### Chord diagram\n"`
-```{r fig.width=6, fig.height=6, eval=rmdVars$reportChord && rGroupLen > 1}
+
+### Retention vs m/z
+```{r fig.height=4}
+par(mai = c(0.9, 0.8, 0.1, 0.1))
+selectMethod("plot", class(rmdVars$fGroups))(rmdVars$fGroups)
+```
+
+
+```{r}
+rGroupLen <- length(unique(analysisInfo(removeEmptyAnalyses(rmdVars$fGroups))$group))
+doPlotChord <- rmdVars$reportChord && rGroupLen > 1
+doPlotVenn <- rGroupLen > 1 && rGroupLen < 6
+```
+
+
+`r if (doPlotChord || doPlotVenn) "## { data-height=425 } \n"`
+
+`r if (doPlotChord) "### Chord diagram\n"`
+```{r fig.height=5.5, eval=doPlotChord,out.height="400px"}
 message("Creating chord diagram... ", appendLF = FALSE)
-plotChord(rmdVars$fGroups, average = TRUE)
+plotChord(rmdVars$fGroups, average = F)
 message("Done!")
 ```
 
-`r if (rGroupLen > 1 && rGroupLen < 6) "### Venn diagram\n"`
-```{r eval=(rGroupLen > 1 && rGroupLen < 6)}
+`r if (doPlotVenn) "### Venn diagram\n"`
+```{r fig.height=5.5, eval=doPlotVenn}
 plotVenn(rmdVars$fGroups)
 ```
 

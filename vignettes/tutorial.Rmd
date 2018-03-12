@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
   message = FALSE
 )
 
-# options("patRoon.cache.fileName" = "~/werk/tutorial_cache")
+options("patRoon.cache.fileName" = "~/werk/tutorial.sqlite")
 options(patRoon.path.metFragCL = "~/werk/MetFrag2.4.3-CL.jar")
 ```
 
@@ -79,7 +79,7 @@ For larger project it may be preferred to export the `data.frame` to a _.csv_ fi
 ## Extract and group features
 
 ```{r features,results='hide'}
-fList <- findFeatures(anaInfo, "openms", maxlength = 60, mzppm = 5)
+fList <- findFeatures(anaInfo, "openms", mzppm = 5)
 ```
 ```{r}
 fList
@@ -90,6 +90,10 @@ fGroups <- groupFeatures(fList, "openms")
 fGroups
 ```
 
+```{r gTable}
+head(groupTable(fGroups))
+```
+
 ## Data cleanup { #data-cleanup }
 
 ```{r filter}
@@ -98,7 +102,8 @@ fGroups <- filter(fGroups, intensityThreshold = 10000, intraRGroupAbundance = 1,
 ```
 
 ```{r plotEIC,fig.width=7,results='hide'}
-plotEIC(fGroups, colourBy = "fGroups", showFGroupRect = FALSE, showPeakArea = TRUE, topMost = 1, showLegend = FALSE)
+plotEIC(fGroups, colourBy = "fGroups", showFGroupRect = FALSE, showPeakArea = TRUE,
+        topMost = 1, showLegend = FALSE)
 ```
 
 ## MS peak lists
@@ -163,6 +168,8 @@ reportMD(fGroups, formConsensus = formulas, compounds = compounds, components = 
          MSPeakLists = plists)
 ```
 
+The output of `reportMD` can be seen [here][../examples/report.html].
+
 ```{r echo=FALSE,eval=!pkgdown::in_pkgdown()}
 # ugly work around for nested rmarkdown call made by reportMD; based on https://gist.github.com/jennybc/1f747c5bb84aa9be9c3c
 tempF <- tempfile(); tempScript <- tempfile(fileext = ".R")
@@ -171,10 +178,11 @@ writeLines(sprintf('
 library(patRoon)
 setwd("%s")
 load("%s")
+options("patRoon.cache.fileName" = "%s")
 options(patRoon.path.pngquant = "~/werk/pngquant/")
 reportMD(fGroups, path = "../docs/examples", formConsensus = formulas, compounds = compounds,
          components = components, MSPeakLists = plists, optimizePng = TRUE)
-', gsub("\\", "/", getwd(), fixed = TRUE), gsub("\\", "/", tempF, fixed = TRUE)), con = tempScript)
+', gsub("\\", "/", getwd(), fixed = TRUE), gsub("\\", "/", tempF, fixed = TRUE), getOption("patRoon.cache.fileName")), con = tempScript)
 devtools::clean_source(tempScript, quiet = TRUE)
 ```
 
@@ -186,7 +194,27 @@ devtools::clean_source(tempScript, quiet = TRUE)
 
 ### Suspect screening
 
+```{r}
+scr <- screenTargets(fGroups, patRoonData::targets)
+head(scr[, 1:4])
+```
+
+```{r}
+fGroupsScreening <- groupFeaturesScreening(fGroups, scr)
+head(groupTable(fGroupsScreening))
+```
+
+```{r}
+# perform 'regular' workflow steps as shown before (MS peak lists, formulas, compounds, ...)
+```
+
 ### Import and exporting feature groups
 
 ### caching
 
+
+
+```{r echo=FALSE}
+# cleanup
+unlink("log", TRUE)
+```

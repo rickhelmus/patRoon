@@ -20,8 +20,16 @@ knitr::opts_chunk$set(
 
 options("patRoon.cache.fileName" = "~/werk/tutorial.sqlite")
 options(patRoon.path.metFragCL = "~/werk/MetFrag2.4.3-CL.jar")
+
+options(width=250) # big nr to avoid wrapping text in code chunks
 ```
 
+<style>
+pre, code {
+    white-space: pre !important;
+    overflow-x: auto !important;
+}
+</style>
 
 ## Introduction
 
@@ -33,7 +41,9 @@ The intro ...
 In this tutorial we will use example data provided with patRoon. The provided analyses already have been exported to an open format (_.mzML_) and are ready to use. For your own data it may be necessary to first perform mass recalibration and data export using vendor software (`patRoon` supplies several utilities for Bruker data, see the bruker-utils reference documentation).
 
 ## New project
+
 To start a new non-target analysis it is highly recommended to create a new directory. We will refer to this directory as the _project directory_. This directory typically contains:
+
 * a `R` script (or scripts) which will do the actual processing
 * an (optional) _.csv_ file with analysis information
 * an automatically generated cache file which is internally used by `patRoon` to cache (intermediate) results, therefore, preventing repeated execution of lengthy workflow steps that have been performed before.
@@ -49,7 +59,7 @@ setwd(workPath)
 dataDir <- patRoonData::exampleDataPath()
 ```
 
-Next step is to generate information ncessary for the analysis. To do so, we need to specify the names and file locations of the analyses, to which _replicate group_ they belong and which replicate group(s) should be used for blank subtraction. To do so, we can use the `generateAnalysisInfo()` utility function which automatically generates a suitable `data.frame` for us from given analyses:
+The next step is to generate information ncessary for the analysis. To do so, we need to specify the names and file locations of the analyses, to which _replicate group_ they belong and which replicate group(s) should be used for blank subtraction. To do so, we can use the `generateAnalysisInfo()` utility function which automatically generates a suitable `data.frame` for us from given analyses:
 
 ```{r}
 generateAnalysisInfo(dataDir)
@@ -141,8 +151,9 @@ compounds <- generateCompounds(fGroups, plists, "metfrag", topMost = 25,
                                               "PubChemNumberPatents",
                                               "PubChemNumberPubMedReferences"))
 ```
-```{r}
+```{r fig.width=4,fig.height=4}
 compounds
+plotSpec(compounds, 1, "M120_R328_91", plists)
 ```
 
 ```{r,results='hide'}
@@ -154,8 +165,10 @@ compounds <- addFormulaScoring(compounds, formulas, updateScore = TRUE)
 ```{r components,results='hide'}
 components <- generateComponents(fGroups, "camera", ionization = "positive")
 ```
-```{r}
+```{r fig.width=5,fig.height=4}
 components
+plotSpec(components, "CMP17")
+plotEIC(components, "CMP17", fGroups)
 ```
 
 ## Reporting
@@ -202,6 +215,11 @@ head(scr[, 1:4])
 ```{r}
 fGroupsScreening <- groupFeaturesScreening(fGroups, scr)
 head(groupTable(fGroupsScreening))
+```
+
+```{r fig.width=7,fig.height=5,results='hide'}
+plotEIC(fGroupsScreening, colourBy = "fGroups", showFGroupRect = FALSE, showPeakArea = TRUE,
+        topMost = 1, showLegend = TRUE)
 ```
 
 ```{r}

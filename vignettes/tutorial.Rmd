@@ -181,7 +181,7 @@ reportMD(fGroups, formConsensus = formulas, compounds = compounds, components = 
          MSPeakLists = plists)
 ```
 
-The output of `reportMD` can be seen [here][../examples/report.html].
+The output of `reportMD` can be seen [here](../examples/report.html).
 
 ```{r echo=FALSE,eval=!pkgdown::in_pkgdown()}
 # ugly work around for nested rmarkdown call made by reportMD; based on https://gist.github.com/jennybc/1f747c5bb84aa9be9c3c

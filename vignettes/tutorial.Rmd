@@ -20,8 +20,16 @@ knitr::opts_chunk$set(
 
 options("patRoon.cache.fileName" = "~/werk/tutorial.sqlite")
 options(patRoon.path.metFragCL = "~/werk/MetFrag2.4.3-CL.jar")
+
+options(width=250) # big nr to avoid wrapping text in code chunks
 ```
 
+<style>
+pre, code {
+    white-space: pre !important;
+    overflow-x: auto !important;
+}
+</style>
 
 ## Introduction
 
@@ -35,6 +43,7 @@ In this tutorial we will use example data provided within the [patRoonData] pack
 The provided analyses already have been exported to an open format (_.mzML_) and are ready to use. For your own data it may be necessary to first perform mass recalibration and data export using external tools such as [proteowizard] or vendor software (`patRoon` supplies several utilities for Bruker data, see the bruker-utils reference documentation) to _mzML_ or _mzXML_ files.
 
 ## New project
+
 To start a new non-target analysis it is highly recommended to create a new directory. We will refer to this directory as the _project directory_. This directory typically contains:
 
 * an `R` script (or scripts) which will do the non-target data processing
@@ -187,8 +196,9 @@ compounds <- generateCompounds(fGroups, plists, "metfrag", topMost = 25,
                                               "PubChemNumberPatents",
                                               "PubChemNumberPubMedReferences"))
 ```
-```{r}
+```{r fig.width=4,fig.height=4}
 compounds
+plotSpec(compounds, 1, "M120_R328_91", plists)
 ```
 
 While `generateCompounds()` is running a list of candidate compound structures will be downloaded for every feature group (in this case from PubChem) and ranked according to various scoring parameters.
@@ -212,8 +222,10 @@ Generating components is performed with the `generateComponents()` function:
 ```{r components,results='hide'}
 components <- generateComponents(fGroups, "camera", ionization = "positive")
 ```
-```{r}
+```{r fig.width=5,fig.height=4}
 components
+plotSpec(components, "CMP17")
+plotEIC(components, "CMP17", fGroups)
 ```
 
 ## Reporting
@@ -228,7 +240,7 @@ reportMD(fGroups, formConsensus = formulas, compounds = compounds, components = 
          MSPeakLists = plists)
 ```
 
-The output of `reportMD()` can be viewed [here][../examples/report.html].
+The output of `reportMD()` can be viewed [here](../examples/report.html).
 
 Note that these functions can be called at any time during the workflow. This may be especially useful if you want evaluate results during optimization or exploring the various algorithms available.
 
@@ -268,6 +280,11 @@ head(scr)
 ```{r}
 fGroupsScreening <- groupFeaturesScreening(fGroups, scr)
 head(groupTable(fGroupsScreening))
+```
+
+```{r fig.width=7,fig.height=5,results='hide'}
+plotEIC(fGroupsScreening, colourBy = "fGroups", showFGroupRect = FALSE, showPeakArea = TRUE,
+        topMost = 1, showLegend = TRUE)
 ```
 
 ```{r}

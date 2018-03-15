@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>C:/Users/Rick/Documents/werk/patRoon/README.md • patRoon</title>
+<title>/mnt/nixshared2/shared/werk/patRoon/README.md • patRoon</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -27,7 +27,7 @@
 <script src="pkgdown.js"></script>
   
   
-<meta property="og:title" content="C:/Users/Rick/Documents/werk/patRoon/README.md" />
+<meta property="og:title" content="/mnt/nixshared2/shared/werk/patRoon/README.md" />
 <!-- mathjax -->
 <script src='https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
 
@@ -86,7 +86,7 @@
       <div class="row">
   <div class="contents col-md-12">
     <div class="page-header">
-      <h1>C:/Users/Rick/Documents/werk/patRoon/README.md</h1>
+      <h1>/mnt/nixshared2/shared/werk/patRoon/README.md</h1>
     </div>
 
 <div id="patroon" class="section level1">
@@ -114,6 +114,7 @@
 <li>
 <strong>reporting</strong> of all workflow steps in various formats: <em>CSV</em>, <em>PDF</em> and <em>HTML</em>.</li>
 </ul>
+<p>An example HTML report can viewed <a href="https://rickhelmus.github.io/patRoon/examples/report.html">here</a>.</p>
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
@@ -157,10 +158,11 @@ devtools<span class="op">::</span><span class="kw"><a href="http://www.rdocument
 <a href="#patroon-installation" class="anchor"></a>patRoon installation</h3>
 <p>Finally, you can install patRoon from github with:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">install.packages</span>(<span class="st">"devtools"</span>) <span class="co"># needed only if not already installed</span>
-devtools<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/devtools/topics/install_github">install_github</a></span>(<span class="st">"rickhelmus/patRoon"</span>)</code></pre></div>
-<p>In some cases this may fail with an error telling you that <code>SVN</code> is absent. In this case you may have better luck by changing to the <a href="https://github.com/r-lib/remotes#readme">remotes</a> package:</p>
+devtools<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/devtools/topics/install_github">install_github</a></span>(<span class="st">"rickhelmus/patRoon"</span>)
+devtools<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/devtools/topics/install_github">install_github</a></span>(<span class="st">"rickhelmus/patRoonData"</span>) <span class="co"># example data used by tutorial</span></code></pre></div>
+<p>In some cases the <code>patRoon</code> installation may fail with an error telling you that <code>SVN</code> is absent. In this case you may have better luck by changing to the <a href="https://github.com/r-lib/remotes#readme">remotes</a> package:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">install.packages</span>(<span class="st">"remotes"</span>)
-remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">"rickhelmus/patRoon"</span>)</code></pre></div>
+remotes<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/remotes/topics/install_github">install_github</a></span>(<span class="st">"rickhelmus/patRoon"</span>)</code></pre></div>
 </div>
 </div>
 <div id="getting-started" class="section level2">

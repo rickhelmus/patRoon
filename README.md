@@ -76,9 +76,10 @@ Finally, you can install patRoon from github with:
 ``` r
 install.packages("devtools") # needed only if not already installed
 devtools::install_github("rickhelmus/patRoon")
+devtools::install_github("rickhelmus/patRoonData") # example data used by tutorial
 ```
 
-In some cases this may fail with an error telling you that `SVN` is absent. In this case you may have better luck by changing to the [remotes] package:
+In some cases the `patRoon` installation may fail with an error telling you that `SVN` is absent. In this case you may have better luck by changing to the [remotes] package:
 
 ``` r
 install.packages("remotes")

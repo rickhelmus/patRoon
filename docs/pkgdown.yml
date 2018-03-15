@@ -1,9 +1,8 @@
 pandoc: 1.19.2.1
 pkgdown: 0.1.0.9000
-pkgdown_sha: 17f683717d0a1547f13a08a259b34c58927452d6
+pkgdown_sha: c51b0ba1e9363aa50033677fb074bfc26b4a9824
 articles:
   tutorial: tutorial.html
-  tutorial.html: tutorial.html
 urls:
   reference: https://rickhelmus.github.io/patRoon/reference
   article: https://rickhelmus.github.io/patRoon/articles

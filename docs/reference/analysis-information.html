@@ -25,8 +25,6 @@
 <link href="../pkgdown.css" rel="stylesheet">
 <script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
-  
-  
 <meta property="og:title" content="Analysis information — analysis-information" />
 
 <meta property="og:description" content="Required information for analyses that should be processed and utilities to
@@ -136,7 +134,8 @@ replicate group.</p></td>
   <a href='feature-finding.html'>finding features</a>, averaging intensities of feature
   groups and blank subtraction. This information should be made available
   with an 'analysis info' object, which is a <code>data.frame</code> containing the
-  following columns:</p><ul>
+  following columns:</p>
+<ul>
 <li><p><code>path</code> the full path to the analysis.</p></li>
 <li><p><code>analysis</code> the filename <strong>without</strong> extension. Must be <strong>unique</strong>,
    even if the <code>path</code> is different.</p></li>
@@ -170,15 +169,15 @@ replicate group.</p></td>
   may contain empty character strings (<code>""</code>) for analyses where no blank
   subtraction should occur. The <code>conc</code> column is only required when
   using the <code><a href='featureGroups-class.html'>regression</a></code> method and optional for the
-  <code><a href='target-screening.html'>screenTargets</a></code> method.
-    <code>generateAnalysisInfo</code> is an utility function that automatically
+  <code><a href='target-screening.html'>screenTargets</a></code> method.</p>
+<p><code>generateAnalysisInfo</code> is an utility function that automatically
   generates an analysis information object. It will collect all datafiles
   from given file paths and convert the filenames into valid analysis names
   (<em>i.e.</em> without extensions such as <code class="file">.d</code> and <code class="file">.mzML</code>).
   Duplicate analyses, which may appear when datafiles with different file
   extension (<code class="file">.d</code>, <code class="file">.mzXML</code> and/or <code class="file">.mzML</code>) are present, will
-  be automatically removed.
-    <code>generateAnalysisInfoFromEnviMass</code> loads analysis information
+  be automatically removed.</p>
+<p><code>generateAnalysisInfoFromEnviMass</code> loads analysis information
   from an <span class="pkg">enviMass</span> project.</p>
     
 

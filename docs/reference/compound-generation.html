@@ -25,8 +25,6 @@
 <link href="../pkgdown.css" rel="stylesheet">
 <script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
-  
-  
 <meta property="og:title" content="Automatic compound identification — compound-generation" />
 
 <meta property="og:description" content="Functionality to automatically identify chemical compounds from feature
@@ -358,14 +356,14 @@ within other data sources such as patent databases and similarity of measured
 and in-silico predicted MS/MS fragments. Note that this process is often
 quite time consuming, especially for large feature group sets. Therefore,
 this is often one of the last steps within the workflow and not performed
-before feature groups have been prioritized.
-    <code>generateCompounds</code> is a generic function that will generate compounds
+before feature groups have been prioritized.</p>
+<p><code>generateCompounds</code> is a generic function that will generate compounds
   using one of the supported algorithms. The actual functionality is provided
   by algorithm specific functions such as <code>generateCompoundsMetfrag</code> and
   <code>generateCompoundsSirius</code>. While these functions may be called directly,
   <code>generateCompounds</code> provides a generic interface and is therefore usually
-  preferred.
-    <code>generateCompoundsMetfrag</code> uses the <span class="pkg">metfRag</span>
+  preferred.</p>
+<p><code>generateCompoundsMetfrag</code> uses the <span class="pkg">metfRag</span>
   package for compound identification (see
   <a href='http://c-ruttkies.github.io/MetFrag/'>http://c-ruttkies.github.io/MetFrag/</a>). Several online compound
   databases such as <a href='https://pubchem.ncbi.nlm.nih.gov/'>PubChem</a> and
@@ -375,8 +373,8 @@ before feature groups have been prioritized.
   improve results. While MS/MS data is not mandatory, it will usually greatly
   improve candidate scoring. The <code class='command'>MetFrag</code> options <code>PeakList</code>,
   <code>IonizedPrecursorMass</code> and <code>ExperimentalRetentionTimeValue</code> (in
-  minutes) fields are automatically set from feature data.
-    <code>generateCompoundsSirius</code> uses
+  minutes) fields are automatically set from feature data.</p>
+<p><code>generateCompoundsSirius</code> uses
   <a href='https://bio.informatik.uni-jena.de/software/sirius/'>SIRIUS</a> in
   combination with <a href='https://www.csi-fingerid.uni-jena.de/'>CSI:FingerID</a>
   for compound identification. Similar to
@@ -398,8 +396,8 @@ before feature groups have been prioritized.
 &#8220;MetFrag relaunched: incorporating strategies beyond in silico fragmentation.&#8221;
 <em>Journal of Cheminformatics</em>, <b>8</b>(1).
 doi: <a href='http://doi.org/10.1186/s13321-016-0115-9'>10.1186/s13321-016-0115-9</a>
-.
-    Duhrkop K and Bocker S (2015).
+.</p>
+<p>Duhrkop K and Bocker S (2015).
 &#8220;Fragmentation Trees Reloaded.&#8221;
 In Przytycka TM (ed.), <em>Research in Computational Molecular Biology</em>, pp. 65--79.
 ISBN 978-3-319-16706-0.

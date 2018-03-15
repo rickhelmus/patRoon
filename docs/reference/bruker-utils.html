@@ -25,8 +25,6 @@
 <link href="../pkgdown.css" rel="stylesheet">
 <script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
-  
-  
 <meta property="og:title" content="Bruker DataAnalysis utilities — bruker-utils" />
 
 <meta property="og:description" content="Miscellaneous utility functions which interface with Bruker DataAnalysis" />
@@ -210,22 +208,22 @@ none).</p></td>
     <p>These functions communicate directly with Bruker DataAnalysis to provide
 various functionality, such as calibrating and exporting data and adding
 chromatographic traces. For this the <span class="pkg">RDCOMClient</span> package is
-required to be installed.
-    <code>showDataAnalysis</code> makes a hidden DataAnalysis window visible
+required to be installed.</p>
+<p><code>showDataAnalysis</code> makes a hidden DataAnalysis window visible
   again. Most functions using DataAnalysis will hide the window during
   processing for efficiency reasons. If the window remains hidden
   (<em>e.g.</em> because there was an error) this function can be used to make
-  it visible again.
-    <code>setDAMethod</code> Sets a given DataAnalysis method (<code class="file">.m</code> file)
-  to a set of analyses.
-    <code>recalibrarateDAFiles</code> Performs automatic mass recalibration of
+  it visible again.</p>
+<p><code>setDAMethod</code> Sets a given DataAnalysis method (<code class="file">.m</code> file)
+  to a set of analyses.</p>
+<p><code>recalibrarateDAFiles</code> Performs automatic mass recalibration of
   a given set of analyses. The current method settings for each analyses will
-  be used.
-    <code>getDACalibrationError</code> is used to obtain the standard
-  deviation of the current mass calibration (in ppm).
-    <code>exportDAFiles</code> will export a set of analyses either in
-  <code class="file">.mzXML</code> or <code class="file">.mzML</code> formats.
-    <code>addDAEIC</code> adds an Extracted Ion Chromatogram (EIC) or other
+  be used.</p>
+<p><code>getDACalibrationError</code> is used to obtain the standard
+  deviation of the current mass calibration (in ppm).</p>
+<p><code>exportDAFiles</code> will export a set of analyses either in
+  <code class="file">.mzXML</code> or <code class="file">.mzML</code> formats.</p>
+<p><code>addDAEIC</code> adds an Extracted Ion Chromatogram (EIC) or other
   chromatographic trace to a given analysis which can be used directly with
   DataAnalysis.</p>
     

@@ -25,8 +25,6 @@
 <link href="../pkgdown.css" rel="stylesheet">
 <script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
-  
-  
 <meta property="og:title" content="Grouping feature groups in components — component-generation" />
 
 <meta property="og:description" content="Functionality to automatically group related feature groups (e.g.
@@ -215,28 +213,28 @@ Set to <code>NULL</code> to ignore.</p></td>
 some (chemical) way to each other. These components generally include
 adducts, isotopes, in-source fragments and homologues. The linking of this
 data is generally useful to provide more information for compound annotation
-and reduce the data size and thus complexity.
-    <code>generateComponents</code> is a generic function that will generate components
+and reduce the data size and thus complexity.</p>
+<p><code>generateComponents</code> is a generic function that will generate components
   using one of the supported algorithms. The actual functionality is provided
   by algorithm specific functions such as <code>generateComponentsRAMClustR</code> and
   <code>generateComponentsNontarget</code>. While these functions may be called directly,
   <code>generateComponents</code> provides a generic interface and is therefore usually
-  preferred.
-    <code>generateComponentsCAMERA</code> provides an interface to
+  preferred.</p>
+<p><code>generateComponentsCAMERA</code> provides an interface to
   <a href='https://bioconductor.org/packages/release/bioc/html/CAMERA.html'>CAMERA</a>
    which is used to generate components from known adducts, isotopes and
   in-source fragments. The specified <code>featureGroups</code> object is
   automatically converted to an <code>xcmsSet</code> object using
-  <code><a href='getXcmsSet.html'>getXcmsSet</a></code>.
-    <code>generateComponentsNontarget</code> uses
+  <code><a href='getXcmsSet.html'>getXcmsSet</a></code>.</p>
+<p><code>generateComponentsNontarget</code> uses
   <a href='https://cran.r-project.org/web/packages/nontarget/index.html'>the
   nontarget R package</a> to generate components by unsupervised detection of
   homologous series. In the first step the <code>homol.search</code>
   function is used to detect all homologues within each replicate group
   (analyses within each replicate group are averaged prior to detection).
   Then, homologous series across replicate groups are merged in case of full
-  overlap or when merging of partial overlapping series causes no conflicts.
-    <code>generateComponentsRAMClustR</code> uses
+  overlap or when merging of partial overlapping series causes no conflicts.</p>
+<p><code>generateComponentsRAMClustR</code> uses
   <a href='https://github.com/cbroeckl/RAMClustR'>RAMClustR</a> to generate
   components from feature groups which follow similar chromatographic
   retention profiles, but are not necessarily restricted to known rules
@@ -246,14 +244,12 @@ and reduce the data size and thus complexity.
     
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
-    <p>Kuhl, C., Tautenhahn, R., Boettcher, C., Larson, T. R. and Neumann, S. CAMERA: an integrated strategy for compound spectra extraction and annotation of liquid chromatography/mass spectrometry data sets. Analytical Chemistry, 84:283-289 (2012)
-    Loos, M., Singer, H. (2017). 
-			Nontargeted homologue series extraction from hyphenated high resolution mass spectrometry, 
-			Journal of Cheminformatics 9(12), .
+    <p>Kuhl, C., Tautenhahn, R., Boettcher, C., Larson, T. R. and Neumann, S. CAMERA: an integrated strategy for compound spectra extraction and annotation of liquid chromatography/mass spectrometry data sets. Analytical Chemistry, 84:283-289 (2012)</p>
+<p>Martin Loos (2016). nontarget: Detecting Isotope, Adduct and Homologue Relations in LC-MS Data. R package version 1.9. https://CRAN.R-project.org/package=nontarget
     Loos, M., Gerber, C., Corona, F., Hollender, J., Singer, H. (2015). 
 			Accelerated isotope fine structure calculation using pruned transition trees, 
-			Analytical Chemistry 87(11), 5738-5744.
-    Broeckling, Heuberger CD, Prince AL, Ingelsson JA, Prenni E and E. J (2013).
+			Analytical Chemistry 87(11), 5738-5744.</p>
+<p>Broeckling, Heuberger CD, Prince AL, Ingelsson JA, Prenni E and E. J (2013).
 &#8220;Assigning precursor-product ion relationships in indiscriminant MS/MS data from non-targeted metabolite profiling studies.&#8221;
 <em>Analytical Chemistry</em>, <b>9</b>, pp. 33-43.
     Broeckling CD, Afsar FA, Neumann S, Ben-Hur A and Prenni JE (2014).

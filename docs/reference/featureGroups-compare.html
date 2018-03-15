@@ -25,8 +25,6 @@
 <link href="../pkgdown.css" rel="stylesheet">
 <script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
-  
-  
 <meta property="og:title" content="Comparing feature groups — featureGroups-compare" />
 
 <meta property="og:description" content="Functionality to compare feature groups and make a consensus." />
@@ -176,9 +174,8 @@ abundance below this number will be removed from the consensus. Set to
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p><code>comparison</code> returns a <code><a href='featureGroupsComparison-class.html'>featureGroupsComparison</a></code>
-  object.
-
-<code>plotVenn</code> (invisibly) returns a list with the following fields:</p><ul>
+  object.</p>
+<p><code>plotVenn</code> (invisibly) returns a list with the following fields:</p><ul>
 <li><p><code>gList</code> the <code>gList</code> object that was returned by
   the utilized <span class="pkg">VennDiagram</span> plotting function.</p></li>
 <li><p><code>areas</code> The total area (<em>i.e.</em> feature group count) for each plotted group.</p></li>
@@ -187,9 +184,8 @@ abundance below this number will be removed from the consensus. Set to
 
 <p>The order for the <code>areas</code> and <code>intersectionCounts</code> fields is the same as the parameter order
 from the used plotting function (see <em>e.g.</em> <code>draw.pairwise.venn</code> and
-<code>draw.triple.venn</code>).
-
-<code>consensus</code> returns a <code><a href='featureGroups-class.html'>featureGroups</a></code>
+<code>draw.triple.venn</code>).</p>
+<p><code>consensus</code> returns a <code><a href='featureGroups-class.html'>featureGroups</a></code>
   object with a consensus from the compared feature groups.</p>
     
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
@@ -205,15 +201,15 @@ output and generate a consensus.</p>
   averaging their retention times, <em>m/z</em> values and intensities, where
   each original feature groups object becomes an 'analysis'. All <em>pseudo</em>
   features are then grouped using <a href='feature-grouping.html'>regular feature
-  grouping algorithms</a> so that a comparison can be made.
-    <code>plot</code> generates an <em>m/z</em> <em>vs</em> retention time plot.
-    <code>plotVenn</code> plots a Venn diagram outlining unique and shared
-  feature groups between up to five compared feature groups.
-    <code>plotChord</code> plots a chord diagram to visualize the distribution
-  of feature groups.
-    <code>consensus</code> combines all compared feature groups and averages
-  their retention, <em>m/z</em> and intensity data.
-    <code>unique</code> returns unique feature groups from one or more
+  grouping algorithms</a> so that a comparison can be made.</p>
+<p><code>plot</code> generates an <em>m/z</em> <em>vs</em> retention time plot.</p>
+<p><code>plotVenn</code> plots a Venn diagram outlining unique and shared
+  feature groups between up to five compared feature groups.</p>
+<p><code>plotChord</code> plots a chord diagram to visualize the distribution
+  of feature groups.</p>
+<p><code>consensus</code> combines all compared feature groups and averages
+  their retention, <em>m/z</em> and intensity data.</p>
+<p><code>unique</code> returns unique feature groups from one or more
   compared feature groups.</p>
     
 

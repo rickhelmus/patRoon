@@ -25,8 +25,6 @@
 <link href="../pkgdown.css" rel="stylesheet">
 <script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
-  
-  
 <meta property="og:title" content="Report feature group data — reporting" />
 
 <meta property="og:description" content="Functionality to report data produced by most workflow steps such as
@@ -279,16 +277,16 @@ graphical overview of results.</p>
 <p>All functions have a wide variety of arguments that influence the reporting
 process. Nevertheless, most parameters are optional and only required to be
 given for fine tuning. In addition, only those objects (<em>e.g.</em> formulae,
-compounds, clustering) that are desired to be reported need to be specified.
-    <code>reportCSV</code> generates tabular data (<em>i.e.</em> <code class="file">.csv</code>
+compounds, clustering) that are desired to be reported need to be specified.</p>
+<p><code>reportCSV</code> generates tabular data (<em>i.e.</em> <code class="file">.csv</code>
   files) for given data to be reported. This may also be useful to allow
-  import by other tools for post processing.
-    <code>reportPDF</code> will report graphical data (<em>e.g.</em>
+  import by other tools for post processing.</p>
+<p><code>reportPDF</code> will report graphical data (<em>e.g.</em>
   chromatograms and mass spectra) within PDF files. Compared
   to <code>reportMD</code> this function may be faster and yield smaller report
   files, however, its functionality is a bit more basic and generated data is
-  more 'scattered' around.
-    <code>reportMD</code> will report graphical data (<em>e.g.</em>
+  more 'scattered' around.</p>
+<p><code>reportMD</code> will report graphical data (<em>e.g.</em>
   chromatograms and mass spectra) and summary information in an easy
   browsable <code>HTML</code> file using rmarkdown, flexdashboard and
   knitr.</p>

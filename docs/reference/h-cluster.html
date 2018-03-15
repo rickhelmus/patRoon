@@ -25,8 +25,6 @@
 <link href="../pkgdown.css" rel="stylesheet">
 <script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
-  
-  
 <meta property="og:title" content="Hierarchical clustering of feature groups — h-cluster" />
 
 <meta property="og:description" content="Utilities to perform and process hierarchical clustering with feature groups." />
@@ -198,39 +196,36 @@ branches to which silhouette information should be calculated.</p></td>
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p><code>makeHCluster</code> Returns an object of the
-  <code><a href='clusterInfo-class.html'>clusterInfo</a></code> class.
-
-<code>drawHeatMap</code> returns the same as <code>heatmap</code> or
-  <code>d3heatmap</code>.
-
-<code>getSilhouetteInfo</code> returns a <code><a href='silhouetteInfo-class.html'>silhouetteInfo</a></code>
-  object.
-
-<code>plot</code> (<code><a href='silhouetteInfo-class.html'>silhouetteInfo</a></code> signature) returns the result of
+  <code><a href='clusterInfo-class.html'>clusterInfo</a></code> class.</p>
+<p><code>drawHeatMap</code> returns the same as <code>heatmap</code> or
+  <code>d3heatmap</code>.</p>
+<p><code>getSilhouetteInfo</code> returns a <code><a href='silhouetteInfo-class.html'>silhouetteInfo</a></code>
+  object.</p>
+<p><code>plot</code> (<code><a href='silhouetteInfo-class.html'>silhouetteInfo</a></code> signature) returns the result of
   <code>barplot</code>.</p>
     
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>These functions provide an interface to common hierarchical clustering tools
-such as <code>hclust</code> that can be used for clustering feature groups.
-    <code>makeHCluster</code> generates hierarchical clustering information
+such as <code>hclust</code> that can be used for clustering feature groups.</p>
+<p><code>makeHCluster</code> generates hierarchical clustering information
   for feature groups. Intensity data will optionally be averaged and then
   normalized. A distance matrix is calculated with <code>daisy</code> and
-  clustering is performed with <code>hclust</code>.
-    <code>hClusterFilter</code> isolates feature groups within a
+  clustering is performed with <code>hclust</code>.</p>
+<p><code>hClusterFilter</code> isolates feature groups within a
   <code><a href='featureGroups-class.html'>featureGroups</a></code> object which are present within a given branch
-  of a cluster object.
-    <code>drawHeatMap</code> draws a heatmap using the <code>heatmap</code>
-  or <code>d3heatmap</code> function.
-    <code>getSilhouetteInfo</code> is used to obtain silhouette information of a
+  of a cluster object.</p>
+<p><code>drawHeatMap</code> draws a heatmap using the <code>heatmap</code>
+  or <code>d3heatmap</code> function.</p>
+<p><code>getSilhouetteInfo</code> is used to obtain silhouette information of a
   <code><a href='clusterInfo-class.html'>clusterInfo</a></code> object which is 'cut' by a given sequence of
-  desired number of branches.
-    <code>plotInt</code> makes a plot for all (normalized) intensity profiles
-  of the feature groups within a given cluster.
-    <code>plot</code> (<code><a href='clusterInfo-class.html'>clusterInfo</a></code> signature) generates a dendrogram
+  desired number of branches.</p>
+<p><code>plotInt</code> makes a plot for all (normalized) intensity profiles
+  of the feature groups within a given cluster.</p>
+<p><code>plot</code> (<code><a href='clusterInfo-class.html'>clusterInfo</a></code> signature) generates a dendrogram
   from a given cluster object and optionally highlights resulting branches
-  when the cluster is cut.
-    <code>plot</code> (<code><a href='silhouetteInfo-class.html'>silhouetteInfo</a></code> signature) plots the various mean
+  when the cluster is cut.</p>
+<p><code>plot</code> (<code><a href='silhouetteInfo-class.html'>silhouetteInfo</a></code> signature) plots the various mean
   silhouette widths stored inside a <code><a href='silhouetteInfo-class.html'>silhouetteInfo</a></code> object. The
   resulting barplot can be used to assess the optimal number of clusters.</p>
     

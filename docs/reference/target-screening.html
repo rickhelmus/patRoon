@@ -25,8 +25,6 @@
 <link href="../pkgdown.css" rel="stylesheet">
 <script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
-  
-  
 <meta property="og:title" content="Target and suspect screening — target-screening" />
 
 <meta property="og:description" content="Utilities to screen for targets with known or suspected identity." />
@@ -161,15 +159,13 @@ information</a>.</p></td>
   specified in the <a href='analysis-information.html'>analysis info</a> then the
   <code>featureGroups</code> method will also report correlation coefficients
   (<code>'RSQ'</code> column) calculated from the linear regression between
-  intensity values and specified concentrations.
-
-<code>groupFeaturesScreening</code> returns a modified <code>featureGroups</code>
+  intensity values and specified concentrations.</p>
+<p><code>groupFeaturesScreening</code> returns a modified <code>featureGroups</code>
   object in which those feature groups that were not matched by any targets
   are removed and others renamed by the respective target name. In case of
   duplicate target results, feature group names are made unique with
-  <code>make.unique</code>.
-
-<code>importFeatureGroupsBrukerTASQ</code> returns a new
+  <code>make.unique</code>.</p>
+<p><code>importFeatureGroupsBrukerTASQ</code> returns a new
   <code>featureGroups</code> object containing converted screening results from
   Bruker TASQ.</p>
     
@@ -178,11 +174,11 @@ information</a>.</p></td>
     <p>Besides 'full non-target analysis', where compounds may be identitified with
 little to no prior knowledge, a common strategy is to screen for compounds
 with known or suspected identity. This may be a generally favourable approach
-if possible, as it can significantly reduce the load on data interpretation.
-    <code>screenTargets</code> will screen a set of targets (provided as a
+if possible, as it can significantly reduce the load on data interpretation.</p>
+<p><code>screenTargets</code> will screen a set of targets (provided as a
   <code>data.frame</code>) within an <code><a href='features-class.html'>features</a></code> or
-  <code><a href='featureGroups-class.html'>featureGroups</a></code> object.
-    <code>groupFeaturesScreening</code> uses results from <code>screenTargets</code>
+  <code><a href='featureGroups-class.html'>featureGroups</a></code> object.</p>
+<p><code>groupFeaturesScreening</code> uses results from <code>screenTargets</code>
   to transform an existing <code><a href='featureGroups-class.html'>featureGroups</a></code> object by (1) renaming
   any matched feature groups by the respective name of the target and (2)
   filtering out any feature groups that were not matched. A common workflow
@@ -191,8 +187,8 @@ if possible, as it can significantly reduce the load on data interpretation.
   with <code>screenTargets</code>, convert the <code>featureGroups</code> object that was
   used for screening with this method function and continue any further
   workflow steps such as compound identification as with 'regular'
-  <code>featureGroups</code>.
-    <code>importFeatureGroupsBrukerTASQ</code> will convert screening results
+  <code>featureGroups</code>.</p>
+<p><code>importFeatureGroupsBrukerTASQ</code> will convert screening results
   from Bruker TASQ to a <code><a href='featureGroups-class.html'>featureGroups</a></code> object. Groups are made
   based on target analyte names and individual results per analysis are used
   to generate the features. The input for this function is obtained by
@@ -209,8 +205,8 @@ if possible, as it can significantly reduce the load on data interpretation.
   names when <a href='reporting.html'>reporting data</a>.</p>
 <p>Please note that <code>groupFeaturesScreening</code> method can only
   transform the <code>featureGroups</code> object that was used to obtain the given
-  screening results.
-    <code>importFeatureGroupsBrukerTASQ</code> will use dummy values for
+  screening results.</p>
+<p><code>importFeatureGroupsBrukerTASQ</code> will use dummy values for
   retention time and <em>m/z</em> values for conversion to features, since this
   information is not available. Hence, when plotting, for instance, extracted
   ion chromatograms (with <code><a href='generics.html'>plotEIC</a></code>) the integrated

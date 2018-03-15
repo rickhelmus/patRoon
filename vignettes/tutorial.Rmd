@@ -30,11 +30,14 @@ The intro ...
 ### Workflow
 
 ## Data preparation
-In this tutorial we will use example data provided with patRoon. The provided analyses already have been exported to an open format (_.mzML_) and are ready to use. For your own data it may be necessary to first perform mass recalibration and data export using vendor software (`patRoon` supplies several utilities for Bruker data, see the bruker-utils reference documentation).
+In this tutorial we will use example data provided within the [patRoonData] package. Please make sure this package is installed (see the [readme] for brief installation instructions). The example dataset contains LC-MS data for a standard mixture with known composition ('standard-X') and a blank solvent ('solvent-X'), both in triplicate. While this may not seem like the most exciting data, it does allow to demonstrate the most important functionalities of `patRoon`.
+
+The provided analyses already have been exported to an open format (_.mzML_) and are ready to use. For your own data it may be necessary to first perform mass recalibration and data export using external tools such as [proteowizard] or vendor software (`patRoon` supplies several utilities for Bruker data, see the bruker-utils reference documentation) to _mzML_ or _mzXML_ files.
 
 ## New project
 To start a new non-target analysis it is highly recommended to create a new directory. We will refer to this directory as the _project directory_. This directory typically contains:
-* a `R` script (or scripts) which will do the actual processing
+
+* an `R` script (or scripts) which will do the non-target data processing
 * an (optional) _.csv_ file with analysis information
 * an automatically generated cache file which is internally used by `patRoon` to cache (intermediate) results, therefore, preventing repeated execution of lengthy workflow steps that have been performed before.
 
@@ -46,10 +49,10 @@ library(patRoon)
 workPath <- "~/my_project" # change this to the location of your project directory
 setwd(workPath)
 
-dataDir <- patRoonData::exampleDataPath()
+dataDir <- patRoonData::exampleDataPath() # path to example data files
 ```
 
-Next step is to generate information ncessary for the analysis. To do so, we need to specify the names and file locations of the analyses, to which _replicate group_ they belong and which replicate group(s) should be used for blank subtraction. To do so, we can use the `generateAnalysisInfo()` utility function which automatically generates a suitable `data.frame` for us from given analyses:
+The next step is to generate information ncessary for the analysis. To do so, we need to specify the names and file locations of the analyses, to which _replicate group_ they belong and which replicate group(s) should be used for blank subtraction. To do so, we can use the `generateAnalysisInfo()` utility function which automatically generates a suitable `data.frame` for us from given analyses:
 
 ```{r}
 generateAnalysisInfo(dataDir)
@@ -60,11 +63,11 @@ As you can see the generated `data.frame` consists of four columns:
 * *path*: the path of the file directory containing the analysis
 * *analysis*: the name of the analysis. The shoud be the file name _without_ file extension.
 * *group*: to which _replicate group_ the analysis belongs. All analysis which are replicates of each other get the same name.
-* *ref*: which replicate groub should be used for blank subtraction.
+* *ref*: which replicate group should be used for blank subtraction.
 
 The latter two columns are especially important for [data cleanup](#data-cleanup).
 
-In our example, the solvents and standards should belong each to a different replicate group (`"solvent"` and `"standards"`). The solvents should also be used for blank subtraction. For this we can use the `groups` and `refs` arguments:
+In our example, the solvents and standards should belong each to a different replicate group (`"solvent"` and `"standard"`). The solvents should be used for blank subtraction. For this we can use the `groups` and `refs` arguments of `generateAnalysisInfo()`:
 ```{r}
 anaInfo <- generateAnalysisInfo(dataDir,
                                 groups = c(rep("solvent", 3), rep("standard", 3)),
@@ -74,9 +77,15 @@ anaInfo
 
 Note that we set the reference for the solvents to themself. This will remove any features from the solvents, which is generally fine as we are usually not interested in the blanks anyway.
 
-For larger project it may be preferred to export the `data.frame` to a _.csv_ file so it can be easily edited, for instance, with Excel. Alternatively, the `newProject()` function can be used to make this process even easier (briefly discussed [here](#newProject)).
+Depending on your preference, it may be preferred to export the `data.frame` to a _.csv_ file for larger project so it can be easily edited, for instance, with graphical tools such as Excel. Alternatively, the `newProject()` function can be used to make this process even easier (briefly discussed [here](#newProject)).
 
 ## Extract and group features
+
+The first step of a LC-MS non-target analysis workflow is typically the extraction of so called 'features'. While sometimes slightly different definitions are used, a feature can be seen as a single peak within an extracted ion chromatogram. For a complex sample it is not uncommon that hundreds to thousands of features can extracted. Because these large numbers this process is typically automatized nowadays.
+
+To obtain all the features within your dataset the `findFeatures` function is used. This function requires that the analysis information (`anaInfo` variable created earlier) and the desired algorithm that should be used. On top of that there are many more options that can significantly influence the feature finding process, hence, it is important to evaulate results afterwards.
+
+In this tutorial we will use the [OpenMS] software to find features:
 
 ```{r features,results='hide'}
 fList <- findFeatures(anaInfo, "openms", mzppm = 5)
@@ -85,10 +94,16 @@ fList <- findFeatures(anaInfo, "openms", mzppm = 5)
 fList
 ```
 
+After some processing time (especially for larger datasets), the next step is to _group features_. During this step, features from different analysis are grouped by alignment of their retention times and _m/z_ data. This alignment is necessary because it is common that instrumental error will result in (slight) variations for these data between analyses.
+
+To group features the `groupFeatures()` function is used, which has similar argument requirements as `findFeatures` and many more options to tune the process. 
+
 ```{r fGroups}
 fGroups <- groupFeatures(fList, "openms")
 fGroups
 ```
+
+The `groupTable()` function can be used to have a look at generated feature groups and their intensities (_i.e._ peak heights) across all analyses:
 
 ```{r gTable}
 head(groupTable(fGroups))
@@ -96,17 +111,36 @@ head(groupTable(fGroups))
 
 ## Data cleanup { #data-cleanup }
 
+The next step is to perform some basic rule based filtering with the `filter()` function. As its name suggests this function has several way to filter data. It is a so called _generic_ function and _methods_ exists for various data types, such as the feature groups object (`fGroups`) that was made in the previous section.
+
+In this tutorial we will filter grouped features (or 'feature groups') based on a minimal intensity, minimal abundance within replicates and absence within blanks. Finally, we will also remove any feature groups eluting before roughly the dead volume of the system: 
+
 ```{r filter}
 fGroups <- filter(fGroups, intensityThreshold = 10000, intraRGroupAbundance = 1,
                   minBlankThreshold = 5, repetitions = 2, retentionRange = c(110, -1))
 ```
+
+As can been from above command this will remove quite a large part our data. However, in our experience using the right settings is a very effective way to separate interesting data from the rest. Some hints on this process:
+
+* The intensity filter is an effective way to remove not oly 'noisy' data, but can also be used to remove any low intensity peaks which are very likely to miss any MS/MS data (assuming you are interested in this and data has been recorded with it).
+* The `intraRGroupAbundance` argument specifies a fraction to which a feature group should be minimally present within all replicates. This is a _very_ effective filter in removing any outliers or features which don't actually represent a well defined chromatographic peak, but perhaps are just part of another peak or simply noise.
+* The `minBlankThreshold` argument is used for blank subtraction. In the above example, any features with an intensity less than five times compared to the average intensity in blanks will be removed.
+* The `repetitions` argument is used to repeat some of the filter steps to make sure that all the data is really filtered out. A value of two is usually sufficient.
+
+Finally, we can have a quick look at our data by plotting some nice extracted ion chromatograms (EICs) for all remaining feature groups:
 
 ```{r plotEIC,fig.width=7,results='hide'}
 plotEIC(fGroups, colourBy = "fGroups", showFGroupRect = FALSE, showPeakArea = TRUE,
         topMost = 1, showLegend = FALSE)
 ```
 
+The next logical step in a non-target workflow is most likely to perform further prioritization of data. However, in this tutorial we are just dealing with a relative simple standard mixture, se we will move to the identification part.
+
 ## MS peak lists
+
+Having obtained a good dataset with features of interest, we can start moving to figuring out what these may be. Before performing any identification steps, however, the first step is to extract all relevant MS data. This data was obtained with data-dependent MS/MS mode, so in the ideal case we obtain al MS and MS/MS spectra for each feature group.
+
+The `generateMSPeakLists()` will perform this action for us and will generate so called _MS peaklists_ in the process. These peaklists are basicially the relevant MS and MS/MS spectra in tabular form. The command below will use the _mzR_ algorithm to do so:
 
 ```{r MSPeakLists,results='hide'}
 plists <- generateMSPeakLists(fGroups, "mzr", avgMzWindow = 0.0005,
@@ -118,10 +152,17 @@ plists
 
 ## Formula calculation
 
+Using the data from the MS peaklists generated during the previous step we can generate a list of formula candidates for each feature group based on measured _m/z_ values, isotopic patterns and presence of MS/MS fragments. In this tutorial we will use this data as an extra hint to score canddiate chemical structures generated during the next step. The command below will use [GenForm] to perform this step: 
+
 ```{r formulas,results='hide'}
 forms <- generateFormulas(fGroups, "genform", plists, maxMzDev = 5,
                           adduct = "M+H", elements = "CHNOPSCl")
 ```
+
+Note that we limited to only to the the elements C, H, N, O, O, S and Cl. It is highly recommended to limit the elements (by default it is just C, H, N, O and P) as this can signfificantly reduce porcessing time and improper numbers. In this tutorial we already knew which compounds to expect so the choice was easy, but often a good guess can be made in advance.
+
+The `generateFormulas()` function returns a list of formulas of every feature in all analyses. The `consensus()` function is used subsequently to generate a final table of formula candidates for each feature group. During this process, any formulas for a particular feature group which were detected in only a fraction of the analyses (by default <75%, controlled by the `formAnaThreshold` argument) are considered as outliers and removed. In addition, this function will also set a limit to only keep a number of top candidates (ten by default, controlled by the `maxFormulas` and `maxFragFormulas` arguments). In this tutorial we will just stick with defaults:
+
 ```{r}
 formulas <- consensus(forms, fGroups = fGroups)
 formulas
@@ -129,9 +170,14 @@ formulas
 
 ## Compound identification
 
+Now it is time to actually see what compounds we may be dealing with. In this tutorial we will use [MetFrag] to come up with a list of possible candidates structures for each feature group. Before we can start you have to download the [MetFrag CLI jar file][MetFragCLI] and specify its file location: 
+
 ```{r MF_opt,eval=FALSE}
-options(patRoon.path.metFragCL = "~/MetFrag2.4.3-CL.jar")
+options(patRoon.path.metFragCL = "~/MetFrag2.4.3-CL.jar") # change to the full path of the MetFrag CLI jar file
 ```
+
+
+Then `generateCompounds()` is used to execute MetFrag and generate the `compounds`.
 
 ```{r compounds,results='hide'}
 compounds <- generateCompounds(fGroups, plists, "metfrag", topMost = 25,
@@ -145,11 +191,23 @@ compounds <- generateCompounds(fGroups, plists, "metfrag", topMost = 25,
 compounds
 ```
 
+While `generateCompounds()` is running a list of candidate compound structures will be downloaded for every feature group (in this case from PubChem) and ranked according to various scoring parameters.
+
+As with previous described workfow functions, there are many different arguments that can specified to modify the behaviour when generating compounds. In brief, here we limit the number to the top 25 candidates (this will save a lot of processing time), specify that we are primarily interested in protonated ions and use the extended PubChem database so that we can score on number of patents and PubMed references along with scoring for similarity to in-silico generated MS/MS spectra (`FragmenterScore`) and MassBank derived mass spectra (`OfflineMetFusionScore`).
+
+As a side note: this is often one of the most time consuming steps during the workflow. For this reason, and in order to not 'abuse' the server used by MetFrag, you should always take care to prioritie your data before running this function.
+
+In the previous step we generated candidate formulas for all feature groups. These can be used to add yet another scoring parameter so we can assess if the formula part of a candidate structure makes sense: 
+
 ```{r,results='hide'}
 compounds <- addFormulaScoring(compounds, formulas, updateScore = TRUE)
 ```
 
 ## Components
+
+So far we mainly dealt with feature groups as if they are separate chemical compounds. However, formation of multiple ionization adducts (_e.g._ sodium and potassium) and the presence of isotopologues yield multiple _m/z_ values for the same compound. As a result, multiple feature groups will be present describing the same chemical compound, each describing the same retention pattern. To reduce this complexity it is useful to generate so called _components_ which are basically groups of feature groups which are likely to be the same compound. Another advantage is this grouping process is that extra chemical information of a compound is revealed which may help compound identification.
+
+Generating components is performed with the `generateComponents()` function:
 
 ```{r components,results='hide'}
 components <- generateComponents(fGroups, "camera", ionization = "positive")
@@ -160,6 +218,8 @@ components
 
 ## Reporting
 
+The last step of the workflow is typically reporting data: during this step all the collected data is transformed to graphical plots (`reportPDF()` and `reportMD()`) or tabular csv data (`reportCSV()`).
+
 ```{r eval=FALSE}
 reportCSV(fGroups, formConsensus = formulas, compounds = compounds, components = components)
 reportPDF(fGroups, formConsensus = formulas, compounds = compounds, components = components,
@@ -168,9 +228,13 @@ reportMD(fGroups, formConsensus = formulas, compounds = compounds, components = 
          MSPeakLists = plists)
 ```
 
-The output of `reportMD` can be seen [here][../examples/report.html].
+The output of `reportMD()` can be viewed [here][../examples/report.html].
+
+Note that these functions can be called at any time during the workflow. This may be especially useful if you want evaluate results during optimization or exploring the various algorithms available.
 
 ```{r echo=FALSE,eval=!pkgdown::in_pkgdown()}
+# do the actual reporting here
+
 # ugly work around for nested rmarkdown call made by reportMD; based on https://gist.github.com/jennybc/1f747c5bb84aa9be9c3c
 tempF <- tempfile(); tempScript <- tempfile(fileext = ".R")
 save(fGroups, formulas, compounds, components, plists, file = tempF)
@@ -192,11 +256,13 @@ devtools::clean_source(tempScript, quiet = TRUE)
 
 ### Create new projects with `newProject()` { #newProject }
 
+In this tutorial we started with creating a project directory with a template script and using the `generateAnalysisInfo()` to (semi-)automatically generate analysis information required for subsequent workflow steps. If you are using (a recent version of) R Studio a quicker and potentially user friendlier alternative is to use the `newProject()` function. This function will present you with a 'wizard' like graphical screen guiding you to choose a project directory, select all analyses and select all common workflow steps that should be executed. When finished the input will then be used to generate a template processing script.
+
 ### Suspect screening
 
 ```{r}
 scr <- screenTargets(fGroups, patRoonData::targets)
-head(scr[, 1:4])
+head(scr)
 ```
 
 ```{r}

@@ -26,7 +26,7 @@ Some implementation notes:
 * Developed on both Windows and Linux
 * `data.table` is used internally as a generally much more efficient alternative to `data.frame`.
 * The [processx] R package is used to execute command line processes in parallel to reduce computation times.
-* Results from workflow steps are cached within a [sqlite] database to avoid repeated computations.
+* Results from workflow steps are cached within a [SQLite] database to avoid repeated computations.
 * The [RDCOMClient] is used to provide several functionalities from DataAnalysis (Bruker).
 * Depending on which software algorithms, the following MS data formats are supported: `mzXML`, `mzML` and `.d` (Bruker).
 * The [Shiny] R package was used to implement several GUI tools.
@@ -137,6 +137,7 @@ Finally, the [reference] outlines all the details of the `patRoon` package.
 [Rtools]: https://cran.r-project.org/bin/windows/Rtools/
 [RStudio]: https://www.rstudio.com/
 [processx]: https://github.com/r-lib/processx
+[SQLite]: https://www.sqlite.org/index.html
 [RDCOMClient]: http://www.omegahat.net/RDCOMClient/
 [Shiny]: https://shiny.rstudio.com/
 [example]: https://rickhelmus.github.io/patRoon/examples/report.html

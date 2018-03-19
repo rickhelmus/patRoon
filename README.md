@@ -19,7 +19,20 @@ Below is an overview of the most common non-target workflow steps supported alon
 * **Generation of components**: grouping of (chemically) related features such as isotopes, adducts and homologs ([RAMClustR], [CAMERA], [nontarget R package][nontarget]).
 * **reporting** of all workflow steps in various formats: _CSV_, _PDF_ and _HTML_.
 
-An example HTML report can viewed [here][example].
+An example HTML report which gives an overview of what data can be produced can viewed [here][example].
+
+Some implementation notes:
+
+* Developed on both Windows and Linux
+* `data.table` is used internally as a generally much more efficient alternative to `data.frame`.
+* The [processx] R package is used to execute command line processes in parallel to reduce computation times.
+* Results from workflow steps are cached within a [sqlite] database to avoid repeated computations.
+* The [RDCOMClient] is used to provide several functionalities from DataAnalysis (Bruker).
+* Depending on which software algorithms, the following MS data formats are supported: `mzXML`, `mzML` and `.d` (Bruker).
+* The [Shiny] R package was used to implement several GUI tools.
+* S4 classes and generics are used to implement a consistent interface to the many different supported software algorithms for each workflow step.
+
+Currently most functionalities have been implemented. On the short term the main focus is to improve and extend documentation, improve robustness when dealing with user input and find & remove bugs by (implementing automated) testing.
 
 ## Installation
 
@@ -123,6 +136,9 @@ Finally, the [reference] outlines all the details of the `patRoon` package.
 [remotes]: https://github.com/r-lib/remotes#readme
 [Rtools]: https://cran.r-project.org/bin/windows/Rtools/
 [RStudio]: https://www.rstudio.com/
+[processx]: https://github.com/r-lib/processx
+[RDCOMClient]: http://www.omegahat.net/RDCOMClient/
+[Shiny]: https://shiny.rstudio.com/
 [example]: https://rickhelmus.github.io/patRoon/examples/report.html
 
 

@@ -93,7 +93,20 @@
 <li>
 <strong>reporting</strong> of all workflow steps in various formats: <em>CSV</em>, <em>PDF</em> and <em>HTML</em>.</li>
 </ul>
-<p>An example HTML report can viewed <a href="https://rickhelmus.github.io/patRoon/examples/report.html">here</a>.</p>
+<p>An example HTML report which gives an overview of what data can be produced can viewed <a href="https://rickhelmus.github.io/patRoon/examples/report.html">here</a>.</p>
+<p>Some implementation notes:</p>
+<ul>
+<li>Developed on both Windows and Linux</li>
+<li>
+<code>data.table</code> is used internally as a generally much more efficient alternative to <code>data.frame</code>.</li>
+<li>The <a href="https://github.com/r-lib/processx">processx</a> R package is used to execute command line processes in parallel to reduce computation times.</li>
+<li>Results from workflow steps are cached within a [sqlite] database to avoid repeated computations.</li>
+<li>The <a href="http://www.omegahat.net/RDCOMClient/">RDCOMClient</a> is used to provide several functionalities from DataAnalysis (Bruker).</li>
+<li>Depending on which software algorithms, the following MS data formats are supported: <code>mzXML</code>, <code>mzML</code> and <code>.d</code> (Bruker).</li>
+<li>The <a href="https://shiny.rstudio.com/">Shiny</a> R package was used to implement several GUI tools.</li>
+<li>S4 classes and generics are used to implement a consistent interface to the many different supported software algorithms for each workflow step.</li>
+</ul>
+<p>Currently most functionalities have been implemented. On the short term the main focus is to improve and extend documentation, improve robustness when dealing with user input and find &amp; remove bugs by (implementing automated) testing.</p>
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>

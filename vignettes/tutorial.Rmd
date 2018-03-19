@@ -40,7 +40,7 @@ The intro ...
 ## Data preparation
 In this tutorial we will use example data provided within the [patRoonData] package. Please make sure this package is installed (see the [readme] for brief installation instructions). The example dataset contains LC-MS data for a standard mixture with known composition ('standard-X') and a blank solvent ('solvent-X'), both in triplicate. While this may not seem like the most exciting data, it does allow to demonstrate the most important functionalities of `patRoon`.
 
-The provided analyses already have been exported to an open format (_.mzML_) and are ready to use. For your own data it may be necessary to first perform mass recalibration and data export using external tools such as [proteowizard] or vendor software (`patRoon` supplies several utilities for Bruker data, see the bruker-utils reference documentation) to _mzML_ or _mzXML_ files.
+The provided analyses already have been exported to an open format (_.mzML_) and are ready to use. For your own data it may be necessary to first perform mass recalibration and data export using external tools such as [ProteoWizard] or vendor software (`patRoon` supplies several utilities for Bruker data, see the bruker-utils reference documentation) to _mzML_ or _mzXML_ files.
 
 ## New project
 
@@ -168,7 +168,7 @@ forms <- generateFormulas(fGroups, "genform", plists, maxMzDev = 5,
                           adduct = "M+H", elements = "CHNOPSCl")
 ```
 
-Note that we limited to only to the the elements C, H, N, O, O, S and Cl. It is highly recommended to limit the elements (by default it is just C, H, N, O and P) as this can signfificantly reduce porcessing time and improper numbers. In this tutorial we already knew which compounds to expect so the choice was easy, but often a good guess can be made in advance.
+Note that we limited to only to the the elements C, H, N, O, P, S and Cl. It is highly recommended to limit the elements (by default it is just C, H, N, O and P) as this can significantly reduce processing time and improbable formula candidates. In this tutorial we already knew which compounds to expect so the choice was easy, but often a good guess can be made in advance.
 
 The `generateFormulas()` function returns a list of formulas of every feature in all analyses. The `consensus()` function is used subsequently to generate a final table of formula candidates for each feature group. During this process, any formulas for a particular feature group which were detected in only a fraction of the analyses (by default <75%, controlled by the `formAnaThreshold` argument) are considered as outliers and removed. In addition, this function will also set a limit to only keep a number of top candidates (ten by default, controlled by the `maxFormulas` and `maxFragFormulas` arguments). In this tutorial we will just stick with defaults:
 
@@ -179,7 +179,7 @@ formulas
 
 ## Compound identification
 
-Now it is time to actually see what compounds we may be dealing with. In this tutorial we will use [MetFrag] to come up with a list of possible candidates structures for each feature group. Before we can start you have to download the [MetFrag CLI jar file][MetFragCLI] and specify its file location: 
+Now it is time to actually see what compounds we may be dealing with. In this tutorial we will use [MetFrag] to come up with a list of possible candidates structures for each feature group. Before we can start you have to download the [MetFrag CLI jar file][MetFragCL] and specify its file location: 
 
 ```{r MF_opt,eval=FALSE}
 options(patRoon.path.metFragCL = "~/MetFrag2.4.3-CL.jar") # change to the full path of the MetFrag CLI jar file
@@ -301,3 +301,13 @@ plotEIC(fGroupsScreening, colourBy = "fGroups", showFGroupRect = FALSE, showPeak
 # cleanup
 unlink("log", TRUE)
 ```
+
+
+
+[patroonData]: https://github.com/rickhelmus/patRoonData
+[readme]: https://rickhelmus.github.io/patRoon/
+[ProteoWizard]: http://proteowizard.sourceforge.net/
+[OpenMS]: http://openms.de/
+[GenForm]: https://sourceforge.net/projects/genform/
+[MetFrag]: http://c-ruttkies.github.io/MetFrag/
+[MetFragCL]: http://c-ruttkies.github.io/MetFrag/projects/metfragcl/

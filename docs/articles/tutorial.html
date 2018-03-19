@@ -66,7 +66,7 @@
       <h1>patRoon tutorial</h1>
                         <h4 class="author">Rick Helmus</h4>
             
-            <h4 class="date">2018-03-15</h4>
+            <h4 class="date">2018-03-18</h4>
           </div>
 
     
@@ -90,8 +90,8 @@ pre, code {
 <div id="data-preparation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#data-preparation" class="anchor"></a>Data preparation</h2>
-<p>In this tutorial we will use example data provided within the [patRoonData] package. Please make sure this package is installed (see the [readme] for brief installation instructions). The example dataset contains LC-MS data for a standard mixture with known composition (‘standard-X’) and a blank solvent (‘solvent-X’), both in triplicate. While this may not seem like the most exciting data, it does allow to demonstrate the most important functionalities of <code>patRoon</code>.</p>
-<p>The provided analyses already have been exported to an open format (<em>.mzML</em>) and are ready to use. For your own data it may be necessary to first perform mass recalibration and data export using external tools such as [proteowizard] or vendor software (<code>patRoon</code> supplies several utilities for Bruker data, see the bruker-utils reference documentation) to <em>mzML</em> or <em>mzXML</em> files.</p>
+<p>In this tutorial we will use example data provided within the <a href="https://github.com/rickhelmus/patRoonData">patRoonData</a> package. Please make sure this package is installed (see the <a href="https://rickhelmus.github.io/patRoon/">readme</a> for brief installation instructions). The example dataset contains LC-MS data for a standard mixture with known composition (‘standard-X’) and a blank solvent (‘solvent-X’), both in triplicate. While this may not seem like the most exciting data, it does allow to demonstrate the most important functionalities of <code>patRoon</code>.</p>
+<p>The provided analyses already have been exported to an open format (<em>.mzML</em>) and are ready to use. For your own data it may be necessary to first perform mass recalibration and data export using external tools such as <a href="http://proteowizard.sourceforge.net/">ProteoWizard</a> or vendor software (<code>patRoon</code> supplies several utilities for Bruker data, see the bruker-utils reference documentation) to <em>mzML</em> or <em>mzXML</em> files.</p>
 </div>
 <div id="new-project" class="section level2">
 <h2 class="hasAnchor">
@@ -150,7 +150,7 @@ anaInfo
 <a href="#extract-and-group-features" class="anchor"></a>Extract and group features</h2>
 <p>The first step of a LC-MS non-target analysis workflow is typically the extraction of so called ‘features’. While sometimes slightly different definitions are used, a feature can be seen as a single peak within an extracted ion chromatogram. For a complex sample it is not uncommon that hundreds to thousands of features can extracted. Because these large numbers this process is typically automatized nowadays.</p>
 <p>To obtain all the features within your dataset the <code>findFeatures</code> function is used. This function requires that the analysis information (<code>anaInfo</code> variable created earlier) and the desired algorithm that should be used. On top of that there are many more options that can significantly influence the feature finding process, hence, it is important to evaulate results afterwards.</p>
-<p>In this tutorial we will use the [OpenMS] software to find features:</p>
+<p>In this tutorial we will use the <a href="http://openms.de/">OpenMS</a> software to find features:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fList &lt;-<span class="st"> </span><span class="kw"><a href="../reference/feature-finding.html">findFeatures</a></span>(anaInfo, <span class="st">"openms"</span>, <span class="dt">mzppm =</span> <span class="dv">5</span>)</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fList
 <span class="co">#&gt; A features object ('featuresOpenMS')</span>
@@ -226,10 +226,10 @@ fGroups
 <div id="formula-calculation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#formula-calculation" class="anchor"></a>Formula calculation</h2>
-<p>Using the data from the MS peaklists generated during the previous step we can generate a list of formula candidates for each feature group based on measured <em>m/z</em> values, isotopic patterns and presence of MS/MS fragments. In this tutorial we will use this data as an extra hint to score canddiate chemical structures generated during the next step. The command below will use [GenForm] to perform this step:</p>
+<p>Using the data from the MS peaklists generated during the previous step we can generate a list of formula candidates for each feature group based on measured <em>m/z</em> values, isotopic patterns and presence of MS/MS fragments. In this tutorial we will use this data as an extra hint to score canddiate chemical structures generated during the next step. The command below will use <a href="https://sourceforge.net/projects/genform/">GenForm</a> to perform this step:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">forms &lt;-<span class="st"> </span><span class="kw"><a href="../reference/formula-generation.html">generateFormulas</a></span>(fGroups, <span class="st">"genform"</span>, plists, <span class="dt">maxMzDev =</span> <span class="dv">5</span>,
                           <span class="dt">adduct =</span> <span class="st">"M+H"</span>, <span class="dt">elements =</span> <span class="st">"CHNOPSCl"</span>)</code></pre></div>
-<p>Note that we limited to only to the the elements C, H, N, O, O, S and Cl. It is highly recommended to limit the elements (by default it is just C, H, N, O and P) as this can signfificantly reduce porcessing time and improper numbers. In this tutorial we already knew which compounds to expect so the choice was easy, but often a good guess can be made in advance.</p>
+<p>Note that we limited to only to the the elements C, H, N, O, P, S and Cl. It is highly recommended to limit the elements (by default it is just C, H, N, O and P) as this can significantly reduce processing time and improbable formula candidates. In this tutorial we already knew which compounds to expect so the choice was easy, but often a good guess can be made in advance.</p>
 <p>The <code><a href="../reference/formula-generation.html">generateFormulas()</a></code> function returns a list of formulas of every feature in all analyses. The <code><a href="../reference/generics.html">consensus()</a></code> function is used subsequently to generate a final table of formula candidates for each feature group. During this process, any formulas for a particular feature group which were detected in only a fraction of the analyses (by default &lt;75%, controlled by the <code>formAnaThreshold</code> argument) are considered as outliers and removed. In addition, this function will also set a limit to only keep a number of top candidates (ten by default, controlled by the <code>maxFormulas</code> and <code>maxFragFormulas</code> arguments). In this tutorial we will just stick with defaults:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">formulas &lt;-<span class="st"> </span><span class="kw"><a href="../reference/generics.html">consensus</a></span>(forms, <span class="dt">fGroups =</span> fGroups)
 <span class="co">#&gt; Generating consensus for formula lists (GenForm)... Done!</span>
@@ -243,7 +243,7 @@ formulas
 <div id="compound-identification" class="section level2">
 <h2 class="hasAnchor">
 <a href="#compound-identification" class="anchor"></a>Compound identification</h2>
-<p>Now it is time to actually see what compounds we may be dealing with. In this tutorial we will use [MetFrag] to come up with a list of possible candidates structures for each feature group. Before we can start you have to download the [MetFrag CLI jar file][MetFragCLI] and specify its file location:</p>
+<p>Now it is time to actually see what compounds we may be dealing with. In this tutorial we will use <a href="http://c-ruttkies.github.io/MetFrag/">MetFrag</a> to come up with a list of possible candidates structures for each feature group. Before we can start you have to download the <a href="http://c-ruttkies.github.io/MetFrag/projects/metfragcl/">MetFrag CLI jar file</a> and specify its file location:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">options</span>(<span class="dt">patRoon.path.metFragCL =</span> <span class="st">"~/MetFrag2.4.3-CL.jar"</span>) <span class="co"># change to the full path of the MetFrag CLI jar file</span></code></pre></div>
 <p>Then <code><a href="../reference/compound-generation.html">generateCompounds()</a></code> is used to execute MetFrag and generate the <code>compounds</code>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">compounds &lt;-<span class="st"> </span><span class="kw"><a href="../reference/compound-generation.html">generateCompounds</a></span>(fGroups, plists, <span class="st">"metfrag"</span>, <span class="dt">topMost =</span> <span class="dv">25</span>,

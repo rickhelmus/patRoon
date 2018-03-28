@@ -205,7 +205,7 @@ While `generateCompounds()` is running a list of candidate compound structures w
 
 As with previous described workfow functions, there are many different arguments that can specified to modify the behaviour when generating compounds. In brief, here we limit the number to the top 25 candidates (this will save a lot of processing time), specify that we are primarily interested in protonated ions and use the extended PubChem database so that we can score on number of patents and PubMed references along with scoring for similarity to in-silico generated MS/MS spectra (`FragmenterScore`) and MassBank derived mass spectra (`OfflineMetFusionScore`).
 
-As a side note: this is often one of the most time consuming steps during the workflow. For this reason, and in order to not 'abuse' the server used by MetFrag, you should always take care to prioritie your data before running this function.
+As a side note: this is often one of the most time consuming steps during the workflow. For this reason, and in order to not 'abuse' the server used by MetFrag, you should always take care to prioritize your data before running this function.
 
 In the previous step we generated candidate formulas for all feature groups. These can be used to add yet another scoring parameter so we can assess if the formula part of a candidate structure makes sense: 
 
@@ -297,7 +297,7 @@ plotEIC(fGroupsScreening, colourBy = "fGroups", showFGroupRect = FALSE, showPeak
 
 
 
-```{r echo=FALSE}
+```{r echo=FALSE,eval=!pkgdown::in_pkgdown()}
 # cleanup
 unlink("log", TRUE)
 ```

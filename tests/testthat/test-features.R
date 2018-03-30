@@ -5,9 +5,9 @@ ffXCMS <- findFeatures(testAnaInfo, "xcms")
 ffEP <- findFeatures(testAnaInfo, "envipick")
 
 test_that("verify feature finder output", {
-    expect_known_value(ffOpenMS, testFile("ff-openms"))
-    expect_known_value(ffXCMS, testFile("ff-xcms"))
-    expect_known_value(ffEP, testFile("ff-envipick"))
+    expect_known_value(featureTable(ffOpenMS), testFile("ff-openms"))
+    expect_known_value(featureTable(ffXCMS), testFile("ff-xcms"))
+    expect_known_value(featureTable(ffEP), testFile("ff-envipick"))
 })
 
 test_that("verify show output", {

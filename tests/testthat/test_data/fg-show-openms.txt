@@ -1,0 +1,6 @@
+A feature groups object ('featureGroupsOpenMS')
+Feature groups: M79_R20_1, M79_R20_2, M79_R112_3, M79_R8_4, M85_R113_5, M85_R14_6, ... (644 total)
+Analyses: solvent-1, solvent-2, solvent-3, standard-1, standard-2, standard-3 (6 total)
+Replicate groups: solvent, standard (2 total)
+Replicate groups used as ref: solvent (1 total)
+Object size (indication): 751.3 kB

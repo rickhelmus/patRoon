@@ -1,4 +1,4 @@
-context("test-features.R")
+context("features")
 
 ffOpenMS <- findFeatures(testAnaInfo, "openms", logPath = NULL)
 ffXCMS <- findFeatures(testAnaInfo, "xcms")

@@ -66,10 +66,12 @@ Imports:
     cowplot,
     jsonlite,
     Rdpack
-Suggests:
+Suggests: 
     RDCOMClient,
     metfRag,
-    RAMClustR
+    RAMClustR,
+    testthat,
+    patRoonData
 RdMacros:
     Rdpack
 Collate:
@@ -120,4 +122,3 @@ Collate:
     'utils.R'
     'zzz.R'
 VignetteBuilder: knitr
-

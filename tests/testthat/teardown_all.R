@@ -1,0 +1,1 @@
+unlink(getWorkPath(), TRUE)

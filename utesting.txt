@@ -1,0 +1,26 @@
+overall
+- generate (temporary) work directory
+- copy mzML
+- convert mzXML
+- disable logging (or put to temp dir)
+- set/disable cache file
+
+features
+- test all feature finders --> simply compare to reference
+
+featureGroups
+- import csv features
+- compare all algos to refs
+- test subsetting
+    - verify nr of rows/columns
+    - drop?
+    - empty
+- export --> ref
+- groupTable: check rows/columns with/without averaging
+- unique
+- overlap
+- import?
+
+
+screenTargets
+- both features and featureGroups methods

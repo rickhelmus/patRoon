@@ -84,7 +84,7 @@ importFeatureGroupsXCMSFromFeat <- function(xs, analysisInfo, feat)
     setnames(groups, gNames)
     groups[is.na(groups)] <- 0
 
-    return(featureGroupsXCMS(xs = xs, groups = groups, groupInfo = gInfo, analysisInfo = anaInfo, features = feat,
+    return(featureGroupsXCMS(xs = xs, groups = groups, groupInfo = gInfo, analysisInfo = analysisInfo, features = feat,
                              ftindex = setnames(getFeatIndicesFromXS(xs), gNames)))
 }
 

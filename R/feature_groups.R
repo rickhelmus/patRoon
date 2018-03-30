@@ -830,7 +830,7 @@ setMethod("unique", "featureGroups", function(x, which, relativeTo = NULL, outer
     rGroups <- unique(anaInfo$group)
 
     if (all(rGroups %in% which))
-        return(x) # nothing to do...
+        return(if (outer) x[FALSE] else x) # nothing to do...
 
     # Split by selected and other replicate groups
     selFGroups <- replicateGroupFilter(x, which, verbose = FALSE)
@@ -839,7 +839,7 @@ setMethod("unique", "featureGroups", function(x, which, relativeTo = NULL, outer
     # pick out all feature groups NOT present in others
     ret <- selFGroups[, setdiff(names(selFGroups), names(otherFGroups))]
 
-    if (outer)
+    if (outer && length(which) > 1)
         ret <- interReplicateAbundanceFilter(ret, relThreshold = 1, negate = outer, verbose = FALSE)
 
     return(ret)

@@ -225,7 +225,7 @@ compoundFilter <- function(fGroups, compounds, negate = FALSE, verbose = TRUE)
 #'   this step.
 #' @param
 #' relAbundance,absAbundance,interRelRGroupAbundance,interAbsRGroupAbundance
-#' Minimal overal relative/absolute abundance for a feature group to be present
+#' Minimal overall relative/absolute abundance for a feature group to be present
 #' within all analyses/replicate groups.
 #' @param intraRGroupAbundance Minimum relative abundance (0-1) that a feature
 #'   group should be present within a replicate group. Set to \code{NULL} to

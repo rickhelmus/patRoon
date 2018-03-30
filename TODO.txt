@@ -6,3 +6,4 @@ Release:
 - more withr wrapping? (dev, par)
 - re-enable cleaning for GenForm compile
 - windows
+- file hashes for findFeaturesXCMS/EnviPick

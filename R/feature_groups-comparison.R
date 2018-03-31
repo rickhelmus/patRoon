@@ -172,7 +172,7 @@ setMethod("plotChord", "featureGroupsComparison",
 #'
 #' @param relAbundance,absAbundance Feature groups with relative/absolute
 #'   abundance below this number will be removed from the consensus. Set to
-#'   \code{NULL} for no limits.
+#'   \code{0} for no limits.
 #'
 #' @return \code{consensus} returns a \code{\link{featureGroups}}
 #'   object with a consensus from the compared feature groups.
@@ -194,8 +194,9 @@ setMethod("consensus", "featureGroupsComparison", function(obj, relAbundance = 0
 
     anaInfo <- allAnaInfos[[1]]
 
+    comparedFGroups <- obj@comparedFGroups
     if (relAbundance > 0 || absAbundance > 0)
-        obj <- abundanceFilter(obj, relAbundance, absAbundance)
+        comparedFGroups <- abundanceFilter(comparedFGroups, relAbundance, absAbundance)
 
     # synchronize analyses
     # allAnalyses <- lapply(obj@fGroupsList, function(fg) analysisInfo(fg)$analysis)
@@ -204,8 +205,8 @@ setMethod("consensus", "featureGroupsComparison", function(obj, relAbundance = 0
     fGroupsList <- obj@fGroupsList
 
     candidates <- names(fGroupsList)
-    compFeats <- featureTable(obj@comparedFGroups)
-    compFeatInds <- groupFeatIndex(obj@comparedFGroups)
+    compFeats <- featureTable(comparedFGroups)
+    compFeatInds <- groupFeatIndex(comparedFGroups)
 
     # Add consensus feature groups to original features
     adjFeatures <- sapply(candidates, function(ca)
@@ -292,7 +293,7 @@ setMethod("consensus", "featureGroupsComparison", function(obj, relAbundance = 0
 
     retFeatures <- featuresConsensus(features = consFeatures, analysisInfo = anaInfo)
     return(featureGroupsConsensus(groups = consGroups, analysisInfo = anaInfo,
-                                  groupInfo = groupInfo(obj@comparedFGroups), features = retFeatures,
+                                  groupInfo = groupInfo(comparedFGroups), features = retFeatures,
                                   ftindex = consFeatInds))
 })
 

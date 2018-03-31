@@ -41,7 +41,7 @@ test_that("unique works", {
     # note: only have two rep groups
     
     expect_equivalent(unique(fgOpenMS, which = "standard"),
-                     unique(fgOpenMS, which = "standard", relativeTo = "solvent"))
+                      unique(fgOpenMS, which = "standard", relativeTo = "solvent"))
     expect_equivalent(unique(fgOpenMS, which = "standard"), unique(fgOpenMS, which = "standard", outer = TRUE))
     expect_lt(length(unique(fgOpenMS, which = "standard")), length(fgOpenMS))
     expect_equal(length(unique(fgOpenMS, which = c("standard", "solvent"))), length(fgOpenMS))
@@ -84,4 +84,21 @@ test_that("replicate group subtraction", {
     # should be as these are the only two rep groups
     expect_setequal(names(replicateGroupSubtract(fgOpenMS, "solvent")),
                     names(unique(fgOpenMS, which = "standard")))
+})
+
+fGCompOpenMS <- comparison(openms = fgOpenMS, xcms = fgXCMS, groupAlgo = "openms")
+fGCons <- consensus(fGCompOpenMS)
+fGCompXCMS <- comparison(openms = fgOpenMS, xcms = fgXCMS, groupAlgo = "xcms")
+
+test_that("verify feature group comparison", {
+    expect_known_value(fGCompOpenMS, testFile("fg-comp-openms"))
+    expect_known_value(fGCompXCMS, testFile("fg-comp-xcms"))
+    expect_named(fGCompOpenMS, c("openms", "xcms"))
+    expect_named(fGCompXCMS, c("openms", "xcms"))
+    expect_named(fGCompOpenMS[1], "openms")
+    expect_named(fGCompOpenMS[2], "xcms")
+    expect_known_value(fGCons, testFile("fg-comp-cons"))
+    expect_lt(length(consensus(fGCompOpenMS, relAbundance = 1)), length(fGCons))
+    expect_lt((length(unique(fGCompOpenMS, which = "openms")) +
+                  length(unique(fGCompOpenMS, which = "xcms"))), length(fGCons))
 })

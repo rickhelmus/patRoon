@@ -1,7 +1,7 @@
 context("features")
 
-ffOpenMS <- findFeatures(testAnaInfo, "openms", logPath = NULL)
-ffXCMS <- findFeatures(testAnaInfo, "xcms")
+ffOpenMS <- findFeatures(getTestAnaInfo(), "openms", logPath = NULL)
+ffXCMS <- findFeatures(getTestAnaInfo(), "xcms")
 
 if (runWithEnviPick)
     ffEP <- findFeatures(testAnaInfoMzXML, "envipick")

@@ -1,6 +1,6 @@
 context("feature groups")
 
-fList <- findFeatures(testAnaInfo, "openms", logPath = NULL)
+fList <- findFeatures(getTestAnaInfo(), "openms", logPath = NULL)
 
 fgOpenMS <- groupFeatures(fList, "openms")
 fgXCMS <- groupFeatures(fList, "xcms")
@@ -17,10 +17,10 @@ test_that("verify show output", {
 
 test_that("basic subsetting", {
     expect_equal(length(fgOpenMS[, 1:50]), 50)
-    expect_equivalent(analysisInfo(fgOpenMS[1:3]), testAnaInfo[1:3, ])
+    expect_equivalent(analysisInfo(fgOpenMS[1:3]), getTestAnaInfo()[1:3, ])
     expect_equivalent(analysisInfo(fgOpenMS[c(TRUE, TRUE, FALSE, TRUE, FALSE, TRUE)]),
-                     testAnaInfo[c(TRUE, TRUE, FALSE, TRUE, FALSE, TRUE), ])
-    expect_equivalent(analysisInfo(fgOpenMS[testAnaInfo$analysis[4:6]]), testAnaInfo[4:6, ])
+                     getTestAnaInfo()[c(TRUE, TRUE, FALSE, TRUE, FALSE, TRUE), ])
+    expect_equivalent(analysisInfo(fgOpenMS[getTestAnaInfo()$analysis[4:6]]), getTestAnaInfo()[4:6, ])
     expect_equal(length(fgOpenMS[FALSE]), 0)
 })
 
@@ -34,7 +34,7 @@ test_that("exporting works", {
 test_that("groupTable works", {
     expect_equal(nrow(groupTable(fgOpenMS)), length(fgOpenMS))
     # first 3 cols contain general info, then rep group ints
-    expect_equal(ncol(groupTable(fgOpenMS, average = TRUE)), 3 + length(unique(testAnaInfo$group)))
+    expect_equal(ncol(groupTable(fgOpenMS, average = TRUE)), 3 + length(unique(getTestAnaInfo()$group)))
 })
 
 test_that("unique works", {

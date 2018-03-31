@@ -1,6 +1,10 @@
 getWorkPath <- function() "test_temp"
 getTestDataPath <- function() "test_data"
 testFile <- function(f, ..., text = FALSE) file.path(getTestDataPath(), paste0(f, ..., if (!text) ".Rds" else ".txt", collapse = ""))
+getTestAnaInfo <- function() generateAnalysisInfo(patRoonData::exampleDataPath(),
+                                                  groups = c(rep("solvent", 3), rep("standard", 3)),
+                                                  refs = "solvent")
+getTestFGroups <- function() groupFeatures(findFeatures(getTestAnaInfo(), "openms", logPath = NULL), "openms")
 
 expect_file <- function(object, file, removeIfExists = TRUE)
 {

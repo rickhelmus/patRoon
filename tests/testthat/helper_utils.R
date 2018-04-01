@@ -25,3 +25,33 @@ expect_range <- function(object, r)
                    act$lab, act$r[1], act$r[2], r[1], r[2]))
     invisible(act$val)
 }
+
+expect_known_show <- function(object, file)
+{
+    act <- quasi_label(rlang::enquo(object))
+    
+    text <- capture_output_lines(show(act$val))
+    
+    # remove last line with object size as it may vary even if object remain the same
+    text <- text[seq_len(length(text)-1)]
+    
+    text <- paste0(text, collapse = "")
+    
+    # based on simplified expect_known_output
+    if (!file.exists(file))
+    {
+        warning("Creating reference output", call. = FALSE)
+        cat(text, file = file)
+        succeed()
+    }
+    else
+    {
+        ref <- patRoon:::readAllFile(file)
+        cat(text, file = file)
+        
+        cmp <- compare(text, enc2native(ref))
+        expect(cmp$equal, sprintf("show reference of %s has changed\n%s", act$lab, cmp$message))
+    }
+    
+    invisible(act$val)
+}

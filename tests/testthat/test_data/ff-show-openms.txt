@@ -1,7 +1,1 @@
-A features object ('featuresOpenMS')
-Total feature count: 2692
-Average feature count/analysis: 449
-Analyses: solvent-1, solvent-2, solvent-3, standard-1, standard-2, standard-3 (6 total)
-Replicate groups: solvent, standard (2 total)
-Replicate groups used as ref: solvent (1 total)
-Object size (indication): 406 kB
+A features object ('featuresOpenMS')Total feature count: 2692Average feature count/analysis: 449Analyses: solvent-1, solvent-2, solvent-3, standard-1, standard-2, standard-3 (6 total)Replicate groups: solvent, standard (2 total)Replicate groups used as ref: solvent (1 total)

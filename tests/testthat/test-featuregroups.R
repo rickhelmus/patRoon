@@ -11,8 +11,8 @@ test_that("verify feature grouping output", {
 })
 
 test_that("verify show output", {
-    expect_known_output(show(fgOpenMS), testFile("fg-show-openms", text = TRUE))
-    expect_known_output(show(fgXCMS), testFile("fg-show-xcms", text = TRUE))
+    expect_known_show(fgOpenMS, testFile("fg-show-openms", text = TRUE))
+    expect_known_show(fgXCMS, testFile("fg-show-xcms", text = TRUE))
 })
 
 test_that("basic subsetting", {
@@ -91,13 +91,13 @@ fGCons <- consensus(fGCompOpenMS)
 fGCompXCMS <- comparison(openms = fgOpenMS, xcms = fgXCMS, groupAlgo = "xcms")
 
 test_that("verify feature group comparison", {
-    expect_known_value(fGCompOpenMS, testFile("fg-comp-openms"))
-    expect_known_value(fGCompXCMS, testFile("fg-comp-xcms"))
+    expect_known_value(groups(fGCompOpenMS@comparedFGroups), testFile("fg-comp-openms"))
+    expect_known_value(groups(fGCompXCMS@comparedFGroups), testFile("fg-comp-xcms"))
     expect_named(fGCompOpenMS, c("openms", "xcms"))
     expect_named(fGCompXCMS, c("openms", "xcms"))
     expect_named(fGCompOpenMS[1], "openms")
     expect_named(fGCompOpenMS[2], "xcms")
-    expect_known_value(fGCons, testFile("fg-comp-cons"))
+    expect_known_value(groups(fGCons), testFile("fg-comp-cons"))
     expect_lt(length(consensus(fGCompOpenMS, relAbundance = 1)), length(fGCons))
     expect_lt((length(unique(fGCompOpenMS, which = "openms")) +
                   length(unique(fGCompOpenMS, which = "xcms"))), length(fGCons))

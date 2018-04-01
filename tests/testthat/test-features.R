@@ -14,8 +14,8 @@ test_that("verify feature finder output", {
 })
 
 test_that("verify show output", {
-    expect_known_output(show(ffOpenMS), testFile("ff-show-openms", text = TRUE))
-    expect_known_output(show(ffXCMS), testFile("ff-show-xcms", text = TRUE))
+    expect_known_show(ffOpenMS, testFile("ff-show-openms", text = TRUE))
+    expect_known_show(ffXCMS, testFile("ff-show-xcms", text = TRUE))
     skip_if_not(runWithEnviPick)
-    expect_known_output(show(ffEP), testFile("ff-show-envipick", text = TRUE))
+    expect_known_show(ffEP, testFile("ff-show-envipick", text = TRUE))
 })

@@ -17,9 +17,9 @@ test_that("verify formula generation", {
 })
 
 test_that("verify show output", {
-    expect_known_output(show(formsGF), testFile("formulas-gf", text = TRUE))
+    expect_known_show(formsGF, testFile("formulas-gf", text = TRUE))
     skip_if_not(doSIRIUS)
-    expect_known_output(show(formsSIR), testFile("formulas-sir", text = TRUE))
+    expect_known_show(formsSIR, testFile("formulas-sir", text = TRUE))
 })
 
 fCons <- consensus(formsGF, fGroups = fGroups)
@@ -28,7 +28,7 @@ if (doSIRIUS)
 
 test_that("consensus works", {
     expect_known_value(fCons, testFile("formulas-cons"))
-    expect_known_output(show(fCons), testFile("formulas-cons", text = TRUE))
+    expect_known_show(fCons, testFile("formulas-cons", text = TRUE))
     expect_error(consensus(formsGF, formsGF, fGroups = fGroups)) # only support different algos at this point
     expect_gt(length(consensus(formsGF, fGroups = fGroups, formAnaThreshold = 0)), length(fCons))
     expect_lt(length(consensus(formsGF, fGroups = fGroups, maxFormulas = 1)), length(fCons))
@@ -44,7 +44,7 @@ test_that("consensus works", {
     
     skip_if_not(doSIRIUS)
     expect_known_value(fCons2, testFile("formulas-cons2"))
-    expect_known_output(show(fCons2), testFile("formulas-cons2", text = TRUE))
+    expect_known_show(fCons2, testFile("formulas-cons2", text = TRUE))
     expect_lt(length(consensus(formsGF, formsSIR, fGroups = fGroups, formListThreshold = 1)), length(fCons2))
 })
 

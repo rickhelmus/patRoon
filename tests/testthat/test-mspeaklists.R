@@ -8,7 +8,7 @@ test_that("verify generation of MS peak lists", {
 })
 
 test_that("verify show output", {
-    expect_known_output(show(plists), testFile("plists-mzr", text = TRUE))
+    expect_known_show(plists, testFile("plists-mzr", text = TRUE))
 })
 
 checkMinInt <- function(plists, relative, doMSMS)

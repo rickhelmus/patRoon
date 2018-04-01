@@ -10,7 +10,12 @@ getGenFormBin <- function()
     if (!is.null(pOpt) && nzchar(pOpt))
         ret <- file.path(pOpt, gbin)
     else
-        ret <- system.file("bin", Sys.getenv("R_ARCH"), gbin, package = "patRoon")
+    {
+        if (requireNamespace("devtools", quietly = TRUE) && "patRoon" %in% devtools::loaded_packages()$package)
+            ret <- normalizePath(file.path(system.file(".", package = "patRoon"), "..", "src", gbin))
+        else
+            ret <- system.file("bin", Sys.getenv("R_ARCH"), gbin, package = "patRoon")
+    }
 
     if (!file.exists(ret))
         stop(sprintf("GenForm binary does not exist: %s", ret))

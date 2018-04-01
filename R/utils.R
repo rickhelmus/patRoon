@@ -83,7 +83,7 @@ createCOMReference <- function(ref, className)
 checkPackage <- function(pkg, gh = NULL)
 {
     # from http://stackoverflow.com/a/20333756
-    if (!requireNamespace(pkg, quietly = T))
+    if (!requireNamespace(pkg, quietly = TRUE))
     {
         if (!is.null(gh))
             stop(sprintf("Please install %s from github: devtools::install_github('%s')", pkg, gh))

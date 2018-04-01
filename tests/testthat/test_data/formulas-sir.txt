@@ -1,0 +1,6 @@
+A formulas object (formulas)
+Algorithm: SIRIUS
+Total formula count: 1163
+Average formulas per analysis: 581.5
+Average formulas per feature group: 12.4
+Object size (indication): 611.3 kB

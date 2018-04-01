@@ -1,0 +1,6 @@
+A formulas object (formulas)
+Algorithm: GenForm
+Total formula count: 1846
+Average formulas per analysis: 923.0
+Average formulas per feature group: 2.6
+Object size (indication): 2.6 MB

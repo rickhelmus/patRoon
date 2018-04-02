@@ -1,0 +1,1 @@
+A compounds object (compoundsConsensus)Algorithm: MetFrag/SIRIUSMerged: MetFrag, SIRIUSNumber of feature groups with compounds in this object: 5Number of compounds: 401 (total), 80.2 (mean), 1 - 100 (min - max)

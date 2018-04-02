@@ -8,3 +8,6 @@ Release:
 - windows
 - file hashes for findFeaturesXCMS/EnviPick
 - DA tests
+- patRoon.path.metFragCL --> patRoon.path.MetFragCL
+- clarify that sirius headless 4.0 now also works
+- do something with sirius fingerprints?

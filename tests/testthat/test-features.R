@@ -7,7 +7,8 @@ if (runWithEnviPick)
     ffEP <- findFeatures(testAnaInfoMzXML, "envipick")
 
 test_that("verify feature finder output", {
-    expect_known_value(featureTable(ffOpenMS), testFile("ff-openms"))
+    # Don't store ID column: not reproducible
+    expect_known_value(sapply(featureTable(ffOpenMS), function(fts) fts[, -"ID"], simplify = FALSE), testFile("ff-openms"))
     expect_known_value(featureTable(ffXCMS), testFile("ff-xcms"))
     skip_if_not(runWithEnviPick)
     expect_known_value(featureTable(ffEP), testFile("ff-envipick"))

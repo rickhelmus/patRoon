@@ -8,8 +8,9 @@ suppressWarnings(compsCAM <- generateComponents(fGroups, "camera", ionization = 
 compsNT <- generateComponents(fGroups, "nontarget", ionization = "positive")
 
 test_that("components generation works", {
-    expect_known_value(compsRC, testFile("components-rc"))
-    expect_known_value(compsCAM, testFile("components-cam"))
+    # For RC/CAM: don't store their internal objects as they contain irreproducible file names
+    expect_known_value(list(componentTable(compsRC), componentInfo(compsRC)), testFile("components-rc"))
+    expect_known_value(list(componentTable(compsCAM), componentInfo(compsCAM)), testFile("components-cam"))
     expect_known_value(compsNT, testFile("components-nt"))
 })
 

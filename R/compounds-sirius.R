@@ -22,7 +22,7 @@ processSiriusCompounds <- function(cmd, exitStatus, retries)
         results <- unifySirNames(results)
 
         # NOTE: fragment info is based on SIRIUS results, ie from formula prediction and not by compounds!
-        pat <- "[:0-9:]+_([A-Za-z0-9]+)\\.ms"
+        pat <- "[:0-9:]+_([A-Za-z0-9]+).*\\.ms"
         fragFiles <- list.files(file.path(resultPath, "spectra"), full.names = TRUE, pattern = pat)
         for (ff in fragFiles)
         {

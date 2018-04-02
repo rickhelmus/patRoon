@@ -112,7 +112,7 @@ component.
 feature groups within a single component.
 
 \item \code{consensus}: Generates a consensus from multiple \code{components}
-objects. At this point results are simply combined an no attempt is made to
+objects. At this point results are simply combined and no attempt is made to
 merge similar components.
 }}
 

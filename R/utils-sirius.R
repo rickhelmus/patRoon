@@ -1,6 +1,6 @@
 #' @include main.R
 
-getSiriusBin <- function(path)
+getSiriusBin <- function()
 {
     si <- Sys.info()
 

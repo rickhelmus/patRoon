@@ -22,7 +22,7 @@
 \item{intensityThreshold}{Minimum intensity. Set to 0 or \code{NULL} to skip
 this step.}
 
-\item{relAbundance, absAbundance, interRelRGroupAbundance, interAbsRGroupAbundance}{Minimal overal relative/absolute abundance for a feature group to be present
+\item{relAbundance, absAbundance, interRelRGroupAbundance, interAbsRGroupAbundance}{Minimal overall relative/absolute abundance for a feature group to be present
 within all analyses/replicate groups.}
 
 \item{intraRGroupAbundance}{Minimum relative abundance (0-1) that a feature

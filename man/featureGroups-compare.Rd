@@ -59,7 +59,7 @@ retention time scatter plots.}
 
 \item{relAbundance, absAbundance}{Feature groups with relative/absolute
 abundance below this number will be removed from the consensus. Set to
-\code{NULL} for no limits.}
+\code{0} for no limits.}
 }
 \value{
 \code{comparison} returns a \code{\link{featureGroupsComparison}}

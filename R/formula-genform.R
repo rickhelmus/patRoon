@@ -11,10 +11,11 @@ getGenFormBin <- function()
         ret <- file.path(pOpt, gbin)
     else
     {
-        if (requireNamespace("devtools", quietly = TRUE) && "patRoon" %in% devtools::loaded_packages()$package)
+        ret <- system.file("bin", Sys.getenv("R_ARCH"), gbin, package = "patRoon")
+        
+        if (!nzchar(ret) && requireNamespace("devtools", quietly = TRUE) &&
+            !is.null(devtools::dev_meta("patRoon")))
             ret <- normalizePath(file.path(system.file(".", package = "patRoon"), "..", "src", gbin))
-        else
-            ret <- system.file("bin", Sys.getenv("R_ARCH"), gbin, package = "patRoon")
     }
 
     if (!file.exists(ret))

@@ -1,0 +1,28 @@
+context("components")
+
+fGroups <- getTestFGroups(getTestAnaInfo()[4:5, ])
+
+compsRC <- generateComponents(fGroups, "ramclustr", ionization = "positive")
+# UNDONE: getting unknown NaN warnings here...
+suppressWarnings(compsCAM <- generateComponents(fGroups, "camera", ionization = "positive"))
+compsNT <- generateComponents(fGroups, "nontarget", ionization = "positive")
+
+test_that("components generation works", {
+    expect_known_value(compsRC, testFile("components-rc"))
+    expect_known_value(compsCAM, testFile("components-cam"))
+    expect_known_value(compsNT, testFile("components-nt"))
+})
+
+test_that("verify components show", {
+    expect_known_show(compsRC, testFile("components-rc", text = TRUE))
+    expect_known_show(compsCAM, testFile("components-cam", text = TRUE))
+    expect_known_show(compsNT, testFile("components-nt", text = TRUE))
+})
+
+test_that("findFGroup works", {
+    expect_equivalent(findFGroup(compsCAM, names(fGroups)[1]), 1)
+})
+
+test_that("consensus works", {
+    expect_equal(length(consensus(compsRC, compsNT)), length(compsRC) + length(compsNT))
+})

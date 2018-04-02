@@ -1,0 +1,1 @@
+A components object (componentsCamera)Algorithm: CAMERAComponents: CMP1, CMP2, CMP3, CMP4, CMP5, CMP6, ... (133 total)Number of feature groups in components: 577 (total), 4.3 (mean), 1 - 169 (min - max)

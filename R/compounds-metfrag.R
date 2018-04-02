@@ -164,10 +164,12 @@ processMFResults <- function(metf, analysis, spec, db, topMost, lfile = "")
 
         # fill in fragment info
         # NOTE: double wrap in list to nest table
-        cat(sprintf("\n%s - Done! Processing frags...\n", date()), file = lfile, append = TRUE)
+        if (!is.null(lfile))
+            cat(sprintf("\n%s - Done! Processing frags...\n", date()), file = lfile, append = TRUE)
         for (r in seq_len(nrow(metf)))
             set(metf, r, "fragInfo", list(list(getMFFragmentInfo(spec, metf[r]))))
-        cat(sprintf("\n%s - Done!\n", date()), file = lfile, append = TRUE)
+        if (!is.null(lfile))
+            cat(sprintf("\n%s - Done!\n", date()), file = lfile, append = TRUE)
 
         # unify column names & filter unnecessary columns
         metf <- unifyMFNames(metf)
@@ -372,13 +374,17 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
                 }
                 else
                 {
-                    cat(sprintf("\n%s - Done with MF! Reading results...\n", date()), file = cmd$stderrFile, append = TRUE)
+                    if (!is.null(cmd$stderrFile))
+                        cat(sprintf("\n%s - Done with MF! Reading results...\n", date()), file = cmd$stderrFile, append = TRUE)
                     metf <- fread(cmd$outFile, colClasses = c(Identifier = "character"))
-                    cat(sprintf("\n%s - Done! Prcoessing results...\n", date()), file = cmd$stderrFile, append = TRUE)
+                    if (!is.null(cmd$stderrFile))
+                        cat(sprintf("\n%s - Done! Prcoessing results...\n", date()), file = cmd$stderrFile, append = TRUE)
                     metf <- processMFResults(metf, cmd$analysis, cmd$spec, database, topMost, cmd$stderrFile)
-                    cat(sprintf("\n%s - Done! Caching results...\n", date()), file = cmd$stderrFile, append = TRUE)
+                    if (!is.null(cmd$stderrFile))
+                        cat(sprintf("\n%s - Done! Caching results...\n", date()), file = cmd$stderrFile, append = TRUE)
                     saveCacheData("identifyMetFrag", metf, cmd$hash, cacheDB)
-                    cat(sprintf("\n%s - Done!\n", date()), file = cmd$stderrFile, append = TRUE)
+                    if (!is.null(cmd$stderrFile))
+                        cat(sprintf("\n%s - Done!\n", date()), file = cmd$stderrFile, append = TRUE)
                 }
 
                 return(metf)

@@ -63,7 +63,7 @@ setMethod("show", "compounds", function(object)
 
     printf("Number of feature groups with compounds in this object: %d\n", length(object@compounds))
 
-    cCounts <- sapply(object@compounds, nrow)
+    cCounts <- if (length(object) == 0) 0 else sapply(object@compounds, nrow)
     printf("Number of compounds: %d (total), %.1f (mean), %d - %d (min - max)\n",
            sum(cCounts), mean(cCounts), min(cCounts), max(cCounts))
 

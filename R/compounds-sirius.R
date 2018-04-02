@@ -39,6 +39,13 @@ processSiriusCompounds <- function(cmd, exitStatus, retries)
                 set(results, which(results$formula == precursor), "explainedPeaks", nrow(fragInfo))
             }
         }
+        
+        if (is.null(results[["fragInfo"]]))
+        {
+            warning("no fragment info for %s")
+            results[, fragInfo := list(rep(list(data.table()), nrow(results)))]
+            results[, explainedPeaks := 0]
+        }
 
         results[, analysis := cmd$analysis]
         results[, database := cmd$database]

@@ -236,7 +236,7 @@ setMethod("plotEIC", "components", function(obj, index, fGroups, rtWindow = 5, .
 })
 
 #' @describeIn components Generates a consensus from multiple \code{components}
-#'   objects. At this point results are simply combined an no attempt is made to
+#'   objects. At this point results are simply combined and no attempt is made to
 #'   merge similar components.
 #' @return \code{consensus} returns a \code{components} object that is produced
 #'   by merging multiple specified \code{components} objects.

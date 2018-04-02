@@ -11,3 +11,4 @@ Release:
 - patRoon.path.metFragCL --> patRoon.path.MetFragCL
 - clarify that sirius headless 4.0 now also works
 - do something with sirius fingerprints?
+- fillPeaks for CAMERA (and RAMClustR?)

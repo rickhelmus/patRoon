@@ -191,7 +191,7 @@ reportFeatureTable <- function(fGroups, path, retMin)
     for (anai in seq_along(fTable))
     {
         ana <- names(fTable)[anai]
-        out <- file.path(path, sprintf("%s-%s.csv", class(fGroups), ana))
+        out <- file.path(path, sprintf("%s-%s.csv", class(getFeatures(fGroups)), ana))
         tab <- copy(fTable[[ana]])
         if (retMin)
             tab[, ret := ret / 60]

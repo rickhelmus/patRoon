@@ -1,4 +1,4 @@
-getWorkPath <- function() "test_temp"
+getWorkPath <- function(file = "", ...) if (nzchar(file)) file.path("test_temp", file, ...) else "test_temp"
 getTestDataPath <- function() "test_data"
 testFile <- function(f, ..., text = FALSE) file.path(getTestDataPath(), paste0(f, ..., if (!text) ".Rds" else ".txt", collapse = ""))
 getTestAnaInfo <- function() generateAnalysisInfo(patRoonData::exampleDataPath(),

@@ -102,3 +102,21 @@ test_that("verify feature group comparison", {
     expect_lt((length(unique(fGCompOpenMS, which = "openms")) +
                   length(unique(fGCompOpenMS, which = "xcms"))), length(fGCons))
 })
+
+subFgroups <- fgOpenMS[, 1:25]
+test_that("reporting works", {
+    expect_file(reportCSV(subFgroups, getWorkPath(), reportFeatures = TRUE),
+                file.path(getWorkPath(), "featureGroupsOpenMS.csv"))
+    for (ana in getTestAnaInfo()$analysis)
+        checkmate::expect_file_exists(file.path(getWorkPath(), "features", sprintf("featuresOpenMS-%s.csv", ana)))
+    
+    expect_file(reportPDF(subFgroups, getWorkPath()), getWorkPath("featureGroupsOpenMS.pdf"))
+    
+    expect_file(reportMD(subFgroups, getWorkPath()), getWorkPath("report.html"))
+    
+    # skip if pngquant is not specified and not in PATH
+    skip_if_not((!is.null(getOption("patRoon.path.pngquant")) && nzchar(getOption("patRoon.path.pngquant"))) ||
+                nzchar(Sys.which(sprintf("pngquant%s", if (Sys.info()[["sysname"]] == "Windows") ".exe" else ""))))
+    expect_error(reportMD(subFgroups, getWorkPath("pngquant"), optimizePng = TRUE), NA)
+    expect_lt(file.size(getWorkPath("pngquant", "report.html")), file.size(getWorkPath("report.html")))
+})

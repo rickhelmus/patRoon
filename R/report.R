@@ -270,7 +270,7 @@ reportFormulaSpectra <- function(fGroups, path, formConsensus, MSPeakLists, EICR
 
 reportCompoundTable <- function(fGroups, path, compounds, normalizeScores)
 {
-    printf("Exporting identification results table...")
+    printf("Exporting identification results tables...")
 
     gInfo <- groupInfo(fGroups)
     gNames <- names(fGroups)
@@ -394,7 +394,7 @@ reportComponentSpectra <- function(fGroups, path, components, EICRtWindow, EICMz
 
         screen(scr[1])
         plotEIC(components, cmpi, fGroups, title = sprintf("Component %d", cmpi), rtWindow = EICRtWindow,
-                mzWindow = EICMzWindow, retMin = retMin, EICs = EICs, tit)
+                mzWindow = EICMzWindow, retMin = retMin, EICs = EICs)
 
         screen(scr[2])
         plotSpec(components, cmpi, main = sprintf("ret: %.1f; m/z: %.4f - %.4f",
@@ -563,11 +563,7 @@ setMethod("reportPDF", "featureGroups", function(fGroups, path, reportFGroups,
     }
 
     if (!is.null(components))
-    {
-        p <- file.path(path, "components")
-        mkdirp(p)
-        reportComponentSpectra(fGroups, p, components, EICRtWindow, EICMzWindow, retMin, EICs)
-    }
+        reportComponentSpectra(fGroups, path, components, EICRtWindow, EICMzWindow, retMin, EICs)
 
     if (!is.null(cInfo))
     {

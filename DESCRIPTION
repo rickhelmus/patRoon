@@ -72,6 +72,7 @@ Suggests:
     metfRag,
     RAMClustR,
     testthat,
+    vdiffr,
     patRoonData
 RdMacros:
     Rdpack

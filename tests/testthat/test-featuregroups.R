@@ -121,3 +121,27 @@ test_that("reporting works", {
     expect_error(reportMD(subFGroups, getWorkPath("pngquant"), optimizePng = TRUE), NA)
     expect_lt(file.size(getWorkPath("pngquant", "report.html")), file.size(getWorkPath("report.html")))
 })
+
+test_that("plotting works", {
+    vdiffr::expect_doppelganger("retmz", function() plot(fgOpenMS))
+    vdiffr::expect_doppelganger("retmz-comp", function() plot(fGCompOpenMS))
+    
+    vdiffr::expect_doppelganger("intensity-def", function() plotInt(fgOpenMS))
+    vdiffr::expect_doppelganger("intensity-avg", function() plotInt(fgOpenMS, TRUE))
+    
+    vdiffr::expect_doppelganger("chord-def", function() plotChord(fgOpenMS))
+    vdiffr::expect_doppelganger("chord-selflinks", function() plotChord(fgOpenMS, addSelfLinks = TRUE))
+    vdiffr::expect_doppelganger("chord-nortmz", function() plotChord(fgOpenMS, addRetMzPlots = FALSE))
+    vdiffr::expect_doppelganger("chord-comp", function() plotChord(fGCompOpenMS))
+    
+    vdiffr::expect_doppelganger("eic-def", function() plotEIC(subFGroups))
+    vdiffr::expect_doppelganger("eic-rtmin", function() plotEIC(subFGroups, retMin = TRUE))
+    vdiffr::expect_doppelganger("eic-tm1", function() plotEIC(subFGroups, topMost = 1))
+    vdiffr::expect_doppelganger("eic-area", function() plotEIC(subFGroups, showPeakArea = TRUE))
+    vdiffr::expect_doppelganger("eic-cbr", function() plotEIC(subFGroups, colourBy = "rGroups"))
+    vdiffr::expect_doppelganger("eic-cbf", function() plotEIC(subFGroups, colourBy = "fGroups"))
+    vdiffr::expect_doppelganger("eic-ann", function() plotEIC(subFGroups, annotate = "mz"))
+    
+    vdiffr::expect_doppelganger("venn", function() plotVenn(fgOpenMS))
+    vdiffr::expect_doppelganger("venn-comp", function() plotVenn(fGCompOpenMS))
+})

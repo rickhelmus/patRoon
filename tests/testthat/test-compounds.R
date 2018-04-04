@@ -97,3 +97,20 @@ test_that("feature group filtering", {
     skip_if_not(hasCompounds)
     expect_named(filter(fGroups, compounds = comps), names(compoundTable(comps)))
 })
+
+test_that("reporting works", {
+    skip_if_not(hasCompounds)
+    
+    expect_error(reportCSV(fGroups, getWorkPath(), compounds = comps), NA)
+    for (grp in names(compoundTable(comps)))
+        checkmate::expect_file_exists(getWorkPath("compounds", sprintf("%s-%s.csv", class(fGroups), grp)))
+    
+    expect_error(reportPDF(fGroups, getWorkPath(), reportFGroups = FALSE, compounds = comps,
+                           MSPeakLists = plists), NA)
+    for (grp in names(compoundTable(comps)))
+        checkmate::expect_file_exists(getWorkPath("compounds", sprintf("%s-%s.pdf", class(fGroups), grp)))
+    
+    expect_file(reportMD(fGroups, getWorkPath(), reportChord = FALSE, reportFGroups = FALSE,
+                         compounds = comps, MSPeakLists = plists),
+                getWorkPath("report.html"))
+})

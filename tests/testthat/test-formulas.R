@@ -51,3 +51,17 @@ test_that("consensus works", {
 test_that("feature group filtering", {
     expect_setequal(names(filter(fGroups, formConsensus = fCons)), formulaTable(fCons)$group)
 })
+
+test_that("reporting works", {
+    expect_file(reportCSV(fGroups, getWorkPath(), formConsensus = fCons),
+                getWorkPath("formulas.csv"))
+    
+    expect_error(reportPDF(fGroups, getWorkPath(), reportFGroups = FALSE, formConsensus = fCons,
+                           MSPeakLists = plists), NA)
+    for (grp in unique(formulaTable(fCons)[byMSMS == TRUE, group]))
+        checkmate::expect_file_exists(getWorkPath("formulas", sprintf("%s-%s.pdf", class(fGroups), grp)))
+    
+    expect_file(reportMD(fGroups, getWorkPath(), reportChord = FALSE, reportFGroups = FALSE,
+                         formConsensus = fCons, MSPeakLists = plists),
+                getWorkPath("report.html"))
+})

@@ -27,3 +27,15 @@ test_that("findFGroup works", {
 test_that("consensus works", {
     expect_equal(length(consensus(compsRC, compsNT)), length(compsRC) + length(compsNT))
 })
+
+test_that("reporting works", {
+    expect_file(reportCSV(fGroups, getWorkPath(), components = compsRC),
+                getWorkPath("components.csv"))
+
+    expect_file(reportPDF(fGroups, getWorkPath(), reportFGroups = FALSE, components = compsRC),
+                getWorkPath("components.pdf"))
+    
+    expect_file(reportMD(fGroups, getWorkPath(), reportChord = FALSE, reportFGroups = FALSE,
+                         components = compsRC),
+                getWorkPath("report.html"))
+})

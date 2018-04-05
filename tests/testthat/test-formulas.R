@@ -26,6 +26,8 @@ fCons <- consensus(formsGF, fGroups = fGroups)
 if (doSIRIUS)
     fCons2 <- consensus(formsGF, formsSIR, fGroups = fGroups)
 
+fTable <- formulaTable(fCons)
+
 test_that("consensus works", {
     expect_known_value(fCons, testFile("formulas-cons"))
     expect_known_show(fCons, testFile("formulas-cons", text = TRUE))
@@ -34,7 +36,7 @@ test_that("consensus works", {
     expect_lt(length(consensus(formsGF, fGroups = fGroups, maxFormulas = 1)), length(fCons))
     expect_lt(length(consensus(formsGF, fGroups = fGroups, maxFragFormulas = 1)), length(fCons))
     expect_lte(length(consensus(formsGF, fGroups = fGroups, maxFormulas = 1, maxFragFormulas = 1)),
-               length(unique(formulaTable(fCons)$group)) * 2) # * 2: one MS + one MSMS formula max
+               length(unique(fTable$group)) * 2) # * 2: one MS + one MSMS formula max
     expect_gte(min(formulaTable(consensus(formsGF, fGroups = fGroups, minIntensity = 500))$min_intensity), 500)
     expect_lte(min(formulaTable(consensus(formsGF, fGroups = fGroups, maxIntensity = 10000))$min_intensity), 10000)
     checkmate::expect_names(names(formulaTable(consensus(formsGF, fGroups = fGroups, elements = c("C", "H")))),
@@ -49,7 +51,7 @@ test_that("consensus works", {
 })
 
 test_that("feature group filtering", {
-    expect_setequal(names(filter(fGroups, formConsensus = fCons)), formulaTable(fCons)$group)
+    expect_setequal(names(filter(fGroups, formConsensus = fCons)), fTable$group)
 })
 
 test_that("reporting works", {
@@ -58,10 +60,20 @@ test_that("reporting works", {
     
     expect_error(reportPDF(fGroups, getWorkPath(), reportFGroups = FALSE, formConsensus = fCons,
                            MSPeakLists = plists), NA)
-    for (grp in unique(formulaTable(fCons)[byMSMS == TRUE, group]))
+    for (grp in unique(fTable[byMSMS == TRUE, group]))
         checkmate::expect_file_exists(getWorkPath("formulas", sprintf("%s-%s.pdf", class(fGroups), grp)))
     
     expect_file(reportMD(fGroups, getWorkPath(), reportChord = FALSE, reportFGroups = FALSE,
                          formConsensus = fCons, MSPeakLists = plists),
                 getWorkPath("report.html"))
+})
+
+test_that("plotting works", {
+    vdiffr::expect_doppelganger("spec", function() plotSpec(fCons, fTable[byMSMS == TRUE, formula][1],
+                                                            fTable[byMSMS == TRUE, group][1], plists))
+    
+    # ggplot2 versions don't really work with vdiffr at the moment :(
+    # vdiffr::expect_doppelganger("spec-gg", plotSpec(fCons, fTable[byMSMS == TRUE, formula][1],
+    #                                                 fTable[byMSMS == TRUE, group][1], plists,
+    #                                                 useGGPlot2 = TRUE))
 })

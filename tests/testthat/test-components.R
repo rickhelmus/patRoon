@@ -39,3 +39,10 @@ test_that("reporting works", {
                          components = compsRC),
                 getWorkPath("report.html"))
 })
+
+test_that("plotting works", {
+    # specs don't work because of legend ... :(
+    # vdiffr::expect_doppelganger("spec", function() plotSpec(compsNT, 1))
+    # vdiffr::expect_doppelganger("spec-mark", function() plotSpec(compsNT, 1, markFGroup = names(fGroups)[1]))
+    vdiffr::expect_doppelganger("eic", function() plotEIC(compsNT, 1, fGroups))
+})

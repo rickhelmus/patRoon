@@ -114,3 +114,13 @@ test_that("reporting works", {
                          compounds = comps, MSPeakLists = plists),
                 getWorkPath("report.html"))
 })
+
+test_that("plotting works", {
+    skip_if_not(hasCompounds)
+    
+    vdiffr::expect_doppelganger("spec", function() plotSpec(comps, 1, names(compoundTable(comps))[1], plists))
+    # vdiffr::expect_doppelganger("spec-gg", plotSpec(comps, 1, names(compoundTable(comps))[1], plists, useGGPlot2 = TRUE))
+    # plotStructure gives an empty plot??
+    # vdiffr::expect_doppelganger("struct", function() plotStructure(comps, 1, names(compoundTable(comps))[1]))
+    vdiffr::expect_doppelganger("scores", function() plotScores(comps, 1, names(compoundTable(comps))[1]))
+})

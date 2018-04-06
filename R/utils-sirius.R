@@ -16,7 +16,7 @@ getSiriusBin <- function()
 
 getSiriusFragFiles <- function(resultPath)
 {
-    pat <- "[:0-9:]+_([A-Za-z0-9]+)\\.ms"
+    pat <- "[:0-9:]+_([A-Za-z0-9]+).*\\.ms"
     return(list.files(file.path(resultPath, "spectra"), full.names = TRUE, pattern = pat))
 }
 

@@ -73,8 +73,7 @@
 
 \S4method{plotVenn}{featureGroups}(obj, which = NULL, ...)
 
-\S4method{unique}{featureGroups}(x, incomparables = FALSE, which,
-  relativeTo = NULL, outer = FALSE)
+\S4method{unique}{featureGroups}(x, which, relativeTo = NULL, outer = FALSE)
 
 \S4method{overlap}{featureGroups}(fGroups, which, exclusive = FALSE)
 

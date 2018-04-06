@@ -44,5 +44,8 @@ test_that("plotting works", {
     # specs don't work because of legend ... :(
     # vdiffr::expect_doppelganger("spec", function() plotSpec(compsNT, 1))
     # vdiffr::expect_doppelganger("spec-mark", function() plotSpec(compsNT, 1, markFGroup = names(fGroups)[1]))
+    expect_plot(plotSpec(compsNT, 1))
+    expect_plot(plotSpec(compsNT, 1, markFGroup = names(fGroups)[1]))
+    expect_plot(print(plotSpec(compsNT, 1, useGGPlot2 = TRUE)))
     vdiffr::expect_doppelganger("eic", function() plotEIC(compsNT, 1, fGroups))
 })

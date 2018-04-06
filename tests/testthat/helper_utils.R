@@ -55,3 +55,11 @@ expect_known_show <- function(object, file)
     
     invisible(act$val)
 }
+
+expect_plot <- function(object)
+{
+    tf <- tempfile()
+    withr::with_png(tf, act <- quasi_label(rlang::enquo(object)))
+    expect(file.exists(tf), "failed to generate plot")
+    invisible(act$val)
+}

@@ -116,8 +116,10 @@ test_that("reporting works", {
     expect_file(reportMD(subFGroups, getWorkPath()), getWorkPath("report.html"))
     
     # skip if pngquant is not specified and not in PATH
-    skip_if_not((!is.null(getOption("patRoon.path.pngquant")) && nzchar(getOption("patRoon.path.pngquant"))) ||
-                nzchar(Sys.which(sprintf("pngquant%s", if (Sys.info()[["sysname"]] == "Windows") ".exe" else ""))))
+    # assign condition to variable as expression seems to be to complicated for skip...
+    havePngQuant <- (!is.null(getOption("patRoon.path.pngquant")) && nzchar(getOption("patRoon.path.pngquant"))) ||
+        nzchar(Sys.which(sprintf("pngquant%s", if (Sys.info()[["sysname"]] == "Windows") ".exe" else "")))
+    skip_if_not(havePngQuant)
     expect_error(reportMD(subFGroups, getWorkPath("pngquant"), optimizePng = TRUE), NA)
     expect_lt(file.size(getWorkPath("pngquant", "report.html")), file.size(getWorkPath("report.html")))
 })

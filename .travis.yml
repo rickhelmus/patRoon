@@ -12,20 +12,12 @@ addons:
       - libxml2-dev
       - libnetcdf-dev
       - netcdf-bin
+      - r-cran-rcpp
+      - r-cran-stringr
+      - r-cran-rjson
 
 jdk: openjdk8
 
-r_binary_packages:
-    - Rcpp
-    - stringr
-    - shiny
-    - ggplot2
-    - rmarkdown
-    - withr
-    - git2r
-    - plotly
-    - rsqlite
-    
 bioc_packages:
     - mzR
     - xcms

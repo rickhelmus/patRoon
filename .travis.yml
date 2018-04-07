@@ -10,6 +10,7 @@ addons:
     packages:
       - openjdk-8-jdk
       - libxml2-dev
+      - libnetcdf-dev
 
 jdk: openjdk8
 
@@ -20,3 +21,9 @@ bioc_packages:
 
 r_github_packages:
     - cbroeckl/RAMClustR
+
+before_install:
+    - wget https://abibuilder.informatik.uni-tuebingen.de/archive/openms/OpenMSInstaller/nightly/OpenMS-2.3.0-Linux.deb
+    - dpkg -x OpenMS-2.3.0-Linux.deb OpenMS
+
+warnings_are_errors: false

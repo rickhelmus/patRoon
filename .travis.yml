@@ -11,9 +11,21 @@ addons:
       - openjdk-8-jdk
       - libxml2-dev
       - libnetcdf-dev
+      - netcdf-bin
 
 jdk: openjdk8
 
+r_binary_packages:
+    - Rcpp
+    - stringr
+    - shiny
+    - ggplot2
+    - rmarkdown
+    - withr
+    - git2r
+    - plotly
+    - rsqlite
+    
 bioc_packages:
     - mzR
     - xcms
@@ -27,3 +39,8 @@ before_install:
     - dpkg -x OpenMS-2.3.0-Linux.deb OpenMS
 
 warnings_are_errors: false
+
+env:
+    global:
+        - R_BUILD_ARGS="--no-build-vignettes --no-manual"
+        - R_CHECK_ARGS="--no-build-vignettes --no-manual --as-cran"

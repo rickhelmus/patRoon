@@ -1,6 +1,9 @@
 unlink(getWorkPath(), TRUE)
 dir.create(getWorkPath())
 
+if (getOption("patRoon.clearCache", FALSE))
+    clearCache("all")
+
 runWithEnviPick <- FALSE
 
 if (runWithEnviPick)

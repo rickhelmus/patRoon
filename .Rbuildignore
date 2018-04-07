@@ -5,3 +5,5 @@
 ^src/GenForm$
 ^src/GenForm\.exe$
 ^src/GenForm-svn/*\.o$
+^\.covrignore$
+^tests/testthat/cache\.sqlite$

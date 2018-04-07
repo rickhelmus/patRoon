@@ -7,3 +7,4 @@
 ^src/GenForm-svn/*\.o$
 ^\.covrignore$
 ^tests/testthat/cache\.sqlite$
+^\.travis\.yml$

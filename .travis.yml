@@ -1,0 +1,22 @@
+# R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
+
+language: R
+r: bioc-release
+sudo: false
+cache: packages
+
+addons:
+  apt:
+    packages:
+      - openjdk-8-jdk
+      - libxml2-dev
+
+jdk: openjdk8
+
+bioc_packages:
+    - mzR
+    - xcms
+    - CAMERA
+
+r_github_packages:
+    - cbroeckl/RAMClustR

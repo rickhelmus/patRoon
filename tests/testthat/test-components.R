@@ -2,7 +2,8 @@ context("components")
 
 fGroups <- getTestFGroups(getTestAnaInfo()[4:5, ])
 
-compsRC <- generateComponents(fGroups, "ramclustr", ionization = "positive")
+# fix seed for reproducible clustering
+withr::with_seed(20, compsRC <- generateComponents(fGroups, "ramclustr", ionization = "positive"))
 # UNDONE: getting unknown NaN warnings here...
 suppressWarnings(compsCAM <- generateComponents(fGroups, "camera", ionization = "positive"))
 compsNT <- generateComponents(fGroups, "nontarget", ionization = "positive")

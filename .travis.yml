@@ -63,7 +63,7 @@ r_github_packages:
 
 before_install:
     - wget https://abibuilder.informatik.uni-tuebingen.de/archive/openms/OpenMSInstaller/nightly/OpenMS-2.3.0-Linux.deb
-    - sudo apt-get -i ./OpenMS-2.3.0-Linux.deb
+    - sudo apt-get install ./OpenMS-2.3.0-Linux.deb
 
 warnings_are_errors: false
 

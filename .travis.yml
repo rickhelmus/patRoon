@@ -40,6 +40,17 @@ r_binary_packages:
     - cowplot
     - jsonlite
     - Rdpack
+    - igraph
+    - RBGL
+    - Hmisc
+    - BiocGenerics
+    - BiocParallel
+    - zlibbioc
+    - affy
+    - ff
+    - mclust
+    - robustbase
+    - commonmark
 
 bioc_packages:
     - mzR
@@ -48,14 +59,18 @@ bioc_packages:
 
 r_github_packages:
     - cbroeckl/RAMClustR
+    - rickhelmus/patRoonData
 
 before_install:
     - wget https://abibuilder.informatik.uni-tuebingen.de/archive/openms/OpenMSInstaller/nightly/OpenMS-2.3.0-Linux.deb
-    - dpkg -x OpenMS-2.3.0-Linux.deb OpenMS
+    - sudo apt-get -i ./OpenMS-2.3.0-Linux.deb
 
 warnings_are_errors: false
 
-env:
-    global:
-        - R_BUILD_ARGS="--no-build-vignettes --no-manual"
-        - R_CHECK_ARGS="--no-build-vignettes --no-manual --as-cran"
+r_build_args: --no-build-vignettes --no-manual
+r_check_args: --no-build-vignettes --no-manual
+
+script:
+    - |
+      R CMD build .
+      travis_wait 30 R CMD check patRoon.tar.gz

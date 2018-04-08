@@ -76,4 +76,4 @@ script:
       travis_wait 30 R CMD check --no-build-vignettes --no-manual patRoon*tar.gz
 
 after_failure:
-    - cat '/home/travis/build/rickhelmus/patRoon/patRoon.Rcheck/00check.log'
+    - Rscript -e 'devtools::install(); devtools::test()' # https://stackoverflow.com/a/45866031/9264518

@@ -2,21 +2,44 @@
 
 language: R
 r: bioc-release
-sudo: false
+sudo: required
 cache: packages
 
-addons:
-  apt:
-    packages:
-      - openjdk-8-jdk
-      - libxml2-dev
-      - libnetcdf-dev
-      - netcdf-bin
-      - r-cran-rcpp
-      - r-cran-stringr
-      - r-cran-rjson
+apt_packages:
+  - openjdk-8-jdk
+  - libxml2-dev
+  - libnetcdf-dev
+  - netcdf-bin
 
 jdk: openjdk8
+
+r_binary_packages:
+    - checkmate
+    - data.table
+    - withr
+    - digest
+    - XML
+    - DBI
+    - RSQLite
+    - processx
+    - rJava
+    - rcdk
+    - circlize
+    - plotly
+    - rhandsontable
+    - htmlwidgets
+    - shiny
+    - knitr
+    - rmarkdown
+    - DT
+    - kableExtra
+    - R.utils
+    - glue
+    - ggplot2
+    - ggrepel
+    - cowplot
+    - jsonlite
+    - Rdpack
 
 bioc_packages:
     - mzR

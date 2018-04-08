@@ -6,12 +6,12 @@ sudo: required
 cache: packages
 
 apt_packages:
-  - openjdk-8-jdk
+  - oracle-java9-installer
   - libxml2-dev
   - libnetcdf-dev
   - netcdf-bin
 
-jdk: openjdk8
+jdk: oraclejdk9
 
 r_binary_packages:
     - checkmate

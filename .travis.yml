@@ -65,6 +65,10 @@ warnings_are_errors: false
 r_build_args: --no-build-vignettes --no-manual
 r_check_args: --no-build-vignettes --no-manual
 
+env:
+    global:
+        - _R_CHECK_FORCE_SUGGESTS_=0
+
 script:
     - |
       R CMD build --no-build-vignettes --no-manual .

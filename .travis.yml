@@ -62,6 +62,9 @@ before_install:
     - wget -P ~/ http://msbi.ipb-halle.de/~cruttkie/metfrag/MetFrag2.4.3-CL.jar
     - wget -P ~/ https://bio.informatik.uni-jena.de/repository/dist-release-local/de/unijena/bioinf/ms/sirius/4.0/sirius-4.0-linux64-headless.zip
     - unzip -d ~/ ~/sirius-4.0-linux64-headless.zip
+    - sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu/ xenial main" -y
+    - sudo apt-get update -q
+    - sudo apt-get install libfreetype6
 
 warnings_are_errors: false
 

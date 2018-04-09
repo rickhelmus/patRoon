@@ -53,12 +53,15 @@ bioc_packages:
     - CAMERA
 
 r_github_packages:
-    - cbroeckl/RAMClustR
+    - cbroeckl/RAMClustR@036cdd4
     - rickhelmus/patRoonData
 
 before_install:
     - wget https://abibuilder.informatik.uni-tuebingen.de/archive/openms/OpenMSInstaller/nightly/OpenMS-2.3.0-Linux.deb
     - sudo dpkg -i ./OpenMS-2.3.0-Linux.deb
+    - wget http://msbi.ipb-halle.de/~cruttkie/metfrag/MetFrag2.4.3-CL.jar
+    - wget https://bio.informatik.uni-jena.de/repository/dist-release-local/de/unijena/bioinf/ms/sirius/4.0/sirius-4.0-linux64-headless.zip
+    - unzip sirius-4.0-linux64-headless.zip
 
 warnings_are_errors: false
 
@@ -69,6 +72,8 @@ env:
     global:
         - _R_CHECK_FORCE_SUGGESTS_=0
         - OPENMS_DATA_PATH=/usr/share/OpenMS
+        - PATROON_METFRAG=MetFrag2.4.3-CL.jar
+        - PATROON_SIRIUS=sirius-linux64-headless-4.0/bin
 
 script:
     - |

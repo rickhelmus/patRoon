@@ -251,6 +251,8 @@ setMethod("show", "formulaConsensus", function(object)
 #'   detected by the MS).
 #'
 #' @template plotSpec-args
+#' 
+#' @template useGGplot2
 #'
 #' @return \code{plotSpec} will return a \code{\link[=ggplot2]{ggplot object}}
 #'   if \code{useGGPlot2} is \code{TRUE}.

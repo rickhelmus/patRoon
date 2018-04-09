@@ -8,6 +8,7 @@
 \alias{length,featureGroups-method}
 \alias{show,featureGroups-method}
 \alias{groups,featureGroups-method}
+\alias{groups}
 \alias{analysisInfo,featureGroups-method}
 \alias{groupInfo,featureGroups-method}
 \alias{groupInfo}

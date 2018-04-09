@@ -2,4 +2,4 @@
 #'   belongs.
 #' @param MSPeakLists The \code{\link{MSPeakLists}} object that was used to
 #'   generate the candidate
-#' @template useGGplot2
+

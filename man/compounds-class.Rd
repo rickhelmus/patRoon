@@ -80,6 +80,11 @@ belongs.}
 \item{width, height}{The dimensions (in pixels) of the raster image that
 should be plotted.}
 
+\item{useGGPlot2}{If \code{TRUE} then \pkg{\link{ggplot2}} is used for
+plotting, otherwise base plot used. For \code{plotSpec}, \code{ggplot2}
+allows nicely repelled text for annotation. However, base plot is generally
+faster.}
+
 \item{normalizeScores}{Normalize scores to maximum values.}
 
 \item{MSPeakLists}{The \code{\link{MSPeakLists}} object that was used to

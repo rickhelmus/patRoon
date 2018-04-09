@@ -22,6 +22,8 @@ NULL
 #'   \code{\link[=ggplot2]{ggplot object}} if \code{useGGPlot2} is \code{TRUE}.
 #'
 #' @template plotSpec-args
+#' 
+#' @template useGGplot2
 #'
 #' @export
 compounds <- setClass("compounds",

@@ -157,34 +157,6 @@ importFeatureXML <- function(ffile)
     return(ret)
 }
 
-# test with xml2 package: nicer code but slower, so don't use for now
-importFeatureXML2 <- function(ffile)
-{
-    xml <- xml2::read_xml(ffile)
-
-    featPath <- xml_find_all(xml, "/featureMap/featureList/feature")
-    featIds <- xml_text(xml_find_all(featPath, "@id"))
-    rets <- xml_double(xml_find_all(featPath, "position[@dim = 0]"))
-    mzs <- xml_double(xml_find_all(featPath, "position[@dim = 1]"))
-    areas <- xml_double(xml_find_all(featPath, "intensity"))
-
-    # this will get ALL retention/mz values for each hulls --> use hull sizes to
-    # relate back actual hulls
-    hullPath <- xml_find_all(featPath, "convexhull[@nr = 0]")
-    hullSizes <- xml_length(hullPath)
-    hullTab <- data.table(rt = xml_double(xml_find_all(hullPath, "pt/@x")),
-                          mz = xml_double(xml_find_all(hullPath, "pt/@y")),
-                          hull = unlist(sapply(seq_along(hullSizes), function(h) rep(h, hullSizes[h]))))
-
-    rtMin <- hullTab[, min(rt), by = "hull"]
-    rtMax <- hullTab[, max(rt), by = "hull"]
-    mzMin <- hullTab[, min(mz), by = "hull"]
-    mzMax <- hullTab[, max(mz), by = "hull"]
-
-    return(data.table(ID = featIds, ret = rets, mz = mzs, area = areas,
-                      retmin = rtMin, retmax = rtMax, mzmin = mzMin, mzmax = mzMax))
-}
-
 # OpenMS doesn't support peak intensities. Estimate them from retention times
 loadIntensities <- function(dfile, features)
 {

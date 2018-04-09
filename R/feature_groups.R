@@ -65,6 +65,7 @@ setMethod("show", "featureGroups", function(object)
 })
 
 #' @describeIn featureGroups Accessor for \code{groups} slot.
+#' @aliases groups
 #' @export
 setMethod("groups", "featureGroups", function(object) object@groups)
 

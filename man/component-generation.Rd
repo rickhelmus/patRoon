@@ -68,7 +68,7 @@ deviation for detection of homologues within series. These arguments set
 the \code{rttol} and \code{mztol} arguments of \code{\link{homol.search}}.}
 
 \item{st, sr, maxt, hmax, normalize}{Arguments to tune the behaviour of feature
-group clustering. See their documentation from \code{\link{ramclustR}}.
+group clustering. See their documentation from \code{\link[RAMClustR]{ramclustR}}.
 When \code{st} is \code{NULL} it will be automatically calculated as the
 half of the median for all chromatographic peak widths.}
 
@@ -78,10 +78,10 @@ to \code{\link[RAMClustR]{do.findmain}}.}
 
 \item{RCExperimentVals}{A named \code{list} containing two more \code{list}s:
 \code{design} and \code{instrument}. These are used to construct the
-\code{ExpDes} argument passed to \code{\link{ramclustR}}.}
+\code{ExpDes} argument passed to \code{\link[RAMClustR]{ramclustR}}.}
 
 \item{extraOptsRC, extraOptsFM}{Named \code{list} with further arguments to be
-passed to \code{\link{ramclustR}} and \code{\link[RAMClustR]{do.findmain}}.
+passed to \code{\link[RAMClustR]{ramclustR}} and \code{\link[RAMClustR]{do.findmain}}.
 Set to \code{NULL} to ignore.}
 }
 \value{
@@ -127,7 +127,7 @@ and reduce the data size and thus complexity.
   components from feature groups which follow similar chromatographic
   retention profiles, but are not necessarily restricted to known rules
   (\emph{e.g.} adducts or isotopes). This method uses the
-  \code{\link{ramclustR}} functions for generating the components, whereas
+  \code{\link[RAMClustR]{ramclustR}} functions for generating the components, whereas
   \code{\link[RAMClustR]{do.findmain}} is used for annotation.
 }
 \references{

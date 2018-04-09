@@ -19,6 +19,7 @@ RoxygenNote: 6.0.1
 URL: https://github.com/rickhelmus/patRoon
 BugReports: https://github.com/rickhelmus/patRoon/issues
 Imports:
+    methods,
     checkmate,
     VennDiagram,
     stats,
@@ -73,7 +74,8 @@ Suggests:
     RAMClustR,
     testthat,
     vdiffr,
-    patRoonData
+    patRoonData,
+    devtools
 RdMacros:
     Rdpack
 Collate:

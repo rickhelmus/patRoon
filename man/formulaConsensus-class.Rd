@@ -33,6 +33,11 @@ belongs.}
 
 \item{MSPeakLists}{The \code{\link{MSPeakLists}} object that was used to
 generate the candidate}
+
+\item{useGGPlot2}{If \code{TRUE} then \pkg{\link{ggplot2}} is used for
+plotting, otherwise base plot used. For \code{plotSpec}, \code{ggplot2}
+allows nicely repelled text for annotation. However, base plot is generally
+faster.}
 }
 \value{
 \code{formulaTable} returns a \code{\link{data.table}} containing all

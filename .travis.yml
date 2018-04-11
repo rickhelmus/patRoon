@@ -64,6 +64,7 @@ before_install:
     - unzip -d ~/ ~/sirius-4.0-linux64-headless.zip
     - wget -P ~/ http://security.ubuntu.com/ubuntu/pool/main/f/freetype/libfreetype6_2.6.1-0.1ubuntu2.3_amd64.deb
     - sudo dpkg -i ~/libfreetype6_2.6.1-0.1ubuntu2.3_amd64.deb
+    - apt-get -f install
 
 warnings_are_errors: false
 

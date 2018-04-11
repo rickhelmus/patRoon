@@ -10,6 +10,7 @@ apt_packages:
   - libxml2-dev
   - libnetcdf-dev
   - netcdf-bin
+  - pngquant
 
 #jdk: oraclejdk8
 
@@ -56,12 +57,13 @@ r_github_packages:
     - rickhelmus/patRoonData
 
 before_install:
-    - jdk_switcher use openjdk8
     - wget -P ~/ https://abibuilder.informatik.uni-tuebingen.de/archive/openms/OpenMSInstaller/nightly/OpenMS-2.2.0-Linux.deb
     - sudo dpkg -i ~/OpenMS-2.2.0-Linux.deb
-    - wget -P ~/ http://msbi.ipb-halle.de/~cruttkie/metfrag/MetFrag2.4.3-CL.jar
+    #- wget -P ~/ http://msbi.ipb-halle.de/~cruttkie/metfrag/MetFrag2.4.3-CL.jar
     - wget -P ~/ https://bio.informatik.uni-jena.de/repository/dist-release-local/de/unijena/bioinf/ms/sirius/4.0/sirius-4.0-linux64-headless.zip
     - unzip -d ~/ ~/sirius-4.0-linux64-headless.zip
+    - wget -P ~/ http://security.ubuntu.com/ubuntu/pool/main/f/freetype/libfreetype6_2.6.1-0.1ubuntu2.3_amd64.deb
+    - sudo dpkg -i ~/libfreetype6_2.6.1-0.1ubuntu2.3_amd64.deb
 
 warnings_are_errors: false
 
@@ -72,7 +74,7 @@ env:
     global:
         - _R_CHECK_FORCE_SUGGESTS_=0
         - OPENMS_DATA_PATH=/usr/share/OpenMS
-        - PATROON_METFRAG=~/MetFrag2.4.3-CL.jar
+        #- PATROON_METFRAG=~/MetFrag2.4.3-CL.jar
         - PATROON_SIRIUS=~/sirius-linux64-headless-4.0/bin
 
 script:
@@ -81,5 +83,5 @@ script:
       travis_wait 30 R CMD check --no-build-vignettes --no-manual patRoon*tar.gz
 
 after_failure:
-    - Rscript -e 'options(patRoon.path.metFragCL = "~/MetFrag2.4.3-CL.jar", patRoon.path.SIRIUS = "~/sirius-linux64-headless-4.0/bin"); devtools::install(); devtools::test()' # https://stackoverflow.com/a/45866031/9264518
+    - Rscript -e 'options(patRoon.path.metFragCL = "", patRoon.path.SIRIUS = "~/sirius-linux64-headless-4.0/bin"); devtools::install(); devtools::test()' # https://stackoverflow.com/a/45866031/9264518
     - cat ~/mflog/*.txt

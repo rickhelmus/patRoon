@@ -6,12 +6,12 @@ sudo: required
 cache: packages
 
 apt_packages:
-  #- openjdk-8-jdk
+  - oracle-java8-installer
   - libxml2-dev
   - libnetcdf-dev
   - netcdf-bin
 
-jdk: openjdk7
+jdk: oraclejdk8
 
 r_binary_packages:
     - checkmate
@@ -23,7 +23,6 @@ r_binary_packages:
     - RSQLite
     - processx
     - rJava
-    - rcdk
     - circlize
     - plotly
     - rhandsontable

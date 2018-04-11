@@ -6,12 +6,12 @@ sudo: required
 cache: packages
 
 apt_packages:
-  - openjdk-8-jdk
+  #- openjdk-8-jdk
   - libxml2-dev
   - libnetcdf-dev
   - netcdf-bin
 
-jdk: openjdk8
+jdk: openjdk7
 
 r_binary_packages:
     - checkmate

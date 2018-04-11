@@ -82,3 +82,4 @@ script:
 
 after_failure:
     - Rscript -e 'options(patRoon.path.metFragCL = "~/MetFrag2.4.3-CL.jar", patRoon.path.SIRIUS = "~/sirius-linux64-headless-4.0/bin"); devtools::install(); devtools::test()' # https://stackoverflow.com/a/45866031/9264518
+    - cat ~/mflog/*.txt

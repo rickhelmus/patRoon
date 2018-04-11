@@ -6,12 +6,12 @@ sudo: required
 cache: packages
 
 apt_packages:
-  - oracle-java8-installer
+  #- oracle-java8-installer
   - libxml2-dev
   - libnetcdf-dev
   - netcdf-bin
 
-jdk: oraclejdk8
+#jdk: oraclejdk8
 
 r_binary_packages:
     - checkmate
@@ -56,6 +56,7 @@ r_github_packages:
     - rickhelmus/patRoonData
 
 before_install:
+    - jdk_switcher use openjdk8
     - wget -P ~/ https://abibuilder.informatik.uni-tuebingen.de/archive/openms/OpenMSInstaller/nightly/OpenMS-2.2.0-Linux.deb
     - sudo dpkg -i ~/OpenMS-2.2.0-Linux.deb
     - wget -P ~/ http://msbi.ipb-halle.de/~cruttkie/metfrag/MetFrag2.4.3-CL.jar

@@ -138,7 +138,7 @@ reportPDF(fGroups, path = "report", reportFGroups = TRUE, formConsensus = {{ if 
 {{ optionalCodeBlock("MD" %in% reportFormats) }}
 reportMD(fGroups, path = "report", reportFGroups = TRUE, reportChord = TRUE, formConsensus = {{ if (formulaOpts$algo != "") "formulas" else "NULL" }}, reportFormulaSpectra = TRUE,
          compounds = {{ if (identOpts$algo != "") "compounds" else "NULL" }}, compoundNormalizeScores = TRUE,
-         components = {{ if (identOpts$algo != "") "components" else "NULL" }}, MSPeakLists = {{ if (formulaOpts$algo != "" || identOpts$algo != "") "plists" else "NULL" }},
+         components = {{ if (componentOpts$algo != "") "components" else "NULL" }}, MSPeakLists = {{ if (formulaOpts$algo != "" || identOpts$algo != "") "plists" else "NULL" }},
          selfContained = TRUE)
 
 {{ endCodeBlock() }}

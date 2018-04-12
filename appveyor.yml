@@ -9,7 +9,7 @@ init:
 
 install:
     - ps: Bootstrap
-    - ps: Invoke-WebRequest https://sourceforge.net/projects/open-ms/files/OpenMS/OpenMS-2.3/OpenMS-2.3.0-Win64.exe -OutFile "..\openms.msi")
+    - ps: Invoke-WebRequest https://sourceforge.net/projects/open-ms/files/OpenMS/OpenMS-2.3/OpenMS-2.3.0-Win64.exe -OutFile "..\openms.msi"
     - ps: msiexec /i ..\openms.msi /quiet /qn /norestart /log ..\install.log
 
 cache:

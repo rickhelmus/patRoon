@@ -9,4 +9,7 @@ if (nzchar(envOpts[["PATROON_SIRIUS"]]))
 
 options(patRoon.clearCache = TRUE)
 
+# https://github.com/r-lib/devtools/issues/1526
+Sys.unsetenv("R_TESTS")
+
 test_check("patRoon")

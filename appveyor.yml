@@ -9,8 +9,8 @@ init:
 
 install:
     - ps: Bootstrap
-    - ps: (new-object net.webclient).DownloadFile('https://downloads.sourceforge.net/project/open-ms/OpenMS/OpenMS-2.3/OpenMS-2.3.0-Win64.exe?r=https%3A%2F%2Fsourceforge.net%2Fprojects%2Fopen-ms%2Ffiles%2FOpenMS%2FOpenMS-2.3%2FOpenMS-2.3.0-Win64.exe%2Fdownload&ts=1523561987', 'openms.msi')
-    - ps: msiexec /i openms.msi /quiet /qn /norestart /log install.log
+    - ps: Invoke-WebRequest https://sourceforge.net/projects/open-ms/files/OpenMS/OpenMS-2.3/OpenMS-2.3.0-Win64.exe -OutFile "..\openms.msi")
+    - ps: msiexec /i ..\openms.msi /quiet /qn /norestart /log ..\install.log
 
 cache:
   - C:\RLibrary
@@ -47,6 +47,9 @@ artifacts:
     name: Logs
 
   - path: '*.Rcheck\**\*.Rout'
+    name: Logs
+
+  - path: '..\install.log'
     name: Logs
 
   - path: '\*_*.tar.gz'

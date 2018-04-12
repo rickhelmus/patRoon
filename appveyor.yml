@@ -8,7 +8,9 @@ init:
         Import-Module '..\appveyor-tool.ps1'
 
 install:
-  ps: Bootstrap
+    - ps: Bootstrap
+    - ps: (new-object net.webclient).DownloadFile('https://downloads.sourceforge.net/project/open-ms/OpenMS/OpenMS-2.3/OpenMS-2.3.0-Win64.exe?r=https%3A%2F%2Fsourceforge.net%2Fprojects%2Fopen-ms%2Ffiles%2FOpenMS%2FOpenMS-2.3%2FOpenMS-2.3.0-Win64.exe%2Fdownload&ts=1523561987', 'openms.msi')
+    - ps: msiexec /i openms.msi /quiet /qn /norestart /log install.log
 
 cache:
   - C:\RLibrary
@@ -18,7 +20,8 @@ cache:
 platform: x64
 environment:
     R_ARCH: x64
-    BIOC_USE_DEVEL: "FALSE"
+    BIOC_USE_DEVEL: FALSE
+    _R_CHECK_FORCE_SUGGESTS_: 0
 
 build_script:
     - travis-tool.sh install_bioc mzR xcms CAMERA

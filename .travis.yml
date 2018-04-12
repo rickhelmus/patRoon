@@ -84,5 +84,5 @@ script:
       travis_wait 30 R CMD check --no-build-vignettes --no-manual patRoon*tar.gz
 
 after_failure:
-    - Rscript -e 'options(patRoon.path.metFragCL = "", patRoon.path.SIRIUS = ""); devtools::install(); devtools::test()' # https://stackoverflow.com/a/45866031/9264518
+    - Rscript -e 'options(patRoon.path.metFragCL = "", patRoon.path.SIRIUS = ""); library("nontarget"); detach("package:nontarget", unload = TRUE); devtools::install(); devtools::test()' # https://stackoverflow.com/a/45866031/9264518
     #- cat ~/mflog/*.txt

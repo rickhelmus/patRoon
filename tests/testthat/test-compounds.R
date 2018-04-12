@@ -60,9 +60,9 @@ comps <- if (doMetFrag) compsMFIso else if (doSIRIUS) compsSIR
 test_that("filtering works", {
     skip_if_not(hasCompounds)
     
-    expect_length(filter(comps, topMost = 1), length(fGroupsSub))
+    expect_lte(length(filter(comps, topMost = 1)), length(fGroupsSub))
     expect_lte(length(filter(comps, topMost = 5)), 5 * length(fGroupsSub))
-    expect_lt(length(filter(comps, minExplainedPeaks = 2)), length(comps))
+    expect_lte(length(filter(comps, minExplainedPeaks = 2)), length(comps))
     
     skip_if_not(doMetFrag)
     expect_lt(length(filter(compsMFIso, minScore = 2)), length(compsMFIso))

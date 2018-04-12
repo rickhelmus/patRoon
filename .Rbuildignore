@@ -8,3 +8,4 @@
 ^\.covrignore$
 ^tests/testthat/cache\.sqlite$
 ^\.travis\.yml$
+^appveyor\.yml$

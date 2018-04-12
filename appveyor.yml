@@ -8,19 +8,23 @@ init:
         Import-Module '..\appveyor-tool.ps1'
 
 install:
-  ps: |
-        Bootstrap
-        travis-tool.sh install_bioc mzR xcms CAMERA
-        travis-tool.sh install_github cbroeckl/RAMClustR@036cdd4
-        travis-tool.sh install_github rickhelmus/patRoonData
+  ps: Bootstrap
 
 cache:
   - C:\RLibrary
 
 # Adapt as necessary starting from here
 
+platform: x64
+environment:
+    R_ARCH: x64
+    BIOC_USE_DEVEL: "FALSE"
+
 build_script:
-  - travis-tool.sh install_deps
+    - travis-tool.sh install_bioc mzR xcms CAMERA
+    - travis-tool.sh install_github cbroeckl/RAMClustR@036cdd4
+    - travis-tool.sh install_github rickhelmus/patRoonData
+    - travis-tool.sh install_deps
 
 test_script:
   - travis-tool.sh run_tests

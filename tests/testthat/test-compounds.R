@@ -18,9 +18,9 @@ doSIRIUS <- !is.null(getOption("patRoon.path.SIRIUS")) && nzchar(getOption("patR
 
 if (doMetFrag)
 {
-    compsMF <- generateCompounds(fGroupsSub, plists, "metfrag", logPath = normalizePath("~/mflog"),
+    compsMF <- generateCompounds(fGroupsSub, plists, "metfrag", logPath = normalizePath("~/mflog", mustWork = FALSE),
                                  adduct = 1, isPositive = TRUE, database = "LocalCSV",
-                                 scoreTypes = "FragmenterScore",
+                                 scoreTypes = "FragmenterScore", maxProcAmount = 1, # UNDONE: fails with multi proc if ran for first time
                                  extraOpts = list(LocalDatabasePath = mfTestDBPath))
     ct <- compoundTable(compsMF)
 }

@@ -13,4 +13,4 @@
 !vignettes/*
 !DESCRIPTION
 !NAMESPACE
-!install_deps.R
+!docker/*.R

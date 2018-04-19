@@ -14,7 +14,7 @@ RUN apt-get update -y && \
         r-bioc-rbgl r-bioc-s4vectors r-bioc-biocparallel r-bioc-multtest && \
     mkdir -p $SETUPDIR && \
     wget -P $SETUPDIR https://abibuilder.informatik.uni-tuebingen.de/archive/openms/OpenMSInstaller/nightly/OpenMS-2.2.0-Linux.deb && \
-    apt-get install -y $SETUPDIR/OpenMS-2.2.0-Linux.deb && \
+    apt-get install -y --no-install-recommends $SETUPDIR/OpenMS-2.2.0-Linux.deb && \
     rm -rf $SETUPDIR && \
     useradd -ms /bin/bash patRoon && \
     addgroup patRoon staff && \
@@ -23,11 +23,11 @@ RUN apt-get update -y && \
 USER patRoon
 WORKDIR /home/patRoon
 
-COPY ./docker/install_deps.R .
+COPY ./docker/install_deps.R ./DESCRIPTION ./
 
 RUN wget http://msbi.ipb-halle.de/~cruttkie/metfrag/MetFrag2.4.3-CL.jar && \
     wget https://bio.informatik.uni-jena.de/repository/dist-release-local/de/unijena/bioinf/ms/sirius/4.0/sirius-4.0-linux64-headless.zip && \
-    unzip sirius-4.0-linux64-headless.zip && \
+    unzip sirius-4.0-linux64-headless.zip && rm sirius-4.0-linux64-headless.zip && \
     Rscript install_deps.R
 
 ADD --chown=patRoon . patRoon
@@ -37,5 +37,5 @@ ARG FAIL_TESTS=1
 
 WORKDIR patRoon
 RUN Rscript docker/run_tests.R || [ $FAIL_TESTS -eq 0 ] && \
-    rm -rf patRoon /tmp/Rtmp*
+    rm -rf ~/patRoon /tmp/Rtmp* ~/install_deps.R
 

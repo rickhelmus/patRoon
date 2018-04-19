@@ -1,88 +1,14 @@
-# R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
-
-language: R
-r: bioc-release
 sudo: required
-cache: packages
 
-apt_packages:
-  #- oracle-java8-installer
-  - libxml2-dev
-  - libnetcdf-dev
-  - netcdf-bin
-  - pngquant
-
-#jdk: oraclejdk8
-
-r_binary_packages:
-    - checkmate
-    - data.table
-    - withr
-    - digest
-    - XML
-    - DBI
-    - RSQLite
-    - processx
-    - rJava
-    - circlize
-    - plotly
-    - rhandsontable
-    - htmlwidgets
-    - shiny
-    - knitr
-    - rmarkdown
-    - DT
-    - kableExtra
-    - R.utils
-    - glue
-    - ggplot2
-    - ggrepel
-    - cowplot
-    - jsonlite
-    - Rdpack
-    - igraph
-    - Hmisc
-    - ff
-    - mclust
-    - robustbase
-    - commonmark
-
-bioc_packages:
-    - mzR
-    - xcms
-    - CAMERA
-
-r_github_packages:
-    - cbroeckl/RAMClustR@036cdd4
-    - rickhelmus/patRoonData
+services:
+  - docker
 
 before_install:
-    - wget -P ~/ https://abibuilder.informatik.uni-tuebingen.de/archive/openms/OpenMSInstaller/nightly/OpenMS-2.2.0-Linux.deb
-    - sudo dpkg -i ~/OpenMS-2.2.0-Linux.deb
-    #- wget -P ~/ http://msbi.ipb-halle.de/~cruttkie/metfrag/MetFrag2.4.3-CL.jar
-    #- wget -P ~/ https://bio.informatik.uni-jena.de/repository/dist-release-local/de/unijena/bioinf/ms/sirius/4.0/sirius-4.0-linux64-headless.zip
-    #- unzip -d ~/ ~/sirius-4.0-linux64-headless.zip
-    - wget -P ~/ http://security.ubuntu.com/ubuntu/pool/main/f/freetype/libfreetype6_2.6.1-0.1ubuntu2.3_amd64.deb
-    - sudo dpkg -i ~/libfreetype6_2.6.1-0.1ubuntu2.3_amd64.deb
-    - sudo apt-get -f install
-
-warnings_are_errors: false
-
-r_build_args: --no-build-vignettes --no-manual
-r_check_args: --no-build-vignettes --no-manual
-
-env:
-    global:
-        - _R_CHECK_FORCE_SUGGESTS_=0
-        - OPENMS_DATA_PATH=/usr/share/OpenMS
-        #- PATROON_METFRAG=~/MetFrag2.4.3-CL.jar
-        #- PATROON_SIRIUS=~/sirius-linux64-headless-4.0/bin
+    - sudo apt-get update
+    - sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
 
 script:
-    - |
-      R CMD build --no-build-vignettes --no-manual .
-      travis_wait 30 R CMD check --no-build-vignettes --no-manual patRoon*tar.gz
+    - docker build --tag patroonorg/patroon .
 
-after_failure:
-    - Rscript -e 'options(patRoon.path.metFragCL = "", patRoon.path.SIRIUS = ""); library("nontarget"); detach("package:nontarget", unload = TRUE); devtools::install(); devtools::test()' # https://stackoverflow.com/a/45866031/9264518
-    #- cat ~/mflog/*.txt
+after_script:
+  - docker images

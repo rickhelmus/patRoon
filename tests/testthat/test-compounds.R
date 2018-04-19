@@ -18,7 +18,7 @@ doSIRIUS <- !is.null(getOption("patRoon.path.SIRIUS")) && nzchar(getOption("patR
 
 if (doMetFrag)
 {
-    compsMF <- generateCompounds(fGroupsSub, plists, "metfrag", logPath = normalizePath("~/mflog", mustWork = FALSE),
+    compsMF <- generateCompounds(fGroupsSub, plists, "metfrag", logPath = NULL,
                                  adduct = 1, isPositive = TRUE, database = "LocalCSV",
                                  scoreTypes = "FragmenterScore", maxProcAmount = 1, # UNDONE: fails with multi proc if ran for first time
                                  extraOpts = list(LocalDatabasePath = mfTestDBPath))
@@ -118,12 +118,12 @@ test_that("reporting works", {
 test_that("plotting works", {
     skip_if_not(hasCompounds)
     
-    vdiffr::expect_doppelganger("spec", function() plotSpec(comps, 1, names(compoundTable(comps))[1], plists))
-    # vdiffr::expect_doppelganger("spec-gg", plotSpec(comps, 1, names(compoundTable(comps))[1], plists, useGGPlot2 = TRUE))
+    expect_docker("compound-spec", function() plotSpec(comps, 1, names(compoundTable(comps))[1], plists))
+    # expect_docker("spec-gg", plotSpec(comps, 1, names(compoundTable(comps))[1], plists, useGGPlot2 = TRUE))
     expect_plot(print(plotSpec(comps, 1, names(compoundTable(comps))[1], plists, useGGPlot2 = TRUE)))
     
     # plotStructure gives an empty plot??
-    # vdiffr::expect_doppelganger("struct", function() plotStructure(comps, 1, names(compoundTable(comps))[1]))
+    # expect_docker("struct", function() plotStructure(comps, 1, names(compoundTable(comps))[1]))
     expect_plot(plotStructure(comps, 1, names(compoundTable(comps))[1]))
-    vdiffr::expect_doppelganger("scores", function() plotScores(comps, 1, names(compoundTable(comps))[1]))
+    expect_docker("scores", function() plotScores(comps, 1, names(compoundTable(comps))[1]))
 })

@@ -69,11 +69,11 @@ test_that("reporting works", {
 })
 
 test_that("plotting works", {
-    vdiffr::expect_doppelganger("spec", function() plotSpec(fCons, fTable[byMSMS == TRUE, formula][1],
-                                                            fTable[byMSMS == TRUE, group][1], plists))
+    expect_docker("form-spec", function() plotSpec(fCons, fTable[byMSMS == TRUE, formula][1],
+                                              fTable[byMSMS == TRUE, group][1], plists))
     
     # ggplot2 versions don't really work with vdiffr at the moment :(
-    # vdiffr::expect_doppelganger("spec-gg", plotSpec(fCons, fTable[byMSMS == TRUE, formula][1],
+    # expect_docker("spec-gg", plotSpec(fCons, fTable[byMSMS == TRUE, formula][1],
     #                                                 fTable[byMSMS == TRUE, group][1], plists,
     #                                                 useGGPlot2 = TRUE))
     expect_plot(print(plotSpec(fCons, fTable[byMSMS == TRUE, formula][1],

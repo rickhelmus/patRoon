@@ -17,7 +17,7 @@ before_script:
     - docker pull "${IMAGE_NAME}:latest" || true
 
 script:
-    - docker build --pull --cache-from "${IMAGE_NAME}:latest" --tag "${IMAGE_NAME}"" .
+    - docker build --pull --cache-from "${IMAGE_NAME}:latest" --tag "${IMAGE_NAME}" .
 
 after_script:
     - docker images
@@ -32,3 +32,7 @@ deploy:
     script: docker push "${IMAGE_NAME}:latest" && docker push "${IMAGE_NAME}:${git_sha}-master"
     on:
         branch: master
+
+notifications:
+    email: false
+

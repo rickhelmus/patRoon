@@ -36,6 +36,6 @@ ENV OPENMS_DATA_PATH=/usr/share/OpenMS _R_CHECK_FORCE_SUGGESTS_=0
 ARG FAIL_TESTS=1
 
 WORKDIR patRoon
-RUN Rscript docker/run_tests.R || [ $FAIL_TESTS -eq 0 ] && \
+RUN Rscript docker/run_tests.R || [ $FAIL_TESTS -eq 0 ] && cat ~/olog/* && \
     rm -rf ~/patRoon /tmp/Rtmp* ~/install_deps.R
 

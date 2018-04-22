@@ -2,6 +2,9 @@ context("components")
 
 fGroups <- getTestFGroups(getTestAnaInfo()[4:5, ])
 
+if (Sys.info()[["sysname"]] == "Windows")
+    detach("package:nontarget", unload = TRUE)
+
 # fix seed for reproducible clustering
 withr::with_seed(20, compsRC <- generateComponents(fGroups, "ramclustr", ionization = "positive"))
 # UNDONE: getting unknown NaN warnings here...

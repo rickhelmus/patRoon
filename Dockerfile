@@ -1,4 +1,4 @@
-FROM rocker/r-ver
+FROM rocker/r-ver:3.4.4
 
 ENV SETUPDIR=/usr/local/setup
 

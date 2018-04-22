@@ -3,7 +3,10 @@ context("components")
 fGroups <- getTestFGroups(getTestAnaInfo()[4:5, ])
 
 if (Sys.info()[["sysname"]] == "Windows")
+{
+    library(nontarget)
     detach("package:nontarget", unload = TRUE)
+}
 
 # fix seed for reproducible clustering
 withr::with_seed(20, compsRC <- generateComponents(fGroups, "ramclustr", ionization = "positive"))

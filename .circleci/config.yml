@@ -37,13 +37,14 @@ jobs:
                 command: |
                     docker create --name patroon "${IMAGE_NAME}"
                     docker cp patroon:/home/patRoon/junit.xml /app
+                    cat /app/junit.xml
             - store_test_results:
                 path: /app                    
             - deploy:
                 name: Push application Docker image
                 command: |
                     if [ "${CIRCLE_BRANCH}" == "master" ]; then
-                        docker login -u "$DH_USER" -p "$DH_PASS"
+                        echo "$DH_PASS" | docker login -u "$DH_USER" --password-stdin
                         git_sha="$(git rev-parse --short HEAD)"
                         docker tag "$IMAGE_NAME" "${IMAGE_NAME}:${git_sha}-master"
                         docker push "${IMAGE_NAME}:latest" && docker push "${IMAGE_NAME}:${git_sha}-master"

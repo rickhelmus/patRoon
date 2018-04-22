@@ -9,7 +9,7 @@ init:
 
 install:
     - ps: Bootstrap
-    - ps: mkdir c:\deps
+    - ps: mkdir -Force c:\deps
     - ps: >-
         if (-Not (Test-Path C:\deps\openms.exe)) {
             Invoke-WebRequest https://github.com/OpenMS/OpenMS/releases/download/Release2.3.0/OpenMS-2.3.0-Win64.exe -OutFile "C:\deps\openms.exe"
@@ -64,7 +64,7 @@ test_script:
     - set PATH=C:\Program Files\OpenMS-2.3.0\bin;%PATH%
     - set OPENMS_DATA_PATH=C:\Program Files\OpenMS-2.3.0\share\OpenMS
     - set PATROON_METFRAG=C:\deps\MetFrag2.4.3-CL.jar
-    - set PATROON_SIRIUS=C:\deps\sirius-linux64-headless-4.0
+    - set PATROON_SIRIUS=C:\deps\sirius-win64-headless-4.0
     - travis-tool.sh run_tests
 
 on_failure:

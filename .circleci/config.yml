@@ -36,10 +36,11 @@ jobs:
                 name: Copy test results
                 command: |
                     docker create --name patroon "${IMAGE_NAME}"
-                    docker cp patroon:/home/patRoon/junit.xml /app
-                    cat /app/junit.xml
+                    mkdir /tmp/tests
+                    docker cp patroon:/home/patRoon/junit.xml /tmp/tests/
+                    cat /tmp/tests/junit.xml
             - store_test_results:
-                path: /app                    
+                path: /tmp/tests                    
             - deploy:
                 name: Push application Docker image
                 command: |

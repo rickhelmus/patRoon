@@ -41,3 +41,9 @@ jobs:
                         docker tag "$IMAGE_NAME" "${IMAGE_NAME}:${git_sha}-master"
                         docker push "${IMAGE_NAME}:latest" && docker push "${IMAGE_NAME}:${git_sha}-master"
                     fi
+            - run:
+                name: Copy test results
+                command: |
+                    docker cp ${IMAGE_NAME}:/home/patRoon/patRoon/junit.xml /app
+            - store_test_results:
+                path: /app

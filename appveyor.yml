@@ -11,7 +11,7 @@ install:
     - ps: Bootstrap
     - ps: Invoke-WebRequest https://github.com/OpenMS/OpenMS/releases/download/Release2.3.0/OpenMS-2.3.0-Win64.exe -OutFile "..\openms.exe"
     - ps: ..\openms.exe /S
-    #- ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+    - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
 cache:
   - C:\RLibrary
@@ -39,23 +39,23 @@ on_failure:
     - appveyor PushArtifact failure.zip
 
 artifacts:
-    - path: '*.Rcheck\**\*.log'
-        name: Logs
+  - path: '*.Rcheck\**\*.log'
+    name: Logs
 
-    - path: '*.Rcheck\**\*.out'
-        name: Logs
+  - path: '*.Rcheck\**\*.out'
+    name: Logs
 
-    - path: '*.Rcheck\**\*.fail'
-        name: Logs
+  - path: '*.Rcheck\**\*.fail'
+    name: Logs
 
-    - path: '*.Rcheck\**\*.Rout'
-        name: Logs
+  - path: '*.Rcheck\**\*.Rout'
+    name: Logs
 
-    - path: '..\install.log'
-        name: Logs
+  - path: '..\install.log'
+    name: Logs
 
-    - path: '\*_*.tar.gz'
-        name: Bits
+  - path: '\*_*.tar.gz'
+    name: Bits
 
-    - path: '\*_*.zip'
-        name: Bits
+  - path: '\*_*.zip'
+    name: Bits

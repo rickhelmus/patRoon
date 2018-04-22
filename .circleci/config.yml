@@ -35,7 +35,8 @@ jobs:
             - run:
                 name: Copy test results
                 command: |
-                    docker cp ${IMAGE_NAME}:/home/patRoon/patRoon/junit.xml /app
+                    docker create --name patroon "${IMAGE_NAME}"
+                    docker cp patroon:/home/patRoon/junit.xml /app
             - store_test_results:
                 path: /app                    
             - deploy:

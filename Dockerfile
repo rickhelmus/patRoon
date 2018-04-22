@@ -37,5 +37,5 @@ ARG FAIL_TESTS=1
 
 WORKDIR patRoon
 RUN Rscript docker/run_tests.R || [ $FAIL_TESTS -eq 0 ] && cat ~/olog/* && \
-    rm -rf ~/patRoon /tmp/Rtmp* ~/install_deps.R
+    cp ~/patRoon/junit.xml ~/ && rm -rf ~/patRoon /tmp/Rtmp* ~/install_deps.R
 

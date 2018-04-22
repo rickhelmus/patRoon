@@ -23,7 +23,6 @@ environment:
     R_ARCH: x64
     BIOC_USE_DEVEL: FALSE
     _R_CHECK_FORCE_SUGGESTS_: 0
-    OPENMS_DATA_PATH: C:\Program Files\OpenMS\share\OpenMS
 
 build_script:
     - travis-tool.sh install_bioc mzR xcms CAMERA
@@ -33,6 +32,7 @@ build_script:
 
 test_script:
     - set PATH=C:\Program Files\OpenMS-2.3.0\bin;%PATH%
+    - set OPENMS_DATA_PATH=C:\Program Files\OpenMS-2.3.0\share\OpenMS
     - travis-tool.sh run_tests
 
 on_failure:

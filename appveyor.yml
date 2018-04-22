@@ -65,6 +65,8 @@ test_script:
     - set OPENMS_DATA_PATH=C:\Program Files\OpenMS-2.3.0\share\OpenMS
     - set PATROON_METFRAG=C:\deps\MetFrag2.4.3-CL.jar
     - set PATROON_SIRIUS=C:\deps\sirius-win64-headless-4.0
+    # HACK for SIRIUS
+    - del C:\tools\Coverity\bin\jnidispatch.dll
     - travis-tool.sh run_tests
 
 on_failure:

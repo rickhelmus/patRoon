@@ -13,3 +13,4 @@
 ^install_deps\.R$
 ^\.dockerignore$
 ^\.circleci$
+^codecov\.yml$

@@ -13,8 +13,8 @@ install:
     - ps: >-
         if (-Not (Test-Path C:\deps\openms.exe)) {
             Invoke-WebRequest https://github.com/OpenMS/OpenMS/releases/download/Release2.3.0/OpenMS-2.3.0-Win64.exe -OutFile "C:\deps\openms.exe"
-            C:\deps\openms.exe /S
         }
+        C:\deps\openms.exe /S
     - ps: >-
         if (-Not (Test-Path C:\deps\MetFrag2.4.3-CL.jar)) {
             Invoke-WebRequest http://msbi.ipb-halle.de/~cruttkie/metfrag/MetFrag2.4.3-CL.jar -OutFile "C:\deps\MetFrag2.4.3-CL.jar"

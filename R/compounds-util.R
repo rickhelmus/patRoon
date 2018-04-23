@@ -218,6 +218,7 @@ getCompInfoList <- function(compResults, compIndex, addHTMLURL, mCompNames)
     return(ctext)
 }
 
+# nocov
 getCompViewerUI <- function(pageChoices)
 {
     fillPage(
@@ -543,3 +544,4 @@ setMethod("compoundViewer", c("featureGroups", "MSPeakLists", "compounds"), func
 
     runApp(shinyApp(getCompViewerUI(generatePageLabels(names(fGroups)[1], 50)), server))
 })
+# nocov end

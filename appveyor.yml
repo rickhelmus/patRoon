@@ -90,9 +90,6 @@ artifacts:
   - path: '*.Rcheck\**\*.Rout'
     name: Logs
 
-  - path: '..\install.log'
-    name: Logs
-
   - path: '\*_*.tar.gz'
     name: Bits
 

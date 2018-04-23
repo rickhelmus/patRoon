@@ -13,17 +13,18 @@ install:
     - ps: >-
         if (-Not (Test-Path C:\deps\openms.exe)) {
             Invoke-WebRequest https://github.com/OpenMS/OpenMS/releases/download/Release2.3.0/OpenMS-2.3.0-Win64.exe -OutFile "C:\deps\openms.exe"
+            C:\deps\openms.exe /S
         }
-        C:\deps\openms.exe /S
     - ps: >-
         if (-Not (Test-Path C:\deps\MetFrag2.4.3-CL.jar)) {
             Invoke-WebRequest http://msbi.ipb-halle.de/~cruttkie/metfrag/MetFrag2.4.3-CL.jar -OutFile "C:\deps\MetFrag2.4.3-CL.jar"
         }
     - ps: >-
-        if (-Not (Test-Path C:\deps\sirius-win.zip)) {
+        if (-Not (Test-Path C:\deps\sirius-win64-headless-4.0)) {
             Invoke-WebRequest https://bio.informatik.uni-jena.de/repository/dist-release-local/de/unijena/bioinf/ms/sirius/4.0/sirius-4.0-win64-headless.zip -OutFile "C:\deps\sirius-win.zip"
+            7z x -oC:\deps\ C:\deps\sirius-win.zip
         }
-        7z x -oC:\deps\ C:\deps\sirius-win.zip
+        
     #- ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
 cache:

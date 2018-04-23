@@ -40,12 +40,12 @@ before_test:
       if (-Not (Test-Path "C:\Program Files (x86)\Pandoc\")) {
         cinst pandoc
       }
+  - ps: $env:Path += ";C:\Program Files (x86)\Pandoc\"
   - pandoc -v
   - ps: >-
       if (-Not (Test-Path "C:\ProgramData\chocolatey\bin\pngquant.exe")) {
         cinst pngquant
       }
-  - ps: $env:Path += ";C:\Program Files (x86)\Pandoc\"
 
 platform: x64
 environment:

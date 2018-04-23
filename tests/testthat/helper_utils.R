@@ -64,4 +64,4 @@ expect_plot <- function(object)
     invisible(act$val)
 }
 
-expect_docker <- function(...) vdiffr::expect_doppelganger(..., path = getOption("patRoon.path.vdiffr"))
+expect_doppel <- function(...) vdiffr::expect_doppelganger(..., path = getOption("patRoon.path.vdiffr"))

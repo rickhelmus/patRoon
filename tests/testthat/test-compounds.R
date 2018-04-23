@@ -118,12 +118,12 @@ test_that("reporting works", {
 test_that("plotting works", {
     skip_if_not(hasCompounds)
     
-    expect_docker("compound-spec", function() plotSpec(comps, 1, names(compoundTable(comps))[1], plists))
-    # expect_docker("spec-gg", plotSpec(comps, 1, names(compoundTable(comps))[1], plists, useGGPlot2 = TRUE))
+    expect_doppel("compound-spec", function() plotSpec(comps, 1, names(compoundTable(comps))[1], plists))
+    # expect_doppel("spec-gg", plotSpec(comps, 1, names(compoundTable(comps))[1], plists, useGGPlot2 = TRUE))
     expect_plot(print(plotSpec(comps, 1, names(compoundTable(comps))[1], plists, useGGPlot2 = TRUE)))
     
     # plotStructure gives an empty plot??
-    # expect_docker("struct", function() plotStructure(comps, 1, names(compoundTable(comps))[1]))
+    # expect_doppel("struct", function() plotStructure(comps, 1, names(compoundTable(comps))[1]))
     expect_plot(plotStructure(comps, 1, names(compoundTable(comps))[1]))
-    expect_docker("scores", function() plotScores(comps, 1, names(compoundTable(comps))[1]))
+    expect_doppel("scores", function() plotScores(comps, 1, names(compoundTable(comps))[1]))
 })

@@ -536,13 +536,32 @@ loadXCMSEICForFGroups <- function(fGroups, rtWindow, mzWindow, topMost, onlyPres
 
         # rtRange <- gInfo[grpi, "rts"] + c(-rtWindow, rtWindow)
         mzRange <- gInfo[grpi, "mzs"] + c(-mzWindow, mzWindow)
+        
+        getFTCol <- function(anai, col)
+        {
+            ana <- anaInfo$analysis[anai]
+            if (ftind[[grpi]][anai] == 0)
+                NA
+            else
+                fTable[[anaInfo$analysis[anai]]][ftind[[grpi]][anai]][[col]]
+        }
 
+        rtRange <- c(min(sapply(topAnalysesInd,
+                                function(anai) getFTCol(anai, "retmin")),
+                         na.rm = TRUE),
+                     max(sapply(topAnalysesInd,
+                                function(anai) getFTCol(anai, "retmax")),
+                         na.rm = TRUE))
+        if (any(is.na(rtRange)))
+            rtRange <- gInfo[grpi, "rts"]
+        rtRange <- rtRange + c(-rtWindow, rtWindow)
+        
         ret <- lapply(topAnalysesInd, function(anai)
         {
             ana <- anaInfo$analysis[anai]
 
-            feat <- fTable[[ana]][ftind[[grpi]][anai]]
-            rtRange <- c(feat$retmin - rtWindow, feat$retmax + rtWindow)
+            # feat <- fTable[[ana]][ftind[[grpi]][anai]]
+            # rtRange <- c(feat$retmin - rtWindow, feat$retmax + rtWindow)
 
             if (is.null(anaHashes[[ana]]))
                 anaHashes[[ana]] <<- makeFileHash(getMzMLOrMzXMLAnalysisPath(ana, anaInfo$path[anai]))

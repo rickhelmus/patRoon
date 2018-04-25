@@ -34,6 +34,7 @@ jobs:
                     - /caches/dock.tar
             - run:
                 name: Copy test results
+                when: always
                 command: |
                     docker create --name patroon "${IMAGE_NAME}"
                     mkdir /tmp/tests

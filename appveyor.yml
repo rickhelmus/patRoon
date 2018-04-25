@@ -60,7 +60,7 @@ build_script:
     - travis-tool.sh install_github rickhelmus/patRoonData
     - travis-tool.sh install_github blosloos/nontarget
     - travis-tool.sh install_github lionel-/vdiffr
-    - travis-tool.sh install_r covr
+    #- travis-tool.sh install_r covr
     - travis-tool.sh install_deps
 
 test_script:
@@ -72,7 +72,6 @@ test_script:
     # HACK for SIRIUS
     - del C:\tools\Coverity\bin\jnidispatch.dll
     - travis-tool.sh run_tests
-    - ps: (New-Object 'System.Net.WebClient').UploadFile("https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)", "$($env:PATROON_JUNIT)")
 
 on_failure:
     - 7z a failure.zip *.Rcheck\*
@@ -81,6 +80,9 @@ on_failure:
 on_success:
   # NOTE: disable coverage compiler flags as they don't work with GenForm
   - Rscript -e "options(covr.flags = list(CXXFLAGS = "", LDFLAGS = "")); covr::codecov()"
+
+on_finish:
+  - ps: (New-Object 'System.Net.WebClient').UploadFile("https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)", "$($env:PATROON_JUNIT)")
 
 artifacts:
   - path: '*.Rcheck\**\*.log'

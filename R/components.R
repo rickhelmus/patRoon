@@ -65,7 +65,10 @@ setMethod("show", "components", function(object)
     printf("Algorithm: %s\n", algorithm(object))
     printf("Components: %s (%d total)\n", getStrListWithMax(names(object), 6, ", "), length(object))
 
-    gCounts <- sapply(object@components, nrow)
+    if (length(object@components) == 0)
+        gCounts <- 0
+    else
+        gCounts <- sapply(object@components, nrow)
 
     printf("Number of feature groups in components: %d (total), %.1f (mean), %d - %d (min - max)\n",
            sum(gCounts), mean(gCounts), min(gCounts), max(gCounts))

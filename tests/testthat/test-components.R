@@ -12,14 +12,14 @@ test_that("components generation works", {
     # For RC/CAM: don't store their internal objects as they contain irreproducible file names
     expect_known_value(list(componentTable(compsRC), componentInfo(compsRC)), testFile("components-rc"))
     expect_known_value(list(componentTable(compsCAM), componentInfo(compsCAM)), testFile("components-cam"))
-    skip_on_appveyor()
+    skip_if(length(compsNT) == 0)
     expect_known_value(compsNT, testFile("components-nt"))
 })
 
 test_that("verify components show", {
     expect_known_show(compsRC, testFile("components-rc", text = TRUE))
     expect_known_show(compsCAM, testFile("components-cam", text = TRUE))
-    skip_on_appveyor()
+    skip_if(length(compsNT) == 0)
     expect_known_show(compsNT, testFile("components-nt", text = TRUE))
 })
 
@@ -28,7 +28,7 @@ test_that("findFGroup works", {
 })
 
 test_that("consensus works", {
-    skip_on_appveyor()
+    skip_if(length(compsNT) == 0)
     expect_equal(length(consensus(compsRC, compsNT)), length(compsRC) + length(compsNT))
 })
 
@@ -48,7 +48,7 @@ test_that("plotting works", {
     # specs don't work because of legend ... :(
     # expect_doppel("compon-spec", function() plotSpec(compsNT, 1))
     # expect_doppel("compon-spec-mark", function() plotSpec(compsNT, 1, markFGroup = names(fGroups)[1]))
-    skip_on_appveyor()
+    skip_if(length(compsNT) == 0)
     expect_plot(plotSpec(compsNT, 1))
     expect_plot(plotSpec(compsNT, 1, markFGroup = names(fGroups)[1]))
     expect_plot(print(plotSpec(compsNT, 1, useGGPlot2 = TRUE)))

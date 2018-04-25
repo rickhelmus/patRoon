@@ -246,7 +246,7 @@ setMethod("plotStructure", "compounds", function(compounds, index, groupName, wi
     }
     else
     {
-        if (!is.na(mol))
+        if (!is.na(mol) && !is.null(mol) && !is.null(mol[[1]]))
             rcdkplot(mol[[1]], width, height)
         else
             plot.new()
@@ -322,7 +322,7 @@ setMethod("plotScores", "compounds", function(obj, index, groupName, normalizeSc
             # par(omd = c(0, 1, 0, 1 - lh), new = TRUE)
             lw <- (grconvertX(leg$rect$w, to = "ndc") - grconvertX(0, to = "ndc"))
             par(omd = c(0, 1 - lw, 0, 1), new = TRUE)
-            do.call(barplot, c(list(as.matrix(plotTab[, -1]), beside = TRUE), bpargs))
+            do.call(barplot, c(list(as.matrix(plotTab[, -"merged"]), beside = TRUE), bpargs))
             # legend("top", plotTab$merged, col = cols, lwd = 1, inset = c(0, -0.2), xpd = NA, horiz = TRUE, cex = 0.75)
             # makeLegend(0, par("usr")[4] + lh)
             makeLegend(par("usr")[2], par("usr")[4])
@@ -411,7 +411,7 @@ setMethod("plotSpec", "compounds", function(obj, index, groupName, MSPeakLists, 
 
         # draw structure
         mol <- rcdk::parse.smiles(compr$SMILES)
-        if (!is.na(mol))
+        if (!is.null(mol) && !is.na(mol) && !is.null(mol[[1]]))
         {
             raster <- rcdk::view.image.2d(mol[[1]], rcdk::get.depictor(100, 100))
             img <- magick::image_trim(magick::image_read(raster))

@@ -48,7 +48,7 @@ generateDAMSPeakLists <- function(fGroups, bgsubtr = TRUE, maxRtMSWidth = NULL, 
         anac <- compounds[[anai]]
         gcount <- nrow(anac)
 
-        setHash <- makeHash(compounds[i], ana)
+        setHash <- makeHash(compounds[anai], ana)
         cachedSet <- loadCacheSet("MSPeakListsDA", setHash, cacheDB)
         resultHashes <- vector("character", gcount)
 

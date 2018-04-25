@@ -53,7 +53,8 @@ Summary {data-orientation=rows}
 ```{r obj-plot, fig.width=10, fig.height=4}
 par(mai = c(0.9, 0.8, 0.6, 0.1))
 plotEIC(rmdVars$fGroups, rmdVars$EICRtWindow, rmdVars$EICMzWindow,
-        rmdVars$retMin, 1, rmdVars$EICs, TRUE, FALSE, colourBy = "fGroup", showLegend = FALSE)
+        rmdVars$retMin, 1, rmdVars$EICs, TRUE, FALSE, colourBy = "fGroup", showLegend = FALSE,
+        onlyPresent = rmdVars$EICOnlyPresent)
 ```
 
 
@@ -112,7 +113,7 @@ for (grpi in seq_len(length(rmdVars$fGroups)))
     setTxtProgressBar(prog, grpi)
     plotEIC(rmdVars$fGroups[, grpi], rmdVars$EICRtWindow, rmdVars$EICMzWindow,
             rmdVars$retMin, rmdVars$EICTopMost, rmdVars$EICs, colourBy = "rGroup",
-            showLegend = TRUE)
+            showLegend = TRUE, onlyPresent = rmdVars$EICOnlyPresent)
 }
 
 close(prog)

@@ -12,3 +12,5 @@ Release:
 - clarify that sirius headless 4.0 now also works
 - do something with sirius fingerprints?
 - fillPeaks for CAMERA (and RAMClustR?)
+- mzR precursor window in newProject()
+- filter formulas, compounds etc on (remaining) feature groups

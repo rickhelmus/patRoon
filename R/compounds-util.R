@@ -37,13 +37,15 @@ getCompScoreColNames <- function()
     return(c("score",
              "fragScore",
              "metFusionScore",
+             "individualMoNAScore",
              "numberPatents",
              "pubMedReferences",
              "extReferenceCount",
              "dataSourceCount",
              "referenceCount",
              "RSCCount",
-             "formulaScore"))
+             "formulaScore",
+             "smartsInclusionScore"))
 }
 
 normalizeCompScores <- function(compResults, mCompNames)

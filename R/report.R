@@ -648,7 +648,7 @@ setMethod("reportMD", "featureGroups", function(fGroups, path, reportChord, repo
 
     rmdVars <- list(outPath = path, fGroups = fGroups, groupNames = names(fGroups), gInfo = groupInfo(fGroups), reportChord = reportChord,
                     reportFGroups = reportFGroups, EICRtWindow = EICRtWindow, EICMzWindow = EICMzWindow,
-                    retMin = retMin, EICTopMost = EICTopMost, EICs = EICs,
+                    retMin = retMin, EICTopMost = EICTopMost, EICOnlyPresent = EICOnlyPresent, EICs = EICs,
                     compounds = compounds, MSPeakLists = MSPeakLists, formConsensus = formConsensus,
                     compoundNormalizeScores = compoundNormalizeScores, components = components,
                     cInfo = cInfo, clusterK = clusterK, silInfo = silInfo, interactiveHeat = interactiveHeat,

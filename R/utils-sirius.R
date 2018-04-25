@@ -22,7 +22,7 @@ getSiriusFragFiles <- function(resultPath)
 
 getFormulaFromSiriusFragFile <- function(ffile)
 {
-    pat <- "[:0-9:]+_([A-Za-z0-9]+)\\.ms"
+    pat <- "[:0-9:]+_([A-Za-z0-9]+).*\\.ms"
     gsub(pat, "\\1", basename(ffile))
 }
 

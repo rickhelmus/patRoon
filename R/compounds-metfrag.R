@@ -30,7 +30,9 @@ unifyMFNames <- function(mfr)
                  ChemSpiderDataSourceCount = "dataSourceCount",
                  ChemSpiderReferenceCount = "referenceCount",
                  ChemSpiderRSCCount = "RSCCount",
-                 OfflineMetFusionScore = "metFusionScore")
+                 OfflineMetFusionScore = "metFusionScore",
+                 OfflineIndividualMoNAScore = "individualMoNAScore",
+                 SmartsSubstructureInclusionScore = "smartsInclusionScore")
 
     unNames <- unNames[names(unNames) %in% names(mfr)] # filter out missing
     setnames(mfr, names(unNames), unNames)

@@ -63,3 +63,5 @@ expect_plot <- function(object)
     expect(file.exists(tf), "failed to generate plot")
     invisible(act$val)
 }
+
+expect_doppel <- function(...) vdiffr::expect_doppelganger(..., path = getOption("patRoon.path.vdiffr"))

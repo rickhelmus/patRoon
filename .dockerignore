@@ -1,0 +1,16 @@
+*
+!inst/**
+!R/*.R
+!man/*
+!src/*.R
+!src/Makefile
+!src/GenForm-svn/*.cpp
+!src/GenForm-svn/*.h
+!tests/testthat.R
+!tests/figs/*
+!tests/testthat/*.R
+!tests/testthat/test_data/*
+!vignettes/*
+!DESCRIPTION
+!NAMESPACE
+!docker/*.R

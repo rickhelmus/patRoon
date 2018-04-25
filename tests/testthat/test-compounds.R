@@ -18,9 +18,9 @@ doSIRIUS <- !is.null(getOption("patRoon.path.SIRIUS")) && nzchar(getOption("patR
 
 if (doMetFrag)
 {
-    compsMF <- generateCompounds(fGroupsSub, plists, "metfrag", logPath = normalizePath("~/mflog"),
+    compsMF <- generateCompounds(fGroupsSub, plists, "metfrag", logPath = NULL,
                                  adduct = 1, isPositive = TRUE, database = "LocalCSV",
-                                 scoreTypes = "FragmenterScore",
+                                 scoreTypes = "FragmenterScore", maxProcAmount = 1, # UNDONE: fails with multi proc if ran for first time
                                  extraOpts = list(LocalDatabasePath = mfTestDBPath))
     ct <- compoundTable(compsMF)
 }
@@ -60,9 +60,9 @@ comps <- if (doMetFrag) compsMFIso else if (doSIRIUS) compsSIR
 test_that("filtering works", {
     skip_if_not(hasCompounds)
     
-    expect_length(filter(comps, topMost = 1), length(fGroupsSub))
+    expect_lte(length(filter(comps, topMost = 1)), length(fGroupsSub))
     expect_lte(length(filter(comps, topMost = 5)), 5 * length(fGroupsSub))
-    expect_lt(length(filter(comps, minExplainedPeaks = 2)), length(comps))
+    expect_lte(length(filter(comps, minExplainedPeaks = 2)), length(comps))
     
     skip_if_not(doMetFrag)
     expect_lt(length(filter(compsMFIso, minScore = 2)), length(compsMFIso))
@@ -118,12 +118,12 @@ test_that("reporting works", {
 test_that("plotting works", {
     skip_if_not(hasCompounds)
     
-    vdiffr::expect_doppelganger("spec", function() plotSpec(comps, 1, names(compoundTable(comps))[1], plists))
-    # vdiffr::expect_doppelganger("spec-gg", plotSpec(comps, 1, names(compoundTable(comps))[1], plists, useGGPlot2 = TRUE))
+    expect_doppel("compound-spec", function() plotSpec(comps, 1, names(compoundTable(comps))[1], plists))
+    # expect_doppel("spec-gg", plotSpec(comps, 1, names(compoundTable(comps))[1], plists, useGGPlot2 = TRUE))
     expect_plot(print(plotSpec(comps, 1, names(compoundTable(comps))[1], plists, useGGPlot2 = TRUE)))
     
     # plotStructure gives an empty plot??
-    # vdiffr::expect_doppelganger("struct", function() plotStructure(comps, 1, names(compoundTable(comps))[1]))
+    # expect_doppel("struct", function() plotStructure(comps, 1, names(compoundTable(comps))[1]))
     expect_plot(plotStructure(comps, 1, names(compoundTable(comps))[1]))
-    vdiffr::expect_doppelganger("scores", function() plotScores(comps, 1, names(compoundTable(comps))[1]))
+    expect_doppel("scores", function() plotScores(comps, 1, names(compoundTable(comps))[1]))
 })

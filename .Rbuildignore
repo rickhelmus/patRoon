@@ -8,3 +8,9 @@
 ^\.covrignore$
 ^tests/testthat/cache\.sqlite$
 ^\.travis\.yml$
+^appveyor\.yml$
+^Dockerfile$
+^install_deps\.R$
+^\.dockerignore$
+^\.circleci$
+^codecov\.yml$

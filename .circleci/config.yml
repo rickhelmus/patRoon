@@ -1,0 +1,52 @@
+version: 2
+jobs:
+    build:
+        working_directory: /app
+        docker:
+            - image: docker:18.04.0-ce-git
+        environment:
+            IMAGE_NAME=patroonorg/patroon
+        steps:
+            - checkout
+            - setup_remote_docker
+            - restore_cache:
+                keys:
+                    - v1-{{ .Branch }}
+                paths:
+                    - /caches/dock.tar
+            - run:
+                name: Load Docker image layer cache
+                command: |
+                    set +o pipefail
+                    docker load -i /caches/dock.tar | true
+            - run:
+                name: Build Docker image
+                command: |
+                    docker build --pull --cache-from "${IMAGE_NAME}" --tag "${IMAGE_NAME}" .
+            - run:
+                name: Save Docker image layer cache
+                command: |
+                    mkdir -p /caches
+                    docker save -o /caches/dock.tar "${IMAGE_NAME}"
+            - save_cache:
+                key: v1-{{ .Branch }}-{{ epoch }}
+                paths:
+                    - /caches/dock.tar
+            - run:
+                name: Copy test results
+                command: |
+                    docker create --name patroon "${IMAGE_NAME}"
+                    mkdir /tmp/tests
+                    docker cp patroon:/home/patRoon/junit.xml /tmp/tests/
+                    cat /tmp/tests/junit.xml
+            - store_test_results:
+                path: /tmp/tests                    
+            - deploy:
+                name: Push application Docker image
+                command: |
+                    if [ "${CIRCLE_BRANCH}" == "master" ]; then
+                        echo "$DH_PASS" | docker login -u "$DH_USER" --password-stdin
+                        git_sha="$(git rev-parse --short HEAD)"
+                        docker tag "$IMAGE_NAME" "${IMAGE_NAME}:${git_sha}-master"
+                        docker push "${IMAGE_NAME}:latest" && docker push "${IMAGE_NAME}:${git_sha}-master"
+                    fi

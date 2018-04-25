@@ -75,7 +75,8 @@ Suggests:
     testthat,
     vdiffr,
     patRoonData,
-    devtools
+    devtools,
+    covr
 RdMacros:
     Rdpack
 Collate:

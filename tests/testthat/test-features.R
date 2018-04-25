@@ -8,7 +8,8 @@ if (runWithEnviPick)
 
 test_that("verify feature finder output", {
     # Don't store ID column: not reproducible
-    expect_known_value(sapply(featureTable(ffOpenMS), function(fts) fts[, -"ID"], simplify = FALSE), testFile("ff-openms"))
+    expect_known_value(sapply(featureTable(ffOpenMS), function(fts) fts[, -"ID"], simplify = FALSE),
+                       testFile("ff-openms"), tolerance = 1E-5) # increased tolerance value for win/lin deviations
     expect_known_value(featureTable(ffXCMS), testFile("ff-xcms"))
     skip_if_not(runWithEnviPick)
     expect_known_value(featureTable(ffEP), testFile("ff-envipick"))

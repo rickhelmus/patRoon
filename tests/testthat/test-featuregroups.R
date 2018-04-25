@@ -1,6 +1,6 @@
 context("feature groups")
 
-fList <- findFeatures(getTestAnaInfo(), "openms", logPath = NULL)
+fList <- findFeatures(getTestAnaInfo(), "openms", logPath = normalizePath("~/olog", mustWork = FALSE))
 
 fgOpenMS <- groupFeatures(fList, "openms")
 fgXCMS <- groupFeatures(fList, "xcms")
@@ -125,25 +125,25 @@ test_that("reporting works", {
 })
 
 test_that("plotting works", {
-    vdiffr::expect_doppelganger("retmz", function() plot(fgOpenMS))
-    vdiffr::expect_doppelganger("retmz-comp", function() plot(fGCompOpenMS))
+    expect_doppel("retmz", function() plot(fgOpenMS))
+    expect_doppel("retmz-comp", function() plot(fGCompOpenMS))
     
-    vdiffr::expect_doppelganger("intensity-def", function() plotInt(fgOpenMS))
-    vdiffr::expect_doppelganger("intensity-avg", function() plotInt(fgOpenMS, TRUE))
+    expect_doppel("intensity-def", function() plotInt(fgOpenMS))
+    expect_doppel("intensity-avg", function() plotInt(fgOpenMS, TRUE))
     
-    vdiffr::expect_doppelganger("chord-def", function() plotChord(fgOpenMS))
-    vdiffr::expect_doppelganger("chord-selflinks", function() plotChord(fgOpenMS, addSelfLinks = TRUE))
-    vdiffr::expect_doppelganger("chord-nortmz", function() plotChord(fgOpenMS, addRetMzPlots = FALSE))
-    vdiffr::expect_doppelganger("chord-comp", function() plotChord(fGCompOpenMS))
+    expect_doppel("chord-def", function() plotChord(fgOpenMS))
+    expect_doppel("chord-selflinks", function() plotChord(fgOpenMS, addSelfLinks = TRUE))
+    expect_doppel("chord-nortmz", function() plotChord(fgOpenMS, addRetMzPlots = FALSE))
+    expect_doppel("chord-comp", function() plotChord(fGCompOpenMS))
     
-    vdiffr::expect_doppelganger("eic-def", function() plotEIC(subFGroups))
-    vdiffr::expect_doppelganger("eic-rtmin", function() plotEIC(subFGroups, retMin = TRUE))
-    vdiffr::expect_doppelganger("eic-tm1", function() plotEIC(subFGroups, topMost = 1))
-    vdiffr::expect_doppelganger("eic-area", function() plotEIC(subFGroups, showPeakArea = TRUE))
-    vdiffr::expect_doppelganger("eic-cbr", function() plotEIC(subFGroups, colourBy = "rGroups"))
-    vdiffr::expect_doppelganger("eic-cbf", function() plotEIC(subFGroups, colourBy = "fGroups"))
-    vdiffr::expect_doppelganger("eic-ann", function() plotEIC(subFGroups, annotate = "mz"))
+    expect_doppel("eic-def", function() plotEIC(subFGroups))
+    expect_doppel("eic-rtmin", function() plotEIC(subFGroups, retMin = TRUE))
+    expect_doppel("eic-tm1", function() plotEIC(subFGroups, topMost = 1))
+    expect_doppel("eic-area", function() plotEIC(subFGroups, showPeakArea = TRUE))
+    expect_doppel("eic-cbr", function() plotEIC(subFGroups, colourBy = "rGroups"))
+    expect_doppel("eic-cbf", function() plotEIC(subFGroups, colourBy = "fGroups"))
+    expect_doppel("eic-ann", function() plotEIC(subFGroups, annotate = "mz"))
     
-    vdiffr::expect_doppelganger("venn", function() plotVenn(fgOpenMS))
-    vdiffr::expect_doppelganger("venn-comp", function() plotVenn(fGCompOpenMS))
+    expect_doppel("venn", function() plotVenn(fgOpenMS))
+    expect_doppel("venn-comp", function() plotVenn(fGCompOpenMS))
 })

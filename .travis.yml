@@ -1,85 +1,38 @@
-# R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
+# config adapted from https://medium.com/mobileforgood/coding-tips-patterns-for-continuous-integration-with-docker-on-travis-ci-9cedb8348a62
+# and https://medium.com/mobileforgood/patterns-for-continuous-integration-with-docker-on-travis-ci-71857fff14c5
 
-language: R
-r: bioc-release
 sudo: required
-cache: packages
 
-apt_packages:
-  #- openjdk-8-jdk
-  - libxml2-dev
-  - libnetcdf-dev
-  - netcdf-bin
-
-jdk: openjdk7
-
-r_binary_packages:
-    - checkmate
-    - data.table
-    - withr
-    - digest
-    - XML
-    - DBI
-    - RSQLite
-    - processx
-    - rJava
-    - rcdk
-    - circlize
-    - plotly
-    - rhandsontable
-    - htmlwidgets
-    - shiny
-    - knitr
-    - rmarkdown
-    - DT
-    - kableExtra
-    - R.utils
-    - glue
-    - ggplot2
-    - ggrepel
-    - cowplot
-    - jsonlite
-    - Rdpack
-    - igraph
-    - Hmisc
-    - ff
-    - mclust
-    - robustbase
-    - commonmark
-
-bioc_packages:
-    - mzR
-    - xcms
-    - CAMERA
-
-r_github_packages:
-    - cbroeckl/RAMClustR@036cdd4
-    - rickhelmus/patRoonData
-
-before_install:
-    - wget -P ~/ https://abibuilder.informatik.uni-tuebingen.de/archive/openms/OpenMSInstaller/nightly/OpenMS-2.2.0-Linux.deb
-    - sudo dpkg -i ~/OpenMS-2.2.0-Linux.deb
-    - wget -P ~/ http://msbi.ipb-halle.de/~cruttkie/metfrag/MetFrag2.4.3-CL.jar
-    - wget -P ~/ https://bio.informatik.uni-jena.de/repository/dist-release-local/de/unijena/bioinf/ms/sirius/4.0/sirius-4.0-linux64-headless.zip
-    - unzip -d ~/ ~/sirius-4.0-linux64-headless.zip
-
-warnings_are_errors: false
-
-r_build_args: --no-build-vignettes --no-manual
-r_check_args: --no-build-vignettes --no-manual
+services:
+  - docker
 
 env:
-    global:
-        - _R_CHECK_FORCE_SUGGESTS_=0
-        - OPENMS_DATA_PATH=/usr/share/OpenMS
-        - PATROON_METFRAG=~/MetFrag2.4.3-CL.jar
-        - PATROON_SIRIUS=~/sirius-linux64-headless-4.0/bin
+    - IMAGE_NAME=patroonorg/patroon
+
+before_install:
+    - sudo apt-get update
+    - sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
+
+before_script:
+    - docker pull "${IMAGE_NAME}:latest" || true
 
 script:
-    - |
-      R CMD build --no-build-vignettes --no-manual .
-      travis_wait 30 R CMD check --no-build-vignettes --no-manual patRoon*tar.gz
+    - docker build --cache-from "${IMAGE_NAME}:latest" --tag "${IMAGE_NAME}" .
 
-after_failure:
-    - Rscript -e 'options(patRoon.path.metFragCL = "~/MetFrag2.4.3-CL.jar", patRoon.path.SIRIUS = "~/sirius-linux64-headless-4.0/bin"); devtools::install(); devtools::test()' # https://stackoverflow.com/a/45866031/9264518
-    - cat ~/mflog/*.txt
+after_script:
+    - docker images
+
+before_deploy:
+    - docker login -u "$DH_USER" -p "$DH_PASS"
+    - git_sha="$(git rev-parse --short HEAD)"
+    - docker tag "$IMAGE_NAME" "${IMAGE_NAME}:${git_sha}-master"
+
+deploy:
+    provider: script
+    script: docker push "${IMAGE_NAME}:latest" && docker push "${IMAGE_NAME}:${git_sha}-master"
+    on:
+        branch: master
+
+notifications:
+    email: false
+

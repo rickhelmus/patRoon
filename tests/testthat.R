@@ -12,4 +12,9 @@ options(patRoon.clearCache = TRUE)
 # https://github.com/r-lib/devtools/issues/1526
 Sys.unsetenv("R_TESTS")
 
-test_check("patRoon")
+ju <- Sys.getenv("PATROON_JUNIT")
+if (nzchar(ju))
+{
+    test_check("patRoon", reporter = JunitReporter$new(file = ju))
+} else
+    test_check("patRoon")

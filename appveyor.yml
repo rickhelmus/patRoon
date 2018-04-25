@@ -59,6 +59,8 @@ build_script:
     - travis-tool.sh install_github cbroeckl/RAMClustR@036cdd4
     - travis-tool.sh install_github rickhelmus/patRoonData
     - travis-tool.sh install_github blosloos/nontarget
+    - travis-tool.sh install_github lionel-/vdiffr
+    - travis-tool.sh install_r covr
     - travis-tool.sh install_deps
 
 test_script:
@@ -66,17 +68,20 @@ test_script:
     - set OPENMS_DATA_PATH=C:\Program Files\OpenMS-2.3.0\share\OpenMS
     - set PATROON_METFRAG=C:\deps\MetFrag2.4.3-CL.jar
     - set PATROON_SIRIUS=C:\deps\sirius-win64-headless-4.0
+    - set PATROON_JUNIT=%APPVEYOR_BUILD_FOLDER%\junit.xml
     # HACK for SIRIUS
     - del C:\tools\Coverity\bin\jnidispatch.dll
     - travis-tool.sh run_tests
+    - ps: (New-Object 'System.Net.WebClient').UploadFile("https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)", "$($env:PATROON_JUNIT)")
 
 on_failure:
     - 7z a failure.zip *.Rcheck\*
     - appveyor PushArtifact failure.zip
 
-on_finish:
-    - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
-  
+on_success:
+  # NOTE: disable coverage compiler flags as they don't work with GenForm
+  - Rscript -e "options(covr.flags = list(CXXFLAGS = "", LDFLAGS = "")); covr::codecov()"
+
 artifacts:
   - path: '*.Rcheck\**\*.log'
     name: Logs

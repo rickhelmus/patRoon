@@ -60,7 +60,7 @@ build_script:
     - travis-tool.sh install_github rickhelmus/patRoonData
     - travis-tool.sh install_github blosloos/nontarget
     - travis-tool.sh install_github lionel-/vdiffr
-    #- travis-tool.sh install_r covr
+    - travis-tool.sh install_r covr
     - travis-tool.sh install_deps
 
 test_script:

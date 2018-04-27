@@ -67,10 +67,14 @@ generateComponentsNontarget <- function(fGroups, ionization, rtRange = c(-120, 1
     homList <- sapply(rGroups, function(rg)
     {
         gt <- groupTablesRG[[rg]][, c("mz", rg, "ret"), with = FALSE] # convert to nontarget peaklist format
+        
+        if (is.null(gt))
+            return(NULL) # rep group doesn't have feature groups
 
+        # UNDONE: find some way to differentiate between actual errors?
         hom <- tryCatch(do.call(nontarget::homol.search, c(list(gt), homArgs)),
                         error = function(e) FALSE)
-
+        
         if (is.logical(hom))
             return(NULL) # no results
 
@@ -87,10 +91,10 @@ generateComponentsNontarget <- function(fGroups, ionization, rtRange = c(-120, 1
             ginds <- as.integer(unlist(strsplit(pids, ",")))
             ginds <- ginds[order(gInfo[gNames[ginds], "mzs"])] # ensure they are from low to high m/z
             return(list(gNames[ginds]))
-        })]
+        }, simplify = FALSE)]
 
         homTab[, c("HS IDs", "peak IDs") := NULL]
-        homTab[, (rg) := groups]
+        homTab[, (rg) := list(groups)]
 
         return(homTab)
     }, simplify = FALSE)

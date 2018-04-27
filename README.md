@@ -1,4 +1,9 @@
 # patRoon
+
+[![CircleCI](https://circleci.com/gh/rickhelmus/patRoon.svg?style=svg)](https://circleci.com/gh/rickhelmus/patRoon)
+[![Build status](https://ci.appveyor.com/api/projects/status/52nnpq8kqpkjqc92/branch/master?svg=true)](https://ci.appveyor.com/project/rickhelmus/patroon/branch/master)
+[![codecov](https://codecov.io/gh/rickhelmus/patRoon/branch/master/graph/badge.svg)](https://codecov.io/gh/rickhelmus/patRoon)
+
 `patRoon` aims to provide a common interface to various (primarily
 open-source) software solutions for mass spectrometry based non-target analysis.
 The name is derived from a Dutch word that means _pattern_ and may also be an acronym for _hyPhenated

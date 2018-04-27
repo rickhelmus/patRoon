@@ -1,9 +1,9 @@
 getWorkPath <- function(file = "", ...) if (nzchar(file)) file.path("test_temp", file, ...) else "test_temp"
 getTestDataPath <- function() "test_data"
 testFile <- function(f, ..., text = FALSE) file.path(getTestDataPath(), paste0(f, ..., if (!text) ".Rds" else ".txt", collapse = ""))
-getTestAnaInfo <- function() generateAnalysisInfo(patRoonData::exampleDataPath(),
-                                                  groups = c(rep("solvent", 3), rep("standard", 3)),
-                                                  refs = "solvent")
+getTestAnaInfo <- function(path = patRoonData::exampleDataPath()) generateAnalysisInfo(path,
+                                                                                       groups = c(rep("solvent", 3), rep("standard", 3)),
+                                                                                       refs = "solvent")
 getTestFGroups <- function(anaInfo = getTestAnaInfo()) groupFeatures(findFeatures(anaInfo, "openms", logPath = NULL), "openms")
 
 expect_file <- function(object, file, removeIfExists = TRUE)

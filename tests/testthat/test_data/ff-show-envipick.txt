@@ -1,7 +1,1 @@
-A features object ('featuresEnviPick')
-Total feature count: 132
-Average feature count/analysis: 22
-Analyses: solvent-1, solvent-2, solvent-3, standard-1, standard-2, standard-3 (6 total)
-Replicate groups: solvent, standard (2 total)
-Replicate groups used as ref: solvent (1 total)
-Object size (indication): 27.8 kB
+A features object ('featuresEnviPick')Total feature count: 132Average feature count/analysis: 22Analyses: solvent-1, solvent-2, solvent-3, standard-1, standard-2, standard-3 (6 total)Replicate groups: solvent, standard (2 total)Replicate groups used as ref: solvent (1 total)

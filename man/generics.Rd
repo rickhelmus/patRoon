@@ -85,7 +85,7 @@ please refer to the linked method documentation for each generic.
 
 
 \itemize{
-    \item Methods are defined for: \code{\link[=algorithm,components-method]{components}}, \code{\link[=algorithm,compounds-method]{compounds}}, \code{\link[=algorithm,formulaConsensus-method]{formulaConsensus}}, \code{\link[=algorithm,formulas-method]{formulas}}, \code{\link[=algorithm,MSPeakLists-method]{MSPeakLists}}.
+    \item Methods are defined for: \code{\link[=algorithm,MSPeakLists-method]{MSPeakLists}}, \code{\link[=algorithm,components-method]{components}}, \code{\link[=algorithm,compounds-method]{compounds}}, \code{\link[=algorithm,formulaConsensus-method]{formulaConsensus}}, \code{\link[=algorithm,formulas-method]{formulas}}.
 }
 
 \code{filter} provides various functionality to do post-filtering of data.
@@ -95,7 +95,7 @@ please refer to the linked method documentation for each generic.
 
 
 \itemize{
-    \item Methods are defined for: \code{\link[=filter,compounds-method]{compounds}}, \code{\link[=filter,featureGroups-method]{featureGroups}}, \code{\link[=filter,MSPeakLists-method]{MSPeakLists}}.
+    \item Methods are defined for: \code{\link[=filter,MSPeakLists-method]{MSPeakLists}}, \code{\link[=filter,compounds-method]{compounds}}, \code{\link[=filter,featureGroups-method]{featureGroups}}.
 }
 
 \code{plotInt} plots the intensity of all contained features.

@@ -1,5 +1,5 @@
 Fontconfig: 2.11.1
 FreeType: 2.6.3
 Cairo: 1.15.2
-vdiffr: 0.2.2
+vdiffr: 0.2.3
 svglite: 1.2.1

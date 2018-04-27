@@ -52,11 +52,10 @@ environment:
     R_ARCH: x64
     BIOC_USE_DEVEL: FALSE
     _R_CHECK_FORCE_SUGGESTS_: 0
-    APPVEYOR_SAVE_CACHE_ON_ERROR: true
 
 build_script:
     - travis-tool.sh install_bioc mzR xcms CAMERA
-    - travis-tool.sh install_github cbroeckl/RAMClustR@036cdd4
+    - travis-tool.sh install_github cbroeckl/RAMClustR
     - travis-tool.sh install_github rickhelmus/patRoonData
     - travis-tool.sh install_github blosloos/nontarget
     - travis-tool.sh install_github lionel-/vdiffr

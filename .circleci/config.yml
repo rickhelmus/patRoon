@@ -5,8 +5,8 @@ jobs:
         docker:
             - image: docker:18.04.0-ce-git
         environment:
-            IMAGE_NAME=patroonorg/patroon
-            TMP_IMAGE_NAME=patroon
+            IMAGE_NAME: "patroonorg/patroon"
+            TMP_IMAGE_NAME: "patroon"
         steps:
             - checkout
             - setup_remote_docker

@@ -86,12 +86,12 @@ generateComponentsNontarget <- function(fGroups, ionization, rtRange = c(-120, 1
 
         # peak IDs are now numeric indices of a subset of the original feature
         # groups. Replace them by group names to allow easy comparison.
-        homTab[, groups := sapply(`peak IDs`, function(pids)
+        homTab[, groups := list(sapply(`peak IDs`, function(pids)
         {
             ginds <- as.integer(unlist(strsplit(pids, ",")))
             ginds <- ginds[order(gInfo[gNames[ginds], "mzs"])] # ensure they are from low to high m/z
             return(list(gNames[ginds]))
-        }, simplify = FALSE)]
+        }, simplify = FALSE))]
 
         homTab[, c("HS IDs", "peak IDs") := NULL]
         homTab[, (rg) := list(groups)]
@@ -110,7 +110,7 @@ generateComponentsNontarget <- function(fGroups, ionization, rtRange = c(-120, 1
 
     for (r in seq_len(nrow(compTab)))
     {
-        series <- compTab[["groups"]][[r]]
+        series <- compTab[["groups"]][[r]][[1]]
         nseries <- length(series)
         mzRange <- range(gInfo[series, "mzs"])
         links <- integer(0)
@@ -123,7 +123,7 @@ generateComponentsNontarget <- function(fGroups, ionization, rtRange = c(-120, 1
                 abs(compTab[["RT increment"]][r] - compTab[["RT increment"]][ro]) > maxRTDev)
                 next # different series
 
-            otherSeries <- compTab[["groups"]][[ro]]
+            otherSeries <- compTab[["groups"]][[ro]][[1]]
 
             if (sum(series %in% otherSeries) < 1) # UNDONE: minimum overlap?
                 next
@@ -166,9 +166,9 @@ generateComponentsNontarget <- function(fGroups, ionization, rtRange = c(-120, 1
             if (length(otherLinks) == 1 && otherLinks[1] == r)
             {
                 # merge groups
-                mGroups <- union(compTab[["groups"]][[r]], compTab[["groups"]][[links[1]]])
+                mGroups <- union(compTab[["groups"]][[r]][[1]], compTab[["groups"]][[links[1]]][[1]])
                 mGroups <- mGroups[order(gInfo[mGroups, "mzs"])] # make sure order stays correct
-                set(compTab, r, "groups", list(list(mGroups)))
+                set(compTab, r, "groups", list(list(list(mGroups))))
 
                 # mark presence
                 l <- links[1] # BUG: cannot use "links" name in next line?
@@ -176,7 +176,7 @@ generateComponentsNontarget <- function(fGroups, ionization, rtRange = c(-120, 1
                 for (rg in presentRGroups)
                 {
                     if (!is.null(lc[[rg]][[1]]))
-                        set(compTab, r, rg, list(list(lc[[rg]][[1]]))) # need to rewrap it in a list?
+                        set(compTab, r, rg, list(list(list(lc[[rg]][[1]])))) # need to rewrap it in a list?
                 }
 
                 set(compTab, links[1], "keep", FALSE) # remove other
@@ -203,11 +203,11 @@ generateComponentsNontarget <- function(fGroups, ionization, rtRange = c(-120, 1
     # split all rows in list with tables containing groups per row
     comps <- lapply(seq_len(nrow(compTab)), function(cmpi)
     {
-        allGroups <- compTab[["groups"]][[cmpi]]
+        allGroups <- compTab[["groups"]][[cmpi]][[1]]
         homSeries <- seq_along(allGroups)
         ret <- rbindlist(lapply(presentRGroups, function(rg)
         {
-            grp <- compTab[[rg]][[cmpi]]
+            grp <- compTab[[rg]][[cmpi]][[1]]
             if (!is.null(grp))
                 return(data.table(rt = gInfo[grp, "rts"], mz = gInfo[grp, "mzs"], group = grp,
                                   hsnr = match(grp, allGroups), rGroup = rg,

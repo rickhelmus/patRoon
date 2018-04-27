@@ -25,10 +25,15 @@
 <link href="../pkgdown.css" rel="stylesheet">
 <script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
+
+
+
 <meta property="og:title" content="Filtering of grouped features — feature-filtering" />
 
 <meta property="og:description" content="Basic rule based filtering of feature groups." />
 <meta name="twitter:card" content="summary" />
+
+
 <!-- mathjax -->
 <script src='https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
 
@@ -51,8 +56,12 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="../index.html">patRoon</a>
+      <span class="navbar-brand">
+        <a class="navbar-link" href="../index.html">patRoon</a>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.0.9000</span>
+      </span>
     </div>
+
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
@@ -67,6 +76,9 @@
 <li>
   <a href="../articles/tutorial.html">Tutorial</a>
 </li>
+<li>
+  <a href="../news/index.html">Changelog</a>
+</li>
       </ul>
       
       <ul class="nav navbar-nav navbar-right">
@@ -77,6 +89,7 @@
   </a>
 </li>
       </ul>
+      
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
@@ -84,15 +97,19 @@
       
       </header>
 
-      <div class="row">
+<div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Filtering of grouped features</h1>
+    <small class="dont-index">Source: <a href='https://github.com/rickhelmus/patRoon/blob/master/R/feature_groups-filter.R'><code>R/feature_groups-filter.R</code></a></small>
+    <div class="hidden name"><code>feature-filtering.Rd</code></div>
     </div>
 
+    <div class="ref-description">
     
     <p>Basic rule based filtering of feature groups.</p>
     
+    </div>
 
     <pre class="usage"><span class='co'># S4 method for featureGroups</span>
 <span class='fu'><a href='generics.html'>filter</a></span>(<span class='no'>obj</span>, <span class='kw'>intensityThreshold</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
@@ -106,7 +123,7 @@
 <span class='fu'>replicateGroupSubtract</span>(<span class='no'>fGroups</span>, <span class='no'>rGroups</span>,
   <span class='kw'>threshold</span> <span class='kw'>=</span> <span class='fl'>0</span>)</pre>
     
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
@@ -116,7 +133,7 @@ this step.</p></td>
     </tr>
     <tr>
       <th>relAbundance, absAbundance, interRelRGroupAbundance, interAbsRGroupAbundance</th>
-      <td><p>Minimal overal relative/absolute abundance for a feature group to be present
+      <td><p>Minimal overall relative/absolute abundance for a feature group to be present
 within all analyses/replicate groups.</p></td>
     </tr>
     <tr>
@@ -192,8 +209,8 @@ present in the given replicate groups.</p></td>
     
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <p><code><a href='featureGroups-class.html'>featureGroups-class</a></code></p>
-<p><code><a href='feature-grouping.html'>feature-grouping</a></code></p>
+    <div class='dont-index'><p><code><a href='featureGroups-class.html'>featureGroups-class</a></code></p>
+<p><code><a href='feature-grouping.html'>feature-grouping</a></code></p></div>
     
 
   </div>
@@ -223,6 +240,8 @@ present in the given replicate groups.</p></td>
 
       </footer>
    </div>
+
+  
 
   </body>
 </html>

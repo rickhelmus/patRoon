@@ -25,6 +25,9 @@
 <link href="../pkgdown.css" rel="stylesheet">
 <script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
+
+
+
 <meta property="og:title" content="Miscellaneous generics — generics" />
 
 <meta property="og:description" content="Various (S4) generic functions provide a common interface for common tasks
@@ -32,6 +35,8 @@ such as plotting and filtering data. The actual functionality and function
 arguments are often specific for the implemented methods, for this reason,
 please refer to the linked method documentation for each generic." />
 <meta name="twitter:card" content="summary" />
+
+
 <!-- mathjax -->
 <script src='https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
 
@@ -54,8 +59,12 @@ please refer to the linked method documentation for each generic." />
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="../index.html">patRoon</a>
+      <span class="navbar-brand">
+        <a class="navbar-link" href="../index.html">patRoon</a>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.0.9000</span>
+      </span>
     </div>
+
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
@@ -70,6 +79,9 @@ please refer to the linked method documentation for each generic." />
 <li>
   <a href="../articles/tutorial.html">Tutorial</a>
 </li>
+<li>
+  <a href="../news/index.html">Changelog</a>
+</li>
       </ul>
       
       <ul class="nav navbar-nav navbar-right">
@@ -80,6 +92,7 @@ please refer to the linked method documentation for each generic." />
   </a>
 </li>
       </ul>
+      
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
@@ -87,18 +100,22 @@ please refer to the linked method documentation for each generic." />
       
       </header>
 
-      <div class="row">
+<div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Miscellaneous generics</h1>
+    <small class="dont-index">Source: <a href='https://github.com/rickhelmus/patRoon/blob/master/R/generics.R'><code>R/generics.R</code></a></small>
+    <div class="hidden name"><code>generics.Rd</code></div>
     </div>
 
+    <div class="ref-description">
     
     <p>Various (S4) generic functions provide a common interface for common tasks
 such as plotting and filtering data. The actual functionality and function
 arguments are often specific for the implemented methods, for this reason,
 please refer to the linked method documentation for each generic.</p>
     
+    </div>
 
     <pre class="usage"><span class='fu'>analysisInfo</span>(<span class='no'>obj</span>)
 
@@ -122,7 +139,7 @@ please refer to the linked method documentation for each generic.</p>
 
 <span class='fu'>formulaTable</span>(<span class='no'>obj</span>)</pre>
     
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
@@ -221,6 +238,8 @@ retention time scatter plots.</p></td>
 
       </footer>
    </div>
+
+  
 
   </body>
 </html>

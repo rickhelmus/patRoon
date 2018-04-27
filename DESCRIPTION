@@ -1,7 +1,7 @@
 Package: patRoon
 Type: Package
 Title: Workflow Solutions for Mass-Spectrometry Based Non-Target Analysis
-Version: 0.1
+Version: 0.1.0.9000
 Authors@R: c(
     person("Rick", "Helmus", email = "r.helmus@uva.nl", role = c("aut", "cre")),
     person("Olaf", "Brock", role = "ctb"),

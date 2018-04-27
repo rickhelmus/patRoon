@@ -25,11 +25,16 @@
 <link href="../pkgdown.css" rel="stylesheet">
 <script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
+
+
+
 <meta property="og:title" content="Analysis information — analysis-information" />
 
 <meta property="og:description" content="Required information for analyses that should be processed and utilities to
 automatically generate this information." />
 <meta name="twitter:card" content="summary" />
+
+
 <!-- mathjax -->
 <script src='https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
 
@@ -52,8 +57,12 @@ automatically generate this information." />
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="../index.html">patRoon</a>
+      <span class="navbar-brand">
+        <a class="navbar-link" href="../index.html">patRoon</a>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.0.9000</span>
+      </span>
     </div>
+
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
@@ -68,6 +77,9 @@ automatically generate this information." />
 <li>
   <a href="../articles/tutorial.html">Tutorial</a>
 </li>
+<li>
+  <a href="../news/index.html">Changelog</a>
+</li>
       </ul>
       
       <ul class="nav navbar-nav navbar-right">
@@ -78,6 +90,7 @@ automatically generate this information." />
   </a>
 </li>
       </ul>
+      
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
@@ -85,23 +98,27 @@ automatically generate this information." />
       
       </header>
 
-      <div class="row">
+<div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Analysis information</h1>
+    <small class="dont-index">Source: <a href='https://github.com/rickhelmus/patRoon/blob/master/R/main.R'><code>R/main.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/utils.R'><code>R/utils.R</code></a></small>
+    <div class="hidden name"><code>analysis-information.Rd</code></div>
     </div>
 
+    <div class="ref-description">
     
     <p>Required information for analyses that should be processed and utilities to
 automatically generate this information.</p>
     
+    </div>
 
     <pre class="usage"><span class='fu'>generateAnalysisInfo</span>(<span class='no'>paths</span>, <span class='kw'>groups</span> <span class='kw'>=</span> <span class='st'>""</span>, <span class='kw'>refs</span> <span class='kw'>=</span> <span class='st'>""</span>,
   <span class='kw'>fileTypes</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"Bruker"</span>, <span class='st'>"mzXML"</span>, <span class='st'>"mzML"</span>))
 
 <span class='fu'>generateAnalysisInfoFromEnviMass</span>(<span class='no'>path</span>)</pre>
     
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
@@ -204,6 +221,8 @@ replicate group.</p></td>
 
       </footer>
    </div>
+
+  
 
   </body>
 </html>

@@ -18,7 +18,7 @@
 <![endif]-->
 </head>
 <body>
-    <div class="container template-vignette">
+    <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
     <div class="navbar-header">
@@ -27,8 +27,12 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="../index.html">patRoon</a>
+      <span class="navbar-brand">
+        <a class="navbar-link" href="../index.html">patRoon</a>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.0.9000</span>
+      </span>
     </div>
+
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
 <li>
@@ -42,6 +46,9 @@
 </li>
 <li>
   <a href="../articles/tutorial.html">Tutorial</a>
+</li>
+<li>
+  <a href="../news/index.html">Changelog</a>
 </li>
       </ul>
 <ul class="nav navbar-nav navbar-right">
@@ -61,17 +68,20 @@
 
       
       </header><div class="row">
-  <div class="col-md-9">
+  <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1>patRoon tutorial</h1>
                         <h4 class="author">Rick Helmus</h4>
             
-            <h4 class="date">2018-03-18</h4>
-          </div>
+            <h4 class="date">2018-04-27</h4>
+      
+      <small class="dont-index">Source: <a href="https://github.com/rickhelmus/patRoon/blob/master/vignettes/tutorial.Rmd"><code>vignettes/tutorial.Rmd</code></a></small>
+      <div class="hidden name"><code>tutorial.Rmd</code></div>
+
+    </div>
 
     
     
-<div class="contents">
 <style>
 pre, code {
     white-space: pre !important;
@@ -111,13 +121,13 @@ workPath &lt;-<span class="st"> "~/my_project"</span> <span class="co"># change 
 dataDir &lt;-<span class="st"> </span>patRoonData<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/patRoonData/topics/patRoonData">exampleDataPath</a></span>() <span class="co"># path to example data files</span></code></pre></div>
 <p>The next step is to generate information ncessary for the analysis. To do so, we need to specify the names and file locations of the analyses, to which <em>replicate group</em> they belong and which replicate group(s) should be used for blank subtraction. To do so, we can use the <code><a href="../reference/analysis-information.html">generateAnalysisInfo()</a></code> utility function which automatically generates a suitable <code>data.frame</code> for us from given analyses:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/analysis-information.html">generateAnalysisInfo</a></span>(dataDir)
-<span class="co">#&gt;                                                     path   analysis      group ref</span>
-<span class="co">#&gt; 1 C:/Program Files/R/R-3.4.3/library/patRoonData/extdata  solvent-1  solvent-1    </span>
-<span class="co">#&gt; 2 C:/Program Files/R/R-3.4.3/library/patRoonData/extdata  solvent-2  solvent-2    </span>
-<span class="co">#&gt; 3 C:/Program Files/R/R-3.4.3/library/patRoonData/extdata  solvent-3  solvent-3    </span>
-<span class="co">#&gt; 4 C:/Program Files/R/R-3.4.3/library/patRoonData/extdata standard-1 standard-1    </span>
-<span class="co">#&gt; 5 C:/Program Files/R/R-3.4.3/library/patRoonData/extdata standard-2 standard-2    </span>
-<span class="co">#&gt; 6 C:/Program Files/R/R-3.4.3/library/patRoonData/extdata standard-3 standard-3</span></code></pre></div>
+<span class="co">#&gt;                                                                 path   analysis      group ref</span>
+<span class="co">#&gt; 1 /home/rick/R/x86_64-suse-linux-gnu-library/3.5/patRoonData/extdata  solvent-1  solvent-1    </span>
+<span class="co">#&gt; 2 /home/rick/R/x86_64-suse-linux-gnu-library/3.5/patRoonData/extdata  solvent-2  solvent-2    </span>
+<span class="co">#&gt; 3 /home/rick/R/x86_64-suse-linux-gnu-library/3.5/patRoonData/extdata  solvent-3  solvent-3    </span>
+<span class="co">#&gt; 4 /home/rick/R/x86_64-suse-linux-gnu-library/3.5/patRoonData/extdata standard-1 standard-1    </span>
+<span class="co">#&gt; 5 /home/rick/R/x86_64-suse-linux-gnu-library/3.5/patRoonData/extdata standard-2 standard-2    </span>
+<span class="co">#&gt; 6 /home/rick/R/x86_64-suse-linux-gnu-library/3.5/patRoonData/extdata standard-3 standard-3</span></code></pre></div>
 <p>As you can see the generated <code>data.frame</code> consists of four columns:</p>
 <ul>
 <li>
@@ -135,13 +145,13 @@ dataDir &lt;-<span class="st"> </span>patRoonData<span class="op">::</span><span
                                 <span class="dt">groups =</span> <span class="kw">c</span>(<span class="kw">rep</span>(<span class="st">"solvent"</span>, <span class="dv">3</span>), <span class="kw">rep</span>(<span class="st">"standard"</span>, <span class="dv">3</span>)),
                                 <span class="dt">refs =</span> <span class="st">"solvent"</span>)
 anaInfo
-<span class="co">#&gt;                                                     path   analysis    group     ref</span>
-<span class="co">#&gt; 1 C:/Program Files/R/R-3.4.3/library/patRoonData/extdata  solvent-1  solvent solvent</span>
-<span class="co">#&gt; 2 C:/Program Files/R/R-3.4.3/library/patRoonData/extdata  solvent-2  solvent solvent</span>
-<span class="co">#&gt; 3 C:/Program Files/R/R-3.4.3/library/patRoonData/extdata  solvent-3  solvent solvent</span>
-<span class="co">#&gt; 4 C:/Program Files/R/R-3.4.3/library/patRoonData/extdata standard-1 standard solvent</span>
-<span class="co">#&gt; 5 C:/Program Files/R/R-3.4.3/library/patRoonData/extdata standard-2 standard solvent</span>
-<span class="co">#&gt; 6 C:/Program Files/R/R-3.4.3/library/patRoonData/extdata standard-3 standard solvent</span></code></pre></div>
+<span class="co">#&gt;                                                                 path   analysis    group     ref</span>
+<span class="co">#&gt; 1 /home/rick/R/x86_64-suse-linux-gnu-library/3.5/patRoonData/extdata  solvent-1  solvent solvent</span>
+<span class="co">#&gt; 2 /home/rick/R/x86_64-suse-linux-gnu-library/3.5/patRoonData/extdata  solvent-2  solvent solvent</span>
+<span class="co">#&gt; 3 /home/rick/R/x86_64-suse-linux-gnu-library/3.5/patRoonData/extdata  solvent-3  solvent solvent</span>
+<span class="co">#&gt; 4 /home/rick/R/x86_64-suse-linux-gnu-library/3.5/patRoonData/extdata standard-1 standard solvent</span>
+<span class="co">#&gt; 5 /home/rick/R/x86_64-suse-linux-gnu-library/3.5/patRoonData/extdata standard-2 standard solvent</span>
+<span class="co">#&gt; 6 /home/rick/R/x86_64-suse-linux-gnu-library/3.5/patRoonData/extdata standard-3 standard solvent</span></code></pre></div>
 <p>Note that we set the reference for the solvents to themself. This will remove any features from the solvents, which is generally fine as we are usually not interested in the blanks anyway.</p>
 <p>Depending on your preference, it may be preferred to export the <code>data.frame</code> to a <em>.csv</em> file for larger project so it can be easily edited, for instance, with graphical tools such as Excel. Alternatively, the <code><a href="../reference/GUI-utils.html">newProject()</a></code> function can be used to make this process even easier (briefly discussed <a href="#newProject">here</a>).</p>
 </div>
@@ -159,7 +169,7 @@ anaInfo
 <span class="co">#&gt; Analyses: solvent-1, solvent-2, solvent-3, standard-1, standard-2, standard-3 (6 total)</span>
 <span class="co">#&gt; Replicate groups: solvent, standard (2 total)</span>
 <span class="co">#&gt; Replicate groups used as ref: solvent (1 total)</span>
-<span class="co">#&gt; Object size (indication): 401.6 kB</span></code></pre></div>
+<span class="co">#&gt; Object size (indication): 424.9 kB</span></code></pre></div>
 <p>After some processing time (especially for larger datasets), the next step is to <em>group features</em>. During this step, features from different analysis are grouped by alignment of their retention times and <em>m/z</em> data. This alignment is necessary because it is common that instrumental error will result in (slight) variations for these data between analyses.</p>
 <p>To group features the <code><a href="../reference/feature-grouping.html">groupFeatures()</a></code> function is used, which has similar argument requirements as <code>findFeatures</code> and many more options to tune the process.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fGroups &lt;-<span class="st"> </span><span class="kw"><a href="../reference/feature-grouping.html">groupFeatures</a></span>(fList, <span class="st">"openms"</span>)
@@ -169,7 +179,7 @@ fGroups
 <span class="co">#&gt; Analyses: solvent-1, solvent-2, solvent-3, standard-1, standard-2, standard-3 (6 total)</span>
 <span class="co">#&gt; Replicate groups: solvent, standard (2 total)</span>
 <span class="co">#&gt; Replicate groups used as ref: solvent (1 total)</span>
-<span class="co">#&gt; Object size (indication): 744.5 kB</span></code></pre></div>
+<span class="co">#&gt; Object size (indication): 804 kB</span></code></pre></div>
 <p>The <code><a href="../reference/featureGroups-class.html">groupTable()</a></code> function can be used to have a look at generated feature groups and their intensities (<em>i.e.</em> peak heights) across all analyses:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(<span class="kw"><a href="../reference/featureGroups-class.html">groupTable</a></span>(fGroups))
 <span class="co">#&gt;         group        ret       mz solvent-1 solvent-2 solvent-3 standard-1 standard-2 standard-3</span>
@@ -221,7 +231,7 @@ fGroups
 <span class="co">#&gt; Average peak count/analysis: 6572 (MS: 5714 - MS/MS: 858)</span>
 <span class="co">#&gt; Total peak lists: 171 (MS: 87 - MS/MS: 84)</span>
 <span class="co">#&gt; Average peak lists/analysis: 57 (MS: 29 - MS/MS: 28)</span>
-<span class="co">#&gt; Object size (indication): 565.8 kB</span></code></pre></div>
+<span class="co">#&gt; Object size (indication): 587.1 kB</span></code></pre></div>
 </div>
 <div id="formula-calculation" class="section level2">
 <h2 class="hasAnchor">
@@ -238,7 +248,7 @@ formulas
 <span class="co">#&gt; Algorithm: GenForm</span>
 <span class="co">#&gt; Total formula count: 246 (all), 41 (MS) and 205 (MS/MS)</span>
 <span class="co">#&gt; Average formulas per feature group: 18.3 (all), 11.6 (MS), 19.6 (MS/MS)</span>
-<span class="co">#&gt; Object size (indication): 75.8 kB</span></code></pre></div>
+<span class="co">#&gt; Object size (indication): 80.3 kB</span></code></pre></div>
 </div>
 <div id="compound-identification" class="section level2">
 <h2 class="hasAnchor">
@@ -257,12 +267,12 @@ formulas
 <span class="co">#&gt; Algorithm: MetFrag</span>
 <span class="co">#&gt; Number of feature groups with compounds in this object: 23</span>
 <span class="co">#&gt; Number of compounds: 559 (total), 24.3 (mean), 9 - 25 (min - max)</span>
-<span class="co">#&gt; Object size (indication): 1.7 MB</span>
+<span class="co">#&gt; Object size (indication): 1.8 MB</span>
 <span class="kw"><a href="../reference/generics.html">plotSpec</a></span>(compounds, <span class="dv">1</span>, <span class="st">"M120_R328_91"</span>, plists)</code></pre></div>
 <p><img src="tutorial_files/figure-html/unnamed-chunk-7-1.png" width="384"></p>
 <p>While <code><a href="../reference/compound-generation.html">generateCompounds()</a></code> is running a list of candidate compound structures will be downloaded for every feature group (in this case from PubChem) and ranked according to various scoring parameters.</p>
 <p>As with previous described workfow functions, there are many different arguments that can specified to modify the behaviour when generating compounds. In brief, here we limit the number to the top 25 candidates (this will save a lot of processing time), specify that we are primarily interested in protonated ions and use the extended PubChem database so that we can score on number of patents and PubMed references along with scoring for similarity to in-silico generated MS/MS spectra (<code>FragmenterScore</code>) and MassBank derived mass spectra (<code>OfflineMetFusionScore</code>).</p>
-<p>As a side note: this is often one of the most time consuming steps during the workflow. For this reason, and in order to not ‘abuse’ the server used by MetFrag, you should always take care to prioritie your data before running this function.</p>
+<p>As a side note: this is often one of the most time consuming steps during the workflow. For this reason, and in order to not ‘abuse’ the server used by MetFrag, you should always take care to prioritize your data before running this function.</p>
 <p>In the previous step we generated candidate formulas for all feature groups. These can be used to add yet another scoring parameter so we can assess if the formula part of a candidate structure makes sense:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">compounds &lt;-<span class="st"> </span><span class="kw"><a href="../reference/compounds-class.html">addFormulaScoring</a></span>(compounds, formulas, <span class="dt">updateScore =</span> <span class="ot">TRUE</span>)</code></pre></div>
 </div>
@@ -277,7 +287,7 @@ formulas
 <span class="co">#&gt; Algorithm: CAMERA</span>
 <span class="co">#&gt; Components: CMP1, CMP2, CMP3, CMP4, CMP5, CMP6, ... (20 total)</span>
 <span class="co">#&gt; Number of feature groups in components: 29 (total), 1.4 (mean), 1 - 3 (min - max)</span>
-<span class="co">#&gt; Object size (indication): 512.9 kB</span>
+<span class="co">#&gt; Object size (indication): 524.6 kB</span>
 <span class="kw"><a href="../reference/generics.html">plotSpec</a></span>(components, <span class="st">"CMP17"</span>)</code></pre></div>
 <p><img src="tutorial_files/figure-html/unnamed-chunk-9-1.png" width="480"></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/generics.html">plotEIC</a></span>(components, <span class="st">"CMP17"</span>, fGroups)</code></pre></div>
@@ -345,7 +355,6 @@ formulas
 <a href="#caching" class="anchor"></a>caching</h3>
 </div>
 </div>
-</div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
@@ -382,6 +391,8 @@ formulas
 
       </footer>
 </div>
+
+  
 
   </body>
 </html>

@@ -13,6 +13,8 @@ navbar:
         href: reference/index.html
       - text: Tutorial
         href: articles/tutorial.html
+      - text: Changelog
+        href: news/index.html
         
     right:
       - icon: fa-github fa-lg

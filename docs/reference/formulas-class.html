@@ -25,10 +25,15 @@
 <link href="../pkgdown.css" rel="stylesheet">
 <script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
+
+
+
 <meta property="og:title" content="Formula lists class — formulas-class" />
 
 <meta property="og:description" content="Contains data of generated chemical formulae for given feature groups." />
 <meta name="twitter:card" content="summary" />
+
+
 <!-- mathjax -->
 <script src='https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
 
@@ -51,8 +56,12 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="../index.html">patRoon</a>
+      <span class="navbar-brand">
+        <a class="navbar-link" href="../index.html">patRoon</a>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.0.9000</span>
+      </span>
     </div>
+
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
@@ -67,6 +76,9 @@
 <li>
   <a href="../articles/tutorial.html">Tutorial</a>
 </li>
+<li>
+  <a href="../news/index.html">Changelog</a>
+</li>
       </ul>
       
       <ul class="nav navbar-nav navbar-right">
@@ -77,6 +89,7 @@
   </a>
 </li>
       </ul>
+      
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
@@ -84,15 +97,19 @@
       
       </header>
 
-      <div class="row">
+<div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Formula lists class</h1>
+    <small class="dont-index">Source: <a href='https://github.com/rickhelmus/patRoon/blob/master/R/formulas.R'><code>R/formulas.R</code></a></small>
+    <div class="hidden name"><code>formulas-class.Rd</code></div>
     </div>
 
+    <div class="ref-description">
     
     <p>Contains data of generated chemical formulae for given feature groups.</p>
     
+    </div>
 
     <pre class="usage"><span class='co'># S4 method for formulas</span>
 <span class='fu'><a href='generics.html'>formulaTable</a></span>(<span class='no'>obj</span>)
@@ -112,7 +129,7 @@
   <span class='kw'>minIntensity</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>maxIntensity</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>minPreferredFormulas</span> <span class='kw'>=</span> <span class='fl'>1</span>,
   <span class='kw'>minPreferredIntensity</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>elements</span> <span class='kw'>=</span> <span class='fu'>c</span>(), <span class='kw'>fragElements</span> <span class='kw'>=</span> <span class='fu'>c</span>())</pre>
     
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
@@ -249,6 +266,8 @@ the <code>algorithm</code> method for access.</p></dd>
 
       </footer>
    </div>
+
+  
 
   </body>
 </html>

@@ -33,8 +33,12 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="index.html">patRoon</a>
+      <span class="navbar-brand">
+        <a class="navbar-link" href="index.html">patRoon</a>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.0.9000</span>
+      </span>
     </div>
+
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
 <li>
@@ -48,6 +52,9 @@
 </li>
 <li>
   <a href="articles/tutorial.html">Tutorial</a>
+</li>
+<li>
+  <a href="news/index.html">Changelog</a>
 </li>
       </ul>
 <ul class="nav navbar-nav navbar-right">
@@ -71,6 +78,7 @@
     <div id="patroon" class="section level1">
 <div class="page-header"><h1 class="hasAnchor">
 <a href="#patroon" class="anchor"></a>patRoon</h1></div>
+
 <p><code>patRoon</code> aims to provide a common interface to various (primarily open-source) software solutions for mass spectrometry based non-target analysis. The name is derived from a Dutch word that means <em>pattern</em> and may also be an acronym for <em>hyPhenated mAss specTROmetry nOn-target aNalysis</em>.</p>
 <p>Mass spectrometry based non-target analysis is used to screen large numbers of chemicals simultaneously. For this purpose, high resolution mass spectrometry instruments are used which are typically coupled (or <em>hyphenated</em>) with chromatography (<em>e.g.</em> LC or GC) to provide additional separation of analytes prior to mass detection. The size and complexity of resulting data makes manual processing impractical, however, many dedicated software tools were developed (and are generally still in active development) to facilitate a more automated approach. The aim of <code>patRoon</code> is to harmonize the many tools available to provide a consistent user interface without the need to know all the details of each individual software tool and remove the need for tedious conversion of data when multiple tools are used. Many of the available tools were developed using the <a href="https://www.r-project.org/">R language</a> or otherwise easily interface with <code>R</code>, hence, it was a straightforward decision to develop <code>patRoon</code> as an <code>R</code> package.</p>
 <p>The workflow of non-target analysis is typically highly dependent on several factors such as the analytical instrumentation used and requirements of the study. For this reason, <code>patRoon</code> does not enforce a certain workflow. Instead, most workflow steps are optional, are highly configurable and algorithms can easily be mixed or even combined.</p>
@@ -100,7 +108,7 @@
 <li>
 <code>data.table</code> is used internally as a generally much more efficient alternative to <code>data.frame</code>.</li>
 <li>The <a href="https://github.com/r-lib/processx">processx</a> R package is used to execute command line processes in parallel to reduce computation times.</li>
-<li>Results from workflow steps are cached within a [sqlite] database to avoid repeated computations.</li>
+<li>Results from workflow steps are cached within a <a href="https://www.sqlite.org/index.html">SQLite</a> database to avoid repeated computations.</li>
 <li>The <a href="http://www.omegahat.net/RDCOMClient/">RDCOMClient</a> is used to provide several functionalities from DataAnalysis (Bruker).</li>
 <li>Depending on which software algorithms, the following MS data formats are supported: <code>mzXML</code>, <code>mzML</code> and <code>.d</code> (Bruker).</li>
 <li>The <a href="https://shiny.rstudio.com/">Shiny</a> R package was used to implement several GUI tools.</li>
@@ -170,20 +178,37 @@ remotes<span class="op">::</span><span class="kw">install_github</span>(<span cl
   </div>
 
   <div class="col-md-3" id="sidebar">
-    <h2>Links</h2>
+    <div class="links">
+<h2>Links</h2>
 <ul class="list-unstyled">
 <li>Browse source code at <br><a href="https://github.com/rickhelmus/patRoon">https://​github.com/​rickhelmus/​patRoon</a>
 </li>
 <li>Report a bug at <br><a href="https://github.com/rickhelmus/patRoon/issues">https://​github.com/​rickhelmus/​patRoon/​issues</a>
 </li>
 </ul>
+</div>
+<div class="license">
 <h2>License</h2>
-<p><a href="https://www.r-project.org/Licenses/GPL-3">GPL-3</a></p>
+<ul class="list-unstyled">
+<li><a href="https://www.r-project.org/Licenses/GPL-3">GPL-3</a></li>
+</ul>
+</div>
+<div class="developers">
 <h2>Developers</h2>
 <ul class="list-unstyled">
 <li>Rick Helmus <br><small class="roles"> Author, maintainer </small>  </li>
 <li><a href="authors.html">All authors...</a></li>
 </ul>
+</div>
+
+  <div class="dev-status">
+<h2>Dev status</h2>
+<ul class="list-unstyled">
+<li><a href="https://circleci.com/gh/rickhelmus/patRoon"><img src="https://circleci.com/gh/rickhelmus/patRoon.svg?style=svg" alt="CircleCI"></a></li>
+<li><a href="https://ci.appveyor.com/project/rickhelmus/patroon/branch/master"><img src="https://ci.appveyor.com/api/projects/status/52nnpq8kqpkjqc92/branch/master?svg=true" alt="Build status"></a></li>
+<li><a href="https://codecov.io/gh/rickhelmus/patRoon"><img src="https://codecov.io/gh/rickhelmus/patRoon/branch/master/graph/badge.svg" alt="codecov"></a></li>
+</ul>
+</div>
 </div>
 </div>
 
@@ -198,6 +223,8 @@ remotes<span class="op">::</span><span class="kw">install_github</span>(<span cl
 
       </footer>
 </div>
+
+  
 
   </body>
 </html>

@@ -25,7 +25,12 @@
 <link href="../pkgdown.css" rel="stylesheet">
 <script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
+
+
+
 <meta property="og:title" content="Function reference" />
+
+
 <!-- mathjax -->
 <script src='https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
 
@@ -48,8 +53,12 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="../index.html">patRoon</a>
+      <span class="navbar-brand">
+        <a class="navbar-link" href="../index.html">patRoon</a>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.0.9000</span>
+      </span>
     </div>
+
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
@@ -64,6 +73,9 @@
 <li>
   <a href="../articles/tutorial.html">Tutorial</a>
 </li>
+<li>
+  <a href="../news/index.html">Changelog</a>
+</li>
       </ul>
       
       <ul class="nav navbar-nav navbar-right">
@@ -74,6 +86,7 @@
   </a>
 </li>
       </ul>
+      
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
@@ -81,214 +94,209 @@
       
       </header>
 
-      <div class="row">
-  <div class="col-md-9">
+<div class="row">
+  <div class="contents col-md-9">
     <div class="page-header">
-      <h1>
-        Reference
-        <small>version&nbsp;0.1</small>
-      </h1>
+      <h1>Reference</h1>
     </div>
 
-    <div class="contents">
-      <table class="ref-index">
+    <table class="ref-index">
 
-      <colgroup>
-        <col class="alias" />
-        <col class="title" />
-      </colgroup>
+    <colgroup>
+      <col class="alias" />
+      <col class="title" />
+    </colgroup>
 
-      <tbody>
-        <tr>
-          <th colspan="2">
-            <h2 id="section-all-functions" class="hasAnchor"><a href="#section-all-functions" class="anchor"></a>All functions</h2>
-            <p class="section-desc"></p>
-          </th>
-        </tr>
-        <tr>
-          <!--  -->
-          <td>
-            <p><code><a href="analysis-information.html">generateAnalysisInfo</a></code> <code><a href="analysis-information.html">generateAnalysisInfoFromEnviMass</a></code> </p>
-          </td>
-          <td><p>Analysis information</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="bruker-utils.html">showDataAnalysis</a></code> <code><a href="bruker-utils.html">setDAMethod</a></code> <code><a href="bruker-utils.html">recalibrarateDAFiles</a></code> <code><a href="bruker-utils.html">getDACalibrationError</a></code> <code><a href="bruker-utils.html">exportDAFiles</a></code> <code><a href="bruker-utils.html">addDAEIC</a></code> </p>
-          </td>
-          <td><p>Bruker DataAnalysis utilities</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="clearCache.html">clearCache</a></code> </p>
-          </td>
-          <td><p>Clearing of cached data</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="clusterInfo-class.html">length</a></code> <code><a href="clusterInfo-class.html">show</a></code> <code><a href="clusterInfo-class.html">clusterProperties</a></code> </p>
-          </td>
-          <td><p>Hierarchical clustering information</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="component-generation.html">generateComponents</a></code> <code><a href="component-generation.html">generateComponentsCAMERA</a></code> <code><a href="component-generation.html">generateComponentsNontarget</a></code> <code><a href="component-generation.html">generateComponentsRAMClustR</a></code> </p>
-          </td>
-          <td><p>Grouping feature groups in components</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="components-class.html">componentTable</a></code> <code><a href="components-class.html">componentInfo</a></code> <code><a href="components-class.html">algorithm</a></code> <code><a href="components-class.html">length</a></code> <code><a href="components-class.html">names</a></code> <code><a href="components-class.html">show</a></code> <code><a href="components-class.html">findFGroup</a></code> <code><a href="components-class.html">plotSpec</a></code> <code><a href="components-class.html">plotEIC</a></code> <code><a href="components-class.html">consensus</a></code> </p>
-          </td>
-          <td><p>Component class</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="compound-generation.html">generateCompounds</a></code> <code><a href="compound-generation.html">generateCompoundsMetfrag</a></code> <code><a href="compound-generation.html">generateCompoundsSirius</a></code> </p>
-          </td>
-          <td><p>Automatic compound identification</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="compounds-class.html">compoundTable</a></code> <code><a href="compounds-class.html">algorithm</a></code> <code><a href="compounds-class.html">length</a></code> <code><a href="compounds-class.html">show</a></code> <code><a href="compounds-class.html">identifiers</a></code> <code><a href="compounds-class.html">filter</a></code> <code><a href="compounds-class.html">addFormulaScoring</a></code> <code><a href="compounds-class.html">plotStructure</a></code> <code><a href="compounds-class.html">plotScores</a></code> <code><a href="compounds-class.html">plotSpec</a></code> <code><a href="compounds-class.html">consensus</a></code> </p>
-          </td>
-          <td><p>Compound lists class</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="convertMSFiles.html">convertMSFiles</a></code> </p>
-          </td>
-          <td><p>Conversion of analyses between several open formats</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="createCOMReference.html">createCOMReference</a></code> </p>
-          </td>
-          <td><p>Internal fix for <span class="pkg">RDCOMClient</span>, ignore.</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="feature-filtering.html">filter</a></code> <code><a href="feature-filtering.html">replicateGroupSubtract</a></code> </p>
-          </td>
-          <td><p>Filtering of grouped features</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="feature-finding.html">findFeatures</a></code> <code><a href="feature-finding.html">findFeaturesBruker</a></code> <code><a href="feature-finding.html">findFeaturesEnviPick</a></code> <code><a href="feature-finding.html">importFeaturesEnviMass</a></code> <code><a href="feature-finding.html">findFeaturesOpenMS</a></code> <code><a href="feature-finding.html">findFeaturesXCMS</a></code> <code><a href="feature-finding.html">importFeaturesXCMS</a></code> </p>
-          </td>
-          <td><p>Finding features</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="feature-grouping.html">groupFeatures</a></code> <code><a href="feature-grouping.html">importFeatureGroups</a></code> <code><a href="feature-grouping.html">importFeatureGroupsBrukerPA</a></code> <code><a href="feature-grouping.html">importFeatureGroupsEnviMass</a></code> <code><a href="feature-grouping.html">groupFeaturesOpenMS</a></code> <code><a href="feature-grouping.html">groupFeaturesXCMS</a></code> <code><a href="feature-grouping.html">importFeatureGroupsXCMS</a></code> </p>
-          </td>
-          <td><p>Grouping of features</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="featureGroups-class.html">featureGroups-class</a></code> </p>
-          </td>
-          <td><p>Base class for grouped features.</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="featureGroups-compare.html">comparison</a></code> <code><a href="featureGroups-compare.html">plot</a></code> <code><a href="featureGroups-compare.html">plotVenn</a></code> <code><a href="featureGroups-compare.html">plotChord</a></code> <code><a href="featureGroups-compare.html">consensus</a></code> <code><a href="featureGroups-compare.html">unique</a></code> </p>
-          </td>
-          <td><p>Comparing feature groups</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="featureGroupsComparison-class.html">featureGroupsComparison-class</a></code> </p>
-          </td>
-          <td><p>Feature groups comparison class</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="features-class.html">length</a></code> <code><a href="features-class.html">show</a></code> <code><a href="features-class.html">featureTable</a></code> <code><a href="features-class.html">analysisInfo</a></code> </p>
-          </td>
-          <td><p>Base features class</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="formula-generation.html">generateFormulas</a></code> <code><a href="formula-generation.html">generateFormulasDA</a></code> <code><a href="formula-generation.html">generateFormulasGenForm</a></code> <code><a href="formula-generation.html">generateFormulasSirius</a></code> </p>
-          </td>
-          <td><p>Automatic chemical formula generation</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="formulaConsensus-class.html">formulaTable</a></code> <code><a href="formulaConsensus-class.html">algorithm</a></code> <code><a href="formulaConsensus-class.html">length</a></code> <code><a href="formulaConsensus-class.html">show</a></code> <code><a href="formulaConsensus-class.html">plotSpec</a></code> </p>
-          </td>
-          <td><p>Formula consensus class</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="formulas-class.html">formulaTable</a></code> <code><a href="formulas-class.html">algorithm</a></code> <code><a href="formulas-class.html">length</a></code> <code><a href="formulas-class.html">show</a></code> <code><a href="formulas-class.html">consensus</a></code> </p>
-          </td>
-          <td><p>Formula lists class</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="generics.html">analysisInfo</a></code> <code><a href="generics.html">featureTable</a></code> <code><a href="generics.html">algorithm</a></code> <code><a href="generics.html">filter</a></code> <code><a href="generics.html">plotInt</a></code> <code><a href="generics.html">plotVenn</a></code> <code><a href="generics.html">plotChord</a></code> <code><a href="generics.html">plotSpec</a></code> <code><a href="generics.html">plotEIC</a></code> <code><a href="generics.html">consensus</a></code> <code><a href="generics.html">formulaTable</a></code> </p>
-          </td>
-          <td><p>Miscellaneous generics</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="getXcmsSet.html">getXcmsSet</a></code> </p>
-          </td>
-          <td><p>Conversion to xcmsSet objects</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="GUI-utils.html">checkChromatograms</a></code> <code><a href="GUI-utils.html">compoundViewer</a></code> <code><a href="GUI-utils.html">newProject</a></code> </p>
-          </td>
-          <td><p>Interactive GUI utilities</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="h-cluster.html">makeHCluster</a></code> <code><a href="h-cluster.html">hClusterFilter</a></code> <code><a href="h-cluster.html">drawHeatMap</a></code> <code><a href="h-cluster.html">getSilhouetteInfo</a></code> <code><a href="h-cluster.html">plotInt</a></code> <code><a href="h-cluster.html">plot</a></code> </p>
-          </td>
-          <td><p>Hierarchical clustering of feature groups</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="MSPeakLists-class.html">peakLists</a></code> <code><a href="MSPeakLists-class.html">algorithm</a></code> <code><a href="MSPeakLists-class.html">length</a></code> <code><a href="MSPeakLists-class.html">show</a></code> <code><a href="MSPeakLists-class.html">filter</a></code> </p>
-          </td>
-          <td><p>Class containing MS Peak Lists</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="MSPeakLists-generation.html">generateMSPeakLists</a></code> <code><a href="MSPeakLists-generation.html">generateDAMSPeakLists</a></code> <code><a href="MSPeakLists-generation.html">generateDAFMFMSPeakLists</a></code> <code><a href="MSPeakLists-generation.html">generateMzRPeakLists</a></code> </p>
-          </td>
-          <td><p>Generation of MS Peak Lists</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="patRoon-package.html">patRoon-package</a></code> </p>
-          </td>
-          <td><p>Workflow solutions for mass-spectrometry based non-target analysis.</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="reporting.html">reportCSV</a></code> <code><a href="reporting.html">reportPDF</a></code> <code><a href="reporting.html">reportMD</a></code> </p>
-          </td>
-          <td><p>Report feature group data</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="silhouetteInfo-class.html">silhouetteInfo-class</a></code> </p>
-          </td>
-          <td><p>Silhouette information</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="target-screening.html">screenTargets</a></code> <code><a href="target-screening.html">groupFeaturesScreening</a></code> <code><a href="target-screening.html">importFeatureGroupsBrukerTASQ</a></code> </p>
-          </td>
-          <td><p>Target and suspect screening</p></td>
-        </tr>
-      </tbody>
-      </table>
-    </div>
+    <tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-all-functions" class="hasAnchor"><a href="#section-all-functions" class="anchor"></a>All functions</h2>
+          <p class="section-desc"></p>
+        </th>
+      </tr>
+      <tr>
+        <!--  -->
+        <td>
+          <p><code><a href="GUI-utils.html">checkChromatograms(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="GUI-utils.html">compoundViewer(<i>&lt;featureGroups&gt;</i>,<i>&lt;MSPeakLists&gt;</i>,<i>&lt;compounds&gt;</i>)</a></code> <code><a href="GUI-utils.html">newProject()</a></code> </p>
+        </td>
+        <td><p>Interactive GUI utilities</p></td>
+      </tr><tr>
+        <!--  -->
+        <td>
+          <p><code><a href="MSPeakLists-class.html">peakLists(<i>&lt;MSPeakLists&gt;</i>)</a></code> <code><a href="MSPeakLists-class.html">algorithm(<i>&lt;MSPeakLists&gt;</i>)</a></code> <code><a href="MSPeakLists-class.html">length(<i>&lt;MSPeakLists&gt;</i>)</a></code> <code><a href="MSPeakLists-class.html">show(<i>&lt;MSPeakLists&gt;</i>)</a></code> <code><a href="MSPeakLists-class.html">filter(<i>&lt;MSPeakLists&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Class containing MS Peak Lists</p></td>
+      </tr><tr>
+        <!--  -->
+        <td>
+          <p><code><a href="MSPeakLists-generation.html">generateMSPeakLists(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="MSPeakLists-generation.html">generateDAMSPeakLists()</a></code> <code><a href="MSPeakLists-generation.html">generateDAFMFMSPeakLists()</a></code> <code><a href="MSPeakLists-generation.html">generateMzRPeakLists()</a></code> </p>
+        </td>
+        <td><p>Generation of MS Peak Lists</p></td>
+      </tr><tr>
+        <!--  -->
+        <td>
+          <p><code><a href="analysis-information.html">generateAnalysisInfo()</a></code> <code><a href="analysis-information.html">generateAnalysisInfoFromEnviMass()</a></code> </p>
+        </td>
+        <td><p>Analysis information</p></td>
+      </tr><tr>
+        <!--  -->
+        <td>
+          <p><code><a href="bruker-utils.html">showDataAnalysis()</a></code> <code><a href="bruker-utils.html">setDAMethod()</a></code> <code><a href="bruker-utils.html">recalibrarateDAFiles()</a></code> <code><a href="bruker-utils.html">getDACalibrationError()</a></code> <code><a href="bruker-utils.html">exportDAFiles()</a></code> <code><a href="bruker-utils.html">addDAEIC()</a></code> </p>
+        </td>
+        <td><p>Bruker DataAnalysis utilities</p></td>
+      </tr><tr>
+        <!--  -->
+        <td>
+          <p><code><a href="clearCache.html">clearCache()</a></code> </p>
+        </td>
+        <td><p>Clearing of cached data</p></td>
+      </tr><tr>
+        <!--  -->
+        <td>
+          <p><code><a href="clusterInfo-class.html">length(<i>&lt;clusterInfo&gt;</i>)</a></code> <code><a href="clusterInfo-class.html">show(<i>&lt;clusterInfo&gt;</i>)</a></code> <code><a href="clusterInfo-class.html">clusterProperties(<i>&lt;clusterInfo&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Hierarchical clustering information</p></td>
+      </tr><tr>
+        <!--  -->
+        <td>
+          <p><code><a href="component-generation.html">generateComponents(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="component-generation.html">generateComponentsCAMERA()</a></code> <code><a href="component-generation.html">generateComponentsNontarget()</a></code> <code><a href="component-generation.html">generateComponentsRAMClustR()</a></code> </p>
+        </td>
+        <td><p>Grouping feature groups in components</p></td>
+      </tr><tr>
+        <!--  -->
+        <td>
+          <p><code><a href="components-class.html">componentTable(<i>&lt;components&gt;</i>)</a></code> <code><a href="components-class.html">componentInfo(<i>&lt;components&gt;</i>)</a></code> <code><a href="components-class.html">algorithm(<i>&lt;components&gt;</i>)</a></code> <code><a href="components-class.html">length(<i>&lt;components&gt;</i>)</a></code> <code><a href="components-class.html">names(<i>&lt;components&gt;</i>)</a></code> <code><a href="components-class.html">show(<i>&lt;components&gt;</i>)</a></code> <code><a href="components-class.html">findFGroup(<i>&lt;components&gt;</i>)</a></code> <code><a href="components-class.html">plotSpec(<i>&lt;components&gt;</i>)</a></code> <code><a href="components-class.html">plotEIC(<i>&lt;components&gt;</i>)</a></code> <code><a href="components-class.html">consensus(<i>&lt;components&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Component class</p></td>
+      </tr><tr>
+        <!--  -->
+        <td>
+          <p><code><a href="compound-generation.html">generateCompounds(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="compound-generation.html">generateCompoundsMetfrag()</a></code> <code><a href="compound-generation.html">generateCompoundsSirius()</a></code> </p>
+        </td>
+        <td><p>Automatic compound identification</p></td>
+      </tr><tr>
+        <!--  -->
+        <td>
+          <p><code><a href="compounds-class.html">compoundTable(<i>&lt;compounds&gt;</i>)</a></code> <code><a href="compounds-class.html">algorithm(<i>&lt;compounds&gt;</i>)</a></code> <code><a href="compounds-class.html">length(<i>&lt;compounds&gt;</i>)</a></code> <code><a href="compounds-class.html">show(<i>&lt;compounds&gt;</i>)</a></code> <code><a href="compounds-class.html">identifiers(<i>&lt;compounds&gt;</i>)</a></code> <code><a href="compounds-class.html">filter(<i>&lt;compounds&gt;</i>)</a></code> <code><a href="compounds-class.html">addFormulaScoring(<i>&lt;compounds&gt;</i>)</a></code> <code><a href="compounds-class.html">plotStructure(<i>&lt;compounds&gt;</i>)</a></code> <code><a href="compounds-class.html">plotScores(<i>&lt;compounds&gt;</i>)</a></code> <code><a href="compounds-class.html">plotSpec(<i>&lt;compounds&gt;</i>)</a></code> <code><a href="compounds-class.html">consensus(<i>&lt;compounds&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Compound lists class</p></td>
+      </tr><tr>
+        <!--  -->
+        <td>
+          <p><code><a href="convertMSFiles.html">convertMSFiles()</a></code> </p>
+        </td>
+        <td><p>Conversion of analyses between several open formats</p></td>
+      </tr><tr>
+        <!--  -->
+        <td>
+          <p><code><a href="createCOMReference.html">createCOMReference()</a></code> </p>
+        </td>
+        <td><p>Internal fix for <span class="pkg">RDCOMClient</span>, ignore.</p></td>
+      </tr><tr>
+        <!--  -->
+        <td>
+          <p><code><a href="feature-filtering.html">filter(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="feature-filtering.html">replicateGroupSubtract(<i>&lt;featureGroups&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Filtering of grouped features</p></td>
+      </tr><tr>
+        <!--  -->
+        <td>
+          <p><code><a href="feature-finding.html">findFeatures()</a></code> <code><a href="feature-finding.html">findFeaturesBruker()</a></code> <code><a href="feature-finding.html">findFeaturesEnviPick()</a></code> <code><a href="feature-finding.html">importFeaturesEnviMass()</a></code> <code><a href="feature-finding.html">findFeaturesOpenMS()</a></code> <code><a href="feature-finding.html">findFeaturesXCMS()</a></code> <code><a href="feature-finding.html">importFeaturesXCMS()</a></code> </p>
+        </td>
+        <td><p>Finding features</p></td>
+      </tr><tr>
+        <!--  -->
+        <td>
+          <p><code><a href="feature-grouping.html">groupFeatures(<i>&lt;features&gt;</i>)</a></code> <code><a href="feature-grouping.html">importFeatureGroups()</a></code> <code><a href="feature-grouping.html">importFeatureGroupsBrukerPA()</a></code> <code><a href="feature-grouping.html">importFeatureGroupsEnviMass()</a></code> <code><a href="feature-grouping.html">groupFeaturesOpenMS()</a></code> <code><a href="feature-grouping.html">groupFeaturesXCMS()</a></code> <code><a href="feature-grouping.html">importFeatureGroupsXCMS()</a></code> </p>
+        </td>
+        <td><p>Grouping of features</p></td>
+      </tr><tr>
+        <!--  -->
+        <td>
+          <p><code><a href="featureGroups-class.html">names(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="featureGroups-class.html">length(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="featureGroups-class.html">show(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="featureGroups-class.html">groups(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="featureGroups-class.html">analysisInfo(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="featureGroups-class.html">groupInfo(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="featureGroups-class.html">featureTable(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="featureGroups-class.html">getFeatures(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="featureGroups-class.html">groupFeatIndex(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="featureGroups-class.html">`[`(<i>&lt;featureGroups&gt;</i>,<i>&lt;ANY&gt;</i>,<i>&lt;ANY&gt;</i>,<i>&lt;ANY&gt;</i>)</a></code> <code><a href="featureGroups-class.html">export(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="featureGroups-class.html">groupTable(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="featureGroups-class.html">plot(<i>&lt;featureGroups&gt;</i>,<i>&lt;ANY&gt;</i>)</a></code> <code><a href="featureGroups-class.html">plotInt(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="featureGroups-class.html">plotChord(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="featureGroups-class.html">plotEIC(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="featureGroups-class.html">plotVenn(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="featureGroups-class.html">unique(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="featureGroups-class.html">overlap(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="featureGroups-class.html">regression(<i>&lt;featureGroups&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Base class for grouped features.</p></td>
+      </tr><tr>
+        <!--  -->
+        <td>
+          <p><code><a href="featureGroups-compare.html">comparison(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="featureGroups-compare.html">plot(<i>&lt;featureGroupsComparison&gt;</i>,<i>&lt;ANY&gt;</i>)</a></code> <code><a href="featureGroups-compare.html">plotVenn(<i>&lt;featureGroupsComparison&gt;</i>)</a></code> <code><a href="featureGroups-compare.html">plotChord(<i>&lt;featureGroupsComparison&gt;</i>)</a></code> <code><a href="featureGroups-compare.html">consensus(<i>&lt;featureGroupsComparison&gt;</i>)</a></code> <code><a href="featureGroups-compare.html">unique(<i>&lt;featureGroupsComparison&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Comparing feature groups</p></td>
+      </tr><tr>
+        <!--  -->
+        <td>
+          <p><code><a href="featureGroupsComparison-class.html">names(<i>&lt;featureGroupsComparison&gt;</i>)</a></code> <code><a href="featureGroupsComparison-class.html">length(<i>&lt;featureGroupsComparison&gt;</i>)</a></code> <code><a href="featureGroupsComparison-class.html">`[`(<i>&lt;featureGroupsComparison&gt;</i>,<i>&lt;ANY&gt;</i>,<i>&lt;ANY&gt;</i>,<i>&lt;ANY&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Feature groups comparison class</p></td>
+      </tr><tr>
+        <!--  -->
+        <td>
+          <p><code><a href="features-class.html">length(<i>&lt;features&gt;</i>)</a></code> <code><a href="features-class.html">show(<i>&lt;features&gt;</i>)</a></code> <code><a href="features-class.html">featureTable(<i>&lt;features&gt;</i>)</a></code> <code><a href="features-class.html">analysisInfo(<i>&lt;features&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Base features class</p></td>
+      </tr><tr>
+        <!--  -->
+        <td>
+          <p><code><a href="formula-generation.html">generateFormulas(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="formula-generation.html">generateFormulasDA()</a></code> <code><a href="formula-generation.html">generateFormulasGenForm()</a></code> <code><a href="formula-generation.html">generateFormulasSirius()</a></code> </p>
+        </td>
+        <td><p>Automatic chemical formula generation</p></td>
+      </tr><tr>
+        <!--  -->
+        <td>
+          <p><code><a href="formulaConsensus-class.html">formulaTable(<i>&lt;formulaConsensus&gt;</i>)</a></code> <code><a href="formulaConsensus-class.html">algorithm(<i>&lt;formulaConsensus&gt;</i>)</a></code> <code><a href="formulaConsensus-class.html">length(<i>&lt;formulaConsensus&gt;</i>)</a></code> <code><a href="formulaConsensus-class.html">show(<i>&lt;formulaConsensus&gt;</i>)</a></code> <code><a href="formulaConsensus-class.html">plotSpec(<i>&lt;formulaConsensus&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Formula consensus class</p></td>
+      </tr><tr>
+        <!--  -->
+        <td>
+          <p><code><a href="formulas-class.html">formulaTable(<i>&lt;formulas&gt;</i>)</a></code> <code><a href="formulas-class.html">algorithm(<i>&lt;formulas&gt;</i>)</a></code> <code><a href="formulas-class.html">length(<i>&lt;formulas&gt;</i>)</a></code> <code><a href="formulas-class.html">show(<i>&lt;formulas&gt;</i>)</a></code> <code><a href="formulas-class.html">consensus(<i>&lt;formulas&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Formula lists class</p></td>
+      </tr><tr>
+        <!--  -->
+        <td>
+          <p><code><a href="generics.html">analysisInfo()</a></code> <code><a href="generics.html">featureTable()</a></code> <code><a href="generics.html">algorithm()</a></code> <code><a href="generics.html">filter()</a></code> <code><a href="generics.html">plotInt()</a></code> <code><a href="generics.html">plotVenn()</a></code> <code><a href="generics.html">plotChord()</a></code> <code><a href="generics.html">plotSpec()</a></code> <code><a href="generics.html">plotEIC()</a></code> <code><a href="generics.html">consensus()</a></code> <code><a href="generics.html">formulaTable()</a></code> </p>
+        </td>
+        <td><p>Miscellaneous generics</p></td>
+      </tr><tr>
+        <!--  -->
+        <td>
+          <p><code><a href="getXcmsSet.html">getXcmsSet()</a></code> </p>
+        </td>
+        <td><p>Conversion to xcmsSet objects</p></td>
+      </tr><tr>
+        <!--  -->
+        <td>
+          <p><code><a href="h-cluster.html">makeHCluster(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="h-cluster.html">hClusterFilter(<i>&lt;featureGroups&gt;</i>,<i>&lt;clusterInfo&gt;</i>)</a></code> <code><a href="h-cluster.html">drawHeatMap(<i>&lt;clusterInfo&gt;</i>)</a></code> <code><a href="h-cluster.html">getSilhouetteInfo(<i>&lt;clusterInfo&gt;</i>)</a></code> <code><a href="h-cluster.html">plotInt(<i>&lt;clusterInfo&gt;</i>)</a></code> <code><a href="h-cluster.html">plot(<i>&lt;clusterInfo&gt;</i>,<i>&lt;ANY&gt;</i>)</a></code> <code><a href="h-cluster.html">plot(<i>&lt;silhouetteInfo&gt;</i>,<i>&lt;ANY&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Hierarchical clustering of feature groups</p></td>
+      </tr><tr>
+        <!--  -->
+        <td>
+          <p><code><a href="patRoon-package.html">patRoon-package</a></code> </p>
+        </td>
+        <td><p>Workflow solutions for mass-spectrometry based non-target analysis.</p></td>
+      </tr><tr>
+        <!--  -->
+        <td>
+          <p><code><a href="reporting.html">reportCSV(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="reporting.html">reportPDF(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="reporting.html">reportMD(<i>&lt;featureGroups&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Report feature group data</p></td>
+      </tr><tr>
+        <!--  -->
+        <td>
+          <p><code><a href="silhouetteInfo-class.html">silhouetteInfo-class</a></code> </p>
+        </td>
+        <td><p>Silhouette information</p></td>
+      </tr><tr>
+        <!--  -->
+        <td>
+          <p><code><a href="target-screening.html">screenTargets()</a></code> <code><a href="target-screening.html">groupFeaturesScreening(<i>&lt;featureGroups&gt;</i>)</a></code> <code><a href="target-screening.html">importFeatureGroupsBrukerTASQ()</a></code> </p>
+        </td>
+        <td><p>Target and suspect screening</p></td>
+      </tr>
+    </tbody>
+    </table>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
@@ -310,6 +318,8 @@
 
       </footer>
    </div>
+
+  
 
   </body>
 </html>

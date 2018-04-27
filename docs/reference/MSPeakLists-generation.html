@@ -25,10 +25,15 @@
 <link href="../pkgdown.css" rel="stylesheet">
 <script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
+
+
+
 <meta property="og:title" content="Generation of MS Peak Lists — MSPeakLists-generation" />
 
 <meta property="og:description" content="Functionality to generate MS peak lists." />
 <meta name="twitter:card" content="summary" />
+
+
 <!-- mathjax -->
 <script src='https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
 
@@ -51,8 +56,12 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="../index.html">patRoon</a>
+      <span class="navbar-brand">
+        <a class="navbar-link" href="../index.html">patRoon</a>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.0.9000</span>
+      </span>
     </div>
+
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
@@ -67,6 +76,9 @@
 <li>
   <a href="../articles/tutorial.html">Tutorial</a>
 </li>
+<li>
+  <a href="../news/index.html">Changelog</a>
+</li>
       </ul>
       
       <ul class="nav navbar-nav navbar-right">
@@ -77,6 +89,7 @@
   </a>
 </li>
       </ul>
+      
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
@@ -84,15 +97,19 @@
       
       </header>
 
-      <div class="row">
+<div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Generation of MS Peak Lists</h1>
+    <small class="dont-index">Source: <a href='https://github.com/rickhelmus/patRoon/blob/master/R/main.R'><code>R/main.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/mspeaklists.R'><code>R/mspeaklists.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/mspeaklists-bruker.R'><code>R/mspeaklists-bruker.R</code></a>, and 2 more</small>
+    <div class="hidden name"><code>MSPeakLists-generation.Rd</code></div>
     </div>
 
+    <div class="ref-description">
     
     <p>Functionality to generate MS peak lists.</p>
     
+    </div>
 
     <pre class="usage"><span class='co'># S4 method for featureGroups</span>
 <span class='fu'>generateMSPeakLists</span>(<span class='no'>fGroups</span>, <span class='no'>algorithm</span>, <span class='no'>...</span>)
@@ -106,7 +123,7 @@
   <span class='kw'>avgTopPeaks</span> <span class='kw'>=</span> <span class='fl'>50</span>, <span class='kw'>avgMinIntensity</span> <span class='kw'>=</span> <span class='fl'>500</span>, <span class='kw'>avgMassFun</span> <span class='kw'>=</span> <span class='no'>mean</span>,
   <span class='kw'>avgMethod</span> <span class='kw'>=</span> <span class='st'>"distance"</span>, <span class='kw'>precursorMzWindow</span> <span class='kw'>=</span> <span class='fl'>8</span>, <span class='kw'>topMost</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
     
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
@@ -254,7 +271,7 @@ groups.</p>
     <p>Averaging of mass spectra algorithms used by
   <code>generateMzRPeakLists</code> were based on the
   <a href='https://github.com/zeehio/msProcess'>msProcess</a> R package (now
-  archived on CRAN). 
+  archived on CRAN). <br /><br />
   A cross-platform toolkit for mass spectrometry and proteomics Chambers, Matthew C. and Maclean, Brendan and Burke, Robert and Amodei, 
 		 Dario and Ruderman, Daniel L. and Neumann, Steffen and Gatto, Laurent and 
 		 Fischer, Bernd and Pratt, Brian and Egertson, Jarrett and Hoff, Katherine 
@@ -267,14 +284,18 @@ groups.</p>
 		 Trey and Holly, Krisztina and Eckels, Josh and Deutsch, Eric W. and Moritz, 
 		 Robert L. and Katz, Jonathan E. and Agus, David B. and MacCoss, Michael and 
 		 Tabb, David L. and Mallick, Parag Nat Biotechnol. 2012 NOct;30(10):918-920.
-    Mol Cell Proteomics. 2010 Aug 17. mzML - a Community Standard for Mass Spectrometry Data. Martens L, Chambers M, Sturm M, Kessner D, Levander F, Shofstahl J, Tang WH, Rompp A, Neumann S,  Pizarro AD, Montecchi-Palazzi L, Tasman N, Coleman M, Reisinger F, Souda P,  Hermjakob H, Binz PA, Deutsch EW.
-    Nat Biotechnol. 2004 Nov;22(11):1459-66. A common open representation of mass spectrometry data and its application to proteomics research. Pedrioli PG, Eng JK, Hubley R, Vogelzang M, Deutsch EW, Raught B, Pratt B, Nilsson E, Angeletti RH, Apweiler R, Cheung K, Costello CE, Hermjakob H, Huang S, Julian RK, Kapp E, McComb ME, Oliver SG,  Omenn G, Paton NW, Simpson R, Smith R, Taylor CF, Zhu W, Aebersold R.
-    Mol Syst Biol. 2005;1:2005.0017. Epub 2005 Aug 2. A uniform proteomics MS/MS analysis platform utilizing open XML file formats. Keller A, Eng J, Zhang N, Li XJ, Aebersold R.
-    Bioinformatics. 2008 Nov 1;24(21):2534-6. Epub 2008 Jul 7. ProteoWizard: open source software for rapid proteomics tools development. Kessner D, Chambers M, Burke R, Agus D, Mallick P.</p>
+ <br /><br />
+  Mol Cell Proteomics. 2010 Aug 17. mzML - a Community Standard for Mass Spectrometry Data. Martens L, Chambers M, Sturm M, Kessner D, Levander F, Shofstahl J, Tang WH, Rompp A, Neumann S,  Pizarro AD, Montecchi-Palazzi L, Tasman N, Coleman M, Reisinger F, Souda P,  Hermjakob H, Binz PA, Deutsch EW.
+ <br /><br />
+  Nat Biotechnol. 2004 Nov;22(11):1459-66. A common open representation of mass spectrometry data and its application to proteomics research. Pedrioli PG, Eng JK, Hubley R, Vogelzang M, Deutsch EW, Raught B, Pratt B, Nilsson E, Angeletti RH, Apweiler R, Cheung K, Costello CE, Hermjakob H, Huang S, Julian RK, Kapp E, McComb ME, Oliver SG,  Omenn G, Paton NW, Simpson R, Smith R, Taylor CF, Zhu W, Aebersold R.
+ <br /><br />
+  Mol Syst Biol. 2005;1:2005.0017. Epub 2005 Aug 2. A uniform proteomics MS/MS analysis platform utilizing open XML file formats. Keller A, Eng J, Zhang N, Li XJ, Aebersold R.
+ <br /><br />
+  Bioinformatics. 2008 Nov 1;24(21):2534-6. Epub 2008 Jul 7. ProteoWizard: open source software for rapid proteomics tools development. Kessner D, Chambers M, Burke R, Agus D, Mallick P.</p>
     
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <p><code><a href='MSPeakLists-class.html'>MSPeakLists-class</a></code></p>
+    <div class='dont-index'><p><code><a href='MSPeakLists-class.html'>MSPeakLists-class</a></code></p></div>
     
 
   </div>
@@ -308,6 +329,8 @@ groups.</p>
 
       </footer>
    </div>
+
+  
 
   </body>
 </html>

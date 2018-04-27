@@ -25,11 +25,16 @@
 <link href="../pkgdown.css" rel="stylesheet">
 <script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
+
+
+
 <meta property="og:title" content="Interactive GUI utilities — GUI-utils" />
 
 <meta property="og:description" content="Interactive utilities using shiny to provide a graphical user
 interface (GUI)." />
 <meta name="twitter:card" content="summary" />
+
+
 <!-- mathjax -->
 <script src='https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
 
@@ -52,8 +57,12 @@ interface (GUI)." />
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="../index.html">patRoon</a>
+      <span class="navbar-brand">
+        <a class="navbar-link" href="../index.html">patRoon</a>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.0.9000</span>
+      </span>
     </div>
+
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
@@ -68,6 +77,9 @@ interface (GUI)." />
 <li>
   <a href="../articles/tutorial.html">Tutorial</a>
 </li>
+<li>
+  <a href="../news/index.html">Changelog</a>
+</li>
       </ul>
       
       <ul class="nav navbar-nav navbar-right">
@@ -78,6 +90,7 @@ interface (GUI)." />
   </a>
 </li>
       </ul>
+      
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
@@ -85,16 +98,20 @@ interface (GUI)." />
       
       </header>
 
-      <div class="row">
+<div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Interactive GUI utilities</h1>
+    <small class="dont-index">Source: <a href='https://github.com/rickhelmus/patRoon/blob/master/R/main.R'><code>R/main.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/EIC-tool.R'><code>R/EIC-tool.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/compounds-util.R'><code>R/compounds-util.R</code></a>, and 2 more</small>
+    <div class="hidden name"><code>GUI-utils.Rd</code></div>
     </div>
 
+    <div class="ref-description">
     
     <p>Interactive utilities using <span class="pkg">shiny</span> to provide a graphical user
 interface (GUI).</p>
     
+    </div>
 
     <pre class="usage"><span class='co'># S4 method for featureGroups</span>
 <span class='fu'>checkChromatograms</span>(<span class='no'>fGroups</span>, <span class='kw'>mzWindow</span> <span class='kw'>=</span> <span class='fl'>0.005</span>,
@@ -106,7 +123,7 @@ interface (GUI).</p>
 
 <span class='fu'>newProject</span>()</pre>
     
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
@@ -195,6 +212,8 @@ groups are considered to be kept.</p></td>
 
       </footer>
    </div>
+
+  
 
   </body>
 </html>

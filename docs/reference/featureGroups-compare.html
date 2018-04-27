@@ -25,10 +25,15 @@
 <link href="../pkgdown.css" rel="stylesheet">
 <script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
+
+
+
 <meta property="og:title" content="Comparing feature groups — featureGroups-compare" />
 
 <meta property="og:description" content="Functionality to compare feature groups and make a consensus." />
 <meta name="twitter:card" content="summary" />
+
+
 <!-- mathjax -->
 <script src='https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
 
@@ -51,8 +56,12 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="../index.html">patRoon</a>
+      <span class="navbar-brand">
+        <a class="navbar-link" href="../index.html">patRoon</a>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.0.9000</span>
+      </span>
     </div>
+
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
@@ -67,6 +76,9 @@
 <li>
   <a href="../articles/tutorial.html">Tutorial</a>
 </li>
+<li>
+  <a href="../news/index.html">Changelog</a>
+</li>
       </ul>
       
       <ul class="nav navbar-nav navbar-right">
@@ -77,6 +89,7 @@
   </a>
 </li>
       </ul>
+      
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
@@ -84,15 +97,19 @@
       
       </header>
 
-      <div class="row">
+<div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Comparing feature groups</h1>
+    <small class="dont-index">Source: <a href='https://github.com/rickhelmus/patRoon/blob/master/R/feature_groups-comparison.R'><code>R/feature_groups-comparison.R</code></a></small>
+    <div class="hidden name"><code>featureGroups-compare.Rd</code></div>
     </div>
 
+    <div class="ref-description">
     
     <p>Functionality to compare feature groups and make a consensus.</p>
     
+    </div>
 
     <pre class="usage"><span class='co'># S4 method for featureGroups</span>
 <span class='fu'>comparison</span>(<span class='no'>...</span>, <span class='no'>groupAlgo</span>, <span class='kw'>groupArgs</span> <span class='kw'>=</span> <span class='fu'>list</span>(<span class='kw'>rtalign</span>
@@ -115,7 +132,7 @@
 <span class='co'># S4 method for featureGroupsComparison</span>
 <span class='fu'>unique</span>(<span class='no'>x</span>, <span class='no'>which</span>, <span class='no'>...</span>)</pre>
     
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
@@ -167,7 +184,7 @@ retention time scatter plots.</p></td>
       <th>relAbundance, absAbundance</th>
       <td><p>Feature groups with relative/absolute
 abundance below this number will be removed from the consensus. Set to
-<code>NULL</code> for no limits.</p></td>
+<code>0</code> for no limits.</p></td>
     </tr>
     </table>
     
@@ -238,6 +255,8 @@ output and generate a consensus.</p>
 
       </footer>
    </div>
+
+  
 
   </body>
 </html>

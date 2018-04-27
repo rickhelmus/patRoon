@@ -25,12 +25,17 @@
 <link href="../pkgdown.css" rel="stylesheet">
 <script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
+
+
+
 <meta property="og:title" content="Report feature group data — reporting" />
 
 <meta property="og:description" content="Functionality to report data produced by most workflow steps such as
 features, feature groups, calculated chemical formulae and tentatively
 identified compounds." />
 <meta name="twitter:card" content="summary" />
+
+
 <!-- mathjax -->
 <script src='https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
 
@@ -53,8 +58,12 @@ identified compounds." />
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="../index.html">patRoon</a>
+      <span class="navbar-brand">
+        <a class="navbar-link" href="../index.html">patRoon</a>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.0.9000</span>
+      </span>
     </div>
+
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
@@ -69,6 +78,9 @@ identified compounds." />
 <li>
   <a href="../articles/tutorial.html">Tutorial</a>
 </li>
+<li>
+  <a href="../news/index.html">Changelog</a>
+</li>
       </ul>
       
       <ul class="nav navbar-nav navbar-right">
@@ -79,6 +91,7 @@ identified compounds." />
   </a>
 </li>
       </ul>
+      
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
@@ -86,17 +99,21 @@ identified compounds." />
       
       </header>
 
-      <div class="row">
+<div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Report feature group data</h1>
+    <small class="dont-index">Source: <a href='https://github.com/rickhelmus/patRoon/blob/master/R/report.R'><code>R/report.R</code></a></small>
+    <div class="hidden name"><code>reporting.Rd</code></div>
     </div>
 
+    <div class="ref-description">
     
     <p>Functionality to report data produced by most workflow steps such as
 features, feature groups, calculated chemical formulae and tentatively
 identified compounds.</p>
     
+    </div>
 
     <pre class="usage"><span class='co'># S4 method for featureGroups</span>
 <span class='fu'>reportCSV</span>(<span class='no'>fGroups</span>, <span class='kw'>path</span> <span class='kw'>=</span> <span class='st'>"report"</span>,
@@ -125,7 +142,7 @@ identified compounds.</p>
   <span class='kw'>EICOnlyPresent</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>selfContained</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>optimizePng</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>maxProcAmount</span> <span class='kw'>=</span> <span class='fu'>getOption</span>(<span class='st'>"patRoon.maxProcAmount"</span>), <span class='kw'>clearPath</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
     
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
@@ -300,7 +317,8 @@ compounds, clustering) that are desired to be reported need to be specified.</p>
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
     <p>Yihui Xie (2015) Dynamic Documents with R and knitr. 2nd edition. Chapman and Hall/CRC. ISBN 978-1498716963
-    Yihui Xie (2014) knitr: A Comprehensive Tool for Reproducible Research in R. In Victoria Stodden, Friedrich Leisch and Roger D. Peng, editors, Implementing Reproducible Computational Research. Chapman and Hall/CRC. ISBN 978-1466561595</p>
+ <br /><br />
+  Yihui Xie (2014) knitr: A Comprehensive Tool for Reproducible Research in R. In Victoria Stodden, Friedrich Leisch and Roger D. Peng, editors, Implementing Reproducible Computational Research. Chapman and Hall/CRC. ISBN 978-1466561595</p>
     
 
   </div>
@@ -330,6 +348,8 @@ compounds, clustering) that are desired to be reported need to be specified.</p>
 
       </footer>
    </div>
+
+  
 
   </body>
 </html>

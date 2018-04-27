@@ -28,14 +28,15 @@ COPY ./docker/install_deps.R ./DESCRIPTION ./
 RUN wget http://msbi.ipb-halle.de/~cruttkie/metfrag/MetFrag2.4.3-CL.jar && \
     wget https://bio.informatik.uni-jena.de/repository/dist-release-local/de/unijena/bioinf/ms/sirius/4.0/sirius-4.0-linux64-headless.zip && \
     unzip sirius-4.0-linux64-headless.zip && rm sirius-4.0-linux64-headless.zip && \
-    Rscript install_deps.R
+    echo 'options(patRoon.path.metFragCL = "~/MetFrag2.4.3-CL.jar")' >> .Rprofile && \
+    echo 'options(patRoon.path.SIRIUS = "~/sirius-linux64-headless-4.0/bin")' >> .Rprofile && \
+    echo 'options(patRoon.path.vdiffr = "docker")' >> .Rprofile && \
+    Rscript install_deps.R && rm -f ~/install_deps.R ~/DESCRIPTION
 
 ADD --chown=patRoon . patRoon
 
+RUN Rscript -e 'devtools::install(pkg = "patRoon", upgrade_dependencies = FALSE)'
+
 ENV OPENMS_DATA_PATH=/usr/share/OpenMS _R_CHECK_FORCE_SUGGESTS_=0
-ARG FAIL_TESTS=1
 
-WORKDIR patRoon
-RUN Rscript docker/run_tests.R || [ $FAIL_TESTS -eq 0 ] && cat ~/olog/* && \
-    cp ~/patRoon/junit.xml ~/ && rm -rf ~/patRoon /tmp/Rtmp* ~/install_deps.R ~/DESCRIPTION
-
+CMD ["R"]

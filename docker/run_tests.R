@@ -1,9 +1,3 @@
-options(patRoon.path.metFragCL = "~/MetFrag2.4.3-CL.jar",
-        patRoon.path.SIRIUS = "~/sirius-linux64-headless-4.0/bin",
-        patRoon.path.vdiffr = "docker")
-
-devtools::install(upgrade_dependencies = FALSE)
-
 # unfortunately vdiffr doesn't allow to specify the deps file name.
 file.rename("tests/figs/deps-docker.txt", "tests/figs/deps.txt")
 

@@ -1,6 +1,6 @@
 context("feature groups")
 
-fList <- findFeatures(getTestAnaInfo(), "openms", logPath = normalizePath("~/olog", mustWork = FALSE))
+fList <- findFeatures(getTestAnaInfo(), "openms", logPath = NULL)
 
 fgOpenMS <- groupFeatures(fList, "openms")
 fgXCMS <- groupFeatures(fList, "xcms")

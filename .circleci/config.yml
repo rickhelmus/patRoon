@@ -6,6 +6,7 @@ jobs:
             - image: docker:18.04.0-ce-git
         environment:
             IMAGE_NAME=patroonorg/patroon
+            TMP_IMAGE_NAME=patroon
         steps:
             - checkout
             - setup_remote_docker
@@ -22,7 +23,14 @@ jobs:
             - run:
                 name: Build Docker image
                 command: |
-                    docker build --pull --cache-from "${IMAGE_NAME}" --tag "${IMAGE_NAME}" .
+                    docker build --pull --cache-from "${IMAGE_NAME}" --tag "${TMP_IMAGE_NAME}" .
+            - run:
+                name: Perform tests
+                command: |
+                    docker run --name patroon -t patroon /bin/bash -c "cd patRoon; Rscript docker/run_tests.R"
+                    # tag if tests were OK
+                    docker tag "${TMP_IMAGE_NAME}" "${IMAGE_NAME}"
+
             - run:
                 name: Save Docker image layer cache
                 command: |
@@ -36,18 +44,28 @@ jobs:
                 name: Copy test results
                 when: always
                 command: |
-                    docker create --name patroon "${IMAGE_NAME}"
+                    CONTAINER_ID=`docker ps -aqf "name=patroon"`
                     mkdir /tmp/tests
-                    docker cp patroon:/home/patRoon/junit.xml /tmp/tests/
+                    docker cp $CONTAINER_ID:/home/patRoon/patRoon/junit.xml /tmp/tests/
                     cat /tmp/tests/junit.xml
             - store_test_results:
-                path: /tmp/tests                    
+                path: /tmp/tests
             - deploy:
-                name: Push application Docker image
+                name: Push tested Docker image
                 command: |
                     if [ "${CIRCLE_BRANCH}" == "master" ]; then
                         echo "$DH_PASS" | docker login -u "$DH_USER" --password-stdin
                         git_sha="$(git rev-parse --short HEAD)"
                         docker tag "$IMAGE_NAME" "${IMAGE_NAME}:${git_sha}-master"
                         docker push "${IMAGE_NAME}:latest" && docker push "${IMAGE_NAME}:${git_sha}-master"
+                    fi
+            - deploy:
+                name: Push failed Docker image
+                when: on_fail
+                command: |
+                    if [ "${CIRCLE_BRANCH}" == "master" ]; then
+                        echo "$DH_PASS" | docker login -u "$DH_USER" --password-stdin
+                        git_sha="$(git rev-parse --short HEAD)"
+                        docker tag "TMP_IMAGE_NAME" "${IMAGE_NAME}:${git_sha}-master-failed"
+                        docker push "${IMAGE_NAME}:${git_sha}-master-failed"
                     fi

@@ -4,9 +4,7 @@ testFile <- function(f, ..., text = FALSE) file.path(getTestDataPath(), paste0(f
 getTestAnaInfo <- function() generateAnalysisInfo(patRoonData::exampleDataPath(),
                                                   groups = c(rep("solvent", 3), rep("standard", 3)),
                                                   refs = "solvent")
-getTestFGroups <- function(anaInfo = getTestAnaInfo()) groupFeatures(findFeatures(anaInfo, "openms",
-                                                                                  logPath = normalizePath("~/olog", mustWork = FALSE)),
-                                                                     "openms")
+getTestFGroups <- function(anaInfo = getTestAnaInfo()) groupFeatures(findFeatures(anaInfo, "openms", logPath = NULL), "openms")
 
 expect_file <- function(object, file, removeIfExists = TRUE)
 {

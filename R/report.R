@@ -85,7 +85,7 @@ optimizePngPlots <- function(plotFiles, progressOut, maxProcAmount)
     })
 
     message("Optimizing plot sizes...")
-    executeMultiProcess(cmdQueue, function(cmd, ...)
+    executeMultiProcess(cmdQueue, function(cmd)
     {
         # pngquant create new files as <filename_without_extension>-fs8.png --> rename them to original names
         plots <- plotFiles[seq(cmd$startpl, cmd$endpl)]
@@ -424,7 +424,7 @@ reportHClusterTable <- function(fGroups, path, cInfo, k)
 }
 
 # UNDONE: eawag refs, call also from report?
-reportHCluster <- function(fGroups, path, cInfo, k, silInfo = NULL)
+reportHCluster <- function(fGroups, path, cInfo, k, silInfo = NULL, clusterMaxLabels)
 {
     printf("Exporting hierarchical clustering plots...")
 

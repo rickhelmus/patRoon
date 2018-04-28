@@ -73,7 +73,8 @@ test_script:
     - travis-tool.sh run_tests
 
 on_failure:
-    - 7z a failure.zip *.Rcheck\*
+    - type %APPVEYOR_BUILD_FOLDER%\junit.xml
+    - 7z a failure.zip *.Rcheck\* %APPVEYOR_BUILD_FOLDER%\junit.xml
     - appveyor PushArtifact failure.zip
 
 on_success:

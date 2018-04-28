@@ -1,5 +1,13 @@
 FROM rocker/r-ver:3.4.4
 
+LABEL maintainer="Rick Helmus <r.helmus@uva.nl>" \
+    org.label-schema.name="patRoon" \
+    org.label-schema.description="Docker image used for patRoon CI" \
+    org.label-schema.schema-version="1.0" \
+    org.label-schema.vcs-url="https://github.com/rickhelmus/patRoon" \
+    org.label-schema.vendor="patRoon" \
+    docker.cmd.test="docker run -t patroonorg/patroon /bin/bash -c 'cd patRoon; Rscript docker/run_tests.R'"
+
 ENV SETUPDIR=/usr/local/setup
 
 RUN apt-get update -y && \

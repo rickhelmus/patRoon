@@ -1,6 +1,9 @@
-executeMultiProcess <- function(commandQueue, finishProc, printOutput = FALSE,
-                                printError = FALSE, showProgress = TRUE, progressOut = "", waitTimeout = 50,
-                                procTimeout = NULL, timeoutRetries = 3, maxProcAmount = getOption("patRoon.maxProcAmount"),
+executeMultiProcess <- function(commandQueue, finishHandler,
+                                timeoutHandler = function(...) TRUE,
+                                errorHandler = function(...) FALSE,
+                                procTimeout = NULL, printOutput = FALSE, printError = FALSE,
+                                showProgress = TRUE, progressOut = "", waitTimeout = 50,
+                                maxProcAmount = getOption("patRoon.maxProcAmount"),
                                 maxCmdsPerProc = 1, delayBetweenProc = 0)
 {
     if (length(commandQueue) == 0)
@@ -24,7 +27,28 @@ executeMultiProcess <- function(commandQueue, finishProc, printOutput = FALSE,
     {
         for (pi in seq_along(runningProcs))
         {
-            if (is.null(runningProcs[[pi]]) || (!runningProcs[[pi]]$is_alive() && runningProcInfo[[pi]]$running))
+            finishedRunning <- !is.null(runningProcs[[pi]]) && !runningProcs[[pi]]$is_alive() && runningProcInfo[[pi]]$running
+
+            if (!is.null(runningProcs[[pi]]))
+                cmdInds <- seq(runningProcInfo[[pi]]$startCmdInd, runningProcInfo[[pi]]$endCmdInd)
+            
+            if (finishedRunning)
+            {
+                exitStatus = runningProcs[[pi]]$get_exit_status()
+                if (exitStatus != 0)
+                {
+                    if (all(sapply(cmdInds, function(ci) errorHandler(cmd = commandQueue[[ci]],
+                                                                      exitStatus = exitStatus,
+                                                                      retries = runningProcInfo[[pi]]$noResRetries))))
+                    {
+                        runningProcInfo[[pi]]$noResRetries <- runningProcInfo[[pi]]$noResRetries + 1
+                        runningProcs[[pi]] <- runningProcs[[pi]]$restart()
+                        finishedRunning <- FALSE
+                    }
+                }
+            }
+            
+            if (is.null(runningProcs[[pi]]) || finishedRunning)
             {
                 finishedProc <- runningProcs[[pi]]
                 finishedProcInfo <- runningProcInfo[[pi]]
@@ -78,7 +102,8 @@ executeMultiProcess <- function(commandQueue, finishProc, printOutput = FALSE,
                     runningProcInfo[[pi]]$startCmdInd <- nextCommand
                     runningProcInfo[[pi]]$endCmdInd <- nextCommand + (nproc - 1)
                     runningProcInfo[[pi]]$killed <- FALSE
-                    runningProcInfo[[pi]]$retries <- timeoutRetries
+                    runningProcInfo[[pi]]$timeOutRetries <- 0
+                    runningProcInfo[[pi]]$noResRetries <- 0
                     runningProcInfo[[pi]]$running <- TRUE
 
                     # printf("started %d-%d on slot %d\n", nextCommand, runningProcInfo[[pi]]$endCmdInd, pi)
@@ -99,12 +124,7 @@ executeMultiProcess <- function(commandQueue, finishProc, printOutput = FALSE,
                     runningProcInfo[[pi]]$running <- FALSE
 
                 if (!is.null(finishedProc))
-                {
-                    inds <- seq(finishedProcInfo$startCmdInd, finishedProcInfo$endCmdInd)
-                    ret[inds] <- lapply(inds, function(ci) finishProc(commandQueue[[ci]],
-                                                                      finishedProc$get_exit_status(),
-                                                                      finishedProcInfo$retries))
-                }
+                    ret[cmdInds] <- lapply(cmdInds, function(ci) finishHandler(cmd = commandQueue[[ci]]))
             }
             else if (!is.null(procTimeout) && runningProcInfo[[pi]]$running &&
                      (Sys.time() - runningProcs[[pi]]$get_start_time()) > procTimeout)
@@ -112,9 +132,10 @@ executeMultiProcess <- function(commandQueue, finishProc, printOutput = FALSE,
                 runningProcs[[pi]]$kill()
                 runningProcs[[pi]]$wait()
 
-                if (runningProcInfo[[pi]]$retries > 0)
+                if (all(sapply(cmdInds, function(ci) timeoutHandler(cmd = commandQueue[[ci]],
+                                                                    retries = runningProcInfo[[pi]]$timeOutRetries))))
                 {
-                    runningProcInfo[[pi]]$retries <- runningProcInfo[[pi]]$retries - 1
+                    runningProcInfo[[pi]]$timeOutRetries <- runningProcInfo[[pi]]$timeOutRetries + 1
                     runningProcs[[pi]] <- runningProcs[[pi]]$restart()
                 }
                 else

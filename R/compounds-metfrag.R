@@ -183,10 +183,10 @@ processMFResults <- function(metf, analysis, spec, db, topMost, lfile = "")
     return(metf)
 }
 
-#' @details \code{generateCompoundsMetfrag} uses the \pkg{metfRag}
-#'   package for compound identification (see
-#'   \url{http://c-ruttkies.github.io/MetFrag/}). Several online compound
-#'   databases such as \href{https://pubchem.ncbi.nlm.nih.gov/}{PubChem} and
+#' @details \code{generateCompoundsMetfrag} uses the \pkg{metfRag} package for
+#'   compound identification (see \url{http://c-ruttkies.github.io/MetFrag/}).
+#'   Several online compound databases such as
+#'   \href{https://pubchem.ncbi.nlm.nih.gov/}{PubChem} and
 #'   \href{http://www.chemspider.com/}{ChemSpider} may be chosen for retrieval
 #'   of candidate structures. In addition, many options exist to score and
 #'   filter resulting data, and it is highly suggested to optimize these to
@@ -203,6 +203,8 @@ processMFResults <- function(metf, analysis, spec, db, topMost, lfile = "")
 #' @param timeoutRetries Maximum number of retries after reaching a timeout
 #'   before completely skipping the metFrag query for a feature group. Also see
 #'   \code{timeout} argument.
+#' @param errorRetries Maximum number of retries after an error occurred. This
+#'   may be useful to handle e.g. connection errors.
 #' @param dbRelMzDev Relative mass deviation (in ppm) for database search. Sets
 #'   the \option{DatabaseSearchRelativeMassDeviation} option.
 #' @param fragRelMzDev Relative mass deviation (in ppm) for fragment matching.
@@ -276,9 +278,9 @@ processMFResults <- function(metf, analysis, spec, db, topMost, lfile = "")
 #' @rdname compound-generation
 #' @export
 generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPath = file.path("log", "metfrag"),
-                                     timeout = 300, timeoutRetries = 2, topMost = 100, dbRelMzDev = 5, fragRelMzDev = 5,
-                                     fragAbsMzDev = 0.002, isPositive, adduct, database = "PubChem",
-                                     chemSpiderToken = "",
+                                     timeout = 300, timeoutRetries = 2, errorRetries = 2, topMost = 100,
+                                     dbRelMzDev = 5, fragRelMzDev = 5, fragAbsMzDev = 0.002, isPositive, adduct,
+                                     database = "PubChem", chemSpiderToken = "",
                                      scoreTypes = c("FragmenterScore", "OfflineMetFusionScore"), scoreWeights = 1.0,
                                      preProcessingFilters = c("UnconnectedCompoundFilter","IsotopeFilter"),
                                      postProcessingFilters = c("InChIKeyFilter"),
@@ -362,35 +364,44 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
                          initMetFragCLCommand(rd$mfSettings, rd$spec, mfBin, logf)))
             })
 
-            ret <- executeMultiProcess(cmdQueue, function(cmd, exitStatus, retries)
+            ret <- executeMultiProcess(cmdQueue, finishHandler = function(cmd, exitStatus, retries)
             {
-                metf <- NULL
-                if (retries == 0)
-                    warning(sprintf("Could not run MetFrag for %s: timeout", cmd$gName))
-                else if (exitStatus != 0)
-                {
-                    if (exitStatus <= 6) # some error thrown by MF
-                        warning(sprintf("Could not run MetFrag for %s - exit: %d", cmd$gName, exitStatus))
-                    else
-                        stop("Failed to execute MetFragCL!") # some other error (e.g. java not present)
-                }
-                else
-                {
-                    if (!is.null(cmd$stderrFile))
-                        cat(sprintf("\n%s - Done with MF! Reading results...\n", date()), file = cmd$stderrFile, append = TRUE)
-                    metf <- fread(cmd$outFile, colClasses = c(Identifier = "character"))
-                    if (!is.null(cmd$stderrFile))
-                        cat(sprintf("\n%s - Done! Prcoessing results...\n", date()), file = cmd$stderrFile, append = TRUE)
-                    metf <- processMFResults(metf, cmd$analysis, cmd$spec, database, topMost, cmd$stderrFile)
-                    if (!is.null(cmd$stderrFile))
-                        cat(sprintf("\n%s - Done! Caching results...\n", date()), file = cmd$stderrFile, append = TRUE)
-                    saveCacheData("identifyMetFrag", metf, cmd$hash, cacheDB)
-                    if (!is.null(cmd$stderrFile))
-                        cat(sprintf("\n%s - Done!\n", date()), file = cmd$stderrFile, append = TRUE)
-                }
+                if (!is.null(cmd$stderrFile))
+                    cat(sprintf("\n%s - Done with MF! Reading results...\n", date()), file = cmd$stderrFile, append = TRUE)
+                metf <- fread(cmd$outFile, colClasses = c(Identifier = "character"))
+                if (!is.null(cmd$stderrFile))
+                    cat(sprintf("\n%s - Done! Prcoessing results...\n", date()), file = cmd$stderrFile, append = TRUE)
+                metf <- processMFResults(metf, cmd$analysis, cmd$spec, database, topMost, cmd$stderrFile)
+                if (!is.null(cmd$stderrFile))
+                    cat(sprintf("\n%s - Done! Caching results...\n", date()), file = cmd$stderrFile, append = TRUE)
+                saveCacheData("identifyMetFrag", metf, cmd$hash, cacheDB)
+                if (!is.null(cmd$stderrFile))
+                    cat(sprintf("\n%s - Done!\n", date()), file = cmd$stderrFile, append = TRUE)
 
                 return(metf)
-            }, maxProcAmount = maxProcAmount, procTimeout = timeout, timeoutRetries = timeoutRetries, delayBetweenProc = 100)
+            }, timeoutHandler = function(cmd, retries)
+            {
+                if (retries > timeoutRetries)
+                {
+                    warning(sprintf("Could not run MetFrag for %s: timeout", cmd$gName))
+                    return(FALSE)
+                }
+                return(TRUE)
+            }, errorHandler = function(cmd, exitStatus, retries)
+            {
+                if (exitStatus <= 6) # some error thrown by MF
+                {
+                    if (retries > errorRetries)
+                    {
+                        warning(sprintf("Could not run MetFrag for %s - exit: %d", cmd$gName, exitStatus))
+                        return(FALSE)
+                    }
+                    return(TRUE)
+                }
+                
+                # some other error (e.g. java not present)
+                stop("Failed to execute MetFragCL!")
+            }, maxProcAmount = maxProcAmount, procTimeout = timeout, delayBetweenProc = 100)
         }
         else
         {

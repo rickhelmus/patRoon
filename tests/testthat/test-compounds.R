@@ -16,12 +16,17 @@ plists <- generateMSPeakLists(fGroupsSub, "mzr")
 doMetFrag <- !is.null(getOption("patRoon.path.metFragCL")) && nzchar(getOption("patRoon.path.metFragCL"))
 doSIRIUS <- !is.null(getOption("patRoon.path.SIRIUS")) && nzchar(getOption("patRoon.path.SIRIUS"))
 
+callMF <- function(db = mfTestDBPath, to = 300)
+{
+    generateCompounds(fGroupsSub, plists, "metfrag", logPath = NULL,
+                      adduct = 1, isPositive = TRUE, timeout = to,
+                      database = "LocalCSV", scoreTypes = "FragmenterScore",
+                      extraOpts = list(LocalDatabasePath = db))
+}
+
 if (doMetFrag)
 {
-    compsMF <- generateCompounds(fGroupsSub, plists, "metfrag", logPath = NULL,
-                                 adduct = 1, isPositive = TRUE, database = "LocalCSV",
-                                 scoreTypes = "FragmenterScore",
-                                 extraOpts = list(LocalDatabasePath = mfTestDBPath))
+    compsMF <- callMF()
     ct <- compoundTable(compsMF)
 }
 
@@ -48,10 +53,7 @@ hasCompounds <- doMetFrag || doSIRIUS
 if (doMetFrag)
 {
     # include some isomers to test filtering... (sirius should already have multiple compounds for feature groups)
-    compsMFIso <- generateCompounds(fGroupsSub, plists, "metfrag", logPath = NULL,
-                                    adduct = 1, isPositive = TRUE, database = "LocalCSV",
-                                    scoreTypes = "FragmenterScore",
-                                 extraOpts = list(LocalDatabasePath = file.path(getTestDataPath(), "test-mf-db-isomers.csv")))
+    compsMFIso <- callMF(file.path(getTestDataPath(), "test-mf-db-isomers.csv"))
 }
 
 # continue with one or another...
@@ -81,6 +83,36 @@ if (doMetFrag)
 test_that("formula scoring works", {
     skip_if_not(doMetFrag)
     expect_lt(length(filter(compsMFIsoF, minFormulaScore = 3)), length(compsMFIsoF))
+})
+
+# on a clean system, i.e. where ~/.jnati/repo/jnniinchi is not yet initialized, starting multiple
+# MetFrag processes in parallel (i.e. when maxProcAmount>1) may result in errors. This should now
+# be fixed by setting a small delay between starting up processes (delayBetweenProc arg of executeMultiProcess())
+jnatiTestDir <- file.path(tempdir(), "jnati-test")
+test_that("MetFrag uninitialized jniinchi workaround", {
+    skip_if_not(doMetFrag)
+
+    # temporarily change jnati workdir so it can be safely wiped
+    withr::with_envvar(c(JAVA_TOOL_OPTIONS = sprintf("-Djnati.dir=%s", jnatiTestDir)), {
+        withr::with_options(c(patRoon.cache.mode = "none"), {
+            for (n in seq_len(5))
+            {
+                info = sprintf("iter: %d", n)
+                unlink(jnatiTestDir, recursive = TRUE)
+                expect_warning(compsJNI <- callMF(), NA, info = info)
+                expect_equal(compsJNI, compsMF, info = info)
+            }
+        })
+    })
+})
+
+test_that("MetFrag can timeout", {
+    skip_if_not(doMetFrag)
+    withr::with_options(c(patRoon.cache.mode = "none"), {
+        # call with unreasonably short timeout...
+        expect_warning(compsTO <- callMF(to = 1))
+        expect_lt(length(compsTO), length(compsMF))
+    })
 })
 
 if (doMetFrag && doSIRIUS)

@@ -370,7 +370,7 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
                     cat(sprintf("\n%s - Done with MF! Reading results...\n", date()), file = cmd$stderrFile, append = TRUE)
                 metf <- fread(cmd$outFile, colClasses = c(Identifier = "character"))
                 if (!is.null(cmd$stderrFile))
-                    cat(sprintf("\n%s - Done! Prcoessing results...\n", date()), file = cmd$stderrFile, append = TRUE)
+                    cat(sprintf("\n%s - Done! Processing results...\n", date()), file = cmd$stderrFile, append = TRUE)
                 metf <- processMFResults(metf, cmd$analysis, cmd$spec, database, topMost, cmd$stderrFile)
                 if (!is.null(cmd$stderrFile))
                     cat(sprintf("\n%s - Done! Caching results...\n", date()), file = cmd$stderrFile, append = TRUE)
@@ -386,6 +386,8 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
                     warning(sprintf("Could not run MetFrag for %s: timeout", cmd$gName))
                     return(FALSE)
                 }
+                warning(sprintf("Restarting timed out MetFrag command for %s (retry %d/%d)",
+                                cmd$gName, retries, errorRetries))
                 return(TRUE)
             }, errorHandler = function(cmd, exitStatus, retries)
             {
@@ -396,6 +398,8 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
                         warning(sprintf("Could not run MetFrag for %s - exit: %d", cmd$gName, exitStatus))
                         return(FALSE)
                     }
+                    warning(sprintf("Restarting failed MetFrag command for %s - exit: %d (retry %d/%d)",
+                                    cmd$gName, exitStatus, retries, errorRetries))
                     return(TRUE)
                 }
                 

@@ -567,3 +567,5 @@ makeMSPlotGG <- function(spec, fragInfo, ...)
         xlab("m/z") + ylab("Intensity") +
         cowplot::theme_cowplot(font_size = 12) + theme(legend.position = "bottom", legend.title = element_blank())
 }
+
+curTimeMS <- function() as.numeric(Sys.time()) * 1000

@@ -1,7 +1,7 @@
 executeMultiProcess <- function(commandQueue, finishProc, printOutput = FALSE,
                                 printError = FALSE, showProgress = TRUE, progressOut = "", waitTimeout = 50,
                                 procTimeout = NULL, timeoutRetries = 3, maxProcAmount = getOption("patRoon.maxProcAmount"),
-                                maxCmdsPerProc = 1)
+                                maxCmdsPerProc = 1, delayBetweenProc = 0)
 {
     if (length(commandQueue) == 0)
         return(list())
@@ -18,6 +18,7 @@ executeMultiProcess <- function(commandQueue, finishProc, printOutput = FALSE,
 
     nextCommand <- 1
     finishedCommands <- 0
+    lastCommandTime <- 0 # at which time (in ms) the last command was started
 
     while (nextCommand <= totCmdCount || any(sapply(runningProcInfo, function(rp) !is.null(rp) && rp$running)))
     {
@@ -31,6 +32,13 @@ executeMultiProcess <- function(commandQueue, finishProc, printOutput = FALSE,
                 # start next command first, so we can process results while next is already running
                 if (nextCommand <= totCmdCount)
                 {
+                    if (delayBetweenProc > 0)
+                    {
+                        diffTime <- curTimeMS() - lastCommandTime
+                        if (diffTime < delayBetweenProc)
+                            Sys.sleep((delayBetweenProc - diffTime) / 1000)
+                    }
+                    
                     nproc <- min(maxCmdsPerProc, (totCmdCount - (nextCommand-1)))
 
                     procArgs <- list()
@@ -74,6 +82,7 @@ executeMultiProcess <- function(commandQueue, finishProc, printOutput = FALSE,
                     runningProcInfo[[pi]]$running <- TRUE
 
                     # printf("started %d-%d on slot %d\n", nextCommand, runningProcInfo[[pi]]$endCmdInd, pi)
+                    lastCommandTime <- curTimeMS()
 
                     if (!is.null(finishedProc))
                     {

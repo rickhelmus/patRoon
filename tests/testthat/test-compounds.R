@@ -20,7 +20,7 @@ if (doMetFrag)
 {
     compsMF <- generateCompounds(fGroupsSub, plists, "metfrag", logPath = NULL,
                                  adduct = 1, isPositive = TRUE, database = "LocalCSV",
-                                 scoreTypes = "FragmenterScore", maxProcAmount = 1, # UNDONE: fails with multi proc if ran for first time
+                                 scoreTypes = "FragmenterScore",
                                  extraOpts = list(LocalDatabasePath = mfTestDBPath))
     ct <- compoundTable(compsMF)
 }

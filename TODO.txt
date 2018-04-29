@@ -18,3 +18,4 @@ Release:
 - filter method for components
 - compound clustering
 - hclust and mass defect components
+- fix compoundViewer

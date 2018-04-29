@@ -57,91 +57,6 @@ normalizeCompScores <- function(compResults, mCompNames)
     return(compResults)
 }
 
-getCompInfoText <- function(compResults, compIndex, addHTMLURL, normalizeScores, mCompNames)
-{
-    columns <- names(compResults)
-
-    if (normalizeScores)
-        compResults <- normalizeCompScores(compResults, mCompNames)
-
-    resultRow <- compResults[compIndex, ]
-
-    addValText <- function(curText, fmt, cols)
-    {
-        cols <- getAllCompCols(cols, columns, mCompNames)
-        ret <- ""
-        for (cl in cols)
-        {
-            if (!is.null(resultRow[[cl]]) && !is.na(resultRow[[cl]]) &&
-                (!is.character(resultRow[[cl]]) || nzchar(resultRow[[cl]])))
-            {
-                fm <- sprintf("%s: %s\n", cl, fmt)
-                ret <- paste0(ret, sprintf(fm, resultRow[[cl]]))
-            }
-        }
-
-        return(paste0(curText, ret))
-    }
-
-    ctext <- ""
-
-    if (addHTMLURL)
-    {
-        addIdURL <- function(param, ident, db)
-        {
-            ident <- as.character(ident)
-
-            if (is.na(ident) || !nzchar(ident))
-                return("")
-
-            # CSI:FingerID might return multiple identifiers
-            idlist <- unlist(strsplit(ident, ";"))
-
-            if (grepl("pubchem", tolower(db)))
-                fmt <- "<a href=\"https://pubchem.ncbi.nlm.nih.gov/compound/%s\">%s</a>"
-            else if (tolower(db) == "chemspider")
-                fmt <- "<a href=\"http://www.chemspider.com/Search.aspx?q=%s\">%s</a>"
-            else
-                fmt <- "%s"
-
-            return(sprintf("%s: %s\n", param, paste0(sprintf(fmt, idlist, idlist), collapse = "; ")))
-        }
-
-        if (!is.null(resultRow$identifier)) # compounds were not merged, can use 'regular' column
-            ctext <- paste0(ctext, addIdURL("identifier", resultRow$identifier, resultRow$database))
-        else
-        {
-            idcols <- getAllCompCols("identifier", columns, mCompNames)
-            dbcols <- getAllCompCols("database", columns, mCompNames)
-
-            if (allSame(resultRow[, idcols, with = FALSE])) # no need to show double ids
-                ctext <- paste0(ctext, addIdURL("identifier", resultRow[[idcols[1]]], resultRow[[dbcols[1]]]))
-            else
-            {
-                for (i in seq_along(idcols))
-                    ctext <- paste0(ctext, addIdURL(idcols[i], resultRow[[idcols[i]]], resultRow[[dbcols[i]]]))
-            }
-        }
-    }
-    else
-        ctext <- addValText(ctext, "%s", "identifier")
-
-    ctext <- addValText(ctext, "%s", c("trivialName", "formula", "SMILES", "analysis"))
-
-    if (length(getAllCompCols("InChIKey", columns, mCompNames)) > 0)
-        ctext <- addValText(ctext, "%s", "InChIKey")
-    else # only add InChIKey1/2 if full isn't available
-        ctext <- addValText(ctext, "%s", c("InChIKey1", "InChIKey2"))
-
-    ctext <- addValText(ctext, "%.2f", getCompScoreColNames())
-    ctext <- addValText(ctext, "%.2f", c("XlogP", "AlogP"))
-
-    # remove trailing newline
-    ctext <- gsub("\n$", "", ctext)
-
-    return(ctext)
-}
-
 getCompInfoList <- function(compResults, compIndex, addHTMLURL, mCompNames)
 {
     columns <- names(compResults)
@@ -220,7 +135,92 @@ getCompInfoList <- function(compResults, compIndex, addHTMLURL, mCompNames)
     return(ctext)
 }
 
-# nocov
+# nocov start
+getCompInfoText <- function(compResults, compIndex, addHTMLURL, normalizeScores, mCompNames)
+{
+    columns <- names(compResults)
+    
+    if (normalizeScores)
+        compResults <- normalizeCompScores(compResults, mCompNames)
+    
+    resultRow <- compResults[compIndex, ]
+    
+    addValText <- function(curText, fmt, cols)
+    {
+        cols <- getAllCompCols(cols, columns, mCompNames)
+        ret <- ""
+        for (cl in cols)
+        {
+            if (!is.null(resultRow[[cl]]) && !is.na(resultRow[[cl]]) &&
+                (!is.character(resultRow[[cl]]) || nzchar(resultRow[[cl]])))
+            {
+                fm <- sprintf("%s: %s\n", cl, fmt)
+                ret <- paste0(ret, sprintf(fm, resultRow[[cl]]))
+            }
+        }
+        
+        return(paste0(curText, ret))
+    }
+    
+    ctext <- ""
+    
+    if (addHTMLURL)
+    {
+        addIdURL <- function(param, ident, db)
+        {
+            ident <- as.character(ident)
+            
+            if (is.na(ident) || !nzchar(ident))
+                return("")
+            
+            # CSI:FingerID might return multiple identifiers
+            idlist <- unlist(strsplit(ident, ";"))
+            
+            if (grepl("pubchem", tolower(db)))
+                fmt <- "<a href=\"https://pubchem.ncbi.nlm.nih.gov/compound/%s\">%s</a>"
+            else if (tolower(db) == "chemspider")
+                fmt <- "<a href=\"http://www.chemspider.com/Search.aspx?q=%s\">%s</a>"
+            else
+                fmt <- "%s"
+            
+            return(sprintf("%s: %s\n", param, paste0(sprintf(fmt, idlist, idlist), collapse = "; ")))
+        }
+        
+        if (!is.null(resultRow$identifier)) # compounds were not merged, can use 'regular' column
+            ctext <- paste0(ctext, addIdURL("identifier", resultRow$identifier, resultRow$database))
+        else
+        {
+            idcols <- getAllCompCols("identifier", columns, mCompNames)
+            dbcols <- getAllCompCols("database", columns, mCompNames)
+            
+            if (allSame(resultRow[, idcols, with = FALSE])) # no need to show double ids
+                ctext <- paste0(ctext, addIdURL("identifier", resultRow[[idcols[1]]], resultRow[[dbcols[1]]]))
+            else
+            {
+                for (i in seq_along(idcols))
+                    ctext <- paste0(ctext, addIdURL(idcols[i], resultRow[[idcols[i]]], resultRow[[dbcols[i]]]))
+            }
+        }
+    }
+    else
+        ctext <- addValText(ctext, "%s", "identifier")
+    
+    ctext <- addValText(ctext, "%s", c("trivialName", "formula", "SMILES", "analysis"))
+    
+    if (length(getAllCompCols("InChIKey", columns, mCompNames)) > 0)
+        ctext <- addValText(ctext, "%s", "InChIKey")
+    else # only add InChIKey1/2 if full isn't available
+        ctext <- addValText(ctext, "%s", c("InChIKey1", "InChIKey2"))
+    
+    ctext <- addValText(ctext, "%.2f", getCompScoreColNames())
+    ctext <- addValText(ctext, "%.2f", c("XlogP", "AlogP"))
+    
+    # remove trailing newline
+    ctext <- gsub("\n$", "", ctext)
+    
+    return(ctext)
+}
+
 getCompViewerUI <- function(pageChoices)
 {
     fillPage(

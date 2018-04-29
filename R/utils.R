@@ -74,6 +74,7 @@ insertDTColumn <- function(dt, col, d, before)
 # Fix from R DescTools
 #' Internal fix for \pkg{RDCOMClient}, ignore.
 #' @param ref,className ignore
+#' @keywords internal
 #' @export
 createCOMReference <- function(ref, className)
 {

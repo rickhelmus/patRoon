@@ -12,7 +12,6 @@
 #' @importFrom Rdpack reprompt
 #' @importClassesFrom CAMERA xsAnnotate
 #' @import data.table
-#' @import withr
 #' @import enviPick
 #' @import DBI
 #' @import RSQLite

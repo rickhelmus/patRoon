@@ -13,7 +13,7 @@ DAConstants <- list(
 # DA needs backslashes
 getBrukerAnalysisPath <- function(analysis, path) normalizePath(file.path(path, paste0(analysis, ".d")))
 
-hideDAInScope <- local_(function(x) getDAApplication()$Hide(), function(x) getDAApplication()$Show())
+hideDAInScope <- withr::local_(function(x) getDAApplication()$Hide(), function(x) getDAApplication()$Show())
 
 #' @details \code{showDataAnalysis} makes a hidden DataAnalysis window visible
 #'   again. Most functions using DataAnalysis will hide the window during

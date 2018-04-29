@@ -79,7 +79,7 @@ Suggests:
     covr
 RdMacros:
     Rdpack
-Collate:
+Collate: 
     'generics.R'
     'cache.R'
     'main.R'
@@ -123,6 +123,7 @@ Collate:
     'multi-process.R'
     'project-tool.R'
     'report.R'
+    'utils-checkmate.R'
     'utils-xcms.R'
     'utils.R'
     'zzz.R'

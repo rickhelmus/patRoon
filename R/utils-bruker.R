@@ -321,6 +321,22 @@ makeDAEIC <- function(mz, mzWidth, ctype = "EIC", mtype = "MS", polarity = "both
 addDAEIC <- function(analysis, path, mz, mzWidth, ctype = "EIC", mtype = "MS", polarity = "both", bgsubtr = FALSE, fragpath = "",
                      name = NULL, hideDA = TRUE)
 {
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertCharacter(analysis, len = 1, add = ac)
+    checkmate::assertCharacter(path, len = 1, add = ac)
+    checkmate::assertDirectoryExists(file.path(path, paste0(analysis, ".d")), add = ac)
+    checkmate::assertNumber(mz, lower = 0, finite = TRUE, add = ac)
+    checkmate::assertNumber(mzWidth, lower = 0, finite = TRUE, add = ac)
+    checkmate::assertChoice(ctype, c("EIC", "TIC", "BPC"), add = ac)
+    checkmate::assertChoice(mtype, c("MS", "MSMS", "allMSMS", "BBCID"), add = ac)
+    checkmate::assertChoice(polarity, c("positive", "negative", "both"), add = ac)
+    checkmate::assertFlag(bgsubtr, add = ac)
+    checkmate::assert(
+        checkmate::checkNumber(fragpath, lower = 0, finite = TRUE),
+        checkmate::checkChoice(fragpath, "")
+    )
+    checkmate::reportAssertions(ac)
+    
     DA <- getDAApplication()
 
     if (hideDA)

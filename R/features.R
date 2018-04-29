@@ -102,6 +102,8 @@ setMethod("screenTargets", "features", function(obj, targets, rtWindow, mzWindow
 #' @export
 findFeatures <- function(analysisInfo, algorithm, ...)
 {
+    assertAnalysisInfo(analysisInfo)
+    
     f <- switch(algorithm,
                 bruker = findFeaturesBruker,
                 openms = findFeaturesOpenMS,

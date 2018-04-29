@@ -1,7 +1,7 @@
 defMultiProcErrorHandler <- function(cmd, exitStatus, ...)
 {
     stop(sprintf("Failed to run command '%s' with args: '%s'. Exit code: %d",
-                 cmd$command, paste0(cmd$args, collapse = ", "), exitStatus))
+                 cmd$command, paste0(cmd$args, collapse = " "), exitStatus))
 }
 
 executeMultiProcess <- function(commandQueue, finishHandler,

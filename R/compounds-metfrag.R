@@ -203,8 +203,6 @@ processMFResults <- function(metf, analysis, spec, db, topMost, lfile = "")
 #' @param timeoutRetries Maximum number of retries after reaching a timeout
 #'   before completely skipping the metFrag query for a feature group. Also see
 #'   \code{timeout} argument.
-#' @param errorRetries Maximum number of retries after an error occurred. This
-#'   may be useful to handle e.g. connection errors.
 #' @param dbRelMzDev Relative mass deviation (in ppm) for database search. Sets
 #'   the \option{DatabaseSearchRelativeMassDeviation} option.
 #' @param fragRelMzDev Relative mass deviation (in ppm) for fragment matching.
@@ -381,30 +379,30 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
                 return(metf)
             }, timeoutHandler = function(cmd, retries)
             {
-                if (retries > timeoutRetries)
+                if (retries >= timeoutRetries)
                 {
                     warning(sprintf("Could not run MetFrag for %s: timeout", cmd$gName))
                     return(FALSE)
                 }
                 warning(sprintf("Restarting timed out MetFrag command for %s (retry %d/%d)",
-                                cmd$gName, retries, errorRetries))
+                                cmd$gName, retries+1, errorRetries))
                 return(TRUE)
             }, errorHandler = function(cmd, exitStatus, retries)
             {
                 if (exitStatus <= 6) # some error thrown by MF
                 {
-                    if (retries > errorRetries)
+                    if (retries >= errorRetries)
                     {
-                        warning(sprintf("Could not run MetFrag for %s - exit: %d", cmd$gName, exitStatus))
+                        warning(sprintf("Could not run MetFrag for %s - exit code: %d", cmd$gName, exitStatus))
                         return(FALSE)
                     }
                     warning(sprintf("Restarting failed MetFrag command for %s - exit: %d (retry %d/%d)",
-                                    cmd$gName, exitStatus, retries, errorRetries))
+                                    cmd$gName, exitStatus, retries+1, errorRetries))
                     return(TRUE)
                 }
                 
                 # some other error (e.g. java not present)
-                stop("Failed to execute MetFragCL!")
+                stop(sprintf("Fatal: Failed to execute MetFragCL for %s - exit code: %d", cmd$gName, exitStatus))
             }, maxProcAmount = maxProcAmount, procTimeout = timeout, delayBetweenProc = 100)
         }
         else

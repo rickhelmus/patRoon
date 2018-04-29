@@ -213,12 +213,16 @@ getDACalibrationError <- function(anaInfo)
 #' @export
 exportDAFiles <- function(anaInfo, format = "mzML", exportLine = TRUE, outPath = anaInfo$path, overWrite = FALSE)
 {
-    outPath <- rep(outPath, length.out = length(anaInfo$path))
+    ac <- checkmate::makeAssertCollection()
+    assertAnalysisInfo(anaInfo, add = ac)
+    checkmate::assertChoice(format, c("mzML", "mzXML", "mzData"), add = ac)
+    checkmate::assertFlag(exportLine, add = ac)
+    checkmate::assertCharacter(outPath, min.chars = 1, min.len = 1, add = ac)
+    checkmate::assertDirectoryExists(outPath, "w", add = ac)
+    checkmate::assertFlag(overWrite, add = ac)
+    checkmate::reportAssertions(ac)
 
-    if (!format %in% c("mzXML", "mzData", "mzML"))
-        stop("Wrong export format!")
-    else if (length(anaInfo$path) != length(outPath))
-        stop("Size of output paths differs from input")
+    outPath <- rep(outPath, length.out = length(anaInfo$path))
 
     expConstant <- if (format == "mzXML") DAConstants$daMzXML else if (format == "mzData") DAConstants$daMzData else DAConstants$daMzML
     expSpecConstant <- if (exportLine) DAConstants$daLine else DAConstants$daProfile

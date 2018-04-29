@@ -363,10 +363,10 @@ getBrewerPal <- function(n, name)
 #' @param formatFrom,formatTo A \code{character} that specifies the source and
 #'   destination format, respectively. Valid options are: \code{"mzXML"},
 #'   \code{"mzML"} and \code{"mzData"}.
-#' @param outPath A directory path that should be used for the output. Usually
+#' @param outPath A character vector specifying directories that should be used for the output. Usually
 #'   this is the same as the source (otherwise the
 #'   \link[=analysis-information]{analysis information} should be changed for
-#'   further processing).
+#'   further processing). Will be re-cycled if necessary.
 #' @param overWrite Should existing destination file be overwritten
 #'   (\code{TRUE}) or not (\code{FALSE})?
 #'
@@ -375,6 +375,15 @@ getBrewerPal <- function(n, name)
 #' @export
 convertMSFiles <- function(anaInfo, formatFrom, formatTo, outPath = anaInfo$path, overWrite = FALSE)
 {
+    ac <- checkmate::makeAssertCollection()
+    assertAnalysisInfo(anaInfo, add = ac)
+    checkmate::assertCharacter(formatFrom, len = 1, add = ac)
+    checkmate::assertCharacter(formatTo, len = 1, add = ac)
+    checkmate::assertCharacter(outPath, min.chars = 1, min.len = 1, add = ac)
+    checkmate::assertDirectoryExists(outPath, "w", add = ac)
+    checkmate::assertFlag(overWrite, add = ac)
+    checkmate::reportAssertions(ac)
+    
     outPath <- rep(outPath, length.out = length(anaInfo$path))
 
     for (anai in seq_len(nrow(anaInfo)))

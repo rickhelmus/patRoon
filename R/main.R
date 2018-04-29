@@ -27,6 +27,10 @@
 #' @import ggplot2
 NULL # need this for doc generation
 
+# need this: https://github.com/mllg/checkmate/issues/139
+#' @importFrom checkmate vname makeAssertion makeAssertionFunction
+NULL
+
 # UNDONE: rstudioapi optional?
 
 #' @include cache.R

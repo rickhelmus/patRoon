@@ -87,7 +87,7 @@ processSiriusCompounds <- function(cmd, exitStatus, retries)
 #' @export
 generateCompoundsSirius <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct = "[M+H]+", elements = "CHNOP",
                                     profile = "qtof", formulaDatabase = NULL, fingerIDDatabase = "pubchem",
-                                    noise = NULL, topMost = 100, logPath = file.path("log", "sirius"),
+                                    noise = NULL, errorRetries = 2, topMost = 100, logPath = file.path("log", "sirius"),
                                     maxProcAmount = getOption("patRoon.maxProcAmount"))
 {
     anaInfo <- analysisInfo(fGroups)
@@ -135,9 +135,11 @@ generateCompoundsSirius <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct =
                                 fingerIDDatabase)
         db <- if (!is.null(fingerIDDatabase)) fingerIDDatabase else if (!is.null(formulaDatabase)) formulaDatabase else "pubchem"
         logf <- if (!is.null(logPath)) file.path(logPath, paste0("sirius-comp-", grp, ".txt")) else NULL
+        logfe <- if (!is.null(logPath)) file.path(logPath, paste0("sirius-comp-err-", grp, ".txt")) else NULL
 
         return(c(list(hash = hash, adduct = adduct, cacheDB = cacheDB, MSMSSpec = pLists[[ana]][[grp]]$MSMS,
-                      analysis = ana, database = db, topMost = topMost, stdoutFile = logf), cmd))
+                      analysis = ana, database = db, topMost = topMost, stdoutFile = logf, stderrFile = logfe,
+                      gName = grp), cmd))
     }, simplify = FALSE)
     cmdQueue <- cmdQueue[!sapply(cmdQueue, is.null)]
 
@@ -158,7 +160,16 @@ generateCompoundsSirius <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct =
     {
         if (!is.null(logPath))
             mkdirp(logPath)
-        ret <- executeMultiProcess(cmdQueue, processSiriusCompounds, maxProcAmount = maxProcAmount)
+        ret <- executeMultiProcess(cmdQueue, processSiriusCompounds, errorHandler = function(cmd, exitStatus, retries) {
+            if (retries < errorRetries)
+            {
+                warning(sprintf("Restarting failed SIRIUS for %s - exit: %d (retry %d/%d)",
+                                cmd$gName, exitStatus, retries+1, errorRetries))
+                return(TRUE)
+            }
+            stop(sprintf("Fatal: Failed to execute SIRIUS for %s - exit code: %d\nCommand: %s", cmd$gName, exitStatus,
+                         paste(cmd$command, paste0(cmd$args, collapse = " "))))
+        }, maxProcAmount = maxProcAmount)
     }
     else
         ret <- list()

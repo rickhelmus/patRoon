@@ -148,14 +148,14 @@ test_that("reporting works", {
 })
 
 test_that("plotting works", {
-    skip_if_not(hasCompounds)
+    skip_if_not(doMetFrag)
     
-    expect_doppel("compound-spec", function() plotSpec(comps, 1, names(compoundTable(comps))[1], plists))
-    # expect_doppel("spec-gg", plotSpec(comps, 1, names(compoundTable(comps))[1], plists, useGGPlot2 = TRUE))
-    expect_plot(print(plotSpec(comps, 1, names(compoundTable(comps))[1], plists, useGGPlot2 = TRUE)))
+    expect_doppel("compound-spec", function() plotSpec(compsMFIso, 1, names(compoundTable(compsMFIso))[1], plists))
+    # expect_doppel("spec-gg", plotSpec(compsMFIso, 1, names(compoundTable(compsMFIso))[1], plists, useGGPlot2 = TRUE))
+    expect_plot(print(plotSpec(compsMFIso, 1, names(compoundTable(compsMFIso))[1], plists, useGGPlot2 = TRUE)))
     
     # plotStructure gives an empty plot??
-    # expect_doppel("struct", function() plotStructure(comps, 1, names(compoundTable(comps))[1]))
-    expect_plot(plotStructure(comps, 1, names(compoundTable(comps))[1]))
-    expect_doppel("scores", function() plotScores(comps, 1, names(compoundTable(comps))[1]))
+    # expect_doppel("struct", function() plotStructure(compsMFIso, 1, names(compoundTable(compsMFIso))[1]))
+    expect_plot(plotStructure(compsMFIso, 1, names(compoundTable(compsMFIso))[1]))
+    expect_doppel("scores", function() plotScores(compsMFIso, 1, names(compoundTable(compsMFIso))[1]))
 })

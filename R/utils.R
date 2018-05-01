@@ -155,6 +155,13 @@ line2user <- function(line, side)
 #' @export
 generateAnalysisInfo <- function(paths, groups = "", refs = "", fileTypes = c("Bruker", "mzXML", "mzML"))
 {
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertDirectoryExists(paths, access = "r", add = ac)
+    checkmate::assertCharacter(groups, min.len = 1, add = ac)
+    checkmate::assertCharacter(refs, min.len = 1, add = ac)
+    checkmate::assertSubset(fileTypes, c("Bruker", "mzXML", "mzML"), empty.ok = FALSE, add = ac)
+    checkmate::reportAssertions(ac)
+    
     fileExts <- c(Bruker = ".d", mzXML = ".mzXML", mzML = ".mzML")
     fileTypes <- fileExts[fileTypes] # rename to file extensions
 
@@ -195,6 +202,8 @@ generateAnalysisInfo <- function(paths, groups = "", refs = "", fileTypes = c("B
 #' @export
 generateAnalysisInfoFromEnviMass <- function(path)
 {
+    checkmate::assertDirectoryExists(path, access = "r")
+    
     enviSInfo <- fread(file.path(path, "dataframes", "measurements"))[Type %in% c("sample", "blank")]
 
     enviSInfo[, DT := as.POSIXct(paste(Date, Time, sep = " "))]

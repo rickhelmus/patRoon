@@ -26,6 +26,13 @@ featuresBruker <- setClass("featuresBruker", contains = "features")
 #' @export
 findFeaturesBruker <- function(analysisInfo, doFMF = "auto", startRange = 0, endRange = 0)
 {
+    ac <- checkmate::makeAssertCollection()
+    assertAnalysisInfo(analysisInfo, add = ac)
+    checkmate::assertChoice(as.character(doFMF), c("auto", FALSE, TRUE), add = ac)
+    checkmate::assertNumber(startRange, lower = 0, finite = TRUE, add = ac)
+    checkmate::assertNumber(endRange, lower = 0, finite = TRUE, add = ac)
+    checkmate::reportAssertions(ac)
+    
     ret <- featuresBruker(analysisInfo = analysisInfo)
 
     DA <- getDAApplication()

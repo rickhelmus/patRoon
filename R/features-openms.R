@@ -41,6 +41,15 @@ findFeaturesOpenMS <- function(analysisInfo, thr = 1000, comfwhm = 5, minfwhm = 
                                maxlength = -1, mzppm = 10, extraOpts = NULL,
                                logPath = file.path("log", "openms"), maxProcAmount = getOption("patRoon.maxProcAmount"))
 {
+    ac <- checkmate::makeAssertCollection()
+    assertAnalysisInfo(analysisInfo, add = ac)
+    aapply(checkmate::assertNumber, . ~ thr + minfwhm + maxfwhm + minlength + mzppm, lower = 0,
+           finite = TRUE, fixed = list(add = ac))
+    checkmate::assertNumber(maxlength, finite = TRUE, add = ac)
+    checkmate::assertList(extraOpts, any.missing = FALSE, names = "unique", null.ok = TRUE, add = ac)
+    assertMultiProcArgs(logPath, maxProcAmount, add = ac)
+    checkmate::reportAssertions(ac)
+    
     printf("Finding features with OpenMS for %d analyses ...\n", nrow(analysisInfo))
 
     cmdQueue <- lapply(seq_len(nrow(analysisInfo)), function(anai)

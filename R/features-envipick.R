@@ -16,6 +16,8 @@ featuresEnviPick <- setClass("featuresEnviPick", contains = "features")
 #' @export
 findFeaturesEnviPick <- function(analysisInfo, ...)
 {
+    assertAnalysisInfo(anaInfo)
+    
     ret <- featuresEnviPick(analysisInfo = analysisInfo)
 
     cat("Finding features with enviPick...\n===========\n")

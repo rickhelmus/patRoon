@@ -326,8 +326,8 @@ addDAEIC <- function(analysis, path, mz, mzWidth, ctype = "EIC", mtype = "MS", p
                      name = NULL, hideDA = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertCharacter(analysis, len = 1, add = ac)
-    checkmate::assertCharacter(path, len = 1, add = ac)
+    checkmate::assertString(analysis, min.chars = "1", add = ac)
+    checkmate::assertString(path, add = ac)
     checkmate::assertDirectoryExists(file.path(path, paste0(analysis, ".d")), add = ac)
     checkmate::assertNumber(mz, lower = 0, finite = TRUE, add = ac)
     checkmate::assertNumber(mzWidth, lower = 0, finite = TRUE, add = ac)

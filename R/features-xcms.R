@@ -24,7 +24,7 @@ findFeaturesXCMS <- function(analysisInfo, method = "centWave", ...)
 {
     ac <- checkmate::makeAssertCollection()
     assertAnalysisInfo(analysisInfo, add = ac)
-    checkmate::assertCharacter(method, min.chars = 1, len = 1, add = ac)
+    checkmate::assertString(method, min.chars = 1, add = ac)
     checkmate::reportAssertions(ac)
     
     hash <- makeHash(analysisInfo, list(...)) # UNDONE: better hash?

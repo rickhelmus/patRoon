@@ -28,7 +28,7 @@ assertCanCreateDir <- function(x, .var.name = checkmate::vname(x), add = NULL)
     if (!is.null(add))
         mc <- length(add$getMessages())
     
-    checkmate::assertCharacter(x, min.chars = 1, len = 1, .var.name = .var.name, add = add)
+    checkmate::assertString(x, min.chars = 1, .var.name = .var.name, add = add)
 
     # only continue if previous assertions didn't fail: x needs to be a valid path for next assertions
     # NOTE: this is only applicable if add != NULL, otherwise previous assertions will throw errors

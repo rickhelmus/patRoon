@@ -90,6 +90,18 @@ generateCompoundsSirius <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct =
                                     noise = NULL, errorRetries = 2, topMost = 100, logPath = file.path("log", "sirius"),
                                     maxProcAmount = getOption("patRoon.maxProcAmount"))
 {
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertClass(fGroups, "featureGroups", add = ac)
+    checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
+    checkmate::assertNumber(maxMzDev, lower = 1, finite = TRUE, add = ac)
+    aapply(checkmate::assertString, . ~ adduct + elements + profile + fingerIDDatabase, fixed = list(add = ac))
+    checkmate::assertString(formulaDatabase, null.ok = TRUE, add = ac)
+    checkmate::assertNumber(noise, lower = 0, finite = TRUE, null.ok = TRUE, add = ac)
+    checkmate::assertCount(errorRetries, add = ac)
+    checkmate::assertCount(topMost, positive = TRUE, add = ac)
+    assertMultiProcArgs(logPath, maxProcAmount, add = ac)
+    checkmate::reportAssertions(ac)
+    
     anaInfo <- analysisInfo(fGroups)
     fTable <- featureTable(fGroups)
     ftind <- groupFeatIndex(fGroups)

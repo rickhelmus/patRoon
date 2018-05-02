@@ -160,6 +160,17 @@ generateFormulasGenForm <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct =
                                     elements = "CHNOP", hetero = TRUE, MSMode = "both", extraOpts = NULL,
                                     maxProcAmount = getOption("patRoon.maxProcAmount"), maxCmdsPerProc = 25)
 {
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertClass(fGroups, "featureGroups", add = ac)
+    checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
+    checkmate::assertNumber(maxMzDev, lower = 0, finite = TRUE, add = ac)
+    aapply(checkmate::assertString, . ~ adduct + elements, fixed = list(add = ac))
+    checkmate::assertFlag(hetero, add = ac)
+    checkmate::assertChoice(MSMode, c("ms", "msms", "both"), add = ac)
+    checkmate::assertList(extraOpts, any.missing = FALSE, names = "unique", null.ok = TRUE, add = ac)
+    aapply(checkmate::assertCount, . ~ maxProcAmount + maxCmdsPerProc, positive = TRUE, fixed = list(add = ac))
+    checkmate::reportAssertions(ac)
+    
     gInfo <- groupInfo(fGroups)
     anaInfo <- analysisInfo(fGroups)
     ftind <- groupFeatIndex(fGroups)

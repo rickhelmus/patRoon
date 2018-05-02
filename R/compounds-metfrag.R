@@ -290,7 +290,26 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
     
     if (method == "R")
         checkPackage("metfRag", "c-ruttkies/MetFragR")
-
+    
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertClass(fGroups, "featureGroups", add = ac)
+    checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
+    checkmate::assertChoice(method, c("CL", "R"), add = ac)
+    assertMultiProcArgs(logPath, maxProcAmount, add = ac)
+    aapply(checkmate::assertNumber, . ~ timeout + dbRelMzDev + fragRelMzDev + fragAbsMzDev,
+           lower = 0, finite = TRUE, fixed = list(add = ac))
+    aapply(checkmate::assertCount, . ~ timeoutRetries + errorRetries, fixed = list(add = ac))
+    aapply(checkmate::assertCount, . ~ topMost + maxCandidatesToStop, positive = TRUE, fixed = list(add = ac))
+    aapply(checkmate::assertFlag, . ~ isPositive + addTrivialNames, fixed = list(add = ac))
+    checkmate::assertInt(adduct, add = ac)
+    aapply(checkmate::assertString, . ~ database + chemSpiderToken, fixed = list(add = ac))
+    aapply(checkmate::assertCharacter, . ~ scoreTypes + preProcessingFilters + postProcessingFilters,
+           any.missing = FALSE, fixed = list(add = ac))
+    checkmate::assertNumeric(scoreWeights, lower = 0, finite = TRUE, any.missing = FALSE, min.len = 1, add = ac)
+    aapply(checkmate::assertList, . ~ identifiers + extraOpts, any.missing = FALSE,
+           names = "unique", null.ok = TRUE, fixed = list(add = ac))
+    checkmate::reportAssertions(ac)
+    
     anaInfo <- analysisInfo(fGroups)
     ftind <- groupFeatIndex(fGroups)
     gTable <- groups(fGroups)

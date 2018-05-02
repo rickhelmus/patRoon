@@ -27,6 +27,13 @@ generateDAMSPeakLists <- function(fGroups, bgsubtr = TRUE, maxRtMSWidth = NULL, 
 {
     # UNDONE: implement topMost
 
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertClass(fGroups, "featureGroups", add = ac)
+    aapply(checkmate::assertFlag, . ~ bgsubtr + clear + save, fixed = list(add = ac))
+    checkmate::assertNumber(maxRtMSWidth, lower = 0, finite = TRUE, null.ok = TRUE, add = ac)
+    checkmate::assertChoice(MSMSType, c("MSMS", "BBCID"), add = ac)
+    checkmate::reportAssertions(ac)
+    
     compounds <- generateDACompounds(fGroups, bgsubtr, maxRtMSWidth, clear, save, MSMSType)
 
     cacheDB <- openCacheDB()
@@ -121,6 +128,8 @@ generateDAMSPeakLists <- function(fGroups, bgsubtr = TRUE, maxRtMSWidth = NULL, 
 #' @export
 generateDAFMFMSPeakLists <- function(fGroups)
 {
+    checkmate::assertClass(fGroups, "featureGroups")
+    
     # UNDONE: implement topMost
 
     cacheDB <- openCacheDB()

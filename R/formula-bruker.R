@@ -31,6 +31,12 @@ simplifyDAFormula <- function(formula)
 generateFormulasDA <- function(fGroups, precursorMzSearchWindow = 0.002, MSMode = "both")
 {
     # UNDONE: test MSMode and duplicate MS formulas removal
+    
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertClass(fGroups, "featureGroups", add = ac)
+    checkmate::assertNumber(precursorMzSearchWindow, lower = 0, finite = TRUE, add = ac)
+    checkmate::assertChoice(MSMode, c("ms", "msms", "both"), add = ac)
+    checkmate::reportAssertions(ac)
 
     DA <- getDAApplication()
     anaInfo <- analysisInfo(fGroups)

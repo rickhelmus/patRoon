@@ -386,8 +386,8 @@ convertMSFiles <- function(anaInfo, formatFrom, formatTo, outPath = anaInfo$path
 {
     ac <- checkmate::makeAssertCollection()
     assertAnalysisInfo(anaInfo, add = ac)
-    checkmate::assertCharacter(formatFrom, len = 1, add = ac)
-    checkmate::assertCharacter(formatTo, len = 1, add = ac)
+    checkmate::assertChoice(formatFrom, c("mzXML", "mzML", "mzData"), add = ac)
+    checkmate::assertChoice(formatTo, c("mzXML", "mzML", "mzData"), add = ac)
     checkmate::assertCharacter(outPath, min.chars = 1, min.len = 1, add = ac)
     checkmate::assertDirectoryExists(outPath, "w", add = ac)
     checkmate::assertFlag(overWrite, add = ac)

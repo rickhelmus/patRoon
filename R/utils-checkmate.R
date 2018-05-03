@@ -1,7 +1,7 @@
 checkHasNames <- function(x, n, type = "unique") checkmate::checkNames(names(x), must.include = n, type = type)
 assertHasNames <- checkmate::makeAssertionFunction(checkHasNames)
 
-assertAnalysisInfo <- function(x, requiredFormat = NULL, allowedFormats = NULL, .var.name = checkmate::vname(x), add = NULL)
+assertAnalysisInfo <- function(x, allowedFormats = NULL, .var.name = checkmate::vname(x), add = NULL)
 {
     if (!is.null(add))
         mc <- length(add$getMessages())
@@ -14,33 +14,29 @@ assertAnalysisInfo <- function(x, requiredFormat = NULL, allowedFormats = NULL, 
     if (is.null(add) || length(add$getMessages()) == mc)
     {
         checkmate::assertDirectoryExists(x$path, .var.name = .var.name, add = add)
-        if (!is.null(requiredFormat))
-            checkmate::assertFileExists(file.path(x$path, paste0(x$analysis, ".", requiredFormat)),
-                                        .var.name = .var.name, add = add)
-        else
+        
+        # UNDONE: more extensions? (e.g. mzData)
+        if (is.null(allowedFormats))
+            allowedFormats <- c("mzML", "mzXML", "d")
+        
+        res <- FALSE
+        for (f in allowedFormats)
         {
-            # UNDONE: more extensions? (e.g. mzData)
-            if (is.null(allowedFormats))
-                allowedFormats <- c("mzML", "mzXML", "d")
+            p <- file.path(x$path, paste0(x$analysis, ".", f))
+            if (f == "d")
+                res <- checkmate::checkDirectoryExists(p)
+            else
+                res <- checkmate::checkFileExists(p)
             
-            res <- FALSE
-            for (f in allowedFormats)
-            {
-                p <- file.path(x$path, paste0(x$analysis, ".", f))
-                if (f == "d")
-                    res <- checkmate::checkDirectoryExists(p)
-                else
-                    res <- checkmate::checkFileExists(p)
-                
-                if (isTRUE(res))
-                    break
-            }
-            
-            if (!isTRUE(res))
-                checkmate::makeAssertion(x, sprintf("No valid data format found (valid: %s)",
-                                                    paste0(allowedFormats, collapse = ", ")),
-                                         var.name = .var.name, collection = add)
+            if (isTRUE(res))
+                break
         }
+        
+        allowedFormats <- sub("d", "bruker", allowedFormats) # user friendly name
+        if (!isTRUE(res))
+            checkmate::makeAssertion(x, sprintf("No analyses found with correct data format (valid: %s)",
+                                                paste0(allowedFormats, collapse = ", ")),
+                                     var.name = .var.name, collection = add)
     }
     
     invisible(NULL)

@@ -27,6 +27,13 @@ featureGroupsBruker <- setClass("featureGroupsBruker", contains = "featureGroups
 #' @export
 importFeatureGroupsBrukerPA <- function(path, feat, maxRtDev = 12, maxMzDev = 0.005, maxIntDev = 5, warn = TRUE)
 {
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertFileExists(path, "r", add = ac)
+    checkmate::assertClass(feat, "featuresBruker", add = ac)
+    aapply(checkmate::assertNumber, . ~ maxRtDev + maxMzDev + maxIntDev, lower = 0, finite = TRUE, fixed = list(add = ac))
+    checkmate::assertFlag(warn, add = ac)
+    checkmate::reportAssertions(ac)
+    
     hash <- makeHash(makeFileHash(path), feat, maxRtDev, maxMzDev, maxIntDev)
     cachefg <- loadCacheData("featureGroupsPA", hash)
     if (!is.null(cachefg))
@@ -37,7 +44,7 @@ importFeatureGroupsBrukerPA <- function(path, feat, maxRtDev = 12, maxMzDev = 0.
     anaInfo <- analysisInfo(feat)
 
     # disable check.names: keep original names as much as possible
-    f <- fread(path, check.names = F, sep="\t", stringsAsFactors = FALSE, header = TRUE)
+    f <- fread(path, check.names = F, sep = "\t", stringsAsFactors = FALSE, header = TRUE)
     setnames(f, make.unique(colnames(f))) # still make them unique
 
     # assume first column contains filenames

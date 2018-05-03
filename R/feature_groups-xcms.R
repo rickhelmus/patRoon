@@ -30,6 +30,12 @@ groupFeaturesXCMS <- function(feat, rtalign = TRUE, exportedData = TRUE, groupAr
 {
     # UNDONE: keep exportedData things? Or just require that it's exported? If keep document also for OpenMS and implications.
 
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertClass(feat, "features", add = ac)
+    aapply(checkmate::assertFlag, . ~ rtalign + exportedData, fixed = list(add = ac))
+    aapply(checkmate::assertList, . ~ groupArgs + retcorArgs, any.missing = FALSE, names = "unique", fixed = list(add = ac))
+    checkmate::reportAssertions(ac)
+    
     hash <- makeHash(feat, rtalign, exportedData, groupArgs, retcorArgs)
     cachefg <- loadCacheData("featureGroupsXCMS", hash)
     if (!is.null(cachefg))

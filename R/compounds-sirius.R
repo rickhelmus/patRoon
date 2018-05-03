@@ -93,7 +93,7 @@ generateCompoundsSirius <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct =
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
-    checkmate::assertNumber(maxMzDev, lower = 1, finite = TRUE, add = ac)
+    checkmate::assertNumber(maxMzDev, lower = 0, finite = TRUE, add = ac)
     aapply(checkmate::assertString, . ~ adduct + elements + profile + fingerIDDatabase, fixed = list(add = ac))
     checkmate::assertString(formulaDatabase, null.ok = TRUE, add = ac)
     checkmate::assertNumber(noise, lower = 0, finite = TRUE, null.ok = TRUE, add = ac)

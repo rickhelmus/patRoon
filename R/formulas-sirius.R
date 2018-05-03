@@ -79,6 +79,16 @@ generateFormulasSirius <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct = 
                                    profile = "qtof", database = NULL, noise = NULL,
                                    logPath = file.path("log", "sirius"), maxProcAmount = getOption("patRoon.maxProcAmount"))
 {
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertClass(fGroups, "featureGroups", add = ac)
+    checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
+    checkmate::assertNumber(maxMzDev, lower = 0, finite = TRUE, add = ac)
+    aapply(checkmate::assertString, . ~ adduct + elements + profile, fixed = list(add = ac))
+    checkmate::assertString(database, null.ok = TRUE, add = ac)
+    checkmate::assertNumber(noise, lower = 0, finite = TRUE, null.ok = TRUE, add = ac)
+    assertMultiProcArgs(logPath, maxProcAmount, add = ac)
+    checkmate::reportAssertions(ac)
+    
     anaInfo <- analysisInfo(fGroups)
     fTable <- featureTable(fGroups)
     ftind <- groupFeatIndex(fGroups)

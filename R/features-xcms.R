@@ -23,7 +23,7 @@ featuresXCMS <- setClass("featuresXCMS", slots = list(xs = "xcmsSet"), contains 
 findFeaturesXCMS <- function(analysisInfo, method = "centWave", ...)
 {
     ac <- checkmate::makeAssertCollection()
-    assertAnalysisInfo(analysisInfo, add = ac)
+    assertAnalysisInfo(analysisInfo, c("mzXML", "mzML"), add = ac)
     checkmate::assertString(method, min.chars = 1, add = ac)
     checkmate::reportAssertions(ac)
     

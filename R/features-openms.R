@@ -42,7 +42,7 @@ findFeaturesOpenMS <- function(analysisInfo, thr = 1000, comfwhm = 5, minfwhm = 
                                logPath = file.path("log", "openms"), maxProcAmount = getOption("patRoon.maxProcAmount"))
 {
     ac <- checkmate::makeAssertCollection()
-    assertAnalysisInfo(analysisInfo, add = ac)
+    assertAnalysisInfo(analysisInfo, "mzML", add = ac)
     aapply(checkmate::assertNumber, . ~ thr + minfwhm + maxfwhm + minlength + mzppm, lower = 0,
            finite = TRUE, fixed = list(add = ac))
     checkmate::assertNumber(maxlength, finite = TRUE, add = ac)

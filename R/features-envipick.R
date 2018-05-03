@@ -16,7 +16,7 @@ featuresEnviPick <- setClass("featuresEnviPick", contains = "features")
 #' @export
 findFeaturesEnviPick <- function(analysisInfo, ...)
 {
-    assertAnalysisInfo(anaInfo)
+    assertAnalysisInfo(anaInfo, "mzXML")
     
     ret <- featuresEnviPick(analysisInfo = analysisInfo)
 

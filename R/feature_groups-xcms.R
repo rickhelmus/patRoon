@@ -104,6 +104,11 @@ importFeatureGroupsXCMSFromFeat <- function(xs, analysisInfo, feat)
 #' @export
 importFeatureGroupsXCMS <- function(xs, analysisInfo)
 {
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertClass(xs, "xcmsSet", add = ac)
+    assertAnalysisInfo(analysisInfo, add = ac)
+    checkmate::reportAssertions(ac)
+    
     if (length(xcms::groups(xs)) == 0)
         stop("Provided xcmsSet does not contain any grouped features!")
 

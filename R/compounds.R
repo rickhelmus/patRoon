@@ -154,6 +154,12 @@ setMethod("filter", "compounds", function(obj, minExplainedPeaks = NULL, minScor
 setMethod("addFormulaScoring", "compounds", function(compounds, formConsensus, updateScore,
                                                     formulaScoreWeight)
 {
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertClass(formConsensus, "formulaConsensus", add = ac)
+    checkmate::assertFlag(updateScore, add = ac)
+    checkmate::assertNumber(formulaScoreWeight, lower = 0, finite = TRUE, add = ac)
+    checkmate::reportAssertions(ac)
+    
     fTable <- formulaTable(formConsensus)
     cTable <- compoundTable(compounds)
     cGNames <- names(cTable)

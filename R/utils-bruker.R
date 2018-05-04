@@ -106,6 +106,11 @@ closeDAFile <- function(DA, analysis, path, save)
 #' @export
 setDAMethod <- function(anaInfo, method)
 {
+    ac <- checkmate::makeAssertCollection()
+    assertAnalysisInfo(anaInfo, "d", add = ac)
+    checkmate::assertDirectoryExists(method, add = ac)
+    checkmate::reportAssertions(ac)
+    
     DA <- getDAApplication()
     method <- normalizePath(method)
     hideDAInScope()
@@ -135,6 +140,8 @@ setDAMethod <- function(anaInfo, method)
 #' @export
 recalibrarateDAFiles <- function(anaInfo)
 {
+    assertAnalysisInfo(anaInfo, "d")
+    
     DA <- getDAApplication()
     hideDAInScope()
 

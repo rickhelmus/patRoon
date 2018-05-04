@@ -58,6 +58,11 @@ findFeaturesXCMS <- function(analysisInfo, method = "centWave", ...)
 #' @export
 importFeaturesXCMS <- function(xs, analysisInfo)
 {
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertClass(xs, "xcmsSet", add = ac)
+    assertAnalysisInfo(analysisInfo, add = ac)
+    checkmate::reportAssertions(ac)
+    
     plist <- as.data.table(peaks(xs))
     snames <- sampnames(xs)
     feat <- list()

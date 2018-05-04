@@ -131,6 +131,24 @@ setMethod("removeGroups", "featureGroups", function(fGroups, indices)
 #' @export
 setMethod("[", c("featureGroups", "ANY", "ANY", "ANY"), function(x, i, j, ..., drop = TRUE)
 {
+    if (!missing(i))
+    {
+        checkmate::assert(
+            checkmate::checkNumeric(i, lower = 0, finite = TRUE),
+            checkmate::checkCharacter(i),
+            checkmate::checkLogical(i)
+            , .var.name = "i")
+    }
+    if (!missing(j))
+    {
+        checkmate::assert(
+            checkmate::checkNumeric(j, lower = 0, finite = TRUE),
+            checkmate::checkCharacter(j),
+            checkmate::checkLogical(j)
+            , .var.name = "j")
+    }
+    checkmate::assertFlag(drop)
+    
     toNumIndex <- function(ind, names)
     {
         if (typeof(ind) == "character")

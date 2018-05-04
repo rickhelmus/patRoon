@@ -59,6 +59,12 @@ findFeaturesEnviPick <- function(analysisInfo, ...)
 #' @export
 importFeaturesEnviMass <- function(analysisInfo, enviProjPath)
 {
+    ac <- checkmate::makeAssertCollection()
+    assertAnalysisInfo(analysisInfo, "mzXML", add = ac)
+    checkmate::assertDirectoryExists(enviProjPath, "r", add = ac)
+    checkmate::assertDirectoryExists(file.path(enviProjPath, "peaklist"), "r", .var.name = "enviProjPath", add = ac)
+    checkmate::reportAssertions(ac)
+    
     cat("Importing features from enviMass...\n")
 
     ret <- featuresEnviPick(analysisInfo = analysisInfo)

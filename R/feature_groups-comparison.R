@@ -36,6 +36,12 @@ setMethod("length", "featureGroupsComparison", function(x) length(x@fGroupsList)
 #' @export
 setMethod("[", "featureGroupsComparison", function(x, i, j = "missing", drop = "missing")
 {
+    checkmate::assert(
+        checkmate::checkNumeric(i, lower = 0, finite = TRUE),
+        checkmate::checkCharacter(i),
+        checkmate::checkLogical(i)
+        , .var.name = "i")
+    
     x@fGroupsList <- x@fGroupsList[i]
     x@comparedFGroups <- x@comparedFGroups[i]
     return(x)

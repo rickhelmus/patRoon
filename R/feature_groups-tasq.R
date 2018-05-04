@@ -32,12 +32,13 @@ featureGroupsBrukerTASQ <- setClass("featureGroupsBrukerTASQ", contains = "featu
 #' @export
 importFeatureGroupsBrukerTASQ <- function(path, analysisInfo)
 {
+    selCols <- c("Row", "Sample", "Analyte", "RT [min]", "m/z meas.", "Height")
+    
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertFileExists(path, "r", add = ac)
+    assertCSVFile(path, selCols, add = ac)
     assertAnalysisInfo(analysisInfo, "d", add = ac)
     checkmate::reportAssertions(ac)
     
-    selCols <- c("Row", "Sample", "Analyte", "RT [min]", "m/z meas.", "Height")
     tExport <- fread(path, select = selCols)
     tExport <- tExport[!is.na(`RT [min]`) & Sample %in% analysisInfo$analysis] # skip empty/other results
     setnames(tExport, selCols, c("ID", "analysis", "group", "rts", "mzs", "intensity"))

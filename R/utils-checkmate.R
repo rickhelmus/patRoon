@@ -76,6 +76,20 @@ assertMultiProcArgs <- function(x, maxProcAmount, .var.name = checkmate::vname(x
     checkmate::assertCount(maxProcAmount, positive = TRUE, .var.name = "maxProcAmount", add = add)
 }
 
+checkCSVFile <- function(x, cols)
+{
+    ret <- checkmate::checkFileExists(x, "r")
+    if (isTRUE(ret))
+    {
+        t <- fread(x, nrows = 0)
+        missingc <- setdiff(cols, names(t))
+        if (length(missingc) > 0)
+            ret <- paste0("Missing columns: ", paste0(missingc, collapse = ", "))
+    }
+    return(ret)
+}
+assertCSVFile <- checkmate::makeAssertionFunction(checkCSVFile)
+
 # from https://github.com/mllg/checkmate/issues/115
 aapply = function(fun, formula, ..., fixed = list())
 {

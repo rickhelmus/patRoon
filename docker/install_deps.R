@@ -8,6 +8,7 @@ devtools::install_github("cbroeckl/RAMClustR@036cdd4", upgrade_dependencies = FA
 devtools::install_github("rickhelmus/patRoonData", upgrade_dependencies = FALSE)
 # devtools::install_github("yutannihilation/vdiffr", ref = "fix-strip-version", upgrade_dependencies = FALSE)
 devtools::install_github("lionel-/vdiffr", upgrade_dependencies = FALSE)
+devtools::install_github("mllg/checkmate", upgrade_dependencies = FALSE)
 
 install.packages("desc")
 dp <- desc::desc_get_deps()

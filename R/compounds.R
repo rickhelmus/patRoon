@@ -103,8 +103,8 @@ setMethod("filter", "compounds", function(obj, minExplainedPeaks = NULL, minScor
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertCount, . ~ minExplainedPeaks + topMost, positive = c(FALSE, TRUE),
            null.ok = TRUE, fixed = list(add = ac))
-    aapply(checkmate::assertNumber, . ~ minScore + minFragScore + minFormulaScore, lower = 0, finite = TRUE,
-           null.ok = TRUE, fixed = list(add = ac))
+    aapply(checkmate::assertNumber, . ~ minScore + minFragScore + minFormulaScore, finite = TRUE,
+           null.ok = TRUE, fixed = list(add = ac)) # note: negative scores allowed for SIRIUS
     checkmate::reportAssertions(ac)
     
     cat("Filtering compounds... ")

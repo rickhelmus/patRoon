@@ -100,6 +100,13 @@ setMethod("identifiers", "compounds", function(compounds)
 setMethod("filter", "compounds", function(obj, minExplainedPeaks = NULL, minScore = NULL, minFragScore = NULL,
                                           minFormulaScore = NULL, topMost = NULL)
 {
+    ac <- checkmate::makeAssertCollection()
+    aapply(checkmate::assertCount, . ~ minExplainedPeaks + topMost, positive = c(FALSE, TRUE),
+           null.ok = TRUE, fixed = list(add = ac))
+    aapply(checkmate::assertNumber, . ~ minScore + minFragScore + minFormulaScore, lower = 0, finite = TRUE,
+           null.ok = TRUE, fixed = list(add = ac))
+    checkmate::reportAssertions(ac)
+    
     cat("Filtering compounds... ")
 
     mCompNames <- mergedCompoundNames(obj)
@@ -267,6 +274,12 @@ setMethod("plotStructure", "compounds", function(compounds, index, groupName, wi
 #' @export
 setMethod("plotScores", "compounds", function(obj, index, groupName, normalizeScores, useGGPlot2)
 {
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertCount(index, positive = TRUE, add = ac)
+    checkmate::assertString(groupName, min.chars = 1, add = ac)
+    aapply(checkmate::assertFlag, . ~normalizeScores + useGGPlot2, fixed = list(add = ac))
+    checkmate::reportAssertions(ac)
+    
     compTable <- compoundTable(obj)[[groupName]]
 
     if (is.null(compTable) || nrow(compTable) == 0)
@@ -550,9 +563,13 @@ setMethod("consensus", "compounds", function(obj, ..., compThreshold = 0.0, merg
 {
     allCompounds <- c(list(obj), list(...))
 
-    if (length(allCompounds) == 1)
-        return(obj)
-
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertList(allCompounds, types = "compounds", min.len = 2, any.missing = FALSE,
+                          unique = TRUE, .var.name = "...", add = ac)
+    checkmate::assertNumber(compThreshold, lower = 0, finite = TRUE, add = ac)
+    checkmate::assertFunction(mergeScoresFunc, add = ac)
+    checkmate::reportAssertions(ac)
+    
     compNames <- sapply(allCompounds, algorithm)
     if (anyDuplicated(compNames))
     {

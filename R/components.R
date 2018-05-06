@@ -84,6 +84,7 @@ setMethod("show", "components", function(object)
 #' @export
 setMethod("findFGroup", "components", function(obj, fGroup)
 {
+    checkmate::assertString(fGroup, min.chars = 1)
     which(sapply(componentTable(obj), function(ct) fGroup %in% ct$group))
 })
 
@@ -216,6 +217,12 @@ setMethod("plotSpec", "components", function(obj, index, markFGroup = NULL, useG
 #' @export
 setMethod("plotEIC", "components", function(obj, index, fGroups, rtWindow = 5, ...)
 {
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertInt(index, lower = 1, upper = length(componentTable(obj)), add = ac)
+    checkmate::assertClass(fGroups, "featureGroups", add = ac)
+    checkmate::assertNumber(rtWindow, lower = 0, finite = TRUE, add = ac)
+    checkmate::reportAssertions(ac)
+    
     comp <- componentTable(obj)[[index]]
 
     isHom <- !is.null(comp[["hsnr"]]) # homologues?
@@ -247,6 +254,9 @@ setMethod("plotEIC", "components", function(obj, index, fGroups, rtWindow = 5, .
 setMethod("consensus", "components", function(obj, ...)
 {
     allComponents <- c(list(obj), list(...))
+    
+    checkmate::assertList(allComponents, types = "components", min.len = 2, any.missing = FALSE,
+                          unique = TRUE, .var.name = "...")
     
     if (length(allComponents) == 1)
         return(obj)

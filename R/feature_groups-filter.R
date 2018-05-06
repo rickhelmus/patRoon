@@ -256,6 +256,19 @@ setMethod("filter", "featureGroups", function(obj, intensityThreshold = NULL, re
                                               formConsensus = NULL, compounds = NULL,
                                               repetitions = 2, negate = FALSE)
 {
+    ac <- checkmate::makeAssertCollection()
+    aapply(checkmate::assertNumber, . ~ intensityThreshold + relAbundance + absAbundance +
+               interRelRGroupAbundance + interAbsRGroupAbundance + intraRGroupAbundance +
+               minBlankThreshold,
+           lower = 0, finite = TRUE, null.ok = TRUE, fixed = list(add = ac))
+    checkmate::assertNumeric(retentionRange, any.missing = FALSE, finite = TRUE, len = 2, null.ok = TRUE, add = ac)
+    checkmate::assertCharacter(rGroups, min.chars = 1, min.len = 1, any.missing = FALSE, null.ok = TRUE, add = ac)
+    checkmate::assertClass(formConsensus, "formulaConsensus", null.ok = TRUE, add = ac)
+    checkmate::assertClass(compounds, "compounds", null.ok = TRUE, add = ac)
+    checkmate::assertCount(repetitions, positive = TRUE, add = ac)
+    checkmate::assertFlag(negate, add = ac)
+    checkmate::reportAssertions(ac)
+    
     if (!is.null(intensityThreshold) && intensityThreshold > 0)
         obj <- intensityFilter(obj, intensityThreshold)
 

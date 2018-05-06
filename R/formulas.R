@@ -101,12 +101,27 @@ setMethod("consensus", "formulas", function(obj, ..., fGroups, formAnaThreshold 
                                             maxIntensity = NULL, minPreferredFormulas = 1,
                                             minPreferredIntensity = NULL, elements = c(), fragElements = c())
 {
+    allFLists <- c(list(obj), list(...))
+    
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertList(allFLists, types = "formulas", min.len = 1, any.missing = FALSE,
+                          unique = TRUE, .var.name = "...", add = ac)
+    checkmate::assertClass(fGroups, "featureGroups", add = ac)
+    aapply(checkmate::assertNumber, . ~ formAnaThreshold + formListThreshold, lower = 0, finite = TRUE,
+           fixed = list(add = ac))
+    aapply(checkmate::assertCount, . ~ maxFormulas + maxFragFormulas + minPreferredFormulas, positive = TRUE,
+           null.ok = TRUE, fixed = list(add = ac))
+    aapply(checkmate::assertNumber, . ~ minIntensity + maxIntensity + minPreferredIntensity,
+           lower = 0, finite = TRUE, null.ok = TRUE, fixed = list(add = ac))
+    aapply(checkmate::assertCharacter, . ~ elements + fragElements, min.chars = 1,
+           any.missing = FALSE, null.ok = TRUE, fixed = list(add = ac))
+    checkmate::reportAssertions(ac)
+    
     ftind <- groupFeatIndex(fGroups)
     gInfo <- groupInfo(fGroups)
     anaInfo <- analysisInfo(fGroups)
     gTable <- groups(fGroups)
 
-    allFLists <- c(list(obj), list(...))
 
     if (length(allFLists) > length(unique(sapply(allFLists, algorithm))))
         stop("Consensus can only be generated from different algorithms at this moment.")

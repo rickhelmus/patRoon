@@ -10,6 +10,8 @@ setMethod("getXcmsSet", "features", function(obj, exportedData)
 {
     # generate dummy XCMS set, based on https://groups.google.com/forum/m/#!topic/xcms/CGC0SKMVhAQ
 
+    checkmate::assertFlag(exportedData)
+    
     xs <- new(getClassDef("xcmsSet", package = "xcms"))
     anaInfo <- analysisInfo(obj)
     phenoData(xs) <- data.frame(class = anaInfo$group, row.names = anaInfo$analysis)
@@ -64,6 +66,8 @@ setMethod("getXcmsSet", "featuresXCMS", function(obj, exportedData)
 #' @export
 setMethod("getXcmsSet", "featureGroups", function(obj, exportedData)
 {
+    checkmate::assertFlag(exportedData)
+    
     fTable <- featureTable(obj)
 
     # add unique feat IDs (corresponding to ftindex)

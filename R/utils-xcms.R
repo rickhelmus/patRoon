@@ -5,6 +5,7 @@
 #' @include feature_groups-xcms.R
 
 #' @rdname getXcmsSet
+#' @export
 setMethod("getXcmsSet", "features", function(obj, exportedData)
 {
     # generate dummy XCMS set, based on https://groups.google.com/forum/m/#!topic/xcms/CGC0SKMVhAQ
@@ -46,12 +47,14 @@ setMethod("getXcmsSet", "features", function(obj, exportedData)
 })
 
 #' @rdname getXcmsSet
+#' @export
 setMethod("getXcmsSet", "featuresOpenMS", function(obj, exportedData)
 {
     return(callNextMethod(obj, TRUE))
 })
 
 #' @rdname getXcmsSet
+#' @export
 setMethod("getXcmsSet", "featuresXCMS", function(obj, exportedData)
 {
     return(obj@xs)

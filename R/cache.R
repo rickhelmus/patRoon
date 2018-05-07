@@ -122,7 +122,7 @@ saveCacheSet <- function(category, dataHashes, setHash, dbArg = NULL)
 #' Remove (part of) the cache database used to store (intermediate) processing
 #' results.
 #'
-#' This function will either remove oen or more tables within the cache
+#' This function will either remove one or more tables within the cache
 #' \code{sqlite} database or simply wipe the whole cache file. Removing tables
 #' will \code{VACUUM} the database, which may take some time for large cache
 #' files. (intermediate) processing results.
@@ -136,6 +136,8 @@ saveCacheSet <- function(category, dataHashes, setHash, dbArg = NULL)
 #' @export
 clearCache <- function(what = NULL)
 {
+    checkmate::assertCharacter(what, min.len = 1, null.ok = TRUE)
+    
     if (!file.exists(getCacheFile()))
         printf("No cache file found, nothing to do ...\n")
     else if ("all" %in% what)

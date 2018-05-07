@@ -129,6 +129,11 @@ getEICUI <- function(rtRange, mzWindow)
 #' @export
 setMethod("checkChromatograms", "featureGroups", function(fGroups, mzWindow, enabledFGroups)
 {
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertNumber(mzWindow, lower = 0, finite = TRUE, add = ac)
+    checkmate::assertCharacter(enabledFGroups, null.ok = TRUE, add = ac)
+    checkmate::reportAssertions(ac)
+    
     fTable <- featureTable(fGroups)
     anaInfo <- analysisInfo(fGroups)
     gInfo <- groupInfo(fGroups)

@@ -86,6 +86,14 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
                                             relMSMSIntThr = NULL, topMSPeaks = NULL, topMSMSPeaks = NULL,
                                             deIsotopeMS = FALSE, deIsotopeMSMS = FALSE)
 {
+    ac <- checkmate::makeAssertCollection()
+    aapply(checkmate::assertNumber, . ~ absMSIntThr + absMSMSIntThr + relMSIntThr + relMSMSIntThr,
+           lower = 0, finite = TRUE, null.ok = TRUE, fixed = list(add = ac))
+    aapply(checkmate::assertCount, . ~ topMSPeaks + topMSMSPeaks, positive = TRUE,
+           null.ok = TRUE, fixed = list(add = ac))
+    aapply(checkmate::assertFlag, . ~ deIsotopeMS + deIsotopeMSMS, fixed = list(add = ac))
+    checkmate::reportAssertions(ac)
+    
     hash <- makeHash(obj, absMSIntThr, absMSMSIntThr, relMSIntThr, relMSMSIntThr,
                      topMSPeaks, topMSMSPeaks, deIsotopeMS, deIsotopeMSMS)
     cache <- loadCacheData("filterMSPeakLists", hash)

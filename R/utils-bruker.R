@@ -106,6 +106,11 @@ closeDAFile <- function(DA, analysis, path, save)
 #' @export
 setDAMethod <- function(anaInfo, method)
 {
+    ac <- checkmate::makeAssertCollection()
+    assertAnalysisInfo(anaInfo, "d", add = ac)
+    checkmate::assertDirectoryExists(method, add = ac)
+    checkmate::reportAssertions(ac)
+    
     DA <- getDAApplication()
     method <- normalizePath(method)
     hideDAInScope()
@@ -135,6 +140,8 @@ setDAMethod <- function(anaInfo, method)
 #' @export
 recalibrarateDAFiles <- function(anaInfo)
 {
+    assertAnalysisInfo(anaInfo, "d")
+    
     DA <- getDAApplication()
     hideDAInScope()
 
@@ -170,6 +177,8 @@ recalibrarateDAFiles <- function(anaInfo)
 #' @export
 getDACalibrationError <- function(anaInfo)
 {
+    assertAnalysisInfo(anaInfo, "d")
+    
     DA <- getDAApplication()
     hideDAInScope()
 
@@ -213,12 +222,16 @@ getDACalibrationError <- function(anaInfo)
 #' @export
 exportDAFiles <- function(anaInfo, format = "mzML", exportLine = TRUE, outPath = anaInfo$path, overWrite = FALSE)
 {
-    outPath <- rep(outPath, length.out = length(anaInfo$path))
+    ac <- checkmate::makeAssertCollection()
+    assertAnalysisInfo(anaInfo, "d", add = ac)
+    checkmate::assertChoice(format, c("mzML", "mzXML", "mzData"), add = ac)
+    checkmate::assertFlag(exportLine, add = ac)
+    checkmate::assertCharacter(outPath, min.chars = 1, min.len = 1, add = ac)
+    checkmate::assertDirectoryExists(outPath, "w", add = ac)
+    checkmate::assertFlag(overWrite, add = ac)
+    checkmate::reportAssertions(ac)
 
-    if (!format %in% c("mzXML", "mzData", "mzML"))
-        stop("Wrong export format!")
-    else if (length(anaInfo$path) != length(outPath))
-        stop("Size of output paths differs from input")
+    outPath <- rep(outPath, length.out = length(anaInfo$path))
 
     expConstant <- if (format == "mzXML") DAConstants$daMzXML else if (format == "mzData") DAConstants$daMzData else DAConstants$daMzML
     expSpecConstant <- if (exportLine) DAConstants$daLine else DAConstants$daProfile
@@ -321,6 +334,22 @@ makeDAEIC <- function(mz, mzWidth, ctype = "EIC", mtype = "MS", polarity = "both
 addDAEIC <- function(analysis, path, mz, mzWidth, ctype = "EIC", mtype = "MS", polarity = "both", bgsubtr = FALSE, fragpath = "",
                      name = NULL, hideDA = TRUE)
 {
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertString(analysis, min.chars = "1", add = ac)
+    checkmate::assertString(path, add = ac)
+    checkmate::assertDirectoryExists(file.path(path, paste0(analysis, ".d")), add = ac)
+    checkmate::assertNumber(mz, lower = 0, finite = TRUE, add = ac)
+    checkmate::assertNumber(mzWidth, lower = 0, finite = TRUE, add = ac)
+    checkmate::assertChoice(ctype, c("EIC", "TIC", "BPC"), add = ac)
+    checkmate::assertChoice(mtype, c("MS", "MSMS", "allMSMS", "BBCID"), add = ac)
+    checkmate::assertChoice(polarity, c("positive", "negative", "both"), add = ac)
+    checkmate::assertFlag(bgsubtr, add = ac)
+    checkmate::assert(
+        checkmate::checkNumber(fragpath, lower = 0, finite = TRUE),
+        checkmate::checkChoice(fragpath, "")
+    )
+    checkmate::reportAssertions(ac)
+    
     DA <- getDAApplication()
 
     if (hideDA)

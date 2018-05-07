@@ -79,6 +79,13 @@ NULL
 #' @export
 setMethod("makeHCluster", "featureGroups", function(fGroups, normFunc = max, metric, method, average)
 {
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertFunction(normFunc, add = ac)
+    checkmate::assertString(metric, add = ac)
+    checkmate::assertString(method, add = ac)
+    checkmate::assertFlag(average, add = ac)
+    checkmate::reportAssertions(ac)
+    
     if (average)
     {
         gTable <- averageGroups(fGroups)
@@ -121,6 +128,7 @@ setMethod("makeHCluster", "featureGroups", function(fGroups, normFunc = max, met
 #' @export
 setMethod("hClusterFilter", c("featureGroups", "clusterInfo"), function(fGroups, cInfo, k, c)
 {
+    aapply(checkmate::assertCount, . ~ k + c, positive = TRUE)
     ct <- cutree(cInfo@clust, k)
     return(fGroups[, colnames(groups(fGroups)) %in% names(ct)[ct == c]])
 })
@@ -172,6 +180,11 @@ setMethod("clusterProperties", "clusterInfo", function(cInfo)
 #' @export
 setMethod("drawHeatMap", "clusterInfo", function(cInfo, col, interactive, ...)
 {
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertCharacter(col, min.chars = 1, any.missing = FALSE, add = ac)
+    checkmate::assertFlag(interactive, add = ac)
+    checkmate::reportAssertions(ac)
+    
     if (interactive)
         d3heatmap::d3heatmap(cInfo@clusterm, Colv = NA, distfun = function(d) dist(d, cInfo@metric), hclustfun = function(h) hclust(h, cInfo@method),
                              scale = "none", colors = col, ...)
@@ -192,6 +205,8 @@ setMethod("drawHeatMap", "clusterInfo", function(cInfo, col, interactive, ...)
 #' @export
 setMethod("getSilhouetteInfo", "clusterInfo", function(cInfo, ranges)
 {
+    checkmate::assertIntegerish(ranges, lower = 1, any.missing = FALSE)
+    
     silInfo <- vector("list", length(seq))
     maxmw <- maxk <- NULL
 
@@ -219,6 +234,8 @@ setMethod("getSilhouetteInfo", "clusterInfo", function(cInfo, ranges)
 #' @export
 setMethod("plotInt", "clusterInfo", function(obj, k, c, ...)
 {
+    aapply(checkmate::assertCount, . ~ k + c, positive = TRUE)
+    
     ct <- cutree(obj@clust, k)
     plotm <- obj@clusterm[rownames(obj@clusterm) %in% names(ct)[ct == c], ]
     nsamp <- ncol(plotm)
@@ -238,6 +255,8 @@ setMethod("plotInt", "clusterInfo", function(obj, k, c, ...)
 #' @export
 setMethod("plot", "clusterInfo", function(x, k = NULL, ...)
 {
+    checkmate::assertCount(k, positive = TRUE, null.ok = TRUE)
+    
     plot(x@clust, ...)
     if (!is.null(k))
         rect.hclust(x@clust, k)

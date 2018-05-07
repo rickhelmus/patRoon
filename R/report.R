@@ -23,7 +23,8 @@ NULL
 #'
 #' @param fGroups The \code{\link{featureGroups}} object that should be used for
 #'   reporting data.
-#' @param path The destination file path files generated during reporting.
+#' @param path The destination file path for files generated during reporting.
+#'   Will be generated if needed.
 #' @param reportFGroups If \code{TRUE} then feature group data will be reported.
 #' @param formConsensus,compounds,components Further objects
 #'   (\code{\link{formulaConsensus}}, \code{\link{compounds}},
@@ -476,6 +477,17 @@ setMethod("reportCSV", "featureGroups", function(fGroups, path, reportFGroupsAsR
                                                  formConsensus, compounds, compoundNormalizeScores,
                                                  components, cInfo, clusterK, retMin, clearPath)
 {
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertPathForOutput(path, overwrite = TRUE, add = ac)
+    aapply(checkmate::assertFlag, . ~ reportFGroupsAsRows + reportFGroupsAnalysisInfo + reportFGroupsRetMz +
+               reportFeatures + compoundNormalizeScores + retMin + clearPath,
+           fixed = list(add = ac))
+    aapply(checkmate::assertClass, . ~ formConsensus + compounds + components + cInfo,
+           c("formulaConsensus", "compounds", "components", "clusterInfo"), null.ok = TRUE,
+           fixed = list(add = ac))
+    checkmate::assertCount(clusterK, positive = TRUE, null.ok = TRUE, add = ac)
+    checkmate::reportAssertions(ac)
+    
     prepareReportPath(path, clearPath)
 
     reportFGroupTable(fGroups, path, reportFGroupsAsRows, reportFGroupsAnalysisInfo, reportFGroupsRetMz, retMin)
@@ -524,6 +536,21 @@ setMethod("reportPDF", "featureGroups", function(fGroups, path, reportFGroups,
                                                  MSPeakLists, retMin, EICGrid, EICRtWindow, EICMzWindow,
                                                  EICTopMost, EICOnlyPresent, clearPath)
 {
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertPathForOutput(path, overwrite = TRUE, add = ac)
+    aapply(checkmate::assertFlag, . ~ reportFGroups + reportFormulaSpectra +
+               compoundNormalizeScores + retMin + EICOnlyPresent + clearPath,
+           fixed = list(add = ac))
+    aapply(checkmate::assertClass, . ~ formConsensus + compounds + components + cInfo + silInfo + MSPeakLists,
+           c("formulaConsensus", "compounds", "components", "clusterInfo", "silhouetteInfo", "MSPeakLists"),
+           null.ok = TRUE, fixed = list(add = ac))
+    checkmate::assertCount(clusterK, positive = TRUE, null.ok = TRUE, add = ac)
+    checkmate::assertCount(clusterMaxLabels, add = ac)
+    checkmate::assertIntegerish(EICGrid, lower = 1, any.missing = FALSE, len = 2, add = ac)
+    aapply(checkmate::assertNumber, . ~ EICRtWindow + EICMzWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
+    checkmate::assertCount(EICTopMost, positive = TRUE, null.ok = TRUE, add = ac)
+    checkmate::reportAssertions(ac)
+    
     if (!reportFGroups && is.null(formConsensus) && is.null(compounds) && is.null(components) &&
         is.null(cInfo))
     {
@@ -612,7 +639,23 @@ setMethod("reportMD", "featureGroups", function(fGroups, path, reportChord, repo
                                                 selfContained, optimizePng, maxProcAmount, clearPath)
 {
     # UNDONE: mention pandoc win limits
-    
+ 
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertPathForOutput(path, overwrite = TRUE, add = ac)
+    aapply(checkmate::assertFlag, . ~ reportChord + reportFGroups + reportFormulaSpectra +
+               compoundNormalizeScores + interactiveHeat + retMin + EICOnlyPresent +
+               selfContained + optimizePng + clearPath,
+           fixed = list(add = ac))
+    aapply(checkmate::assertClass, . ~ formConsensus + compounds + components + cInfo + silInfo + MSPeakLists,
+           c("formulaConsensus", "compounds", "components", "clusterInfo", "silhouetteInfo", "MSPeakLists"),
+           null.ok = TRUE, fixed = list(add = ac))
+    checkmate::assertCount(clusterK, positive = TRUE, null.ok = TRUE, add = ac)
+    checkmate::assertCount(clusterMaxLabels, add = ac)
+    aapply(checkmate::assertNumber, . ~ EICRtWindow + EICMzWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
+    checkmate::assertCount(EICTopMost, positive = TRUE, null.ok = TRUE, add = ac)
+    checkmate::assertCount(maxProcAmount, positive = TRUE, add = ac)
+    checkmate::reportAssertions(ac)
+       
     if (is.null(MSPeakLists) &&
         ((!is.null(formConsensus) && reportFormulaSpectra) || !is.null(compounds)))
         stop("MSPeakLists is NULL, please specify when reporting formula and/or compounds")

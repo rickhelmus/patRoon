@@ -131,6 +131,24 @@ setMethod("removeGroups", "featureGroups", function(fGroups, indices)
 #' @export
 setMethod("[", c("featureGroups", "ANY", "ANY", "ANY"), function(x, i, j, ..., drop = TRUE)
 {
+    if (!missing(i))
+    {
+        checkmate::assert(
+            checkmate::checkNumeric(i, lower = 0, finite = TRUE),
+            checkmate::checkCharacter(i),
+            checkmate::checkLogical(i)
+            , .var.name = "i")
+    }
+    if (!missing(j))
+    {
+        checkmate::assert(
+            checkmate::checkNumeric(j, lower = 0, finite = TRUE),
+            checkmate::checkCharacter(j),
+            checkmate::checkLogical(j)
+            , .var.name = "j")
+    }
+    checkmate::assertFlag(drop)
+    
     toNumIndex <- function(ind, names)
     {
         if (typeof(ind) == "character")
@@ -220,6 +238,11 @@ setMethod("updateFeatIndex", "featureGroups", function(fGroups)
 #' @export
 setMethod("export", "featureGroups", function(fGroups, type, out)
 {
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertChoice(type, c("brukerpa", "brukertasq", "mzmine"), add = ac)
+    checkmate::assertPathForOutput(out, overwrite = TRUE, add = ac) # NOTE: assert doesn't work on Windows...
+    checkmate::reportAssertions(ac)
+    
     if (type == "brukerpa")
     {
         # UNDONE: do we need this?
@@ -256,8 +279,6 @@ setMethod("export", "featureGroups", function(fGroups, type, out)
         df$rts <- df$rts / 60
         write.table(df, out, row.names = FALSE, col.names = FALSE, sep = ",", quote = FALSE)
     }
-    else
-        stop("Invalid export type! Should be: brukerpa, brukertasq or mzmine")
 })
 
 #' @describeIn featureGroups Obtain summary table (a \code{\link{data.table}})
@@ -266,6 +287,8 @@ setMethod("export", "featureGroups", function(fGroups, type, out)
 #' @export
 setMethod("groupTable", "featureGroups", function(fGroups, average)
 {
+    checkmate::assertFlag(average)
+    
     # UNDONE: Add formulas/idents?
     anaInfo <- analysisInfo(fGroups)
 
@@ -296,6 +319,8 @@ setMethod("groupTable", "featureGroups", function(fGroups, average)
 #' @export
 setMethod("plot", "featureGroups", function(x, retMin = TRUE, ...)
 {
+    checkmate::assertFlag(retMin)
+    
     plot(if (retMin) x@groupInfo$rts / 60 else x@groupInfo$rts, x@groupInfo$mzs,
          xlab = if (retMin) "retention (min)" else "retention (s)",
          ylab = "m/z", ...)
@@ -306,6 +331,8 @@ setMethod("plot", "featureGroups", function(x, retMin = TRUE, ...)
 #' @export
 setMethod("plotInt", "featureGroups", function(obj, average = FALSE, ...)
 {
+    checkmate::assertFlag(average)
+    
     anaInfo <- analysisInfo(obj)
 
     if (average)
@@ -352,8 +379,12 @@ setMethod("plotInt", "featureGroups", function(obj, average = FALSE, ...)
 setMethod("plotChord", "featureGroups", function(obj, addSelfLinks = FALSE, addRetMzPlots = TRUE, average = FALSE,
                                                  outerGroups = NULL, addIntraOuterGroupLinks = FALSE, ...)
 {
-    if (!is.null(outerGroups) && (is.null(names(outerGroups)) || length(outerGroups) < 2))
-        stop("outerGroups need to be a named vector with length >= 2")
+    ac <- checkmate::makeAssertCollection()
+    aapply(checkmate::assertFlag, . ~ addSelfLinks + addRetMzPlots + average + addIntraOuterGroupLinks,
+           fixed = list(add = ac))
+    checkmate::assertCharacter(outerGroups, min.chars = 1, min.len = 2, names = "unique", null.ok = TRUE)
+    checkmate::reportAssertions(ac)
+    
     hasOuter <- !is.null(outerGroups)
     
     obj <- removeEmptyAnalyses(obj)
@@ -547,8 +578,19 @@ setMethod("plotEIC", "featureGroups", function(obj, rtWindow = 30, mzWindow = 0.
                                                showLegend = TRUE, onlyPresent = TRUE,
                                                annotate = c("none", "ret", "mz"), showProgress = FALSE, ...)
 {
-    colourBy <- match.arg(colourBy, c("none", "rGroups", "fGroups"))
-    annotate = match.arg(annotate, c("none", "ret", "mz"), several.ok = TRUE)
+    ac <- checkmate::makeAssertCollection()
+    aapply(checkmate::assertNumber, . ~ rtWindow + mzWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
+    aapply(checkmate::assertFlag, . ~ retMin + showPeakArea + showFGroupRect + showLegend +
+               onlyPresent + showProgress,
+           fixed = list(add = ac))
+    checkmate::assertCount(topMost, positive = TRUE, null.ok = TRUE, add = ac)
+    checkmate::assertString(title, null.ok = TRUE, add = ac)
+    
+    colourBy <- checkmate::matchArg(colourBy, c("none", "rGroups", "fGroups"), add = ac)
+    annotate = checkmate::matchArg(annotate, c("none", "ret", "mz"), several.ok = TRUE, add = ac)
+    
+    checkmate::reportAssertions(ac)
+    
 
     if (showLegend && colourBy == "none")
         showLegend <- FALSE
@@ -754,6 +796,8 @@ setMethod("plotEIC", "featureGroups", function(obj, rtWindow = 30, mzWindow = 0.
 #' @export
 setMethod("plotVenn", "featureGroups", function(obj, which, ...)
 {
+    checkmate::assertCharacter(which, min.chars = 1, null.ok = TRUE)
+    
     if (is.null(which))
         which <- unique(analysisInfo(obj)$group)
 
@@ -819,6 +863,13 @@ setMethod("plotVenn", "featureGroups", function(obj, which, ...)
 #' @export
 setMethod("unique", "featureGroups", function(x, which, relativeTo = NULL, outer = FALSE)
 {
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertCharacter(which, min.len = 1, min.chars = 1, any.missing = FALSE, add = ac)
+    checkmate::assertCharacter(relativeTo, min.len = 1, min.chars = 1, any.missing = FALSE,
+                               null.ok = TRUE, add = ac)
+    checkmate::assertFlag(outer, add = ac)
+    checkmate::reportAssertions(ac)
+    
     if (is.null(relativeTo))
         relativeTo <- unique(analysisInfo(x)$group)
     else
@@ -854,6 +905,11 @@ setMethod("unique", "featureGroups", function(x, which, relativeTo = NULL, outer
 #' @export
 setMethod("overlap", "featureGroups", function(fGroups, which, exclusive)
 {
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertCharacter(which, min.len = 2, min.chars = 1, any.missing = FALSE, add = ac)
+    checkmate::assertFlag(exclusive, add = ac)
+    checkmate::reportAssertions(ac)
+    
     anaInfo <- analysisInfo(fGroups)
     rGroups <- unique(anaInfo$group)
 
@@ -874,6 +930,12 @@ setMethod("overlap", "featureGroups", function(fGroups, which, exclusive)
 #' @export
 setMethod("screenTargets", "featureGroups", function(obj, targets, rtWindow, mzWindow)
 {
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertDataFrame(targets, any.missing = FALSE, min.rows = 1, add = add)
+    assertHasNames(targets, c("name", "mz"), add = ac)
+    aapply(checkmate::assertNumber, . ~ rtWindow + mzWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
+    checkmate::reportAssertions(ac)
+    
     gTable <- groups(obj)
     gInfo <- groupInfo(obj)
     anaInfo <- analysisInfo(obj)

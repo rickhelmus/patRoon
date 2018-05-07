@@ -34,6 +34,13 @@ featureGroupsOpenMS <- setClass("featureGroupsOpenMS", contains = "featureGroups
 groupFeaturesOpenMS <- function(feat, rtalign = TRUE, QT = FALSE, maxAlignRT = 30, maxAlignMZ = 0.005, maxGroupRT = 12,
                                 maxGroupMZ = 0.005)
 {
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertClass(feat, "features", add = ac)
+    aapply(checkmate::assertFlag, . ~ rtalign + QT, fixed = list(add = ac))
+    aapply(checkmate::assertNumber, . ~ maxAlignRT + maxAlignMZ + maxGroupRT + maxGroupMZ,
+           finite = TRUE, lower = 0, fixed = list(add = ac))
+    checkmate::reportAssertions(ac)
+    
     # UNDONE: allow extra options for aligning/grouping?
 
     hash <- makeHash(feat, rtalign, QT, maxAlignRT, maxAlignMZ, maxGroupRT, maxGroupMZ)

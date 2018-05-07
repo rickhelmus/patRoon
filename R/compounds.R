@@ -100,6 +100,13 @@ setMethod("identifiers", "compounds", function(compounds)
 setMethod("filter", "compounds", function(obj, minExplainedPeaks = NULL, minScore = NULL, minFragScore = NULL,
                                           minFormulaScore = NULL, topMost = NULL)
 {
+    ac <- checkmate::makeAssertCollection()
+    aapply(checkmate::assertCount, . ~ minExplainedPeaks + topMost, positive = c(FALSE, TRUE),
+           null.ok = TRUE, fixed = list(add = ac))
+    aapply(checkmate::assertNumber, . ~ minScore + minFragScore + minFormulaScore, finite = TRUE,
+           null.ok = TRUE, fixed = list(add = ac)) # note: negative scores allowed for SIRIUS
+    checkmate::reportAssertions(ac)
+    
     cat("Filtering compounds... ")
 
     mCompNames <- mergedCompoundNames(obj)
@@ -154,6 +161,12 @@ setMethod("filter", "compounds", function(obj, minExplainedPeaks = NULL, minScor
 setMethod("addFormulaScoring", "compounds", function(compounds, formConsensus, updateScore,
                                                     formulaScoreWeight)
 {
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertClass(formConsensus, "formulaConsensus", add = ac)
+    checkmate::assertFlag(updateScore, add = ac)
+    checkmate::assertNumber(formulaScoreWeight, lower = 0, finite = TRUE, add = ac)
+    checkmate::reportAssertions(ac)
+    
     fTable <- formulaTable(formConsensus)
     cTable <- compoundTable(compounds)
     cGNames <- names(cTable)
@@ -226,6 +239,13 @@ setMethod("addFormulaScoring", "compounds", function(compounds, formConsensus, u
 #' @export
 setMethod("plotStructure", "compounds", function(compounds, index, groupName, width, height, useGGPlot2 = FALSE)
 {
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertCount(index, positive = TRUE, add = ac)
+    checkmate::assertString(groupName, min.chars = 1, add = ac)
+    aapply(checkmate::assertNumber, . ~ width + height, lower = 0, finite = TRUE, fixed = list(add = ac))
+    checkmate::assertFlag(useGGPlot2, add = ac)
+    checkmate::reportAssertions(ac)
+    
     compTable <- compoundTable(compounds)[[groupName]]
 
     if (is.null(compTable) || nrow(compTable) == 0)
@@ -261,6 +281,12 @@ setMethod("plotStructure", "compounds", function(compounds, index, groupName, wi
 #' @export
 setMethod("plotScores", "compounds", function(obj, index, groupName, normalizeScores, useGGPlot2)
 {
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertCount(index, positive = TRUE, add = ac)
+    checkmate::assertString(groupName, min.chars = 1, add = ac)
+    aapply(checkmate::assertFlag, . ~normalizeScores + useGGPlot2, fixed = list(add = ac))
+    checkmate::reportAssertions(ac)
+    
     compTable <- compoundTable(obj)[[groupName]]
 
     if (is.null(compTable) || nrow(compTable) == 0)
@@ -375,6 +401,14 @@ setMethod("plotScores", "compounds", function(obj, index, groupName, normalizeSc
 setMethod("plotSpec", "compounds", function(obj, index, groupName, MSPeakLists, formConsensus = NULL,
                                             normalizeScores = TRUE, useGGPlot2 = FALSE)
 {
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertCount(index, positive = TRUE, add = ac)
+    checkmate::assertString(groupName, min.chars = 1, add = ac)
+    checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
+    checkmate::assertClass(formConsensus, "formulaConsensus", null.ok = TRUE, add = ac)
+    aapply(checkmate::assertFlag, . ~normalizeScores + useGGPlot2, fixed = list(add = ac))
+    checkmate::reportAssertions(ac)
+
     compTable <- compoundTable(obj)[[groupName]]
 
     if (is.null(compTable) || nrow(compTable) == 0)
@@ -544,9 +578,13 @@ setMethod("consensus", "compounds", function(obj, ..., compThreshold = 0.0, merg
 {
     allCompounds <- c(list(obj), list(...))
 
-    if (length(allCompounds) == 1)
-        return(obj)
-
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertList(allCompounds, types = "compounds", min.len = 2, any.missing = FALSE,
+                          unique = TRUE, .var.name = "...", add = ac)
+    checkmate::assertNumber(compThreshold, lower = 0, finite = TRUE, add = ac)
+    checkmate::assertFunction(mergeScoresFunc, add = ac)
+    checkmate::reportAssertions(ac)
+    
     compNames <- sapply(allCompounds, algorithm)
     if (anyDuplicated(compNames))
     {

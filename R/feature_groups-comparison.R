@@ -36,6 +36,12 @@ setMethod("length", "featureGroupsComparison", function(x) length(x@fGroupsList)
 #' @export
 setMethod("[", "featureGroupsComparison", function(x, i, j = "missing", drop = "missing")
 {
+    checkmate::assert(
+        checkmate::checkNumeric(i, lower = 0, finite = TRUE),
+        checkmate::checkCharacter(i),
+        checkmate::checkLogical(i)
+        , .var.name = "i")
+    
     x@fGroupsList <- x@fGroupsList[i]
     x@comparedFGroups <- x@comparedFGroups[i]
     return(x)
@@ -130,8 +136,16 @@ convertFeatureGroupsToFeatures <- function(fGroupsList)
 #' @export
 setMethod("comparison", "featureGroups", function(..., groupAlgo, groupArgs = list(rtalign = FALSE))
 {
-    labels <- getArgNames(...)
     fGroupsList <- list(...)
+    
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertChoice(groupAlgo, c("xcms", "openms"), add = ac)
+    checkmate::assertList(groupArgs, any.missing = FALSE, names = "unique", add = ac)
+    checkmate::assertList(fGroupsList, types = "featureGroups", min.len = 2, any.missing = FALSE,
+                          unique = TRUE, .var.name = "...", add = ac)
+    checkmate::reportAssertions(ac)
+    
+    labels <- getArgNames(...)
     names(fGroupsList) <- labels
 
     # convert feature groups to features
@@ -186,8 +200,13 @@ setMethod("consensus", "featureGroupsComparison", function(obj, relAbundance = 0
     # - original feature groups --> from pseudo features
     # - original features --> from original feature groups
 
-
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertNumber(relAbundance, lower = 0, finite = TRUE, add = ac)
+    checkmate::assertNumber(absAbundance, lower = 0, finite = TRUE, add = ac)
+    checkmate::reportAssertions(ac)
+    
     allAnaInfos <- lapply(obj@fGroupsList, analysisInfo)
+    
     # UNDONE: is this a limitation?
     if (!all(sapply(allAnaInfos[-1], identical, allAnaInfos[[1]]))) # from https://stackoverflow.com/a/30850654
         stop("This function only works with feature groups with equal analyses")

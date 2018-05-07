@@ -155,6 +155,13 @@ line2user <- function(line, side)
 #' @export
 generateAnalysisInfo <- function(paths, groups = "", refs = "", fileTypes = c("Bruker", "mzXML", "mzML"))
 {
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertDirectoryExists(paths, access = "r", add = ac)
+    checkmate::assertCharacter(groups, min.len = 1, add = ac)
+    checkmate::assertCharacter(refs, min.len = 1, add = ac)
+    checkmate::assertSubset(fileTypes, c("Bruker", "mzXML", "mzML"), empty.ok = FALSE, add = ac)
+    checkmate::reportAssertions(ac)
+    
     fileExts <- c(Bruker = ".d", mzXML = ".mzXML", mzML = ".mzML")
     fileTypes <- fileExts[fileTypes] # rename to file extensions
 
@@ -195,6 +202,8 @@ generateAnalysisInfo <- function(paths, groups = "", refs = "", fileTypes = c("B
 #' @export
 generateAnalysisInfoFromEnviMass <- function(path)
 {
+    checkmate::assertDirectoryExists(path, access = "r")
+    
     enviSInfo <- fread(file.path(path, "dataframes", "measurements"))[Type %in% c("sample", "blank")]
 
     enviSInfo[, DT := as.POSIXct(paste(Date, Time, sep = " "))]
@@ -363,10 +372,10 @@ getBrewerPal <- function(n, name)
 #' @param formatFrom,formatTo A \code{character} that specifies the source and
 #'   destination format, respectively. Valid options are: \code{"mzXML"},
 #'   \code{"mzML"} and \code{"mzData"}.
-#' @param outPath A directory path that should be used for the output. Usually
+#' @param outPath A character vector specifying directories that should be used for the output. Usually
 #'   this is the same as the source (otherwise the
 #'   \link[=analysis-information]{analysis information} should be changed for
-#'   further processing).
+#'   further processing). Will be re-cycled if necessary.
 #' @param overWrite Should existing destination file be overwritten
 #'   (\code{TRUE}) or not (\code{FALSE})?
 #'
@@ -375,6 +384,15 @@ getBrewerPal <- function(n, name)
 #' @export
 convertMSFiles <- function(anaInfo, formatFrom, formatTo, outPath = anaInfo$path, overWrite = FALSE)
 {
+    ac <- checkmate::makeAssertCollection()
+    assertAnalysisInfo(anaInfo, add = ac)
+    checkmate::assertChoice(formatFrom, c("mzXML", "mzML", "mzData"), add = ac)
+    checkmate::assertChoice(formatTo, c("mzXML", "mzML", "mzData"), add = ac)
+    checkmate::assertCharacter(outPath, min.chars = 1, min.len = 1, add = ac)
+    checkmate::assertDirectoryExists(outPath, "w", add = ac)
+    checkmate::assertFlag(overWrite, add = ac)
+    checkmate::reportAssertions(ac)
+    
     outPath <- rep(outPath, length.out = length(anaInfo$path))
 
     for (anai in seq_len(nrow(anaInfo)))

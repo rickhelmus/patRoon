@@ -39,6 +39,18 @@ generateComponentsRAMClustR <- function(fGroups, st = NULL, sr = NULL, maxt = 12
 {
     checkPackage("RAMClustR", "cbroeckl/RAMClustR")
     
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertClass(fGroups, "featureGroups", add = ac)
+    aapply(checkmate::assertNumber, . ~ st + sr + maxt + hmax, lower = 0, null.ok = TRUE, fixed = list(add = ac))
+    checkmate::assertString(normalize, add = ac)
+    checkmate::assertChoice(ionization, c("positive", "negative"), add = ac)
+    checkmate::assertNumber(absMzDev, lower = 0, finite = TRUE, add = ac)
+    checkmate::assertNumber(relMzDev, lower = 0, finite = TRUE, add = ac)
+    checkmate::assertList(RCExperimentVals, any.missing = FALSE, names = "unique", add = ac)
+    checkmate::assertList(extraOptsRC, any.missing = FALSE, names = "unique", null.ok = TRUE, add = ac)
+    checkmate::assertList(extraOptsFM, any.missing = FALSE, names = "unique", null.ok = TRUE, add = ac)
+    checkmate::reportAssertions(ac)
+    
     gTable <- groups(fGroups)
     gInfo <- groupInfo(fGroups)
     gNames <- names(fGroups)

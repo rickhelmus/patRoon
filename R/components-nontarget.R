@@ -36,6 +36,17 @@ generateComponentsNontarget <- function(fGroups, ionization, rtRange = c(-120, 1
                                         elements = c("C", "H", "O"), maxRTDev = 30, maxMzDev = 0.002,
                                         extraOpts = NULL)
 {
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertClass(fGroups, "featureGroups", add = ac)
+    checkmate::assertChoice(ionization, c("positive", "negative"), add = ac)
+    checkmate::assertNumeric(rtRange, finite = TRUE, any.missing = FALSE, len = 2, add = ac)
+    checkmate::assertNumeric(mzRange, lower = 0, finite = TRUE, any.missing = FALSE, len = 2, add = ac)
+    checkmate::assertCharacter(elements, min.chars = 1, any.missing = FALSE, min.len = 1, add = ac)
+    checkmate::assertNumber(maxRTDev, lower = 0, finite = TRUE, add = ac)
+    checkmate::assertNumber(maxMzDev, lower = 0, finite = TRUE, add = ac)
+    checkmate::assertList(extraOpts, any.missing = FALSE, names = "unique", null.ok = TRUE, add = ac)
+    checkmate::reportAssertions(ac)
+    
     hash <- makeHash(fGroups, ionization, rtRange, mzRange, elements, maxRTDev, maxMzDev, extraOpts)
     cd <- loadCacheData("componentsNontarget", hash)
     if (!is.null(cd))

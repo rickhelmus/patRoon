@@ -21,6 +21,13 @@ componentsCamera <- setClass("componentsCamera", slots = c(xsa = "xsAnnotate"), 
 #' @export
 generateComponentsCAMERA <- function(fGroups, ionization, onlyIsotopes = FALSE, extraOpts = NULL)
 {
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertClass(fGroups, "featureGroups", add = ac)
+    checkmate::assertChoice(ionization, c("positive", "negative"), add = ac)
+    checkmate::assertFlag(onlyIsotopes, add = ac)
+    checkmate::assertList(extraOpts, any.missing = FALSE, names = "unique", null.ok = TRUE, add = ac)
+    checkmate::reportAssertions(ac)
+    
     hash <- makeHash(fGroups, ionization, onlyIsotopes, extraOpts)
     cd <- loadCacheData("componentsCAMERA", hash)
     if (!is.null(cd))

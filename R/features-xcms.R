@@ -22,6 +22,11 @@ featuresXCMS <- setClass("featuresXCMS", slots = list(xs = "xcmsSet"), contains 
 #' @export
 findFeaturesXCMS <- function(analysisInfo, method = "centWave", ...)
 {
+    ac <- checkmate::makeAssertCollection()
+    assertAnalysisInfo(analysisInfo, c("mzXML", "mzML"), add = ac)
+    checkmate::assertString(method, min.chars = 1, add = ac)
+    checkmate::reportAssertions(ac)
+    
     hash <- makeHash(analysisInfo, list(...)) # UNDONE: better hash?
     cachef <- loadCacheData("featuresXCMS", hash)
     if (!is.null(cachef))
@@ -53,6 +58,11 @@ findFeaturesXCMS <- function(analysisInfo, method = "centWave", ...)
 #' @export
 importFeaturesXCMS <- function(xs, analysisInfo)
 {
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertClass(xs, "xcmsSet", add = ac)
+    assertAnalysisInfo(analysisInfo, add = ac)
+    checkmate::reportAssertions(ac)
+    
     plist <- as.data.table(peaks(xs))
     snames <- sampnames(xs)
     feat <- list()

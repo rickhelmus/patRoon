@@ -19,6 +19,22 @@ featureGroupsEnviMass <- setClass("featureGroupsEnviMass", contains = "featureGr
 #' @export
 importFeatureGroupsEnviMass <- function(path, feat, positive)
 {
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertDirectoryExists(path, "r", add = ac)
+    checkmate::assertClass(feat, "featuresEnviPick", add = ac)
+    checkmate::assertFlag(positive, add = ac)
+    
+    if (ac$isEmpty())
+    {
+        resPath <- file.path(path, "results")
+        profPeaksPath <- file.path(resPath, sprintf("profpeaks_%s", if (positive) "pos" else "neg"))
+        profListPath <- file.path(resPath, sprintf("profileList_%s", if (positive) "pos" else "neg"))
+        checkmate::assertFileExists(profPeaksPath, "r", .var.name = "path", add = ac)
+        checkmate::assertFileExists(profListPath, "r", .var.name = "path", add = ac)
+    }
+        
+    checkmate::reportAssertions(ac)
+    
     hash <- makeHash(feat, path, positive)
     cachefg <- loadCacheData("featureGroupsEnviMass", hash)
     if (!is.null(cachefg))
@@ -28,14 +44,13 @@ importFeatureGroupsEnviMass <- function(path, feat, positive)
 
     anaInfo <- analysisInfo(feat)
     fTable <- featureTable(feat)
-    path <- file.path(path, "results")
 
-    profPeaks <- as.data.table(loadRData(file.path(path, sprintf("profpeaks_%s", if (positive) "pos" else "neg"))))
+    profPeaks <- as.data.table(loadRData(profPeaksPath))
     setorder(profPeaks, profileID)
     gInfo <- data.frame(mzs = profPeaks$`mean_m/z`, rts = profPeaks$mean_RT)
     rownames(gInfo) <- makeFGroupName(seq_len(nrow(gInfo)), gInfo$rts, gInfo$mzs)
 
-    profList <- loadRData(file.path(path, sprintf("profileList_%s", if (positive) "pos" else "neg")))
+    profList <- loadRData(profListPath)
     peaks <- as.data.table(profList$peaks)
 
     groups <- as.data.table(matrix(0, nrow(anaInfo), nrow(gInfo)))

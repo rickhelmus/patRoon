@@ -52,6 +52,17 @@ NULL
 generateMzRPeakLists <- function(fGroups, avgMzWindow = 0.001, maxRtMSWidth = NULL, avgTopPeaks = 50, avgMinIntensity = 500,
                                  avgMassFun = mean, avgMethod = "distance", precursorMzWindow = 8, topMost = NULL)
 {
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertClass(fGroups, "featureGroups", add = ac)
+    aapply(checkmate::assertNumber, . ~ avgMzWindow + avgMinIntensity + precursorMzWindow,
+           lower = 0, finite = TRUE, fixed = list(add = ac))
+    checkmate::assertNumber(maxRtMSWidth, lower = 1, finite = TRUE, null.ok = TRUE, add = ac)
+    checkmate::assertCount(avgTopPeaks, positive = TRUE, add = ac)
+    checkmate::assertFunction(avgMassFun, add = ac)
+    checkmate::assertChoice(avgMethod, c("distance", "hclust"), add = ac)
+    checkmate::assertCount(topMost, positive = TRUE, null.ok = TRUE, add = ac)
+    checkmate::reportAssertions(ac)
+    
     ftindex <- groupFeatIndex(fGroups)
     fTable <- featureTable(fGroups)
     anaInfo <- analysisInfo(fGroups)

@@ -275,6 +275,13 @@ setMethod("show", "formulaConsensus", function(object)
 #' @export
 setMethod("plotSpec", "formulaConsensus", function(obj, precursor, groupName, MSPeakLists, useGGPlot2 = FALSE)
 {
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertString(precursor, min.chars = 1, add = ac)
+    checkmate::assertString(groupName, min.chars = 1, add = ac)
+    checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
+    checkmate::assertFlag(useGGPlot2, add = ac)
+    checkmate::reportAssertions(ac)
+    
     formTable <- formulaTable(obj)[group == groupName & byMSMS == TRUE & formula == precursor]
 
     if (nrow(formTable) == 0)

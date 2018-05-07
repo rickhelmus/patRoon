@@ -239,6 +239,13 @@ setMethod("addFormulaScoring", "compounds", function(compounds, formConsensus, u
 #' @export
 setMethod("plotStructure", "compounds", function(compounds, index, groupName, width, height, useGGPlot2 = FALSE)
 {
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertCount(index, positive = TRUE, add = ac)
+    checkmate::assertString(groupName, min.chars = 1, add = ac)
+    aapply(checkmate::assertNumber, . ~ width + height, lower = 0, finite = TRUE, fixed = list(add = ac))
+    checkmate::assertFlag(useGGPlot2, add = ac)
+    checkmate::reportAssertions(ac)
+    
     compTable <- compoundTable(compounds)[[groupName]]
 
     if (is.null(compTable) || nrow(compTable) == 0)
@@ -394,6 +401,14 @@ setMethod("plotScores", "compounds", function(obj, index, groupName, normalizeSc
 setMethod("plotSpec", "compounds", function(obj, index, groupName, MSPeakLists, formConsensus = NULL,
                                             normalizeScores = TRUE, useGGPlot2 = FALSE)
 {
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertCount(index, positive = TRUE, add = ac)
+    checkmate::assertString(groupName, min.chars = 1, add = ac)
+    checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
+    checkmate::assertClass(formConsensus, "formulaConsensus", null.ok = TRUE, add = ac)
+    aapply(checkmate::assertFlag, . ~normalizeScores + useGGPlot2, fixed = list(add = ac))
+    checkmate::reportAssertions(ac)
+
     compTable <- compoundTable(obj)[[groupName]]
 
     if (is.null(compTable) || nrow(compTable) == 0)

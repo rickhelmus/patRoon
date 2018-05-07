@@ -796,6 +796,8 @@ setMethod("plotEIC", "featureGroups", function(obj, rtWindow = 30, mzWindow = 0.
 #' @export
 setMethod("plotVenn", "featureGroups", function(obj, which, ...)
 {
+    checkmate::assertCharacter(which, min.chars = 1, null.ok = TRUE)
+    
     if (is.null(which))
         which <- unique(analysisInfo(obj)$group)
 
@@ -861,6 +863,13 @@ setMethod("plotVenn", "featureGroups", function(obj, which, ...)
 #' @export
 setMethod("unique", "featureGroups", function(x, which, relativeTo = NULL, outer = FALSE)
 {
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertCharacter(which, min.len = 1, min.chars = 1, any.missing = FALSE, add = ac)
+    checkmate::assertCharacter(relativeTo, min.len = 1, min.chars = 1, any.missing = FALSE,
+                               null.ok = TRUE, add = ac)
+    checkmate::assertFlag(outer, add = ac)
+    checkmate::reportAssertions(ac)
+    
     if (is.null(relativeTo))
         relativeTo <- unique(analysisInfo(x)$group)
     else
@@ -921,6 +930,12 @@ setMethod("overlap", "featureGroups", function(fGroups, which, exclusive)
 #' @export
 setMethod("screenTargets", "featureGroups", function(obj, targets, rtWindow, mzWindow)
 {
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertDataFrame(targets, any.missing = FALSE, min.rows = 1, add = add)
+    assertHasNames(targets, c("name", "mz"), add = ac)
+    aapply(checkmate::assertNumber, . ~ rtWindow + mzWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
+    checkmate::reportAssertions(ac)
+    
     gTable <- groups(obj)
     gInfo <- groupInfo(obj)
     anaInfo <- analysisInfo(obj)

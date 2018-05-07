@@ -101,6 +101,12 @@ setMethod("findFGroup", "components", function(obj, fGroup)
 #' @export
 setMethod("plotSpec", "components", function(obj, index, markFGroup = NULL, useGGPlot2 = FALSE, ...)
 {
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertInt(index, lower = 1, upper = length(componentTable(obj)), add = ac)
+    checkmate::assertString(markFGroup, min.chars = 1, null.ok = TRUE, add = ac)
+    checkmate::assertFlag(useGGPlot2, add = ac)
+    checkmate::reportAssertions(ac)
+    
     plotData <- copy(componentTable(obj)[[index]]) # UNDONE: allow multiple selection?
 
     haveIso <- !is.null(plotData[["isogroup"]])

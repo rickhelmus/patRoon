@@ -63,6 +63,12 @@ setMethod("analysisInfo", "features", function(obj) obj@analysisInfo)
 #' @export
 setMethod("screenTargets", "features", function(obj, targets, rtWindow, mzWindow)
 {
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertDataFrame(targets, any.missing = FALSE, min.rows = 1, add = add)
+    assertHasNames(targets, c("name", "mz"), add = ac)
+    aapply(checkmate::assertNumber, . ~ rtWindow + mzWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
+    checkmate::reportAssertions(ac)
+    
     fTable <- featureTable(obj)
     anaInfo <- analysisInfo(obj)
 

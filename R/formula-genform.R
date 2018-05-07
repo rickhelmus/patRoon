@@ -47,7 +47,7 @@ initGenFormFiles <- function(MSPList, MSMSPList)
 
 processGenFormMSMSResultFile <- function(file)
 {
-    formsMSMS <- fread(file, sep = "\t", fill = TRUE) # fill should be set with strange formatting of file
+    formsMSMS <- fread(file, sep = "\t", fill = TRUE, header = FALSE) # fill should be set with strange formatting of file
 
     # first column: either formula precursor or fragment mass
     # second column: either dbe or formula fragment/neutral loss
@@ -100,7 +100,7 @@ processGenFormResultFile <- function(file, isMSMS, adduct)
 
     if (!isMSMS)
     {
-        forms <- fread(file)
+        forms <- fread(file, header = FALSE)
         setnames(forms, c("neutral_formula", "dbe", "formula_mz", "error", "MS_match"))
         forms[, neutral_formula := Vectorize(sortFormula)(neutral_formula)] # GenForm doesn't seem use Hill sorting
         forms[, byMSMS := FALSE]

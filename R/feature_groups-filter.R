@@ -328,6 +328,11 @@ setMethod("filter", "featureGroups", function(obj, intensityThreshold = NULL, re
 #' @export
 setMethod("replicateGroupSubtract", "featureGroups", function(fGroups, rGroups, threshold)
 {
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertCharacter(rGroups, min.chars = 1, add = ac)
+    checkmate::assertNumber(threshold, lower = 0, finite = TRUE, add = ac)
+    checkmate::reportAssertions(ac)
+    
     fGroups@groups <- copy(fGroups@groups)
     filteredGroups <- replicateGroupFilter(fGroups, rGroups, verbose = FALSE)
     filteredGroupMeans <- sapply(filteredGroups@groups, function(x) return(mean(x[x>0])))

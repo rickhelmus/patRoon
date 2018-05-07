@@ -15,10 +15,10 @@ information} that contains the analyses to be converted.}
 destination format, respectively. Valid options are: \code{"mzXML"},
 \code{"mzML"} and \code{"mzData"}.}
 
-\item{outPath}{A directory path that should be used for the output. Usually
+\item{outPath}{A character vector specifying directories that should be used for the output. Usually
 this is the same as the source (otherwise the
 \link[=analysis-information]{analysis information} should be changed for
-further processing).}
+further processing). Will be re-cycled if necessary.}
 
 \item{overWrite}{Should existing destination file be overwritten
 (\code{TRUE}) or not (\code{FALSE})?}

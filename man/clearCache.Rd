@@ -18,7 +18,7 @@ Remove (part of) the cache database used to store (intermediate) processing
 results.
 }
 \details{
-This function will either remove oen or more tables within the cache
+This function will either remove one or more tables within the cache
 \code{sqlite} database or simply wipe the whole cache file. Removing tables
 will \code{VACUUM} the database, which may take some time for large cache
 files. (intermediate) processing results.

@@ -12,3 +12,4 @@ createCOMReference(ref, className)
 \description{
 Internal fix for \pkg{RDCOMClient}, ignore.
 }
+\keyword{internal}

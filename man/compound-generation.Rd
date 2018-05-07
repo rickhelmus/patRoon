@@ -15,19 +15,19 @@
 
 generateCompoundsMetfrag(fGroups, MSPeakLists, method = "CL",
   logPath = file.path("log", "metfrag"), timeout = 300,
-  timeoutRetries = 2, topMost = 100, dbRelMzDev = 5, fragRelMzDev = 5,
-  fragAbsMzDev = 0.002, isPositive, adduct, database = "PubChem",
-  chemSpiderToken = "", scoreTypes = c("FragmenterScore",
-  "OfflineMetFusionScore"), scoreWeights = 1,
-  preProcessingFilters = c("UnconnectedCompoundFilter", "IsotopeFilter"),
-  postProcessingFilters = c("InChIKeyFilter"), maxCandidatesToStop = 2500,
-  addTrivialNames = TRUE, identifiers = NULL, extraOpts = NULL,
-  maxProcAmount = getOption("patRoon.maxProcAmount"))
+  timeoutRetries = 2, errorRetries = 2, topMost = 100, dbRelMzDev = 5,
+  fragRelMzDev = 5, fragAbsMzDev = 0.002, isPositive, adduct,
+  database = "PubChem", chemSpiderToken = "",
+  scoreTypes = c("FragmenterScore", "OfflineMetFusionScore"),
+  scoreWeights = 1, preProcessingFilters = c("UnconnectedCompoundFilter",
+  "IsotopeFilter"), postProcessingFilters = c("InChIKeyFilter"),
+  maxCandidatesToStop = 2500, addTrivialNames = TRUE, identifiers = NULL,
+  extraOpts = NULL, maxProcAmount = getOption("patRoon.maxProcAmount"))
 
 generateCompoundsSirius(fGroups, MSPeakLists, maxMzDev = 5,
   adduct = "[M+H]+", elements = "CHNOP", profile = "qtof",
   formulaDatabase = NULL, fingerIDDatabase = "pubchem", noise = NULL,
-  topMost = 100, logPath = file.path("log", "sirius"),
+  errorRetries = 2, topMost = 100, logPath = file.path("log", "sirius"),
   maxProcAmount = getOption("patRoon.maxProcAmount"))
 }
 \arguments{
@@ -59,6 +59,9 @@ group is stopped. Also see \code{timeoutRetries} argument.}
 \item{timeoutRetries}{Maximum number of retries after reaching a timeout
 before completely skipping the metFrag query for a feature group. Also see
 \code{timeout} argument.}
+
+\item{errorRetries}{Maximum number of retries after an error occurred. This
+may be useful to handle e.g. connection errors.}
 
 \item{topMost}{Only keep this number of candidates (per feature group) with
 highest score. Set to \code{NULL} to always keep all candidates, however,
@@ -216,10 +219,10 @@ before feature groups have been prioritized.
   \code{generateCompounds} provides a generic interface and is therefore usually
   preferred.
 
-\code{generateCompoundsMetfrag} uses the \pkg{metfRag}
-  package for compound identification (see
-  \url{http://c-ruttkies.github.io/MetFrag/}). Several online compound
-  databases such as \href{https://pubchem.ncbi.nlm.nih.gov/}{PubChem} and
+\code{generateCompoundsMetfrag} uses the \pkg{metfRag} package for
+  compound identification (see \url{http://c-ruttkies.github.io/MetFrag/}).
+  Several online compound databases such as
+  \href{https://pubchem.ncbi.nlm.nih.gov/}{PubChem} and
   \href{http://www.chemspider.com/}{ChemSpider} may be chosen for retrieval
   of candidate structures. In addition, many options exist to score and
   filter resulting data, and it is highly suggested to optimize these to

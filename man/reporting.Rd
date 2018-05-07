@@ -39,7 +39,8 @@
 \item{fGroups}{The \code{\link{featureGroups}} object that should be used for
 reporting data.}
 
-\item{path}{The destination file path files generated during reporting.}
+\item{path}{The destination file path for files generated during reporting.
+Will be generated if needed.}
 
 \item{reportFGroupsAsRows}{Report feature groups as rows (instead of columns)
 within the resulting \file{.csv} file.}

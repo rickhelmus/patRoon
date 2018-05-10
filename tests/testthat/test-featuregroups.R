@@ -1,9 +1,12 @@
 context("feature groups")
 
 fList <- findFeatures(getTestAnaInfo(), "openms", logPath = NULL)
-
 fgOpenMS <- groupFeatures(fList, "openms")
 fgXCMS <- groupFeatures(fList, "xcms")
+
+fListEmpty <- findFeatures(getTestAnaInfo(), "openms", thr = 1E9, logPath = NULL)
+fgOpenMSEmpty <- groupFeatures(fListEmpty, "openms")
+fgXCMSEmpty <- groupFeatures(fListEmpty, "xcms")
 
 test_that("verify feature grouping output", {
     expect_known_value(groups(fgOpenMS), testFile("fg-openms"))
@@ -15,13 +18,21 @@ test_that("verify show output", {
     expect_known_show(fgXCMS, testFile("fg-show-xcms", text = TRUE))
 })
 
+test_that("empty objects work", {
+    expect_length(fgOpenMSEmpty, 0)
+    expect_length(fgXCMSEmpty, 0)
+})
+
 test_that("basic subsetting", {
-    expect_equal(length(fgOpenMS[, 1:50]), 50)
+    expect_length(fgOpenMS[, 1:50], 50)
+    expect_length(fgOpenMS[, "nope"], 0)
+    expect_length(fgOpenMS["nope"], 0)
     expect_equivalent(analysisInfo(fgOpenMS[1:3]), getTestAnaInfo()[1:3, ])
     expect_equivalent(analysisInfo(fgOpenMS[c(TRUE, TRUE, FALSE, TRUE, FALSE, TRUE)]),
                      getTestAnaInfo()[c(TRUE, TRUE, FALSE, TRUE, FALSE, TRUE), ])
     expect_equivalent(analysisInfo(fgOpenMS[getTestAnaInfo()$analysis[4:6]]), getTestAnaInfo()[4:6, ])
     expect_equal(length(fgOpenMS[FALSE]), 0)
+    expect_length(fgOpenMSEmpty[, 1:50], 0)
 })
 
 expfile <- file.path(getWorkPath(), "export.csv") # NOTE: will be removed prior to each test automatically
@@ -29,12 +40,16 @@ test_that("exporting works", {
     expect_file(export(fgOpenMS, "brukerpa", expfile), expfile)
     expect_file(export(fgOpenMS, "brukertasq", expfile), expfile)
     expect_file(export(fgOpenMS, "mzmine", expfile), expfile)
+    expect_error(export(fgOpenMSEmpty, "brukerpa", expfile))
+    expect_file(export(fgOpenMSEmpty, "brukertasq", expfile), expfile)
+    expect_file(export(fgOpenMSEmpty, "mzmine", expfile), expfile)
 })
 
 test_that("groupTable works", {
     expect_equal(nrow(groupTable(fgOpenMS)), length(fgOpenMS))
     # first 3 cols contain general info, then rep group ints
     expect_equal(ncol(groupTable(fgOpenMS, average = TRUE)), 3 + length(unique(getTestAnaInfo()$group)))
+    expect_equal(nrow(groupTable(fgOpenMSEmpty)), 0)
 })
 
 test_that("unique works", {
@@ -46,12 +61,14 @@ test_that("unique works", {
     expect_lt(length(unique(fgOpenMS, which = "standard")), length(fgOpenMS))
     expect_equal(length(unique(fgOpenMS, which = c("standard", "solvent"))), length(fgOpenMS))
     expect_equal(length(unique(fgOpenMS, which = c("standard", "solvent"), outer = TRUE)), 0)
+    expect_length(unique(fgOpenMSEmpty, which = c("standard", "solvent")), 0)
 })
 
-test_that("unique works", {
+test_that("overlap works", {
     # note: only have two rep groups
     
     expect_lt(length(overlap(fgOpenMS, which = c("standard", "solvent"))), length(fgOpenMS))
+    expect_length(overlap(fgOpenMSEmpty, which = c("standard", "solvent")), 0)
 })
 
 minInt <- function(fg)
@@ -78,17 +95,24 @@ test_that("basic filtering", {
     expect_known_output(filter(fgOpenMS, intensityThreshold = 500, minBlankThreshold = 5,
                                retentionRange = c(120, -1), intraRGroupAbundance = 1, negate = TRUE),
                         testFile("fgf-combi-neg", text = TRUE))
+    expect_length(filter(fgOpenMSEmpty, intensityThreshold = 500, minBlankThreshold = 5,
+                         retentionRange = c(120, -1), intraRGroupAbundance = 1), 0)
 })
 
 test_that("replicate group subtraction", {
     # should be as these are the only two rep groups
     expect_setequal(names(replicateGroupSubtract(fgOpenMS, "solvent")),
                     names(unique(fgOpenMS, which = "standard")))
+    expect_length(replicateGroupSubtract(fgOpenMSEmpty, "solvent"), 0)
 })
 
 fGCompOpenMS <- comparison(openms = fgOpenMS, xcms = fgXCMS, groupAlgo = "openms")
 fGCons <- consensus(fGCompOpenMS)
 fGCompXCMS <- comparison(openms = fgOpenMS, xcms = fgXCMS, groupAlgo = "xcms")
+fgCompOneEmpty <- comparison(openms = fgOpenMS, xcms = fgXCMSEmpty, groupAlgo = "openms")
+fGConsOneEmpty <- consensus(fgCompOneEmpty)
+fgCompBothEmpty <- comparison(openms = fgOpenMSEmpty, xcms = fgXCMSEmpty, groupAlgo = "openms")
+fGConsBothEmpty <- consensus(fgCompBothEmpty)
 
 test_that("verify feature group comparison", {
     expect_known_value(groups(fGCompOpenMS@comparedFGroups), testFile("fg-comp-openms"))
@@ -101,6 +125,10 @@ test_that("verify feature group comparison", {
     expect_lt(length(consensus(fGCompOpenMS, relAbundance = 1)), length(fGCons))
     expect_lt((length(unique(fGCompOpenMS, which = "openms")) +
                   length(unique(fGCompOpenMS, which = "xcms"))), length(fGCons))
+    expect_length(fgCompOneEmpty, 2)
+    expect_length(fGConsOneEmpty, length(fgOpenMS))
+    expect_length(fgCompBothEmpty, 2)
+    expect_length(fGConsBothEmpty, 0)
 })
 
 subFGroups <- fgOpenMS[, 1:25]
@@ -122,6 +150,18 @@ test_that("reporting works", {
     skip_if_not(havePngQuant)
     expect_error(reportMD(subFGroups, getWorkPath("pngquant"), optimizePng = TRUE), NA)
     expect_lt(file.size(getWorkPath("pngquant", "report.html")), file.size(getWorkPath("report.html")))
+})
+
+test_that("reporting with empty object works", {
+    expect_file(reportCSV(fgOpenMSEmpty, getWorkPath(), reportFeatures = TRUE),
+                file.path(getWorkPath(), sprintf("%s.csv", class(fgOpenMSEmpty))))
+    for (ana in getTestAnaInfo()$analysis)
+        checkmate::expect_file_exists(file.path(getWorkPath(), "features",
+                                                sprintf("%s-%s.csv", class(getFeatures(fgOpenMSEmpty)), ana)))
+    
+    expect_error(reportPDF(fgOpenMSEmpty, getWorkPath()), NA)
+    
+    expect_file(reportMD(fgOpenMSEmpty, getWorkPath()), getWorkPath("report.html"))
 })
 
 test_that("plotting works", {
@@ -146,4 +186,23 @@ test_that("plotting works", {
     
     expect_doppel("venn", function() plotVenn(fgOpenMS))
     expect_doppel("venn-comp", function() plotVenn(fGCompOpenMS))
+})
+
+test_that("plotting empty objects works", {
+    expect_doppel("retmz-empty", function() plot(fgOpenMSEmpty))
+    expect_doppel("retmz", function() plot(fGConsOneEmpty)) # should be same as fgOpenMS
+    expect_doppel("retmz-comp-empty", function() plot(fgCompBothEmpty))
+    
+    expect_doppel("intensity-def-empty", function() plotInt(fgOpenMSEmpty))
+    expect_doppel("intensity-avg-empty", function() plotInt(fgOpenMSEmpty, TRUE))
+    
+    expect_error(plotChord(fgOpenMSEmpty))
+    expect_doppel("chord-def", function() plotChord(fGConsOneEmpty)) # should be same as fgOpenMS
+    expect_error(plotChord(fgCompBothEmpty))
+    
+    expect_doppel("eic-def-empty", function() plotEIC(fgOpenMSEmpty))
+
+    expect_error(plotVenn(fgOpenMSEmpty))
+    expect_doppel("venn", function() plotVenn(fGConsOneEmpty)) # should be same as fgOpenMS
+    expect_error(plotVenn(fgCompBothEmpty))
 })

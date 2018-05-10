@@ -269,6 +269,9 @@ setMethod("filter", "featureGroups", function(obj, intensityThreshold = NULL, re
     checkmate::assertFlag(negate, add = ac)
     checkmate::reportAssertions(ac)
     
+    if (length(obj) == 0)
+        return(obj)
+    
     if (!is.null(intensityThreshold) && intensityThreshold > 0)
         obj <- intensityFilter(obj, intensityThreshold)
 
@@ -332,6 +335,9 @@ setMethod("replicateGroupSubtract", "featureGroups", function(fGroups, rGroups, 
     checkmate::assertCharacter(rGroups, min.chars = 1, add = ac)
     checkmate::assertNumber(threshold, lower = 0, finite = TRUE, add = ac)
     checkmate::reportAssertions(ac)
+    
+    if (length(fGroups) == 0)
+        return(fGroups)
     
     fGroups@groups <- copy(fGroups@groups)
     filteredGroups <- replicateGroupFilter(fGroups, rGroups, verbose = FALSE)

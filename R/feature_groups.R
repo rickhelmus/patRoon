@@ -41,7 +41,8 @@ NULL
 featureGroups <- setClass("featureGroups",
                           slots = c(groups = "data.table", analysisInfo = "data.frame", groupInfo = "data.frame",
                                     features = "features", ftindex = "data.table"),
-                          prototype = list(groups = data.table(), analysisInfo = data.frame(), groupInfo = data.frame(),
+                          prototype = list(groups = data.table(), analysisInfo = data.frame(),
+                                           groupInfo = data.frame(rts = numeric(), mzs = numeric()),
                                            ftindex = data.table()),
                           contains = "VIRTUAL")
 
@@ -245,12 +246,15 @@ setMethod("export", "featureGroups", function(fGroups, type, out)
     
     if (type == "brukerpa")
     {
+        if (length(fGroups) == 0)
+            stop("Cannot export empty feature groups object")
+        
         # UNDONE: do we need this?
         #files <- sapply(bucketInfo$fInfo$analysis, function(f) file.path(bucketInfo$dataPath, paste0(f, ".d")), USE.NAMES = F)
         files <- fGroups@analysisInfo$analysis
 
         # col.names: if NA an empty initial column is added
-        write.table(fGroups@groups, out, na="", sep="\t", quote=F, row.names = files, col.names = NA)
+        write.table(fGroups@groups, out, na = "", sep = "\t", quote = FALSE, row.names = files, col.names = NA)
     }
     else if (type == "brukertasq")
     {
@@ -289,6 +293,9 @@ setMethod("groupTable", "featureGroups", function(fGroups, average)
 {
     checkmate::assertFlag(average)
     
+    if (length(fGroups) == 0)
+        return(data.table(mz = numeric(), ret = numeric(), group = character()))
+    
     # UNDONE: Add formulas/idents?
     anaInfo <- analysisInfo(fGroups)
 
@@ -321,9 +328,12 @@ setMethod("plot", "featureGroups", function(x, retMin = TRUE, ...)
 {
     checkmate::assertFlag(retMin)
     
-    plot(if (retMin) x@groupInfo$rts / 60 else x@groupInfo$rts, x@groupInfo$mzs,
-         xlab = if (retMin) "retention (min)" else "retention (s)",
-         ylab = "m/z", ...)
+    if (length(x) == 0)
+        plot(0, type = "n", ...)
+    else
+        plot(if (retMin) x@groupInfo$rts / 60 else x@groupInfo$rts, x@groupInfo$mzs,
+             xlab = if (retMin) "retention (min)" else "retention (s)",
+             ylab = "m/z", ...)
 })
 
 #' @describeIn featureGroups Generates a line plot for the (averaged) intensity
@@ -332,6 +342,12 @@ setMethod("plot", "featureGroups", function(x, retMin = TRUE, ...)
 setMethod("plotInt", "featureGroups", function(obj, average = FALSE, ...)
 {
     checkmate::assertFlag(average)
+    
+    if (length(obj) == 0)
+    {
+        plot(0, type = "n")
+        invisible(return(NULL))
+    }
     
     anaInfo <- analysisInfo(obj)
 
@@ -384,6 +400,9 @@ setMethod("plotChord", "featureGroups", function(obj, addSelfLinks = FALSE, addR
            fixed = list(add = ac))
     checkmate::assertCharacter(outerGroups, min.chars = 1, min.len = 2, names = "unique", null.ok = TRUE)
     checkmate::reportAssertions(ac)
+    
+    if (length(obj) == 0)
+        stop("Can't plot empty feature groups object")
     
     hasOuter <- !is.null(outerGroups)
     
@@ -591,6 +610,11 @@ setMethod("plotEIC", "featureGroups", function(obj, rtWindow = 30, mzWindow = 0.
     
     checkmate::reportAssertions(ac)
     
+    if (length(obj) == 0)
+    {
+        plot(0, type = "n")
+        invisible(return(NULL))
+    }
 
     if (showLegend && colourBy == "none")
         showLegend <- FALSE
@@ -798,6 +822,9 @@ setMethod("plotVenn", "featureGroups", function(obj, which, ...)
 {
     checkmate::assertCharacter(which, min.chars = 1, null.ok = TRUE)
     
+    if (length(obj) == 0)
+        stop("Can't plot empty feature groups object")
+    
     if (is.null(which))
         which <- unique(analysisInfo(obj)$group)
 
@@ -913,7 +940,7 @@ setMethod("overlap", "featureGroups", function(fGroups, which, exclusive)
     anaInfo <- analysisInfo(fGroups)
     rGroups <- unique(anaInfo$group)
 
-    if (length(which) < 2)
+    if (length(which) < 2 || length(fGroups) == 0)
         return(fGroups) # nothing to do...
 
     if (exclusive)

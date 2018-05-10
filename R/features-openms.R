@@ -100,7 +100,7 @@ findFeaturesOpenMS <- function(analysisInfo, thr = 1000, comfwhm = 5, minfwhm = 
     fCounts <- sapply(fList, nrow)
     fTotCount <- sum(fCounts)
     printf("Done! Feature statistics:\n")
-    printf("%s: %d (%.1f%%)\n", analysisInfo$analysis, fCounts, fCounts * 100 / fTotCount)
+    printf("%s: %d (%.1f%%)\n", analysisInfo$analysis, fCounts, if (fTotCount == 0) 0 else fCounts * 100 / fTotCount)
     printf("Total: %d\n", fTotCount)
 
     return(featuresOpenMS(analysisInfo = analysisInfo, features = fList))
@@ -172,13 +172,18 @@ loadIntensities <- function(dfile, features)
     spectra <- loadSpectra(dfile, verbose = FALSE)
     features <- copy(features) # HACK: avoid sR crash caused by data.table
 
-    # take max intensity within +/- 5 sec window from retention time
-    for (f in seq_len(nrow(features)))
+    if (nrow(features) == 0)
+        features[, intensity := 0]
+    else
     {
-        ft <- features[f]
-        eic <- getEIC(spectra, ft$ret + c(-5, 5), c(ft$mzmin, ft$mzmax))
-        set(features, f, "intensity", max(eic$intensity))
+        # take max intensity within +/- 5 sec window from retention time
+        for (f in seq_len(nrow(features)))
+        {
+            ft <- features[f]
+            eic <- getEIC(spectra, ft$ret + c(-5, 5), c(ft$mzmin, ft$mzmax))
+            set(features, f, "intensity", max(eic$intensity))
+        }
     }
-
+    
     return(features)
 }

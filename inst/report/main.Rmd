@@ -83,8 +83,9 @@ selectMethod("plot", class(rmdVars$fGroups))(rmdVars$fGroups)
 
 ```{r}
 rGroupLen <- length(unique(analysisInfo(removeEmptyAnalyses(rmdVars$fGroups))$group))
-doPlotChord <- rmdVars$reportChord && rGroupLen > 1
-doPlotVenn <- rGroupLen > 1 && rGroupLen < 6
+doPlotChord <- length(rmdVars$fGroups) > 0 && rmdVars$reportChord && rGroupLen > 1
+doPlotVenn <- length(rmdVars$fGroups) > 0 && rGroupLen > 1 && rGroupLen < 6
+doEICs <- length(rmdVars$fGroups) > 0 && rmdVars$reportFGroups
 ```
 
 
@@ -104,7 +105,7 @@ plotVenn(rmdVars$fGroups)
 
 
 `r if (rmdVars$reportFGroups) "EICs\n===\n"`
-```{r eval=rmdVars$reportFGroups}
+```{r eval=doEICs}
 message("Plotting EICs...")
 prog <- txtProgressBar(0, length(rmdVars$fGroups), style = 3, file = stderr())
 

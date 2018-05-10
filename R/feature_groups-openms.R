@@ -43,6 +43,9 @@ groupFeaturesOpenMS <- function(feat, rtalign = TRUE, QT = FALSE, maxAlignRT = 3
     
     # UNDONE: allow extra options for aligning/grouping?
 
+    if (length(feat) == 0)
+        return(featureGroupsOpenMS(analysisInfo = analysisInfo(feat), features = feat))
+    
     hash <- makeHash(feat, rtalign, QT, maxAlignRT, maxAlignMZ, maxGroupRT, maxGroupMZ)
     cachefg <- loadCacheData("featureGroupsOpenMS", hash)
     if (!is.null(cachefg))
@@ -171,11 +174,14 @@ importConsensusXML <- function(feat, cfile)
     })
 
     gInfo <- as.data.frame(gInfoDT, stringsAsFactors = FALSE)
-    gNames <- sapply(seq_len(nrow(gInfo)), function(grpi) makeFGroupName(grpi, gInfo$rts[grpi], gInfo$mzs[grpi]))
-    rownames(gInfo) <- gNames
-    setnames(groups, gNames)
-    setnames(ftindex, gNames)
-
+    if (nrow(gInfo) > 0)
+    {
+        gNames <- sapply(seq_len(nrow(gInfo)), function(grpi) makeFGroupName(grpi, gInfo$rts[grpi], gInfo$mzs[grpi]))
+        rownames(gInfo) <- gNames
+        setnames(groups, gNames)
+        setnames(ftindex, gNames)
+    }
+    
     cat("Done!\n")
 
     return(list(groups = groups, gInfo = gInfo, ftindex = ftindex))

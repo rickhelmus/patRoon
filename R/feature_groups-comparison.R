@@ -90,9 +90,14 @@ convertFeatureGroupsToFeatures <- function(fGroupsList)
         setnames(ft, c("rts", "mzs"), c("ret", "mz"))
         ft[, ID := colnames(gt)]
 
-        avgit <- transpose(gt[, lapply(.SD, mean)])
-        setnames(avgit, 1, "intensity")
-        ft <- cbind(ft, avgit)
+        if (nrow(ft) == 0)
+            ft[, intensity := 0]
+        else
+        {
+            avgit <- transpose(gt[, lapply(.SD, mean)])
+            setnames(avgit, 1, "intensity")
+            ft <- cbind(ft, avgit)
+        }
 
         # dummy ranges
         ft[, retmin := ret - 3]
@@ -286,7 +291,13 @@ setMethod("consensus", "featureGroupsComparison", function(obj, relAbundance = 0
     }, simplify = FALSE)
     cat("Done!\n")
 
+    retFeatures <- featuresConsensus(features = consFeatures, analysisInfo = anaInfo)
+    
+    if (nrow(compFeatInds) == 0) # all input were empty feature groups
+        return(featureGroupsConsensus(analysisInfo = anaInfo, features = retFeatures))
+    
     # initialize new feature group tables
+    
     consFeatInds <- data.table(matrix(0, nrow = nrow(anaInfo), ncol = ncol(compFeatInds)))
     consFGNames <- colnames(compFeatInds)
     setnames(consFeatInds, consFGNames)
@@ -310,7 +321,6 @@ setMethod("consensus", "featureGroupsComparison", function(obj, relAbundance = 0
     setTxtProgressBar(prog, nrow(anaInfo))
     close(prog)
 
-    retFeatures <- featuresConsensus(features = consFeatures, analysisInfo = anaInfo)
     return(featureGroupsConsensus(groups = consGroups, analysisInfo = anaInfo,
                                   groupInfo = groupInfo(comparedFGroups), features = retFeatures,
                                   ftindex = consFeatInds))

@@ -35,7 +35,10 @@ groupFeaturesXCMS <- function(feat, rtalign = TRUE, exportedData = TRUE, groupAr
     aapply(checkmate::assertFlag, . ~ rtalign + exportedData, fixed = list(add = ac))
     aapply(checkmate::assertList, . ~ groupArgs + retcorArgs, any.missing = FALSE, names = "unique", fixed = list(add = ac))
     checkmate::reportAssertions(ac)
-    
+
+    if (length(feat) == 0)
+        return(featureGroupsXCMS(analysisInfo = analysisInfo(feat), features = feat))
+        
     hash <- makeHash(feat, rtalign, exportedData, groupArgs, retcorArgs)
     cachefg <- loadCacheData("featureGroupsXCMS", hash)
     if (!is.null(cachefg))

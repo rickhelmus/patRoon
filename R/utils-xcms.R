@@ -29,10 +29,15 @@ setMethod("getXcmsSet", "features", function(obj, exportedData)
     {
         ft <- fts[[anaInfo$analysis[i]]]
 
-        plist[[i]] <- data.frame(mz = ft$mz, mzmin = ft$mzmin, mzmax = ft$mzmax, rt = ft$ret,
-                                 rtmin = ft$retmin, rtmax = ft$retmax, maxo = ft$intensity, into=ft$area,
-                                 sample = i, stringsAsFactors = F)
-
+        if (nrow(ft) > 0)
+            plist[[i]] <- data.frame(mz = ft$mz, mzmin = ft$mzmin, mzmax = ft$mzmax, rt = ft$ret,
+                                     rtmin = ft$retmin, rtmax = ft$retmax, maxo = ft$intensity, into = ft$area,
+                                     sample = i, stringsAsFactors = F)
+        else
+            plist[[i]] <- data.frame(mz = numeric(), mzmin = numeric(), mzmax = numeric(), rt = numeric(),
+                                     rtmin = numeric(), rtmax = numeric(), maxo = numeric(), into = numeric(),
+                                     sample = numeric())
+        
         if (exportedData)
         {
             xr <- loadXCMSRaw(anaInfo$analysis[i], anaInfo$path[i])[[1]]

@@ -102,6 +102,12 @@ reportFGroupTable <- function(fGroups, path, fGroupsAsRows, reportAnalysisInfo, 
 {
     printf("Exporting feature group table...")
 
+    if (length(fGroups) == 0)
+    {
+        write.csv(data.frame(), file.path(path, sprintf("%s.csv", class(fGroups))))
+        invisible(return(NULL))
+    }
+    
     gTable <- copy(groups(fGroups))
     gInfo <- groupInfo(fGroups)
     anaInfo <- analysisInfo(fGroups)
@@ -150,6 +156,9 @@ reportFGroupTable <- function(fGroups, path, fGroupsAsRows, reportAnalysisInfo, 
 reportFGroupPlots <- function(fGroups, path, plotGrid, rtWindow, mzWindow, retMin, topMost, EICs)
 {
     printf("Exporting feature group plots...\n")
+    
+    if (length(fGroups) == 0)
+        invisible(return(NULL))
 
     gTable <- groups(fGroups)
     gCount <- length(fGroups)

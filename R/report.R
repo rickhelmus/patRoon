@@ -698,6 +698,12 @@ setMethod("reportMD", "featureGroups", function(fGroups, path, reportChord, repo
                     clusterMaxLabels = clusterMaxLabels, selfContained = selfContained,
                     optimizePng = optimizePng, maxProcAmount = maxProcAmount)
 
+    # HACK: not sure what exactly happens here, but... kableExtra adds latex
+    # dependencies by default, which then may cause serious memory leakage when
+    # rmarkdown::render() is called repeatedly. For now just remove them temporarily.
+    knitMeta <- knitr::knit_meta("latex_dependency", clean = TRUE)
+    on.exit(knitr::knit_meta_add(knitMeta), add = TRUE)
+    
     rmarkdown::render(file.path(workPath, "main.Rmd"), output_file = file.path(path, "report.html"),
                       output_options = list(self_contained = selfContained),
                       quiet = TRUE)

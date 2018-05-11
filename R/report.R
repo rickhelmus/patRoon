@@ -104,7 +104,7 @@ reportFGroupTable <- function(fGroups, path, fGroupsAsRows, reportAnalysisInfo, 
 
     if (length(fGroups) == 0)
     {
-        write.csv(data.frame(), file.path(path, sprintf("%s.csv", class(fGroups))))
+        printf("No feature groups!\n")
         invisible(return(NULL))
     }
     
@@ -158,7 +158,10 @@ reportFGroupPlots <- function(fGroups, path, plotGrid, rtWindow, mzWindow, retMi
     printf("Exporting feature group plots...\n")
     
     if (length(fGroups) == 0)
+    {
+        printf("No feature groups!\n")
         invisible(return(NULL))
+    }
 
     gTable <- groups(fGroups)
     gCount <- length(fGroups)
@@ -376,19 +379,30 @@ reportComponentTable <- function(components, path, retMin)
 {
     printf("Exporting component table...")
 
-    cTable <- rbindlist(componentTable(components), idcol = "component")
-
-    if (retMin)
-        cTable[, rt := rt / 60]
-    write.csv(cTable, file.path(path, "components.csv"))
-
-    printf("Done!\n")
+    if (length(components) == 0)
+        printf("No components!\n")
+    else
+    {
+        cTable <- rbindlist(componentTable(components), idcol = "component")
+        
+        if (retMin)
+            cTable[, rt := rt / 60]
+        write.csv(cTable, file.path(path, "components.csv"))
+        
+        printf("Done!\n")
+    }
 }
 
 reportComponentSpectra <- function(fGroups, path, components, EICRtWindow, EICMzWindow, retMin, EICs)
 {
     printf("Exporting component spectra...\n")
 
+    if (length(components) == 0)
+    {
+        printf("No components!\n")
+        invisible(return(NULL))
+    }
+    
     gInfo <- groupInfo(fGroups)
     anaInfo <- analysisInfo(fGroups)
     cInfo <- componentInfo(components)

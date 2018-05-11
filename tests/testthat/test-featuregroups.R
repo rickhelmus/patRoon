@@ -153,14 +153,8 @@ test_that("reporting works", {
 })
 
 test_that("reporting with empty object works", {
-    expect_file(reportCSV(fgOpenMSEmpty, getWorkPath(), reportFeatures = TRUE),
-                file.path(getWorkPath(), sprintf("%s.csv", class(fgOpenMSEmpty))))
-    for (ana in getTestAnaInfo()$analysis)
-        checkmate::expect_file_exists(file.path(getWorkPath(), "features",
-                                                sprintf("%s-%s.csv", class(getFeatures(fgOpenMSEmpty)), ana)))
-    
+    expect_error(reportCSV(fgOpenMSEmpty, getWorkPath(), reportFeatures = TRUE), NA)
     expect_error(reportPDF(fgOpenMSEmpty, getWorkPath()), NA)
-    
     expect_file(reportMD(fgOpenMSEmpty, getWorkPath()), getWorkPath("report.html"))
 })
 

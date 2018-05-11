@@ -28,6 +28,11 @@ generateComponentsCAMERA <- function(fGroups, ionization, onlyIsotopes = FALSE, 
     checkmate::assertList(extraOpts, any.missing = FALSE, names = "unique", null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
+    if (length(fGroups) == 0)
+        return(componentsCamera(componentInfo = data.table(), components = list(),
+                                algorithm = "CAMERA",
+                                xsa = new("xsAnnotate")))
+    
     hash <- makeHash(fGroups, ionization, onlyIsotopes, extraOpts)
     cd <- loadCacheData("componentsCAMERA", hash)
     if (!is.null(cd))

@@ -29,7 +29,9 @@ NULL
 #' @export
 components <- setClass("components",
                        slots = c(components = "list", componentInfo = "data.table",
-                                 algorithm = "character"))
+                                 algorithm = "character"),
+                       prototype = c(components = list(), componentInfo = data.table(),
+                                     algorithm = "none"))
 
 #' @describeIn components Accessor method for the \code{components} slot of a
 #'   \code{components} class. Each component is stored as a
@@ -85,6 +87,8 @@ setMethod("show", "components", function(object)
 setMethod("findFGroup", "components", function(obj, fGroup)
 {
     checkmate::assertString(fGroup, min.chars = 1)
+    if (length(obj) == 0)
+        return(numeric())
     which(sapply(componentTable(obj), function(ct) fGroup %in% ct$group))
 })
 
@@ -264,8 +268,9 @@ setMethod("consensus", "components", function(obj, ...)
     checkmate::assertList(allComponents, types = "components", min.len = 2, any.missing = FALSE,
                           unique = TRUE, .var.name = "...")
     
-    if (length(allComponents) == 1)
-        return(obj)
+    allComponents <- allComponents[lengths(allComponents) > 0]
+    if (length(allComponents) < 2)
+        stop("Need at least two non-empty components objects")
     
     compNames <- make.unique(sapply(allComponents, algorithm))
     retCInfo <- copy(componentInfo(allComponents[[1]]))
@@ -274,6 +279,8 @@ setMethod("consensus", "components", function(obj, ...)
     
     for (mi in seq(2, length(allComponents)))
     {
+        if (length(allComponents[[mi]]) == 0)
+            next
         rci <- copy(componentInfo(allComponents[[mi]]))
         rci[, algorithm := compNames[[mi]]]
         retCInfo <- rbind(retCInfo, rci, fill = TRUE)

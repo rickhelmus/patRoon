@@ -121,7 +121,7 @@ close(prog)
 ```
 
 
-```{r child="components.Rmd", eval=!is.null(rmdVars$components)}
+```{r child="components.Rmd", eval=!is.null(rmdVars$components) && length(rmdVars$components) > 0}
 ```
 
 

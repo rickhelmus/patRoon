@@ -2,7 +2,8 @@
 #' @include components.R
 NULL
 
-componentsRC <- setClass("componentsRC", slots = c(RC = "hclust"), contains = "components")
+componentsRC <- setClass("componentsRC", slots = c(RC = "hclust"),
+                         contains = "components")
 
 #' @details \code{generateComponentsRAMClustR} uses
 #'   \href{https://github.com/cbroeckl/RAMClustR}{RAMClustR} to generate
@@ -50,6 +51,11 @@ generateComponentsRAMClustR <- function(fGroups, st = NULL, sr = NULL, maxt = 12
     checkmate::assertList(extraOptsRC, any.missing = FALSE, names = "unique", null.ok = TRUE, add = ac)
     checkmate::assertList(extraOptsFM, any.missing = FALSE, names = "unique", null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
+    
+    if (length(fGroups) == 0)
+        return(componentsRC(componentInfo = data.table(), components = list(),
+                            algorithm = "RAMClustR",
+                            RC = structure(list(), class = "hclust")))
     
     gTable <- groups(fGroups)
     gInfo <- groupInfo(fGroups)
@@ -140,7 +146,7 @@ generateComponentsRAMClustR <- function(fGroups, st = NULL, sr = NULL, maxt = 12
     cInfo <- data.table(name = RC$cmpd, ret = RC$clrt, retsd = RC$clrtsd, neutral_mass = RC$M, ppm = Mppm,
                         size = sapply(comps, nrow))
 
-    ret <- componentsRC(RC = RC, components = comps, componentInfo = cInfo, algorithm = "RAMClustR")
+    ret <- componentsRC(RC = RC, components = comps, componentInfo = cInfo)
     saveCacheData("componentsRC", ret, hash)
     return(ret)
 }

@@ -69,6 +69,9 @@ generateMzRPeakLists <- function(fGroups, avgMzWindow = 0.001, maxRtMSWidth = NU
     gTable <- groups(fGroups)
     gcount <- ncol(ftindex)
     anaCount <- nrow(anaInfo)
+    
+    if (gcount == 0)
+        return(MSPeakLists(algorithm = "mzR"))
 
     cacheDB <- openCacheDB()
     setHash <- makeHash(fGroups, avgMzWindow, maxRtMSWidth, avgTopPeaks, avgMinIntensity, avgMassFun, avgMethod,

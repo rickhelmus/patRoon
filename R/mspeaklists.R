@@ -114,7 +114,7 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
             if (!is.null(absMSIntThr))
                 pLists[[anai]][[grpi]]$MS <- pLists[[anai]][[grpi]]$MS[intensity >= absMSIntThr]
 
-            if (!is.null(relMSIntThr))
+            if (!is.null(relMSIntThr) && nrow(pLists[[anai]][[grpi]]$MS) > 0)
             {
                 thr <- max(pLists[[anai]][[grpi]]$MS$intensity) * relMSIntThr
                 pLists[[anai]][[grpi]]$MS <- pLists[[anai]][[grpi]]$MS[intensity >= thr]
@@ -134,7 +134,7 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
                 if (!is.null(absMSMSIntThr) && !is.null(pLists[[anai]][[grpi]]$MSMS))
                     pLists[[anai]][[grpi]]$MSMS <- pLists[[anai]][[grpi]]$MSMS[intensity >= absMSMSIntThr]
 
-                if (!is.null(relMSMSIntThr))
+                if (!is.null(relMSMSIntThr) && nrow(pLists[[anai]][[grpi]]$MS) > 0)
                 {
                     thr <- max(pLists[[anai]][[grpi]]$MSMS$intensity) * relMSMSIntThr
                     pLists[[anai]][[grpi]]$MSMS <- pLists[[anai]][[grpi]]$MSMS[intensity >= thr]

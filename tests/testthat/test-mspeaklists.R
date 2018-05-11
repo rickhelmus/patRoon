@@ -1,10 +1,11 @@
 context("MS peak lists")
 
-fGroups <- getTestFGroups()
+fGroups <- getTestFGroups()[4:5, 1:100]
 plists <- generateMSPeakLists(fGroups, "mzr")
 
 test_that("verify generation of MS peak lists", {
-    expect_known_hash(plists, "d4b026d4e3") # use a hash here because of the large resulting file
+    # expect_known_hash(plists, "d4b026d4e3") # use a hash here because of the large resulting file
+    expect_known_value(plists, testFile("plists-mzr"))
 })
 
 test_that("verify show output", {
@@ -55,4 +56,13 @@ test_that("filtering", {
     expect_lte(checkMaxPeaks(filter(plists, topMSPeaks = 10), FALSE), 10)
     expect_lte(checkMaxPeaks(filter(plists, topMSMSPeaks = 10), TRUE), 10)
     # UNDONE: deisotope?
+})
+
+plistsEmpty <- filter(plists, absMSIntThr = 1E9, absMSMSIntThr = 1E9)
+
+test_that("empty object", {
+    expect_length(plistsEmpty, 0)
+    expect_length(filter(plistsEmpty, relMSIntThr = 0.2, relMSMSIntThr = 0.2, topMSPeaks = 10,
+                         topMSMSPeaks = 10), 0)
+    expect_length(generateMSPeakLists(getEmptyTestFGroups(), "mzr"), 0)
 })

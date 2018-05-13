@@ -1,19 +1,31 @@
 context("formulas")
 
 fGroups <- getTestFGroups(getTestAnaInfo()[4:5, ])
+fGroupsEmpty <- getEmptyTestFGroups()
 plists <- generateMSPeakLists(fGroups, "mzr")
+plistsEmpty <- getEmptyPLists()
 
 doSIRIUS <- !is.null(getOption("patRoon.path.SIRIUS")) && nzchar(getOption("patRoon.path.SIRIUS"))
 
 formsGF <- generateFormulas(fGroups, "genform", plists)
+formsGFEmpty <- generateFormulas(fGroupsEmpty, "genform", plistsEmpty)
+formsGFEmptyPL <- generateFormulas(fGroups, "genform", plistsEmpty)
 
 if (doSIRIUS)
+{
     formsSIR <- generateFormulas(fGroups, "sirius", plists, logPath = NULL)
+    formsSIREmpty <- generateFormulas(fGroupsEmpty, "sirius", plistsEmpty, logPath = NULL)
+    formsSIREmptyPL <- generateFormulas(fGroups, "sirius", plistsEmpty, logPath = NULL)
+}
 
 test_that("verify formula generation", {
     expect_known_value(formsGF, testFile("formulas-gf"))
+    expect_length(formsGFEmpty, 0)
+    expect_length(formsGFEmptyPL, 0)
     skip_if_not(doSIRIUS)
     expect_known_value(formsSIR, testFile("formulas-sir"))
+    expect_length(formsSIREmpty, 0)
+    expect_length(formsSIREmptyPL, 0)
 })
 
 test_that("verify show output", {
@@ -44,10 +56,14 @@ test_that("consensus works", {
     checkmate::expect_names(names(formulaTable(consensus(formsGF, fGroups = fGroups, fragElements = c("C", "H")))),
                             must.include = c("frag_C", "frag_H"))
     
+    expect_error(consensus(formsGFEmpty, fGroups = fGroupsEmpty), "non-empty")
+    
     skip_if_not(doSIRIUS)
     expect_known_value(fCons2, testFile("formulas-cons2"))
     expect_known_show(fCons2, testFile("formulas-cons2", text = TRUE))
     expect_lt(length(consensus(formsGF, formsSIR, fGroups = fGroups, formListThreshold = 1)), length(fCons2))
+    
+    expect_equal(consensus(formsSIR, formsGFEmptyPL, fGroups = fGroups), consensus(formsSIR, fGroups = fGroups))
 })
 
 test_that("feature group filtering", {

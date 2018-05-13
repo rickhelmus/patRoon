@@ -197,7 +197,7 @@ generateCompoundsSirius <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct =
 
     ngrp <- length(ret)
     printf("Loaded %d compounds from %d features (%.2f%%).\n", sum(unlist(lapply(ret, nrow))),
-           ngrp, ngrp * 100 / gCount)
+           ngrp, if (gCount == 0) 0 else ngrp * 100 / gCount)
 
     if (is.null(cachedSet))
         saveCacheSet("identifySirius", resultHashes[resultHashes != ""], setHash, cacheDB)

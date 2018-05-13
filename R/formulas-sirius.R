@@ -177,7 +177,7 @@ generateFormulasSirius <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct = 
         }
 
         printf("Loaded %d formulas from %d features (%.2f%%).\n", sum(unlist(lapply(formTable[[ana]], nrow))),
-               ngrp, ngrp * 100 / gcount)
+               ngrp, if (gcount == 0) 0 else ngrp * 100 / gcount)
     }
 
     if (is.null(cachedSet))

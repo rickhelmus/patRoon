@@ -6,6 +6,7 @@ getTestAnaInfo <- function(path = patRoonData::exampleDataPath()) generateAnalys
                                                                                        refs = "solvent")
 getTestFGroups <- function(anaInfo = getTestAnaInfo()) groupFeatures(findFeatures(anaInfo, "openms", logPath = NULL), "openms")
 getEmptyTestFGroups <- function() getTestFGroups()[, "none"]
+getEmptyPLists <- function() MSPeakLists()
 
 expect_file <- function(object, file, removeIfExists = TRUE)
 {

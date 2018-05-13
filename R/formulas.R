@@ -126,6 +126,10 @@ setMethod("consensus", "formulas", function(obj, ..., fGroups, formAnaThreshold 
     if (length(allFLists) > length(unique(sapply(allFLists, algorithm))))
         stop("Consensus can only be generated from different algorithms at this moment.")
 
+    allFLists <- allFLists[lengths(allFLists) > 0]
+    if (length(allFLists) < 1)
+        stop("Need at least one non-empty formulas objects")
+    
     formConsList <- lapply(allFLists,
                            function (fl) consensusForFormulaList(fl, fGroups, formAnaThreshold, maxFormulas, maxFragFormulas,
                                                                  minIntensity, maxIntensity, minPreferredFormulas,
@@ -141,6 +145,7 @@ setMethod("consensus", "formulas", function(obj, ..., fGroups, formAnaThreshold 
 
             forms1 <- formulaTable(fCons1)
             forms2 <- formulaTable(fCons2)
+            
             haveMSMS <- "frag_formula" %in% colnames(forms1) && "frag_formula" %in% colnames(forms2)
 
             mergeCols <- c("group", "formula")

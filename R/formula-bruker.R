@@ -225,7 +225,7 @@ generateFormulasDA <- function(fGroups, precursorMzSearchWindow = 0.002, MSMode 
 
         ngrp <- length(fTable[[ana]])
         printf("Loaded %d formulas from %d features (%.2f%%).\n", sum(unlist(lapply(fTable[[ana]], nrow))),
-               ngrp, ngrp * 100 / gCount)
+               ngrp, if (gCount == 0) 0 else ngrp * 100 / gCount)
     }
 
     if (is.null(cachedSet))

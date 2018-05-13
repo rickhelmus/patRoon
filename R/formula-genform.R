@@ -254,7 +254,7 @@ generateFormulasGenForm <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct =
 
         ngrp <- sum(unlist(sapply(ret, function(ft) nrow(ft) > 0)))
         printf("Loaded %d %s formulas from %d features (%.2f%%).\n", sum(unlist(sapply(ret, nrow))),
-               if (doMSMS) "MS/MS" else "MS", ngrp, ngrp * 100 / gCount)
+               if (doMSMS) "MS/MS" else "MS", ngrp, if (gCount == 0) 0 else ngrp * 100 / gCount)
 
         return(ret)
     }

@@ -146,7 +146,7 @@ generateComponentsRAMClustR <- function(fGroups, st = NULL, sr = NULL, maxt = 12
     cInfo <- data.table(name = RC$cmpd, ret = RC$clrt, retsd = RC$clrtsd, neutral_mass = RC$M, ppm = Mppm,
                         size = sapply(comps, nrow))
 
-    ret <- componentsRC(RC = RC, components = comps, componentInfo = cInfo)
+    ret <- componentsRC(RC = RC, components = comps, componentInfo = cInfo, algorithm = "RAMClustR")
     saveCacheData("componentsRC", ret, hash)
     return(ret)
 }

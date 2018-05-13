@@ -167,7 +167,7 @@ test_that("reporting works", {
                          compounds = comps, MSPeakLists = plists),
                 getWorkPath("report.html"))
 })
-browser()
+
 test_that("reporting empty objects works", {
     skip_if_not(hasCompounds)
     expect_error(reportCSV(fGroups, getWorkPath(), compounds = compsEmpty), NA)

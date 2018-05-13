@@ -108,7 +108,7 @@ setMethod("filter", "compounds", function(obj, minExplainedPeaks = NULL, minScor
     checkmate::reportAssertions(ac)
     
     cat("Filtering compounds... ")
-
+    
     mCompNames <- mergedCompoundNames(obj)
     filterCols <- function(cmpTable, col, minVal)
     {
@@ -134,7 +134,8 @@ setMethod("filter", "compounds", function(obj, minExplainedPeaks = NULL, minScor
         return(cmpTable)
     }, simplify = FALSE)
 
-    obj@compounds <- obj@compounds[sapply(obj@compounds, function(cm) !is.null(cm) && nrow(cm) > 0)]
+    if (length(obj) > 0)
+        obj@compounds <- obj@compounds[sapply(obj@compounds, function(cm) !is.null(cm) && nrow(cm) > 0)]
 
     newn <- length(obj)
     printf("Done! Filtered %d (%.2f%%) compounds. Remaining: %d\n", oldn - newn, (1-(newn/oldn))*100, newn)
@@ -159,13 +160,16 @@ setMethod("filter", "compounds", function(obj, minExplainedPeaks = NULL, minScor
 #' @aliases addFormulaScoring
 #' @export
 setMethod("addFormulaScoring", "compounds", function(compounds, formConsensus, updateScore,
-                                                    formulaScoreWeight)
+                                                     formulaScoreWeight)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(formConsensus, "formulaConsensus", add = ac)
     checkmate::assertFlag(updateScore, add = ac)
     checkmate::assertNumber(formulaScoreWeight, lower = 0, finite = TRUE, add = ac)
     checkmate::reportAssertions(ac)
+    
+    if (length(compounds) == 0)
+        return(compounds)
     
     fTable <- formulaTable(formConsensus)
     cTable <- compoundTable(compounds)
@@ -584,7 +588,7 @@ setMethod("consensus", "compounds", function(obj, ..., compThreshold = 0.0, merg
     checkmate::assertNumber(compThreshold, lower = 0, finite = TRUE, add = ac)
     checkmate::assertFunction(mergeScoresFunc, add = ac)
     checkmate::reportAssertions(ac)
-    
+
     compNames <- sapply(allCompounds, algorithm)
     if (anyDuplicated(compNames))
     {
@@ -604,6 +608,7 @@ setMethod("consensus", "compounds", function(obj, ..., compThreshold = 0.0, merg
         # in case names are still duplicated
         compNames <- make.unique(compNames)
     }
+    
 
     # initialize all compound objects for merge: copy them, rename columns to
     # avoid duplicates and set merged by field of fragInfo.
@@ -754,7 +759,8 @@ setMethod("consensus", "compounds", function(obj, ..., compThreshold = 0.0, merg
     cat("Done!")
 
     # prune empty/NULL results
-    mCompList <- mCompList[sapply(mCompList, function(r) !is.null(r) && nrow(r) > 0, USE.NAMES = FALSE)]
+    if (length(mCompList) > 0)
+        mCompList <- mCompList[sapply(mCompList, function(r) !is.null(r) && nrow(r) > 0, USE.NAMES = FALSE)]
 
     return(compoundsConsensus(compounds = mCompList, algorithm = unique(paste0(sapply(allCompounds, algorithm))),
                               mergedCompNames = compNames))

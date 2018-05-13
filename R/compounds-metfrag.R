@@ -479,7 +479,7 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
 
     ngrp <- length(ret)
     printf("Loaded %d compounds from %d features (%.2f%%).\n", sum(unlist(lapply(ret, nrow))),
-           ngrp, ngrp * 100 / gCount)
+           ngrp, if (gCount == 0) 0 else ngrp * 100 / gCount)
 
     if (is.null(cachedSet))
         saveCacheSet("identifyMetFrag", resultHashes[resultHashes != ""], setHash, cacheDB)

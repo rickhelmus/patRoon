@@ -211,6 +211,10 @@ compoundFilter <- function(fGroups, compounds, negate = FALSE, verbose = TRUE)
     {
         compTable <- compoundTable(compounds)
         compgrps <- names(compTable)[sapply(compTable, function(r) !is.null(r) && nrow(r) > 0, USE.NAMES = FALSE)]
+        
+        if (is.null(compgrps)) # empty object
+            return(if (negate) fGroups else fGroups[, FALSE]) # FALSE: give empty object
+        
         if (negate)
             return(fGroups[, setdiff(names(fGroups), compgrps)])
         return(fGroups[, compgrps])

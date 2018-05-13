@@ -237,6 +237,12 @@ reportFormulaSpectra <- function(fGroups, path, formConsensus, MSPeakLists, EICR
 {
     printf("Exporting formula MS/MS spectra...\n")
 
+    if (length(formConsensus) == 0)
+    {
+        printf("No formulas!\n")
+        invisible(return(NULL))
+    }
+    
     gInfo <- groupInfo(fGroups)
     anaInfo <- analysisInfo(fGroups)
     # specs <- loadAllSpectra(anaInfo$analysis, anaInfo$path)
@@ -320,6 +326,12 @@ reportCompoundSpectra <- function(fGroups, path, MSPeakLists, compounds, formCon
     compTable <- compoundTable(compounds)
     pLists <- peakLists(MSPeakLists)
 
+    if (length(compounds) == 0)
+    {
+        printf("No compounds!\n")
+        invisible(return(NULL))
+    }
+    
     if (!is.null(formConsensus))
         fTable <- formulaTable(formConsensus)
 
@@ -597,7 +609,7 @@ setMethod("reportPDF", "featureGroups", function(fGroups, path, reportFGroups,
     if (reportFGroups)
         reportFGroupPlots(fGroups, path, EICGrid, EICRtWindow, EICMzWindow, retMin, EICTopMost, EICs)
 
-    if (reportFormulaSpectra && !is.null(formConsensus) && length(formConsensus) > 0)
+    if (reportFormulaSpectra && !is.null(formConsensus))
     {
         p <- file.path(path, "formulas")
         mkdirp(p)

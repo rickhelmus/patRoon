@@ -49,12 +49,18 @@ setMethod("length", "MSPeakLists", function(x) sum(unlist(recursiveApplyDT(x@pea
 #' @export
 setMethod("show", "MSPeakLists", function(object)
 {
-    mspcount <- sum(sapply(object@peakLists, function(pa) sum(sapply(pa, function(pf) nrow(pf$MS)))))
-    msmspcount <- sum(sapply(object@peakLists, function(pa) sum(sapply(pa, function(pf) if (!is.null(pf$MSMS)) nrow(pf$MSMS) else 0))))
-    totpcount <- sum(mspcount, msmspcount)
-    mslcount <- sum(lengths(object@peakLists))
-    msmslcount <- sum(sapply(object@peakLists, function(pa) sum(sapply(pa, function(pf) !is.null(pf$MSMS)))))
-    totlcount <- sum(mslcount, msmslcount)
+    if (length(object) == 0)
+        mspcount <- msmspcount <- totpcount <- totpcount <- mslcount <- msmslcount <- totlcount <- 0
+    else
+    {
+        mspcount <- sum(sapply(object@peakLists, function(pa) sum(sapply(pa, function(pf) nrow(pf$MS)))))
+        msmspcount <- sum(sapply(object@peakLists, function(pa) sum(sapply(pa, function(pf) if (!is.null(pf$MSMS)) nrow(pf$MSMS) else 0))))
+        totpcount <- sum(mspcount, msmspcount)
+        mslcount <- sum(lengths(object@peakLists))
+        msmslcount <- sum(sapply(object@peakLists, function(pa) sum(sapply(pa, function(pf) !is.null(pf$MSMS)))))
+        totlcount <- sum(mslcount, msmslcount)
+    }
+    
     anacount <- length(object@peakLists)
 
     printf("A MSPeakLists object ('%s')\n", class(object))

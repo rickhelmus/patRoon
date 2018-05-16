@@ -41,6 +41,7 @@ Imports:
     xcms,
     cluster,
     d3heatmap,
+    dynamicTreeCut,
     rJava,
     rcdk,
     mzR,

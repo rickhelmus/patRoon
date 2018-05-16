@@ -3,10 +3,6 @@ NULL
 
 # UNDONE: add eawag references
 
-# So it can be used as a S4 slot
-setOldClass("hclust")
-setOldClass("dissimilarity")
-
 #' Hierarchical clustering information
 #'
 #' Objects from this class hold information required for

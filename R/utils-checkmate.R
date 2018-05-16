@@ -1,6 +1,15 @@
 checkHasNames <- function(x, n, type = "unique") checkmate::checkNames(names(x), must.include = n, type = type)
 assertHasNames <- checkmate::makeAssertionFunction(checkHasNames)
 
+checkChoiceSilent <- function(x, ch)
+{
+    ret <- checkmate::checkString(x, min.chars = 1)
+    if (isTRUE(ret) && !x %in% ch)
+        ret <- paste("Must be element of", getStrListWithMax(ch, 6, ", "))
+    return(ret)
+}
+assertChoiceSilent <- checkmate::makeAssertionFunction(checkChoiceSilent)
+
 assertAnalysisInfo <- function(x, allowedFormats = NULL, .var.name = checkmate::vname(x), add = NULL)
 {
     if (!is.null(add))

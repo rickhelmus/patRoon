@@ -32,6 +32,10 @@ NULL # need this for doc generation
 #' @include cache.R
 NULL
 
+# So it can be used as a S4 slot
+setOldClass("hclust")
+setOldClass("dissimilarity")
+
 #### Generics
 
 #' @include generics.R

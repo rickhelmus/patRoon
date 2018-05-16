@@ -16,8 +16,8 @@
 \alias{plot,silhouetteInfo,ANY-method}
 \title{Hierarchical clustering of feature groups}
 \usage{
-\S4method{makeHCluster}{featureGroups}(fGroups, normFunc = max,
-  metric = "euclidean", method = "ward.D2", average = TRUE)
+\S4method{makeHCluster}{featureGroups}(obj, method = "ward.D2",
+  metric = "euclidean", normFunc = max, average = TRUE)
 
 \S4method{hClusterFilter}{featureGroups,clusterInfo}(fGroups, cInfo, k, c)
 
@@ -33,7 +33,11 @@
 \S4method{plot}{silhouetteInfo,ANY}(x, y, ...)
 }
 \arguments{
-\item{fGroups}{A \code{\link{featureGroups}} object.}
+\item{method}{Clustering method that should be applied (passed to
+\code{\link{hclust}}).}
+
+\item{metric}{Distance metric used to calculate the distance matrix (passed
+to \code{\link{daisy}}).}
 
 \item{normFunc}{Function that should be used for normalization of data.
 Intensitity values of a feature group will be divided by the result of this
@@ -41,14 +45,10 @@ function when it is called with all intensity values of that feature group.
 For example, when \code{\link{max}} is used normalized intensities will be
 between zero and one.}
 
-\item{metric}{Distance metric used to calculate the distance matrix (passed
-to \code{\link{daisy}}).}
-
-\item{method}{Clustering method that should be applied (passed to
-\code{\link{hclust}}).}
-
 \item{average}{If \code{TRUE} then all intensitity data will be averaged for
 each replicate group.}
+
+\item{fGroups}{A \code{\link{featureGroups}} object.}
 
 \item{cInfo}{A \code{\link{clusterInfo}} object with relevant clustering
 information.}
@@ -66,13 +66,14 @@ information.}
 \item{\dots}{Further options passed to \code{\link{heatmap}} /
 \code{\link{d3heatmap}} (\code{drawHeatMap}), \code{\link{barplot}}
 (\code{plot}, \code{\link{silhouetteInfo}} signature) or
-\code{\link[graphics]{plot}} (\code{plot}, \code{\link{clusterInfo}} signature and
-\code{plotInt}).}
+\code{\link[graphics]{plot}} (\code{plot}, \code{\link{clusterInfo}}
+signature and \code{plotInt}).}
 
 \item{ranges}{An integer vector containing a sequence of desired amounts of
 branches to which silhouette information should be calculated.}
 
-\item{x, obj}{A \code{\link{clusterInfo}}/\code{\link{silhouetteInfo}} object.}
+\item{x, obj}{A \code{\link{clusterInfo}}, \code{\link{silhouetteInfo}}
+or \code{\link{featureGroups}} object.}
 
 \item{y}{Ignored.}
 }

@@ -66,8 +66,7 @@ setGeneric("plotScores", function(obj, index, groupName, normalizeScores = TRUE,
 ### h-clustering
 
 setGeneric("clusterProperties", function(cInfo) standardGeneric("clusterProperties"))
-setGeneric("makeHCluster", function(fGroups, normFunc = max, metric = "euclidean", method = "ward.D2",
-                                    average = TRUE) standardGeneric("makeHCluster"))
+setGeneric("makeHCluster", function(obj, method = "complete", ...) standardGeneric("makeHCluster"))
 setGeneric("drawHeatMap", function(cInfo, col = colorRampPalette(c("black", "yellow"))(100),
                                    interactive = FALSE, ...) standardGeneric("drawHeatMap"))
 setGeneric("getSilhouetteInfo", function(cInfo, ranges = seq(10, 100, 10)) standardGeneric("getSilhouetteInfo"))

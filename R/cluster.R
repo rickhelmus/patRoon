@@ -46,11 +46,12 @@ clusterInfo <- setClass("clusterInfo",
 #' @param \dots Further options passed to \code{\link{heatmap}} /
 #'   \code{\link{d3heatmap}} (\code{drawHeatMap}), \code{\link{barplot}}
 #'   (\code{plot}, \code{\link{silhouetteInfo}} signature) or
-#'   \code{\link[graphics]{plot}} (\code{plot}, \code{\link{clusterInfo}} signature and
-#'   \code{plotInt}).
+#'   \code{\link[graphics]{plot}} (\code{plot}, \code{\link{clusterInfo}}
+#'   signature and \code{plotInt}).
 #' @param k The desired number of branches from a given cluster object.
 #' @param c The numeric identifier of the desired branch from a cut cluster.
-#' @param x,obj A \code{\link{clusterInfo}}/\code{\link{silhouetteInfo}} object.
+#' @param x,obj A \code{\link{clusterInfo}}, \code{\link{silhouetteInfo}}
+#'   or \code{\link{featureGroups}} object.
 #' @name h-cluster
 NULL
 
@@ -59,15 +60,15 @@ NULL
 #'   normalized. A distance matrix is calculated with \code{\link{daisy}} and
 #'   clustering is performed with \code{\link{hclust}}.
 #'
+#' @param method Clustering method that should be applied (passed to
+#'   \code{\link{hclust}}).
+#' @param metric Distance metric used to calculate the distance matrix (passed
+#'   to \code{\link{daisy}}).
 #' @param normFunc Function that should be used for normalization of data.
 #'   Intensitity values of a feature group will be divided by the result of this
 #'   function when it is called with all intensity values of that feature group.
 #'   For example, when \code{\link{max}} is used normalized intensities will be
 #'   between zero and one.
-#' @param metric Distance metric used to calculate the distance matrix (passed
-#'   to \code{\link{daisy}}).
-#' @param method Clustering method that should be applied (passed to
-#'   \code{\link{hclust}}).
 #' @param average If \code{TRUE} then all intensitity data will be averaged for
 #'   each replicate group.
 #'
@@ -77,7 +78,8 @@ NULL
 #' @rdname h-cluster
 #' @aliases makeHCluster
 #' @export
-setMethod("makeHCluster", "featureGroups", function(fGroups, normFunc = max, metric, method, average)
+setMethod("makeHCluster", "featureGroups", function(obj, method, metric = "euclidean", 
+                                                    normFunc = max, average = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertFunction(normFunc, add = ac)
@@ -88,13 +90,13 @@ setMethod("makeHCluster", "featureGroups", function(fGroups, normFunc = max, met
     
     if (average)
     {
-        gTable <- averageGroups(fGroups)
-        analysis <- unique(analysisInfo(fGroups)$group)
+        gTable <- averageGroups(obj)
+        analysis <- unique(analysisInfo(obj)$group)
     }
     else
     {
-        gTable <- groups(fGroups)
-        analysis <- analysisInfo(fGroups)$analysis
+        gTable <- groups(obj)
+        analysis <- analysisInfo(obj)$analysis
     }
 
     clusterdt <- copy(gTable)

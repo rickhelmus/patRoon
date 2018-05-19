@@ -6,12 +6,36 @@ NULL
 # package vignette of rcdk
 
 compoundsCluster <- setClass("compoundsCluster",
-                             slots = c(clusters = "list", molecules = "list", cutClusters = "list"),
-                             prototype = list(clusters = list(), molecules = list(), cutClusters = list()))
+                             slots = c(clusters = "list", molecules = "list", cutClusters = "list",
+                                       properties = "list"),
+                             prototype = list(clusters = list(), molecules = list(), cutClusters = list(),
+                                              properties = list()))
+
+setMethod("length", "compoundsCluster", function(x) sum(lengths(x)))
 
 setMethod("lengths", "compoundsCluster", function(x, use.names = TRUE) sapply(x@cutClusters,
                                                                               function(cc) length(unique(cc)),
                                                                               USE.NAMES = use.names))
+
+#' @describeIn compounds-clust Show summary information for this object.
+#' @export
+setMethod("show", "compoundsCluster", function(object)
+{
+    printf("A compounds cluster object (%s)\n", class(object))
+    
+    printf("Number of feature groups with compound clusters in this object: %d\n", length(object@clusters))
+    
+    ls <- lengths(object)
+    printf("Number of clusters: %d (total), %.1f (mean), %d - %d (min - max)\n",
+           sum(ls), mean(ls), min(ls), max(ls))
+    
+    printf("Clustering properties:\n")
+    printf(" - hclust method: %s\n", object@properties$method)
+    printf(" - fingerprint type: %s\n", object@properties$fpType)
+    printf(" - fingerprint similarity method: %s\n", object@properties$fpSimMethod)
+    
+    showObjectSize(object)
+})
 
 setMethod("cutCluster", "compoundsCluster", function(obj, k = NULL, h = NULL, groupName)
 {
@@ -75,6 +99,7 @@ setMethod("getMCS", "compoundsCluster", function(obj, groupName, cluster)
 setMethod("plotStructure", "compoundsCluster", function(obj, groupName, cluster,
                                                         width = 500, height = 500)
 {
+    aapply(checkmate::assertNumber, . ~ width + height, lower = 0, finite = TRUE)
     rcdkplot(getMCS(obj, groupName, cluster), width, height)
 })
 
@@ -126,5 +151,7 @@ setMethod("makeHCluster", "compounds", function(obj, method, fpType = "extended"
     names(clust) <- names(compTable)
     names(cutClusters) <- names(compTable)
     
-    return(compoundsCluster(clusters = clust, molecules = mols, cutClusters = cutClusters))
+    return(compoundsCluster(clusters = clust, molecules = mols, cutClusters = cutClusters,
+                            properties = list(method = method, fpType = fpType,
+                                              fpSimMethod = fpSimMethod)))
 })

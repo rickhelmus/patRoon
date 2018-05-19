@@ -60,17 +60,17 @@ setGeneric("mergedCompoundNames", function(compounds) standardGeneric("mergedCom
 setGeneric("identifiers", function(compounds) standardGeneric("identifiers"))
 setGeneric("addFormulaScoring", function(compounds, formConsensus, updateScore = FALSE,
                                          formulaScoreWeight = 1) standardGeneric("addFormulaScoring"))
-setGeneric("plotStructure", function(compounds, index, groupName, width = 500, height = 500, useGGPlot2 = FALSE) standardGeneric("plotStructure"))
 setGeneric("plotScores", function(obj, index, groupName, normalizeScores = TRUE, useGGPlot2 = FALSE) standardGeneric("plotScores"))
 
 ### h-clustering
 
 setGeneric("clusterProperties", function(cInfo) standardGeneric("clusterProperties"))
-setGeneric("makeHCluster", function(obj, method = "complete", ...) standardGeneric("makeHCluster"))
 setGeneric("drawHeatMap", function(cInfo, col = colorRampPalette(c("black", "yellow"))(100),
                                    interactive = FALSE, ...) standardGeneric("drawHeatMap"))
 setGeneric("getSilhouetteInfo", function(cInfo, ranges = seq(10, 100, 10)) standardGeneric("getSilhouetteInfo"))
 setGeneric("hClusterFilter", function(fGroups, cInfo, k, c) standardGeneric("hClusterFilter"))
+setGeneric("cutCluster", function(obj, k = NULL, h = NULL, ...) standardGeneric("cutCluster"))
+setGeneric("getMCS", function(obj, groupName, cluster) standardGeneric("getMCS"))
 
 ### target screening
 
@@ -185,6 +185,11 @@ setGeneric("plotSpec", function(obj, ...) standardGeneric("plotSpec"))
 #' @template generics
 setGeneric("plotEIC", function(obj, ...) standardGeneric("plotEIC"))
 
+#' @templateVar func plotStructure
+#' @templateVar desc plots a chemical structure.
+#' @template generics
+setGeneric("plotStructure", function(obj, ...) standardGeneric("plotStructure"))
+
 #' @templateVar func consensus
 #' @templateVar desc combines and merges data from various algorithms to
 #'   generate a consensus.
@@ -195,6 +200,11 @@ setGeneric("consensus", function(obj, ...) standardGeneric("consensus"))
 #' @templateVar desc returns formula data.
 #' @template generics
 setGeneric("formulaTable", function(obj) standardGeneric("formulaTable"))
+
+#' @templateVar func makeHCluster
+#' @templateVar desc Performs hierarchical clustering.
+#' @template generics
+setGeneric("makeHCluster", function(obj, method = "complete", ...) standardGeneric("makeHCluster"))
 
 setGeneric("checkChromatograms", function(fGroups, mzWindow = 0.005, enabledFGroups = NULL) standardGeneric("checkChromatograms"))
 setGeneric("compoundViewer", function(fGroups, MSPeakLists, compounds) standardGeneric("compoundViewer"))

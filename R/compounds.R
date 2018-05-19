@@ -241,7 +241,7 @@ setMethod("addFormulaScoring", "compounds", function(compounds, formConsensus, u
 #'
 #' @aliases plotStructure
 #' @export
-setMethod("plotStructure", "compounds", function(compounds, index, groupName, width, height, useGGPlot2 = FALSE)
+setMethod("plotStructure", "compounds", function(obj, index, groupName, width = 500, height = 500, useGGPlot2 = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertCount(index, positive = TRUE, add = ac)
@@ -250,7 +250,7 @@ setMethod("plotStructure", "compounds", function(compounds, index, groupName, wi
     checkmate::assertFlag(useGGPlot2, add = ac)
     checkmate::reportAssertions(ac)
     
-    compTable <- compoundTable(compounds)[[groupName]]
+    compTable <- compoundTable(obj)[[groupName]]
 
     if (is.null(compTable) || nrow(compTable) == 0)
         return(NULL)

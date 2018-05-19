@@ -288,7 +288,7 @@ setMethod("plotScores", "compounds", function(obj, index, groupName, normalizeSc
     ac <- checkmate::makeAssertCollection()
     checkmate::assertCount(index, positive = TRUE, add = ac)
     checkmate::assertString(groupName, min.chars = 1, add = ac)
-    aapply(checkmate::assertFlag, . ~normalizeScores + useGGPlot2, fixed = list(add = ac))
+    aapply(checkmate::assertFlag, . ~ normalizeScores + useGGPlot2, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
     
     compTable <- compoundTable(obj)[[groupName]]

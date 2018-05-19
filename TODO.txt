@@ -20,3 +20,4 @@ Release:
 - hclust and mass defect components
 - fix compoundViewer
 - getMCS for compounds
+- names() for compounds/compounds clusters etc?

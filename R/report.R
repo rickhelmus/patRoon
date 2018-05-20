@@ -401,6 +401,36 @@ reportCompoundSpectra <- function(fGroups, path, MSPeakLists, compounds, compsCl
     close(prog)
 }
 
+reportCompoundClusters <- function(fGroups, compsCluster, path)
+{
+    cutcl <- cutClusters(compsCluster)
+    cutcl <- cutcl[names(cutcl) %in% names(fGroups)]
+    ls <- lengths(compsCluster)
+    ccount <- length(cutcl)
+    
+    prog <- txtProgressBar(0, ccount, style = 3)
+    
+    for (gi in seq_along(cutcl))
+    {
+        grp <- names(cutcl)[gi]
+        if (length(cutcl[[grp]]) > 0)
+        {
+            out <- file.path(path, sprintf("%s-%s-clusters.pdf", class(fGroups), grp))
+            withr::with_pdf(out, paper = "a4", code =
+            {
+                plot(compsCluster, groupName = grp)
+                par(mfrow = c(3, 3))
+                for (i in seq_len(ls[[grp]]))
+                    plotStructure(compsCluster, groupName = grp, cluster = i)
+            })
+        }
+        setTxtProgressBar(prog, gi)
+    }
+    
+    setTxtProgressBar(prog, ccount)
+    close(prog)
+}
+
 reportComponentTable <- function(components, path, retMin)
 {
     printf("Exporting component table...")
@@ -638,6 +668,13 @@ setMethod("reportPDF", "featureGroups", function(fGroups, path, reportFGroups,
                               EICTopMost, EICs, compoundNormalizeScores)
     }
 
+    if (!is.null(compsCluster))
+    {
+        p <- file.path(path, "compounds")
+        mkdirp(p)
+        reportCompoundClusters(fGroups, compsCluster, p)
+    }
+    
     if (!is.null(components))
         reportComponentSpectra(fGroups, path, components, EICRtWindow, EICMzWindow, retMin, EICs)
 

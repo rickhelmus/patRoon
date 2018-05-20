@@ -38,7 +38,7 @@
 \S4method{addFormulaScoring}{compounds}(compounds, formConsensus,
   updateScore = FALSE, formulaScoreWeight = 1)
 
-\S4method{plotStructure}{compounds}(compounds, index, groupName, width = 500,
+\S4method{plotStructure}{compounds}(obj, index, groupName, width = 500,
   height = 500, useGGPlot2 = FALSE)
 
 \S4method{plotScores}{compounds}(obj, index, groupName,

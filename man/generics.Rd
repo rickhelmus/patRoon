@@ -11,8 +11,11 @@
 \alias{plotChord}
 \alias{plotSpec}
 \alias{plotEIC}
+\alias{plotStructure}
 \alias{consensus}
 \alias{formulaTable}
+\alias{makeHCluster}
+\alias{clusterProperties}
 \title{Miscellaneous generics}
 \usage{
 analysisInfo(obj)
@@ -33,9 +36,15 @@ plotSpec(obj, ...)
 
 plotEIC(obj, ...)
 
+plotStructure(obj, ...)
+
 consensus(obj, ...)
 
 formulaTable(obj)
+
+makeHCluster(obj, method = "complete", ...)
+
+clusterProperties(obj)
 }
 \arguments{
 \item{obj}{The object the generic should be applied to.}
@@ -148,6 +157,16 @@ please refer to the linked method documentation for each generic.
     \item Methods are defined for: \code{\link[=plotEIC,components-method]{components}}, \code{\link[=plotEIC,featureGroups-method]{featureGroups}}.
 }
 
+\code{plotStructure} plots a chemical structure.
+
+
+
+
+
+\itemize{
+    \item Methods are defined for: \code{\link[=plotStructure,compounds-method]{compounds}}, \code{\link[=plotStructure,compoundsCluster-method]{compoundsCluster}}.
+}
+
 \code{consensus} combines and merges data from various algorithms to
 
 
@@ -166,5 +185,25 @@ please refer to the linked method documentation for each generic.
 
 \itemize{
     \item Methods are defined for: \code{\link[=formulaTable,formulaConsensus-method]{formulaConsensus}}, \code{\link[=formulaTable,formulas-method]{formulas}}.
+}
+
+\code{makeHCluster} Performs hierarchical clustering.
+
+
+
+
+
+\itemize{
+    \item Methods are defined for: \code{\link[=makeHCluster,compounds-method]{compounds}}, \code{\link[=makeHCluster,featureGroups-method]{featureGroups}}.
+}
+
+\code{clusterProperties} Obtain a list with properties of the generated cluster(s).
+
+
+
+
+
+\itemize{
+    \item Methods are defined for: \code{\link[=clusterProperties,clusterInfo-method]{clusterInfo}}, \code{\link[=clusterProperties,compoundsCluster-method]{compoundsCluster}}.
 }
 }

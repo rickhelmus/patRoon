@@ -160,10 +160,10 @@ setMethod("show", "clusterInfo", function(object)
 #' @return \code{clusterProperties} returns a \code{list}
 #' @export
 #' @aliases clusterProperties
-setMethod("clusterProperties", "clusterInfo", function(cInfo)
+setMethod("clusterProperties", "clusterInfo", function(obj)
 {
-    return(list(clusterm = cInfo@clusterm, distm = cInfo@distm, clust = cInfo@clust,
-                metric = cInfo@metric, method = cInfo@method, average = cInfo@average))
+    return(list(clusterm = obj@clusterm, distm = obj@distm, clust = obj@clust,
+                metric = obj@metric, method = obj@method, average = obj@average))
 })
 
 

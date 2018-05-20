@@ -14,8 +14,9 @@
 \S4method{reportCSV}{featureGroups}(fGroups, path = "report",
   reportFGroupsAsRows = TRUE, reportFGroupsAnalysisInfo = TRUE,
   reportFGroupsRetMz = TRUE, reportFeatures = FALSE, formConsensus = NULL,
-  compounds = NULL, compoundNormalizeScores = TRUE, components = NULL,
-  cInfo = NULL, clusterK = NULL, retMin = TRUE, clearPath = FALSE)
+  compounds = NULL, compoundNormalizeScores = TRUE, compsCluster = NULL,
+  components = NULL, cInfo = NULL, clusterK = NULL, retMin = TRUE,
+  clearPath = FALSE)
 
 \S4method{reportPDF}{featureGroups}(fGroups, path = "report",
   reportFGroups = TRUE, formConsensus = NULL, reportFormulaSpectra = TRUE,

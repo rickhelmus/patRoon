@@ -14,7 +14,7 @@
 
 \S4method{show}{clusterInfo}(object)
 
-\S4method{clusterProperties}{clusterInfo}(cInfo)
+\S4method{clusterProperties}{clusterInfo}(obj)
 }
 \arguments{
 \item{x, object, cInfo}{A \code{clusterInfo} object.}

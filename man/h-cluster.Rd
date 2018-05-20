@@ -16,8 +16,8 @@
 \alias{plot,silhouetteInfo,ANY-method}
 \title{Hierarchical clustering of feature groups}
 \usage{
-\S4method{makeHCluster}{featureGroups}(obj, method = "ward.D2",
-  metric = "euclidean", normFunc = max, average = TRUE)
+\S4method{makeHCluster}{featureGroups}(obj, method, metric = "euclidean",
+  normFunc = max, average = TRUE)
 
 \S4method{hClusterFilter}{featureGroups,clusterInfo}(fGroups, cInfo, k, c)
 

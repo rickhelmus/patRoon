@@ -287,7 +287,7 @@ reportFormulaSpectra <- function(fGroups, path, formConsensus, MSPeakLists, EICR
     close(prog)
 }
 
-reportCompoundTable <- function(fGroups, path, compounds, normalizeScores)
+reportCompoundTable <- function(fGroups, path, compounds, normalizeScores, compsCluster)
 {
     printf("Exporting identification results tables...")
 
@@ -295,9 +295,11 @@ reportCompoundTable <- function(fGroups, path, compounds, normalizeScores)
     gNames <- names(fGroups)
     anaInfo <- analysisInfo(fGroups)
     compTable <- compoundTable(compounds)
-
     mcn <- mergedCompoundNames(compounds)
-
+    
+    if (!is.null(compsCluster))
+        cutcl <- cutClusters(compsCluster)
+    
     if (normalizeScores)
         compTable <- sapply(compTable, normalizeCompScores, mCompNames = mcn, simplify = FALSE)
 
@@ -306,15 +308,19 @@ reportCompoundTable <- function(fGroups, path, compounds, normalizeScores)
         if (grp %in% gNames && nrow(compTable[[grp]]) > 0)
         {
             out <- file.path(path, sprintf("%s-%s.csv", class(fGroups), grp))
-            write.csv(compTable[[grp]][, -getAllCompCols("fragInfo", names(compTable[[grp]]), mergedCompoundNames(compounds)),
-                                       with = FALSE], out)
+            tab <- compTable[[grp]][, -getAllCompCols("fragInfo", names(compTable[[grp]]), mergedCompoundNames(compounds)),
+                                    with = FALSE]
+            if (!is.null(compsCluster) && !is.null(cutcl[[grp]]))
+                tab[, cluster := cutcl[[grp]]]
+            write.csv(tab, out)
         }
     }
 
     printf("Done!\n")
 }
 
-reportCompoundSpectra <- function(fGroups, path, MSPeakLists, compounds, formConsensus, EICRtWindow, EICMzWindow, retMin,
+reportCompoundSpectra <- function(fGroups, path, MSPeakLists, compounds, compsCluster,
+                                  formConsensus, EICRtWindow, EICMzWindow, retMin,
                                   EICTopMost, EICs, normalizeScores)
 {
     printf("Exporting compound identification MS/MS spectra...\n")
@@ -331,6 +337,9 @@ reportCompoundSpectra <- function(fGroups, path, MSPeakLists, compounds, formCon
         printf("No compounds!\n")
         invisible(return(NULL))
     }
+
+    if (!is.null(compsCluster))
+        cutcl <- cutClusters(compsCluster)
     
     if (!is.null(formConsensus))
         fTable <- formulaTable(formConsensus)
@@ -368,11 +377,16 @@ reportCompoundSpectra <- function(fGroups, path, MSPeakLists, compounds, formCon
                 plotScores(compounds, idi, grp, normalizeScores)
 
                 screen(scr[4])
+                
                 # draw text info
+                txt <- paste0(getCompInfoList(compTable[[grp]], idi, FALSE, mergedCompoundNames(compounds)),
+                              collapse = "\n")
+                if (!is.null(compsCluster) && !is.null(cutcl[[grp]]))
+                    txt <- paste(txt, sprintf("cluster: %d", cutcl[[grp]][idi]), sep = "\n")
+                
                 oldp <- par(mar = c(0, 2, 0, 0))
                 plot(1:10, 1:10, ann = FALSE, xaxt = "n", yaxt = "n", xlab = "", ylab = "", type = "n", adj = 1, bty = "n") # empty dummy plot
-                text(1, 5, paste0(getCompInfoList(compTable[[grp]], idi, FALSE, mergedCompoundNames(compounds)),
-                                  collapse = "\n"), adj = 0, cex = 0.8)
+                text(1, 5, txt, adj = 0, cex = 0.8)
                 par(oldp)
 
                 close.screen(scr)
@@ -510,16 +524,16 @@ reportHCluster <- function(fGroups, path, cInfo, k, silInfo = NULL, clusterMaxLa
 setMethod("reportCSV", "featureGroups", function(fGroups, path, reportFGroupsAsRows, reportFGroupsAnalysisInfo,
                                                  reportFGroupsRetMz, reportFeatures,
                                                  formConsensus, compounds, compoundNormalizeScores,
-                                                 components, cInfo, clusterK, retMin, clearPath)
+                                                 compsCluster, components, cInfo, clusterK, retMin, clearPath)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertPathForOutput(path, overwrite = TRUE, add = ac)
     aapply(checkmate::assertFlag, . ~ reportFGroupsAsRows + reportFGroupsAnalysisInfo + reportFGroupsRetMz +
                reportFeatures + compoundNormalizeScores + retMin + clearPath,
            fixed = list(add = ac))
-    aapply(checkmate::assertClass, . ~ formConsensus + compounds + components + cInfo,
-           c("formulaConsensus", "compounds", "components", "clusterInfo"), null.ok = TRUE,
-           fixed = list(add = ac))
+    aapply(checkmate::assertClass, . ~ formConsensus + compounds + compsCluster + components + cInfo,
+           c("formulaConsensus", "compounds", "compoundsCluster", "components", "clusterInfo"),
+           null.ok = TRUE, fixed = list(add = ac))
     checkmate::assertCount(clusterK, positive = TRUE, null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
@@ -541,7 +555,7 @@ setMethod("reportCSV", "featureGroups", function(fGroups, path, reportFGroupsAsR
     {
         p <- file.path(path, "compounds")
         mkdirp(p)
-        reportCompoundTable(fGroups, p, compounds, compoundNormalizeScores)
+        reportCompoundTable(fGroups, p, compounds, compoundNormalizeScores, compsCluster)
     }
 
     if (!is.null(components))
@@ -566,7 +580,7 @@ setMethod("reportCSV", "featureGroups", function(fGroups, path, reportFGroupsAsR
 #' @export
 setMethod("reportPDF", "featureGroups", function(fGroups, path, reportFGroups,
                                                  formConsensus, reportFormulaSpectra,
-                                                 compounds, compoundNormalizeScores,
+                                                 compounds, compoundNormalizeScores, compsCluster,
                                                  components, cInfo, clusterK, silInfo, clusterMaxLabels,
                                                  MSPeakLists, retMin, EICGrid, EICRtWindow, EICMzWindow,
                                                  EICTopMost, EICOnlyPresent, clearPath)
@@ -576,8 +590,8 @@ setMethod("reportPDF", "featureGroups", function(fGroups, path, reportFGroups,
     aapply(checkmate::assertFlag, . ~ reportFGroups + reportFormulaSpectra +
                compoundNormalizeScores + retMin + EICOnlyPresent + clearPath,
            fixed = list(add = ac))
-    aapply(checkmate::assertClass, . ~ formConsensus + compounds + components + cInfo + silInfo + MSPeakLists,
-           c("formulaConsensus", "compounds", "components", "clusterInfo", "silhouetteInfo", "MSPeakLists"),
+    aapply(checkmate::assertClass, . ~ formConsensus + compounds + compsCluster + components + cInfo + silInfo + MSPeakLists,
+           c("formulaConsensus", "compounds", "compoundsCluster", "components", "clusterInfo", "silhouetteInfo", "MSPeakLists"),
            null.ok = TRUE, fixed = list(add = ac))
     checkmate::assertCount(clusterK, positive = TRUE, null.ok = TRUE, add = ac)
     checkmate::assertCount(clusterMaxLabels, add = ac)
@@ -620,7 +634,7 @@ setMethod("reportPDF", "featureGroups", function(fGroups, path, reportFGroups,
     {
         p <- file.path(path, "compounds")
         mkdirp(p)
-        reportCompoundSpectra(fGroups, p, MSPeakLists, compounds, formConsensus, EICRtWindow, EICMzWindow, retMin,
+        reportCompoundSpectra(fGroups, p, MSPeakLists, compounds, compsCluster, formConsensus, EICRtWindow, EICMzWindow, retMin,
                               EICTopMost, EICs, compoundNormalizeScores)
     }
 

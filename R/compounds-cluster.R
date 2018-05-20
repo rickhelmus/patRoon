@@ -11,6 +11,14 @@ compoundsCluster <- setClass("compoundsCluster",
                              prototype = list(clusters = list(), molecules = list(), cutClusters = list(),
                                               properties = list()))
 
+setMethod("clusters", "compoundsCluster", function(obj) obj@clusters)
+
+setMethod("molecules", "compoundsCluster", function(obj) obj@molecules)
+
+setMethod("cutClusters", "compoundsCluster", function(obj) obj@cutClusters)
+
+setMethod("clusterProperties", "compoundsCluster", function(obj) obj@properties)
+
 setMethod("length", "compoundsCluster", function(x) sum(lengths(x)))
 
 setMethod("lengths", "compoundsCluster", function(x, use.names = TRUE) sapply(x@cutClusters,
@@ -61,10 +69,9 @@ setMethod("plot", "compoundsCluster", function(x, groupName, pal = "Paired", ...
     ct <- ct[order.dendrogram(dend)] # re-order for dendrogram
     nclust <- length(unique(ct[ct != 0])) # without unassigned
     cols <- getBrewerPal(nclust, pal)
-    dend <- dendextend::color_branches(dend, clusters = ct, col = cols)
+    dend <- dendextend::color_branches(dend, clusters = ct, col = cols[unique(ct)]) # unique: fixup colour order
     lcols <- dendextend::get_leaves_branches_col(dend)
     dendextend::labels_colors(dend) <- lcols
-    # dendextend::labels(dend) <- ct
     
     withr::with_par(list(mai = par("mai") + c(0, 0, 0, 0.5)),
     {

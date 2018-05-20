@@ -64,7 +64,9 @@ setGeneric("plotScores", function(obj, index, groupName, normalizeScores = TRUE,
 
 ### h-clustering
 
-setGeneric("clusterProperties", function(cInfo) standardGeneric("clusterProperties"))
+setGeneric("clusters", function(obj) standardGeneric("clusters"))
+setGeneric("molecules", function(obj) standardGeneric("molecules"))
+setGeneric("cutClusters", function(obj) standardGeneric("cutClusters"))
 setGeneric("drawHeatMap", function(cInfo, col = colorRampPalette(c("black", "yellow"))(100),
                                    interactive = FALSE, ...) standardGeneric("drawHeatMap"))
 setGeneric("getSilhouetteInfo", function(cInfo, ranges = seq(10, 100, 10)) standardGeneric("getSilhouetteInfo"))
@@ -206,17 +208,23 @@ setGeneric("formulaTable", function(obj) standardGeneric("formulaTable"))
 #' @template generics
 setGeneric("makeHCluster", function(obj, method = "complete", ...) standardGeneric("makeHCluster"))
 
+#' @templateVar func clusterProperties
+#' @templateVar desc Obtain a list with properties of the generated cluster(s).
+#' @template generics
+setGeneric("clusterProperties", function(obj) standardGeneric("clusterProperties"))
+
+
 setGeneric("checkChromatograms", function(fGroups, mzWindow = 0.005, enabledFGroups = NULL) standardGeneric("checkChromatograms"))
 setGeneric("compoundViewer", function(fGroups, MSPeakLists, compounds) standardGeneric("compoundViewer"))
 setGeneric("reportCSV", function(fGroups, path = "report", reportFGroupsAsRows = TRUE, reportFGroupsAnalysisInfo = TRUE,
                                  reportFGroupsRetMz = TRUE, reportFeatures = FALSE, formConsensus = NULL,
-                                 compounds = NULL, compoundNormalizeScores = TRUE, components = NULL,
+                                 compounds = NULL, compoundNormalizeScores = TRUE, compsCluster = NULL, components = NULL,
                                  cInfo = NULL, clusterK = NULL, retMin = TRUE, clearPath = FALSE) standardGeneric("reportCSV"))
 setGeneric("reportPDF", function(fGroups, path = "report", reportFGroups = TRUE,
                                  formConsensus = NULL, reportFormulaSpectra = TRUE, compounds = NULL, compoundNormalizeScores = TRUE,
-                                 components = NULL, cInfo = NULL, clusterK = NULL, silInfo = NULL, clusterMaxLabels = 250,
-                                 MSPeakLists = NULL, retMin = TRUE, EICGrid = c(2, 1), EICRtWindow = 20, EICMzWindow = 0.005,
-                                 EICTopMost = NULL, EICOnlyPresent = TRUE, clearPath = FALSE) standardGeneric("reportPDF"))
+                                 compsCluster = NULL, components = NULL, cInfo = NULL, clusterK = NULL, silInfo = NULL,
+                                 clusterMaxLabels = 250, MSPeakLists = NULL, retMin = TRUE, EICGrid = c(2, 1), EICRtWindow = 20,
+                                 EICMzWindow = 0.005, EICTopMost = NULL, EICOnlyPresent = TRUE, clearPath = FALSE) standardGeneric("reportPDF"))
 setGeneric("reportMD", function(fGroups, path = "report", reportChord = TRUE, reportFGroups = TRUE,
                                 formConsensus = NULL, reportFormulaSpectra = TRUE,
                                 compounds = NULL, compoundNormalizeScores = TRUE,

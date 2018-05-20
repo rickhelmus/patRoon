@@ -403,10 +403,18 @@ reportCompoundSpectra <- function(fGroups, path, MSPeakLists, compounds, compsCl
 
 reportCompoundClusters <- function(fGroups, compsCluster, path)
 {
+    printf("Exporting compound clusters...\n")
+    
     cutcl <- cutClusters(compsCluster)
     cutcl <- cutcl[names(cutcl) %in% names(fGroups)]
     ls <- lengths(compsCluster)
     ccount <- length(cutcl)
+    
+    if (ccount == 0)
+    {
+        printf("No compound clusters!\n")
+        invisible(return(NULL))
+    }
     
     prog <- txtProgressBar(0, ccount, style = 3)
     
@@ -421,7 +429,10 @@ reportCompoundClusters <- function(fGroups, compsCluster, path)
                 plot(compsCluster, groupName = grp)
                 par(mfrow = c(3, 3))
                 for (i in seq_len(ls[[grp]]))
+                {
                     plotStructure(compsCluster, groupName = grp, cluster = i)
+                    title(paste0("cluster ", i))
+                }
             })
         }
         setTxtProgressBar(prog, gi)

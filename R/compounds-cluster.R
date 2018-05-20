@@ -97,7 +97,12 @@ setMethod("getMCS", "compoundsCluster", function(obj, groupName, cluster)
     if (length(mols) > 1)
     {
         for (i in seq(2, length(mols)))
-            mcons <- rcdk::get.mcs(mcons, mols[[i]])
+        {
+            # might fail if there is no overlap...
+            tryCatch(mcons <- rcdk::get.mcs(mcons, mols[[i]]), error = function(e) FALSE)
+            if (mcons == FALSE)
+                return(rcdk::parse.smiles("")) # return empty molecule
+        }
     }
 
     return(mcons)    

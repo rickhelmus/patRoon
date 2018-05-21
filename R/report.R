@@ -761,7 +761,7 @@ setMethod("reportMD", "featureGroups", function(fGroups, path, reportChord, repo
     mkdirp(workPath)
 
     file.copy(system.file("report", "main.Rmd", package = "patRoon"), workPath)
-    file.copy(system.file("report", "spectra.Rmd", package = "patRoon"), workPath)
+    file.copy(system.file("report", "annotation", package = "patRoon"), workPath)
     file.copy(system.file("report", "components.Rmd", package = "patRoon"), workPath)
     file.copy(system.file("report", "cluster.Rmd", package = "patRoon"), workPath)
 

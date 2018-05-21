@@ -71,7 +71,9 @@ setGeneric("drawHeatMap", function(cInfo, col = colorRampPalette(c("black", "yel
                                    interactive = FALSE, ...) standardGeneric("drawHeatMap"))
 setGeneric("getSilhouetteInfo", function(cInfo, ranges = seq(10, 100, 10)) standardGeneric("getSilhouetteInfo"))
 setGeneric("hClusterFilter", function(fGroups, cInfo, k, c) standardGeneric("hClusterFilter"))
-setGeneric("cutCluster", function(obj, k = NULL, h = NULL, ...) standardGeneric("cutCluster"))
+setGeneric("treeCut", function(obj, k = NULL, h = NULL, ...) standardGeneric("treeCut"))
+setGeneric("treeCutDynamic", function(obj, maxTreeHeight = 1, deepSplit = TRUE,
+                                      minModuleSize = 1, groupName) standardGeneric("treeCutDynamic"))
 setGeneric("getMCS", function(obj, groupName, cluster) standardGeneric("getMCS"))
 
 ### target screening

@@ -2,6 +2,24 @@
 #' @include compounds.R
 NULL
 
+doDynamicTreeCut <- function(dendro, maxTreeHeight, deepSplit,
+                             minModuleSize)
+{
+    if (minModuleSize == 1)
+    {
+        # workaround adapted from RAMClustR (ramclustR.R)
+        ret <- dynamicTreeCut::cutreeDynamicTree(dendro = dendro, maxTreeHeight = maxTreeHeight,
+                                                 deepSplit = deepSplit, minModuleSize = 2)
+        single <- which(ret == 0) # all unassigned have length = 1
+        ret[single] <- max(ret) + seq_len(length(single))
+    }
+    else
+        ret <- dynamicTreeCut::cutreeDynamicTree(dendro = dendro, maxTreeHeight = maxTreeHeight,
+                                                 deepSplit = deepSplit, minModuleSize = minModuleSize)
+    
+    return(ret)
+}
+
 # This way of compound clustering largely based on metfRag's chemclust.R and the
 # package vignette of rcdk
 
@@ -45,7 +63,7 @@ setMethod("show", "compoundsCluster", function(object)
     showObjectSize(object)
 })
 
-setMethod("cutCluster", "compoundsCluster", function(obj, k = NULL, h = NULL, groupName)
+setMethod("treeCut", "compoundsCluster", function(obj, k = NULL, h = NULL, groupName)
 {
     if (is.null(k) && is.null(h))
         stop("Either k or h should be specified")
@@ -57,6 +75,20 @@ setMethod("cutCluster", "compoundsCluster", function(obj, k = NULL, h = NULL, gr
     checkmate::reportAssertions(ac)
     
     obj@cutClusters[[groupName]] <- cutree(obj@clusters[[groupName]], k, h)
+    return(obj)
+})
+
+setMethod("treeCutDynamic", "compoundsCluster", function(obj, maxTreeHeight, deepSplit,
+                                                         minModuleSize, groupName)
+{
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertNumber(maxTreeHeight, 0, finite = TRUE, add = ac)
+    checkmate::assertFlag(deepSplit, add = ac)
+    checkmate::assertCount(minModuleSize, positive = TRUE, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    obj@cutClusters[[groupName]] <- doDynamicTreeCut(obj@clusters[[groupName]], maxTreeHeight,
+                                                     deepSplit, minModuleSize)
     return(obj)
 })
 
@@ -159,18 +191,7 @@ setMethod("makeHCluster", "compounds", function(obj, method, fpType = "extended"
     cutClusters <- lapply(seq_along(clust), function(ci)
     {
         dendro <- clust[[ci]]
-        if (minModuleSize == 1)
-        {
-            # workaround adapted from RAMClustR (ramclustR.R)
-            ret <- dynamicTreeCut::cutreeDynamicTree(dendro = dendro, maxTreeHeight = maxTreeHeight,
-                                                     deepSplit = deepSplit, minModuleSize = 2)
-            single <- which(ret == 0) # all unassigned have length = 1
-            ret[single] <- max(ret) + seq_len(length(single))
-        }
-        else
-            ret <- dynamicTreeCut::cutreeDynamicTree(dendro = dendro, maxTreeHeight = maxTreeHeight,
-                                                     deepSplit = deepSplit, minModuleSize = minModuleSize)
-        
+        ret <- doDynamicTreeCut(dendro, maxTreeHeight, deepSplit, minModuleSize)
         setTxtProgressBar(prog, i)
         return(ret)
     })

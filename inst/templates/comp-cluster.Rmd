@@ -1,0 +1,11 @@
+## {{ .annotationClass .compscl_ann-{ grpi } }}
+
+### Dendrogram { grp } {{ .annotationClass .compscl_ann-{ grpi } }}
+
+![]({ plotPath }/dendro_{ grpi }.png)
+
+## {{ .annotationClass .compscl_ann-{ grpi } }}
+
+### {{ .annotationClass .compscl_ann-{ grpi } }}
+
+{ mcs }

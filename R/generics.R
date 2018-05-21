@@ -229,7 +229,7 @@ setGeneric("reportPDF", function(fGroups, path = "report", reportFGroups = TRUE,
                                  EICMzWindow = 0.005, EICTopMost = NULL, EICOnlyPresent = TRUE, clearPath = FALSE) standardGeneric("reportPDF"))
 setGeneric("reportMD", function(fGroups, path = "report", reportChord = TRUE, reportFGroups = TRUE,
                                 formConsensus = NULL, reportFormulaSpectra = TRUE,
-                                compounds = NULL, compoundNormalizeScores = TRUE,
+                                compounds = NULL, compoundNormalizeScores = TRUE, compsCluster = NULL,
                                 components = NULL, cInfo = NULL, clusterK = NULL, silInfo = NULL,
                                 interactiveHeat = FALSE, clusterMaxLabels = 250, MSPeakLists = NULL, retMin = TRUE,
                                 EICRtWindow = 20, EICMzWindow = 0.005, EICTopMost = NULL, EICOnlyPresent = TRUE,

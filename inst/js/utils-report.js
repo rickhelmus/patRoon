@@ -1,32 +1,33 @@
-function getSpecPageElement()
+function getAnnotationPageElement()
 {
     return document.getElementById("feature-groups").parentElement.parentElement;
 }
 
-function showSpec(group, type)
+function showAnnotation(group, type)
 {
     clearComponentSpecs();
     
-    var comps = document.getElementsByClassName('specClass');
-    var specId = type + "_" + "spectra-" + group;
+    var comps = document.getElementsByClassName('annotationClass');
+    var annotationId = type + "_" + "ann-" + group;
     var EICId = "EIC-" + group;
     for (var i=0; i<comps.length; i++)
-        comps[i].style.display = (comps[i].classList.contains(specId) || comps[i].classList.contains(EICId)) ? 'flex' : 'none';
+        comps[i].style.display = (comps[i].classList.contains(annotationId) || comps[i].classList.contains(EICId)) ? 'flex' : 'none';
 
-    document.getElementById("noSpecSelected").style.display = 'none';
+    document.getElementById("noAnnotationSelected").style.display = 'none';
 }
 
 function showComponentSpec(component, parentID)
 {
+    // component specs are treated differently as they are cloned
     clearComponentSpecs();
-    disableAllSpecs();
+    disableAllAnnotations();
     
     var comp = document.getElementById(component).parentElement;
     var clonedComp = comp.cloneNode(true);
     clonedComp.id = clonedComp.id + "-clone";
     clonedComp.className += " clonedComp";
     
-    getSpecPageElement().appendChild(clonedComp);
+    getAnnotationPageElement().appendChild(clonedComp);
 }
 
 function clearComponentSpecs()
@@ -34,9 +35,9 @@ function clearComponentSpecs()
     $('.clonedComp').remove();
 }
 
-function disableAllSpecs()
+function disableAllAnnotations()
 {
-    var comps = document.getElementsByClassName('specClass');
+    var comps = document.getElementsByClassName('annotationClass');
     for (var i=0; i<comps.length; i++)
         comps[i].style.display = 'none';
 }

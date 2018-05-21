@@ -125,7 +125,7 @@ close(prog)
 ```
 
 
-```{r child="spectra.Rmd", eval=!is.null(rmdVars$compounds) || !is.null(rmdVars$formConsensus) || !is.null(rmdVars$components)}
+```{r child="spectra.Rmd", eval=!is.null(rmdVars$compounds) || !is.null(rmdVars$compsCluster) || !is.null(rmdVars$formConsensus) || !is.null(rmdVars$components)}
 ```
 
 ```{r child="cluster.Rmd", eval=!is.null(rmdVars$cInfo)}

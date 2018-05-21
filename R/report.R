@@ -726,7 +726,7 @@ setMethod("reportPDF", "featureGroups", function(fGroups, path, reportFGroups,
 #' @export
 setMethod("reportMD", "featureGroups", function(fGroups, path, reportChord, reportFGroups,
                                                 formConsensus, reportFormulaSpectra,
-                                                compounds, compoundNormalizeScores,
+                                                compounds, compoundNormalizeScores, compsCluster,
                                                 components, cInfo, clusterK, silInfo,
                                                 interactiveHeat, clusterMaxLabels, MSPeakLists, retMin,
                                                 EICRtWindow, EICMzWindow, EICTopMost, EICOnlyPresent,
@@ -783,13 +783,13 @@ setMethod("reportMD", "featureGroups", function(fGroups, path, reportChord, repo
         cat("Done!\n")
     }
 
-    rmdVars <- list(outPath = path, fGroups = fGroups, groupNames = names(fGroups), gInfo = groupInfo(fGroups), reportChord = reportChord,
-                    reportFGroups = reportFGroups, EICRtWindow = EICRtWindow, EICMzWindow = EICMzWindow,
+    rmdVars <- list(outPath = path, fGroups = fGroups, groupNames = names(fGroups), gInfo = groupInfo(fGroups),
+                    reportChord = reportChord, reportFGroups = reportFGroups, EICRtWindow = EICRtWindow, EICMzWindow = EICMzWindow,
                     retMin = retMin, EICTopMost = EICTopMost, EICOnlyPresent = EICOnlyPresent, EICs = EICs,
-                    compounds = compounds, MSPeakLists = MSPeakLists, formConsensus = formConsensus,
-                    compoundNormalizeScores = compoundNormalizeScores, components = components,
-                    cInfo = cInfo, clusterK = clusterK, silInfo = silInfo, interactiveHeat = interactiveHeat,
-                    clusterMaxLabels = clusterMaxLabels, selfContained = selfContained,
+                    compounds = compounds, compsCluster = compsCluster, MSPeakLists = MSPeakLists,
+                    formConsensus = formConsensus, compoundNormalizeScores = compoundNormalizeScores,
+                    components = components, cInfo = cInfo, clusterK = clusterK, silInfo = silInfo,
+                    interactiveHeat = interactiveHeat, clusterMaxLabels = clusterMaxLabels, selfContained = selfContained,
                     optimizePng = optimizePng, maxProcAmount = maxProcAmount)
 
     # HACK: not sure what exactly happens here, but... kableExtra adds latex

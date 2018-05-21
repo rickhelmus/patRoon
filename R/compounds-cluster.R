@@ -131,6 +131,9 @@ setMethod("makeHCluster", "compounds", function(obj, method, fpType = "extended"
     mols <- sapply(compTable, function(ct) rcdk::parse.smiles(ct$SMILES),
                    simplify = FALSE)
     
+
+    cat("Performing clustering ...\n")    
+    prog <- txtProgressBar(0, length(mols), style = 3)
     clust <- lapply(seq_along(mols), function(i)
     {
         for (j in seq_along(mols[[i]]))
@@ -141,24 +144,39 @@ setMethod("makeHCluster", "compounds", function(obj, method, fpType = "extended"
         
         fps <- lapply(mols[[i]], rcdk::get.fingerprint, type = fpType)
         dist <- as.dist(1 - fingerprint::fp.sim.matrix(fps, method = fpSimMethod))
-        return(hclust(dist, method))
+        
+        hc <- hclust(dist, method)
+        setTxtProgressBar(prog, i)
+        
+        return(hc)
     })
     
-    cutClusters <- lapply(clust, function(d)
+    setTxtProgressBar(prog, length(obj))
+    close(prog)
+    
+    cat("Performing dynamic tree cutting ...\n")
+    prog <- txtProgressBar(0, length(obj), style = 3)
+    cutClusters <- lapply(seq_along(clust), function(ci)
     {
+        dendro <- clust[[ci]]
         if (minModuleSize == 1)
         {
             # workaround adapted from RAMClustR (ramclustR.R)
-            ret <- dynamicTreeCut::cutreeDynamicTree(dendro = d, maxTreeHeight = maxTreeHeight,
+            ret <- dynamicTreeCut::cutreeDynamicTree(dendro = dendro, maxTreeHeight = maxTreeHeight,
                                                      deepSplit = deepSplit, minModuleSize = 2)
             single <- which(ret == 0) # all unassigned have length = 1
             ret[single] <- max(ret) + seq_len(length(single))
         }
         else
-            ret <- dynamicTreeCut::cutreeDynamicTree(dendro = d, maxTreeHeight = maxTreeHeight,
+            ret <- dynamicTreeCut::cutreeDynamicTree(dendro = dendro, maxTreeHeight = maxTreeHeight,
                                                      deepSplit = deepSplit, minModuleSize = minModuleSize)
+        
+        setTxtProgressBar(prog, i)
         return(ret)
     })
+
+    setTxtProgressBar(prog, length(obj))
+    close(prog)
     
     names(clust) <- names(compTable)
     names(cutClusters) <- names(compTable)

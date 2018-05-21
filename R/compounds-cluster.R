@@ -105,12 +105,12 @@ setMethod("plot", "compoundsCluster", function(x, groupName, pal = "Paired", ...
     lcols <- dendextend::get_leaves_branches_col(dend)
     dendextend::labels_colors(dend) <- lcols
     
-    withr::with_par(list(mai = par("mai") + c(0, 0, 0, 0.5)),
+    withr::with_par(list(mar = c(1, 4, 0, 5.5)),
     {
         plot(dend, ylab = "Tanimoto dist", ...)
         legend("topright", legend = seq_len(nclust),
-               bty = "n", cex = 1, fill = cols, inset = c(-0.1, 0), xpd = NA,
-               title = "cluster")
+               bty = "n", cex = 1, fill = cols, inset = c(-0.18, 0), xpd = NA,
+               ncol = 2, title = "cluster")
     })
 })
 
@@ -141,10 +141,22 @@ setMethod("getMCS", "compoundsCluster", function(obj, groupName, cluster)
 })
 
 setMethod("plotStructure", "compoundsCluster", function(obj, groupName, cluster,
-                                                        width = 500, height = 500)
+                                                        width = 500, height = 500,
+                                                        withTitle = TRUE)
 {
-    aapply(checkmate::assertNumber, . ~ width + height, lower = 0, finite = TRUE)
+    ac <- checkmate::makeAssertCollection()
+    aapply(checkmate::assertNumber, . ~ width + height, lower = 0, finite = TRUE,
+           fixed = list(add = ac))
+    checkmate::assertFlag(withTitle, add = ac)
+    checkmate::reportAssertions(ac)
+    
     rcdkplot(getMCS(obj, groupName, cluster), width, height)
+    
+    if (withTitle)
+    {
+        count <- sum(obj@cutClusters[[groupName]] == cluster)
+        title(sprintf("cluster %d (n=%d)", cluster, count))
+    }
 })
 
 setMethod("makeHCluster", "compounds", function(obj, method, fpType = "extended",

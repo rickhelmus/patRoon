@@ -429,10 +429,7 @@ reportCompoundClusters <- function(fGroups, compsCluster, path)
                 plot(compsCluster, groupName = grp)
                 par(mfrow = c(3, 3))
                 for (i in seq_len(ls[[grp]]))
-                {
                     plotStructure(compsCluster, groupName = grp, cluster = i)
-                    title(paste0("cluster ", i))
-                }
             })
         }
         setTxtProgressBar(prog, gi)

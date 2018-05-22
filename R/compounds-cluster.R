@@ -112,6 +112,8 @@ setMethod("plot", "compoundsCluster", function(x, groupName, pal = "Paired", ...
                bty = "n", cex = 1, fill = cols, inset = c(-0.18, 0), xpd = NA,
                ncol = 2, title = "cluster")
     })
+    
+    invisible(NULL)
 })
 
 setMethod("getMCS", "compoundsCluster", function(obj, groupName, cluster)
@@ -180,6 +182,9 @@ setMethod("makeHCluster", "compounds", function(obj, method, fpType = "extended"
     prog <- txtProgressBar(0, length(mols), style = 3)
     clust <- lapply(seq_along(mols), function(i)
     {
+        if (length(mols[[i]]) < 2)
+            return(NULL) # need multiple candidates to cluster
+        
         for (j in seq_along(mols[[i]]))
         {
             rcdk::do.typing(mols[[i]][[j]])
@@ -195,20 +200,22 @@ setMethod("makeHCluster", "compounds", function(obj, method, fpType = "extended"
         return(hc)
     })
     
+    clust <- clust[!sapply(clust, is.null)]
+    
     setTxtProgressBar(prog, length(obj))
     close(prog)
     
     cat("Performing dynamic tree cutting ...\n")
-    prog <- txtProgressBar(0, length(obj), style = 3)
+    prog <- txtProgressBar(0, length(clust), style = 3)
     cutClusters <- lapply(seq_along(clust), function(ci)
     {
         dendro <- clust[[ci]]
         ret <- doDynamicTreeCut(dendro, maxTreeHeight, deepSplit, minModuleSize)
-        setTxtProgressBar(prog, i)
+        setTxtProgressBar(prog, ci)
         return(ret)
     })
 
-    setTxtProgressBar(prog, length(obj))
+    setTxtProgressBar(prog, length(clust))
     close(prog)
     
     names(clust) <- names(compTable)

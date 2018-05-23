@@ -150,6 +150,9 @@ compSpecTempl <- readAllFile(system.file("templates", "comp-spectra.Rmd", packag
 compClustTempl <- readAllFile(system.file("templates", "comp-cluster.Rmd", package = "patRoon"))
 formSpecTempl <- readAllFile(system.file("templates", "formula-spectra.Rmd", package = "patRoon"))
 
+if (!is.null(rmdVars$compsCluster))
+    cutcl <- cutClusters(rmdVars$compsCluster)
+
 for (grpi in seq_along(plotGroups))
 {
     rmdTexts[grpi] <- glue::glue("
@@ -165,16 +168,21 @@ for (grpi in seq_along(plotGroups))
     if (plotGroups[grpi] %in% compFGroups)
     {
         compsSeq <- seq_len(nrow(compTable[[plotGroups[grpi]]]))
-        rmdTexts[grpi] <-
-            paste(rmdTexts[grpi],
-                  paste0(glue::glue(compSpecTempl, grpi = grpi,
-                                    compi = compsSeq,
-                                    plotPath = plotPath,
-                                    cil = sapply(compsSeq,
-                                                 function(compi) paste0(getCompInfoList(compTable[[plotGroups[grpi]]],
-                                                                                        compi, TRUE,
-                                                                                        mergedCompoundNames(rmdVars$compounds)),
-                                                                        collapse = "<br>"))), collapse = "\n"), sep = "\n")
+
+        cInfos <- sapply(compsSeq, function(compi)
+        {
+            ret <- paste0(getCompInfoList(compTable[[plotGroups[grpi]]], compi, TRUE,
+                                          mergedCompoundNames(rmdVars$compounds)), collapse = "<br>")
+            if (!is.null(rmdVars$compsCluster) && !is.null(cutcl[[plotGroups[grpi]]]))
+                ret <- paste(ret, sprintf("cluster: %d", cutcl[[plotGroups[grpi]]][compi]), sep = "<br>")
+            return(ret)
+        })
+        
+        rmdTexts[grpi] <- paste(rmdTexts[grpi], paste0(glue::glue(compSpecTempl, grpi = grpi,
+                                                                  compi = compsSeq,
+                                                                  plotPath = plotPath,
+                                                                  cInfo = cInfos),
+                                                       collapse = "\n"), sep = "\n")
     }
     
     if (plotGroups[grpi] %in% compsClustFGroups)

@@ -40,3 +40,22 @@ test_that("plotting works", {
     expect_plot(plot(compsClust, groupName = firstGroup))
     expect_plot(plotStructure(compsClust, groupName = firstGroup, cluster = 1))
 })
+
+test_that("reporting works", {
+    skip_if_not(hasMetfrag)
+    
+    # also include reporting compounds: cluster number is added to candidate info
+    
+    expect_error(reportCSV(fGroups, getWorkPath(), compounds = compounds, compsCluster = compsClust), NA)
+    for (grp in names(clusters(compsClust)))
+        expect_csv_file(getWorkPath("compounds", sprintf("%s-%s.csv", class(fGroups), grp)), "cluster")
+    
+    expect_error(reportPDF(fGroups, getWorkPath(), reportFGroups = FALSE, compounds = compounds,
+                           MSPeakLists = plists, compsCluster = compsClust), NA)
+    for (grp in names(clusters(compsClust)))
+        checkmate::expect_file_exists(getWorkPath("compounds", sprintf("%s-%s-clusters.pdf", class(fGroups), grp))) # UNDONE: check col name
+    
+    expect_file(reportMD(fGroups, getWorkPath(), reportChord = FALSE, reportFGroups = FALSE,
+                         compounds = compounds, MSPeakLists = plists),
+                getWorkPath("report.html"))
+})

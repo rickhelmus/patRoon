@@ -90,7 +90,7 @@ checkCSVFile <- function(x, cols)
     ret <- checkmate::checkFileExists(x, "r")
     if (isTRUE(ret))
     {
-        t <- fread(x, nrows = 0)
+        t <- fread(x, nrows = 1) # nrows=0 doesn't always bug (may give internal error)
         missingc <- setdiff(cols, names(t))
         if (length(missingc) > 0)
             ret <- paste0("Missing columns: ", paste0(missingc, collapse = ", "))

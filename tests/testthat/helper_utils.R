@@ -67,3 +67,9 @@ expect_plot <- function(object)
 }
 
 expect_doppel <- function(...) vdiffr::expect_doppelganger(..., path = getOption("patRoon.path.vdiffr"))
+
+# HACK: workaround for non imported checkmate namespace
+makeExpectation <- checkmate::makeExpectation
+vname <- checkmate::vname
+
+expect_csv_file <- checkmate::makeExpectationFunction(checkCSVFile)

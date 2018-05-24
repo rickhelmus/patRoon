@@ -172,11 +172,15 @@ setMethod("makeHCluster", "compounds", function(obj, method, fpType = "extended"
     checkmate::assertFlag(deepSplit, add = ac)
     checkmate::assertCount(minModuleSize, positive = TRUE, add = ac)
     checkmate::reportAssertions(ac)
-    
+
+    hash <- makeHash(obj, method, fpType, fpSimMethod, maxTreeHeight, deepSplit, minModuleSize)
+    cd <- loadCacheData("compoundsCluster", hash)
+    if (!is.null(cd))
+        return(cd)
+        
     compTable <- compoundTable(obj)
     mols <- sapply(compTable, function(ct) rcdk::parse.smiles(ct$SMILES),
                    simplify = FALSE)
-    
 
     cat("Performing clustering ...\n")    
     prog <- txtProgressBar(0, length(mols), style = 3)
@@ -221,7 +225,9 @@ setMethod("makeHCluster", "compounds", function(obj, method, fpType = "extended"
     names(clust) <- names(compTable)
     names(cutClusters) <- names(compTable)
     
-    return(compoundsCluster(clusters = clust, molecules = mols, cutClusters = cutClusters,
+    ret <- compoundsCluster(clusters = clust, molecules = mols, cutClusters = cutClusters,
                             properties = list(method = method, fpType = fpType,
-                                              fpSimMethod = fpSimMethod)))
+                                              fpSimMethod = fpSimMethod))
+    saveCacheData("compoundsCluster", ret, hash)
+    return(ret)
 })

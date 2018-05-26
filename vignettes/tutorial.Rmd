@@ -255,7 +255,7 @@ library(patRoon)
 setwd("%s")
 load("%s")
 options("patRoon.cache.fileName" = "%s")
-options(patRoon.path.pngquant = "~/werk/pngquant/")
+#options(patRoon.path.pngquant = "~/werk/pngquant/")
 reportMD(fGroups, path = "../docs/examples", formConsensus = formulas, compounds = compounds,
          components = components, MSPeakLists = plists, optimizePng = TRUE)
 ', gsub("\\", "/", getwd(), fixed = TRUE), gsub("\\", "/", tempF, fixed = TRUE), getOption("patRoon.cache.fileName")), con = tempScript)

@@ -112,8 +112,8 @@
     </div>
 
     <pre class="usage"><span class='co'># S4 method for featureGroups</span>
-<span class='fu'>makeHCluster</span>(<span class='no'>fGroups</span>, <span class='kw'>normFunc</span> <span class='kw'>=</span> <span class='no'>max</span>,
-  <span class='kw'>metric</span> <span class='kw'>=</span> <span class='st'>"euclidean"</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"ward.D2"</span>, <span class='kw'>average</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+<span class='fu'>makeHCluster</span>(<span class='no'>obj</span>, <span class='no'>method</span>, <span class='kw'>metric</span> <span class='kw'>=</span> <span class='st'>"euclidean"</span>,
+  <span class='kw'>normFunc</span> <span class='kw'>=</span> <span class='no'>max</span>, <span class='kw'>average</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
 
 <span class='co'># S4 method for featureGroups,clusterInfo</span>
 <span class='fu'>hClusterFilter</span>(<span class='no'>fGroups</span>, <span class='no'>cInfo</span>, <span class='no'>k</span>, <span class='no'>c</span>)
@@ -138,8 +138,14 @@
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>fGroups</th>
-      <td><p>A <code><a href='featureGroups-class.html'>featureGroups</a></code> object.</p></td>
+      <th>method</th>
+      <td><p>Clustering method that should be applied (passed to
+<code>hclust</code>).</p></td>
+    </tr>
+    <tr>
+      <th>metric</th>
+      <td><p>Distance metric used to calculate the distance matrix (passed
+to <code>daisy</code>).</p></td>
     </tr>
     <tr>
       <th>normFunc</th>
@@ -150,19 +156,13 @@ For example, when <code>max</code> is used normalized intensities will be
 between zero and one.</p></td>
     </tr>
     <tr>
-      <th>metric</th>
-      <td><p>Distance metric used to calculate the distance matrix (passed
-to <code>daisy</code>).</p></td>
-    </tr>
-    <tr>
-      <th>method</th>
-      <td><p>Clustering method that should be applied (passed to
-<code>hclust</code>).</p></td>
-    </tr>
-    <tr>
       <th>average</th>
       <td><p>If <code>TRUE</code> then all intensitity data will be averaged for
 each replicate group.</p></td>
+    </tr>
+    <tr>
+      <th>fGroups</th>
+      <td><p>A <code><a href='featureGroups-class.html'>featureGroups</a></code> object.</p></td>
     </tr>
     <tr>
       <th>cInfo</th>
@@ -192,8 +192,8 @@ information.</p></td>
       <td><p>Further options passed to <code>heatmap</code> /
 <code>d3heatmap</code> (<code>drawHeatMap</code>), <code>barplot</code>
 (<code>plot</code>, <code><a href='silhouetteInfo-class.html'>silhouetteInfo</a></code> signature) or
-<code><a href='http://www.rdocumentation.org/packages/graphics/topics/plot'>plot</a></code> (<code>plot</code>, <code><a href='clusterInfo-class.html'>clusterInfo</a></code> signature and
-<code>plotInt</code>).</p></td>
+<code><a href='http://www.rdocumentation.org/packages/graphics/topics/plot'>plot</a></code> (<code>plot</code>, <code><a href='clusterInfo-class.html'>clusterInfo</a></code>
+signature and <code>plotInt</code>).</p></td>
     </tr>
     <tr>
       <th>ranges</th>
@@ -202,7 +202,8 @@ branches to which silhouette information should be calculated.</p></td>
     </tr>
     <tr>
       <th>x, obj</th>
-      <td><p>A <code><a href='clusterInfo-class.html'>clusterInfo</a></code>/<code><a href='silhouetteInfo-class.html'>silhouetteInfo</a></code> object.</p></td>
+      <td><p>A <code><a href='clusterInfo-class.html'>clusterInfo</a></code>, <code><a href='silhouetteInfo-class.html'>silhouetteInfo</a></code>
+or <code><a href='featureGroups-class.html'>featureGroups</a></code> object.</p></td>
     </tr>
     <tr>
       <th>y</th>

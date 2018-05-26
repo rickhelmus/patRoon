@@ -119,19 +119,19 @@ groups.</p>
 
 <span class='fu'>generateCompoundsMetfrag</span>(<span class='no'>fGroups</span>, <span class='no'>MSPeakLists</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"CL"</span>,
   <span class='kw'>logPath</span> <span class='kw'>=</span> <span class='fu'>file.path</span>(<span class='st'>"log"</span>, <span class='st'>"metfrag"</span>), <span class='kw'>timeout</span> <span class='kw'>=</span> <span class='fl'>300</span>,
-  <span class='kw'>timeoutRetries</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>topMost</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='kw'>dbRelMzDev</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>fragRelMzDev</span> <span class='kw'>=</span> <span class='fl'>5</span>,
-  <span class='kw'>fragAbsMzDev</span> <span class='kw'>=</span> <span class='fl'>0.002</span>, <span class='no'>isPositive</span>, <span class='no'>adduct</span>, <span class='kw'>database</span> <span class='kw'>=</span> <span class='st'>"PubChem"</span>,
-  <span class='kw'>chemSpiderToken</span> <span class='kw'>=</span> <span class='st'>""</span>, <span class='kw'>scoreTypes</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"FragmenterScore"</span>,
-  <span class='st'>"OfflineMetFusionScore"</span>), <span class='kw'>scoreWeights</span> <span class='kw'>=</span> <span class='fl'>1</span>,
-  <span class='kw'>preProcessingFilters</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"UnconnectedCompoundFilter"</span>, <span class='st'>"IsotopeFilter"</span>),
-  <span class='kw'>postProcessingFilters</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"InChIKeyFilter"</span>), <span class='kw'>maxCandidatesToStop</span> <span class='kw'>=</span> <span class='fl'>2500</span>,
-  <span class='kw'>addTrivialNames</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>identifiers</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>extraOpts</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>maxProcAmount</span> <span class='kw'>=</span> <span class='fu'>getOption</span>(<span class='st'>"patRoon.maxProcAmount"</span>))
+  <span class='kw'>timeoutRetries</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>errorRetries</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>topMost</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='kw'>dbRelMzDev</span> <span class='kw'>=</span> <span class='fl'>5</span>,
+  <span class='kw'>fragRelMzDev</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>fragAbsMzDev</span> <span class='kw'>=</span> <span class='fl'>0.002</span>, <span class='no'>isPositive</span>, <span class='no'>adduct</span>,
+  <span class='kw'>database</span> <span class='kw'>=</span> <span class='st'>"PubChem"</span>, <span class='kw'>chemSpiderToken</span> <span class='kw'>=</span> <span class='st'>""</span>,
+  <span class='kw'>scoreTypes</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"FragmenterScore"</span>, <span class='st'>"OfflineMetFusionScore"</span>),
+  <span class='kw'>scoreWeights</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>preProcessingFilters</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"UnconnectedCompoundFilter"</span>,
+  <span class='st'>"IsotopeFilter"</span>), <span class='kw'>postProcessingFilters</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"InChIKeyFilter"</span>),
+  <span class='kw'>maxCandidatesToStop</span> <span class='kw'>=</span> <span class='fl'>2500</span>, <span class='kw'>addTrivialNames</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>identifiers</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>extraOpts</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>maxProcAmount</span> <span class='kw'>=</span> <span class='fu'>getOption</span>(<span class='st'>"patRoon.maxProcAmount"</span>))
 
 <span class='fu'>generateCompoundsSirius</span>(<span class='no'>fGroups</span>, <span class='no'>MSPeakLists</span>, <span class='kw'>maxMzDev</span> <span class='kw'>=</span> <span class='fl'>5</span>,
   <span class='kw'>adduct</span> <span class='kw'>=</span> <span class='st'>"[M+H]+"</span>, <span class='kw'>elements</span> <span class='kw'>=</span> <span class='st'>"CHNOP"</span>, <span class='kw'>profile</span> <span class='kw'>=</span> <span class='st'>"qtof"</span>,
   <span class='kw'>formulaDatabase</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>fingerIDDatabase</span> <span class='kw'>=</span> <span class='st'>"pubchem"</span>, <span class='kw'>noise</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>topMost</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='kw'>logPath</span> <span class='kw'>=</span> <span class='fu'>file.path</span>(<span class='st'>"log"</span>, <span class='st'>"sirius"</span>),
+  <span class='kw'>errorRetries</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>topMost</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='kw'>logPath</span> <span class='kw'>=</span> <span class='fu'>file.path</span>(<span class='st'>"log"</span>, <span class='st'>"sirius"</span>),
   <span class='kw'>maxProcAmount</span> <span class='kw'>=</span> <span class='fu'>getOption</span>(<span class='st'>"patRoon.maxProcAmount"</span>))</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -181,6 +181,11 @@ group is stopped. Also see <code>timeoutRetries</code> argument.</p></td>
       <td><p>Maximum number of retries after reaching a timeout
 before completely skipping the metFrag query for a feature group. Also see
 <code>timeout</code> argument.</p></td>
+    </tr>
+    <tr>
+      <th>errorRetries</th>
+      <td><p>Maximum number of retries after an error occurred. This
+may be useful to handle e.g. connection errors.</p></td>
     </tr>
     <tr>
       <th>topMost</th>
@@ -380,10 +385,10 @@ before feature groups have been prioritized.</p>
   <code>generateCompoundsSirius</code>. While these functions may be called directly,
   <code>generateCompounds</code> provides a generic interface and is therefore usually
   preferred.</p>
-<p><code>generateCompoundsMetfrag</code> uses the <span class="pkg">metfRag</span>
-  package for compound identification (see
-  <a href='http://c-ruttkies.github.io/MetFrag/'>http://c-ruttkies.github.io/MetFrag/</a>). Several online compound
-  databases such as <a href='https://pubchem.ncbi.nlm.nih.gov/'>PubChem</a> and
+<p><code>generateCompoundsMetfrag</code> uses the <span class="pkg">metfRag</span> package for
+  compound identification (see <a href='http://c-ruttkies.github.io/MetFrag/'>http://c-ruttkies.github.io/MetFrag/</a>).
+  Several online compound databases such as
+  <a href='https://pubchem.ncbi.nlm.nih.gov/'>PubChem</a> and
   <a href='http://www.chemspider.com/'>ChemSpider</a> may be chosen for retrieval
   of candidate structures. In addition, many options exist to score and
   filter resulting data, and it is highly suggested to optimize these to

@@ -104,6 +104,15 @@
     <div id="patroon-0-1-0-9000" class="section level1">
 <h1 class="page-header">
 <a href="#patroon-0-1-0-9000" class="anchor"></a>patRoon 0.1.0.9000</h1>
+<div id="may-2018" class="section level2">
+<h2 class="hasAnchor">
+<a href="#may-2018" class="anchor"></a>May 2018</h2>
+<ul>
+<li>Added compound clustering (see makeHCluster method for compounds). This is an useful tool to get an overview of all the candidate chemical structures after compound identification. The clustering will reduce data complexity. Furthermore, maximum common sucstructures (MCS) can be calculated and plotted for each cluster to get a quick impression of the different structures of candidates.</li>
+<li>Added function arguments checks using <a href="https://github.com/mllg/checkmate">checkmate</a>. This guards all exported functions and methods from wrong user input arguments. If any problems are found (e.g. a wrong data type or range was specified) then the user is informed about this and what kind of input is to be expected.</li>
+<li>Added workaround (removed latex dependencies added automatically by <code>kableExtra</code> package) that may cause memory leakage when <code><a href="../reference/reporting.html">reportMD()</a></code> is called repeatedly.</li>
+</ul>
+</div>
 <div id="april-2018" class="section level2">
 <h2 class="hasAnchor">
 <a href="#april-2018" class="anchor"></a>April 2018</h2>

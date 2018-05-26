@@ -106,7 +106,10 @@ setMethod("findFGroup", "components", function(obj, fGroup)
 setMethod("plotSpec", "components", function(obj, index, markFGroup = NULL, useGGPlot2 = FALSE, ...)
 {
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertInt(index, lower = 1, upper = length(componentTable(obj)), add = ac)
+    checkmate::assert(
+        checkmate::checkInt(index, lower = 1, upper = length(componentTable(obj))),
+        checkChoiceSilent(index, names(obj))
+    , .var.name = index)
     checkmate::assertString(markFGroup, min.chars = 1, null.ok = TRUE, add = ac)
     checkmate::assertFlag(useGGPlot2, add = ac)
     checkmate::reportAssertions(ac)
@@ -228,7 +231,10 @@ setMethod("plotSpec", "components", function(obj, index, markFGroup = NULL, useG
 setMethod("plotEIC", "components", function(obj, index, fGroups, rtWindow = 5, ...)
 {
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertInt(index, lower = 1, upper = length(componentTable(obj)), add = ac)
+    checkmate::assert(
+        checkmate::checkInt(index, lower = 1, upper = length(componentTable(obj))),
+        checkChoiceSilent(index, names(obj))
+    , .var.name = index)
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
     checkmate::assertNumber(rtWindow, lower = 0, finite = TRUE, add = ac)
     checkmate::reportAssertions(ac)

@@ -80,7 +80,7 @@ optimizePngPlots <- function(plotFiles, progressOut, maxProcAmount)
     cmdQueue <- lapply(seq_len(blocks), function(bl)
     {
         startpl <- (bl - 1) * plotsPerBlock + 1
-        endpl <- startpl + plotsPerBlock - 1
+        endpl <- min(startpl + plotsPerBlock - 1, length(plotFiles))
         return(list(block = bl, startpl = startpl, endpl = endpl, command = pqcmd,
                     args = c(mainArgs, plotFiles[seq(startpl, endpl)])))
     })

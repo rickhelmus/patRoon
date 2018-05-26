@@ -11,19 +11,21 @@ if (hasMetfrag)
     
     compsClust <- makeHCluster(compounds)
     firstGroup <- names(clusters(compsClust))[1]
-    
-    # for reference: clearout molecules as these can't be stored well
-    compsClustRef <- compsClust
-    compsClustRef@molecules <- list()
+
+    compsEmpty <- filter(compounds, minFragScore = 1E4)
+    compsClustEmpty <- makeHCluster(compsEmpty)
 }
 
 test_that("verify compound cluster generation", {
     skip_if_not(hasMetfrag)
 
-    expect_known_value(compsClustRef, testFile("compounds-clust"))
+    expect_known_value(compsClust, testFile("compounds-clust"))
     expect_known_show(compsClust, testFile("compounds-clust", text = TRUE))
     # should have clusters for same number of feature groups with compounds
     expect_length(clusters(compsClust), length(compoundTable(compounds)))
+    
+    expect_length(compsClustEmpty, 0)
+    expect_known_show(compsClustEmpty, testFile("compounds-clust-empty", text = TRUE))
 })
 
 test_that("override cutting clusters work", {
@@ -56,6 +58,15 @@ test_that("reporting works", {
         checkmate::expect_file_exists(getWorkPath("compounds", sprintf("%s-%s-clusters.pdf", class(fGroups), grp))) # UNDONE: check col name
     
     expect_file(reportMD(fGroups, getWorkPath(), reportChord = FALSE, reportFGroups = FALSE,
-                         compounds = compounds, MSPeakLists = plists),
+                         compounds = compounds, MSPeakLists = plists, compsCluster = compsClust),
                 getWorkPath("report.html"))
+})
+
+test_that("reporting empty object works", {
+    skip_if_not(hasMetfrag)
+    
+    expect_error(reportCSV(fGroups, getWorkPath(), compsCluster = compsClustEmpty), NA)
+    expect_error(reportPDF(fGroups, getWorkPath(), compsCluster = compsClustEmpty), NA)
+    expect_file(reportMD(fGroups, getWorkPath(), reportChord = FALSE, reportFGroups = FALSE,
+                         compsCluster = compsClustEmpty), getWorkPath("report.html"))
 })

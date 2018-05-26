@@ -65,7 +65,6 @@ setGeneric("plotScores", function(obj, index, groupName, normalizeScores = TRUE,
 ### h-clustering
 
 setGeneric("clusters", function(obj) standardGeneric("clusters"))
-setGeneric("molecules", function(obj) standardGeneric("molecules"))
 setGeneric("cutClusters", function(obj) standardGeneric("cutClusters"))
 setGeneric("drawHeatMap", function(cInfo, col = colorRampPalette(c("black", "yellow"))(100),
                                    interactive = FALSE, ...) standardGeneric("drawHeatMap"))

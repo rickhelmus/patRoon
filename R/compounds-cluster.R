@@ -20,18 +20,27 @@ doDynamicTreeCut <- function(dendro, maxTreeHeight, deepSplit,
     return(ret)
 }
 
+getMoleculesFromSMILES <- function(SMILES)
+{
+    mols <- rcdk::parse.smiles(SMILES)
+    
+    for (i in seq_along(mols))
+    {
+        rcdk::do.typing(mols[[i]])
+        rcdk::do.aromaticity(mols[[i]])
+    }
+    
+    return(mols)
+}
+
 # This way of compound clustering largely based on metfRag's chemclust.R and the
 # package vignette of rcdk
 
 compoundsCluster <- setClass("compoundsCluster",
-                             slots = c(clusters = "list", molecules = "list", cutClusters = "list",
-                                       properties = "list"),
-                             prototype = list(clusters = list(), molecules = list(), cutClusters = list(),
-                                              properties = list()))
+                             slots = c(clusters = "list", SMILES = "list", cutClusters = "list",
+                                       properties = "list"))
 
 setMethod("clusters", "compoundsCluster", function(obj) obj@clusters)
-
-setMethod("molecules", "compoundsCluster", function(obj) obj@molecules)
 
 setMethod("cutClusters", "compoundsCluster", function(obj) obj@cutClusters)
 
@@ -39,9 +48,12 @@ setMethod("clusterProperties", "compoundsCluster", function(obj) obj@properties)
 
 setMethod("length", "compoundsCluster", function(x) sum(lengths(x)))
 
-setMethod("lengths", "compoundsCluster", function(x, use.names = TRUE) sapply(x@cutClusters,
-                                                                              function(cc) length(unique(cc)),
-                                                                              USE.NAMES = use.names))
+setMethod("lengths", "compoundsCluster", function(x, use.names = TRUE)
+{
+    if (length(x@cutClusters) == 0)
+        return(0)
+    sapply(x@cutClusters, function(cc) length(unique(cc)), USE.NAMES = use.names)
+})
 
 #' @describeIn compounds-clust Show summary information for this object.
 #' @export
@@ -126,7 +138,7 @@ setMethod("getMCS", "compoundsCluster", function(obj, groupName, cluster)
     checkmate::assertInt(cluster, lower = 0, upper = nclust)
     checkmate::reportAssertions(ac)
 
-    mols <- obj@molecules[[groupName]][cc == cluster]
+    mols <- getMoleculesFromSMILES(obj@SMILES[[groupName]][cc == cluster])
     mcons <- mols[[1]]
     if (length(mols) > 1)
     {
@@ -179,21 +191,23 @@ setMethod("makeHCluster", "compounds", function(obj, method, fpType = "extended"
         return(cd)
         
     compTable <- compoundTable(obj)
-    mols <- sapply(compTable, function(ct) rcdk::parse.smiles(ct$SMILES),
-                   simplify = FALSE)
 
-    cat("Performing clustering ...\n")    
+    if (length(obj) == 0)
+    {
+        return(compoundsCluster(clusters = list(), SMILES = list(), cutClusters = list(),
+                                properties = list(method = method, fpType = fpType,
+                                                  fpSimMethod = fpSimMethod)))
+    }
+
+    mols <- sapply(compTable, function(ct) getMoleculesFromSMILES(ct$SMILES),
+                   simplify = FALSE) 
+    
+    cat("Performing clustering ...\n")
     prog <- txtProgressBar(0, length(mols), style = 3)
     clust <- lapply(seq_along(mols), function(i)
     {
         if (length(mols[[i]]) < 2)
             return(NULL) # need multiple candidates to cluster
-        
-        for (j in seq_along(mols[[i]]))
-        {
-            rcdk::do.typing(mols[[i]][[j]])
-            rcdk::do.aromaticity(mols[[i]][[j]])
-        }
         
         fps <- lapply(mols[[i]], rcdk::get.fingerprint, type = fpType)
         dist <- as.dist(1 - fingerprint::fp.sim.matrix(fps, method = fpSimMethod))
@@ -225,7 +239,8 @@ setMethod("makeHCluster", "compounds", function(obj, method, fpType = "extended"
     names(clust) <- names(compTable)
     names(cutClusters) <- names(compTable)
     
-    ret <- compoundsCluster(clusters = clust, molecules = mols, cutClusters = cutClusters,
+    ret <- compoundsCluster(clusters = clust, SMILES = sapply(compTable, "[[", "SMILES"),
+                            cutClusters = cutClusters,
                             properties = list(method = method, fpType = fpType,
                                               fpSimMethod = fpSimMethod))
     saveCacheData("compoundsCluster", ret, hash)

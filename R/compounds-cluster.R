@@ -33,9 +33,27 @@ getMoleculesFromSMILES <- function(SMILES)
     return(mols)
 }
 
-# This way of compound clustering largely based on metfRag's chemclust.R and the
-# package vignette of rcdk
-
+#' Hierarchical clustering of compounds
+#'
+#' Perform hierarchical clustering of structure candidates based on chemical
+#' similarity and obtain overall structural information based on the maximum
+#' common structure (MCS).
+#'
+#' Often many possible chemical structure candidates are found for each feature
+#' group when performing \link[=compound-generation]{compound identification}.
+#' Therefore, it may be useful to obtain an overview of their general structural
+#' properties. One strategy is to perform hierarchical clustering based on their
+#' chemical (dis)similarity, for instance, using the Tanimoto score. The
+#' resulting clusters can then be characterized by evaluating their
+#' \emph{maximum common substructure} (MCS).
+#'
+#' @section Source: The methodology applied here has been largely derived from
+#'   \file{chemclust.R} from the \pkg{metfRag} package and the package vignette
+#'   of \pkg{\link{rcdk}}.
+#'
+#' @name compounds-cluster
+#' @seealso compoundsCluster
+NULL
 
 #' Compounds cluster class
 #'
@@ -250,6 +268,29 @@ setMethod("plotStructure", "compoundsCluster", function(obj, groupName, cluster,
     }
 })
 
+#' @details \code{makeHCluster} performs hierarchical clustering of all
+#'   structure candidates for each feature group within a
+#'   \code{\link{compounds}} object. The resulting dendrograms are automatically
+#'   cut using the \code{\link{cutreeDynamicTree}} function from the
+#'   \pkg{\link{dynamicTreeCut}} package. The returned
+#'   \code{\link{compoundsCluster}} object can then be used, for instance, for
+#'   plotting dendrograms and MCS structures and manually re-cutting specific
+#'   clusters.
+#'
+#' @param obj The \code{\link{compounds}} object to be clustered.
+#' @param method The clustering method passed to \code{\link{hclust}}.
+#' @param fpType The type of structural fingerprint that should be calculated.
+#'   See the \code{type} argument of the \code{\link{get.fingerprint}} function
+#'   of \pkg{\link{rcdk}}.
+#' @param fpSimMethod The similarity method (i.e. not dissimilarity!) to be used
+#'   for generating the distance matrix. See the \code{method} argument of the
+#'   \code{\link{fp.sim.matrix}} function of the \pkg{\link{fingerprint}}
+#'   package.
+#'
+#' @template dynamictreecut
+#'
+#' @return \code{makeHCluster} returns an \code{\link{compoundsCluster}} object.
+#' @rdname compounds-cluster
 setMethod("makeHCluster", "compounds", function(obj, method, fpType = "extended",
                                                 fpSimMethod = "tanimoto",
                                                 maxTreeHeight = 1, deepSplit = TRUE,

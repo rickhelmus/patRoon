@@ -36,18 +36,62 @@ getMoleculesFromSMILES <- function(SMILES)
 # This way of compound clustering largely based on metfRag's chemclust.R and the
 # package vignette of rcdk
 
+
+#' Compounds cluster class
+#'
+#' Objects from this class are used to store hierarchical clustering data of
+#' candidate structures within \code{\link{compounds}} objects.
+#'
+#' Objects from this type are returned by the \code{compounds} method for
+#' \code{\link[=makeHCluster,compounds-method]{makeHCluster}}.
+#'
+#' @slot clusters A \code{list} with \code{\link{hclust}} objects for each
+#'   feature group.
+#' @slot SMILES A \code{list} containing a vector with \code{SMILES} for all
+#'   candidate structures per feature group.
+#' @slot cutClusters A \code{list} with assigned clusters for all candidates per
+#'   feature group (same format as what \code{\link{cutree}} returns).
+#' @slot properties A list containing general properties and parameters used for
+#'   clustering.
+#'
+#' @param obj,x,object A \code{compoundsCluster} object.
+#' @param groupName A character specifying the feature group name.
+#' @param cluster A numeric value specifying the cluster.
+#'
+#' @return \code{cutTree} and \code{cutTreeDynamic} return the modified
+#'   \code{compoundsCluster} object.
+#'
+#' @export
 compoundsCluster <- setClass("compoundsCluster",
                              slots = c(clusters = "list", SMILES = "list", cutClusters = "list",
                                        properties = "list"))
 
+#' @describeIn compoundsCluster Accessor method to the \code{clusters} slot.
+#'   Returns a list that contains for each feature group an object as returned
+#'   by \code{\link{hclust}}.
+#' @export
 setMethod("clusters", "compoundsCluster", function(obj) obj@clusters)
 
+#' @describeIn compoundsCluster Accessor method to the \code{cutClusters} slot.
+#'   Returns a list that contains for each feature group a vector with cluster
+#'   membership for each candidate (format as \code{\link{cutree}}).
+#' @export
 setMethod("cutClusters", "compoundsCluster", function(obj) obj@cutClusters)
 
+#' @describeIn compoundsCluster Returns a list with properties on how the
+#'   clustering was performed.
+#' @export
 setMethod("clusterProperties", "compoundsCluster", function(obj) obj@properties)
 
+#' @describeIn compoundsCluster Returns the total number of clusters.
+#' @export
 setMethod("length", "compoundsCluster", function(x) sum(lengths(x)))
 
+#' @describeIn compoundsCluster Returns a \code{vector} with the number of
+#'   clusters per feature group.
+#' @param use.names A logical value specifying whether the returned vector
+#'   should be named with the feature group names.
+#' @export
 setMethod("lengths", "compoundsCluster", function(x, use.names = TRUE)
 {
     if (length(x@cutClusters) == 0)
@@ -55,7 +99,7 @@ setMethod("lengths", "compoundsCluster", function(x, use.names = TRUE)
     sapply(x@cutClusters, function(cc) length(unique(cc)), USE.NAMES = use.names)
 })
 
-#' @describeIn compounds-clust Show summary information for this object.
+#' @describeIn compoundsCluster Show summary information for this object.
 #' @export
 setMethod("show", "compoundsCluster", function(object)
 {
@@ -75,6 +119,12 @@ setMethod("show", "compoundsCluster", function(object)
     showObjectSize(object)
 })
 
+#' @describeIn compoundsCluster Manually (re-)cut a dendrogram that was
+#'   generated for a feature group.
+#' @param k,h Desired number of clusters or tree height to be used for cutting
+#'   the dendrogram, respecitively. One or the other must be specified.
+#'   Analogous to \code{\link{cutree}}.
+#' @export
 setMethod("treeCut", "compoundsCluster", function(obj, k = NULL, h = NULL, groupName)
 {
     if (is.null(k) && is.null(h))
@@ -90,6 +140,13 @@ setMethod("treeCut", "compoundsCluster", function(obj, k = NULL, h = NULL, group
     return(obj)
 })
 
+#' @describeIn compoundsCluster Automatically (re-)cut a dendrogram that was
+#'   generated for a feature group using the \code{\link{cutreeDynamicTree}}
+#'   function from \pkg{\link{dynamicTreeCut}}.
+#' 
+#' @template dynamictreecut
+#' 
+#' @export
 setMethod("treeCutDynamic", "compoundsCluster", function(obj, maxTreeHeight, deepSplit,
                                                          minModuleSize, groupName)
 {
@@ -104,6 +161,12 @@ setMethod("treeCutDynamic", "compoundsCluster", function(obj, maxTreeHeight, dee
     return(obj)
 })
 
+#' @describeIn compoundsCluster Plot the dendrogram for clustered compounds of a
+#'   feature group. Clusters are highlighted using \pkg{\link{dendextend}}.
+#' @param pal Colour palette to be used from \pkg{\link{RColorBrewer}}.
+#' @param \dots Any arguments directly given to \code{\link{plot.dendrogram}}.
+#'
+#' @export
 setMethod("plot", "compoundsCluster", function(x, groupName, pal = "Paired", ...)
 {
     assertChoiceSilent(groupName, names(x@clusters))
@@ -128,6 +191,12 @@ setMethod("plot", "compoundsCluster", function(x, groupName, pal = "Paired", ...
     invisible(NULL)
 })
 
+#' @describeIn compoundsCluster Calculates the maximum common substructure (MCS)
+#'   for all candidate structures within a specified cluster. This method uses
+#'   the \code{\link{get.mcs}} function from \pkg{\link{rcdk}}.
+#' @return \code{getMCS} returns an \pkg{\link{rcdk}} molecule object
+#'   (\code{IAtomContainer}).
+#' @export
 setMethod("getMCS", "compoundsCluster", function(obj, groupName, cluster)
 {
     ac <- checkmate::makeAssertCollection()
@@ -154,6 +223,14 @@ setMethod("getMCS", "compoundsCluster", function(obj, groupName, cluster)
     return(mcons)    
 })
 
+#' @describeIn compoundsCluster Plots the maximum common substructure (MCS) for
+#'   all candidate structures within a specified cluster.
+#'
+#' @param width,height The dimensions (in pixels) of the raster image that
+#'   should be plotted.
+#' @param withTitle A logical value specifying whether a title should be added.
+#' 
+#' @export
 setMethod("plotStructure", "compoundsCluster", function(obj, groupName, cluster,
                                                         width = 500, height = 500,
                                                         withTitle = TRUE)

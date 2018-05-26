@@ -20,21 +20,22 @@
 
 \S4method{reportPDF}{featureGroups}(fGroups, path = "report",
   reportFGroups = TRUE, formConsensus = NULL, reportFormulaSpectra = TRUE,
-  compounds = NULL, compoundNormalizeScores = TRUE, components = NULL,
-  cInfo = NULL, clusterK = NULL, silInfo = NULL, clusterMaxLabels = 250,
-  MSPeakLists = NULL, retMin = TRUE, EICGrid = c(2, 1),
-  EICRtWindow = 20, EICMzWindow = 0.005, EICTopMost = NULL,
-  EICOnlyPresent = TRUE, clearPath = FALSE)
+  compounds = NULL, compoundNormalizeScores = TRUE, compsCluster = NULL,
+  components = NULL, cInfo = NULL, clusterK = NULL, silInfo = NULL,
+  clusterMaxLabels = 250, MSPeakLists = NULL, retMin = TRUE,
+  EICGrid = c(2, 1), EICRtWindow = 20, EICMzWindow = 0.005,
+  EICTopMost = NULL, EICOnlyPresent = TRUE, clearPath = FALSE)
 
 \S4method{reportMD}{featureGroups}(fGroups, path = "report",
   reportChord = TRUE, reportFGroups = TRUE, formConsensus = NULL,
   reportFormulaSpectra = TRUE, compounds = NULL,
-  compoundNormalizeScores = TRUE, components = NULL, cInfo = NULL,
-  clusterK = NULL, silInfo = NULL, interactiveHeat = FALSE,
-  clusterMaxLabels = 250, MSPeakLists = NULL, retMin = TRUE,
-  EICRtWindow = 20, EICMzWindow = 0.005, EICTopMost = NULL,
-  EICOnlyPresent = TRUE, selfContained = TRUE, optimizePng = FALSE,
-  maxProcAmount = getOption("patRoon.maxProcAmount"), clearPath = FALSE)
+  compoundNormalizeScores = TRUE, compsCluster = NULL, components = NULL,
+  cInfo = NULL, clusterK = NULL, silInfo = NULL,
+  interactiveHeat = FALSE, clusterMaxLabels = 250, MSPeakLists = NULL,
+  retMin = TRUE, EICRtWindow = 20, EICMzWindow = 0.005,
+  EICTopMost = NULL, EICOnlyPresent = TRUE, selfContained = TRUE,
+  optimizePng = FALSE, maxProcAmount = getOption("patRoon.maxProcAmount"),
+  clearPath = FALSE)
 }
 \arguments{
 \item{fGroups}{The \code{\link{featureGroups}} object that should be used for

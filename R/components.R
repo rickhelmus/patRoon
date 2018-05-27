@@ -303,7 +303,7 @@ setMethod("consensus", "components", function(obj, ...)
 #' @templateVar what generate components
 #' @templateVar ex1 generateComponentsRAMClustR
 #' @templateVar ex2 generateComponentsNontarget
-#' @templateVar algos ramclustr,camera,nontarget
+#' @templateVar algos ramclustr,camera,nontarget,intclust
 #' @template generic-algo
 #'
 #' @param ... Any parameters to be passed to the selected component generation
@@ -318,7 +318,8 @@ setMethod("generateComponents", "featureGroups", function(fGroups, algorithm, ..
                 ramclustr = generateComponentsRAMClustR,
                 camera = generateComponentsCAMERA,
                 nontarget = generateComponentsNontarget,
-                stop("Invalid algorithm! Should be: ramclustr, camera or nontarget"))
+                intclust = generateComponentsIntClust,
+                stop("Invalid algorithm! Should be: ramclustr, camera, nontarget or intclust"))
 
     f(fGroups, ...)
 })

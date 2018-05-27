@@ -349,7 +349,7 @@ NULL
 #'   \code{\link[CAMERA:annotate-methods]{CAMERA::annotate}}
 #'   (\code{generateComponentsCAMERA}). Set to \code{NULL} to ignore.
 #'
-#' @return A \code{\link{components}} object containing all generated
+#' @return A \code{\link{components}} (derived) object containing all generated
 #'   components.
 #'
 #' @name component-generation

@@ -20,3 +20,6 @@ Release:
 - fix compoundViewer
 - getMCS for compounds
 - names() for compounds/compounds clusters etc?
+- drawHeatMap --> plotHeatMap
+- vdiffr plots for intensity components
+- update report functions for intensity components

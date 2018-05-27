@@ -7,6 +7,7 @@ withr::with_seed(20, compsRC <- generateComponents(fGroups, "ramclustr", ionizat
 # UNDONE: getting unknown NaN warnings here...
 suppressWarnings(compsCAM <- generateComponents(fGroups, "camera", ionization = "positive"))
 compsNT <- generateComponents(fGroups, "nontarget", ionization = "positive")
+compsInt <- generateComponents(fGroups, "intclust", average = FALSE) # no averaging: only one rep group 
 fGroupsEmpty <- getEmptyTestFGroups()
 compsEmpty <- components()
 
@@ -14,9 +15,11 @@ test_that("components generation works", {
     # For RC/CAM: don't store their internal objects as they contain irreproducible file names
     expect_known_value(list(componentTable(compsRC), componentInfo(compsRC)), testFile("components-rc"))
     expect_known_value(list(componentTable(compsCAM), componentInfo(compsCAM)), testFile("components-cam"))
+    expect_known_value(compsInt, testFile("components-int"))
     expect_length(compsEmpty, 0)
     expect_length(generateComponents(fGroupsEmpty, "ramclustr", ionization = "positive"), 0)
     expect_length(generateComponents(fGroupsEmpty, "camera", ionization = "positive"), 0)
+    expect_length(generateComponents(fGroupsEmpty, "intclust"), 0)
     skip_if(length(compsNT) == 0)
     expect_known_value(compsNT, testFile("components-nt"))
     expect_length(generateComponents(fGroupsEmpty, "nontarget", ionization = "positive"), 0)
@@ -25,6 +28,7 @@ test_that("components generation works", {
 test_that("verify components show", {
     expect_known_show(compsRC, testFile("components-rc", text = TRUE))
     expect_known_show(compsCAM, testFile("components-cam", text = TRUE))
+    expect_known_show(compsInt, testFile("components-int", text = TRUE))
     skip_if(length(compsNT) == 0)
     expect_known_show(compsNT, testFile("components-nt", text = TRUE))
 })
@@ -41,6 +45,11 @@ test_that("consensus works", {
     expect_error(consensus(compsEmpty, components(componentInfo = data.table(),
                                                   algorithm = "empty2")),
                  "non-empty")
+})
+
+test_that("intensity clustered components", {
+    expect_equivalent(length(treeCut(compsInt, k = 5)), 5)
+    expect_equal(treeCutDynamic(compsInt), compsInt)
 })
 
 test_that("reporting works", {
@@ -71,4 +80,9 @@ test_that("plotting works", {
     expect_plot(plotSpec(compsRC, 1, markFGroup = names(fGroups)[1]))
     expect_plot(print(plotSpec(compsRC, 1, useGGPlot2 = TRUE)))
     expect_doppel("eic-component", function() plotEIC(compsRC, 1, fGroups))
+    
+    expect_plot(plot(compsInt))
+    expect_doppel("component-ic-int", function() plotInt(compsInt, cluster = 1))
+    expect_doppel("component-ic-sil", function() plotSilhouettes(compsInt, 2:6))
+    expect_doppel("component-ic-heat", function() drawHeatMap(compsInt, interactive = FALSE))
 })

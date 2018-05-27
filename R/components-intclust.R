@@ -2,6 +2,25 @@
 #' @include components.R
 NULL
 
+genIntComponents <- function(cutClusters, gInfo)
+{
+    clinds <- seq_along(unique(cutClusters))
+    comps <- lapply(clinds, function(ci)
+    {
+        gNames <- rownames(gInfo)[cutClusters == ci]
+        return(data.table(group = gNames, ret = gInfo[gNames, "rts"], mz = gInfo[gNames, "mzs"]))
+    })
+    names(comps) <- paste0("CMP", seq_along(clinds))
+    return(comps)
+}
+
+genIntComponentInfo <- function(cutClusters)
+{
+    clinds <- seq_along(unique(cutClusters))
+    return(data.table(name = paste0("CMP", seq_along(clinds)),
+                      size = sapply(clinds, function(ci) sum(cutClusters == ci))))
+}
+
 #' Components based on clustered intensity profiles.
 #'
 #' This class is derived from \code{\link{components}} and is used to store
@@ -18,6 +37,8 @@ NULL
 #' @slot clust Object returned by \code{\link{hclust}}.
 #' @slot cutClusters A \code{list} with assigned clusters (same format as what
 #'   \code{\link{cutree}} returns).
+#' @slot gInfo The \code{\link{groupInfo}} of the feature groups object that was
+#'   used.
 #' @slot properties A list containing general properties and parameters used for
 #'   clustering.
 #'
@@ -31,7 +52,7 @@ NULL
 #' @export
 componentsIntClust <- setClass("componentsIntClust",
                                slots = c(clusterm = "matrix", distm = "dissimilarity", clust = "hclust",
-                                         cutClusters = "numeric", properties = "list"),
+                                         cutClusters = "numeric", gInfo = "data.frame", properties = "list"),
                                contains = "components")
 
 
@@ -67,6 +88,10 @@ setMethod("treeCut", "componentsIntClust", function(obj, k = NULL, h = NULL)
     checkmate::reportAssertions(ac)
     
     obj@cutClusters <- cutree(obj@clust, k, h)
+    
+    obj@components <- genIntComponents(obj@cutClusters, obj@gInfo)
+    obj@componentInfo <- genIntComponentInfo(obj@cutClusters)
+    
     return(obj)
 })
 
@@ -88,6 +113,10 @@ setMethod("treeCutDynamic", "componentsIntClust", function(obj, maxTreeHeight, d
     
     obj@cutClusters <- doDynamicTreeCut(obj@clust, maxTreeHeight,
                                         deepSplit, minModuleSize)
+    
+    obj@components <- genIntComponents(obj@cutClusters, obj@gInfo)
+    obj@componentInfo <- genIntComponentInfo(obj@cutClusters)
+    
     return(obj)
 })
 
@@ -107,10 +136,12 @@ setMethod("drawHeatMap", "componentsIntClust", function(obj, col, interactive, .
     checkmate::reportAssertions(ac)
     
     if (interactive)
-        d3heatmap::d3heatmap(obj@clusterm, Colv = NA, distfun = function(d) dist(d, obj@metric), hclustfun = function(h) hclust(h, obj@method),
+        d3heatmap::d3heatmap(obj@clusterm, Colv = NA, distfun = function(d) dist(d, obj@properties$metric),
+                             hclustfun = function(h) hclust(h, obj@properties$method),
                              scale = "none", colors = col, ...)
     else
-        heatmap(obj@clusterm, Colv = NA, distfun = function(d) dist(d, obj@metric), hclustfun = function(h) hclust(h, obj@method),
+        heatmap(obj@clusterm, Colv = NA, distfun = function(d) dist(d, obj@properties$metric),
+                hclustfun = function(h) hclust(h, obj@properties$method),
                 scale = "none", col = col, ...)
 })
 
@@ -122,7 +153,7 @@ setMethod("plotInt", "componentsIntClust", function(obj, cluster, ...)
 {
     checkmate::assertInt(cluster, lower = 1, upper = length(obj@cutClusters), null.ok = TRUE)
     
-    plotm <- obj@clusterm[rownames(obj@clusterm) %in% names(obj@cutClusters)[obj@cutClusters == cluster], ]
+    plotm <- obj@clusterm[rownames(obj@clusterm) %in% rownames(obj@gInfo)[obj@cutClusters == cluster], ]
     nsamp <- ncol(plotm)
     
     plot(x = c(0, nsamp), y = c(0, max(plotm)), type = "n", xlab = "", ylab = "normalized intensity", xaxt = "n", ...)
@@ -220,6 +251,12 @@ generateComponentsIntClust <- function(fGroups, method = "complete", metric = "e
     checkmate::assertFlag(average, add = ac)
     checkmate::reportAssertions(ac)
     
+    if (length(fGroups) == 0)
+        return(componentsIntClust(components = list(), componentInfo = data.table(), clusterm = matrix(),
+                                  distm = structure(list(), class = "dissimilarity"),
+                                  clust = structure(list(), class = "hclust"), cutClusters = numeric(),
+                                  gInfo = data.frame(), properties = list(), algorithm = "IntClust"))
+    
     if (average)
     {
         gTable <- averageGroups(fGroups)
@@ -230,6 +267,9 @@ generateComponentsIntClust <- function(fGroups, method = "complete", metric = "e
         gTable <- groups(fGroups)
         analysis <- analysisInfo(fGroups)$analysis
     }
+    
+    if (length(analysis) < 2)
+        stop(paste("Need at least >= 2", if (average) "replicate groups" else "analyses"))
     
     clusterdt <- copy(gTable)
     
@@ -252,22 +292,13 @@ generateComponentsIntClust <- function(fGroups, method = "complete", metric = "e
     cat("Done!\n")
     
     cutClusters <- doDynamicTreeCut(clust, maxTreeHeight, deepSplit, minModuleSize)
-    names(cutClusters) <- colnames(gTable)
-    clinds <- seq_along(unique(cutClusters))
-    
-    cInfo <- data.table(name = paste0("CMP", seq_along(clinds)),
-                        size = sapply(clinds, function(ci) sum(cutClusters == ci)))
     
     gInfo <- groupInfo(fGroups)
-    comps <- lapply(clinds, function(ci)
-    {
-        gNames <- names(cutClusters)[cutClusters == ci]
-        return(data.table(group = gNames, ret = gInfo[gNames, "rts"], mz = gInfo[gNames, "mzs"]))
-    })
-    names(comps) <- cInfo$name
+    comps <- genIntComponents(cutClusters, gInfo)
+    cInfo <- genIntComponentInfo(cutClusters)
     
     return(componentsIntClust(components = comps, componentInfo = cInfo, clusterm = clusterm, distm = distm,
-                              clust = clust, cutClusters = cutClusters,
+                              clust = clust, cutClusters = cutClusters, gInfo = gInfo,
                               properties = list(metric = metric, method = method, average = average),
                               algorithm = "IntClust"))
 }

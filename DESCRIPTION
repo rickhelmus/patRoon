@@ -88,7 +88,6 @@ Collate:
     'features.R'
     'feature_groups.R'
     'EIC-tool.R'
-    'cluster.R'
     'components.R'
     'components-camera.R'
     'components-intclust.R'

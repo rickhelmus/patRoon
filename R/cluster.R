@@ -176,7 +176,7 @@ setMethod("clusterProperties", "clusterInfo", function(obj)
 #' @rdname h-cluster
 #' @aliases drawHeatMap
 #' @export
-setMethod("drawHeatMap", "clusterInfo", function(cInfo, col, interactive, ...)
+setMethod("drawHeatMap", "clusterInfo", function(obj, col, interactive, ...)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertCharacter(col, min.chars = 1, any.missing = FALSE, add = ac)
@@ -184,10 +184,10 @@ setMethod("drawHeatMap", "clusterInfo", function(cInfo, col, interactive, ...)
     checkmate::reportAssertions(ac)
     
     if (interactive)
-        d3heatmap::d3heatmap(cInfo@clusterm, Colv = NA, distfun = function(d) dist(d, cInfo@metric), hclustfun = function(h) hclust(h, cInfo@method),
+        d3heatmap::d3heatmap(obj@clusterm, Colv = NA, distfun = function(d) dist(d, obj@metric), hclustfun = function(h) hclust(h, obj@method),
                              scale = "none", colors = col, ...)
     else
-        heatmap(cInfo@clusterm, Colv = NA, distfun = function(d) dist(d, cInfo@metric), hclustfun = function(h) hclust(h, cInfo@method),
+        heatmap(obj@clusterm, Colv = NA, distfun = function(d) dist(d, obj@metric), hclustfun = function(h) hclust(h, obj@method),
                 scale = "none", col = col, ...)
 })
 
@@ -205,7 +205,7 @@ setMethod("getSilhouetteInfo", "clusterInfo", function(cInfo, ranges)
 {
     checkmate::assertIntegerish(ranges, lower = 1, any.missing = FALSE)
     
-    silInfo <- vector("list", length(seq))
+    silInfo <- vector("list", length(ranges))
     maxmw <- maxk <- NULL
 
     for (i in seq_along(ranges))

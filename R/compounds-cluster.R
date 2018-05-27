@@ -2,37 +2,6 @@
 #' @include compounds.R
 NULL
 
-doDynamicTreeCut <- function(dendro, maxTreeHeight, deepSplit,
-                             minModuleSize)
-{
-    if (minModuleSize == 1)
-    {
-        # workaround adapted from RAMClustR (ramclustR.R)
-        ret <- dynamicTreeCut::cutreeDynamicTree(dendro = dendro, maxTreeHeight = maxTreeHeight,
-                                                 deepSplit = deepSplit, minModuleSize = 2)
-        single <- which(ret == 0) # all unassigned have length = 1
-        ret[single] <- max(ret) + seq_len(length(single))
-    }
-    else
-        ret <- dynamicTreeCut::cutreeDynamicTree(dendro = dendro, maxTreeHeight = maxTreeHeight,
-                                                 deepSplit = deepSplit, minModuleSize = minModuleSize)
-    
-    return(ret)
-}
-
-getMoleculesFromSMILES <- function(SMILES)
-{
-    mols <- rcdk::parse.smiles(SMILES)
-    
-    for (i in seq_along(mols))
-    {
-        rcdk::do.typing(mols[[i]])
-        rcdk::do.aromaticity(mols[[i]])
-    }
-    
-    return(mols)
-}
-
 #' Hierarchical clustering of compounds
 #'
 #' Perform hierarchical clustering of structure candidates based on chemical
@@ -188,24 +157,9 @@ setMethod("treeCutDynamic", "compoundsCluster", function(obj, maxTreeHeight, dee
 setMethod("plot", "compoundsCluster", function(x, groupName, pal = "Paired", ...)
 {
     assertChoiceSilent(groupName, names(x@clusters))
-    
-    dend <- as.dendrogram(x@clusters[[groupName]])
-    ct <- x@cutClusters[[groupName]]
-    ct <- ct[order.dendrogram(dend)] # re-order for dendrogram
-    nclust <- length(unique(ct[ct != 0])) # without unassigned
-    cols <- getBrewerPal(nclust, pal)
-    dend <- dendextend::color_branches(dend, clusters = ct, col = cols[unique(ct)]) # unique: fixup colour order
-    lcols <- dendextend::get_leaves_branches_col(dend)
-    dendextend::labels_colors(dend) <- lcols
-    
-    withr::with_par(list(mar = c(1, 4, 0, 5.5)),
-    {
-        plot(dend, ylab = "Tanimoto dist", ...)
-        legend("topright", legend = seq_len(nclust),
-               bty = "n", cex = 1, fill = cols, inset = c(-0.18, 0), xpd = NA,
-               ncol = 2, title = "cluster")
-    })
-    
+    checkmate::assertString(pal, min.chars = 1)
+    plotDendroWithClusters(as.dendrogram(x@clusters[[groupName]]), x@cutClusters[[groupName]], pal,
+                           ylab = "Tanimoto dist", ...)
     invisible(NULL)
 })
 

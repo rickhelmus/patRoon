@@ -588,3 +588,54 @@ makeMSPlotGG <- function(spec, fragInfo, ...)
 }
 
 curTimeMS <- function() as.numeric(Sys.time()) * 1000
+
+doDynamicTreeCut <- function(dendro, maxTreeHeight, deepSplit,
+                             minModuleSize)
+{
+    if (minModuleSize == 1)
+    {
+        # workaround adapted from RAMClustR (ramclustR.R)
+        ret <- dynamicTreeCut::cutreeDynamicTree(dendro = dendro, maxTreeHeight = maxTreeHeight,
+                                                 deepSplit = deepSplit, minModuleSize = 2)
+        single <- which(ret == 0) # all unassigned have length = 1
+        ret[single] <- max(ret) + seq_len(length(single))
+    }
+    else
+        ret <- dynamicTreeCut::cutreeDynamicTree(dendro = dendro, maxTreeHeight = maxTreeHeight,
+                                                 deepSplit = deepSplit, minModuleSize = minModuleSize)
+    
+    return(ret)
+}
+
+plotDendroWithClusters <- function(dendro, ct, pal, ...)
+{
+    ct <- ct[order.dendrogram(dendro)] # re-order for dendrogram
+    nclust <- length(unique(ct[ct != 0])) # without unassigned (in case of dynamicTreeCut)
+    cols <- getBrewerPal(nclust, pal)
+    dendro <- dendextend::color_branches(dendro, clusters = ct, col = cols[unique(ct)]) # unique: fixup colour order
+    lcols <- dendextend::get_leaves_branches_col(dendro)
+    dendextend::labels_colors(dendro) <- lcols
+    
+    mr <- par("mar")
+    mr[4] <- max(5.5, mr[4])
+    withr::with_par(list(mar = mr),
+    {
+        plot(dendro, ...)
+        legend("topright", legend = seq_len(nclust),
+               bty = "n", cex = 1, fill = cols, inset = c(-0.18, 0), xpd = NA,
+               ncol = 2, title = "cluster")
+    })
+}
+
+getMoleculesFromSMILES <- function(SMILES)
+{
+    mols <- rcdk::parse.smiles(SMILES)
+    
+    for (i in seq_along(mols))
+    {
+        rcdk::do.typing(mols[[i]])
+        rcdk::do.aromaticity(mols[[i]])
+    }
+    
+    return(mols)
+}

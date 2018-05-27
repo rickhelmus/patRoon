@@ -21,7 +21,7 @@
 
 \S4method{hClusterFilter}{featureGroups,clusterInfo}(fGroups, cInfo, k, c)
 
-\S4method{drawHeatMap}{clusterInfo}(cInfo, col = colorRampPalette(c("black",
+\S4method{drawHeatMap}{clusterInfo}(obj, col = colorRampPalette(c("black",
   "yellow"))(100), interactive = FALSE, ...)
 
 \S4method{getSilhouetteInfo}{clusterInfo}(cInfo, ranges = seq(10, 100, 10))

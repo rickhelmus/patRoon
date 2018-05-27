@@ -66,14 +66,15 @@ setGeneric("plotScores", function(obj, index, groupName, normalizeScores = TRUE,
 
 setGeneric("clusters", function(obj) standardGeneric("clusters"))
 setGeneric("cutClusters", function(obj) standardGeneric("cutClusters"))
-setGeneric("drawHeatMap", function(cInfo, col = colorRampPalette(c("black", "yellow"))(100),
+setGeneric("drawHeatMap", function(obj, col = colorRampPalette(c("black", "yellow"))(100),
                                    interactive = FALSE, ...) standardGeneric("drawHeatMap"))
 setGeneric("getSilhouetteInfo", function(cInfo, ranges = seq(10, 100, 10)) standardGeneric("getSilhouetteInfo"))
 setGeneric("hClusterFilter", function(fGroups, cInfo, k, c) standardGeneric("hClusterFilter"))
 setGeneric("treeCut", function(obj, k = NULL, h = NULL, ...) standardGeneric("treeCut"))
 setGeneric("treeCutDynamic", function(obj, maxTreeHeight = 1, deepSplit = TRUE,
-                                      minModuleSize = 1, groupName) standardGeneric("treeCutDynamic"))
+                                      minModuleSize = 1, ...) standardGeneric("treeCutDynamic"))
 setGeneric("getMCS", function(obj, groupName, cluster) standardGeneric("getMCS"))
+setGeneric("plotSilhouettes", function(obj, kSeq, ...) standardGeneric("plotSilhouettes"))
 
 ### target screening
 

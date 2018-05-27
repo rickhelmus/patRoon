@@ -114,7 +114,7 @@ please refer to the linked method documentation for each generic.
 
 
 \itemize{
-    \item Methods are defined for: \code{\link[=plotInt,clusterInfo-method]{clusterInfo}}, \code{\link[=plotInt,featureGroups-method]{featureGroups}}.
+    \item Methods are defined for: \code{\link[=plotInt,clusterInfo-method]{clusterInfo}}, \code{\link[=plotInt,componentsIntClust-method]{componentsIntClust}}, \code{\link[=plotInt,featureGroups-method]{featureGroups}}.
 }
 
 \code{plotVenn} plots a Venn diagram to assess unique and overlapping data.
@@ -204,6 +204,6 @@ please refer to the linked method documentation for each generic.
 
 
 \itemize{
-    \item Methods are defined for: \code{\link[=clusterProperties,clusterInfo-method]{clusterInfo}}, \code{\link[=clusterProperties,compoundsCluster-method]{compoundsCluster}}.
+    \item Methods are defined for: \code{\link[=clusterProperties,clusterInfo-method]{clusterInfo}}, \code{\link[=clusterProperties,componentsIntClust-method]{componentsIntClust}}, \code{\link[=clusterProperties,compoundsCluster-method]{compoundsCluster}}.
 }
 }

@@ -16,7 +16,6 @@ Release:
 - filter formulas, compounds etc on (remaining) feature groups
 - filterBy generic for formulas, components, compounds
 - filter method for components
-- compound clustering
 - hclust and mass defect components
 - fix compoundViewer
 - getMCS for compounds

@@ -31,8 +31,8 @@
 
 \S4method{treeCut}{compoundsCluster}(obj, k = NULL, h = NULL, groupName)
 
-\S4method{treeCutDynamic}{compoundsCluster}(obj, maxTreeHeight = 1,
-  deepSplit = TRUE, minModuleSize = 1, groupName)
+\S4method{treeCutDynamic}{compoundsCluster}(obj, maxTreeHeight, deepSplit,
+  minModuleSize, groupName)
 
 \S4method{plot}{compoundsCluster,ANY}(x, groupName, pal = "Paired", ...)
 

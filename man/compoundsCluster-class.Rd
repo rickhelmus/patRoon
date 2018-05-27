@@ -14,6 +14,7 @@
 \alias{treeCutDynamic,compoundsCluster-method}
 \alias{plot,compoundsCluster,ANY-method}
 \alias{getMCS,compoundsCluster-method}
+\alias{getMCS}
 \alias{plotStructure,compoundsCluster-method}
 \title{Compounds cluster class}
 \usage{

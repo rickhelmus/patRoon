@@ -169,6 +169,7 @@ setMethod("plot", "compoundsCluster", function(x, groupName, pal = "Paired", ...
 #' @return \code{getMCS} returns an \pkg{\link{rcdk}} molecule object
 #'   (\code{IAtomContainer}).
 #' @export
+#' @aliases getMCS
 setMethod("getMCS", "compoundsCluster", function(obj, groupName, cluster)
 {
     ac <- checkmate::makeAssertCollection()
@@ -245,6 +246,7 @@ setMethod("plotStructure", "compoundsCluster", function(obj, groupName, cluster,
 #'
 #' @return \code{makeHCluster} returns an \code{\link{compoundsCluster}} object.
 #' @rdname compounds-cluster
+#' @aliases makeHCluster
 setMethod("makeHCluster", "compounds", function(obj, method, fpType = "extended",
                                                 fpSimMethod = "tanimoto",
                                                 maxTreeHeight = 1, deepSplit = TRUE,

@@ -160,6 +160,7 @@ setMethod("plot", "componentsIntClust", function(x, pal = "Paired", numericLabel
 #' @param kSeq An integer vector containing the sequence that should be used for
 #'   average silhouette width calculation.
 #' @export
+#' @aliases plotSilhouettes
 setMethod("plotSilhouettes", "componentsIntClust", function(obj, kSeq, ...)
 {
     checkmate::assertIntegerish(kSeq, lower = 2, any.missing = FALSE)

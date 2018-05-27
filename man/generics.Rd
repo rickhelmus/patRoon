@@ -3,48 +3,58 @@
 \name{generics}
 \alias{generics}
 \alias{analysisInfo}
-\alias{featureTable}
 \alias{algorithm}
-\alias{filter}
-\alias{plotInt}
-\alias{plotVenn}
-\alias{plotChord}
-\alias{plotSpec}
-\alias{plotEIC}
-\alias{plotStructure}
-\alias{consensus}
-\alias{formulaTable}
-\alias{makeHCluster}
 \alias{clusterProperties}
+\alias{clusters}
+\alias{cutClusters}
+\alias{consensus}
+\alias{featureTable}
+\alias{filter}
+\alias{formulaTable}
+\alias{plotChord}
+\alias{plotEIC}
+\alias{plotInt}
+\alias{plotSpec}
+\alias{plotStructure}
+\alias{plotVenn}
+\alias{treeCut}
+\alias{treeCutDynamic}
 \title{Miscellaneous generics}
 \usage{
 analysisInfo(obj)
 
-featureTable(obj)
-
 algorithm(obj)
 
-filter(obj, ...)
+clusterProperties(obj)
 
-plotInt(obj, ...)
+clusters(obj)
 
-plotVenn(obj, which = NULL, ...)
-
-plotChord(obj, addSelfLinks = FALSE, addRetMzPlots = TRUE, ...)
-
-plotSpec(obj, ...)
-
-plotEIC(obj, ...)
-
-plotStructure(obj, ...)
+cutClusters(obj)
 
 consensus(obj, ...)
 
+featureTable(obj)
+
+filter(obj, ...)
+
 formulaTable(obj)
 
-makeHCluster(obj, method = "complete", ...)
+plotChord(obj, addSelfLinks = FALSE, addRetMzPlots = TRUE, ...)
 
-clusterProperties(obj)
+plotEIC(obj, ...)
+
+plotInt(obj, ...)
+
+plotSpec(obj, ...)
+
+plotStructure(obj, ...)
+
+plotVenn(obj, which = NULL, ...)
+
+treeCut(obj, k = NULL, h = NULL, ...)
+
+treeCutDynamic(obj, maxTreeHeight = 1, deepSplit = TRUE,
+  minModuleSize = 1, ...)
 }
 \arguments{
 \item{obj}{The object the generic should be applied to.}
@@ -52,13 +62,13 @@ clusterProperties(obj)
 \item{\dots}{Any further method specific arguments. See method documentation
 for details.}
 
-\item{which}{What should be plotted. See method documentation for specifics.}
-
 \item{addSelfLinks}{If \code{TRUE} then 'self-links' are added which
 represent non-shared data.}
 
 \item{addRetMzPlots}{Set to \code{TRUE} to enable \emph{m/z} \emph{vs}
 retention time scatter plots.}
+
+\item{which}{What should be plotted. See method documentation for specifics.}
 }
 \description{
 Various (S4) generic functions provide a common interface for common tasks
@@ -77,16 +87,6 @@ please refer to the linked method documentation for each generic.
     \item Methods are defined for: \code{\link[=analysisInfo,featureGroups-method]{featureGroups}}, \code{\link[=analysisInfo,features-method]{features}}.
 }
 
-\code{featureTable} returns feature information.
-
-
-
-
-
-\itemize{
-    \item Methods are defined for: \code{\link[=featureTable,featureGroups-method]{featureGroups}}, \code{\link[=featureTable,features-method]{features}}.
-}
-
 \code{algorithm} returns the algorithm that was used to generate an object.
 
 
@@ -95,6 +95,56 @@ please refer to the linked method documentation for each generic.
 
 \itemize{
     \item Methods are defined for: \code{\link[=algorithm,MSPeakLists-method]{MSPeakLists}}, \code{\link[=algorithm,components-method]{components}}, \code{\link[=algorithm,compounds-method]{compounds}}, \code{\link[=algorithm,formulaConsensus-method]{formulaConsensus}}, \code{\link[=algorithm,formulas-method]{formulas}}.
+}
+
+\code{clusterProperties} Obtain a list with properties of the generated cluster(s).
+
+
+
+
+
+\itemize{
+    \item Methods are defined for: \code{\link[=clusterProperties,componentsIntClust-method]{componentsIntClust}}, \code{\link[=clusterProperties,compoundsCluster-method]{compoundsCluster}}.
+}
+
+\code{clusters} Obtain clustering object(s).
+
+
+
+
+
+\itemize{
+    \item Methods are defined for: \code{\link[=clusters,componentsIntClust-method]{componentsIntClust}}, \code{\link[=clusters,compoundsCluster-method]{compoundsCluster}}.
+}
+
+\code{cutClusters} Returns assigned cluster indices of a cut cluster.
+
+
+
+
+
+\itemize{
+    \item Methods are defined for: \code{\link[=cutClusters,componentsIntClust-method]{componentsIntClust}}, \code{\link[=cutClusters,compoundsCluster-method]{compoundsCluster}}.
+}
+
+\code{consensus} combines and merges data from various algorithms to generate a consensus.
+
+
+
+
+
+\itemize{
+    \item Methods are defined for: \code{\link[=consensus,components-method]{components}}, \code{\link[=consensus,compounds-method]{compounds}}, \code{\link[=consensus,featureGroupsComparison-method]{featureGroupsComparison}}, \code{\link[=consensus,formulas-method]{formulas}}.
+}
+
+\code{featureTable} returns feature information.
+
+
+
+
+
+\itemize{
+    \item Methods are defined for: \code{\link[=featureTable,featureGroups-method]{featureGroups}}, \code{\link[=featureTable,features-method]{features}}.
 }
 
 \code{filter} provides various functionality to do post-filtering of data.
@@ -107,24 +157,14 @@ please refer to the linked method documentation for each generic.
     \item Methods are defined for: \code{\link[=filter,MSPeakLists-method]{MSPeakLists}}, \code{\link[=filter,compounds-method]{compounds}}, \code{\link[=filter,featureGroups-method]{featureGroups}}.
 }
 
-\code{plotInt} plots the intensity of all contained features.
+\code{formulaTable} returns formula data.
 
 
 
 
 
 \itemize{
-    \item Methods are defined for: \code{\link[=plotInt,clusterInfo-method]{clusterInfo}}, \code{\link[=plotInt,componentsIntClust-method]{componentsIntClust}}, \code{\link[=plotInt,featureGroups-method]{featureGroups}}.
-}
-
-\code{plotVenn} plots a Venn diagram to assess unique and overlapping data.
-
-
-
-
-
-\itemize{
-    \item Methods are defined for: \code{\link[=plotVenn,featureGroups-method]{featureGroups}}, \code{\link[=plotVenn,featureGroupsComparison-method]{featureGroupsComparison}}.
+    \item Methods are defined for: \code{\link[=formulaTable,formulaConsensus-method]{formulaConsensus}}, \code{\link[=formulaTable,formulas-method]{formulas}}.
 }
 
 \code{plotChord} plots a Chord diagram to assess overlapping data.
@@ -137,16 +177,6 @@ please refer to the linked method documentation for each generic.
     \item Methods are defined for: \code{\link[=plotChord,featureGroups-method]{featureGroups}}, \code{\link[=plotChord,featureGroupsComparison-method]{featureGroupsComparison}}.
 }
 
-\code{plotSpec} plots a (annotated) spectrum.
-
-
-
-
-
-\itemize{
-    \item Methods are defined for: \code{\link[=plotSpec,components-method]{components}}, \code{\link[=plotSpec,compounds-method]{compounds}}, \code{\link[=plotSpec,formulaConsensus-method]{formulaConsensus}}.
-}
-
 \code{plotEIC} plots extracted ion chromatogram(s).
 
 
@@ -155,6 +185,26 @@ please refer to the linked method documentation for each generic.
 
 \itemize{
     \item Methods are defined for: \code{\link[=plotEIC,components-method]{components}}, \code{\link[=plotEIC,featureGroups-method]{featureGroups}}.
+}
+
+\code{plotInt} plots the intensity of all contained features.
+
+
+
+
+
+\itemize{
+    \item Methods are defined for: \code{\link[=plotInt,componentsIntClust-method]{componentsIntClust}}, \code{\link[=plotInt,featureGroups-method]{featureGroups}}.
+}
+
+\code{plotSpec} plots a (annotated) spectrum.
+
+
+
+
+
+\itemize{
+    \item Methods are defined for: \code{\link[=plotSpec,components-method]{components}}, \code{\link[=plotSpec,compounds-method]{compounds}}, \code{\link[=plotSpec,formulaConsensus-method]{formulaConsensus}}.
 }
 
 \code{plotStructure} plots a chemical structure.
@@ -167,43 +217,33 @@ please refer to the linked method documentation for each generic.
     \item Methods are defined for: \code{\link[=plotStructure,compounds-method]{compounds}}, \code{\link[=plotStructure,compoundsCluster-method]{compoundsCluster}}.
 }
 
-\code{consensus} combines and merges data from various algorithms to
+\code{plotVenn} plots a Venn diagram to assess unique and overlapping data.
 
 
 
 
 
 \itemize{
-    \item Methods are defined for: \code{\link[=consensus,components-method]{components}}, \code{\link[=consensus,compounds-method]{compounds}}, \code{\link[=consensus,featureGroupsComparison-method]{featureGroupsComparison}}, \code{\link[=consensus,formulas-method]{formulas}}.
+    \item Methods are defined for: \code{\link[=plotVenn,featureGroups-method]{featureGroups}}, \code{\link[=plotVenn,featureGroupsComparison-method]{featureGroupsComparison}}.
 }
 
-\code{formulaTable} returns formula data.
+\code{treeCut} Manually cut a cluster.
 
 
 
 
 
 \itemize{
-    \item Methods are defined for: \code{\link[=formulaTable,formulaConsensus-method]{formulaConsensus}}, \code{\link[=formulaTable,formulas-method]{formulas}}.
+    \item Methods are defined for: \code{\link[=treeCut,componentsIntClust-method]{componentsIntClust}}, \code{\link[=treeCut,compoundsCluster-method]{compoundsCluster}}.
 }
 
-\code{makeHCluster} Performs hierarchical clustering.
+\code{treeCutDynamic} Automatically cut a cluster.
 
 
 
 
 
 \itemize{
-    \item Methods are defined for: \code{\link[=makeHCluster,compounds-method]{compounds}}, \code{\link[=makeHCluster,featureGroups-method]{featureGroups}}.
-}
-
-\code{clusterProperties} Obtain a list with properties of the generated cluster(s).
-
-
-
-
-
-\itemize{
-    \item Methods are defined for: \code{\link[=clusterProperties,clusterInfo-method]{clusterInfo}}, \code{\link[=clusterProperties,componentsIntClust-method]{componentsIntClust}}, \code{\link[=clusterProperties,compoundsCluster-method]{compoundsCluster}}.
+    \item Methods are defined for: \code{\link[=treeCutDynamic,componentsIntClust-method]{componentsIntClust}}, \code{\link[=treeCutDynamic,compoundsCluster-method]{compoundsCluster}}.
 }
 }

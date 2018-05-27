@@ -4,6 +4,7 @@
 \name{compounds-cluster}
 \alias{compounds-cluster}
 \alias{makeHCluster,compounds-method}
+\alias{makeHCluster}
 \title{Hierarchical clustering of compounds}
 \usage{
 \S4method{makeHCluster}{compounds}(obj, method, fpType = "extended",

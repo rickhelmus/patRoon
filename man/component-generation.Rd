@@ -36,7 +36,7 @@ generateComponentsRAMClustR(fGroups, st = NULL, sr = NULL, maxt = 12,
 be generated.}
 
 \item{algorithm}{A character string describing the algorithm that should be
-used: \code{"ramclustr"}, \code{"camera"}, \code{"nontarget"}}
+used: \code{"ramclustr"}, \code{"camera"}, \code{"nontarget"}, \code{"intclust"}}
 
 \item{...}{Any parameters to be passed to the selected component generation
 algorithm.}

@@ -62,18 +62,13 @@ setGeneric("addFormulaScoring", function(compounds, formConsensus, updateScore =
                                          formulaScoreWeight = 1) standardGeneric("addFormulaScoring"))
 setGeneric("plotScores", function(obj, index, groupName, normalizeScores = TRUE, useGGPlot2 = FALSE) standardGeneric("plotScores"))
 
-### h-clustering
+### clustering
 
-setGeneric("clusters", function(obj) standardGeneric("clusters"))
-setGeneric("cutClusters", function(obj) standardGeneric("cutClusters"))
+setGeneric("makeHCluster", function(obj, method = "complete", ...) standardGeneric("makeHCluster"))
+setGeneric("getMCS", function(obj, groupName, cluster) standardGeneric("getMCS"))
+
 setGeneric("drawHeatMap", function(obj, col = colorRampPalette(c("black", "yellow"))(100),
                                    interactive = FALSE, ...) standardGeneric("drawHeatMap"))
-setGeneric("getSilhouetteInfo", function(cInfo, ranges = seq(10, 100, 10)) standardGeneric("getSilhouetteInfo"))
-setGeneric("hClusterFilter", function(fGroups, cInfo, k, c) standardGeneric("hClusterFilter"))
-setGeneric("treeCut", function(obj, k = NULL, h = NULL, ...) standardGeneric("treeCut"))
-setGeneric("treeCutDynamic", function(obj, maxTreeHeight = 1, deepSplit = TRUE,
-                                      minModuleSize = 1, ...) standardGeneric("treeCutDynamic"))
-setGeneric("getMCS", function(obj, groupName, cluster) standardGeneric("getMCS"))
 setGeneric("plotSilhouettes", function(obj, kSeq, ...) standardGeneric("plotSilhouettes"))
 
 ### target screening
@@ -143,33 +138,45 @@ NULL
 #' @template generics
 setGeneric("analysisInfo", function(obj) standardGeneric("analysisInfo"))
 
-#' @templateVar func featureTable
-#' @templateVar desc returns feature information.
-#' @template generics
-setGeneric("featureTable", function(obj) standardGeneric("featureTable"))
-
 #' @templateVar func algorithm
 #' @templateVar desc returns the algorithm that was used to generate an object.
 #' @template generics
 setGeneric("algorithm", function(obj) standardGeneric("algorithm"))
+
+#' @templateVar func clusterProperties
+#' @templateVar desc Obtain a list with properties of the generated cluster(s).
+#' @template generics
+setGeneric("clusterProperties", function(obj) standardGeneric("clusterProperties"))
+
+#' @templateVar func clusters
+#' @templateVar desc Obtain clustering object(s).
+#' @template generics
+setGeneric("clusters", function(obj) standardGeneric("clusters"))
+
+#' @templateVar func cutClusters
+#' @templateVar desc Returns assigned cluster indices of a cut cluster.
+#' @template generics
+setGeneric("cutClusters", function(obj) standardGeneric("cutClusters"))
+
+#' @templateVar func consensus
+#' @templateVar desc combines and merges data from various algorithms to generate a consensus.
+#' @template generics
+setGeneric("consensus", function(obj, ...) standardGeneric("consensus"))
+
+#' @templateVar func featureTable
+#' @templateVar desc returns feature information.
+#' @template generics
+setGeneric("featureTable", function(obj) standardGeneric("featureTable"))
 
 #' @templateVar func filter
 #' @templateVar desc provides various functionality to do post-filtering of data.
 #' @template generics
 setGeneric("filter", function(obj, ...) standardGeneric("filter"))
 
-#' @templateVar func plotInt
-#' @templateVar desc plots the intensity of all contained features.
+#' @templateVar func formulaTable
+#' @templateVar desc returns formula data.
 #' @template generics
-setGeneric("plotInt", function(obj, ...) standardGeneric("plotInt"))
-
-#' @templateVar func plotVenn
-#' @templateVar desc plots a Venn diagram to assess unique and overlapping data.
-#' @template generics
-#'
-#' @param which What should be plotted. See method documentation for specifics.
-#'
-setGeneric("plotVenn", function(obj, which = NULL, ...) standardGeneric("plotVenn"))
+setGeneric("formulaTable", function(obj) standardGeneric("formulaTable"))
 
 #' @templateVar func plotChord
 #' @templateVar desc plots a Chord diagram to assess overlapping data.
@@ -179,41 +186,44 @@ setGeneric("plotVenn", function(obj, which = NULL, ...) standardGeneric("plotVen
 #'
 setGeneric("plotChord", function(obj, addSelfLinks = FALSE, addRetMzPlots = TRUE, ...) standardGeneric("plotChord"))
 
-#' @templateVar func plotSpec
-#' @templateVar desc plots a (annotated) spectrum.
-#' @template generics
-setGeneric("plotSpec", function(obj, ...) standardGeneric("plotSpec"))
-
 #' @templateVar func plotEIC
 #' @templateVar desc plots extracted ion chromatogram(s).
 #' @template generics
 setGeneric("plotEIC", function(obj, ...) standardGeneric("plotEIC"))
+
+#' @templateVar func plotInt
+#' @templateVar desc plots the intensity of all contained features.
+#' @template generics
+setGeneric("plotInt", function(obj, ...) standardGeneric("plotInt"))
+
+#' @templateVar func plotSpec
+#' @templateVar desc plots a (annotated) spectrum.
+#' @template generics
+setGeneric("plotSpec", function(obj, ...) standardGeneric("plotSpec"))
 
 #' @templateVar func plotStructure
 #' @templateVar desc plots a chemical structure.
 #' @template generics
 setGeneric("plotStructure", function(obj, ...) standardGeneric("plotStructure"))
 
-#' @templateVar func consensus
-#' @templateVar desc combines and merges data from various algorithms to
-#'   generate a consensus.
+#' @templateVar func plotVenn
+#' @templateVar desc plots a Venn diagram to assess unique and overlapping data.
 #' @template generics
-setGeneric("consensus", function(obj, ...) standardGeneric("consensus"))
+#'
+#' @param which What should be plotted. See method documentation for specifics.
+#'
+setGeneric("plotVenn", function(obj, which = NULL, ...) standardGeneric("plotVenn"))
 
-#' @templateVar func formulaTable
-#' @templateVar desc returns formula data.
+#' @templateVar func treeCut
+#' @templateVar desc Manually cut a cluster.
 #' @template generics
-setGeneric("formulaTable", function(obj) standardGeneric("formulaTable"))
+setGeneric("treeCut", function(obj, k = NULL, h = NULL, ...) standardGeneric("treeCut"))
 
-#' @templateVar func makeHCluster
-#' @templateVar desc Performs hierarchical clustering.
+#' @templateVar func treeCutDynamic
+#' @templateVar desc Automatically cut a cluster.
 #' @template generics
-setGeneric("makeHCluster", function(obj, method = "complete", ...) standardGeneric("makeHCluster"))
-
-#' @templateVar func clusterProperties
-#' @templateVar desc Obtain a list with properties of the generated cluster(s).
-#' @template generics
-setGeneric("clusterProperties", function(obj) standardGeneric("clusterProperties"))
+setGeneric("treeCutDynamic", function(obj, maxTreeHeight = 1, deepSplit = TRUE,
+                                      minModuleSize = 1, ...) standardGeneric("treeCutDynamic"))
 
 
 setGeneric("checkChromatograms", function(fGroups, mzWindow = 0.005, enabledFGroups = NULL) standardGeneric("checkChromatograms"))

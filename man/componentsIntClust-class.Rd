@@ -14,6 +14,7 @@
 \alias{plotInt,componentsIntClust-method}
 \alias{plot,componentsIntClust,ANY-method}
 \alias{plotSilhouettes,componentsIntClust-method}
+\alias{plotSilhouettes}
 \title{Components based on clustered intensity profiles.}
 \usage{
 \S4method{clusters}{componentsIntClust}(obj)

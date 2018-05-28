@@ -23,3 +23,4 @@ Release:
 - drawHeatMap --> plotHeatMap
 - vdiffr plots for intensity components
 - update report functions for intensity components
+- int hclust refs

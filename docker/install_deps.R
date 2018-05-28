@@ -19,3 +19,6 @@ if (length(dp) > 0)
     cat(sprintf("Missing packages: %s\n", paste0(dp, collapse = ", ")))
     install.packages(dp)
 }
+
+# workaround for sildist not found bug: https://github.com/hemberg-lab/SC3/issues/36
+install.packages("cluster")

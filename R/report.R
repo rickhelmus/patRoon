@@ -36,15 +36,6 @@ NULL
 #'   further annotation of compound MS/MS spectra.
 #' @param compoundNormalizeScores If \code{TRUE} compound identification scores
 #'   will be normalized to maximum values.
-#' @param cInfo If not \code{NULL} a \code{\link{clusterInfo}} object to be used
-#'   for reporting hierarchical clustering results.
-#' @param clusterK Number of branches the hierarchical cluster should be cut
-#'   into. If specified (\emph{i.e.} not \code{NULL}) then individual clusters
-#'   will be reported.
-#' @param silInfo A \code{\link{silhouetteInfo}} object to be used for reporting
-#'   a silhouette plot.
-#' @param clusterMaxLabels Maximum amount of clusters when labels are still
-#'   drawn within a dendrogram.
 #' @param MSPeakLists A \code{\link{MSPeakLists}} object that is
 #'   \emph{mandatory} when spectra for formulae and/or compounds will be
 #'   reported.
@@ -457,9 +448,9 @@ reportComponentTable <- function(components, path, retMin)
     }
 }
 
-reportComponentSpectra <- function(fGroups, path, components, EICRtWindow, EICMzWindow, retMin, EICs)
+reportComponentPlots <- function(fGroups, path, components, EICRtWindow, EICMzWindow, retMin, EICs)
 {
-    printf("Exporting component spectra...\n")
+    printf("Exporting component plots...\n")
 
     if (length(components) == 0)
     {
@@ -475,10 +466,26 @@ reportComponentSpectra <- function(fGroups, path, components, EICRtWindow, EICMz
     prog <- txtProgressBar(0, length(components), style = 3)
 
     pdf(file.path(path, "components.pdf"), paper = "a4", pointsize = 10, width = 8, height = 11)
+    
+    # HACK: this should be replaced some proper inheritance/methods at some point
+    isHClust <- inherits(components, "componentsIntClust")
+    
+    if (isHClust)
+    {
+        drawHeatMap(components, interactive = FALSE)
+        plot(components)
+        clProps <- clusterProperties(components)
+    }
 
     for (cmpi in seq_len(length(components)))
     {
-        scr <- split.screen(c(2, 1))
+        if (isHClust)
+        {
+            scr <- split.screen(c(3, 1))
+            scr <- c(scr, split.screen(c(1, 2), scr[3]))
+        }
+        else
+            scr <- split.screen(c(2, 1))
 
         screen(scr[1])
         plotEIC(components, cmpi, fGroups, title = sprintf("Component %d", cmpi), rtWindow = EICRtWindow,
@@ -488,6 +495,16 @@ reportComponentSpectra <- function(fGroups, path, components, EICRtWindow, EICMz
         plotSpec(components, cmpi, main = sprintf("ret: %.1f; m/z: %.4f - %.4f",
                                                   cInfo$ret[cmpi], min(cTable[[cmpi]]$mz), max(cTable[[cmpi]]$mz)))
 
+        if (isHClust)
+        {
+            screen(scr[4])
+            plotInt(components, index = cmpi, main = "normalized")
+            
+            screen(scr[5])
+            fg <- fGroups[, unique(cTable[[cmpi]]$group)]
+            plotInt(fg, average = clProps$average, main = "absolute")
+        }
+        
         close.screen(scr)
 
         setTxtProgressBar(prog, cmpi)
@@ -495,51 +512,6 @@ reportComponentSpectra <- function(fGroups, path, components, EICRtWindow, EICMz
 
     dev.off()
     close(prog)
-}
-
-reportHClusterTable <- function(fGroups, path, cInfo, k)
-{
-    printf("Exporting hierarchical clustering table...")
-
-    ct <- cutree(cInfo@clust, k)
-    gInfo <- groupInfo(fGroups)
-
-    gTable <- setnames(as.data.table(gInfo), c("rts", "mzs"), c("ret", "mz"))
-    gTable[, group := rownames(gInfo)]
-    gTable[, cluster := ct[group]]
-
-    write.csv(gTable, file.path(path, "hcluster.csv"))
-}
-
-# UNDONE: eawag refs, call also from report?
-reportHCluster <- function(fGroups, path, cInfo, k, silInfo = NULL, clusterMaxLabels)
-{
-    printf("Exporting hierarchical clustering plots...")
-
-    out <- file.path(path, sprintf("%s-hcluster.pdf", class(fGroups)))
-    pdf(out, paper = "a4", pointsize = 10, width = 8, height = 11)
-
-    drawHeatMap(cInfo)
-
-    if (!is.null(silInfo))
-        plot(silInfo)
-
-    plot(cInfo, k, cex = 0.3,
-         labels = if (length(cInfo) <= clusterMaxLabels) NULL else FALSE)
-
-    if (!is.null(k))
-    {
-        par(mfrow = c(2, 2))
-        for (cl in seq_len(k))
-        {
-            plotInt(cInfo, k, cl, main = sprintf("Cluster %d - normalized", cl))
-            plotInt(hClusterFilter(fGroups, cInfo, k, cl), TRUE, main = sprintf("Cluster %d - absolute", cl))
-        }
-    }
-
-    dev.off()
-
-    printf("Done!\n")
 }
 
 #' @details \code{reportCSV} generates tabular data (\emph{i.e.} \file{.csv}
@@ -562,17 +534,16 @@ reportHCluster <- function(fGroups, path, cInfo, k, silInfo = NULL, clusterMaxLa
 setMethod("reportCSV", "featureGroups", function(fGroups, path, reportFGroupsAsRows, reportFGroupsAnalysisInfo,
                                                  reportFGroupsRetMz, reportFeatures,
                                                  formConsensus, compounds, compoundNormalizeScores,
-                                                 compsCluster, components, cInfo, clusterK, retMin, clearPath)
+                                                 compsCluster, components, retMin, clearPath)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertPathForOutput(path, overwrite = TRUE, add = ac)
     aapply(checkmate::assertFlag, . ~ reportFGroupsAsRows + reportFGroupsAnalysisInfo + reportFGroupsRetMz +
                reportFeatures + compoundNormalizeScores + retMin + clearPath,
            fixed = list(add = ac))
-    aapply(checkmate::assertClass, . ~ formConsensus + compounds + compsCluster + components + cInfo,
-           c("formulaConsensus", "compounds", "compoundsCluster", "components", "clusterInfo"),
+    aapply(checkmate::assertClass, . ~ formConsensus + compounds + compsCluster + components,
+           c("formulaConsensus", "compounds", "compoundsCluster", "components"),
            null.ok = TRUE, fixed = list(add = ac))
-    checkmate::assertCount(clusterK, positive = TRUE, null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
     prepareReportPath(path, clearPath)
@@ -598,10 +569,6 @@ setMethod("reportCSV", "featureGroups", function(fGroups, path, reportFGroupsAsR
 
     if (!is.null(components))
         reportComponentTable(components, path, retMin)
-
-    if (!is.null(cInfo))
-        reportHClusterTable(fGroups, path, cInfo, clusterK)
-
 })
 
 #' @details \code{reportPDF} will report graphical data (\emph{e.g.}
@@ -619,20 +586,17 @@ setMethod("reportCSV", "featureGroups", function(fGroups, path, reportFGroupsAsR
 setMethod("reportPDF", "featureGroups", function(fGroups, path, reportFGroups,
                                                  formConsensus, reportFormulaSpectra,
                                                  compounds, compoundNormalizeScores, compsCluster,
-                                                 components, cInfo, clusterK, silInfo, clusterMaxLabels,
-                                                 MSPeakLists, retMin, EICGrid, EICRtWindow, EICMzWindow,
-                                                 EICTopMost, EICOnlyPresent, clearPath)
+                                                 components, MSPeakLists, retMin, EICGrid, EICRtWindow,
+                                                 EICMzWindow, EICTopMost, EICOnlyPresent, clearPath)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertPathForOutput(path, overwrite = TRUE, add = ac)
     aapply(checkmate::assertFlag, . ~ reportFGroups + reportFormulaSpectra +
                compoundNormalizeScores + retMin + EICOnlyPresent + clearPath,
            fixed = list(add = ac))
-    aapply(checkmate::assertClass, . ~ formConsensus + compounds + compsCluster + components + cInfo + silInfo + MSPeakLists,
-           c("formulaConsensus", "compounds", "compoundsCluster", "components", "clusterInfo", "silhouetteInfo", "MSPeakLists"),
+    aapply(checkmate::assertClass, . ~ formConsensus + compounds + compsCluster + components + MSPeakLists,
+           c("formulaConsensus", "compounds", "compoundsCluster", "components", "MSPeakLists"),
            null.ok = TRUE, fixed = list(add = ac))
-    checkmate::assertCount(clusterK, positive = TRUE, null.ok = TRUE, add = ac)
-    checkmate::assertCount(clusterMaxLabels, add = ac)
     checkmate::assertIntegerish(EICGrid, lower = 1, any.missing = FALSE, len = 2, add = ac)
     aapply(checkmate::assertNumber, . ~ EICRtWindow + EICMzWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
     checkmate::assertCount(EICTopMost, positive = TRUE, null.ok = TRUE, add = ac)
@@ -684,14 +648,7 @@ setMethod("reportPDF", "featureGroups", function(fGroups, path, reportFGroups,
     }
     
     if (!is.null(components))
-        reportComponentSpectra(fGroups, path, components, EICRtWindow, EICMzWindow, retMin, EICs)
-
-    if (!is.null(cInfo))
-    {
-        if (is.null(clusterK))
-            stop("Please specify clusterK argument!")
-        reportHCluster(fGroups, path, cInfo, clusterK, silInfo, clusterMaxLabels)
-    }
+        reportComponentPlots(fGroups, path, components, EICRtWindow, EICMzWindow, retMin, EICs)
 })
 
 #' @details \code{reportMD} will report graphical data (\emph{e.g.}
@@ -727,8 +684,7 @@ setMethod("reportPDF", "featureGroups", function(fGroups, path, reportFGroups,
 setMethod("reportMD", "featureGroups", function(fGroups, path, reportChord, reportFGroups,
                                                 formConsensus, reportFormulaSpectra,
                                                 compounds, compoundNormalizeScores, compsCluster,
-                                                components, cInfo, clusterK, silInfo,
-                                                interactiveHeat, clusterMaxLabels, MSPeakLists, retMin,
+                                                components, interactiveHeat, MSPeakLists, retMin,
                                                 EICRtWindow, EICMzWindow, EICTopMost, EICOnlyPresent,
                                                 selfContained, optimizePng, maxProcAmount, clearPath)
 {
@@ -740,11 +696,9 @@ setMethod("reportMD", "featureGroups", function(fGroups, path, reportChord, repo
                compoundNormalizeScores + interactiveHeat + retMin + EICOnlyPresent +
                selfContained + optimizePng + clearPath,
            fixed = list(add = ac))
-    aapply(checkmate::assertClass, . ~ formConsensus + compounds + components + cInfo + silInfo + MSPeakLists,
-           c("formulaConsensus", "compounds", "components", "clusterInfo", "silhouetteInfo", "MSPeakLists"),
+    aapply(checkmate::assertClass, . ~ formConsensus + compounds + components + MSPeakLists,
+           c("formulaConsensus", "compounds", "components", "MSPeakLists"),
            null.ok = TRUE, fixed = list(add = ac))
-    checkmate::assertCount(clusterK, positive = TRUE, null.ok = TRUE, add = ac)
-    checkmate::assertCount(clusterMaxLabels, add = ac)
     aapply(checkmate::assertNumber, . ~ EICRtWindow + EICMzWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
     checkmate::assertCount(EICTopMost, positive = TRUE, null.ok = TRUE, add = ac)
     checkmate::assertCount(maxProcAmount, positive = TRUE, add = ac)
@@ -788,8 +742,7 @@ setMethod("reportMD", "featureGroups", function(fGroups, path, reportChord, repo
                     retMin = retMin, EICTopMost = EICTopMost, EICOnlyPresent = EICOnlyPresent, EICs = EICs,
                     compounds = compounds, compsCluster = compsCluster, MSPeakLists = MSPeakLists,
                     formConsensus = formConsensus, compoundNormalizeScores = compoundNormalizeScores,
-                    components = components, cInfo = cInfo, clusterK = clusterK, silInfo = silInfo,
-                    interactiveHeat = interactiveHeat, clusterMaxLabels = clusterMaxLabels, selfContained = selfContained,
+                    components = components, interactiveHeat = interactiveHeat, selfContained = selfContained,
                     optimizePng = optimizePng, maxProcAmount = maxProcAmount)
 
     # HACK: not sure what exactly happens here, but... kableExtra adds latex

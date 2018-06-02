@@ -16,11 +16,9 @@ Release:
 - filter formulas, compounds etc on (remaining) feature groups
 - filterBy generic for formulas, components, compounds
 - filter method for components
-- hclust and mass defect components
+- mass defect components
 - fix compoundViewer
 - getMCS for compounds
 - names() for compounds/compounds clusters etc?
 - drawHeatMap --> plotHeatMap
-- vdiffr plots for intensity components
-- update report functions for intensity components
 - int hclust refs

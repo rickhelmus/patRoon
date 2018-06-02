@@ -4,28 +4,48 @@ cInfo <- componentInfo(rmdVars$components)
 cNames <- names(rmdVars$components)
 cCount <- length(rmdVars$components)
 
-message("Plotting component spectra...")
+message("Plotting components...")
 prog <- txtProgressBar(0, length(rmdVars$components), style = 3, file = stderr())
 allPlots <- vector("character", length(rmdVars$components) * 2)
 curPlotInd <- 0
 plotPath <- getPlotPath()
 
+# HACK: this should be replaced some proper inheritance/methods at some point
+isHClust <- inherits(rmdVars$components, "componentsIntClust")
+
+if (isHClust)
+    clProps <- clusterProperties(rmdVars$components)
+
 for (ci in seq_len(length(rmdVars$components)))
 {
     curPlotInd <- curPlotInd + 1
     allPlots[curPlotInd] <- file.path(plotPath, sprintf("component_spec_%d.png", ci))
-    makePlot(allPlots[curPlotInd], 6, 5, plotSpec(rmdVars$components, ci,
+    makePlot(allPlots[curPlotInd], 8, 6, plotSpec(rmdVars$components, ci,
                                    main = sprintf("ret: %.1f; m/z: %.4f - %.4f",
                                                   cInfo$ret[ci], min(cTable[[ci]]$mz), max(cTable[[ci]]$mz))))
 
     curPlotInd <- curPlotInd + 1
     allPlots[curPlotInd] <- file.path(plotPath, sprintf("component_eic_%d.png", ci))
-    makePlot(allPlots[curPlotInd], 6, 5,
+    makePlot(allPlots[curPlotInd], 8, 6,
              plotEIC(rmdVars$components, ci, rmdVars$fGroups,
                      rtWindow = rmdVars$EICRtWindow,
                      mzWindow = rmdVars$EICMzWindow, retMin = rmdVars$retMin,
                      EICs = rmdVars$EICs))
-             
+    
+    if (isHClust)
+    {
+        curPlotInd <- curPlotInd + 1
+        allPlots[curPlotInd] <- file.path(plotPath, sprintf("component_int_norm_%d.png", ci))
+        makePlot(allPlots[curPlotInd], 3.3, 3.3,
+                 plotInt(rmdVars$components, index = ci, main = "normalized"))
+        
+        curPlotInd <- curPlotInd + 1
+        allPlots[curPlotInd] <- file.path(plotPath, sprintf("component_int_abs_%d.png", ci))
+        fg <- fGroups[, unique(cTable[[ci]]$group)]
+        makePlot(allPlots[curPlotInd], 3.3, 3.3,
+                 plotInt(fg, average = clProps$average, main = "absolute"))
+    }
+    
     setTxtProgressBar(prog, ci)
 }
 
@@ -48,7 +68,12 @@ message("Generating component layout...")
 prog <- txtProgressBar(0, pageCount, style = 3, file = stderr())
 
 rmdTexts <- vector("character", length = pageCount)
-compTempl <- readAllFile(system.file("templates", "components-spectra.Rmd", package = "patRoon"))
+if (isHClust)
+{
+    compTempl <- readAllFile(system.file("templates", "components-intclust.Rmd", package = "patRoon"))
+} else
+    compTempl <- readAllFile(system.file("templates", "components-spectra.Rmd", package = "patRoon"))
+
 for (page in seq_len(pageCount))
 {
     cmpStart <- cmpsPerPage * (page - 1) + 1
@@ -70,10 +95,31 @@ Components { data-orientation=rows }
 "
     }
     
+    if (isHClust)
+    {
+        rmdTexts[page] <- paste(rmdTexts[page], knitr::knit(text = glue::glue("
+##
+
+### heatmap
+
+{ ticks } {{r fig.width=6, fig.height=5}}
+drawHeatMap(components, interactive = { inter })
+{ ticks }
+
+### dendrogram
+
+{ ticks } {{r fig.width=6, fig.height=5}}
+plot(components)
+{ ticks }
+
+", ticks = "```", inter = as.character(rmdVars$interactiveHeat))), sep = "\n")
+    }
+
     # all components of this page
     rmdTexts[page] <- paste(rmdTexts[page], knitr::knit(text = paste0(glue::glue(compTempl,
                                                                                  ci = seq(cmpStart, cmpEnd),
-                                                                                 plotPath = plotPath),
+                                                                                 plotPath = plotPath,
+                                                                                 doInt = isHClust),
                                                                       collapse = "\n")),
                             sep = "\n")
     setTxtProgressBar(prog, page)

@@ -1,0 +1,24 @@
+##
+
+### meta 
+
+```{{r}}
+knitr::kable(cTable[[{ ci }]], "html") %>% kableExtra::kable_styling(bootstrap_options = "striped", font_size = 11) %>%
+    kableExtra::scroll_box() # width = "310px", height = "480px" {{ data-width=320 }}
+```
+
+##
+
+### { cNames[ci] }
+
+![]({ plotPath }/component_spec_{ ci }.png)
+
+### EICs
+
+![]({ plotPath }/component_eic_{ ci }.png)
+
+### intensities {{ data-width=180 }}
+
+![]({ plotPath }/component_int_norm_{ ci }.png)
+![]({ plotPath }/component_int_abs_{ ci }.png)
+

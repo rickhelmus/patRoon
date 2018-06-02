@@ -82,7 +82,7 @@ test_that("plotting works", {
     expect_doppel("eic-component", function() plotEIC(compsRC, 1, fGroups))
     
     expect_plot(plot(compsInt))
-    expect_doppel("component-ic-int", function() plotInt(compsInt, cluster = 1))
+    expect_doppel("component-ic-int", function() plotInt(compsInt, index = 1))
     expect_doppel("component-ic-sil", function() plotSilhouettes(compsInt, 2:6))
     expect_doppel("component-ic-heat", function() drawHeatMap(compsInt, interactive = FALSE))
 })

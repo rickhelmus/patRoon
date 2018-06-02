@@ -8,7 +8,8 @@ genIntComponents <- function(cutClusters, gInfo)
     comps <- lapply(clinds, function(ci)
     {
         gNames <- rownames(gInfo)[cutClusters == ci]
-        return(data.table(group = gNames, ret = gInfo[gNames, "rts"], mz = gInfo[gNames, "mzs"]))
+        return(data.table(group = gNames, ret = gInfo[gNames, "rts"], mz = gInfo[gNames, "mzs"],
+                          intensity = 1))
     })
     names(comps) <- paste0("CMP", seq_along(clinds))
     return(comps)
@@ -49,6 +50,9 @@ genIntComponentInfo <- function(cutClusters)
 #'
 #' @seealso \code{\link{components}} and \link{component-generation}
 #'
+#' @note The intensity values for components (used by \code{plotSpec}) are set
+#'   to a dummy value (1) as no single intensity value exists for this kind of
+#'   components.
 #' @export
 componentsIntClust <- setClass("componentsIntClust",
                                slots = c(clusterm = "matrix", distm = "dissimilarity", clust = "hclust",
@@ -147,13 +151,13 @@ setMethod("drawHeatMap", "componentsIntClust", function(obj, col, interactive, .
 
 #' @describeIn componentsIntClust makes a plot for all (normalized) intensity
 #'   profiles of the feature groups within a given cluster.
-#' @param cluster Numeric cluster index.
+#' @param index Numeric component/cluster index.
 #' @export
-setMethod("plotInt", "componentsIntClust", function(obj, cluster, ...)
+setMethod("plotInt", "componentsIntClust", function(obj, index, ...)
 {
-    checkmate::assertInt(cluster, lower = 1, upper = length(obj@cutClusters), null.ok = TRUE)
+    checkmate::assertInt(index, lower = 1, upper = length(obj@cutClusters), null.ok = TRUE)
     
-    plotm <- obj@clusterm[rownames(obj@clusterm) %in% rownames(obj@gInfo)[obj@cutClusters == cluster], ]
+    plotm <- obj@clusterm[rownames(obj@clusterm) %in% rownames(obj@gInfo)[obj@cutClusters == index], ]
     nsamp <- ncol(plotm)
     
     plot(x = c(0, nsamp), y = c(0, max(plotm)), type = "n", xlab = "", ylab = "normalized intensity", xaxt = "n", ...)

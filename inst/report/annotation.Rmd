@@ -214,6 +214,7 @@ for (grpi in seq_along(plotGroups))
 }
 
 rmdText <- paste0(rmdTexts, collapse = "\n")
+cat(rmdText)
 close(prog)
 ```
 

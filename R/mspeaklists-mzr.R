@@ -54,9 +54,10 @@ generateMzRPeakLists <- function(fGroups, avgMzWindow = 0.001, maxRtMSWidth = NU
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
-    aapply(checkmate::assertNumber, . ~ avgMzWindow + avgMinIntensity + precursorMzWindow,
+    aapply(checkmate::assertNumber, . ~ avgMzWindow + avgMinIntensity,
            lower = 0, finite = TRUE, fixed = list(add = ac))
     checkmate::assertNumber(maxRtMSWidth, lower = 1, finite = TRUE, null.ok = TRUE, add = ac)
+    checkmate::assertNumber(precursorMzWindow, lower = 0, finite = TRUE, null.ok = TRUE, add = ac)
     checkmate::assertCount(avgTopPeaks, positive = TRUE, add = ac)
     checkmate::assertFunction(avgMassFun, add = ac)
     checkmate::assertChoice(avgMethod, c("distance", "hclust"), add = ac)

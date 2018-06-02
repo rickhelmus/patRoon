@@ -4,14 +4,16 @@ hasMetfrag <- !is.null(getOption("patRoon.path.metFragCL")) && nzchar(getOption(
 
 if (hasMetfrag)
 {
-    fGroups <- getTestFGroups(getTestAnaInfo()[4, ])[, 1:25]
+    fGroups <- getTestFGroups(getTestAnaInfo()[4, ])
+    fGroups <- groupFeaturesScreening(fGroups, screenTargets(fGroups, patRoonData::targets))[1:5]
     plists <- generateMSPeakLists(fGroups, "mzr")
-    compounds <- generateCompounds(fGroups, plists, "metfrag", logPath = NULL,
-                                   adduct = 1, isPositive = TRUE)
-    
+    compounds <- generateCompounds(fGroups, plists, "metfrag", adduct = 1, isPositive = TRUE,
+                                   database = "LocalCSV", scoreTypes = "FragmenterScore",
+                                   extraOpts = list(LocalDatabasePath = file.path(getTestDataPath(), "test-mf-db-isomers.csv")),
+                                   logPath = NULL)
     compsClust <- makeHCluster(compounds)
     firstGroup <- names(clusters(compsClust))[1]
-
+    
     compsEmpty <- filter(compounds, minFragScore = 1E4)
     compsClustEmpty <- makeHCluster(compsEmpty)
 }
@@ -31,7 +33,7 @@ test_that("verify compound cluster generation", {
 test_that("override cutting clusters work", {
     skip_if_not(hasMetfrag)
     
-    expect_equivalent(lengths(treeCut(compsClust, k = 5, groupName = firstGroup))[1], 5)
+    expect_equivalent(lengths(treeCut(compsClust, k = 2, groupName = firstGroup))[1], 2)
     expect_equal(treeCutDynamic(compsClust, groupName = firstGroup), compsClust)
 })
 

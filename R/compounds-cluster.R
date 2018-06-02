@@ -292,7 +292,8 @@ setMethod("makeHCluster", "compounds", function(obj, method, fpType = "extended"
         return(hc)
     })
     
-    clust <- clust[!sapply(clust, is.null)]
+    hasClust <- !sapply(clust, is.null)
+    clust <- clust[hasClust]
     
     setTxtProgressBar(prog, length(obj))
     close(prog)
@@ -310,10 +311,11 @@ setMethod("makeHCluster", "compounds", function(obj, method, fpType = "extended"
     setTxtProgressBar(prog, length(clust))
     close(prog)
     
-    names(clust) <- names(compTable)
-    names(cutClusters) <- names(compTable)
+    gNames <- names(compTable)[hasClust]
+    names(clust) <- gNames
+    names(cutClusters) <- gNames
     
-    ret <- compoundsCluster(clusters = clust, SMILES = sapply(compTable, "[[", "SMILES"),
+    ret <- compoundsCluster(clusters = clust, SMILES = sapply(compTable, "[[", "SMILES", simplify = FALSE),
                             cutClusters = cutClusters,
                             properties = list(method = method, fpType = fpType,
                                               fpSimMethod = fpSimMethod))

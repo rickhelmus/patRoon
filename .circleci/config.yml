@@ -66,6 +66,6 @@ jobs:
                     if [ "${CIRCLE_BRANCH}" == "master" ]; then
                         echo "$DH_PASS" | docker login -u "$DH_USER" --password-stdin
                         git_sha="$(git rev-parse --short HEAD)"
-                        docker tag "TMP_IMAGE_NAME" "${IMAGE_NAME}:${git_sha}-master-failed"
+                        docker tag "${TMP_IMAGE_NAME}" "${IMAGE_NAME}:${git_sha}-master-failed"
                         docker push "${IMAGE_NAME}:${git_sha}-master-failed"
                     fi

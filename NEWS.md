@@ -1,6 +1,7 @@
 # patRoon 0.1.0.9000
 
 ## June 2018
+* Added mz and chromatographic peak width range options to filter() method for feature groups.
 * Moved intensity clustering code (makeHCluster) to new component type (see componentsIntClust class documentation).
 
 

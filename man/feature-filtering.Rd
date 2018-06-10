@@ -12,8 +12,9 @@
   relAbundance = NULL, absAbundance = NULL,
   interRelRGroupAbundance = NULL, interAbsRGroupAbundance = NULL,
   intraRGroupAbundance = NULL, minBlankThreshold = NULL,
-  retentionRange = NULL, rGroups = NULL, formConsensus = NULL,
-  compounds = NULL, repetitions = 2, negate = FALSE)
+  retentionRange = NULL, mzRange = NULL, chromWidthRange = NULL,
+  rGroups = NULL, formConsensus = NULL, compounds = NULL,
+  repetitions = 2, negate = FALSE)
 
 \S4method{replicateGroupSubtract}{featureGroups}(fGroups, rGroups,
   threshold = 0)
@@ -34,9 +35,11 @@ analyses (see \link[=analysis-information]{analysis info}) are filtered out
 unless their relative intensity is above this threshold. Set to \code{NULL}
 to skip this step.}
 
-\item{retentionRange}{Retention time range (in seconds). Should be a numeric
-vector with length of two containing the min/max values. If the max value
-is set to a value below 0 then no maximum retention is assumed. Set to
+\item{retentionRange, mzRange, chromWidthRange}{Range of retention time (in
+seconds), \emph{m/z} or chromatographic peak width (in seconds),
+respectively. Features outside this range will be removed. Should be a
+numeric vector with length of two containing the min/max values. If the max
+value is set to a value below 0 then no maximum is assumed. Set to
 \code{NULL} to skip this step.}
 
 \item{rGroups}{A character vector of replicate groups that should be kept

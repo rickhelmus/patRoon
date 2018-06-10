@@ -14,7 +14,7 @@ Release:
 - fillPeaks for CAMERA (and RAMClustR?)
 - mzR precursor window in newProject()
 - filter formulas, compounds etc on (remaining) feature groups
-- filterBy generic for formulas, components, compounds
+- filterBy generic for formulas, components, compounds, peaklists
 - filter method for components
 - mass defect components
 - fix compoundViewer

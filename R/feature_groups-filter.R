@@ -162,22 +162,49 @@ intraReplicateFilter <- function(fGroups, threshold, negate = FALSE)
     }))
 }
 
-retentionFilter <- function(fGroups, range, negate = FALSE)
+retentionMzFilter <- function(fGroups, range, negate, doRet)
 {
-    return(doFilter(fGroups, "retention", c(range, negate), function(fGroups)
+    return(doFilter(fGroups, if (doRet) "retention" else "mz", c(range, negate), function(fGroups)
     {
         if (range[2] < 0)
             pred <- function(x) x >= range[1]
         else
-        {
-            stopifnot(range[1] < range[2])
             pred <- function(x) x >= range[1] & x <= range[2]
-        }
 
         if (negate)
             pred <- Negate(pred)
 
-        return(fGroups[, pred(fGroups@groupInfo$rts)])
+        return(fGroups[, pred(if (doRet) fGroups@groupInfo$rts else fGroups@groupInfo$mzs)])
+    }))
+}
+
+chromWidthFilter <- function(fGroups, range, negate)
+{
+    ftindex <- groupFeatIndex(fGroups)
+    fTable <- featureTable(fGroups)
+    anaInfo <- analysisInfo(fGroups)
+    gNames <- names(fGroups)
+    
+    return(doFilter(fGroups, "chromwidth", c(range, negate), function(fGroups)
+    {
+        pred <- function(finds)
+        {
+            cwidths <- sapply(seq_along(finds), function(i)
+            {
+                if (finds[i] == 0)
+                    0
+                else
+                    diff(unlist(fTable[[anaInfo$analysis[i]]][finds[i], c("retmin", "retmax")]))
+            }, USE.NAMES = FALSE)
+            return(cwidths >= range[1] & (range[2] < 0 | cwidths <= range[2]))
+        }
+        
+        if (negate)
+            pred <- Negate(pred)
+        
+        fGroups@groups[, (gNames) := lapply(seq_along(.SD), function(n) ifelse(pred(ftindex[[n]]), .SD[[n]], 0))]
+    
+        return(updateFeatIndex(removeEmptyGroups(fGroups)))
     }))
 }
 
@@ -238,9 +265,11 @@ compoundFilter <- function(fGroups, compounds, negate = FALSE, verbose = TRUE)
 #'   analyses (see \link[=analysis-information]{analysis info}) are filtered out
 #'   unless their relative intensity is above this threshold. Set to \code{NULL}
 #'   to skip this step.
-#' @param retentionRange Retention time range (in seconds). Should be a numeric
-#'   vector with length of two containing the min/max values. If the max value
-#'   is set to a value below 0 then no maximum retention is assumed. Set to
+#' @param retentionRange,mzRange,chromWidthRange Range of retention time (in
+#'   seconds), \emph{m/z} or chromatographic peak width (in seconds),
+#'   respectively. Features outside this range will be removed. Should be a
+#'   numeric vector with length of two containing the min/max values. If the max
+#'   value is set to a value below 0 then no maximum is assumed. Set to
 #'   \code{NULL} to skip this step.
 #' @param formConsensus,compounds Only keep feature groups which have results in
 #'   the given \code{\link{formulaConsensus}} and \code{\link{compounds}}
@@ -256,7 +285,8 @@ compoundFilter <- function(fGroups, compounds, negate = FALSE, verbose = TRUE)
 setMethod("filter", "featureGroups", function(obj, intensityThreshold = NULL, relAbundance = NULL,
                                               absAbundance = NULL, interRelRGroupAbundance = NULL,
                                               interAbsRGroupAbundance = NULL, intraRGroupAbundance = NULL,
-                                              minBlankThreshold = NULL, retentionRange = NULL, rGroups = NULL,
+                                              minBlankThreshold = NULL, retentionRange = NULL, mzRange = NULL,
+                                              chromWidthRange = NULL, rGroups = NULL,
                                               formConsensus = NULL, compounds = NULL,
                                               repetitions = 2, negate = FALSE)
 {
@@ -265,7 +295,7 @@ setMethod("filter", "featureGroups", function(obj, intensityThreshold = NULL, re
                interRelRGroupAbundance + interAbsRGroupAbundance + intraRGroupAbundance +
                minBlankThreshold,
            lower = 0, finite = TRUE, null.ok = TRUE, fixed = list(add = ac))
-    checkmate::assertNumeric(retentionRange, any.missing = FALSE, finite = TRUE, len = 2, null.ok = TRUE, add = ac)
+    aapply(assertRange, . ~ retentionRange + mzRange + chromWidthRange, null.ok = TRUE, fixed = list(add = ac))
     checkmate::assertCharacter(rGroups, min.chars = 1, min.len = 1, any.missing = FALSE, null.ok = TRUE, add = ac)
     checkmate::assertClass(formConsensus, "formulaConsensus", null.ok = TRUE, add = ac)
     checkmate::assertClass(compounds, "compounds", null.ok = TRUE, add = ac)
@@ -280,8 +310,14 @@ setMethod("filter", "featureGroups", function(obj, intensityThreshold = NULL, re
         obj <- intensityFilter(obj, intensityThreshold)
 
     if (!is.null(retentionRange))
-        obj <- retentionFilter(obj, retentionRange, negate)
+        obj <- retentionMzFilter(obj, retentionRange, negate, doRet = TRUE)
 
+    if (!is.null(mzRange))
+        obj <- retentionMzFilter(obj, mzRange, negate, doRet = FALSE)
+
+    if (!is.null(chromWidthRange))
+        obj <- chromWidthFilter(obj, chromWidthRange, negate)
+    
     if (!is.null(rGroups))
         obj <- replicateGroupFilter(obj, rGroups, negate)
 

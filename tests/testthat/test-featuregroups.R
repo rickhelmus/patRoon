@@ -80,8 +80,14 @@ minInt <- function(fg)
 
 test_that("basic filtering", {
     expect_gte(minInt(filter(fgOpenMS, intensityThreshold = 500)), 500)
+    
     expect_range(groupInfo(filter(fgOpenMS, retentionRange = c(120, 200)))$rts, range(120, 200))
     expect_equivalent(filter(fgOpenMS, retentionRange = c(0, -1)), fgOpenMS)
+    expect_range(groupInfo(filter(fgOpenMS, mzRange = c(200, 300)))$mzs, range(200, 300))
+    expect_equivalent(filter(fgOpenMS, mzRange = c(0, -1)), fgOpenMS)
+    expect_lt(length(filter(fgOpenMS, chromWidthRange = c(0, 30))), length(fgOpenMS))
+    expect_equivalent(filter(fgOpenMS, chromWidthRange = c(0, -1)), fgOpenMS)
+    
     expect_identical(unique(analysisInfo(filter(fgOpenMS, rGroups = "standard"))$group), "standard")
     expect_known_output(filter(fgOpenMS, relAbundance = 0.5), testFile("fgf-relabu", text = TRUE))
     expect_known_output(filter(fgOpenMS, absAbundance = 3), testFile("fgf-absabu", text = TRUE))

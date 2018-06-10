@@ -472,7 +472,7 @@ reportComponentPlots <- function(fGroups, path, components, EICRtWindow, EICMzWi
     
     if (isHClust)
     {
-        drawHeatMap(components, interactive = FALSE)
+        plotHeatMap(components, interactive = FALSE)
         plot(components)
         clProps <- clusterProperties(components)
     }

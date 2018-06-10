@@ -103,7 +103,7 @@ Components { data-orientation=rows }
 ### heatmap
 
 { ticks } {{r fig.width=6, fig.height=5}}
-drawHeatMap(components, interactive = { inter })
+plotHeatMap(components, interactive = { inter })
 { ticks }
 
 ### dendrogram

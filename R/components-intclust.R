@@ -45,7 +45,7 @@ genIntComponentInfo <- function(cutClusters)
 #'
 #' @param x,obj A \code{componentsIntClust} object.
 #' @param \dots Further options passed to \code{\link{heatmap}} /
-#'   \code{\link{d3heatmap}} (\code{drawHeatMap}), \code{\link{plot.dendrogram}}
+#'   \code{\link{d3heatmap}} (\code{plotHeatMap}), \code{\link{plot.dendrogram}}
 #'   (\code{plot}) or \code{\link[graphics]{plot}} (\code{plotInt}).
 #'
 #' @references \insertRef{Scholle2018}{patRoon}
@@ -130,11 +130,11 @@ setMethod("treeCutDynamic", "componentsIntClust", function(obj, maxTreeHeight, d
 #'   \code{\link{heatmap}} or \code{\link{d3heatmap}} function.
 #' @param interactive If \code{TRUE} an interactive heatmap will be drawn (with
 #'   \code{\link{d3heatmap}}).
-#' @return \code{drawHeatMap} returns the same as \code{\link{heatmap}} or
+#' @return \code{plotHeatMap} returns the same as \code{\link{heatmap}} or
 #'   \code{\link{d3heatmap}}.
-#' @aliases drawHeatMap
+#' @aliases plotHeatMap
 #' @export
-setMethod("drawHeatMap", "componentsIntClust", function(obj, col, interactive, ...)
+setMethod("plotHeatMap", "componentsIntClust", function(obj, col, interactive, ...)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertCharacter(col, min.chars = 1, any.missing = FALSE, add = ac)

@@ -20,4 +20,3 @@ Release:
 - fix compoundViewer
 - getMCS for compounds
 - names() for compounds/compounds clusters etc?
-- drawHeatMap --> plotHeatMap

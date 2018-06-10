@@ -84,5 +84,5 @@ test_that("plotting works", {
     expect_plot(plot(compsInt))
     expect_doppel("component-ic-int", function() plotInt(compsInt, index = 1))
     expect_doppel("component-ic-sil", function() plotSilhouettes(compsInt, 2:6))
-    expect_doppel("component-ic-heat", function() drawHeatMap(compsInt, interactive = FALSE))
+    expect_doppel("component-ic-heat", function() plotHeatMap(compsInt, interactive = FALSE))
 })

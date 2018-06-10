@@ -71,8 +71,8 @@ setGeneric("plotScores", function(obj, index, groupName, normalizeScores = TRUE,
 setGeneric("makeHCluster", function(obj, method = "complete", ...) standardGeneric("makeHCluster"))
 setGeneric("getMCS", function(obj, groupName, cluster) standardGeneric("getMCS"))
 
-setGeneric("drawHeatMap", function(obj, col = colorRampPalette(c("black", "yellow"))(100),
-                                   interactive = FALSE, ...) standardGeneric("drawHeatMap"))
+setGeneric("plotHeatMap", function(obj, col = colorRampPalette(c("black", "yellow"))(100),
+                                   interactive = FALSE, ...) standardGeneric("plotHeatMap"))
 setGeneric("plotSilhouettes", function(obj, kSeq, ...) standardGeneric("plotSilhouettes"))
 
 ### target screening

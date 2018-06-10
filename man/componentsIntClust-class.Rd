@@ -9,8 +9,8 @@
 \alias{clusterProperties,componentsIntClust-method}
 \alias{treeCut,componentsIntClust-method}
 \alias{treeCutDynamic,componentsIntClust-method}
-\alias{drawHeatMap,componentsIntClust-method}
-\alias{drawHeatMap}
+\alias{plotHeatMap,componentsIntClust-method}
+\alias{plotHeatMap}
 \alias{plotInt,componentsIntClust-method}
 \alias{plot,componentsIntClust,ANY-method}
 \alias{plotSilhouettes,componentsIntClust-method}
@@ -28,7 +28,7 @@
 \S4method{treeCutDynamic}{componentsIntClust}(obj, maxTreeHeight, deepSplit,
   minModuleSize)
 
-\S4method{drawHeatMap}{componentsIntClust}(obj,
+\S4method{plotHeatMap}{componentsIntClust}(obj,
   col = colorRampPalette(c("black", "yellow"))(100), interactive = FALSE,
   ...)
 
@@ -51,7 +51,7 @@ Analogous to \code{\link{cutree}}.}
 \code{\link{d3heatmap}}).}
 
 \item{\dots}{Further options passed to \code{\link{heatmap}} /
-\code{\link{d3heatmap}} (\code{drawHeatMap}), \code{\link{plot.dendrogram}}
+\code{\link{d3heatmap}} (\code{plotHeatMap}), \code{\link{plot.dendrogram}}
 (\code{plot}) or \code{\link[graphics]{plot}} (\code{plotInt}).}
 
 \item{index}{Numeric component/cluster index.}
@@ -69,7 +69,7 @@ average silhouette width calculation.}
 \item{\dots}{Any arguments directly given to \code{\link{plot.dendrogram}}.}
 }
 \value{
-\code{drawHeatMap} returns the same as \code{\link{heatmap}} or
+\code{plotHeatMap} returns the same as \code{\link{heatmap}} or
   \code{\link{d3heatmap}}.
 }
 \description{
@@ -99,7 +99,7 @@ clustering was performed.
 the \code{\link{cutreeDynamicTree}} function from
 \pkg{\link{dynamicTreeCut}}.
 
-\item \code{drawHeatMap}: draws a heatmap using the
+\item \code{plotHeatMap}: draws a heatmap using the
 \code{\link{heatmap}} or \code{\link{d3heatmap}} function.
 
 \item \code{plotInt}: makes a plot for all (normalized) intensity

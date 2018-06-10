@@ -6,7 +6,7 @@ Hierarchical cluster {data-orientation=rows}
 ### Heatmap
 
 ```{r fig.width=10, fig.height=5}
-drawHeatMap(rmdVars$cInfo, interactive = rmdVars$interactiveHeat)
+plotHeatMap(rmdVars$cInfo, interactive = rmdVars$interactiveHeat)
 ```
 
 ##

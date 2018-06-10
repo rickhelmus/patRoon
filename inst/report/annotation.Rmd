@@ -14,7 +14,7 @@ Annotation {data-orientation=rows}
 ### feature groups
 
 ```{r echo=FALSE}
-showButton <- function(jsFunc, arg1, arg2) sprintf("<button onclick=\"%s('%s', '%s');\" style=\"padding: 0px 3px 0px 3px\">show</button>", jsFunc, arg1, arg2)
+showButton <- function(title, jsFunc, arg1, arg2) sprintf("<button onclick=\"%s('%s', '%s');\" style=\"padding: 0px 3px 0px 3px\">%s</button>", jsFunc, arg1, arg2, title)
 
 compFGroups <- compsClustFGroups <- formFGroups <- componentFGroups <- character()
 if (!is.null(rmdVars$compounds))
@@ -46,22 +46,28 @@ allGroups <- unique(c(plotGroups, componentFGroups))
 fGroupsSpecDT <- data.table(group = allGroups, rt = round(rmdVars$gInfo[allGroups, "rts"], 2),
                             mz = round(rmdVars$gInfo[allGroups, "mzs"], 5))
 
-if (length(compFGroups))
-    fGroupsSpecDT[group %in% compFGroups, compound := showButton("showAnnotation", match(group, allGroups), "comp")]
-if (length(compsClustFGroups))
-    fGroupsSpecDT[group %in% compsClustFGroups, compoundsCluster := showButton("showAnnotation",
-                                                                               match(group, allGroups), "compscl")]
-if (length(formFGroups))
-    fGroupsSpecDT[group %in% formFGroups, formula := showButton("showAnnotation", match(group, allGroups), "form")]
-if (length(componentFGroups))
+maybeAddButton <- function(grpi, subGroups, ...) if (allGroups[grpi] %in% subGroups) showButton(...) else "-"
+
+compButtons <- sapply(seq_along(allGroups), function(gi) maybeAddButton(gi, compFGroups, "compounds", "showAnnotation", gi, "comp"))
+compCLButtons <- sapply(seq_along(allGroups),function(gi) maybeAddButton(gi, compsClustFGroups,
+                                                                         "compounds clust", "showAnnotation",
+                                                                         gi, "compscl"))
+formButtons <- sapply(seq_along(allGroups), function(gi) maybeAddButton(gi, formFGroups, "formulas",
+                                                                        "showAnnotation", gi, "form"))
+componButtons <- sapply(seq_along(allGroups), function(gi)
 {
-    fGroupsSpecDT[group %in% componentFGroups, component := sapply(group, function(grp)
-    {
-        cmpIds <- findFGroup(rmdVars$components, grp)
-        cmpNames <- tolower(names(rmdVars$components)[cmpIds]) # NOTE: headings are automatically made lowercase
-        showButton("showComponentSpec", cmpNames[1], "feature-groups") # UNDONE: multiple indices
-    })]
-}
+    
+    cmpIds <- findFGroup(rmdVars$components, allGroups[gi])
+    # UNDONE: multiple indices
+    cmpNames <- tolower(names(rmdVars$components)[cmpIds]) # NOTE: headings are automatically made lowercase
+    maybeAddButton(gi, componentFGroups, "components", "showComponentSpec", cmpNames[1], "feature-groups")
+})
+
+sp <- paste0(rep("&nbsp;", 4), collapse = "")
+buttons <- paste(compButtons, compCLButtons, formButtons, componButtons, sep = sp)
+buttons <- gsub("\\-(&nbsp;)*", "", buttons) # remove placeholder (-) with accompanying spaces
+fGroupsSpecDT[, show := buttons]
+
 
 DT::datatable(fGroupsSpecDT, options = list(paging = FALSE, scrollY = "200px"), escape = FALSE)
 ```

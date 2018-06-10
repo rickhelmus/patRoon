@@ -32,7 +32,7 @@
   col = colorRampPalette(c("black", "yellow"))(100), interactive = FALSE,
   ...)
 
-\S4method{plotInt}{componentsIntClust}(obj, cluster, ...)
+\S4method{plotInt}{componentsIntClust}(obj, index, ...)
 
 \S4method{plot}{componentsIntClust,ANY}(x, pal = "Paired",
   numericLabels = TRUE, ...)
@@ -54,7 +54,7 @@ Analogous to \code{\link{cutree}}.}
 \code{\link{d3heatmap}} (\code{drawHeatMap}), \code{\link{plot.dendrogram}}
 (\code{plot}) or \code{\link[graphics]{plot}} (\code{plotInt}).}
 
-\item{cluster}{Numeric cluster index.}
+\item{index}{Numeric component/cluster index.}
 
 \item{x, obj}{A \code{componentsIntClust} object.}
 
@@ -129,10 +129,21 @@ was used for clustering.}
 \item{\code{cutClusters}}{A \code{list} with assigned clusters (same format as what
 \code{\link{cutree}} returns).}
 
+\item{\code{gInfo}}{The \code{\link{groupInfo}} of the feature groups object that was
+used.}
+
 \item{\code{properties}}{A list containing general properties and parameters used for
 clustering.}
 }}
 
+\note{
+The intensity values for components (used by \code{plotSpec}) are set
+  to a dummy value (1) as no single intensity value exists for this kind of
+  components.
+}
+\references{
+\insertRef{Scholle2018}{patRoon}
+}
 \seealso{
 \code{\link{components}} and \link{component-generation}
 }

@@ -21,4 +21,3 @@ Release:
 - getMCS for compounds
 - names() for compounds/compounds clusters etc?
 - drawHeatMap --> plotHeatMap
-- int hclust refs

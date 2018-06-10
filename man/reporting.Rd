@@ -15,27 +15,23 @@
   reportFGroupsAsRows = TRUE, reportFGroupsAnalysisInfo = TRUE,
   reportFGroupsRetMz = TRUE, reportFeatures = FALSE, formConsensus = NULL,
   compounds = NULL, compoundNormalizeScores = TRUE, compsCluster = NULL,
-  components = NULL, cInfo = NULL, clusterK = NULL, retMin = TRUE,
-  clearPath = FALSE)
+  components = NULL, retMin = TRUE, clearPath = FALSE)
 
 \S4method{reportPDF}{featureGroups}(fGroups, path = "report",
   reportFGroups = TRUE, formConsensus = NULL, reportFormulaSpectra = TRUE,
   compounds = NULL, compoundNormalizeScores = TRUE, compsCluster = NULL,
-  components = NULL, cInfo = NULL, clusterK = NULL, silInfo = NULL,
-  clusterMaxLabels = 250, MSPeakLists = NULL, retMin = TRUE,
-  EICGrid = c(2, 1), EICRtWindow = 20, EICMzWindow = 0.005,
-  EICTopMost = NULL, EICOnlyPresent = TRUE, clearPath = FALSE)
+  components = NULL, MSPeakLists = NULL, retMin = TRUE, EICGrid = c(2,
+  1), EICRtWindow = 20, EICMzWindow = 0.005, EICTopMost = NULL,
+  EICOnlyPresent = TRUE, clearPath = FALSE)
 
 \S4method{reportMD}{featureGroups}(fGroups, path = "report",
   reportChord = TRUE, reportFGroups = TRUE, formConsensus = NULL,
   reportFormulaSpectra = TRUE, compounds = NULL,
   compoundNormalizeScores = TRUE, compsCluster = NULL, components = NULL,
-  cInfo = NULL, clusterK = NULL, silInfo = NULL,
-  interactiveHeat = FALSE, clusterMaxLabels = 250, MSPeakLists = NULL,
-  retMin = TRUE, EICRtWindow = 20, EICMzWindow = 0.005,
-  EICTopMost = NULL, EICOnlyPresent = TRUE, selfContained = TRUE,
-  optimizePng = FALSE, maxProcAmount = getOption("patRoon.maxProcAmount"),
-  clearPath = FALSE)
+  interactiveHeat = FALSE, MSPeakLists = NULL, retMin = TRUE,
+  EICRtWindow = 20, EICMzWindow = 0.005, EICTopMost = NULL,
+  EICOnlyPresent = TRUE, selfContained = TRUE, optimizePng = FALSE,
+  maxProcAmount = getOption("patRoon.maxProcAmount"), clearPath = FALSE)
 }
 \arguments{
 \item{fGroups}{The \code{\link{featureGroups}} object that should be used for
@@ -65,13 +61,6 @@ skip reporting a particular object.}
 \item{compoundNormalizeScores}{If \code{TRUE} compound identification scores
 will be normalized to maximum values.}
 
-\item{cInfo}{If not \code{NULL} a \code{\link{clusterInfo}} object to be used
-for reporting hierarchical clustering results.}
-
-\item{clusterK}{Number of branches the hierarchical cluster should be cut
-into. If specified (\emph{i.e.} not \code{NULL}) then individual clusters
-will be reported.}
-
 \item{retMin}{If \code{TRUE} then report retention times in minutes
 (otehrwise seconds).}
 
@@ -84,12 +73,6 @@ will be reported.}
 available) for candidate formulae will be reported. Specifying
 \code{formConsensus} and setting this argument to \code{FALSE} still allows
 further annotation of compound MS/MS spectra.}
-
-\item{silInfo}{A \code{\link{silhouetteInfo}} object to be used for reporting
-a silhouette plot.}
-
-\item{clusterMaxLabels}{Maximum amount of clusters when labels are still
-drawn within a dendrogram.}
 
 \item{MSPeakLists}{A \code{\link{MSPeakLists}} object that is
 \emph{mandatory} when spectra for formulae and/or compounds will be

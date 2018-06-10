@@ -48,6 +48,8 @@ genIntComponentInfo <- function(cutClusters)
 #'   \code{\link{d3heatmap}} (\code{drawHeatMap}), \code{\link{plot.dendrogram}}
 #'   (\code{plot}) or \code{\link[graphics]{plot}} (\code{plotInt}).
 #'
+#' @references \insertRef{Scholle2018}{patRoon}
+#'
 #' @seealso \code{\link{components}} and \link{component-generation}
 #'
 #' @note The intensity values for components (used by \code{plotSpec}) are set
@@ -157,7 +159,7 @@ setMethod("plotInt", "componentsIntClust", function(obj, index, ...)
 {
     checkmate::assertInt(index, lower = 1, upper = length(obj@cutClusters), null.ok = TRUE)
     
-    plotm <- obj@clusterm[rownames(obj@clusterm) %in% rownames(obj@gInfo)[obj@cutClusters == index], ]
+    plotm <- obj@clusterm[rownames(obj@clusterm) %in% rownames(obj@gInfo)[obj@cutClusters == index], , drop = FALSE]
     nsamp <- ncol(plotm)
     
     plot(x = c(0, nsamp), y = c(0, max(plotm)), type = "n", xlab = "", ylab = "normalized intensity", xaxt = "n", ...)

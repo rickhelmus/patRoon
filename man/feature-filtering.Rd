@@ -13,8 +13,7 @@
   interRelRGroupAbundance = NULL, interAbsRGroupAbundance = NULL,
   intraRGroupAbundance = NULL, minBlankThreshold = NULL,
   retentionRange = NULL, mzRange = NULL, chromWidthRange = NULL,
-  rGroups = NULL, formConsensus = NULL, compounds = NULL,
-  repetitions = 2, negate = FALSE)
+  rGroups = NULL, repetitions = 2, negate = FALSE)
 
 \S4method{replicateGroupSubtract}{featureGroups}(fGroups, rGroups,
   threshold = 0)
@@ -44,10 +43,6 @@ value is set to a value below 0 then no maximum is assumed. Set to
 
 \item{rGroups}{A character vector of replicate groups that should be kept
 (\code{filter}) or subtracted from (\code{replicateGroupSubtract}).}
-
-\item{formConsensus, compounds}{Only keep feature groups which have results in
-the given \code{\link{formulaConsensus}} and \code{\link{compounds}}
-object, respectively.}
 
 \item{repetitions}{Sometimes more feature groups may be removed by repeating
 filtering steps after another. Usually a value of two is enough to filter

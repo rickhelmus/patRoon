@@ -16,7 +16,6 @@
 \alias{addFormulaScoring,compounds-method}
 \alias{addFormulaScoring}
 \alias{plotStructure,compounds-method}
-\alias{plotStructure}
 \alias{plotScores,compounds-method}
 \alias{plotScores}
 \alias{plotSpec,compounds-method}

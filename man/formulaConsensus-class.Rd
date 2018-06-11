@@ -8,6 +8,7 @@
 \alias{algorithm,formulaConsensus-method}
 \alias{length,formulaConsensus-method}
 \alias{show,formulaConsensus-method}
+\alias{filterBy,formulaConsensus-method}
 \alias{plotSpec,formulaConsensus-method}
 \title{Formula consensus class}
 \usage{
@@ -19,11 +20,18 @@
 
 \S4method{show}{formulaConsensus}(object)
 
+\S4method{filterBy}{formulaConsensus}(obj, fGroups, negate)
+
 \S4method{plotSpec}{formulaConsensus}(obj, precursor, groupName, MSPeakLists,
   useGGPlot2 = FALSE)
 }
 \arguments{
 \item{obj, x, object}{The \code{formulaConsensus} object.}
+
+\item{fGroups}{A \code{\link{featureGroups}} object which should be filtered.}
+
+\item{negate}{If set to \code{TRUE} then the filter is applied in opposite
+manner.}
 
 \item{precursor}{The formula of the precursor (in ionic form, \emph{i.e.} as
 detected by the MS).}
@@ -42,6 +50,9 @@ faster.}
 \value{
 \code{formulaTable} returns a \code{\link{data.table}} containing all
   generated formulae, scoring information, MS/MS fragments, etc.
+
+\code{filterBy} returns a filtered \code{\link{featureGroups}}
+  object.
 
 \code{plotSpec} will return a \code{\link[=ggplot2]{ggplot object}}
   if \code{useGGPlot2} is \code{TRUE}.
@@ -63,6 +74,10 @@ string) used to generate formulae.
 \item \code{length}: Obtain total number of formulae entries.
 
 \item \code{show}: Show summary information for this object.
+
+\item \code{filterBy}: Only keep feature groups in a given
+\code{\link{featureGroups}} object that are also present in the specified
+\code{formulaConsensus} object.
 
 \item \code{plotSpec}: Plots an annotated spectrum for a given
 candidate formula of a feature group.

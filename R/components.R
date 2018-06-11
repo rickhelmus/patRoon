@@ -17,8 +17,8 @@ NULL
 #'   the \code{algorithm} method for access.
 #'
 #' @param obj,object,x The \code{component} object.
-#' @param index The index of the component that should be plotted. Can be a
-#'   numeric index or a character with its name.
+#' @param index The index of the component. Can be a numeric index or a
+#'   character with its name.
 #' @param \dots For \code{plotEIC}: Further (optional) arguments passed to the
 #'   \code{plotEIC} method for the \code{\link{featureGroups}} class. Note that
 #'   the \code{colourBy}, \code{showPeakArea}, \code{showFGroupRect} and
@@ -90,6 +90,37 @@ setMethod("findFGroup", "components", function(obj, fGroup)
     if (length(obj) == 0)
         return(numeric())
     which(sapply(componentTable(obj), function(ct) fGroup %in% ct$group))
+})
+
+#' @templateVar class components
+#' @template filterby
+#' @export
+setMethod("filterBy", "components", function(obj, fGroups, negate, index = NULL)
+{
+    # UNDONE: filter by presence of isotopes, adducts, ...
+    
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertClass(fGroups, "featureGroups", add = ac)
+    checkmate::assertFlag(negate, add = ac)
+    checkmate::assert(
+        checkmate::checkInt(index, lower = 1, upper = length(componentTable(obj))),
+        checkChoiceSilent(index, names(obj)),
+        checkmate::checkNull(index)
+        , .var.name = index)
+    checkmate::reportAssertions(ac)
+    
+    if (length(obj) == 0)
+        grps <- character()
+    else
+    {
+        cTable <- componentTable(obj)
+        
+        if (!is.null(index))
+            cTable <- cTable[index]
+        grps <- unique(unlist(sapply(cTable, "[[", "group")))
+    }
+    
+    return(groupNamesFilter(fGroups, "components", grps, negate, hashParam = c(grps, negate, index)))
 })
 
 #' @describeIn components Plot a \emph{pseudo} mass spectrum for a single

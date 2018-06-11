@@ -169,6 +169,35 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
     return(obj)
 })
 
+#' @templateVar class MSPeakLists
+#' @template filterby
+#' @param onlyMSMS If \code{TRUE} then only keep feature groups that have MS/MS
+#'   peaklists.
+#' @export
+setMethod("filterBy", "MSPeakLists", function(obj, fGroups, negate, onlyMSMS = FALSE)
+{
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertClass(fGroups, "featureGroups", add = ac)
+    aapply(checkmate::assertFlag, . ~ negate + onlyMSMS, fixed = list(add = ac))
+    checkmate::reportAssertions(ac)
+    
+    if (length(obj) == 0)
+        grps <- character()
+    else
+    {
+        if (onlyMSMS)
+        {
+            grps <- unique(unlist(sapply(peakLists(obj),
+                                         function(pa) ifelse(sapply(pa, function(pg) !is.null(pg[["MSMS"]])), names(pa), NA))))
+            grps <- grps[!is.na(grps)]
+        }
+        else
+            grps <- unique(unlist(sapply(peakLists(obj), function(pa) names(pa))))
+    }
+    
+    return(groupNamesFilter(fGroups, "mspeaklists", grps, negate, hashParam = c(grps, negate, onlyMSMS)))
+})
+
 #' @templateVar func generateMSPeakLists
 #' @templateVar what generate MS peak lists
 #' @templateVar ex1 generateFormulasDA

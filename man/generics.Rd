@@ -10,6 +10,7 @@
 \alias{consensus}
 \alias{featureTable}
 \alias{filter}
+\alias{filterBy}
 \alias{formulaTable}
 \alias{plotChord}
 \alias{plotEIC}
@@ -37,6 +38,8 @@ featureTable(obj)
 
 filter(obj, ...)
 
+filterBy(obj, fGroups, negate = FALSE, ...)
+
 formulaTable(obj)
 
 plotChord(obj, addSelfLinks = FALSE, addRetMzPlots = TRUE, ...)
@@ -61,6 +64,11 @@ treeCutDynamic(obj, maxTreeHeight = 1, deepSplit = TRUE,
 
 \item{\dots}{Any further method specific arguments. See method documentation
 for details.}
+
+\item{fGroups}{A \code{\link{featureGroups}} object.}
+
+\item{negate}{If set to \code{TRUE} then filtering operations are performed
+in opposite manner.}
 
 \item{addSelfLinks}{If \code{TRUE} then 'self-links' are added which
 represent non-shared data.}
@@ -94,7 +102,7 @@ please refer to the linked method documentation for each generic.
 
 
 \itemize{
-    \item Methods are defined for: \code{\link[=algorithm,MSPeakLists-method]{MSPeakLists}}, \code{\link[=algorithm,components-method]{components}}, \code{\link[=algorithm,compounds-method]{compounds}}, \code{\link[=algorithm,formulaConsensus-method]{formulaConsensus}}, \code{\link[=algorithm,formulas-method]{formulas}}.
+    \item Methods are defined for: \code{\link[=algorithm,components-method]{components}}, \code{\link[=algorithm,compounds-method]{compounds}}, \code{\link[=algorithm,formulaConsensus-method]{formulaConsensus}}, \code{\link[=algorithm,formulas-method]{formulas}}, \code{\link[=algorithm,MSPeakLists-method]{MSPeakLists}}.
 }
 
 \code{clusterProperties} Obtain a list with properties of the generated cluster(s).
@@ -154,7 +162,17 @@ please refer to the linked method documentation for each generic.
 
 
 \itemize{
-    \item Methods are defined for: \code{\link[=filter,MSPeakLists-method]{MSPeakLists}}, \code{\link[=filter,compounds-method]{compounds}}, \code{\link[=filter,featureGroups-method]{featureGroups}}.
+    \item Methods are defined for: \code{\link[=filter,compounds-method]{compounds}}, \code{\link[=filter,featureGroups-method]{featureGroups}}, \code{\link[=filter,MSPeakLists-method]{MSPeakLists}}.
+}
+
+\code{filterBy} only keep feature groups that are also present in another
+
+
+
+
+
+\itemize{
+    \item Methods are defined for: \code{\link[=filterBy,components-method]{components}}, \code{\link[=filterBy,compounds-method]{compounds}}, \code{\link[=filterBy,formulaConsensus-method]{formulaConsensus}}, \code{\link[=filterBy,MSPeakLists-method]{MSPeakLists}}.
 }
 
 \code{formulaTable} returns formula data.

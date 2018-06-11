@@ -221,30 +221,14 @@ replicateGroupFilter <- function(fGroups, rGroups, negate = FALSE, verbose = TRU
     }, "replicate_group", verbose))
 }
 
-formulaFilter <- function(fGroups, formConsensus, negate = FALSE)
+# used by filterBy methods
+groupNamesFilter <- function(fGroups, what, gNames, negate = FALSE, hashParam = c(gNames, negate), verbose = TRUE)
 {
-    return(doFilter(fGroups, "formula", c(formConsensus, negate), function(fGroups)
+    return(doFilter(fGroups, what, hashParam, function(fGroups)
     {
-        formgrps <- unique(formulaTable(formConsensus)$group)
         if (negate)
-            return(fGroups[, setdiff(names(fGroups), formgrps)])
-        return(fGroups[, formgrps])
-    }))
-}
-
-compoundFilter <- function(fGroups, compounds, negate = FALSE, verbose = TRUE)
-{
-    return(doFilter(fGroups, "compound", c(compounds, negate), function(fGroups)
-    {
-        compTable <- compoundTable(compounds)
-        compgrps <- names(compTable)[sapply(compTable, function(r) !is.null(r) && nrow(r) > 0, USE.NAMES = FALSE)]
-        
-        if (is.null(compgrps)) # empty object
-            return(if (negate) fGroups else fGroups[, FALSE]) # FALSE: give empty object
-        
-        if (negate)
-            return(fGroups[, setdiff(names(fGroups), compgrps)])
-        return(fGroups[, compgrps])
+            return(fGroups[, setdiff(names(fGroups), gNames)])
+        return(fGroups[, gNames])
     }, verbose = verbose))
 }
 
@@ -271,9 +255,6 @@ compoundFilter <- function(fGroups, compounds, negate = FALSE, verbose = TRUE)
 #'   numeric vector with length of two containing the min/max values. If the max
 #'   value is set to a value below 0 then no maximum is assumed. Set to
 #'   \code{NULL} to skip this step.
-#' @param formConsensus,compounds Only keep feature groups which have results in
-#'   the given \code{\link{formulaConsensus}} and \code{\link{compounds}}
-#'   object, respectively.
 #' @param repetitions Sometimes more feature groups may be removed by repeating
 #'   filtering steps after another. Usually a value of two is enough to filter
 #'   the maximum amount of feature groups.
@@ -287,7 +268,6 @@ setMethod("filter", "featureGroups", function(obj, intensityThreshold = NULL, re
                                               interAbsRGroupAbundance = NULL, intraRGroupAbundance = NULL,
                                               minBlankThreshold = NULL, retentionRange = NULL, mzRange = NULL,
                                               chromWidthRange = NULL, rGroups = NULL,
-                                              formConsensus = NULL, compounds = NULL,
                                               repetitions = 2, negate = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
@@ -297,8 +277,6 @@ setMethod("filter", "featureGroups", function(obj, intensityThreshold = NULL, re
            lower = 0, finite = TRUE, null.ok = TRUE, fixed = list(add = ac))
     aapply(assertRange, . ~ retentionRange + mzRange + chromWidthRange, null.ok = TRUE, fixed = list(add = ac))
     checkmate::assertCharacter(rGroups, min.chars = 1, min.len = 1, any.missing = FALSE, null.ok = TRUE, add = ac)
-    checkmate::assertClass(formConsensus, "formulaConsensus", null.ok = TRUE, add = ac)
-    checkmate::assertClass(compounds, "compounds", null.ok = TRUE, add = ac)
     checkmate::assertCount(repetitions, positive = TRUE, add = ac)
     checkmate::assertFlag(negate, add = ac)
     checkmate::reportAssertions(ac)
@@ -320,12 +298,6 @@ setMethod("filter", "featureGroups", function(obj, intensityThreshold = NULL, re
     
     if (!is.null(rGroups))
         obj <- replicateGroupFilter(obj, rGroups, negate)
-
-    if (!is.null(formConsensus))
-        obj <- formulaFilter(obj, formConsensus, negate)
-
-    if (!is.null(compounds))
-        obj <- compoundFilter(obj, compounds, negate)
 
     # make sure that both absolute and relative abundances are set when only one of them is specified
     if (!is.null(relAbundance) && is.null(absAbundance))

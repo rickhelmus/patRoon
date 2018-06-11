@@ -14,6 +14,7 @@
 \alias{show,components-method}
 \alias{findFGroup,components-method}
 \alias{findFGroup}
+\alias{filterBy,components-method}
 \alias{plotSpec,components-method}
 \alias{plotEIC,components-method}
 \alias{consensus,components-method}
@@ -33,6 +34,8 @@
 
 \S4method{findFGroup}{components}(obj, fGroup)
 
+\S4method{filterBy}{components}(obj, fGroups, negate, index = NULL)
+
 \S4method{plotSpec}{components}(obj, index, markFGroup = NULL,
   useGGPlot2 = FALSE, ...)
 
@@ -46,8 +49,13 @@
 \item{fGroup}{The name (thus a character) of the feature group that should be
 searched for.}
 
-\item{index}{The index of the component that should be plotted. Can be a
-numeric index or a character with its name.}
+\item{fGroups}{A \code{\link{featureGroups}} object which should be filtered.}
+
+\item{negate}{If set to \code{TRUE} then the filter is applied in opposite
+manner.}
+
+\item{index}{The index of the component. Can be a numeric index or a
+character with its name.}
 
 \item{markFGroup}{If specified (\emph{i.e.} not \code{NULL}) this argument
 can be used to mark a feature group in the plotted spectrum. The value
@@ -66,13 +74,16 @@ the \code{colourBy}, \code{showPeakArea}, \code{showFGroupRect} and
 \code{consensus}: \code{components} objects that should be used to generate
 the consensus.}
 
-\item{fGroups}{The \code{\link{featureGroups}} object that was used to
-generate the components.}
-
 \item{rtWindow}{Retention window: see the \code{plotEIC} method for the
 \code{\link{featureGroups}} class.}
+
+\item{fGroups}{The \code{\link{featureGroups}} object that was used to
+generate the components.}
 }
 \value{
+\code{filterBy} returns a filtered \code{\link{featureGroups}}
+  object.
+
 \code{consensus} returns a \code{components} object that is produced
   by merging multiple specified \code{components} objects.
 }
@@ -104,6 +115,10 @@ generate components.
 
 \item \code{findFGroup}: Returns the component id(s) to which a feature group
 belongs.
+
+\item \code{filterBy}: Only keep feature groups in a given
+\code{\link{featureGroups}} object that are also present in the specified
+\code{components} object.
 
 \item \code{plotSpec}: Plot a \emph{pseudo} mass spectrum for a single
 component.

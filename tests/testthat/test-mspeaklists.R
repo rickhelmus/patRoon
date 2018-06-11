@@ -66,3 +66,9 @@ test_that("empty object", {
                          topMSMSPeaks = 10), 0)
     expect_length(generateMSPeakLists(getEmptyTestFGroups(), "mzr"), 0)
 })
+
+test_that("feature group filtering", {
+    expect_equal(filterBy(plists, fGroups), fGroups)
+    expect_lt(length(filterBy(plists, fGroups, onlyMSMS = TRUE)), length(fGroups))
+    expect_length(filterBy(plistsEmpty, fGroups), 0)
+})

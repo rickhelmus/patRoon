@@ -138,8 +138,28 @@ setMethod("filter", "compounds", function(obj, minExplainedPeaks = NULL, minScor
         obj@compounds <- obj@compounds[sapply(obj@compounds, function(cm) !is.null(cm) && nrow(cm) > 0)]
 
     newn <- length(obj)
-    printf("Done! Filtered %d (%.2f%%) compounds. Remaining: %d\n", oldn - newn, (1-(newn/oldn))*100, newn)
+    printf("Done! Filtered %d (%.2f%%) compounds. Remaining: %d\n", oldn - newn, if (oldn == 0) 0 else (1-(newn/oldn))*100, newn)
     return(obj)
+})
+
+#' @templateVar class compounds
+#' @template filterby
+#' @export
+setMethod("filterBy", "compounds", function(obj, fGroups, negate)
+{
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertClass(fGroups, "featureGroups", add = ac)
+    checkmate::assertFlag(negate, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    compTable <- compoundTable(obj)
+    
+    if (length(compTable) == 0)
+        compgrps <- character()
+    else
+        compgrps <- names(compTable)[sapply(compTable, function(r) !is.null(r) && nrow(r) > 0, USE.NAMES = FALSE)]
+    
+    return(groupNamesFilter(fGroups, "compounds", compgrps, negate))
 })
 
 #' @describeIn compounds Provides compound scoring data that is based on the
@@ -239,7 +259,6 @@ setMethod("addFormulaScoring", "compounds", function(compounds, formConsensus, u
 #'
 #' @references \addCitations{rcdk}{1}
 #'
-#' @aliases plotStructure
 #' @export
 setMethod("plotStructure", "compounds", function(obj, index, groupName, width = 500, height = 500, useGGPlot2 = FALSE)
 {

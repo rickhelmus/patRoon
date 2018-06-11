@@ -147,8 +147,8 @@ test_that("consensus works", {
 
 test_that("feature group filtering", {
     skip_if_not(hasCompounds)
-    expect_named(filter(fGroups, compounds = comps), names(compoundTable(comps)))
-    expect_length(filter(fGroups, compounds = compsEmpty), 0)
+    expect_named(filterBy(comps, fGroups), names(compoundTable(comps)))
+    expect_length(filterBy(compsEmpty, fGroups), 0)
 })
 
 test_that("reporting works", {

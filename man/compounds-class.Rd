@@ -12,6 +12,7 @@
 \alias{identifiers,compounds-method}
 \alias{identifiers}
 \alias{filter,compounds-method}
+\alias{filterBy,compounds-method}
 \alias{addFormulaScoring,compounds-method}
 \alias{addFormulaScoring}
 \alias{plotStructure,compounds-method}
@@ -34,6 +35,8 @@
 
 \S4method{filter}{compounds}(obj, minExplainedPeaks = NULL, minScore = NULL,
   minFragScore = NULL, minFormulaScore = NULL, topMost = NULL)
+
+\S4method{filterBy}{compounds}(obj, fGroups, negate)
 
 \S4method{addFormulaScoring}{compounds}(compounds, formConsensus,
   updateScore = FALSE, formulaScoreWeight = 1)
@@ -59,6 +62,11 @@ formula score, respectively. Set to \code{NULL} to ignore.}
 
 \item{topMost}{Only keep a maximum of \code{topMost} candidates with highest
 score. Set to \code{NULL} to ignore.}
+
+\item{fGroups}{A \code{\link{featureGroups}} object which should be filtered.}
+
+\item{negate}{If set to \code{TRUE} then the filter is applied in opposite
+manner.}
 
 \item{formConsensus}{The \code{\link{formulaConsensus}} object that should be
 used for scoring/annotation. For \code{plotSpec}: set to \code{NULL} to
@@ -110,6 +118,9 @@ within all given \code{compounds} objects.}
 
 \code{filter} returns a filtered \code{compounds} object.
 
+\code{filterBy} returns a filtered \code{\link{featureGroups}}
+  object.
+
 \code{addFormulaScoring} returns a \code{compounds} object updated
   with formula scoring.
 
@@ -141,6 +152,10 @@ list is named by feature group names, and is typically used with the
 
 \item \code{filter}: Provides rule based filtering for generated compounds.
 Useful to eliminate unlikely candidates and speed up further processing.
+
+\item \code{filterBy}: Only keep feature groups in a given
+\code{\link{featureGroups}} object that are also present in the specified
+\code{compounds} object.
 
 \item \code{addFormulaScoring}: Provides compound scoring data that is based on the
 presence of candidate formulae being present in a given

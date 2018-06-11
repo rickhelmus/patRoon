@@ -67,7 +67,7 @@ test_that("consensus works", {
 })
 
 test_that("feature group filtering", {
-    expect_setequal(names(filter(fGroups, formConsensus = fCons)), fTable$group)
+    expect_setequal(names(filterBy(fCons, fGroups)), fTable$group)
 })
 
 test_that("reporting works", {

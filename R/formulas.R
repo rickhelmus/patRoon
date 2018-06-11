@@ -264,6 +264,24 @@ setMethod("show", "formulaConsensus", function(object)
     showObjectSize(object)
 })
 
+#' @templateVar class formulaConsensus
+#' @template filterby
+#' @export
+setMethod("filterBy", "formulaConsensus", function(obj, fGroups, negate)
+{
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertClass(fGroups, "featureGroups", add = ac)
+    checkmate::assertFlag(negate, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    if (length(obj) == 0)
+        grps <- character()
+    else
+        grps <- unique(formulaTable(obj)$group)
+    
+    return(groupNamesFilter(fGroups, "formulas", grps, negate))
+})
+
 #' @describeIn formulaConsensus Plots an annotated spectrum for a given
 #'   candidate formula of a feature group.
 #'

@@ -422,7 +422,7 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
                 
                 # some other error (e.g. java not present)
                 stop(sprintf("Fatal: Failed to execute MetFragCL for %s - exit code: %d", cmd$gName, exitStatus))
-            }, maxProcAmount = maxProcAmount, procTimeout = timeout, delayBetweenProc = 200)
+            }, maxProcAmount = maxProcAmount, procTimeout = timeout, delayBetweenProc = 1000)
         }
         else
         {

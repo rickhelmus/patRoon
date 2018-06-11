@@ -54,14 +54,18 @@ compCLButtons <- sapply(seq_along(allGroups),function(gi) maybeAddButton(gi, com
                                                                          gi, "compscl"))
 formButtons <- sapply(seq_along(allGroups), function(gi) maybeAddButton(gi, formFGroups, "formulas",
                                                                         "showAnnotation", gi, "form"))
-componButtons <- sapply(seq_along(allGroups), function(gi)
+if (!is.null(rmdVars$components))
 {
-    
-    cmpIds <- findFGroup(rmdVars$components, allGroups[gi])
-    # UNDONE: multiple indices
-    cmpNames <- tolower(names(rmdVars$components)[cmpIds]) # NOTE: headings are automatically made lowercase
-    maybeAddButton(gi, componentFGroups, "components", "showComponentSpec", cmpNames[1], "feature-groups")
-})
+    componButtons <- sapply(seq_along(allGroups), function(gi)
+    {
+        
+        cmpIds <- findFGroup(rmdVars$components, allGroups[gi])
+        # UNDONE: multiple indices
+        cmpNames <- tolower(names(rmdVars$components)[cmpIds]) # NOTE: headings are automatically made lowercase
+        maybeAddButton(gi, componentFGroups, "components", "showComponentSpec", cmpNames[1], "feature-groups")
+    })
+} else
+    componButtons <- rep("-", length(allGroups))
 
 sp <- paste0(rep("&nbsp;", 4), collapse = "")
 buttons <- paste(compButtons, compCLButtons, formButtons, componButtons, sep = sp)

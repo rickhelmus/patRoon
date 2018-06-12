@@ -20,8 +20,9 @@ getScriptCode <- function(destination, analysisTableFile, DAMethod, dataPretreat
     formulaOpts = list(algo = formulaGenerator)
     identOpts = list(algo = compIdentifier)
     componentOpts = list(algo = componentGenerator)
+    sldest <- gsub("\\", "\\\\", destination) # BUG: tmpl() seems to eat backslashes!?
     template <- tmpl(readAllFile(system.file("templates", "main_script.R", package = "patRoon")),
-                     destination = destination, analysisTableFile = analysisTableFile,
+                     destination = sldest, analysisTableFile = analysisTableFile,
                      doMSPeakFind = formulaGenerator != "" || compIdentifier != "",
                      polarity = polarity, reportFormats = reportFormats)
 
@@ -57,7 +58,6 @@ doCreateProject <- function(destination, scriptFile, analyses, analysisTableFile
                           featFinder, featGrouper, intThreshold, replThreshold, blankThreshold,
                           filterRepetitions, peakListGenerator, formulaGenerator,
                           compIdentifier, componentGenerator, polarity, reportFormats)
-
     if (is.null(scriptFile))
     {
         # insert at end of current document
@@ -90,7 +90,7 @@ getNewProjectUI <- function()
             miniTabPanel("Destination", icon = icon("save"),
                          miniContentPanel(
                              fillCol(
-                                 fileSelect("destinationPath", "projectDestButton", "Project destination", "~/werk/test"), # UNDONE
+                                 fileSelect("destinationPath", "projectDestButton", "Project destination", "~/"),
                                  radioButtons("outputScriptTo", "Insert code into", c("New file" = "newFile",
                                                                                       "Current file" = "curFile")),
                                  conditionalPanel(
@@ -123,7 +123,7 @@ getNewProjectUI <- function()
                                      flex = c(1, NA),
                                      height = 90,
                                      fileSelect("DAMethod", "DAMethodButton", "Set DataAnalysis method to"),
-                                     textNote("Leave blanking this blank will not set any method")
+                                     textNote("Leaving this blank will not set any method")
                                  ),
                                  fillCol(
                                      flex = c(1, NA),
@@ -275,7 +275,7 @@ newProject <- function()
         })
 
         observeEvent(input$addAnalyses, {
-            anaDir <- selectDirectory(path = "~/werk/Vittorio/20160929-proc/") # UNDONE
+            anaDir <- selectDirectory(path = "~/")
             if (!is.null(anaDir))
             {
                 files <- list.files(anaDir, "\\.(mzML|mzXML|d)$", full.names = TRUE)

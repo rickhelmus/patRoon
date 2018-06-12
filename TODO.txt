@@ -14,10 +14,9 @@ Release:
 - fillPeaks for CAMERA (and RAMClustR?)
 - mzR precursor window in newProject()
 - filter formulas, compounds etc on (remaining) feature groups
-- filterBy: isoptes/adducts
+- filterBy: isotopes/adducts
 - filter method for components
 - mass defect components
 - fix compoundViewer
 - getMCS for compounds
 - names() for compounds/compounds clusters etc?
-- MSPeakLists filter should prune empty

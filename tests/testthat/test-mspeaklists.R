@@ -59,12 +59,15 @@ test_that("filtering", {
 })
 
 plistsEmpty <- filter(plists, absMSIntThr = 1E9, absMSMSIntThr = 1E9)
+plistsEmptyMS <- filter(plists, absMSIntThr = 1E9)
 
 test_that("empty object", {
     expect_length(plistsEmpty, 0)
     expect_length(filter(plistsEmpty, relMSIntThr = 0.2, relMSMSIntThr = 0.2, topMSPeaks = 10,
                          topMSMSPeaks = 10), 0)
     expect_length(generateMSPeakLists(getEmptyTestFGroups(), "mzr"), 0)
+    expect_lt(length(plistsEmptyMS), length(plists))
+    expect_gt(length(plistsEmptyMS), 0)
 })
 
 test_that("feature group filtering", {

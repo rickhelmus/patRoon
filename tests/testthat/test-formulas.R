@@ -4,28 +4,36 @@ fGroups <- getTestFGroups(getTestAnaInfo()[4:5, ])
 fGroupsEmpty <- getEmptyTestFGroups()
 plists <- generateMSPeakLists(fGroups, "mzr")
 plistsEmpty <- getEmptyPLists()
+plistsEmptyMS <- filter(plists, absMSIntThr = 1E9)
+plistsEmptyMSMS <- filter(plists, absMSMSIntThr = 1E9)
 
 doSIRIUS <- !is.null(getOption("patRoon.path.SIRIUS")) && nzchar(getOption("patRoon.path.SIRIUS"))
 
 formsGF <- generateFormulas(fGroups, "genform", plists)
 formsGFEmpty <- generateFormulas(fGroupsEmpty, "genform", plistsEmpty)
 formsGFEmptyPL <- generateFormulas(fGroups, "genform", plistsEmpty)
+formsGFEmptyPLMS <- generateFormulas(fGroups, "genform", plistsEmptyMS)
 
 if (doSIRIUS)
 {
     formsSIR <- generateFormulas(fGroups, "sirius", plists, logPath = NULL)
     formsSIREmpty <- generateFormulas(fGroupsEmpty, "sirius", plistsEmpty, logPath = NULL)
     formsSIREmptyPL <- generateFormulas(fGroups, "sirius", plistsEmpty, logPath = NULL)
+    formsSIREmptyPLMS <- generateFormulas(fGroups, "sirius", plistsEmptyMS, logPath = NULL)
 }
 
 test_that("verify formula generation", {
     expect_known_value(formsGF, testFile("formulas-gf"))
     expect_length(formsGFEmpty, 0)
     expect_length(formsGFEmptyPL, 0)
+    expect_length(formsGFEmptyPLMS, 0)
+    expect_equal(generateFormulas(fGroups, "genform", plistsEmptyMSMS),
+                 generateFormulas(fGroups, "genform", plists, MSMode = "ms"))
     skip_if_not(doSIRIUS)
     expect_known_value(formsSIR, testFile("formulas-sir"))
     expect_length(formsSIREmpty, 0)
     expect_length(formsSIREmptyPL, 0)
+    expect_length(formsSIREmptyPLMS, 0)
 })
 
 test_that("verify show output", {

@@ -443,7 +443,7 @@ setMethod("plotSpec", "compounds", function(obj, index, groupName, MSPeakLists, 
         fTable <- formulaTable(formConsensus)[group == groupName & byMSMS == TRUE]
 
     compr <- compTable[index, ]
-    spec <- pLists[[compr$analysis]][[groupName]]$MSMS
+    spec <- pLists[[compr$analysis]][[groupName]][["MSMS"]]
 
     # merge formulas
     fi <- compr$fragInfo[[1]]

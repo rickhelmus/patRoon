@@ -117,17 +117,17 @@ generateFormulasSirius <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct = 
             if (ftind[[grp]][anai] == 0)
                 return(NULL) # feature not present
 
-            if (is.null(pLists[[ana]][[grp]]) || nrow(pLists[[ana]][[grp]]$MS) == 0)
+            if (is.null(pLists[[ana]][[grp]]) || is.null(pLists[[ana]][[grp]][["MS"]]))
                 return(NULL) # MS or MSMS spectrum probably filtered away
 
-            if (is.null(pLists[[ana]][[grp]]$MSMS))
+            if (is.null(pLists[[ana]][[grp]][["MSMS"]]))
                 return(NULL) # no MSMS
 
             ftmz <- fTable[[ana]][["mz"]][ftind[[grp]][anai]]
-            plmz <- getMZFromMSPeakList(ftmz, pLists[[ana]][[grp]]$MS)
+            plmz <- getMZFromMSPeakList(ftmz, pLists[[ana]][[grp]][["MS"]])
             hash <- makeHash(ana, grp, ftmz, pLists[[ana]][[grp]], profile, adduct, maxMzDev, elements, database, noise)
 
-            cmd <- getSiriusCommand(plmz, pLists[[ana]][[grp]]$MS, pLists[[ana]][[grp]]$MSMS, profile,
+            cmd <- getSiriusCommand(plmz, pLists[[ana]][[grp]][["MS"]], pLists[[ana]][[grp]][["MSMS"]], profile,
                                     adduct, maxMzDev, elements, database, noise, FALSE, NULL)
             logf <- if (!is.null(logPath)) file.path(logPath, paste0("sirius-form-", grp, ".txt")) else NULL
             logfe <- if (!is.null(logPath)) file.path(logPath, paste0("sirius-form-err-", grp, ".txt")) else NULL

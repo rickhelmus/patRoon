@@ -270,24 +270,24 @@ generateFormulasGenForm <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct =
 
             ana <- anaInfo$analysis[anai]
 
-            if (is.null(pLists[[ana]][[grp]]) || nrow(pLists[[ana]][[grp]]$MS) == 0)
+            if (is.null(pLists[[ana]][[grp]]) || is.null(pLists[[ana]][[grp]][["MS"]]))
                 return(NULL) # MS or MSMS spectrum probably filtered away
 
-            if (MSMode == "msms" && (is.null(pLists[[ana]][[grp]]$MSMS) || nrow(pLists[[ana]][[grp]]$MSMS) == 0))
+            if (MSMode == "msms" && is.null(pLists[[ana]][[grp]][["MSMS"]]))
                 return(NULL)
 
             ftmz <- fTable[[ana]][["mz"]][ftind[[grp]][anai]]
-            plmz <- getMZFromMSPeakList(ftmz, pLists[[ana]][[grp]]$MS)
+            plmz <- getMZFromMSPeakList(ftmz, pLists[[ana]][[grp]][["MS"]])
 
-            MSHash <- makeHash(ftmz, pLists[[ana]][[grp]]$MS, maxMzDev, adduct, elements, hetero, extraOpts)
+            MSHash <- makeHash(ftmz, pLists[[ana]][[grp]][["MS"]], maxMzDev, adduct, elements, hetero, extraOpts)
 
             if (MSMode != "ms")
-                MSMSHash <- makeHash(MSHash, pLists[[ana]][[grp]]$MSMS)
+                MSMSHash <- makeHash(MSHash, pLists[[ana]][[grp]][["MSMS"]])
             else
                 MSMSHash <- NULL
 
-            files <- initGenFormFiles(pLists[[ana]][[grp]]$MS,
-                                      if (MSMode != "ms") pLists[[ana]][[grp]]$MSMS else NULL)
+            files <- initGenFormFiles(pLists[[ana]][[grp]][["MS"]],
+                                      if (MSMode != "ms") pLists[[ana]][[grp]][["MSMS"]] else NULL)
 
             return(c(list(precursorMz = plmz, MSHash = MSHash, MSMSHash = MSMSHash), files))
         }, simplify = FALSE)

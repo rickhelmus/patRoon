@@ -47,11 +47,21 @@ setMethod("show", "formulas", function(object)
 
     printf("Total formula count: %d\n", length(object))
 
-    ft <- formulaTable(object)
-    ft <- ft[lengths(ft) > 0]
-    formCounts <- lapply(ft, function(fa) sapply(fa, nrow))
-    printf("Average formulas per analysis: %.1f\n", mean(sapply(formCounts, function(fc) sum(fc))))
-    printf("Average formulas per feature group: %.1f\n", mean(sapply(formCounts, function(fc) mean(fc))))
+    if (length(object) == 0)
+    {
+        ma <- mfg <- 0
+    }
+    else
+    {
+        ft <- formulaTable(object)
+        ft <- ft[lengths(ft) > 0]
+        formCounts <- lapply(ft, function(fa) sapply(fa, nrow))
+        ma <- mean(sapply(formCounts, function(fc) sum(fc)))
+        mfg <- mean(sapply(formCounts, function(fc) mean(fc)))
+    }
+    
+    printf("Average formulas per analysis: %.1f\n", ma)
+    printf("Average formulas per feature group: %.1f\n", mfg)
 
     showObjectSize(object)
 })
@@ -313,7 +323,7 @@ setMethod("plotSpec", "formulaConsensus", function(obj, precursor, groupName, MS
     pLists <- peakLists(MSPeakLists)
 
     precInfo <- formTable[1] # precursor info is duplicated over all fragment rows
-    spec <- pLists[[precInfo$ana_max_intensity]][[groupName]]$MSMS
+    spec <- pLists[[precInfo$ana_max_intensity]][[groupName]][["MSMS"]]
 
     if (is.null(spec))
         return(NULL)

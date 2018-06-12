@@ -50,26 +50,35 @@ setMethod("length", "MSPeakLists", function(x) sum(unlist(recursiveApplyDT(x@pea
 setMethod("show", "MSPeakLists", function(object)
 {
     if (length(object) == 0)
+    {
         mspcount <- msmspcount <- totpcount <- totpcount <- mslcount <- msmslcount <- totlcount <- 0
+        amspcount <- amsmspcount <- atotpcount <- atotpcount <- amslcount <- amsmslcount <- atotlcount <- 0
+    }
     else
     {
-        mspcount <- sum(sapply(object@peakLists, function(pa) sum(sapply(pa, function(pf) nrow(pf$MS)))))
-        msmspcount <- sum(sapply(object@peakLists, function(pa) sum(sapply(pa, function(pf) if (!is.null(pf$MSMS)) nrow(pf$MSMS) else 0))))
+        mspcount <- sum(sapply(object@peakLists, function(pa) sum(sapply(pa, function(pf) if (!is.null(pf[["MS"]])) nrow(pf[["MS"]]) else 0))))
+        msmspcount <- sum(sapply(object@peakLists, function(pa) sum(sapply(pa, function(pf) if (!is.null(pf[["MSMS"]])) nrow(pf[["MSMS"]]) else 0))))
         totpcount <- sum(mspcount, msmspcount)
         mslcount <- sum(lengths(object@peakLists))
-        msmslcount <- sum(sapply(object@peakLists, function(pa) sum(sapply(pa, function(pf) !is.null(pf$MSMS)))))
+        msmslcount <- sum(sapply(object@peakLists, function(pa) sum(sapply(pa, function(pf) !is.null(pf[["MSMS"]])))))
         totlcount <- sum(mslcount, msmslcount)
+        
+        anacount <- length(object@peakLists)
+        atotpcount <- totpcount / anacount
+        amspcount <- mspcount / anacount
+        amsmspcount <- msmspcount / anacount
+        atotlcount <- totlcount / anacount
+        amslcount <- mslcount / anacount
+        amsmslcount <- msmslcount / anacount
     }
-    
-    anacount <- length(object@peakLists)
 
     printf("A MSPeakLists object ('%s')\n", class(object))
     printf("Total peak count: %d (MS: %d - MS/MS: %d)\n", totpcount, mspcount, msmspcount)
-    printf("Average peak count/analysis: %.0f (MS: %.0f - MS/MS: %.0f)\n", totpcount / anacount,
-           mspcount / anacount, msmspcount / anacount)
+    printf("Average peak count/analysis: %.0f (MS: %.0f - MS/MS: %.0f)\n", atotpcount,
+           amspcount, amsmspcount)
     printf("Total peak lists: %d (MS: %d - MS/MS: %d)\n", totlcount, mslcount, msmslcount)
-    printf("Average peak lists/analysis: %.0f (MS: %.0f - MS/MS: %.0f)\n", totlcount / anacount,
-           mslcount / anacount, msmslcount / anacount)
+    printf("Average peak lists/analysis: %.0f (MS: %.0f - MS/MS: %.0f)\n", atotlcount,
+           amslcount, amsmslcount)
     showObjectSize(object)
 })
 
@@ -100,6 +109,9 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
     aapply(checkmate::assertFlag, . ~ deIsotopeMS + deIsotopeMSMS, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
     
+    if (length(obj) == 0)
+        return(obj)
+    
     hash <- makeHash(obj, absMSIntThr, absMSMSIntThr, relMSIntThr, relMSMSIntThr,
                      topMSPeaks, topMSMSPeaks, deIsotopeMS, deIsotopeMSMS)
     cache <- loadCacheData("filterMSPeakLists", hash)
@@ -118,46 +130,56 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
         for (grpi in seq_along(pLists[[anai]]))
         {
             if (!is.null(absMSIntThr))
-                pLists[[anai]][[grpi]]$MS <- pLists[[anai]][[grpi]]$MS[intensity >= absMSIntThr]
+                pLists[[anai]][[grpi]][["MS"]] <- pLists[[anai]][[grpi]][["MS"]][intensity >= absMSIntThr]
 
-            if (!is.null(relMSIntThr) && nrow(pLists[[anai]][[grpi]]$MS) > 0)
+            if (!is.null(relMSIntThr) && nrow(pLists[[anai]][[grpi]][["MS"]]) > 0)
             {
-                thr <- max(pLists[[anai]][[grpi]]$MS$intensity) * relMSIntThr
-                pLists[[anai]][[grpi]]$MS <- pLists[[anai]][[grpi]]$MS[intensity >= thr]
+                thr <- max(pLists[[anai]][[grpi]][["MS"]]$intensity) * relMSIntThr
+                pLists[[anai]][[grpi]][["MS"]] <- pLists[[anai]][[grpi]][["MS"]][intensity >= thr]
             }
 
-            if (!is.null(topMSPeaks) && nrow(pLists[[anai]][[grpi]]$MS) > topMSPeaks)
+            if (!is.null(topMSPeaks) && nrow(pLists[[anai]][[grpi]][["MS"]]) > topMSPeaks)
             {
-                ord <- order(-pLists[[anai]][[grpi]]$MS$intensity)
-                pLists[[anai]][[grpi]]$MS <- pLists[[anai]][[grpi]]$MS[ord[seq_len(topMSPeaks)]]
+                ord <- order(-pLists[[anai]][[grpi]][["MS"]]$intensity)
+                pLists[[anai]][[grpi]][["MS"]] <- pLists[[anai]][[grpi]][["MS"]][ord[seq_len(topMSPeaks)]]
             }
 
             if (deIsotopeMS)
-                pLists[[anai]][[grpi]]$MS <- deIsotopeMSPeakList(pLists[[anai]][[grpi]]$MS)
+                pLists[[anai]][[grpi]][["MS"]] <- deIsotopeMSPeakList(pLists[[anai]][[grpi]][["MS"]])
 
-            if (!is.null(pLists[[anai]][[grpi]]$MSMS))
+            if (!is.null(pLists[[anai]][[grpi]][["MSMS"]]))
             {
-                if (!is.null(absMSMSIntThr) && !is.null(pLists[[anai]][[grpi]]$MSMS))
-                    pLists[[anai]][[grpi]]$MSMS <- pLists[[anai]][[grpi]]$MSMS[intensity >= absMSMSIntThr]
+                if (!is.null(absMSMSIntThr) && !is.null(pLists[[anai]][[grpi]][["MSMS"]]))
+                    pLists[[anai]][[grpi]][["MSMS"]] <- pLists[[anai]][[grpi]][["MSMS"]][intensity >= absMSMSIntThr]
 
-                if (!is.null(relMSMSIntThr) && nrow(pLists[[anai]][[grpi]]$MS) > 0)
+                if (!is.null(relMSMSIntThr) && nrow(pLists[[anai]][[grpi]][["MS"]]) > 0)
                 {
-                    thr <- max(pLists[[anai]][[grpi]]$MSMS$intensity) * relMSMSIntThr
-                    pLists[[anai]][[grpi]]$MSMS <- pLists[[anai]][[grpi]]$MSMS[intensity >= thr]
+                    thr <- max(pLists[[anai]][[grpi]][["MSMS"]]$intensity) * relMSMSIntThr
+                    pLists[[anai]][[grpi]][["MSMS"]] <- pLists[[anai]][[grpi]][["MSMS"]][intensity >= thr]
                 }
 
-                if (!is.null(topMSMSPeaks) && nrow(pLists[[anai]][[grpi]]$MSMS) > topMSMSPeaks)
+                if (!is.null(topMSMSPeaks) && nrow(pLists[[anai]][[grpi]][["MSMS"]]) > topMSMSPeaks)
                 {
-                    ord <- order(-pLists[[anai]][[grpi]]$MSMS$intensity)
-                    pLists[[anai]][[grpi]]$MSMS <- pLists[[anai]][[grpi]]$MSMS[ord[seq_len(topMSMSPeaks)]]
+                    ord <- order(-pLists[[anai]][[grpi]][["MSMS"]]$intensity)
+                    pLists[[anai]][[grpi]][["MSMS"]] <- pLists[[anai]][[grpi]][["MSMS"]][ord[seq_len(topMSMSPeaks)]]
                 }
 
                 if (deIsotopeMSMS)
-                    pLists[[anai]][[grpi]]$MSMS <- deIsotopeMSPeakList(pLists[[anai]][[grpi]]$MSMS)
+                    pLists[[anai]][[grpi]][["MSMS"]] <- deIsotopeMSPeakList(pLists[[anai]][[grpi]][["MSMS"]])
             }
-
+            
+            # prune empty
+            if (!is.null(pLists[[anai]][[grpi]][["MS"]]) && nrow(pLists[[anai]][[grpi]][["MS"]]) == 0)
+                pLists[[anai]][[grpi]][["MS"]] <- NULL
+            if (!is.null(pLists[[anai]][[grpi]][["MSMS"]]) && nrow(pLists[[anai]][[grpi]][["MSMS"]]) == 0)
+                pLists[[anai]][[grpi]][["MSMS"]] <- NULL
+            
             setTxtProgressBar(prog, grpi)
         }
+        
+        # prune empty
+        empties <- sapply(pLists[[anai]], function(pg) is.null(pg[["MS"]]) && is.null(pg[["MSMS"]]))
+        pLists[[anai]] <- pLists[[anai]][!empties]
 
         setTxtProgressBar(prog, gcount)
         close(prog)

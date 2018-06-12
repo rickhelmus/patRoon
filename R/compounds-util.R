@@ -486,7 +486,7 @@ setMethod("compoundViewer", c("featureGroups", "MSPeakLists", "compounds"), func
         })
 
         output$spectrum <- renderPlotly({
-            spec <- pLists[[getAnalysis()]][[rValues$currentFGroup]]$MSMS
+            spec <- pLists[[getAnalysis()]][[rValues$currentFGroup]][["MSMS"]]
             fi <- fragmentInfo()
 
             p <- plot_ly(type="scatter", mode = "lines", hoverinfo = "text") %>%

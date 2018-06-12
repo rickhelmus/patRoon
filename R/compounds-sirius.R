@@ -125,8 +125,15 @@ generateCompoundsSirius <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct =
         ogind <- order(-gTable[[grp]])
         oanalyses <- anaInfo$analysis[ogind] # analyses ordered from highest to lowest intensity
 
-        # filter out analyses without MS/MS
-        oanalyses <- sapply(oanalyses, function(a) if (!is.null(pLists[[a]][[grp]]$MSMS)) a else "", USE.NAMES = FALSE)
+        # filter out analyses without MS(/MS)
+        oanalyses <- sapply(oanalyses, function(a)
+        {
+            if (!is.null(pLists[[a]][[grp]][["MS"]]) && !is.null(pLists[[a]][[grp]][["MSMS"]]))
+                a
+            else
+                ""
+        }, USE.NAMES = FALSE)
+        
         ogind <- ogind[oanalyses != ""]
         oanalyses <- oanalyses[oanalyses != ""]
 
@@ -136,20 +143,20 @@ generateCompoundsSirius <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct =
         ana <- oanalyses[[1]] # take most sensitive analysis
 
         ftmz <- fTable[[ana]][["mz"]][ftind[[grp]][ogind[1]]]
-        plmz <- getMZFromMSPeakList(ftmz, pLists[[ana]][[grp]]$MS)
+        plmz <- getMZFromMSPeakList(ftmz, pLists[[ana]][[grp]][["MS"]])
 
         hash <- makeHash(plmz, pLists[[ana]][[grp]], profile, adduct, maxMzDev, elements,
                          formulaDatabase, fingerIDDatabase, noise, topMost)
         resultHashes[[grp]] <<- hash
 
-        cmd <- getSiriusCommand(plmz, pLists[[ana]][[grp]]$MS, pLists[[ana]][[grp]]$MSMS, profile,
+        cmd <- getSiriusCommand(plmz, pLists[[ana]][[grp]][["MS"]], pLists[[ana]][[grp]][["MSMS"]], profile,
                                 adduct, maxMzDev, elements, formulaDatabase, noise, TRUE,
                                 fingerIDDatabase)
         db <- if (!is.null(fingerIDDatabase)) fingerIDDatabase else if (!is.null(formulaDatabase)) formulaDatabase else "pubchem"
         logf <- if (!is.null(logPath)) file.path(logPath, paste0("sirius-comp-", grp, ".txt")) else NULL
         logfe <- if (!is.null(logPath)) file.path(logPath, paste0("sirius-comp-err-", grp, ".txt")) else NULL
 
-        return(c(list(hash = hash, adduct = adduct, cacheDB = cacheDB, MSMSSpec = pLists[[ana]][[grp]]$MSMS,
+        return(c(list(hash = hash, adduct = adduct, cacheDB = cacheDB, MSMSSpec = pLists[[ana]][[grp]][["MSMS"]],
                       analysis = ana, database = db, topMost = topMost, stdoutFile = logf, stderrFile = logfe,
                       gName = grp), cmd))
     }, simplify = FALSE)

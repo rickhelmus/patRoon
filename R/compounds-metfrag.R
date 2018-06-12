@@ -132,13 +132,13 @@ generateMetFragRunData <- function(fGroups, MSPeakLists, mfSettings, topMost, id
         oanalyses <- anaInfo$analysis[ogind] # analyses ordered from highest to lowest intensity
 
         # filter out analyses without MS/MS
-        oanalyses <- sapply(oanalyses, function(a) if (!is.null(pLists[[a]][[grp]]$MSMS)) a else "", USE.NAMES = FALSE)
+        oanalyses <- sapply(oanalyses, function(a) if (!is.null(pLists[[a]][[grp]][["MSMS"]])) a else "", USE.NAMES = FALSE)
         oanalyses <- oanalyses[oanalyses != ""]
 
         if (length(oanalyses) < 1)
             return(NULL)
 
-        spec <- pLists[[oanalyses[[1]]]][[grp]]$MSMS
+        spec <- pLists[[oanalyses[[1]]]][[grp]][["MSMS"]]
         mfSettings$IonizedPrecursorMass <- gInfo[grp, "mzs"]
         mfSettings$ExperimentalRetentionTimeValue <- gInfo[grp, "rts"] / 60
 

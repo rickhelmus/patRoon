@@ -13,6 +13,7 @@ fGroupsSub <- fGroups[, mfTestDB$Name]
 
 plists <- generateMSPeakLists(fGroupsSub, "mzr")
 plistsEmpty <- getEmptyPLists()
+plistsEmptyMS <- filter(plists, absMSIntThr = 1E9)
 fGroupsEmpty <- getEmptyTestFGroups()
 
 doMetFrag <- !is.null(getOption("patRoon.path.metFragCL")) && nzchar(getOption("patRoon.path.metFragCL"))
@@ -50,6 +51,7 @@ test_that("verify MetFragCL compound generation", {
     expect_true(all(sapply(names(ct), function(grp) nrow(ct[[grp]]) == 1 && ct[[grp]]$identifier == grp)))
     expect_length(compsMFEmpty, 0)
     expect_length(compsMFEmptyPL, 0)
+    expect_length(generateCompounds(fGroupsSub, plistsEmptyMS, "sirius", logPath = NULL), 0)
 })
 
 test_that("verify SIRIUS compound generation", {

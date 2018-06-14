@@ -94,7 +94,7 @@ doEICs <- length(rmdVars$fGroups) > 0 && rmdVars$reportFGroups
 `r if (doPlotChord) "### Chord diagram\n"`
 ```{r fig.height=5.5, eval=doPlotChord,out.height="400px"}
 message("Creating chord diagram... ", appendLF = FALSE)
-plotChord(rmdVars$fGroups, average = F)
+plotChord(rmdVars$fGroups)
 message("Done!")
 ```
 

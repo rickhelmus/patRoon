@@ -150,16 +150,16 @@ setMethod("treeCutDynamic", "compoundsCluster", function(obj, maxTreeHeight, dee
 
 #' @describeIn compoundsCluster Plot the dendrogram for clustered compounds of a
 #'   feature group. Clusters are highlighted using \pkg{\link{dendextend}}.
-#' @param pal Colour palette to be used from \pkg{\link{RColorBrewer}}.
-#' @param \dots Any arguments directly given to \code{\link{plot.dendrogram}}.
-#'
+#' @template plot_clust
 #' @export
-setMethod("plot", "compoundsCluster", function(x, groupName, pal = "Paired", ...)
+setMethod("plot", "compoundsCluster", function(x, groupName, pal = "Paired",
+                                               colourBranches = length(x) < 50,
+                                               showLegend = length(x) < 20, ...)
 {
     assertChoiceSilent(groupName, names(x@clusters))
     checkmate::assertString(pal, min.chars = 1)
     plotDendroWithClusters(as.dendrogram(x@clusters[[groupName]]), x@cutClusters[[groupName]], pal,
-                           ylab = "Tanimoto dist", ...)
+                           colourBranches, showLegend, ylab = "Tanimoto dist", ...)
     invisible(NULL)
 })
 

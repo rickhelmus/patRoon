@@ -175,18 +175,19 @@ setMethod("plotInt", "componentsIntClust", function(obj, index, ...)
 #' @describeIn componentsIntClust generates a dendrogram from a given cluster
 #'   object and optionally highlights resulting branches when the cluster is
 #'   cut.
-#' @param pal Colour palette to be used from \pkg{\link{RColorBrewer}}.
 #' @param numericLabels Set to \code{TRUE} to label with numeric indices instead
 #'   of (long) feature group names.
-#' @param \dots Any arguments directly given to \code{\link{plot.dendrogram}}.
+#' @template plot_clust
 #' @export
-setMethod("plot", "componentsIntClust", function(x, pal = "Paired", numericLabels = TRUE, ...)
+setMethod("plot", "componentsIntClust", function(x, pal = "Paired", numericLabels = TRUE,
+                                                 colourBranches = length(x) < 50,
+                                                 showLegend = length(x) < 20, ...)
 {
     checkmate::assertString(pal, min.chars = 1)
     dendro <- as.dendrogram(x@clust)
     if (numericLabels)
-        dendextend::labels(dendro) <- seq_along(x@cutClusters)
-    plotDendroWithClusters(dendro, x@cutClusters, pal, ...)
+        dendextend::labels(dendro) <- as.character(seq_along(x@cutClusters))
+    plotDendroWithClusters(dendro, x@cutClusters, pal, colourBranches, showLegend, ...)
     invisible(NULL)
 })
 

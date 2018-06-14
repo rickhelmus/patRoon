@@ -35,7 +35,8 @@
 \S4method{treeCutDynamic}{compoundsCluster}(obj, maxTreeHeight, deepSplit,
   minModuleSize, groupName)
 
-\S4method{plot}{compoundsCluster,ANY}(x, groupName, pal = "Paired", ...)
+\S4method{plot}{compoundsCluster,ANY}(x, groupName, pal = "Paired",
+  colourBranches = length(x) < 50, showLegend = length(x) < 20, ...)
 
 \S4method{getMCS}{compoundsCluster}(obj, groupName, cluster)
 
@@ -58,6 +59,16 @@ Analogous to \code{\link{cutree}}.}
 \code{\link{cutreeDynamicTree}}.}
 
 \item{pal}{Colour palette to be used from \pkg{\link{RColorBrewer}}.}
+
+\item{colourBranches}{Whether branches from cut clusters (and their labels)
+should be coloured. Might be slow with large numbers of clusters, hence, by
+default this value is by default only \code{TRUE} when this is not the
+case.}
+
+\item{showLegend}{If \code{TRUE} and \code{colourBranches} is also
+\code{TRUE} then a legend will be shown which outlines cluster numbers and
+their colours. By default \code{TRUE} for small amount of clusters to avoid
+overflowing the plot.}
 
 \item{\dots}{Any arguments directly given to \code{\link{plot.dendrogram}}.}
 

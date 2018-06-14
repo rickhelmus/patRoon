@@ -607,24 +607,32 @@ doDynamicTreeCut <- function(dendro, maxTreeHeight, deepSplit,
     return(ret)
 }
 
-plotDendroWithClusters <- function(dendro, ct, pal, ...)
+plotDendroWithClusters <- function(dendro, ct, pal, colourBranches, showLegend, ...)
 {
-    ct <- ct[order.dendrogram(dendro)] # re-order for dendrogram
-    nclust <- length(unique(ct[ct != 0])) # without unassigned (in case of dynamicTreeCut)
-    cols <- getBrewerPal(nclust, pal)
-    dendro <- dendextend::color_branches(dendro, clusters = ct, col = cols[unique(ct)]) # unique: fixup colour order
-    lcols <- dendextend::get_leaves_branches_col(dendro)
-    dendextend::labels_colors(dendro) <- lcols
-    
-    mr <- par("mar")
-    mr[4] <- max(5.5, mr[4])
-    withr::with_par(list(mar = mr),
+    if (colourBranches)
     {
+        ct <- ct[order.dendrogram(dendro)] # re-order for dendrogram
+        nclust <- length(unique(ct[ct != 0])) # without unassigned (in case of dynamicTreeCut)
+        cols <- getBrewerPal(nclust, pal)
+        dendro <- dendextend::color_branches(dendro, clusters = ct, col = cols[unique(ct)]) # unique: fixup colour order
+        lcols <- dendextend::get_leaves_branches_col(dendro)
+        dendextend::labels_colors(dendro) <- lcols
+    }
+
+    if (colourBranches && showLegend)
+    {
+        mr <- par("mar")
+        mr[4] <- max(5.5, mr[4])
+        withr::with_par(list(mar = mr),
+        {
+            plot(dendro, ...)
+            legend("topright", legend = seq_len(nclust),
+                   bty = "n", cex = 1, fill = cols, inset = c(-0.22, 0), xpd = NA,
+                   ncol = 2, title = "cluster")
+        })
+    }
+    else
         plot(dendro, ...)
-        legend("topright", legend = seq_len(nclust),
-               bty = "n", cex = 1, fill = cols, inset = c(-0.18, 0), xpd = NA,
-               ncol = 2, title = "cluster")
-    })
 }
 
 getMoleculesFromSMILES <- function(SMILES)

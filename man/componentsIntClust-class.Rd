@@ -35,7 +35,8 @@
 \S4method{plotInt}{componentsIntClust}(obj, index, ...)
 
 \S4method{plot}{componentsIntClust,ANY}(x, pal = "Paired",
-  numericLabels = TRUE, ...)
+  numericLabels = TRUE, colourBranches = length(x) < 50,
+  showLegend = length(x) < 20, ...)
 
 \S4method{plotSilhouettes}{componentsIntClust}(obj, kSeq, ...)
 }
@@ -62,6 +63,16 @@ Analogous to \code{\link{cutree}}.}
 
 \item{numericLabels}{Set to \code{TRUE} to label with numeric indices instead
 of (long) feature group names.}
+
+\item{colourBranches}{Whether branches from cut clusters (and their labels)
+should be coloured. Might be slow with large numbers of clusters, hence, by
+default this value is by default only \code{TRUE} when this is not the
+case.}
+
+\item{showLegend}{If \code{TRUE} and \code{colourBranches} is also
+\code{TRUE} then a legend will be shown which outlines cluster numbers and
+their colours. By default \code{TRUE} for small amount of clusters to avoid
+overflowing the plot.}
 
 \item{kSeq}{An integer vector containing the sequence that should be used for
 average silhouette width calculation.}

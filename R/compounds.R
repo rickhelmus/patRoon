@@ -348,7 +348,7 @@ setMethod("plotScores", "compounds", function(obj, index, groupName, normalizeSc
         else
             cols <- getBrewerPal(nrow(scores), "Paired")
 
-        bpargs <- list(las = 2, col = cols, border = cols, cex.axis = 0.9)
+        bpargs <- list(las = 2, col = cols, border = cols, cex.axis = 0.9, xpd = TRUE)
 
         if (length(mcn) > 1)
         {
@@ -371,14 +371,16 @@ setMethod("plotScores", "compounds", function(obj, index, groupName, normalizeSc
             # par(omd = c(0, 1, 0, 1 - lh), new = TRUE)
             lw <- (grconvertX(leg$rect$w, to = "ndc") - grconvertX(0, to = "ndc"))
             par(omd = c(0, 1 - lw, 0, 1), new = TRUE)
-            do.call(barplot, c(list(as.matrix(plotTab[, -"merged"]), beside = TRUE), bpargs))
+            bp <- do.call(barplot, c(list(as.matrix(plotTab[, -"merged"]), beside = TRUE), bpargs))
             # legend("top", plotTab$merged, col = cols, lwd = 1, inset = c(0, -0.2), xpd = NA, horiz = TRUE, cex = 0.75)
             # makeLegend(0, par("usr")[4] + lh)
             makeLegend(par("usr")[2], par("usr")[4])
         }
         else
-            do.call(barplot, c(list(scores$score, names.arg = scores$type), bpargs))
+            bp <- do.call(barplot, c(list(scores$score, names.arg = scores$type), bpargs))
 
+        text(bp, scores$score, labels = round(scores$score, 2), pos = 1, cex = 0.8)
+    
         par(oldp)
     }
     else

@@ -10,6 +10,7 @@
 #' @importFrom fst compress_fst decompress_fst
 #' @importFrom processx process poll
 #' @importFrom Rdpack reprompt
+#' @importFrom checkmate makeAssertion vname
 #' @importClassesFrom CAMERA xsAnnotate
 #' @import data.table
 #' @import enviPick

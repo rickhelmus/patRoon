@@ -89,6 +89,7 @@ test_that("basic filtering", {
     expect_equivalent(filter(fgOpenMS, chromWidthRange = c(0, -1)), fgOpenMS)
     
     expect_identical(unique(analysisInfo(filter(fgOpenMS, rGroups = "standard"))$group), "standard")
+    expect_identical(unique(analysisInfo(filter(fgOpenMS, removeRefAnalyses = TRUE))$group), "standard")
     expect_known_output(filter(fgOpenMS, relAbundance = 0.5), testFile("fgf-relabu", text = TRUE))
     expect_known_output(filter(fgOpenMS, absAbundance = 3), testFile("fgf-absabu", text = TRUE))
     expect_known_output(filter(fgOpenMS, interRelRGroupAbundance = 1), testFile("fgf-inter_rel_rg", text = TRUE))

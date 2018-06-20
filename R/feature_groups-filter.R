@@ -255,6 +255,12 @@ groupNamesFilter <- function(fGroups, what, gNames, negate = FALSE, hashParam = 
 #'   numeric vector with length of two containing the min/max values. If the max
 #'   value is set to a value below 0 then no maximum is assumed. Set to
 #'   \code{NULL} to skip this step.
+#' @param removeRefAnalyses Set to \code{TRUE} to remove all analyses that
+#'   belong to replicate groups that are specified as a reference in the
+#'   \link{analysis-information}. This is useful to simplify the analyses in the
+#'   specified \code{\link{featureGroups}} object after blank subtraction.
+#'   Consequently, when both \code{minBlankThreshold} and this argument are set,
+#'   blank subtraction is performed prior to removing any analyses.
 #' @param repetitions Sometimes more feature groups may be removed by repeating
 #'   filtering steps after another. Usually a value of two is enough to filter
 #'   the maximum amount of feature groups.
@@ -267,7 +273,7 @@ setMethod("filter", "featureGroups", function(obj, intensityThreshold = NULL, re
                                               absAbundance = NULL, interRelRGroupAbundance = NULL,
                                               interAbsRGroupAbundance = NULL, intraRGroupAbundance = NULL,
                                               minBlankThreshold = NULL, retentionRange = NULL, mzRange = NULL,
-                                              chromWidthRange = NULL, rGroups = NULL,
+                                              chromWidthRange = NULL, rGroups = NULL, removeRefAnalyses = FALSE,
                                               repetitions = 2, negate = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
@@ -327,6 +333,9 @@ setMethod("filter", "featureGroups", function(obj, intensityThreshold = NULL, re
         }
     }
 
+    if (removeRefAnalyses)
+        obj <- replicateGroupFilter(obj, unique(analysisInfo(fGroups)$ref), negate = !negate)
+    
     return(obj)
 })
 

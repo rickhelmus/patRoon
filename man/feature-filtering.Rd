@@ -13,7 +13,8 @@
   interRelRGroupAbundance = NULL, interAbsRGroupAbundance = NULL,
   intraRGroupAbundance = NULL, minBlankThreshold = NULL,
   retentionRange = NULL, mzRange = NULL, chromWidthRange = NULL,
-  rGroups = NULL, repetitions = 2, negate = FALSE)
+  rGroups = NULL, removeRefAnalyses = FALSE, repetitions = 2,
+  negate = FALSE)
 
 \S4method{replicateGroupSubtract}{featureGroups}(fGroups, rGroups,
   threshold = 0)
@@ -43,6 +44,13 @@ value is set to a value below 0 then no maximum is assumed. Set to
 
 \item{rGroups}{A character vector of replicate groups that should be kept
 (\code{filter}) or subtracted from (\code{replicateGroupSubtract}).}
+
+\item{removeRefAnalyses}{Set to \code{TRUE} to remove all analyses that
+belong to replicate groups that are specified as a reference in the
+\link{analysis-information}. This is useful to simplify the analyses in the
+specified \code{\link{featureGroups}} object after blank subtraction.
+Consequently, when both \code{minBlankThreshold} and this argument are set,
+blank subtraction is performed prior to removing any analyses.}
 
 \item{repetitions}{Sometimes more feature groups may be removed by repeating
 filtering steps after another. Usually a value of two is enough to filter

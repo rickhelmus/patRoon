@@ -1,6 +1,7 @@
 # patRoon 0.1.0.9000
 
 ## June 2018
+* Added removeRefAnalyses argument to filter() (featureGroups method) to easily remove e.g. analyses that are used as blanks after blank subtraction.
 * Added filterBy() method which removes any feature groups from a featureGroups object of which no results are present in a specified object. Methods are defined for MSPeakLists, formulaConsenus, compounds and components. This method replaces some of the functionality of the filter() method for featureGroups (formConsensus and compounds arguments).
 * Added mz and chromatographic peak width range options to filter() method for feature groups.
 * Moved intensity clustering code (makeHCluster) to new component type (see componentsIntClust class documentation).

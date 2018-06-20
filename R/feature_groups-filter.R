@@ -284,7 +284,7 @@ setMethod("filter", "featureGroups", function(obj, intensityThreshold = NULL, re
     aapply(assertRange, . ~ retentionRange + mzRange + chromWidthRange, null.ok = TRUE, fixed = list(add = ac))
     checkmate::assertCharacter(rGroups, min.chars = 1, min.len = 1, any.missing = FALSE, null.ok = TRUE, add = ac)
     checkmate::assertCount(repetitions, positive = TRUE, add = ac)
-    checkmate::assertFlag(negate, add = ac)
+    aapply(checkmate::assertFlag, . ~ removeRefAnalyses + negate, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
     
     if (length(obj) == 0)
@@ -334,7 +334,7 @@ setMethod("filter", "featureGroups", function(obj, intensityThreshold = NULL, re
     }
 
     if (removeRefAnalyses)
-        obj <- replicateGroupFilter(obj, unique(analysisInfo(fGroups)$ref), negate = !negate)
+        obj <- replicateGroupFilter(obj, unique(analysisInfo(obj)$ref), negate = !negate)
     
     return(obj)
 })

@@ -20,7 +20,7 @@ getScriptCode <- function(destination, analysisTableFile, DAMethod, dataPretreat
     formulaOpts = list(algo = formulaGenerator)
     identOpts = list(algo = compIdentifier)
     componentOpts = list(algo = componentGenerator)
-    sldest <- gsub("\\", "\\\\", destination) # BUG: tmpl() seems to eat backslashes!?
+    sldest <- gsub("\\", "/", destination) # BUG: tmpl() seems to eat backslashes!? Convert to forward slashes for now
     template <- tmpl(readAllFile(system.file("templates", "main_script.R", package = "patRoon")),
                      destination = sldest, analysisTableFile = analysisTableFile,
                      doMSPeakFind = formulaGenerator != "" || compIdentifier != "",

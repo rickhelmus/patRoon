@@ -981,7 +981,11 @@ setMethod("screenTargets", "featureGroups", function(obj, targets, rtWindow, mzW
         hasRT <- !is.null(targets$rt) && !is.na(targets$rt[ti])
 
         # find related feature group(s)
-        gi <- gInfo[(!hasRT | abs(gInfo$rts - targets$rt[ti]) <= rtWindow) & abs(gInfo$mzs - targets$mz[ti]) <= mzWindow, ]
+        gi <- gInfo
+        if (hasRT)
+            gi <- gInfo[abs(gInfo$rts - targets$rt[ti]) <= rtWindow & abs(gInfo$mzs - targets$mz[ti]) <= mzWindow, ]
+        else
+            gi <- gInfo[abs(gInfo$mzs - targets$mz[ti]) <= mzWindow, ]
 
         if (nrow(gi) == 0) # no results? --> add NA result
             return(data.table(name = targets$name[ti], rt = if (hasRT) targets$rt[ti] else NA, mz = targets$mz[ti],

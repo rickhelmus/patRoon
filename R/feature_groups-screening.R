@@ -36,7 +36,7 @@ featureGroupsScreening <- setClass("featureGroupsScreening", contains = "feature
 #' @export
 setMethod("groupFeaturesScreening", "featureGroups", function(fGroups, scr)
 {
-    checkmate::assertDataFrame(scr, any.missing = FALSE)
+    checkmate::assertDataFrame(scr)
     
     if (is.null(scr[["group"]]))
         stop("This function only accepts screening results obtained from feature groups (thus not from features objects)")

@@ -958,7 +958,7 @@ setMethod("overlap", "featureGroups", function(fGroups, which, exclusive)
 setMethod("screenTargets", "featureGroups", function(obj, targets, rtWindow, mzWindow)
 {
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertDataFrame(targets, any.missing = FALSE, min.rows = 1, add = add)
+    checkmate::assertDataFrame(targets, any.missing = FALSE, min.rows = 1, add = ac)
     assertHasNames(targets, c("name", "mz"), add = ac)
     aapply(checkmate::assertNumber, . ~ rtWindow + mzWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
     checkmate::reportAssertions(ac)

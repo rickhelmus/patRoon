@@ -72,20 +72,26 @@ setMethod("screenTargets", "features", function(obj, targets, rtWindow, mzWindow
     fTable <- featureTable(obj)
     anaInfo <- analysisInfo(obj)
 
-    retlist <- lapply(seq_len(nrow(targets)), function (ti)
+    retlist <- lapply(seq_len(nrow(targets)), function(ti)
     {
+        hasRT <- !is.null(targets$rt) && !is.na(targets$rt[ti])
+        
         rbindlist(lapply(names(fTable), function(ana)
         {
-            fts <- fTable[[ana]][abs(ret - targets$rt[ti]) <= rtWindow & abs(mz - targets$mz[ti]) <= mzWindow, ]
+            if (hasRT)
+                fts <- fTable[[ana]][abs(ret - targets$rt[ti]) <= rtWindow & abs(mz - targets$mz[ti]) <= mzWindow, ]
+            else
+                fts <- fTable[[ana]][abs(mz - targets$mz[ti]) <= mzWindow, ]
 
             if (nrow(fts) == 0) # no results? --> add NA result
-                return(data.table(name = targets$name[ti], rt = targets$rt[ti], mz = targets$mz[ti], analysis = ana,
+                return(data.table(name = targets$name[ti], rt = if (hasRT) targets$rt[ti] else NA,
+                                  mz = targets$mz[ti], analysis = ana,
                                   feature = NA, d_rt = NA, d_mz = NA, intensity = NA, area = NA))
 
             return(rbindlist(lapply(seq_len(nrow(fts)), function(i)
             {
-                data.table(name = targets$name[ti], rt = targets$rt[ti], mz = targets$mz[ti], analysis = ana,
-                           feature = fts[["ID"]][i], d_rt = fts[["ret"]][i] - targets$rt[ti],
+                data.table(name = targets$name[ti], rt = if (hasRT) targets$rt[ti] else NA, mz = targets$mz[ti], analysis = ana,
+                           feature = fts[["ID"]][i], d_rt = if (hasRT) fts[["ret"]][i] - targets$rt[ti] else NA,
                            d_mz = fts[["mz"]][i] - targets$mz[ti], intensity = fts[["intensity"]][i],
                            area = if (is.null(fts[["area"]][i])) 0 else fts[["area"]][i])
             })))

@@ -10,4 +10,8 @@ test_that("target screening is OK", {
     expect_known_value(scr, testFile("screening"))
     expect_known_value(scrF[, -"feature"], testFile("screening-feat"))
     expect_length(groupFeaturesScreening(fGroups, scr), nrow(patRoonData::targets))
+    
+    # check suspects without retention
+    expect_gte(nrow(screenTargets(fGroups, patRoonData::targets[, -3])), nrow(scr))
+    expect_gte(nrow(screenTargets(getFeatures(fGroups), patRoonData::targets[, -3])), nrow(scrF))
 })

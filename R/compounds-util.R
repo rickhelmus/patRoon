@@ -45,7 +45,10 @@ getCompScoreColNames <- function()
              "referenceCount",
              "RSCCount",
              "formulaScore",
-             "smartsInclusionScore"))
+             "smartsInclusionScore",
+             "smartsExclusionScore",
+             "suspectListScore",
+             "retentionTimeScore"))
 }
 
 normalizeCompScores <- function(compResults, mCompNames)

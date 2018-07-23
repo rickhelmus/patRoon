@@ -15,6 +15,7 @@
 \alias{filterBy,compounds-method}
 \alias{addFormulaScoring,compounds-method}
 \alias{addFormulaScoring}
+\alias{getMCS,compounds-method}
 \alias{plotStructure,compounds-method}
 \alias{plotScores,compounds-method}
 \alias{plotScores}
@@ -39,6 +40,8 @@
 
 \S4method{addFormulaScoring}{compounds}(compounds, formConsensus,
   updateScore = FALSE, formulaScoreWeight = 1)
+
+\S4method{getMCS}{compounds}(obj, index, groupName)
 
 \S4method{plotStructure}{compounds}(obj, index, groupName, width = 500,
   height = 500, useGGPlot2 = FALSE)
@@ -79,7 +82,12 @@ updated by adding the normalized \option{formulaScore} (weighted by
 \item{formulaScoreWeight}{Weight used to update scoring (see
 \code{updateScore} parameter).}
 
-\item{index}{The (numeric) index of the candidate to be plotted.}
+\item{index}{The numeric index of the candidate structure. Multiple indices
+(\emph{i.e.} vector with length >=2) may be specified for
+\code{plotStructure} and are mandatory for \code{getMCS}. Alternatively,
+\samp{-1} may be specified to these methods to select all candidates. When
+multiple indices are specified for \code{plotStructure}, their maximum
+common substructure will be drawn.}
 
 \item{groupName}{The name of the feature group to which the candidate
 belongs.}
@@ -123,6 +131,9 @@ within all given \code{compounds} objects.}
 \code{addFormulaScoring} returns a \code{compounds} object updated
   with formula scoring.
 
+\code{getMCS} returns an \pkg{\link{rcdk}} molecule object
+  (\code{IAtomContainer}).
+
 \code{consensus} returns a \code{compounds} object that is produced
   by merging multiple specified \code{compounds} objects.
 }
@@ -161,8 +172,14 @@ presence of candidate formulae being present in a given
 \code{\link{formulaConsensus}} object. Matched precursor formulae yield one
 point, whereas matched MS/MS fragments yield 0.5 point each.
 
+\item \code{getMCS}: Calculates the maximum common substructure (MCS)
+for two or more candidate structures for a feature group. This method uses
+the \code{\link{get.mcs}} function from \pkg{\link{rcdk}}.
+
 \item \code{plotStructure}: Plots a structure of a candidate compound using the
-\CRANpkg{rcdk} package.
+\CRANpkg{rcdk} package. If multiple candidates are specified (\emph{i.e.}
+by specifying a \code{vector} for \code{index}) then the maximum common
+substructure (MCS) of the selected candidates is drawn.
 
 \item \code{plotScores}: Plots a barplot with scoring of a candidate compound.
 

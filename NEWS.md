@@ -1,5 +1,10 @@
 # patRoon 0.1.0.9000
 
+## July 2018
+* getMCS() method for compounds
+* plotStructure() method for compounds will draw MCS when mutiple indices are specified
+
+
 ## June 2018
 * Added removeRefAnalyses argument to filter() (featureGroups method) to easily remove e.g. analyses that are used as blanks after blank subtraction.
 * Added filterBy() method which removes any feature groups from a featureGroups object of which no results are present in a specified object. Methods are defined for MSPeakLists, formulaConsenus, compounds and components. This method replaces some of the functionality of the filter() method for featureGroups (formConsensus and compounds arguments).

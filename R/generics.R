@@ -69,7 +69,6 @@ setGeneric("plotScores", function(obj, index, groupName, normalizeScores = TRUE,
 ### clustering
 
 setGeneric("makeHCluster", function(obj, method = "complete", ...) standardGeneric("makeHCluster"))
-setGeneric("getMCS", function(obj, groupName, cluster) standardGeneric("getMCS"))
 
 setGeneric("plotHeatMap", function(obj, col = colorRampPalette(c("black", "yellow"))(100),
                                    interactive = FALSE, ...) standardGeneric("plotHeatMap"))
@@ -190,6 +189,11 @@ setGeneric("filterBy", function(obj, fGroups, negate = FALSE, ...) standardGener
 #' @templateVar desc returns formula data.
 #' @template generics
 setGeneric("formulaTable", function(obj) standardGeneric("formulaTable"))
+
+#' @templateVar func getMCS
+#' @templateVar desc Calculcates the maximum common substructure.
+#' @template generics
+setGeneric("getMCS", function(obj, ...) standardGeneric("getMCS"))
 
 #' @templateVar func plotChord
 #' @templateVar desc plots a Chord diagram to assess overlapping data.

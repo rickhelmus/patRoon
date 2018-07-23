@@ -169,7 +169,6 @@ setMethod("plot", "compoundsCluster", function(x, groupName, pal = "Paired",
 #' @return \code{getMCS} returns an \pkg{\link{rcdk}} molecule object
 #'   (\code{IAtomContainer}).
 #' @export
-#' @aliases getMCS
 setMethod("getMCS", "compoundsCluster", function(obj, groupName, cluster)
 {
     ac <- checkmate::makeAssertCollection()
@@ -189,7 +188,7 @@ setMethod("getMCS", "compoundsCluster", function(obj, groupName, cluster)
             # might fail if there is no overlap...
             tryCatch(mcons <- rcdk::get.mcs(mcons, mols[[i]]), error = function(e) FALSE)
             if (mcons == FALSE)
-                return(rcdk::parse.smiles("")) # return empty molecule
+                return(rcdk::parse.smiles("")[[1]]) # return empty molecule
         }
     }
 

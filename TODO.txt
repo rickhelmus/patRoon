@@ -18,6 +18,5 @@ Release:
 - filter method for components
 - mass defect components
 - fix compoundViewer
-- getMCS for compounds
 - names() for compounds/compounds clusters etc?
 - check why generics sometimes are not found

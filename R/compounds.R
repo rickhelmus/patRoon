@@ -17,12 +17,18 @@ NULL
 #'   ignore.
 #'
 #' @param obj,object,x,compounds The \code{compound} object.
+#' @param index The numeric index of the candidate structure. Multiple indices
+#'   (\emph{i.e.} vector with length >=2) may be specified for
+#'   \code{plotStructure} and are mandatory for \code{getMCS}. Alternatively,
+#'   \samp{-1} may be specified to these methods to select all candidates. When
+#'   multiple indices are specified for \code{plotStructure}, their maximum
+#'   common substructure will be drawn.
 #'
 #' @return \code{plotSpec} and \code{plotStructure} will return a
 #'   \code{\link[=ggplot2]{ggplot object}} if \code{useGGPlot2} is \code{TRUE}.
 #'
 #' @template plotSpec-args
-#' 
+#'
 #' @template useGGplot2
 #'
 #' @export
@@ -249,10 +255,49 @@ setMethod("addFormulaScoring", "compounds", function(compounds, formConsensus, u
     return(compounds)
 })
 
+#' @describeIn compounds Calculates the maximum common substructure (MCS)
+#'   for two or more candidate structures for a feature group. This method uses
+#'   the \code{\link{get.mcs}} function from \pkg{\link{rcdk}}.
+#' @return \code{getMCS} returns an \pkg{\link{rcdk}} molecule object
+#'   (\code{IAtomContainer}).
+#' @export
+setMethod("getMCS", "compounds", function(obj, index, groupName)
+{
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assert(
+        checkmate::checkIntegerish(index, lower = 1, any.missing = FALSE, min.len = 2, unique = TRUE),
+        checkmate::checkTRUE(index == -1),
+        .var.name = "index"
+    )
+    
+    assertChoiceSilent(groupName, names(obj@compounds), add = ac)
+    checkmate::reportAssertions(ac)
+    
+    if (length(index) == 1 && index == -1)
+        index <- seq_len(nrow(compoundTable(obj)[[groupName]]))
+    
+    mols <- getMoleculesFromSMILES(compoundTable(obj)[[groupName]][["SMILES"]][index])
+    mcons <- mols[[1]]
+    if (length(mols) > 1)
+    {
+        for (i in seq(2, length(mols)))
+        {
+            # might fail if there is no overlap...
+            tryCatch(mcons <- rcdk::get.mcs(mcons, mols[[i]]), error = function(e) FALSE)
+            if (mcons == FALSE)
+                return(rcdk::parse.smiles("")[[1]]) # return empty molecule
+        }
+    }
+    
+    return(mcons)
+})
+
 # NOTE: argument docs 'borrowed' from plotSpec-args.R template
 
 #' @describeIn compounds Plots a structure of a candidate compound using the
-#'   \CRANpkg{rcdk} package.
+#'   \CRANpkg{rcdk} package. If multiple candidates are specified (\emph{i.e.}
+#'   by specifying a \code{vector} for \code{index}) then the maximum common
+#'   substructure (MCS) of the selected candidates is drawn.
 #'
 #' @param width,height The dimensions (in pixels) of the raster image that
 #'   should be plotted.
@@ -263,7 +308,7 @@ setMethod("addFormulaScoring", "compounds", function(compounds, formConsensus, u
 setMethod("plotStructure", "compounds", function(obj, index, groupName, width = 500, height = 500, useGGPlot2 = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertCount(index, positive = TRUE, add = ac)
+    checkmate::assertIntegerish(index, lower = -1, any.missing = FALSE, min.len = 1, unique = TRUE, add = ac)
     checkmate::assertString(groupName, min.chars = 1, add = ac)
     aapply(checkmate::assertNumber, . ~ width + height, lower = 0, finite = TRUE, fixed = list(add = ac))
     checkmate::assertFlag(useGGPlot2, add = ac)
@@ -274,26 +319,25 @@ setMethod("plotStructure", "compounds", function(obj, index, groupName, width = 
     if (is.null(compTable) || nrow(compTable) == 0)
         return(NULL)
 
-    mol <- rcdk::parse.smiles(compTable$SMILES[index])
-
-    if (useGGPlot2)
-    {
-        if (!is.na(mol))
-        {
-            raster <- rcdk::view.image.2d(mol[[1]], rcdk::get.depictor(width, height))
-            img <- magick::image_trim(magick::image_read(raster))
-            cowplot::ggdraw() + cowplot::draw_image(img)
-        }
-        else
-            ggplot()
-    }
+    if (length(index) > 1 || index == -1)
+        mol <- getMCS(obj, index, groupName)
     else
     {
-        if (!is.na(mol) && !is.null(mol) && !is.null(mol[[1]]))
-            rcdkplot(mol[[1]], width, height)
+        mol <- rcdk::parse.smiles(compTable$SMILES[index])
+        if (is.null(mol) || is.na(mol) || is.null(mol)[[1]])
+            mol <- rcdk::parse.smiles("")[[1]]
         else
-            plot.new()
+            mol <- mol[[1]]
     }
+    
+    if (useGGPlot2)
+    {
+        raster <- rcdk::view.image.2d(mol, rcdk::get.depictor(width, height))
+        img <- magick::image_trim(magick::image_read(raster))
+        cowplot::ggdraw() + cowplot::draw_image(img)
+    }
+    else
+        rcdkplot(mol, width, height)
 })
 
 # NOTE: argument docs 'borrowed' from plotSpec-args.R template
@@ -419,7 +463,6 @@ setMethod("plotScores", "compounds", function(obj, index, groupName, normalizeSc
 #' @describeIn compounds Plots an annotated spectrum for a given candidate
 #'   compound of a feature group.
 #'
-#' @param index The (numeric) index of the candidate to be plotted.
 #' @param normalizeScores Normalize scores to maximum values.
 #'
 #' @export

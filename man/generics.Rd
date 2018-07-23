@@ -12,6 +12,7 @@
 \alias{filter}
 \alias{filterBy}
 \alias{formulaTable}
+\alias{getMCS}
 \alias{plotChord}
 \alias{plotEIC}
 \alias{plotInt}
@@ -41,6 +42,8 @@ filter(obj, ...)
 filterBy(obj, fGroups, negate = FALSE, ...)
 
 formulaTable(obj)
+
+getMCS(obj, ...)
 
 plotChord(obj, addSelfLinks = FALSE, addRetMzPlots = TRUE, ...)
 
@@ -183,6 +186,16 @@ please refer to the linked method documentation for each generic.
 
 \itemize{
     \item Methods are defined for: \code{\link[=formulaTable,formulaConsensus-method]{formulaConsensus}}, \code{\link[=formulaTable,formulas-method]{formulas}}.
+}
+
+\code{getMCS} Calculcates the maximum common substructure.
+
+
+
+
+
+\itemize{
+    \item Methods are defined for: \code{\link[=getMCS,compounds-method]{compounds}}, \code{\link[=getMCS,compoundsCluster-method]{compoundsCluster}}.
 }
 
 \code{plotChord} plots a Chord diagram to assess overlapping data.

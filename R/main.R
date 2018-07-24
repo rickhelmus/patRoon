@@ -10,7 +10,6 @@
 #' @importFrom fst compress_fst decompress_fst
 #' @importFrom processx process poll
 #' @importFrom Rdpack reprompt
-#' @importFrom checkmate makeAssertion vname
 #' @importClassesFrom CAMERA xsAnnotate
 #' @import data.table
 #' @import enviPick
@@ -27,6 +26,11 @@
 #' @import circlize
 #' @import ggplot2
 NULL # need this for doc generation
+
+# Need to import these as functions generated with checkmate/withr don't always take namespace in to account
+#' @importFrom checkmate makeAssertion vname
+#' @importFrom withr defer
+NULL
 
 # UNDONE: rstudioapi optional?
 

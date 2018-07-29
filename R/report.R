@@ -658,6 +658,11 @@ setMethod("reportPDF", "featureGroups", function(fGroups, path, reportFGroups,
 #'
 #' @param reportChord If \code{TRUE} then a chord diagram for all feature groups
 #'   is plotted (data will be averaged among replicates).
+#' @param includeMFWebLinks A \code{character} specifying to which feature
+#'   groups a web link should be added in the annotation page to
+#'   \href{https://msbi.ipb-halle.de/MetFragBeta/index.xhtml}{MetFragWeb}.
+#'   Options are: \code{"compounds"} (only to those with compounds results),
+#'   \code{"MSMS"} (only to those with MSMS peak lists) or \code{"none"}.
 #' @param interactiveHeat If \code{TRUE} an interactive heatmap HTML widget will
 #'   be generated to display hierarchical clustering results. Set to
 #'   \code{FALSE} for a 'regular' static plot.
@@ -675,8 +680,9 @@ setMethod("reportPDF", "featureGroups", function(fGroups, path, reportFGroups,
 #'   parallel. Higher numbers will decrease processing time, with an optimum
 #'   usually close to the amount of CPU cores.
 #'
-#' @references \addCitations{knitr}{2} \cr\cr
-#'   \addCitations{knitr}{3}
+#' @references Creating MetFrag landing page URLs based on code from
+#'   \href{https://github.com/Treutler/MetFamily}{MetFamily} R package. \cr\cr
+#'   \addCitations{knitr}{2} \cr\cr \addCitations{knitr}{3}
 #'
 #' @rdname reporting
 #' @aliases reportMD
@@ -684,9 +690,10 @@ setMethod("reportPDF", "featureGroups", function(fGroups, path, reportFGroups,
 setMethod("reportMD", "featureGroups", function(fGroups, path, reportChord, reportFGroups,
                                                 formConsensus, reportFormulaSpectra,
                                                 compounds, compoundNormalizeScores, compsCluster,
-                                                components, interactiveHeat, MSPeakLists, retMin,
-                                                EICRtWindow, EICMzWindow, EICTopMost, EICOnlyPresent,
-                                                selfContained, optimizePng, maxProcAmount, clearPath)
+                                                includeMFWebLinks, components, interactiveHeat,
+                                                MSPeakLists, retMin, EICRtWindow, EICMzWindow,
+                                                EICTopMost, EICOnlyPresent, selfContained,
+                                                optimizePng, maxProcAmount, clearPath)
 {
     # UNDONE: mention pandoc win limits
  
@@ -699,6 +706,7 @@ setMethod("reportMD", "featureGroups", function(fGroups, path, reportChord, repo
     aapply(checkmate::assertClass, . ~ formConsensus + compounds + components + MSPeakLists,
            c("formulaConsensus", "compounds", "components", "MSPeakLists"),
            null.ok = TRUE, fixed = list(add = ac))
+    checkmate::assertChoice(includeMFWebLinks, c("compounds", "MSMS", "none"))
     aapply(checkmate::assertNumber, . ~ EICRtWindow + EICMzWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
     checkmate::assertCount(EICTopMost, positive = TRUE, null.ok = TRUE, add = ac)
     checkmate::assertCount(maxProcAmount, positive = TRUE, add = ac)
@@ -740,9 +748,10 @@ setMethod("reportMD", "featureGroups", function(fGroups, path, reportChord, repo
     rmdVars <- list(outPath = path, fGroups = fGroups, groupNames = names(fGroups), gInfo = groupInfo(fGroups),
                     reportChord = reportChord, reportFGroups = reportFGroups, EICRtWindow = EICRtWindow, EICMzWindow = EICMzWindow,
                     retMin = retMin, EICTopMost = EICTopMost, EICOnlyPresent = EICOnlyPresent, EICs = EICs,
-                    compounds = compounds, compsCluster = compsCluster, MSPeakLists = MSPeakLists,
-                    formConsensus = formConsensus, compoundNormalizeScores = compoundNormalizeScores,
-                    components = components, interactiveHeat = interactiveHeat, selfContained = selfContained,
+                    compounds = compounds, compsCluster = compsCluster, includeMFWebLinks = includeMFWebLinks,
+                    MSPeakLists = MSPeakLists, formConsensus = formConsensus,
+                    compoundNormalizeScores = compoundNormalizeScores, components = components,
+                    interactiveHeat = interactiveHeat, selfContained = selfContained,
                     optimizePng = optimizePng, maxProcAmount = maxProcAmount)
 
     # HACK: not sure what exactly happens here, but... kableExtra adds latex

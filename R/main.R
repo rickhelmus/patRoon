@@ -324,9 +324,6 @@ NULL
 #'
 #' @template multiProc-args
 #'
-#' @return A \code{\link{compounds}} object containing all tentatively
-#'   identified compounds.
-#'
 #' @note At this point only mass spectrometric data from the most intense
 #'   feature is used for compound identification.
 #'

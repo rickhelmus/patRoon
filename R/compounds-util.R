@@ -138,6 +138,40 @@ getCompInfoList <- function(compResults, compIndex, addHTMLURL, mCompNames)
     return(ctext)
 }
 
+buildMFLandingURL <- function(mfSettings, peakList, precursorMz)
+{
+    # Via personal communication Steffen/Emma, see https://github.com/Treutler/MetFamily/blob/22b9f46b2716b805c24c03d260045605c0da8b3e/ClusteringMS2SpectraGUI.R#L2433
+    # Code adopted from MetFamily R package: https://github.com/Treutler/MetFamily
+    
+    if (is.null(mfSettings))
+    {
+        # no settings given, simply default to PubChem
+        mfSettings <- list(MetFragDatabaseType = "PubChem")
+    }
+    
+    mfSettings$IonizedPrecursorMass <- precursorMz
+    mfSettings$NeutralPrecursorMass <- "" # make sure user needs to calculate it and remove default
+    
+    PL <- paste(peakList$mz, peakList$intensity, sep = " ", collapse = "; ")
+    mfSettings$PeakList <- PL
+    
+    if (mfSettings$MetFragDatabaseType == "ExtendedPubChem")
+        mfSettings$MetFragDatabaseType <- "PubChem" # user should tick box for now...
+    
+    # Allowed parameters: list taken from error page when unsupported parameter is given
+    mfSettings <- mfSettings[names(mfSettings) %in%
+                                 c("FragmentPeakMatchAbsoluteMassDeviation", "FragmentPeakMatchRelativeMassDeviation",
+                                   "DatabaseSearchRelativeMassDeviation", "PrecursorCompoundIDs", "IonizedPrecursorMass",
+                                   "NeutralPrecursorMass", "NeutralPrecursorMolecularFormula", "PrecursorIonMode",
+                                   "PeakList", "MetFragDatabaseType")]
+    
+    setstr <- paste0(paste0(names(mfSettings), "=", mfSettings), collapse = "&")
+    ret <- paste0("https://msbi.ipb-halle.de/MetFragBeta/landing.xhtml?", setstr)
+    ret <- sprintf("<a target=\"_blank\" href=\"%s\">MetFragWeb</a>", ret)
+    
+    return(ret)
+}
+
 # nocov start
 getCompInfoText <- function(compResults, compIndex, addHTMLURL, normalizeScores, mCompNames)
 {

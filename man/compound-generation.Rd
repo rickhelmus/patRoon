@@ -191,8 +191,11 @@ is also \code{NULL}. Sets the \option{--fingerid-db} option.}
 parameter). Sets the \option{--noise} commandline option.}
 }
 \value{
-A \code{\link{compounds}} object containing all tentatively
-  identified compounds.
+\code{generateCompoundsMetFrag} returns a \code{\link{compoundsMF}}
+  object.
+
+\code{generateCompoundsSirius} returns a \code{\link{compounds}}
+  object.
 }
 \description{
 Functionality to automatically identify chemical compounds from feature

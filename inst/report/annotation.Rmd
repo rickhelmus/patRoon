@@ -16,7 +16,7 @@ Annotation {data-orientation=rows}
 ```{r echo=FALSE}
 showButton <- function(title, jsFunc, arg1, arg2) sprintf("<button onclick=\"%s('%s', '%s');\" style=\"padding: 0px 3px 0px 3px\">%s</button>", jsFunc, arg1, arg2, title)
 
-compFGroups <- compsClustFGroups <- formFGroups <- componentFGroups <- character()
+compFGroups <- compsClustFGroups <- formFGroups <- componentFGroups <- mfWebFGroups <- character()
 if (!is.null(rmdVars$compounds))
 {
     compTable <- compoundTable(rmdVars$compounds)
@@ -28,6 +28,18 @@ if (!is.null(rmdVars$compsCluster))
     cl <- clusters(rmdVars$compsCluster)
     compsClustFGroups <- rmdVars$groupNames[rmdVars$groupNames %in% names(cl)]
 }
+if (rmdVars$includeMFWebLinks != "none")
+{
+    if (rmdVars$includeMFWebLinks == "compounds")
+        mfWebFGroups <- compFGroups
+    else if (rmdVars$includeMFWebLinks == "MSMS")
+        mfWebFGroups <- rmdVars$groupNames[sapply(rmdVars$groupNames,
+                                                  function(grp) any(sapply(peakLists(rmdVars$MSPeakLists),
+                                                                           function(pa) !is.null(pa[[grp]]) &&
+                                                                               !is.null(pa[[grp]][["MSMS"]]))),
+                                                  USE.NAMES = FALSE)]
+}
+
 if (!is.null(rmdVars$formConsensus))
 {
     formTable <- formulaTable(rmdVars$formConsensus)[byMSMS == TRUE]
@@ -41,7 +53,7 @@ if (!is.null(rmdVars$components))
     componentFGroups <- componentFGroups[componentFGroups %in% rmdVars$groupNames]
 }
 plotGroups <- unique(c(compFGroups, compsClustFGroups, formFGroups))
-allGroups <- unique(c(plotGroups, componentFGroups))
+allGroups <- unique(c(plotGroups, componentFGroups, mfWebFGroups))
 
 fGroupsSpecDT <- data.table(group = allGroups, rt = round(rmdVars$gInfo[allGroups, "rts"], 2),
                             mz = round(rmdVars$gInfo[allGroups, "mzs"], 5))
@@ -72,6 +84,27 @@ buttons <- paste(compButtons, compCLButtons, formButtons, componButtons, sep = s
 buttons <- gsub("\\-(&nbsp;)*", "", buttons) # remove placeholder (-) with accompanying spaces
 fGroupsSpecDT[, show := buttons]
 
+if (rmdVars$includeMFWebLinks != "none")
+{
+    fGroupsSpecDT[group %in% mfWebFGroups, MetFragWeb := sapply(mfWebFGroups, function(grp)
+    {
+        if (grp %in% compFGroups && is(rmdVars$compounds, "compoundsMF"))
+        {
+            # make link with used MF settings
+            ana <- compTable[[grp]]$analysis[1]
+            set <- settings(compounds)
+        }
+        else
+        {
+            ana <- getMostIntenseAnaWithMSMS(rmdVars$fGroups, rmdVars$MSPeakLists, grp)
+            set <- NULL
+        }
+        
+        buildMFLandingURL(set, peakLists(rmdVars$MSPeakLists)[[ana]][[grp]][["MSMS"]],
+                          rmdVars$gInfo[grp, "mzs"])
+
+    })]
+}
 
 DT::datatable(fGroupsSpecDT, options = list(paging = FALSE, scrollY = "200px"), escape = FALSE)
 ```

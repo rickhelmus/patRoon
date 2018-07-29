@@ -27,7 +27,8 @@
 \S4method{reportMD}{featureGroups}(fGroups, path = "report",
   reportChord = TRUE, reportFGroups = TRUE, formConsensus = NULL,
   reportFormulaSpectra = TRUE, compounds = NULL,
-  compoundNormalizeScores = TRUE, compsCluster = NULL, components = NULL,
+  compoundNormalizeScores = TRUE, compsCluster = NULL,
+  includeMFWebLinks = "compounds", components = NULL,
   interactiveHeat = FALSE, MSPeakLists = NULL, retMin = TRUE,
   EICRtWindow = 20, EICMzWindow = 0.005, EICTopMost = NULL,
   EICOnlyPresent = TRUE, selfContained = TRUE, optimizePng = FALSE,
@@ -87,6 +88,12 @@ passed to \code{\link{plotEIC}} (\emph{i.e.} \code{rtWindow},
 
 \item{reportChord}{If \code{TRUE} then a chord diagram for all feature groups
 is plotted (data will be averaged among replicates).}
+
+\item{includeMFWebLinks}{A \code{character} specifying to which feature
+groups a web link should be added in the annotation page to
+\href{https://msbi.ipb-halle.de/MetFragBeta/index.xhtml}{MetFragWeb}.
+Options are: \code{"compounds"} (only to those with compounds results),
+\code{"MSMS"} (only to those with MSMS peak lists) or \code{"none"}.}
 
 \item{interactiveHeat}{If \code{TRUE} an interactive heatmap HTML widget will
 be generated to display hierarchical clustering results. Set to
@@ -149,6 +156,7 @@ Any formulae and compounds for feature groups which are not present
   will not be reported.
 }
 \references{
-\addCitations{knitr}{2} \cr\cr
-  \addCitations{knitr}{3}
+Creating MetFrag landing page URLs based on code from
+  \href{https://github.com/Treutler/MetFamily}{MetFamily} R package. \cr\cr
+  \addCitations{knitr}{2} \cr\cr \addCitations{knitr}{3}
 }

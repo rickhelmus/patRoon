@@ -74,6 +74,8 @@ processSiriusCompounds <- function(cmd, exitStatus, retries)
 #' @templateVar genForm FALSE
 #' @template form-args
 #'
+#' @return \code{generateCompoundsSirius} returns a \code{\link{compounds}}
+#'   object.
 #' @param fingerIDDatabase Database specifically used for
 #'   \command{CSI:FingerID}. If \code{NULL}, the value of the
 #'   \code{formulaDatabase} parameter will be used or \code{"pubchem"} when that

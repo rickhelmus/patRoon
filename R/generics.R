@@ -65,6 +65,7 @@ setGeneric("identifiers", function(compounds) standardGeneric("identifiers"))
 setGeneric("addFormulaScoring", function(compounds, formConsensus, updateScore = FALSE,
                                          formulaScoreWeight = 1) standardGeneric("addFormulaScoring"))
 setGeneric("plotScores", function(obj, index, groupName, normalizeScores = TRUE, useGGPlot2 = FALSE) standardGeneric("plotScores"))
+setGeneric("settings", function(compoundsMF) standardGeneric("settings"))
 
 ### clustering
 
@@ -257,7 +258,8 @@ setGeneric("reportPDF", function(fGroups, path = "report", reportFGroups = TRUE,
 setGeneric("reportMD", function(fGroups, path = "report", reportChord = TRUE, reportFGroups = TRUE,
                                 formConsensus = NULL, reportFormulaSpectra = TRUE,
                                 compounds = NULL, compoundNormalizeScores = TRUE, compsCluster = NULL,
-                                components = NULL,  interactiveHeat = FALSE, MSPeakLists = NULL, retMin = TRUE,
+                                includeMFWebLinks = "compounds", components = NULL, 
+                                interactiveHeat = FALSE, MSPeakLists = NULL, retMin = TRUE,
                                 EICRtWindow = 20, EICMzWindow = 0.005, EICTopMost = NULL, EICOnlyPresent = TRUE,
                                 selfContained = TRUE, optimizePng = FALSE, maxProcAmount = getOption("patRoon.maxProcAmount"),
                                 clearPath = FALSE) standardGeneric("reportMD"))

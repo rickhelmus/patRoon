@@ -647,3 +647,22 @@ getMoleculesFromSMILES <- function(SMILES)
     
     return(mols)
 }
+
+getMostIntenseAnaWithMSMS <- function(fGroups, MSPeakLists, groupName)
+{
+    gTable <- groups(fGroups)
+    anaInfo <- analysisInfo(fGroups)
+    pLists <- peakLists(MSPeakLists)
+    
+    ogind <- order(-gTable[[groupName]])
+    oanalyses <- anaInfo$analysis[ogind] # analyses ordered from highest to lowest intensity
+    
+    # filter out analyses without MS/MS
+    oanalyses <- sapply(oanalyses, function(a) if (!is.null(pLists[[a]][[groupName]][["MSMS"]])) a else "", USE.NAMES = FALSE)
+    oanalyses <- oanalyses[oanalyses != ""]
+    
+    if (length(oanalyses) < 1)
+        return(NULL)
+    
+    return(oanalyses[[1]])
+}

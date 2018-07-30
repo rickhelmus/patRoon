@@ -246,6 +246,7 @@ setMethod("plotStructure", "compoundsCluster", function(obj, groupName, cluster,
 #' @return \code{makeHCluster} returns an \code{\link{compoundsCluster}} object.
 #' @rdname compounds-cluster
 #' @aliases makeHCluster
+#' @export
 setMethod("makeHCluster", "compounds", function(obj, method, fpType = "extended",
                                                 fpSimMethod = "tanimoto",
                                                 maxTreeHeight = 1, deepSplit = TRUE,

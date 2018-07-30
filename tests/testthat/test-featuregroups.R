@@ -60,7 +60,7 @@ test_that("unique works", {
     expect_equivalent(unique(fgOpenMS, which = "standard"), unique(fgOpenMS, which = "standard", outer = TRUE))
     expect_lt(length(unique(fgOpenMS, which = "standard")), length(fgOpenMS))
     expect_equal(length(unique(fgOpenMS, which = c("standard", "solvent"))), length(fgOpenMS))
-    expect_equal(length(unique(fgOpenMS, which = c("standard", "solvent"), outer = TRUE)), 0)
+    expect_lt(length(unique(fgOpenMS, which = c("standard", "solvent"), outer = TRUE)), length(fgOpenMS))
     expect_length(unique(fgOpenMSEmpty, which = c("standard", "solvent")), 0)
 })
 

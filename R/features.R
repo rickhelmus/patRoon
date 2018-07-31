@@ -59,6 +59,23 @@ setMethod("featureTable", "features", function(obj) obj@features)
 #' @export
 setMethod("analysisInfo", "features", function(obj) obj@analysisInfo)
 
+# UNDONE: more options, docs, tests, ...
+# UNDONE: This probably needs more work for XCMS/enviPick?
+#' @describeIn features Performs common rule based filtering on of features,
+#'   such as intensity thresholds.
+#' @export
+setMethod("filter", "features", function(obj, intensityThreshold = NULL)
+{
+    anaInfo <- analysisInfo(obj)
+    if (!is.null(intensityThreshold))
+    {
+        for (ana in anaInfo$analysis)
+            obj@features[[ana]] <- obj@features[[ana]][intensity >= intensityThreshold]
+    }
+    
+    return(obj)
+})
+
 #' @rdname target-screening
 #' @export
 setMethod("screenTargets", "features", function(obj, targets, rtWindow, mzWindow)

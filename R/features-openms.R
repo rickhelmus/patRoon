@@ -176,12 +176,12 @@ loadIntensities <- function(dfile, features)
         features[, intensity := 0]
     else
     {
-        # take max intensity within +/- 5 sec window from retention time
+        # find closest data point to retention time in +/- 5 sec window
         for (f in seq_len(nrow(features)))
         {
             ft <- features[f]
             eic <- getEIC(spectra, ft$ret + c(-5, 5), c(ft$mzmin, ft$mzmax))
-            set(features, f, "intensity", max(eic$intensity))
+            set(features, f, "intensity", eic$intensity[which.min(abs(ft$ret - eic$time))])
         }
     }
     

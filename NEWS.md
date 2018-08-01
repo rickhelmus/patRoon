@@ -3,6 +3,7 @@
 ## July 2018
 * getMCS() method for compounds
 * plotStructure() method for compounds will draw MCS when mutiple indices are specified
+- Tweaked OpenMS feature intensity loading
 
 
 ## June 2018

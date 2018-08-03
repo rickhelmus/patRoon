@@ -3,7 +3,7 @@
 ## July 2018
 * getMCS() method for compounds
 * plotStructure() method for compounds will draw MCS when mutiple indices are specified
-- Tweaked OpenMS feature intensity loading
+* Tweaked OpenMS feature intensity loading: now takes intensity from data point closest to retention time instead of max intensity from datapoints in the search window. Furthermore, the search window for datapoints was reduced and made configurable.
 
 
 ## June 2018

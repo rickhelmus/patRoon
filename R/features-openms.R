@@ -30,15 +30,18 @@ featuresOpenMS <- setClass("featuresOpenMS", contains = "features")
 #' @param extraOpts Named character \code{vector} containing extra options that
 #'   will be passed to \code{FeatureFinderMetabo}. Any options specified here
 #'   will override any of the above.
+#' @param intSearchRTWindow Retention time window (in seconds) that is used to
+#'   find the closest data point to the retention time to obtain the intensity
+#'   of a feature (this is needed since OpenMS does not provide this data).
 #'
 #' @template multiProc-args
-#' 
+#'
 #' @references \insertRef{Rst2016}{patRoon}
 #'
 #' @rdname feature-finding
 #' @export
 findFeaturesOpenMS <- function(analysisInfo, thr = 1000, comfwhm = 5, minfwhm = 3, maxfwhm = 60, minlength = 3,
-                               maxlength = -1, mzppm = 10, extraOpts = NULL,
+                               maxlength = -1, mzppm = 10, extraOpts = NULL, intSearchRTWindow = 3,
                                logPath = file.path("log", "openms"), maxProcAmount = getOption("patRoon.maxProcAmount"))
 {
     ac <- checkmate::makeAssertCollection()
@@ -79,7 +82,7 @@ findFeaturesOpenMS <- function(analysisInfo, thr = 1000, comfwhm = 5, minfwhm = 
         fList <- executeMultiProcess(cmdQueue, function(cmd, ...)
         {
             fts <- importFeatureXML(cmd$featFile)
-            fts <- loadIntensities(cmd$dataFile, fts)
+            fts <- loadIntensities(cmd$dataFile, fts, intSearchRTWindow)
 
             # BUG: OpenMS sporadically reports features with 0 intensity
             # (noticed this with a feature of only two datapoints in hull).
@@ -167,7 +170,7 @@ importFeatureXML <- function(ffile)
 }
 
 # OpenMS doesn't support peak intensities. Estimate them from retention times
-loadIntensities <- function(dfile, features)
+loadIntensities <- function(dfile, features, rtWindow)
 {
     spectra <- loadSpectra(dfile, verbose = FALSE)
     features <- copy(features) # HACK: avoid sR crash caused by data.table
@@ -180,7 +183,7 @@ loadIntensities <- function(dfile, features)
         for (f in seq_len(nrow(features)))
         {
             ft <- features[f]
-            eic <- getEIC(spectra, ft$ret + c(-5, 5), c(ft$mzmin, ft$mzmax))
+            eic <- getEIC(spectra, ft$ret + c(-rtWindow, rtWindow), c(ft$mzmin, ft$mzmax))
             set(features, f, "intensity", eic$intensity[which.min(abs(ft$ret - eic$time))])
         }
     }

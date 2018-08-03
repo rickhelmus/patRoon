@@ -32,8 +32,8 @@ importFeaturesEnviMass(analysisInfo, enviProjPath)
 
 findFeaturesOpenMS(analysisInfo, thr = 1000, comfwhm = 5, minfwhm = 3,
   maxfwhm = 60, minlength = 3, maxlength = -1, mzppm = 10,
-  extraOpts = NULL, logPath = file.path("log", "openms"),
-  maxProcAmount = getOption("patRoon.maxProcAmount"))
+  extraOpts = NULL, intSearchRTWindow = 3, logPath = file.path("log",
+  "openms"), maxProcAmount = getOption("patRoon.maxProcAmount"))
 
 findFeaturesXCMS(analysisInfo, method = "centWave", ...)
 
@@ -79,6 +79,10 @@ Set negative value for maxlength to disable maximum. Sets
 \item{extraOpts}{Named character \code{vector} containing extra options that
 will be passed to \code{FeatureFinderMetabo}. Any options specified here
 will override any of the above.}
+
+\item{intSearchRTWindow}{Retention time window (in seconds) that is used to
+find the closest data point to the retention time to obtain the intensity
+of a feature (this is needed since OpenMS does not provide this data).}
 
 \item{logPath}{Destination directory for log files with output from executed
 commands. Will be created if non-existant. Set to \code{NULL} to disable

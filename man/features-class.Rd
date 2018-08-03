@@ -8,6 +8,7 @@
 \alias{show,features-method}
 \alias{featureTable,features-method}
 \alias{analysisInfo,features-method}
+\alias{filter,features-method}
 \title{Base features class}
 \usage{
 \S4method{length}{features}(x)
@@ -17,6 +18,8 @@
 \S4method{featureTable}{features}(obj)
 
 \S4method{analysisInfo}{features}(obj)
+
+\S4method{filter}{features}(obj, intensityThreshold = NULL)
 }
 \arguments{
 \item{obj, x, object}{\code{features} object to be accessed}
@@ -49,6 +52,9 @@ and derived objects are created by 'feature finders' such as
 \item \code{featureTable}: Get table with feature information
 
 \item \code{analysisInfo}: Get analysis information
+
+\item \code{filter}: Performs common rule based filtering on of features,
+such as intensity thresholds.
 }}
 
 \section{Slots}{

@@ -635,12 +635,17 @@ plotDendroWithClusters <- function(dendro, ct, pal, colourBranches, showLegend, 
         plot(dendro, ...)
 }
 
+isValidMol <- function(mol) !is.null(mol) # && !is.na(mol)
+emptyMol <- function() rcdk::parse.smiles("")[[1]]
+
 getMoleculesFromSMILES <- function(SMILES)
 {
     mols <- rcdk::parse.smiles(SMILES)
     
     for (i in seq_along(mols))
     {
+        if (!isValidMol(mols[[i]]))
+            next
         rcdk::do.typing(mols[[i]])
         rcdk::do.aromaticity(mols[[i]])
     }

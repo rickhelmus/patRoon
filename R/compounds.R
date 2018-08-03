@@ -282,10 +282,13 @@ setMethod("getMCS", "compounds", function(obj, index, groupName)
     {
         for (i in seq(2, length(mols)))
         {
+            if (!isValidMol(mols[[i]]))
+                return(emptyMol())
+            
             # might fail if there is no overlap...
             tryCatch(mcons <- rcdk::get.mcs(mcons, mols[[i]]), error = function(e) FALSE)
             if (mcons == FALSE)
-                return(rcdk::parse.smiles("")[[1]]) # return empty molecule
+                return(emptyMol())
         }
     }
     
@@ -415,15 +418,20 @@ setMethod("plotScores", "compounds", function(obj, index, groupName, normalizeSc
             # par(omd = c(0, 1, 0, 1 - lh), new = TRUE)
             lw <- (grconvertX(leg$rect$w, to = "ndc") - grconvertX(0, to = "ndc"))
             par(omd = c(0, 1 - lw, 0, 1), new = TRUE)
-            bp <- do.call(barplot, c(list(as.matrix(plotTab[, -"merged"]), beside = TRUE), bpargs))
+            bpvals <- as.matrix(plotTab[, -"merged"])
+            bp <- do.call(barplot, c(list(bpvals, beside = TRUE), bpargs))
+            bpsc <- as.vector(bpvals)
             # legend("top", plotTab$merged, col = cols, lwd = 1, inset = c(0, -0.2), xpd = NA, horiz = TRUE, cex = 0.75)
             # makeLegend(0, par("usr")[4] + lh)
             makeLegend(par("usr")[2], par("usr")[4])
         }
         else
+        {
             bp <- do.call(barplot, c(list(scores$score, names.arg = scores$type), bpargs))
+            bpsc <- scores$score
+        }
 
-        text(bp, scores$score, labels = round(scores$score, 2), pos = 1, cex = 0.8)
+        text(bp, bpsc, labels = round(bpsc, 2), pos = 3, cex = 0.8, xpd = TRUE)
     
         par(oldp)
     }

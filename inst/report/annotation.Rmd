@@ -135,14 +135,14 @@ for (grpi in seq_along(plotGroups))
         allPlots <- c(allPlots, sapply(seq_len(nrow(compTable[[plotGroups[grpi]]])), function(compi)
         {
             ret <- file.path(plotPath, sprintf("compscore_%d_%d.png", grpi, compi))
-            makePlot(ret, 3, 4.5, plotScores(rmdVars$compounds, compi, plotGroups[grpi]))
+            makePlot(ret, 3.5, 4.5, plotScores(rmdVars$compounds, compi, plotGroups[grpi]))
             return(ret)
         }))
 
         allPlots <- c(allPlots, sapply(seq_len(nrow(compTable[[plotGroups[grpi]]])), function(compi)
         {
             ret <- file.path(plotPath, sprintf("compspec_%d_%d.png", grpi, compi))
-            makePlot(ret, 6, 4.5, plotSpec(rmdVars$compounds, compi,  plotGroups[grpi],
+            makePlot(ret, 7, 4.5, plotSpec(rmdVars$compounds, compi,  plotGroups[grpi],
                                            rmdVars$MSPeakLists, rmdVars$formConsensus,
                                            rmdVars$compoundNormalizeScores))
             return(ret)

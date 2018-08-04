@@ -21,3 +21,4 @@ Release:
 - names() for compounds/compounds clusters etc?
 - check why generics sometimes are not found
 - better SMILES to mol error handling + check kekulize=FALSE for fails
+- finalize filter() method for features

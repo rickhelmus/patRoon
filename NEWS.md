@@ -1,9 +1,13 @@
 # patRoon 0.1.0.9000
 
+## Augustus 2018
+* Improved general numeric comparisons, resulting in e.g. improved EIC generation.
+* Tweaked OpenMS feature intensity loading: now takes intensity from data point closest to retention time instead of max intensity from datapoints in the search window. Furthermore, the search window for datapoints was reduced and made configurable.
+
+
 ## July 2018
 * getMCS() method for compounds
 * plotStructure() method for compounds will draw MCS when mutiple indices are specified
-* Tweaked OpenMS feature intensity loading: now takes intensity from data point closest to retention time instead of max intensity from datapoints in the search window. Furthermore, the search window for datapoints was reduced and made configurable.
 
 
 ## June 2018

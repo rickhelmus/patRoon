@@ -21,9 +21,11 @@
 <!-- clipboard.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js" integrity="sha384-cV+rhyOuRHc9Ub/91rihWcGmMmCXDeksTtCihMupQHSsi8GIIRDG0ThDc3HGQFJ3" crossorigin="anonymous"></script>
 
+<!-- sticky kit -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script>
+
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
-<script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
 
 
@@ -32,6 +34,7 @@
 
 <meta property="og:description" content="Functions and classes for collection of features." />
 <meta name="twitter:card" content="summary" />
+
 
 
 <!-- mathjax -->
@@ -122,8 +125,8 @@
 
 <span class='fu'>findFeaturesOpenMS</span>(<span class='no'>analysisInfo</span>, <span class='kw'>thr</span> <span class='kw'>=</span> <span class='fl'>1000</span>, <span class='kw'>comfwhm</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>minfwhm</span> <span class='kw'>=</span> <span class='fl'>3</span>,
   <span class='kw'>maxfwhm</span> <span class='kw'>=</span> <span class='fl'>60</span>, <span class='kw'>minlength</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>maxlength</span> <span class='kw'>=</span> -<span class='fl'>1</span>, <span class='kw'>mzppm</span> <span class='kw'>=</span> <span class='fl'>10</span>,
-  <span class='kw'>extraOpts</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>logPath</span> <span class='kw'>=</span> <span class='fu'>file.path</span>(<span class='st'>"log"</span>, <span class='st'>"openms"</span>),
-  <span class='kw'>maxProcAmount</span> <span class='kw'>=</span> <span class='fu'>getOption</span>(<span class='st'>"patRoon.maxProcAmount"</span>))
+  <span class='kw'>extraOpts</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>intSearchRTWindow</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>logPath</span> <span class='kw'>=</span> <span class='fu'>file.path</span>(<span class='st'>"log"</span>,
+  <span class='st'>"openms"</span>), <span class='kw'>maxProcAmount</span> <span class='kw'>=</span> <span class='fu'>getOption</span>(<span class='st'>"patRoon.maxProcAmount"</span>))
 
 <span class='fu'>findFeaturesXCMS</span>(<span class='no'>analysisInfo</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"centWave"</span>, <span class='no'>...</span>)
 
@@ -193,6 +196,12 @@ Set negative value for maxlength to disable maximum. Sets
       <td><p>Named character <code>vector</code> containing extra options that
 will be passed to <code>FeatureFinderMetabo</code>. Any options specified here
 will override any of the above.</p></td>
+    </tr>
+    <tr>
+      <th>intSearchRTWindow</th>
+      <td><p>Retention time window (in seconds) that is used to
+find the closest data point to the retention time to obtain the intensity
+of a feature (this is needed since OpenMS does not provide this data).</p></td>
     </tr>
     <tr>
       <th>logPath</th>
@@ -272,15 +281,13 @@ methodology and instrumentation.</p>
     
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
-    <p>Rost HL, Sachsenberg T, Aiche S, Bielow C, Weisser H, Aicheler F, Andreotti S, Ehrlich H, Gutenbrunner P, Kenar E, Liang X, Nahnsen S, Nilse L, Pfeuffer J, Rosenberger G, Rurik M, Schmitt U, Veit J, Walzer M, Wojnar D, Wolski WE, Schilling O, Choudhary JS, Malmstrom L, Aebersold R, Reinert K, Kohlbacher O (2016).
+    <p>Rost HL, Sachsenberg T, Aiche S, Bielow C, Weisser H, Aicheler F, Andreotti S, Ehrlich H, Gutenbrunner P, Kenar E, Liang X, Nahnsen S, Nilse L, Pfeuffer J, Rosenberger G, Rurik M, Schmitt U, Veit J, Walzer M, Wojnar D, Wolski WE, Schilling O, Choudhary JS, Malmstrom L, Aebersold R, Reinert K and Kohlbacher O (2016).
 &#8220;OpenMS: a flexible open-source software platform for mass spectrometry data analysis.&#8221;
-<em>Nature Methods</em>, <b>13</b>(9), 741--748.
+<em>Nature Methods</em>, <b>13</b>(9), pp. 741--748.
 doi: <a href='http://doi.org/10.1038/nmeth.3959'>10.1038/nmeth.3959</a>
 .</p>
-<p>Smith, C.A. and Want, E.J. and O'Maille, G. and Abagyan,R. and Siuzdak, G.: XCMS: Processing mass spectrometry data for metabolite profiling using nonlinear peak alignment, matching and identification, Analytical Chemistry, 78:779-787 (2006)
- <br /><br />
-   Ralf Tautenhahn, Christoph Boettcher, Steffen Neumann: Highly sensitive feature detection for high resolution LC/MS BMC Bioinformatics, 9:504 (2008)
- <br /><br />
+<p>Smith, C.A. and Want, E.J. and O'Maille, G. and Abagyan,R. and Siuzdak, G.: XCMS: Processing mass spectrometry data for metabolite profiling using nonlinear peak alignment, matching and identification, Analytical Chemistry, 78:779-787 (2006) <br /><br />
+   Ralf Tautenhahn, Christoph Boettcher, Steffen Neumann: Highly sensitive feature detection for high resolution LC/MS BMC Bioinformatics, 9:504 (2008) <br /><br />
    H. Paul Benton, Elizabeth J. Want and Timothy M. D. Ebbels Correction of mass calibration gaps in liquid chromatography-mass spectrometry metabolomics data Bioinformatics, 26:2488 (2010)</p>
     
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>

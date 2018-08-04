@@ -21,9 +21,11 @@
 <!-- clipboard.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js" integrity="sha384-cV+rhyOuRHc9Ub/91rihWcGmMmCXDeksTtCihMupQHSsi8GIIRDG0ThDc3HGQFJ3" crossorigin="anonymous"></script>
 
+<!-- sticky kit -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script>
+
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
-<script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
 
 
@@ -34,6 +36,7 @@
 features, feature groups, calculated chemical formulae and tentatively
 identified compounds." />
 <meta name="twitter:card" content="summary" />
+
 
 
 <!-- mathjax -->
@@ -120,29 +123,26 @@ identified compounds.</p>
   <span class='kw'>reportFGroupsAsRows</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>reportFGroupsAnalysisInfo</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>reportFGroupsRetMz</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>reportFeatures</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>formConsensus</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>compounds</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>compoundNormalizeScores</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>compsCluster</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>components</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>cInfo</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>clusterK</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>retMin</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>clearPath</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+  <span class='kw'>components</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>retMin</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>clearPath</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
 
 <span class='co'># S4 method for featureGroups</span>
 <span class='fu'>reportPDF</span>(<span class='no'>fGroups</span>, <span class='kw'>path</span> <span class='kw'>=</span> <span class='st'>"report"</span>,
   <span class='kw'>reportFGroups</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>formConsensus</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>reportFormulaSpectra</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>compounds</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>compoundNormalizeScores</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>compsCluster</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>components</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>cInfo</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>clusterK</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>silInfo</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>clusterMaxLabels</span> <span class='kw'>=</span> <span class='fl'>250</span>, <span class='kw'>MSPeakLists</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>retMin</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>EICGrid</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='fl'>2</span>, <span class='fl'>1</span>), <span class='kw'>EICRtWindow</span> <span class='kw'>=</span> <span class='fl'>20</span>, <span class='kw'>EICMzWindow</span> <span class='kw'>=</span> <span class='fl'>0.005</span>,
-  <span class='kw'>EICTopMost</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>EICOnlyPresent</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>clearPath</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+  <span class='kw'>components</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>MSPeakLists</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>retMin</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>EICGrid</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='fl'>2</span>,
+  <span class='fl'>1</span>), <span class='kw'>EICRtWindow</span> <span class='kw'>=</span> <span class='fl'>20</span>, <span class='kw'>EICMzWindow</span> <span class='kw'>=</span> <span class='fl'>0.005</span>, <span class='kw'>EICTopMost</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>EICOnlyPresent</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>clearPath</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
 
 <span class='co'># S4 method for featureGroups</span>
 <span class='fu'>reportMD</span>(<span class='no'>fGroups</span>, <span class='kw'>path</span> <span class='kw'>=</span> <span class='st'>"report"</span>,
   <span class='kw'>reportChord</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>reportFGroups</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>formConsensus</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>reportFormulaSpectra</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>compounds</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>compoundNormalizeScores</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>compsCluster</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>components</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>cInfo</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>clusterK</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>silInfo</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>interactiveHeat</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>clusterMaxLabels</span> <span class='kw'>=</span> <span class='fl'>250</span>, <span class='kw'>MSPeakLists</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>retMin</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>EICRtWindow</span> <span class='kw'>=</span> <span class='fl'>20</span>, <span class='kw'>EICMzWindow</span> <span class='kw'>=</span> <span class='fl'>0.005</span>,
-  <span class='kw'>EICTopMost</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>EICOnlyPresent</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>selfContained</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>optimizePng</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>maxProcAmount</span> <span class='kw'>=</span> <span class='fu'>getOption</span>(<span class='st'>"patRoon.maxProcAmount"</span>),
-  <span class='kw'>clearPath</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
+  <span class='kw'>compoundNormalizeScores</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>compsCluster</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>includeMFWebLinks</span> <span class='kw'>=</span> <span class='st'>"compounds"</span>, <span class='kw'>components</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>interactiveHeat</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>MSPeakLists</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>retMin</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>EICRtWindow</span> <span class='kw'>=</span> <span class='fl'>20</span>, <span class='kw'>EICMzWindow</span> <span class='kw'>=</span> <span class='fl'>0.005</span>, <span class='kw'>EICTopMost</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>EICOnlyPresent</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>selfContained</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>optimizePng</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>maxProcAmount</span> <span class='kw'>=</span> <span class='fu'>getOption</span>(<span class='st'>"patRoon.maxProcAmount"</span>), <span class='kw'>clearPath</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -191,17 +191,6 @@ skip reporting a particular object.</p></td>
 will be normalized to maximum values.</p></td>
     </tr>
     <tr>
-      <th>cInfo</th>
-      <td><p>If not <code>NULL</code> a <code><a href='clusterInfo-class.html'>clusterInfo</a></code> object to be used
-for reporting hierarchical clustering results.</p></td>
-    </tr>
-    <tr>
-      <th>clusterK</th>
-      <td><p>Number of branches the hierarchical cluster should be cut
-into. If specified (<em>i.e.</em> not <code>NULL</code>) then individual clusters
-will be reported.</p></td>
-    </tr>
-    <tr>
       <th>retMin</th>
       <td><p>If <code>TRUE</code> then report retention times in minutes
 (otehrwise seconds).</p></td>
@@ -221,16 +210,6 @@ will be reported.</p></td>
 available) for candidate formulae will be reported. Specifying
 <code>formConsensus</code> and setting this argument to <code>FALSE</code> still allows
 further annotation of compound MS/MS spectra.</p></td>
-    </tr>
-    <tr>
-      <th>silInfo</th>
-      <td><p>A <code><a href='silhouetteInfo-class.html'>silhouetteInfo</a></code> object to be used for reporting
-a silhouette plot.</p></td>
-    </tr>
-    <tr>
-      <th>clusterMaxLabels</th>
-      <td><p>Maximum amount of clusters when labels are still
-drawn within a dendrogram.</p></td>
     </tr>
     <tr>
       <th>MSPeakLists</th>
@@ -253,6 +232,14 @@ passed to <code><a href='generics.html'>plotEIC</a></code> (<em>i.e.</em> <code>
       <th>reportChord</th>
       <td><p>If <code>TRUE</code> then a chord diagram for all feature groups
 is plotted (data will be averaged among replicates).</p></td>
+    </tr>
+    <tr>
+      <th>includeMFWebLinks</th>
+      <td><p>A <code>character</code> specifying to which feature
+groups a web link should be added in the annotation page to
+<a href='https://msbi.ipb-halle.de/MetFragBeta/index.xhtml'>MetFragWeb</a>.
+Options are: <code>"compounds"</code> (only to those with compounds results),
+<code>"MSMS"</code> (only to those with MSMS peak lists) or <code>"none"</code>.</p></td>
     </tr>
     <tr>
       <th>interactiveHeat</th>
@@ -319,9 +306,9 @@ compounds, clustering) that are desired to be reported need to be specified.</p>
     
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
-    <p>Yihui Xie (2015) Dynamic Documents with R and knitr. 2nd edition. Chapman and Hall/CRC. ISBN 978-1498716963
- <br /><br />
-  Yihui Xie (2014) knitr: A Comprehensive Tool for Reproducible Research in R. In Victoria Stodden, Friedrich Leisch and Roger D. Peng, editors, Implementing Reproducible Computational Research. Chapman and Hall/CRC. ISBN 978-1466561595</p>
+    <p>Creating MetFrag landing page URLs based on code from
+  <a href='https://github.com/Treutler/MetFamily'>MetFamily</a> R package. <br /><br />
+  Yihui Xie (2015) Dynamic Documents with R and knitr. 2nd edition. Chapman and Hall/CRC. ISBN 978-1498716963 <br /><br /> Yihui Xie (2014) knitr: A Comprehensive Tool for Reproducible Research in R. In Victoria Stodden, Friedrich Leisch and Roger D. Peng, editors, Implementing Reproducible Computational Research. Chapman and Hall/CRC. ISBN 978-1466561595</p>
     
 
   </div>

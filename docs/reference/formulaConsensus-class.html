@@ -21,9 +21,11 @@
 <!-- clipboard.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js" integrity="sha384-cV+rhyOuRHc9Ub/91rihWcGmMmCXDeksTtCihMupQHSsi8GIIRDG0ThDc3HGQFJ3" crossorigin="anonymous"></script>
 
+<!-- sticky kit -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script>
+
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
-<script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
 
 
@@ -32,6 +34,7 @@
 
 <meta property="og:description" content="Contains all formulae for given feature groups after a consensus was made." />
 <meta name="twitter:card" content="summary" />
+
 
 
 <!-- mathjax -->
@@ -124,6 +127,9 @@
 <span class='fu'>show</span>(<span class='no'>object</span>)
 
 <span class='co'># S4 method for formulaConsensus</span>
+<span class='fu'><a href='generics.html'>filterBy</a></span>(<span class='no'>obj</span>, <span class='no'>fGroups</span>, <span class='no'>negate</span>)
+
+<span class='co'># S4 method for formulaConsensus</span>
 <span class='fu'><a href='generics.html'>plotSpec</a></span>(<span class='no'>obj</span>, <span class='no'>precursor</span>, <span class='no'>groupName</span>, <span class='no'>MSPeakLists</span>,
   <span class='kw'>useGGPlot2</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
     
@@ -133,6 +139,15 @@
     <tr>
       <th>obj, x, object</th>
       <td><p>The <code>formulaConsensus</code> object.</p></td>
+    </tr>
+    <tr>
+      <th>fGroups</th>
+      <td><p>A <code><a href='featureGroups-class.html'>featureGroups</a></code> object which should be filtered.</p></td>
+    </tr>
+    <tr>
+      <th>negate</th>
+      <td><p>If set to <code>TRUE</code> then the filter is applied in opposite
+manner.</p></td>
     </tr>
     <tr>
       <th>precursor</th>
@@ -162,6 +177,8 @@ faster.</p></td>
 
     <p><code>formulaTable</code> returns a <code>data.table</code> containing all
   generated formulae, scoring information, MS/MS fragments, etc.</p>
+<p><code>filterBy</code> returns a filtered <code><a href='featureGroups-class.html'>featureGroups</a></code>
+  object.</p>
 <p><code>plotSpec</code> will return a <code>ggplot object</code>
   if <code>useGGPlot2</code> is <code>TRUE</code>.</p>
     
@@ -178,6 +195,9 @@ faster.</p></td>
 string) used to generate formulae.</p></li>
 <li><p><code>length</code>: Obtain total number of formulae entries.</p></li>
 <li><p><code>show</code>: Show summary information for this object.</p></li>
+<li><p><code>filterBy</code>: Only keep feature groups in a given
+<code><a href='featureGroups-class.html'>featureGroups</a></code> object that are also present in the specified
+<code>formulaConsensus</code> object.</p></li>
 <li><p><code>plotSpec</code>: Plots an annotated spectrum for a given
 candidate formula of a feature group.</p></li>
 </ul>

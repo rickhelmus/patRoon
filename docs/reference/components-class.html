@@ -21,9 +21,11 @@
 <!-- clipboard.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js" integrity="sha384-cV+rhyOuRHc9Ub/91rihWcGmMmCXDeksTtCihMupQHSsi8GIIRDG0ThDc3HGQFJ3" crossorigin="anonymous"></script>
 
+<!-- sticky kit -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script>
+
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
-<script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
 
 
@@ -33,6 +35,7 @@
 <meta property="og:description" content="Contains data for feature groups that are related in some way. These
 components commonly include adducts, isotopes and homologues." />
 <meta name="twitter:card" content="summary" />
+
 
 
 <!-- mathjax -->
@@ -135,6 +138,9 @@ components commonly include adducts, isotopes and homologues." />
 <span class='fu'>findFGroup</span>(<span class='no'>obj</span>, <span class='no'>fGroup</span>)
 
 <span class='co'># S4 method for components</span>
+<span class='fu'><a href='generics.html'>filterBy</a></span>(<span class='no'>obj</span>, <span class='no'>fGroups</span>, <span class='no'>negate</span>, <span class='kw'>index</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
+
+<span class='co'># S4 method for components</span>
 <span class='fu'><a href='generics.html'>plotSpec</a></span>(<span class='no'>obj</span>, <span class='no'>index</span>, <span class='kw'>markFGroup</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>useGGPlot2</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='no'>...</span>)
 
@@ -157,9 +163,18 @@ components commonly include adducts, isotopes and homologues." />
 searched for.</p></td>
     </tr>
     <tr>
+      <th>fGroups</th>
+      <td><p>A <code><a href='featureGroups-class.html'>featureGroups</a></code> object which should be filtered.</p></td>
+    </tr>
+    <tr>
+      <th>negate</th>
+      <td><p>If set to <code>TRUE</code> then the filter is applied in opposite
+manner.</p></td>
+    </tr>
+    <tr>
       <th>index</th>
-      <td><p>The index of the component that should be plotted. Can be a
-numeric index or a character with its name.</p></td>
+      <td><p>The index of the component. Can be a numeric index or a
+character with its name.</p></td>
     </tr>
     <tr>
       <th>markFGroup</th>
@@ -185,20 +200,22 @@ the <code>colourBy</code>, <code>showPeakArea</code>, <code>showFGroupRect</code
 the consensus.</p></td>
     </tr>
     <tr>
-      <th>fGroups</th>
-      <td><p>The <code><a href='featureGroups-class.html'>featureGroups</a></code> object that was used to
-generate the components.</p></td>
-    </tr>
-    <tr>
       <th>rtWindow</th>
       <td><p>Retention window: see the <code>plotEIC</code> method for the
 <code><a href='featureGroups-class.html'>featureGroups</a></code> class.</p></td>
+    </tr>
+    <tr>
+      <th>fGroups</th>
+      <td><p>The <code><a href='featureGroups-class.html'>featureGroups</a></code> object that was used to
+generate the components.</p></td>
     </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p><code>consensus</code> returns a <code>components</code> object that is produced
+    <p><code>filterBy</code> returns a filtered <code><a href='featureGroups-class.html'>featureGroups</a></code>
+  object.</p>
+<p><code>consensus</code> returns a <code>components</code> object that is produced
   by merging multiple specified <code>components</code> objects.</p>
     
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
@@ -221,6 +238,9 @@ generate components.</p></li>
 <li><p><code>show</code>: Show summary information for this object.</p></li>
 <li><p><code>findFGroup</code>: Returns the component id(s) to which a feature group
 belongs.</p></li>
+<li><p><code>filterBy</code>: Only keep feature groups in a given
+<code><a href='featureGroups-class.html'>featureGroups</a></code> object that are also present in the specified
+<code>components</code> object.</p></li>
 <li><p><code>plotSpec</code>: Plot a <em>pseudo</em> mass spectrum for a single
 component.</p></li>
 <li><p><code>plotEIC</code>: Plot an extracted ion chromatogram (EIC) for all

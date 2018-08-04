@@ -21,9 +21,11 @@
 <!-- clipboard.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js" integrity="sha384-cV+rhyOuRHc9Ub/91rihWcGmMmCXDeksTtCihMupQHSsi8GIIRDG0ThDc3HGQFJ3" crossorigin="anonymous"></script>
 
+<!-- sticky kit -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script>
+
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
-<script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
 
 
@@ -35,6 +37,7 @@ such as plotting and filtering data. The actual functionality and function
 arguments are often specific for the implemented methods, for this reason,
 please refer to the linked method documentation for each generic." />
 <meta name="twitter:card" content="summary" />
+
 
 
 <!-- mathjax -->
@@ -119,31 +122,42 @@ please refer to the linked method documentation for each generic.</p>
 
     <pre class="usage"><span class='fu'>analysisInfo</span>(<span class='no'>obj</span>)
 
-<span class='fu'>featureTable</span>(<span class='no'>obj</span>)
-
 <span class='fu'>algorithm</span>(<span class='no'>obj</span>)
 
-<span class='fu'>filter</span>(<span class='no'>obj</span>, <span class='no'>...</span>)
+<span class='fu'>clusterProperties</span>(<span class='no'>obj</span>)
 
-<span class='fu'>plotInt</span>(<span class='no'>obj</span>, <span class='no'>...</span>)
+<span class='fu'>clusters</span>(<span class='no'>obj</span>)
 
-<span class='fu'>plotVenn</span>(<span class='no'>obj</span>, <span class='kw'>which</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)
-
-<span class='fu'>plotChord</span>(<span class='no'>obj</span>, <span class='kw'>addSelfLinks</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>addRetMzPlots</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='no'>...</span>)
-
-<span class='fu'>plotSpec</span>(<span class='no'>obj</span>, <span class='no'>...</span>)
-
-<span class='fu'>plotEIC</span>(<span class='no'>obj</span>, <span class='no'>...</span>)
-
-<span class='fu'>plotStructure</span>(<span class='no'>obj</span>, <span class='no'>...</span>)
+<span class='fu'>cutClusters</span>(<span class='no'>obj</span>)
 
 <span class='fu'>consensus</span>(<span class='no'>obj</span>, <span class='no'>...</span>)
 
+<span class='fu'>featureTable</span>(<span class='no'>obj</span>)
+
+<span class='fu'>filter</span>(<span class='no'>obj</span>, <span class='no'>...</span>)
+
+<span class='fu'>filterBy</span>(<span class='no'>obj</span>, <span class='no'>fGroups</span>, <span class='kw'>negate</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='no'>...</span>)
+
 <span class='fu'>formulaTable</span>(<span class='no'>obj</span>)
 
-<span class='fu'>makeHCluster</span>(<span class='no'>obj</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"complete"</span>, <span class='no'>...</span>)
+<span class='fu'>getMCS</span>(<span class='no'>obj</span>, <span class='no'>...</span>)
 
-<span class='fu'>clusterProperties</span>(<span class='no'>obj</span>)</pre>
+<span class='fu'>plotChord</span>(<span class='no'>obj</span>, <span class='kw'>addSelfLinks</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>addRetMzPlots</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='no'>...</span>)
+
+<span class='fu'>plotEIC</span>(<span class='no'>obj</span>, <span class='no'>...</span>)
+
+<span class='fu'>plotInt</span>(<span class='no'>obj</span>, <span class='no'>...</span>)
+
+<span class='fu'>plotSpec</span>(<span class='no'>obj</span>, <span class='no'>...</span>)
+
+<span class='fu'>plotStructure</span>(<span class='no'>obj</span>, <span class='no'>...</span>)
+
+<span class='fu'>plotVenn</span>(<span class='no'>obj</span>, <span class='kw'>which</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)
+
+<span class='fu'>treeCut</span>(<span class='no'>obj</span>, <span class='kw'>k</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>h</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)
+
+<span class='fu'>treeCutDynamic</span>(<span class='no'>obj</span>, <span class='kw'>maxTreeHeight</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>deepSplit</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>minModuleSize</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='no'>...</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -158,8 +172,13 @@ please refer to the linked method documentation for each generic.</p>
 for details.</p></td>
     </tr>
     <tr>
-      <th>which</th>
-      <td><p>What should be plotted. See method documentation for specifics.</p></td>
+      <th>fGroups</th>
+      <td><p>A <code><a href='featureGroups-class.html'>featureGroups</a></code> object.</p></td>
+    </tr>
+    <tr>
+      <th>negate</th>
+      <td><p>If set to <code>TRUE</code> then filtering operations are performed
+in opposite manner.</p></td>
     </tr>
     <tr>
       <th>addSelfLinks</th>
@@ -171,6 +190,10 @@ represent non-shared data.</p></td>
       <td><p>Set to <code>TRUE</code> to enable <em>m/z</em> <em>vs</em>
 retention time scatter plots.</p></td>
     </tr>
+    <tr>
+      <th>which</th>
+      <td><p>What should be plotted. See method documentation for specifics.</p></td>
+    </tr>
     </table>
     
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
@@ -179,57 +202,77 @@ retention time scatter plots.</p></td>
     <ul>
 <li><p>Methods are defined for: <code><a href='featureGroups-class.html'>featureGroups</a></code>, <code><a href='features-class.html'>features</a></code>.</p></li>
 </ul>
+    <p><code>algorithm</code> returns the algorithm that was used to generate an object.</p>
+    <ul>
+<li><p>Methods are defined for: <code><a href='components-class.html'>components</a></code>, <code><a href='compounds-class.html'>compounds</a></code>, <code><a href='formulaConsensus-class.html'>formulaConsensus</a></code>, <code><a href='formulas-class.html'>formulas</a></code>, <code><a href='MSPeakLists-class.html'>MSPeakLists</a></code>.</p></li>
+</ul>
+    <p><code>clusterProperties</code> Obtain a list with properties of the generated cluster(s).</p>
+    <ul>
+<li><p>Methods are defined for: <code><a href='componentsIntClust-class.html'>componentsIntClust</a></code>, <code><a href='compoundsCluster-class.html'>compoundsCluster</a></code>.</p></li>
+</ul>
+    <p><code>clusters</code> Obtain clustering object(s).</p>
+    <ul>
+<li><p>Methods are defined for: <code><a href='componentsIntClust-class.html'>componentsIntClust</a></code>, <code><a href='compoundsCluster-class.html'>compoundsCluster</a></code>.</p></li>
+</ul>
+    <p><code>cutClusters</code> Returns assigned cluster indices of a cut cluster.</p>
+    <ul>
+<li><p>Methods are defined for: <code><a href='componentsIntClust-class.html'>componentsIntClust</a></code>, <code><a href='compoundsCluster-class.html'>compoundsCluster</a></code>.</p></li>
+</ul>
+    <p><code>consensus</code> combines and merges data from various algorithms to generate a consensus.</p>
+    <ul>
+<li><p>Methods are defined for: <code><a href='components-class.html'>components</a></code>, <code><a href='compounds-class.html'>compounds</a></code>, <code><a href='featureGroups-compare.html'>featureGroupsComparison</a></code>, <code><a href='formulas-class.html'>formulas</a></code>.</p></li>
+</ul>
     <p><code>featureTable</code> returns feature information.</p>
     <ul>
 <li><p>Methods are defined for: <code><a href='featureGroups-class.html'>featureGroups</a></code>, <code><a href='features-class.html'>features</a></code>.</p></li>
 </ul>
-    <p><code>algorithm</code> returns the algorithm that was used to generate an object.</p>
-    <ul>
-<li><p>Methods are defined for: <code><a href='MSPeakLists-class.html'>MSPeakLists</a></code>, <code><a href='components-class.html'>components</a></code>, <code><a href='compounds-class.html'>compounds</a></code>, <code><a href='formulaConsensus-class.html'>formulaConsensus</a></code>, <code><a href='formulas-class.html'>formulas</a></code>.</p></li>
-</ul>
     <p><code>filter</code> provides various functionality to do post-filtering of data.</p>
     <ul>
-<li><p>Methods are defined for: <code><a href='MSPeakLists-class.html'>MSPeakLists</a></code>, <code><a href='compounds-class.html'>compounds</a></code>, <code><a href='feature-filtering.html'>featureGroups</a></code>.</p></li>
+<li><p>Methods are defined for: <code><a href='compounds-class.html'>compounds</a></code>, <code><a href='feature-filtering.html'>featureGroups</a></code>, <code><a href='features-class.html'>features</a></code>, <code><a href='MSPeakLists-class.html'>MSPeakLists</a></code>.</p></li>
 </ul>
-    <p><code>plotInt</code> plots the intensity of all contained features.</p>
+    <p><code>filterBy</code> only keep feature groups that are also present in another</p>
     <ul>
-<li><p>Methods are defined for: <code><a href='h-cluster.html'>clusterInfo</a></code>, <code><a href='featureGroups-class.html'>featureGroups</a></code>.</p></li>
-</ul>
-    <p><code>plotVenn</code> plots a Venn diagram to assess unique and overlapping data.</p>
-    <ul>
-<li><p>Methods are defined for: <code><a href='featureGroups-class.html'>featureGroups</a></code>, <code><a href='featureGroups-compare.html'>featureGroupsComparison</a></code>.</p></li>
-</ul>
-    <p><code>plotChord</code> plots a Chord diagram to assess overlapping data.</p>
-    <ul>
-<li><p>Methods are defined for: <code><a href='featureGroups-class.html'>featureGroups</a></code>, <code><a href='featureGroups-compare.html'>featureGroupsComparison</a></code>.</p></li>
-</ul>
-    <p><code>plotSpec</code> plots a (annotated) spectrum.</p>
-    <ul>
-<li><p>Methods are defined for: <code><a href='components-class.html'>components</a></code>, <code><a href='compounds-class.html'>compounds</a></code>, <code><a href='formulaConsensus-class.html'>formulaConsensus</a></code>.</p></li>
-</ul>
-    <p><code>plotEIC</code> plots extracted ion chromatogram(s).</p>
-    <ul>
-<li><p>Methods are defined for: <code><a href='components-class.html'>components</a></code>, <code><a href='featureGroups-class.html'>featureGroups</a></code>.</p></li>
-</ul>
-    <p><code>plotStructure</code> plots a chemical structure.</p>
-    <ul>
-<li><p>Methods are defined for: <code><a href='compounds-class.html'>compounds</a></code>, <code><a href='compoundsCluster-class.html'>compoundsCluster</a></code>.</p></li>
-</ul>
-    <p><code>consensus</code> combines and merges data from various algorithms to</p>
-    <ul>
-<li><p>Methods are defined for: <code><a href='components-class.html'>components</a></code>, <code><a href='compounds-class.html'>compounds</a></code>, <code><a href='featureGroups-compare.html'>featureGroupsComparison</a></code>, <code><a href='formulas-class.html'>formulas</a></code>.</p></li>
+<li><p>Methods are defined for: <code><a href='components-class.html'>components</a></code>, <code><a href='compounds-class.html'>compounds</a></code>, <code><a href='formulaConsensus-class.html'>formulaConsensus</a></code>, <code><a href='MSPeakLists-class.html'>MSPeakLists</a></code>.</p></li>
 </ul>
     <p><code>formulaTable</code> returns formula data.</p>
     <ul>
 <li><p>Methods are defined for: <code><a href='formulaConsensus-class.html'>formulaConsensus</a></code>, <code><a href='formulas-class.html'>formulas</a></code>.</p></li>
 </ul>
-    <p><code>makeHCluster</code> Performs hierarchical clustering.</p>
+    <p><code>getMCS</code> Calculcates the maximum common substructure.</p>
     <ul>
-<li><p>Methods are defined for: <code><a href='compounds-cluster.html'>compounds</a></code>, <code><a href='h-cluster.html'>featureGroups</a></code>.</p></li>
+<li><p>Methods are defined for: <code><a href='compounds-class.html'>compounds</a></code>, <code><a href='compoundsCluster-class.html'>compoundsCluster</a></code>.</p></li>
 </ul>
-    <p><code>clusterProperties</code> Obtain a list with properties of the generated cluster(s).</p>
+    <p><code>plotChord</code> plots a Chord diagram to assess overlapping data.</p>
     <ul>
-<li><p>Methods are defined for: <code><a href='clusterInfo-class.html'>clusterInfo</a></code>, <code><a href='compoundsCluster-class.html'>compoundsCluster</a></code>.</p></li>
+<li><p>Methods are defined for: <code><a href='featureGroups-class.html'>featureGroups</a></code>, <code><a href='featureGroups-compare.html'>featureGroupsComparison</a></code>.</p></li>
+</ul>
+    <p><code>plotEIC</code> plots extracted ion chromatogram(s).</p>
+    <ul>
+<li><p>Methods are defined for: <code><a href='components-class.html'>components</a></code>, <code><a href='featureGroups-class.html'>featureGroups</a></code>.</p></li>
+</ul>
+    <p><code>plotInt</code> plots the intensity of all contained features.</p>
+    <ul>
+<li><p>Methods are defined for: <code><a href='componentsIntClust-class.html'>componentsIntClust</a></code>, <code><a href='featureGroups-class.html'>featureGroups</a></code>.</p></li>
+</ul>
+    <p><code>plotSpec</code> plots a (annotated) spectrum.</p>
+    <ul>
+<li><p>Methods are defined for: <code><a href='components-class.html'>components</a></code>, <code><a href='compounds-class.html'>compounds</a></code>, <code><a href='formulaConsensus-class.html'>formulaConsensus</a></code>.</p></li>
+</ul>
+    <p><code>plotStructure</code> plots a chemical structure.</p>
+    <ul>
+<li><p>Methods are defined for: <code><a href='compounds-class.html'>compounds</a></code>, <code><a href='compoundsCluster-class.html'>compoundsCluster</a></code>.</p></li>
+</ul>
+    <p><code>plotVenn</code> plots a Venn diagram to assess unique and overlapping data.</p>
+    <ul>
+<li><p>Methods are defined for: <code><a href='featureGroups-class.html'>featureGroups</a></code>, <code><a href='featureGroups-compare.html'>featureGroupsComparison</a></code>.</p></li>
+</ul>
+    <p><code>treeCut</code> Manually cut a cluster.</p>
+    <ul>
+<li><p>Methods are defined for: <code><a href='componentsIntClust-class.html'>componentsIntClust</a></code>, <code><a href='compoundsCluster-class.html'>compoundsCluster</a></code>.</p></li>
+</ul>
+    <p><code>treeCutDynamic</code> Automatically cut a cluster.</p>
+    <ul>
+<li><p>Methods are defined for: <code><a href='componentsIntClust-class.html'>componentsIntClust</a></code>, <code><a href='compoundsCluster-class.html'>compoundsCluster</a></code>.</p></li>
 </ul>
     
 

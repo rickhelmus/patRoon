@@ -21,9 +21,11 @@
 <!-- clipboard.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js" integrity="sha384-cV+rhyOuRHc9Ub/91rihWcGmMmCXDeksTtCihMupQHSsi8GIIRDG0ThDc3HGQFJ3" crossorigin="anonymous"></script>
 
+<!-- sticky kit -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script>
+
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
-<script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
 
 
@@ -32,6 +34,7 @@
 
 <meta property="og:description" content="Basic rule based filtering of feature groups." />
 <meta name="twitter:card" content="summary" />
+
 
 
 <!-- mathjax -->
@@ -116,8 +119,9 @@
   <span class='kw'>relAbundance</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>absAbundance</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>interRelRGroupAbundance</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>interAbsRGroupAbundance</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>intraRGroupAbundance</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>minBlankThreshold</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>retentionRange</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>rGroups</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>formConsensus</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>compounds</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>repetitions</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>negate</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+  <span class='kw'>retentionRange</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>mzRange</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>chromWidthRange</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>rGroups</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>removeRefAnalyses</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>repetitions</span> <span class='kw'>=</span> <span class='fl'>2</span>,
+  <span class='kw'>negate</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
 
 <span class='co'># S4 method for featureGroups</span>
 <span class='fu'>replicateGroupSubtract</span>(<span class='no'>fGroups</span>, <span class='no'>rGroups</span>,
@@ -150,10 +154,12 @@ unless their relative intensity is above this threshold. Set to <code>NULL</code
 to skip this step.</p></td>
     </tr>
     <tr>
-      <th>retentionRange</th>
-      <td><p>Retention time range (in seconds). Should be a numeric
-vector with length of two containing the min/max values. If the max value
-is set to a value below 0 then no maximum retention is assumed. Set to
+      <th>retentionRange, mzRange, chromWidthRange</th>
+      <td><p>Range of retention time (in
+seconds), <em>m/z</em> or chromatographic peak width (in seconds),
+respectively. Features outside this range will be removed. Should be a
+numeric vector with length of two containing the min/max values. If the max
+value is set to a value below 0 then no maximum is assumed. Set to
 <code>NULL</code> to skip this step.</p></td>
     </tr>
     <tr>
@@ -162,10 +168,13 @@ is set to a value below 0 then no maximum retention is assumed. Set to
 (<code>filter</code>) or subtracted from (<code>replicateGroupSubtract</code>).</p></td>
     </tr>
     <tr>
-      <th>formConsensus, compounds</th>
-      <td><p>Only keep feature groups which have results in
-the given <code><a href='formulaConsensus-class.html'>formulaConsensus</a></code> and <code><a href='compounds-class.html'>compounds</a></code>
-object, respectively.</p></td>
+      <th>removeRefAnalyses</th>
+      <td><p>Set to <code>TRUE</code> to remove all analyses that
+belong to replicate groups that are specified as a reference in the
+<a href='analysis-information.html'>analysis-information</a>. This is useful to simplify the analyses in the
+specified <code><a href='featureGroups-class.html'>featureGroups</a></code> object after blank subtraction.
+Consequently, when both <code>minBlankThreshold</code> and this argument are set,
+blank subtraction is performed prior to removing any analyses.</p></td>
     </tr>
     <tr>
       <th>repetitions</th>

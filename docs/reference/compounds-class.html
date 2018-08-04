@@ -21,9 +21,11 @@
 <!-- clipboard.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js" integrity="sha384-cV+rhyOuRHc9Ub/91rihWcGmMmCXDeksTtCihMupQHSsi8GIIRDG0ThDc3HGQFJ3" crossorigin="anonymous"></script>
 
+<!-- sticky kit -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script>
+
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
-<script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
 
 
@@ -32,6 +34,7 @@
 
 <meta property="og:description" content="Contains data of generated chemical compounds for given feature groups." />
 <meta name="twitter:card" content="summary" />
+
 
 
 <!-- mathjax -->
@@ -131,11 +134,17 @@
   <span class='kw'>minFragScore</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>minFormulaScore</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>topMost</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
 
 <span class='co'># S4 method for compounds</span>
+<span class='fu'><a href='generics.html'>filterBy</a></span>(<span class='no'>obj</span>, <span class='no'>fGroups</span>, <span class='no'>negate</span>)
+
+<span class='co'># S4 method for compounds</span>
 <span class='fu'>addFormulaScoring</span>(<span class='no'>compounds</span>, <span class='no'>formConsensus</span>,
   <span class='kw'>updateScore</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>formulaScoreWeight</span> <span class='kw'>=</span> <span class='fl'>1</span>)
 
 <span class='co'># S4 method for compounds</span>
-<span class='fu'>plotStructure</span>(<span class='no'>obj</span>, <span class='no'>index</span>, <span class='no'>groupName</span>, <span class='kw'>width</span> <span class='kw'>=</span> <span class='fl'>500</span>,
+<span class='fu'><a href='generics.html'>getMCS</a></span>(<span class='no'>obj</span>, <span class='no'>index</span>, <span class='no'>groupName</span>)
+
+<span class='co'># S4 method for compounds</span>
+<span class='fu'><a href='generics.html'>plotStructure</a></span>(<span class='no'>obj</span>, <span class='no'>index</span>, <span class='no'>groupName</span>, <span class='kw'>width</span> <span class='kw'>=</span> <span class='fl'>500</span>,
   <span class='kw'>height</span> <span class='kw'>=</span> <span class='fl'>500</span>, <span class='kw'>useGGPlot2</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
 
 <span class='co'># S4 method for compounds</span>
@@ -169,6 +178,15 @@ formula score, respectively. Set to <code>NULL</code> to ignore.</p></td>
 score. Set to <code>NULL</code> to ignore.</p></td>
     </tr>
     <tr>
+      <th>fGroups</th>
+      <td><p>A <code><a href='featureGroups-class.html'>featureGroups</a></code> object which should be filtered.</p></td>
+    </tr>
+    <tr>
+      <th>negate</th>
+      <td><p>If set to <code>TRUE</code> then the filter is applied in opposite
+manner.</p></td>
+    </tr>
+    <tr>
       <th>formConsensus</th>
       <td><p>The <code><a href='formulaConsensus-class.html'>formulaConsensus</a></code> object that should be
 used for scoring/annotation. For <code>plotSpec</code>: set to <code>NULL</code> to
@@ -188,7 +206,12 @@ updated by adding the normalized <span class="option">formulaScore</span> (weigh
     </tr>
     <tr>
       <th>index</th>
-      <td><p>The (numeric) index of the candidate to be plotted.</p></td>
+      <td><p>The numeric index of the candidate structure. Multiple indices
+(<em>i.e.</em> vector with length &gt;=2) may be specified for
+<code>plotStructure</code> and are mandatory for <code>getMCS</code>. Alternatively,
+<samp>-1</samp> may be specified to these methods to select all candidates. When
+multiple indices are specified for <code>plotStructure</code>, their maximum
+common substructure will be drawn.</p></td>
     </tr>
     <tr>
       <th>groupName</th>
@@ -242,8 +265,12 @@ within all given <code>compounds</code> objects.</p></td>
   compounds and other data such as candidate scoring, matched MS/MS
   fragments, etc.</p>
 <p><code>filter</code> returns a filtered <code>compounds</code> object.</p>
+<p><code>filterBy</code> returns a filtered <code><a href='featureGroups-class.html'>featureGroups</a></code>
+  object.</p>
 <p><code>addFormulaScoring</code> returns a <code>compounds</code> object updated
   with formula scoring.</p>
+<p><code>getMCS</code> returns an <span class="pkg">rcdk</span> molecule object
+  (<code>IAtomContainer</code>).</p>
 <p><code>consensus</code> returns a <code>compounds</code> object that is produced
   by merging multiple specified <code>compounds</code> objects.</p>
     
@@ -266,12 +293,20 @@ list is named by feature group names, and is typically used with the
 <code>identifiers</code> option of <code><a href='compound-generation.html'>generateCompoundsMetfrag</a></code>.</p></li>
 <li><p><code>filter</code>: Provides rule based filtering for generated compounds.
 Useful to eliminate unlikely candidates and speed up further processing.</p></li>
+<li><p><code>filterBy</code>: Only keep feature groups in a given
+<code><a href='featureGroups-class.html'>featureGroups</a></code> object that are also present in the specified
+<code>compounds</code> object.</p></li>
 <li><p><code>addFormulaScoring</code>: Provides compound scoring data that is based on the
 presence of candidate formulae being present in a given
 <code><a href='formulaConsensus-class.html'>formulaConsensus</a></code> object. Matched precursor formulae yield one
 point, whereas matched MS/MS fragments yield 0.5 point each.</p></li>
+<li><p><code>getMCS</code>: Calculates the maximum common substructure (MCS)
+for two or more candidate structures for a feature group. This method uses
+the <code>get.mcs</code> function from <span class="pkg">rcdk</span>.</p></li>
 <li><p><code>plotStructure</code>: Plots a structure of a candidate compound using the
-<a href='https://CRAN.R-project.org/package=rcdk'><span class="pkg">rcdk</span></a> package.</p></li>
+<a href='https://CRAN.R-project.org/package=rcdk'><span class="pkg">rcdk</span></a> package. If multiple candidates are specified (<em>i.e.</em>
+by specifying a <code>vector</code> for <code>index</code>) then the maximum common
+substructure (MCS) of the selected candidates is drawn.</p></li>
 <li><p><code>plotScores</code>: Plots a barplot with scoring of a candidate compound.</p></li>
 <li><p><code>plotSpec</code>: Plots an annotated spectrum for a given candidate
 compound of a feature group.</p></li>

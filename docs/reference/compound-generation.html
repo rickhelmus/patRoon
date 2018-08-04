@@ -21,9 +21,11 @@
 <!-- clipboard.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js" integrity="sha384-cV+rhyOuRHc9Ub/91rihWcGmMmCXDeksTtCihMupQHSsi8GIIRDG0ThDc3HGQFJ3" crossorigin="anonymous"></script>
 
+<!-- sticky kit -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script>
+
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
-<script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
 
 
@@ -33,6 +35,7 @@
 <meta property="og:description" content="Functionality to automatically identify chemical compounds from feature
 groups." />
 <meta name="twitter:card" content="summary" />
+
 
 
 <!-- mathjax -->
@@ -362,8 +365,10 @@ parameter). Sets the <span class="option">--noise</span> commandline option.</p>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A <code><a href='compounds-class.html'>compounds</a></code> object containing all tentatively
-  identified compounds.</p>
+    <p><code>generateCompoundsMetFrag</code> returns a <code><a href='compoundsMF-class.html'>compoundsMF</a></code>
+  object.</p>
+<p><code>generateCompoundsSirius</code> returns a <code><a href='compounds-class.html'>compounds</a></code>
+  object.</p>
     
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
@@ -414,25 +419,25 @@ before feature groups have been prioritized.</p>
     
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
-    <p>Ruttkies C, Schymanski EL, Wolf S, Hollender J, Neumann S (2016).
+    <p>Ruttkies C, Schymanski EL, Wolf S, Hollender J and Neumann S (2016).
 &#8220;MetFrag relaunched: incorporating strategies beyond in silico fragmentation.&#8221;
 <em>Journal of Cheminformatics</em>, <b>8</b>(1).
 doi: <a href='http://doi.org/10.1186/s13321-016-0115-9'>10.1186/s13321-016-0115-9</a>
 .</p>
-<p>Duhrkop K, Bocker S (2015).
+<p>Duhrkop K and Bocker S (2015).
 &#8220;Fragmentation Trees Reloaded.&#8221;
-In Przytycka TM (ed.), <em>Research in Computational Molecular Biology</em>, 65--79.
+In Przytycka TM (ed.), <em>Research in Computational Molecular Biology</em>, pp. 65--79.
 ISBN 978-3-319-16706-0.
  <br /><br />
-  Duhrkop K, Shen H, Meusel M, Rousu J, Bocker S (2015).
+  Duhrkop K, Shen H, Meusel M, Rousu J and Bocker S (2015).
 &#8220;Searching molecular structure databases with tandem mass spectra using CSI:FingerID.&#8221;
-<em>Proceedings of the National Academy of Sciences</em>, <b>112</b>(41), 12580--12585.
+<em>Proceedings of the National Academy of Sciences</em>, <b>112</b>(41), pp. 12580--12585.
 doi: <a href='http://doi.org/10.1073/pnas.1509788112'>10.1073/pnas.1509788112</a>
 .
  <br /><br />
-  Bocker S, Letzel MC, Liptak Z, Pervukhin A (2008).
+  Bocker S, Letzel MC, Liptak Z and Pervukhin A (2008).
 &#8220;SIRIUS: decomposing isotope patterns for metabolite identification.&#8221;
-<em>Bioinformatics</em>, <b>25</b>(2), 218--224.
+<em>Bioinformatics</em>, <b>25</b>(2), pp. 218--224.
 doi: <a href='http://doi.org/10.1093/bioinformatics/btn603'>10.1093/bioinformatics/btn603</a>
 .</p>
     

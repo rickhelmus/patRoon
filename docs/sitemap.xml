@@ -4,15 +4,6 @@
     <loc>https://rickhelmus.github.io/patRoon/index.html</loc>
   </url>
   <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/GUI-utils.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/MSPeakLists-class.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/MSPeakLists-generation.html</loc>
-  </url>
-  <url>
     <loc>https://rickhelmus.github.io/patRoon/reference/analysis-information.html</loc>
   </url>
   <url>
@@ -22,13 +13,13 @@
     <loc>https://rickhelmus.github.io/patRoon/reference/clearCache.html</loc>
   </url>
   <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/clusterInfo-class.html</loc>
-  </url>
-  <url>
     <loc>https://rickhelmus.github.io/patRoon/reference/component-generation.html</loc>
   </url>
   <url>
     <loc>https://rickhelmus.github.io/patRoon/reference/components-class.html</loc>
+  </url>
+  <url>
+    <loc>https://rickhelmus.github.io/patRoon/reference/componentsIntClust-class.html</loc>
   </url>
   <url>
     <loc>https://rickhelmus.github.io/patRoon/reference/compound-generation.html</loc>
@@ -41,6 +32,9 @@
   </url>
   <url>
     <loc>https://rickhelmus.github.io/patRoon/reference/compoundsCluster-class.html</loc>
+  </url>
+  <url>
+    <loc>https://rickhelmus.github.io/patRoon/reference/compoundsMF-class.html</loc>
   </url>
   <url>
     <loc>https://rickhelmus.github.io/patRoon/reference/convertMSFiles.html</loc>
@@ -85,16 +79,19 @@
     <loc>https://rickhelmus.github.io/patRoon/reference/getXcmsSet.html</loc>
   </url>
   <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/h-cluster.html</loc>
+    <loc>https://rickhelmus.github.io/patRoon/reference/GUI-utils.html</loc>
+  </url>
+  <url>
+    <loc>https://rickhelmus.github.io/patRoon/reference/MSPeakLists-class.html</loc>
+  </url>
+  <url>
+    <loc>https://rickhelmus.github.io/patRoon/reference/MSPeakLists-generation.html</loc>
   </url>
   <url>
     <loc>https://rickhelmus.github.io/patRoon/reference/patRoon-package.html</loc>
   </url>
   <url>
     <loc>https://rickhelmus.github.io/patRoon/reference/reporting.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/silhouetteInfo-class.html</loc>
   </url>
   <url>
     <loc>https://rickhelmus.github.io/patRoon/reference/target-screening.html</loc>

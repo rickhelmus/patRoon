@@ -623,7 +623,7 @@ plotXCMSEIC <- function(EIC, rtRange = NULL, intRange = NULL, fillRange = NULL, 
 
     if (!is.null(fillRange))
     {
-        EICFill <- EIC[EIC$time >= fillRange[1] & EIC$time <= fillRange[2], ]
+        EICFill <- EIC[numGTE(EIC$time, fillRange[1]) & numLTE(EIC$time, fillRange[2]), ]
         if (retMin)
             EICFill$time <- EICFill$time / 60
         polygon(c(EICFill$time, rev(EICFill$time)), c(EICFill$intensity, rep(0, length(EICFill$intensity))),

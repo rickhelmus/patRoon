@@ -671,3 +671,8 @@ getMostIntenseAnaWithMSMS <- function(fGroups, MSPeakLists, groupName)
     
     return(oanalyses[[1]])
 }
+
+# don't use all.equal here so functions are vectorized
+numEQ <- function(x, y, tol = sqrt(.Machine$double.eps)) abs(x - y) < tol
+numGTE <- function(x, y, tol = sqrt(.Machine$double.eps)) numEQ(x, y, tol) | x > y
+numLTE <- function(x, y, tol = sqrt(.Machine$double.eps)) numEQ(x, y, tol) | x < y

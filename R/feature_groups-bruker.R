@@ -107,13 +107,13 @@ getFeatIndicesFromPA <- function(fGroups, maxRtDev, maxMzDev, maxIntDev, warn)
             if (gTable[[dfind, grp]] > 0) # check if this file should have this feature
             {
                 # Filter retention time
-                subf <- fts[abs(ret - gInfo$rts[grp]) <= maxRtDev]
+                subf <- fts[numLTE(abs(ret - gInfo$rts[grp]), maxRtDev)]
 
                 # Filter m/z
-                subf <- subf[abs(mz - gInfo$mzs[grp]) <= maxMzDev]
+                subf <- subf[numLTE(abs(mz - gInfo$mzs[grp]), maxMzDev)]
 
                 # Filter intensity
-                subf <- subf[abs(intensity - gTable[[dfind, grp]]) <= maxIntDev]
+                subf <- subf[numLTE(abs(intensity - gTable[[dfind, grp]]), maxIntDev)]
 
                 if (nrow(subf) > 0)
                 {

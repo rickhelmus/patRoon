@@ -379,7 +379,7 @@ setMethod("checkChromatograms", "featureGroups", function(fGroups, mzWindow, ena
 
                         if (!is.na(pmin))
                         {
-                            sdata <- pinfo$data[[i]][pinfo$data[[i]]$time >= pmin & pinfo$data[[i]]$time <= pmax, ]
+                            sdata <- pinfo$data[[i]][numGTE(pinfo$data[[i]]$time, pmin) & numLTE(pinfo$data[[i]]$time, pmax), ]
                             p <- add_trace(p, x = sdata$time, y = sdata$intensity,
                                            mode = "none", fill = "tozeroy", fillcolor = anaColorsTrans[i])
                         }
@@ -422,7 +422,7 @@ setMethod("checkChromatograms", "featureGroups", function(fGroups, mzWindow, ena
 
                         if (!is.na(pmin))
                         {
-                            sdata <- pinfo$data[[i]][pinfo$data[[i]]$time >= pmin & pinfo$data[[i]]$time <= pmax, ]
+                            sdata <- pinfo$data[[i]][numGTE(pinfo$data[[i]]$time, pmin) & numGLE(pinfo$data[[i]]$time, pmax), ]
                             polygon(c(sdata$time, rev(sdata$time)), c(sdata$intensity, rep(0, length(sdata$intensity))),
                                     col = anaColorsTrans[i], border = NA)
                         }

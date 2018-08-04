@@ -751,7 +751,6 @@ setMethod("plotEIC", "featureGroups", function(obj, rtWindow = 30, mzWindow = 0.
                 next
 
             EIC <- EICs[[grp]][[ana]]
-            # EIC <- EIC[EIC$time >= rtEICRange[1] & EIC$time <= rtEICRange[2], ]
 
             if (colourBy == "rGroups")
                 colInd <- anaInfo$group[anai]
@@ -764,7 +763,7 @@ setMethod("plotEIC", "featureGroups", function(obj, rtWindow = 30, mzWindow = 0.
 
             if (showPeakArea && !is.na(fts[["mz"]][anai]))
             {
-                EICFill <- EIC[EIC$time >= fts[anai, retmin] & EIC$time <= fts[anai, retmax], ]
+                EICFill <- EIC[numGTE(EIC$time, fts[anai, retmin]) & numLTE(EIC$time, fts[anai, retmax]), ]
                 if (retMin)
                     EICFill$time <- EICFill$time / 60
                 polygon(c(EICFill$time, rev(EICFill$time)), c(EICFill$intensity, rep(0, length(EICFill$intensity))),
@@ -984,9 +983,9 @@ setMethod("screenTargets", "featureGroups", function(obj, targets, rtWindow, mzW
         # find related feature group(s)
         gi <- gInfo
         if (hasRT)
-            gi <- gInfo[abs(gInfo$rts - targets$rt[ti]) <= rtWindow & abs(gInfo$mzs - targets$mz[ti]) <= mzWindow, ]
+            gi <- gInfo[numLTE(abs(gInfo$rts - targets$rt[ti]), rtWindow) & numLTE(abs(gInfo$mzs - targets$mz[ti]), mzWindow), ]
         else
-            gi <- gInfo[abs(gInfo$mzs - targets$mz[ti]) <= mzWindow, ]
+            gi <- gInfo[numLTE(abs(gInfo$mzs - targets$mz[ti]), mzWindow), ]
 
         if (nrow(gi) == 0) # no results? --> add NA result
             return(data.table(name = targets$name[ti], rt = if (hasRT) targets$rt[ti] else NA, mz = targets$mz[ti],

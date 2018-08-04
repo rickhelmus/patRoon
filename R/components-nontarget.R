@@ -149,7 +149,7 @@ generateComponentsNontarget <- function(fGroups, ionization, rtRange = c(-120, 1
             missingG <- setdiff(series, otherSeries)
             missingOtherG <- setdiff(otherSeries, series)
 
-            mzWithin <- function(mz1, mz2) abs(mz1 - mz2) <= (compTab[["m/z increment"]][r] - maxMzDev)
+            mzWithin <- function(mz1, mz2) numLTE(abs(mz1 - mz2), (compTab[["m/z increment"]][r] - maxMzDev))
 
             if (any(sapply(missingG, function(mg) any(mzWithin(gInfo[mg, "mzs"], gInfo[otherSeries, "mzs"])))) ||
                 any(sapply(missingOtherG, function(mg) any(mzWithin(gInfo[mg, "mzs"], gInfo[series, "mzs"])))))

@@ -14,7 +14,7 @@ loadSpectra <- function(path, rtRange = NULL, verbose = TRUE)
         if (is.null(rtRange))
             ps <- peaks(msf) # load all
         else
-            ps <- peaks(msf, hd[retentionTime >= rtRange[1] & retentionTime <= rtRange[2], seqNum])
+            ps <- peaks(msf, hd[numGTE(retentionTime, rtRange[1]) & numLTE(retentionTime, rtRange[2]), seqNum])
 
         spectra <- lapply(ps, function(spec) setnames(as.data.table(spec), c("mz", "intensity")))
         ret <- list(header = hd, spectra = spectra)
@@ -34,10 +34,10 @@ loadAllSpectra <- function(analyses, paths)
 
 getSpectraHeader <- function(spectra, rtRange, MSLevel, precursor, precursorMzWindow)
 {
-    hd <- spectra$header[retentionTime >= rtRange[1] & retentionTime <= rtRange[2] & msLevel == MSLevel]
+    hd <- spectra$header[numGTE(retentionTime, rtRange[1]) & numLTE(retentionTime, rtRange[2]) & msLevel == MSLevel]
 
     if (!is.null(precursor) && !is.null(precursorMzWindow))
-        hd <- hd[abs(precursorMZ - precursor) <= precursorMzWindow]
+        hd <- hd[numLTE(abs(precursorMZ - precursor), precursorMzWindow)]
 
     return(hd)
 }
@@ -46,7 +46,8 @@ getEIC <- function(spectra, rtRange, mzRange, MSLevel = 1, precursor = NULL, pre
 {
     hd <- getSpectraHeader(spectra, rtRange, MSLevel, precursor, precursorMzWindow)
     return(data.table(time = hd$retentionTime,
-                      intensity = sapply(spectra$spectra[hd$seqNum], function(s) sum(s[mz >= mzRange[1] & mz <= mzRange[2], intensity]))))
+                      intensity = sapply(spectra$spectra[hd$seqNum],
+                                         function(s) sum(s[numGTE(mz, mzRange[1]) & numLTE(mz, mzRange[2]), intensity]))))
 }
 
 # align & average spectra by clustering or between peak distances

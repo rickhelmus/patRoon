@@ -1,4 +1,4 @@
 filter repetition 1/2
-Applying blank filter... Done! Filtered 515 (79.97%) groups. Remaining: 129.
+Applying blank filter... Done! Filtered 498 (79.68%) groups. Remaining: 127.
 filter repetition 2/2
-Applying blank filter... Done! Filtered 0 (0.00%) groups. Remaining: 129.
+Applying blank filter... Done! Filtered 0 (0.00%) groups. Remaining: 127.

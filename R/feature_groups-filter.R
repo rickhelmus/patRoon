@@ -167,9 +167,9 @@ retentionMzFilter <- function(fGroups, range, negate, doRet)
     return(doFilter(fGroups, if (doRet) "retention" else "mz", c(range, negate), function(fGroups)
     {
         if (range[2] < 0)
-            pred <- function(x) x >= range[1]
+            pred <- function(x) numGTE(x, range[1])
         else
-            pred <- function(x) x >= range[1] & x <= range[2]
+            pred <- function(x) numGTE(x, range[1]) & numLTE(x, range[2])
 
         if (negate)
             pred <- Negate(pred)
@@ -196,7 +196,9 @@ chromWidthFilter <- function(fGroups, range, negate)
                 else
                     diff(unlist(fTable[[anaInfo$analysis[i]]][finds[i], c("retmin", "retmax")]))
             }, USE.NAMES = FALSE)
-            return(cwidths >= range[1] & (range[2] < 0 | cwidths <= range[2]))
+            if (range[2] < 0)
+                return(numGTE(cwidths, range[1]))
+            return(numGTE(cwidths, range[1]) & numLTE(cwidths, range[2]))
         }
         
         if (negate)

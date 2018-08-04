@@ -96,9 +96,9 @@ setMethod("screenTargets", "features", function(obj, targets, rtWindow, mzWindow
         rbindlist(lapply(names(fTable), function(ana)
         {
             if (hasRT)
-                fts <- fTable[[ana]][abs(ret - targets$rt[ti]) <= rtWindow & abs(mz - targets$mz[ti]) <= mzWindow, ]
+                fts <- fTable[[ana]][numLTE(abs(ret - targets$rt[ti]), rtWindow) & numLTE(abs(mz - targets$mz[ti]), mzWindow), ]
             else
-                fts <- fTable[[ana]][abs(mz - targets$mz[ti]) <= mzWindow, ]
+                fts <- fTable[[ana]][numLTE(abs(mz - targets$mz[ti]), mzWindow), ]
 
             if (nrow(fts) == 0) # no results? --> add NA result
                 return(data.table(name = targets$name[ti], rt = if (hasRT) targets$rt[ti] else NA,

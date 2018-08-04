@@ -29,13 +29,8 @@
 <text x='6.31' y='234.41' style='font-size: 10.80px; font-family: Liberation Sans;' textLength='15.29px' lengthAdjust='spacingAndGlyphs'>0.6</text>
 <text x='6.31' y='148.62' style='font-size: 10.80px; font-family: Liberation Sans;' textLength='15.29px' lengthAdjust='spacingAndGlyphs'>0.8</text>
 <text x='6.31' y='62.82' style='font-size: 10.80px; font-family: Liberation Sans;' textLength='15.29px' lengthAdjust='spacingAndGlyphs'>1.0</text>
-<defs>
-  <clipPath id='cpMzZ8NzIwfDQ5Mi4zMXw1OS4wNA=='>
-    <rect x='36.00' y='59.04' width='684.00' height='433.27' />
-  </clipPath>
-</defs>
-<g clip-path='url(#cpMzZ8NzIwfDQ5Mi4zMXw1OS4wNA==)'><text x='202.49' y='71.97' style='font-size: 9.60px; font-family: Liberation Sans;' textLength='5.56px' lengthAdjust='spacingAndGlyphs'>1</text></g>
-<g clip-path='url(#cpMzZ8NzIwfDQ5Mi4zMXw1OS4wNA==)'><text x='547.95' y='71.97' style='font-size: 9.60px; font-family: Liberation Sans;' textLength='5.56px' lengthAdjust='spacingAndGlyphs'>1</text></g>
+<text x='202.49' y='51.84' style='font-size: 9.60px; font-family: Liberation Sans;' textLength='5.56px' lengthAdjust='spacingAndGlyphs'>1</text>
+<text x='547.95' y='51.84' style='font-size: 9.60px; font-family: Liberation Sans;' textLength='5.56px' lengthAdjust='spacingAndGlyphs'>1</text>
 <defs>
   <clipPath id='cpNTkuMDR8Njg5Ljc2fDUwMi41Nnw1OS4wNA=='>
     <rect x='59.04' y='59.04' width='630.72' height='443.52' />

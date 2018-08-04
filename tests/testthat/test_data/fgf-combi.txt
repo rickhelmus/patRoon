@@ -1,8 +1,8 @@
-Applying intensity filter... Done! Filtered 0 (0.00%) groups. Remaining: 625.
-Applying retention filter... Done! Filtered 527 (84.32%) groups. Remaining: 98.
+Applying intensity filter... Done! Filtered 0 (0.00%) groups. Remaining: 644.
+Applying retention filter... Done! Filtered 544 (84.47%) groups. Remaining: 100.
 filter repetition 1/2
-Applying replicate filter... Done! Filtered 41 (41.84%) groups. Remaining: 57.
-Applying blank filter... Done! Filtered 13 (22.81%) groups. Remaining: 44.
+Applying replicate filter... Done! Filtered 41 (41.00%) groups. Remaining: 59.
+Applying blank filter... Done! Filtered 13 (22.03%) groups. Remaining: 46.
 filter repetition 2/2
-Applying replicate filter... Done! Filtered 0 (0.00%) groups. Remaining: 44.
-Applying blank filter... Done! Filtered 0 (0.00%) groups. Remaining: 44.
+Applying replicate filter... Done! Filtered 0 (0.00%) groups. Remaining: 46.
+Applying blank filter... Done! Filtered 0 (0.00%) groups. Remaining: 46.

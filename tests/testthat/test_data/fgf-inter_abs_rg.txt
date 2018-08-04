@@ -1,4 +1,4 @@
 filter repetition 1/2
-Applying inter replicate abundance filter... Done! Filtered 181 (28.96%) groups. Remaining: 444.
+Applying inter replicate abundance filter... Done! Filtered 194 (30.12%) groups. Remaining: 450.
 filter repetition 2/2
-Applying inter replicate abundance filter... Done! Filtered 0 (0.00%) groups. Remaining: 444.
+Applying inter replicate abundance filter... Done! Filtered 0 (0.00%) groups. Remaining: 450.

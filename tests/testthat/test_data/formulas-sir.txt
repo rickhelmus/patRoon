@@ -1,1 +1,1 @@
-A formulas object (formulas)Algorithm: SIRIUSTotal formula count: 1338Average formulas per analysis: 669.0Average formulas per feature group: 14.1
+A formulas object (formulas)Algorithm: SIRIUSTotal formula count: 1339Average formulas per analysis: 669.5Average formulas per feature group: 14.1

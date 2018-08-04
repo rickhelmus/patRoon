@@ -1,1 +1,1 @@
-A components object (componentsRC)Algorithm: RAMClustRComponents: C01, C02, C03, C04, C05, C06, ... (36 total)Number of feature groups in components: 501 (total), 13.9 (mean), 2 - 177 (min - max)
+A components object (componentsRC)Algorithm: RAMClustRComponents: C01, C02, C03, C04, C05, C06, ... (34 total)Number of feature groups in components: 507 (total), 14.9 (mean), 2 - 129 (min - max)

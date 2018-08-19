@@ -55,7 +55,7 @@ groupFeaturesOpenMS <- function(feat, rtalign = TRUE, QT = FALSE, maxAlignRT = 3
 
     cfile <- tempfile("cons", fileext = ".consensusXML")
     generateConsensusXML(feat, cfile, rtalign, QT, maxAlignRT, maxAlignMZ, maxGroupRT, maxGroupMZ)
-    fgimp <- importConsensusXML(feat, cfile)
+    fgimp <- importConsensusXMLCpp(feat, cfile)
 
     ret <- featureGroupsOpenMS(groups = fgimp$groups, groupInfo=fgimp$gInfo, analysisInfo = analysisInfo(feat),
                                features=feat, ftindex=fgimp$ftindex)
@@ -185,4 +185,46 @@ importConsensusXML <- function(feat, cfile)
     cat("Done!\n")
 
     return(list(groups = groups, gInfo = gInfo, ftindex = ftindex))
+}
+
+importConsensusXMLCpp <- function(feat, cfile)
+{
+    cat("Importing consensus XML...")
+    
+    fTable <- featureTable(feat)
+    anaCount <- nrow(analysisInfo(feat))
+    
+    consXML <- parseFeatConsXMLFile(cfile, anaCount)
+
+    gCount <- nrow(consXML$gInfo)
+    if (gCount > 0)
+    {
+        # generate group intensity table
+        gtab <- data.table(matrix(0, nrow = anaCount, ncol = gCount))
+        ftindex <- as.data.table(consXML$ftindex)
+        
+        for (gi in seq_len(gCount))
+        {
+            for (ai in seq_len(anaCount))
+            {
+                fti <- ftindex[[gi]][ai]
+                if (fti != 0)
+                    set(gtab, ai, gi, fTable[[ai]][["intensity"]][fti])
+            }
+        }
+
+        gNames <- sapply(seq_len(gCount), function(grpi) makeFGroupName(grpi, consXML$gInfo$rts[grpi],
+                                                                        consXML$gInfo$mzs[grpi]))
+        rownames(consXML$gInfo) <- gNames
+        setnames(gtab, gNames)
+        setnames(ftindex, gNames)
+        
+        ret <- list(groups = gtab, gInfo = consXML$gInfo, ftindex = ftindex)
+    }
+    else
+        ret <- list(groups = data.table(), gInfo = data.frame(), ftindex = data.table())
+    
+    cat("Done!\n")
+    
+    return(ret)
 }

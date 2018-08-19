@@ -21,6 +21,7 @@ BugReports: https://github.com/rickhelmus/patRoon/issues
 Imports:
     methods,
     checkmate (>= 1.8.5),
+    Rcpp,
     VennDiagram,
     stats,
     utils,
@@ -79,6 +80,8 @@ Suggests:
     patRoonData,
     devtools,
     covr
+LinkingTo:
+    Rcpp
 RdMacros:
     Rdpack
 Collate: 
@@ -88,6 +91,7 @@ Collate:
     'features.R'
     'feature_groups.R'
     'EIC-tool.R'
+    'RcppExports.R'
     'components.R'
     'components-camera.R'
     'components-intclust.R'

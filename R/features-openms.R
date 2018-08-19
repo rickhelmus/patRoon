@@ -81,7 +81,8 @@ findFeaturesOpenMS <- function(analysisInfo, thr = 1000, comfwhm = 5, minfwhm = 
 
         fList <- executeMultiProcess(cmdQueue, function(cmd, ...)
         {
-            fts <- importFeatureXML(cmd$featFile)
+            # fts <- importFeatureXML(cmd$featFile)
+            fts <- importFeatureXMLCpp(cmd$featFile)
             fts <- loadIntensities(cmd$dataFile, fts, intSearchRTWindow)
 
             # BUG: OpenMS sporadically reports features with 0 intensity
@@ -167,6 +168,11 @@ importFeatureXML <- function(ffile)
     })
 
     return(ret)
+}
+
+importFeatureXMLCpp <- function(ffile)
+{
+    return(as.data.table(parseFeatureXMLFile(ffile)))
 }
 
 # OpenMS doesn't support peak intensities. Estimate them from retention times

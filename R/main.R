@@ -34,6 +34,12 @@ NULL
 
 # UNDONE: rstudioapi optional?
 
+# For Rcpp
+#' @importFrom Rcpp evalCpp
+#' @useDynLib patRoon, .registration = TRUE
+NULL
+
+
 #' @include cache.R
 NULL
 

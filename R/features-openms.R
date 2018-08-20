@@ -36,8 +36,8 @@ featuresOpenMS <- setClass("featuresOpenMS", contains = "features")
 #'
 #' @template multiProc-args
 #'
-#' @references \insertRef{Rst2016}{patRoon}
-#'
+#' @template refs-openms
+#' 
 #' @rdname feature-finding
 #' @export
 findFeaturesOpenMS <- function(analysisInfo, thr = 1000, comfwhm = 5, minfwhm = 3, maxfwhm = 60, minlength = 3,

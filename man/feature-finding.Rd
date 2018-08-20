@@ -161,7 +161,11 @@ The file format of analyses for \code{findFeaturesXCMS} must be
   \code{mzML} or \code{mzXML}.
 }
 \references{
-\insertRef{Rst2016}{patRoon}
+\insertRef{Rst2016}{patRoon} \cr\cr
+  \href{https://pugixml.org/}{pugixml} (via \href{http://www.rcpp.org/}{Rcpp}) is used to process OpenMS XML output. \cr\cr
+  \addCitations{Rcpp}{1} \cr\cr
+  \addCitations{Rcpp}{2} \cr\cr
+  \addCitations{Rcpp}{3}
 
 \addCitations{xcms}{1} \cr\cr
    \addCitations{xcms}{2} \cr\cr

@@ -22,3 +22,4 @@ Release:
 - check why generics sometimes are not found
 - better SMILES to mol error handling + check kekulize=FALSE for fails
 - finalize filter() method for features
+- remove R xml code for OpenMS features/feature groups

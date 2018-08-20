@@ -27,7 +27,7 @@ featureGroupsOpenMS <- setClass("featureGroupsOpenMS", contains = "featureGroups
 #'   for grouping of features. Sets \code{-algorithm:distance_RT:max_difference}
 #'   and \code{-algorithm:distance_MZ:max_difference} options, respectively.
 #'
-#' @references \insertRef{Rst2016}{patRoon}
+#' @template refs-openms
 #'
 #' @rdname feature-grouping
 #' @export

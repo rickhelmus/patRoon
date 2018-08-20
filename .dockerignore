@@ -3,7 +3,11 @@
 !R/*.R
 !man/*
 !src/*.R
-!src/Makefile
+!src/Makevars
+!src/*.cpp
+!src/*.h
+!src/pugixml/*.hpp
+!src/pugixml/*.cpp
 !src/GenForm-svn/*.cpp
 !src/GenForm-svn/*.h
 !tests/testthat.R

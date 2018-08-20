@@ -74,8 +74,8 @@ test_script:
     - travis-tool.sh run_tests
 
 on_failure:
-    - type %APPVEYOR_BUILD_FOLDER%\junit.xml
-    - 7z a failure.zip *.Rcheck\* %APPVEYOR_BUILD_FOLDER%\junit.xml
+    - if exist %APPVEYOR_BUILD_FOLDER%\junit.xml ( type %APPVEYOR_BUILD_FOLDER%\junit.xml && appveyor PushArtifact %APPVEYOR_BUILD_FOLDER%\junit.xml )
+    - 7z a failure.zip *.Rcheck\*
     - appveyor PushArtifact failure.zip
 
 on_success:

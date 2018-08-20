@@ -4,12 +4,12 @@ DEST_GF=GenForm.exe
 
 CXX_STD = CXX11
 
-.PHONY: all noclean inst
+.PHONY: all clean inst
 
 all: GenForm $(SHLIB)
 
 GenForm: $(OBJECTS_GF)
 	$(CXX) -o $(DEST_GF) $(OBJECTS_GF)
 
-noclean:
-	rm -rf $(OBJECTS_GF) $(DEST_GF)
+clean:
+	rm -rf $(OBJECTS_GF) $(DEST_GF) $(SHLIB) $(OBJECTS)

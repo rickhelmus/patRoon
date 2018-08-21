@@ -54,10 +54,10 @@ and \emph{m/z}) within the reported feature groups table \file{.csv} file.}
 \file{.csv} file will be generated with information about its detected
 features.}
 
-\item{formConsensus, compounds, components}{Further objects
+\item{formConsensus, compounds, compsCluster, components}{Further objects
 (\code{\link{formulaConsensus}}, \code{\link{compounds}},
-\code{\link{components}}) that should be reported. Specify \code{NULL} to
-skip reporting a particular object.}
+\code{\link{compoundsCluster}}, \code{\link{components}}) that should be
+reported. Specify \code{NULL} to skip reporting a particular object.}
 
 \item{compoundNormalizeScores}{If \code{TRUE} compound identification scores
 will be normalized to maximum values.}

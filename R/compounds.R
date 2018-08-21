@@ -257,8 +257,8 @@ setMethod("addFormulaScoring", "compounds", function(compounds, formConsensus, u
 
 #' @describeIn compounds Calculates the maximum common substructure (MCS)
 #'   for two or more candidate structures for a feature group. This method uses
-#'   the \code{\link{get.mcs}} function from \pkg{\link{rcdk}}.
-#' @return \code{getMCS} returns an \pkg{\link{rcdk}} molecule object
+#'   the \code{\link{get.mcs}} function from \CRANpkg{rcdk}.
+#' @return \code{getMCS} returns an \CRANpkg{rcdk} molecule object
 #'   (\code{IAtomContainer}).
 #' @export
 setMethod("getMCS", "compounds", function(obj, index, groupName)

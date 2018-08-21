@@ -18,12 +18,11 @@
 
 \item{fpType}{The type of structural fingerprint that should be calculated.
 See the \code{type} argument of the \code{\link{get.fingerprint}} function
-of \pkg{\link{rcdk}}.}
+of \CRANpkg{rcdk}.}
 
 \item{fpSimMethod}{The similarity method (i.e. not dissimilarity!) to be used
 for generating the distance matrix. See the \code{method} argument of the
-\code{\link{fp.sim.matrix}} function of the \pkg{\link{fingerprint}}
-package.}
+\code{\link{fp.sim.matrix}} function of the \CRANpkg{fingerprint} package.}
 
 \item{maxTreeHeight, deepSplit, minModuleSize}{Arguments used by
 \code{\link{cutreeDynamicTree}}.}
@@ -57,7 +56,7 @@ resulting clusters can then be characterized by evaluating their
 \section{Source}{
  The methodology applied here has been largely derived from
   \file{chemclust.R} from the \pkg{metfRag} package and the package vignette
-  of \pkg{\link{rcdk}}.
+  of \CRANpkg{rcdk}.
 }
 
 \seealso{

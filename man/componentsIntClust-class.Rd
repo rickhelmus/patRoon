@@ -42,11 +42,14 @@
 }
 \arguments{
 \item{k, h}{Desired number of clusters or tree height to be used for cutting
-the dendrogram, respecitively. One or the other must be specified.
+the dendrogram, respectively. One or the other must be specified.
 Analogous to \code{\link{cutree}}.}
 
 \item{maxTreeHeight, deepSplit, minModuleSize}{Arguments used by
 \code{\link{cutreeDynamicTree}}.}
+
+\item{col}{Colours used for drawing the heatmap. See \code{\link{heatmap}} /
+\code{\link{d3heatmap}}.}
 
 \item{interactive}{If \code{TRUE} an interactive heatmap will be drawn (with
 \code{\link{d3heatmap}}).}
@@ -75,8 +78,6 @@ overflowing the plot.}
 
 \item{kSeq}{An integer vector containing the sequence that should be used for
 average silhouette width calculation.}
-
-\item{\dots}{Any arguments directly given to \code{\link{plot.dendrogram}}.}
 }
 \value{
 \code{plotHeatMap} returns the same as \code{\link{heatmap}} or

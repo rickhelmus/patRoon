@@ -26,10 +26,10 @@ NULL
 #' @param path The destination file path for files generated during reporting.
 #'   Will be generated if needed.
 #' @param reportFGroups If \code{TRUE} then feature group data will be reported.
-#' @param formConsensus,compounds,components Further objects
+#' @param formConsensus,compounds,compsCluster,components Further objects
 #'   (\code{\link{formulaConsensus}}, \code{\link{compounds}},
-#'   \code{\link{components}}) that should be reported. Specify \code{NULL} to
-#'   skip reporting a particular object.
+#'   \code{\link{compoundsCluster}}, \code{\link{components}}) that should be
+#'   reported. Specify \code{NULL} to skip reporting a particular object.
 #' @param reportFormulaSpectra If \code{TRUE} then explained MS/MS spectra (if
 #'   available) for candidate formulae will be reported. Specifying
 #'   \code{formConsensus} and setting this argument to \code{FALSE} still allows

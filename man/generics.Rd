@@ -80,6 +80,11 @@ represent non-shared data.}
 retention time scatter plots.}
 
 \item{which}{What should be plotted. See method documentation for specifics.}
+
+\item{k, h}{Desired numbers of clusters. See \code{\link{cutree}}.}
+
+\item{maxTreeHeight, deepSplit, minModuleSize}{Arguments used by
+\code{\link{cutreeDynamicTree}}.}
 }
 \description{
 Various (S4) generic functions provide a common interface for common tasks

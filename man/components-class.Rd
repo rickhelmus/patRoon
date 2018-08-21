@@ -49,7 +49,8 @@
 \item{fGroup}{The name (thus a character) of the feature group that should be
 searched for.}
 
-\item{fGroups}{A \code{\link{featureGroups}} object which should be filtered.}
+\item{fGroups}{The \code{\link{featureGroups}} object that was used to
+generate the components.}
 
 \item{negate}{If set to \code{TRUE} then the filter is applied in opposite
 manner.}
@@ -76,9 +77,6 @@ the consensus.}
 
 \item{rtWindow}{Retention window: see the \code{plotEIC} method for the
 \code{\link{featureGroups}} class.}
-
-\item{fGroups}{The \code{\link{featureGroups}} object that was used to
-generate the components.}
 }
 \value{
 \code{filterBy} returns a filtered \code{\link{featureGroups}}

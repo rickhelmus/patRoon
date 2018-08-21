@@ -131,7 +131,7 @@ within all given \code{compounds} objects.}
 \code{addFormulaScoring} returns a \code{compounds} object updated
   with formula scoring.
 
-\code{getMCS} returns an \pkg{\link{rcdk}} molecule object
+\code{getMCS} returns an \CRANpkg{rcdk} molecule object
   (\code{IAtomContainer}).
 
 \code{consensus} returns a \code{compounds} object that is produced
@@ -174,7 +174,7 @@ point, whereas matched MS/MS fragments yield 0.5 point each.
 
 \item \code{getMCS}: Calculates the maximum common substructure (MCS)
 for two or more candidate structures for a feature group. This method uses
-the \code{\link{get.mcs}} function from \pkg{\link{rcdk}}.
+the \code{\link{get.mcs}} function from \CRANpkg{rcdk}.
 
 \item \code{plotStructure}: Plots a structure of a candidate compound using the
 \CRANpkg{rcdk} package. If multiple candidates are specified (\emph{i.e.}

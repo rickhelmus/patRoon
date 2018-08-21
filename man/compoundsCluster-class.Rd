@@ -81,7 +81,7 @@ should be plotted.}
 \code{cutTree} and \code{cutTreeDynamic} return the modified
   \code{compoundsCluster} object.
 
-\code{getMCS} returns an \pkg{\link{rcdk}} molecule object
+\code{getMCS} returns an \CRANpkg{rcdk} molecule object
   (\code{IAtomContainer}).
 }
 \description{
@@ -120,11 +120,11 @@ generated for a feature group using the \code{\link{cutreeDynamicTree}}
 function from \pkg{\link{dynamicTreeCut}}.
 
 \item \code{plot}: Plot the dendrogram for clustered compounds of a
-feature group. Clusters are highlighted using \pkg{\link{dendextend}}.
+feature group. Clusters are highlighted using \CRANpkg{dendextend}.
 
 \item \code{getMCS}: Calculates the maximum common substructure (MCS)
 for all candidate structures within a specified cluster. This method uses
-the \code{\link{get.mcs}} function from \pkg{\link{rcdk}}.
+the \code{\link{get.mcs}} function from \CRANpkg{rcdk}.
 
 \item \code{plotStructure}: Plots the maximum common substructure (MCS) for
 all candidate structures within a specified cluster.

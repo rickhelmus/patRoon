@@ -80,7 +80,7 @@ setMethod("clusterProperties", "componentsIntClust", function(obj) obj@propertie
 
 #' @describeIn componentsIntClust Manually (re-)cut the dendrogram.
 #' @param k,h Desired number of clusters or tree height to be used for cutting
-#'   the dendrogram, respecitively. One or the other must be specified.
+#'   the dendrogram, respectively. One or the other must be specified.
 #'   Analogous to \code{\link{cutree}}.
 #' @export
 setMethod("treeCut", "componentsIntClust", function(obj, k = NULL, h = NULL)
@@ -128,6 +128,8 @@ setMethod("treeCutDynamic", "componentsIntClust", function(obj, maxTreeHeight, d
 
 #' @describeIn componentsIntClust draws a heatmap using the
 #'   \code{\link{heatmap}} or \code{\link{d3heatmap}} function.
+#' @param col Colours used for drawing the heatmap. See \code{\link{heatmap}} /
+#'   \code{\link{d3heatmap}}.
 #' @param interactive If \code{TRUE} an interactive heatmap will be drawn (with
 #'   \code{\link{d3heatmap}}).
 #' @return \code{plotHeatMap} returns the same as \code{\link{heatmap}} or
@@ -177,6 +179,7 @@ setMethod("plotInt", "componentsIntClust", function(obj, index, ...)
 #'   cut.
 #' @param numericLabels Set to \code{TRUE} to label with numeric indices instead
 #'   of (long) feature group names.
+#' @templateVar withoutDots TRUE
 #' @template plot_clust
 #' @export
 setMethod("plot", "componentsIntClust", function(x, pal = "Paired", numericLabels = TRUE,

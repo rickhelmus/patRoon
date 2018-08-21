@@ -93,6 +93,7 @@ setMethod("findFGroup", "components", function(obj, fGroup)
 })
 
 #' @templateVar class components
+#' @templateVar withoutFGroups TRUE
 #' @template filterby
 #' @export
 setMethod("filterBy", "components", function(obj, fGroups, negate, index = NULL)

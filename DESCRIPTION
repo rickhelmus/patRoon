@@ -43,6 +43,7 @@ Imports:
     cluster,
     d3heatmap,
     dynamicTreeCut,
+    dendextend,
     rJava,
     rcdk,
     fingerprint,

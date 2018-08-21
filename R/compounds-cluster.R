@@ -18,7 +18,7 @@ NULL
 #'
 #' @section Source: The methodology applied here has been largely derived from
 #'   \file{chemclust.R} from the \pkg{metfRag} package and the package vignette
-#'   of \pkg{\link{rcdk}}.
+#'   of \CRANpkg{rcdk}.
 #'
 #' @name compounds-cluster
 #' @seealso compoundsCluster
@@ -149,7 +149,7 @@ setMethod("treeCutDynamic", "compoundsCluster", function(obj, maxTreeHeight, dee
 })
 
 #' @describeIn compoundsCluster Plot the dendrogram for clustered compounds of a
-#'   feature group. Clusters are highlighted using \pkg{\link{dendextend}}.
+#'   feature group. Clusters are highlighted using \CRANpkg{dendextend}.
 #' @template plot_clust
 #' @export
 setMethod("plot", "compoundsCluster", function(x, groupName, pal = "Paired",
@@ -165,8 +165,8 @@ setMethod("plot", "compoundsCluster", function(x, groupName, pal = "Paired",
 
 #' @describeIn compoundsCluster Calculates the maximum common substructure (MCS)
 #'   for all candidate structures within a specified cluster. This method uses
-#'   the \code{\link{get.mcs}} function from \pkg{\link{rcdk}}.
-#' @return \code{getMCS} returns an \pkg{\link{rcdk}} molecule object
+#'   the \code{\link{get.mcs}} function from \CRANpkg{rcdk}.
+#' @return \code{getMCS} returns an \CRANpkg{rcdk} molecule object
 #'   (\code{IAtomContainer}).
 #' @export
 setMethod("getMCS", "compoundsCluster", function(obj, groupName, cluster)
@@ -238,11 +238,10 @@ setMethod("plotStructure", "compoundsCluster", function(obj, groupName, cluster,
 #' @param method The clustering method passed to \code{\link{hclust}}.
 #' @param fpType The type of structural fingerprint that should be calculated.
 #'   See the \code{type} argument of the \code{\link{get.fingerprint}} function
-#'   of \pkg{\link{rcdk}}.
+#'   of \CRANpkg{rcdk}.
 #' @param fpSimMethod The similarity method (i.e. not dissimilarity!) to be used
 #'   for generating the distance matrix. See the \code{method} argument of the
-#'   \code{\link{fp.sim.matrix}} function of the \pkg{\link{fingerprint}}
-#'   package.
+#'   \code{\link{fp.sim.matrix}} function of the \CRANpkg{fingerprint} package.
 #'
 #' @template dynamictreecut
 #'

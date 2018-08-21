@@ -2,7 +2,7 @@
 #'   \code{\link{featureGroups}} object that are also present in the specified
 #'   \code{<%=class%>} object.
 #'
-#' @param fGroups A \code{\link{featureGroups}} object which should be filtered.
+#' <%=if (!exists("withoutFGroups") || !withoutFGroups) "@param fGroups A \\code{\\link{featureGroups}} object which should be filtered." else "" %>
 #' @param negate If set to \code{TRUE} then the filter is applied in opposite
 #'   manner.
 #' @return \code{filterBy} returns a filtered \code{\link{featureGroups}}

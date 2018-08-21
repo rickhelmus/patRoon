@@ -235,11 +235,13 @@ setGeneric("plotVenn", function(obj, which = NULL, ...) standardGeneric("plotVen
 #' @templateVar func treeCut
 #' @templateVar desc Manually cut a cluster.
 #' @template generics
+#' @param k,h Desired numbers of clusters. See \code{\link{cutree}}.
 setGeneric("treeCut", function(obj, k = NULL, h = NULL, ...) standardGeneric("treeCut"))
 
 #' @templateVar func treeCutDynamic
 #' @templateVar desc Automatically cut a cluster.
 #' @template generics
+#' @template dynamictreecut
 setGeneric("treeCutDynamic", function(obj, maxTreeHeight = 1, deepSplit = TRUE,
                                       minModuleSize = 1, ...) standardGeneric("treeCutDynamic"))
 

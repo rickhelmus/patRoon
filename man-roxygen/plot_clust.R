@@ -6,4 +6,4 @@
 #'   \code{TRUE} then a legend will be shown which outlines cluster numbers and
 #'   their colours. By default \code{TRUE} for small amount of clusters to avoid
 #'   overflowing the plot.
-#' @param \dots Any arguments directly given to \code{\link{plot.dendrogram}}.
+#' <%=if (!exists("withoutDots") || !withoutDots) "@param \\dots Any arguments directly given to \\code{\\link{plot.dendrogram}}." else "" %>

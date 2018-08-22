@@ -48,7 +48,7 @@ executeMultiProcess <- function(commandQueue, finishHandler,
                                                                       retries = runningProcInfo[[pi]]$noResRetries))))
                     {
                         runningProcInfo[[pi]]$noResRetries <- runningProcInfo[[pi]]$noResRetries + 1
-                        runningProcs[[pi]] <- runningProcs[[pi]]$restart()
+                        runningProcs[[pi]] <- do.call(process$new, runningProcInfo[[pi]]$procArgs)
                         finishedRunning <- FALSE
                     }
                     else
@@ -107,6 +107,7 @@ executeMultiProcess <- function(commandQueue, finishHandler,
                         procArgs <- c(procArgs, stderr = "|")
 
                     runningProcs[[pi]] <- do.call(process$new, procArgs)
+                    runningProcInfo[[pi]]$procArgs <- procArgs
                     runningProcInfo[[pi]]$startCmdInd <- nextCommand
                     runningProcInfo[[pi]]$endCmdInd <- nextCommand + (nproc - 1)
                     runningProcInfo[[pi]]$failed <- FALSE
@@ -144,7 +145,7 @@ executeMultiProcess <- function(commandQueue, finishHandler,
                                                                     retries = runningProcInfo[[pi]]$timeOutRetries))))
                 {
                     runningProcInfo[[pi]]$timeOutRetries <- runningProcInfo[[pi]]$timeOutRetries + 1
-                    runningProcs[[pi]] <- runningProcs[[pi]]$restart()
+                    runningProcs[[pi]] <- do.call(process$new, runningProcInfo[[pi]]$procArgs)
                 }
                 else
                     runningProcInfo[[pi]]$failed <- TRUE

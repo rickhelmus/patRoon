@@ -74,7 +74,6 @@ test_script:
     - travis-tool.sh run_tests
 
 on_failure:
-    - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
     - if exist %APPVEYOR_BUILD_FOLDER%\junit.xml ( type %APPVEYOR_BUILD_FOLDER%\junit.xml && appveyor PushArtifact %APPVEYOR_BUILD_FOLDER%\junit.xml )
     - 7z a failure.zip *.Rcheck\*
     - appveyor PushArtifact failure.zip

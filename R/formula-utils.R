@@ -171,55 +171,60 @@ consensusForFormulaList <- function(formList, fGroups, formThreshold, maxFormula
             formTable <- formTable[intensity >= minIntensity]
         if (!is.null(maxIntensity))
             formTable <- formTable[intensity <= maxIntensity]
-
-        # check if we can remove some more to stay in optimal intensity range
-        if (!is.null(minPreferredIntensity))
+        
+        if (nrow(formTable) == 0)
+            warning("Filtered all formulas!")
+        else
         {
-            formTable[, prefAnaCount := length(unique(.SD[intensity >= minPreferredIntensity]$analysis)), by = group]
-            formTable <- formTable[prefAnaCount < minPreferredFormulas | intensity >= minPreferredIntensity]
-            formTable[, prefAnaCount := NULL]
+            # check if we can remove some more to stay in optimal intensity range
+            if (!is.null(minPreferredIntensity))
+            {
+                formTable[, prefAnaCount := length(unique(.SD[intensity >= minPreferredIntensity]$analysis)), by = group]
+                formTable <- formTable[prefAnaCount < minPreferredFormulas | intensity >= minPreferredIntensity]
+                formTable[, prefAnaCount := NULL]
+            }
+            
+            formTable[, min_intensity := min(intensity), by = .(group, byMSMS)]
+            formTable[, max_intensity := max(intensity), by = .(group, byMSMS)]
+            
+            formTable[, ana_min_intensity := .SD[which.min(intensity), analysis], by = .(group, byMSMS)]
+            formTable[, ana_max_intensity := .SD[which.max(intensity), analysis], by = .(group, byMSMS)]
+            
+            # number of analyses searched for formulas per group
+            formTable[, anaCount := length(unique(analysis)), by = group]
+            
+            byCols <- c("group", "formula")
+            if (haveMSMS)
+                byCols <- c(byCols, "frag_formula")
+            
+            # Determine coverage of formulas within analyses
+            formTable[, anaCoverage := .N / anaCount, by = byCols]
+            if (formThreshold > 0)
+                formTable <- formTable[anaCoverage >= formThreshold] # Apply coverage filter
+            
+            # Remove duplicate entries (do this after coverage!)
+            formTable <- unique(formTable, by = byCols)
+            
+            # order from best to worst (important for max unique formula filter)
+            colorder <- c("group", "byMSMS", intersect(names(formTable), formulaScoringColumns()))
+            setorderv(formTable, colorder, c(1, 1, rep(-1, length(colorder)-2)))
+            
+            # filter max unique formulas
+            formTable[, form_unique := match(formula, unique(.SD$formula)), by = group]
+            formTable <- formTable[form_unique <= maxFormulas]
+            if (haveMSMS)
+            {
+                formTable[, form_unique_frag := match(frag_formula, unique(frag_formula)), by=.(group, byMSMS, formula)]
+                formTable <- formTable[form_unique_frag <= maxFragFormulas]
+            }
+            
+            # Remove some uninteresting columns
+            formTable[, c("analysis", "intensity", "anaCount", "form_unique") := NULL]
+            if (haveMSMS)
+                formTable[, form_unique_frag := NULL]
         }
-
-        formTable[, min_intensity := min(intensity), by = .(group, byMSMS)]
-        formTable[, max_intensity := max(intensity), by = .(group, byMSMS)]
-
-        formTable[, ana_min_intensity := .SD[which.min(intensity), analysis], by = .(group, byMSMS)]
-        formTable[, ana_max_intensity := .SD[which.max(intensity), analysis], by = .(group, byMSMS)]
-
-        # number of analyses searched for formulas per group
-        formTable[, anaCount := length(unique(analysis)), by = group]
-
-        byCols <- c("group", "formula")
-        if (haveMSMS)
-            byCols <- c(byCols, "frag_formula")
-
-        # Determine coverage of formulas within analyses
-        formTable[, anaCoverage := .N / anaCount, by = byCols]
-        if (formThreshold > 0)
-            formTable <- formTable[anaCoverage >= formThreshold] # Apply coverage filter
-
-        # Remove duplicate entries (do this after coverage!)
-        formTable <- unique(formTable, by = byCols)
-
-        # order from best to worst (important for max unique formula filter)
-        colorder <- c("group", "byMSMS", intersect(names(formTable), formulaScoringColumns()))
-        setorderv(formTable, colorder, c(1, 1, rep(-1, length(colorder)-2)))
-
-        # filter max unique formulas
-        formTable[, form_unique := match(formula, unique(.SD$formula)), by = group]
-        formTable <- formTable[form_unique <= maxFormulas]
-        if (haveMSMS)
-        {
-            formTable[, form_unique_frag := match(frag_formula, unique(frag_formula)), by=.(group, byMSMS, formula)]
-            formTable <- formTable[form_unique_frag <= maxFragFormulas]
-        }
-
-        # Remove some uninteresting columns
-        formTable[, c("analysis", "intensity", "anaCount", "form_unique") := NULL]
-        if (haveMSMS)
-            formTable[, form_unique_frag := NULL]
     }
-
+        
     cat("Done!\n")
 
     return(formulaConsensus(formulas = formTable, algorithm = algorithm(formList)))

@@ -1,13 +1,16 @@
 context("components")
 
 fGroups <- getTestFGroups(getTestAnaInfo()[4:5, ])
+# reduced set for CAMERA/RAMClustR; for nontarget we keep all to get less common homologues
+fGroupsSimple <- groupFeaturesScreening(fGroups, screenTargets(fGroups, patRoonData::targets))
+
 
 # fix seed for reproducible clustering
-withr::with_seed(20, compsRC <- generateComponents(fGroups, "ramclustr", ionization = "positive"))
+withr::with_seed(20, compsRC <- generateComponents(fGroupsSimple, "ramclustr", ionization = "positive"))
 # UNDONE: getting unknown NaN warnings here...
-suppressWarnings(compsCAM <- generateComponents(fGroups, "camera", ionization = "positive"))
+suppressWarnings(compsCAM <- generateComponents(fGroupsSimple, "camera", ionization = "positive"))
 compsNT <- generateComponents(fGroups, "nontarget", ionization = "positive")
-compsInt <- generateComponents(fGroups, "intclust", average = FALSE) # no averaging: only one rep group 
+compsInt <- generateComponents(fGroupsSimple, "intclust", average = FALSE) # no averaging: only one rep group 
 fGroupsEmpty <- getEmptyTestFGroups()
 compsEmpty <- components()
 
@@ -34,7 +37,7 @@ test_that("verify components show", {
 })
 
 test_that("findFGroup works", {
-    expect_equivalent(findFGroup(compsCAM, names(fGroups)[1]), 1)
+    expect_equivalent(findFGroup(compsCAM, names(fGroupsSimple)[1]), 2)
     expect_length(findFGroup(compsCAM, "none"), 0)
     expect_length(findFGroup(compsEmpty, "1"), 0)
 })
@@ -48,9 +51,9 @@ test_that("consensus works", {
 })
 
 test_that("feature group filtering", {
-    expect_named(filterBy(compsRC, fGroups), unique(unlist(sapply(componentTable(compsRC), "[[", "group"))), ignore.order = TRUE)
-    expect_named(filterBy(compsRC, fGroups, index = 1), componentTable(compsRC)[[1]]$group)
-    expect_length(filterBy(compsEmpty, fGroups), 0)
+    expect_named(filterBy(compsRC, fGroupsSimple), unique(unlist(sapply(componentTable(compsRC), "[[", "group"))), ignore.order = TRUE)
+    expect_named(filterBy(compsRC, fGroupsSimple, index = 1), componentTable(compsRC)[[1]]$group)
+    expect_length(filterBy(compsEmpty, fGroupsSimple), 0)
 })
 
 test_that("intensity clustered components", {
@@ -59,21 +62,21 @@ test_that("intensity clustered components", {
 })
 
 test_that("reporting works", {
-    expect_file(reportCSV(fGroups, getWorkPath(), components = compsRC),
+    expect_file(reportCSV(fGroupsSimple, getWorkPath(), components = compsRC),
                 getWorkPath("components.csv"))
 
-    expect_file(reportPDF(fGroups, getWorkPath(), reportFGroups = FALSE, components = compsRC),
+    expect_file(reportPDF(fGroupsSimple, getWorkPath(), reportFGroups = FALSE, components = compsRC),
                 getWorkPath("components.pdf"))
     
-    expect_file(reportMD(fGroups, getWorkPath(), reportChord = FALSE, reportFGroups = FALSE,
+    expect_file(reportMD(fGroupsSimple, getWorkPath(), reportChord = FALSE, reportFGroups = FALSE,
                          components = compsRC),
                 getWorkPath("report.html"))
 })
 
 test_that("reporting empty object works", {
-    expect_error(reportCSV(fGroups, getWorkPath(), components = compsEmpty), NA)
-    expect_error(reportPDF(fGroups, getWorkPath(), reportFGroups = FALSE, components = compsEmpty), NA)
-    expect_file(reportMD(fGroups, getWorkPath(), reportChord = FALSE, reportFGroups = FALSE,
+    expect_error(reportCSV(fGroupsSimple, getWorkPath(), components = compsEmpty), NA)
+    expect_error(reportPDF(fGroupsSimple, getWorkPath(), reportFGroups = FALSE, components = compsEmpty), NA)
+    expect_file(reportMD(fGroupsSimple, getWorkPath(), reportChord = FALSE, reportFGroups = FALSE,
                          components = compsEmpty),
                 getWorkPath("report.html"))
 })
@@ -83,9 +86,9 @@ test_that("plotting works", {
     # expect_doppel("compon-spec", function() plotSpec(compsNT, 1))
     # expect_doppel("compon-spec-mark", function() plotSpec(compsNT, 1, markFGroup = names(fGroups)[1]))
     expect_plot(plotSpec(compsRC, 1))
-    expect_plot(plotSpec(compsRC, 1, markFGroup = names(fGroups)[1]))
+    expect_plot(plotSpec(compsRC, 1, markFGroup = names(fGroupsSimple)[1]))
     expect_plot(print(plotSpec(compsRC, 1, useGGPlot2 = TRUE)))
-    expect_doppel("eic-component", function() plotEIC(compsRC, 1, fGroups))
+    expect_doppel("eic-component", function() plotEIC(compsRC, 1, fGroupsSimple))
     
     expect_plot(plot(compsInt))
     expect_doppel("component-ic-int", function() plotInt(compsInt, index = 1))

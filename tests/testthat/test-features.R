@@ -1,11 +1,13 @@
 context("features")
 
-ffOpenMS <- findFeatures(getTestAnaInfo(), "openms", logPath = NULL)
-ffXCMS <- findFeatures(getTestAnaInfo(), "xcms")
+anaInfo <- getTestAnaInfo()[4, ]
+
+ffOpenMS <- findFeatures(anaInfo, "openms", logPath = NULL)
+ffXCMS <- findFeatures(anaInfo, "xcms")
 
 # generate mzXML files for enviPick
 exDataFiles <- list.files(patRoonData::exampleDataPath(), "\\.mzML$", full.names = TRUE)
-convertMSFiles(getTestAnaInfo(), "mzML", "mzXML", getWorkPath())
+convertMSFiles(anaInfo, "mzML", "mzXML", getWorkPath())
 epAnaInfo <- getTestAnaInfo(getWorkPath())
 ffEP <- findFeatures(epAnaInfo, "envipick")
 
@@ -24,7 +26,7 @@ test_that("verify show output", {
 })
 
 test_that("verify empty object can be generated", {
-    expect_length(findFeatures(getTestAnaInfo(), "openms", thr = 1E9, logPath = NULL), 0)
-    expect_length(suppressWarnings(findFeatures(getTestAnaInfo(), "xcms", snthresh = 1E9)), 0)
+    expect_length(findFeatures(anaInfo, "openms", thr = 1E9, logPath = NULL), 0)
+    expect_length(suppressWarnings(findFeatures(anaInfo, "xcms", snthresh = 1E9)), 0)
     expect_length(findFeatures(epAnaInfo, "envipick", minint = 1E8, maxint = 1E9), 0)
 })

@@ -1,6 +1,9 @@
 context("formulas")
 
 fGroups <- getTestFGroups(getTestAnaInfo()[4:5, ])
+# convert to screening results to simplify things a bit
+fGroups <- groupFeaturesScreening(fGroups, screenTargets(fGroups, patRoonData::targets))
+
 fGroupsEmpty <- getEmptyTestFGroups()
 plists <- generateMSPeakLists(fGroups, "mzr")
 plistsEmpty <- getEmptyPLists()
@@ -58,7 +61,7 @@ test_that("consensus works", {
     expect_lte(length(consensus(formsGF, fGroups = fGroups, maxFormulas = 1, maxFragFormulas = 1)),
                length(unique(fTable$group)) * 2) # * 2: one MS + one MSMS formula max
     expect_gte(min(formulaTable(consensus(formsGF, fGroups = fGroups, minIntensity = 500))$min_intensity), 500)
-    expect_lte(min(formulaTable(consensus(formsGF, fGroups = fGroups, maxIntensity = 10000))$min_intensity), 10000)
+    expect_lte(min(formulaTable(consensus(formsGF, fGroups = fGroups, maxIntensity = 15000))$min_intensity), 15000)
     checkmate::expect_names(names(formulaTable(consensus(formsGF, fGroups = fGroups, elements = c("C", "H")))),
                             must.include = c("C", "H"))
     checkmate::expect_names(names(formulaTable(consensus(formsGF, fGroups = fGroups, fragElements = c("C", "H")))),

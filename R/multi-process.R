@@ -90,7 +90,14 @@ executeMultiProcess <- function(commandQueue, finishHandler,
                             procArgs$command <- shFile
                         }
                         else
-                            procArgs$commandline <- paste0(cmdList, collapse = " ; ")
+                        {
+                            # not supported anymore by processx :(
+                            # procArgs$commandline <- paste0(cmdList, collapse = " ; ")
+                            
+                            # --> call sh instead for nix
+                            procArgs$command <- "/bin/sh"
+                            procArgs$args <- c("-c", paste0(cmdList, collapse = " ; "))
+                        }
                     }
                     else
                     {

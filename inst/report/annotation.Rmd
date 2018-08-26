@@ -1,8 +1,3 @@
-<style>
-.annotationClass {
-    display: none;
-}
-</style>
 
 <script>`r readAllFile(system.file("js", "utils-report.js", package = "patRoon"))`</script>
 
@@ -11,7 +6,7 @@ Annotation {data-orientation=rows}
 
 ##
 
-### feature groups
+### feature groups { data-width=300 }
 
 ```{r echo=FALSE}
 showButton <- function(title, jsFunc, arg1, arg2) sprintf("<button onclick=\"%s('%s', '%s');\" style=\"padding: 0px 3px 0px 3px\">%s</button>", jsFunc, arg1, arg2, title)
@@ -60,12 +55,12 @@ fGroupsSpecDT <- data.table(group = allGroups, rt = round(rmdVars$gInfo[allGroup
 
 maybeAddButton <- function(grpi, subGroups, ...) if (allGroups[grpi] %in% subGroups) showButton(...) else "-"
 
-compButtons <- sapply(seq_along(allGroups), function(gi) maybeAddButton(gi, compFGroups, "compounds", "showAnnotation", gi, "comp"))
+compButtons <- sapply(seq_along(allGroups), function(gi) maybeAddButton(gi, compFGroups, "compounds", "showAnnotation", gi, "compounds"))
 compCLButtons <- sapply(seq_along(allGroups),function(gi) maybeAddButton(gi, compsClustFGroups,
                                                                          "compounds clust", "showAnnotation",
-                                                                         gi, "compscl"))
+                                                                         gi, "compsclust"))
 formButtons <- sapply(seq_along(allGroups), function(gi) maybeAddButton(gi, formFGroups, "formulas",
-                                                                        "showAnnotation", gi, "form"))
+                                                                        "showAnnotation", gi, "formulas"))
 if (!is.null(rmdVars$components))
 {
     componButtons <- sapply(seq_along(allGroups), function(gi)
@@ -109,9 +104,10 @@ if (rmdVars$includeMFWebLinks != "none")
 DT::datatable(fGroupsSpecDT, options = list(paging = FALSE, scrollY = "200px"), escape = FALSE)
 ```
 
-####
+### { .noAnnotationSelected data-width=100 }
 
-<div id="noAnnotationSelected">Push a **show** button to view annotation data for a feature group.</div>
+<div>Push a **show** button to view annotation data for a feature group.</div>
+
 
 ```{r allCompPlots, fig.keep='none', eval=length(plotGroups) > 0}
 # Generate all plots in advance, since having many code chunks will cause a lot of overhead.
@@ -125,10 +121,10 @@ for (grpi in seq_along(plotGroups))
 {
     plotf <- file.path(plotPath, sprintf("eic_%i.png", grpi))
     allPlots[length(allPlots) + 1] <- plotf
-    makePlot(plotf, 8, 4.5,
+    makePlot(plotf, 5, 4.5,
              plotEIC(rmdVars$fGroups[, plotGroups[grpi]], rmdVars$EICRtWindow,
                      rmdVars$EICMzWindow, rmdVars$retMin,
-                     rmdVars$EICTopMost, rmdVars$EICs, colourBy = "rGroup"))
+                     rmdVars$EICTopMost, rmdVars$EICs, colourBy = "rGroup", title = ""))
     
     if (plotGroups[grpi] %in% compFGroups)
     {
@@ -192,11 +188,39 @@ if (rmdVars$optimizePng && length(allPlots > 0))
 }
 ```
 
-##
+```{r echo=FALSE, eval=length(plotGroups) > 0}
+rmdTexts <- vector("character", length = length(plotGroups))
 
-### Compound results
+message("Generating annotation layout...")
+# prog <- txtProgressBar(0, length(plotGroups), style = 3, file = stderr())
 
-```{r echo=FALSE, length(plotGroups) > 0}
+if (!is.null(rmdVars$compsCluster))
+    cutcl <- cutClusters(rmdVars$compsCluster)
+
+for (grpi in seq_along(plotGroups))
+{
+    rmdTexts[grpi] <- glue::glue("
+
+
+### EIC {{ data-width=100 .annotationClass .EIC-{ grpi } }}
+
+![]({ plotPath }/eic_{ grpi }.png)
+
+", grpi = grpi, plotPath = plotPath)
+}
+
+# stuff everything together: https://stackoverflow.com/a/21730473
+rmdText <- paste0(rmdTexts, collapse = "\n")
+```
+
+`r if (length(plotGroups) > 0) rmdText`
+
+
+## { .annotationClass .compounds }
+
+### { .annotationClass .compounds }
+
+```{r echo=FALSE, eval=length(plotGroups) > 0}
 compoundsDT <- rbindlist(lapply(seq_along(plotGroups), function(grpi)
 {
     grp <- plotGroups[grpi]
@@ -243,6 +267,7 @@ compoundsDT <- rbindlist(lapply(seq_along(plotGroups), function(grpi)
 }))
 
 DT::datatable(compoundsDT, options = list(scrollX = TRUE, scrollY = "600px", deferRender = TRUE,
+                                          dom = "lrtip", pageLength = 25,
                                           columnDefs = list(list(visible = FALSE, targets = 0))),
               rownames = FALSE, escape = FALSE, elementId = "compoundsTable")
 
@@ -327,5 +352,3 @@ rmdText <- paste0(rmdTexts, collapse = "\n")
 close(prog)
 ```
 
-<!-- stuff everything together: https://stackoverflow.com/a/21730473 -->
-`r if (FALSE && length(plotGroups) > 0) rmdText`

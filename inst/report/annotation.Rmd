@@ -184,7 +184,74 @@ if (rmdVars$optimizePng && length(allPlots > 0))
     optimizePngPlots(allPlots, stderr(), rmdVars$maxProcAmount)
 ```
 
-```{r echo=FALSE, eval=length(plotGroups) > 0}
+
+```{css}
+/* fix for horizontal scroll: https://groups.google.com/d/msg/shiny-discuss/N5N0PqcBvuY/PAvQnSWSAQAJ */
+.chart-wrapper {
+  overflow-x: scroll;
+}
+```
+
+##
+
+### Compound results
+
+```{r echo=FALSE, length(plotGroups) > 0}
+compoundsDT <- rbindlist(lapply(seq_along(plotGroups), function(grpi)
+{
+    grp <- plotGroups[grpi]
+    mn <- mergedCompoundNames(rmdVars$compounds)
+    if (grp %in% compFGroups)
+    {
+        ct <- compTable[[grp]]
+        
+        if (FALSE)
+        {
+            ret <- rbindlist(lapply(seq_len(nrow(ct)), function(compi)
+            {
+                # as.data.table(getCompInfoList(ct, compi, TRUE, mn))
+                ct[compi, ] # UNDONE
+            }))
+            
+            ret[, group := grp]
+            ppaths <- file.path(plotPath, sprintf("compspec_%d_%d.png", grpi, seq_len(nrow(ct))))
+            if (rmdVars$selfContained)
+                ppaths <- sapply(ppaths, knitr::image_uri)
+            ret[, spectrum := sprintf("<img src=%s></img>", ppaths)]
+        }
+
+        sppaths <- file.path(plotPath, sprintf("compspec_%d_%d.png", grpi, seq_len(nrow(ct))))
+        scpaths <- file.path(plotPath, sprintf("compscore_%d_%d.png", grpi, seq_len(nrow(ct))))
+        
+        if (rmdVars$selfContained)
+        {
+            sppaths <- sapply(sppaths, knitr::image_uri)
+            scpaths <- sapply(scpaths, knitr::image_uri)
+        }
+        
+        infoTexts <- sapply(seq_len(nrow(ct)),
+                            function(compi) paste0(getCompInfoList(ct, compi, TRUE, mn), collapse = "<br>"))
+        
+        ret <- data.table(group = grpi,
+                          "#" = seq_len(nrow(ct)),
+                          spectrum = sprintf("<img src=%s></img>", sppaths),
+                          info = infoTexts,
+                          scores = sprintf("<img src=%s></img>", scpaths))
+        return(ret)
+    }
+    return(data.table())
+}))
+
+DT::datatable(compoundsDT, options = list(scrollX = TRUE, scrollY = "600px", deferRender = TRUE,
+                                          columnDefs = list(list(visible = FALSE, targets = 0))),
+              rownames = FALSE, escape = FALSE, elementId = "compoundsTable")
+
+```
+
+
+
+
+```{r echo=FALSE, eval=FALSE && length(plotGroups) > 0}
 rmdTexts <- vector("character", length = length(plotGroups))
 
 message("Generating annotation layout...")
@@ -261,4 +328,4 @@ close(prog)
 ```
 
 <!-- stuff everything together: https://stackoverflow.com/a/21730473 -->
-`r if (length(plotGroups) > 0) rmdText`
+`r if (FALSE && length(plotGroups) > 0) rmdText`

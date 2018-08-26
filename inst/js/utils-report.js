@@ -5,6 +5,9 @@ function getAnnotationPageElement()
 
 function showAnnotation(group, type)
 {
+    $('#compoundsTable .dataTable').DataTable().column(0).search(group).draw();
+    return;
+    
     clearComponentSpecs();
     
     var comps = document.getElementsByClassName('annotationClass');

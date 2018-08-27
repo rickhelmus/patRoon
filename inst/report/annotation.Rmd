@@ -220,50 +220,51 @@ rmdText <- paste0(rmdTexts, collapse = "\n")
 
 ### { .annotationClass .compounds }
 
-```{r echo=FALSE, eval=length(plotGroups) > 0}
-compoundsDT <- rbindlist(lapply(seq_along(plotGroups), function(grpi)
+```{r echo=FALSE, eval=length(compFGroups) > 0}
+compoundsDT <- rbindlist(lapply(compFGroups, function(grp)
 {
-    grp <- plotGroups[grpi]
+    grpi <- which(plotGroups == grp)
     mn <- mergedCompoundNames(rmdVars$compounds)
-    if (grp %in% compFGroups)
-    {
-        ct <- compTable[[grp]]
-        
-        if (FALSE)
-        {
-            ret <- rbindlist(lapply(seq_len(nrow(ct)), function(compi)
-            {
-                # as.data.table(getCompInfoList(ct, compi, TRUE, mn))
-                ct[compi, ] # UNDONE
-            }))
-            
-            ret[, group := grp]
-            ppaths <- file.path(plotPath, sprintf("compspec_%d_%d.png", grpi, seq_len(nrow(ct))))
-            if (rmdVars$selfContained)
-                ppaths <- sapply(ppaths, knitr::image_uri)
-            ret[, spectrum := sprintf("<img src=%s></img>", ppaths)]
-        }
 
-        sppaths <- file.path(plotPath, sprintf("compspec_%d_%d.png", grpi, seq_len(nrow(ct))))
-        scpaths <- file.path(plotPath, sprintf("compscore_%d_%d.png", grpi, seq_len(nrow(ct))))
-        
-        if (rmdVars$selfContained)
+    ct <- compTable[[grp]]
+    
+    if (FALSE)
+    {
+        ret <- rbindlist(lapply(seq_len(nrow(ct)), function(compi)
         {
-            sppaths <- sapply(sppaths, knitr::image_uri)
-            scpaths <- sapply(scpaths, knitr::image_uri)
-        }
+            # as.data.table(getCompInfoList(ct, compi, TRUE, mn))
+            ct[compi, ] # UNDONE
+        }))
         
-        infoTexts <- sapply(seq_len(nrow(ct)),
-                            function(compi) paste0(getCompInfoList(ct, compi, TRUE, mn), collapse = "<br>"))
-        
-        ret <- data.table(group = grpi,
-                          "#" = seq_len(nrow(ct)),
-                          spectrum = sprintf("<img src=%s></img>", sppaths),
-                          info = infoTexts,
-                          scores = sprintf("<img src=%s></img>", scpaths))
-        return(ret)
+        ret[, group := grp]
+        ppaths <- file.path(plotPath, sprintf("compspec_%d_%d.png", grpi, seq_len(nrow(ct))))
+        if (rmdVars$selfContained)
+            ppaths <- sapply(ppaths, knitr::image_uri)
+        ret[, spectrum := sprintf("<img src=%s></img>", ppaths)]
     }
-    return(data.table())
+    
+    sppaths <- file.path(plotPath, sprintf("compspec_%d_%d.png", grpi, seq_len(nrow(ct))))
+    scpaths <- file.path(plotPath, sprintf("compscore_%d_%d.png", grpi, seq_len(nrow(ct))))
+        
+    if (rmdVars$selfContained)
+    {
+        sppaths <- sapply(sppaths, knitr::image_uri)
+        scpaths <- sapply(scpaths, knitr::image_uri)
+    }
+    
+    infoTexts <- sapply(seq_len(nrow(ct)),
+                        function(compi) paste0(getCompInfoList(ct, compi, TRUE, mn), collapse = "<br>"))
+    
+    ret <- data.table(group = grpi,
+                      "#" = seq_len(nrow(ct)),
+                      spectrum = sprintf("<img src=%s></img>", sppaths),
+                      info = infoTexts,
+                      scores = sprintf("<img src=%s></img>", scpaths))
+    # otherCols <- getAllCompCols(c("identifier", "formula", "neutralMass", "SMILES", "XlogP", "AlogP"),
+    #                             names(ct), mn)
+    # ret <- cbind(ret, ct[, otherCols, with = FALSE])
+    
+    return(ret)
 }))
 
 DT::datatable(compoundsDT, options = list(scrollX = TRUE, scrollY = "600px", deferRender = TRUE,
@@ -273,6 +274,38 @@ DT::datatable(compoundsDT, options = list(scrollX = TRUE, scrollY = "600px", def
 
 ```
 
+
+## { .annotationClass .formulas }
+
+### { .annotationClass .formulas }
+
+```{r echo=FALSE, eval=length(formFGroups) > 0}
+formulasDT <- rbindlist(lapply(formFGroups, function(grp)
+{
+    grpi <- which(plotGroups == grp)
+    precursors <- unique(formTable[group == grp, formula])
+    
+    sppaths <- file.path(plotPath, sprintf("formspec_%d_%s.png", grpi, precursors))
+    if (rmdVars$selfContained)
+        sppaths <- sapply(sppaths, knitr::image_uri)
+
+    infoTexts <- sapply(precursors,
+                        function(prec) paste0(getFormInfoList(rmdVars$formConsensus, prec, grp),
+                                                              collapse = "<br>"))
+        
+    ret <- data.table(group = grpi,
+                      spectrum = sprintf("<img src=%s></img>", sppaths),
+                      info = infoTexts)
+
+    return(ret)
+}))
+
+DT::datatable(formulasDT, options = list(scrollX = TRUE, scrollY = "600px", deferRender = TRUE,
+                                         dom = "lrtip", pageLength = 25,
+                                         columnDefs = list(list(visible = FALSE, targets = 0))),
+              rownames = FALSE, escape = FALSE, elementId = "formulasTable")
+
+```
 
 
 

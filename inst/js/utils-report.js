@@ -16,8 +16,11 @@ function showAnnotation(group, type)
     }
     
     document.getElementsByClassName("noAnnotationSelected")[0].style.display = 'none';
-    $('#compoundsTable .dataTable').DataTable().column(0).search(group).draw();
-    //$('.compounds').show();
+    
+    if (type == "compounds")
+        $('#compoundsTable .dataTable').DataTable().column(0).search(group).draw();
+    else
+        $('#formulasTable .dataTable').DataTable().column(0).search(group).draw();
 }
 
 function showComponentSpec(component, parentID)

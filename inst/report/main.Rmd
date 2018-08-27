@@ -25,9 +25,9 @@ getPlotPath <- function()
     return(ret)
 }
 
-makePlot <- function(out, w, h, expr)
+makePlot <- function(out, w, h, expr, bg = "white")
 {
-    png(out, w, h, units = "in", res = 72)
+    png(out, w, h, units = "in", res = 72, bg = bg)
     eval(expr)
     dev.off()
 }

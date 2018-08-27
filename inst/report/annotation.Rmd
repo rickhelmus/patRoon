@@ -128,19 +128,27 @@ for (grpi in seq_along(plotGroups))
     
     if (plotGroups[grpi] %in% compFGroups)
     {
-        allPlots <- c(allPlots, sapply(seq_len(nrow(compTable[[plotGroups[grpi]]])), function(compi)
+        compsSeq <- seq_len(nrow(compTable[[plotGroups[grpi]]]))
+        allPlots <- c(allPlots, sapply(compsSeq, function(compi)
         {
             ret <- file.path(plotPath, sprintf("compscore_%d_%d.png", grpi, compi))
             makePlot(ret, 3.5, 4.5, plotScores(rmdVars$compounds, compi, plotGroups[grpi]))
             return(ret)
         }))
 
-        allPlots <- c(allPlots, sapply(seq_len(nrow(compTable[[plotGroups[grpi]]])), function(compi)
+        allPlots <- c(allPlots, sapply(compsSeq, function(compi)
         {
             ret <- file.path(plotPath, sprintf("compspec_%d_%d.png", grpi, compi))
             makePlot(ret, 7, 4.5, plotSpec(rmdVars$compounds, compi,  plotGroups[grpi],
                                            rmdVars$MSPeakLists, rmdVars$formConsensus,
                                            rmdVars$compoundNormalizeScores))
+            return(ret)
+        }))
+        
+        allPlots <- c(allPlots, sapply(compsSeq, function(compi)
+        {
+            ret <- file.path(plotPath, sprintf("compstruct_%d_%d.png", grpi, compi))
+            makePlot(ret, 3, 3, bg = "transparent", plotStructure(rmdVars$compounds, compi, plotGroups[grpi]))
             return(ret)
         }))
     }
@@ -245,20 +253,23 @@ compoundsDT <- rbindlist(lapply(compFGroups, function(grp)
     
     sppaths <- file.path(plotPath, sprintf("compspec_%d_%d.png", grpi, seq_len(nrow(ct))))
     scpaths <- file.path(plotPath, sprintf("compscore_%d_%d.png", grpi, seq_len(nrow(ct))))
+    stpaths <- file.path(plotPath, sprintf("compstruct_%d_%d.png", grpi, seq_len(nrow(ct))))
         
     if (rmdVars$selfContained)
     {
         sppaths <- sapply(sppaths, knitr::image_uri)
         scpaths <- sapply(scpaths, knitr::image_uri)
+        stpaths <- sapply(stpaths, knitr::image_uri)
     }
     
     infoTexts <- sapply(seq_len(nrow(ct)),
                         function(compi) paste0(getCompInfoList(ct, compi, TRUE, mn), collapse = "<br>"))
+    infoTexts <- sprintf("<div style='max-width: 300px; max-height: 432px; border: 1px solid black; border-style: dotted; margin: 1px; padding: 1px; overflow: auto; white-space: nowrap; }'>%s</div>", infoTexts)
     
     ret <- data.table(group = grpi,
                       "#" = seq_len(nrow(ct)),
+                      structure = sprintf("<img src=%s></img><br>%s", stpaths, infoTexts),
                       spectrum = sprintf("<img src=%s></img>", sppaths),
-                      info = infoTexts,
                       scores = sprintf("<img src=%s></img>", scpaths))
     # otherCols <- getAllCompCols(c("identifier", "formula", "neutralMass", "SMILES", "XlogP", "AlogP"),
     #                             names(ct), mn)

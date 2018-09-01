@@ -17,10 +17,9 @@ function showAnnotation(group, type)
     
     document.getElementsByClassName("noAnnotationSelected")[0].style.display = 'none';
     
-    if (type == "compounds")
-        $('#compoundsTable .dataTable').DataTable().column(0).search(group).draw();
-    else
-        $('#formulasTable .dataTable').DataTable().column(0).search(group).draw();
+    qu = "#" + type + "Table .dataTable";
+    $(qu).DataTable().column(0).search(group).draw();
+    $(qu).DataTable().columns.adjust().draw();
 }
 
 function showComponentSpec(component, parentID)
@@ -47,10 +46,10 @@ function disableAllAnnotations()
     var comps = document.getElementsByClassName('annotationClass');
     for (var i=0; i<comps.length; i++)
         comps[i].style.display = 'none';
+    $(".dataTable").DataTable().columns.adjust().draw(); // fixup feature group table
 }
 
 $(document).ready(function()
 {
-    //setTimeout(function() { $('.annotationClass').hide(); }, 1500);
-    setTimeout(disableAllAnnotations, 5); // HACK: wait a bit so that HTML instances are available
+    //setTimeout(disableAllAnnotations, 5000); // HACK: wait a bit so that HTML instances are available
 });

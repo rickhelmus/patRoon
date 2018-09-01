@@ -1,4 +1,3 @@
-
 <script>`r readAllFile(system.file("js", "utils-report.js", package = "patRoon"))`</script>
 
 Annotation {data-orientation=rows}
@@ -101,7 +100,10 @@ if (rmdVars$includeMFWebLinks != "none")
     })]
 }
 
-DT::datatable(fGroupsSpecDT, options = list(paging = FALSE, scrollY = "200px"), escape = FALSE)
+DT::datatable(fGroupsSpecDT, options = list(paging = FALSE, scrollY = "200px",
+                                            initComplete = DT::JS("function(settings, json)",
+                                                                "{ setTimeout(disableAllAnnotations, 50); }")),
+              escape = FALSE)
 ```
 
 ### { .noAnnotationSelected data-width=100 }
@@ -189,13 +191,6 @@ if (rmdVars$optimizePng && length(allPlots > 0))
 ```
 
 
-```{css}
-/* fix for horizontal scroll: https://groups.google.com/d/msg/shiny-discuss/N5N0PqcBvuY/PAvQnSWSAQAJ */
-.chart-wrapper {
-  overflow-x: scroll;
-}
-```
-
 ```{r echo=FALSE, eval=length(plotGroups) > 0}
 rmdTexts <- vector("character", length = length(plotGroups))
 
@@ -228,6 +223,8 @@ rmdText <- paste0(rmdTexts, collapse = "\n")
 
 ### { .annotationClass .compounds }
 
+<style> .compounds { overflow-x: auto; } </style>
+
 ```{r echo=FALSE, eval=length(compFGroups) > 0}
 compoundsDT <- rbindlist(lapply(compFGroups, function(grp)
 {
@@ -235,21 +232,6 @@ compoundsDT <- rbindlist(lapply(compFGroups, function(grp)
     mn <- mergedCompoundNames(rmdVars$compounds)
 
     ct <- compTable[[grp]]
-    
-    if (FALSE)
-    {
-        ret <- rbindlist(lapply(seq_len(nrow(ct)), function(compi)
-        {
-            # as.data.table(getCompInfoList(ct, compi, TRUE, mn))
-            ct[compi, ] # UNDONE
-        }))
-        
-        ret[, group := grp]
-        ppaths <- file.path(plotPath, sprintf("compspec_%d_%d.png", grpi, seq_len(nrow(ct))))
-        if (rmdVars$selfContained)
-            ppaths <- sapply(ppaths, knitr::image_uri)
-        ret[, spectrum := sprintf("<img src=%s></img>", ppaths)]
-    }
     
     sppaths <- file.path(plotPath, sprintf("compspec_%d_%d.png", grpi, seq_len(nrow(ct))))
     scpaths <- file.path(plotPath, sprintf("compscore_%d_%d.png", grpi, seq_len(nrow(ct))))
@@ -266,29 +248,25 @@ compoundsDT <- rbindlist(lapply(compFGroups, function(grp)
                         function(compi) paste0(getCompInfoList(ct, compi, TRUE, mn), collapse = "<br>"))
     infoTexts <- sprintf("<div style='max-width: 300px; max-height: 432px; border: 1px solid black; border-style: dotted; margin: 1px; padding: 1px; overflow: auto; white-space: nowrap; }'>%s</div>", infoTexts)
     
-    ret <- data.table(group = grpi,
+    return(data.table(group = grpi,
                       "#" = seq_len(nrow(ct)),
                       structure = sprintf("<img src=%s></img><br>%s", stpaths, infoTexts),
                       spectrum = sprintf("<img src=%s></img>", sppaths),
-                      scores = sprintf("<img src=%s></img>", scpaths))
-    # otherCols <- getAllCompCols(c("identifier", "formula", "neutralMass", "SMILES", "XlogP", "AlogP"),
-    #                             names(ct), mn)
-    # ret <- cbind(ret, ct[, otherCols, with = FALSE])
-    
-    return(ret)
+                      scores = sprintf("<img src=%s></img>", scpaths)))
 }))
 
 DT::datatable(compoundsDT, options = list(scrollX = TRUE, scrollY = "600px", deferRender = TRUE,
-                                          dom = "lrtip", pageLength = 25,
+                                          dom = "lrtip", pageLength = 25, autoWidth = TRUE,
                                           columnDefs = list(list(visible = FALSE, targets = 0))),
               rownames = FALSE, escape = FALSE, elementId = "compoundsTable")
-
 ```
 
 
 ## { .annotationClass .formulas }
 
 ### { .annotationClass .formulas }
+
+<style> .formulas { overflow-x: auto; } </style>
 
 ```{r echo=FALSE, eval=length(formFGroups) > 0}
 formulasDT <- rbindlist(lapply(formFGroups, function(grp)
@@ -312,7 +290,7 @@ formulasDT <- rbindlist(lapply(formFGroups, function(grp)
 }))
 
 DT::datatable(formulasDT, options = list(scrollX = TRUE, scrollY = "600px", deferRender = TRUE,
-                                         dom = "lrtip", pageLength = 25,
+                                         dom = "lrtip", pageLength = 25, autoWidth = TRUE,
                                          columnDefs = list(list(visible = FALSE, targets = 0))),
               rownames = FALSE, escape = FALSE, elementId = "formulasTable")
 

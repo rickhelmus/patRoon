@@ -68,7 +68,7 @@ if (!is.null(rmdVars$components))
         cmpIds <- findFGroup(rmdVars$components, allGroups[gi])
         # UNDONE: multiple indices
         cmpNames <- tolower(names(rmdVars$components)[cmpIds]) # NOTE: headings are automatically made lowercase
-        maybeAddButton(gi, componentFGroups, "components", "showComponentSpec", cmpNames[1], "feature-groups")
+        maybeAddButton(gi, componentFGroups, "components", "showComponentSpec", cmpNames[1], gi)
     })
 } else
     componButtons <- rep("-", length(allGroups))
@@ -100,7 +100,7 @@ if (rmdVars$includeMFWebLinks != "none")
     })]
 }
 
-DT::datatable(fGroupsSpecDT, options = list(paging = FALSE, scrollY = "200px",
+DT::datatable(fGroupsSpecDT, options = list(paging = FALSE, scrollY = "200px", autoWidth = TRUE,
                                             initComplete = DT::JS("function(settings, json)",
                                                                 "{ setTimeout(disableAllAnnotations, 50); }")),
               escape = FALSE)
@@ -250,13 +250,14 @@ compoundsDT <- rbindlist(lapply(compFGroups, function(grp)
     
     return(data.table(group = grpi,
                       "#" = seq_len(nrow(ct)),
-                      structure = sprintf("<img src=%s></img><br>%s", stpaths, infoTexts),
+                      compound = sprintf("<img src=%s></img><br>%s", stpaths, infoTexts),
                       spectrum = sprintf("<img src=%s></img>", sppaths),
                       scores = sprintf("<img src=%s></img>", scpaths)))
 }))
 
 DT::datatable(compoundsDT, options = list(scrollX = TRUE, scrollY = "600px", deferRender = TRUE,
-                                          dom = "lrtip", pageLength = 25, autoWidth = TRUE,
+                                          dom = "lrtp", pageLength = 25, autoWidth = TRUE,
+                                          ordering = FALSE,
                                           columnDefs = list(list(visible = FALSE, targets = 0))),
               rownames = FALSE, escape = FALSE, elementId = "compoundsTable")
 ```
@@ -290,7 +291,8 @@ formulasDT <- rbindlist(lapply(formFGroups, function(grp)
 }))
 
 DT::datatable(formulasDT, options = list(scrollX = TRUE, scrollY = "600px", deferRender = TRUE,
-                                         dom = "lrtip", pageLength = 25, autoWidth = TRUE,
+                                         dom = "lrtp", pageLength = 25, autoWidth = TRUE,
+                                         ordering = FALSE,
                                          columnDefs = list(list(visible = FALSE, targets = 0))),
               rownames = FALSE, escape = FALSE, elementId = "formulasTable")
 

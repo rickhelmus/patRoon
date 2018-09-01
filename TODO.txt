@@ -23,3 +23,4 @@ Release:
 - better SMILES to mol error handling + check kekulize=FALSE for fails
 - finalize filter() method for features
 - remove R xml code for OpenMS features/feature groups
+- subsetting of components to allow e.g. reporting components with subsetted feature groups

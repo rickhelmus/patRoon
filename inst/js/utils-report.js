@@ -3,30 +3,41 @@ function getAnnotationPageElement()
     return document.getElementById("feature-groups").parentElement.parentElement;
 }
 
-function showAnnotation(group, type)
+function showEICs(group)
 {
-    clearComponentSpecs();
-    
     const annElements = document.getElementsByClassName('annotationClass');
     const EICId = "EIC-" + group;
     for (var i=0; i<annElements.length; i++)
     {
-        annElements[i].style.display = (annElements[i].classList.contains(type) ||
-                                        annElements[i].classList.contains(EICId)) ? 'flex' : 'none';
+        if (annElements[i].classList.contains(EICId))
+            annElements[i].style.display = 'flex';
     }
     
-    document.getElementsByClassName("noAnnotationSelected")[0].style.display = 'none';
-    
+    document.getElementsByClassName("noAnnotationSelected")[0].style.display = 'none';    
+}
+
+function showAnnotation(group, type)
+{
+    clearComponentSpecs();
+
+    const annElements = document.getElementsByClassName('annotationClass');
+    for (var i=0; i<annElements.length; i++)
+        annElements[i].style.display = (annElements[i].classList.contains(type)) ? 'flex' : 'none';
+
+    showEICs(group);
+
     qu = "#" + type + "Table .dataTable";
     $(qu).DataTable().column(0).search(group).draw();
     $(qu).DataTable().columns.adjust().draw();
 }
 
-function showComponentSpec(component, parentID)
+function showComponentSpec(component, group)
 {
     // component specs are treated differently as they are cloned
     clearComponentSpecs();
     disableAllAnnotations();
+
+    showEICs(group);
     
     var comp = document.getElementById(component).parentElement;
     var clonedComp = comp.cloneNode(true);
@@ -46,7 +57,7 @@ function disableAllAnnotations()
     var comps = document.getElementsByClassName('annotationClass');
     for (var i=0; i<comps.length; i++)
         comps[i].style.display = 'none';
-    $(".dataTable").DataTable().columns.adjust().draw(); // fixup feature group table
+    //$(".dataTable").DataTable().columns.adjust().draw(); // fixup feature group table
 }
 
 $(document).ready(function()

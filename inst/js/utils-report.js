@@ -31,6 +31,18 @@ function showAnnotation(group, type)
     $(qu).DataTable().columns.adjust().draw();
 }
 
+function showCompoundsCluster(group)
+{
+    clearComponentSpecs();
+
+    const type = "compscl_ann-" + group;
+    const annElements = document.getElementsByClassName('annotationClass');
+    for (var i=0; i<annElements.length; i++)
+        annElements[i].style.display = (annElements[i].classList.contains(type)) ? 'flex' : 'none';
+    
+    showEICs(group);
+}
+
 function showComponentSpec(component, group)
 {
     // component specs are treated differently as they are cloned
@@ -58,6 +70,12 @@ function disableAllAnnotations()
     for (var i=0; i<comps.length; i++)
         comps[i].style.display = 'none';
     //$(".dataTable").DataTable().columns.adjust().draw(); // fixup feature group table
+}
+
+function initAnnotation()
+{
+    disableAllAnnotations();
+    $('.dataTable').DataTable().columns.adjust().draw();
 }
 
 $(document).ready(function()

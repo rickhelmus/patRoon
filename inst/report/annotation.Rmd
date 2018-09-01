@@ -55,9 +55,8 @@ fGroupsSpecDT <- data.table(group = allGroups, rt = round(rmdVars$gInfo[allGroup
 maybeAddButton <- function(grpi, subGroups, ...) if (allGroups[grpi] %in% subGroups) showButton(...) else "-"
 
 compButtons <- sapply(seq_along(allGroups), function(gi) maybeAddButton(gi, compFGroups, "compounds", "showAnnotation", gi, "compounds"))
-compCLButtons <- sapply(seq_along(allGroups),function(gi) maybeAddButton(gi, compsClustFGroups,
-                                                                         "compounds clust", "showAnnotation",
-                                                                         gi, "compsclust"))
+compCLButtons <- sapply(seq_along(allGroups), function(gi) maybeAddButton(gi, compsClustFGroups,
+                                                                          "compounds clust", "showCompoundsCluster", gi, ""))
 formButtons <- sapply(seq_along(allGroups), function(gi) maybeAddButton(gi, formFGroups, "formulas",
                                                                         "showAnnotation", gi, "formulas"))
 if (!is.null(rmdVars$components))
@@ -100,9 +99,10 @@ if (rmdVars$includeMFWebLinks != "none")
     })]
 }
 
-DT::datatable(fGroupsSpecDT, options = list(paging = FALSE, scrollY = "200px", autoWidth = TRUE,
-                                            initComplete = DT::JS("function(settings, json)",
-                                                                "{ setTimeout(disableAllAnnotations, 50); }")),
+DT::datatable(fGroupsSpecDT,
+              options = list(paging = FALSE, scrollY = "200px", autoWidth = TRUE,
+                             initComplete = DT::JS("function(settings, json)",
+                                                   "{ setTimeout(initAnnotation, 50); }")),
               escape = FALSE)
 ```
 
@@ -194,11 +194,8 @@ if (rmdVars$optimizePng && length(allPlots > 0))
 ```{r echo=FALSE, eval=length(plotGroups) > 0}
 rmdTexts <- vector("character", length = length(plotGroups))
 
-message("Generating annotation layout...")
+message("Generating annotation EIC layout...")
 # prog <- txtProgressBar(0, length(plotGroups), style = 3, file = stderr())
-
-if (!is.null(rmdVars$compsCluster))
-    cutcl <- cutClusters(rmdVars$compsCluster)
 
 for (grpi in seq_along(plotGroups))
 {
@@ -300,79 +297,28 @@ DT::datatable(formulasDT, options = list(scrollX = TRUE, scrollY = "600px", defe
 
 
 
-```{r echo=FALSE, eval=FALSE && length(plotGroups) > 0}
-rmdTexts <- vector("character", length = length(plotGroups))
+```{r echo=FALSE, eval=length(compsClustFGroups) > 0}
+rmdTexts <- vector("character", length = length(compsClustFGroups))
 
-message("Generating annotation layout...")
-prog <- txtProgressBar(0, length(plotGroups), style = 3, file = stderr())
-compSpecTempl <- readAllFile(system.file("templates", "comp-spectra.Rmd", package = "patRoon"))
+message("Generating compounds cluster layout...")
+# prog <- txtProgressBar(0, length(plotGroups), style = 3, file = stderr())
 compClustTempl <- readAllFile(system.file("templates", "comp-cluster.Rmd", package = "patRoon"))
-formSpecTempl <- readAllFile(system.file("templates", "formula-spectra.Rmd", package = "patRoon"))
 
-if (!is.null(rmdVars$compsCluster))
-    cutcl <- cutClusters(rmdVars$compsCluster)
-
-for (grpi in seq_along(plotGroups))
+cutcl <- cutClusters(rmdVars$compsCluster)
+for (grpi in seq_along(compsClustFGroups))
 {
-    rmdTexts[grpi] <- glue::glue("
-
-## {{ .annotationClass .EIC-{ grpi } }}
-
-### EIC {{ .annotationClass .EIC-{ grpi } }}
-
-![]({ plotPath }/eic_{ grpi }.png)
-
-", grpi = grpi, plotPath = plotPath)
-
-    if (plotGroups[grpi] %in% compFGroups)
-    {
-        compsSeq <- seq_len(nrow(compTable[[plotGroups[grpi]]]))
-
-        cInfos <- sapply(compsSeq, function(compi)
-        {
-            ret <- paste0(getCompInfoList(compTable[[plotGroups[grpi]]], compi, TRUE,
-                                          mergedCompoundNames(rmdVars$compounds)), collapse = "<br>")
-            if (!is.null(rmdVars$compsCluster) && !is.null(cutcl[[plotGroups[grpi]]]))
-                ret <- paste(ret, sprintf("cluster: %d", cutcl[[plotGroups[grpi]]][compi]), sep = "<br>")
-            return(ret)
-        })
-        
-        rmdTexts[grpi] <- paste(rmdTexts[grpi], paste0(glue::glue(compSpecTempl, grpi = grpi,
-                                                                  compi = compsSeq,
-                                                                  plotPath = plotPath,
-                                                                  cInfo = cInfos),
-                                                       collapse = "\n"), sep = "\n")
-    }
-    
-    if (plotGroups[grpi] %in% compsClustFGroups)
-    {
-        ct <- cutClusters(compsCluster)[[plotGroups[grpi]]]
-        rmdTexts[grpi] <-
-            paste(rmdTexts[grpi],
-                  paste0(glue::glue(compClustTempl, grpi = grpi,
-                                    grp = plotGroups[grpi],
-                                    plotPath = plotPath,
-                                    mcs = paste0(glue::glue("![]({ plotPath }/mcs_{ grpi }_{ cli }.png)",
-                                                            grpi = grpi, cli = seq_len(length(unique(ct)))),
-                                                 collapse = "\n")),
-                         collapse = "\n"), sep = "\n")
-    }
-    
-    if (plotGroups[grpi] %in% formFGroups)
-    {
-        precursors <- unique(formTable[group == plotGroups[grpi], formula])
-        rmdTexts[grpi] <- paste(rmdTexts[grpi], paste0(glue::glue(formSpecTempl, grpi = grpi,
-                   precursor = precursors, plotPath = plotPath,
-                   fil = sapply(precursors,
-                                function(prec) paste0(getFormInfoList(rmdVars$formConsensus, prec, plotGroups[grpi]),
-                                collapse = "<br>"))), collapse = "\n"), sep = "\n")
-    }
-    
-    # rmdTexts[grpi] <- knitr::knit(text = rmdTexts[grpi])
-    setTxtProgressBar(prog, grpi)
+    ct <- cutcl[[plotGroups[grpi]]]
+    rmdTexts[grpi] <-
+        paste0(glue::glue(compClustTempl, grpi = grpi,
+                          grp = plotGroups[grpi],
+                          plotPath = plotPath,
+                          mcs = paste0(glue::glue("![]({ plotPath }/mcs_{ grpi }_{ cli }.png)",
+                                                  grpi = grpi, cli = seq_len(length(unique(ct)))),
+                                       collapse = "\n")),
+               collapse = "\n")
 }
 
 rmdText <- paste0(rmdTexts, collapse = "\n")
-close(prog)
 ```
 
+`r if (length(compsClustFGroups) > 0) rmdText`

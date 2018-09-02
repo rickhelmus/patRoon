@@ -602,8 +602,7 @@ setMethod("reportPDF", "featureGroups", function(fGroups, path, reportFGroups,
     checkmate::assertCount(EICTopMost, positive = TRUE, null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
-    if (!reportFGroups && is.null(formConsensus) && is.null(compounds) && is.null(components) &&
-        is.null(cInfo))
+    if (!reportFGroups && is.null(formConsensus) && is.null(compounds) && is.null(components))
     {
         cat("Nothing to report...\n")
         return(NULL)
@@ -725,7 +724,6 @@ setMethod("reportMD", "featureGroups", function(fGroups, path, reportChord, repo
     file.copy(system.file("report", "main.Rmd", package = "patRoon"), workPath)
     file.copy(system.file("report", "annotation.Rmd", package = "patRoon"), workPath)
     file.copy(system.file("report", "components.Rmd", package = "patRoon"), workPath)
-    file.copy(system.file("report", "cluster.Rmd", package = "patRoon"), workPath)
 
     # rmarkdown needs absolute path as relative paths will be from the path of the Rmd
     if (!R.utils::isAbsolutePath(path))

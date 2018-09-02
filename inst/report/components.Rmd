@@ -124,8 +124,8 @@ if (isHClust)
 } else
     compTable[, spectrum := sprintf("<img src=%s></img>", sppaths)]
 
-DT::datatable(compTable, options = list(scrollX = TRUE, scrollY = "600px", deferRender = TRUE,
-                                        dom = "lrtip", pageLength = 25, autoWidth = TRUE,
+DT::datatable(compTable, options = list(scrollX = TRUE, scrollY = "800px", deferRender = TRUE,
+                                        dom = "lrtip", pageLength = 25, autoWidth = FALSE,
                                         ordering = FALSE),
               class = "striped row-border",
               rownames = FALSE, escape = FALSE)

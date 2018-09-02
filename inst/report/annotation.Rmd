@@ -32,8 +32,24 @@ if (rmdVars$includeMFWebLinks != "none")
                                                                            function(pa) !is.null(pa[[grp]]) &&
                                                                                !is.null(pa[[grp]][["MSMS"]]))),
                                                   USE.NAMES = FALSE)]
+    mfWebLinks <- sapply(mfWebFGroups, function(grp)
+    {
+        if (grp %in% compFGroups && is(rmdVars$compounds, "compoundsMF"))
+        {
+            # make link with used MF settings
+            ana <- compTable[[grp]]$analysis[1]
+            set <- settings(compounds)
+        }
+        else
+        {
+            ana <- getMostIntenseAnaWithMSMS(rmdVars$fGroups, rmdVars$MSPeakLists, grp)
+            set <- NULL
+        }
+        
+        return(buildMFLandingURL(set, peakLists(rmdVars$MSPeakLists)[[ana]][[grp]][["MSMS"]],
+                                 rmdVars$gInfo[grp, "mzs"]))
+    })
 }
-
 if (!is.null(rmdVars$formConsensus))
 {
     formTable <- formulaTable(rmdVars$formConsensus)[byMSMS == TRUE]
@@ -52,51 +68,50 @@ allGroups <- unique(c(plotGroups, componentFGroups, mfWebFGroups))
 fGroupsSpecDT <- data.table(group = allGroups, rt = round(rmdVars$gInfo[allGroups, "rts"], 2),
                             mz = round(rmdVars$gInfo[allGroups, "mzs"], 5))
 
-maybeAddButton <- function(grpi, subGroups, ...) if (allGroups[grpi] %in% subGroups) showButton(...) else "-"
+maybeAddButton <- function(grpi, subGroups, ...) if (allGroups[grpi] %in% subGroups) showButton(...) else "^"
 
 compButtons <- sapply(seq_along(allGroups), function(gi) maybeAddButton(gi, compFGroups, "compounds", "showAnnotation", gi, "compounds"))
 compCLButtons <- sapply(seq_along(allGroups), function(gi) maybeAddButton(gi, compsClustFGroups,
                                                                           "compounds clust", "showCompoundsCluster", gi, ""))
 formButtons <- sapply(seq_along(allGroups), function(gi) maybeAddButton(gi, formFGroups, "formulas",
                                                                         "showAnnotation", gi, "formulas"))
-if (!is.null(rmdVars$components))
-{
-    componButtons <- sapply(seq_along(allGroups), function(gi)
-    {
-        
-        cmpIds <- findFGroup(rmdVars$components, allGroups[gi])
-        # UNDONE: multiple indices
-        cmpNames <- tolower(names(rmdVars$components)[cmpIds]) # NOTE: headings are automatically made lowercase
-        maybeAddButton(gi, componentFGroups, "components", "showComponentSpec", cmpNames[1], gi)
-    })
-} else
-    componButtons <- rep("-", length(allGroups))
+mfWebButtons <- sapply(seq_along(allGroups), function(gi) maybeAddButton(gi, mfWebFGroups, "MetFrag web",
+                                                                         "window.open", mfWebLinks[allGroups[gi]], "_blank"))
 
 sp <- paste0(rep("&nbsp;", 4), collapse = "")
-buttons <- paste(compButtons, compCLButtons, formButtons, componButtons, sep = sp)
-buttons <- gsub("\\-(&nbsp;)*", "", buttons) # remove placeholder (-) with accompanying spaces
+buttons <- paste(compButtons, compCLButtons, formButtons, mfWebButtons, sep = sp)
+buttons <- gsub("\\^(&nbsp;)*", "", buttons) # remove placeholder (^) with accompanying spaces
 fGroupsSpecDT[, show := buttons]
 
-if (rmdVars$includeMFWebLinks != "none")
+if (!is.null(rmdVars$components))
 {
-    fGroupsSpecDT[group %in% mfWebFGroups, MetFragWeb := sapply(mfWebFGroups, function(grp)
+    annCols <- c("isogroup", "isonr", "charge", "ppm", # RAMClustR
+                 "adduct_rule", "adduct_charge", "adduct_nmol", "M_adduct",
+                 "adduct_ion", # RC/CAMERA
+                 "hsnr", "rGroup") # nontarget
+    
+    fGroupsSpecDT[, components := sapply(group, function(grp)
     {
-        if (grp %in% compFGroups && is(rmdVars$compounds, "compoundsMF"))
-        {
-            # make link with used MF settings
-            ana <- compTable[[grp]]$analysis[1]
-            set <- settings(compounds)
-        }
-        else
-        {
-            ana <- getMostIntenseAnaWithMSMS(rmdVars$fGroups, rmdVars$MSPeakLists, grp)
-            set <- NULL
-        }
+        cmps <- findFGroup(rmdVars$components, grp)
+        if (length(cmps) == 0)
+            return("")
         
-        buildMFLandingURL(set, peakLists(rmdVars$MSPeakLists)[[ana]][[grp]][["MSMS"]],
-                          rmdVars$gInfo[grp, "mzs"])
-
-    })]
+        return(paste0(sapply(cmps, function(cmpi)
+        {
+            cline <- cTable[[cmpi]][group == grp]
+            cline <- cline[, !sapply(cline, is.na), with = FALSE]
+            annColsPresent <- annCols[annCols %in% names(cline)]
+            cname <- names(rmdVars$components)[cmpi]
+            
+            if (length(annColsPresent) > 0)
+            {
+                cline <- cline[, annColsPresent, with = FALSE]
+                ann <- paste0(sprintf("%s: %s", names(cline), cline), collapse = ", ")
+                return(sprintf("%s (%s)", cname, ann))
+            }
+            return(cname)
+        }), collapse = ", "))
+    }, USE.NAMES = FALSE)]
 }
 
 DT::datatable(fGroupsSpecDT,

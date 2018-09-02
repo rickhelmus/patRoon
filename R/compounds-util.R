@@ -167,7 +167,7 @@ buildMFLandingURL <- function(mfSettings, peakList, precursorMz)
     
     setstr <- paste0(paste0(names(mfSettings), "=", mfSettings), collapse = "&")
     ret <- paste0("https://msbi.ipb-halle.de/MetFragBeta/landing.xhtml?", setstr)
-    ret <- sprintf("<a target=\"_blank\" href=\"%s\">MetFragWeb</a>", ret)
+    #ret <- sprintf("<a target=\"_blank\" href=\"%s\">MetFragWeb</a>", ret)
     
     return(ret)
 }

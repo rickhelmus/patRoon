@@ -676,3 +676,5 @@ getMostIntenseAnaWithMSMS <- function(fGroups, MSPeakLists, groupName)
 numEQ <- function(x, y, tol = sqrt(.Machine$double.eps)) abs(x - y) < tol
 numGTE <- function(x, y, tol = sqrt(.Machine$double.eps)) numEQ(x, y, tol) | x > y
 numLTE <- function(x, y, tol = sqrt(.Machine$double.eps)) numEQ(x, y, tol) | x < y
+
+wrapStr <- function(s, width, sep = "\n") paste0(strwrap(s, width), collapse = sep)

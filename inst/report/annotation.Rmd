@@ -96,7 +96,7 @@ if (!is.null(rmdVars$components))
         if (length(cmps) == 0)
             return("")
         
-        return(paste0(sapply(cmps, function(cmpi)
+        return(wrapStr(paste0(sapply(cmps, function(cmpi)
         {
             cline <- cTable[[cmpi]][group == grp]
             cline <- cline[, sapply(cline, function(x) !is.na(x) && nzchar(x),
@@ -107,11 +107,16 @@ if (!is.null(rmdVars$components))
             if (length(annColsPresent) > 0)
             {
                 cline <- cline[, annColsPresent, with = FALSE]
+                for (j in seq_along(cline))
+                {
+                    if (is.numeric(cline[[j]]))
+                        set(cline, 1L, j, round(cline[[j]], 5))
+                }
                 ann <- paste0(sprintf("%s: %s", names(cline), cline), collapse = ", ")
                 return(sprintf("%s (%s)", cname, ann))
             }
             return(cname)
-        }), collapse = ", "))
+        }), collapse = ", "), width = 50, sep = "<br>"))
     }, USE.NAMES = FALSE)]
 }
 

@@ -92,7 +92,7 @@ getCompInfoList <- function(compResults, compIndex, addHTMLURL, mCompNames)
             ident <- as.character(ident)
 
             if (is.na(ident) || !nzchar(ident))
-                return("")
+                return(character())
 
             # CSI:FingerID might return multiple identifiers
             idlist <- unlist(strsplit(ident, ";"))

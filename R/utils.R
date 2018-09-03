@@ -497,7 +497,7 @@ makeMSPlot <- function(spec, fragInfo, ...)
 
     if (isMerged)
     {
-        allMergedBy <- sapply(fragInfo[["mergedBy"]], function(mb) paste0(unlist(mb), collapse = ","))
+        allMergedBy <- sapply(fragInfo[["mergedBy"]], function(mb) wrapStr(paste0(unlist(mb), collapse = ", "), 10))
         mbsUnique <- unique(allMergedBy)
         # order from small to big based on number of commas
         mbsUnique <- mbsUnique[order(sapply(mbsUnique, countCharInStr, ch = ",", USE.NAMES = FALSE))]

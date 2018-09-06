@@ -343,10 +343,10 @@ setMethod("plotStructure", "compounds", function(obj, index, groupName, width = 
         rcdkplot(mol, width, height)
 })
 
-# NOTE: argument docs 'borrowed' from plotSpec-args.R template
-
 #' @describeIn compounds Plots a barplot with scoring of a candidate compound.
 #'
+#' @param normalizeScores Normalize scores to maximum values.
+#' 
 #' @aliases plotScores
 #' @export
 setMethod("plotScores", "compounds", function(obj, index, groupName, normalizeScores, useGGPlot2)
@@ -471,18 +471,19 @@ setMethod("plotScores", "compounds", function(obj, index, groupName, normalizeSc
 #' @describeIn compounds Plots an annotated spectrum for a given candidate
 #'   compound of a feature group.
 #'
-#' @param normalizeScores Normalize scores to maximum values.
+#' @param plotStruct If \code{TRUE} then the candidate structure is drawn in the
+#'   spectrum.
 #'
 #' @export
 setMethod("plotSpec", "compounds", function(obj, index, groupName, MSPeakLists, formConsensus = NULL,
-                                            normalizeScores = TRUE, useGGPlot2 = FALSE)
+                                            plotStruct = TRUE, useGGPlot2 = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertCount(index, positive = TRUE, add = ac)
     checkmate::assertString(groupName, min.chars = 1, add = ac)
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
     checkmate::assertClass(formConsensus, "formulaConsensus", null.ok = TRUE, add = ac)
-    aapply(checkmate::assertFlag, . ~normalizeScores + useGGPlot2, fixed = list(add = ac))
+    aapply(checkmate::assertFlag, . ~plotStruct + useGGPlot2, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
 
     compTable <- compoundTable(obj)[[groupName]]
@@ -515,14 +516,20 @@ setMethod("plotSpec", "compounds", function(obj, index, groupName, MSPeakLists, 
 
     if (!useGGPlot2)
     {
-        mol <- rcdk::parse.smiles(compr$SMILES)
         oldp <- par(mar = par("mar") * c(1, 1, 0, 0))
         
-        molHInch <- if (isValidMol(mol)) 1.5 else NULL
-        makeMSPlot(spec, fi, extraHeightInch = molHInch)
+        if (plotStruct)
+        {
+            mol <- rcdk::parse.smiles(compr$SMILES)
+            
+            molHInch <- if (isValidMol(mol)) 1.5 else NULL
+            makeMSPlot(spec, fi, extraHeightInch = molHInch)
+        }
+        else
+            makeMSPlot(spec, fi)
         
         # draw structure
-        if (isValidMol(mol))
+        if (plotStruct && isValidMol(mol))
         {
             raster <- rcdk::view.image.2d(mol[[1]], rcdk::get.depictor(100, 100))
             img <- magick::image_trim(magick::image_read(raster))

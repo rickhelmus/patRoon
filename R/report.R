@@ -144,7 +144,7 @@ reportFGroupTable <- function(fGroups, path, fGroupsAsRows, reportAnalysisInfo, 
     printf("Done!\n")
 }
 
-reportFGroupPlots <- function(fGroups, path, plotGrid, rtWindow, mzWindow, retMin, topMost, EICs)
+reportFGroupPlots <- function(fGroups, path, plotGrid, rtWindow, mzWindow, retMin, topMost, onlyPresent, EICs)
 {
     printf("Exporting feature group plots...\n")
     
@@ -169,7 +169,7 @@ reportFGroupPlots <- function(fGroups, path, plotGrid, rtWindow, mzWindow, retMi
     prog <- txtProgressBar(0, gCount, style=3)
     for (grpi in seq_len(gCount))
     {
-        plotEIC(fGroups[, grpi], rtWindow, mzWindow, retMin, topMost, EICs)
+        plotEIC(fGroups[, grpi], rtWindow, mzWindow, retMin, topMost, EICs, onlyPresent = onlyPresent, colourBy = "rGroups")
         setTxtProgressBar(prog, grpi)
     }
 
@@ -623,7 +623,7 @@ setMethod("reportPDF", "featureGroups", function(fGroups, path, reportFGroups,
     }
 
     if (reportFGroups)
-        reportFGroupPlots(fGroups, path, EICGrid, EICRtWindow, EICMzWindow, retMin, EICTopMost, EICs)
+        reportFGroupPlots(fGroups, path, EICGrid, EICRtWindow, EICMzWindow, retMin, EICTopMost, EICOnlyPresent, EICs)
 
     if (reportFormulaSpectra && !is.null(formConsensus))
     {

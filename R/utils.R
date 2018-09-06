@@ -489,7 +489,7 @@ normalize <- function(x)
 # from https://stackoverflow.com/a/38228840
 countCharInStr <- function(str, ch) sum(charToRaw(str) == charToRaw(ch))
 
-makeMSPlot <- function(spec, fragInfo, ...)
+makeMSPlot <- function(spec, fragInfo, ..., extraHeightInch = 0)
 {
     isMerged <- !is.null(fragInfo[["mergedBy"]]) && nrow(fragInfo) > 0
     oldp <- NULL
@@ -513,13 +513,30 @@ makeMSPlot <- function(spec, fragInfo, ...)
     }
 
     # ym <- (if (is.null(fragInfo)) max(spec$intensity) else max(fragInfo$intensity)) * 1.2
-    ym <- max(spec$intensity) * 1.5
+    fragInfoInds <- if (nrow(fragInfo) > 0) match(seq_len(nrow(spec)), fragInfo$PLIndex, 0) else rep(0, nrow(spec))
+    
+    # see how much extra vertical space is needed by formula labels
+    # get character widths (assuming that height of vertically plotted text is the same)
+    formWidths <- sapply(fragInfoInds, function(i) if (i) strwidth(fragInfo$formula[i], units = "inches") else 0)
+    
+    pheight <- par("din")[2] # plot dev height in inches
+    relFormHeights <- formWidths / pheight
+    
+    ym <- max(spec$intensity) # 'regular' plot height in user coordinates, not considering any labels etc
+    relIntHeights <- spec$intensity / ym
+    maxRelH <- max(relFormHeights + relIntHeights)
+    
+    ym <- ym * maxRelH * 1.05 # enlarge y limit and add some extra spacing
+    
+    if (extraHeightInch > 0)
+        ym <- ym * (1 + (extraHeightInch / pheight))
+    
     plot(0, xlab = "m/z", ylab = "Intensity", xlim = range(spec$mz) * c(0.9, 1.1), ylim = c(0, ym),
          type = "n", bty = "l", ...)
 
     for (i in seq_len(nrow(spec)))
     {
-        infoi <- if (is.null(fragInfo) || nrow(fragInfo) == 0) FALSE else match(i, fragInfo$PLIndex, nomatch = FALSE)
+        infoi <- fragInfoInds[i]
 
         if (infoi && isMerged)
             specCol <- mbCombCols[match(allMergedBy[infoi], mbsUnique)]
@@ -531,7 +548,7 @@ makeMSPlot <- function(spec, fragInfo, ...)
         segments(spec[i]$mz, 0, spec[i]$mz, spec[i]$intensity, col = specCol, lwd = if (infoi) 2 else 1)
 
         if (infoi)
-            text(spec[i]$mz, spec[i]$intensity + (max(spec[i]$intensity) * 0.02), fragInfo$formula[infoi], srt = 90, adj = 0)
+            text(spec[i]$mz, spec[i]$intensity + (ym * 0.02), fragInfo$formula[infoi], srt = 90, adj = 0)
     }
 
     if (isMerged)

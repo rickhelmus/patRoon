@@ -515,19 +515,21 @@ setMethod("plotSpec", "compounds", function(obj, index, groupName, MSPeakLists, 
 
     if (!useGGPlot2)
     {
-        # plot spectrum
-        oldp <- par(mar = par("mar") * c(1, 1, 0, 0))
-        makeMSPlot(spec, fi)
-
-        # draw structure
         mol <- rcdk::parse.smiles(compr$SMILES)
-        if (!is.null(mol) && !is.na(mol) && !is.null(mol[[1]]))
+        oldp <- par(mar = par("mar") * c(1, 1, 0, 0))
+        
+        molHInch <- if (isValidMol(mol)) 1.5 else NULL
+        makeMSPlot(spec, fi, extraHeightInch = molHInch)
+        
+        # draw structure
+        if (isValidMol(mol))
         {
             raster <- rcdk::view.image.2d(mol[[1]], rcdk::get.depictor(100, 100))
             img <- magick::image_trim(magick::image_read(raster))
             img <- magick::image_transparent(img, "white")
 
             dpi <- (par("cra")/par("cin"))[1]
+            
             startx <- par("usr")[1]
             xlim <- par("usr")[2]
             ylim <- par("usr")[4]
@@ -536,26 +538,20 @@ setMethod("plotSpec", "compounds", function(obj, index, groupName, MSPeakLists, 
             imgPlotW <- xinch(imgInfo$width / dpi)
             imgPlotH <- yinch(imgInfo$height / dpi)
 
-            if (imgInfo$width >= imgInfo$height)
+            maxW <- 0.2 * xlim
+            if (imgPlotW > maxW)
             {
-                maxW <- 0.2 * xlim
-                if (imgPlotW > maxW)
-                {
-                    hresize <- imgPlotW / maxW
-                    imgPlotH <- imgPlotH / hresize
-                    imgPlotW <- maxW
-                }
+                hresize <- imgPlotW / maxW
+                imgPlotH <- imgPlotH / hresize
+                imgPlotW <- maxW
             }
-            else
+            
+            maxH <- yinch(molHInch)
+            if (imgPlotH > maxH)
             {
-                maxH <- 0.2 * ylim
-
-                if (imgPlotH > maxH)
-                {
-                    wresize <- imgPlotH / maxH
-                    imgPlotW <- imgPlotW / wresize
-                    imgPlotH <- maxH
-                }
+                wresize <- imgPlotH / maxH
+                imgPlotW <- imgPlotW / wresize
+                imgPlotH <- maxH
             }
 
             # offset a little

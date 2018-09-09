@@ -514,15 +514,16 @@ setMethod("plotSpec", "compounds", function(obj, index, groupName, MSPeakLists, 
                                 algorithm(obj), algorithm(formConsensus), TRUE)
     }
 
+    if (plotStruct)
+        mol <- rcdk::parse.smiles(compr$SMILES)
+    
     if (!useGGPlot2)
     {
         oldp <- par(mar = par("mar") * c(1, 1, 0, 0))
         
-        if (plotStruct)
+        if (plotStruct && isValidMol(mol))
         {
-            mol <- rcdk::parse.smiles(compr$SMILES)
-            
-            molHInch <- if (isValidMol(mol)) 1.5 else NULL
+            molHInch <- 1.5
             makeMSPlot(spec, fi, extraHeightInch = molHInch)
         }
         else
@@ -574,8 +575,7 @@ setMethod("plotSpec", "compounds", function(obj, index, groupName, MSPeakLists, 
     {
         MSPlot <- makeMSPlotGG(spec, fi)
 
-        mol <- rcdk::parse.smiles(compr$SMILES)
-        if (!is.na(mol))
+        if (plotStruct && isValidMol(mol))
         {
             raster <- rcdk::view.image.2d(mol[[1]], rcdk::get.depictor(100, 100))
             img <- magick::image_trim(magick::image_read(raster))

@@ -758,7 +758,8 @@ setMethod("reportMD", "featureGroups", function(fGroups, path, reportChord, repo
     knitMeta <- knitr::knit_meta("latex_dependency", clean = TRUE)
     on.exit(knitr::knit_meta_add(knitMeta), add = TRUE)
     
-    rmarkdown::render(file.path(workPath, "main.Rmd"), output_file = file.path(path, "report.html"),
-                      output_options = list(self_contained = selfContained),
-                      quiet = TRUE)
+    withr::with_options(list(DT.warn.size = FALSE),
+                        rmarkdown::render(file.path(workPath, "main.Rmd"), output_file = file.path(path, "report.html"),
+                                          output_options = list(self_contained = selfContained),
+                                          quiet = TRUE))
 })

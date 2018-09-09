@@ -123,7 +123,7 @@ if (!is.null(rmdVars$components))
 DT::datatable(fGroupsSpecDT,
               options = list(paging = FALSE, scrollY = "200px", autoWidth = TRUE,
                              initComplete = DT::JS("function(settings, json)",
-                                                   "{ setTimeout(initAnnotation, 50); }"),
+                                                   "{ setTimeout(initAnnotation, 25); }"),
                              order = list(list(0, "asc"))),
               escape = FALSE, rownames = FALSE)
 ```
@@ -322,7 +322,7 @@ DT::datatable(formulasDT, options = list(scrollX = TRUE, scrollY = "600px", defe
 ```{r echo=FALSE, eval=length(compsClustFGroups) > 0}
 rmdTexts <- vector("character", length = length(compsClustFGroups))
 
-message("Generating compounds cluster layout...")
+message("Generating compounds cluster layout... ", appendLF = FALSE)
 # prog <- txtProgressBar(0, length(plotGroups), style = 3, file = stderr())
 compClustTempl <- readAllFile(system.file("templates", "comp-cluster.Rmd", package = "patRoon"))
 
@@ -341,6 +341,7 @@ for (grpi in seq_along(compsClustFGroups))
 }
 
 rmdText <- paste0(rmdTexts, collapse = "\n")
+message("Done!")
 ```
 
 `r if (length(compsClustFGroups) > 0) rmdText`

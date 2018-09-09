@@ -27,7 +27,7 @@ function showAnnotation(group, type)
     showEICs(group);
 
     qu = "#" + type + "Table .dataTable";
-    $(qu).DataTable().column(0).search(group).draw();
+    $(qu).DataTable().column(0).search("^" + group + "$", true, false).draw();
     $(qu).DataTable().columns.adjust().draw();
 }
 

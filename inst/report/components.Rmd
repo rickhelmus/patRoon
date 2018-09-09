@@ -16,17 +16,17 @@ isHClust <- inherits(rmdVars$components, "componentsIntClust")
 if (isHClust)
     clProps <- clusterProperties(rmdVars$components)
 
-for (ci in seq_len(length(rmdVars$components)))
+for (ci in seq_len(cCount))
 {
     curPlotInd <- curPlotInd + 1
     allPlots[curPlotInd] <- file.path(plotPath, sprintf("component_spec_%d.png", ci))
-    makePlot(allPlots[curPlotInd], 8, 6, plotSpec(rmdVars$components, ci,
+    makePlot(allPlots[curPlotInd], 7, 4.5, bg = NA, plotSpec(rmdVars$components, ci,
                                    main = sprintf("ret: %.1f; m/z: %.4f - %.4f",
                                                   cInfo$ret[ci], min(cTable[[ci]]$mz), max(cTable[[ci]]$mz))))
 
     curPlotInd <- curPlotInd + 1
     allPlots[curPlotInd] <- file.path(plotPath, sprintf("component_eic_%d.png", ci))
-    makePlot(allPlots[curPlotInd], 8, 6,
+    makePlot(allPlots[curPlotInd], 7, 4.5, bg = NA,
              plotEIC(rmdVars$components, ci, rmdVars$fGroups,
                      rtWindow = rmdVars$EICRtWindow,
                      mzWindow = rmdVars$EICMzWindow, retMin = rmdVars$retMin,
@@ -36,13 +36,13 @@ for (ci in seq_len(length(rmdVars$components)))
     {
         curPlotInd <- curPlotInd + 1
         allPlots[curPlotInd] <- file.path(plotPath, sprintf("component_int_norm_%d.png", ci))
-        makePlot(allPlots[curPlotInd], 3.3, 3.3,
+        makePlot(allPlots[curPlotInd], 3.3, 3.3, bg = NA,
                  plotInt(rmdVars$components, index = ci, main = "normalized"))
         
         curPlotInd <- curPlotInd + 1
         allPlots[curPlotInd] <- file.path(plotPath, sprintf("component_int_abs_%d.png", ci))
         fg <- fGroups[, unique(cTable[[ci]]$group)]
-        makePlot(allPlots[curPlotInd], 3.3, 3.3,
+        makePlot(allPlots[curPlotInd], 3.3, 3.3, bg = NA,
                  plotInt(fg, average = clProps$average, main = "absolute"))
     }
     
@@ -53,51 +53,14 @@ close(prog)
 
 if (rmdVars$optimizePng && curPlotInd > 0)
     optimizePngPlots(allPlots, stderr(), rmdVars$maxProcAmount)
+```
 
-# divide into subpages to speed up page rendering: ideally cmpsPerPage per subpage, else with max maxCmpsPages subpages
-maxCmpsPages <- 20
-cmpsPerPage <- 50
-pageCount <- ceiling(cCount / cmpsPerPage)
-if (pageCount > maxCmpsPages)
-{
-    pageCount <- maxCmpsPages
-    cmpsPerPage <- as.integer(cCount / maxCmpsPages)
-}
 
-message("Generating component layout...")
-prog <- txtProgressBar(0, pageCount, style = 3, file = stderr())
-
-rmdTexts <- vector("character", length = pageCount)
-if (isHClust)
-{
-    compTempl <- readAllFile(system.file("templates", "components-intclust.Rmd", package = "patRoon"))
-} else
-    compTempl <- readAllFile(system.file("templates", "components-spectra.Rmd", package = "patRoon"))
-
-for (page in seq_len(pageCount))
-{
-    cmpStart <- cmpsPerPage * (page - 1) + 1
-    cmpEnd <- min(cCount, cmpStart + cmpsPerPage - 1)
-    
-    # page header
-    if (pageCount > 1)
-    {
-        rmdTexts[page] <- glue::glue("
-Components { cmpStart } - { cmpEnd } {{ data-orientation=rows data-navmenu=\"Components\" }}
+Components {data-orientation=rows}
 ===
-", cmpStart = cmpStart, cmpEnd = cmpEnd)
-    }
-    else
-    {
-        rmdTexts[page] <- "
-Components { data-orientation=rows }
-===
-"
-    }
-    
-    if (isHClust)
-    {
-        rmdTexts[page] <- paste(rmdTexts[page], knitr::knit(text = glue::glue("
+
+```{r echo=FALSE,eval=isHClust}
+rmdText <- knitr::knit(text = glue::glue("
 ##
 
 ### heatmap
@@ -112,23 +75,58 @@ plotHeatMap(components, interactive = { inter })
 plot(components)
 { ticks }
 
-", ticks = "```", inter = as.character(rmdVars$interactiveHeat))), sep = "\n")
-    }
+", ticks = "```", inter = as.character(rmdVars$interactiveHeat)))
+```
+`r if (isHClust) rmdText`
 
-    # all components of this page
-    rmdTexts[page] <- paste(rmdTexts[page], knitr::knit(text = paste0(glue::glue(compTempl,
-                                                                                 ci = seq(cmpStart, cmpEnd),
-                                                                                 plotPath = plotPath,
-                                                                                 doInt = isHClust),
-                                                                      collapse = "\n")),
-                            sep = "\n")
-    setTxtProgressBar(prog, page)
+## { .components }
+
+### Components { .components }
+
+<style> .components { overflow-x: auto; } </style>
+
+```{r echo=FALSE}
+compSeq <- seq_len(cCount)
+sppaths <- file.path(plotPath, sprintf("component_spec_%d.png", compSeq))
+eicpaths <- file.path(plotPath, sprintf("component_eic_%d.png", compSeq))
+
+if (rmdVars$selfContained)
+{
+    sppaths <- sapply(sppaths, knitr::image_uri)
+    eicpaths <- sapply(eicpaths, knitr::image_uri)
 }
 
-close(prog)
+# clearout useless columns with only NA in them
+cTable <- sapply(cTable, function(ct)
+{
+    ct[, sapply(ct, function(x) !all(is.na(x))), with = FALSE]
+}, simplify = FALSE)
+infoTables <- sapply(compSeq, function(compi) knitr::kable(cTable[[compi]], "html") %>%
+                         kableExtra::kable_styling(font_size = 11) %>%
+                         kableExtra::scroll_box(extra_css = "overflow: auto; width: 350px; height: 300px;"))
 
-rmdText <- paste0(rmdTexts, collapse = "\n")
+compTable <- data.table(component = names(rmdVars$components),
+                        info = infoTables,
+                        EIC = sprintf("<img src=%s></img>", eicpaths))
+                             
+if (isHClust)
+{
+    intnpaths <- file.path(plotPath, sprintf("component_int_norm_%d.png", compSeq))
+    intapaths <- file.path(plotPath, sprintf("component_int_abs_%d.png", compSeq))
+    
+    if (rmdVars$selfContained)
+    {
+        intnpaths <- sapply(intnpaths, knitr::image_uri)
+        intapaths <- sapply(intapaths, knitr::image_uri)
+    }
+    
+    compTable[, intensities := sprintf("<img src=%s></img><br><img src=%s></img>", intnpaths, intapaths)]
+} else
+    compTable[, spectrum := sprintf("<img src=%s></img>", sppaths)]
+
+DT::datatable(compTable, options = list(scrollX = TRUE, scrollY = "800px", deferRender = TRUE,
+                                        dom = "lrtip", pageLength = 25, autoWidth = FALSE,
+                                        ordering = FALSE),
+              class = "striped row-border",
+              rownames = FALSE, escape = FALSE)
 ```
-
-<!-- stuff everything together: https://stackoverflow.com/a/21730473 -->
-`r rmdText`

@@ -102,7 +102,7 @@ NULL
 #'   \code{\link{features}} or \code{\link{featureGroups}}).
 #' @param targets A \code{data.frame} consisting of mandatory columns
 #'   \code{"name"} (the targeted analyte name) and \code{"mz"} (the \emph{m/z}
-#'   value of the target). In addition, a column \code{"ret"} can be used to
+#'   value of the target). In addition, a column \code{"rt"} can be used to
 #'   specify the retention time (if unspecified no retention times are checked).
 #' @param rtWindow,mzWindow The retention time window (in seconds) and
 #'   \emph{m/z} window that will be used for matching a target.

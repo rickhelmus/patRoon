@@ -10,25 +10,27 @@
 \alias{generateCompoundsSirius}
 \title{Automatic compound identification}
 \usage{
-\S4method{generateCompounds}{featureGroups}(fGroups, MSPeakLists, algorithm,
-  ...)
+\S4method{generateCompounds}{featureGroups}(fGroups, MSPeakLists,
+  algorithm, ...)
 
 generateCompoundsMetfrag(fGroups, MSPeakLists, method = "CL",
   logPath = file.path("log", "metfrag"), timeout = 300,
-  timeoutRetries = 2, errorRetries = 2, topMost = 100, dbRelMzDev = 5,
-  fragRelMzDev = 5, fragAbsMzDev = 0.002, isPositive, adduct,
-  database = "PubChem", chemSpiderToken = "",
+  timeoutRetries = 2, errorRetries = 2, topMost = 100,
+  dbRelMzDev = 5, fragRelMzDev = 5, fragAbsMzDev = 0.002, isPositive,
+  adduct, database = "PubChem", chemSpiderToken = "",
   scoreTypes = c("FragmenterScore", "OfflineMetFusionScore"),
-  scoreWeights = 1, preProcessingFilters = c("UnconnectedCompoundFilter",
-  "IsotopeFilter"), postProcessingFilters = c("InChIKeyFilter"),
-  maxCandidatesToStop = 2500, addTrivialNames = TRUE, identifiers = NULL,
-  extraOpts = NULL, maxProcAmount = getOption("patRoon.maxProcAmount"))
+  scoreWeights = 1,
+  preProcessingFilters = c("UnconnectedCompoundFilter", "IsotopeFilter"),
+  postProcessingFilters = c("InChIKeyFilter"),
+  maxCandidatesToStop = 2500, addTrivialNames = TRUE,
+  identifiers = NULL, extraOpts = NULL,
+  maxProcAmount = getOption("patRoon.maxProcAmount"))
 
 generateCompoundsSirius(fGroups, MSPeakLists, maxMzDev = 5,
   adduct = "[M+H]+", elements = "CHNOP", profile = "qtof",
   formulaDatabase = NULL, fingerIDDatabase = "pubchem", noise = NULL,
-  errorRetries = 2, topMost = 100, logPath = file.path("log", "sirius"),
-  maxProcAmount = getOption("patRoon.maxProcAmount"))
+  errorRetries = 2, topMost = 100, logPath = file.path("log",
+  "sirius"), maxProcAmount = getOption("patRoon.maxProcAmount"))
 }
 \arguments{
 \item{fGroups}{\code{\link{featureGroups}} object for which compounds should

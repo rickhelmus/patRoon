@@ -30,10 +30,11 @@ findFeaturesEnviPick(analysisInfo, ...)
 
 importFeaturesEnviMass(analysisInfo, enviProjPath)
 
-findFeaturesOpenMS(analysisInfo, thr = 1000, comfwhm = 5, minfwhm = 3,
-  maxfwhm = 60, minlength = 3, maxlength = -1, mzppm = 10,
-  extraOpts = NULL, intSearchRTWindow = 3, logPath = file.path("log",
-  "openms"), maxProcAmount = getOption("patRoon.maxProcAmount"))
+findFeaturesOpenMS(analysisInfo, thr = 1000, comfwhm = 5,
+  minfwhm = 3, maxfwhm = 60, minlength = 3, maxlength = -1,
+  mzppm = 10, extraOpts = NULL, intSearchRTWindow = 3,
+  logPath = file.path("log", "openms"),
+  maxProcAmount = getOption("patRoon.maxProcAmount"))
 
 findFeaturesXCMS(analysisInfo, method = "centWave", ...)
 

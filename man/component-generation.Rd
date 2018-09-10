@@ -27,9 +27,9 @@ generateComponentsNontarget(fGroups, ionization, rtRange = c(-120, 120),
 
 generateComponentsRAMClustR(fGroups, st = NULL, sr = NULL, maxt = 12,
   hmax = 0.3, normalize = "TIC", ionization, absMzDev = 0.002,
-  relMzDev = 5, RCExperimentVals = list(design = list(platform = "LC-MS"),
-  instrument = list(ionization = ionization, MSlevs = 1)), extraOptsRC = NULL,
-  extraOptsFM = NULL)
+  relMzDev = 5, RCExperimentVals = list(design = list(platform =
+  "LC-MS"), instrument = list(ionization = ionization, MSlevs = 1)),
+  extraOptsRC = NULL, extraOptsFM = NULL)
 }
 \arguments{
 \item{fGroups}{\code{\link{featureGroups}} object for which components should

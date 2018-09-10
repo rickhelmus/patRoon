@@ -13,16 +13,18 @@
 \usage{
 \S4method{reportCSV}{featureGroups}(fGroups, path = "report",
   reportFGroupsAsRows = TRUE, reportFGroupsAnalysisInfo = TRUE,
-  reportFGroupsRetMz = TRUE, reportFeatures = FALSE, formConsensus = NULL,
-  compounds = NULL, compoundNormalizeScores = TRUE, compsCluster = NULL,
+  reportFGroupsRetMz = TRUE, reportFeatures = FALSE,
+  formConsensus = NULL, compounds = NULL,
+  compoundNormalizeScores = TRUE, compsCluster = NULL,
   components = NULL, retMin = TRUE, clearPath = FALSE)
 
 \S4method{reportPDF}{featureGroups}(fGroups, path = "report",
-  reportFGroups = TRUE, formConsensus = NULL, reportFormulaSpectra = TRUE,
-  compounds = NULL, compoundNormalizeScores = TRUE, compsCluster = NULL,
-  components = NULL, MSPeakLists = NULL, retMin = TRUE, EICGrid = c(2,
-  1), EICRtWindow = 20, EICMzWindow = 0.005, EICTopMost = NULL,
-  EICOnlyPresent = TRUE, clearPath = FALSE)
+  reportFGroups = TRUE, formConsensus = NULL,
+  reportFormulaSpectra = TRUE, compounds = NULL,
+  compoundNormalizeScores = TRUE, compsCluster = NULL,
+  components = NULL, MSPeakLists = NULL, retMin = TRUE,
+  EICGrid = c(2, 1), EICRtWindow = 20, EICMzWindow = 0.005,
+  EICTopMost = NULL, EICOnlyPresent = TRUE, clearPath = FALSE)
 
 \S4method{reportMD}{featureGroups}(fGroups, path = "report",
   reportChord = TRUE, reportFGroups = TRUE, formConsensus = NULL,
@@ -32,7 +34,8 @@
   interactiveHeat = FALSE, MSPeakLists = NULL, retMin = TRUE,
   EICRtWindow = 20, EICMzWindow = 0.005, EICTopMost = NULL,
   EICOnlyPresent = TRUE, selfContained = TRUE, optimizePng = FALSE,
-  maxProcAmount = getOption("patRoon.maxProcAmount"), clearPath = FALSE)
+  maxProcAmount = getOption("patRoon.maxProcAmount"),
+  clearPath = FALSE)
 }
 \arguments{
 \item{fGroups}{The \code{\link{featureGroups}} object that should be used for

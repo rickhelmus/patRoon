@@ -110,7 +110,7 @@ please refer to the linked method documentation for each generic.
 
 
 \itemize{
-    \item Methods are defined for: \code{\link[=algorithm,components-method]{components}}, \code{\link[=algorithm,compounds-method]{compounds}}, \code{\link[=algorithm,formulaConsensus-method]{formulaConsensus}}, \code{\link[=algorithm,formulas-method]{formulas}}, \code{\link[=algorithm,MSPeakLists-method]{MSPeakLists}}.
+    \item Methods are defined for: \code{\link[=algorithm,MSPeakLists-method]{MSPeakLists}}, \code{\link[=algorithm,components-method]{components}}, \code{\link[=algorithm,compounds-method]{compounds}}, \code{\link[=algorithm,formulaConsensus-method]{formulaConsensus}}, \code{\link[=algorithm,formulas-method]{formulas}}.
 }
 
 \code{clusterProperties} Obtain a list with properties of the generated cluster(s).
@@ -170,7 +170,7 @@ please refer to the linked method documentation for each generic.
 
 
 \itemize{
-    \item Methods are defined for: \code{\link[=filter,compounds-method]{compounds}}, \code{\link[=filter,featureGroups-method]{featureGroups}}, \code{\link[=filter,features-method]{features}}, \code{\link[=filter,MSPeakLists-method]{MSPeakLists}}.
+    \item Methods are defined for: \code{\link[=filter,MSPeakLists-method]{MSPeakLists}}, \code{\link[=filter,compounds-method]{compounds}}, \code{\link[=filter,featureGroups-method]{featureGroups}}, \code{\link[=filter,features-method]{features}}.
 }
 
 \code{filterBy} only keep feature groups that are also present in another
@@ -180,7 +180,7 @@ please refer to the linked method documentation for each generic.
 
 
 \itemize{
-    \item Methods are defined for: \code{\link[=filterBy,components-method]{components}}, \code{\link[=filterBy,compounds-method]{compounds}}, \code{\link[=filterBy,formulaConsensus-method]{formulaConsensus}}, \code{\link[=filterBy,MSPeakLists-method]{MSPeakLists}}.
+    \item Methods are defined for: \code{\link[=filterBy,MSPeakLists-method]{MSPeakLists}}, \code{\link[=filterBy,components-method]{components}}, \code{\link[=filterBy,compounds-method]{compounds}}, \code{\link[=filterBy,formulaConsensus-method]{formulaConsensus}}.
 }
 
 \code{formulaTable} returns formula data.

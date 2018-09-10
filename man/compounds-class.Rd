@@ -33,8 +33,9 @@
 
 \S4method{identifiers}{compounds}(compounds)
 
-\S4method{filter}{compounds}(obj, minExplainedPeaks = NULL, minScore = NULL,
-  minFragScore = NULL, minFormulaScore = NULL, topMost = NULL)
+\S4method{filter}{compounds}(obj, minExplainedPeaks = NULL,
+  minScore = NULL, minFragScore = NULL, minFormulaScore = NULL,
+  topMost = NULL)
 
 \S4method{filterBy}{compounds}(obj, fGroups, negate)
 
@@ -50,7 +51,7 @@
   normalizeScores = TRUE, useGGPlot2 = FALSE)
 
 \S4method{plotSpec}{compounds}(obj, index, groupName, MSPeakLists,
-  formConsensus = NULL, normalizeScores = TRUE, useGGPlot2 = FALSE)
+  formConsensus = NULL, plotStruct = TRUE, useGGPlot2 = FALSE)
 
 \S4method{consensus}{compounds}(obj, ..., compThreshold = 0,
   mergeScoresFunc = sum)
@@ -104,6 +105,9 @@ faster.}
 
 \item{MSPeakLists}{The \code{\link{MSPeakLists}} object that was used to
 generate the candidate}
+
+\item{plotStruct}{If \code{TRUE} then the candidate structure is drawn in the
+spectrum.}
 
 \item{\dots}{\code{compounds} objects that should be used to generate the
 consensus.}

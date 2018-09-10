@@ -29,13 +29,15 @@
 
 \S4method{show}{compoundsCluster}(object)
 
-\S4method{treeCut}{compoundsCluster}(obj, k = NULL, h = NULL, groupName)
+\S4method{treeCut}{compoundsCluster}(obj, k = NULL, h = NULL,
+  groupName)
 
 \S4method{treeCutDynamic}{compoundsCluster}(obj, maxTreeHeight, deepSplit,
   minModuleSize, groupName)
 
 \S4method{plot}{compoundsCluster,ANY}(x, groupName, pal = "Paired",
-  colourBranches = length(x) < 50, showLegend = length(x) < 20, ...)
+  colourBranches = lengths(x)[groupName] < 50,
+  showLegend = lengths(x)[groupName] < 20, ...)
 
 \S4method{getMCS}{compoundsCluster}(obj, groupName, cluster)
 

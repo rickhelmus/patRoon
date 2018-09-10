@@ -12,8 +12,8 @@
 \alias{unique,featureGroupsComparison-method}
 \title{Comparing feature groups}
 \usage{
-\S4method{comparison}{featureGroups}(..., groupAlgo, groupArgs = list(rtalign
-  = FALSE))
+\S4method{comparison}{featureGroups}(..., groupAlgo,
+  groupArgs = list(rtalign = FALSE))
 
 \S4method{plot}{featureGroupsComparison,ANY}(x, retMin = TRUE, ...)
 

@@ -67,14 +67,16 @@
   addIntraOuterGroupLinks = FALSE, ...)
 
 \S4method{plotEIC}{featureGroups}(obj, rtWindow = 30, mzWindow = 0.005,
-  retMin = FALSE, topMost = NULL, EICs = NULL, showPeakArea = FALSE,
-  showFGroupRect = TRUE, title = NULL, colourBy = c("none", "rGroups",
-  "fGroups"), showLegend = TRUE, onlyPresent = TRUE, annotate = c("none",
-  "ret", "mz"), showProgress = FALSE, ...)
+  retMin = FALSE, topMost = NULL, EICs = NULL,
+  showPeakArea = FALSE, showFGroupRect = TRUE, title = NULL,
+  colourBy = c("none", "rGroups", "fGroups"), showLegend = TRUE,
+  onlyPresent = TRUE, annotate = c("none", "ret", "mz"),
+  showProgress = FALSE, ...)
 
 \S4method{plotVenn}{featureGroups}(obj, which = NULL, ...)
 
-\S4method{unique}{featureGroups}(x, which, relativeTo = NULL, outer = FALSE)
+\S4method{unique}{featureGroups}(x, which, relativeTo = NULL,
+  outer = FALSE)
 
 \S4method{overlap}{featureGroups}(fGroups, which, exclusive = FALSE)
 

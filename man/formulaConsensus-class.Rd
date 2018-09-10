@@ -22,8 +22,8 @@
 
 \S4method{filterBy}{formulaConsensus}(obj, fGroups, negate)
 
-\S4method{plotSpec}{formulaConsensus}(obj, precursor, groupName, MSPeakLists,
-  useGGPlot2 = FALSE)
+\S4method{plotSpec}{formulaConsensus}(obj, precursor, groupName,
+  MSPeakLists, useGGPlot2 = FALSE)
 }
 \arguments{
 \item{obj, x, object}{The \code{formulaConsensus} object.}

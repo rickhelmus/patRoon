@@ -27,16 +27,18 @@
 
 importFeatureGroups(path, type, ...)
 
-importFeatureGroupsBrukerPA(path, feat, maxRtDev = 12, maxMzDev = 0.005,
-  maxIntDev = 5, warn = TRUE)
+importFeatureGroupsBrukerPA(path, feat, maxRtDev = 12,
+  maxMzDev = 0.005, maxIntDev = 5, warn = TRUE)
 
 importFeatureGroupsEnviMass(path, feat, positive)
 
-groupFeaturesOpenMS(feat, rtalign = TRUE, QT = FALSE, maxAlignRT = 30,
-  maxAlignMZ = 0.005, maxGroupRT = 12, maxGroupMZ = 0.005)
+groupFeaturesOpenMS(feat, rtalign = TRUE, QT = FALSE,
+  maxAlignRT = 30, maxAlignMZ = 0.005, maxGroupRT = 12,
+  maxGroupMZ = 0.005)
 
 groupFeaturesXCMS(feat, rtalign = TRUE, exportedData = TRUE,
-  groupArgs = list(mzwid = 0.015), retcorArgs = list(method = "obiwarp"))
+  groupArgs = list(mzwid = 0.015), retcorArgs = list(method =
+  "obiwarp"))
 
 importFeatureGroupsXCMS(xs, analysisInfo)
 }

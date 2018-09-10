@@ -16,14 +16,16 @@
 generateFormulasDA(fGroups, precursorMzSearchWindow = 0.002,
   MSMode = "both")
 
-generateFormulasGenForm(fGroups, MSPeakLists, maxMzDev = 5, adduct = "M+H",
-  elements = "CHNOP", hetero = TRUE, MSMode = "both", extraOpts = NULL,
-  maxProcAmount = getOption("patRoon.maxProcAmount"), maxCmdsPerProc = 25)
+generateFormulasGenForm(fGroups, MSPeakLists, maxMzDev = 5,
+  adduct = "M+H", elements = "CHNOP", hetero = TRUE,
+  MSMode = "both", extraOpts = NULL,
+  maxProcAmount = getOption("patRoon.maxProcAmount"),
+  maxCmdsPerProc = 25)
 
 generateFormulasSirius(fGroups, MSPeakLists, maxMzDev = 5,
   adduct = "[M+H]+", elements = "CHNOP", profile = "qtof",
-  database = NULL, noise = NULL, logPath = file.path("log", "sirius"),
-  maxProcAmount = getOption("patRoon.maxProcAmount"))
+  database = NULL, noise = NULL, logPath = file.path("log",
+  "sirius"), maxProcAmount = getOption("patRoon.maxProcAmount"))
 }
 \arguments{
 \item{fGroups}{\code{\link{featureGroups}} object for which formulae should

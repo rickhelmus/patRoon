@@ -25,12 +25,12 @@
 
 \S4method{treeCut}{componentsIntClust}(obj, k = NULL, h = NULL)
 
-\S4method{treeCutDynamic}{componentsIntClust}(obj, maxTreeHeight, deepSplit,
-  minModuleSize)
+\S4method{treeCutDynamic}{componentsIntClust}(obj, maxTreeHeight,
+  deepSplit, minModuleSize)
 
 \S4method{plotHeatMap}{componentsIntClust}(obj,
-  col = colorRampPalette(c("black", "yellow"))(100), interactive = FALSE,
-  ...)
+  col = colorRampPalette(c("black", "yellow"))(100),
+  interactive = FALSE, ...)
 
 \S4method{plotInt}{componentsIntClust}(obj, index, ...)
 

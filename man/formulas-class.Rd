@@ -19,10 +19,11 @@
 
 \S4method{show}{formulas}(object)
 
-\S4method{consensus}{formulas}(obj, ..., fGroups, formAnaThreshold = 0.75,
-  formListThreshold = 0, maxFormulas = 10, maxFragFormulas = 10,
-  minIntensity = NULL, maxIntensity = NULL, minPreferredFormulas = 1,
-  minPreferredIntensity = NULL, elements = c(), fragElements = c())
+\S4method{consensus}{formulas}(obj, ..., fGroups,
+  formAnaThreshold = 0.75, formListThreshold = 0, maxFormulas = 10,
+  maxFragFormulas = 10, minIntensity = NULL, maxIntensity = NULL,
+  minPreferredFormulas = 1, minPreferredIntensity = NULL,
+  elements = c(), fragElements = c())
 }
 \arguments{
 \item{obj, x, object, formulas}{The \code{formulas} object.}

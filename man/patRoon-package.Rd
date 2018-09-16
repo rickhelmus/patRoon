@@ -77,6 +77,8 @@ Other contributors:
 \itemize{
   \item Olaf Brock [contributor]
   \item Vittorio Albergamo [contributor]
+  \item Andrea Brunner [contributor]
+  \item Emma Schymanski [contributor]
 }
 
 }

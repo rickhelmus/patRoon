@@ -59,6 +59,12 @@ setMethod("featureTable", "features", function(obj) obj@features)
 #' @export
 setMethod("analysisInfo", "features", function(obj) obj@analysisInfo)
 
+#' @templateVar class features
+#' @templateVar what analyses
+#' @template strmethod
+#' @export
+setMethod("analyses", "features", function(obj) analysisInfo(obj)$analysis)
+
 # UNDONE: more options, docs, tests, ...
 # UNDONE: This probably needs more work for XCMS/enviPick?
 #' @describeIn features Performs common rule based filtering on of features,

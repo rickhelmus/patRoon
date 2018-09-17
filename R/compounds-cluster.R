@@ -70,6 +70,12 @@ setMethod("cutClusters", "compoundsCluster", function(obj) obj@cutClusters)
 #' @export
 setMethod("clusterProperties", "compoundsCluster", function(obj) obj@properties)
 
+#' @templateVar class compoundsCluster
+#' @templateVar what feature groups
+#' @template strmethod
+#' @export
+setMethod("groupNames", "compoundsCluster", function(obj) names(obj@clusters))
+
 #' @describeIn compoundsCluster Returns the total number of clusters.
 #' @export
 setMethod("length", "compoundsCluster", function(x) sum(lengths(x)))

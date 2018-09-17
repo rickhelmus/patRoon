@@ -54,6 +54,12 @@ setMethod("compoundTable", "compounds", function(obj) obj@compounds)
 #' @export
 setMethod("algorithm", "compounds", function(obj) obj@algorithm)
 
+#' @templateVar class compounds
+#' @templateVar what feature groups
+#' @template strmethod
+#' @export
+setMethod("groupNames", "compounds", function(obj) names(obj@compounds))
+
 #' @describeIn compounds Obtain total number of candidate compounds.
 #' @export
 setMethod("length", "compounds", function(x) if (length(x@compounds) > 0) sum(sapply(x@compounds, nrow)) else 0)

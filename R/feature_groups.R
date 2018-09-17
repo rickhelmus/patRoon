@@ -50,6 +50,16 @@ featureGroups <- setClass("featureGroups",
 #' @export
 setMethod("names", "featureGroups", function(x) names(x@groups))
 
+#' @templateVar class featureGroups
+#' @templateVar what analyses
+#' @template strmethod
+#' @export
+setMethod("analyses", "featureGroups", function(obj) analysisInfo(obj)$analysis)
+
+#' @describeIn featureGroups Same as \code{names}. Provided for consistency to other classes.
+#' @export
+setMethod("groupNames", "featureGroups", function(obj) names(obj))
+
 #' @describeIn featureGroups Obtain number of feature groups.
 #' @export
 setMethod("length", "featureGroups", function(x) ncol(x@groups))

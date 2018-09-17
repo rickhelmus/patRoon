@@ -36,6 +36,18 @@ MSPeakLists <- setClass("MSPeakLists",
 #' @export
 setMethod("peakLists", "MSPeakLists", function(obj) obj@peakLists)
 
+#' @templateVar class MSPeakLists
+#' @templateVar what analyses
+#' @template strmethod
+#' @export
+setMethod("analyses", "MSPeakLists", function(obj) names(obj@peakLists))
+
+#' @templateVar class MSPeakLists
+#' @templateVar what feature groups
+#' @template strmethod
+#' @export
+setMethod("groupNames", "MSPeakLists", function(obj) unique(unlist(sapply(obj@peakLists, names, simplify = FALSE), use.names = FALSE)))
+
 #' @describeIn MSPeakLists Retrieve the algorithm (a character string) used to
 #'   generate the MS peak lists.
 #' @export

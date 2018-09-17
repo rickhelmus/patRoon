@@ -1,6 +1,7 @@
 # patRoon 0.1.0.9000
 
 ## September 2018
+* analyses() and groupNames() generics to get analyses and feature group names of the data within an object.
 * reportMD(): The layout to show compounds, formulas and components is now done with DataTables (DT package). This change allows faster initial loading of results. Furthermore, several small tweaks were done to improve general design.
 * plotSpec() (compounds method): remove unused normalizeScores flag
 * plotSpec() (compounds method): plotting of embedded structure now optional (plotStruct argument)

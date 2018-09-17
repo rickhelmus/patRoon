@@ -142,6 +142,18 @@ NULL
 #' @template generics
 setGeneric("analysisInfo", function(obj) standardGeneric("analysisInfo"))
 
+#' @templateVar func analyses
+#' @templateVar desc returns a \code{character} vector with the analyses from
+#'   which data is present in this object.
+#' @template generics
+setGeneric("analyses", function(obj) standardGeneric("analyses"))
+
+#' @templateVar func groupNames
+#' @templateVar desc returns a \code{character} vector with the names of the
+#'   feature groups from which data is present in this object.
+#' @template generics
+setGeneric("groupNames", function(obj) standardGeneric("groupNames"))
+
 #' @templateVar func algorithm
 #' @templateVar desc returns the algorithm that was used to generate an object.
 #' @template generics

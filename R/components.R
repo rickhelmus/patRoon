@@ -51,6 +51,12 @@ setMethod("componentInfo", "components", function(obj) obj@componentInfo)
 #' @export
 setMethod("algorithm", "components", function(obj) obj@algorithm)
 
+#' @templateVar class components
+#' @templateVar what feature groups
+#' @template strmethod
+#' @export
+setMethod("groupNames", "components", function(obj) unique(unlist(sapply(obj@components, "[[", "group", simplify = FALSE), use.names = FALSE)))
+
 #' @describeIn components Obtain total number of components.
 #' @export
 setMethod("length", "components", function(x) length(x@components))

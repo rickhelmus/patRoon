@@ -33,6 +33,18 @@ setMethod("formulaTable", "formulas", function(obj) obj@formulas)
 #' @export
 setMethod("algorithm", "formulas", function(obj) obj@algorithm)
 
+#' @templateVar class formulas
+#' @templateVar what analyses
+#' @template strmethod
+#' @export
+setMethod("analyses", "formulas", function(obj) names(obj@formulas))
+
+#' @templateVar class formulas
+#' @templateVar what feature groups
+#' @template strmethod
+#' @export
+setMethod("groupNames", "formulas", function(obj) unique(unlist(sapply(obj@formulas, names, simplify = FALSE), use.names = FALSE)))
+
 # UNDONE: this seems not so useful now, change to unique formulae?
 #' @describeIn formulas Obtain total number of formulae entries.
 #' @export
@@ -252,6 +264,12 @@ setMethod("formulaTable", "formulaConsensus", function(obj) obj@formulas)
 #'   string) used to generate formulae.
 #' @export
 setMethod("algorithm", "formulaConsensus", function(obj) obj@algorithm)
+
+#' @templateVar class formulaConsensus
+#' @templateVar what feature groups
+#' @template strmethod
+#' @export
+setMethod("groupNames", "formulaConsensus", function(obj) unique(obj@formulas$group))
 
 #' @describeIn formulaConsensus Obtain total number of formulae entries.
 #' @export

@@ -33,7 +33,7 @@ setMethod("length", "features", function(x) sum(sapply(x@features, nrow)))
 #' @export
 setMethod("show", "features", function(object)
 {
-    ftcounts <- sapply(object@features, nrow)
+    ftcounts <- if (length(object@features) > 0) sapply(object@features, nrow) else 0
     printf("A features object ('%s')\n", class(object))
     printf("Total feature count: %d\n", sum(ftcounts))
     printf("Average feature count/analysis: %.0f\n", sum(ftcounts) / nrow(analysisInfo(object)))

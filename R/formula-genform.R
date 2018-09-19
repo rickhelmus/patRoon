@@ -335,7 +335,7 @@ generateFormulasGenForm <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct =
 
     closeCacheDB(cacheDB)
 
-    formTable <- sapply(formTable, function(ft) ft[sapply(ft, nrow) > 0], simplify = FALSE)
+    formTable <- pruneList(sapply(formTable, function(ft) ft[sapply(ft, nrow) > 0], simplify = FALSE), TRUE)
 
     return(formulas(formulas = formTable, algorithm = "GenForm"))
 }

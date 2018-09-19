@@ -233,7 +233,7 @@ generateFormulasDA <- function(fGroups, precursorMzSearchWindow = 0.002, MSMode 
 
     closeCacheDB(cacheDB)
 
-    fTable <- sapply(fTable, function(ft) ft[sapply(ft, nrow) > 0], simplify = FALSE)
+    fTable <- pruneList(sapply(fTable, function(ft) ft[sapply(ft, nrow) > 0], simplify = FALSE), TRUE)
 
     return(formulas(formulas = fTable, algorithm = "Bruker_DataAnalysis"))
 }

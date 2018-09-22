@@ -82,6 +82,29 @@ setMethod("filter", "features", function(obj, intensityThreshold = NULL)
     return(obj)
 })
 
+#' @templateVar class features
+#' @templateVar whati analyses
+#' @templateVar orderi analyses()
+#' @template extr_op-args
+#'
+#' @export
+setMethod("[", c("features", "ANY", "ANY", "ANY"), function(x, i, j, ..., drop = TRUE)
+{
+    if (!missing(i))
+    {
+        assertExtractArg(i)
+    
+        if (!is.character(i))
+            i <- analyses(x)[i]
+        
+        i <- i[i %in% analyses(x)]
+        x@features <- x@features[i]
+        x@analysisInfo <- x@analysisInfo[x@analysisInfo$analysis == i, ]
+    }
+    
+    return(x)
+})
+
 #' @rdname target-screening
 #' @export
 setMethod("screenTargets", "features", function(obj, targets, rtWindow, mzWindow)

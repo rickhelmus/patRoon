@@ -108,6 +108,20 @@ checkCSVFile <- function(x, cols)
 }
 assertCSVFile <- checkmate::makeAssertionFunction(checkCSVFile)
 
+# used for "[" methods
+checkExtractArg <- function(x)
+{
+    ret <- checkmate::checkIntegerish(x, lower = 0)
+    if (!isTRUE(ret))
+        ret <- checkmate::checkCharacter(x)
+    if (!isTRUE(ret))
+        ret <- checkmate::checkLogical(x)
+    if (!isTRUE(ret))
+        ret <- "Should be valid numeric, character or logical"
+    return(ret)
+}
+assertExtractArg <- checkmate::makeAssertionFunction(checkExtractArg)
+
 # from https://github.com/mllg/checkmate/issues/115
 aapply = function(fun, formula, ..., fixed = list())
 {

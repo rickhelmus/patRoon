@@ -26,12 +26,24 @@ NULL
 #'   \code{consensus}: \code{components} objects that should be used to generate
 #'   the consensus.
 #'
+#' @return The subset/extract operator (\code{"["}) and \code{filter} method
+#'   return the data subset in an object from the \code{componentsReduced}
+#'   class. This object does not contain any algorithm specific data and as
+#'   such, algorithm specific methods (\emph{e.g.} \code{treeCut}) will not work
+#'   on this object. The reason for this is that it is often very difficult or
+#'   impossible to subset the algorithmic data.
+#'
+#' @seealso \link{component-generation} and \code{\link{componentsIntClust}}
+#'
 #' @export
 components <- setClass("components",
                        slots = c(components = "list", componentInfo = "data.table",
                                  algorithm = "character"),
                        prototype = c(components = list(), componentInfo = data.table(),
                                      algorithm = "none"))
+
+componentsReduced <- setClass("componentsReduced",
+                              contains = "components")
 
 #' @describeIn components Accessor method for the \code{components} slot of a
 #'   \code{components} class. Each component is stored as a
@@ -82,6 +94,45 @@ setMethod("show", "components", function(object)
            sum(gCounts), mean(gCounts), min(gCounts), max(gCounts))
 
     showObjectSize(object)
+})
+
+#' @templateVar class components
+#' @templateVar whati components
+#' @templateVar orderi names()
+#' @templateVar whatj feature groups
+#' @templateVar orderj groupNames()
+#' @template extr_op-args
+#'
+#' @export
+setMethod("[", c("components", "ANY", "ANY", "ANY"), function(x, i, j, ..., drop = TRUE)
+{
+    if (!missing(i))
+        assertExtractArg(i)
+    if (!missing(j))
+        assertExtractArg(j)
+    
+    # non-existing indices result in NULL values --> prune
+    
+    if (!missing(i))
+    {
+        if (!is.character(i))
+            i <- names(x)[i]
+        x@components <- pruneList(x@components[i])
+        x@componentInfo <- x@componentInfo[name %in% i]
+    }
+    
+    if (!missing(j))
+    {
+        if (!is.character(j))
+            j <- groupNames(x)[j]
+        x@components <- sapply(x@components, function(cmp) cmp[group == j],
+                               simplify = FALSE)
+        x@components <- x@components[sapply(x@components, nrow) > 0]
+        x@componentInfo <- x@componentInfo[name %in% names(x@components)]
+        x@componentInfo[, size := sapply(x@components, nrow)] # update in case groups were filtered away
+    }
+    
+    return(componentsReduced(components = x@components, componentInfo = x@componentInfo, algorithm = "reduced"))
 })
 
 #' @describeIn components Returns the component id(s) to which a feature group

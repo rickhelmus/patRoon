@@ -5,6 +5,15 @@ NULL
 #' @export
 featuresXCMS <- setClass("featuresXCMS", slots = list(xs = "xcmsSet"), contains = "features")
 
+#' @export
+setMethod("[", c("featuresXCMS", "ANY", "ANY", "ANY"), function(x, i, j, ..., drop = TRUE)
+{
+    x <- callNextMethod(x, i, j, ..., drop)
+    x@xs <- x@xs[, analyses(x)]
+    return(x)
+})
+
+
 #' @details \code{findFeaturesXCMS} uses the \code{\link[xcms]{xcmsSet}}
 #'   function from the \pkg{xcms} package to find features.
 #'

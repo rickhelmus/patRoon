@@ -1,7 +1,9 @@
 # patRoon 0.1.0.9000
 
 ## September 2018
+* subset/extraction operator ("[") for MSPeakLists, formulas, formulaConsensus, compounds, compoundsCluster and components classes.
 * analyses() and groupNames() generics to get analyses and feature group names of the data within an object.
+* "[" method for featureGroups: empty feature groups now always dropped, drop argument now ignored.
 * reportMD(): The layout to show compounds, formulas and components is now done with DataTables (DT package). This change allows faster initial loading of results. Furthermore, several small tweaks were done to improve general design.
 * plotSpec() (compounds method): remove unused normalizeScores flag
 * plotSpec() (compounds method): plotting of embedded structure now optional (plotStruct argument)

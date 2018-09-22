@@ -84,6 +84,28 @@ setMethod("show", "compounds", function(object)
     showObjectSize(object)
 })
 
+#' @templateVar class compounds
+#' @templateVar whati feature groups
+#' @templateVar orderi groupNames()
+#' @template extr_op-args
+#'
+#' @export
+setMethod("[", c("compounds", "ANY", "ANY", "ANY"), function(x, i, j, ..., drop = TRUE)
+{
+    if (!missing(i))
+    {
+        assertExtractArg(i)
+        
+        if (!is.character(i))
+            i <- groupNames(x)[i]
+        
+        i <- i[i %in% groupNames(x)]
+        x@compounds <- x@compounds[i]
+    }
+    
+    return(x)
+})
+
 #' @describeIn compounds Returns a list containing for each feature group a
 #'   character vector with database identifiers for all candidate compounds. The
 #'   list is named by feature group names, and is typically used with the

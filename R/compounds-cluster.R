@@ -112,6 +112,30 @@ setMethod("show", "compoundsCluster", function(object)
     showObjectSize(object)
 })
 
+#' @templateVar class compoundsCluster
+#' @templateVar whati feature groups
+#' @templateVar orderi groupNames()
+#' @template extr_op-args
+#'
+#' @export
+setMethod("[", c("compoundsCluster", "ANY", "ANY", "ANY"), function(x, i, j, ..., drop = TRUE)
+{
+    if (!missing(i))
+    {
+        assertExtractArg(i)
+        
+        if (!is.character(i))
+            i <- groupNames(x)[i]
+        
+        i <- i[i %in% groupNames(x)]
+        x@clusters <- x@clusters[i]
+        x@SMILES <- x@SMILES[i]
+        x@cutClusters <- x@cutClusters[i]
+    }
+    
+    return(x)
+})
+
 #' @describeIn compoundsCluster Manually (re-)cut a dendrogram that was
 #'   generated for a feature group.
 #' @param k,h Desired number of clusters or tree height to be used for cutting

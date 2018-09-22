@@ -695,3 +695,11 @@ numGTE <- function(x, y, tol = sqrt(.Machine$double.eps)) numEQ(x, y, tol) | x >
 numLTE <- function(x, y, tol = sqrt(.Machine$double.eps)) numEQ(x, y, tol) | x < y
 
 wrapStr <- function(s, width, sep = "\n") paste0(strwrap(s, width), collapse = sep)
+
+pruneList <- function(l, checkEmptyElements = FALSE)
+{
+    ret <- l[!sapply(l, is.null)]
+    if (checkEmptyElements)
+        ret <- ret[lengths(ret) > 0]
+    return(ret)
+}

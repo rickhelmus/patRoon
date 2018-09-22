@@ -125,40 +125,20 @@ setMethod("removeGroups", "featureGroups", function(fGroups, indices)
     return(fGroups)
 })
 
-#' @describeIn featureGroups Operator to subset on analyses and/or feature
-#'   groups.
-#'
-#' @param i Either a numeric, character or logical \code{vector} that is used to
-#'   select analyses by their index, name (for index order/names see
-#'   \code{analysisInfo()}) and logical selection, respectively. If missing all
-#'   analyses are selected.
-#' @param j Either a numeric, character or logical \code{vector} that is used to
-#'   select feature groups by their index, name (for index order/names use
-#'   \code{groupInfo}) and logical selection, respectively. If missing all
-#'   feature groups are selected.
-#' @param drop Remove feature groups that are not present anymore in any of the
-#'   analyses after subsetting.
+#' @templateVar class featureGroups
+#' @templateVar whati analyses
+#' @templateVar orderi analyses()
+#' @templateVar whatj feature groups
+#' @templateVar orderj names()
+#' @template extr_op-args
 #'
 #' @export
 setMethod("[", c("featureGroups", "ANY", "ANY", "ANY"), function(x, i, j, ..., drop = TRUE)
 {
     if (!missing(i))
-    {
-        checkmate::assert(
-            checkmate::checkNumeric(i, lower = 0, finite = TRUE),
-            checkmate::checkCharacter(i),
-            checkmate::checkLogical(i)
-            , .var.name = "i")
-    }
+        assertExtractArg(i)
     if (!missing(j))
-    {
-        checkmate::assert(
-            checkmate::checkNumeric(j, lower = 0, finite = TRUE),
-            checkmate::checkCharacter(j),
-            checkmate::checkLogical(j)
-            , .var.name = "j")
-    }
-    checkmate::assertFlag(drop)
+        assertExtractArg(j)
     
     toNumIndex <- function(ind, names)
     {
@@ -175,10 +155,7 @@ setMethod("[", c("featureGroups", "ANY", "ANY", "ANY"), function(x, i, j, ..., d
     if (!missing(j))
         x <- removeGroups(x, setdiff(seq_len(ncol(x@groups)), toNumIndex(j, colnames(x@groups))))
 
-    if (drop)
-        x <- removeEmptyGroups(x)
-
-    return(x)
+    return(removeEmptyGroups(x))
 })
 
 
@@ -1032,8 +1009,8 @@ setMethod("screenTargets", "featureGroups", function(obj, targets, rtWindow, mzW
 #'   groups within specified analyses. The analyses to be used (\emph{e.g.} a
 #'   set of standards) must have the \code{conc} column set in the
 #'   \link{analysis-information} that was used to generate the feature groups.
-#' @return A \code{data.frame} containing retention, \emph{m/z}, R squared,
-#'   intercepts and slopes for all feature groups.
+#' @return \code{regression} returns a \code{data.frame} containing retention,
+#'   \emph{m/z}, R squared, intercepts and slopes for all feature groups.
 #' @aliases regression
 #' @export
 setMethod("regression", "featureGroups", function(fGroups)

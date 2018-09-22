@@ -94,6 +94,45 @@ setMethod("show", "MSPeakLists", function(object)
     showObjectSize(object)
 })
 
+#' @templateVar class MSPeakLists
+#' @templateVar whati analyses
+#' @templateVar orderi analyses()
+#' @templateVar whatj feature groups
+#' @templateVar orderj groupNames()
+#' @template extr_op-args
+#'
+#' @export
+setMethod("[", c("MSPeakLists", "ANY", "ANY", "ANY"), function(x, i, j, ..., drop = TRUE)
+{
+    if (!missing(i))
+        assertExtractArg(i)
+    if (!missing(j))
+        assertExtractArg(j)
+    
+    # non-existing indices result in NULL values --> prune
+    
+    if (!missing(i))
+    {
+        if (!is.character(i))
+            i <- analyses(x)[i]
+        x@peakLists <- pruneList(x@peakLists[i])
+    }
+    
+    if (!missing(j))
+    {
+        if (!is.character(j))
+            j <- groupNames(x)[j]
+        x@peakLists <- sapply(x@peakLists, function(a)
+        {
+            ret <- a[j]
+            return(pruneList(ret))
+        }, simplify = FALSE)
+        x@peakLists <- pruneList(x@peakLists, TRUE)
+    }
+    
+    return(x)
+})
+
 #' @describeIn MSPeakLists provides post filtering of generated MS
 #'   peak lists, which may further enhance quality of subsequent workflow steps
 #'   (\emph{e.g.} formulae calculation and compounds identification) and/or

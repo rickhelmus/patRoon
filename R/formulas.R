@@ -78,6 +78,47 @@ setMethod("show", "formulas", function(object)
     showObjectSize(object)
 })
 
+#' @templateVar class formulas
+#' @templateVar whati analyses
+#' @templateVar orderi analyses()
+#' @templateVar whatj feature groups
+#' @templateVar orderj groupNames()
+#' @template extr_op-args
+#'
+#' @export
+setMethod("[", c("formulas", "ANY", "ANY", "ANY"), function(x, i, j, ..., drop = TRUE)
+{
+    # UNDONE: this is mostly the same as the MSPeakLists method
+    
+    if (!missing(i))
+        assertExtractArg(i)
+    if (!missing(j))
+        assertExtractArg(j)
+    
+    # non-existing indices result in NULL values --> prune
+    
+    if (!missing(i))
+    {
+        if (!is.character(i))
+            i <- analyses(x)[i]
+        x@formulas <- pruneList(x@formulas[i])
+    }
+    
+    if (!missing(j))
+    {
+        if (!is.character(j))
+            j <- groupNames(x)[j]
+        x@formulas <- sapply(x@formulas, function(a)
+        {
+            ret <- a[j]
+            return(pruneList(ret))
+        }, simplify = FALSE)
+        x@formulas <- pruneList(x@formulas, TRUE)
+    }
+    
+    return(x)
+})
+
 #' @describeIn formulas Generates a consensus and other summarizing data for
 #'   formulae of feature groups that are present in multiple analyses.
 #'
@@ -290,6 +331,29 @@ setMethod("show", "formulaConsensus", function(object)
            mean(fCounts[byMSMS == FALSE, N]), mean(fCounts[byMSMS == TRUE, N]))
 
     showObjectSize(object)
+})
+
+#' @templateVar class formulaConsensus
+#' @templateVar whati feature groups
+#' @templateVar orderi groupNames()
+#' @template extr_op-args
+#'
+#' @export
+setMethod("[", c("formulaConsensus", "ANY", "ANY", "ANY"), function(x, i, j, ..., drop = TRUE)
+{
+    if (!missing(i))
+        assertExtractArg(i)
+    
+    # non-existing indices result in NULL values --> prune
+    
+    if (!missing(i))
+    {
+        if (!is.character(i))
+            i <- groupNames(x)[i]
+        x@formulas <- x@formulas[group %in% i]
+    }
+    
+    return(x)
 })
 
 #' @templateVar class formulaConsensus

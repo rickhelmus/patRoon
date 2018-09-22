@@ -177,7 +177,8 @@ reportFGroupPlots <- function(fGroups, path, plotGrid, rtWindow, mzWindow, retMi
     close(prog)
     dev.off()
 
-    tools::compactPDF(pdfFile)
+    # UNDONE: may fail sometimes (on AppVeyor)
+    # tools::compactPDF(pdfFile)
     # tools::compactPDF(pdfFile, gs_quality = "ebook")
 
     invisible(NULL)

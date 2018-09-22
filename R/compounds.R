@@ -90,7 +90,7 @@ setMethod("show", "compounds", function(object)
 #' @template extr_op-args
 #'
 #' @export
-setMethod("[", c("compounds", "ANY", "ANY", "ANY"), function(x, i, j, ..., drop = TRUE)
+setMethod("[", c("compounds", "ANY", "missing", "missing"), function(x, i, ...)
 {
     if (!missing(i))
     {

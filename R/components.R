@@ -104,7 +104,7 @@ setMethod("show", "components", function(object)
 #' @template extr_op-args
 #'
 #' @export
-setMethod("[", c("components", "ANY", "ANY", "ANY"), function(x, i, j, ..., drop = TRUE)
+setMethod("[", c("components", "ANY", "ANY", "missing"), function(x, i, j, ...)
 {
     if (!missing(i))
         assertExtractArg(i)

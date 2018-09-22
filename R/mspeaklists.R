@@ -102,7 +102,7 @@ setMethod("show", "MSPeakLists", function(object)
 #' @template extr_op-args
 #'
 #' @export
-setMethod("[", c("MSPeakLists", "ANY", "ANY", "ANY"), function(x, i, j, ..., drop = TRUE)
+setMethod("[", c("MSPeakLists", "ANY", "ANY", "missing"), function(x, i, j, ...)
 {
     if (!missing(i))
         assertExtractArg(i)

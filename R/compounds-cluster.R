@@ -118,7 +118,7 @@ setMethod("show", "compoundsCluster", function(object)
 #' @template extr_op-args
 #'
 #' @export
-setMethod("[", c("compoundsCluster", "ANY", "ANY", "ANY"), function(x, i, j, ..., drop = TRUE)
+setMethod("[", c("compoundsCluster", "ANY", "missing", "missing"), function(x, i, ...)
 {
     if (!missing(i))
     {

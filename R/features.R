@@ -88,7 +88,7 @@ setMethod("filter", "features", function(obj, intensityThreshold = NULL)
 #' @template extr_op-args
 #'
 #' @export
-setMethod("[", c("features", "ANY", "ANY", "ANY"), function(x, i, j, ..., drop = TRUE)
+setMethod("[", c("features", "ANY", "missing", "missing"), function(x, i, ...)
 {
     if (!missing(i))
     {

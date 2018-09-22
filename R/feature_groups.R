@@ -133,7 +133,7 @@ setMethod("removeGroups", "featureGroups", function(fGroups, indices)
 #' @template extr_op-args
 #'
 #' @export
-setMethod("[", c("featureGroups", "ANY", "ANY", "ANY"), function(x, i, j, ..., drop = TRUE)
+setMethod("[", c("featureGroups", "ANY", "ANY", "missing"), function(x, i, j, ...)
 {
     if (!missing(i))
         assertExtractArg(i)

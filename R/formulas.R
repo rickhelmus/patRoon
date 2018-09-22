@@ -15,6 +15,8 @@ NULL
 #'
 #' @param obj,x,object,formulas The \code{formulas} object.
 #'
+#' @seealso \code{\link{formulaConsensus}}
+#' 
 #' @export
 formulas <- setClass("formulas",
                      slots = c(formulas = "list", algorithm = "character"),
@@ -86,10 +88,8 @@ setMethod("show", "formulas", function(object)
 #' @template extr_op-args
 #'
 #' @export
-setMethod("[", c("formulas", "ANY", "ANY", "ANY"), function(x, i, j, ..., drop = TRUE)
+setMethod("[", c("formulas", "ANY", "ANY", "missing"), function(x, i, j, ...)
 {
-    # UNDONE: this is mostly the same as the MSPeakLists method
-    
     if (!missing(i))
         assertExtractArg(i)
     if (!missing(j))
@@ -290,6 +290,8 @@ setMethod("consensus", "formulas", function(obj, ..., fGroups, formAnaThreshold 
 #'
 #' @param obj,x,object The \code{formulaConsensus} object.
 #'
+#' @seealso \code{\link{formulas}}
+#' 
 #' @export
 formulaConsensus <- setClass("formulaConsensus",
                              slots = c(formulas = "data.table", algorithm = "character"),
@@ -339,7 +341,7 @@ setMethod("show", "formulaConsensus", function(object)
 #' @template extr_op-args
 #'
 #' @export
-setMethod("[", c("formulaConsensus", "ANY", "ANY", "ANY"), function(x, i, j, ..., drop = TRUE)
+setMethod("[", c("formulaConsensus", "ANY", "missing", "missing"), function(x, i, ...)
 {
     if (!missing(i))
         assertExtractArg(i)

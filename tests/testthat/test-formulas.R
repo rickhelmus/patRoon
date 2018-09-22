@@ -39,7 +39,7 @@ test_that("verify formula generation", {
     expect_length(formsSIREmptyPLMS, 0)
 })
 
-test_that("verify show output", {
+test_that("verify formula show output", {
     expect_known_show(formsGF, testFile("formulas-gf", text = TRUE))
     skip_if_not(doSIRIUS)
     expect_known_show(formsSIR, testFile("formulas-sir", text = TRUE))
@@ -75,6 +75,24 @@ test_that("consensus works", {
     expect_lt(length(consensus(formsGF, formsSIR, fGroups = fGroups, formListThreshold = 1)), length(fCons2))
     
     expect_equal(consensus(formsSIR, formsGFEmptyPL, fGroups = fGroups), consensus(formsSIR, fGroups = fGroups))
+})
+
+test_that("basic subsetting", {
+    expect_length(formsGF["nope"], 0)
+    expect_equivalent(analyses(formsGF[1:2]), analyses(fGroups)[1:2])
+    expect_equivalent(analyses(formsGF[analyses(fGroups)[1:2]]), analyses(fGroups)[1:2])
+    expect_equivalent(analyses(formsGF[c(FALSE, TRUE)]), analyses(fGroups)[2])
+    expect_equivalent(groupNames(formsGF[, 1:2]), groupNames(formsGF)[1:2])
+    expect_equivalent(groupNames(formsGF[, groupNames(formsGF)[2:3]]), groupNames(formsGF)[2:3])
+    expect_equivalent(groupNames(formsGF[, c(FALSE, TRUE)]), groupNames(formsGF)[c(FALSE, TRUE)])
+    expect_equal(length(formsGF[FALSE]), 0)
+    expect_length(formsGFEmpty[1:5], 0)
+    
+    expect_length(fCons["nope"], 0)
+    expect_equivalent(groupNames(fCons[1:2]), groupNames(fCons)[1:2])
+    expect_equivalent(groupNames(fCons[groupNames(formsGF)[2:3]]), groupNames(fCons)[2:3])
+    expect_equivalent(groupNames(fCons[c(FALSE, TRUE)]), groupNames(fCons)[c(FALSE, TRUE)])
+    expect_equal(length(fCons[FALSE]), 0)
 })
 
 test_that("feature group filtering", {

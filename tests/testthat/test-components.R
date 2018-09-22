@@ -36,6 +36,18 @@ test_that("verify components show", {
     expect_known_show(compsNT, testFile("components-nt", text = TRUE))
 })
 
+test_that("basic subsetting", {
+    expect_length(compsRC["nope"], 0)
+    expect_equivalent(names(compsRC[1:2]), names(compsRC)[1:2])
+    expect_equivalent(names(compsRC[names(compsRC)[1:2]]), names(compsRC)[1:2])
+    expect_equivalent(names(compsRC[c(FALSE, TRUE)]), names(compsRC)[c(FALSE, TRUE)])
+    expect_equivalent(groupNames(compsRC[, 1:2]), groupNames(compsRC)[1:2])
+    expect_equivalent(groupNames(compsRC[, groupNames(compsRC)[2:3]]), groupNames(compsRC)[2:3])
+    expect_equivalent(groupNames(compsRC[, c(FALSE, TRUE)]), groupNames(compsRC)[c(FALSE, TRUE)])
+    expect_equal(length(compsRC[FALSE]), 0)
+    expect_length(compsEmpty[1:5], 0)
+})
+
 test_that("findFGroup works", {
     expect_equivalent(findFGroup(compsCAM, names(fGroupsSimple)[1]), 2)
     expect_length(findFGroup(compsCAM, "none"), 0)

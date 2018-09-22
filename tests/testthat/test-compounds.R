@@ -91,6 +91,17 @@ test_that("filtering works", {
     expect_lt(length(filter(compsSIR, minScore = -200)), length(compsSIR))
 })
 
+test_that("basic subsetting", {
+    skip_if_not(hasCompounds)
+    
+    expect_length(comps["nope"], 0)
+    expect_equivalent(groupNames(comps[1:2]), groupNames(comps)[1:2])
+    expect_equivalent(groupNames(comps[groupNames(comps)[2:3]]), groupNames(comps)[2:3])
+    expect_equivalent(groupNames(comps[c(FALSE, TRUE)]), groupNames(comps)[c(FALSE, TRUE)])
+    expect_equal(length(comps[FALSE]), 0)
+    expect_length(compsEmpty[1:5], 0)
+})
+
 if (doMetFrag)
 {
     forms <- consensus(generateFormulas(fGroupsSub, "genform", plists), fGroups = fGroupsSub)

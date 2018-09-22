@@ -75,3 +75,15 @@ test_that("feature group filtering", {
     expect_lt(length(filterBy(plists, fGroups, onlyMSMS = TRUE)), length(fGroups))
     expect_length(filterBy(plistsEmpty, fGroups), 0)
 })
+
+test_that("basic subsetting", {
+    expect_length(plists["nope"], 0)
+    expect_equivalent(analyses(plists[1:2]), analyses(fGroups)[1:2])
+    expect_equivalent(analyses(plists[analyses(fGroups)[1:2]]), analyses(fGroups)[1:2])
+    expect_equivalent(analyses(plists[c(FALSE, TRUE)]), analyses(fGroups)[2])
+    expect_equivalent(groupNames(plists[, 1:2]), groupNames(plists)[1:2])
+    expect_equivalent(groupNames(plists[, groupNames(plists)[2:3]]), groupNames(plists)[2:3])
+    expect_equivalent(groupNames(plists[, c(FALSE, TRUE)]), groupNames(plists)[c(FALSE, TRUE)])
+    expect_equal(length(plists[FALSE]), 0)
+    expect_length(plistsEmpty[1:5], 0)
+})

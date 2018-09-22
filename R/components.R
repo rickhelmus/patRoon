@@ -113,6 +113,10 @@ setMethod("[", c("components", "ANY", "ANY", "ANY"), function(x, i, j, ..., drop
     
     # non-existing indices result in NULL values --> prune
     
+    # for some reason we need to explicitly give a data.table() as otherwise it complains componentInfo was assigned a list()
+    if (length(x) == 0)
+        return(componentsReduced(components = list(), componentInfo = data.table(), algorithm = "reduced"))
+    
     if (!missing(i))
     {
         if (!is.character(i))
@@ -125,13 +129,13 @@ setMethod("[", c("components", "ANY", "ANY", "ANY"), function(x, i, j, ..., drop
     {
         if (!is.character(j))
             j <- groupNames(x)[j]
-        x@components <- sapply(x@components, function(cmp) cmp[group == j],
+        x@components <- sapply(x@components, function(cmp) cmp[group %in% j],
                                simplify = FALSE)
         x@components <- x@components[sapply(x@components, nrow) > 0]
         x@componentInfo <- x@componentInfo[name %in% names(x@components)]
         x@componentInfo[, size := sapply(x@components, nrow)] # update in case groups were filtered away
     }
-    
+
     return(componentsReduced(components = x@components, componentInfo = x@componentInfo, algorithm = "reduced"))
 })
 

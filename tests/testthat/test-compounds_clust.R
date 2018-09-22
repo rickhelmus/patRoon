@@ -30,6 +30,17 @@ test_that("verify compound cluster generation", {
     expect_known_show(compsClustEmpty, testFile("compounds-clust-empty", text = TRUE))
 })
 
+test_that("basic subsetting", {
+    skip_if_not(hasMetfrag)
+    
+    expect_length(compsClust["nope"], 0)
+    expect_equivalent(groupNames(compsClust[1:2]), groupNames(compsClust)[1:2])
+    expect_equivalent(groupNames(compsClust[groupNames(compsClust)[2:3]]), groupNames(compsClust)[2:3])
+    expect_equivalent(groupNames(compsClust[c(FALSE, TRUE)]), groupNames(compsClust)[c(FALSE, TRUE)])
+    expect_equal(length(compsClust[FALSE]), 0)
+    expect_length(compsClustEmpty[1:5], 0)
+})
+
 test_that("override cutting clusters work", {
     skip_if_not(hasMetfrag)
     

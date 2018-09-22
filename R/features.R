@@ -27,7 +27,7 @@ features <- setClass("features",
 
 #' @describeIn features Obtain total number of features.
 #' @export
-setMethod("length", "features", function(x) sum(sapply(x@features, nrow)))
+setMethod("length", "features", function(x) if (length(x@features) > 0) sum(sapply(x@features, nrow)) else 0)
 
 #' @describeIn features Shows summary information for this object.
 #' @export
@@ -99,7 +99,7 @@ setMethod("[", c("features", "ANY", "ANY", "ANY"), function(x, i, j, ..., drop =
         
         i <- i[i %in% analyses(x)]
         x@features <- x@features[i]
-        x@analysisInfo <- x@analysisInfo[x@analysisInfo$analysis == i, ]
+        x@analysisInfo <- x@analysisInfo[x@analysisInfo$analysis %in% i, ]
     }
     
     return(x)

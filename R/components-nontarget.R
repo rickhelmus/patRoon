@@ -238,6 +238,7 @@ generateComponentsNontarget <- function(fGroups, ionization, rtRange = c(-120, 1
              c("m/z increment", "RT increment", "min. RT in series", "max. RT in series", "max.-min. RT"),
              c("mz_increment", "rt_increment", "rt_min", "rt_max", "rt_range"))
     cInfo[, name := names(comps)]
+    cInfo[, size := sapply(comps, nrow)]
 
     # convert from fgroup lists to logical presence
     for (rg in presentRGroups)

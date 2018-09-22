@@ -32,18 +32,26 @@ setMethod("names", "featureGroupsComparison", function(x) names(x@fGroupsList))
 #' @export
 setMethod("length", "featureGroupsComparison", function(x) length(x@fGroupsList))
 
-#' @describeIn featureGroupsComparison Creates a subset of the compared feature groups.
+#' @templateVar class featureGroupsComparison
+#' @templateVar whati labels
+#' @templateVar orderi names()
+#' @template extr_op-args
+#'
 #' @export
-setMethod("[", "featureGroupsComparison", function(x, i, j = "missing", drop = "missing")
+setMethod("[", c("featureGroupsComparison", "ANY", "missing", "missing"), function(x, i, ...)
 {
-    checkmate::assert(
-        checkmate::checkNumeric(i, lower = 0, finite = TRUE),
-        checkmate::checkCharacter(i),
-        checkmate::checkLogical(i)
-        , .var.name = "i")
+    if (!missing(i))
+    {
+        assertExtractArg(i)
+        
+        if (!is.character(i))
+            i <- names(x)[i]
+        
+        i <- i[i %in% names(x)]
+        x@fGroupsList <- x@fGroupsList[i]
+        x@comparedFGroups <- x@comparedFGroups[i]
+    }
     
-    x@fGroupsList <- x@fGroupsList[i]
-    x@comparedFGroups <- x@comparedFGroups[i]
     return(x)
 })
 

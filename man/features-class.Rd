@@ -8,7 +8,9 @@
 \alias{show,features-method}
 \alias{featureTable,features-method}
 \alias{analysisInfo,features-method}
+\alias{analyses,features-method}
 \alias{filter,features-method}
+\alias{[,features,ANY,missing,missing-method}
 \title{Base features class}
 \usage{
 \S4method{length}{features}(x)
@@ -19,10 +21,20 @@
 
 \S4method{analysisInfo}{features}(obj)
 
+\S4method{analyses}{features}(obj)
+
 \S4method{filter}{features}(obj, intensityThreshold = NULL)
+
+\S4method{[}{features,ANY,missing,missing}(x, i, j, ..., drop = TRUE)
 }
 \arguments{
 \item{obj, x, object}{\code{features} object to be accessed}
+
+\item{i}{Either a numeric, character or logical \code{vector} that is used to select analyses by their index, name and logical selection, respectively (for the order/names see \code{analyses()}). If missing all analyses are selected.}
+
+\item{j}{ignored.}
+
+\item{drop}{ignored.}
 }
 \value{
 \code{featureTable}: A \code{list} containing a
@@ -53,8 +65,13 @@ and derived objects are created by 'feature finders' such as
 
 \item \code{analysisInfo}: Get analysis information
 
+\item \code{analyses}: returns a \code{character} vector with the names of the
+analyses from which data is present in this object.
+
 \item \code{filter}: Performs common rule based filtering on of features,
 such as intensity thresholds.
+
+\item \code{[}: Operator to subset on analyses .
 }}
 
 \section{Slots}{

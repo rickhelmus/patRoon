@@ -7,8 +7,10 @@
 \alias{compoundTable,compounds-method}
 \alias{compoundTable}
 \alias{algorithm,compounds-method}
+\alias{groupNames,compounds-method}
 \alias{length,compounds-method}
 \alias{show,compounds-method}
+\alias{[,compounds,ANY,missing,missing-method}
 \alias{identifiers,compounds-method}
 \alias{identifiers}
 \alias{filter,compounds-method}
@@ -27,9 +29,13 @@
 
 \S4method{algorithm}{compounds}(obj)
 
+\S4method{groupNames}{compounds}(obj)
+
 \S4method{length}{compounds}(x)
 
 \S4method{show}{compounds}(object)
+
+\S4method{[}{compounds,ANY,missing,missing}(x, i, j, ..., drop = TRUE)
 
 \S4method{identifiers}{compounds}(compounds)
 
@@ -58,6 +64,15 @@
 }
 \arguments{
 \item{obj, object, x, compounds}{The \code{compound} object.}
+
+\item{i}{Either a numeric, character or logical \code{vector} that is used to select feature groups by their index, name and logical selection, respectively (for the order/names see \code{groupNames()}). If missing all feature groups are selected.}
+
+\item{j}{ignored.}
+
+\item{\dots}{\code{compounds} objects that should be used to generate the
+consensus.}
+
+\item{drop}{ignored.}
 
 \item{minExplainedPeaks, minScore, minFragScore, minFormulaScore}{Minimal number
 of explained peaks, overall score, in-silico fragmentation score and
@@ -109,9 +124,6 @@ generate the candidate}
 \item{plotStruct}{If \code{TRUE} then the candidate structure is drawn in the
 spectrum.}
 
-\item{\dots}{\code{compounds} objects that should be used to generate the
-consensus.}
-
 \item{compThreshold}{Minimal fraction (0-1) that a candidate must be present
 within all given \code{compounds} objects.}
 
@@ -155,9 +167,14 @@ Contains data of generated chemical compounds for given feature groups.
 \item \code{algorithm}: Accessor method for the algorithm (a character
 string) used to generate compounds.
 
+\item \code{groupNames}: returns a \code{character} vector with the names of the
+feature groups from which data is present in this object.
+
 \item \code{length}: Obtain total number of candidate compounds.
 
 \item \code{show}: Show summary information for this object.
+
+\item \code{[}: Operator to subset on feature groups .
 
 \item \code{identifiers}: Returns a list containing for each feature group a
 character vector with database identifiers for all candidate compounds. The

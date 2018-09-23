@@ -7,9 +7,11 @@
 \alias{clusters,compoundsCluster-method}
 \alias{cutClusters,compoundsCluster-method}
 \alias{clusterProperties,compoundsCluster-method}
+\alias{groupNames,compoundsCluster-method}
 \alias{length,compoundsCluster-method}
 \alias{lengths,compoundsCluster-method}
 \alias{show,compoundsCluster-method}
+\alias{[,compoundsCluster,ANY,missing,missing-method}
 \alias{treeCut,compoundsCluster-method}
 \alias{treeCutDynamic,compoundsCluster-method}
 \alias{plot,compoundsCluster,ANY-method}
@@ -23,11 +25,16 @@
 
 \S4method{clusterProperties}{compoundsCluster}(obj)
 
+\S4method{groupNames}{compoundsCluster}(obj)
+
 \S4method{length}{compoundsCluster}(x)
 
 \S4method{lengths}{compoundsCluster}(x, use.names = TRUE)
 
 \S4method{show}{compoundsCluster}(object)
+
+\S4method{[}{compoundsCluster,ANY,missing,missing}(x, i, j, ...,
+  drop = TRUE)
 
 \S4method{treeCut}{compoundsCluster}(obj, k = NULL, h = NULL,
   groupName)
@@ -50,6 +57,14 @@
 \item{use.names}{A logical value specifying whether the returned vector
 should be named with the feature group names.}
 
+\item{i}{Either a numeric, character or logical \code{vector} that is used to select feature groups by their index, name and logical selection, respectively (for the order/names see \code{groupNames()}). If missing all feature groups are selected.}
+
+\item{j}{ignored.}
+
+\item{\dots}{Any arguments directly given to \code{\link{plot.dendrogram}}.}
+
+\item{drop}{ignored.}
+
 \item{k, h}{Desired number of clusters or tree height to be used for cutting
 the dendrogram, respecitively. One or the other must be specified.
 Analogous to \code{\link{cutree}}.}
@@ -69,8 +84,6 @@ the default is only \code{TRUE} when this is not the case.}
 \code{TRUE} then a legend will be shown which outlines cluster numbers and
 their colours. By default \code{TRUE} for small amount of clusters to avoid
 overflowing the plot.}
-
-\item{\dots}{Any arguments directly given to \code{\link{plot.dendrogram}}.}
 
 \item{cluster}{A numeric value specifying the cluster.}
 
@@ -107,12 +120,17 @@ membership for each candidate (format as \code{\link{cutree}}).
 \item \code{clusterProperties}: Returns a list with properties on how the
 clustering was performed.
 
+\item \code{groupNames}: returns a \code{character} vector with the names of the
+feature groups from which data is present in this object.
+
 \item \code{length}: Returns the total number of clusters.
 
 \item \code{lengths}: Returns a \code{vector} with the number of
 clusters per feature group.
 
 \item \code{show}: Show summary information for this object.
+
+\item \code{[}: Operator to subset on feature groups .
 
 \item \code{treeCut}: Manually (re-)cut a dendrogram that was
 generated for a feature group.

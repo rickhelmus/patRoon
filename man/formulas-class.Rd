@@ -6,8 +6,11 @@
 \alias{formulas}
 \alias{formulaTable,formulas-method}
 \alias{algorithm,formulas-method}
+\alias{analyses,formulas-method}
+\alias{groupNames,formulas-method}
 \alias{length,formulas-method}
 \alias{show,formulas-method}
+\alias{[,formulas,ANY,ANY,missing-method}
 \alias{consensus,formulas-method}
 \title{Formula lists class}
 \usage{
@@ -15,9 +18,15 @@
 
 \S4method{algorithm}{formulas}(obj)
 
+\S4method{analyses}{formulas}(obj)
+
+\S4method{groupNames}{formulas}(obj)
+
 \S4method{length}{formulas}(x)
 
 \S4method{show}{formulas}(object)
+
+\S4method{[}{formulas,ANY,ANY,missing}(x, i, j, ..., drop = TRUE)
 
 \S4method{consensus}{formulas}(obj, ..., fGroups,
   formAnaThreshold = 0.75, formListThreshold = 0, maxFormulas = 10,
@@ -28,10 +37,16 @@
 \arguments{
 \item{obj, x, object, formulas}{The \code{formulas} object.}
 
+\item{i}{Either a numeric, character or logical \code{vector} that is used to select analyses by their index, name and logical selection, respectively (for the order/names see \code{analyses()}). If missing all analyses are selected.}
+
+\item{j}{Either a numeric, character or logical \code{vector} that is used to select feature groups by their index, name and logical selection, respectively (for the order/names see \code{groupNames()}). If missing all feature groups are selected.}
+
 \item{\dots}{Any further \code{formulas} objects on top of the object given
 for the \code{obj} parameter to which a consensus should be generated.
 Using the \dots parameter formulae from various
 \link[=formula-generation]{formula generators} can be merged.}
+
+\item{drop}{ignored.}
 
 \item{fGroups}{The \code{\link{featureGroups}} object that was used when
 formulae were generated.}
@@ -93,9 +108,17 @@ generators}.
 \item \code{algorithm}: Accessor method for the algorithm (a character
 string) used to generate formulae.
 
+\item \code{analyses}: returns a \code{character} vector with the names of the
+analyses from which data is present in this object.
+
+\item \code{groupNames}: returns a \code{character} vector with the names of the
+feature groups from which data is present in this object.
+
 \item \code{length}: Obtain total number of formulae entries.
 
 \item \code{show}: Show summary information for this object.
+
+\item \code{[}: Operator to subset on analyses and/or feature groups.
 
 \item \code{consensus}: Generates a consensus and other summarizing data for
 formulae of feature groups that are present in multiple analyses.
@@ -111,3 +134,6 @@ method for access.}
 the \code{algorithm} method for access.}
 }}
 
+\seealso{
+\code{\link{formulaConsensus}}
+}

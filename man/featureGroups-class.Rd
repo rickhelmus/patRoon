@@ -5,6 +5,8 @@
 \alias{featureGroups-class}
 \alias{featureGroups}
 \alias{names,featureGroups-method}
+\alias{analyses,featureGroups-method}
+\alias{groupNames,featureGroups-method}
 \alias{length,featureGroups-method}
 \alias{show,featureGroups-method}
 \alias{groups,featureGroups-method}
@@ -17,7 +19,8 @@
 \alias{getFeatures}
 \alias{groupFeatIndex,featureGroups-method}
 \alias{groupFeatIndex}
-\alias{[,featureGroups,ANY,ANY,ANY-method}
+\alias{[,featureGroups,ANY,ANY,missing-method}
+\alias{[[,featureGroups,numChar,ANY-method}
 \alias{export,featureGroups-method}
 \alias{export}
 \alias{groupTable,featureGroups-method}
@@ -36,6 +39,10 @@
 \usage{
 \S4method{names}{featureGroups}(x)
 
+\S4method{analyses}{featureGroups}(obj)
+
+\S4method{groupNames}{featureGroups}(obj)
+
 \S4method{length}{featureGroups}(x)
 
 \S4method{show}{featureGroups}(object)
@@ -52,7 +59,9 @@
 
 \S4method{groupFeatIndex}{featureGroups}(fGroups)
 
-\S4method{[}{featureGroups,ANY,ANY,ANY}(x, i, j, ..., drop = TRUE)
+\S4method{[}{featureGroups,ANY,ANY,missing}(x, i, j, ..., drop = TRUE)
+
+\S4method{[[}{featureGroups,numChar,ANY}(x, i, j, ...)
 
 \S4method{export}{featureGroups}(fGroups, type, out)
 
@@ -85,23 +94,16 @@
 \arguments{
 \item{fGroups, obj, x, object}{\code{featureGroups} object to be accessed.}
 
-\item{i}{Either a numeric, character or logical \code{vector} that is used to
-select analyses by their index, name (for index order/names see
-\code{analysisInfo()}) and logical selection, respectively. If missing all
-analyses are selected.}
+\item{i}{Either a numeric, character or logical \code{vector} that is used to select analyses by their index, name and logical selection, respectively (for the order/names see \code{analyses()}). If missing all analyses are selected.}
 
-\item{j}{Either a numeric, character or logical \code{vector} that is used to
-select feature groups by their index, name (for index order/names use
-\code{groupInfo}) and logical selection, respectively. If missing all
-feature groups are selected.}
+\item{j}{Either a numeric, character or logical \code{vector} that is used to select feature groups by their index, name and logical selection, respectively (for the order/names see \code{names()}). If missing all feature groups are selected.}
 
 \item{\dots}{Ignored for \code{"["} operator or passed to
 \code{\link[graphics]{plot}} (\code{plot}, \code{plotInt} and
 \code{plotEIC}), \pkg{\link{VennDiagram}} plotting functions
 (\code{plotVenn}) or \code{\link{chordDiagram}} (\code{plotChord}).}
 
-\item{drop}{Remove feature groups that are not present anymore in any of the
-analyses after subsetting.}
+\item{drop}{ignored.}
 
 \item{type}{Which file type should be exported: \code{"brukerpa"} (Bruker
 ProfileAnalysis), \code{"brukertasq"} (Bruker TASQ) or \code{"mzmine"}
@@ -200,8 +202,8 @@ The order for the \code{areas} and \code{intersectionCounts} fields is the same 
 from the used plotting function (see \emph{e.g.} \code{\link{draw.pairwise.venn}} and
 \code{\link{draw.triple.venn}}).
 
-A \code{data.frame} containing retention, \emph{m/z}, R squared,
-  intercepts and slopes for all feature groups.
+\code{regression} returns a \code{data.frame} containing retention,
+  \emph{m/z}, R squared, intercepts and slopes for all feature groups.
 }
 \description{
 This class holds all the information for grouped features.
@@ -219,6 +221,11 @@ grouping of features across analyses.
 \itemize{
 \item \code{names}: Obtain feature group names.
 
+\item \code{analyses}: returns a \code{character} vector with the names of the
+analyses from which data is present in this object.
+
+\item \code{groupNames}: Same as \code{names}. Provided for consistency to other classes.
+
 \item \code{length}: Obtain number of feature groups.
 
 \item \code{show}: Shows summary information for this object.
@@ -235,8 +242,9 @@ grouping of features across analyses.
 
 \item \code{groupFeatIndex}: Accessor for \code{ftindex} slot.
 
-\item \code{[}: Operator to subset on analyses and/or feature
-groups.
+\item \code{[}: Operator to subset on analyses and/or feature groups.
+
+\item \code{[[}: Extraction operator
 
 \item \code{export}: Exports feature groups to a \file{.csv} file that
 is readable to Bruker ProfileAnalysis (a 'bucket table'), Bruker TASQ (an

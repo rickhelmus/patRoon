@@ -6,15 +6,15 @@
 \alias{featureGroupsComparison}
 \alias{names,featureGroupsComparison-method}
 \alias{length,featureGroupsComparison-method}
-\alias{[,featureGroupsComparison,ANY,ANY,ANY-method}
+\alias{[,featureGroupsComparison,ANY,missing,missing-method}
 \title{Feature groups comparison class}
 \usage{
 \S4method{names}{featureGroupsComparison}(x)
 
 \S4method{length}{featureGroupsComparison}(x)
 
-\S4method{[}{featureGroupsComparison,ANY,ANY,ANY}(x, i, j = "missing",
-  drop = "missing")
+\S4method{[}{featureGroupsComparison,ANY,missing,missing}(x, i, j, ...,
+  drop = TRUE)
 }
 \arguments{
 \item{x}{A \code{featureGroupsComparison} object.}
@@ -23,6 +23,12 @@
 to a \code{list}).}
 
 \item{j, drop}{Not used. Should be ignored.}
+
+\item{drop}{ignored.}
+
+\item{i}{Either a numeric, character or logical \code{vector} that is used to select labels by their index, name and logical selection, respectively (for the order/names see \code{names()}). If missing all labels are selected.}
+
+\item{j}{ignored.}
 }
 \description{
 This class is used for comparing different \code{\link{featureGroups}}
@@ -37,7 +43,7 @@ Objects from this class are returned by \code{\link{comparison}}.
 
 \item \code{length}: Number of feature groups objects that were compared.
 
-\item \code{[}: Creates a subset of the compared feature groups.
+\item \code{[}: Operator to subset on labels .
 }}
 
 \section{Slots}{

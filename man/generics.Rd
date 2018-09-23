@@ -3,6 +3,8 @@
 \name{generics}
 \alias{generics}
 \alias{analysisInfo}
+\alias{analyses}
+\alias{groupNames}
 \alias{algorithm}
 \alias{clusterProperties}
 \alias{clusters}
@@ -24,6 +26,10 @@
 \title{Miscellaneous generics}
 \usage{
 analysisInfo(obj)
+
+analyses(obj)
+
+groupNames(obj)
 
 algorithm(obj)
 
@@ -99,11 +105,35 @@ please refer to the linked method documentation for each generic.
 
 
 
+
 \itemize{
     \item Methods are defined for: \code{\link[=analysisInfo,featureGroups-method]{featureGroups}}, \code{\link[=analysisInfo,features-method]{features}}.
 }
 
+\code{analyses} returns a \code{character} vector with the analyses from
+
+
+
+
+
+
+\itemize{
+    \item Methods are defined for: \code{\link[=analyses,MSPeakLists-method]{MSPeakLists}}, \code{\link[=analyses,featureGroups-method]{featureGroups}}, \code{\link[=analyses,features-method]{features}}, \code{\link[=analyses,formulas-method]{formulas}}.
+}
+
+\code{groupNames} returns a \code{character} vector with the names of the
+
+
+
+
+
+
+\itemize{
+    \item Methods are defined for: \code{\link[=groupNames,MSPeakLists-method]{MSPeakLists}}, \code{\link[=groupNames,components-method]{components}}, \code{\link[=groupNames,compounds-method]{compounds}}, \code{\link[=groupNames,compoundsCluster-method]{compoundsCluster}}, \code{\link[=groupNames,featureGroups-method]{featureGroups}}, \code{\link[=groupNames,formulaConsensus-method]{formulaConsensus}}, \code{\link[=groupNames,formulas-method]{formulas}}.
+}
+
 \code{algorithm} returns the algorithm that was used to generate an object.
+
 
 
 
@@ -119,11 +149,13 @@ please refer to the linked method documentation for each generic.
 
 
 
+
 \itemize{
     \item Methods are defined for: \code{\link[=clusterProperties,componentsIntClust-method]{componentsIntClust}}, \code{\link[=clusterProperties,compoundsCluster-method]{compoundsCluster}}.
 }
 
 \code{clusters} Obtain clustering object(s).
+
 
 
 
@@ -139,11 +171,13 @@ please refer to the linked method documentation for each generic.
 
 
 
+
 \itemize{
     \item Methods are defined for: \code{\link[=cutClusters,componentsIntClust-method]{componentsIntClust}}, \code{\link[=cutClusters,compoundsCluster-method]{compoundsCluster}}.
 }
 
 \code{consensus} combines and merges data from various algorithms to generate a consensus.
+
 
 
 
@@ -159,11 +193,13 @@ please refer to the linked method documentation for each generic.
 
 
 
+
 \itemize{
     \item Methods are defined for: \code{\link[=featureTable,featureGroups-method]{featureGroups}}, \code{\link[=featureTable,features-method]{features}}.
 }
 
 \code{filter} provides various functionality to do post-filtering of data.
+
 
 
 
@@ -179,11 +215,13 @@ please refer to the linked method documentation for each generic.
 
 
 
+
 \itemize{
     \item Methods are defined for: \code{\link[=filterBy,MSPeakLists-method]{MSPeakLists}}, \code{\link[=filterBy,components-method]{components}}, \code{\link[=filterBy,compounds-method]{compounds}}, \code{\link[=filterBy,formulaConsensus-method]{formulaConsensus}}.
 }
 
 \code{formulaTable} returns formula data.
+
 
 
 
@@ -199,11 +237,13 @@ please refer to the linked method documentation for each generic.
 
 
 
+
 \itemize{
     \item Methods are defined for: \code{\link[=getMCS,compounds-method]{compounds}}, \code{\link[=getMCS,compoundsCluster-method]{compoundsCluster}}.
 }
 
 \code{plotChord} plots a Chord diagram to assess overlapping data.
+
 
 
 
@@ -219,11 +259,13 @@ please refer to the linked method documentation for each generic.
 
 
 
+
 \itemize{
     \item Methods are defined for: \code{\link[=plotEIC,components-method]{components}}, \code{\link[=plotEIC,featureGroups-method]{featureGroups}}.
 }
 
 \code{plotInt} plots the intensity of all contained features.
+
 
 
 
@@ -239,11 +281,13 @@ please refer to the linked method documentation for each generic.
 
 
 
+
 \itemize{
     \item Methods are defined for: \code{\link[=plotSpec,components-method]{components}}, \code{\link[=plotSpec,compounds-method]{compounds}}, \code{\link[=plotSpec,formulaConsensus-method]{formulaConsensus}}.
 }
 
 \code{plotStructure} plots a chemical structure.
+
 
 
 
@@ -259,6 +303,7 @@ please refer to the linked method documentation for each generic.
 
 
 
+
 \itemize{
     \item Methods are defined for: \code{\link[=plotVenn,featureGroups-method]{featureGroups}}, \code{\link[=plotVenn,featureGroupsComparison-method]{featureGroupsComparison}}.
 }
@@ -269,11 +314,13 @@ please refer to the linked method documentation for each generic.
 
 
 
+
 \itemize{
     \item Methods are defined for: \code{\link[=treeCut,componentsIntClust-method]{componentsIntClust}}, \code{\link[=treeCut,compoundsCluster-method]{compoundsCluster}}.
 }
 
 \code{treeCutDynamic} Automatically cut a cluster.
+
 
 
 

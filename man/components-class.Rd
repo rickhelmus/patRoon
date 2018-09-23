@@ -9,9 +9,11 @@
 \alias{componentInfo,components-method}
 \alias{componentInfo}
 \alias{algorithm,components-method}
+\alias{groupNames,components-method}
 \alias{length,components-method}
 \alias{names,components-method}
 \alias{show,components-method}
+\alias{[,components,ANY,ANY,missing-method}
 \alias{findFGroup,components-method}
 \alias{findFGroup}
 \alias{filterBy,components-method}
@@ -26,11 +28,15 @@
 
 \S4method{algorithm}{components}(obj)
 
+\S4method{groupNames}{components}(obj)
+
 \S4method{length}{components}(x)
 
 \S4method{names}{components}(x)
 
 \S4method{show}{components}(object)
+
+\S4method{[}{components,ANY,ANY,missing}(x, i, j, ..., drop = TRUE)
 
 \S4method{findFGroup}{components}(obj, fGroup)
 
@@ -45,6 +51,19 @@
 }
 \arguments{
 \item{obj, object, x}{The \code{component} object.}
+
+\item{i}{Either a numeric, character or logical \code{vector} that is used to select components by their index, name and logical selection, respectively (for the order/names see \code{names()}). If missing all components are selected.}
+
+\item{j}{Either a numeric, character or logical \code{vector} that is used to select feature groups by their index, name and logical selection, respectively (for the order/names see \code{groupNames()}). If missing all feature groups are selected.}
+
+\item{\dots}{For \code{plotEIC}: Further (optional) arguments passed to the
+\code{plotEIC} method for the \code{\link{featureGroups}} class. Note that
+the \code{colourBy}, \code{showPeakArea}, \code{showFGroupRect} and
+\code{topMost} arguments cannot be set as these are set by this method. For
+\code{consensus}: \code{components} objects that should be used to generate
+the consensus.}
+
+\item{drop}{ignored.}
 
 \item{fGroup}{The name (thus a character) of the feature group that should be
 searched for.}
@@ -68,17 +87,17 @@ plotting, otherwise base plot used. For \code{plotSpec}, \code{ggplot2}
 allows nicely repelled text for annotation. However, base plot is generally
 faster.}
 
-\item{\dots}{For \code{plotEIC}: Further (optional) arguments passed to the
-\code{plotEIC} method for the \code{\link{featureGroups}} class. Note that
-the \code{colourBy}, \code{showPeakArea}, \code{showFGroupRect} and
-\code{topMost} arguments cannot be set as these are set by this method. For
-\code{consensus}: \code{components} objects that should be used to generate
-the consensus.}
-
 \item{rtWindow}{Retention window: see the \code{plotEIC} method for the
 \code{\link{featureGroups}} class.}
 }
 \value{
+The subset operator (\code{"["}) and \code{filter} method
+  return the data subset in an object from the \code{componentsReduced}
+  class. This object does not contain any algorithm specific data and as
+  such, algorithm specific methods (\emph{e.g.} \code{treeCut}) will not work
+  on this object. The reason for this is that it is often very difficult or
+  impossible to subset the algorithmic data.
+
 \code{filterBy} returns a filtered \code{\link{featureGroups}}
   object.
 
@@ -105,11 +124,16 @@ Contains data for feature groups that are related in some way. These
 \item \code{algorithm}: Retrieve the algorithm (a character string) used to
 generate components.
 
+\item \code{groupNames}: returns a \code{character} vector with the names of the
+feature groups from which data is present in this object.
+
 \item \code{length}: Obtain total number of components.
 
 \item \code{names}: Obtain the names of all components.
 
 \item \code{show}: Show summary information for this object.
+
+\item \code{[}: Operator to subset on components and/or feature groups.
 
 \item \code{findFGroup}: Returns the component id(s) to which a feature group
 belongs.
@@ -142,3 +166,6 @@ for each component. Use the \code{componentInfo} method for access.}
 the \code{algorithm} method for access.}
 }}
 
+\seealso{
+\link{component-generation} and \code{\link{componentsIntClust}}
+}

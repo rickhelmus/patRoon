@@ -6,20 +6,29 @@
 \alias{MSPeakLists}
 \alias{peakLists,MSPeakLists-method}
 \alias{peakLists}
+\alias{analyses,MSPeakLists-method}
+\alias{groupNames,MSPeakLists-method}
 \alias{algorithm,MSPeakLists-method}
 \alias{length,MSPeakLists-method}
 \alias{show,MSPeakLists-method}
+\alias{[,MSPeakLists,ANY,ANY,missing-method}
 \alias{filter,MSPeakLists-method}
 \alias{filterBy,MSPeakLists-method}
 \title{Class containing MS Peak Lists}
 \usage{
 \S4method{peakLists}{MSPeakLists}(obj)
 
+\S4method{analyses}{MSPeakLists}(obj)
+
+\S4method{groupNames}{MSPeakLists}(obj)
+
 \S4method{algorithm}{MSPeakLists}(obj)
 
 \S4method{length}{MSPeakLists}(x)
 
 \S4method{show}{MSPeakLists}(object)
+
+\S4method{[}{MSPeakLists,ANY,ANY,missing}(x, i, j, ..., drop = TRUE)
 
 \S4method{filter}{MSPeakLists}(obj, absMSIntThr = NULL,
   absMSMSIntThr = NULL, relMSIntThr = NULL, relMSMSIntThr = NULL,
@@ -30,6 +39,12 @@
 }
 \arguments{
 \item{obj, x, object}{The \code{\link{MSPeakLists}} object to access.}
+
+\item{i}{Either a numeric, character or logical \code{vector} that is used to select analyses by their index, name and logical selection, respectively (for the order/names see \code{analyses()}). If missing all analyses are selected.}
+
+\item{j}{Either a numeric, character or logical \code{vector} that is used to select feature groups by their index, name and logical selection, respectively (for the order/names see \code{groupNames()}). If missing all feature groups are selected.}
+
+\item{drop}{ignored.}
 
 \item{absMSIntThr, absMSMSIntThr, relMSIntThr, relMSMSIntThr}{Absolute/relative
 intensity threshold for MS or MS/MS peak lists. \code{NULL} for none.}
@@ -77,12 +92,20 @@ lists generators}.
 \itemize{
 \item \code{peakLists}: Accessor method to obtain the MS peak lists.
 
+\item \code{analyses}: returns a \code{character} vector with the names of the
+analyses from which data is present in this object.
+
+\item \code{groupNames}: returns a \code{character} vector with the names of the
+feature groups from which data is present in this object.
+
 \item \code{algorithm}: Retrieve the algorithm (a character string) used to
 generate the MS peak lists.
 
 \item \code{length}: Obtain total number of \emph{m/z} values.
 
 \item \code{show}: Shows summary information for this object.
+
+\item \code{[}: Operator to subset on analyses and/or feature groups.
 
 \item \code{filter}: provides post filtering of generated MS
 peak lists, which may further enhance quality of subsequent workflow steps

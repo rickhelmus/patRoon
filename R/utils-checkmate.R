@@ -122,6 +122,18 @@ checkSubsetArg <- function(x)
 }
 assertSubsetArg <- checkmate::makeAssertionFunction(checkSubsetArg)
 
+# used for "[[" methods
+checkExtractArg <- function(x)
+{
+    ret <- checkmate::checkInt(x, lower = 0)
+    if (!isTRUE(ret))
+        ret <- checkmate::checkString(x)
+    if (!isTRUE(ret))
+        ret <- "Should be valid numeric or character skalar"
+    return(ret)
+}
+assertExtractArg <- checkmate::makeAssertionFunction(checkExtractArg)
+
 # from https://github.com/mllg/checkmate/issues/115
 aapply = function(fun, formula, ..., fixed = list())
 {

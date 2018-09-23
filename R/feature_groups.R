@@ -158,6 +158,21 @@ setMethod("[", c("featureGroups", "ANY", "ANY", "missing"), function(x, i, j, ..
     return(removeEmptyGroups(x))
 })
 
+#' @describeIn featureGroups Extraction operator
+#' @export
+setMethod("[[", c("featureGroups", "numChar", "ANY"), function(x, i, j, ...)
+{
+    assertExtractArg(i)
+    
+    if (missing(j))
+        return(x@groups[[i]])
+
+    assertExtractArg(j)
+    if (is.character(i))
+        i <- match(i, analyses(x))
+    return(x@groups[[i, j]])
+})
+
 
 setMethod("removeEmptyGroups", "featureGroups", function(fGroups)
 {

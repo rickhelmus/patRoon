@@ -47,6 +47,9 @@ NULL
 setOldClass("hclust")
 setOldClass("dissimilarity")
 
+# for method signatures
+setClassUnion("numChar", c("numeric", "character"))
+
 #### Generics
 
 #' @include generics.R

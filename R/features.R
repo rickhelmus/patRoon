@@ -85,14 +85,14 @@ setMethod("filter", "features", function(obj, intensityThreshold = NULL)
 #' @templateVar class features
 #' @templateVar whati analyses
 #' @templateVar orderi analyses()
-#' @template extr_op-args
+#' @template sub_op-args
 #'
 #' @export
 setMethod("[", c("features", "ANY", "missing", "missing"), function(x, i, ...)
 {
     if (!missing(i))
     {
-        assertExtractArg(i)
+        assertSubsetArg(i)
     
         if (!is.character(i))
             i <- analyses(x)[i]

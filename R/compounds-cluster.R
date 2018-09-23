@@ -115,14 +115,14 @@ setMethod("show", "compoundsCluster", function(object)
 #' @templateVar class compoundsCluster
 #' @templateVar whati feature groups
 #' @templateVar orderi groupNames()
-#' @template extr_op-args
+#' @template sub_op-args
 #'
 #' @export
 setMethod("[", c("compoundsCluster", "ANY", "missing", "missing"), function(x, i, ...)
 {
     if (!missing(i))
     {
-        assertExtractArg(i)
+        assertSubsetArg(i)
         
         if (!is.character(i))
             i <- groupNames(x)[i]

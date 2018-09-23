@@ -130,15 +130,15 @@ setMethod("removeGroups", "featureGroups", function(fGroups, indices)
 #' @templateVar orderi analyses()
 #' @templateVar whatj feature groups
 #' @templateVar orderj names()
-#' @template extr_op-args
+#' @template sub_op-args
 #'
 #' @export
 setMethod("[", c("featureGroups", "ANY", "ANY", "missing"), function(x, i, j, ...)
 {
     if (!missing(i))
-        assertExtractArg(i)
+        assertSubsetArg(i)
     if (!missing(j))
-        assertExtractArg(j)
+        assertSubsetArg(j)
     
     toNumIndex <- function(ind, names)
     {

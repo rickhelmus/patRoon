@@ -26,7 +26,7 @@ NULL
 #'   \code{consensus}: \code{components} objects that should be used to generate
 #'   the consensus.
 #'
-#' @return The subset/extract operator (\code{"["}) and \code{filter} method
+#' @return The subset operator (\code{"["}) and \code{filter} method
 #'   return the data subset in an object from the \code{componentsReduced}
 #'   class. This object does not contain any algorithm specific data and as
 #'   such, algorithm specific methods (\emph{e.g.} \code{treeCut}) will not work
@@ -101,15 +101,15 @@ setMethod("show", "components", function(object)
 #' @templateVar orderi names()
 #' @templateVar whatj feature groups
 #' @templateVar orderj groupNames()
-#' @template extr_op-args
+#' @template sub_op-args
 #'
 #' @export
 setMethod("[", c("components", "ANY", "ANY", "missing"), function(x, i, j, ...)
 {
     if (!missing(i))
-        assertExtractArg(i)
+        assertSubsetArg(i)
     if (!missing(j))
-        assertExtractArg(j)
+        assertSubsetArg(j)
     
     # non-existing indices result in NULL values --> prune
     

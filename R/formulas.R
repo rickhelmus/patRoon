@@ -85,15 +85,15 @@ setMethod("show", "formulas", function(object)
 #' @templateVar orderi analyses()
 #' @templateVar whatj feature groups
 #' @templateVar orderj groupNames()
-#' @template extr_op-args
+#' @template sub_op-args
 #'
 #' @export
 setMethod("[", c("formulas", "ANY", "ANY", "missing"), function(x, i, j, ...)
 {
     if (!missing(i))
-        assertExtractArg(i)
+        assertSubsetArg(i)
     if (!missing(j))
-        assertExtractArg(j)
+        assertSubsetArg(j)
     
     # non-existing indices result in NULL values --> prune
     
@@ -338,13 +338,13 @@ setMethod("show", "formulaConsensus", function(object)
 #' @templateVar class formulaConsensus
 #' @templateVar whati feature groups
 #' @templateVar orderi groupNames()
-#' @template extr_op-args
+#' @template sub_op-args
 #'
 #' @export
 setMethod("[", c("formulaConsensus", "ANY", "missing", "missing"), function(x, i, ...)
 {
     if (!missing(i))
-        assertExtractArg(i)
+        assertSubsetArg(i)
     
     # non-existing indices result in NULL values --> prune
     

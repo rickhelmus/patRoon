@@ -35,14 +35,14 @@ setMethod("length", "featureGroupsComparison", function(x) length(x@fGroupsList)
 #' @templateVar class featureGroupsComparison
 #' @templateVar whati labels
 #' @templateVar orderi names()
-#' @template extr_op-args
+#' @template sub_op-args
 #'
 #' @export
 setMethod("[", c("featureGroupsComparison", "ANY", "missing", "missing"), function(x, i, ...)
 {
     if (!missing(i))
     {
-        assertExtractArg(i)
+        assertSubsetArg(i)
         
         if (!is.character(i))
             i <- names(x)[i]

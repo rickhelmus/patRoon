@@ -16,10 +16,12 @@ NULL
 #'   grouped feature groups.
 #'
 #' @param x A \code{featureGroupsComparison} object.
-#' @param i Character, numeric or logical vector used for subsetting (analogous
-#'   to a \code{list}).
-#' @param j,drop Not used. Should be ignored.
 #'
+#' @templateVar seli labels
+#' @templateVar selOrderi names()
+#' @templateVar dollarOpName label
+#' @template sub_op-args
+
 #' @export
 featureGroupsComparison <- setClass("featureGroupsComparison",
                                     slots = c(fGroupsList = "list", comparedFGroups = "featureGroups"))
@@ -32,11 +34,7 @@ setMethod("names", "featureGroupsComparison", function(x) names(x@fGroupsList))
 #' @export
 setMethod("length", "featureGroupsComparison", function(x) length(x@fGroupsList))
 
-#' @templateVar class featureGroupsComparison
-#' @templateVar whati labels
-#' @templateVar orderi names()
-#' @template sub_op-args
-#'
+#' @describeIn featureGroupsComparison Subset on labels that were assigned to compared feature groups.
 #' @export
 setMethod("[", c("featureGroupsComparison", "ANY", "missing", "missing"), function(x, i, ...)
 {
@@ -53,6 +51,21 @@ setMethod("[", c("featureGroupsComparison", "ANY", "missing", "missing"), functi
     }
     
     return(x)
+})
+
+#' @describeIn featureGroupsComparison Extract a \code{\link{featureGroups}} object by its label.
+#' @export
+setMethod("[[", c("featureGroupsComparison", "numChar", "missing"), function(x, i, j)
+{
+    assertExtractArg(i)
+    return(x@fGroupsList[[i]])
+})
+
+#' @describeIn featureGroupsComparison Extract a compound table for a feature group.
+#' @export
+setMethod("$", "featureGroupsComparison", function(x, name)
+{
+    eval(substitute(x@fGroupsList$NAME_ARG, list(NAME_ARG = name)))
 })
 
 #' Comparing feature groups

@@ -11,6 +11,8 @@
 \alias{analyses,features-method}
 \alias{filter,features-method}
 \alias{[,features,ANY,missing,missing-method}
+\alias{[[,features,numChar,missing-method}
+\alias{$,features-method}
 \title{Base features class}
 \usage{
 \S4method{length}{features}(x)
@@ -26,15 +28,21 @@
 \S4method{filter}{features}(obj, intensityThreshold = NULL)
 
 \S4method{[}{features,ANY,missing,missing}(x, i, j, ..., drop = TRUE)
+
+\S4method{[[}{features,numChar,missing}(x, i)
+
+\S4method{$}{features}(x, name)
 }
 \arguments{
 \item{obj, x, object}{\code{features} object to be accessed}
 
-\item{i}{Either a numeric, character or logical \code{vector} that is used to select analyses by their index, name and logical selection, respectively (for the order/names see \code{analyses()}). If missing all analyses are selected.}
+\item{i}{A numeric or character value which is used to select analyses by
+their index or name, respectively (for the order/names see \code{analyses()}).\cr\cr For \code{[}: Can also be logical to perform logical selection
+(similar to regular vectors). If missing all analyses are selected.\cr\cr For \code{[[}: should be a skalar value.}
 
-\item{j}{ignored.}
+\item{drop, j}{ignored.}
 
-\item{drop}{ignored.}
+\item{name}{The analysis name (partially matched).}
 }
 \value{
 \code{featureTable}: A \code{list} containing a
@@ -71,7 +79,11 @@ analyses from which data is present in this object.
 \item \code{filter}: Performs common rule based filtering on of features,
 such as intensity thresholds.
 
-\item \code{[}: Operator to subset on analyses .
+\item \code{[}: Subset on analyses.
+
+\item \code{[[}: Extract a feature table for an analysis.
+
+\item \code{$}: Extract a feature table for an analysis.
 }}
 
 \section{Slots}{

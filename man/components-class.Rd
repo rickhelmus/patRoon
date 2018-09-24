@@ -14,6 +14,8 @@
 \alias{names,components-method}
 \alias{show,components-method}
 \alias{[,components,ANY,ANY,missing-method}
+\alias{[[,components,numChar,ANY-method}
+\alias{$,components-method}
 \alias{findFGroup,components-method}
 \alias{findFGroup}
 \alias{filterBy,components-method}
@@ -38,6 +40,10 @@
 
 \S4method{[}{components,ANY,ANY,missing}(x, i, j, ..., drop = TRUE)
 
+\S4method{[[}{components,numChar,ANY}(x, i, j)
+
+\S4method{$}{components}(x, name)
+
 \S4method{findFGroup}{components}(obj, fGroup)
 
 \S4method{filterBy}{components}(obj, fGroups, negate, index = NULL)
@@ -52,9 +58,9 @@
 \arguments{
 \item{obj, object, x}{The \code{component} object.}
 
-\item{i}{Either a numeric, character or logical \code{vector} that is used to select components by their index, name and logical selection, respectively (for the order/names see \code{names()}). If missing all components are selected.}
-
-\item{j}{Either a numeric, character or logical \code{vector} that is used to select feature groups by their index, name and logical selection, respectively (for the order/names see \code{groupNames()}). If missing all feature groups are selected.}
+\item{i, j}{A numeric or character value which is used to select components/feature groups by
+their index or name, respectively (for the order/names see \code{names()/groupNames()}).\cr\cr For \code{[}: Can also be logical to perform logical selection
+(similar to regular vectors). If missing all components/feature groups are selected.\cr\cr For \code{[[}: should be a skalar value. \code{j} is optional.}
 
 \item{\dots}{For \code{plotEIC}: Further (optional) arguments passed to the
 \code{plotEIC} method for the \code{\link{featureGroups}} class. Note that
@@ -64,6 +70,8 @@ the \code{colourBy}, \code{showPeakArea}, \code{showFGroupRect} and
 the consensus.}
 
 \item{drop}{ignored.}
+
+\item{name}{The component name (partially matched).}
 
 \item{fGroup}{The name (thus a character) of the feature group that should be
 searched for.}
@@ -133,7 +141,11 @@ feature groups from which data is present in this object.
 
 \item \code{show}: Show summary information for this object.
 
-\item \code{[}: Operator to subset on components and/or feature groups.
+\item \code{[}: Subset on components/feature groups.
+
+\item \code{[[}: Extracts a component table, optionally filtered by a feature group.
+
+\item \code{$}: Extracts a component table by component name.
 
 \item \code{findFGroup}: Returns the component id(s) to which a feature group
 belongs.

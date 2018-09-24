@@ -23,6 +23,11 @@ NULL
 #'   \samp{-1} may be specified to these methods to select all candidates. When
 #'   multiple indices are specified for \code{plotStructure}, their maximum
 #'   common substructure will be drawn.
+#' 
+#' @templateVar seli feature groups
+#' @templateVar selOrderi groupNames()
+#' @templateVar dollarOpName feature group
+#' @template sub_op-args
 #'
 #' @return \code{plotSpec} and \code{plotStructure} will return a
 #'   \code{\link[=ggplot2]{ggplot object}} if \code{useGGPlot2} is \code{TRUE}.
@@ -84,11 +89,7 @@ setMethod("show", "compounds", function(object)
     showObjectSize(object)
 })
 
-#' @templateVar class compounds
-#' @templateVar whati feature groups
-#' @templateVar orderi groupNames()
-#' @template sub_op-args
-#'
+#' @describeIn compounds Subset on feature groups.
 #' @export
 setMethod("[", c("compounds", "ANY", "missing", "missing"), function(x, i, ...)
 {
@@ -104,6 +105,21 @@ setMethod("[", c("compounds", "ANY", "missing", "missing"), function(x, i, ...)
     }
     
     return(x)
+})
+
+#' @describeIn compounds Extract a compound table for a feature group.
+#' @export
+setMethod("[[", c("compounds", "numChar", "missing"), function(x, i, j)
+{
+    assertExtractArg(i)
+    return(x@compounds[[i]])
+})
+
+#' @describeIn compounds Extract a compound table for a feature group.
+#' @export
+setMethod("$", "compounds", function(x, name)
+{
+    eval(substitute(x@compounds$NAME_ARG, list(NAME_ARG = name)))
 })
 
 #' @describeIn compounds Returns a list containing for each feature group a

@@ -10,6 +10,8 @@
 \alias{length,formulaConsensus-method}
 \alias{show,formulaConsensus-method}
 \alias{[,formulaConsensus,ANY,missing,missing-method}
+\alias{[[,formulaConsensus,numChar,missing-method}
+\alias{$,formulaConsensus-method}
 \alias{filterBy,formulaConsensus-method}
 \alias{plotSpec,formulaConsensus-method}
 \title{Formula consensus class}
@@ -27,6 +29,10 @@
 \S4method{[}{formulaConsensus,ANY,missing,missing}(x, i, j, ...,
   drop = TRUE)
 
+\S4method{[[}{formulaConsensus,numChar,missing}(x, i, j)
+
+\S4method{$}{formulaConsensus}(x, name)
+
 \S4method{filterBy}{formulaConsensus}(obj, fGroups, negate)
 
 \S4method{plotSpec}{formulaConsensus}(obj, precursor, groupName,
@@ -35,11 +41,13 @@
 \arguments{
 \item{obj, x, object}{The \code{formulaConsensus} object.}
 
-\item{i}{Either a numeric, character or logical \code{vector} that is used to select feature groups by their index, name and logical selection, respectively (for the order/names see \code{groupNames()}). If missing all feature groups are selected.}
+\item{i}{A numeric or character value which is used to select feature groups by
+their index or name, respectively (for the order/names see \code{groupNames()}).\cr\cr For \code{[}: Can also be logical to perform logical selection
+(similar to regular vectors). If missing all feature groups are selected.\cr\cr For \code{[[}: should be a skalar value.}
 
-\item{j}{ignored.}
+\item{drop, j}{ignored.}
 
-\item{drop}{ignored.}
+\item{name}{The feature group name (partially matched).}
 
 \item{fGroups}{A \code{\link{featureGroups}} object which should be filtered.}
 
@@ -91,7 +99,11 @@ feature groups from which data is present in this object.
 
 \item \code{show}: Show summary information for this object.
 
-\item \code{[}: Operator to subset on feature groups .
+\item \code{[}: Subset on feature groups.
+
+\item \code{[[}: Extract formula information a feature group.
+
+\item \code{$}: Extract formula information a feature group.
 
 \item \code{filterBy}: Only keep feature groups in a given
 \code{\link{featureGroups}} object that are also present in the specified

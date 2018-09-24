@@ -26,6 +26,14 @@ NULL
 #'   \code{consensus}: \code{components} objects that should be used to generate
 #'   the consensus.
 #'
+#' @templateVar seli components
+#' @templateVar selOrderi names()
+#' @templateVar selj feature groups
+#' @templateVar selOrderj groupNames()
+#' @templateVar optionalj TRUE
+#' @templateVar dollarOpName component
+#' @template sub_op-args
+#'
 #' @return The subset operator (\code{"["}) and \code{filter} method
 #'   return the data subset in an object from the \code{componentsReduced}
 #'   class. This object does not contain any algorithm specific data and as
@@ -96,13 +104,7 @@ setMethod("show", "components", function(object)
     showObjectSize(object)
 })
 
-#' @templateVar class components
-#' @templateVar whati components
-#' @templateVar orderi names()
-#' @templateVar whatj feature groups
-#' @templateVar orderj groupNames()
-#' @template sub_op-args
-#'
+#' @describeIn components Subset on components/feature groups.
 #' @export
 setMethod("[", c("components", "ANY", "ANY", "missing"), function(x, i, j, ...)
 {
@@ -137,6 +139,28 @@ setMethod("[", c("components", "ANY", "ANY", "missing"), function(x, i, j, ...)
     }
 
     return(componentsReduced(components = x@components, componentInfo = x@componentInfo, algorithm = "reduced"))
+})
+
+#' @describeIn components Extracts a component table, optionally filtered by a feature group.
+#' @export
+setMethod("[[", c("components", "numChar", "ANY"), function(x, i, j)
+{
+    assertExtractArg(i)
+    
+    if (missing(j))
+        return(x@components[[i]])
+    
+    assertExtractArg(j)
+    if (!is.character(j))
+        j <- groupNames(x)[j]
+    return(x@components[[i]][group == j])
+})
+
+#' @describeIn components Extracts a component table by component name.
+#' @export
+setMethod("$", "components", function(x, name)
+{
+    eval(substitute(x@components$NAME_ARG, list(NAME_ARG = name)))
 })
 
 #' @describeIn components Returns the component id(s) to which a feature group

@@ -14,6 +14,12 @@ NULL
 #'   the \code{algorithm} method for access.
 #'
 #' @param obj,x,object,formulas The \code{formulas} object.
+#' 
+#' @templateVar seli analyses
+#' @templateVar selOrderi analyses()
+#' @templateVar selj feature groups
+#' @templateVar selOrderj groupNames()
+#' @template sub_op-args
 #'
 #' @seealso \code{\link{formulaConsensus}}
 #' 
@@ -80,13 +86,7 @@ setMethod("show", "formulas", function(object)
     showObjectSize(object)
 })
 
-#' @templateVar class formulas
-#' @templateVar whati analyses
-#' @templateVar orderi analyses()
-#' @templateVar whatj feature groups
-#' @templateVar orderj groupNames()
-#' @template sub_op-args
-#'
+#' @describeIn formulas Subset on analyses/feature groups.
 #' @export
 setMethod("[", c("formulas", "ANY", "ANY", "missing"), function(x, i, j, ...)
 {
@@ -117,6 +117,21 @@ setMethod("[", c("formulas", "ANY", "ANY", "missing"), function(x, i, j, ...)
     }
     
     return(x)
+})
+
+#' @describeIn formulas Extract a formula table from a specified analysis/feature group.
+#' @export
+setMethod("[[", c("formulas", "numChar", "numChar"), function(x, i, j)
+{
+    assertExtractArg(i)
+    assertExtractArg(j)
+    
+    if (!is.character(i))
+        i <- analyses(x)[i]
+    if (!is.character(j))
+        j <- groupNames(x)[j]
+    
+    return(x@formulas[[c(i, j)]])
 })
 
 #' @describeIn formulas Generates a consensus and other summarizing data for
@@ -289,7 +304,12 @@ setMethod("consensus", "formulas", function(obj, ..., fGroups, formAnaThreshold 
 #'   the \code{algorithm} method for access.
 #'
 #' @param obj,x,object The \code{formulaConsensus} object.
-#'
+#' 
+#' @templateVar seli feature groups
+#' @templateVar selOrderi groupNames()
+#' @templateVar dollarOpName feature group
+#' @template sub_op-args
+#' 
 #' @seealso \code{\link{formulas}}
 #' 
 #' @export
@@ -335,18 +355,12 @@ setMethod("show", "formulaConsensus", function(object)
     showObjectSize(object)
 })
 
-#' @templateVar class formulaConsensus
-#' @templateVar whati feature groups
-#' @templateVar orderi groupNames()
-#' @template sub_op-args
-#'
+#' @describeIn formulaConsensus Subset on feature groups.
 #' @export
 setMethod("[", c("formulaConsensus", "ANY", "missing", "missing"), function(x, i, ...)
 {
     if (!missing(i))
         assertSubsetArg(i)
-    
-    # non-existing indices result in NULL values --> prune
     
     if (!missing(i))
     {
@@ -356,6 +370,23 @@ setMethod("[", c("formulaConsensus", "ANY", "missing", "missing"), function(x, i
     }
     
     return(x)
+})
+
+#' @describeIn formulaConsensus Extract formula information a feature group.
+#' @export
+setMethod("[[", c("formulaConsensus", "numChar", "missing"), function(x, i, j)
+{
+    assertExtractArg(i)
+    if (!is.character(i))
+        i <- groupNames(x)[i]
+    return(x@formulas[group == i])
+})
+
+#' @describeIn formulaConsensus Extract formula information a feature group.
+#' @export
+setMethod("$", "formulaConsensus", function(x, name)
+{
+    eval(substitute(x@formulas[group == NAME_ARG], list(NAME_ARG = name)))
 })
 
 #' @templateVar class formulaConsensus

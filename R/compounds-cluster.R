@@ -45,6 +45,11 @@ NULL
 #' @param groupName A character specifying the feature group name.
 #' @param cluster A numeric value specifying the cluster.
 #'
+#' @templateVar seli feature groups
+#' @templateVar selOrderi groupNames()
+#' @templateVar noextract TRUE
+#' @template sub_op-args
+#'
 #' @return \code{cutTree} and \code{cutTreeDynamic} return the modified
 #'   \code{compoundsCluster} object.
 #'
@@ -112,11 +117,7 @@ setMethod("show", "compoundsCluster", function(object)
     showObjectSize(object)
 })
 
-#' @templateVar class compoundsCluster
-#' @templateVar whati feature groups
-#' @templateVar orderi groupNames()
-#' @template sub_op-args
-#'
+#' @describeIn compounds Subset on feature groups.
 #' @export
 setMethod("[", c("compoundsCluster", "ANY", "missing", "missing"), function(x, i, ...)
 {

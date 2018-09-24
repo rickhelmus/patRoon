@@ -7,6 +7,8 @@
 \alias{names,featureGroupsComparison-method}
 \alias{length,featureGroupsComparison-method}
 \alias{[,featureGroupsComparison,ANY,missing,missing-method}
+\alias{[[,featureGroupsComparison,numChar,missing-method}
+\alias{$,featureGroupsComparison-method}
 \title{Feature groups comparison class}
 \usage{
 \S4method{names}{featureGroupsComparison}(x)
@@ -15,20 +17,21 @@
 
 \S4method{[}{featureGroupsComparison,ANY,missing,missing}(x, i, j, ...,
   drop = TRUE)
+
+\S4method{[[}{featureGroupsComparison,numChar,missing}(x, i, j)
+
+\S4method{$}{featureGroupsComparison}(x, name)
 }
 \arguments{
 \item{x}{A \code{featureGroupsComparison} object.}
 
-\item{i}{Character, numeric or logical vector used for subsetting (analogous
-to a \code{list}).}
+\item{i}{A numeric or character value which is used to select labels by
+their index or name, respectively (for the order/names see \code{names()}).\cr\cr For \code{[}: Can also be logical to perform logical selection
+(similar to regular vectors). If missing all labels are selected.\cr\cr For \code{[[}: should be a skalar value.}
 
-\item{j, drop}{Not used. Should be ignored.}
+\item{drop, j}{ignored.}
 
-\item{drop}{ignored.}
-
-\item{i}{Either a numeric, character or logical \code{vector} that is used to select labels by their index, name and logical selection, respectively (for the order/names see \code{names()}). If missing all labels are selected.}
-
-\item{j}{ignored.}
+\item{name}{The label name (partially matched).}
 }
 \description{
 This class is used for comparing different \code{\link{featureGroups}}
@@ -43,7 +46,11 @@ Objects from this class are returned by \code{\link{comparison}}.
 
 \item \code{length}: Number of feature groups objects that were compared.
 
-\item \code{[}: Operator to subset on labels .
+\item \code{[}: Subset on labels that were assigned to compared feature groups.
+
+\item \code{[[}: Extract a \code{\link{featureGroups}} object by its label.
+
+\item \code{$}: Extract a compound table for a feature group.
 }}
 
 \section{Slots}{

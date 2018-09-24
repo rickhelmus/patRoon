@@ -21,6 +21,7 @@
 \alias{groupFeatIndex}
 \alias{[,featureGroups,ANY,ANY,missing-method}
 \alias{[[,featureGroups,numChar,ANY-method}
+\alias{$,featureGroups-method}
 \alias{export,featureGroups-method}
 \alias{export}
 \alias{groupTable,featureGroups-method}
@@ -61,7 +62,9 @@
 
 \S4method{[}{featureGroups,ANY,ANY,missing}(x, i, j, ..., drop = TRUE)
 
-\S4method{[[}{featureGroups,numChar,ANY}(x, i, j, ...)
+\S4method{[[}{featureGroups,numChar,ANY}(x, i, j)
+
+\S4method{$}{featureGroups}(x, name)
 
 \S4method{export}{featureGroups}(fGroups, type, out)
 
@@ -94,9 +97,9 @@
 \arguments{
 \item{fGroups, obj, x, object}{\code{featureGroups} object to be accessed.}
 
-\item{i}{Either a numeric, character or logical \code{vector} that is used to select analyses by their index, name and logical selection, respectively (for the order/names see \code{analyses()}). If missing all analyses are selected.}
-
-\item{j}{Either a numeric, character or logical \code{vector} that is used to select feature groups by their index, name and logical selection, respectively (for the order/names see \code{names()}). If missing all feature groups are selected.}
+\item{i, j}{A numeric or character value which is used to select analyses/feature groups by
+their index or name, respectively (for the order/names see \code{analyses()/names()}).\cr\cr For \code{[}: Can also be logical to perform logical selection
+(similar to regular vectors). If missing all analyses/feature groups are selected.\cr\cr For \code{[[}: should be a skalar value. If \code{j} is not specified, \code{i} selects by feature groups instead.}
 
 \item{\dots}{Ignored for \code{"["} operator or passed to
 \code{\link[graphics]{plot}} (\code{plot}, \code{plotInt} and
@@ -104,6 +107,8 @@
 (\code{plotVenn}) or \code{\link{chordDiagram}} (\code{plotChord}).}
 
 \item{drop}{ignored.}
+
+\item{name}{The feature group name (partially matched).}
 
 \item{type}{Which file type should be exported: \code{"brukerpa"} (Bruker
 ProfileAnalysis), \code{"brukertasq"} (Bruker TASQ) or \code{"mzmine"}
@@ -242,9 +247,11 @@ analyses from which data is present in this object.
 
 \item \code{groupFeatIndex}: Accessor for \code{ftindex} slot.
 
-\item \code{[}: Operator to subset on analyses and/or feature groups.
+\item \code{[}: Subset on analyses/feature groups.
 
-\item \code{[[}: Extraction operator
+\item \code{[[}: Extract intensity values.
+
+\item \code{$}: Extract intensity values for a feature group.
 
 \item \code{export}: Exports feature groups to a \file{.csv} file that
 is readable to Bruker ProfileAnalysis (a 'bucket table'), Bruker TASQ (an

@@ -12,6 +12,7 @@
 \alias{length,MSPeakLists-method}
 \alias{show,MSPeakLists-method}
 \alias{[,MSPeakLists,ANY,ANY,missing-method}
+\alias{[[,MSPeakLists,numChar,numChar-method}
 \alias{filter,MSPeakLists-method}
 \alias{filterBy,MSPeakLists-method}
 \title{Class containing MS Peak Lists}
@@ -30,6 +31,8 @@
 
 \S4method{[}{MSPeakLists,ANY,ANY,missing}(x, i, j, ..., drop = TRUE)
 
+\S4method{[[}{MSPeakLists,numChar,numChar}(x, i, j)
+
 \S4method{filter}{MSPeakLists}(obj, absMSIntThr = NULL,
   absMSMSIntThr = NULL, relMSIntThr = NULL, relMSMSIntThr = NULL,
   topMSPeaks = NULL, topMSMSPeaks = NULL, deIsotopeMS = FALSE,
@@ -40,9 +43,9 @@
 \arguments{
 \item{obj, x, object}{The \code{\link{MSPeakLists}} object to access.}
 
-\item{i}{Either a numeric, character or logical \code{vector} that is used to select analyses by their index, name and logical selection, respectively (for the order/names see \code{analyses()}). If missing all analyses are selected.}
-
-\item{j}{Either a numeric, character or logical \code{vector} that is used to select feature groups by their index, name and logical selection, respectively (for the order/names see \code{groupNames()}). If missing all feature groups are selected.}
+\item{i, j}{A numeric or character value which is used to select analyses/feature groups by
+their index or name, respectively (for the order/names see \code{analyses()/groupNames()}).\cr\cr For \code{[}: Can also be logical to perform logical selection
+(similar to regular vectors). If missing all analyses/feature groups are selected.\cr\cr For \code{[[}: should be a skalar value.}
 
 \item{drop}{ignored.}
 
@@ -105,7 +108,9 @@ generate the MS peak lists.
 
 \item \code{show}: Shows summary information for this object.
 
-\item \code{[}: Operator to subset on analyses and/or feature groups.
+\item \code{[}: Subset on analyses/feature groups.
+
+\item \code{[[}: Extract a list with MS and MS/MS (if available) peak lists.
 
 \item \code{filter}: provides post filtering of generated MS
 peak lists, which may further enhance quality of subsequent workflow steps

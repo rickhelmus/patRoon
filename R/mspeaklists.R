@@ -14,6 +14,12 @@ NULL
 #' @slot algorithm The algorithm that was used to generate the MS peak lists.
 #'   Use the \code{algorithm} method for access.
 #'
+#' @templateVar seli analyses
+#' @templateVar selOrderi analyses()
+#' @templateVar selj feature groups
+#' @templateVar selOrderj groupNames()
+#' @template sub_op-args
+#'
 #' @param obj,x,object The \code{\link{MSPeakLists}} object to access.
 #' @export
 MSPeakLists <- setClass("MSPeakLists",
@@ -94,13 +100,7 @@ setMethod("show", "MSPeakLists", function(object)
     showObjectSize(object)
 })
 
-#' @templateVar class MSPeakLists
-#' @templateVar whati analyses
-#' @templateVar orderi analyses()
-#' @templateVar whatj feature groups
-#' @templateVar orderj groupNames()
-#' @template sub_op-args
-#'
+#' @describeIn MSPeakLists Subset on analyses/feature groups.
 #' @export
 setMethod("[", c("MSPeakLists", "ANY", "ANY", "missing"), function(x, i, j, ...)
 {
@@ -131,6 +131,21 @@ setMethod("[", c("MSPeakLists", "ANY", "ANY", "missing"), function(x, i, j, ...)
     }
     
     return(x)
+})
+
+#' @describeIn MSPeakLists Extract a list with MS and MS/MS (if available) peak lists.
+#' @export
+setMethod("[[", c("MSPeakLists", "numChar", "numChar"), function(x, i, j)
+{
+    assertExtractArg(i)
+    assertExtractArg(j)
+    
+    if (!is.character(i))
+        i <- analyses(x)[i]
+    if (!is.character(j))
+        j <- groupNames(x)[j]
+    
+    return(x@peakLists[[c(i, j)]])
 })
 
 #' @describeIn MSPeakLists provides post filtering of generated MS

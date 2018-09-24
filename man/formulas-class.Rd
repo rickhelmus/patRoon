@@ -11,6 +11,7 @@
 \alias{length,formulas-method}
 \alias{show,formulas-method}
 \alias{[,formulas,ANY,ANY,missing-method}
+\alias{[[,formulas,numChar,numChar-method}
 \alias{consensus,formulas-method}
 \title{Formula lists class}
 \usage{
@@ -28,6 +29,8 @@
 
 \S4method{[}{formulas,ANY,ANY,missing}(x, i, j, ..., drop = TRUE)
 
+\S4method{[[}{formulas,numChar,numChar}(x, i, j)
+
 \S4method{consensus}{formulas}(obj, ..., fGroups,
   formAnaThreshold = 0.75, formListThreshold = 0, maxFormulas = 10,
   maxFragFormulas = 10, minIntensity = NULL, maxIntensity = NULL,
@@ -37,9 +40,9 @@
 \arguments{
 \item{obj, x, object, formulas}{The \code{formulas} object.}
 
-\item{i}{Either a numeric, character or logical \code{vector} that is used to select analyses by their index, name and logical selection, respectively (for the order/names see \code{analyses()}). If missing all analyses are selected.}
-
-\item{j}{Either a numeric, character or logical \code{vector} that is used to select feature groups by their index, name and logical selection, respectively (for the order/names see \code{groupNames()}). If missing all feature groups are selected.}
+\item{i, j}{A numeric or character value which is used to select analyses/feature groups by
+their index or name, respectively (for the order/names see \code{analyses()/groupNames()}).\cr\cr For \code{[}: Can also be logical to perform logical selection
+(similar to regular vectors). If missing all analyses/feature groups are selected.\cr\cr For \code{[[}: should be a skalar value.}
 
 \item{\dots}{Any further \code{formulas} objects on top of the object given
 for the \code{obj} parameter to which a consensus should be generated.
@@ -118,7 +121,9 @@ feature groups from which data is present in this object.
 
 \item \code{show}: Show summary information for this object.
 
-\item \code{[}: Operator to subset on analyses and/or feature groups.
+\item \code{[}: Subset on analyses/feature groups.
+
+\item \code{[[}: Extract a formula table from a specified analysis/feature group.
 
 \item \code{consensus}: Generates a consensus and other summarizing data for
 formulae of feature groups that are present in multiple analyses.

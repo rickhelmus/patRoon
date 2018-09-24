@@ -23,6 +23,14 @@ NULL
 #' @param average Average data within replicate groups.
 #' @param which A character vector with replicate groups used for comparison.
 #'
+#' @templateVar seli analyses
+#' @templateVar selOrderi analyses()
+#' @templateVar selj feature groups
+#' @templateVar selOrderj names()
+#' @templateVar optionalji TRUE
+#' @templateVar dollarOpName feature group
+#' @template sub_op-args
+#' 
 #' @slot groups Matrix (\code{\link{data.table}}) with intensities for each
 #'   feature group (columns) per analysis (rows). Access with \code{groups}
 #'   method.
@@ -125,13 +133,7 @@ setMethod("removeGroups", "featureGroups", function(fGroups, indices)
     return(fGroups)
 })
 
-#' @templateVar class featureGroups
-#' @templateVar whati analyses
-#' @templateVar orderi analyses()
-#' @templateVar whatj feature groups
-#' @templateVar orderj names()
-#' @template sub_op-args
-#'
+#' @describeIn featureGroups Subset on analyses/feature groups.
 #' @export
 setMethod("[", c("featureGroups", "ANY", "ANY", "missing"), function(x, i, j, ...)
 {
@@ -158,9 +160,9 @@ setMethod("[", c("featureGroups", "ANY", "ANY", "missing"), function(x, i, j, ..
     return(removeEmptyGroups(x))
 })
 
-#' @describeIn featureGroups Extraction operator
+#' @describeIn featureGroups Extract intensity values.
 #' @export
-setMethod("[[", c("featureGroups", "numChar", "ANY"), function(x, i, j, ...)
+setMethod("[[", c("featureGroups", "numChar", "ANY"), function(x, i, j)
 {
     assertExtractArg(i)
     
@@ -173,6 +175,12 @@ setMethod("[[", c("featureGroups", "numChar", "ANY"), function(x, i, j, ...)
     return(x@groups[[i, j]])
 })
 
+#' @describeIn featureGroups Extract intensity values for a feature group.
+#' @export
+setMethod("$", "featureGroups", function(x, name)
+{
+    eval(substitute(x@groups$NAME_ARG, list(NAME_ARG = name)))
+})
 
 setMethod("removeEmptyGroups", "featureGroups", function(fGroups)
 {

@@ -19,6 +19,12 @@ NULL
 #'   \code{featureTable} method for access.
 #' @slot analysisInfo Analysis group information. Use the \code{analysisInfo} method
 #'   for access.
+#' 
+#' @templateVar seli analyses
+#' @templateVar selOrderi analyses()
+#' @templateVar dollarOpName analysis
+#' @template sub_op-args
+#' 
 #' @export
 features <- setClass("features",
                      slots = c(features = "list", analysisInfo = "data.frame"),
@@ -82,11 +88,7 @@ setMethod("filter", "features", function(obj, intensityThreshold = NULL)
     return(obj)
 })
 
-#' @templateVar class features
-#' @templateVar whati analyses
-#' @templateVar orderi analyses()
-#' @template sub_op-args
-#'
+#' @describeIn features Subset on analyses.
 #' @export
 setMethod("[", c("features", "ANY", "missing", "missing"), function(x, i, ...)
 {
@@ -103,6 +105,21 @@ setMethod("[", c("features", "ANY", "missing", "missing"), function(x, i, ...)
     }
     
     return(x)
+})
+
+#' @describeIn features Extract a feature table for an analysis.
+#' @export
+setMethod("[[", c("features", "numChar", "missing"), function(x, i)
+{
+    assertExtractArg(i)
+    return(x@features[[i]])
+})
+
+#' @describeIn features Extract a feature table for an analysis.
+#' @export
+setMethod("$", "features", function(x, name)
+{
+    eval(substitute(x@features$NAME_ARG, list(NAME_ARG = name)))
 })
 
 #' @rdname target-screening

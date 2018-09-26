@@ -109,7 +109,7 @@ setMethod("[", c("features", "ANY", "missing", "missing"), function(x, i, ...)
 
 #' @describeIn features Extract a feature table for an analysis.
 #' @export
-setMethod("[[", c("features", "numChar", "missing"), function(x, i)
+setMethod("[[", c("features", "ANY", "missing"), function(x, i)
 {
     assertExtractArg(i)
     return(x@features[[i]])

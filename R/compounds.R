@@ -109,7 +109,7 @@ setMethod("[", c("compounds", "ANY", "missing", "missing"), function(x, i, ...)
 
 #' @describeIn compounds Extract a compound table for a feature group.
 #' @export
-setMethod("[[", c("compounds", "numChar", "missing"), function(x, i, j)
+setMethod("[[", c("compounds", "ANY", "missing"), function(x, i, j)
 {
     assertExtractArg(i)
     return(x@compounds[[i]])

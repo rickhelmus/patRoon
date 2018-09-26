@@ -55,7 +55,7 @@ setMethod("[", c("featureGroupsComparison", "ANY", "missing", "missing"), functi
 
 #' @describeIn featureGroupsComparison Extract a \code{\link{featureGroups}} object by its label.
 #' @export
-setMethod("[[", c("featureGroupsComparison", "numChar", "missing"), function(x, i, j)
+setMethod("[[", c("featureGroupsComparison", "ANY", "missing"), function(x, i, j)
 {
     assertExtractArg(i)
     return(x@fGroupsList[[i]])

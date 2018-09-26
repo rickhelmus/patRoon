@@ -121,7 +121,7 @@ setMethod("[", c("formulas", "ANY", "ANY", "missing"), function(x, i, j, ...)
 
 #' @describeIn formulas Extract a formula table from a specified analysis/feature group.
 #' @export
-setMethod("[[", c("formulas", "numChar", "numChar"), function(x, i, j)
+setMethod("[[", c("formulas", "ANY", "ANY"), function(x, i, j)
 {
     assertExtractArg(i)
     assertExtractArg(j)
@@ -374,7 +374,7 @@ setMethod("[", c("formulaConsensus", "ANY", "missing", "missing"), function(x, i
 
 #' @describeIn formulaConsensus Extract formula information a feature group.
 #' @export
-setMethod("[[", c("formulaConsensus", "numChar", "missing"), function(x, i, j)
+setMethod("[[", c("formulaConsensus", "ANY", "missing"), function(x, i, j)
 {
     assertExtractArg(i)
     if (!is.character(i))

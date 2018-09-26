@@ -143,7 +143,7 @@ setMethod("[", c("components", "ANY", "ANY", "missing"), function(x, i, j, ...)
 
 #' @describeIn components Extracts a component table, optionally filtered by a feature group.
 #' @export
-setMethod("[[", c("components", "numChar", "ANY"), function(x, i, j)
+setMethod("[[", c("components", "ANY", "ANY"), function(x, i, j)
 {
     assertExtractArg(i)
     

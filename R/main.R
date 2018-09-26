@@ -48,7 +48,8 @@ setOldClass("hclust")
 setOldClass("dissimilarity")
 
 # for method signatures
-setClassUnion("numChar", c("numeric", "character"))
+# doesn't work with devtools::load_all(): confuses xcmsRaw "[" operator (!?!?)
+#setClassUnion("numChar", c("character", "numeric"))
 
 #### Generics
 

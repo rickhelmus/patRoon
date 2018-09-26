@@ -162,7 +162,7 @@ setMethod("[", c("featureGroups", "ANY", "ANY", "missing"), function(x, i, j, ..
 
 #' @describeIn featureGroups Extract intensity values.
 #' @export
-setMethod("[[", c("featureGroups", "numChar", "ANY"), function(x, i, j)
+setMethod("[[", c("featureGroups", "ANY", "ANY"), function(x, i, j)
 {
     assertExtractArg(i)
     

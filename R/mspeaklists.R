@@ -135,7 +135,7 @@ setMethod("[", c("MSPeakLists", "ANY", "ANY", "missing"), function(x, i, j, ...)
 
 #' @describeIn MSPeakLists Extract a list with MS and MS/MS (if available) peak lists.
 #' @export
-setMethod("[[", c("MSPeakLists", "numChar", "numChar"), function(x, i, j)
+setMethod("[[", c("MSPeakLists", "ANY", "ANY"), function(x, i, j)
 {
     assertExtractArg(i)
     assertExtractArg(j)

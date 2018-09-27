@@ -46,6 +46,11 @@ test_that("basic subsetting", {
     expect_equivalent(groupNames(compsRC[, c(FALSE, TRUE)]), groupNames(compsRC)[c(FALSE, TRUE)])
     expect_equal(length(compsRC[FALSE]), 0)
     expect_length(compsEmpty[1:5], 0)
+    
+    expect_equivalent(compsRC[[1, 1]], componentTable(compsRC)[[1]][group == groupNames(compsRC)[1]])
+    expect_equivalent(compsRC[[names(compsRC)[1], groupNames(compsRC)[1]]], componentTable(compsRC)[[1]][group == groupNames(compsRC)[1]])
+    expect_equivalent(compsRC[[2]], componentTable(compsRC)[[2]])
+    expect_equivalent(callDollar(compsRC, names(compsRC)[3]), compsRC[[3]])
 })
 
 test_that("findFGroup works", {

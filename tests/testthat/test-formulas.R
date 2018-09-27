@@ -88,11 +88,18 @@ test_that("basic subsetting", {
     expect_equal(length(formsGF[FALSE]), 0)
     expect_length(formsGFEmpty[1:5], 0)
     
+    expect_equivalent(formsGF[[2, 15]], formulaTable(formsGF)[[2]][[groupNames(formsGF)[15]]])
+    expect_equivalent(formsGF[[analyses(formsGF)[2], groupNames(formsGF)[15]]], formulaTable(formsGF)[[2]][[groupNames(formsGF)[15]]])
+    
     expect_length(fCons["nope"], 0)
     expect_equivalent(groupNames(fCons[1:2]), groupNames(fCons)[1:2])
     expect_equivalent(groupNames(fCons[groupNames(formsGF)[2:3]]), groupNames(fCons)[2:3])
     expect_equivalent(groupNames(fCons[c(FALSE, TRUE)]), groupNames(fCons)[c(FALSE, TRUE)])
     expect_equal(length(fCons[FALSE]), 0)
+    
+    expect_equivalent(fCons[[15]], formulaTable(fCons)[group == groupNames(fCons)[15]])
+    expect_equivalent(fCons[[groupNames(fCons)[15]]], formulaTable(fCons)[group == groupNames(fCons)[15]])
+    expect_equivalent(callDollar(fCons, groupNames(fCons)[4]), fCons[[4]])
 })
 
 test_that("feature group filtering", {

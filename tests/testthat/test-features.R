@@ -40,4 +40,8 @@ test_that("basic subsetting", {
     expect_equivalent(analyses(ffOpenMS[c(FALSE, TRUE, FALSE)]), anaInfo$analysis[2])
     expect_equal(length(ffOpenMS[FALSE]), 0)
     expect_length(ffEmpty[1:5], 0)
+    
+    expect_equivalent(ffOpenMS[[2]], featureTable(ffOpenMS)[[2]])
+    expect_equivalent(ffOpenMS[[analyses(ffOpenMS)[2]]], featureTable(ffOpenMS)[[2]])
+    expect_equivalent(callDollar(ffOpenMS, analyses(ffOpenMS)[2]), ffOpenMS[[2]])
 })

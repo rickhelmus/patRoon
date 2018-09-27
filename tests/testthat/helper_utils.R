@@ -73,3 +73,6 @@ makeExpectation <- checkmate::makeExpectation
 vname <- checkmate::vname
 
 expect_csv_file <- checkmate::makeExpectationFunction(checkCSVFile)
+
+# call dollar operator with string
+callDollar <- function(x, name) eval(substitute(x$NAME_ARG, list(NAME_ARG = name)))

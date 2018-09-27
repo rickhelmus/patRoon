@@ -86,4 +86,7 @@ test_that("basic subsetting", {
     expect_equivalent(groupNames(plists[, c(FALSE, TRUE)]), groupNames(plists)[c(FALSE, TRUE)])
     expect_equal(length(plists[FALSE]), 0)
     expect_length(plistsEmpty[1:5], 0)
+    
+    expect_equivalent(plists[[2, 15]], peakLists(plists)[[2]][[groupNames(plists)[15]]])
+    expect_equivalent(plists[[analyses(plists)[2], groupNames(plists)[15]]], peakLists(plists)[[2]][[groupNames(plists)[15]]])
 })

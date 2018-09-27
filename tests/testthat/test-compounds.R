@@ -100,6 +100,10 @@ test_that("basic subsetting", {
     expect_equivalent(groupNames(comps[c(FALSE, TRUE)]), groupNames(comps)[c(FALSE, TRUE)])
     expect_equal(length(comps[FALSE]), 0)
     expect_length(compsEmpty[1:5], 0)
+    
+    expect_equivalent(comps[[1]], compoundTable(comps)[[1]])
+    expect_equivalent(comps[[groupNames(comps)[1]]], compoundTable(comps)[[1]])
+    expect_equivalent(callDollar(comps, groupNames(comps)[1]), comps[[1]])
 })
 
 if (doMetFrag)

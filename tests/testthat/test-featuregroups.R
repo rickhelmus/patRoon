@@ -33,6 +33,13 @@ test_that("basic subsetting", {
     expect_equivalent(analysisInfo(fgOpenMS[getTestAnaInfo()$analysis[4:6]]), getTestAnaInfo()[4:6, ])
     expect_equal(length(fgOpenMS[FALSE]), 0)
     expect_length(fgOpenMSEmpty[, 1:50], 0)
+    
+    expect_length(fgOpenMS[[1]], length(analyses(fgOpenMS)))
+    expect_length(fgOpenMS[[1, 1]], 1)
+    expect_equivalent(fgOpenMS[[4, 50]], groups(fgOpenMS)[[4, 50]])
+    expect_equivalent(fgOpenMS[[analyses(fgOpenMS)[4], names(fgOpenMS)[50]]], groups(fgOpenMS)[[4, 50]])
+    expect_equivalent(fgOpenMS[[4]], groups(fgOpenMS)[[4]])
+    expect_equivalent(callDollar(fgOpenMS, names(fgOpenMS)[4]), fgOpenMS[[4]])
 })
 
 expfile <- file.path(getWorkPath(), "export.csv") # NOTE: will be removed prior to each test automatically
@@ -124,11 +131,19 @@ fGConsBothEmpty <- consensus(fgCompBothEmpty)
 test_that("verify feature group comparison", {
     expect_known_value(groups(fGCompOpenMS@comparedFGroups), testFile("fg-comp-openms"))
     expect_known_value(groups(fGCompXCMS@comparedFGroups), testFile("fg-comp-xcms"))
+    
     expect_named(fGCompOpenMS, c("openms", "xcms"))
     expect_named(fGCompXCMS, c("openms", "xcms"))
     expect_named(fGCompOpenMS[1], "openms")
     expect_named(fGCompOpenMS[2], "xcms")
+
+    expect_equivalent(fGCompOpenMS[[1]], fgOpenMS)
+    expect_equivalent(fGCompOpenMS[[names(fGCompOpenMS)[2]]], fgXCMS)
+    expect_equivalent(fGCompOpenMS[[names(fGCompOpenMS)[2]]], fgXCMS)
+    expect_equivalent(callDollar(fGCompOpenMS, names(fGCompOpenMS)[1]), fgOpenMS)
+    
     expect_known_value(groups(fGCons), testFile("fg-comp-cons"))
+    
     expect_lt(length(consensus(fGCompOpenMS, relAbundance = 1)), length(fGCons))
     expect_lt((length(unique(fGCompOpenMS, which = "openms")) +
                   length(unique(fGCompOpenMS, which = "xcms"))), length(fGCons))

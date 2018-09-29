@@ -27,6 +27,8 @@ function showAnnotation(group, type)
     qu = "#" + type + "Table .dataTable";
     $(qu).DataTable().column(0).search("^" + group + "$", true, false).draw();
     $(qu).DataTable().columns.adjust().draw();
+    
+    selectFGroupRow(group);
 }
 
 function showCompoundsCluster(group)
@@ -37,6 +39,7 @@ function showCompoundsCluster(group)
         annElements[i].style.display = (annElements[i].classList.contains(type)) ? 'flex' : 'none';
     
     showEICs(group);
+    selectFGroupRow(group);
 }
 
 function disableAllAnnotations()
@@ -45,6 +48,13 @@ function disableAllAnnotations()
     for (var i=0; i<comps.length; i++)
         comps[i].style.display = 'none';
     //$(".dataTable").DataTable().columns.adjust().draw(); // fixup feature group table
+}
+
+function selectFGroupRow(group)
+{
+    qu = "#fGroupsTable .dataTable";
+    $(qu).DataTable().$('tr.selected').removeClass('selected'); // remove any current selections
+    $(qu).DataTable().row(group-1).node().classList.add("selected");
 }
 
 function initAnnotation()

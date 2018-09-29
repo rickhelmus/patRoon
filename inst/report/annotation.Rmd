@@ -125,7 +125,7 @@ DT::datatable(fGroupsSpecDT,
                              initComplete = DT::JS("function(settings, json)",
                                                    "{ setTimeout(initAnnotation, 25); }"),
                              order = list(list(0, "asc"))),
-              escape = FALSE, rownames = FALSE)
+              escape = FALSE, rownames = FALSE, elementId = "fGroupsTable")
 ```
 
 ### { .noAnnotationSelected data-width=100 }

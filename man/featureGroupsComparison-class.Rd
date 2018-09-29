@@ -7,7 +7,7 @@
 \alias{names,featureGroupsComparison-method}
 \alias{length,featureGroupsComparison-method}
 \alias{[,featureGroupsComparison,ANY,missing,missing-method}
-\alias{[[,featureGroupsComparison,numChar,missing-method}
+\alias{[[,featureGroupsComparison,ANY,missing-method}
 \alias{$,featureGroupsComparison-method}
 \title{Feature groups comparison class}
 \usage{
@@ -18,7 +18,7 @@
 \S4method{[}{featureGroupsComparison,ANY,missing,missing}(x, i, j, ...,
   drop = TRUE)
 
-\S4method{[[}{featureGroupsComparison,numChar,missing}(x, i, j)
+\S4method{[[}{featureGroupsComparison,ANY,missing}(x, i, j)
 
 \S4method{$}{featureGroupsComparison}(x, name)
 }

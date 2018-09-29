@@ -10,7 +10,7 @@
 \alias{length,formulaConsensus-method}
 \alias{show,formulaConsensus-method}
 \alias{[,formulaConsensus,ANY,missing,missing-method}
-\alias{[[,formulaConsensus,numChar,missing-method}
+\alias{[[,formulaConsensus,ANY,missing-method}
 \alias{$,formulaConsensus-method}
 \alias{filterBy,formulaConsensus-method}
 \alias{plotSpec,formulaConsensus-method}
@@ -29,7 +29,7 @@
 \S4method{[}{formulaConsensus,ANY,missing,missing}(x, i, j, ...,
   drop = TRUE)
 
-\S4method{[[}{formulaConsensus,numChar,missing}(x, i, j)
+\S4method{[[}{formulaConsensus,ANY,missing}(x, i, j)
 
 \S4method{$}{formulaConsensus}(x, name)
 

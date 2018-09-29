@@ -11,7 +11,7 @@
 \alias{analyses,features-method}
 \alias{filter,features-method}
 \alias{[,features,ANY,missing,missing-method}
-\alias{[[,features,numChar,missing-method}
+\alias{[[,features,ANY,missing-method}
 \alias{$,features-method}
 \title{Base features class}
 \usage{
@@ -29,7 +29,7 @@
 
 \S4method{[}{features,ANY,missing,missing}(x, i, j, ..., drop = TRUE)
 
-\S4method{[[}{features,numChar,missing}(x, i)
+\S4method{[[}{features,ANY,missing}(x, i)
 
 \S4method{$}{features}(x, name)
 }

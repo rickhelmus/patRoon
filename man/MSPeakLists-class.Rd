@@ -12,7 +12,7 @@
 \alias{length,MSPeakLists-method}
 \alias{show,MSPeakLists-method}
 \alias{[,MSPeakLists,ANY,ANY,missing-method}
-\alias{[[,MSPeakLists,numChar,numChar-method}
+\alias{[[,MSPeakLists,ANY,ANY-method}
 \alias{filter,MSPeakLists-method}
 \alias{filterBy,MSPeakLists-method}
 \title{Class containing MS Peak Lists}
@@ -31,7 +31,7 @@
 
 \S4method{[}{MSPeakLists,ANY,ANY,missing}(x, i, j, ..., drop = TRUE)
 
-\S4method{[[}{MSPeakLists,numChar,numChar}(x, i, j)
+\S4method{[[}{MSPeakLists,ANY,ANY}(x, i, j)
 
 \S4method{filter}{MSPeakLists}(obj, absMSIntThr = NULL,
   absMSMSIntThr = NULL, relMSIntThr = NULL, relMSMSIntThr = NULL,

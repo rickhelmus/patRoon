@@ -11,7 +11,7 @@
 \alias{length,formulas-method}
 \alias{show,formulas-method}
 \alias{[,formulas,ANY,ANY,missing-method}
-\alias{[[,formulas,numChar,numChar-method}
+\alias{[[,formulas,ANY,ANY-method}
 \alias{consensus,formulas-method}
 \title{Formula lists class}
 \usage{
@@ -29,7 +29,7 @@
 
 \S4method{[}{formulas,ANY,ANY,missing}(x, i, j, ..., drop = TRUE)
 
-\S4method{[[}{formulas,numChar,numChar}(x, i, j)
+\S4method{[[}{formulas,ANY,ANY}(x, i, j)
 
 \S4method{consensus}{formulas}(obj, ..., fGroups,
   formAnaThreshold = 0.75, formListThreshold = 0, maxFormulas = 10,

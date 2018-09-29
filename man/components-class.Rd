@@ -14,7 +14,7 @@
 \alias{names,components-method}
 \alias{show,components-method}
 \alias{[,components,ANY,ANY,missing-method}
-\alias{[[,components,numChar,ANY-method}
+\alias{[[,components,ANY,ANY-method}
 \alias{$,components-method}
 \alias{findFGroup,components-method}
 \alias{findFGroup}
@@ -40,7 +40,7 @@
 
 \S4method{[}{components,ANY,ANY,missing}(x, i, j, ..., drop = TRUE)
 
-\S4method{[[}{components,numChar,ANY}(x, i, j)
+\S4method{[[}{components,ANY,ANY}(x, i, j)
 
 \S4method{$}{components}(x, name)
 

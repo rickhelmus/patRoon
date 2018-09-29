@@ -11,7 +11,7 @@
 \alias{length,compounds-method}
 \alias{show,compounds-method}
 \alias{[,compounds,ANY,missing,missing-method}
-\alias{[[,compounds,numChar,missing-method}
+\alias{[[,compounds,ANY,missing-method}
 \alias{$,compounds-method}
 \alias{identifiers,compounds-method}
 \alias{identifiers}
@@ -40,7 +40,7 @@
 
 \S4method{[}{compounds,ANY,missing,missing}(x, i, j, ..., drop = TRUE)
 
-\S4method{[[}{compounds,numChar,missing}(x, i, j)
+\S4method{[[}{compounds,ANY,missing}(x, i, j)
 
 \S4method{$}{compounds}(x, name)
 

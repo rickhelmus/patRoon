@@ -20,7 +20,7 @@
 \alias{groupFeatIndex,featureGroups-method}
 \alias{groupFeatIndex}
 \alias{[,featureGroups,ANY,ANY,missing-method}
-\alias{[[,featureGroups,numChar,ANY-method}
+\alias{[[,featureGroups,ANY,ANY-method}
 \alias{$,featureGroups-method}
 \alias{export,featureGroups-method}
 \alias{export}
@@ -62,7 +62,7 @@
 
 \S4method{[}{featureGroups,ANY,ANY,missing}(x, i, j, ..., drop = TRUE)
 
-\S4method{[[}{featureGroups,numChar,ANY}(x, i, j)
+\S4method{[[}{featureGroups,ANY,ANY}(x, i, j)
 
 \S4method{$}{featureGroups}(x, name)
 

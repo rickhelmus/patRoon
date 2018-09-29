@@ -223,17 +223,6 @@ replicateGroupFilter <- function(fGroups, rGroups, negate = FALSE, verbose = TRU
     }, "replicate_group", verbose))
 }
 
-# used by filterBy methods
-groupNamesFilter <- function(fGroups, what, gNames, negate = FALSE, hashParam = c(gNames, negate), verbose = TRUE)
-{
-    return(doFilter(fGroups, what, hashParam, function(fGroups)
-    {
-        if (negate)
-            return(fGroups[, setdiff(names(fGroups), gNames)])
-        return(fGroups[, gNames])
-    }, verbose = verbose))
-}
-
 #' @details \code{filter} performs common rule based filtering of feature groups
 #'   such as blank subtraction, minimum intensity and minimal replicate
 #'   abundance.

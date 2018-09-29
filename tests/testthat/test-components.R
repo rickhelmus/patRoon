@@ -67,12 +67,6 @@ test_that("consensus works", {
                  "non-empty")
 })
 
-test_that("feature group filtering", {
-    expect_named(filterBy(compsRC, fGroupsSimple), unique(unlist(sapply(componentTable(compsRC), "[[", "group"))), ignore.order = TRUE)
-    expect_named(filterBy(compsRC, fGroupsSimple, index = 1), componentTable(compsRC)[[1]]$group)
-    expect_length(filterBy(compsEmpty, fGroupsSimple), 0)
-})
-
 test_that("intensity clustered components", {
     expect_equivalent(length(treeCut(compsInt, k = 5)), 5)
     expect_equal(treeCutDynamic(compsInt), compsInt)

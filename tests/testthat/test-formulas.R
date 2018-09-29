@@ -102,10 +102,6 @@ test_that("basic subsetting", {
     expect_equivalent(callDollar(fCons, groupNames(fCons)[4]), fCons[[4]])
 })
 
-test_that("feature group filtering", {
-    expect_setequal(names(filterBy(fCons, fGroups)), fTable$group)
-})
-
 test_that("reporting works", {
     expect_file(reportCSV(fGroups, getWorkPath(), formConsensus = fCons),
                 getWorkPath("formulas.csv"))

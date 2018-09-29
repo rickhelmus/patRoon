@@ -192,26 +192,6 @@ setMethod("filter", "compounds", function(obj, minExplainedPeaks = NULL, minScor
     return(obj)
 })
 
-#' @templateVar class compounds
-#' @template filterby
-#' @export
-setMethod("filterBy", "compounds", function(obj, fGroups, negate)
-{
-    ac <- checkmate::makeAssertCollection()
-    checkmate::assertClass(fGroups, "featureGroups", add = ac)
-    checkmate::assertFlag(negate, add = ac)
-    checkmate::reportAssertions(ac)
-    
-    compTable <- compoundTable(obj)
-    
-    if (length(compTable) == 0)
-        compgrps <- character()
-    else
-        compgrps <- names(compTable)[sapply(compTable, function(r) !is.null(r) && nrow(r) > 0, USE.NAMES = FALSE)]
-    
-    return(groupNamesFilter(fGroups, "compounds", compgrps, negate))
-})
-
 #' @describeIn compounds Provides compound scoring data that is based on the
 #'   presence of candidate formulae being present in a given
 #'   \code{\link{formulaConsensus}} object. Matched precursor formulae yield one

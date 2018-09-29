@@ -367,7 +367,7 @@ setMethod("compoundViewer", c("featureGroups", "MSPeakLists", "compounds"), func
 {
     compTable <- compoundTable(compounds)
 
-    fGroups <- groupNamesFilter(fGroups, "compoundViewer", names(compoundTable(compounds)), verbose = FALSE)
+    fGroups <- fGroups[, groupNames(compounds)]
 
     fTable <- featureTable(fGroups)
     anaInfo <- analysisInfo(fGroups)

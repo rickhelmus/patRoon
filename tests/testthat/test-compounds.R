@@ -162,12 +162,6 @@ test_that("consensus works", {
     expect_length(consensus(compsMFEmptyPL, compsSIREmptyPL), 0)
 })
 
-test_that("feature group filtering", {
-    skip_if_not(hasCompounds)
-    expect_named(filterBy(comps, fGroups), names(compoundTable(comps)))
-    expect_length(filterBy(compsEmpty, fGroups), 0)
-})
-
 test_that("reporting works", {
     skip_if_not(hasCompounds)
     

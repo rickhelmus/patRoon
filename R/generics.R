@@ -189,15 +189,6 @@ setGeneric("featureTable", function(obj) standardGeneric("featureTable"))
 #' @template generics
 setGeneric("filter", function(obj, ...) standardGeneric("filter"))
 
-#' @templateVar func filterBy
-#' @templateVar desc only keep feature groups that are also present in another
-#'   object.
-#' @template generics
-#' @param fGroups A \code{\link{featureGroups}} object.
-#' @param negate If set to \code{TRUE} then filtering operations are performed
-#'   in opposite manner.
-setGeneric("filterBy", function(obj, fGroups, negate = FALSE, ...) standardGeneric("filterBy"))
-
 #' @templateVar func formulaTable
 #' @templateVar desc returns formula data.
 #' @template generics

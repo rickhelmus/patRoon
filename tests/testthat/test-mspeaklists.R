@@ -70,12 +70,6 @@ test_that("empty object", {
     expect_gt(length(plistsEmptyMS), 0)
 })
 
-test_that("feature group filtering", {
-    expect_equal(filterBy(plists, fGroups), fGroups)
-    expect_lt(length(filterBy(plists, fGroups, onlyMSMS = TRUE)), length(fGroups))
-    expect_length(filterBy(plistsEmpty, fGroups), 0)
-})
-
 test_that("basic subsetting", {
     expect_length(plists["nope"], 0)
     expect_equivalent(analyses(plists[1:2]), analyses(fGroups)[1:2])

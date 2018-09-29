@@ -13,14 +13,10 @@ Release:
 - do something with sirius fingerprints?
 - fillPeaks for CAMERA (and RAMClustR?)
 - mzR precursor window in newProject()
-- filter formulas, compounds etc on (remaining) feature groups
-- filterBy: isotopes/adducts
-- filter method for components
+- filter method for components (e.g. isotopes, adducts)
 - mass defect components
 - fix compoundViewer
-- names() for compounds/compounds clusters etc?
 - check why generics sometimes are not found
 - better SMILES to mol error handling + check kekulize=FALSE for fails
 - finalize filter() method for features
 - remove R xml code for OpenMS features/feature groups
-- subsetting of components to allow e.g. reporting components with subsetted feature groups

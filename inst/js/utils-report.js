@@ -18,8 +18,6 @@ function showEICs(group)
 
 function showAnnotation(group, type)
 {
-    clearComponentSpecs();
-
     const annElements = document.getElementsByClassName('annotationClass');
     for (var i=0; i<annElements.length; i++)
         annElements[i].style.display = (annElements[i].classList.contains(type)) ? 'flex' : 'none';
@@ -33,35 +31,12 @@ function showAnnotation(group, type)
 
 function showCompoundsCluster(group)
 {
-    clearComponentSpecs();
-
     const type = "compscl_ann-" + group;
     const annElements = document.getElementsByClassName('annotationClass');
     for (var i=0; i<annElements.length; i++)
         annElements[i].style.display = (annElements[i].classList.contains(type)) ? 'flex' : 'none';
     
     showEICs(group);
-}
-
-function showComponentSpec(component, group)
-{
-    // component specs are treated differently as they are cloned
-    clearComponentSpecs();
-    disableAllAnnotations();
-
-    showEICs(group);
-    
-    var comp = document.getElementById(component).parentElement;
-    var clonedComp = comp.cloneNode(true);
-    clonedComp.id = clonedComp.id + "-clone";
-    clonedComp.className += " clonedComp";
-    
-    getAnnotationPageElement().appendChild(clonedComp);
-}
-
-function clearComponentSpecs()
-{
-    $('.clonedComp').remove();
 }
 
 function disableAllAnnotations()

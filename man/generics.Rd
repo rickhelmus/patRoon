@@ -12,7 +12,6 @@
 \alias{consensus}
 \alias{featureTable}
 \alias{filter}
-\alias{filterBy}
 \alias{formulaTable}
 \alias{getMCS}
 \alias{plotChord}
@@ -45,8 +44,6 @@ featureTable(obj)
 
 filter(obj, ...)
 
-filterBy(obj, fGroups, negate = FALSE, ...)
-
 formulaTable(obj)
 
 getMCS(obj, ...)
@@ -73,11 +70,6 @@ treeCutDynamic(obj, maxTreeHeight = 1, deepSplit = TRUE,
 
 \item{\dots}{Any further method specific arguments. See method documentation
 for details.}
-
-\item{fGroups}{A \code{\link{featureGroups}} object.}
-
-\item{negate}{If set to \code{TRUE} then filtering operations are performed
-in opposite manner.}
 
 \item{addSelfLinks}{If \code{TRUE} then 'self-links' are added which
 represent non-shared data.}
@@ -207,17 +199,6 @@ please refer to the linked method documentation for each generic.
 
 \itemize{
     \item Methods are defined for: \code{\link[=filter,MSPeakLists-method]{MSPeakLists}}, \code{\link[=filter,compounds-method]{compounds}}, \code{\link[=filter,featureGroups-method]{featureGroups}}, \code{\link[=filter,features-method]{features}}.
-}
-
-\code{filterBy} only keep feature groups that are also present in another
-
-
-
-
-
-
-\itemize{
-    \item Methods are defined for: \code{\link[=filterBy,MSPeakLists-method]{MSPeakLists}}, \code{\link[=filterBy,components-method]{components}}, \code{\link[=filterBy,compounds-method]{compounds}}, \code{\link[=filterBy,formulaConsensus-method]{formulaConsensus}}.
 }
 
 \code{formulaTable} returns formula data.

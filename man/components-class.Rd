@@ -18,7 +18,6 @@
 \alias{$,components-method}
 \alias{findFGroup,components-method}
 \alias{findFGroup}
-\alias{filterBy,components-method}
 \alias{plotSpec,components-method}
 \alias{plotEIC,components-method}
 \alias{consensus,components-method}
@@ -45,8 +44,6 @@
 \S4method{$}{components}(x, name)
 
 \S4method{findFGroup}{components}(obj, fGroup)
-
-\S4method{filterBy}{components}(obj, fGroups, negate, index = NULL)
 
 \S4method{plotSpec}{components}(obj, index, markFGroup = NULL,
   useGGPlot2 = FALSE, ...)
@@ -76,12 +73,6 @@ the consensus.}
 \item{fGroup}{The name (thus a character) of the feature group that should be
 searched for.}
 
-\item{fGroups}{The \code{\link{featureGroups}} object that was used to
-generate the components.}
-
-\item{negate}{If set to \code{TRUE} then the filter is applied in opposite
-manner.}
-
 \item{index}{The index of the component. Can be a numeric index or a
 character with its name.}
 
@@ -95,6 +86,9 @@ plotting, otherwise base plot used. For \code{plotSpec}, \code{ggplot2}
 allows nicely repelled text for annotation. However, base plot is generally
 faster.}
 
+\item{fGroups}{The \code{\link{featureGroups}} object that was used to
+generate the components.}
+
 \item{rtWindow}{Retention window: see the \code{plotEIC} method for the
 \code{\link{featureGroups}} class.}
 }
@@ -105,9 +99,6 @@ The subset operator (\code{"["}) and \code{filter} method
   such, algorithm specific methods (\emph{e.g.} \code{treeCut}) will not work
   on this object. The reason for this is that it is often very difficult or
   impossible to subset the algorithmic data.
-
-\code{filterBy} returns a filtered \code{\link{featureGroups}}
-  object.
 
 \code{consensus} returns a \code{components} object that is produced
   by merging multiple specified \code{components} objects.
@@ -149,10 +140,6 @@ feature groups from which data is present in this object.
 
 \item \code{findFGroup}: Returns the component id(s) to which a feature group
 belongs.
-
-\item \code{filterBy}: Only keep feature groups in a given
-\code{\link{featureGroups}} object that are also present in the specified
-\code{components} object.
 
 \item \code{plotSpec}: Plot a \emph{pseudo} mass spectrum for a single
 component.

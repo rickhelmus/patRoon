@@ -196,3 +196,16 @@ loadIntensities <- function(dfile, features, rtWindow)
     
     return(features)
 }
+
+loadIntensitiesCPP <- function(dfile, features, rtWindow)
+{
+    spectra <- loadSpectra(dfile, verbose = FALSE)
+    features <- copy(features) # HACK: avoid sR crash caused by data.table
+    
+    if (nrow(features) == 0)
+        features[, intensity := 0]
+    else
+        features[, intensity := loadEICIntensities(spectra, features, rtWindow)]
+
+    return(features)
+}

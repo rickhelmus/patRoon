@@ -9,3 +9,7 @@ parseFeatConsXMLFile <- function(file, anaCount) {
     .Call(`_patRoon_parseFeatConsXMLFile`, file, anaCount)
 }
 
+loadEICIntensities <- function(spectra, featList, rtWindow) {
+    .Call(`_patRoon_loadEICIntensities`, spectra, featList, rtWindow)
+}
+

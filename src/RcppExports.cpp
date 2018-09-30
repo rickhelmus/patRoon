@@ -28,10 +28,24 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// loadEICIntensities
+Rcpp::NumericVector loadEICIntensities(Rcpp::List spectra, Rcpp::DataFrame featList, Rcpp::NumericVector rtWindow);
+RcppExport SEXP _patRoon_loadEICIntensities(SEXP spectraSEXP, SEXP featListSEXP, SEXP rtWindowSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::List >::type spectra(spectraSEXP);
+    Rcpp::traits::input_parameter< Rcpp::DataFrame >::type featList(featListSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type rtWindow(rtWindowSEXP);
+    rcpp_result_gen = Rcpp::wrap(loadEICIntensities(spectra, featList, rtWindow));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_parseFeatureXMLFile", (DL_FUNC) &_patRoon_parseFeatureXMLFile, 1},
     {"_patRoon_parseFeatConsXMLFile", (DL_FUNC) &_patRoon_parseFeatConsXMLFile, 2},
+    {"_patRoon_loadEICIntensities", (DL_FUNC) &_patRoon_loadEICIntensities, 3},
     {NULL, NULL, 0}
 };
 

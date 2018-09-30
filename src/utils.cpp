@@ -39,3 +39,14 @@ bool strStartsWith(const std::string &str, const std::string &pref)
 {
     return(str.compare(0, pref.size(), pref) == 0);
 }
+
+bool compareTol(double x, double y, double tol)
+{
+    return std::fabs(x - y) <= tol;
+}
+
+bool numberWithin(double x, double minVal, double maxVal, double tol)
+{
+    return((x > minVal || compareTol(x, minVal, tol)) &&
+           (x < maxVal || compareTol(x, maxVal, tol)));
+}

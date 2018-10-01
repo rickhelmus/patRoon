@@ -83,7 +83,7 @@ findFeaturesOpenMS <- function(analysisInfo, thr = 1000, comfwhm = 5, minfwhm = 
         {
             # fts <- importFeatureXML(cmd$featFile)
             fts <- importFeatureXMLCpp(cmd$featFile)
-            fts <- loadIntensities(cmd$dataFile, fts, intSearchRTWindow)
+            fts <- loadIntensitiesCPP(cmd$dataFile, fts, intSearchRTWindow)
 
             # BUG: OpenMS sporadically reports features with 0 intensity
             # (noticed this with a feature of only two datapoints in hull).

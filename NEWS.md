@@ -1,6 +1,7 @@
 # patRoon 0.1.0.9000
 
 ## September 2018
+* Moved feature intensity loading code for OpenMS features to C++. This results in much faster feature finding.
 * Removed filterBy methods: these are now deprecated with new subset operators and groupNames()/analyses() methods. Example: `fGroups <- fGroups[, groupNames(compounds)]`
 * subset/extraction operators ("[", "[[" and "$") for features, featureGroups, MSPeakLists, formulas, formulaConsensus, compounds, compoundsCluster and components classes.
 * analyses() and groupNames() generics to get analyses and feature group names of the data within an object.

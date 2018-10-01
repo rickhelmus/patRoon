@@ -41,11 +41,25 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// loadEICs
+Rcpp::List loadEICs(Rcpp::List spectra, Rcpp::List rtRanges, Rcpp::List mzRanges);
+RcppExport SEXP _patRoon_loadEICs(SEXP spectraSEXP, SEXP rtRangesSEXP, SEXP mzRangesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::List >::type spectra(spectraSEXP);
+    Rcpp::traits::input_parameter< Rcpp::List >::type rtRanges(rtRangesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::List >::type mzRanges(mzRangesSEXP);
+    rcpp_result_gen = Rcpp::wrap(loadEICs(spectra, rtRanges, mzRanges));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_parseFeatureXMLFile", (DL_FUNC) &_patRoon_parseFeatureXMLFile, 1},
     {"_patRoon_parseFeatConsXMLFile", (DL_FUNC) &_patRoon_parseFeatConsXMLFile, 2},
     {"_patRoon_loadEICIntensities", (DL_FUNC) &_patRoon_loadEICIntensities, 3},
+    {"_patRoon_loadEICs", (DL_FUNC) &_patRoon_loadEICs, 3},
     {NULL, NULL, 0}
 };
 

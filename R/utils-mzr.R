@@ -1,9 +1,9 @@
 #' @include main.R
 
-loadSpectra <- function(path, rtRange = NULL, verbose = TRUE)
+loadSpectra <- function(path, rtRange = NULL, verbose = TRUE, cacheDB = NULL)
 {
     hash <- makeHash(makeFileHash(path), rtRange)
-    ret <- loadCacheData("specData", hash)
+    ret <- loadCacheData("specData", hash, cacheDB)
     if (is.null(ret))
     {
         if (verbose)
@@ -48,6 +48,140 @@ getEIC <- function(spectra, rtRange, mzRange, MSLevel = 1, precursor = NULL, pre
     return(data.table(time = hd$retentionTime,
                       intensity = sapply(spectra$spectra[hd$seqNum],
                                          function(s) sum(s[numGTE(mz, mzRange[1]) & numLTE(mz, mzRange[2]), intensity]))))
+}
+
+getEICsForFGroups <- function(fGroups, rtWindow, mzWindow, topMost, onlyPresent)
+{
+    gNames <- names(fGroups)
+    gTable <- groups(fGroups)
+    gInfo <- groupInfo(fGroups)
+    ftind <- groupFeatIndex(fGroups)
+    fTable <- featureTable(fGroups)
+    anaList <- analyses(fGroups)
+    
+    # load EICs per analysis: we don't want to load multiple potentially large
+    # analysis files simultaneously. Before that, it's more efficient to first
+    # figure out for which feature groups EICs have to be generated per
+    # analysis. Furthermore, collect all retention ranges for EICs as these also
+    # have to be checked on a per group basis.
+    
+    
+    doEICs <- list()
+    rtRanges <- list()
+    
+    getFTCol <- function(fg, anai, col)
+    {
+        if (ftind[[fg]][anai] == 0)
+            NA
+        else
+            fTable[[anaList[anai]]][ftind[[fg]][anai]][[col]]
+    }
+    
+    for (fg in gNames)
+    {
+        if (!is.null(topMost))
+        {
+            oint <- order(-gTable[[fg]])
+            topAnalysesInd <- oint[seq_len(topMost)]
+        }
+        else
+            topAnalysesInd <- seq_len(nrow(anaInfo))
+        
+        if (onlyPresent)
+            topAnalysesInd <- topAnalysesInd[gTable[[fg]][topAnalysesInd] != 0]
+        
+        rtr <- c(min(sapply(topAnalysesInd,
+                            function(anai) getFTCol(fg, anai, "retmin")),
+                     na.rm = TRUE),
+                 max(sapply(topAnalysesInd,
+                            function(anai) getFTCol(fg, anai, "retmax")),
+                     na.rm = TRUE))
+        if (any(is.na(rtr)))
+            rtr <- gInfo[fg, "rts"]
+        rtr <- rtr + c(-rtWindow, rtWindow)
+        
+        doEICs[[fg]] <- anaList[topAnalysesInd]
+        rtRanges[[fg]] <- rtr
+    }
+    
+    if (!is.null(topMost))
+        topMost <- min(topMost, nrow(anaInfo))
+    
+    cacheDB <- openCacheDB()
+    
+    EICs <- list()
+    for (anai in seq_along(anaList))
+    {
+        ana <- anaList[anai]
+        anaHash <- NULL
+        dfile <- getMzMLOrMzXMLAnalysisPath(ana, anaInfo$path[anai])
+        
+        doGroups <- gNames[sapply(gNames, function(fg) ana %in% doEICs[[fg]])]
+        rtr <- rtRanges[doGroups]
+        mzr <- sapply(doGroups, function(fg) gInfo[fg, "mzs"] + c(-mzWindow, mzWindow), simplify = FALSE)
+        names(mzr) <- doGroups
+        
+        EICHashes <- sapply(doGroups, function(fg)
+        {
+            if (is.null(anaHash))
+                anaHash <<- makeFileHash(dfile)
+            makeHash(anaHash, rtr[[fg]], mzr[[fg]])
+        })
+        
+        gEICs <- pruneList(sapply(doGroups, function(fg) loadCacheData("mzREIC", EICHashes[[fg]], cacheDB),
+                                  simplify = FALSE))
+        
+        EICGNames <- doGroups[!doGroups %in% names(gEICs)]
+        if (length(EICGNames) > 0)
+        {
+            spectra <- loadSpectra(dfile, verbose = FALSE, cacheDB = cacheDB)
+            rtr <- rtr[EICGNames]
+            mzr <- mzr[EICGNames]
+            gEICs <- c(gEICs, setNames(loadEICs(spectra, rtr, mzr), EICGNames))
+            
+            for (fg in EICGNames)
+                saveCacheData("mzREIC", gEICs[[fg]], EICHashes[[fg]], cacheDB)
+        }
+        
+        EICs[[ana]] <- gEICs
+        
+        # for (fg in gNames)
+        # {
+        #     if (ana %in% doEICs[[fg]])
+        #     {
+        #         rtRange <- rtRanges[[fg]]
+        #         mzRange <- gInfo[fg, "mzs"] + c(-mzWindow, mzWindow)
+        #         
+        #         if (is.null(anaHashes[[ana]]))
+        #             anaHashes[[ana]] <- makeFileHash(dfile)
+        #             
+        #         hash <- makeHash(anaHashes[[ana]], rtRange, mzRange)
+        #         
+        #         eic <- loadCacheData("mzREIC", hash, cacheDB)
+        #         if (is.null(eic))
+        #         {
+        #             if (is.null(spectra))
+        #                 spectra <- loadSpectra(dfile, verbose = FALSE, cacheDB = cacheDB)
+        #             
+        #             eic <- loadEICs(spectra, list(rtRange), list(mzRange))[[1]]
+        #             saveCacheData("mzREIC", eic, hash, cacheDB)
+        #         }
+        # 
+        #         EICs[[ana]][[fg]] <- eic                
+        #     }
+        # }
+    }
+    
+    closeCacheDB(cacheDB)
+    
+    # UNDONE
+    EICFGroups <- unique(unlist(sapply(EICs, names)))
+    return(sapply(EICFGroups, function(fg)
+    {
+        pruneList(sapply(anaList, function(ana) EICs[[ana]][[fg]], simplify = FALSE))
+    }))
+    
+    return(EICs)
 }
 
 # align & average spectra by clustering or between peak distances

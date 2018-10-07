@@ -551,7 +551,6 @@ loadXCMSEICForFGroups <- function(fGroups, rtWindow, mzWindow, topMost, onlyPres
         
         getFTCol <- function(anai, col)
         {
-            ana <- anaInfo$analysis[anai]
             if (ftind[[grpi]][anai] == 0)
                 NA
             else

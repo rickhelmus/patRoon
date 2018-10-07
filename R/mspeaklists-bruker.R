@@ -36,7 +36,7 @@ generateDAMSPeakLists <- function(fGroups, bgsubtr = TRUE, maxRtMSWidth = NULL, 
     
     compounds <- generateDACompounds(fGroups, bgsubtr, maxRtMSWidth, clear, save, MSMSType)
 
-    cacheDB <- openCacheDB()
+    cacheDB <- openCacheDBScope()
 
     ftindex <- groupFeatIndex(fGroups)
     fTable <- featureTable(fGroups)
@@ -111,8 +111,6 @@ generateDAMSPeakLists <- function(fGroups, bgsubtr = TRUE, maxRtMSWidth = NULL, 
             saveCacheSet("MSPeakListsDA", resultHashes[resultHashes != ""], setHash, cacheDB)
     }
 
-    closeCacheDB(cacheDB)
-
     return(MSPeakLists(peakLists = ret, algorithm = "Bruker_DataAnalysis"))
 }
 
@@ -132,7 +130,7 @@ generateDAFMFMSPeakLists <- function(fGroups)
     
     # UNDONE: implement topMost
 
-    cacheDB <- openCacheDB()
+    cacheDB <- openCacheDBScope()
 
     ftindex <- groupFeatIndex(fGroups)
     gcount <- ncol(ftindex)
@@ -207,8 +205,6 @@ generateDAFMFMSPeakLists <- function(fGroups)
         if (is.null(cachedSet))
             saveCacheSet("MSPeakListsDAFMF", resultHashes[resultHashes != ""], setHash, cacheDB)
     }
-
-    closeCacheDB(cacheDB)
 
     return(MSPeakLists(peakLists = ret, algorithm = "Bruker_DataAnalysis_FMF"))
 }

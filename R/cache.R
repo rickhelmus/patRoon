@@ -18,6 +18,7 @@ makeFileHash <- function(...) digest::digest(sapply(list(...), digest::digest, f
 
 openCacheDB <- function() dbConnect(SQLite(), getCacheFile())
 closeCacheDB <- function(db) dbDisconnect(db)
+openCacheDBScope <- withr::local_(function(x) openCacheDB(), function(x) closeCacheDB(x))
 
 loadCacheData <- function(category, hashes, dbArg = NULL)
 {
@@ -25,7 +26,7 @@ loadCacheData <- function(category, hashes, dbArg = NULL)
         return(NULL)
 
     if (is.null(dbArg))
-        db <- openCacheDB()
+        db <- openCacheDBScope()
     else
         db <- dbArg
 
@@ -54,9 +55,6 @@ loadCacheData <- function(category, hashes, dbArg = NULL)
         }
     }
 
-    if (is.null(dbArg))
-        closeCacheDB(db)
-
     return(ret)
 }
 
@@ -66,7 +64,7 @@ saveCacheData <- function(category, data, hash, dbArg = NULL)
         return(NULL)
 
     if (is.null(dbArg))
-        db <- openCacheDB()
+        db <- openCacheDBScope()
     else
         db <- dbArg
 
@@ -82,9 +80,6 @@ saveCacheData <- function(category, data, hash, dbArg = NULL)
     # too many rows
     if (dbGetQuery(db, sprintf("SELECT Count(*) FROM %s", category))[[1]] > getMaxCacheEntries())
         dbExecute(db, sprintf("DELETE FROM %s WHERE ROWID in (SELECT min(ROWID) FROM %s)", category, category))
-
-    if (is.null(dbArg))
-        closeCacheDB(db)
 }
 
 loadCacheSet <- function(category, setHash, dbArg = NULL)
@@ -152,7 +147,7 @@ clearCache <- function(what = NULL)
     }
     else
     {
-        db <- openCacheDB()
+        db <- openCacheDBScope()
         tables <- dbListTables(db)
 
         if (length(tables) == 0)
@@ -177,7 +172,6 @@ clearCache <- function(what = NULL)
                 dbExecute(db, "VACUUM")
         }
 
-        closeCacheDB(db)
     }
     invisible(NULL)
 }

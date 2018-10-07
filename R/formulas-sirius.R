@@ -100,7 +100,7 @@ generateFormulasSirius <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct = 
 
     formTable <- list()
 
-    cacheDB <- openCacheDB() # open manually so caching code doesn't need to on each R/W access
+    cacheDB <- openCacheDBScope() # open manually so caching code doesn't need to on each R/W access
     setHash <- makeHash(fGroups, pLists, profile, adduct, maxMzDev, elements, database, noise)
     cachedSet <- loadCacheSet("formulasSirius", setHash, cacheDB)
     formHashes <- character(0)
@@ -182,8 +182,6 @@ generateFormulasSirius <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct = 
 
     if (is.null(cachedSet))
         saveCacheSet("formulasSirius", formHashes, setHash, cacheDB)
-
-    closeCacheDB(cacheDB)
 
     formTable <- pruneList(sapply(formTable, function(ft) ft[sapply(ft, nrow) > 0], simplify = FALSE), TRUE)
 

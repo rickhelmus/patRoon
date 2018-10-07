@@ -74,7 +74,7 @@ generateMzRPeakLists <- function(fGroups, avgMzWindow = 0.001, maxRtMSWidth = NU
     if (gcount == 0)
         return(MSPeakLists(algorithm = "mzR"))
 
-    cacheDB <- openCacheDB()
+    cacheDB <- openCacheDBScope()
     setHash <- makeHash(fGroups, avgMzWindow, maxRtMSWidth, avgTopPeaks, avgMinIntensity, avgMassFun, avgMethod,
                         precursorMzWindow, topMost)
     cachedSet <- loadCacheSet("MSPeakListsMzR", setHash, cacheDB)
@@ -156,8 +156,6 @@ generateMzRPeakLists <- function(fGroups, avgMzWindow = 0.001, maxRtMSWidth = NU
 
     if (is.null(cachedSet))
         saveCacheSet("MSPeakListsMzR", resultHashes[1:resultHashCount], setHash, cacheDB)
-
-    closeCacheDB(cacheDB)
 
     return(MSPeakLists(peakLists = ret, algorithm = "mzR"))
 }

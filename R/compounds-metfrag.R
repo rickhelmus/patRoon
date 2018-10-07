@@ -368,7 +368,7 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
         mfSettings <- modifyList(mfSettings, extraOpts)
     }
 
-    cacheDB <- openCacheDB()
+    cacheDB <- openCacheDBScope()
     setHash <- makeHash(fGroups, pLists, method, mfSettings, topMost, identifiers, addTrivialNames)
     cachedSet <- loadCacheSet("identifyMetFrag", setHash, cacheDB)
     resultHashes <- vector("character", length(gNames))
@@ -514,8 +514,6 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
 
     if (is.null(cachedSet))
         saveCacheSet("identifyMetFrag", resultHashes[resultHashes != ""], setHash, cacheDB)
-
-    closeCacheDB(cacheDB)
 
     return(compoundsMF(compounds = ret, algorithm = "MetFrag", settings = mfSettings))
 }

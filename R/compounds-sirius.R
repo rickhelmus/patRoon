@@ -113,7 +113,7 @@ generateCompoundsSirius <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct =
     gInfo <- groupInfo(fGroups)
     pLists <- peakLists(MSPeakLists)
 
-    cacheDB <- openCacheDB()
+    cacheDB <- openCacheDBScope()
     setHash <- makeHash(fGroups, pLists, profile, adduct, maxMzDev, elements, formulaDatabase,
                         fingerIDDatabase, noise, topMost)
     cachedSet <- loadCacheSet("identifySirius", setHash, cacheDB)
@@ -211,8 +211,6 @@ generateCompoundsSirius <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct =
 
     if (is.null(cachedSet))
         saveCacheSet("identifySirius", resultHashes[resultHashes != ""], setHash, cacheDB)
-
-    closeCacheDB(cacheDB)
 
     return(compounds(compounds = ret, algorithm = "SIRIUS"))
 }

@@ -193,7 +193,7 @@ generateFormulasGenForm <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct =
         mainArgs <- c(mainArgs, "het")
 
     formTable <- list()
-    cacheDB <- openCacheDB() # open manually so caching code doesn't need to on each R/W access
+    cacheDB <- openCacheDBScope() # open manually so caching code doesn't need to on each R/W access
     setHash <- makeHash(fGroups, maxMzDev, adduct, elements, hetero, MSMode, extraOpts)
     cachedSet <- loadCacheSet("formulasGenForm", setHash, cacheDB)
     formHashes <- character(0)
@@ -332,8 +332,6 @@ generateFormulasGenForm <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct =
 
     if (is.null(cachedSet))
         saveCacheSet("formulasGenForm", formHashes, setHash, cacheDB)
-
-    closeCacheDB(cacheDB)
 
     formTable <- pruneList(sapply(formTable, function(ft) ft[sapply(ft, nrow) > 0], simplify = FALSE), TRUE)
 

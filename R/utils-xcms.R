@@ -531,7 +531,7 @@ loadXCMSEICForFGroups <- function(fGroups, rtWindow, mzWindow, topMost, onlyPres
     if (!is.null(topMost))
         topMost <- min(topMost, nrow(anaInfo))
 
-    cacheDB <- openCacheDB()
+    cacheDB <- openCacheDBScope()
 
     EICs <- lapply(seq_len(length(fGroups)), function(grpi)
     {
@@ -593,8 +593,6 @@ loadXCMSEICForFGroups <- function(fGroups, rtWindow, mzWindow, topMost, onlyPres
         return(ret)
     })
     names(EICs) <- gNames
-
-    closeCacheDB(cacheDB)
 
     return(EICs)
 }

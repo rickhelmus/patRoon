@@ -49,7 +49,7 @@ generateFormulasDA <- function(fGroups, precursorMzSearchWindow = 0.002, MSMode 
     fts <- featureTable(fGroups)
     fTable <- list()
 
-    cacheDB <- openCacheDB() # open manually so caching code doesn't need to on each R/W access
+    cacheDB <- openCacheDBScope() # open manually so caching code doesn't need to on each R/W access
     setHash <- makeHash(fGroups, precursorMzSearchWindow)
     cachedSet <- loadCacheSet("formulasBruker", setHash, cacheDB)
     formHashes <- vector("character", nrow(anaInfo) * gCount)
@@ -230,8 +230,6 @@ generateFormulasDA <- function(fGroups, precursorMzSearchWindow = 0.002, MSMode 
 
     if (is.null(cachedSet))
         saveCacheSet("formulasBruker", formHashes[1:formHashCount], setHash, cacheDB)
-
-    closeCacheDB(cacheDB)
 
     fTable <- pruneList(sapply(fTable, function(ft) ft[sapply(ft, nrow) > 0], simplify = FALSE), TRUE)
 

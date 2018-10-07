@@ -107,17 +107,21 @@ Rcpp::List loadEICs(Rcpp::List spectra, Rcpp::List rtRanges, Rcpp::List mzRanges
         // compress data by removing any zero intensity datapoints that are inbetween two other zero intensitiy points.
         for (size_t ind=0; ind<(EICTimes.size()-2); )
         {
-            if (EICIntensities[ind] == 0 && EICIntensities[ind+1] == 0 && EICIntensities[ind+2] == 0)
+            if (EICIntensities[ind+2] != 0)
+                ind += 3;
+            else if (EICIntensities[ind+1] != 0)
+                ind += 2;
+            else if (EICIntensities[ind] != 0)
+                ++ind;
+            else // all zero
             {
                 EICTimes.erase(EICTimes.begin() + (ind + 1));
                 EICIntensities.erase(EICIntensities.begin() + (ind + 1));
             }
-            else
-                ++ind;
         }
         
-        ret[eici] = Rcpp::List::create(Rcpp::Named("time") = EICTimes,
-                                       Rcpp::Named("intensity") = EICIntensities);
+        ret[eici] = Rcpp::DataFrame::create(Rcpp::Named("time") = EICTimes,
+                                            Rcpp::Named("intensity") = EICIntensities);
     }
     
     return ret;

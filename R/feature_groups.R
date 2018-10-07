@@ -640,8 +640,9 @@ setMethod("plotEIC", "featureGroups", function(obj, rtWindow = 30, mzWindow = 0.
     rGroups <- unique(anaInfo$group)
 
     if (is.null(EICs))
-        EICs <- loadXCMSEICForFGroups(obj, rtWindow, mzWindow, topMost, onlyPresent)
-
+        EICs <- getEICsForFGroups(obj, rtWindow, mzWindow, topMost, onlyPresent)
+    EICFGroups <- unique(unlist(sapply(EICs, names)))
+    
     if (colourBy == "rGroups")
     {
         EICColors <- colorRampPalette(brewer.pal(12, "Paired"))(length(rGroups))
@@ -700,14 +701,15 @@ setMethod("plotEIC", "featureGroups", function(obj, rtWindow = 30, mzWindow = 0.
 
     anaIndsToPlot <- sapply(gNames, function(grp)
     {
-        ret <- match(names(EICs[[grp]]), anaInfo$analysis)
+        anasWGroup <- names(EICs)[sapply(EICs, function(e) !is.null(e[[grp]]))]
+        ret <- match(anasWGroup, anaInfo$analysis)
         if (onlyPresent)
             ret <- ret[gTable[[grp]][ret] != 0]
         return(ret)
     }, simplify = FALSE)
 
     rGroupsInPlot <- unique(anaInfo$group[unlist(anaIndsToPlot)])
-    fGroupsInPlot <- gNames[gNames %in% names(EICs)]
+    fGroupsInPlot <- gNames[gNames %in% EICFGroups]
 
     oldp <- par(no.readonly = TRUE)
     if (showLegend)
@@ -751,7 +753,7 @@ setMethod("plotEIC", "featureGroups", function(obj, rtWindow = 30, mzWindow = 0.
         if (retMin)
             rtRange <- rtRange / 60
 
-        for (ana in names(EICs[[grp]]))
+        for (ana in names(EICs))
         {
             anai <- match(ana, anaInfo$analysis)
             if (is.na(anai))
@@ -759,9 +761,11 @@ setMethod("plotEIC", "featureGroups", function(obj, rtWindow = 30, mzWindow = 0.
 
             if (onlyPresent && gTable[[grp]][anai] == 0)
                 next
-
-            EIC <- EICs[[grp]][[ana]]
-
+            
+            EIC <- EICs[[ana]][[grp]]
+            if (is.null(EIC))
+                next
+            
             if (colourBy == "rGroups")
                 colInd <- anaInfo$group[anai]
             else if (colourBy == "fGroups")

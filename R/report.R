@@ -618,7 +618,7 @@ setMethod("reportPDF", "featureGroups", function(fGroups, path, reportFGroups,
     if (reportFGroups || !is.null(formConsensus) || !is.null(compounds) || !is.null(components))
     {
         cat("Loading all EICs... ")
-        EICs <- loadXCMSEICForFGroups(fGroups, EICRtWindow, EICMzWindow, EICTopMost, EICOnlyPresent)
+        EICs <- getEICsForFGroups(fGroups, EICRtWindow, EICMzWindow, EICTopMost, EICOnlyPresent)
         cat("Done!\n")
     }
 
@@ -740,7 +740,7 @@ setMethod("reportMD", "featureGroups", function(fGroups, path, reportChord, repo
     #     !is.null(compounds) || !is.null(components))
     {
         cat("Loading all EICs... ")
-        EICs <- loadXCMSEICForFGroups(fGroups, EICRtWindow, EICMzWindow, EICTopMost, EICOnlyPresent)
+        EICs <- getEICsForFGroups(fGroups, EICRtWindow, EICMzWindow, EICTopMost, EICOnlyPresent)
         cat("Done!\n")
     }
 

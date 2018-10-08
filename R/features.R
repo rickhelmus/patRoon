@@ -71,10 +71,17 @@ setMethod("analysisInfo", "features", function(obj) obj@analysisInfo)
 #' @export
 setMethod("analyses", "features", function(obj) analysisInfo(obj)$analysis)
 
-# UNDONE: more options, docs, tests, ...
-# UNDONE: This probably needs more work for XCMS/enviPick?
-#' @describeIn features Performs common rule based filtering,
-#'   such as intensity thresholds.
+#' @describeIn features Performs common rule based filtering of features.
+#' @param intensityThreshold Minimum intensity of a feature. Set to \code{NULL}
+#'   to ignore.
+#' @param retentionRange,mzRange,chromWidthRange Range of retention time (in
+#'   seconds), \emph{m/z} or chromatographic peak width (in seconds),
+#'   respectively. Features outside this range will be removed. Should be a
+#'   numeric vector with length of two containing the min/max values. If the max
+#'   value is set to a value below 0 then no maximum is assumed. Set to
+#'   \code{NULL} to skip this step.
+#' @param negate If set to \code{TRUE} then filtering operations are performed
+#'   in opposite manner.
 #' @export
 setMethod("filter", "features", function(obj, intensityThreshold = NULL, retentionRange = NULL,
                                          mzRange = NULL, chromWidthRange = NULL, negate = FALSE)
@@ -87,6 +94,11 @@ setMethod("filter", "features", function(obj, intensityThreshold = NULL, retenti
     
     if (length(obj) == 0)
         return(obj)
+    
+    hash <- makeHash(obj, intensityThreshold, retentionRange, mzRange, chromWidthRange, negate)
+    cache <- loadCacheData("filterFeatures", hash)
+    if (!is.null(cache))
+        return(cache)
     
     anaInfo <- analysisInfo(obj)
     
@@ -102,6 +114,7 @@ setMethod("filter", "features", function(obj, intensityThreshold = NULL, retenti
     if (negate)
         rangePred <- Negate(rangePred)
     
+    oldn <- length(obj)
     
     for (ana in analyses(obj))
     {
@@ -118,6 +131,10 @@ setMethod("filter", "features", function(obj, intensityThreshold = NULL, retenti
             obj@features[[ana]] <- obj@features[[ana]][rangePred(retmax - retmin, chromWidthRange)]
     }
     
+    saveCacheData("filterFeatures", obj, hash)
+    
+    newn <- length(obj)
+    printf("Done! Filtered %d (%.2f%%) features. Remaining: %d\n", oldn - newn, if (oldn == 0) 0 else (1-(newn/oldn))*100, newn)
     
     return(obj)
 })

@@ -25,7 +25,9 @@
 
 \S4method{analyses}{features}(obj)
 
-\S4method{filter}{features}(obj, intensityThreshold = NULL)
+\S4method{filter}{features}(obj, intensityThreshold = NULL,
+  retentionRange = NULL, mzRange = NULL, chromWidthRange = NULL,
+  negate = FALSE)
 
 \S4method{[}{features,ANY,missing,missing}(x, i, j, ..., drop = TRUE)
 
@@ -35,6 +37,19 @@
 }
 \arguments{
 \item{obj, x, object}{\code{features} object to be accessed}
+
+\item{intensityThreshold}{Minimum intensity of a feature. Set to \code{NULL}
+to ignore.}
+
+\item{retentionRange, mzRange, chromWidthRange}{Range of retention time (in
+seconds), \emph{m/z} or chromatographic peak width (in seconds),
+respectively. Features outside this range will be removed. Should be a
+numeric vector with length of two containing the min/max values. If the max
+value is set to a value below 0 then no maximum is assumed. Set to
+\code{NULL} to skip this step.}
+
+\item{negate}{If set to \code{TRUE} then filtering operations are performed
+in opposite manner.}
 
 \item{i}{A numeric or character value which is used to select analyses by
 their index or name, respectively (for the order/names see \code{analyses()}).\cr\cr For \code{[}: Can also be logical to perform logical selection
@@ -76,8 +91,7 @@ and derived objects are created by 'feature finders' such as
 \item \code{analyses}: returns a \code{character} vector with the names of the
 analyses from which data is present in this object.
 
-\item \code{filter}: Performs common rule based filtering on of features,
-such as intensity thresholds.
+\item \code{filter}: Performs common rule based filtering of features.
 
 \item \code{[}: Subset on analyses.
 

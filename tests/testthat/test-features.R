@@ -45,3 +45,23 @@ test_that("basic subsetting", {
     expect_equivalent(ffOpenMS[[analyses(ffOpenMS)[2]]], featureTable(ffOpenMS)[[2]])
     expect_equivalent(callDollar(ffOpenMS, analyses(ffOpenMS)[2]), ffOpenMS[[2]])
 })
+
+test_that("basic filtering", {
+    expect_gte(min(filter(ffOpenMS, intensityThreshold = 500)[[1]]$intensity), 500)
+    
+    expect_range(filter(ffOpenMS, retentionRange = c(120, 300))[[1]]$ret, range(120, 300))
+    expect_equivalent(filter(ffOpenMS, retentionRange = c(0, -1)), ffOpenMS)
+    expect_range(filter(ffOpenMS, mzRange = c(200, 300))[[1]]$mz, range(200, 300))
+    expect_equivalent(filter(ffOpenMS, mzRange = c(0, -1)), ffOpenMS)
+    expect_lt(length(filter(ffOpenMS, chromWidthRange = c(0, 30))), length(ffOpenMS))
+    expect_equivalent(filter(ffOpenMS, chromWidthRange = c(0, -1)), ffOpenMS)
+    
+    expect_known_output(filter(ffOpenMS, intensityThreshold = 500, retentionRange = c(120, -1),
+                               mzRange = c(100, 400)),
+                        testFile("ff-combi", text = TRUE))
+    expect_known_output(filter(ffOpenMS, intensityThreshold = 500, retentionRange = c(120, -1),
+                               mzRange = c(100, 400), negate = TRUE),
+                        testFile("ff-combi-neg", text = TRUE))
+    expect_length(filter(ffEmpty, intensityThreshold = 500, retentionRange = c(120, -1),
+                         mzRange = c(100, 400)), 0)
+})

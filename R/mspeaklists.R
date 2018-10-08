@@ -185,7 +185,8 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
         return(cache)
 
     pLists <- peakLists(obj)
-
+    oldn <- length(obj)
+    
     for (anai in seq_along(pLists))
     {
         gcount <- length(pLists[[anai]])
@@ -254,6 +255,9 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
     obj@peakLists <- pLists
     saveCacheData("filterMSPeakLists", obj, hash)
 
+    newn <- length(obj)
+    printf("Done! Filtered %d (%.2f%%) MS peak lists. Remaining: %d\n", oldn - newn, if (oldn == 0) 0 else (1-(newn/oldn))*100, newn)
+    
     return(obj)
 })
 

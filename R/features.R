@@ -73,17 +73,51 @@ setMethod("analyses", "features", function(obj) analysisInfo(obj)$analysis)
 
 # UNDONE: more options, docs, tests, ...
 # UNDONE: This probably needs more work for XCMS/enviPick?
-#' @describeIn features Performs common rule based filtering on of features,
+#' @describeIn features Performs common rule based filtering,
 #'   such as intensity thresholds.
 #' @export
-setMethod("filter", "features", function(obj, intensityThreshold = NULL)
+setMethod("filter", "features", function(obj, intensityThreshold = NULL, retentionRange = NULL,
+                                         mzRange = NULL, chromWidthRange = NULL, negate = FALSE)
 {
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertNumber(intensityThreshold, lower = 0, finite = TRUE, null.ok = TRUE, add = ac)
+    aapply(assertRange, . ~ retentionRange + mzRange + chromWidthRange, null.ok = TRUE, fixed = list(add = ac))
+    checkmate::assertFlag(negate, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    if (length(obj) == 0)
+        return(obj)
+    
     anaInfo <- analysisInfo(obj)
-    if (!is.null(intensityThreshold))
+    
+    intPred <- if (!negate) function(x) x >= intensityThreshold else function(x) x < intensityThreshold
+    rangePred <- function(x, range)
     {
-        for (ana in anaInfo$analysis)
-            obj@features[[ana]] <- obj@features[[ana]][intensity >= intensityThreshold]
+        if (range[2] < 0)
+            numGTE(x, range[1])
+        else
+            numGTE(x, range[1]) & numLTE(x, range[2])
     }
+    
+    if (negate)
+        rangePred <- Negate(rangePred)
+    
+    
+    for (ana in analyses(obj))
+    {
+        if (!is.null(intensityThreshold))
+            obj@features[[ana]] <- obj@features[[ana]][intPred(intensity)]
+        
+        if (!is.null(retentionRange))
+            obj@features[[ana]] <- obj@features[[ana]][rangePred(ret, retentionRange)]
+        
+        if (!is.null(mzRange))
+            obj@features[[ana]] <- obj@features[[ana]][rangePred(mz, mzRange)]
+        
+        if (!is.null(chromWidthRange))
+            obj@features[[ana]] <- obj@features[[ana]][rangePred(retmax - retmin, chromWidthRange)]
+    }
+    
     
     return(obj)
 })

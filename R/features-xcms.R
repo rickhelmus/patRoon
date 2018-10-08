@@ -13,6 +13,21 @@ setMethod("[", c("featuresXCMS", "ANY", "missing", "missing"), function(x, i, j,
     return(x)
 })
 
+setMethod("filter", "featuresXCMS", function(obj, ...)
+{
+    obj <- callNextMethod(obj, ...)
+    
+    # check if amount of features (peaks) changed (e.g. due to filtering), if so update
+    if (length(obj) != nrow(peaks(obj@xs)))
+    {
+        cat("Updating xcmsSet...\n")
+        # NOTE: use base method to force update as overloaded method simply returns @xs slot
+        obj@xs <- selectMethod(getXcmsSet, "features")(obj, TRUE)
+    }
+    
+    return(obj)
+})
+
 
 #' @details \code{findFeaturesXCMS} uses the \code{\link[xcms]{xcmsSet}}
 #'   function from the \pkg{xcms} package to find features.

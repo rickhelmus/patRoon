@@ -117,7 +117,7 @@ membership for each candidate (format as \code{\link{cutree}}).
 clustering was performed.
 
 \item \code{groupNames}: returns a \code{character} vector with the names of the
-feature groups from which data is present in this object.
+feature groups for which data is present in this object.
 
 \item \code{length}: Returns the total number of clusters.
 

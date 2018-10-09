@@ -124,7 +124,7 @@ Contains data for feature groups that are related in some way. These
 generate components.
 
 \item \code{groupNames}: returns a \code{character} vector with the names of the
-feature groups from which data is present in this object.
+feature groups for which data is present in this object.
 
 \item \code{length}: Obtain total number of components.
 

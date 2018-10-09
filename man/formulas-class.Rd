@@ -112,10 +112,10 @@ generators}.
 string) used to generate formulae.
 
 \item \code{analyses}: returns a \code{character} vector with the names of the
-analyses from which data is present in this object.
+analyses for which data is present in this object.
 
 \item \code{groupNames}: returns a \code{character} vector with the names of the
-feature groups from which data is present in this object.
+feature groups for which data is present in this object.
 
 \item \code{length}: Obtain total number of formulae entries.
 

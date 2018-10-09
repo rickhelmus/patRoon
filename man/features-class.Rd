@@ -9,6 +9,7 @@
 \alias{featureTable,features-method}
 \alias{analysisInfo,features-method}
 \alias{analyses,features-method}
+\alias{replicateGroups,features-method}
 \alias{filter,features-method}
 \alias{[,features,ANY,missing,missing-method}
 \alias{[[,features,ANY,missing-method}
@@ -24,6 +25,8 @@
 \S4method{analysisInfo}{features}(obj)
 
 \S4method{analyses}{features}(obj)
+
+\S4method{replicateGroups}{features}(obj)
 
 \S4method{filter}{features}(obj, intensityThreshold = NULL,
   retentionRange = NULL, mzRange = NULL, chromWidthRange = NULL,
@@ -89,7 +92,10 @@ and derived objects are created by 'feature finders' such as
 \item \code{analysisInfo}: Get analysis information
 
 \item \code{analyses}: returns a \code{character} vector with the names of the
-analyses from which data is present in this object.
+analyses for which data is present in this object.
+
+\item \code{replicateGroups}: returns a \code{character} vector with the names of the
+replicate groups for which data is present in this object.
 
 \item \code{filter}: Performs common rule based filtering of features.
 

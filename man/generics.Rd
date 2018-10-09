@@ -4,6 +4,7 @@
 \alias{generics}
 \alias{analysisInfo}
 \alias{analyses}
+\alias{replicateGroups}
 \alias{groupNames}
 \alias{algorithm}
 \alias{clusterProperties}
@@ -20,6 +21,7 @@
 \alias{plotSpec}
 \alias{plotStructure}
 \alias{plotVenn}
+\alias{plotUpSet}
 \alias{treeCut}
 \alias{treeCutDynamic}
 \title{Miscellaneous generics}
@@ -27,6 +29,8 @@
 analysisInfo(obj)
 
 analyses(obj)
+
+replicateGroups(obj)
 
 groupNames(obj)
 
@@ -60,6 +64,8 @@ plotStructure(obj, ...)
 
 plotVenn(obj, which = NULL, ...)
 
+plotUpSet(obj, ...)
+
 treeCut(obj, k = NULL, h = NULL, ...)
 
 treeCutDynamic(obj, maxTreeHeight = 1, deepSplit = TRUE,
@@ -83,6 +89,8 @@ retention time scatter plots.}
 
 \item{maxTreeHeight, deepSplit, minModuleSize}{Arguments used by
 \code{\link{cutreeDynamicTree}}.}
+
+\item{which}{What should be plotted. See method documentation for specifics.}
 }
 \description{
 Various (S4) generic functions provide a common interface for common tasks
@@ -102,7 +110,7 @@ please refer to the linked method documentation for each generic.
     \item Methods are defined for: \code{\link[=analysisInfo,featureGroups-method]{featureGroups}}, \code{\link[=analysisInfo,features-method]{features}}.
 }
 
-\code{analyses} returns a \code{character} vector with the analyses from
+\code{analyses} returns a \code{character} vector with the analyses for which data is present in this object.
 
 
 
@@ -113,7 +121,18 @@ please refer to the linked method documentation for each generic.
     \item Methods are defined for: \code{\link[=analyses,MSPeakLists-method]{MSPeakLists}}, \code{\link[=analyses,featureGroups-method]{featureGroups}}, \code{\link[=analyses,features-method]{features}}, \code{\link[=analyses,formulas-method]{formulas}}.
 }
 
-\code{groupNames} returns a \code{character} vector with the names of the
+\code{replicateGroups} returns a \code{character} vector with the analyses for which data is present in this object.
+
+
+
+
+
+
+\itemize{
+    \item Methods are defined for: \code{\link[=replicateGroups,featureGroups-method]{featureGroups}}, \code{\link[=replicateGroups,features-method]{features}}.
+}
+
+\code{groupNames} returns a \code{character} vector with the names of the feature groups for which data is present in this object.
 
 
 
@@ -287,6 +306,17 @@ please refer to the linked method documentation for each generic.
 
 \itemize{
     \item Methods are defined for: \code{\link[=plotVenn,featureGroups-method]{featureGroups}}, \code{\link[=plotVenn,featureGroupsComparison-method]{featureGroupsComparison}}.
+}
+
+\code{plotUpSet} plots an UpSet diagram to assess unique and overlapping data.
+
+
+
+
+
+
+\itemize{
+    \item Methods are defined for: \code{\link[=plotUpSet,featureGroups-method]{featureGroups}}, \code{\link[=plotUpSet,featureGroupsComparison-method]{featureGroupsComparison}}.
 }
 
 \code{treeCut} Manually cut a cluster.

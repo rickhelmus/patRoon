@@ -82,10 +82,10 @@ lists generators}.
 \item \code{peakLists}: Accessor method to obtain the MS peak lists.
 
 \item \code{analyses}: returns a \code{character} vector with the names of the
-analyses from which data is present in this object.
+analyses for which data is present in this object.
 
 \item \code{groupNames}: returns a \code{character} vector with the names of the
-feature groups from which data is present in this object.
+feature groups for which data is present in this object.
 
 \item \code{algorithm}: Retrieve the algorithm (a character string) used to
 generate the MS peak lists.

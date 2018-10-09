@@ -6,6 +6,7 @@
 \alias{featureGroups}
 \alias{names,featureGroups-method}
 \alias{analyses,featureGroups-method}
+\alias{replicateGroups,featureGroups-method}
 \alias{groupNames,featureGroups-method}
 \alias{length,featureGroups-method}
 \alias{show,featureGroups-method}
@@ -31,6 +32,7 @@
 \alias{plotChord,featureGroups-method}
 \alias{plotEIC,featureGroups-method}
 \alias{plotVenn,featureGroups-method}
+\alias{plotUpSet,featureGroups-method}
 \alias{unique,featureGroups-method}
 \alias{overlap,featureGroups-method}
 \alias{overlap}
@@ -41,6 +43,8 @@
 \S4method{names}{featureGroups}(x)
 
 \S4method{analyses}{featureGroups}(obj)
+
+\S4method{replicateGroups}{featureGroups}(obj)
 
 \S4method{groupNames}{featureGroups}(obj)
 
@@ -87,6 +91,9 @@
 
 \S4method{plotVenn}{featureGroups}(obj, which = NULL, ...)
 
+\S4method{plotUpSet}{featureGroups}(obj, which = replicateGroups(obj),
+  nsets = length(which), ...)
+
 \S4method{unique}{featureGroups}(x, which, relativeTo = NULL,
   outer = FALSE)
 
@@ -104,7 +111,8 @@ their index or name, respectively (for the order/names see \code{analyses()/name
 \item{\dots}{Ignored for \code{"["} operator or passed to
 \code{\link[graphics]{plot}} (\code{plot}, \code{plotInt} and
 \code{plotEIC}), \pkg{\link{VennDiagram}} plotting functions
-(\code{plotVenn}) or \code{\link{chordDiagram}} (\code{plotChord}).}
+(\code{plotVenn}), \code{\link{chordDiagram}} (\code{plotChord}) or
+\code{\link[UpSetR]{upset}} (\code{plotUpSet}).}
 
 \item{drop}{ignored.}
 
@@ -183,6 +191,8 @@ annotation.}
 
 \item{which}{A character vector with replicate groups used for comparison.}
 
+\item{nsets}{See \code{\link[UpSetR]{upset}}.}
+
 \item{relativeTo}{A character vector with replicate groups that should be
 used for unique comparison. If \code{NULL} then all replicate groups are
 used for comparison. Replicate groups specified in \code{which} are
@@ -227,7 +237,10 @@ grouping of features across analyses.
 \item \code{names}: Obtain feature group names.
 
 \item \code{analyses}: returns a \code{character} vector with the names of the
-analyses from which data is present in this object.
+analyses for which data is present in this object.
+
+\item \code{replicateGroups}: returns a \code{character} vector with the names of the
+replicate groups for which data is present in this object.
 
 \item \code{groupNames}: Same as \code{names}. Provided for consistency to other classes.
 
@@ -274,12 +287,15 @@ groups. In addition, analyses/replicates sharing similar properties
 between these 'outer groups'.
 
 \item \code{plotEIC}: Plots extracted ion chromatograms (EICs) of feature
-groups. This function uses the \pkg{xcms} package for loading EIC
-data.
+groups.
 
 \item \code{plotVenn}: plots a Venn diagram (using
 \pkg{\link{VennDiagram}}) outlining unique and shared feature groups
 between up to five replicate groups.
+
+\item \code{plotUpSet}: plots an UpSet diagram (using the
+\code{\link[UpSetR]{upset}} function) outlining unique and shared feature
+groups between given replicate groups.
 
 \item \code{unique}: Obtain a subset with unique feature groups
 present in one or more specified replicate group(s).
@@ -315,5 +331,7 @@ row within the feature table of the analysis (see
 }}
 
 \references{
-\addCitations{circlize}{1}
+\addCitations{circlize}{1} \cr\cr
+  \insertRef{Conway2017}{patRoon} \cr\cr
+  \insertRef{Lex2014}{patRoon}
 }

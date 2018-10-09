@@ -7,6 +7,7 @@
 \alias{comparison}
 \alias{plot,featureGroupsComparison,ANY-method}
 \alias{plotVenn,featureGroupsComparison-method}
+\alias{plotUpSet,featureGroupsComparison-method}
 \alias{plotChord,featureGroupsComparison-method}
 \alias{consensus,featureGroupsComparison-method}
 \alias{unique,featureGroupsComparison-method}
@@ -18,6 +19,9 @@
 \S4method{plot}{featureGroupsComparison,ANY}(x, retMin = TRUE, ...)
 
 \S4method{plotVenn}{featureGroupsComparison}(obj, which = NULL, ...)
+
+\S4method{plotUpSet}{featureGroupsComparison}(obj, which = names(obj),
+  ...)
 
 \S4method{plotChord}{featureGroupsComparison}(obj, addSelfLinks = FALSE,
   addRetMzPlots = TRUE, ...)
@@ -101,6 +105,9 @@ The \code{comparison} method generates a
 
 \code{plotVenn} plots a Venn diagram outlining unique and shared
   feature groups between up to five compared feature groups.
+
+\code{plotUpSet} plots an UpSet diagram outlining unique and shared
+  feature groups.
 
 \code{plotChord} plots a chord diagram to visualize the distribution
   of feature groups.

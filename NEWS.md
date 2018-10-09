@@ -1,6 +1,7 @@
 # patRoon 0.1.0.9000
 
 ## October 2018
+* plotUpSet() methods to compare feature groups by UpSet plots. See e.g. http://caleydo.org/tools/upset/
 * filter() method for features.
 * EICs now loaded via faster C++ code thats uses mzR instead of XCMS
 * Moved feature intensity loading code for OpenMS features to C++. This results in much faster feature finding.

@@ -19,7 +19,8 @@ NULL
 #' @param \dots Ignored for \code{"["} operator or passed to
 #'   \code{\link[graphics]{plot}} (\code{plot}, \code{plotInt} and
 #'   \code{plotEIC}), \pkg{\link{VennDiagram}} plotting functions
-#'   (\code{plotVenn}) or \code{\link{chordDiagram}} (\code{plotChord}).
+#'   (\code{plotVenn}), \code{\link{chordDiagram}} (\code{plotChord}) or
+#'   \code{\link[UpSetR]{upset}} (\code{plotUpSet}).
 #' @param average Average data within replicate groups.
 #' @param which A character vector with replicate groups used for comparison.
 #'
@@ -30,7 +31,7 @@ NULL
 #' @templateVar optionalji TRUE
 #' @templateVar dollarOpName feature group
 #' @template sub_op-args
-#' 
+#'
 #' @slot groups Matrix (\code{\link{data.table}}) with intensities for each
 #'   feature group (columns) per analysis (rows). Access with \code{groups}
 #'   method.
@@ -63,6 +64,12 @@ setMethod("names", "featureGroups", function(x) names(x@groups))
 #' @template strmethod
 #' @export
 setMethod("analyses", "featureGroups", function(obj) analysisInfo(obj)$analysis)
+
+#' @templateVar class featureGroups
+#' @templateVar what replicate groups
+#' @template strmethod
+#' @export
+setMethod("replicateGroups", "featureGroups", function(obj) unique(analysisInfo(obj)$group))
 
 #' @describeIn featureGroups Same as \code{names}. Provided for consistency to other classes.
 #' @export
@@ -399,7 +406,9 @@ setMethod("plotInt", "featureGroups", function(obj, average = FALSE, ...)
 #'
 #' @template plotChord-args
 #'
-#' @references \addCitations{circlize}{1}
+#' @references \addCitations{circlize}{1} \cr\cr
+#'   \insertRef{Conway2017}{patRoon} \cr\cr
+#'   \insertRef{Lex2014}{patRoon}
 #'
 #' @export
 setMethod("plotChord", "featureGroups", function(obj, addSelfLinks = FALSE, addRetMzPlots = TRUE, average = FALSE,
@@ -563,8 +572,7 @@ setMethod("plotChord", "featureGroups", function(obj, addSelfLinks = FALSE, addR
 })
 
 #' @describeIn featureGroups Plots extracted ion chromatograms (EICs) of feature
-#'   groups. This function uses the \pkg{xcms} package for loading EIC
-#'   data.
+#'   groups.
 #'
 #' @param rtWindow Retention time (in seconds) that will be subtracted/added to
 #'   respectively the minimum and maximum retention time of the plotted feature
@@ -889,6 +897,29 @@ setMethod("plotVenn", "featureGroups", function(obj, which, ...)
     }
 
     invisible(list(gList = gRet, areas = areas, intersectionCounts = icounts))
+})
+
+#' @describeIn featureGroups plots an UpSet diagram (using the
+#'   \code{\link[UpSetR]{upset}} function) outlining unique and shared feature
+#'   groups between given replicate groups.
+#' @param nsets See \code{\link[UpSetR]{upset}}.
+#' @export
+setMethod("plotUpSet", "featureGroups", function(obj, which = replicateGroups(obj), nsets = length(which), ...)
+{
+    rGroups <- replicateGroups(obj)
+
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertSubset(which, rGroups, empty.ok = FALSE, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    if (length(obj) == 0)
+        stop("Can't plot empty feature groups object")
+    
+    obj <- replicateGroupFilter(obj, which, verbose = FALSE)
+    
+    gt <- groupTable(obj, average = TRUE)
+    gt[, (which) := lapply(.SD, function(x) as.integer(x > 0)), .SDcols = which]
+    UpSetR::upset(gt, nsets = nsets, ...)
 })
 
 #' @describeIn featureGroups Obtain a subset with unique feature groups

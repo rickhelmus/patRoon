@@ -71,6 +71,12 @@ setMethod("analysisInfo", "features", function(obj) obj@analysisInfo)
 #' @export
 setMethod("analyses", "features", function(obj) analysisInfo(obj)$analysis)
 
+#' @templateVar class features
+#' @templateVar what replicate groups
+#' @template strmethod
+#' @export
+setMethod("replicateGroups", "features", function(obj) unique(analysisInfo(obj)$group))
+
 #' @describeIn features Performs common rule based filtering of features.
 #' @param intensityThreshold Minimum intensity of a feature. Set to \code{NULL}
 #'   to ignore.

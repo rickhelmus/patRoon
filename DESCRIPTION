@@ -26,6 +26,7 @@ Imports:
     checkmate (>= 1.8.5),
     Rcpp,
     VennDiagram,
+    UpSetR,
     stats,
     utils,
     parallel,

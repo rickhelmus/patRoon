@@ -143,14 +143,17 @@ NULL
 setGeneric("analysisInfo", function(obj) standardGeneric("analysisInfo"))
 
 #' @templateVar func analyses
-#' @templateVar desc returns a \code{character} vector with the analyses from
-#'   which data is present in this object.
+#' @templateVar desc returns a \code{character} vector with the analyses for which data is present in this object.
 #' @template generics
 setGeneric("analyses", function(obj) standardGeneric("analyses"))
 
+#' @templateVar func replicateGroups
+#' @templateVar desc returns a \code{character} vector with the analyses for which data is present in this object.
+#' @template generics
+setGeneric("replicateGroups", function(obj) standardGeneric("replicateGroups"))
+
 #' @templateVar func groupNames
-#' @templateVar desc returns a \code{character} vector with the names of the
-#'   feature groups from which data is present in this object.
+#' @templateVar desc returns a \code{character} vector with the names of the feature groups for which data is present in this object.
 #' @template generics
 setGeneric("groupNames", function(obj) standardGeneric("groupNames"))
 
@@ -234,6 +237,14 @@ setGeneric("plotStructure", function(obj, ...) standardGeneric("plotStructure"))
 #' @param which What should be plotted. See method documentation for specifics.
 #'
 setGeneric("plotVenn", function(obj, which = NULL, ...) standardGeneric("plotVenn"))
+
+#' @templateVar func plotUpSet
+#' @templateVar desc plots an UpSet diagram to assess unique and overlapping data.
+#' @template generics
+#'
+#' @param which What should be plotted. See method documentation for specifics.
+#'
+setGeneric("plotUpSet", function(obj, ...) standardGeneric("plotUpSet"))
 
 #' @templateVar func treeCut
 #' @templateVar desc Manually cut a cluster.

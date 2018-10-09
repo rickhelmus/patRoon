@@ -202,6 +202,10 @@ test_that("plotting works", {
     
     expect_doppel("venn", function() plotVenn(fgOpenMS))
     expect_doppel("venn-comp", function() plotVenn(fGCompOpenMS))
+    
+    # vdiffr doesn't work with UpSet
+    expect_plot(plotUpSet(fgOpenMS))
+    expect_plot(plotUpSet(fGCompOpenMS))
 })
 
 test_that("plotting empty objects works", {
@@ -221,4 +225,8 @@ test_that("plotting empty objects works", {
     expect_error(plotVenn(fgOpenMSEmpty))
     expect_doppel("venn", function() plotVenn(fGConsOneEmpty)) # should be same as fgOpenMS
     expect_error(plotVenn(fgCompBothEmpty))
+    
+    expect_error(plotUpSet(fgOpenMSEmpty))
+    expect_plot(plotUpSet(fGConsOneEmpty))
+    expect_error(plotUpSet(fgCompBothEmpty))
 })

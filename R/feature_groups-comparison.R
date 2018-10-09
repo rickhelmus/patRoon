@@ -197,6 +197,12 @@ setMethod("plot", "featureGroupsComparison", function(x, retMin = TRUE, ...) plo
 #' @export
 setMethod("plotVenn", "featureGroupsComparison", function(obj, which, ...) plotVenn(obj@comparedFGroups, which, ...))
 
+#' @details \code{plotUpSet} plots an UpSet diagram outlining unique and shared
+#'   feature groups.
+#' @rdname featureGroups-compare
+#' @export
+setMethod("plotUpSet", "featureGroupsComparison", function(obj, which = names(obj), ...) plotUpSet(obj@comparedFGroups, which, ...))
+
 #' @details \code{plotChord} plots a chord diagram to visualize the distribution
 #'   of feature groups.
 #'

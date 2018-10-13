@@ -406,9 +406,7 @@ setMethod("plotInt", "featureGroups", function(obj, average = FALSE, ...)
 #'
 #' @template plotChord-args
 #'
-#' @references \addCitations{circlize}{1} \cr\cr
-#'   \insertRef{Conway2017}{patRoon} \cr\cr
-#'   \insertRef{Lex2014}{patRoon}
+#' @references \addCitations{circlize}{1}
 #'
 #' @export
 setMethod("plotChord", "featureGroups", function(obj, addSelfLinks = FALSE, addRetMzPlots = TRUE, average = FALSE,
@@ -902,7 +900,12 @@ setMethod("plotVenn", "featureGroups", function(obj, which, ...)
 #' @describeIn featureGroups plots an UpSet diagram (using the
 #'   \code{\link[UpSetR]{upset}} function) outlining unique and shared feature
 #'   groups between given replicate groups.
+#'   
 #' @param nsets See \code{\link[UpSetR]{upset}}.
+#' 
+#' @references \insertRef{Conway2017}{patRoon} \cr\cr
+#'   \insertRef{Lex2014}{patRoon}
+#' 
 #' @export
 setMethod("plotUpSet", "featureGroups", function(obj, which = replicateGroups(obj), nsets = length(which), ...)
 {

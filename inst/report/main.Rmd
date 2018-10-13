@@ -85,16 +85,17 @@ selectMethod("plot", class(rmdVars$fGroups))(rmdVars$fGroups)
 rGroupLen <- length(unique(analysisInfo(removeEmptyAnalyses(rmdVars$fGroups))$group))
 doPlotChord <- length(rmdVars$fGroups) > 0 && rmdVars$reportChord && rGroupLen > 1
 doPlotVenn <- length(rmdVars$fGroups) > 0 && rGroupLen > 1 && rGroupLen < 6
+doPlotUpSet <- length(rmdVars$fGroups) > 0 && rGroupLen > 1
 doEICs <- length(rmdVars$fGroups) > 0 && rmdVars$reportFGroups
 ```
 
 
-`r if (doPlotChord || doPlotVenn) "## { data-height=425 } \n"`
+`r if (doPlotChord || doPlotVenn || doPlotUpSet) "## { data-height=425 } \n"`
 
 `r if (doPlotChord) "### Chord diagram\n"`
 ```{r fig.height=5.5, eval=doPlotChord,out.height="400px"}
 message("Creating chord diagram... ", appendLF = FALSE)
-plotChord(rmdVars$fGroups)
+plotChord(rmdVars$fGroups, average = TRUE)
 message("Done!")
 ```
 
@@ -103,6 +104,10 @@ message("Done!")
 plotVenn(rmdVars$fGroups)
 ```
 
+`r if (doPlotUpSet) "### UpSet diagram\n"`
+```{r fig.height=5.5, eval=doPlotUpSet}
+plotUpSet(rmdVars$fGroups)
+```
 
 `r if (rmdVars$reportFGroups) "EICs\n===\n"`
 ```{r eval=doEICs}

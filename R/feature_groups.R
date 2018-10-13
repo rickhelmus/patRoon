@@ -622,7 +622,7 @@ setMethod("plotEIC", "featureGroups", function(obj, rtWindow = 30, mzWindow = 0.
     checkmate::assertString(title, null.ok = TRUE, add = ac)
     
     colourBy <- checkmate::matchArg(colourBy, c("none", "rGroups", "fGroups"), add = ac)
-    annotate = checkmate::matchArg(annotate, c("none", "ret", "mz"), several.ok = TRUE, add = ac)
+    annotate <- checkmate::matchArg(annotate, c("none", "ret", "mz"), several.ok = TRUE, add = ac)
     
     checkmate::reportAssertions(ac)
     

@@ -21,4 +21,4 @@ Release:
 - remove R xml code for OpenMS features/feature groups
 - remove R intensity loading code for OpenMS features
 - remove XCMS EIC loading (and update checkChromatograms())
-- update vdiffr Docker
+- add more options to reportPlots argument of reportMD()?

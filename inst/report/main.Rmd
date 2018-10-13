@@ -83,10 +83,10 @@ selectMethod("plot", class(rmdVars$fGroups))(rmdVars$fGroups)
 
 ```{r}
 rGroupLen <- length(unique(analysisInfo(removeEmptyAnalyses(rmdVars$fGroups))$group))
-doPlotChord <- length(rmdVars$fGroups) > 0 && rmdVars$reportChord && rGroupLen > 1
-doPlotVenn <- length(rmdVars$fGroups) > 0 && rGroupLen > 1 && rGroupLen < 6
-doPlotUpSet <- length(rmdVars$fGroups) > 0 && rGroupLen > 1
-doEICs <- length(rmdVars$fGroups) > 0 && rmdVars$reportFGroups
+doPlotChord <- length(rmdVars$fGroups) > 0 && "chord" %in% rmdVars$reportPlots && rGroupLen > 1
+doPlotVenn <- length(rmdVars$fGroups) > 0 && "venn" %in% rmdVars$reportPlots && rGroupLen > 1 && rGroupLen < 6
+doPlotUpSet <- length(rmdVars$fGroups) > 0 && "upset" %in% rmdVars$reportPlots && rGroupLen > 1
+doEICs <- length(rmdVars$fGroups) > 0 && "eics" %in% rmdVars$reportPlots
 ```
 
 
@@ -109,7 +109,7 @@ plotVenn(rmdVars$fGroups)
 plotUpSet(rmdVars$fGroups)
 ```
 
-`r if (rmdVars$reportFGroups) "EICs\n===\n"`
+`r if ("eics" %in% rmdVars$reportPlots) "EICs\n===\n"`
 ```{r eval=doEICs}
 message("Plotting EICs...")
 prog <- txtProgressBar(0, length(rmdVars$fGroups), style = 3, file = stderr())

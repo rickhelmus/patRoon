@@ -111,7 +111,7 @@ test_that("reporting works", {
     for (grp in unique(fTable[byMSMS == TRUE, group]))
         checkmate::expect_file_exists(getWorkPath("formulas", sprintf("%s-%s.pdf", class(fGroups), grp)))
     
-    expect_file(reportMD(fGroups, getWorkPath(), reportChord = FALSE, reportFGroups = FALSE,
+    expect_file(reportMD(fGroups, getWorkPath(), reportPlots = "formulas",
                          formConsensus = fCons, MSPeakLists = plists),
                 getWorkPath("report.html"))
 })

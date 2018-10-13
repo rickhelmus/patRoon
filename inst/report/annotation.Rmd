@@ -50,7 +50,7 @@ if (rmdVars$includeMFWebLinks != "none")
                                  rmdVars$gInfo[grp, "mzs"]))
     })
 }
-if (!is.null(rmdVars$formConsensus))
+if (!is.null(rmdVars$formConsensus) && "formulas" %in% rmdVars$reportPlots)
 {
     formTable <- formulaTable(rmdVars$formConsensus)[byMSMS == TRUE]
     formFGroups <- unique(formTable$group)

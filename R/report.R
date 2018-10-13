@@ -656,6 +656,11 @@ setMethod("reportPDF", "featureGroups", function(fGroups, path, reportFGroups,
 #'   browsable \code{HTML} file using \link{rmarkdown}, \link{flexdashboard} and
 #'   \link{knitr}.
 #'
+#' @param reportPlots A character vector specifying what should be plotted.
+#'   Valid options are: \code{"chord"}, \code{"venn"}, \code{"upset"} (plot a
+#'   chord, Venn and UpSet diagram, respectively), \code{"eics"} (plot EICs for
+#'   individual feature groups) and \code{"formulas"} (plot annotated formula
+#'   spectra). Set to \code{"none"} to plot none of these.
 #' @param reportChord If \code{TRUE} then a chord diagram for all feature groups
 #'   is plotted (data will be averaged among replicates).
 #' @param includeMFWebLinks A \code{character} specifying to which feature
@@ -687,8 +692,7 @@ setMethod("reportPDF", "featureGroups", function(fGroups, path, reportFGroups,
 #' @rdname reporting
 #' @aliases reportMD
 #' @export
-setMethod("reportMD", "featureGroups", function(fGroups, path, reportChord, reportFGroups,
-                                                formConsensus, reportFormulaSpectra,
+setMethod("reportMD", "featureGroups", function(fGroups, path, reportPlots, formConsensus,
                                                 compounds, compoundNormalizeScores, compsCluster,
                                                 includeMFWebLinks, components, interactiveHeat,
                                                 MSPeakLists, retMin, EICRtWindow, EICMzWindow,
@@ -699,8 +703,8 @@ setMethod("reportMD", "featureGroups", function(fGroups, path, reportChord, repo
  
     ac <- checkmate::makeAssertCollection()
     checkmate::assertPathForOutput(path, overwrite = TRUE, add = ac)
-    aapply(checkmate::assertFlag, . ~ reportChord + reportFGroups + reportFormulaSpectra +
-               compoundNormalizeScores + interactiveHeat + retMin + EICOnlyPresent +
+    reportPlots <- checkmate::matchArg(reportPlots, c("none", "chord", "venn", "upset", "eics", "formulas"), several.ok = TRUE, add = ac)
+    aapply(checkmate::assertFlag, . ~ compoundNormalizeScores + interactiveHeat + retMin + EICOnlyPresent +
                selfContained + optimizePng + clearPath,
            fixed = list(add = ac))
     aapply(checkmate::assertClass, . ~ formConsensus + compounds + components + MSPeakLists,
@@ -711,7 +715,10 @@ setMethod("reportMD", "featureGroups", function(fGroups, path, reportChord, repo
     checkmate::assertCount(EICTopMost, positive = TRUE, null.ok = TRUE, add = ac)
     checkmate::assertCount(maxProcAmount, positive = TRUE, add = ac)
     checkmate::reportAssertions(ac)
-       
+
+    if ("none" %in% reportPlots)
+        reportPlots <- ""
+           
     if (is.null(MSPeakLists) &&
         ((!is.null(formConsensus) && reportFormulaSpectra) || !is.null(compounds)))
         stop("MSPeakLists is NULL, please specify when reporting formula and/or compounds")
@@ -745,7 +752,7 @@ setMethod("reportMD", "featureGroups", function(fGroups, path, reportChord, repo
     }
 
     rmdVars <- list(outPath = path, fGroups = fGroups, groupNames = names(fGroups), gInfo = groupInfo(fGroups),
-                    reportChord = reportChord, reportFGroups = reportFGroups, EICRtWindow = EICRtWindow, EICMzWindow = EICMzWindow,
+                    reportPlots = reportPlots, EICRtWindow = EICRtWindow, EICMzWindow = EICMzWindow,
                     retMin = retMin, EICTopMost = EICTopMost, EICOnlyPresent = EICOnlyPresent, EICs = EICs,
                     compounds = compounds, compsCluster = compsCluster, includeMFWebLinks = includeMFWebLinks,
                     MSPeakLists = MSPeakLists, formConsensus = formConsensus,

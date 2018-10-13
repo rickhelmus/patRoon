@@ -27,8 +27,8 @@
   EICTopMost = NULL, EICOnlyPresent = TRUE, clearPath = FALSE)
 
 \S4method{reportMD}{featureGroups}(fGroups, path = "report",
-  reportChord = TRUE, reportFGroups = TRUE, formConsensus = NULL,
-  reportFormulaSpectra = TRUE, compounds = NULL,
+  reportedPlots = c("chord", "venn", "upset", "eics", "formulas"),
+  formConsensus = NULL, compounds = NULL,
   compoundNormalizeScores = TRUE, compsCluster = NULL,
   includeMFWebLinks = "compounds", components = NULL,
   interactiveHeat = FALSE, MSPeakLists = NULL, retMin = TRUE,
@@ -89,8 +89,11 @@ used to determine the plotting grid when reporting EICs in PDF files.}
 passed to \code{\link{plotEIC}} (\emph{i.e.} \code{rtWindow},
 \code{mzWindow}, \code{topMost} and \code{onlyPresent} arguments).}
 
-\item{reportChord}{If \code{TRUE} then a chord diagram for all feature groups
-is plotted (data will be averaged among replicates).}
+\item{reportedPlots}{A character vector specifying what should be plotted.
+Valid options are: \code{"chord"}, \code{"venn"}, \code{"upset"} (plot a
+chord, Venn and UpSet diagram, respectively), \code{"eics"} (plot EICs for
+individual feature groups) and \code{"formulas"} (plot annotated formula
+spectra). Set to \code{"none"} to show none of these.}
 
 \item{includeMFWebLinks}{A \code{character} specifying to which feature
 groups a web link should be added in the annotation page to
@@ -117,6 +120,9 @@ may be seen, however, at the cost additional processing time.}
 \item{maxProcAmount}{Maximum amount of \command{pngquant} commands to run in
 parallel. Higher numbers will decrease processing time, with an optimum
 usually close to the amount of CPU cores.}
+
+\item{reportChord}{If \code{TRUE} then a chord diagram for all feature groups
+is plotted (data will be averaged among replicates).}
 }
 \description{
 Functionality to report data produced by most workflow steps such as

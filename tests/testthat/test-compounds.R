@@ -174,7 +174,7 @@ test_that("reporting works", {
     for (grp in names(compoundTable(comps)))
         checkmate::expect_file_exists(getWorkPath("compounds", sprintf("%s-%s.pdf", class(fGroups), grp)))
     
-    expect_file(reportMD(fGroups, getWorkPath(), reportChord = FALSE, reportFGroups = FALSE,
+    expect_file(reportMD(fGroups, getWorkPath(), reportPlots = "none",
                          compounds = comps, MSPeakLists = plists),
                 getWorkPath("report.html"))
 })
@@ -184,7 +184,7 @@ test_that("reporting empty objects works", {
     expect_error(reportCSV(fGroups, getWorkPath(), compounds = compsEmpty), NA)
     expect_error(reportPDF(fGroups, getWorkPath(), reportFGroups = FALSE, compounds = compsEmpty,
                            MSPeakLists = plistsEmpty), NA)
-    expect_file(reportMD(fGroups, getWorkPath(), reportChord = FALSE, reportFGroups = FALSE,
+    expect_file(reportMD(fGroups, getWorkPath(), reportPlots = "none",
                          compounds = compsEmpty, MSPeakLists = plistsEmpty),
                 getWorkPath("report.html"))
 })

@@ -331,7 +331,8 @@ row within the feature table of the analysis (see
 }}
 
 \references{
-\addCitations{circlize}{1} \cr\cr
-  \insertRef{Conway2017}{patRoon} \cr\cr
+\addCitations{circlize}{1}
+
+\insertRef{Conway2017}{patRoon} \cr\cr
   \insertRef{Lex2014}{patRoon}
 }

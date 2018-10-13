@@ -66,7 +66,7 @@ expect_plot <- function(object)
     invisible(act$val)
 }
 
-makeReportMD <- function(fGroups, ...) reportMD(fGroups, getWorkPath("report.html"), openReport = FALSE, ...)
+makeReportMD <- function(fGroups, ...) reportMD(fGroups, getWorkPath(), openReport = FALSE, ...)
 expect_reportMD <- function(object)
 {
     act <- quasi_label(rlang::enquo(object))

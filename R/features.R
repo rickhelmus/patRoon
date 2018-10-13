@@ -101,43 +101,45 @@ setMethod("filter", "features", function(obj, intensityThreshold = NULL, retenti
     if (length(obj) == 0)
         return(obj)
     
+    oldn <- length(obj)
+    
     hash <- makeHash(obj, intensityThreshold, retentionRange, mzRange, chromWidthRange, negate)
     cache <- loadCacheData("filterFeatures", hash)
     if (!is.null(cache))
-        return(cache)
-    
-    anaInfo <- analysisInfo(obj)
-    
-    intPred <- if (!negate) function(x) x >= intensityThreshold else function(x) x < intensityThreshold
-    rangePred <- function(x, range)
+        obj <- cache
+    else
     {
-        if (range[2] < 0)
-            numGTE(x, range[1])
-        else
-            numGTE(x, range[1]) & numLTE(x, range[2])
+        anaInfo <- analysisInfo(obj)
+        
+        intPred <- if (!negate) function(x) x >= intensityThreshold else function(x) x < intensityThreshold
+        rangePred <- function(x, range)
+        {
+            if (range[2] < 0)
+                numGTE(x, range[1])
+            else
+                numGTE(x, range[1]) & numLTE(x, range[2])
+        }
+        
+        if (negate)
+            rangePred <- Negate(rangePred)
+        
+        for (ana in analyses(obj))
+        {
+            if (!is.null(intensityThreshold))
+                obj@features[[ana]] <- obj@features[[ana]][intPred(intensity)]
+            
+            if (!is.null(retentionRange))
+                obj@features[[ana]] <- obj@features[[ana]][rangePred(ret, retentionRange)]
+            
+            if (!is.null(mzRange))
+                obj@features[[ana]] <- obj@features[[ana]][rangePred(mz, mzRange)]
+            
+            if (!is.null(chromWidthRange))
+                obj@features[[ana]] <- obj@features[[ana]][rangePred(retmax - retmin, chromWidthRange)]
+        }
+        
+        saveCacheData("filterFeatures", obj, hash)
     }
-    
-    if (negate)
-        rangePred <- Negate(rangePred)
-    
-    oldn <- length(obj)
-    
-    for (ana in analyses(obj))
-    {
-        if (!is.null(intensityThreshold))
-            obj@features[[ana]] <- obj@features[[ana]][intPred(intensity)]
-        
-        if (!is.null(retentionRange))
-            obj@features[[ana]] <- obj@features[[ana]][rangePred(ret, retentionRange)]
-        
-        if (!is.null(mzRange))
-            obj@features[[ana]] <- obj@features[[ana]][rangePred(mz, mzRange)]
-        
-        if (!is.null(chromWidthRange))
-            obj@features[[ana]] <- obj@features[[ana]][rangePred(retmax - retmin, chromWidthRange)]
-    }
-    
-    saveCacheData("filterFeatures", obj, hash)
     
     newn <- length(obj)
     printf("Done! Filtered %d (%.2f%%) features. Remaining: %d\n", oldn - newn, if (oldn == 0) 0 else (1-(newn/oldn))*100, newn)

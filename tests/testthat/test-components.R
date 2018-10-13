@@ -79,17 +79,13 @@ test_that("reporting works", {
     expect_file(reportPDF(fGroupsSimple, getWorkPath(), reportFGroups = FALSE, components = compsRC),
                 getWorkPath("components.pdf"))
     
-    expect_file(reportMD(fGroupsSimple, getWorkPath(), reportPlots = "none",
-                         components = compsRC),
-                getWorkPath("report.html"))
+    expect_reportMD(makeReportMD(fGroupsSimple, reportPlots = "none", components = compsRC))
 })
 
 test_that("reporting empty object works", {
     expect_error(reportCSV(fGroupsSimple, getWorkPath(), components = compsEmpty), NA)
     expect_error(reportPDF(fGroupsSimple, getWorkPath(), reportFGroups = FALSE, components = compsEmpty), NA)
-    expect_file(reportMD(fGroupsSimple, getWorkPath(), reportPlots = "none",
-                         components = compsEmpty),
-                getWorkPath("report.html"))
+    expect_reportMD(makeReportMD(fGroupsSimple, reportPlots = "none", components = compsEmpty))
 })
 
 test_that("plotting works", {

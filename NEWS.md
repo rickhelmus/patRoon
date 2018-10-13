@@ -1,6 +1,7 @@
 # patRoon 0.1.0.9000
 
 ## October 2018
+* openReport option for reportMD(). If TRUE the generated report will be opened with a web browser.
 * reportPlots option for reportMD() which collapses reportFGroups, reportChord and reportFormulaSpectra and adds control to plot Venn and UpSet diagrams.
 * plotUpSet() methods to compare feature groups by UpSet plots. See e.g. http://caleydo.org/tools/upset/
 * filter() method for features.

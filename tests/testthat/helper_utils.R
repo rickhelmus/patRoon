@@ -66,6 +66,14 @@ expect_plot <- function(object)
     invisible(act$val)
 }
 
+makeReportMD <- function(fGroups, ...) reportMD(fGroups, getWorkPath("report.html"), openReport = FALSE, ...)
+expect_reportMD <- function(object)
+{
+    act <- quasi_label(rlang::enquo(object))
+    expect(file.exists(getWorkPath("report.html")), "failed to generate report")
+    invisible(act$val)
+}
+
 expect_doppel <- function(...) vdiffr::expect_doppelganger(..., path = getOption("patRoon.path.vdiffr"))
 
 # HACK: workaround for non imported checkmate namespace

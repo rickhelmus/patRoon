@@ -276,4 +276,4 @@ setGeneric("reportMD", function(fGroups, path = "report", reportPlots = c("chord
                                 includeMFWebLinks = "compounds", components = NULL, interactiveHeat = FALSE, MSPeakLists = NULL, retMin = TRUE,
                                 EICRtWindow = 20, EICMzWindow = 0.005, EICTopMost = NULL, EICOnlyPresent = TRUE,
                                 selfContained = TRUE, optimizePng = FALSE, maxProcAmount = getOption("patRoon.maxProcAmount"),
-                                clearPath = FALSE) standardGeneric("reportMD"))
+                                clearPath = FALSE, openReport = TRUE) standardGeneric("reportMD"))

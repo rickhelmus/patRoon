@@ -257,7 +257,7 @@ load("%s")
 options("patRoon.cache.fileName" = "%s")
 #options(patRoon.path.pngquant = "~/werk/pngquant/")
 reportMD(fGroups, path = "../docs/examples", formConsensus = formulas, compounds = compounds,
-         components = components, MSPeakLists = plists, optimizePng = TRUE)
+         components = components, MSPeakLists = plists, optimizePng = TRUE, openReport = FALSE)
 ', gsub("\\", "/", getwd(), fixed = TRUE), gsub("\\", "/", tempF, fixed = TRUE), getOption("patRoon.cache.fileName")), con = tempScript)
 devtools::clean_source(tempScript, quiet = TRUE)
 ```

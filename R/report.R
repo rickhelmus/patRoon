@@ -684,6 +684,8 @@ setMethod("reportPDF", "featureGroups", function(fGroups, path, reportFGroups,
 #' @param maxProcAmount Maximum amount of \command{pngquant} commands to run in
 #'   parallel. Higher numbers will decrease processing time, with an optimum
 #'   usually close to the amount of CPU cores.
+#' @param openReport If set to \code{TRUE} then the output report file will be
+#'   opened with the system browser.
 #'
 #' @references Creating MetFrag landing page URLs based on code from
 #'   \href{https://github.com/Treutler/MetFamily}{MetFamily} R package. \cr\cr
@@ -697,20 +699,21 @@ setMethod("reportMD", "featureGroups", function(fGroups, path, reportPlots, form
                                                 includeMFWebLinks, components, interactiveHeat,
                                                 MSPeakLists, retMin, EICRtWindow, EICMzWindow,
                                                 EICTopMost, EICOnlyPresent, selfContained,
-                                                optimizePng, maxProcAmount, clearPath)
+                                                optimizePng, maxProcAmount, clearPath, openReport)
 {
     # UNDONE: mention pandoc win limits
  
     ac <- checkmate::makeAssertCollection()
     checkmate::assertPathForOutput(path, overwrite = TRUE, add = ac)
-    reportPlots <- checkmate::matchArg(reportPlots, c("none", "chord", "venn", "upset", "eics", "formulas"), several.ok = TRUE, add = ac)
+    reportPlots <- checkmate::matchArg(reportPlots, c("none", "chord", "venn", "upset", "eics", "formulas"),
+                                       several.ok = TRUE, add = ac)
     aapply(checkmate::assertFlag, . ~ compoundNormalizeScores + interactiveHeat + retMin + EICOnlyPresent +
-               selfContained + optimizePng + clearPath,
+               selfContained + optimizePng + clearPath + openReport,
            fixed = list(add = ac))
     aapply(checkmate::assertClass, . ~ formConsensus + compounds + components + MSPeakLists,
            c("formulaConsensus", "compounds", "components", "MSPeakLists"),
            null.ok = TRUE, fixed = list(add = ac))
-    checkmate::assertChoice(includeMFWebLinks, c("compounds", "MSMS", "none"))
+    checkmate::assertChoice(includeMFWebLinks, c("compounds", "MSMS", "none"), add = ac)
     aapply(checkmate::assertNumber, . ~ EICRtWindow + EICMzWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
     checkmate::assertCount(EICTopMost, positive = TRUE, null.ok = TRUE, add = ac)
     checkmate::assertCount(maxProcAmount, positive = TRUE, add = ac)
@@ -766,8 +769,12 @@ setMethod("reportMD", "featureGroups", function(fGroups, path, reportPlots, form
     knitMeta <- knitr::knit_meta("latex_dependency", clean = TRUE)
     on.exit(knitr::knit_meta_add(knitMeta), add = TRUE)
     
+    outputFile <- file.path(path, "report.html")
     withr::with_options(list(DT.warn.size = FALSE),
-                        rmarkdown::render(file.path(workPath, "main.Rmd"), output_file = file.path(path, "report.html"),
+                        rmarkdown::render(file.path(workPath, "main.Rmd"), output_file = outputFile,
                                           output_options = list(self_contained = selfContained),
                                           quiet = TRUE))
+    
+    if (openReport)
+        browseURL(paste0("file://", outputFile))
 })

@@ -139,6 +139,6 @@ reportPDF(fGroups, path = "report", reportFGroups = TRUE, formConsensus = {{ if 
 reportMD(fGroups, path = "report", reportPlots = c("chord", "venn", "upset", "eics", "formulas"), formConsensus = {{ if (formulaOpts$algo != "") "formulas" else "NULL" }},
          compounds = {{ if (identOpts$algo != "") "compounds" else "NULL" }}, compoundNormalizeScores = TRUE,
          components = {{ if (componentOpts$algo != "") "components" else "NULL" }}, MSPeakLists = {{ if (formulaOpts$algo != "" || identOpts$algo != "") "plists" else "NULL" }},
-         selfContained = TRUE)
+         selfContained = TRUE, openReport = TRUE)
 
 {{ endCodeBlock() }}

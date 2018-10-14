@@ -126,7 +126,7 @@ setMethod("removeGroups", "featureGroupsXCMS", function(fGroups, indices)
     # update xcmsSet
     if (length(indices) > 0)
     {
-        xcms::groups(fGroups@xs) <- xcms::groups(fGroups@xs)[-indices, ]
+        xcms::groups(fGroups@xs) <- xcms::groups(fGroups@xs)[-indices, , drop = FALSE]
         groupidx(fGroups@xs) <- groupidx(fGroups@xs)[-indices]
     }
 

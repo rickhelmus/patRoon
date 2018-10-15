@@ -75,7 +75,8 @@ Imports:
     ggrepel,
     cowplot,
     jsonlite,
-    Rdpack
+    Rdpack,
+    rsm
 Suggests: 
     RDCOMClient,
     metfRag,
@@ -123,6 +124,8 @@ Collate:
     'features-envipick.R'
     'features-feature_groups.R'
     'features-openms.R'
+    'utils-IPO.R'
+    'features-optimize.R'
     'features-tasq.R'
     'features-xcms.R'
     'formula-bruker.R'

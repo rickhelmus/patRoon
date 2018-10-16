@@ -22,3 +22,4 @@ Release:
 - remove R intensity loading code for OpenMS features
 - remove XCMS EIC loading (and update checkChromatograms())
 - add more options to reportPlots argument of reportMD()?
+- integrate OpenMS feature scoring and isotopes

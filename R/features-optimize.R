@@ -1,5 +1,17 @@
 #' @include utils-IPO.R
 #' @include main.R
+NULL
+
+callAlgoFunc <- function(func, algorithm, ...)
+{
+    func <- substitute(func)
+    suffix <- switch(algorithm,
+                     xcms = "XCMS",
+                     openms = "OpenMS",
+                     envipick = "enviPick",
+                     stop("Invalid algorithm!"))
+    do.call(paste0(func, suffix), list(...))
+}
 
 # Adapted from combineParams() function of IPO
 combineOptParams = function(params_1, params_2, algorithm)
@@ -64,44 +76,22 @@ combineOptParams = function(params_1, params_2, algorithm)
 
 calculateFeatures <- function(anaInfo, algorithm, params, task)
 {
-    # UNDONE: move to XCMS specific function
-    
     # UNDONE: do we want to keep caching this?
-    
-    if (is.null(params$step))
-    {
-        # centWave
-        ret <- findFeaturesXCMS(anaInfo, method = "centWave",
-                                peakwidth = c(params$min_peakwidth[task],
-                                              params$max_peakwidth[task]),
-                                ppm         = params$ppm[task],
-                                noise       = params$noise[task],
-                                snthresh    = params$snthresh[task],
-                                mzdiff      = params$mzdiff[task],
-                                prefilter   = c(
-                                    params$prefilter[task],
-                                    params$value_of_prefilter[task]
-                                ),
-                                mzCenterFun = params$mzCenterFun[task],
-                                integrate   = params$integrate[task],
-                                fitgauss    = params$fitgauss[task])
-        
-    }
+
+    # params is a data.frame when called from performOptimIteration() and a list
+    # when called from performOptimIterationStat().
+    if (is.data.frame(params))
+        params <- as.list(params[task, ])
     else
-    {
-        #matchedFilter
-        ret <- findFeaturesXCMS(anaInfo, method = "matchedFilter",
-                                fwhm      = params$fwhm[task],
-                                snthresh  = params$snthresh[task],
-                                step      = params$step[task],
-                                steps     = params$steps[task],
-                                sigma     = params$sigma[task],
-                                max       = params$max[task],
-                                mzdiff    = params$mzdiff[task],
-                                index     = params$index[task])
-    }
+        params <- as.list(params[task])
+        
+    # get rid of design specific params
+    params[["run.order"]] <- NULL
+    params[["std.order"]] <- NULL
+    params[["Block"]] <- NULL
     
-    return(ret)
+    params <- callAlgoFunc(convertOptToCallParams, algorithm, params)
+    return(do.call(findFeatures, c(list(anaInfo, algorithm), params)))
 }
 
 # Heavily based on xcmsSetExperimentsCluster() from IPO
@@ -186,65 +176,9 @@ performOptimIterationStat <- function(anaInfo, algorithm, result, isoIdent)
     return(result)
 }
 
-# Heavily based on part of optimizeXcmsSet() function from IPO
-fixOptParamBounds <- function(param, bounds, algorithm)
-{
-    # UNDONE: move to algo specific functions
-    
-    if (param == "steps" || param == "prefilter")
-        return(round(bounds, 0))
-    
-    return(bounds)
-}
-
-# Heavily based on part of optimizeXcmsSet() function from IPO
-checkOptParams <- function(params, algorithm)
-{
-    # UNDONE: move to algo specific functions
-    
-    if (params$no_optimization$method == "centWave")
-    {
-        #checking peakwidths plausiability
-        if (!is.null(params$to_optimize$min_peakwidth) || 
-           !is.null(params$to_optimize$max_peakwidth))
-        {
-            
-            if (is.null(params$to_optimize$min_peakwidth))
-                pw_min <- params$no_optimization$min_peakwidth
-            else
-                pw_min <- max(params$to_optimize$min_peakwidth)
-            
-            if (is.null(params$to_optimize$max_peakwidth))
-                pw_max <- params$no_optimization$max_peakwidth
-            else
-                pw_max <- min(params$to_optimize$max_peakwidth)
-            
-            if (pw_min >= pw_max)
-            {
-                additional <- abs(pw_min-pw_max) + 1
-                if (!is.null(params$to_optimize$max_peakwidth))
-                    params$to_optimize$max_peakwidth <- params$to_optimize$max_peakwidth + additional
-                else
-                    params$no_optimization$max_peakwidth <- params$no_optimization$max_peakwidth + additional
-            }
-        }
-    }
-    return(params)
-}
-
-getMinOptSetting <- function(settingName, algorithm, params)
-{
-    # UNDONE: move to algo specific functions
-    
-    if (settingName == "min_peakwidth")
-        return(3)
-    if (settingName == "mzdiff")
-        return(if (params$no_optimization$method == "centWave") 3 else 0.001)
-    if (settingName == "step")
-        return(0.0005)
-    
-    return(1)
-}
+fixOptParamBounds <- function(param, bounds, algorithm) callAlgoFunc(fixOptParamBounds, algorithm, param, bounds)
+checkOptParams <- function(params, algorithm) callAlgoFunc(checkOptParams, algorithm, params)
+getMinOptSetting <- function(settingName, algorithm, params) callAlgoFunc(getMinOptSetting, algorithm, settingName, params)
 
 # heavily based on optimizeXcmsSet() from IPO
 optimizeFeatureFinding <- function(anaInfo, algorithm, params, isoIdent = "IPO",
@@ -287,7 +221,7 @@ optimizeFeatureFinding <- function(anaInfo, algorithm, params, isoIdent = "IPO",
             finalParams <- combineOptParams(finalParams, params$no_optimization, algorithm)
             
             if (!is.list(finalParams))
-                finalParams <- as.list(finalParams) # UNDONE: need this?
+                finalParams <- as.list(finalParams)
             
             bestSettings <- list()
             bestSettings$parameters <- finalParams

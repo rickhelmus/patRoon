@@ -1,6 +1,67 @@
 #' @include utils-IPO.R
 #' @include main.R
 
+# Adapted from combineParams() function of IPO
+combineOptParams = function(params_1, params_2, algorithm)
+{
+    len <- max(unlist(sapply(params_1, length)))
+    #num_params <- length(params_1)
+    
+    p_names <- c(names(params_1), names(params_2))
+    matchedFilter <- algorithm == "xcms" &&
+        ((!is.null(params_1[["method"]]) && params_1[["method"]] == "matchedFilter") ||
+         (!is.null(params_2[["method"]]) && params_2[["method"]] == "matchedFilter"))
+    
+    for(i in 1:length(params_2))
+    {
+        new_index <- length(params_1) + 1
+        fact <- params_2[[i]]
+        params_1[[new_index]] <- fact
+        if (matchedFilter)
+        {
+            if (p_names[new_index] == "sigma" && fact == 0)
+            {
+                # update values for sigma if zero
+                if ("fwhm" %in% names(params_1))
+                    params_1[[new_index]][1:len] <- params_1$fwhm/2.3548
+                else
+                    params_1[[new_index]][1:len] <- params_2$fwhm/2.3548
+            }
+            else if (p_names[new_index] == "mzdiff" && fact == 0)
+            {
+                # update values for mzdiff if zero
+                if ("step" %in% names(params_1))
+                {
+                    if ("steps"  %in% names(params_1))
+                        params_1[[new_index]][1:len] <- 0.8-params_1$step*params_1$steps
+                    else
+                        params_1[[new_index]][1:len] <- 0.8-params_1$step*params_2$steps
+                }
+                else
+                {
+                    if ("steps"  %in% names(params_1))
+                        params_1[[new_index]][1:len] <- 0.8-params_2$step*params_1$steps
+                    else
+                        params_1[[new_index]][1:len] <- 0.8-params_2$step*params_2$steps
+                }
+            }
+            else
+            {  
+                # standard: replicate value
+                params_1[[new_index]][1:len] <- fact
+            }
+        }
+        else
+        {
+            # standard: replicate value
+            params_1[[new_index]][1:len] <- fact
+        }
+    } 
+    names(params_1) <- p_names   
+    return(params_1)
+}
+
+
 calculateFeatures <- function(anaInfo, algorithm, params, task)
 {
     # UNDONE: move to XCMS specific function
@@ -24,7 +85,6 @@ calculateFeatures <- function(anaInfo, algorithm, params, task)
                                 mzCenterFun = params$mzCenterFun[task],
                                 integrate   = params$integrate[task],
                                 fitgauss    = params$fitgauss[task])
-                                #verbose.columns = params$verbose.columns[task]) UNDONE
         
     }
     else
@@ -64,8 +124,8 @@ performOptimIteration <- function(anaInfo, algorithm, params, isoIdent)
                                 diff(typParams$to_optimize[[1]]) / 8)
     }
     
-    designParams <- utilsIPO$combineParams(designParams, typParams$no_optimization)   
-    tasks <- seq_len(nrow(design))[1:2]
+    designParams <- combineOptParams(designParams, typParams$no_optimization, algorithm)   
+    tasks <- seq_len(nrow(design))
     
     response <- sapply(tasks, function(task)
     {
@@ -115,9 +175,9 @@ performOptimIterationStat <- function(anaInfo, algorithm, result, isoIdent)
     result$max_settings <- maxSettings
     
     runParams <- as.list(utilsIPO$decodeAll(maxSettings[-1], params$to_optimize))      
-    runParams <- utilsIPO$combineParams(runParams, params$no_optimization)
+    runParams <- combineOptParams(runParams, params$no_optimization, algorithm)
     
-    if(!is.list(runParams))
+    if (!is.list(runParams))
         runParams <- as.list(runParams)
     
     result$features <- calculateFeatures(anaInfo, algorithm, runParams, 1)
@@ -126,6 +186,18 @@ performOptimIterationStat <- function(anaInfo, algorithm, result, isoIdent)
     return(result)
 }
 
+# Heavily based on part of optimizeXcmsSet() function from IPO
+fixOptParamBounds <- function(param, bounds, algorithm)
+{
+    # UNDONE: move to algo specific functions
+    
+    if (param == "steps" || param == "prefilter")
+        return(round(bounds, 0))
+    
+    return(bounds)
+}
+
+# Heavily based on part of optimizeXcmsSet() function from IPO
 checkOptParams <- function(params, algorithm)
 {
     # UNDONE: move to algo specific functions
@@ -133,7 +205,7 @@ checkOptParams <- function(params, algorithm)
     if (params$no_optimization$method == "centWave")
     {
         #checking peakwidths plausiability
-        if(!is.null(params$to_optimize$min_peakwidth) || 
+        if (!is.null(params$to_optimize$min_peakwidth) || 
            !is.null(params$to_optimize$max_peakwidth))
         {
             
@@ -147,7 +219,7 @@ checkOptParams <- function(params, algorithm)
             else
                 pw_max <- min(params$to_optimize$max_peakwidth)
             
-            if(pw_min >= pw_max)
+            if (pw_min >= pw_max)
             {
                 additional <- abs(pw_min-pw_max) + 1
                 if (!is.null(params$to_optimize$max_peakwidth))
@@ -180,8 +252,10 @@ optimizeFeatureFinding <- function(anaInfo, algorithm, params, isoIdent = "IPO",
 {
     ac <- checkmate::makeAssertCollection()
     assertAnalysisInfo(anaInfo, add = ac)
-    checkmate::assertChoice(algorithm, c("bruker", "openms", "xcms", "enviPick"), add = ac)
+    checkmate::assertChoice(algorithm, c("openms", "xcms", "enviPick"), add = ac)
+    checkmate::assertList(params, add = ac)
     checkmate::assertChoice(isoIdent, c("IPO", "CAMERA"), add = ac)
+    checkmate::assertInt(maxIterations, add = ac)
     checkmate::reportAssertions(ac)
     
     history <- list()
@@ -201,7 +275,7 @@ optimizeFeatureFinding <- function(anaInfo, algorithm, params, isoIdent = "IPO",
             maxIndex <- 1
             for (i in seq_len(length(history)))
             {
-                if(history[[i]]$max_settings[1] > maxima)
+                if (history[[i]]$max_settings[1] > maxima)
                 {
                     maxima <- history[[i]]$max_settings[1]
                     maxIndex <- i
@@ -210,9 +284,9 @@ optimizeFeatureFinding <- function(anaInfo, algorithm, params, isoIdent = "IPO",
             
             finalParams <- as.list(utilsIPO$decodeAll(history[[maxIndex]]$max_settings[-1],
                                                       history[[maxIndex]]$params$to_optimize))      
-            finalParams <- utilsIPO$combineParams(finalParams, params$no_optimization)
+            finalParams <- combineOptParams(finalParams, params$no_optimization, algorithm)
             
-            if(!is.list(finalParams))
+            if (!is.list(finalParams))
                 finalParams <- as.list(finalParams) # UNDONE: need this?
             
             bestSettings <- list()
@@ -258,10 +332,7 @@ optimizeFeatureFinding <- function(anaInfo, algorithm, params, isoIdent = "IPO",
             
             names(newBounds) <- NULL
             
-            if (names(params$to_optimize)[i] == "steps" || names(params$to_optimize)[i] == "prefilter")
-                params$to_optimize[[i]] <- round(newBounds, 0)
-            else
-                params$to_optimize[[i]] <- newBounds
+            params$to_optimize[[i]] <- fixOptParamBounds(names(params$to_optimize)[i], newBounds, algorithm)
         }
         
         params <- checkOptParams(params, algorithm)

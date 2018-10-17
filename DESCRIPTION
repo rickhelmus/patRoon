@@ -124,6 +124,7 @@ Collate:
     'features-envipick.R'
     'features-feature_groups.R'
     'features-openms.R'
+    'features-optimize-openms.R'
     'features-optimize-xcms.R'
     'utils-IPO.R'
     'features-optimize.R'

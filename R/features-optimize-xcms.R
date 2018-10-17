@@ -28,8 +28,6 @@ fixOptParamBoundsXCMS <- function(param, bounds)
 # based on part of optimizeXcmsSet() function from IPO
 checkOptParamsXCMS <- function(params)
 {
-    # UNDONE: move to algo specific functions
-    
     if (params$no_optimization$method == "centWave")
     {
         #checking peakwidths plausiability
@@ -67,7 +65,7 @@ getMinOptSettingXCMS <- function(settingName, params)
     if (settingName == "min_peakwidth")
         return(3)
     if (settingName == "mzdiff")
-        return(if (params$no_optimization$method == "centWave") 3 else 0.001)
+        return(if (params$no_optimization$method == "centWave") -100000000 else 0.001)
     if (settingName == "step")
         return(0.0005)
     

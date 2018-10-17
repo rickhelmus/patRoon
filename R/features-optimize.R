@@ -13,6 +13,90 @@ callAlgoFunc <- function(func, algorithm, ...)
     do.call(paste0(func, suffix), list(...))
 }
 
+# Adapted from IPO: add OpenMS isotope detection
+calcPPS <- function(feat, isotopeIdentification = c("IPO", "CAMERA", "OpenMS"), ...)
+{
+    fTable <- featureTable(feat)
+    
+    isotopeIdentification <- match.arg(isotopeIdentification)
+    
+    ret <- vector(mode="numeric", 5) #array(0, dim=c(1,5)) 
+    names(ret) <- c("ExpId", "#peaks", "#NonRP", "#RP", "PPS")
+    
+    if (length(feat) == 0)
+        return(ret)
+
+    ret[2] <- length(feat)
+    
+    doOpenMS <- isotopeIdentification == "OpenMS"
+    if (!doOpenMS)
+    {
+        xset <- getXcmsSet(feat, TRUE)
+        peak_source <- utilsIPO$peaks_IPO(xset)[,c("mz", "rt", "sample", "into", "mzmin", 
+                                                   "mzmax", "rtmin", "rtmax"),drop=FALSE]
+        if(isotopeIdentification == "IPO")
+            iso_mat <- utilsIPO$findIsotopes.IPO(xset, ...)  
+        else
+            iso_mat <- utilsIPO$findIsotopes.CAMERA(xset, ...)
+    }
+    
+    isotope_abundance = 0.01108    
+    
+    #calculating low intensity peaks
+    for (anai in seq_along(analyses(feat)))
+    {
+        if (doOpenMS)
+        {
+            intensities <- fTable[[anai]]$intensity
+            masses <- fTable[[anai]]$mz
+        }
+        else
+        {
+            non_isos_peaks <- peak_source
+            
+            if (nrow(iso_mat) > 0)
+                non_isos_peaks <- peak_source[-unique(c(iso_mat)),,drop=FALSE] 
+            
+            speaks <- non_isos_peaks[non_isos_peaks[,"sample"]==anai,,drop=FALSE]
+            intensities <- speaks[,"into"]
+            na_int <- is.na(intensities)
+            intensities <- intensities[!na_int]
+            
+            if (length(intensities) > 0)
+            {
+                masses <- speaks[!na_int, "mz"]
+                #floor((masses-2*CH3)/CH2) + 2
+            }            
+        }
+        
+        if (length(intensities) > 0)
+        {
+            tmp <- intensities[order(intensities)]
+            int_cutoff <- mean(tmp[1:max(round((length(tmp)/33),0),1)])
+            
+            maximum_carbon <- utilsIPO$calcMaximumCarbon(masses)
+            carbon_probability <- maximum_carbon * isotope_abundance
+            
+            iso_int <- intensities * carbon_probability
+            
+            not_loq_peaks <- sum(iso_int > int_cutoff)
+            ret[3] <- ret[3] + not_loq_peaks
+        }
+    }#end_for_sample    
+    
+    if (doOpenMS)
+        ret[4] <- sum(unlist(lapply(fTable, function(ft) ft$isocount - 1)))
+    else
+        ret[4] <- length(unique(c(iso_mat)))
+    
+    if (ret[3] == 0)
+        ret[5] <- (ret[4]+1)^2/(ret[3]+1)  
+    else
+        ret[5] <- ret[4]^2/ret[3]  
+    
+    return(ret)
+}
+
 # Adapted from combineParams() function of IPO
 combineOptParams = function(params_1, params_2, algorithm)
 {
@@ -24,7 +108,7 @@ combineOptParams = function(params_1, params_2, algorithm)
         ((!is.null(params_1[["method"]]) && params_1[["method"]] == "matchedFilter") ||
          (!is.null(params_2[["method"]]) && params_2[["method"]] == "matchedFilter"))
     
-    for(i in 1:length(params_2))
+    for (i in seq_along(params_2))
     {
         new_index <- length(params_1) + 1
         fact <- params_2[[i]]
@@ -121,7 +205,7 @@ performOptimIteration <- function(anaInfo, algorithm, params, isoIdent)
     {
         # simplified optimizeSlaveCluster() from IPO
         feat <- calculateFeatures(anaInfo, algorithm, designParams, task)
-        result <- utilsIPO$calcPPS(getXcmsSet(feat, TRUE), isoIdent)
+        result <- calcPPS(feat, isoIdent)
         result[1] <- task
         return(result)
     })
@@ -171,7 +255,7 @@ performOptimIterationStat <- function(anaInfo, algorithm, result, isoIdent)
         runParams <- as.list(runParams)
     
     result$features <- calculateFeatures(anaInfo, algorithm, runParams, 1)
-    result$PPS <- utilsIPO$calcPPS(getXcmsSet(result$features, TRUE), isoIdent) # UNDONE: what about the "..." params?
+    result$PPS <- calcPPS(result$features, isoIdent) # UNDONE: what about the "..." params?
     
     return(result)
 }
@@ -188,7 +272,7 @@ optimizeFeatureFinding <- function(anaInfo, algorithm, params, isoIdent = "IPO",
     assertAnalysisInfo(anaInfo, add = ac)
     checkmate::assertChoice(algorithm, c("openms", "xcms", "enviPick"), add = ac)
     checkmate::assertList(params, add = ac)
-    checkmate::assertChoice(isoIdent, c("IPO", "CAMERA"), add = ac)
+    checkmate::assertChoice(isoIdent, c("IPO", "CAMERA", "OpenMS"), add = ac)
     checkmate::assertInt(maxIterations, add = ac)
     checkmate::reportAssertions(ac)
     

@@ -13,6 +13,7 @@ struct feature
     numType ret, mz, intensity;
     numType retMin, retMax;
     numType mzMin, mzMax;
+    int isoCount;
 };
 
 feature parseFeatureXMLBlock(pugi::xml_document &doc)
@@ -31,8 +32,11 @@ feature parseFeatureXMLBlock(pugi::xml_document &doc)
             ret.mz = getNumericFromXML(pos.text());
     }
     
+    ret.isoCount = 0;
     for (auto hull: featNode.children("convexhull"))
     {
+        ++ret.isoCount;
+        
         // only take first for now
         if (hull.attribute("nr").as_int() == 0)
         {
@@ -55,7 +59,6 @@ feature parseFeatureXMLBlock(pugi::xml_document &doc)
                     ret.mzMax = std::max(ret.mzMax, mz);
                 }
             }
-            break;
         }
     }
     
@@ -69,6 +72,7 @@ Rcpp::DataFrame parseFeatureXMLFile(Rcpp::CharacterVector file)
 {
     std::vector<std::string> ids;
     std::vector<numType> ints, rets, mzs, retMins, retMaxs, mzMins, mzMaxs;
+    std::vector<int> isoCounts;
     
     parseXMLFile(Rcpp::as<const char *>(file), "<feature id=", "</feature>",
                  [&](pugi::xml_document &doc)
@@ -82,6 +86,7 @@ Rcpp::DataFrame parseFeatureXMLFile(Rcpp::CharacterVector file)
                      retMaxs.push_back(f.retMax);
                      mzMins.push_back(f.mzMin);
                      mzMaxs.push_back(f.mzMax);
+                     isoCounts.push_back(f.isoCount);
                  });
     
     return Rcpp::DataFrame::create(Rcpp::Named("ID") = ids,
@@ -92,5 +97,6 @@ Rcpp::DataFrame parseFeatureXMLFile(Rcpp::CharacterVector file)
                                    Rcpp::Named("retmax") = retMaxs,
                                    Rcpp::Named("mzmin") = mzMins,
                                    Rcpp::Named("mzmax") = mzMaxs,
+                                   Rcpp::Named("isocount") = isoCounts,
                                    Rcpp::Named("stringsAsFactors") = false);
 }

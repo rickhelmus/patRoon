@@ -25,37 +25,10 @@ fixOptParamBoundsXCMS <- function(param, bounds)
     return(bounds)
 }
 
-# based on part of optimizeXcmsSet() function from IPO
 checkOptParamsXCMS <- function(params)
 {
     if (params$no_optimization$method == "centWave")
-    {
-        #checking peakwidths plausiability
-        if (!is.null(params$to_optimize$min_peakwidth) || 
-            !is.null(params$to_optimize$max_peakwidth))
-        {
-            
-            if (is.null(params$to_optimize$min_peakwidth))
-                pw_min <- params$no_optimization$min_peakwidth
-            else
-                pw_min <- max(params$to_optimize$min_peakwidth)
-            
-            if (is.null(params$to_optimize$max_peakwidth))
-                pw_max <- params$no_optimization$max_peakwidth
-            else
-                pw_max <- min(params$to_optimize$max_peakwidth)
-            
-            if (pw_min >= pw_max)
-            {
-                additional <- abs(pw_min-pw_max) + 1
-                if (!is.null(params$to_optimize$max_peakwidth))
-                    params$to_optimize$max_peakwidth <- params$to_optimize$max_peakwidth + additional
-                else
-                    params$no_optimization$max_peakwidth <- params$no_optimization$max_peakwidth + additional
-            }
-        }
-    }
-    
+        return(fixOptParamRange(params, list(c("min_peakwidth", "max_peakwidth"))))
     return(params)
 }
 

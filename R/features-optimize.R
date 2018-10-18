@@ -13,6 +13,37 @@ callAlgoFunc <- function(func, algorithm, ...)
     do.call(paste0(func, suffix), list(...))
 }
 
+# based on part of optimizeXcmsSet() function from IPO
+fixOptParamRange <- function(params, paramPairs)
+{
+    for (pp in paramPairs)
+    {
+        if (!is.null(params$to_optimize[[pp[1]]]) || !is.null(params$to_optimize[[pp[2]]]))
+        {
+            if (is.null(params$to_optimize[[pp[1]]]))
+                pmin <- params$no_optimization[[pp[1]]]
+            else
+                pmin <- max(params$to_optimize[[pp[1]]])
+            
+            if (is.null(params$to_optimize[[pp[2]]]))
+                pmax <- params$no_optimization[[pp[2]]]
+            else
+                pmax <- min(params$to_optimize[[pp[2]]])
+            
+            if (pmin >= pmax)
+            {
+                additional <- abs(pmin-pmax) + 1
+                if (!is.null(params$to_optimize[[pp[2]]]))
+                    params$to_optimize[[pp[2]]] <- params$to_optimize[[pp[2]]] + additional
+                else
+                    params$no_optimization[[pp[2]]] <- params$no_optimization[[pp[2]]] + additional
+            }
+        }
+    }
+    
+    return(params)
+}
+
 # Adapted from IPO: add OpenMS isotope detection
 calcPPS <- function(feat, isotopeIdentification = c("IPO", "CAMERA", "OpenMS"), ...)
 {
@@ -29,11 +60,11 @@ calcPPS <- function(feat, isotopeIdentification = c("IPO", "CAMERA", "OpenMS"), 
     ret[2] <- length(feat)
     
     doOpenMS <- isotopeIdentification == "OpenMS"
-    if (!doOpenMS)
+    if (!doOpenMS) # no need to find isotopes with OpenMS algo
     {
         xset <- getXcmsSet(feat, TRUE)
-        peak_source <- utilsIPO$peaks_IPO(xset)[,c("mz", "rt", "sample", "into", "mzmin", 
-                                                   "mzmax", "rtmin", "rtmax"),drop=FALSE]
+        peak_source <- utilsIPO$peaks_IPO(xset)[, c("mz", "rt", "sample", "into", "mzmin", 
+                                                    "mzmax", "rtmin", "rtmax"), drop=FALSE]
         if(isotopeIdentification == "IPO")
             iso_mat <- utilsIPO$findIsotopes.IPO(xset, ...)  
         else
@@ -47,8 +78,9 @@ calcPPS <- function(feat, isotopeIdentification = c("IPO", "CAMERA", "OpenMS"), 
     {
         if (doOpenMS)
         {
-            intensities <- fTable[[anai]]$intensity
-            masses <- fTable[[anai]]$mz
+            # intensities/masses of features without assigned isotopes
+            intensities <- fTable[[anai]][isocount == 1, intensity]
+            masses <- fTable[[anai]][isocount == 1, mz]
         }
         else
         {
@@ -85,7 +117,12 @@ calcPPS <- function(feat, isotopeIdentification = c("IPO", "CAMERA", "OpenMS"), 
     }#end_for_sample    
     
     if (doOpenMS)
-        ret[4] <- sum(unlist(lapply(fTable, function(ft) ft$isocount - 1)))
+    {
+        # isocount represent the number of isotopes collapsed in a feature. When
+        # it's one, no other isotopes are present and hence its a NP. The
+        # remaining are assumed to be RP.
+        ret[4] <- sum(unlist(lapply(fTable, function(ft) ft[isocount > 1, isocount])))
+    }
     else
         ret[4] <- length(unique(c(iso_mat)))
     
@@ -157,22 +194,25 @@ combineOptParams = function(params_1, params_2, algorithm)
     return(params_1)
 }
 
-
-calculateFeatures <- function(anaInfo, algorithm, params, task)
+calculateFeatures <- function(anaInfo, algorithm, params, task, final = FALSE)
 {
     # UNDONE: do we want to keep caching this?
 
-    # params is a data.frame when called from performOptimIteration() and a list
-    # when called from performOptimIterationStat().
-    if (is.data.frame(params))
+    # params is a data.frame when not final and a list when it is final.
+    if (!final)
         params <- as.list(params[task, ])
-    else
-        params <- as.list(params[task])
-        
+
     # get rid of design specific params
     params[["run.order"]] <- NULL
     params[["std.order"]] <- NULL
     params[["Block"]] <- NULL
+
+    if (!final)
+        printf("---\nTask %d\n", task)
+    else
+        printf("---\nGetting features with final settings...\n")
+    printf("%s: %s\n", names(params), params)
+    printf("---\n")
     
     params <- callAlgoFunc(convertOptToCallParams, algorithm, params)
     return(do.call(findFeatures, c(list(anaInfo, algorithm), params)))
@@ -212,7 +252,7 @@ performOptimIteration <- function(anaInfo, algorithm, params, isoIdent)
     
     response <- t(response)
     colnames(response) <- c("exp", "num_peaks", "notLLOQP", "num_C13", "PPS")
-    response <- response[order(response[,1]),]
+    response <- response[order(response[, 1]), ]
     
     ret <- list()
     ret$params <- typParams
@@ -254,7 +294,7 @@ performOptimIterationStat <- function(anaInfo, algorithm, result, isoIdent)
     if (!is.list(runParams))
         runParams <- as.list(runParams)
     
-    result$features <- calculateFeatures(anaInfo, algorithm, runParams, 1)
+    result$features <- calculateFeatures(anaInfo, algorithm, runParams, final = TRUE)
     result$PPS <- calcPPS(result$features, isoIdent) # UNDONE: what about the "..." params?
     
     return(result)
@@ -265,15 +305,14 @@ checkOptParams <- function(params, algorithm) callAlgoFunc(checkOptParams, algor
 getMinOptSetting <- function(settingName, algorithm, params) callAlgoFunc(getMinOptSetting, algorithm, settingName, params)
 
 # heavily based on optimizeXcmsSet() from IPO
-optimizeFeatureFinding <- function(anaInfo, algorithm, params, isoIdent = "IPO",
-                                   maxIterations = 50)
+optimizeFeatureFinding <- function(anaInfo, algorithm, params, isoIdent = "IPO", maxIterations = 50)
 {
     ac <- checkmate::makeAssertCollection()
     assertAnalysisInfo(anaInfo, add = ac)
-    checkmate::assertChoice(algorithm, c("openms", "xcms", "enviPick"), add = ac)
+    checkmate::assertChoice(algorithm, c("openms", "xcms", "envipick"), add = ac)
     checkmate::assertList(params, add = ac)
     checkmate::assertChoice(isoIdent, c("IPO", "CAMERA", "OpenMS"), add = ac)
-    checkmate::assertInt(maxIterations, add = ac)
+    checkmate::assertCount(maxIterations, positive = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
     history <- list()
@@ -281,6 +320,12 @@ optimizeFeatureFinding <- function(anaInfo, algorithm, params, isoIdent = "IPO",
     
     for (iter in seq_len(maxIterations))
     {
+        printf("\n\n===\n")
+        printf("Starting new DoE with:\n")
+        printf(paste0(rbind(paste0(names(params), ": "), 
+                            paste0(params, "\n"))))
+        printf("===\n\n")
+        
         result <- performOptimIteration(anaInfo, algorithm, params, isoIdent)
         result <- performOptimIterationStat(anaInfo, algorithm, result, isoIdent)
         
@@ -317,7 +362,7 @@ optimizeFeatureFinding <- function(anaInfo, algorithm, params, isoIdent = "IPO",
             return(history)   
         }
         
-        for(i in seq_len(length(params$to_optimize)))
+        for (i in seq_len(length(params$to_optimize)))
         {
             setting <- result$max_settings[i+1]
             bounds <- params$to_optimize[[i]] 
@@ -357,7 +402,7 @@ optimizeFeatureFinding <- function(anaInfo, algorithm, params, isoIdent = "IPO",
         params <- utilsIPO$attachList(params$to_optimize, params$no_optimization)
     }
     
-    params <- utilsIPO$attachList(params$to_optimize, params$no_optimization)
+    #params <- utilsIPO$attachList(params$to_optimize, params$no_optimization)
     
     return(history)
 }

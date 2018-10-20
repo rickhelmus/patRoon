@@ -19,7 +19,7 @@ featuresOpenMS <- setClass("featuresOpenMS", contains = "features")
 #'   \code{algorithm:common:noise_threshold_int} option.
 #' @param chromSNR Minimum S/N of a mass trace. Sets
 #'   \code{algorithm:common:chrom_peak_snr} option.
-#' @param comFWHM Expected chromatographic peak width (in seconds). Sets
+#' @param chromFWHM Expected chromatographic peak width (in seconds). Sets
 #'   \code{algorithm:common:chrom_fwhm} option.
 #' @param mzPPM Allowed mass deviation (ppm) for trace detection. Sets
 #'   \code{algorithm:mtd:mass_error_ppm}.
@@ -68,7 +68,7 @@ featuresOpenMS <- setClass("featuresOpenMS", contains = "features")
 #'
 #' @rdname feature-finding
 #' @export
-findFeaturesOpenMS <- function(analysisInfo, noiseThrInt = 1000, chromSNR = 3, comFWHM = 5, mzPPM = 10, reEstimateMTSD = TRUE,
+findFeaturesOpenMS <- function(analysisInfo, noiseThrInt = 1000, chromSNR = 3, chromFWHM = 5, mzPPM = 10, reEstimateMTSD = TRUE,
                                traceTermCriterion = "sample_rate", traceTermOutliers = 5, minSampleRate = 0.5,
                                minTraceLength = 3, maxTraceLength = -1, widthFiltering = "fixed", minFWHM = 3,
                                maxFWHM = 60, traceSNRFiltering = FALSE, localRTRange = 10, localMZRange = 6.5,
@@ -78,22 +78,35 @@ findFeaturesOpenMS <- function(analysisInfo, noiseThrInt = 1000, chromSNR = 3, c
 {
     ac <- checkmate::makeAssertCollection()
     assertAnalysisInfo(analysisInfo, "mzML", add = ac)
-    aapply(checkmate::assertNumber, . ~ thr + minfwhm + maxfwhm + minlength + mzppm, lower = 0,
-           finite = TRUE, fixed = list(add = ac))
-    checkmate::assertNumber(maxlength, finite = TRUE, add = ac)
+    aapply(checkmate::assertNumber, . ~ noiseThrInt + chromSNR + chromFWHM + mzPPM + minSampleRate +
+               minTraceLength + minFWHM + maxFWHM + localRTRange + localMZRange + intSearchRTWindow,
+           lower = 0, finite = TRUE, fixed = list(add = ac))
+    checkmate::assertChoice(traceTermCriterion, c("sample_rate", "outlier"))
+    checkmate::assertCount(traceTermOutliers, add = ac)
+    checkmate::assertNumber(maxTraceLength, finite = TRUE, add = ac)
+    checkmate::assertChoice(widthFiltering, c("fixed", "off", "auto"))
+    checkmate::assertChoice(isotopeFilteringModel, c("metabolites (2% RMS)", "metabolites (5% RMS)",
+                                                     "peptides", "none"), add = ac)
+    aapply(checkmate::assertLogical, . ~ reEstimateMTSD + traceSNRFiltering + MZScoring13C + useSmoothedInts, fixed = list(add = ac))
     checkmate::assertList(extraOpts, any.missing = FALSE, names = "unique", null.ok = TRUE, add = ac)
     assertMultiProcArgs(logPath, maxProcAmount, add = ac)
     checkmate::reportAssertions(ac)
     
     printf("Finding features with OpenMS for %d analyses ...\n", nrow(analysisInfo))
 
+    params <- list(noiseThrInt, chromSNR, chromFWHM, mzPPM, reEstimateMTSD,
+                   traceTermCriterion, traceTermOutliers, minSampleRate,
+                   minTraceLength, maxTraceLength, widthFiltering, minFWHM,
+                   maxFWHM, traceSNRFiltering, localRTRange, localMZRange,
+                   isotopeFilteringModel, MZScoring13C, useSmoothedInts, extraOpts)
+    paramsHash <- makeHash(params)
+    
     cmdQueue <- lapply(seq_len(nrow(analysisInfo)), function(anai)
     {
         dfile <- getMzMLAnalysisPath(analysisInfo$analysis[anai], analysisInfo$path[anai])
         ffile <- tempfile(analysisInfo$analysis[anai], fileext = ".featureXML")
-        hash <- makeHash(makeFileHash(dfile), thr, comfwhm, minfwhm, maxfwhm, minlength,
-                         maxlength, mzppm, extraOpts)
-        cmd <- getOpenMSFFCommand(dfile, ffile, thr, comfwhm, minfwhm, maxfwhm, minlength, maxlength, mzppm, extraOpts)
+        hash <- makeHash(makeFileHash(dfile), paramsHash)
+        cmd <- do.call(getOpenMSFFCommand, c(list(dfile, ffile), params))
 
         logf <- if (!is.null(logPath)) file.path(logPath, paste0("ffm-", analysisInfo$analysis[anai], ".txt")) else NULL
 
@@ -142,17 +155,33 @@ findFeaturesOpenMS <- function(analysisInfo, noiseThrInt = 1000, chromSNR = 3, c
     return(featuresOpenMS(analysisInfo = analysisInfo, features = fList))
 }
 
-getOpenMSFFCommand <- function(datafile, out, thr, comfwhm, minfwhm, maxfwhm, minlength, maxlength, mzppm, extraOpts)
+getOpenMSFFCommand <- function(datafile, out, noiseThrInt, chromSNR, chromFWHM, mzPPM, reEstimateMTSD,
+                               traceTermCriterion, traceTermOutliers, minSampleRate,
+                               minTraceLength, maxTraceLength, widthFiltering, minFWHM,
+                               maxFWHM, traceSNRFiltering, localRTRange, localMZRange,
+                               isotopeFilteringModel, MZScoring13C, useSmoothedInts, extraOpts)
 {
-    settings <- c("-algorithm:common:noise_threshold_int" = thr,
-                  "-algorithm:common:chrom_fwhm" = comfwhm,
-                  "-algorithm:mtd:mass_error_ppm" = mzppm,
-                  "-algorithm:mtd:trace_termination_criterion" = "sample_rate",
-                  "-algorithm:mtd:min_trace_length" = minlength,
-                  "-algorithm:mtd:max_trace_length" = maxlength, # positive value makes it much slower
-                  "-algorithm:epd:width_filtering" = "fixed",
-                  "-algorithm:epd:min_fwhm" = minfwhm,
-                  "-algorithm:epd:max_fwhm" = maxfwhm,
+    boolToChr <- function(b) if (b) "true" else "false"
+    
+    settings <- c("-algorithm:common:noise_threshold_int" = noiseThrInt,
+                  "-algorithm:common:chrom_peak_snr" = chromSNR,
+                  "-algorithm:common:chrom_fwhm" = chromFWHM,
+                  "-algorithm:mtd:mass_error_ppm" = mzPPM,
+                  "-algorithm:mtd:reestimate_mt_sd" = boolToChr(reEstimateMTSD),
+                  "-algorithm:mtd:trace_termination_criterion" = traceTermCriterion,
+                  "-algorithm:mtd:trace_termination_outliers" = traceTermOutliers,
+                  "-algorithm:mtd:min_sample_rate" = minSampleRate,
+                  "-algorithm:mtd:min_trace_length" = minTraceLength,
+                  "-algorithm:mtd:max_trace_length" = maxTraceLength,
+                  "-algorithm:epd:width_filtering" = widthFiltering,
+                  "-algorithm:epd:min_fwhm" = minFWHM,
+                  "-algorithm:epd:max_fwhm" = maxFWHM,
+                  "-algorithm:epd:masstrace_snr_filtering" = boolToChr(traceSNRFiltering),
+                  "-algorithm:ffm:local_rt_range" = localRTRange,
+                  "-algorithm:ffm:local_mz_range" = localMZRange,
+                  "-algorithm:ffm:isotope_filtering_model" = isotopeFilteringModel,
+                  "-algorithm:ffm:mz_scoring_13C" = boolToChr(MZScoring13C),
+                  "-algorithm:ffm:use_smoothed_intensities" = boolToChr(useSmoothedInts),
                   "-algorithm:ffm:report_convex_hulls" = "true")
 
     if (!is.null(extraOpts))

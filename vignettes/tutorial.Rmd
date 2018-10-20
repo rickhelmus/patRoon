@@ -97,7 +97,7 @@ To obtain all the features within your dataset the `findFeatures` function is us
 In this tutorial we will use the [OpenMS] software to find features:
 
 ```{r features,results='hide'}
-fList <- findFeatures(anaInfo, "openms", mzppm = 5)
+fList <- findFeatures(anaInfo, "openms", mzPPM = 5)
 ```
 ```{r}
 fList

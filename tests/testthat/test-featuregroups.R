@@ -4,7 +4,7 @@ fList <- findFeatures(getTestAnaInfo(), "openms", logPath = NULL)
 fgOpenMS <- groupFeatures(fList, "openms")
 fgXCMS <- groupFeatures(fList, "xcms")
 
-fListEmpty <- findFeatures(getTestAnaInfo(), "openms", thr = 1E9, logPath = NULL)
+fListEmpty <- findFeatures(getTestAnaInfo(), "openms", noiseThrInt = 1E9, logPath = NULL)
 fgOpenMSEmpty <- groupFeatures(fListEmpty, "openms")
 fgXCMSEmpty <- groupFeatures(fListEmpty, "xcms")
 

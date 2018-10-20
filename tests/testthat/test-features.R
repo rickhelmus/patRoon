@@ -11,7 +11,7 @@ exDataFiles <- list.files(patRoonData::exampleDataPath(), "\\.mzML$", full.names
 convertMSFiles(anaInfoOne, "mzML", "mzXML", getWorkPath())
 epAnaInfo <- getTestAnaInfo(getWorkPath())
 ffEP <- findFeatures(epAnaInfo, "envipick")
-ffEmpty <- findFeatures(anaInfoOne, "openms", thr = 1E9, logPath = NULL)
+ffEmpty <- findFeatures(anaInfoOne, "openms", noiseThrInt = 1E9, logPath = NULL)
 
 test_that("verify feature finder output", {
     # Don't store ID column: not reproducible

@@ -16,7 +16,7 @@ convertOptToCallParamsXCMS <- function(params)
     return(params)
 }
 
-checkInitialOptParamsXCMS <- function(params)
+checkInitialOptParamsXCMS <- function(params, isoIdent)
 {
     return(params)
 }

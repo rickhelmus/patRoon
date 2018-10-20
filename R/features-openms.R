@@ -48,11 +48,14 @@ featuresOpenMS <- setClass("featuresOpenMS", contains = "features")
 #'   coeluting/isotopic mass traces. Sets the
 #'   \code{algorithm:ffm:local_rt_range} and \code{algorithm:ffm:local_mz_range}
 #'   options, respectively.
-#' @param isotopeFilteringModel,MZScoring13C Remove/score candidate assemblies
-#'   based on isotope intensities. See
+#' @param isotopeFilteringModel Remove/score candidate assemblies based on
+#'   isotope intensities. See
 #'   \href{http://ftp.mi.fu-berlin.de/pub/OpenMS/release2.1.0-documentation/html/TOPP_FeatureFinderMetabo.html}{FeatureFinderMetabo}.
-#'    Sets the \code{algorithm:ffm:isotope_filtering_model} and
-#'   \code{algorithm:ffm:mz_scoring_13C} options, respectivly.
+#'    Sets the \code{algorithm:ffm:isotope_filtering_model} option.
+#' @param MZScoring13C Use the 13C isotope as the expected shift for isotope
+#'   mass traces. See
+#'   \href{http://ftp.mi.fu-berlin.de/pub/OpenMS/release2.1.0-documentation/html/TOPP_FeatureFinderMetabo.html}{FeatureFinderMetabo}.
+#'   Sets \code{algorithm:ffm:mz_scoring_13C}.
 #' @param useSmoothedInts If \code{TRUE} then use LOWESS intensities instead of
 #'   raw intensities. Sets the \code{algorithm:ffm:use_smoothed_intensities}
 #'   option.

@@ -8,7 +8,7 @@ callAlgoFunc <- function(func, algorithm, ...)
     suffix <- switch(algorithm,
                      xcms = "XCMS",
                      openms = "OpenMS",
-                     envipick = "enviPick",
+                     envipick = "EnviPick",
                      stop("Invalid algorithm!"))
     do.call(paste0(func, suffix), list(...))
 }
@@ -64,7 +64,7 @@ calcPPS <- function(feat, isotopeIdentification = c("IPO", "CAMERA", "OpenMS"), 
     {
         xset <- getXcmsSet(feat, TRUE)
         peak_source <- utilsIPO$peaks_IPO(xset)[, c("mz", "rt", "sample", "into", "mzmin", 
-                                                    "mzmax", "rtmin", "rtmax"), drop=FALSE]
+                                                    "mzmax", "rtmin", "rtmax"), drop = FALSE]
         if(isotopeIdentification == "IPO")
             iso_mat <- utilsIPO$findIsotopes.IPO(xset, ...)  
         else
@@ -87,9 +87,9 @@ calcPPS <- function(feat, isotopeIdentification = c("IPO", "CAMERA", "OpenMS"), 
             non_isos_peaks <- peak_source
             
             if (nrow(iso_mat) > 0)
-                non_isos_peaks <- peak_source[-unique(c(iso_mat)),,drop=FALSE] 
+                non_isos_peaks <- peak_source[-unique(c(iso_mat)), , drop = FALSE] 
             
-            speaks <- non_isos_peaks[non_isos_peaks[,"sample"]==anai,,drop=FALSE]
+            speaks <- non_isos_peaks[non_isos_peaks[,"sample"]==anai, , drop = FALSE]
             intensities <- speaks[,"into"]
             na_int <- is.na(intensities)
             intensities <- intensities[!na_int]
@@ -120,8 +120,8 @@ calcPPS <- function(feat, isotopeIdentification = c("IPO", "CAMERA", "OpenMS"), 
     {
         # isocount represent the number of isotopes collapsed in a feature. When
         # it's one, no other isotopes are present and hence its a NP. The
-        # remaining are assumed to be RP.
-        ret[4] <- sum(unlist(lapply(fTable, function(ft) ft[isocount > 1, isocount])))
+        # remaining (except the last, hence - 1) are assumed to be RP.
+        ret[4] <- sum(unlist(lapply(fTable, function(ft) ft[isocount > 1, isocount - 1])))
     }
     else
         ret[4] <- length(unique(c(iso_mat)))
@@ -300,7 +300,7 @@ performOptimIterationStat <- function(anaInfo, algorithm, result, isoIdent)
     return(result)
 }
 
-checkInitialOptParams <- function(params, algorithm) callAlgoFunc(checkInitialOptParams, algorithm, params)
+checkInitialOptParams <- function(params, isoIdent, algorithm) callAlgoFunc(checkInitialOptParams, algorithm, params, isoIdent)
 fixOptParamBounds <- function(param, bounds, algorithm) callAlgoFunc(fixOptParamBounds, algorithm, param, bounds)
 fixOptParams <- function(params, algorithm) callAlgoFunc(fixOptParams, algorithm, params)
 getMinOptSetting <- function(settingName, algorithm, params) callAlgoFunc(getMinOptSetting, algorithm, settingName, params)
@@ -316,7 +316,10 @@ optimizeFeatureFinding <- function(anaInfo, algorithm, params, isoIdent = "IPO",
     checkmate::assertCount(maxIterations, positive = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
-    params <- checkInitialOptParams(params, algorithm)
+    if (algorithm != "openms" && isoIdent == "OpenMS")
+        stop("OpenMS isotope identification can only be used when OpenMS is used to find features.")
+    
+    params <- checkInitialOptParams(params, isoIdent, algorithm)
     
     history <- list()
     bestRange <- 0.25

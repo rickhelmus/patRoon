@@ -6,15 +6,20 @@ convertOptToCallParamsOpenMS <- function(params)
     return(params)
 }
 
-checkInitialOptParamsOpenMS <- function(params)
+checkInitialOptParamsOpenMS <- function(params, isoIdent)
 {
+    if (isoIdent != "OpenMS")
+    {
+        warning("Isotopic detection during feature finding will be disabled (by setting localMZRange=0). Set isoIdent=\"OpenMS\" to avoid this (see ?optimizeFeatureFinding).")
+        params[["localMZRange"]] <- 0
+    }
     return(params)
 }
 
 # based on part of optimizeXcmsSet() function from IPO
 fixOptParamBoundsOpenMS <- function(param, bounds)
 {
-    if (param == "trace_termination_outliers")
+    if (param == "traceTermOutliers")
         return(round(bounds, 0))
     
     return(bounds)
@@ -23,8 +28,8 @@ fixOptParamBoundsOpenMS <- function(param, bounds)
 # based on part of optimizeXcmsSet() function from IPO
 fixOptParamsOpenMS <- function(params)
 {
-    return(fixOptParamRange(params, list(c("minfwhm", "maxfwhm"),
-                                         c("minlength", "maxlength"))))
+    return(fixOptParamRange(params, list(c("minFWHM", "maxFWHM"),
+                                         c("minTraceLength", "maxTraceLength"))))
 }
 
 # based on part of optimizeXcmsSet() function from IPO

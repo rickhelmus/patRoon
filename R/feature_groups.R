@@ -109,9 +109,8 @@ setMethod("groupInfo", "featureGroups", function(fGroups) fGroups@groupInfo)
 setMethod("featureTable", "featureGroups", function(obj) featureTable(obj@features))
 
 #' @describeIn featureGroups Accessor for \code{features} slot.
-#' @aliases getFeatures
 #' @export
-setMethod("getFeatures", "featureGroups", function(fGroups) fGroups@features)
+setMethod("getFeatures", "featureGroups", function(obj) obj@features)
 
 #' @describeIn featureGroups Accessor for \code{ftindex} slot.
 #' @aliases groupFeatIndex

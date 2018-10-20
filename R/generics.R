@@ -5,7 +5,6 @@ if (!isGeneric("plot"))
 ### Feature groups
 
 setGeneric("groups", function(object) standardGeneric("groups"))
-setGeneric("getFeatures", function(fGroups) standardGeneric("getFeatures"))
 setGeneric("groupFeatIndex", function(fGroups) standardGeneric("groupFeatIndex"))
 setGeneric("groupInfo", function(fGroups) standardGeneric("groupInfo"))
 setGeneric("removeAnalyses", function(fGroups, indices) standardGeneric("removeAnalyses"))
@@ -147,16 +146,6 @@ setGeneric("analysisInfo", function(obj) standardGeneric("analysisInfo"))
 #' @template generics
 setGeneric("analyses", function(obj) standardGeneric("analyses"))
 
-#' @templateVar func replicateGroups
-#' @templateVar desc returns a \code{character} vector with the analyses for which data is present in this object.
-#' @template generics
-setGeneric("replicateGroups", function(obj) standardGeneric("replicateGroups"))
-
-#' @templateVar func groupNames
-#' @templateVar desc returns a \code{character} vector with the names of the feature groups for which data is present in this object.
-#' @template generics
-setGeneric("groupNames", function(obj) standardGeneric("groupNames"))
-
 #' @templateVar func algorithm
 #' @templateVar desc returns the algorithm that was used to generate an object.
 #' @template generics
@@ -197,10 +186,20 @@ setGeneric("filter", function(obj, ...) standardGeneric("filter"))
 #' @template generics
 setGeneric("formulaTable", function(obj) standardGeneric("formulaTable"))
 
+#' @templateVar func getFeatures
+#' @templateVar desc returns the object's \code{\link{features}} object.
+#' @template generics
+setGeneric("getFeatures", function(obj) standardGeneric("getFeatures"))
+
 #' @templateVar func getMCS
 #' @templateVar desc Calculcates the maximum common substructure.
 #' @template generics
 setGeneric("getMCS", function(obj, ...) standardGeneric("getMCS"))
+
+#' @templateVar func groupNames
+#' @templateVar desc returns a \code{character} vector with the names of the feature groups for which data is present in this object.
+#' @template generics
+setGeneric("groupNames", function(obj) standardGeneric("groupNames"))
 
 #' @templateVar func plotChord
 #' @templateVar desc plots a Chord diagram to assess overlapping data.
@@ -245,6 +244,11 @@ setGeneric("plotVenn", function(obj, which = NULL, ...) standardGeneric("plotVen
 #' @param which What should be plotted. See method documentation for specifics.
 #'
 setGeneric("plotUpSet", function(obj, ...) standardGeneric("plotUpSet"))
+
+#' @templateVar func replicateGroups
+#' @templateVar desc returns a \code{character} vector with the analyses for which data is present in this object.
+#' @template generics
+setGeneric("replicateGroups", function(obj) standardGeneric("replicateGroups"))
 
 #' @templateVar func treeCut
 #' @templateVar desc Manually cut a cluster.

@@ -1,6 +1,42 @@
 #' @include utils-IPO.R
+#' @include features.R
 #' @include main.R
 NULL
+
+#' @export
+featuresOptimization <- setClass("featuresOptimization",
+                                 slots = c(algorithm = "character",
+                                           startParams = "list", finalResults = "list",
+                                           experiments = "list"))
+
+#' @describeIn featuresOptimization Returns the algorithm that was used for finding features.
+setMethod("algorithm", "featuresOptimization", function(obj) obj@algorithm)
+
+#' @describeIn featuresOptimization Obtain total number of experimental design iteratations performed.
+#' @export
+setMethod("length", "featuresOptimization", function(x) length(x@experiments))
+
+#' @describeIn featuresOptimization Shows summary information for this object.
+#' @export
+setMethod("show", "featuresOptimization", function(object)
+{
+    printf("A features optimization object ('%s')\n", class(object))
+    printf("Algorithm: %s\n", algorithm(object))
+    printf("Experimental designs performed: %d\n", length(object))
+    printf("Starting params:\n"); printf("- %s: %s\n", names(object@startParams), object@startParams)
+    printf("Optimized params:\n"); printf("- %s: %s\n", names(object@finalResults$parameters), object@finalResults$parameters)
+    
+    br <- object@finalResults$result
+    br <- br[!names(br) %in% "ExpId"]
+    printf("Best results: "); cat(paste(names(br), br, sep = ": ", collapse = "; ")); cat("\n")
+    
+    showObjectSize(object)
+})
+
+#' @describeIn featuresOptimization Returns the \code{\link{features}} object obtained with the optimized parameters.
+#' @export
+setMethod("getFeatures", "featuresOptimization", function(obj) obj@finalResults$features)
+
 
 callAlgoFunc <- function(func, algorithm, ...)
 {
@@ -319,7 +355,7 @@ optimizeFeatureFinding <- function(anaInfo, algorithm, params, isoIdent = "IPO",
     if (algorithm != "openms" && isoIdent == "OpenMS")
         stop("OpenMS isotope identification can only be used when OpenMS is used to find features.")
     
-    params <- checkInitialOptParams(params, isoIdent, algorithm)
+    params <- startParams <- checkInitialOptParams(params, isoIdent, algorithm)
     
     history <- list()
     bestRange <- 0.25
@@ -365,7 +401,7 @@ optimizeFeatureFinding <- function(anaInfo, algorithm, params, isoIdent = "IPO",
             bestSettings$result <- history[[maxIndex]]$PPS
             history$bestSettings <- bestSettings
             
-            return(history)   
+            break  
         }
         
         for (i in seq_len(length(params$to_optimize)))
@@ -410,5 +446,6 @@ optimizeFeatureFinding <- function(anaInfo, algorithm, params, isoIdent = "IPO",
     
     #params <- utilsIPO$attachList(params$to_optimize, params$no_optimization)
     
-    return(history)
+    return(featuresOptimization(algorithm = algorithm, startParams = startParams,
+                                finalResults = history$bestSettings, experiments = history[seq_len(iter)]))
 }

@@ -6,6 +6,11 @@ convertOptToCallParamsOpenMS <- function(params)
     return(params)
 }
 
+checkInitialOptParamsOpenMS <- function(params)
+{
+    return(params)
+}
+
 # based on part of optimizeXcmsSet() function from IPO
 fixOptParamBoundsOpenMS <- function(param, bounds)
 {
@@ -16,7 +21,7 @@ fixOptParamBoundsOpenMS <- function(param, bounds)
 }
 
 # based on part of optimizeXcmsSet() function from IPO
-checkOptParamsOpenMS <- function(params)
+fixOptParamsOpenMS <- function(params)
 {
     return(fixOptParamRange(params, list(c("minfwhm", "maxfwhm"),
                                          c("minlength", "maxlength"))))

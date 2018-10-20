@@ -16,6 +16,11 @@ convertOptToCallParamsXCMS <- function(params)
     return(params)
 }
 
+checkInitialOptParamsXCMS <- function(params)
+{
+    return(params)
+}
+
 # based on part of optimizeXcmsSet() function from IPO
 fixOptParamBoundsXCMS <- function(param, bounds)
 {
@@ -25,7 +30,7 @@ fixOptParamBoundsXCMS <- function(param, bounds)
     return(bounds)
 }
 
-checkOptParamsXCMS <- function(params)
+fixOptParamsXCMS <- function(params)
 {
     if (params$no_optimization$method == "centWave")
         return(fixOptParamRange(params, list(c("min_peakwidth", "max_peakwidth"))))

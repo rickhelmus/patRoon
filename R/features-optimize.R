@@ -300,8 +300,9 @@ performOptimIterationStat <- function(anaInfo, algorithm, result, isoIdent)
     return(result)
 }
 
+checkInitialOptParams <- function(params, algorithm) callAlgoFunc(checkInitialOptParams, algorithm, params)
 fixOptParamBounds <- function(param, bounds, algorithm) callAlgoFunc(fixOptParamBounds, algorithm, param, bounds)
-checkOptParams <- function(params, algorithm) callAlgoFunc(checkOptParams, algorithm, params)
+fixOptParams <- function(params, algorithm) callAlgoFunc(fixOptParams, algorithm, params)
 getMinOptSetting <- function(settingName, algorithm, params) callAlgoFunc(getMinOptSetting, algorithm, settingName, params)
 
 # heavily based on optimizeXcmsSet() from IPO
@@ -314,6 +315,8 @@ optimizeFeatureFinding <- function(anaInfo, algorithm, params, isoIdent = "IPO",
     checkmate::assertChoice(isoIdent, c("IPO", "CAMERA", "OpenMS"), add = ac)
     checkmate::assertCount(maxIterations, positive = TRUE, add = ac)
     checkmate::reportAssertions(ac)
+    
+    params <- checkInitialOptParams(params, algorithm)
     
     history <- list()
     bestRange <- 0.25
@@ -398,7 +401,7 @@ optimizeFeatureFinding <- function(anaInfo, algorithm, params, isoIdent = "IPO",
             params$to_optimize[[i]] <- fixOptParamBounds(names(params$to_optimize)[i], newBounds, algorithm)
         }
         
-        params <- checkOptParams(params, algorithm)
+        params <- fixOptParams(params, algorithm)
         params <- utilsIPO$attachList(params$to_optimize, params$no_optimization)
     }
     

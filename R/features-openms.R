@@ -90,7 +90,7 @@ findFeaturesOpenMS <- function(analysisInfo, noiseThrInt = 1000, chromSNR = 3, c
     checkmate::assertChoice(widthFiltering, c("fixed", "off", "auto"))
     checkmate::assertChoice(isotopeFilteringModel, c("metabolites (2% RMS)", "metabolites (5% RMS)",
                                                      "peptides", "none"), add = ac)
-    aapply(checkmate::assertLogical, . ~ reEstimateMTSD + traceSNRFiltering + MZScoring13C + useSmoothedInts, fixed = list(add = ac))
+    aapply(checkmate::assertFlag, . ~ reEstimateMTSD + traceSNRFiltering + MZScoring13C + useSmoothedInts, fixed = list(add = ac))
     checkmate::assertList(extraOpts, any.missing = FALSE, names = "unique", null.ok = TRUE, add = ac)
     assertMultiProcArgs(logPath, maxProcAmount, add = ac)
     checkmate::reportAssertions(ac)

@@ -304,8 +304,7 @@ resultIncreased = function(history) {
         
         index = length(history)
         if(history[[index]]$PPS["PPS"] == 0 & index == 1)
-            stop(paste("No isotopes have been detected,",
-                       "peak picking not optimizable by IPO!"))
+            stop("No isotopes have been detected!")
         
         if(index < 2)
             return(TRUE)

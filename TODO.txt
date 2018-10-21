@@ -31,5 +31,6 @@ Release:
     - plotting
     - qualitative optim?
     - tests (e.g. check equality with IPO)
+- progressbar and parallel enviPick
 
     

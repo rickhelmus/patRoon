@@ -379,26 +379,9 @@ performOptimIterationStat <- function(anaInfo, algorithm, result, isoIdent)
     resp <- result$response[, "PPS"]
     
     result$model <- utilsIPO$createModel(result$design, params$to_optimize, resp)
-    maxSettings <- utilsIPO$getMaximumLevels(result$model)
-
-    # plotting rms --> UNDONE
-    # tmp <- max_settings[1,-1] # first row without response
-    # tmp[is.na(tmp)] <- 1 # if Na (i.e. -1, and 1), show +1
-    # if (isTRUE(plot) & length(tmp) > 1) {
-    #     if (!is.null(subdir)) {
-    #         plotContours(
-    #             model = result$model,
-    #             maximum_slice = tmp,
-    #             plot_name = file.path(subdir, paste("rsm_", iterator, sep = ""))
-    #         )
-    #     } else if (is.null(subdir))  {
-    #         plotContours(result$model, tmp, plot_name = NULL)
-    #     }
-    # }
+    result$max_settings <- utilsIPO$getMaximumLevels(result$model)
     
-    result$max_settings <- maxSettings
-    
-    runParams <- as.list(utilsIPO$decodeAll(maxSettings[-1], params$to_optimize))      
+    runParams <- as.list(utilsIPO$decodeAll(result$max_settings[-1], params$to_optimize))      
     runParams <- combineOptParams(runParams, params$no_optimization, algorithm)
     
     if (!is.list(runParams))

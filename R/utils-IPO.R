@@ -316,7 +316,7 @@ resultIncreased = function(history) {
         
     },
 
-### utils.cpp
+### utils.R
 
 attachList = function(params_1, params_2) {
     params <- params_1
@@ -541,47 +541,6 @@ peaks_IPO = function(xset) {
         colnames(peaks_act)[colnames(peaks_act) == ""] <- "sample"
     }
     peaks_act
-},
-
-plotContours = function(model, maximum_slice, plot_name = NULL) {
-    # generate for all variable combinations formulas
-    # (which will give the plots)
-    plots <- c()
-    for(i in 1:(length(maximum_slice)-1)) {
-        for(j in (i+1):length(maximum_slice)) {
-            plots <- c(plots, as.formula(paste("~ x", i, "* x", j, sep="")))
-        } 
-    }
-    
-    # determine number of plot rows and column on single device
-    plot_rows <- round(sqrt(length(plots)))
-    plot_cols <- 
-        if(plot_rows==1){
-            length(plots)
-        } else {
-            ceiling(sqrt(length(plots)))
-        }
-    
-    # save as jpeg, if plot_name is given
-    if(!is.null(plot_name)) {
-        plot_name = paste(plot_name, ".jpg", sep="")
-        jpeg(plot_name, width=4*plot_cols, height=2*plot_rows+2, 
-             units="in", res=c(200,200))
-    } # otherwise plot on device
-    
-    op <- par(mfrow = c(plot_rows, plot_cols), oma = c(0,0,0,0))  
-    # contour.lm is called
-    ret_tr <- try({#may produce errors, if figure margins are too small
-        contour(model, plots, image = TRUE, at = maximum_slice)
-    })
-    if (class(ret_tr) == "try-error") {
-        message("Error in plotting (see above), but IPO continues to work normally!")
-    }
-    
-    if (!is.null(plot_name)) {
-        dev.off()
-    }
-    par(op)
 },
 
 

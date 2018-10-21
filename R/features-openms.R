@@ -75,7 +75,7 @@ findFeaturesOpenMS <- function(analysisInfo, noiseThrInt = 1000, chromSNR = 3, c
                                traceTermCriterion = "sample_rate", traceTermOutliers = 5, minSampleRate = 0.5,
                                minTraceLength = 3, maxTraceLength = -1, widthFiltering = "fixed", minFWHM = 3,
                                maxFWHM = 60, traceSNRFiltering = FALSE, localRTRange = 10, localMZRange = 6.5,
-                               isotopeFilteringModel = "metabolites (5% RMS)", MZScoring13C = FALSE, useSmoothedInts = FALSE,
+                               isotopeFilteringModel = "metabolites (5% RMS)", MZScoring13C = FALSE, useSmoothedInts = TRUE,
                                extraOpts = NULL, intSearchRTWindow = 3,
                                logPath = file.path("log", "openms"), maxProcAmount = getOption("patRoon.maxProcAmount"))
 {

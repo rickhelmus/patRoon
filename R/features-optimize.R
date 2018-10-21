@@ -37,6 +37,80 @@ setMethod("show", "featuresOptimization", function(object)
 #' @export
 setMethod("getFeatures", "featuresOptimization", function(obj) obj@finalResults$features)
 
+#' @export
+setMethod("plot", "featuresOptimization", function(x, index, paramsToPlot = NULL, maxCols = NULL, type = "contour",
+                                                   image = TRUE, contours = "colors", ...)
+{
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertInt(index, lower = 1, upper = length(x))
+    checkmate::assert(checkmate::checkList(paramsToPlot, types = "character", any.missing = FALSE, min.len = 1, null.ok = TRUE),
+                      checkmate::checkCharacter(paramsToPlot, min.chars = 1, len = 2),
+                      checkmate::checkNull(paramsToPlot),
+                      .var.name = "paramsToPlot")
+    checkmate::assertCount(maxCols, positive = TRUE, null.ok = TRUE, add = ac)
+    checkmate::assertChoice(type, c("contour", "image", "persp"), add = ac)
+    checkmate::assertFlag(image, add = ac)
+    checkmate::assert(checkmate::checkFlag(contours),
+                      checkmate::checkCharacter(contours),
+                      checkmate::checkList(contours),
+                      .var.name = "contours")
+    checkmate::reportAssertions(ac)
+
+    ex <- x@experiments[[index]]
+    
+    if (is.null(paramsToPlot))
+    {
+        paramsToPlot <- list()
+        optNames <- names(ex$params$to_optimize)
+        for (i in seq(1, length(optNames)-1))
+        {
+            for (j in seq(i+1, length(optNames)))
+                paramsToPlot <- c(paramsToPlot, list(c(optNames[i], optNames[j])))
+        }
+    }
+    else if (is.character(paramsToPlot))
+        paramsToPlot <- list(paramsToPlot)
+    
+    codedNames <- names(ex$design)
+    decodedNames <- rsm::truenames(ex$design)
+    
+    forms <- lapply(paramsToPlot, function(pn)
+    {
+        # change to coded names
+        pn <- sapply(pn, function(n) codedNames[decodedNames == n])
+        return(as.formula(paste(pn[2], "~", pn[1])))
+    })
+    
+    maxSlice <- ex$max_settings[1, -1]
+    maxSlice[is.na(maxSlice)] <- 1
+    
+    formsLen <- length(forms)
+    if (formsLen > 1) # multiple plots?
+    {
+        if (is.null(maxCols))
+            maxCols <- ceiling(sqrt(formsLen))
+        
+        if (formsLen <= maxCols)
+        {
+            cols <- formsLen
+            rows <- 1
+        }
+        else
+        {
+            cols <- maxCols
+            rows <- ceiling(formsLen / cols)
+        }
+        
+        withr::local_par(list(mfrow = c(rows, cols)))
+    }
+    
+    switch(type,
+           contour = contour(ex$model, forms, image = image, at = maxSlice, ...),
+           image = image(ex$model, forms, at = maxSlice, ...),
+           persp = persp(ex$model, forms, contours = contours, at = maxSlice, ...))
+})
+
+
 
 callAlgoFunc <- function(func, algorithm, ...)
 {

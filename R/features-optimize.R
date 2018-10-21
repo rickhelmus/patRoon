@@ -9,10 +9,11 @@ featuresOptimizer <- setRefClass("featuresOptimizer", contains = c("DoEOptimizer
 
 featuresOptimizer$methods(
  
+    # dummy methods to be potentially overrided
     convertOptToCallParams = function(params) params,
     
     # Adapted from IPO: add OpenMS isotope detection
-    calcPPS = function(feat, isoIdent, ...) # UNDONE: handle ...
+    calcPPS = function(feat, ...) # UNDONE: handle ...
     {
         fTable <- featureTable(feat)
         
@@ -120,7 +121,7 @@ featuresOptimizer$methods(
         
         params <- convertOptToCallParams(params)
         feat <- do.call(findFeatures, c(list(anaInfo, algorithm), params))
-        ret <- calcPPS(feat, isoIdent)
+        ret <- calcPPS(feat)
         
         if (final) # store optimized features object
             ret$object <- feat

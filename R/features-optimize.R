@@ -253,3 +253,28 @@ setMethod("plot", "featuresOptimization", function(x, index, paramsToPlot = NULL
            persp = persp(ex$model, forms, contours = contours, at = maxSlice, ...))
 })
 
+
+optimizeFeatureFinding <- function(anaInfo, algorithm, params, isoIdent = "IPO", maxIterations = 50)
+{
+    ac <- checkmate::makeAssertCollection()
+    assertAnalysisInfo(anaInfo, add = ac)
+    checkmate::assertChoice(algorithm, c("openms", "xcms", "envipick"), add = ac)
+    checkmate::assertList(params, add = ac)
+    checkmate::assertChoice(isoIdent, c("IPO", "CAMERA", "OpenMS"), add = ac)
+    checkmate::assertCount(maxIterations, positive = TRUE, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    if (algorithm != "openms" && isoIdent == "OpenMS")
+        stop("OpenMS isotope identification can only be used when OpenMS is used to find features.")
+    
+    fo <- switch(algorithm,
+                 openms = featuresOptimizerOpenMS,
+                 xcms = featuresOptimizerXCMS,
+                 envipick = featuresOptimizerEnviPick)
+    
+    fo <- fo$new(anaInfo = anaInfo, algorithm = algorithm, isoIdent = isoIdent)
+    result <- fo$optimize(params, maxIterations)
+    
+    return(featuresOptimization(algorithm = algorithm, startParams = params,
+                                finalResults = result$finalResults, experiments = result$experiments))
+}

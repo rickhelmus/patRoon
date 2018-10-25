@@ -254,7 +254,8 @@ setMethod("plot", "featuresOptimization", function(x, index, paramsToPlot = NULL
 })
 
 
-optimizeFeatureFinding <- function(anaInfo, algorithm, params, isoIdent = "IPO", maxIterations = 50)
+optimizeFeatureFinding <- function(anaInfo, algorithm, params, isoIdent = "IPO", maxIterations = 50,
+                                   maxModelDeviation = 0.1)
 {
     ac <- checkmate::makeAssertCollection()
     assertAnalysisInfo(anaInfo, add = ac)
@@ -262,6 +263,7 @@ optimizeFeatureFinding <- function(anaInfo, algorithm, params, isoIdent = "IPO",
     checkmate::assertList(params, add = ac)
     checkmate::assertChoice(isoIdent, c("IPO", "CAMERA", "OpenMS"), add = ac)
     checkmate::assertCount(maxIterations, positive = TRUE, add = ac)
+    checkmate::assertNumber(maxModelDeviation, finite = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
     if (algorithm != "openms" && isoIdent == "OpenMS")
@@ -273,7 +275,7 @@ optimizeFeatureFinding <- function(anaInfo, algorithm, params, isoIdent = "IPO",
                  envipick = featuresOptimizerEnviPick)
     
     fo <- fo$new(anaInfo = anaInfo, algorithm = algorithm, isoIdent = isoIdent)
-    result <- fo$optimize(params, maxIterations)
+    result <- fo$optimize(params, maxIterations, maxModelDeviation)
     
     return(featuresOptimization(algorithm = algorithm, startParams = params,
                                 finalResults = result$finalResults, experiments = result$experiments))

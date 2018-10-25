@@ -3,7 +3,8 @@
 NULL
 
 DoEOptimizer <- setRefClass("DoEOptimizer", contains = "VIRTUAL",
-                            fields = list(anaInfo = "data.frame", algorithm = "character"))
+                            fields = list(anaInfo = "data.frame", algorithm = "character",
+                                          maxModelDeviation = "numeric"))
 
 DoEOptimizer$methods(
     
@@ -74,7 +75,7 @@ DoEOptimizer$methods(
     },
 
     # Heavily based on xcmsSetStatistic() from IPO
-    performIterationStat = function(result)
+    performIterationStat = function(result, maxModelDeviation)
     {
         params <- result$params
         resp <- result$response$score
@@ -82,20 +83,43 @@ DoEOptimizer$methods(
         result$model <- utilsIPO$createModel(result$design, params$to_optimize, resp)
         result$max_settings <- utilsIPO$getMaximumLevels(result$model)
         
-        runParams <- as.list(utilsIPO$decodeAll(result$max_settings[-1], params$to_optimize))      
+        runParams <- as.list(utilsIPO$decodeAll(result$max_settings[-1], params$to_optimize))
         runParams <- combineParams(runParams, params$no_optimization)
         
         if (!is.list(runParams))
             runParams <- as.list(runParams)
         
-        result$finalResponse <- calculateResponse(runParams, task, final = TRUE)
-        # UNDONE: what about the "..." params?
+        result$finalResponse <- calculateResponse(runParams, 1, final = TRUE)
+        # UNDONE: what about the "..." params in IPO?
+        
+        # Sometimes the response from the parameter set returned by the model
+        # doesn't actually give an optimum (see: https://github.com/rietho/IPO/issues/61).
+        # In this case we simply take the best results from the experiments
+        maxExpResp <- result$response[which.max(score)]
+        if ((maxExpResp$score * (1 - maxModelDeviation)) > result$finalResponse$score)
+        {
+            printf("Modelled parameter optimum yields significantly lower experimental PPS: %.1f/%.1f\n",
+                   result$finalResponse$score, result$max_settings[1])
+            printf("Taking data from best experimental value (%.1f) instead...\n", maxExpResp$score)
+            
+            designParams <- as.list(rsm::decode.data(result$design)[maxExpResp$experiment, names(params$to_optimize)])
+
+            #re-run as object wasn't stored
+            result$finalResponse <- calculateResponse(combineParams(designParams, params$no_optimization), task, final = TRUE)
+
+            # update max_settings from experimental results
+            result$max_settings <- sapply(seq_along(params$to_optimize),
+                                          function(i) utilsIPO$encode(designParams[[i]], params$to_optimize[[i]]))
+            result$max_settings <- c(result$finalResponse$score, result$max_settings)
+            names(result$max_settings) <- c("response", names(rsm::codings(result$design)))
+            result$max_settings <- t(result$max_settings) # convert to usual data format...
+        }
         
         return(result)
     },
     
     # heavily based on optimizeXcmsSet() from IPO
-    optimize = function(params, maxIterations)
+    optimize = function(params, maxIterations, maxModelDeviation)
     {
         params <- startParams <- checkInitialParams(params)
         
@@ -111,7 +135,7 @@ DoEOptimizer$methods(
             printf("===\n\n")
             
             result <- performIteration(params)
-            result <- performIterationStat(result)
+            result <- performIterationStat(result, maxModelDeviation)
             
             history[[iter]] <- result
             params <- result$params

@@ -300,21 +300,6 @@ calcMaximumCarbon = function(masses) {
     },   
 
 
-resultIncreased = function(history) {
-        
-        index = length(history)
-        if(history[[index]]$PPS["PPS"] == 0 & index == 1)
-            stop("No isotopes have been detected!")
-        
-        if(index < 2)
-            return(TRUE)
-        
-        if(history[[index-1]]$PPS["PPS"] >= history[[index]]$PPS["PPS"])
-            return(FALSE)
-        
-        return(TRUE)
-        
-    },
 
 ### utils.R
 

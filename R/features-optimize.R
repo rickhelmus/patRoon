@@ -132,11 +132,11 @@ featuresOptimizer$methods(
     resultIncreased = function(history)
     {
         index <- length(history)
-        if(history[[index]]$finalResponse$PPS == 0 & index == 1)
+        if (history[[index]]$finalResponse$PPS == 0 & index == 1)
             stop("No isotopes have been detected!")
-        if(index < 2)
+        if (index < 2)
             return(TRUE)
-        if(history[[index-1]]$finalResponse$PPS >= history[[index]]$finalResponse$PPS)
+        if (history[[index-1]]$finalResponse$PPS >= history[[index]]$finalResponse$PPS)
             return(FALSE)
         return(TRUE)
     }

@@ -9,7 +9,7 @@ featureGroupsOptimizerOpenMS$methods(
     getMinOptSetting = function(settingName, params)
     {
         if (settingName %in% c("maxAlignMZ", "maxGroupMZ"))
-            return(0.00001)
+            return(0.0001)
 
         return(1) # not reached
     }

@@ -10,7 +10,7 @@ DoEOptimizer$methods(
     
     # dummy methods that may need to be overloaded
     checkInitialParams = function(params) params,
-    getMinOptSetting = function(settingName, params) 1,
+    getMinOptSetting = function(settingName, params) 0,
     fixParamBounds = function(params, bounds) bounds,
     fixOptParams = function(params) params,
     

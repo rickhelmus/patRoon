@@ -29,6 +29,13 @@ featuresOptimizerOpenMS$methods(
     {
         return(fixOptParamRange(params, list(c("minFWHM", "maxFWHM"),
                                              c("minTraceLength", "maxTraceLength"))))
+    },
+    
+    getMinOptSetting = function(settingName, params)
+    {
+        if (settingName == "localMZRange")
+            return(0.00001)
+        return(1)
     }
     
 )

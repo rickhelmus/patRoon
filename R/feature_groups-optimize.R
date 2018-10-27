@@ -31,7 +31,7 @@ featureGroupsOptimizer$methods(
         params <- convertOptToCallParams(params)
         fg <- do.call(groupFeatures, c(list(features, algorithm), params))
         
-        ret <- utilsIPO$getRGTVValues(getXcmsSet(fg), task, retCorFailed)
+        ret <- utilsIPO$getRGTVValues(getXcmsSet(fg, TRUE), task, retCorFailed)
         
         if (final)
             ret$object <- fg

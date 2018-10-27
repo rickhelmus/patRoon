@@ -119,6 +119,7 @@ Collate:
     'feature_groups-filter.R'
     'feature_groups-openms.R'
     'feature_groups-optimize.R'
+    'feature_groups-optimize-openms.R'
     'feature_groups-optimize-xcms.R'
     'feature_groups-screening.R'
     'feature_groups-tasq.R'

@@ -72,8 +72,7 @@ featuresOptimizerXCMS$methods(
     # based on part of optimizeXcmsSet() function from IPO
     fixOptParams = function(params)
     {
-        return(fixOptParamRange(params, list(c("minFWHM", "maxFWHM"),
-                                             c("minTraceLength", "maxTraceLength"))))
+        return(fixOptParamRange(params, list(c("min_peakwidth", "max_peakwidth"))))
     },
     
     getMinOptSetting = function(settingName, params)

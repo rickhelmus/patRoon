@@ -3,7 +3,7 @@
 NULL
 
 DoEOptimizer <- setRefClass("DoEOptimizer", contains = "VIRTUAL",
-                            fields = list(anaInfo = "data.frame", algorithm = "character",
+                            fields = list(algorithm = "character",
                                           maxModelDeviation = "numeric"))
 
 DoEOptimizer$methods(
@@ -17,6 +17,9 @@ DoEOptimizer$methods(
     # "virtual" methods
     resultIncreased = function(history) stop("VIRTUAL"),
     calculateResponse = function(params, task, final = FALSE) stop("VIRTUAL"),
+    getResponseScores = function(response) stop("VIRTUAL"),
+    getFinalScore = function(response) stop("VIRTUAL"),
+    
     
     # Adapted from combineParams() function of IPO
     combineParams = function(params_1, params_2)
@@ -61,7 +64,10 @@ DoEOptimizer$methods(
         response <- rbindlist(lapply(tasks, function(task)
         {
             # simplified optimizeSlaveCluster() from IPO
-            result <- calculateResponse(designParams, task)
+            
+            runParams <- as.list(designParams[task, ])
+            runParams <- runParams[!names(runParams) %in% c("run.order", "std.order", "Block")]
+            result <- calculateResponse(runParams, task)
             result$experiment <- task
             return(result)
         }))
@@ -78,7 +84,8 @@ DoEOptimizer$methods(
     performIterationStat = function(result, maxModelDeviation)
     {
         params <- result$params
-        resp <- result$response$score
+        resp <- getResponseScores(result$response)
+        result$response$score <- resp
         
         result$model <- utilsIPO$createModel(result$design, params$to_optimize, resp)
         result$max_settings <- utilsIPO$getMaximumLevels(result$model)
@@ -90,6 +97,8 @@ DoEOptimizer$methods(
             runParams <- as.list(runParams)
         
         result$finalResponse <- calculateResponse(runParams, 1, final = TRUE)
+        result$finalResponse$score <- getFinalScore(result$response[, -"score"], result$finalResponse)
+        
         # UNDONE: what about the "..." params in IPO?
         
         # Sometimes the response from the parameter set returned by the model
@@ -98,15 +107,16 @@ DoEOptimizer$methods(
         maxExpResp <- result$response[which.max(score)]
         if ((maxExpResp$score * (1 - maxModelDeviation)) > result$finalResponse$score)
         {
-            printf("Modelled parameter optimum yields significantly lower experimental PPS: %.1f/%.1f\n",
+            printf("Modelled parameter optimum yields significantly lower experimental score: %.1f/%.1f\n",
                    result$finalResponse$score, result$max_settings[1])
             printf("Taking data from best experimental value (%.1f) instead...\n", maxExpResp$score)
             
             designParams <- as.list(rsm::decode.data(result$design)[maxExpResp$experiment, names(params$to_optimize)])
 
-            #re-run as object wasn't stored
-            result$finalResponse <- calculateResponse(combineParams(designParams, params$no_optimization), task, final = TRUE)
-
+            # re-run as object wasn't stored
+            result$finalResponse <- calculateResponse(combineParams(designParams, params$no_optimization), 1, final = TRUE)
+            result$finalResponse$score <- getFinalScore(result$response[, -"score"], result$finalResponse)
+            
             # update max_settings from experimental results
             result$max_settings <- sapply(seq_along(params$to_optimize),
                                           function(i) utilsIPO$encode(designParams[[i]], params$to_optimize[[i]]))
@@ -247,3 +257,110 @@ fixOptParamRange <- function(params, paramPairs)
     
     return(params)
 }
+
+
+#' @export
+optimizationResult <- setClass("optimizationResult",
+                               slots = c(algorithm = "character",
+                                         startParams = "list", finalResults = "list",
+                                         experiments = "list"))
+
+#' @describeIn optimizationResult Returns the algorithm that was used for finding features.
+setMethod("algorithm", "optimizationResult", function(obj) obj@algorithm)
+
+#' @describeIn optimizationResult Obtain total number of experimental design iteratations performed.
+#' @export
+setMethod("length", "optimizationResult", function(x) length(x@experiments))
+
+#' @describeIn optimizationResult Shows summary information for this object.
+#' @export
+setMethod("show", "optimizationResult", function(object)
+{
+    printf("An optimization result object ('%s')\n", class(object))
+    printf("Algorithm: %s\n", algorithm(object))
+    printf("Experimental designs performed: %d\n", length(object))
+    printf("Starting params:\n"); printf("- %s: %s\n", names(object@startParams), object@startParams)
+    printf("Optimized params:\n"); printf("- %s: %s\n", names(object@finalResults$parameters), object@finalResults$parameters)
+    
+    br <- object@finalResults$result
+    br <- br[!names(br) %in% "ExpId"]
+    printf("Best results: "); cat(paste(names(br), br, sep = ": ", collapse = "; ")); cat("\n")
+    
+    printf("\nOptimized object:\n---\n"); show(object@finalResults$object); cat("---\n")
+    
+    showObjectSize(object)
+})
+
+#' @export
+setMethod("plot", "optimizationResult", function(x, index, paramsToPlot = NULL, maxCols = NULL, type = "contour",
+                                                 image = TRUE, contours = "colors", ...)
+{
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertInt(index, lower = 1, upper = length(x))
+    checkmate::assert(checkmate::checkList(paramsToPlot, types = "character", any.missing = FALSE, min.len = 1, null.ok = TRUE),
+                      checkmate::checkCharacter(paramsToPlot, min.chars = 1, len = 2),
+                      checkmate::checkNull(paramsToPlot),
+                      .var.name = "paramsToPlot")
+    checkmate::assertCount(maxCols, positive = TRUE, null.ok = TRUE, add = ac)
+    checkmate::assertChoice(type, c("contour", "image", "persp"), add = ac)
+    checkmate::assertFlag(image, add = ac)
+    checkmate::assert(checkmate::checkFlag(contours),
+                      checkmate::checkCharacter(contours),
+                      checkmate::checkList(contours),
+                      .var.name = "contours")
+    checkmate::reportAssertions(ac)
+    
+    ex <- x@experiments[[index]]
+    
+    if (is.null(paramsToPlot))
+    {
+        paramsToPlot <- list()
+        optNames <- names(ex$params$to_optimize)
+        for (i in seq(1, length(optNames)-1))
+        {
+            for (j in seq(i+1, length(optNames)))
+                paramsToPlot <- c(paramsToPlot, list(c(optNames[i], optNames[j])))
+        }
+    }
+    else if (is.character(paramsToPlot))
+        paramsToPlot <- list(paramsToPlot)
+    
+    codedNames <- names(ex$design)
+    decodedNames <- rsm::truenames(ex$design)
+    
+    forms <- lapply(paramsToPlot, function(pn)
+    {
+        # change to coded names
+        pn <- sapply(pn, function(n) codedNames[decodedNames == n])
+        return(as.formula(paste(pn[2], "~", pn[1])))
+    })
+    
+    maxSlice <- ex$max_settings[1, -1]
+    maxSlice[is.na(maxSlice)] <- 1
+    
+    formsLen <- length(forms)
+    if (formsLen > 1) # multiple plots?
+    {
+        if (is.null(maxCols))
+            maxCols <- ceiling(sqrt(formsLen))
+        
+        if (formsLen <= maxCols)
+        {
+            cols <- formsLen
+            rows <- 1
+        }
+        else
+        {
+            cols <- maxCols
+            rows <- ceiling(formsLen / cols)
+        }
+        
+        withr::local_par(list(mfrow = c(rows, cols)))
+    }
+    
+    switch(type,
+           contour = contour(ex$model, forms, image = image, at = maxSlice, ...),
+           image = image(ex$model, forms, at = maxSlice, ...),
+           persp = persp(ex$model, forms, contours = contours, at = maxSlice, ...))
+})
+

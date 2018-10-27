@@ -560,6 +560,51 @@ typeCastParams = function(params) {
     ret$no_optimization <- ret_2
     
     return(ret)
+},
+
+
+## optimizeRetCorGroupParameters.R
+
+getRGTVValues = function(xset, exp_index=1, retcor_penalty=1) {
+    
+    relative_rt_diff <- c()
+    
+    if(nrow(xcms::groups(xset)) > 0) {
+        for(i in 1:nrow(xcms::groups(xset))) {
+            feature_rtmed <- xcms::groups(xset)[i, "rtmed"]
+            relative_rt_diff <- 
+                c(relative_rt_diff, 
+                  mean(abs(feature_rtmed - 
+                               peaks_IPO(xset)[groupidx(xset)[[i]], "rt"]) / feature_rtmed))
+        }
+        good_groups <- 
+            sum(unlist(lapply(X=groupidx(xset), FUN = function(x, xset) {
+                ifelse(length(unique(peaks_IPO(xset)[x,"sample"])) == 
+                           length(filepaths(xset)) & 
+                           length(peaks_IPO(xset)[x,"sample"]) == 
+                           length(filepaths(xset)), 1, 0)
+            }, xset)))
+        bad_groups <- nrow(xcms::groups(xset)) - good_groups
+    } else {
+        relative_rt_diff <- 1
+        good_groups <- 0
+        bad_groups <- 0   
+    }
+    
+    tmp_good_groups <- good_groups + ifelse(bad_groups==0, 1, 0)
+    tmp_bad_groups <- bad_groups + ifelse(bad_groups==0, 1, 0)
+    
+    ARTS <- (mean(relative_rt_diff)) * retcor_penalty
+    
+    ret <- list(exp_index   = exp_index, 
+                good_groups = good_groups, 
+                bad_groups  = bad_groups, 
+                GS          = tmp_good_groups^2/tmp_bad_groups, 
+                RCS         = 1/ARTS)
+    
+    ret$retcor_done = retcor_penalty        
+    
+    return(ret)  
 }
 
 

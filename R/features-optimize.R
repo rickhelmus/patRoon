@@ -4,8 +4,8 @@
 #' @include main.R
 NULL
 
-featuresOptimizer <- setRefClass("featuresOptimizer", contains = c("DoEOptimizer" ,"VIRTUAL"),
-                                 fields = list(isoIdent = "character"))
+featuresOptimizer <- setRefClass("featuresOptimizer", contains = c("DoEOptimizer", "VIRTUAL"),
+                                 fields = list(anaInfo = "data.frame", isoIdent = "character"))
 
 featuresOptimizer$methods(
  
@@ -94,23 +94,15 @@ featuresOptimizer$methods(
         else
             ret$PPS <- ret$RP^2/ret$nonRP
         
-        ret$score <- ret$PPS
-        
         return(ret)
     },
+    
+    getResponseScores = function(response) response$PPS,
+    getFinalScore = function(oldr, newr) newr$PPS,
     
     calculateResponse = function(params, task, final = FALSE)
     {
         # UNDONE: do we want to keep caching this?
-        
-        # params is a data.frame when not final and a list when it is final.
-        if (!final)
-            params <- as.list(params[task, ])
-        
-        # get rid of design specific params
-        params[["run.order"]] <- NULL
-        params[["std.order"]] <- NULL
-        params[["Block"]] <- NULL
         
         if (!final)
             printf("---\nTask %d\n", task)
@@ -143,117 +135,6 @@ featuresOptimizer$methods(
 )
 
 
-
-#' @export
-featuresOptimization <- setClass("featuresOptimization",
-                                 slots = c(algorithm = "character",
-                                           startParams = "list", finalResults = "list",
-                                           experiments = "list"))
-
-#' @describeIn featuresOptimization Returns the algorithm that was used for finding features.
-setMethod("algorithm", "featuresOptimization", function(obj) obj@algorithm)
-
-#' @describeIn featuresOptimization Obtain total number of experimental design iteratations performed.
-#' @export
-setMethod("length", "featuresOptimization", function(x) length(x@experiments))
-
-#' @describeIn featuresOptimization Shows summary information for this object.
-#' @export
-setMethod("show", "featuresOptimization", function(object)
-{
-    printf("A features optimization object ('%s')\n", class(object))
-    printf("Algorithm: %s\n", algorithm(object))
-    printf("Experimental designs performed: %d\n", length(object))
-    printf("Starting params:\n"); printf("- %s: %s\n", names(object@startParams), object@startParams)
-    printf("Optimized params:\n"); printf("- %s: %s\n", names(object@finalResults$parameters), object@finalResults$parameters)
-    
-    br <- object@finalResults$result
-    br <- br[!names(br) %in% "ExpId"]
-    printf("Best results: "); cat(paste(names(br), br, sep = ": ", collapse = "; ")); cat("\n")
-    
-    printf("\nOptimized object:\n---\n"); show(object@finalResults$object); cat("---\n")
-    
-    showObjectSize(object)
-})
-
-#' @describeIn featuresOptimization Returns the \code{\link{features}} object obtained with the optimized parameters.
-#' @export
-setMethod("getFeatures", "featuresOptimization", function(obj) obj@finalResults$features)
-
-#' @export
-setMethod("plot", "featuresOptimization", function(x, index, paramsToPlot = NULL, maxCols = NULL, type = "contour",
-                                                   image = TRUE, contours = "colors", ...)
-{
-    ac <- checkmate::makeAssertCollection()
-    checkmate::assertInt(index, lower = 1, upper = length(x))
-    checkmate::assert(checkmate::checkList(paramsToPlot, types = "character", any.missing = FALSE, min.len = 1, null.ok = TRUE),
-                      checkmate::checkCharacter(paramsToPlot, min.chars = 1, len = 2),
-                      checkmate::checkNull(paramsToPlot),
-                      .var.name = "paramsToPlot")
-    checkmate::assertCount(maxCols, positive = TRUE, null.ok = TRUE, add = ac)
-    checkmate::assertChoice(type, c("contour", "image", "persp"), add = ac)
-    checkmate::assertFlag(image, add = ac)
-    checkmate::assert(checkmate::checkFlag(contours),
-                      checkmate::checkCharacter(contours),
-                      checkmate::checkList(contours),
-                      .var.name = "contours")
-    checkmate::reportAssertions(ac)
-
-    ex <- x@experiments[[index]]
-    
-    if (is.null(paramsToPlot))
-    {
-        paramsToPlot <- list()
-        optNames <- names(ex$params$to_optimize)
-        for (i in seq(1, length(optNames)-1))
-        {
-            for (j in seq(i+1, length(optNames)))
-                paramsToPlot <- c(paramsToPlot, list(c(optNames[i], optNames[j])))
-        }
-    }
-    else if (is.character(paramsToPlot))
-        paramsToPlot <- list(paramsToPlot)
-    
-    codedNames <- names(ex$design)
-    decodedNames <- rsm::truenames(ex$design)
-    
-    forms <- lapply(paramsToPlot, function(pn)
-    {
-        # change to coded names
-        pn <- sapply(pn, function(n) codedNames[decodedNames == n])
-        return(as.formula(paste(pn[2], "~", pn[1])))
-    })
-    
-    maxSlice <- ex$max_settings[1, -1]
-    maxSlice[is.na(maxSlice)] <- 1
-    
-    formsLen <- length(forms)
-    if (formsLen > 1) # multiple plots?
-    {
-        if (is.null(maxCols))
-            maxCols <- ceiling(sqrt(formsLen))
-        
-        if (formsLen <= maxCols)
-        {
-            cols <- formsLen
-            rows <- 1
-        }
-        else
-        {
-            cols <- maxCols
-            rows <- ceiling(formsLen / cols)
-        }
-        
-        withr::local_par(list(mfrow = c(rows, cols)))
-    }
-    
-    switch(type,
-           contour = contour(ex$model, forms, image = image, at = maxSlice, ...),
-           image = image(ex$model, forms, at = maxSlice, ...),
-           persp = persp(ex$model, forms, contours = contours, at = maxSlice, ...))
-})
-
-
 optimizeFeatureFinding <- function(anaInfo, algorithm, params, isoIdent = "IPO", maxIterations = 50,
                                    maxModelDeviation = 0.1)
 {
@@ -277,6 +158,6 @@ optimizeFeatureFinding <- function(anaInfo, algorithm, params, isoIdent = "IPO",
     fo <- fo$new(anaInfo = anaInfo, algorithm = algorithm, isoIdent = isoIdent)
     result <- fo$optimize(params, maxIterations, maxModelDeviation)
     
-    return(featuresOptimization(algorithm = algorithm, startParams = params,
-                                finalResults = result$finalResults, experiments = result$experiments))
+    return(optimizationResult(algorithm = algorithm, startParams = params,
+                              finalResults = result$finalResults, experiments = result$experiments))
 }

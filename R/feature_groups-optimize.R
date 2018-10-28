@@ -24,9 +24,9 @@ featureGroupsOptimizer$methods(
         printf("%s: %s\n", names(params), params)
         printf("---\n")
         
-        retCorFailed = if (!is.null(params[["rtalign"]]) && params$rtalign) 1.1 else 1
-        
         # UNDONE: error handling necessary as is done in IPO?
+        # retCorFailed <- if (!is.null(params[["rtalign"]]) && params$rtalign) 1.1 else 1
+        retCorFailed <- 1
         
         params <- convertOptToCallParams(params)
         fg <- do.call(groupFeatures, c(list(features, algorithm), params))

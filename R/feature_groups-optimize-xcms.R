@@ -3,7 +3,7 @@
 NULL
 
 featureGroupsOptimizerXCMS <- setRefClass("featureGroupsOptimizerXCMS", contains = "featureGroupsOptimizer",
-                                          fields = list(groupArgs = "character", retcorArgs = "character"))
+                                          fields = list(groupArgs = "list", retcorArgs = "list"))
 
 featureGroupsOptimizerXCMS$methods(
     
@@ -13,11 +13,13 @@ featureGroupsOptimizerXCMS$methods(
         {
             if (!is.null(params[[p]]))
             {
-                .self[[p]] <- names(params[[p]])
-                params <- c(params, params[[p]])
+                .self[[p]] <- params[[p]]
+                # don't save method here: both groupArgs and retcorArgs have method parameter
+                params <- c(params, params[[p]][names(params[[p]]) != "method"])
                 params[[p]] <- NULL
             }
         }
+        
         return(params)
     },
     
@@ -59,7 +61,16 @@ featureGroupsOptimizerXCMS$methods(
         for (p in c("groupArgs", "retcorArgs"))
         {
             if (!is.null(.self[[p]]))
-                ret[[p]] <- params[.self[[p]]]
+            {
+                pn <- names(.self[[p]])
+                pn <- pn[names(pn) != "method"]
+                ret[[p]] <- params[pn]
+                
+                # re-add method
+                method <- .self[[p]][["method"]]
+                if (!is.null(method))
+                    ret[[p]] <- c(ret[[p]], list(method = method))
+            }
         }
         
         return(ret)

@@ -5,20 +5,27 @@ NULL
 featuresOptimizerXCMS <- setRefClass("featuresOptimizerXCMS", contains = "featuresOptimizer")
 
 featuresOptimizerXCMS$methods(
-    
+
+    checkInitialParams = function(params)
+    {
+        if (is.null(params[["method"]]))
+            params$method <- "centWave"
+        return(params)
+    },
+
     # Adapted from combineParams() function of IPO
     combineOptParams = function(params_1, params_2)
     {
         len <- max(unlist(sapply(params_1, length)))
         #num_params <- length(params_1)
-        
+
         p_names <- c(names(params_1), names(params_2))
         matchedFilter <- ((!is.null(params_1[["method"]]) && params_1[["method"]] == "matchedFilter") ||
                           (!is.null(params_2[["method"]]) && params_2[["method"]] == "matchedFilter"))
-        
+
         if (!matchedFilter)
             return(callSuper(params_1, params_2))
-        
+
         for (i in seq_along(params_2))
         {
             new_index <- length(params_1) + 1
@@ -52,29 +59,29 @@ featuresOptimizerXCMS$methods(
                 }
             }
             else
-            {  
+            {
                 # standard: replicate value
                 params_1[[new_index]][1:len] <- fact
             }
-        } 
-        names(params_1) <- p_names   
+        }
+        names(params_1) <- p_names
         return(params_1)
     },
-    
+
     fixOptParamBounds = function(param, bounds)
     {
         if (param == "steps" || param == "prefilter")
             return(round(bounds, 0))
-        
+
         return(bounds)
     },
-    
+
     # based on part of optimizeXcmsSet() function from IPO
     fixOptParams = function(params)
     {
         return(fixOptParamRange(params, list(c("min_peakwidth", "max_peakwidth"))))
     },
-    
+
     getMinOptSetting = function(settingName, params)
     {
         if (settingName == "min_peakwidth")
@@ -85,7 +92,7 @@ featuresOptimizerXCMS$methods(
             return(0.0005)
         return(1)
     },
-    
+
     convertOptToCallParams = function(params)
     {
         if (!is.null(params[["min_peakwidth"]])) # also implies max_peakwidth

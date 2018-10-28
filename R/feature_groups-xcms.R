@@ -26,7 +26,7 @@ featureGroupsXCMS <- setClass("featureGroupsXCMS", slots = c(xs = "xcmsSet"), co
 #' @rdname feature-grouping
 #' @export
 groupFeaturesXCMS <- function(feat, rtalign = TRUE, exportedData = TRUE, groupArgs = list(mzwid = 0.015),
-                              retcorArgs = list(method = "obiwarp"))
+                              retcorArgs = list(method = "obiwarp"), verbose = TRUE)
 {
     # UNDONE: keep exportedData things? Or just require that it's exported? If keep document also for OpenMS and implications.
 
@@ -38,29 +38,44 @@ groupFeaturesXCMS <- function(feat, rtalign = TRUE, exportedData = TRUE, groupAr
 
     if (length(feat) == 0)
         return(featureGroupsXCMS(analysisInfo = analysisInfo(feat), features = feat))
-        
+
     hash <- makeHash(feat, rtalign, exportedData, groupArgs, retcorArgs)
     cachefg <- loadCacheData("featureGroupsXCMS", hash)
     if (!is.null(cachefg))
         return(cachefg)
 
-    cat("Grouping features with XCMS...\n===========\n")
+    if (verbose)
+        cat("Grouping features with XCMS...\n===========\n")
 
-    xs <- getXcmsSet(feat, exportedData)
-    xs <- do.call(group, c(list(xs), groupArgs))
+    xs <- getXCMSSet(feat, exportedData, verbose = verbose)
+    if (verbose)
+        xs <- do.call(group, c(list(xs), groupArgs))
+        suppressMessages(xs <- do.call(group, c(list(xs), groupArgs)))
 
     if (!exportedData && rtalign)
-        cat("Skipping RT alignment: no raw data\n")
+    {
+        if (verbose)
+            cat("Skipping RT alignment: no raw data\n")
+    }
     else if (rtalign)
     {
-        xs <- do.call(retcor, c(list(xs), retcorArgs))
-        xs <- do.call(group, c(list(xs), groupArgs))
+        if (verbose)
+        {
+            xs <- do.call(retcor, c(list(xs), retcorArgs))
+            xs <- do.call(group, c(list(xs), groupArgs))
+        }
+        else
+        {
+            suppressMessages(xs <- do.call(retcor, c(list(xs), retcorArgs)))
+            suppressMessages(xs <- do.call(group, c(list(xs), groupArgs)))
+        }
     }
 
     ret <- importFeatureGroupsXCMSFromFeat(xs, analysisInfo(feat), feat)
     saveCacheData("featureGroupsXCMS", ret, hash)
 
-    cat("\n===========\nDone!\n")
+    if (verbose)
+        cat("\n===========\nDone!\n")
     return(ret)
 }
 
@@ -111,7 +126,7 @@ importFeatureGroupsXCMS <- function(xs, analysisInfo)
     checkmate::assertClass(xs, "xcmsSet", add = ac)
     assertAnalysisInfo(analysisInfo, add = ac)
     checkmate::reportAssertions(ac)
-    
+
     if (length(xcms::groups(xs)) == 0)
         stop("Provided xcmsSet does not contain any grouped features!")
 

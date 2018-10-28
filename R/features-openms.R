@@ -77,7 +77,8 @@ findFeaturesOpenMS <- function(analysisInfo, noiseThrInt = 1000, chromSNR = 3, c
                                maxFWHM = 60, traceSNRFiltering = FALSE, localRTRange = 10, localMZRange = 6.5,
                                isotopeFilteringModel = "metabolites (5% RMS)", MZScoring13C = FALSE, useSmoothedInts = TRUE,
                                extraOpts = NULL, intSearchRTWindow = 3,
-                               logPath = file.path("log", "openms"), maxProcAmount = getOption("patRoon.maxProcAmount"))
+                               logPath = file.path("log", "openms"), maxProcAmount = getOption("patRoon.maxProcAmount"),
+                               verbose = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
     assertAnalysisInfo(analysisInfo, "mzML", add = ac)
@@ -94,8 +95,9 @@ findFeaturesOpenMS <- function(analysisInfo, noiseThrInt = 1000, chromSNR = 3, c
     checkmate::assertList(extraOpts, any.missing = FALSE, names = "unique", null.ok = TRUE, add = ac)
     assertMultiProcArgs(logPath, maxProcAmount, add = ac)
     checkmate::reportAssertions(ac)
-    
-    printf("Finding features with OpenMS for %d analyses ...\n", nrow(analysisInfo))
+
+    if (verbose)
+        printf("Finding features with OpenMS for %d analyses ...\n", nrow(analysisInfo))
 
     params <- list(noiseThrInt, chromSNR, chromFWHM, mzPPM, reEstimateMTSD,
                    traceTermCriterion, traceTermOutliers, minSampleRate,
@@ -103,7 +105,7 @@ findFeaturesOpenMS <- function(analysisInfo, noiseThrInt = 1000, chromSNR = 3, c
                    maxFWHM, traceSNRFiltering, localRTRange, localMZRange,
                    isotopeFilteringModel, MZScoring13C, useSmoothedInts, extraOpts)
     paramsHash <- makeHash(params)
-    
+
     cmdQueue <- lapply(seq_len(nrow(analysisInfo)), function(anai)
     {
         dfile <- getMzMLAnalysisPath(analysisInfo$analysis[anai], analysisInfo$path[anai])
@@ -140,7 +142,7 @@ findFeaturesOpenMS <- function(analysisInfo, noiseThrInt = 1000, chromSNR = 3, c
             saveCacheData("featuresOpenMS", fts, cmd$hash)
 
             return(fts)
-        }, maxProcAmount = maxProcAmount)
+        }, maxProcAmount = maxProcAmount, showProgress = verbose)
     }
 
     if (length(cachedResults) > 0)
@@ -149,11 +151,14 @@ findFeaturesOpenMS <- function(analysisInfo, noiseThrInt = 1000, chromSNR = 3, c
         fList <- fList[intersect(analysisInfo$analysis, names(fList))] # re-order
     }
 
-    fCounts <- sapply(fList, nrow)
-    fTotCount <- sum(fCounts)
-    printf("Done! Feature statistics:\n")
-    printf("%s: %d (%.1f%%)\n", analysisInfo$analysis, fCounts, if (fTotCount == 0) 0 else fCounts * 100 / fTotCount)
-    printf("Total: %d\n", fTotCount)
+    if (verbose)
+    {
+        fCounts <- sapply(fList, nrow)
+        fTotCount <- sum(fCounts)
+        printf("Done! Feature statistics:\n")
+        printf("%s: %d (%.1f%%)\n", analysisInfo$analysis, fCounts, if (fTotCount == 0) 0 else fCounts * 100 / fTotCount)
+        printf("Total: %d\n", fTotCount)
+    }
 
     return(featuresOpenMS(analysisInfo = analysisInfo, features = fList))
 }
@@ -165,7 +170,7 @@ getOpenMSFFCommand <- function(datafile, out, noiseThrInt, chromSNR, chromFWHM, 
                                isotopeFilteringModel, MZScoring13C, useSmoothedInts, extraOpts)
 {
     boolToChr <- function(b) if (b) "true" else "false"
-    
+
     settings <- c("-algorithm:common:noise_threshold_int" = noiseThrInt,
                   "-algorithm:common:chrom_peak_snr" = chromSNR,
                   "-algorithm:common:chrom_fwhm" = chromFWHM,
@@ -257,7 +262,7 @@ loadIntensities <- function(dfile, features, rtWindow)
             set(features, f, "intensity", eic$intensity[which.min(abs(ft$ret - eic$time))])
         }
     }
-    
+
     return(features)
 }
 
@@ -265,7 +270,7 @@ loadIntensitiesCPP <- function(dfile, features, rtWindow)
 {
     spectra <- loadSpectra(dfile, verbose = FALSE)
     features <- copy(features) # HACK: avoid sR crash caused by data.table
-    
+
     if (nrow(features) == 0)
         features[, intensity := 0]
     else

@@ -113,7 +113,7 @@ NULL
 #'   instead.
 #'
 #'   }
-#'   
+#'
 "_PACKAGE"
 
 #' Analysis information
@@ -175,6 +175,7 @@ NULL
 #'   (\code{findFeaturesXCMS}), \code{\link[enviPick]{enviPickwrap}}
 #'   (\code{featurefinderEnviPick}) or to selected feature finding algorithms
 #'   (\code{findFeatures}).
+#' @param verbose If set to \code{FALSE} then no text output is shown.
 #'
 #' @name feature-finding
 #' @return An object of a class which is derived from \code{\link{features}}.
@@ -205,6 +206,7 @@ NULL
 #' @param rtalign Enable retention time alignment.
 #' @param \dots Any parameters to be passed to the selected grouping/importing
 #'   algorithm.
+#' @param verbose if \code{FALSE} then no text output will be shown.
 #'
 #' @name feature-grouping
 #' @return An object of a class which is derived from

@@ -16,15 +16,15 @@ setMethod("[", c("featuresXCMS", "ANY", "missing", "missing"), function(x, i, j,
 setMethod("filter", "featuresXCMS", function(obj, ...)
 {
     obj <- callNextMethod(obj, ...)
-    
+
     # check if amount of features (peaks) changed (e.g. due to filtering), if so update
     if (length(obj) != nrow(peaks(obj@xs)))
     {
         cat("Updating xcmsSet...\n")
         # NOTE: use base method to force update as overloaded method simply returns @xs slot
-        obj@xs <- selectMethod(getXcmsSet, "features")(obj, TRUE)
+        obj@xs <- selectMethod(getXCMSSet, "features")(obj, TRUE)
     }
-    
+
     return(obj)
 })
 
@@ -44,30 +44,35 @@ setMethod("filter", "featuresXCMS", function(obj, ...)
 #'
 #' @rdname feature-finding
 #' @export
-findFeaturesXCMS <- function(analysisInfo, method = "centWave", ...)
+findFeaturesXCMS <- function(analysisInfo, method = "centWave", ..., verbose = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
     assertAnalysisInfo(analysisInfo, c("mzXML", "mzML"), add = ac)
     checkmate::assertString(method, min.chars = 1, add = ac)
     checkmate::reportAssertions(ac)
-    
+
     hash <- makeHash(analysisInfo, list(...)) # UNDONE: better hash?
     cachef <- loadCacheData("featuresXCMS", hash)
     if (!is.null(cachef))
         return(cachef)
 
-    cat("Finding features with XCMS...\n===========\n")
+    if (verbose)
+        cat("Finding features with XCMS...\n===========\n")
 
-    xs <- xcmsSet(sapply(seq_len(nrow(analysisInfo)),
-                         function(i) getMzMLOrMzXMLAnalysisPath(analysisInfo$analysis[i], analysisInfo$path[i]),
-                         USE.NAMES = FALSE),
-                  analysisInfo$analysis, analysisInfo$group, method = method, ...)
+    files <- sapply(seq_len(nrow(analysisInfo)),
+                    function(i) getMzMLOrMzXMLAnalysisPath(analysisInfo$analysis[i], analysisInfo$path[i]),
+                    USE.NAMES = FALSE)
+    if (verbose)
+        xs <- xcmsSet(files, analysisInfo$analysis, analysisInfo$group, method = method, ...)
+    else
+        suppressMessages(xs <- xcmsSet(files, analysisInfo$analysis, analysisInfo$group, method = method, ...))
 
     ret <- importFeaturesXCMS(xs, analysisInfo)
 
     saveCacheData("featuresXCMS", ret, hash)
 
-    cat("\n===========\nDone!\n")
+    if (verbose)
+        cat("\n===========\nDone!\n")
 
     return(ret)
 }
@@ -86,7 +91,7 @@ importFeaturesXCMS <- function(xs, analysisInfo)
     checkmate::assertClass(xs, "xcmsSet", add = ac)
     assertAnalysisInfo(analysisInfo, add = ac)
     checkmate::reportAssertions(ac)
-    
+
     plist <- as.data.table(peaks(xs))
     snames <- sampnames(xs)
     feat <- list()

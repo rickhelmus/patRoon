@@ -24,7 +24,7 @@ featuresBruker <- setClass("featuresBruker", contains = "features")
 #'   analysis.
 #' @rdname feature-finding
 #' @export
-findFeaturesBruker <- function(analysisInfo, doFMF = "auto", startRange = 0, endRange = 0)
+findFeaturesBruker <- function(analysisInfo, doFMF = "auto", startRange = 0, endRange = 0, verbose = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
     assertAnalysisInfo(analysisInfo, "d", add = ac)
@@ -32,20 +32,21 @@ findFeaturesBruker <- function(analysisInfo, doFMF = "auto", startRange = 0, end
     checkmate::assertNumber(startRange, lower = 0, finite = TRUE, add = ac)
     checkmate::assertNumber(endRange, lower = 0, finite = TRUE, add = ac)
     checkmate::reportAssertions(ac)
-    
+
     ret <- featuresBruker(analysisInfo = analysisInfo)
 
     DA <- getDAApplication()
     hideDAInScope()
 
-    ret@features = sapply(seq_len(nrow(analysisInfo)), function(i) getDAFeatures(DA, analysisInfo$analysis[i], analysisInfo$path[i], doFMF,
-                                                                                 startRange, endRange), simplify = FALSE)
+    ret@features = sapply(seq_len(nrow(analysisInfo)),
+                          function(i) getDAFeatures(DA, analysisInfo$analysis[i], analysisInfo$path[i], doFMF,
+                                                    startRange, endRange, verbose), simplify = FALSE)
     names(ret@features) <- analysisInfo$analysis
 
     return(ret)
 }
 
-getDAFeatures <- function(DA, analysis, path, doFMF, startRange, endRange)
+getDAFeatures <- function(DA, analysis, path, doFMF, startRange, endRange, verbose)
 {
     printf("Loading bruker features for analysis '%s'...\n", analysis)
 
@@ -86,7 +87,9 @@ getDAFeatures <- function(DA, analysis, path, doFMF, startRange, endRange)
 
         if (doFMF == TRUE)
         {
-            printf("Running Find Molecular Features (FMF)... ")
+            if (verbose)
+                printf("Running Find Molecular Features (FMF)... ")
+
             DA[["Analyses"]][[ind]][["Compounds"]]$Clear()
             DA[["Analyses"]][[ind]]$ClearChromatogramRangeSelections()
             DA[["Analyses"]][[ind]]$ClearResults()
@@ -94,11 +97,16 @@ getDAFeatures <- function(DA, analysis, path, doFMF, startRange, endRange)
                 DA[["Analyses"]][[ind]]$AddChromatogramRangeSelection(startRange, endRange, 0, 0)
             DA[["Analyses"]][[ind]]$FindMolecularFeatures()
             ccount <- cmpds[["Count"]]
-            cat("Done!\n")
+
+            if (verbose)
+                cat("Done!\n")
         }
 
-        printf("Loading %d features from DataAnalysis...\n", ccount, analysis)
-        prog <- txtProgressBar(0, ccount, style=3)
+        if (verbose)
+        {
+            printf("Loading %d features from DataAnalysis...\n", ccount, analysis)
+            prog <- txtProgressBar(0, ccount, style=3)
+        }
 
         dt <- data.table(ID=numeric(ccount), ret=numeric(ccount), mz=numeric(ccount), intensity=numeric(ccount), peak_score=numeric(ccount),
                          retmin=numeric(ccount), retmax=numeric(ccount), mzmin=numeric(ccount), mzmax=numeric(ccount))
@@ -123,18 +131,22 @@ getDAFeatures <- function(DA, analysis, path, doFMF, startRange, endRange)
                          mzmn, mzmx)]
             }
 
-            if ((i %% 10) == 0)
+            if (verbose && (i %% 10) == 0)
                 setTxtProgressBar(prog, i) # update every 10 iterations
         }
 
-        setTxtProgressBar(prog, ccount)
-        close(prog)
+        if (verbose)
+        {
+            setTxtProgressBar(prog, ccount)
+            close(prog)
+        }
 
         ret <- dt[1:dtCount]
         saveCacheData("featuresBruker", ret, hash)
     }
 
-    cat("... Done!\n")
+    if (verbose)
+        cat("... Done!\n")
 
     return(ret)
 }

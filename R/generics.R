@@ -21,7 +21,7 @@ setGeneric("comparison", function(..., groupAlgo,
                                   groupArgs = list(rtalign = FALSE)) standardGeneric("comparison"), signature = "...")
 setGeneric("regression", function(fGroups) standardGeneric("regression"))
 setGeneric("groupFeatures", function(feat, algorithm, ...) standardGeneric("groupFeatures"))
-setGeneric("generateConsensusXML", function(feat, out, rtalign, QT, maxAlignRT, maxAlignMZ, maxGroupRT, maxGroupMZ) standardGeneric("generateConsensusXML"))
+setGeneric("generateConsensusXML", function(feat, out, rtalign, QT, maxAlignRT, maxAlignMZ, maxGroupRT, maxGroupMZ, verbose) standardGeneric("generateConsensusXML"))
 setGeneric("groupFeaturesScreening", function(fGroups, scr) standardGeneric("groupFeaturesScreening"))
 setGeneric("replicateGroupSubtract", function(fGroups, rGroups, threshold = 0) standardGeneric("replicateGroupSubtract"))
 
@@ -36,8 +36,9 @@ setGeneric("replicateGroupSubtract", function(fGroups, rGroups, threshold = 0) s
 #' @param exportedData,\dots Set to \code{TRUE} if analyses were exported as
 #'   \code{mzXML} or \code{mzML} files (ignored for \code{featuresOpenMS} and
 #'   \code{featuresXCMS} methods).
+#' @param verbose If \code{FALSE} then no text output is shown.
 #'
-setGeneric("getXcmsSet", function(obj, ...) standardGeneric("getXcmsSet"))
+setGeneric("getXCMSSet", function(obj, ..., verbose = TRUE) standardGeneric("getXCMSSet"))
 
 ### MS Peak Lists
 

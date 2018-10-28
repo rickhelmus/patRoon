@@ -7,20 +7,20 @@ DoEOptimizer <- setRefClass("DoEOptimizer", contains = "VIRTUAL",
                                           maxModelDeviation = "numeric"))
 
 DoEOptimizer$methods(
-    
+
     # dummy methods that may need to be overloaded
     checkInitialParams = function(params) params,
     getMinOptSetting = function(settingName, params) 0,
     fixParamBounds = function(params, bounds) bounds,
     fixOptParams = function(params) params,
-    
+
     # "virtual" methods
     resultIncreased = function(history) stop("VIRTUAL"),
     calculateResponse = function(params, task, final = FALSE) stop("VIRTUAL"),
     getResponseScores = function(response) stop("VIRTUAL"),
     getFinalScore = function(response) stop("VIRTUAL"),
-    
-    
+
+
     # Adapted from combineParams() function of IPO
     combineParams = function(params_1, params_2)
     {
@@ -33,20 +33,20 @@ DoEOptimizer$methods(
             fact <- params_2[[i]]
             params_1[[new_index]] <- fact
             params_1[[new_index]][1:len] <- fact
-        } 
-        names(params_1) <- p_names   
+        }
+        names(params_1) <- p_names
         return(params_1)
     },
-    
+
     # Heavily based on xcmsSetExperimentsCluster() from IPO
     performIteration = function(params)
     {
-        typParams <- utilsIPO$typeCastParams(params) 
-        
+        typParams <- utilsIPO$typeCastParams(params)
+
         if (length(typParams$to_optimize) > 1)
         {
-            design <- utilsIPO$getCcdParameter(typParams$to_optimize)  	
-            designParams <- rsm::decode.data(design) 
+            design <- utilsIPO$getCcdParameter(typParams$to_optimize)
+            designParams <- rsm::decode.data(design)
         }
         else
         {
@@ -54,29 +54,41 @@ DoEOptimizer$methods(
             colnames(design)[2] <- names(typParams$to_optimize)
             designParams <- design
             designParams[,2] <- seq(min(typParams$to_optimize[[1]]),
-                                    max(typParams$to_optimize[[1]]), 
+                                    max(typParams$to_optimize[[1]]),
                                     diff(typParams$to_optimize[[1]]) / 8)
         }
-        
-        designParams <- combineParams(designParams, typParams$no_optimization)   
+
+        designParams <- combineParams(designParams, typParams$no_optimization)
         tasks <- seq_len(nrow(design))
-        
+
+        printf("---\nDesign:\n")
+        print(rsm::decode.data(design))
+        printf("---\n")
+
+        prog <- txtProgressBar(0, length(tasks), style = 3)
+
         response <- rbindlist(lapply(tasks, function(task)
         {
             # simplified optimizeSlaveCluster() from IPO
-            
+
             runParams <- as.list(designParams[task, ])
             runParams <- runParams[!names(runParams) %in% c("run.order", "std.order", "Block")]
             result <- calculateResponse(runParams, task)
             result$experiment <- task
+
+            setTxtProgressBar(prog, task)
+
             return(result)
         }))
-        
+
+        setTxtProgressBar(prog, length(tasks))
+        close(prog)
+
         ret <- list()
         ret$params <- typParams
         ret$design <- design
         ret$response <- response
-        
+
         return(ret)
     },
 
@@ -86,21 +98,21 @@ DoEOptimizer$methods(
         params <- result$params
         resp <- getResponseScores(result$response)
         result$response$score <- resp
-        
+
         result$model <- utilsIPO$createModel(result$design, params$to_optimize, resp)
         result$max_settings <- utilsIPO$getMaximumLevels(result$model)
-        
+
         runParams <- as.list(utilsIPO$decodeAll(result$max_settings[-1], params$to_optimize))
         runParams <- combineParams(runParams, params$no_optimization)
-        
+
         if (!is.list(runParams))
             runParams <- as.list(runParams)
-        
+
         result$finalResponse <- calculateResponse(runParams, 1, final = TRUE)
         result$finalResponse$score <- getFinalScore(result$response[, -"score"], result$finalResponse)
-        
+
         # UNDONE: what about the "..." params in IPO?
-        
+
         # Sometimes the response from the parameter set returned by the model
         # doesn't actually give an optimum (see: https://github.com/rietho/IPO/issues/61).
         # In this case we simply take the best results from the experiments
@@ -110,46 +122,53 @@ DoEOptimizer$methods(
             printf("Modelled parameter optimum yields significantly lower experimental score: %.1f/%.1f\n",
                    result$finalResponse$score, result$max_settings[1])
             printf("Taking data from best experimental value (%.1f) instead...\n", maxExpResp$score)
-            
-            designParams <- as.list(rsm::decode.data(result$design)[maxExpResp$experiment, names(params$to_optimize)])
+
+            runParams <- as.list(rsm::decode.data(result$design)[maxExpResp$experiment, names(params$to_optimize)])
 
             # re-run as object wasn't stored
-            result$finalResponse <- calculateResponse(combineParams(designParams, params$no_optimization), 1, final = TRUE)
+            result$finalResponse <- calculateResponse(combineParams(runParams, params$no_optimization), 1, final = TRUE)
             result$finalResponse$score <- getFinalScore(result$response[, -"score"], result$finalResponse)
-            
+
             # update max_settings from experimental results
             result$max_settings <- sapply(seq_along(params$to_optimize),
-                                          function(i) utilsIPO$encode(designParams[[i]], params$to_optimize[[i]]))
+                                          function(i) utilsIPO$encode(runParams[[i]], params$to_optimize[[i]]))
             result$max_settings <- c(result$finalResponse$score, result$max_settings)
             names(result$max_settings) <- c("response", names(rsm::codings(result$design)))
             result$max_settings <- t(result$max_settings) # convert to usual data format...
         }
-        
+
+        printf("\n---\nResponse:\n")
+        print(result$response)
+        printf("---\n")
+
+        cat("Best params: "); printf("%s: %s; ", names(runParams), runParams); cat("\n")
+        br <- result$finalResponse[names(result$finalResponse) != "object"]
+        cat("Best results: "); printf("%s: %s; ", names(br), br); cat("\n")
+        printf("---\n")
+
         return(result)
     },
-    
+
     # heavily based on optimizeXcmsSet() from IPO
     optimize = function(params, maxIterations, maxModelDeviation)
     {
         params <- startParams <- checkInitialParams(params)
-        
+
         history <- list()
         bestRange <- 0.25
-        
+
         for (iter in seq_len(maxIterations))
         {
-            printf("\n\n===\n")
-            printf("Starting new DoE with:\n")
-            printf(paste0(rbind(paste0(names(params), ": "), 
+            printf("Starting new DoE with (#%d):\n", iter)
+            printf(paste0(rbind(paste0(names(params), ": "),
                                 paste0(params, "\n"))))
-            printf("===\n\n")
-            
+
             result <- performIteration(params)
             result <- performIterationStat(result, maxModelDeviation)
-            
+
             history[[iter]] <- result
             params <- result$params
-            
+
             if (!resultIncreased(history))
             {
                 maxima <- 0
@@ -162,34 +181,34 @@ DoEOptimizer$methods(
                         maxIndex <- i
                     }
                 }
-                
+
                 finalParams <- as.list(utilsIPO$decodeAll(history[[maxIndex]]$max_settings[-1],
-                                                          history[[maxIndex]]$params$to_optimize))      
+                                                          history[[maxIndex]]$params$to_optimize))
                 finalParams <- combineParams(finalParams, params$no_optimization)
-                
+
                 if (!is.list(finalParams))
                     finalParams <- as.list(finalParams)
-                
+
                 bestSettings <- list()
                 bestSettings$parameters <- finalParams
-                
+
                 bestSettings$object <- history[[maxIndex]]$finalResponse$object
                 bestSettings$result <- history[[maxIndex]]$finalResponse[names(history[[maxIndex]]$finalResponse) != "object"]
                 bestSettings$score <- history[[maxIndex]]$finalResponse$score
                 history$bestSettings <- bestSettings
-                
-                break  
+
+                break
             }
-            
+
             for (i in seq_len(length(params$to_optimize)))
             {
                 setting <- result$max_settings[i+1]
-                bounds <- params$to_optimize[[i]] 
+                bounds <- params$to_optimize[[i]]
                 settingName <- names(params$to_optimize)[i]
-                
+
                 minSetting <- getMinOptSetting(settingName, params)
-                
-                # - if the parameter is NA, we increase the range by 20%, 
+
+                # - if the parameter is NA, we increase the range by 20%,
                 # - if it was within the inner 25% of the previous range or
                 #   at the minimum value we decrease the range by 20%
                 if (is.na(setting))
@@ -199,30 +218,30 @@ DoEOptimizer$methods(
                     stepFactor <- 0.8
                 else
                     stepFactor <- 1
-                
+
                 step <- (diff(bounds) / 2) * stepFactor
-                
+
                 if (is.na(setting))
                     setting <- 0
-                
+
                 newCenter <- utilsIPO$decode(setting, bounds)
-                
+
                 if ((newCenter-minSetting) > step)
-                    newBounds <- c(newCenter - step, newCenter + step) 
+                    newBounds <- c(newCenter - step, newCenter + step)
                 else
-                    newBounds <- c(minSetting, 2*step+minSetting) 
-                
+                    newBounds <- c(minSetting, 2*step+minSetting)
+
                 names(newBounds) <- NULL
-                
+
                 params$to_optimize[[i]] <- fixParamBounds(names(params$to_optimize)[i], newBounds)
             }
-            
+
             params <- fixOptParams(params)
             params <- utilsIPO$attachList(params$to_optimize, params$no_optimization)
         }
-        
+
         #params <- utilsIPO$attachList(params$to_optimize, params$no_optimization)
-        
+
         return(list(startParams = startParams, finalResults = history$bestSettings, experiments = history[seq_len(iter)]))
     }
 )
@@ -238,12 +257,12 @@ fixOptParamRange <- function(params, paramPairs)
                 pmin <- params$no_optimization[[pp[1]]]
             else
                 pmin <- max(params$to_optimize[[pp[1]]])
-            
+
             if (is.null(params$to_optimize[[pp[2]]]))
                 pmax <- params$no_optimization[[pp[2]]]
             else
                 pmax <- min(params$to_optimize[[pp[2]]])
-            
+
             if (pmin >= pmax)
             {
                 additional <- abs(pmin-pmax) + 1
@@ -254,7 +273,7 @@ fixOptParamRange <- function(params, paramPairs)
             }
         }
     }
-    
+
     return(params)
 }
 
@@ -281,13 +300,13 @@ setMethod("show", "optimizationResult", function(object)
     printf("Experimental designs performed: %d\n", length(object))
     printf("Starting params:\n"); printf("- %s: %s\n", names(object@startParams), object@startParams)
     printf("Optimized params:\n"); printf("- %s: %s\n", names(object@finalResults$parameters), object@finalResults$parameters)
-    
+
     br <- object@finalResults$result
     br <- br[!names(br) %in% "ExpId"]
     printf("Best results: "); cat(paste(names(br), br, sep = ": ", collapse = "; ")); cat("\n")
-    
+
     printf("\nOptimized object:\n---\n"); show(object@finalResults$object); cat("---\n")
-    
+
     showObjectSize(object)
 })
 
@@ -309,9 +328,9 @@ setMethod("plot", "optimizationResult", function(x, index, paramsToPlot = NULL, 
                       checkmate::checkList(contours),
                       .var.name = "contours")
     checkmate::reportAssertions(ac)
-    
+
     ex <- x@experiments[[index]]
-    
+
     if (is.null(paramsToPlot))
     {
         paramsToPlot <- list()
@@ -324,26 +343,26 @@ setMethod("plot", "optimizationResult", function(x, index, paramsToPlot = NULL, 
     }
     else if (is.character(paramsToPlot))
         paramsToPlot <- list(paramsToPlot)
-    
+
     codedNames <- names(ex$design)
     decodedNames <- rsm::truenames(ex$design)
-    
+
     forms <- lapply(paramsToPlot, function(pn)
     {
         # change to coded names
         pn <- sapply(pn, function(n) codedNames[decodedNames == n])
         return(as.formula(paste(pn[2], "~", pn[1])))
     })
-    
+
     maxSlice <- ex$max_settings[1, -1]
     maxSlice[is.na(maxSlice)] <- 1
-    
+
     formsLen <- length(forms)
     if (formsLen > 1) # multiple plots?
     {
         if (is.null(maxCols))
             maxCols <- ceiling(sqrt(formsLen))
-        
+
         if (formsLen <= maxCols)
         {
             cols <- formsLen
@@ -354,10 +373,10 @@ setMethod("plot", "optimizationResult", function(x, index, paramsToPlot = NULL, 
             cols <- maxCols
             rows <- ceiling(formsLen / cols)
         }
-        
+
         withr::local_par(list(mfrow = c(rows, cols)))
     }
-    
+
     switch(type,
            contour = contour(ex$model, forms, image = image, at = maxSlice, ...),
            image = image(ex$model, forms, at = maxSlice, ...),

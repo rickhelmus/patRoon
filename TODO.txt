@@ -26,11 +26,9 @@ Release:
 - update tutorial on website
 - feature optim:
     - convert results to class --> need some more methods, check after group optim
-    - progress bars?
     - docs
-    - plotting
     - qualitative optim?
     - tests (e.g. check equality with IPO)
+    - keep retcor_done?
 - progressbar and parallel enviPick
 
-    

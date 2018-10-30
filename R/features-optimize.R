@@ -128,7 +128,7 @@ featuresOptimizer$methods(
 )
 
 
-optimizeFeatureFinding <- function(anaInfo, algorithm, params, isoIdent = "IPO", maxIterations = 50,
+optimizeFeatureFinding <- function(anaInfo, algorithm, params, paramRanges = list(), isoIdent = "IPO", maxIterations = 50,
                                    maxModelDeviation = 0.1)
 {
     ac <- checkmate::makeAssertCollection()
@@ -149,7 +149,7 @@ optimizeFeatureFinding <- function(anaInfo, algorithm, params, isoIdent = "IPO",
                  envipick = featuresOptimizerEnviPick)
 
     fo <- fo$new(anaInfo = anaInfo, algorithm = algorithm, isoIdent = isoIdent)
-    result <- fo$optimize(params, maxIterations, maxModelDeviation)
+    result <- fo$optimize(params, paramRanges, maxIterations, maxModelDeviation)
 
     return(optimizationResult(algorithm = algorithm, startParams = params,
                               finalResults = result$finalResults, experiments = result$experiments))

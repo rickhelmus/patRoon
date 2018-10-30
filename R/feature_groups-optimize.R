@@ -86,8 +86,8 @@ featureGroupsOptimizer$methods(
 )
 
 
-optimizeFeatureGrouping <- function(features, algorithm, params, maxIterations = 50,
-                                    maxModelDeviation = 0.1)
+optimizeFeatureGrouping <- function(features, algorithm, params, paramRanges = list(),
+                                    maxIterations = 50, maxModelDeviation = 0.1)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assert_class(features, "features", add = ac)
@@ -102,7 +102,7 @@ optimizeFeatureGrouping <- function(features, algorithm, params, maxIterations =
                  xcms = featureGroupsOptimizerXCMS)
 
     go <- go$new(features = features, algorithm = algorithm)
-    result <- go$optimize(params, maxIterations, maxModelDeviation)
+    result <- go$optimize(params, paramRanges, maxIterations, maxModelDeviation)
 
     return(optimizationResult(algorithm = algorithm, startParams = params,
                               finalResults = result$finalResults, experiments = result$experiments))

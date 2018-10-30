@@ -5,7 +5,7 @@ NULL
 featuresOptimizerOpenMS <- setRefClass("featuresOptimizerOpenMS", contains = "featuresOptimizer")
 
 featuresOptimizerOpenMS$methods(
-    
+
     checkInitialParams = function(params)
     {
         if (isoIdent != "OpenMS")
@@ -15,27 +15,22 @@ featuresOptimizerOpenMS$methods(
         }
         return(params)
     },
-    
+
+    defaultParamRanges = function(params) list(localMZRange = c(0.00001, Inf)),
+
     fixOptParamBounds = function(param, bounds)
     {
         if (param == "traceTermOutliers")
             return(round(bounds, 0))
-        
+
         return(bounds)
     },
-    
+
     # based on part of optimizeXcmsSet() function from IPO
     fixOptParams = function(params)
     {
         return(fixOptParamRange(params, list(c("minFWHM", "maxFWHM"),
                                              c("minTraceLength", "maxTraceLength"))))
-    },
-    
-    getMinOptSetting = function(settingName, params)
-    {
-        if (settingName == "localMZRange")
-            return(0.00001)
-        return(1)
     }
-    
+
 )

@@ -6,7 +6,7 @@ featureGroupsOptimizerXCMS <- setRefClass("featureGroupsOptimizerXCMS", contains
                                           fields = list(groupArgs = "list", retcorArgs = "list"))
 
 featureGroupsOptimizerXCMS$methods(
-    
+
     checkInitialParams = function(params)
     {
         for (p in c("groupArgs", "retcorArgs"))
@@ -19,10 +19,18 @@ featureGroupsOptimizerXCMS$methods(
                 params[[p]] <- NULL
             }
         }
-        
+
         return(params)
     },
-    
+
+    defaultParamRanges = function(params)
+    {
+        return(list(profStep = c(0.3, Inf),
+                    mzwid = c(0.0001, Inf),
+                    bw = c(0.25, Inf),
+                    span = c(0.001, Inf)))
+    },
+
     fixOptParamBounds = function(param, bounds)
     {
         if (param %in% c("extra", "missing"))
@@ -35,29 +43,15 @@ featureGroupsOptimizerXCMS$methods(
                 printf("profStep or minfrac greater 1, decreasing to %s\n", bounds)
             }
         }
-        
+
         return(bounds)
     },
-    
-    getMinOptSetting = function(settingName, params)
-    {
-        if (settingName == "profStep")
-            return(0.3)
-        if (settingName == "mzwid")
-            return(0.0001)
-        if (settingName == "bw")
-            return(0.25)
-        if (settingName == "span")
-            return(0.001)
-        
-        return(0)
-    },
-    
+
     convertOptToCallParams = function(params)
     {
         # general params
         ret <- params[names(params) %in% c("rtalign", "exportedData")]
-        
+
         for (p in c("groupArgs", "retcorArgs"))
         {
             if (!is.null(.self[[p]]))
@@ -65,14 +59,14 @@ featureGroupsOptimizerXCMS$methods(
                 pn <- names(.self[[p]])
                 pn <- pn[names(pn) != "method"]
                 ret[[p]] <- params[pn]
-                
+
                 # re-add method
                 method <- .self[[p]][["method"]]
                 if (!is.null(method))
                     ret[[p]] <- c(ret[[p]], list(method = method))
             }
         }
-        
+
         return(ret)
     }
 )

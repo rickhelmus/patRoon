@@ -6,12 +6,10 @@ featureGroupsOptimizerOpenMS <- setRefClass("featureGroupsOptimizerOpenMS", cont
 
 featureGroupsOptimizerOpenMS$methods(
 
-    getMinOptSetting = function(settingName, params)
+    defaultParamRanges = function(params)
     {
-        if (settingName %in% c("maxAlignMZ", "maxGroupMZ"))
-            return(0.0001)
-
-        return(1)
+        return(list(maxAlignMZ = c(0.0001, Inf),
+                    maxGroupMZ = c(0.0001, Inf)))
     }
 
 )

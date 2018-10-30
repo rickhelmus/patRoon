@@ -13,6 +13,13 @@ featuresOptimizerXCMS$methods(
         return(params)
     },
 
+    defaultParamRanges = function(params)
+    {
+        return(list(min_peakwidth = c(3, Inf),
+                    mzdiff = c(if (params$method == "centWave") -100000000 else 0.001, Inf),
+                    step = c(0.0005, Inf)))
+    },
+
     # Adapted from combineParams() function of IPO
     combineOptParams = function(params_1, params_2)
     {
@@ -80,17 +87,6 @@ featuresOptimizerXCMS$methods(
     fixOptParams = function(params)
     {
         return(fixOptParamRange(params, list(c("min_peakwidth", "max_peakwidth"))))
-    },
-
-    getMinOptSetting = function(settingName, params)
-    {
-        if (settingName == "min_peakwidth")
-            return(3)
-        if (settingName == "mzdiff")
-            return(if (params$no_optimization$method == "centWave") -100000000 else 0.001)
-        if (settingName == "step")
-            return(0.0005)
-        return(1)
     },
 
     convertOptToCallParams = function(params)

@@ -3,15 +3,14 @@
 NULL
 
 DoEOptimizer <- setRefClass("DoEOptimizer", contains = "VIRTUAL",
-                            fields = list(algorithm = "character",
-                                          maxModelDeviation = "numeric"))
+                            fields = list(algorithm = "character", maxModelDeviation = "numeric"))
 
 DoEOptimizer$methods(
 
     # dummy methods that may need to be overloaded
     checkInitialParams = function(params) params,
-    getMinOptSetting = function(settingName, params) 0,
-    fixParamBounds = function(params, bounds) bounds,
+    defaultParamRanges = function(params) list(),
+    fixOptParamBounds = function(params, bounds) bounds,
     fixOptParams = function(params) params,
 
     # "virtual" methods
@@ -20,6 +19,12 @@ DoEOptimizer$methods(
     getResponseScores = function(response) stop("VIRTUAL"),
     getFinalScore = function(response) stop("VIRTUAL"),
 
+    getOptSettingRange = function(settingName, params, paramRanges)
+    {
+        if (!is.null(paramRanges[[settingName]]))
+            return(paramRanges[[settingName]])
+        return(c(1, Inf)) # UNDONE: for grouping IPO has default of zero... change?
+    },
 
     # Adapted from combineParams() function of IPO
     combineParams = function(params_1, params_2)
@@ -123,7 +128,9 @@ DoEOptimizer$methods(
                    result$finalResponse$score, result$max_settings[1])
             printf("Taking data from best experimental value (%.1f) instead...\n", maxExpResp$score)
 
-            runParams <- as.list(rsm::decode.data(result$design)[maxExpResp$experiment, names(params$to_optimize)])
+            # runParams <- as.list(rsm::decode.data(result$design)[maxExpResp$experiment, names(params$to_optimize)])
+            runParams <- utilsIPO$decodeAll(result$design[maxExpResp$experiment, names(params$to_optimize), drop = FALSE],
+                                            params$to_optimize)
 
             # re-run as object wasn't stored
             result$finalResponse <- calculateResponse(combineParams(runParams, params$no_optimization), 1, final = TRUE)
@@ -133,7 +140,7 @@ DoEOptimizer$methods(
             result$max_settings <- sapply(seq_along(params$to_optimize),
                                           function(i) utilsIPO$encode(runParams[[i]], params$to_optimize[[i]]))
             result$max_settings <- c(result$finalResponse$score, result$max_settings)
-            names(result$max_settings) <- c("response", names(rsm::codings(result$design)))
+            names(result$max_settings) <- c("response", paste0("x", seq_len(length(result$max_settings) - 1)))
             result$max_settings <- t(result$max_settings) # convert to usual data format...
         }
 
@@ -150,16 +157,17 @@ DoEOptimizer$methods(
     },
 
     # heavily based on optimizeXcmsSet() from IPO
-    optimize = function(params, maxIterations, maxModelDeviation)
+    optimize = function(params, paramRanges, maxIterations, maxModelDeviation)
     {
         params <- startParams <- checkInitialParams(params)
+        paramRanges <- modifyList(defaultParamRanges(params), paramRanges)
 
         history <- list()
         bestRange <- 0.25
 
         for (iter in seq_len(maxIterations))
         {
-            printf("Starting new DoE with (#%d):\n", iter)
+            printf("Starting new DoE (#%d):\n", iter)
             printf(paste0(rbind(paste0(names(params), ": "),
                                 paste0(params, "\n"))))
 
@@ -206,7 +214,7 @@ DoEOptimizer$methods(
                 bounds <- params$to_optimize[[i]]
                 settingName <- names(params$to_optimize)[i]
 
-                minSetting <- getMinOptSetting(settingName, params)
+                settingRange <- getOptSettingRange(settingName, params, paramRanges)
 
                 # - if the parameter is NA, we increase the range by 20%,
                 # - if it was within the inner 25% of the previous range or
@@ -214,26 +222,45 @@ DoEOptimizer$methods(
                 if (is.na(setting))
                     stepFactor <- 1.2
                 else if (abs(setting) < bestRange ||
-                         (setting == -1 && utilsIPO$decode(-1, params$to_optimize[[i]]) == minSetting))
+                         (setting == -1 && utilsIPO$decode(-1, params$to_optimize[[i]]) == settingRange[1]))
                     stepFactor <- 0.8
                 else
                     stepFactor <- 1
 
                 step <- (diff(bounds) / 2) * stepFactor
 
+                # CHANGED: check min-max for step
+                if (all(is.finite(settingRange)))
+                {
+                    if ((diff(settingRange) / 2) < step)
+                        printf("Changed step size to make sure its within range: %f --> %f\n", step, diff(settingRange) / 2)
+                    step <- min(step, diff(settingRange) / 2)
+                }
+
                 if (is.na(setting))
                     setting <- 0
 
                 newCenter <- utilsIPO$decode(setting, bounds)
 
-                if ((newCenter-minSetting) > step)
-                    newBounds <- c(newCenter - step, newCenter + step)
-                else
-                    newBounds <- c(minSetting, 2*step+minSetting)
+                # CHANGED: also take max into account
+                # if ((newCenter-settingRange[1]) > step)
+                #     newBounds <- c(newCenter - step, newCenter + step)
+                # else
+                #     newBounds <- c(settingRange[1], 2*step+settingRange[1])
+
+                newBounds <- c(newCenter - step, newCenter + step)
+                if (is.finite(settingRange[1]) && newBounds[1] < settingRange[1])
+                    newBounds <- c(settingRange[1], 2 * step + settingRange[1])
+                if (is.finite(settingRange[2]) && newBounds[2] > settingRange[2])
+                {
+                    oldnb <- newBounds
+                    newBounds <- c(settingRange[2] - 2 * step, settingRange[2])
+                    printf("changed max range from (%f, %f) to (%f, %f)\n", oldnb[1], oldnb[2], newBounds[1], newBounds[2])
+                }
 
                 names(newBounds) <- NULL
 
-                params$to_optimize[[i]] <- fixParamBounds(names(params$to_optimize)[i], newBounds)
+                params$to_optimize[[i]] <- fixOptParamBounds(names(params$to_optimize)[i], newBounds)
             }
 
             params <- fixOptParams(params)

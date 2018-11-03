@@ -30,5 +30,6 @@ Release:
     - qualitative optim?
     - tests (e.g. check equality with IPO)
     - keep retcor_done?
+    - proper credits/refs
 - progressbar and parallel enviPick
 

@@ -128,16 +128,18 @@ featuresOptimizer$methods(
 )
 
 
-optimizeFeatureFinding <- function(anaInfo, algorithm, params, paramRanges = list(), isoIdent = "IPO", maxIterations = 50,
-                                   maxModelDeviation = 0.1)
+optimizeFeatureFinding <- function(anaInfo, algorithm, ..., templateParams = list(),
+                                   paramRanges = list(),
+                                   isoIdent = if (algorithm == "openms") "OpenMS" else "IPO",
+                                   maxIterations = 50, maxModelDeviation = 0.1)
 {
+    params <- list(...)
+
     ac <- checkmate::makeAssertCollection()
     assertAnalysisInfo(anaInfo, add = ac)
     checkmate::assertChoice(algorithm, c("openms", "xcms", "envipick"), add = ac)
-    checkmate::assertList(params, add = ac)
+    assertOptimArgs(params, templateParams, paramRanges, maxIterations, maxModelDeviation, ac)
     checkmate::assertChoice(isoIdent, c("IPO", "CAMERA", "OpenMS"), add = ac)
-    checkmate::assertCount(maxIterations, positive = TRUE, add = ac)
-    checkmate::assertNumber(maxModelDeviation, finite = TRUE, add = ac)
     checkmate::reportAssertions(ac)
 
     if (algorithm != "openms" && isoIdent == "OpenMS")
@@ -149,8 +151,8 @@ optimizeFeatureFinding <- function(anaInfo, algorithm, params, paramRanges = lis
                  envipick = featuresOptimizerEnviPick)
 
     fo <- fo$new(anaInfo = anaInfo, algorithm = algorithm, isoIdent = isoIdent)
-    result <- fo$optimize(params, paramRanges, maxIterations, maxModelDeviation)
+    result <- fo$optimize(params, templateParams, paramRanges, maxIterations, maxModelDeviation)
 
-    return(optimizationResult(algorithm = algorithm, startParams = params,
-                              finalResults = result$finalResults, experiments = result$experiments))
+    return(optimizationResult(algorithm = algorithm, paramSets = result$paramSets,
+                              bestParamSet = result$bestParamSet))
 }

@@ -129,8 +129,18 @@ DoEOptimizer$methods(
             printf("Taking data from best experimental value (%.1f) instead...\n", maxExpResp$score)
 
             # runParams <- as.list(rsm::decode.data(result$design)[maxExpResp$experiment, names(params$to_optimize)])
-            runParams <- utilsIPO$decodeAll(result$design[maxExpResp$experiment, names(params$to_optimize), drop = FALSE],
-                                            params$to_optimize)
+
+            if (length(params$to_optimize) == 1)
+                vals <- result$design[maxExpResp$experiment, 2, drop = FALSE] # design is just a df, see performIteration()
+            else
+            {
+                # need to use as.data.frame here to avoid strange errors related to subsetting...
+                vals <- as.data.frame(result$design)[maxExpResp$experiment,
+                                                     paste0("x", seq_along(params$to_optimize)),
+                                                     drop = FALSE]
+            }
+
+            runParams <- utilsIPO$decodeAll(vals, params$to_optimize)
 
             # re-run as object wasn't stored
             result$finalResponse <- calculateResponse(combineParams(runParams, params$no_optimization), 1, final = TRUE)
@@ -157,166 +167,153 @@ DoEOptimizer$methods(
     },
 
     # heavily based on optimizeXcmsSet() from IPO
-    optimize = function(params, paramRanges, maxIterations, maxModelDeviation)
+    optimize = function(allParams, templateParams, paramRanges, maxIterations, maxModelDeviation)
     {
-        params <- startParams <- checkInitialParams(params)
-        paramRanges <- modifyList(defaultParamRanges(params), paramRanges)
-
-        history <- list()
-        bestRange <- 0.25
-
-        for (iter in seq_len(maxIterations))
+        pSets <- lapply(seq_along(allParams), function(pi)
         {
-            printf("Starting new DoE (#%d):\n", iter)
-            printf(paste0(rbind(paste0(names(params), ": "),
-                                paste0(params, "\n"))))
+            params <- modifyList(templateParams, allParams[[pi]])
 
-            result <- performIteration(params)
-            result <- performIterationStat(result, maxModelDeviation)
+            params <- startParams <- checkInitialParams(params)
+            paramRanges <- modifyList(defaultParamRanges(params), paramRanges)
 
-            history[[iter]] <- result
-            params <- result$params
+            history <- list()
+            bestRange <- 0.25
 
-            if (!resultIncreased(history))
+            for (iter in seq_len(maxIterations))
             {
-                maxima <- 0
-                maxIndex <- 1
-                for (i in seq_len(length(history)))
-                {
-                    if (history[[i]]$max_settings[1] > maxima)
-                    {
-                        maxima <- history[[i]]$max_settings[1]
-                        maxIndex <- i
-                    }
-                }
-
-                finalParams <- as.list(utilsIPO$decodeAll(history[[maxIndex]]$max_settings[-1],
-                                                          history[[maxIndex]]$params$to_optimize))
-                finalParams <- combineParams(finalParams, params$no_optimization)
-
-                if (!is.list(finalParams))
-                    finalParams <- as.list(finalParams)
-
-                bestSettings <- list()
-                bestSettings$parameters <- finalParams
-
-                bestSettings$object <- history[[maxIndex]]$finalResponse$object
-                bestSettings$result <- history[[maxIndex]]$finalResponse[names(history[[maxIndex]]$finalResponse) != "object"]
-                bestSettings$score <- history[[maxIndex]]$finalResponse$score
-                history$bestSettings <- bestSettings
-
-                break
-            }
-
-            for (i in seq_len(length(params$to_optimize)))
-            {
-                setting <- result$max_settings[i+1]
-                bounds <- params$to_optimize[[i]]
-                settingName <- names(params$to_optimize)[i]
-
-                settingRange <- getOptSettingRange(settingName, params, paramRanges)
-
-                # - if the parameter is NA, we increase the range by 20%,
-                # - if it was within the inner 25% of the previous range or
-                #   at the minimum value we decrease the range by 20%
-                if (is.na(setting))
-                    stepFactor <- 1.2
-                else if (abs(setting) < bestRange ||
-                         (setting == -1 && utilsIPO$decode(-1, params$to_optimize[[i]]) == settingRange[1]))
-                    stepFactor <- 0.8
+                if (length(allParams) > 1)
+                    printf("Starting new DoE (parameter set %d/%d, iteration %d):\n", pi, length(allParams), iter)
                 else
-                    stepFactor <- 1
+                    printf("Starting new DoE (iteration %d):\n", iter)
+                cat(paste0(rbind(paste0(names(params), ": "),
+                                 paste0(params, "\n"))), sep = "")
 
-                step <- (diff(bounds) / 2) * stepFactor
+                result <- performIteration(params)
+                result <- performIterationStat(result, maxModelDeviation)
 
-                # CHANGED: check min-max for step
-                if (all(is.finite(settingRange)))
+                history[[iter]] <- result
+                params <- result$params
+
+                lastRun <- iter == maxIterations
+                if (!resultIncreased(history) || lastRun)
                 {
-                    if ((diff(settingRange) / 2) < step)
-                        printf("Changed step size to make sure its within range: %f --> %f\n", step, diff(settingRange) / 2)
-                    step <- min(step, diff(settingRange) / 2)
+                    if (lastRun)
+                        warning(sprintf("Reached maximum number of iterations (maxIterations=%d). Returning possibly suboptimal result.",
+                                        maxIterations))
+
+                    break
                 }
 
-                if (is.na(setting))
-                    setting <- 0
-
-                newCenter <- utilsIPO$decode(setting, bounds)
-
-                # CHANGED: also take max into account
-                # if ((newCenter-settingRange[1]) > step)
-                #     newBounds <- c(newCenter - step, newCenter + step)
-                # else
-                #     newBounds <- c(settingRange[1], 2*step+settingRange[1])
-
-                newBounds <- c(newCenter - step, newCenter + step)
-                if (is.finite(settingRange[1]) && newBounds[1] < settingRange[1])
-                    newBounds <- c(settingRange[1], 2 * step + settingRange[1])
-                if (is.finite(settingRange[2]) && newBounds[2] > settingRange[2])
+                for (i in seq_len(length(params$to_optimize)))
                 {
-                    oldnb <- newBounds
-                    newBounds <- c(settingRange[2] - 2 * step, settingRange[2])
-                    printf("changed max range from (%f, %f) to (%f, %f)\n", oldnb[1], oldnb[2], newBounds[1], newBounds[2])
+                    setting <- result$max_settings[i+1]
+                    bounds <- params$to_optimize[[i]]
+                    settingName <- names(params$to_optimize)[i]
+
+                    settingRange <- getOptSettingRange(settingName, params, paramRanges)
+
+                    # - if the parameter is NA, we increase the range by 20%,
+                    # - if it was within the inner 25% of the previous range or
+                    #   at the minimum value we decrease the range by 20%
+                    if (is.na(setting))
+                        stepFactor <- 1.2
+                    else if (abs(setting) < bestRange ||
+                             (setting == -1 && utilsIPO$decode(-1, params$to_optimize[[i]]) == settingRange[1]))
+                        stepFactor <- 0.8
+                    else
+                        stepFactor <- 1
+
+                    step <- (diff(bounds) / 2) * stepFactor
+
+                    # CHANGED: check min-max for step
+                    if (all(is.finite(settingRange)))
+                    {
+                        if ((diff(settingRange) / 2) < step)
+                            printf("Changed step size to make sure its within range: %f --> %f\n", step, diff(settingRange) / 2)
+                        step <- min(step, diff(settingRange) / 2)
+                    }
+
+                    if (is.na(setting))
+                        setting <- 0
+
+                    newCenter <- utilsIPO$decode(setting, bounds)
+
+                    # CHANGED: also take max into account
+                    # if ((newCenter-settingRange[1]) > step)
+                    #     newBounds <- c(newCenter - step, newCenter + step)
+                    # else
+                    #     newBounds <- c(settingRange[1], 2*step+settingRange[1])
+
+                    newBounds <- c(newCenter - step, newCenter + step)
+                    if (is.finite(settingRange[1]) && newBounds[1] < settingRange[1])
+                        newBounds <- c(settingRange[1], 2 * step + settingRange[1])
+                    if (is.finite(settingRange[2]) && newBounds[2] > settingRange[2])
+                    {
+                        oldnb <- newBounds
+                        newBounds <- c(settingRange[2] - 2 * step, settingRange[2])
+                        printf("changed max range from (%f, %f) to (%f, %f)\n", oldnb[1], oldnb[2], newBounds[1], newBounds[2])
+                    }
+
+                    names(newBounds) <- NULL
+
+                    params$to_optimize[[i]] <- fixOptParamBounds(names(params$to_optimize)[i], newBounds)
                 }
 
-                names(newBounds) <- NULL
-
-                params$to_optimize[[i]] <- fixOptParamBounds(names(params$to_optimize)[i], newBounds)
+                params <- fixOptParams(params)
+                params <- utilsIPO$attachList(params$to_optimize, params$no_optimization)
             }
 
-            params <- fixOptParams(params)
-            params <- utilsIPO$attachList(params$to_optimize, params$no_optimization)
-        }
+            #params <- utilsIPO$attachList(params$to_optimize, params$no_optimization)
 
-        #params <- utilsIPO$attachList(params$to_optimize, params$no_optimization)
+            maxima <- 0
+            maxIndex <- 1
+            for (i in seq_len(length(history)))
+            {
+                if (history[[i]]$max_settings[1] > maxima)
+                {
+                    maxima <- history[[i]]$max_settings[1]
+                    maxIndex <- i
+                }
+            }
 
-        return(list(startParams = startParams, finalResults = history$bestSettings, experiments = history[seq_len(iter)]))
+            finalParams <- as.list(utilsIPO$decodeAll(history[[maxIndex]]$max_settings[-1],
+                                                      history[[maxIndex]]$params$to_optimize))
+            finalParams <- combineParams(finalParams, params$no_optimization)
+
+            if (!is.list(finalParams))
+                finalParams <- as.list(finalParams)
+
+            bestResults <- list()
+            bestResults$parameters <- finalParams
+
+            bestResults$object <- history[[maxIndex]]$finalResponse$object
+            bestResults$experiment <- maxIndex
+            bestResults$score <- history[[maxIndex]]$finalResponse$score
+
+            return(list(startParams = startParams, bestResults = bestResults, experiments = history))
+        })
+
+        bestPS <- which.max(sapply(pSets, function(ps) ps$bestResults$score))
+
+        printf("===\nDONE!\nBest parameter set: %d\nBest experiment: %d\n",
+               bestPS, pSets[[bestPS]]$bestResults$experiment)
+
+        return(list(paramSets = pSets, bestParamSet = bestPS))
     }
 )
-
-# based on part of optimizeXcmsSet() function from IPO
-fixOptParamRange <- function(params, paramPairs)
-{
-    for (pp in paramPairs)
-    {
-        if (!is.null(params$to_optimize[[pp[1]]]) || !is.null(params$to_optimize[[pp[2]]]))
-        {
-            if (is.null(params$to_optimize[[pp[1]]]))
-                pmin <- params$no_optimization[[pp[1]]]
-            else
-                pmin <- max(params$to_optimize[[pp[1]]])
-
-            if (is.null(params$to_optimize[[pp[2]]]))
-                pmax <- params$no_optimization[[pp[2]]]
-            else
-                pmax <- min(params$to_optimize[[pp[2]]])
-
-            if (pmin >= pmax)
-            {
-                additional <- abs(pmin-pmax) + 1
-                if (!is.null(params$to_optimize[[pp[2]]]))
-                    params$to_optimize[[pp[2]]] <- params$to_optimize[[pp[2]]] + additional
-                else
-                    params$no_optimization[[pp[2]]] <- params$no_optimization[[pp[2]]] + additional
-            }
-        }
-    }
-
-    return(params)
-}
 
 
 #' @export
 optimizationResult <- setClass("optimizationResult",
                                slots = c(algorithm = "character",
-                                         startParams = "list", finalResults = "list",
-                                         experiments = "list"))
+                                         paramSets = "list", bestParamSet = "numeric"))
 
 #' @describeIn optimizationResult Returns the algorithm that was used for finding features.
 setMethod("algorithm", "optimizationResult", function(obj) obj@algorithm)
 
 #' @describeIn optimizationResult Obtain total number of experimental design iteratations performed.
 #' @export
-setMethod("length", "optimizationResult", function(x) length(x@experiments))
+setMethod("length", "optimizationResult", function(x) sum(sapply(x@paramSets, function(ps) length(ps$experiments))))
 
 #' @describeIn optimizationResult Shows summary information for this object.
 #' @export
@@ -324,25 +321,38 @@ setMethod("show", "optimizationResult", function(object)
 {
     printf("An optimization result object ('%s')\n", class(object))
     printf("Algorithm: %s\n", algorithm(object))
-    printf("Experimental designs performed: %d\n", length(object))
-    printf("Starting params:\n"); printf("- %s: %s\n", names(object@startParams), object@startParams)
-    printf("Optimized params:\n"); printf("- %s: %s\n", names(object@finalResults$parameters), object@finalResults$parameters)
 
-    br <- object@finalResults$result
-    br <- br[!names(br) %in% "ExpId"]
-    printf("Best results: "); cat(paste(names(br), br, sep = ": ", collapse = "; ")); cat("\n")
+    for (pi in seq_along(object@paramSets))
+    {
+        ps <- object@paramSets[[pi]]
+        printf("Parameter set %d/%d%s:\n", pi, length(object@paramSets),
+               if (pi == object@bestParamSet) " (BEST)" else "")
 
-    printf("\nOptimized object:\n---\n"); show(object@finalResults$object); cat("---\n")
+        printf("    Experimental designs performed: %d\n", length(ps$experiments))
+        printf("    Starting params:\n"); printf("\t- %s: %s\n", names(ps$startParams), ps$startParams)
+        printf("    Optimized params:\n"); printf("\t- %s: %s\n", names(ps$bestResults$parameters), ps$bestResults$parameters)
+
+        bexp <- ps$experiments[[ps$bestResults$experiment]]
+        br <- bexp$finalResponse
+        br <- br[!names(br) %in% c("ExpId", "object")]
+        printf("    Best results: "); cat(paste(names(br), br, sep = ": ", collapse = "; ")); cat("\n")
+
+    }
+
+    printf("Best parameter set: %d\n", object@bestParamSet)
+
+    # printf("\nOptimized object:\n---\n"); show(object@bestResults$object); cat("---\n")
 
     showObjectSize(object)
 })
 
 #' @export
-setMethod("plot", "optimizationResult", function(x, index, paramsToPlot = NULL, maxCols = NULL, type = "contour",
+setMethod("plot", "optimizationResult", function(x, paramSet, experiment, paramsToPlot = NULL, maxCols = NULL, type = "contour",
                                                  image = TRUE, contours = "colors", ...)
 {
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertInt(index, lower = 1, upper = length(x))
+    checkmate::assertInt(paramSet, lower = 1, upper = length(x@paramSets)) # don't add, this should fail before the next line
+    checkmate::assertInt(experiment, lower = 1, upper = length(x@paramSets[[paramSet]]$experiments), add = ac)
     checkmate::assert(checkmate::checkList(paramsToPlot, types = "character", any.missing = FALSE, min.len = 1, null.ok = TRUE),
                       checkmate::checkCharacter(paramsToPlot, min.chars = 1, len = 2),
                       checkmate::checkNull(paramsToPlot),
@@ -356,7 +366,10 @@ setMethod("plot", "optimizationResult", function(x, index, paramsToPlot = NULL, 
                       .var.name = "contours")
     checkmate::reportAssertions(ac)
 
-    ex <- x@experiments[[index]]
+    ex <- x@paramSets[[paramSet]]$experiments[[experiment]]
+
+    if (length(ex$params$to_optimize) < 2)
+        stop("Need at least two optimized parameters for plotting.")
 
     if (is.null(paramsToPlot))
     {

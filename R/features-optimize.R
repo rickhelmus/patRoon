@@ -100,7 +100,7 @@ featuresOptimizer$methods(
     getResponseScores = function(response) response$PPS,
     getFinalScore = function(oldr, newr) newr$PPS,
 
-    calculateResponse = function(params, task, final = FALSE)
+    calculateResponse = function(params, task, keepObject)
     {
         # UNDONE: do we want to keep caching this?
 
@@ -108,8 +108,8 @@ featuresOptimizer$methods(
         feat <- do.call(findFeatures, c(list(anaInfo, algorithm, verbose = FALSE), params))
         ret <- calcPPS(feat)
 
-        if (final) # store optimized features object
-            ret$object <- feat
+        if (keepObject)
+            ret <- list(response = ret, object <- feat)
 
         return(ret)
     },
@@ -117,11 +117,11 @@ featuresOptimizer$methods(
     resultIncreased = function(history)
     {
         index <- length(history)
-        if (history[[index]]$finalResponse$PPS == 0 & index == 1)
+        if (history[[index]]$finalResult$response$PPS == 0 & index == 1)
             stop("No isotopes have been detected!")
         if (index < 2)
             return(TRUE)
-        if (history[[index-1]]$finalResponse$PPS >= history[[index]]$finalResponse$PPS)
+        if (history[[index-1]]$finalResult$response$PPS >= history[[index]]$finalResult$response$PPS)
             return(FALSE)
         return(TRUE)
     }

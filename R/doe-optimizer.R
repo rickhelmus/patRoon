@@ -15,7 +15,7 @@ DoEOptimizer$methods(
 
     # "virtual" methods
     resultIncreased = function(history) stop("VIRTUAL"),
-    calculateResponse = function(params, task, final = FALSE) stop("VIRTUAL"),
+    calculateResponse = function(params, task, keepObject) stop("VIRTUAL"),
     getResponseScores = function(response) stop("VIRTUAL"),
     getFinalScore = function(response) stop("VIRTUAL"),
 
@@ -78,7 +78,7 @@ DoEOptimizer$methods(
 
             runParams <- as.list(designParams[task, ])
             runParams <- runParams[!names(runParams) %in% c("run.order", "std.order", "Block")]
-            result <- calculateResponse(runParams, task)
+            result <- calculateResponse(runParams, task, FALSE)
             result$experiment <- task
 
             setTxtProgressBar(prog, task)
@@ -113,8 +113,9 @@ DoEOptimizer$methods(
         if (!is.list(runParams))
             runParams <- as.list(runParams)
 
-        result$finalResponse <- calculateResponse(runParams, 1, final = TRUE)
-        result$finalResponse$score <- getFinalScore(result$response[, -"score"], result$finalResponse)
+        result$finalResult <- calculateResponse(runParams, 1, TRUE)
+        result$finalResult$parameters <- runParams
+        result$finalResult$score <- getFinalScore(result$response[, -"score"], result$finalResult$response)
 
         # UNDONE: what about the "..." params in IPO?
 
@@ -122,10 +123,10 @@ DoEOptimizer$methods(
         # doesn't actually give an optimum (see: https://github.com/rietho/IPO/issues/61).
         # In this case we simply take the best results from the experiments
         maxExpResp <- result$response[which.max(score)]
-        if ((maxExpResp$score * (1 - maxModelDeviation)) > result$finalResponse$score)
+        if ((maxExpResp$score * (1 - maxModelDeviation)) > result$finalResult$score)
         {
             printf("Modelled parameter optimum yields significantly lower experimental score: %.1f/%.1f\n",
-                   result$finalResponse$score, result$max_settings[1])
+                   result$finalResult$score, result$max_settings[1])
             printf("Taking data from best experimental value (%.1f) instead...\n", maxExpResp$score)
 
             # runParams <- as.list(rsm::decode.data(result$design)[maxExpResp$experiment, names(params$to_optimize)])
@@ -143,13 +144,14 @@ DoEOptimizer$methods(
             runParams <- utilsIPO$decodeAll(vals, params$to_optimize)
 
             # re-run as object wasn't stored
-            result$finalResponse <- calculateResponse(combineParams(runParams, params$no_optimization), 1, final = TRUE)
-            result$finalResponse$score <- getFinalScore(result$response[, -"score"], result$finalResponse)
+            result$finalResult <- calculateResponse(combineParams(runParams, params$no_optimization), 1, TRUE)
+            result$finalResult$parameters <- runParams
+            result$finalResult$score <- getFinalScore(result$response[, -"score"], result$finalResult$response)
 
             # update max_settings from experimental results
             result$max_settings <- sapply(seq_along(params$to_optimize),
                                           function(i) utilsIPO$encode(runParams[[i]], params$to_optimize[[i]]))
-            result$max_settings <- c(result$finalResponse$score, result$max_settings)
+            result$max_settings <- c(result$finalResult$score, result$max_settings)
             names(result$max_settings) <- c("response", paste0("x", seq_len(length(result$max_settings) - 1)))
             result$max_settings <- t(result$max_settings) # convert to usual data format...
         }
@@ -159,7 +161,7 @@ DoEOptimizer$methods(
         printf("---\n")
 
         cat("Best params: "); printf("%s: %s; ", names(runParams), runParams); cat("\n")
-        br <- result$finalResponse[names(result$finalResponse) != "object"]
+        br <- result$finalResult$response
         cat("Best results: "); printf("%s: %s; ", names(br), br); cat("\n")
         printf("---\n")
 
@@ -286,9 +288,9 @@ DoEOptimizer$methods(
             bestResults <- list()
             bestResults$parameters <- finalParams
 
-            bestResults$object <- history[[maxIndex]]$finalResponse$object
+            bestResults$object <- history[[maxIndex]]$finalResult$object
             bestResults$experiment <- maxIndex
-            bestResults$score <- history[[maxIndex]]$finalResponse$score
+            bestResults$score <- history[[maxIndex]]$finalResult$score
 
             return(list(startParams = startParams, bestResults = bestResults, experiments = history))
         })
@@ -313,8 +315,13 @@ setMethod("algorithm", "optimizationResult", function(obj) obj@algorithm)
 
 #' @describeIn optimizationResult Obtain total number of experimental design iteratations performed.
 #' @export
-setMethod("length", "optimizationResult", function(x) sum(sapply(x@paramSets, function(ps) length(ps$experiments))))
+setMethod("length", "optimizationResult", function(x) sum(lengths(x)))
 
+#' @describeIn optimizationResult Obtain number of experimental design iteratations performed for each parameter set.
+#' @param use.names Ignored.
+#' @export
+setMethod("lengths", "optimizationResult", function(x, use.names = FALSE) sapply(x@paramSets, function(ps) length(ps$experiments),
+                                                                                 USE.NAMES = use.names))
 #' @describeIn optimizationResult Shows summary information for this object.
 #' @export
 setMethod("show", "optimizationResult", function(object)
@@ -333,8 +340,7 @@ setMethod("show", "optimizationResult", function(object)
         printf("    Optimized params:\n"); printf("    - %s: %s\n", names(ps$bestResults$parameters), ps$bestResults$parameters)
 
         bexp <- ps$experiments[[ps$bestResults$experiment]]
-        br <- bexp$finalResponse
-        br <- br[!names(br) %in% c("ExpId", "object")]
+        br <- bexp$finalResult$response
         printf("    Best results: "); cat(paste(names(br), br, sep = ": ", collapse = "; ")); cat("\n")
 
     }
@@ -423,3 +429,60 @@ setMethod("plot", "optimizationResult", function(x, paramSet, experiment, params
            persp = persp(ex$model, forms, contours = contours, at = maxSlice, ...))
 })
 
+#' @export
+setMethod("optimizedParameters", "optimizationResult", function(object, paramSet, experiment)
+{
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertInt(paramSet, lower = 1, upper = length(object@paramSets),
+                         null.ok = is.null(experiment), add = ac)
+    checkmate::assertCount(experiment, positive = TRUE, null.ok = TRUE, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    if (is.null(paramSet))
+        paramSet <- object@bestParamSet
+    
+    if (!is.null(experiment))
+        return(object@paramSets[[paramSet]]$experiments[[experiment]]$finalResult$parameters)
+    
+    return(object@paramSets[[paramSet]]$bestResults$parameters)
+})
+
+#' @export
+setMethod("optimizedObject", "optimizationResult", function(object, paramSet)
+{
+    checkmate::assertInt(paramSet, lower = 1, upper = length(object@paramSets), null.ok = TRUE)
+    
+    if (is.null(paramSet))
+        paramSet <- object@bestParamSet
+    
+    return(object@paramSets[[paramSet]]$bestResults$object)
+})
+
+#' @export
+setMethod("scores", "optimizationResult", function(object, paramSet, experiment)
+{
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertInt(paramSet, lower = 1, upper = length(object@paramSets),
+                         null.ok = is.null(experiment), add = ac)
+    checkmate::assertCount(experiment, positive = TRUE, null.ok = TRUE, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    if (is.null(paramSet))
+        paramSet <- object@bestParamSet
+    
+    if (is.null(experiment))
+        experiment <- object@paramSets[[paramSet]]$bestResults$experiment
+    
+    return(object@paramSets[[paramSet]]$experiments[[experiment]]$finalResult$response)
+})
+
+#' @export
+setMethod("experimentInfo", "optimizationResult", function(object, paramSet, experiment)
+{
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertInt(paramSet, lower = 1, upper = length(object@paramSets)) # don't add, this should fail before the next line
+    checkmate::assertInt(experiment, lower = 1, upper = length(object@paramSets[[paramSet]]$experiments), add = ac)
+    checkmate::reportAssertions(ac)
+    
+    return(object@paramSets[[paramSet]]$experiments[[experiment]])
+})

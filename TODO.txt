@@ -25,11 +25,11 @@ Release:
 - integrate OpenMS feature scoring and isotopes and PPS in general (also include filters?)
 - update tutorial on website
 - feature optim:
-    - convert results to class --> need some more methods, check after group optim
     - docs
     - qualitative optim?
     - tests (e.g. check equality with IPO)
     - keep retcor_done?
     - proper credits/refs
+    - get rid of getXCMSSet() calls?
 - progressbar and parallel enviPick
 

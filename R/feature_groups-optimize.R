@@ -13,7 +13,7 @@ featureGroupsOptimizer$methods(
     # dummy methods to be potentially overrided
     convertOptToCallParams = function(params) params,
 
-    calculateResponse = function(params, task, final = FALSE)
+    calculateResponse = function(params, task, keepObject)
     {
         # UNDONE: do we want to keep caching this?
 
@@ -26,8 +26,8 @@ featureGroupsOptimizer$methods(
 
         ret <- utilsIPO$getRGTVValues(getXCMSSet(fg, TRUE, verbose = FALSE), task, retCorFailed)
 
-        if (final)
-            ret$object <- fg
+        if (keepObject)
+            ret <- list(response = ret, object <- fg)
 
         return(ret)
     },
@@ -62,8 +62,8 @@ featureGroupsOptimizer$methods(
         if (index < 2)
             return(TRUE)
 
-        prevFR <- history[[index-1]]$finalResponse
-        curFR <- history[[index]]$finalResponse
+        prevFR <- history[[index-1]]$finalResult$response
+        curFR <- history[[index]]$finalResult$response
 
         if (curFR$bad_groups == 0)
         {

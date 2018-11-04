@@ -20,7 +20,7 @@ featuresBruker <- setClass("featuresBruker", contains = "features")
 #'   compounds. Valid options are: \code{TRUE} (always), \code{FALSE} (never)
 #'   and \code{"auto"} (automatically if no compounds present).
 #' @param startRange,endRange Start/End retention range (seconds) from which to
-#'   collect features. A 0 (zero) for code{endRange} marks the end of the
+#'   collect features. A 0 (zero) for \code{endRange} marks the end of the
 #'   analysis.
 #' @rdname feature-finding
 #' @export

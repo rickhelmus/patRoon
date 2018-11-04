@@ -146,6 +146,7 @@ Collate:
     'project-tool.R'
     'report.R'
     'utils-checkmate.R'
+    'utils-optimize.R'
     'utils-xcms.R'
     'utils.R'
     'zzz.R'

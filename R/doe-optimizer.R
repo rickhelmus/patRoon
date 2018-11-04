@@ -329,8 +329,8 @@ setMethod("show", "optimizationResult", function(object)
                if (pi == object@bestParamSet) " (BEST)" else "")
 
         printf("    Experimental designs performed: %d\n", length(ps$experiments))
-        printf("    Starting params:\n"); printf("\t- %s: %s\n", names(ps$startParams), ps$startParams)
-        printf("    Optimized params:\n"); printf("\t- %s: %s\n", names(ps$bestResults$parameters), ps$bestResults$parameters)
+        printf("    Starting params:\n"); printf("    - %s: %s\n", names(ps$startParams), ps$startParams)
+        printf("    Optimized params:\n"); printf("    - %s: %s\n", names(ps$bestResults$parameters), ps$bestResults$parameters)
 
         bexp <- ps$experiments[[ps$bestResults$experiment]]
         br <- bexp$finalResponse

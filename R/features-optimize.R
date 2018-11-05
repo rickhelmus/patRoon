@@ -5,7 +5,8 @@
 NULL
 
 featuresOptimizer <- setRefClass("featuresOptimizer", contains = c("DoEOptimizer", "VIRTUAL"),
-                                 fields = list(anaInfo = "data.frame", isoIdent = "character"))
+                                 fields = list(anaInfo = "data.frame", isoIdent = "character",
+                                               checkPeakShape = "character", CAMERAOpts = "list"))
 
 featuresOptimizer$methods(
 
@@ -13,7 +14,7 @@ featuresOptimizer$methods(
     convertOptToCallParams = function(params) params,
 
     # Adapted from IPO: add OpenMS isotope detection
-    calcPPS = function(feat, ...) # UNDONE: handle ...
+    calcPPS = function(feat)
     {
         fTable <- featureTable(feat)
 
@@ -29,9 +30,9 @@ featuresOptimizer$methods(
             peak_source <- utilsIPO$peaks_IPO(xset)[, c("mz", "rt", "sample", "into", "mzmin",
                                                         "mzmax", "rtmin", "rtmax"), drop = FALSE]
             if(isoIdent == "IPO")
-                iso_mat <- utilsIPO$findIsotopes.IPO(xset, ...)
+                iso_mat <- utilsIPO$findIsotopes.IPO(xset, checkPeakShape)
             else
-                iso_mat <- utilsIPO$findIsotopes.CAMERA(xset, ...)
+                iso_mat <- do.call(utilsIPO$findIsotopes.CAMERA, c(list(xset), CAMERAOpts))
         }
 
         isotope_abundance = 0.01108
@@ -131,7 +132,8 @@ featuresOptimizer$methods(
 optimizeFeatureFinding <- function(anaInfo, algorithm, ..., templateParams = list(),
                                    paramRanges = list(),
                                    isoIdent = if (algorithm == "openms") "OpenMS" else "IPO",
-                                   maxIterations = 50, maxModelDeviation = 0.1)
+                                   checkPeakShape = c("none", "borderIntensity", "sinusCurve", "normalDistr"),
+                                   CAMERAOpts = list(), maxIterations = 50, maxModelDeviation = 0.1)
 {
     params <- list(...)
 
@@ -150,7 +152,8 @@ optimizeFeatureFinding <- function(anaInfo, algorithm, ..., templateParams = lis
                  xcms = featuresOptimizerXCMS,
                  envipick = featuresOptimizerEnviPick)
 
-    fo <- fo$new(anaInfo = anaInfo, algorithm = algorithm, isoIdent = isoIdent)
+    fo <- fo$new(anaInfo = anaInfo, algorithm = algorithm, isoIdent = isoIdent,
+                 checkPeakShape = checkPeakShape, CAMERAOpts = CAMERAOpts)
     result <- fo$optimize(params, templateParams, paramRanges, maxIterations, maxModelDeviation)
 
     return(optimizationResult(algorithm = algorithm, paramSets = result$paramSets,

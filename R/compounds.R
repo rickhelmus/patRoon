@@ -349,13 +349,7 @@ setMethod("plotStructure", "compounds", function(obj, index, groupName, width = 
     if (length(index) > 1 || index == -1)
         mol <- getMCS(obj, index, groupName)
     else
-    {
-        mol <- rcdk::parse.smiles(compTable$SMILES[index])
-        if (is.null(mol) || is.na(mol) || is.null(mol)[[1]])
-            mol <- rcdk::parse.smiles("")[[1]]
-        else
-            mol <- mol[[1]]
-    }
+        mol <- getMoleculesFromSMILES(compTable$SMILES[index], emptyIfFails = TRUE)[[1]]
     
     if (useGGPlot2)
     {
@@ -539,7 +533,7 @@ setMethod("plotSpec", "compounds", function(obj, index, groupName, MSPeakLists, 
     }
 
     if (plotStruct)
-        mol <- rcdk::parse.smiles(compr$SMILES)
+        mol <- getMoleculesFromSMILES(compr$SMILES)
     
     if (!useGGPlot2)
     {
@@ -557,9 +551,12 @@ setMethod("plotSpec", "compounds", function(obj, index, groupName, MSPeakLists, 
         if (plotStruct && isValidMol(mol))
         {
             raster <- rcdk::view.image.2d(mol[[1]], rcdk::get.depictor(100, 100))
-            img <- magick::image_trim(magick::image_read(raster))
-            img <- magick::image_transparent(img, "white")
-
+            if (!isEmptyMol(mol[[1]]))
+            {
+                img <- magick::image_trim(magick::image_read(raster))
+                img <- magick::image_transparent(img, "white")
+            }
+            
             dpi <- (par("cra")/par("cin"))[1]
             
             startx <- par("usr")[1]

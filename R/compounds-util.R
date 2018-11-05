@@ -440,8 +440,8 @@ setMethod("compoundViewer", c("featureGroups", "MSPeakLists", "compounds"), func
                     ret$structure[i] <- paste0("struct/", basename(f)) # server location
                     png(f, 100, 100)
                     par(mai = rep(0, 4))
-                    mol <- rcdk::parse.smiles(ret$SMILES[i])
-                    if (!is.na(mol)) # this may fail
+                    mol <- getMoleculesFromSMILES(ret$SMILES[i])
+                    if (isValidMol(mol[[1]])) # this may fail
                         rcdkplot(mol[[1]], width = 100, height = 100)
                     dev.off()
                 }
@@ -570,8 +570,8 @@ setMethod("compoundViewer", c("featureGroups", "MSPeakLists", "compounds"), func
         })
 
         output$structure <- renderPlot({
-            mol <- rcdk::parse.smiles(compTable[[rValues$currentFGroup]]$SMILES[rValues$currentResult])
-            if (!is.na(mol))
+            mol <- getMoleculesFromSMILES(compTable[[rValues$currentFGroup]]$SMILES[rValues$currentResult])
+            if (isValidMol(mol[[1]]))
                 rcdkplot(mol[[1]], width = 200, height = 200)
         })
 

@@ -17,7 +17,6 @@ Release:
 - mass defect components
 - fix compoundViewer
 - check why generics sometimes are not found
-- better SMILES to mol error handling + check kekulize=FALSE for fails
 - remove R xml code for OpenMS features/feature groups
 - remove R intensity loading code for OpenMS features
 - remove XCMS EIC loading (and update checkChromatograms())

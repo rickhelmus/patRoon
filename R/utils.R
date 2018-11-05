@@ -280,8 +280,11 @@ rcdkplot <- function(molecule, width = 500, height = 500)
     # grid::grid.newpage()
     # grid::grid.raster(temp)
 
+    img <- magick::image_read(temp)
     # trim image before plotting it
-    plot(magick::image_transparent(magick::image_trim(magick::image_read(temp)), "white"))
+    if (!isEmptyMol(molecule))
+        img <- magick::image_transparent(magick::image_trim(img), "white")
+    plot(img)
 }
 
 unFactorDF <- function(df)
@@ -654,18 +657,26 @@ plotDendroWithClusters <- function(dendro, ct, pal, colourBranches, showLegend, 
 
 isValidMol <- function(mol) !is.null(mol) # && !is.na(mol)
 emptyMol <- function() rcdk::parse.smiles("")[[1]]
+isEmptyMol <- function(mol) rcdk::get.atom.count(mol) == 0
 
-getMoleculesFromSMILES <- function(SMILES)
+getMoleculesFromSMILES <- function(SMILES, doTyping = FALSE, emptyIfFails = FALSE)
 {
-    mols <- rcdk::parse.smiles(SMILES)
-    
-    for (i in seq_along(mols))
+    # vectorization doesn't work if any of the SMILES are not OK
+    # mols <- rcdk::parse.smiles(SMILES)
+    mols <- lapply(SMILES, function(sm)
     {
-        if (!isValidMol(mols[[i]]))
-            next
-        rcdk::do.typing(mols[[i]])
-        rcdk::do.aromaticity(mols[[i]])
-    }
+        ret <- rcdk::parse.smiles(sm)[[1]]
+        if (!isValidMol(ret))
+            ret <- rcdk::parse.smiles(sm, kekulise = FALSE)[[1]] # might work w/out kekulization
+        if (emptyIfFails && !isValidMol(ret))
+            ret <- emptyMol()
+        else if (doTyping && isValidMol(ret))
+        {
+            rcdk::do.typing(ret)
+            rcdk::do.aromaticity(ret)
+        }
+        return(ret)
+    })
     
     return(mols)
 }

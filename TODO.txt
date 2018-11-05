@@ -31,5 +31,6 @@ Release:
     - keep retcor_done?
     - proper credits/refs
     - get rid of getXCMSSet() calls?
+    - CAMERA params etc
 - progressbar and parallel enviPick
 

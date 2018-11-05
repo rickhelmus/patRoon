@@ -44,7 +44,7 @@ findIsotopes.IPO = function(xset, checkPeakShape=c("none", "borderIntensity", "s
             speaks <- peak_source[peak_source[,"sample"]==sample,,drop=FALSE]
             split <- 250
             if(!(checkPeakShape=="none"))
-                rawdata <- loadRaw(xcmsSource(filepaths(xset)[sample]))
+                rawdata <- xcms::loadRaw(xcms::xcmsSource(filepaths(xset)[sample]))
             
             if(nrow(speaks)>1) {  		      
                 #speaks <- speaks[,-c("sample")]
@@ -278,8 +278,11 @@ findIsotopes.CAMERA = function(xset, ...) {
         xsets <- split(xset, unique(peaks_IPO(xset)[,"sample"]))
         samples <- unique(peaks_IPO(xset)[,"sample"])
         for(sample in samples) {
-            an <- xsAnnotate(xset, sample=sample)
-            isos <- findIsotopes(an, ...)@isoID[,c("mpeak", "isopeak"), drop=FALSE]
+            # CHANGED: throws error "First argument must be a xcmsSet with group information or contain only one sample."
+            #an <- CAMERA::xsAnnotate(xset, sample=sample)
+            an <- CAMERA::xsAnnotate(xset[, sample])
+            # CHANGED: suppress output
+            invisible(capture.output(isos <- CAMERA::findIsotopes(an, ...)@isoID[,c("mpeak", "isopeak"), drop=FALSE]))
             #start_id <- ids[ids[,2]==sample,,drop=FALSE][1,1] - 1
             iso_mat <- rbind(iso_mat, matrix(ids[ids[,2]==sample,1][isos], ncol=2))
         }

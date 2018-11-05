@@ -122,10 +122,10 @@ setGeneric("screenTargets", function(obj, targets, rtWindow = 12, mzWindow = 0.0
 
 ### Optimization
 
-setGeneric("optimizedParameters", function(object, paramSet = NULL, experiment = NULL) standardGeneric("optimizedParameters"))
+setGeneric("optimizedParameters", function(object, paramSet = NULL, DoEIteration = NULL) standardGeneric("optimizedParameters"))
 setGeneric("optimizedObject", function(object, paramSet = NULL) standardGeneric("optimizedObject"))
-setGeneric("scores", function(object, paramSet = NULL, experiment = NULL) standardGeneric("scores"))
-setGeneric("experimentInfo", function(object, paramSet, experiment) standardGeneric("experimentInfo"))
+setGeneric("scores", function(object, paramSet = NULL, DoEIteration = NULL) standardGeneric("scores"))
+setGeneric("experimentInfo", function(object, paramSet, DoEIteration) standardGeneric("experimentInfo"))
 
 
 ### Misc.

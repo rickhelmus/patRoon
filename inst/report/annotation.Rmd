@@ -269,9 +269,9 @@ compoundsDT <- rbindlist(lapply(compFGroups, function(grp)
     
     return(data.table(group = grpi,
                       "#" = seq_len(nrow(ct)),
-                      compound = sprintf("<img src=%s></img><br>%s", stpaths, infoTexts),
-                      spectrum = sprintf("<img src=%s></img>", sppaths),
-                      scores = sprintf("<img src=%s></img>", scpaths)))
+                      compound = sprintf("<img src=file://%s></img><br>%s", stpaths, infoTexts),
+                      spectrum = sprintf("<img src=file://%s></img>", sppaths),
+                      scores = sprintf("<img src=file://%s></img>", scpaths)))
 }))
 
 DT::datatable(compoundsDT, options = list(scrollX = TRUE, scrollY = "600px", deferRender = TRUE,
@@ -303,7 +303,7 @@ formulasDT <- rbindlist(lapply(formFGroups, function(grp)
                                                               collapse = "<br>"))
         
     ret <- data.table(group = grpi,
-                      spectrum = sprintf("<img src=%s></img>", sppaths),
+                      spectrum = sprintf("<img src=file://%s></img>", sppaths),
                       info = infoTexts)
 
     return(ret)

@@ -82,10 +82,11 @@ selectMethod("plot", class(rmdVars$fGroups))(rmdVars$fGroups)
 
 
 ```{r}
-rGroupLen <- length(unique(analysisInfo(removeEmptyAnalyses(rmdVars$fGroups))$group))
-doPlotChord <- length(rmdVars$fGroups) > 0 && "chord" %in% rmdVars$reportPlots && rGroupLen > 1
-doPlotVenn <- length(rmdVars$fGroups) > 0 && "venn" %in% rmdVars$reportPlots && rGroupLen > 1 && rGroupLen < 6
-doPlotUpSet <- length(rmdVars$fGroups) > 0 && "upset" %in% rmdVars$reportPlots && rGroupLen > 1
+rGroupLenNonEmpty <- length(unique(analysisInfo(removeEmptyAnalyses(rmdVars$fGroups))$group))
+rGroupLen <- length(replicateGroups(rmdVars$fGroups))
+doPlotChord <- length(rmdVars$fGroups) > 0 && "chord" %in% rmdVars$reportPlots && rGroupLenNonEmpty > 1
+doPlotVenn <- length(rmdVars$fGroups) > 0 && "venn" %in% rmdVars$reportPlots && rGroupLenNonEmpty > 1 && rGroupLen < 6
+doPlotUpSet <- length(rmdVars$fGroups) > 0 && "upset" %in% rmdVars$reportPlots && rGroupLenNonEmpty > 1
 doEICs <- length(rmdVars$fGroups) > 0 && "eics" %in% rmdVars$reportPlots
 ```
 

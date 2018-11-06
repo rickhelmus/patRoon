@@ -210,7 +210,8 @@ setMethod("getMCS", "compoundsCluster", function(obj, groupName, cluster)
     checkmate::assertInt(cluster, lower = 0, upper = nclust)
     checkmate::reportAssertions(ac)
 
-    mols <- getMoleculesFromSMILES(obj@SMILES[[groupName]][cc == cluster], doTyping = TRUE)
+    mols <- getMoleculesFromSMILES(obj@SMILES[[groupName]][cc == cluster], doTyping = TRUE,
+                                   emptyIfFails = TRUE)
     mcons <- mols[[1]]
     if (length(mols) > 1)
     {
@@ -306,7 +307,8 @@ setMethod("makeHCluster", "compounds", function(obj, method, fpType = "extended"
                                                   fpSimMethod = fpSimMethod)))
     }
 
-    mols <- sapply(compTable, function(ct) getMoleculesFromSMILES(ct$SMILES, doTyping = TRUE),
+    mols <- sapply(compTable, function(ct) getMoleculesFromSMILES(ct$SMILES,
+                                                                  doTyping = TRUE, emptyIfFails = TRUE),
                    simplify = FALSE) 
     
     cat("Performing clustering ...\n")

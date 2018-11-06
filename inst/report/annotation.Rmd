@@ -10,6 +10,9 @@ Annotation {data-orientation=rows}
 ```{r echo=FALSE}
 showButton <- function(title, jsFunc, arg1, arg2) sprintf("<button onclick=\"%s('%s', '%s');\" style=\"padding: 0px 3px 0px 3px\">%s</button>", jsFunc, arg1, arg2, title)
 
+# for compound/formula tables
+imgSrcText <- if (rmdVars$selfContained) "src=" else "src=file://"
+
 compFGroups <- compsClustFGroups <- formFGroups <- componentFGroups <- mfWebFGroups <- character()
 if (!is.null(rmdVars$compounds))
 {
@@ -269,9 +272,9 @@ compoundsDT <- rbindlist(lapply(compFGroups, function(grp)
     
     return(data.table(group = grpi,
                       "#" = seq_len(nrow(ct)),
-                      compound = sprintf("<img src=file://%s></img><br>%s", stpaths, infoTexts),
-                      spectrum = sprintf("<img src=file://%s></img>", sppaths),
-                      scores = sprintf("<img src=file://%s></img>", scpaths)))
+                      compound = sprintf("<img %s%s></img><br>%s", imgSrcText, stpaths, infoTexts),
+                      spectrum = sprintf("<img %s%s></img>", imgSrcText, sppaths),
+                      scores = sprintf("<img %s%s></img>", imgSrcText, scpaths)))
 }))
 
 DT::datatable(compoundsDT, options = list(scrollX = TRUE, scrollY = "600px", deferRender = TRUE,
@@ -303,7 +306,7 @@ formulasDT <- rbindlist(lapply(formFGroups, function(grp)
                                                               collapse = "<br>"))
         
     ret <- data.table(group = grpi,
-                      spectrum = sprintf("<img src=file://%s></img>", sppaths),
+                      spectrum = sprintf("<img %s%s></img>", imgSrcText, sppaths),
                       info = infoTexts)
 
     return(ret)

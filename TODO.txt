@@ -22,3 +22,8 @@ Release:
 - remove R intensity loading code for OpenMS features
 - remove XCMS EIC loading (and update checkChromatograms())
 - add more options to reportPlots argument of reportMD()?
+- integrate OpenMS feature scoring and isotopes
+- importFeatures() function (analog to importFeatureGroups)
+- getXcmsSet --> export
+- generateCompounds: take averaged mass spectrum (as an option)
+- support fastcluster for compounds clustering/int component clusters?

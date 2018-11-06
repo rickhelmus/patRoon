@@ -134,7 +134,7 @@ and reduce the data size and thus complexity.
    which is used to generate components from known adducts, isotopes and
   in-source fragments. The specified \code{featureGroups} object is
   automatically converted to an \code{\link{xcmsSet}} object using
-  \code{\link{getXcmsSet}}.
+  \code{\link{getXCMSSet}}.
 
 \code{generateComponentsIntClust} generates components based on
   intensity profiles of feature groups. Hierarchical clustering is performed

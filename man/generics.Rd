@@ -4,8 +4,6 @@
 \alias{generics}
 \alias{analysisInfo}
 \alias{analyses}
-\alias{replicateGroups}
-\alias{groupNames}
 \alias{algorithm}
 \alias{clusterProperties}
 \alias{clusters}
@@ -14,7 +12,9 @@
 \alias{featureTable}
 \alias{filter}
 \alias{formulaTable}
+\alias{getFeatures}
 \alias{getMCS}
+\alias{groupNames}
 \alias{plotChord}
 \alias{plotEIC}
 \alias{plotInt}
@@ -22,6 +22,7 @@
 \alias{plotStructure}
 \alias{plotVenn}
 \alias{plotUpSet}
+\alias{replicateGroups}
 \alias{treeCut}
 \alias{treeCutDynamic}
 \title{Miscellaneous generics}
@@ -29,10 +30,6 @@
 analysisInfo(obj)
 
 analyses(obj)
-
-replicateGroups(obj)
-
-groupNames(obj)
 
 algorithm(obj)
 
@@ -50,7 +47,11 @@ filter(obj, ...)
 
 formulaTable(obj)
 
+getFeatures(obj)
+
 getMCS(obj, ...)
+
+groupNames(obj)
 
 plotChord(obj, addSelfLinks = FALSE, addRetMzPlots = TRUE, ...)
 
@@ -65,6 +66,8 @@ plotStructure(obj, ...)
 plotVenn(obj, which = NULL, ...)
 
 plotUpSet(obj, ...)
+
+replicateGroups(obj)
 
 treeCut(obj, k = NULL, h = NULL, ...)
 
@@ -121,28 +124,6 @@ please refer to the linked method documentation for each generic.
     \item Methods are defined for: \code{\link[=analyses,MSPeakLists-method]{MSPeakLists}}, \code{\link[=analyses,featureGroups-method]{featureGroups}}, \code{\link[=analyses,features-method]{features}}, \code{\link[=analyses,formulas-method]{formulas}}.
 }
 
-\code{replicateGroups} returns a \code{character} vector with the analyses for which data is present in this object.
-
-
-
-
-
-
-\itemize{
-    \item Methods are defined for: \code{\link[=replicateGroups,featureGroups-method]{featureGroups}}, \code{\link[=replicateGroups,features-method]{features}}.
-}
-
-\code{groupNames} returns a \code{character} vector with the names of the feature groups for which data is present in this object.
-
-
-
-
-
-
-\itemize{
-    \item Methods are defined for: \code{\link[=groupNames,MSPeakLists-method]{MSPeakLists}}, \code{\link[=groupNames,components-method]{components}}, \code{\link[=groupNames,compounds-method]{compounds}}, \code{\link[=groupNames,compoundsCluster-method]{compoundsCluster}}, \code{\link[=groupNames,featureGroups-method]{featureGroups}}, \code{\link[=groupNames,formulaConsensus-method]{formulaConsensus}}, \code{\link[=groupNames,formulas-method]{formulas}}.
-}
-
 \code{algorithm} returns the algorithm that was used to generate an object.
 
 
@@ -151,7 +132,7 @@ please refer to the linked method documentation for each generic.
 
 
 \itemize{
-    \item Methods are defined for: \code{\link[=algorithm,MSPeakLists-method]{MSPeakLists}}, \code{\link[=algorithm,components-method]{components}}, \code{\link[=algorithm,compounds-method]{compounds}}, \code{\link[=algorithm,formulaConsensus-method]{formulaConsensus}}, \code{\link[=algorithm,formulas-method]{formulas}}.
+    \item Methods are defined for: \code{\link[=algorithm,MSPeakLists-method]{MSPeakLists}}, \code{\link[=algorithm,components-method]{components}}, \code{\link[=algorithm,compounds-method]{compounds}}, \code{\link[=algorithm,formulaConsensus-method]{formulaConsensus}}, \code{\link[=algorithm,formulas-method]{formulas}}, \code{\link[=algorithm,optimizationResult-method]{optimizationResult}}.
 }
 
 \code{clusterProperties} Obtain a list with properties of the generated cluster(s).
@@ -231,6 +212,17 @@ please refer to the linked method documentation for each generic.
     \item Methods are defined for: \code{\link[=formulaTable,formulaConsensus-method]{formulaConsensus}}, \code{\link[=formulaTable,formulas-method]{formulas}}.
 }
 
+\code{getFeatures} returns the object's \code{\link{features}} object.
+
+
+
+
+
+
+\itemize{
+    \item Methods are defined for: \code{\link[=getFeatures,featureGroups-method]{featureGroups}}.
+}
+
 \code{getMCS} Calculcates the maximum common substructure.
 
 
@@ -240,6 +232,17 @@ please refer to the linked method documentation for each generic.
 
 \itemize{
     \item Methods are defined for: \code{\link[=getMCS,compounds-method]{compounds}}, \code{\link[=getMCS,compoundsCluster-method]{compoundsCluster}}.
+}
+
+\code{groupNames} returns a \code{character} vector with the names of the feature groups for which data is present in this object.
+
+
+
+
+
+
+\itemize{
+    \item Methods are defined for: \code{\link[=groupNames,MSPeakLists-method]{MSPeakLists}}, \code{\link[=groupNames,components-method]{components}}, \code{\link[=groupNames,compounds-method]{compounds}}, \code{\link[=groupNames,compoundsCluster-method]{compoundsCluster}}, \code{\link[=groupNames,featureGroups-method]{featureGroups}}, \code{\link[=groupNames,formulaConsensus-method]{formulaConsensus}}, \code{\link[=groupNames,formulas-method]{formulas}}.
 }
 
 \code{plotChord} plots a Chord diagram to assess overlapping data.
@@ -317,6 +320,17 @@ please refer to the linked method documentation for each generic.
 
 \itemize{
     \item Methods are defined for: \code{\link[=plotUpSet,featureGroups-method]{featureGroups}}, \code{\link[=plotUpSet,featureGroupsComparison-method]{featureGroupsComparison}}.
+}
+
+\code{replicateGroups} returns a \code{character} vector with the analyses for which data is present in this object.
+
+
+
+
+
+
+\itemize{
+    \item Methods are defined for: \code{\link[=replicateGroups,featureGroups-method]{featureGroups}}, \code{\link[=replicateGroups,features-method]{features}}.
 }
 
 \code{treeCut} Manually cut a cluster.

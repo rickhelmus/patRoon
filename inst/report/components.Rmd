@@ -107,7 +107,7 @@ infoTables <- sapply(compSeq, function(compi) knitr::kable(cTable[[compi]], "htm
 
 compTable <- data.table(component = names(rmdVars$components),
                         info = infoTables,
-                        EIC = sprintf("<img src=%s></img>", eicpaths))
+                        EIC = imgTags(eicpaths))
                              
 if (isHClust)
 {
@@ -120,9 +120,9 @@ if (isHClust)
         intapaths <- sapply(intapaths, knitr::image_uri)
     }
     
-    compTable[, intensities := sprintf("<img src=%s></img><br><img src=%s></img>", intnpaths, intapaths)]
+    compTable[, intensities := paste0(imgTags(intnpaths), "<br>", imgTags(intapaths))]
 } else
-    compTable[, spectrum := sprintf("<img src=%s></img>", sppaths)]
+    compTable[, spectrum := imgTags(sppaths)]
 
 DT::datatable(compTable, options = list(scrollX = TRUE, scrollY = "800px", deferRender = TRUE,
                                         dom = "lrtip", pageLength = 25, autoWidth = FALSE,

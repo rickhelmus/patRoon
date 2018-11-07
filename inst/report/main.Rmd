@@ -31,6 +31,13 @@ makePlot <- function(out, w, h, expr, bg = "white")
     eval(expr)
     dev.off()
 }
+
+imgTags <- function(img) 
+{
+    if (rmdVars$selfContained)
+        return(sprintf("<img src=%s></img>", img))
+    return(sprintf("<img src=file://%s></img>", img))
+}
 ```
 
 <style>

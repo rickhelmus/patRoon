@@ -47,6 +47,9 @@ executeMultiProcess <- function(commandQueue, finishHandler,
                                                                       exitStatus = exitStatus,
                                                                       retries = runningProcInfo[[pi]]$noResRetries))))
                     {
+                        # Prevents occasional error: "The requested operation cannot be performed on a file with a user-mapped section open"
+                        Sys.sleep(1)
+                        
                         runningProcInfo[[pi]]$noResRetries <- runningProcInfo[[pi]]$noResRetries + 1
                         runningProcs[[pi]] <- do.call(process$new, runningProcInfo[[pi]]$procArgs)
                         finishedRunning <- FALSE
@@ -151,6 +154,9 @@ executeMultiProcess <- function(commandQueue, finishHandler,
                 if (all(sapply(cmdInds, function(ci) timeoutHandler(cmd = commandQueue[[ci]],
                                                                     retries = runningProcInfo[[pi]]$timeOutRetries))))
                 {
+                    # As with restarting failed commands short sleep may prevent errors (this situation was never tested)
+                    Sys.sleep(1)
+                    
                     runningProcInfo[[pi]]$timeOutRetries <- runningProcInfo[[pi]]$timeOutRetries + 1
                     runningProcs[[pi]] <- do.call(process$new, runningProcInfo[[pi]]$procArgs)
                 }

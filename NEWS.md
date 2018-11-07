@@ -1,6 +1,7 @@
 # patRoon 0.1.0.9000
 
 ## November 2018
+* Fixed: Wrong compound clusters plotted in reportMD()
 * Fixed: Added timeout after restarting failed command (e.g. MetFrag CL) to prevent rare error "The requested operation cannot be performed on a file with a user-mapped section open".
 
 

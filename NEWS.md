@@ -1,7 +1,9 @@
 # patRoon 0.1.0.9000
 
 ## November 2018
-* Fixed: Wrong compound clusters plotted in reportMD()
+* replicateGroupSubtract() now removes replicate groups that were subtracted.
+* Fixed: replicateGroupSubtract() now correctly takes maximum mean intensity for threshold determination when multiple rGroups are specified.
+* Fixed: Wrong compound clusters plotted in reportMD().
 * Fixed: Added timeout after restarting failed command (e.g. MetFrag CL) to prevent rare error "The requested operation cannot be performed on a file with a user-mapped section open".
 
 

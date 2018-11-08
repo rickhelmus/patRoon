@@ -332,11 +332,12 @@ setMethod("filter", "featureGroups", function(obj, intensityThreshold = NULL, re
 
 #' @details \code{replicateGroupSubtract} removes feature groups present in a
 #'   given set of replicate groups (unless intensities are above a given
-#'   threshold).
+#'   threshold). The replicate groups that are subtracted will be removed.
 #'
-#' @param threshold Minimal relative threshold for a feature group to be
-#'   \emph{not} removed. When \samp{0} a feature group is always removed when
-#'   present in the given replicate groups.
+#' @param threshold Minimal relative threshold (compared to mean intensity of
+#'   replicate group being subtracted) for a feature group to be \emph{not}
+#'   removed. When \samp{0} a feature group is always removed when present in
+#'   the given replicate groups.
 #'
 #' @rdname feature-filtering
 #' @aliases replicateGroupSubtract
@@ -351,22 +352,29 @@ setMethod("replicateGroupSubtract", "featureGroups", function(fGroups, rGroups, 
     if (length(fGroups) == 0)
         return(fGroups)
     
+    checkIntensities <- threshold > 0
+    gNames <- names(fGroups)
     fGroups@groups <- copy(fGroups@groups)
+    
     filteredGroups <- replicateGroupFilter(fGroups, rGroups, verbose = FALSE)
-    filteredGroupMeans <- sapply(filteredGroups@groups, function(x) return(mean(x[x>0])))
-    sharedGroups <- colnames(fGroups@groups)[colnames(fGroups@groups) %in% colnames(filteredGroups@groups)]
-
+    sharedGroups <- gNames[gNames %in% names(filteredGroups)]
+    
+    if (length(sharedGroups) == 0)
+        return(fGroups)
+    
+    if (checkIntensities)
+    {
+        avgGroups <- averageGroups(filteredGroups)
+        thrs <- sapply(avgGroups, max) * threshold
+    }
+    
     for (b in sharedGroups)
     {
-        if (threshold > 0)
-        {
-            thr <- threshold * filteredGroupMeans[b]
-            set(fGroups@groups, which(fGroups@groups[[b]] < thr), b, 0)
-        }
+        if (checkIntensities)
+            set(fGroups@groups, which(fGroups@groups[[b]] < thrs[b]), b, 0)
         else
             fGroups@groups[, (b) := 0] # no threshold, zero-out everything
-
     }
-
-    return(updateFeatIndex(removeEmptyGroups(fGroups)))
+    
+    return(replicateGroupFilter(updateFeatIndex(removeEmptyGroups(fGroups)), rGroups, negate = TRUE, verbose = FALSE))
 })

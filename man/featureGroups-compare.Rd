@@ -38,7 +38,9 @@ labels are automatically determined. For \code{plot}, \code{plotVenn},
 \code{plotChord}, \code{unique}: further options passed to \code{plot},
 \pkg{\link{VennDiagram}} plotting functions (\emph{e.g.}
 \code{\link{draw.pairwise.venn}}), \code{\link{chordDiagram}} and
-\code{unique} (\code{featureGroups} signature), respectively.}
+\code{unique} (\code{featureGroups} signature), respectively. For
+\code{plotUpSet}: any further arguments passed to the \code{plotUpSet}
+method defined for \code{\link{featureGroups}}.}
 
 \item{groupAlgo}{The \code{\link[=feature-grouping]{feature grouping
 algorithm}} that should be used for grouping \emph{pseudo} features (see

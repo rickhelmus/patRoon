@@ -479,7 +479,7 @@ setMethod("plotChord", "featureGroups", function(obj, addSelfLinks = FALSE, addR
     }
 
     chordTable[, value := as.integer(Vectorize(getLinkScore)(from, to))]
-
+    
     if (addSelfLinks)
     {
         gt <- getGTable()
@@ -503,6 +503,9 @@ setMethod("plotChord", "featureGroups", function(obj, addSelfLinks = FALSE, addR
         circos.par(gap.after = gaps)
     }
 
+    if (all(chordTable$value == 0))
+        stop("Did not found any overlap! Nothing to plot.")
+    
     tracks <- NULL
     if (hasOuter)
         tracks <- list(list(track.height = 0.1, track.margin = c(if (addRetMzPlots) 0.05 else 0.06, 0)))

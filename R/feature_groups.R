@@ -479,7 +479,7 @@ setMethod("plotChord", "featureGroups", function(obj, addSelfLinks = FALSE, addR
     }
 
     chordTable[, value := as.integer(Vectorize(getLinkScore)(from, to))]
-
+    
     if (addSelfLinks)
     {
         gt <- getGTable()
@@ -503,6 +503,9 @@ setMethod("plotChord", "featureGroups", function(obj, addSelfLinks = FALSE, addR
         circos.par(gap.after = gaps)
     }
 
+    if (all(chordTable$value == 0))
+        stop("Did not found any overlap! Nothing to plot.")
+    
     tracks <- NULL
     if (hasOuter)
         tracks <- list(list(track.height = 0.1, track.margin = c(if (addRetMzPlots) 0.05 else 0.06, 0)))
@@ -901,13 +904,14 @@ setMethod("plotVenn", "featureGroups", function(obj, which, ...)
 #'   \code{\link[UpSetR]{upset}} function) outlining unique and shared feature
 #'   groups between given replicate groups.
 #'   
-#' @param nsets See \code{\link[UpSetR]{upset}}.
+#' @param nsets,nintersects See \code{\link[UpSetR]{upset}}.
 #' 
 #' @references \insertRef{Conway2017}{patRoon} \cr\cr
 #'   \insertRef{Lex2014}{patRoon}
 #' 
 #' @export
-setMethod("plotUpSet", "featureGroups", function(obj, which = replicateGroups(obj), nsets = length(which), ...)
+setMethod("plotUpSet", "featureGroups", function(obj, which = replicateGroups(obj), nsets = length(which),
+                                                 nintersects = NA, ...)
 {
     rGroups <- replicateGroups(obj)
 
@@ -922,7 +926,7 @@ setMethod("plotUpSet", "featureGroups", function(obj, which = replicateGroups(ob
     
     gt <- groupTable(obj, average = TRUE)
     gt[, (which) := lapply(.SD, function(x) as.integer(x > 0)), .SDcols = which]
-    UpSetR::upset(gt, nsets = nsets, ...)
+    UpSetR::upset(gt, nsets = nsets, nintersects = nintersects, ...)
 })
 
 #' @describeIn featureGroups Obtain a subset with unique feature groups

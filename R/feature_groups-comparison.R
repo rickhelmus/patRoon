@@ -82,7 +82,9 @@ setMethod("$", "featureGroupsComparison", function(x, name)
 #'   \code{plotChord}, \code{unique}: further options passed to \code{plot},
 #'   \pkg{\link{VennDiagram}} plotting functions (\emph{e.g.}
 #'   \code{\link{draw.pairwise.venn}}), \code{\link{chordDiagram}} and
-#'   \code{unique} (\code{featureGroups} signature), respectively.
+#'   \code{unique} (\code{featureGroups} signature), respectively. For
+#'   \code{plotUpSet}: any further arguments passed to the \code{plotUpSet}
+#'   method defined for \code{\link{featureGroups}}.
 #' @param which A character vector specifying one or more labels of compared
 #'   feature groups. For \code{plotVenn}: if \code{NULL} then all compared
 #'   groups are used.

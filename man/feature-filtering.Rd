@@ -62,9 +62,10 @@ in opposite manner.}
 \item{fGroups, obj}{\code{\link{featureGroups}} object to which the filter is
 applied.}
 
-\item{threshold}{Minimal relative threshold for a feature group to be
-\emph{not} removed. When \samp{0} a feature group is always removed when
-present in the given replicate groups.}
+\item{threshold}{Minimal relative threshold (compared to mean intensity of
+replicate group being subtracted) for a feature group to be \emph{not}
+removed. When \samp{0} a feature group is always removed when present in
+the given replicate groups.}
 }
 \value{
 A filtered \code{\link{featureGroups}} object. Feature groups that
@@ -82,7 +83,7 @@ Basic rule based filtering of feature groups.
 
 \code{replicateGroupSubtract} removes feature groups present in a
   given set of replicate groups (unless intensities are above a given
-  threshold).
+  threshold). The replicate groups that are subtracted will be removed.
 }
 \seealso{
 \code{\link{featureGroups-class}}

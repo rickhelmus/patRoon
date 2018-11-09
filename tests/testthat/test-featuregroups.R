@@ -191,6 +191,10 @@ test_that("plotting works", {
     expect_doppel("chord-selflinks", function() plotChord(fgOpenMS, addSelfLinks = TRUE))
     expect_doppel("chord-nortmz", function() plotChord(fgOpenMS, addRetMzPlots = FALSE))
     expect_doppel("chord-comp", function() plotChord(fGCompOpenMS))
+    expect_error(plotChord(unique(fgOpenMS, which = replicateGroups(fgOpenMS), outer = TRUE),
+                           average = TRUE)) # stops with nothing to plot: no overlap
+    expect_plot(plotChord(unique(fgOpenMS, which = replicateGroups(fgOpenMS), outer = TRUE),
+                          average = TRUE, addSelfLinks = TRUE)) # unless there are self links
     
     expect_doppel("eic-def", function() plotEIC(subFGroups))
     expect_doppel("eic-rtmin", function() plotEIC(subFGroups, retMin = TRUE))

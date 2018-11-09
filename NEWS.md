@@ -1,5 +1,14 @@
 # patRoon 0.1.0.9000
 
+## November 2018
+* Changed `nintersects` default for plotUpSet so that all intersections are plotted by default.
+* plotChord() now properly stops if nothing overlaps.
+* replicateGroupSubtract() now removes replicate groups that were subtracted.
+* Fixed: replicateGroupSubtract() now correctly takes maximum mean intensity for threshold determination when multiple rGroups are specified.
+* Fixed: Wrong compound clusters plotted in reportMD().
+* Fixed: Added timeout after restarting failed command (e.g. MetFrag CL) to prevent rare error "The requested operation cannot be performed on a file with a user-mapped section open".
+
+
 ## October 2018
 * openReport option for reportMD(). If TRUE the generated report will be opened with a web browser.
 * reportPlots option for reportMD() which collapses reportFGroups, reportChord and reportFormulaSpectra and adds control to plot Venn and UpSet diagrams.

@@ -92,7 +92,7 @@
 \S4method{plotVenn}{featureGroups}(obj, which = NULL, ...)
 
 \S4method{plotUpSet}{featureGroups}(obj, which = replicateGroups(obj),
-  nsets = length(which), ...)
+  nsets = length(which), nintersects = NA, ...)
 
 \S4method{unique}{featureGroups}(x, which, relativeTo = NULL,
   outer = FALSE)
@@ -191,7 +191,7 @@ annotation.}
 
 \item{which}{A character vector with replicate groups used for comparison.}
 
-\item{nsets}{See \code{\link[UpSetR]{upset}}.}
+\item{nsets, nintersects}{See \code{\link[UpSetR]{upset}}.}
 
 \item{relativeTo}{A character vector with replicate groups that should be
 used for unique comparison. If \code{NULL} then all replicate groups are

@@ -132,8 +132,7 @@ featuresOptimizer$methods(
 optimizeFeatureFinding <- function(anaInfo, algorithm, ..., templateParams = list(),
                                    paramRanges = list(),
                                    isoIdent = if (algorithm == "openms") "OpenMS" else "IPO",
-                                   checkPeakShape = c("none", "borderIntensity", "sinusCurve", "normalDistr"),
-                                   CAMERAOpts = list(), maxIterations = 50, maxModelDeviation = 0.1)
+                                   checkPeakShape = "none", CAMERAOpts = list(), maxIterations = 50, maxModelDeviation = 0.1)
 {
     params <- list(...)
 
@@ -142,6 +141,8 @@ optimizeFeatureFinding <- function(anaInfo, algorithm, ..., templateParams = lis
     checkmate::assertChoice(algorithm, c("openms", "xcms", "envipick"), add = ac)
     assertOptimArgs(params, templateParams, paramRanges, maxIterations, maxModelDeviation, ac)
     checkmate::assertChoice(isoIdent, c("IPO", "CAMERA", "OpenMS"), add = ac)
+    checkmate::assertChoice(checkPeakShape, c("none", "borderIntensity", "sinusCurve", "normalDistr"), add = ac)
+    checkmate::assertList(CAMERAOpts, add = ac)
     checkmate::reportAssertions(ac)
 
     if (algorithm != "openms" && isoIdent == "OpenMS")

@@ -26,3 +26,4 @@ Release:
 - getXcmsSet --> export
 - generateCompounds: take averaged mass spectrum (as an option)
 - support fastcluster for compounds clustering/int component clusters?
+- groupFeaturesScreening functionality for features?

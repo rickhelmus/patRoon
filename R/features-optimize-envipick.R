@@ -19,3 +19,13 @@ featuresOptimizerEnviPick$methods(
         return(fixOptParamRange(params, list(c("minint", "maxint"))))
     }
 )
+
+generateFeatureOptPSetEnviPick <- function(...)
+{
+    return(list(dmzdens = c(3, 10),
+                drtsmall = c(10, 30),
+                minpeak = c(4, 10),
+                drttotal = c(60, 150),
+                minint = c(1E3, 1E4),
+                ppm = TRUE))
+}

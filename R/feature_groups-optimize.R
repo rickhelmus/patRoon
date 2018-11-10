@@ -107,3 +107,15 @@ optimizeFeatureGrouping <- function(features, algorithm, ..., templateParams = l
     return(optimizationResult(algorithm = algorithm, paramSets = result$paramSets,
                               bestParamSet = result$bestParamSet))
 }
+
+generateFGroupsOptPSet <- function(algorithm, ...)
+{
+    checkmate::assertChoice(algorithm, c("openms", "xcms"))
+    
+    f <- switch(algorithm,
+                openms = generateFGroupsOptPSetOpenMS,
+                xcms = generateFGroupsOptPSetXCMS)
+    
+    defs <- f(...)
+    return(modifyList(defs, list(...)))
+}

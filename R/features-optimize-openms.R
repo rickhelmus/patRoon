@@ -34,3 +34,11 @@ featuresOptimizerOpenMS$methods(
     }
 
 )
+
+generateFeatureOptPSetOpenMS <- function(...)
+{
+    return(list(chromFWHM = c(5, 10),
+                mzPPM = c(3, 10),
+                minFWHM = c(3, 6),
+                maxFWHM = c(35, 65)))
+}

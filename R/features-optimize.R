@@ -104,7 +104,7 @@ featuresOptimizer$methods(
     calculateResponse = function(params, task, keepObject)
     {
         # UNDONE: do we want to keep caching this?
-
+        
         params <- convertOptToCallParams(params)
         feat <- do.call(findFeatures, c(list(anaInfo, algorithm, verbose = FALSE), params))
         ret <- calcPPS(feat)
@@ -159,4 +159,20 @@ optimizeFeatureFinding <- function(anaInfo, algorithm, ..., templateParams = lis
 
     return(optimizationResult(algorithm = algorithm, paramSets = result$paramSets,
                               bestParamSet = result$bestParamSet))
+}
+
+generateFeatureOptPSet <- function(algorithm, method = "centWave", ...)
+{
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertChoice(algorithm, c("openms", "xcms", "envipick"), add = ac)
+    checkmate::assertString(method, min.chars = 1, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    f <- switch(algorithm,
+                openms = generateFeatureOptPSetOpenMS,
+                xcms = generateFeatureOptPSetXCMS,
+                envipick = generateFeatureOptPSetEnviPick)
+    
+    defs <- f(method)
+    return(modifyList(defs, list(...)))
 }

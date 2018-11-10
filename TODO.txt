@@ -26,8 +26,13 @@ Release:
 - update tutorial on website
 - feature optim:
     - docs
+        - mention parameters default unless specified
+        - only default xcms grouping support for xcms
+        - retcor/group arg separation
     - qualitative optim?
-    - tests (e.g. check equality with IPO)
+    - tests
+        - (e.g. check equality with IPO)
+        - check default settings
     - keep retcor_done?
     - proper credits/refs
     - get rid of getXCMSSet() calls?

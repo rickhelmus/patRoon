@@ -29,3 +29,5 @@ generateFeatureOptPSetEnviPick <- function(...)
                 minint = c(1E3, 1E4),
                 ppm = TRUE))
 }
+
+getDefFeaturesOptParamRangesEnviPick <- function() list()

@@ -23,14 +23,6 @@ featureGroupsOptimizerXCMS$methods(
         return(params)
     },
 
-    defaultParamRanges = function(params)
-    {
-        return(list(profStep = c(0.3, Inf),
-                    mzwid = c(0.0001, Inf),
-                    bw = c(0.25, Inf),
-                    span = c(0.001, Inf)))
-    },
-
     fixOptParamBounds = function(param, bounds)
     {
         if (param %in% c("extra", "missing"))
@@ -131,4 +123,12 @@ generateFGroupsOptPSetXCMS <- function(...)
     }
     
     return(list(groupArgs = groupArgs, retcorArgs = retcorArgs))
+}
+
+getDefFGroupsOptParamRangesXCMS <- function()
+{
+    return(list(profStep = c(0.3, Inf),
+                mzwid = c(0.0001, Inf),
+                bw = c(0.25, Inf),
+                span = c(0.001, Inf)))
 }

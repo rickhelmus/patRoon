@@ -13,6 +13,8 @@ featuresOptimizer$methods(
     # dummy methods to be potentially overrided
     convertOptToCallParams = function(params) params,
 
+    defaultParamRanges = function(params) getDefFeaturesOptParamRanges(algorithm, params[["method"]]),
+    
     # Adapted from IPO: add OpenMS isotope detection
     calcPPS = function(feat)
     {
@@ -175,4 +177,15 @@ generateFeatureOptPSet <- function(algorithm, method = "centWave", ...)
     
     defs <- f(method)
     return(modifyList(defs, list(...)))
+}
+
+getDefFeaturesOptParamRanges <- function(algorithm, method = "centWave")
+{
+    checkmate::assertChoice(algorithm, c("openms", "xcms", "envipick"))
+    
+    if (algorithm == "openms")
+        return(getDefFeaturesOptParamRangesOpenMS())
+    else if (algorithm == "xcms")
+        return(getDefFeaturesOptParamRangesXCMS(method))
+    return(getDefFeaturesOptParamRangesEnviPick())
 }

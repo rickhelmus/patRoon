@@ -13,6 +13,8 @@ featureGroupsOptimizer$methods(
     # dummy methods to be potentially overrided
     convertOptToCallParams = function(params) params,
 
+    defaultParamRanges = function(...) getDefFGroupsOptParamRanges(algorithm),
+    
     calculateResponse = function(params, task, keepObject)
     {
         # UNDONE: do we want to keep caching this?
@@ -118,4 +120,14 @@ generateFGroupsOptPSet <- function(algorithm, ...)
     
     defs <- f(...)
     return(modifyList(defs, list(...)))
+}
+
+getDefFGroupsOptParamRanges <- function(algorithm)
+{
+    checkmate::assertChoice(algorithm, c("openms", "xcms"))
+    
+    if (algorithm == "openms")
+        return(getDefFGroupsOptParamRangesOpenMS())
+    
+    return(getDefFGroupsOptParamRangesXCMS())
 }

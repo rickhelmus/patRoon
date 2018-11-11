@@ -14,7 +14,7 @@ featuresOptimizer$methods(
     convertOptToCallParams = function(params) params,
 
     defaultParamRanges = function(params) getDefFeaturesOptParamRanges(algorithm, params[["method"]]),
-    
+
     # Adapted from IPO: add OpenMS isotope detection
     calcPPS = function(feat)
     {
@@ -80,7 +80,7 @@ featuresOptimizer$methods(
                 not_loq_peaks <- sum(iso_int > int_cutoff)
                 ret$nonRP <- ret$nonRP + not_loq_peaks
             }
-        }#end_for_sample
+        }
 
         if (doOpenMS)
         {
@@ -106,7 +106,7 @@ featuresOptimizer$methods(
     calculateResponse = function(params, task, keepObject)
     {
         # UNDONE: do we want to keep caching this?
-        
+
         params <- convertOptToCallParams(params)
         feat <- do.call(findFeatures, c(list(anaInfo, algorithm, verbose = FALSE), params))
         ret <- calcPPS(feat)
@@ -169,12 +169,12 @@ generateFeatureOptPSet <- function(algorithm, method = "centWave", ...)
     checkmate::assertChoice(algorithm, c("openms", "xcms", "envipick"), add = ac)
     checkmate::assertString(method, min.chars = 1, add = ac)
     checkmate::reportAssertions(ac)
-    
+
     f <- switch(algorithm,
                 openms = generateFeatureOptPSetOpenMS,
                 xcms = generateFeatureOptPSetXCMS,
                 envipick = generateFeatureOptPSetEnviPick)
-    
+
     defs <- f(method)
     return(modifyList(defs, list(...)))
 }
@@ -182,7 +182,7 @@ generateFeatureOptPSet <- function(algorithm, method = "centWave", ...)
 getDefFeaturesOptParamRanges <- function(algorithm, method = "centWave")
 {
     checkmate::assertChoice(algorithm, c("openms", "xcms", "envipick"))
-    
+
     if (algorithm == "openms")
         return(getDefFeaturesOptParamRangesOpenMS())
     else if (algorithm == "xcms")

@@ -24,11 +24,17 @@ featuresOptimizerOpenMS$methods(
         return(bounds)
     },
 
-    # based on part of optimizeXcmsSet() function from IPO
     fixOptParams = function(params)
     {
         return(fixOptParamRange(params, list(c("minFWHM", "maxFWHM"),
                                              c("minTraceLength", "maxTraceLength"))))
+    },
+
+    convertOptToCallParams = function(params)
+    {
+        # logging won't make a lot of sense (constantly overwritten during experiments)
+        params$logPath <- NULL
+        return(params)
     }
 
 )

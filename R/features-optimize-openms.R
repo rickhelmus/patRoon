@@ -16,8 +16,6 @@ featuresOptimizerOpenMS$methods(
         return(params)
     },
 
-    defaultParamRanges = function(params) list(localMZRange = c(0.00001, Inf)),
-
     fixOptParamBounds = function(param, bounds)
     {
         if (param == "traceTermOutliers")
@@ -34,3 +32,13 @@ featuresOptimizerOpenMS$methods(
     }
 
 )
+
+generateFeatureOptPSetOpenMS <- function(...)
+{
+    return(list(chromFWHM = c(5, 10),
+                mzPPM = c(3, 10),
+                minFWHM = c(3, 6),
+                maxFWHM = c(35, 65)))
+}
+
+getDefFeaturesOptParamRangesOpenMS <- function(params) list(localMZRange = c(0.00001, Inf))

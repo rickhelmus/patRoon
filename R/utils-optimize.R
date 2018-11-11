@@ -15,6 +15,10 @@ fixOptParamRange <- function(params, paramPairs)
             else
                 pmax <- min(params$to_optimize[[pp[2]]])
 
+            # CHANGED: for now ignore fixing the range if the min/max is not known (unlike IPO default params can be omitted)
+            if (is.null(pmin) || is.null(pmax))
+                next
+            
             if (pmin >= pmax)
             {
                 additional <- abs(pmin-pmax) + 1

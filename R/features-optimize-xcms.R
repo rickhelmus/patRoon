@@ -13,13 +13,6 @@ featuresOptimizerXCMS$methods(
         return(params)
     },
 
-    defaultParamRanges = function(params)
-    {
-        return(list(min_peakwidth = c(3, Inf),
-                    mzdiff = c(if (params$method == "centWave") -100000000 else 0.001, Inf),
-                    step = c(0.0005, Inf)))
-    },
-
     # Adapted from combineParams() function of IPO
     combineOptParams = function(params_1, params_2)
     {
@@ -104,3 +97,33 @@ featuresOptimizerXCMS$methods(
         return(params)
     }
 )
+
+generateFeatureOptPSetXCMS <- function(method)
+{
+    if (method == "centWave")
+    {
+        # CHANGED: tightened ranges bit for modern equipment (ie smaller peakwidths and mz ranges)
+        ret <- list(min_peakwidth = c(4, 12), 
+                    max_peakwidth = c(35, 65), 
+                    ppm = c(5, 15),
+                    mzdiff = c(-0.001, 0.01))
+    }
+    else if (method == "matchedFilter")
+    {
+        ret <- list(fwhm = c(25, 35), 
+                    snthresh = c(3, 17), 
+                    step = c(0.05, 0.15), 
+                    steps = c(1, 3))
+    }
+    else
+        stop("Only centWave and matchedFilter methods supported")
+    
+    return(c(list(method = method), ret))
+}
+
+getDefFeaturesOptParamRangesXCMS <- function(method)
+{
+    return(list(min_peakwidth = c(3, Inf),
+                mzdiff = c(if (method == "centWave") -100000000 else 0.001, Inf),
+                step = c(0.0005, Inf)))
+}

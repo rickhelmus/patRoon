@@ -13,6 +13,8 @@ featuresOptimizer$methods(
     # dummy methods to be potentially overrided
     convertOptToCallParams = function(params) params,
 
+    defaultParamRanges = function(params) getDefFeaturesOptParamRanges(algorithm, params[["method"]]),
+    
     # Adapted from IPO: add OpenMS isotope detection
     calcPPS = function(feat)
     {
@@ -104,7 +106,7 @@ featuresOptimizer$methods(
     calculateResponse = function(params, task, keepObject)
     {
         # UNDONE: do we want to keep caching this?
-
+        
         params <- convertOptToCallParams(params)
         feat <- do.call(findFeatures, c(list(anaInfo, algorithm, verbose = FALSE), params))
         ret <- calcPPS(feat)
@@ -132,8 +134,7 @@ featuresOptimizer$methods(
 optimizeFeatureFinding <- function(anaInfo, algorithm, ..., templateParams = list(),
                                    paramRanges = list(),
                                    isoIdent = if (algorithm == "openms") "OpenMS" else "IPO",
-                                   checkPeakShape = c("none", "borderIntensity", "sinusCurve", "normalDistr"),
-                                   CAMERAOpts = list(), maxIterations = 50, maxModelDeviation = 0.1)
+                                   checkPeakShape = "none", CAMERAOpts = list(), maxIterations = 50, maxModelDeviation = 0.1)
 {
     params <- list(...)
 
@@ -142,6 +143,8 @@ optimizeFeatureFinding <- function(anaInfo, algorithm, ..., templateParams = lis
     checkmate::assertChoice(algorithm, c("openms", "xcms", "envipick"), add = ac)
     assertOptimArgs(params, templateParams, paramRanges, maxIterations, maxModelDeviation, ac)
     checkmate::assertChoice(isoIdent, c("IPO", "CAMERA", "OpenMS"), add = ac)
+    checkmate::assertChoice(checkPeakShape, c("none", "borderIntensity", "sinusCurve", "normalDistr"), add = ac)
+    checkmate::assertList(CAMERAOpts, add = ac)
     checkmate::reportAssertions(ac)
 
     if (algorithm != "openms" && isoIdent == "OpenMS")
@@ -158,4 +161,31 @@ optimizeFeatureFinding <- function(anaInfo, algorithm, ..., templateParams = lis
 
     return(optimizationResult(algorithm = algorithm, paramSets = result$paramSets,
                               bestParamSet = result$bestParamSet))
+}
+
+generateFeatureOptPSet <- function(algorithm, method = "centWave", ...)
+{
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertChoice(algorithm, c("openms", "xcms", "envipick"), add = ac)
+    checkmate::assertString(method, min.chars = 1, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    f <- switch(algorithm,
+                openms = generateFeatureOptPSetOpenMS,
+                xcms = generateFeatureOptPSetXCMS,
+                envipick = generateFeatureOptPSetEnviPick)
+    
+    defs <- f(method)
+    return(modifyList(defs, list(...)))
+}
+
+getDefFeaturesOptParamRanges <- function(algorithm, method = "centWave")
+{
+    checkmate::assertChoice(algorithm, c("openms", "xcms", "envipick"))
+    
+    if (algorithm == "openms")
+        return(getDefFeaturesOptParamRangesOpenMS())
+    else if (algorithm == "xcms")
+        return(getDefFeaturesOptParamRangesXCMS(method))
+    return(getDefFeaturesOptParamRangesEnviPick())
 }

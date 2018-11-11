@@ -21,12 +21,12 @@
 \alias{importFeaturesXCMS}
 \title{Finding features}
 \usage{
-findFeatures(analysisInfo, algorithm, ...)
+findFeatures(analysisInfo, algorithm, ..., verbose = TRUE)
 
 findFeaturesBruker(analysisInfo, doFMF = "auto", startRange = 0,
-  endRange = 0)
+  endRange = 0, verbose = TRUE)
 
-findFeaturesEnviPick(analysisInfo, ...)
+findFeaturesEnviPick(analysisInfo, ..., verbose = TRUE)
 
 importFeaturesEnviMass(analysisInfo, enviProjPath)
 
@@ -37,11 +37,12 @@ findFeaturesOpenMS(analysisInfo, noiseThrInt = 1000, chromSNR = 3,
   widthFiltering = "fixed", minFWHM = 3, maxFWHM = 60,
   traceSNRFiltering = FALSE, localRTRange = 10, localMZRange = 6.5,
   isotopeFilteringModel = "metabolites (5\% RMS)",
-  MZScoring13C = FALSE, useSmoothedInts = FALSE, extraOpts = NULL,
+  MZScoring13C = FALSE, useSmoothedInts = TRUE, extraOpts = NULL,
   intSearchRTWindow = 3, logPath = file.path("log", "openms"),
-  maxProcAmount = getOption("patRoon.maxProcAmount"))
+  maxProcAmount = getOption("patRoon.maxProcAmount"), verbose = TRUE)
 
-findFeaturesXCMS(analysisInfo, method = "centWave", ...)
+findFeaturesXCMS(analysisInfo, method = "centWave", ...,
+  verbose = TRUE)
 
 importFeaturesXCMS(xs, analysisInfo)
 }
@@ -56,12 +57,14 @@ used: \code{"bruker"}, \code{"openms"}, \code{"xcms"}, \code{"envipick"}}
 (\code{featurefinderEnviPick}) or to selected feature finding algorithms
 (\code{findFeatures}).}
 
+\item{verbose}{If set to \code{FALSE} then no text output is shown.}
+
 \item{doFMF}{Run the 'Find Molecular Features' algorithm before loading
 compounds. Valid options are: \code{TRUE} (always), \code{FALSE} (never)
 and \code{"auto"} (automatically if no compounds present).}
 
 \item{startRange, endRange}{Start/End retention range (seconds) from which to
-collect features. A 0 (zero) for code{endRange} marks the end of the
+collect features. A 0 (zero) for \code{endRange} marks the end of the
 analysis.}
 
 \item{enviProjPath}{The path of the enviMass project.}
@@ -109,11 +112,15 @@ coeluting/isotopic mass traces. Sets the
 \code{algorithm:ffm:local_rt_range} and \code{algorithm:ffm:local_mz_range}
 options, respectively.}
 
-\item{isotopeFilteringModel, MZScoring13C}{Remove/score candidate assemblies
-based on isotope intensities. See
+\item{isotopeFilteringModel}{Remove/score candidate assemblies based on
+isotope intensities. See
 \href{http://ftp.mi.fu-berlin.de/pub/OpenMS/release2.1.0-documentation/html/TOPP_FeatureFinderMetabo.html}{FeatureFinderMetabo}.
- Sets the \code{algorithm:ffm:isotope_filtering_model} and
-\code{algorithm:ffm:mz_scoring_13C} options, respectivly.}
+ Sets the \code{algorithm:ffm:isotope_filtering_model} option.}
+
+\item{MZScoring13C}{Use the 13C isotope as the expected shift for isotope
+mass traces. See
+\href{http://ftp.mi.fu-berlin.de/pub/OpenMS/release2.1.0-documentation/html/TOPP_FeatureFinderMetabo.html}{FeatureFinderMetabo}.
+Sets \code{algorithm:ffm:mz_scoring_13C}.}
 
 \item{useSmoothedInts}{If \code{TRUE} then use LOWESS intensities instead of
 raw intensities. Sets the \code{algorithm:ffm:use_smoothed_intensities}

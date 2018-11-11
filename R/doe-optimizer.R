@@ -289,16 +289,16 @@ DoEOptimizer$methods(
             bestResults$parameters <- finalParams
 
             bestResults$object <- history[[maxIndex]]$finalResult$object
-            bestResults$experiment <- maxIndex
+            bestResults$DoEIteration <- maxIndex
             bestResults$score <- history[[maxIndex]]$finalResult$score
 
-            return(list(startParams = startParams, bestResults = bestResults, experiments = history))
+            return(list(startParams = startParams, bestResults = bestResults, iterations = history))
         })
 
         bestPS <- which.max(sapply(pSets, function(ps) ps$bestResults$score))
 
-        printf("===\nDONE!\nBest parameter set: %d\nBest experiment: %d\n",
-               bestPS, pSets[[bestPS]]$bestResults$experiment)
+        printf("===\nDONE!\nBest parameter set: %d\nBest DoE iteration: %d\n",
+               bestPS, pSets[[bestPS]]$bestResults$DoEIteration)
 
         return(list(paramSets = pSets, bestParamSet = bestPS))
     }
@@ -313,14 +313,14 @@ optimizationResult <- setClass("optimizationResult",
 #' @describeIn optimizationResult Returns the algorithm that was used for finding features.
 setMethod("algorithm", "optimizationResult", function(obj) obj@algorithm)
 
-#' @describeIn optimizationResult Obtain total number of experimental design iteratations performed.
+#' @describeIn optimizationResult Obtain total number of experimental design iterations performed.
 #' @export
 setMethod("length", "optimizationResult", function(x) sum(lengths(x)))
 
-#' @describeIn optimizationResult Obtain number of experimental design iteratations performed for each parameter set.
+#' @describeIn optimizationResult Obtain number of experimental design iterations performed for each parameter set.
 #' @param use.names Ignored.
 #' @export
-setMethod("lengths", "optimizationResult", function(x, use.names = FALSE) sapply(x@paramSets, function(ps) length(ps$experiments),
+setMethod("lengths", "optimizationResult", function(x, use.names = FALSE) sapply(x@paramSets, function(ps) length(ps$iterations),
                                                                                  USE.NAMES = use.names))
 #' @describeIn optimizationResult Shows summary information for this object.
 #' @export
@@ -335,11 +335,11 @@ setMethod("show", "optimizationResult", function(object)
         printf("Parameter set %d/%d%s:\n", pi, length(object@paramSets),
                if (pi == object@bestParamSet) " (BEST)" else "")
 
-        printf("    Experimental designs performed: %d\n", length(ps$experiments))
+        printf("    Experimental designs tested: %d\n", length(ps$iterations))
         printf("    Starting params:\n"); printf("    - %s: %s\n", names(ps$startParams), ps$startParams)
         printf("    Optimized params:\n"); printf("    - %s: %s\n", names(ps$bestResults$parameters), ps$bestResults$parameters)
 
-        bexp <- ps$experiments[[ps$bestResults$experiment]]
+        bexp <- ps$iterations[[ps$bestResults$DoEIteration]]
         br <- bexp$finalResult$response
         printf("    Best results: "); cat(paste(names(br), br, sep = ": ", collapse = "; ")); cat("\n")
 
@@ -353,12 +353,12 @@ setMethod("show", "optimizationResult", function(object)
 })
 
 #' @export
-setMethod("plot", "optimizationResult", function(x, paramSet, experiment, paramsToPlot = NULL, maxCols = NULL, type = "contour",
+setMethod("plot", "optimizationResult", function(x, paramSet, DoEIteration, paramsToPlot = NULL, maxCols = NULL, type = "contour",
                                                  image = TRUE, contours = "colors", ...)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertInt(paramSet, lower = 1, upper = length(x@paramSets)) # don't add, this should fail before the next line
-    checkmate::assertInt(experiment, lower = 1, upper = length(x@paramSets[[paramSet]]$experiments), add = ac)
+    checkmate::assertInt(DoEIteration, lower = 1, upper = length(x@paramSets[[paramSet]]$iterations), add = ac)
     checkmate::assert(checkmate::checkList(paramsToPlot, types = "character", any.missing = FALSE, min.len = 1, null.ok = TRUE),
                       checkmate::checkCharacter(paramsToPlot, min.chars = 1, len = 2),
                       checkmate::checkNull(paramsToPlot),
@@ -372,7 +372,7 @@ setMethod("plot", "optimizationResult", function(x, paramSet, experiment, params
                       .var.name = "contours")
     checkmate::reportAssertions(ac)
 
-    ex <- x@paramSets[[paramSet]]$experiments[[experiment]]
+    ex <- x@paramSets[[paramSet]]$iterations[[DoEIteration]]
 
     if (length(ex$params$to_optimize) < 2)
         stop("Need at least two optimized parameters for plotting.")
@@ -430,19 +430,19 @@ setMethod("plot", "optimizationResult", function(x, paramSet, experiment, params
 })
 
 #' @export
-setMethod("optimizedParameters", "optimizationResult", function(object, paramSet, experiment)
+setMethod("optimizedParameters", "optimizationResult", function(object, paramSet, DoEIteration)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertInt(paramSet, lower = 1, upper = length(object@paramSets),
-                         null.ok = is.null(experiment), add = ac)
-    checkmate::assertCount(experiment, positive = TRUE, null.ok = TRUE, add = ac)
+                         null.ok = is.null(DoEIteration), add = ac)
+    checkmate::assertCount(DoEIteration, positive = TRUE, null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
     if (is.null(paramSet))
         paramSet <- object@bestParamSet
     
-    if (!is.null(experiment))
-        return(object@paramSets[[paramSet]]$experiments[[experiment]]$finalResult$parameters)
+    if (!is.null(DoEIteration))
+        return(object@paramSets[[paramSet]]$iterations[[DoEIteration]]$finalResult$parameters)
     
     return(object@paramSets[[paramSet]]$bestResults$parameters)
 })
@@ -459,30 +459,30 @@ setMethod("optimizedObject", "optimizationResult", function(object, paramSet)
 })
 
 #' @export
-setMethod("scores", "optimizationResult", function(object, paramSet, experiment)
+setMethod("scores", "optimizationResult", function(object, paramSet, DoEIteration)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertInt(paramSet, lower = 1, upper = length(object@paramSets),
-                         null.ok = is.null(experiment), add = ac)
-    checkmate::assertCount(experiment, positive = TRUE, null.ok = TRUE, add = ac)
+                         null.ok = is.null(DoEIteration), add = ac)
+    checkmate::assertCount(DoEIteration, positive = TRUE, null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
     if (is.null(paramSet))
         paramSet <- object@bestParamSet
     
-    if (is.null(experiment))
-        experiment <- object@paramSets[[paramSet]]$bestResults$experiment
+    if (is.null(DoEIteration))
+        DoEIteration <- object@paramSets[[paramSet]]$bestResults$DoEIteration
     
-    return(object@paramSets[[paramSet]]$experiments[[experiment]]$finalResult$response)
+    return(object@paramSets[[paramSet]]$iterations[[DoEIteration]]$finalResult$response)
 })
 
 #' @export
-setMethod("experimentInfo", "optimizationResult", function(object, paramSet, experiment)
+setMethod("experimentInfo", "optimizationResult", function(object, paramSet, DoEIteration)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertInt(paramSet, lower = 1, upper = length(object@paramSets)) # don't add, this should fail before the next line
-    checkmate::assertInt(experiment, lower = 1, upper = length(object@paramSets[[paramSet]]$experiments), add = ac)
+    checkmate::assertInt(DoEIteration, lower = 1, upper = length(object@paramSets[[paramSet]]$iterations), add = ac)
     checkmate::reportAssertions(ac)
     
-    return(object@paramSets[[paramSet]]$experiments[[experiment]])
+    return(object@paramSets[[paramSet]]$iterations[[DoEIteration]])
 })

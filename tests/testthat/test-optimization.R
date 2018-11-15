@@ -16,26 +16,29 @@ ffOptEnviPick <- optimizeFeatureFinding(epAnaInfo, "envipick", list(drtsmall = c
 suppressWarnings(ffOptEmpty <- optimizeFeatureFinding(anaInfo, "openms", list(chromFWHM = c(5, 10), noiseThrInt = 1E9)))
 
 fgOptOpenMS <- optimizeFeatureGrouping(optimizedObject(ffOptOpenMS), "openms", list(maxGroupMZ = c(0.002, 0.007)))
-fgOptXCMS <- optimizeFeatureGrouping(optimizedObject(ffOptXCMS), "xcms", list(bw = c(22, 28)))
+fgOptXCMS <- optimizeFeatureGrouping(optimizedObject(ffOptXCMS), "xcms", list(bw = c(22, 28), method = "obiwarp"))
+
+# don't want to compare resulting object as it may be irreproducible due to file paths etc
+expInfoNoObject <- function(...) { ret <- experimentInfo(...); return(ret[names(ret) != "object"]) }
 
 test_that("verify feature optimization output", {
-    expect_known_value(experimentInfo(ffOptOpenMS, 1, 1), testFile("ff-opt-oms"))
+    expect_known_value(expInfoNoObject(ffOptOpenMS, 1, 1), testFile("ff-opt-oms"))
     expect_known_show(ffOptOpenMS, testFile("ff-opt-oms-show", text = TRUE))
 
-    expect_known_value(experimentInfo(ffOptXCMS, 1, 1), testFile("ff-opt-xcms"))
+    expect_known_value(expInfoNoObject(ffOptXCMS, 1, 1), testFile("ff-opt-xcms"))
     expect_known_show(ffOptXCMS, testFile("ff-opt-xcms-show", text = TRUE))
 
-    expect_known_value(experimentInfo(ffOptEnviPick, 1, 1), testFile("ff-opt-ep"))
+    expect_known_value(expInfoNoObject(ffOptEnviPick, 1, 1), testFile("ff-opt-ep"))
     expect_known_show(ffOptEnviPick, testFile("ff-opt-ep-show", text = TRUE))
 
     expect_length(ffOptEmpty, 1)
 })
 
 test_that("verify feature group optimization output", {
-    expect_known_value(experimentInfo(fgOptOpenMS, 1, 1), testFile("fg-opt-oms"))
+    expect_known_value(expInfoNoObject(fgOptOpenMS, 1, 1), testFile("fg-opt-oms"))
     expect_known_show(fgOptOpenMS, testFile("fg-opt-oms-show", text = TRUE))
 
-    expect_known_value(experimentInfo(fgOptXCMS, 1, 1), testFile("fg-opt-xcms"))
+    expect_known_value(expInfoNoObject(fgOptXCMS, 1, 1), testFile("fg-opt-xcms"))
     expect_known_show(fgOptXCMS, testFile("fg-opt-xcms-show", text = TRUE))
 })
 

@@ -10,9 +10,6 @@ featuresOptimizer <- setRefClass("featuresOptimizer", contains = c("DoEOptimizer
 
 featuresOptimizer$methods(
 
-    # dummy methods to be potentially overrided
-    convertOptToCallParams = function(params) params,
-
     defaultParamRanges = function(params) getDefFeaturesOptParamRanges(algorithm, params[["method"]]),
 
     # Adapted from IPO: add OpenMS isotope detection
@@ -107,12 +104,11 @@ featuresOptimizer$methods(
     {
         # UNDONE: do we want to keep caching this?
 
-        params <- convertOptToCallParams(params)
         feat <- do.call(findFeatures, c(list(anaInfo, algorithm, verbose = FALSE), params))
         ret <- calcPPS(feat)
 
         if (keepObject)
-            ret <- list(response = ret, object <- feat)
+            ret <- list(response = ret, object = feat)
 
         return(ret)
     },
@@ -121,7 +117,10 @@ featuresOptimizer$methods(
     {
         index <- length(history)
         if (history[[index]]$finalResult$response$PPS == 0 & index == 1)
-            stop("No isotopes have been detected!")
+        {
+            warning("No isotopes have been detected!")
+            return(FALSE)
+        }
         if (index < 2)
             return(TRUE)
         if (history[[index-1]]$finalResult$response$PPS >= history[[index]]$finalResult$response$PPS)

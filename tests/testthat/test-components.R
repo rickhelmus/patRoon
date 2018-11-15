@@ -10,7 +10,7 @@ withr::with_seed(20, compsRC <- generateComponents(fGroupsSimple, "ramclustr", i
 # UNDONE: getting unknown NaN warnings here...
 suppressWarnings(compsCAM <- generateComponents(fGroupsSimple, "camera", ionization = "positive"))
 compsNT <- generateComponents(fGroups, "nontarget", ionization = "positive")
-compsInt <- generateComponents(fGroupsSimple, "intclust", average = FALSE) # no averaging: only one rep group 
+compsInt <- generateComponents(fGroupsSimple, "intclust", average = FALSE) # no averaging: only one rep group
 fGroupsEmpty <- getEmptyTestFGroups()
 compsEmpty <- components()
 
@@ -46,7 +46,7 @@ test_that("basic subsetting", {
     expect_equivalent(groupNames(compsRC[, c(FALSE, TRUE)]), groupNames(compsRC)[c(FALSE, TRUE)])
     expect_equal(length(compsRC[FALSE]), 0)
     expect_length(compsEmpty[1:5], 0)
-    
+
     expect_equivalent(compsRC[[1, 1]], componentTable(compsRC)[[1]][group == groupNames(compsRC)[1]])
     expect_equivalent(compsRC[[names(compsRC)[1], groupNames(compsRC)[1]]], componentTable(compsRC)[[1]][group == groupNames(compsRC)[1]])
     expect_equivalent(compsRC[[2]], componentTable(compsRC)[[2]])
@@ -78,8 +78,10 @@ test_that("reporting works", {
 
     expect_file(reportPDF(fGroupsSimple, getWorkPath(), reportFGroups = FALSE, components = compsRC),
                 getWorkPath("components.pdf"))
-    
-    expect_reportMD(makeReportMD(fGroupsSimple, reportPlots = "none", components = compsRC))
+
+    # UNDONE: setting reportPlots="none" in combination with plotting components
+    # crashes pandoc2, using "eics" for now...
+    expect_reportMD(makeReportMD(fGroupsSimple, reportPlots = "eics", components = compsRC))
 })
 
 test_that("reporting empty object works", {
@@ -96,7 +98,7 @@ test_that("plotting works", {
     expect_plot(plotSpec(compsRC, 1, markFGroup = names(fGroupsSimple)[1]))
     expect_plot(print(plotSpec(compsRC, 1, useGGPlot2 = TRUE)))
     expect_doppel("eic-component", function() plotEIC(compsRC, 1, fGroupsSimple))
-    
+
     expect_plot(plot(compsInt))
     expect_doppel("component-ic-int", function() plotInt(compsInt, index = 1))
     expect_doppel("component-ic-sil", function() plotSilhouettes(compsInt, 2:6))

@@ -1,0 +1,1 @@
+An optimization result object ('optimizationResult')Algorithm: openmsParameter set 1/1 (BEST):    Experimental designs tested: 4    Starting params:    - chromFWHM: c(5, 10)    - mzPPM: c(5, 15)    Optimized params:    - chromFWHM: 3.5    - mzPPM: 18.5    Best results: featureCount: 841; nonRP: 130; RP: 77; PPS: 45.6076923076923Best parameter set: 1

@@ -49,7 +49,7 @@ featureGroupsOptimizerXCMS$methods(
             if (!is.null(.self[[p]]))
             {
                 pn <- names(.self[[p]])
-                pn <- pn[names(pn) != "method"]
+                pn <- pn[pn != "method"]
                 ret[[p]] <- params[pn]
 
                 # re-add method
@@ -66,18 +66,18 @@ featureGroupsOptimizerXCMS$methods(
 generateFGroupsOptPSetXCMS <- function(...)
 {
     givenArgs <- list(...)
-    
+
     groupMethod <- givenArgs[["groupArgs"]][["method"]]
     if (is.null(groupMethod))
         groupMethod <- "density"
-    
+
     retcorMethod <- givenArgs[["retcorArgs"]][["method"]]
     if (is.null(retcorMethod))
         retcorMethod <- "obiwarp"
-    
+
     groupArgs <- list(method = groupMethod)
     retcorArgs <- list(method = retcorMethod)
-    
+
     if (groupMethod == "density")
     {
         groupArgs$bw <- c(22, 28)
@@ -91,7 +91,7 @@ generateFGroupsOptPSetXCMS <- function(...)
     }
     else
         stop("Only density and nearest group methods supported.")
-    
+
     if (is.null(givenArgs[["rtalign"]]) || givenArgs[["rtalign"]])
     {
         if (retcorMethod == "obiwarp")
@@ -103,7 +103,7 @@ generateFGroupsOptPSetXCMS <- function(...)
                 # only set when not specified, otherwise it will be doubly set in generateFGroupsOptPSet()
                 retcorArgs$distFunc <- distFunc
             }
-            
+
             retcorArgs[c("gapInit", "gapExtend")] <- switch(distFunc,
                                                             cor = list(c(0, 0.4), c(2.1, 2.7)),
                                                             cor_opt = list(c(0, 0.4), c(2.1, 2.7)),
@@ -121,7 +121,7 @@ generateFGroupsOptPSetXCMS <- function(...)
         else
             stop("Only obiwarp and loess alignment methods supported.")
     }
-    
+
     return(list(groupArgs = groupArgs, retcorArgs = retcorArgs))
 }
 

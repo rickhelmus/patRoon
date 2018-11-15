@@ -10,11 +10,8 @@ featureGroupsOptimizer <- setRefClass("featureGroupsOptimizer", contains = c("Do
 
 featureGroupsOptimizer$methods(
 
-    # dummy methods to be potentially overrided
-    convertOptToCallParams = function(params) params,
-
     defaultParamRanges = function(...) getDefFGroupsOptParamRanges(algorithm),
-    
+
     calculateResponse = function(params, task, keepObject)
     {
         # UNDONE: do we want to keep caching this?
@@ -23,13 +20,12 @@ featureGroupsOptimizer$methods(
         # retCorFailed <- if (!is.null(params[["rtalign"]]) && params$rtalign) 1.1 else 1
         retCorFailed <- 1
 
-        params <- convertOptToCallParams(params)
         fg <- do.call(groupFeatures, c(list(features, algorithm, verbose = FALSE), params))
 
         ret <- utilsIPO$getRGTVValues(getXCMSSet(fg, TRUE, verbose = FALSE), task, retCorFailed)
 
         if (keepObject)
-            ret <- list(response = ret, object <- fg)
+            ret <- list(response = ret, object = fg)
 
         return(ret)
     },
@@ -113,11 +109,11 @@ optimizeFeatureGrouping <- function(features, algorithm, ..., templateParams = l
 generateFGroupsOptPSet <- function(algorithm, ...)
 {
     checkmate::assertChoice(algorithm, c("openms", "xcms"))
-    
+
     f <- switch(algorithm,
                 openms = generateFGroupsOptPSetOpenMS,
                 xcms = generateFGroupsOptPSetXCMS)
-    
+
     defs <- f(...)
     return(modifyList(defs, list(...)))
 }
@@ -125,9 +121,9 @@ generateFGroupsOptPSet <- function(algorithm, ...)
 getDefFGroupsOptParamRanges <- function(algorithm)
 {
     checkmate::assertChoice(algorithm, c("openms", "xcms"))
-    
+
     if (algorithm == "openms")
         return(getDefFGroupsOptParamRangesOpenMS())
-    
+
     return(getDefFGroupsOptParamRangesXCMS())
 }

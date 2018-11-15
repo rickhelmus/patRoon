@@ -10,6 +10,7 @@ DoEOptimizer$methods(
     # dummy methods that may need to be overloaded
     checkInitialParams = function(params) params,
     defaultParamRanges = function(params) list(),
+    convertOptToCallParams = function(params) params,
     fixOptParamBounds = function(params, bounds) bounds,
     fixOptParams = function(params) params,
 
@@ -78,6 +79,7 @@ DoEOptimizer$methods(
 
             runParams <- as.list(designParams[task, ])
             runParams <- runParams[!names(runParams) %in% c("run.order", "std.order", "Block")]
+            runParams <- convertOptToCallParams(runParams)
             result <- calculateResponse(runParams, task, FALSE)
             result$experiment <- task
 
@@ -113,6 +115,7 @@ DoEOptimizer$methods(
         if (!is.list(runParams))
             runParams <- as.list(runParams)
 
+        runParams <- convertOptToCallParams(runParams)
         result$finalResult <- calculateResponse(runParams, 1, TRUE)
         result$finalResult$parameters <- runParams
         result$finalResult$score <- getFinalScore(result$response[, -"score"], result$finalResult$response)
@@ -144,6 +147,7 @@ DoEOptimizer$methods(
             runParams <- utilsIPO$decodeAll(vals, params$to_optimize)
 
             # re-run as object wasn't stored
+            runParams <- convertOptToCallParams(runParams)
             result$finalResult <- calculateResponse(combineParams(runParams, params$no_optimization), 1, TRUE)
             result$finalResult$parameters <- runParams
             result$finalResult$score <- getFinalScore(result$response[, -"score"], result$finalResult$response)
@@ -286,7 +290,7 @@ DoEOptimizer$methods(
                 finalParams <- as.list(finalParams)
 
             bestResults <- list()
-            bestResults$parameters <- finalParams
+            bestResults$parameters <- convertOptToCallParams(finalParams)
 
             bestResults$object <- history[[maxIndex]]$finalResult$object
             bestResults$DoEIteration <- maxIndex
@@ -437,13 +441,13 @@ setMethod("optimizedParameters", "optimizationResult", function(object, paramSet
                          null.ok = is.null(DoEIteration), add = ac)
     checkmate::assertCount(DoEIteration, positive = TRUE, null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
-    
+
     if (is.null(paramSet))
         paramSet <- object@bestParamSet
-    
+
     if (!is.null(DoEIteration))
         return(object@paramSets[[paramSet]]$iterations[[DoEIteration]]$finalResult$parameters)
-    
+
     return(object@paramSets[[paramSet]]$bestResults$parameters)
 })
 
@@ -451,10 +455,10 @@ setMethod("optimizedParameters", "optimizationResult", function(object, paramSet
 setMethod("optimizedObject", "optimizationResult", function(object, paramSet)
 {
     checkmate::assertInt(paramSet, lower = 1, upper = length(object@paramSets), null.ok = TRUE)
-    
+
     if (is.null(paramSet))
         paramSet <- object@bestParamSet
-    
+
     return(object@paramSets[[paramSet]]$bestResults$object)
 })
 
@@ -466,13 +470,13 @@ setMethod("scores", "optimizationResult", function(object, paramSet, DoEIteratio
                          null.ok = is.null(DoEIteration), add = ac)
     checkmate::assertCount(DoEIteration, positive = TRUE, null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
-    
+
     if (is.null(paramSet))
         paramSet <- object@bestParamSet
-    
+
     if (is.null(DoEIteration))
         DoEIteration <- object@paramSets[[paramSet]]$bestResults$DoEIteration
-    
+
     return(object@paramSets[[paramSet]]$iterations[[DoEIteration]]$finalResult$response)
 })
 
@@ -483,6 +487,6 @@ setMethod("experimentInfo", "optimizationResult", function(object, paramSet, DoE
     checkmate::assertInt(paramSet, lower = 1, upper = length(object@paramSets)) # don't add, this should fail before the next line
     checkmate::assertInt(DoEIteration, lower = 1, upper = length(object@paramSets[[paramSet]]$iterations), add = ac)
     checkmate::reportAssertions(ac)
-    
+
     return(object@paramSets[[paramSet]]$iterations[[DoEIteration]])
 })

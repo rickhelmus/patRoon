@@ -84,6 +84,8 @@ featureGroupsOptimizer$methods(
 )
 
 
+#' @rdname feature-optimization
+#' @export
 optimizeFeatureGrouping <- function(features, algorithm, ..., templateParams = list(),
                                     paramRanges = list(), maxIterations = 50, maxModelDeviation = 0.1)
 {
@@ -106,6 +108,8 @@ optimizeFeatureGrouping <- function(features, algorithm, ..., templateParams = l
                               bestParamSet = result$bestParamSet))
 }
 
+#' @rdname feature-optimization
+#' @export
 generateFGroupsOptPSet <- function(algorithm, ...)
 {
     checkmate::assertChoice(algorithm, c("openms", "xcms"))
@@ -118,6 +122,8 @@ generateFGroupsOptPSet <- function(algorithm, ...)
     return(modifyList(defs, list(...)))
 }
 
+#' @rdname feature-optimization
+#' @export
 getDefFGroupsOptParamRanges <- function(algorithm)
 {
     checkmate::assertChoice(algorithm, c("openms", "xcms"))

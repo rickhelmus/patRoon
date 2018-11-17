@@ -130,6 +130,18 @@ featuresOptimizer$methods(
 )
 
 
+#' @param isoIdent Sets the algorithm used to identify isotopes. Valid values
+#'   are: \code{"IPO"}, \code{"CAMERA"} and \code{"OpenMS"}. The latter can only
+#'   be used when OpenMS is used to find features, and is highly recommended in
+#'   this situation.
+#' @param checkPeakShape Additional peak shape checking of isotopes. Only used
+#'   if \code{isoIdent="IPO"}. Valid values: \code{"none"},
+#'   \code{"borderIntensity"}, \code{"sinusCurve"} or \code{"normalDistr"}.
+#' @param CAMERAOpts A \code{list} with additional arguments passed to
+#'   \code{\link{CAMERA::findIsotopes}} when \code{isoIdent="CAMERA"}.
+#'
+#' @rdname feature-optimization
+#' @export
 optimizeFeatureFinding <- function(anaInfo, algorithm, ..., templateParams = list(),
                                    paramRanges = list(),
                                    isoIdent = if (algorithm == "openms") "OpenMS" else "IPO",
@@ -162,6 +174,9 @@ optimizeFeatureFinding <- function(anaInfo, algorithm, ..., templateParams = lis
                               bestParamSet = result$bestParamSet))
 }
 
+#' @param method Method used by XCMS to find features (only if \code{algorithm="xcms"}).
+#' @rdname feature-optimization
+#' @export
 generateFeatureOptPSet <- function(algorithm, method = "centWave", ...)
 {
     ac <- checkmate::makeAssertCollection()
@@ -178,6 +193,8 @@ generateFeatureOptPSet <- function(algorithm, method = "centWave", ...)
     return(modifyList(defs, list(...)))
 }
 
+#' @rdname feature-optimization
+#' @export
 getDefFeaturesOptParamRanges <- function(algorithm, method = "centWave")
 {
     checkmate::assertChoice(algorithm, c("openms", "xcms", "envipick"))

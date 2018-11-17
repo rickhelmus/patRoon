@@ -146,7 +146,7 @@ DoEOptimizer$methods(
                                                      drop = FALSE]
             }
 
-            runParams <- utilsIPO$decodeAll(vals, params$to_optimize)
+            runParams <- runParamsNoCall <- utilsIPO$decodeAll(vals, params$to_optimize)
 
             # re-run as object wasn't stored
             runParams <- convertOptToCallParams(runParams)
@@ -156,7 +156,7 @@ DoEOptimizer$methods(
 
             # update max_settings from experimental results
             result$max_settings <- sapply(seq_along(params$to_optimize),
-                                          function(i) utilsIPO$encode(runParams[[i]], params$to_optimize[[i]]))
+                                          function(i) utilsIPO$encode(runParamsNoCall[[i]], params$to_optimize[[i]]))
             result$max_settings <- c(result$finalResult$score, result$max_settings)
             names(result$max_settings) <- c("response", paste0("x", seq_len(length(result$max_settings) - 1)))
             result$max_settings <- t(result$max_settings) # convert to usual data format...
@@ -310,7 +310,28 @@ DoEOptimizer$methods(
     }
 )
 
-
+#' Class containing optimization results.
+#'
+#' Objects from this class contain optimization results resulting from design of
+#' experiment (DoE).
+#'
+#' Objects from this class are returned by \code{\link{optimizeFeatureFinding}} and
+#' \code{\link{optimizeFeatureGrouping}}.
+#'
+#' @slot algorithm A character specifying the algorithm that was optimized.
+#' @slot paramSets A \code{list} with detailed results from each parameter set
+#'   that was tested.
+#' @slot bestParamSet Numeric index of the parameter set yielding the best
+#'   response.
+#'
+#' @param obj,x,object An \code{optimizationResult} object.
+#' @param paramSet Numeric index of the parameter set (\emph{i.e.} the first
+#'   parameter set gets index \samp{1}). For some methods optional: if
+#'   \code{NULL} the best will be selected.
+#' @param DoEIteration Numeric index specifying the DoE iteration within the
+#'   specified \code{paramSet}. For some methods optional: if \code{NULL} the
+#'   best will be selected.
+#'
 #' @export
 optimizationResult <- setClass("optimizationResult",
                                slots = c(algorithm = "character",
@@ -358,6 +379,39 @@ setMethod("show", "optimizationResult", function(object)
     showObjectSize(object)
 })
 
+#' @describeIn optimizationResult Generates response plots for all or a selected
+#'   set of parameters.
+#'
+#' @param paramsToPlot Which parameters relations should be plot. If \code{NULL}
+#'   all will be plot. Alternatively, a \code{list} containing one or more
+#'   \code{character} vectors specifying each two parameters that should be
+#'   plotted. Finally, if only one pair should be plotted, can be a
+#'   \code{character} vector specifying both parameters.
+#' @param maxCols Multiple parameter pairs are plotted in a grid. The maximum
+#'   number of columns can be set with this argument. Set to \code{NULL} for no
+#'   limit.
+#' @param type The type of plots to be generated: \code{"contour"},
+#'   \code{"image"} or \code{"persp"}. The equally named functions will be
+#'   called for plotting.
+#' @param image Passed to \code{\link{contour}} (if \code{type="contour"}).
+#' @param contours Passed to \code{\link{persp}} (if \code{type="persp"}).
+#' @param \dots Further arguments passed to \code{\link{contour}},
+#'   \code{\link{image}} or \code{\link{persp}} (depending on \code{type}).
+#'
+#' @examples \dontrun{
+#' # ftOpt is an optimization object.
+#'
+#' # plot contour of all parameter pairs from the first parameter set/iteration.
+#' plot(ftOpt, paramSet = 1, DoEIteration = 1)
+#'
+#' # as above, but only plot two parameter pairs
+#' plot(ftOpt, paramSet = 1, DoEIteration = 1,
+#'      paramsToPlot = list(c("mzPPM", "chromFWHM"), c("chromFWHM", "chromSNR")))
+#'
+#' # plot 3d perspective plots
+#' plot(ftOpt, paramSet = 1, DoEIteration = 1, type = "persp")
+#' }
+#'
 #' @export
 setMethod("plot", "optimizationResult", function(x, paramSet, DoEIteration, paramsToPlot = NULL, maxCols = NULL, type = "contour",
                                                  image = TRUE, contours = "colors", ...)
@@ -435,6 +489,9 @@ setMethod("plot", "optimizationResult", function(x, paramSet, DoEIteration, para
            persp = persp(ex$model, forms, contours = contours, at = maxSlice, ...))
 })
 
+#' @describeIn optimizationResult Returns parameter set yielding optimal
+#'   results. The \code{paramSet} and \code{DoEIteration} arguments can be
+#'   \code{NULL}.
 #' @export
 setMethod("optimizedParameters", "optimizationResult", function(object, paramSet, DoEIteration)
 {
@@ -453,6 +510,10 @@ setMethod("optimizedParameters", "optimizationResult", function(object, paramSet
     return(object@paramSets[[paramSet]]$bestResults$parameters)
 })
 
+#' @describeIn optimizationResult Returns the object (\emph{i.e.} a
+#'   \code{\link{features}} or \code{\link{featureGroups}} object) that was
+#'   generated with optimized parameters. The \code{paramSet} argument can be
+#'   \code{NULL}.
 #' @export
 setMethod("optimizedObject", "optimizationResult", function(object, paramSet)
 {
@@ -464,6 +525,9 @@ setMethod("optimizedObject", "optimizationResult", function(object, paramSet)
     return(object@paramSets[[paramSet]]$bestResults$object)
 })
 
+
+#' @describeIn optimizationResult Returns optimization scores. The
+#'   \code{paramSet} and \code{DoEIteration} arguments can be \code{NULL}.
 #' @export
 setMethod("scores", "optimizationResult", function(object, paramSet, DoEIteration)
 {
@@ -482,6 +546,8 @@ setMethod("scores", "optimizationResult", function(object, paramSet, DoEIteratio
     return(object@paramSets[[paramSet]]$iterations[[DoEIteration]]$finalResult$response)
 })
 
+#' @describeIn optimizationResult Returns a \code{list} with optimization
+#'   information from an DoE iteration.
 #' @export
 setMethod("experimentInfo", "optimizationResult", function(object, paramSet, DoEIteration)
 {

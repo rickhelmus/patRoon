@@ -7,8 +7,10 @@ featureGroupsOptimizerXCMS <- setRefClass("featureGroupsOptimizerXCMS", contains
 
 featureGroupsOptimizerXCMS$methods(
 
-    checkInitialParams = function(params)
+    flattenParams = function(params, setFields)
     {
+        # combine groupArgs and retcorArgs in one list for easier optimization
+
         # filter out invalid params (e.g. when user forgets to use
         # groupArgs/retcorArgs for specifying params to optimize)
         params <- params[names(params) %in% c("rtalign", "exportedData", "groupArgs", "retcorArgs")]
@@ -17,16 +19,21 @@ featureGroupsOptimizerXCMS$methods(
         {
             if (!is.null(params[[p]]))
             {
-                .self[[p]] <- params[[p]]
+                if (setFields)
+                    .self[[p]] <- params[[p]]
+                
                 # don't save method here: both groupArgs and retcorArgs have method parameter
                 params <- c(params, params[[p]][names(params[[p]]) != "method"])
                 params[[p]] <- NULL
             }
         }
-
+        
         return(params)
     },
-
+    
+    checkInitialParams = function(params) flattenParams(params, TRUE),
+    getOptSettingRange = function(settingName, params, paramRanges) callSuper(settingName, params, flattenParams(paramRanges, FALSE)),
+    
     fixOptParamBounds = function(param, bounds)
     {
         if (param %in% c("extra", "missing"))
@@ -131,8 +138,6 @@ generateFGroupsOptPSetXCMS <- function(...)
 
 getDefFGroupsOptParamRangesXCMS <- function()
 {
-    return(list(profStep = c(0.3, Inf),
-                mzwid = c(0.0001, Inf),
-                bw = c(0.25, Inf),
-                span = c(0.001, Inf)))
+    return(list(groupArgs = list(mzwid = c(0.0001, Inf), bw = c(0.25, Inf)),
+                retcorArgs = list(profStep = c(0.3, Inf), span = c(0.001, Inf))))
 }

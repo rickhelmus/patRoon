@@ -30,6 +30,7 @@ Release:
         - only default xcms grouping support for xcms
         - retcor/group arg separation
         - min_peakwidth etc have to be specified in pairs
+        - no parallel yet
     - qualitative optim?
     - keep retcor_done?
     - proper credits/refs

@@ -54,6 +54,8 @@ DoEOptimizer$methods(
             design <- utilsIPO$getCcdParameter(typParams$to_optimize)
             designParams <- rsm::decode.data(design)
         }
+        else if (length(typParams$to_optimize) == 0)
+            stop("No parameters specified for optimization!")
         else
         {
             design <- data.frame(run.order = 1:9, a = seq(-1,1,0.25))

@@ -9,6 +9,10 @@ featureGroupsOptimizerXCMS$methods(
 
     checkInitialParams = function(params)
     {
+        # filter out invalid params (e.g. when user forgets to use
+        # groupArgs/retcorArgs for specifying params to optimize)
+        params <- params[names(params) %in% c("rtalign", "exportedData", "groupArgs", "retcorArgs")]
+        
         for (p in c("groupArgs", "retcorArgs"))
         {
             if (!is.null(params[[p]]))

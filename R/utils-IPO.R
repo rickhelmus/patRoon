@@ -549,7 +549,9 @@ typeCastParams = function(params) {
     ret_1 <- list()
     ret_2 <- list()
     ret <- list()
-    for(i in  1:length(params)) {
+    # CHANGED
+    # for(i in  1:length(params)) {
+    for(i in seq_along(params)) {
         factor <- params[[i]]
         if(length(factor) == 2) {
             ret_1[[(length(ret_1)+1)]] <- factor

@@ -50,7 +50,8 @@ groupFeaturesXCMS <- function(feat, rtalign = TRUE, exportedData = TRUE, groupAr
     xs <- getXCMSSet(feat, exportedData, verbose = verbose)
     if (verbose)
         xs <- do.call(group, c(list(xs), groupArgs))
-        suppressMessages(xs <- do.call(group, c(list(xs), groupArgs)))
+    else
+        suppressMessages(invisible(capture.output(xs <- do.call(group, c(list(xs), groupArgs)))))
 
     if (!exportedData && rtalign)
     {
@@ -67,7 +68,7 @@ groupFeaturesXCMS <- function(feat, rtalign = TRUE, exportedData = TRUE, groupAr
         else
         {
             suppressMessages(xs <- do.call(retcor, c(list(xs), retcorArgs)))
-            suppressMessages(xs <- do.call(group, c(list(xs), groupArgs)))
+            suppressMessages(invisible(capture.output(xs <- do.call(group, c(list(xs), groupArgs)))))
         }
     }
 

@@ -1,3 +1,5 @@
+options(Ncpus = 3)
+
 install.packages("devtools")
 
 source("https://bioconductor.org/biocLite.R")
@@ -7,6 +9,7 @@ biocLite(c("Rdisop", "InterpretMSSpectrum")) # need to install these deps manual
 devtools::install_github("cbroeckl/RAMClustR@036cdd4", upgrade_dependencies = FALSE)
 devtools::install_github("rickhelmus/patRoonData", upgrade_dependencies = FALSE)
 # devtools::install_github("yutannihilation/vdiffr", ref = "fix-strip-version", upgrade_dependencies = FALSE)
+devtools::install_github("lionel-/freetypeharfbuzz", upgrade_dependencies = FALSE)
 devtools::install_github("lionel-/vdiffr", upgrade_dependencies = FALSE)
 devtools::install_github("mllg/checkmate", upgrade_dependencies = FALSE)
 

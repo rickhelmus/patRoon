@@ -16,10 +16,16 @@ ffOptEnviPick <- optimizeFeatureFinding(epAnaInfo, "envipick", list(drtsmall = c
 suppressWarnings(ffOptEmpty <- optimizeFeatureFinding(anaInfo, "openms", list(chromFWHM = c(5, 10), noiseThrInt = 1E9)))
 
 fgOptOpenMS <- optimizeFeatureGrouping(optimizedObject(ffOptOpenMS), "openms", list(maxGroupMZ = c(0.002, 0.007)))
-fgOptXCMS <- optimizeFeatureGrouping(optimizedObject(ffOptXCMS), "xcms", list(bw = c(22, 28), method = "obiwarp"))
+fgOptXCMS <- optimizeFeatureGrouping(optimizedObject(ffOptXCMS), "xcms", list(groupArgs = list(bw = c(22, 28)),
+                                                                              retcorArgs = list(method = "obiwarp")))
 
 # don't want to compare resulting object as it may be irreproducible due to file paths etc
-expInfoNoObject <- function(...) { ret <- experimentInfo(...); return(ret[names(ret) != "object"]) }
+expInfoNoObject <- function(...)
+{
+    ret <- experimentInfo(...)
+    ret$finalResult$object <- NULL
+    return(ret)
+}
 
 test_that("verify feature optimization output", {
     expect_known_value(expInfoNoObject(ffOptOpenMS, 1, 1), testFile("ff-opt-oms"))

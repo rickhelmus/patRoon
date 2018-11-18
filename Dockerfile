@@ -34,10 +34,10 @@ WORKDIR /home/patRoon
 COPY ./docker/install_deps.R ./DESCRIPTION ./
 
 RUN wget http://msbi.ipb-halle.de/~cruttkie/metfrag/MetFrag2.4.3-CL.jar && \
-    wget https://bio.informatik.uni-jena.de/repository/dist-release-local/de/unijena/bioinf/ms/sirius/4.0/sirius-4.0-linux64-headless.zip && \
-    unzip sirius-4.0-linux64-headless.zip && rm sirius-4.0-linux64-headless.zip && \
+    wget https://bio.informatik.uni-jena.de/repository/dist-release-local/de/unijena/bioinf/ms/sirius/4.0.1/sirius-4.0.1-linux64-headless.zip && \
+    unzip sirius-4.0.1-linux64-headless.zip && rm sirius-4.0.1-linux64-headless.zip && \
     echo 'options(patRoon.path.metFragCL = "~/MetFrag2.4.3-CL.jar")' >> .Rprofile && \
-    echo 'options(patRoon.path.SIRIUS = "~/sirius-linux64-headless-4.0/bin")' >> .Rprofile && \
+    echo 'options(patRoon.path.SIRIUS = "~/sirius-linux64-headless-4.0.1/bin")' >> .Rprofile && \
     echo 'options(patRoon.path.vdiffr = "docker")' >> .Rprofile && \
     Rscript install_deps.R && rm -f ~/install_deps.R ~/DESCRIPTION
 

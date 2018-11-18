@@ -19,12 +19,12 @@ NULL
 #'   \code{featureTable} method for access.
 #' @slot analysisInfo Analysis group information. Use the \code{analysisInfo} method
 #'   for access.
-#' 
+#'
 #' @templateVar seli analyses
 #' @templateVar selOrderi analyses()
 #' @templateVar dollarOpName analysis
 #' @template sub_op-args
-#' 
+#'
 #' @export
 features <- setClass("features",
                      slots = c(features = "list", analysisInfo = "data.frame"),
@@ -97,12 +97,12 @@ setMethod("filter", "features", function(obj, intensityThreshold = NULL, retenti
     aapply(assertRange, . ~ retentionRange + mzRange + chromWidthRange, null.ok = TRUE, fixed = list(add = ac))
     checkmate::assertFlag(negate, add = ac)
     checkmate::reportAssertions(ac)
-    
+
     if (length(obj) == 0)
         return(obj)
-    
+
     oldn <- length(obj)
-    
+
     hash <- makeHash(obj, intensityThreshold, retentionRange, mzRange, chromWidthRange, negate)
     cache <- loadCacheData("filterFeatures", hash)
     if (!is.null(cache))
@@ -110,7 +110,7 @@ setMethod("filter", "features", function(obj, intensityThreshold = NULL, retenti
     else
     {
         anaInfo <- analysisInfo(obj)
-        
+
         intPred <- if (!negate) function(x) x >= intensityThreshold else function(x) x < intensityThreshold
         rangePred <- function(x, range)
         {
@@ -119,31 +119,31 @@ setMethod("filter", "features", function(obj, intensityThreshold = NULL, retenti
             else
                 numGTE(x, range[1]) & numLTE(x, range[2])
         }
-        
+
         if (negate)
             rangePred <- Negate(rangePred)
-        
+
         for (ana in analyses(obj))
         {
             if (!is.null(intensityThreshold))
                 obj@features[[ana]] <- obj@features[[ana]][intPred(intensity)]
-            
+
             if (!is.null(retentionRange))
                 obj@features[[ana]] <- obj@features[[ana]][rangePred(ret, retentionRange)]
-            
+
             if (!is.null(mzRange))
                 obj@features[[ana]] <- obj@features[[ana]][rangePred(mz, mzRange)]
-            
+
             if (!is.null(chromWidthRange))
                 obj@features[[ana]] <- obj@features[[ana]][rangePred(retmax - retmin, chromWidthRange)]
         }
-        
+
         saveCacheData("filterFeatures", obj, hash)
     }
-    
+
     newn <- length(obj)
     printf("Done! Filtered %d (%.2f%%) features. Remaining: %d\n", oldn - newn, if (oldn == 0) 0 else (1-(newn/oldn))*100, newn)
-    
+
     return(obj)
 })
 
@@ -154,15 +154,15 @@ setMethod("[", c("features", "ANY", "missing", "missing"), function(x, i, ...)
     if (!missing(i))
     {
         assertSubsetArg(i)
-    
+
         if (!is.character(i))
             i <- analyses(x)[i]
-        
+
         i <- i[i %in% analyses(x)]
         x@features <- x@features[i]
         x@analysisInfo <- x@analysisInfo[x@analysisInfo$analysis %in% i, ]
     }
-    
+
     return(x)
 })
 
@@ -190,14 +190,14 @@ setMethod("screenTargets", "features", function(obj, targets, rtWindow, mzWindow
     assertHasNames(targets, c("name", "mz"), add = ac)
     aapply(checkmate::assertNumber, . ~ rtWindow + mzWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
-    
+
     fTable <- featureTable(obj)
     anaInfo <- analysisInfo(obj)
 
     retlist <- lapply(seq_len(nrow(targets)), function(ti)
     {
         hasRT <- !is.null(targets$rt) && !is.na(targets$rt[ti])
-        
+
         rbindlist(lapply(names(fTable), function(ana)
         {
             if (hasRT)
@@ -234,10 +234,10 @@ setMethod("screenTargets", "features", function(obj, targets, rtWindow, mzWindow
 #' @rdname feature-finding
 #' @aliases findFeatures
 #' @export
-findFeatures <- function(analysisInfo, algorithm, ...)
+findFeatures <- function(analysisInfo, algorithm, ..., verbose = TRUE)
 {
     assertAnalysisInfo(analysisInfo)
-    
+
     f <- switch(algorithm,
                 bruker = findFeaturesBruker,
                 openms = findFeaturesOpenMS,
@@ -245,5 +245,5 @@ findFeatures <- function(analysisInfo, algorithm, ...)
                 envipick = findFeaturesEnviPick,
                 stop("Invalid algorithm! Should be: bruker, openms, xcms or envipick"))
 
-    f(analysisInfo, ...)
+    f(analysisInfo, ..., verbose = verbose)
 }

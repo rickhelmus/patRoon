@@ -12,9 +12,10 @@ getGenFormBin <- function()
     else
     {
         ret <- system.file("bin", Sys.getenv("R_ARCH"), gbin, package = "patRoon")
-        
-        if (!nzchar(ret) && requireNamespace("devtools", quietly = TRUE) &&
-            !is.null(devtools::dev_meta("patRoon")))
+
+        if (!nzchar(ret) &&
+            ((requireNamespace("pkgload", quietly = TRUE) && !is.null(pkgload::dev_meta("patRoon"))) ||
+             (requireNamespace("devtools", quietly = TRUE) && !is.null(devtools::dev_meta("patRoon")))))
             ret <- normalizePath(file.path(system.file(".", package = "patRoon"), "..", "src", gbin))
     }
 
@@ -170,7 +171,7 @@ generateFormulasGenForm <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct =
     checkmate::assertList(extraOpts, any.missing = FALSE, names = "unique", null.ok = TRUE, add = ac)
     aapply(checkmate::assertCount, . ~ maxProcAmount + maxCmdsPerProc, positive = TRUE, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
-    
+
     gInfo <- groupInfo(fGroups)
     anaInfo <- analysisInfo(fGroups)
     ftind <- groupFeatIndex(fGroups)

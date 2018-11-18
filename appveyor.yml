@@ -24,7 +24,7 @@ install:
             Invoke-WebRequest https://bio.informatik.uni-jena.de/repository/dist-release-local/de/unijena/bioinf/ms/sirius/4.0/sirius-4.0-win64-headless.zip -OutFile "C:\deps\sirius-win.zip"
             7z x -oC:\deps\ C:\deps\sirius-win.zip
         }
-        
+
     #- ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
 cache:
@@ -51,7 +51,7 @@ platform: x64
 environment:
     R_ARCH: x64
     BIOC_USE_DEVEL: FALSE
-    _R_CHECK_FORCE_SUGGESTS_: 0
+    _R_CHECK_FORCE_SUGGESTS_: FALSE
 
 build_script:
     - travis-tool.sh install_bioc mzR xcms CAMERA

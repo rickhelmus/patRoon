@@ -9,7 +9,7 @@ componentsCamera <- setClass("componentsCamera", slots = c(xsa = "xsAnnotate"), 
 #'    which is used to generate components from known adducts, isotopes and
 #'   in-source fragments. The specified \code{featureGroups} object is
 #'   automatically converted to an \code{\link{xcmsSet}} object using
-#'   \code{\link{getXcmsSet}}.
+#'   \code{\link{getXCMSSet}}.
 #'
 #' @param onlyIsotopes Logical value. If \code{TRUE} only isotopes are
 #'   considered when generating components (faster). Corresponds to \code{quick}
@@ -27,12 +27,12 @@ generateComponentsCAMERA <- function(fGroups, ionization, onlyIsotopes = FALSE, 
     checkmate::assertFlag(onlyIsotopes, add = ac)
     checkmate::assertList(extraOpts, any.missing = FALSE, names = "unique", null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
-    
+
     if (length(fGroups) == 0)
         return(componentsCamera(componentInfo = data.table(), components = list(),
                                 algorithm = "CAMERA",
                                 xsa = new("xsAnnotate")))
-    
+
     hash <- makeHash(fGroups, ionization, onlyIsotopes, extraOpts)
     cd <- loadCacheData("componentsCAMERA", hash)
     if (!is.null(cd))
@@ -43,7 +43,7 @@ generateComponentsCAMERA <- function(fGroups, ionization, onlyIsotopes = FALSE, 
     gInfo <- groupInfo(fGroups)
     anaInfo <- analysisInfo(fGroups)
 
-    xs <- getXcmsSet(fGroups, TRUE) # UNDONE: handle exportedData: check if all files are present? Is it necessary?
+    xs <- getXCMSSet(fGroups, TRUE) # UNDONE: handle exportedData: check if all files are present? Is it necessary?
 
     # UNDONE: do fillpeaks? What about RC?
 

@@ -4,14 +4,14 @@
 #' @include feature_groups.R
 #' @include feature_groups-xcms.R
 
-#' @rdname getXcmsSet
+#' @rdname getXCMSSet
 #' @export
-setMethod("getXcmsSet", "features", function(obj, exportedData)
+setMethod("getXCMSSet", "features", function(obj, exportedData, verbose)
 {
     # generate dummy XCMS set, based on https://groups.google.com/forum/m/#!topic/xcms/CGC0SKMVhAQ
 
     checkmate::assertFlag(exportedData)
-    
+
     xs <- new(getClassDef("xcmsSet", package = "xcms"))
     anaInfo <- analysisInfo(obj)
     phenoData(xs) <- data.frame(class = anaInfo$group, row.names = anaInfo$analysis)
@@ -37,10 +37,10 @@ setMethod("getXcmsSet", "features", function(obj, exportedData)
             plist[[i]] <- data.frame(mz = numeric(), mzmin = numeric(), mzmax = numeric(), rt = numeric(),
                                      rtmin = numeric(), rtmax = numeric(), maxo = numeric(), into = numeric(),
                                      sample = numeric())
-        
+
         if (exportedData)
         {
-            xr <- loadXCMSRaw(anaInfo$analysis[i], anaInfo$path[i])[[1]]
+            xr <- loadXCMSRaw(anaInfo$analysis[i], anaInfo$path[i], verbose = verbose)[[1]]
             rlist$raw[[i]] <- xr@scantime
             rlist$corrected[[i]] <- xr@scantime
         }
@@ -53,26 +53,26 @@ setMethod("getXcmsSet", "features", function(obj, exportedData)
     return(xs)
 })
 
-#' @rdname getXcmsSet
+#' @rdname getXCMSSet
 #' @export
-setMethod("getXcmsSet", "featuresOpenMS", function(obj, exportedData)
+setMethod("getXCMSSet", "featuresOpenMS", function(obj, exportedData, verbose)
 {
-    return(callNextMethod(obj, TRUE))
+    return(callNextMethod(obj, TRUE, verbose = verbose))
 })
 
-#' @rdname getXcmsSet
+#' @rdname getXCMSSet
 #' @export
-setMethod("getXcmsSet", "featuresXCMS", function(obj, exportedData)
+setMethod("getXCMSSet", "featuresXCMS", function(obj, exportedData, verbose)
 {
     return(obj@xs)
 })
 
-#' @rdname getXcmsSet
+#' @rdname getXCMSSet
 #' @export
-setMethod("getXcmsSet", "featureGroups", function(obj, exportedData)
+setMethod("getXCMSSet", "featureGroups", function(obj, exportedData, verbose)
 {
     checkmate::assertFlag(exportedData)
-    
+
     fTable <- featureTable(obj)
 
     # add unique feat IDs (corresponding to ftindex)
@@ -87,10 +87,12 @@ setMethod("getXcmsSet", "featureGroups", function(obj, exportedData)
     ftind <- copy(groupFeatIndex(obj))
     anaInfo <- analysisInfo(obj)
 
-    cat("Getting ungrouped xcmsSet...\n")
-    xs <- getXcmsSet(getFeatures(obj), exportedData)
+    if (verbose)
+        cat("Getting ungrouped xcmsSet...\n")
+    xs <- getXCMSSet(getFeatures(obj), exportedData, verbose = verbose)
 
-    cat("Making group index table\n")
+    if (verbose)
+        cat("Making group index table\n")
 
     setkeyv(combfts, c("sind", "ftID"))
     groupidx(xs) <- lapply(seq_along(ftind), function(g)
@@ -102,7 +104,8 @@ setMethod("getXcmsSet", "featureGroups", function(obj, exportedData)
         combfts[fti, nomatch = 0][["xsID"]] # xsID is the XCMS peak ID
     })
 
-    cat("Making groups...\n")
+    if (verbose)
+        cat("Making groups...\n")
 
     # generate xcmsSet group matrix
     grps <- matrix(unlist(sapply(seq_along(ftind), function(g)
@@ -131,9 +134,9 @@ setMethod("getXcmsSet", "featureGroups", function(obj, exportedData)
     return(xs)
 })
 
-#' @rdname getXcmsSet
+#' @rdname getXCMSSet
 #' @export
-setMethod("getXcmsSet", "featureGroupsXCMS", function(obj, exportedData)
+setMethod("getXCMSSet", "featureGroupsXCMS", function(obj, exportedData, verbose)
 {
     # first see if we can just return the xcmsSet used during grouping
 
@@ -141,7 +144,7 @@ setMethod("getXcmsSet", "featureGroupsXCMS", function(obj, exportedData)
 
     if (length(filepaths(obj@xs)) != length(anaInfo$analysis) ||
         !all(simplifyAnalysisNames(filepaths(obj@xs)) == anaInfo$analysis))
-        return(callNextMethod(obj, exportedData)) # files changed, need to update group statistics which is rather complex so just fallback
+        return(callNextMethod(obj, exportedData, verbose)) # files changed, need to update group statistics which is rather complex so just fallback
 
     return(obj@xs)
 })
@@ -466,7 +469,7 @@ plotFeatGroupEIC <- function(xr, groupName, mz, rt, rtRange, intRange, mzwin=0.0
     return()
 }
 
-loadXCMSRaw <- function(analyses, paths, cacheDB = NULL)
+loadXCMSRaw <- function(analyses, paths, cacheDB = NULL, verbose = TRUE)
 {
     ret <- sapply(seq_along(analyses), function(anai)
     {
@@ -475,7 +478,8 @@ loadXCMSRaw <- function(analyses, paths, cacheDB = NULL)
         xr <- loadCacheData("EICData", hash, cacheDB)
         if (is.null(xr))
         {
-            printf("Loading raw data from '%s'...\n", analyses[anai])
+            if (verbose)
+                printf("Loading raw data from '%s'...\n", analyses[anai])
             xr <- xcmsRaw(p, profstep = 0)
             saveCacheData("EICData", xr, hash, cacheDB)
         }
@@ -548,7 +552,7 @@ loadXCMSEICForFGroups <- function(fGroups, rtWindow, mzWindow, topMost, onlyPres
 
         # rtRange <- gInfo[grpi, "rts"] + c(-rtWindow, rtWindow)
         mzRange <- gInfo[grpi, "mzs"] + c(-mzWindow, mzWindow)
-        
+
         getFTCol <- function(anai, col)
         {
             if (ftind[[grpi]][anai] == 0)
@@ -566,7 +570,7 @@ loadXCMSEICForFGroups <- function(fGroups, rtWindow, mzWindow, topMost, onlyPres
         if (any(is.na(rtRange)))
             rtRange <- gInfo[grpi, "rts"]
         rtRange <- rtRange + c(-rtWindow, rtWindow)
-        
+
         ret <- lapply(topAnalysesInd, function(anai)
         {
             ana <- anaInfo$analysis[anai]

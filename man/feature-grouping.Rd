@@ -23,7 +23,7 @@
 \alias{importFeatureGroupsXCMS}
 \title{Grouping of features}
 \usage{
-\S4method{groupFeatures}{features}(feat, algorithm, ...)
+\S4method{groupFeatures}{features}(feat, algorithm, ..., verbose = TRUE)
 
 importFeatureGroups(path, type, ...)
 
@@ -34,11 +34,11 @@ importFeatureGroupsEnviMass(path, feat, positive)
 
 groupFeaturesOpenMS(feat, rtalign = TRUE, QT = FALSE,
   maxAlignRT = 30, maxAlignMZ = 0.005, maxGroupRT = 12,
-  maxGroupMZ = 0.005)
+  maxGroupMZ = 0.005, verbose = TRUE)
 
 groupFeaturesXCMS(feat, rtalign = TRUE, exportedData = TRUE,
   groupArgs = list(mzwid = 0.015), retcorArgs = list(method =
-  "obiwarp"))
+  "obiwarp"), verbose = TRUE)
 
 importFeatureGroupsXCMS(xs, analysisInfo)
 }
@@ -53,6 +53,8 @@ used: \code{"openms"}, \code{"xcms"}}
 
 \item{\dots}{Any parameters to be passed to the selected grouping/importing
 algorithm.}
+
+\item{verbose}{if \code{FALSE} then no text output will be shown.}
 
 \item{path}{The path that should be used for importing. For
 \code{importFeatureGroupsBrukerPA} an exported 'bucket table' \file{.txt}

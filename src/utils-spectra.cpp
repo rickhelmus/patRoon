@@ -10,7 +10,7 @@ namespace {
 void specApply(Rcpp::List spectra, double rtMin, double rtMax, double mzMin, double mzMax,
                std::function<void(double, const Rcpp::NumericVector &, const Rcpp::NumericVector &)> func)
 {
-    const Rcpp::DataFrame specHeader = spectra["header"];
+    const Rcpp::DataFrame specHeader = Rcpp::as<Rcpp::DataFrame>(spectra["header"]);
     const Rcpp::NumericVector hdRetTimes = specHeader["retentionTime"];
     const Rcpp::NumericVector hdMSLevels = specHeader["msLevel"];
     const Rcpp::NumericVector hdSeqNums = specHeader["seqNum"];
@@ -24,7 +24,7 @@ void specApply(Rcpp::List spectra, double rtMin, double rtMax, double mzMin, dou
         if (!numberWithin(specRt, rtMin, rtMax, 1E-4) || hdMSLevels[spi] != 1)
             continue;
         
-        const Rcpp::DataFrame peaklist = specList[hdSeqNums[spi] - 1]; // -1: R 1 based index
+        const Rcpp::DataFrame peaklist = Rcpp::as<Rcpp::DataFrame>(specList[hdSeqNums[spi] - 1]); // -1: R 1 based index
         func(specRt, peaklist["mz"], peaklist["intensity"]);
     }
 }

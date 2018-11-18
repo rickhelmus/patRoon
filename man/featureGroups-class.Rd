@@ -17,7 +17,6 @@
 \alias{groupInfo}
 \alias{featureTable,featureGroups-method}
 \alias{getFeatures,featureGroups-method}
-\alias{getFeatures}
 \alias{groupFeatIndex,featureGroups-method}
 \alias{groupFeatIndex}
 \alias{[,featureGroups,ANY,ANY,missing-method}
@@ -60,7 +59,7 @@
 
 \S4method{featureTable}{featureGroups}(obj)
 
-\S4method{getFeatures}{featureGroups}(fGroups)
+\S4method{getFeatures}{featureGroups}(obj)
 
 \S4method{groupFeatIndex}{featureGroups}(fGroups)
 

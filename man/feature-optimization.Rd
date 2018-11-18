@@ -229,7 +229,8 @@ plot(ftOpt, paramSet = 1, DoEIteration = 1, type = "contour")
 
 # generate parameter set with some predefined and custom parameters to be
 # optimized.
-pSet <- generateFeatureOptPSet("openms", chromSNR = c(3, 9), useSmoothedInts = FALSE)
+pSet <- generateFeatureOptPSet("openms", chromSNR = c(3, 9),
+                               useSmoothedInts = FALSE)
 }
 }
 \references{

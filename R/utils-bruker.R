@@ -348,6 +348,8 @@ addDAEIC <- function(analysis, path, mz, mzWidth, ctype = "EIC", mtype = "MS", p
         checkmate::checkNumber(fragpath, lower = 0, finite = TRUE),
         checkmate::checkChoice(fragpath, "")
     )
+    checkmate::assertString(name, min.chars = 1, null.ok = TRUE, add = ac)
+    checkmate::assertFlag(hideDA, add = ac)
     checkmate::reportAssertions(ac)
     
     DA <- getDAApplication()
@@ -368,6 +370,42 @@ addDAEIC <- function(analysis, path, mz, mzWidth, ctype = "EIC", mtype = "MS", p
     }
 
     return(ret)
+}
+
+# UNDONE: make method?
+addAllDAEICs <- function(fGroups, mzWidth, ctype = "EIC", bgsubtr = FALSE, name = TRUE,
+                         onlyPresent = TRUE, hideDA = TRUE)
+{
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertClass(fGroups, "featureGroups", add = ac)
+    checkmate::assertNumber(mzWidth, lower = 0, finite = TRUE, add = ac)
+    checkmate::assertChoice(ctype, c("EIC", "TIC", "BPC"), add = ac)
+    aapply(checkmate::assertFlag, . ~ bgsubtr + name + hideDA, fixed = list(add = ac))
+    checkmate::reportAssertions(ac)
+    
+    gInfo <- groupInfo(fGroups)
+    gNames <- names(fGroups)
+    gCount <- length(fGroups)
+    ftInd <- groupFeatIndex(fGroups)
+    anaInfo <- analysisInfo(fGroups)
+    anaCount <- nrow(anaInfo)
+    fTable <- featureTable(fGroups)
+    
+    for (gi in seq_len(gCount))
+    {
+        for (anai in seq_len(anaCount))
+        {
+            fti <- ftInd[[gi]][anai]
+            if (onlyPresent && fti == 0)
+                next
+            
+            ana <- anaInfo$analysis[anai]
+            addDAEIC(ana, anaInfo$path[anai], gInfo[gi, "mzs"], mzWidth, ctype, bgsubtr = bgsubtr,
+                     name = if (name) gNames[gi] else NULL, hideDA = hideDA)
+        }
+    }
+    
+    invisible(NULL)
 }
 
 generateDACompounds <- function(fGroups, bgsubtr, maxRtMSWidth, clear, save, MSMSType)

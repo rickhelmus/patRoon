@@ -44,7 +44,7 @@ before_test:
   - pandoc -v
   - ps: >-
       if (-Not (Test-Path "C:\ProgramData\chocolatey\bin\pngquant.exe")) {
-        cinst pngquant
+        cinst pngquant --ignore-checksums
       }
 
 platform: x64

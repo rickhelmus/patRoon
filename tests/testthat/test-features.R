@@ -8,9 +8,12 @@ ffXCMS <- findFeatures(anaInfoOne, "xcms")
 
 # generate mzXML files for enviPick
 exDataFiles <- list.files(patRoonData::exampleDataPath(), "\\.mzML$", full.names = TRUE)
-convertMSFiles(anaInfoOne, "mzML", "mzXML", getWorkPath())
+convertMSFiles(file.path(anaInfoOne$path, paste0(anaInfoOne$analysis, ".mzML")),
+               outPath = getWorkPath(), to = "mzXML", algorithm = "openms",
+               logPath = NULL)
 epAnaInfo <- getTestAnaInfo(getWorkPath())
 ffEP <- findFeatures(epAnaInfo, "envipick")
+
 ffEmpty <- findFeatures(anaInfoOne, "openms", thr = 1E9, logPath = NULL)
 
 test_that("verify feature finder output", {

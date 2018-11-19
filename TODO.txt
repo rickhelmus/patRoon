@@ -27,3 +27,4 @@ Release:
 - generateCompounds: take averaged mass spectrum (as an option)
 - support fastcluster for compounds clustering/int component clusters?
 - groupFeaturesScreening functionality for features?
+- reportPDF/reportMD: MS only formulas are not reported?

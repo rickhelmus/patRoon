@@ -1,6 +1,7 @@
 # patRoon 0.1.0.9000
 
 ## November 2018
+* `convertMSFiles`: changed interface with more options, parallelization and ProteoWizard support.
 * Changed `nintersects` default for plotUpSet so that all intersections are plotted by default.
 * plotChord() now properly stops if nothing overlaps.
 * replicateGroupSubtract() now removes replicate groups that were subtracted.

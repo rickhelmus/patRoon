@@ -86,6 +86,12 @@ assertCanCreateDir <- function(x, .var.name = checkmate::vname(x), add = NULL)
     invisible(NULL)
 }
 
+assertCanCreateDirs <- function(x, .var.name = checkmate::vname(x), add = NULL)
+{
+    for (ana in x)
+        assertCanCreateDir(ana, .var.name, add)
+}
+
 assertMultiProcArgs <- function(x, maxProcAmount, .var.name = checkmate::vname(x), add = NULL)
 {
     if (!is.null(x))

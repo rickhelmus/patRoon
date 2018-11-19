@@ -110,6 +110,7 @@ Collate:
     'utils-sirius.R'
     'compounds-sirius.R'
     'compounds-util.R'
+    'convert.R'
     'feature_groups-bruker.R'
     'feature_groups-comparison.R'
     'feature_groups-envimass.R'

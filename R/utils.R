@@ -18,6 +18,7 @@ simplifyAnalysisNames <- function(slist)
 getMzMLAnalysisPath <- function(file, path) file.path(path, paste0(file, ".mzML"))
 getMzXMLAnalysisPath <- function(file, path) file.path(path, paste0(file, ".mzXML"))
 getMzDataAnalysisPath <- function(file, path) file.path(path, paste0(file, ".mzData"))
+getAnalysisPath <- function(file, path, ext) file.path(path, paste0(file, ".", ext))
 
 getMzMLOrMzXMLAnalysisPath <- function(file, path)
 {
@@ -31,8 +32,11 @@ makeFGroupName <- function(id, ret, mz) sprintf("M%.0f_R%.0f_%d", mz, ret, id)
 
 mkdirp <- function(path)
 {
-    if (!dir.exists(path))
-        dir.create(path, recursive = TRUE)
+    for (p in path)
+    {
+        if (!dir.exists(p))
+            dir.create(p, recursive = TRUE)
+    }
 }
 
 insertDFColumn <- function(df, col, d, before)
@@ -361,68 +365,6 @@ getBrewerPal <- function(n, name)
         return(brewer.pal(3, name)[seq_len(n)])
 
     return(brewer.pal(n, name))
-}
-
-#' Conversion of analyses between several open formats
-#'
-#' This function uses the \command{FileConverter} command from
-#' \href{http://www.openms.de/}{OpenMS} to convert analyses files from one open
-#' format to another. The supported file formats are (both directions):
-#' \file{.mzXML}, \file{.mzML} and \file{.mzData}.
-#'
-#' @param anaInfo A table with \link[=analysis-information]{analysis
-#'   information} that contains the analyses to be converted.
-#' @param formatFrom,formatTo A \code{character} that specifies the source and
-#'   destination format, respectively. Valid options are: \code{"mzXML"},
-#'   \code{"mzML"} and \code{"mzData"}.
-#' @param outPath A character vector specifying directories that should be used for the output. Usually
-#'   this is the same as the source (otherwise the
-#'   \link[=analysis-information]{analysis information} should be changed for
-#'   further processing). Will be re-cycled if necessary.
-#' @param overWrite Should existing destination file be overwritten
-#'   (\code{TRUE}) or not (\code{FALSE})?
-#'
-#' @references \insertRef{Rst2016}{patRoon}
-#' 
-#' @export
-convertMSFiles <- function(anaInfo, formatFrom, formatTo, outPath = anaInfo$path, overWrite = FALSE)
-{
-    ac <- checkmate::makeAssertCollection()
-    assertAnalysisInfo(anaInfo, add = ac)
-    checkmate::assertChoice(formatFrom, c("mzXML", "mzML", "mzData"), add = ac)
-    checkmate::assertChoice(formatTo, c("mzXML", "mzML", "mzData"), add = ac)
-    checkmate::assertCharacter(outPath, min.chars = 1, min.len = 1, add = ac)
-    checkmate::assertDirectoryExists(outPath, "w", add = ac)
-    checkmate::assertFlag(overWrite, add = ac)
-    checkmate::reportAssertions(ac)
-    
-    outPath <- rep(outPath, length.out = length(anaInfo$path))
-
-    for (anai in seq_len(nrow(anaInfo)))
-    {
-        input <- switch(formatFrom,
-                        mzXML = getMzXMLAnalysisPath(anaInfo$analysis[anai], anaInfo$path[anai]),
-                        mzML = getMzMLAnalysisPath(anaInfo$analysis[anai], anaInfo$path[anai]),
-                        mzData = getMzDataAnalysisPath(anaInfo$analysis[anai], anaInfo$path[anai]),
-                        stop(sprintf("Unknown input file format: %s!", formatFrom)))
-
-        outExt <- switch(formatTo,
-                         mzXML = ".mzXML",
-                         mzML = ".mzML",
-                         mzData = ".mzData",
-                         stop(sprintf("Unknown output file format: %s!", formatTo)))
-
-        output <- file.path(outPath[anai], paste0(anaInfo$analysis[anai], outExt))
-
-        if (!file.exists(input))
-            warning(sprintf("Skipping non-existing input analysis %s", input))
-        else if (overWrite || !file.exists(output))
-        {
-            if (executeCommand(getCommandWithOptPath("FileConverter", "OpenMS"),
-                               c("-in", input, "-out", output)) != 0)
-                stop("Failed to execute OpenMS FileConverter command.")
-        }
-    }
 }
 
 getArgNames <- function(...)

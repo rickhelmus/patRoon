@@ -91,7 +91,7 @@ selectMethod("plot", class(rmdVars$fGroups))(rmdVars$fGroups)
 ```{r}
 rGroupLenNonEmpty <- length(unique(analysisInfo(removeEmptyAnalyses(rmdVars$fGroups))$group))
 rGroupLen <- length(replicateGroups(rmdVars$fGroups))
-anyOverlap <- length(overlap(rmdVars$fGroups, which = replicateGroups(rmdVars$fGroups))) > 0
+anyOverlap <- rGroupLen > 1 && length(overlap(rmdVars$fGroups, which = replicateGroups(rmdVars$fGroups))) > 0
 if (length(rmdVars$fGroups) > 0 && anyOverlap && rGroupLenNonEmpty > 1)
 {
     doPlotChord <- "chord" %in% rmdVars$reportPlots

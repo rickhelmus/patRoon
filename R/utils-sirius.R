@@ -56,7 +56,7 @@ unifySirNames <- function(sir)
                  score = "score",
                  molecularFormula = "formula",
                  xlogp = "XlogP",
-                 name = "trivialName",
+                 name = "compoundName",
                  links = "libraryLinks")
 
     unNames <- unNames[names(unNames) %in% names(sir)] # filter out missing

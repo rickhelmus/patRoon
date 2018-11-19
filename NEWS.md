@@ -1,6 +1,8 @@
 # patRoon 0.1.0.9000
 
 ## November 2018
+* Store/report IUPACName (as compoundName) from MetFrag PubChem data.
+* Renamed trivialName to compoundName for compound tables.
 * `convertMSFiles`: changed interface with more options, parallelization and ProteoWizard support.
 * Automatic optimization of parameters necessary for feature finding and grouping. Heavily based on the IPO R package. See the 'feature-optimization' manual page.
 * **IMPORTANT** `getXcmsSet()` is renamed to `getXCMSSet()`

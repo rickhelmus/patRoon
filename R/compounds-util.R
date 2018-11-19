@@ -126,7 +126,7 @@ getCompInfoList <- function(compResults, compIndex, addHTMLURL, mCompNames)
     else
         ctext <- addValText(ctext, "%s", "identifier")
 
-    ctext <- addValText(ctext, "%s", c("trivialName", "formula", "SMILES", "analysis"))
+    ctext <- addValText(ctext, "%s", c("compoundName", "formula", "SMILES", "analysis"))
 
     if (length(getAllCompCols("InChIKey", columns, mCompNames)) > 0)
         ctext <- addValText(ctext, "%s", "InChIKey")
@@ -242,7 +242,7 @@ getCompInfoText <- function(compResults, compIndex, addHTMLURL, normalizeScores,
     else
         ctext <- addValText(ctext, "%s", "identifier")
     
-    ctext <- addValText(ctext, "%s", c("trivialName", "formula", "SMILES", "analysis"))
+    ctext <- addValText(ctext, "%s", c("compoundName", "formula", "SMILES", "analysis"))
     
     if (length(getAllCompCols("InChIKey", columns, mCompNames)) > 0)
         ctext <- addValText(ctext, "%s", "InChIKey")
@@ -455,7 +455,7 @@ setMethod("compoundViewer", c("featureGroups", "MSPeakLists", "compounds"), func
             }
 
             keepCols <- c(getCols("identifier"), "structure",
-                          getCols(c("trivialName", "formula", "explainedPeaks")))
+                          getCols(c("compoundName", "formula", "explainedPeaks")))
 
             # optional scoring columns
             scorecols <- getCols(getCompScoreColNames())

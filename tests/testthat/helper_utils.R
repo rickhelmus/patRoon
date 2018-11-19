@@ -8,11 +8,18 @@ getTestFGroups <- function(anaInfo = getTestAnaInfo()) groupFeatures(findFeature
 getEmptyTestFGroups <- function() getTestFGroups()[, "none"]
 getEmptyPLists <- function() MSPeakLists()
 
+makeMZXMLs <- function(anaInfo)
+{
+    exDataFiles <- list.files(patRoonData::exampleDataPath(), "\\.mzML$", full.names = TRUE)
+    convertMSFiles(anaInfo, "mzML", "mzXML", getWorkPath())
+    return(getTestAnaInfo(getWorkPath()))
+}
+
 expect_file <- function(object, file, removeIfExists = TRUE)
 {
     if (removeIfExists && file.exists(file))
         file.remove(file)
-    
+
     act <- quasi_label(rlang::enquo(object))
     expect(file.exists(file), sprintf("failed to generate %s", file))
     invisible(act$val)
@@ -31,14 +38,14 @@ expect_range <- function(object, r)
 expect_known_show <- function(object, file)
 {
     act <- quasi_label(rlang::enquo(object))
-    
+
     text <- capture_output_lines(show(act$val))
-    
+
     # remove last line with object size as it may vary even if object remain the same
     text <- text[seq_len(length(text)-1)]
-    
+
     text <- paste0(text, collapse = "")
-    
+
     # based on simplified expect_known_output
     if (!file.exists(file))
     {
@@ -50,11 +57,11 @@ expect_known_show <- function(object, file)
     {
         ref <- patRoon:::readAllFile(file)
         cat(text, file = file)
-        
+
         cmp <- compare(text, enc2native(ref))
         expect(cmp$equal, sprintf("show reference of %s has changed\n%s", act$lab, cmp$message))
     }
-    
+
     invisible(act$val)
 }
 
@@ -80,7 +87,7 @@ expect_doppel <- function(...) vdiffr::expect_doppelganger(..., path = getOption
 makeExpectation <- checkmate::makeExpectation
 vname <- checkmate::vname
 
-expect_csv_file <- checkmate::makeExpectationFunction(checkCSVFile)
+expect_csv_file <- checkmate::makeExpectationFunction(patRoon:::checkCSVFile)
 
 # call dollar operator with string
 callDollar <- function(x, name) eval(substitute(x$NAME_ARG, list(NAME_ARG = name)))

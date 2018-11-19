@@ -2,6 +2,9 @@
 
 ## November 2018
 * `convertMSFiles`: changed interface with more options, parallelization and ProteoWizard support.
+* Automatic optimization of parameters necessary for feature finding and grouping. Heavily based on the IPO R package. See the 'feature-optimization' manual page.
+* **IMPORTANT** `getXcmsSet()` is renamed to `getXCMSSet()`
+* verbose option for `findFeatures()` / `groupFeatures()`
 * Changed `nintersects` default for plotUpSet so that all intersections are plotted by default.
 * plotChord() now properly stops if nothing overlaps.
 * replicateGroupSubtract() now removes replicate groups that were subtracted.
@@ -11,6 +14,8 @@
 
 
 ## October 2018
+* OpenMS `features` class objects now store number of isotopes found for each feature.
+* **IMPORTANT** Added all relevant options of FeatureFinderMetabo as function arguments to findFeaturesOpenMS() and renamed/reordered current options for more conistent style. Please check ?findFeatures for the updated function arguments!
 * openReport option for reportMD(). If TRUE the generated report will be opened with a web browser.
 * reportPlots option for reportMD() which collapses reportFGroups, reportChord and reportFormulaSpectra and adds control to plot Venn and UpSet diagrams.
 * plotUpSet() methods to compare feature groups by UpSet plots. See e.g. http://caleydo.org/tools/upset/

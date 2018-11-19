@@ -109,9 +109,8 @@ setMethod("groupInfo", "featureGroups", function(fGroups) fGroups@groupInfo)
 setMethod("featureTable", "featureGroups", function(obj) featureTable(obj@features))
 
 #' @describeIn featureGroups Accessor for \code{features} slot.
-#' @aliases getFeatures
 #' @export
-setMethod("getFeatures", "featureGroups", function(fGroups) fGroups@features)
+setMethod("getFeatures", "featureGroups", function(obj) obj@features)
 
 #' @describeIn featureGroups Accessor for \code{ftindex} slot.
 #' @aliases groupFeatIndex
@@ -148,7 +147,7 @@ setMethod("[", c("featureGroups", "ANY", "ANY", "missing"), function(x, i, j, ..
         assertSubsetArg(i)
     if (!missing(j))
         assertSubsetArg(j)
-    
+
     toNumIndex <- function(ind, names)
     {
         if (typeof(ind) == "character")
@@ -172,7 +171,7 @@ setMethod("[", c("featureGroups", "ANY", "ANY", "missing"), function(x, i, j, ..
 setMethod("[[", c("featureGroups", "ANY", "ANY"), function(x, i, j)
 {
     assertExtractArg(i)
-    
+
     if (missing(j))
         return(x@groups[[i]])
 
@@ -207,7 +206,7 @@ setMethod("removeEmptyAnalyses", "featureGroups", function(fGroups)
     if (length(fGroups) > 0)
     {
         trGT <- transpose(groups(fGroups))
-        
+
         empty <- trGT[, sapply(.SD, sum) == 0]
         if (any(empty))
             fGroups <- removeAnalyses(fGroups, which(empty))
@@ -260,12 +259,12 @@ setMethod("export", "featureGroups", function(fGroups, type, out)
     checkmate::assertChoice(type, c("brukerpa", "brukertasq", "mzmine"), add = ac)
     checkmate::assertPathForOutput(out, overwrite = TRUE, add = ac) # NOTE: assert doesn't work on Windows...
     checkmate::reportAssertions(ac)
-    
+
     if (type == "brukerpa")
     {
         if (length(fGroups) == 0)
             stop("Cannot export empty feature groups object")
-        
+
         # UNDONE: do we need this?
         #files <- sapply(bucketInfo$fInfo$analysis, function(f) file.path(bucketInfo$dataPath, paste0(f, ".d")), USE.NAMES = F)
         files <- fGroups@analysisInfo$analysis
@@ -309,10 +308,10 @@ setMethod("export", "featureGroups", function(fGroups, type, out)
 setMethod("groupTable", "featureGroups", function(fGroups, average)
 {
     checkmate::assertFlag(average)
-    
+
     if (length(fGroups) == 0)
         return(data.table(mz = numeric(), ret = numeric(), group = character()))
-    
+
     # UNDONE: Add formulas/idents?
     anaInfo <- analysisInfo(fGroups)
 
@@ -344,7 +343,7 @@ setMethod("groupTable", "featureGroups", function(fGroups, average)
 setMethod("plot", "featureGroups", function(x, retMin = TRUE, ...)
 {
     checkmate::assertFlag(retMin)
-    
+
     if (length(x) == 0)
         plot(0, type = "n", ...)
     else
@@ -359,13 +358,13 @@ setMethod("plot", "featureGroups", function(x, retMin = TRUE, ...)
 setMethod("plotInt", "featureGroups", function(obj, average = FALSE, ...)
 {
     checkmate::assertFlag(average)
-    
+
     if (length(obj) == 0)
     {
         plot(0, type = "n")
         invisible(return(NULL))
     }
-    
+
     anaInfo <- analysisInfo(obj)
 
     if (average)
@@ -417,12 +416,12 @@ setMethod("plotChord", "featureGroups", function(obj, addSelfLinks = FALSE, addR
            fixed = list(add = ac))
     checkmate::assertCharacter(outerGroups, min.chars = 1, min.len = 2, names = "unique", null.ok = TRUE)
     checkmate::reportAssertions(ac)
-    
+
     if (length(obj) == 0)
         stop("Can't plot empty feature groups object")
-    
+
     hasOuter <- !is.null(outerGroups)
-    
+
     obj <- removeEmptyAnalyses(obj)
 
     anaInfo <- analysisInfo(obj)
@@ -511,7 +510,7 @@ setMethod("plotChord", "featureGroups", function(obj, addSelfLinks = FALSE, addR
         tracks <- list(list(track.height = 0.1, track.margin = c(if (addRetMzPlots) 0.05 else 0.06, 0)))
     if (addRetMzPlots)
         tracks = c(tracks, list(list(track.height = 0.1, track.margin = c(0.08, 0))))
-    
+
     maxv <- max(if (hasOuter) chordTable[groupFrom != groupTo, value] else chordTable$value)
     colFunc <- colorRamp2(maxv * seq(0, 1, 0.25),
                           c("blue4", "deepskyblue1", "green", "orange", "red"),
@@ -623,12 +622,12 @@ setMethod("plotEIC", "featureGroups", function(obj, rtWindow = 30, mzWindow = 0.
            fixed = list(add = ac))
     checkmate::assertCount(topMost, positive = TRUE, null.ok = TRUE, add = ac)
     checkmate::assertString(title, null.ok = TRUE, add = ac)
-    
+
     colourBy <- checkmate::matchArg(colourBy, c("none", "rGroups", "fGroups"), add = ac)
     annotate <- checkmate::matchArg(annotate, c("none", "ret", "mz"), several.ok = TRUE, add = ac)
-    
+
     checkmate::reportAssertions(ac)
-    
+
     if (length(obj) == 0)
     {
         plot(0, type = "n")
@@ -651,7 +650,7 @@ setMethod("plotEIC", "featureGroups", function(obj, rtWindow = 30, mzWindow = 0.
     if (is.null(EICs))
         EICs <- getEICsForFGroups(obj, rtWindow, mzWindow, topMost, onlyPresent)
     EICFGroups <- unique(unlist(sapply(EICs, names)))
-    
+
     if (colourBy == "rGroups")
     {
         EICColors <- colorRampPalette(brewer.pal(12, "Paired"))(length(rGroups))
@@ -770,11 +769,11 @@ setMethod("plotEIC", "featureGroups", function(obj, rtWindow = 30, mzWindow = 0.
 
             if (onlyPresent && gTable[[grp]][anai] == 0)
                 next
-            
+
             EIC <- EICs[[ana]][[grp]]
             if (is.null(EIC))
                 next
-            
+
             if (colourBy == "rGroups")
                 colInd <- anaInfo$group[anai]
             else if (colourBy == "fGroups")
@@ -843,10 +842,10 @@ setMethod("plotEIC", "featureGroups", function(obj, rtWindow = 30, mzWindow = 0.
 setMethod("plotVenn", "featureGroups", function(obj, which, ...)
 {
     checkmate::assertCharacter(which, min.chars = 1, null.ok = TRUE)
-    
+
     if (length(obj) == 0)
         stop("Can't plot empty feature groups object")
-    
+
     if (is.null(which))
         which <- unique(analysisInfo(obj)$group)
 
@@ -908,7 +907,7 @@ setMethod("plotVenn", "featureGroups", function(obj, which, ...)
 #' 
 #' @references \insertRef{Conway2017}{patRoon} \cr\cr
 #'   \insertRef{Lex2014}{patRoon}
-#' 
+#'
 #' @export
 setMethod("plotUpSet", "featureGroups", function(obj, which = replicateGroups(obj), nsets = length(which),
                                                  nintersects = NA, ...)
@@ -918,12 +917,12 @@ setMethod("plotUpSet", "featureGroups", function(obj, which = replicateGroups(ob
     ac <- checkmate::makeAssertCollection()
     checkmate::assertSubset(which, rGroups, empty.ok = FALSE, add = ac)
     checkmate::reportAssertions(ac)
-    
+
     if (length(obj) == 0)
         stop("Can't plot empty feature groups object")
-    
+
     obj <- replicateGroupFilter(obj, which, verbose = FALSE)
-    
+
     gt <- groupTable(obj, average = TRUE)
     gt[, (which) := lapply(.SD, function(x) as.integer(x > 0)), .SDcols = which]
     UpSetR::upset(gt, nsets = nsets, nintersects = nintersects, ...)
@@ -947,7 +946,7 @@ setMethod("unique", "featureGroups", function(x, which, relativeTo = NULL, outer
                                null.ok = TRUE, add = ac)
     checkmate::assertFlag(outer, add = ac)
     checkmate::reportAssertions(ac)
-    
+
     if (is.null(relativeTo))
         relativeTo <- unique(analysisInfo(x)$group)
     else
@@ -988,7 +987,7 @@ setMethod("overlap", "featureGroups", function(fGroups, which, exclusive)
     checkmate::assertCharacter(which, min.len = 2, min.chars = 1, any.missing = FALSE, add = ac)
     checkmate::assertFlag(exclusive, add = ac)
     checkmate::reportAssertions(ac)
-    
+
     anaInfo <- analysisInfo(fGroups)
     rGroups <- unique(anaInfo$group)
 
@@ -1014,7 +1013,7 @@ setMethod("screenTargets", "featureGroups", function(obj, targets, rtWindow, mzW
     assertHasNames(targets, c("name", "mz"), add = ac)
     aapply(checkmate::assertNumber, . ~ rtWindow + mzWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
-    
+
     gTable <- groups(obj)
     gInfo <- groupInfo(obj)
     anaInfo <- analysisInfo(obj)
@@ -1108,14 +1107,14 @@ setMethod("regression", "featureGroups", function(fGroups)
 #' @rdname feature-grouping
 #' @aliases groupFeatures
 #' @export
-setMethod("groupFeatures", "features", function(feat, algorithm, ...)
+setMethod("groupFeatures", "features", function(feat, algorithm, ..., verbose = TRUE)
 {
     f <- switch(algorithm,
                 openms = groupFeaturesOpenMS,
                 xcms = groupFeaturesXCMS,
                 stop("Invalid algorithm! Should be: openms or xcms"))
 
-    f(feat, ...)
+    f(feat, ..., verbose = verbose)
 })
 
 #' @details \code{importFeatureGroups} is a generic function to import feature

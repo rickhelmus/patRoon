@@ -21,22 +21,28 @@
 \alias{importFeaturesXCMS}
 \title{Finding features}
 \usage{
-findFeatures(analysisInfo, algorithm, ...)
+findFeatures(analysisInfo, algorithm, ..., verbose = TRUE)
 
 findFeaturesBruker(analysisInfo, doFMF = "auto", startRange = 0,
-  endRange = 0)
+  endRange = 0, verbose = TRUE)
 
-findFeaturesEnviPick(analysisInfo, ...)
+findFeaturesEnviPick(analysisInfo, ..., verbose = TRUE)
 
 importFeaturesEnviMass(analysisInfo, enviProjPath)
 
-findFeaturesOpenMS(analysisInfo, thr = 1000, comfwhm = 5,
-  minfwhm = 3, maxfwhm = 60, minlength = 3, maxlength = -1,
-  mzppm = 10, extraOpts = NULL, intSearchRTWindow = 3,
-  logPath = file.path("log", "openms"),
-  maxProcAmount = getOption("patRoon.maxProcAmount"))
+findFeaturesOpenMS(analysisInfo, noiseThrInt = 1000, chromSNR = 3,
+  chromFWHM = 5, mzPPM = 10, reEstimateMTSD = TRUE,
+  traceTermCriterion = "sample_rate", traceTermOutliers = 5,
+  minSampleRate = 0.5, minTraceLength = 3, maxTraceLength = -1,
+  widthFiltering = "fixed", minFWHM = 3, maxFWHM = 60,
+  traceSNRFiltering = FALSE, localRTRange = 10, localMZRange = 6.5,
+  isotopeFilteringModel = "metabolites (5\% RMS)",
+  MZScoring13C = FALSE, useSmoothedInts = TRUE, extraOpts = NULL,
+  intSearchRTWindow = 3, logPath = file.path("log", "openms"),
+  maxProcAmount = getOption("patRoon.maxProcAmount"), verbose = TRUE)
 
-findFeaturesXCMS(analysisInfo, method = "centWave", ...)
+findFeaturesXCMS(analysisInfo, method = "centWave", ...,
+  verbose = TRUE)
 
 importFeaturesXCMS(xs, analysisInfo)
 }
@@ -51,31 +57,74 @@ used: \code{"bruker"}, \code{"openms"}, \code{"xcms"}, \code{"envipick"}}
 (\code{featurefinderEnviPick}) or to selected feature finding algorithms
 (\code{findFeatures}).}
 
+\item{verbose}{If set to \code{FALSE} then no text output is shown.}
+
 \item{doFMF}{Run the 'Find Molecular Features' algorithm before loading
 compounds. Valid options are: \code{TRUE} (always), \code{FALSE} (never)
 and \code{"auto"} (automatically if no compounds present).}
 
 \item{startRange, endRange}{Start/End retention range (seconds) from which to
-collect features. A 0 (zero) for code{endRange} marks the end of the
+collect features. A 0 (zero) for \code{endRange} marks the end of the
 analysis.}
 
 \item{enviProjPath}{The path of the enviMass project.}
 
-\item{thr}{Noise intensity threshold. Sets
+\item{noiseThrInt}{Noise intensity threshold. Sets
 \code{algorithm:common:noise_threshold_int} option.}
 
-\item{comfwhm, minfwhm, maxfwhm}{Expected/Minimal/Maximal chromatographic peak
-width (seconds). Sets \code{algorithm:common:chrom_fwhm},
-\code{algorithm:epd:min_fwhm} and \code{algorithm:epd:max_fwhm},
-respectively.}
+\item{chromSNR}{Minimum S/N of a mass trace. Sets
+\code{algorithm:common:chrom_peak_snr} option.}
 
-\item{minlength, maxlength}{Minimum/Maximum length of mass trace (seconds).
-Set negative value for maxlength to disable maximum. Sets
+\item{chromFWHM}{Expected chromatographic peak width (in seconds). Sets
+\code{algorithm:common:chrom_fwhm} option.}
+
+\item{mzPPM}{Allowed mass deviation (ppm) for trace detection. Sets
+\code{algorithm:mtd:mass_error_ppm}.}
+
+\item{reEstimateMTSD}{If \code{TRUE} then enables dynamic re-estimation of
+m/z variance during mass trace collection stage. Sets
+\code{algorithm:mtd:reestimate_mt_sd}.}
+
+\item{traceTermCriterion, traceTermOutliers, minSampleRate}{Termination
+criterion for the extension of mass traces. See
+\href{http://ftp.mi.fu-berlin.de/pub/OpenMS/release2.1.0-documentation/html/TOPP_FeatureFinderMetabo.html}{FeatureFinderMetabo}.
+ Sets the \code{algorithm:mtd:trace_termination_criterion},
+\code{algorithm:mtd:trace_termination_outliers} and
+\code{algorithm:mtd:min_sample_rate} options, respectively.}
+
+\item{minTraceLength, maxTraceLength}{Minimum/Maximum length of mass trace
+(seconds). Set negative value for maxlength to disable maximum. Sets
 \code{algorithm:mtd:min_trace_length} and
 \code{algorithm:mtd:min_trace_length}, respectively.}
 
-\item{mzppm}{Allowed mass deviation (ppm) for trace detection. Sets
-\code{algorithm:mtd:mass_error_ppm}.}
+\item{widthFiltering, minFWHM, maxFWHM}{Enable filtering of unlikely peak
+widths. See
+\href{http://ftp.mi.fu-berlin.de/pub/OpenMS/release2.1.0-documentation/html/TOPP_FeatureFinderMetabo.html}{FeatureFinderMetabo}.
+ Sets \code{algorithm:epd:width_filtering}, \code{algorithm:epd:min_fwhm}
+and \code{algorithm:epd:max_fwhm}, respectively.}
+
+\item{traceSNRFiltering}{If \code{TRUE} then apply post-filtering by
+signal-to-noise ratio after smoothing. Sets the
+\code{algorithm:epd:masstrace_snr_filtering} option.}
+
+\item{localRTRange, localMZRange}{Retention/MZ range where to look for
+coeluting/isotopic mass traces. Sets the
+\code{algorithm:ffm:local_rt_range} and \code{algorithm:ffm:local_mz_range}
+options, respectively.}
+
+\item{isotopeFilteringModel}{Remove/score candidate assemblies based on
+isotope intensities. See
+\href{http://ftp.mi.fu-berlin.de/pub/OpenMS/release2.1.0-documentation/html/TOPP_FeatureFinderMetabo.html}{FeatureFinderMetabo}.
+ Sets the \code{algorithm:ffm:isotope_filtering_model} option.}
+
+\item{MZScoring13C}{Use the 13C isotope as the expected shift for isotope
+mass traces. See
+\href{http://ftp.mi.fu-berlin.de/pub/OpenMS/release2.1.0-documentation/html/TOPP_FeatureFinderMetabo.html}{FeatureFinderMetabo}.
+Sets \code{algorithm:ffm:mz_scoring_13C}.}
+
+\item{useSmoothedInts}{If \code{TRUE} then use LOWESS intensities instead of
+raw intensities. Sets the \code{algorithm:ffm:use_smoothed_intensities}
+option.}
 
 \item{extraOpts}{Named character \code{vector} containing extra options that
 will be passed to \code{FeatureFinderMetabo}. Any options specified here

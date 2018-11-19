@@ -14,18 +14,20 @@ featuresEnviPick <- setClass("featuresEnviPick", contains = "features")
 #'
 #' @rdname feature-finding
 #' @export
-findFeaturesEnviPick <- function(analysisInfo, ...)
+findFeaturesEnviPick <- function(analysisInfo, ..., verbose = TRUE)
 {
     assertAnalysisInfo(analysisInfo, "mzXML")
-    
+
     ret <- featuresEnviPick(analysisInfo = analysisInfo)
 
-    cat("Finding features with enviPick...\n===========\n")
+    if (verbose)
+        cat("Finding features with enviPick...\n===========\n")
 
     fts <- list()
     for (i in seq_len(nrow(analysisInfo)))
     {
-        printf("Loading features with envipick from analysis '%s'... \n", analysisInfo$analysis[i])
+        if (verbose)
+            printf("Loading features with envipick from analysis '%s'... \n", analysisInfo$analysis[i])
 
         # UNDONE: use makeFileHash instead?
         hash <- makeHash(analysisInfo$analysis[i], analysisInfo$path[i], list(...))
@@ -34,19 +36,21 @@ findFeaturesEnviPick <- function(analysisInfo, ...)
         if (is.null(f))
         {
             fp <- getMzXMLAnalysisPath(analysisInfo$analysis[i], analysisInfo$path[i])
-            ep <- enviPickwrap(fp, ...)
+            invisible(capture.output(ep <- enviPickwrap(fp, ...)))
             f <- importEnviPickPeakList(ep$Peaklist)
             saveCacheData("featuresEnviPick", f, hash)
         }
 
         fts[[analysisInfo$analysis[i]]] <- f
 
-        cat("Done!\n")
+        if (verbose)
+            cat("Done!\n")
     }
 
     ret@features <- fts
 
-    cat("\n===========\nDone!\n")
+    if (verbose)
+        cat("\n===========\nDone!\n")
 
     return(ret)
 }
@@ -64,7 +68,7 @@ importFeaturesEnviMass <- function(analysisInfo, enviProjPath)
     checkmate::assertDirectoryExists(enviProjPath, "r", add = ac)
     checkmate::assertDirectoryExists(file.path(enviProjPath, "peaklist"), "r", .var.name = "enviProjPath", add = ac)
     checkmate::reportAssertions(ac)
-    
+
     cat("Importing features from enviMass...\n")
 
     ret <- featuresEnviPick(analysisInfo = analysisInfo)
@@ -97,9 +101,9 @@ importEnviPickPeakList <- function(peaklist)
         return(data.table(ID = character(), ret = numeric(), mz = numeric(), intensity = numeric(),
                           area = numeric(), retmin = numeric(), retmax = numeric(), mzmin = numeric(),
                           mzmax = numeric()))
-    
+
     ft <- as.data.table(peaklist)
-    
+
     setnames(ft, c("m/z", "max_int", "sum_int", "RT", "minRT", "maxRT", "peak_ID"),
              c("mz", "intensity", "area", "ret", "retmin", "retmax", "ID"))
 

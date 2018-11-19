@@ -32,7 +32,7 @@ featureGroupsOpenMS <- setClass("featureGroupsOpenMS", contains = "featureGroups
 #' @rdname feature-grouping
 #' @export
 groupFeaturesOpenMS <- function(feat, rtalign = TRUE, QT = FALSE, maxAlignRT = 30, maxAlignMZ = 0.005, maxGroupRT = 12,
-                                maxGroupMZ = 0.005)
+                                maxGroupMZ = 0.005, verbose = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(feat, "features", add = ac)
@@ -40,33 +40,37 @@ groupFeaturesOpenMS <- function(feat, rtalign = TRUE, QT = FALSE, maxAlignRT = 3
     aapply(checkmate::assertNumber, . ~ maxAlignRT + maxAlignMZ + maxGroupRT + maxGroupMZ,
            finite = TRUE, lower = 0, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
-    
+
     # UNDONE: allow extra options for aligning/grouping?
 
     if (length(feat) == 0)
         return(featureGroupsOpenMS(analysisInfo = analysisInfo(feat), features = feat))
-    
+
     hash <- makeHash(feat, rtalign, QT, maxAlignRT, maxAlignMZ, maxGroupRT, maxGroupMZ)
     cachefg <- loadCacheData("featureGroupsOpenMS", hash)
     if (!is.null(cachefg))
         return(cachefg)
 
-    cat("Grouping features with OpenMS...\n===========\n")
+    if (verbose)
+        cat("Grouping features with OpenMS...\n===========\n")
 
     cfile <- tempfile("cons", fileext = ".consensusXML")
-    generateConsensusXML(feat, cfile, rtalign, QT, maxAlignRT, maxAlignMZ, maxGroupRT, maxGroupMZ)
-    fgimp <- importConsensusXMLCpp(feat, cfile)
+    generateConsensusXML(feat, cfile, rtalign, QT, maxAlignRT, maxAlignMZ, maxGroupRT, maxGroupMZ, verbose)
+    fgimp <- importConsensusXMLCpp(feat, cfile, verbose)
 
     ret <- featureGroupsOpenMS(groups = fgimp$groups, groupInfo=fgimp$gInfo, analysisInfo = analysisInfo(feat),
                                features=feat, ftindex=fgimp$ftindex)
 
     saveCacheData("featureGroupsOpenMS", ret, hash)
 
-    cat("\n===========\nDone!\n")
+    if (verbose)
+        cat("\n===========\nDone!\n")
+
     return(ret)
 }
 
-setMethod("generateConsensusXML", "features", function(feat, out, rtalign, QT, maxAlignRT, maxAlignMZ, maxGroupRT, maxGroupMZ)
+setMethod("generateConsensusXML", "features", function(feat, out, rtalign, QT, maxAlignRT, maxAlignMZ, maxGroupRT,
+                                                       maxGroupMZ, verbose)
 {
     sGroup <- analysisInfo(feat)
     fts <- featureTable(feat)
@@ -88,14 +92,18 @@ setMethod("generateConsensusXML", "features", function(feat, out, rtalign, QT, m
                       "-algorithm:pairfinder:distance_MZ:max_difference", maxAlignMZ,
                       "-algorithm:pairfinder:distance_MZ:unit", "Da")
         executeCommand(getCommandWithOptPath("MapAlignerPoseClustering", "OpenMS"),
-                       c(settings, "-in", featFiles, "-out", featFiles))
+                       c(settings, "-in", featFiles, "-out", featFiles),
+                       stdout = if (verbose) "" else FALSE,
+                       stderr = if (verbose) "" else FALSE)
     }
 
     settings <- c("-algorithm:distance_RT:max_difference", maxGroupRT,
                   "-algorithm:distance_MZ:max_difference", maxGroupMZ,
                   "-algorithm:distance_MZ:unit", "Da")
     executeCommand(getCommandWithOptPath(if (QT) "FeatureLinkerUnlabeledQT" else "FeatureLinkerUnlabeled", "OpenMS"),
-                   c(settings, "-in", featFiles, "-out", out))
+                   c(settings, "-in", featFiles, "-out", out),
+                   stdout = if (verbose) "" else FALSE,
+                   stderr = if (verbose) "" else FALSE)
 })
 
 # generating XML via package is too slow...http://r.789695.n4.nabble.com/Creating-XML-document-extremely-slow-td4376088.html
@@ -181,19 +189,20 @@ importConsensusXML <- function(feat, cfile)
         setnames(groups, gNames)
         setnames(ftindex, gNames)
     }
-    
+
     cat("Done!\n")
 
     return(list(groups = groups, gInfo = gInfo, ftindex = ftindex))
 }
 
-importConsensusXMLCpp <- function(feat, cfile)
+importConsensusXMLCpp <- function(feat, cfile, verbose)
 {
-    cat("Importing consensus XML...")
-    
+    if (verbose)
+        cat("Importing consensus XML...")
+
     fTable <- featureTable(feat)
     anaCount <- nrow(analysisInfo(feat))
-    
+
     consXML <- parseFeatConsXMLFile(cfile, anaCount)
 
     gCount <- nrow(consXML$gInfo)
@@ -202,7 +211,7 @@ importConsensusXMLCpp <- function(feat, cfile)
         # generate group intensity table
         gtab <- data.table(matrix(0, nrow = anaCount, ncol = gCount))
         ftindex <- as.data.table(consXML$ftindex)
-        
+
         for (gi in seq_len(gCount))
         {
             for (ai in seq_len(anaCount))
@@ -218,13 +227,14 @@ importConsensusXMLCpp <- function(feat, cfile)
         rownames(consXML$gInfo) <- gNames
         setnames(gtab, gNames)
         setnames(ftindex, gNames)
-        
+
         ret <- list(groups = gtab, gInfo = consXML$gInfo, ftindex = ftindex)
     }
     else
         ret <- list(groups = data.table(), gInfo = data.frame(), ftindex = data.table())
-    
-    cat("Done!\n")
-    
+
+    if (verbose)
+        cat("Done!\n")
+
     return(ret)
 }

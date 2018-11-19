@@ -15,53 +15,103 @@ featuresOpenMS <- setClass("featuresOpenMS", contains = "features")
 #'   Please make sure it is installed and its binaries are added to the PATH
 #'   environment variable or the \code{patRoon.path.OpenMS} option is set.
 #'
-#' @param thr Noise intensity threshold. Sets
+#' @param noiseThrInt Noise intensity threshold. Sets
 #'   \code{algorithm:common:noise_threshold_int} option.
-#' @param comfwhm,minfwhm,maxfwhm Expected/Minimal/Maximal chromatographic peak
-#'   width (seconds). Sets \code{algorithm:common:chrom_fwhm},
-#'   \code{algorithm:epd:min_fwhm} and \code{algorithm:epd:max_fwhm},
-#'   respectively.
-#' @param minlength,maxlength Minimum/Maximum length of mass trace (seconds).
-#'   Set negative value for maxlength to disable maximum. Sets
+#' @param chromSNR Minimum S/N of a mass trace. Sets
+#'   \code{algorithm:common:chrom_peak_snr} option.
+#' @param chromFWHM Expected chromatographic peak width (in seconds). Sets
+#'   \code{algorithm:common:chrom_fwhm} option.
+#' @param mzPPM Allowed mass deviation (ppm) for trace detection. Sets
+#'   \code{algorithm:mtd:mass_error_ppm}.
+#' @param reEstimateMTSD If \code{TRUE} then enables dynamic re-estimation of
+#'   m/z variance during mass trace collection stage. Sets
+#'   \code{algorithm:mtd:reestimate_mt_sd}.
+#' @param traceTermCriterion,traceTermOutliers,minSampleRate Termination
+#'   criterion for the extension of mass traces. See
+#'   \href{http://ftp.mi.fu-berlin.de/pub/OpenMS/release2.1.0-documentation/html/TOPP_FeatureFinderMetabo.html}{FeatureFinderMetabo}.
+#'    Sets the \code{algorithm:mtd:trace_termination_criterion},
+#'   \code{algorithm:mtd:trace_termination_outliers} and
+#'   \code{algorithm:mtd:min_sample_rate} options, respectively.
+#' @param minTraceLength,maxTraceLength Minimum/Maximum length of mass trace
+#'   (seconds). Set negative value for maxlength to disable maximum. Sets
 #'   \code{algorithm:mtd:min_trace_length} and
 #'   \code{algorithm:mtd:min_trace_length}, respectively.
-#' @param mzppm Allowed mass deviation (ppm) for trace detection. Sets
-#'   \code{algorithm:mtd:mass_error_ppm}.
+#' @param widthFiltering,minFWHM,maxFWHM Enable filtering of unlikely peak
+#'   widths. See
+#'   \href{http://ftp.mi.fu-berlin.de/pub/OpenMS/release2.1.0-documentation/html/TOPP_FeatureFinderMetabo.html}{FeatureFinderMetabo}.
+#'    Sets \code{algorithm:epd:width_filtering}, \code{algorithm:epd:min_fwhm}
+#'   and \code{algorithm:epd:max_fwhm}, respectively.
+#' @param traceSNRFiltering If \code{TRUE} then apply post-filtering by
+#'   signal-to-noise ratio after smoothing. Sets the
+#'   \code{algorithm:epd:masstrace_snr_filtering} option.
+#' @param localRTRange,localMZRange Retention/MZ range where to look for
+#'   coeluting/isotopic mass traces. Sets the
+#'   \code{algorithm:ffm:local_rt_range} and \code{algorithm:ffm:local_mz_range}
+#'   options, respectively.
+#' @param isotopeFilteringModel Remove/score candidate assemblies based on
+#'   isotope intensities. See
+#'   \href{http://ftp.mi.fu-berlin.de/pub/OpenMS/release2.1.0-documentation/html/TOPP_FeatureFinderMetabo.html}{FeatureFinderMetabo}.
+#'    Sets the \code{algorithm:ffm:isotope_filtering_model} option.
+#' @param MZScoring13C Use the 13C isotope as the expected shift for isotope
+#'   mass traces. See
+#'   \href{http://ftp.mi.fu-berlin.de/pub/OpenMS/release2.1.0-documentation/html/TOPP_FeatureFinderMetabo.html}{FeatureFinderMetabo}.
+#'   Sets \code{algorithm:ffm:mz_scoring_13C}.
+#' @param useSmoothedInts If \code{TRUE} then use LOWESS intensities instead of
+#'   raw intensities. Sets the \code{algorithm:ffm:use_smoothed_intensities}
+#'   option.
 #' @param extraOpts Named character \code{vector} containing extra options that
 #'   will be passed to \code{FeatureFinderMetabo}. Any options specified here
 #'   will override any of the above.
 #' @param intSearchRTWindow Retention time window (in seconds) that is used to
 #'   find the closest data point to the retention time to obtain the intensity
 #'   of a feature (this is needed since OpenMS does not provide this data).
-#'
 #' @template multiProc-args
 #'
 #' @template refs-openms
-#' 
+#'
 #' @rdname feature-finding
 #' @export
-findFeaturesOpenMS <- function(analysisInfo, thr = 1000, comfwhm = 5, minfwhm = 3, maxfwhm = 60, minlength = 3,
-                               maxlength = -1, mzppm = 10, extraOpts = NULL, intSearchRTWindow = 3,
-                               logPath = file.path("log", "openms"), maxProcAmount = getOption("patRoon.maxProcAmount"))
+findFeaturesOpenMS <- function(analysisInfo, noiseThrInt = 1000, chromSNR = 3, chromFWHM = 5, mzPPM = 10, reEstimateMTSD = TRUE,
+                               traceTermCriterion = "sample_rate", traceTermOutliers = 5, minSampleRate = 0.5,
+                               minTraceLength = 3, maxTraceLength = -1, widthFiltering = "fixed", minFWHM = 3,
+                               maxFWHM = 60, traceSNRFiltering = FALSE, localRTRange = 10, localMZRange = 6.5,
+                               isotopeFilteringModel = "metabolites (5% RMS)", MZScoring13C = FALSE, useSmoothedInts = TRUE,
+                               extraOpts = NULL, intSearchRTWindow = 3,
+                               logPath = file.path("log", "openms"), maxProcAmount = getOption("patRoon.maxProcAmount"),
+                               verbose = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
     assertAnalysisInfo(analysisInfo, "mzML", add = ac)
-    aapply(checkmate::assertNumber, . ~ thr + minfwhm + maxfwhm + minlength + mzppm, lower = 0,
-           finite = TRUE, fixed = list(add = ac))
-    checkmate::assertNumber(maxlength, finite = TRUE, add = ac)
+    aapply(checkmate::assertNumber, . ~ noiseThrInt + chromSNR + chromFWHM + mzPPM + minSampleRate +
+               minTraceLength + minFWHM + maxFWHM + localRTRange + localMZRange + intSearchRTWindow,
+           lower = 0, finite = TRUE, fixed = list(add = ac))
+    checkmate::assertChoice(traceTermCriterion, c("sample_rate", "outlier"))
+    checkmate::assertCount(traceTermOutliers, add = ac)
+    checkmate::assertNumber(maxTraceLength, finite = TRUE, add = ac)
+    checkmate::assertChoice(widthFiltering, c("fixed", "off", "auto"))
+    checkmate::assertChoice(isotopeFilteringModel, c("metabolites (2% RMS)", "metabolites (5% RMS)",
+                                                     "peptides", "none"), add = ac)
+    aapply(checkmate::assertFlag, . ~ reEstimateMTSD + traceSNRFiltering + MZScoring13C + useSmoothedInts, fixed = list(add = ac))
     checkmate::assertList(extraOpts, any.missing = FALSE, names = "unique", null.ok = TRUE, add = ac)
     assertMultiProcArgs(logPath, maxProcAmount, add = ac)
     checkmate::reportAssertions(ac)
-    
-    printf("Finding features with OpenMS for %d analyses ...\n", nrow(analysisInfo))
+
+    if (verbose)
+        printf("Finding features with OpenMS for %d analyses ...\n", nrow(analysisInfo))
+
+    params <- list(noiseThrInt, chromSNR, chromFWHM, mzPPM, reEstimateMTSD,
+                   traceTermCriterion, traceTermOutliers, minSampleRate,
+                   minTraceLength, maxTraceLength, widthFiltering, minFWHM,
+                   maxFWHM, traceSNRFiltering, localRTRange, localMZRange,
+                   isotopeFilteringModel, MZScoring13C, useSmoothedInts, extraOpts)
+    paramsHash <- makeHash(params)
 
     cmdQueue <- lapply(seq_len(nrow(analysisInfo)), function(anai)
     {
         dfile <- getMzMLAnalysisPath(analysisInfo$analysis[anai], analysisInfo$path[anai])
         ffile <- tempfile(analysisInfo$analysis[anai], fileext = ".featureXML")
-        hash <- makeHash(makeFileHash(dfile), thr, comfwhm, minfwhm, maxfwhm, minlength,
-                         maxlength, mzppm, extraOpts)
-        cmd <- getOpenMSFFCommand(dfile, ffile, thr, comfwhm, minfwhm, maxfwhm, minlength, maxlength, mzppm, extraOpts)
+        hash <- makeHash(makeFileHash(dfile), paramsHash)
+        cmd <- do.call(getOpenMSFFCommand, c(list(dfile, ffile), params))
 
         logf <- if (!is.null(logPath)) file.path(logPath, paste0("ffm-", analysisInfo$analysis[anai], ".txt")) else NULL
 
@@ -92,7 +142,7 @@ findFeaturesOpenMS <- function(analysisInfo, thr = 1000, comfwhm = 5, minfwhm = 
             saveCacheData("featuresOpenMS", fts, cmd$hash)
 
             return(fts)
-        }, maxProcAmount = maxProcAmount)
+        }, maxProcAmount = maxProcAmount, showProgress = verbose)
     }
 
     if (length(cachedResults) > 0)
@@ -101,26 +151,45 @@ findFeaturesOpenMS <- function(analysisInfo, thr = 1000, comfwhm = 5, minfwhm = 
         fList <- fList[intersect(analysisInfo$analysis, names(fList))] # re-order
     }
 
-    fCounts <- sapply(fList, nrow)
-    fTotCount <- sum(fCounts)
-    printf("Done! Feature statistics:\n")
-    printf("%s: %d (%.1f%%)\n", analysisInfo$analysis, fCounts, if (fTotCount == 0) 0 else fCounts * 100 / fTotCount)
-    printf("Total: %d\n", fTotCount)
+    if (verbose)
+    {
+        fCounts <- sapply(fList, nrow)
+        fTotCount <- sum(fCounts)
+        printf("Done! Feature statistics:\n")
+        printf("%s: %d (%.1f%%)\n", analysisInfo$analysis, fCounts, if (fTotCount == 0) 0 else fCounts * 100 / fTotCount)
+        printf("Total: %d\n", fTotCount)
+    }
 
     return(featuresOpenMS(analysisInfo = analysisInfo, features = fList))
 }
 
-getOpenMSFFCommand <- function(datafile, out, thr, comfwhm, minfwhm, maxfwhm, minlength, maxlength, mzppm, extraOpts)
+getOpenMSFFCommand <- function(datafile, out, noiseThrInt, chromSNR, chromFWHM, mzPPM, reEstimateMTSD,
+                               traceTermCriterion, traceTermOutliers, minSampleRate,
+                               minTraceLength, maxTraceLength, widthFiltering, minFWHM,
+                               maxFWHM, traceSNRFiltering, localRTRange, localMZRange,
+                               isotopeFilteringModel, MZScoring13C, useSmoothedInts, extraOpts)
 {
-    settings <- c("-algorithm:common:noise_threshold_int" = thr,
-                  "-algorithm:common:chrom_fwhm" = comfwhm,
-                  "-algorithm:mtd:mass_error_ppm" = mzppm,
-                  "-algorithm:mtd:trace_termination_criterion" = "sample_rate",
-                  "-algorithm:mtd:min_trace_length" = minlength,
-                  "-algorithm:mtd:max_trace_length" = maxlength, # positive value makes it much slower
-                  "-algorithm:epd:width_filtering" = "fixed",
-                  "-algorithm:epd:min_fwhm" = minfwhm,
-                  "-algorithm:epd:max_fwhm" = maxfwhm,
+    boolToChr <- function(b) if (b) "true" else "false"
+
+    settings <- c("-algorithm:common:noise_threshold_int" = noiseThrInt,
+                  "-algorithm:common:chrom_peak_snr" = chromSNR,
+                  "-algorithm:common:chrom_fwhm" = chromFWHM,
+                  "-algorithm:mtd:mass_error_ppm" = mzPPM,
+                  "-algorithm:mtd:reestimate_mt_sd" = boolToChr(reEstimateMTSD),
+                  "-algorithm:mtd:trace_termination_criterion" = traceTermCriterion,
+                  "-algorithm:mtd:trace_termination_outliers" = traceTermOutliers,
+                  "-algorithm:mtd:min_sample_rate" = minSampleRate,
+                  "-algorithm:mtd:min_trace_length" = minTraceLength,
+                  "-algorithm:mtd:max_trace_length" = maxTraceLength,
+                  "-algorithm:epd:width_filtering" = widthFiltering,
+                  "-algorithm:epd:min_fwhm" = minFWHM,
+                  "-algorithm:epd:max_fwhm" = maxFWHM,
+                  "-algorithm:epd:masstrace_snr_filtering" = boolToChr(traceSNRFiltering),
+                  "-algorithm:ffm:local_rt_range" = localRTRange,
+                  "-algorithm:ffm:local_mz_range" = localMZRange,
+                  "-algorithm:ffm:isotope_filtering_model" = isotopeFilteringModel,
+                  "-algorithm:ffm:mz_scoring_13C" = boolToChr(MZScoring13C),
+                  "-algorithm:ffm:use_smoothed_intensities" = boolToChr(useSmoothedInts),
                   "-algorithm:ffm:report_convex_hulls" = "true")
 
     if (!is.null(extraOpts))
@@ -193,7 +262,7 @@ loadIntensities <- function(dfile, features, rtWindow)
             set(features, f, "intensity", eic$intensity[which.min(abs(ft$ret - eic$time))])
         }
     }
-    
+
     return(features)
 }
 
@@ -201,7 +270,7 @@ loadIntensitiesCPP <- function(dfile, features, rtWindow)
 {
     spectra <- loadSpectra(dfile, verbose = FALSE)
     features <- copy(features) # HACK: avoid sR crash caused by data.table
-    
+
     if (nrow(features) == 0)
         features[, intensity := 0]
     else

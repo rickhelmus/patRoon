@@ -2,7 +2,7 @@
 <svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' viewBox='0 0 720.00 576.00'>
 <defs>
   <style type='text/css'><![CDATA[
-    line, polyline, path, rect, circle {
+    line, polyline, polygon, path, rect, circle {
       fill: none;
       stroke: #000000;
       stroke-linecap: round;
@@ -20,11 +20,11 @@
 <line x1='59.04' y1='184.39' x2='51.84' y2='184.39' style='stroke-width: 0.75;' />
 <line x1='59.04' y1='108.95' x2='51.84' y2='108.95' style='stroke-width: 0.75;' />
 <text transform='translate(41.76,489.47) rotate(-90)' style='font-size: 12.00px; font-family: Liberation Sans;' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>0</text>
-<text transform='translate(41.76,430.72) rotate(-90)' style='font-size: 12.00px; font-family: Liberation Sans;' textLength='40.04px' lengthAdjust='spacingAndGlyphs'>500000</text>
-<text transform='translate(41.76,358.62) rotate(-90)' style='font-size: 12.00px; font-family: Liberation Sans;' textLength='46.72px' lengthAdjust='spacingAndGlyphs'>1000000</text>
-<text transform='translate(41.76,283.18) rotate(-90)' style='font-size: 12.00px; font-family: Liberation Sans;' textLength='46.72px' lengthAdjust='spacingAndGlyphs'>1500000</text>
-<text transform='translate(41.76,207.75) rotate(-90)' style='font-size: 12.00px; font-family: Liberation Sans;' textLength='46.72px' lengthAdjust='spacingAndGlyphs'>2000000</text>
-<text transform='translate(41.76,132.31) rotate(-90)' style='font-size: 12.00px; font-family: Liberation Sans;' textLength='46.72px' lengthAdjust='spacingAndGlyphs'>2500000</text>
+<text transform='translate(41.76,430.71) rotate(-90)' style='font-size: 12.00px; font-family: Liberation Sans;' textLength='40.03px' lengthAdjust='spacingAndGlyphs'>500000</text>
+<text transform='translate(41.76,358.61) rotate(-90)' style='font-size: 12.00px; font-family: Liberation Sans;' textLength='46.70px' lengthAdjust='spacingAndGlyphs'>1000000</text>
+<text transform='translate(41.76,283.18) rotate(-90)' style='font-size: 12.00px; font-family: Liberation Sans;' textLength='46.70px' lengthAdjust='spacingAndGlyphs'>1500000</text>
+<text transform='translate(41.76,207.74) rotate(-90)' style='font-size: 12.00px; font-family: Liberation Sans;' textLength='46.70px' lengthAdjust='spacingAndGlyphs'>2000000</text>
+<text transform='translate(41.76,132.31) rotate(-90)' style='font-size: 12.00px; font-family: Liberation Sans;' textLength='46.70px' lengthAdjust='spacingAndGlyphs'>2500000</text>
 <polyline points='59.04,502.56 689.76,502.56 689.76,59.04 59.04,59.04 59.04,502.56 ' style='stroke-width: 0.75;' />
 <text transform='translate(12.96,302.81) rotate(-90)' style='font-size: 12.00px; font-family: Liberation Sans;' textLength='44.02px' lengthAdjust='spacingAndGlyphs'>intensity</text>
 <line x1='179.73' y1='502.56' x2='666.40' y2='502.56' style='stroke-width: 0.75;' />
@@ -37,9 +37,9 @@
 <text transform='translate(183.86,565.65) rotate(-90)' style='font-size: 12.00px; font-family: Liberation Sans;' textLength='48.69px' lengthAdjust='spacingAndGlyphs'>solvent-1</text>
 <text transform='translate(281.19,565.65) rotate(-90)' style='font-size: 12.00px; font-family: Liberation Sans;' textLength='48.69px' lengthAdjust='spacingAndGlyphs'>solvent-2</text>
 <text transform='translate(378.53,565.65) rotate(-90)' style='font-size: 12.00px; font-family: Liberation Sans;' textLength='48.69px' lengthAdjust='spacingAndGlyphs'>solvent-3</text>
-<text transform='translate(475.86,574.33) rotate(-90)' style='font-size: 12.00px; font-family: Liberation Sans;' textLength='57.37px' lengthAdjust='spacingAndGlyphs'>standard-1</text>
-<text transform='translate(573.19,574.33) rotate(-90)' style='font-size: 12.00px; font-family: Liberation Sans;' textLength='57.37px' lengthAdjust='spacingAndGlyphs'>standard-2</text>
-<text transform='translate(670.52,574.33) rotate(-90)' style='font-size: 12.00px; font-family: Liberation Sans;' textLength='57.37px' lengthAdjust='spacingAndGlyphs'>standard-3</text>
+<text transform='translate(475.86,574.32) rotate(-90)' style='font-size: 12.00px; font-family: Liberation Sans;' textLength='57.36px' lengthAdjust='spacingAndGlyphs'>standard-1</text>
+<text transform='translate(573.19,574.32) rotate(-90)' style='font-size: 12.00px; font-family: Liberation Sans;' textLength='57.36px' lengthAdjust='spacingAndGlyphs'>standard-2</text>
+<text transform='translate(670.52,574.32) rotate(-90)' style='font-size: 12.00px; font-family: Liberation Sans;' textLength='57.36px' lengthAdjust='spacingAndGlyphs'>standard-3</text>
 <defs>
   <clipPath id='cpNTkuMDR8Njg5Ljc2fDUwMi41Nnw1OS4wNA=='>
     <rect x='59.04' y='59.04' width='630.72' height='443.52' />

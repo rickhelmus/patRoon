@@ -2,7 +2,7 @@
 <svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' viewBox='0 0 720.00 576.00'>
 <defs>
   <style type='text/css'><![CDATA[
-    line, polyline, path, rect, circle {
+    line, polyline, polygon, path, rect, circle {
       fill: none;
       stroke: #000000;
       stroke-linecap: round;
@@ -20,11 +20,11 @@
 <line x1='556.34' y1='502.56' x2='556.34' y2='509.76' style='stroke-width: 0.75;' />
 <line x1='677.63' y1='502.56' x2='677.63' y2='509.76' style='stroke-width: 0.75;' />
 <text x='67.83' y='528.48' style='font-size: 12.00px; font-family: Liberation Sans;' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>5</text>
-<text x='189.12' y='528.48' style='font-size: 12.00px; font-family: Liberation Sans;' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>6</text>
+<text x='189.13' y='528.48' style='font-size: 12.00px; font-family: Liberation Sans;' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>6</text>
 <text x='310.42' y='528.48' style='font-size: 12.00px; font-family: Liberation Sans;' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>7</text>
 <text x='431.71' y='528.48' style='font-size: 12.00px; font-family: Liberation Sans;' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>8</text>
 <text x='553.00' y='528.48' style='font-size: 12.00px; font-family: Liberation Sans;' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>9</text>
-<text x='670.96' y='528.48' style='font-size: 12.00px; font-family: Liberation Sans;' textLength='13.35px' lengthAdjust='spacingAndGlyphs'>10</text>
+<text x='670.96' y='528.48' style='font-size: 12.00px; font-family: Liberation Sans;' textLength='13.34px' lengthAdjust='spacingAndGlyphs'>10</text>
 <line x1='59.04' y1='451.38' x2='59.04' y2='110.22' style='stroke-width: 0.75;' />
 <line x1='59.04' y1='451.38' x2='51.84' y2='451.38' style='stroke-width: 0.75;' />
 <line x1='59.04' y1='366.09' x2='51.84' y2='366.09' style='stroke-width: 0.75;' />
@@ -33,11 +33,11 @@
 <line x1='59.04' y1='110.22' x2='51.84' y2='110.22' style='stroke-width: 0.75;' />
 <text transform='translate(41.76,454.72) rotate(-90)' style='font-size: 12.00px; font-family: Liberation Sans;' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>6</text>
 <text transform='translate(41.76,369.43) rotate(-90)' style='font-size: 12.00px; font-family: Liberation Sans;' textLength='6.67px' lengthAdjust='spacingAndGlyphs'>8</text>
-<text transform='translate(41.76,287.47) rotate(-90)' style='font-size: 12.00px; font-family: Liberation Sans;' textLength='13.35px' lengthAdjust='spacingAndGlyphs'>10</text>
-<text transform='translate(41.76,202.18) rotate(-90)' style='font-size: 12.00px; font-family: Liberation Sans;' textLength='13.35px' lengthAdjust='spacingAndGlyphs'>12</text>
-<text transform='translate(41.76,116.89) rotate(-90)' style='font-size: 12.00px; font-family: Liberation Sans;' textLength='13.35px' lengthAdjust='spacingAndGlyphs'>14</text>
+<text transform='translate(41.76,287.47) rotate(-90)' style='font-size: 12.00px; font-family: Liberation Sans;' textLength='13.34px' lengthAdjust='spacingAndGlyphs'>10</text>
+<text transform='translate(41.76,202.18) rotate(-90)' style='font-size: 12.00px; font-family: Liberation Sans;' textLength='13.34px' lengthAdjust='spacingAndGlyphs'>12</text>
+<text transform='translate(41.76,116.89) rotate(-90)' style='font-size: 12.00px; font-family: Liberation Sans;' textLength='13.34px' lengthAdjust='spacingAndGlyphs'>14</text>
 <polyline points='59.04,502.56 689.76,502.56 689.76,59.04 59.04,59.04 59.04,502.56 ' style='stroke-width: 0.75;' />
-<text x='339.07' y='557.28' style='font-size: 12.00px; font-family: Liberation Sans;' textLength='70.66px' lengthAdjust='spacingAndGlyphs'>chromFWHM</text>
+<text x='339.06' y='557.28' style='font-size: 12.00px; font-family: Liberation Sans;' textLength='70.67px' lengthAdjust='spacingAndGlyphs'>chromFWHM</text>
 <text transform='translate(12.96,301.80) rotate(-90)' style='font-size: 12.00px; font-family: Liberation Sans;' textLength='42.00px' lengthAdjust='spacingAndGlyphs'>mzPPM</text>
 <defs>
   <clipPath id='cpNTkuMDR8Njg5Ljc2fDUwMi41Nnw1OS4wNA=='>

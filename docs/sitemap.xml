@@ -4,6 +4,15 @@
     <loc>https://rickhelmus.github.io/patRoon/index.html</loc>
   </url>
   <url>
+    <loc>https://rickhelmus.github.io/patRoon/reference/GUI-utils.html</loc>
+  </url>
+  <url>
+    <loc>https://rickhelmus.github.io/patRoon/reference/MSPeakLists-class.html</loc>
+  </url>
+  <url>
+    <loc>https://rickhelmus.github.io/patRoon/reference/MSPeakLists-generation.html</loc>
+  </url>
+  <url>
     <loc>https://rickhelmus.github.io/patRoon/reference/analysis-information.html</loc>
   </url>
   <url>
@@ -52,6 +61,9 @@
     <loc>https://rickhelmus.github.io/patRoon/reference/feature-grouping.html</loc>
   </url>
   <url>
+    <loc>https://rickhelmus.github.io/patRoon/reference/feature-optimization.html</loc>
+  </url>
+  <url>
     <loc>https://rickhelmus.github.io/patRoon/reference/featureGroups-class.html</loc>
   </url>
   <url>
@@ -76,16 +88,10 @@
     <loc>https://rickhelmus.github.io/patRoon/reference/generics.html</loc>
   </url>
   <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/getXcmsSet.html</loc>
+    <loc>https://rickhelmus.github.io/patRoon/reference/getXCMSSet.html</loc>
   </url>
   <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/GUI-utils.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/MSPeakLists-class.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/MSPeakLists-generation.html</loc>
+    <loc>https://rickhelmus.github.io/patRoon/reference/optimizationResult-class.html</loc>
   </url>
   <url>
     <loc>https://rickhelmus.github.io/patRoon/reference/patRoon-package.html</loc>

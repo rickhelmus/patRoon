@@ -10,7 +10,7 @@ getEmptyPLists <- function() MSPeakLists()
 
 makeMZXMLs <- function(anaInfo)
 {
-    convertMSFiles(paste0(anaInfo$path, "/", anaInfo$analysis, ".mzML"), getWorkPath(), to = "mzXML")
+    convertMSFiles(paste0(anaInfo$path, "/", anaInfo$analysis, ".mzML"), getWorkPath(), to = "mzXML", algorithm = "openms")
     return(getTestAnaInfo(getWorkPath()))
 }
 

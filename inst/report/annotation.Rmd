@@ -156,7 +156,9 @@ for (grpi in seq_along(plotGroups))
         allPlots <- c(allPlots, sapply(compsSeq, function(compi)
         {
             ret <- file.path(plotPath, sprintf("compscore_%d_%d.png", grpi, compi))
-            makePlot(ret, 4.5, 4.5, bg = NA, plotScores(rmdVars$compounds, compi, plotGroups[grpi]))
+            makePlot(ret, 4.5, 4.5, bg = NA,
+                     plotScores(rmdVars$compounds, compi, plotGroups[grpi], rmdVars$compoundNormalizeScores,
+                                rmdVars$compoundExclNormScores))
             return(ret)
         }))
 

@@ -121,7 +121,7 @@ please refer to the linked method documentation for each generic.
 
 
 \itemize{
-    \item Methods are defined for: \code{\link[=analyses,featureGroups-method]{featureGroups}}, \code{\link[=analyses,features-method]{features}}, \code{\link[=analyses,formulas-method]{formulas}}, \code{\link[=analyses,MSPeakLists-method]{MSPeakLists}}.
+    \item Methods are defined for: \code{\link[=analyses,MSPeakLists-method]{MSPeakLists}}, \code{\link[=analyses,featureGroups-method]{featureGroups}}, \code{\link[=analyses,features-method]{features}}, \code{\link[=analyses,formulas-method]{formulas}}.
 }
 
 \code{algorithm} returns the algorithm that was used to generate an object.
@@ -132,7 +132,7 @@ please refer to the linked method documentation for each generic.
 
 
 \itemize{
-    \item Methods are defined for: \code{\link[=algorithm,components-method]{components}}, \code{\link[=algorithm,compounds-method]{compounds}}, \code{\link[=algorithm,formulaConsensus-method]{formulaConsensus}}, \code{\link[=algorithm,formulas-method]{formulas}}, \code{\link[=algorithm,MSPeakLists-method]{MSPeakLists}}, \code{\link[=algorithm,optimizationResult-method]{optimizationResult}}.
+    \item Methods are defined for: \code{\link[=algorithm,MSPeakLists-method]{MSPeakLists}}, \code{\link[=algorithm,components-method]{components}}, \code{\link[=algorithm,compounds-method]{compounds}}, \code{\link[=algorithm,formulaConsensus-method]{formulaConsensus}}, \code{\link[=algorithm,formulas-method]{formulas}}, \code{\link[=algorithm,optimizationResult-method]{optimizationResult}}.
 }
 
 \code{clusterProperties} Obtain a list with properties of the generated cluster(s).
@@ -198,7 +198,7 @@ please refer to the linked method documentation for each generic.
 
 
 \itemize{
-    \item Methods are defined for: \code{\link[=filter,compounds-method]{compounds}}, \code{\link[=filter,featureGroups-method]{featureGroups}}, \code{\link[=filter,features-method]{features}}, \code{\link[=filter,featuresXCMS-method]{featuresXCMS}}, \code{\link[=filter,MSPeakLists-method]{MSPeakLists}}.
+    \item Methods are defined for: \code{\link[=filter,MSPeakLists-method]{MSPeakLists}}, \code{\link[=filter,compounds-method]{compounds}}, \code{\link[=filter,featureGroups-method]{featureGroups}}, \code{\link[=filter,features-method]{features}}, \code{\link[=filter,featuresXCMS-method]{featuresXCMS}}.
 }
 
 \code{formulaTable} returns formula data.
@@ -242,7 +242,7 @@ please refer to the linked method documentation for each generic.
 
 
 \itemize{
-    \item Methods are defined for: \code{\link[=groupNames,components-method]{components}}, \code{\link[=groupNames,compounds-method]{compounds}}, \code{\link[=groupNames,compoundsCluster-method]{compoundsCluster}}, \code{\link[=groupNames,featureGroups-method]{featureGroups}}, \code{\link[=groupNames,formulaConsensus-method]{formulaConsensus}}, \code{\link[=groupNames,formulas-method]{formulas}}, \code{\link[=groupNames,MSPeakLists-method]{MSPeakLists}}.
+    \item Methods are defined for: \code{\link[=groupNames,MSPeakLists-method]{MSPeakLists}}, \code{\link[=groupNames,components-method]{components}}, \code{\link[=groupNames,compounds-method]{compounds}}, \code{\link[=groupNames,compoundsCluster-method]{compoundsCluster}}, \code{\link[=groupNames,featureGroups-method]{featureGroups}}, \code{\link[=groupNames,formulaConsensus-method]{formulaConsensus}}, \code{\link[=groupNames,formulas-method]{formulas}}.
 }
 
 \code{plotChord} plots a Chord diagram to assess overlapping data.

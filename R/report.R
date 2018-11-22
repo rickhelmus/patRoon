@@ -34,8 +34,6 @@ NULL
 #'   available) for candidate formulae will be reported. Specifying
 #'   \code{formConsensus} and setting this argument to \code{FALSE} still allows
 #'   further annotation of compound MS/MS spectra.
-#' @param compoundNormalizeScores If \code{TRUE} compound identification scores
-#'   will be normalized to maximum values.
 #' @param MSPeakLists A \code{\link{MSPeakLists}} object that is
 #'   \emph{mandatory} when spectra for formulae and/or compounds will be
 #'   reported.
@@ -47,6 +45,10 @@ NULL
 #' @param clearPath If \code{TRUE} then the destination path will be
 #'   (recursively) removed prior to reporting.
 #'
+#' @templateVar normParam compoundNormalizeScores
+#' @templateVar excludeParam compoundExclNormScores
+#' @template comp_norm
+#' 
 #' @note Any formulae and compounds for feature groups which are not present
 #'   within \code{fGroups} (\emph{i.e.} because it has been subset afterwards)
 #'   will not be reported.
@@ -279,7 +281,7 @@ reportFormulaSpectra <- function(fGroups, path, formConsensus, MSPeakLists, EICR
     close(prog)
 }
 
-reportCompoundTable <- function(fGroups, path, compounds, normalizeScores, compsCluster)
+reportCompoundTable <- function(fGroups, path, compounds, normalizeScores, excludeNormScores, compsCluster)
 {
     printf("Exporting identification results tables...")
 
@@ -292,8 +294,10 @@ reportCompoundTable <- function(fGroups, path, compounds, normalizeScores, comps
     if (!is.null(compsCluster))
         cutcl <- cutClusters(compsCluster)
     
-    if (normalizeScores)
-        compTable <- sapply(compTable, normalizeCompScores, mCompNames = mcn, simplify = FALSE)
+    if (normalizeScores != "none")
+        compTable <- sapply(compTable, normalizeCompScores, mCompNames = mcn,
+                            minMaxNormalization = normalizeScores == "minmax", exclude = excludeNormScores,
+                            simplify = FALSE)
 
     for (grp in names(compTable))
     {
@@ -534,17 +538,19 @@ reportComponentPlots <- function(fGroups, path, components, EICRtWindow, EICMzWi
 #' @export
 setMethod("reportCSV", "featureGroups", function(fGroups, path, reportFGroupsAsRows, reportFGroupsAnalysisInfo,
                                                  reportFGroupsRetMz, reportFeatures,
-                                                 formConsensus, compounds, compoundNormalizeScores,
+                                                 formConsensus, compounds, compoundNormalizeScores, compoundExclNormScores,
                                                  compsCluster, components, retMin, clearPath)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertPathForOutput(path, overwrite = TRUE, add = ac)
     aapply(checkmate::assertFlag, . ~ reportFGroupsAsRows + reportFGroupsAnalysisInfo + reportFGroupsRetMz +
-               reportFeatures + compoundNormalizeScores + retMin + clearPath,
+               reportFeatures + retMin + clearPath,
            fixed = list(add = ac))
     aapply(checkmate::assertClass, . ~ formConsensus + compounds + compsCluster + components,
            c("formulaConsensus", "compounds", "compoundsCluster", "components"),
            null.ok = TRUE, fixed = list(add = ac))
+    assertNormalizationMethod(compoundNormalizeScores, add = ac)
+    checkmate::assertCharacter(compoundExclNormScores, min.chars = 1, null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
     prepareReportPath(path, clearPath)
@@ -565,7 +571,7 @@ setMethod("reportCSV", "featureGroups", function(fGroups, path, reportFGroupsAsR
     {
         p <- file.path(path, "compounds")
         mkdirp(p)
-        reportCompoundTable(fGroups, p, compounds, compoundNormalizeScores, compsCluster)
+        reportCompoundTable(fGroups, p, compounds, compoundNormalizeScores, compoundExclNormScores, compsCluster)
     }
 
     if (!is.null(components))
@@ -586,18 +592,20 @@ setMethod("reportCSV", "featureGroups", function(fGroups, path, reportFGroupsAsR
 #' @export
 setMethod("reportPDF", "featureGroups", function(fGroups, path, reportFGroups,
                                                  formConsensus, reportFormulaSpectra,
-                                                 compounds, compoundNormalizeScores, compsCluster,
-                                                 components, MSPeakLists, retMin, EICGrid, EICRtWindow,
-                                                 EICMzWindow, EICTopMost, EICOnlyPresent, clearPath)
+                                                 compounds, compoundNormalizeScores, compoundExclNormScores,
+                                                 compsCluster, components, MSPeakLists, retMin, EICGrid,
+                                                 EICRtWindow, EICMzWindow, EICTopMost, EICOnlyPresent, clearPath)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertPathForOutput(path, overwrite = TRUE, add = ac)
     aapply(checkmate::assertFlag, . ~ reportFGroups + reportFormulaSpectra +
-               compoundNormalizeScores + retMin + EICOnlyPresent + clearPath,
+               retMin + EICOnlyPresent + clearPath,
            fixed = list(add = ac))
     aapply(checkmate::assertClass, . ~ formConsensus + compounds + compsCluster + components + MSPeakLists,
            c("formulaConsensus", "compounds", "compoundsCluster", "components", "MSPeakLists"),
            null.ok = TRUE, fixed = list(add = ac))
+    assertNormalizationMethod(compoundNormalizeScores, add = ac)
+    checkmate::assertCharacter(compoundExclNormScores, min.chars = 1, null.ok = TRUE, add = ac)
     checkmate::assertIntegerish(EICGrid, lower = 1, any.missing = FALSE, len = 2, add = ac)
     aapply(checkmate::assertNumber, . ~ EICRtWindow + EICMzWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
     checkmate::assertCount(EICTopMost, positive = TRUE, null.ok = TRUE, add = ac)
@@ -695,8 +703,8 @@ setMethod("reportPDF", "featureGroups", function(fGroups, path, reportFGroups,
 #' @aliases reportMD
 #' @export
 setMethod("reportMD", "featureGroups", function(fGroups, path, reportPlots, formConsensus,
-                                                compounds, compoundNormalizeScores, compsCluster,
-                                                includeMFWebLinks, components, interactiveHeat,
+                                                compounds, compoundNormalizeScores, compoundExclNormScores,
+                                                compsCluster, includeMFWebLinks, components, interactiveHeat,
                                                 MSPeakLists, retMin, EICRtWindow, EICMzWindow,
                                                 EICTopMost, EICOnlyPresent, selfContained,
                                                 optimizePng, maxProcAmount, clearPath, openReport)
@@ -707,12 +715,14 @@ setMethod("reportMD", "featureGroups", function(fGroups, path, reportPlots, form
     checkmate::assertPathForOutput(path, overwrite = TRUE, add = ac)
     reportPlots <- checkmate::matchArg(reportPlots, c("none", "chord", "venn", "upset", "eics", "formulas"),
                                        several.ok = TRUE, add = ac)
-    aapply(checkmate::assertFlag, . ~ compoundNormalizeScores + interactiveHeat + retMin + EICOnlyPresent +
+    aapply(checkmate::assertFlag, . ~ interactiveHeat + retMin + EICOnlyPresent +
                selfContained + optimizePng + clearPath + openReport,
            fixed = list(add = ac))
     aapply(checkmate::assertClass, . ~ formConsensus + compounds + components + MSPeakLists,
            c("formulaConsensus", "compounds", "components", "MSPeakLists"),
            null.ok = TRUE, fixed = list(add = ac))
+    assertNormalizationMethod(compoundNormalizeScores, add = ac)
+    checkmate::assertCharacter(compoundExclNormScores, min.chars = 1, null.ok = TRUE, add = ac)
     checkmate::assertChoice(includeMFWebLinks, c("compounds", "MSMS", "none"), add = ac)
     aapply(checkmate::assertNumber, . ~ EICRtWindow + EICMzWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
     checkmate::assertCount(EICTopMost, positive = TRUE, null.ok = TRUE, add = ac)
@@ -759,8 +769,8 @@ setMethod("reportMD", "featureGroups", function(fGroups, path, reportPlots, form
                     retMin = retMin, EICTopMost = EICTopMost, EICOnlyPresent = EICOnlyPresent, EICs = EICs,
                     compounds = compounds, compsCluster = compsCluster, includeMFWebLinks = includeMFWebLinks,
                     MSPeakLists = MSPeakLists, formConsensus = formConsensus,
-                    compoundNormalizeScores = compoundNormalizeScores, components = components,
-                    interactiveHeat = interactiveHeat, selfContained = selfContained,
+                    compoundNormalizeScores = compoundNormalizeScores, compoundExclNormScores = compoundExclNormScores,
+                    components = components, interactiveHeat = interactiveHeat, selfContained = selfContained,
                     optimizePng = optimizePng, maxProcAmount = maxProcAmount)
 
     # HACK: not sure what exactly happens here, but... kableExtra adds latex

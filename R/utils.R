@@ -399,7 +399,7 @@ showObjectSize <- function(object) printf("Object size (indication): %s\n", form
 
 allSame <- function(l)
 {
-    if (length(l) > 0)
+    if (length(l) > 1)
     {
         if (all(is.na(l)))
             return(TRUE)
@@ -412,7 +412,7 @@ allSame <- function(l)
     return(TRUE)
 }
 
-normalize <- function(x)
+normalize <- function(x, minMax)
 {
     xn <- x[!is.na(x)]
     if (length(xn) == 0 || all(xn == 0))
@@ -422,7 +422,11 @@ normalize <- function(x)
         xn <- rep(as(1, typeof(xn[[1]])), length(xn))
     else
     {
-        xn <- xn - min(xn)
+        minv <- min(xn)
+        if (!minMax)
+            minv <- min(minv, 0) # force minMax if min <0
+        
+        xn <- xn - minv
         xn <- xn / max(xn)
     }
 

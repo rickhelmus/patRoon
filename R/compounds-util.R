@@ -51,12 +51,16 @@ getCompScoreColNames <- function()
              "retentionTimeScore"))
 }
 
-normalizeCompScores <- function(compResults, mCompNames)
+normalizeCompScores <- function(compResults, mCompNames, minMaxNormalization, exclude = NULL)
 {
     compResults <- copy(compResults)
     columns <- names(compResults)
     scoreCols <- getAllCompCols(getCompScoreColNames(), columns, mCompNames)
-    compResults[, (scoreCols) := lapply(.SD, normalize), .SDcols = scoreCols]
+    
+    if (!is.null(exclude))
+        scoreCols <- scoreCols[!scoreCols %in% exclude]
+    
+    compResults[, (scoreCols) := lapply(.SD, normalize, minMax = minMaxNormalization), .SDcols = scoreCols]
     return(compResults)
 }
 
@@ -178,7 +182,7 @@ getCompInfoText <- function(compResults, compIndex, addHTMLURL, normalizeScores,
     columns <- names(compResults)
     
     if (normalizeScores)
-        compResults <- normalizeCompScores(compResults, mCompNames)
+        compResults <- normalizeCompScores(compResults, mCompNames, FALSE) # UNDONE: select normalization method?
     
     resultRow <- compResults[compIndex, ]
     
@@ -426,7 +430,7 @@ setMethod("compoundViewer", c("featureGroups", "MSPeakLists", "compounds"), func
 
             ct <- compTable[[rValues$currentFGroup]]
             if (input$normalizeScores)
-                ct <- normalizeCompScores(ct, mergedCompoundNames(compounds))
+                ct <- normalizeCompScores(ct, mergedCompoundNames(compounds), FALSE) # UNDONE: select normalization method?
 
             ret <- ct[pr[1]:pr[2], ]
 

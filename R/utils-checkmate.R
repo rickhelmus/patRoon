@@ -140,6 +140,11 @@ checkExtractArg <- function(x)
 }
 assertExtractArg <- checkmate::makeAssertionFunction(checkExtractArg)
 
+assertNormalizationMethod <- function(x, .var.name = checkmate::vname(x), add = NULL)
+{
+    checkmate::assertChoice(x, c("none", "max", "minmax"), .var.name = .var.name, add = add)
+}
+
 # from https://github.com/mllg/checkmate/issues/115
 aapply = function(fun, formula, ..., fixed = list())
 {

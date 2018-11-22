@@ -15,25 +15,28 @@
   reportFGroupsAsRows = TRUE, reportFGroupsAnalysisInfo = TRUE,
   reportFGroupsRetMz = TRUE, reportFeatures = FALSE,
   formConsensus = NULL, compounds = NULL,
-  compoundNormalizeScores = TRUE, compsCluster = NULL,
-  components = NULL, retMin = TRUE, clearPath = FALSE)
+  compoundNormalizeScores = "max", compoundExclNormScores = "score",
+  compsCluster = NULL, components = NULL, retMin = TRUE,
+  clearPath = FALSE)
 
 \S4method{reportPDF}{featureGroups}(fGroups, path = "report",
   reportFGroups = TRUE, formConsensus = NULL,
   reportFormulaSpectra = TRUE, compounds = NULL,
-  compoundNormalizeScores = TRUE, compsCluster = NULL,
-  components = NULL, MSPeakLists = NULL, retMin = TRUE,
-  EICGrid = c(2, 1), EICRtWindow = 20, EICMzWindow = 0.005,
-  EICTopMost = NULL, EICOnlyPresent = TRUE, clearPath = FALSE)
+  compoundNormalizeScores = "max", compoundExclNormScores = "score",
+  compsCluster = NULL, components = NULL, MSPeakLists = NULL,
+  retMin = TRUE, EICGrid = c(2, 1), EICRtWindow = 20,
+  EICMzWindow = 0.005, EICTopMost = NULL, EICOnlyPresent = TRUE,
+  clearPath = FALSE)
 
 \S4method{reportMD}{featureGroups}(fGroups, path = "report",
   reportPlots = c("chord", "venn", "upset", "eics", "formulas"),
   formConsensus = NULL, compounds = NULL,
-  compoundNormalizeScores = TRUE, compsCluster = NULL,
-  includeMFWebLinks = "compounds", components = NULL,
-  interactiveHeat = FALSE, MSPeakLists = NULL, retMin = TRUE,
-  EICRtWindow = 20, EICMzWindow = 0.005, EICTopMost = NULL,
-  EICOnlyPresent = TRUE, selfContained = TRUE, optimizePng = FALSE,
+  compoundNormalizeScores = "max", compoundExclNormScores = "score",
+  compsCluster = NULL, includeMFWebLinks = "compounds",
+  components = NULL, interactiveHeat = FALSE, MSPeakLists = NULL,
+  retMin = TRUE, EICRtWindow = 20, EICMzWindow = 0.005,
+  EICTopMost = NULL, EICOnlyPresent = TRUE, selfContained = TRUE,
+  optimizePng = FALSE,
   maxProcAmount = getOption("patRoon.maxProcAmount"),
   clearPath = FALSE, openReport = TRUE)
 }
@@ -62,8 +65,16 @@ features.}
 \code{\link{compoundsCluster}}, \code{\link{components}}) that should be
 reported. Specify \code{NULL} to skip reporting a particular object.}
 
-\item{compoundNormalizeScores}{If \code{TRUE} compound identification scores
-will be normalized to maximum values.}
+\item{compoundNormalizeScores}{A \code{character} that specifies how normalization of
+compound scorings occurs. Either \code{"none"} (no normalization),
+\code{"max"} (normalize to max value) or \code{"minmax"} (perform min-max
+normalization). Note that normalization of negative scores (e.g. output by
+SIRIUS) is always performed as min-max.}
+
+\item{compoundExclNormScores}{A \code{character} vector specifying any compound
+scoring names that should \emph{not} be normalized. Set to \code{NULL} to
+normalize all scorings. Note that whether any normalization occurs is set
+by the \code{compoundExclNormScores} argument.}
 
 \item{retMin}{If \code{TRUE} then report retention times in minutes
 (otehrwise seconds).}

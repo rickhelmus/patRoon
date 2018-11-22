@@ -363,16 +363,19 @@ setMethod("plotStructure", "compounds", function(obj, index, groupName, width = 
 
 #' @describeIn compounds Plots a barplot with scoring of a candidate compound.
 #'
-#' @param normalizeScores Normalize scores to maximum values.
-#' 
+#' @templateVar normParam normalizeScores
+#' @templateVar excludeParam excludeNormScores
+#' @template comp_norm
+#'
 #' @aliases plotScores
 #' @export
-setMethod("plotScores", "compounds", function(obj, index, groupName, normalizeScores, useGGPlot2)
+setMethod("plotScores", "compounds", function(obj, index, groupName, normalizeScores, excludeNormScores, useGGPlot2)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertCount(index, positive = TRUE, add = ac)
     checkmate::assertString(groupName, min.chars = 1, add = ac)
-    aapply(checkmate::assertFlag, . ~ normalizeScores + useGGPlot2, fixed = list(add = ac))
+    checkmate::assertChoice(normalizeScores, c("none", "max", "minmax"))
+    checkmate::assertFlag(useGGPlot2, add = ac)
     checkmate::reportAssertions(ac)
     
     compTable <- compoundTable(obj)[[groupName]]
@@ -382,8 +385,8 @@ setMethod("plotScores", "compounds", function(obj, index, groupName, normalizeSc
 
     mcn <- mergedCompoundNames(obj)
 
-    if (normalizeScores)
-        compTable <- normalizeCompScores(compTable, mcn)
+    if (normalizeScores != "none")
+        compTable <- normalizeCompScores(compTable, mcn, normalizeScores == "minmax", excludeNormScores)
 
     scoreCols <- getAllCompCols(getCompScoreColNames(), names(compTable), mcn)
     scores <- setnames(transpose(compTable[index, scoreCols, with = FALSE]), "score")
@@ -669,12 +672,17 @@ setMethod("mergedCompoundNames", "compoundsConsensus", function(compounds) compo
 #'   within all given \code{compounds} objects.
 #' @param mergeScoresFunc Function used to calculate the total score for all
 #'   (merged) score columns.
+#' @param minMaxNormalization Set to \code{TRUE} to apply min-max normalization
+#'   of (merged) scoring columns. \code{FALSE} will apply normalization to the
+#'   maximum value. Scorings with negative values will always be min-max
+#'   normalized.
 #'
 #' @return \code{consensus} returns a \code{compounds} object that is produced
 #'   by merging multiple specified \code{compounds} objects.
 #'
 #' @export
-setMethod("consensus", "compounds", function(obj, ..., compThreshold = 0.0, mergeScoresFunc = sum)
+setMethod("consensus", "compounds", function(obj, ..., compThreshold = 0.0, minMaxNormalization = TRUE,
+                                             mergeScoresFunc = sum)
 {
     allCompounds <- c(list(obj), list(...))
 
@@ -840,7 +848,7 @@ setMethod("consensus", "compounds", function(obj, ..., compThreshold = 0.0, merg
         # set scores after filtering: otherwise normalized values are out of date
         if (length(scoreCols) > 0 && nrow(mCompList[[grpi]]) > 0)
         {
-            scores <- mCompList[[grpi]][, lapply(.SD, normalize), .SDcols = scoreCols]
+            scores <- mCompList[[grpi]][, lapply(.SD, normalize, minMax = minMaxNormalization), .SDcols = scoreCols]
 
             for (r in seq_len(nrow(mCompList[[grpi]])))
             {

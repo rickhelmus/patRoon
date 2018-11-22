@@ -58,13 +58,14 @@
   height = 500, useGGPlot2 = FALSE)
 
 \S4method{plotScores}{compounds}(obj, index, groupName,
-  normalizeScores = TRUE, useGGPlot2 = FALSE)
+  normalizeScores = "max", excludeNormScores = NULL,
+  useGGPlot2 = FALSE)
 
 \S4method{plotSpec}{compounds}(obj, index, groupName, MSPeakLists,
   formConsensus = NULL, plotStruct = TRUE, useGGPlot2 = FALSE)
 
 \S4method{consensus}{compounds}(obj, ..., compThreshold = 0,
-  mergeScoresFunc = sum)
+  minMaxNormalization = TRUE, mergeScoresFunc = sum)
 
 \S4method{[}{compoundsCluster,ANY,missing,missing}(x, i, j, ...,
   drop = TRUE)
@@ -120,7 +121,16 @@ plotting, otherwise base plot used. For \code{plotSpec}, \code{ggplot2}
 allows nicely repelled text for annotation. However, base plot is generally
 faster.}
 
-\item{normalizeScores}{Normalize scores to maximum values.}
+\item{normalizeScores}{A \code{character} that specifies how normalization of
+compound scorings occurs. Either \code{"none"} (no normalization),
+\code{"max"} (normalize to max value) or \code{"minmax"} (perform min-max
+normalization). Note that normalization of negative scores (e.g. output by
+SIRIUS) is always performed as min-max.}
+
+\item{excludeNormScores}{A \code{character} vector specifying any compound
+scoring names that should \emph{not} be normalized. Set to \code{NULL} to
+normalize all scorings. Note that whether any normalization occurs is set
+by the \code{excludeNormScores} argument.}
 
 \item{MSPeakLists}{The \code{\link{MSPeakLists}} object that was used to
 generate the candidate}
@@ -130,6 +140,11 @@ spectrum.}
 
 \item{compThreshold}{Minimal fraction (0-1) that a candidate must be present
 within all given \code{compounds} objects.}
+
+\item{minMaxNormalization}{Set to \code{TRUE} to apply min-max normalization
+of (merged) scoring columns. \code{FALSE} will apply normalization to the
+maximum value. Scorings with negative values will always be min-max
+normalized.}
 
 \item{mergeScoresFunc}{Function used to calculate the total score for all
 (merged) score columns.}

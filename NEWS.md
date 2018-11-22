@@ -1,6 +1,7 @@
 # patRoon 0.1.0.9000
 
 ## November 2018
+* Normalization of compound scores: normalization method can now be set and specified scorings can be excluded.
 * Store/report IUPACName (as compoundName) from MetFrag PubChem data.
 * Renamed trivialName to compoundName for compound tables.
 * `convertMSFiles`: changed interface with more options, parallelization and ProteoWizard support.

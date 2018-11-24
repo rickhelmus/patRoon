@@ -1,4 +1,4 @@
-FROM rocker/r-ver:3.4.4
+FROM r-base:3.5.0
 
 LABEL maintainer="Rick Helmus <r.helmus@uva.nl>" \
     org.label-schema.name="patRoon" \
@@ -42,7 +42,7 @@ RUN wget http://msbi.ipb-halle.de/~cruttkie/metfrag/MetFrag2.4.3-CL.jar && \
 
 ADD --chown=patRoon . patRoon
 
-RUN Rscript -e 'devtools::install(pkg = "patRoon", upgrade_dependencies = FALSE)'
+RUN Rscript -e 'devtools::install(pkg = "patRoon", upgrade = FALSE)'
 
 ENV OPENMS_DATA_PATH=/usr/share/OpenMS _R_CHECK_FORCE_SUGGESTS_=0 R_MAX_NUM_DLLS=150
 

@@ -190,7 +190,9 @@ test_that("reporting empty objects works", {
 test_that("plotting works", {
     skip_if_not(doMetFrag)
     
-    expect_doppel("compound-spec", function() plotSpec(compsMFIso, 1, names(compoundTable(compsMFIso))[1], plists))
+    # plotting structure seems to be difficult to do reproducible between systems, so disable for vdiffr now...
+    expect_doppel("compound-spec", function() plotSpec(compsMFIso, 1, names(compoundTable(compsMFIso))[1], plists, plotStruct = FALSE))
+    expect_plot(plotSpec(compsMFIso, 1, names(compoundTable(compsMFIso))[1], plists, plotStruct = TRUE))
     # expect_doppel("spec-gg", plotSpec(compsMFIso, 1, names(compoundTable(compsMFIso))[1], plists, useGGPlot2 = TRUE))
     expect_plot(print(plotSpec(compsMFIso, 1, names(compoundTable(compsMFIso))[1], plists, useGGPlot2 = TRUE)))
     

@@ -22,6 +22,7 @@ jobs:
                     docker load -i /caches/dock.tar | true
             - run:
                 name: Build Docker image
+                no_output_timeout: 30m
                 command: |
                     docker build --pull --cache-from "${IMAGE_NAME}" --tag "${TMP_IMAGE_NAME}" .
             - run:

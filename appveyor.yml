@@ -52,6 +52,7 @@ environment:
     R_ARCH: x64
     BIOC_USE_DEVEL: FALSE
     _R_CHECK_FORCE_SUGGESTS_: FALSE
+    R_CHECK_INSTALL_ARGS: "--install-args=--build --no-multiarch"
 
 build_script:
     - travis-tool.sh install_bioc mzR xcms CAMERA
@@ -75,7 +76,7 @@ test_script:
 
 on_failure:
     - if exist %APPVEYOR_BUILD_FOLDER%\junit.xml ( type %APPVEYOR_BUILD_FOLDER%\junit.xml && appveyor PushArtifact %APPVEYOR_BUILD_FOLDER%\junit.xml )
-    - 7z a failure.zip *.Rcheck\*
+    - 7z a failure.zip *.Rcheck\* "-xr!*.sqlite"
     - appveyor PushArtifact failure.zip
 
 on_success:

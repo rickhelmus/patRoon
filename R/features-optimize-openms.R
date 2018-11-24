@@ -33,7 +33,7 @@ featuresOptimizerOpenMS$methods(
     convertOptToCallParams = function(params)
     {
         # logging won't make a lot of sense (constantly overwritten during experiments)
-        params$logPath <- NULL
+        params <- c(params, list(logPath = NULL)) # NOTE: wrap in list to be able to assign
         return(params)
     }
 

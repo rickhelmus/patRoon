@@ -52,7 +52,7 @@ environment:
     R_ARCH: x64
     BIOC_USE_DEVEL: FALSE
     _R_CHECK_FORCE_SUGGESTS_: FALSE
-    R_CHECK_INSTALL_ARGS: "--install-args=--build --no-multiarch"
+    R_CHECK_ARGS: --no-build-vignettes --no-manual --no-multiarch
 
 build_script:
     - travis-tool.sh install_bioc mzR xcms CAMERA

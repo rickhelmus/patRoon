@@ -12,7 +12,7 @@ jobs:
             - setup_remote_docker
             - restore_cache:
                 keys:
-                    - v1-{{ .Branch }}
+                    - v2-{{ .Branch }}
                 paths:
                     - /caches/dock.tar
             - run:

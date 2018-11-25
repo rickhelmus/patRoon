@@ -8,6 +8,7 @@
 \alias{getDACalibrationError}
 \alias{exportDAFiles}
 \alias{addDAEIC}
+\alias{addAllDAEICs}
 \title{Bruker DataAnalysis utilities}
 \usage{
 showDataAnalysis()
@@ -21,9 +22,12 @@ getDACalibrationError(anaInfo)
 exportDAFiles(anaInfo, format = "mzML", exportLine = TRUE,
   outPath = anaInfo$path, overWrite = FALSE)
 
-addDAEIC(analysis, path, mz, mzWidth, ctype = "EIC", mtype = "MS",
-  polarity = "both", bgsubtr = FALSE, fragpath = "", name = NULL,
-  hideDA = TRUE)
+addDAEIC(analysis, path, mz, mzWindow = 0.005, ctype = "EIC",
+  mtype = "MS", polarity = "both", bgsubtr = FALSE, fragpath = "",
+  name = NULL, hideDA = TRUE)
+
+addAllDAEICs(fGroups, mzWindow = 0.005, ctype = "EIC",
+  bgsubtr = FALSE, name = TRUE, onlyPresent = TRUE, hideDA = TRUE)
 }
 \arguments{
 \item{anaInfo}{\link[=analysis-information]{Analysis info table}}
@@ -50,12 +54,13 @@ be recycled if necessary.}
 \item{mz}{\emph{m/z} (Da) value used for the chromatographic trace (if
 applicable).}
 
-\item{mzWidth}{\emph{m/z} width (in Da) used for the chromatographic trace
+\item{mzWindow}{\emph{m/z} window (in Da) used for the chromatographic trace
 (if applicable).}
 
 \item{ctype}{Type of the chromatographic trace. Valid options are:
 \code{"EIC"} (extracted ion chromatogram), \code{"TIC"} (total ion
-chromatogram) and \code{"BPC"} (Base Peak Chromatogram).}
+chromatogram, only for \code{addDAEIC}) and \code{"BPC"} (Base Peak
+Chromatogram).}
 
 \item{mtype}{MS filter for chromatographic trace. Valid values are:
 \code{"all"}, \code{"MS"}, \code{"MSMS"}, \code{"allMSMS"} and
@@ -70,10 +75,17 @@ algorithm) will be performed.}
 \item{fragpath}{Precursor \emph{m/z} used for MS/MS traces (\code{""} for
 none).}
 
-\item{name}{The name for the chromatographic trace. \code{NULL} for none.}
+\item{name}{For \code{addDAEIC}: the name for the chromatographic trace. For
+\code{addAllEICs}: \code{TRUE} to automatically set EIC names. Set to
+\code{NULL} for none.}
 
 \item{hideDA}{Hides DataAnalysis while adding the chromatographic trace
 (faster).}
+
+\item{fGroups}{The \code{\link{featureGroups}} object for which EICs should be made.}
+
+\item{onlyPresent}{If \code{TRUE} then EICs are only generated for analyses
+where the feature was detected.}
 }
 \value{
 \code{getDACalibrationError} returns a \code{data.frame} with a
@@ -111,6 +123,9 @@ required to be installed.
 \code{addDAEIC} adds an Extracted Ion Chromatogram (EIC) or other
   chromatographic trace to a given analysis which can be used directly with
   DataAnalysis.
+
+\code{addAllDAEICs} adds Extracted Ion Chromatograms (EICs) for all
+  features within a \code{\link{featureGroups}} object.
 }
 \seealso{
 \code{\link{analysis-information}}

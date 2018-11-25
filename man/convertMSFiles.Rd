@@ -12,7 +12,7 @@ convertMSFiles(files, outPath = NULL, dirs = FALSE,
 }
 \arguments{
 \item{files}{A \code{character} vector with input files. Alternatively, if
-\code{dir=TRUE}, then a \code{character} vector with one or more
+\code{dirs=TRUE}, then a \code{character} vector with one or more
 directories from which input files are automatically selected.}
 
 \item{outPath}{A character vector specifying directories that should be used

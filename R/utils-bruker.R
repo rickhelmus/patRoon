@@ -265,13 +265,13 @@ exportDAFiles <- function(anaInfo, format = "mzML", exportLine = TRUE, outPath =
     invisible(NULL)
 }
 
-makeDAEIC <- function(mz, mzWidth, ctype = "EIC", mtype = "MS", polarity = "both", bgsubtr = FALSE, fragpath = "")
+makeDAEIC <- function(mz, mzWindow, ctype = "EIC", mtype = "MS", polarity = "both", bgsubtr = FALSE, fragpath = "")
 {
-    trace <- switch (ctype,
-                     TIC = RDCOMClient::COMCreate("DataAnalysis.TICChromatogramDefinition"),
-                     BPC = RDCOMClient::COMCreate("DataAnalysis.BPCChromatogramDefinition"),
-                     EIC = RDCOMClient::COMCreate("DataAnalysis.EICChromatogramDefinition"),
-                     stop("Wrong ctype: should be TIC, BPC OR EIC")
+    trace <- switch(ctype,
+                    TIC = RDCOMClient::COMCreate("DataAnalysis.TICChromatogramDefinition"),
+                    BPC = RDCOMClient::COMCreate("DataAnalysis.BPCChromatogramDefinition"),
+                    EIC = RDCOMClient::COMCreate("DataAnalysis.EICChromatogramDefinition"),
+                    stop("Wrong ctype: should be TIC, BPC OR EIC")
     )
 
     trace[["MSFilter"]][["Type"]] <- switch (mtype,
@@ -296,8 +296,8 @@ makeDAEIC <- function(mz, mzWidth, ctype = "EIC", mtype = "MS", polarity = "both
     if (ctype != "TIC")
     {
         trace[["Range"]] <- mz
-        trace[["WidthLeft"]] <- mzWidth[1]
-        trace[["WidthRight"]] <- if (length(mzWidth) > 1) mzWidth[2] else mzWidth[1]
+        trace[["WidthLeft"]] <- mzWindow[1]
+        trace[["WidthRight"]] <- mzWindow[1]
     }
 
     return(trace)
@@ -311,27 +311,17 @@ makeDAEIC <- function(mz, mzWidth, ctype = "EIC", mtype = "MS", polarity = "both
 #' @param path path of the analysis.
 #' @param mz \emph{m/z} (Da) value used for the chromatographic trace (if
 #'   applicable).
-#' @param mzWidth \emph{m/z} width (in Da) used for the chromatographic trace
-#'   (if applicable).
-#' @param ctype Type of the chromatographic trace. Valid options are:
-#'   \code{"EIC"} (extracted ion chromatogram), \code{"TIC"} (total ion
-#'   chromatogram) and \code{"BPC"} (Base Peak Chromatogram).
 #' @param mtype MS filter for chromatographic trace. Valid values are:
 #'   \code{"all"}, \code{"MS"}, \code{"MSMS"}, \code{"allMSMS"} and
 #'   \code{"BBCID"}.
 #' @param polarity Polarity filter for chromatographic trace. Valid values:
 #'   \code{"both"}, \code{"positive"} and \code{"negative"}.
-#' @param bgsubtr If \code{TRUE} then background subtraction ('Spectral'
-#'   algorithm) will be performed.
 #' @param fragpath Precursor \emph{m/z} used for MS/MS traces (\code{""} for
 #'   none).
-#' @param name The name for the chromatographic trace. \code{NULL} for none.
-#' @param hideDA Hides DataAnalysis while adding the chromatographic trace
-#'   (faster).
-#'
+
 #' @rdname bruker-utils
 #' @export
-addDAEIC <- function(analysis, path, mz, mzWidth, ctype = "EIC", mtype = "MS", polarity = "both", bgsubtr = FALSE, fragpath = "",
+addDAEIC <- function(analysis, path, mz, mzWindow = 0.005, ctype = "EIC", mtype = "MS", polarity = "both", bgsubtr = FALSE, fragpath = "",
                      name = NULL, hideDA = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
@@ -339,7 +329,7 @@ addDAEIC <- function(analysis, path, mz, mzWidth, ctype = "EIC", mtype = "MS", p
     checkmate::assertString(path, add = ac)
     checkmate::assertDirectoryExists(file.path(path, paste0(analysis, ".d")), add = ac)
     checkmate::assertNumber(mz, lower = 0, finite = TRUE, add = ac)
-    checkmate::assertNumber(mzWidth, lower = 0, finite = TRUE, add = ac)
+    checkmate::assertNumber(mzWindow, lower = 0, finite = TRUE, add = ac)
     checkmate::assertChoice(ctype, c("EIC", "TIC", "BPC"), add = ac)
     checkmate::assertChoice(mtype, c("MS", "MSMS", "allMSMS", "BBCID"), add = ac)
     checkmate::assertChoice(polarity, c("positive", "negative", "both"), add = ac)
@@ -363,7 +353,7 @@ addDAEIC <- function(analysis, path, mz, mzWidth, ctype = "EIC", mtype = "MS", p
     {
         chroms <- DA[["Analyses"]][[ind]][["Chromatograms"]]
         oldEICCount <- chroms$Count()
-        chroms$AddChromatogram(makeDAEIC(mz, mzWidth, ctype, mtype, polarity, bgsubtr, fragpath))
+        chroms$AddChromatogram(makeDAEIC(mz, mzWindow, ctype, mtype, polarity, bgsubtr, fragpath))
         ret <- chroms$Count()
         if (!is.null(name))
             chroms[[ret]][["Name_"]] <- name
@@ -373,13 +363,23 @@ addDAEIC <- function(analysis, path, mz, mzWidth, ctype = "EIC", mtype = "MS", p
 }
 
 # UNDONE: make method?
-addAllDAEICs <- function(fGroups, mzWidth, ctype = "EIC", bgsubtr = FALSE, name = TRUE,
+
+#' @details \code{addAllDAEICs} adds Extracted Ion Chromatograms (EICs) for all
+#'   features within a \code{\link{featureGroups}} object.
+#'
+#' @param fGroups The \code{\link{featureGroups}} object for which EICs should be made.
+#' @param onlyPresent If \code{TRUE} then EICs are only generated for analyses
+#'   where the feature was detected.
+#'
+#' @rdname bruker-utils
+#' @export
+addAllDAEICs <- function(fGroups, mzWindow = 0.005, ctype = "EIC", bgsubtr = FALSE, name = TRUE,
                          onlyPresent = TRUE, hideDA = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
-    checkmate::assertNumber(mzWidth, lower = 0, finite = TRUE, add = ac)
-    checkmate::assertChoice(ctype, c("EIC", "TIC", "BPC"), add = ac)
+    checkmate::assertNumber(mzWindow, lower = 0, finite = TRUE, add = ac)
+    checkmate::assertChoice(ctype, c("EIC", "BPC"), add = ac)
     aapply(checkmate::assertFlag, . ~ bgsubtr + name + hideDA, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
     
@@ -390,20 +390,55 @@ addAllDAEICs <- function(fGroups, mzWidth, ctype = "EIC", bgsubtr = FALSE, name 
     anaInfo <- analysisInfo(fGroups)
     anaCount <- nrow(anaInfo)
     fTable <- featureTable(fGroups)
+
+    if (gCount == 0)
+        invisible(return(NULL))
     
-    for (gi in seq_len(gCount))
+    DA <- getDAApplication()
+    
+    if (hideDA)
+        hideDAInScope()
+    
+    printf("Adding EICs for %d feature groups in DataAnalysis...\n", gCount)
+    prog <- txtProgressBar(0, anaCount, style = 3)
+    
+    for (anai in seq_len(anaCount))
     {
-        for (anai in seq_len(anaCount))
+        ind <- getDAFileIndex(DA, anaInfo$analysis[anai], anaInfo$path[anai])
+        
+        if (ind == -1)
+            next
+                
+        grpsInAna <- seq_len(gCount)
+        if (onlyPresent)
+            grpsInAna <- grpsInAna[sapply(grpsInAna, function(i) ftInd[[i]][anai] != 0)]
+        
+        eics <- sapply(grpsInAna, function(grpi)
         {
-            fti <- ftInd[[gi]][anai]
-            if (onlyPresent && fti == 0)
-                next
-            
-            ana <- anaInfo$analysis[anai]
-            addDAEIC(ana, anaInfo$path[anai], gInfo[gi, "mzs"], mzWidth, ctype, bgsubtr = bgsubtr,
-                     name = if (name) gNames[gi] else NULL, hideDA = hideDA)
+            makeDAEIC(gInfo[grpi, "mzs"], mzWindow, ctype, bgsubtr = bgsubtr)
+        }, USE.NAMES = FALSE)
+
+        chroms <- DA[["Analyses"]][[ind]][["Chromatograms"]]        
+        oldEICCount <- chroms$Count()
+        chroms$AddChromatograms(eics)
+        newEICCount <- chroms$Count()
+        
+        if (!is.null(name) && name)
+        {
+            if ((newEICCount - oldEICCount) != length(grpsInAna))
+                warning("Failed to add some EICs, cannot set names.")
+            else
+            {
+                for (eici in seq(oldEICCount+1, newEICCount))
+                    chroms[[eici]][["Name_"]] <- gNames[eici - oldEICCount]
+            }
         }
+        
+        setTxtProgressBar(prog, anai)
     }
+    
+    setTxtProgressBar(prog, anaCount)
+    close(prog)
     
     invisible(NULL)
 }

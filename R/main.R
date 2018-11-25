@@ -532,7 +532,20 @@ NULL
 #' required to be installed.
 #'
 #' @param anaInfo \link[=analysis-information]{Analysis info table}
-#'
+#' @param mzWindow \emph{m/z} window (in Da) used for the chromatographic trace
+#'   (if applicable).
+#' @param ctype Type of the chromatographic trace. Valid options are:
+#'   \code{"EIC"} (extracted ion chromatogram), \code{"TIC"} (total ion
+#'   chromatogram, only for \code{addDAEIC}) and \code{"BPC"} (Base Peak
+#'   Chromatogram).
+#' @param bgsubtr If \code{TRUE} then background subtraction ('Spectral'
+#'   algorithm) will be performed.
+#' @param name For \code{addDAEIC}: the name for the chromatographic trace. For
+#'   \code{addAllEICs}: \code{TRUE} to automatically set EIC names. Set to
+#'   \code{NULL} for none.
+#' @param hideDA Hides DataAnalysis while adding the chromatographic trace
+#'   (faster).
+
 #' @name bruker-utils
 #'
 #' @seealso \code{\link{analysis-information}}

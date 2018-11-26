@@ -225,7 +225,7 @@ processMFResults <- function(metf, analysis, spec, db, topMost, lfile = "")
         scoreSuspCols <- c(getCompScoreColNames(), getCompSuspectListColNames())
         scoreSuspCols <- scoreSuspCols[scoreSuspCols %in% names(metf)]
         if (length(scoreSuspCols) > 0)
-            metf[, (scoreSuspCols) := lapply(.SD, function(x) ifelse(x == "-", 0, 1)), .SDcols = scoreSuspCols]
+            metf[, (scoreSuspCols) := lapply(.SD, function(x) ifelse(x == "-", 0, x)), .SDcols = scoreSuspCols]
         
         if (!is.null(metf[["CASRN"]]))
             metf[, CASRN := sub("CASRN:", "", CASRN, fixed = TRUE)] # remove "CASRN" prefix

@@ -37,3 +37,4 @@ Release:
     - get rid of getXCMSSet() calls?
     - cache?
 - progressbar and parallel enviPick
+- clearCache: partial match

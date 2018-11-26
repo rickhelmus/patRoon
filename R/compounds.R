@@ -388,7 +388,7 @@ setMethod("plotScores", "compounds", function(obj, index, groupName, normalizeSc
     if (normalizeScores != "none")
         compTable <- normalizeCompScores(compTable, mcn, normalizeScores == "minmax", excludeNormScores)
 
-    scoreCols <- getAllCompCols(getCompScoreColNames(), names(compTable), mcn)
+    scoreCols <- getAllCompCols(c(getCompScoreColNames(), getCompSuspectListColNames()), names(compTable), mcn)
     scores <- setnames(transpose(compTable[index, scoreCols, with = FALSE]), "score")
     scores[, type := scoreCols]
     scores <- scores[!is.na(score)]

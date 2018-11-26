@@ -66,7 +66,23 @@ unifyMFNames <- function(mfr)
                  SmartsSubstructureInclusionScore = "smartsInclusionScore",
                  SmartsSubstructureExclusionScore = "smartsExclusionScore",
                  SuspectListScore = "suspectListScore",
-                 RetentionTimeScore = "retentionTimeScore"
+                 RetentionTimeScore = "retentionTimeScore",
+                 
+                 # Dashboard variables
+                 CASRN_DTXSID = "CASRN",
+                 CPDAT_COUNT = "CPDATCount",
+                 ECOTOX = "ECOTOX",
+                 NORMANSUSDAT = "NORMANSUSDAT",
+                 TOXCAST_PERCENT_ACTIVE = "TOXCASTActive",
+                 NUMBER_OF_PUBMED_ARTICLES = "pubMedReferences",
+                 MASSBANKEU = "MASSBANKEU",
+                 #MONOISOTOPIC_MASS_DTXCID = "neutralMass",
+                 QC_LEVEL = "QCLevel",
+                 DATA_SOURCES = "dataSources",
+                 PUBCHEM_DATA_SOURCES = "pubChemDataSources",
+                 TOX21SL = "TOX21SL",
+                 "EXPOCAST_MEDIAN_EXPOSURE_PREDICTION_MG/KG-BW/DAY" = "EXPOCASTPredExpo",
+                 TOXCAST = "TOXCAST"
                  )
 
     unNames <- unNames[names(unNames) %in% names(mfr)] # filter out missing
@@ -205,6 +221,15 @@ processMFResults <- function(metf, analysis, spec, db, topMost, lfile = "")
         # unify column names & filter unnecessary columns
         metf <- unifyMFNames(metf)
 
+        # fix up score and suspect list columns: dash --> 0
+        scoreSuspCols <- c(getCompScoreColNames(), getCompSuspectListColNames())
+        scoreSuspCols <- scoreSuspCols[scoreSuspCols %in% names(metf)]
+        if (length(scoreSuspCols) > 0)
+            metf[, (scoreSuspCols) := lapply(.SD, function(x) ifelse(x == "-", 0, 1)), .SDcols = scoreSuspCols]
+        
+        if (!is.null(metf[["CASRN"]]))
+            metf[, CASRN := sub("CASRN:", "", CASRN, fixed = TRUE)] # remove "CASRN" prefix
+        
         metf[, analysis := analysis]
         metf[, database := db]
     }

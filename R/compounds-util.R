@@ -48,7 +48,25 @@ getCompScoreColNames <- function()
              "smartsInclusionScore",
              "smartsExclusionScore",
              "suspectListScore",
-             "retentionTimeScore"))
+             "retentionTimeScore",
+             
+             # From Dashboard
+             "CPDATCount",
+             "TOXCASTActive",
+             "dataSources",
+             "pubChemDataSources",
+             "EXPOCASTPredExpo"
+             ))
+}
+
+getCompSuspectListColNames <- function()
+{
+    # suspect lists from Dashboard
+    return(c("ECOTOX",
+             "NORMANSUSDAT",
+             "MASSBANKEU",
+             "TOX21SL",
+             "TOXCAST"))
 }
 
 normalizeCompScores <- function(compResults, mCompNames, minMaxNormalization, exclude = NULL)
@@ -105,6 +123,8 @@ getCompInfoList <- function(compResults, compIndex, addHTMLURL, mCompNames)
                 fmt <- "<a target=\"_blank\" href=\"https://pubchem.ncbi.nlm.nih.gov/compound/%s\">%s</a>"
             else if (tolower(db) == "chemspider")
                 fmt <- "<a target=\"_blank\" href=\"http://www.chemspider.com/Search.aspx?q=%s\">%s</a>"
+            else if (startsWith(idlist[1], "DTX"))
+                fmt <- "<a target=\"_blank\" href=\"https://comptox.epa.gov/dashboard/dsstoxdb/results?search=%s\">%s</a>"
             else
                 fmt <- "%s"
 
@@ -138,6 +158,9 @@ getCompInfoList <- function(compResults, compIndex, addHTMLURL, mCompNames)
         ctext <- addValText(ctext, "%s", c("InChIKey1", "InChIKey2"))
 
     ctext <- addValText(ctext, "%.2f", c("XlogP", "AlogP"))
+    
+    # Dashboard
+    ctext <- addValText(ctext, "%s", c("CASRN", "QCLevel"))
 
     return(ctext)
 }

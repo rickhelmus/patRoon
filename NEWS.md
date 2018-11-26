@@ -1,6 +1,7 @@
 # patRoon 0.1.0.9000
 
 ## November 2018
+* Preliminary EPA DSSTox support (via LocalCSV).
 * Added `addAllDAEICs()` function.
 * Renamed `mzWidth` argument of `addDAEIC()` to `mzWindow`.
 * Normalization of compound scores: normalization method can now be set and specified scorings can be excluded.

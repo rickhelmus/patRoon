@@ -225,7 +225,10 @@ processMFResults <- function(metf, analysis, spec, db, topMost, lfile = "")
         scoreSuspCols <- c(getCompScoreColNames(), getCompSuspectListColNames())
         scoreSuspCols <- scoreSuspCols[scoreSuspCols %in% names(metf)]
         if (length(scoreSuspCols) > 0)
-            metf[, (scoreSuspCols) := lapply(.SD, function(x) ifelse(x == "-", 0, x)), .SDcols = scoreSuspCols]
+        {
+            # NOTE: do as.numeric as values with - will cause the column to be a character
+            metf[, (scoreSuspCols) := lapply(.SD, function(x) as.numeric(ifelse(x == "-", 0, x))), .SDcols = scoreSuspCols]
+        }
         
         if (!is.null(metf[["CASRN"]]))
             metf[, CASRN := sub("CASRN:", "", CASRN, fixed = TRUE)] # remove "CASRN" prefix

@@ -152,57 +152,14 @@ getEICsForFGroups <- function(fGroups, rtWindow, mzWindow, topMost, onlyPresent)
     return(EICs)
 }
 
-# align & average spectra by clustering or between peak distances
-# code inspired from msProcess R package: https://github.com/zeehio/msProcess
-averageSpectra <- function(spectra, rtRange, clusterMzWindow = 0.003, maxPeaks = 50, minIntensity, MSLevel = 1, precursor = NULL,
-                           precursorMzWindow = NULL, avgMassFun = mean, method = "hclust")
+averageSpectraMZR <- function(spectra, rtRange, clusterMzWindow = 0.003, maxPeaks = 50, minIntensity, MSLevel = 1, precursor = NULL,
+                              precursorMzWindow = NULL, avgMassFun = mean, method = "hclust")
 {
     hd <- getSpectraHeader(spectra, rtRange, MSLevel, precursor, precursorMzWindow)
-
+    
     if (nrow(hd) == 0) # no spectra, return empty spectrum
         return(data.table(mz = integer(0), intensity = integer(0)))
-
+    
     sp <- spectra$spectra[hd$seqNum]
-    sp <- lapply(sp, function(s) s[intensity >= minIntensity])
-
-    # limit amount of peaks per spectra, otherwise clustering will clog all memory/cpu
-    sp <- lapply(sp, function(s)
-    {
-        if (nrow(s) > maxPeaks)
-        {
-            ord <- order(-s$intensity)
-            s <- s[ord[seq_len(maxPeaks)]]
-        }
-        return(s)
-    })
-
-    spcomb <- rbindlist(sp)
-    spcomb[, ret := rep(hd$retentionTime, sapply(sp, nrow))]
-    setorder(spcomb, mz)
-
-    if (nrow(spcomb) < 2)
-        return(spcomb)
-
-    # UNDONE: why the hell does this happen??
-    if (MSLevel == 2 && !is.null(precursorMzWindow) && max(spcomb$mz) > (precursor + precursorMzWindow))
-        warning(sprintf("Found fragment masses above precursor isolation window for m/z %.4f!", precursor))
-
-    if (method == "hclust")
-    {
-        mzd <- dist(spcomb$mz)
-        hc <- hclust(mzd)
-        spcomb[, cluster := cutree(hc, h = clusterMzWindow)]
-
-    }
-    else if (method == "distance")
-    {
-        mzdiff <- abs(diff(spcomb$mz))
-        spcomb[, cluster := 1 + c(0, cumsum(mzdiff > clusterMzWindow))]
-    }
-
-    if (any(spcomb[, .(dup = anyDuplicated(ret)), key = cluster][["dup"]] > 0))
-        warning("Clustered multiple masses from same spectrum, consider lowering clusterMzWindow!\n")
-
-    spcount <- nrow(hd)
-    return(spcomb[, .(mz = avgMassFun(mz), intensity = sum(intensity) / spcount), by = cluster][, cluster := NULL])
+    return(averageSpectra(sp, clusterMzWindow, maxPeaks, minIntensity, avgMassFun, method))
 }

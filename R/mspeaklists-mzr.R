@@ -68,21 +68,22 @@ generateMzRPeakLists <- function(fGroups, avgMzWindow = 0.001, maxRtMSWidth = NU
     fTable <- featureTable(fGroups)
     anaInfo <- analysisInfo(fGroups)
     gTable <- groups(fGroups)
-    gcount <- ncol(ftindex)
+    gCount <- length(fGroups)
+    gNames <- names(fGroups)
     anaCount <- nrow(anaInfo)
     
-    if (gcount == 0)
+    if (gCount == 0)
         return(MSPeakLists(algorithm = "mzR"))
 
     cacheDB <- openCacheDBScope()
     setHash <- makeHash(fGroups, avgMzWindow, maxRtMSWidth, avgTopPeaks, avgMinIntensity, avgMassFun, avgMethod,
                         precursorMzWindow, topMost)
     cachedSet <- loadCacheSet("MSPeakListsMzR", setHash, cacheDB)
-    resultHashes <- vector("character", anaCount * gcount)
+    resultHashes <- vector("character", anaCount * gCount)
     resultHashCount <- 0
 
     # structure: [[analysis]][[fGroup]][[MSType]][[MSPeak]]
-    ret <- list()
+    plists <- list()
 
     # if topMost is specified, make list (topAna) of topMost intense analyses
     if (!is.null(topMost) && topMost > 0)
@@ -97,15 +98,15 @@ generateMzRPeakLists <- function(fGroups, avgMzWindow = 0.001, maxRtMSWidth = NU
         baseHash <- makeHash(ana, avgMzWindow, maxRtMSWidth, avgTopPeaks, avgMinIntensity, avgMassFun, avgMethod,
                              precursorMzWindow, topMost)
 
-        printf("Loading all MS peak lists for %d feature groups in analysis '%s'...\n", gcount, ana)
-        prog <- txtProgressBar(0, gcount, style = 3)
+        printf("Loading all MS peak lists for %d feature groups in analysis '%s'...\n", gCount, ana)
+        prog <- txtProgressBar(0, gCount, style = 3)
 
         for (grpi in seq_along(ftindex))
         {
             if (!is.null(topMost) && !ana %in% topAna[[grpi]])
                 next # not intense enough
 
-            grp <- colnames(ftindex)[grpi]
+            grp <- gNames[grpi]
 
             fti <- ftindex[[grpi]][anai]
             if (fti == 0)
@@ -133,29 +134,32 @@ generateMzRPeakLists <- function(fGroups, avgMzWindow = 0.001, maxRtMSWidth = NU
                 if (is.null(spectra))
                     spectra <- loadSpectra(fp, verbose = FALSE)
 
-                results$MS <- averageSpectra(spectra, rtRange, avgMzWindow, avgTopPeaks,
-                                             avgMinIntensity, avgMassFun = avgMassFun, method = avgMethod)
+                results$MS <- averageSpectraMZR(spectra, rtRange, avgMzWindow, avgTopPeaks,
+                                                avgMinIntensity, avgMassFun = avgMassFun, method = avgMethod)
 
                 stopifnot(!is.null(ft$mz))
-                MSMS <- averageSpectra(spectra, rtRange, avgMzWindow, avgTopPeaks, avgMinIntensity, 2, ft$mz,
-                                       precursorMzWindow, avgMassFun, avgMethod)
+                MSMS <- averageSpectraMZR(spectra, rtRange, avgMzWindow, avgTopPeaks, avgMinIntensity, 2, ft$mz,
+                                          precursorMzWindow, avgMassFun, avgMethod)
                 if (nrow(MSMS) > 0)
                     results$MSMS <- MSMS
 
                 saveCacheData("MSPeakListsMzR", results, hash, cacheDB)
             }
 
-            ret[[ana]][[grp]] <- results
+            plists[[ana]][[grp]] <- results
 
             setTxtProgressBar(prog, grpi)
         }
 
-        setTxtProgressBar(prog, gcount)
+        setTxtProgressBar(prog, gCount)
         close(prog)
     }
 
     if (is.null(cachedSet))
-        saveCacheSet("MSPeakListsMzR", resultHashes[1:resultHashCount], setHash, cacheDB)
-
-    return(MSPeakLists(peakLists = ret, algorithm = "mzR"))
+        saveCacheSet("MSPeakListsMzR", resultHashes[seq_len(resultHashCount)], setHash, cacheDB)
+    
+    avgArgs <- list(clusterMzWindow = avgMzWindow, maxPeaks = avgTopPeaks, minIntensity = avgMinIntensity,
+                    avgMassFun = avgMassFun, method = avgMethod)
+    
+    return(MSPeakLists(peakLists = plists, avgPeakListArgs = avgArgs, algorithm = "mzR"))
 }

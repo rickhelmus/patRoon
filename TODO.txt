@@ -37,4 +37,9 @@ Release:
     - get rid of getXCMSSet() calls?
     - cache?
 - progressbar and parallel enviPick
-- clearCache: partial match
+- clearCache: partial match, specify file name
+- MSPeakLists
+    - plotSpec method
+    - post filter intensity after averaging? (implicitly done when fgroup averages are made)
+    - DA avg args
+- algorithm slot/method for all classes

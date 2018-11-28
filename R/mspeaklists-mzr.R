@@ -49,7 +49,7 @@ NULL
 #'
 #' @rdname MSPeakLists-generation
 #' @export
-generateMzRPeakLists <- function(fGroups, avgMzWindow = 0.001, maxRtMSWidth = NULL, avgTopPeaks = 50, avgMinIntensity = 500,
+generateMzRPeakLists <- function(fGroups, avgMzWindow = 0.001, maxRtMSWidth = 20, avgTopPeaks = 50, avgMinIntensity = 500,
                                  avgMassFun = mean, avgMethod = "distance", precursorMzWindow = 8, topMost = NULL)
 {
     ac <- checkmate::makeAssertCollection()
@@ -129,7 +129,7 @@ generateMzRPeakLists <- function(fGroups, avgMzWindow = 0.001, maxRtMSWidth = NU
 
                 rtRange <- c(ft$retmin, ft$retmax)
                 if (!is.null(maxRtMSWidth) && diff(rtRange) > maxRtMSWidth)
-                    rtRange <- c(max(rtRange[1], ft$rt - maxRtMSWidth/2), min(rtRange[2], ft$rt + maxRtMSWidth/2))
+                    rtRange <- c(max(rtRange[1], ft$ret - maxRtMSWidth/2), min(rtRange[2], ft$ret + maxRtMSWidth/2))
 
                 if (is.null(spectra))
                     spectra <- loadSpectra(fp, verbose = FALSE)

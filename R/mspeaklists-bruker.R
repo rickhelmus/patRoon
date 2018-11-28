@@ -23,7 +23,7 @@ NULL
 #'
 #' @rdname MSPeakLists-generation
 #' @export
-generateDAMSPeakLists <- function(fGroups, bgsubtr = TRUE, maxRtMSWidth = NULL, clear = TRUE, save = TRUE, MSMSType = "MSMS")
+generateDAMSPeakLists <- function(fGroups, bgsubtr = TRUE, maxRtMSWidth = 20, clear = TRUE, save = TRUE, MSMSType = "MSMS")
 {
     # UNDONE: implement topMost
 

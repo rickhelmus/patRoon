@@ -394,8 +394,47 @@ NULL
 #' @param maxRtMSWidth Maximum total chromatographic peak width (seconds) used
 #'   for spectrum averaging. If \code{NULL} all spectra from a feature will be
 #'   taken into account. Lower to decrease processing time.
+#' @param avgFeatParams,avgFGroupParams A \code{list} with parameters used for
+#'   averaging of peak lists for individual features and feature groups,
+#'   respectively (see below). Note that averaging parameters for Bruker
+#'   algorithms are set in DataAnalysis.
+#' @param \dots For \code{generateMSPeakLists}: Any parameters to be passed to
+#'   the selected MS peak lists generation algorithm.
+#'
+#'   For \code{getDefAvgPListParams}: Optional named arguments that override
+#'   defaults.
+#'
+#' @section Peak list averaging parameters: The parameters set used for
+#'   averaging peak lists are set by the \code{avgFeatParams} and
+#'   \code{avgFGroupParams} arguments. This should be a named \code{list} with
+#'   the following values:
+#'   \itemize{
+#'   \item \code{clusterMzWindow} \emph{m/z} window (in Da) used for clustering
+#'   \emph{m/z} values when spectra are averaged. Too small windows will prevent
+#'   clustering \emph{m/z} values (thus erroneously creating 'extra' values),
+#'   whereas too big windows may cluster unrelated \emph{m/z} values from
+#'   different or even the same spectrum together.
+#'   \item \code{topMost} Only retain this maximum number of MS peaks when
+#'   generating averaged spectra. Lowering this number may exclude more
+#'   irrelevant (noisy) MS peaks and decrease processing time, whereas higher
+#'   values may avoid excluding lower intense MS peaks that may still be of
+#'   interest.
+#'   \item \code{minIntensity} MS peaks with intensities below this value will
+#'   be removed (applied prior to selection by \code{topMost})
+#'   \item \code{avgFun} Function that is used to calculate average \emph{m/z}
+#'   values.
+#'   \item \code{method} Method used for producing averaged MS spectra. Valid
+#'   values are \code{"hclust"}, used for hierarchical clustering, and
+#'   \code{"distance"}, to use the between peak distance. The latter method
+#'   significantly reduces processing time and memory requirements, at the
+#'   (potential) cost of slightly reduced accuracy.
+#'   }
+#'   The \code{getDefAvgPListParams} function can be used to generate a default
+#'   parameter list.
+#'
 #' @return A \code{\link{MSPeakLists}} object that can be used for formulae
 #'   calculation and compound identification.
+#'
 #' @seealso \code{\link{MSPeakLists-class}}
 #' @name MSPeakLists-generation
 NULL

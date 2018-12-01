@@ -57,6 +57,14 @@ setMethod("initialize", "MSPeakLists", function(.Object, ...)
 #' @export
 setMethod("peakLists", "MSPeakLists", function(obj) obj@peakLists)
 
+#' @describeIn MSPeakLists Accessor method to obtain the feature group averaged
+#'   MS peak lists.
+#' @return \code{averagedPeakLists} returns a nested list of feature group
+#'   averaged peak lists in a similar format as \code{peakLists}.
+#' @aliases peakLists
+#' @export
+setMethod("averagedPeakLists", "MSPeakLists", function(obj) obj@averagedPeakLists)
+
 #' @templateVar class MSPeakLists
 #' @templateVar what analyses
 #' @template strmethod
@@ -301,9 +309,6 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
 #' @templateVar ex2 generateFormulasGenForm
 #' @templateVar algos bruker,brukerfmf,mzr
 #' @template generic-algo
-#'
-#' @param \dots Any parameters to be passed to the selected MS peak lists
-#'   generation algorithm.
 #'
 #' @rdname MSPeakLists-generation
 #' @aliases generateMSPeakLists

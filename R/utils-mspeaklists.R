@@ -1,6 +1,21 @@
+
+#' @details The \code{getDefAvgPListParams} is used to create a parameter list
+#'   for peak list averaging (discussed below).
+#' @rdname MSPeakLists-generation
+#' @export
+getDefAvgPListParams <- function(...)
+{
+    def <- list(clusterMzWindow = 0.005,
+                topMost = 50,
+                minIntensity = 500,
+                avgFun = mean,
+                method = "distance")
+    return(modifyList(def, list(...)))
+}
+
 # align & average spectra by clustering or between peak distances
 # code inspired from msProcess R package: https://github.com/zeehio/msProcess
-averageSpectra <- function(spectra, clusterMzWindow, maxPeaks, minIntensity, avgMassFun, method)
+averageSpectra <- function(spectra, clusterMzWindow, topMost, minIntensity, avgFun, method)
 {
     if (length(spectra) == 0) # no spectra, return empty spectrum
         return(data.table(mz = integer(0), intensity = integer(0)))
@@ -8,10 +23,10 @@ averageSpectra <- function(spectra, clusterMzWindow, maxPeaks, minIntensity, avg
     spectra <- lapply(spectra, function(s)
     {
         s <- s[intensity >= minIntensity]
-        if (nrow(s) > maxPeaks)
+        if (nrow(s) > topMost)
         {
             ord <- order(-s$intensity)
-            s <- s[ord[seq_len(maxPeaks)]]
+            s <- s[ord[seq_len(topMost)]]
         }
         return(s)
     })
@@ -27,7 +42,6 @@ averageSpectra <- function(spectra, clusterMzWindow, maxPeaks, minIntensity, avg
         mzd <- dist(spcomb$mz)
         hc <- hclust(mzd)
         spcomb[, cluster := cutree(hc, h = clusterMzWindow)]
-        
     }
     else if (method == "distance")
     {
@@ -36,19 +50,19 @@ averageSpectra <- function(spectra, clusterMzWindow, maxPeaks, minIntensity, avg
     }
     
     if (any(spcomb[, .(dup = anyDuplicated(spid)), key = cluster][["dup"]] > 0))
-        warning("Clustered multiple masses from same spectrum, consider lowering clusterMzWindow!\n")
+        warning("During spectral averaging multiple masses from the same spectrum were clustered, consider tweaking clusterMzWindow!\n")
     
     spcount <- length(spectra)
-    return(spcomb[, .(mz = avgMassFun(mz), intensity = sum(intensity) / spcount), by = cluster][, cluster := NULL])
+    return(spcomb[, .(mz = avgFun(mz), intensity = sum(intensity) / spcount), by = cluster][, cluster := NULL])
 }
 
-averageMSPeakLists <- function(peakLists, clusterMzWindow, maxPeaks, minIntensity, avgMassFun, method)
+averageMSPeakLists <- function(peakLists, clusterMzWindow, topMost, minIntensity, avgFun, method)
 {
     # UNDONE: use cache sets?
     
     cat("Generating averaged peak lists for all feature groups...\n")
     
-    hash <- makeHash(peakLists, clusterMzWindow, maxPeaks, minIntensity, avgMassFun, method)
+    hash <- makeHash(peakLists, clusterMzWindow, topMost, minIntensity, avgFun, method)
     avgPLists <- loadCacheData("MSPeakListsAvg", hash)
     
     if (is.null(avgPLists))
@@ -63,11 +77,11 @@ averageMSPeakLists <- function(peakLists, clusterMzWindow, maxPeaks, minIntensit
         {
             plistsMS <- lapply(peakLists, function(pl) pl[[gNames[grpi]]][["MS"]])
             plistsMS <- plistsMS[!sapply(plistsMS, is.null)]
-            plistsMS <- averageSpectra(plistsMS, clusterMzWindow, maxPeaks, minIntensity, avgMassFun, method)
+            plistsMS <- averageSpectra(plistsMS, clusterMzWindow, topMost, minIntensity, avgFun, method)
             
             plistsMSMS <- lapply(peakLists, function(pl) pl[[gNames[grpi]]][["MSMS"]])
             plistsMSMS <- plistsMSMS[!sapply(plistsMSMS, is.null)]
-            plistsMSMS <- averageSpectra(plistsMSMS, clusterMzWindow, maxPeaks, minIntensity, avgMassFun, method)
+            plistsMSMS <- averageSpectra(plistsMSMS, clusterMzWindow, topMost, minIntensity, avgFun, method)
             
             setTxtProgressBar(prog, grpi)
             return(list(MS = if (nrow(plistsMS) > 0) plistsMS else NULL,

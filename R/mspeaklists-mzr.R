@@ -49,19 +49,17 @@ NULL
 #'
 #' @rdname MSPeakLists-generation
 #' @export
-generateMzRPeakLists <- function(fGroups, avgMzWindow = 0.001, maxRtMSWidth = 20, avgTopPeaks = 50, avgMinIntensity = 500,
-                                 avgMassFun = mean, avgMethod = "distance", precursorMzWindow = 8, topMost = NULL)
+generateMzRPeakLists <- function(fGroups, maxRtMSWidth = 20, precursorMzWindow = 8, topMost = NULL,
+                                 avgFeatParams = getDefAvgPListParams(),
+                                 avgFGroupParams = getDefAvgPListParams())
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
-    aapply(checkmate::assertNumber, . ~ avgMzWindow + avgMinIntensity,
-           lower = 0, finite = TRUE, fixed = list(add = ac))
     checkmate::assertNumber(maxRtMSWidth, lower = 1, finite = TRUE, null.ok = TRUE, add = ac)
     checkmate::assertNumber(precursorMzWindow, lower = 0, finite = TRUE, null.ok = TRUE, add = ac)
-    checkmate::assertCount(avgTopPeaks, positive = TRUE, add = ac)
-    checkmate::assertFunction(avgMassFun, add = ac)
-    checkmate::assertChoice(avgMethod, c("distance", "hclust"), add = ac)
     checkmate::assertCount(topMost, positive = TRUE, null.ok = TRUE, add = ac)
+    assertAvgPListParams(avgFeatParams, add = ac)
+    assertAvgPListParams(avgFGroupParams, add = ac)
     checkmate::reportAssertions(ac)
     
     ftindex <- groupFeatIndex(fGroups)
@@ -76,8 +74,7 @@ generateMzRPeakLists <- function(fGroups, avgMzWindow = 0.001, maxRtMSWidth = 20
         return(MSPeakLists(algorithm = "mzR"))
 
     cacheDB <- openCacheDBScope()
-    setHash <- makeHash(fGroups, avgMzWindow, maxRtMSWidth, avgTopPeaks, avgMinIntensity, avgMassFun, avgMethod,
-                        precursorMzWindow, topMost)
+    setHash <- makeHash(fGroups, maxRtMSWidth, precursorMzWindow, topMost, avgFeatParams)
     cachedSet <- loadCacheSet("MSPeakListsMzR", setHash, cacheDB)
     resultHashes <- vector("character", anaCount * gCount)
     resultHashCount <- 0
@@ -95,8 +92,7 @@ generateMzRPeakLists <- function(fGroups, avgMzWindow = 0.001, maxRtMSWidth = 20
         fp <- getMzMLOrMzXMLAnalysisPath(ana, anaInfo$path[anai])
         spectra <- NULL
 
-        baseHash <- makeHash(ana, avgMzWindow, maxRtMSWidth, avgTopPeaks, avgMinIntensity, avgMassFun, avgMethod,
-                             precursorMzWindow, topMost)
+        baseHash <- makeHash(ana, maxRtMSWidth, precursorMzWindow, topMost, avgFeatParams)
 
         printf("Loading all MS peak lists for %d feature groups in analysis '%s'...\n", gCount, ana)
         prog <- txtProgressBar(0, gCount, style = 3)
@@ -134,12 +130,12 @@ generateMzRPeakLists <- function(fGroups, avgMzWindow = 0.001, maxRtMSWidth = 20
                 if (is.null(spectra))
                     spectra <- loadSpectra(fp, verbose = FALSE)
 
-                results$MS <- averageSpectraMZR(spectra, rtRange, avgMzWindow, avgTopPeaks,
-                                                avgMinIntensity, avgMassFun = avgMassFun, method = avgMethod)
+                results$MS <- do.call(averageSpectraMZR, c(list(spectra, rtRange), avgFeatParams))
 
                 stopifnot(!is.null(ft$mz))
-                MSMS <- averageSpectraMZR(spectra, rtRange, avgMzWindow, avgTopPeaks, avgMinIntensity, 2, ft$mz,
-                                          precursorMzWindow, avgMassFun, avgMethod)
+                MSMS <- do.call(averageSpectraMZR, c(list(spectra = spectra, rtRange = rtRange, MSLevel = 2,
+                                                          precursor = ft$mz, precursorMzWindow = precursorMzWindow),
+                                                     avgFeatParams))
                 if (nrow(MSMS) > 0)
                     results$MSMS <- MSMS
 
@@ -158,8 +154,5 @@ generateMzRPeakLists <- function(fGroups, avgMzWindow = 0.001, maxRtMSWidth = 20
     if (is.null(cachedSet))
         saveCacheSet("MSPeakListsMzR", resultHashes[seq_len(resultHashCount)], setHash, cacheDB)
     
-    avgArgs <- list(clusterMzWindow = avgMzWindow, maxPeaks = avgTopPeaks, minIntensity = avgMinIntensity,
-                    avgMassFun = avgMassFun, method = avgMethod)
-    
-    return(MSPeakLists(peakLists = plists, avgPeakListArgs = avgArgs, algorithm = "mzR"))
+    return(MSPeakLists(peakLists = plists, avgPeakListArgs = avgFGroupParams, algorithm = "mzR"))
 }

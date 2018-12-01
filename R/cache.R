@@ -16,9 +16,9 @@ makeFileHash <- function(...) digest::digest(sapply(list(...), digest::digest, f
 
 # storing/retrieving R objects: http://jfaganuk.github.io/2015/01/12/storing-r-objects-in-sqlite-tables/
 
-openCacheDB <- function() dbConnect(SQLite(), getCacheFile())
+openCacheDB <- function(file = getCacheFile()) dbConnect(SQLite(), file)
 closeCacheDB <- function(db) dbDisconnect(db)
-openCacheDBScope <- withr::local_(function(x) openCacheDB(), function(x) closeCacheDB(x))
+openCacheDBScope <- withr::local_(function(x, file = getCacheFile()) openCacheDB(file), function(x) closeCacheDB(x))
 
 loadCacheData <- function(category, hashes, dbArg = NULL)
 {
@@ -120,34 +120,41 @@ saveCacheSet <- function(category, dataHashes, setHash, dbArg = NULL)
 #' This function will either remove one or more tables within the cache
 #' \code{sqlite} database or simply wipe the whole cache file. Removing tables
 #' will \code{VACUUM} the database, which may take some time for large cache
-#' files. (intermediate) processing results.
+#' files.
 #'
 #' @param what This argument describes what should be done. When \code{what =
 #'   NULL} this function will list which tables are present along with an
 #'   indication of their size (database rows). If \code{what = "all"} then the
 #'   complete file will be removed. Finally, \code{what} can be a character
 #'   vector with table names that should be removed.
+#' @param file The cache file. If \code{NULL} then the value of the
+#'   \code{patRoon.cache.fileName} option is used.
 #'
 #' @export
-clearCache <- function(what = NULL)
+clearCache <- function(what = NULL, file = NULL)
 {
     checkmate::assertCharacter(what, min.len = 1, null.ok = TRUE)
     
-    if (!file.exists(getCacheFile()))
+    if (!is.null(file))
+        checkmate::assertFile(file, "r")
+    else
+        file <- getCacheFile()
+    
+    if (!file.exists(file))
         printf("No cache file found, nothing to do ...\n")
     else if ("all" %in% what)
     {
         cat("Clearing ALL caches...\n")
-        if (unlink(getCacheFile()) != 0)
+        if (unlink(file) != 0)
         {
             gc() # might be some orphaned connection open
-            if (unlink(getCacheFile()) != 0)
+            if (unlink(file) != 0)
                 warning("Could not clear cache file!")
         }
     }
     else
     {
-        db <- openCacheDBScope()
+        db <- openCacheDBScope(file = file)
         tables <- dbListTables(db)
 
         if (length(tables) == 0)

@@ -38,13 +38,14 @@ Release:
     - cache?
 - progressbar and parallel enviPick
 - OpenMS: also write XMLs in C++?
-- clearCache: partial match, specify file name
+- clearCache: partial match
 - MSPeakLists
     - plotSpec method
     - post filter intensity after averaging? (implicitly done when fgroup averages are made)
     - DA avg args
     - isotope tagging is lost after averaging
     - most intense analysis as alternative to averaging?
+    - report spectra/tables?
 - algorithm slot/method for all classes
 - MetFrag: (buggy) trivial name fetching not needed anymore?
 - reportMD: if blanks are still present chord etc not plotted?

@@ -37,16 +37,12 @@ if (rmdVars$includeMFWebLinks != "none")
         if (grp %in% compFGroups && is(rmdVars$compounds, "compoundsMF"))
         {
             # make link with used MF settings
-            ana <- compTable[[grp]]$analysis[1]
             set <- settings(compounds)
         }
         else
-        {
-            ana <- getMostIntenseAnaWithMSMS(rmdVars$fGroups, rmdVars$MSPeakLists, grp)
             set <- NULL
-        }
         
-        return(buildMFLandingURL(set, peakLists(rmdVars$MSPeakLists)[[ana]][[grp]][["MSMS"]],
+        return(buildMFLandingURL(set, rmdVars$MSPeakLists[[grp]][["MSMS"]],
                                  rmdVars$gInfo[grp, "mzs"]))
     })
 }

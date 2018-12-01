@@ -42,7 +42,8 @@ setGeneric("getXCMSSet", function(obj, ..., verbose = TRUE) standardGeneric("get
 
 ### MS Peak Lists
 
-setGeneric("peakLists", function(obj) obj@peakLists)
+setGeneric("peakLists", function(obj) standardGeneric("peakLists"))
+setGeneric("averagedPeakLists", function(obj) standardGeneric("averagedPeakLists"))
 setGeneric("generateMSPeakLists", function(fGroups, algorithm, ...) standardGeneric("generateMSPeakLists"))
 
 ### Components

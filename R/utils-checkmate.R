@@ -145,6 +145,19 @@ assertNormalizationMethod <- function(x, .var.name = checkmate::vname(x), add = 
     checkmate::assertChoice(x, c("none", "max", "minmax"), .var.name = .var.name, add = add)
 }
 
+assertAvgPListParams <- function(x, .var.name = checkmate::vname(x), add = NULL)
+{
+    checkmate::assertList(x, names = "unique", .var.name = .var.name) # no add: should fail
+    
+    assertVal <- function(f, v, ...) f(x[[v]], ..., .var.name = paste0(.var.name, "$", v), add = add)
+    
+    assertVal(checkmate::assertNumber, "clusterMzWindow", lower = 0, finite = TRUE)
+    assertVal(checkmate::assertCount, "topMost", positive = TRUE)
+    assertVal(checkmate::assertNumber, "minIntensity", lower = 0, finite = TRUE)
+    assertVal(checkmate::assertFunction, "avgFun")
+    assertVal(checkmate::assertChoice, "method", choices = c("distance", "hclust"))
+}
+
 # from https://github.com/mllg/checkmate/issues/115
 aapply = function(fun, formula, ..., fixed = list())
 {

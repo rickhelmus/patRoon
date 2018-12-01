@@ -23,7 +23,8 @@ NULL
 #'
 #' @rdname MSPeakLists-generation
 #' @export
-generateDAMSPeakLists <- function(fGroups, bgsubtr = TRUE, maxRtMSWidth = NULL, clear = TRUE, save = TRUE, MSMSType = "MSMS")
+generateDAMSPeakLists <- function(fGroups, bgsubtr = TRUE, maxRtMSWidth = 20, clear = TRUE, save = TRUE, MSMSType = "MSMS",
+                                  avgFGroupParams = getDefAvgPListParams())
 {
     # UNDONE: implement topMost
 
@@ -32,6 +33,7 @@ generateDAMSPeakLists <- function(fGroups, bgsubtr = TRUE, maxRtMSWidth = NULL, 
     aapply(checkmate::assertFlag, . ~ bgsubtr + clear + save, fixed = list(add = ac))
     checkmate::assertNumber(maxRtMSWidth, lower = 0, finite = TRUE, null.ok = TRUE, add = ac)
     checkmate::assertChoice(MSMSType, c("MSMS", "BBCID"), add = ac)
+    assertAvgPListParams(avgFGroupParams, add = ac)
     checkmate::reportAssertions(ac)
     
     compounds <- generateDACompounds(fGroups, bgsubtr, maxRtMSWidth, clear, save, MSMSType)
@@ -111,7 +113,7 @@ generateDAMSPeakLists <- function(fGroups, bgsubtr = TRUE, maxRtMSWidth = NULL, 
             saveCacheSet("MSPeakListsDA", resultHashes[resultHashes != ""], setHash, cacheDB)
     }
 
-    return(MSPeakLists(peakLists = ret, algorithm = "Bruker_DataAnalysis"))
+    return(MSPeakLists(peakLists = ret, avgPeakListArgs = avgFGroupParams, algorithm = "Bruker_DataAnalysis"))
 }
 
 #' @details \code{generateDAFMFMSPeakLists} is similar to \code{generateDAMSPeakLists},
@@ -124,9 +126,12 @@ generateDAMSPeakLists <- function(fGroups, bgsubtr = TRUE, maxRtMSWidth = NULL, 
 #'
 #' @rdname MSPeakLists-generation
 #' @export
-generateDAFMFMSPeakLists <- function(fGroups)
+generateDAFMFMSPeakLists <- function(fGroups, avgFGroupParams = getDefAvgPListParams())
 {
-    checkmate::assertClass(fGroups, "featureGroups")
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertClass(fGroups, "featureGroups", add = ac)
+    assertAvgPListParams(avgFGroupParams, add = ac)
+    checkmate::reportAssertions(ac)
     
     # UNDONE: implement topMost
 
@@ -206,5 +211,5 @@ generateDAFMFMSPeakLists <- function(fGroups)
             saveCacheSet("MSPeakListsDAFMF", resultHashes[resultHashes != ""], setHash, cacheDB)
     }
 
-    return(MSPeakLists(peakLists = ret, algorithm = "Bruker_DataAnalysis_FMF"))
+    return(MSPeakLists(peakLists = ret, avgPeakListArgs = avgFGroupParams, algorithm = "Bruker_DataAnalysis_FMF"))
 }

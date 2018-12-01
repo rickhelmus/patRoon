@@ -1,6 +1,8 @@
 # patRoon 0.1.0.9000
 
 ## November 2018
+* Default value for `maxRtMSWidth` argument used for peak list generation.
+* Fixed: `maxRtMSWidth` argument for mzR peak list generation had no effect.
 * Preliminary EPA DSSTox support (via LocalCSV).
 * Added `addAllDAEICs()` function.
 * Renamed `mzWidth` argument of `addDAEIC()` to `mzWindow`.

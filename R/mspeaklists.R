@@ -11,6 +11,10 @@ NULL
 #'
 #' @slot peakLists Contains a list of all MS (and MS/MS) peak lists. Use the
 #'   \code{peakLists} method for access.
+#' @slot averagedPeakLists A \code{list} with averaged MS (and MS/MS) peak lists
+#'   for each feature group.
+#' @slot avgPeakListArgs A \code{list} with arguments used to generate feature
+#'   group averaged MS(/MS) peak lists.
 #' @slot algorithm The algorithm that was used to generate the MS peak lists.
 #'   Use the \code{algorithm} method for access.
 #'
@@ -18,13 +22,24 @@ NULL
 #' @templateVar selOrderi analyses()
 #' @templateVar selj feature groups
 #' @templateVar selOrderj groupNames()
+#' @templateVar optionalji TRUE
 #' @template sub_op-args
 #'
 #' @param obj,x,object The \code{\link{MSPeakLists}} object to access.
 #' @export
 MSPeakLists <- setClass("MSPeakLists",
-                         slots = c(peakLists = "list", algorithm = "character"),
-                         prototype = list(peakLists = list(), algorithm = "none"))
+                        slots = c(peakLists = "list", averagedPeakLists = "list", avgPeakListArgs = "list",
+                                  algorithm = "character"))
+
+
+setMethod("initialize", "MSPeakLists", function(.Object, ...)
+{
+    .Object <- callNextMethod(.Object, ...)
+    
+    .Object@averagedPeakLists <- do.call(averageMSPeakLists, c(list(.Object@peakLists),
+                                                               .Object@avgPeakListArgs))
+    return(.Object)
+})
 
 #' @describeIn MSPeakLists Accessor method to obtain the MS peak lists.
 #' @return \code{peakLists} returns a nested list containing MS (and MS/MS where
@@ -42,6 +57,14 @@ MSPeakLists <- setClass("MSPeakLists",
 #' @export
 setMethod("peakLists", "MSPeakLists", function(obj) obj@peakLists)
 
+#' @describeIn MSPeakLists Accessor method to obtain the feature group averaged
+#'   MS peak lists.
+#' @return \code{averagedPeakLists} returns a nested list of feature group
+#'   averaged peak lists in a similar format as \code{peakLists}.
+#' @aliases peakLists
+#' @export
+setMethod("averagedPeakLists", "MSPeakLists", function(obj) obj@averagedPeakLists)
+
 #' @templateVar class MSPeakLists
 #' @templateVar what analyses
 #' @template strmethod
@@ -52,7 +75,7 @@ setMethod("analyses", "MSPeakLists", function(obj) names(obj@peakLists))
 #' @templateVar what feature groups
 #' @template strmethod
 #' @export
-setMethod("groupNames", "MSPeakLists", function(obj) unique(unlist(sapply(obj@peakLists, names, simplify = FALSE), use.names = FALSE)))
+setMethod("groupNames", "MSPeakLists", function(obj) names(obj@averagedPeakLists))
 
 #' @describeIn MSPeakLists Retrieve the algorithm (a character string) used to
 #'   generate the MS peak lists.
@@ -122,30 +145,46 @@ setMethod("[", c("MSPeakLists", "ANY", "ANY", "missing"), function(x, i, j, ...)
     {
         if (!is.character(j))
             j <- groupNames(x)[j]
-        x@peakLists <- sapply(x@peakLists, function(a)
-        {
-            ret <- a[j]
-            return(pruneList(ret))
-        }, simplify = FALSE)
+        x@peakLists <- sapply(x@peakLists, function(a) return(pruneList(a[j])),
+                              simplify = FALSE)
         x@peakLists <- pruneList(x@peakLists, TRUE)
+        
+        x@averagedPeakLists <- pruneList(x@averagedPeakLists[j], TRUE)
     }
     
     return(x)
 })
 
-#' @describeIn MSPeakLists Extract a list with MS and MS/MS (if available) peak lists.
+#' @describeIn MSPeakLists Extract a list with MS and MS/MS (if available) peak
+#'   lists. If the second argument (\code{j}) is not specified the averaged peak
+#'   lists for the group specified by the first argument (\code{i}) will be
+#'   returned.
 #' @export
 setMethod("[[", c("MSPeakLists", "ANY", "ANY"), function(x, i, j)
 {
     assertExtractArg(i)
-    assertExtractArg(j)
+    if (!missing(j))
+        assertSubsetArg(j)
     
+    if (!missing(j))
+    {
+        # both arguments specified, return regular peak lists
+
+        if (!is.character(i))
+            i <- analyses(x)[i]
+        
+        if (!is.character(j))
+            j <- groupNames(x)[j]
+        
+        return(x@peakLists[[c(i, j)]])
+    }
+    
+    # else return averaged peak lists for specified feature group
+
     if (!is.character(i))
-        i <- analyses(x)[i]
-    if (!is.character(j))
-        j <- groupNames(x)[j]
+        i <- groupNames(x)[i]
     
-    return(x@peakLists[[c(i, j)]])
+    return(x@averagedPeakLists[[i]])
 })
 
 #' @describeIn MSPeakLists provides post filtering of generated MS
@@ -255,8 +294,11 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
     obj@peakLists <- pLists
     saveCacheData("filterMSPeakLists", obj, hash)
 
+    # update group averaged peak lists
+    obj@averagedPeakLists <- do.call(averageMSPeakLists, c(list(pLists), obj@avgPeakListArgs))
+    
     newn <- length(obj)
-    printf("Done! Filtered %d (%.2f%%) MS peak lists. Remaining: %d\n", oldn - newn, if (oldn == 0) 0 else (1-(newn/oldn))*100, newn)
+    printf("Done! Filtered %d (%.2f%%) MS peaks. Remaining: %d\n", oldn - newn, if (oldn == 0) 0 else (1-(newn/oldn))*100, newn)
     
     return(obj)
 })
@@ -267,9 +309,6 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
 #' @templateVar ex2 generateFormulasGenForm
 #' @templateVar algos bruker,brukerfmf,mzr
 #' @template generic-algo
-#'
-#' @param \dots Any parameters to be passed to the selected MS peak lists
-#'   generation algorithm.
 #'
 #' @rdname MSPeakLists-generation
 #' @aliases generateMSPeakLists

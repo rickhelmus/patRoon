@@ -239,37 +239,6 @@ generateAnalysisInfoFromEnviMass <- function(path)
     return(ret)
 }
 
-deIsotopeMSPeakList <- function(MSPeakList)
-{
-    if (nrow(MSPeakList) == 0)
-        return(MSPeakList)
-
-    # make sure most intense ions top the table
-    MSPeakList <- MSPeakList[order(mz, -intensity)]
-
-    unique_iso <- sapply(seq_along(MSPeakList$cmp), function(i)
-    {
-        # first and unassigned compounds are always unique
-        if (i == 1 || MSPeakList$cmp[i] == "")
-            return(TRUE)
-
-        # peak may belong to multiple isotope compounds (separated by whitespace)
-        cmp <- strsplit(MSPeakList$cmp[i], "\\s+")
-
-        # isotope compound present before this entry?
-        othercmp <- MSPeakList[seq_len(i - 1)][cmp != ""]$cmp
-        for (ocmp in othercmp)
-        {
-            if (any(cmp %in% strsplit(ocmp, "\\s+")))
-                return(FALSE)
-        }
-
-        return(TRUE)
-    }, USE.NAMES = FALSE)
-
-    return(MSPeakList[unique_iso])
-}
-
 # from: http://www.cureffi.org/2013/09/23/a-quick-intro-to-chemical-informatics-in-r/
 rcdkplot <- function(molecule, width = 500, height = 500)
 {
@@ -517,11 +486,6 @@ makeMSPlotGG <- function(spec, fragInfo, ...)
         mbsUnique <- mbsUnique[order(sapply(mbsUnique, countCharInStr, ch = ",", USE.NAMES = FALSE))]
         mbCombCols <- getBrewerPal(length(mbsUnique), "Paired")
     }
-
-    if (is.null(fragInfo) || nrow(fragInfo) == 0)
-        fragSpecIndices <- NA
-    else
-        fragSpecIndices <- sapply(seq_len(nrow(spec)), function(r) match(r, fragInfo$PLIndex))
 
     plotData <- copy(spec)
 

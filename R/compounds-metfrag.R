@@ -172,18 +172,16 @@ generateMetFragRunData <- function(fGroups, MSPeakLists, mfSettings, topMost, id
     gTable <- groups(fGroups)
     gInfo <- groupInfo(fGroups)
     anaInfo <- analysisInfo(fGroups)
-    pLists <- peakLists(MSPeakLists)
 
     ret <- sapply(gNames, function(grp)
     {
         if (!is.null(identifiers) && is.null(identifiers[[grp]]))
             return(NULL)
 
-        intana <- getMostIntenseAnaWithMSMS(fGroups, MSPeakLists, grp)
-        if (is.null(intana))
+        spec <- MSPeakLists[[grp]][["MSMS"]]
+        if (is.null(spec))
             return(NULL)
-
-        spec <- pLists[[intana]][[grp]][["MSMS"]]
+        
         mfSettings$IonizedPrecursorMass <- gInfo[grp, "mzs"]
         mfSettings$ExperimentalRetentionTimeValue <- gInfo[grp, "rts"] / 60
 
@@ -192,13 +190,13 @@ generateMetFragRunData <- function(fGroups, MSPeakLists, mfSettings, topMost, id
 
         hash <- makeHash(method, mfSettings, spec, topMost, if (method == "R") addTrivialNames else FALSE)
 
-        return(list(hash = hash, analysis = intana, gName = grp, spec = spec, mfSettings = mfSettings))
+        return(list(hash = hash, gName = grp, spec = spec, mfSettings = mfSettings))
     }, simplify = FALSE)
 
     return(ret[!sapply(ret, is.null)])
 }
 
-processMFResults <- function(metf, analysis, spec, db, topMost, lfile = "")
+processMFResults <- function(metf, spec, db, topMost, lfile = "")
 {
     if (nrow(metf) > 0)
     {
@@ -233,7 +231,6 @@ processMFResults <- function(metf, analysis, spec, db, topMost, lfile = "")
         if (!is.null(metf[["CASRN"]]))
             metf[, CASRN := sub("CASRN:", "", CASRN, fixed = TRUE)] # remove "CASRN" prefix
         
-        metf[, analysis := analysis]
         metf[, database := db]
     }
 
@@ -437,7 +434,7 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
             cmdQueue <- lapply(runData, function(rd)
             {
                 logf <- if (!is.null(logPath)) file.path(logPath, paste0("mfcl-", rd$gName, ".txt")) else NULL
-                return(c(rd[c("hash", "analysis", "gName", "spec")],
+                return(c(rd[c("hash", "gName", "spec")],
                          initMetFragCLCommand(rd$mfSettings, rd$spec, mfBin, logf)))
             })
 
@@ -448,7 +445,7 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
                 metf <- fread(cmd$outFile, colClasses = c(Identifier = "character"))
                 if (!is.null(cmd$stderrFile))
                     cat(sprintf("\n%s - Done! Processing results...\n", date()), file = cmd$stderrFile, append = TRUE)
-                metf <- processMFResults(metf, cmd$analysis, cmd$spec, database, topMost, cmd$stderrFile)
+                metf <- processMFResults(metf, cmd$spec, database, topMost, cmd$stderrFile)
                 if (!is.null(cmd$stderrFile))
                     cat(sprintf("\n%s - Done! Caching results...\n", date()), file = cmd$stderrFile, append = TRUE)
                 saveCacheData("identifyMetFrag", metf, cmd$hash, cacheDB)
@@ -505,7 +502,7 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
                     metf <- unFactorDF(metf)
                     metf <- as.data.table(metf)
 
-                    metf <- processMFResults(metf, rd$analysis, rd$spec, database, topMost)
+                    metf <- processMFResults(metf, rd$spec, database, topMost)
 
                     # BUG: metfRag seems to give second duplicate results where only NoExplPeaks may differ and have an incorrect value.
                     # for now, just remove all duplicates and re-assign NoExplPeaks

@@ -303,6 +303,54 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
     return(obj)
 })
 
+#' @describeIn MSPeakLists Plots a spectrum using MS or MS/MS peak lists for a
+#'   given feature group.
+#'
+#' @param groupName The name of the feature group for which a plot should be
+#'   made.
+#' @param analysis The name of the analysis for which a plot should be made. If
+#'   \code{NULL} then data from the feature group averaged peak list is used.
+#' @param MSLevel The MS level: \samp{1} for regular MS, \samp{2} for MSMS.
+#'
+#' @template useGGplot2
+#'
+#' @return \code{plotSpec} will return a \code{\link[=ggplot2]{ggplot object}}
+#'   if \code{useGGPlot2} is \code{TRUE}.
+#'
+#' @export
+setMethod("plotSpec", "MSPeakLists", function(obj, groupName, analysis = NULL, MSLevel = 2, useGGPlot2 = FALSE)
+{
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertString(groupName, min.chars = 1, add = ac)
+    checkmate::assertString(analysis, min.chars = 1, null.ok = TRUE, add = ac)
+    checkmate::assertChoice(MSLevel, 1:2, add = ac)
+    checkmate::assertFlag(useGGPlot2, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    if (length(obj) == 0)
+        return(NULL)
+    
+    MSInd <- if (MSLevel == 1) "MS" else "MSMS"
+    if (!is.null(analysis))
+        spec <- obj[[analysis, groupName]][[MSInd]]
+    else
+        spec <- obj[[groupName]][[MSInd]]
+    
+    if (is.null(spec))
+        return(NULL)
+    
+    if (!is.null(analysis))
+        title <- sprintf("%s (%s) %s", groupName, analysis, MSInd)
+    else
+        title <- paste(groupName, MSInd)
+    
+    if (useGGPlot2)
+        return(makeMSPlotGG(spec, NULL) + ggtitle(title))
+    
+    makeMSPlot(spec, NULL, main = title)
+})
+
+
 #' @templateVar func generateMSPeakLists
 #' @templateVar what generate MS peak lists
 #' @templateVar ex1 generateMSPeakListsMzR

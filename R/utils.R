@@ -409,7 +409,8 @@ countCharInStr <- function(str, ch) sum(charToRaw(str) == charToRaw(ch))
 
 makeMSPlot <- function(spec, fragInfo, ..., extraHeightInch = 0)
 {
-    isMerged <- !is.null(fragInfo[["mergedBy"]]) && nrow(fragInfo) > 0
+    hasFragInfo <- !is.null(fragInfo) && nrow(fragInfo) > 0
+    isMerged <- hasFragInfo && !is.null(fragInfo[["mergedBy"]])
     oldp <- NULL
     # par(mar = c(par("mar")[1:2], 0, 0))
 
@@ -431,7 +432,7 @@ makeMSPlot <- function(spec, fragInfo, ..., extraHeightInch = 0)
     }
 
     # ym <- (if (is.null(fragInfo)) max(spec$intensity) else max(fragInfo$intensity)) * 1.2
-    fragInfoInds <- if (nrow(fragInfo) > 0) match(seq_len(nrow(spec)), fragInfo$PLIndex, 0) else rep(0, nrow(spec))
+    fragInfoInds <- if (hasFragInfo) match(seq_len(nrow(spec)), fragInfo$PLIndex, 0) else rep(0, nrow(spec))
     
     # see how much extra vertical space is needed by formula labels
     # get character widths (assuming that height of vertically plotted text is the same)
@@ -478,7 +479,8 @@ makeMSPlot <- function(spec, fragInfo, ..., extraHeightInch = 0)
 
 makeMSPlotGG <- function(spec, fragInfo, ...)
 {
-    if (!is.null(fragInfo[["mergedBy"]]))
+    hasFragInfo <- !is.null(fragInfo) && nrow(fragInfo) > 0
+    if (hasFragInfo && !is.null(fragInfo[["mergedBy"]]))
     {
         allMergedBy <- sapply(fragInfo[["mergedBy"]], function(mb) paste0(unlist(mb), collapse = ","))
         mbsUnique <- unique(allMergedBy)
@@ -490,7 +492,7 @@ makeMSPlotGG <- function(spec, fragInfo, ...)
     plotData <- copy(spec)
 
     plotData[, c("colour", "lab", "lwd", "text") := .("grey", "unassigned", 0.5, "")]
-    if (!is.null(fragInfo) && nrow(fragInfo) > 0)
+    if (hasFragInfo)
     {
         plotData[, fiInd := sapply(seq_len(nrow(spec)), function(r) match(r, fragInfo$PLIndex))]
         if (!is.null(fragInfo[["mergedBy"]]))

@@ -305,8 +305,8 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
 
 #' @templateVar func generateMSPeakLists
 #' @templateVar what generate MS peak lists
-#' @templateVar ex1 generateFormulasDA
-#' @templateVar ex2 generateFormulasGenForm
+#' @templateVar ex1 generateMSPeakListsMzR
+#' @templateVar ex2 generateMSPeakListsDA
 #' @templateVar algos bruker,brukerfmf,mzr
 #' @template generic-algo
 #'
@@ -316,9 +316,9 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
 setMethod("generateMSPeakLists", "featureGroups", function(fGroups, algorithm, ...)
 {
     f <- switch(algorithm,
-                bruker = generateDAMSPeakLists,
-                brukerfmf = generateDAFMFMSPeakLists,
-                mzr = generateMzRPeakLists,
+                bruker = generateMSPeakListsDA,
+                brukerfmf = generateMSPeakListsDAFMF,
+                mzr = generateMSPeakListsMzR,
                 stop("Invalid algorithm! Should be: bruker, brukerfmf or mzr"))
 
     f(fGroups, ...)

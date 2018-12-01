@@ -6,7 +6,7 @@ NULL
 # use mzR to generate MS peaklists.
 # limitations compared to DA: no bg subtraction, no isotope information
 
-#' @details \code{generateMzRPeakLists} uses the \pkg{\link{mzR}} package to
+#' @details \code{generateMSPeakListsMzR} uses the \pkg{\link{mzR}} package to
 #'   extract MS peak lists. For this analyses should be either in \file{.mzXML}
 #'   or \file{.mzML} format. This function can optionally average multiple
 #'   spectra over a chromatgraphic peak to improve accuracy.
@@ -38,7 +38,7 @@ NULL
 #'   all-ion, ...) the value should be \code{NULL}.
 #'
 #' @references Averaging of mass spectra algorithms used by
-#'   \code{generateMzRPeakLists} were based on the
+#'   \code{generateMSPeakListsMzR} are based on the
 #'   \href{https://github.com/zeehio/msProcess}{msProcess} R package (now
 #'   archived on CRAN). \cr\cr
 #'   \addCitations{mzR}{1} \cr\cr
@@ -49,9 +49,9 @@ NULL
 #'
 #' @rdname MSPeakLists-generation
 #' @export
-generateMzRPeakLists <- function(fGroups, maxRtMSWidth = 20, precursorMzWindow = 8, topMost = NULL,
-                                 avgFeatParams = getDefAvgPListParams(),
-                                 avgFGroupParams = getDefAvgPListParams())
+generateMSPeakListsMzR <- function(fGroups, maxRtMSWidth = 20, precursorMzWindow = 8, topMost = NULL,
+                                   avgFeatParams = getDefAvgPListParams(),
+                                   avgFGroupParams = getDefAvgPListParams())
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)

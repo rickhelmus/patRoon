@@ -131,7 +131,7 @@ convertMSFiles <- function(files, outPath = NULL, dirs = FALSE,
     checkmate::assertFlag(overWrite, add = ac)
     checkmate::assertChoice(algorithm, c("pwiz", "openms"), add = ac)
     checkmate::assertCharacter(filters, min.chars = 1, null.ok = TRUE, add = ac)
-    checkmate::assertList(extraOpts, null.ok = TRUE, add = ac)
+    checkmate::assertCharacter(extraOpts, null.ok = TRUE, add = ac)
     assertMultiProcArgs(logPath, maxProcAmount, add = ac)
     checkmate::reportAssertions(ac)
 
@@ -152,7 +152,7 @@ convertMSFiles <- function(files, outPath = NULL, dirs = FALSE,
                         mzML = ".mzML")
         fExt <- unique(unlist(sapply(from, function(f) allExts[[f]], USE.NAMES = FALSE)))
         files <- unique(unlist(sapply(fExt,
-                                      function(e) list.files(files,
+                                      function(e) list.files(files, full.names = TRUE,
                                                              pattern = paste0("*\\", e, "$", collapse = " "),
                                                              ignore.case = TRUE))))
     }

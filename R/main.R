@@ -355,7 +355,7 @@ NULL
 #'   parameters.
 #' 
 #' @return The \code{optimizeFeatureFinding} and \code{optimizeFeatureGrouping}
-#'   return their results in a \code{\link{DoEOptimizer}} object.
+#'   return their results in a \code{\link{optimizationResult}} object.
 #'
 #' @section Source: The code and methodology is a direct adaptation from the
 #'   \href{https://github.com/rietho/IPO}{IPO R package}.

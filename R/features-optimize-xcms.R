@@ -14,7 +14,7 @@ featuresOptimizerXCMS$methods(
     },
 
     # Adapted from combineParams() function of IPO
-    combineOptParams = function(params_1, params_2)
+    combineParams = function(params_1, params_2)
     {
         len <- max(unlist(sapply(params_1, length)))
         #num_params <- length(params_1)

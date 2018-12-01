@@ -14,16 +14,15 @@ test_that("verify show output", {
 
 checkMinInt <- function(plists, relative, doMSMS)
 {
-    pl <- peakLists(plists)
-    return(min(sapply(pl, function(ana) min(sapply(ana, function(grp)
+    minIntPL <- function(pl)
     {
         if (!doMSMS)
-            ints <- grp$MS$intensity
-        else if (!is.null(grp$MSMS))
-            ints <- grp$MSMS$intensity
+            ints <- pl$MS$intensity
+        else if (!is.null(pl$MSMS))
+            ints <- pl$MSMS$intensity
         else
             return(NA)
-
+        
         if (length(ints) == 0)
             return(NA)
         
@@ -31,7 +30,11 @@ checkMinInt <- function(plists, relative, doMSMS)
         if (relative)
             ret <- ret / max(ints)
         return(ret)
-    }), na.rm = TRUE)), na.rm = TRUE))
+    }
+    
+    ftMin <- min(sapply(peakLists(plists), function(ana) min(sapply(ana, minIntPL), na.rm = TRUE)), na.rm = TRUE)
+    fgMin <- min(sapply(averagedPeakLists(plists), minIntPL), na.rm = TRUE)
+    return(min(ftMin, fgMin))
 }
 
 checkMaxPeaks <- function(plists, doMSMS)
@@ -70,7 +73,7 @@ test_that("empty object", {
     expect_gt(length(plistsEmptyMS), 0)
 })
 
-test_that("basic subsetting", {
+test_that("basic functionality", {
     expect_length(plists["nope"], 0)
     expect_equivalent(analyses(plists[1:2]), analyses(fGroups)[1:2])
     expect_equivalent(analyses(plists[analyses(fGroups)[1:2]]), analyses(fGroups)[1:2])
@@ -83,4 +86,25 @@ test_that("basic subsetting", {
     
     expect_equivalent(plists[[2, 15]], peakLists(plists)[[2]][[groupNames(plists)[15]]])
     expect_equivalent(plists[[analyses(plists)[2], groupNames(plists)[15]]], peakLists(plists)[[2]][[groupNames(plists)[15]]])
+    
+    expect_equivalent(plists[[20]], averagedPeakLists(plists)[[groupNames(plists)[20]]])
+    expect_equivalent(plists[[groupNames(plists)[20]]], averagedPeakLists(plists)[[groupNames(plists)[20]]])
+})
+
+test_that("plotting works", {
+    expect_doppel("mspl-spec-ms", function() plotSpec(plists, groupName = groupNames(plists)[70],
+                                                      analysis = analyses(plists)[1], MSLevel = 1))
+    expect_doppel("mspl-spec-msms", function() plotSpec(plists, groupName = groupNames(plists)[70],
+                                                        analysis = analyses(plists)[1], MSLevel = 2))
+    expect_doppel("mspl-spec-avg-ms", function() plotSpec(plists, groupName = groupNames(plists)[70],
+                                                          MSLevel = 1))
+    expect_doppel("mspl-spec-avg-msms", function() plotSpec(plists, groupName = groupNames(plists)[70],
+                                                            MSLevel = 2))
+
+    expect_plot(print(plotSpec(plists, groupName = groupNames(plists)[70],
+                               analysis = analyses(plists)[1], MSLevel = 1)))
+    expect_plot(print(plotSpec(plists, groupName = groupNames(plists)[70],
+                               analysis = analyses(plists)[1], MSLevel = 2)))
+    expect_plot(print(plotSpec(plists, groupName = groupNames(plists)[70], MSLevel = 1)))
+    expect_plot(print(plotSpec(plists, groupName = groupNames(plists)[70], MSLevel = 2)))
 })

@@ -1,1 +1,1 @@
-A MSPeakLists object ('MSPeakLists')Total peak count: 20700 (MS: 20625 - MS/MS: 75)Average peak count/analysis: 10350 (MS: 10312 - MS/MS: 38)Total peak lists: 155 (MS: 142 - MS/MS: 13)Average peak lists/analysis: 78 (MS: 71 - MS/MS: 6)
+A MSPeakLists object ('MSPeakLists')Total peak count: 14326 (MS: 14275 - MS/MS: 51)Average peak count/analysis: 7163 (MS: 7138 - MS/MS: 26)Total peak lists: 152 (MS: 142 - MS/MS: 10)Average peak lists/analysis: 76 (MS: 71 - MS/MS: 5)

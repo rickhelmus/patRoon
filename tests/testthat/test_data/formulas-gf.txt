@@ -1,1 +1,1 @@
-A formulas object (formulas)Algorithm: GenFormTotal formula count: 502Average formulas per analysis: 251.0Average formulas per feature group: 10.9
+A formulas object (formulas)Algorithm: GenFormTotal formula count: 329Average formulas per analysis: 164.5Average formulas per feature group: 7.2

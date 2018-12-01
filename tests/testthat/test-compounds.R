@@ -51,7 +51,6 @@ test_that("verify MetFragCL compound generation", {
     expect_true(all(sapply(names(ct), function(grp) nrow(ct[[grp]]) == 1 && ct[[grp]]$identifier == grp)))
     expect_length(compsMFEmpty, 0)
     expect_length(compsMFEmptyPL, 0)
-    expect_length(generateCompounds(fGroupsSub, plistsEmptyMS, "sirius", logPath = NULL), 0)
 })
 
 test_that("verify SIRIUS compound generation", {
@@ -60,6 +59,7 @@ test_that("verify SIRIUS compound generation", {
     expect_known_show(compsSIR, testFile("compounds-sir", text = TRUE))
     expect_length(compsSIREmpty, 0)
     expect_length(compsSIREmptyPL, 0)
+    expect_length(generateCompounds(fGroupsSub, plistsEmptyMS, "sirius", logPath = NULL), 0)
 })
 
 hasCompounds <- doMetFrag || doSIRIUS

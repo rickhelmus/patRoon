@@ -1,1 +1,1 @@
-A formulaConsensus object (formulaConsensus)Algorithm: GenFormTotal formula count: 164 (all), 6 (MS) and 158 (MS/MS)Average formulas per feature group: 12.9 (all), 12.7 (MS), 12.9 (MS/MS)
+A formulaConsensus object (formulaConsensus)Algorithm: GenFormTotal formula count: 133 (all), 6 (MS) and 127 (MS/MS)Average formulas per feature group: 10.2 (all), 10.7 (MS), 10.2 (MS/MS)

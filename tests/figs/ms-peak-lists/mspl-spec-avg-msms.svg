@@ -35,7 +35,7 @@
 <text transform='translate(41.76,210.46) rotate(-90)' style='font-size: 12.00px; font-family: Liberation Sans;' textLength='33.36px' lengthAdjust='spacingAndGlyphs'>30000</text>
 <text transform='translate(41.76,113.01) rotate(-90)' style='font-size: 12.00px; font-family: Liberation Sans;' textLength='33.36px' lengthAdjust='spacingAndGlyphs'>40000</text>
 <polyline points='59.04,59.04 59.04,502.56 689.76,502.56 ' style='stroke-width: 0.75;' />
-<text x='346.81' y='34.47' style='font-size: 14.40px; font-weight: bold; font-family: Liberation Sans;' textLength='55.17px' lengthAdjust='spacingAndGlyphs'>C6H6N3</text>
+<text x='299.63' y='34.47' style='font-size: 14.40px; font-weight: bold; font-family: Liberation Sans;' textLength='149.53px' lengthAdjust='spacingAndGlyphs'>M120_R328_93 MSMS</text>
 <text x='364.74' y='557.28' style='font-size: 12.00px; font-family: Liberation Sans;' textLength='19.33px' lengthAdjust='spacingAndGlyphs'>m/z</text>
 <text transform='translate(12.96,303.14) rotate(-90)' style='font-size: 12.00px; font-family: Liberation Sans;' textLength='44.67px' lengthAdjust='spacingAndGlyphs'>Intensity</text>
 <defs>
@@ -43,8 +43,7 @@
     <rect x='59.04' y='59.04' width='630.72' height='443.52' />
   </clipPath>
 </defs>
-<line x1='189.23' y1='486.13' x2='189.23' y2='399.47' style='stroke-width: 1.50; stroke: #0000FF;' clip-path='url(#cpNTkuMDR8Njg5Ljc2fDUwMi41Nnw1OS4wNA==)' />
-<g clip-path='url(#cpNTkuMDR8Njg5Ljc2fDUwMi41Nnw1OS4wNA==)'><text transform='translate(193.36,391.25) rotate(-90)' style='font-size: 12.00px; font-family: Liberation Sans;' textLength='39.36px' lengthAdjust='spacingAndGlyphs'>C6H6N</text></g>
+<line x1='189.23' y1='486.13' x2='189.23' y2='399.47' style='stroke-width: 0.75; stroke: #BEBEBE;' clip-path='url(#cpNTkuMDR8Njg5Ljc2fDUwMi41Nnw1OS4wNA==)' />
 <line x1='200.87' y1='486.13' x2='200.87' y2='480.01' style='stroke-width: 0.75; stroke: #BEBEBE;' clip-path='url(#cpNTkuMDR8Njg5Ljc2fDUwMi41Nnw1OS4wNA==)' />
 <line x1='491.41' y1='486.13' x2='491.41' y2='465.20' style='stroke-width: 0.75; stroke: #BEBEBE;' clip-path='url(#cpNTkuMDR8Njg5Ljc2fDUwMi41Nnw1OS4wNA==)' />
 <line x1='514.26' y1='486.13' x2='514.26' y2='95.02' style='stroke-width: 0.75; stroke: #BEBEBE;' clip-path='url(#cpNTkuMDR8Njg5Ljc2fDUwMi41Nnw1OS4wNA==)' />

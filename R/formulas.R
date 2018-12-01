@@ -417,11 +417,7 @@ setMethod("plotSpec", "formulaConsensus", function(obj, precursor, groupName, MS
     if (nrow(formTable) == 0)
         return(NULL)
 
-    pLists <- peakLists(MSPeakLists)
-
-    precInfo <- formTable[1] # precursor info is duplicated over all fragment rows
-    spec <- pLists[[precInfo$ana_max_intensity]][[groupName]][["MSMS"]]
-
+    spec <- MSPeakLists[[groupName]][["MSMS"]]
     if (is.null(spec))
         return(NULL)
 

@@ -42,4 +42,9 @@ Release:
     - plotSpec method
     - post filter intensity after averaging? (implicitly done when fgroup averages are made)
     - DA avg args
+    - isotope tagging is lost after averaging
+    - most intense analysis as alternative to averaging?
 - algorithm slot/method for all classes
+- MetFrag: (buggy) trivial name fetching not needed anymore?
+- reportMD: if blanks are still present chord etc not plotted?
+- removeRefAnalyses TRUE by default?

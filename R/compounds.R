@@ -512,13 +512,11 @@ setMethod("plotSpec", "compounds", function(obj, index, groupName, MSPeakLists, 
     if (is.null(compTable) || nrow(compTable) == 0)
         return(NULL)
 
-    pLists <- peakLists(MSPeakLists)
-
     if (!is.null(formConsensus))
         fTable <- formulaTable(formConsensus)[group == groupName & byMSMS == TRUE]
 
     compr <- compTable[index, ]
-    spec <- pLists[[compr$analysis]][[groupName]][["MSMS"]]
+    spec <- MSPeakLists[[groupName]][["MSMS"]]
 
     # merge formulas
     fi <- compr$fragInfo[[1]]
@@ -742,7 +740,7 @@ setMethod("consensus", "compounds", function(obj, ..., compThreshold = 0.0, minM
     })
 
     # columns that should be unique (fragInfo and InChIKey1 are dealt separately)
-    uniqueCols <- c("analysis", "SMILES", "formula", "InChi")
+    uniqueCols <- c("SMILES", "formula", "InChi")
 
     leftName <- compNames[[1]]
     mCompList <- allCompTables[[1]]

@@ -78,7 +78,9 @@ normalizeCompScores <- function(compResults, mCompNames, minMaxNormalization, ex
     if (!is.null(exclude))
         scoreCols <- scoreCols[!scoreCols %in% exclude]
     
-    compResults[, (scoreCols) := lapply(.SD, normalize, minMax = minMaxNormalization), .SDcols = scoreCols]
+    if (length(scoreCols) > 0)
+        compResults[, (scoreCols) := lapply(.SD, normalize, minMax = minMaxNormalization), .SDcols = scoreCols]
+    
     return(compResults)
 }
 
@@ -150,7 +152,7 @@ getCompInfoList <- function(compResults, compIndex, addHTMLURL, mCompNames)
     else
         ctext <- addValText(ctext, "%s", "identifier")
 
-    ctext <- addValText(ctext, "%s", c("compoundName", "formula", "SMILES", "analysis"))
+    ctext <- addValText(ctext, "%s", c("compoundName", "formula", "SMILES"))
 
     if (length(getAllCompCols("InChIKey", columns, mCompNames)) > 0)
         ctext <- addValText(ctext, "%s", "InChIKey")
@@ -269,7 +271,7 @@ getCompInfoText <- function(compResults, compIndex, addHTMLURL, normalizeScores,
     else
         ctext <- addValText(ctext, "%s", "identifier")
     
-    ctext <- addValText(ctext, "%s", c("compoundName", "formula", "SMILES", "analysis"))
+    ctext <- addValText(ctext, "%s", c("compoundName", "formula", "SMILES"))
     
     if (length(getAllCompCols("InChIKey", columns, mCompNames)) > 0)
         ctext <- addValText(ctext, "%s", "InChIKey")
@@ -446,8 +448,6 @@ setMethod("compoundViewer", c("featureGroups", "MSPeakLists", "compounds"), func
                                   currentPage = 1,
                                   resultsPerPage = 50)
 
-        getAnalysis <- reactive({ return(compTable[[rValues$currentFGroup]]$analysis[1]) })
-
         compData <- reactive({
             pr <- getPageRange(rValues$currentFGroup, rValues$currentPage, rValues$resultsPerPage)
 
@@ -550,7 +550,7 @@ setMethod("compoundViewer", c("featureGroups", "MSPeakLists", "compounds"), func
         })
 
         output$spectrum <- renderPlotly({
-            spec <- pLists[[getAnalysis()]][[rValues$currentFGroup]][["MSMS"]]
+            spec <- pLists[[rValues$currentFGroup]][["MSMS"]]
             fi <- fragmentInfo()
 
             p <- plot_ly(type="scatter", mode = "lines", hoverinfo = "text") %>%

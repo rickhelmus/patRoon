@@ -420,8 +420,10 @@ NULL
 #'   irrelevant (noisy) MS peaks and decrease processing time, whereas higher
 #'   values may avoid excluding lower intense MS peaks that may still be of
 #'   interest.
-#'   \item \code{minIntensity} MS peaks with intensities below this value will
-#'   be removed (applied prior to selection by \code{topMost})
+#'   \item \code{minIntensityPre} MS peaks with intensities below this value will
+#'   be removed (applied prior to selection by \code{topMost}) before averaging.
+#'   \item \code{minIntensityPost} MS peaks with intensities below this value will
+#'   be removed after averaging.
 #'   \item \code{avgFun} Function that is used to calculate average \emph{m/z}
 #'   values.
 #'   \item \code{method} Method used for producing averaged MS spectra. Valid

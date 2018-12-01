@@ -152,8 +152,8 @@ getEICsForFGroups <- function(fGroups, rtWindow, mzWindow, topMost, onlyPresent)
     return(EICs)
 }
 
-averageSpectraMZR <- function(spectra, rtRange, clusterMzWindow, topMost, minIntensity,
-                              avgFun, method, MSLevel = 1, precursor = NULL,
+averageSpectraMZR <- function(spectra, rtRange, clusterMzWindow, topMost, minIntensityPre,
+                              minIntensityPost, avgFun, method, MSLevel = 1, precursor = NULL,
                               precursorMzWindow = NULL)
 {
     hd <- getSpectraHeader(spectra, rtRange, MSLevel, precursor, precursorMzWindow)
@@ -162,5 +162,5 @@ averageSpectraMZR <- function(spectra, rtRange, clusterMzWindow, topMost, minInt
         return(data.table(mz = integer(0), intensity = integer(0)))
     
     sp <- spectra$spectra[hd$seqNum]
-    return(averageSpectra(sp, clusterMzWindow, topMost, minIntensity, avgFun, method))
+    return(averageSpectra(sp, clusterMzWindow, topMost, minIntensityPre, minIntensityPost, avgFun, method))
 }

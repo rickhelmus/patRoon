@@ -7,7 +7,8 @@ getDefAvgPListParams <- function(...)
 {
     def <- list(clusterMzWindow = 0.005,
                 topMost = 50,
-                minIntensity = 500,
+                minIntensityPre = 500,
+                minIntensityPost = 500,
                 avgFun = mean,
                 method = "distance")
     return(modifyList(def, list(...)))
@@ -15,14 +16,14 @@ getDefAvgPListParams <- function(...)
 
 # align & average spectra by clustering or between peak distances
 # code inspired from msProcess R package: https://github.com/zeehio/msProcess
-averageSpectra <- function(spectra, clusterMzWindow, topMost, minIntensity, avgFun, method)
+averageSpectra <- function(spectra, clusterMzWindow, topMost, minIntensityPre, minIntensityPost, avgFun, method)
 {
     if (length(spectra) == 0) # no spectra, return empty spectrum
         return(data.table(mz = integer(0), intensity = integer(0)))
     
     spectra <- lapply(spectra, function(s)
     {
-        s <- s[intensity >= minIntensity]
+        s <- s[intensity >= minIntensityPre]
         if (nrow(s) > topMost)
         {
             ord <- order(-s$intensity)
@@ -53,35 +54,42 @@ averageSpectra <- function(spectra, clusterMzWindow, topMost, minIntensity, avgF
         warning("During spectral averaging multiple masses from the same spectrum were clustered, consider tweaking clusterMzWindow!\n")
     
     spcount <- length(spectra)
-    return(spcomb[, .(mz = avgFun(mz), intensity = sum(intensity) / spcount), by = cluster][, cluster := NULL])
+    ret <- spcomb[, .(mz = avgFun(mz), intensity = sum(intensity) / spcount), by = cluster][, cluster := NULL]
+    
+    # post intensity filter
+    ret <- ret[intensity >= minIntensityPost]
+    
+    return(ret)
 }
 
-averageMSPeakLists <- function(peakLists, clusterMzWindow, topMost, minIntensity, avgFun, method)
+averageMSPeakLists <- function(peakLists, clusterMzWindow, topMost, minIntensityPre, minIntensityPost, avgFun, method)
 {
     # UNDONE: use cache sets?
     
     cat("Generating averaged peak lists for all feature groups...\n")
     
-    hash <- makeHash(peakLists, clusterMzWindow, topMost, minIntensity, avgFun, method)
+    hash <- makeHash(peakLists, clusterMzWindow, topMost, minIntensityPre, avgFun, method)
     avgPLists <- loadCacheData("MSPeakListsAvg", hash)
     
-    if (is.null(avgPLists))
+    # figure out feature groups from (non-averaged) peak lists
+    gNames <- unique(unlist(sapply(peakLists, names, simplify = FALSE), use.names = FALSE))
+    gCount <- length(gNames)
+    
+    if (gCount == 0)
+        avgPLists <- list()
+    else if (is.null(avgPLists))
     {
-        # figure out feature groups from (non-averaged) peak lists
-        gNames <- unique(unlist(sapply(peakLists, names, simplify = FALSE), use.names = FALSE))
-        gCount <- length(gNames)
-        
         prog <- txtProgressBar(0, gCount, style = 3)
         
         avgPLists <- lapply(seq_len(gCount), function(grpi)
         {
             plistsMS <- lapply(peakLists, function(pl) pl[[gNames[grpi]]][["MS"]])
             plistsMS <- plistsMS[!sapply(plistsMS, is.null)]
-            plistsMS <- averageSpectra(plistsMS, clusterMzWindow, topMost, minIntensity, avgFun, method)
+            plistsMS <- averageSpectra(plistsMS, clusterMzWindow, topMost, minIntensityPre, minIntensityPost, avgFun, method)
             
             plistsMSMS <- lapply(peakLists, function(pl) pl[[gNames[grpi]]][["MSMS"]])
             plistsMSMS <- plistsMSMS[!sapply(plistsMSMS, is.null)]
-            plistsMSMS <- averageSpectra(plistsMSMS, clusterMzWindow, topMost, minIntensity, avgFun, method)
+            plistsMSMS <- averageSpectra(plistsMSMS, clusterMzWindow, topMost, minIntensityPre, minIntensityPost, avgFun, method)
             
             setTxtProgressBar(prog, grpi)
             return(list(MS = if (nrow(plistsMS) > 0) plistsMS else NULL,
@@ -95,7 +103,7 @@ averageMSPeakLists <- function(peakLists, clusterMzWindow, topMost, minIntensity
         saveCacheData("MSPeakListsAvg", avgPLists, hash)
     }
     else
-        cat("Done! (cached)")
+        cat("Done!\n")
     
     return(avgPLists)
 }
@@ -129,4 +137,59 @@ deIsotopeMSPeakList <- function(MSPeakList)
     }, USE.NAMES = FALSE)
     
     return(MSPeakList[unique_iso])
+}
+
+doMSPeakListFilter <- function(pList, absMSIntThr, absMSMSIntThr, relMSIntThr,
+                               relMSMSIntThr, topMSPeaks, topMSMSPeaks,
+                               deIsotopeMS, deIsotopeMSMS)
+{
+    if (!is.null(pList[["MS"]]))
+    {
+        if (!is.null(absMSIntThr))
+            pList[["MS"]] <- pList[["MS"]][intensity >= absMSIntThr]
+        
+        if (!is.null(relMSIntThr) && nrow(pList[["MS"]]) > 0)
+        {
+            thr <- max(pList[["MS"]]$intensity) * relMSIntThr
+            pList[["MS"]] <- pList[["MS"]][intensity >= thr]
+        }
+        
+        if (!is.null(topMSPeaks) && nrow(pList[["MS"]]) > topMSPeaks)
+        {
+            ord <- order(-pList[["MS"]]$intensity)
+            pList[["MS"]] <- pList[["MS"]][ord[seq_len(topMSPeaks)]]
+        }
+        
+        if (deIsotopeMS)
+            pList[["MS"]] <- deIsotopeMSPeakList(pList[["MS"]])
+    }
+    
+    if (!is.null(pList[["MSMS"]]))
+    {
+        if (!is.null(absMSMSIntThr) && !is.null(pList[["MSMS"]]))
+            pList[["MSMS"]] <- pList[["MSMS"]][intensity >= absMSMSIntThr]
+        
+        if (!is.null(relMSMSIntThr) && nrow(pList[["MS"]]) > 0)
+        {
+            thr <- max(pList[["MSMS"]]$intensity) * relMSMSIntThr
+            pList[["MSMS"]] <- pList[["MSMS"]][intensity >= thr]
+        }
+        
+        if (!is.null(topMSMSPeaks) && nrow(pList[["MSMS"]]) > topMSMSPeaks)
+        {
+            ord <- order(-pList[["MSMS"]]$intensity)
+            pList[["MSMS"]] <- pList[["MSMS"]][ord[seq_len(topMSMSPeaks)]]
+        }
+        
+        if (deIsotopeMSMS)
+            pList[["MSMS"]] <- deIsotopeMSPeakList(pList[["MSMS"]])
+    }
+    
+    # prune empty
+    if (!is.null(pList[["MS"]]) && nrow(pList[["MS"]]) == 0)
+        pList[["MS"]] <- NULL
+    if (!is.null(pList[["MSMS"]]) && nrow(pList[["MSMS"]]) == 0)
+        pList[["MSMS"]] <- NULL
+    
+    return(pList)
 }

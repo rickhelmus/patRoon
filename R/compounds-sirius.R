@@ -123,7 +123,7 @@ generateCompoundsSirius <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct =
     cmdQueue <- sapply(gNames, function(grp)
     {
         plist <- MSPeakLists[[grp]]
-        if (is.null(plist[["MSMS"]]))
+        if (is.null(plist[["MS"]]) || is.null(plist[["MSMS"]]))
             return(NULL)
         
         plmz <- getMZFromMSPeakList(gInfo[grp, "mzs"], plist$MS)

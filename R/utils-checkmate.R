@@ -153,7 +153,8 @@ assertAvgPListParams <- function(x, .var.name = checkmate::vname(x), add = NULL)
     
     assertVal(checkmate::assertNumber, "clusterMzWindow", lower = 0, finite = TRUE)
     assertVal(checkmate::assertCount, "topMost", positive = TRUE)
-    assertVal(checkmate::assertNumber, "minIntensity", lower = 0, finite = TRUE)
+    assertVal(checkmate::assertNumber, "minIntensityPre", lower = 0, finite = TRUE)
+    assertVal(checkmate::assertNumber, "minIntensityPost", lower = 0, finite = TRUE)
     assertVal(checkmate::assertFunction, "avgFun")
     assertVal(checkmate::assertChoice, "method", choices = c("distance", "hclust"))
 }

@@ -376,14 +376,16 @@ NULL
 #' reduced to a table with a column containing measured \emph{m/z} values and a
 #' column containing their intensities. These 'MS peak lists' can then be used
 #' for \link[=formula-generation]{formula generation} and
-#' \link[=compound-generation]{compound generation}. By default, peak lists are
-#' generated from all analyses containing a particular feature group. The main
-#' advantage is that this will allow subsequent processes (at the moment only
-#' formulae calculation) to generate a consensus from feature group data
-#' originating from multiple analyses. Nevertheless, it might be useful to limit
-#' to maximum amount of analyses (\code{topMost} parameter) to signficantly
-#' reduce the processing time required for MS peak list extraction.
-#'
+#' \link[=compound-generation]{compound generation}.
+#' 
+#' MS and MS/MS peak lists are first generated for all features (or a subset, if
+#' the \code{topMost} argument is set). Subsequently, averaged peak lists will
+#' be generated for each feature group from peak lists of the features within the
+#' group. Functionality dpeending on peak lists will either use data from
+#' individual features or from group averaged peak lists. For instance, the former may be used
+#' by formulae calculation, while compound identification and plotting
+#' functionality typically uses group averaged peak lists.
+#' 
 #' Several functions exist to automatically extract MS peak lists for feature
 #' groups.
 #'
@@ -396,8 +398,7 @@ NULL
 #'   taken into account. Lower to decrease processing time.
 #' @param avgFeatParams,avgFGroupParams A \code{list} with parameters used for
 #'   averaging of peak lists for individual features and feature groups,
-#'   respectively (see below). Note that averaging parameters for Bruker
-#'   algorithms are set in DataAnalysis.
+#'   respectively (see below).
 #' @param \dots For \code{generateMSPeakLists}: Any parameters to be passed to
 #'   the selected MS peak lists generation algorithm.
 #'
@@ -431,6 +432,10 @@ NULL
 #'   }
 #'   The \code{getDefAvgPListParams} function can be used to generate a default
 #'   parameter list.
+#'   
+#'   Note that when Bruker algorithms are used these parameters only control
+#'   generation of feature groups averaged peak lists: how peak lists for
+#'   features are generated is controlled by DataAnalysis.
 #'
 #' @return A \code{\link{MSPeakLists}} object that can be used for formulae
 #'   calculation and compound identification.

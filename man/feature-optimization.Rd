@@ -72,7 +72,7 @@ to \code{\link{findFeatures}}).}
 }
 \value{
 The \code{optimizeFeatureFinding} and \code{optimizeFeatureGrouping}
-  return their results in a \code{\link{DoEOptimizer}} object.
+  return their results in a \code{\link{optimizationResult}} object.
 }
 \description{
 Automatic optimizatation of feature finding and grouping parameters through

@@ -286,7 +286,7 @@ please refer to the linked method documentation for each generic.
 
 
 \itemize{
-    \item Methods are defined for: \code{\link[=plotSpec,components-method]{components}}, \code{\link[=plotSpec,compounds-method]{compounds}}, \code{\link[=plotSpec,formulaConsensus-method]{formulaConsensus}}.
+    \item Methods are defined for: \code{\link[=plotSpec,MSPeakLists-method]{MSPeakLists}}, \code{\link[=plotSpec,components-method]{components}}, \code{\link[=plotSpec,compounds-method]{compounds}}, \code{\link[=plotSpec,formulaConsensus-method]{formulaConsensus}}.
 }
 
 \code{plotStructure} plots a chemical structure.

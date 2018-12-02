@@ -48,20 +48,21 @@ fGroups <- groupFeatures(fList, "xcms", rtalign = TRUE, retcorArgs = list(method
 # Basic rule based filtering
 fGroups <- filter(fGroups, intensityThreshold = {{ filterFGroupsOpts$intThr }}, intraRGroupAbundance = {{ filterFGroupsOpts$replThr }},
                   minBlankThreshold = {{ filterFGroupsOpts$blankThr }}, repetitions = {{ filterFGroupsOpts$filterRepetitions }})
-{{ optionalCodeBlock(formulaOpts$algo != "" || identOpts$algo != "") }}
+{{ optionalCodeBlock(doMSPeakFind) }}
 
 # Retrieve MS peak lists
+avgPListParams <- getDefAvgPListParams(clusterMzWindow = 0.005)
 {{ endCodeBlock() }}
 {{ optionalCodeBlock(doMSPeakFind && peakListOpts$algo == "mzR") }}
 # NOTE: please check all arguments, especially precursorMzWindow!
-plists <- generateMSPeakLists(fGroups, "mzr", avgMzWindow = 0.001, avgTopPeaks = 50,
-                              avgMinIntensity = 500,  precursorMzWindow = NULL)
+plists <- generateMSPeakLists(fGroups, "mzr", maxRtMSWidth = 20, precursorMzWindow = NULL,
+                              avgFeatParams = avgPListParams, avgFGroupParams = avgPListParams)
 {{ endCodeBlock() }}
 {{ optionalCodeBlock(doMSPeakFind && peakListOpts$algo == "Bruker" && featFinderOpts$algo != "Bruker") }}
-plists <- generateMSPeakLists(fGroups, "bruker", bgsubtr = TRUE, MSMSType = "MSMS")
+plists <- generateMSPeakLists(fGroups, "bruker", bgsubtr = TRUE, MSMSType = "MSMS", avgFGroupParams = avgPListParams)
 {{ endCodeBlock() }}
 {{ optionalCodeBlock(doMSPeakFind && peakListOpts$algo == "Bruker" && featFinderOpts$algo == "Bruker") }}
-plists <- generateMSPeakLists(fGroups, "brukerfmf")
+plists <- generateMSPeakLists(fGroups, "brukerfmf", avgFGroupParams = avgPListParams)
 {{ endCodeBlock() }}
 {{ optionalCodeBlock(doMSPeakFind) }}
 # uncomment and configure for extra filtering of MS peak lists

@@ -4,7 +4,7 @@
 \alias{clearCache}
 \title{Clearing of cached data}
 \usage{
-clearCache(what = NULL)
+clearCache(what = NULL, file = NULL)
 }
 \arguments{
 \item{what}{This argument describes what should be done. When \code{what =
@@ -12,6 +12,9 @@ NULL} this function will list which tables are present along with an
 indication of their size (database rows). If \code{what = "all"} then the
 complete file will be removed. Finally, \code{what} can be a character
 vector with table names that should be removed.}
+
+\item{file}{The cache file. If \code{NULL} then the value of the
+\code{patRoon.cache.fileName} option is used.}
 }
 \description{
 Remove (part of) the cache database used to store (intermediate) processing
@@ -21,5 +24,5 @@ results.
 This function will either remove one or more tables within the cache
 \code{sqlite} database or simply wipe the whole cache file. Removing tables
 will \code{VACUUM} the database, which may take some time for large cache
-files. (intermediate) processing results.
+files.
 }

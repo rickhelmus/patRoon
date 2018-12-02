@@ -379,12 +379,13 @@ NULL
 #' \link[=compound-generation]{compound generation}.
 #' 
 #' MS and MS/MS peak lists are first generated for all features (or a subset, if
-#' the \code{topMost} argument is set). Subsequently, averaged peak lists will
-#' be generated for each feature group from peak lists of the features within the
-#' group. Functionality dpeending on peak lists will either use data from
-#' individual features or from group averaged peak lists. For instance, the former may be used
-#' by formulae calculation, while compound identification and plotting
-#' functionality typically uses group averaged peak lists.
+#' the \code{topMost} argument is set). During this step multiple spectra over
+#' the feature elution profile are averaged. Subsequently, peak lists
+#' will be generated for each feature group by averaging peak lists of the features
+#' within the group. Functionality that uses peak lists will either use data
+#' from individual features or from group averaged peak lists. For instance, the
+#' former may be used by formulae calculation, while compound identification and
+#' plotting functionality typically uses group averaged peak lists.
 #' 
 #' Several functions exist to automatically extract MS peak lists for feature
 #' groups.
@@ -427,10 +428,11 @@ NULL
 #'   \item \code{avgFun} Function that is used to calculate average \emph{m/z}
 #'   values.
 #'   \item \code{method} Method used for producing averaged MS spectra. Valid
-#'   values are \code{"hclust"}, used for hierarchical clustering, and
-#'   \code{"distance"}, to use the between peak distance. The latter method
-#'   significantly reduces processing time and memory requirements, at the
-#'   (potential) cost of slightly reduced accuracy.
+#'   values are \code{"hclust"}, used for hierarchical clustering (using the
+#'   \pkg{\link{fastcluster}} package), and \code{"distance"}, to use the
+#'   between peak distance. The latter method may reduces processing
+#'   time and memory requirements, at the potential cost of reduced
+#'   accuracy.
 #'   }
 #'   The \code{getDefAvgPListParams} function can be used to generate a default
 #'   parameter list.
@@ -441,6 +443,18 @@ NULL
 #'
 #' @return A \code{\link{MSPeakLists}} object that can be used for formulae
 #'   calculation and compound identification.
+#'
+#' @section Source: Averaging of mass spectra algorithms used by are based on
+#'   the \href{https://github.com/zeehio/msProcess}{msProcess} R package (now
+#'   archived on CRAN).
+#' 
+#' @references  \cr\cr
+#'   \addCitations{mzR}{1} \cr\cr
+#'   \addCitations{mzR}{2} \cr\cr
+#'   \addCitations{mzR}{3} \cr\cr
+#'   \addCitations{mzR}{4} \cr\cr
+#'   \addCitations{mzR}{5} \cr\cr
+#'   \addCitations{fastcluster}{1}
 #'
 #' @seealso \code{\link{MSPeakLists-class}}
 #' @name MSPeakLists-generation

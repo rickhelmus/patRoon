@@ -10,7 +10,7 @@ getDefAvgPListParams <- function(...)
                 minIntensityPre = 500,
                 minIntensityPost = 500,
                 avgFun = mean,
-                method = "distance")
+                method = "hclust")
     return(modifyList(def, list(...)))
 }
 
@@ -41,7 +41,7 @@ averageSpectra <- function(spectra, clusterMzWindow, topMost, minIntensityPre, m
     if (method == "hclust")
     {
         mzd <- dist(spcomb$mz)
-        hc <- hclust(mzd)
+        hc <- fastcluster::hclust(mzd)
         spcomb[, cluster := cutree(hc, h = clusterMzWindow)]
     }
     else if (method == "distance")

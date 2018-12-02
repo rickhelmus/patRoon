@@ -8,6 +8,7 @@
     * `generateCompounds()` and plotting functionality now uses averaged group peak lists instead of peak list of most intense analysis.
     * `plotSpec()` method for MSPeakLists: plot (non-annotated) MS and MS/MS spectra.
     * Minimum intensity filter option that is applied after averaging.
+    * Now uses "hclust" method for averaging by default, which now uses the [fastcluster] package.
 
 
 ## November 2018
@@ -93,3 +94,4 @@
 [AppVeyor]: https://ci.appveyor.com/project/rickhelmus/patroon/branch/master
 [Codecov]: https://codecov.io/gh/rickhelmus/patRoon
 [DH]: https://hub.docker.com/r/patroonorg/patroon/
+[fastcluster]: https://cran.r-project.org/web/packages/fastcluster/index.html

@@ -8,44 +8,15 @@ NULL
 
 #' @details \code{generateMSPeakListsMzR} uses the \pkg{\link{mzR}} package to
 #'   extract MS peak lists. For this analyses should be either in \file{.mzXML}
-#'   or \file{.mzML} format. This function can optionally average multiple
-#'   spectra over a chromatgraphic peak to improve accuracy.
+#'   or \file{.mzML} format. This function averages multiple spectra over a
+#'   chromatgraphic peak to improve accuracy.
 #'
-#' @param avgMzWindow \emph{m/z} window (in Da) used for clustering \emph{m/z}
-#'   values when spectra are averaged. Too small windows will prevent clustering
-#'   \emph{m/z} values (thus erroneously creating 'extra' values), whereas too
-#'   big windows may cluster unrelated \emph{m/z} values from different or even
-#'   the same spectrum together.
-#' @param avgTopPeaks Only retain a maximum number of \code{avgTopPeaks} MS
-#'   peaks when generating averaged spectra. Lowering this number may exclude
-#'   more irrelevant (noisy) MS peaks and decrease processing time, whereas
-#'   higher values may avoid excluding lower intense MS peaks that may still be
-#'   of interest.
-#' @param avgMinIntensity MS peaks with intensities below this value will be
-#'   completely excluded (overrides \code{avgTopPeaks}).
-#' @param avgMassFun Function that is used to calculate average \emph{m/z}
-#'   values.
-#' @param avgMethod Method used for producing averaged MS spectra. Valid values
-#'   are \code{"hclust"}, used for hierarchical clustering, and
-#'   \code{"distance"}, to use the between peak distance. The latter method
-#'   significantly reduces processing time and memory requirements, at the
-#'   (potential) cost of slightly reducing accuracy.
 #' @param precursorMzWindow The \emph{m/z} window (in Da) to find MS/MS spectra
 #'   of a precursor. This is typically used for Data-Dependent like MS/MS data
 #'   and should correspond to the isolation \emph{m/z} width that was used to
 #'   collect the data. For Data-Independent MS/MS experiments, where precursor
 #'   ions are not isolated prior to fragmentation (\emph{e.g.} bbCID, MSe,
 #'   all-ion, ...) the value should be \code{NULL}.
-#'
-#' @references Averaging of mass spectra algorithms used by
-#'   \code{generateMSPeakListsMzR} are based on the
-#'   \href{https://github.com/zeehio/msProcess}{msProcess} R package (now
-#'   archived on CRAN). \cr\cr
-#'   \addCitations{mzR}{1} \cr\cr
-#'   \addCitations{mzR}{2} \cr\cr
-#'   \addCitations{mzR}{3} \cr\cr
-#'   \addCitations{mzR}{4} \cr\cr
-#'   \addCitations{mzR}{5}
 #'
 #' @rdname MSPeakLists-generation
 #' @export

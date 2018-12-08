@@ -116,6 +116,14 @@ sortFormula <- function(formula)
 formulaScoringColumns <- function() c("score", "MS_match", "treeScore", "isoScore",
                                       "frag_score", "MSMS_match", "comb_match")
 
+rankFormulaTable <- function(formTable)
+{
+    # order from best to worst
+    colorder <- c("byMSMS", intersect(names(formTable), formulaScoringColumns()))
+    setorderv(formTable, colorder, c(1, rep(-1, length(colorder)-1)))
+    return(formTable)
+}
+
 generateFormConsensusForGroup <- function(formAnaList, formThreshold)
 {
     # merge all together
@@ -139,10 +147,8 @@ generateFormConsensusForGroup <- function(formAnaList, formThreshold)
         # Remove duplicate entries (do this after coverage!)
         formTable <- unique(formTable, by = byCols)
         
-        # order from best to worst
-        colorder <- c("byMSMS", intersect(names(formTable), formulaScoringColumns()))
-        setorderv(formTable, colorder, c(1, rep(-1, length(colorder)-1)))
-        
+        formTable <- rankFormulaTable(formTable)
+
         formTable[, "analysis" := NULL]
     }
     

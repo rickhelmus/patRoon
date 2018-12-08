@@ -619,10 +619,12 @@ numLTE <- function(x, y, tol = sqrt(.Machine$double.eps)) numEQ(x, y, tol) | x <
 
 wrapStr <- function(s, width, sep = "\n") paste0(strwrap(s, width), collapse = sep)
 
-pruneList <- function(l, checkEmptyElements = FALSE)
+pruneList <- function(l, checkEmptyElements = FALSE, checkZeroRows = FALSE)
 {
     ret <- l[!sapply(l, is.null)]
     if (checkEmptyElements)
         ret <- ret[lengths(ret) > 0]
+    if (checkZeroRows)
+        ret <- ret[sapply(ret, nrow) > 0]
     return(ret)
 }

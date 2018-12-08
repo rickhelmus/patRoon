@@ -116,6 +116,78 @@ sortFormula <- function(formula)
 formulaScoringColumns <- function() c("score", "MS_match", "treeScore", "isoScore",
                                       "frag_score", "MSMS_match", "comb_match")
 
+generateFormConsensusForGroup <- function(formAnaList, formThreshold)
+{
+    # merge all together
+    formTable <- rbindlist(formAnaList, fill = TRUE, idcol = "analysis")
+    haveMSMS <- "frag_formula" %in% colnames(formTable)
+    
+    if (nrow(formTable) > 0)
+    {
+        # number of analyses searched for formulas per group
+        anaCount <- length(formAnaList)
+        
+        byCols <- "formula"
+        if (haveMSMS)
+            byCols <- c(byCols, "frag_formula")
+        
+        # Determine coverage of formulas within analyses
+        formTable[, anaCoverage := .N / anaCount, by = byCols]
+        if (formThreshold > 0)
+            formTable <- formTable[anaCoverage >= formThreshold] # Apply coverage filter
+        
+        # Remove duplicate entries (do this after coverage!)
+        formTable <- unique(formTable, by = byCols)
+        
+        # order from best to worst
+        colorder <- c("byMSMS", intersect(names(formTable), formulaScoringColumns()))
+        setorderv(formTable, colorder, c(1, rep(-1, length(colorder)-1)))
+        
+        formTable[, "analysis" := NULL]
+    }
+    
+    return(formTable)
+}
+
+generateGroupFormulasByConsensus <- function(formList, formThreshold)
+{
+    cat("Generating feature group formula consensus...\n")
+    
+    hash <- makeHash(formList, formThreshold)
+    formCons <- loadCacheData("formCons", hash)
+    
+    # figure out feature groups 
+    gNames <- unique(unlist(sapply(formList, names, simplify = FALSE), use.names = FALSE))
+    gCount <- length(gNames)
+    
+    if (gCount == 0)
+        formCons <- list()
+    else if (is.null(formCons))
+    {
+        prog <- txtProgressBar(0, gCount, style = 3)
+        
+        formCons <- lapply(seq_len(gCount), function(grpi)
+        {
+            fAnaList <- lapply(formList, "[[", gNames[[grpi]])
+            fAnaList <- fAnaList[!sapply(fAnaList, is.null)]
+            
+            ret <- generateFormConsensusForGroup(fAnaList, formThreshold)
+            setTxtProgressBar(prog, grpi)
+            return(ret)
+        })
+        names(formCons) <- gNames
+        
+        setTxtProgressBar(prog, gCount)
+        close(prog)
+        
+        saveCacheData("formCons", formCons, hash)
+    }
+    else
+        cat("Done!\n")
+    
+    return(formCons)
+}
+
 consensusForFormulaList <- function(formList, fGroups, formThreshold, maxFormulas,
                                     maxFragFormulas, minIntensity, maxIntensity, minPreferredFormulas,
                                     minPreferredIntensity)

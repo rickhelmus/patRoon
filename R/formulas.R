@@ -25,8 +25,7 @@ NULL
 #' 
 #' @export
 formulas <- setClass("formulas",
-                     slots = c(formulas = "list", algorithm = "character"),
-                     prototype = list(formulas = list(), algorithm = "none"))
+                     slots = c(formulas = "list", groupFormulas = "list",  algorithm = "character"))
 
 #' @describeIn formulas Accessor method to obtain generated formulae.
 #' @return \code{formulas} returns a \code{list} containing for each analysis

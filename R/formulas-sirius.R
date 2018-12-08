@@ -106,7 +106,6 @@ generateFormulasSirius <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct = 
     cachedSet <- loadCacheSet("formulasSirius", setHash, cacheDB)
     formHashes <- character(0)
 
-    if (T){
     doSIRIUS <- function(featMZs, groupPeakLists)
     {
         doFGroups <- names(featMZs)
@@ -214,92 +213,6 @@ generateFormulasSirius <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct = 
         formTable <- list()
     }
     
-    return(formulas(formulas = formTable, groupFormulas = groupFormulas, algorithm = "SIRIUS"))}
+    return(formulas(formulas = formTable, groupFormulas = groupFormulas, algorithm = "SIRIUS"))
     
-    formTable <- list()
-    pLists <- peakLists(MSPeakLists)
-    
-    for (anai in seq_along(anaInfo$analysis))
-    {
-        ana <- anaInfo$analysis[anai]
-        gforms <- list()
-
-        printf("Loading all formulas from analysis '%s'...\n", ana)
-
-        cmdQueue <- sapply(gNames, function(grp)
-        {
-            if (featIndex[[grp]][anai] == 0)
-                return(NULL) # feature not present
-
-            if (is.null(pLists[[ana]][[grp]]) || is.null(pLists[[ana]][[grp]][["MS"]]))
-                return(NULL) # MS or MSMS spectrum probably filtered away
-
-            if (is.null(pLists[[ana]][[grp]][["MSMS"]]))
-                return(NULL) # no MSMS
-
-            ftmz <- fTable[[ana]][["mz"]][featIndex[[grp]][anai]]
-            plmz <- getMZFromMSPeakList(ftmz, pLists[[ana]][[grp]][["MS"]])
-            hash <- makeHash(ana, grp, ftmz, pLists[[ana]][[grp]], profile, adduct, maxMzDev, elements, database, noise)
-
-            cmd <- getSiriusCommand(plmz, pLists[[ana]][[grp]][["MS"]], pLists[[ana]][[grp]][["MSMS"]], profile,
-                                    adduct, maxMzDev, elements, database, noise, FALSE, NULL)
-            logf <- if (!is.null(logPath)) file.path(logPath, paste0("sirius-form-", grp, ".txt")) else NULL
-            logfe <- if (!is.null(logPath)) file.path(logPath, paste0("sirius-form-err-", grp, ".txt")) else NULL
-
-            return(c(list(hash = hash, adduct = adduct, cacheDB = cacheDB, stdoutFile = logf,
-                          stderrFile = logfe, gName = grp), cmd))
-        }, simplify = FALSE)
-        cmdQueue <- cmdQueue[!sapply(cmdQueue, is.null)]
-
-        formHashes <- c(formHashes, sapply(cmdQueue, function(cmd) cmd$hash))
-
-        cachedResults <- sapply(cmdQueue, function(cmd)
-        {
-            forms <- NULL
-            if (!is.null(cachedSet))
-                forms <- cachedSet[[cmd$hash]]
-            if (is.null(forms))
-                forms <- loadCacheData("formulasSirius", cmd$hash, cacheDB)
-            return(forms)
-        }, simplify = FALSE)
-        cachedResults <- cachedResults[!sapply(cachedResults, is.null)]
-
-        cmdQueue <- cmdQueue[setdiff(names(cmdQueue), names(cachedResults))] # remove cached results
-
-        if (length(cmdQueue) > 0)
-        {
-            if (!is.null(logPath))
-                mkdirp(logPath)
-
-            formTable[[ana]] <- executeMultiProcess(cmdQueue, processSiriusFormulas,
-                                                    errorHandler = function(cmd, exitStatus, retries)
-            {
-                stop(sprintf("Fatal: Failed to execute SIRIUS for %s - exit code: %d\nCommand: %s", cmd$gName, exitStatus,
-                             paste(cmd$command, paste0(cmd$args, collapse = " "))))
-            }, maxProcAmount = maxProcAmount)
-            ngrp <- length(formTable[[ana]])
-        }
-        else
-        {
-            formTable[[ana]] <- list()
-            ngrp <- 0
-        }
-
-        if (length(cachedResults) > 0)
-        {
-            ngrp <- ngrp + length(cachedResults)
-            formTable[[ana]] <- c(formTable[[ana]], cachedResults)
-            formTable[[ana]] <- formTable[[ana]][intersect(gNames, names(formTable[[ana]]))] # re-order
-        }
-
-        printf("Loaded %d formulas from %d features (%.2f%%).\n", sum(unlist(lapply(formTable[[ana]], nrow))),
-               ngrp, if (gCount == 0) 0 else ngrp * 100 / gCount)
-    }
-
-    if (is.null(cachedSet))
-        saveCacheSet("formulasSirius", formHashes, setHash, cacheDB)
-
-    formTable <- pruneList(sapply(formTable, function(ft) ft[sapply(ft, nrow) > 0], simplify = FALSE), TRUE)
-
-    return(formulas(formulas = formTable, algorithm = "SIRIUS"))
 }

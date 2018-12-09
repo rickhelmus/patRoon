@@ -37,7 +37,7 @@ Release:
     - get rid of getXCMSSet() calls?
     - cache?
 - progressbar and parallel enviPick
-- OpenMS: also write XMLs in C++?
+- OpenMS: also write XMLs in C++? Support newest grouper?
 - clearCache: partial match
 - MSPeakLists
     - isotope tagging is lost after averaging
@@ -47,3 +47,5 @@ Release:
 - MetFrag: (buggy) trivial name fetching not needed anymore?
 - reportMD: if blanks are still present chord etc not plotted?
 - removeRefAnalyses TRUE by default?
+- convertMSFiles() add DA functionality
+

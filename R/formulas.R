@@ -55,10 +55,9 @@ setMethod("analyses", "formulas", function(obj) names(obj@formulas))
 #' @export
 setMethod("groupNames", "formulas", function(obj) unique(unlist(sapply(obj@formulas, names, simplify = FALSE), use.names = FALSE)))
 
-# UNDONE: this seems not so useful now, change to unique formulae?
 #' @describeIn formulas Obtain total number of formulae entries.
 #' @export
-setMethod("length", "formulas", function(x) sum(unlist(sapply(x@groupFormulas, nrow))))
+setMethod("length", "formulas", function(x) sum(unlist(sapply(x@groupFormulas, function(ft) length(unique(ft$formula))))))
 
 #' @describeIn formulas Show summary information for this object.
 #' @export
@@ -67,23 +66,21 @@ setMethod("show", "formulas", function(object)
     printf("A formulas object (%s)\n", class(object))
     printf("Algorithm: %s\n", algorithm(object))
 
-    printf("Total formula count: %d\n", length(object))
-
-    if (length(object) == 0)
-    {
-        ma <- mfg <- 0
-    }
-    else
-    {
-        ft <- formulaTable(object)
-        ft <- ft[lengths(ft) > 0]
-        formCounts <- lapply(ft, function(fa) sapply(fa, nrow))
-        ma <- mean(sapply(formCounts, function(fc) sum(fc)))
-        mfg <- mean(sapply(formCounts, function(fc) mean(fc)))
-    }
+    ft <- formulaTable(object)
+    hasFeatForms <- length(ft) > 0
+    ftcounts <- if (hasFeatForms) recursiveApplyDT(ft, function(x) length(unique(x$formula)), sapply) else 0
+    ma <- mean(sapply(ftcounts, sum))
+    mft <- mean(sapply(ftcounts, mean))
+    printf("Formulas assigned to features:\n")
+    printf("  - Total formula count: %d\n", sum(unlist(ftcounts)))
+    printf("  - Average formulas per analysis: %.1f\n", ma)
+    printf("  - Average formulas per feature: %.1f\n", mft)
     
-    printf("Average formulas per analysis: %.1f\n", ma)
-    printf("Average formulas per feature group: %.1f\n", mfg)
+    gft <- groupFormulas(object)
+    mfg <- if (length(gft) > 0) sapply(gft, nrow) else 0
+    printf("Formulas assigned to feature groups:\n")
+    printf("  - Total formula count: %d\n", length(object))
+    printf("  - Average formulas per feature group: %.1f\n", mean(mfg))
 
     showObjectSize(object)
 })

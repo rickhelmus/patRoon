@@ -1,6 +1,8 @@
 # patRoon 0.1.0.9000
 
 ## Decomber 2018
+* Updates on formulas
+    * length now returns number of unique precursor formulas (was total number of results)
 * `file` argument for `clearCache()`
 * Updates on MS peak lists
     * More consistent naming for algorithm specific MS peak list generators (i.e. `generateMSPeakListsX` where X is the algo).

@@ -199,7 +199,7 @@ setGeneric("formulaTable", function(obj) standardGeneric("formulaTable"))
 
 
 # UNDONE
-setGeneric("groupFormulas", function(obj) standardGeneric("groupFormulas"))
+setGeneric("featureFormulas", function(obj) standardGeneric("featureFormulas"))
 
 #' @templateVar func getFeatures
 #' @templateVar desc returns the object's \code{\link{features}} object.

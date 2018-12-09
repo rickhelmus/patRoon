@@ -43,6 +43,8 @@ Release:
     - isotope tagging is lost after averaging
     - most intense analysis as alternative to averaging?
     - report spectra/tables?
+    - don't subset on analyses? or re-average? if no, mention in docs
+    - $ method?
 - algorithm slot/method for all classes
 - MetFrag: (buggy) trivial name fetching not needed anymore?
 - reportMD: if blanks are still present chord etc not plotted?
@@ -52,4 +54,8 @@ Release:
     - DBE calculation for SIRIUS?
     - docs
         - move generics in to right place, set aliases
-        - groupFormulas() name?
+        - featureFormulas() name?
+    - tests
+        - $ method
+        - calculateFeatures TRUE/FALSE
+        - verify group count for consensus

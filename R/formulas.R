@@ -19,13 +19,14 @@ NULL
 #' @templateVar selOrderi analyses()
 #' @templateVar selj feature groups
 #' @templateVar selOrderj groupNames()
+#' @templateVar optionalji TRUE
 #' @template sub_op-args
 #'
 #' @seealso \code{\link{formulaConsensus}}
 #' 
 #' @export
 formulas <- setClass("formulas",
-                     slots = c(formulas = "list", groupFormulas = "list",  algorithm = "character"))
+                     slots = c(formulas = "list", featureFormulas = "list", algorithm = "character"))
 
 #' @describeIn formulas Accessor method to obtain generated formulae.
 #' @return \code{formulas} returns a \code{list} containing for each analysis
@@ -36,7 +37,7 @@ formulas <- setClass("formulas",
 setMethod("formulaTable", "formulas", function(obj) obj@formulas)
 
 # UNDONE
-setMethod("groupFormulas", "formulas", function(obj) obj@groupFormulas)
+setMethod("featureFormulas", "formulas", function(obj) obj@featureFormulas)
 
 #' @describeIn formulas Accessor method for the algorithm (a character
 #'   string) used to generate formulae.
@@ -47,17 +48,17 @@ setMethod("algorithm", "formulas", function(obj) obj@algorithm)
 #' @templateVar what analyses
 #' @template strmethod
 #' @export
-setMethod("analyses", "formulas", function(obj) names(obj@formulas))
+setMethod("analyses", "formulas", function(obj) names(obj@featureFormulas))
 
 #' @templateVar class formulas
 #' @templateVar what feature groups
 #' @template strmethod
 #' @export
-setMethod("groupNames", "formulas", function(obj) unique(unlist(sapply(obj@formulas, names, simplify = FALSE), use.names = FALSE)))
+setMethod("groupNames", "formulas", function(obj) names(obj@formulas))
 
 #' @describeIn formulas Obtain total number of formulae entries.
 #' @export
-setMethod("length", "formulas", function(x) sum(unlist(sapply(x@groupFormulas, function(ft) length(unique(ft$formula))))))
+setMethod("length", "formulas", function(x) sum(unlist(sapply(x@formulas, function(ft) length(unique(ft$formula))))))
 
 #' @describeIn formulas Show summary information for this object.
 #' @export
@@ -66,7 +67,7 @@ setMethod("show", "formulas", function(object)
     printf("A formulas object (%s)\n", class(object))
     printf("Algorithm: %s\n", algorithm(object))
 
-    ft <- formulaTable(object)
+    ft <- featureFormulas(object)
     hasFeatForms <- length(ft) > 0
     ftcounts <- if (hasFeatForms) recursiveApplyDT(ft, function(x) length(unique(x$formula)), sapply) else 0
     ma <- mean(sapply(ftcounts, sum))
@@ -76,7 +77,7 @@ setMethod("show", "formulas", function(object)
     printf("  - Average formulas per analysis: %.1f\n", ma)
     printf("  - Average formulas per feature: %.1f\n", mft)
     
-    gft <- groupFormulas(object)
+    gft <- formulaTable(object)
     mfg <- if (length(gft) > 0) sapply(gft, nrow) else 0
     printf("Formulas assigned to feature groups:\n")
     printf("  - Total formula count: %d\n", length(object))
@@ -85,52 +86,66 @@ setMethod("show", "formulas", function(object)
     showObjectSize(object)
 })
 
-#' @describeIn formulas Subset on analyses/feature groups.
+#' @describeIn formulas Subset on feature groups.
 #' @export
-setMethod("[", c("formulas", "ANY", "ANY", "missing"), function(x, i, j, ...)
+setMethod("[", c("formulas", "ANY", "missing", "missing"), function(x, i, j, ...)
 {
     if (!missing(i))
         assertSubsetArg(i)
-    if (!missing(j))
-        assertSubsetArg(j)
-    
-    # non-existing indices result in NULL values --> prune
-    
+
     if (!missing(i))
     {
         if (!is.character(i))
-            i <- analyses(x)[i]
-        x@formulas <- pruneList(x@formulas[i])
-    }
-    
-    if (!missing(j))
-    {
-        if (!is.character(j))
-            j <- groupNames(x)[j]
-        x@formulas <- sapply(x@formulas, function(a)
-        {
-            ret <- a[j]
-            return(pruneList(ret))
-        }, simplify = FALSE)
-        x@formulas <- pruneList(x@formulas, TRUE)
+            i <- groupNames(x)[i]
+        x@featureFormulas <- sapply(x@eatureFormulas, function(a) pruneList(a[i]),
+                                    simplify = FALSE)
+        x@eatureFormulas <- pruneList(x@eatureFormulas, TRUE)
+        
+        x@formulas <- xformulas[i]
     }
     
     return(x)
 })
 
-#' @describeIn formulas Extract a formula table from a specified analysis/feature group.
+#' @describeIn formulas Extract a formula table. If both arguments (\code{i} and
+#'   \code{j}) are specified, the feature specific formula table belonging to
+#'   the analysis (\code{i})/feature group (\code{j}) is returned. Otherwise the
+#'   formula table for the feature group specified by \code{j} is returned.
 #' @export
 setMethod("[[", c("formulas", "ANY", "ANY"), function(x, i, j)
 {
     assertExtractArg(i)
-    assertExtractArg(j)
+    if (!missing(j))
+        assertExtractArg(j)
+    
+    if (!missing(j))
+    {
+        # both arguments specified, return feature formula table
+        
+        if (length(x@featureFormulas) == 0)
+            stop("This object does not contain formulas for features.")
+        
+        if (!is.character(i))
+            i <- analyses(x)[i]
+        
+        if (!is.character(j))
+            j <- groupNames(x)[j]
+        
+        return(x@featureFormulas[[c(i, j)]])
+    }
+    
+    # else return regular feature group formulas
     
     if (!is.character(i))
-        i <- analyses(x)[i]
-    if (!is.character(j))
-        j <- groupNames(x)[j]
-    
-    return(x@formulas[[c(i, j)]])
+        i <- groupNames(x)[i]
+    return(x@formulas[[i]])
+})
+
+#' @describeIn formulas Extract a formula table for a feature group.
+#' @export
+setMethod("$", "formulas", function(x, name)
+{
+    eval(substitute(x@formulas[group == NAME_ARG], list(NAME_ARG = name)))
 })
 
 #' @describeIn formulas Generates a consensus and other summarizing data for
@@ -138,37 +153,13 @@ setMethod("[[", c("formulas", "ANY", "ANY"), function(x, i, j)
 #'
 #' @param \dots Any further \code{formulas} objects on top of the object given
 #'   for the \code{obj} parameter to which a consensus should be generated.
-#'   Using the \dots parameter formulae from various
-#'   \link[=formula-generation]{formula generators} can be merged.
-#' @param fGroups The \code{\link{featureGroups}} object that was used when
-#'   formulae were generated.
-#' @param formAnaThreshold,formListThreshold Fractional minimum amount (0-1) to
-#'   which a generated formula should be present in all the analyses
-#'   (\code{formAnaThreshold}) or in all given formula lists
+#' @param formThreshold Fractional minimum amount (0-1) to
+#'   which a generated precursor formula should be present in all given formula objects
 #'   (\code{formListThreshold}) containing the related feature group. For
 #'   instance, a value of \samp{0.5} for \code{formAnaThreshold} means that a
 #'   particular formula should be present in at least \samp{50\%} of all
 #'   analyses containing the feature group that was used to generate the
 #'   formula.
-#' @param maxFormulas,maxFragFormulas Maximum amount of candidate formulae (or
-#'   fragment formulae) per feature group.
-#' @param minIntensity Results from features below this intensity will be
-#'   excluded.
-#' @param maxIntensity Results from features above this intensity will be
-#'   excluded.
-#' @param minPreferredFormulas Preferred minimum amount of candidate formulae
-#'   per feature group. See \code{minPreferredIntensity}.
-#' @param minPreferredIntensity Minimum preferred intensity of formulae
-#'   candidates per feature group. Results from features below this intensity
-#'   will be removed unless the total count of formulae of the related feature
-#'   group is below \code{minPreferredFormulas}. When a higher
-#'   \code{minIntensity} is given this parameter has no effect.
-#' @param elements An optional character vector containing elements for which
-#'   the total count present in each formula should be calculated. For instance,
-#'   \code{c("C", "H")} will count all carbon and hydrogen atoms present in each
-#'   formula.
-#' @param fragElements Same as \code{elements} parameter, but for MS/MS
-#'   formulae.
 #'
 #' @return \code{consensus} returns a \code{\link{formulaConsensus}} object.
 #'
@@ -195,7 +186,7 @@ setMethod("consensus", "formulas", function(obj, ..., formThreshold = 0)
 
     allFormulasLists <- sapply(seq_along(allFormulas), function(fi)
     {
-        return(lapply(groupFormulas(allFormulas[[fi]]), function(ft)
+        return(lapply(formulaTable(allFormulas[[fi]]), function(ft)
         {
             ret <- copy(ft)
             setnames(ret, paste0(names(ret), "-", allFormNames[fi]))

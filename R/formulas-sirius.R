@@ -215,6 +215,6 @@ generateFormulasSirius <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct = 
         formTable <- list()
     }
     
-    return(formulas(formulas = formTable, groupFormulas = groupFormulas, algorithm = "SIRIUS"))
+    return(formulas(formulas = groupFormulas, featureFormulas = formTable, algorithm = "SIRIUS"))
     
 }

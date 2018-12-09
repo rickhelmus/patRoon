@@ -197,6 +197,10 @@ setGeneric("filter", function(obj, ...) standardGeneric("filter"))
 #' @template generics
 setGeneric("formulaTable", function(obj) standardGeneric("formulaTable"))
 
+
+# UNDONE
+setGeneric("groupFormulas", function(obj) standardGeneric("groupFormulas"))
+
 #' @templateVar func getFeatures
 #' @templateVar desc returns the object's \code{\link{features}} object.
 #' @template generics

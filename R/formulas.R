@@ -35,6 +35,9 @@ formulas <- setClass("formulas",
 #' @export
 setMethod("formulaTable", "formulas", function(obj) obj@formulas)
 
+# UNDONE
+setMethod("groupFormulas", "formulas", function(obj) obj@groupFormulas)
+
 #' @describeIn formulas Accessor method for the algorithm (a character
 #'   string) used to generate formulae.
 #' @export
@@ -173,6 +176,210 @@ setMethod("[[", c("formulas", "ANY", "ANY"), function(x, i, j)
 #' @return \code{consensus} returns a \code{\link{formulaConsensus}} object.
 #'
 #' @export
+setMethod("consensus", "formulas", function(obj, ..., formThreshold = 0)
+{
+    allFormulas <- c(list(obj), list(...))
+    
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertList(allFormulas, types = "formulas", min.len = 2, any.missing = FALSE,
+                          unique = TRUE, .var.name = "...", add = ac)
+    checkmate::assertNumber(formThreshold, lower = 0, finite = TRUE, add = ac)
+    checkmate::reportAssertions(ac)
+
+    allFormulas <- allFormulas[lengths(allFormulas) > 0]
+    if (length(allFormulas) < 2)
+        stop("Need at least two non-empty formulas objects")
+    
+    allFormNames <- sapply(allFormulas, algorithm)
+    # UNDONE?
+    # if (length(allFormulas) > length(unique(allFormNames)))
+    #     stop("Consensus can only be generated from different algorithms at this moment.")
+    allFormNames <- make.unique(allFormNames)
+
+    allFormulasLists <- sapply(seq_along(allFormulas), function(fi)
+    {
+        return(lapply(groupFormulas(allFormulas[[fi]]), function(ft)
+        {
+            ret <- copy(ft)
+            setnames(ret, paste0(names(ret), "-", allFormNames[fi]))
+            return(ret)
+        }))
+        
+    }, simplify = FALSE)
+    
+    # UNDONE: remove old style columns?
+    uniqueCols <- c("neutral_formula", "formula_mz", "error", "dbe", "frag_formula", "frag_mz",
+                    "frag_formula_mz", "frag_error", "neutral_loss", "frag_dbe", "min_intensity", "max_intensity",
+                    "ana_min_intensity", "ana_max_intensity")
+    
+    consFormulaList <- allFormulasLists[[1]]
+    leftName <- allFormNames[1]
+    for (righti in seq(2, length(allFormulasLists)))
+    {
+        rightName <- allFormNames[righti]
+        
+        printf("Merging %s with %s... ", paste0(allFormNames[seq_len(righti-1)], collapse = ","), rightName)
+        
+        rightTable <- allFormulasLists[[righti]]
+        
+        for (grp in union(names(consFormulaList), names(rightTable)))
+        {
+            if (is.null(rightTable[[grp]]))
+                next # nothing to merge
+            else if (is.null(consFormulaList[[grp]])) # not yet present
+            {
+                mTable <- rightTable[[grp]]
+                
+                # rename columns that should be unique from right to left
+                unColsPresent <- uniqueCols[sapply(uniqueCols, function(uc) !is.null(mTable[[paste0(uc, "-", rightName)]]))]
+                setnames(mTable, paste0(unColsPresent, "-", rightName), paste0(unColsPresent, "-", leftName))
+            }
+            else
+            {
+                haveMSMS <- paste0("frag_formula-", leftName) %in% names(consFormulaList[[grp]]) &&
+                            paste0("frag_formula-", rightName) %in% names(consFormulaList[[grp]])
+                
+                mergeCols <- "formula"
+                if (haveMSMS)
+                    mergeCols <- c(mergeCols, "byMSMS", "frag_formula")
+                mTable <- merge(consFormulaList[[grp]], rightTable[[grp]], all = TRUE,
+                                by.x = paste0(mergeCols, "-", leftName),
+                                by.y = paste0(mergeCols, "-", rightName))
+                
+                # remove duplicate columns that shouldn't
+                for (col in uniqueCols)
+                {
+                    colLeft <- paste0(col, "-", leftName)
+                    colRight <- paste0(col, "-", rightName)
+                    if (!is.null(mTable[[colRight]]))
+                    {
+                        mTable[, (colLeft) := ifelse(!is.na(get(colLeft)), get(colLeft), get(colRight))]
+                        mTable[, (colRight) := NULL]
+                    }
+                }
+            }
+            
+            consFormulaList[[grp]] <- mTable
+        }
+        
+        cat("Done!\n")
+    }
+    
+    
+    printf("Determining coverage and final scores... ")
+    
+    # Determine coverage of compounds between objects and the merged score. The formula column can be
+    # used for the former as there is guaranteed to be one for each merged object.
+    for (grpi in seq_along(consFormulaList))
+    {
+        # fix up de-duplicated column names
+        deDupCols <- c(uniqueCols)
+        leftCols <- paste0(deDupCols, "-", leftName)
+        deDupCols <- deDupCols[leftCols %in% names(consFormulaList[[grpi]])]
+        leftCols <- leftCols[leftCols %in% names(consFormulaList[[grpi]])]
+        if (length(leftCols) > 0)
+            setnames(consFormulaList[[grpi]], leftCols, deDupCols)
+        
+        formCols <- grep("formula-", colnames(consFormulaList[[grpi]]), value = TRUE)
+        
+        if (length(formCols) == 0) # nothing was merged
+            consFormulaList[[grpi]][, coverage := 1 / length(allCompounds)]
+        else
+        {
+            for (r in seq_len(nrow(consFormulaList[[grpi]])))
+                set(consFormulaList[[grpi]], r, "coverage",
+                    sum(sapply(formCols, function(c) !is.na(consFormulaList[[grpi]][[c]][r]))) / length(allCompounds))
+        }
+        
+        if (formThreshold > 0)
+            consFormulaList[[grpi]] <- consFormulaList[[grpi]][coverage >= formThreshold]
+        
+        setcolorder(consFormulaList[[grpi]], formConsensusColOrder(consFormulaList[[grpi]]))
+    }
+    
+    cat("Done!")
+        
+    return(formulas(formulas = list(), groupFormulas = consFormulaList,
+                    algorithm = paste0(unique(sapply(allFormulas, algorithm)), collapse = ",")))
+    
+    
+    
+    
+    allFGroups <- unique(unlist(sapply(allFormulasLists, names)))
+    formCons <- sapply(allFGroups, function(grp)
+    {
+        ftPresent <- sapply(allFormulasLists, function(fl) !is.null(fl[[grp]]))
+        formTables <- sapply(allFormulasLists[ftPresent], "[[", grp, simplify = FALSE)
+        ftNames <- allFormNames[ftPresent]
+        
+        if (length(formTables) < 2)
+            return(formTables[[1]])
+        
+        consTable <- formTables[[1]]
+        for (otherFTi in seq(2, length(formTables)))
+        {
+            algCons <- paste0(ftNames[seq_len(otherFTi-1)], collapse = ",")
+            printf("Merging %s and %s... ", algCons, ftNames[otherFTi])
+            
+            otherFT <- formTables[[otherFTi]]
+            
+            haveMSMS <- "frag_formula" %in% colnames(consTable) && "frag_formula" %in% colnames(otherFT)
+            
+            mergeCols <- "formula"
+            if (haveMSMS)
+                mergeCols <- c(mergeCols, "byMSMS", "frag_formula")
+            
+            mTable <- merge(consTable, otherFT, all = TRUE, by = mergeCols)
+            
+            # score and anaCoverage columns may now be double and should be renamed
+            # note that double columns get .x/.y suffix on merge
+            for (col in c("score", "anaCoverage"))
+            {
+                cols <- paste0(col, c(".x", ".y"))
+                if (!any(sapply(cols, function(cl) is.null(mTable[[cl]]))))
+                    setnames(mTable, cols, paste0(col, "-", c(algCons, ftNames[otherFTi])))
+            }
+            
+            # Other (potentially) double columns which should be (more or less) the same, so only keep one of these
+            # UNDONE: remove old style columns?
+            takeOneCols <- c("ret", "mz", "neutral_formula", "formula_mz", "error", "dbe", "frag_formula", "frag_mz",
+                             "frag_formula_mz", "frag_error", "neutral_loss", "frag_dbe", "min_intensity", "max_intensity",
+                             "ana_min_intensity", "ana_max_intensity")
+            for (col in takeOneCols)
+            {
+                colLeft <- paste0(col, ".x")
+                colRight <- paste0(col, ".y")
+                if (colLeft %in% colnames(mTable))
+                {
+                    mTable[, (col) := ifelse(!is.na(get(colLeft)), get(colLeft), get(colRight))]
+                    mTable[, c(colLeft, colRight) := NULL]
+                }
+            }
+            
+            cat("Done!\n")
+            
+            # return(mTable)
+            consTable <- mTable
+        }
+        
+        # Calculate coverage of formulae across formula lists. score is a
+        # column that is present with all algorithms, so we can use presence of
+        # its value as counter
+        scoreCols <- grep("score-", colnames(consTable), value = TRUE)
+        for (r in seq_len(nrow(consTable)))
+            set(consTable, r, "mergeCoverage", sum(sapply(scoreCols, function(c) !is.na(consTable[[c]][r]))) / length(allFormulas))
+        
+        if (formThreshold > 0)
+            consTable <- consTable[mergeCoverage >= formThreshold]
+        
+        setcolorder(consTable, formConsensusColOrder(consTable))
+    })
+    
+    return(formulas(formulas = list(), groupFormulas = formCons,
+                    algorithm = paste0(unique(sapply(allFormulas, algorithm)), collapse = ",")))
+})
+
+if (FALSE){
 setMethod("consensus", "formulas", function(obj, ..., fGroups, formAnaThreshold = 0.75, formListThreshold = 0,
                                             maxFormulas = 10, maxFragFormulas = 10, minIntensity = NULL,
                                             maxIntensity = NULL, minPreferredFormulas = 1,
@@ -198,11 +405,11 @@ setMethod("consensus", "formulas", function(obj, ..., fGroups, formAnaThreshold 
     gInfo <- groupInfo(fGroups)
     anaInfo <- analysisInfo(fGroups)
     gTable <- groups(fGroups)
-
-
+    
+    
     if (length(allFLists) > length(unique(sapply(allFLists, algorithm))))
         stop("Consensus can only be generated from different algorithms at this moment.")
-
+    
     allFLists <- allFLists[lengths(allFLists) > 0]
     if (length(allFLists) < 1)
         stop("Need at least one non-empty formulas objects")
@@ -211,7 +418,7 @@ setMethod("consensus", "formulas", function(obj, ..., fGroups, formAnaThreshold 
                            function (fl) consensusForFormulaList(fl, fGroups, formAnaThreshold, maxFormulas, maxFragFormulas,
                                                                  minIntensity, maxIntensity, minPreferredFormulas,
                                                                  minPreferredIntensity))
-
+    
     if (length(formConsList) == 1)
         retConsTable <- formConsList[[1]]@formulas
     else
@@ -219,18 +426,18 @@ setMethod("consensus", "formulas", function(obj, ..., fGroups, formAnaThreshold 
         retConsTable <- Reduce(function(fCons1, fCons2)
         {
             printf("Merging %s and %s... ", algorithm(fCons1), algorithm(fCons2))
-
+            
             forms1 <- formulaTable(fCons1)
             forms2 <- formulaTable(fCons2)
             
             haveMSMS <- "frag_formula" %in% colnames(forms1) && "frag_formula" %in% colnames(forms2)
-
+            
             mergeCols <- c("group", "formula")
             if (haveMSMS)
                 mergeCols <- c(mergeCols, "byMSMS", "frag_formula")
-
+            
             mTable <- merge(forms1, forms2, all = TRUE, by = mergeCols)
-
+            
             # score and anaCoverage columns may now be double and should be renamed
             # note that double columns get .x/.y suffix on merge
             for (col in c("score", "anaCoverage"))
@@ -239,7 +446,7 @@ setMethod("consensus", "formulas", function(obj, ..., fGroups, formAnaThreshold 
                 if (!any(sapply(cols, function(cl) is.null(mTable[[cl]]))))
                     setnames(mTable, cols, paste0(col, "-", c(algorithm(fCons1), algorithm(fCons2))))
             }
-
+            
             # Other (potentially) double columns which should be (more or less) the same, so only keep one of these
             takeOneCols <- c("ret", "mz", "neutral_formula", "formula_mz", "error", "dbe", "frag_formula", "frag_mz",
                              "frag_formula_mz", "frag_error", "neutral_loss", "frag_dbe", "min_intensity", "max_intensity",
@@ -254,25 +461,25 @@ setMethod("consensus", "formulas", function(obj, ..., fGroups, formAnaThreshold 
                     mTable[, c(colLeft, colRight) := NULL]
                 }
             }
-
+            
             cat("Done!\n")
-
+            
             return(mTable)
         }, formConsList)
-
+        
         # Calculate coverage of formulae across formula lists. anaCoverage is a
         # column that is present with all algorithms, so we can use presence of
         # its value as counter
         anaCovCols <- grep("anaCoverage-", colnames(retConsTable), value = TRUE)
         for (r in seq_len(nrow(retConsTable)))
             set(retConsTable, r, "listCoverage", sum(sapply(anaCovCols, function(c) !is.na(retConsTable[[c]][r]))) / length(formConsList))
-
+        
         if (formListThreshold > 0)
             retConsTable <- retConsTable[listCoverage >= formListThreshold]
     }
-
+    
     setcolorder(retConsTable, formConsensusColOrder(retConsTable))
-
+    
     if (length(elements) > 0)
     {
         # Retrieve element lists from formulas
@@ -285,10 +492,10 @@ setMethod("consensus", "formulas", function(obj, ..., fGroups, formAnaThreshold 
         colnames(el) <- sapply(colnames(el), function(e) paste0("frag_", e), USE.NAMES = F)
         retConsTable <- cbind(retConsTable, el)
     }
-
+    
     return(formulaConsensus(formulas = retConsTable,
                             algorithm = paste0(unique(sapply(formConsList, algorithm)), collapse = ",")))
-})
+})}
 
 #' Formula consensus class
 #'

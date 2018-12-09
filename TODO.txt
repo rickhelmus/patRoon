@@ -47,3 +47,9 @@ Release:
 - MetFrag: (buggy) trivial name fetching not needed anymore?
 - reportMD: if blanks are still present chord etc not plotted?
 - removeRefAnalyses TRUE by default?
+- formulas
+    - keep ana_min_intensity etc?
+    - DBE calculation for SIRIUS?
+    - docs
+        - move generics in to right place, set aliases
+        - groupFormulas() name?

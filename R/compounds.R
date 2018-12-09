@@ -740,7 +740,7 @@ setMethod("consensus", "compounds", function(obj, ..., compThreshold = 0.0, minM
     })
 
     # columns that should be unique (fragInfo and InChIKey1 are dealt separately)
-    uniqueCols <- c("SMILES", "formula", "InChi")
+    uniqueCols <- c("SMILES", "formula", "InChi", "InChIKey2", "InChIKey", "neutralMass")
 
     leftName <- compNames[[1]]
     mCompList <- allCompTables[[1]]
@@ -761,8 +761,9 @@ setMethod("consensus", "compounds", function(obj, ..., compThreshold = 0.0, minM
                 mCompounds <- rightTable[[grp]]
 
                 # rename columns that should be unique from right to left
-                uc <- c(uniqueCols, "fragInfo", "InChIKey1")
-                setnames(mCompounds, paste0(uc, "-", rightName), paste0(uc, "-", leftName))
+                unCols <- c(uniqueCols, "fragInfo", "InChIKey1")
+                unCols <- unCols[sapply(unCols, function(uc) !is.null(mCompounds[[paste0(uc, "-", rightName)]]))]
+                setnames(mCompounds, paste0(unCols, "-", rightName), paste0(unCols, "-", leftName))
             }
             else
             {
@@ -804,8 +805,16 @@ setMethod("consensus", "compounds", function(obj, ..., compThreshold = 0.0, minM
                 {
                     colLeft <- paste0(col, "-", leftName)
                     colRight <- paste0(col, "-", rightName)
-                    mCompounds[, (colLeft) := ifelse(!is.na(get(colLeft)), get(colLeft), get(colRight))]
-                    mCompounds[, (colRight) := NULL]
+                    if (!is.null(mCompounds[[colRight]]))
+                    {
+                        if (is.null(mCompounds[[colLeft]]))
+                            setnames(mCompounds, colRight, colLeft)
+                        else
+                        {
+                            mCompounds[, (colLeft) := ifelse(!is.na(get(colLeft)), get(colLeft), get(colRight))]
+                            mCompounds[, (colRight) := NULL]
+                        }
+                    }
                 }
             }
 
@@ -822,7 +831,7 @@ setMethod("consensus", "compounds", function(obj, ..., compThreshold = 0.0, minM
     for (grpi in seq_along(mCompList))
     {
         # fix up de-duplicated column names
-        deDupCols <- c(uniqueCols, "fragInfo")
+        deDupCols <- c(uniqueCols, c("fragInfo", "InChIKey1"))
         leftCols <- paste0(deDupCols, "-", leftName)
         deDupCols <- deDupCols[leftCols %in% names(mCompList[[grpi]])]
         leftCols <- leftCols[leftCols %in% names(mCompList[[grpi]])]
@@ -858,7 +867,7 @@ setMethod("consensus", "compounds", function(obj, ..., compThreshold = 0.0, minM
         }
     }
 
-    cat("Done!")
+    cat("Done!\n")
 
     # prune empty/NULL results
     if (length(mCompList) > 0)

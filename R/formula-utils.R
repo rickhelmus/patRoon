@@ -346,31 +346,49 @@ getFragmentInfoFromForms <- function(spec, fragFormTable)
     fi[, intensity := spec$intensity[PLIndex]]
 }
 
-getFormInfoList <- function(formConsensus, precursor, groupName)
+getFormInfoList <- function(formTable, precursor)
 {
-    formTable <- formulaTable(formConsensus)[group == groupName & byMSMS == TRUE & formula == precursor]
+    formTable <- formTable[byMSMS == TRUE & formula == precursor]
 
     if (nrow(formTable) == 0)
         return(NULL)
 
     precInfo <- formTable[1] # precursor info is duplicated over all fragment rows
 
-    valText <- function(fmt, value) if (!is.null(value) && !is.na(value)) sprintf(fmt, value) else NULL
+    addValText <- function(curText, fmt, col)
+    {
+        # get all columns matching value of 'col' as prefix: merged names after
+        # consensus will have format 'col-X'.
+        cols <- grep(paste0("^", col), names(precInfo))
+        
+        ret <- character()
+        for (cl in cols)
+        {
+            if (!is.null(precInfo[[cl]]) && !is.na(precInfo[[cl]]) &&
+                (!is.character(precInfo[[cl]]) || nzchar(precInfo[[cl]])))
+            {
+                fm <- sprintf("%s: %s", cl, fmt)
+                ret <- c(ret, sprintf(fm, precInfo[[cl]]))
+            }
+        }
+        
+        return(c(curText, ret))
+    }
+    
     ret <- character()
-    ret <- c(ret, valText("Ion formula: %s", precInfo$formula))
-    ret <- c(ret, valText("Neutral formula: %s", precInfo$neutral_formula))
-    ret <- c(ret, valText("Error: %.2f ppm", precInfo$error))
-    ret <- c(ret, valText("mSigma: %.1f", precInfo$mSigma))
-    ret <- c(ret, valText("dbe: %f", precInfo$error))
-    ret <- c(ret, valText("Rank: %f", precInfo$rank))
-    ret <- c(ret, valText("Score: %.2f", precInfo$score))
-    ret <- c(ret, valText("Score SIRIUS: %.2f", precInfo[["score-SIRIUS"]]))
-    ret <- c(ret, valText("Score DataAnalysis: %.2f", precInfo[["score-Bruker_DataAnalysis"]]))
-    ret <- c(ret, valText("MS match: %.2f", precInfo$MS_match))
-    ret <- c(ret, valText("MSMS match: %.2f", precInfo$MSMS_match))
-    ret <- c(ret, valText("comb match: %.2f", precInfo$comb_match))
-    ret <- c(ret, valText("treeScore: %.2f", precInfo$treeScore))
-    ret <- c(ret, valText("isoScore: %.2f", precInfo$isoScore))
+    
+    ret <- addValText(ret, "%s", "formula")
+    ret <- addValText(ret, "%s", "neutral_formula")
+    ret <- addValText(ret, "%.2f ppm", "error")
+    ret <- addValText(ret, "%.1f", "mSigma")
+    ret <- addValText(ret, "%f", "error")
+    ret <- addValText(ret, "%f", "rank")
+    ret <- addValText(ret, "%.2f", "score")
+    ret <- addValText(ret, "%.2f", "MS_match")
+    ret <- addValText(ret, "%.2f", "MSMS_match")
+    ret <- addValText(ret, "%.2f", "comb_match")
+    ret <- addValText(ret, "%.2f", "treeScore")
+    ret <- addValText(ret, "%.2f", "isoScore")
 
     return(ret)
 }

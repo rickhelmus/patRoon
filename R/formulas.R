@@ -58,7 +58,7 @@ setMethod("groupNames", "formulas", function(obj) unique(unlist(sapply(obj@formu
 # UNDONE: this seems not so useful now, change to unique formulae?
 #' @describeIn formulas Obtain total number of formulae entries.
 #' @export
-setMethod("length", "formulas", function(x) sum(unlist(recursiveApplyDT(x@formulas, nrow))))
+setMethod("length", "formulas", function(x) sum(unlist(sapply(x@groupFormulas, nrow))))
 
 #' @describeIn formulas Show summary information for this object.
 #' @export
@@ -208,7 +208,7 @@ setMethod("consensus", "formulas", function(obj, ..., formThreshold = 0)
     }, simplify = FALSE)
     
     # UNDONE: remove old style columns?
-    uniqueCols <- c("neutral_formula", "formula_mz", "error", "dbe", "frag_formula", "frag_mz",
+    uniqueCols <- c("neutral_formula", "formula_mz", "error", "dbe", "frag_mz",
                     "frag_formula_mz", "frag_error", "neutral_loss", "frag_dbe", "min_intensity", "max_intensity",
                     "ana_min_intensity", "ana_max_intensity")
     
@@ -220,29 +220,30 @@ setMethod("consensus", "formulas", function(obj, ..., formThreshold = 0)
         
         printf("Merging %s with %s... ", paste0(allFormNames[seq_len(righti-1)], collapse = ","), rightName)
         
-        rightTable <- allFormulasLists[[righti]]
+        rightFList <- allFormulasLists[[righti]]
         
-        for (grp in union(names(consFormulaList), names(rightTable)))
+        for (grp in union(names(consFormulaList), names(rightFList)))
         {
-            if (is.null(rightTable[[grp]]))
+            if (is.null(rightFList[[grp]]))
                 next # nothing to merge
             else if (is.null(consFormulaList[[grp]])) # not yet present
             {
-                mTable <- rightTable[[grp]]
+                mTable <- rightFList[[grp]]
                 
                 # rename columns that should be unique from right to left
-                unColsPresent <- uniqueCols[sapply(uniqueCols, function(uc) !is.null(mTable[[paste0(uc, "-", rightName)]]))]
-                setnames(mTable, paste0(unColsPresent, "-", rightName), paste0(unColsPresent, "-", leftName))
+                unCols <- c(uniqueCols, c("formula", "byMSMS", "frag_formula"))
+                unCols <- unCols[sapply(unCols, function(uc) !is.null(mTable[[paste0(uc, "-", rightName)]]))]
+                setnames(mTable, paste0(unCols, "-", rightName), paste0(unCols, "-", leftName))
             }
             else
             {
                 haveMSMS <- paste0("frag_formula-", leftName) %in% names(consFormulaList[[grp]]) &&
-                            paste0("frag_formula-", rightName) %in% names(consFormulaList[[grp]])
+                            paste0("frag_formula-", rightName) %in% names(rightFList[[grp]])
                 
                 mergeCols <- "formula"
                 if (haveMSMS)
                     mergeCols <- c(mergeCols, "byMSMS", "frag_formula")
-                mTable <- merge(consFormulaList[[grp]], rightTable[[grp]], all = TRUE,
+                mTable <- merge(consFormulaList[[grp]], rightFList[[grp]], all = TRUE,
                                 by.x = paste0(mergeCols, "-", leftName),
                                 by.y = paste0(mergeCols, "-", rightName))
                 
@@ -253,8 +254,13 @@ setMethod("consensus", "formulas", function(obj, ..., formThreshold = 0)
                     colRight <- paste0(col, "-", rightName)
                     if (!is.null(mTable[[colRight]]))
                     {
-                        mTable[, (colLeft) := ifelse(!is.na(get(colLeft)), get(colLeft), get(colRight))]
-                        mTable[, (colRight) := NULL]
+                        if (is.null(mTable[[colLeft]]))
+                            setnames(mTable, colRight, colLeft)
+                        else
+                        {
+                            mTable[, (colLeft) := ifelse(!is.na(get(colLeft)), get(colLeft), get(colRight))]
+                            mTable[, (colRight) := NULL]
+                        }
                     }
                 }
             }
@@ -266,14 +272,14 @@ setMethod("consensus", "formulas", function(obj, ..., formThreshold = 0)
     }
     
     
-    printf("Determining coverage and final scores... ")
+    printf("Determining coverage... ")
     
     # Determine coverage of compounds between objects and the merged score. The formula column can be
     # used for the former as there is guaranteed to be one for each merged object.
     for (grpi in seq_along(consFormulaList))
     {
         # fix up de-duplicated column names
-        deDupCols <- c(uniqueCols)
+        deDupCols <- c(uniqueCols, "formula", "byMSMS", "frag_formula")
         leftCols <- paste0(deDupCols, "-", leftName)
         deDupCols <- deDupCols[leftCols %in% names(consFormulaList[[grpi]])]
         leftCols <- leftCols[leftCols %in% names(consFormulaList[[grpi]])]
@@ -283,21 +289,21 @@ setMethod("consensus", "formulas", function(obj, ..., formThreshold = 0)
         formCols <- grep("formula-", colnames(consFormulaList[[grpi]]), value = TRUE)
         
         if (length(formCols) == 0) # nothing was merged
-            consFormulaList[[grpi]][, coverage := 1 / length(allCompounds)]
+            consFormulaList[[grpi]][, coverage := 1 / length(allFormulas)]
         else
         {
             for (r in seq_len(nrow(consFormulaList[[grpi]])))
                 set(consFormulaList[[grpi]], r, "coverage",
-                    sum(sapply(formCols, function(c) !is.na(consFormulaList[[grpi]][[c]][r]))) / length(allCompounds))
+                    sum(sapply(formCols, function(c) !is.na(consFormulaList[[grpi]][[c]][r]))) / length(allFormulas))
         }
         
         if (formThreshold > 0)
             consFormulaList[[grpi]] <- consFormulaList[[grpi]][coverage >= formThreshold]
         
-        setcolorder(consFormulaList[[grpi]], formConsensusColOrder(consFormulaList[[grpi]]))
+        # setcolorder(consFormulaList[[grpi]], formConsensusColOrder(consFormulaList[[grpi]]))
     }
     
-    cat("Done!")
+    cat("Done!\n")
         
     return(formulas(formulas = list(), groupFormulas = consFormulaList,
                     algorithm = paste0(unique(sapply(allFormulas, algorithm)), collapse = ",")))

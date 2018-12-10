@@ -262,8 +262,6 @@ setMethod("consensus", "formulas", function(obj, ..., formThreshold = 0)
     
     printf("Determining coverage... ")
     
-    # Determine coverage of compounds between objects and the merged score. The formula column can be
-    # used for the former as there is guaranteed to be one for each merged object.
     for (grpi in seq_along(consFormulaList))
     {
         # fix up de-duplicated column names
@@ -274,15 +272,25 @@ setMethod("consensus", "formulas", function(obj, ..., formThreshold = 0)
         if (length(leftCols) > 0)
             setnames(consFormulaList[[grpi]], leftCols, deDupCols)
         
-        formCols <- grep("formula-", colnames(consFormulaList[[grpi]]), value = TRUE)
+        # match all that has a dash inbetween
+        mergedCols <- grep(".+\\-.+", names(consFormulaList[[grpi]]), value = TRUE)
         
-        if (length(formCols) == 0) # nothing was merged
+        # figure out what was merged (i.e. name after dash)
+        mergedColsWhat <- sub(".+\\-", "", mergedCols)
+        
+        if (length(unique(mergedColsWhat)) < 2) # nothing was merged
             consFormulaList[[grpi]][, coverage := 1 / length(allFormulas)]
         else
         {
             for (r in seq_len(nrow(consFormulaList[[grpi]])))
-                set(consFormulaList[[grpi]], r, "coverage",
-                    sum(sapply(formCols, function(c) !is.na(consFormulaList[[grpi]][[c]][r]))) / length(allFormulas))
+            {
+                # count how many merged objects have a value in this line: each
+                # object should at least have one non-NA value
+                notNAs <- sapply(mergedCols, function(mc) !is.na(consFormulaList[[grpi]][[mc]][r]))
+                mergedNotNACount <- length(unique(mergedColsWhat[notNAs]))
+                
+                set(consFormulaList[[grpi]], r, "coverage", mergedNotNACount / length(allFormulas))
+            }
         }
         
         if (formThreshold > 0)
@@ -293,7 +301,7 @@ setMethod("consensus", "formulas", function(obj, ..., formThreshold = 0)
     
     cat("Done!\n")
         
-    return(formulas(formulas = list(), groupFormulas = consFormulaList,
+    return(formulas(formulas = consFormulaList, featureFormulas = list(),
                     algorithm = paste0(unique(sapply(allFormulas, algorithm)), collapse = ",")))
 })
 

@@ -196,7 +196,7 @@ setMethod("consensus", "formulas", function(obj, ..., formThreshold = 0)
     }, simplify = FALSE)
     
     # UNDONE: remove old style columns?
-    uniqueCols <- c("neutral_formula", "formula_mz", "error", "dbe", "frag_mz",
+    uniqueCols <- c("neutral_formula", "formula_mz", "error", "dbe", "frag_mz", "frag_neutral_formula",
                     "frag_formula_mz", "frag_error", "neutral_loss", "frag_dbe", "min_intensity", "max_intensity",
                     "ana_min_intensity", "ana_max_intensity")
     

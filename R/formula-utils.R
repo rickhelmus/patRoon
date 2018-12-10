@@ -201,7 +201,7 @@ formConsensusColOrder <- function(fConsTable)
     # all possible columns, depending on algorithm(s) used and their settings
     allCols <- c("group", "ret", "mz", "neutral_formula", "formula", "adduct", "formula_mz", "error",
                  "mSigma", "dbe", "rank", "score", "MS_match", "treeScore", "isoScore", "anaCoverage",
-                 "listCoverage", "byMSMS", "frag_formula", "frag_intensity", "frag_mz", "frag_formula_mz",
+                 "listCoverage", "byMSMS", "frag_neutral_formula", "frag_formula", "frag_intensity", "frag_mz", "frag_formula_mz",
                  "frag_error", "frag_mSigma", "neutral_loss", "frag_dbe", "frag_score", "MSMS_match",
                  "comb_match", "explainedPeaks", "explainedIntensity", "min_intensity", "max_intensity",
                  "ana_min_intensity", "ana_max_intensity")

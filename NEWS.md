@@ -3,6 +3,7 @@
 ## Decomber 2018
 * Updates on formulas
     * length now returns number of unique precursor formulas (was total number of results)
+    * Fixed: Reported fragment formulas from SIRIUS were incorrectly assumed to be charged. Charged fragment formulas are now calculated manually (the neutral form is charged in the `frag_neutral_formula` column). This also ensures correct comparison when a consensus is made. 
 * `file` argument for `clearCache()`
 * Updates on MS peak lists
     * More consistent naming for algorithm specific MS peak list generators (i.e. `generateMSPeakListsX` where X is the algo).

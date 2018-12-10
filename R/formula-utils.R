@@ -119,7 +119,10 @@ formulaScoringColumns <- function() c("score", "MS_match", "treeScore", "isoScor
 rankFormulaTable <- function(formTable)
 {
     # order from best to worst
-    colorder <- c("byMSMS", intersect(names(formTable), formulaScoringColumns()))
+    # do grap to handle merged columns
+    scCols <- grep(paste0("^(", paste0(formulaScoringColumns(), collapse = "|"), ")"),
+                   names(formTable), value = TRUE)
+    colorder <- c("byMSMS", scCols)
     setorderv(formTable, colorder, c(1, rep(-1, length(colorder)-1)))
     return(formTable)
 }

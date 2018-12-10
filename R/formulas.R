@@ -179,9 +179,6 @@ setMethod("consensus", "formulas", function(obj, ..., formThreshold = 0)
         stop("Need at least two non-empty formulas objects")
     
     allFormNames <- sapply(allFormulas, algorithm)
-    # UNDONE?
-    # if (length(allFormulas) > length(unique(allFormNames)))
-    #     stop("Consensus can only be generated from different algorithms at this moment.")
     allFormNames <- make.unique(allFormNames)
 
     allFormulasLists <- sapply(seq_along(allFormulas), function(fi)
@@ -259,7 +256,6 @@ setMethod("consensus", "formulas", function(obj, ..., formThreshold = 0)
         cat("Done!\n")
     }
     
-    
     printf("Determining coverage... ")
     
     for (grpi in seq_along(consFormulaList))
@@ -297,6 +293,7 @@ setMethod("consensus", "formulas", function(obj, ..., formThreshold = 0)
             consFormulaList[[grpi]] <- consFormulaList[[grpi]][coverage >= formThreshold]
         
         # setcolorder(consFormulaList[[grpi]], formConsensusColOrder(consFormulaList[[grpi]]))
+        consFormulaList[[grpi]] <- rankFormulaTable(consFormulaList[[grpi]])
     }
     
     cat("Done!\n")

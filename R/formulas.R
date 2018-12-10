@@ -148,6 +148,57 @@ setMethod("$", "formulas", function(x, name)
     eval(substitute(x@formulas[group == NAME_ARG], list(NAME_ARG = name)))
 })
 
+#' @describeIn formulas Plots an annotated spectrum for a given candidate
+#'   formula of a feature or feature group.
+#'
+#' @param precursor The formula of the precursor (in ionic form, \emph{i.e.} as
+#'   detected by the MS).
+#' @param analysis A \code{character} specifying the analysis for which the
+#'   annotated spectrum should be plotted. If \code{NULL} then annotation
+#'   results for the complete feature group will be plotted.
+#'
+#' @template plotSpec-args
+#'
+#' @template useGGplot2
+#'
+#' @return \code{plotSpec} will return a \code{\link[=ggplot2]{ggplot object}}
+#'   if \code{useGGPlot2} is \code{TRUE}.
+#'
+#' @export
+setMethod("plotSpec", "formulas", function(obj, precursor, groupName, analysis = NULL, MSPeakLists, useGGPlot2 = FALSE)
+{
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertString(precursor, min.chars = 1, add = ac)
+    checkmate::assertString(groupName, min.chars = 1, add = ac)
+    checkmate::assertString(analysis, min.chars = 1, null.ok = TRUE, add = ac)
+    checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
+    checkmate::assertFlag(useGGPlot2, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    if (!is.null(analysis))
+    {
+        formTable <- obj[[analysis, groupName]]
+        spec <- MSPeakLists[[analysis, groupName]][["MSMS"]]
+    }
+    else
+    {
+        formTable <- obj[[groupName]]
+        spec <- MSPeakLists[[groupName]][["MSMS"]]
+    }
+    
+    formTable <- formTable[byMSMS == TRUE & formula == precursor]
+    
+    if (nrow(formTable) == 0 || is.null(spec))
+        return(NULL)
+    
+    fi <- getFragmentInfoFromForms(spec, formTable)
+    
+    if (useGGPlot2)
+        return(makeMSPlotGG(spec, fi) + ggtitle(precursor))
+    
+    makeMSPlot(spec, fi, main = precursor)
+})
+
 #' @describeIn formulas Generates a consensus and other summarizing data for
 #'   formulae of feature groups that are present in multiple analyses.
 #'

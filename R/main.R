@@ -501,8 +501,7 @@ NULL
 #'
 #' @return A \code{\link{formulas}} object containing all generated formulae.
 #'
-#' @seealso \code{\link{formulas-class}} and
-#'   \code{\link{formulaConsensus-class}}. The
+#' @seealso \code{\link{formulas-class}}. The
 #'   \href{https://www.researchgate.net/publication/307964728_MOLGEN-MSMS_Software_User_Manual}{GenForm
 #'   manual} (formerly known as MOLGEN-MSMS).
 #' @name formula-generation

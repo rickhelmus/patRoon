@@ -103,16 +103,16 @@ test_that("basic subsetting", {
 })
 
 test_that("reporting works", {
-    expect_file(reportCSV(fGroups, getWorkPath(), formConsensus = fCons),
+    expect_file(reportCSV(fGroups, getWorkPath(), formulas = fCons),
                 getWorkPath("formulas.csv"))
     
-    expect_error(reportPDF(fGroups, getWorkPath(), reportFGroups = FALSE, formConsensus = fCons,
+    expect_error(reportPDF(fGroups, getWorkPath(), reportFGroups = FALSE, formulas = fCons,
                            MSPeakLists = plists), NA)
     for (grp in unique(fTable[byMSMS == TRUE, group]))
         checkmate::expect_file_exists(getWorkPath("formulas", sprintf("%s-%s.pdf", class(fGroups), grp)))
     
     expect_reportMD(makeReportMD(fGroups, reportPlots = "formulas",
-                                 formConsensus = fCons, MSPeakLists = plists))
+                                 formulas = fCons, MSPeakLists = plists))
 })
 
 test_that("plotting works", {

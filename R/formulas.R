@@ -22,8 +22,6 @@ NULL
 #' @templateVar optionalji TRUE
 #' @template sub_op-args
 #'
-#' @seealso \code{\link{formulaConsensus}}
-#' 
 #' @export
 formulas <- setClass("formulas",
                      slots = c(formulas = "list", featureFormulas = "list", algorithm = "character"))
@@ -101,7 +99,7 @@ setMethod("[", c("formulas", "ANY", "missing", "missing"), function(x, i, j, ...
                                     simplify = FALSE)
         x@eatureFormulas <- pruneList(x@eatureFormulas, TRUE)
         
-        x@formulas <- xformulas[i]
+        x@formulas <- pruneList(x@formulas[i], TRUE)
     }
     
     return(x)
@@ -145,7 +143,7 @@ setMethod("[[", c("formulas", "ANY", "ANY"), function(x, i, j)
 #' @export
 setMethod("$", "formulas", function(x, name)
 {
-    eval(substitute(x@formulas[group == NAME_ARG], list(NAME_ARG = name)))
+    eval(substitute(x@formulas[[NAME_ARG]], list(NAME_ARG = name)))
 })
 
 #' @describeIn formulas Plots an annotated spectrum for a given candidate
@@ -212,7 +210,8 @@ setMethod("plotSpec", "formulas", function(obj, precursor, groupName, analysis =
 #'   analyses containing the feature group that was used to generate the
 #'   formula.
 #'
-#' @return \code{consensus} returns a \code{\link{formulaConsensus}} object.
+#' @return \code{consensus} returns a \code{formulas} object that is produced
+#'   by merging multiple \code{formulas} objects.
 #'
 #' @export
 setMethod("consensus", "formulas", function(obj, ..., formThreshold = 0)

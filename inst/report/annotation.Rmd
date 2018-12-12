@@ -46,11 +46,11 @@ if (rmdVars$includeMFWebLinks != "none")
                                  rmdVars$gInfo[grp, "mzs"]))
     })
 }
-if (!is.null(rmdVars$formConsensus) && "formulas" %in% rmdVars$reportPlots)
+if (!is.null(rmdVars$formulas) && "formulas" %in% rmdVars$reportPlots)
 {
-    formTable <- formulaTable(rmdVars$formConsensus)[byMSMS == TRUE]
-    formFGroups <- unique(formTable$group)
-    formFGroups <- formFGroups[formFGroups %in% rmdVars$groupNames]
+    formFGroups <- groupNames(rmdVars$formulas)
+    formFGroups <- formFGroups[sapply(formFGroups, function(grp) any(rmdVars$formulas[[grp]]$byMSMS))]
+    formFGroups <- intersect(formFGroups, rmdVars$groupNames)
 }
 if (!is.null(rmdVars$components))
 {
@@ -162,7 +162,7 @@ for (grpi in seq_along(plotGroups))
         {
             ret <- file.path(plotPath, sprintf("compspec_%d_%d.png", grpi, compi))
             makePlot(ret, 7, 4.5, bg = NA, plotSpec(rmdVars$compounds, compi,  plotGroups[grpi],
-                                                    rmdVars$MSPeakLists, rmdVars$formConsensus,
+                                                    rmdVars$MSPeakLists, rmdVars$formulas,
                                                     FALSE))
             return(ret)
         }))
@@ -193,11 +193,11 @@ for (grpi in seq_along(plotGroups))
     
     if (plotGroups[grpi] %in% formFGroups)
     {
-        precursors <- unique(formTable[group == plotGroups[grpi], formula])
+        precursors <- unique(rmdVars$formulas[[plotGroups[grpi]]][byMSMS == TRUE, formula])
         allPlots <- c(allPlots, sapply(precursors, function(prec)
         {
             ret <- file.path(plotPath, sprintf("formspec_%d_%s.png", grpi, prec))
-            makePlot(ret, 6, 4.5, plotSpec(rmdVars$formConsensus, prec, plotGroups[grpi], rmdVars$MSPeakLists))
+            makePlot(ret, 6, 4.5, plotSpec(rmdVars$formulas, prec, plotGroups[grpi], MSPeakLists = rmdVars$MSPeakLists))
             return(ret)
         }))
     }
@@ -290,14 +290,14 @@ DT::datatable(compoundsDT, options = list(scrollX = TRUE, scrollY = "600px", def
 formulasDT <- rbindlist(lapply(formFGroups, function(grp)
 {
     grpi <- which(plotGroups == grp)
-    precursors <- unique(formTable[group == grp, formula])
+    precursors <- unique(rmdVars$formulas[[grp]][byMSMS == TRUE, formula])
     
     sppaths <- file.path(plotPath, sprintf("formspec_%d_%s.png", grpi, precursors))
     if (rmdVars$selfContained)
         sppaths <- sapply(sppaths, knitr::image_uri)
 
     infoTexts <- sapply(precursors,
-                        function(prec) paste0(getFormInfoList(rmdVars$formConsensus, prec, grp),
+                        function(prec) paste0(getFormInfoList(rmdVars$formulas[[grp]], prec),
                                                               collapse = "<br>"))
         
     ret <- data.table(group = grpi, spectrum = imgTags(sppaths), info = infoTexts)

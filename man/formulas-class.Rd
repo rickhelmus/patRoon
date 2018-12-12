@@ -10,8 +10,10 @@
 \alias{groupNames,formulas-method}
 \alias{length,formulas-method}
 \alias{show,formulas-method}
-\alias{[,formulas,ANY,ANY,missing-method}
+\alias{[,formulas,ANY,missing,missing-method}
 \alias{[[,formulas,ANY,ANY-method}
+\alias{$,formulas-method}
+\alias{plotSpec,formulas-method}
 \alias{consensus,formulas-method}
 \title{Formula lists class}
 \usage{
@@ -27,67 +29,54 @@
 
 \S4method{show}{formulas}(object)
 
-\S4method{[}{formulas,ANY,ANY,missing}(x, i, j, ..., drop = TRUE)
+\S4method{[}{formulas,ANY,missing,missing}(x, i, j, ..., drop = TRUE)
 
 \S4method{[[}{formulas,ANY,ANY}(x, i, j)
 
-\S4method{consensus}{formulas}(obj, ..., fGroups,
-  formAnaThreshold = 0.75, formListThreshold = 0, maxFormulas = 10,
-  maxFragFormulas = 10, minIntensity = NULL, maxIntensity = NULL,
-  minPreferredFormulas = 1, minPreferredIntensity = NULL,
-  elements = c(), fragElements = c())
+\S4method{$}{formulas}(x, name)
+
+\S4method{plotSpec}{formulas}(obj, precursor, groupName, analysis = NULL,
+  MSPeakLists, useGGPlot2 = FALSE)
+
+\S4method{consensus}{formulas}(obj, ..., formThreshold = 0)
 }
 \arguments{
 \item{obj, x, object, formulas}{The \code{formulas} object.}
 
 \item{i, j}{A numeric or character value which is used to select analyses/feature groups by
 their index or name, respectively (for the order/names see \code{analyses()/groupNames()}).\cr\cr For \code{[}: Can also be logical to perform logical selection
-(similar to regular vectors). If missing all analyses/feature groups are selected.\cr\cr For \code{[[}: should be a skalar value.}
+(similar to regular vectors). If missing all analyses/feature groups are selected.\cr\cr For \code{[[}: should be a skalar value. If \code{j} is not specified, \code{i} selects by feature groups instead.}
 
 \item{\dots}{Any further \code{formulas} objects on top of the object given
-for the \code{obj} parameter to which a consensus should be generated.
-Using the \dots parameter formulae from various
-\link[=formula-generation]{formula generators} can be merged.}
+for the \code{obj} parameter to which a consensus should be generated.}
 
 \item{drop}{ignored.}
 
-\item{fGroups}{The \code{\link{featureGroups}} object that was used when
-formulae were generated.}
+\item{precursor}{The formula of the precursor (in ionic form, \emph{i.e.} as
+detected by the MS).}
 
-\item{formAnaThreshold, formListThreshold}{Fractional minimum amount (0-1) to
-which a generated formula should be present in all the analyses
-(\code{formAnaThreshold}) or in all given formula lists
+\item{groupName}{The name of the feature group to which the candidate
+belongs.}
+
+\item{analysis}{A \code{character} specifying the analysis for which the
+annotated spectrum should be plotted. If \code{NULL} then annotation
+results for the complete feature group will be plotted.}
+
+\item{MSPeakLists}{The \code{\link{MSPeakLists}} object that was used to
+generate the candidate}
+
+\item{useGGPlot2}{If \code{TRUE} then \pkg{\link{ggplot2}} is used for
+plotting, otherwise base plot used. For \code{plotSpec}, \code{ggplot2}
+allows nicely repelled text for annotation. However, base plot is generally
+faster.}
+
+\item{formThreshold}{Fractional minimum amount (0-1) to
+which a generated precursor formula should be present in all given formula objects
 (\code{formListThreshold}) containing the related feature group. For
 instance, a value of \samp{0.5} for \code{formAnaThreshold} means that a
 particular formula should be present in at least \samp{50\%} of all
 analyses containing the feature group that was used to generate the
 formula.}
-
-\item{maxFormulas, maxFragFormulas}{Maximum amount of candidate formulae (or
-fragment formulae) per feature group.}
-
-\item{minIntensity}{Results from features below this intensity will be
-excluded.}
-
-\item{maxIntensity}{Results from features above this intensity will be
-excluded.}
-
-\item{minPreferredFormulas}{Preferred minimum amount of candidate formulae
-per feature group. See \code{minPreferredIntensity}.}
-
-\item{minPreferredIntensity}{Minimum preferred intensity of formulae
-candidates per feature group. Results from features below this intensity
-will be removed unless the total count of formulae of the related feature
-group is below \code{minPreferredFormulas}. When a higher
-\code{minIntensity} is given this parameter has no effect.}
-
-\item{elements}{An optional character vector containing elements for which
-the total count present in each formula should be calculated. For instance,
-\code{c("C", "H")} will count all carbon and hydrogen atoms present in each
-formula.}
-
-\item{fragElements}{Same as \code{elements} parameter, but for MS/MS
-formulae.}
 }
 \value{
 \code{formulas} returns a \code{list} containing for each analysis
@@ -95,7 +84,11 @@ formulae.}
   generated formulae and other data such as candidate scoring and MS/MS
   fragments.
 
-\code{consensus} returns a \code{\link{formulaConsensus}} object.
+\code{plotSpec} will return a \code{\link[=ggplot2]{ggplot object}}
+  if \code{useGGPlot2} is \code{TRUE}.
+
+\code{consensus} returns a \code{formulas} object that is produced
+  by merging multiple \code{formulas} objects.
 }
 \description{
 Contains data of generated chemical formulae for given feature groups.
@@ -121,9 +114,17 @@ feature groups for which data is present in this object.
 
 \item \code{show}: Show summary information for this object.
 
-\item \code{[}: Subset on analyses/feature groups.
+\item \code{[}: Subset on feature groups.
 
-\item \code{[[}: Extract a formula table from a specified analysis/feature group.
+\item \code{[[}: Extract a formula table. If both arguments (\code{i} and
+\code{j}) are specified, the feature specific formula table belonging to
+the analysis (\code{i})/feature group (\code{j}) is returned. Otherwise the
+formula table for the feature group specified by \code{j} is returned.
+
+\item \code{$}: Extract a formula table for a feature group.
+
+\item \code{plotSpec}: Plots an annotated spectrum for a given candidate
+formula of a feature or feature group.
 
 \item \code{consensus}: Generates a consensus and other summarizing data for
 formulae of feature groups that are present in multiple analyses.
@@ -139,6 +140,3 @@ method for access.}
 the \code{algorithm} method for access.}
 }}
 
-\seealso{
-\code{\link{formulaConsensus}}
-}

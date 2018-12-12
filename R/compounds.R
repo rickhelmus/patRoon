@@ -12,7 +12,7 @@ NULL
 #'   method for access.
 #' @slot algorithm The algorithm that was used for generation of compounds. Use
 #'   the \code{algorithm} method for access.
-#' @param formConsensus The \code{\link{formulaConsensus}} object that should be
+#' @param formulas The \code{\link{formulas}} object that should be
 #'   used for scoring/annotation. For \code{plotSpec}: set to \code{NULL} to
 #'   ignore.
 #'
@@ -194,7 +194,7 @@ setMethod("filter", "compounds", function(obj, minExplainedPeaks = NULL, minScor
 
 #' @describeIn compounds Provides compound scoring data that is based on the
 #'   presence of candidate formulae being present in a given
-#'   \code{\link{formulaConsensus}} object. Matched precursor formulae yield one
+#'   \code{\link{formulas}} object. Matched precursor formulae yield one
 #'   point, whereas matched MS/MS fragments yield 0.5 point each.
 #'
 #' @param updateScore If set to \code{TRUE} then the \code{score} column is
@@ -209,11 +209,11 @@ setMethod("filter", "compounds", function(obj, minExplainedPeaks = NULL, minScor
 #'
 #' @aliases addFormulaScoring
 #' @export
-setMethod("addFormulaScoring", "compounds", function(compounds, formConsensus, updateScore,
+setMethod("addFormulaScoring", "compounds", function(compounds, formulas, updateScore,
                                                      formulaScoreWeight)
 {
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertClass(formConsensus, "formulaConsensus", add = ac)
+    checkmate::assertClass(formulas, "formulas", add = ac)
     checkmate::assertFlag(updateScore, add = ac)
     checkmate::assertNumber(formulaScoreWeight, lower = 0, finite = TRUE, add = ac)
     checkmate::reportAssertions(ac)
@@ -221,7 +221,6 @@ setMethod("addFormulaScoring", "compounds", function(compounds, formConsensus, u
     if (length(compounds) == 0)
         return(compounds)
     
-    fTable <- formulaTable(formConsensus)
     cTable <- compoundTable(compounds)
     cGNames <- names(cTable)
 
@@ -247,14 +246,14 @@ setMethod("addFormulaScoring", "compounds", function(compounds, formConsensus, u
 
     cTable <- lapply(seq_along(cTable), function(grpi)
     {
-        forms <- fTable[group == cGNames[grpi]]
+        forms <- formulas[[cGNames[grpi]]]
 
         ct <- copy(cTable[[grpi]])
 
         if (nrow(ct) == 0)
             return(ct)
 
-        if (nrow(forms) == 0)
+        if (length(forms) == 0 || nrow(forms) == 0)
             ct[, formulaScore := 0]
         else
             ct[, formulaScore := calculateScores(ct, forms)]
@@ -496,14 +495,14 @@ setMethod("plotScores", "compounds", function(obj, index, groupName, normalizeSc
 #'   spectrum.
 #'
 #' @export
-setMethod("plotSpec", "compounds", function(obj, index, groupName, MSPeakLists, formConsensus = NULL,
+setMethod("plotSpec", "compounds", function(obj, index, groupName, MSPeakLists, formulas = NULL,
                                             plotStruct = TRUE, useGGPlot2 = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertCount(index, positive = TRUE, add = ac)
     checkmate::assertString(groupName, min.chars = 1, add = ac)
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
-    checkmate::assertClass(formConsensus, "formulaConsensus", null.ok = TRUE, add = ac)
+    checkmate::assertClass(formulas, "formulas", null.ok = TRUE, add = ac)
     aapply(checkmate::assertFlag, . ~plotStruct + useGGPlot2, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
 
@@ -512,25 +511,27 @@ setMethod("plotSpec", "compounds", function(obj, index, groupName, MSPeakLists, 
     if (is.null(compTable) || nrow(compTable) == 0)
         return(NULL)
 
-    if (!is.null(formConsensus))
-        fTable <- formulaTable(formConsensus)[group == groupName & byMSMS == TRUE]
+    if (!is.null(formulas) && groupName %in% groupNames(formulas))
+        fTable <- formulas[[groupName]][byMSMS == TRUE]
+    else
+        fTable <- NULL
 
     compr <- compTable[index, ]
     spec <- MSPeakLists[[groupName]][["MSMS"]]
 
     # merge formulas
     fi <- compr$fragInfo[[1]]
-    if (!is.null(formConsensus))
+    if (!is.null(fTable) && nrow(fTable) > 0)
     {
         ft <- fTable[frag_formula %in% fi$formula]
         if (is.null(fi))
         {
             fi <- ft
-            fi[, mergedBy := list(list(algorithm(formConsensus)))]
+            fi[, mergedBy := list(list(algorithm(formulas)))]
         }
         else
             fi <- mergeFragInfo(fi, getFragmentInfoFromForms(spec, ft),
-                                algorithm(obj), algorithm(formConsensus), TRUE)
+                                algorithm(obj), algorithm(formulas), TRUE)
     }
 
     if (plotStruct)

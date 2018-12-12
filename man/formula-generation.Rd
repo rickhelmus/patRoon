@@ -14,18 +14,20 @@
 \S4method{generateFormulas}{featureGroups}(fGroups, algorithm, ...)
 
 generateFormulasDA(fGroups, precursorMzSearchWindow = 0.002,
-  MSMode = "both")
+  MSMode = "both", formFeatThreshold = 0.75)
 
 generateFormulasGenForm(fGroups, MSPeakLists, maxMzDev = 5,
   adduct = "M+H", elements = "CHNOP", hetero = TRUE,
-  MSMode = "both", extraOpts = NULL,
+  extraOpts = NULL, calculateFeatures = TRUE,
+  formFeatThreshold = 0.75, MSMode = "both",
   maxProcAmount = getOption("patRoon.maxProcAmount"),
   maxCmdsPerProc = 25)
 
 generateFormulasSirius(fGroups, MSPeakLists, maxMzDev = 5,
   adduct = "[M+H]+", elements = "CHNOP", profile = "qtof",
-  database = NULL, noise = NULL, logPath = file.path("log",
-  "sirius"), maxProcAmount = getOption("patRoon.maxProcAmount"))
+  database = NULL, noise = NULL, calculateFeatures = TRUE,
+  formFeatThreshold = 0.75, logPath = file.path("log", "sirius"),
+  maxProcAmount = getOption("patRoon.maxProcAmount"))
 }
 \arguments{
 \item{fGroups}{\code{\link{featureGroups}} object for which formulae should
@@ -175,8 +177,7 @@ used to further improve formula assignment.
   \insertRef{Bcker2008}{patRoon}
 }
 \seealso{
-\code{\link{formulas-class}} and
-  \code{\link{formulaConsensus-class}}. The
+\code{\link{formulas-class}}. The
   \href{https://www.researchgate.net/publication/307964728_MOLGEN-MSMS_Software_User_Manual}{GenForm
   manual} (formerly known as MOLGEN-MSMS).
 }

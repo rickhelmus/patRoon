@@ -13,30 +13,27 @@
 \usage{
 \S4method{reportCSV}{featureGroups}(fGroups, path = "report",
   reportFGroupsAsRows = TRUE, reportFGroupsAnalysisInfo = TRUE,
-  reportFGroupsRetMz = TRUE, reportFeatures = FALSE,
-  formConsensus = NULL, compounds = NULL,
-  compoundNormalizeScores = "max", compoundExclNormScores = "score",
-  compsCluster = NULL, components = NULL, retMin = TRUE,
-  clearPath = FALSE)
+  reportFGroupsRetMz = TRUE, reportFeatures = FALSE, formulas = NULL,
+  compounds = NULL, compoundNormalizeScores = "max",
+  compoundExclNormScores = "score", compsCluster = NULL,
+  components = NULL, retMin = TRUE, clearPath = FALSE)
 
 \S4method{reportPDF}{featureGroups}(fGroups, path = "report",
-  reportFGroups = TRUE, formConsensus = NULL,
-  reportFormulaSpectra = TRUE, compounds = NULL,
-  compoundNormalizeScores = "max", compoundExclNormScores = "score",
-  compsCluster = NULL, components = NULL, MSPeakLists = NULL,
-  retMin = TRUE, EICGrid = c(2, 1), EICRtWindow = 20,
-  EICMzWindow = 0.005, EICTopMost = NULL, EICOnlyPresent = TRUE,
-  clearPath = FALSE)
+  reportFGroups = TRUE, formulas = NULL, reportFormulaSpectra = TRUE,
+  compounds = NULL, compoundNormalizeScores = "max",
+  compoundExclNormScores = "score", compsCluster = NULL,
+  components = NULL, MSPeakLists = NULL, retMin = TRUE,
+  EICGrid = c(2, 1), EICRtWindow = 20, EICMzWindow = 0.005,
+  EICTopMost = NULL, EICOnlyPresent = TRUE, clearPath = FALSE)
 
 \S4method{reportMD}{featureGroups}(fGroups, path = "report",
   reportPlots = c("chord", "venn", "upset", "eics", "formulas"),
-  formConsensus = NULL, compounds = NULL,
-  compoundNormalizeScores = "max", compoundExclNormScores = "score",
-  compsCluster = NULL, includeMFWebLinks = "compounds",
-  components = NULL, interactiveHeat = FALSE, MSPeakLists = NULL,
-  retMin = TRUE, EICRtWindow = 20, EICMzWindow = 0.005,
-  EICTopMost = NULL, EICOnlyPresent = TRUE, selfContained = TRUE,
-  optimizePng = FALSE,
+  formulas = NULL, compounds = NULL, compoundNormalizeScores = "max",
+  compoundExclNormScores = "score", compsCluster = NULL,
+  includeMFWebLinks = "compounds", components = NULL,
+  interactiveHeat = FALSE, MSPeakLists = NULL, retMin = TRUE,
+  EICRtWindow = 20, EICMzWindow = 0.005, EICTopMost = NULL,
+  EICOnlyPresent = TRUE, selfContained = TRUE, optimizePng = FALSE,
   maxProcAmount = getOption("patRoon.maxProcAmount"),
   clearPath = FALSE, openReport = TRUE)
 }
@@ -60,8 +57,8 @@ and \emph{m/z}) within the reported feature groups table \file{.csv} file.}
 \file{.csv} file will be generated with information about its detected
 features.}
 
-\item{formConsensus, compounds, compsCluster, components}{Further objects
-(\code{\link{formulaConsensus}}, \code{\link{compounds}},
+\item{formulas, compounds, compsCluster, components}{Further objects
+(\code{\link{formulas}}, \code{\link{compounds}},
 \code{\link{compoundsCluster}}, \code{\link{components}}) that should be
 reported. Specify \code{NULL} to skip reporting a particular object.}
 
@@ -86,7 +83,7 @@ by the \code{compoundExclNormScores} argument.}
 
 \item{reportFormulaSpectra}{If \code{TRUE} then explained MS/MS spectra (if
 available) for candidate formulae will be reported. Specifying
-\code{formConsensus} and setting this argument to \code{FALSE} still allows
+\code{formulas} and setting this argument to \code{FALSE} still allows
 further annotation of compound MS/MS spectra.}
 
 \item{MSPeakLists}{A \code{\link{MSPeakLists}} object that is

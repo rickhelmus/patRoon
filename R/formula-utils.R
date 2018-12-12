@@ -248,7 +248,7 @@ getFormInfoList <- function(formTable, precursor)
     {
         # get all columns matching value of 'col' as prefix: merged names after
         # consensus will have format 'col-X'.
-        cols <- grep(paste0("^", col), names(precInfo))
+        cols <- grep(paste0("^", col), names(precInfo), value = TRUE)
         
         ret <- character()
         for (cl in cols)

@@ -15,6 +15,7 @@
 \alias{getFeatures}
 \alias{getMCS}
 \alias{groupNames}
+\alias{makeTable}
 \alias{plotChord}
 \alias{plotEIC}
 \alias{plotInt}
@@ -52,6 +53,8 @@ getFeatures(obj)
 getMCS(obj, ...)
 
 groupNames(obj)
+
+makeTable(obj, ...)
 
 plotChord(obj, addSelfLinks = FALSE, addRetMzPlots = TRUE, ...)
 
@@ -243,6 +246,17 @@ please refer to the linked method documentation for each generic.
 
 \itemize{
     \item Methods are defined for: \code{\link[=groupNames,MSPeakLists-method]{MSPeakLists}}, \code{\link[=groupNames,components-method]{components}}, \code{\link[=groupNames,compounds-method]{compounds}}, \code{\link[=groupNames,compoundsCluster-method]{compoundsCluster}}, \code{\link[=groupNames,featureGroups-method]{featureGroups}}, \code{\link[=groupNames,formulaConsensus-method]{formulaConsensus}}, \code{\link[=groupNames,formulas-method]{formulas}}.
+}
+
+\code{makeTable} converts an object into a table (\code{\link{data.table}}) with extra useful information.
+
+
+
+
+
+
+\itemize{
+    \item Methods are defined for: \code{\link[=makeTable,formulas-method]{formulas}}.
 }
 
 \code{plotChord} plots a Chord diagram to assess overlapping data.

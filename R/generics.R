@@ -216,6 +216,11 @@ setGeneric("getMCS", function(obj, ...) standardGeneric("getMCS"))
 #' @template generics
 setGeneric("groupNames", function(obj) standardGeneric("groupNames"))
 
+#' @templateVar func makeTable
+#' @templateVar desc converts an object into a table (\code{\link{data.table}}) with extra useful information.
+#' @template generics
+setGeneric("makeTable", function(obj, ...) standardGeneric("makeTable"))
+
 #' @templateVar func plotChord
 #' @templateVar desc plots a Chord diagram to assess overlapping data.
 #' @template generics

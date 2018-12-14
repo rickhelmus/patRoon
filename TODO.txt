@@ -57,6 +57,7 @@ Release:
     - genform(/DA?): also include precursor in fragments? or omit from SIRIUS?
     - set mergedBy in getFragmentInfoFromForms()?
     - byMSMS filter
+    - more options to makeTable? (element ratios? see Olaf's work)
     - docs
         - move generics in to right place, set aliases
         - featureFormulas() name?
@@ -65,5 +66,6 @@ Release:
         - $ method
         - calculateFeatures TRUE/FALSE
         - verify group count for consensus
+        - makeTable: check elements?
 - plotSpec(): mark precursor?
 - look into supervisors for processx

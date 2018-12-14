@@ -31,7 +31,7 @@ getElements <- function(formula, elements)
         fl <- splitFormulaToList(f)
         df <- as.data.frame(t(as.data.frame(fl)))
         df[setdiff(elements, names(fl))] <- 0
-        return(df[, elements, drop=F])
+        return(df[, elements, drop = FALSE])
     }, simplify = F, USE.NAMES = F)
 
     ret <- as.data.frame(do.call(rbind, ret))
@@ -132,68 +132,68 @@ generateFormConsensusForGroup <- function(formAnaList, formThreshold)
     # merge all together
     formTable <- rbindlist(formAnaList, fill = TRUE, idcol = "analysis")
     haveMSMS <- "frag_formula" %in% colnames(formTable)
-    
+
     if (nrow(formTable) > 0)
     {
         # number of analyses searched for formulas per group
         anaCount <- length(formAnaList)
-        
+
         byCols <- "formula"
         if (haveMSMS)
             byCols <- c(byCols, "frag_formula")
-        
+
         # Determine coverage of formulas within analyses
         formTable[, anaCoverage := .N / anaCount, by = byCols]
         if (formThreshold > 0)
             formTable <- formTable[anaCoverage >= formThreshold] # Apply coverage filter
-        
+
         # Remove duplicate entries (do this after coverage!)
         formTable <- unique(formTable, by = byCols)
-        
+
         formTable <- rankFormulaTable(formTable)
 
         formTable[, "analysis" := NULL]
     }
-    
+
     return(formTable)
 }
 
 generateGroupFormulasByConsensus <- function(formList, formThreshold)
 {
     cat("Generating feature group formula consensus...\n")
-    
+
     hash <- makeHash(formList, formThreshold)
     formCons <- loadCacheData("formCons", hash)
-    
-    # figure out feature groups 
+
+    # figure out feature groups
     gNames <- unique(unlist(sapply(formList, names, simplify = FALSE), use.names = FALSE))
     gCount <- length(gNames)
-    
+
     if (gCount == 0)
         formCons <- list()
     else if (is.null(formCons))
     {
         prog <- txtProgressBar(0, gCount, style = 3)
-        
+
         formCons <- lapply(seq_len(gCount), function(grpi)
         {
             fAnaList <- lapply(formList, "[[", gNames[[grpi]])
             fAnaList <- fAnaList[!sapply(fAnaList, is.null)]
-            
+
             ret <- generateFormConsensusForGroup(fAnaList, formThreshold)
             setTxtProgressBar(prog, grpi)
             return(ret)
         })
         names(formCons) <- gNames
-        
+
         setTxtProgressBar(prog, gCount)
         close(prog)
-        
+
         saveCacheData("formCons", formCons, hash)
     }
     else
         cat("Done!\n")
-    
+
     return(formCons)
 }
 
@@ -249,7 +249,7 @@ getFormInfoList <- function(formTable, precursor)
         # get all columns matching value of 'col' as prefix: merged names after
         # consensus will have format 'col-X'.
         cols <- grep(paste0("^", col), names(precInfo), value = TRUE)
-        
+
         ret <- character()
         for (cl in cols)
         {
@@ -260,12 +260,12 @@ getFormInfoList <- function(formTable, precursor)
                 ret <- c(ret, sprintf(fm, precInfo[[cl]]))
             }
         }
-        
+
         return(c(curText, ret))
     }
-    
+
     ret <- character()
-    
+
     ret <- addValText(ret, "%s", "formula")
     ret <- addValText(ret, "%s", "neutral_formula")
     ret <- addValText(ret, "%.2f ppm", "error")

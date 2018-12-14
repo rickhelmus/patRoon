@@ -14,7 +14,7 @@ NULL
 #'   the \code{algorithm} method for access.
 #'
 #' @param obj,x,object,formulas The \code{formulas} object.
-#' 
+#'
 #' @templateVar seli analyses
 #' @templateVar selOrderi analyses()
 #' @templateVar selj feature groups
@@ -74,7 +74,7 @@ setMethod("show", "formulas", function(object)
     printf("  - Total formula count: %d\n", sum(unlist(ftcounts)))
     printf("  - Average formulas per analysis: %.1f\n", ma)
     printf("  - Average formulas per feature: %.1f\n", mft)
-    
+
     gft <- formulaTable(object)
     mfg <- if (length(gft) > 0) sapply(gft, nrow) else 0
     printf("Formulas assigned to feature groups:\n")
@@ -98,10 +98,10 @@ setMethod("[", c("formulas", "ANY", "missing", "missing"), function(x, i, j, ...
         x@featureFormulas <- sapply(x@eatureFormulas, function(a) pruneList(a[i]),
                                     simplify = FALSE)
         x@eatureFormulas <- pruneList(x@eatureFormulas, TRUE)
-        
+
         x@formulas <- pruneList(x@formulas[i], TRUE)
     }
-    
+
     return(x)
 })
 
@@ -115,25 +115,25 @@ setMethod("[[", c("formulas", "ANY", "ANY"), function(x, i, j)
     assertExtractArg(i)
     if (!missing(j))
         assertExtractArg(j)
-    
+
     if (!missing(j))
     {
         # both arguments specified, return feature formula table
-        
+
         if (length(x@featureFormulas) == 0)
             stop("This object does not contain formulas for features.")
-        
+
         if (!is.character(i))
             i <- analyses(x)[i]
-        
+
         if (!is.character(j))
             j <- groupNames(x)[j]
-        
+
         return(x@featureFormulas[[c(i, j)]])
     }
-    
+
     # else return regular feature group formulas
-    
+
     if (!is.character(i))
         i <- groupNames(x)[i]
     return(x@formulas[[i]])
@@ -144,6 +144,47 @@ setMethod("[[", c("formulas", "ANY", "ANY"), function(x, i, j)
 setMethod("$", "formulas", function(x, name)
 {
     eval(substitute(x@formulas[[NAME_ARG]], list(NAME_ARG = name)))
+})
+
+#' @describeIn formulas Generates a table with all candidate formulae for each
+#'   feature group and other information such as element counts.
+#'
+#' @param fGroups The \code{\link{featureGroups}} object that was used to
+#'   generate this \code{formulas} object.
+#' @param elements,fragElements A \code{character} vector with elements that should be
+#'   counted for each MS(/MS) formula candidate. For instance, \code{c("C",
+#'   "H")} adds columns for both carbon and hydrogen amounts in each formula.
+#'   Set to \code{NULL} to not count any elements.
+#'
+#' @return \code{makeTable} returns a \code{\link{data.table}}.
+#'
+#' @export
+setMethod("makeTable", "formulas", function(obj, fGroups, elements = NULL, fragElements = NULL)
+{
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertCharacter(elements, min.chars = 1, any.missing = FALSE, null.ok = TRUE, add = ac)
+    checkmate::assertCharacter(fragElements, min.chars = 1, any.missing = FALSE, null.ok = TRUE, add = ac)
+    checkmate::reportAssertions(ac)
+
+    gInfo <- groupInfo(fGroups)
+
+    ret <- rbindlist(formulaTable(obj), fill = TRUE, idcol = "group")
+    ret[, c("ret", "mz") := gInfo[group, ]]
+
+    if (!is.null(elements) && length(elements) > 0)
+    {
+        # Retrieve element lists from formulas
+        el <- getElements(ret$formula, elements)
+        ret[, names(el) := el]
+    }
+    if (!is.null(fragElements) && !is.null(ret[["frag_formula"]]) &&
+        length(fragElements) > 0)
+    {
+        el <- getElements(ret$frag_formula, fragElements)
+        ret[, (paste0("frag_", names(el))) := el]
+    }
+
+    return(ret)
 })
 
 #' @describeIn formulas Plots an annotated spectrum for a given candidate
@@ -172,7 +213,7 @@ setMethod("plotSpec", "formulas", function(obj, precursor, groupName, analysis =
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
     checkmate::assertFlag(useGGPlot2, add = ac)
     checkmate::reportAssertions(ac)
-    
+
     if (!is.null(analysis))
     {
         formTable <- obj[[analysis, groupName]]
@@ -183,17 +224,17 @@ setMethod("plotSpec", "formulas", function(obj, precursor, groupName, analysis =
         formTable <- obj[[groupName]]
         spec <- MSPeakLists[[groupName]][["MSMS"]]
     }
-    
+
     formTable <- formTable[byMSMS == TRUE & formula == precursor]
-    
+
     if (nrow(formTable) == 0 || is.null(spec))
         return(NULL)
-    
+
     fi <- getFragmentInfoFromForms(spec, formTable)
-    
+
     if (useGGPlot2)
         return(makeMSPlotGG(spec, fi) + ggtitle(precursor))
-    
+
     makeMSPlot(spec, fi, main = precursor)
 })
 
@@ -217,7 +258,7 @@ setMethod("plotSpec", "formulas", function(obj, precursor, groupName, analysis =
 setMethod("consensus", "formulas", function(obj, ..., formThreshold = 0)
 {
     allFormulas <- c(list(obj), list(...))
-    
+
     ac <- checkmate::makeAssertCollection()
     checkmate::assertList(allFormulas, types = "formulas", min.len = 2, any.missing = FALSE,
                           unique = TRUE, .var.name = "...", add = ac)
@@ -227,7 +268,7 @@ setMethod("consensus", "formulas", function(obj, ..., formThreshold = 0)
     allFormulas <- allFormulas[lengths(allFormulas) > 0]
     if (length(allFormulas) < 2)
         stop("Need at least two non-empty formulas objects")
-    
+
     allFormNames <- sapply(allFormulas, algorithm)
     allFormNames <- make.unique(allFormNames)
 
@@ -239,24 +280,24 @@ setMethod("consensus", "formulas", function(obj, ..., formThreshold = 0)
             setnames(ret, paste0(names(ret), "-", allFormNames[fi]))
             return(ret)
         }))
-        
+
     }, simplify = FALSE)
-    
+
     # UNDONE: remove old style columns?
     uniqueCols <- c("neutral_formula", "formula_mz", "error", "dbe", "frag_mz", "frag_neutral_formula",
                     "frag_formula_mz", "frag_error", "neutral_loss", "frag_dbe", "min_intensity", "max_intensity",
                     "ana_min_intensity", "ana_max_intensity")
-    
+
     consFormulaList <- allFormulasLists[[1]]
     leftName <- allFormNames[1]
     for (righti in seq(2, length(allFormulasLists)))
     {
         rightName <- allFormNames[righti]
-        
+
         printf("Merging %s with %s... ", paste0(allFormNames[seq_len(righti-1)], collapse = ","), rightName)
-        
+
         rightFList <- allFormulasLists[[righti]]
-        
+
         for (grp in union(names(consFormulaList), names(rightFList)))
         {
             if (is.null(rightFList[[grp]]))
@@ -264,7 +305,7 @@ setMethod("consensus", "formulas", function(obj, ..., formThreshold = 0)
             else if (is.null(consFormulaList[[grp]])) # not yet present
             {
                 mTable <- rightFList[[grp]]
-                
+
                 # rename columns that should be unique from right to left
                 unCols <- c(uniqueCols, c("formula", "byMSMS", "frag_formula"))
                 unCols <- unCols[sapply(unCols, function(uc) !is.null(mTable[[paste0(uc, "-", rightName)]]))]
@@ -274,14 +315,14 @@ setMethod("consensus", "formulas", function(obj, ..., formThreshold = 0)
             {
                 haveMSMS <- paste0("frag_formula-", leftName) %in% names(consFormulaList[[grp]]) &&
                             paste0("frag_formula-", rightName) %in% names(rightFList[[grp]])
-                
+
                 mergeCols <- "formula"
                 if (haveMSMS)
                     mergeCols <- c(mergeCols, "byMSMS", "frag_formula")
                 mTable <- merge(consFormulaList[[grp]], rightFList[[grp]], all = TRUE,
                                 by.x = paste0(mergeCols, "-", leftName),
                                 by.y = paste0(mergeCols, "-", rightName))
-                
+
                 # remove duplicate columns that shouldn't
                 for (col in uniqueCols)
                 {
@@ -299,15 +340,15 @@ setMethod("consensus", "formulas", function(obj, ..., formThreshold = 0)
                     }
                 }
             }
-            
+
             consFormulaList[[grp]] <- mTable
         }
-        
+
         cat("Done!\n")
     }
-    
+
     printf("Determining coverage... ")
-    
+
     for (grpi in seq_along(consFormulaList))
     {
         # fix up de-duplicated column names
@@ -317,13 +358,13 @@ setMethod("consensus", "formulas", function(obj, ..., formThreshold = 0)
         leftCols <- leftCols[leftCols %in% names(consFormulaList[[grpi]])]
         if (length(leftCols) > 0)
             setnames(consFormulaList[[grpi]], leftCols, deDupCols)
-        
+
         # match all that has a dash inbetween
         mergedCols <- grep(".+\\-.+", names(consFormulaList[[grpi]]), value = TRUE)
-        
+
         # figure out what was merged (i.e. name after dash)
         mergedColsWhat <- sub(".+\\-", "", mergedCols)
-        
+
         if (length(unique(mergedColsWhat)) < 2) # nothing was merged
             consFormulaList[[grpi]][, coverage := 1 / length(allFormulas)]
         else
@@ -334,20 +375,20 @@ setMethod("consensus", "formulas", function(obj, ..., formThreshold = 0)
                 # object should at least have one non-NA value
                 notNAs <- sapply(mergedCols, function(mc) !is.na(consFormulaList[[grpi]][[mc]][r]))
                 mergedNotNACount <- length(unique(mergedColsWhat[notNAs]))
-                
+
                 set(consFormulaList[[grpi]], r, "coverage", mergedNotNACount / length(allFormulas))
             }
         }
-        
+
         if (formThreshold > 0)
             consFormulaList[[grpi]] <- consFormulaList[[grpi]][coverage >= formThreshold]
-        
+
         # setcolorder(consFormulaList[[grpi]], formConsensusColOrder(consFormulaList[[grpi]]))
         consFormulaList[[grpi]] <- rankFormulaTable(consFormulaList[[grpi]])
     }
-    
+
     cat("Done!\n")
-        
+
     return(formulas(formulas = consFormulaList, featureFormulas = list(),
                     algorithm = paste0(unique(sapply(allFormulas, algorithm)), collapse = ",")))
 })
@@ -366,14 +407,14 @@ setMethod("consensus", "formulas", function(obj, ..., formThreshold = 0)
 #'   the \code{algorithm} method for access.
 #'
 #' @param obj,x,object The \code{formulaConsensus} object.
-#' 
+#'
 #' @templateVar seli feature groups
 #' @templateVar selOrderi groupNames()
 #' @templateVar dollarOpName feature group
 #' @template sub_op-args
-#' 
+#'
 #' @seealso \code{\link{formulas}}
-#' 
+#'
 #' @export
 formulaConsensus <- setClass("formulaConsensus",
                              slots = c(formulas = "data.table", algorithm = "character"),
@@ -423,14 +464,14 @@ setMethod("[", c("formulaConsensus", "ANY", "missing", "missing"), function(x, i
 {
     if (!missing(i))
         assertSubsetArg(i)
-    
+
     if (!missing(i))
     {
         if (!is.character(i))
             i <- groupNames(x)[i]
         x@formulas <- x@formulas[group %in% i]
     }
-    
+
     return(x)
 })
 
@@ -458,7 +499,7 @@ setMethod("$", "formulaConsensus", function(x, name)
 #'   detected by the MS).
 #'
 #' @template plotSpec-args
-#' 
+#'
 #' @template useGGplot2
 #'
 #' @return \code{plotSpec} will return a \code{\link[=ggplot2]{ggplot object}}
@@ -473,7 +514,7 @@ setMethod("plotSpec", "formulaConsensus", function(obj, precursor, groupName, MS
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
     checkmate::assertFlag(useGGPlot2, add = ac)
     checkmate::reportAssertions(ac)
-    
+
     formTable <- formulaTable(obj)[group == groupName & byMSMS == TRUE & formula == precursor]
 
     if (nrow(formTable) == 0)

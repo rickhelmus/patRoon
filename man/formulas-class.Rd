@@ -13,6 +13,7 @@
 \alias{[,formulas,ANY,missing,missing-method}
 \alias{[[,formulas,ANY,ANY-method}
 \alias{$,formulas-method}
+\alias{makeTable,formulas-method}
 \alias{plotSpec,formulas-method}
 \alias{consensus,formulas-method}
 \title{Formula lists class}
@@ -35,6 +36,9 @@
 
 \S4method{$}{formulas}(x, name)
 
+\S4method{makeTable}{formulas}(obj, fGroups, elements = NULL,
+  fragElements = NULL)
+
 \S4method{plotSpec}{formulas}(obj, precursor, groupName, analysis = NULL,
   MSPeakLists, useGGPlot2 = FALSE)
 
@@ -51,6 +55,14 @@ their index or name, respectively (for the order/names see \code{analyses()/grou
 for the \code{obj} parameter to which a consensus should be generated.}
 
 \item{drop}{ignored.}
+
+\item{fGroups}{The \code{\link{featureGroups}} object that was used to
+generate this \code{formulas} object.}
+
+\item{elements, fragElements}{A \code{character} vector with elements that should be
+counted for each MS(/MS) formula candidate. For instance, \code{c("C",
+"H")} adds columns for both carbon and hydrogen amounts in each formula.
+Set to \code{NULL} to not count any elements.}
 
 \item{precursor}{The formula of the precursor (in ionic form, \emph{i.e.} as
 detected by the MS).}
@@ -83,6 +95,8 @@ formula.}
   and each feature group a \code{\link{data.table}} with an overview of all
   generated formulae and other data such as candidate scoring and MS/MS
   fragments.
+
+\code{makeTable} returns a \code{\link{data.table}}.
 
 \code{plotSpec} will return a \code{\link[=ggplot2]{ggplot object}}
   if \code{useGGPlot2} is \code{TRUE}.
@@ -122,6 +136,9 @@ the analysis (\code{i})/feature group (\code{j}) is returned. Otherwise the
 formula table for the feature group specified by \code{j} is returned.
 
 \item \code{$}: Extract a formula table for a feature group.
+
+\item \code{makeTable}: Generates a table with all candidate formulae for each
+feature group and other information such as element counts.
 
 \item \code{plotSpec}: Plots an annotated spectrum for a given candidate
 formula of a feature or feature group.

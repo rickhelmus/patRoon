@@ -6,6 +6,7 @@
     * Fixed: Reported fragment formulas from SIRIUS were incorrectly assumed to be charged. Charged fragment formulas are now calculated manually (the neutral form is charged in the `frag_neutral_formula` column). This also ensures correct comparison when a consensus is made.
     * `reportCSV()` now splits formulas for each feature group in separate CSV files (similar to `compounds` reporting).
     * Fixed: `reportPDF()` now actually includes formula annotations in annotated compound spectra when formulas are specified.
+    * New `makeTable()` method that generates a table with all formulas and other information (partially replaces old `consensus()` functionality).
 * `file` argument for `clearCache()`
 * Updates on MS peak lists
     * More consistent naming for algorithm specific MS peak list generators (i.e. `generateMSPeakListsX` where X is the algo).

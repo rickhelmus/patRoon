@@ -113,6 +113,36 @@ sortFormula <- function(formula)
     return(formulaListToString(fl[el]))
 }
 
+averageFormulas <- function(formulas)
+{
+    fltab <- rbindlist(lapply(formulas, function(f) as.list(splitFormulaToList(f))), fill = TRUE)
+    for (j in seq_along(fltab))
+        set(fltab, which(is.na(fltab[[j]])), j, 0)
+    fl <- round(colMeans(fltab))
+    return(formulaListToString(fl))
+}
+
+# classification according to Abdulla 2013 (10.1021/ac303221j)
+classifyFormula <- function(OC, HC, NC, AI)
+{
+    if (OC <= 0.2 && HC >= 1.7 && HC <= 2.2)
+        return("lipid")
+    if (OC > 0.2 && OC <= 0.6 && HC >= 1.7 && HC <= 2.2 && NC > 0.05)
+        return("protein")
+    if (OC > 0.6 && OC <= 1.2 && HC >= 1.5 && HC <= 2.2)
+        return("carbohydrate")
+    if (OC > 0.1 && OC <= 0.6 && HC >= 0.6 && HC <= 1.7 && AI < 0.67)
+        return("lignin_CRAM")
+    if (OC > 0.6 && OC <= 1.2 && HC >= 0.5 && HC <= 1.5 && AI < 0.67)
+        return("tannin")
+    if (OC <= 0.1 && HC >= 0.7 && HC <= 1.5)
+        return("unsat_hydrocarbon")
+    if (OC <= 0.1 && HC >= 0.3 && HC <= 0.7 && AI >= 0.67)
+        return("condensed_aromatic")
+
+    return("other")
+}
+
 formulaScoringColumns <- function() c("score", "MS_match", "treeScore", "isoScore",
                                       "frag_score", "MSMS_match", "comb_match")
 

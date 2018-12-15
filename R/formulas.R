@@ -151,25 +151,68 @@ setMethod("$", "formulas", function(x, name)
 #'
 #' @param fGroups The \code{\link{featureGroups}} object that was used to
 #'   generate this \code{formulas} object.
-#' @param elements,fragElements A \code{character} vector with elements that should be
-#'   counted for each MS(/MS) formula candidate. For instance, \code{c("C",
-#'   "H")} adds columns for both carbon and hydrogen amounts in each formula.
-#'   Set to \code{NULL} to not count any elements.
+#' @param elements,fragElements A \code{character} vector with elements that
+#'   should be counted for each MS(/MS) formula candidate. For instance,
+#'   \code{c("C", "H")} adds columns for both carbon and hydrogen amounts in
+#'   each formula. Set to \code{NULL} to not count any elements.
+#' @param OM If set to \code{TRUE} several columns with information relevant for
+#'   organic matter (OM) characterization will be added (e.g. elemental ratios,
+#'   classification). This will also make sure that \code{elements} contains at
+#'   least C, H, N, O, P and S.
 #'
 #' @return \code{makeTable} returns a \code{\link{data.table}}.
 #'
 #' @export
-setMethod("makeTable", "formulas", function(obj, fGroups, elements = NULL, fragElements = NULL)
+setMethod("makeTable", "formulas", function(obj, fGroups, average = FALSE, elements = NULL,
+                                            fragElements = NULL, OM = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
+    checkmate::assertClass(fGroups, "featureGroups", add = ac)
+    checkmate::assertFlag(average, add = ac)
     checkmate::assertCharacter(elements, min.chars = 1, any.missing = FALSE, null.ok = TRUE, add = ac)
     checkmate::assertCharacter(fragElements, min.chars = 1, any.missing = FALSE, null.ok = TRUE, add = ac)
+    checkmate::assertFlag(OM, add = ac)
     checkmate::reportAssertions(ac)
 
     gInfo <- groupInfo(fGroups)
 
     ret <- rbindlist(formulaTable(obj), fill = TRUE, idcol = "group")
     ret[, c("ret", "mz") := gInfo[group, ]]
+    setcolorder(ret, c("group", "ret", "mz"))
+
+    if (average)
+    {
+        # UNDONE: continue this?
+
+        # if (any(ret$byMSMS))
+        # {
+        #     avgMSMSCols <- c("frag_formula", "neutral_loss")
+        #     if (!is.null(ret[["neutral_frag_formula"]]))
+        #         avgMSMSCols <- c(avgMSMSCols, "frag_neutral_formula")
+        #
+        #     ret[byMSMS == TRUE, (avgMSMSCols) := lapply(.SD, averageFormulas), .SDcols = avgMSMSCols,
+        #         by = c("group", "formula")]
+        # }
+
+        # collapse byMSMS: will be TRUE if at least an MS/MS formula candidate was there
+        ret[, byMSMS := any(byMSMS), by = "group"]
+
+        avgCols <- c("formula", "neutral_formula")
+        ret[, (avgCols) := lapply(.SD, function(f) averageFormulas(unique(f))), .SDcols = avgCols, by = "group"]
+
+        # remove any fragment info (now collapsed, doesn't make sense anymore)
+        ret[, (grep("^frag_", names(ret), value = TRUE)) := NULL]
+
+        # average scores
+        scCols <- intersect(names(ret), formulaScoringColumns())
+        ret[, (scCols) := as.list(colMeans(.SD)), .SDcols = scCols, by = "group"]
+
+        ret <- unique(ret, by = "formula")
+    }
+
+    # ensure CHNOPS counts are present
+    if (OM)
+        elements <- unique(c(if (is.null(elements)) c() else elements, c("C", "H", "N", "O", "P", "S")))
 
     if (!is.null(elements) && length(elements) > 0)
     {
@@ -182,6 +225,31 @@ setMethod("makeTable", "formulas", function(obj, fGroups, elements = NULL, fragE
     {
         el <- getElements(ret$frag_formula, fragElements)
         ret[, (paste0("frag_", names(el))) := el]
+    }
+
+    if (OM)
+    {
+        # add element ratios commonly used for plotting
+        elrat <- function(el1, el2) ifelse(el2 == 0, 0, el1 / el2)
+        ret[, c("OC", "HC", "NC") := .(elrat(O, C), elrat(H, C), elrat(N, C))]
+
+        # aromaticity index and related DBE (see Koch 2016, 10.1002/rcm.7433)
+        ret[, DBE_AI := 1 + C - O - S - 0.5 * (N + P + H)]
+        getAI <- function(dbe, cai) ifelse(cai == 0, 0, dbe / cai)
+        ret[, AI := getAI(DBE_AI, (C - O - N - S - P))]
+
+        # classification according to Abdulla 2013 (10.1021/ac303221j)
+        # ret[, lipid := OC <= 0.2 & HC >= 1.7 & HC <= 2.2]
+        # ret[, protein := OC > 0.2 & OC <= 0.6 & HC >= 1.7 & HC <= 2.2 & NC > 0.05]
+        # ret[, carbohydrate := OC > 0.6 & OC <= 1.2 & HC >= 1.5 & HC <= 2.2]
+        # ret[, lignin_CRAM := OC > 0.1 & OC <= 0.6 & HC >= 0.6 & HC <= 1.7 & AI < 0.67]
+        # ret[, tannin := OC > 0.6 & OC <= 1.2 & HC >= 0.5 & HC <= 1.5 & AI < 0.67]
+        # ret[, unsat_hydrocarbon := OC <= 0.1 & HC >= 0.7 & HC <= 1.5]
+        # ret[, condensed_aromatic := OC <= 0.1 & HC >= 0.3 & HC <= 0.7 & AI >= 0.67]
+        # ret[, other := !lipid & !protein & !carbohydrate & !lignin_CRAM & !tannin &
+        #         !unsat_hydrocarbon & !condensed_aromatic]
+
+        ret[, classification := Vectorize(classifyFormula)(OC, HC, NC, AI)]
     }
 
     return(ret)

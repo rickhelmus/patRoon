@@ -422,15 +422,18 @@ setMethod("consensus", "formulas", function(obj, ..., formThreshold = 0)
             }
             else
             {
-                haveMSMS <- paste0("frag_formula-", leftName) %in% names(consFormulaList[[grp]]) &&
-                            paste0("frag_formula-", rightName) %in% names(rightFList[[grp]])
+                haveLeftMSMS <- paste0("frag_formula-", leftName) %in% names(consFormulaList[[grp]])
+                haveRightMSMS <- paste0("frag_formula-", rightName) %in% names(rightFList[[grp]])
 
-                mergeCols <- "formula"
-                if (haveMSMS)
-                    mergeCols <- c(mergeCols, "byMSMS", "frag_formula")
+                mergeCols <- c("formula", "byMSMS") # put byMSMS in there anyway in case only left/right has MSMS
+                if (haveLeftMSMS && haveRightMSMS)
+                    mergeCols <- c(mergeCols, "frag_formula")
                 mTable <- merge(consFormulaList[[grp]], rightFList[[grp]], all = TRUE,
                                 by.x = paste0(mergeCols, "-", leftName),
                                 by.y = paste0(mergeCols, "-", rightName))
+
+                if (!haveLeftMSMS && haveRightMSMS)
+                    setnames(mTable, paste0("frag_formula-", rightName), paste0("frag_formula-", leftName))
 
                 # remove duplicate columns that shouldn't
                 for (col in uniqueCols)

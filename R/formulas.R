@@ -159,12 +159,16 @@ setMethod("$", "formulas", function(x, name)
 #'   organic matter (OM) characterization will be added (e.g. elemental ratios,
 #'   classification). This will also make sure that \code{elements} contains at
 #'   least C, H, N, O, P and S.
+#' @param maxFormulas,maxFragFormulas Maximum amount of unique candidate
+#'   formulae (or fragment formulae) per feature group. Set to \code{NULL} to
+#'   ignore.
 #'
 #' @return \code{makeTable} returns a \code{\link{data.table}}.
 #'
 #' @export
 setMethod("makeTable", "formulas", function(obj, fGroups, average = FALSE, elements = NULL,
-                                            fragElements = NULL, OM = FALSE)
+                                            fragElements = NULL, OM = FALSE,
+                                            maxFormulas = NULL, maxFragFormulas = NULL)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
@@ -184,30 +188,45 @@ setMethod("makeTable", "formulas", function(obj, fGroups, average = FALSE, eleme
     {
         # UNDONE: continue this?
 
-        # if (any(ret$byMSMS))
-        # {
-        #     avgMSMSCols <- c("frag_formula", "neutral_loss")
-        #     if (!is.null(ret[["neutral_frag_formula"]]))
-        #         avgMSMSCols <- c(avgMSMSCols, "frag_neutral_formula")
-        #
-        #     ret[byMSMS == TRUE, (avgMSMSCols) := lapply(.SD, averageFormulas), .SDcols = avgMSMSCols,
-        #         by = c("group", "formula")]
-        # }
-
         # collapse byMSMS: will be TRUE if at least an MS/MS formula candidate was there
         ret[, byMSMS := any(byMSMS), by = "group"]
+
+        ret[, formula_avg_count := length(unique(formula)), by = "group"]
 
         avgCols <- c("formula", "neutral_formula")
         ret[, (avgCols) := lapply(.SD, function(f) averageFormulas(unique(f))), .SDcols = avgCols, by = "group"]
 
-        # remove any fragment info (now collapsed, doesn't make sense anymore)
-        ret[, (grep("^frag_", names(ret), value = TRUE)) := NULL]
+        # remove columns which don't really make sense anymore
+        rmCols <- c("neutral_loss", "error", "formula_mz", "dbe", "anaCoverage",
+                    "adduct", "mSigma", "rank", "explainedPeaks", "explainedIntensity",
+                    # add any fragment columns
+                    grep("^frag_", names(ret), value = TRUE),
+                    formulaScoringColumns())
+
+        rmCols <- getAllFormulasCols(rmCols, names(ret))
+        if (length(rmCols) > 0)
+            ret[, (rmCols) := NULL]
 
         # average scores
-        scCols <- intersect(names(ret), formulaScoringColumns())
-        ret[, (scCols) := as.list(colMeans(.SD)), .SDcols = scCols, by = "group"]
+        # scCols <- intersect(names(ret), formulaScoringColumns())
+        # ret[, (scCols) := as.list(colMeans(.SD)), .SDcols = scCols, by = "group"]
 
         ret <- unique(ret, by = "formula")
+    }
+    else
+    {
+        if (!is.null(maxFormulas))
+        {
+            ret[, unFormNr := match(formula, unique(.SD$formula)), by = "group"]
+            ret <- ret[unFormNr <= maxFormulas][, unFormNr := NULL]
+        }
+
+        if (!is.null(maxFragFormulas) && any(ret$byMSMS))
+        {
+            ret[, unFormNr := match(frag_formula, unique(.SD$frag_formula)),
+                by = c("group", "byMSMS", "formula")]
+            ret <- ret[unFormNr <= maxFragFormulas][, unFormNr := NULL]
+        }
     }
 
     # ensure CHNOPS counts are present
@@ -237,17 +256,6 @@ setMethod("makeTable", "formulas", function(obj, fGroups, average = FALSE, eleme
         ret[, DBE_AI := 1 + C - O - S - 0.5 * (N + P + H)]
         getAI <- function(dbe, cai) ifelse(cai == 0, 0, dbe / cai)
         ret[, AI := getAI(DBE_AI, (C - O - N - S - P))]
-
-        # classification according to Abdulla 2013 (10.1021/ac303221j)
-        # ret[, lipid := OC <= 0.2 & HC >= 1.7 & HC <= 2.2]
-        # ret[, protein := OC > 0.2 & OC <= 0.6 & HC >= 1.7 & HC <= 2.2 & NC > 0.05]
-        # ret[, carbohydrate := OC > 0.6 & OC <= 1.2 & HC >= 1.5 & HC <= 2.2]
-        # ret[, lignin_CRAM := OC > 0.1 & OC <= 0.6 & HC >= 0.6 & HC <= 1.7 & AI < 0.67]
-        # ret[, tannin := OC > 0.6 & OC <= 1.2 & HC >= 0.5 & HC <= 1.5 & AI < 0.67]
-        # ret[, unsat_hydrocarbon := OC <= 0.1 & HC >= 0.7 & HC <= 1.5]
-        # ret[, condensed_aromatic := OC <= 0.1 & HC >= 0.3 & HC <= 0.7 & AI >= 0.67]
-        # ret[, other := !lipid & !protein & !carbohydrate & !lignin_CRAM & !tannin &
-        #         !unsat_hydrocarbon & !condensed_aromatic]
 
         ret[, classification := Vectorize(classifyFormula)(OC, HC, NC, AI)]
     }
@@ -472,7 +480,7 @@ setMethod("consensus", "formulas", function(obj, ..., formThreshold = 0)
             setnames(consFormulaList[[grpi]], leftCols, deDupCols)
 
         # match all that has a dash inbetween
-        mergedCols <- grep(".+\\-.+", names(consFormulaList[[grpi]]), value = TRUE)
+        mergedCols <- getAllMergedFormulasCols(names(consFormulaList[[grpi]]))
 
         # figure out what was merged (i.e. name after dash)
         mergedColsWhat <- sub(".+\\-", "", mergedCols)

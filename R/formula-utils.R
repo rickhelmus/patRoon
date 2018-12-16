@@ -265,6 +265,33 @@ getFragmentInfoFromForms <- function(spec, fragFormTable)
     fi[, intensity := spec$intensity[PLIndex]]
 }
 
+# get a vector of all (merged) columns
+getAllFormulasCols <- function(targetCols, allCols)
+{
+    # find regular (non-merged) columns
+    reg <- intersect(targetCols, allCols)
+
+    mCols <- getAllMergedFormulasCols(allCols)
+    if (length(mCols) > 0)
+    {
+        merged <- lapply(targetCols, function(tc) grep(paste0("^", tc, "\\-"), mCols, value = TRUE))
+        merged <- merged[lengths(merged) > 0]
+        merged <- unlist(merged)
+    }
+    else
+        merged <- character()
+
+    return(c(reg, merged))
+}
+
+getAllMergedFormulasCols <- function(allCols)
+{
+    # NOTE: we simply assume that merged columns have "-X" (X is name of merged
+    # object) appended. This means that regular columns should never contain
+    # dashes!
+    return(grep("^.+\\-.+", allCols, value = TRUE))
+}
+
 getFormInfoList <- function(formTable, precursor)
 {
     formTable <- formTable[byMSMS == TRUE & formula == precursor]

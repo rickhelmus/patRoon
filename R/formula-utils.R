@@ -153,7 +153,7 @@ rankFormulaTable <- function(formTable)
     scCols <- grep(paste0("^(", paste0(formulaScoringColumns(), collapse = "|"), ")"),
                    names(formTable), value = TRUE)
     colorder <- c("byMSMS", scCols)
-    setorderv(formTable, colorder, c(1, rep(-1, length(colorder)-1)))
+    setorderv(formTable, colorder, rep(-1, length(colorder)))
     return(formTable)
 }
 

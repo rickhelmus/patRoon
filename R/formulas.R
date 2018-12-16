@@ -255,6 +255,47 @@ setMethod("makeTable", "formulas", function(obj, fGroups, average = FALSE, eleme
     return(ret)
 })
 
+# NOTE: feature formulas untouched
+setMethod("filter", "formulas", function(obj, minExplainedMSMSPeaks = NULL, neutralLoss = NULL,
+                                         topMost = NULL)
+{
+    # UNDONE: also add (ranges for) element counts/ratios, AI, scorings, errors, classification?
+    # UNDONE: handle merged column names
+
+    ac <- checkmate::makeAssertCollection()
+    aapply(checkmate::assertCount, . ~ topMost + minExplainedMSMSPeaks,
+           positive = c(TRUE, TRUE, FALSE), null.ok = TRUE, fixed = list(add = ac))
+    checkmate::assertCharacter(neutralLoss, min.chars = 1, min.len = 1, null.ok = TRUE, add = ac)
+    checkmate::reportAssertions(ac)
+
+    cat("Filtering formulas... ")
+
+    oldn <- length(obj)
+    obj@formulas <- pruneList(sapply(obj@formulas, function(formTable)
+    {
+        if (!is.null(minExplainedMSMSPeaks) && minExplainedMSMSPeaks > 0)
+        {
+            fragCounts <- formTable[, ifelse(byMSMS, length(frag_formula), 0), by = "formula"]
+            formTable[fragCounts >= minExplainedMSMSPeaks]
+        }
+
+        if (!is.null(neutralLoss))
+            formTable <- formTable[byMSMS == TRUE & neutral_loss %in% neutralLoss]
+
+        if (!is.null(topMost))
+        {
+            unFormNrs <- formTable[, match(formula, unique(.SD$formula))]
+            formTable <- formTable[unFormNrs <= topMost]
+        }
+
+        return(formTable)
+    }, simplify = FALSE), checkZeroRows = TRUE)
+
+    newn <- length(obj)
+    printf("Done! Filtered %d (%.2f%%) formulas. Remaining: %d\n", oldn - newn, if (oldn == 0) 0 else (1-(newn/oldn))*100, newn)
+    return(obj)
+})
+
 #' @describeIn formulas Plots an annotated spectrum for a given candidate
 #'   formula of a feature or feature group.
 #'

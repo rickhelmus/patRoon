@@ -227,16 +227,6 @@ generateFormConsensusForGroup <- function(formAnaList, formThreshold)
         # Determine coverage of precursor formulas within analyses.
         formTable[, anaCoverage := uniqueN(analysis) / anaCount, by = "formula"]
 
-        # The coverage for MS only formulas is determined from MS _and_ MS/MS
-        # formulas: this is done for the corner case that for a candidate the
-        # analyses contain either an MS or MS/MS formula, but the total amount
-        # of MS or MS/MS is not above the threshold. If summation of the number
-        # of MS(/MS) formulas then falls above formThreshold at least the MS
-        # only formula is then retained.
-        # formTable[, anaCoverage := .N / anaCount, by = "formula"]
-        #
-        # formTable[byMSMS == TRUE, anaCoverage := .N / anaCount, by = byCols]
-
         if (formThreshold > 0)
             formTable <- formTable[anaCoverage >= formThreshold] # Apply coverage filter
 

@@ -99,6 +99,18 @@ calculateIonFormula <- function(formula, adduct)
         sapply(formula, subtractFormula, formula2 = "H", USE.NAMES = FALSE)
 }
 
+calculateNeutralFormula <- function(formula, adduct)
+{
+    if (grepl("+H", adduct, fixed = TRUE))
+        sapply(formula, subtractFormula, formula2 = "H", USE.NAMES = FALSE)
+    else if (grepl("+Na", adduct, fixed = TRUE))
+        sapply(formula, subtractFormula, formula2 = "Na", USE.NAMES = FALSE)
+    else if (grepl("+K", adduct, fixed = TRUE))
+        sapply(formula, subtractFormula, formula2 = "K", USE.NAMES = FALSE)
+    else if (grepl("-H", adduct, fixed = TRUE))
+        sapply(formula, addFormula, formula2 = "H", USE.NAMES = FALSE)
+}
+
 sortFormula <- function(formula)
 {
     fl <- splitFormulaToList(formula)
@@ -120,6 +132,43 @@ averageFormulas <- function(formulas)
         set(fltab, which(is.na(fltab[[j]])), j, 0)
     fl <- round(colMeans(fltab))
     return(formulaListToString(fl))
+}
+
+addElementInfoToFormTable <- function(formTable, elements, fragElements, OM)
+{
+    # ensure CHNOPS counts are present
+    if (OM)
+        elements <- unique(c(if (is.null(elements)) c() else elements, c("C", "H", "N", "O", "P", "S")))
+
+    if (!is.null(elements) && length(elements) > 0)
+    {
+        # Retrieve element lists from formulas
+        el <- getElements(formTable$neutral_formula, elements)
+        formTable[, names(el) := el]
+    }
+    if (!is.null(fragElements) && !is.null(formTable[["frag_formula"]]) &&
+        length(fragElements) > 0)
+    {
+        el <- getElements(formTable$frag_formula, fragElements)
+        formTable[, (paste0("frag_", names(el))) := el]
+    }
+
+    if (OM)
+    {
+        # add element ratios commonly used for plotting
+        elrat <- function(el1, el2) ifelse(el2 == 0, 0, el1 / el2)
+        formTable[, c("OC", "HC", "NC", "PC", "SC") :=
+                      .(elrat(O, C), elrat(H, C), elrat(N, C), elrat(P, C), elrat(S, C))]
+
+        # aromaticity index and related DBE (see Koch 2016, 10.1002/rcm.7433)
+        formTable[, DBE_AI := 1 + C - O - S - 0.5 * (N + P + H)]
+        getAI <- function(dbe, cai) ifelse(cai == 0, 0, dbe / cai)
+        formTable[, AI := getAI(DBE_AI, (C - O - N - S - P))]
+
+        formTable[, classification := Vectorize(classifyFormula)(OC, HC, NC, AI)]
+    }
+
+    return(formTable)
 }
 
 # classification according to Abdulla 2013 (10.1021/ac303221j)
@@ -149,7 +198,7 @@ formulaScoringColumns <- function() c("score", "MS_match", "treeScore", "isoScor
 rankFormulaTable <- function(formTable)
 {
     # order from best to worst
-    # do grap to handle merged columns
+    # do grep to handle merged columns
     scCols <- grep(paste0("^(", paste0(formulaScoringColumns(), collapse = "|"), ")"),
                    names(formTable), value = TRUE)
     colorder <- c("byMSMS", scCols)
@@ -172,15 +221,35 @@ generateFormConsensusForGroup <- function(formAnaList, formThreshold)
         if (haveMSMS)
             byCols <- c(byCols, "frag_formula")
 
-        # Determine coverage of formulas within analyses
-        formTable[, anaCoverage := .N / anaCount, by = byCols]
+        # unique precursor formulas per analysis
+        uniqueAnaForms <- unique(formAnaList, by = c("formula", "analysis"))
+
+        # Determine coverage of precursor formulas within analyses.
+        formTable[, anaCoverage := uniqueN(analysis) / anaCount, by = "formula"]
+
+        # The coverage for MS only formulas is determined from MS _and_ MS/MS
+        # formulas: this is done for the corner case that for a candidate the
+        # analyses contain either an MS or MS/MS formula, but the total amount
+        # of MS or MS/MS is not above the threshold. If summation of the number
+        # of MS(/MS) formulas then falls above formThreshold at least the MS
+        # only formula is then retained.
+        # formTable[, anaCoverage := .N / anaCount, by = "formula"]
+        #
+        # formTable[byMSMS == TRUE, anaCoverage := .N / anaCount, by = byCols]
+
         if (formThreshold > 0)
             formTable <- formTable[anaCoverage >= formThreshold] # Apply coverage filter
 
+        # remove MS only formulas if MS/MS candidate is also present (do after
+        # coverage filter as is explained above).
+        MSMSForms <- unique(formTable[byMSMS == TRUE, formula])
+        formTable <- formTable[byMSMS == TRUE | !formula %in% MSMSForms]
+
+        # rank before duplicate removal: make sure to retain best scored candidate
+        formTable <- rankFormulaTable(formTable)
+
         # Remove duplicate entries (do this after coverage!)
         formTable <- unique(formTable, by = byCols)
-
-        formTable <- rankFormulaTable(formTable)
 
         formTable[, "analysis" := NULL]
     }
@@ -215,6 +284,7 @@ generateGroupFormulasByConsensus <- function(formList, formThreshold)
             return(ret)
         })
         names(formCons) <- gNames
+        formCons <- pruneList(formCons, checkZeroRows = TRUE)
 
         setTxtProgressBar(prog, gCount)
         close(prog)

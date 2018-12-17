@@ -186,8 +186,6 @@ setMethod("makeTable", "formulas", function(obj, fGroups, average = FALSE, eleme
 
     if (average)
     {
-        # UNDONE: continue this?
-
         # collapse byMSMS: will be TRUE if at least an MS/MS formula candidate was there
         ret[, byMSMS := any(byMSMS), by = "group"]
 
@@ -229,58 +227,29 @@ setMethod("makeTable", "formulas", function(obj, fGroups, average = FALSE, eleme
         }
     }
 
-    # ensure CHNOPS counts are present
-    if (OM)
-        elements <- unique(c(if (is.null(elements)) c() else elements, c("C", "H", "N", "O", "P", "S")))
-
-    if (!is.null(elements) && length(elements) > 0)
-    {
-        # Retrieve element lists from formulas
-        el <- getElements(ret$formula, elements)
-        ret[, names(el) := el]
-    }
-    if (!is.null(fragElements) && !is.null(ret[["frag_formula"]]) &&
-        length(fragElements) > 0)
-    {
-        el <- getElements(ret$frag_formula, fragElements)
-        ret[, (paste0("frag_", names(el))) := el]
-    }
-
-    if (OM)
-    {
-        # add element ratios commonly used for plotting
-        elrat <- function(el1, el2) ifelse(el2 == 0, 0, el1 / el2)
-        ret[, c("OC", "HC", "NC") := .(elrat(O, C), elrat(H, C), elrat(N, C))]
-
-        # aromaticity index and related DBE (see Koch 2016, 10.1002/rcm.7433)
-        ret[, DBE_AI := 1 + C - O - S - 0.5 * (N + P + H)]
-        getAI <- function(dbe, cai) ifelse(cai == 0, 0, dbe / cai)
-        ret[, AI := getAI(DBE_AI, (C - O - N - S - P))]
-
-        ret[, classification := Vectorize(classifyFormula)(OC, HC, NC, AI)]
-    }
+    ret <- addElementInfoToFormTable(ret, elements, fragElements, OM)
 
     return(ret)
 })
 
 # NOTE: feature formulas untouched
 setMethod("filter", "formulas", function(obj, minExplainedMSMSPeaks = NULL, neutralLoss = NULL,
-                                         topMost = NULL)
+                                         topMost = NULL, OM = NULL)
 {
-    # UNDONE: also add (ranges for) element counts/ratios, AI, scorings, errors, classification?
-    # UNDONE: handle merged column names
+    # UNDONE: also add (ranges for) element counts/ratios, scorings?
 
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertCount, . ~ topMost + minExplainedMSMSPeaks,
-           positive = c(TRUE, TRUE, FALSE), null.ok = TRUE, fixed = list(add = ac))
+           positive = c(TRUE, FALSE), null.ok = TRUE, fixed = list(add = ac))
     checkmate::assertCharacter(neutralLoss, min.chars = 1, min.len = 1, null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
 
     cat("Filtering formulas... ")
 
     oldn <- length(obj)
-    obj@formulas <- pruneList(sapply(obj@formulas, function(formTable)
+    obj@formulas <- pruneList(sapply(groupNames(obj), function(grp)
     {
+        formTable <- obj[[grp]]
         if (!is.null(minExplainedMSMSPeaks) && minExplainedMSMSPeaks > 0)
         {
             fragCounts <- formTable[, ifelse(byMSMS, length(frag_formula), 0), by = "formula"]
@@ -288,12 +257,40 @@ setMethod("filter", "formulas", function(obj, minExplainedMSMSPeaks = NULL, neut
         }
 
         if (!is.null(neutralLoss))
-            formTable <- formTable[byMSMS == TRUE & neutral_loss %in% neutralLoss]
+        {
+            formTable <- formTable[byMSMS == TRUE]
+            if (nrow(formTable) > 0)
+            {
+                formTable[, keep := any(neutral_loss %in% neutralLoss), by = "formula"]
+                formTable <- formTable[keep == TRUE][, keep := NULL]
+            }
+        }
 
         if (!is.null(topMost))
         {
             unFormNrs <- formTable[, match(formula, unique(.SD$formula))]
             formTable <- formTable[unFormNrs <= topMost]
+        }
+
+        if (!is.null(OM) && OM)
+        {
+            fElTable <- addElementInfoToFormTable(copy(formTable), NULL, NULL, OM = TRUE)
+            keep <- fElTable[,
+                         # rules from Kujawinski & Behn, 2006 (10.1021/ac0600306)
+                         H >= 1/3 * C &
+                         H <= ((2 * C) + N + 2) &
+                         (H + N) %% 2 == 0 &
+                         N <= C &
+                         O <= C &
+                         P <= 2 &
+                         S <= 2 &
+
+                         # rules from Koch & dittmar 2006 (10.1002/rcm.2386)
+                         sapply(DBE_AI, checkmate::checkInt) &
+                         HC <= 2.2 &
+                         OC <= 1.2 &
+                         NC <= 0.5]
+            formTable <- formTable[keep]
         }
 
         return(formTable)

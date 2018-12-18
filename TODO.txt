@@ -52,21 +52,26 @@ Release:
 - SIRIUS compounds: report charged formula for fragInfo (as is now done for formulas, also affects formula scoring for compounds)
 - formulas
     - keep ana_min_intensity etc?
-    - DBE calculation for SIRIUS?
+    - DBE/formula_mz calculation for SIRIUS?
     - set column order?
     - genform(/DA?): also include precursor in fragments? or omit from SIRIUS?
     - set mergedBy in getFragmentInfoFromForms()?
-    - MS_match and mSigma --> isoScore? If yes, mention in docs...
+    - mSigma --> isoScore? (tricky as low value is best) If yes, mention in docs...
     - only some adducts are supported now (do more?)
     - only keep best scoring candidates for consensus? (what about fragments?? --> seems fine for genform/sirius as all scores are the same for each fragment, need to check DA)
     - customize/document ranking column order? (only do rank for sirius?)
+    - how to handle ranking of consensus results?
+      - rank by one normalized column per algo? (GenForm: either MS_match or comb_match)
+      - or simply don't and mention limitation in doc? (one limitation: filtering)
     - docs / NEWS
         - move generics in to right place, set aliases
         - featureFormulas() name?
         - clarify feature & group formulas
-        - fragElements takes ionic formula (or remove option?)
+        - countFragElements takes ionic formula (or remove option?)
         - OM refs
         - MS only formulas removed if MS/MS also present
+        - filter() and makeTable()
+        - unification of scorings: mention original names, value ranges (best/worst), table
         - detail consensus process
             - highest scoring candidate of analyses is retained(?)
             - feature consensus now uses both MS and MS/MS formulas for coverage calculation
@@ -75,6 +80,7 @@ Release:
         - calculateFeatures TRUE/FALSE
         - verify group count for consensus
         - makeTable: check elements?
+    - test DA formulas, ranking (mSigma)
 - plotSpec(): mark precursor?
 - look into supervisors for processx
 - groupTable --> makeTable

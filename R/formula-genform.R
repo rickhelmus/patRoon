@@ -146,7 +146,7 @@ processGenFormMSMSResultFile <- function(file)
         return(NULL)
 
     fMS <- formsMSMS[isPrecursor == TRUE, ]
-    setnames(fMS, 1:7, c("neutral_formula", "dbe", "formula_mz", "error", "MS_match", "MSMS_match", "comb_match"))
+    setnames(fMS, 1:7, c("neutral_formula", "dbe", "formula_mz", "error", "isoScore", "MSMSScore", "combMatch"))
     fMS[, isPrecursor := NULL]
     setkey(fMS, "precursorGroup")
 
@@ -182,7 +182,7 @@ processGenFormResultFile <- function(file, isMSMS, adduct)
     if (!isMSMS)
     {
         forms <- fread(file, header = FALSE)
-        setnames(forms, c("neutral_formula", "dbe", "formula_mz", "error", "MS_match"))
+        setnames(forms, c("neutral_formula", "dbe", "formula_mz", "error", "isoScore"))
         forms[, neutral_formula := Vectorize(sortFormula)(neutral_formula)] # GenForm doesn't seem use Hill sorting
         forms[, byMSMS := FALSE]
     }
@@ -195,7 +195,7 @@ processGenFormResultFile <- function(file, isMSMS, adduct)
     forms[, formula := calculateIonFormula(neutral_formula, adduct)]
 
     # set correct column types
-    numCols <- c("error", "dbe", "MS_match", "frag_mz", "frag_error", "frag_dbe", "MSMS_match", "comb_match")
+    numCols <- c("error", "dbe", "isoScore", "frag_mz", "frag_error", "frag_dbe", "MSMSScore", "combMatch")
     for (col in numCols)
         set(forms, j = col, value = as.numeric(forms[[col]]))
 

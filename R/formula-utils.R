@@ -239,17 +239,21 @@ checkFormula <- function(formula, elementsVec)
     return(FALSE)
 }
 
-formulaScoringColumns <- function() c("score", "MS_match", "treeScore", "isoScore",
-                                      "frag_score", "MSMS_match", "comb_match")
+formulaScoringColumns <- function() c("score", "combMatch", "isoScore", "mSigma", "MSMSScore", "frag_score", "frag_mSigma")
+formulaRankingColumns <- function() c("byMSMS", "score", "combMatch", "isoScore", "mSigma", "MSMSScore")
 
 rankFormulaTable <- function(formTable)
 {
     # order from best to worst
-    # do grep to handle merged columns
-    scCols <- grep(paste0("^(", paste0(formulaScoringColumns(), collapse = "|"), ")"),
-                   names(formTable), value = TRUE)
-    colorder <- c("byMSMS", scCols)
-    setorderv(formTable, colorder, rep(-1, length(colorder)))
+
+    rankCols <- getAllFormulasCols(formulaRankingColumns(), names(formTable))
+
+    colorder <- rep(-1, length(rankCols))
+
+    # low mSigma values are best
+    colorder[grepl("^mSigma", names(rankCols))] <- 1
+
+    setorderv(formTable, rankCols, colorder)
     return(formTable)
 }
 
@@ -437,10 +441,8 @@ getFormInfoList <- function(formTable, precursor)
     ret <- addValText(ret, "%f", "error")
     ret <- addValText(ret, "%f", "rank")
     ret <- addValText(ret, "%.2f", "score")
-    ret <- addValText(ret, "%.2f", "MS_match")
-    ret <- addValText(ret, "%.2f", "MSMS_match")
-    ret <- addValText(ret, "%.2f", "comb_match")
-    ret <- addValText(ret, "%.2f", "treeScore")
+    ret <- addValText(ret, "%.2f", "MSMSScore")
+    ret <- addValText(ret, "%.2f", "combMatch")
     ret <- addValText(ret, "%.2f", "isoScore")
 
     return(ret)

@@ -196,7 +196,7 @@ setMethod("makeTable", "formulas", function(obj, fGroups, average = FALSE, count
 
         # remove columns which don't really make sense anymore
         rmCols <- c("neutral_loss", "error", "formula_mz", "dbe", "anaCoverage",
-                    "adduct", "mSigma", "rank", "explainedPeaks", "explainedIntensity",
+                    "adduct", "rank", "explainedPeaks", "explainedIntensity",
                     # add any fragment columns
                     grep("^frag_", names(ret), value = TRUE),
                     formulaScoringColumns())
@@ -506,7 +506,6 @@ setMethod("consensus", "formulas", function(obj, ..., formThreshold = 0)
         if (formThreshold > 0)
             consFormulaList[[grpi]] <- consFormulaList[[grpi]][coverage >= formThreshold]
 
-        # setcolorder(consFormulaList[[grpi]], formConsensusColOrder(consFormulaList[[grpi]]))
         consFormulaList[[grpi]] <- rankFormulaTable(consFormulaList[[grpi]])
     }
 

@@ -151,14 +151,14 @@ setMethod("$", "formulas", function(x, name)
 #'
 #' @param fGroups The \code{\link{featureGroups}} object that was used to
 #'   generate this \code{formulas} object.
-#' @param elements,fragElements A \code{character} vector with elements that
-#'   should be counted for each MS(/MS) formula candidate. For instance,
-#'   \code{c("C", "H")} adds columns for both carbon and hydrogen amounts in
-#'   each formula. Set to \code{NULL} to not count any elements.
+#' @param countElements,countFragElements A \code{character} vector with
+#'   elements that should be counted for each MS(/MS) formula candidate. For
+#'   instance, \code{c("C", "H")} adds columns for both carbon and hydrogen
+#'   amounts in each formula. Set to \code{NULL} to not count any elements.
 #' @param OM If set to \code{TRUE} several columns with information relevant for
 #'   organic matter (OM) characterization will be added (e.g. elemental ratios,
-#'   classification). This will also make sure that \code{elements} contains at
-#'   least C, H, N, O, P and S.
+#'   classification). This will also make sure that \code{countElements}
+#'   contains at least C, H, N, O, P and S.
 #' @param maxFormulas,maxFragFormulas Maximum amount of unique candidate
 #'   formulae (or fragment formulae) per feature group. Set to \code{NULL} to
 #'   ignore.
@@ -166,15 +166,15 @@ setMethod("$", "formulas", function(x, name)
 #' @return \code{makeTable} returns a \code{\link{data.table}}.
 #'
 #' @export
-setMethod("makeTable", "formulas", function(obj, fGroups, average = FALSE, elements = NULL,
-                                            fragElements = NULL, OM = FALSE,
+setMethod("makeTable", "formulas", function(obj, fGroups, average = FALSE, countElements = NULL,
+                                            countFragElements = NULL, OM = FALSE,
                                             maxFormulas = NULL, maxFragFormulas = NULL)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
     checkmate::assertFlag(average, add = ac)
-    checkmate::assertCharacter(elements, min.chars = 1, any.missing = FALSE, null.ok = TRUE, add = ac)
-    checkmate::assertCharacter(fragElements, min.chars = 1, any.missing = FALSE, null.ok = TRUE, add = ac)
+    checkmate::assertCharacter(countElements, min.chars = 1, any.missing = FALSE, null.ok = TRUE, add = ac)
+    checkmate::assertCharacter(countFragElements, min.chars = 1, any.missing = FALSE, null.ok = TRUE, add = ac)
     checkmate::assertFlag(OM, add = ac)
     checkmate::reportAssertions(ac)
 
@@ -227,21 +227,24 @@ setMethod("makeTable", "formulas", function(obj, fGroups, average = FALSE, eleme
         }
     }
 
-    ret <- addElementInfoToFormTable(ret, elements, fragElements, OM)
+    ret <- addElementInfoToFormTable(ret, countElements, countFragElements, OM)
 
     return(ret)
 })
 
 # NOTE: feature formulas untouched
-setMethod("filter", "formulas", function(obj, minExplainedMSMSPeaks = NULL, neutralLoss = NULL,
+setMethod("filter", "formulas", function(obj, minExplainedMSMSPeaks = NULL, elements = NULL,
+                                         fragElements = NULL, lossElements = NULL,
                                          topMost = NULL, OM = NULL)
 {
-    # UNDONE: also add (ranges for) element counts/ratios, scorings?
+    # UNDONE: scorings?
 
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertCount, . ~ topMost + minExplainedMSMSPeaks,
            positive = c(TRUE, FALSE), null.ok = TRUE, fixed = list(add = ac))
-    checkmate::assertCharacter(neutralLoss, min.chars = 1, min.len = 1, null.ok = TRUE, add = ac)
+    aapply(checkmate::assertCharacter, . ~ elements + fragElements + lossElements,
+           min.chars = 1, min.len = 1, null.ok = TRUE, fixed = list(add = ac))
+    checkmate::assertLogical(OM, null.ok = TRUE)
     checkmate::reportAssertions(ac)
 
     cat("Filtering formulas... ")
@@ -256,14 +259,17 @@ setMethod("filter", "formulas", function(obj, minExplainedMSMSPeaks = NULL, neut
             formTable[fragCounts >= minExplainedMSMSPeaks]
         }
 
-        if (!is.null(neutralLoss))
+        if (!is.null(elements))
+            formTable <- formTable[sapply(formula, checkFormula, elements)]
+        if (any(formTable$byMSMS))
         {
             formTable <- formTable[byMSMS == TRUE]
-            if (nrow(formTable) > 0)
-            {
-                formTable[, keep := any(neutral_loss %in% neutralLoss), by = "formula"]
-                formTable <- formTable[keep == TRUE][, keep := NULL]
-            }
+            if (!is.null(fragElements))
+                formTable <- formTable[formTable[, rep(any(sapply(frag_formula, checkFormula, fragElements)), .N),
+                                                 by = "formula"][[2]]]
+            if (!is.null(lossElements))
+                formTable <- formTable[formTable[, any(sapply(neutral_loss, checkFormula, lossElements)),
+                                                 by = "formula"][[2]]]
         }
 
         if (!is.null(topMost))

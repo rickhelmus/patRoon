@@ -192,6 +192,53 @@ classifyFormula <- function(OC, HC, NC, AI)
     return("other")
 }
 
+checkFormula <- function(formula, elementsVec)
+{
+    for (elements in elementsVec)
+    {
+        # any ranges specified?
+        if (grepl("[0-9]+\\-[0-9]+", elements))
+        {
+            minElements <- gsub("([0-9]+)\\-[0-9]+", "\\1", elements)
+            maxElements <- gsub("[0-9]+\\-([0-9]+)", "\\1", elements)
+            minElFL <- splitFormulaToList(minElements)
+            maxElFL <- splitFormulaToList(maxElements)
+        }
+        else
+            minElFL <- maxElFL <- splitFormulaToList(elements)
+
+        formlist <- splitFormulaToList(formula)
+
+        OK <- TRUE
+
+        missingElements <- setdiff(names(minElFL), names(formlist))
+        if (length(missingElements) > 0 &&
+            any(sapply(missingElements, function(mel) minElFL[mel] > 0)))
+            OK <- FALSE
+        else
+        {
+            for (el in names(formlist))
+            {
+                elc <- formlist[el]
+
+                if (el %in% names(minElFL))
+                {
+                    if (elc < minElFL[el] || elc > maxElFL[el])
+                    {
+                        OK <- FALSE
+                        break
+                    }
+                }
+            }
+        }
+
+        if (OK)
+            return(TRUE)
+    }
+
+    return(FALSE)
+}
+
 formulaScoringColumns <- function() c("score", "MS_match", "treeScore", "isoScore",
                                       "frag_score", "MSMS_match", "comb_match")
 

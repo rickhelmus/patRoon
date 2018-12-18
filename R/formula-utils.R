@@ -338,34 +338,6 @@ generateGroupFormulasByConsensus <- function(formList, formThreshold)
     return(formCons)
 }
 
-formConsensusColOrder <- function(fConsTable)
-{
-    currentCols <- colnames(fConsTable)
-
-    # all possible columns, depending on algorithm(s) used and their settings
-    allCols <- c("group", "ret", "mz", "neutral_formula", "formula", "adduct", "formula_mz", "error",
-                 "mSigma", "dbe", "rank", "score", "MS_match", "treeScore", "isoScore", "anaCoverage",
-                 "listCoverage", "byMSMS", "frag_neutral_formula", "frag_formula", "frag_intensity", "frag_mz", "frag_formula_mz",
-                 "frag_error", "frag_mSigma", "neutral_loss", "frag_dbe", "frag_score", "MSMS_match",
-                 "comb_match", "explainedPeaks", "explainedIntensity", "min_intensity", "max_intensity",
-                 "ana_min_intensity", "ana_max_intensity")
-
-    # add algorithm specific scoring/anaCoverage columns that may have been created during merging
-    scorePos <- which(allCols == "score")
-    curScoreCols <- currentCols[grepl("score-", currentCols)]
-    if (length(curScoreCols) > 0)
-        allCols <- append(allCols, curScoreCols, scorePos)
-
-    covPos <- which(allCols == "anaCoverage")
-    curCovCols <- currentCols[grepl("anaCoverage-", currentCols)]
-    if (length(curCovCols) > 0)
-        allCols <- append(allCols, curCovCols, covPos)
-
-    ret <- currentCols[match(allCols, currentCols, nomatch = 0)] # re-order
-
-    return(ret)
-}
-
 getFragmentInfoFromForms <- function(spec, fragFormTable)
 {
     if (nrow(fragFormTable) == 0)

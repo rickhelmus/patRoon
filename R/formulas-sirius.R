@@ -51,6 +51,12 @@ processSiriusFormulas <- function(cmd, exitStatus, retries)
             forms[, neutral_loss := as.character(Vectorize(subtractFormula)(formula, frag_formula))]
             forms[, byMSMS := TRUE]
 
+            # Precursor is always present in MS/MS spectrum: it's added by
+            # SIRIUS if necessarily (with zero intensity). Remove it and use its
+            # frag_formula_mz to get the formula_mz
+            forms[, formula_mz := .SD[frag_formula == formula, frag_formula_mz], by = "formula"]
+            forms <- forms[frag_intensity != 0 | formula != frag_formula]
+
             # set nice column order
             setcolorder(forms, c("neutral_formula", "formula", "adduct", "rank", "score", "MSMSScore", "isoScore", "byMSMS",
                                  "frag_neutral_formula", "frag_formula", "frag_mz", "frag_formula_mz", "frag_intensity", "neutral_loss",

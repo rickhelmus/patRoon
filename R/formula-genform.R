@@ -183,7 +183,7 @@ processGenFormResultFile <- function(file, isMSMS, adduct)
     {
         forms <- fread(file, header = FALSE)
         setnames(forms, c("neutral_formula", "dbe", "formula_mz", "error", "isoScore"))
-        forms[, neutral_formula := Vectorize(sortFormula)(neutral_formula)] # GenForm doesn't seem use Hill sorting
+        forms[, neutral_formula := Vectorize(sortFormula)(neutral_formula)] # GenForm doesn't seem to use Hill sorting
         forms[, byMSMS := FALSE]
     }
     else
@@ -200,10 +200,7 @@ processGenFormResultFile <- function(file, isMSMS, adduct)
         set(forms, j = col, value = as.numeric(forms[[col]]))
 
     if (isMSMS)
-    {
         forms[, neutral_loss := as.character(Vectorize(subtractFormula)(formula, frag_formula))]
-        forms <- forms[nzchar(neutral_loss)] # remove fragments that are precursors
-    }
 
     forms <- rankFormulaTable(forms)
 

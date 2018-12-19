@@ -181,6 +181,9 @@ setMethod("makeTable", "formulas", function(obj, fGroups, average = FALSE, count
     gInfo <- groupInfo(fGroups)
 
     ret <- rbindlist(formulaTable(obj), fill = TRUE, idcol = "group")
+    if (length(ret) == 0)
+        return(ret)
+
     ret[, c("ret", "mz") := gInfo[group, ]]
     setcolorder(ret, c("group", "ret", "mz"))
 
@@ -199,15 +202,11 @@ setMethod("makeTable", "formulas", function(obj, fGroups, average = FALSE, count
                     "adduct", "rank", "explainedPeaks", "explainedIntensity",
                     # add any fragment columns
                     grep("^frag_", names(ret), value = TRUE),
-                    formulaScoringColumns())
+                    formulaScorings()$name)
 
         rmCols <- getAllFormulasCols(rmCols, names(ret))
         if (length(rmCols) > 0)
             ret[, (rmCols) := NULL]
-
-        # average scores
-        # scCols <- intersect(names(ret), formulaScoringColumns())
-        # ret[, (scCols) := as.list(colMeans(.SD)), .SDcols = scCols, by = "group"]
 
         ret <- unique(ret, by = "formula")
     }
@@ -235,15 +234,22 @@ setMethod("makeTable", "formulas", function(obj, fGroups, average = FALSE, count
 # NOTE: feature formulas untouched
 setMethod("filter", "formulas", function(obj, minExplainedMSMSPeaks = NULL, elements = NULL,
                                          fragElements = NULL, lossElements = NULL,
-                                         topMost = NULL, OM = NULL)
+                                         topMost = NULL, scoreLimits = NULL,
+                                         OM = NULL)
 {
-    # UNDONE: scorings?
+    scCols <- formulaScorings()$name
 
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertCount, . ~ topMost + minExplainedMSMSPeaks,
            positive = c(TRUE, FALSE), null.ok = TRUE, fixed = list(add = ac))
     aapply(checkmate::assertCharacter, . ~ elements + fragElements + lossElements,
            min.chars = 1, min.len = 1, null.ok = TRUE, fixed = list(add = ac))
+    checkmate::assertList(scoreLimits, null.ok = TRUE, types = "numeric", add = ac)
+    if (!is.null(scoreLimits))
+    {
+        checkmate::assertNames(names(scoreLimits), type = "unique", subset.of = scCols, add = ac)
+        checkmate::qassertr(scoreLimits, "N2")
+    }
     checkmate::assertLogical(OM, null.ok = TRUE)
     checkmate::reportAssertions(ac)
 
@@ -261,7 +267,7 @@ setMethod("filter", "formulas", function(obj, minExplainedMSMSPeaks = NULL, elem
 
         if (!is.null(elements))
             formTable <- formTable[sapply(formula, checkFormula, elements)]
-        if (any(formTable$byMSMS))
+        if ((!is.null(fragElements) || !is.null(lossElements)) && any(formTable$byMSMS))
         {
             formTable <- formTable[byMSMS == TRUE]
             if (!is.null(fragElements))
@@ -276,6 +282,19 @@ setMethod("filter", "formulas", function(obj, minExplainedMSMSPeaks = NULL, elem
         {
             unFormNrs <- formTable[, match(formula, unique(.SD$formula))]
             formTable <- formTable[unFormNrs <= topMost]
+        }
+
+        if (!is.null(scoreLimits))
+        {
+            for (sc in names(scoreLimits))
+            {
+                cols <- getAllFormulasCols(sc, names(formTable))
+                if (length(cols) == 0)
+                    next
+                formTable <- formTable[formTable[, do.call(pmin, c(.SD, list(na.rm = TRUE))) >= scoreLimits[[sc]][1] &
+                                                   do.call(pmax, c(.SD, list(na.rm = TRUE))) <= scoreLimits[[sc]][2],
+                                                 .SDcols = cols]]
+            }
         }
 
         if (!is.null(OM) && OM)

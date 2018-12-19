@@ -150,7 +150,8 @@ setMethod("$", "formulas", function(x, name)
 #'   feature group and other information such as element counts.
 #'
 #' @param fGroups The \code{\link{featureGroups}} object that was used to
-#'   generate this \code{formulas} object.
+#'   generate this \code{formulas} object. If not \code{NULL} it is used to add
+#'   feature group information (retention and \emph{m/z} values).
 #' @param countElements,countFragElements A \code{character} vector with
 #'   elements that should be counted for each MS(/MS) formula candidate. For
 #'   instance, \code{c("C", "H")} adds columns for both carbon and hydrogen
@@ -166,26 +167,27 @@ setMethod("$", "formulas", function(x, name)
 #' @return \code{makeTable} returns a \code{\link{data.table}}.
 #'
 #' @export
-setMethod("makeTable", "formulas", function(obj, fGroups, average = FALSE, countElements = NULL,
+setMethod("makeTable", "formulas", function(obj, fGroups = NULL, average = FALSE, countElements = NULL,
                                             countFragElements = NULL, OM = FALSE,
                                             maxFormulas = NULL, maxFragFormulas = NULL)
 {
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertClass(fGroups, "featureGroups", add = ac)
+    checkmate::assertClass(fGroups, "featureGroups", null.ok = TRUE, add = ac)
     checkmate::assertFlag(average, add = ac)
     checkmate::assertCharacter(countElements, min.chars = 1, any.missing = FALSE, null.ok = TRUE, add = ac)
     checkmate::assertCharacter(countFragElements, min.chars = 1, any.missing = FALSE, null.ok = TRUE, add = ac)
     checkmate::assertFlag(OM, add = ac)
     checkmate::reportAssertions(ac)
 
-    gInfo <- groupInfo(fGroups)
-
     ret <- rbindlist(formulaTable(obj), fill = TRUE, idcol = "group")
     if (length(ret) == 0)
         return(ret)
 
-    ret[, c("ret", "mz") := gInfo[group, ]]
-    setcolorder(ret, c("group", "ret", "mz"))
+    if (!is.null(fGroups))
+    {
+        ret[, c("ret", "mz") := groupInfo(fGroups)[group, ]]
+        setcolorder(ret, c("group", "ret", "mz"))
+    }
 
     if (average)
     {

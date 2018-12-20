@@ -36,8 +36,9 @@
 
 \S4method{$}{formulas}(x, name)
 
-\S4method{makeTable}{formulas}(obj, fGroups, elements = NULL,
-  fragElements = NULL)
+\S4method{makeTable}{formulas}(obj, fGroups = NULL, average = FALSE,
+  countElements = NULL, countFragElements = NULL, OM = FALSE,
+  maxFormulas = NULL, maxFragFormulas = NULL)
 
 \S4method{plotSpec}{formulas}(obj, precursor, groupName, analysis = NULL,
   MSPeakLists, useGGPlot2 = FALSE)
@@ -57,12 +58,22 @@ for the \code{obj} parameter to which a consensus should be generated.}
 \item{drop}{ignored.}
 
 \item{fGroups}{The \code{\link{featureGroups}} object that was used to
-generate this \code{formulas} object.}
+generate this \code{formulas} object. If not \code{NULL} it is used to add
+feature group information (retention and \emph{m/z} values).}
 
-\item{elements, fragElements}{A \code{character} vector with elements that should be
-counted for each MS(/MS) formula candidate. For instance, \code{c("C",
-"H")} adds columns for both carbon and hydrogen amounts in each formula.
-Set to \code{NULL} to not count any elements.}
+\item{countElements, countFragElements}{A \code{character} vector with
+elements that should be counted for each MS(/MS) formula candidate. For
+instance, \code{c("C", "H")} adds columns for both carbon and hydrogen
+amounts in each formula. Set to \code{NULL} to not count any elements.}
+
+\item{OM}{If set to \code{TRUE} several columns with information relevant for
+organic matter (OM) characterization will be added (e.g. elemental ratios,
+classification). This will also make sure that \code{countElements}
+contains at least C, H, N, O, P and S.}
+
+\item{maxFormulas, maxFragFormulas}{Maximum amount of unique candidate
+formulae (or fragment formulae) per feature group. Set to \code{NULL} to
+ignore.}
 
 \item{precursor}{The formula of the precursor (in ionic form, \emph{i.e.} as
 detected by the MS).}

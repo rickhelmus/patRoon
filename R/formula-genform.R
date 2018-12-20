@@ -238,7 +238,7 @@ processGenFormResultFile <- function(file, isMSMS, adduct)
 #' @export
 generateFormulasGenForm <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct = "M+H",
                                     elements = "CHNOP", hetero = TRUE, extraOpts = NULL,
-                                    calculateFeatures = TRUE, formFeatThreshold = 0.75, MSMode = "both",
+                                    calculateFeatures = TRUE, featThreshold = 0.75, MSMode = "both",
                                     maxProcAmount = getOption("patRoon.maxProcAmount"), maxCmdsPerProc = 25)
 {
     ac <- checkmate::makeAssertCollection()
@@ -248,7 +248,7 @@ generateFormulasGenForm <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct =
     aapply(checkmate::assertString, . ~ adduct + elements, fixed = list(add = ac))
     checkmate::assertFlag(hetero, add = ac)
     checkmate::assertFlag(calculateFeatures, add = ac)
-    checkmate::assertNumber(formFeatThreshold, lower = 0, finite = TRUE, null.ok = TRUE, add = ac)
+    checkmate::assertNumber(featThreshold, lower = 0, finite = TRUE, null.ok = TRUE, add = ac)
     checkmate::assertChoice(MSMode, c("ms", "msms", "both"), add = ac)
     checkmate::assertList(extraOpts, any.missing = FALSE, names = "unique", null.ok = TRUE, add = ac)
     aapply(checkmate::assertCount, . ~ maxProcAmount + maxCmdsPerProc, positive = TRUE, fixed = list(add = ac))
@@ -378,7 +378,7 @@ generateFormulasGenForm <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct =
             saveCacheSet("formulasGenForm", formHashes, setHash, cacheDB)
 
         if (length(formTable) > 0)
-            groupFormulas <- generateGroupFormulasByConsensus(formTable, formFeatThreshold)
+            groupFormulas <- generateGroupFormulasByConsensus(formTable, featThreshold)
         else
             groupFormulas <- list()
     }

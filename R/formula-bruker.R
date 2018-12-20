@@ -29,14 +29,15 @@ simplifyDAFormula <- function(formula)
 #' @rdname formula-generation
 #' @export
 generateFormulasDA <- function(fGroups, precursorMzSearchWindow = 0.002, MSMode = "both",
-                               formFeatThreshold = 0.75)
+                               featThreshold = 0.75)
 {
     # UNDONE: test MSMode, duplicate MS formulas removal, new group formulas
-    
+
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
     checkmate::assertNumber(precursorMzSearchWindow, lower = 0, finite = TRUE, add = ac)
     checkmate::assertChoice(MSMode, c("ms", "msms", "both"), add = ac)
+    checkmate::assertNumber(featThreshold, lower = 0, finite = TRUE, null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
 
     DA <- getDAApplication()
@@ -235,9 +236,9 @@ generateFormulasDA <- function(fGroups, precursorMzSearchWindow = 0.002, MSMode 
     fTable <- pruneList(sapply(fTable, function(ft) ft[sapply(ft, nrow) > 0], simplify = FALSE), TRUE)
 
     if (length(fTable) > 0)
-        groupFormulas <- generateGroupFormulasByConsensus(fTable, formFeatThreshold)
+        groupFormulas <- generateGroupFormulasByConsensus(fTable, featThreshold)
     else
         groupFormulas <- list()
-    
+
     return(formulas(formulas = groupFormulas, featFormulas = fTable, algorithm = "Bruker_DataAnalysis"))
 }

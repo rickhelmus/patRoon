@@ -167,13 +167,13 @@ Using the data from the MS peaklists generated during the previous step we can g
 ```{r formulas,results='hide'}
 formulas <- generateFormulas(fGroups, "genform", plists, maxMzDev = 5,
                              adduct = "M+H", elements = "CHNOPSCl",
-                             calculateFeatures = TRUE, formFeatThreshold = 0.75)
+                             calculateFeatures = TRUE, featThreshold = 0.75)
 formulas
 ```
 
 Note that we limited to only to the the elements C, H, N, O, P, S and Cl. It is highly recommended to limit the elements (by default it is just C, H, N, O and P) as this can significantly reduce processing time and improbable formula candidates. In this tutorial we already knew which compounds to expect so the choice was easy, but often a good guess can be made in advance.
 
-The `generateFormulas()` function returns an object that contains formula candidates assigned for each feature group. In the above call the `calculateFeatures` argument is set to `TRUE`: by doing so formulae are first calculated for individual features within a feature group. These results are then used to generate a consensus candidate formula list for each feature group. During this process any outliers (defined by `formFeatThreshold`) are automatically removed. Setting `calculateFeatures` to `FALSE` instead will calculate formulae directly for feature groups from averaged MS peak lists. This will be significantly faster, but might produce (slightly) less accurate results.
+The `generateFormulas()` function returns an object that contains formula candidates assigned for each feature group. In the above call the `calculateFeatures` argument is set to `TRUE`: by doing so formulae are first calculated for individual features within a feature group. These results are then used to generate a consensus candidate formula list for each feature group. During this process any outliers (defined by `featThreshold`) are automatically removed. Setting `calculateFeatures` to `FALSE` instead will calculate formulae directly for feature groups from averaged MS peak lists. This will be significantly faster, but might produce (slightly) less accurate results.
 
 ## Compound identification
 

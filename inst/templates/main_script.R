@@ -77,15 +77,15 @@ plists <- generateMSPeakLists(fGroups, "brukerfmf", avgFGroupParams = avgPListPa
 {{ optionalCodeBlock(formulaOpts$algo == "GenForm") }}
 formulas <- generateFormulas(fGroups, "genform", plists, maxMzDev = 5,
                              adduct = "{{ if (polarity == 'positive') 'M+H' else 'M-H' }}", elements = "CHNOP",
-                             calculateFeatures = TRUE, formFeatThreshold = 0.75)
+                             calculateFeatures = TRUE, featThreshold = 0.75)
 {{ endCodeBlock() }}
 {{ optionalCodeBlock(formulaOpts$algo == "Bruker") }}
-formulas <- generateFormulas(fGroups, "bruker", precursorMzSearchWindow = 0.002, formFeatThreshold = 0.75)
+formulas <- generateFormulas(fGroups, "bruker", precursorMzSearchWindow = 0.002, featThreshold = 0.75)
 {{ endCodeBlock() }}
 {{ optionalCodeBlock(formulaOpts$algo == "SIRIUS") }}
 formulas <- generateFormulas(fGroups, "sirius", plists, maxMzDev = 5,
                              adduct = "{{ if (polarity == 'positive') '[M+H]+' else '[M-H]-' }}", elements = "CHNOP",
-                             profile = "qtof", calculateFeatures = TRUE, formFeatThreshold = 0.75)
+                             profile = "qtof", calculateFeatures = TRUE, featThreshold = 0.75)
 {{ endCodeBlock() }}
 {{ optionalCodeBlock(identOpts$algo != "") }}
 

@@ -87,7 +87,7 @@ processSiriusFormulas <- function(cmd, exitStatus, retries)
 #' @export
 generateFormulasSirius <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct = "[M+H]+", elements = "CHNOP",
                                    profile = "qtof", database = NULL, noise = NULL,
-                                   calculateFeatures = TRUE, formFeatThreshold = 0.75,
+                                   calculateFeatures = TRUE, featThreshold = 0.75,
                                    logPath = file.path("log", "sirius"), maxProcAmount = getOption("patRoon.maxProcAmount"))
 {
     ac <- checkmate::makeAssertCollection()
@@ -98,7 +98,7 @@ generateFormulasSirius <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct = 
     checkmate::assertString(database, null.ok = TRUE, add = ac)
     checkmate::assertNumber(noise, lower = 0, finite = TRUE, null.ok = TRUE, add = ac)
     checkmate::assertFlag(calculateFeatures, add = ac)
-    checkmate::assertNumber(formFeatThreshold, lower = 0, finite = TRUE, null.ok = TRUE, add = ac)
+    checkmate::assertNumber(featThreshold, lower = 0, finite = TRUE, null.ok = TRUE, add = ac)
     assertMultiProcArgs(logPath, maxProcAmount, add = ac)
     checkmate::reportAssertions(ac)
 
@@ -212,7 +212,7 @@ generateFormulasSirius <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct = 
             saveCacheSet("formulasGenForm", formHashes, setHash, cacheDB)
 
         if (length(formTable) > 0)
-            groupFormulas <- generateGroupFormulasByConsensus(formTable, formFeatThreshold)
+            groupFormulas <- generateGroupFormulasByConsensus(formTable, featThreshold)
         else
             groupFormulas <- list()
     }

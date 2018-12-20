@@ -158,11 +158,11 @@ generateFormulasSirius <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct = 
             if (!is.null(logPath))
                 mkdirp(logPath)
 
-            ret <- executeMultiProcess(cmdQueue, processSiriusFormulas, errorHandler = function(cmd, exitStatus, retries)
+            ret <- pruneList(executeMultiProcess(cmdQueue, processSiriusFormulas, errorHandler = function(cmd, exitStatus, retries)
             {
                 stop(sprintf("Fatal: Failed to execute SIRIUS for %s - exit code: %d\nCommand: %s", cmd$gName, exitStatus,
                              paste(cmd$command, paste0(cmd$args, collapse = " "))))
-            }, maxProcAmount = maxProcAmount)
+            }, maxProcAmount = maxProcAmount), checkZeroRows = TRUE)
 
             ngrp <- length(ret)
         }

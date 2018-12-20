@@ -56,7 +56,6 @@ Release:
     - set column order?
     - DA: also include precursor in fragments?
     - mSigma --> isoScore? (tricky as low value is best) If yes, mention in docs...
-    - only some adducts are supported now (do more?)
     - only keep best scoring candidates for consensus? (what about fragments?? --> seems fine for genform/sirius as all scores are the same for each fragment, need to check DA)
     - customize/document ranking column order? (only do rank for sirius?)
     - how to handle ranking of consensus results?
@@ -82,8 +81,11 @@ Release:
         - calculateFeatures TRUE/FALSE
         - verify group count for consensus
         - makeTable: check elements?
+        - filter()
+        - filter/makeTable with MS only formulas
     - test DA formulas, ranking (mSigma)
 - plotSpec(): mark precursor?
 - look into supervisors for processx
 - groupTable --> makeTable
 - filter() for compounds: copy new functionality from formulas method
+- harmonize adduct specification for formulas/compounds (also update calculateIonFormula())

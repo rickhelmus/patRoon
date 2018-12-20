@@ -95,9 +95,9 @@ setMethod("[", c("formulas", "ANY", "missing", "missing"), function(x, i, j, ...
     {
         if (!is.character(i))
             i <- groupNames(x)[i]
-        x@featureFormulas <- sapply(x@eatureFormulas, function(a) pruneList(a[i]),
+        x@featureFormulas <- sapply(x@featureFormulas, function(a) pruneList(a[i]),
                                     simplify = FALSE)
-        x@eatureFormulas <- pruneList(x@eatureFormulas, TRUE)
+        x@featureFormulas <- pruneList(x@featureFormulas, TRUE)
 
         x@formulas <- pruneList(x@formulas[i], TRUE)
     }
@@ -263,7 +263,10 @@ setMethod("filter", "formulas", function(obj, minExplainedMSMSPeaks = NULL, elem
         formTable <- obj[[grp]]
         if (!is.null(minExplainedMSMSPeaks) && minExplainedMSMSPeaks > 0)
         {
-            fragCounts <- formTable[, ifelse(byMSMS, length(frag_formula), 0), by = "formula"]
+            formTable <- formTable[byMSMS == TRUE]
+            if (nrow(formTable) == 0)
+                return(formTable)
+            fragCounts <- formTable[, ifelse(byMSMS, length(frag_formula), 0L), by = "formula"][[2]]
             formTable[fragCounts >= minExplainedMSMSPeaks]
         }
 
@@ -272,6 +275,8 @@ setMethod("filter", "formulas", function(obj, minExplainedMSMSPeaks = NULL, elem
         if ((!is.null(fragElements) || !is.null(lossElements)) && any(formTable$byMSMS))
         {
             formTable <- formTable[byMSMS == TRUE]
+            if (nrow(formTable) == 0)
+                return(formTable)
             if (!is.null(fragElements))
                 formTable <- formTable[formTable[, rep(any(sapply(frag_formula, checkFormula, fragElements)), .N),
                                                  by = "formula"][[2]]]
@@ -405,10 +410,6 @@ setMethod("consensus", "formulas", function(obj, ..., formThreshold = 0)
                           unique = TRUE, .var.name = "...", add = ac)
     checkmate::assertNumber(formThreshold, lower = 0, finite = TRUE, add = ac)
     checkmate::reportAssertions(ac)
-
-    allFormulas <- allFormulas[lengths(allFormulas) > 0]
-    if (length(allFormulas) < 2)
-        stop("Need at least two non-empty formulas objects")
 
     allFormNames <- sapply(allFormulas, algorithm)
     allFormNames <- make.unique(allFormNames)

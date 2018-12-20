@@ -147,7 +147,7 @@ The parameters specified in parameter sets are directly passed through
 
   Using multiple parameter sets with differing fixed values allows
   optimization of qualitative values (see examples below).
-  
+
   \strong{NOTE:} Similar to IPO, the \code{peakwidth} and \code{prefilter}
   parameters for XCMS feature finding should be split in two different
   values:

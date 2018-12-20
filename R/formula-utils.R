@@ -361,6 +361,8 @@ getFragmentInfoFromForms <- function(spec, fragFormTable)
 
     if (!is.null(fragFormTable[["mergedBy"]]))
         fi[, mergedBy := list(strsplit(fragFormTable$mergedBy, ",", fixed = TRUE))]
+
+    return(fi)
 }
 
 # get a vector of all (merged) columns

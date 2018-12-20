@@ -76,31 +76,31 @@ compsEmpty <- if (doMetFrag) compsMFEmptyPL else if (doSIRIUS) compsSIREmptyPL
 
 test_that("filtering works", {
     skip_if_not(hasCompounds)
-    
+
     expect_lte(length(filter(comps, topMost = 1)), length(fGroupsSub))
     expect_lte(length(filter(comps, topMost = 5)), 5 * length(fGroupsSub))
     expect_lte(length(filter(comps, minExplainedPeaks = 2)), length(comps))
     expect_length(filter(comps, minExplainedPeaks = 1E6), 0)
     expect_length(filter(compsEmpty, minExplainedPeaks = 2, topMost = 1), 0)
-    
+
     skip_if_not(doMetFrag)
     expect_lt(length(filter(compsMFIso, minScore = 2)), length(compsMFIso))
     expect_lt(length(filter(compsMFIso, minFragScore = 200)), length(compsMFIso))
-    
+
     skip_if_not(doSIRIUS)
     expect_lt(length(filter(compsSIR, minScore = -200)), length(compsSIR))
 })
 
 test_that("basic subsetting", {
     skip_if_not(hasCompounds)
-    
+
     expect_length(comps["nope"], 0)
     expect_equivalent(groupNames(comps[1:2]), groupNames(comps)[1:2])
     expect_equivalent(groupNames(comps[groupNames(comps)[2:3]]), groupNames(comps)[2:3])
     expect_equivalent(groupNames(comps[c(FALSE, TRUE)]), groupNames(comps)[c(FALSE, TRUE)])
     expect_equal(length(comps[FALSE]), 0)
     expect_length(compsEmpty[1:5], 0)
-    
+
     expect_equivalent(comps[[1]], compoundTable(comps)[[1]])
     expect_equivalent(comps[[groupNames(comps)[1]]], compoundTable(comps)[[1]])
     expect_equivalent(callDollar(comps, groupNames(comps)[1]), comps[[1]])
@@ -108,7 +108,7 @@ test_that("basic subsetting", {
 
 if (doMetFrag)
 {
-    forms <- consensus(generateFormulas(fGroupsSub, "genform", plists), fGroups = fGroupsSub)
+    forms <- generateFormulas(fGroupsSub, "genform", plists)
     compsMFIsoF <- addFormulaScoring(compsMFIso, forms)
 }
 
@@ -154,7 +154,7 @@ if (doMetFrag && doSIRIUS)
 test_that("consensus works", {
     skip_if_not(hasCompounds)
     expect_length(consensus(comps, compsEmpty), length(comps))
-    
+
     skip_if_not(doMetFrag && doSIRIUS)
     expect_known_value(compsCons, testFile("compounds-cons"))
     expect_known_show(compsCons, testFile("compounds-cons", text = TRUE))
@@ -164,16 +164,16 @@ test_that("consensus works", {
 
 test_that("reporting works", {
     skip_if_not(hasCompounds)
-    
+
     expect_error(reportCSV(fGroups, getWorkPath(), compounds = comps), NA)
     for (grp in names(compoundTable(comps)))
         checkmate::expect_file_exists(getWorkPath("compounds", sprintf("%s-%s.csv", class(fGroups), grp)))
-    
+
     expect_error(reportPDF(fGroups, getWorkPath(), reportFGroups = FALSE, compounds = comps,
                            MSPeakLists = plists), NA)
     for (grp in names(compoundTable(comps)))
         checkmate::expect_file_exists(getWorkPath("compounds", sprintf("%s-%s.pdf", class(fGroups), grp)))
-    
+
     expect_reportMD(makeReportMD(fGroups, reportPlots = "none",
                                  compounds = comps, MSPeakLists = plists))
 })
@@ -189,13 +189,13 @@ test_that("reporting empty objects works", {
 
 test_that("plotting works", {
     skip_if_not(doMetFrag)
-    
+
     # plotting structure seems to be difficult to do reproducible between systems, so disable for vdiffr now...
     expect_doppel("compound-spec", function() plotSpec(compsMFIso, 1, names(compoundTable(compsMFIso))[1], plists, plotStruct = FALSE))
     expect_plot(plotSpec(compsMFIso, 1, names(compoundTable(compsMFIso))[1], plists, plotStruct = TRUE))
     # expect_doppel("spec-gg", plotSpec(compsMFIso, 1, names(compoundTable(compsMFIso))[1], plists, useGGPlot2 = TRUE))
     expect_plot(print(plotSpec(compsMFIso, 1, names(compoundTable(compsMFIso))[1], plists, useGGPlot2 = TRUE)))
-    
+
     # plotStructure gives an empty plot??
     # expect_doppel("struct", function() plotStructure(compsMFIso, 1, names(compoundTable(compsMFIso))[1]))
     expect_plot(plotStructure(compsMFIso, 1, names(compoundTable(compsMFIso))[1]))

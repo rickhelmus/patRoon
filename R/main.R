@@ -247,7 +247,7 @@ NULL
 #' \code{\link{optimizationResult}} class).
 #'   \item Experiments are not (yet) executed in parallel.
 #' }
-#' 
+#'
 #'
 #' @param analysisInfo \link[=analysis-information]{Analysis info table} (passed
 #'   to \code{\link{findFeatures}}).
@@ -301,7 +301,7 @@ NULL
 #'
 #'   Using multiple parameter sets with differing fixed values allows
 #'   optimization of qualitative values (see examples below).
-#'   
+#'
 #'   \strong{NOTE:} Similar to IPO, the \code{peakwidth} and \code{prefilter}
 #'   parameters for XCMS feature finding should be split in two different
 #'   values:
@@ -312,13 +312,13 @@ NULL
 #'     are split in \code{prefilter} and \code{value_of_prefilter},
 #'     respectively.
 #'   }
-#'   
+#'
 #' @section Functions: The \code{optimizeFeatureFinding} and
 #'   \code{optimizeFeatureGrouping} are the functions to be used to optimize
 #'   parameters for feature finding and grouping, respectively. These functions
 #'   are analogous to \code{\link{optimizeXcmsSet}} and
 #'   \code{\link{optimizeRetGroup}} from \pkg{IPO}.
-#' 
+#'
 #'   The \code{generateFeatureOptPSet} and \code{generateFGroupsOptPSet} functions
 #'   may be used to generate a parameter set for feature finding and grouping,
 #'   respectively. Some algorithm dependent default parameter optimization ranges
@@ -353,7 +353,7 @@ NULL
 #'   Hence, grouping and retention time alignment parameters used by XCMS should
 #'   (still) be set through the \code{groupArgs} and \code{retcorArgs}
 #'   parameters.
-#' 
+#'
 #' @return The \code{optimizeFeatureFinding} and \code{optimizeFeatureGrouping}
 #'   return their results in a \code{\link{optimizationResult}} object.
 #'
@@ -377,7 +377,7 @@ NULL
 #' column containing their intensities. These 'MS peak lists' can then be used
 #' for \link[=formula-generation]{formula generation} and
 #' \link[=compound-generation]{compound generation}.
-#' 
+#'
 #' MS and MS/MS peak lists are first generated for all features (or a subset, if
 #' the \code{topMost} argument is set). During this step multiple spectra over
 #' the feature elution profile are averaged. Subsequently, peak lists
@@ -386,7 +386,7 @@ NULL
 #' from individual features or from group averaged peak lists. For instance, the
 #' former may be used by formulae calculation, while compound identification and
 #' plotting functionality typically uses group averaged peak lists.
-#' 
+#'
 #' Several functions exist to automatically extract MS peak lists for feature
 #' groups.
 #'
@@ -436,7 +436,7 @@ NULL
 #'   }
 #'   The \code{getDefAvgPListParams} function can be used to generate a default
 #'   parameter list.
-#'   
+#'
 #'   Note that when Bruker algorithms are used these parameters only control
 #'   generation of feature groups averaged peak lists: how peak lists for
 #'   features are generated is controlled by DataAnalysis.
@@ -447,7 +447,7 @@ NULL
 #' @section Source: Averaging of mass spectra algorithms used by are based on
 #'   the \href{https://github.com/zeehio/msProcess}{msProcess} R package (now
 #'   archived on CRAN).
-#' 
+#'
 #' @references  \cr\cr
 #'   \addCitations{mzR}{1} \cr\cr
 #'   \addCitations{mzR}{2} \cr\cr

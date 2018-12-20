@@ -162,7 +162,7 @@ The \code{getDefAvgPListParams} is used to create a parameter list
   }
   The \code{getDefAvgPListParams} function can be used to generate a default
   parameter list.
-  
+
   Note that when Bruker algorithms are used these parameters only control
   generation of feature groups averaged peak lists: how peak lists for
   features are generated is controlled by DataAnalysis.

@@ -358,6 +358,9 @@ getFragmentInfoFromForms <- function(spec, fragFormTable)
     fi <- data.table(mz = fragFormTable$frag_mz, formula = fragFormTable$frag_formula)
     fi[, PLIndex := sapply(mz, function(omz) which.min(abs(omz - spec$mz)))] # UNDONE: is this always correct?
     fi[, intensity := spec$intensity[PLIndex]]
+
+    if (!is.null(fragFormTable[["mergedBy"]]))
+        fi[, mergedBy := list(strsplit(fragFormTable$mergedBy, ",", fixed = TRUE))]
 }
 
 # get a vector of all (merged) columns

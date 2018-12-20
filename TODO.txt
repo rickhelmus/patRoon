@@ -55,7 +55,6 @@ Release:
     - DBE calculation for SIRIUS?
     - set column order?
     - DA: also include precursor in fragments?
-    - set mergedBy in getFragmentInfoFromForms()?
     - mSigma --> isoScore? (tricky as low value is best) If yes, mention in docs...
     - only some adducts are supported now (do more?)
     - only keep best scoring candidates for consensus? (what about fragments?? --> seems fine for genform/sirius as all scores are the same for each fragment, need to check DA)
@@ -87,3 +86,4 @@ Release:
 - plotSpec(): mark precursor?
 - look into supervisors for processx
 - groupTable --> makeTable
+- filter() for compounds: copy new functionality from formulas method

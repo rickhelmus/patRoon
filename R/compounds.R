@@ -23,7 +23,7 @@ NULL
 #'   \samp{-1} may be specified to these methods to select all candidates. When
 #'   multiple indices are specified for \code{plotStructure}, their maximum
 #'   common substructure will be drawn.
-#' 
+#'
 #' @templateVar seli feature groups
 #' @templateVar selOrderi groupNames()
 #' @templateVar dollarOpName feature group
@@ -96,14 +96,14 @@ setMethod("[", c("compounds", "ANY", "missing", "missing"), function(x, i, ...)
     if (!missing(i))
     {
         assertSubsetArg(i)
-        
+
         if (!is.character(i))
             i <- groupNames(x)[i]
-        
+
         i <- i[i %in% groupNames(x)]
         x@compounds <- x@compounds[i]
     }
-    
+
     return(x)
 })
 
@@ -156,9 +156,9 @@ setMethod("filter", "compounds", function(obj, minExplainedPeaks = NULL, minScor
     aapply(checkmate::assertNumber, . ~ minScore + minFragScore + minFormulaScore, finite = TRUE,
            null.ok = TRUE, fixed = list(add = ac)) # note: negative scores allowed for SIRIUS
     checkmate::reportAssertions(ac)
-    
+
     cat("Filtering compounds... ")
-    
+
     mCompNames <- mergedCompoundNames(obj)
     filterCols <- function(cmpTable, col, minVal)
     {
@@ -217,10 +217,10 @@ setMethod("addFormulaScoring", "compounds", function(compounds, formulas, update
     checkmate::assertFlag(updateScore, add = ac)
     checkmate::assertNumber(formulaScoreWeight, lower = 0, finite = TRUE, add = ac)
     checkmate::reportAssertions(ac)
-    
+
     if (length(compounds) == 0)
         return(compounds)
-    
+
     cTable <- compoundTable(compounds)
     cGNames <- names(cTable)
 
@@ -292,13 +292,13 @@ setMethod("getMCS", "compounds", function(obj, index, groupName)
         checkmate::checkTRUE(index == -1),
         .var.name = "index"
     )
-    
+
     assertChoiceSilent(groupName, names(obj@compounds), add = ac)
     checkmate::reportAssertions(ac)
-    
+
     if (length(index) == 1 && index == -1)
         index <- seq_len(nrow(compoundTable(obj)[[groupName]]))
-    
+
     mols <- getMoleculesFromSMILES(compoundTable(obj)[[groupName]][["SMILES"]][index])
     mcons <- mols[[1]]
     if (length(mols) > 1)
@@ -307,14 +307,14 @@ setMethod("getMCS", "compounds", function(obj, index, groupName)
         {
             if (!isValidMol(mols[[i]]))
                 return(emptyMol())
-            
+
             # might fail if there is no overlap...
             tryCatch(mcons <- rcdk::get.mcs(mcons, mols[[i]]), error = function(e) FALSE)
             if (mcons == FALSE)
                 return(emptyMol())
         }
     }
-    
+
     return(mcons)
 })
 
@@ -339,7 +339,7 @@ setMethod("plotStructure", "compounds", function(obj, index, groupName, width = 
     aapply(checkmate::assertNumber, . ~ width + height, lower = 0, finite = TRUE, fixed = list(add = ac))
     checkmate::assertFlag(useGGPlot2, add = ac)
     checkmate::reportAssertions(ac)
-    
+
     compTable <- compoundTable(obj)[[groupName]]
 
     if (is.null(compTable) || nrow(compTable) == 0)
@@ -349,7 +349,7 @@ setMethod("plotStructure", "compounds", function(obj, index, groupName, width = 
         mol <- getMCS(obj, index, groupName)
     else
         mol <- getMoleculesFromSMILES(compTable$SMILES[index], emptyIfFails = TRUE)[[1]]
-    
+
     if (useGGPlot2)
     {
         raster <- rcdk::view.image.2d(mol, rcdk::get.depictor(width, height))
@@ -376,7 +376,7 @@ setMethod("plotScores", "compounds", function(obj, index, groupName, normalizeSc
     checkmate::assertChoice(normalizeScores, c("none", "max", "minmax"))
     checkmate::assertFlag(useGGPlot2, add = ac)
     checkmate::reportAssertions(ac)
-    
+
     compTable <- compoundTable(obj)[[groupName]]
 
     if (is.null(compTable) || nrow(compTable) == 0)
@@ -452,7 +452,7 @@ setMethod("plotScores", "compounds", function(obj, index, groupName, normalizeSc
         }
 
         text(bp, bpsc, labels = round(bpsc, 2), pos = 3, cex = 0.8, xpd = TRUE)
-    
+
         par(oldp)
     }
     else
@@ -523,7 +523,7 @@ setMethod("plotSpec", "compounds", function(obj, index, groupName, MSPeakLists, 
     fi <- compr$fragInfo[[1]]
     if (!is.null(fTable) && nrow(fTable) > 0)
     {
-        ft <- fTable[frag_formula %in% fi$formula]
+        ft <- fTable[neutral_formula == compr$formula]
         if (is.null(fi))
         {
             fi <- ft
@@ -531,16 +531,16 @@ setMethod("plotSpec", "compounds", function(obj, index, groupName, MSPeakLists, 
         }
         else
             fi <- mergeFragInfo(fi, getFragmentInfoFromForms(spec, ft),
-                                algorithm(obj), algorithm(formulas), TRUE)
+                                algorithm(obj), algorithm(formulas))
     }
 
     if (plotStruct)
         mol <- getMoleculesFromSMILES(compr$SMILES)
-    
+
     if (!useGGPlot2)
     {
         oldp <- par(mar = par("mar") * c(1, 1, 0, 0))
-        
+
         if (plotStruct && isValidMol(mol))
         {
             molHInch <- 1.5
@@ -548,7 +548,7 @@ setMethod("plotSpec", "compounds", function(obj, index, groupName, MSPeakLists, 
         }
         else
             makeMSPlot(spec, fi)
-        
+
         # draw structure
         if (plotStruct && isValidMol(mol))
         {
@@ -558,9 +558,9 @@ setMethod("plotSpec", "compounds", function(obj, index, groupName, MSPeakLists, 
                 img <- magick::image_trim(magick::image_read(raster))
                 img <- magick::image_transparent(img, "white")
             }
-            
+
             dpi <- (par("cra")/par("cin"))[1]
-            
+
             startx <- par("usr")[1]
             xlim <- par("usr")[2]
             ylim <- par("usr")[4]
@@ -576,7 +576,7 @@ setMethod("plotSpec", "compounds", function(obj, index, groupName, MSPeakLists, 
                 imgPlotH <- imgPlotH / hresize
                 imgPlotW <- maxW
             }
-            
+
             maxH <- yinch(molHInch)
             if (imgPlotH > maxH)
             {
@@ -711,7 +711,7 @@ setMethod("consensus", "compounds", function(obj, ..., compThreshold = 0.0, minM
         # in case names are still duplicated
         compNames <- make.unique(compNames)
     }
-    
+
 
     # initialize all compound objects for merge: copy them, rename columns to
     # avoid duplicates and set merged by field of fragInfo.
@@ -791,7 +791,7 @@ setMethod("consensus", "compounds", function(obj, ..., compThreshold = 0.0, minM
                         if (hasLeft && hasRight)
                         {
                             # both have fraginfo
-                            fiMerged <- mergeFragInfo(fiRLeft, fiRRight, leftName, rightName, FALSE)
+                            fiMerged <- mergeFragInfo(fiRLeft, fiRRight, leftName, rightName)
                             set(mCompounds, r, fiColLeft, list(list(fiMerged)))
                         }
                         else if (hasRight) # only right

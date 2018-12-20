@@ -418,6 +418,7 @@ setMethod("consensus", "formulas", function(obj, ..., formThreshold = 0)
         return(lapply(formulaTable(allFormulas[[fi]]), function(ft)
         {
             ret <- copy(ft)
+            ret[, mergedBy := allFormNames[fi]]
             setnames(ret, paste0(names(ret), "-", allFormNames[fi]))
             return(ret)
         }))
@@ -448,7 +449,7 @@ setMethod("consensus", "formulas", function(obj, ..., formThreshold = 0)
                 mTable <- rightFList[[grp]]
 
                 # rename columns that should be unique from right to left
-                unCols <- c(uniqueCols, c("formula", "byMSMS", "frag_formula"))
+                unCols <- c(uniqueCols, c("formula", "byMSMS", "frag_formula", "mergedBy"))
                 unCols <- unCols[sapply(unCols, function(uc) !is.null(mTable[[paste0(uc, "-", rightName)]]))]
                 setnames(mTable, paste0(unCols, "-", rightName), paste0(unCols, "-", leftName))
             }
@@ -483,6 +484,12 @@ setMethod("consensus", "formulas", function(obj, ..., formThreshold = 0)
                         }
                     }
                 }
+
+                # collapse mergedBy
+                ml <- paste0("mergedBy-", leftName); mr <- paste0("mergedBy-", rightName)
+                mTable[!is.na(get(ml)), (ml) := ifelse(!is.na(get(mr)), paste(get(ml), get(mr), sep = ","), get(ml))]
+                mTable[is.na(get(ml)), (ml) := get(mr)]
+                mTable[, (mr) := NULL]
             }
 
             consFormulaList[[grp]] <- mTable
@@ -496,33 +503,14 @@ setMethod("consensus", "formulas", function(obj, ..., formThreshold = 0)
     for (grpi in seq_along(consFormulaList))
     {
         # fix up de-duplicated column names
-        deDupCols <- c(uniqueCols, "formula", "byMSMS", "frag_formula")
+        deDupCols <- c(uniqueCols, "formula", "byMSMS", "frag_formula", "mergedBy")
         leftCols <- paste0(deDupCols, "-", leftName)
         deDupCols <- deDupCols[leftCols %in% names(consFormulaList[[grpi]])]
         leftCols <- leftCols[leftCols %in% names(consFormulaList[[grpi]])]
         if (length(leftCols) > 0)
             setnames(consFormulaList[[grpi]], leftCols, deDupCols)
 
-        # match all that has a dash inbetween
-        mergedCols <- getAllMergedFormulasCols(names(consFormulaList[[grpi]]))
-
-        # figure out what was merged (i.e. name after dash)
-        mergedColsWhat <- sub(".+\\-", "", mergedCols)
-
-        if (length(unique(mergedColsWhat)) < 2) # nothing was merged
-            consFormulaList[[grpi]][, coverage := 1 / length(allFormulas)]
-        else
-        {
-            for (r in seq_len(nrow(consFormulaList[[grpi]])))
-            {
-                # count how many merged objects have a value in this line: each
-                # object should at least have one non-NA value
-                notNAs <- sapply(mergedCols, function(mc) !is.na(consFormulaList[[grpi]][[mc]][r]))
-                mergedNotNACount <- length(unique(mergedColsWhat[notNAs]))
-
-                set(consFormulaList[[grpi]], r, "coverage", mergedNotNACount / length(allFormulas))
-            }
-        }
+        consFormulaList[[grpi]][, coverage := (sapply(mergedBy, countCharInStr, ",") + 1) / length(allFormulas)]
 
         if (formThreshold > 0)
             consFormulaList[[grpi]] <- consFormulaList[[grpi]][coverage >= formThreshold]

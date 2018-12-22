@@ -218,10 +218,12 @@ processGenFormResultFile <- function(file, isMSMS, adduct)
 #'   \command{GenForm} without commandline options) which can be set by the
 #'   \code{extraOpts} parameter.
 #'   \Sexpr[results=verbatim,echo=FALSE,stage=build]{cat(patRoon:::readAllFile(system.file("misc",
-#'   "genform.txt", package = "patRoon")))}
+#'    "genform.txt", package = "patRoon")))}
 #'
 #' @param hetero Only consider formulae with at least one hetero atom. Sets the
 #'   \option{het} commandline option.
+#' @param oc Only consider organic formulae (\emph{i.e.} with at least one
+#'   carbon atom). Sets the \option{oc} commandline option.
 #' @param extraOpts An optional character vector with any other commandline
 #'   options that will be passed to \command{GenForm}. See the \verb{GenForm
 #'   options} section for all available commandline options.
@@ -237,7 +239,7 @@ processGenFormResultFile <- function(file, isMSMS, adduct)
 #' @rdname formula-generation
 #' @export
 generateFormulasGenForm <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct = "M+H",
-                                    elements = "CHNOP", hetero = TRUE, extraOpts = NULL,
+                                    elements = "CHNOP", hetero = TRUE, oc = FALSE, extraOpts = NULL,
                                     calculateFeatures = TRUE, featThreshold = 0.75, MSMode = "both",
                                     maxProcAmount = getOption("patRoon.maxProcAmount"), maxCmdsPerProc = 25)
 {
@@ -274,7 +276,9 @@ generateFormulasGenForm <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct =
 
     if (hetero)
         mainArgs <- c(mainArgs, "het")
-
+    if (oc)
+        mainArgs <- c(mainArgs, "oc")
+    
     formTable <- list()
     cacheDB <- openCacheDBScope() # open manually so caching code doesn't need to on each R/W access
     baseHash <- makeHash(maxMzDev, adduct, elements, hetero, extraOpts)

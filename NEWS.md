@@ -7,6 +7,7 @@
     * `reportCSV()` now splits formulas for each feature group in separate CSV files (similar to `compounds` reporting).
     * Fixed: `reportPDF()` now actually includes formula annotations in annotated compound spectra when formulas are specified.
     * New `makeTable()` method that generates a table with all formulas and other information (partially replaces old `consensus()` functionality).
+    * New oc argument for GenForm: if enabled only organic formulae are accepted (i.e. with carbon atom)
 * `file` argument for `clearCache()`
 * Updates on MS peak lists
     * More consistent naming for algorithm specific MS peak list generators (i.e. `generateMSPeakListsX` where X is the algo).

@@ -210,7 +210,7 @@ setMethod("makeTable", "formulas", function(obj, fGroups = NULL, average = FALSE
         if (length(rmCols) > 0)
             ret[, (rmCols) := NULL]
 
-        ret <- unique(ret, by = "formula")
+        ret <- unique(ret, by = c("group", "formula"))
     }
     else
     {
@@ -267,12 +267,12 @@ setMethod("filter", "formulas", function(obj, minExplainedFragPeaks = NULL, elem
             if (nrow(formTable) == 0)
                 return(formTable)
             fragCounts <- formTable[, ifelse(byMSMS, length(frag_formula), 0L), by = "formula"][[2]]
-            formTable[fragCounts >= minExplainedFragPeaks]
+            formTable <- formTable[fragCounts >= minExplainedFragPeaks]
         }
 
         if (!is.null(elements))
             formTable <- formTable[sapply(formula, checkFormula, elements)]
-        if ((!is.null(fragElements) || !is.null(lossElements)) && any(formTable$byMSMS))
+        if ((!is.null(fragElements) || !is.null(lossElements)))
         {
             formTable <- formTable[byMSMS == TRUE]
             if (nrow(formTable) == 0)
@@ -281,7 +281,7 @@ setMethod("filter", "formulas", function(obj, minExplainedFragPeaks = NULL, elem
                 formTable <- formTable[formTable[, rep(any(sapply(frag_formula, checkFormula, fragElements)), .N),
                                                  by = "formula"][[2]]]
             if (!is.null(lossElements))
-                formTable <- formTable[formTable[, any(sapply(neutral_loss, checkFormula, lossElements)),
+                formTable <- formTable[formTable[, rep(any(sapply(neutral_loss, checkFormula, lossElements)), .N),
                                                  by = "formula"][[2]]]
         }
 

@@ -51,6 +51,7 @@ Release:
 - removeRefAnalyses TRUE by default?
 - SIRIUS compounds: report charged formula for fragInfo (as is now done for formulas, also affects formula scoring for compounds)
 - formulas
+    - featureFormulas() name
     - keep ana_min_intensity etc?
     - DBE calculation for SIRIUS?
     - set column order?
@@ -76,13 +77,6 @@ Release:
         - detail consensus process
             - highest scoring candidate of analyses is retained(?)
             - feature consensus now uses both MS and MS/MS formulas for coverage calculation
-    - tests
-        - $ method
-        - calculateFeatures TRUE/FALSE
-        - verify group count for consensus
-        - makeTable: check elements?
-        - filter()
-        - filter/makeTable with MS only formulas
     - test DA formulas, ranking (mSigma)
 - plotSpec(): mark precursor?
 - look into supervisors for processx

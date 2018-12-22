@@ -51,7 +51,6 @@ Release:
 - removeRefAnalyses TRUE by default?
 - SIRIUS compounds: report charged formula for fragInfo (as is now done for formulas, also affects formula scoring for compounds)
 - formulas
-    - featureFormulas() name
     - keep ana_min_intensity etc?
     - DBE calculation for SIRIUS?
     - set column order?
@@ -64,7 +63,6 @@ Release:
       - or simply don't and mention limitation in doc? (one limitation: filtering)
     - docs / NEWS
         - move generics in to right place, set aliases
-        - featureFormulas() name?
         - clarify feature & group formulas
         - countFragElements takes ionic formula (or remove option?)
         - OM refs

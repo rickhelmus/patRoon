@@ -5,6 +5,7 @@
 \alias{formulas-class}
 \alias{formulas}
 \alias{formulaTable,formulas-method}
+\alias{formulaTable}
 \alias{algorithm,formulas-method}
 \alias{analyses,formulas-method}
 \alias{groupNames,formulas-method}
@@ -18,7 +19,7 @@
 \alias{consensus,formulas-method}
 \title{Formula lists class}
 \usage{
-\S4method{formulaTable}{formulas}(obj)
+\S4method{formulaTable}{formulas}(obj, features = FALSE)
 
 \S4method{algorithm}{formulas}(obj)
 
@@ -47,6 +48,9 @@
 }
 \arguments{
 \item{obj, x, object, formulas}{The \code{formulas} object.}
+
+\item{features}{If \code{TRUE} returns formula data for features, otherwise
+for feature groups.}
 
 \item{i, j}{A numeric or character value which is used to select analyses/feature groups by
 their index or name, respectively (for the order/names see \code{analyses()/groupNames()}).\cr\cr For \code{[}: Can also be logical to perform logical selection
@@ -102,10 +106,10 @@ analyses containing the feature group that was used to generate the
 formula.}
 }
 \value{
-\code{formulas} returns a \code{list} containing for each analysis
-  and each feature group a \code{\link{data.table}} with an overview of all
-  generated formulae and other data such as candidate scoring and MS/MS
-  fragments.
+\code{formulaTable} returns a \code{list} containing for each feature
+  group (or feature if \code{features=TRUE}) a \code{\link{data.table}}
+  with an overview of all generated formulae and other data such as candidate
+  scoring and MS/MS fragments.
 
 \code{makeTable} returns a \code{\link{data.table}}.
 
@@ -161,7 +165,7 @@ formulae of feature groups that are present in multiple analyses.
 \section{Slots}{
 
 \describe{
-\item{\code{formulas}}{Lists of all generated formulae. Use the \code{formulaTable}
+\item{\code{formulas,featureFormulas}}{Lists of all generated formulae. Use the \code{formulaTable}
 method for access.}
 
 \item{\code{algorithm}}{The algorithm that was used for generation of formulae. Use

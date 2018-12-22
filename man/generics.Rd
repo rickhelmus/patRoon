@@ -11,7 +11,6 @@
 \alias{consensus}
 \alias{featureTable}
 \alias{filter}
-\alias{formulaTable}
 \alias{getFeatures}
 \alias{getMCS}
 \alias{groupNames}
@@ -45,8 +44,6 @@ consensus(obj, ...)
 featureTable(obj)
 
 filter(obj, ...)
-
-formulaTable(obj)
 
 getFeatures(obj)
 
@@ -202,17 +199,6 @@ please refer to the linked method documentation for each generic.
 
 \itemize{
     \item Methods are defined for: \code{\link[=filter,MSPeakLists-method]{MSPeakLists}}, \code{\link[=filter,compounds-method]{compounds}}, \code{\link[=filter,featureGroups-method]{featureGroups}}, \code{\link[=filter,features-method]{features}}, \code{\link[=filter,featuresXCMS-method]{featuresXCMS}}, \code{\link[=filter,formulas-method]{formulas}}.
-}
-
-\code{formulaTable} returns formula data.
-
-
-
-
-
-
-\itemize{
-    \item Methods are defined for: \code{\link[=formulaTable,formulas-method]{formulas}}.
 }
 
 \code{getFeatures} returns the object's \code{\link{features}} object.

@@ -8,7 +8,7 @@ NULL
 #' \code{formulas} objects are obtained from \link[=formula-generation]{formula
 #' generators}.
 #'
-#' @slot formulas Lists of all generated formulae. Use the \code{formulaTable}
+#' @slot formulas,featureFormulas Lists of all generated formulae. Use the \code{formulaTable}
 #'   method for access.
 #' @slot algorithm The algorithm that was used for generation of formulae. Use
 #'   the \code{algorithm} method for access.
@@ -27,15 +27,18 @@ formulas <- setClass("formulas",
                      slots = c(formulas = "list", featureFormulas = "list", algorithm = "character"))
 
 #' @describeIn formulas Accessor method to obtain generated formulae.
-#' @return \code{formulas} returns a \code{list} containing for each analysis
-#'   and each feature group a \code{\link{data.table}} with an overview of all
-#'   generated formulae and other data such as candidate scoring and MS/MS
-#'   fragments.
+#'
+#' @param features If \code{TRUE} returns formula data for features, otherwise
+#'   for feature groups.
+#'
+#' @return \code{formulaTable} returns a \code{list} containing for each feature
+#'   group (or feature if \code{features=TRUE}) a \code{\link{data.table}}
+#'   with an overview of all generated formulae and other data such as candidate
+#'   scoring and MS/MS fragments.
+#'
+#' @aliases formulaTable
 #' @export
-setMethod("formulaTable", "formulas", function(obj) obj@formulas)
-
-# UNDONE
-setMethod("featureFormulas", "formulas", function(obj) obj@featureFormulas)
+setMethod("formulaTable", "formulas", function(obj, features) if (features) obj@featureFormulas else obj@formulas)
 
 #' @describeIn formulas Accessor method for the algorithm (a character
 #'   string) used to generate formulae.
@@ -65,7 +68,7 @@ setMethod("show", "formulas", function(object)
     printf("A formulas object (%s)\n", class(object))
     printf("Algorithm: %s\n", algorithm(object))
 
-    ft <- featureFormulas(object)
+    ft <- formulaTable(object, TRUE)
     hasFeatForms <- length(ft) > 0
     ftcounts <- if (hasFeatForms) recursiveApplyDT(ft, function(x) length(unique(x$formula)), sapply) else 0
     ma <- mean(sapply(ftcounts, sum))

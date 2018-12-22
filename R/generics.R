@@ -55,6 +55,7 @@ setGeneric("generateComponents", function(fGroups, algorithm, ...) standardGener
 
 ### Formulas
 
+setGeneric("formulaTable", function(obj, features = FALSE) standardGeneric("formulaTable"))
 setGeneric("generateFormulas", function(fGroups, algorithm, ...) standardGeneric("generateFormulas"))
 
 ### Compounds
@@ -191,15 +192,6 @@ setGeneric("featureTable", function(obj) standardGeneric("featureTable"))
 #' @templateVar desc provides various functionality to do post-filtering of data.
 #' @template generics
 setGeneric("filter", function(obj, ...) standardGeneric("filter"))
-
-#' @templateVar func formulaTable
-#' @templateVar desc returns formula data.
-#' @template generics
-setGeneric("formulaTable", function(obj) standardGeneric("formulaTable"))
-
-
-# UNDONE
-setGeneric("featureFormulas", function(obj) standardGeneric("featureFormulas"))
 
 #' @templateVar func getFeatures
 #' @templateVar desc returns the object's \code{\link{features}} object.

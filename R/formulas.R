@@ -8,12 +8,20 @@ NULL
 #' \code{formulas} objects are obtained from \link[=formula-generation]{formula
 #' generators}.
 #'
-#' @slot formulas,featureFormulas Lists of all generated formulae. Use the \code{formulaTable}
-#'   method for access.
+#' @slot formulas,featureFormulas Lists of all generated formulae. Use the
+#'   \code{formulaTable} method for access.
 #' @slot algorithm The algorithm that was used for generation of formulae. Use
 #'   the \code{algorithm} method for access.
 #'
 #' @param obj,x,object,formulas The \code{formulas} object.
+#' @param OM For \code{makeTable}: if set to \code{TRUE} several columns
+#'   with information relevant for organic matter (OM) characterization will be
+#'   added (e.g. elemental ratios, classification). This will also make sure
+#'   that \code{countElements} contains at least C, H, N, O, P and S.
+#'
+#'   For \code{filter}: If \code{TRUE} then several filters are applied to
+#'   exclude unlikely formula candidates present in organic matter (OM). See
+#'   Source section for details.
 #'
 #' @templateVar seli analyses
 #' @templateVar selOrderi analyses()
@@ -21,6 +29,16 @@ NULL
 #' @templateVar selOrderj groupNames()
 #' @templateVar optionalji TRUE
 #' @template sub_op-args
+#'
+#' @section Source: Calculation of the aromaticity index (AI) and related double
+#'   bond equivalents (DBE_AI) is performed as described in Koch 2015. Formula
+#'   classification is performed by the rules described in Abdulla 2013.
+#'   Filtering of OM related molecules is performed as described in Koch 2006
+#'   and Kujawinski 2006. (see references).
+#'
+#' @references \insertRef{Koch2015}{patRoon} \cr\cr
+#'   \insertRef{Abdulla2013}{patRoon} \cr\cr \insertRef{Koch2006}{patRoon}
+#'   \cr\cr \insertRef{Kujawinski2006}{patRoon}
 #'
 #' @export
 formulas <- setClass("formulas",
@@ -155,14 +173,19 @@ setMethod("$", "formulas", function(x, name)
 #' @param fGroups The \code{\link{featureGroups}} object that was used to
 #'   generate this \code{formulas} object. If not \code{NULL} it is used to add
 #'   feature group information (retention and \emph{m/z} values).
+#' @param average If set to \code{TRUE} an 'average formula' is generated for
+#'   each feature group by combining all elements from all candidates and
+#'   averaging their amounts. This obviously leads to non-existing formulae,
+#'   however, this data may be useful to deal with multiple candidate formulae
+#'   per feature group when performing elemental characterization.
 #' @param countElements,countFragElements A \code{character} vector with
 #'   elements that should be counted for each MS(/MS) formula candidate. For
 #'   instance, \code{c("C", "H")} adds columns for both carbon and hydrogen
-#'   amounts in each formula. Set to \code{NULL} to not count any elements.
-#' @param OM If set to \code{TRUE} several columns with information relevant for
-#'   organic matter (OM) characterization will be added (e.g. elemental ratios,
-#'   classification). This will also make sure that \code{countElements}
-#'   contains at least C, H, N, O, P and S.
+#'   amounts of each formula. Note that the neutral formula
+#'   (\code{neutral_formula} column) is used to count elements of non-fragmented
+#'   formulae, whereas the charged formula of fragments (\code{frag_formula}
+#'   column) is used for fragments. Set to \code{NULL} to not count any
+#'   elements.
 #' @param maxFormulas,maxFragFormulas Maximum amount of unique candidate
 #'   formulae (or fragment formulae) per feature group. Set to \code{NULL} to
 #'   ignore.
@@ -236,7 +259,44 @@ setMethod("makeTable", "formulas", function(obj, fGroups = NULL, average = FALSE
     return(ret)
 })
 
-# NOTE: feature formulas untouched
+#' @describeIn formulas Performs rule based filtering on formula results.
+#'
+#' @param minExplainedFragPeaks Minimum number of fragment peaks that are
+#'   explained. Setting this to \samp{1} will remove any MS only formula
+#'   results. Set to \code{NULL} to ignore.
+#' @param elements Only retain candidate formulae that match a given elemental
+#'   restriction. The format of \code{elements} is a \code{character} string
+#'   with elements that should be present where each element is followed by a
+#'   valid amount or a range thereof. If no number is specified then \samp{1} is
+#'   assumed. For instance, \code{elements="C1-10H2-20O0-2P"}, specifies that
+#'   \samp{1-10}, \samp{2-20}, \samp{0-2} and \samp{1} carbon, hydrogen, oxygen
+#'   and phosphorus atoms should be present, respectively. When
+#'   \code{length(elements)>1} formulas are tested to follow at least one of the
+#'   given elemental restrictions. For instance, \code{elements=c("P", "S")}
+#'   specifies that either one phosphorus or sulphur atom should be present. Set
+#'   to \code{NULL} to ignore this filter.
+#' @param fragElements,lossElements Specifies elemental restrictions for
+#'   fragment or neutral loss formulas. Candidates are retained if at least one
+#'   of the fragment/neutral loss formulae follow the given restrictions. See
+#'   \code{elements} for the used format.
+#' @param topMost Only retain no more than this amount of best ranked candidates
+#'   for each feature group.
+#' @param scoreLimits Filter results by their scores. Should be a named
+#'   \code{list} that contains two-sized numeric vectors with the
+#'   minimum/maximum value of a score (use \code{-Inf}/\code{Inf} for no
+#'   limits). The names of each element should follow the values returned by
+#'   \code{\link{formulaScorings}()$name}. For instance,
+#'   \code{scoreLimits=list(isoScore=c(0.5, Inf))} specifies that the isotopic
+#'   match score should be at least \samp{0.5}. More details of scorings can be
+#'   obtained with \code{\link{formulaScorings}}. Set to \code{NULL} to skip
+#'   this filter.
+#'
+#' @note \code{filter} does not modify any formula results for features (if
+#'   present).
+#'
+#' @return \code{filter} returns a filtered \code{\link{formulas}} object.
+#'
+#' @export
 setMethod("filter", "formulas", function(obj, minExplainedFragPeaks = NULL, elements = NULL,
                                          fragElements = NULL, lossElements = NULL,
                                          topMost = NULL, scoreLimits = NULL,
@@ -387,21 +447,18 @@ setMethod("plotSpec", "formulas", function(obj, precursor, groupName, analysis =
     makeMSPlot(spec, fi, main = precursor)
 })
 
-#' @describeIn formulas Generates a consensus and other summarizing data for
-#'   formulae of feature groups that are present in multiple analyses.
+#' @describeIn formulas Generates a consensus of results from multiple
+#'   \code{formulas} objects.
 #'
-#' @param \dots Any further \code{formulas} objects on top of the object given
-#'   for the \code{obj} parameter to which a consensus should be generated.
-#' @param formThreshold Fractional minimum amount (0-1) to
-#'   which a generated precursor formula should be present in all given formula objects
-#'   (\code{formListThreshold}) containing the related feature group. For
-#'   instance, a value of \samp{0.5} for \code{formAnaThreshold} means that a
-#'   particular formula should be present in at least \samp{50\%} of all
-#'   analyses containing the feature group that was used to generate the
-#'   formula.
+#' @param \dots One or more \code{formulas} objects that should be used to
+#'   generate the consensus.
+#' @param formThreshold Fractional minimum amount (0-1) of which a formula
+#'   candidate should be present within all objects. For instance, a value of
+#'   \samp{0.5} means that a particular formula should be present in at least
+#'   \samp{50\%} of all objects.
 #'
-#' @return \code{consensus} returns a \code{formulas} object that is produced
-#'   by merging multiple \code{formulas} objects.
+#' @return \code{consensus} returns a \code{formulas} object that is produced by
+#'   merging results from multiple \code{formulas} objects.
 #'
 #' @export
 setMethod("consensus", "formulas", function(obj, ..., formThreshold = 0)

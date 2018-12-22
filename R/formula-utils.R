@@ -242,6 +242,9 @@ checkFormula <- function(formula, elementsVec)
     return(FALSE)
 }
 
+#' @details \code{formulaScorings} returns a \code{data.frame} with information
+#'   on which scoring terms are used and what their algorithm specific name is.
+#' @rdname formula-generation
 #' @export
 formulaScorings <- function()
 {
@@ -250,7 +253,7 @@ formulaScorings <- function()
                sirius = c("-", "-", "-", "isoScore", "-", "treeScore", "score"),
                bruker = c("-", "mSigma (SmartFormula3D)", "Score (SmartFormula3D)", "-", "mSigma", "-", "Score"),
                description = c("MS and MS/MS combined match value", "Deviation of isotopic pattern of fragment",
-                               "MS/MS fragment score", "How well isotopic pattern matches", "Deviation of isotopic pattern",
+                               "MS/MS fragment score", "How well the isotopic pattern matches", "Deviation of the isotopic pattern",
                                "How well MS/MS data matches", "Overall MS formula score"),
                stringsAsFactors = FALSE)
 }

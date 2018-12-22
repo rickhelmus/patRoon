@@ -628,3 +628,21 @@ pruneList <- function(l, checkEmptyElements = FALSE, checkZeroRows = FALSE)
         ret <- ret[sapply(ret, nrow) > 0]
     return(ret)
 }
+
+# based on tabular() from formatting vignette of roxygen
+tabularRD <- function(df, ...)
+{
+    align <- function(x) if (is.numeric(x)) "r" else "l"
+    col_align <- vapply(df, align, character(1))
+    
+    # add headers
+    df <- rbind(sprintf("\\strong{%s}", names(df)), df)
+    
+    cols <- lapply(df, format, ...)
+    
+    contents <- do.call("paste",
+                        c(cols, list(sep = " \\tab ", collapse = "\\cr\n  ")))
+    
+    paste("\\tabular{", paste(col_align, collapse = ""), "}{\n  ",
+          contents, "\n}\n", sep = "")
+}

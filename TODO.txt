@@ -63,15 +63,8 @@ Release:
       - or simply don't and mention limitation in doc? (one limitation: filtering)
     - docs / NEWS
         - move generics in to right place, set aliases
-        - clarify feature & group formulas
-        - countFragElements takes ionic formula (or remove option?)
-        - OM refs
-        - MS only formulas removed if MS/MS also present
-        - filter() and makeTable()
-        - unification of scorings: mention original names, value ranges (best/worst), table
+        - NEWS: OM
         - GF now includes precursors in MS/MS annotation
-        - formulaScorings()
-        - scoreLimits filter: use -Inf/Inf for no min/max
         - detail consensus process
             - highest scoring candidate of analyses is retained(?)
             - feature consensus now uses both MS and MS/MS formulas for coverage calculation

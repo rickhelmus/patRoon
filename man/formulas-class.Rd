@@ -15,6 +15,7 @@
 \alias{[[,formulas,ANY,ANY-method}
 \alias{$,formulas-method}
 \alias{makeTable,formulas-method}
+\alias{filter,formulas-method}
 \alias{plotSpec,formulas-method}
 \alias{consensus,formulas-method}
 \title{Formula lists class}
@@ -41,6 +42,10 @@
   countElements = NULL, countFragElements = NULL, OM = FALSE,
   maxFormulas = NULL, maxFragFormulas = NULL)
 
+\S4method{filter}{formulas}(obj, minExplainedFragPeaks = NULL,
+  elements = NULL, fragElements = NULL, lossElements = NULL,
+  topMost = NULL, scoreLimits = NULL, OM = NULL)
+
 \S4method{plotSpec}{formulas}(obj, precursor, groupName, analysis = NULL,
   MSPeakLists, useGGPlot2 = FALSE)
 
@@ -56,8 +61,8 @@ for feature groups.}
 their index or name, respectively (for the order/names see \code{analyses()/groupNames()}).\cr\cr For \code{[}: Can also be logical to perform logical selection
 (similar to regular vectors). If missing all analyses/feature groups are selected.\cr\cr For \code{[[}: should be a skalar value. If \code{j} is not specified, \code{i} selects by feature groups instead.}
 
-\item{\dots}{Any further \code{formulas} objects on top of the object given
-for the \code{obj} parameter to which a consensus should be generated.}
+\item{\dots}{One or more \code{formulas} objects that should be used to
+generate the consensus.}
 
 \item{drop}{ignored.}
 
@@ -65,19 +70,67 @@ for the \code{obj} parameter to which a consensus should be generated.}
 generate this \code{formulas} object. If not \code{NULL} it is used to add
 feature group information (retention and \emph{m/z} values).}
 
+\item{average}{If set to \code{TRUE} an 'average formula' is generated for
+each feature group by combining all elements from all candidates and
+averaging their amounts. This obviously leads to non-existing formulae,
+however, this data may be useful to deal with multiple candidate formulae
+per feature group when performing elemental characterization.}
+
 \item{countElements, countFragElements}{A \code{character} vector with
 elements that should be counted for each MS(/MS) formula candidate. For
 instance, \code{c("C", "H")} adds columns for both carbon and hydrogen
-amounts in each formula. Set to \code{NULL} to not count any elements.}
+amounts of each formula. Note that the neutral formula
+(\code{neutral_formula} column) is used to count elements of non-fragmented
+formulae, whereas the charged formula of fragments (\code{frag_formula}
+column) is used for fragments. Set to \code{NULL} to not count any
+elements.}
 
-\item{OM}{If set to \code{TRUE} several columns with information relevant for
-organic matter (OM) characterization will be added (e.g. elemental ratios,
-classification). This will also make sure that \code{countElements}
-contains at least C, H, N, O, P and S.}
+\item{OM}{For \code{makeTable}: if set to \code{TRUE} several columns
+  with information relevant for organic matter (OM) characterization will be
+  added (e.g. elemental ratios, classification). This will also make sure
+  that \code{countElements} contains at least C, H, N, O, P and S.
+
+  For \code{filter}: If \code{TRUE} then several filters are applied to
+  exclude unlikely formula candidates present in organic matter (OM). See
+  Source section for details.}
 
 \item{maxFormulas, maxFragFormulas}{Maximum amount of unique candidate
 formulae (or fragment formulae) per feature group. Set to \code{NULL} to
 ignore.}
+
+\item{minExplainedFragPeaks}{Minimum number of fragment peaks that are
+explained. Setting this to \samp{1} will remove any MS only formula
+results. Set to \code{NULL} to ignore.}
+
+\item{elements}{Only retain candidate formulae that match a given elemental
+restriction. The format of \code{elements} is a \code{character} string
+with elements that should be present where each element is followed by a
+valid amount or a range thereof. If no number is specified then \samp{1} is
+assumed. For instance, \code{elements="C1-10H2-20O0-2P"}, specifies that
+\samp{1-10}, \samp{2-20}, \samp{0-2} and \samp{1} carbon, hydrogen, oxygen
+and phosphorus atoms should be present, respectively. When
+\code{length(elements)>1} formulas are tested to follow at least one of the
+given elemental restrictions. For instance, \code{elements=c("P", "S")}
+specifies that either one phosphorus or sulphur atom should be present. Set
+to \code{NULL} to ignore this filter.}
+
+\item{fragElements, lossElements}{Specifies elemental restrictions for
+fragment or neutral loss formulas. Candidates are retained if at least one
+of the fragment/neutral loss formulae follow the given restrictions. See
+\code{elements} for the used format.}
+
+\item{topMost}{Only retain no more than this amount of best ranked candidates
+for each feature group.}
+
+\item{scoreLimits}{Filter results by their scores. Should be a named
+\code{list} that contains two-sized numeric vectors with the
+minimum/maximum value of a score (use \code{-Inf}/\code{Inf} for no
+limits). The names of each element should follow the values returned by
+\code{\link{formulaScorings}()$name}. For instance,
+\code{scoreLimits=list(isoScore=c(0.5, Inf))} specifies that the isotopic
+match score should be at least \samp{0.5}. More details of scorings can be
+obtained with \code{\link{formulaScorings}}. Set to \code{NULL} to skip
+this filter.}
 
 \item{precursor}{The formula of the precursor (in ionic form, \emph{i.e.} as
 detected by the MS).}
@@ -97,13 +150,10 @@ plotting, otherwise base plot used. For \code{plotSpec}, \code{ggplot2}
 allows nicely repelled text for annotation. However, base plot is generally
 faster.}
 
-\item{formThreshold}{Fractional minimum amount (0-1) to
-which a generated precursor formula should be present in all given formula objects
-(\code{formListThreshold}) containing the related feature group. For
-instance, a value of \samp{0.5} for \code{formAnaThreshold} means that a
-particular formula should be present in at least \samp{50\%} of all
-analyses containing the feature group that was used to generate the
-formula.}
+\item{formThreshold}{Fractional minimum amount (0-1) of which a formula
+candidate should be present within all objects. For instance, a value of
+\samp{0.5} means that a particular formula should be present in at least
+\samp{50\%} of all objects.}
 }
 \value{
 \code{formulaTable} returns a \code{list} containing for each feature
@@ -113,11 +163,13 @@ formula.}
 
 \code{makeTable} returns a \code{\link{data.table}}.
 
+\code{filter} returns a filtered \code{\link{formulas}} object.
+
 \code{plotSpec} will return a \code{\link[=ggplot2]{ggplot object}}
   if \code{useGGPlot2} is \code{TRUE}.
 
-\code{consensus} returns a \code{formulas} object that is produced
-  by merging multiple \code{formulas} objects.
+\code{consensus} returns a \code{formulas} object that is produced by
+  merging results from multiple \code{formulas} objects.
 }
 \description{
 Contains data of generated chemical formulae for given feature groups.
@@ -155,20 +207,39 @@ formula table for the feature group specified by \code{j} is returned.
 \item \code{makeTable}: Generates a table with all candidate formulae for each
 feature group and other information such as element counts.
 
+\item \code{filter}: Performs rule based filtering on formula results.
+
 \item \code{plotSpec}: Plots an annotated spectrum for a given candidate
 formula of a feature or feature group.
 
-\item \code{consensus}: Generates a consensus and other summarizing data for
-formulae of feature groups that are present in multiple analyses.
+\item \code{consensus}: Generates a consensus of results from multiple
+\code{formulas} objects.
 }}
 
 \section{Slots}{
 
 \describe{
-\item{\code{formulas,featureFormulas}}{Lists of all generated formulae. Use the \code{formulaTable}
-method for access.}
+\item{\code{formulas,featureFormulas}}{Lists of all generated formulae. Use the
+\code{formulaTable} method for access.}
 
 \item{\code{algorithm}}{The algorithm that was used for generation of formulae. Use
 the \code{algorithm} method for access.}
 }}
 
+\note{
+\code{filter} does not modify any formula results for features (if
+  present).
+}
+\section{Source}{
+ Calculation of the aromaticity index (AI) and related double
+  bond equivalents (DBE_AI) is performed as described in Koch 2015. Formula
+  classification is performed by the rules described in Abdulla 2013.
+  Filtering of OM related molecules is performed as described in Koch 2006
+  and Kujawinski 2006. (see references).
+}
+
+\references{
+\insertRef{Koch2015}{patRoon} \cr\cr
+  \insertRef{Abdulla2013}{patRoon} \cr\cr \insertRef{Koch2006}{patRoon}
+  \cr\cr \insertRef{Kujawinski2006}{patRoon}
+}

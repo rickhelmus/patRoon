@@ -462,14 +462,26 @@ NULL
 
 #' Automatic chemical formula generation
 #'
-#' Functionality to automatically calculate chemical formulae from feature
-#' groups and generate a consensus over all analyses.
+#' Functionality to automatically calculate chemical formulae for all feature
+#' groups.
 #'
 #' Several algorithms are provided to automatically generate formulae for given
 #' feature groups. All tools use the accurate mass of a feature to
 #' back-calculate candidate formulae. Depending on the algorithm and data
 #' availability, other data such as isotopic pattern and MS/MS fragments may be
-#' used to further improve formula assignment.
+#' used to further improve formula assignment and ranking.
+#'
+#' When DataAnalysis is used for formula generation or
+#' \code{calculateFeatures=TRUE} formulae are first calculated for each feature.
+#' These results are then combined for final assignment of candidate formulae
+#' for each feature group. This might result in a more thorough formula
+#' search and removal of outliers (controlled by \code{featThreshold} argument).
+#' Otherwise, when \code{calculateFeatures=FALSE} formulae are calculated
+#' directly for each feature group (by using group averaged peak lists), which
+#' can be significantly faster, especially with many analyses. Note that
+#' subsequent algorithms that use formula data (\emph{e.g.}
+#' \code{\link{addFormulaScoring}} and \link{reporting} functions) only use
+#' candidate formulae from feature groups.
 #'
 #' @param fGroups \code{\link{featureGroups}} object for which formulae should
 #'   be generated. This should be the same or a subset of the object that was
@@ -493,17 +505,31 @@ NULL
 #'   the latter option, unique formulae from MS data will still be reported if
 #'   not predicted from MS/MS data. Formulae calculated from MS data that were
 #'   also generated from MS/MS data will be removed.
+#' @param calculateFeatures If \code{TRUE} fomulae are first calculated for all
+#'   features prior to feature group assignment (see details).
+#' @param featThreshold If \code{calculateFeatures=TRUE}: minimum presence
+#'   (\samp{0-1}) of a formula in all features before it is considered as a
+#'   candidate for a feature group. For instance, \code{featThreshold} dictates
+#'   that formulae should be present in at least 75% of the features inside a
+#'   feature group.
 #'
 #' @templateVar genForm TRUE
 #' @template form-args
 #'
 #' @template multiProc-args
 #'
+#' @section Scorings: Each algorithm implements their own scoring system. Their
+#'   names have been harmonized where possible. An overview is obtained with the
+#'   \code{formulaScorings} function:
+#'   \Sexpr[results=rd,echo=FALSE,stage=build]{patRoon:::tabularRD(patRoon::formulaScorings())}
+#'
+#'
+#'
 #' @return A \code{\link{formulas}} object containing all generated formulae.
 #'
 #' @seealso \code{\link{formulas-class}}. The
 #'   \href{https://www.researchgate.net/publication/307964728_MOLGEN-MSMS_Software_User_Manual}{GenForm
-#'   manual} (formerly known as MOLGEN-MSMS).
+#'    manual} (also known as MOLGEN-MSMS).
 #' @name formula-generation
 NULL
 

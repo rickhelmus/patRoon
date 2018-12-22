@@ -59,15 +59,12 @@ Release:
     - only keep best scoring candidates for consensus? (what about fragments?? --> seems fine for genform/sirius as all scores are the same for each fragment, need to check DA)
     - customize/document ranking column order? (only do rank for sirius?)
     - how to handle ranking of consensus results?
-      - rank by one normalized column per algo? (GenForm: either MS_match or comb_match)
-      - or simply don't and mention limitation in doc? (one limitation: filtering)
-    - docs / NEWS
-        - move generics in to right place, set aliases
-        - NEWS: OM
+        - rank by one normalized column per algo? (GenForm: either MS_match or comb_match)
+        - or simply don't and mention limitation in doc? (one limitation: filtering)
+    - NEWS
+        - OM
         - GF now includes precursors in MS/MS annotation
-        - detail consensus process
-            - highest scoring candidate of analyses is retained(?)
-            - feature consensus now uses both MS and MS/MS formulas for coverage calculation
+        - feature consensus now uses both MS and MS/MS formulas for coverage calculation
     - test DA formulas, ranking (mSigma)
 - plotSpec(): mark precursor?
 - look into supervisors for processx

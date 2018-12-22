@@ -473,15 +473,20 @@ NULL
 #'
 #' When DataAnalysis is used for formula generation or
 #' \code{calculateFeatures=TRUE} formulae are first calculated for each feature.
-#' These results are then combined for final assignment of candidate formulae
-#' for each feature group. This might result in a more thorough formula
-#' search and removal of outliers (controlled by \code{featThreshold} argument).
-#' Otherwise, when \code{calculateFeatures=FALSE} formulae are calculated
-#' directly for each feature group (by using group averaged peak lists), which
-#' can be significantly faster, especially with many analyses. Note that
-#' subsequent algorithms that use formula data (\emph{e.g.}
-#' \code{\link{addFormulaScoring}} and \link{reporting} functions) only use
-#' candidate formulae from feature groups.
+#' The results are then combined for final assignment of candidate formulae for
+#' each feature group (if a formula was found in multiple features within the
+#' group, the reported scorings and other values are those from the best ranked
+#' feature). The calculation of formulae on 'feature level' might result in a
+#' more thorough formula search and better removal of outliers (controlled by
+#' \code{featThreshold} argument). In contrast, when calculations occur on
+#' 'feature group level' (\emph{i.e.} \code{calculateFeatures=FALSE}), formulae
+#' are directly assigned to each feature group (by using group averaged peak MS
+#' lists), which significantly reduces processing time is, especially with many
+#' analyses. Note that in both situations subsequent algorithms that use formula
+#' data (\emph{e.g.} \code{\link{addFormulaScoring}} and \link{reporting}
+#' functions) only use formula data that was eventually assigned to feature
+#' groups. Furthermore, please note that calculation of formulae with
+#' DataAnalysis always occurs on 'feature level'.
 #'
 #' @param fGroups \code{\link{featureGroups}} object for which formulae should
 #'   be generated. This should be the same or a subset of the object that was
@@ -503,14 +508,15 @@ NULL
 #' @param MSMode Whether formulae should be generated only from MS data
 #'   (\code{"ms"}), MS/MS data (\code{"msms"}) or both (\code{"both"}). Using
 #'   the latter option, unique formulae from MS data will still be reported if
-#'   not predicted from MS/MS data. Formulae calculated from MS data that were
-#'   also generated from MS/MS data will be removed.
+#'   not predicted from MS/MS data (\emph{e.g.} due to poor/missing MS/MS data).
+#'   Formulae calculated from MS data that were also generated from MS/MS data
+#'   will be removed.
 #' @param calculateFeatures If \code{TRUE} fomulae are first calculated for all
 #'   features prior to feature group assignment (see details).
 #' @param featThreshold If \code{calculateFeatures=TRUE}: minimum presence
 #'   (\samp{0-1}) of a formula in all features before it is considered as a
 #'   candidate for a feature group. For instance, \code{featThreshold} dictates
-#'   that formulae should be present in at least 75% of the features inside a
+#'   that a formula should be present in at least 75% of the features inside a
 #'   feature group.
 #'
 #' @templateVar genForm TRUE
@@ -522,8 +528,6 @@ NULL
 #'   names have been harmonized where possible. An overview is obtained with the
 #'   \code{formulaScorings} function:
 #'   \Sexpr[results=rd,echo=FALSE,stage=build]{patRoon:::tabularRD(patRoon::formulaScorings())}
-#'
-#'
 #'
 #' @return A \code{\link{formulas}} object containing all generated formulae.
 #'

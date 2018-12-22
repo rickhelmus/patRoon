@@ -234,7 +234,7 @@ setMethod("makeTable", "formulas", function(obj, fGroups = NULL, average = FALSE
 })
 
 # NOTE: feature formulas untouched
-setMethod("filter", "formulas", function(obj, minExplainedMSMSPeaks = NULL, elements = NULL,
+setMethod("filter", "formulas", function(obj, minExplainedFragPeaks = NULL, elements = NULL,
                                          fragElements = NULL, lossElements = NULL,
                                          topMost = NULL, scoreLimits = NULL,
                                          OM = NULL)
@@ -242,7 +242,7 @@ setMethod("filter", "formulas", function(obj, minExplainedMSMSPeaks = NULL, elem
     scCols <- formulaScorings()$name
 
     ac <- checkmate::makeAssertCollection()
-    aapply(checkmate::assertCount, . ~ topMost + minExplainedMSMSPeaks,
+    aapply(checkmate::assertCount, . ~ topMost + minExplainedFragPeaks,
            positive = c(TRUE, FALSE), null.ok = TRUE, fixed = list(add = ac))
     aapply(checkmate::assertCharacter, . ~ elements + fragElements + lossElements,
            min.chars = 1, min.len = 1, null.ok = TRUE, fixed = list(add = ac))
@@ -261,13 +261,13 @@ setMethod("filter", "formulas", function(obj, minExplainedMSMSPeaks = NULL, elem
     obj@formulas <- pruneList(sapply(groupNames(obj), function(grp)
     {
         formTable <- obj[[grp]]
-        if (!is.null(minExplainedMSMSPeaks) && minExplainedMSMSPeaks > 0)
+        if (!is.null(minExplainedFragPeaks) && minExplainedFragPeaks > 0)
         {
             formTable <- formTable[byMSMS == TRUE]
             if (nrow(formTable) == 0)
                 return(formTable)
             fragCounts <- formTable[, ifelse(byMSMS, length(frag_formula), 0L), by = "formula"][[2]]
-            formTable[fragCounts >= minExplainedMSMSPeaks]
+            formTable[fragCounts >= minExplainedFragPeaks]
         }
 
         if (!is.null(elements))

@@ -158,11 +158,11 @@ generateFormulasSirius <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct = 
             if (!is.null(logPath))
                 mkdirp(logPath)
 
-            ret <- pruneList(executeMultiProcess(cmdQueue, processSiriusFormulas, errorHandler = function(cmd, exitStatus, retries)
+            ret <- executeMultiProcess(cmdQueue, processSiriusFormulas, errorHandler = function(cmd, exitStatus, retries)
             {
                 stop(sprintf("Fatal: Failed to execute SIRIUS for %s - exit code: %d\nCommand: %s", cmd$gName, exitStatus,
                              paste(cmd$command, paste0(cmd$args, collapse = " "))))
-            }, maxProcAmount = maxProcAmount), checkZeroRows = TRUE)
+            }, maxProcAmount = maxProcAmount)
 
             ngrp <- length(ret)
         }
@@ -179,6 +179,9 @@ generateFormulasSirius <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct = 
             ret <- ret[intersect(gNames, names(ret))] # re-order
         }
 
+        # prune after combining with cached results: these may also contain zero row results
+        ret <- pruneList(ret, checkZeroRows = TRUE)
+        
         printf("Loaded %d formulas for %d %s (%.2f%%).\n", sum(unlist(lapply(ret, nrow))),
                ngrp, if (calculateFeatures) "features" else "feature groups",
                if (gCount == 0) 0 else ngrp * 100 / gCount)

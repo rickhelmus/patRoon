@@ -17,7 +17,7 @@ formsGFEmpty <- generateFormulas(fGroupsEmpty, "genform", plistsEmpty)
 formsGFEmptyPL <- generateFormulas(fGroups, "genform", plistsEmpty)
 formsGFEmptyPLMS <- generateFormulas(fGroups, "genform", plistsEmptyMS)
 formsGFWithMSMS <- filter(formsGF, minExplainedFragPeaks = 1)
-formsGFOC <- generateFormulas(fGroups, "genform", plists, calculateFeatures = FALSE)
+formsGFOC <- generateFormulas(fGroups, "genform", plists, oc = TRUE)
 formsGFMS <- generateFormulas(fGroups, "genform", plists, MSMode = "ms")
 
 if (doSIRIUS)
@@ -74,7 +74,9 @@ test_that("filtering works", {
               length(filter(formsGF, minExplainedFragPeaks = 1)))
     expect_equal(length(filter(formsGFMS, minExplainedFragPeaks = 1)), 0)
 
-    expect_length(filter(formsGFOC, elements = "C1-100"), length(formsGF)) # all should contain carbon
+    expect_length(filter(formsGF, elements = "C1-100"), length(formsGFOC)) # all should contain carbon
+    expect_length(filter(formsGF, elements = c("Na1-100", "C1-100")), length(formsGFOC)) # no sodium, but carbon should be there
+    expect_length(filter(formsGF, elements = c("H1-100", "C1-100")), length(formsGF)) # presence of both shouldn't affect results
     expect_length(filter(formsGF, elements = "Na1-100"), 0) # no sodium
     expect_length(filter(formsGF, elements = "Na0-100"), length(formsGF)) # no sodium, but optional
 

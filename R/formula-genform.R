@@ -248,8 +248,7 @@ generateFormulasGenForm <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct =
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
     checkmate::assertNumber(maxMzDev, lower = 0, finite = TRUE, add = ac)
     aapply(checkmate::assertString, . ~ adduct + elements, fixed = list(add = ac))
-    checkmate::assertFlag(hetero, add = ac)
-    checkmate::assertFlag(calculateFeatures, add = ac)
+    aapply(checkmate::assertFlag, . ~ hetero + oc + calculateFeatures, fixed = list(add = ac))
     checkmate::assertNumber(featThreshold, lower = 0, finite = TRUE, null.ok = TRUE, add = ac)
     checkmate::assertChoice(MSMode, c("ms", "msms", "both"), add = ac)
     checkmate::assertList(extraOpts, any.missing = FALSE, names = "unique", null.ok = TRUE, add = ac)
@@ -281,7 +280,7 @@ generateFormulasGenForm <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct =
     
     formTable <- list()
     cacheDB <- openCacheDBScope() # open manually so caching code doesn't need to on each R/W access
-    baseHash <- makeHash(maxMzDev, adduct, elements, hetero, extraOpts)
+    baseHash <- makeHash(mainArgs)
     setHash <- makeHash(fGroups, MSPeakLists, MSMode, baseHash)
     cachedSet <- loadCacheSet("formulasGenForm", setHash, cacheDB)
     formHashes <- character(0)

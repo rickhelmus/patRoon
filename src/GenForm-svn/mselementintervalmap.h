@@ -46,7 +46,7 @@ Interval ElementIntervalMap::GetInterval(const Element& E) const
 
 void ElementIntervalMap::SetInterval(const Element& E, const Interval& I)
 {
-	if(!I.IsValid()&&I!=Interval()) operator[](E)=I;
+	if(I.IsValid()&&I!=Interval()) operator[](E)=I;
 }
 
 #endif

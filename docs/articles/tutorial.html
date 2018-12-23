@@ -74,7 +74,7 @@
       <h1>patRoon tutorial</h1>
                         <h4 class="author">Rick Helmus</h4>
             
-            <h4 class="date">2018-11-22</h4>
+            <h4 class="date">2018-12-23</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/rickhelmus/patRoon/blob/master/vignettes/tutorial.Rmd"><code>vignettes/tutorial.Rmd</code></a></small>
       <div class="hidden name"><code>tutorial.Rmd</code></div>
@@ -224,32 +224,27 @@ fGroups
 <a href="#ms-peak-lists" class="anchor"></a>MS peak lists</h2>
 <p>Having obtained a good dataset with features of interest, we can start moving to figuring out what these may be. Before performing any identification steps, however, the first step is to extract all relevant MS data. This data was obtained with data-dependent MS/MS mode, so in the ideal case we obtain al MS and MS/MS spectra for each feature group.</p>
 <p>The <code><a href="../reference/MSPeakLists-generation.html">generateMSPeakLists()</a></code> will perform this action for us and will generate so called <em>MS peaklists</em> in the process. These peaklists are basicially the relevant MS and MS/MS spectra in tabular form. The command below will use the <em>mzR</em> algorithm to do so:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">plists &lt;-<span class="st"> </span><span class="kw"><a href="../reference/MSPeakLists-generation.html">generateMSPeakLists</a></span>(fGroups, <span class="st">"mzr"</span>, <span class="dt">avgMzWindow =</span> <span class="fl">0.0005</span>,
-                              <span class="dt">avgMinIntensity =</span> <span class="dv">500</span>, <span class="dt">precursorMzWindow =</span> <span class="dv">8</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">avgPListParams &lt;-<span class="st"> </span><span class="kw"><a href="../reference/MSPeakLists-generation.html">getDefAvgPListParams</a></span>(<span class="dt">clusterMzWindow =</span> <span class="fl">0.005</span>)
+plists &lt;-<span class="st"> </span><span class="kw"><a href="../reference/MSPeakLists-generation.html">generateMSPeakLists</a></span>(fGroups, <span class="st">"mzr"</span>, <span class="dt">maxRtMSWidth =</span> <span class="dv">20</span>, <span class="dt">precursorMzWindow =</span> <span class="dv">8</span>,
+                              <span class="dt">avgFeatParams =</span> avgPListParams, <span class="dt">avgFGroupParams =</span> avgPListParams)</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">plists
 <span class="co">#&gt; A MSPeakLists object ('MSPeakLists')</span>
-<span class="co">#&gt; Total peak count: 21280 (MS: 18492 - MS/MS: 2788)</span>
-<span class="co">#&gt; Average peak count/analysis: 7093 (MS: 6164 - MS/MS: 929)</span>
+<span class="co">#&gt; Total peak count: 5426 (MS: 4430 - MS/MS: 996)</span>
+<span class="co">#&gt; Average peak count/analysis: 1809 (MS: 1477 - MS/MS: 332)</span>
 <span class="co">#&gt; Total peak lists: 183 (MS: 93 - MS/MS: 90)</span>
 <span class="co">#&gt; Average peak lists/analysis: 61 (MS: 31 - MS/MS: 30)</span>
-<span class="co">#&gt; Object size (indication): 631 kB</span></code></pre></div>
+<span class="co">#&gt; Object size (indication): 505.1 kB</span></code></pre></div>
 </div>
 <div id="formula-calculation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#formula-calculation" class="anchor"></a>Formula calculation</h2>
 <p>Using the data from the MS peaklists generated during the previous step we can generate a list of formula candidates for each feature group based on measured <em>m/z</em> values, isotopic patterns and presence of MS/MS fragments. In this tutorial we will use this data as an extra hint to score canddiate chemical structures generated during the next step. The command below will use <a href="https://sourceforge.net/projects/genform/">GenForm</a> to perform this step:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">forms &lt;-<span class="st"> </span><span class="kw"><a href="../reference/formula-generation.html">generateFormulas</a></span>(fGroups, <span class="st">"genform"</span>, plists, <span class="dt">maxMzDev =</span> <span class="dv">5</span>,
-                          <span class="dt">adduct =</span> <span class="st">"M+H"</span>, <span class="dt">elements =</span> <span class="st">"CHNOPSCl"</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">formulas &lt;-<span class="st"> </span><span class="kw"><a href="../reference/formula-generation.html">generateFormulas</a></span>(fGroups, <span class="st">"genform"</span>, plists, <span class="dt">maxMzDev =</span> <span class="dv">5</span>,
+                             <span class="dt">adduct =</span> <span class="st">"M+H"</span>, <span class="dt">elements =</span> <span class="st">"CHNOPSCl"</span>,
+                             <span class="dt">calculateFeatures =</span> <span class="ot">TRUE</span>, <span class="dt">featThreshold =</span> <span class="fl">0.75</span>)
+formulas</code></pre></div>
 <p>Note that we limited to only to the the elements C, H, N, O, P, S and Cl. It is highly recommended to limit the elements (by default it is just C, H, N, O and P) as this can significantly reduce processing time and improbable formula candidates. In this tutorial we already knew which compounds to expect so the choice was easy, but often a good guess can be made in advance.</p>
-<p>The <code><a href="../reference/formula-generation.html">generateFormulas()</a></code> function returns a list of formulas of every feature in all analyses. The <code><a href="../reference/generics.html">consensus()</a></code> function is used subsequently to generate a final table of formula candidates for each feature group. During this process, any formulas for a particular feature group which were detected in only a fraction of the analyses (by default &lt;75%, controlled by the <code>formAnaThreshold</code> argument) are considered as outliers and removed. In addition, this function will also set a limit to only keep a number of top candidates (ten by default, controlled by the <code>maxFormulas</code> and <code>maxFragFormulas</code> arguments). In this tutorial we will just stick with defaults:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">formulas &lt;-<span class="st"> </span><span class="kw"><a href="../reference/generics.html">consensus</a></span>(forms, <span class="dt">fGroups =</span> fGroups)
-<span class="co">#&gt; Generating consensus for formula lists (GenForm)... Done!</span>
-formulas
-<span class="co">#&gt; A formulaConsensus object (formulaConsensus)</span>
-<span class="co">#&gt; Algorithm: GenForm</span>
-<span class="co">#&gt; Total formula count: 259 (all), 43 (MS) and 216 (MS/MS)</span>
-<span class="co">#&gt; Average formulas per feature group: 18.0 (all), 11.7 (MS), 19.3 (MS/MS)</span>
-<span class="co">#&gt; Object size (indication): 84.2 kB</span></code></pre></div>
+<p>The <code><a href="../reference/formula-generation.html">generateFormulas()</a></code> function returns an object that contains formula candidates assigned for each feature group. In the above call the <code>calculateFeatures</code> argument is set to <code>TRUE</code>: by doing so formulae are first calculated for individual features within a feature group. These results are then used to generate a consensus candidate formula list for each feature group. During this process any outliers (defined by <code>featThreshold</code>) are automatically removed. Setting <code>calculateFeatures</code> to <code>FALSE</code> instead will calculate formulae directly for feature groups from averaged MS peak lists. This will be significantly faster, but might produce (slightly) less accurate results.</p>
 </div>
 <div id="compound-identification" class="section level2">
 <h2 class="hasAnchor">
@@ -268,9 +263,9 @@ formulas
 <span class="co">#&gt; Algorithm: MetFrag</span>
 <span class="co">#&gt; Number of feature groups with compounds in this object: 25</span>
 <span class="co">#&gt; Number of compounds: 609 (total), 24.4 (mean), 9 - 25 (min - max)</span>
-<span class="co">#&gt; Object size (indication): 2 MB</span>
+<span class="co">#&gt; Object size (indication): 1.9 MB</span>
 <span class="kw"><a href="../reference/generics.html">plotSpec</a></span>(compounds, <span class="dv">1</span>, <span class="st">"M120_R328_91"</span>, plists)</code></pre></div>
-<p><img src="tutorial_files/figure-html/unnamed-chunk-7-1.png" width="384"></p>
+<p><img src="tutorial_files/figure-html/unnamed-chunk-6-1.png" width="384"></p>
 <p>While <code><a href="../reference/compound-generation.html">generateCompounds()</a></code> is running a list of candidate compound structures will be downloaded for every feature group (in this case from PubChem) and ranked according to various scoring parameters.</p>
 <p>As with previous described workfow functions, there are many different arguments that can specified to modify the behaviour when generating compounds. In brief, here we limit the number to the top 25 candidates (this will save a lot of processing time), specify that we are primarily interested in protonated ions and use the extended PubChem database so that we can score on number of patents and PubMed references along with scoring for similarity to in-silico generated MS/MS spectra (<code>FragmenterScore</code>) and MassBank derived mass spectra (<code>OfflineMetFusionScore</code>).</p>
 <p>As a side note: this is often one of the most time consuming steps during the workflow. For this reason, and in order to not ‘abuse’ the server used by MetFrag, you should always take care to prioritize your data before running this function.</p>
@@ -280,7 +275,7 @@ formulas
 <div id="components" class="section level2">
 <h2 class="hasAnchor">
 <a href="#components" class="anchor"></a>Components</h2>
-<p>So far we mainly dealt with feature groups as if they are separate chemical compounds. However, formation of multiple ionization adducts (<em>e.g.</em> sodium and potassium) and the presence of isotopologues yield multiple <em>m/z</em> values for the same compound. As a result, multiple feature groups will be present describing the same chemical compound, each describing the same retention pattern. To reduce this complexity it is useful to generate so called <em>components</em> which are basically groups of feature groups which are likely to be the same compound. Another advantage is this grouping process is that extra chemical information of a compound is revealed which may help compound identification.</p>
+<p>So far we mainly dealt with feature groups as if they are separate chemical compounds. However, formation of multiple ionization adducts (<em>e.g.</em> sodium and potassium) and the presence of isotopologues yield multiple <em>m/z</em> values for the same compound. As a result, multiple feature groups will be describing the same chemical compound. To reduce this complexity it is useful to generate so called <em>components</em> which are basically groups of feature groups which are likely to be the same compound (based on <em>e.g.</em> similarity of retention profiles and known chemical rules). Another advantage of this grouping process is that extra chemical information of a compound is revealed that may help compound identification.</p>
 <p>Generating components is performed with the <code><a href="../reference/component-generation.html">generateComponents()</a></code> function:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">components &lt;-<span class="st"> </span><span class="kw"><a href="../reference/component-generation.html">generateComponents</a></span>(fGroups, <span class="st">"camera"</span>, <span class="dt">ionization =</span> <span class="st">"positive"</span>)</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">components
@@ -288,20 +283,20 @@ formulas
 <span class="co">#&gt; Algorithm: CAMERA</span>
 <span class="co">#&gt; Components: CMP1, CMP2, CMP3, CMP4, CMP5, CMP6, ... (22 total)</span>
 <span class="co">#&gt; Number of feature groups in components: 31 (total), 1.4 (mean), 1 - 3 (min - max)</span>
-<span class="co">#&gt; Object size (indication): 532.5 kB</span>
+<span class="co">#&gt; Object size (indication): 532.6 kB</span>
 <span class="kw"><a href="../reference/generics.html">plotSpec</a></span>(components, <span class="st">"CMP17"</span>)</code></pre></div>
-<p><img src="tutorial_files/figure-html/unnamed-chunk-9-1.png" width="480"></p>
+<p><img src="tutorial_files/figure-html/unnamed-chunk-8-1.png" width="480"></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/generics.html">plotEIC</a></span>(components, <span class="st">"CMP17"</span>, fGroups)</code></pre></div>
-<p><img src="tutorial_files/figure-html/unnamed-chunk-9-2.png" width="480"></p>
+<p><img src="tutorial_files/figure-html/unnamed-chunk-8-2.png" width="480"></p>
 </div>
 <div id="reporting" class="section level2">
 <h2 class="hasAnchor">
 <a href="#reporting" class="anchor"></a>Reporting</h2>
 <p>The last step of the workflow is typically reporting data: during this step all the collected data is transformed to graphical plots (<code><a href="../reference/reporting.html">reportPDF()</a></code> and <code><a href="../reference/reporting.html">reportMD()</a></code>) or tabular csv data (<code><a href="../reference/reporting.html">reportCSV()</a></code>).</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/reporting.html">reportCSV</a></span>(fGroups, <span class="dt">formConsensus =</span> formulas, <span class="dt">compounds =</span> compounds, <span class="dt">components =</span> components)
-<span class="kw"><a href="../reference/reporting.html">reportPDF</a></span>(fGroups, <span class="dt">formConsensus =</span> formulas, <span class="dt">compounds =</span> compounds, <span class="dt">components =</span> components,
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/reporting.html">reportCSV</a></span>(fGroups, <span class="dt">formulas =</span> formulas, <span class="dt">compounds =</span> compounds, <span class="dt">components =</span> components)
+<span class="kw"><a href="../reference/reporting.html">reportPDF</a></span>(fGroups, <span class="dt">formulas =</span> formulas, <span class="dt">compounds =</span> compounds, <span class="dt">components =</span> components,
           <span class="dt">MSPeakLists =</span> plists)
-<span class="kw"><a href="../reference/reporting.html">reportMD</a></span>(fGroups, <span class="dt">formConsensus =</span> formulas, <span class="dt">compounds =</span> compounds, <span class="dt">components =</span> components,
+<span class="kw"><a href="../reference/reporting.html">reportMD</a></span>(fGroups, <span class="dt">formulas =</span> formulas, <span class="dt">compounds =</span> compounds, <span class="dt">components =</span> components,
          <span class="dt">MSPeakLists =</span> plists)</code></pre></div>
 <p>The output of <code><a href="../reference/reporting.html">reportMD()</a></code> can be viewed <a href="../examples/report.html">here</a>.</p>
 <p>Note that these functions can be called at any time during the workflow. This may be especially useful if you want evaluate results during optimization or exploring the various algorithms available.</p>
@@ -344,7 +339,7 @@ formulas
 <span class="co">#&gt; 6:             8-quinolol 184.9442 146.0599         0         0         0      24516      25100      24172</span></code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/generics.html">plotEIC</a></span>(fGroupsScreening, <span class="dt">colourBy =</span> <span class="st">"fGroups"</span>, <span class="dt">showFGroupRect =</span> <span class="ot">FALSE</span>, <span class="dt">showPeakArea =</span> <span class="ot">TRUE</span>,
         <span class="dt">topMost =</span> <span class="dv">1</span>, <span class="dt">showLegend =</span> <span class="ot">TRUE</span>)</code></pre></div>
-<p><img src="tutorial_files/figure-html/unnamed-chunk-14-1.png" width="672"></p>
+<p><img src="tutorial_files/figure-html/unnamed-chunk-13-1.png" width="672"></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># perform 'regular' workflow steps as shown before (MS peak lists, formulas, compounds, ...)</span></code></pre></div>
 </div>
 <div id="import-and-exporting-feature-groups" class="section level3">
@@ -387,7 +382,7 @@ formulas
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.2.0.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.3.0.</p>
 </div>
       </footer>
 </div>

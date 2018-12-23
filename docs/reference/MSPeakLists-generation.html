@@ -106,7 +106,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Generation of MS Peak Lists</h1>
-    <small class="dont-index">Source: <a href='https://github.com/rickhelmus/patRoon/blob/master/R/main.R'><code>R/main.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/mspeaklists.R'><code>R/mspeaklists.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/mspeaklists-bruker.R'><code>R/mspeaklists-bruker.R</code></a>, and 2 more</small>
+    <small class="dont-index">Source: <a href='https://github.com/rickhelmus/patRoon/blob/master/R/main.R'><code>R/main.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/mspeaklists.R'><code>R/mspeaklists.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/mspeaklists-bruker.R'><code>R/mspeaklists-bruker.R</code></a>, and 3 more</small>
     <div class="hidden name"><code>MSPeakLists-generation.Rd</code></div>
     </div>
 
@@ -119,14 +119,19 @@
     <pre class="usage"><span class='co'># S4 method for featureGroups</span>
 <span class='fu'>generateMSPeakLists</span>(<span class='no'>fGroups</span>, <span class='no'>algorithm</span>, <span class='no'>...</span>)
 
-<span class='fu'>generateDAMSPeakLists</span>(<span class='no'>fGroups</span>, <span class='kw'>bgsubtr</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>maxRtMSWidth</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>clear</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>save</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>MSMSType</span> <span class='kw'>=</span> <span class='st'>"MSMS"</span>)
+<span class='fu'>generateMSPeakListsDA</span>(<span class='no'>fGroups</span>, <span class='kw'>bgsubtr</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>maxRtMSWidth</span> <span class='kw'>=</span> <span class='fl'>20</span>,
+  <span class='kw'>clear</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>save</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>MSMSType</span> <span class='kw'>=</span> <span class='st'>"MSMS"</span>,
+  <span class='kw'>avgFGroupParams</span> <span class='kw'>=</span> <span class='fu'>getDefAvgPListParams</span>())
 
-<span class='fu'>generateDAFMFMSPeakLists</span>(<span class='no'>fGroups</span>)
+<span class='fu'>generateMSPeakListsDAFMF</span>(<span class='no'>fGroups</span>,
+  <span class='kw'>avgFGroupParams</span> <span class='kw'>=</span> <span class='fu'>getDefAvgPListParams</span>())
 
-<span class='fu'>generateMzRPeakLists</span>(<span class='no'>fGroups</span>, <span class='kw'>avgMzWindow</span> <span class='kw'>=</span> <span class='fl'>0.001</span>, <span class='kw'>maxRtMSWidth</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>avgTopPeaks</span> <span class='kw'>=</span> <span class='fl'>50</span>, <span class='kw'>avgMinIntensity</span> <span class='kw'>=</span> <span class='fl'>500</span>, <span class='kw'>avgMassFun</span> <span class='kw'>=</span> <span class='no'>mean</span>,
-  <span class='kw'>avgMethod</span> <span class='kw'>=</span> <span class='st'>"distance"</span>, <span class='kw'>precursorMzWindow</span> <span class='kw'>=</span> <span class='fl'>8</span>, <span class='kw'>topMost</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
+<span class='fu'>generateMSPeakListsMzR</span>(<span class='no'>fGroups</span>, <span class='kw'>maxRtMSWidth</span> <span class='kw'>=</span> <span class='fl'>20</span>,
+  <span class='kw'>precursorMzWindow</span> <span class='kw'>=</span> <span class='fl'>8</span>, <span class='kw'>topMost</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>avgFeatParams</span> <span class='kw'>=</span> <span class='fu'>getDefAvgPListParams</span>(),
+  <span class='kw'>avgFGroupParams</span> <span class='kw'>=</span> <span class='fu'>getDefAvgPListParams</span>())
+
+<span class='fu'>getDefAvgPListParams</span>(<span class='no'>...</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -143,8 +148,10 @@ used: <code>"bruker"</code>, <code>"brukerfmf"</code>, <code>"mzr"</code></p></t
     </tr>
     <tr>
       <th>&#8230;</th>
-      <td><p>Any parameters to be passed to the selected MS peak lists
-generation algorithm.</p></td>
+      <td><p>For <code>generateMSPeakLists</code>: Any parameters to be passed to
+  the selected MS peak lists generation algorithm.</p>
+<p>For <code>getDefAvgPListParams</code>: Optional named arguments that override
+  defaults.</p></td>
     </tr>
     <tr>
       <th>bgsubtr</th>
@@ -172,40 +179,6 @@ making new ones.</p></td>
 MRM/AutoMSMS or <code>"BBCID"</code> for broadband CID.</p></td>
     </tr>
     <tr>
-      <th>avgMzWindow</th>
-      <td><p><em>m/z</em> window (in Da) used for clustering <em>m/z</em>
-values when spectra are averaged. Too small windows will prevent clustering
-<em>m/z</em> values (thus erroneously creating 'extra' values), whereas too
-big windows may cluster unrelated <em>m/z</em> values from different or even
-the same spectrum together.</p></td>
-    </tr>
-    <tr>
-      <th>avgTopPeaks</th>
-      <td><p>Only retain a maximum number of <code>avgTopPeaks</code> MS
-peaks when generating averaged spectra. Lowering this number may exclude
-more irrelevant (noisy) MS peaks and decrease processing time, whereas
-higher values may avoid excluding lower intense MS peaks that may still be
-of interest.</p></td>
-    </tr>
-    <tr>
-      <th>avgMinIntensity</th>
-      <td><p>MS peaks with intensities below this value will be
-completely excluded (overrides <code>avgTopPeaks</code>).</p></td>
-    </tr>
-    <tr>
-      <th>avgMassFun</th>
-      <td><p>Function that is used to calculate average <em>m/z</em>
-values.</p></td>
-    </tr>
-    <tr>
-      <th>avgMethod</th>
-      <td><p>Method used for producing averaged MS spectra. Valid values
-are <code>"hclust"</code>, used for hierarchical clustering, and
-<code>"distance"</code>, to use the between peak distance. The latter method
-significantly reduces processing time and memory requirements, at the
-(potential) cost of slightly reducing accuracy.</p></td>
-    </tr>
-    <tr>
       <th>precursorMzWindow</th>
       <td><p>The <em>m/z</em> window (in Da) to find MS/MS spectra
 of a precursor. This is typically used for Data-Dependent like MS/MS data
@@ -218,6 +191,12 @@ all-ion, ...) the value should be <code>NULL</code>.</p></td>
       <th>topMost</th>
       <td><p>Only extract MS peak lists from a maximum of <code>topMost</code>
 analyses with highest intensity. If <code>NULL</code> all analyses will be used.</p></td>
+    </tr>
+    <tr>
+      <th>avgFeatParams, avgFGroupParams</th>
+      <td><p>A <code>list</code> with parameters used for
+averaging of peak lists for individual features and feature groups,
+respectively (see below).</p></td>
     </tr>
     </table>
     
@@ -233,50 +212,91 @@ to features of interest. For processing, MS (and MS/MS) spectra are typically
 reduced to a table with a column containing measured <em>m/z</em> values and a
 column containing their intensities. These 'MS peak lists' can then be used
 for <a href='formula-generation.html'>formula generation</a> and
-<a href='compound-generation.html'>compound generation</a>. By default, peak lists are
-generated from all analyses containing a particular feature group. The main
-advantage is that this will allow subsequent processes (at the moment only
-formulae calculation) to generate a consensus from feature group data
-originating from multiple analyses. Nevertheless, it might be useful to limit
-to maximum amount of analyses (<code>topMost</code> parameter) to signficantly
-reduce the processing time required for MS peak list extraction.</p>
+<a href='compound-generation.html'>compound generation</a>.</p>
+<p>MS and MS/MS peak lists are first generated for all features (or a subset, if
+the <code>topMost</code> argument is set). During this step multiple spectra over
+the feature elution profile are averaged. Subsequently, peak lists
+will be generated for each feature group by averaging peak lists of the features
+within the group. Functionality that uses peak lists will either use data
+from individual features or from group averaged peak lists. For instance, the
+former may be used by formulae calculation, while compound identification and
+plotting functionality typically uses group averaged peak lists.</p>
 <p>Several functions exist to automatically extract MS peak lists for feature
 groups.</p>
 <p><code>generateMSPeakLists</code> is a generic function that will generate MS peak lists
   using one of the supported algorithms. The actual functionality is provided
-  by algorithm specific functions such as <code>generateFormulasDA</code> and
-  <code>generateFormulasGenForm</code>. While these functions may be called directly,
+  by algorithm specific functions such as <code>generateMSPeakListsMzR</code> and
+  <code>generateMSPeakListsDA</code>. While these functions may be called directly,
   <code>generateMSPeakLists</code> provides a generic interface and is therefore usually
   preferred.</p>
-<p><code>generateDAMSPeakLists</code> uses Bruker DataAnalysis to generate MS
+<p><code>generateMSPeakListsDA</code> uses Bruker DataAnalysis to generate MS
   peak lists. Naturally, this only works with analyses in the Bruker data
   format (<code class="file">.d</code>). This function leverages DataAnalysis functionality to
   support averaging of spectra, background subtraction and identification of
   isotopes. In order to obtain mass spectra TICs will be added of the MS and
   relevant MS/MS signals.</p>
-<p><code>generateDAFMFMSPeakLists</code> is similar to <code>generateDAMSPeakLists</code>,
+<p><code>generateMSPeakListsDAFMF</code> is similar to <code>generateMSPeakListsDA</code>,
   but uses compounds that were generated by the Find Molecular Features (FMF)
   algorithm to extract MS peak lists. This is generally much faster than
-  <code>generateDAMSPeakLists</code>, however, it only works when features were obtained
+  <code>generateMSPeakListsDA</code>, however, it only works when features were obtained
   using the <code><a href='feature-finding.html'>findFeaturesBruker</a></code> function. Since all MS spectra
   are generated in advance by Bruker DataAnalysis, no further parameters
   exist to customize its operation.</p>
-<p><code>generateMzRPeakLists</code> uses the <span class="pkg">mzR</span> package to
+<p><code>generateMSPeakListsMzR</code> uses the <span class="pkg">mzR</span> package to
   extract MS peak lists. For this analyses should be either in <code class="file">.mzXML</code>
-  or <code class="file">.mzML</code> format. This function can optionally average multiple
-  spectra over a chromatgraphic peak to improve accuracy.</p>
+  or <code class="file">.mzML</code> format. This function averages multiple spectra over a
+  chromatgraphic peak to improve accuracy.</p>
+<p>The <code>getDefAvgPListParams</code> is used to create a parameter list
+  for peak list averaging (discussed below).</p>
     
     <h2 class="hasAnchor" id="note"><a class="anchor" href="#note"></a>Note</h2>
 
-    <p><code>generateDAMSPeakLists</code> requires that the <span class="option">Component</span>
+    <p><code>generateMSPeakListsDA</code> requires that the <span class="option">Component</span>
   column is active (Method--&gt;Parameters--&gt;Layouts--&gt;Mass List Layout).</p>
+    
+    <h2 class="hasAnchor" id="peak-list-averaging-parameters"><a class="anchor" href="#peak-list-averaging-parameters"></a>Peak list averaging parameters</h2>
+
+    <p>The parameters set used for
+  averaging peak lists are set by the <code>avgFeatParams</code> and
+  <code>avgFGroupParams</code> arguments. This should be a named <code>list</code> with
+  the following values:</p><ul>
+<li><p><code>clusterMzWindow</code> <em>m/z</em> window (in Da) used for clustering
+  <em>m/z</em> values when spectra are averaged. Too small windows will prevent
+  clustering <em>m/z</em> values (thus erroneously creating 'extra' values),
+  whereas too big windows may cluster unrelated <em>m/z</em> values from
+  different or even the same spectrum together.</p></li>
+<li><p><code>topMost</code> Only retain this maximum number of MS peaks when
+  generating averaged spectra. Lowering this number may exclude more
+  irrelevant (noisy) MS peaks and decrease processing time, whereas higher
+  values may avoid excluding lower intense MS peaks that may still be of
+  interest.</p></li>
+<li><p><code>minIntensityPre</code> MS peaks with intensities below this value will
+  be removed (applied prior to selection by <code>topMost</code>) before averaging.</p></li>
+<li><p><code>minIntensityPost</code> MS peaks with intensities below this value will
+  be removed after averaging.</p></li>
+<li><p><code>avgFun</code> Function that is used to calculate average <em>m/z</em>
+  values.</p></li>
+<li><p><code>method</code> Method used for producing averaged MS spectra. Valid
+  values are <code>"hclust"</code>, used for hierarchical clustering (using the
+  <span class="pkg">fastcluster</span> package), and <code>"distance"</code>, to use the
+  between peak distance. The latter method may reduces processing
+  time and memory requirements, at the potential cost of reduced
+  accuracy.</p></li>
+</ul><p>The <code>getDefAvgPListParams</code> function can be used to generate a default
+  parameter list.</p>
+<p>Note that when Bruker algorithms are used these parameters only control
+  generation of feature groups averaged peak lists: how peak lists for
+  features are generated is controlled by DataAnalysis.</p>
+    
+    <h2 class="hasAnchor" id="source"><a class="anchor" href="#source"></a>Source</h2>
+
+    <p>Averaging of mass spectra algorithms used by are based on
+  the <a href='https://github.com/zeehio/msProcess'>msProcess</a> R package (now
+  archived on CRAN).</p>
     
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
-    <p>Averaging of mass spectra algorithms used by
-  <code>generateMzRPeakLists</code> were based on the
-  <a href='https://github.com/zeehio/msProcess'>msProcess</a> R package (now
-  archived on CRAN). <br /><br />
+    <p><br /><br />
   A cross-platform toolkit for mass spectrometry and proteomics Chambers, Matthew C. and Maclean, Brendan and Burke, Robert and Amodei, 
 		 Dario and Ruderman, Daniel L. and Neumann, Steffen and Gatto, Laurent and 
 		 Fischer, Bernd and Pratt, Brian and Egertson, Jarrett and Hoff, Katherine 
@@ -292,7 +312,8 @@ groups.</p>
   Mol Cell Proteomics. 2010 Aug 17. mzML - a Community Standard for Mass Spectrometry Data. Martens L, Chambers M, Sturm M, Kessner D, Levander F, Shofstahl J, Tang WH, Rompp A, Neumann S,  Pizarro AD, Montecchi-Palazzi L, Tasman N, Coleman M, Reisinger F, Souda P,  Hermjakob H, Binz PA, Deutsch EW. <br /><br />
   Nat Biotechnol. 2004 Nov;22(11):1459-66. A common open representation of mass spectrometry data and its application to proteomics research. Pedrioli PG, Eng JK, Hubley R, Vogelzang M, Deutsch EW, Raught B, Pratt B, Nilsson E, Angeletti RH, Apweiler R, Cheung K, Costello CE, Hermjakob H, Huang S, Julian RK, Kapp E, McComb ME, Oliver SG,  Omenn G, Paton NW, Simpson R, Smith R, Taylor CF, Zhu W, Aebersold R. <br /><br />
   Mol Syst Biol. 2005;1:2005.0017. Epub 2005 Aug 2. A uniform proteomics MS/MS analysis platform utilizing open XML file formats. Keller A, Eng J, Zhang N, Li XJ, Aebersold R. <br /><br />
-  Bioinformatics. 2008 Nov 1;24(21):2534-6. Epub 2008 Jul 7. ProteoWizard: open source software for rapid proteomics tools development. Kessner D, Chambers M, Burke R, Agus D, Mallick P.</p>
+  Bioinformatics. 2008 Nov 1;24(21):2534-6. Epub 2008 Jul 7. ProteoWizard: open source software for rapid proteomics tools development. Kessner D, Chambers M, Burke R, Agus D, Mallick P. <br /><br />
+  Daniel Müllner (2013). fastcluster: Fast Hierarchical, Agglomerative Clustering Routines for R and Python. Journal of Statistical Software, 53(9), 1-18. URL http://www.jstatsoft.org/v53/i09/.</p>
     
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
@@ -311,6 +332,10 @@ groups.</p>
 
       <li><a href="#note">Note</a></li>
 
+      <li><a href="#peak-list-averaging-parameters">Peak list averaging parameters</a></li>
+
+      <li><a href="#source">Source</a></li>
+
       <li><a href="#references">References</a></li>
 
       <li><a href="#see-also">See also</a></li>
@@ -325,7 +350,7 @@ groups.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.2.0.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.3.0.</p>
 </div>
       </footer>
    </div>

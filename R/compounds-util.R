@@ -11,21 +11,27 @@ getAllCompCols <- function(targetCols, allCols, mCompNames)
     return(targetCols[targetCols %in% allCols])
 }
 
-mergeFragInfo <- function(fiLeft, fiRight, leftName, rightName, setMergedBy)
+mergeFragInfo <- function(fiLeft, fiRight, leftName, rightName)
 {
-    fiLeft <- copy(fiLeft)
+    # UNDONE: what about multiple formula candidates?
 
-    if (setMergedBy && is.null(fiLeft[["mergedBy"]]))
+    fiLeft <- copy(fiLeft); fiRight <- copy(fiRight)
+
+    if (is.null(fiLeft[["mergedBy"]]))
         fiLeft[, mergedBy := list(list(leftName))]
+    if (is.null(fiRight[["mergedBy"]]))
+        fiRight[, mergedBy := list(list(rightName))]
 
     # for overlap: just add label
-    fiLeft[PLIndex %in% fiRight$PLIndex,
-            mergedBy := lapply(mergedBy, function(cm) list(unique(c(cm, rightName))))]
+    fiLeft <- merge(fiLeft, fiRight[, c("PLIndex", "mergedBy"), with = FALSE], all = FALSE, by = "PLIndex")
+    fiLeft[is.na(mergedBy.y), mergedBy := mergedBy.x]
+    fiLeft[is.na(mergedBy.x), mergedBy := mergedBy.y]
+    fiLeft[!is.na(mergedBy.x) & !is.na(mergedBy.y),
+           mergedBy := lapply(seq_along(mergedBy.x), function(i) list(unique(c(mergedBy.x[[i]], mergedBy.y[[i]]))))]
+    fiLeft[, c("mergedBy.x", "mergedBy.y") := NULL]
 
     # add unique
     fiUnique <- fiRight[!PLIndex %in% fiLeft$PLIndex]
-    if (setMergedBy)
-        fiUnique[, mergedBy := list(list(rightName))]
     if (nrow(fiUnique) > 0)
         fiLeft <- rbind(fiLeft, fiUnique, fill = TRUE)
 
@@ -49,7 +55,7 @@ getCompScoreColNames <- function()
              "smartsExclusionScore",
              "suspectListScore",
              "retentionTimeScore",
-             
+
              # From Dashboard
              "CPDATCount",
              "TOXCASTActive",
@@ -74,13 +80,13 @@ normalizeCompScores <- function(compResults, mCompNames, minMaxNormalization, ex
     compResults <- copy(compResults)
     columns <- names(compResults)
     scoreCols <- getAllCompCols(getCompScoreColNames(), columns, mCompNames)
-    
+
     if (!is.null(exclude))
         scoreCols <- scoreCols[!scoreCols %in% exclude]
-    
+
     if (length(scoreCols) > 0)
         compResults[, (scoreCols) := lapply(.SD, normalize, minMax = minMaxNormalization), .SDcols = scoreCols]
-    
+
     return(compResults)
 }
 
@@ -160,7 +166,7 @@ getCompInfoList <- function(compResults, compIndex, addHTMLURL, mCompNames)
         ctext <- addValText(ctext, "%s", c("InChIKey1", "InChIKey2"))
 
     ctext <- addValText(ctext, "%.2f", c("XlogP", "AlogP"))
-    
+
     # Dashboard
     ctext <- addValText(ctext, "%s", c("CASRN", "QCLevel"))
 
@@ -171,33 +177,33 @@ buildMFLandingURL <- function(mfSettings, peakList, precursorMz)
 {
     # Via personal communication Steffen/Emma, see https://github.com/Treutler/MetFamily/blob/22b9f46b2716b805c24c03d260045605c0da8b3e/ClusteringMS2SpectraGUI.R#L2433
     # Code adopted from MetFamily R package: https://github.com/Treutler/MetFamily
-    
+
     if (is.null(mfSettings))
     {
         # no settings given, simply default to PubChem
         mfSettings <- list(MetFragDatabaseType = "PubChem")
     }
-    
+
     mfSettings$IonizedPrecursorMass <- precursorMz
     mfSettings$NeutralPrecursorMass <- "" # make sure user needs to calculate it and remove default
-    
+
     PL <- paste(peakList$mz, peakList$intensity, sep = " ", collapse = "; ")
     mfSettings$PeakList <- PL
-    
+
     if (mfSettings$MetFragDatabaseType == "ExtendedPubChem")
         mfSettings$MetFragDatabaseType <- "PubChem" # user should tick box for now...
-    
+
     # Allowed parameters: list taken from error page when unsupported parameter is given
     mfSettings <- mfSettings[names(mfSettings) %in%
                                  c("FragmentPeakMatchAbsoluteMassDeviation", "FragmentPeakMatchRelativeMassDeviation",
                                    "DatabaseSearchRelativeMassDeviation", "PrecursorCompoundIDs", "IonizedPrecursorMass",
                                    "NeutralPrecursorMass", "NeutralPrecursorMolecularFormula", "PrecursorIonMode",
                                    "PeakList", "MetFragDatabaseType")]
-    
+
     setstr <- paste0(paste0(names(mfSettings), "=", mfSettings), collapse = "&")
     ret <- paste0("https://msbi.ipb-halle.de/MetFragBeta/landing.xhtml?", setstr)
     #ret <- sprintf("<a target=\"_blank\" href=\"%s\">MetFragWeb</a>", ret)
-    
+
     return(ret)
 }
 
@@ -205,12 +211,12 @@ buildMFLandingURL <- function(mfSettings, peakList, precursorMz)
 getCompInfoText <- function(compResults, compIndex, addHTMLURL, normalizeScores, mCompNames)
 {
     columns <- names(compResults)
-    
+
     if (normalizeScores)
         compResults <- normalizeCompScores(compResults, mCompNames, FALSE) # UNDONE: select normalization method?
-    
+
     resultRow <- compResults[compIndex, ]
-    
+
     addValText <- function(curText, fmt, cols)
     {
         cols <- getAllCompCols(cols, columns, mCompNames)
@@ -224,41 +230,41 @@ getCompInfoText <- function(compResults, compIndex, addHTMLURL, normalizeScores,
                 ret <- paste0(ret, sprintf(fm, resultRow[[cl]]))
             }
         }
-        
+
         return(paste0(curText, ret))
     }
-    
+
     ctext <- ""
-    
+
     if (addHTMLURL)
     {
         addIdURL <- function(param, ident, db)
         {
             ident <- as.character(ident)
-            
+
             if (is.na(ident) || !nzchar(ident))
                 return("")
-            
+
             # CSI:FingerID might return multiple identifiers
             idlist <- unlist(strsplit(ident, ";"))
-            
+
             if (grepl("pubchem", tolower(db)))
                 fmt <- "<a href=\"https://pubchem.ncbi.nlm.nih.gov/compound/%s\">%s</a>"
             else if (tolower(db) == "chemspider")
                 fmt <- "<a href=\"http://www.chemspider.com/Search.aspx?q=%s\">%s</a>"
             else
                 fmt <- "%s"
-            
+
             return(sprintf("%s: %s\n", param, paste0(sprintf(fmt, idlist, idlist), collapse = "; ")))
         }
-        
+
         if (!is.null(resultRow$identifier)) # compounds were not merged, can use 'regular' column
             ctext <- paste0(ctext, addIdURL("identifier", resultRow$identifier, resultRow$database))
         else
         {
             idcols <- getAllCompCols("identifier", columns, mCompNames)
             dbcols <- getAllCompCols("database", columns, mCompNames)
-            
+
             if (allSame(resultRow[, idcols, with = FALSE])) # no need to show double ids
                 ctext <- paste0(ctext, addIdURL("identifier", resultRow[[idcols[1]]], resultRow[[dbcols[1]]]))
             else
@@ -270,20 +276,20 @@ getCompInfoText <- function(compResults, compIndex, addHTMLURL, normalizeScores,
     }
     else
         ctext <- addValText(ctext, "%s", "identifier")
-    
+
     ctext <- addValText(ctext, "%s", c("compoundName", "formula", "SMILES"))
-    
+
     if (length(getAllCompCols("InChIKey", columns, mCompNames)) > 0)
         ctext <- addValText(ctext, "%s", "InChIKey")
     else # only add InChIKey1/2 if full isn't available
         ctext <- addValText(ctext, "%s", c("InChIKey1", "InChIKey2"))
-    
+
     ctext <- addValText(ctext, "%.2f", getCompScoreColNames())
     ctext <- addValText(ctext, "%.2f", c("XlogP", "AlogP"))
-    
+
     # remove trailing newline
     ctext <- gsub("\n$", "", ctext)
-    
+
     return(ctext)
 }
 

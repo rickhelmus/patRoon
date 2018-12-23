@@ -619,10 +619,30 @@ numLTE <- function(x, y, tol = sqrt(.Machine$double.eps)) numEQ(x, y, tol) | x <
 
 wrapStr <- function(s, width, sep = "\n") paste0(strwrap(s, width), collapse = sep)
 
-pruneList <- function(l, checkEmptyElements = FALSE)
+pruneList <- function(l, checkEmptyElements = FALSE, checkZeroRows = FALSE)
 {
     ret <- l[!sapply(l, is.null)]
     if (checkEmptyElements)
         ret <- ret[lengths(ret) > 0]
+    if (checkZeroRows)
+        ret <- ret[sapply(ret, nrow) > 0]
     return(ret)
+}
+
+# based on tabular() from formatting vignette of roxygen
+tabularRD <- function(df, ...)
+{
+    align <- function(x) if (is.numeric(x)) "r" else "l"
+    col_align <- vapply(df, align, character(1))
+    
+    # add headers
+    df <- rbind(sprintf("\\strong{%s}", names(df)), df)
+    
+    cols <- lapply(df, format, ...)
+    
+    contents <- do.call("paste",
+                        c(cols, list(sep = " \\tab ", collapse = "\\cr\n  ")))
+    
+    paste("\\tabular{", paste(col_align, collapse = ""), "}{\n  ",
+          contents, "\n}\n", sep = "")
 }

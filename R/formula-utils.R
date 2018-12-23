@@ -1,5 +1,8 @@
 splitFormulaToList <- function(formula)
 {
+    if (!nzchar(formula))
+        return(list())
+    
     # split string in pairs of elements+element counts (and optionally isotopic info), e.g.: { "C30", "^13C2" }
     spltform <- unlist(regmatches(formula, gregexpr("(\\^[[:digit:]]+)?[[:upper:]]{1}[[:lower:]]?[[:digit:]]*", formula)))
 
@@ -31,7 +34,7 @@ getElements <- function(formula, elements)
         fl <- splitFormulaToList(f)
         df <- as.data.frame(t(as.data.frame(fl)))
         df[setdiff(elements, names(fl))] <- 0
-        return(df[, elements, drop=F])
+        return(df[, elements, drop = FALSE])
     }, simplify = F, USE.NAMES = F)
 
     ret <- as.data.frame(do.call(rbind, ret))
@@ -99,6 +102,18 @@ calculateIonFormula <- function(formula, adduct)
         sapply(formula, subtractFormula, formula2 = "H", USE.NAMES = FALSE)
 }
 
+calculateNeutralFormula <- function(formula, adduct)
+{
+    if (grepl("+H", adduct, fixed = TRUE))
+        sapply(formula, subtractFormula, formula2 = "H", USE.NAMES = FALSE)
+    else if (grepl("+Na", adduct, fixed = TRUE))
+        sapply(formula, subtractFormula, formula2 = "Na", USE.NAMES = FALSE)
+    else if (grepl("+K", adduct, fixed = TRUE))
+        sapply(formula, subtractFormula, formula2 = "K", USE.NAMES = FALSE)
+    else if (grepl("-H", adduct, fixed = TRUE))
+        sapply(formula, addFormula, formula2 = "H", USE.NAMES = FALSE)
+}
+
 sortFormula <- function(formula)
 {
     fl <- splitFormulaToList(formula)
@@ -113,149 +128,232 @@ sortFormula <- function(formula)
     return(formulaListToString(fl[el]))
 }
 
-formulaScoringColumns <- function() c("score", "MS_match", "treeScore", "isoScore",
-                                      "frag_score", "MSMS_match", "comb_match")
-
-consensusForFormulaList <- function(formList, fGroups, formThreshold, maxFormulas,
-                                    maxFragFormulas, minIntensity, maxIntensity, minPreferredFormulas,
-                                    minPreferredIntensity)
+averageFormulas <- function(formulas)
 {
-    printf("Generating consensus for formula lists (%s)... ", algorithm(formList))
+    fltab <- rbindlist(lapply(formulas, function(f) as.list(splitFormulaToList(f))), fill = TRUE)
+    for (j in seq_along(fltab))
+        set(fltab, which(is.na(fltab[[j]])), j, 0)
+    fl <- round(colMeans(fltab))
+    return(formulaListToString(fl))
+}
 
-    ftind <- groupFeatIndex(fGroups)
-    gInfo <- groupInfo(fGroups)
-    anaInfo <- analysisInfo(fGroups)
-    gTable <- groups(fGroups)
-    forms <- formulaTable(formList)
+addElementInfoToFormTable <- function(formTable, elements, fragElements, OM)
+{
+    # ensure CHNOPS counts are present
+    if (OM)
+        elements <- unique(c(if (is.null(elements)) c() else elements, c("C", "H", "N", "O", "P", "S")))
 
-    # Add analysis & group names
-    for (a in names(forms))
+    if (!is.null(elements) && length(elements) > 0)
     {
-        if (length(forms[[a]]) > 0)
+        # Retrieve element lists from formulas
+        el <- getElements(formTable$neutral_formula, elements)
+        formTable[, names(el) := el]
+    }
+    if (!is.null(fragElements) && !is.null(formTable[["frag_formula"]]) &&
+        length(fragElements) > 0)
+    {
+        el <- getElements(formTable$frag_formula, fragElements)
+        formTable[, (paste0("frag_", names(el))) := el]
+    }
+
+    if (OM)
+    {
+        # add element ratios commonly used for plotting
+        elrat <- function(el1, el2) ifelse(el2 == 0, 0, el1 / el2)
+        formTable[, c("OC", "HC", "NC", "PC", "SC") :=
+                      .(elrat(O, C), elrat(H, C), elrat(N, C), elrat(P, C), elrat(S, C))]
+
+        # aromaticity index and related DBE (see Koch 2016, 10.1002/rcm.7433)
+        formTable[, DBE_AI := 1 + C - O - S - 0.5 * (N + P + H)]
+        getAI <- function(dbe, cai) ifelse(cai == 0, 0, dbe / cai)
+        formTable[, AI := getAI(DBE_AI, (C - O - N - S - P))]
+
+        formTable[, classification := Vectorize(classifyFormula)(OC, HC, NC, AI)]
+    }
+
+    return(formTable)
+}
+
+# classification according to Abdulla 2013 (10.1021/ac303221j)
+classifyFormula <- function(OC, HC, NC, AI)
+{
+    if (OC <= 0.2 && HC >= 1.7 && HC <= 2.2)
+        return("lipid")
+    if (OC > 0.2 && OC <= 0.6 && HC >= 1.7 && HC <= 2.2 && NC > 0.05)
+        return("protein")
+    if (OC > 0.6 && OC <= 1.2 && HC >= 1.5 && HC <= 2.2)
+        return("carbohydrate")
+    if (OC > 0.1 && OC <= 0.6 && HC >= 0.6 && HC <= 1.7 && AI < 0.67)
+        return("lignin_CRAM")
+    if (OC > 0.6 && OC <= 1.2 && HC >= 0.5 && HC <= 1.5 && AI < 0.67)
+        return("tannin")
+    if (OC <= 0.1 && HC >= 0.7 && HC <= 1.5)
+        return("unsat_hydrocarbon")
+    if (OC <= 0.1 && HC >= 0.3 && HC <= 0.7 && AI >= 0.67)
+        return("condensed_aromatic")
+
+    return("other")
+}
+
+checkFormula <- function(formula, elementsVec)
+{
+    for (elements in elementsVec)
+    {
+        # any ranges specified?
+        if (grepl("[0-9]+\\-[0-9]+", elements))
         {
-            for (g in names(forms[[a]]))
+            minElements <- gsub("([0-9]+)\\-[0-9]+", "\\1", elements)
+            maxElements <- gsub("[0-9]+\\-([0-9]+)", "\\1", elements)
+            minElFL <- splitFormulaToList(minElements)
+            maxElFL <- splitFormulaToList(maxElements)
+        }
+        else
+            minElFL <- maxElFL <- splitFormulaToList(elements)
+
+        formlist <- splitFormulaToList(formula)
+
+        OK <- TRUE
+
+        missingElements <- setdiff(names(minElFL), names(formlist))
+        if (length(missingElements) > 0 &&
+            any(sapply(missingElements, function(mel) minElFL[mel] > 0)))
+            OK <- FALSE
+        else
+        {
+            for (el in names(formlist))
             {
-                if (nrow(forms[[a]][[g]]) > 0)
+                elc <- formlist[el]
+
+                if (el %in% names(minElFL))
                 {
-                    # BUG: need to copy() otherwise table will not be updated (because it's nested?)
-                    forms[[a]][[g]] <- copy(forms[[a]][[g]])
-                    forms[[a]][[g]][, c("analysis", "group") := .(a, g)]
+                    if (elc < minElFL[el] || elc > maxElFL[el])
+                    {
+                        OK <- FALSE
+                        break
+                    }
                 }
             }
         }
+
+        if (OK)
+            return(TRUE)
     }
 
-    # merge all together
-    formTable <- rbindlist(lapply(forms, rbindlist, fill = TRUE), fill = TRUE)
-    haveMSMS <- "frag_formula" %in% colnames(formTable)
-
-    gTable <- groups(fGroups)
-    gInfo <- groupInfo(fGroups)
-
-    # Filter irrelevant feature groups
-    formTable <- formTable[group %in% colnames(gTable)]
-
-    # add some general info and put to the front
-    formTable[, c("ret", "mz") := .(gInfo[group, "rts"], gInfo[group, "mzs"])]
-    setcolorder(formTable, c((ncol(formTable)-1):ncol(formTable), 1:(ncol(formTable)-2)))
-
-    if (nrow(formTable) == 0)
-        warning("No (relevant) formulas!")
-    else
-    {
-        # (temporarily) add intensities
-        formTable[, intensity := gTable[[group]][match(analysis, anaInfo$analysis)], by = .(group, analysis)]
-
-        # filter formulas above/below intensity thresholds
-        if (!is.null(minIntensity))
-            formTable <- formTable[intensity >= minIntensity]
-        if (!is.null(maxIntensity))
-            formTable <- formTable[intensity <= maxIntensity]
-        
-        if (nrow(formTable) == 0)
-            warning("Filtered all formulas!")
-        else
-        {
-            # check if we can remove some more to stay in optimal intensity range
-            if (!is.null(minPreferredIntensity))
-            {
-                formTable[, prefAnaCount := length(unique(.SD[intensity >= minPreferredIntensity]$analysis)), by = group]
-                formTable <- formTable[prefAnaCount < minPreferredFormulas | intensity >= minPreferredIntensity]
-                formTable[, prefAnaCount := NULL]
-            }
-            
-            formTable[, min_intensity := min(intensity), by = .(group, byMSMS)]
-            formTable[, max_intensity := max(intensity), by = .(group, byMSMS)]
-            
-            formTable[, ana_min_intensity := .SD[which.min(intensity), analysis], by = .(group, byMSMS)]
-            formTable[, ana_max_intensity := .SD[which.max(intensity), analysis], by = .(group, byMSMS)]
-            
-            # number of analyses searched for formulas per group
-            formTable[, anaCount := length(unique(analysis)), by = group]
-            
-            byCols <- c("group", "formula")
-            if (haveMSMS)
-                byCols <- c(byCols, "frag_formula")
-            
-            # Determine coverage of formulas within analyses
-            formTable[, anaCoverage := .N / anaCount, by = byCols]
-            if (formThreshold > 0)
-                formTable <- formTable[anaCoverage >= formThreshold] # Apply coverage filter
-            
-            # Remove duplicate entries (do this after coverage!)
-            formTable <- unique(formTable, by = byCols)
-            
-            # order from best to worst (important for max unique formula filter)
-            colorder <- c("group", "byMSMS", intersect(names(formTable), formulaScoringColumns()))
-            setorderv(formTable, colorder, c(1, 1, rep(-1, length(colorder)-2)))
-            
-            # filter max unique formulas
-            formTable[, form_unique := match(formula, unique(.SD$formula)), by = group]
-            formTable <- formTable[form_unique <= maxFormulas]
-            if (haveMSMS)
-            {
-                formTable[, form_unique_frag := match(frag_formula, unique(frag_formula)), by=.(group, byMSMS, formula)]
-                formTable <- formTable[form_unique_frag <= maxFragFormulas]
-            }
-            
-            # Remove some uninteresting columns
-            formTable[, c("analysis", "intensity", "anaCount", "form_unique") := NULL]
-            if (haveMSMS)
-                formTable[, form_unique_frag := NULL]
-        }
-    }
-        
-    cat("Done!\n")
-
-    return(formulaConsensus(formulas = formTable, algorithm = algorithm(formList)))
+    return(FALSE)
 }
 
-formConsensusColOrder <- function(fConsTable)
+#' @details \code{formulaScorings} returns a \code{data.frame} with information
+#'   on which scoring terms are used and what their algorithm specific name is.
+#' @rdname formula-generation
+#' @export
+formulaScorings <- function()
 {
-    currentCols <- colnames(fConsTable)
+    data.frame(name = c("combMatch", "frag_mSigma", "frag_score", "isoScore", "mSigma", "MSMSScore", "score"),
+               genform = c("comb_match", "-", "-",  "MS_match", "-", "MSMS_match", "-"),
+               sirius = c("-", "-", "-", "isoScore", "-", "treeScore", "score"),
+               bruker = c("-", "mSigma (SmartFormula3D)", "Score (SmartFormula3D)", "-", "mSigma", "-", "Score"),
+               description = c("MS and MS/MS combined match value", "Deviation of isotopic pattern of fragment",
+                               "MS/MS fragment score", "How well the isotopic pattern matches", "Deviation of the isotopic pattern",
+                               "How well MS/MS data matches", "Overall MS formula score"),
+               stringsAsFactors = FALSE)
+}
 
-    # all possible columns, depending on algorithm(s) used and their settings
-    allCols <- c("group", "ret", "mz", "neutral_formula", "formula", "adduct", "formula_mz", "error",
-                 "mSigma", "dbe", "rank", "score", "MS_match", "treeScore", "isoScore", "anaCoverage",
-                 "listCoverage", "byMSMS", "frag_formula", "frag_intensity", "frag_mz", "frag_formula_mz",
-                 "frag_error", "frag_mSigma", "neutral_loss", "frag_dbe", "frag_score", "MSMS_match",
-                 "comb_match", "explainedPeaks", "explainedIntensity", "min_intensity", "max_intensity",
-                 "ana_min_intensity", "ana_max_intensity")
+formulaRankingColumns <- function() c("byMSMS", "score", "combMatch", "isoScore", "mSigma", "MSMSScore")
 
-    # add algorithm specific scoring/anaCoverage columns that may have been created during merging
-    scorePos <- which(allCols == "score")
-    curScoreCols <- currentCols[grepl("score-", currentCols)]
-    if (length(curScoreCols) > 0)
-        allCols <- append(allCols, curScoreCols, scorePos)
+rankFormulaTable <- function(formTable)
+{
+    # order from best to worst
 
-    covPos <- which(allCols == "anaCoverage")
-    curCovCols <- currentCols[grepl("anaCoverage-", currentCols)]
-    if (length(curCovCols) > 0)
-        allCols <- append(allCols, curCovCols, covPos)
+    rankCols <- getAllFormulasCols(formulaRankingColumns(), names(formTable))
 
-    ret <- currentCols[match(allCols, currentCols, nomatch = 0)] # re-order
+    colorder <- rep(-1, length(rankCols))
 
-    return(ret)
+    # low mSigma values are best
+    colorder[grepl("^mSigma", names(rankCols))] <- 1
+
+    setorderv(formTable, rankCols, colorder)
+    return(formTable)
+}
+
+generateFormConsensusForGroup <- function(formAnaList, formThreshold)
+{
+    # merge all together
+    formTable <- rbindlist(formAnaList, fill = TRUE, idcol = "analysis")
+    haveMSMS <- "frag_formula" %in% colnames(formTable)
+
+    if (nrow(formTable) > 0)
+    {
+        # number of analyses searched for formulas per group
+        anaCount <- length(formAnaList)
+
+        byCols <- "formula"
+        if (haveMSMS)
+            byCols <- c(byCols, "frag_formula")
+
+        # unique precursor formulas per analysis
+        uniqueAnaForms <- unique(formAnaList, by = c("formula", "analysis"))
+
+        # Determine coverage of precursor formulas within analyses.
+        formTable[, anaCoverage := uniqueN(analysis) / anaCount, by = "formula"]
+
+        if (formThreshold > 0)
+            formTable <- formTable[anaCoverage >= formThreshold] # Apply coverage filter
+
+        # remove MS only formulas if MS/MS candidate is also present (do after
+        # coverage filter as is explained above).
+        MSMSForms <- unique(formTable[byMSMS == TRUE, formula])
+        formTable <- formTable[byMSMS == TRUE | !formula %in% MSMSForms]
+
+        # rank before duplicate removal: make sure to retain best scored candidate
+        formTable <- rankFormulaTable(formTable)
+
+        # Remove duplicate entries (do this after coverage!)
+        formTable <- unique(formTable, by = byCols)
+
+        formTable[, "analysis" := NULL]
+    }
+
+    return(formTable)
+}
+
+generateGroupFormulasByConsensus <- function(formList, formThreshold)
+{
+    cat("Generating feature group formula consensus...\n")
+
+    hash <- makeHash(formList, formThreshold)
+    formCons <- loadCacheData("formCons", hash)
+
+    # figure out feature groups
+    gNames <- unique(unlist(sapply(formList, names, simplify = FALSE), use.names = FALSE))
+    gCount <- length(gNames)
+
+    if (gCount == 0)
+        formCons <- list()
+    else if (is.null(formCons))
+    {
+        prog <- txtProgressBar(0, gCount, style = 3)
+
+        formCons <- lapply(seq_len(gCount), function(grpi)
+        {
+            fAnaList <- lapply(formList, "[[", gNames[[grpi]])
+            fAnaList <- fAnaList[!sapply(fAnaList, is.null)]
+
+            ret <- generateFormConsensusForGroup(fAnaList, formThreshold)
+            setTxtProgressBar(prog, grpi)
+            return(ret)
+        })
+        names(formCons) <- gNames
+        formCons <- pruneList(formCons, checkZeroRows = TRUE)
+
+        setTxtProgressBar(prog, gCount)
+        close(prog)
+
+        saveCacheData("formCons", formCons, hash)
+    }
+    else
+        cat("Done!\n")
+
+    return(formCons)
 }
 
 getFragmentInfoFromForms <- function(spec, fragFormTable)
@@ -266,33 +364,81 @@ getFragmentInfoFromForms <- function(spec, fragFormTable)
     fi <- data.table(mz = fragFormTable$frag_mz, formula = fragFormTable$frag_formula)
     fi[, PLIndex := sapply(mz, function(omz) which.min(abs(omz - spec$mz)))] # UNDONE: is this always correct?
     fi[, intensity := spec$intensity[PLIndex]]
+
+    if (!is.null(fragFormTable[["mergedBy"]]))
+        fi[, mergedBy := list(strsplit(fragFormTable$mergedBy, ",", fixed = TRUE))]
+
+    return(fi)
 }
 
-getFormInfoList <- function(formConsensus, precursor, groupName)
+# get a vector of all (merged) columns
+getAllFormulasCols <- function(targetCols, allCols)
 {
-    formTable <- formulaTable(formConsensus)[group == groupName & byMSMS == TRUE & formula == precursor]
+    # find regular (non-merged) columns
+    reg <- intersect(targetCols, allCols)
+
+    mCols <- getAllMergedFormulasCols(allCols)
+    if (length(mCols) > 0)
+    {
+        merged <- lapply(targetCols, function(tc) grep(paste0("^", tc, "\\-"), mCols, value = TRUE))
+        merged <- merged[lengths(merged) > 0]
+        merged <- unlist(merged)
+    }
+    else
+        merged <- character()
+
+    return(c(reg, merged))
+}
+
+getAllMergedFormulasCols <- function(allCols)
+{
+    # NOTE: we simply assume that merged columns have "-X" (X is name of merged
+    # object) appended. This means that regular columns should never contain
+    # dashes!
+    return(grep("^.+\\-.+", allCols, value = TRUE))
+}
+
+getFormInfoList <- function(formTable, precursor)
+{
+    formTable <- formTable[byMSMS == TRUE & formula == precursor]
 
     if (nrow(formTable) == 0)
         return(NULL)
 
     precInfo <- formTable[1] # precursor info is duplicated over all fragment rows
 
-    valText <- function(fmt, value) if (!is.null(value) && !is.na(value)) sprintf(fmt, value) else NULL
+    addValText <- function(curText, fmt, col)
+    {
+        # get all columns matching value of 'col' as prefix: merged names after
+        # consensus will have format 'col-X'.
+        cols <- grep(paste0("^", col), names(precInfo), value = TRUE)
+
+        ret <- character()
+        for (cl in cols)
+        {
+            if (!is.null(precInfo[[cl]]) && !is.na(precInfo[[cl]]) &&
+                (!is.character(precInfo[[cl]]) || nzchar(precInfo[[cl]])))
+            {
+                fm <- sprintf("%s: %s", cl, fmt)
+                ret <- c(ret, sprintf(fm, precInfo[[cl]]))
+            }
+        }
+
+        return(c(curText, ret))
+    }
+
     ret <- character()
-    ret <- c(ret, valText("Ion formula: %s", precInfo$formula))
-    ret <- c(ret, valText("Neutral formula: %s", precInfo$neutral_formula))
-    ret <- c(ret, valText("Error: %.2f ppm", precInfo$error))
-    ret <- c(ret, valText("mSigma: %.1f", precInfo$mSigma))
-    ret <- c(ret, valText("dbe: %f", precInfo$error))
-    ret <- c(ret, valText("Rank: %f", precInfo$rank))
-    ret <- c(ret, valText("Score: %.2f", precInfo$score))
-    ret <- c(ret, valText("Score SIRIUS: %.2f", precInfo[["score-SIRIUS"]]))
-    ret <- c(ret, valText("Score DataAnalysis: %.2f", precInfo[["score-Bruker_DataAnalysis"]]))
-    ret <- c(ret, valText("MS match: %.2f", precInfo$MS_match))
-    ret <- c(ret, valText("MSMS match: %.2f", precInfo$MSMS_match))
-    ret <- c(ret, valText("comb match: %.2f", precInfo$comb_match))
-    ret <- c(ret, valText("treeScore: %.2f", precInfo$treeScore))
-    ret <- c(ret, valText("isoScore: %.2f", precInfo$isoScore))
+
+    ret <- addValText(ret, "%s", "formula")
+    ret <- addValText(ret, "%s", "neutral_formula")
+    ret <- addValText(ret, "%.2f ppm", "error")
+    ret <- addValText(ret, "%.1f", "mSigma")
+    ret <- addValText(ret, "%f", "error")
+    ret <- addValText(ret, "%f", "rank")
+    ret <- addValText(ret, "%.2f", "score")
+    ret <- addValText(ret, "%.2f", "MSMSScore")
+    ret <- addValText(ret, "%.2f", "combMatch")
+    ret <- addValText(ret, "%.2f", "isoScore")
 
     return(ret)
 }

@@ -23,20 +23,20 @@ assertAnalysisInfo <- function(x, allowedFormats = NULL, .var.name = checkmate::
 {
     if (!is.null(add))
         mc <- length(add$getMessages())
-    
+
     checkmate::assertDataFrame(x, types = "character", any.missing = FALSE, min.rows = 1, .var.name = .var.name, add = add)
     assertHasNames(x, c("path", "analysis", "group", "ref"), .var.name = .var.name, add = add)
-    
+
     # only continue if previous assertions didn't fail: x needs to be used as list which otherwise gives error
     # NOTE: this is only applicable if add != NULL, otherwise previous assertions will throw errors
     if (is.null(add) || length(add$getMessages()) == mc)
     {
         checkmate::assertDirectoryExists(x$path, .var.name = .var.name, add = add)
-        
+
         # UNDONE: more extensions? (e.g. mzData)
         if (is.null(allowedFormats))
             allowedFormats <- c("mzML", "mzXML", "d")
-        
+
         res <- FALSE
         for (f in allowedFormats)
         {
@@ -45,18 +45,18 @@ assertAnalysisInfo <- function(x, allowedFormats = NULL, .var.name = checkmate::
                 res <- checkmate::checkDirectoryExists(p)
             else
                 res <- checkmate::checkFileExists(p)
-            
+
             if (isTRUE(res))
                 break
         }
-        
+
         allowedFormats <- sub("d", "bruker", allowedFormats) # user friendly name
         if (!isTRUE(res))
             checkmate::makeAssertion(x, sprintf("No analyses found with correct data format (valid: %s)",
                                                 paste0(allowedFormats, collapse = ", ")),
                                      var.name = .var.name, collection = add)
     }
-    
+
     invisible(NULL)
 }
 
@@ -64,7 +64,7 @@ assertCanCreateDir <- function(x, .var.name = checkmate::vname(x), add = NULL)
 {
     if (!is.null(add))
         mc <- length(add$getMessages())
-    
+
     checkmate::assertString(x, min.chars = 1, .var.name = .var.name, add = add)
 
     # only continue if previous assertions didn't fail: x needs to be a valid path for next assertions
@@ -148,9 +148,9 @@ assertNormalizationMethod <- function(x, .var.name = checkmate::vname(x), add = 
 assertAvgPListParams <- function(x, .var.name = checkmate::vname(x), add = NULL)
 {
     checkmate::assertList(x, names = "unique", .var.name = .var.name) # no add: should fail
-    
+
     assertVal <- function(f, v, ...) f(x[[v]], ..., .var.name = paste0(.var.name, "$", v), add = add)
-    
+
     assertVal(checkmate::assertNumber, "clusterMzWindow", lower = 0, finite = TRUE)
     assertVal(checkmate::assertCount, "topMost", positive = TRUE)
     assertVal(checkmate::assertNumber, "minIntensityPre", lower = 0, finite = TRUE)
@@ -166,11 +166,11 @@ aapply = function(fun, formula, ..., fixed = list())
     terms = terms(formula)
     vnames = attr(terms, "term.labels")
     ee = attr(terms, ".Environment")
-    
+
     dots = list(...)
     dots$.var.name = vnames
     dots$x = unname(mget(vnames, envir = ee))
     .mapply(fun, dots, MoreArgs = fixed)
-    
+
     invisible(NULL)
 }

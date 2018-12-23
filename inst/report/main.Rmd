@@ -70,7 +70,7 @@ plotEIC(rmdVars$fGroups, rmdVars$EICRtWindow, rmdVars$EICMzWindow,
 ### Objects
 
 ```{r obj-show}
-objToShow <- list(rmdVars$fGroups, rmdVars$MSPeakLists, rmdVars$formConsensus,
+objToShow <- list(rmdVars$fGroups, rmdVars$MSPeakLists, rmdVars$formulas,
                   rmdVars$compounds, rmdVars$components)
 objToShow <- objToShow[!sapply(objToShow, is.null)]
 for (obji in seq_along(objToShow))
@@ -143,5 +143,5 @@ close(prog)
 ```
 
 
-```{r child="annotation.Rmd", eval=!is.null(rmdVars$compounds) || !is.null(rmdVars$compsCluster) || !is.null(rmdVars$formConsensus) || !is.null(rmdVars$components)}
+```{r child="annotation.Rmd", eval=!is.null(rmdVars$compounds) || !is.null(rmdVars$compsCluster) || !is.null(rmdVars$formulas) || !is.null(rmdVars$components)}
 ```

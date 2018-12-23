@@ -8,8 +8,9 @@ NULL
 processSiriusFormulas <- function(cmd, exitStatus, retries)
 {
     noResult <- forms <- data.table(neutral_formula = character(0), formula = character(0),
-                                    adduct = character(0), rank = integer(0), score = numeric(0), treeScore = numeric(0),
-                                    isoScore = numeric(0), byMSMS = logical(0), frag_formula = character(0),
+                                    adduct = character(0), rank = integer(0), score = numeric(0), MSMSScore = numeric(0),
+                                    isoScore = numeric(0), byMSMS = logical(0),
+                                    frag_neutral_formula = character(0), frag_formula = character(0),
                                     frag_mz = numeric(0), frag_formula_mz = numeric(0), frag_intensity = numeric(0),
                                     neutral_loss = character(0), explainedPeaks = integer(0), explainedIntensity = numeric(0))
 
@@ -28,7 +29,7 @@ processSiriusFormulas <- function(cmd, exitStatus, retries)
             forms <- noResult
         else
         {
-            setnames(forms, "formula", "neutral_formula")
+            setnames(forms, c("formula", "treeScore"), c("neutral_formula", "MSMSScore"))
             setkey(forms, neutral_formula)
 
             frags <- rbindlist(lapply(fragFiles, function(ff)
@@ -36,7 +37,7 @@ processSiriusFormulas <- function(cmd, exitStatus, retries)
                 fragInfo <- fread(ff)
                 setnames(fragInfo,
                          c("mz", "intensity", "exactmass", "explanation"),
-                         c("frag_mz", "frag_intensity", "frag_formula_mz", "frag_formula"))
+                         c("frag_mz", "frag_intensity", "frag_formula_mz", "frag_neutral_formula"))
                 fragInfo[, rel.intensity := NULL]
                 fragInfo[, neutral_formula := getFormulaFromSiriusFragFile(ff)]
                 return(fragInfo)
@@ -46,13 +47,22 @@ processSiriusFormulas <- function(cmd, exitStatus, retries)
             forms <- forms[frags] # merge fragment info
 
             forms[, formula := calculateIonFormula(neutral_formula, cmd$adduct)]
+            forms[, frag_formula := calculateIonFormula(frag_neutral_formula, cmd$adduct)]
             forms[, neutral_loss := as.character(Vectorize(subtractFormula)(formula, frag_formula))]
             forms[, byMSMS := TRUE]
 
+            # Precursor is always present in MS/MS spectrum: it's added by
+            # SIRIUS if necessarily (with zero intensity). Remove it and use its
+            # frag_formula_mz to get the formula_mz
+            forms[, formula_mz := .SD[frag_formula == formula, frag_formula_mz], by = "formula"]
+            forms <- forms[frag_intensity != 0 | formula != frag_formula]
+
             # set nice column order
-            setcolorder(forms, c("neutral_formula", "formula", "adduct", "rank", "score", "treeScore", "isoScore", "byMSMS",
-                                 "frag_formula", "frag_mz", "frag_formula_mz", "frag_intensity", "neutral_loss",
+            setcolorder(forms, c("neutral_formula", "formula", "adduct", "rank", "score", "MSMSScore", "isoScore", "byMSMS",
+                                 "frag_neutral_formula", "frag_formula", "frag_mz", "frag_formula_mz", "frag_intensity", "neutral_loss",
                                  "explainedPeaks", "explainedIntensity"))
+
+            forms <- rankFormulaTable(forms)
         }
     }
 
@@ -77,6 +87,7 @@ processSiriusFormulas <- function(cmd, exitStatus, retries)
 #' @export
 generateFormulasSirius <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct = "[M+H]+", elements = "CHNOP",
                                    profile = "qtof", database = NULL, noise = NULL,
+                                   calculateFeatures = TRUE, featThreshold = 0.75,
                                    logPath = file.path("log", "sirius"), maxProcAmount = getOption("patRoon.maxProcAmount"))
 {
     ac <- checkmate::makeAssertCollection()
@@ -86,104 +97,135 @@ generateFormulasSirius <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct = 
     aapply(checkmate::assertString, . ~ adduct + elements + profile, fixed = list(add = ac))
     checkmate::assertString(database, null.ok = TRUE, add = ac)
     checkmate::assertNumber(noise, lower = 0, finite = TRUE, null.ok = TRUE, add = ac)
+    checkmate::assertFlag(calculateFeatures, add = ac)
+    checkmate::assertNumber(featThreshold, lower = 0, finite = TRUE, null.ok = TRUE, add = ac)
     assertMultiProcArgs(logPath, maxProcAmount, add = ac)
     checkmate::reportAssertions(ac)
-    
+
     anaInfo <- analysisInfo(fGroups)
     fTable <- featureTable(fGroups)
-    ftind <- groupFeatIndex(fGroups)
+    featIndex <- groupFeatIndex(fGroups)
     gTable <- groups(fGroups)
     gNames <- colnames(gTable)
     gInfo <- groupInfo(fGroups)
-    gcount <- ncol(ftind)
-    pLists <- peakLists(MSPeakLists)
-
-    formTable <- list()
+    gCount <- length(fGroups)
 
     cacheDB <- openCacheDBScope() # open manually so caching code doesn't need to on each R/W access
-    setHash <- makeHash(fGroups, pLists, profile, adduct, maxMzDev, elements, database, noise)
+    baseHash <- makeHash(profile, adduct, maxMzDev, elements, database, noise)
+    setHash <- makeHash(fGroups, MSPeakLists, baseHash)
     cachedSet <- loadCacheSet("formulasSirius", setHash, cacheDB)
     formHashes <- character(0)
 
-    for (anai in seq_along(anaInfo$analysis))
+    doSIRIUS <- function(featMZs, groupPeakLists)
     {
-        ana <- anaInfo$analysis[anai]
-        gforms <- list()
+        doFGroups <- names(featMZs)
 
-        printf("Loading all formulas from analysis '%s'...\n", ana)
+        # skip fgroups without proper ms peak lists
+        if (length(doFGroups) > 0)
+            doFGroups <- doFGroups[sapply(doFGroups,
+                                          function(grp) !is.null(groupPeakLists[[grp]][["MS"]]) &&
+                                                        !is.null(groupPeakLists[[grp]][["MSMS"]]))]
 
-        cmdQueue <- sapply(gNames, function(grp)
+        hashes <- sapply(doFGroups, function(grp) makeHash(featMZs[grp], groupPeakLists[[grp]], baseHash))
+        formHashes <<- c(formHashes, hashes)
+
+        cachedResults <- pruneList(sapply(hashes, function(h)
         {
-            if (ftind[[grp]][anai] == 0)
-                return(NULL) # feature not present
+            forms <- NULL
+            if (!is.null(cachedSet))
+                forms <- cachedSet[[h]]
+            if (is.null(forms))
+                forms <- loadCacheData("formulasSirius", h, cacheDB)
+            return(forms)
+        }, simplify = FALSE))
+        doFGroups <- setdiff(doFGroups, names(cachedResults))
 
-            if (is.null(pLists[[ana]][[grp]]) || is.null(pLists[[ana]][[grp]][["MS"]]))
-                return(NULL) # MS or MSMS spectrum probably filtered away
+        cmdQueue <- pruneList(sapply(doFGroups, function(grp)
+        {
+            plmz <- getMZFromMSPeakList(featMZs[grp], groupPeakLists[[grp]][["MS"]])
 
-            if (is.null(pLists[[ana]][[grp]][["MSMS"]]))
-                return(NULL) # no MSMS
-
-            ftmz <- fTable[[ana]][["mz"]][ftind[[grp]][anai]]
-            plmz <- getMZFromMSPeakList(ftmz, pLists[[ana]][[grp]][["MS"]])
-            hash <- makeHash(ana, grp, ftmz, pLists[[ana]][[grp]], profile, adduct, maxMzDev, elements, database, noise)
-
-            cmd <- getSiriusCommand(plmz, pLists[[ana]][[grp]][["MS"]], pLists[[ana]][[grp]][["MSMS"]], profile,
+            cmd <- getSiriusCommand(plmz, groupPeakLists[[grp]][["MS"]], groupPeakLists[[grp]][["MSMS"]], profile,
                                     adduct, maxMzDev, elements, database, noise, FALSE, NULL)
             logf <- if (!is.null(logPath)) file.path(logPath, paste0("sirius-form-", grp, ".txt")) else NULL
             logfe <- if (!is.null(logPath)) file.path(logPath, paste0("sirius-form-err-", grp, ".txt")) else NULL
 
-            return(c(list(hash = hash, adduct = adduct, cacheDB = cacheDB, stdoutFile = logf,
+            return(c(list(hash = hashes[grp], adduct = adduct, cacheDB = cacheDB, stdoutFile = logf,
                           stderrFile = logfe, gName = grp), cmd))
-        }, simplify = FALSE)
-        cmdQueue <- cmdQueue[!sapply(cmdQueue, is.null)]
-
-        formHashes <- c(formHashes, sapply(cmdQueue, function(cmd) cmd$hash))
-
-        cachedResults <- sapply(cmdQueue, function(cmd)
-        {
-            forms <- NULL
-            if (!is.null(cachedSet))
-                forms <- cachedSet[[cmd$hash]]
-            if (is.null(forms))
-                forms <- loadCacheData("formulasSirius", cmd$hash, cacheDB)
-            return(forms)
-        }, simplify = FALSE)
-        cachedResults <- cachedResults[!sapply(cachedResults, is.null)]
-
-        cmdQueue <- cmdQueue[setdiff(names(cmdQueue), names(cachedResults))] # remove cached results
+        }, simplify = FALSE))
 
         if (length(cmdQueue) > 0)
         {
             if (!is.null(logPath))
                 mkdirp(logPath)
 
-            formTable[[ana]] <- executeMultiProcess(cmdQueue, processSiriusFormulas, errorHandler = function(cmd, exitStatus, retries) {
+            ret <- executeMultiProcess(cmdQueue, processSiriusFormulas, errorHandler = function(cmd, exitStatus, retries)
+            {
                 stop(sprintf("Fatal: Failed to execute SIRIUS for %s - exit code: %d\nCommand: %s", cmd$gName, exitStatus,
                              paste(cmd$command, paste0(cmd$args, collapse = " "))))
-                }, maxProcAmount = maxProcAmount)
-            ngrp <- length(formTable[[ana]])
+            }, maxProcAmount = maxProcAmount)
+
+            ngrp <- length(ret)
         }
         else
         {
-            formTable[[ana]] <- list()
+            ret <- list()
             ngrp <- 0
         }
 
         if (length(cachedResults) > 0)
         {
             ngrp <- ngrp + length(cachedResults)
-            formTable[[ana]] <- c(formTable[[ana]], cachedResults)
-            formTable[[ana]] <- formTable[[ana]][intersect(gNames, names(formTable[[ana]]))] # re-order
+            ret <- c(ret, cachedResults)
+            ret <- ret[intersect(gNames, names(ret))] # re-order
         }
 
-        printf("Loaded %d formulas from %d features (%.2f%%).\n", sum(unlist(lapply(formTable[[ana]], nrow))),
-               ngrp, if (gcount == 0) 0 else ngrp * 100 / gcount)
+        # prune after combining with cached results: these may also contain zero row results
+        ret <- pruneList(ret, checkZeroRows = TRUE)
+        
+        printf("Loaded %d formulas for %d %s (%.2f%%).\n", sum(unlist(lapply(ret, nrow))),
+               ngrp, if (calculateFeatures) "features" else "feature groups",
+               if (gCount == 0) 0 else ngrp * 100 / gCount)
+
+        return(ret)
     }
 
-    if (is.null(cachedSet))
-        saveCacheSet("formulasSirius", formHashes, setHash, cacheDB)
+    if (calculateFeatures)
+    {
+        pLists <- peakLists(MSPeakLists)
 
-    formTable <- pruneList(sapply(formTable, function(ft) ft[sapply(ft, nrow) > 0], simplify = FALSE), TRUE)
+        formTable <- sapply(seq_along(anaInfo$analysis), function(anai)
+        {
+            ana <- anaInfo$analysis[anai]
 
-    return(formulas(formulas = formTable, algorithm = "SIRIUS"))
+            if (is.null(pLists[[ana]]))
+                return(NULL)
+
+            ftinds <- sapply(gNames, function(grp) featIndex[[grp]][anai])
+            ftinds <- ftinds[ftinds != 0] # prune missing
+            featMZs <- sapply(ftinds, function(fti) fTable[[ana]][["mz"]][fti])
+
+            printf("Loading all formulas for analysis '%s'...\n", ana)
+            return(doSIRIUS(featMZs, pLists[[ana]]))
+        }, simplify = FALSE)
+
+        names(formTable) <- anaInfo$analysis
+        formTable <- pruneList(formTable, TRUE)
+
+        if (is.null(cachedSet))
+            saveCacheSet("formulasGenForm", formHashes, setHash, cacheDB)
+
+        if (length(formTable) > 0)
+            groupFormulas <- generateGroupFormulasByConsensus(formTable, featThreshold)
+        else
+            groupFormulas <- list()
+    }
+    else
+    {
+        featMZs <- setNames(gInfo[, "mzs"], gNames)
+        groupFormulas <- doSIRIUS(featMZs, averagedPeakLists(MSPeakLists))
+        formTable <- list()
+    }
+
+    return(formulas(formulas = groupFormulas, featureFormulas = formTable, algorithm = "SIRIUS"))
+
 }

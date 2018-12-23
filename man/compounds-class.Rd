@@ -49,7 +49,7 @@
   minScore = NULL, minFragScore = NULL, minFormulaScore = NULL,
   topMost = NULL)
 
-\S4method{addFormulaScoring}{compounds}(compounds, formConsensus,
+\S4method{addFormulaScoring}{compounds}(compounds, formulas,
   updateScore = FALSE, formulaScoreWeight = 1)
 
 \S4method{getMCS}{compounds}(obj, index, groupName)
@@ -62,7 +62,7 @@
   useGGPlot2 = FALSE)
 
 \S4method{plotSpec}{compounds}(obj, index, groupName, MSPeakLists,
-  formConsensus = NULL, plotStruct = TRUE, useGGPlot2 = FALSE)
+  formulas = NULL, plotStruct = TRUE, useGGPlot2 = FALSE)
 
 \S4method{consensus}{compounds}(obj, ..., compThreshold = 0,
   minMaxNormalization = TRUE, mergeScoresFunc = sum)
@@ -91,7 +91,7 @@ formula score, respectively. Set to \code{NULL} to ignore.}
 \item{topMost}{Only keep a maximum of \code{topMost} candidates with highest
 score. Set to \code{NULL} to ignore.}
 
-\item{formConsensus}{The \code{\link{formulaConsensus}} object that should be
+\item{formulas}{The \code{\link{formulas}} object that should be
 used for scoring/annotation. For \code{plotSpec}: set to \code{NULL} to
 ignore.}
 
@@ -206,7 +206,7 @@ Useful to eliminate unlikely candidates and speed up further processing.
 
 \item \code{addFormulaScoring}: Provides compound scoring data that is based on the
 presence of candidate formulae being present in a given
-\code{\link{formulaConsensus}} object. Matched precursor formulae yield one
+\code{\link{formulas}} object. Matched precursor formulae yield one
 point, whereas matched MS/MS fragments yield 0.5 point each.
 
 \item \code{getMCS}: Calculates the maximum common substructure (MCS)

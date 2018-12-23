@@ -26,13 +26,13 @@ NULL
 #' @param path The destination file path for files generated during reporting.
 #'   Will be generated if needed.
 #' @param reportFGroups If \code{TRUE} then feature group data will be reported.
-#' @param formConsensus,compounds,compsCluster,components Further objects
-#'   (\code{\link{formulaConsensus}}, \code{\link{compounds}},
+#' @param formulas,compounds,compsCluster,components Further objects
+#'   (\code{\link{formulas}}, \code{\link{compounds}},
 #'   \code{\link{compoundsCluster}}, \code{\link{components}}) that should be
 #'   reported. Specify \code{NULL} to skip reporting a particular object.
 #' @param reportFormulaSpectra If \code{TRUE} then explained MS/MS spectra (if
 #'   available) for candidate formulae will be reported. Specifying
-#'   \code{formConsensus} and setting this argument to \code{FALSE} still allows
+#'   \code{formulas} and setting this argument to \code{FALSE} still allows
 #'   further annotation of compound MS/MS spectra.
 #' @param MSPeakLists A \code{\link{MSPeakLists}} object that is
 #'   \emph{mandatory} when spectra for formulae and/or compounds will be
@@ -211,68 +211,70 @@ reportFeatureTable <- function(fGroups, path, retMin)
     close(prog)
 }
 
-reportFormulaTable <- function(fGroups, formConsensus, path, retMin)
+reportFormulaTable <- function(fGroups, formulas, path, retMin)
 {
     printf("Exporting formula table...")
+    
+    gNames <- names(fGroups)
 
-    forms <- copy(formulaTable(formConsensus))
-    if (retMin)
-        forms[, ret := ret / 60]
-
-    forms <- forms[group %in% names(fGroups)]
-
-    write.csv(forms, file.path(path, "formulas.csv"))
-
+    for (grp in groupNames(formulas))
+    {
+        if (grp %in% gNames && nrow(formulas[[grp]]) > 0)
+        {
+            out <- file.path(path, sprintf("%s-%s.csv", class(fGroups), grp))
+            write.csv(formulas[[grp]], out)
+        }
+    }
+    
     printf("Done!\n")
 }
 
-reportFormulaSpectra <- function(fGroups, path, formConsensus, MSPeakLists, EICRtWindow, EICMzWindow, retMin,
+reportFormulaSpectra <- function(fGroups, path, formulas, MSPeakLists, EICRtWindow, EICMzWindow, retMin,
                                  EICTopMost, EICs)
 {
     printf("Exporting formula MS/MS spectra...\n")
 
-    if (length(formConsensus) == 0)
+    if (length(formulas) == 0)
     {
         printf("No formulas!\n")
         invisible(return(NULL))
     }
     
-    gInfo <- groupInfo(fGroups)
-    anaInfo <- analysisInfo(fGroups)
-    # specs <- loadAllSpectra(anaInfo$analysis, anaInfo$path)
-    forms <- formulaTable(formConsensus)
-    pLists <- peakLists(MSPeakLists)
+    gNames <- names(fGroups)
 
-    forms <- forms[byMSMS == TRUE & group %in% rownames(gInfo)]
+    if (length(formulas) == 0)
+        invisible(return(NULL))
 
-    if (nrow(forms) == 0)
-        return()
-
-    formGroups <- unique(forms$group)
+    formGroups <- groupNames(formulas)
     fcount <- length(formGroups)
     prog <- txtProgressBar(0, fcount, style = 3)
 
     for (grp in formGroups)
     {
-        grpi <- match(grp, rownames(gInfo))
-
-        out <- file.path(path, sprintf("%s-%s.pdf", class(fGroups), grp))
-        pdf(out, paper = "a4", pointsize = 10, width = 8, height = 11)
-
-        plotEIC(fGroups[, grp], EICRtWindow, EICMzWindow, retMin, EICTopMost, EICs)
-
-        layout(matrix(1:16, 4, 4, byrow = TRUE), widths = c(2, 1, 2, 1))
-
-        for (precursor in unique(forms[group == grp, formula]))
+        ft <- formulas[[grp]][byMSMS == TRUE]
+        
+        if (nrow(ft) > 0)
         {
-            plotSpec(formConsensus, precursor, grp, MSPeakLists)
-
-            oldp <- par(mar = c(0, 2, 0, 0))
-            plot(1:10, 1:10, ann = FALSE, xaxt = "n", yaxt = "n", xlab = "", ylab = "", type = "n", adj = 1, bty = "n") # empty dummy plot
-            text(1, 5, paste0(getFormInfoList(formConsensus, precursor, grp), collapse = "\n"), adj = 0, cex = 0.8)
-            par(oldp)
+            grpi <- match(grp, gNames)
+            
+            out <- file.path(path, sprintf("%s-%s.pdf", class(fGroups), grp))
+            pdf(out, paper = "a4", pointsize = 10, width = 8, height = 11)
+            
+            plotEIC(fGroups[, grp], EICRtWindow, EICMzWindow, retMin, EICTopMost, EICs)
+            
+            layout(matrix(1:16, 4, 4, byrow = TRUE), widths = c(2, 1, 2, 1))
+            
+            for (precursor in unique(ft$formula))
+            {
+                plotSpec(formulas, precursor, grp, MSPeakLists = MSPeakLists)
+                
+                oldp <- par(mar = c(0, 2, 0, 0))
+                plot(1:10, 1:10, ann = FALSE, xaxt = "n", yaxt = "n", xlab = "", ylab = "", type = "n", adj = 1, bty = "n") # empty dummy plot
+                text(1, 5, paste0(getFormInfoList(formulas[[grp]], precursor), collapse = "\n"), adj = 0, cex = 0.8)
+                par(oldp)
+            }
+            dev.off()
         }
-        dev.off()
 
         setTxtProgressBar(prog, match(grp, formGroups))
     }
@@ -316,7 +318,7 @@ reportCompoundTable <- function(fGroups, path, compounds, normalizeScores, exclu
 }
 
 reportCompoundSpectra <- function(fGroups, path, MSPeakLists, compounds, compsCluster,
-                                  formConsensus, EICRtWindow, EICMzWindow, retMin,
+                                  formulas, EICRtWindow, EICMzWindow, retMin,
                                   EICTopMost, EICs, normalizeScores)
 {
     printf("Exporting compound identification MS/MS spectra...\n")
@@ -337,9 +339,6 @@ reportCompoundSpectra <- function(fGroups, path, MSPeakLists, compounds, compsCl
     if (!is.null(compsCluster))
         cutcl <- cutClusters(compsCluster)
     
-    if (!is.null(formConsensus))
-        fTable <- formulaTable(formConsensus)
-
     idcount <- length(compTable)
     prog <- txtProgressBar(0, idcount, style = 3)
 
@@ -367,7 +366,7 @@ reportCompoundSpectra <- function(fGroups, path, MSPeakLists, compounds, compsCl
                 scr <- c(scr, split.screen(c(1, 2), screen = scr[2]))
 
                 screen(scr[1])
-                plotSpec(compounds, idi, grp, MSPeakLists = MSPeakLists)
+                plotSpec(compounds, idi, grp, MSPeakLists = MSPeakLists, formulas = formulas)
 
                 screen(scr[3])
                 plotScores(compounds, idi, grp, normalizeScores)
@@ -538,7 +537,7 @@ reportComponentPlots <- function(fGroups, path, components, EICRtWindow, EICMzWi
 #' @export
 setMethod("reportCSV", "featureGroups", function(fGroups, path, reportFGroupsAsRows, reportFGroupsAnalysisInfo,
                                                  reportFGroupsRetMz, reportFeatures,
-                                                 formConsensus, compounds, compoundNormalizeScores, compoundExclNormScores,
+                                                 formulas, compounds, compoundNormalizeScores, compoundExclNormScores,
                                                  compsCluster, components, retMin, clearPath)
 {
     ac <- checkmate::makeAssertCollection()
@@ -546,8 +545,8 @@ setMethod("reportCSV", "featureGroups", function(fGroups, path, reportFGroupsAsR
     aapply(checkmate::assertFlag, . ~ reportFGroupsAsRows + reportFGroupsAnalysisInfo + reportFGroupsRetMz +
                reportFeatures + retMin + clearPath,
            fixed = list(add = ac))
-    aapply(checkmate::assertClass, . ~ formConsensus + compounds + compsCluster + components,
-           c("formulaConsensus", "compounds", "compoundsCluster", "components"),
+    aapply(checkmate::assertClass, . ~ formulas + compounds + compsCluster + components,
+           c("formulas", "compounds", "compoundsCluster", "components"),
            null.ok = TRUE, fixed = list(add = ac))
     assertNormalizationMethod(compoundNormalizeScores, add = ac)
     checkmate::assertCharacter(compoundExclNormScores, min.chars = 1, null.ok = TRUE, add = ac)
@@ -564,8 +563,12 @@ setMethod("reportCSV", "featureGroups", function(fGroups, path, reportFGroupsAsR
         reportFeatureTable(fGroups, p, retMin)
     }
 
-    if (!is.null(formConsensus) && length(formConsensus) > 0)
-        reportFormulaTable(fGroups, formConsensus, path, retMin)
+    if (!is.null(formulas) && length(formulas) > 0)
+    {
+        p <- file.path(path, "formulas")
+        mkdirp(p)
+        reportFormulaTable(fGroups, formulas, p, retMin)
+    }
 
     if (!is.null(compounds))
     {
@@ -591,7 +594,7 @@ setMethod("reportCSV", "featureGroups", function(fGroups, path, reportFGroupsAsR
 #' @aliases reportPDF
 #' @export
 setMethod("reportPDF", "featureGroups", function(fGroups, path, reportFGroups,
-                                                 formConsensus, reportFormulaSpectra,
+                                                 formulas, reportFormulaSpectra,
                                                  compounds, compoundNormalizeScores, compoundExclNormScores,
                                                  compsCluster, components, MSPeakLists, retMin, EICGrid,
                                                  EICRtWindow, EICMzWindow, EICTopMost, EICOnlyPresent, clearPath)
@@ -601,8 +604,8 @@ setMethod("reportPDF", "featureGroups", function(fGroups, path, reportFGroups,
     aapply(checkmate::assertFlag, . ~ reportFGroups + reportFormulaSpectra +
                retMin + EICOnlyPresent + clearPath,
            fixed = list(add = ac))
-    aapply(checkmate::assertClass, . ~ formConsensus + compounds + compsCluster + components + MSPeakLists,
-           c("formulaConsensus", "compounds", "compoundsCluster", "components", "MSPeakLists"),
+    aapply(checkmate::assertClass, . ~ formulas + compounds + compsCluster + components + MSPeakLists,
+           c("formulas", "compounds", "compoundsCluster", "components", "MSPeakLists"),
            null.ok = TRUE, fixed = list(add = ac))
     assertNormalizationMethod(compoundNormalizeScores, add = ac)
     checkmate::assertCharacter(compoundExclNormScores, min.chars = 1, null.ok = TRUE, add = ac)
@@ -611,19 +614,19 @@ setMethod("reportPDF", "featureGroups", function(fGroups, path, reportFGroups,
     checkmate::assertCount(EICTopMost, positive = TRUE, null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
-    if (!reportFGroups && is.null(formConsensus) && is.null(compounds) && is.null(components))
+    if (!reportFGroups && is.null(formulas) && is.null(compounds) && is.null(components))
     {
         cat("Nothing to report...\n")
         return(NULL)
     }
     
     if (is.null(MSPeakLists) &&
-        ((!is.null(formConsensus) && reportFormulaSpectra) || !is.null(compounds)))
+        ((!is.null(formulas) && reportFormulaSpectra) || !is.null(compounds)))
         stop("MSPeakLists is NULL, please specify when reporting formula and/or compounds")
 
     prepareReportPath(path, clearPath)
 
-    if (reportFGroups || !is.null(formConsensus) || !is.null(compounds) || !is.null(components))
+    if (reportFGroups || !is.null(formulas) || !is.null(compounds) || !is.null(components))
     {
         cat("Loading all EICs... ")
         EICs <- getEICsForFGroups(fGroups, EICRtWindow, EICMzWindow, EICTopMost, EICOnlyPresent)
@@ -633,18 +636,18 @@ setMethod("reportPDF", "featureGroups", function(fGroups, path, reportFGroups,
     if (reportFGroups)
         reportFGroupPlots(fGroups, path, EICGrid, EICRtWindow, EICMzWindow, retMin, EICTopMost, EICOnlyPresent, EICs)
 
-    if (reportFormulaSpectra && !is.null(formConsensus))
+    if (reportFormulaSpectra && !is.null(formulas))
     {
         p <- file.path(path, "formulas")
         mkdirp(p)
-        reportFormulaSpectra(fGroups, p, formConsensus, MSPeakLists, EICRtWindow, EICMzWindow, retMin, EICTopMost, EICs)
+        reportFormulaSpectra(fGroups, p, formulas, MSPeakLists, EICRtWindow, EICMzWindow, retMin, EICTopMost, EICs)
     }
 
     if (!is.null(compounds))
     {
         p <- file.path(path, "compounds")
         mkdirp(p)
-        reportCompoundSpectra(fGroups, p, MSPeakLists, compounds, compsCluster, formConsensus, EICRtWindow, EICMzWindow, retMin,
+        reportCompoundSpectra(fGroups, p, MSPeakLists, compounds, compsCluster, formulas, EICRtWindow, EICMzWindow, retMin,
                               EICTopMost, EICs, compoundNormalizeScores)
     }
 
@@ -702,7 +705,7 @@ setMethod("reportPDF", "featureGroups", function(fGroups, path, reportFGroups,
 #' @rdname reporting
 #' @aliases reportMD
 #' @export
-setMethod("reportMD", "featureGroups", function(fGroups, path, reportPlots, formConsensus,
+setMethod("reportMD", "featureGroups", function(fGroups, path, reportPlots, formulas,
                                                 compounds, compoundNormalizeScores, compoundExclNormScores,
                                                 compsCluster, includeMFWebLinks, components, interactiveHeat,
                                                 MSPeakLists, retMin, EICRtWindow, EICMzWindow,
@@ -718,8 +721,8 @@ setMethod("reportMD", "featureGroups", function(fGroups, path, reportPlots, form
     aapply(checkmate::assertFlag, . ~ interactiveHeat + retMin + EICOnlyPresent +
                selfContained + optimizePng + clearPath + openReport,
            fixed = list(add = ac))
-    aapply(checkmate::assertClass, . ~ formConsensus + compounds + components + MSPeakLists,
-           c("formulaConsensus", "compounds", "components", "MSPeakLists"),
+    aapply(checkmate::assertClass, . ~ formulas + compounds + components + MSPeakLists,
+           c("formulas", "compounds", "components", "MSPeakLists"),
            null.ok = TRUE, fixed = list(add = ac))
     assertNormalizationMethod(compoundNormalizeScores, add = ac)
     checkmate::assertCharacter(compoundExclNormScores, min.chars = 1, null.ok = TRUE, add = ac)
@@ -733,7 +736,7 @@ setMethod("reportMD", "featureGroups", function(fGroups, path, reportPlots, form
         reportPlots <- ""
            
     if (is.null(MSPeakLists) &&
-        ((!is.null(formConsensus) && reportFormulaSpectra) || !is.null(compounds)))
+        ((!is.null(formulas) && reportFormulaSpectra) || !is.null(compounds)))
         stop("MSPeakLists is NULL, please specify when reporting formula and/or compounds")
 
     prepareReportPath(path, clearPath)
@@ -756,7 +759,7 @@ setMethod("reportMD", "featureGroups", function(fGroups, path, reportPlots, form
     # directory is changed so we loose access to the cache.
 
     # UNDONE: always load EICs? Need them for summary EIC plot
-    # if (reportFGroups || (!is.null(formConsensus) && reportFormulaSpectra) ||
+    # if (reportFGroups || (!is.null(formulas) && reportFormulaSpectra) ||
     #     !is.null(compounds) || !is.null(components))
     {
         cat("Loading all EICs... ")
@@ -768,7 +771,7 @@ setMethod("reportMD", "featureGroups", function(fGroups, path, reportPlots, form
                     reportPlots = reportPlots, EICRtWindow = EICRtWindow, EICMzWindow = EICMzWindow,
                     retMin = retMin, EICTopMost = EICTopMost, EICOnlyPresent = EICOnlyPresent, EICs = EICs,
                     compounds = compounds, compsCluster = compsCluster, includeMFWebLinks = includeMFWebLinks,
-                    MSPeakLists = MSPeakLists, formConsensus = formConsensus,
+                    MSPeakLists = MSPeakLists, formulas = formulas,
                     compoundNormalizeScores = compoundNormalizeScores, compoundExclNormScores = compoundExclNormScores,
                     components = components, interactiveHeat = interactiveHeat, selfContained = selfContained,
                     optimizePng = optimizePng, maxProcAmount = maxProcAmount)

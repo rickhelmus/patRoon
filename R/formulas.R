@@ -8,33 +8,55 @@ NULL
 #' \code{formulas} objects are obtained from \link[=formula-generation]{formula
 #' generators}.
 #'
-#' @slot formulas Lists of all generated formulae. Use the \code{formulaTable}
-#'   method for access.
+#' @slot formulas,featureFormulas Lists of all generated formulae. Use the
+#'   \code{formulaTable} method for access.
 #' @slot algorithm The algorithm that was used for generation of formulae. Use
 #'   the \code{algorithm} method for access.
 #'
 #' @param obj,x,object,formulas The \code{formulas} object.
-#' 
+#' @param OM For \code{makeTable}: if set to \code{TRUE} several columns
+#'   with information relevant for organic matter (OM) characterization will be
+#'   added (e.g. elemental ratios, classification). This will also make sure
+#'   that \code{countElements} contains at least C, H, N, O, P and S.
+#'
+#'   For \code{filter}: If \code{TRUE} then several filters are applied to
+#'   exclude unlikely formula candidates present in organic matter (OM). See
+#'   Source section for details.
+#'
 #' @templateVar seli analyses
 #' @templateVar selOrderi analyses()
 #' @templateVar selj feature groups
 #' @templateVar selOrderj groupNames()
+#' @templateVar optionalji TRUE
 #' @template sub_op-args
 #'
-#' @seealso \code{\link{formulaConsensus}}
-#' 
+#' @section Source: Calculation of the aromaticity index (AI) and related double
+#'   bond equivalents (DBE_AI) is performed as described in Koch 2015. Formula
+#'   classification is performed by the rules described in Abdulla 2013.
+#'   Filtering of OM related molecules is performed as described in Koch 2006
+#'   and Kujawinski 2006. (see references).
+#'
+#' @references \insertRef{Koch2015}{patRoon} \cr\cr
+#'   \insertRef{Abdulla2013}{patRoon} \cr\cr \insertRef{Koch2006}{patRoon}
+#'   \cr\cr \insertRef{Kujawinski2006}{patRoon}
+#'
 #' @export
 formulas <- setClass("formulas",
-                     slots = c(formulas = "list", algorithm = "character"),
-                     prototype = list(formulas = list(), algorithm = "none"))
+                     slots = c(formulas = "list", featureFormulas = "list", algorithm = "character"))
 
 #' @describeIn formulas Accessor method to obtain generated formulae.
-#' @return \code{formulas} returns a \code{list} containing for each analysis
-#'   and each feature group a \code{\link{data.table}} with an overview of all
-#'   generated formulae and other data such as candidate scoring and MS/MS
-#'   fragments.
+#'
+#' @param features If \code{TRUE} returns formula data for features, otherwise
+#'   for feature groups.
+#'
+#' @return \code{formulaTable} returns a \code{list} containing for each feature
+#'   group (or feature if \code{features=TRUE}) a \code{\link{data.table}}
+#'   with an overview of all generated formulae and other data such as candidate
+#'   scoring and MS/MS fragments.
+#'
+#' @aliases formulaTable
 #' @export
-setMethod("formulaTable", "formulas", function(obj) obj@formulas)
+setMethod("formulaTable", "formulas", function(obj, features) if (features) obj@featureFormulas else obj@formulas)
 
 #' @describeIn formulas Accessor method for the algorithm (a character
 #'   string) used to generate formulae.
@@ -45,18 +67,17 @@ setMethod("algorithm", "formulas", function(obj) obj@algorithm)
 #' @templateVar what analyses
 #' @template strmethod
 #' @export
-setMethod("analyses", "formulas", function(obj) names(obj@formulas))
+setMethod("analyses", "formulas", function(obj) names(obj@featureFormulas))
 
 #' @templateVar class formulas
 #' @templateVar what feature groups
 #' @template strmethod
 #' @export
-setMethod("groupNames", "formulas", function(obj) unique(unlist(sapply(obj@formulas, names, simplify = FALSE), use.names = FALSE)))
+setMethod("groupNames", "formulas", function(obj) names(obj@formulas))
 
-# UNDONE: this seems not so useful now, change to unique formulae?
 #' @describeIn formulas Obtain total number of formulae entries.
 #' @export
-setMethod("length", "formulas", function(x) sum(unlist(recursiveApplyDT(x@formulas, nrow))))
+setMethod("length", "formulas", function(x) sum(unlist(sapply(x@formulas, function(ft) length(unique(ft$formula))))))
 
 #' @describeIn formulas Show summary information for this object.
 #' @export
@@ -65,360 +86,357 @@ setMethod("show", "formulas", function(object)
     printf("A formulas object (%s)\n", class(object))
     printf("Algorithm: %s\n", algorithm(object))
 
-    printf("Total formula count: %d\n", length(object))
+    ft <- formulaTable(object, TRUE)
+    hasFeatForms <- length(ft) > 0
+    ftcounts <- if (hasFeatForms) recursiveApplyDT(ft, function(x) length(unique(x$formula)), sapply) else 0
+    ma <- mean(sapply(ftcounts, sum))
+    mft <- mean(sapply(ftcounts, mean))
+    printf("Formulas assigned to features:\n")
+    printf("  - Total formula count: %d\n", sum(unlist(ftcounts)))
+    printf("  - Average formulas per analysis: %.1f\n", ma)
+    printf("  - Average formulas per feature: %.1f\n", mft)
 
-    if (length(object) == 0)
-    {
-        ma <- mfg <- 0
-    }
-    else
-    {
-        ft <- formulaTable(object)
-        ft <- ft[lengths(ft) > 0]
-        formCounts <- lapply(ft, function(fa) sapply(fa, nrow))
-        ma <- mean(sapply(formCounts, function(fc) sum(fc)))
-        mfg <- mean(sapply(formCounts, function(fc) mean(fc)))
-    }
-    
-    printf("Average formulas per analysis: %.1f\n", ma)
-    printf("Average formulas per feature group: %.1f\n", mfg)
+    gft <- formulaTable(object)
+    mfg <- if (length(gft) > 0) sapply(gft, nrow) else 0
+    printf("Formulas assigned to feature groups:\n")
+    printf("  - Total formula count: %d\n", length(object))
+    printf("  - Average formulas per feature group: %.1f\n", mean(mfg))
 
     showObjectSize(object)
 })
 
-#' @describeIn formulas Subset on analyses/feature groups.
+#' @describeIn formulas Subset on feature groups.
 #' @export
-setMethod("[", c("formulas", "ANY", "ANY", "missing"), function(x, i, j, ...)
+setMethod("[", c("formulas", "ANY", "missing", "missing"), function(x, i, j, ...)
 {
     if (!missing(i))
         assertSubsetArg(i)
-    if (!missing(j))
-        assertSubsetArg(j)
-    
-    # non-existing indices result in NULL values --> prune
-    
-    if (!missing(i))
-    {
-        if (!is.character(i))
-            i <- analyses(x)[i]
-        x@formulas <- pruneList(x@formulas[i])
-    }
-    
-    if (!missing(j))
-    {
-        if (!is.character(j))
-            j <- groupNames(x)[j]
-        x@formulas <- sapply(x@formulas, function(a)
-        {
-            ret <- a[j]
-            return(pruneList(ret))
-        }, simplify = FALSE)
-        x@formulas <- pruneList(x@formulas, TRUE)
-    }
-    
-    return(x)
-})
 
-#' @describeIn formulas Extract a formula table from a specified analysis/feature group.
-#' @export
-setMethod("[[", c("formulas", "ANY", "ANY"), function(x, i, j)
-{
-    assertExtractArg(i)
-    assertExtractArg(j)
-    
-    if (!is.character(i))
-        i <- analyses(x)[i]
-    if (!is.character(j))
-        j <- groupNames(x)[j]
-    
-    return(x@formulas[[c(i, j)]])
-})
-
-#' @describeIn formulas Generates a consensus and other summarizing data for
-#'   formulae of feature groups that are present in multiple analyses.
-#'
-#' @param \dots Any further \code{formulas} objects on top of the object given
-#'   for the \code{obj} parameter to which a consensus should be generated.
-#'   Using the \dots parameter formulae from various
-#'   \link[=formula-generation]{formula generators} can be merged.
-#' @param fGroups The \code{\link{featureGroups}} object that was used when
-#'   formulae were generated.
-#' @param formAnaThreshold,formListThreshold Fractional minimum amount (0-1) to
-#'   which a generated formula should be present in all the analyses
-#'   (\code{formAnaThreshold}) or in all given formula lists
-#'   (\code{formListThreshold}) containing the related feature group. For
-#'   instance, a value of \samp{0.5} for \code{formAnaThreshold} means that a
-#'   particular formula should be present in at least \samp{50\%} of all
-#'   analyses containing the feature group that was used to generate the
-#'   formula.
-#' @param maxFormulas,maxFragFormulas Maximum amount of candidate formulae (or
-#'   fragment formulae) per feature group.
-#' @param minIntensity Results from features below this intensity will be
-#'   excluded.
-#' @param maxIntensity Results from features above this intensity will be
-#'   excluded.
-#' @param minPreferredFormulas Preferred minimum amount of candidate formulae
-#'   per feature group. See \code{minPreferredIntensity}.
-#' @param minPreferredIntensity Minimum preferred intensity of formulae
-#'   candidates per feature group. Results from features below this intensity
-#'   will be removed unless the total count of formulae of the related feature
-#'   group is below \code{minPreferredFormulas}. When a higher
-#'   \code{minIntensity} is given this parameter has no effect.
-#' @param elements An optional character vector containing elements for which
-#'   the total count present in each formula should be calculated. For instance,
-#'   \code{c("C", "H")} will count all carbon and hydrogen atoms present in each
-#'   formula.
-#' @param fragElements Same as \code{elements} parameter, but for MS/MS
-#'   formulae.
-#'
-#' @return \code{consensus} returns a \code{\link{formulaConsensus}} object.
-#'
-#' @export
-setMethod("consensus", "formulas", function(obj, ..., fGroups, formAnaThreshold = 0.75, formListThreshold = 0,
-                                            maxFormulas = 10, maxFragFormulas = 10, minIntensity = NULL,
-                                            maxIntensity = NULL, minPreferredFormulas = 1,
-                                            minPreferredIntensity = NULL, elements = c(), fragElements = c())
-{
-    allFLists <- c(list(obj), list(...))
-    
-    ac <- checkmate::makeAssertCollection()
-    checkmate::assertList(allFLists, types = "formulas", min.len = 1, any.missing = FALSE,
-                          unique = TRUE, .var.name = "...", add = ac)
-    checkmate::assertClass(fGroups, "featureGroups", add = ac)
-    aapply(checkmate::assertNumber, . ~ formAnaThreshold + formListThreshold, lower = 0, finite = TRUE,
-           fixed = list(add = ac))
-    aapply(checkmate::assertCount, . ~ maxFormulas + maxFragFormulas + minPreferredFormulas, positive = TRUE,
-           null.ok = TRUE, fixed = list(add = ac))
-    aapply(checkmate::assertNumber, . ~ minIntensity + maxIntensity + minPreferredIntensity,
-           lower = 0, finite = TRUE, null.ok = TRUE, fixed = list(add = ac))
-    aapply(checkmate::assertCharacter, . ~ elements + fragElements, min.chars = 1,
-           any.missing = FALSE, null.ok = TRUE, fixed = list(add = ac))
-    checkmate::reportAssertions(ac)
-    
-    ftind <- groupFeatIndex(fGroups)
-    gInfo <- groupInfo(fGroups)
-    anaInfo <- analysisInfo(fGroups)
-    gTable <- groups(fGroups)
-
-
-    if (length(allFLists) > length(unique(sapply(allFLists, algorithm))))
-        stop("Consensus can only be generated from different algorithms at this moment.")
-
-    allFLists <- allFLists[lengths(allFLists) > 0]
-    if (length(allFLists) < 1)
-        stop("Need at least one non-empty formulas objects")
-    
-    formConsList <- lapply(allFLists,
-                           function (fl) consensusForFormulaList(fl, fGroups, formAnaThreshold, maxFormulas, maxFragFormulas,
-                                                                 minIntensity, maxIntensity, minPreferredFormulas,
-                                                                 minPreferredIntensity))
-
-    if (length(formConsList) == 1)
-        retConsTable <- formConsList[[1]]@formulas
-    else
-    {
-        retConsTable <- Reduce(function(fCons1, fCons2)
-        {
-            printf("Merging %s and %s... ", algorithm(fCons1), algorithm(fCons2))
-
-            forms1 <- formulaTable(fCons1)
-            forms2 <- formulaTable(fCons2)
-            
-            haveMSMS <- "frag_formula" %in% colnames(forms1) && "frag_formula" %in% colnames(forms2)
-
-            mergeCols <- c("group", "formula")
-            if (haveMSMS)
-                mergeCols <- c(mergeCols, "byMSMS", "frag_formula")
-
-            mTable <- merge(forms1, forms2, all = TRUE, by = mergeCols)
-
-            # score and anaCoverage columns may now be double and should be renamed
-            # note that double columns get .x/.y suffix on merge
-            for (col in c("score", "anaCoverage"))
-            {
-                cols <- paste0(col, c(".x", ".y"))
-                if (!any(sapply(cols, function(cl) is.null(mTable[[cl]]))))
-                    setnames(mTable, cols, paste0(col, "-", c(algorithm(fCons1), algorithm(fCons2))))
-            }
-
-            # Other (potentially) double columns which should be (more or less) the same, so only keep one of these
-            takeOneCols <- c("ret", "mz", "neutral_formula", "formula_mz", "error", "dbe", "frag_formula", "frag_mz",
-                             "frag_formula_mz", "frag_error", "neutral_loss", "frag_dbe", "min_intensity", "max_intensity",
-                             "ana_min_intensity", "ana_max_intensity")
-            for (col in takeOneCols)
-            {
-                colLeft <- paste0(col, ".x")
-                colRight <- paste0(col, ".y")
-                if (colLeft %in% colnames(mTable))
-                {
-                    mTable[, (col) := ifelse(!is.na(get(colLeft)), get(colLeft), get(colRight))]
-                    mTable[, c(colLeft, colRight) := NULL]
-                }
-            }
-
-            cat("Done!\n")
-
-            return(mTable)
-        }, formConsList)
-
-        # Calculate coverage of formulae across formula lists. anaCoverage is a
-        # column that is present with all algorithms, so we can use presence of
-        # its value as counter
-        anaCovCols <- grep("anaCoverage-", colnames(retConsTable), value = TRUE)
-        for (r in seq_len(nrow(retConsTable)))
-            set(retConsTable, r, "listCoverage", sum(sapply(anaCovCols, function(c) !is.na(retConsTable[[c]][r]))) / length(formConsList))
-
-        if (formListThreshold > 0)
-            retConsTable <- retConsTable[listCoverage >= formListThreshold]
-    }
-
-    setcolorder(retConsTable, formConsensusColOrder(retConsTable))
-
-    if (length(elements) > 0)
-    {
-        # Retrieve element lists from formulas
-        el <- getElements(retConsTable$formula, elements)
-        retConsTable <- cbind(retConsTable, el)
-    }
-    if (!is.null(retConsTable[["frag_formula"]]) && length(fragElements) > 0)
-    {
-        el <- getElements(retConsTable$frag_formula, fragElements)
-        colnames(el) <- sapply(colnames(el), function(e) paste0("frag_", e), USE.NAMES = F)
-        retConsTable <- cbind(retConsTable, el)
-    }
-
-    return(formulaConsensus(formulas = retConsTable,
-                            algorithm = paste0(unique(sapply(formConsList, algorithm)), collapse = ",")))
-})
-
-#' Formula consensus class
-#'
-#' Contains all formulae for given feature groups after a consensus was made.
-#'
-#' Objects of \code{formulaConsensus} are generated by the
-#' \code{\link{consensus}} method.
-#'
-#' @slot formulas A \code{\link{data.table}} containing an overview of all
-#'   consensus formulae. Use the \code{formulaTable} method for access.
-#' @slot algorithm The algorithm that was used for generation of formulae. Use
-#'   the \code{algorithm} method for access.
-#'
-#' @param obj,x,object The \code{formulaConsensus} object.
-#' 
-#' @templateVar seli feature groups
-#' @templateVar selOrderi groupNames()
-#' @templateVar dollarOpName feature group
-#' @template sub_op-args
-#' 
-#' @seealso \code{\link{formulas}}
-#' 
-#' @export
-formulaConsensus <- setClass("formulaConsensus",
-                             slots = c(formulas = "data.table", algorithm = "character"),
-                             prototype = list(formulas = data.table(), algorithm = "none"))
-
-#' @describeIn formulaConsensus Accessor method to obtain generated formulae.
-#' @return \code{formulaTable} returns a \code{\link{data.table}} containing all
-#'   generated formulae, scoring information, MS/MS fragments, etc.
-#' @export
-setMethod("formulaTable", "formulaConsensus", function(obj) obj@formulas)
-
-#' @describeIn formulaConsensus Accessor method for the algorithm (a character
-#'   string) used to generate formulae.
-#' @export
-setMethod("algorithm", "formulaConsensus", function(obj) obj@algorithm)
-
-#' @templateVar class formulaConsensus
-#' @templateVar what feature groups
-#' @template strmethod
-#' @export
-setMethod("groupNames", "formulaConsensus", function(obj) unique(obj@formulas$group))
-
-#' @describeIn formulaConsensus Obtain total number of formulae entries.
-#' @export
-setMethod("length", "formulaConsensus", function(x) nrow(x@formulas))
-
-#' @describeIn formulaConsensus Show summary information for this object.
-#' @export
-setMethod("show", "formulaConsensus", function(object)
-{
-    printf("A formulaConsensus object (%s)\n", class(object))
-    printf("Algorithm: %s\n", paste0(algorithm(object), collapse = "/"))
-
-    printf("Total formula count: %d (all), %d (MS) and %d (MS/MS)\n", length(object),
-           nrow(object@formulas[byMSMS == FALSE]), nrow(object@formulas[byMSMS == TRUE]))
-
-    fCounts <- object@formulas[, .(byMSMS, .N), by = group]
-    printf("Average formulas per feature group: %.1f (all), %.1f (MS), %.1f (MS/MS)\n", mean(fCounts$N),
-           mean(fCounts[byMSMS == FALSE, N]), mean(fCounts[byMSMS == TRUE, N]))
-
-    showObjectSize(object)
-})
-
-#' @describeIn formulaConsensus Subset on feature groups.
-#' @export
-setMethod("[", c("formulaConsensus", "ANY", "missing", "missing"), function(x, i, ...)
-{
-    if (!missing(i))
-        assertSubsetArg(i)
-    
     if (!missing(i))
     {
         if (!is.character(i))
             i <- groupNames(x)[i]
-        x@formulas <- x@formulas[group %in% i]
+        x@featureFormulas <- sapply(x@featureFormulas, function(a) pruneList(a[i]),
+                                    simplify = FALSE)
+        x@featureFormulas <- pruneList(x@featureFormulas, TRUE)
+
+        x@formulas <- pruneList(x@formulas[i], TRUE)
     }
-    
+
     return(x)
 })
 
-#' @describeIn formulaConsensus Extract formula information a feature group.
+#' @describeIn formulas Extract a formula table. If both arguments (\code{i} and
+#'   \code{j}) are specified, the feature specific formula table belonging to
+#'   the analysis (\code{i})/feature group (\code{j}) is returned. Otherwise the
+#'   formula table for the feature group specified by \code{j} is returned.
 #' @export
-setMethod("[[", c("formulaConsensus", "ANY", "missing"), function(x, i, j)
+setMethod("[[", c("formulas", "ANY", "ANY"), function(x, i, j)
 {
     assertExtractArg(i)
+    if (!missing(j))
+        assertExtractArg(j)
+
+    if (!missing(j))
+    {
+        # both arguments specified, return feature formula table
+
+        if (length(x@featureFormulas) == 0)
+            stop("This object does not contain formulas for features.")
+
+        if (!is.character(i))
+            i <- analyses(x)[i]
+
+        if (!is.character(j))
+            j <- groupNames(x)[j]
+
+        return(x@featureFormulas[[c(i, j)]])
+    }
+
+    # else return regular feature group formulas
+
     if (!is.character(i))
         i <- groupNames(x)[i]
-    return(x@formulas[group == i])
+    return(x@formulas[[i]])
 })
 
-#' @describeIn formulaConsensus Extract formula information a feature group.
+#' @describeIn formulas Extract a formula table for a feature group.
 #' @export
-setMethod("$", "formulaConsensus", function(x, name)
+setMethod("$", "formulas", function(x, name)
 {
-    eval(substitute(x@formulas[group == NAME_ARG], list(NAME_ARG = name)))
+    eval(substitute(x@formulas[[NAME_ARG]], list(NAME_ARG = name)))
 })
 
-#' @describeIn formulaConsensus Plots an annotated spectrum for a given
-#'   candidate formula of a feature group.
+#' @describeIn formulas Generates a table with all candidate formulae for each
+#'   feature group and other information such as element counts.
+#'
+#' @param fGroups The \code{\link{featureGroups}} object that was used to
+#'   generate this \code{formulas} object. If not \code{NULL} it is used to add
+#'   feature group information (retention and \emph{m/z} values).
+#' @param average If set to \code{TRUE} an 'average formula' is generated for
+#'   each feature group by combining all elements from all candidates and
+#'   averaging their amounts. This obviously leads to non-existing formulae,
+#'   however, this data may be useful to deal with multiple candidate formulae
+#'   per feature group when performing elemental characterization.
+#' @param countElements,countFragElements A \code{character} vector with
+#'   elements that should be counted for each MS(/MS) formula candidate. For
+#'   instance, \code{c("C", "H")} adds columns for both carbon and hydrogen
+#'   amounts of each formula. Note that the neutral formula
+#'   (\code{neutral_formula} column) is used to count elements of non-fragmented
+#'   formulae, whereas the charged formula of fragments (\code{frag_formula}
+#'   column) is used for fragments. Set to \code{NULL} to not count any
+#'   elements.
+#' @param maxFormulas,maxFragFormulas Maximum amount of unique candidate
+#'   formulae (or fragment formulae) per feature group. Set to \code{NULL} to
+#'   ignore.
+#'
+#' @return \code{makeTable} returns a \code{\link{data.table}}.
+#'
+#' @export
+setMethod("makeTable", "formulas", function(obj, fGroups = NULL, average = FALSE, countElements = NULL,
+                                            countFragElements = NULL, OM = FALSE,
+                                            maxFormulas = NULL, maxFragFormulas = NULL)
+{
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertClass(fGroups, "featureGroups", null.ok = TRUE, add = ac)
+    checkmate::assertFlag(average, add = ac)
+    checkmate::assertCharacter(countElements, min.chars = 1, any.missing = FALSE, null.ok = TRUE, add = ac)
+    checkmate::assertCharacter(countFragElements, min.chars = 1, any.missing = FALSE, null.ok = TRUE, add = ac)
+    checkmate::assertFlag(OM, add = ac)
+    checkmate::reportAssertions(ac)
+
+    ret <- rbindlist(formulaTable(obj), fill = TRUE, idcol = "group")
+    if (length(ret) == 0)
+        return(ret)
+
+    if (!is.null(fGroups))
+    {
+        ret[, c("ret", "mz") := groupInfo(fGroups)[group, ]]
+        setcolorder(ret, c("group", "ret", "mz"))
+    }
+
+    if (average)
+    {
+        # collapse byMSMS: will be TRUE if at least an MS/MS formula candidate was there
+        ret[, byMSMS := any(byMSMS), by = "group"]
+
+        ret[, formula_avg_count := length(unique(formula)), by = "group"]
+
+        avgCols <- c("formula", "neutral_formula")
+        ret[, (avgCols) := lapply(.SD, function(f) averageFormulas(unique(f))), .SDcols = avgCols, by = "group"]
+
+        # remove columns which don't really make sense anymore
+        rmCols <- c("neutral_loss", "error", "formula_mz", "dbe", "anaCoverage",
+                    "adduct", "rank", "explainedPeaks", "explainedIntensity",
+                    # add any fragment columns
+                    grep("^frag_", names(ret), value = TRUE),
+                    formulaScorings()$name)
+
+        rmCols <- getAllFormulasCols(rmCols, names(ret))
+        if (length(rmCols) > 0)
+            ret[, (rmCols) := NULL]
+
+        ret <- unique(ret, by = c("group", "formula"))
+    }
+    else
+    {
+        if (!is.null(maxFormulas))
+        {
+            ret[, unFormNr := match(formula, unique(.SD$formula)), by = "group"]
+            ret <- ret[unFormNr <= maxFormulas][, unFormNr := NULL]
+        }
+
+        if (!is.null(maxFragFormulas) && any(ret$byMSMS))
+        {
+            ret[, unFormNr := match(frag_formula, unique(.SD$frag_formula)),
+                by = c("group", "byMSMS", "formula")]
+            ret <- ret[unFormNr <= maxFragFormulas][, unFormNr := NULL]
+        }
+    }
+
+    ret <- addElementInfoToFormTable(ret, countElements, countFragElements, OM)
+
+    return(ret)
+})
+
+#' @describeIn formulas Performs rule based filtering on formula results.
+#'
+#' @param minExplainedFragPeaks Minimum number of fragment peaks that are
+#'   explained. Setting this to \samp{1} will remove any MS only formula
+#'   results. Set to \code{NULL} to ignore.
+#' @param elements Only retain candidate formulae that match a given elemental
+#'   restriction. The format of \code{elements} is a \code{character} string
+#'   with elements that should be present where each element is followed by a
+#'   valid amount or a range thereof. If no number is specified then \samp{1} is
+#'   assumed. For instance, \code{elements="C1-10H2-20O0-2P"}, specifies that
+#'   \samp{1-10}, \samp{2-20}, \samp{0-2} and \samp{1} carbon, hydrogen, oxygen
+#'   and phosphorus atoms should be present, respectively. When
+#'   \code{length(elements)>1} formulas are tested to follow at least one of the
+#'   given elemental restrictions. For instance, \code{elements=c("P", "S")}
+#'   specifies that either one phosphorus or sulphur atom should be present. Set
+#'   to \code{NULL} to ignore this filter.
+#' @param fragElements,lossElements Specifies elemental restrictions for
+#'   fragment or neutral loss formulas. Candidates are retained if at least one
+#'   of the fragment/neutral loss formulae follow the given restrictions. See
+#'   \code{elements} for the used format.
+#' @param topMost Only retain no more than this amount of best ranked candidates
+#'   for each feature group.
+#' @param scoreLimits Filter results by their scores. Should be a named
+#'   \code{list} that contains two-sized numeric vectors with the
+#'   minimum/maximum value of a score (use \code{-Inf}/\code{Inf} for no
+#'   limits). The names of each element should follow the values returned by
+#'   \code{\link{formulaScorings}()$name}. For instance,
+#'   \code{scoreLimits=list(isoScore=c(0.5, Inf))} specifies that the isotopic
+#'   match score should be at least \samp{0.5}. More details of scorings can be
+#'   obtained with \code{\link{formulaScorings}}. Set to \code{NULL} to skip
+#'   this filter.
+#'
+#' @note \code{filter} does not modify any formula results for features (if
+#'   present).
+#'
+#' @return \code{filter} returns a filtered \code{\link{formulas}} object.
+#'
+#' @export
+setMethod("filter", "formulas", function(obj, minExplainedFragPeaks = NULL, elements = NULL,
+                                         fragElements = NULL, lossElements = NULL,
+                                         topMost = NULL, scoreLimits = NULL,
+                                         OM = NULL)
+{
+    scCols <- formulaScorings()$name
+
+    ac <- checkmate::makeAssertCollection()
+    aapply(checkmate::assertCount, . ~ topMost + minExplainedFragPeaks,
+           positive = c(TRUE, FALSE), null.ok = TRUE, fixed = list(add = ac))
+    aapply(checkmate::assertCharacter, . ~ elements + fragElements + lossElements,
+           min.chars = 1, min.len = 1, null.ok = TRUE, fixed = list(add = ac))
+    checkmate::assertList(scoreLimits, null.ok = TRUE, types = "numeric", add = ac)
+    if (!is.null(scoreLimits))
+    {
+        checkmate::assertNames(names(scoreLimits), type = "unique", subset.of = scCols, add = ac)
+        checkmate::qassertr(scoreLimits, "N2")
+    }
+    checkmate::assertLogical(OM, null.ok = TRUE)
+    checkmate::reportAssertions(ac)
+
+    cat("Filtering formulas... ")
+
+    oldn <- length(obj)
+    obj@formulas <- pruneList(sapply(groupNames(obj), function(grp)
+    {
+        formTable <- obj[[grp]]
+        if (!is.null(minExplainedFragPeaks) && minExplainedFragPeaks > 0)
+        {
+            formTable <- formTable[byMSMS == TRUE]
+            if (nrow(formTable) == 0)
+                return(formTable)
+            fragCounts <- formTable[, ifelse(byMSMS, length(frag_formula), 0L), by = "formula"][[2]]
+            formTable <- formTable[fragCounts >= minExplainedFragPeaks]
+        }
+
+        if (!is.null(elements))
+            formTable <- formTable[sapply(formula, checkFormula, elements)]
+        if ((!is.null(fragElements) || !is.null(lossElements)))
+        {
+            formTable <- formTable[byMSMS == TRUE]
+            if (nrow(formTable) == 0)
+                return(formTable)
+            if (!is.null(fragElements))
+                formTable <- formTable[formTable[, rep(any(sapply(frag_formula, checkFormula, fragElements)), .N),
+                                                 by = "formula"][[2]]]
+            if (!is.null(lossElements))
+                formTable <- formTable[formTable[, rep(any(sapply(neutral_loss, checkFormula, lossElements)), .N),
+                                                 by = "formula"][[2]]]
+        }
+
+        if (!is.null(topMost))
+        {
+            unFormNrs <- formTable[, match(formula, unique(.SD$formula))]
+            formTable <- formTable[unFormNrs <= topMost]
+        }
+
+        if (!is.null(scoreLimits))
+        {
+            for (sc in names(scoreLimits))
+            {
+                cols <- getAllFormulasCols(sc, names(formTable))
+                if (length(cols) == 0)
+                    next
+                formTable <- formTable[formTable[, do.call(pmin, c(.SD, list(na.rm = TRUE))) >= scoreLimits[[sc]][1] &
+                                                   do.call(pmax, c(.SD, list(na.rm = TRUE))) <= scoreLimits[[sc]][2],
+                                                 .SDcols = cols]]
+            }
+        }
+
+        if (!is.null(OM) && OM)
+        {
+            fElTable <- addElementInfoToFormTable(copy(formTable), NULL, NULL, OM = TRUE)
+            keep <- fElTable[,
+                         # rules from Kujawinski & Behn, 2006 (10.1021/ac0600306)
+                         H >= 1/3 * C &
+                         H <= ((2 * C) + N + 2) &
+                         (H + N) %% 2 == 0 &
+                         N <= C &
+                         O <= C &
+                         P <= 2 &
+                         S <= 2 &
+
+                         # rules from Koch & dittmar 2006 (10.1002/rcm.2386)
+                         sapply(DBE_AI, checkmate::checkInt) &
+                         HC <= 2.2 &
+                         OC <= 1.2 &
+                         NC <= 0.5]
+            formTable <- formTable[keep]
+        }
+
+        return(formTable)
+    }, simplify = FALSE), checkZeroRows = TRUE)
+
+    newn <- length(obj)
+    printf("Done! Filtered %d (%.2f%%) formulas. Remaining: %d\n", oldn - newn, if (oldn == 0) 0 else (1-(newn/oldn))*100, newn)
+    return(obj)
+})
+
+#' @describeIn formulas Plots an annotated spectrum for a given candidate
+#'   formula of a feature or feature group.
 #'
 #' @param precursor The formula of the precursor (in ionic form, \emph{i.e.} as
 #'   detected by the MS).
+#' @param analysis A \code{character} specifying the analysis for which the
+#'   annotated spectrum should be plotted. If \code{NULL} then annotation
+#'   results for the complete feature group will be plotted.
 #'
 #' @template plotSpec-args
-#' 
+#'
 #' @template useGGplot2
 #'
 #' @return \code{plotSpec} will return a \code{\link[=ggplot2]{ggplot object}}
 #'   if \code{useGGPlot2} is \code{TRUE}.
 #'
 #' @export
-setMethod("plotSpec", "formulaConsensus", function(obj, precursor, groupName, MSPeakLists, useGGPlot2 = FALSE)
+setMethod("plotSpec", "formulas", function(obj, precursor, groupName, analysis = NULL, MSPeakLists, useGGPlot2 = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertString(precursor, min.chars = 1, add = ac)
     checkmate::assertString(groupName, min.chars = 1, add = ac)
+    checkmate::assertString(analysis, min.chars = 1, null.ok = TRUE, add = ac)
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
     checkmate::assertFlag(useGGPlot2, add = ac)
     checkmate::reportAssertions(ac)
-    
-    formTable <- formulaTable(obj)[group == groupName & byMSMS == TRUE & formula == precursor]
 
-    if (nrow(formTable) == 0)
-        return(NULL)
+    if (!is.null(analysis))
+    {
+        formTable <- obj[[analysis, groupName]]
+        spec <- MSPeakLists[[analysis, groupName]][["MSMS"]]
+    }
+    else
+    {
+        formTable <- obj[[groupName]]
+        spec <- MSPeakLists[[groupName]][["MSMS"]]
+    }
 
-    spec <- MSPeakLists[[groupName]][["MSMS"]]
-    if (is.null(spec))
+    formTable <- formTable[byMSMS == TRUE & formula == precursor]
+
+    if (nrow(formTable) == 0 || is.null(spec))
         return(NULL)
 
     fi <- getFragmentInfoFromForms(spec, formTable)
@@ -428,6 +446,145 @@ setMethod("plotSpec", "formulaConsensus", function(obj, precursor, groupName, MS
 
     makeMSPlot(spec, fi, main = precursor)
 })
+
+#' @describeIn formulas Generates a consensus of results from multiple
+#'   \code{formulas} objects.
+#'
+#' @param \dots One or more \code{formulas} objects that should be used to
+#'   generate the consensus.
+#' @param formThreshold Fractional minimum amount (0-1) of which a formula
+#'   candidate should be present within all objects. For instance, a value of
+#'   \samp{0.5} means that a particular formula should be present in at least
+#'   \samp{50\%} of all objects.
+#'
+#' @return \code{consensus} returns a \code{formulas} object that is produced by
+#'   merging results from multiple \code{formulas} objects.
+#'
+#' @export
+setMethod("consensus", "formulas", function(obj, ..., formThreshold = 0)
+{
+    allFormulas <- c(list(obj), list(...))
+
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertList(allFormulas, types = "formulas", min.len = 2, any.missing = FALSE,
+                          unique = TRUE, .var.name = "...", add = ac)
+    checkmate::assertNumber(formThreshold, lower = 0, finite = TRUE, add = ac)
+    checkmate::reportAssertions(ac)
+
+    allFormNames <- sapply(allFormulas, algorithm)
+    allFormNames <- make.unique(allFormNames)
+
+    allFormulasLists <- sapply(seq_along(allFormulas), function(fi)
+    {
+        return(lapply(formulaTable(allFormulas[[fi]]), function(ft)
+        {
+            ret <- copy(ft)
+            ret[, mergedBy := allFormNames[fi]]
+            setnames(ret, paste0(names(ret), "-", allFormNames[fi]))
+            return(ret)
+        }))
+
+    }, simplify = FALSE)
+
+    # UNDONE: remove old style columns?
+    uniqueCols <- c("neutral_formula", "formula_mz", "error", "dbe", "frag_mz", "frag_neutral_formula",
+                    "frag_formula_mz", "frag_error", "neutral_loss", "frag_dbe", "min_intensity", "max_intensity",
+                    "ana_min_intensity", "ana_max_intensity")
+
+    consFormulaList <- allFormulasLists[[1]]
+    leftName <- allFormNames[1]
+    for (righti in seq(2, length(allFormulasLists)))
+    {
+        rightName <- allFormNames[righti]
+
+        printf("Merging %s with %s... ", paste0(allFormNames[seq_len(righti-1)], collapse = ","), rightName)
+
+        rightFList <- allFormulasLists[[righti]]
+
+        for (grp in union(names(consFormulaList), names(rightFList)))
+        {
+            if (is.null(rightFList[[grp]]))
+                next # nothing to merge
+            else if (is.null(consFormulaList[[grp]])) # not yet present
+            {
+                mTable <- rightFList[[grp]]
+
+                # rename columns that should be unique from right to left
+                unCols <- c(uniqueCols, c("formula", "byMSMS", "frag_formula", "mergedBy"))
+                unCols <- unCols[sapply(unCols, function(uc) !is.null(mTable[[paste0(uc, "-", rightName)]]))]
+                setnames(mTable, paste0(unCols, "-", rightName), paste0(unCols, "-", leftName))
+            }
+            else
+            {
+                haveLeftMSMS <- paste0("frag_formula-", leftName) %in% names(consFormulaList[[grp]])
+                haveRightMSMS <- paste0("frag_formula-", rightName) %in% names(rightFList[[grp]])
+
+                mergeCols <- c("formula", "byMSMS") # put byMSMS in there anyway in case only left/right has MSMS
+                if (haveLeftMSMS && haveRightMSMS)
+                    mergeCols <- c(mergeCols, "frag_formula")
+                mTable <- merge(consFormulaList[[grp]], rightFList[[grp]], all = TRUE,
+                                by.x = paste0(mergeCols, "-", leftName),
+                                by.y = paste0(mergeCols, "-", rightName))
+
+                if (!haveLeftMSMS && haveRightMSMS)
+                    setnames(mTable, paste0("frag_formula-", rightName), paste0("frag_formula-", leftName))
+
+                # remove duplicate columns that shouldn't
+                for (col in uniqueCols)
+                {
+                    colLeft <- paste0(col, "-", leftName)
+                    colRight <- paste0(col, "-", rightName)
+                    if (!is.null(mTable[[colRight]]))
+                    {
+                        if (is.null(mTable[[colLeft]]))
+                            setnames(mTable, colRight, colLeft)
+                        else
+                        {
+                            mTable[, (colLeft) := ifelse(!is.na(get(colLeft)), get(colLeft), get(colRight))]
+                            mTable[, (colRight) := NULL]
+                        }
+                    }
+                }
+
+                # collapse mergedBy
+                ml <- paste0("mergedBy-", leftName); mr <- paste0("mergedBy-", rightName)
+                mTable[!is.na(get(ml)), (ml) := ifelse(!is.na(get(mr)), paste(get(ml), get(mr), sep = ","), get(ml))]
+                mTable[is.na(get(ml)), (ml) := get(mr)]
+                mTable[, (mr) := NULL]
+            }
+
+            consFormulaList[[grp]] <- mTable
+        }
+
+        cat("Done!\n")
+    }
+
+    printf("Determining coverage... ")
+
+    for (grpi in seq_along(consFormulaList))
+    {
+        # fix up de-duplicated column names
+        deDupCols <- c(uniqueCols, "formula", "byMSMS", "frag_formula", "mergedBy")
+        leftCols <- paste0(deDupCols, "-", leftName)
+        deDupCols <- deDupCols[leftCols %in% names(consFormulaList[[grpi]])]
+        leftCols <- leftCols[leftCols %in% names(consFormulaList[[grpi]])]
+        if (length(leftCols) > 0)
+            setnames(consFormulaList[[grpi]], leftCols, deDupCols)
+
+        consFormulaList[[grpi]][, coverage := (sapply(mergedBy, countCharInStr, ",") + 1) / length(allFormulas)]
+
+        if (formThreshold > 0)
+            consFormulaList[[grpi]] <- consFormulaList[[grpi]][coverage >= formThreshold]
+
+        consFormulaList[[grpi]] <- rankFormulaTable(consFormulaList[[grpi]])
+    }
+
+    cat("Done!\n")
+
+    return(formulas(formulas = consFormulaList, featureFormulas = list(),
+                    algorithm = paste0(unique(sapply(allFormulas, algorithm)), collapse = ",")))
+})
+
 
 #' @templateVar func generateFormulas
 #' @templateVar what generate formulae

@@ -75,20 +75,17 @@ plists <- generateMSPeakLists(fGroups, "brukerfmf", avgFGroupParams = avgPListPa
 # Calculate all formulas
 {{ endCodeBlock() }}
 {{ optionalCodeBlock(formulaOpts$algo == "GenForm") }}
-forms <- generateFormulas(fGroups, "genform", plists, maxMzDev = 5,
-                          adduct = "{{ if (polarity == 'positive') 'M+H' else 'M-H' }}", elements = "CHNOP")
+formulas <- generateFormulas(fGroups, "genform", plists, maxMzDev = 5,
+                             adduct = "{{ if (polarity == 'positive') 'M+H' else 'M-H' }}", elements = "CHNOP",
+                             calculateFeatures = TRUE, featThreshold = 0.75)
 {{ endCodeBlock() }}
 {{ optionalCodeBlock(formulaOpts$algo == "Bruker") }}
-forms <- generateFormulas(fGroups, "bruker", precursorMzSearchWindow = 0.002)
+formulas <- generateFormulas(fGroups, "bruker", precursorMzSearchWindow = 0.002, featThreshold = 0.75)
 {{ endCodeBlock() }}
 {{ optionalCodeBlock(formulaOpts$algo == "SIRIUS") }}
-forms <- generateFormulas(fGroups, "sirius", plists, maxMzDev = 5,
-                          adduct = "{{ if (polarity == 'positive') '[M+H]+' else '[M-H]-' }}", elements = "CHNOP",
-                          profile = "qtof")
-{{ endCodeBlock() }}
-{{ optionalCodeBlock(formulaOpts$algo != "") }}
-formulas <- consensus(forms, fGroups = fGroups, formAnaThreshold = 0.75,
-                      maxFormulas = 10, maxFragFormulas = 10)
+formulas <- generateFormulas(fGroups, "sirius", plists, maxMzDev = 5,
+                             adduct = "{{ if (polarity == 'positive') '[M+H]+' else '[M-H]-' }}", elements = "CHNOP",
+                             profile = "qtof", calculateFeatures = TRUE, featThreshold = 0.75)
 {{ endCodeBlock() }}
 {{ optionalCodeBlock(identOpts$algo != "") }}
 
@@ -125,19 +122,19 @@ components <- generateComponents(fGroups, "nontarget", ionization = "{{ polarity
 # Report & export results
 {{ endCodeBlock() }}
 {{ optionalCodeBlock("CSV" %in% reportFormats) }}
-reportCSV(fGroups, path = "report", reportFeatures = FALSE, formConsensus = {{ if (formulaOpts$algo != "") "formulas" else "NULL" }},
+reportCSV(fGroups, path = "report", reportFeatures = FALSE, formulas = {{ if (formulaOpts$algo != "") "formulas" else "NULL" }},
           compounds = {{ if (identOpts$algo != "") "compounds" else "NULL" }}, compoundNormalizeScores = "max",
           components = {{ if (identOpts$algo != "") "components" else "NULL" }})
 
 {{ endCodeBlock() }}
 {{ optionalCodeBlock("PDF" %in% reportFormats) }}
-reportPDF(fGroups, path = "report", reportFGroups = TRUE, formConsensus = {{ if (formulaOpts$algo != "") "formulas" else "NULL" }}, reportFormulaSpectra = TRUE,
+reportPDF(fGroups, path = "report", reportFGroups = TRUE, formulas = {{ if (formulaOpts$algo != "") "formulas" else "NULL" }}, reportFormulaSpectra = TRUE,
           compounds = {{ if (identOpts$algo != "") "compounds" else "NULL" }}, compoundNormalizeScores = "max",
           components = {{ if (identOpts$algo != "") "components" else "NULL" }}, MSPeakLists = {{ if (formulaOpts$algo != "" || identOpts$algo != "") "plists" else "NULL" }})
 
 {{ endCodeBlock() }}
 {{ optionalCodeBlock("MD" %in% reportFormats) }}
-reportMD(fGroups, path = "report", reportPlots = c("chord", "venn", "upset", "eics", "formulas"), formConsensus = {{ if (formulaOpts$algo != "") "formulas" else "NULL" }},
+reportMD(fGroups, path = "report", reportPlots = c("chord", "venn", "upset", "eics", "formulas"), formulas = {{ if (formulaOpts$algo != "") "formulas" else "NULL" }},
          compounds = {{ if (identOpts$algo != "") "compounds" else "NULL" }}, compoundNormalizeScores = "max",
          components = {{ if (componentOpts$algo != "") "components" else "NULL" }}, MSPeakLists = {{ if (formulaOpts$algo != "" || identOpts$algo != "") "plists" else "NULL" }},
          selfContained = TRUE, openReport = TRUE)

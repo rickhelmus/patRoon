@@ -152,8 +152,9 @@ Having obtained a good dataset with features of interest, we can start moving to
 The `generateMSPeakLists()` will perform this action for us and will generate so called _MS peaklists_ in the process. These peaklists are basicially the relevant MS and MS/MS spectra in tabular form. The command below will use the _mzR_ algorithm to do so:
 
 ```{r MSPeakLists,results='hide'}
-plists <- generateMSPeakLists(fGroups, "mzr", avgMzWindow = 0.0005,
-                              avgMinIntensity = 500, precursorMzWindow = 8)
+avgPListParams <- getDefAvgPListParams(clusterMzWindow = 0.005)
+plists <- generateMSPeakLists(fGroups, "mzr", maxRtMSWidth = 20, precursorMzWindow = 8,
+                              avgFeatParams = avgPListParams, avgFGroupParams = avgPListParams)
 ```
 ```{r}
 plists
@@ -164,18 +165,15 @@ plists
 Using the data from the MS peaklists generated during the previous step we can generate a list of formula candidates for each feature group based on measured _m/z_ values, isotopic patterns and presence of MS/MS fragments. In this tutorial we will use this data as an extra hint to score canddiate chemical structures generated during the next step. The command below will use [GenForm] to perform this step: 
 
 ```{r formulas,results='hide'}
-forms <- generateFormulas(fGroups, "genform", plists, maxMzDev = 5,
-                          adduct = "M+H", elements = "CHNOPSCl")
+formulas <- generateFormulas(fGroups, "genform", plists, maxMzDev = 5,
+                             adduct = "M+H", elements = "CHNOPSCl",
+                             calculateFeatures = TRUE, featThreshold = 0.75)
+formulas
 ```
 
 Note that we limited to only to the the elements C, H, N, O, P, S and Cl. It is highly recommended to limit the elements (by default it is just C, H, N, O and P) as this can significantly reduce processing time and improbable formula candidates. In this tutorial we already knew which compounds to expect so the choice was easy, but often a good guess can be made in advance.
 
-The `generateFormulas()` function returns a list of formulas of every feature in all analyses. The `consensus()` function is used subsequently to generate a final table of formula candidates for each feature group. During this process, any formulas for a particular feature group which were detected in only a fraction of the analyses (by default <75%, controlled by the `formAnaThreshold` argument) are considered as outliers and removed. In addition, this function will also set a limit to only keep a number of top candidates (ten by default, controlled by the `maxFormulas` and `maxFragFormulas` arguments). In this tutorial we will just stick with defaults:
-
-```{r}
-formulas <- consensus(forms, fGroups = fGroups)
-formulas
-```
+The `generateFormulas()` function returns an object that contains formula candidates assigned for each feature group. In the above call the `calculateFeatures` argument is set to `TRUE`: by doing so formulae are first calculated for individual features within a feature group. These results are then used to generate a consensus candidate formula list for each feature group. During this process any outliers (defined by `featThreshold`) are automatically removed. Setting `calculateFeatures` to `FALSE` instead will calculate formulae directly for feature groups from averaged MS peak lists. This will be significantly faster, but might produce (slightly) less accurate results.
 
 ## Compound identification
 
@@ -215,7 +213,7 @@ compounds <- addFormulaScoring(compounds, formulas, updateScore = TRUE)
 
 ## Components
 
-So far we mainly dealt with feature groups as if they are separate chemical compounds. However, formation of multiple ionization adducts (_e.g._ sodium and potassium) and the presence of isotopologues yield multiple _m/z_ values for the same compound. As a result, multiple feature groups will be present describing the same chemical compound, each describing the same retention pattern. To reduce this complexity it is useful to generate so called _components_ which are basically groups of feature groups which are likely to be the same compound. Another advantage is this grouping process is that extra chemical information of a compound is revealed which may help compound identification.
+So far we mainly dealt with feature groups as if they are separate chemical compounds. However, formation of multiple ionization adducts (_e.g._ sodium and potassium) and the presence of isotopologues yield multiple _m/z_ values for the same compound. As a result, multiple feature groups will be  describing the same chemical compound. To reduce this complexity it is useful to generate so called _components_ which are basically groups of feature groups which are likely to be the same compound (based on _e.g._ similarity of retention profiles and known chemical rules). Another advantage of this grouping process is that extra chemical information of a compound is revealed that may help compound identification.
 
 Generating components is performed with the `generateComponents()` function:
 
@@ -233,10 +231,10 @@ plotEIC(components, "CMP17", fGroups)
 The last step of the workflow is typically reporting data: during this step all the collected data is transformed to graphical plots (`reportPDF()` and `reportMD()`) or tabular csv data (`reportCSV()`).
 
 ```{r eval=FALSE}
-reportCSV(fGroups, formConsensus = formulas, compounds = compounds, components = components)
-reportPDF(fGroups, formConsensus = formulas, compounds = compounds, components = components,
+reportCSV(fGroups, formulas = formulas, compounds = compounds, components = components)
+reportPDF(fGroups, formulas = formulas, compounds = compounds, components = components,
           MSPeakLists = plists)
-reportMD(fGroups, formConsensus = formulas, compounds = compounds, components = components,
+reportMD(fGroups, formulas = formulas, compounds = compounds, components = components,
          MSPeakLists = plists)
 ```
 
@@ -256,10 +254,11 @@ setwd("%s")
 load("%s")
 options("patRoon.cache.fileName" = "%s")
 #options(patRoon.path.pngquant = "~/werk/pngquant/")
-reportMD(fGroups, path = "../docs/examples", formConsensus = formulas, compounds = compounds,
+reportMD(fGroups, path = "../docs/examples", formulas = formulas, compounds = compounds,
          components = components, MSPeakLists = plists, optimizePng = TRUE, openReport = FALSE)
 ', gsub("\\", "/", getwd(), fixed = TRUE), gsub("\\", "/", tempF, fixed = TRUE), getOption("patRoon.cache.fileName")), con = tempScript)
-devtools::clean_source(tempScript, quiet = TRUE)
+# devtools::clean_source(tempScript, quiet = TRUE)
+callr::rscript(tempScript, show = FALSE)
 ```
 
 ## Final script

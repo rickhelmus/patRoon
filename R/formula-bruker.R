@@ -28,14 +28,16 @@ simplifyDAFormula <- function(formula)
 #'   available from \command{SmartFormula3D} results).
 #' @rdname formula-generation
 #' @export
-generateFormulasDA <- function(fGroups, precursorMzSearchWindow = 0.002, MSMode = "both")
+generateFormulasDA <- function(fGroups, precursorMzSearchWindow = 0.002, MSMode = "both",
+                               featThreshold = 0.75)
 {
-    # UNDONE: test MSMode and duplicate MS formulas removal
-    
+    # UNDONE: test MSMode, duplicate MS formulas removal, new group formulas
+
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
     checkmate::assertNumber(precursorMzSearchWindow, lower = 0, finite = TRUE, add = ac)
     checkmate::assertChoice(MSMode, c("ms", "msms", "both"), add = ac)
+    checkmate::assertNumber(featThreshold, lower = 0, finite = TRUE, null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
 
     DA <- getDAApplication()
@@ -224,7 +226,7 @@ generateFormulasDA <- function(fGroups, precursorMzSearchWindow = 0.002, MSMode 
         close(prog)
 
         ngrp <- length(fTable[[ana]])
-        printf("Loaded %d formulas from %d features (%.2f%%).\n", sum(unlist(lapply(fTable[[ana]], nrow))),
+        printf("Loaded %d formulas for %d features (%.2f%%).\n", sum(unlist(lapply(fTable[[ana]], nrow))),
                ngrp, if (gCount == 0) 0 else ngrp * 100 / gCount)
     }
 
@@ -233,5 +235,10 @@ generateFormulasDA <- function(fGroups, precursorMzSearchWindow = 0.002, MSMode 
 
     fTable <- pruneList(sapply(fTable, function(ft) ft[sapply(ft, nrow) > 0], simplify = FALSE), TRUE)
 
-    return(formulas(formulas = fTable, algorithm = "Bruker_DataAnalysis"))
+    if (length(fTable) > 0)
+        groupFormulas <- generateGroupFormulasByConsensus(fTable, featThreshold)
+    else
+        groupFormulas <- list()
+
+    return(formulas(formulas = groupFormulas, featFormulas = fTable, algorithm = "Bruker_DataAnalysis"))
 }

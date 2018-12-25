@@ -8,6 +8,17 @@ getTestFGroups <- function(anaInfo = getTestAnaInfo()) groupFeatures(findFeature
 getEmptyTestFGroups <- function() getTestFGroups()[, "none"]
 getEmptyPLists <- function() MSPeakLists()
 
+getDAAnaInfo <- function()
+{
+    path <- getOption("patRoon.test.DAAnalyses")
+    if (is.null(path))
+        return(NULL)
+    return(generateAnalysisInfo(path, groups = c(rep("standard", 3), rep("solvent", 3)),
+                                refs = "solvent"))
+}
+
+doDATests <- function() !is.null(getOption("patRoon.test.DAAnalyses"))
+
 makeMZXMLs <- function(anaInfo)
 {
     convertMSFiles(paste0(anaInfo$path, "/", anaInfo$analysis, ".mzML"), getWorkPath(), to = "mzXML", algorithm = "openms",

@@ -36,11 +36,12 @@ getDAMaxIntMZAndFWHM <- function(spec)
     {
         for (i in seq_len(psize))
         {
-            if (plist[[i]][["Intensity"]] > maxInt)
+            int <- plist[[i]][["Intensity"]]
+            if (int > maxInt)
             {
                 ret$mz <- plist[[i]][["m_over_z"]]
                 ret$fwhm <- plist[[i]][["width"]]
-                maxInt <- spec$Intensity(i)
+                maxInt <- int
             }
         }
     }
@@ -546,7 +547,7 @@ generateDACompounds <- function(fGroups, bgsubtr, maxRtMSWidth, clear, save, MSM
 
             cat("Adding EICs for spectra generation... ")
             # add general TIC MS chromatogram used for generating MS spectra
-            MSEIC <- addDAEIC(ana, path, -1, 0.005, "TIC", "MS", bgsubtr = bgsubtr, name = "MS TIC", hideDA = FALSE)
+            MSEIC <- addDAEIC(ana, path, 0, 0.005, "TIC", "MS", bgsubtr = bgsubtr, name = "MS TIC", hideDA = FALSE)
             stopifnot(!is.null(MSEIC))
             cmp$MSEIC <- MSEIC
 
@@ -633,7 +634,7 @@ generateDACompounds <- function(fGroups, bgsubtr, maxRtMSWidth, clear, save, MSM
     return(compounds)
 }
 
-getDAPeakList <- function(findDA, ind, useFMF, getMSMS)
+getDAPeakList <- function(findDA, ind, useFMF, getMSMS, minInt)
 {
     DA <- getDAApplication()
 
@@ -653,5 +654,34 @@ getDAPeakList <- function(findDA, ind, useFMF, getMSMS)
     setnames(plist, c("mz", "intensity", "cmp"))
     unlink(pfile) # amount of peaklists may be large, remove temp files straight away
 
-    return(plist)
+    return(plist[intensity > minInt])
+}
+
+checkDAFMFCompounds <- function(DA, featTable, analysisInd, verify)
+{
+    cmpds <- DA[["Analyses"]][[analysisInd]][["Compounds"]]
+    cCount <- cmpds[["Count"]]
+    ret <- TRUE
+    
+    if (cCount < nrow(featTable))
+        ret <- sprintf("Number of DataAnalysis compounds is less than number of features for analysis %s!",
+                       DA[["Analyses"]][[analysisInd]][["Name"]])
+    else
+    {
+        for (fti in seq_len(nrow(featTable)))
+        {
+            ci <- featTable$ID[fti]
+            if (!grepl(paste0("^Cmpd ", ci, ", MolFeature"), cmpds[[ci]][["Name"]]))
+            {
+                ret <- sprintf("Could not find back the DataAnalysis compound for feature %d in analysis %s!",
+                               fti, DA[["Analyses"]][[analysisInd]][["Name"]])
+                break
+            }
+        }
+    }
+    
+    if (verify && !isTRUE(ret))
+        stop(paste(ret, "Please re-run FMF by calling findFeatures with doFMF=\"force\"."))
+    
+    return(isTRUE(ret))
 }

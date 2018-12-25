@@ -28,6 +28,13 @@ if (doSIRIUS)
     formsSIREmptyPLMS <- generateFormulas(fGroups, "sirius", plistsEmptyMS, logPath = NULL)
 }
 
+if (doDATests())
+{
+    # HACK: use first standard as its compounds are not touched by MS peak lists
+    fgDA <- groupFeatures(findFeatures(getDAAnaInfo()[1, ], "bruker"), "openms")
+    formsDA <- generateFormulas(fgDA, "bruker")
+}
+
 test_that("verify formula generation", {
     expect_known_value(formsGF, testFile("formulas-gf"))
     expect_length(formsGFEmpty, 0)
@@ -49,6 +56,13 @@ test_that("verify formula show output", {
     expect_known_show(formsGF, testFile("formulas-gf", text = TRUE))
     skip_if_not(doSIRIUS)
     expect_known_show(formsSIR, testFile("formulas-sir", text = TRUE))
+})
+
+# extra separate block: can't have >1 skip statements...
+test_that("verify DA formula generation", {
+    skip_if_not(doDATests())
+    expect_known_value(formsDA, testFile("formulas-DA"))
+    expect_known_show(formsDA, testFile("formulas-DA", text = TRUE))
 })
 
 test_that("basic subsetting", {

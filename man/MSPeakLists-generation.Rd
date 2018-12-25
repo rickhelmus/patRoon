@@ -15,11 +15,12 @@
 \S4method{generateMSPeakLists}{featureGroups}(fGroups, algorithm, ...)
 
 generateMSPeakListsDA(fGroups, bgsubtr = TRUE, maxRtMSWidth = 20,
-  clear = TRUE, save = TRUE, MSMSType = "MSMS",
+  minMSIntensity = 500, minMSMSIntensity = 500, clear = TRUE,
+  save = TRUE, MSMSType = "MSMS",
   avgFGroupParams = getDefAvgPListParams())
 
-generateMSPeakListsDAFMF(fGroups,
-  avgFGroupParams = getDefAvgPListParams())
+generateMSPeakListsDAFMF(fGroups, minMSIntensity = 500,
+  minMSMSIntensity = 500, avgFGroupParams = getDefAvgPListParams())
 
 generateMSPeakListsMzR(fGroups, maxRtMSWidth = 20,
   precursorMzWindow = 8, topMost = NULL,
@@ -47,6 +48,10 @@ used: \code{"bruker"}, \code{"brukerfmf"}, \code{"mzr"}}
 \item{maxRtMSWidth}{Maximum total chromatographic peak width (seconds) used
 for spectrum averaging. If \code{NULL} all spectra from a feature will be
 taken into account. Lower to decrease processing time.}
+
+\item{minMSIntensity, minMSMSIntensity}{Minimum intensity for peak lists
+obtained with DataAnalysis. Highly recommended to set \samp{>0} as DA tends
+to report many very low intensity peaks.}
 
 \item{clear}{Remove any existing chromatogram traces/mass spectra prior to
 making new ones.}
@@ -87,8 +92,8 @@ for \link[=formula-generation]{formula generation} and
 
 MS and MS/MS peak lists are first generated for all features (or a subset, if
 the \code{topMost} argument is set). During this step multiple spectra over
-the feature elution profile are averaged. Subsequently, peak lists
-will be generated for each feature group by averaging peak lists of the features
+the feature elution profile are averaged. Subsequently, peak lists will be
+generated for each feature group by averaging peak lists of the features
 within the group. Functionality that uses peak lists will either use data
 from individual features or from group averaged peak lists. For instance, the
 former may be used by formulae calculation, while compound identification and
@@ -147,18 +152,18 @@ The \code{getDefAvgPListParams} is used to create a parameter list
   irrelevant (noisy) MS peaks and decrease processing time, whereas higher
   values may avoid excluding lower intense MS peaks that may still be of
   interest.
-  \item \code{minIntensityPre} MS peaks with intensities below this value will
-  be removed (applied prior to selection by \code{topMost}) before averaging.
-  \item \code{minIntensityPost} MS peaks with intensities below this value will
-  be removed after averaging.
+  \item \code{minIntensityPre} MS peaks with intensities below this value
+  will be removed (applied prior to selection by \code{topMost}) before
+  averaging.
+  \item \code{minIntensityPost} MS peaks with intensities below this value
+  will be removed after averaging.
   \item \code{avgFun} Function that is used to calculate average \emph{m/z}
   values.
   \item \code{method} Method used for producing averaged MS spectra. Valid
   values are \code{"hclust"}, used for hierarchical clustering (using the
   \pkg{\link{fastcluster}} package), and \code{"distance"}, to use the
-  between peak distance. The latter method may reduces processing
-  time and memory requirements, at the potential cost of reduced
-  accuracy.
+  between peak distance. The latter method may reduces processing time and
+  memory requirements, at the potential cost of reduced accuracy.
   }
   The \code{getDefAvgPListParams} function can be used to generate a default
   parameter list.
@@ -175,13 +180,9 @@ The \code{getDefAvgPListParams} is used to create a parameter list
 }
 
 \references{
-\cr\cr
-  \addCitations{mzR}{1} \cr\cr
-  \addCitations{mzR}{2} \cr\cr
-  \addCitations{mzR}{3} \cr\cr
-  \addCitations{mzR}{4} \cr\cr
-  \addCitations{mzR}{5} \cr\cr
-  \addCitations{fastcluster}{1}
+\cr\cr \addCitations{mzR}{1} \cr\cr \addCitations{mzR}{2} \cr\cr
+  \addCitations{mzR}{3} \cr\cr \addCitations{mzR}{4} \cr\cr
+  \addCitations{mzR}{5} \cr\cr \addCitations{fastcluster}{1}
 }
 \seealso{
 \code{\link{MSPeakLists-class}}

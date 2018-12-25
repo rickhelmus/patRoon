@@ -60,11 +60,14 @@ generateFormulasDA <- function(fGroups, precursorMzSearchWindow = 0.002, MSMode 
     for (anai in seq_len(nrow(anaInfo)))
     {
         ana <- anaInfo$analysis[anai]
+        DAAnaInd <- getDAFileIndex(DA, ana, anaInfo$path[anai])
+        checkDAFMFCompounds(DA, fts[[ana]], DAAnaInd, TRUE)
+        
         printf("Loading all formulas from analysis '%s'...\n", ana)
 
         baseHash <- makeHash(fGroups, ana, precursorMzSearchWindow)
 
-        cmpds <- DA[["Analyses"]][[getDAFileIndex(DA, ana, anaInfo$path[anai])]][["Compounds"]]
+        cmpds <- DA[["Analyses"]][[DAAnaInd]][["Compounds"]]
 
         prog <- txtProgressBar(0, gCount, style=3)
 
@@ -240,5 +243,5 @@ generateFormulasDA <- function(fGroups, precursorMzSearchWindow = 0.002, MSMode 
     else
         groupFormulas <- list()
 
-    return(formulas(formulas = groupFormulas, featFormulas = fTable, algorithm = "Bruker_DataAnalysis"))
+    return(formulas(formulas = groupFormulas, featureFormulas = fTable, algorithm = "Bruker_DataAnalysis"))
 }

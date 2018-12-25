@@ -23,8 +23,8 @@ NULL
 #'
 #' @rdname MSPeakLists-generation
 #' @export
-generateMSPeakListsDA <- function(fGroups, bgsubtr = TRUE, maxRtMSWidth = 20, clear = TRUE, save = TRUE, MSMSType = "MSMS",
-                                  avgFGroupParams = getDefAvgPListParams())
+generateMSPeakListsDA <- function(fGroups, bgsubtr = TRUE, maxRtMSWidth = 20, minMSIntensity = 500, minMSMSIntensity = 500,
+                                  clear = TRUE, save = TRUE, MSMSType = "MSMS", avgFGroupParams = getDefAvgPListParams())
 {
     # UNDONE: implement topMost
 
@@ -92,11 +92,13 @@ generateMSPeakListsDA <- function(fGroups, bgsubtr = TRUE, maxRtMSWidth = 20, cl
             {
                 results <- list()
 
-                results$MS <- getDAPeakList(findDA, specindMS, FALSE, FALSE)
+                results$MS <- getDAPeakList(findDA, specindMS, FALSE, FALSE, minMSIntensity)
 
                 specindMSMS <- anac[["MSMSSpec"]][grpi]
                 if (specindMSMS != 0)
-                    results$MSMS <- getDAPeakList(findDA, specindMSMS, FALSE, TRUE)
+                    results$MSMS <- getDAPeakList(findDA, specindMSMS, FALSE, TRUE, minMSMSIntensity)
+                
+                results <- pruneList(results) # MS or MSMS entry might be NULL
 
                 saveCacheData("MSPeakListsDA", results, hash, cacheDB)
             }
@@ -126,7 +128,8 @@ generateMSPeakListsDA <- function(fGroups, bgsubtr = TRUE, maxRtMSWidth = 20, cl
 #'
 #' @rdname MSPeakLists-generation
 #' @export
-generateMSPeakListsDAFMF <- function(fGroups, avgFGroupParams = getDefAvgPListParams())
+generateMSPeakListsDAFMF <- function(fGroups, minMSIntensity = 500, minMSMSIntensity = 500,
+                                     avgFGroupParams = getDefAvgPListParams())
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
@@ -157,7 +160,8 @@ generateMSPeakListsDAFMF <- function(fGroups, avgFGroupParams = getDefAvgPListPa
         resultHashes <- vector("character", gcount)
 
         findDA <- getDAFileIndex(DA, ana, anaInfo$path[anai])
-
+        checkDAFMFCompounds(DA, fTable[[ana]], findDA, TRUE)
+        
         cmpds <- DA[["Analyses"]][[findDA]][["Compounds"]]
 
         if (is.null(cachedSet))
@@ -191,10 +195,10 @@ generateMSPeakListsDAFMF <- function(fGroups, avgFGroupParams = getDefAvgPListPa
             {
                 results <- list()
 
-                results$MS <- getDAPeakList(findDA, fti, TRUE, FALSE)
+                results$MS <- getDAPeakList(findDA, fti, TRUE, FALSE, minMSIntensity)
 
                 if (cmpds[[fti]]$Count() > 1)
-                    results$MSMS <- getDAPeakList(findDA, fti, TRUE, TRUE)
+                    results$MSMS <- getDAPeakList(findDA, fti, TRUE, TRUE, minMSMSIntensity)
 
                 saveCacheData("MSPeakListsDAFMF", results, hash, cacheDB)
             }

@@ -3,13 +3,33 @@ context("MS peak lists")
 fGroups <- getTestFGroups()[4:5, 1:100]
 plists <- generateMSPeakLists(fGroups, "mzr")
 
+if (doDATests())
+{
+    # NOTE: use different analyses than first: this call will clearout all DA
+    # compounds, forcing other calls (from features/formulas tests) to re-run
+    # FMF
+    fgDA <- groupFeatures(findFeatures(getDAAnaInfo()[2, ], "bruker"), "openms")
+    plistsDA <- generateMSPeakLists(fgDA, "bruker", save = FALSE)
+    plistsDAEmpty <- generateMSPeakLists(fgDA["nope"], "bruker", save = FALSE)
+    
+    fgDA2 <- groupFeatures(findFeatures(getDAAnaInfo()[1, ], "bruker"), "openms")
+    plistsDAFMF <- generateMSPeakLists(fgDA2, "brukerfmf")
+}
+
 test_that("verify generation of MS peak lists", {
-    # expect_known_hash(plists, "d4b026d4e3") # use a hash here because of the large resulting file
     expect_known_value(plists, testFile("plists-mzr"))
+    
+    skip_if_not(doDATests())
+    expect_known_value(plistsDA, testFile("plists-DA"))
+    expect_known_value(plistsDAFMF, testFile("plists-DAFMF"))
 })
 
 test_that("verify show output", {
     expect_known_show(plists, testFile("plists-mzr", text = TRUE))
+    
+    skip_if_not(doDATests())
+    expect_known_show(plistsDA, testFile("plists-DA", text = TRUE))
+    expect_known_show(plistsDAFMF, testFile("plists-DAFMF", text = TRUE))
 })
 
 checkMinInt <- function(plists, relative, doMSMS)
@@ -71,6 +91,9 @@ test_that("empty object", {
     expect_length(generateMSPeakLists(getEmptyTestFGroups(), "mzr"), 0)
     expect_lt(length(plistsEmptyMS), length(plists))
     expect_gt(length(plistsEmptyMS), 0)
+    
+    skip_if_not(doDATests())
+    expect_length(plistsDAEmpty, 0)
 })
 
 test_that("basic functionality", {

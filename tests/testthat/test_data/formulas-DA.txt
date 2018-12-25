@@ -1,0 +1,1 @@
+A formulas object (formulas)Algorithm: Bruker_DataAnalysisFormulas assigned to features:  - Total formula count: 95  - Average formulas per analysis: 1.2  - Average formulas per feature: 1.2Formulas assigned to feature groups:  - Total formula count: 95  - Average formulas per feature group: 2.0

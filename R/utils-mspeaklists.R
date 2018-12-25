@@ -92,8 +92,8 @@ averageMSPeakLists <- function(peakLists, clusterMzWindow, topMost, minIntensity
             plistsMSMS <- averageSpectra(plistsMSMS, clusterMzWindow, topMost, minIntensityPre, minIntensityPost, avgFun, method)
             
             setTxtProgressBar(prog, grpi)
-            return(list(MS = if (nrow(plistsMS) > 0) plistsMS else NULL,
-                        MSMS = if (nrow(plistsMSMS) > 0) plistsMSMS else NULL))
+            return(pruneList(list(MS = if (nrow(plistsMS) > 0) plistsMS else NULL,
+                                  MSMS = if (nrow(plistsMSMS) > 0) plistsMSMS else NULL)))
         })
         names(avgPLists) <- gNames
         

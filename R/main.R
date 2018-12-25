@@ -380,8 +380,8 @@ NULL
 #'
 #' MS and MS/MS peak lists are first generated for all features (or a subset, if
 #' the \code{topMost} argument is set). During this step multiple spectra over
-#' the feature elution profile are averaged. Subsequently, peak lists
-#' will be generated for each feature group by averaging peak lists of the features
+#' the feature elution profile are averaged. Subsequently, peak lists will be
+#' generated for each feature group by averaging peak lists of the features
 #' within the group. Functionality that uses peak lists will either use data
 #' from individual features or from group averaged peak lists. For instance, the
 #' former may be used by formulae calculation, while compound identification and
@@ -397,6 +397,9 @@ NULL
 #' @param maxRtMSWidth Maximum total chromatographic peak width (seconds) used
 #'   for spectrum averaging. If \code{NULL} all spectra from a feature will be
 #'   taken into account. Lower to decrease processing time.
+#' @param minMSIntensity,minMSMSIntensity Minimum intensity for peak lists
+#'   obtained with DataAnalysis. Highly recommended to set \samp{>0} as DA tends
+#'   to report many very low intensity peaks.
 #' @param avgFeatParams,avgFGroupParams A \code{list} with parameters used for
 #'   averaging of peak lists for individual features and feature groups,
 #'   respectively (see below).
@@ -421,18 +424,18 @@ NULL
 #'   irrelevant (noisy) MS peaks and decrease processing time, whereas higher
 #'   values may avoid excluding lower intense MS peaks that may still be of
 #'   interest.
-#'   \item \code{minIntensityPre} MS peaks with intensities below this value will
-#'   be removed (applied prior to selection by \code{topMost}) before averaging.
-#'   \item \code{minIntensityPost} MS peaks with intensities below this value will
-#'   be removed after averaging.
+#'   \item \code{minIntensityPre} MS peaks with intensities below this value
+#'   will be removed (applied prior to selection by \code{topMost}) before
+#'   averaging.
+#'   \item \code{minIntensityPost} MS peaks with intensities below this value
+#'   will be removed after averaging.
 #'   \item \code{avgFun} Function that is used to calculate average \emph{m/z}
 #'   values.
 #'   \item \code{method} Method used for producing averaged MS spectra. Valid
 #'   values are \code{"hclust"}, used for hierarchical clustering (using the
 #'   \pkg{\link{fastcluster}} package), and \code{"distance"}, to use the
-#'   between peak distance. The latter method may reduces processing
-#'   time and memory requirements, at the potential cost of reduced
-#'   accuracy.
+#'   between peak distance. The latter method may reduces processing time and
+#'   memory requirements, at the potential cost of reduced accuracy.
 #'   }
 #'   The \code{getDefAvgPListParams} function can be used to generate a default
 #'   parameter list.

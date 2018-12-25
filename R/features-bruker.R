@@ -13,12 +13,15 @@ featuresBruker <- setClass("featuresBruker", contains = "features")
 #'   features.
 #'
 #' @note \code{findFeaturesBruker} only works with Bruker data files (\code{.d}
-#'   extension) and requires Bruker DataAnalysis and the
-#'   \pkg{RDCOMClient} package to be installed.
+#'   extension) and requires Bruker DataAnalysis and the \pkg{RDCOMClient}
+#'   package to be installed.
 #'
 #' @param doFMF Run the 'Find Molecular Features' algorithm before loading
-#'   compounds. Valid options are: \code{TRUE} (always), \code{FALSE} (never)
-#'   and \code{"auto"} (automatically if no compounds present).
+#'   compounds. Valid options are: \code{"auto"} (run FMF automatically if
+#'   current results indicate it is necessary) and \code{"force"} (run FMF
+#'   \emph{always}, even if cached results exist). Note that checks done if
+#'   \code{doFMF="auto"} are fairly simplistic, hence set \code{doFMF="force"}
+#'   if feature data needs to be updated.
 #' @param startRange,endRange Start/End retention range (seconds) from which to
 #'   collect features. A 0 (zero) for \code{endRange} marks the end of the
 #'   analysis.
@@ -28,7 +31,7 @@ findFeaturesBruker <- function(analysisInfo, doFMF = "auto", startRange = 0, end
 {
     ac <- checkmate::makeAssertCollection()
     assertAnalysisInfo(analysisInfo, "d", add = ac)
-    checkmate::assertChoice(as.character(doFMF), c("auto", FALSE, TRUE), add = ac)
+    checkmate::assertChoice(doFMF, c("auto", "force"), add = ac)
     checkmate::assertNumber(startRange, lower = 0, finite = TRUE, add = ac)
     checkmate::assertNumber(endRange, lower = 0, finite = TRUE, add = ac)
     checkmate::reportAssertions(ac)
@@ -51,7 +54,7 @@ getDAFeatures <- function(DA, analysis, path, doFMF, startRange, endRange, verbo
     printf("Loading bruker features for analysis '%s'...\n", analysis)
 
     hash <- makeHash(analysis, path, startRange, endRange) # UNDONE: better hash?
-    ret <- loadCacheData("featuresBruker", hash)
+    ret <- if (doFMF == "force") NULL else loadCacheData("featuresBruker", hash)
 
     if (is.null(ret))
     {
@@ -63,29 +66,13 @@ getDAFeatures <- function(DA, analysis, path, doFMF, startRange, endRange, verbo
         cmpds <- DA[["Analyses"]][[ind]][["Compounds"]]
         ccount <- cmpds[["Count"]]
 
-        if (ccount < 1)
-        {
-            if (doFMF == "auto")
-                doFMF = TRUE
-            else if (doFMF == FALSE)
-                return()
-        }
-
-        if (doFMF == "auto")
-        {
-            # see if we need to do FMF
-            doFMF <- TRUE
-            for (i in 1:ccount)
-            {
-                if (cmpds[[i]][["SeparationType"]] == "MolFeature")
-                {
-                    doFMF <- FALSE
-                    break
-                }
-            }
-        }
-
-        if (doFMF == TRUE)
+        execFMF <- doFMF == "force" || ccount == 0
+        
+        # ensure that all DA compounds are from FMF
+        if (!execFMF)
+            execFMF <- any(sapply(seq_len(ccount), function(ci) cmpds[[ci]][["SeparationType"]] != "MolFeature"))
+        
+        if (execFMF)
         {
             if (verbose)
                 printf("Running Find Molecular Features (FMF)... ")
@@ -101,8 +88,10 @@ getDAFeatures <- function(DA, analysis, path, doFMF, startRange, endRange, verbo
             if (verbose)
                 cat("Done!\n")
         }
+        else if (verbose)
+            printf("Skipping FMF for analysis '%s'\n", analysis)
 
-        if (verbose)
+        if (verbose && ccount > 0)
         {
             printf("Loading %d features from DataAnalysis...\n", ccount, analysis)
             prog <- txtProgressBar(0, ccount, style=3)
@@ -115,7 +104,7 @@ getDAFeatures <- function(DA, analysis, path, doFMF, startRange, endRange, verbo
         for (i in seq_len(ccount))
         {
             cmpd <- cmpds[[i]]
-            if (cmpd[["SeparationType"]] == "MolFeature")
+            stopifnot(cmpd[["SeparationType"]] == "MolFeature")
             {
                 maxintmz <- getDAMaxIntMZAndFWHM(cmpd[[1]])
 
@@ -135,13 +124,13 @@ getDAFeatures <- function(DA, analysis, path, doFMF, startRange, endRange, verbo
                 setTxtProgressBar(prog, i) # update every 10 iterations
         }
 
-        if (verbose)
+        if (verbose && ccount > 0)
         {
             setTxtProgressBar(prog, ccount)
             close(prog)
         }
 
-        ret <- dt[1:dtCount]
+        ret <- dt[seq_len(dtCount)]
         saveCacheData("featuresBruker", ret, hash)
     }
 

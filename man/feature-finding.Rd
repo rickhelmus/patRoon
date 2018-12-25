@@ -60,8 +60,11 @@ used: \code{"bruker"}, \code{"openms"}, \code{"xcms"}, \code{"envipick"}}
 \item{verbose}{If set to \code{FALSE} then no text output is shown.}
 
 \item{doFMF}{Run the 'Find Molecular Features' algorithm before loading
-compounds. Valid options are: \code{TRUE} (always), \code{FALSE} (never)
-and \code{"auto"} (automatically if no compounds present).}
+compounds. Valid options are: \code{"auto"} (run FMF automatically if
+current results indicate it is necessary) and \code{"force"} (run FMF
+\emph{always}, even if cached results exist). Note that checks done if
+\code{doFMF="auto"} are fairly simplistic, hence set \code{doFMF="force"}
+if feature data needs to be updated.}
 
 \item{startRange, endRange}{Start/End retention range (seconds) from which to
 collect features. A 0 (zero) for \code{endRange} marks the end of the
@@ -196,8 +199,8 @@ methodology and instrumentation.
 }
 \note{
 \code{findFeaturesBruker} only works with Bruker data files (\code{.d}
-  extension) and requires Bruker DataAnalysis and the
-  \pkg{RDCOMClient} package to be installed.
+  extension) and requires Bruker DataAnalysis and the \pkg{RDCOMClient}
+  package to be installed.
 
 \code{findFeaturesEnviPick} Requires analysis files to be in the
   \code{mzXML} format.

@@ -113,6 +113,9 @@ deIsotopeMSPeakList <- function(MSPeakList)
     if (nrow(MSPeakList) == 0)
         return(MSPeakList)
     
+    if (is.null(MSPeakList[["cmp"]]))
+        stop("No istope information available. Note that this is currently only implemented for DataAnalysis peak lists (if configured properly, see ?generateMSPeakLists.")
+    
     # make sure most intense ions top the table
     MSPeakList <- MSPeakList[order(mz, -intensity)]
     

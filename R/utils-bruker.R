@@ -649,12 +649,18 @@ getDAPeakList <- function(findDA, ind, useFMF, getMSMS, minInt)
     pfile <- tempfile("peaklist", fileext = ".csv")
     specDA$ExportMassList(pfile, DAConstants$daCSV)
 
+    cnames <- names(fread(pfile, nrows = 0))
+    cnames <- intersect(cnames, c("m/z", "I", "Cmpnt."))
+    hasCmpnt <- "Cmpnt." %in% cnames
+    newNames <- c("mz", "intensity", if (hasCmpnt) "cmp" else character())
+    
     # force colclasses to prevent warnings, make sure iso compounds designated as 'NA' are still interpreted as a value
-    plist <- fread(pfile, colClasses = c(`Cmpnt.` = "character"), na.strings = NULL)[, c("m/z", "I", "Cmpnt.")]
-    setnames(plist, c("mz", "intensity", "cmp"))
+    plist <- fread(pfile, colClasses = if (hasCmpnt) c(`Cmpnt.` = "character") else NULL, na.strings = NULL,
+                   select = cnames, col.names = newNames)
+        
     unlink(pfile) # amount of peaklists may be large, remove temp files straight away
 
-    return(plist[intensity > minInt])
+    return(plist[intensity >= minInt])
 }
 
 checkDAFMFCompounds <- function(DA, featTable, analysisInd, verify)

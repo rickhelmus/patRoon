@@ -19,7 +19,8 @@ NULL
 #'   MRM/AutoMSMS or \code{"BBCID"} for broadband CID.
 #'
 #' @note \code{generateMSPeakListsDA} requires that the \option{Component}
-#'   column is active (Method-->Parameters-->Layouts-->Mass List Layout).
+#'   column is active (Method-->Parameters-->Layouts-->Mass List Layout) in
+#'   order to add isotopologue information.
 #'
 #' @rdname MSPeakLists-generation
 #' @export

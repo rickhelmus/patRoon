@@ -85,6 +85,15 @@ createCOMReference <- function(ref, className)
     RDCOMClient::createCOMReference(ref, className)
 }
 
+#' Internal fix for \pkg{RDCOMClient}, ignore.
+#' @param ...
+#' @keywords internal
+#' @export
+COMStop <- function(...)
+{
+    RDCOMClient::COMStop(...)
+}
+
 checkPackage <- function(pkg, gh = NULL)
 {
     # from http://stackoverflow.com/a/20333756

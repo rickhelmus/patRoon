@@ -101,7 +101,11 @@ closeSaveDAFile <- function(DA, DAFind, close, save)
 }
 
 #' @details \code{setDAMethod} Sets a given DataAnalysis method (\file{.m} file)
-#'   to a set of analyses.
+#'   to a set of analyses. \strong{NOTE}: as a workaround for a bug in
+#'   DataAnalysis, this function will save(!), close and re-open any analyses
+#'   that are already open prior to setting the new method. The \code{close}
+#'   argument only controls whether the file should be closed after setting the
+#'   method (files are always saved).
 #'
 #' @param method The full path of the DataAnalysis method.
 #'

@@ -86,7 +86,7 @@ createCOMReference <- function(ref, className)
 }
 
 #' Internal fix for \pkg{RDCOMClient}, ignore.
-#' @param ...
+#' @param ... ignore
 #' @keywords internal
 #' @export
 COMStop <- function(...)
@@ -622,7 +622,7 @@ getMostIntenseAnaWithMSMS <- function(fGroups, MSPeakLists, groupName)
 }
 
 # don't use all.equal here so functions are vectorized
-numEQ <- function(x, y, tol = sqrt(.Machine$double.eps)) abs(x - y) < tol
+numEQ <- function(x, y, tol = sqrt(.Machine$double.eps)) abs(x - y) <= tol
 numGTE <- function(x, y, tol = sqrt(.Machine$double.eps)) numEQ(x, y, tol) | x > y
 numLTE <- function(x, y, tol = sqrt(.Machine$double.eps)) numEQ(x, y, tol) | x < y
 

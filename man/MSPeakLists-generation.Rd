@@ -134,7 +134,8 @@ The \code{getDefAvgPListParams} is used to create a parameter list
 }
 \note{
 \code{generateMSPeakListsDA} requires that the \option{Component}
-  column is active (Method-->Parameters-->Layouts-->Mass List Layout).
+  column is active (Method-->Parameters-->Layouts-->Mass List Layout) in
+  order to add isotopologue information.
 }
 \section{Peak list averaging parameters}{
  The parameters set used for
@@ -180,9 +181,13 @@ The \code{getDefAvgPListParams} is used to create a parameter list
 }
 
 \references{
-\cr\cr \addCitations{mzR}{1} \cr\cr \addCitations{mzR}{2} \cr\cr
-  \addCitations{mzR}{3} \cr\cr \addCitations{mzR}{4} \cr\cr
-  \addCitations{mzR}{5} \cr\cr \addCitations{fastcluster}{1}
+\cr\cr
+  \addCitations{mzR}{1} \cr\cr
+  \addCitations{mzR}{2} \cr\cr
+  \addCitations{mzR}{3} \cr\cr
+  \addCitations{mzR}{4} \cr\cr
+  \addCitations{mzR}{5} \cr\cr
+  \addCitations{fastcluster}{1}
 }
 \seealso{
 \code{\link{MSPeakLists-class}}

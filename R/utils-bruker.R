@@ -356,7 +356,7 @@ addDAEIC <- function(analysis, path, mz, mzWindow = 0.005, ctype = "EIC", mtype 
         oldEICCount <- chroms$Count()
         chroms$AddChromatogram(makeDAEIC(mz, mzWindow, ctype, mtype, polarity, bgsubtr, fragpath))
         ret <- chroms$Count()
-        if (!is.null(name))
+        if (!is.null(name) && oldEICCount < ret)
             chroms[[ret]][["Name_"]] <- name
     }
 
@@ -442,6 +442,34 @@ addAllDAEICs <- function(fGroups, mzWindow = 0.005, ctype = "EIC", bgsubtr = FAL
     close(prog)
     
     invisible(NULL)
+}
+
+clearDAChromsAndSpecs <- function(DA, gNames, DAFind)
+{
+    # check if s matches our naming format
+    isFGroupName <- function(s) any(!is.na(pmatch(gNames, s)))
+    
+    chroms <- DA[["Analyses"]][[DAFind]][["Chromatograms"]]
+    ccount <- chroms$Count()
+    if (ccount > 0)
+    {
+        for (i in ccount:1) # reverse loop: indices should stay valid after deletion
+        {
+            if (isFGroupName(chroms[[i]][["Name"]]))
+                chroms$DeleteChromatogram(i)
+        }
+    }
+    
+    specs <- DA[["Analyses"]][[DAFind]][["Spectra"]]
+    scount <- specs$Count()
+    if (scount > 0)
+    {
+        for (i in scount:1)
+        {
+            if (isFGroupName(specs[[i]][["Name"]]))
+                specs$Delete(i)
+        }
+    }
 }
 
 generateDACompounds <- function(fGroups, bgsubtr, maxRtMSWidth, clear, save, MSMSType)
@@ -632,6 +660,122 @@ generateDACompounds <- function(fGroups, bgsubtr, maxRtMSWidth, clear, save, MSM
     names(compounds) <- anaInfo$analysis
 
     return(compounds)
+}
+
+generateDAEICsForPeakLists <- function(DA, ana, path, bgsubtr, MSMSType, gNames, featInfo, DAFind)
+{
+    cat("Adding EICs for spectra generation... ")
+    
+    # add general TIC MS chromatogram used for generating MS spectra
+    MSEIC <- addDAEIC(ana, path, 0, 0.005, "TIC", "MS", bgsubtr = bgsubtr, name = "MS TIC", hideDA = FALSE)
+    stopifnot(!is.null(MSEIC))
+
+    # add all MSMS traces
+    eics <- sapply(gNames, function(g)
+    {
+        fmz <- featInfo[group == g, mz]
+        makeDAEIC(fmz, 0.005, "TIC", MSMSType, bgsubtr = bgsubtr, fragpath = fmz)
+    }, simplify = TRUE, USE.NAMES = FALSE) # NOTE: simplify/USE.NAMES have to be this way to not get strange DCOM errors.
+    
+    chroms <- DA[["Analyses"]][[DAFind]][["Chromatograms"]]
+    oldEICCount <- chroms$Count()
+    chroms$AddChromatograms(eics)
+    newEICCount <- chroms$Count()
+
+    MSMSEICs <- list()
+    if (newEICCount > oldEICCount)
+    {
+        gCount <- length(gNames)
+        
+        # not all MSMS EICs may have been added when no MSMS data exists, find back which were added
+        curgrpi <- 1
+        for (eic in seq(oldEICCount + 1, newEICCount))
+        {
+            eicMz <- as.numeric(chroms[[eic]][["Definition"]][["MSFilter"]][["FragmentationPath"]])
+            
+            while (curgrpi <= gCount && !numEQ(featInfo[group == gNames[curgrpi], mz], eicMz, tol = 5e-3))
+                curgrpi <- curgrpi + 1
+            
+            if (curgrpi > gCount)
+                break
+            
+            MSMSEICs[[gNames[curgrpi]]] <- eic
+            chroms[[eic]][["Name_"]] <- sprintf("%s - %s", gNames[curgrpi], MSMSType)
+            curgrpi <- curgrpi + 1
+        }
+    }
+    
+    cat("Done!\n")
+    
+    return(list(MSEIC = MSEIC, MSMSEICs = MSMSEICs))
+}
+
+generateDASpecsForPeakLists <- function(DA, maxRtMSWidth, MSMSType, gNames, featInfo, DAEICs, DAFind)
+{
+    chroms <- DA[["Analyses"]][[DAFind]][["Chromatograms"]]
+    specs <- DA[["Analyses"]][[DAFind]][["Spectra"]]
+    
+    addSpectrum <- function(eic, grp, rt, rtmin, rtmax, mz, mtype)
+    {
+        if (!is.null(maxRtMSWidth) && diff(c(rtmin, rtmax)) > maxRtMSWidth)
+        {
+            rtmin <- max(rtmin, rt - maxRtMSWidth/2)
+            rtmax <- min(rtmax, rt + maxRtMSWidth/2)
+        }
+        
+        chroms[[eic]]$ClearRangeSelections()
+        chroms[[eic]]$AddRangeSelection(rtmin/60, rtmax/60, 0, 0) # divide by 60: seconds to minutes
+        
+        oldSpecCount <- specs$Count()
+        chroms[[eic]]$AverageMassSpectrum(1, 0)
+        newSpecCount <- specs$Count()
+        
+        if (oldSpecCount != newSpecCount)
+        {
+            # HACK HACK HACK: changing the name of a spectrum throws an error but actually seems to work,
+            # bug in RDCOM-client?
+            tryCatch(specs[[newSpecCount]][["Name"]] <- sprintf("%s - %s", grp, mtype), error = function(e) e)
+            return(newSpecCount)
+        }
+        
+        return(NA)
+    }
+    
+    gCount <- length(gNames)
+    printf("Adding spectra for %d feature groups...\n", gCount)
+    prog <- txtProgressBar(0, gCount, style=3)
+    
+    MSSpecs <- list(); MSMSSpecs <- list()
+    for (grpi in seq_along(gNames))
+    {
+        grp <- gNames[grpi]
+        fi <- featInfo[group == grp]
+        
+        spec <- addSpectrum(DAEICs$MSEIC, grp, fi$ret, fi$retmin, fi$retmax, fi$mz, "MS")
+        if (is.na(spec))
+            warning(sprintf("Failed to add MS spectrum for group %s, analysis %s, m/z %f", grp,
+                            DA[["Analyses"]][[DAFind]][["Spectra"]]$Name, fi$mz))
+        else
+            MSSpecs[[grp]] <- spec
+        
+        if (!is.null(DAEICs$MSMSEICs[[grp]]))
+        {
+            spec <- addSpectrum(DAEICs$MSMSEICs[[grp]], grp, fi$ret, fi$retmin, fi$retmax, fi$mz, MSMSType)
+            if (!is.na(spec))
+                MSMSSpecs[[grp]] <- spec
+        }
+        
+        setTxtProgressBar(prog, grpi)
+    }
+    
+    setTxtProgressBar(prog, gCount)
+    close(prog)
+    
+    cat("Deconvoluting spectra ...")
+    specs$Deconvolute()
+    cat("Done!\n")
+    
+    return(list(MSSpecs = MSSpecs, MSMSSpecs = MSMSSpecs))
 }
 
 getDAPeakList <- function(findDA, ind, useFMF, getMSMS, minInt)

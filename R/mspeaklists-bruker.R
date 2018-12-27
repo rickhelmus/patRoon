@@ -28,7 +28,8 @@ generateMSPeakListsDA <- function(fGroups, bgsubtr = TRUE, maxRtMSWidth = 20, mi
                                   clear = TRUE, save = TRUE, MSMSType = "MSMS", avgFGroupParams = getDefAvgPListParams())
 {
     # UNDONE: implement topMost
-
+    # UNDONE: better hashing
+    
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
     aapply(checkmate::assertFlag, . ~ bgsubtr + clear + save, fixed = list(add = ac))
@@ -37,86 +38,96 @@ generateMSPeakListsDA <- function(fGroups, bgsubtr = TRUE, maxRtMSWidth = 20, mi
     assertAvgPListParams(avgFGroupParams, add = ac)
     checkmate::reportAssertions(ac)
     
-    compounds <- generateDACompounds(fGroups, bgsubtr, maxRtMSWidth, clear, save, MSMSType)
-
     cacheDB <- openCacheDBScope()
-
+    baseHash <- makeHash(fGroups, bgsubtr, maxRtMSWidth, minMSIntensity, minMSMSIntensity, MSMSType)
+    
     ftindex <- groupFeatIndex(fGroups)
     fTable <- featureTable(fGroups)
     anaInfo <- analysisInfo(fGroups)
+    gCount <- length(fGroups)
+    gNames <- names(fGroups)
     DA <- getDAApplication()
-
+    
     hideDAInScope()
-
+    
     # structure: [[analysis]][[fGroup]][[MSType]][[MSPeak]]
-    ret <- list()
-
-    for (anai in seq_along(compounds))
+    peakLists <- lapply(seq_len(nrow(anaInfo)), function(anai)
     {
         ana <- anaInfo$analysis[anai]
-        findDA <- getDAFileIndex(DA, ana, anaInfo$path[anai])
-        anac <- compounds[[anai]]
-        gcount <- nrow(anac)
-
-        setHash <- makeHash(compounds[anai], ana)
+        anaFTInds <- unlist(ftindex[anai])
+        anaFTInds <- anaFTInds[anaFTInds != 0]
+        
+        if (length(anaFTInds) == 0)
+            return(NULL)
+        
+        anaGNames <- names(anaFTInds)
+        DAFind <- getDAFileIndex(DA, ana, anaInfo$path[anai])
+        
+        setHash <- makeHash(baseHash, ana) # UNDONE
         cachedSet <- loadCacheSet("MSPeakListsDA", setHash, cacheDB)
-        resultHashes <- vector("character", gcount)
-
-        if (is.null(cachedSet))
+        resultHashes <- sapply(anaGNames, makeHash, setHash) # UNDONE
+        cachedResults <- pruneList(sapply(resultHashes, function(h)
         {
-            cat("Deconvoluting spectra ...")
-            DA[["Analyses"]][[findDA]][["Spectra"]]$Deconvolute()
-            cat("Done!\n")
-        }
-
-        printf("Loading all MS peak lists for %d feature groups in analysis '%s'...\n", gcount, ana)
-        prog <- txtProgressBar(0, gcount, style=3)
-
-        for (grpi in seq_len(gcount))
-        {
-            gname <- colnames(ftindex)[grpi]
-
-            specindMS <- anac[["MSSpec"]][grpi]
-            if (specindMS == 0)
-                next # no MS spectrum for this group/analysis, don't bother
-
-            hash <- makeHash(setHash, gname)
-            resultHashes[grpi] <- hash
-
-            results <- NULL
+            result <- NULL
             if (!is.null(cachedSet))
-                results <- cachedSet[[hash]]
-            if (is.null(results))
-                results <- loadCacheData("MSPeakListsDA", hash, cacheDB)
-
-            if (is.null(results))
+                result <- cachedSet[[h]]
+            if (is.null(result))
+                result <- loadCacheData("MSPeakListsDA", h, cacheDB)
+            return(result)
+        }, simplify = FALSE))
+        
+        uncachedGNames <- setdiff(anaGNames, names(cachedResults))
+        if (length(uncachedGNames) > 0)
+        {
+            clearDAChromsAndSpecs(DA, uncachedGNames, DAFind)
+            
+            uncachedFTInds <- anaFTInds[names(anaFTInds) %in% uncachedGNames]
+            featInfo <- rbindlist(lapply(uncachedFTInds, function(fti) fTable[[ana]][fti]),
+                                  idcol = "group")
+            
+            DAEICs <- generateDAEICsForPeakLists(DA, ana, anaInfo$path[anai], bgsubtr, MSMSType,
+                                                 uncachedGNames, featInfo, DAFind)
+            
+            DASpecs <- generateDASpecsForPeakLists(DA, maxRtMSWidth, MSMSType, uncachedGNames, featInfo,
+                                                   DAEICs, DAFind)
+            
+            printf("Loading all MS peak lists for %d feature groups in analysis '%s'...\n", length(uncachedGNames), ana)
+            prog <- txtProgressBar(0, length(uncachedGNames), style = 3)
+            
+            uncachedResults <- setNames(lapply(seq_along(uncachedGNames), function(grpi)
             {
                 results <- list()
-
-                results$MS <- getDAPeakList(findDA, specindMS, FALSE, FALSE, minMSIntensity)
-
-                specindMSMS <- anac[["MSMSSpec"]][grpi]
-                if (specindMSMS != 0)
-                    results$MSMS <- getDAPeakList(findDA, specindMSMS, FALSE, TRUE, minMSMSIntensity)
+                grp <- uncachedGNames[grpi]
+                
+                if (!is.null(DASpecs$MSSpecs[[grp]]))
+                    results$MS <- getDAPeakList(DAFind, DASpecs$MSSpecs[[grp]], FALSE, FALSE, minMSIntensity)
+                
+                if (!is.null(DASpecs$MSMSSpecs[[grp]]))
+                    results$MSMS <- getDAPeakList(DAFind, DASpecs$MSMSSpecs[[grp]], FALSE, TRUE, minMSMSIntensity)
                 
                 results <- pruneList(results) # MS or MSMS entry might be NULL
-
-                saveCacheData("MSPeakListsDA", results, hash, cacheDB)
-            }
-
-            ret[[ana]][[gname]] <- results
-
-            setTxtProgressBar(prog, grpi)
+                saveCacheData("MSPeakListsDA", results, resultHashes[[grp]], cacheDB)
+                
+                setTxtProgressBar(prog, grpi)
+                return(results)
+            }), uncachedGNames)
+            
+            setTxtProgressBar(prog, length(uncachedGNames))
+            close(prog)
+            
+            cachedResults <- c(cachedResults, uncachedResults)
+            cachedResults <- cachedResults[intersect(anaGNames, names(cachedResults))]
         }
-
-        setTxtProgressBar(prog, gcount)
-        close(prog)
-
+        
         if (is.null(cachedSet))
-            saveCacheSet("MSPeakListsDA", resultHashes[resultHashes != ""], setHash, cacheDB)
-    }
-
-    return(MSPeakLists(peakLists = ret, avgPeakListArgs = avgFGroupParams, algorithm = "Bruker_DataAnalysis"))
+            saveCacheSet("MSPeakListsDA", resultHashes, setHash, cacheDB)
+        
+        return(cachedResults)
+    })
+    
+    peakLists <- pruneList(setNames(peakLists, anaInfo$analysis))
+    
+    return(MSPeakLists(peakLists = peakLists, avgPeakListArgs = avgFGroupParams, algorithm = "Bruker_DataAnalysis"))
 }
 
 #' @details \code{generateMSPeakListsDAFMF} is similar to \code{generateMSPeakListsDA},

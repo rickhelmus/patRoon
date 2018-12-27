@@ -74,6 +74,8 @@ Release:
     - setDAMethod(): mention that files are closed prior the method application, option to save or not
     - mention that highest intensity mz is assumed to be feature
     - auto close/save files
-    - make Cmpnt column optional for DA peaklists
     - merge generateDACompounds()
+    - function to load raw data, use for tests?
+    - NOTE about need to restart DA if strange DCOM errors occur
 - document pwiz path option
+- featInfo function --> generate feature info table for selected fgroup(s)

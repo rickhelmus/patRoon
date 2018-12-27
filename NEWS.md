@@ -1,6 +1,7 @@
 # patRoon 0.1.0.9000
 
 ## Decomber 2018
+* `revertDAAnalyses()` function: brings back set of Bruker analyses to their unprocessed state.
 * Minimum intensity arguments for Bruker DataAnalysis MS peak lists.
 * Slightly different `doFMF` beahviour for DataAnalysis feature finding.
 * Several important updates were made to fomula calculation functionality.

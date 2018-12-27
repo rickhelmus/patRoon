@@ -6,3 +6,9 @@ if (getOption("patRoon.clearCache", FALSE))
 
 if (!file.exists(getTestDataPath()))
     dir.create(getTestDataPath())
+
+if (doDATests())
+{
+    revertDAAnalyses(getDAAnaInfo())
+    clearCache("featuresBruker")
+}

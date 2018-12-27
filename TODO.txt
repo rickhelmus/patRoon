@@ -69,13 +69,12 @@ Release:
 - harmonize adduct specification for formulas/compounds (also update calculateIonFormula())
 - suspect screening: add MS/MS qualifiers
 - DA
-    - better checks what data is present in DA?
     - test MS peak lists deisotoping?
-    - setDAMethod(): mention that files are closed prior the method application, option to save or not
-    - mention that highest intensity mz is assumed to be feature
     - auto close/save files
-    - merge generateDACompounds()
-    - function to load raw data, use for tests?
-    - NOTE about need to restart DA if strange DCOM errors occur
+    - generateMSPeakListsDA: find precursor masses with larger window
+    - docs
+        - setDAMethod(): mention that files are closed prior the method application, option to save or not
+        - mention that highest intensity mz is assumed to be feature
+        - NOTE about need to restart DA if strange DCOM errors occur
 - document pwiz path option
 - featInfo function --> generate feature info table for selected fgroup(s)

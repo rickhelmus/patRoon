@@ -133,6 +133,31 @@ setDAMethod <- function(anaInfo, method)
     invisible(NULL)
 }
 
+#' @details \code{revertDAAnalyses} Reverts a given set of analyses to their
+#'   unprocessed raw state.
+#' @rdname bruker-utils
+#' @export
+revertDAAnalyses <- function(anaInfo)
+{
+    assertAnalysisInfo(anaInfo, "d")
+    
+    DA <- getDAApplication()
+    hideDAInScope()
+    
+    for (i in seq_len(nrow(anaInfo)))
+    {
+        printf("Reverting DA analysis '%s' (%d/%d)...\n", anaInfo$analysis[i], i, nrow(anaInfo))
+        
+        ind <- getDAFileIndex(DA, anaInfo$analysis[i], anaInfo$path[i])
+        if (ind == -1)
+            next
+        DA[["Analyses"]][[ind]]$LoadRawData()
+        DA[["Analyses"]][[ind]]$Save()
+    }
+    
+    invisible(NULL)
+}
+
 #' @details \code{recalibrarateDAFiles} Performs automatic mass recalibration of
 #'   a given set of analyses. The current method settings for each analyses will
 #'   be used.

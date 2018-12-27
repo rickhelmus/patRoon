@@ -23,13 +23,17 @@ simplifyDAFormula <- function(formula)
 #'   requires that features were obtained with
 #'   \code{\link{findFeaturesBruker}}. Unlike other algorithms, there is no
 #'   prior need to generate \code{\link[=MSPeakLists]{MS peak lists}}.
+#'   
 #' @param precursorMzSearchWindow Maximum \emph{m/z} deviation (Da) to find back feature data
 #'   of precursor/parent ions from MS/MS spectra (this data is not readily
 #'   available from \command{SmartFormula3D} results).
+#'   
+#' @template dasaveclose-args
+#' 
 #' @rdname formula-generation
 #' @export
 generateFormulasDA <- function(fGroups, precursorMzSearchWindow = 0.002, MSMode = "both",
-                               featThreshold = 0.75)
+                               featThreshold = 0.75, save = TRUE, close = save)
 {
     # UNDONE: test MSMode, duplicate MS formulas removal, new group formulas
 
@@ -38,6 +42,7 @@ generateFormulasDA <- function(fGroups, precursorMzSearchWindow = 0.002, MSMode 
     checkmate::assertNumber(precursorMzSearchWindow, lower = 0, finite = TRUE, add = ac)
     checkmate::assertChoice(MSMode, c("ms", "msms", "both"), add = ac)
     checkmate::assertNumber(featThreshold, lower = 0, finite = TRUE, null.ok = TRUE, add = ac)
+    assertDACloseSaveArgs(close, save, add = ac)
     checkmate::reportAssertions(ac)
 
     DA <- getDAApplication()
@@ -228,6 +233,8 @@ generateFormulasDA <- function(fGroups, precursorMzSearchWindow = 0.002, MSMode 
         setTxtProgressBar(prog, gCount)
         close(prog)
 
+        closeSaveDAFile(DA, DAAnaInd, close, save)
+        
         ngrp <- length(fTable[[ana]])
         printf("Loaded %d formulas for %d features (%.2f%%).\n", sum(unlist(lapply(fTable[[ana]], nrow))),
                ngrp, if (gCount == 0) 0 else ngrp * 100 / gCount)

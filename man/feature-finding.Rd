@@ -24,7 +24,7 @@
 findFeatures(analysisInfo, algorithm, ..., verbose = TRUE)
 
 findFeaturesBruker(analysisInfo, doFMF = "auto", startRange = 0,
-  endRange = 0, verbose = TRUE)
+  endRange = 0, save = TRUE, close = save, verbose = TRUE)
 
 findFeaturesEnviPick(analysisInfo, ..., verbose = TRUE)
 
@@ -69,6 +69,13 @@ if feature data needs to be updated.}
 \item{startRange, endRange}{Start/End retention range (seconds) from which to
 collect features. A 0 (zero) for \code{endRange} marks the end of the
 analysis.}
+
+\item{close, save}{If \code{TRUE} then Bruker files are closed and saved after
+processing with DataAnalysis, respectively. Setting \code{close=TRUE}
+prevents that many analyses might be opened simultaneously in DataAnalysis,
+which otherwise may use excessive memory or become slow. By default
+\code{save} is \code{TRUE} when \code{close} is \code{TRUE}, which is
+likely what you want as otherwise any processed data is lost.}
 
 \item{enviProjPath}{The path of the enviMass project.}
 

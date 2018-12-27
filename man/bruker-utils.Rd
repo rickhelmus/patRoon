@@ -4,6 +4,7 @@
 \alias{bruker-utils}
 \alias{showDataAnalysis}
 \alias{setDAMethod}
+\alias{revertDAAnalyses}
 \alias{recalibrarateDAFiles}
 \alias{getDACalibrationError}
 \alias{exportDAFiles}
@@ -13,9 +14,11 @@
 \usage{
 showDataAnalysis()
 
-setDAMethod(anaInfo, method)
+setDAMethod(anaInfo, method, close = TRUE)
 
-recalibrarateDAFiles(anaInfo)
+revertDAAnalyses(anaInfo, close = TRUE, save = close)
+
+recalibrarateDAFiles(anaInfo, close = TRUE, save = close)
 
 getDACalibrationError(anaInfo)
 
@@ -24,15 +27,23 @@ exportDAFiles(anaInfo, format = "mzML", exportLine = TRUE,
 
 addDAEIC(analysis, path, mz, mzWindow = 0.005, ctype = "EIC",
   mtype = "MS", polarity = "both", bgsubtr = FALSE, fragpath = "",
-  name = NULL, hideDA = TRUE)
+  name = NULL, hideDA = TRUE, close = FALSE, save = close)
 
 addAllDAEICs(fGroups, mzWindow = 0.005, ctype = "EIC",
-  bgsubtr = FALSE, name = TRUE, onlyPresent = TRUE, hideDA = TRUE)
+  bgsubtr = FALSE, name = TRUE, onlyPresent = TRUE, hideDA = TRUE,
+  close = FALSE, save = close)
 }
 \arguments{
 \item{anaInfo}{\link[=analysis-information]{Analysis info table}}
 
 \item{method}{The full path of the DataAnalysis method.}
+
+\item{close, save}{If \code{TRUE} then Bruker files are closed and saved after
+processing with DataAnalysis, respectively. Setting \code{close=TRUE}
+prevents that many analyses might be opened simultaneously in DataAnalysis,
+which otherwise may use excessive memory or become slow. By default
+\code{save} is \code{TRUE} when \code{close} is \code{TRUE}, which is
+likely what you want as otherwise any processed data is lost.}
 
 \item{format}{The output format of exported files. Should be either
 \code{"mzXML"}, \code{"mzML"} or \code{"mzData"}.}
@@ -105,10 +116,14 @@ required to be installed.
   again. Most functions using DataAnalysis will hide the window during
   processing for efficiency reasons. If the window remains hidden
   (\emph{e.g.} because there was an error) this function can be used to make
-  it visible again.
+  it visible again. This function can also be used to start DataAnalysis if
+  it is not running yet.
 
 \code{setDAMethod} Sets a given DataAnalysis method (\file{.m} file)
   to a set of analyses.
+
+\code{revertDAAnalyses} Reverts a given set of analyses to their
+  unprocessed raw state.
 
 \code{recalibrarateDAFiles} Performs automatic mass recalibration of
   a given set of analyses. The current method settings for each analyses will

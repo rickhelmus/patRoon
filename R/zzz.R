@@ -3,6 +3,7 @@ defaultPkgOpts <- function(pkgname)
     ret <- list(cache.mode = "both",
                 cache.fileName = "cache.sqlite",
                 maxProcAmount = parallel::detectCores(),
+                path.pwiz = "",
                 path.GenForm = "",
                 path.metFragCL = "",
                 path.SIRIUS = "",

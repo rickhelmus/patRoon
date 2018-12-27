@@ -15,7 +15,7 @@
 \S4method{generateFormulas}{featureGroups}(fGroups, algorithm, ...)
 
 generateFormulasDA(fGroups, precursorMzSearchWindow = 0.002,
-  MSMode = "both", featThreshold = 0.75)
+  MSMode = "both", featThreshold = 0.75, save = TRUE, close = save)
 
 generateFormulasGenForm(fGroups, MSPeakLists, maxMzDev = 5,
   adduct = "M+H", elements = "CHNOP", hetero = TRUE, oc = FALSE,
@@ -60,6 +60,13 @@ will be removed.}
 candidate for a feature group. For instance, \code{featThreshold} dictates
 that a formula should be present in at least 75% of the features inside a
 feature group.}
+
+\item{close, save}{If \code{TRUE} then Bruker files are closed and saved after
+processing with DataAnalysis, respectively. Setting \code{close=TRUE}
+prevents that many analyses might be opened simultaneously in DataAnalysis,
+which otherwise may use excessive memory or become slow. By default
+\code{save} is \code{TRUE} when \code{close} is \code{TRUE}, which is
+likely what you want as otherwise any processed data is lost.}
 
 \item{MSPeakLists}{An \code{\link{MSPeakLists}} object that was generated for
 the supplied \code{fGroups}.}

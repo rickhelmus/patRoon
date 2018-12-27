@@ -14,10 +14,9 @@ NULL
 #'   'spectral' algorithm.
 #' @param clear Remove any existing chromatogram traces/mass spectra prior to
 #'   making new ones.
-#' @param save Save data files after completion.
 #' @param MSMSType The type of MS/MS experiment performed: \code{"MSMS"} for
 #'   MRM/AutoMSMS or \code{"BBCID"} for broadband CID.
-#'
+#'   
 #' @note \code{generateMSPeakListsDA} requires that the \option{Component}
 #'   column is active (Method-->Parameters-->Layouts-->Mass List Layout) in
 #'   order to add isotopologue information.
@@ -25,7 +24,8 @@ NULL
 #' @rdname MSPeakLists-generation
 #' @export
 generateMSPeakListsDA <- function(fGroups, bgsubtr = TRUE, maxRtMSWidth = 20, minMSIntensity = 500, minMSMSIntensity = 500,
-                                  clear = TRUE, save = TRUE, MSMSType = "MSMS", avgFGroupParams = getDefAvgPListParams())
+                                  clear = TRUE, close = TRUE, save = close, MSMSType = "MSMS",
+                                  avgFGroupParams = getDefAvgPListParams())
 {
     # UNDONE: implement topMost
     # UNDONE: better hashing
@@ -36,6 +36,7 @@ generateMSPeakListsDA <- function(fGroups, bgsubtr = TRUE, maxRtMSWidth = 20, mi
     checkmate::assertNumber(maxRtMSWidth, lower = 0, finite = TRUE, null.ok = TRUE, add = ac)
     checkmate::assertChoice(MSMSType, c("MSMS", "BBCID"), add = ac)
     assertAvgPListParams(avgFGroupParams, add = ac)
+    assertDACloseSaveArgs(close, save, add = ac)
     checkmate::reportAssertions(ac)
     
     cacheDB <- openCacheDBScope()
@@ -122,6 +123,8 @@ generateMSPeakListsDA <- function(fGroups, bgsubtr = TRUE, maxRtMSWidth = 20, mi
         if (is.null(cachedSet))
             saveCacheSet("MSPeakListsDA", resultHashes, setHash, cacheDB)
         
+        closeSaveDAFile(DA, DAFind, close, save)
+        
         return(cachedResults)
     })
     
@@ -141,10 +144,11 @@ generateMSPeakListsDA <- function(fGroups, bgsubtr = TRUE, maxRtMSWidth = 20, mi
 #' @rdname MSPeakLists-generation
 #' @export
 generateMSPeakListsDAFMF <- function(fGroups, minMSIntensity = 500, minMSMSIntensity = 500,
-                                     avgFGroupParams = getDefAvgPListParams())
+                                     close = TRUE, save = close, avgFGroupParams = getDefAvgPListParams())
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
+    assertDACloseSaveArgs(close, save, add = ac)
     assertAvgPListParams(avgFGroupParams, add = ac)
     checkmate::reportAssertions(ac)
     
@@ -225,6 +229,8 @@ generateMSPeakListsDAFMF <- function(fGroups, minMSIntensity = 500, minMSMSInten
 
         if (is.null(cachedSet))
             saveCacheSet("MSPeakListsDAFMF", resultHashes[resultHashes != ""], setHash, cacheDB)
+        
+        closeSaveDAFile(DA, findDA, close, save)
     }
 
     return(MSPeakLists(peakLists = ret, avgPeakListArgs = avgFGroupParams, algorithm = "Bruker_DataAnalysis_FMF"))

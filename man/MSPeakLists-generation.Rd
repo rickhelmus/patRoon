@@ -16,11 +16,12 @@
 
 generateMSPeakListsDA(fGroups, bgsubtr = TRUE, maxRtMSWidth = 20,
   minMSIntensity = 500, minMSMSIntensity = 500, clear = TRUE,
-  save = TRUE, MSMSType = "MSMS",
+  close = TRUE, save = close, MSMSType = "MSMS",
   avgFGroupParams = getDefAvgPListParams())
 
 generateMSPeakListsDAFMF(fGroups, minMSIntensity = 500,
-  minMSMSIntensity = 500, avgFGroupParams = getDefAvgPListParams())
+  minMSMSIntensity = 500, close = TRUE, save = close,
+  avgFGroupParams = getDefAvgPListParams())
 
 generateMSPeakListsMzR(fGroups, maxRtMSWidth = 20,
   precursorMzWindow = 8, topMost = NULL,
@@ -56,7 +57,12 @@ to report many very low intensity peaks.}
 \item{clear}{Remove any existing chromatogram traces/mass spectra prior to
 making new ones.}
 
-\item{save}{Save data files after completion.}
+\item{close, save}{If \code{TRUE} then Bruker files are closed and saved after
+processing with DataAnalysis, respectively. Setting \code{close=TRUE}
+prevents that many analyses might be opened simultaneously in DataAnalysis,
+which otherwise may use excessive memory or become slow. By default
+\code{save} is \code{TRUE} when \code{close} is \code{TRUE}, which is
+likely what you want as otherwise any processed data is lost.}
 
 \item{MSMSType}{The type of MS/MS experiment performed: \code{"MSMS"} for
 MRM/AutoMSMS or \code{"BBCID"} for broadband CID.}

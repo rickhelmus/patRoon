@@ -409,6 +409,8 @@ NULL
 #'   For \code{getDefAvgPListParams}: Optional named arguments that override
 #'   defaults.
 #'
+#' @template dasaveclose-args
+#'
 #' @section Peak list averaging parameters: The parameters set used for
 #'   averaging peak lists are set by the \code{avgFeatParams} and
 #'   \code{avgFGroupParams} arguments. This should be a named \code{list} with
@@ -637,7 +639,9 @@ NULL
 #'   \code{NULL} for none.
 #' @param hideDA Hides DataAnalysis while adding the chromatographic trace
 #'   (faster).
-
+#'
+#' @template dasaveclose-args
+#'
 #' @name bruker-utils
 #'
 #' @seealso \code{\link{analysis-information}}

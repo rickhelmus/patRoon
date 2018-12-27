@@ -100,6 +100,12 @@ assertMultiProcArgs <- function(x, maxProcAmount, .var.name = checkmate::vname(x
     checkmate::assertCount(maxProcAmount, positive = TRUE, .var.name = "maxProcAmount", add = add)
 }
 
+assertDACloseSaveArgs <- function(x, save, .var.name = checkmate::vname(x), add = NULL)
+{
+    checkmate::assertFlag(x, .var.name = .var.name, add = add)
+    checkmate::assertFlag(save, .var.name = "save", add = add)
+}
+
 checkCSVFile <- function(x, cols)
 {
     ret <- checkmate::checkFileExists(x, "r")

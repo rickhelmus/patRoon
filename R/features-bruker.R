@@ -25,15 +25,20 @@ featuresBruker <- setClass("featuresBruker", contains = "features")
 #' @param startRange,endRange Start/End retention range (seconds) from which to
 #'   collect features. A 0 (zero) for \code{endRange} marks the end of the
 #'   analysis.
+#' 
+#' @template dasaveclose-args
+#' 
 #' @rdname feature-finding
 #' @export
-findFeaturesBruker <- function(analysisInfo, doFMF = "auto", startRange = 0, endRange = 0, verbose = TRUE)
+findFeaturesBruker <- function(analysisInfo, doFMF = "auto", startRange = 0, endRange = 0,
+                               save = TRUE, close = save, verbose = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
     assertAnalysisInfo(analysisInfo, "d", add = ac)
     checkmate::assertChoice(doFMF, c("auto", "force"), add = ac)
     checkmate::assertNumber(startRange, lower = 0, finite = TRUE, add = ac)
     checkmate::assertNumber(endRange, lower = 0, finite = TRUE, add = ac)
+    assertDACloseSaveArgs(close, save, add = ac)
     checkmate::reportAssertions(ac)
 
     ret <- featuresBruker(analysisInfo = analysisInfo)
@@ -43,13 +48,13 @@ findFeaturesBruker <- function(analysisInfo, doFMF = "auto", startRange = 0, end
 
     ret@features = sapply(seq_len(nrow(analysisInfo)),
                           function(i) getDAFeatures(DA, analysisInfo$analysis[i], analysisInfo$path[i], doFMF,
-                                                    startRange, endRange, verbose), simplify = FALSE)
+                                                    startRange, endRange, close, save, verbose), simplify = FALSE)
     names(ret@features) <- analysisInfo$analysis
 
     return(ret)
 }
 
-getDAFeatures <- function(DA, analysis, path, doFMF, startRange, endRange, verbose)
+getDAFeatures <- function(DA, analysis, path, doFMF, startRange, endRange, close, save, verbose)
 {
     printf("Loading bruker features for analysis '%s'...\n", analysis)
 
@@ -59,9 +64,8 @@ getDAFeatures <- function(DA, analysis, path, doFMF, startRange, endRange, verbo
     if (is.null(ret))
     {
         ind <- getDAFileIndex(DA, analysis, path)
-
         if (ind == -1)
-            return()
+            stop(sprintf("Failed to open analysis %s from path %s!", analysis, path))
 
         cmpds <- DA[["Analyses"]][[ind]][["Compounds"]]
         ccount <- cmpds[["Count"]]
@@ -132,6 +136,8 @@ getDAFeatures <- function(DA, analysis, path, doFMF, startRange, endRange, verbo
 
         ret <- dt[seq_len(dtCount)]
         saveCacheData("featuresBruker", ret, hash)
+        
+        closeSaveDAFile(DA, ind, close, save)
     }
 
     if (verbose)

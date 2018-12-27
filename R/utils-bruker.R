@@ -19,7 +19,8 @@ hideDAInScope <- withr::local_(function(x) getDAApplication()$Hide(), function(x
 #'   again. Most functions using DataAnalysis will hide the window during
 #'   processing for efficiency reasons. If the window remains hidden
 #'   (\emph{e.g.} because there was an error) this function can be used to make
-#'   it visible again.
+#'   it visible again. This function can also be used to start DataAnalysis if
+#'   it is not running yet.
 #' @rdname bruker-utils
 #' @export
 showDataAnalysis <- function() getDAApplication()$Show()
@@ -87,15 +88,16 @@ getDAFileIndex <- function(DA, analysis, path, openFileIfClosed = TRUE)
     return(ret)
 }
 
-closeDAFile <- function(DA, analysis, path, save)
+closeSaveDAFile <- function(DA, DAFind, close, save)
 {
-    ind <- getDAFileIndex(DA, analysis, path, FALSE)
-    if (ind != -1)
+    if (DAFind != -1)
     {
         if (save)
-            DA[["Analyses"]][[ind]]$Save()
-        DA[["Analyses"]][[ind]]$Close()
+            DA[["Analyses"]][[DAFind]]$Save()
+        if (close)
+            DA[["Analyses"]][[DAFind]]$Close()
     }
+    invisible(NULL)
 }
 
 #' @details \code{setDAMethod} Sets a given DataAnalysis method (\file{.m} file)
@@ -105,11 +107,12 @@ closeDAFile <- function(DA, analysis, path, save)
 #'
 #' @rdname bruker-utils
 #' @export
-setDAMethod <- function(anaInfo, method)
+setDAMethod <- function(anaInfo, method, close = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
     assertAnalysisInfo(anaInfo, "d", add = ac)
     checkmate::assertDirectoryExists(method, add = ac)
+    checkmate::assertFlag(close, add = ac)
     checkmate::reportAssertions(ac)
     
     DA <- getDAApplication()
@@ -121,13 +124,14 @@ setDAMethod <- function(anaInfo, method)
         printf("Setting DA method of analysis '%s' to %s (%d/%d)...\n", anaInfo$analysis[i], method, i, nrow(anaInfo))
 
         # HACK: need to close file (if open) otherwise method is not applied
-        closeDAFile(DA, anaInfo$analysis[i], anaInfo$path[i], TRUE)
+        ind <- getDAFileIndex(DA, anaInfo$analysis[i], anaInfo$path[i], openFileIfClosed = FALSE)
+        closeSaveDAFile(DA, ind, TRUE, TRUE)
 
         ind <- getDAFileIndex(DA, anaInfo$analysis[i], anaInfo$path[i])
         if (ind == -1)
             next
         DA[["Analyses"]][[ind]]$LoadMethod(method)
-        DA[["Analyses"]][[ind]]$Save()
+        closeSaveDAFile(DA, ind, close, TRUE)
     }
 
     invisible(NULL)
@@ -137,9 +141,12 @@ setDAMethod <- function(anaInfo, method)
 #'   unprocessed raw state.
 #' @rdname bruker-utils
 #' @export
-revertDAAnalyses <- function(anaInfo)
+revertDAAnalyses <- function(anaInfo, close = TRUE, save = close)
 {
-    assertAnalysisInfo(anaInfo, "d")
+    ac <- checkmate::makeAssertCollection()
+    assertAnalysisInfo(anaInfo, "d", add = ac)
+    assertDACloseSaveArgs(close, save, add = ac)
+    checkmate::reportAssertions(ac)
     
     DA <- getDAApplication()
     hideDAInScope()
@@ -152,7 +159,7 @@ revertDAAnalyses <- function(anaInfo)
         if (ind == -1)
             next
         DA[["Analyses"]][[ind]]$LoadRawData()
-        DA[["Analyses"]][[ind]]$Save()
+        closeSaveDAFile(DA, ind, close, save)
     }
     
     invisible(NULL)
@@ -164,9 +171,12 @@ revertDAAnalyses <- function(anaInfo)
 #'
 #' @rdname bruker-utils
 #' @export
-recalibrarateDAFiles <- function(anaInfo)
+recalibrarateDAFiles <- function(anaInfo, close = TRUE, save = close)
 {
+    ac <- checkmate::makeAssertCollection()
     assertAnalysisInfo(anaInfo, "d")
+    assertDACloseSaveArgs(close, save, add = ac)
+    checkmate::reportAssertions(ac)
     
     DA <- getDAApplication()
     hideDAInScope()
@@ -183,9 +193,9 @@ recalibrarateDAFiles <- function(anaInfo)
         }
         else
         {
-            DA[["Analyses"]][[ind]]$Save()
             # UNDONE: assume there is only one calibration item
             printf("Done! (std: %f ppm)\n", DA[["Analyses"]][[ind]][["CalibrationStatus"]][[1]]$StandardDeviation())
+            closeSaveDAFile(DA, ind, close, save)
         }
     }
 
@@ -348,7 +358,7 @@ makeDAEIC <- function(mz, mzWindow, ctype = "EIC", mtype = "MS", polarity = "bot
 #' @rdname bruker-utils
 #' @export
 addDAEIC <- function(analysis, path, mz, mzWindow = 0.005, ctype = "EIC", mtype = "MS", polarity = "both", bgsubtr = FALSE, fragpath = "",
-                     name = NULL, hideDA = TRUE)
+                     name = NULL, hideDA = TRUE, close = FALSE, save = close)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertString(analysis, min.chars = 1, add = ac)
@@ -366,6 +376,7 @@ addDAEIC <- function(analysis, path, mz, mzWindow = 0.005, ctype = "EIC", mtype 
     )
     checkmate::assertString(name, min.chars = 1, null.ok = TRUE, add = ac)
     checkmate::assertFlag(hideDA, add = ac)
+    assertDACloseSaveArgs(close, save, add = ac)
     checkmate::reportAssertions(ac)
     
     DA <- getDAApplication()
@@ -383,6 +394,7 @@ addDAEIC <- function(analysis, path, mz, mzWindow = 0.005, ctype = "EIC", mtype 
         ret <- chroms$Count()
         if (!is.null(name) && oldEICCount < ret)
             chroms[[ret]][["Name_"]] <- name
+        closeSaveDAFile(DA, ind, close, save)
     }
 
     return(ret)
@@ -400,13 +412,14 @@ addDAEIC <- function(analysis, path, mz, mzWindow = 0.005, ctype = "EIC", mtype 
 #' @rdname bruker-utils
 #' @export
 addAllDAEICs <- function(fGroups, mzWindow = 0.005, ctype = "EIC", bgsubtr = FALSE, name = TRUE,
-                         onlyPresent = TRUE, hideDA = TRUE)
+                         onlyPresent = TRUE, hideDA = TRUE, close = FALSE, save = close)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
     checkmate::assertNumber(mzWindow, lower = 0, finite = TRUE, add = ac)
     checkmate::assertChoice(ctype, c("EIC", "BPC"), add = ac)
     aapply(checkmate::assertFlag, . ~ bgsubtr + name + hideDA, fixed = list(add = ac))
+    assertDACloseSaveArgs(close, save, add = ac)
     checkmate::reportAssertions(ac)
     
     gInfo <- groupInfo(fGroups)
@@ -459,6 +472,8 @@ addAllDAEICs <- function(fGroups, mzWindow = 0.005, ctype = "EIC", bgsubtr = FAL
                     chroms[[eici]][["Name_"]] <- gNames[eici - oldEICCount]
             }
         }
+        
+        closeSaveDAFile(DA, ind, close, save)
         
         setTxtProgressBar(prog, anai)
     }

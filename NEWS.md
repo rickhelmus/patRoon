@@ -1,6 +1,7 @@
 # patRoon 0.1.0.9000
 
 ## Decomber 2018
+* Automatic saving & closing of analyses processed with DataAnalysis. Files are now generally closed by default to limit the resources needed by DataAnalysis. 
 * `revertDAAnalyses()` function: brings back set of Bruker analyses to their unprocessed state.
 * Minimum intensity arguments for Bruker DataAnalysis MS peak lists.
 * Slightly different `doFMF` beahviour for DataAnalysis feature finding.

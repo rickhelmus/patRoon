@@ -32,8 +32,8 @@
 
 <meta property="og:title" content="Automatic chemical formula generation — formula-generation" />
 
-<meta property="og:description" content="Functionality to automatically calculate chemical formulae from feature
-groups and generate a consensus over all analyses." />
+<meta property="og:description" content="Functionality to automatically calculate chemical formulae for all feature
+groups." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -107,14 +107,14 @@ groups and generate a consensus over all analyses." />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Automatic chemical formula generation</h1>
-    <small class="dont-index">Source: <a href='https://github.com/rickhelmus/patRoon/blob/master/R/main.R'><code>R/main.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/formulas.R'><code>R/formulas.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/formula-bruker.R'><code>R/formula-bruker.R</code></a>, and 3 more</small>
+    <small class="dont-index">Source: <a href='https://github.com/rickhelmus/patRoon/blob/master/R/main.R'><code>R/main.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/formulas.R'><code>R/formulas.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/formula-bruker.R'><code>R/formula-bruker.R</code></a>, and 4 more</small>
     <div class="hidden name"><code>formula-generation.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>Functionality to automatically calculate chemical formulae from feature
-groups and generate a consensus over all analyses.</p>
+    <p>Functionality to automatically calculate chemical formulae for all feature
+groups.</p>
     
     </div>
 
@@ -122,18 +122,21 @@ groups and generate a consensus over all analyses.</p>
 <span class='fu'>generateFormulas</span>(<span class='no'>fGroups</span>, <span class='no'>algorithm</span>, <span class='no'>...</span>)
 
 <span class='fu'>generateFormulasDA</span>(<span class='no'>fGroups</span>, <span class='kw'>precursorMzSearchWindow</span> <span class='kw'>=</span> <span class='fl'>0.002</span>,
-  <span class='kw'>MSMode</span> <span class='kw'>=</span> <span class='st'>"both"</span>)
+  <span class='kw'>MSMode</span> <span class='kw'>=</span> <span class='st'>"both"</span>, <span class='kw'>featThreshold</span> <span class='kw'>=</span> <span class='fl'>0.75</span>)
 
 <span class='fu'>generateFormulasGenForm</span>(<span class='no'>fGroups</span>, <span class='no'>MSPeakLists</span>, <span class='kw'>maxMzDev</span> <span class='kw'>=</span> <span class='fl'>5</span>,
-  <span class='kw'>adduct</span> <span class='kw'>=</span> <span class='st'>"M+H"</span>, <span class='kw'>elements</span> <span class='kw'>=</span> <span class='st'>"CHNOP"</span>, <span class='kw'>hetero</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>MSMode</span> <span class='kw'>=</span> <span class='st'>"both"</span>, <span class='kw'>extraOpts</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>maxProcAmount</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/options'>getOption</a></span>(<span class='st'>"patRoon.maxProcAmount"</span>),
+  <span class='kw'>adduct</span> <span class='kw'>=</span> <span class='st'>"M+H"</span>, <span class='kw'>elements</span> <span class='kw'>=</span> <span class='st'>"CHNOP"</span>, <span class='kw'>hetero</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>oc</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>extraOpts</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>calculateFeatures</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>featThreshold</span> <span class='kw'>=</span> <span class='fl'>0.75</span>,
+  <span class='kw'>MSMode</span> <span class='kw'>=</span> <span class='st'>"both"</span>, <span class='kw'>maxProcAmount</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/options'>getOption</a></span>(<span class='st'>"patRoon.maxProcAmount"</span>),
   <span class='kw'>maxCmdsPerProc</span> <span class='kw'>=</span> <span class='fl'>25</span>)
+
+<span class='fu'>formulaScorings</span>()
 
 <span class='fu'>generateFormulasSirius</span>(<span class='no'>fGroups</span>, <span class='no'>MSPeakLists</span>, <span class='kw'>maxMzDev</span> <span class='kw'>=</span> <span class='fl'>5</span>,
   <span class='kw'>adduct</span> <span class='kw'>=</span> <span class='st'>"[M+H]+"</span>, <span class='kw'>elements</span> <span class='kw'>=</span> <span class='st'>"CHNOP"</span>, <span class='kw'>profile</span> <span class='kw'>=</span> <span class='st'>"qtof"</span>,
-  <span class='kw'>database</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>noise</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>logPath</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/file.path'>file.path</a></span>(<span class='st'>"log"</span>,
-  <span class='st'>"sirius"</span>), <span class='kw'>maxProcAmount</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/options'>getOption</a></span>(<span class='st'>"patRoon.maxProcAmount"</span>))</pre>
+  <span class='kw'>database</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>noise</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>calculateFeatures</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>featThreshold</span> <span class='kw'>=</span> <span class='fl'>0.75</span>, <span class='kw'>logPath</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/file.path'>file.path</a></span>(<span class='st'>"log"</span>, <span class='st'>"sirius"</span>),
+  <span class='kw'>maxProcAmount</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/options'>getOption</a></span>(<span class='st'>"patRoon.maxProcAmount"</span>))</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -167,8 +170,17 @@ available from <code class='command'>SmartFormula3D</code> results).</p></td>
       <td><p>Whether formulae should be generated only from MS data
 (<code>"ms"</code>), MS/MS data (<code>"msms"</code>) or both (<code>"both"</code>). Using
 the latter option, unique formulae from MS data will still be reported if
-not predicted from MS/MS data. Formulae calculated from MS data that were
-also generated from MS/MS data will be removed.</p></td>
+not predicted from MS/MS data (<em>e.g.</em> due to poor/missing MS/MS data).
+Formulae calculated from MS data that were also generated from MS/MS data
+will be removed.</p></td>
+    </tr>
+    <tr>
+      <th>featThreshold</th>
+      <td><p>If <code>calculateFeatures=TRUE</code>: minimum presence
+(<samp>0-1</samp>) of a formula in all features before it is considered as a
+candidate for a feature group. For instance, <code>featThreshold</code> dictates
+that a formula should be present in at least 75<!-- % of the features inside a -->
+feature group.</p></td>
     </tr>
     <tr>
       <th>MSPeakLists</th>
@@ -214,10 +226,20 @@ respectively.</p></td>
 <span class="option">het</span> commandline option.</p></td>
     </tr>
     <tr>
+      <th>oc</th>
+      <td><p>Only consider organic formulae (<em>i.e.</em> with at least one
+carbon atom). Sets the <span class="option">oc</span> commandline option.</p></td>
+    </tr>
+    <tr>
       <th>extraOpts</th>
       <td><p>An optional character vector with any other commandline
 options that will be passed to <code class='command'>GenForm</code>. See the <code>GenForm
 options</code> section for all available commandline options.</p></td>
+    </tr>
+    <tr>
+      <th>calculateFeatures</th>
+      <td><p>If <code>TRUE</code> fomulae are first calculated for all
+features prior to feature group assignment (see details).</p></td>
     </tr>
     <tr>
       <th>maxProcAmount</th>
@@ -267,7 +289,23 @@ logging.</p></td>
 feature groups. All tools use the accurate mass of a feature to
 back-calculate candidate formulae. Depending on the algorithm and data
 availability, other data such as isotopic pattern and MS/MS fragments may be
-used to further improve formula assignment.</p>
+used to further improve formula assignment and ranking.</p>
+<p>When DataAnalysis is used for formula generation or
+<code>calculateFeatures=TRUE</code> formulae are first calculated for each feature.
+The results are then combined for final assignment of candidate formulae for
+each feature group (if a formula was found in multiple features within the
+group, the reported scorings and other values are those from the best ranked
+feature). The calculation of formulae on 'feature level' might result in a
+more thorough formula search and better removal of outliers (controlled by
+<code>featThreshold</code> argument). In contrast, when calculations occur on
+'feature group level' (<em>i.e.</em> <code>calculateFeatures=FALSE</code>), formulae
+are directly assigned to each feature group (by using group averaged peak MS
+lists), which significantly reduces processing time is, especially with many
+analyses. Note that in both situations subsequent algorithms that use formula
+data (<em>e.g.</em> <code><a href='compounds-class.html'>addFormulaScoring</a></code> and <a href='reporting.html'>reporting</a>
+functions) only use formula data that was eventually assigned to feature
+groups. Furthermore, please note that calculation of formulae with
+DataAnalysis always occurs on 'feature level'.</p>
 <p><code>generateFormulas</code> is a generic function that will generate formulae
   using one of the supported algorithms. The actual functionality is provided
   by algorithm specific functions such as <code>generateFormulasDA</code> and
@@ -290,6 +328,8 @@ used to further improve formula assignment.</p>
   <a href='https://sourceforge.net/projects/genform/'>GenForm</a> to generate
   chemical formulae. When MS/MS data is available it will be used to score
   candidate formulae by presence of 'fitting' fragments.</p>
+<p><code>formulaScorings</code> returns a <code>data.frame</code> with information
+  on which scoring terms are used and what their algorithm specific name is.</p>
 <p><code>generateFormulasSirius</code> uses
   <a href='https://bio.informatik.uni-jena.de/software/sirius/'>SIRIUS</a> to
   generate chemical formulae. Similarity of measured and theoretical isotopic
@@ -300,6 +340,32 @@ used to further improve formula assignment.</p>
 
     <p><code>generateFormulasGenForm</code> always sets the <span class="option">exist</span> and
   <span class="option">oei</span> <code class='command'>GenForm</code> commandline options.</p>
+    
+    <h2 class="hasAnchor" id="scorings"><a class="anchor" href="#scorings"></a>Scorings</h2>
+
+    <p>Each algorithm implements their own scoring system. Their
+  names have been harmonized where possible. An overview is obtained with the
+  <code>formulaScorings</code> function:
+  <table class='table'>
+<tr><td></td><td></td><td><strong>name</strong></td><td></td><td></td></tr>
+<tr><td><strong>genform</strong></td><td></td><td></td><td><strong>sirius</strong></td><td></td></tr>
+<tr><td></td><td><strong>bruker</strong></td><td></td><td></td><td><strong>description</strong></td></tr>
+<tr><td></td><td></td><td>combMatch</td><td>comb_match</td><td>-</td></tr>
+<tr><td>-</td><td>MS and MS/MS combined match value</td><td></td><td>frag_mSigma</td><td>-</td></tr>
+<tr><td>-</td><td>mSigma (SmartFormula3D)</td><td>Deviation of isotopic pattern of fragment</td><td></td><td>frag_score</td></tr>
+<tr><td>-</td><td>-</td><td>Score (SmartFormula3D)</td><td>MS/MS fragment score</td><td></td></tr>
+<tr><td>isoScore</td><td>MS_match</td><td>isoScore</td><td>-</td><td>How well the isotopic pattern matches</td></tr>
+<tr><td></td><td>mSigma</td><td>-</td><td>-</td><td>mSigma</td></tr>
+<tr><td>Deviation of the isotopic pattern</td><td></td><td>MSMSScore</td><td>MSMS_match</td><td>treeScore</td></tr>
+<tr><td>-</td><td>How well MS/MS data matches</td><td></td><td>score</td><td>-</td></tr>
+<tr><td>score</td><td>Score</td><td>Overall MS formula score</td><td></td><td></td></tr>
+</table></p>
+    
+    <h2 class="hasAnchor" id="genform-options"><a class="anchor" href="#genform-options"></a>GenForm options</h2>
+
+    <p>Below is a list of options (generated by running
+  <code class='command'>GenForm</code> without commandline options) which can be set by the
+  <code>extraOpts</code> parameter.</p>
     
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
@@ -319,10 +385,9 @@ doi: <a href='http://doi.org/10.1093/bioinformatics/btn603'>10.1093/bioinformati
     
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code><a href='formulas-class.html'>formulas-class</a></code> and
-  <code><a href='formulaConsensus-class.html'>formulaConsensus-class</a></code>. The
+    <div class='dont-index'><p><code><a href='formulas-class.html'>formulas-class</a></code>. The
   <a href='https://www.researchgate.net/publication/307964728_MOLGEN-MSMS_Software_User_Manual'>GenForm
-  manual</a> (formerly known as MOLGEN-MSMS).</p></div>
+   manual</a> (also known as MOLGEN-MSMS).</p></div>
     
 
   </div>
@@ -336,6 +401,10 @@ doi: <a href='http://doi.org/10.1093/bioinformatics/btn603'>10.1093/bioinformati
       <li><a href="#details">Details</a></li>
 
       <li><a href="#note">Note</a></li>
+
+      <li><a href="#scorings">Scorings</a></li>
+
+      <li><a href="#genform-options">GenForm options</a></li>
 
       <li><a href="#references">References</a></li>
 
@@ -351,7 +420,7 @@ doi: <a href='http://doi.org/10.1093/bioinformatics/btn603'>10.1093/bioinformati
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.2.0.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.3.0.</p>
 </div>
       </footer>
    </div>

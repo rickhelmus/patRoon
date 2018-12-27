@@ -242,7 +242,7 @@ The output of `reportMD()` can be viewed [here](../examples/report.html).
 
 Note that these functions can be called at any time during the workflow. This may be especially useful if you want evaluate results during optimization or exploring the various algorithms available.
 
-```{r echo=FALSE,eval=!pkgdown::in_pkgdown()}
+```{r echo=FALSE,eval=pkgdown::in_pkgdown()}
 # do the actual reporting here
 
 # ugly work around for nested rmarkdown call made by reportMD; based on https://gist.github.com/jennybc/1f747c5bb84aa9be9c3c

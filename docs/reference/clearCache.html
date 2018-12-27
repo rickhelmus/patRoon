@@ -118,7 +118,7 @@ results.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>clearCache</span>(<span class='kw'>what</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
+    <pre class="usage"><span class='fu'>clearCache</span>(<span class='kw'>what</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>file</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -131,6 +131,11 @@ indication of their size (database rows). If <code>what = "all"</code> then the
 complete file will be removed. Finally, <code>what</code> can be a character
 vector with table names that should be removed.</p></td>
     </tr>
+    <tr>
+      <th>file</th>
+      <td><p>The cache file. If <code>NULL</code> then the value of the
+<code>patRoon.cache.fileName</code> option is used.</p></td>
+    </tr>
     </table>
     
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
@@ -138,7 +143,7 @@ vector with table names that should be removed.</p></td>
     <p>This function will either remove one or more tables within the cache
 <code>sqlite</code> database or simply wipe the whole cache file. Removing tables
 will <code>VACUUM</code> the database, which may take some time for large cache
-files. (intermediate) processing results.</p>
+files.</p>
     
 
   </div>
@@ -159,7 +164,7 @@ files. (intermediate) processing results.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.2.0.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.3.0.</p>
 </div>
       </footer>
    </div>

@@ -106,46 +106,6 @@ setMethod("generateConsensusXML", "features", function(feat, out, rtalign, QT, m
                    stderr = if (verbose) "" else FALSE)
 })
 
-# generating XML via package is too slow...http://r.789695.n4.nabble.com/Creating-XML-document-extremely-slow-td4376088.html
-# generate by simply writing text to file instead
-writeFeatureXML <- function(ft, out)
-{
-    con <- file(out, "w")
-
-    writeLine <- function(level, txt, ...)
-    {
-        if (level > 0)
-            cat(rep("    ", level), file=con)
-        cat(paste0(sprintf(txt, ...), "\n"), file=con)
-    }
-
-    writeLine(0, '<?xml version="1.0" encoding="ISO-8859-1"?>')
-
-    writeLine(0, '<featureMap version="1.9" id="fm" xsi:noNamespaceSchemaLocation="http://open-ms.sourceforge.net/schemas/FeatureXML_1_9.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">')
-
-    writeLine(1, '<featureList count="%d">', nrow(ft))
-
-    for (i in seq_len(nrow(ft)))
-    {
-        writeLine(2, '<feature id="f_%d">', i)
-
-        writeLine(3, '<position dim="0">%f</position>', ft[i, ret])
-        writeLine(3, '<position dim="1">%f</position>', ft[i, mz])
-        writeLine(3, '<intensity>%f</intensity>', ft[i, area])
-        writeLine(3, '<quality dim="0">0</quality>')
-        writeLine(3, '<quality dim="1">0</quality>')
-        writeLine(3, '<overallquality>0</overallquality>')
-        writeLine(3, '<charge>0</charge>')
-
-        writeLine(2, '</feature>')
-    }
-
-    writeLine(1, "</featureList>")
-
-    writeLine(0, "</featureMap>")
-    close(con)
-}
-
 importConsensusXML <- function(feat, cfile)
 {
     cat("Importing consensus XML...")

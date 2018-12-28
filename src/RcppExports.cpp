@@ -28,6 +28,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// writeFeatureXML
+void writeFeatureXML(Rcpp::DataFrame featList, Rcpp::CharacterVector out);
+RcppExport SEXP _patRoon_writeFeatureXML(SEXP featListSEXP, SEXP outSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::DataFrame >::type featList(featListSEXP);
+    Rcpp::traits::input_parameter< Rcpp::CharacterVector >::type out(outSEXP);
+    writeFeatureXML(featList, out);
+    return R_NilValue;
+END_RCPP
+}
 // loadEICIntensities
 Rcpp::NumericVector loadEICIntensities(Rcpp::List spectra, Rcpp::DataFrame featList, Rcpp::NumericVector rtWindow);
 RcppExport SEXP _patRoon_loadEICIntensities(SEXP spectraSEXP, SEXP featListSEXP, SEXP rtWindowSEXP) {
@@ -58,6 +69,7 @@ END_RCPP
 static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_parseFeatureXMLFile", (DL_FUNC) &_patRoon_parseFeatureXMLFile, 1},
     {"_patRoon_parseFeatConsXMLFile", (DL_FUNC) &_patRoon_parseFeatConsXMLFile, 2},
+    {"_patRoon_writeFeatureXML", (DL_FUNC) &_patRoon_writeFeatureXML, 2},
     {"_patRoon_loadEICIntensities", (DL_FUNC) &_patRoon_loadEICIntensities, 3},
     {"_patRoon_loadEICs", (DL_FUNC) &_patRoon_loadEICs, 3},
     {NULL, NULL, 0}

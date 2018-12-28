@@ -1,3 +1,5 @@
+#include <iomanip>
+#include <fstream>
 #include <string>
 #include <vector>
 
@@ -70,4 +72,46 @@ Rcpp::List parseFeatConsXMLFile(Rcpp::CharacterVector file, Rcpp::IntegerVector 
     
     return Rcpp::List::create(Rcpp::Named("gInfo") = gInfo,
                               Rcpp::Named("ftindex") = ftindex);
+}
+
+// generating XML via package is too slow...http://r.789695.n4.nabble.com/Creating-XML-document-extremely-slow-td4376088.html
+// generate by simply writing text to file instead
+// [[Rcpp::export]]
+void writeFeatureXML(Rcpp::DataFrame featList, Rcpp::CharacterVector out)
+{
+    const char *outStr = Rcpp::as<const char *>(out);
+    const Rcpp::NumericVector rets = featList["ret"];
+    const Rcpp::NumericVector mzs = featList["mz"];
+    const Rcpp::NumericVector areas = featList["area"];
+    const int ftCount = rets.length();
+    
+    std::ofstream ofile(outStr);
+    ofile << "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n"
+          << "<featureMap version=\"1.9\" id=\"fm\" "
+          << "xsi:noNamespaceSchemaLocation=\"http://open-ms.sourceforge.net/schemas/FeatureXML_1_9.xsd\" "
+          << "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n";
+    
+    auto indent = [](int level) { return(std::string(level * 4, ' ')); };
+    
+    ofile << indent(1) << "<featureList count=\"" << ftCount << "\">\n";
+    ofile << std::fixed << std::setprecision(6);
+    for (int fti=0; fti<ftCount; ++fti)
+    {
+        ofile << indent(2) << "<feature id=\"f_" << fti + 1 << "\">\n";
+        
+        ofile << indent(3) << "<position dim=\"0\">" << rets[fti] << "</position>\n";
+        ofile << indent(3) << "<position dim=\"1\">" << mzs[fti] << "</position>\n";
+        ofile << indent(3) << "<intensity>" << areas[fti] << "</intensity>\n";
+        ofile << indent(3) << "<quality dim=\"0\">0</quality>\n";
+        ofile << indent(3) << "<quality dim=\"1\">0</quality>\n";
+        ofile << indent(3) << "<overallquality>0</overallquality>\n";
+        ofile << indent(3) << "<charge>0</charge>\n";
+        
+        ofile << indent(2) << "</feature>\n";
+    }
+    
+    ofile << indent(1) << "</featureList>\n";
+    ofile << "</featureMap>\n";
+    
+    ofile.close();
 }

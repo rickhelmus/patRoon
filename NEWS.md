@@ -1,6 +1,7 @@
 # patRoon 0.1.0.9000
 
 ## Decomber 2018
+* Moved OpenMS XML writing code from `R` to `C++`: significantly reduces time required for grouping large amount of features.
 * Several updates for functionality that uses Bruker DataAnalyses
     * Improved verification and consistency for handling processed data from DataAnalysis
     * Automatic saving & closing of analyses processed with DataAnalysis. Files are now generally closed by default to limit the resources needed by DataAnalysis. 

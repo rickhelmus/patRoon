@@ -9,6 +9,10 @@ parseFeatConsXMLFile <- function(file, anaCount) {
     .Call(`_patRoon_parseFeatConsXMLFile`, file, anaCount)
 }
 
+writeFeatureXML <- function(featList, out) {
+    invisible(.Call(`_patRoon_writeFeatureXML`, featList, out))
+}
+
 loadEICIntensities <- function(spectra, featList, rtWindow) {
     .Call(`_patRoon_loadEICIntensities`, spectra, featList, rtWindow)
 }

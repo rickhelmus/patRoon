@@ -56,7 +56,7 @@ groupFeaturesOpenMS <- function(feat, rtalign = TRUE, QT = FALSE, maxAlignRT = 3
 
     cfile <- tempfile("cons", fileext = ".consensusXML")
     generateConsensusXML(feat, cfile, rtalign, QT, maxAlignRT, maxAlignMZ, maxGroupRT, maxGroupMZ, verbose)
-    fgimp <- importConsensusXMLCpp(feat, cfile, verbose)
+    fgimp <- importConsensusXML(feat, cfile, verbose)
 
     ret <- featureGroupsOpenMS(groups = fgimp$groups, groupInfo=fgimp$gInfo, analysisInfo = analysisInfo(feat),
                                features=feat, ftindex=fgimp$ftindex)
@@ -106,56 +106,7 @@ setMethod("generateConsensusXML", "features", function(feat, out, rtalign, QT, m
                    stderr = if (verbose) "" else FALSE)
 })
 
-importConsensusXML <- function(feat, cfile)
-{
-    cat("Importing consensus XML...")
-
-    sGroup <- analysisInfo(feat)
-    fTable <- featureTable(feat)
-
-    doc <- XML::xmlTreeParse(cfile)
-    docrt <- XML::xmlRoot(doc)
-
-    ccount <- XML::xmlSize(docrt[["consensusElementList"]])
-    groups <- data.table(matrix(0, nrow = nrow(sGroup), ncol = ccount))
-
-    ftindex <- copy(groups)
-
-    gInfoDT <- data.table(rts=numeric(ccount), mzs=numeric(ccount))
-    gCount <- 0L
-
-    XML::xmlSApply(docrt[["consensusElementList"]], function(xn)
-    {
-        gCount <<- gCount + 1L
-
-        set(gInfoDT, gCount, "rts", as.numeric(XML::xmlAttrs(xn[["centroid"]])[["rt"]]))
-        set(gInfoDT, gCount, "mzs", as.numeric(XML::xmlAttrs(xn[["centroid"]])[["mz"]]))
-
-        XML::xmlSApply(xn[["groupedElementList"]], function(xsn)
-        {
-            a <- XML::xmlAttrs(xsn)
-            fid <- as.integer(a[["map"]]) + 1L
-            ftid <- as.integer(a[["id"]])
-            set(ftindex, fid, gCount, ftid)
-            set(groups, fid, gCount, fTable[[fid]][["intensity"]][ftid])
-        })
-    })
-
-    gInfo <- as.data.frame(gInfoDT, stringsAsFactors = FALSE)
-    if (nrow(gInfo) > 0)
-    {
-        gNames <- sapply(seq_len(nrow(gInfo)), function(grpi) makeFGroupName(grpi, gInfo$rts[grpi], gInfo$mzs[grpi]))
-        rownames(gInfo) <- gNames
-        setnames(groups, gNames)
-        setnames(ftindex, gNames)
-    }
-
-    cat("Done!\n")
-
-    return(list(groups = groups, gInfo = gInfo, ftindex = ftindex))
-}
-
-importConsensusXMLCpp <- function(feat, cfile, verbose)
+importConsensusXML <- function(feat, cfile, verbose)
 {
     if (verbose)
         cat("Importing consensus XML...")

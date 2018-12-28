@@ -14,8 +14,6 @@ Release:
 - mass defect components
 - fix compoundViewer
 - check why generics sometimes are not found
-- remove R xml code for OpenMS features/feature groups
-- remove R intensity loading code for OpenMS features
 - remove XCMS EIC loading (and update checkChromatograms())
 - add more options to reportPlots argument of reportMD()?
 - importFeatures() function (analog to importFeatureGroups)

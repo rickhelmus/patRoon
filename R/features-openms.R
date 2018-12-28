@@ -131,9 +131,8 @@ findFeaturesOpenMS <- function(analysisInfo, noiseThrInt = 1000, chromSNR = 3, c
 
         fList <- executeMultiProcess(cmdQueue, function(cmd, ...)
         {
-            # fts <- importFeatureXML(cmd$featFile)
-            fts <- importFeatureXMLCpp(cmd$featFile)
-            fts <- loadIntensitiesCPP(cmd$dataFile, fts, intSearchRTWindow)
+            fts <- importFeatureXML(cmd$featFile)
+            fts <- loadIntensities(cmd$dataFile, fts, intSearchRTWindow)
 
             # BUG: OpenMS sporadically reports features with 0 intensity
             # (noticed this with a feature of only two datapoints in hull).
@@ -204,69 +203,11 @@ getOpenMSFFCommand <- function(datafile, out, noiseThrInt, chromSNR, chromFWHM, 
 
 importFeatureXML <- function(ffile)
 {
-    doc <- XML::xmlTreeParse(ffile)
-    docrt <- XML::xmlRoot(doc)
-
-    fcount <- as.numeric(XML::xmlAttrs(docrt[["featureList"]])[["count"]])
-    ret <- data.table(ID=character(fcount), ret=numeric(fcount), mz=numeric(fcount), area=numeric(fcount),
-                      retmin=numeric(fcount), retmax=numeric(fcount), mzmin=numeric(fcount), mzmax=numeric(fcount))
-    ind <- 1
-
-    XML::xmlSApply(docrt[["featureList"]], function(xn)
-    {
-        ret[[ind, "ID"]] <<- XML::xmlAttrs(xn)[["id"]]
-        ret[[ind, "area"]] <<- as.numeric(XML::xmlValue(xn[["intensity"]]))
-
-        lapply(XML::xmlElementsByTagName(xn, "position"), function(xsn)
-        {
-            if (XML::xmlAttrs(xsn)[["dim"]] == "0")
-                ret[[ind, "ret"]] <<- as.numeric(XML::xmlValue(xsn))
-            else
-                ret[[ind, "mz"]] <<- as.numeric(XML::xmlValue(xsn))
-        })
-
-        # assume first hull describes main ion
-        hull <- XML::xmlSApply(xn[["convexhull"]], XML::xmlAttrs)
-        # odd indices (1, 3, ...): retention times, others (2, 4, ...): mz's
-        ret[[ind, "retmin"]] <<- min(as.numeric(hull[c(T, F)]))
-        ret[[ind, "retmax"]] <<- max(as.numeric(hull[c(T, F)]))
-        ret[[ind, "mzmin"]] <<- min(as.numeric(hull[c(F, T)]))
-        ret[[ind, "mzmax"]] <<- max(as.numeric(hull[c(F, T)]))
-
-        ind <<- ind + 1
-    })
-
-    return(ret)
-}
-
-importFeatureXMLCpp <- function(ffile)
-{
     return(as.data.table(parseFeatureXMLFile(ffile)))
 }
 
 # OpenMS doesn't support peak intensities. Estimate them from retention times
 loadIntensities <- function(dfile, features, rtWindow)
-{
-    spectra <- loadSpectra(dfile, verbose = FALSE)
-    features <- copy(features) # HACK: avoid sR crash caused by data.table
-
-    if (nrow(features) == 0)
-        features[, intensity := 0]
-    else
-    {
-        # find closest data point to retention time in +/- 5 sec window
-        for (f in seq_len(nrow(features)))
-        {
-            ft <- features[f]
-            eic <- getEIC(spectra, ft$ret + c(-rtWindow, rtWindow), c(ft$mzmin, ft$mzmax))
-            set(features, f, "intensity", eic$intensity[which.min(abs(ft$ret - eic$time))])
-        }
-    }
-
-    return(features)
-}
-
-loadIntensitiesCPP <- function(dfile, features, rtWindow)
 {
     spectra <- loadSpectra(dfile, verbose = FALSE)
     features <- copy(features) # HACK: avoid sR crash caused by data.table

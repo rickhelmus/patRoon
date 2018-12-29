@@ -88,7 +88,7 @@
 <li>
 <strong>Data preparation</strong>: conversion between and export to common open MS data formats (e.g. mzXML and mzML) (<a href="http://openms.de/">OpenMS</a>, <a href="https://www.bruker.com/">DataAnalysis</a>).</li>
 <li>
-<strong>Extraction and grouping of features</strong> (<a href="https://github.com/sneumann/xcms">XCMS</a>, <a href="http://openms.de/">OpenMS</a>, <a href="https://cran.r-project.org/web/packages/enviPick/index.html">enviPick</a>, <a href="http://www.looscomputing.ch/eng/enviMass/overview.htm">enviMass</a>, <a href="https://www.bruker.com/">ProfileAnalysis</a>).</li>
+<strong>Extraction and grouping of features</strong> (e.g. <a href="https://github.com/sneumann/xcms">XCMS</a>, <a href="http://openms.de/">OpenMS</a>, <a href="https://cran.r-project.org/web/packages/enviPick/index.html">enviPick</a>, <a href="https://www.bruker.com/">ProfileAnalysis</a>).</li>
 <li>
 <strong>Data cleanup</strong>: post filtering of data to improve its quality and aid prioritization.</li>
 <li>
@@ -124,14 +124,14 @@
 <h3 class="hasAnchor">
 <a href="#r-dependencies" class="anchor"></a>R Dependencies</h3>
 <p>Most <code>R</code> package dependencies are installed automatically. However, it may be necessary to manually install the following <a href="https://www.bioconductor.org">Bioconductor</a> dependencies:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/source">source</a></span>(<span class="st">"https://bioconductor.org/biocLite.R"</span>)
-<span class="kw">biocLite</span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"mzR"</span>, <span class="st">"xcms"</span>, <span class="st">"CAMERA"</span>))</code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/source">source</a></span>(<span class="st">"https://bioconductor.org/biocLite.R"</span>)</a>
+<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="kw">biocLite</span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"mzR"</span>, <span class="st">"xcms"</span>, <span class="st">"CAMERA"</span>))</a></code></pre></div>
 <p>In addition, the following optional <code>R</code> packages may also need to be installed:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/install.packages">install.packages</a></span>(<span class="st">"RDCOMClient"</span>) <span class="co"># required for DataAnalysis functionality</span>
-
-<span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/install.packages">install.packages</a></span>(<span class="st">"devtools"</span>) <span class="co"># needed only if not already installed</span>
-devtools<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/devtools/topics/reexports">install_github</a></span>(<span class="st">"cbroeckl/RAMClustR"</span>, <span class="dt">build_vignettes =</span> <span class="ot">TRUE</span>, <span class="dt">dependencies =</span> <span class="ot">TRUE</span>)
-devtools<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/devtools/topics/reexports">install_github</a></span>(<span class="st">"c-ruttkies/MetFragR/metfRag"</span>) <span class="co"># only when using the R interface (not by default)</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/install.packages">install.packages</a></span>(<span class="st">"RDCOMClient"</span>) <span class="co"># required for DataAnalysis functionality</span></a>
+<a class="sourceLine" id="cb2-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb2-3" data-line-number="3"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/install.packages">install.packages</a></span>(<span class="st">"devtools"</span>) <span class="co"># needed only if not already installed</span></a>
+<a class="sourceLine" id="cb2-4" data-line-number="4">devtools<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/devtools/topics/reexports">install_github</a></span>(<span class="st">"cbroeckl/RAMClustR"</span>, <span class="dt">build_vignettes =</span> <span class="ot">TRUE</span>, <span class="dt">dependencies =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb2-5" data-line-number="5">devtools<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/devtools/topics/reexports">install_github</a></span>(<span class="st">"c-ruttkies/MetFragR/metfRag"</span>) <span class="co"># only when using the R interface (not by default)</span></a></code></pre></div>
 <p>Note that in order to fulfill installation of the <code>rJava</code> package dependency you may need to setup a proper JDK (see for instance <a href="http://www.rforge.net/rJava/">the rJava website</a>).</p>
 <p>Finally, Windows users need to make sure that <a href="https://cran.r-project.org/bin/windows/Rtools/">Rtools</a> is installed.</p>
 </div>
@@ -148,29 +148,29 @@ devtools<span class="op">::</span><span class="kw"><a href="https://www.rdocumen
 <a href="https://pngquant.org/">pngquant</a> (required for <code>reportMD</code> with <code>optimizePng</code> argument set to <code>TRUE</code>)</li>
 </ul>
 <p>The location of the OpenMS, SIRIUS and pngquant binaries should either be set within the <em>PATH</em> environment variable (the OpenMS installer will do this automatically). Alternatively, one or more of the <code>R</code> options should be set below.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/options">options</a></span>(<span class="st">"patRoon.path.SIRIUS"</span> =<span class="st"> "~/C:/sirius-win64-3.5.1"</span>) <span class="co"># location where SIRIUS was extracted</span>
-<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/options">options</a></span>(<span class="st">"patRoon.path.OpenMS"</span> =<span class="st"> "/usr/local/bin"</span>) <span class="co"># directory with the OpenMS binaries</span>
-<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/options">options</a></span>(<span class="st">"patRoon.path.pngquant"</span> =<span class="st"> "~/pngquant"</span>) <span class="co"># directory containing pngquant binary</span>
-<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/options">options</a></span>(<span class="st">"patRoon.path.metFragCL"</span> =<span class="st"> "~/MetFrag2.4.2-CL.jar"</span>) <span class="co"># full location to the jar file</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/options">options</a></span>(<span class="st">"patRoon.path.SIRIUS"</span> =<span class="st"> "~/C:/sirius-win64-3.5.1"</span>) <span class="co"># location where SIRIUS was extracted</span></a>
+<a class="sourceLine" id="cb3-2" data-line-number="2"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/options">options</a></span>(<span class="st">"patRoon.path.OpenMS"</span> =<span class="st"> "/usr/local/bin"</span>) <span class="co"># directory with the OpenMS binaries</span></a>
+<a class="sourceLine" id="cb3-3" data-line-number="3"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/options">options</a></span>(<span class="st">"patRoon.path.pngquant"</span> =<span class="st"> "~/pngquant"</span>) <span class="co"># directory containing pngquant binary</span></a>
+<a class="sourceLine" id="cb3-4" data-line-number="4"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/options">options</a></span>(<span class="st">"patRoon.path.metFragCL"</span> =<span class="st"> "~/MetFrag2.4.2-CL.jar"</span>) <span class="co"># full location to the jar file</span></a></code></pre></div>
 <p>Please note that the location of the MetFrag CL jar file should always be set manually.</p>
 </div>
 <div id="patroon-installation" class="section level3">
 <h3 class="hasAnchor">
 <a href="#patroon-installation" class="anchor"></a>patRoon installation</h3>
 <p>Finally, you can install patRoon from github with:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/install.packages">install.packages</a></span>(<span class="st">"devtools"</span>) <span class="co"># needed only if not already installed</span>
-devtools<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/devtools/topics/reexports">install_github</a></span>(<span class="st">"rickhelmus/patRoon"</span>)
-devtools<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/devtools/topics/reexports">install_github</a></span>(<span class="st">"rickhelmus/patRoonData"</span>) <span class="co"># example data used by tutorial</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/install.packages">install.packages</a></span>(<span class="st">"devtools"</span>) <span class="co"># needed only if not already installed</span></a>
+<a class="sourceLine" id="cb4-2" data-line-number="2">devtools<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/devtools/topics/reexports">install_github</a></span>(<span class="st">"rickhelmus/patRoon"</span>)</a>
+<a class="sourceLine" id="cb4-3" data-line-number="3">devtools<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/devtools/topics/reexports">install_github</a></span>(<span class="st">"rickhelmus/patRoonData"</span>) <span class="co"># example data used by tutorial</span></a></code></pre></div>
 <p>In some cases the <code>patRoon</code> installation may fail with an error telling you that <code>SVN</code> is absent. In this case you may have better luck by changing to the <a href="https://github.com/r-lib/remotes#readme">remotes</a> package:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/install.packages">install.packages</a></span>(<span class="st">"remotes"</span>)
-remotes<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/remotes/topics/install_github">install_github</a></span>(<span class="st">"rickhelmus/patRoon"</span>)</code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/install.packages">install.packages</a></span>(<span class="st">"remotes"</span>)</a>
+<a class="sourceLine" id="cb5-2" data-line-number="2">remotes<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/remotes/topics/install_github">install_github</a></span>(<span class="st">"rickhelmus/patRoon"</span>)</a></code></pre></div>
 </div>
 </div>
 <div id="getting-started" class="section level2">
 <h2 class="hasAnchor">
 <a href="#getting-started" class="anchor"></a>Getting started</h2>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(patRoon)
-<span class="kw"><a href="reference/GUI-utils.html">newProject</a></span>()</code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(patRoon)</a>
+<a class="sourceLine" id="cb6-2" data-line-number="2"><span class="kw"><a href="reference/GUI-utils.html">newProject</a></span>()</a></code></pre></div>
 <p>The <code><a href="reference/GUI-utils.html">newProject()</a></code> function will pop-up a dialog screen (requires <a href="https://www.rstudio.com/">R Studio</a>!) which will allow you to quickly select the analyses and common workflow options to subsequently generate a template <code>R</code> processing script.</p>
 <p>However, for a better guide to get started it is recommended to read the <a href="https://rickhelmus.github.io/patRoon/articles/tutorial.html">tutorial</a> (work in progress).</p>
 <p>Finally, the <a href="https://rickhelmus.github.io/patRoon/reference/index.html">reference</a> outlines all the details of the <code>patRoon</code> package.</p>

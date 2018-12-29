@@ -113,11 +113,22 @@
 <h2 class="hasAnchor">
 <a href="#decomber-2018" class="anchor"></a>Decomber 2018</h2>
 <ul>
+<li>Moved OpenMS XML writing code from <code>R</code> to <code>C++</code>: significantly reduces time required for grouping large amount of features.</li>
+<li>Several updates for functionality that uses Bruker DataAnalyses
+<ul>
+<li>Improved verification and consistency for handling processed data from DataAnalysis</li>
+<li>Automatic saving &amp; closing of analyses processed with DataAnalysis. Files are now generally closed by default to limit the resources needed by DataAnalysis.</li>
+<li>
+<code><a href="../reference/bruker-utils.html">revertDAAnalyses()</a></code> function: brings back set of Bruker analyses to their unprocessed state.</li>
+<li>Minimum intensity arguments for Bruker DataAnalysis MS peak lists.</li>
+<li>Slightly different <code>doFMF</code> beahviour for DataAnalysis feature finding.</li>
+</ul>
+</li>
 <li>Several important updates were made to fomula calculation functionality.
 <ul>
 <li>The interface has been simplified as the functionality from the <code>formula</code> and <code>formulaConsensus</code> classes are now merged: there is no need to call <code><a href="../reference/generics.html">consensus()</a></code> anymore after <code><a href="../reference/formula-generation.html">generateFormulas()</a></code>.</li>
 <li>Formulae can now directly be calculated for feature groups by using group averaged MS peak lists (by setting <code>calculateFeatures=FALSE</code>). This can greatly speed up calulcation, especially with many analyses.</li>
-<li>The new <code><a href="../reference/generics.html">filter()</a></code> and <code><a href="../reference/generics.html">makeTable()</a></code> methods bring new functionalities related to filtering, extracting data and performing several processing steps commonly performed for organic matter (OM) characterization.</li>
+<li>The new <code><a href="../reference/generics.html">filter()</a></code> and <code>as.data.table()</code>/<code>as.data.frame</code> methods bring new functionalities related to filtering, extracting data and performing several processing steps commonly performed for organic matter (OM) characterization.</li>
 <li>Other updates on formulas
 <ul>
 <li>length now returns number of unique precursor formulas (was total number of results)</li>
@@ -125,7 +136,6 @@
 <li>
 <code><a href="../reference/reporting.html">reportCSV()</a></code> now splits formulas for each feature group in separate CSV files (similar to <code>compounds</code> reporting).</li>
 <li>Fixed: <code><a href="../reference/reporting.html">reportPDF()</a></code> now actually includes formula annotations in annotated compound spectra when formulas are specified.</li>
-<li>New <code><a href="../reference/generics.html">makeTable()</a></code> method that generates a table with all formulas and other information (partially replaces old <code><a href="../reference/generics.html">consensus()</a></code> functionality).</li>
 <li>New oc argument when using GenForm: if enabled only organic formulae are accepted (i.e. with at least one carbon atom). Also incorporated a small fix for the actual GenForm binary to make this option work (<a href="https://sourceforge.net/p/genform/tickets/1/" class="uri">https://sourceforge.net/p/genform/tickets/1/</a>).</li>
 <li>Fixed: coverage calculation of formulae across features treated formulae calculated only from MS data separately.</li>
 <li>GenForm now also includes precursor annotation from MS/MS data.</li>

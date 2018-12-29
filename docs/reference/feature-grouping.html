@@ -275,8 +275,11 @@ optimal settings often depend on applied methodology and instrumentation.</p>
   care must be taken to correctly specify search parameters (<code>maxRtDev</code>,
   <code>maxMzDev</code>, <code>maxIntDev</code>).</p>
 <p><code>importFeatureGroupsEnviMass</code> imports grouped features
-  ('profiles') generated with <span class="pkg">enviMass</span>. Please note that this
-  function only supports features imported by
+  ('profiles') generated with <span class="pkg">enviMass</span>. Note that this function
+  <em>only</em> imports 'raw' profiles, <em>not</em> any results from further
+  componentization steps performed in <span class="pkg">enviMass</span>. Furthermore, this
+  functionality has only been tested with older versions of <span class="pkg">enviMass</span>.
+  Finally, please note that this function only supports features imported by
   <code><a href='feature-finding.html'>importFeaturesEnviMass</a></code> (obviously, the same project should be
   used for both importing functions).</p>
 <p><code>groupFeaturesOpenMS</code> uses the OpenMS tools for grouping of

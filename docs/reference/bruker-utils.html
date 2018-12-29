@@ -118,9 +118,11 @@
 
     <pre class="usage"><span class='fu'>showDataAnalysis</span>()
 
-<span class='fu'>setDAMethod</span>(<span class='no'>anaInfo</span>, <span class='no'>method</span>)
+<span class='fu'>setDAMethod</span>(<span class='no'>anaInfo</span>, <span class='no'>method</span>, <span class='kw'>close</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
 
-<span class='fu'>recalibrarateDAFiles</span>(<span class='no'>anaInfo</span>)
+<span class='fu'>revertDAAnalyses</span>(<span class='no'>anaInfo</span>, <span class='kw'>close</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>save</span> <span class='kw'>=</span> <span class='no'>close</span>)
+
+<span class='fu'>recalibrarateDAFiles</span>(<span class='no'>anaInfo</span>, <span class='kw'>close</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>save</span> <span class='kw'>=</span> <span class='no'>close</span>)
 
 <span class='fu'>getDACalibrationError</span>(<span class='no'>anaInfo</span>)
 
@@ -129,10 +131,11 @@
 
 <span class='fu'>addDAEIC</span>(<span class='no'>analysis</span>, <span class='no'>path</span>, <span class='no'>mz</span>, <span class='kw'>mzWindow</span> <span class='kw'>=</span> <span class='fl'>0.005</span>, <span class='kw'>ctype</span> <span class='kw'>=</span> <span class='st'>"EIC"</span>,
   <span class='kw'>mtype</span> <span class='kw'>=</span> <span class='st'>"MS"</span>, <span class='kw'>polarity</span> <span class='kw'>=</span> <span class='st'>"both"</span>, <span class='kw'>bgsubtr</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>fragpath</span> <span class='kw'>=</span> <span class='st'>""</span>,
-  <span class='kw'>name</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>hideDA</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+  <span class='kw'>name</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>hideDA</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>close</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>save</span> <span class='kw'>=</span> <span class='no'>close</span>)
 
 <span class='fu'>addAllDAEICs</span>(<span class='no'>fGroups</span>, <span class='kw'>mzWindow</span> <span class='kw'>=</span> <span class='fl'>0.005</span>, <span class='kw'>ctype</span> <span class='kw'>=</span> <span class='st'>"EIC"</span>,
-  <span class='kw'>bgsubtr</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>name</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>onlyPresent</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>hideDA</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
+  <span class='kw'>bgsubtr</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>name</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>onlyPresent</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>hideDA</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>close</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>save</span> <span class='kw'>=</span> <span class='no'>close</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -144,6 +147,15 @@
     <tr>
       <th>method</th>
       <td><p>The full path of the DataAnalysis method.</p></td>
+    </tr>
+    <tr>
+      <th>close, save</th>
+      <td><p>If <code>TRUE</code> then Bruker files are closed and saved after
+processing with DataAnalysis, respectively. Setting <code>close=TRUE</code>
+prevents that many analyses might be opened simultaneously in DataAnalysis,
+which otherwise may use excessive memory or become slow. By default
+<code>save</code> is <code>TRUE</code> when <code>close</code> is <code>TRUE</code>, which is
+likely what you want as otherwise any processed data is lost.</p></td>
     </tr>
     <tr>
       <th>format</th>
@@ -250,9 +262,16 @@ required to be installed.</p>
   again. Most functions using DataAnalysis will hide the window during
   processing for efficiency reasons. If the window remains hidden
   (<em>e.g.</em> because there was an error) this function can be used to make
-  it visible again.</p>
+  it visible again. This function can also be used to start DataAnalysis if
+  it is not running yet.</p>
 <p><code>setDAMethod</code> Sets a given DataAnalysis method (<code class="file">.m</code> file)
-  to a set of analyses.</p>
+  to a set of analyses. <strong>NOTE</strong>: as a workaround for a bug in
+  DataAnalysis, this function will save(!), close and re-open any analyses
+  that are already open prior to setting the new method. The <code>close</code>
+  argument only controls whether the file should be closed after setting the
+  method (files are always saved).</p>
+<p><code>revertDAAnalyses</code> Reverts a given set of analyses to their
+  unprocessed raw state.</p>
 <p><code>recalibrarateDAFiles</code> Performs automatic mass recalibration of
   a given set of analyses. The current method settings for each analyses will
   be used.</p>

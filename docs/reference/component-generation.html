@@ -232,7 +232,7 @@ the <code>rttol</code> and <code>mztol</code> arguments of <code>homol.search</c
     <tr>
       <th>st, sr, maxt, hmax, normalize</th>
       <td><p>Arguments to tune the behaviour of feature
-group clustering. See their documentation from <code><a href='https://www.rdocumentation.org/packages/RAMClustR/topics/ramclustR'>ramclustR</a></code>.
+group clustering. See their documentation from <code>ramclustR</code>.
 When <code>st</code> is <code>NULL</code> it will be automatically calculated as the
 half of the median for all chromatographic peak widths.</p></td>
     </tr>
@@ -240,18 +240,18 @@ half of the median for all chromatographic peak widths.</p></td>
       <th>absMzDev, relMzDev</th>
       <td><p>Maximum absolute/relative <em>m/z</em> deviation for
 annotation. Passed as the <code>mzabs.error</code> and <code>ppm.error</code> arguments
-to <code><a href='https://www.rdocumentation.org/packages/RAMClustR/topics/do.findmain'>do.findmain</a></code>.</p></td>
+to <code>do.findmain</code>.</p></td>
     </tr>
     <tr>
       <th>RCExperimentVals</th>
       <td><p>A named <code>list</code> containing two more <code>list</code>s:
 <code>design</code> and <code>instrument</code>. These are used to construct the
-<code>ExpDes</code> argument passed to <code><a href='https://www.rdocumentation.org/packages/RAMClustR/topics/ramclustR'>ramclustR</a></code>.</p></td>
+<code>ExpDes</code> argument passed to <code>ramclustR</code>.</p></td>
     </tr>
     <tr>
       <th>extraOptsRC, extraOptsFM</th>
       <td><p>Named <code>list</code> with further arguments to be
-passed to <code><a href='https://www.rdocumentation.org/packages/RAMClustR/topics/ramclustR'>ramclustR</a></code> and <code><a href='https://www.rdocumentation.org/packages/RAMClustR/topics/do.findmain'>do.findmain</a></code>.
+passed to <code>ramclustR</code> and <code>do.findmain</code>.
 Set to <code>NULL</code> to ignore.</p></td>
     </tr>
     </table>
@@ -301,15 +301,13 @@ and reduce the data size and thus complexity.</p>
   components from feature groups which follow similar chromatographic
   retention profiles, but are not necessarily restricted to known rules
   (<em>e.g.</em> adducts or isotopes). This method uses the
-  <code><a href='https://www.rdocumentation.org/packages/RAMClustR/topics/ramclustR'>ramclustR</a></code> functions for generating the components, whereas
-  <code><a href='https://www.rdocumentation.org/packages/RAMClustR/topics/do.findmain'>do.findmain</a></code> is used for annotation.</p>
+  <code>ramclustR</code> functions for generating the components, whereas
+  <code>do.findmain</code> is used for annotation.</p>
     
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
     <p>Kuhl, C., Tautenhahn, R., Boettcher, C., Larson, T. R. and Neumann, S. CAMERA: an integrated strategy for compound spectra extraction and annotation of liquid chromatography/mass spectrometry data sets. Analytical Chemistry, 84:283-289 (2012)</p>
-<p>Loos, M., Singer, H. (2017). 
-			Nontargeted homologue series extraction from hyphenated high resolution mass spectrometry, 
-			Journal of Cheminformatics 9(12), . <br /><br />
+<p>Martin Loos (2016). nontarget: Detecting Isotope, Adduct and Homologue Relations in LC-MS Data. R package version 1.9. https://CRAN.R-project.org/package=nontarget <br /><br />
   Loos, M., Gerber, C., Corona, F., Hollender, J., Singer, H. (2015). 
 			Accelerated isotope fine structure calculation using pruned transition trees, 
 			Analytical Chemistry 87(11), 5738-5744.</p>

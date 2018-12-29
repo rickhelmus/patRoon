@@ -144,9 +144,13 @@ show(object)
 $(x, name)
 
 # S4 method for formulas
-makeTable(obj, fGroups = NULL, average = FALSE,
+as.data.table(x, fGroups = NULL, average = FALSE,
   countElements = NULL, countFragElements = NULL, OM = FALSE,
   maxFormulas = NULL, maxFragFormulas = NULL)
+
+# S4 method for formulas
+as.data.frame(x, row.names = NULL,
+  optional = FALSE, ...)
 
 # S4 method for formulas
 filter(obj, minExplainedFragPeaks = NULL,
@@ -180,12 +184,17 @@ their index or name, respectively (for the order/names see <code>analyses()/grou
     </tr>
     <tr>
       <th>&#8230;</th>
-      <td><p>One or more <code>formulas</code> objects that should be used to
-generate the consensus.</p></td>
+      <td><p><code>consensus</code>: One or more <code>formulas</code> objects that should be used to
+generate the consensus.</p>
+<p><code>as.data.frame</code>: Arguments passed to <code>as.data.table</code>.</p></td>
     </tr>
     <tr>
       <th>drop</th>
       <td><p>ignored.</p></td>
+    </tr>
+    <tr>
+      <th>name</th>
+      <td><p>The feature group name (partially matched).</p></td>
     </tr>
     <tr>
       <th>fGroups</th>
@@ -214,7 +223,7 @@ elements.</p></td>
     </tr>
     <tr>
       <th>OM</th>
-      <td><p>For <code>makeTable</code>: if set to <code>TRUE</code> several columns
+      <td><p>For <code>as.data.table</code>/<code>as.data.frame</code>: if set to <code>TRUE</code> several columns
   with information relevant for organic matter (OM) characterization will be
   added (e.g. elemental ratios, classification). This will also make sure
   that <code>countElements</code> contains at least C, H, N, O, P and S.</p>
@@ -227,6 +236,10 @@ elements.</p></td>
       <td><p>Maximum amount of unique candidate
 formulae (or fragment formulae) per feature group. Set to <code>NULL</code> to
 ignore.</p></td>
+    </tr>
+    <tr>
+      <th>row.names, optional</th>
+      <td><p>Ignored.</p></td>
     </tr>
     <tr>
       <th>minExplainedFragPeaks</th>
@@ -315,7 +328,7 @@ candidate should be present within all objects. For instance, a value of
   group (or feature if <code>features=TRUE</code>) a <code>data.table</code>
   with an overview of all generated formulae and other data such as candidate
   scoring and MS/MS fragments.</p>
-<p><code>makeTable</code> returns a <code>data.table</code>.</p>
+<p><code>as.data.table</code> returns a <code>data.table</code>.</p>
 <p><code>filter</code> returns a filtered <code>formulas</code> object.</p>
 <p><code>plotSpec</code> will return a <code>ggplot object</code>
   if <code>useGGPlot2</code> is <code>TRUE</code>.</p>
@@ -345,8 +358,9 @@ feature groups for which data is present in this object.</p></li>
 the analysis (<code>i</code>)/feature group (<code>j</code>) is returned. Otherwise the
 formula table for the feature group specified by <code>j</code> is returned.</p></li>
 <li><p><code>$</code>: Extract a formula table for a feature group.</p></li>
-<li><p><code>makeTable</code>: Generates a table with all candidate formulae for each
+<li><p><code>as.data.table</code>: Generates a table with all candidate formulae for each
 feature group and other information such as element counts.</p></li>
+<li><p><code>as.data.frame</code>: Same as <code>as.data.table</code>, but returns a <code>data.frame</code>.</p></li>
 <li><p><code>filter</code>: Performs rule based filtering on formula results.</p></li>
 <li><p><code>plotSpec</code>: Plots an annotated spectrum for a given candidate
 formula of a feature or feature group.</p></li>
@@ -390,12 +404,14 @@ doi: <a href='http://doi.org/10.1002/rcm.7433'>10.1002/rcm.7433</a>
 <em>Analytical Chemistry</em>, <b>85</b>(8), 3895--3902.
 doi: <a href='http://doi.org/10.1021/ac303221j'>10.1021/ac303221j</a>
 , <a href='https://doi.org/10.1021/ac303221j'>https://doi.org/10.1021/ac303221j</a>.
- <br /><br /> Koch BP, Dittmar T (2006).
+ <br /><br />
+  Koch BP, Dittmar T (2006).
 &#8220;From mass to structure: an aromaticity index for high-resolution mass data of natural organic matter.&#8221;
 <em>Rapid Communications in Mass Spectrometry</em>, <b>20</b>(5), 926--932.
 doi: <a href='http://doi.org/10.1002/rcm.2386'>10.1002/rcm.2386</a>
 , <a href='https://doi.org/10.1002/rcm.2386'>https://doi.org/10.1002/rcm.2386</a>.
-    <br /><br /> Kujawinski EB, Behn MD (2006).
+ <br /><br />
+  Kujawinski EB, Behn MD (2006).
 &#8220;Automated Analysis of Electrospray Ionization Fourier Transform Ion Cyclotron Resonance Mass Spectra of Natural Organic Matter.&#8221;
 <em>Analytical Chemistry</em>, <b>78</b>(13), 4363--4373.
 doi: <a href='http://doi.org/10.1021/ac0600306'>10.1021/ac0600306</a>

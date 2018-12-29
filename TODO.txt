@@ -18,7 +18,6 @@ Release:
 - add more options to reportPlots argument of reportMD()?
 - importFeatures() function (analog to importFeatureGroups)
 - getXcmsSet --> export
-- generateCompounds: take averaged mass spectrum (as an option)
 - support fastcluster for compounds clustering/int component clusters?
 - groupFeaturesScreening functionality for features?
 - reportPDF/reportMD: MS only formulas are not reported?
@@ -74,3 +73,4 @@ Release:
 - document pwiz path option
 - fix doc errors from devtools::check_man()
 - featInfo function --> generate feature info table for selected fgroup(s)
+- data.table: add '[]' at the end of (exported) functions when ':=' was used (print bug workaround)

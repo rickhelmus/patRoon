@@ -11,13 +11,12 @@
 * Several important updates were made to fomula calculation functionality.
     * The interface has been simplified as the functionality from the `formula` and `formulaConsensus` classes are now merged: there is no need to call `consensus()` anymore after `generateFormulas()`.
     * Formulae can now directly be calculated for feature groups by using group averaged MS peak lists (by setting `calculateFeatures=FALSE`). This can greatly speed up calulcation, especially with many analyses.
-    * The new `filter()` and `makeTable()` methods bring new functionalities related to filtering, extracting data and performing several processing steps commonly performed for organic matter (OM) characterization.
+    * The new `filter()` and `as.data.table()`/`as.data.frame` methods bring new functionalities related to filtering, extracting data and performing several processing steps commonly performed for organic matter (OM) characterization.
     * Other updates on formulas
         * length now returns number of unique precursor formulas (was total number of results)
         * Fixed: Reported fragment formulas from SIRIUS were incorrectly assumed to be charged. Charged fragment formulas are now calculated manually (the neutral form is stored in the `frag_neutral_formula` column). This ensures correct comparison when a consensus is made.
         * `reportCSV()` now splits formulas for each feature group in separate CSV files (similar to `compounds` reporting).
         * Fixed: `reportPDF()` now actually includes formula annotations in annotated compound spectra when formulas are specified.
-        * New `makeTable()` method that generates a table with all formulas and other information (partially replaces old `consensus()` functionality).
         * New oc argument when using GenForm: if enabled only organic formulae are accepted (i.e. with at least one carbon atom). Also incorporated a small fix for the actual GenForm binary to make this option work (https://sourceforge.net/p/genform/tickets/1/).
         * Fixed: coverage calculation of formulae across features treated formulae calculated only from MS data separately.
         * GenForm now also includes precursor annotation from MS/MS data.

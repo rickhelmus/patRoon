@@ -14,7 +14,8 @@
 \alias{[,formulas,ANY,missing,missing-method}
 \alias{[[,formulas,ANY,ANY-method}
 \alias{$,formulas-method}
-\alias{makeTable,formulas-method}
+\alias{as.data.table,formulas-method}
+\alias{as.data.frame,formulas-method}
 \alias{filter,formulas-method}
 \alias{plotSpec,formulas-method}
 \alias{consensus,formulas-method}
@@ -38,9 +39,12 @@
 
 \S4method{$}{formulas}(x, name)
 
-\S4method{makeTable}{formulas}(obj, fGroups = NULL, average = FALSE,
+\S4method{as.data.table}{formulas}(x, fGroups = NULL, average = FALSE,
   countElements = NULL, countFragElements = NULL, OM = FALSE,
   maxFormulas = NULL, maxFragFormulas = NULL)
+
+\S4method{as.data.frame}{formulas}(x, row.names = NULL,
+  optional = FALSE, ...)
 
 \S4method{filter}{formulas}(obj, minExplainedFragPeaks = NULL,
   elements = NULL, fragElements = NULL, lossElements = NULL,
@@ -61,10 +65,14 @@ for feature groups.}
 their index or name, respectively (for the order/names see \code{analyses()/groupNames()}).\cr\cr For \code{[}: Can also be logical to perform logical selection
 (similar to regular vectors). If missing all analyses/feature groups are selected.\cr\cr For \code{[[}: should be a skalar value. If \code{j} is not specified, \code{i} selects by feature groups instead.}
 
-\item{\dots}{One or more \code{formulas} objects that should be used to
-generate the consensus.}
+\item{\dots}{\code{consensus}: One or more \code{formulas} objects that should be used to
+generate the consensus.
+
+\code{as.data.frame}: Arguments passed to \code{as.data.table}.}
 
 \item{drop}{ignored.}
+
+\item{name}{The feature group name (partially matched).}
 
 \item{fGroups}{The \code{\link{featureGroups}} object that was used to
 generate this \code{formulas} object. If not \code{NULL} it is used to add
@@ -85,7 +93,7 @@ formulae, whereas the charged formula of fragments (\code{frag_formula}
 column) is used for fragments. Set to \code{NULL} to not count any
 elements.}
 
-\item{OM}{For \code{makeTable}: if set to \code{TRUE} several columns
+\item{OM}{For \code{as.data.table}/\code{as.data.frame}: if set to \code{TRUE} several columns
   with information relevant for organic matter (OM) characterization will be
   added (e.g. elemental ratios, classification). This will also make sure
   that \code{countElements} contains at least C, H, N, O, P and S.
@@ -97,6 +105,8 @@ elements.}
 \item{maxFormulas, maxFragFormulas}{Maximum amount of unique candidate
 formulae (or fragment formulae) per feature group. Set to \code{NULL} to
 ignore.}
+
+\item{row.names, optional}{Ignored.}
 
 \item{minExplainedFragPeaks}{Minimum number of fragment peaks that are
 explained. Setting this to \samp{1} will remove any MS only formula
@@ -161,7 +171,7 @@ candidate should be present within all objects. For instance, a value of
   with an overview of all generated formulae and other data such as candidate
   scoring and MS/MS fragments.
 
-\code{makeTable} returns a \code{\link{data.table}}.
+\code{as.data.table} returns a \code{\link{data.table}}.
 
 \code{filter} returns a filtered \code{\link{formulas}} object.
 
@@ -204,8 +214,10 @@ formula table for the feature group specified by \code{j} is returned.
 
 \item \code{$}: Extract a formula table for a feature group.
 
-\item \code{makeTable}: Generates a table with all candidate formulae for each
+\item \code{as.data.table}: Generates a table with all candidate formulae for each
 feature group and other information such as element counts.
+
+\item \code{as.data.frame}: Same as \code{as.data.table}, but returns a \code{data.frame}.
 
 \item \code{filter}: Performs rule based filtering on formula results.
 
@@ -240,6 +252,7 @@ the \code{algorithm} method for access.}
 
 \references{
 \insertRef{Koch2015}{patRoon} \cr\cr
-  \insertRef{Abdulla2013}{patRoon} \cr\cr \insertRef{Koch2006}{patRoon}
-  \cr\cr \insertRef{Kujawinski2006}{patRoon}
+  \insertRef{Abdulla2013}{patRoon} \cr\cr
+  \insertRef{Koch2006}{patRoon} \cr\cr
+  \insertRef{Kujawinski2006}{patRoon}
 }

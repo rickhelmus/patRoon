@@ -14,7 +14,11 @@ NULL
 #'   the \code{algorithm} method for access.
 #'
 #' @param obj,x,object,formulas The \code{formulas} object.
-#' @param OM For \code{makeTable}: if set to \code{TRUE} several columns
+#' @param \dots \code{consensus}: One or more \code{formulas} objects that should be used to
+#'   generate the consensus.
+#'   
+#'   \code{as.data.frame}: Arguments passed to \code{as.data.table}.
+#' @param OM For \code{as.data.table}/\code{as.data.frame}: if set to \code{TRUE} several columns
 #'   with information relevant for organic matter (OM) characterization will be
 #'   added (e.g. elemental ratios, classification). This will also make sure
 #'   that \code{countElements} contains at least C, H, N, O, P and S.
@@ -28,6 +32,7 @@ NULL
 #' @templateVar selj feature groups
 #' @templateVar selOrderj groupNames()
 #' @templateVar optionalji TRUE
+#' @templateVar dollarOpName feature group
 #' @template sub_op-args
 #'
 #' @section Source: Calculation of the aromaticity index (AI) and related double
@@ -37,8 +42,9 @@ NULL
 #'   and Kujawinski 2006. (see references).
 #'
 #' @references \insertRef{Koch2015}{patRoon} \cr\cr
-#'   \insertRef{Abdulla2013}{patRoon} \cr\cr \insertRef{Koch2006}{patRoon}
-#'   \cr\cr \insertRef{Kujawinski2006}{patRoon}
+#'   \insertRef{Abdulla2013}{patRoon} \cr\cr
+#'   \insertRef{Koch2006}{patRoon} \cr\cr
+#'   \insertRef{Kujawinski2006}{patRoon}
 #'
 #' @export
 formulas <- setClass("formulas",
@@ -190,12 +196,12 @@ setMethod("$", "formulas", function(x, name)
 #'   formulae (or fragment formulae) per feature group. Set to \code{NULL} to
 #'   ignore.
 #'
-#' @return \code{makeTable} returns a \code{\link{data.table}}.
+#' @return \code{as.data.table} returns a \code{\link{data.table}}.
 #'
 #' @export
-setMethod("makeTable", "formulas", function(obj, fGroups = NULL, average = FALSE, countElements = NULL,
-                                            countFragElements = NULL, OM = FALSE,
-                                            maxFormulas = NULL, maxFragFormulas = NULL)
+setMethod("as.data.table", "formulas", function(x, fGroups = NULL, average = FALSE, countElements = NULL,
+                                                countFragElements = NULL, OM = FALSE,
+                                                maxFormulas = NULL, maxFragFormulas = NULL)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", null.ok = TRUE, add = ac)
@@ -205,7 +211,7 @@ setMethod("makeTable", "formulas", function(obj, fGroups = NULL, average = FALSE
     checkmate::assertFlag(OM, add = ac)
     checkmate::reportAssertions(ac)
 
-    ret <- rbindlist(formulaTable(obj), fill = TRUE, idcol = "group")
+    ret <- rbindlist(formulaTable(x), fill = TRUE, idcol = "group")
     if (length(ret) == 0)
         return(ret)
 
@@ -256,8 +262,13 @@ setMethod("makeTable", "formulas", function(obj, fGroups = NULL, average = FALSE
 
     ret <- addElementInfoToFormTable(ret, countElements, countFragElements, OM)
 
-    return(ret)
+    return(ret[])
 })
+
+#' @describeIn formulas Same as \code{as.data.table}, but returns a \code{data.frame}.
+#' @param row.names,optional Ignored.
+#' @export
+setMethod("as.data.frame", "formulas", function(x, row.names = NULL, optional = FALSE, ...) as.data.frame(as.data.table(x, ...)))
 
 #' @describeIn formulas Performs rule based filtering on formula results.
 #'
@@ -450,8 +461,6 @@ setMethod("plotSpec", "formulas", function(obj, precursor, groupName, analysis =
 #' @describeIn formulas Generates a consensus of results from multiple
 #'   \code{formulas} objects.
 #'
-#' @param \dots One or more \code{formulas} objects that should be used to
-#'   generate the consensus.
 #' @param formThreshold Fractional minimum amount (0-1) of which a formula
 #'   candidate should be present within all objects. For instance, a value of
 #'   \samp{0.5} means that a particular formula should be present in at least

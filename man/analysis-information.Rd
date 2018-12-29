@@ -85,5 +85,6 @@ Most functionality requires the data files to be in either the
   be automatically removed.
 
 \code{generateAnalysisInfoFromEnviMass} loads analysis information
-  from an \pkg{enviMass} project.
+  from an \pkg{enviMass} project. Note: this funtionality has only been
+  tested with older versions of \pkg{enviMass}.
 }

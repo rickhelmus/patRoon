@@ -74,3 +74,4 @@ Release:
 - fix doc errors from devtools::check_man()
 - featInfo function --> generate feature info table for selected fgroup(s)
 - data.table: add '[]' at the end of (exported) functions when ':=' was used (print bug workaround)
+- setAs() for as.data.table()/as.data.frame() methods

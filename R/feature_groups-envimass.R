@@ -7,8 +7,11 @@ NULL
 featureGroupsEnviMass <- setClass("featureGroupsEnviMass", contains = "featureGroups")
 
 #' @details \code{importFeatureGroupsEnviMass} imports grouped features
-#'   ('profiles') generated with \pkg{enviMass}. Please note that this
-#'   function only supports features imported by
+#'   ('profiles') generated with \pkg{enviMass}. Note that this function
+#'   \emph{only} imports 'raw' profiles, \emph{not} any results from further
+#'   componentization steps performed in \pkg{enviMass}. Furthermore, this
+#'   functionality has only been tested with older versions of \pkg{enviMass}.
+#'   Finally, please note that this function only supports features imported by
 #'   \code{\link{importFeaturesEnviMass}} (obviously, the same project should be
 #'   used for both importing functions).
 #'

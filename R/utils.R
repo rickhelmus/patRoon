@@ -207,7 +207,8 @@ generateAnalysisInfo <- function(paths, groups = "", refs = "", fileTypes = c("B
 }
 
 #' @details \code{generateAnalysisInfoFromEnviMass} loads analysis information
-#'   from an \pkg{enviMass} project.
+#'   from an \pkg{enviMass} project. Note: this funtionality has only been
+#'   tested with older versions of \pkg{enviMass}.
 #'
 #' @param path The path of the enviMass project.
 #'

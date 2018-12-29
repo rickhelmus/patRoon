@@ -17,7 +17,7 @@ The workflow of non-target analysis is typically highly dependent on several fac
 Below is an overview of the most common non-target workflow steps supported along with various software tools that were used to implement them:
 
 * **Data preparation**: conversion between and export to common open MS data formats (e.g. mzXML and mzML) ([OpenMS], [DataAnalysis]).
-* **Extraction and grouping of features** ([XCMS], [OpenMS], [enviPick], [enviMass], [ProfileAnalysis]).
+* **Extraction and grouping of features** (e.g. [XCMS], [OpenMS], [enviPick], [ProfileAnalysis]).
 * **Data cleanup**: post filtering of data to improve its quality and aid prioritization.
 * **Automatic extraction of MS and MS/MS** data ([mzR], [DataAnalysis]).
 * **Formula calculation**: automatic calculation of candidate formulae for detected features ([GenForm], [SIRIUS], [DataAnalysis]).
@@ -124,7 +124,6 @@ Finally, the [reference] outlines all the details of the `patRoon` package.
 [OpenMS]: http://openms.de/
 [enviPick]: https://cran.r-project.org/web/packages/enviPick/index.html
 [DataAnalysis]: https://www.bruker.com/
-[enviMass]: http://www.looscomputing.ch/eng/enviMass/overview.htm
 [ProfileAnalysis]: https://www.bruker.com/
 [mzR]: https://github.com/sneumann/mzR/
 [GenForm]: https://sourceforge.net/projects/genform

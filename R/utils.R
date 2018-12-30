@@ -623,6 +623,8 @@ getMostIntenseAnaWithMSMS <- function(fGroups, MSPeakLists, groupName)
 }
 
 # don't use all.equal here so functions are vectorized
+# NOTE: actually all.equal seems to also take relative
+# tolerances into account and thus may give different results.
 numEQ <- function(x, y, tol = sqrt(.Machine$double.eps)) abs(x - y) <= tol
 numGTE <- function(x, y, tol = sqrt(.Machine$double.eps)) numEQ(x, y, tol) | x > y
 numLTE <- function(x, y, tol = sqrt(.Machine$double.eps)) numEQ(x, y, tol) | x < y
@@ -655,4 +657,88 @@ tabularRD <- function(df, ...)
     
     paste("\\tabular{", paste(col_align, collapse = ""), "}{\n  ",
           contents, "\n}\n", sep = "")
+}
+
+# make a S4 class inheritance tree in a format compatible with data.tree::FromListSimple()
+makeClassHierarchy <- function(class, showParents)
+{
+    cldef <- getClassDef(class)
+    subcl <- list()
+    if (length(cldef@subclasses) > 0)
+        subcl <- cldef@subclasses[sapply(cldef@subclasses, function(sc) sc@distance == 1)]
+
+    ret <- c(list(name = class),
+             lapply(names(subcl), makeClassHierarchy, showParents = FALSE))
+    
+    if (showParents)
+    {
+        pars <- selectSuperClasses(class)
+        if (length(pars) > 0)
+            ret <- c(list(name = paste0(pars, collapse = ", ")), list(ret))
+    }
+    
+    return(ret)
+}
+
+printClassHierarchy <- function(class, showParents = TRUE, RD = FALSE)
+{
+    doPrintTxt <- function(cl, level)
+    {
+        indent <- strrep(" ", (level + 1) * 2)
+        
+        if (level > 0)
+            cat(paste0(indent, "|-- ", cl$name))
+        else
+            cat(cl$name)
+        cat("\n")
+
+        for (clsub in cl)
+        {
+            if (is.list(clsub))
+                doPrintTxt(clsub, level + 1)
+        }
+    }
+    
+    doPrintRD <- function(cl, level)
+    {
+        indent <- strrep(" ", (level + 1) * 2)
+        
+        printf("%s%s\\item{%s}\n", if (level == 0) "\\itemize{\n" else "", indent, cl$name)
+
+        more <- any(sapply(cl, is.list))
+        if (more)
+            cat(paste0(indent, "\\itemize{\n"))
+        
+        for (clsub in cl)
+        {
+            if (is.list(clsub))
+                doPrintRD(clsub, level + 1)
+        }
+        
+        if (more)
+            cat(paste0(indent, "}\n"))
+        if (level == 0)
+            cat("}\n")
+    }
+
+    hier <- makeClassHierarchy(class, showParents)
+    hasParents <- hier$name != class
+    
+    if (RD)
+    {
+        hier <- rapply(hier, function(h) sprintf("\\code{\\link{%s}}", h),
+                       classes = "character", how = "replace")
+        
+        # if parents are shown make the second line (ie this class) bold
+        if (hasParents)
+            hier[[2]]$name <- sprintf("\\strong{%s}", hier[[2]]$name)
+        else
+            hier$name <- sprintf("\\strong{%s}", hier$name)
+        
+        doPrintRD(hier, 0)
+    }
+    else
+        doPrintTxt(hier, 0)
+    
+    invisible(NULL)
 }

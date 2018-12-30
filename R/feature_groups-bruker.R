@@ -1,9 +1,13 @@
 #' @include feature_groups.R
 NULL
 
-#' @rdname feature-grouping
+#' @rdname featureGroups-class
 #' @export
 featureGroupsBruker <- setClass("featureGroupsBruker", contains = "featureGroups")
+
+setMethod("initialize", "featureGroupsBruker",
+          function(.Object, ...) callNextMethod(.Object, algorithm = "bruker_profile", ...))
+
 
 #' @details \code{importFeatureGroupsBrukerPA} imports grouped features
 #'   generated with Bruker ProfileAnalysis (PA). To do so, a 'bucket table'

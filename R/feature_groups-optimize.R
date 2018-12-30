@@ -92,7 +92,7 @@ optimizeFeatureGrouping <- function(features, algorithm, ..., templateParams = l
     params <- list(...)
 
     ac <- checkmate::makeAssertCollection()
-    checkmate::assert_class(features, "features", add = ac)
+    checkmate::assertClass(features, "features", add = ac)
     checkmate::assertChoice(algorithm, c("openms", "xcms"), add = ac)
     assertOptimArgs(params, templateParams, paramRanges, maxIterations, maxModelDeviation, ac)
     checkmate::reportAssertions(ac)

@@ -92,9 +92,23 @@ setMethod("$", "featureGroupsComparison", function(x, name)
 #' @name featureGroups-compare
 NULL
 
+#' @rdname featureGroups-compare
 featuresFromFeatGroups <- setClass("featuresFromFeatGroups", contains = "features")
+setMethod("initialize", "featuresFromFeatGroups",
+          function(.Object, ...) callNextMethod(.Object, algorithm = "feature_groups", ...))
+
+#' @rdname featureGroups-compare
+#' @export
 featuresConsensus <- setClass("featuresConsensus", contains = "features")
+setMethod("initialize", "featuresConsensus",
+          function(.Object, ...) callNextMethod(.Object, algorithm = "consensus", ...))
+
+#' @rdname featureGroups-compare
+#' @export
 featureGroupsConsensus <- setClass("featureGroupsConsensus", contains = "featureGroups")
+setMethod("initialize", "featureGroupsConsensus",
+          function(.Object, ...) callNextMethod(.Object, algorithm = "consensus", ...))
+
 
 # pseudo features: feature groups are converted to features by averaging their
 # intensities. Given feature group objects are then considered as an 'analysis'.

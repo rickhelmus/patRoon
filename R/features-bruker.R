@@ -3,9 +3,13 @@
 #' @include utils-bruker.R
 NULL
 
-#' @rdname feature-finding
+#' @rdname features-class
 #' @export
 featuresBruker <- setClass("featuresBruker", contains = "features")
+
+setMethod("initialize", "featuresBruker",
+          function(.Object, ...) callNextMethod(.Object, algorithm = "bruker_da", ...))
+
 
 #' @details \code{findFeaturesBruker} uses the 'Find Molecular Features' (FMF)
 #'   algorithm of Bruker DataAnalysis vendor software to find features. The

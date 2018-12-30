@@ -1,6 +1,10 @@
 #' @include feature_groups.R
 
+#' @rdname target-screening
 featureGroupsBrukerTASQ <- setClass("featureGroupsBrukerTASQ", contains = "featureGroups")
+
+setMethod("initialize", "featureGroupsBrukerTASQ",
+          function(.Object, ...) callNextMethod(.Object, algorithm = "bruker_tasq", ...))
 
 # UNDONE: does this work with analytes that are matched more than once in an analysis?
 

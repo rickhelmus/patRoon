@@ -8,17 +8,9 @@
 \alias{groupFeatures,features-method}
 \alias{groupFeatures}
 \alias{importFeatureGroups}
-\alias{featureGroupsBruker-class}
-\alias{featureGroupsBruker}
 \alias{importFeatureGroupsBrukerPA}
-\alias{featureGroupsEnviMass-class}
-\alias{featureGroupsEnviMass}
 \alias{importFeatureGroupsEnviMass}
-\alias{featureGroupsOpenMS-class}
-\alias{featureGroupsOpenMS}
 \alias{groupFeaturesOpenMS}
-\alias{featureGroupsXCMS-class}
-\alias{featureGroupsXCMS}
 \alias{groupFeaturesXCMS}
 \alias{importFeatureGroupsXCMS}
 \title{Grouping of features}

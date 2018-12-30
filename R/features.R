@@ -1,4 +1,5 @@
 #' @include main.R
+#' @include workflow-step.R
 NULL
 
 #' Base features class
@@ -24,12 +25,14 @@ NULL
 #' @templateVar selOrderi analyses()
 #' @templateVar dollarOpName analysis
 #' @template sub_op-args
+#' 
+#' @templateVar class features
+#' @template class-hierarchy
 #'
 #' @export
 features <- setClass("features",
                      slots = c(features = "list", analysisInfo = "data.frame"),
-                     prototype = list(features = list(), analysisInfo = data.frame()),
-                     contains = "VIRTUAL")
+                     contains = c("VIRTUAL", "workflowStep"))
 
 #' @describeIn features Obtain total number of features.
 #' @export
@@ -39,14 +42,13 @@ setMethod("length", "features", function(x) if (length(x@features) > 0) sum(sapp
 #' @export
 setMethod("show", "features", function(object)
 {
+    callNextMethod(object)
     ftcounts <- if (length(object@features) > 0) sapply(object@features, nrow) else 0
-    printf("A features object ('%s')\n", class(object))
     printf("Total feature count: %d\n", sum(ftcounts))
-    printf("Average feature count/analysis: %.0f\n", sum(ftcounts) / nrow(analysisInfo(object)))
+    printf("Average feature count/analysis: %.0f\n", if (ftcounts > 0) sum(ftcounts) / nrow(analysisInfo(object)) else 0)
     printf("Least features: %s\n", names(object)[which.min(ftcounts)])
     printf("Most features: %s\n", names(object)[which.max(ftcounts)])
     showAnaInfo(analysisInfo(object))
-    showObjectSize(object)
 })
 
 #' @describeIn features Get table with feature information

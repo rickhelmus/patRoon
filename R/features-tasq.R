@@ -1,6 +1,11 @@
 #' @include features.R
 
+#' @rdname target-screening
 featuresBrukerTASQ <- setClass("featuresBrukerTASQ", contains = "features")
+
+setMethod("initialize", "featuresBrukerTASQ",
+          function(.Object, ...) callNextMethod(.Object, algorithm = "bruker_tasq", ...))
+
 
 # internally used by TASQ feature groups
 importFeaturesBrukerTASQ <- function(analysisInfo, TASQExportFile)

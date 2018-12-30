@@ -2,9 +2,13 @@
 #' @include feature_groups.R
 NULL
 
-#' @rdname feature-grouping
+#' @rdname featureGroups-class
 #' @export
 featureGroupsXCMS <- setClass("featureGroupsXCMS", slots = c(xs = "xcmsSet"), contains = "featureGroups")
+
+setMethod("initialize", "featureGroupsXCMS",
+          function(.Object, ...) callNextMethod(.Object, algorithm = "xcms", ...))
+
 
 #' @details \code{groupFeaturesXCMS} uses the \pkg{xcms} package for grouping of
 #'   features. Grouping of features and alignment of their retention times are

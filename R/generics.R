@@ -159,7 +159,7 @@ setGeneric("analysisInfo", function(obj) standardGeneric("analysisInfo"))
 setGeneric("analyses", function(obj) standardGeneric("analyses"))
 
 #' @templateVar func algorithm
-#' @templateVar desc returns the algorithm that was used to generate an object.
+#' @templateVar desc returns the algorithm that was used to generate the object.
 #' @template generics
 setGeneric("algorithm", function(obj) standardGeneric("algorithm"))
 

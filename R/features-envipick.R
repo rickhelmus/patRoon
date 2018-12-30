@@ -1,9 +1,13 @@
 #' @include features.R
 NULL
 
-#' @rdname feature-finding
+#' @rdname features-class
 #' @export
 featuresEnviPick <- setClass("featuresEnviPick", contains = "features")
+
+setMethod("initialize", "featuresEnviPick",
+          function(.Object, ...) callNextMethod(.Object, algorithm = "envipick", ...))
+
 
 #' @details \code{findFeaturesEnviPick} uses the
 #'   \code{\link[enviPick]{enviPickwrap}}. function from the \pkg{enviPick} R

@@ -1,9 +1,12 @@
 #' @include features.R
 NULL
 
-#' @rdname feature-finding
+#' @rdname features-class
 #' @export
 featuresXCMS <- setClass("featuresXCMS", slots = list(xs = "xcmsSet"), contains = "features")
+
+setMethod("initialize", "featuresXCMS",
+          function(.Object, ...) callNextMethod(.Object, algorithm = "xcms", ...))
 
 #' @export
 setMethod("[", c("featuresXCMS", "ANY", "missing", "missing"), function(x, i, j, ..., drop = TRUE)
@@ -13,6 +16,7 @@ setMethod("[", c("featuresXCMS", "ANY", "missing", "missing"), function(x, i, j,
     return(x)
 })
 
+#' @export
 setMethod("filter", "featuresXCMS", function(obj, ...)
 {
     obj <- callNextMethod(obj, ...)

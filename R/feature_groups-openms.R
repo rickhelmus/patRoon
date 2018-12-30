@@ -2,9 +2,13 @@
 #' @include feature_groups.R
 NULL
 
-#' @rdname feature-grouping
+#' @rdname featureGroups-class
 #' @export
 featureGroupsOpenMS <- setClass("featureGroupsOpenMS", contains = "featureGroups")
+
+setMethod("initialize", "featureGroupsOpenMS",
+          function(.Object, ...) callNextMethod(.Object, algorithm = "openms", ...))
+
 
 #' @details \code{groupFeaturesOpenMS} uses the OpenMS tools for grouping of
 #'   features (see \url{http://www.openms.de}). Retention times may be aligned

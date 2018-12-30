@@ -2,9 +2,13 @@
 #' @include main.R
 NULL
 
-#' @rdname feature-finding
+#' @rdname features-class
 #' @export
 featuresOpenMS <- setClass("featuresOpenMS", contains = "features")
+
+setMethod("initialize", "featuresOpenMS",
+          function(.Object, ...) callNextMethod(.Object, algorithm = "openms", ...))
+
 
 #' @details \code{findFeaturesOpenMS} uses the
 #'   \href{http://ftp.mi.fu-berlin.de/pub/OpenMS/release2.1.0-documentation/html/TOPP_FeatureFinderMetabo.html}{FeatureFinderMetabo}

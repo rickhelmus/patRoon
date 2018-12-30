@@ -2,7 +2,12 @@
 #' @include feature_groups.R
 NULL
 
+#' @rdname target-screening
 featureGroupsScreening <- setClass("featureGroupsScreening", contains = "featureGroups")
+
+setMethod("initialize", "featureGroupsScreening",
+          function(.Object, ...) callNextMethod(.Object, algorithm = "screening", ...))
+
 
 # UNDONE: make sure (document) that analyte names should be file compatible names
 

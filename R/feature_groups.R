@@ -1,5 +1,6 @@
 #' @include main.R
 #' @include features.R
+#' @include workflow-step.R
 NULL
 
 #' Base class for grouped features.
@@ -45,15 +46,15 @@ NULL
 #'   feature group (columns) per analysis (rows). Each index corresponds to the
 #'   row within the feature table of the analysis (see
 #'   \code{\link{featureTable}}).
+#'   
+#' @templateVar class features
+#' @template class-hierarchy
 #'
 #' @export
 featureGroups <- setClass("featureGroups",
                           slots = c(groups = "data.table", analysisInfo = "data.frame", groupInfo = "data.frame",
                                     features = "features", ftindex = "data.table"),
-                          prototype = list(groups = data.table(), analysisInfo = data.frame(),
-                                           groupInfo = data.frame(rts = numeric(), mzs = numeric()),
-                                           ftindex = data.table()),
-                          contains = "VIRTUAL")
+                          contains = c("VIRTUAL", "workflowStep"))
 
 #' @describeIn featureGroups Obtain feature group names.
 #' @export
@@ -83,11 +84,11 @@ setMethod("length", "featureGroups", function(x) ncol(x@groups))
 #' @export
 setMethod("show", "featureGroups", function(object)
 {
+    callNextMethod(object)
     anaInfo <- analysisInfo(object)
     printf("A feature groups object ('%s')\n", class(object))
     printf("Feature groups: %s (%d total)\n", getStrListWithMax(names(object), 6, ", "), ncol(groups(object)))
     showAnaInfo(analysisInfo(object))
-    showObjectSize(object)
 })
 
 #' @describeIn featureGroups Accessor for \code{groups} slot.

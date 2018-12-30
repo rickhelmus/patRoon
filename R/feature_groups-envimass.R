@@ -2,9 +2,13 @@
 #' @include feature_groups.R
 NULL
 
-#' @rdname feature-grouping
+#' @rdname featureGroups-class
 #' @export
 featureGroupsEnviMass <- setClass("featureGroupsEnviMass", contains = "featureGroups")
+
+setMethod("initialize", "featureGroupsEnviMass",
+          function(.Object, ...) callNextMethod(.Object, algorithm = "envimass", ...))
+
 
 #' @details \code{importFeatureGroupsEnviMass} imports grouped features
 #'   ('profiles') generated with \pkg{enviMass}. Note that this function

@@ -314,40 +314,74 @@ setMethod("export", "featureGroups", function(fGroups, type, out)
     }
 })
 
-#' @describeIn featureGroups Obtain summary table (a \code{\link{data.table}})
-#'   with retention, \emph{m/z} and intensity information.
-#' @aliases groupTable
+#' @describeIn featureGroups Obtain a summary table (a \code{\link{data.table}})
+#'   with retention, \emph{m/z}, intensity and optionally other feature data.
+#' @slot If \code{TRUE} then feature specific data will be added. If
+#'   \code{average=TRUE} this data will be averaged for each feature group.
 #' @export
-setMethod("groupTable", "featureGroups", function(fGroups, average)
+setMethod("as.data.table", "featureGroups", function(x, average = FALSE, features = FALSE)
 {
-    checkmate::assertFlag(average)
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertFlag(average, add = ac)
+    checkmate::assertFlag(features, add = ac)
+    checkmate::reportAssertions(ac)
 
-    if (length(fGroups) == 0)
+    if (length(x) == 0)
         return(data.table(mz = numeric(), ret = numeric(), group = character()))
 
-    # UNDONE: Add formulas/idents?
-    anaInfo <- analysisInfo(fGroups)
+    anaInfo <- analysisInfo(x)
+    gNames <- names(x)
+    gInfo <- groupInfo(x)
 
-    if (average)
+    if (features)
     {
-        gTable <- averageGroups(fGroups)
-        snames <- unique(anaInfo$group)
+        ftindex <- groupFeatIndex(x)
+        fTable <- featureTable(x)
+        snames <- anaInfo$analysis
+
+        ret <- rbindlist(lapply(gNames, function(grp)
+        {
+            rbindlist(lapply(snames, function(s)
+            {
+                fTable[[s]][ftindex[[grp]][match(s, snames)]]
+            }), idcol = "analysis")
+        }), idcol = "group")
+        ret[, analysis := snames[analysis]]
+        ret[, group := gNames[group]]
+
+        if (average)
+        {
+            ret <- ret[, -c("isocount", "analysis", "ID")]
+            numCols <- setdiff(names(ret), c("group"))
+            ret[, (numCols) := lapply(.SD, mean), .SDcols = numCols, by = "group"]
+            ret <- unique(ret, by = "group")
+        }
+
+        ret[, c("group_ret", "group_mz") := gInfo[group, c("rts", "mzs")]]
+        setcolorder(ret, c("group", "group_ret", "group_mz"))
     }
     else
     {
-        gTable <- groups(fGroups)
-        snames <- anaInfo$analysis
+        if (average)
+        {
+            gTable <- averageGroups(x)
+            snames <- unique(anaInfo$group)
+        }
+        else
+        {
+            gTable <- groups(x)
+            snames <- anaInfo$analysis
+        }
+
+        ret <- transpose(gTable)
+        setnames(ret, snames)
+
+        ret <- insertDTColumn(ret, "mz", gInfo$mzs, 1)
+        ret <- insertDTColumn(ret, "ret", gInfo$rts, 1)
+        ret <- insertDTColumn(ret, "group", rownames(gInfo), 1)
     }
 
-    ret <- transpose(gTable)
-    setnames(ret, snames)
-
-    gInfo <- groupInfo(fGroups)
-    ret <- insertDTColumn(ret, "mz", gInfo$mzs, 1)
-    ret <- insertDTColumn(ret, "ret", gInfo$rts, 1)
-    ret <- insertDTColumn(ret, "group", rownames(gInfo), 1)
-
-    return(ret)
+    return(ret[])
 })
 
 #' @describeIn featureGroups Generates an \emph{m/z} \emph{vs} retention time plot
@@ -936,7 +970,7 @@ setMethod("plotUpSet", "featureGroups", function(obj, which = replicateGroups(ob
 
     obj <- replicateGroupFilter(obj, which, verbose = FALSE)
 
-    gt <- groupTable(obj, average = TRUE)
+    gt <- as.data.table(obj, average = TRUE)
     gt[, (which) := lapply(.SD, function(x) as.integer(x > 0)), .SDcols = which]
     UpSetR::upset(gt, nsets = nsets, nintersects = nintersects, ...)
 })
@@ -1095,7 +1129,7 @@ setMethod("regression", "featureGroups", function(fGroups)
     anaInfo <- analysisInfo(fGroups)
     anaInfo$conc <- as.numeric(anaInfo$conc)
     concs <- anaInfo$conc[!is.na(anaInfo$conc)]
-    ret <- groupInfo(fGroups) # UNDONE: use groupTable
+    ret <- groupInfo(fGroups) # UNDONE: use as.data.table
 
     regr <- lapply(groups(fGroups), function(grp)
     {

@@ -14,7 +14,6 @@ setGeneric("removeEmptyAnalyses", function(fGroups) standardGeneric("removeEmpty
 setGeneric("averageGroups", function(fGroups) standardGeneric("averageGroups"))
 setGeneric("updateFeatIndex", function(fGroups) standardGeneric("updateFeatIndex"))
 setGeneric("export", function(fGroups, type, out) standardGeneric("export"))
-setGeneric("groupTable", function(fGroups, average = FALSE) standardGeneric("groupTable"))
 setGeneric("unique", function(x, incomparables = FALSE, ...) standardGeneric("unique"))
 setGeneric("overlap", function(fGroups, which, exclusive = FALSE) standardGeneric("overlap"))
 setGeneric("comparison", function(..., groupAlgo,
@@ -135,7 +134,7 @@ setGeneric("experimentInfo", function(object, paramSet, DoEIteration) standardGe
 
 #' Miscellaneous generics
 #'
-#' Various (S4) generic functions provide a common interface for common tasks
+#' Various (S4) generic functions providing a common interface for common tasks
 #' such as plotting and filtering data. The actual functionality and function
 #' arguments are often specific for the implemented methods, for this reason,
 #' please refer to the linked method documentation for each generic.

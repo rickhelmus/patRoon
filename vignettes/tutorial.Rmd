@@ -112,10 +112,10 @@ fGroups <- groupFeatures(fList, "openms")
 fGroups
 ```
 
-The `groupTable()` function can be used to have a look at generated feature groups and their intensities (_i.e._ peak heights) across all analyses:
+The `as.data.table()` function can be used to have a look at generated feature groups and their intensities (_i.e._ peak heights) across all analyses:
 
 ```{r gTable}
-head(groupTable(fGroups))
+head(as.data.table(fGroups))
 ```
 
 ## Data cleanup { #data-cleanup }
@@ -278,7 +278,7 @@ head(scr)
 
 ```{r}
 fGroupsScreening <- groupFeaturesScreening(fGroups, scr)
-head(groupTable(fGroupsScreening))
+head(as.data.table(fGroupsScreening))
 ```
 
 ```{r fig.width=7,fig.height=5,results='hide'}

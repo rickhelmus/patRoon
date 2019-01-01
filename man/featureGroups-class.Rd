@@ -26,8 +26,7 @@
 \alias{$,featureGroups-method}
 \alias{export,featureGroups-method}
 \alias{export}
-\alias{groupTable,featureGroups-method}
-\alias{groupTable}
+\alias{as.data.table,featureGroups-method}
 \alias{plot,featureGroups,ANY-method}
 \alias{plotInt,featureGroups-method}
 \alias{plotChord,featureGroups-method}
@@ -81,7 +80,8 @@
 
 \S4method{export}{featureGroups}(fGroups, type, out)
 
-\S4method{groupTable}{featureGroups}(fGroups, average = FALSE)
+\S4method{as.data.table}{featureGroups}(x, average = FALSE,
+  features = FALSE)
 
 \S4method{plot}{featureGroups,ANY}(x, retMin = TRUE, ...)
 
@@ -280,8 +280,8 @@ is readable to Bruker ProfileAnalysis (a 'bucket table'), Bruker TASQ (an
 analyte database) or that is suitable as input for the \verb{Targeted peak
 detection} functionality of \href{http://mzmine.github.io/}{MZmine}.
 
-\item \code{groupTable}: Obtain summary table (a \code{\link{data.table}})
-with retention, \emph{m/z} and intensity information.
+\item \code{as.data.table}: Obtain a summary table (a \code{\link{data.table}})
+with retention, \emph{m/z}, intensity and optionally other feature data.
 
 \item \code{plot}: Generates an \emph{m/z} \emph{vs} retention time plot
 for all featue groups.
@@ -337,6 +337,9 @@ with \code{groupInfo} method.}
 feature group (columns) per analysis (rows). Each index corresponds to the
 row within the feature table of the analysis (see
 \code{\link{featureTable}}).}
+
+\item{\code{If}}{\code{TRUE} then feature specific data will be added. If
+\code{average=TRUE} this data will be averaged for each feature group.}
 }}
 
 \section{S4 class hierarchy}{

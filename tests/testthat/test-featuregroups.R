@@ -50,11 +50,11 @@ test_that("exporting works", {
     expect_error(export(fgOpenMSEmpty, "brukerpa", expfile))
 })
 
-test_that("groupTable works", {
-    expect_equal(nrow(groupTable(fgOpenMS)), length(fgOpenMS))
+test_that("as.data.table works", {
+    expect_equal(nrow(as.data.table(fgOpenMS)), length(fgOpenMS))
     # first 3 cols contain general info, then rep group ints
-    expect_equal(ncol(groupTable(fgOpenMS, average = TRUE)), 3 + length(unique(getTestAnaInfo()$group)))
-    expect_equal(nrow(groupTable(fgOpenMSEmpty)), 0)
+    expect_equal(ncol(as.data.table(fgOpenMS, average = TRUE)), 3 + length(unique(getTestAnaInfo()$group)))
+    expect_equal(nrow(as.data.table(fgOpenMSEmpty)), 0)
 })
 
 test_that("unique works", {

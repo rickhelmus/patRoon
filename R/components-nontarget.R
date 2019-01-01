@@ -46,15 +46,15 @@ generateComponentsNontarget <- function(fGroups, ionization, rtRange = c(-120, 1
     checkmate::assertNumber(maxMzDev, lower = 0, finite = TRUE, add = ac)
     checkmate::assertList(extraOpts, any.missing = FALSE, names = "unique", null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
-    
+
     if (length(fGroups) == 0)
         return(components(componentInfo = data.table(), components = list(), algorithm = "nontarget"))
-    
+
     hash <- makeHash(fGroups, ionization, rtRange, mzRange, elements, maxRTDev, maxMzDev, extraOpts)
     cd <- loadCacheData("componentsNontarget", hash)
     if (!is.null(cd))
         return(cd)
-    
+
     gTable <- groups(fGroups)
     gInfo <- groupInfo(fGroups)
     anaInfo <- analysisInfo(fGroups)
@@ -69,7 +69,7 @@ generateComponentsNontarget <- function(fGroups, ionization, rtRange = c(-120, 1
     groupTablesRG <- sapply(rGroups, function(rg)
     {
         fGrpRep <- replicateGroupFilter(fGroups, rg, verbose = FALSE)
-        return(if (length(fGrpRep) == 0) NULL else groupTable(fGrpRep, average = TRUE))
+        return(if (length(fGrpRep) == 0) NULL else as.data.table(fGrpRep, average = TRUE))
     }, simplify = FALSE)
 
     homArgs <- list(isotopes = isotopes, elements = elements, minmz = mzRange[1],
@@ -81,14 +81,14 @@ generateComponentsNontarget <- function(fGroups, ionization, rtRange = c(-120, 1
     homList <- sapply(rGroups, function(rg)
     {
         gt <- groupTablesRG[[rg]][, c("mz", rg, "ret"), with = FALSE] # convert to nontarget peaklist format
-        
+
         if (is.null(gt))
             return(NULL) # rep group doesn't have feature groups
 
         # UNDONE: find some way to differentiate between actual errors?
         hom <- tryCatch(do.call(nontarget::homol.search, c(list(gt), homArgs)),
                         error = function(e) FALSE)
-        
+
         if (is.logical(hom))
             return(NULL) # no results
 
@@ -246,6 +246,6 @@ generateComponentsNontarget <- function(fGroups, ionization, rtRange = c(-120, 1
 
     ret <- components(componentInfo = cInfo, components = comps, algorithm = "nontarget")
     saveCacheData("componentsNontarget", ret, hash)
-    
+
     return(ret)
 }

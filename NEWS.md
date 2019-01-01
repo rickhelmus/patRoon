@@ -7,7 +7,7 @@
     * Automatic saving & closing of analyses processed with DataAnalysis. Files are now generally closed by default to limit the resources needed by DataAnalysis. 
     * `revertDAAnalyses()` function: brings back set of Bruker analyses to their unprocessed state.
     * Minimum intensity arguments for Bruker DataAnalysis MS peak lists.
-    * Slightly different `doFMF` beahviour for DataAnalysis feature finding.
+    * Slightly different `doFMF` behaviour for DataAnalysis feature finding.
 * Several important updates were made to fomula calculation functionality.
     * The interface has been simplified as the functionality from the `formula` and `formulaConsensus` classes are now merged: there is no need to call `consensus()` anymore after `generateFormulas()`.
     * Formulae can now directly be calculated for feature groups by using group averaged MS peak lists (by setting `calculateFeatures=FALSE`). This can greatly speed up calulcation, especially with many analyses.

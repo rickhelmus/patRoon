@@ -4,6 +4,8 @@
 \name{compounds-class}
 \alias{compounds-class}
 \alias{compounds}
+\alias{compoundsConsensus-class}
+\alias{compoundsConsensus}
 \alias{compoundTable,compounds-method}
 \alias{compoundTable}
 \alias{algorithm,compounds-method}
@@ -240,6 +242,10 @@ method for access.}
 \item{\code{algorithm}}{The algorithm that was used for generation of compounds. Use
 the \code{algorithm} method for access.}
 }}
+
+\section{S4 class hierarchy}{
+ \itemize{   \item{\code{\link{workflowStep}}}   \itemize{     \item{\strong{\code{\link{compounds}}}}     \itemize{       \item{\code{\link{compoundsConsensus}}}       \item{\code{\link{compoundsMF}}}     }   } }
+}
 
 \references{
 \addCitations{rcdk}{1}

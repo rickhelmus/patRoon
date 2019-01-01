@@ -2,8 +2,12 @@
 #' @include components.R
 NULL
 
+#' @rdname components-class
 componentsRC <- setClass("componentsRC", slots = c(RC = "hclust"),
                          contains = "components")
+setMethod("initialize", "componentsRC",
+          function(.Object, ...) callNextMethod(.Object, ..., algorithm = "ramclustr"))
+
 
 #' @details \code{generateComponentsRAMClustR} uses
 #'   \href{https://github.com/cbroeckl/RAMClustR}{RAMClustR} to generate
@@ -39,7 +43,7 @@ generateComponentsRAMClustR <- function(fGroups, st = NULL, sr = NULL, maxt = 12
                                         extraOptsRC = NULL, extraOptsFM = NULL)
 {
     checkPackage("RAMClustR", "cbroeckl/RAMClustR")
-    
+
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
     aapply(checkmate::assertNumber, . ~ st + sr + maxt + hmax, lower = 0, null.ok = TRUE, fixed = list(add = ac))
@@ -51,12 +55,11 @@ generateComponentsRAMClustR <- function(fGroups, st = NULL, sr = NULL, maxt = 12
     checkmate::assertList(extraOptsRC, any.missing = FALSE, names = "unique", null.ok = TRUE, add = ac)
     checkmate::assertList(extraOptsFM, any.missing = FALSE, names = "unique", null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
-    
+
     if (length(fGroups) == 0)
         return(componentsRC(componentInfo = data.table(), components = list(),
-                            algorithm = "RAMClustR",
                             RC = structure(list(), class = "hclust")))
-    
+
     gTable <- groups(fGroups)
     gInfo <- groupInfo(fGroups)
     gNames <- names(fGroups)
@@ -146,7 +149,7 @@ generateComponentsRAMClustR <- function(fGroups, st = NULL, sr = NULL, maxt = 12
     cInfo <- data.table(name = RC$cmpd, ret = RC$clrt, retsd = RC$clrtsd, neutral_mass = RC$M, ppm = Mppm,
                         size = sapply(comps, nrow))
 
-    ret <- componentsRC(RC = RC, components = comps, componentInfo = cInfo, algorithm = "RAMClustR")
+    ret <- componentsRC(RC = RC, components = comps, componentInfo = cInfo)
     saveCacheData("componentsRC", ret, hash)
     return(ret)
 }

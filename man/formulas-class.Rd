@@ -66,9 +66,9 @@ their index or name, respectively (for the order/names see \code{analyses()/grou
 (similar to regular vectors). If missing all analyses/feature groups are selected.\cr\cr For \code{[[}: should be a skalar value. If \code{j} is not specified, \code{i} selects by feature groups instead.}
 
 \item{\dots}{\code{consensus}: One or more \code{formulas} objects that should be used to
-generate the consensus.
+  generate the consensus.
 
-\code{as.data.frame}: Arguments passed to \code{as.data.table}.}
+  \code{as.data.frame}: Arguments passed to \code{as.data.table}.}
 
 \item{drop}{ignored.}
 
@@ -248,6 +248,10 @@ the \code{algorithm} method for access.}
   classification is performed by the rules described in Abdulla 2013.
   Filtering of OM related molecules is performed as described in Koch 2006
   and Kujawinski 2006. (see references).
+}
+
+\section{S4 class hierarchy}{
+ \itemize{   \item{\code{\link{workflowStep}}}   \itemize{     \item{\strong{\code{\link{formulas}}}}   } }
 }
 
 \references{

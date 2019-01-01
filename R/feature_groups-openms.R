@@ -62,8 +62,8 @@ groupFeaturesOpenMS <- function(feat, rtalign = TRUE, QT = FALSE, maxAlignRT = 3
     generateConsensusXML(feat, cfile, rtalign, QT, maxAlignRT, maxAlignMZ, maxGroupRT, maxGroupMZ, verbose)
     fgimp <- importConsensusXML(feat, cfile, verbose)
 
-    ret <- featureGroupsOpenMS(groups = fgimp$groups, groupInfo=fgimp$gInfo, analysisInfo = analysisInfo(feat),
-                               features=feat, ftindex=fgimp$ftindex)
+    ret <- featureGroupsOpenMS(groups = fgimp$groups, groupInfo = fgimp$gInfo, analysisInfo = analysisInfo(feat),
+                               features = feat, ftindex = fgimp$ftindex)
 
     saveCacheData("featureGroupsOpenMS", ret, hash)
 

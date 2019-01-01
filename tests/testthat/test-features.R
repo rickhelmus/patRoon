@@ -20,7 +20,7 @@ if (doDATests())
 {
     anaInfoDA <- getDAAnaInfo()[1, ]
     ffDA <- findFeatures(getDAAnaInfo()[1, ], "bruker")
-    
+
     # NOTE: use 2nd analysis here so first can be re-used for MS peaklists/formulas...
     ffDAEmpty <- findFeatures(getDAAnaInfo()[2, ], "bruker", endRange = 0.01, doFMF = "force")
 }
@@ -31,7 +31,7 @@ test_that("verify feature finder output", {
                        testFile("ff-openms"), tolerance = 1E-5) # increased tolerance value for win/lin deviations
     expect_known_value(featureTable(ffXCMS), testFile("ff-xcms"))
     expect_known_value(featureTable(ffEP), testFile("ff-envipick"))
-    
+
     skip_if_not(doDATests())
     expect_known_value(featureTable(ffDA), testFile("ff-DA"))
 })
@@ -40,7 +40,7 @@ test_that("verify show output", {
     expect_known_show(ffOpenMS, testFile("ff-show-openms", text = TRUE))
     expect_known_show(ffXCMS, testFile("ff-show-xcms", text = TRUE))
     expect_known_show(ffEP, testFile("ff-show-envipick", text = TRUE))
-    
+
     skip_if_not(doDATests())
     expect_known_show(ffDA, testFile("ff-DA", text = TRUE))
 })
@@ -49,7 +49,7 @@ test_that("verify empty object can be generated", {
     expect_length(ffEmpty, 0)
     expect_length(suppressWarnings(findFeatures(anaInfoOne, "xcms", snthresh = 1E9)), 0)
     expect_length(findFeatures(epAnaInfo, "envipick", minint = 1E8, maxint = 1E9), 0)
-    
+
     skip_if_not(doDATests())
     expect_length(ffDAEmpty, 0)
 })

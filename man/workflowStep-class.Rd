@@ -20,7 +20,9 @@
 \S4method{show}{workflowStep}(object)
 }
 \arguments{
-\item{obj, x}{An object (derived from) this class.}
+\item{obj, x, object}{An object (derived from) this class.}
+
+\item{keep.rownames}{Ignored.}
 
 \item{\dots}{Method specific arguments. Please see the documentation of the
 derived classes.}
@@ -46,7 +48,14 @@ converts the result to a classic a \code{data.frame}.
 \item \code{show}: Shows summary information for this object.
 }}
 
+\section{Slots}{
+
+\describe{
+\item{\code{algorithm}}{The algorithm that was used to generate this object. Use the
+\code{algorithm} method for access.}
+}}
+
 \section{S4 class hierarchy}{
- \itemize{   \item{\strong{\code{\link{workflowStep}}}}   \itemize{     \item{\code{\link{features}}}     \itemize{       \item{\code{\link{featuresFromFeatGroups}}}       \item{\code{\link{featuresConsensus}}}       \item{\code{\link{featuresBruker}}}       \item{\code{\link{featuresEnviPick}}}       \item{\code{\link{featuresOpenMS}}}       \item{\code{\link{featuresBrukerTASQ}}}       \item{\code{\link{featuresXCMS}}}     }     \item{\code{\link{featureGroups}}}     \itemize{       \item{\code{\link{featureGroupsBruker}}}       \item{\code{\link{featureGroupsConsensus}}}       \item{\code{\link{featureGroupsEnviMass}}}       \item{\code{\link{featureGroupsOpenMS}}}       \item{\code{\link{featureGroupsScreening}}}       \item{\code{\link{featureGroupsBrukerTASQ}}}       \item{\code{\link{featureGroupsXCMS}}}     }   } }
+ \itemize{   \item{\strong{\code{\link{workflowStep}}}}   \itemize{     \item{\code{\link{features}}}     \itemize{       \item{\code{\link{featuresFromFeatGroups}}}       \item{\code{\link{featuresConsensus}}}       \item{\code{\link{featuresBruker}}}       \item{\code{\link{featuresEnviPick}}}       \item{\code{\link{featuresOpenMS}}}       \item{\code{\link{featuresBrukerTASQ}}}       \item{\code{\link{featuresXCMS}}}     }     \item{\code{\link{featureGroups}}}     \itemize{       \item{\code{\link{featureGroupsBruker}}}       \item{\code{\link{featureGroupsConsensus}}}       \item{\code{\link{featureGroupsEnviMass}}}       \item{\code{\link{featureGroupsOpenMS}}}       \item{\code{\link{featureGroupsScreening}}}       \item{\code{\link{featureGroupsBrukerTASQ}}}       \item{\code{\link{featureGroupsXCMS}}}     }     \item{\code{\link{components}}}     \itemize{       \item{\code{\link{componentsReduced}}}       \item{\code{\link{componentsCamera}}}       \item{\code{\link{componentsIntClust}}}       \item{\code{\link{componentsRC}}}     }     \item{\code{\link{compounds}}}     \itemize{       \item{\code{\link{compoundsConsensus}}}       \item{\code{\link{compoundsMF}}}     }     \item{\code{\link{formulas}}}     \item{\code{\link{MSPeakLists}}}   } }
 }
 

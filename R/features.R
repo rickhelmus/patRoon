@@ -25,7 +25,7 @@ NULL
 #' @templateVar selOrderi analyses()
 #' @templateVar dollarOpName analysis
 #' @template sub_op-args
-#' 
+#'
 #' @templateVar class features
 #' @template class-hierarchy
 #'
@@ -45,7 +45,7 @@ setMethod("show", "features", function(object)
     callNextMethod(object)
     ftcounts <- if (length(object@features) > 0) sapply(object@features, nrow) else 0
     printf("Total feature count: %d\n", sum(ftcounts))
-    printf("Average feature count/analysis: %.0f\n", if (ftcounts > 0) sum(ftcounts) / nrow(analysisInfo(object)) else 0)
+    printf("Average feature count/analysis: %.0f\n", if (length(object) > 0) sum(ftcounts) / nrow(analysisInfo(object)) else 0)
     printf("Least features: %s\n", names(object)[which.min(ftcounts)])
     printf("Most features: %s\n", names(object)[which.max(ftcounts)])
     showAnaInfo(analysisInfo(object))

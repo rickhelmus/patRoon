@@ -46,7 +46,7 @@ NULL
 #'   feature group (columns) per analysis (rows). Each index corresponds to the
 #'   row within the feature table of the analysis (see
 #'   \code{\link{featureTable}}).
-#'   
+#'
 #' @templateVar class features
 #' @template class-hierarchy
 #'
@@ -55,6 +55,19 @@ featureGroups <- setClass("featureGroups",
                           slots = c(groups = "data.table", analysisInfo = "data.frame", groupInfo = "data.frame",
                                     features = "features", ftindex = "data.table"),
                           contains = c("VIRTUAL", "workflowStep"))
+
+setMethod("initialize", "featureGroups", function(.Object, ...)
+{
+    args <- list(...)
+
+    # data.table's don't seem to initialize well (gives error that slot is init as list)
+    if (is.null(args[["groups"]]))
+        args$groups <- data.table()
+    if (is.null(args[["ftindex"]]))
+        args$ftindex <- data.table()
+
+    do.call(callNextMethod, c(list(.Object), args))
+})
 
 #' @describeIn featureGroups Obtain feature group names.
 #' @export
@@ -86,7 +99,6 @@ setMethod("show", "featureGroups", function(object)
 {
     callNextMethod(object)
     anaInfo <- analysisInfo(object)
-    printf("A feature groups object ('%s')\n", class(object))
     printf("Feature groups: %s (%d total)\n", getStrListWithMax(names(object), 6, ", "), ncol(groups(object)))
     showAnaInfo(analysisInfo(object))
 })
@@ -261,11 +273,11 @@ setMethod("export", "featureGroups", function(fGroups, type, out)
     checkmate::assertPathForOutput(out, overwrite = TRUE, add = ac) # NOTE: assert doesn't work on Windows...
     checkmate::reportAssertions(ac)
 
+    if (length(fGroups) == 0)
+        stop("Cannot export empty feature groups object")
+
     if (type == "brukerpa")
     {
-        if (length(fGroups) == 0)
-            stop("Cannot export empty feature groups object")
-
         # UNDONE: do we need this?
         #files <- sapply(bucketInfo$fInfo$analysis, function(f) file.path(bucketInfo$dataPath, paste0(f, ".d")), USE.NAMES = F)
         files <- fGroups@analysisInfo$analysis
@@ -479,7 +491,7 @@ setMethod("plotChord", "featureGroups", function(obj, addSelfLinks = FALSE, addR
     }
 
     chordTable[, value := as.integer(Vectorize(getLinkScore)(from, to))]
-    
+
     if (addSelfLinks)
     {
         gt <- getGTable()
@@ -505,7 +517,7 @@ setMethod("plotChord", "featureGroups", function(obj, addSelfLinks = FALSE, addR
 
     if (all(chordTable$value == 0))
         stop("Did not found any overlap! Nothing to plot.")
-    
+
     tracks <- NULL
     if (hasOuter)
         tracks <- list(list(track.height = 0.1, track.margin = c(if (addRetMzPlots) 0.05 else 0.06, 0)))
@@ -903,9 +915,9 @@ setMethod("plotVenn", "featureGroups", function(obj, which, ...)
 #' @describeIn featureGroups plots an UpSet diagram (using the
 #'   \code{\link[UpSetR]{upset}} function) outlining unique and shared feature
 #'   groups between given replicate groups.
-#'   
+#'
 #' @param nsets,nintersects See \code{\link[UpSetR]{upset}}.
-#' 
+#'
 #' @references \insertRef{Conway2017}{patRoon} \cr\cr
 #'   \insertRef{Lex2014}{patRoon}
 #'

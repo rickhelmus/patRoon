@@ -60,6 +60,8 @@ componentsIntClust <- setClass("componentsIntClust",
                                slots = c(clusterm = "matrix", distm = "dissimilarity", clust = "hclust",
                                          cutClusters = "numeric", gInfo = "data.frame", properties = "list"),
                                contains = "components")
+setMethod("initialize", "componentsIntClust",
+          function(.Object, ...) callNextMethod(.Object, algorithm = "intclust", ...))
 
 
 #' @describeIn componentsIntClust Accessor method to the \code{clust} slot,
@@ -87,17 +89,17 @@ setMethod("treeCut", "componentsIntClust", function(obj, k = NULL, h = NULL)
 {
     if (is.null(k) && is.null(h))
         stop("Either k or h should be specified")
-    
+
     ac <- checkmate::makeAssertCollection()
     checkmate::assertCount(k, positive = TRUE, null.ok = TRUE, add = ac)
     checkmate::assertNumber(h, lower = 0, finite = TRUE, null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
-    
+
     obj@cutClusters <- cutree(obj@clust, k, h)
-    
+
     obj@components <- genIntComponents(obj@cutClusters, obj@gInfo)
     obj@componentInfo <- genIntComponentInfo(obj@cutClusters)
-    
+
     return(obj)
 })
 
@@ -116,13 +118,13 @@ setMethod("treeCutDynamic", "componentsIntClust", function(obj, maxTreeHeight, d
     checkmate::assertFlag(deepSplit, add = ac)
     checkmate::assertCount(minModuleSize, positive = TRUE, add = ac)
     checkmate::reportAssertions(ac)
-    
+
     obj@cutClusters <- doDynamicTreeCut(obj@clust, maxTreeHeight,
                                         deepSplit, minModuleSize)
-    
+
     obj@components <- genIntComponents(obj@cutClusters, obj@gInfo)
     obj@componentInfo <- genIntComponentInfo(obj@cutClusters)
-    
+
     return(obj)
 })
 
@@ -142,7 +144,7 @@ setMethod("plotHeatMap", "componentsIntClust", function(obj, col, interactive, .
     checkmate::assertCharacter(col, min.chars = 1, any.missing = FALSE, add = ac)
     checkmate::assertFlag(interactive, add = ac)
     checkmate::reportAssertions(ac)
-    
+
     if (interactive)
         d3heatmap::d3heatmap(obj@clusterm, Colv = NA, distfun = function(d) dist(d, obj@properties$metric),
                              hclustfun = function(h) hclust(h, obj@properties$method),
@@ -160,17 +162,17 @@ setMethod("plotHeatMap", "componentsIntClust", function(obj, col, interactive, .
 setMethod("plotInt", "componentsIntClust", function(obj, index, ...)
 {
     checkmate::assertInt(index, lower = 1, upper = length(obj@cutClusters), null.ok = TRUE)
-    
+
     plotm <- obj@clusterm[rownames(obj@clusterm) %in% rownames(obj@gInfo)[obj@cutClusters == index], , drop = FALSE]
     nsamp <- ncol(plotm)
-    
+
     plot(x = c(0, nsamp), y = c(0, max(plotm)), type = "n", xlab = "", ylab = "normalized intensity", xaxt = "n", ...)
     axis(1, seq_len(nsamp), colnames(plotm), las = 2)
-    
+
     px <- seq_len(nsamp)
     for (i in seq_len(nrow(plotm)))
         lines(x = px, y = plotm[i, ])
-    
+
     invisible(NULL)
 })
 
@@ -205,21 +207,21 @@ setMethod("plot", "componentsIntClust", function(x, pal = "Paired", numericLabel
 setMethod("plotSilhouettes", "componentsIntClust", function(obj, kSeq, ...)
 {
     checkmate::assertIntegerish(kSeq, lower = 2, any.missing = FALSE)
-    
+
     silInfo <- vector("list", length(kSeq))
     maxmw <- maxk <- NULL
-    
+
     meanws <- sapply(kSeq, function(k)
     {
         sil <- silhouette(cutree(obj@clust, k = k), obj@distm)
         summary(sil)$avg.width
     })
-    
+
     plot(x = kSeq, y = meanws, pch = 16, type = "b", xaxt = "none",
          xlab = "cluster k", ylab = "mean silhouette width", ...)
     axis(1, kSeq)
     abline(v = kSeq[which.max(meanws)], lty = 2)
-    
+
     invisible(NULL)
 })
 
@@ -248,7 +250,7 @@ setMethod("plotSilhouettes", "componentsIntClust", function(obj, kSeq, ...)
 #'
 #' @rdname component-generation
 #' @export
-generateComponentsIntClust <- function(fGroups, method = "complete", metric = "euclidean", 
+generateComponentsIntClust <- function(fGroups, method = "complete", metric = "euclidean",
                                        normFunc = max, average = TRUE,
                                        maxTreeHeight = 1, deepSplit = TRUE,
                                        minModuleSize = 1)
@@ -260,13 +262,13 @@ generateComponentsIntClust <- function(fGroups, method = "complete", metric = "e
     checkmate::assertString(method, add = ac)
     checkmate::assertFlag(average, add = ac)
     checkmate::reportAssertions(ac)
-    
+
     if (length(fGroups) == 0)
         return(componentsIntClust(components = list(), componentInfo = data.table(), clusterm = matrix(),
                                   distm = structure(list(), class = "dissimilarity"),
                                   clust = structure(list(), class = "hclust"), cutClusters = numeric(),
-                                  gInfo = data.frame(), properties = list(), algorithm = "IntClust"))
-    
+                                  gInfo = data.frame(), properties = list()))
+
     if (average)
     {
         gTable <- averageGroups(fGroups)
@@ -277,38 +279,37 @@ generateComponentsIntClust <- function(fGroups, method = "complete", metric = "e
         gTable <- groups(fGroups)
         analysis <- analysisInfo(fGroups)$analysis
     }
-    
+
     if (length(analysis) < 2)
         stop(paste("Need at least >= 2", if (average) "replicate groups" else "analyses"))
-    
+
     clusterdt <- copy(gTable)
-    
+
     cat("Normalizing data... ")
     normv <- clusterdt[, lapply(.SD, normFunc)]
     for (g in seq_along(clusterdt))
         set(clusterdt, j = g, value = clusterdt[[g]] / normv[[g]])
     cat("Done!\n")
-    
+
     clusterm <- as.matrix(transpose(clusterdt))
     rownames(clusterm) <- colnames(gTable)
     colnames(clusterm) <- analysis
-    
+
     cat("Calculating distance matrix... ")
     distm <- daisy(clusterm, metric)
     cat("Done!\n")
-    
+
     cat("Hierarchical clustering... ")
     clust <- hclust(distm, method)
     cat("Done!\n")
-    
+
     cutClusters <- doDynamicTreeCut(clust, maxTreeHeight, deepSplit, minModuleSize)
-    
+
     gInfo <- groupInfo(fGroups)
     comps <- genIntComponents(cutClusters, gInfo)
     cInfo <- genIntComponentInfo(cutClusters)
-    
+
     return(componentsIntClust(components = comps, componentInfo = cInfo, clusterm = clusterm, distm = distm,
                               clust = clust, cutClusters = cutClusters, gInfo = gInfo,
-                              properties = list(metric = metric, method = method, average = average),
-                              algorithm = "IntClust"))
+                              properties = list(metric = metric, method = method, average = average)))
 }

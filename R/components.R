@@ -1,4 +1,5 @@
 #' @include main.R
+#' @include workflow-step.R
 NULL
 
 #' Component class
@@ -41,17 +42,22 @@ NULL
 #'   on this object. The reason for this is that it is often very difficult or
 #'   impossible to subset the algorithmic data.
 #'
+#' @templateVar class components
+#' @template class-hierarchy
+#'
 #' @seealso \link{component-generation} and \code{\link{componentsIntClust}}
 #'
 #' @export
 components <- setClass("components",
-                       slots = c(components = "list", componentInfo = "data.table",
-                                 algorithm = "character"),
-                       prototype = c(components = list(), componentInfo = data.table(),
-                                     algorithm = "none"))
+                       slots = c(components = "list", componentInfo = "data.table"),
+                       contains = "workflowStep")
 
+#' @rdname components-class
 componentsReduced <- setClass("componentsReduced",
                               contains = "components")
+setMethod("initialize", "componentsReduced",
+          function(.Object, ...) callNextMethod(.Object, algorithm = "reduced", ...))
+
 
 #' @describeIn components Accessor method for the \code{components} slot of a
 #'   \code{components} class. Each component is stored as a
@@ -89,8 +95,8 @@ setMethod("names", "components", function(x) names(x@components))
 #' @export
 setMethod("show", "components", function(object)
 {
-    printf("A components object (%s)\n", class(object))
-    printf("Algorithm: %s\n", algorithm(object))
+    callNextMethod()
+
     printf("Components: %s (%d total)\n", getStrListWithMax(names(object), 6, ", "), length(object))
 
     if (length(object@components) == 0)
@@ -100,8 +106,6 @@ setMethod("show", "components", function(object)
 
     printf("Number of feature groups in components: %d (total), %.1f (mean), %d - %d (min - max)\n",
            sum(gCounts), mean(gCounts), min(gCounts), max(gCounts))
-
-    showObjectSize(object)
 })
 
 #' @describeIn components Subset on components/feature groups.
@@ -112,13 +116,13 @@ setMethod("[", c("components", "ANY", "ANY", "missing"), function(x, i, j, ...)
         assertSubsetArg(i)
     if (!missing(j))
         assertSubsetArg(j)
-    
+
     # non-existing indices result in NULL values --> prune
-    
+
     # for some reason we need to explicitly give a data.table() as otherwise it complains componentInfo was assigned a list()
     if (length(x) == 0)
-        return(componentsReduced(components = list(), componentInfo = data.table(), algorithm = "reduced"))
-    
+        return(componentsReduced(components = list(), componentInfo = data.table()))
+
     if (!missing(i))
     {
         if (!is.character(i))
@@ -126,7 +130,7 @@ setMethod("[", c("components", "ANY", "ANY", "missing"), function(x, i, j, ...)
         x@components <- pruneList(x@components[i])
         x@componentInfo <- x@componentInfo[name %in% i]
     }
-    
+
     if (!missing(j))
     {
         if (!is.character(j))
@@ -138,7 +142,7 @@ setMethod("[", c("components", "ANY", "ANY", "missing"), function(x, i, j, ...)
         x@componentInfo[, size := sapply(x@components, nrow)] # update in case groups were filtered away
     }
 
-    return(componentsReduced(components = x@components, componentInfo = x@componentInfo, algorithm = "reduced"))
+    return(componentsReduced(components = x@components, componentInfo = x@componentInfo))
 })
 
 #' @describeIn components Extracts a component table, optionally filtered by a feature group.
@@ -146,10 +150,10 @@ setMethod("[", c("components", "ANY", "ANY", "missing"), function(x, i, j, ...)
 setMethod("[[", c("components", "ANY", "ANY"), function(x, i, j)
 {
     assertExtractArg(i)
-    
+
     if (missing(j))
         return(x@components[[i]])
-    
+
     assertExtractArg(j)
     if (!is.character(j))
         j <- groupNames(x)[j]
@@ -198,7 +202,7 @@ setMethod("plotSpec", "components", function(obj, index, markFGroup = NULL, useG
     checkmate::assertString(markFGroup, min.chars = 1, null.ok = TRUE, add = ac)
     checkmate::assertFlag(useGGPlot2, add = ac)
     checkmate::reportAssertions(ac)
-    
+
     plotData <- copy(componentTable(obj)[[index]]) # UNDONE: allow multiple selection?
 
     haveIso <- !is.null(plotData[["isogroup"]])
@@ -323,7 +327,7 @@ setMethod("plotEIC", "components", function(obj, index, fGroups, rtWindow = 5, .
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
     checkmate::assertNumber(rtWindow, lower = 0, finite = TRUE, add = ac)
     checkmate::reportAssertions(ac)
-    
+
     comp <- componentTable(obj)[[index]]
 
     isHom <- !is.null(comp[["hsnr"]]) # homologues?
@@ -355,19 +359,19 @@ setMethod("plotEIC", "components", function(obj, index, fGroups, rtWindow = 5, .
 setMethod("consensus", "components", function(obj, ...)
 {
     allComponents <- c(list(obj), list(...))
-    
+
     checkmate::assertList(allComponents, types = "components", min.len = 2, any.missing = FALSE,
                           unique = TRUE, .var.name = "...")
-    
+
     allComponents <- allComponents[lengths(allComponents) > 0]
     if (length(allComponents) < 2)
         stop("Need at least two non-empty components objects")
-    
+
     compNames <- make.unique(sapply(allComponents, algorithm))
     retCInfo <- copy(componentInfo(allComponents[[1]]))
     retCInfo[, algorithm := compNames[[1]]]
     retCTable <- componentTable(allComponents[[1]])
-    
+
     for (mi in seq(2, length(allComponents)))
     {
         if (length(allComponents[[mi]]) == 0)
@@ -377,10 +381,10 @@ setMethod("consensus", "components", function(obj, ...)
         retCInfo <- rbind(retCInfo, rci, fill = TRUE)
         retCTable <- c(retCTable, componentTable(allComponents[[mi]]))
     }
-    
+
     retCInfo[, name := paste0(name, "-", algorithm)]
     names(retCTable) <- retCInfo[["name"]]
-    
+
     return(components(components = retCTable, componentInfo = retCInfo, algorithm = paste0(compNames, collapse = ",")))
 })
 

@@ -1,1 +1,1 @@
-A compounds object (compounds)Algorithm: SIRIUSNumber of feature groups with compounds in this object: 4Number of compounds: 400 (total), 100.0 (mean), 100 - 100 (min - max)
+A compounds object (derived from workflowStep)Algorithm: SIRIUSNumber of feature groups with compounds in this object: 4Number of compounds: 400 (total), 100.0 (mean), 100 - 100 (min - max)

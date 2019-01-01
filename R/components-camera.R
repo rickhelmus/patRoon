@@ -2,7 +2,13 @@
 #' @include components.R
 NULL
 
-componentsCamera <- setClass("componentsCamera", slots = c(xsa = "xsAnnotate"), contains = "components")
+#' @rdname components-class
+#' @export
+componentsCamera <- setClass("componentsCamera", slots = c(xsa = "xsAnnotate"),
+                             contains = "components")
+setMethod("initialize", "componentsCamera",
+          function(.Object, ...) callNextMethod(.Object, algorithm = "camera", ...))
+
 
 #' @details \code{generateComponentsCAMERA} provides an interface to
 #'   \href{https://bioconductor.org/packages/release/bioc/html/CAMERA.html}{CAMERA}
@@ -30,7 +36,6 @@ generateComponentsCAMERA <- function(fGroups, ionization, onlyIsotopes = FALSE, 
 
     if (length(fGroups) == 0)
         return(componentsCamera(componentInfo = data.table(), components = list(),
-                                algorithm = "CAMERA",
                                 xsa = new("xsAnnotate")))
 
     hash <- makeHash(fGroups, ionization, onlyIsotopes, extraOpts)
@@ -127,7 +132,7 @@ generateComponentsCAMERA <- function(fGroups, ionization, onlyIsotopes = FALSE, 
 
     # UNDONE: keep n=1 sized components?
 
-    ret <- componentsCamera(xsa = an, components = comps, componentInfo = cInfo, algorithm = "CAMERA")
+    ret <- componentsCamera(xsa = an, components = comps, componentInfo = cInfo)
     saveCacheData("componentsCAMERA", ret, hash)
     return(ret)
 }

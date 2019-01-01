@@ -1,4 +1,5 @@
 #' @include main.R
+#' @include workflow-step.R
 NULL
 
 #' Compound lists class
@@ -36,14 +37,19 @@ NULL
 #'
 #' @template useGGplot2
 #'
+#' @templateVar class compounds
+#' @template class-hierarchy
+#'
 #' @export
 compounds <- setClass("compounds",
-                      slots = c(compounds = "list", algorithm = "character"),
-                      prototype = list(compounds = list(), algorithm = "none"))
+                      slots = c(compounds = "list"),
+                      contains = "workflowStep")
 
+#' @rdname compounds-class
 compoundsConsensus <- setClass("compoundsConsensus",
                                slots = c(mergedCompNames = "character"),
                                contains = "compounds")
+
 
 #' @describeIn compounds Accessor method to obtain generated compounds.
 #' @return \code{compoundTable} returns a \code{list} containing for each feature
@@ -73,8 +79,7 @@ setMethod("length", "compounds", function(x) if (length(x@compounds) > 0) sum(sa
 #' @export
 setMethod("show", "compounds", function(object)
 {
-    printf("A compounds object (%s)\n", class(object))
-    printf("Algorithm: %s\n", paste0(algorithm(object), collapse = "/"))
+    callNextMethod()
 
     mn <- mergedCompoundNames(object)
     if (length(mn) > 1)
@@ -85,8 +90,6 @@ setMethod("show", "compounds", function(object)
     cCounts <- if (length(object) == 0) 0 else sapply(object@compounds, nrow)
     printf("Number of compounds: %d (total), %.1f (mean), %d - %d (min - max)\n",
            sum(cCounts), mean(cCounts), min(cCounts), max(cCounts))
-
-    showObjectSize(object)
 })
 
 #' @describeIn compounds Subset on feature groups.
@@ -874,7 +877,7 @@ setMethod("consensus", "compounds", function(obj, ..., compThreshold = 0.0, minM
     if (length(mCompList) > 0)
         mCompList <- mCompList[sapply(mCompList, function(r) !is.null(r) && nrow(r) > 0, USE.NAMES = FALSE)]
 
-    return(compoundsConsensus(compounds = mCompList, algorithm = unique(paste0(sapply(allCompounds, algorithm))),
+    return(compoundsConsensus(compounds = mCompList, algorithm = paste0(unique(sapply(allCompounds, algorithm)), collapse = ", "),
                               mergedCompNames = compNames))
 })
 

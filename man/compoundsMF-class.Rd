@@ -34,9 +34,11 @@ MetFrag. Feature specific items (\emph{e.g.} spectra and precursor masses)
 are not contained in this list.}
 }}
 
-\references{
-\insertRef{Scholle2018}{patRoon}
+\section{S4 class hierarchy}{
+ \itemize{   \item{\code{\link{compounds}}}   \itemize{     \item{\strong{\code{\link{compoundsMF}}}}   } }
+}
 
+\references{
 \insertRef{Ruttkies2016}{patRoon}
 }
 \seealso{

@@ -41,15 +41,15 @@ setMethod("[", c("featureGroupsComparison", "ANY", "missing", "missing"), functi
     if (!missing(i))
     {
         assertSubsetArg(i)
-        
+
         if (!is.character(i))
             i <- names(x)[i]
-        
+
         i <- i[i %in% names(x)]
         x@fGroupsList <- x@fGroupsList[i]
         x@comparedFGroups <- x@comparedFGroups[i]
     }
-    
+
     return(x)
 })
 
@@ -95,19 +95,15 @@ NULL
 #' @rdname featureGroups-compare
 featuresFromFeatGroups <- setClass("featuresFromFeatGroups", contains = "features")
 setMethod("initialize", "featuresFromFeatGroups",
-          function(.Object, ...) callNextMethod(.Object, algorithm = "feature_groups", ...))
+          function(.Object, ...) callNextMethod(.Object, algorithm = "collapsed_feature_groups", ...))
 
 #' @rdname featureGroups-compare
 #' @export
 featuresConsensus <- setClass("featuresConsensus", contains = "features")
-setMethod("initialize", "featuresConsensus",
-          function(.Object, ...) callNextMethod(.Object, algorithm = "consensus", ...))
 
 #' @rdname featureGroups-compare
 #' @export
 featureGroupsConsensus <- setClass("featureGroupsConsensus", contains = "featureGroups")
-setMethod("initialize", "featureGroupsConsensus",
-          function(.Object, ...) callNextMethod(.Object, algorithm = "consensus", ...))
 
 
 # pseudo features: feature groups are converted to features by averaging their
@@ -119,6 +115,14 @@ convertFeatureGroupsToFeatures <- function(fGroupsList)
     flist <- list()
     for (fgi in seq_along(fGroupsList))
     {
+        if (length(fGroupsList[[fgi]]) == 0)
+        {
+            flist[[fGNames[fgi]]] <- data.table(ID = character(), ret = numeric(), mz = numeric(), intensity = numeric(),
+                                                area = numeric(), retmin = numeric(), retmax = numeric(), mzmin = numeric(),
+                                                mzmax = numeric())
+            next
+        }
+
         gt <- groups(fGroupsList[[fgi]])
         gi <- groupInfo(fGroupsList[[fgi]])
 
@@ -179,14 +183,14 @@ convertFeatureGroupsToFeatures <- function(fGroupsList)
 setMethod("comparison", "featureGroups", function(..., groupAlgo, groupArgs = list(rtalign = FALSE))
 {
     fGroupsList <- list(...)
-    
+
     ac <- checkmate::makeAssertCollection()
     checkmate::assertChoice(groupAlgo, c("xcms", "openms"), add = ac)
     checkmate::assertList(groupArgs, any.missing = FALSE, names = "unique", add = ac)
     checkmate::assertList(fGroupsList, types = "featureGroups", min.len = 2, any.missing = FALSE,
                           unique = TRUE, .var.name = "...", add = ac)
     checkmate::reportAssertions(ac)
-    
+
     labels <- getArgNames(...)
     names(fGroupsList) <- labels
 
@@ -252,9 +256,9 @@ setMethod("consensus", "featureGroupsComparison", function(obj, relAbundance = 0
     checkmate::assertNumber(relAbundance, lower = 0, finite = TRUE, add = ac)
     checkmate::assertNumber(absAbundance, lower = 0, finite = TRUE, add = ac)
     checkmate::reportAssertions(ac)
-    
+
     allAnaInfos <- lapply(obj@fGroupsList, analysisInfo)
-    
+
     # UNDONE: is this a limitation?
     if (!all(sapply(allAnaInfos[-1], identical, allAnaInfos[[1]]))) # from https://stackoverflow.com/a/30850654
         stop("This function only works with feature groups with equal analyses")
@@ -334,13 +338,19 @@ setMethod("consensus", "featureGroupsComparison", function(obj, relAbundance = 0
     }, simplify = FALSE)
     cat("Done!\n")
 
-    retFeatures <- featuresConsensus(features = consFeatures, analysisInfo = anaInfo)
-    
+    allAlgos <- paste0(sapply(obj@fGroupsList, algorithm), collapse = ",")
+
+    retFeatures <- featuresConsensus(features = consFeatures, analysisInfo = anaInfo,
+                                     algorithm = allAlgos)
+
     if (nrow(compFeatInds) == 0) # all input were empty feature groups
-        return(featureGroupsConsensus(analysisInfo = anaInfo, features = retFeatures))
-    
+        return(featureGroupsConsensus(groups = data.table(), groupInfo = data.frame(),
+                                      analysisInfo = anaInfo, features = retFeatures,
+                                      ftindex = data.table(),
+                                      algorithm = allAlgos))
+
     # initialize new feature group tables
-    
+
     consFeatInds <- data.table(matrix(0, nrow = nrow(anaInfo), ncol = ncol(compFeatInds)))
     consFGNames <- colnames(compFeatInds)
     setnames(consFeatInds, consFGNames)
@@ -366,7 +376,7 @@ setMethod("consensus", "featureGroupsComparison", function(obj, relAbundance = 0
 
     return(featureGroupsConsensus(groups = consGroups, analysisInfo = anaInfo,
                                   groupInfo = groupInfo(comparedFGroups), features = retFeatures,
-                                  ftindex = consFeatInds))
+                                  ftindex = consFeatInds, algorithm = allAlgos))
 })
 
 #' @details \code{unique} returns unique feature groups from one or more

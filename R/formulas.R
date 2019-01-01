@@ -1,4 +1,5 @@
 #' @include main.R
+#' @include workflow-step.R
 NULL
 
 #' Formula lists class
@@ -16,7 +17,7 @@ NULL
 #' @param obj,x,object,formulas The \code{formulas} object.
 #' @param \dots \code{consensus}: One or more \code{formulas} objects that should be used to
 #'   generate the consensus.
-#'   
+#'
 #'   \code{as.data.frame}: Arguments passed to \code{as.data.table}.
 #' @param OM For \code{as.data.table}/\code{as.data.frame}: if set to \code{TRUE} several columns
 #'   with information relevant for organic matter (OM) characterization will be
@@ -46,9 +47,12 @@ NULL
 #'   \insertRef{Koch2006}{patRoon} \cr\cr
 #'   \insertRef{Kujawinski2006}{patRoon}
 #'
+#' @templateVar class formulas
+#' @template class-hierarchy
+#'
 #' @export
-formulas <- setClass("formulas",
-                     slots = c(formulas = "list", featureFormulas = "list", algorithm = "character"))
+formulas <- setClass("formulas", slots = c(formulas = "list", featureFormulas = "list"),
+                     contains = "workflowStep")
 
 #' @describeIn formulas Accessor method to obtain generated formulae.
 #'
@@ -89,8 +93,7 @@ setMethod("length", "formulas", function(x) sum(unlist(sapply(x@formulas, functi
 #' @export
 setMethod("show", "formulas", function(object)
 {
-    printf("A formulas object (%s)\n", class(object))
-    printf("Algorithm: %s\n", algorithm(object))
+    callNextMethod()
 
     ft <- formulaTable(object, TRUE)
     hasFeatForms <- length(ft) > 0
@@ -107,8 +110,6 @@ setMethod("show", "formulas", function(object)
     printf("Formulas assigned to feature groups:\n")
     printf("  - Total formula count: %d\n", length(object))
     printf("  - Average formulas per feature group: %.1f\n", mean(mfg))
-
-    showObjectSize(object)
 })
 
 #' @describeIn formulas Subset on feature groups.

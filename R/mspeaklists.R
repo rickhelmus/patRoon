@@ -1,4 +1,5 @@
 #' @include main.R
+#' @include workflow-step.R
 NULL
 
 #' Class containing MS Peak Lists
@@ -25,11 +26,14 @@ NULL
 #' @templateVar optionalji TRUE
 #' @template sub_op-args
 #'
+#' @templateVar class MSPeakLists
+#' @template class-hierarchy
+#'
 #' @param obj,x,object The \code{\link{MSPeakLists}} object to access.
 #' @export
 MSPeakLists <- setClass("MSPeakLists",
-                        slots = c(peakLists = "list", averagedPeakLists = "list", avgPeakListArgs = "list",
-                                  algorithm = "character"))
+                        slots = c(peakLists = "list", averagedPeakLists = "list", avgPeakListArgs = "list"),
+                        contains = "workflowStep")
 
 
 setMethod("initialize", "MSPeakLists", function(.Object, ...)
@@ -78,11 +82,6 @@ setMethod("analyses", "MSPeakLists", function(obj) names(obj@peakLists))
 #' @export
 setMethod("groupNames", "MSPeakLists", function(obj) names(obj@averagedPeakLists))
 
-#' @describeIn MSPeakLists Retrieve the algorithm (a character string) used to
-#'   generate the MS peak lists.
-#' @export
-setMethod("algorithm", "MSPeakLists", function(obj) obj@algorithm)
-
 #' @describeIn MSPeakLists Obtain total number of \emph{m/z} values.
 #' @export
 setMethod("length", "MSPeakLists", function(x) sum(unlist(recursiveApplyDT(x@peakLists, nrow))))
@@ -91,6 +90,8 @@ setMethod("length", "MSPeakLists", function(x) sum(unlist(recursiveApplyDT(x@pea
 #' @export
 setMethod("show", "MSPeakLists", function(object)
 {
+    callNextMethod()
+
     if (length(object) == 0)
     {
         mspcount <- msmspcount <- totpcount <- totpcount <- mslcount <- msmslcount <- totlcount <- 0
@@ -104,7 +105,7 @@ setMethod("show", "MSPeakLists", function(object)
         mslcount <- sum(sapply(object@peakLists, function(pa) sum(sapply(pa, function(pf) !is.null(pf[["MS"]])))))
         msmslcount <- sum(sapply(object@peakLists, function(pa) sum(sapply(pa, function(pf) !is.null(pf[["MSMS"]])))))
         totlcount <- sum(mslcount, msmslcount)
-        
+
         anacount <- length(object@peakLists)
         atotpcount <- totpcount / anacount
         amspcount <- mspcount / anacount
@@ -114,14 +115,12 @@ setMethod("show", "MSPeakLists", function(object)
         amsmslcount <- msmslcount / anacount
     }
 
-    printf("A MSPeakLists object ('%s')\n", class(object))
     printf("Total peak count: %d (MS: %d - MS/MS: %d)\n", totpcount, mspcount, msmspcount)
     printf("Average peak count/analysis: %.0f (MS: %.0f - MS/MS: %.0f)\n", atotpcount,
            amspcount, amsmspcount)
     printf("Total peak lists: %d (MS: %d - MS/MS: %d)\n", totlcount, mslcount, msmslcount)
     printf("Average peak lists/analysis: %.0f (MS: %.0f - MS/MS: %.0f)\n", atotlcount,
            amslcount, amsmslcount)
-    showObjectSize(object)
 })
 
 #' @describeIn MSPeakLists Subset on analyses/feature groups.
@@ -132,16 +131,16 @@ setMethod("[", c("MSPeakLists", "ANY", "ANY", "missing"), function(x, i, j, ...)
         assertSubsetArg(i)
     if (!missing(j))
         assertSubsetArg(j)
-    
+
     # non-existing indices result in NULL values --> prune
-    
+
     if (!missing(i))
     {
         if (!is.character(i))
             i <- analyses(x)[i]
         x@peakLists <- pruneList(x@peakLists[i])
     }
-    
+
     if (!missing(j))
     {
         if (!is.character(j))
@@ -149,10 +148,10 @@ setMethod("[", c("MSPeakLists", "ANY", "ANY", "missing"), function(x, i, j, ...)
         x@peakLists <- sapply(x@peakLists, function(a) return(pruneList(a[j])),
                               simplify = FALSE)
         x@peakLists <- pruneList(x@peakLists, TRUE)
-        
+
         x@averagedPeakLists <- pruneList(x@averagedPeakLists[j], TRUE)
     }
-    
+
     return(x)
 })
 
@@ -166,25 +165,25 @@ setMethod("[[", c("MSPeakLists", "ANY", "ANY"), function(x, i, j)
     assertExtractArg(i)
     if (!missing(j))
         assertSubsetArg(j)
-    
+
     if (!missing(j))
     {
         # both arguments specified, return regular peak lists
 
         if (!is.character(i))
             i <- analyses(x)[i]
-        
+
         if (!is.character(j))
             j <- groupNames(x)[j]
-        
+
         return(x@peakLists[[c(i, j)]])
     }
-    
+
     # else return averaged peak lists for specified feature group
 
     if (!is.character(i))
         i <- groupNames(x)[i]
-    
+
     return(x@averagedPeakLists[[i]])
 })
 
@@ -214,10 +213,10 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
            null.ok = TRUE, fixed = list(add = ac))
     aapply(checkmate::assertFlag, . ~ deIsotopeMS + deIsotopeMSMS, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
-    
+
     if (length(obj) == 0)
         return(obj)
-    
+
     hash <- makeHash(obj, absMSIntThr, absMSMSIntThr, relMSIntThr, relMSMSIntThr,
                      topMSPeaks, topMSMSPeaks, deIsotopeMS, deIsotopeMSMS)
     cache <- loadCacheData("filterMSPeakLists", hash)
@@ -229,33 +228,33 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
         gCount <- length(pl)
         if (gCount == 0)
             return(pl)
-        
+
         prog <- txtProgressBar(0, gCount, style = 3)
-        
+
         pln <- names(pl)
         pl <- lapply(seq_along(pl), function(grpi)
         {
             ret <- doMSPeakListFilter(pl[[grpi]], absMSIntThr, absMSMSIntThr, relMSIntThr, relMSMSIntThr,
                                       topMSPeaks, topMSMSPeaks, deIsotopeMS, deIsotopeMSMS)
             setTxtProgressBar(prog, grpi)
-            
+
             return(ret)
         })
         names(pl) <- pln
-        
+
         # prune empty
         empties <- sapply(pl, function(pg) is.null(pg[["MS"]]) && is.null(pg[["MSMS"]]))
         pl <- pl[!empties]
-        
+
         setTxtProgressBar(prog, gCount)
         close(prog)
-        
+
         return(pl)
     }
-    
+
     pLists <- peakLists(obj)
     oldn <- length(obj)
-    
+
     for (anai in seq_along(pLists))
     {
         printf("Filtering MS peak lists for %d feature groups in analysis '%s'...\n", length(pLists[[anai]]),
@@ -265,17 +264,17 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
 
     # update group averaged peak lists
     obj@averagedPeakLists <- do.call(averageMSPeakLists, c(list(pLists), obj@avgPeakListArgs))
-    
+
     # and filter it as well...
     printf("Filtering averaged MS peak lists for %d feature groups...\n", length(obj@averagedPeakLists))
     obj@averagedPeakLists <- doFilterGroups(obj@averagedPeakLists)
-    
+
     obj@peakLists <- pLists
     saveCacheData("filterMSPeakLists", obj, hash)
 
     newn <- length(obj)
     printf("Done! Filtered %d (%.2f%%) MS peaks. Remaining: %d\n", oldn - newn, if (oldn == 0) 0 else (1-(newn/oldn))*100, newn)
-    
+
     return(obj)
 })
 
@@ -302,27 +301,27 @@ setMethod("plotSpec", "MSPeakLists", function(obj, groupName, analysis = NULL, M
     checkmate::assertChoice(MSLevel, 1:2, add = ac)
     checkmate::assertFlag(useGGPlot2, add = ac)
     checkmate::reportAssertions(ac)
-    
+
     if (length(obj) == 0)
         return(NULL)
-    
+
     MSInd <- if (MSLevel == 1) "MS" else "MSMS"
     if (!is.null(analysis))
         spec <- obj[[analysis, groupName]][[MSInd]]
     else
         spec <- obj[[groupName]][[MSInd]]
-    
+
     if (is.null(spec))
         return(NULL)
-    
+
     if (!is.null(analysis))
         title <- sprintf("%s (%s) %s", groupName, analysis, MSInd)
     else
         title <- paste(groupName, MSInd)
-    
+
     if (useGGPlot2)
         return(makeMSPlotGG(spec, NULL) + ggtitle(title))
-    
+
     makeMSPlot(spec, NULL, main = title)
 })
 

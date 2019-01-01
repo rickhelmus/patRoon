@@ -18,15 +18,20 @@ NULL
 #'
 #' @param compoundsMF A \code{compoundsMF} object.
 #'
-#' @references \insertRef{Scholle2018}{patRoon}
+#' @templateVar class compoundsMF
+#' @template class-hierarchy
 #'
 #' @seealso \code{\link{compounds}} and \link{compound-generation}
 #'
 #' @references \insertRef{Ruttkies2016}{patRoon}
-#' 
+#'
 #' @export
 compoundsMF <- setClass("compoundsMF", slots = c(settings = "list"),
                         contains = "compounds")
+
+setMethod("initialize", "compoundsMF",
+          function(.Object, ...) callNextMethod(.Object, algorithm = "metfrag", ...))
+
 
 #' @describeIn compoundsMF Accessor method for the \code{settings} slot.
 #' @aliases settings
@@ -67,7 +72,7 @@ unifyMFNames <- function(mfr)
                  SmartsSubstructureExclusionScore = "smartsExclusionScore",
                  SuspectListScore = "suspectListScore",
                  RetentionTimeScore = "retentionTimeScore",
-                 
+
                  # Dashboard variables
                  CASRN_DTXSID = "CASRN",
                  CPDAT_COUNT = "CPDATCount",
@@ -181,7 +186,7 @@ generateMetFragRunData <- function(fGroups, MSPeakLists, mfSettings, topMost, id
         spec <- MSPeakLists[[grp]][["MSMS"]]
         if (is.null(spec))
             return(NULL)
-        
+
         mfSettings$IonizedPrecursorMass <- gInfo[grp, "mzs"]
         mfSettings$ExperimentalRetentionTimeValue <- gInfo[grp, "rts"] / 60
 
@@ -227,10 +232,10 @@ processMFResults <- function(metf, spec, db, topMost, lfile = "")
             # NOTE: do as.numeric as values with - will cause the column to be a character
             metf[, (scoreSuspCols) := lapply(.SD, function(x) as.numeric(ifelse(x == "-", 0, x))), .SDcols = scoreSuspCols]
         }
-        
+
         if (!is.null(metf[["CASRN"]]))
             metf[, CASRN := sub("CASRN:", "", CASRN, fixed = TRUE)] # remove "CASRN" prefix
-        
+
         metf[, database := db]
     }
 
@@ -344,10 +349,10 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
                                      maxProcAmount = getOption("patRoon.maxProcAmount"))
 {
     # UNDONE: does addTrivialNames actually work?
-    
+
     if (method == "R")
         checkPackage("metfRag", "c-ruttkies/MetFragR")
-    
+
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
@@ -366,7 +371,7 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
     aapply(checkmate::assertList, . ~ identifiers + extraOpts, any.missing = FALSE,
            names = "unique", null.ok = TRUE, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
-    
+
     anaInfo <- analysisInfo(fGroups)
     ftind <- groupFeatIndex(fGroups)
     gTable <- groups(fGroups)
@@ -476,7 +481,7 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
                                     cmd$gName, exitStatus, retries+1, errorRetries))
                     return(TRUE)
                 }
-                
+
                 # some other error (e.g. java not present)
                 stop(sprintf("Fatal: Failed to execute MetFragCL for %s - exit code: %d", cmd$gName, exitStatus))
             }, maxProcAmount = maxProcAmount, procTimeout = timeout, delayBetweenProc = 1000)
@@ -541,5 +546,5 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
     if (is.null(cachedSet))
         saveCacheSet("identifyMetFrag", resultHashes[resultHashes != ""], setHash, cacheDB)
 
-    return(compoundsMF(compounds = ret, algorithm = "MetFrag", settings = mfSettings))
+    return(compoundsMF(compounds = ret, settings = mfSettings))
 }

@@ -101,21 +101,21 @@ test_that("filtering works", {
     expect_length(filter(formsGFWithMSMS, fragElements = "Na1-100"), 0)
     expect_length(filter(formsGFWithMSMS, fragElements = "Na0-100"), length(formsGFWithMSMS))
     expect_length(filter(formsGFMS, fragElements = "C0-100"), 0) # no MS/MS
-    
+
     expect_length(filter(formsGFWithMSMS, lossElements = "C0-100"), length(formsGFWithMSMS))
     expect_length(filter(formsGFWithMSMS, lossElements = "Na0-100"), length(formsGFWithMSMS))
     expect_gt(length(filter(formsGFWithMSMS, lossElements = "C1-100")), 0) # NL might be empty, at least some should contain carbon though!
     expect_length(filter(formsGFWithMSMS, lossElements = "Na1-100"), 0) # no sodium
     expect_length(filter(formsGFMS, lossElements = "C0-100"), 0) # no MS/MS
-    
+
     expect_equal(length(filter(formsGF, topMost = 1)), length(groupNames(formsGF)))
     expect_range(length(filter(formsGF, topMost = 2)),
                  c(length(groupNames(formsGF)), length(groupNames(formsGF)) * 2))
-    
+
     expect_equivalent(filter(formsGF, scoreLimits = list(isoScore = c(-Inf, Inf))), formsGF)
     expect_lt(length(filter(formsGF, scoreLimits = list(isoScore = c(0.1, Inf)))), length(formsGF))
     expect_length(filter(formsGF, scoreLimits = list(MSMSScore = c(0, Inf))), length(formsGFWithMSMS)) # should filter away MS only formulas
-    
+
     expect_lt(length(filter(formsGF, OM = TRUE)), length(formsGF))
 })
 
@@ -140,13 +140,13 @@ test_that("as.data.table() works", {
     expect_equal(uniqueN(as.data.table(formsGF, average = TRUE), by = "group"),
                  length(groupNames(formsGF)))
     expect_equal(as.data.table(formsGFMS, maxFragFormulas = 1), as.data.table(formsGFMS))
-    
+
     checkmate::expect_names(names(as.data.table(formsGF, countElements = c("C", "H"))),
                             must.include = c("C", "H"))
     checkmate::expect_names(names(as.data.table(formsGF, countFragElements = c("C", "H"))),
                             must.include = c("frag_C", "frag_H"))
     expect_false(any(names(as.data.table(formsGFMS, countFragElements = c("C", "H"))) %in% c("frag_C", "frag_H")))
-    
+
     checkmate::qexpectr(OMTab[, c(unlist(strsplit("CHNOPS", "")), paste0(unlist(strsplit("HNOPS", "")), "C"),
                                   "DBE_AI", "AI")], "N+")
     checkmate::expect_character(OMTab[["classification"]], min.chars = 1, any.missing = FALSE, len = nrow(OMTab))

@@ -6,7 +6,7 @@ getTestAnaInfo <- function(path = patRoonData::exampleDataPath()) generateAnalys
                                                                                        refs = "solvent")
 getTestFGroups <- function(anaInfo = getTestAnaInfo()) groupFeatures(findFeatures(anaInfo, "openms", logPath = NULL), "openms")
 getEmptyTestFGroups <- function() getTestFGroups()[, "none"]
-getEmptyPLists <- function() MSPeakLists()
+getEmptyPLists <- function() MSPeakLists(algorithm = "none")
 
 getDAAnaInfo <- function()
 {
@@ -52,8 +52,8 @@ expect_known_show <- function(object, file)
 
     text <- capture_output_lines(show(act$val))
 
-    # remove last line with object size as it may vary even if object remain the same
-    text <- text[seq_len(length(text)-1)]
+    # remove object size as it may vary even if object remain the same
+    text <- text[!grepl("Object size", text)]
 
     text <- paste0(text, collapse = "")
 

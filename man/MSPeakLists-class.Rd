@@ -9,7 +9,6 @@
 \alias{averagedPeakLists,MSPeakLists-method}
 \alias{analyses,MSPeakLists-method}
 \alias{groupNames,MSPeakLists-method}
-\alias{algorithm,MSPeakLists-method}
 \alias{length,MSPeakLists-method}
 \alias{show,MSPeakLists-method}
 \alias{[,MSPeakLists,ANY,ANY,missing-method}
@@ -25,8 +24,6 @@
 \S4method{analyses}{MSPeakLists}(obj)
 
 \S4method{groupNames}{MSPeakLists}(obj)
-
-\S4method{algorithm}{MSPeakLists}(obj)
 
 \S4method{length}{MSPeakLists}(x)
 
@@ -116,9 +113,6 @@ analyses for which data is present in this object.
 \item \code{groupNames}: returns a \code{character} vector with the names of the
 feature groups for which data is present in this object.
 
-\item \code{algorithm}: Retrieve the algorithm (a character string) used to
-generate the MS peak lists.
-
 \item \code{length}: Obtain total number of \emph{m/z} values.
 
 \item \code{show}: Shows summary information for this object.
@@ -154,4 +148,8 @@ group averaged MS(/MS) peak lists.}
 \item{\code{algorithm}}{The algorithm that was used to generate the MS peak lists.
 Use the \code{algorithm} method for access.}
 }}
+
+\section{S4 class hierarchy}{
+ \itemize{   \item{\code{\link{workflowStep}}}   \itemize{     \item{\strong{\code{\link{MSPeakLists}}}}   } }
+}
 

@@ -39,7 +39,6 @@ Release:
     - report spectra/tables?
     - don't subset on analyses? or re-average? if no, mention in docs
     - $ method?
-- algorithm slot/method for all classes
 - MetFrag: (buggy) trivial name fetching not needed anymore?
 - reportMD: if blanks are still present chord etc not plotted?
 - removeRefAnalyses TRUE by default (or if blank filter is specified?)?

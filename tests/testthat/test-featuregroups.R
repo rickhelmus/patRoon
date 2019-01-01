@@ -33,7 +33,7 @@ test_that("basic subsetting", {
     expect_equivalent(analysisInfo(fgOpenMS[getTestAnaInfo()$analysis[4:6]]), getTestAnaInfo()[4:6, ])
     expect_equal(length(fgOpenMS[FALSE]), 0)
     expect_length(fgOpenMSEmpty[, 1:50], 0)
-    
+
     expect_length(fgOpenMS[[1]], length(analyses(fgOpenMS)))
     expect_length(fgOpenMS[[1, 1]], 1)
     expect_equivalent(fgOpenMS[[4, 50]], groups(fgOpenMS)[[4, 50]])
@@ -48,8 +48,6 @@ test_that("exporting works", {
     expect_file(export(fgOpenMS, "brukertasq", expfile), expfile)
     expect_file(export(fgOpenMS, "mzmine", expfile), expfile)
     expect_error(export(fgOpenMSEmpty, "brukerpa", expfile))
-    expect_file(export(fgOpenMSEmpty, "brukertasq", expfile), expfile)
-    expect_file(export(fgOpenMSEmpty, "mzmine", expfile), expfile)
 })
 
 test_that("groupTable works", {
@@ -61,7 +59,7 @@ test_that("groupTable works", {
 
 test_that("unique works", {
     # note: only have two rep groups
-    
+
     expect_equivalent(unique(fgOpenMS, which = "standard"),
                       unique(fgOpenMS, which = "standard", relativeTo = "solvent"))
     expect_equivalent(unique(fgOpenMS, which = "standard"), unique(fgOpenMS, which = "standard", outer = TRUE))
@@ -73,7 +71,7 @@ test_that("unique works", {
 
 test_that("overlap works", {
     # note: only have two rep groups
-    
+
     expect_lt(length(overlap(fgOpenMS, which = c("standard", "solvent"))), length(fgOpenMS))
     expect_length(overlap(fgOpenMSEmpty, which = c("standard", "solvent")), 0)
 })
@@ -87,14 +85,14 @@ minInt <- function(fg)
 
 test_that("basic filtering", {
     expect_gte(minInt(filter(fgOpenMS, intensityThreshold = 500)), 500)
-    
+
     expect_range(groupInfo(filter(fgOpenMS, retentionRange = c(120, 200)))$rts, range(120, 200))
     expect_equivalent(filter(fgOpenMS, retentionRange = c(0, -1)), fgOpenMS)
     expect_range(groupInfo(filter(fgOpenMS, mzRange = c(200, 300)))$mzs, range(200, 300))
     expect_equivalent(filter(fgOpenMS, mzRange = c(0, -1)), fgOpenMS)
     expect_lt(length(filter(fgOpenMS, chromWidthRange = c(0, 30))), length(fgOpenMS))
     expect_equivalent(filter(fgOpenMS, chromWidthRange = c(0, -1)), fgOpenMS)
-    
+
     expect_identical(unique(analysisInfo(filter(fgOpenMS, rGroups = "standard"))$group), "standard")
     expect_identical(unique(analysisInfo(filter(fgOpenMS, removeRefAnalyses = TRUE))$group), "standard")
     expect_known_output(filter(fgOpenMS, relAbundance = 0.5), testFile("fgf-relabu", text = TRUE))
@@ -131,7 +129,7 @@ fGConsBothEmpty <- consensus(fgCompBothEmpty)
 test_that("verify feature group comparison", {
     expect_known_value(groups(fGCompOpenMS@comparedFGroups), testFile("fg-comp-openms"))
     expect_known_value(groups(fGCompXCMS@comparedFGroups), testFile("fg-comp-xcms"))
-    
+
     expect_named(fGCompOpenMS, c("openms", "xcms"))
     expect_named(fGCompXCMS, c("openms", "xcms"))
     expect_named(fGCompOpenMS[1], "openms")
@@ -141,9 +139,9 @@ test_that("verify feature group comparison", {
     expect_equivalent(fGCompOpenMS[[names(fGCompOpenMS)[2]]], fgXCMS)
     expect_equivalent(fGCompOpenMS[[names(fGCompOpenMS)[2]]], fgXCMS)
     expect_equivalent(callDollar(fGCompOpenMS, names(fGCompOpenMS)[1]), fgOpenMS)
-    
+
     expect_known_value(groups(fGCons), testFile("fg-comp-cons"))
-    
+
     expect_lt(length(consensus(fGCompOpenMS, relAbundance = 1)), length(fGCons))
     expect_lt((length(unique(fGCompOpenMS, which = "openms")) +
                   length(unique(fGCompOpenMS, which = "xcms"))), length(fGCons))
@@ -160,11 +158,11 @@ test_that("reporting works", {
     for (ana in getTestAnaInfo()$analysis)
         checkmate::expect_file_exists(file.path(getWorkPath(), "features",
                                                 sprintf("%s-%s.csv", class(getFeatures(subFGroups)), ana)))
-    
+
     expect_file(reportPDF(subFGroups, getWorkPath()), getWorkPath(sprintf("%s.pdf", class(subFGroups))))
-    
+
     expect_reportMD(makeReportMD(subFGroups))
-    
+
     # skip if pngquant is not specified and not in PATH
     # assign condition to variable as expression seems to be to complicated for skip...
     havePngQuant <- (!is.null(getOption("patRoon.path.pngquant")) && nzchar(getOption("patRoon.path.pngquant"))) ||
@@ -183,10 +181,10 @@ test_that("reporting with empty object works", {
 test_that("plotting works", {
     expect_doppel("retmz", function() plot(fgOpenMS))
     expect_doppel("retmz-comp", function() plot(fGCompOpenMS))
-    
+
     expect_doppel("intensity-def", function() plotInt(fgOpenMS))
     expect_doppel("intensity-avg", function() plotInt(fgOpenMS, TRUE))
-    
+
     expect_doppel("chord-def", function() plotChord(fgOpenMS))
     expect_doppel("chord-selflinks", function() plotChord(fgOpenMS, addSelfLinks = TRUE))
     expect_doppel("chord-nortmz", function() plotChord(fgOpenMS, addRetMzPlots = FALSE))
@@ -195,7 +193,7 @@ test_that("plotting works", {
                            average = TRUE)) # stops with nothing to plot: no overlap
     expect_plot(plotChord(unique(fgOpenMS, which = replicateGroups(fgOpenMS), outer = TRUE),
                           average = TRUE, addSelfLinks = TRUE)) # unless there are self links
-    
+
     expect_doppel("eic-def", function() plotEIC(subFGroups))
     expect_doppel("eic-rtmin", function() plotEIC(subFGroups, retMin = TRUE))
     expect_doppel("eic-tm1", function() plotEIC(subFGroups, topMost = 1))
@@ -203,10 +201,10 @@ test_that("plotting works", {
     expect_doppel("eic-cbr", function() plotEIC(subFGroups, colourBy = "rGroups"))
     expect_doppel("eic-cbf", function() plotEIC(subFGroups, colourBy = "fGroups"))
     expect_doppel("eic-ann", function() plotEIC(subFGroups, annotate = "mz"))
-    
+
     expect_doppel("venn", function() plotVenn(fgOpenMS))
     expect_doppel("venn-comp", function() plotVenn(fGCompOpenMS))
-    
+
     # vdiffr doesn't work with UpSet
     expect_plot(plotUpSet(fgOpenMS))
     expect_plot(plotUpSet(fGCompOpenMS))
@@ -216,20 +214,20 @@ test_that("plotting empty objects works", {
     expect_doppel("retmz-empty", function() plot(fgOpenMSEmpty))
     expect_doppel("retmz", function() plot(fGConsOneEmpty)) # should be same as fgOpenMS
     expect_doppel("retmz-comp-empty", function() plot(fgCompBothEmpty))
-    
+
     expect_doppel("intensity-def-empty", function() plotInt(fgOpenMSEmpty))
     expect_doppel("intensity-avg-empty", function() plotInt(fgOpenMSEmpty, TRUE))
-    
+
     expect_error(plotChord(fgOpenMSEmpty))
     expect_doppel("chord-def", function() plotChord(fGConsOneEmpty)) # should be same as fgOpenMS
     expect_error(plotChord(fgCompBothEmpty))
-    
+
     expect_doppel("eic-def-empty", function() plotEIC(fgOpenMSEmpty))
 
     expect_error(plotVenn(fgOpenMSEmpty))
     expect_doppel("venn", function() plotVenn(fGConsOneEmpty)) # should be same as fgOpenMS
     expect_error(plotVenn(fgCompBothEmpty))
-    
+
     expect_error(plotUpSet(fgOpenMSEmpty))
     expect_plot(plotUpSet(fGConsOneEmpty))
     expect_error(plotUpSet(fgCompBothEmpty))

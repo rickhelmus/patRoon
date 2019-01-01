@@ -39,6 +39,7 @@ Release:
     - report spectra/tables?
     - don't subset on analyses? or re-average? if no, mention in docs
     - $ method?
+    - collapse averagedPeakLists
 - MetFrag: (buggy) trivial name fetching not needed anymore?
 - reportMD: if blanks are still present chord etc not plotted?
 - removeRefAnalyses TRUE by default (or if blank filter is specified?)?
@@ -73,3 +74,5 @@ Release:
 - featInfo function --> generate feature info table for selected fgroup(s)
 - data.table: add '[]' at the end of (exported) functions when ':=' was used (print bug workaround)
 - setAs() for as.data.table()/as.data.frame() methods
+- regular generics docs
+- add/update as.data.table tests

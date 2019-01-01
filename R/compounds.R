@@ -125,6 +125,49 @@ setMethod("$", "compounds", function(x, name)
     eval(substitute(x@compounds$NAME_ARG, list(NAME_ARG = name)))
 })
 
+#' @describeIn compounds Returns all MS peak list data in a table.
+#'
+#' @param fGroups The \code{\link{featureGroups}} object that was used to
+#'   generate this \code{compounds} object. If not \code{NULL} it is used to add
+#'   feature group information (retention and \emph{m/z} values).
+#' @param fragments IF \code{TRUE} then information on annotated fragments will
+#'   be included.
+#'
+#' @export
+setMethod("as.data.table", "compounds", function(x, fGroups = NULL, fragments = FALSE)
+{
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertClass(fGroups, "featureGroups", null.ok = TRUE, add = ac)
+    checkmate::assertFlag(fragments, add = ac)
+    checkmate::reportAssertions(ac)
+
+    if (fragments)
+    {
+        ret <- rbindlist(lapply(compoundTable(x), function(ct)
+        {
+            ct <- copy(ct)
+            ct[, row := seq_len(nrow(ct))]
+
+            fragTab <- rbindlist(ct$fragInfo, idcol = "row", fill = TRUE)
+            fragTab[, PLIndex := NULL]
+            cnames <- setdiff(names(fragTab), "row")
+            setnames(fragTab, cnames, paste0("frag_", cnames))
+
+            return(merge(ct, fragTab, by = "row")[, -"row"])
+        }), idcol = "group", fill = TRUE)
+    }
+    else
+        ret <- rbindlist(compoundTable(x), idcol = "group", fill = TRUE)
+
+    if (!is.null(fGroups))
+    {
+        ret[, c("ret", "group_mz") := groupInfo(fGroups)[group, c("rts", "mzs")]]
+        setcolorder(ret, c("group", "ret", "group_mz"))
+    }
+
+    return(ret[, -"fragInfo"])
+})
+
 #' @describeIn compounds Returns a list containing for each feature group a
 #'   character vector with database identifiers for all candidate compounds. The
 #'   list is named by feature group names, and is typically used with the

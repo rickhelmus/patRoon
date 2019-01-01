@@ -13,6 +13,7 @@
 \alias{show,MSPeakLists-method}
 \alias{[,MSPeakLists,ANY,ANY,missing-method}
 \alias{[[,MSPeakLists,ANY,ANY-method}
+\alias{as.data.table,MSPeakLists-method}
 \alias{filter,MSPeakLists-method}
 \alias{plotSpec,MSPeakLists-method}
 \title{Class containing MS Peak Lists}
@@ -33,6 +34,9 @@
 
 \S4method{[[}{MSPeakLists,ANY,ANY}(x, i, j)
 
+\S4method{as.data.table}{MSPeakLists}(x, fGroups = NULL,
+  averaged = TRUE)
+
 \S4method{filter}{MSPeakLists}(obj, absMSIntThr = NULL,
   absMSMSIntThr = NULL, relMSIntThr = NULL, relMSMSIntThr = NULL,
   topMSPeaks = NULL, topMSMSPeaks = NULL, deIsotopeMS = FALSE,
@@ -49,6 +53,13 @@ their index or name, respectively (for the order/names see \code{analyses()/grou
 (similar to regular vectors). If missing all analyses/feature groups are selected.\cr\cr For \code{[[}: should be a skalar value. If \code{j} is not specified, \code{i} selects by feature groups instead.}
 
 \item{drop}{ignored.}
+
+\item{fGroups}{The \code{\link{featureGroups}} object that was used to
+generate this \code{MSPeakLists} object. If not \code{NULL} it is used to add
+feature group information (retention and \emph{m/z} values).}
+
+\item{averaged}{If \code{TRUE} then feature group averaged peak list data is
+used.}
 
 \item{absMSIntThr, absMSMSIntThr, relMSIntThr, relMSMSIntThr}{Absolute/relative
 intensity threshold for MS or MS/MS peak lists. \code{NULL} for none.}
@@ -123,6 +134,8 @@ feature groups for which data is present in this object.
 lists. If the second argument (\code{j}) is not specified the averaged peak
 lists for the group specified by the first argument (\code{i}) will be
 returned.
+
+\item \code{as.data.table}: Returns all MS peak list data in a table.
 
 \item \code{filter}: provides post filtering of generated MS
 peak lists, which may further enhance quality of subsequent workflow steps

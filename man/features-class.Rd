@@ -11,6 +11,7 @@
 \alias{analysisInfo,features-method}
 \alias{analyses,features-method}
 \alias{replicateGroups,features-method}
+\alias{as.data.table,features-method}
 \alias{filter,features-method}
 \alias{[,features,ANY,missing,missing-method}
 \alias{[[,features,ANY,missing-method}
@@ -36,6 +37,8 @@
 \S4method{analyses}{features}(obj)
 
 \S4method{replicateGroups}{features}(obj)
+
+\S4method{as.data.table}{features}(x)
 
 \S4method{filter}{features}(obj, intensityThreshold = NULL,
   retentionRange = NULL, mzRange = NULL, chromWidthRange = NULL,
@@ -105,6 +108,8 @@ analyses for which data is present in this object.
 
 \item \code{replicateGroups}: returns a \code{character} vector with the names of the
 replicate groups for which data is present in this object.
+
+\item \code{as.data.table}: Returns all feature data in a table.
 
 \item \code{filter}: Performs common rule based filtering of features.
 

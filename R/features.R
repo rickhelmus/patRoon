@@ -79,6 +79,10 @@ setMethod("analyses", "features", function(obj) analysisInfo(obj)$analysis)
 #' @export
 setMethod("replicateGroups", "features", function(obj) unique(analysisInfo(obj)$group))
 
+#' @describeIn features Returns all feature data in a table.
+#' @export
+setMethod("as.data.table", "features", function(x) rbindlist(featureTable(x), idcol = "analysis", fill = TRUE))
+
 #' @describeIn features Performs common rule based filtering of features.
 #' @param intensityThreshold Minimum intensity of a feature. Set to \code{NULL}
 #'   to ignore.

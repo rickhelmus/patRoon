@@ -187,6 +187,41 @@ setMethod("[[", c("MSPeakLists", "ANY", "ANY"), function(x, i, j)
     return(x@averagedPeakLists[[i]])
 })
 
+#' @describeIn MSPeakLists Returns all MS peak list data in a table.
+#'
+#' @param fGroups The \code{\link{featureGroups}} object that was used to
+#'   generate this \code{MSPeakLists} object. If not \code{NULL} it is used to add
+#'   feature group information (retention and \emph{m/z} values).
+#' @param averaged If \code{TRUE} then feature group averaged peak list data is
+#'   used.
+#'
+#' @export
+setMethod("as.data.table", "MSPeakLists", function(x, fGroups = NULL, averaged = TRUE)
+{
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertClass(fGroups, "featureGroups", null.ok = TRUE, add = ac)
+    checkmate::assertFlag(averaged, add = ac)
+    checkmate::reportAssertions(ac)
+
+    if (averaged)
+        ret <- rbindlist(lapply(averagedPeakLists(x), rbindlist, idcol = "type"), idcol = "group")
+    else
+    {
+        ret <- rbindlist(lapply(peakLists(x), function(pa)
+        {
+            rbindlist(lapply(pa, rbindlist, idcol = "type"), idcol = "group")
+        }), idcol = "analysis")
+    }
+
+    if (!is.null(fGroups))
+    {
+        ret[, c("ret", "group_mz") := groupInfo(fGroups)[group, c("rts", "mzs")]][]
+        setcolorder(ret, c("analysis", "group", "ret", "group_mz"))
+    }
+
+    return(ret)
+})
+
 #' @describeIn MSPeakLists provides post filtering of generated MS
 #'   peak lists, which may further enhance quality of subsequent workflow steps
 #'   (\emph{e.g.} formulae calculation and compounds identification) and/or

@@ -15,6 +15,7 @@
 \alias{[,compounds,ANY,missing,missing-method}
 \alias{[[,compounds,ANY,missing-method}
 \alias{$,compounds-method}
+\alias{as.data.table,compounds-method}
 \alias{identifiers,compounds-method}
 \alias{identifiers}
 \alias{filter,compounds-method}
@@ -44,6 +45,9 @@
 \S4method{[[}{compounds,ANY,missing}(x, i, j)
 
 \S4method{$}{compounds}(x, name)
+
+\S4method{as.data.table}{compounds}(x, fGroups = NULL,
+  fragments = FALSE)
 
 \S4method{identifiers}{compounds}(compounds)
 
@@ -85,6 +89,13 @@ consensus.}
 \item{drop, j}{ignored.}
 
 \item{name}{The feature group name (partially matched).}
+
+\item{fGroups}{The \code{\link{featureGroups}} object that was used to
+generate this \code{compounds} object. If not \code{NULL} it is used to add
+feature group information (retention and \emph{m/z} values).}
+
+\item{fragments}{IF \code{TRUE} then information on annotated fragments will
+be included.}
 
 \item{minExplainedPeaks, minScore, minFragScore, minFormulaScore}{Minimal number
 of explained peaks, overall score, in-silico fragmentation score and
@@ -197,6 +208,8 @@ feature groups for which data is present in this object.
 \item \code{[[}: Extract a compound table for a feature group.
 
 \item \code{$}: Extract a compound table for a feature group.
+
+\item \code{as.data.table}: Returns all MS peak list data in a table.
 
 \item \code{identifiers}: Returns a list containing for each feature group a
 character vector with database identifiers for all candidate compounds. The

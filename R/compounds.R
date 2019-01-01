@@ -127,11 +127,10 @@ setMethod("$", "compounds", function(x, name)
 
 #' @describeIn compounds Returns all MS peak list data in a table.
 #'
-#' @param fGroups The \code{\link{featureGroups}} object that was used to
-#'   generate this \code{compounds} object. If not \code{NULL} it is used to add
-#'   feature group information (retention and \emph{m/z} values).
-#' @param fragments IF \code{TRUE} then information on annotated fragments will
+#' @param fragments If \code{TRUE} then information on annotated fragments will
 #'   be included.
+#' 
+#' @template as_data_table-args
 #'
 #' @export
 setMethod("as.data.table", "compounds", function(x, fGroups = NULL, fragments = FALSE)

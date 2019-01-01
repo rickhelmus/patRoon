@@ -189,11 +189,10 @@ setMethod("[[", c("MSPeakLists", "ANY", "ANY"), function(x, i, j)
 
 #' @describeIn MSPeakLists Returns all MS peak list data in a table.
 #'
-#' @param fGroups The \code{\link{featureGroups}} object that was used to
-#'   generate this \code{MSPeakLists} object. If not \code{NULL} it is used to add
-#'   feature group information (retention and \emph{m/z} values).
 #' @param averaged If \code{TRUE} then feature group averaged peak list data is
 #'   used.
+#'
+#' @template as_data_table-args
 #'
 #' @export
 setMethod("as.data.table", "MSPeakLists", function(x, fGroups = NULL, averaged = TRUE)

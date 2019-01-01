@@ -91,10 +91,10 @@ consensus.}
 \item{name}{The feature group name (partially matched).}
 
 \item{fGroups}{The \code{\link{featureGroups}} object that was used to
-generate this \code{compounds} object. If not \code{NULL} it is used to add
-feature group information (retention and \emph{m/z} values).}
+generate this object. If not \code{NULL} it is used to add feature group
+information (retention and \emph{m/z} values).}
 
-\item{fragments}{IF \code{TRUE} then information on annotated fragments will
+\item{fragments}{If \code{TRUE} then information on annotated fragments will
 be included.}
 
 \item{minExplainedPeaks, minScore, minFragScore, minFormulaScore}{Minimal number

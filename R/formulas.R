@@ -177,9 +177,6 @@ setMethod("$", "formulas", function(x, name)
 #' @describeIn formulas Generates a table with all candidate formulae for each
 #'   feature group and other information such as element counts.
 #'
-#' @param fGroups The \code{\link{featureGroups}} object that was used to
-#'   generate this \code{formulas} object. If not \code{NULL} it is used to add
-#'   feature group information (retention and \emph{m/z} values).
 #' @param average If set to \code{TRUE} an 'average formula' is generated for
 #'   each feature group by combining all elements from all candidates and
 #'   averaging their amounts. This obviously leads to non-existing formulae,
@@ -197,6 +194,8 @@ setMethod("$", "formulas", function(x, name)
 #'   formulae (or fragment formulae) per feature group. Set to \code{NULL} to
 #'   ignore.
 #'
+#' @template as_data_table-args
+#' 
 #' @return \code{as.data.table} returns a \code{\link{data.table}}.
 #'
 #' @export
@@ -265,11 +264,6 @@ setMethod("as.data.table", "formulas", function(x, fGroups = NULL, average = FAL
 
     return(ret[])
 })
-
-#' @describeIn formulas Same as \code{as.data.table}, but returns a \code{data.frame}.
-#' @param row.names,optional Ignored.
-#' @export
-setMethod("as.data.frame", "formulas", function(x, row.names = NULL, optional = FALSE, ...) as.data.frame(as.data.table(x, ...)))
 
 #' @describeIn formulas Performs rule based filtering on formula results.
 #'

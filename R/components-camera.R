@@ -124,8 +124,8 @@ generateComponentsCAMERA <- function(fGroups, ionization, onlyIsotopes = FALSE, 
     else
         Ms <- NA
 
-    cInfo <- data.table(name = names(comps), ret = sapply(rets, mean),
-                        retsd = sapply(rets, sd), neutral_mass = Ms,
+    cInfo <- data.table(name = names(comps), cmp_ret = sapply(rets, mean),
+                        cmp_retsd = sapply(rets, sd), neutral_mass = Ms,
                         analysis = anaInfo$analysis[unlist(an@psSamples)],
                         size = sapply(comps, nrow))
 

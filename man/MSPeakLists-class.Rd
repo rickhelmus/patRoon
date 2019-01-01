@@ -55,8 +55,8 @@ their index or name, respectively (for the order/names see \code{analyses()/grou
 \item{drop}{ignored.}
 
 \item{fGroups}{The \code{\link{featureGroups}} object that was used to
-generate this \code{MSPeakLists} object. If not \code{NULL} it is used to add
-feature group information (retention and \emph{m/z} values).}
+generate this object. If not \code{NULL} it is used to add feature group
+information (retention and \emph{m/z} values).}
 
 \item{averaged}{If \code{TRUE} then feature group averaged peak list data is
 used.}

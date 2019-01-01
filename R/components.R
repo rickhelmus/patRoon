@@ -2,6 +2,9 @@
 #' @include workflow-step.R
 NULL
 
+# from https://stackoverflow.com/a/17531678
+orderComponentsNames <- function(n) order(nchar(n), n)
+
 #' Component class
 #'
 #' Contains data for feature groups that are related in some way. These
@@ -165,6 +168,16 @@ setMethod("[[", c("components", "ANY", "ANY"), function(x, i, j)
 setMethod("$", "components", function(x, name)
 {
     eval(substitute(x@components$NAME_ARG, list(NAME_ARG = name)))
+})
+
+#' @describeIn components Returns all component data in a table.
+#' @export
+setMethod("as.data.table", "components", function(x)
+{
+    ret <- rbindlist(componentTable(x), idcol = "name")
+    ret <- merge(componentInfo(x), ret, by = "name")
+    ret <- ret[orderComponentsNames(name)]
+    return(ret)
 })
 
 #' @describeIn components Returns the component id(s) to which a feature group

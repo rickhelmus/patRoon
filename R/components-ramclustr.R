@@ -146,7 +146,7 @@ generateComponentsRAMClustR <- function(fGroups, st = NULL, sr = NULL, maxt = 12
     Mppm[!RC$use.findmain] <- RC$M.ppm.ramclustr[!RC$use.findmain]
 
     # UNDONE: include both main+ramclust results?
-    cInfo <- data.table(name = RC$cmpd, ret = RC$clrt, retsd = RC$clrtsd, neutral_mass = RC$M, ppm = Mppm,
+    cInfo <- data.table(name = RC$cmpd, cmp_ret = RC$clrt, cmp_retsd = RC$clrtsd, neutral_mass = RC$M, cmp_ppm = Mppm,
                         size = sapply(comps, nrow))
 
     ret <- componentsRC(RC = RC, components = comps, componentInfo = cInfo)

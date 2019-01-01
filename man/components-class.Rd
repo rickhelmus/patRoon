@@ -19,6 +19,7 @@
 \alias{[,components,ANY,ANY,missing-method}
 \alias{[[,components,ANY,ANY-method}
 \alias{$,components-method}
+\alias{as.data.table,components-method}
 \alias{findFGroup,components-method}
 \alias{findFGroup}
 \alias{plotSpec,components-method}
@@ -49,6 +50,8 @@
 \S4method{[[}{components,ANY,ANY}(x, i, j)
 
 \S4method{$}{components}(x, name)
+
+\S4method{as.data.table}{components}(x)
 
 \S4method{findFGroup}{components}(obj, fGroup)
 
@@ -144,6 +147,8 @@ feature groups for which data is present in this object.
 \item \code{[[}: Extracts a component table, optionally filtered by a feature group.
 
 \item \code{$}: Extracts a component table by component name.
+
+\item \code{as.data.table}: Returns all component data in a table.
 
 \item \code{findFGroup}: Returns the component id(s) to which a feature group
 belongs.

@@ -107,6 +107,9 @@ generateMSPeakListsDA <- function(fGroups, bgsubtr = TRUE, maxRtMSWidth = 20, mi
                     results$MSMS <- getDAPeakList(DAFind, DASpecs$MSMSSpecs[[grp]], FALSE, TRUE, minMSMSIntensity)
                 
                 results <- pruneList(results) # MS or MSMS entry might be NULL
+                results <- lapply(results, assignPrecursorToMSPeakList,
+                                  precursorMZ = featInfo[group == uncachedGNames[grpi], mz])
+                
                 saveCacheData("MSPeakListsDA", results, resultHashes[[grp]], cacheDB)
                 
                 setTxtProgressBar(prog, grpi)

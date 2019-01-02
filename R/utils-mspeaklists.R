@@ -74,7 +74,7 @@ averageMSPeakLists <- function(peakLists, clusterMzWindow, topMost, minIntensity
     # figure out feature groups from (non-averaged) peak lists
     gNames <- unique(unlist(sapply(peakLists, names, simplify = FALSE), use.names = FALSE))
     gCount <- length(gNames)
-    
+
     if (gCount == 0)
         avgPLists <- list()
     else if (is.null(avgPLists))
@@ -85,15 +85,30 @@ averageMSPeakLists <- function(peakLists, clusterMzWindow, topMost, minIntensity
         {
             plistsMS <- lapply(peakLists, function(pl) pl[[gNames[grpi]]][["MS"]])
             plistsMS <- plistsMS[!sapply(plistsMS, is.null)]
-            plistsMS <- averageSpectra(plistsMS, clusterMzWindow, topMost, minIntensityPre, minIntensityPost, avgFun, method)
-            
+            avgPLMS <- averageSpectra(plistsMS, clusterMzWindow, topMost, minIntensityPre, minIntensityPost, avgFun, method)
+
             plistsMSMS <- lapply(peakLists, function(pl) pl[[gNames[grpi]]][["MSMS"]])
             plistsMSMS <- plistsMSMS[!sapply(plistsMSMS, is.null)]
-            plistsMSMS <- averageSpectra(plistsMSMS, clusterMzWindow, topMost, minIntensityPre, minIntensityPost, avgFun, method)
+            avgPLMSMS <- averageSpectra(plistsMSMS, clusterMzWindow, topMost, minIntensityPre, minIntensityPost, avgFun, method)
+            
+            results <- pruneList(list(MS = if (nrow(avgPLMS) > 0) avgPLMS else NULL,
+                                      MSMS = if (nrow(avgPLMSMS) > 0) avgPLMSMS else NULL))
+
+            # update precursor flags
+            allPL <- c(plistsMS, plistsMSMS)
+            precMZs <- lapply(allPL, function(pl) pl[precursor == TRUE, mz])
+            precMZs <- precMZs[lengths(precMZs) != 0]
+            if (length(precMZs) > 0)
+                precMZ <- mean(unlist(precMZs))
+            else
+            {
+                precMZ <- -1
+                warning(sprintf("Couldn't find back any precursor m/z from spectra of group %s!", gNames[grpi]))
+            }
+            results <- lapply(results, assignPrecursorToMSPeakList, precursorMZ = precMZ)
             
             setTxtProgressBar(prog, grpi)
-            return(pruneList(list(MS = if (nrow(plistsMS) > 0) plistsMS else NULL,
-                                  MSMS = if (nrow(plistsMSMS) > 0) plistsMSMS else NULL)))
+            return(results)
         })
         names(avgPLists) <- gNames
         
@@ -106,6 +121,37 @@ averageMSPeakLists <- function(peakLists, clusterMzWindow, topMost, minIntensity
         cat("Done!\n")
     
     return(avgPLists)
+}
+
+# get corresponding mz of feature from MS peaklist
+getMZIndexFromMSPeakList <- function(featMZ, plist)
+{
+    ret <- which.min(abs(plist$mz - featMZ))
+    if (abs(plist$mz[ret] - featMZ) <= 0.01) # UNDONE: make range configurable?
+        return(ret)
+    return(NA)
+}
+
+getMZFromMSPeakList <- function(featMZ, plist)
+{
+    ret <- getMZIndexFromMSPeakList(featMZ, plist)
+    if (!is.na(ret))
+        return(plist$mz[ret])
+    return(NA)
+}
+
+assignPrecursorToMSPeakList <- function(MSPeakList, precursorMZ)
+{
+    if (nrow(MSPeakList) == 0)
+        MSPeakList[, precursor := logical()]
+    else
+    {
+        MSPeakList[, precursor := FALSE]
+        ind <- getMZIndexFromMSPeakList(precursorMZ, MSPeakList)
+        if (!is.na(ind))
+            MSPeakList[ind, precursor := TRUE]
+    }
+    return(MSPeakList)
 }
 
 deIsotopeMSPeakList <- function(MSPeakList)

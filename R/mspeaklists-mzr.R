@@ -109,6 +109,8 @@ generateMSPeakListsMzR <- function(fGroups, maxRtMSWidth = 20, precursorMzWindow
                                                      avgFeatParams))
                 if (nrow(MSMS) > 0)
                     results$MSMS <- MSMS
+                
+                results <- lapply(results, assignPrecursorToMSPeakList, precursorMZ = ft$mz)
 
                 saveCacheData("MSPeakListsMzR", results, hash, cacheDB)
             }

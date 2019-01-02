@@ -285,9 +285,6 @@ loadRData <- function(fileName)
     get(ls()[ls() != "fileName"])
 }
 
-# get corresponding mz of feature from MS peaklist
-getMZFromMSPeakList <- function(featMZ, plist) return(plist$mz[which.min(abs(plist$mz - featMZ))])
-
 # from https://stackoverflow.com/a/34788691
 jgc <- function()
 {
@@ -420,39 +417,72 @@ countCharInStr <- function(str, ch) sum(charToRaw(str) == charToRaw(ch))
 makeMSPlot <- function(spec, fragInfo, ..., extraHeightInch = 0)
 {
     hasFragInfo <- !is.null(fragInfo) && nrow(fragInfo) > 0
-    isMerged <- hasFragInfo && !is.null(fragInfo[["mergedBy"]])
-    oldp <- NULL
-    # par(mar = c(par("mar")[1:2], 0, 0))
-
-    if (isMerged)
+    plotData <- copy(spec)
+    
+    # default colour/line width
+    plotData[, c("colour", "lwd") := .("grey", 1)]
+    
+    if (hasFragInfo)
     {
-        allMergedBy <- sapply(fragInfo[["mergedBy"]], function(mb) wrapStr(paste0(unlist(mb), collapse = ", "), 10))
-        mbsUnique <- unique(allMergedBy)
-        # order from small to big based on number of commas
-        mbsUnique <- mbsUnique[order(sapply(mbsUnique, countCharInStr, ch = ",", USE.NAMES = FALSE))]
-        mbCombCols <- getBrewerPal(length(mbsUnique), "Paired")
-
-        makeLegend <- function(x, y, ...) legend(x, y, mbsUnique, col = mbCombCols, xpd = NA, bty = "n",
-                                                 text.col = mbCombCols, lty = 1, cex = 0.75, ...)
-
+        fragPlotData <- copy(fragInfo)
+        isMerged <- hasFragInfo && !is.null(fragInfo[["mergedBy"]])
+        if (isMerged)
+        {
+            fragPlotData <- copy(fragInfo)
+            fragPlotData[, mergedBy := sapply(mergedBy, function(mb) wrapStr(paste0(unlist(mb), collapse = ", "), 10))]
+            
+            mbsUnique <- unique(fragPlotData$mergedBy)
+            # order from small to big based on number of commas
+            mbsUnique <- mbsUnique[order(sapply(mbsUnique, countCharInStr, ch = ",", USE.NAMES = FALSE))]
+            mbCombCols <- setNames(getBrewerPal(length(mbsUnique), "Paired"), mbsUnique)
+            
+            fragPlotData[nzchar(mergedBy), c("colour", "lwd") := .(mbCombCols[match(mergedBy, mbsUnique)], 2)]
+            setnames(fragPlotData, "mergedBy", "legend")
+        }
+        else
+            fragPlotData[, c("colour", "lwd", "legend") := .("blue", 2, "assigned")] # nothing merged, just mark all annotated blue
+        
+        fragPlotData[, formWidth := strwidth(formula, units = "inches")]
+        
+        # add PLIndex to merge
+        plotData[, PLIndex := seq_len(nrow(plotData))]
+        plotData[fragPlotData, c("colour", "lwd", "formula", "formWidth", "legend") :=
+                     .(ifelse(is.na(i.colour), colour, i.colour),
+                       ifelse(is.na(i.lwd), lwd, i.lwd),
+                       i.formula, i.formWidth, i.legend), on = "PLIndex"]
+    }
+    
+    # mark precursor
+    plotData[precursor == TRUE, c("colour", "lwd", "legend") := .("red", 2, "precursor")]
+    
+    doLegend <- !is.null(plotData[["legend"]])
+    if (doLegend)
+    {
+        makeLegend <- function(x, y, ...)
+        {
+            legTab <- unique(plotData, by = "legend")[!is.na(legend)]
+            # order from small to big based on number of commas
+            legTab <- legTab[order(sapply(legTab$legend, countCharInStr, ch = ",", USE.NAMES = FALSE))]
+            legend(x, y, legTab$legend, col = legTab$colour, xpd = NA, bty = "n",
+                   text.col = legTab$colour, lty = 1, cex = 0.75, ...)
+        }
+        
         plot.new()
         leg <- makeLegend(0, 0, plot = FALSE)
-        lw <- (grconvertX(leg$rect$w, to = "ndc") - grconvertX(0, to = "ndc"))
+        lw <- grconvertX(leg$rect$w, to = "ndc") - grconvertX(0, to = "ndc")
         oldp <- par(omd = c(0, 1 - lw, 0, 1), new = TRUE)
     }
-
-    # ym <- (if (is.null(fragInfo)) max(spec$intensity) else max(fragInfo$intensity)) * 1.2
-    fragInfoInds <- if (hasFragInfo) match(seq_len(nrow(spec)), fragInfo$PLIndex, 0) else rep(0, nrow(spec))
+    
+    formWidths <- if (!is.null(plotData[["formWidth"]])) plotData$formWidth else rep(0, nrow(plotData))
+    formWidths[is.na(formWidths)] <- 0
     
     # see how much extra vertical space is needed by formula labels
     # get character widths (assuming that height of vertically plotted text is the same)
-    formWidths <- sapply(fragInfoInds, function(i) if (i) strwidth(fragInfo$formula[i], units = "inches") else 0)
-    
     pheight <- par("din")[2] # plot dev height in inches
     relFormHeights <- formWidths / pheight
     
-    ym <- max(spec$intensity) # 'regular' plot height in user coordinates, not considering any labels etc
-    relIntHeights <- spec$intensity / ym
+    ym <- max(plotData$intensity) # 'regular' plot height in user coordinates, not considering any labels etc
+    relIntHeights <- plotData$intensity / ym
     maxRelH <- max(relFormHeights + relIntHeights)
     
     ym <- ym * maxRelH * 1.05 # enlarge y limit and add some extra spacing
@@ -460,31 +490,24 @@ makeMSPlot <- function(spec, fragInfo, ..., extraHeightInch = 0)
     if (extraHeightInch > 0)
         ym <- ym * (1 + (extraHeightInch / pheight))
     
-    plot(0, xlab = "m/z", ylab = "Intensity", xlim = range(spec$mz) * c(0.9, 1.1), ylim = c(0, ym),
-         type = "n", bty = "l", ...)
-
-    for (i in seq_len(nrow(spec)))
+    plot(0, xlab = "m/z", ylab = "Intensity", xlim = range(plotData$mz) * c(0.9, 1.1), ylim = c(0, ym),
+         type = "n", bty = "l", ...)    
+    
+    for (i in seq_len(nrow(plotData)))
     {
-        infoi <- fragInfoInds[i]
-
-        if (infoi && isMerged)
-            specCol <- mbCombCols[match(allMergedBy[infoi], mbsUnique)]
-        else if (infoi)
-            specCol <- "blue"
-        else
-            specCol <- "grey"
-
-        segments(spec[i]$mz, 0, spec[i]$mz, spec[i]$intensity, col = specCol, lwd = if (infoi) 2 else 1)
-
-        if (infoi)
-            text(spec[i]$mz, spec[i]$intensity + (ym * 0.02), fragInfo$formula[infoi], srt = 90, adj = 0)
+        segments(plotData[[i, "mz"]], 0, plotData[[i, "mz"]], plotData[[i, "intensity"]],
+                 col = plotData[[i, "colour"]], lwd = plotData[[i, "lwd"]])
+        
+        if (!is.null(plotData[["formula"]]) && !is.na(plotData[[i, "formula"]]))
+            text(plotData[[i, "mz"]], plotData[[i, "intensity"]] + (ym * 0.02),
+                 plotData[[i, "formula"]], srt = 90, adj = 0)
     }
-
-    if (isMerged)
+    
+    if (doLegend)
+    {
         makeLegend(par("usr")[2], par("usr")[4])
-
-    if (!is.null(oldp))
         par(oldp)
+    }
 }
 
 makeMSPlotGG <- function(spec, fragInfo, ...)
@@ -519,6 +542,10 @@ makeMSPlotGG <- function(spec, fragInfo, ...)
         plotData[!is.na(fiInd), lwd := 2]
         plotData[!is.na(fiInd), text := fragInfo$formula[fiInd]]
     }
+    
+    # mark precursor
+    plotData[precursor == TRUE, c("colour", "lab", "lwd", "text") :=
+                 .("red", "precursor", 2, "")]
 
     ggplot(plotData, aes_string(x = "mz", y = 0, label = "text")) + xlim(range(spec$mz) * c(0.9, 1.1)) +
         geom_segment(aes_string(xend = "mz", yend = "intensity",

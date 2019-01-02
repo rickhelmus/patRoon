@@ -52,9 +52,15 @@ test_that("exporting works", {
 
 test_that("as.data.table works", {
     expect_equal(nrow(as.data.table(fgOpenMS)), length(fgOpenMS))
+    
     # first 3 cols contain general info, then rep group ints
     expect_equal(ncol(as.data.table(fgOpenMS, average = TRUE)), 3 + length(unique(getTestAnaInfo()$group)))
-    expect_equal(nrow(as.data.table(fgOpenMSEmpty)), 0)
+    
+    expect_range(nrow(as.data.table(fgOpenMS, features = TRUE)), length(fgOpenMS) * c(1, length(analyses(fgOpenMS))))
+    
+    expect_equal(nrow(as.data.table(fgOpenMSEmpty, average = TRUE)), 0)
+    expect_equal(nrow(as.data.table(fgOpenMSEmpty, features = TRUE)), 0)
+    expect_equal(nrow(as.data.table(fgOpenMSEmpty, average = TRUE, features = TRUE)), 0)
 })
 
 test_that("unique works", {

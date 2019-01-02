@@ -86,3 +86,7 @@ test_that("basic filtering", {
     expect_length(filter(ffEmpty, intensityThreshold = 500, retentionRange = c(120, -1),
                          mzRange = c(100, 400)), 0)
 })
+
+test_that("basic usage", {
+    expect_equal(nrow(as.data.table(ffOpenMS)), length(ffOpenMS))
+})

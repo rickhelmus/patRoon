@@ -112,6 +112,12 @@ test_that("basic functionality", {
     
     expect_equivalent(plists[[20]], averagedPeakLists(plists)[[groupNames(plists)[20]]])
     expect_equivalent(plists[[groupNames(plists)[20]]], averagedPeakLists(plists)[[groupNames(plists)[20]]])
+    
+    expect_equal(nrow(as.data.table(plists, averaged = TRUE)),
+                 sum(unlist(recursiveApplyDT(averagedPeakLists(plists), nrow))))
+    expect_equal(nrow(as.data.table(plists, averaged = FALSE)), length(plists))
+    checkmate::expect_names(names(as.data.table(plists, fGroups = fGroups)),
+                            must.include = c("ret", "group_mz"))
 })
 
 test_that("plotting works", {

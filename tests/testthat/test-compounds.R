@@ -106,6 +106,15 @@ test_that("basic subsetting", {
     expect_equivalent(callDollar(comps, groupNames(comps)[1]), comps[[1]])
 })
 
+test_that("basic usage", {
+    expect_equal(nrow(as.data.table(comps)), length(comps))
+    checkmate::expect_names(names(as.data.table(comps, fGroups = fGroups)),
+                            must.include = c("ret", "group_mz"))
+    checkmate::expect_names(names(as.data.table(comps, fragments = TRUE)),
+                            must.include = c("frag_formula", "frag_mz"))
+    expect_gt(nrow(as.data.table(comps, fragments = TRUE)), length(comps))
+})
+
 if (doMetFrag)
 {
     forms <- generateFormulas(fGroupsSub, "genform", plists)

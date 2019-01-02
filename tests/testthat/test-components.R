@@ -53,7 +53,9 @@ test_that("basic subsetting", {
     expect_equivalent(callDollar(compsRC, names(compsRC)[3]), compsRC[[3]])
 })
 
-test_that("findFGroup works", {
+test_that("basic usage works", {
+    expect_equal(length(unique(as.data.table(compsCAM)$name)), length(compsCAM))
+    
     expect_equivalent(findFGroup(compsCAM, names(fGroupsSimple)[1]), 2)
     expect_length(findFGroup(compsCAM, "none"), 0)
     expect_length(findFGroup(compsEmpty, "1"), 0)

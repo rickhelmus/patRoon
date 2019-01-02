@@ -143,6 +143,10 @@ setGeneric("experimentInfo", function(object, paramSet, DoEIteration) standardGe
 #' @param \dots Any further method specific arguments. See method documentation
 #'   for details.
 #'
+#' @section Other generics: Below are methods that are defined for existing
+#'   generics (\emph{e.g.} defined in \code{base}). Please see method specific
+#'   documentation for more details.
+#'
 #' @name generics
 NULL
 
@@ -289,3 +293,54 @@ setGeneric("reportMD", function(fGroups, path = "report", reportPlots = c("chord
                                 EICRtWindow = 20, EICMzWindow = 0.005, EICTopMost = NULL, EICOnlyPresent = TRUE,
                                 selfContained = TRUE, optimizePng = FALSE, maxProcAmount = getOption("patRoon.maxProcAmount"),
                                 clearPath = FALSE, openReport = TRUE) standardGeneric("reportMD"))
+
+
+#' @templateVar func [
+#' @templateVar desc Subsets data within an object.
+#' @template existing-generics
+NULL
+
+#' @templateVar func [[
+#' @templateVar desc Extract data from an object.
+#' @template existing-generics
+NULL
+
+#' @templateVar func $
+#' @templateVar desc Extract data from an object.
+#' @template existing-generics
+NULL
+
+#' @templateVar func as.data.table
+#' @templateVar desc Converts an object to a table (\code{\link{data.table}}).
+#' @template existing-generics
+NULL
+
+#' @templateVar func as.data.frame
+#' @templateVar desc Converts an object to a table (\code{data.frame}).
+#' @template existing-generics
+NULL
+
+#' @templateVar func length
+#' @templateVar desc Returns the length of an object.
+#' @template existing-generics
+NULL
+
+#' @templateVar func lengths
+#' @templateVar desc Returns the lengths of elements within this object.
+#' @template existing-generics
+NULL
+
+#' @templateVar func names
+#' @templateVar desc Return names for this object.
+#' @template existing-generics
+NULL
+
+#' @templateVar func plot
+#' @templateVar desc Generates a plot for an object.
+#' @template existing-generics
+NULL
+
+#' @templateVar func show
+#' @templateVar desc Prints information about this object.
+#' @template existing-generics
+NULL

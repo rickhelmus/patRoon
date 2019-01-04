@@ -34,6 +34,8 @@ test_that("verify show output", {
 
 checkMinInt <- function(plists, relative, doMSMS)
 {
+    plists <- removePrecursors(plists)
+    
     minIntPL <- function(pl)
     {
         if (!doMSMS)
@@ -59,7 +61,7 @@ checkMinInt <- function(plists, relative, doMSMS)
 
 checkMaxPeaks <- function(plists, doMSMS)
 {
-    pl <- peakLists(plists)
+    pl <- peakLists(removePrecursors(plists))
     return(max(sapply(pl, function(ana) max(sapply(ana, function(grp)
     {
         if (!doMSMS)
@@ -78,11 +80,13 @@ test_that("filtering", {
     expect_gte(checkMinInt(filter(plists, relMSMSIntThr = 0.2), TRUE, TRUE), 0.2)
     expect_lte(checkMaxPeaks(filter(plists, topMSPeaks = 10), FALSE), 10)
     expect_lte(checkMaxPeaks(filter(plists, topMSMSPeaks = 10), TRUE), 10)
+    expect_lte(length(filter(plists, topMSMSPeaks = 10, retainPrecursorMSMS = FALSE)),
+               length(filter(plists, topMSMSPeaks = 10)))
     # UNDONE: deisotope?
 })
 
-plistsEmpty <- filter(plists, absMSIntThr = 1E9, absMSMSIntThr = 1E9)
-plistsEmptyMS <- filter(plists, absMSIntThr = 1E9)
+plistsEmpty <- removePrecursors(filter(plists, absMSIntThr = 1E9, absMSMSIntThr = 1E9))
+plistsEmptyMS <- removePrecursors(filter(plists, absMSIntThr = 1E9))
 
 test_that("empty object", {
     expect_length(plistsEmpty, 0)
@@ -131,9 +135,13 @@ test_that("plotting works", {
                                                             MSLevel = 2))
 
     expect_plot(print(plotSpec(plists, groupName = groupNames(plists)[70],
-                               analysis = analyses(plists)[1], MSLevel = 1)))
+                               analysis = analyses(plists)[1], MSLevel = 1,
+                               useGGPlot2 = TRUE)))
     expect_plot(print(plotSpec(plists, groupName = groupNames(plists)[70],
-                               analysis = analyses(plists)[1], MSLevel = 2)))
-    expect_plot(print(plotSpec(plists, groupName = groupNames(plists)[70], MSLevel = 1)))
-    expect_plot(print(plotSpec(plists, groupName = groupNames(plists)[70], MSLevel = 2)))
+                               analysis = analyses(plists)[1], MSLevel = 2,
+                               useGGPlot2 = TRUE)))
+    expect_plot(print(plotSpec(plists, groupName = groupNames(plists)[70], MSLevel = 1,
+                               useGGPlot2 = TRUE)))
+    expect_plot(print(plotSpec(plists, groupName = groupNames(plists)[70], MSLevel = 2,
+                               useGGPlot2 = TRUE)))
 })

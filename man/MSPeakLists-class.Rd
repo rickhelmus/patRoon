@@ -40,7 +40,7 @@
 \S4method{filter}{MSPeakLists}(obj, absMSIntThr = NULL,
   absMSMSIntThr = NULL, relMSIntThr = NULL, relMSMSIntThr = NULL,
   topMSPeaks = NULL, topMSMSPeaks = NULL, deIsotopeMS = FALSE,
-  deIsotopeMSMS = FALSE)
+  deIsotopeMSMS = FALSE, retainPrecursorMSMS = TRUE)
 
 \S4method{plotSpec}{MSPeakLists}(obj, groupName, analysis = NULL,
   MSLevel = 2, useGGPlot2 = FALSE)
@@ -71,6 +71,10 @@ with highest intensity. \code{NULL} to consider all.}
 peak lists. This may improve data processing steps which do not assume the
 presence of isotopic peaks (e.g. MetFrag for MS/MS). Note that
 \code{getMzRPeakLists} does not (yet) support flagging of isotopes.}
+
+\item{retainPrecursorMSMS}{If \code{TRUE} then precursor peaks will never be
+filtered out from MS/MS peak lists (note that precursors are never removed
+from MS peak lists).}
 
 \item{groupName}{The name of the feature group for which a plot should be
 made.}
@@ -137,10 +141,10 @@ returned.
 
 \item \code{as.data.table}: Returns all MS peak list data in a table.
 
-\item \code{filter}: provides post filtering of generated MS
-peak lists, which may further enhance quality of subsequent workflow steps
-(\emph{e.g.} formulae calculation and compounds identification) and/or
-speed up these processes.
+\item \code{filter}: provides post filtering of generated MS peak lists,
+which may further enhance quality of subsequent workflow steps (\emph{e.g.}
+formulae calculation and compounds identification) and/or speed up these
+processes.
 
 \item \code{plotSpec}: Plots a spectrum using MS or MS/MS peak lists for a
 given feature group.

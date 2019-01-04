@@ -223,10 +223,10 @@ setMethod("as.data.table", "MSPeakLists", function(x, fGroups = NULL, averaged =
     return(ret)
 })
 
-#' @describeIn MSPeakLists provides post filtering of generated MS
-#'   peak lists, which may further enhance quality of subsequent workflow steps
-#'   (\emph{e.g.} formulae calculation and compounds identification) and/or
-#'   speed up these processes.
+#' @describeIn MSPeakLists provides post filtering of generated MS peak lists,
+#'   which may further enhance quality of subsequent workflow steps (\emph{e.g.}
+#'   formulae calculation and compounds identification) and/or speed up these
+#'   processes.
 #'
 #' @param absMSIntThr,absMSMSIntThr,relMSIntThr,relMSMSIntThr Absolute/relative
 #'   intensity threshold for MS or MS/MS peak lists. \code{NULL} for none.
@@ -236,25 +236,28 @@ setMethod("as.data.table", "MSPeakLists", function(x, fGroups = NULL, averaged =
 #'   peak lists. This may improve data processing steps which do not assume the
 #'   presence of isotopic peaks (e.g. MetFrag for MS/MS). Note that
 #'   \code{getMzRPeakLists} does not (yet) support flagging of isotopes.
+#' @param retainPrecursorMSMS If \code{TRUE} then precursor peaks will never be
+#'   filtered out from MS/MS peak lists (note that precursors are never removed
+#'   from MS peak lists).
 #'
 #' @export
 setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntThr = NULL, relMSIntThr = NULL,
                                             relMSMSIntThr = NULL, topMSPeaks = NULL, topMSMSPeaks = NULL,
-                                            deIsotopeMS = FALSE, deIsotopeMSMS = FALSE)
+                                            deIsotopeMS = FALSE, deIsotopeMSMS = FALSE, retainPrecursorMSMS = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertNumber, . ~ absMSIntThr + absMSMSIntThr + relMSIntThr + relMSMSIntThr,
            lower = 0, finite = TRUE, null.ok = TRUE, fixed = list(add = ac))
     aapply(checkmate::assertCount, . ~ topMSPeaks + topMSMSPeaks, positive = TRUE,
            null.ok = TRUE, fixed = list(add = ac))
-    aapply(checkmate::assertFlag, . ~ deIsotopeMS + deIsotopeMSMS, fixed = list(add = ac))
+    aapply(checkmate::assertFlag, . ~ deIsotopeMS + deIsotopeMSMS + retainPrecursorMSMS, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
 
     if (length(obj) == 0)
         return(obj)
 
     hash <- makeHash(obj, absMSIntThr, absMSMSIntThr, relMSIntThr, relMSMSIntThr,
-                     topMSPeaks, topMSMSPeaks, deIsotopeMS, deIsotopeMSMS)
+                     topMSPeaks, topMSMSPeaks, deIsotopeMS, deIsotopeMSMS, retainPrecursorMSMS)
     cache <- loadCacheData("filterMSPeakLists", hash)
     if (!is.null(cache))
         return(cache)
@@ -270,17 +273,20 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
         pln <- names(pl)
         pl <- lapply(seq_along(pl), function(grpi)
         {
-            ret <- doMSPeakListFilter(pl[[grpi]], absMSIntThr, absMSMSIntThr, relMSIntThr, relMSMSIntThr,
-                                      topMSPeaks, topMSMSPeaks, deIsotopeMS, deIsotopeMSMS)
+            ret <- list()
+            if (!is.null(pl[[grpi]][["MS"]]))
+                ret$MS <- doMSPeakListFilter(pl[[grpi]]$MS, absMSIntThr, relMSIntThr, topMSPeaks, deIsotopeMS, TRUE)
+            if (!is.null(pl[[grpi]][["MSMS"]]))
+                ret$MSMS <- doMSPeakListFilter(pl[[grpi]]$MSMS, absMSMSIntThr, relMSMSIntThr, topMSMSPeaks,
+                                               deIsotopeMSMS, retainPrecursorMSMS)
+            
             setTxtProgressBar(prog, grpi)
-
-            return(ret)
+            
+            return(pruneList(ret, checkZeroRows = TRUE))
         })
         names(pl) <- pln
 
-        # prune empty
-        empties <- sapply(pl, function(pg) is.null(pg[["MS"]]) && is.null(pg[["MSMS"]]))
-        pl <- pl[!empties]
+        pl <- pl[sapply(pl, function(p) !is.null(p[["MS"]]) || !is.null(p[["MSMS"]]))]
 
         setTxtProgressBar(prog, gCount)
         close(prog)

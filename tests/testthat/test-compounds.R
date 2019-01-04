@@ -13,7 +13,7 @@ fGroupsSub <- fGroups[, mfTestDB$Name]
 
 plists <- generateMSPeakLists(fGroupsSub, "mzr")
 plistsEmpty <- getEmptyPLists()
-plistsEmptyMS <- filter(plists, absMSIntThr = 1E9)
+plistsEmptyMS <- removeMSPlists(plists, "MS")
 fGroupsEmpty <- getEmptyTestFGroups()
 
 doMetFrag <- !is.null(getOption("patRoon.path.metFragCL")) && nzchar(getOption("patRoon.path.metFragCL"))

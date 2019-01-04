@@ -414,37 +414,59 @@ NULL
 #' @section Peak list averaging parameters: The parameters set used for
 #'   averaging peak lists are set by the \code{avgFeatParams} and
 #'   \code{avgFGroupParams} arguments. This should be a named \code{list} with
-#'   the following values:
-#'   \itemize{
+#'   the following values: \itemize{
+#'
 #'   \item \code{clusterMzWindow} \emph{m/z} window (in Da) used for clustering
 #'   \emph{m/z} values when spectra are averaged. Too small windows will prevent
 #'   clustering \emph{m/z} values (thus erroneously creating 'extra' values),
 #'   whereas too big windows may cluster unrelated \emph{m/z} values from
 #'   different or even the same spectrum together.
+#'
 #'   \item \code{topMost} Only retain this maximum number of MS peaks when
 #'   generating averaged spectra. Lowering this number may exclude more
 #'   irrelevant (noisy) MS peaks and decrease processing time, whereas higher
 #'   values may avoid excluding lower intense MS peaks that may still be of
 #'   interest.
+#'
 #'   \item \code{minIntensityPre} MS peaks with intensities below this value
 #'   will be removed (applied prior to selection by \code{topMost}) before
 #'   averaging.
+#'
 #'   \item \code{minIntensityPost} MS peaks with intensities below this value
 #'   will be removed after averaging.
+#'
 #'   \item \code{avgFun} Function that is used to calculate average \emph{m/z}
 #'   values.
+#'
 #'   \item \code{method} Method used for producing averaged MS spectra. Valid
 #'   values are \code{"hclust"}, used for hierarchical clustering (using the
 #'   \pkg{\link{fastcluster}} package), and \code{"distance"}, to use the
 #'   between peak distance. The latter method may reduces processing time and
 #'   memory requirements, at the potential cost of reduced accuracy.
+#'
+#'   \item \code{pruneMissingPrecursorMS} For MS data only: if \code{TRUE} then
+#'   peak lists without a precursor peak are removed. Note that even when this
+#'   is set to \code{FALSE}, functionality that relies on MS (not MS/MS) peak
+#'   lists (\emph{e.g.} formulae calulcation) will still skip calculation if a
+#'   precursor is not found.
+#'
+#'   \item \code{retainPrecursorMSMS} For MS/MS data only: if \code{TRUE} then
+#'   always retain the precursor mass peak event it is not amongst the
+#'   \code{topMost} peaks. Note that MS precursor mass peaks are always kept.
+#'   Furthermore, note that precursor peaks in both MS and MS/MS data may still
+#'   be removed by intensity thresholds (this is unlike the
+#'   \code{\link[=filter,MSPeakLists-method]{filter}} method function).
+#'
 #'   }
-#'   The \code{getDefAvgPListParams} function can be used to generate a default
-#'   parameter list.
 #'
 #'   Note that when Bruker algorithms are used these parameters only control
 #'   generation of feature groups averaged peak lists: how peak lists for
 #'   features are generated is controlled by DataAnalysis.
+#'   
+#'   The \code{getDefAvgPListParams} function can be used to generate a default
+#'   parameter list. The current defaults are:
+#'   
+#' @eval paste0("@@section Peak list averaging parameters:", getDefAvgPListParamsRD())
 #'
 #' @return A \code{\link{MSPeakLists}} object that can be used for formulae
 #'   calculation and compound identification.
@@ -453,12 +475,16 @@ NULL
 #'   the \href{https://github.com/zeehio/msProcess}{msProcess} R package (now
 #'   archived on CRAN).
 #'
-#' @references  \cr\cr
-#'   \addCitations{mzR}{1} \cr\cr
+#' @references \addCitations{mzR}{1} \cr\cr
+#'
 #'   \addCitations{mzR}{2} \cr\cr
+#'
 #'   \addCitations{mzR}{3} \cr\cr
+#'
 #'   \addCitations{mzR}{4} \cr\cr
+#'
 #'   \addCitations{mzR}{5} \cr\cr
+#'
 #'   \addCitations{fastcluster}{1}
 #'
 #' @seealso \code{\link{MSPeakLists-class}}

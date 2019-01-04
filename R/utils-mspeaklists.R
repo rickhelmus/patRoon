@@ -1,3 +1,5 @@
+emptyMSPeakList <- function() data.table(mz = numeric(), intensity = numeric(), precursor = logical())
+
 
 #' @details The \code{getDefAvgPListParams} is used to create a parameter list
 #'   for peak list averaging (discussed below).
@@ -10,24 +12,40 @@ getDefAvgPListParams <- function(...)
                 minIntensityPre = 500,
                 minIntensityPost = 500,
                 avgFun = mean,
-                method = "hclust")
+                method = "hclust",
+                pruneMissingPrecursorMS = TRUE,
+                retainPrecursorMSMS = TRUE)
     return(modifyList(def, list(...)))
+}
+
+# For docs
+getDefAvgPListParamsRD <- function()
+{
+    def <- getDefAvgPListParams()
+    def <- sapply(def, function(v) if (is.character(v)) paste0("\"", v, "\"") else v)
+    def$avgFun <- "mean" # UNDONE?
+    return(paste0("\\code{", names(def), "=", def, "}", collapse = "; "))
 }
 
 # align & average spectra by clustering or between peak distances
 # code inspired from msProcess R package: https://github.com/zeehio/msProcess
-averageSpectra <- function(spectra, clusterMzWindow, topMost, minIntensityPre, minIntensityPost, avgFun, method)
+averageSpectra <- function(spectra, clusterMzWindow, topMost, minIntensityPre, minIntensityPost,
+                           avgFun, method, pruneMissingPrecursor, retainPrecursor)
 {
     if (length(spectra) == 0) # no spectra, return empty spectrum
-        return(data.table(mz = integer(0), intensity = integer(0)))
-    
+        return(emptyMSPeakList())
+
     spectra <- lapply(spectra, function(s)
     {
         s <- s[intensity >= minIntensityPre]
+        
         if (nrow(s) > topMost)
         {
             ord <- order(-s$intensity)
-            s <- s[ord[seq_len(topMost)]]
+            keep <- ord[seq_len(topMost)]
+            if (retainPrecursor)
+                keep <- unique(c(keep, s[precursor == TRUE, which = TRUE]))
+            s <- s[keep]
         }
         return(s)
     })
@@ -36,7 +54,7 @@ averageSpectra <- function(spectra, clusterMzWindow, topMost, minIntensityPre, m
     setorder(spcomb, mz)
     
     if (nrow(spcomb) < 2 || length(spectra) < 2)
-        return(spcomb[, c("mz", "intensity")])
+        return(spcomb[, -"spid"])
     
     if (method == "hclust")
     {
@@ -56,13 +74,25 @@ averageSpectra <- function(spectra, clusterMzWindow, topMost, minIntensityPre, m
     spcount <- length(spectra)
     ret <- spcomb[, .(mz = avgFun(mz), intensity = sum(intensity) / spcount), by = cluster][, cluster := NULL]
     
+    # update precursor flags
+    precMZs <- spcomb[precursor == TRUE, mz]
+    if (length(precMZs) > 0)
+        precMZ <- mean(precMZs)
+    else
+        precMZ <- -1
+    ret <- assignPrecursorToMSPeakList(ret, precMZ)
+    
     # post intensity filter
     ret <- ret[intensity >= minIntensityPost]
+    
+    if (pruneMissingPrecursor && !any(ret$precursor))
+        return(emptyMSPeakList())
     
     return(ret)
 }
 
-averageMSPeakLists <- function(peakLists, clusterMzWindow, topMost, minIntensityPre, minIntensityPost, avgFun, method)
+averageMSPeakLists <- function(peakLists, clusterMzWindow, topMost, minIntensityPre, minIntensityPost,
+                               avgFun, method, pruneMissingPrecursorMS, retainPrecursorMSMS)
 {
     # UNDONE: use cache sets?
     
@@ -84,28 +114,20 @@ averageMSPeakLists <- function(peakLists, clusterMzWindow, topMost, minIntensity
         avgPLists <- lapply(seq_len(gCount), function(grpi)
         {
             plistsMS <- lapply(peakLists, function(pl) pl[[gNames[grpi]]][["MS"]])
-            plistsMS <- plistsMS[!sapply(plistsMS, is.null)]
-            avgPLMS <- averageSpectra(plistsMS, clusterMzWindow, topMost, minIntensityPre, minIntensityPost, avgFun, method)
+            plistsMS <- pruneList(plistsMS, checkZeroRows = TRUE)
+            avgPLMS <- averageSpectra(plistsMS, clusterMzWindow, topMost, minIntensityPre, minIntensityPost,
+                                      avgFun, method, pruneMissingPrecursorMS, TRUE)
 
             plistsMSMS <- lapply(peakLists, function(pl) pl[[gNames[grpi]]][["MSMS"]])
-            plistsMSMS <- plistsMSMS[!sapply(plistsMSMS, is.null)]
-            avgPLMSMS <- averageSpectra(plistsMSMS, clusterMzWindow, topMost, minIntensityPre, minIntensityPost, avgFun, method)
+            plistsMSMS <- pruneList(plistsMSMS, checkZeroRows = TRUE)
+            avgPLMSMS <- averageSpectra(plistsMSMS, clusterMzWindow, topMost, minIntensityPre, minIntensityPost,
+                                        avgFun, method, FALSE, retainPrecursorMSMS)
             
             results <- pruneList(list(MS = if (nrow(avgPLMS) > 0) avgPLMS else NULL,
                                       MSMS = if (nrow(avgPLMSMS) > 0) avgPLMSMS else NULL))
 
-            # update precursor flags
-            allPL <- c(plistsMS, plistsMSMS)
-            precMZs <- lapply(allPL, function(pl) pl[precursor == TRUE, mz])
-            precMZs <- precMZs[lengths(precMZs) != 0]
-            if (length(precMZs) > 0)
-                precMZ <- mean(unlist(precMZs))
-            else
-            {
-                precMZ <- -1
-                warning(sprintf("Couldn't find back any precursor m/z from spectra of group %s!", gNames[grpi]))
-            }
-            results <- lapply(results, assignPrecursorToMSPeakList, precursorMZ = precMZ)
+            if (!any(avgPLMS$precursor))
+                warning(sprintf("Couldn't find back any precursor m/z from (averaged) MS peak list of group %s!", gNames[grpi]))
             
             setTxtProgressBar(prog, grpi)
             return(results)
@@ -129,14 +151,6 @@ getMZIndexFromMSPeakList <- function(featMZ, plist)
     ret <- which.min(abs(plist$mz - featMZ))
     if (abs(plist$mz[ret] - featMZ) <= 0.01) # UNDONE: make range configurable?
         return(ret)
-    return(NA)
-}
-
-getMZFromMSPeakList <- function(featMZ, plist)
-{
-    ret <- getMZIndexFromMSPeakList(featMZ, plist)
-    if (!is.na(ret))
-        return(plist$mz[ret])
     return(NA)
 }
 
@@ -188,57 +202,36 @@ deIsotopeMSPeakList <- function(MSPeakList)
     return(MSPeakList[unique_iso])
 }
 
-doMSPeakListFilter <- function(pList, absMSIntThr, absMSMSIntThr, relMSIntThr,
-                               relMSMSIntThr, topMSPeaks, topMSMSPeaks,
-                               deIsotopeMS, deIsotopeMSMS)
+doMSPeakListFilter <- function(pList, absIntThr, relIntThr, topMost, deIsotope, retainPrecursor)
 {
-    if (!is.null(pList[["MS"]]))
+    if (retainPrecursor)
+        prec <- pList[precursor == TRUE]
+    
+    if (!is.null(absIntThr))
+        pList <- pList[intensity >= absIntThr]
+    
+    if (!is.null(relIntThr) && nrow(pList) > 0)
     {
-        if (!is.null(absMSIntThr))
-            pList[["MS"]] <- pList[["MS"]][intensity >= absMSIntThr]
-        
-        if (!is.null(relMSIntThr) && nrow(pList[["MS"]]) > 0)
-        {
-            thr <- max(pList[["MS"]]$intensity) * relMSIntThr
-            pList[["MS"]] <- pList[["MS"]][intensity >= thr]
-        }
-        
-        if (!is.null(topMSPeaks) && nrow(pList[["MS"]]) > topMSPeaks)
-        {
-            ord <- order(-pList[["MS"]]$intensity)
-            pList[["MS"]] <- pList[["MS"]][ord[seq_len(topMSPeaks)]]
-        }
-        
-        if (deIsotopeMS)
-            pList[["MS"]] <- deIsotopeMSPeakList(pList[["MS"]])
+        thr <- max(pList$intensity) * relIntThr
+        pList <- pList[intensity >= thr]
     }
     
-    if (!is.null(pList[["MSMS"]]))
+    if (!is.null(topMost) && nrow(pList) > topMost)
     {
-        if (!is.null(absMSMSIntThr) && !is.null(pList[["MSMS"]]))
-            pList[["MSMS"]] <- pList[["MSMS"]][intensity >= absMSMSIntThr]
-        
-        if (!is.null(relMSMSIntThr) && nrow(pList[["MS"]]) > 0)
-        {
-            thr <- max(pList[["MSMS"]]$intensity) * relMSMSIntThr
-            pList[["MSMS"]] <- pList[["MSMS"]][intensity >= thr]
-        }
-        
-        if (!is.null(topMSMSPeaks) && nrow(pList[["MSMS"]]) > topMSMSPeaks)
-        {
-            ord <- order(-pList[["MSMS"]]$intensity)
-            pList[["MSMS"]] <- pList[["MSMS"]][ord[seq_len(topMSMSPeaks)]]
-        }
-        
-        if (deIsotopeMSMS)
-            pList[["MSMS"]] <- deIsotopeMSPeakList(pList[["MSMS"]])
+        ord <- order(-pList$intensity)
+        pList <- pList[ord[seq_len(topMost)]]
     }
     
-    # prune empty
-    if (!is.null(pList[["MS"]]) && nrow(pList[["MS"]]) == 0)
-        pList[["MS"]] <- NULL
-    if (!is.null(pList[["MSMS"]]) && nrow(pList[["MSMS"]]) == 0)
-        pList[["MSMS"]] <- NULL
+    if (deIsotope)
+        pList <- deIsotopeMSPeakList(pList)
+    
+    # re-add precursor if necessary
+    if (retainPrecursor && nrow(prec) > 0 && !any(pList$precursor))
+    {
+        pList <- rbind(pList, prec)
+        setorderv(pList, "mz")
+    }
     
     return(pList)
 }
+

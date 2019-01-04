@@ -126,7 +126,9 @@ generateCompoundsSirius <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct =
         if (is.null(plist[["MS"]]) || is.null(plist[["MSMS"]]))
             return(NULL)
         
-        plmz <- getMZFromMSPeakList(gInfo[grp, "mzs"], plist$MS)
+        plmz <- plist$MS[precursor == TRUE, mz]
+        if (length(plmz) == 0)
+            return(NULL)
 
         hash <- makeHash(plmz, plist, profile, adduct, maxMzDev, elements,
                          formulaDatabase, fingerIDDatabase, noise, topMost)

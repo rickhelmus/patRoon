@@ -23,9 +23,9 @@ NULL
 #'
 #' @rdname MSPeakLists-generation
 #' @export
-generateMSPeakListsDA <- function(fGroups, bgsubtr = TRUE, maxRtMSWidth = 20, minMSIntensity = 500, minMSMSIntensity = 500,
-                                  clear = TRUE, close = TRUE, save = close, MSMSType = "MSMS",
-                                  avgFGroupParams = getDefAvgPListParams())
+generateMSPeakListsDA <- function(fGroups, bgsubtr = TRUE, maxRtMSWidth = 20, minMSIntensity = 500,
+                                  minMSMSIntensity = 500,  clear = TRUE, close = TRUE, save = close,
+                                  MSMSType = "MSMS", avgFGroupParams = getDefAvgPListParams())
 {
     # UNDONE: implement topMost
     # UNDONE: better hashing
@@ -33,7 +33,8 @@ generateMSPeakListsDA <- function(fGroups, bgsubtr = TRUE, maxRtMSWidth = 20, mi
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
     aapply(checkmate::assertFlag, . ~ bgsubtr + clear + save, fixed = list(add = ac))
-    checkmate::assertNumber(maxRtMSWidth, lower = 0, finite = TRUE, null.ok = TRUE, add = ac)
+    aapply(checkmate::assertNumber, . ~ maxRtMSWidth + minMSIntensity + minMSMSIntensity,
+           lower = 0, finite = TRUE, null.ok = TRUE, add = ac)
     checkmate::assertChoice(MSMSType, c("MSMS", "BBCID"), add = ac)
     assertAvgPListParams(avgFGroupParams, add = ac)
     assertDACloseSaveArgs(close, save, add = ac)
@@ -101,10 +102,12 @@ generateMSPeakListsDA <- function(fGroups, bgsubtr = TRUE, maxRtMSWidth = 20, mi
                 grp <- uncachedGNames[grpi]
                 
                 if (!is.null(DASpecs$MSSpecs[[grp]]))
-                    results$MS <- getDAPeakList(DAFind, DASpecs$MSSpecs[[grp]], FALSE, FALSE, minMSIntensity)
+                    results$MS <- getDAPeakList(DAFind, DASpecs$MSSpecs[[grp]], FALSE, FALSE,
+                                                minMSIntensity)
                 
                 if (!is.null(DASpecs$MSMSSpecs[[grp]]))
-                    results$MSMS <- getDAPeakList(DAFind, DASpecs$MSMSSpecs[[grp]], FALSE, TRUE, minMSMSIntensity)
+                    results$MSMS <- getDAPeakList(DAFind, DASpecs$MSMSSpecs[[grp]], FALSE, TRUE,
+                                                  minMSMSIntensity)
                 
                 results <- pruneList(results) # MS or MSMS entry might be NULL
                 results <- lapply(results, assignPrecursorToMSPeakList,
@@ -147,10 +150,13 @@ generateMSPeakListsDA <- function(fGroups, bgsubtr = TRUE, maxRtMSWidth = 20, mi
 #' @rdname MSPeakLists-generation
 #' @export
 generateMSPeakListsDAFMF <- function(fGroups, minMSIntensity = 500, minMSMSIntensity = 500,
-                                     close = TRUE, save = close, avgFGroupParams = getDefAvgPListParams())
+                                     close = TRUE, save = close,
+                                     avgFGroupParams = getDefAvgPListParams())
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
+    aapply(checkmate::assertNumber, . ~ minMSIntensity + minMSMSIntensity,
+           lower = 0, finite = TRUE, null.ok = TRUE, add = ac)
     assertDACloseSaveArgs(close, save, add = ac)
     assertAvgPListParams(avgFGroupParams, add = ac)
     checkmate::reportAssertions(ac)
@@ -219,6 +225,10 @@ generateMSPeakListsDAFMF <- function(fGroups, minMSIntensity = 500, minMSMSInten
                 if (cmpds[[fti]]$Count() > 1)
                     results$MSMS <- getDAPeakList(findDA, fti, TRUE, TRUE, minMSMSIntensity)
 
+                results <- pruneList(results)
+                results <- lapply(results, assignPrecursorToMSPeakList,
+                                  precursorMZ = fTable[[ana]][[fti, "mz"]])
+                
                 saveCacheData("MSPeakListsDAFMF", results, hash, cacheDB)
             }
 

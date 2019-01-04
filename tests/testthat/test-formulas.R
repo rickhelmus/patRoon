@@ -7,8 +7,8 @@ fGroups <- groupFeaturesScreening(fGroups, screenTargets(fGroups, patRoonData::t
 fGroupsEmpty <- getEmptyTestFGroups()
 plists <- generateMSPeakLists(fGroups, "mzr")
 plistsEmpty <- getEmptyPLists()
-plistsEmptyMS <- filter(plists, absMSIntThr = 1E9)
-plistsEmptyMSMS <- filter(plists, absMSMSIntThr = 1E9)
+plistsEmptyMS <- removeMSPlists(plists, "MS")
+plistsEmptyMSMS <- removeMSPlists(plists, "MSMS")
 
 doSIRIUS <- !is.null(getOption("patRoon.path.SIRIUS")) && nzchar(getOption("patRoon.path.SIRIUS"))
 

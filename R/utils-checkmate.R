@@ -163,6 +163,7 @@ assertAvgPListParams <- function(x, .var.name = checkmate::vname(x), add = NULL)
     assertVal(checkmate::assertNumber, "minIntensityPost", lower = 0, finite = TRUE)
     assertVal(checkmate::assertFunction, "avgFun")
     assertVal(checkmate::assertChoice, "method", choices = c("distance", "hclust"))
+    assertVal(checkmate::assertFlag, "retainPrecursorMSMS")
 }
 
 # from https://github.com/mllg/checkmate/issues/115

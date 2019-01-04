@@ -46,7 +46,7 @@ writeGenFormFiles <- function(MSPList, MSMSPList, workFiles)
         writePList(workFiles$MSMSFile, MSMSPList)
 }
 
-makeGenFormCmdQueue <- function(gfBin, mainArgs, featMZs, groupPeakLists, workFiles, hashes, doMSMS)
+makeGenFormCmdQueue <- function(gfBin, mainArgs, groupPeakLists, workFiles, hashes, doMSMS)
 {
     pruneList(sapply(names(groupPeakLists), function(grp)
     {
@@ -56,7 +56,9 @@ makeGenFormCmdQueue <- function(gfBin, mainArgs, featMZs, groupPeakLists, workFi
         if (doMSMS && is.null(groupPeakLists[[grp]][["MSMS"]]))
             return(NULL)
 
-        plmz <- getMZFromMSPeakList(featMZs[grp], groupPeakLists[[grp]][["MS"]])
+        plmz <- groupPeakLists[[grp]][["MS"]][precursor == TRUE, mz]
+        if (length(plmz) == 0)
+            return(NULL) # no precursor
 
         args <- c(mainArgs, sprintf("ms=%s", workFiles[[grp]]$MSFile), sprintf("m=%f", plmz),
                   sprintf("out=%s", workFiles[[grp]]$outFile))
@@ -101,7 +103,7 @@ runGenForm <- function(gfBin, mainArgs, featMZs, groupPeakLists, doMSMS, hashes,
                           if (doMSMS) groupPeakLists[[grp]][["MSMS"]] else NULL,
                           workFiles[[grp]])
 
-    cmdQueue <- makeGenFormCmdQueue(gfBin, mainArgs, featMZs[doGNames], groupPeakLists[doGNames],
+    cmdQueue <- makeGenFormCmdQueue(gfBin, mainArgs, groupPeakLists[doGNames],
                                     workFiles[doGNames], hashes, doMSMS)
 
     ret <- list()

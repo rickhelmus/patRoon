@@ -124,6 +124,7 @@ generateFormulasSirius <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct = 
         if (length(doFGroups) > 0)
             doFGroups <- doFGroups[sapply(doFGroups,
                                           function(grp) !is.null(groupPeakLists[[grp]][["MS"]]) &&
+                                                        any(groupPeakLists[[grp]][["MS"]]$precursor) &&
                                                         !is.null(groupPeakLists[[grp]][["MSMS"]]))]
 
         hashes <- sapply(doFGroups, function(grp) makeHash(featMZs[grp], groupPeakLists[[grp]], baseHash))
@@ -142,7 +143,7 @@ generateFormulasSirius <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct = 
 
         cmdQueue <- pruneList(sapply(doFGroups, function(grp)
         {
-            plmz <- getMZFromMSPeakList(featMZs[grp], groupPeakLists[[grp]][["MS"]])
+            plmz <- groupPeakLists[[grp]][["MS"]][precursor == TRUE, mz]
 
             cmd <- getSiriusCommand(plmz, groupPeakLists[[grp]][["MS"]], groupPeakLists[[grp]][["MSMS"]], profile,
                                     adduct, maxMzDev, elements, database, noise, FALSE, NULL)

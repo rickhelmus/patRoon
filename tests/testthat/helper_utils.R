@@ -8,6 +8,25 @@ getTestFGroups <- function(anaInfo = getTestAnaInfo()) groupFeatures(findFeature
 getEmptyTestFGroups <- function() getTestFGroups()[, "none"]
 getEmptyPLists <- function() MSPeakLists(algorithm = "none")
 
+# to make testing it a easier: precursors don't have to follow filter rules
+removePrecursors <- function(plists)
+{
+    plists@peakLists <- lapply(plists@peakLists,
+                               function(pa) lapply(pa, function(pg) lapply(pg, function(pl) pl[precursor == FALSE])))
+    plists@averagedPeakLists <- lapply(plists@averagedPeakLists,
+                                       function(pg) lapply(pg, function(pl) pl[precursor == FALSE]))
+    return(plists)
+}
+
+removeMSPlists <- function(plists, type)
+{
+    clearpl <- function(pl) { pl[[type]] <- NULL; return(pl) }
+    plists@peakLists <- lapply(plists@peakLists,
+                               function(pa) pruneList(lapply(pa, clearpl), checkEmptyElements = TRUE))
+    plists@averagedPeakLists <- pruneList(lapply(plists@averagedPeakLists, clearpl), checkEmptyElements = TRUE)
+    return(plists)
+}
+
 getDAAnaInfo <- function()
 {
     path <- getOption("patRoon.test.DAAnalyses")

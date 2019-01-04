@@ -50,6 +50,13 @@ generateMSPeakListsMzR <- function(fGroups, maxRtMSWidth = 20, precursorMzWindow
     resultHashes <- vector("character", anaCount * gCount)
     resultHashCount <- 0
 
+    avgFeatParamsMS <- avgFeatParamsMSMS <-
+        avgFeatParams[setdiff(names(avgFeatParams), c("pruneMissingPrecursorMS", "retainPrecursorMSMS"))]
+    avgFeatParamsMS$retainPrecursor <- TRUE;
+    avgFeatParamsMS$pruneMissingPrecursor <- avgFeatParams$pruneMissingPrecursorMS
+    avgFeatParamsMSMS$pruneMissingPrecursor <- FALSE
+    avgFeatParamsMSMS$retainPrecursor <- avgFeatParams$retainPrecursorMSMS
+    
     # structure: [[analysis]][[fGroup]][[MSType]][[MSPeak]]
     plists <- list()
 
@@ -101,17 +108,19 @@ generateMSPeakListsMzR <- function(fGroups, maxRtMSWidth = 20, precursorMzWindow
                 if (is.null(spectra))
                     spectra <- loadSpectra(fp, verbose = FALSE)
 
-                results$MS <- do.call(averageSpectraMZR, c(list(spectra, rtRange), avgFeatParams))
+                # NOTE: precursor is set here only for precursor assignment,
+                # keeping precursorMzWindow unset makes sure that no spectra
+                # selection is made.
+                results$MS <- do.call(averageSpectraMZR,
+                                      c(list(spectra = spectra, rtRange = rtRange, precursor = ft$mz), avgFeatParamsMS))
 
                 stopifnot(!is.null(ft$mz))
                 MSMS <- do.call(averageSpectraMZR, c(list(spectra = spectra, rtRange = rtRange, MSLevel = 2,
                                                           precursor = ft$mz, precursorMzWindow = precursorMzWindow),
-                                                     avgFeatParams))
+                                                     avgFeatParamsMSMS))
                 if (nrow(MSMS) > 0)
                     results$MSMS <- MSMS
                 
-                results <- lapply(results, assignPrecursorToMSPeakList, precursorMZ = ft$mz)
-
                 saveCacheData("MSPeakListsMzR", results, hash, cacheDB)
             }
 

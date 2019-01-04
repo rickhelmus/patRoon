@@ -1,4 +1,5 @@
 #' @include main.R
+NULL
 
 loadSpectra <- function(path, rtRange = NULL, verbose = TRUE, cacheDB = NULL)
 {
@@ -153,14 +154,17 @@ getEICsForFGroups <- function(fGroups, rtWindow, mzWindow, topMost, onlyPresent)
 }
 
 averageSpectraMZR <- function(spectra, rtRange, clusterMzWindow, topMost, minIntensityPre,
-                              minIntensityPost, avgFun, method, MSLevel = 1, precursor = NULL,
-                              precursorMzWindow = NULL)
+                              minIntensityPost, avgFun, method, MSLevel = 1, precursor,
+                              precursorMzWindow = NULL, pruneMissingPrecursor, retainPrecursor)
 {
     hd <- getSpectraHeader(spectra, rtRange, MSLevel, precursor, precursorMzWindow)
     
     if (nrow(hd) == 0) # no spectra, return empty spectrum
-        return(data.table(mz = integer(0), intensity = integer(0)))
+        return(emptyMSPeakList())
     
     sp <- spectra$spectra[hd$seqNum]
-    return(averageSpectra(sp, clusterMzWindow, topMost, minIntensityPre, minIntensityPost, avgFun, method))
+    sp <- lapply(sp, assignPrecursorToMSPeakList, precursor)
+    
+    return(averageSpectra(sp, clusterMzWindow, topMost, minIntensityPre, minIntensityPost,
+                          avgFun, method, pruneMissingPrecursor, retainPrecursor))
 }

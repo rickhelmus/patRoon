@@ -1,6 +1,7 @@
 # patRoon 0.1.0.9000
 
 ## January 2019
+* `filter()` method for compounds now support generic scoring filtering and on elements of precursor and fragment formulae.
 * **IMPORTANT** Several changes were made to the MetFrag compound generation interface in order to simplify it and make it more generic. See `?generateCompounds` for more details (notably the Scorings section).
 * More MS peak list updates
     * Precursor peaks are now flagged in MS peak list data and `plotSpec()`

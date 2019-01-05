@@ -53,6 +53,7 @@
 
 \S4method{filter}{compounds}(obj, minExplainedPeaks = NULL,
   minScore = NULL, minFragScore = NULL, minFormulaScore = NULL,
+  scoreLimits = NULL, elements = NULL, fragElements = NULL,
   topMost = NULL)
 
 \S4method{addFormulaScoring}{compounds}(compounds, formulas,
@@ -99,7 +100,37 @@ be included.}
 
 \item{minExplainedPeaks, minScore, minFragScore, minFormulaScore}{Minimal number
 of explained peaks, overall score, in-silico fragmentation score and
-formula score, respectively. Set to \code{NULL} to ignore.}
+formula score, respectively. Set to \code{NULL} to ignore. The
+\code{scoreLimits} argument allows for more advanced score filtering.}
+
+\item{scoreLimits}{Filter results by their scores. Should be a named
+\code{list} that contains two-sized numeric vectors with the
+minimum/maximum value of a score (use \code{-Inf}/\code{Inf} for no
+limits). The names of each element should follow the values returned by
+\code{\link{compoundScorings}()$name}. For instance,
+\code{scoreLimits=list(numberPatents=c(10, Inf))} specifies that
+\code{numberPatents} should be at least \samp{10}. For more details of
+scorings see \code{\link{compoundScorings}}. Note that a result without a
+specified scoring is never removed. Set to \code{NULL} to skip this filter.}
+
+\item{elements}{Only retain candidate formulae (neutral form) that match a
+given elemental restriction. The format of \code{elements} is a
+\code{character} string with elements that should be present where each
+element is followed by a valid amount or a range thereof. If no number is
+specified then \samp{1} is assumed. For instance,
+\code{elements="C1-10H2-20O0-2P"}, specifies that \samp{1-10}, \samp{2-20},
+\samp{0-2} and \samp{1} carbon, hydrogen, oxygen and phosphorus atoms
+should be present, respectively. When \code{length(elements)>1} formulas
+are tested to follow at least one of the given elemental restrictions. For
+instance, \code{elements=c("P", "S")} specifies that either one phosphorus
+or one sulphur atom should be present. Set to \code{NULL} to ignore this
+filter.}
+
+\item{fragElements}{Specifies
+elemental restrictions for fragment
+formulae (charged form). Candidates are retained if at least one of the fragment
+formulae follow the given restrictions. See \code{elements} for the used
+format.}
 
 \item{topMost}{Only keep a maximum of \code{topMost} candidates with highest
 score. Set to \code{NULL} to ignore.}

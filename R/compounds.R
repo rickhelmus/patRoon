@@ -185,27 +185,50 @@ setMethod("identifiers", "compounds", function(compounds)
 #'
 #' @param minExplainedPeaks,minScore,minFragScore,minFormulaScore Minimal number
 #'   of explained peaks, overall score, in-silico fragmentation score and
-#'   formula score, respectively. Set to \code{NULL} to ignore.
+#'   formula score, respectively. Set to \code{NULL} to ignore. The
+#'   \code{scoreLimits} argument allows for more advanced score filtering.
+#' @param scoreLimits Filter results by their scores. Should be a named
+#'   \code{list} that contains two-sized numeric vectors with the
+#'   minimum/maximum value of a score (use \code{-Inf}/\code{Inf} for no
+#'   limits). The names of each element should follow the values returned by
+#'   \code{\link{compoundScorings}()$name}. For instance,
+#'   \code{scoreLimits=list(numberPatents=c(10, Inf))} specifies that
+#'   \code{numberPatents} should be at least \samp{10}. For more details of
+#'   scorings see \code{\link{compoundScorings}}. Note that a result without a
+#'   specified scoring is never removed. Set to \code{NULL} to skip this filter.
 #' @param topMost Only keep a maximum of \code{topMost} candidates with highest
 #'   score. Set to \code{NULL} to ignore.
+#'
+#' @templateVar withLoss FALSE
+#' @template element-args
 #'
 #' @return \code{filter} returns a filtered \code{compounds} object.
 #'
 #' @export
 setMethod("filter", "compounds", function(obj, minExplainedPeaks = NULL, minScore = NULL, minFragScore = NULL,
-                                          minFormulaScore = NULL, topMost = NULL)
+                                          minFormulaScore = NULL, scoreLimits = NULL, elements = NULL,
+                                          fragElements = NULL, topMost = NULL)
 {
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertCount, . ~ minExplainedPeaks + topMost, positive = c(FALSE, TRUE),
            null.ok = TRUE, fixed = list(add = ac))
     aapply(checkmate::assertNumber, . ~ minScore + minFragScore + minFormulaScore, finite = TRUE,
            null.ok = TRUE, fixed = list(add = ac)) # note: negative scores allowed for SIRIUS
+    checkmate::assertList(scoreLimits, null.ok = TRUE, types = "numeric", add = ac)
+    if (!is.null(scoreLimits))
+    {
+        scCols <- unique(compoundScorings()$name)
+        checkmate::assertNames(names(scoreLimits), type = "unique", subset.of = scCols, add = ac)
+        checkmate::qassertr(scoreLimits, "N2")
+    }
+    aapply(checkmate::assertCharacter, . ~ elements + fragElements,
+           min.chars = 1, min.len = 1, null.ok = TRUE, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
 
     cat("Filtering compounds... ")
 
     mCompNames <- mergedCompoundNames(obj)
-    filterCols <- function(cmpTable, col, minVal)
+    filterMinCols <- function(cmpTable, col, minVal)
     {
         cols <- getAllCompCols(col, names(cmpTable), mCompNames)
         for (cl in cols)
@@ -213,16 +236,44 @@ setMethod("filter", "compounds", function(obj, minExplainedPeaks = NULL, minScor
         return(cmpTable)
     }
 
-    fVals <- c(explainedPeaks = minExplainedPeaks, score = minScore, fragScore = minFragScore,
-               formulaScore = minFormulaScore)
-    fVals <- fVals[!sapply(fVals, is.null)]
+    fMinVals <- c(explainedPeaks = minExplainedPeaks, score = minScore, fragScore = minFragScore,
+                  formulaScore = minFormulaScore)
+    fMinVals <- fMinVals[!sapply(fMinVals, is.null)]
 
     oldn <- length(obj)
     obj@compounds <- sapply(obj@compounds, function(cmpTable)
     {
-        for (cl in names(fVals))
-            cmpTable <- filterCols(cmpTable, cl, fVals[cl])
+        for (cl in names(fMinVals))
+            cmpTable <- filterMinCols(cmpTable, cl, fMinVals[cl])
 
+        if (!is.null(scoreLimits))
+        {
+            for (sc in names(scoreLimits))
+            {
+                cols <- getAllCompCols(sc, names(cmpTable), mCompNames)
+                if (length(cols) == 0)
+                    next
+                cmpTable <- cmpTable[cmpTable[, do.call(pmin, c(.SD, list(na.rm = TRUE))) >= scoreLimits[[sc]][1] &
+                                                  do.call(pmax, c(.SD, list(na.rm = TRUE))) <= scoreLimits[[sc]][2],
+                                              .SDcols = cols]]
+            }
+        }
+        
+        if (!is.null(elements))
+            cmpTable <- cmpTable[sapply(formula, checkFormula, elements)]
+        if (!is.null(fragElements))
+        {
+            keep <- sapply(cmpTable$fragInfo, function(fi)
+            {
+                if (nrow(fi) == 0)
+                    return(FALSE)
+                if (!is.null(fragElements) && !any(sapply(fi$formula, checkFormula, fragElements)))
+                    return(FALSE)
+                return(TRUE)
+            })
+            cmpTable <- cmpTable[keep]
+        }
+        
         if (!is.null(topMost) && nrow(cmpTable) > topMost)
             cmpTable <- cmpTable[seq_len(topMost)]
 

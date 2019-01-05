@@ -73,6 +73,7 @@ if (doMetFrag)
 # continue with one or another...
 comps <- if (doMetFrag) compsMFIso else if (doSIRIUS) compsSIR
 compsEmpty <- if (doMetFrag) compsMFEmptyPL else if (doSIRIUS) compsSIREmptyPL
+compsExplained <- filter(comps, minExplainedPeaks = 1)
 
 test_that("filtering works", {
     skip_if_not(hasCompounds)
@@ -82,13 +83,28 @@ test_that("filtering works", {
     expect_lte(length(filter(comps, minExplainedPeaks = 2)), length(comps))
     expect_length(filter(comps, minExplainedPeaks = 1E6), 0)
     expect_length(filter(compsEmpty, minExplainedPeaks = 2, topMost = 1), 0)
+    expect_equivalent(filter(comps, scoreLimits = list(fragScore = c(-Inf, Inf))), comps)
+    
+    expect_length(filter(comps, elements = "C1-100"), length(comps)) # all should contain carbon
+    expect_length(filter(comps, elements = c("Na1-100", "C1-100")), length(comps)) # no sodium, but carbon should be there
+    expect_length(filter(comps, elements = c("H1-100", "C1-100")), length(comps)) # presence of both shouldn't affect results
+    expect_length(filter(comps, elements = "Na1-100"), 0) # no sodium
+    expect_length(filter(comps, elements = "Na0-100"), length(comps)) # no sodium, but optional
+    
+    expect_lte(length(filter(compsExplained, fragElements = "C1-100")), length(compsExplained))
+    expect_lt(length(filter(compsExplained, fragElements = "C")), length(compsExplained)) # fragments may contain only single carbon
+    expect_length(filter(compsExplained, fragElements = "Na1-100"), 0)
+    expect_length(filter(compsExplained, fragElements = "Na0-100"), length(compsExplained))
 
     skip_if_not(doMetFrag)
     expect_lt(length(filter(compsMFIso, minScore = 2)), length(compsMFIso))
     expect_lt(length(filter(compsMFIso, minFragScore = 200)), length(compsMFIso))
-
+    expect_lt(length(filter(compsMFIso, scoreLimits = list(fragScore = c(200, Inf)))),
+              length(compsMFIso))
+    
     skip_if_not(doSIRIUS)
     expect_lt(length(filter(compsSIR, minScore = -200)), length(compsSIR))
+    expect_lt(length(filter(compsSIR, scoreLimits = list(score = c(-200, Inf)))), length(compsSIR))
 })
 
 test_that("basic subsetting", {

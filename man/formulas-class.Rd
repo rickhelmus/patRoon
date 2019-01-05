@@ -106,22 +106,24 @@ ignore.}
 explained. Setting this to \samp{1} will remove any MS only formula
 results. Set to \code{NULL} to ignore.}
 
-\item{elements}{Only retain candidate formulae that match a given elemental
-restriction. The format of \code{elements} is a \code{character} string
-with elements that should be present where each element is followed by a
-valid amount or a range thereof. If no number is specified then \samp{1} is
-assumed. For instance, \code{elements="C1-10H2-20O0-2P"}, specifies that
-\samp{1-10}, \samp{2-20}, \samp{0-2} and \samp{1} carbon, hydrogen, oxygen
-and phosphorus atoms should be present, respectively. When
-\code{length(elements)>1} formulas are tested to follow at least one of the
-given elemental restrictions. For instance, \code{elements=c("P", "S")}
-specifies that either one phosphorus or sulphur atom should be present. Set
-to \code{NULL} to ignore this filter.}
+\item{elements}{Only retain candidate formulae (neutral form) that match a
+given elemental restriction. The format of \code{elements} is a
+\code{character} string with elements that should be present where each
+element is followed by a valid amount or a range thereof. If no number is
+specified then \samp{1} is assumed. For instance,
+\code{elements="C1-10H2-20O0-2P"}, specifies that \samp{1-10}, \samp{2-20},
+\samp{0-2} and \samp{1} carbon, hydrogen, oxygen and phosphorus atoms
+should be present, respectively. When \code{length(elements)>1} formulas
+are tested to follow at least one of the given elemental restrictions. For
+instance, \code{elements=c("P", "S")} specifies that either one phosphorus
+or one sulphur atom should be present. Set to \code{NULL} to ignore this
+filter.}
 
-\item{fragElements, lossElements}{Specifies elemental restrictions for
-fragment or neutral loss formulas. Candidates are retained if at least one
-of the fragment/neutral loss formulae follow the given restrictions. See
-\code{elements} for the used format.}
+\item{fragElements, lossElements}{Specifies
+elemental restrictions for fragment or neutral loss
+formulae (charged form). Candidates are retained if at least one of the fragment
+formulae follow the given restrictions. See \code{elements} for the used
+format.}
 
 \item{topMost}{Only retain no more than this amount of best ranked candidates
 for each feature group.}
@@ -133,8 +135,8 @@ limits). The names of each element should follow the values returned by
 \code{\link{formulaScorings}()$name}. For instance,
 \code{scoreLimits=list(isoScore=c(0.5, Inf))} specifies that the isotopic
 match score should be at least \samp{0.5}. More details of scorings can be
-obtained with \code{\link{formulaScorings}}. Set to \code{NULL} to skip
-this filter.}
+obtained with \code{\link{formulaScorings}}. Note that a result without a
+specified scoring is never removed. Set to \code{NULL} to skip this filter.}
 
 \item{precursor}{The formula of the precursor (in ionic form, \emph{i.e.} as
 detected by the MS).}

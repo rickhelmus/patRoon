@@ -340,7 +340,7 @@ setMethod("filter", "formulas", function(obj, minExplainedFragPeaks = NULL, elem
         }
 
         if (!is.null(elements))
-            formTable <- formTable[sapply(formula, checkFormula, elements)]
+            formTable <- formTable[sapply(neutral_formula, checkFormula, elements)]
         if ((!is.null(fragElements) || !is.null(lossElements)))
         {
             formTable <- formTable[byMSMS == TRUE]

@@ -455,7 +455,7 @@ makeMSPlot <- function(spec, fragInfo, ..., extraHeightInch = 0)
     # mark precursor
     plotData[precursor == TRUE, c("colour", "lwd", "legend") := .("red", 2, "precursor")]
     
-    doLegend <- !is.null(plotData[["legend"]])
+    doLegend <- !is.null(plotData[["legend"]]) && any(!is.na(plotData[["legend"]]) & nzchar(plotData[["legend"]]))
     if (doLegend)
     {
         makeLegend <- function(x, y, ...)

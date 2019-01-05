@@ -90,7 +90,7 @@ test_that("filtering works", {
 
     expect_length(filter(formsGF, elements = "C1-100"), length(formsGFOC)) # all should contain carbon
     expect_length(filter(formsGF, elements = c("Na1-100", "C1-100")), length(formsGFOC)) # no sodium, but carbon should be there
-    expect_length(filter(formsGF, elements = c("H1-100", "C1-100")), length(formsGF)) # presence of both shouldn't affect results
+    expect_length(filter(formsGF, elements = c("H0-100", "C1-100")), length(formsGF)) # presence of both shouldn't affect results
     expect_length(filter(formsGF, elements = "Na1-100"), 0) # no sodium
     expect_length(filter(formsGF, elements = "Na0-100"), length(formsGF)) # no sodium, but optional
 

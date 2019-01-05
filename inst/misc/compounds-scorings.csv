@@ -1,0 +1,28 @@
+name,metfrag,sirius,database,suspect_list,default,description
+score,Score,score,,FALSE,TRUE,Overall score
+fragScore,FragmenterScore,,,FALSE,TRUE,In-silico MS/MS score
+metFusionScore,OfflineMetFusionScore,,,FALSE,TRUE,
+individualMoNAScore,OfflineIndividualMoNAScore,,,FALSE,TRUE,
+numberPatents,PubChemNumberPatents,PubChemNumberPatents,pubchem,FALSE,TRUE,Not reported anymore by SIRIUS?
+pubMedReferences,PubChemNumberPubMedReferences,,pubchem,FALSE,TRUE,
+pubMedReferences,ChemSpiderNumberPubMedReferences,,chemspider,FALSE,TRUE,
+pubMedReferences,NUMBER_OF_PUBMED_ARTICLES,,toxcast,FALSE,TRUE,
+extReferenceCount,ChemSpiderNumberExternalReferences,,chemspider,FALSE,TRUE,
+dataSourceCount,ChemSpiderDataSourceCount,,chemspider,FALSE,TRUE,
+referenceCount,ChemSpiderReferenceCount,,chemspider,FALSE,TRUE,
+RSCCount,ChemSpiderRSCCount,,chemspider,FALSE,TRUE,
+formulaScore,,,,FALSE,FALSE,Match with formula explanation: see addFormulaScorings()
+smartsInclusionScore,SmartsSubstructureInclusionScore,,,FALSE,FALSE,
+smartsExclusionScore,SmartsSubstructureExclusionScore,,,FALSE,FALSE,
+suspectListScore,SuspectListScore,,,FALSE,FALSE,Hit in custom suspect list file (set with ScoreSuspectLists in extraOpts)
+retentionTimeScore,RetentionTimeScore,,,FALSE,FALSE,How well retention time matches predicted value. Training file is set by RetentionTimeTrainingFile in extraOpts.
+CPDATCount,CPDAT_COUNT,,toxcast,FALSE,TRUE,
+TOXCASTActive,TOXCAST_PERCENT_ACTIVE,,toxcast,FALSE,TRUE,
+dataSources,DATA_SOURCES,,toxcast,FALSE,TRUE,
+pubChemDataSources,PUBCHEM_DATA_SOURCES,,toxcast,FALSE,TRUE,
+EXPOCASTPredExpo,EXPOCAST_MEDIAN_EXPOSURE_PREDICTION_MG/KG-BW/DAY,,toxcast,FALSE,TRUE,
+ECOTOX,ECOTOX,,toxcast,TRUE,TRUE,
+NORMANSUSDAT,NORMANSUSDAT,,toxcast,TRUE,TRUE,
+MASSBANKEU,MASSBANKEU,,toxcast,TRUE,TRUE,
+TOX21SL,TOX21SL,,toxcast,TRUE,TRUE,
+TOXCAST,TOXCAST,,toxcast,TRUE,TRUE,

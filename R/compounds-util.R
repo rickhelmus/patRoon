@@ -38,42 +38,53 @@ mergeFragInfo <- function(fiLeft, fiRight, leftName, rightName)
     return(fiLeft)
 }
 
-getCompScoreColNames <- function()
+#' @details \code{compoundScorings} displays an overview of scorings may be
+#'   applied to rank candidate compounds (see \verb{Scorings} section below).
+#'
+#' @param includeSuspectLists,onlyDefault,includeNoDB A logical specifying
+#'   whether scoring terms releated to suspect lists, default scoring terms and
+#'   non-database specific scoring terms should be included in the output,
+#'   respectively.
+#'
+#' @return \code{compoundScorings} returns a \code{data.frame} with information
+#'   on which scoring terms are used, what their algorithm specific name is and
+#'   other information such as to which database they apply and short remarks.
+#' @rdname compound-generation
+#' @export
+compoundScorings <- function(algorithm = NULL, database = NULL, includeSuspectLists = TRUE,
+                             onlyDefault = FALSE, includeNoDB = TRUE)
 {
-    return(c("score",
-             "fragScore",
-             "metFusionScore",
-             "individualMoNAScore",
-             "numberPatents",
-             "pubMedReferences",
-             "extReferenceCount",
-             "dataSourceCount",
-             "referenceCount",
-             "RSCCount",
-             "formulaScore",
-             "smartsInclusionScore",
-             "smartsExclusionScore",
-             "suspectListScore",
-             "retentionTimeScore",
-
-             # From Dashboard
-             "CPDATCount",
-             "TOXCASTActive",
-             "dataSources",
-             "pubChemDataSources",
-             "EXPOCASTPredExpo"
-             ))
+    algos <- c("metfrag", "sirius")
+    
+    ret <- read.csv(system.file("misc", "compounds-scorings.csv", package = "patRoon"),
+                    stringsAsFactors = FALSE)
+    
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertChoice(algorithm, algos, null.ok = TRUE, add = ac)
+    checkmate::assertString(database, na.ok = FALSE, null.ok = TRUE, add = ac)
+    checkmate::assertFlag(includeSuspectLists, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    if (!is.null(algorithm))
+        ret <- ret[nzchar(ret[[algorithm]]), names(ret) != setdiff(algos, algorithm)]
+    if (!is.null(database))
+    {
+        if (includeNoDB)
+            ret <- ret[!nzchar(ret$database) | ret$database == database, ]
+        else
+            ret <- ret[ret$database == database, ]
+    }
+    if (!includeSuspectLists)
+        ret <- ret[!ret$suspect_list, ]
+    if (onlyDefault)
+        ret <- ret[ret$default, ]
+    
+    return(ret)
 }
 
-getCompSuspectListColNames <- function()
-{
-    # suspect lists from Dashboard
-    return(c("ECOTOX",
-             "NORMANSUSDAT",
-             "MASSBANKEU",
-             "TOX21SL",
-             "TOXCAST"))
-}
+getCompScoreColNames <- function() unique(compoundScorings(includeSuspectLists = FALSE)$name)
+getCompSuspectListColNames <- function() setdiff(unique(compoundScorings(includeSuspectLists = TRUE)$name),
+                                                 getCompScoreColNames())
 
 normalizeCompScores <- function(compResults, mCompNames, minMaxNormalization, exclude = NULL)
 {

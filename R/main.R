@@ -600,6 +600,15 @@ NULL
 #'   set. For \code{generateCompoundsSirius}, a character string such as
 #'   \code{"[M+H]+"}, \code{"[M-H]-"}, \code{"[M+Na]+"} and \code{"[M]+"}. Sets
 #'   the \option{PrecursorIonMode} and \option{--ion} options, respectively.
+#' @param database Compound database to use. Valid values are: \code{"pubchem"},
+#'   \code{"chemspider"}, \code{"kegg"}, \code{"sdf"}, \code{"psv"} and
+#'   \code{"csv"}.
+#'
+#'   For compound generation: note that when \code{database="chemspider"}, the
+#'   \code{chemSpiderToken} argument should be set. Similarly, when a local database is
+#'   set (\emph{i.e.} \code{sdf}, \code{psv}, \code{csv}) the
+#'   \code{LocalDatabasePath} value should be set in \code{extraOpts}. Sets the
+#'   \code{MetFragDatabaseType} option.
 #' @param errorRetries Maximum number of retries after an error occurred. This
 #'   may be useful to handle e.g. connection errors.
 #' @param topMost Only keep this number of candidates (per feature group) with
@@ -609,8 +618,26 @@ NULL
 #'
 #' @template multiProc-args
 #'
-#' @note At this point only mass spectrometric data from the most intense
-#'   feature is used for compound identification.
+#' @section Scorings: Each algorithm implements their own scoring system. Their
+#'   names have been simplified and harmonized where possible and are used for
+#'   reporting and in the case \command{MetFrag} is used to specify how
+#'   compounds should be scored (\code{scoreTypes} argument). The
+#'   \code{compoundScorings} function can be used to get an overview of both the
+#'   algorithm specific and generic scoring names. For instance, the table below
+#'   shows all scorings for \command{MetFrag}: (some columns are omitted)
+#'
+#' @eval paste("@@section Scorings:",
+#'   patRoon:::tabularRD(patRoon::compoundScorings("metfrag")[, 1:3]))
+#'
+#' @section Scorings: In addition, the \code{compoundScorings} function is also
+#'   useful to programatically generate  a set of scorings to be used by
+#'   \command{MetFrag}. For instance, the following can be given to the
+#'   \code{scoreTypes} argument to use all default scorings for PubChem:
+#'   \code{compoundScorings("metfrag", "pubchem", onlyDefault=TRUE)$name}.
+#'
+#'   For all \command{MetFrag} scoring types refer to the \verb{Candidate Scores}
+#'   section on the \href{http://c-ruttkies.github.io/MetFrag/projects/metfragr/}{MetFragR
+#'   homepage}.
 #'
 #' @seealso \code{\link{compounds-class}}
 #' @name compound-generation

@@ -270,31 +270,23 @@ processMFResults <- function(metf, spec, db, topMost, lfile = "")
 #'   Sets the \option{FragmentPeakMatchAbsoluteMassDeviation} option.
 #' @param isPositive Set to \code{TRUE} for data measured with positive
 #'   ionization. Sets the \option{IsPositiveIonMode} option.
-#' @param database Compound database to use. Valid values are: \code{"PubChem"},
-#'   \code{"ExtendedPubChem"}, \code{"ChemSpider"} and \code{"KEGG"}. The
-#'   \code{"ExtendedPubChem"} is a PubChem database which includes number of
-#'   patents and references information, which an be used for further scoring
-#'   (see \code{scoreTypes} parameter.) In order to use the \code{ChemSpider}
-#'   database the \code{chemSpiderToken} should be set. Sets the
-#'   \option{MetFragDatabaseType} option.
+#' @param extendedPubChem If \code{database="pubchem"}: whether to use the
+#'   \emph{extended} database that includes information for compound scoring
+#'   (\emph{i.e.} number of patents/PubMed references). Note that downloading
+#'   candidates from this database might take extra time. Valid values are:
+#'   \code{FALSE} (never use it), \code{TRUE} (always use it) or \code{"auto"}
+#'   (default, use if specified scorings demand it).
 #' @param chemSpiderToken A character string with the
 #'   \href{http://www.chemspider.com/AboutServices.aspx}{ChemSpider security
 #'   token} that should be set when the ChemSpider database is used. Sets the
 #'   \option{ChemSpiderToken} option.
-#' @param scoreTypes A character vector defining the scoring methods
-#'   (\emph{e.g.} \code{"FragmenterScore"}, \code{"OfflineMetFusionScore"},
-#'   \code{"RetentionTimeScore"}). Some methods require further options to be
-#'   set. Additional scoring methods become available when the
-#'   \option{"ExtendedPubChem"} (\emph{i.e.} \option{"PubChemNumberPatents"} and
-#'   \option{"PubChemNumberPubMedReferences"}) or \option{"ChemSpider"}
-#'   (\emph{i.e.} \option{"ChemSpiderReferenceCount"},
-#'   \option{"ChemSpiderNumberExternalReferences"},
-#'   \option{"ChemSpiderRSCCount"}, \option{"ChemSpiderNumberPubMedReferences"}
-#'   and \option{"ChemSpiderDataSourceCount"}) database type is used. For all
-#'   scoring types and more information refer to the \verb{Candidate Scores}
-#'   section on the
-#'   \href{http://c-ruttkies.github.io/MetFrag/projects/metfragr/}{MetFragR
-#'   homepage}. Sets the \option{MetFragScoreTypes} option.
+#' @param scoreTypes A character vector defining the scoring types. See the
+#'   \verb{Scorings} section below for more information. Note that both generic
+#'   and \command{MetFrag} specific names are accepted (\emph{i.e.} \code{name}
+#'   and \code{metfrag} columns returned by \code{compoundScorings}). When a
+#'   local database is used, the name should match what is given there
+#'   (\code{e.g} column names when \code{database=csv}). Sets the
+#'   \option{MetFragScoreTypes} option.
 #' @param scoreWeights Numeric vector containing weights of the used scoring
 #'   types. Order is the same as set in \code{scoreTypes}. Values are recycled
 #'   if necessary. Sets the \option{MetFragScoreWeights} option.
@@ -340,9 +332,10 @@ processMFResults <- function(metf, spec, db, topMost, lfile = "")
 generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPath = file.path("log", "metfrag"),
                                      timeout = 300, timeoutRetries = 2, errorRetries = 2, topMost = 100,
                                      dbRelMzDev = 5, fragRelMzDev = 5, fragAbsMzDev = 0.002, isPositive, adduct,
-                                     database = "PubChem", chemSpiderToken = "",
-                                     scoreTypes = c("FragmenterScore", "OfflineMetFusionScore"), scoreWeights = 1.0,
-                                     preProcessingFilters = c("UnconnectedCompoundFilter","IsotopeFilter"),
+                                     database = "pubchem", extendedPubChem = "auto", chemSpiderToken = "",
+                                     scoreTypes = compoundScorings("metfrag", database, onlyDefault = TRUE)$name,
+                                     scoreWeights = 1.0,
+                                     preProcessingFilters = c("UnconnectedCompoundFilter", "IsotopeFilter"),
                                      postProcessingFilters = c("InChIKeyFilter"),
                                      maxCandidatesToStop = 2500, addTrivialNames = TRUE,
                                      identifiers = NULL, extraOpts = NULL,
@@ -364,12 +357,24 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
     aapply(checkmate::assertCount, . ~ topMost + maxCandidatesToStop, positive = TRUE, fixed = list(add = ac))
     aapply(checkmate::assertFlag, . ~ isPositive + addTrivialNames, fixed = list(add = ac))
     checkmate::assertInt(adduct, add = ac)
-    aapply(checkmate::assertString, . ~ database + chemSpiderToken, fixed = list(add = ac))
+    checkmate::assertString(chemSpiderToken, add = ac)
+    checkmate::assertChoice(database, c("pubchem", "chemspider", "kegg", "sdf", "psv", "csv"), add = ac)
+    checkmate::assert(checkmate::checkFlag(extendedPubChem),
+                      checkmate::checkChoice(extendedPubChem, "auto"),
+                      .var.name = "extendedPubChem")
     aapply(checkmate::assertCharacter, . ~ scoreTypes + preProcessingFilters + postProcessingFilters,
            any.missing = FALSE, fixed = list(add = ac))
     checkmate::assertNumeric(scoreWeights, lower = 0, finite = TRUE, any.missing = FALSE, min.len = 1, add = ac)
     aapply(checkmate::assertList, . ~ identifiers + extraOpts, any.missing = FALSE,
            names = "unique", null.ok = TRUE, fixed = list(add = ac))
+    
+    compsScores <- compoundScorings("metfrag", database)
+    isLocalDB <- database %in% c("sdf", "psv", "csv")
+    allScoringNames <- union(compsScores$name, compsScores$metfrag)
+    # allow freely definable scorings from local databases
+    if (!isLocalDB)
+        checkmate::assertSubset(scoreTypes, allScoringNames, add = ac)
+    
     checkmate::reportAssertions(ac)
 
     anaInfo <- analysisInfo(fGroups)
@@ -380,6 +385,29 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
     gInfo <- groupInfo(fGroups)
     pLists <- peakLists(MSPeakLists)
 
+    if (!is.logical(extendedPubChem) && database == "pubchem")
+    {
+        PCScorings <- compoundScorings("metfrag", "pubchem", includeNoDB = FALSE)
+        extendedPubChem <- any(scoreTypes %in% union(PCScorings$name, PCScorings$metfrag))
+    }
+    
+    # convert to metfrag naming scheme
+    database <- switch(database,
+                       pubchem = "PubChem",
+                       chemspider = "ChemSpider",
+                       kegg = "KEGG",
+                       sdf = "LocalSDF",
+                       psv = "LocalPSV",
+                       csv = "LocalCSV")
+    if (extendedPubChem && database == "PubChem") # can't seem to combine this conditional in above switch...
+        database <- "ExtendedPubChem"
+    
+    rownames(compsScores) <- compsScores$name
+    scoreTypes <- setdiff(scoreTypes, c("score", "Score")) # final score is to be determined
+    isSimplScore <- scoreTypes %in% compsScores$name
+    if (any(isSimplScore))
+        scoreTypes[isSimplScore] <- compsScores[scoreTypes[isSimplScore], "metfrag"]
+    
     mfSettings <- list(DatabaseSearchRelativeMassDeviation = dbRelMzDev,
                        FragmentPeakMatchRelativeMassDeviation = fragRelMzDev,
                        FragmentPeakMatchAbsoluteMassDeviation = fragAbsMzDev,
@@ -405,7 +433,7 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
     resultHashes <- vector("character", length(gNames))
     names(resultHashes) <- gNames
 
-    printf("Identifying %d feature groups with metFrag...\n", gCount)
+    printf("Identifying %d feature groups with MetFrag...\n", gCount)
 
     runData <- generateMetFragRunData(fGroups, MSPeakLists, mfSettings, topMost, identifiers, method, addTrivialNames)
 

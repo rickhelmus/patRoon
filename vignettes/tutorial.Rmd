@@ -189,10 +189,7 @@ Then `generateCompounds()` is used to execute MetFrag and generate the `compound
 ```{r compounds,results='hide'}
 compounds <- generateCompounds(fGroups, plists, "metfrag", topMost = 25,
                                adduct = 1, isPositive = TRUE,
-                               database = "ExtendedPubChem", maxCandidatesToStop = 5000,
-                               scoreTypes = c("FragmenterScore", "OfflineMetFusionScore",
-                                              "PubChemNumberPatents",
-                                              "PubChemNumberPubMedReferences"))
+                               database = "pubchem", maxCandidatesToStop = 5000)
 ```
 ```{r fig.width=4,fig.height=4}
 compounds
@@ -201,7 +198,7 @@ plotSpec(compounds, 1, "M120_R328_91", plists)
 
 While `generateCompounds()` is running a list of candidate compound structures will be downloaded for every feature group (in this case from PubChem) and ranked according to various scoring parameters.
 
-As with previous described workfow functions, there are many different arguments that can specified to modify the behaviour when generating compounds. In brief, here we limit the number to the top 25 candidates (this will save a lot of processing time), specify that we are primarily interested in protonated ions and use the extended PubChem database so that we can score on number of patents and PubMed references along with scoring for similarity to in-silico generated MS/MS spectra (`FragmenterScore`) and MassBank derived mass spectra (`OfflineMetFusionScore`).
+As with previous described workfow functions, there are many different arguments that can specified to modify the behaviour when generating compounds. In brief, here we limit the number to the top 25 candidates (this will save a lot of processing time), specify that we are primarily interested in protonated ions and use the pubchem database.
 
 As a side note: this is often one of the most time consuming steps during the workflow. For this reason, and in order to not 'abuse' the server used by MetFrag, you should always take care to prioritize your data before running this function.
 

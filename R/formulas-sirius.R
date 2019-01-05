@@ -77,6 +77,12 @@ processSiriusFormulas <- function(cmd, exitStatus, retries)
 #'   patterns will be used for scoring candidates. Note that \command{SIRIUS}
 #'   requires availability of MS/MS data.
 #'
+#' @param topMost Only keep this number of candidates (per feature group) with
+#'   highest score. Sets the \option{--candidates} commandline option.
+#' @param extraOpts A \code{character} vector with any extra commandline
+#'   parameters. See the SIRIUS manual for more details. Set to \code{NULL} to
+#'   ignore.
+#'
 #' @templateVar ident FALSE
 #' @template sirius-args
 #'
@@ -86,8 +92,8 @@ processSiriusFormulas <- function(cmd, exitStatus, retries)
 #' @rdname formula-generation
 #' @export
 generateFormulasSirius <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct = "[M+H]+", elements = "CHNOP",
-                                   profile = "qtof", database = NULL, noise = NULL,
-                                   calculateFeatures = TRUE, featThreshold = 0.75,
+                                   profile = "qtof", database = NULL, noise = NULL, topMost = 100,
+                                   extraOpts = NULL, calculateFeatures = TRUE, featThreshold = 0.75,
                                    logPath = file.path("log", "sirius"), maxProcAmount = getOption("patRoon.maxProcAmount"))
 {
     ac <- checkmate::makeAssertCollection()
@@ -97,6 +103,8 @@ generateFormulasSirius <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct = 
     aapply(checkmate::assertString, . ~ adduct + elements + profile, fixed = list(add = ac))
     checkmate::assertString(database, null.ok = TRUE, add = ac)
     checkmate::assertNumber(noise, lower = 0, finite = TRUE, null.ok = TRUE, add = ac)
+    checkmate::assertCount(topMost, positive = TRUE, add = ac)
+    checkmate::assertCharacter(extraOpts, null.ok = TRUE, add = ac)
     checkmate::assertFlag(calculateFeatures, add = ac)
     checkmate::assertNumber(featThreshold, lower = 0, finite = TRUE, null.ok = TRUE, add = ac)
     assertMultiProcArgs(logPath, maxProcAmount, add = ac)
@@ -111,7 +119,7 @@ generateFormulasSirius <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct = 
     gCount <- length(fGroups)
 
     cacheDB <- openCacheDBScope() # open manually so caching code doesn't need to on each R/W access
-    baseHash <- makeHash(profile, adduct, maxMzDev, elements, database, noise)
+    baseHash <- makeHash(profile, adduct, maxMzDev, elements, database, noise, topMost, extraOpts)
     setHash <- makeHash(fGroups, MSPeakLists, baseHash)
     cachedSet <- loadCacheSet("formulasSirius", setHash, cacheDB)
     formHashes <- character(0)
@@ -146,7 +154,7 @@ generateFormulasSirius <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct = 
             plmz <- groupPeakLists[[grp]][["MS"]][precursor == TRUE, mz]
 
             cmd <- getSiriusCommand(plmz, groupPeakLists[[grp]][["MS"]], groupPeakLists[[grp]][["MSMS"]], profile,
-                                    adduct, maxMzDev, elements, database, noise, FALSE, NULL)
+                                    adduct, maxMzDev, elements, database, noise, FALSE, NULL, topMost, extraOpts)
             logf <- if (!is.null(logPath)) file.path(logPath, paste0("sirius-form-", grp, ".txt")) else NULL
             logfe <- if (!is.null(logPath)) file.path(logPath, paste0("sirius-form-err-", grp, ".txt")) else NULL
 

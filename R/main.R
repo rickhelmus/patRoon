@@ -612,9 +612,24 @@ NULL
 #' @param errorRetries Maximum number of retries after an error occurred. This
 #'   may be useful to handle e.g. connection errors.
 #' @param topMost Only keep this number of candidates (per feature group) with
-#'   highest score. Set to \code{NULL} to always keep all candidates, however,
+#'   highest score.
+#'   
+#'   For \command{MetFrag}: Set to \code{NULL} to always keep all candidates, however,
 #'   please note that this may result in significant usage of CPU/RAM resources
 #'   for large numbers of candidates.
+#'   
+#'   For \command{SIRIUS}: Sets the \option{--candidates} commandline option.
+#'
+#' @param extraOpts For \command{MetFrag}: A named \code{list} containing
+#'   further settings to be passed to \code{\link[metfRag]{run.metfrag}}. See
+#'   the \href{http://c-ruttkies.github.io/MetFrag/projects/metfragr/}{MetFragR}
+#'   and \href{http://c-ruttkies.github.io/MetFrag/projects/metfragcl/}{MetFrag
+#'   CL} homepages for all available options.
+#'
+#'   For \command{SIRIUS}: a \code{character} vector with any extra commandline
+#'   parameters. See the SIRIUS manual for more details.
+#'
+#'   Set to \code{NULL} to ignore.
 #'
 #' @template multiProc-args
 #'

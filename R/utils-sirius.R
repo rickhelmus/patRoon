@@ -67,7 +67,7 @@ unifySirNames <- function(sir)
 
 # get a command queue list that can be used with executeMultiProcess()
 getSiriusCommand <- function(precursorMZ, MSPList, MSMSPList, profile, ionization, ppmMax, elements,
-                             database, noise, withFingerID, fingerIDDatabase)
+                             database, noise, withFingerID, fingerIDDatabase, topMost, extraOpts)
 {
     outPath <- tempfile("sirius")
     # unlink(outPath, TRUE) # start with fresh output directory (otherwise previous results are combined)
@@ -78,6 +78,7 @@ getSiriusCommand <- function(precursorMZ, MSPList, MSMSPList, profile, ionizatio
                   "-i", ionization,
                   "-e", elements,
                   "--ppm-max", ppmMax,
+                  "-c", topMost,
                   "-o", outPath)
 
     if (!is.null(database))
@@ -88,6 +89,8 @@ getSiriusCommand <- function(precursorMZ, MSPList, MSMSPList, profile, ionizatio
         mainArgs <- c(mainArgs, "--fingerid")
     if (!is.null(fingerIDDatabase))
         mainArgs <- c(mainArgs, "--fingerid-db", fingerIDDatabase)
+    if (!is.null(extraOpts))
+        mainArgs <- c(mainArgs, extraOpts)
 
     msFName <- tempfile("spec", fileext = ".ms")
     cmpName <- "unknownCompound"

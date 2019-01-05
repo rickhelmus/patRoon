@@ -13,6 +13,7 @@ processSiriusCompounds <- function(cmd, exitStatus, retries)
     {
         results <- fread(summary)
 
+        # UNDONE: this shouldn't be necessary anymore as SIRIUS already limits to given amount of top ranked.
         if (!is.null(cmd$topMost))
         {
             if (nrow(results) > cmd$topMost)
@@ -91,7 +92,8 @@ processSiriusCompounds <- function(cmd, exitStatus, retries)
 #' @export
 generateCompoundsSirius <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct = "[M+H]+", elements = "CHNOP",
                                     profile = "qtof", formulaDatabase = NULL, fingerIDDatabase = "pubchem",
-                                    noise = NULL, errorRetries = 2, topMost = 100, logPath = file.path("log", "sirius"),
+                                    noise = NULL, errorRetries = 2, topMost = 100, extraOpts = NULL,
+                                    logPath = file.path("log", "sirius"),
                                     maxProcAmount = getOption("patRoon.maxProcAmount"))
 {
     ac <- checkmate::makeAssertCollection()
@@ -103,6 +105,7 @@ generateCompoundsSirius <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct =
     checkmate::assertNumber(noise, lower = 0, finite = TRUE, null.ok = TRUE, add = ac)
     checkmate::assertCount(errorRetries, add = ac)
     checkmate::assertCount(topMost, positive = TRUE, add = ac)
+    checkmate::assertCharacter(extraOpts, null.ok = TRUE, add = ac)
     assertMultiProcArgs(logPath, maxProcAmount, add = ac)
     checkmate::reportAssertions(ac)
     
@@ -116,7 +119,7 @@ generateCompoundsSirius <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct =
 
     cacheDB <- openCacheDBScope()
     setHash <- makeHash(fGroups, MSPeakLists, profile, adduct, maxMzDev, elements, formulaDatabase,
-                        fingerIDDatabase, noise, topMost)
+                        fingerIDDatabase, noise, topMost, extraOpts)
     cachedSet <- loadCacheSet("identifySirius", setHash, cacheDB)
     resultHashes <- vector("character", gCount)
     names(resultHashes) <- gNames
@@ -134,12 +137,12 @@ generateCompoundsSirius <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct =
             return(NULL)
 
         hash <- makeHash(plmz, plist, profile, adduct, maxMzDev, elements,
-                         formulaDatabase, fingerIDDatabase, noise, topMost)
+                         formulaDatabase, fingerIDDatabase, noise, topMost, extraOpts)
         resultHashes[[grp]] <<- hash
 
         cmd <- getSiriusCommand(plmz, plist$MS, plist$MSMS, profile,
                                 adduct, maxMzDev, elements, formulaDatabase, noise, TRUE,
-                                fingerIDDatabase)
+                                fingerIDDatabase, topMost, extraOpts)
         db <- if (!is.null(fingerIDDatabase)) fingerIDDatabase else if (!is.null(formulaDatabase)) formulaDatabase else "pubchem"
         logf <- if (!is.null(logPath)) file.path(logPath, paste0("sirius-comp-", grp, ".txt")) else NULL
         logfe <- if (!is.null(logPath)) file.path(logPath, paste0("sirius-comp-err-", grp, ".txt")) else NULL

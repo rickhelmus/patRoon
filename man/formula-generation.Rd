@@ -27,8 +27,9 @@ formulaScorings()
 
 generateFormulasSirius(fGroups, MSPeakLists, maxMzDev = 5,
   adduct = "[M+H]+", elements = "CHNOP", profile = "qtof",
-  database = NULL, noise = NULL, calculateFeatures = TRUE,
-  featThreshold = 0.75, logPath = file.path("log", "sirius"),
+  database = NULL, noise = NULL, topMost = 100, extraOpts = NULL,
+  calculateFeatures = TRUE, featThreshold = 0.75,
+  logPath = file.path("log", "sirius"),
   maxProcAmount = getOption("patRoon.maxProcAmount"))
 }
 \arguments{
@@ -131,9 +132,16 @@ option.}
 \item{noise}{Median intensity of the noise (\code{NULL} ignores this
 parameter). Sets the \option{--noise} commandline option.}
 
+\item{topMost}{Only keep this number of candidates (per feature group) with
+highest score. Sets the \option{--candidates} commandline option.}
+
 \item{logPath}{Destination directory for log files with output from executed
 commands. Will be created if non-existant. Set to \code{NULL} to disable
 logging.}
+
+\item{extraOpts}{A \code{character} vector with any extra commandline
+parameters. See the SIRIUS manual for more details. Set to \code{NULL} to
+ignore.}
 }
 \value{
 A \code{\link{formulas}} object containing all generated formulae.

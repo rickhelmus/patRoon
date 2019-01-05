@@ -32,7 +32,7 @@ Release:
     - cache?
 - progressbar and parallel enviPick
 - OpenMS: Support newest grouper?
-- clearCache: partial match
+- clearCache: partial match, more conistsent naming
 - MSPeakLists
     - isotope tagging is lost after averaging
     - most intense analysis as alternative to averaging?
@@ -46,7 +46,6 @@ Release:
 - reportMD: if blanks are still present chord etc not plotted?
 - removeRefAnalyses TRUE by default (or if blank filter is specified?)?
 - convertMSFiles(): add DA functionality
-- SIRIUS compounds: report charged formula for fragInfo (as is now done for formulas, also affects formula scoring for compounds)
 - formulas
     - DBE calculation for SIRIUS?
     - set column order?

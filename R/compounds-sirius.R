@@ -34,6 +34,9 @@ processSiriusCompounds <- function(cmd, exitStatus, retries)
                 fragInfo[, c("rel.intensity", "exactmass") := NULL]
                 setnames(fragInfo, "explanation", "formula")
                 fragInfo[, PLIndex := sapply(mz, function(omz) which.min(abs(omz - cmd$MSMSSpec$mz)))]
+                
+                # sirius neutralizes fragments, make them ion again
+                fragInfo[, formula := calculateIonFormula(formula, cmd$adduct)]
 
                 set(results, which(results$formula == precursor), "fragInfo", list(list(fragInfo)))
                 set(results, which(results$formula == precursor), "explainedPeaks", nrow(fragInfo))
@@ -42,7 +45,7 @@ processSiriusCompounds <- function(cmd, exitStatus, retries)
         
         if (is.null(results[["fragInfo"]]))
         {
-            warning(sprintf("no fragment info for %s", cmd$gName))
+            # warning(sprintf("no fragment info for %s", cmd$gName))
             results[, fragInfo := list(rep(list(data.table()), nrow(results)))]
             results[, explainedPeaks := 0]
         }

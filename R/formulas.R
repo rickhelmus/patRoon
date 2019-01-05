@@ -354,12 +354,6 @@ setMethod("filter", "formulas", function(obj, minExplainedFragPeaks = NULL, elem
                                                  by = "formula"][[2]]]
         }
 
-        if (!is.null(topMost))
-        {
-            unFormNrs <- formTable[, match(formula, unique(.SD$formula))]
-            formTable <- formTable[unFormNrs <= topMost]
-        }
-
         if (!is.null(scoreLimits))
         {
             for (sc in names(scoreLimits))
@@ -392,6 +386,12 @@ setMethod("filter", "formulas", function(obj, minExplainedFragPeaks = NULL, elem
                          OC <= 1.2 &
                          NC <= 0.5]
             formTable <- formTable[keep]
+        }
+        
+        if (!is.null(topMost))
+        {
+            unFormNrs <- formTable[, match(formula, unique(.SD$formula))]
+            formTable <- formTable[unFormNrs <= topMost]
         }
 
         return(formTable)

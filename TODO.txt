@@ -60,8 +60,8 @@ Release:
     - OM reporting
     - as.data.table: option to average per replicate group?
 - look into supervisors for processx
-- filter() for compounds: copy new functionality from formulas method
 - harmonize adduct specification for formulas/compounds (also update calculateIonFormula())
+    - if done: add loss filter to compounds
 - suspect screening: add MS/MS qualifiers
 - DA
     - generateMSPeakListsDA: find precursor masses with larger window

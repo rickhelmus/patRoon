@@ -399,7 +399,7 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
                        sdf = "LocalSDF",
                        psv = "LocalPSV",
                        csv = "LocalCSV")
-    if (extendedPubChem && database == "PubChem") # can't seem to combine this conditional in above switch...
+    if (database == "PubChem" && extendedPubChem) # can't seem to combine this conditional in above switch...
         database <- "ExtendedPubChem"
     
     rownames(compsScores) <- compsScores$name

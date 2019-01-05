@@ -7,8 +7,9 @@ NULL
 # get a vector of all (merged) columns
 getAllCompCols <- function(targetCols, allCols, mCompNames)
 {
-    targetCols <- c(targetCols, sapply(targetCols, function(cl) paste0(cl, "-", mCompNames)))
-    return(targetCols[targetCols %in% allCols])
+    targetCols <- c(targetCols, sapply(targetCols, function(cl) paste0(cl, "-", mCompNames),
+                                       USE.NAMES = FALSE))
+    return(intersect(targetCols, allCols))
 }
 
 mergeFragInfo <- function(fiLeft, fiRight, leftName, rightName)

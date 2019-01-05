@@ -234,7 +234,7 @@ generateFormulasDA <- function(fGroups, precursorMzSearchWindow = 0.002, MSMode 
         closeSaveDAFile(DA, DAAnaInd, close, save)
         
         ngrp <- length(fTable[[ana]])
-        printf("Loaded %d formulas for %d features (%.2f%%).\n", sum(unlist(lapply(fTable[[ana]], nrow))),
+        printf("Loaded %d formulas for %d features (%.2f%%).\n", countUniqueFormulas(fTable[[ana]]),
                ngrp, if (gCount == 0) 0 else ngrp * 100 / gCount)
     }
 

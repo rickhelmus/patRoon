@@ -137,6 +137,8 @@ averageFormulas <- function(formulas)
     return(formulaListToString(fl))
 }
 
+countUniqueFormulas <- function(fList) sum(unlist(lapply(fList, function(ft) length(unique(ft$formula)))))
+
 addElementInfoToFormTable <- function(formTable, elements, fragElements, OM)
 {
     # ensure CHNOPS counts are present

@@ -87,7 +87,7 @@ setMethod("groupNames", "formulas", function(obj) names(obj@formulas))
 
 #' @describeIn formulas Obtain total number of formulae entries.
 #' @export
-setMethod("length", "formulas", function(x) sum(unlist(sapply(x@formulas, function(ft) length(unique(ft$formula))))))
+setMethod("length", "formulas", function(x) countUniqueFormulas(x@formulas))
 
 #' @describeIn formulas Show summary information for this object.
 #' @export

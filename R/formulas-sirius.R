@@ -183,7 +183,7 @@ generateFormulasSirius <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct = 
         # prune after combining with cached results: these may also contain zero row results
         ret <- pruneList(ret, checkZeroRows = TRUE)
         
-        printf("Loaded %d formulas for %d %s (%.2f%%).\n", sum(unlist(lapply(ret, nrow))),
+        printf("Loaded %d formulas for %d %s (%.2f%%).\n", countUniqueFormulas(ret),
                ngrp, if (calculateFeatures) "features" else "feature groups",
                if (gCount == 0) 0 else ngrp * 100 / gCount)
 

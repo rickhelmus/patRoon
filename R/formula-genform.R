@@ -322,7 +322,7 @@ generateFormulasGenForm <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct =
             MSForms <- runGenForm(gfBin, mainArgs, featMZs, groupPeakLists, FALSE, MSHashes,
                                   cachedSet, workFiles, gNames, adduct, maxProcAmount, maxCmdsPerProc)
 
-            printf(endMsg, sum(unlist(sapply(MSForms, nrow))), "MS", length(MSForms),
+            printf(endMsg, countUniqueFormulas(MSForms), "MS", length(MSForms),
                    if (gCount == 0) 0 else length(MSForms) * 100 / gCount)
         }
 
@@ -333,7 +333,7 @@ generateFormulasGenForm <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct =
             MSMSForms <- runGenForm(gfBin, mainArgs, featMZs, groupPeakLists[doGNames], TRUE, MSMSHashes,
                                     cachedSet, workFiles, gNames, adduct, maxProcAmount, maxCmdsPerProc)
 
-            printf(endMsg, sum(unlist(sapply(MSMSForms, nrow))), "MS/MS", length(MSMSForms),
+            printf(endMsg, countUniqueFormulas(MSMSForms), "MS/MS", length(MSMSForms),
                    if (gCount == 0) 0 else length(MSMSForms) * 100 / gCount)
 
             MSForms <- sapply(union(names(MSForms), names(MSMSForms)), function(grp)

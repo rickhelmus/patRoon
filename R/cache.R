@@ -177,6 +177,7 @@ clearCache <- function(what = NULL, file = NULL)
                 for (tab in matchedTables)
                     dbExecute(db, sprintf("DROP TABLE IF EXISTS %s", tab))
                 dbExecute(db, "VACUUM")
+                printf("Removed caches: %s\n", paste0(matchedTables, collapse = ", "))
             }
         }
 

@@ -57,7 +57,7 @@ generateFormulasDA <- function(fGroups, precursorMzSearchWindow = 0.002, MSMode 
     fTable <- list()
 
     cacheDB <- openCacheDBScope() # open manually so caching code doesn't need to on each R/W access
-    setHash <- makeHash(fGroups, precursorMzSearchWindow)
+    setHash <- makeHash(fGroups, precursorMzSearchWindow, MSMode)
     cachedSet <- loadCacheSet("formulasBruker", setHash, cacheDB)
     formHashes <- vector("character", nrow(anaInfo) * gCount)
     formHashCount <- 0
@@ -70,7 +70,7 @@ generateFormulasDA <- function(fGroups, precursorMzSearchWindow = 0.002, MSMode 
         
         printf("Loading all formulas from analysis '%s'...\n", ana)
 
-        baseHash <- makeHash(fGroups, ana, precursorMzSearchWindow)
+        baseHash <- makeHash(fGroups, ana, precursorMzSearchWindow, MSMode)
 
         cmpds <- DA[["Analyses"]][[DAAnaInd]][["Compounds"]]
 

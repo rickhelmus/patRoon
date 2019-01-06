@@ -64,7 +64,6 @@ Release:
 - DA
     - generateMSPeakListsDA: find precursor masses with larger window
     - docs
-        - mention that highest intensity mz is assumed to be feature
         - NOTE about need to restart DA if strange DCOM errors occur
     - tests
         - utils? EICs with export/vdiffr?

@@ -199,7 +199,11 @@ methodology and instrumentation.
 \note{
 \code{findFeaturesBruker} only works with Bruker data files (\code{.d}
   extension) and requires Bruker DataAnalysis and the \pkg{RDCOMClient}
-  package to be installed.
+  package to be installed. Furthermore, DataAnalysis combines multiple
+  related masses in a feature (\emph{e.g.} isotopes, adducts) but does not
+  report the actual (monoisotopic) mass of the feature. Therefore, it is
+  simply assumed that the feature mass equals that of the highest intensity
+  mass peak.
 
 \code{findFeaturesEnviPick} Requires analysis files to be in the
   \code{mzXML} format.

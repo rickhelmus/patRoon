@@ -29,6 +29,9 @@
   should be initiated in parallel. A good starting point is the number of
   cores available. Default is set by \code{\link[parallel]{detectCores}}.
 
+  \item \code{patRoon.path.pwiz}: The path in which the \command{ProteoWizard}
+  binaries are installed. Only need to be set if not yet in \option{PATH}. 
+  
   \item \code{patRoon.path.GenForm}: The path to the \command{GenForm}
   executable. If not set (the default) the internal \code{GenForm} binary is
   used. Only set if you want to override the executable.

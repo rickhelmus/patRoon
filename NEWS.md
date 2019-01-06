@@ -1,6 +1,7 @@
 # patRoon 0.1.0.9000
 
 ## January 2019
+* `clearCache()` now supports removal of caches via regular expressions.
 * Added/Improved `topMost` and `extraOpts` arguments for SIRIUS formula/compound generation.
 * Annotated fragments from SIRIUS compounds now correctly contain charged molecular form.
 * `filter()` method for compounds now support generic scoring filtering and on elements of precursor and fragment formulae.

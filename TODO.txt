@@ -32,7 +32,7 @@ Release:
     - cache?
 - progressbar and parallel enviPick
 - OpenMS: Support newest grouper?
-- clearCache: partial match, more conistsent naming
+- clearCache: more conistsent naming
 - MSPeakLists
     - isotope tagging is lost after averaging
     - most intense analysis as alternative to averaging?

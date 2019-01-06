@@ -10,8 +10,9 @@ clearCache(what = NULL, file = NULL)
 \item{what}{This argument describes what should be done. When \code{what =
 NULL} this function will list which tables are present along with an
 indication of their size (database rows). If \code{what = "all"} then the
-complete file will be removed. Finally, \code{what} can be a character
-vector with table names that should be removed.}
+complete file will be removed. Otherwise, \code{what} should be a character
+string (a regular expression) that is used to match the table names that
+should be removed.}
 
 \item{file}{The cache file. If \code{NULL} then the value of the
 \code{patRoon.cache.fileName} option is used.}

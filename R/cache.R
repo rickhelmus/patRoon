@@ -125,15 +125,16 @@ saveCacheSet <- function(category, dataHashes, setHash, dbArg = NULL)
 #' @param what This argument describes what should be done. When \code{what =
 #'   NULL} this function will list which tables are present along with an
 #'   indication of their size (database rows). If \code{what = "all"} then the
-#'   complete file will be removed. Finally, \code{what} can be a character
-#'   vector with table names that should be removed.
+#'   complete file will be removed. Otherwise, \code{what} should be a character
+#'   string (a regular expression) that is used to match the table names that
+#'   should be removed.
 #' @param file The cache file. If \code{NULL} then the value of the
 #'   \code{patRoon.cache.fileName} option is used.
 #'
 #' @export
 clearCache <- function(what = NULL, file = NULL)
 {
-    checkmate::assertCharacter(what, min.len = 1, null.ok = TRUE)
+    checkmate::assertString(what, na.ok = FALSE, null.ok = TRUE)
     
     if (!is.null(file))
         checkmate::assertFile(file, "r")
@@ -142,7 +143,7 @@ clearCache <- function(what = NULL, file = NULL)
     
     if (!file.exists(file))
         printf("No cache file found, nothing to do ...\n")
-    else if ("all" %in% what)
+    else if (!is.null(what) && what == "all")
     {
         cat("Clearing ALL caches...\n")
         if (unlink(file) != 0)
@@ -168,15 +169,15 @@ clearCache <- function(what = NULL, file = NULL)
         }
         else
         {
-            nexist <- what[!what %in% tables]
-            if (length(nexist) > 0)
-                warning(sprintf("Non-existing cache: %s\n", paste0(nexist, collapse = ", ")))
-
-            for (categ in what[what %in% tables])
-                dbExecute(db, sprintf("DROP TABLE IF EXISTS %s", categ))
-
-            if (any(what %in% tables))
+            matchedTables <- grep(what, tables, value = TRUE)
+            if (length(matchedTables) == 0)
+                printf("No cache found that matches given pattern. Currently stored caches: %s\n", paste0(tables, collapse = ", "))
+            else
+            {
+                for (tab in matchedTables)
+                    dbExecute(db, sprintf("DROP TABLE IF EXISTS %s", tab))
                 dbExecute(db, "VACUUM")
+            }
         }
 
     }

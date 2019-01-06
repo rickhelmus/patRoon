@@ -9,8 +9,12 @@ if (doDATests())
     # compounds, forcing other calls (from features/formulas tests) to re-run
     # FMF
     fgDA <- groupFeatures(findFeatures(getDAAnaInfo()[2, ], "bruker"), "openms")
-    plistsDA <- generateMSPeakLists(fgDA, "bruker", save = FALSE)
-    plistsDAEmpty <- generateMSPeakLists(fgDA["nope"], "bruker", save = FALSE)
+    
+    # NOTE: set bgsubtr to FALSE: subtraction might remove pecursor peaks of
+    # (often wrong) low intensity features and result in warnings during
+    # averaging
+    plistsDA <- generateMSPeakLists(fgDA, "bruker", save = FALSE, bgsubtr = FALSE)
+    plistsDAEmpty <- generateMSPeakLists(fgDA["nope"], "bruker", save = FALSE, bgsubtr = FALSE)
     
     fgDA2 <- groupFeatures(findFeatures(getDAAnaInfo()[1, ], "bruker"), "openms")
     plistsDAFMF <- generateMSPeakLists(fgDA2, "brukerfmf")

@@ -34,7 +34,7 @@ generateMSPeakListsDA <- function(fGroups, bgsubtr = TRUE, maxRtMSWidth = 20, mi
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
     aapply(checkmate::assertFlag, . ~ bgsubtr + clear + save, fixed = list(add = ac))
     aapply(checkmate::assertNumber, . ~ maxRtMSWidth + minMSIntensity + minMSMSIntensity,
-           lower = 0, finite = TRUE, null.ok = TRUE, add = ac)
+           lower = 0, finite = TRUE, null.ok = TRUE, fixed = list(add = ac))
     checkmate::assertChoice(MSMSType, c("MSMS", "BBCID"), add = ac)
     assertAvgPListParams(avgFGroupParams, add = ac)
     assertDACloseSaveArgs(close, save, add = ac)
@@ -81,7 +81,8 @@ generateMSPeakListsDA <- function(fGroups, bgsubtr = TRUE, maxRtMSWidth = 20, mi
         uncachedGNames <- setdiff(anaGNames, names(cachedResults))
         if (length(uncachedGNames) > 0)
         {
-            clearDAChromsAndSpecs(DA, uncachedGNames, DAFind)
+            if (clear)
+                clearDAChromsAndSpecs(DA, uncachedGNames, DAFind)
             
             uncachedFTInds <- anaFTInds[names(anaFTInds) %in% uncachedGNames]
             featInfo <- rbindlist(lapply(uncachedFTInds, function(fti) fTable[[ana]][fti]),
@@ -156,7 +157,7 @@ generateMSPeakListsDAFMF <- function(fGroups, minMSIntensity = 500, minMSMSInten
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
     aapply(checkmate::assertNumber, . ~ minMSIntensity + minMSMSIntensity,
-           lower = 0, finite = TRUE, null.ok = TRUE, add = ac)
+           lower = 0, finite = TRUE, null.ok = TRUE, fixed = list(add = ac))
     assertDACloseSaveArgs(close, save, add = ac)
     assertAvgPListParams(avgFGroupParams, add = ac)
     checkmate::reportAssertions(ac)

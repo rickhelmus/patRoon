@@ -39,7 +39,6 @@ Release:
     - don't subset on analyses? or re-average? if no, mention in docs
     - $ method?
     - collapse averagedPeakLists
-    - test DA precursor marking
     - test avg params
 - MetFrag: (buggy) trivial name fetching not needed anymore?
 - reportMD: if blanks are still present chord etc not plotted?
@@ -68,7 +67,6 @@ Release:
     - tests
         - utils? EICs with export/vdiffr?
         - test MS peak lists deisotoping?
-        - update
 - fix doc errors from devtools::check_man()
 - data.table: add '[]' at the end of (exported) functions when ':=' was used (print bug workaround)
 - setAs() for as.data.table()/as.data.frame() methods

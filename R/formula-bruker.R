@@ -30,6 +30,8 @@ simplifyDAFormula <- function(formula)
 #'   
 #' @template dasaveclose-args
 #' 
+#' @template DA-restart-note
+#' 
 #' @rdname formula-generation
 #' @export
 generateFormulasDA <- function(fGroups, precursorMzSearchWindow = 0.002, MSMode = "both",

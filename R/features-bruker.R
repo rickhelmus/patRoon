@@ -36,6 +36,8 @@ setMethod("initialize", "featuresBruker",
 #'
 #' @template dasaveclose-args
 #'
+#' @template DA-restart-note
+#'
 #' @rdname feature-finding
 #' @export
 findFeaturesBruker <- function(analysisInfo, doFMF = "auto", startRange = 0, endRange = 0,

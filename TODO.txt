@@ -47,7 +47,6 @@ Release:
 - formulas
     - DBE calculation for SIRIUS?
     - set column order?
-    - DA: also include precursor in fragments?
     - mSigma --> isoScore? (tricky as low value is best) If yes, mention in docs...
     - customize/document ranking column order? (only do rank for sirius?)
     - how to handle ranking of consensus results?
@@ -62,8 +61,6 @@ Release:
 - suspect screening: add MS/MS qualifiers
 - DA
     - generateMSPeakListsDA: find precursor masses with larger window
-    - docs
-        - NOTE about need to restart DA if strange DCOM errors occur
     - tests
         - utils? EICs with export/vdiffr?
         - test MS peak lists deisotoping?

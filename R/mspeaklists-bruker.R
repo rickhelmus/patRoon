@@ -21,6 +21,8 @@ NULL
 #'   column is active (Method-->Parameters-->Layouts-->Mass List Layout) in
 #'   order to add isotopologue information.
 #'
+#' @template DA-restart-note
+#' 
 #' @rdname MSPeakLists-generation
 #' @export
 generateMSPeakListsDA <- function(fGroups, bgsubtr = TRUE, maxRtMSWidth = 20, minMSIntensity = 500,

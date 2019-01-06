@@ -106,8 +106,9 @@ respectively.}
 carbon atom). Sets the \option{oc} commandline option.}
 
 \item{extraOpts}{An optional character vector with any other commandline
-options that will be passed to \command{GenForm}. See the \verb{GenForm
-options} section for all available commandline options.}
+options that will be passed to \command{GenForm} or \command{SIRIUS}. See
+the \verb{GenForm options} section/SIRIUS manual for all available
+commandline options.}
 
 \item{calculateFeatures}{If \code{TRUE} fomulae are first calculated for all
 features prior to feature group assignment (see details).}
@@ -138,10 +139,6 @@ highest score. Sets the \option{--candidates} commandline option.}
 \item{logPath}{Destination directory for log files with output from executed
 commands. Will be created if non-existant. Set to \code{NULL} to disable
 logging.}
-
-\item{extraOpts}{A \code{character} vector with any extra commandline
-parameters. See the SIRIUS manual for more details. Set to \code{NULL} to
-ignore.}
 }
 \value{
 A \code{\link{formulas}} object containing all generated formulae.

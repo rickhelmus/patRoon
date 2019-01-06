@@ -131,9 +131,6 @@ usually close to the amount of CPU cores.}
 
 \item{openReport}{If set to \code{TRUE} then the output report file will be
 opened with the system browser.}
-
-\item{reportChord}{If \code{TRUE} then a chord diagram for all feature groups
-is plotted (data will be averaged among replicates).}
 }
 \description{
 Functionality to report data produced by most workflow steps such as

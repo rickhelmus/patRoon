@@ -117,7 +117,7 @@ setMethod("show", "compoundsCluster", function(object)
     showObjectSize(object)
 })
 
-#' @describeIn compounds Subset on feature groups.
+#' @describeIn compoundsCluster Subset on feature groups.
 #' @export
 setMethod("[", c("compoundsCluster", "ANY", "missing", "missing"), function(x, i, ...)
 {

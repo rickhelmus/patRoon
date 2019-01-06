@@ -8,6 +8,7 @@ featuresXCMS <- setClass("featuresXCMS", slots = list(xs = "xcmsSet"), contains 
 setMethod("initialize", "featuresXCMS",
           function(.Object, ...) callNextMethod(.Object, algorithm = "xcms", ...))
 
+#' @rdname features-class
 #' @export
 setMethod("[", c("featuresXCMS", "ANY", "missing", "missing"), function(x, i, j, ..., drop = TRUE)
 {
@@ -16,6 +17,7 @@ setMethod("[", c("featuresXCMS", "ANY", "missing", "missing"), function(x, i, j,
     return(x)
 })
 
+#' @rdname features-class
 #' @export
 setMethod("filter", "featuresXCMS", function(obj, ...)
 {

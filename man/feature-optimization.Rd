@@ -29,6 +29,9 @@ generateFeatureOptPSet(algorithm, method = "centWave", ...)
 getDefFeaturesOptParamRanges(algorithm, method = "centWave")
 }
 \arguments{
+\item{features}{A \code{\link{features}} object with the features that should
+be used to optimize grouping.}
+
 \item{algorithm}{Which algorithm should be used for feature finding/grouping
 (passed to \code{\link{findFeatures}}/\code{\link{groupFeatures}}).}
 
@@ -53,6 +56,9 @@ optimization procedures. In IPO this was fixed to \samp{50}.}
 \item{maxModelDeviation}{See the \verb{Potential suboptimal results by
 optimization model} section below.}
 
+\item{anaInfo}{\link[=analysis-information]{Analysis info table} (passed
+to \code{\link{findFeatures}}).}
+
 \item{isoIdent}{Sets the algorithm used to identify isotopes. Valid values
 are: \code{"IPO"}, \code{"CAMERA"} and \code{"OpenMS"}. The latter can only
 be used when OpenMS is used to find features, and is highly recommended in
@@ -63,12 +69,9 @@ if \code{isoIdent="IPO"}. Valid values: \code{"none"},
 \code{"borderIntensity"}, \code{"sinusCurve"} or \code{"normalDistr"}.}
 
 \item{CAMERAOpts}{A \code{list} with additional arguments passed to
-\code{\link{CAMERA::findIsotopes}} when \code{isoIdent="CAMERA"}.}
+\code{\link[CAMERA:findIsotopes]{CAMERA::findIsotopes}} when \code{isoIdent="CAMERA"}.}
 
 \item{method}{Method used by XCMS to find features (only if \code{algorithm="xcms"}).}
-
-\item{analysisInfo}{\link[=analysis-information]{Analysis info table} (passed
-to \code{\link{findFeatures}}).}
 }
 \value{
 The \code{optimizeFeatureFinding} and \code{optimizeFeatureGrouping}
@@ -164,15 +167,15 @@ The parameters specified in parameter sets are directly passed through
  The \code{optimizeFeatureFinding} and
   \code{optimizeFeatureGrouping} are the functions to be used to optimize
   parameters for feature finding and grouping, respectively. These functions
-  are analogous to \code{\link{optimizeXcmsSet}} and
-  \code{\link{optimizeRetGroup}} from \pkg{IPO}.
+  are analogous to \code{\link[IPO]{optimizeXcmsSet}} and
+  \code{\link[IPO]{optimizeRetGroup}} from \pkg{IPO}.
 
   The \code{generateFeatureOptPSet} and \code{generateFGroupsOptPSet} functions
   may be used to generate a parameter set for feature finding and grouping,
   respectively. Some algorithm dependent default parameter optimization ranges
   will be returned. These functions are analogous to
-  \code{\link{getDefaultXcmsSetStartingParams}} and
-  \code{\link{getDefaultRetGroupStartingParams}} from \pkg{IPO}. However,
+  \code{\link[IPO]{getDefaultXcmsSetStartingParams}} and
+  \code{\link[IPO]{getDefaultRetGroupStartingParams}} from \pkg{IPO}. However,
   unlike their IPO counterparts, these functions will not output default fixed
   values. The \code{generateFGroupsOptPSet} will only generate defaults for
   density grouping if \code{algorithm="xcms"}.

@@ -29,6 +29,8 @@
 their index or name, respectively (for the order/names see \code{names()}).\cr\cr For \code{[}: Can also be logical to perform logical selection
 (similar to regular vectors). If missing all labels are selected.\cr\cr For \code{[[}: should be a skalar value.}
 
+\item{\dots}{Ignored.}
+
 \item{drop, j}{ignored.}
 
 \item{name}{The label name (partially matched).}

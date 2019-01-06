@@ -85,6 +85,8 @@ featureGroupsOptimizer$methods(
 
 
 #' @rdname feature-optimization
+#' @param features A \code{\link{features}} object with the features that should
+#'   be used to optimize grouping.
 #' @export
 optimizeFeatureGrouping <- function(features, algorithm, ..., templateParams = list(),
                                     paramRanges = list(), maxIterations = 50, maxModelDeviation = 0.1)

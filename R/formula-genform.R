@@ -227,9 +227,6 @@ processGenFormResultFile <- function(file, isMSMS, adduct)
 #'   \option{het} commandline option.
 #' @param oc Only consider organic formulae (\emph{i.e.} with at least one
 #'   carbon atom). Sets the \option{oc} commandline option.
-#' @param extraOpts An optional character vector with any other commandline
-#'   options that will be passed to \command{GenForm}. See the \verb{GenForm
-#'   options} section for all available commandline options.
 #' @param maxCmdsPerProc Maximum number of commands that should be combined for
 #'   each executed process. Combining commands with short runtimes (such as
 #'   \command{GenForm}) can significantly increase parallel performance.

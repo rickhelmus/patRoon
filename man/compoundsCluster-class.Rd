@@ -11,6 +11,7 @@
 \alias{length,compoundsCluster-method}
 \alias{lengths,compoundsCluster-method}
 \alias{show,compoundsCluster-method}
+\alias{[,compoundsCluster,ANY,missing,missing-method}
 \alias{treeCut,compoundsCluster-method}
 \alias{treeCutDynamic,compoundsCluster-method}
 \alias{plot,compoundsCluster,ANY-method}
@@ -31,6 +32,9 @@
 \S4method{lengths}{compoundsCluster}(x, use.names = TRUE)
 
 \S4method{show}{compoundsCluster}(object)
+
+\S4method{[}{compoundsCluster,ANY,missing,missing}(x, i, j, ...,
+  drop = TRUE)
 
 \S4method{treeCut}{compoundsCluster}(obj, k = NULL, h = NULL,
   groupName)
@@ -53,6 +57,14 @@
 \item{use.names}{A logical value specifying whether the returned vector
 should be named with the feature group names.}
 
+\item{i}{A numeric or character value which is used to select feature groups by
+their index or name, respectively (for the order/names see \code{groupNames()}). Can also be logical to perform logical selection
+(similar to regular vectors). If missing all feature groups are selected.}
+
+\item{\dots}{Any arguments directly given to \code{\link{plot.dendrogram}}.}
+
+\item{drop, j}{ignored.}
+
 \item{k, h}{Desired number of clusters or tree height to be used for cutting
 the dendrogram, respecitively. One or the other must be specified.
 Analogous to \code{\link{cutree}}.}
@@ -73,20 +85,12 @@ the default is only \code{TRUE} when this is not the case.}
 their colours. By default \code{TRUE} for small amount of clusters to avoid
 overflowing the plot.}
 
-\item{\dots}{Any arguments directly given to \code{\link{plot.dendrogram}}.}
-
 \item{cluster}{A numeric value specifying the cluster.}
 
 \item{width, height}{The dimensions (in pixels) of the raster image that
 should be plotted.}
 
 \item{withTitle}{A logical value specifying whether a title should be added.}
-
-\item{drop, j}{ignored.}
-
-\item{i}{A numeric or character value which is used to select feature groups by
-their index or name, respectively (for the order/names see \code{groupNames()}). Can also be logical to perform logical selection
-(similar to regular vectors). If missing all feature groups are selected.}
 }
 \value{
 \code{cutTree} and \code{cutTreeDynamic} return the modified
@@ -125,6 +129,8 @@ feature groups for which data is present in this object.
 clusters per feature group.
 
 \item \code{show}: Show summary information for this object.
+
+\item \code{[}: Subset on feature groups.
 
 \item \code{treeCut}: Manually (re-)cut a dendrogram that was
 generated for a feature group.

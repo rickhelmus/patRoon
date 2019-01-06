@@ -135,6 +135,9 @@ ProfileAnalysis), \code{"brukertasq"} (Bruker TASQ) or \code{"mzmine"}
 
 \item{average}{Average data within replicate groups.}
 
+\item{features}{If \code{TRUE} then feature specific data will be added. If
+\code{average=TRUE} this data will be averaged for each feature group.}
+
 \item{retMin}{Plot retention time in minutes (instead of seconds).}
 
 \item{addSelfLinks}{If \code{TRUE} then 'self-links' are added which
@@ -337,9 +340,6 @@ with \code{groupInfo} method.}
 feature group (columns) per analysis (rows). Each index corresponds to the
 row within the feature table of the analysis (see
 \code{\link{featureTable}}).}
-
-\item{\code{If}}{\code{TRUE} then feature specific data will be added. If
-\code{average=TRUE} this data will be averaged for each feature group.}
 }}
 
 \section{S4 class hierarchy}{

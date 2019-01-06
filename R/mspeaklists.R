@@ -124,6 +124,7 @@ setMethod("show", "MSPeakLists", function(object)
 })
 
 #' @describeIn MSPeakLists Subset on analyses/feature groups.
+#' @param \dots Ignored.
 #' @export
 setMethod("[", c("MSPeakLists", "ANY", "ANY", "missing"), function(x, i, j, ...)
 {

@@ -672,8 +672,6 @@ setMethod("reportPDF", "featureGroups", function(fGroups, path, reportFGroups,
 #'   chord, Venn and UpSet diagram, respectively), \code{"eics"} (plot EICs for
 #'   individual feature groups) and \code{"formulas"} (plot annotated formula
 #'   spectra). Set to \code{"none"} to plot none of these.
-#' @param reportChord If \code{TRUE} then a chord diagram for all feature groups
-#'   is plotted (data will be averaged among replicates).
 #' @param includeMFWebLinks A \code{character} specifying to which feature
 #'   groups a web link should be added in the annotation page to
 #'   \href{https://msbi.ipb-halle.de/MetFragBeta/index.xhtml}{MetFragWeb}.

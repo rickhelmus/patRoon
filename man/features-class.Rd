@@ -24,6 +24,8 @@
 \alias{featuresOpenMS}
 \alias{featuresXCMS-class}
 \alias{featuresXCMS}
+\alias{[,featuresXCMS,ANY,missing,missing-method}
+\alias{filter,featuresXCMS-method}
 \title{Base features class}
 \usage{
 \S4method{length}{features}(x)
@@ -49,6 +51,10 @@
 \S4method{[[}{features,ANY,missing}(x, i)
 
 \S4method{$}{features}(x, name)
+
+\S4method{[}{featuresXCMS,ANY,missing,missing}(x, i, j, ..., drop = TRUE)
+
+\S4method{filter}{featuresXCMS}(obj, ...)
 }
 \arguments{
 \item{obj, x, object}{\code{features} object to be accessed}
@@ -69,6 +75,8 @@ in opposite manner.}
 \item{i}{A numeric or character value which is used to select analyses by
 their index or name, respectively (for the order/names see \code{analyses()}).\cr\cr For \code{[}: Can also be logical to perform logical selection
 (similar to regular vectors). If missing all analyses are selected.\cr\cr For \code{[[}: should be a skalar value.}
+
+\item{\dots}{Ignored.}
 
 \item{drop, j}{ignored.}
 

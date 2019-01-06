@@ -316,7 +316,7 @@ setMethod("export", "featureGroups", function(fGroups, type, out)
 
 #' @describeIn featureGroups Obtain a summary table (a \code{\link{data.table}})
 #'   with retention, \emph{m/z}, intensity and optionally other feature data.
-#' @slot If \code{TRUE} then feature specific data will be added. If
+#' @param features If \code{TRUE} then feature specific data will be added. If
 #'   \code{average=TRUE} this data will be averaged for each feature group.
 #' @export
 setMethod("as.data.table", "featureGroups", function(x, average = FALSE, features = FALSE)

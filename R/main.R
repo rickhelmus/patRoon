@@ -252,7 +252,7 @@ NULL
 #' }
 #'
 #'
-#' @param analysisInfo \link[=analysis-information]{Analysis info table} (passed
+#' @param anaInfo \link[=analysis-information]{Analysis info table} (passed
 #'   to \code{\link{findFeatures}}).
 #' @param algorithm Which algorithm should be used for feature finding/grouping
 #'   (passed to \code{\link{findFeatures}}/\code{\link{groupFeatures}}).
@@ -319,15 +319,15 @@ NULL
 #' @section Functions: The \code{optimizeFeatureFinding} and
 #'   \code{optimizeFeatureGrouping} are the functions to be used to optimize
 #'   parameters for feature finding and grouping, respectively. These functions
-#'   are analogous to \code{\link{optimizeXcmsSet}} and
-#'   \code{\link{optimizeRetGroup}} from \pkg{IPO}.
+#'   are analogous to \code{\link[IPO]{optimizeXcmsSet}} and
+#'   \code{\link[IPO]{optimizeRetGroup}} from \pkg{IPO}.
 #'
 #'   The \code{generateFeatureOptPSet} and \code{generateFGroupsOptPSet} functions
 #'   may be used to generate a parameter set for feature finding and grouping,
 #'   respectively. Some algorithm dependent default parameter optimization ranges
 #'   will be returned. These functions are analogous to
-#'   \code{\link{getDefaultXcmsSetStartingParams}} and
-#'   \code{\link{getDefaultRetGroupStartingParams}} from \pkg{IPO}. However,
+#'   \code{\link[IPO]{getDefaultXcmsSetStartingParams}} and
+#'   \code{\link[IPO]{getDefaultRetGroupStartingParams}} from \pkg{IPO}. However,
 #'   unlike their IPO counterparts, these functions will not output default fixed
 #'   values. The \code{generateFGroupsOptPSet} will only generate defaults for
 #'   density grouping if \code{algorithm="xcms"}.
@@ -552,6 +552,10 @@ NULL
 #'   candidate for a feature group. For instance, \code{featThreshold} dictates
 #'   that a formula should be present in at least 75% of the features inside a
 #'   feature group.
+#' @param extraOpts An optional character vector with any other commandline
+#'   options that will be passed to \command{GenForm} or \command{SIRIUS}. See
+#'   the \verb{GenForm options} section/SIRIUS manual for all available
+#'   commandline options.
 #'
 #' @templateVar genForm TRUE
 #' @template form-args

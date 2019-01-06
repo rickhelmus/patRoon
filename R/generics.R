@@ -250,9 +250,6 @@ setGeneric("plotVenn", function(obj, which = NULL, ...) standardGeneric("plotVen
 #' @templateVar func plotUpSet
 #' @templateVar desc plots an UpSet diagram to assess unique and overlapping data.
 #' @template generics
-#'
-#' @param which What should be plotted. See method documentation for specifics.
-#'
 setGeneric("plotUpSet", function(obj, ...) standardGeneric("plotUpSet"))
 
 #' @templateVar func replicateGroups

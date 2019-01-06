@@ -35,6 +35,7 @@ setMethod("names", "featureGroupsComparison", function(x) names(x@fGroupsList))
 setMethod("length", "featureGroupsComparison", function(x) length(x@fGroupsList))
 
 #' @describeIn featureGroupsComparison Subset on labels that were assigned to compared feature groups.
+#' @param \dots Ignored.
 #' @export
 setMethod("[", c("featureGroupsComparison", "ANY", "missing", "missing"), function(x, i, ...)
 {

@@ -154,6 +154,7 @@ setMethod("filter", "features", function(obj, intensityThreshold = NULL, retenti
 })
 
 #' @describeIn features Subset on analyses.
+#' @param \dots Ignored.
 #' @export
 setMethod("[", c("features", "ANY", "missing", "missing"), function(x, i, ...)
 {

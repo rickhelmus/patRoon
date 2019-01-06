@@ -52,6 +52,8 @@
 their index or name, respectively (for the order/names see \code{analyses()/groupNames()}).\cr\cr For \code{[}: Can also be logical to perform logical selection
 (similar to regular vectors). If missing all analyses/feature groups are selected.\cr\cr For \code{[[}: should be a skalar value. If \code{j} is not specified, \code{i} selects by feature groups instead.}
 
+\item{\dots}{Ignored.}
+
 \item{drop}{ignored.}
 
 \item{fGroups}{The \code{\link{featureGroups}} object that was used to

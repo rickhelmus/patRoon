@@ -99,8 +99,6 @@ retention time scatter plots.}
 
 \item{maxTreeHeight, deepSplit, minModuleSize}{Arguments used by
 \code{\link{cutreeDynamicTree}}.}
-
-\item{which}{What should be plotted. See method documentation for specifics.}
 }
 \description{
 Various (S4) generic functions providing a common interface for common tasks

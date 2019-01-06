@@ -64,7 +64,6 @@ Release:
     - tests
         - utils? EICs with export/vdiffr?
         - test MS peak lists deisotoping?
-- fix doc errors from devtools::check_man()
 - data.table: add '[]' at the end of (exported) functions when ':=' was used (print bug workaround)
 - setAs() for as.data.table()/as.data.frame() methods
 - compounds

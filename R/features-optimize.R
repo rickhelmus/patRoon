@@ -138,7 +138,7 @@ featuresOptimizer$methods(
 #'   if \code{isoIdent="IPO"}. Valid values: \code{"none"},
 #'   \code{"borderIntensity"}, \code{"sinusCurve"} or \code{"normalDistr"}.
 #' @param CAMERAOpts A \code{list} with additional arguments passed to
-#'   \code{\link{CAMERA::findIsotopes}} when \code{isoIdent="CAMERA"}.
+#'   \code{\link[CAMERA:findIsotopes]{CAMERA::findIsotopes}} when \code{isoIdent="CAMERA"}.
 #'
 #' @rdname feature-optimization
 #' @export

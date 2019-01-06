@@ -79,9 +79,6 @@ processSiriusFormulas <- function(cmd, exitStatus, retries)
 #'
 #' @param topMost Only keep this number of candidates (per feature group) with
 #'   highest score. Sets the \option{--candidates} commandline option.
-#' @param extraOpts A \code{character} vector with any extra commandline
-#'   parameters. See the SIRIUS manual for more details. Set to \code{NULL} to
-#'   ignore.
 #'
 #' @templateVar ident FALSE
 #' @template sirius-args

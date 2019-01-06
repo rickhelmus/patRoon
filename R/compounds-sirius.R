@@ -56,7 +56,7 @@ processSiriusCompounds <- function(cmd, exitStatus, retries)
     else
         results <- data.table()
 
-    saveCacheData("identifySirius", results, cmd$hash, cmd$cacheDB)
+    saveCacheData("compoundsSirius", results, cmd$hash, cmd$cacheDB)
     return(results)
 }
 
@@ -120,7 +120,7 @@ generateCompoundsSirius <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct =
     cacheDB <- openCacheDBScope()
     setHash <- makeHash(fGroups, MSPeakLists, profile, adduct, maxMzDev, elements, formulaDatabase,
                         fingerIDDatabase, noise, topMost, extraOpts)
-    cachedSet <- loadCacheSet("identifySirius", setHash, cacheDB)
+    cachedSet <- loadCacheSet("compoundsSirius", setHash, cacheDB)
     resultHashes <- vector("character", gCount)
     names(resultHashes) <- gNames
 
@@ -159,7 +159,7 @@ generateCompoundsSirius <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct =
         if (!is.null(cachedSet))
             cr <- cachedSet[[cmd$hash]]
         if (is.null(cr))
-            cr <- loadCacheData("identifySirius", cmd$hash, cacheDB)
+            cr <- loadCacheData("compoundsSirius", cmd$hash, cacheDB)
         return(cr)
     }, simplify = FALSE)
     cachedResults <- cachedResults[!sapply(cachedResults, is.null)]
@@ -199,7 +199,7 @@ generateCompoundsSirius <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct =
            ngrp, if (gCount == 0) 0 else ngrp * 100 / gCount)
 
     if (is.null(cachedSet))
-        saveCacheSet("identifySirius", resultHashes[resultHashes != ""], setHash, cacheDB)
+        saveCacheSet("compoundsSirius", resultHashes[resultHashes != ""], setHash, cacheDB)
 
     return(compounds(compounds = ret, algorithm = "SIRIUS"))
 }

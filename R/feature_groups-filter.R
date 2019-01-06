@@ -28,7 +28,7 @@ doFilter <- function(fGroups, what, hashParam, func, cacheCateg = what, verbose 
         oldn <- ncol(fGroups@groups)
     }
 
-    cacheName <- sprintf("filteredFGroups_%s", cacheCateg)
+    cacheName <- sprintf("filterFGroups_%s", cacheCateg)
     hash <- makeHash(fGroups, hashParam)
     ret <- loadCacheData(cacheName, hash)
     if (is.null(ret))

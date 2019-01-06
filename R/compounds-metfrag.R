@@ -424,7 +424,7 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
 
     cacheDB <- openCacheDBScope()
     setHash <- makeHash(fGroups, pLists, method, mfSettings, topMost, identifiers, addTrivialNames)
-    cachedSet <- loadCacheSet("identifyMetFrag", setHash, cacheDB)
+    cachedSet <- loadCacheSet("compoundsMetFrag", setHash, cacheDB)
     resultHashes <- vector("character", length(gNames))
     names(resultHashes) <- gNames
 
@@ -439,7 +439,7 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
         if (!is.null(cachedSet))
             metf <- cachedSet[[rd$hash]]
         if (is.null(metf))
-            metf <- loadCacheData("identifyMetFrag", rd$hash, cacheDB)
+            metf <- loadCacheData("compoundsMetFrag", rd$hash, cacheDB)
         return(metf)
     }, simplify = FALSE)
     cachedResults <- cachedResults[!sapply(cachedResults, is.null)]
@@ -476,7 +476,7 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
                 metf <- processMFResults(metf, cmd$spec, database, topMost, cmd$stderrFile)
                 if (!is.null(cmd$stderrFile))
                     cat(sprintf("\n%s - Done! Caching results...\n", date()), file = cmd$stderrFile, append = TRUE)
-                saveCacheData("identifyMetFrag", metf, cmd$hash, cacheDB)
+                saveCacheData("compoundsMetFrag", metf, cmd$hash, cacheDB)
                 if (!is.null(cmd$stderrFile))
                     cat(sprintf("\n%s - Done!\n", date()), file = cmd$stderrFile, append = TRUE)
 
@@ -538,7 +538,7 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
                     metf[, explainedPeaks := sapply(fragInfo, nrow)]
                 }
 
-                saveCacheData("identifyMetFrag", metf, rd$hash, cacheDB)
+                saveCacheData("compoundsMetFrag", metf, rd$hash, cacheDB)
 
                 setTxtProgressBar(prog, match(rd$gName, gNames))
 
@@ -567,7 +567,7 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
            ngrp, if (gCount == 0) 0 else ngrp * 100 / gCount)
 
     if (is.null(cachedSet))
-        saveCacheSet("identifyMetFrag", resultHashes[resultHashes != ""], setHash, cacheDB)
+        saveCacheSet("compoundsMetFrag", resultHashes[resultHashes != ""], setHash, cacheDB)
 
     return(compoundsMF(compounds = ret, settings = mfSettings))
 }

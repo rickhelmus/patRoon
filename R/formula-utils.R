@@ -323,7 +323,7 @@ generateGroupFormulasByConsensus <- function(formList, formThreshold)
     cat("Generating feature group formula consensus...\n")
 
     hash <- makeHash(formList, formThreshold)
-    formCons <- loadCacheData("formCons", hash)
+    formCons <- loadCacheData("formulasFGroupConsensus", hash)
 
     # figure out feature groups
     gNames <- unique(unlist(sapply(formList, names, simplify = FALSE), use.names = FALSE))
@@ -350,7 +350,7 @@ generateGroupFormulasByConsensus <- function(formList, formThreshold)
         setTxtProgressBar(prog, gCount)
         close(prog)
 
-        saveCacheData("formCons", formCons, hash)
+        saveCacheData("formulasFGroupConsensus", formCons, hash)
     }
     else
         cat("Done!\n")

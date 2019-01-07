@@ -69,7 +69,7 @@ if \code{isoIdent="IPO"}. Valid values: \code{"none"},
 \code{"borderIntensity"}, \code{"sinusCurve"} or \code{"normalDistr"}.}
 
 \item{CAMERAOpts}{A \code{list} with additional arguments passed to
-\code{\link[CAMERA:findIsotopes]{CAMERA::findIsotopes}} when \code{isoIdent="CAMERA"}.}
+\code{\link[CAMERA:findIsotopes-methods]{CAMERA::findIsotopes}} when \code{isoIdent="CAMERA"}.}
 
 \item{method}{Method used by XCMS to find features (only if \code{algorithm="xcms"}).}
 }

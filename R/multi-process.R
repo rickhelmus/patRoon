@@ -4,7 +4,20 @@ defMultiProcErrorHandler <- function(cmd, exitStatus, ...)
                  cmd$command, paste0(cmd$args, collapse = " "), exitStatus))
 }
 
-executeMultiProcess <- function(commandQueue, finishHandler,
+executeMultiProcess <- function(...)
+{
+    # wrap the actual code here so we can act on user interrupts: calling gc()
+    # afterwards makes sure processes are cleaned up
+    tryCatch(executeMultiProcess2(...), interrupt = function(e)
+    {
+        invisible(capture.output(gc(verbose = FALSE)))
+        # re-throw: Thanks to @gaborcsardi (https://github.com/r-lib/processx/issues/171)
+        signalCondition(e)
+        invokeRestart("abort")
+    })
+}
+
+executeMultiProcess2 <- function(commandQueue, finishHandler,
                                 timeoutHandler = function(...) TRUE,
                                 errorHandler = defMultiProcErrorHandler,
                                 procTimeout = NULL, printOutput = FALSE, printError = FALSE,
@@ -76,7 +89,7 @@ executeMultiProcess <- function(commandQueue, finishHandler,
                     
                     nproc <- min(maxCmdsPerProc, (totCmdCount - (nextCommand-1)))
 
-                    procArgs <- list()
+                    procArgs <- list(cleanup_tree = TRUE, supervise = TRUE)
                     if (nproc > 1)
                     {
                         # execute multiple processes at once
@@ -167,14 +180,15 @@ executeMultiProcess <- function(commandQueue, finishHandler,
 
         if (printOutput || printError)
         {
-            pl <- poll(runningProcs, waitTimeout)
+            rp <- pruneList(runningProcs)
+            pl <- poll(rp, waitTimeout)
 
-            for (pi in seq_along(runningProcs))
+            for (pi in seq_along(rp))
             {
-                if (pl[[pi]]$output == "ready")
-                    cat(runningProcs[[pi]]$read_output_lines())
-                if (pl[[pi]]$error == "ready")
-                    cat(runningProcs[[ci]]$read_error_lines())
+                if (pl[[pi]][["output"]] == "ready")
+                    cat(rp[[pi]]$read_output_lines())
+                if (pl[[pi]][["error"]] == "ready")
+                    cat(rp[[pi]]$read_error_lines())
             }
         }
         else

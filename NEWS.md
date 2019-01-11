@@ -1,6 +1,7 @@
 # patRoon 0.1.0.9000
 
 ## January 2019
+* Workaround for homologous series generation with nontarget (see https://github.com/blosloos/nontarget/issues/6)
 * Improvements to terminate background commandline processes when e.g. R is terminated. 
 * `clearCache()` now supports removal of caches via regular expressions.
 * Added/Improved `topMost` and `extraOpts` arguments for SIRIUS formula/compound generation.

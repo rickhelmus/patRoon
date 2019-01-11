@@ -26,15 +26,19 @@ NULL
 #' @param maxRTDev,maxMzDev Maximum retention and (absolute) \emph{m/z}
 #'   deviation for detection of homologues within series. These arguments set
 #'   the \code{rttol} and \code{mztol} arguments of \code{\link{homol.search}}.
+#' @param traceHack Currently \code{\link{homol.search}} does not work with \R
+#'   \samp{>3.3.3}. This flag, which is enabled by default on these R versions,
+#'   implements a (messy) workaround
+#'   (\href{https://github.com/blosloos/nontarget/issues/6}{more details here}).
 #'
-#' @references \addCitations{nontarget}{1} \cr\cr
-#'   \addCitations{enviPat}{1}
+#' @references \addCitations{nontarget}{1} \cr\cr \addCitations{enviPat}{1}
 #'
 #' @rdname component-generation
 #' @export
 generateComponentsNontarget <- function(fGroups, ionization, rtRange = c(-120, 120), mzRange = c(5, 120),
                                         elements = c("C", "H", "O"), maxRTDev = 30, maxMzDev = 0.002,
-                                        extraOpts = NULL)
+                                        extraOpts = NULL,
+                                        traceHack = all(R.Version()[c("major", "minor")] >= c(3, 4)))
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
@@ -45,6 +49,7 @@ generateComponentsNontarget <- function(fGroups, ionization, rtRange = c(-120, 1
     checkmate::assertNumber(maxRTDev, lower = 0, finite = TRUE, add = ac)
     checkmate::assertNumber(maxMzDev, lower = 0, finite = TRUE, add = ac)
     checkmate::assertList(extraOpts, any.missing = FALSE, names = "unique", null.ok = TRUE, add = ac)
+    checkmate::assertFlag(traceHack, add = ac)
     checkmate::reportAssertions(ac)
 
     if (length(fGroups) == 0)
@@ -85,10 +90,16 @@ generateComponentsNontarget <- function(fGroups, ionization, rtRange = c(-120, 1
         if (is.null(gt))
             return(NULL) # rep group doesn't have feature groups
 
+        if (traceHack)
+            suppressMessages(trace(nontarget::homol.search, function() {})) # put in dummy trace
+        
         # UNDONE: find some way to differentiate between actual errors?
         hom <- tryCatch(do.call(nontarget::homol.search, c(list(gt), homArgs)),
                         error = function(e) FALSE)
 
+        if (traceHack)
+            suppressMessages(untrace(nontarget::homol.search))
+        
         if (is.logical(hom))
             return(NULL) # no results
 
@@ -190,7 +201,7 @@ generateComponentsNontarget <- function(fGroups, ionization, rtRange = c(-120, 1
                 for (rg in presentRGroups)
                 {
                     if (!is.null(lc[[rg]][[1]]))
-                        set(compTab, r, rg, list(list(list(lc[[rg]][[1]])))) # need to rewrap it in a list?
+                        set(compTab, r, rg, list(list(lc[[rg]][[1]]))) # need to rewrap it in a list?
                 }
 
                 set(compTab, links[1], "keep", FALSE) # remove other

@@ -23,7 +23,8 @@ generateComponentsIntClust(fGroups, method = "complete",
 
 generateComponentsNontarget(fGroups, ionization, rtRange = c(-120, 120),
   mzRange = c(5, 120), elements = c("C", "H", "O"), maxRTDev = 30,
-  maxMzDev = 0.002, extraOpts = NULL)
+  maxMzDev = 0.002, extraOpts = NULL,
+  traceHack = all(R.Version()[c("major", "minor")] >= c(3, 4)))
 
 generateComponentsRAMClustR(fGroups, st = NULL, sr = NULL, maxt = 12,
   hmax = 0.3, normalize = "TIC", ionization, absMzDev = 0.002,
@@ -89,6 +90,11 @@ detection of repeating units. Sets the \code{elements} argument of
 \item{maxRTDev, maxMzDev}{Maximum retention and (absolute) \emph{m/z}
 deviation for detection of homologues within series. These arguments set
 the \code{rttol} and \code{mztol} arguments of \code{\link{homol.search}}.}
+
+\item{traceHack}{Currently \code{\link{homol.search}} does not work with \R
+\samp{>3.3.3}. This flag, which is enabled by default on these R versions,
+implements a (messy) workaround
+(\href{https://github.com/blosloos/nontarget/issues/6}{more details here}).}
 
 \item{st, sr, maxt, hmax, normalize}{Arguments to tune the behaviour of feature
 group clustering. See their documentation from \code{\link[RAMClustR]{ramclustR}}.
@@ -165,8 +171,7 @@ and reduce the data size and thus complexity.
 \references{
 \addCitations{CAMERA}{1}
 
-\addCitations{nontarget}{1} \cr\cr
-  \addCitations{enviPat}{1}
+\addCitations{nontarget}{1} \cr\cr \addCitations{enviPat}{1}
 
 \insertRef{Broeckling2013}{patRoon} \cr\cr
   \insertRef{Broeckling2014}{patRoon}

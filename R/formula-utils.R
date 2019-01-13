@@ -90,30 +90,6 @@ addFormula <- function(formula1, formula2)
     return(formulaListToString(newfl))
 }
 
-calculateIonFormula <- function(formula, adduct)
-{
-    if (grepl("+H", adduct, fixed = TRUE))
-        sapply(formula, addFormula, formula2 = "H", USE.NAMES = FALSE)
-    else if (grepl("+Na", adduct, fixed = TRUE))
-        sapply(formula, addFormula, formula2 = "Na", USE.NAMES = FALSE)
-    else if (grepl("+K", adduct, fixed = TRUE))
-        sapply(formula, addFormula, formula2 = "K", USE.NAMES = FALSE)
-    else if (grepl("-H", adduct, fixed = TRUE))
-        sapply(formula, subtractFormula, formula2 = "H", USE.NAMES = FALSE)
-}
-
-calculateNeutralFormula <- function(formula, adduct)
-{
-    if (grepl("+H", adduct, fixed = TRUE))
-        sapply(formula, subtractFormula, formula2 = "H", USE.NAMES = FALSE)
-    else if (grepl("+Na", adduct, fixed = TRUE))
-        sapply(formula, subtractFormula, formula2 = "Na", USE.NAMES = FALSE)
-    else if (grepl("+K", adduct, fixed = TRUE))
-        sapply(formula, subtractFormula, formula2 = "K", USE.NAMES = FALSE)
-    else if (grepl("-H", adduct, fixed = TRUE))
-        sapply(formula, addFormula, formula2 = "H", USE.NAMES = FALSE)
-}
-
 sortFormula <- function(formula)
 {
     fl <- splitFormulaToList(formula)

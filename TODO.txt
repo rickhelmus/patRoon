@@ -67,3 +67,4 @@ Release:
 - setAs() for as.data.table()/as.data.frame() methods
 - compounds
     - convert score csv to internal data?
+- SIRIUS: use --auto-charge instead of manually fixing charge of fragments (or not? conflicting docs on what it does)

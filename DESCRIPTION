@@ -100,6 +100,8 @@ Collate:
     'feature_groups.R'
     'EIC-tool.R'
     'RcppExports.R'
+    'utils-adduct.R'
+    'adduct.R'
     'components.R'
     'components-camera.R'
     'components-intclust.R'

@@ -188,8 +188,7 @@ Then `generateCompounds()` is used to execute MetFrag and generate the `compound
 
 ```{r compounds,results='hide'}
 compounds <- generateCompounds(fGroups, plists, "metfrag", topMost = 25,
-                               adduct = 1, isPositive = TRUE,
-                               database = "pubchem", maxCandidatesToStop = 5000)
+                               adduct = "[M+H]+", database = "pubchem", maxCandidatesToStop = 5000)
 ```
 ```{r fig.width=4,fig.height=4}
 compounds

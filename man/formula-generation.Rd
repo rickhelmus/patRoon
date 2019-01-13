@@ -18,7 +18,7 @@ generateFormulasDA(fGroups, precursorMzSearchWindow = 0.002,
   MSMode = "both", featThreshold = 0.75, save = TRUE, close = save)
 
 generateFormulasGenForm(fGroups, MSPeakLists, maxMzDev = 5,
-  adduct = "M+H", elements = "CHNOP", hetero = TRUE, oc = FALSE,
+  adduct = "[M+H]+", elements = "CHNOP", hetero = TRUE, oc = FALSE,
   extraOpts = NULL, calculateFeatures = TRUE, featThreshold = 0.75,
   MSMode = "both", maxProcAmount = getOption("patRoon.maxProcAmount"),
   maxCmdsPerProc = 25)
@@ -77,16 +77,9 @@ the supplied \code{fGroups}.}
 \option{--ppm-max} commandline options for \command{GenForm} and
 \command{SIRIUS}, respectively.}
 
-\item{adduct}{Sets the adduct form of measured ions. For
-\code{generateFormulasGenForm} the format is without brackets and charges
-(based on
-\href{http://fiehnlab.ucdavis.edu/staff/kind/Metabolomics/MS-Adduct-Calculator}{this
- website}), examples: \code{"M+H"}, \code{"M-H"}, \code{"M+Na"},
-\code{"M-e"}. For \code{generateFormulasSirius} the format is with brackets
-and charge, for example: \code{"[M+H]+"}, \code{"[M-H]-"},
-\code{"[M+Na]+"}, \code{"[M]+"}. Sets the \option{ion} and \option{--ion}
-commandline options for \command{GenForm} and \command{SIRIUS},
-respectively.}
+\item{adduct}{An \code{\link{adduct}} object (or something that can be
+converted to it with \code{\link{as.adduct}}). Examples: \code{"[M-H]-"},
+\code{"[M+Na]+"}.}
 
 \item{elements}{Elements to be considered for formulae calculation. This will
 heavily affects the number of candidates! Always try to work with a minimal

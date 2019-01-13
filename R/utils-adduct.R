@@ -3,8 +3,8 @@
 #' Several utility functions to work with adducts.
 #'
 #' @param formula A \code{character} vector with formulae to convert.
-#' @param adduct An \code{\link{adduct}} object (or something that can be
-#'   converted to it with \code{\link{as.adduct}}).
+#' 
+#' @template adduct-arg
 #'
 #' @name adduct-utils
 NULL

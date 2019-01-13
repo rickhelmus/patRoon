@@ -97,7 +97,7 @@ generateFormulasSirius <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct = 
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
     checkmate::assertNumber(maxMzDev, lower = 0, finite = TRUE, add = ac)
-    aapply(checkmate::assertString, . ~ adduct + elements + profile, fixed = list(add = ac))
+    aapply(checkmate::assertString, . ~ elements + profile, fixed = list(add = ac))
     checkmate::assertString(database, null.ok = TRUE, add = ac)
     checkmate::assertNumber(noise, lower = 0, finite = TRUE, null.ok = TRUE, add = ac)
     checkmate::assertCount(topMost, positive = TRUE, add = ac)
@@ -107,6 +107,8 @@ generateFormulasSirius <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct = 
     assertMultiProcArgs(logPath, maxProcAmount, add = ac)
     checkmate::reportAssertions(ac)
 
+    adduct <- checkAndToAdduct(adduct)
+    
     anaInfo <- analysisInfo(fGroups)
     fTable <- featureTable(fGroups)
     featIndex <- groupFeatIndex(fGroups)

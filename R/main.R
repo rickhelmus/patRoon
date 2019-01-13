@@ -529,16 +529,6 @@ NULL
 #'   remaining feature groups in the subset are considered.
 #' @param MSPeakLists An \code{\link{MSPeakLists}} object that was generated for
 #'   the supplied \code{fGroups}.
-#' @param adduct Sets the adduct form of measured ions. For
-#'   \code{generateFormulasGenForm} the format is without brackets and charges
-#'   (based on
-#'   \href{http://fiehnlab.ucdavis.edu/staff/kind/Metabolomics/MS-Adduct-Calculator}{this
-#'    website}), examples: \code{"M+H"}, \code{"M-H"}, \code{"M+Na"},
-#'   \code{"M-e"}. For \code{generateFormulasSirius} the format is with brackets
-#'   and charge, for example: \code{"[M+H]+"}, \code{"[M-H]-"},
-#'   \code{"[M+Na]+"}, \code{"[M]+"}. Sets the \option{ion} and \option{--ion}
-#'   commandline options for \command{GenForm} and \command{SIRIUS},
-#'   respectively.
 #' @param MSMode Whether formulae should be generated only from MS data
 #'   (\code{"ms"}), MS/MS data (\code{"msms"}) or both (\code{"both"}). Using
 #'   the latter option, unique formulae from MS data will still be reported if
@@ -559,6 +549,8 @@ NULL
 #'
 #' @templateVar genForm TRUE
 #' @template form-args
+#' 
+#' @template adduct-arg
 #'
 #' @template multiProc-args
 #'
@@ -599,14 +591,6 @@ NULL
 #'   only the remaining feature groups in the subset are considered.
 #' @param MSPeakLists A \code{\link{MSPeakLists}} object that was generated for
 #'   the supplied \code{fGroups}.
-#' @param adduct The assumed MS adduct. For \code{generateCompoundsMetfrag}: a
-#'   numeric value (\emph{e.g.} \samp{1} for [M+H]+, \samp{-1} for [M-H]- and
-#'   \samp{0} for [M]+/-, see the
-#'   \href{http://c-ruttkies.github.io/MetFrag/projects/metfragcl/}{MetFrag CL}
-#'   homepage for more). Please note that \code{isPositive} also needs to be
-#'   set. For \code{generateCompoundsSirius}, a character string such as
-#'   \code{"[M+H]+"}, \code{"[M-H]-"}, \code{"[M+Na]+"} and \code{"[M]+"}. Sets
-#'   the \option{PrecursorIonMode} and \option{--ion} options, respectively.
 #' @param database Compound database to use. Valid values are: \code{"pubchem"},
 #'   \code{"chemspider"}, \code{"kegg"}, \code{"sdf"}, \code{"psv"} and
 #'   \code{"csv"}.
@@ -637,6 +621,8 @@ NULL
 #'   parameters. See the SIRIUS manual for more details.
 #'
 #'   Set to \code{NULL} to ignore.
+#'
+#' @template adduct-arg
 #'
 #' @template multiProc-args
 #'

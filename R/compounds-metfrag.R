@@ -268,8 +268,6 @@ processMFResults <- function(metf, spec, db, topMost, lfile = "")
 #'   Sets the \option{FragmentPeakMatchRelativeMassDeviation} option.
 #' @param fragAbsMzDev Absolute mass deviation (in Da) for fragment matching.
 #'   Sets the \option{FragmentPeakMatchAbsoluteMassDeviation} option.
-#' @param isPositive Set to \code{TRUE} for data measured with positive
-#'   ionization. Sets the \option{IsPositiveIonMode} option.
 #' @param extendedPubChem If \code{database="pubchem"}: whether to use the
 #'   \emph{extended} database that includes information for compound scoring
 #'   (\emph{i.e.} number of patents/PubMed references). Note that downloading
@@ -326,7 +324,7 @@ processMFResults <- function(metf, spec, db, topMost, lfile = "")
 #' @export
 generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPath = file.path("log", "metfrag"),
                                      timeout = 300, timeoutRetries = 2, errorRetries = 2, topMost = 100,
-                                     dbRelMzDev = 5, fragRelMzDev = 5, fragAbsMzDev = 0.002, isPositive, adduct,
+                                     dbRelMzDev = 5, fragRelMzDev = 5, fragAbsMzDev = 0.002, adduct,
                                      database = "pubchem", extendedPubChem = "auto", chemSpiderToken = "",
                                      scoreTypes = compoundScorings("metfrag", database, onlyDefault = TRUE)$name,
                                      scoreWeights = 1.0,
@@ -350,8 +348,7 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
            lower = 0, finite = TRUE, fixed = list(add = ac))
     aapply(checkmate::assertCount, . ~ timeoutRetries + errorRetries, fixed = list(add = ac))
     aapply(checkmate::assertCount, . ~ topMost + maxCandidatesToStop, positive = TRUE, fixed = list(add = ac))
-    aapply(checkmate::assertFlag, . ~ isPositive + addTrivialNames, fixed = list(add = ac))
-    checkmate::assertInt(adduct, add = ac)
+    aapply(checkmate::assertFlag, . ~ addTrivialNames, fixed = list(add = ac))
     checkmate::assertString(chemSpiderToken, add = ac)
     checkmate::assertChoice(database, c("pubchem", "chemspider", "kegg", "sdf", "psv", "csv"), add = ac)
     checkmate::assert(checkmate::checkFlag(extendedPubChem),
@@ -372,6 +369,8 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
     
     checkmate::reportAssertions(ac)
 
+    adduct <- checkAndToAdduct(adduct)
+    
     anaInfo <- analysisInfo(fGroups)
     ftind <- groupFeatIndex(fGroups)
     gTable <- groups(fGroups)
@@ -406,7 +405,7 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
     mfSettings <- list(DatabaseSearchRelativeMassDeviation = dbRelMzDev,
                        FragmentPeakMatchRelativeMassDeviation = fragRelMzDev,
                        FragmentPeakMatchAbsoluteMassDeviation = fragAbsMzDev,
-                       PrecursorIonMode = adduct, IsPositiveIonMode = isPositive,
+                       PrecursorIonType = as.character(adduct, format = "metfrag"),
                        MetFragDatabaseType = database, MetFragScoreTypes = scoreTypes,
                        MetFragScoreWeights = rep(scoreWeights, length.out = length(scoreTypes)),
                        MetFragPreProcessingCandidateFilter = preProcessingFilters,

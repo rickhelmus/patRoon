@@ -46,7 +46,8 @@ positive. Should only be set when \code{format="metfrag"} and \code{x} is a
 \item{formula}{A \code{character} vector with formulae to convert.}
 
 \item{adduct}{An \code{\link{adduct}} object (or something that can be
-converted to it with \code{\link{as.adduct}}).}
+converted to it with \code{\link{as.adduct}}). Examples: \code{"[M-H]-"},
+\code{"[M+Na]+"}.}
 }
 \description{
 Several utility functions to work with adducts.

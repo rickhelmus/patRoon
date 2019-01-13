@@ -1,6 +1,7 @@
 # patRoon 0.1.0.9000
 
 ## January 2019
+* **IMPORTANT** Adduct specification is now simplified and more generic by usage of a new `adduct` class. This means that `generateCompounds()` and `generateFormulas()` now expect slightly differing arguments. Please see their manual pages.
 * Workaround for homologous series generation with nontarget (see https://github.com/blosloos/nontarget/issues/6)
 * Improvements to terminate background commandline processes when e.g. R is terminated. 
 * `clearCache()` now supports removal of caches via regular expressions.

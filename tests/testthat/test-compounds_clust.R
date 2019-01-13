@@ -7,7 +7,7 @@ if (hasMetfrag)
     fGroups <- getTestFGroups(getTestAnaInfo()[4, ])
     fGroups <- groupFeaturesScreening(fGroups, screenTargets(fGroups, patRoonData::targets))[1:5]
     plists <- generateMSPeakLists(fGroups, "mzr")
-    compounds <- generateCompounds(fGroups, plists, "metfrag", adduct = 1, isPositive = TRUE,
+    compounds <- generateCompounds(fGroups, plists, "metfrag", adduct = "[M+H]+",
                                    database = "csv", scoreTypes = "fragScore",
                                    extraOpts = list(LocalDatabasePath = file.path(getTestDataPath(), "test-mf-db-isomers.csv")),
                                    logPath = NULL)

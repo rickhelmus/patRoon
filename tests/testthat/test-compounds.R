@@ -22,7 +22,7 @@ doSIRIUS <- !is.null(getOption("patRoon.path.SIRIUS")) && nzchar(getOption("patR
 callMF <- function(fGroups, plists, db = mfTestDBPath, to = 300)
 {
     generateCompounds(fGroups, plists, "metfrag", logPath = NULL,
-                      adduct = 1, isPositive = TRUE, timeout = to,
+                      adduct = "[M+H]+", timeout = to,
                       database = "csv", scoreTypes = "fragScore",
                       extraOpts = list(LocalDatabasePath = db))
 }

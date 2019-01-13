@@ -35,15 +35,17 @@ processSiriusCompounds <- function(cmd, exitStatus, retries)
                 fragInfo[, c("rel.intensity", "exactmass") := NULL]
                 setnames(fragInfo, "explanation", "formula")
                 fragInfo[, PLIndex := sapply(mz, function(omz) which.min(abs(omz - cmd$MSMSSpec$mz)))]
-                
+
                 # sirius neutralizes fragments, make them ion again
                 fragInfo[, formula := calculateIonFormula(formula, cmd$adduct)]
+                fragInfo[, neutral_loss := sapply(formula, subtractFormula,
+                                                  formula1 = calculateIonFormula(precursor, cmd$adduct))]
 
                 set(results, which(results$formula == precursor), "fragInfo", list(list(fragInfo)))
                 set(results, which(results$formula == precursor), "explainedPeaks", nrow(fragInfo))
             }
         }
-        
+
         if (is.null(results[["fragInfo"]]))
         {
             # warning(sprintf("no fragment info for %s", cmd$gName))
@@ -108,9 +110,9 @@ generateCompoundsSirius <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct =
     checkmate::assertCharacter(extraOpts, null.ok = TRUE, add = ac)
     assertMultiProcArgs(logPath, maxProcAmount, add = ac)
     checkmate::reportAssertions(ac)
-    
+
     adduct <- checkAndToAdduct(adduct)
-    
+
     anaInfo <- analysisInfo(fGroups)
     fTable <- featureTable(fGroups)
     ftind <- groupFeatIndex(fGroups)
@@ -133,7 +135,7 @@ generateCompoundsSirius <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct =
         plist <- MSPeakLists[[grp]]
         if (is.null(plist[["MS"]]) || is.null(plist[["MSMS"]]))
             return(NULL)
-        
+
         plmz <- plist$MS[precursor == TRUE, mz]
         if (length(plmz) == 0)
             return(NULL)

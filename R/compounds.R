@@ -129,7 +129,7 @@ setMethod("$", "compounds", function(x, name)
 #'
 #' @param fragments If \code{TRUE} then information on annotated fragments will
 #'   be included.
-#' 
+#'
 #' @template as_data_table-args
 #'
 #' @export
@@ -199,7 +199,6 @@ setMethod("identifiers", "compounds", function(compounds)
 #' @param topMost Only keep a maximum of \code{topMost} candidates with highest
 #'   score. Set to \code{NULL} to ignore.
 #'
-#' @templateVar withLoss FALSE
 #' @template element-args
 #'
 #' @return \code{filter} returns a filtered \code{compounds} object.
@@ -207,7 +206,7 @@ setMethod("identifiers", "compounds", function(compounds)
 #' @export
 setMethod("filter", "compounds", function(obj, minExplainedPeaks = NULL, minScore = NULL, minFragScore = NULL,
                                           minFormulaScore = NULL, scoreLimits = NULL, elements = NULL,
-                                          fragElements = NULL, topMost = NULL)
+                                          fragElements = NULL, lossElements = NULL, topMost = NULL)
 {
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertCount, . ~ minExplainedPeaks + topMost, positive = c(FALSE, TRUE),
@@ -221,7 +220,7 @@ setMethod("filter", "compounds", function(obj, minExplainedPeaks = NULL, minScor
         checkmate::assertNames(names(scoreLimits), type = "unique", subset.of = scCols, add = ac)
         checkmate::qassertr(scoreLimits, "N2")
     }
-    aapply(checkmate::assertCharacter, . ~ elements + fragElements,
+    aapply(checkmate::assertCharacter, . ~ elements + fragElements + lossElements,
            min.chars = 1, min.len = 1, null.ok = TRUE, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
 
@@ -258,10 +257,10 @@ setMethod("filter", "compounds", function(obj, minExplainedPeaks = NULL, minScor
                                               .SDcols = cols]]
             }
         }
-        
+
         if (!is.null(elements))
             cmpTable <- cmpTable[sapply(formula, checkFormula, elements)]
-        if (!is.null(fragElements))
+        if (!is.null(fragElements) || !is.null(lossElements))
         {
             keep <- sapply(cmpTable$fragInfo, function(fi)
             {
@@ -269,11 +268,13 @@ setMethod("filter", "compounds", function(obj, minExplainedPeaks = NULL, minScor
                     return(FALSE)
                 if (!is.null(fragElements) && !any(sapply(fi$formula, checkFormula, fragElements)))
                     return(FALSE)
+                if (!is.null(lossElements) && !any(sapply(fi$neutral_loss, checkFormula, lossElements)))
+                    return(FALSE)
                 return(TRUE)
             })
             cmpTable <- cmpTable[keep]
         }
-        
+
         if (!is.null(topMost) && nrow(cmpTable) > topMost)
             cmpTable <- cmpTable[seq_len(topMost)]
 

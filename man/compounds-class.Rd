@@ -53,7 +53,7 @@
 \S4method{filter}{compounds}(obj, minExplainedPeaks = NULL,
   minScore = NULL, minFragScore = NULL, minFormulaScore = NULL,
   scoreLimits = NULL, elements = NULL, fragElements = NULL,
-  topMost = NULL)
+  lossElements = NULL, topMost = NULL)
 
 \S4method{addFormulaScoring}{compounds}(compounds, formulas,
   updateScore = FALSE, formulaScoreWeight = 1)
@@ -122,11 +122,10 @@ instance, \code{elements=c("P", "S")} specifies that either one phosphorus
 or one sulphur atom should be present. Set to \code{NULL} to ignore this
 filter.}
 
-\item{fragElements}{Specifies
-elemental restrictions for fragment
-formulae (charged form). Candidates are retained if at least one of the fragment
-formulae follow the given restrictions. See \code{elements} for the used
-format.}
+\item{fragElements, lossElements}{Specifies elemental restrictions for
+fragment or neutral loss formulae (charged form). Candidates are retained
+if at least one of the fragment formulae follow the given restrictions. See
+\code{elements} for the used format.}
 
 \item{topMost}{Only keep a maximum of \code{topMost} candidates with highest
 score. Set to \code{NULL} to ignore.}

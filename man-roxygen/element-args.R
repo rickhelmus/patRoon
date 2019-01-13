@@ -10,8 +10,7 @@
 #'   instance, \code{elements=c("P", "S")} specifies that either one phosphorus
 #'   or one sulphur atom should be present. Set to \code{NULL} to ignore this
 #'   filter.
-#' @param fragElements<%= if (withLoss) ",lossElements" else "" %> Specifies
-#'   elemental restrictions for fragment<%=if (withLoss) " or neutral loss" else "" %>
-#'   formulae (charged form). Candidates are retained if at least one of the fragment
-#'   formulae follow the given restrictions. See \code{elements} for the used
-#'   format.
+#' @param fragElements,lossElements Specifies elemental restrictions for
+#'   fragment or neutral loss formulae (charged form). Candidates are retained
+#'   if at least one of the fragment formulae follow the given restrictions. See
+#'   \code{elements} for the used format.

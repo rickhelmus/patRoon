@@ -195,7 +195,7 @@ setMethod("$", "formulas", function(x, name)
 #'   ignore.
 #'
 #' @template as_data_table-args
-#' 
+#'
 #' @return \code{as.data.table} returns a \code{\link{data.table}}.
 #'
 #' @export
@@ -282,7 +282,6 @@ setMethod("as.data.table", "formulas", function(x, fGroups = NULL, average = FAL
 #'   obtained with \code{\link{formulaScorings}}. Note that a result without a
 #'   specified scoring is never removed. Set to \code{NULL} to skip this filter.
 #'
-#' @templateVar withLoss TRUE
 #' @template element-args
 #'
 #' @note \code{filter} does not modify any formula results for features (if
@@ -375,7 +374,7 @@ setMethod("filter", "formulas", function(obj, minExplainedFragPeaks = NULL, elem
                          NC <= 0.5]
             formTable <- formTable[keep]
         }
-        
+
         if (!is.null(topMost))
         {
             unFormNrs <- formTable[, match(formula, unique(.SD$formula))]

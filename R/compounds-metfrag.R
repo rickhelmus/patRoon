@@ -130,7 +130,7 @@ cleanFragFormulas <- function(forms)
     }))
 }
 
-getMFFragmentInfo <- function(spec, mfResult)
+getMFFragmentInfo <- function(spec, mfResult, adduct)
 {
     if (mfResult$NoExplPeaks == 0 || mfResult$FormulasOfExplPeaks == "NA")
         return(data.table(mz = numeric(0), formula = character(0), score = numeric(0), PLIndex = numeric(0)))
@@ -141,6 +141,8 @@ getMFFragmentInfo <- function(spec, mfResult)
     ret <- data.table(mz = as.numeric(fi[c(TRUE, FALSE)]),
                       formula = cleanFragFormulas(fi[c(FALSE, TRUE)]),
                       score = as.numeric(unlist(strsplit(mfResult$FragmenterScore_Values, ";"))))
+    ionform <- calculateIonFormula(mfResult$MolecularFormula, adduct)
+    ret[, neutral_loss := sapply(formula, subtractFormula, formula1 = ionform)]
     ret[, PLIndex := sapply(mz, function(omz) which.min(abs(omz - spec$mz)))]
     ret[, intensity := spec$intensity[PLIndex]]
 
@@ -201,7 +203,7 @@ generateMetFragRunData <- function(fGroups, MSPeakLists, mfSettings, topMost, id
     return(ret[!sapply(ret, is.null)])
 }
 
-processMFResults <- function(metf, spec, db, topMost, lfile = "")
+processMFResults <- function(metf, spec, adduct, db, topMost, lfile = "")
 {
     if (nrow(metf) > 0)
     {
@@ -217,7 +219,7 @@ processMFResults <- function(metf, spec, db, topMost, lfile = "")
         if (!is.null(lfile))
             cat(sprintf("\n%s - Done! Processing frags...\n", date()), file = lfile, append = TRUE)
         for (r in seq_len(nrow(metf)))
-            set(metf, r, "fragInfo", list(list(getMFFragmentInfo(spec, metf[r]))))
+            set(metf, r, "fragInfo", list(list(getMFFragmentInfo(spec, metf[r], adduct))))
         if (!is.null(lfile))
             cat(sprintf("\n%s - Done!\n", date()), file = lfile, append = TRUE)
 
@@ -359,18 +361,18 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
     checkmate::assertNumeric(scoreWeights, lower = 0, finite = TRUE, any.missing = FALSE, min.len = 1, add = ac)
     aapply(checkmate::assertList, . ~ identifiers + extraOpts, any.missing = FALSE,
            names = "unique", null.ok = TRUE, fixed = list(add = ac))
-    
+
     compsScores <- compoundScorings("metfrag", database)
     isLocalDB <- database %in% c("sdf", "psv", "csv")
     allScoringNames <- union(compsScores$name, compsScores$metfrag)
     # allow freely definable scorings from local databases
     if (!isLocalDB)
         checkmate::assertSubset(scoreTypes, allScoringNames, add = ac)
-    
+
     checkmate::reportAssertions(ac)
 
     adduct <- checkAndToAdduct(adduct)
-    
+
     anaInfo <- analysisInfo(fGroups)
     ftind <- groupFeatIndex(fGroups)
     gTable <- groups(fGroups)
@@ -384,7 +386,7 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
         PCScorings <- compoundScorings("metfrag", "pubchem", includeNoDB = FALSE)
         extendedPubChem <- any(scoreTypes %in% union(PCScorings$name, PCScorings$metfrag))
     }
-    
+
     # convert to metfrag naming scheme
     database <- switch(database,
                        pubchem = "PubChem",
@@ -395,13 +397,13 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
                        csv = "LocalCSV")
     if (database == "PubChem" && extendedPubChem) # can't seem to combine this conditional in above switch...
         database <- "ExtendedPubChem"
-    
+
     rownames(compsScores) <- compsScores$name
     scoreTypes <- setdiff(scoreTypes, c("score", "Score")) # final score is to be determined
     isSimplScore <- scoreTypes %in% compsScores$name
     if (any(isSimplScore))
         scoreTypes[isSimplScore] <- compsScores[scoreTypes[isSimplScore], "metfrag"]
-    
+
     mfSettings <- list(DatabaseSearchRelativeMassDeviation = dbRelMzDev,
                        FragmentPeakMatchRelativeMassDeviation = fragRelMzDev,
                        FragmentPeakMatchAbsoluteMassDeviation = fragAbsMzDev,
@@ -472,7 +474,7 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
                 metf <- fread(cmd$outFile, colClasses = c(Identifier = "character"))
                 if (!is.null(cmd$stderrFile))
                     cat(sprintf("\n%s - Done! Processing results...\n", date()), file = cmd$stderrFile, append = TRUE)
-                metf <- processMFResults(metf, cmd$spec, database, topMost, cmd$stderrFile)
+                metf <- processMFResults(metf, cmd$spec, adduct, database, topMost, cmd$stderrFile)
                 if (!is.null(cmd$stderrFile))
                     cat(sprintf("\n%s - Done! Caching results...\n", date()), file = cmd$stderrFile, append = TRUE)
                 saveCacheData("compoundsMetFrag", metf, cmd$hash, cacheDB)
@@ -529,7 +531,7 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
                     metf <- unFactorDF(metf)
                     metf <- as.data.table(metf)
 
-                    metf <- processMFResults(metf, rd$spec, database, topMost)
+                    metf <- processMFResults(metf, rd$spec, adduct, database, topMost)
 
                     # BUG: metfRag seems to give second duplicate results where only NoExplPeaks may differ and have an incorrect value.
                     # for now, just remove all duplicates and re-assign NoExplPeaks

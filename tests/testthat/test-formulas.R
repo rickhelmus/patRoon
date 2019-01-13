@@ -32,7 +32,7 @@ if (doDATests())
 {
     # HACK: use first standard as its compounds are not touched by MS peak lists
     fgDA <- groupFeatures(findFeatures(getDAAnaInfo()[1, ], "bruker"), "openms")
-    formsDA <- generateFormulas(fgDA, "bruker")
+    formsDA <- generateFormulas(fgDA, "bruker", adduct = "[M+H]+")
 }
 
 test_that("verify formula generation", {

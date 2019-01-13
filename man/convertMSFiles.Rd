@@ -81,7 +81,7 @@ are supported for input files.
 }
 
 \examples{
-\donttest{
+\dontrun{
 # Use FileConverter of OpenMS to convert between open mzXML/mzML format
 convertMSFiles("standard-1.mzXML", to = "mzML", algorithm = "openms")
 

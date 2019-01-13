@@ -68,3 +68,15 @@ Several utility functions to work with adducts.
 \code{calculateNeutralFormula} Converts one or more adduct ions to
   neutral formulae.
 }
+\examples{
+as.adduct("[M+H]+")
+as.adduct("[M+H2]2+")
+as.adduct("[2M+H]+")
+as.adduct("[M-H]-")
+as.adduct("+H", format = "genform")
+as.adduct(1, isPositive = TRUE, format = "metfrag") # MetFrag adduct ID 1 --> returns [M+H]+
+
+calculateIonFormula("C2H4O", "[M+H]+") # C2H5O
+calculateNeutralFormula("C2H5O", "[M+H]+") # C2H4O
+
+}

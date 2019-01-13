@@ -22,10 +22,19 @@ NULL
 #' @param add,sub,molMult,charge See \verb{Slots}.
 #' @param x,object An \code{adduct} object.
 #'
+#' @examples adduct("H") # [M+H]+
+#' adduct(sub = "H", charge = -1) # [M-H]-
+#' adduct(add = "K", sub = "H2", charge = -1) # [M+K-H2]+
+#' adduct(add = "H3", charge = 3) # [M+H3]3+
+#' adduct(add = "H", molMult = 2) # [2M+H]+
+#'
+#' as.character(adduct("H")) # returns "[M+H]+"
+#'
 #' @seealso \code{\link{as.adduct}} for easy creation of \code{adduct} objects
 #'   and \link[=adduct-utils]{adduct utilities} for other adduct functionality.
 #'
-#' @export
+#' @export adduct
+#' @exportClass adduct
 adduct <- setClass("adduct", slots = c(add = "character", sub = "character",
                                        molMult = "numeric", charge = "numeric"))
 
@@ -35,10 +44,10 @@ setMethod("initialize", "adduct", function(.Object, add = character(), sub = cha
 
     checkmate::assertCount(.Object@molMult, positive = TRUE)
     checkmate::assertInt(.Object@charge)
-    
+
     if (.Object@charge == 0)
         stop("Adduct charge cannot be zero.")
-    
+
     return(.Object)
 })
 
@@ -47,14 +56,14 @@ setMethod("initialize", "adduct", function(.Object, add = character(), sub = cha
 setMethod("show", "adduct", function(object)
 {
     printf("An adduct object ('%s')\n", class(object))
-    
+
     printf("Addition: %s\n", paste0(object@add, collapse = ", "))
     printf("Subtraction: %s\n", paste0(object@sub, collapse = ", "))
     printf("Molecule multiplier: %d\n", object@molMult)
     printf("Charge: %s%d\n", if (object@charge > 0) "+" else "", object@charge)
-    
+
     printf("Generic textual representation: %s\n", as.character(object))
-    
+
     showObjectSize(object)
 })
 
@@ -65,7 +74,7 @@ setMethod("show", "adduct", function(object)
 setMethod("as.character", "adduct", function(x, format = "generic")
 {
     checkmate::assertChoice(format, c("generic", "sirius", "genform", "metfrag"))
-    
+
     if (format == "sirius" || format == "generic")
     {
         if (format == "sirius")
@@ -75,16 +84,16 @@ setMethod("as.character", "adduct", function(x, format = "generic")
             if (x@molMult > 1)
                 stop("SIRIUS only supports a molecular multiplier of 1")
         }
-        
+
         adds <- if (length(x@add)) paste0("+", x@add, collapse = "") else ""
         subs <- if (length(x@sub)) paste0("-", x@sub, collapse = "") else ""
+
         charge <- if (x@charge > 0) "+" else "-"
-        
-        if (format == "sirius" || abs(x@charge) == 1)
-            return(paste0("[M", adds, subs, "]", charge))
-        
+        if (abs(x@charge) > 1)
+            charge <- paste0(abs(x@charge), charge)
         mult <- if (x@molMult > 1) x@molMult else ""
-        return(paste0("[", mult, "M", adds, subs, "]", charge, abs(x@charge)))
+
+        return(paste0("[", mult, "M", adds, subs, "]", charge))
     }
     else if (format == "genform")
     {
@@ -92,7 +101,7 @@ setMethod("as.character", "adduct", function(x, format = "generic")
         gfadd <- if (length(x@add) == 0) "" else x@add
         gfsub <- if (length(x@sub) == 0) "" else x@sub
         gfadds <- GenFormAdducts()[add == gfadd & sub == gfsub & charge == x@charge & molMult == x@molMult, adduct]
-        
+
         if (length(gfadds) == 0)
             stop("Invalid adduct for GenForm! See GenFormAdducts() for valid options.")
         return(gfadds[1]) # return first one in case there are multiple hits
@@ -103,11 +112,11 @@ setMethod("as.character", "adduct", function(x, format = "generic")
             stop("MetFrag only supports a charge of +/- 1")
         if (x@molMult > 1)
             stop("MetFrag only supports a molecular multiplier of 1")
-        
+
         mfadd <- if (length(x@add) == 0) "" else x@add
         mfsub <- if (length(x@sub) == 0) "" else x@sub
         mfadds <- MetFragAdducts()[add == mfadd & sub == mfsub & charge == x@charge, adduct_type]
-        
+
         if (length(mfadds) == 0)
             stop("Invalid adduct for MetFrag! See MetFragAdducts() for valid options.")
         return(mfadds[1]) # return first one in case there are multiple hits

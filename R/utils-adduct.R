@@ -3,8 +3,18 @@
 #' Several utility functions to work with adducts.
 #'
 #' @param formula A \code{character} vector with formulae to convert.
-#' 
+#'
 #' @template adduct-arg
+#'
+#' @examples as.adduct("[M+H]+")
+#' as.adduct("[M+H2]2+")
+#' as.adduct("[2M+H]+")
+#' as.adduct("[M-H]-")
+#' as.adduct("+H", format = "genform")
+#' as.adduct(1, isPositive = TRUE, format = "metfrag") # MetFrag adduct ID 1 --> returns [M+H]+
+#'
+#' calculateIonFormula("C2H4O", "[M+H]+") # C2H5O
+#' calculateNeutralFormula("C2H5O", "[M+H]+") # C2H4O
 #'
 #' @name adduct-utils
 NULL
@@ -46,7 +56,7 @@ GenFormAdducts <- function()
         list("M+2Na-H", "Na2", "H", "+1", 1),
         list("M+IsoProp+H", "C3H10O", "", "+1", 1), # IsoProp=C3H9O(?)
         list("M+ACN+Na", "C2H3NNa", "", "+1", 1),
-        list("M+2K-H", "K", "H", "+1", 1),
+        list("M+2K-H", "K", "H", "+1", 1), # UNDONE: should be K2
         list("M+DMSO+H", "C2H7OS", "", "+1", 1), # DMSO=C2H6OS
         list("M+2ACN+H", "C4H7N2", "", "+1", 1),
         list("M+IsoProp+Na+H", "C3H10ONa", "", "+1", 1),
@@ -56,7 +66,7 @@ GenFormAdducts <- function()
         list("2M+K", "K", "", "+1", 2),
         list("2M+ACN+H", "C2H4N", "", "+1", 2),
         list("2M+ACN+Na", "C2H3NNa", "", "+1", 2),
-        
+
         list("M-3H", "", "H3", "-3", 1),
         list("M-2H", "", "H2", "-2", 1),
         list("M-H2O-H", "", "H", "-1", 1),
@@ -72,19 +82,19 @@ GenFormAdducts <- function()
         list("2M+FA-H", "", "H", "-1", 2),
         list("2M+Hac-H", "C2H4O2", "H", "-1", 2),
         list("3M-H", "", "H", "-1", 3),
-        
+
         list("M-e", "", "", "+1", 1),
         list("M+e", "", "H", "-1", 1),
-        
+
         list("-e", "", "", "+1", 1),
         list("+e", "", "", "-1", 1),
         list("+H", "H", "", "+1", 1),
         list("-H", "", "H", "-1", 1),
         list("+Na", "Na", "", "+1", 1)
     ))
-    
+
     setnames(ret, c("adduct", "add", "sub", "charge", "molMult"))
-    ret[, charge := as.numeric(charge)] 
+    ret[, charge := as.numeric(charge)]
     return(ret[])
 }
 
@@ -105,7 +115,7 @@ MetFragAdducts <- function()
         list(64, "[M+ACN+Na]+", "C2H3NNa", "", 1), # ACN+Na
         list(83, "[M+2ACN+H]+", "C4H7N2", "", 1), # 2ACN+H
         list(0, "[M]+", "", "", 1),
-        
+
         list(-1, "[M-H]-", "", "H", -1),
         list(35, "[M+Cl]-", "Cl", "", -1),
         list(45, "[M+HCOO]-", "CO2H", "", -1),
@@ -144,7 +154,7 @@ as.adduct <- function(x, format = "generic", isPositive = NULL)
 {
     if (is(x, "adduct"))
         return(x)
-    
+
     ac <- checkmate::makeAssertCollection()
     checkmate::assertChoice(format, c("generic", "sirius", "genform", "metfrag")) # don't add: this should fail immediately
     if (format == "metfrag")
@@ -158,7 +168,7 @@ as.adduct <- function(x, format = "generic", isPositive = NULL)
     else
         checkmate::assertString(x, min.chars = 1, add = ac)
     checkmate::reportAssertions(ac)
-    
+
     if (format == "generic" || format == "sirius")
     {
         if (format == "sirius")
@@ -172,7 +182,7 @@ as.adduct <- function(x, format = "generic", isPositive = NULL)
             if (is.na(charge))
                 charge <- 1
         }
-        
+
         adds <- sub("\\+", "", unlist(regmatches(x, gregexpr("[\\+]{1}[[:alnum:]]+", x))))
         subs <- sub("\\-", "", unlist(regmatches(x, gregexpr("[\\-]{1}[[:alnum:]]+", x))))
         if (endsWith(x, "-"))
@@ -183,7 +193,7 @@ as.adduct <- function(x, format = "generic", isPositive = NULL)
         gfadds <- GenFormAdducts()[adduct == x]
         if (nrow(gfadds) == 0)
             stop("Invalid adduct for GenForm! See GenFormAdducts() for valid options.")
-        
+
         gfadds <- gfadds[1] # in case there are multiple hits
         adds <- gfadds$add; subs <- gfadds$sub; charge <- gfadds$charge; mult <- gfadds$molMult
     }
@@ -203,14 +213,16 @@ as.adduct <- function(x, format = "generic", isPositive = NULL)
         }
         else
             mfadds <- MetFragAdducts()[adduct_type == x]
-        
+
         if (nrow(mfadds) == 0)
             stop("Invalid adduct for MetFrag! See MetFragAdducts() for valid options.")
-        
+
         mfadds <- mfadds[1] # in case there are multiple hits
         adds <- mfadds$add; subs <- mfadds$sub; charge <- mfadds$charge
     }
-    
+
+    adds <- adds[nzchar(adds)]; subs <- subs[nzchar(subs)]
+
     return(adduct(add = adds, sub = subs, charge = charge, molMult = mult))
 }
 
@@ -222,7 +234,7 @@ calculateIonFormula <- function(formula, adduct)
 {
     checkmate::assertCharacter(formula, min.chars = 1)
     adduct <- checkAndToAdduct(adduct)
-    
+
     sapply(formula, function(f)
     {
         if (adduct@molMult > 1)
@@ -243,7 +255,7 @@ calculateNeutralFormula <- function(formula, adduct)
 {
     checkmate::assertCharacter(formula, min.chars = 1)
     adduct <- checkAndToAdduct(adduct)
-    
+
     sapply(formula, function(f)
     {
         if (length(adduct@add) > 0)

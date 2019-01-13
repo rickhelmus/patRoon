@@ -56,6 +56,16 @@ molecule (\emph{e.g.} for a dimer this would be \samp{2}).}
 \item{\code{charge}}{The final charge of the adduct.}
 }}
 
+\examples{
+adduct("H") # [M+H]+
+adduct(sub = "H", charge = -1) # [M-H]-
+adduct(add = "K", sub = "H2", charge = -1) # [M+K-H2]+
+adduct(add = "H3", charge = 3) # [M+H3]3+
+adduct(add = "H", molMult = 2) # [2M+H]+
+
+as.character(adduct("H")) # returns "[M+H]+"
+
+}
 \seealso{
 \code{\link{as.adduct}} for easy creation of \code{adduct} objects
   and \link[=adduct-utils]{adduct utilities} for other adduct functionality.

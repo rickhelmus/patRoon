@@ -221,7 +221,7 @@ setMethod("filter", "components", function(obj, size = NULL, adducts = NULL,
     checkmate::reportAssertions(ac)
 
     if (!is.null(adducts) && !is.logical(adducts))
-        adducts <- checkAndToAdduct(adducts, FALSE, TRUE)
+        adducts <- sapply(adducts, function(a) as.character(checkAndToAdduct(a)))
 
     oldn <- length(obj); oldresn <- if (oldn > 0) sum(sapply(obj@components, nrow)) else 0
     cat("Filtering components... ")
@@ -239,7 +239,7 @@ setMethod("filter", "components", function(obj, size = NULL, adducts = NULL,
             else if (is.logical(adducts) && !adducts)
                 cmp <- cmp[is.na(adduct_ion)]
             else
-                cmp <- cmp[sapply(adduct_ion, as.adduct) %in% adducts]
+                cmp <- cmp[adduct_ion %in% adducts]
         }
 
         if (!is.null(isotopes) && !is.null(cmp[["isonr"]]))
@@ -271,6 +271,7 @@ setMethod("filter", "components", function(obj, size = NULL, adducts = NULL,
             obj@componentInfo <- obj@componentInfo[rt_increment >= rtIncrement[1] & rt_increment <= rtIncrement[2]]
         if (!is.null(mzIncrement) && !is.null(obj@componentInfo[["mz_increment"]]))
             obj@componentInfo <- obj@componentInfo[mz_increment >= mzIncrement[1] & mz_increment <= mzIncrement[2]]
+        
         obj@components <- obj@components[names(obj@components) %in% obj@componentInfo$name]
     }
 

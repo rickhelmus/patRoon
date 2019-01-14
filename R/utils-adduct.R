@@ -19,21 +19,12 @@
 #' @name adduct-utils
 NULL
 
-checkAndToAdduct <- function(adduct, scalar = TRUE, na.ok = FALSE)
+checkAndToAdduct <- function(adduct, na.ok = FALSE)
 {
-    if (scalar)
-        checkmate::assertScalar(adduct, na.ok = na.ok)
-
-    sapply(adduct, function(a)
-    {
-        if (na.ok && is.na(a))
-            return(a)
-
-        checkmate::assert(checkmate::checkString(a, min.chars = 1),
-                          checkmate::checkClass(a, "adduct"),
-                          .var.name = "adduct")
-        as.adduct(a)
-    }, USE.NAMES = FALSE)
+    checkmate::assert(checkmate::checkString(adduct, min.chars = 1, na.ok = na.ok),
+                      checkmate::checkClass(adduct, "adduct"),
+                      .var.name = "adduct")
+    as.adduct(adduct)
 }
 
 #' @details \code{GenFormAdducts} returns a table with information on adducts
@@ -182,6 +173,9 @@ as.adduct <- function(x, format = "generic", isPositive = NULL)
 
     if (format == "generic" || format == "sirius")
     {
+        if (!grepl("^\\[.+\\].*[\\+\\-]{1}", x))
+            stop("Wrong format! (forgot brackets or charge?)")
+        
         if (format == "sirius")
             mult <- charge <- 1
         else

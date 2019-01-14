@@ -158,7 +158,7 @@ please refer to the linked method documentation for each generic.
 \code{filter} provides various functionality to do post-filtering of data.
 
 \itemize{
-    \item Methods are defined for: \code{\link[=filter,compounds-method]{compounds}}; \code{\link[=filter,featureGroups-method]{featureGroups}}; \code{\link[=filter,features-method]{features}}; \code{\link[=filter,featuresXCMS-method]{featuresXCMS}}; \code{\link[=filter,formulas-method]{formulas}}; \code{\link[=filter,MSPeakLists-method]{MSPeakLists}}.
+    \item Methods are defined for: \code{\link[=filter,components-method]{components}}; \code{\link[=filter,compounds-method]{compounds}}; \code{\link[=filter,featureGroups-method]{featureGroups}}; \code{\link[=filter,features-method]{features}}; \code{\link[=filter,featuresXCMS-method]{featuresXCMS}}; \code{\link[=filter,formulas-method]{formulas}}; \code{\link[=filter,MSPeakLists-method]{MSPeakLists}}.
 }
 
 \code{getFeatures} returns the object's \code{\link{features}} object.

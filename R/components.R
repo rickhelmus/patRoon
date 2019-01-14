@@ -180,6 +180,109 @@ setMethod("as.data.table", "components", function(x)
     return(ret)
 })
 
+#' @describeIn components Provides rule based filtering for components.
+#'
+#' @param size Should be a two sized vector with the minimum/maximum size of a
+#'   component. Set to \code{NULL} to ignore.
+#' @param adducts Remove any feature groups within components that do not match
+#'   given adduct rules. If \code{adducts} is a logical then only results are
+#'   kept when an adduct is assigned (\code{adducts=TRUE}) or not assigned
+#'   (\code{adducts=FALSE}). Otherwise, if \code{adducts} contains one or more
+#'   \code{\link{adduct}} objects (or something that can be converted to it with
+#'   \code{\link{as.adduct}}) then only results are kept that match the given
+#'   adducts. Set to \code{NULL} to ignore this filter.
+#' @param isotopes Only keep results that match a given isotope rule. If
+#'   \code{isotopes} is a logical then only results are kept with
+#'   (\code{isotopes=TRUE}) or without (\code{isotopes=FALSE}) isotope
+#'   assignment. Otherwise \code{isotopes} should be a numeric vector with
+#'   isotope identifiers to keep (\emph{e.g.} \samp{0} for monoisotopic results,
+#'   \samp{1} for \samp{M+1} results etc.). Set to \code{NULL} to ignore this
+#'   filter.
+#' @param rtIncrement,mzIncrement Should be a two sized vector with the
+#'   minimum/maximum retention or mz increment of a homologous series. Set to
+#'   \code{NULL} to ignore.
+#'
+#' @note \code{filter} Applies only those filters for which a component has data
+#'   available. For instance, filtering by adduct will only filter any results
+#'   within a component if that component contains adduct information.
+#'
+#' @export
+setMethod("filter", "components", function(obj, size = NULL, adducts = NULL,
+                                           isotopes = NULL, rtIncrement = NULL,
+                                           mzIncrement = NULL)
+{
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertIntegerish(size, lower = 0, any.missing = FALSE, len = 2, null.ok = TRUE, add = ac)
+    checkmate::assert(checkmate::checkFlag(isotopes, null.ok = TRUE),
+                      checkmate::checkIntegerish(isotopes, lower = 0),
+                      .var.name = isotopes)
+    checkmate::assertNumeric(rtIncrement, lower = 0, any.missing = FALSE, len = 2, null.ok = TRUE, add = ac)
+    checkmate::assertNumeric(mzIncrement, lower = 0, any.missing = FALSE, len = 2, null.ok = TRUE, add = ac)
+    checkmate::reportAssertions(ac)
+
+    if (!is.null(adducts) && !is.logical(adducts))
+        adducts <- checkAndToAdduct(adducts, FALSE, TRUE)
+
+    oldn <- length(obj); oldresn <- if (oldn > 0) sum(sapply(obj@components, nrow)) else 0
+    cat("Filtering components... ")
+
+    obj@components <- pruneList(lapply(obj@components, function(cmp)
+    {
+        if (!is.null(adducts) && !is.null(cmp[["adduct_ion"]]))
+        {
+            # NOTE: RAMClustR and CAMERA follow the generic adduct format
+            # applied here, hence we can simply call as.adduct w/out specific
+            # formatting.
+
+            if (is.logical(adducts) && adducts)
+                cmp <- cmp[!is.na(adduct_ion)]
+            else if (is.logical(adducts) && !adducts)
+                cmp <- cmp[is.na(adduct_ion)]
+            else
+                cmp <- cmp[sapply(adduct_ion, as.adduct) %in% adducts]
+        }
+
+        if (!is.null(isotopes) && !is.null(cmp[["isonr"]]))
+        {
+            if (is.logical(isotopes) && isotopes)
+                cmp <- cmp[!is.na(isonr)]
+            else if (is.logical(isotopes) && !isotopes)
+                cmp <- cmp[is.na(isonr)]
+            else
+                cmp <- cmp[isonr %in% isotopes]
+        }
+
+        return(cmp)
+    }), checkZeroRows = TRUE)
+
+    if (length(obj) == 0)
+        obj@componentInfo <- data.table()
+    else
+    {
+        obj@componentInfo <- obj@componentInfo[name %in% names(obj@components)]
+        obj@componentInfo[, size := sapply(obj@components, nrow)] # update in case groups were filtered away
+
+        if (!is.null(size))
+        {
+            csize <- size # rename for DT
+            obj@componentInfo <- obj@componentInfo[size >= csize[1] & size <= csize[2]]
+        }
+        if (!is.null(rtIncrement) && !is.null(obj@componentInfo[["rt_increment"]]))
+            obj@componentInfo <- obj@componentInfo[rt_increment >= rtIncrement[1] & rt_increment <= rtIncrement[2]]
+        if (!is.null(mzIncrement) && !is.null(obj@componentInfo[["mz_increment"]]))
+            obj@componentInfo <- obj@componentInfo[mz_increment >= mzIncrement[1] & mz_increment <= mzIncrement[2]]
+        obj@components <- obj@components[names(obj@components) %in% obj@componentInfo$name]
+    }
+
+    newn <- length(obj); newresn <- if (newn > 0) sum(sapply(obj@components, nrow)) else 0
+    printf("Done! Filtered %d (%.2f%%) components and %d (%.2f%%) feature groups. Remaining: %d components with %d feature groups\n",
+           oldn - newn, if (oldn == 0) 0 else (1-(newn/oldn))*100,
+           oldresn - newresn, if (oldresn == 0) 0 else (1-(newresn/oldresn))*100,
+           newn, newresn)
+
+    return(componentsReduced(components = obj@components, componentInfo = obj@componentInfo))
+})
+
 #' @describeIn components Returns the component id(s) to which a feature group
 #'   belongs.
 #' @param fGroup The name (thus a character) of the feature group that should be

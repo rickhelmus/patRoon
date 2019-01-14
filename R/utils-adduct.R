@@ -19,12 +19,21 @@
 #' @name adduct-utils
 NULL
 
-checkAndToAdduct <- function(adduct)
+checkAndToAdduct <- function(adduct, scalar = TRUE, na.ok = FALSE)
 {
-    checkmate::assert(checkmate::checkString(adduct, min.chars = 1),
-                      checkmate::checkClass(adduct, "adduct"),
-                      .var.name = "adduct")
-    as.adduct(adduct)
+    if (scalar)
+        checkmate::assertScalar(adduct, na.ok = na.ok)
+
+    sapply(adduct, function(a)
+    {
+        if (na.ok && is.na(a))
+            return(a)
+
+        checkmate::assert(checkmate::checkString(a, min.chars = 1),
+                          checkmate::checkClass(a, "adduct"),
+                          .var.name = "adduct")
+        as.adduct(a)
+    }, USE.NAMES = FALSE)
 }
 
 #' @details \code{GenFormAdducts} returns a table with information on adducts

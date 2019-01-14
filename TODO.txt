@@ -10,7 +10,6 @@ Release:
 - do something with sirius fingerprints?
 - fillPeaks for CAMERA (and RAMClustR?)
 - mzR precursor window in newProject()
-- filter method for components (e.g. isotopes, adducts)
 - mass defect components
 - fix compoundViewer
 - check why generics sometimes are not found

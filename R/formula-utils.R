@@ -2,7 +2,7 @@ splitFormulaToList <- function(formula)
 {
     if (!nzchar(formula))
         return(list())
-    
+
     # split string in pairs of elements+element counts (and optionally isotopic info), e.g.: { "C30", "^13C2" }
     spltform <- unlist(regmatches(formula, gregexpr("(\\^[[:digit:]]+)?[[:upper:]]{1}[[:lower:]]?[[:digit:]]*", formula)))
 
@@ -103,6 +103,8 @@ sortFormula <- function(formula)
         el <- c("C", el)
     return(formulaListToString(fl[el]))
 }
+
+simplifyFormula <- function(formula) sortFormula(formula)
 
 averageFormulas <- function(formulas)
 {

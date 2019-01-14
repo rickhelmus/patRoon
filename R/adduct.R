@@ -48,6 +48,11 @@ setMethod("initialize", "adduct", function(.Object, add = character(), sub = cha
     if (.Object@charge == 0)
         stop("Adduct charge cannot be zero.")
 
+    if (length(.Object@add) > 0)
+        .Object@add <- sapply(.Object@add, simplifyFormula, USE.NAMES = FALSE)
+    if (length(.Object@sub) > 0)
+        .Object@sub <- sapply(.Object@sub, simplifyFormula, USE.NAMES = FALSE)
+
     return(.Object)
 })
 

@@ -154,6 +154,8 @@ as.adduct <- function(x, format = "generic", isPositive = NULL)
 {
     if (is(x, "adduct"))
         return(x)
+    if (is.na(x))
+        return(x)
 
     ac <- checkmate::makeAssertCollection()
     checkmate::assertChoice(format, c("generic", "sirius", "genform", "metfrag")) # don't add: this should fail immediately

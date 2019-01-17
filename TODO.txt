@@ -68,3 +68,5 @@ Release:
 - setAs() for as.data.table()/as.data.frame() methods
 - compounds
     - convert score csv to internal data?
+- Fix plotUpSet with <2 rgroups
+- as.data.table for fGroups is slow?

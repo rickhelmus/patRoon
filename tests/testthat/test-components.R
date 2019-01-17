@@ -1,8 +1,9 @@
 context("components")
 
-fGroups <- getTestFGroups(getTestAnaInfo()[4:5, ])
+# set localMZRange=0 to keep isotopes
+fGroups <- getTestFGroups(getTestAnaInfo()[4:5, ], localMZRange = 0)
 # reduced set for CAMERA/RAMClustR; for nontarget we keep all to get less common homologues
-fGroupsSimple <- groupFeaturesScreening(fGroups, screenTargets(fGroups, patRoonData::targets))
+fGroupsSimple <- fGroups[, 1:50]
 
 
 # fix seed for reproducible clustering
@@ -53,10 +54,39 @@ test_that("basic subsetting", {
     expect_equivalent(callDollar(compsRC, names(compsRC)[3]), compsRC[[3]])
 })
 
+test_that("filtering works", {
+    expect_length(filter(compsRC, size = c(0, 100)), length(compsRC))
+    expect_length(filter(compsRC, size = c(50, 100)), 0)
+
+    expect_length(filter(compsEmpty, size = c(0, 100)), 0)
+
+    # shouldn't filter if related data is not there
+    expect_equal(groupNames(filter(compsInt, adducts = TRUE)), groupNames(compsInt))
+    expect_equal(groupNames(filter(compsInt, isotopes = TRUE)), groupNames(compsInt))
+
+    expect_lt(length(groupNames(filter(compsRC, adducts = TRUE))), length(groupNames(compsRC)))
+    expect_lt(length(groupNames(filter(compsRC, adducts = FALSE))), length(groupNames(compsRC)))
+    expect_lt(length(groupNames(filter(compsRC, adducts = "[M+H]+"))), length(groupNames(compsRC)))
+    expect_true(all(sapply(componentTable(filter(compsRC, adducts = "[M+H]+")),
+                           function(cmp) all(cmp$adduct_ion == "[M+H]+"))))
+
+    expect_lt(length(groupNames(filter(compsRC, isotopes = TRUE))), length(groupNames(compsRC)))
+    expect_lt(length(groupNames(filter(compsRC, isotopes = FALSE))), length(groupNames(compsRC)))
+    expect_lt(length(groupNames(filter(compsRC, isotopes = 0:1))), length(groupNames(compsRC)))
+    expect_true(all(sapply(componentTable(filter(compsRC, isotopes = 0)),
+                           function(cmp) all(cmp$isonr == 0))))
+
+    skip_if(length(compsNT) == 0)
+    expect_length(filter(compsNT, rtIncrement = c(0, 1000)), length(compsNT))
+    expect_length(filter(compsNT, rtIncrement = c(100, 1000)), 0)
+    expect_length(filter(compsNT, mzIncrement = c(0, 1000)), length(compsNT))
+    expect_length(filter(compsNT, mzIncrement = c(1000, 10000)), 0)
+})
+
 test_that("basic usage works", {
     expect_equal(length(unique(as.data.table(compsCAM)$name)), length(compsCAM))
-    
-    expect_equivalent(findFGroup(compsCAM, names(fGroupsSimple)[1]), 2)
+
+    expect_equivalent(findFGroup(compsCAM, compsCAM[[3]]$group[3]), 3)
     expect_length(findFGroup(compsCAM, "none"), 0)
     expect_length(findFGroup(compsEmpty, "1"), 0)
 })
@@ -71,7 +101,7 @@ test_that("consensus works", {
 
 test_that("intensity clustered components", {
     expect_equivalent(length(treeCut(compsInt, k = 5)), 5)
-    expect_equal(treeCutDynamic(compsInt), compsInt)
+    expect_equivalent(treeCutDynamic(compsInt), compsInt)
 })
 
 test_that("reporting works", {

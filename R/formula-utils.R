@@ -2,7 +2,7 @@ splitFormulaToList <- function(formula)
 {
     if (!nzchar(formula))
         return(list())
-    
+
     # split string in pairs of elements+element counts (and optionally isotopic info), e.g.: { "C30", "^13C2" }
     spltform <- unlist(regmatches(formula, gregexpr("(\\^[[:digit:]]+)?[[:upper:]]{1}[[:lower:]]?[[:digit:]]*", formula)))
 
@@ -90,30 +90,6 @@ addFormula <- function(formula1, formula2)
     return(formulaListToString(newfl))
 }
 
-calculateIonFormula <- function(formula, adduct)
-{
-    if (grepl("+H", adduct, fixed = TRUE))
-        sapply(formula, addFormula, formula2 = "H", USE.NAMES = FALSE)
-    else if (grepl("+Na", adduct, fixed = TRUE))
-        sapply(formula, addFormula, formula2 = "Na", USE.NAMES = FALSE)
-    else if (grepl("+K", adduct, fixed = TRUE))
-        sapply(formula, addFormula, formula2 = "K", USE.NAMES = FALSE)
-    else if (grepl("-H", adduct, fixed = TRUE))
-        sapply(formula, subtractFormula, formula2 = "H", USE.NAMES = FALSE)
-}
-
-calculateNeutralFormula <- function(formula, adduct)
-{
-    if (grepl("+H", adduct, fixed = TRUE))
-        sapply(formula, subtractFormula, formula2 = "H", USE.NAMES = FALSE)
-    else if (grepl("+Na", adduct, fixed = TRUE))
-        sapply(formula, subtractFormula, formula2 = "Na", USE.NAMES = FALSE)
-    else if (grepl("+K", adduct, fixed = TRUE))
-        sapply(formula, subtractFormula, formula2 = "K", USE.NAMES = FALSE)
-    else if (grepl("-H", adduct, fixed = TRUE))
-        sapply(formula, addFormula, formula2 = "H", USE.NAMES = FALSE)
-}
-
 sortFormula <- function(formula)
 {
     fl <- splitFormulaToList(formula)
@@ -127,6 +103,8 @@ sortFormula <- function(formula)
         el <- c("C", el)
     return(formulaListToString(fl[el]))
 }
+
+simplifyFormula <- function(formula) sortFormula(formula)
 
 averageFormulas <- function(formulas)
 {

@@ -119,11 +119,10 @@ instance, \code{elements=c("P", "S")} specifies that either one phosphorus
 or one sulphur atom should be present. Set to \code{NULL} to ignore this
 filter.}
 
-\item{fragElements, lossElements}{Specifies
-elemental restrictions for fragment or neutral loss
-formulae (charged form). Candidates are retained if at least one of the fragment
-formulae follow the given restrictions. See \code{elements} for the used
-format.}
+\item{fragElements, lossElements}{Specifies elemental restrictions for
+fragment or neutral loss formulae (charged form). Candidates are retained
+if at least one of the fragment formulae follow the given restrictions. See
+\code{elements} for the used format.}
 
 \item{topMost}{Only retain no more than this amount of best ranked candidates
 for each feature group.}

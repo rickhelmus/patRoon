@@ -17,8 +17,8 @@
 generateCompoundsMetfrag(fGroups, MSPeakLists, method = "CL",
   logPath = file.path("log", "metfrag"), timeout = 300,
   timeoutRetries = 2, errorRetries = 2, topMost = 100,
-  dbRelMzDev = 5, fragRelMzDev = 5, fragAbsMzDev = 0.002, isPositive,
-  adduct, database = "pubchem", extendedPubChem = "auto",
+  dbRelMzDev = 5, fragRelMzDev = 5, fragAbsMzDev = 0.002, adduct,
+  database = "pubchem", extendedPubChem = "auto",
   chemSpiderToken = "", scoreTypes = compoundScorings("metfrag",
   database, onlyDefault = TRUE)$name, scoreWeights = 1,
   preProcessingFilters = c("UnconnectedCompoundFilter", "IsotopeFilter"),
@@ -89,17 +89,9 @@ Sets the \option{FragmentPeakMatchRelativeMassDeviation} option.}
 \item{fragAbsMzDev}{Absolute mass deviation (in Da) for fragment matching.
 Sets the \option{FragmentPeakMatchAbsoluteMassDeviation} option.}
 
-\item{isPositive}{Set to \code{TRUE} for data measured with positive
-ionization. Sets the \option{IsPositiveIonMode} option.}
-
-\item{adduct}{The assumed MS adduct. For \code{generateCompoundsMetfrag}: a
-numeric value (\emph{e.g.} \samp{1} for [M+H]+, \samp{-1} for [M-H]- and
-\samp{0} for [M]+/-, see the
-\href{http://c-ruttkies.github.io/MetFrag/projects/metfragcl/}{MetFrag CL}
-homepage for more). Please note that \code{isPositive} also needs to be
-set. For \code{generateCompoundsSirius}, a character string such as
-\code{"[M+H]+"}, \code{"[M-H]-"}, \code{"[M+Na]+"} and \code{"[M]+"}. Sets
-the \option{PrecursorIonMode} and \option{--ion} options, respectively.}
+\item{adduct}{An \code{\link{adduct}} object (or something that can be
+converted to it with \code{\link{as.adduct}}). Examples: \code{"[M-H]-"},
+\code{"[M+Na]+"}.}
 
 \item{database}{Compound database to use. Valid values are: \code{"pubchem"},
   \code{"chemspider"}, \code{"kegg"}, \code{"sdf"}, \code{"psv"} and

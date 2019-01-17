@@ -1,1 +1,1 @@
-A componentsRC object (derived from components -> workflowStep)Algorithm: ramclustrComponents: C1, C2, C3 (3 total)Number of feature groups in components: 7 (total), 2.3 (mean), 2 - 3 (min - max)
+A componentsRC object (derived from components -> workflowStep)Algorithm: ramclustrComponents: C1, C2, C3, C4, C5, C6, ... (9 total)Number of feature groups in components: 46 (total), 5.1 (mean), 2 - 9 (min - max)

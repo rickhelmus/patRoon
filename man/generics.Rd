@@ -158,7 +158,7 @@ please refer to the linked method documentation for each generic.
 \code{filter} provides various functionality to do post-filtering of data.
 
 \itemize{
-    \item Methods are defined for: \code{\link[=filter,compounds-method]{compounds}}; \code{\link[=filter,featureGroups-method]{featureGroups}}; \code{\link[=filter,features-method]{features}}; \code{\link[=filter,featuresXCMS-method]{featuresXCMS}}; \code{\link[=filter,formulas-method]{formulas}}; \code{\link[=filter,MSPeakLists-method]{MSPeakLists}}.
+    \item Methods are defined for: \code{\link[=filter,components-method]{components}}; \code{\link[=filter,compounds-method]{compounds}}; \code{\link[=filter,featureGroups-method]{featureGroups}}; \code{\link[=filter,features-method]{features}}; \code{\link[=filter,featuresXCMS-method]{featuresXCMS}}; \code{\link[=filter,formulas-method]{formulas}}; \code{\link[=filter,MSPeakLists-method]{MSPeakLists}}.
 }
 
 \code{getFeatures} returns the object's \code{\link{features}} object.
@@ -301,7 +301,7 @@ please refer to the linked method documentation for each generic.
  \code{show} Prints information about this object.
 
 \itemize{
-    \item Methods are defined for: \code{\link[=show,components-method]{components}}; \code{\link[=show,compounds-method]{compounds}}; \code{\link[=show,compoundsCluster-method]{compoundsCluster}}; \code{\link[=show,featureGroups-method]{featureGroups}}; \code{\link[=show,features-method]{features}}; \code{\link[=show,formulas-method]{formulas}}; \code{\link[=show,MSPeakLists-method]{MSPeakLists}}; \code{\link[=show,optimizationResult-method]{optimizationResult}}; \code{\link[=show,workflowStep-method]{workflowStep}}.
+    \item Methods are defined for: \code{\link[=show,adduct-method]{adduct}}; \code{\link[=show,components-method]{components}}; \code{\link[=show,compounds-method]{compounds}}; \code{\link[=show,compoundsCluster-method]{compoundsCluster}}; \code{\link[=show,featureGroups-method]{featureGroups}}; \code{\link[=show,features-method]{features}}; \code{\link[=show,formulas-method]{formulas}}; \code{\link[=show,MSPeakLists-method]{MSPeakLists}}; \code{\link[=show,optimizationResult-method]{optimizationResult}}; \code{\link[=show,workflowStep-method]{workflowStep}}.
 }
 }
 

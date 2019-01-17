@@ -6,21 +6,21 @@ convertMSFilesPWiz <- function(inFiles, outFiles, to, filters, extraOpts,
         mainArgs <- c(mainArgs, sapply(filters, function(f) c("--filter", f)))
     if (!is.null(extraOpts))
         mainArgs <- c(mainArgs, extraOpts)
-    
+
     msc <- getCommandWithOptPath("msconvert", "pwiz")
     cmdQueue <- lapply(seq_along(inFiles), function(fi)
     {
         basef <- basename(tools::file_path_sans_ext(inFiles[fi]))
-        
+
         logf <- if (!is.null(logPath)) file.path(logPath, paste0("pwiz-", basef, ".txt")) else NULL
         logfe <- if (!is.null(logPath)) file.path(logPath, paste0("pwiz-", basef, "-err.txt")) else NULL
         return(list(stdoutFile = logf, stderrFile = logfe, command = msc,
                     args = c(inFiles[fi], "--outfile", outFiles[fi],
                              "-o", dirname(outFiles[fi]), mainArgs)))
     })
-    
+
     executeMultiProcess(cmdQueue, function(cmd) {}, maxProcAmount = maxProcAmount)
-    
+
     invisible(NULL)
 }
 
@@ -29,20 +29,20 @@ convertMSFilesOpenMS <- function(inFiles, outFiles, to, extraOpts, logPath, maxP
     mainArgs <- c()
     if (!is.null(extraOpts))
         mainArgs <- c(mainArgs, extraOpts)
-    
+
     msc <- getCommandWithOptPath("FileConverter", "OpenMS")
     cmdQueue <- lapply(seq_along(inFiles), function(fi)
     {
         basef <- basename(tools::file_path_sans_ext(inFiles[fi]))
         logf <- if (!is.null(logPath)) file.path(logPath, paste0("openms-", basef, ".txt")) else NULL
         logfe <- if (!is.null(logPath)) file.path(logPath, paste0("openms-", basef, "-err.txt")) else NULL
-        
+
         return(list(stdoutFile = logf, stderrFile = logfe, command = msc,
                     args = c("-in", inFiles[fi], "-out", outFiles[fi], mainArgs)))
     })
-    
+
     executeMultiProcess(cmdQueue, function(cmd) {}, maxProcAmount = maxProcAmount)
-    
+
     invisible(NULL)
 }
 
@@ -100,10 +100,10 @@ convertMSFilesOpenMS <- function(inFiles, outFiles, to, extraOpts, logPath, maxP
 #'   installation (see
 #'   \href{http://proteowizard.sourceforge.net/formats/index.html}{here}).
 #'
-#' @examples \donttest{
+#' @examples \dontrun{
 #' # Use FileConverter of OpenMS to convert between open mzXML/mzML format
 #' convertMSFiles("standard-1.mzXML", to = "mzML", algorithm = "openms")
-#' 
+#'
 #' # Convert all Thermo .RAW files in the analyses/raw directory to mzML and
 #' # store the files in analyses/mzml. During conversion files are centroided by
 #' # the peakPicking filter and only MS 1 data is kept.
@@ -140,7 +140,7 @@ convertMSFiles <- function(files, outPath = NULL, dirs = FALSE,
                                     several.ok = TRUE, add = ac)
     else # OpenMS
         from <- checkmate::matchArg(from, c("mzXML", "mzML"), several.ok = TRUE, add = ac)
-        
+
     if (dirs)
     {
         allExts <- list(thermo = ".raw",
@@ -159,19 +159,19 @@ convertMSFiles <- function(files, outPath = NULL, dirs = FALSE,
 
     if (is.null(outPath))
         outPath <- dirname(files)
-    
+
     mkdirp(outPath)
     if (!is.null(logPath))
         mkdirp(logPath)
-    
+
     # NOTE: use normalizePath() here to convert to backslashes on Windows: needed by msconvert
     outPath <- normalizePath(rep(outPath, length.out = length(files)), mustWork = TRUE)
     files <- normalizePath(files, mustWork = TRUE)
-    
+
     basef <- basename(tools::file_path_sans_ext(files))
     output <- normalizePath(file.path(outPath, paste0(basef, ".", to)),
                             mustWork = FALSE)
-    
+
     keepFiles <- sapply(seq_along(files), function(fi)
     {
         if (!file.exists(files[fi]))
@@ -182,10 +182,10 @@ convertMSFiles <- function(files, outPath = NULL, dirs = FALSE,
             return(TRUE)
         return(FALSE)
     }, USE.NAMES = FALSE)
-    
+
     files <- files[keepFiles]
     output <- output[keepFiles]
-    
+
     if (length(files) > 0)
     {
         if (algorithm == "pwiz")

@@ -238,7 +238,7 @@ processGenFormResultFile <- function(file, isMSMS, adduct)
 #'
 #' @rdname formula-generation
 #' @export
-generateFormulasGenForm <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct = "M+H",
+generateFormulasGenForm <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct = "[M+H]+",
                                     elements = "CHNOP", hetero = TRUE, oc = FALSE, extraOpts = NULL,
                                     calculateFeatures = TRUE, featThreshold = 0.75, MSMode = "both",
                                     maxProcAmount = getOption("patRoon.maxProcAmount"), maxCmdsPerProc = 25)
@@ -247,7 +247,7 @@ generateFormulasGenForm <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct =
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
     checkmate::assertNumber(maxMzDev, lower = 0, finite = TRUE, add = ac)
-    aapply(checkmate::assertString, . ~ adduct + elements, fixed = list(add = ac))
+    aapply(checkmate::assertString, . ~ elements, fixed = list(add = ac))
     aapply(checkmate::assertFlag, . ~ hetero + oc + calculateFeatures, fixed = list(add = ac))
     checkmate::assertNumber(featThreshold, lower = 0, finite = TRUE, null.ok = TRUE, add = ac)
     checkmate::assertChoice(MSMode, c("ms", "msms", "both"), add = ac)
@@ -255,6 +255,8 @@ generateFormulasGenForm <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct =
     aapply(checkmate::assertCount, . ~ maxProcAmount + maxCmdsPerProc, positive = TRUE, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
 
+    adduct <- checkAndToAdduct(adduct)
+    
     gInfo <- groupInfo(fGroups)
     anaInfo <- analysisInfo(fGroups)
     featIndex <- groupFeatIndex(fGroups)
@@ -268,7 +270,7 @@ generateFormulasGenForm <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct =
                   "noref",
                   "dbe",
                   "cm",
-                  sprintf("ion=%s", adduct),
+                  sprintf("ion=%s", as.character(adduct, format = "genform")),
                   sprintf("ppm=%f", maxMzDev),
                   sprintf("el=%s", elements),
                   extraOpts)

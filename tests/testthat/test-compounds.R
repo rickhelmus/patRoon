@@ -22,7 +22,7 @@ doSIRIUS <- !is.null(getOption("patRoon.path.SIRIUS")) && nzchar(getOption("patR
 callMF <- function(fGroups, plists, db = mfTestDBPath, to = 300)
 {
     generateCompounds(fGroups, plists, "metfrag", logPath = NULL,
-                      adduct = 1, isPositive = TRUE, timeout = to,
+                      adduct = "[M+H]+", timeout = to,
                       database = "csv", scoreTypes = "fragScore",
                       extraOpts = list(LocalDatabasePath = db))
 }
@@ -84,24 +84,29 @@ test_that("filtering works", {
     expect_length(filter(comps, minExplainedPeaks = 1E6), 0)
     expect_length(filter(compsEmpty, minExplainedPeaks = 2, topMost = 1), 0)
     expect_equivalent(filter(comps, scoreLimits = list(fragScore = c(-Inf, Inf))), comps)
-    
+
     expect_length(filter(comps, elements = "C1-100"), length(comps)) # all should contain carbon
     expect_length(filter(comps, elements = c("Na1-100", "C1-100")), length(comps)) # no sodium, but carbon should be there
     expect_length(filter(comps, elements = c("H1-100", "C1-100")), length(comps)) # presence of both shouldn't affect results
     expect_length(filter(comps, elements = "Na1-100"), 0) # no sodium
     expect_length(filter(comps, elements = "Na0-100"), length(comps)) # no sodium, but optional
-    
+
     expect_lte(length(filter(compsExplained, fragElements = "C1-100")), length(compsExplained))
     expect_lt(length(filter(compsExplained, fragElements = "C")), length(compsExplained)) # fragments may contain only single carbon
     expect_length(filter(compsExplained, fragElements = "Na1-100"), 0)
     expect_length(filter(compsExplained, fragElements = "Na0-100"), length(compsExplained))
+
+    expect_length(filter(compsExplained, lossElements = "C0-100"), length(compsExplained))
+    expect_length(filter(compsExplained, lossElements = "Na0-100"), length(compsExplained))
+    expect_gt(length(filter(compsExplained, lossElements = "C1-100")), 0) # NL might be empty, at least some should contain carbon though!
+    expect_length(filter(compsExplained, lossElements = "Na1-100"), 0) # no sodium
 
     skip_if_not(doMetFrag)
     expect_lt(length(filter(compsMFIso, minScore = 2)), length(compsMFIso))
     expect_lt(length(filter(compsMFIso, minFragScore = 200)), length(compsMFIso))
     expect_lt(length(filter(compsMFIso, scoreLimits = list(fragScore = c(200, Inf)))),
               length(compsMFIso))
-    
+
     skip_if_not(doSIRIUS)
     expect_lt(length(filter(compsSIR, minScore = -200)), length(compsSIR))
     expect_lt(length(filter(compsSIR, scoreLimits = list(score = c(-200, Inf)))), length(compsSIR))

@@ -20,6 +20,7 @@
 \alias{[[,components,ANY,ANY-method}
 \alias{$,components-method}
 \alias{as.data.table,components-method}
+\alias{filter,components-method}
 \alias{findFGroup,components-method}
 \alias{findFGroup}
 \alias{plotSpec,components-method}
@@ -53,6 +54,9 @@
 
 \S4method{as.data.table}{components}(x)
 
+\S4method{filter}{components}(obj, size = NULL, adducts = NULL,
+  isotopes = NULL, rtIncrement = NULL, mzIncrement = NULL)
+
 \S4method{findFGroup}{components}(obj, fGroup)
 
 \S4method{plotSpec}{components}(obj, index, markFGroup = NULL,
@@ -79,6 +83,29 @@ the consensus.}
 \item{drop}{ignored.}
 
 \item{name}{The component name (partially matched).}
+
+\item{size}{Should be a two sized vector with the minimum/maximum size of a
+component. Set to \code{NULL} to ignore.}
+
+\item{adducts}{Remove any feature groups within components that do not match
+given adduct rules. If \code{adducts} is a logical then only results are
+kept when an adduct is assigned (\code{adducts=TRUE}) or not assigned
+(\code{adducts=FALSE}). Otherwise, if \code{adducts} contains one or more
+\code{\link{adduct}} objects (or something that can be converted to it with
+\code{\link{as.adduct}}) then only results are kept that match the given
+adducts. Set to \code{NULL} to ignore this filter.}
+
+\item{isotopes}{Only keep results that match a given isotope rule. If
+\code{isotopes} is a logical then only results are kept with
+(\code{isotopes=TRUE}) or without (\code{isotopes=FALSE}) isotope
+assignment. Otherwise \code{isotopes} should be a numeric vector with
+isotope identifiers to keep (\emph{e.g.} \samp{0} for monoisotopic results,
+\samp{1} for \samp{M+1} results etc.). Set to \code{NULL} to ignore this
+filter.}
+
+\item{rtIncrement, mzIncrement}{Should be a two sized vector with the
+minimum/maximum retention or mz increment of a homologous series. Set to
+\code{NULL} to ignore.}
 
 \item{fGroup}{The name (thus a character) of the feature group that should be
 searched for.}
@@ -150,6 +177,8 @@ feature groups for which data is present in this object.
 
 \item \code{as.data.table}: Returns all component data in a table.
 
+\item \code{filter}: Provides rule based filtering for components.
+
 \item \code{findFGroup}: Returns the component id(s) to which a feature group
 belongs.
 
@@ -177,6 +206,11 @@ for each component. Use the \code{componentInfo} method for access.}
 the \code{algorithm} method for access.}
 }}
 
+\note{
+\code{filter} Applies only those filters for which a component has data
+  available. For instance, filtering by adduct will only filter any results
+  within a component if that component contains adduct information.
+}
 \section{S4 class hierarchy}{
  \itemize{   \item{\code{\link{workflowStep}}}   \itemize{     \item{\strong{\code{\link{components}}}}     \itemize{       \item{\code{\link{componentsReduced}}}       \item{\code{\link{componentsCamera}}}       \item{\code{\link{componentsIntClust}}}       \item{\code{\link{componentsRC}}}     }   } }
 }

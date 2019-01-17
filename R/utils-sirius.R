@@ -66,7 +66,7 @@ unifySirNames <- function(sir)
 }
 
 # get a command queue list that can be used with executeMultiProcess()
-getSiriusCommand <- function(precursorMZ, MSPList, MSMSPList, profile, ionization, ppmMax, elements,
+getSiriusCommand <- function(precursorMZ, MSPList, MSMSPList, profile, adduct, ppmMax, elements,
                              database, noise, withFingerID, fingerIDDatabase, topMost, extraOpts)
 {
     outPath <- tempfile("sirius")
@@ -74,6 +74,7 @@ getSiriusCommand <- function(precursorMZ, MSPList, MSMSPList, profile, ionizatio
 
     stopifnot(!file.exists(outPath))
 
+    ionization <- as.character(adduct, format = "sirius")
     mainArgs <- c("-p", profile,
                   "-i", ionization,
                   "-e", elements,

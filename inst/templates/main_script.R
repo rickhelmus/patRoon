@@ -93,8 +93,8 @@ formulas <- generateFormulas(fGroups, "sirius", plists, maxMzDev = 5,
 {{ endCodeBlock() }}
 {{ optionalCodeBlock(identOpts$algo == "MetFrag") }}
 compounds <- generateCompounds(fGroups, plists, "metfrag", method = "CL", dbRelMzDev = 5,
-                               fragRelMzDev = 5, fragAbsMzDev = 0.002, isPositive = {{ if (polarity == "positive") "TRUE" else "FALSE" }},
-                               adduct = {{ if (polarity == "positive") 1 else -1 }}, database = "pubchem", maxCandidatesToStop = 2500)
+                               fragRelMzDev = 5, fragAbsMzDev = 0.002,
+                               adduct = {{ if (polarity == "positive") "[M+H]+" else "[M-H]-" }}, database = "pubchem", maxCandidatesToStop = 2500)
 compounds <- addFormulaScoring(compounds, formulas, TRUE) {{ optionalLine(formulaOpts$algo != "") }}
 {{ endCodeBlock() }}
 {{ optionalCodeBlock(identOpts$algo == "SIRIUS") }}

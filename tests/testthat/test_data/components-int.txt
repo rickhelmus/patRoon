@@ -1,1 +1,1 @@
-A componentsIntClust object (derived from components -> workflowStep)Algorithm: intclustComponents: CMP1, CMP2, CMP3, CMP4 (4 total)Number of feature groups in components: 23 (total), 5.8 (mean), 2 - 8 (min - max)
+A componentsIntClust object (derived from components -> workflowStep)Algorithm: intclustComponents: CMP1, CMP2, CMP3, CMP4, CMP5, CMP6 (6 total)Number of feature groups in components: 50 (total), 8.3 (mean), 3 - 19 (min - max)

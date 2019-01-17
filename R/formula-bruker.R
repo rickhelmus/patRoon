@@ -23,19 +23,19 @@ simplifyDAFormula <- function(formula)
 #'   requires that features were obtained with
 #'   \code{\link{findFeaturesBruker}}. Unlike other algorithms, there is no
 #'   prior need to generate \code{\link[=MSPeakLists]{MS peak lists}}.
-#'   
+#'
 #' @param precursorMzSearchWindow Maximum \emph{m/z} deviation (Da) to find back feature data
 #'   of precursor/parent ions from MS/MS spectra (this data is not readily
 #'   available from \command{SmartFormula3D} results).
-#'   
+#'
 #' @template dasaveclose-args
-#' 
+#'
 #' @template DA-restart-note
-#' 
+#'
 #' @rdname formula-generation
 #' @export
 generateFormulasDA <- function(fGroups, precursorMzSearchWindow = 0.002, MSMode = "both",
-                               featThreshold = 0.75, save = TRUE, close = save)
+                               adduct, featThreshold = 0.75, save = TRUE, close = save)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
@@ -44,6 +44,8 @@ generateFormulasDA <- function(fGroups, precursorMzSearchWindow = 0.002, MSMode 
     checkmate::assertNumber(featThreshold, lower = 0, finite = TRUE, null.ok = TRUE, add = ac)
     assertDACloseSaveArgs(close, save, add = ac)
     checkmate::reportAssertions(ac)
+
+    adduct <- checkAndToAdduct(adduct)
 
     DA <- getDAApplication()
     anaInfo <- analysisInfo(fGroups)
@@ -67,7 +69,7 @@ generateFormulasDA <- function(fGroups, precursorMzSearchWindow = 0.002, MSMode 
         ana <- anaInfo$analysis[anai]
         DAAnaInd <- getDAFileIndex(DA, ana, anaInfo$path[anai])
         checkDAFMFCompounds(DA, fts[[ana]], DAAnaInd, TRUE)
-        
+
         printf("Loading all formulas from analysis '%s'...\n", ana)
 
         baseHash <- makeHash(fGroups, ana, precursorMzSearchWindow, MSMode)
@@ -166,9 +168,7 @@ generateFormulasDA <- function(fGroups, precursorMzSearchWindow = 0.002, MSMode 
                                 next
 
                             form <- simplifyDAFormula(parent[["SumFormula"]])
-
-                            # HACK: get neutral formula from SMF results
-                            nform <- ftable[[ftableCount]][formula == form, neutral_formula]
+                            nform <- calculateNeutralFormula(form, adduct)
 
                             dt <- data.table(neutral_formula = nform, formula = form, formula_mz = parent[["m_over_z"]],
                                              error = parent[["Error"]], mSigma = parent[["Sigma"]] * 1000,
@@ -234,7 +234,7 @@ generateFormulasDA <- function(fGroups, precursorMzSearchWindow = 0.002, MSMode 
         close(prog)
 
         closeSaveDAFile(DA, DAAnaInd, close, save)
-        
+
         ngrp <- length(fTable[[ana]])
         printf("Loaded %d formulas for %d features (%.2f%%).\n", countUniqueFormulas(fTable[[ana]]),
                ngrp, if (gCount == 0) 0 else ngrp * 100 / gCount)

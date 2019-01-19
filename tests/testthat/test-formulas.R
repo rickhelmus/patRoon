@@ -201,4 +201,8 @@ test_that("plotting works", {
     expect_equal(expect_plot(plotVenn(formsGF, formsSIR))$intersectionCounts,
                  length(consensus(formsGF, formsSIR, formThreshold = 1)))
     expect_equal(expect_plot(plotVenn(formsGF, formsSIREmpty))$intersectionCounts, 0)
+    
+    expect_plot(plotUpSet(formsGF, formsSIR))
+    expect_error(plotUpSet(formsGFEmpty, formsSIREmpty))
+    expect_error(plotUpSet(formsGF, formsSIREmpty))
 })

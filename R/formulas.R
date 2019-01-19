@@ -28,6 +28,8 @@ NULL
 #'   For \code{filter}: If \code{TRUE} then several filters are applied to
 #'   exclude unlikely formula candidates present in organic matter (OM). See
 #'   Source section for details.
+#' @param labels A \code{character} with names to use for labelling. If
+#'   \code{NULL} labels are automatically generated.
 #'
 #' @templateVar seli analyses
 #' @templateVar selOrderi analyses()
@@ -445,8 +447,6 @@ setMethod("plotSpec", "formulas", function(obj, precursor, groupName, analysis =
 #'   outlining unique and shared formula candidates of up to five different
 #'   \code{formulas} objects.
 #'
-#' @param labels A \code{character} with names to use for labelling. If
-#'   \code{NULL} labels are automatically generated.
 #' @param vennArgs A \code{list} with further arguments passed to
 #'   \pkg{VennDiagram} plotting functions. Set to \code{NULL} to ignore.
 #' 
@@ -475,6 +475,57 @@ setMethod("plotVenn", "formulas", function(obj, ..., labels = NULL, vennArgs = N
             return(data.table())
         fintersect(ctab1[, c("group", "formula")], ctab2[, c("group", "formula")])
     }, nrow), vennArgs))
+})
+
+#' @describeIn formulas plots an UpSet diagram (using the
+#'   \code{\link[UpSetR]{upset}} function) outlining unique and shared formula
+#'   candidates between different \code{formula} objects.
+#'
+#' @param nsets,nintersects See \code{\link[UpSetR]{upset}}.
+#' @param upsetArgs A list with any further arguments to be passed to
+#'   \code{\link[UpSetR]{upset}}. Set to \code{NULL} to ignore.
+#'
+#' @references \insertRef{Conway2017}{patRoon} \cr\cr
+#'   \insertRef{Lex2014}{patRoon}
+#'
+#' @export
+setMethod("plotUpSet", "formulas", function(obj, ..., labels = NULL, nsets = length(list(...)) + 1,
+                                            nintersects = NA, upsetArgs = NULL)
+{
+    allForms <- c(list(obj), list(...))
+    
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertList(allForms, types = "formulas", min.len = 2, any.missing = FALSE,
+                          unique = TRUE, .var.name = "...", add = ac)
+    checkmate::assertList(upsetArgs, names = "unique", null.ok = TRUE, add = ac)
+    checkmate::assertCount(nsets, positive = TRUE)
+    checkmate::assertCount(nintersects, positive = TRUE, na.ok = TRUE)
+    checkmate::reportAssertions(ac)
+    
+    if (is.null(labels))
+        labels <- make.unique(sapply(allForms, algorithm))
+
+    allFormTabs <- mapply(allForms, labels, SIMPLIFY = FALSE, FUN = function(f, l)
+    {
+        ret <- as.data.table(f)
+        if (length(ret) == 0)
+            ret <- data.table(group = character(), formula = character())
+        ret <- unique(ret[, c("group", "formula")])[, (l) := 1]
+    })
+    
+    formTab <- Reduce(function(f1, f2)
+    {
+        merge(f1, f2, by = c("group", "formula"), all = TRUE)
+    }, allFormTabs)
+    
+    formTab <- formTab[, labels, with = FALSE]
+    for (j in seq_along(formTab))
+        set(formTab, which(is.na(formTab[[j]])), j, 0)
+    
+    if (sum(sapply(formTab, function(x) any(x>0))) < 2)
+        stop("Need at least two non-empty objects to plot")
+    
+    do.call(UpSetR::upset, c(list(formTab, nsets = nsets, nintersects = nintersects), upsetArgs))
 })
 
 #' @describeIn formulas Generates a consensus of results from multiple

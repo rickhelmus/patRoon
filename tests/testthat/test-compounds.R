@@ -240,4 +240,8 @@ test_that("plotting works", {
     expect_equal(expect_plot(plotVenn(compsMF, compsSIR))$intersectionCounts,
                  length(consensus(compsMF, compsSIR, compThreshold = 1)))
     expect_equal(expect_plot(plotVenn(compsMF, compsSIREmpty))$intersectionCounts, 0)
+    
+    expect_plot(plotUpSet(compsMF, compsSIR))
+    expect_error(plotUpSet(compsMFEmpty, compsSIREmpty))
+    expect_error(plotUpSet(compsMF, compsSIREmpty))
 })

@@ -216,7 +216,7 @@ please refer to the linked method documentation for each generic.
 \code{plotUpSet} plots an UpSet diagram to assess unique and overlapping data.
 
 \itemize{
-    \item Methods are defined for: \code{\link[=plotUpSet,featureGroups-method]{featureGroups}}; \code{\link[=plotUpSet,featureGroupsComparison-method]{featureGroupsComparison}}.
+    \item Methods are defined for: \code{\link[=plotUpSet,compounds-method]{compounds}}; \code{\link[=plotUpSet,featureGroups-method]{featureGroups}}; \code{\link[=plotUpSet,featureGroupsComparison-method]{featureGroupsComparison}}; \code{\link[=plotUpSet,formulas-method]{formulas}}.
 }
 
 \code{replicateGroups} returns a \code{character} vector with the analyses for which data is present in this object.

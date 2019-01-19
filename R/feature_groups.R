@@ -936,6 +936,10 @@ setMethod("plotUpSet", "featureGroups", function(obj, which = NULL, nsets = leng
 
     gt <- as.data.table(obj, average = TRUE)
     gt[, (which) := lapply(.SD, function(x) as.integer(x > 0)), .SDcols = which]
+    
+    if (sum(sapply(gt[, which, with = FALSE], function(x) any(x>0))) < 2)
+        stop("Need at least two replicate groups with non-zero intensities")
+    
     UpSetR::upset(gt, nsets = nsets, nintersects = nintersects, ...)
 })
 

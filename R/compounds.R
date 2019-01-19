@@ -760,10 +760,7 @@ setMethod("plotSpec", "compounds", function(obj, index, groupName, MSPeakLists, 
 #'   outlining unique and shared compound candidates of up to five different
 #'   \code{compounds} objects. Comparison is made on \code{InChIKey1}.
 #'
-#' @param labels A \code{character} with names to use for labelling. If
-#'   \code{NULL} labels are automatically generated.
-#' @param vennArgs A \code{list} with further arguments passed to
-#'   \pkg{VennDiagram} plotting functions. Set to \code{NULL} to ignore.
+#' @inheritParams plotUpSet,formulas-method
 #' 
 #' @template plotvenn-ret
 #' 
@@ -790,6 +787,56 @@ setMethod("plotVenn", "compounds", function(obj, ..., labels = NULL, vennArgs = 
             return(data.table())
         fintersect(ctab1[, c("group", "InChIKey1")], ctab2[, c("group", "InChIKey1")])
     }, nrow), vennArgs))
+})
+
+#' @describeIn compounds plots an UpSet diagram (using the
+#'   \code{\link[UpSetR]{upset}} function) outlining unique and shared compound
+#'   candidates between different \code{compounds} objects. Comparison is made
+#'   on \code{InChIKey1}.
+#'
+#' @inheritParams plotUpSet,formulas-method
+#'
+#' @references \insertRef{Conway2017}{patRoon} \cr\cr
+#'   \insertRef{Lex2014}{patRoon}
+#'
+#' @export
+setMethod("plotUpSet", "compounds", function(obj, ..., labels = NULL, nsets = length(list(...)) + 1,
+                                             nintersects = NA, upsetArgs = NULL)
+{
+    allCompounds <- c(list(obj), list(...))
+    
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertList(allCompounds, types = "compounds", min.len = 2, any.missing = FALSE,
+                          unique = TRUE, .var.name = "...", add = ac)
+    checkmate::assertList(upsetArgs, names = "unique", null.ok = TRUE, add = ac)
+    checkmate::assertCount(nsets, positive = TRUE)
+    checkmate::assertCount(nintersects, positive = TRUE, na.ok = TRUE)
+    checkmate::reportAssertions(ac)
+    
+    if (is.null(labels))
+        labels <- make.unique(sapply(allCompounds, algorithm))
+    
+    allCompsTabs <- mapply(allCompounds, labels, SIMPLIFY = FALSE, FUN = function(f, l)
+    {
+        ret <- as.data.table(f)
+        if (length(ret) == 0)
+            ret <- data.table(group = character(), InChIKey1 = character())
+        ret <- unique(ret[, c("group", "InChIKey1")])[, (l) := 1]
+    })
+    
+    compTab <- Reduce(function(f1, f2)
+    {
+        merge(f1, f2, by = c("group", "InChIKey1"), all = TRUE)
+    }, allCompsTabs)
+    
+    compTab <- compTab[, labels, with = FALSE]
+    for (j in seq_along(compTab))
+        set(compTab, which(is.na(compTab[[j]])), j, 0)
+    
+    if (sum(sapply(compTab, function(x) any(x>0))) < 2)
+        stop("Need at least two non-empty objects to plot")
+    
+    do.call(UpSetR::upset, c(list(compTab, nsets = nsets, nintersects = nintersects), upsetArgs))
 })
 
 

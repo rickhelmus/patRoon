@@ -27,6 +27,7 @@
 \alias{plotScores}
 \alias{plotSpec,compounds-method}
 \alias{plotVenn,compounds-method}
+\alias{plotUpSet,compounds-method}
 \alias{consensus,compounds-method}
 \title{Compound lists class}
 \usage{
@@ -73,6 +74,9 @@
 
 \S4method{plotVenn}{compounds}(obj, ..., labels = NULL,
   vennArgs = NULL)
+
+\S4method{plotUpSet}{compounds}(obj, ..., labels = NULL,
+  nsets = length(list(...)) + 1, nintersects = NA, upsetArgs = NULL)
 
 \S4method{consensus}{compounds}(obj, ..., compThreshold = 0,
   minMaxNormalization = TRUE, mergeScoresFunc = sum)
@@ -186,6 +190,13 @@ spectrum.}
 \item{vennArgs}{A \code{list} with further arguments passed to
 \pkg{VennDiagram} plotting functions. Set to \code{NULL} to ignore.}
 
+\item{nsets}{See \code{\link[UpSetR]{upset}}.}
+
+\item{nintersects}{See \code{\link[UpSetR]{upset}}.}
+
+\item{upsetArgs}{A list with any further arguments to be passed to
+\code{\link[UpSetR]{upset}}. Set to \code{NULL} to ignore.}
+
 \item{compThreshold}{Minimal fraction (0-1) that a candidate must be present
 within all given \code{compounds} objects.}
 
@@ -288,6 +299,11 @@ compound of a feature group.
 outlining unique and shared compound candidates of up to five different
 \code{compounds} objects. Comparison is made on \code{InChIKey1}.
 
+\item \code{plotUpSet}: plots an UpSet diagram (using the
+\code{\link[UpSetR]{upset}} function) outlining unique and shared compound
+candidates between different \code{compounds} objects. Comparison is made
+on \code{InChIKey1}.
+
 \item \code{consensus}: Generates a consensus from multiple \code{compounds}
 objects. The compound results will be merged and optionally compounds will
 be filtered by their occurrence throughout the specified \code{compounds}
@@ -310,4 +326,7 @@ the \code{algorithm} method for access.}
 
 \references{
 \addCitations{rcdk}{1}
+
+\insertRef{Conway2017}{patRoon} \cr\cr
+  \insertRef{Lex2014}{patRoon}
 }

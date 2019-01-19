@@ -18,6 +18,7 @@
 \alias{filter,formulas-method}
 \alias{plotSpec,formulas-method}
 \alias{plotVenn,formulas-method}
+\alias{plotUpSet,formulas-method}
 \alias{consensus,formulas-method}
 \title{Formula lists class}
 \usage{
@@ -51,6 +52,9 @@
   MSPeakLists, useGGPlot2 = FALSE)
 
 \S4method{plotVenn}{formulas}(obj, ..., labels = NULL, vennArgs = NULL)
+
+\S4method{plotUpSet}{formulas}(obj, ..., labels = NULL,
+  nsets = length(list(...)) + 1, nintersects = NA, upsetArgs = NULL)
 
 \S4method{consensus}{formulas}(obj, ..., formThreshold = 0)
 }
@@ -165,6 +169,11 @@ faster.}
 \item{vennArgs}{A \code{list} with further arguments passed to
 \pkg{VennDiagram} plotting functions. Set to \code{NULL} to ignore.}
 
+\item{nsets, nintersects}{See \code{\link[UpSetR]{upset}}.}
+
+\item{upsetArgs}{A list with any further arguments to be passed to
+\code{\link[UpSetR]{upset}}. Set to \code{NULL} to ignore.}
+
 \item{formThreshold}{Fractional minimum amount (0-1) of which a formula
 candidate should be present within all objects. For instance, a value of
 \samp{0.5} means that a particular formula should be present in at least
@@ -242,6 +251,10 @@ formula of a feature or feature group.
 outlining unique and shared formula candidates of up to five different
 \code{formulas} objects.
 
+\item \code{plotUpSet}: plots an UpSet diagram (using the
+\code{\link[UpSetR]{upset}} function) outlining unique and shared formula
+candidates between different \code{formula} objects.
+
 \item \code{consensus}: Generates a consensus of results from multiple
 \code{formulas} objects.
 }}
@@ -277,4 +290,7 @@ the \code{algorithm} method for access.}
   \insertRef{Abdulla2013}{patRoon} \cr\cr
   \insertRef{Koch2006}{patRoon} \cr\cr
   \insertRef{Kujawinski2006}{patRoon}
+
+\insertRef{Conway2017}{patRoon} \cr\cr
+  \insertRef{Lex2014}{patRoon}
 }

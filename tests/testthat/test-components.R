@@ -6,8 +6,8 @@ fGroups <- getTestFGroups(getTestAnaInfo()[4:5, ], localMZRange = 0)
 fGroupsSimple <- fGroups[, 1:50]
 
 
-# fix seed for reproducible clustering
-withr::with_seed(20, compsRC <- generateComponents(fGroupsSimple, "ramclustr", ionization = "positive"))
+# fix seed for reproducible clustering, suppress warnings about <5 samples
+withr::with_seed(20, suppressWarnings(compsRC <- generateComponents(fGroupsSimple, "ramclustr", ionization = "positive")))
 # UNDONE: getting unknown NaN warnings here...
 suppressWarnings(compsCAM <- generateComponents(fGroupsSimple, "camera", ionization = "positive"))
 compsNT <- generateComponents(fGroups, "nontarget", ionization = "positive")

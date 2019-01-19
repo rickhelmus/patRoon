@@ -15,7 +15,8 @@
 \S4method{generateFormulas}{featureGroups}(fGroups, algorithm, ...)
 
 generateFormulasDA(fGroups, precursorMzSearchWindow = 0.002,
-  MSMode = "both", featThreshold = 0.75, save = TRUE, close = save)
+  MSMode = "both", adduct, featThreshold = 0.75, save = TRUE,
+  close = save)
 
 generateFormulasGenForm(fGroups, MSPeakLists, maxMzDev = 5,
   adduct = "[M+H]+", elements = "CHNOP", hetero = TRUE, oc = FALSE,
@@ -56,6 +57,10 @@ not predicted from MS/MS data (\emph{e.g.} due to poor/missing MS/MS data).
 Formulae calculated from MS data that were also generated from MS/MS data
 will be removed.}
 
+\item{adduct}{An \code{\link{adduct}} object (or something that can be
+converted to it with \code{\link{as.adduct}}). Examples: \code{"[M-H]-"},
+\code{"[M+Na]+"}.}
+
 \item{featThreshold}{If \code{calculateFeatures=TRUE}: minimum presence
 (\samp{0-1}) of a formula in all features before it is considered as a
 candidate for a feature group. For instance, \code{featThreshold} dictates
@@ -76,10 +81,6 @@ the supplied \code{fGroups}.}
 \emph{m/z} values (in ppm). Sets the \option{ppm} and
 \option{--ppm-max} commandline options for \command{GenForm} and
 \command{SIRIUS}, respectively.}
-
-\item{adduct}{An \code{\link{adduct}} object (or something that can be
-converted to it with \code{\link{as.adduct}}). Examples: \code{"[M-H]-"},
-\code{"[M+Na]+"}.}
 
 \item{elements}{Elements to be considered for formulae calculation. This will
 heavily affects the number of candidates! Always try to work with a minimal

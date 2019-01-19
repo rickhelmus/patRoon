@@ -216,7 +216,7 @@ setMethod("plot", "featureGroupsComparison", function(x, retMin = TRUE, ...) plo
 #' @template plotvenn-ret
 #' @rdname featureGroups-compare
 #' @export
-setMethod("plotVenn", "featureGroupsComparison", function(obj, which, ...) plotVenn(obj@comparedFGroups, which, ...))
+setMethod("plotVenn", "featureGroupsComparison", function(obj, which = NULL, ...) plotVenn(obj@comparedFGroups, which, ...))
 
 #' @details \code{plotUpSet} plots an UpSet diagram outlining unique and shared
 #'   feature groups.

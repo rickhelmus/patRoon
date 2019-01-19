@@ -100,7 +100,7 @@
 
 \S4method{plotVenn}{featureGroups}(obj, which = NULL, ...)
 
-\S4method{plotUpSet}{featureGroups}(obj, which = replicateGroups(obj),
+\S4method{plotUpSet}{featureGroups}(obj, which = NULL,
   nsets = length(which), nintersects = NA, ...)
 
 \S4method{unique}{featureGroups}(x, which, relativeTo = NULL,
@@ -201,7 +201,8 @@ and/or \emph{m/z} values will be drawn for each plotted feature group.}
 displayed when all EICs are being plot. Set to \code{"none"} to disable any
 annotation.}
 
-\item{which}{A character vector with replicate groups used for comparison.}
+\item{which}{A character vector with replicate groups used for comparison.
+For plotting functions: set to \code{NULL} for all replicate groups.}
 
 \item{nsets, nintersects}{See \code{\link[UpSetR]{upset}}.}
 
@@ -221,7 +222,7 @@ not unique to the given replicate groups.}
 \code{plotVenn} (invisibly) returns a list with the following fields: \itemize{
 \item \code{gList} the \code{gList} object that was returned by
   the utilized \pkg{\link{VennDiagram}} plotting function.
-\item \code{areas} The total area (\emph{i.e.} feature group count) for each plotted group.
+\item \code{areas} The total area for each plotted group.
 \item \code{intersectionCounts} The number of intersections between groups.
 }
 

@@ -80,7 +80,7 @@ abundance below this number will be removed from the consensus. Set to
 \code{plotVenn} (invisibly) returns a list with the following fields: \itemize{
 \item \code{gList} the \code{gList} object that was returned by
   the utilized \pkg{\link{VennDiagram}} plotting function.
-\item \code{areas} The total area (\emph{i.e.} feature group count) for each plotted group.
+\item \code{areas} The total area for each plotted group.
 \item \code{intersectionCounts} The number of intersections between groups.
 }
 

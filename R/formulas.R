@@ -15,11 +15,12 @@ NULL
 #'   the \code{algorithm} method for access.
 #'
 #' @param obj,x,object,formulas The \code{formulas} object.
-#' @param \dots \code{consensus}: One or more \code{formulas} objects that should be used to
-#'   generate the consensus.
+#' @param \dots \code{plotVenn}: other \code{formulas} objects that should be
+#'   compared.
 #'
-#'   \code{as.data.frame}: Arguments passed to \code{as.data.table}.
-#' @param OM For \code{as.data.table}/\code{as.data.frame}: if set to \code{TRUE} several columns
+#'   \code{consensus}: One or more \code{formulas} objects that should be used
+#'   to generate the consensus.
+#' @param OM For \code{as.data.table}: if set to \code{TRUE} several columns
 #'   with information relevant for organic matter (OM) characterization will be
 #'   added (e.g. elemental ratios, classification). This will also make sure
 #'   that \code{countElements} contains at least C, H, N, O, P and S.
@@ -438,6 +439,42 @@ setMethod("plotSpec", "formulas", function(obj, precursor, groupName, analysis =
         return(makeMSPlotGG(spec, fi) + ggtitle(precursor))
 
     makeMSPlot(spec, fi, main = precursor)
+})
+
+#' @describeIn formulas plots a Venn diagram (using \pkg{\link{VennDiagram}})
+#'   outlining unique and shared formula candidates of up to five different
+#'   \code{formulas} objects.
+#'
+#' @param labels A \code{character} with names to use for labelling. If
+#'   \code{NULL} labels are automatically generated.
+#' @param vennArgs A \code{list} with further arguments passed to
+#'   \pkg{VennDiagram} plotting functions. Set to \code{NULL} to ignore.
+#' 
+#' @template plotvenn-ret
+#' 
+#' @export
+setMethod("plotVenn", "formulas", function(obj, ..., labels = NULL, vennArgs = NULL)
+{
+    allForms <- c(list(obj), list(...))
+    
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertList(allForms, types = "formulas", min.len = 2, any.missing = FALSE,
+                          unique = TRUE, .var.name = "...", add = ac)
+    checkmate::assertList(vennArgs, names = "unique", null.ok = TRUE, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    if (is.null(labels))
+        labels <- make.unique(sapply(allForms, algorithm))
+    if (is.null(vennArgs))
+        vennArgs <- list()
+    
+    do.call(makeVennPlot, c(list(allForms, labels, lengths(allForms), function(obj1, obj2)
+    {
+        ctab1 <- as.data.table(obj1); ctab2 <- as.data.table(obj2)
+        if (length(ctab1) == 0 || length(ctab2) == 0)
+            return(data.table())
+        fintersect(ctab1[, c("group", "formula")], ctab2[, c("group", "formula")])
+    }, nrow), vennArgs))
 })
 
 #' @describeIn formulas Generates a consensus of results from multiple

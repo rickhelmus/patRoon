@@ -230,4 +230,14 @@ test_that("plotting works", {
     # expect_doppel("struct", function() plotStructure(compsMFIso, 1, names(compoundTable(compsMFIso))[1]))
     expect_plot(plotStructure(compsMFIso, 1, names(compoundTable(compsMFIso))[1]))
     expect_doppel("scores", function() plotScores(compsMFIso, 1, names(compoundTable(compsMFIso))[1]))
+    
+    skip_if_not(doSIRIUS)
+    expect_doppel("venn", function() plotVenn(compsMF, compsSIR))
+    expect_error(plotVenn(compsMFEmpty, compsSIREmpty))
+    expect_equal(expect_plot(plotVenn(compsMF, compsSIR))$areas[2], length(compsSIR))
+    expect_equal(expect_plot(plotVenn(compsMF, compsSIREmpty))$areas[1], length(compsMF))
+    expect_equal(expect_plot(plotVenn(compsMFEmpty, compsSIR))$areas[2], length(compsSIR))
+    expect_equal(expect_plot(plotVenn(compsMF, compsSIR))$intersectionCounts,
+                 length(consensus(compsMF, compsSIR, compThreshold = 1)))
+    expect_equal(expect_plot(plotVenn(compsMF, compsSIREmpty))$intersectionCounts, 0)
 })

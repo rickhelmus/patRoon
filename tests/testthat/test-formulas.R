@@ -163,8 +163,7 @@ test_that("consensus works", {
     expect_known_show(fCons, testFile("formulas-cons", text = TRUE))
     expect_setequal(groupNames(consensus(formsGF, formsSIR)), union(groupNames(formsGF), groupNames(formsSIR)))
     expect_lt(length(consensus(formsGF, formsSIR, formThreshold = 1)), length(fCons))
-    expect_length(consensus(formsGFEmpty,
-                            generateFormulas(fGroupsEmpty, "sirius", plistsEmpty)), 0)
+    expect_length(consensus(formsGFEmpty, formsSIREmpty), 0)
 })
 
 test_that("reporting works", {
@@ -192,4 +191,14 @@ test_that("plotting works", {
     #                                                 useGGPlot2 = TRUE))
     expect_plot(print(plotSpec(formsGFWithMSMS, plotPrec, groupNames(formsGFWithMSMS)[1], MSPeakLists = plists,
                                useGGPlot2 = TRUE)))
+    
+    skip_if_not(doSIRIUS)
+    expect_doppel("venn", function() plotVenn(formsGF, formsSIR))
+    expect_error(plotVenn(formsGFEmpty, formsSIREmpty))
+    expect_equal(expect_plot(plotVenn(formsGF, formsSIR))$areas[2], length(formsSIR))
+    expect_equal(expect_plot(plotVenn(formsGF, formsSIREmpty))$areas[1], length(formsGF))
+    expect_equal(expect_plot(plotVenn(formsGFEmpty, formsSIR))$areas[2], length(formsSIR))
+    expect_equal(expect_plot(plotVenn(formsGF, formsSIR))$intersectionCounts,
+                 length(consensus(formsGF, formsSIR, formThreshold = 1)))
+    expect_equal(expect_plot(plotVenn(formsGF, formsSIREmpty))$intersectionCounts, 0)
 })

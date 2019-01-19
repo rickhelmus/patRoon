@@ -70,7 +70,7 @@ plotSpec(obj, ...)
 
 plotStructure(obj, ...)
 
-plotVenn(obj, which = NULL, ...)
+plotVenn(obj, ...)
 
 plotUpSet(obj, ...)
 
@@ -92,8 +92,6 @@ represent non-shared data.}
 
 \item{addRetMzPlots}{Set to \code{TRUE} to enable \emph{m/z} \emph{vs}
 retention time scatter plots.}
-
-\item{which}{What should be plotted. See method documentation for specifics.}
 
 \item{k, h}{Desired numbers of clusters. See \code{\link{cutree}}.}
 
@@ -212,7 +210,7 @@ please refer to the linked method documentation for each generic.
 \code{plotVenn} plots a Venn diagram to assess unique and overlapping data.
 
 \itemize{
-    \item Methods are defined for: \code{\link[=plotVenn,featureGroups-method]{featureGroups}}; \code{\link[=plotVenn,featureGroupsComparison-method]{featureGroupsComparison}}.
+    \item Methods are defined for: \code{\link[=plotVenn,compounds-method]{compounds}}; \code{\link[=plotVenn,featureGroups-method]{featureGroups}}; \code{\link[=plotVenn,featureGroupsComparison-method]{featureGroupsComparison}}; \code{\link[=plotVenn,formulas-method]{formulas}}.
 }
 
 \code{plotUpSet} plots an UpSet diagram to assess unique and overlapping data.

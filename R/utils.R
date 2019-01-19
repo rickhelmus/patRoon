@@ -414,6 +414,58 @@ normalize <- function(x, minMax)
 # from https://stackoverflow.com/a/38228840
 countCharInStr <- function(str, ch) sum(charToRaw(str) == charToRaw(ch))
 
+makeVennPlot <- function(plotObjects, categories, areas, intersectFunc,
+                         intersectLenFunc, ...)
+{
+    nobj <- length(plotObjects)
+    areas <- unname(areas) # do.call below won't work with names
+    
+    if (all(areas == 0))
+        stop("Cannot plot Venn when all objects are empty")
+    
+    fill <- getBrewerPal(nobj, "Paired")
+    vennArgs <- list(category = categories, lty = rep("blank", nobj), alpha = rep(0.5, nobj),
+                     cex = 1.5, cat.cex = 1.5, fill = fill)
+    vennArgs <- modifyList(vennArgs, list(...))
+    
+    getIntersectCounts <- function(inters) sapply(inters,
+                                                  function(i) intersectLenFunc(Reduce(intersectFunc, plotObjects[i])))
+    
+    grid::grid.newpage() # need to clear plot region manually
+    # plot.new()
+    
+    if (nobj == 1)
+        gRet <- do.call(draw.single.venn, c(list(area = areas), vennArgs))
+    else if (nobj == 2)
+    {
+        icounts <- getIntersectCounts(list(c(1, 2)))
+        gRet <- do.call(draw.pairwise.venn, c(areas, icounts,
+                                              list(rotation.degree = if (areas[1] < areas[2]) 180 else 0), vennArgs))
+    }
+    else if (nobj == 3)
+    {
+        icounts <- getIntersectCounts(list(c(1, 2), c(2, 3), c(1, 3), c(1, 2, 3)))
+        gRet <- do.call(draw.triple.venn, c(areas, icounts, vennArgs))
+    }
+    else if (nobj == 4)
+    {
+        icounts <- getIntersectCounts(list(c(1, 2), c(1, 3), c(1, 4), c(2, 3), c(2, 4), c(3, 4),
+                                           c(1, 2, 3), c(1, 2, 4), c(1, 3, 4), c(2, 3, 4), c(1, 2, 3, 4)))
+        gRet <- do.call(draw.quad.venn, c(areas, icounts, vennArgs))
+    }
+    else if (nobj == 5)
+    {
+        icounts <- getIntersectCounts(list(c(1, 2), c(1, 3), c(1, 4), c(1, 5), c(2, 3), c(2, 4), c(2, 5), c(3, 4),
+                                           c(3, 5), c(4, 5), c(1, 2, 3), c(1, 2, 4), c(1, 2, 5), c(1, 3, 4), c(1, 3, 5),
+                                           c(1, 4, 5), c(2, 3, 4), c(2, 3, 5), c(2, 4, 5), c(3, 4, 5),
+                                           c(1, 2, 3, 4), c(1, 2, 3, 5), c(1, 2, 4, 5), c(1, 3, 4, 5), c(2, 3, 4, 5),
+                                           c(1, 2, 3, 4, 5)))
+        gRet <- do.call(draw.quintuple.venn, c(areas, icounts, vennArgs))
+    }
+    
+    invisible(list(gList = gRet, areas = areas, intersectionCounts = icounts))
+}
+
 makeMSPlot <- function(spec, fragInfo, ..., extraHeightInch = 0)
 {
     hasFragInfo <- !is.null(fragInfo) && nrow(fragInfo) > 0

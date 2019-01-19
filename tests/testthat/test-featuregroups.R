@@ -210,6 +210,11 @@ test_that("plotting works", {
 
     expect_doppel("venn", function() plotVenn(fgOpenMS))
     expect_doppel("venn-comp", function() plotVenn(fGCompOpenMS))
+    expect_equal(expect_plot(plotVenn(fgOpenMS, which = c("solvent", "standard")))$areas[2],
+                 length(filter(fgOpenMS, rGroups = "standard")))
+    expect_equal(expect_plot(plotVenn(fGCompOpenMS))$areas[2], length(fgXCMS))
+    expect_equal(expect_plot(plotVenn(fGCompOpenMS))$intersectionCounts,
+                 length(consensus(fGCompOpenMS, relAbundance = 1)))
 
     # vdiffr doesn't work with UpSet
     expect_plot(plotUpSet(fgOpenMS))

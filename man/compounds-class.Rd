@@ -26,6 +26,7 @@
 \alias{plotScores,compounds-method}
 \alias{plotScores}
 \alias{plotSpec,compounds-method}
+\alias{plotVenn,compounds-method}
 \alias{consensus,compounds-method}
 \title{Compound lists class}
 \usage{
@@ -70,6 +71,9 @@
 \S4method{plotSpec}{compounds}(obj, index, groupName, MSPeakLists,
   formulas = NULL, plotStruct = TRUE, useGGPlot2 = FALSE)
 
+\S4method{plotVenn}{compounds}(obj, ..., labels = NULL,
+  vennArgs = NULL)
+
 \S4method{consensus}{compounds}(obj, ..., compThreshold = 0,
   minMaxNormalization = TRUE, mergeScoresFunc = sum)
 }
@@ -80,8 +84,7 @@
 their index or name, respectively (for the order/names see \code{groupNames()}).\cr\cr For \code{[}: Can also be logical to perform logical selection
 (similar to regular vectors). If missing all feature groups are selected.\cr\cr For \code{[[}: should be a skalar value.}
 
-\item{\dots}{\code{compounds} objects that should be used to generate the
-consensus.}
+\item{\dots}{Any further (and unique) \code{compounds} objects.}
 
 \item{drop, j}{ignored.}
 
@@ -177,6 +180,12 @@ generate the candidate}
 \item{plotStruct}{If \code{TRUE} then the candidate structure is drawn in the
 spectrum.}
 
+\item{labels}{A \code{character} with names to use for labelling. If
+\code{NULL} labels are automatically generated.}
+
+\item{vennArgs}{A \code{list} with further arguments passed to
+\pkg{VennDiagram} plotting functions. Set to \code{NULL} to ignore.}
+
 \item{compThreshold}{Minimal fraction (0-1) that a candidate must be present
 within all given \code{compounds} objects.}
 
@@ -204,6 +213,17 @@ normalized.}
 
 \code{getMCS} returns an \CRANpkg{rcdk} molecule object
   (\code{IAtomContainer}).
+
+\code{plotVenn} (invisibly) returns a list with the following fields: \itemize{
+\item \code{gList} the \code{gList} object that was returned by
+  the utilized \pkg{\link{VennDiagram}} plotting function.
+\item \code{areas} The total area for each plotted group.
+\item \code{intersectionCounts} The number of intersections between groups.
+}
+
+The order for the \code{areas} and \code{intersectionCounts} fields is the same as the parameter order
+from the used plotting function (see \emph{e.g.} \code{\link{draw.pairwise.venn}} and
+\code{\link{draw.triple.venn}}).
 
 \code{consensus} returns a \code{compounds} object that is produced
   by merging multiple specified \code{compounds} objects.
@@ -263,6 +283,10 @@ substructure (MCS) of the selected candidates is drawn.
 
 \item \code{plotSpec}: Plots an annotated spectrum for a given candidate
 compound of a feature group.
+
+\item \code{plotVenn}: plots a Venn diagram (using \pkg{\link{VennDiagram}})
+outlining unique and shared compound candidates of up to five different
+\code{compounds} objects. Comparison is made on \code{InChIKey1}.
 
 \item \code{consensus}: Generates a consensus from multiple \code{compounds}
 objects. The compound results will be merged and optionally compounds will

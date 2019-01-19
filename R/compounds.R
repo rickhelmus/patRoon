@@ -24,7 +24,8 @@ NULL
 #'   \samp{-1} may be specified to these methods to select all candidates. When
 #'   multiple indices are specified for \code{plotStructure}, their maximum
 #'   common substructure will be drawn.
-#'
+#' @param \dots Any further (and unique) \code{compounds} objects.
+#' 
 #' @templateVar seli feature groups
 #' @templateVar selOrderi groupNames()
 #' @templateVar dollarOpName feature group
@@ -755,6 +756,42 @@ setMethod("plotSpec", "compounds", function(obj, index, groupName, MSPeakLists, 
     }
 })
 
+#' @describeIn compounds plots a Venn diagram (using \pkg{\link{VennDiagram}})
+#'   outlining unique and shared compound candidates of up to five different
+#'   \code{compounds} objects. Comparison is made on \code{InChIKey1}.
+#'
+#' @param labels A \code{character} with names to use for labelling. If
+#'   \code{NULL} labels are automatically generated.
+#' @param vennArgs A \code{list} with further arguments passed to
+#'   \pkg{VennDiagram} plotting functions. Set to \code{NULL} to ignore.
+#' 
+#' @template plotvenn-ret
+#' 
+#' @export
+setMethod("plotVenn", "compounds", function(obj, ..., labels = NULL, vennArgs = NULL)
+{
+    allCompounds <- c(list(obj), list(...))
+    
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertList(allCompounds, types = "compounds", min.len = 2, any.missing = FALSE,
+                          unique = TRUE, .var.name = "...", add = ac)
+    checkmate::assertList(vennArgs, names = "unique", null.ok = TRUE, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    if (is.null(labels))
+        labels <- make.unique(sapply(allCompounds, algorithm))
+    if (is.null(vennArgs))
+        vennArgs <- list()
+
+    do.call(makeVennPlot, c(list(allCompounds, labels, lengths(allCompounds), function(obj1, obj2)
+    {
+        ctab1 <- as.data.table(obj1); ctab2 <- as.data.table(obj2)
+        if (length(ctab1) == 0 || length(ctab2) == 0)
+            return(data.table())
+        fintersect(ctab1[, c("group", "InChIKey1")], ctab2[, c("group", "InChIKey1")])
+    }, nrow), vennArgs))
+})
+
 
 setMethod("mergedCompoundNames", "compounds", function(compounds) character(0))
 setMethod("mergedCompoundNames", "compoundsConsensus", function(compounds) compounds@mergedCompNames)
@@ -764,8 +801,6 @@ setMethod("mergedCompoundNames", "compoundsConsensus", function(compounds) compo
 #'   be filtered by their occurrence throughout the specified \code{compounds}
 #'   objects.
 #'
-#' @param \dots \code{compounds} objects that should be used to generate the
-#'   consensus.
 #' @param compThreshold Minimal fraction (0-1) that a candidate must be present
 #'   within all given \code{compounds} objects.
 #' @param mergeScoresFunc Function used to calculate the total score for all

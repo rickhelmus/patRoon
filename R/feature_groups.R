@@ -24,6 +24,7 @@ NULL
 #'   \code{\link[UpSetR]{upset}} (\code{plotUpSet}).
 #' @param average Average data within replicate groups.
 #' @param which A character vector with replicate groups used for comparison.
+#'   For plotting functions: set to \code{NULL} for all replicate groups.
 #'
 #' @templateVar seli analyses
 #' @templateVar selOrderi analyses()
@@ -956,13 +957,17 @@ setMethod("plotVenn", "featureGroups", function(obj, which, ...)
 #'   \insertRef{Lex2014}{patRoon}
 #'
 #' @export
-setMethod("plotUpSet", "featureGroups", function(obj, which = replicateGroups(obj), nsets = length(which),
+setMethod("plotUpSet", "featureGroups", function(obj, which = NULL, nsets = length(which),
                                                  nintersects = NA, ...)
 {
     rGroups <- replicateGroups(obj)
-
+    if (is.null(which))
+        which <- rGroups
+    
     ac <- checkmate::makeAssertCollection()
     checkmate::assertSubset(which, rGroups, empty.ok = FALSE, add = ac)
+    checkmate::assertCount(nsets, positive = TRUE)
+    checkmate::assertCount(nintersects, positive = TRUE, na.ok = TRUE)
     checkmate::reportAssertions(ac)
 
     if (length(obj) == 0)
@@ -989,13 +994,14 @@ setMethod("unique", "featureGroups", function(x, which, relativeTo = NULL, outer
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertCharacter(which, min.len = 1, min.chars = 1, any.missing = FALSE, add = ac)
+    checkmate::assertSubset(which, replicateGroups(x), empty.ok = FALSE, add = ac)
     checkmate::assertCharacter(relativeTo, min.len = 1, min.chars = 1, any.missing = FALSE,
                                null.ok = TRUE, add = ac)
     checkmate::assertFlag(outer, add = ac)
     checkmate::reportAssertions(ac)
 
     if (is.null(relativeTo))
-        relativeTo <- unique(analysisInfo(x)$group)
+        relativeTo <- replicateGroups(x)
     else
     {
         relativeTo <- union(which, relativeTo)
@@ -1032,6 +1038,7 @@ setMethod("overlap", "featureGroups", function(fGroups, which, exclusive)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertCharacter(which, min.len = 2, min.chars = 1, any.missing = FALSE, add = ac)
+    checkmate::assertSubset(which, replicateGroups(fGroups), empty.ok = FALSE, add = ac)
     checkmate::assertFlag(exclusive, add = ac)
     checkmate::reportAssertions(ac)
 

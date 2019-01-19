@@ -164,7 +164,9 @@ setMethod("as.data.table", "compounds", function(x, fGroups = NULL, fragments = 
         setcolorder(ret, c("group", "ret", "group_mz"))
     }
 
-    return(ret[, -"fragInfo"])
+    if (!is.null(ret[["fragInfo"]]))
+        return(ret[, -"fragInfo"]) # not there if empty results
+    return(ret)
 })
 
 #' @describeIn compounds Returns a list containing for each feature group a

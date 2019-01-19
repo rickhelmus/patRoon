@@ -562,7 +562,7 @@ setMethod("consensus", "formulas", function(obj, ..., formThreshold = 0)
         if (length(leftCols) > 0)
             setnames(consFormulaList[[grpi]], leftCols, deDupCols)
 
-        consFormulaList[[grpi]][, coverage := (sapply(mergedBy, countCharInStr, ",") + 1) / length(allFormulas)]
+        consFormulaList[[grpi]][, coverage := length(unique(unlist(strsplit(mergedBy, ",")))) / length(allFormulas), by = "formula"]
 
         if (formThreshold > 0)
             consFormulaList[[grpi]] <- consFormulaList[[grpi]][coverage >= formThreshold]

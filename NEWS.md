@@ -1,6 +1,7 @@
 # patRoon 0.1.0.9000
 
 ## January 2019
+* Fixed: coverage calculation for consensus formulas now correctly based on precursor overlap (was overlap of precursor+fragment).
 * `filter()` method for components.
 * DataAnalysis formula generation: fixed neutral formula calculation if `MSMode="msms"`, now needs `adduct` argument.
 * Neutral loss filter for compounds.

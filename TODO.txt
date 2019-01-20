@@ -47,7 +47,6 @@ MSPeakLists
 - isotope tagging is lost after averaging
 - most intense analysis as alternative to averaging?
 - report spectra/tables?
-- don't subset on analyses? or re-average? if no, mention in docs
 - collapse averagedPeakLists
 - test avg params
 

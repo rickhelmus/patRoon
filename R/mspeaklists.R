@@ -126,9 +126,13 @@ setMethod("show", "MSPeakLists", function(object)
 
 #' @describeIn MSPeakLists Subset on analyses/feature groups.
 #' @param \dots Ignored.
+#' @param reAverage Set to \code{TRUE} to regenerate averaged MS peak lists
+#'   after subsetting analyses.
 #' @export
-setMethod("[", c("MSPeakLists", "ANY", "ANY", "missing"), function(x, i, j, ...)
+setMethod("[", c("MSPeakLists", "ANY", "ANY", "missing"), function(x, i, j, ..., reAverage = TRUE, drop = TRUE)
 {
+    checkmate::assertFlag(reAverage)
+
     if (!missing(i))
         assertSubsetArg(i)
     if (!missing(j))
@@ -141,6 +145,10 @@ setMethod("[", c("MSPeakLists", "ANY", "ANY", "missing"), function(x, i, j, ...)
         if (!is.character(i))
             i <- analyses(x)[i]
         x@peakLists <- pruneList(x@peakLists[i])
+
+        # update group averaged peak lists
+        if (reAverage)
+            x@averagedPeakLists <- do.call(averageMSPeakLists, c(list(peakLists(x)), x@avgPeakListArgs))
     }
 
     if (!missing(j))

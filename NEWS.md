@@ -1,6 +1,7 @@
 # patRoon 0.1.0.9000
 
 ## January 2019
+* Various small additions to newProject()
 * `reportMD()`: added table with annotated fragments for compounds/formulas
 * `consensus()` updates
     * `consensus()` methods now support extracting unique data. This also replaces the `unique()` method that was defined for `featureGroupsComparison`.

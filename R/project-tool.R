@@ -1,9 +1,9 @@
 #' @include main.R
 NULL
 
-getScriptCode <- function(destination, analysisTableFile, DAMethod, dataPretreatments,
+getScriptCode <- function(destination, generateAnaInfo, analysisTableFile, analyses, DAMethod, dataPretreatments,
                           featFinder, featGrouper, intThreshold, replThreshold,
-                          blankThreshold, filterRepetitions, peakListGenerator, formulaGenerator,
+                          blankThreshold, filterRepetitions, peakListGenerator, precursorMzWindow, formulaGenerator,
                           compIdentifier, componentGenerator, polarity, reportFormats)
 {
     optionalCodeBlock <- function(e) if (e) "<<startCodeBlock>>" else "<<skipCodeBlock>>"
@@ -22,8 +22,10 @@ getScriptCode <- function(destination, analysisTableFile, DAMethod, dataPretreat
     componentOpts = list(algo = componentGenerator)
     sldest <- gsub("\\", "/", destination, fixed = TRUE) # BUG: tmpl() seems to eat backslashes!? Convert to forward slashes for now
     template <- tmpl(readAllFile(system.file("templates", "main_script.R", package = "patRoon")),
-                     destination = sldest, analysisTableFile = analysisTableFile,
+                     destination = sldest, generateAnaInfo = generateAnaInfo, analysisTableFile = analysisTableFile,
+                     analyses = analyses,
                      doMSPeakFind = formulaGenerator != "" || compIdentifier != "",
+                     precursorMzWindow = precursorMzWindow,
                      polarity = polarity, reportFormats = reportFormats)
 
     ret <- template
@@ -40,10 +42,10 @@ getScriptCode <- function(destination, analysisTableFile, DAMethod, dataPretreat
     return(ret)
 }
 
-doCreateProject <- function(destination, scriptFile, analyses, analysisTableFile, DAMethod, dataPretreatments,
-                            featFinder, featGrouper, intThreshold, replThreshold, blankThreshold,
-                            filterRepetitions, peakListGenerator, formulaGenerator,
-                            compIdentifier, componentGenerator, polarity, reportFormats)
+doCreateProject <- function(destination, scriptFile, createRStudioProj, generateAnaInfo, analyses, analysisTableFile,
+                            DAMethod, dataPretreatments, featFinder, featGrouper, intThreshold,
+                            replThreshold, blankThreshold, filterRepetitions, peakListGenerator, precursorMzWindow,
+                            formulaGenerator, compIdentifier, componentGenerator, polarity, reportFormats)
 {
     mkdirp(destination)
 
@@ -51,12 +53,13 @@ doCreateProject <- function(destination, scriptFile, analyses, analysisTableFile
     analyses[, group := ifelse(!nzchar(group), analysis, group)]
 
     # Make analysis table
-    write.csv(analyses[, c("path", "analysis", "group", "ref")], file.path(destination, analysisTableFile),
-              row.names = FALSE)
+    if (generateAnaInfo != "none")
+        write.csv(analyses[, c("path", "analysis", "group", "ref")], file.path(destination, analysisTableFile),
+                  row.names = FALSE)
 
-    code <- getScriptCode(destination, analysisTableFile, DAMethod, dataPretreatments,
+    code <- getScriptCode(destination, generateAnaInfo, analysisTableFile, analyses, DAMethod, dataPretreatments,
                           featFinder, featGrouper, intThreshold, replThreshold, blankThreshold,
-                          filterRepetitions, peakListGenerator, formulaGenerator,
+                          filterRepetitions, peakListGenerator, precursorMzWindow, formulaGenerator,
                           compIdentifier, componentGenerator, polarity, reportFormats)
     if (is.null(scriptFile))
     {
@@ -67,7 +70,14 @@ doCreateProject <- function(destination, scriptFile, analyses, analysisTableFile
     {
         sp <- file.path(destination, scriptFile)
         writeChar(code, file.path(destination, scriptFile))
-        navigateToFile(sp)
+
+        if (createRStudioProj)
+        {
+            rstudioapi::initializeProject(destination)
+            rstudioapi::openProject(destination)
+        }
+        else
+            navigateToFile(sp)
     }
 }
 
@@ -91,11 +101,14 @@ getNewProjectUI <- function()
                          miniContentPanel(
                              fillCol(
                                  fileSelect("destinationPath", "projectDestButton", "Project destination", "~/"),
-                                 radioButtons("outputScriptTo", "Insert code into", c("New file" = "newFile",
-                                                                                      "Current file" = "curFile")),
-                                 conditionalPanel(
-                                     condition = "input.outputScriptTo == \"newFile\"",
-                                     textInput("scriptFile", "Script file", "process.R")
+                                 fillRow(
+                                     radioButtons("outputScriptTo", "Insert code into", c("New file" = "newFile",
+                                                                                          "Current file" = "curFile")),
+                                     conditionalPanel(
+                                         condition = "input.outputScriptTo == \"newFile\"",
+                                         textInput("scriptFile", "Script file", "process.R"),
+                                         checkboxInput("createRStudioProj", "Create RStudio project", value = TRUE)
+                                     )
                                  )
                              )
                          )
@@ -105,14 +118,30 @@ getNewProjectUI <- function()
                          miniContentPanel(
                              fillCol(
                                  flex = c(NA, 1),
-                                 textInput("analysisTableFile", "Analysis table output file", "analyses.csv"),
-                                 rHandsontableOutput("analysesHot")
+                                 fillRow(
+                                     height = 125,
+                                     radioButtons("generateAnaInfo", "Generate analysis information",
+                                                  c("None" = "none", "From new csv file" = "table",
+                                                    "Load in script" = "script")),
+                                     conditionalPanel(
+                                         condition = "input.generateAnaInfo == \"table\"",
+                                         textInput("analysisTableFile", "Analysis table output file", "analyses.csv")
+                                     )
+                                 ),
+                                 conditionalPanel(
+                                     condition = "input.generateAnaInfo != \"none\"",
+                                     rHandsontableOutput("analysesHot")
+                                 )
                              )
                          ),
 
-                         miniButtonBlock(
-                             actionButton("addAnalyses", "Add analyses from directory ..."),
-                             actionButton("removeAnalyses", "Remove")
+                         conditionalPanel(
+                             condition = "input.generateAnaInfo != \"none\"",
+                             miniButtonBlock(
+                                 actionButton("addAnalysesDir", "Add analyses from directory ..."),
+                                 actionButton("addAnalysesCSV", "Add analyses from csv file ..."),
+                                 actionButton("removeAnalyses", "Remove")
+                             )
                          )
             ),
             miniTabPanel("Bruker data pretreatment", icon = icon("upload"),
@@ -168,11 +197,16 @@ getNewProjectUI <- function()
                                              multiple = FALSE, width = "100%"),
                                  conditionalPanel(
                                      condition = "input.formulaGen != \"\" || input.compIdent != \"\"",
-                                     conditionalPanel(
-                                         condition = "input.formulaGen != \"\" || input.compIdent != \"\"",
+                                     fillRow(
+                                         height = 90,
                                          selectInput("peakListGen", "Peak list generator",
                                                      c("mzR", "Bruker DataAnalysis" = "Bruker"),
-                                                     "mzR", multiple = FALSE, width = "100%")
+                                                     "mzR", multiple = FALSE, width = "95%"),
+                                         conditionalPanel(
+                                             condition = "input.peakListGen == \"mzR\"",
+                                             numericInput("precursorMzWindow", "MS/MS precursor m/z search window", 8, width = "100%"),
+                                             textNote("The precursor m/z search window applied when finding MS/MS spectra. Set to zero for DIA experiments.")
+                                         )
                                      )
                                  ),
                                  conditionalPanel(
@@ -233,9 +267,9 @@ newProject <- function()
                 showDialog("Invalid destination", "Please select a destination path!", "")
             else if (input$outputScriptTo != "curFile" && input$scriptFile == "")
                 showDialog("No script file", "Please select a destination script file!", "")
-            else if (nrow(rValues$analyses) == 0)
-                showDialog("No analysis selected", "Please select some analyses!", "")
-            else if (file.exists(file.path(input$destinationPath, input$analysisTableFile)) &&
+            else if (input$generateAnaInfo != "none" && nrow(rValues$analyses) == 0)
+                showDialog("No analyses selected", "Please select some analyses!", "")
+            else if (input$generateAnaInfo != "none" && file.exists(file.path(input$destinationPath, input$analysisTableFile)) &&
                      !showQuestion("Analysis table file already exists",
                                    sprintf("Analysis table file already exists: '%s'.\nOverwrite?",
                                            file.path(input$destinationPath, input$analysisTableFile)),
@@ -251,16 +285,17 @@ newProject <- function()
             {
                 doCreateProject(input$destinationPath,
                                 if (input$outputScriptTo == "curFile") NULL else input$scriptFile,
-                                rValues$analyses, input$analysisTableFile, input$DAMethod, input$pretreat,
-                                input$featFinder, input$featGrouper, input$intThr, input$replThr,
-                                input$blankThr, input$filterRepetitions, input$peakListGen, input$formulaGen,
-                                input$compIdent, input$components, input$polarity, input$report)
+                                input$createRStudioProj, input$generateAnaInfo, rValues$analyses,
+                                input$analysisTableFile, input$DAMethod, input$pretreat, input$featFinder,
+                                input$featGrouper, input$intThr, input$replThr, input$blankThr, input$filterRepetitions,
+                                input$peakListGen, input$precursorMzWindow, input$formulaGen, input$compIdent, input$components,
+                                input$polarity, input$report)
                 stopApp(TRUE)
             }
         })
 
         observeEvent(input$projectDestButton, {
-            dest <- selectDirectory("Select destination directory")
+            dest <- selectDirectory("Select destination directory", path = input$destinationPath)
             if (!is.null(dest))
                 updateTextInput(session, "destinationPath", value = dest)
         })
@@ -274,7 +309,7 @@ newProject <- function()
             }
         })
 
-        observeEvent(input$addAnalyses, {
+        observeEvent(input$addAnalysesDir, {
             anaDir <- selectDirectory(path = "~/")
             if (!is.null(anaDir))
             {
@@ -289,6 +324,31 @@ newProject <- function()
                 setcolorder(dt, c("analysis", "type", "group", "ref", "path"))
 
                 rValues$analyses <- rbind(rValues$analyses, dt)
+            }
+        })
+
+        observeEvent(input$addAnalysesCSV, {
+            csvFile <- selectFile(path = "~/", filter = "csv files (*.csv)")
+            if (!is.null(csvFile))
+            {
+                csvTab <- tryCatch(fread(csvFile, select = c("path", "analysis", "group", "ref")),
+                                   error = function(e) FALSE)
+                if (is.logical(csvTab))
+                    showDialog("Error", "Failed to open/parse selected csv file!", "")
+                else
+                {
+                    exts <- mapply(csvTab$analysis, csvTab$path, FUN = function(ana, path)
+                    {
+                        fp <- file.path(path, ana)
+                        ret <- c("mzML", "mzXML", "d")
+                        ret <- ret[file.exists(paste0(fp, ".", ret))]
+                        ret[ret == "d"] <- "bruker"
+                        return(paste0(ret, collapse = ", "))
+                    })
+
+                    csvTab[, type := exts]
+                    rValues$analyses <- rbind(rValues$analyses, csvTab)
+                }
             }
 
         })

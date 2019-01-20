@@ -265,17 +265,22 @@ compoundsDT <- rbindlist(lapply(compFGroups, function(grp)
                         function(compi) paste0(getCompInfoList(ct, compi, TRUE, mn), collapse = "<br>"))
     infoTexts <- sprintf("<div style='max-width: 300px; max-height: 432px; border: 1px solid black; border-style: dotted; margin: 1px; padding: 1px; overflow: auto; white-space: nowrap; }'>%s</div>", infoTexts)
     
+    fiTables <- sapply(ct$fragInfo, function(fi) knitr::kable(fi[, -"PLIndex"], "html") %>%
+                           kableExtra::kable_styling(font_size = 11) %>%
+                           kableExtra::scroll_box(extra_css = "overflow: auto; height: 125px;"))
+    
     return(data.table(group = grpi,
                       "#" = seq_len(nrow(ct)),
                       compound = paste0(imgTags(stpaths), "<br>", infoTexts),
-                      spectrum = imgTags(sppaths),
+                      spectrum = paste0(imgTags(sppaths), "<br>", fiTables),
                       scores = imgTags(scpaths)))
 }))
 
 DT::datatable(compoundsDT, options = list(scrollX = TRUE, scrollY = "600px", deferRender = TRUE,
                                           dom = "lrtp", pageLength = 25, autoWidth = TRUE,
                                           ordering = FALSE,
-                                          columnDefs = list(list(visible = FALSE, targets = 0))),
+                                          columnDefs = list(list(visible = FALSE, targets = 0),
+                                                            list(className = "dt-center", targets = 3))),
               rownames = FALSE, escape = FALSE, elementId = "compoundsTable")
 ```
 
@@ -299,8 +304,18 @@ formulasDT <- rbindlist(lapply(formFGroups, function(grp)
     infoTexts <- sapply(precursors,
                         function(prec) paste0(getFormInfoList(rmdVars$formulas[[grp]], prec),
                                                               collapse = "<br>"))
-        
-    ret <- data.table(group = grpi, spectrum = imgTags(sppaths), info = infoTexts)
+    
+    fiTables <- sapply(precursors, function(prec)
+    {
+        knitr::kable(getFragmentInfoFromForms(rmdVars$MSPeakLists[[grp]][["MSMS"]],
+                                              rmdVars$formulas[[grp]][formula == prec])[, -"PLIndex"], "html") %>%
+                           kableExtra::kable_styling(font_size = 11) %>%
+                           kableExtra::scroll_box(extra_css = "overflow: auto; height: 125px;")
+    })
+    
+    ret <- data.table(group = grpi,
+                      spectrum = paste0(imgTags(sppaths), "<br>", fiTables),
+                      info = infoTexts)
 
     return(ret)
 }))

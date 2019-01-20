@@ -149,12 +149,20 @@ test_that("verify feature group comparison", {
     expect_known_value(groups(fGCons), testFile("fg-comp-cons"))
 
     expect_lt(length(consensus(fGCompOpenMS, relAbundance = 1)), length(fGCons))
-    expect_lt((length(unique(fGCompOpenMS, which = "openms")) +
-                  length(unique(fGCompOpenMS, which = "xcms"))), length(fGCons))
     expect_length(fgCompOneEmpty, 2)
     expect_length(fGConsOneEmpty, length(fgOpenMS))
     expect_length(fgCompBothEmpty, 2)
     expect_length(fGConsBothEmpty, 0)
+    
+    expect_equal(length(consensus(fGCompOpenMS, uniqueFrom = 1)) +
+                 length(consensus(fGCompOpenMS, uniqueFrom = 2)) +
+                 length(consensus(fGCompOpenMS, relAbundance = 1)), length(fGCons))
+    expect_equal(length(consensus(fGCompOpenMS, uniqueFrom = 1:2, uniqueOuter = TRUE)) +
+                 length(consensus(fGCompOpenMS, relAbundance = 1)), length(fGCons))
+    expect_length(consensus(fGCompOpenMS, uniqueFrom = 1:2), length(fGCons))
+    expect_lt(length(consensus(fGCompOpenMS, uniqueFrom = 1:2, uniqueOuter = TRUE)), length(fGCons))
+    expect_length(consensus(fgCompBothEmpty, uniqueFrom = 1), 0)
+    expect_length(consensus(fgCompBothEmpty, uniqueFrom = 1, uniqueOuter = TRUE), 0)
 })
 
 subFGroups <- fgOpenMS[, 1:25]

@@ -79,7 +79,8 @@
   nsets = length(list(...)) + 1, nintersects = NA, upsetArgs = NULL)
 
 \S4method{consensus}{compounds}(obj, ..., compThreshold = 0,
-  minMaxNormalization = TRUE, mergeScoresFunc = sum)
+  uniqueFrom = NULL, uniqueOuter = FALSE, minMaxNormalization = TRUE,
+  mergeScoresFunc = sum)
 }
 \arguments{
 \item{obj, object, x, compounds}{The \code{compound} object.}
@@ -199,6 +200,18 @@ spectrum.}
 
 \item{compThreshold}{Minimal fraction (0-1) that a candidate must be present
 within all given \code{compounds} objects.}
+
+\item{uniqueFrom}{Set this argument to only retain compounds that are unique
+within one or more of the objects for which the consensus is made.
+Selection is done by setting the value of \code{uniqueFrom} to a
+\code{logical} (values are recycled), \code{numeric} (select by index) or a
+\code{character} (as obtained with \code{algorithm(obj)}). For
+\code{logical} and \code{numeric} values the order corresponds to the order
+of the objects given for the consensus. Set to \code{NULL} to ignore.}
+
+\item{uniqueOuter}{If \code{uniqueFrom} is not \code{NULL} and if
+\code{uniqueOuter=TRUE}: only retain data that are also unique between
+objects specified in \code{uniqueFrom}.}
 
 \item{minMaxNormalization}{Set to \code{TRUE} to apply min-max normalization
 of (merged) scoring columns. \code{FALSE} will apply normalization to the

@@ -535,12 +535,16 @@ setMethod("plotUpSet", "formulas", function(obj, ..., labels = NULL, nsets = len
 #'   candidate should be present within all objects. For instance, a value of
 #'   \samp{0.5} means that a particular formula should be present in at least
 #'   \samp{50\%} of all objects.
+#'   
+#' @templateVar what formulas
+#' @template consensus-unique-args
 #'
 #' @return \code{consensus} returns a \code{formulas} object that is produced by
 #'   merging results from multiple \code{formulas} objects.
 #'
 #' @export
-setMethod("consensus", "formulas", function(obj, ..., formThreshold = 0)
+setMethod("consensus", "formulas", function(obj, ..., formThreshold = 0,
+                                            uniqueFrom = NULL, uniqueOuter = FALSE)
 {
     allFormulas <- c(list(obj), list(...))
 
@@ -550,9 +554,12 @@ setMethod("consensus", "formulas", function(obj, ..., formThreshold = 0)
     checkmate::assertNumber(formThreshold, lower = 0, finite = TRUE, add = ac)
     checkmate::reportAssertions(ac)
 
-    allFormNames <- sapply(allFormulas, algorithm)
-    allFormNames <- make.unique(allFormNames)
+    allFormNames <- make.unique(sapply(allFormulas, algorithm))
+    assertConsUniqueArgs(uniqueFrom, uniqueOuter, allFormNames)
 
+    if (!is.null(uniqueFrom) && formThreshold != 0)
+        stop("Cannot apply both unique and abundance filters simultaneously.")
+    
     allFormulasLists <- sapply(seq_along(allFormulas), function(fi)
     {
         return(lapply(formulaTable(allFormulas[[fi]]), function(ft)
@@ -654,7 +661,21 @@ setMethod("consensus", "formulas", function(obj, ..., formThreshold = 0)
 
         if (formThreshold > 0)
             consFormulaList[[grpi]] <- consFormulaList[[grpi]][coverage >= formThreshold]
-
+        else if (!is.null(uniqueFrom))
+        {
+            if (!is.character(uniqueFrom))
+                uniqueFrom <- allFormNames[uniqueFrom]
+            
+            keep <- function(mergedBy)
+            {
+                mbs <- unique(unlist(strsplit(mergedBy, ",")))
+                ret <- all(mbs %in% uniqueFrom) && (!uniqueOuter || length(mbs) == 1)
+                return(rep(ret, length(mergedBy)))
+            }
+            
+            consFormulaList[[grpi]] <- consFormulaList[[grpi]][consFormulaList[[grpi]][, keep(mergedBy), by = "formula"][[2]]]
+        }
+            
         consFormulaList[[grpi]] <- rankFormulaTable(consFormulaList[[grpi]])
     }
 

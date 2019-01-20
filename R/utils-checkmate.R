@@ -106,6 +106,15 @@ assertDACloseSaveArgs <- function(x, save, .var.name = checkmate::vname(x), add 
     checkmate::assertFlag(save, .var.name = "save", add = add)
 }
 
+assertConsUniqueArgs <- function(x, uniqueOuter, objNames, .var.name = checkmate::vname(x), add = NULL)
+{
+    checkmate::assert(checkmate::checkLogical(x, min.len = 1, max.len = length(objNames), any.missing = FALSE, null.ok = TRUE),
+                      checkmate::checkIntegerish(x, lower = 1, upper = length(objNames), any.missing = FALSE),
+                      checkmate::checkSubset(x, objNames, empty.ok = FALSE),
+                      .var.name = .var.name)
+    checkmate::assertFlag(uniqueOuter, .var.name = "uniqueOuter", add = ac)
+}
+
 checkCSVFile <- function(x, cols)
 {
     ret <- checkmate::checkFileExists(x, "r")

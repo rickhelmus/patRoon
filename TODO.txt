@@ -65,3 +65,5 @@ Release:
     - convert score csv to internal data?
 - SIRIUS: use --auto-charge instead of manually fixing charge of fragments (or not? conflicting docs on what it does)
 - negate for all filter methods
+- plotChord: which argument
+- make algorithm names more consistent

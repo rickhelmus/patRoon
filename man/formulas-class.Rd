@@ -56,7 +56,8 @@
 \S4method{plotUpSet}{formulas}(obj, ..., labels = NULL,
   nsets = length(list(...)) + 1, nintersects = NA, upsetArgs = NULL)
 
-\S4method{consensus}{formulas}(obj, ..., formThreshold = 0)
+\S4method{consensus}{formulas}(obj, ..., formThreshold = 0,
+  uniqueFrom = NULL, uniqueOuter = FALSE)
 }
 \arguments{
 \item{obj, x, object, formulas}{The \code{formulas} object.}
@@ -178,6 +179,18 @@ faster.}
 candidate should be present within all objects. For instance, a value of
 \samp{0.5} means that a particular formula should be present in at least
 \samp{50\%} of all objects.}
+
+\item{uniqueFrom}{Set this argument to only retain formulas that are unique
+within one or more of the objects for which the consensus is made.
+Selection is done by setting the value of \code{uniqueFrom} to a
+\code{logical} (values are recycled), \code{numeric} (select by index) or a
+\code{character} (as obtained with \code{algorithm(obj)}). For
+\code{logical} and \code{numeric} values the order corresponds to the order
+of the objects given for the consensus. Set to \code{NULL} to ignore.}
+
+\item{uniqueOuter}{If \code{uniqueFrom} is not \code{NULL} and if
+\code{uniqueOuter=TRUE}: only retain data that are also unique between
+objects specified in \code{uniqueFrom}.}
 }
 \value{
 \code{formulaTable} returns a \code{list} containing for each feature

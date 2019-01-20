@@ -78,13 +78,15 @@ setMethod("$", "featureGroupsComparison", function(x, name)
 #' output and generate a consensus.
 #'
 #' @param \dots For \code{comparison}: \code{featureGroups} objects that should
-#'   be compared. Objects may be labeled by naming the parameters, otherwise
-#'   labels are automatically determined. For \code{plot}, \code{plotVenn},
-#'   \code{plotChord}, \code{unique}: further options passed to \code{plot},
-#'   \pkg{\link{VennDiagram}} plotting functions (\emph{e.g.}
-#'   \code{\link{draw.pairwise.venn}}), \code{\link{chordDiagram}} and
-#'   \code{unique} (\code{featureGroups} signature), respectively. For
-#'   \code{plotUpSet}: any further arguments passed to the \code{plotUpSet}
+#'   be compared. Objects are automatically labelled by their
+#'   \code{\link{algorithm}}.
+#'
+#'   For \code{plot}, \code{plotVenn}, \code{plotChord}: further options passed
+#'   to \code{plot}, \pkg{\link{VennDiagram}} plotting functions (\emph{e.g.}
+#'   \code{\link{draw.pairwise.venn}}) and \code{\link{chordDiagram}}
+#'   respectively.
+#'
+#'   For \code{plotUpSet}: any further arguments passed to the \code{plotUpSet}
 #'   method defined for \code{\link{featureGroups}}.
 #' @param which A character vector specifying one or more labels of compared
 #'   feature groups. For \code{plotVenn}: if \code{NULL} then all compared
@@ -192,8 +194,7 @@ setMethod("comparison", "featureGroups", function(..., groupAlgo, groupArgs = li
                           unique = TRUE, .var.name = "...", add = ac)
     checkmate::reportAssertions(ac)
 
-    labels <- getArgNames(...)
-    names(fGroupsList) <- labels
+    names(fGroupsList) <- make.unique(sapply(fGroupsList, algorithm))
 
     # convert feature groups to features
     featsFromGroups <- convertFeatureGroupsToFeatures(fGroupsList)
@@ -222,7 +223,7 @@ setMethod("plotVenn", "featureGroupsComparison", function(obj, which = NULL, ...
 #'   feature groups.
 #' @rdname featureGroups-compare
 #' @export
-setMethod("plotUpSet", "featureGroupsComparison", function(obj, which = names(obj), ...) plotUpSet(obj@comparedFGroups, which, ...))
+setMethod("plotUpSet", "featureGroupsComparison", function(obj, which = NULL, ...) plotUpSet(obj@comparedFGroups, which, ...))
 
 #' @details \code{plotChord} plots a chord diagram to visualize the distribution
 #'   of feature groups.
@@ -239,14 +240,19 @@ setMethod("plotChord", "featureGroupsComparison",
 #'
 #' @param relAbundance,absAbundance Feature groups with relative/absolute
 #'   abundance below this number will be removed from the consensus. Set to
-#'   \code{0} for no limits.
+#'   \code{0} for no limits. Limits cannot be set when \code{uniqueFrom} is not
+#'   \code{NULL}.
+#'   
+#' @templateVar what feature groups
+#' @template consensus-unique-args
 #'
-#' @return \code{consensus} returns a \code{\link{featureGroups}}
-#'   object with a consensus from the compared feature groups.
+#' @return \code{consensus} returns a \code{\link{featureGroups}} object with a
+#'   consensus from the compared feature groups.
 #'
 #' @rdname featureGroups-compare
 #' @export
-setMethod("consensus", "featureGroupsComparison", function(obj, relAbundance = 0, absAbundance = 0)
+setMethod("consensus", "featureGroupsComparison", function(obj, relAbundance = 0, absAbundance = 0,
+                                                           uniqueFrom = NULL, uniqueOuter = FALSE)
 {
     # available info:
     # - grouped feature groups --> these are the new consensus feature groups
@@ -256,6 +262,7 @@ setMethod("consensus", "featureGroupsComparison", function(obj, relAbundance = 0
     ac <- checkmate::makeAssertCollection()
     checkmate::assertNumber(relAbundance, lower = 0, finite = TRUE, add = ac)
     checkmate::assertNumber(absAbundance, lower = 0, finite = TRUE, add = ac)
+    assertConsUniqueArgs(uniqueFrom, uniqueOuter, names(obj), add = ac)
     checkmate::reportAssertions(ac)
 
     allAnaInfos <- lapply(obj@fGroupsList, analysisInfo)
@@ -264,22 +271,34 @@ setMethod("consensus", "featureGroupsComparison", function(obj, relAbundance = 0
     if (!all(sapply(allAnaInfos[-1], identical, allAnaInfos[[1]]))) # from https://stackoverflow.com/a/30850654
         stop("This function only works with feature groups with equal analyses")
 
+    if (!is.null(uniqueFrom) && (relAbundance != 0 || absAbundance != 0))
+        stop("Cannot apply both unique and abundance filters simultaneously.")
+    
     anaInfo <- allAnaInfos[[1]]
-
-    comparedFGroups <- obj@comparedFGroups
-    if (relAbundance > 0 || absAbundance > 0)
-        comparedFGroups <- abundanceFilter(comparedFGroups, relAbundance, absAbundance)
 
     # synchronize analyses
     # allAnalyses <- lapply(obj@fGroupsList, function(fg) analysisInfo(fg)$analysis)
     # allAnalyses <- Reduce(intersect, allAnalyses)
     # fGroupsList <- sapply(obj@fGroupsList, function(fg) fg[allAnalyses], simplify = FALSE)
     fGroupsList <- obj@fGroupsList
+    comparedFGroups <- obj@comparedFGroups
+    
+    if (relAbundance > 0 || absAbundance > 0)
+        comparedFGroups <- abundanceFilter(comparedFGroups, relAbundance, absAbundance)
 
-    candidates <- names(fGroupsList)
+    if (!is.null(uniqueFrom))
+    {
+        if (!is.character(uniqueFrom))
+            uniqueFrom <- names(obj)[uniqueFrom]
+        comparedFGroups <- unique(comparedFGroups, which = uniqueFrom,
+                                  outer = uniqueOuter)
+        fGroupsList <- fGroupsList[replicateGroups(comparedFGroups)]
+    }
+
     compFeats <- featureTable(comparedFGroups)
     compFeatInds <- groupFeatIndex(comparedFGroups)
-
+    candidates <- names(fGroupsList)
+    
     # Add consensus feature groups to original features
     adjFeatures <- sapply(candidates, function(ca)
     {
@@ -339,7 +358,7 @@ setMethod("consensus", "featureGroupsComparison", function(obj, relAbundance = 0
     }, simplify = FALSE)
     cat("Done!\n")
 
-    allAlgos <- paste0(sapply(obj@fGroupsList, algorithm), collapse = ",")
+    allAlgos <- paste0(sapply(fGroupsList, algorithm), collapse = ",")
 
     retFeatures <- featuresConsensus(features = consFeatures, analysisInfo = anaInfo,
                                      algorithm = allAlgos)
@@ -378,14 +397,4 @@ setMethod("consensus", "featureGroupsComparison", function(obj, relAbundance = 0
     return(featureGroupsConsensus(groups = consGroups, analysisInfo = anaInfo,
                                   groupInfo = groupInfo(comparedFGroups), features = retFeatures,
                                   ftindex = consFeatInds, algorithm = allAlgos))
-})
-
-#' @details \code{unique} returns unique feature groups from one or more
-#'   compared feature groups.
-#' @rdname featureGroups-compare
-#' @export
-setMethod("unique", "featureGroupsComparison", function(x, which, ...)
-{
-    x@comparedFGroups <- unique(x@comparedFGroups, which = which, ...)
-    return(consensus(x[which]))
 })

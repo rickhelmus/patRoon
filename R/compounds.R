@@ -760,7 +760,7 @@ setMethod("plotSpec", "compounds", function(obj, index, groupName, MSPeakLists, 
 #'   outlining unique and shared compound candidates of up to five different
 #'   \code{compounds} objects. Comparison is made on \code{InChIKey1}.
 #'
-#' @inheritParams plotUpSet,formulas-method
+#' @inheritParams plotVenn,formulas-method
 #' 
 #' @template plotvenn-ret
 #' 
@@ -856,13 +856,17 @@ setMethod("mergedCompoundNames", "compoundsConsensus", function(compounds) compo
 #'   of (merged) scoring columns. \code{FALSE} will apply normalization to the
 #'   maximum value. Scorings with negative values will always be min-max
 #'   normalized.
+#' 
+#' @templateVar what compounds
+#' @template consensus-unique-args
 #'
 #' @return \code{consensus} returns a \code{compounds} object that is produced
 #'   by merging multiple specified \code{compounds} objects.
 #'
 #' @export
-setMethod("consensus", "compounds", function(obj, ..., compThreshold = 0.0, minMaxNormalization = TRUE,
-                                             mergeScoresFunc = sum)
+setMethod("consensus", "compounds", function(obj, ..., compThreshold = 0.0,
+                                             uniqueFrom = NULL, uniqueOuter = FALSE,
+                                             minMaxNormalization = TRUE, mergeScoresFunc = sum)
 {
     allCompounds <- c(list(obj), list(...))
 
@@ -873,6 +877,9 @@ setMethod("consensus", "compounds", function(obj, ..., compThreshold = 0.0, minM
     checkmate::assertFunction(mergeScoresFunc, add = ac)
     checkmate::reportAssertions(ac)
 
+    if (!is.null(uniqueFrom) && compThreshold != 0)
+        stop("Cannot apply both unique and abundance filters simultaneously.")
+    
     compNames <- sapply(allCompounds, algorithm)
     if (anyDuplicated(compNames))
     {
@@ -893,6 +900,7 @@ setMethod("consensus", "compounds", function(obj, ..., compThreshold = 0.0, minM
         compNames <- make.unique(compNames)
     }
 
+    assertConsUniqueArgs(uniqueFrom, uniqueOuter, compNames)
 
     # initialize all compound objects for merge: copy them, rename columns to
     # avoid duplicates and set merged by field of fragInfo.
@@ -915,6 +923,7 @@ setMethod("consensus", "compounds", function(obj, ..., compThreshold = 0.0, minM
                 }
             }
 
+            ret[, mergedBy := compNames[cmpi]]
             setnames(ret, paste0(names(ret), "-", compNames[[cmpi]]))
 
             return(ret)
@@ -943,7 +952,7 @@ setMethod("consensus", "compounds", function(obj, ..., compThreshold = 0.0, minM
                 mCompounds <- rightTable[[grp]]
 
                 # rename columns that should be unique from right to left
-                unCols <- c(uniqueCols, "fragInfo", "InChIKey1")
+                unCols <- c(uniqueCols, "fragInfo", "InChIKey1", "mergedBy")
                 unCols <- unCols[sapply(unCols, function(uc) !is.null(mCompounds[[paste0(uc, "-", rightName)]]))]
                 setnames(mCompounds, paste0(unCols, "-", rightName), paste0(unCols, "-", leftName))
             }
@@ -998,6 +1007,12 @@ setMethod("consensus", "compounds", function(obj, ..., compThreshold = 0.0, minM
                         }
                     }
                 }
+                
+                # collapse mergedBy
+                ml <- paste0("mergedBy-", leftName); mr <- paste0("mergedBy-", rightName)
+                mCompounds[!is.na(get(ml)), (ml) := ifelse(!is.na(get(mr)), paste(get(ml), get(mr), sep = ","), get(ml))]
+                mCompounds[is.na(get(ml)), (ml) := get(mr)]
+                mCompounds[, (mr) := NULL]
             }
 
             mCompList[[grp]] <- mCompounds
@@ -1013,28 +1028,33 @@ setMethod("consensus", "compounds", function(obj, ..., compThreshold = 0.0, minM
     for (grpi in seq_along(mCompList))
     {
         # fix up de-duplicated column names
-        deDupCols <- c(uniqueCols, c("fragInfo", "InChIKey1"))
+        deDupCols <- c(uniqueCols, c("fragInfo", "InChIKey1", "mergedBy"))
         leftCols <- paste0(deDupCols, "-", leftName)
         deDupCols <- deDupCols[leftCols %in% names(mCompList[[grpi]])]
         leftCols <- leftCols[leftCols %in% names(mCompList[[grpi]])]
         if (length(leftCols) > 0)
             setnames(mCompList[[grpi]], leftCols, deDupCols)
 
-        scoreCols <- grep("score-", colnames(mCompList[[grpi]]), value = TRUE)
-
-        if (length(scoreCols) == 0) # nothing was merged
-            mCompList[[grpi]][, coverage := 1 / length(allCompounds)]
-        else
-        {
-            for (r in seq_len(nrow(mCompList[[grpi]])))
-                set(mCompList[[grpi]], r, "coverage",
-                    sum(sapply(scoreCols, function(c) !is.na(mCompList[[grpi]][[c]][r]))) / length(allCompounds))
-        }
-
+        mCompList[[grpi]][, coverage := sapply(mergedBy, function(mb) (countCharInStr(mb, ",") + 1) / length(allCompounds))]
+        
         if (compThreshold > 0)
             mCompList[[grpi]] <- mCompList[[grpi]][coverage >= compThreshold]
-
+        else if (!is.null(uniqueFrom))
+        {
+            if (!is.character(uniqueFrom))
+                uniqueFrom <- compNames[uniqueFrom]
+            
+            keep <- function(mergedBy)
+            {
+                mbs <- unlist(strsplit(mergedBy, ","))
+                return(all(mbs %in% uniqueFrom) && (!uniqueOuter || length(mbs) == 1))
+            }
+            
+            mCompList[[grpi]] <- mCompList[[grpi]][mCompList[[grpi]][, sapply(mergedBy, keep)]]
+        }
+        
         # set scores after filtering: otherwise normalized values are out of date
+        scoreCols <- grep("score-", colnames(mCompList[[grpi]]), value = TRUE)
         if (length(scoreCols) > 0 && nrow(mCompList[[grpi]]) > 0)
         {
             scores <- mCompList[[grpi]][, lapply(.SD, normalize, minMax = minMaxNormalization), .SDcols = scoreCols]

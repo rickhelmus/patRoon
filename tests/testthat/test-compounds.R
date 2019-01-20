@@ -190,6 +190,16 @@ test_that("consensus works", {
     expect_known_show(compsCons, testFile("compounds-cons", text = TRUE))
     expect_lt(length(consensus(compsMF, compsSIR, compThreshold = 1)), length(compsCons))
     expect_length(consensus(compsMFEmptyPL, compsSIREmptyPL), 0)
+    
+    expect_equal(length(consensus(compsMF, compsSIR, uniqueFrom = 1)) +
+                 length(consensus(compsMF, compsSIR, uniqueFrom = 2)) +
+                 length(consensus(compsMF, compsSIR, compThreshold = 1)), length(compsCons))
+    expect_equal(length(consensus(compsMF, compsSIR, uniqueFrom = 1:2, uniqueOuter = TRUE)) +
+                 length(consensus(compsMF, compsSIR, compThreshold = 1)), length(compsCons))
+    expect_length(consensus(compsMF, compsSIR, uniqueFrom = 1:2), length(compsCons))
+    expect_lt(length(consensus(compsMF, compsSIR, uniqueFrom = 1:2, uniqueOuter = TRUE)), length(compsCons))
+    expect_length(consensus(compsMFEmptyPL, compsSIREmptyPL, uniqueFrom = 1), 0)
+    expect_length(consensus(compsMFEmptyPL, compsSIREmptyPL, uniqueFrom = 1, uniqueOuter = TRUE), 0)
 })
 
 test_that("reporting works", {

@@ -24,6 +24,7 @@ NULL
 #' @templateVar selj feature groups
 #' @templateVar selOrderj groupNames()
 #' @templateVar optionalji TRUE
+#' @templateVar dollarOpName feature group
 #' @template sub_op-args
 #'
 #' @templateVar class MSPeakLists
@@ -188,6 +189,13 @@ setMethod("[[", c("MSPeakLists", "ANY", "ANY"), function(x, i, j)
     return(x@averagedPeakLists[[i]])
 })
 
+#' @describeIn MSPeakLists Extract group averaged MS peaklists for a feature group.
+#' @export
+setMethod("$", "MSPeakLists", function(x, name)
+{
+    eval(substitute(x@averagedPeakLists[[NAME_ARG]], list(NAME_ARG = name)))
+})
+
 #' @describeIn MSPeakLists Returns all MS peak list data in a table.
 #'
 #' @param averaged If \code{TRUE} then feature group averaged peak list data is
@@ -280,9 +288,9 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
             if (!is.null(pl[[grpi]][["MSMS"]]))
                 ret$MSMS <- doMSPeakListFilter(pl[[grpi]]$MSMS, absMSMSIntThr, relMSMSIntThr, topMSMSPeaks,
                                                deIsotopeMSMS, retainPrecursorMSMS)
-            
+
             setTxtProgressBar(prog, grpi)
-            
+
             return(pruneList(ret, checkZeroRows = TRUE))
         })
         names(pl) <- pln

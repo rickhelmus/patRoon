@@ -48,7 +48,6 @@ MSPeakLists
 - most intense analysis as alternative to averaging?
 - report spectra/tables?
 - don't subset on analyses? or re-average? if no, mention in docs
-- $ method?
 - collapse averagedPeakLists
 - test avg params
 

@@ -13,6 +13,7 @@
 \alias{show,MSPeakLists-method}
 \alias{[,MSPeakLists,ANY,ANY,missing-method}
 \alias{[[,MSPeakLists,ANY,ANY-method}
+\alias{$,MSPeakLists-method}
 \alias{as.data.table,MSPeakLists-method}
 \alias{filter,MSPeakLists-method}
 \alias{plotSpec,MSPeakLists-method}
@@ -33,6 +34,8 @@
 \S4method{[}{MSPeakLists,ANY,ANY,missing}(x, i, j, ..., drop = TRUE)
 
 \S4method{[[}{MSPeakLists,ANY,ANY}(x, i, j)
+
+\S4method{$}{MSPeakLists}(x, name)
 
 \S4method{as.data.table}{MSPeakLists}(x, fGroups = NULL,
   averaged = TRUE)
@@ -55,6 +58,8 @@ their index or name, respectively (for the order/names see \code{analyses()/grou
 \item{\dots}{Ignored.}
 
 \item{drop}{ignored.}
+
+\item{name}{The feature group name (partially matched).}
 
 \item{fGroups}{The \code{\link{featureGroups}} object that was used to
 generate this object. If not \code{NULL} it is used to add feature group
@@ -140,6 +145,8 @@ feature groups for which data is present in this object.
 lists. If the second argument (\code{j}) is not specified the averaged peak
 lists for the group specified by the first argument (\code{i}) will be
 returned.
+
+\item \code{$}: Extract group averaged MS peaklists for a feature group.
 
 \item \code{as.data.table}: Returns all MS peak list data in a table.
 

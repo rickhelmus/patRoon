@@ -257,7 +257,7 @@ please refer to the linked method documentation for each generic.
  \code{$} Extract data from an object.
 
 \itemize{
-    \item Methods are defined for: \code{\link[=$,components-method]{components}}; \code{\link[=$,compounds-method]{compounds}}; \code{\link[=$,featureGroups-method]{featureGroups}}; \code{\link[=$,featureGroupsComparison-method]{featureGroupsComparison}}; \code{\link[=$,features-method]{features}}; \code{\link[=$,formulas-method]{formulas}}.
+    \item Methods are defined for: \code{\link[=$,components-method]{components}}; \code{\link[=$,compounds-method]{compounds}}; \code{\link[=$,featureGroups-method]{featureGroups}}; \code{\link[=$,featureGroupsComparison-method]{featureGroupsComparison}}; \code{\link[=$,features-method]{features}}; \code{\link[=$,formulas-method]{formulas}}; \code{\link[=$,MSPeakLists-method]{MSPeakLists}}.
 }
 
  \code{as.data.table} Converts an object to a table (\code{\link{data.table}}).

@@ -449,31 +449,31 @@ setMethod("plotSpec", "formulas", function(obj, precursor, groupName, analysis =
 #'
 #' @param vennArgs A \code{list} with further arguments passed to
 #'   \pkg{VennDiagram} plotting functions. Set to \code{NULL} to ignore.
-#' 
+#'
 #' @template plotvenn-ret
-#' 
+#'
 #' @export
 setMethod("plotVenn", "formulas", function(obj, ..., labels = NULL, vennArgs = NULL)
 {
     allForms <- c(list(obj), list(...))
-    
+
     ac <- checkmate::makeAssertCollection()
     checkmate::assertList(allForms, types = "formulas", min.len = 2, any.missing = FALSE,
                           unique = TRUE, .var.name = "...", add = ac)
     checkmate::assertList(vennArgs, names = "unique", null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
-    
+
     if (is.null(labels))
         labels <- make.unique(sapply(allForms, algorithm))
     if (is.null(vennArgs))
         vennArgs <- list()
-    
-    do.call(makeVennPlot, c(list(allForms, labels, lengths(allForms), function(obj1, obj2)
+
+    allFormTabs <- lapply(allForms, as.data.table)
+    do.call(makeVennPlot, c(list(allFormTabs, labels, lengths(allForms), function(obj1, obj2)
     {
-        ctab1 <- as.data.table(obj1); ctab2 <- as.data.table(obj2)
-        if (length(ctab1) == 0 || length(ctab2) == 0)
+        if (length(obj1) == 0 || length(obj2) == 0)
             return(data.table())
-        fintersect(ctab1[, c("group", "formula")], ctab2[, c("group", "formula")])
+        fintersect(obj1[, c("group", "formula")], obj2[, c("group", "formula")])
     }, nrow), vennArgs))
 })
 
@@ -493,7 +493,7 @@ setMethod("plotUpSet", "formulas", function(obj, ..., labels = NULL, nsets = len
                                             nintersects = NA, upsetArgs = NULL)
 {
     allForms <- c(list(obj), list(...))
-    
+
     ac <- checkmate::makeAssertCollection()
     checkmate::assertList(allForms, types = "formulas", min.len = 2, any.missing = FALSE,
                           unique = TRUE, .var.name = "...", add = ac)
@@ -501,7 +501,7 @@ setMethod("plotUpSet", "formulas", function(obj, ..., labels = NULL, nsets = len
     checkmate::assertCount(nsets, positive = TRUE)
     checkmate::assertCount(nintersects, positive = TRUE, na.ok = TRUE)
     checkmate::reportAssertions(ac)
-    
+
     if (is.null(labels))
         labels <- make.unique(sapply(allForms, algorithm))
 
@@ -512,19 +512,19 @@ setMethod("plotUpSet", "formulas", function(obj, ..., labels = NULL, nsets = len
             ret <- data.table(group = character(), formula = character())
         ret <- unique(ret[, c("group", "formula")])[, (l) := 1]
     })
-    
+
     formTab <- Reduce(function(f1, f2)
     {
         merge(f1, f2, by = c("group", "formula"), all = TRUE)
     }, allFormTabs)
-    
+
     formTab <- formTab[, labels, with = FALSE]
     for (j in seq_along(formTab))
         set(formTab, which(is.na(formTab[[j]])), j, 0)
-    
+
     if (sum(sapply(formTab, function(x) any(x>0))) < 2)
         stop("Need at least two non-empty objects to plot")
-    
+
     do.call(UpSetR::upset, c(list(formTab, nsets = nsets, nintersects = nintersects), upsetArgs))
 })
 
@@ -535,7 +535,7 @@ setMethod("plotUpSet", "formulas", function(obj, ..., labels = NULL, nsets = len
 #'   candidate should be present within all objects. For instance, a value of
 #'   \samp{0.5} means that a particular formula should be present in at least
 #'   \samp{50\%} of all objects.
-#'   
+#'
 #' @templateVar what formulas
 #' @template consensus-unique-args
 #'
@@ -559,7 +559,7 @@ setMethod("consensus", "formulas", function(obj, ..., formThreshold = 0,
 
     if (!is.null(uniqueFrom) && formThreshold != 0)
         stop("Cannot apply both unique and abundance filters simultaneously.")
-    
+
     allFormulasLists <- sapply(seq_along(allFormulas), function(fi)
     {
         return(lapply(formulaTable(allFormulas[[fi]]), function(ft)
@@ -665,17 +665,17 @@ setMethod("consensus", "formulas", function(obj, ..., formThreshold = 0,
         {
             if (!is.character(uniqueFrom))
                 uniqueFrom <- allFormNames[uniqueFrom]
-            
+
             keep <- function(mergedBy)
             {
                 mbs <- unique(unlist(strsplit(mergedBy, ",")))
                 ret <- all(mbs %in% uniqueFrom) && (!uniqueOuter || length(mbs) == 1)
                 return(rep(ret, length(mergedBy)))
             }
-            
+
             consFormulaList[[grpi]] <- consFormulaList[[grpi]][consFormulaList[[grpi]][, keep(mergedBy), by = "formula"][[2]]]
         }
-            
+
         consFormulaList[[grpi]] <- rankFormulaTable(consFormulaList[[grpi]])
     }
 

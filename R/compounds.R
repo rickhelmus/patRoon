@@ -25,7 +25,7 @@ NULL
 #'   multiple indices are specified for \code{plotStructure}, their maximum
 #'   common substructure will be drawn.
 #' @param \dots Any further (and unique) \code{compounds} objects.
-#' 
+#'
 #' @templateVar seli feature groups
 #' @templateVar selOrderi groupNames()
 #' @templateVar dollarOpName feature group
@@ -761,31 +761,31 @@ setMethod("plotSpec", "compounds", function(obj, index, groupName, MSPeakLists, 
 #'   \code{compounds} objects. Comparison is made on \code{InChIKey1}.
 #'
 #' @inheritParams plotVenn,formulas-method
-#' 
+#'
 #' @template plotvenn-ret
-#' 
+#'
 #' @export
 setMethod("plotVenn", "compounds", function(obj, ..., labels = NULL, vennArgs = NULL)
 {
     allCompounds <- c(list(obj), list(...))
-    
+
     ac <- checkmate::makeAssertCollection()
     checkmate::assertList(allCompounds, types = "compounds", min.len = 2, any.missing = FALSE,
                           unique = TRUE, .var.name = "...", add = ac)
     checkmate::assertList(vennArgs, names = "unique", null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
-    
+
     if (is.null(labels))
         labels <- make.unique(sapply(allCompounds, algorithm))
     if (is.null(vennArgs))
         vennArgs <- list()
 
-    do.call(makeVennPlot, c(list(allCompounds, labels, lengths(allCompounds), function(obj1, obj2)
+    allCompoundTabs <- lapply(allCompounds, as.data.table)
+    do.call(makeVennPlot, c(list(allCompoundTabs, labels, lengths(allCompounds), function(obj1, obj2)
     {
-        ctab1 <- as.data.table(obj1); ctab2 <- as.data.table(obj2)
-        if (length(ctab1) == 0 || length(ctab2) == 0)
+        if (length(obj1) == 0 || length(obj2) == 0)
             return(data.table())
-        fintersect(ctab1[, c("group", "InChIKey1")], ctab2[, c("group", "InChIKey1")])
+        fintersect(obj1[, c("group", "InChIKey1")], obj2[, c("group", "InChIKey1")])
     }, nrow), vennArgs))
 })
 
@@ -804,7 +804,7 @@ setMethod("plotUpSet", "compounds", function(obj, ..., labels = NULL, nsets = le
                                              nintersects = NA, upsetArgs = NULL)
 {
     allCompounds <- c(list(obj), list(...))
-    
+
     ac <- checkmate::makeAssertCollection()
     checkmate::assertList(allCompounds, types = "compounds", min.len = 2, any.missing = FALSE,
                           unique = TRUE, .var.name = "...", add = ac)
@@ -812,10 +812,10 @@ setMethod("plotUpSet", "compounds", function(obj, ..., labels = NULL, nsets = le
     checkmate::assertCount(nsets, positive = TRUE)
     checkmate::assertCount(nintersects, positive = TRUE, na.ok = TRUE)
     checkmate::reportAssertions(ac)
-    
+
     if (is.null(labels))
         labels <- make.unique(sapply(allCompounds, algorithm))
-    
+
     allCompsTabs <- mapply(allCompounds, labels, SIMPLIFY = FALSE, FUN = function(f, l)
     {
         ret <- as.data.table(f)
@@ -823,19 +823,19 @@ setMethod("plotUpSet", "compounds", function(obj, ..., labels = NULL, nsets = le
             ret <- data.table(group = character(), InChIKey1 = character())
         ret <- unique(ret[, c("group", "InChIKey1")])[, (l) := 1]
     })
-    
+
     compTab <- Reduce(function(f1, f2)
     {
         merge(f1, f2, by = c("group", "InChIKey1"), all = TRUE)
     }, allCompsTabs)
-    
+
     compTab <- compTab[, labels, with = FALSE]
     for (j in seq_along(compTab))
         set(compTab, which(is.na(compTab[[j]])), j, 0)
-    
+
     if (sum(sapply(compTab, function(x) any(x>0))) < 2)
         stop("Need at least two non-empty objects to plot")
-    
+
     do.call(UpSetR::upset, c(list(compTab, nsets = nsets, nintersects = nintersects), upsetArgs))
 })
 
@@ -856,7 +856,7 @@ setMethod("mergedCompoundNames", "compoundsConsensus", function(compounds) compo
 #'   of (merged) scoring columns. \code{FALSE} will apply normalization to the
 #'   maximum value. Scorings with negative values will always be min-max
 #'   normalized.
-#' 
+#'
 #' @templateVar what compounds
 #' @template consensus-unique-args
 #'
@@ -879,7 +879,7 @@ setMethod("consensus", "compounds", function(obj, ..., compThreshold = 0.0,
 
     if (!is.null(uniqueFrom) && compThreshold != 0)
         stop("Cannot apply both unique and abundance filters simultaneously.")
-    
+
     compNames <- sapply(allCompounds, algorithm)
     if (anyDuplicated(compNames))
     {
@@ -1007,7 +1007,7 @@ setMethod("consensus", "compounds", function(obj, ..., compThreshold = 0.0,
                         }
                     }
                 }
-                
+
                 # collapse mergedBy
                 ml <- paste0("mergedBy-", leftName); mr <- paste0("mergedBy-", rightName)
                 mCompounds[!is.na(get(ml)), (ml) := ifelse(!is.na(get(mr)), paste(get(ml), get(mr), sep = ","), get(ml))]
@@ -1036,23 +1036,23 @@ setMethod("consensus", "compounds", function(obj, ..., compThreshold = 0.0,
             setnames(mCompList[[grpi]], leftCols, deDupCols)
 
         mCompList[[grpi]][, coverage := sapply(mergedBy, function(mb) (countCharInStr(mb, ",") + 1) / length(allCompounds))]
-        
+
         if (compThreshold > 0)
             mCompList[[grpi]] <- mCompList[[grpi]][coverage >= compThreshold]
         else if (!is.null(uniqueFrom))
         {
             if (!is.character(uniqueFrom))
                 uniqueFrom <- compNames[uniqueFrom]
-            
+
             keep <- function(mergedBy)
             {
                 mbs <- unlist(strsplit(mergedBy, ","))
                 return(all(mbs %in% uniqueFrom) && (!uniqueOuter || length(mbs) == 1))
             }
-            
+
             mCompList[[grpi]] <- mCompList[[grpi]][mCompList[[grpi]][, sapply(mergedBy, keep)]]
         }
-        
+
         # set scores after filtering: otherwise normalized values are out of date
         scoreCols <- grep("score-", colnames(mCompList[[grpi]]), value = TRUE)
         if (length(scoreCols) > 0 && nrow(mCompList[[grpi]]) > 0)

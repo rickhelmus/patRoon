@@ -901,8 +901,8 @@ setMethod("plotVenn", "featureGroups", function(obj, which = NULL, ...)
     checkmate::assertSubset(which, rGroups, empty.ok = FALSE)
 
     fGroupsList <- lapply(which, function(w) replicateGroupFilter(obj, w, verbose = FALSE))
-    makeVennPlot(fGroupsList, which, lengths(fGroupsList),
-                 function(obj1, obj2) intersect(names(obj1), names(obj2)),
+    makeVennPlot(lapply(fGroupsList, names), which, lengths(fGroupsList),
+                 function(obj1, obj2) intersect(obj1, obj2),
                  length, ...)
 })
 
@@ -922,7 +922,7 @@ setMethod("plotUpSet", "featureGroups", function(obj, which = NULL, nsets = leng
     rGroups <- replicateGroups(obj)
     if (is.null(which))
         which <- rGroups
-    
+
     ac <- checkmate::makeAssertCollection()
     checkmate::assertSubset(which, rGroups, empty.ok = FALSE, add = ac)
     checkmate::assertCount(nsets, positive = TRUE)
@@ -936,10 +936,10 @@ setMethod("plotUpSet", "featureGroups", function(obj, which = NULL, nsets = leng
 
     gt <- as.data.table(obj, average = TRUE)
     gt[, (which) := lapply(.SD, function(x) as.integer(x > 0)), .SDcols = which]
-    
+
     if (sum(sapply(gt[, which, with = FALSE], function(x) any(x>0))) < 2)
         stop("Need at least two replicate groups with non-zero intensities")
-    
+
     UpSetR::upset(gt, nsets = nsets, nintersects = nintersects, ...)
 })
 

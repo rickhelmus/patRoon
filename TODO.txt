@@ -80,4 +80,3 @@ components
 reporting
 - add more options to reportPlots argument of reportMD()?
 - reportPDF/reportMD: MS only formulas are not reported?
-- reportMD: if blanks are still present chord etc not plotted?

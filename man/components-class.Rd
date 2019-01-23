@@ -60,7 +60,7 @@
 \S4method{findFGroup}{components}(obj, fGroup)
 
 \S4method{plotSpec}{components}(obj, index, markFGroup = NULL,
-  useGGPlot2 = FALSE, ...)
+  useGGPlot2 = FALSE, xlim = NULL, ylim = NULL, ...)
 
 \S4method{plotEIC}{components}(obj, index, fGroups, rtWindow = 5, ...)
 
@@ -74,11 +74,15 @@ their index or name, respectively (for the order/names see \code{names()/groupNa
 (similar to regular vectors). If missing all components/feature groups are selected.\cr\cr For \code{[[}: should be a skalar value. \code{j} is optional.}
 
 \item{\dots}{For \code{plotEIC}: Further (optional) arguments passed to the
-\code{plotEIC} method for the \code{\link{featureGroups}} class. Note that
-the \code{colourBy}, \code{showPeakArea}, \code{showFGroupRect} and
-\code{topMost} arguments cannot be set as these are set by this method. For
-\code{consensus}: \code{components} objects that should be used to generate
-the consensus.}
+  \code{plotEIC} method for the \code{\link{featureGroups}} class. Note that
+  the \code{colourBy}, \code{showPeakArea}, \code{showFGroupRect} and
+  \code{topMost} arguments cannot be set as these are set by this method.
+
+  For \code{plotSpec}: Further arguments passed to
+  \code{\link[graphics]{plot}}.
+
+  For \code{consensus}: \code{components} objects that should be used to
+  generate the consensus.}
 
 \item{drop}{ignored.}
 
@@ -123,6 +127,9 @@ plotting, otherwise base plot used. For \code{plotSpec}, \code{ggplot2}
 allows nicely repelled text for annotation. However, base plot is generally
 faster.}
 
+\item{xlim, ylim}{Sets the plot size limits used by
+\code{\link[graphics]{plot}}. Set to \code{NULL} for automatic plot sizing.}
+
 \item{fGroups}{The \code{\link{featureGroups}} object that was used to
 generate the components.}
 
@@ -130,12 +137,12 @@ generate the components.}
 \code{\link{featureGroups}} class.}
 }
 \value{
-The subset operator (\code{"["}) and \code{filter} method
-  return the data subset in an object from the \code{componentsReduced}
-  class. This object does not contain any algorithm specific data and as
-  such, algorithm specific methods (\emph{e.g.} \code{treeCut}) will not work
-  on this object. The reason for this is that it is often very difficult or
-  impossible to subset the algorithmic data.
+The subset operator (\code{"["}) and \code{filter} method return the
+  data subset in an object from the \code{componentsReduced} class. This
+  object does not contain any algorithm specific data and as such, algorithm
+  specific methods (\emph{e.g.} \code{treeCut}) will not work on this object.
+  The reason for this is that it is often very difficult or impossible to
+  subset the algorithmic data.
 
 \code{consensus} returns a \code{components} object that is produced
   by merging multiple specified \code{components} objects.

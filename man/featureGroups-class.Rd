@@ -96,7 +96,7 @@
   showPeakArea = FALSE, showFGroupRect = TRUE, title = NULL,
   colourBy = c("none", "rGroups", "fGroups"), showLegend = TRUE,
   onlyPresent = TRUE, annotate = c("none", "ret", "mz"),
-  showProgress = FALSE, ...)
+  showProgress = FALSE, xlim = NULL, ylim = NULL, ...)
 
 \S4method{plotVenn}{featureGroups}(obj, which = NULL, ...)
 
@@ -200,6 +200,9 @@ and/or \emph{m/z} values will be drawn for each plotted feature group.}
 \item{showProgress}{if set to \code{TRUE} then a text progressbar will be
 displayed when all EICs are being plot. Set to \code{"none"} to disable any
 annotation.}
+
+\item{xlim, ylim}{Sets the plot size limits used by
+\code{\link[graphics]{plot}}. Set to \code{NULL} for automatic plot sizing.}
 
 \item{which}{A character vector with replicate groups used for comparison.
 For plotting functions: set to \code{NULL} for all replicate groups.}

@@ -31,7 +31,8 @@
 
 \S4method{show}{MSPeakLists}(object)
 
-\S4method{[}{MSPeakLists,ANY,ANY,missing}(x, i, j, ..., drop = TRUE)
+\S4method{[}{MSPeakLists,ANY,ANY,missing}(x, i, j, ..., reAverage = TRUE,
+  drop = TRUE)
 
 \S4method{[[}{MSPeakLists,ANY,ANY}(x, i, j)
 
@@ -46,7 +47,8 @@
   deIsotopeMSMS = FALSE, retainPrecursorMSMS = TRUE)
 
 \S4method{plotSpec}{MSPeakLists}(obj, groupName, analysis = NULL,
-  MSLevel = 2, useGGPlot2 = FALSE)
+  MSLevel = 1, title = NULL, useGGPlot2 = FALSE, xlim = NULL,
+  ylim = NULL, ...)
 }
 \arguments{
 \item{obj, x, object}{The \code{\link{MSPeakLists}} object to access.}
@@ -55,7 +57,10 @@
 their index or name, respectively (for the order/names see \code{analyses()/groupNames()}).\cr\cr For \code{[}: Can also be logical to perform logical selection
 (similar to regular vectors). If missing all analyses/feature groups are selected.\cr\cr For \code{[[}: should be a skalar value. If \code{j} is not specified, \code{i} selects by feature groups instead.}
 
-\item{\dots}{Ignored.}
+\item{\dots}{Further arguments passed to \code{\link[graphics]{plot}}.}
+
+\item{reAverage}{Set to \code{TRUE} to regenerate averaged MS peak lists
+after subsetting analyses.}
 
 \item{drop}{ignored.}
 
@@ -95,6 +100,9 @@ made.}
 plotting, otherwise base plot used. For \code{plotSpec}, \code{ggplot2}
 allows nicely repelled text for annotation. However, base plot is generally
 faster.}
+
+\item{xlim, ylim}{Sets the plot size limits used by
+\code{\link[graphics]{plot}}. Set to \code{NULL} for automatic plot sizing.}
 }
 \value{
 \code{peakLists} returns a nested list containing MS (and MS/MS where

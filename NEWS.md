@@ -1,6 +1,7 @@
 # patRoon 0.1.0.9000
 
 ## January 2019
+* Various tweaks for plotEIC() and plotSpec() methods
 * Various small additions to newProject()
 * `reportMD()`: added table with annotated fragments for compounds/formulas
 * `consensus()` updates

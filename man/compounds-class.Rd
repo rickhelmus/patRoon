@@ -70,7 +70,8 @@
   useGGPlot2 = FALSE)
 
 \S4method{plotSpec}{compounds}(obj, index, groupName, MSPeakLists,
-  formulas = NULL, plotStruct = TRUE, useGGPlot2 = FALSE)
+  formulas = NULL, plotStruct = TRUE, useGGPlot2 = FALSE,
+  xlim = NULL, ylim = NULL, ...)
 
 \S4method{plotVenn}{compounds}(obj, ..., labels = NULL,
   vennArgs = NULL)
@@ -89,7 +90,10 @@
 their index or name, respectively (for the order/names see \code{groupNames()}).\cr\cr For \code{[}: Can also be logical to perform logical selection
 (similar to regular vectors). If missing all feature groups are selected.\cr\cr For \code{[[}: should be a skalar value.}
 
-\item{\dots}{Any further (and unique) \code{compounds} objects.}
+\item{\dots}{For \code{plotSpec}: Further arguments passed to
+  \code{\link[graphics]{plot}}.
+
+  Others: Any further (and unique) \code{compounds} objects.}
 
 \item{drop, j}{ignored.}
 
@@ -138,9 +142,8 @@ if at least one of the fragment formulae follow the given restrictions. See
 \item{topMost}{Only keep a maximum of \code{topMost} candidates with highest
 score. Set to \code{NULL} to ignore.}
 
-\item{formulas}{The \code{\link{formulas}} object that should be
-used for scoring/annotation. For \code{plotSpec}: set to \code{NULL} to
-ignore.}
+\item{formulas}{The \code{\link{formulas}} object that should be used for
+scoring/annotation. For \code{plotSpec}: set to \code{NULL} to ignore.}
 
 \item{updateScore}{If set to \code{TRUE} then the \code{score} column is
 updated by adding the normalized \option{formulaScore} (weighted by
@@ -184,6 +187,9 @@ generate the candidate}
 
 \item{plotStruct}{If \code{TRUE} then the candidate structure is drawn in the
 spectrum.}
+
+\item{xlim, ylim}{Sets the plot size limits used by
+\code{\link[graphics]{plot}}. Set to \code{NULL} for automatic plot sizing.}
 
 \item{labels}{A \code{character} with names to use for labelling. If
 \code{NULL} labels are automatically generated.}

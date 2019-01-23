@@ -466,7 +466,7 @@ makeVennPlot <- function(plotObjects, categories, areas, intersectFunc,
     invisible(list(gList = gRet, areas = areas, intersectionCounts = icounts))
 }
 
-makeMSPlot <- function(spec, fragInfo, ..., extraHeightInch = 0)
+makeMSPlot <- function(spec, fragInfo, xlim, ylim, ..., extraHeightInch = 0)
 {
     hasFragInfo <- !is.null(fragInfo) && nrow(fragInfo) > 0
     plotData <- copy(spec)
@@ -507,6 +507,11 @@ makeMSPlot <- function(spec, fragInfo, ..., extraHeightInch = 0)
     # mark precursor
     plotData[precursor == TRUE, c("colour", "lwd", "legend") := .("red", 2, "precursor")]
 
+    if (is.null(xlim))
+        xlim <- range(plotData$mz) * c(0.9, 1.1)
+    else
+        plotData <- plotData[numGTE(mz, xlim[1]) & numLTE(mz, xlim[2])] # remove any peaks outisde plotting range
+
     doLegend <- !is.null(plotData[["legend"]]) && any(!is.na(plotData[["legend"]]) & nzchar(plotData[["legend"]]))
     if (doLegend)
     {
@@ -525,24 +530,29 @@ makeMSPlot <- function(spec, fragInfo, ..., extraHeightInch = 0)
         oldp <- par(omd = c(0, 1 - lw, 0, 1), new = TRUE)
     }
 
-    formWidths <- if (!is.null(plotData[["formWidth"]])) plotData$formWidth else rep(0, nrow(plotData))
-    formWidths[is.na(formWidths)] <- 0
+    if (is.null(ylim))
+    {
+        formWidths <- if (!is.null(plotData[["formWidth"]])) plotData$formWidth else rep(0, nrow(plotData))
+        formWidths[is.na(formWidths)] <- 0
 
-    # see how much extra vertical space is needed by formula labels
-    # get character widths (assuming that height of vertically plotted text is the same)
-    pheight <- par("din")[2] # plot dev height in inches
-    relFormHeights <- formWidths / pheight
+        # see how much extra vertical space is needed by formula labels
+        # get character widths (assuming that height of vertically plotted text is the same)
+        pheight <- par("din")[2] # plot dev height in inches
+        relFormHeights <- formWidths / pheight
 
-    ym <- max(plotData$intensity) # 'regular' plot height in user coordinates, not considering any labels etc
-    relIntHeights <- plotData$intensity / ym
-    maxRelH <- max(relFormHeights + relIntHeights)
+        ym <- max(plotData$intensity) # 'regular' plot height in user coordinates, not considering any labels etc
+        relIntHeights <- plotData$intensity / ym
+        maxRelH <- max(relFormHeights + relIntHeights)
 
-    ym <- ym * maxRelH * 1.05 # enlarge y limit and add some extra spacing
+        ym <- ym * maxRelH * 1.05 # enlarge y limit and add some extra spacing
 
-    if (extraHeightInch > 0)
-        ym <- ym * (1 + (extraHeightInch / pheight))
+        if (extraHeightInch > 0)
+            ym <- ym * (1 + (extraHeightInch / pheight))
 
-    plot(0, xlab = "m/z", ylab = "Intensity", xlim = range(plotData$mz) * c(0.9, 1.1), ylim = c(0, ym),
+        ylim <- c(0, ym)
+    }
+
+    plot(0, xlab = "m/z", ylab = "Intensity", xlim = xlim, ylim = ylim,
          type = "n", bty = "l", ...)
 
     for (i in seq_len(nrow(plotData)))
@@ -551,7 +561,7 @@ makeMSPlot <- function(spec, fragInfo, ..., extraHeightInch = 0)
                  col = plotData[[i, "colour"]], lwd = plotData[[i, "lwd"]])
 
         if (!is.null(plotData[["formula"]]) && !is.na(plotData[[i, "formula"]]))
-            text(plotData[[i, "mz"]], plotData[[i, "intensity"]] + (ym * 0.02),
+            text(plotData[[i, "mz"]], plotData[[i, "intensity"]] + (ylim[2] * 0.02),
                  plotData[[i, "formula"]], srt = 90, adj = 0)
     }
 

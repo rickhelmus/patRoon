@@ -13,9 +13,8 @@ NULL
 #'   method for access.
 #' @slot algorithm The algorithm that was used for generation of compounds. Use
 #'   the \code{algorithm} method for access.
-#' @param formulas The \code{\link{formulas}} object that should be
-#'   used for scoring/annotation. For \code{plotSpec}: set to \code{NULL} to
-#'   ignore.
+#' @param formulas The \code{\link{formulas}} object that should be used for
+#'   scoring/annotation. For \code{plotSpec}: set to \code{NULL} to ignore.
 #'
 #' @param obj,object,x,compounds The \code{compound} object.
 #' @param index The numeric index of the candidate structure. Multiple indices
@@ -24,7 +23,10 @@ NULL
 #'   \samp{-1} may be specified to these methods to select all candidates. When
 #'   multiple indices are specified for \code{plotStructure}, their maximum
 #'   common substructure will be drawn.
-#' @param \dots Any further (and unique) \code{compounds} objects.
+#' @param \dots For \code{plotSpec}: Further arguments passed to
+#'   \code{\link[graphics]{plot}}.
+#'
+#'   Others: Any further (and unique) \code{compounds} objects.
 #'
 #' @templateVar seli feature groups
 #' @templateVar selOrderi groupNames()
@@ -593,10 +595,15 @@ setMethod("plotScores", "compounds", function(obj, index, groupName, normalizeSc
 #'
 #' @param plotStruct If \code{TRUE} then the candidate structure is drawn in the
 #'   spectrum.
+#' @param title The title of the plot. If \code{NULL} a title will be
+#'   automatically made.
+#'
+#' @template plot-lim
 #'
 #' @export
 setMethod("plotSpec", "compounds", function(obj, index, groupName, MSPeakLists, formulas = NULL,
-                                            plotStruct = TRUE, useGGPlot2 = FALSE)
+                                            plotStruct = TRUE, title = NULL, useGGPlot2 = FALSE, xlim = NULL,
+                                            ylim = NULL, ...)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertCount(index, positive = TRUE, add = ac)
@@ -604,6 +611,7 @@ setMethod("plotSpec", "compounds", function(obj, index, groupName, MSPeakLists, 
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
     checkmate::assertClass(formulas, "formulas", null.ok = TRUE, add = ac)
     aapply(checkmate::assertFlag, . ~plotStruct + useGGPlot2, fixed = list(add = ac))
+    assertXYLim(xlim, ylim, add = ac)
     checkmate::reportAssertions(ac)
 
     compTable <- compoundTable(obj)[[groupName]]
@@ -637,17 +645,25 @@ setMethod("plotSpec", "compounds", function(obj, index, groupName, MSPeakLists, 
     if (plotStruct)
         mol <- getMoleculesFromSMILES(compr$SMILES)
 
+    if (is.null(title))
+    {
+        if (!is.null(compr$compoundName) && !is.na(compr$compoundName) && nzchar(compr$compoundName))
+            title <- sprintf("%s (%s)", compr$compoundName, compr$formula)
+        else
+            title <- compr$formula
+    }
+
     if (!useGGPlot2)
     {
-        oldp <- par(mar = par("mar") * c(1, 1, 0, 0))
+        # oldp <- par(mar = par("mar") * c(1, 1, 0, 0))
 
         if (plotStruct && isValidMol(mol))
         {
             molHInch <- 1.5
-            makeMSPlot(spec, fi, extraHeightInch = molHInch)
+            makeMSPlot(spec, fi, xlim, ylim, main = title, ..., extraHeightInch = molHInch)
         }
         else
-            makeMSPlot(spec, fi)
+            makeMSPlot(spec, fi, xlim, ylim, main = title, ...)
 
         # draw structure
         if (plotStruct && isValidMol(mol))
@@ -692,11 +708,11 @@ setMethod("plotSpec", "compounds", function(obj, index, groupName, MSPeakLists, 
             rasterImage(img, startx, ylim - imgPlotH, startx + imgPlotW, ylim)
         }
 
-        par(oldp)
+        # par(oldp)
     }
     else
     {
-        MSPlot <- makeMSPlotGG(spec, fi)
+        MSPlot <- makeMSPlotGG(spec, fi) + ggtitle(title)
 
         if (plotStruct && isValidMol(mol))
         {

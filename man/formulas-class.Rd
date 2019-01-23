@@ -49,7 +49,8 @@
   topMost = NULL, scoreLimits = NULL, OM = NULL)
 
 \S4method{plotSpec}{formulas}(obj, precursor, groupName, analysis = NULL,
-  MSPeakLists, useGGPlot2 = FALSE)
+  MSPeakLists, title = precursor, useGGPlot2 = FALSE, xlim = NULL,
+  ylim = NULL, ...)
 
 \S4method{plotVenn}{formulas}(obj, ..., labels = NULL, vennArgs = NULL)
 
@@ -69,11 +70,10 @@ for feature groups.}
 their index or name, respectively (for the order/names see \code{analyses()/groupNames()}).\cr\cr For \code{[}: Can also be logical to perform logical selection
 (similar to regular vectors). If missing all analyses/feature groups are selected.\cr\cr For \code{[[}: should be a skalar value. If \code{j} is not specified, \code{i} selects by feature groups instead.}
 
-\item{\dots}{\code{plotVenn}: other \code{formulas} objects that should be
-  compared.
+\item{\dots}{For \code{plotSpec}: Further arguments passed to
+  \code{\link[graphics]{plot}}.
 
-  \code{consensus}: One or more \code{formulas} objects that should be used
-  to generate the consensus.}
+  Others: Any further (and unique) \code{formulas} objects.}
 
 \item{drop}{ignored.}
 
@@ -163,6 +163,9 @@ generate the candidate}
 plotting, otherwise base plot used. For \code{plotSpec}, \code{ggplot2}
 allows nicely repelled text for annotation. However, base plot is generally
 faster.}
+
+\item{xlim, ylim}{Sets the plot size limits used by
+\code{\link[graphics]{plot}}. Set to \code{NULL} for automatic plot sizing.}
 
 \item{labels}{A \code{character} with names to use for labelling. If
 \code{NULL} labels are automatically generated.}

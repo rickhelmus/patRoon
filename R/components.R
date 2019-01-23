@@ -26,9 +26,13 @@ orderComponentsNames <- function(n) order(nchar(n), n)
 #' @param \dots For \code{plotEIC}: Further (optional) arguments passed to the
 #'   \code{plotEIC} method for the \code{\link{featureGroups}} class. Note that
 #'   the \code{colourBy}, \code{showPeakArea}, \code{showFGroupRect} and
-#'   \code{topMost} arguments cannot be set as these are set by this method. For
-#'   \code{consensus}: \code{components} objects that should be used to generate
-#'   the consensus.
+#'   \code{topMost} arguments cannot be set as these are set by this method.
+#'
+#'   For \code{plotSpec}: Further arguments passed to
+#'   \code{\link[graphics]{plot}}.
+#'
+#'   For \code{consensus}: \code{components} objects that should be used to
+#'   generate the consensus.
 #'
 #' @templateVar seli components
 #' @templateVar selOrderi names()
@@ -38,12 +42,12 @@ orderComponentsNames <- function(n) order(nchar(n), n)
 #' @templateVar dollarOpName component
 #' @template sub_op-args
 #'
-#' @return The subset operator (\code{"["}) and \code{filter} method
-#'   return the data subset in an object from the \code{componentsReduced}
-#'   class. This object does not contain any algorithm specific data and as
-#'   such, algorithm specific methods (\emph{e.g.} \code{treeCut}) will not work
-#'   on this object. The reason for this is that it is often very difficult or
-#'   impossible to subset the algorithmic data.
+#' @return The subset operator (\code{"["}) and \code{filter} method return the
+#'   data subset in an object from the \code{componentsReduced} class. This
+#'   object does not contain any algorithm specific data and as such, algorithm
+#'   specific methods (\emph{e.g.} \code{treeCut}) will not work on this object.
+#'   The reason for this is that it is often very difficult or impossible to
+#'   subset the algorithmic data.
 #'
 #' @templateVar class components
 #' @template class-hierarchy
@@ -271,7 +275,7 @@ setMethod("filter", "components", function(obj, size = NULL, adducts = NULL,
             obj@componentInfo <- obj@componentInfo[rt_increment >= rtIncrement[1] & rt_increment <= rtIncrement[2]]
         if (!is.null(mzIncrement) && !is.null(obj@componentInfo[["mz_increment"]]))
             obj@componentInfo <- obj@componentInfo[mz_increment >= mzIncrement[1] & mz_increment <= mzIncrement[2]]
-        
+
         obj@components <- obj@components[names(obj@components) %in% obj@componentInfo$name]
     }
 
@@ -308,8 +312,11 @@ setMethod("findFGroup", "components", function(obj, fGroup)
 #'
 #' @template useGGplot2
 #'
+#' @template plot-lim
+#'
 #' @export
-setMethod("plotSpec", "components", function(obj, index, markFGroup = NULL, useGGPlot2 = FALSE, ...)
+setMethod("plotSpec", "components", function(obj, index, markFGroup = NULL, useGGPlot2 = FALSE,
+                                             xlim = NULL, ylim = NULL, ...)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assert(
@@ -318,6 +325,7 @@ setMethod("plotSpec", "components", function(obj, index, markFGroup = NULL, useG
     , .var.name = index)
     checkmate::assertString(markFGroup, min.chars = 1, null.ok = TRUE, add = ac)
     checkmate::assertFlag(useGGPlot2, add = ac)
+    assertXYLim(xlim, ylim, add = ac)
     checkmate::reportAssertions(ac)
 
     plotData <- copy(componentTable(obj)[[index]]) # UNDONE: allow multiple selection?
@@ -396,7 +404,12 @@ setMethod("plotSpec", "components", function(obj, index, markFGroup = NULL, useG
         lw <- (grconvertX(leg$rect$w, to = "ndc") - grconvertX(0, to = "ndc"))
         par(omd = c(0, 1 - lw, 0, 1), new = TRUE)
 
-        plot(0, xlab = "m/z", ylab = "Intensity", xlim = mzRange, ylim = c(0, intMax * 1.25),
+        if (is.null(xlim))
+            xlim <- mzRange
+        if (is.null(ylim))
+            ylim <- c(0, intMax * 1.25)
+
+        plot(0, xlab = "m/z", ylab = "Intensity", xlim = xlim, ylim = ylim,
              type = "n", bty = "l", ...)
 
         segments(plotData$mz, 0, plotData$mz, plotData$intensity,

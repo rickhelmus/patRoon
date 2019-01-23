@@ -662,12 +662,15 @@ setMethod("plotChord", "featureGroups", function(obj, addSelfLinks = FALSE, addR
 #'   displayed when all EICs are being plot. Set to \code{"none"} to disable any
 #'   annotation.
 #'
+#' @template plot-lim
+#'
 #' @export
 setMethod("plotEIC", "featureGroups", function(obj, rtWindow = 30, mzWindow = 0.005, retMin = FALSE, topMost = NULL,
                                                EICs = NULL, showPeakArea = FALSE, showFGroupRect = TRUE,
                                                title = NULL, colourBy = c("none", "rGroups", "fGroups"),
                                                showLegend = TRUE, onlyPresent = TRUE,
-                                               annotate = c("none", "ret", "mz"), showProgress = FALSE, ...)
+                                               annotate = c("none", "ret", "mz"), showProgress = FALSE,
+                                               xlim = NULL, ylim = NULL, ...)
 {
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertNumber, . ~ rtWindow + mzWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
@@ -679,6 +682,8 @@ setMethod("plotEIC", "featureGroups", function(obj, rtWindow = 30, mzWindow = 0.
 
     colourBy <- checkmate::matchArg(colourBy, c("none", "rGroups", "fGroups"), add = ac)
     annotate <- checkmate::matchArg(annotate, c("none", "ret", "mz"), several.ok = TRUE, add = ac)
+
+    assertXYLim(xlim, ylim, add = ac)
 
     checkmate::reportAssertions(ac)
 
@@ -790,9 +795,13 @@ setMethod("plotEIC", "featureGroups", function(obj, rtWindow = 30, mzWindow = 0.
         par(omd = c(0, 1 - lw, 0, 1), new = TRUE)
     }
 
-    ymax <- plotLimits$maxInt * 1.1
+    if (is.null(xlim))
+        xlim <- plotLimits$rtRange
+    if (is.null(ylim))
+        ylim <- c(0, plotLimits$maxInt * 1.1)
+
     plot(0, type = "n", main = title, xlab = sprintf("Retention time (%s)", if (retMin) "min." else "sec."), ylab = "Intensity",
-         xlim = plotLimits$rtRange, ylim = c(0, ymax), ...)
+         xlim = xlim, ylim = ylim, ...)
 
     if (showProgress)
         prog <- txtProgressBar(0, gCount, style = 3)
@@ -868,7 +877,7 @@ setMethod("plotEIC", "featureGroups", function(obj, rtWindow = 30, mzWindow = 0.
                     antxt <- paste(antxt, sprintf("%.4f", gInfo[grp, "mzs"]), sep = "\n")
 
                 if (nzchar(antxt))
-                    text(rt, intRange[2] + ymax * 0.02, antxt)
+                    text(rt, intRange[2] + ylim[2] * 0.02, antxt)
             }
         }
 

@@ -15,11 +15,10 @@ NULL
 #'   the \code{algorithm} method for access.
 #'
 #' @param obj,x,object,formulas The \code{formulas} object.
-#' @param \dots \code{plotVenn}: other \code{formulas} objects that should be
-#'   compared.
+#' @param \dots For \code{plotSpec}: Further arguments passed to
+#'   \code{\link[graphics]{plot}}.
 #'
-#'   \code{consensus}: One or more \code{formulas} objects that should be used
-#'   to generate the consensus.
+#'   Others: Any further (and unique) \code{formulas} objects.
 #' @param OM For \code{as.data.table}: if set to \code{TRUE} several columns
 #'   with information relevant for organic matter (OM) characterization will be
 #'   added (e.g. elemental ratios, classification). This will also make sure
@@ -400,16 +399,20 @@ setMethod("filter", "formulas", function(obj, minExplainedFragPeaks = NULL, elem
 #' @param analysis A \code{character} specifying the analysis for which the
 #'   annotated spectrum should be plotted. If \code{NULL} then annotation
 #'   results for the complete feature group will be plotted.
+#' @param title The title of the plot.
 #'
 #' @template plotSpec-args
 #'
 #' @template useGGplot2
 #'
+#' @template plot-lim
+#'
 #' @return \code{plotSpec} will return a \code{\link[=ggplot2]{ggplot object}}
 #'   if \code{useGGPlot2} is \code{TRUE}.
 #'
 #' @export
-setMethod("plotSpec", "formulas", function(obj, precursor, groupName, analysis = NULL, MSPeakLists, useGGPlot2 = FALSE)
+setMethod("plotSpec", "formulas", function(obj, precursor, groupName, analysis = NULL, MSPeakLists,
+                                           title = precursor, useGGPlot2 = FALSE, xlim = NULL, ylim = NULL, ...)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertString(precursor, min.chars = 1, add = ac)
@@ -417,6 +420,7 @@ setMethod("plotSpec", "formulas", function(obj, precursor, groupName, analysis =
     checkmate::assertString(analysis, min.chars = 1, null.ok = TRUE, add = ac)
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
     checkmate::assertFlag(useGGPlot2, add = ac)
+    assertXYLim(xlim, ylim, add = ac)
     checkmate::reportAssertions(ac)
 
     if (!is.null(analysis))
@@ -438,9 +442,9 @@ setMethod("plotSpec", "formulas", function(obj, precursor, groupName, analysis =
     fi <- getFragmentInfoFromForms(spec, formTable)
 
     if (useGGPlot2)
-        return(makeMSPlotGG(spec, fi) + ggtitle(precursor))
+        return(makeMSPlotGG(spec, fi) + ggtitle(title))
 
-    makeMSPlot(spec, fi, main = precursor)
+    makeMSPlot(spec, fi, xlim, ylim, ..., main = title)
 })
 
 #' @describeIn formulas plots a Venn diagram (using \pkg{\link{VennDiagram}})

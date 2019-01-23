@@ -8,13 +8,17 @@ getTestFGroups <- function(anaInfo = getTestAnaInfo(), ...) groupFeatures(findFe
 getEmptyTestFGroups <- function() getTestFGroups()[, "none"]
 getEmptyPLists <- function() MSPeakLists(algorithm = "none")
 
-# to make testing it a easier: precursors don't have to follow filter rules
+# to make testing a bit easier: precursors don't have to follow filter rules
 removePrecursors <- function(plists)
 {
-    plists@peakLists <- lapply(plists@peakLists,
-                               function(pa) lapply(pa, function(pg) lapply(pg, function(pl) pl[precursor == FALSE])))
-    plists@averagedPeakLists <- lapply(plists@averagedPeakLists,
-                                       function(pg) lapply(pg, function(pl) pl[precursor == FALSE]))
+    plists@peakLists <- pruneList(lapply(plists@peakLists,
+                                         function(pa) pruneList(lapply(pa, function(pg)
+                                             pruneList(lapply(pg, function(pl) pl[precursor == FALSE]), checkZeroRows = TRUE)),
+                                             checkEmptyElements = TRUE)), checkEmptyElements = TRUE)
+    plists@averagedPeakLists <- pruneList(lapply(plists@averagedPeakLists,
+                                                 function(pg) pruneList(lapply(pg, function(pl) pl[precursor == FALSE]),
+                                                                        checkZeroRows = TRUE)),
+                                          checkEmptyElements = TRUE)
     return(plists)
 }
 

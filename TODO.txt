@@ -49,6 +49,7 @@ MSPeakLists
 - report spectra/tables?
 - collapse averagedPeakLists
 - test avg params
+- add pruneMissingPrecursorMS to filter()?
 
 
 compounds

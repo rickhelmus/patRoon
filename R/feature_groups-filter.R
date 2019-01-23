@@ -34,7 +34,7 @@ doFilter <- function(fGroups, what, hashParam, func, cacheCateg = what, verbose 
     if (is.null(ret))
     {
         fGroups@groups <- copy(fGroups@groups)
-        ret <- func(fGroups)
+        ret <- if (length(fGroups) > 0) func(fGroups) else fGroups
         saveCacheData(cacheName, ret, hash)
     }
 

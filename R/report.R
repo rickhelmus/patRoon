@@ -753,7 +753,7 @@ setMethod("reportMD", "featureGroups", function(fGroups, path, reportPlots, form
 
     EICs <- NULL
 
-    # NOTE: loading ECIs is done outside knitr environment: the current working
+    # NOTE: loading EICs is done outside knitr environment: the current working
     # directory is changed so we loose access to the cache.
 
     # UNDONE: always load EICs? Need them for summary EIC plot
@@ -788,4 +788,6 @@ setMethod("reportMD", "featureGroups", function(fGroups, path, reportPlots, form
     
     if (openReport)
         browseURL(paste0("file://", outputFile))
+    
+    invisible(NULL)
 })

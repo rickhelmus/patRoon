@@ -257,6 +257,9 @@ setMethod("filter", "compounds", function(obj, minExplainedPeaks = NULL, minScor
                                               .SDcols = cols]]
             }
         }
+        
+        if (nrow(cmpTable) == 0)
+            return(cmpTable)
 
         if (!is.null(elements))
             cmpTable <- cmpTable[sapply(formula, checkFormula, elements)]

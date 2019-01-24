@@ -217,9 +217,9 @@ NULL
 #' @seealso \code{\link{featureGroups-class}}
 NULL
 
-#' Optimizatation of feature finding and grouping parameters
+#' Optimization of feature finding and grouping parameters
 #'
-#' Automatic optimizatation of feature finding and grouping parameters through
+#' Automatic optimization of feature finding and grouping parameters through
 #' Design of Experiments (DoE).
 #'
 #' Many different parameters exist that may affect the output quality of feature

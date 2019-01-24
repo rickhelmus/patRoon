@@ -15,11 +15,11 @@ NULL
 #'   the \code{algorithm} method for access.
 #'
 #' @param obj,x,object,formulas The \code{formulas} object.
-#' @param \dots \code{consensus}: One or more \code{formulas} objects that should be used to
-#'   generate the consensus.
+#' @param \dots For \code{plotSpec}: Further arguments passed to
+#'   \code{\link[graphics]{plot}}.
 #'
-#'   \code{as.data.frame}: Arguments passed to \code{as.data.table}.
-#' @param OM For \code{as.data.table}/\code{as.data.frame}: if set to \code{TRUE} several columns
+#'   Others: Any further (and unique) \code{formulas} objects.
+#' @param OM For \code{as.data.table}: if set to \code{TRUE} several columns
 #'   with information relevant for organic matter (OM) characterization will be
 #'   added (e.g. elemental ratios, classification). This will also make sure
 #'   that \code{countElements} contains at least C, H, N, O, P and S.
@@ -27,6 +27,8 @@ NULL
 #'   For \code{filter}: If \code{TRUE} then several filters are applied to
 #'   exclude unlikely formula candidates present in organic matter (OM). See
 #'   Source section for details.
+#' @param labels A \code{character} with names to use for labelling. If
+#'   \code{NULL} labels are automatically generated.
 #'
 #' @templateVar seli analyses
 #' @templateVar selOrderi analyses()
@@ -397,16 +399,20 @@ setMethod("filter", "formulas", function(obj, minExplainedFragPeaks = NULL, elem
 #' @param analysis A \code{character} specifying the analysis for which the
 #'   annotated spectrum should be plotted. If \code{NULL} then annotation
 #'   results for the complete feature group will be plotted.
+#' @param title The title of the plot.
 #'
 #' @template plotSpec-args
 #'
 #' @template useGGplot2
 #'
+#' @template plot-lim
+#'
 #' @return \code{plotSpec} will return a \code{\link[=ggplot2]{ggplot object}}
 #'   if \code{useGGPlot2} is \code{TRUE}.
 #'
 #' @export
-setMethod("plotSpec", "formulas", function(obj, precursor, groupName, analysis = NULL, MSPeakLists, useGGPlot2 = FALSE)
+setMethod("plotSpec", "formulas", function(obj, precursor, groupName, analysis = NULL, MSPeakLists,
+                                           title = precursor, useGGPlot2 = FALSE, xlim = NULL, ylim = NULL, ...)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertString(precursor, min.chars = 1, add = ac)
@@ -414,6 +420,7 @@ setMethod("plotSpec", "formulas", function(obj, precursor, groupName, analysis =
     checkmate::assertString(analysis, min.chars = 1, null.ok = TRUE, add = ac)
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
     checkmate::assertFlag(useGGPlot2, add = ac)
+    assertXYLim(xlim, ylim, add = ac)
     checkmate::reportAssertions(ac)
 
     if (!is.null(analysis))
@@ -435,9 +442,94 @@ setMethod("plotSpec", "formulas", function(obj, precursor, groupName, analysis =
     fi <- getFragmentInfoFromForms(spec, formTable)
 
     if (useGGPlot2)
-        return(makeMSPlotGG(spec, fi) + ggtitle(precursor))
+        return(makeMSPlotGG(spec, fi) + ggtitle(title))
 
-    makeMSPlot(spec, fi, main = precursor)
+    makeMSPlot(spec, fi, xlim, ylim, ..., main = title)
+})
+
+#' @describeIn formulas plots a Venn diagram (using \pkg{\link{VennDiagram}})
+#'   outlining unique and shared formula candidates of up to five different
+#'   \code{formulas} objects.
+#'
+#' @param vennArgs A \code{list} with further arguments passed to
+#'   \pkg{VennDiagram} plotting functions. Set to \code{NULL} to ignore.
+#'
+#' @template plotvenn-ret
+#'
+#' @export
+setMethod("plotVenn", "formulas", function(obj, ..., labels = NULL, vennArgs = NULL)
+{
+    allForms <- c(list(obj), list(...))
+
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertList(allForms, types = "formulas", min.len = 2, any.missing = FALSE,
+                          unique = TRUE, .var.name = "...", add = ac)
+    checkmate::assertList(vennArgs, names = "unique", null.ok = TRUE, add = ac)
+    checkmate::reportAssertions(ac)
+
+    if (is.null(labels))
+        labels <- make.unique(sapply(allForms, algorithm))
+    if (is.null(vennArgs))
+        vennArgs <- list()
+
+    allFormTabs <- lapply(allForms, as.data.table)
+    do.call(makeVennPlot, c(list(allFormTabs, labels, lengths(allForms), function(obj1, obj2)
+    {
+        if (length(obj1) == 0 || length(obj2) == 0)
+            return(data.table())
+        fintersect(obj1[, c("group", "formula")], obj2[, c("group", "formula")])
+    }, nrow), vennArgs))
+})
+
+#' @describeIn formulas plots an UpSet diagram (using the
+#'   \code{\link[UpSetR]{upset}} function) outlining unique and shared formula
+#'   candidates between different \code{formula} objects.
+#'
+#' @param nsets,nintersects See \code{\link[UpSetR]{upset}}.
+#' @param upsetArgs A list with any further arguments to be passed to
+#'   \code{\link[UpSetR]{upset}}. Set to \code{NULL} to ignore.
+#'
+#' @references \insertRef{Conway2017}{patRoon} \cr\cr
+#'   \insertRef{Lex2014}{patRoon}
+#'
+#' @export
+setMethod("plotUpSet", "formulas", function(obj, ..., labels = NULL, nsets = length(list(...)) + 1,
+                                            nintersects = NA, upsetArgs = NULL)
+{
+    allForms <- c(list(obj), list(...))
+
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertList(allForms, types = "formulas", min.len = 2, any.missing = FALSE,
+                          unique = TRUE, .var.name = "...", add = ac)
+    checkmate::assertList(upsetArgs, names = "unique", null.ok = TRUE, add = ac)
+    checkmate::assertCount(nsets, positive = TRUE)
+    checkmate::assertCount(nintersects, positive = TRUE, na.ok = TRUE)
+    checkmate::reportAssertions(ac)
+
+    if (is.null(labels))
+        labels <- make.unique(sapply(allForms, algorithm))
+
+    allFormTabs <- mapply(allForms, labels, SIMPLIFY = FALSE, FUN = function(f, l)
+    {
+        ret <- as.data.table(f)
+        if (length(ret) == 0)
+            ret <- data.table(group = character(), formula = character())
+        ret <- unique(ret[, c("group", "formula")])[, (l) := 1]
+    })
+
+    formTab <- Reduce(function(f1, f2)
+    {
+        merge(f1, f2, by = c("group", "formula"), all = TRUE)
+    }, allFormTabs)
+
+    formTab <- formTab[, labels, with = FALSE]
+    for (j in seq_along(formTab))
+        set(formTab, which(is.na(formTab[[j]])), j, 0)
+
+    if (sum(sapply(formTab, function(x) any(x>0))) < 2)
+        stop("Need at least two non-empty objects to plot")
+
+    do.call(UpSetR::upset, c(list(formTab, nsets = nsets, nintersects = nintersects), upsetArgs))
 })
 
 #' @describeIn formulas Generates a consensus of results from multiple
@@ -448,11 +540,15 @@ setMethod("plotSpec", "formulas", function(obj, precursor, groupName, analysis =
 #'   \samp{0.5} means that a particular formula should be present in at least
 #'   \samp{50\%} of all objects.
 #'
+#' @templateVar what formulas
+#' @template consensus-unique-args
+#'
 #' @return \code{consensus} returns a \code{formulas} object that is produced by
 #'   merging results from multiple \code{formulas} objects.
 #'
 #' @export
-setMethod("consensus", "formulas", function(obj, ..., formThreshold = 0)
+setMethod("consensus", "formulas", function(obj, ..., formThreshold = 0,
+                                            uniqueFrom = NULL, uniqueOuter = FALSE)
 {
     allFormulas <- c(list(obj), list(...))
 
@@ -462,8 +558,11 @@ setMethod("consensus", "formulas", function(obj, ..., formThreshold = 0)
     checkmate::assertNumber(formThreshold, lower = 0, finite = TRUE, add = ac)
     checkmate::reportAssertions(ac)
 
-    allFormNames <- sapply(allFormulas, algorithm)
-    allFormNames <- make.unique(allFormNames)
+    allFormNames <- make.unique(sapply(allFormulas, algorithm))
+    assertConsUniqueArgs(uniqueFrom, uniqueOuter, allFormNames)
+
+    if (!is.null(uniqueFrom) && formThreshold != 0)
+        stop("Cannot apply both unique and abundance filters simultaneously.")
 
     allFormulasLists <- sapply(seq_along(allFormulas), function(fi)
     {
@@ -562,10 +661,24 @@ setMethod("consensus", "formulas", function(obj, ..., formThreshold = 0)
         if (length(leftCols) > 0)
             setnames(consFormulaList[[grpi]], leftCols, deDupCols)
 
-        consFormulaList[[grpi]][, coverage := (sapply(mergedBy, countCharInStr, ",") + 1) / length(allFormulas)]
+        consFormulaList[[grpi]][, coverage := length(unique(unlist(strsplit(mergedBy, ",")))) / length(allFormulas), by = "formula"]
 
         if (formThreshold > 0)
             consFormulaList[[grpi]] <- consFormulaList[[grpi]][coverage >= formThreshold]
+        else if (!is.null(uniqueFrom))
+        {
+            if (!is.character(uniqueFrom))
+                uniqueFrom <- allFormNames[uniqueFrom]
+
+            keep <- function(mergedBy)
+            {
+                mbs <- unique(unlist(strsplit(mergedBy, ",")))
+                ret <- all(mbs %in% uniqueFrom) && (!uniqueOuter || length(mbs) == 1)
+                return(rep(ret, length(mergedBy)))
+            }
+
+            consFormulaList[[grpi]] <- consFormulaList[[grpi]][consFormulaList[[grpi]][, keep(mergedBy), by = "formula"][[2]]]
+        }
 
         consFormulaList[[grpi]] <- rankFormulaTable(consFormulaList[[grpi]])
     }

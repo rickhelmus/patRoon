@@ -339,9 +339,10 @@ generateGroupFormulasByConsensus <- function(formList, formThreshold)
 getFragmentInfoFromForms <- function(spec, fragFormTable)
 {
     if (nrow(fragFormTable) == 0)
-        return(data.table(mz = numeric(0), formula = character(0), intensity = numeric(0), PLIndex = numeric(0)))
+        return(data.table(mz = numeric(0), formula = character(0), neutral_loss = character(0),
+                          intensity = numeric(0), PLIndex = numeric(0)))
 
-    fi <- data.table(mz = fragFormTable$frag_mz, formula = fragFormTable$frag_formula)
+    fi <- data.table(mz = fragFormTable$frag_mz, formula = fragFormTable$frag_formula, neutral_loss = fragFormTable$neutral_loss)
     fi[, PLIndex := sapply(mz, function(omz) which.min(abs(omz - spec$mz)))] # UNDONE: is this always correct?
     fi[, intensity := spec$intensity[PLIndex]]
 

@@ -4,9 +4,17 @@ library(patRoon)
 
 workPath <- "{{ destination }}"
 setwd(workPath)
+{{ optionalCodeBlock(generateAnaInfo == "table") }}
 
 # Load analysis table
 anaInfo <- read.csv("{{ analysisTableFile }}", stringsAsFactors = FALSE, colClasses = "character")
+{{ endCodeBlock() }}
+{{ optionalCodeBlock(generateAnaInfo == "script") }}
+
+anaInfo <- generateAnalysisInfo(paths = c({{ paste0("\"", unique(analyses$path), "\"", collapse = ", ") }}),
+                                groups = c({{ paste0("\"", analyses$group, "\"", collapse = ", ") }}),
+                                refs = c({{ paste0("\"", analyses$ref, "\"", collapse = ", ") }}))
+{{ endCodeBlock() }}
 {{ optionalCodeBlock(dataPretreatmentOpts$DAMethod != "" || length(dataPretreatmentOpts$steps) > 0) }}
 
 # Set to FALSE to skip data pretreatment (e.g. calibration, export, ...)
@@ -55,7 +63,7 @@ avgPListParams <- getDefAvgPListParams(clusterMzWindow = 0.005)
 {{ endCodeBlock() }}
 {{ optionalCodeBlock(doMSPeakFind && peakListOpts$algo == "mzR") }}
 # NOTE: please check all arguments, especially precursorMzWindow!
-plists <- generateMSPeakLists(fGroups, "mzr", maxRtMSWidth = 20, precursorMzWindow = NULL,
+plists <- generateMSPeakLists(fGroups, "mzr", maxRtMSWidth = 20, precursorMzWindow = {{ if (precursorMzWindow == 0) "NULL" else precursorMzWindow }},
                               avgFeatParams = avgPListParams, avgFGroupParams = avgPListParams)
 {{ endCodeBlock() }}
 {{ optionalCodeBlock(doMSPeakFind && peakListOpts$algo == "Bruker" && featFinderOpts$algo != "Bruker") }}

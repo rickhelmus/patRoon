@@ -70,7 +70,7 @@ plotSpec(obj, ...)
 
 plotStructure(obj, ...)
 
-plotVenn(obj, which = NULL, ...)
+plotVenn(obj, ...)
 
 plotUpSet(obj, ...)
 
@@ -92,8 +92,6 @@ represent non-shared data.}
 
 \item{addRetMzPlots}{Set to \code{TRUE} to enable \emph{m/z} \emph{vs}
 retention time scatter plots.}
-
-\item{which}{What should be plotted. See method documentation for specifics.}
 
 \item{k, h}{Desired numbers of clusters. See \code{\link{cutree}}.}
 
@@ -212,13 +210,13 @@ please refer to the linked method documentation for each generic.
 \code{plotVenn} plots a Venn diagram to assess unique and overlapping data.
 
 \itemize{
-    \item Methods are defined for: \code{\link[=plotVenn,featureGroups-method]{featureGroups}}; \code{\link[=plotVenn,featureGroupsComparison-method]{featureGroupsComparison}}.
+    \item Methods are defined for: \code{\link[=plotVenn,compounds-method]{compounds}}; \code{\link[=plotVenn,featureGroups-method]{featureGroups}}; \code{\link[=plotVenn,featureGroupsComparison-method]{featureGroupsComparison}}; \code{\link[=plotVenn,formulas-method]{formulas}}.
 }
 
 \code{plotUpSet} plots an UpSet diagram to assess unique and overlapping data.
 
 \itemize{
-    \item Methods are defined for: \code{\link[=plotUpSet,featureGroups-method]{featureGroups}}; \code{\link[=plotUpSet,featureGroupsComparison-method]{featureGroupsComparison}}.
+    \item Methods are defined for: \code{\link[=plotUpSet,compounds-method]{compounds}}; \code{\link[=plotUpSet,featureGroups-method]{featureGroups}}; \code{\link[=plotUpSet,featureGroupsComparison-method]{featureGroupsComparison}}; \code{\link[=plotUpSet,formulas-method]{formulas}}.
 }
 
 \code{replicateGroups} returns a \code{character} vector with the analyses for which data is present in this object.
@@ -259,7 +257,7 @@ please refer to the linked method documentation for each generic.
  \code{$} Extract data from an object.
 
 \itemize{
-    \item Methods are defined for: \code{\link[=$,components-method]{components}}; \code{\link[=$,compounds-method]{compounds}}; \code{\link[=$,featureGroups-method]{featureGroups}}; \code{\link[=$,featureGroupsComparison-method]{featureGroupsComparison}}; \code{\link[=$,features-method]{features}}; \code{\link[=$,formulas-method]{formulas}}.
+    \item Methods are defined for: \code{\link[=$,components-method]{components}}; \code{\link[=$,compounds-method]{compounds}}; \code{\link[=$,featureGroups-method]{featureGroups}}; \code{\link[=$,featureGroupsComparison-method]{featureGroupsComparison}}; \code{\link[=$,features-method]{features}}; \code{\link[=$,formulas-method]{formulas}}; \code{\link[=$,MSPeakLists-method]{MSPeakLists}}.
 }
 
  \code{as.data.table} Converts an object to a table (\code{\link{data.table}}).

@@ -1,6 +1,14 @@
 # patRoon 0.1.0.9000
 
 ## January 2019
+* Various tweaks for plotEIC() and plotSpec() methods
+* Various small additions to newProject()
+* `reportMD()`: added table with annotated fragments for compounds/formulas
+* `consensus()` updates
+    * `consensus()` methods now support extracting unique data. This also replaces the `unique()` method that was defined for `featureGroupsComparison`.
+    * `comparison()` now automatically determines object names from algorithm (consistency with `consensus()` method for other objects).
+    * Fixed: coverage calculation for consensus formulas now correctly based on precursor overlap (was overlap of precursor+fragment).    
+* `plotVenn()` and `plotUpSet()` methods to compare different compounds or formulas objects.
 * `filter()` method for components.
 * DataAnalysis formula generation: fixed neutral formula calculation if `MSMode="msms"`, now needs `adduct` argument.
 * Neutral loss filter for compounds.

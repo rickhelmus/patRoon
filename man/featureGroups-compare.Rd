@@ -16,7 +16,6 @@
 \alias{plotUpSet,featureGroupsComparison-method}
 \alias{plotChord,featureGroupsComparison-method}
 \alias{consensus,featureGroupsComparison-method}
-\alias{unique,featureGroupsComparison-method}
 \title{Comparing feature groups}
 \usage{
 \S4method{comparison}{featureGroups}(..., groupAlgo,
@@ -26,27 +25,26 @@
 
 \S4method{plotVenn}{featureGroupsComparison}(obj, which = NULL, ...)
 
-\S4method{plotUpSet}{featureGroupsComparison}(obj, which = names(obj),
-  ...)
+\S4method{plotUpSet}{featureGroupsComparison}(obj, which = NULL, ...)
 
 \S4method{plotChord}{featureGroupsComparison}(obj, addSelfLinks = FALSE,
   addRetMzPlots = TRUE, ...)
 
 \S4method{consensus}{featureGroupsComparison}(obj, relAbundance = 0,
-  absAbundance = 0)
-
-\S4method{unique}{featureGroupsComparison}(x, which, ...)
+  absAbundance = 0, uniqueFrom = NULL, uniqueOuter = FALSE)
 }
 \arguments{
 \item{\dots}{For \code{comparison}: \code{featureGroups} objects that should
-be compared. Objects may be labeled by naming the parameters, otherwise
-labels are automatically determined. For \code{plot}, \code{plotVenn},
-\code{plotChord}, \code{unique}: further options passed to \code{plot},
-\pkg{\link{VennDiagram}} plotting functions (\emph{e.g.}
-\code{\link{draw.pairwise.venn}}), \code{\link{chordDiagram}} and
-\code{unique} (\code{featureGroups} signature), respectively. For
-\code{plotUpSet}: any further arguments passed to the \code{plotUpSet}
-method defined for \code{\link{featureGroups}}.}
+  be compared. Objects are automatically labelled by their
+  \code{\link{algorithm}}.
+
+  For \code{plot}, \code{plotVenn}, \code{plotChord}: further options passed
+  to \code{plot}, \pkg{\link{VennDiagram}} plotting functions (\emph{e.g.}
+  \code{\link{draw.pairwise.venn}}) and \code{\link{chordDiagram}}
+  respectively.
+
+  For \code{plotUpSet}: any further arguments passed to the \code{plotUpSet}
+  method defined for \code{\link{featureGroups}}.}
 
 \item{groupAlgo}{The \code{\link[=feature-grouping]{feature grouping
 algorithm}} that should be used for grouping \emph{pseudo} features (see
@@ -71,7 +69,20 @@ retention time scatter plots.}
 
 \item{relAbundance, absAbundance}{Feature groups with relative/absolute
 abundance below this number will be removed from the consensus. Set to
-\code{0} for no limits.}
+\code{0} for no limits. Limits cannot be set when \code{uniqueFrom} is not
+\code{NULL}.}
+
+\item{uniqueFrom}{Set this argument to only retain feature groups that are unique
+within one or more of the objects for which the consensus is made.
+Selection is done by setting the value of \code{uniqueFrom} to a
+\code{logical} (values are recycled), \code{numeric} (select by index) or a
+\code{character} (as obtained with \code{algorithm(obj)}). For
+\code{logical} and \code{numeric} values the order corresponds to the order
+of the objects given for the consensus. Set to \code{NULL} to ignore.}
+
+\item{uniqueOuter}{If \code{uniqueFrom} is not \code{NULL} and if
+\code{uniqueOuter=TRUE}: only retain data that are also unique between
+objects specified in \code{uniqueFrom}.}
 }
 \value{
 \code{comparison} returns a \code{\link{featureGroupsComparison}}
@@ -80,7 +91,7 @@ abundance below this number will be removed from the consensus. Set to
 \code{plotVenn} (invisibly) returns a list with the following fields: \itemize{
 \item \code{gList} the \code{gList} object that was returned by
   the utilized \pkg{\link{VennDiagram}} plotting function.
-\item \code{areas} The total area (\emph{i.e.} feature group count) for each plotted group.
+\item \code{areas} The total area for each plotted group.
 \item \code{intersectionCounts} The number of intersections between groups.
 }
 
@@ -88,8 +99,8 @@ The order for the \code{areas} and \code{intersectionCounts} fields is the same 
 from the used plotting function (see \emph{e.g.} \code{\link{draw.pairwise.venn}} and
 \code{\link{draw.triple.venn}}).
 
-\code{consensus} returns a \code{\link{featureGroups}}
-  object with a consensus from the compared feature groups.
+\code{consensus} returns a \code{\link{featureGroups}} object with a
+  consensus from the compared feature groups.
 }
 \description{
 Functionality to compare feature groups and make a consensus.
@@ -122,7 +133,4 @@ The \code{comparison} method generates a
 
 \code{consensus} combines all compared feature groups and averages
   their retention, \emph{m/z} and intensity data.
-
-\code{unique} returns unique feature groups from one or more
-  compared feature groups.
 }

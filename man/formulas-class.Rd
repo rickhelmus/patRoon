@@ -17,6 +17,8 @@
 \alias{as.data.table,formulas-method}
 \alias{filter,formulas-method}
 \alias{plotSpec,formulas-method}
+\alias{plotVenn,formulas-method}
+\alias{plotUpSet,formulas-method}
 \alias{consensus,formulas-method}
 \title{Formula lists class}
 \usage{
@@ -47,9 +49,16 @@
   topMost = NULL, scoreLimits = NULL, OM = NULL)
 
 \S4method{plotSpec}{formulas}(obj, precursor, groupName, analysis = NULL,
-  MSPeakLists, useGGPlot2 = FALSE)
+  MSPeakLists, title = precursor, useGGPlot2 = FALSE, xlim = NULL,
+  ylim = NULL, ...)
 
-\S4method{consensus}{formulas}(obj, ..., formThreshold = 0)
+\S4method{plotVenn}{formulas}(obj, ..., labels = NULL, vennArgs = NULL)
+
+\S4method{plotUpSet}{formulas}(obj, ..., labels = NULL,
+  nsets = length(list(...)) + 1, nintersects = NA, upsetArgs = NULL)
+
+\S4method{consensus}{formulas}(obj, ..., formThreshold = 0,
+  uniqueFrom = NULL, uniqueOuter = FALSE)
 }
 \arguments{
 \item{obj, x, object, formulas}{The \code{formulas} object.}
@@ -61,10 +70,10 @@ for feature groups.}
 their index or name, respectively (for the order/names see \code{analyses()/groupNames()}).\cr\cr For \code{[}: Can also be logical to perform logical selection
 (similar to regular vectors). If missing all analyses/feature groups are selected.\cr\cr For \code{[[}: should be a skalar value. If \code{j} is not specified, \code{i} selects by feature groups instead.}
 
-\item{\dots}{\code{consensus}: One or more \code{formulas} objects that should be used to
-  generate the consensus.
+\item{\dots}{For \code{plotSpec}: Further arguments passed to
+  \code{\link[graphics]{plot}}.
 
-  \code{as.data.frame}: Arguments passed to \code{as.data.table}.}
+  Others: Any further (and unique) \code{formulas} objects.}
 
 \item{drop}{ignored.}
 
@@ -89,7 +98,7 @@ formulae, whereas the charged formula of fragments (\code{frag_formula}
 column) is used for fragments. Set to \code{NULL} to not count any
 elements.}
 
-\item{OM}{For \code{as.data.table}/\code{as.data.frame}: if set to \code{TRUE} several columns
+\item{OM}{For \code{as.data.table}: if set to \code{TRUE} several columns
   with information relevant for organic matter (OM) characterization will be
   added (e.g. elemental ratios, classification). This will also make sure
   that \code{countElements} contains at least C, H, N, O, P and S.
@@ -155,10 +164,36 @@ plotting, otherwise base plot used. For \code{plotSpec}, \code{ggplot2}
 allows nicely repelled text for annotation. However, base plot is generally
 faster.}
 
+\item{xlim, ylim}{Sets the plot size limits used by
+\code{\link[graphics]{plot}}. Set to \code{NULL} for automatic plot sizing.}
+
+\item{labels}{A \code{character} with names to use for labelling. If
+\code{NULL} labels are automatically generated.}
+
+\item{vennArgs}{A \code{list} with further arguments passed to
+\pkg{VennDiagram} plotting functions. Set to \code{NULL} to ignore.}
+
+\item{nsets, nintersects}{See \code{\link[UpSetR]{upset}}.}
+
+\item{upsetArgs}{A list with any further arguments to be passed to
+\code{\link[UpSetR]{upset}}. Set to \code{NULL} to ignore.}
+
 \item{formThreshold}{Fractional minimum amount (0-1) of which a formula
 candidate should be present within all objects. For instance, a value of
 \samp{0.5} means that a particular formula should be present in at least
 \samp{50\%} of all objects.}
+
+\item{uniqueFrom}{Set this argument to only retain formulas that are unique
+within one or more of the objects for which the consensus is made.
+Selection is done by setting the value of \code{uniqueFrom} to a
+\code{logical} (values are recycled), \code{numeric} (select by index) or a
+\code{character} (as obtained with \code{algorithm(obj)}). For
+\code{logical} and \code{numeric} values the order corresponds to the order
+of the objects given for the consensus. Set to \code{NULL} to ignore.}
+
+\item{uniqueOuter}{If \code{uniqueFrom} is not \code{NULL} and if
+\code{uniqueOuter=TRUE}: only retain data that are also unique between
+objects specified in \code{uniqueFrom}.}
 }
 \value{
 \code{formulaTable} returns a \code{list} containing for each feature
@@ -172,6 +207,17 @@ candidate should be present within all objects. For instance, a value of
 
 \code{plotSpec} will return a \code{\link[=ggplot2]{ggplot object}}
   if \code{useGGPlot2} is \code{TRUE}.
+
+\code{plotVenn} (invisibly) returns a list with the following fields: \itemize{
+\item \code{gList} the \code{gList} object that was returned by
+  the utilized \pkg{\link{VennDiagram}} plotting function.
+\item \code{areas} The total area for each plotted group.
+\item \code{intersectionCounts} The number of intersections between groups.
+}
+
+The order for the \code{areas} and \code{intersectionCounts} fields is the same as the parameter order
+from the used plotting function (see \emph{e.g.} \code{\link{draw.pairwise.venn}} and
+\code{\link{draw.triple.venn}}).
 
 \code{consensus} returns a \code{formulas} object that is produced by
   merging results from multiple \code{formulas} objects.
@@ -217,6 +263,14 @@ feature group and other information such as element counts.
 \item \code{plotSpec}: Plots an annotated spectrum for a given candidate
 formula of a feature or feature group.
 
+\item \code{plotVenn}: plots a Venn diagram (using \pkg{\link{VennDiagram}})
+outlining unique and shared formula candidates of up to five different
+\code{formulas} objects.
+
+\item \code{plotUpSet}: plots an UpSet diagram (using the
+\code{\link[UpSetR]{upset}} function) outlining unique and shared formula
+candidates between different \code{formula} objects.
+
 \item \code{consensus}: Generates a consensus of results from multiple
 \code{formulas} objects.
 }}
@@ -252,4 +306,7 @@ the \code{algorithm} method for access.}
   \insertRef{Abdulla2013}{patRoon} \cr\cr
   \insertRef{Koch2006}{patRoon} \cr\cr
   \insertRef{Kujawinski2006}{patRoon}
+
+\insertRef{Conway2017}{patRoon} \cr\cr
+  \insertRef{Lex2014}{patRoon}
 }

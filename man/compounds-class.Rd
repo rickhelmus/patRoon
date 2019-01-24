@@ -26,6 +26,8 @@
 \alias{plotScores,compounds-method}
 \alias{plotScores}
 \alias{plotSpec,compounds-method}
+\alias{plotVenn,compounds-method}
+\alias{plotUpSet,compounds-method}
 \alias{consensus,compounds-method}
 \title{Compound lists class}
 \usage{
@@ -68,10 +70,18 @@
   useGGPlot2 = FALSE)
 
 \S4method{plotSpec}{compounds}(obj, index, groupName, MSPeakLists,
-  formulas = NULL, plotStruct = TRUE, useGGPlot2 = FALSE)
+  formulas = NULL, plotStruct = TRUE, useGGPlot2 = FALSE,
+  xlim = NULL, ylim = NULL, ...)
+
+\S4method{plotVenn}{compounds}(obj, ..., labels = NULL,
+  vennArgs = NULL)
+
+\S4method{plotUpSet}{compounds}(obj, ..., labels = NULL,
+  nsets = length(list(...)) + 1, nintersects = NA, upsetArgs = NULL)
 
 \S4method{consensus}{compounds}(obj, ..., compThreshold = 0,
-  minMaxNormalization = TRUE, mergeScoresFunc = sum)
+  uniqueFrom = NULL, uniqueOuter = FALSE, minMaxNormalization = TRUE,
+  mergeScoresFunc = sum)
 }
 \arguments{
 \item{obj, object, x, compounds}{The \code{compound} object.}
@@ -80,8 +90,10 @@
 their index or name, respectively (for the order/names see \code{groupNames()}).\cr\cr For \code{[}: Can also be logical to perform logical selection
 (similar to regular vectors). If missing all feature groups are selected.\cr\cr For \code{[[}: should be a skalar value.}
 
-\item{\dots}{\code{compounds} objects that should be used to generate the
-consensus.}
+\item{\dots}{For \code{plotSpec}: Further arguments passed to
+  \code{\link[graphics]{plot}}.
+
+  Others: Any further (and unique) \code{compounds} objects.}
 
 \item{drop, j}{ignored.}
 
@@ -130,9 +142,8 @@ if at least one of the fragment formulae follow the given restrictions. See
 \item{topMost}{Only keep a maximum of \code{topMost} candidates with highest
 score. Set to \code{NULL} to ignore.}
 
-\item{formulas}{The \code{\link{formulas}} object that should be
-used for scoring/annotation. For \code{plotSpec}: set to \code{NULL} to
-ignore.}
+\item{formulas}{The \code{\link{formulas}} object that should be used for
+scoring/annotation. For \code{plotSpec}: set to \code{NULL} to ignore.}
 
 \item{updateScore}{If set to \code{TRUE} then the \code{score} column is
 updated by adding the normalized \option{formulaScore} (weighted by
@@ -177,8 +188,36 @@ generate the candidate}
 \item{plotStruct}{If \code{TRUE} then the candidate structure is drawn in the
 spectrum.}
 
+\item{xlim, ylim}{Sets the plot size limits used by
+\code{\link[graphics]{plot}}. Set to \code{NULL} for automatic plot sizing.}
+
+\item{labels}{A \code{character} with names to use for labelling. If
+\code{NULL} labels are automatically generated.}
+
+\item{vennArgs}{A \code{list} with further arguments passed to
+\pkg{VennDiagram} plotting functions. Set to \code{NULL} to ignore.}
+
+\item{nsets}{See \code{\link[UpSetR]{upset}}.}
+
+\item{nintersects}{See \code{\link[UpSetR]{upset}}.}
+
+\item{upsetArgs}{A list with any further arguments to be passed to
+\code{\link[UpSetR]{upset}}. Set to \code{NULL} to ignore.}
+
 \item{compThreshold}{Minimal fraction (0-1) that a candidate must be present
 within all given \code{compounds} objects.}
+
+\item{uniqueFrom}{Set this argument to only retain compounds that are unique
+within one or more of the objects for which the consensus is made.
+Selection is done by setting the value of \code{uniqueFrom} to a
+\code{logical} (values are recycled), \code{numeric} (select by index) or a
+\code{character} (as obtained with \code{algorithm(obj)}). For
+\code{logical} and \code{numeric} values the order corresponds to the order
+of the objects given for the consensus. Set to \code{NULL} to ignore.}
+
+\item{uniqueOuter}{If \code{uniqueFrom} is not \code{NULL} and if
+\code{uniqueOuter=TRUE}: only retain data that are also unique between
+objects specified in \code{uniqueFrom}.}
 
 \item{minMaxNormalization}{Set to \code{TRUE} to apply min-max normalization
 of (merged) scoring columns. \code{FALSE} will apply normalization to the
@@ -204,6 +243,17 @@ normalized.}
 
 \code{getMCS} returns an \CRANpkg{rcdk} molecule object
   (\code{IAtomContainer}).
+
+\code{plotVenn} (invisibly) returns a list with the following fields: \itemize{
+\item \code{gList} the \code{gList} object that was returned by
+  the utilized \pkg{\link{VennDiagram}} plotting function.
+\item \code{areas} The total area for each plotted group.
+\item \code{intersectionCounts} The number of intersections between groups.
+}
+
+The order for the \code{areas} and \code{intersectionCounts} fields is the same as the parameter order
+from the used plotting function (see \emph{e.g.} \code{\link{draw.pairwise.venn}} and
+\code{\link{draw.triple.venn}}).
 
 \code{consensus} returns a \code{compounds} object that is produced
   by merging multiple specified \code{compounds} objects.
@@ -264,6 +314,15 @@ substructure (MCS) of the selected candidates is drawn.
 \item \code{plotSpec}: Plots an annotated spectrum for a given candidate
 compound of a feature group.
 
+\item \code{plotVenn}: plots a Venn diagram (using \pkg{\link{VennDiagram}})
+outlining unique and shared compound candidates of up to five different
+\code{compounds} objects. Comparison is made on \code{InChIKey1}.
+
+\item \code{plotUpSet}: plots an UpSet diagram (using the
+\code{\link[UpSetR]{upset}} function) outlining unique and shared compound
+candidates between different \code{compounds} objects. Comparison is made
+on \code{InChIKey1}.
+
 \item \code{consensus}: Generates a consensus from multiple \code{compounds}
 objects. The compound results will be merged and optionally compounds will
 be filtered by their occurrence throughout the specified \code{compounds}
@@ -286,4 +345,7 @@ the \code{algorithm} method for access.}
 
 \references{
 \addCitations{rcdk}{1}
+
+\insertRef{Conway2017}{patRoon} \cr\cr
+  \insertRef{Lex2014}{patRoon}
 }

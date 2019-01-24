@@ -145,6 +145,7 @@ getMFFragmentInfo <- function(spec, mfResult, adduct)
     ret[, neutral_loss := sapply(formula, subtractFormula, formula1 = ionform)]
     ret[, PLIndex := sapply(mz, function(omz) which.min(abs(omz - spec$mz)))]
     ret[, intensity := spec$intensity[PLIndex]]
+    setcolorder(ret, c("mz", "formula", "neutral_loss", "intensity", "score", "PLIndex"))
 
     return(ret)
 }

@@ -243,9 +243,7 @@ setGeneric("plotStructure", function(obj, ...) standardGeneric("plotStructure"))
 #' @templateVar desc plots a Venn diagram to assess unique and overlapping data.
 #' @template generics
 #'
-#' @param which What should be plotted. See method documentation for specifics.
-#'
-setGeneric("plotVenn", function(obj, which = NULL, ...) standardGeneric("plotVenn"))
+setGeneric("plotVenn", function(obj, ...) standardGeneric("plotVenn"))
 
 #' @templateVar func plotUpSet
 #' @templateVar desc plots an UpSet diagram to assess unique and overlapping data.

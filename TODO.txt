@@ -1,27 +1,35 @@
-Release:
-- Vignette
-- Reference docs
-    - Examples?
+general
 - more withr wrapping? (dev, par)
 - windows
-- file hashes for findFeaturesXCMS/EnviPick
-- patRoon.path.metFragCL --> patRoon.path.MetFragCL
-- clarify that sirius headless 4.0 now also works
-- do something with sirius fingerprints?
 - fillPeaks for CAMERA (and RAMClustR?)
-- mzR precursor window in newProject()
-- mass defect components
-- fix compoundViewer
-- check why generics sometimes are not found
 - remove XCMS EIC loading (and update checkChromatograms())
-- add more options to reportPlots argument of reportMD()?
+- support fastcluster for compounds clustering/int component clusters?
+- data.table: add '[]' at the end of (exported) functions when ':=' was used (print bug workaround)
+- setAs() for as.data.table()/as.data.frame() methods
+- negate for all filter methods
+- make algorithm names more consistent
+- convertMSFiles(): add DA functionality
+- suspect screening: add MS/MS qualifiers
+- DA
+    - generateMSPeakListsDA: find precursor masses with larger window
+    - tests
+        - utils? EICs with export/vdiffr?
+        - test MS peak lists deisotoping?
+- somehow integrate convertMSFiles() in newProject()? And other file types?
+
+docs
+- More vignettes
+- Reference docs
+    - Examples?
+- update tutorial
+
+
+features
+- file hashes for findFeaturesXCMS/EnviPick
 - importFeatures() function (analog to importFeatureGroups)
 - getXcmsSet --> export
-- support fastcluster for compounds clustering/int component clusters?
 - groupFeaturesScreening functionality for features?
-- reportPDF/reportMD: MS only formulas are not reported?
 - integrate OpenMS feature scoring and isotopes and PPS in general (also include filters?)
-- update tutorial on website
 - feature optim:
     - docs
         - mention parameters default unless specified
@@ -31,39 +39,46 @@ Release:
     - cache?
 - progressbar and parallel enviPick
 - OpenMS: Support newest grouper?
-- MSPeakLists
-    - isotope tagging is lost after averaging
-    - most intense analysis as alternative to averaging?
-    - report spectra/tables?
-    - don't subset on analyses? or re-average? if no, mention in docs
-    - $ method?
-    - collapse averagedPeakLists
-    - test avg params
-- MetFrag: (buggy) trivial name fetching not needed anymore?
-- reportMD: if blanks are still present chord etc not plotted?
 - removeRefAnalyses TRUE by default (or if blank filter is specified?)?
-- convertMSFiles(): add DA functionality
-- formulas
-    - DBE calculation for SIRIUS?
-    - set column order?
-    - customize/document ranking column order? (only do rank for sirius?)
-    - how to handle ranking of consensus results?
-        - rank by one normalized column per algo? (GenForm: either MS_match or comb_match)
-        - or simply don't and mention limitation in doc? (one limitation: filtering)
-    - OM reporting
-    - as.data.table: option to average per replicate group?
-    - note/warning on GF slowness with high masses
-- suspect screening: add MS/MS qualifiers
-- DA
-    - generateMSPeakListsDA: find precursor masses with larger window
-    - tests
-        - utils? EICs with export/vdiffr?
-        - test MS peak lists deisotoping?
-- data.table: add '[]' at the end of (exported) functions when ':=' was used (print bug workaround)
-- setAs() for as.data.table()/as.data.frame() methods
-- compounds
-    - convert score csv to internal data?
 - Fix plotUpSet with <2 rgroups
 - as.data.table for fGroups is slow?
+
+
+MSPeakLists
+- isotope tagging is lost after averaging
+- most intense analysis as alternative to averaging?
+- report spectra/tables?
+- collapse averagedPeakLists
+- test avg params
+- add pruneMissingPrecursorMS to filter()?
+
+
+compounds
+- patRoon.path.metFragCL --> patRoon.path.MetFragCL
+- clarify that sirius headless 4.0 now also works
+- do something with sirius fingerprints?
+- fix compoundViewer
+- MetFrag: (buggy) trivial name fetching not needed anymore?
+- convert score csv to internal data?
 - SIRIUS: use --auto-charge instead of manually fixing charge of fragments (or not? conflicting docs on what it does)
-- negate for all filter methods
+
+
+formulas
+- DBE calculation for SIRIUS?
+- set column order?
+- customize/document ranking column order? (only do rank for sirius?)
+- how to handle ranking of consensus results?
+    - rank by one normalized column per algo? (GenForm: either MS_match or comb_match)
+    - or simply don't and mention limitation in doc? (one limitation: filtering)
+- OM reporting
+- as.data.table: option to average per replicate group?
+- note/warning on GF slowness with high masses
+
+
+components
+- mass defect components
+
+
+reporting
+- add more options to reportPlots argument of reportMD()?
+- reportPDF/reportMD: MS only formulas are not reported?

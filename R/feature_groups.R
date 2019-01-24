@@ -24,6 +24,7 @@ NULL
 #'   \code{\link[UpSetR]{upset}} (\code{plotUpSet}).
 #' @param average Average data within replicate groups.
 #' @param which A character vector with replicate groups used for comparison.
+#'   For plotting functions: set to \code{NULL} for all replicate groups.
 #'
 #' @templateVar seli analyses
 #' @templateVar selOrderi analyses()
@@ -134,8 +135,11 @@ setMethod("removeAnalyses", "featureGroups", function(fGroups, indices)
 {
     if (length(indices) > 0)
     {
-        fGroups@groups <- fGroups@groups[-indices]
-        fGroups@ftindex <- fGroups@ftindex[-indices]
+        if (length(fGroups@groups) > 0)
+        {
+            fGroups@groups <- fGroups@groups[-indices]
+            fGroups@ftindex <- fGroups@ftindex[-indices]
+        }
         fGroups@analysisInfo <- fGroups@analysisInfo[-indices, ]
     }
     return(fGroups)
@@ -145,8 +149,11 @@ setMethod("removeGroups", "featureGroups", function(fGroups, indices)
 {
     if (length(indices) > 0)
     {
-        fGroups@groups <- fGroups@groups[, -indices, with=F]
-        fGroups@ftindex <- fGroups@ftindex[, -indices, with=F]
+        if (length(fGroups@groups) > 0)
+        {
+            fGroups@groups <- fGroups@groups[, -indices, with = FALSE]
+            fGroups@ftindex <- fGroups@ftindex[, -indices, with = FALSE]
+        }
         fGroups@groupInfo <- fGroups@groupInfo[-indices, ]
     }
     return(fGroups)
@@ -655,12 +662,15 @@ setMethod("plotChord", "featureGroups", function(obj, addSelfLinks = FALSE, addR
 #'   displayed when all EICs are being plot. Set to \code{"none"} to disable any
 #'   annotation.
 #'
+#' @template plot-lim
+#'
 #' @export
 setMethod("plotEIC", "featureGroups", function(obj, rtWindow = 30, mzWindow = 0.005, retMin = FALSE, topMost = NULL,
                                                EICs = NULL, showPeakArea = FALSE, showFGroupRect = TRUE,
                                                title = NULL, colourBy = c("none", "rGroups", "fGroups"),
                                                showLegend = TRUE, onlyPresent = TRUE,
-                                               annotate = c("none", "ret", "mz"), showProgress = FALSE, ...)
+                                               annotate = c("none", "ret", "mz"), showProgress = FALSE,
+                                               xlim = NULL, ylim = NULL, ...)
 {
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertNumber, . ~ rtWindow + mzWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
@@ -672,6 +682,8 @@ setMethod("plotEIC", "featureGroups", function(obj, rtWindow = 30, mzWindow = 0.
 
     colourBy <- checkmate::matchArg(colourBy, c("none", "rGroups", "fGroups"), add = ac)
     annotate <- checkmate::matchArg(annotate, c("none", "ret", "mz"), several.ok = TRUE, add = ac)
+
+    assertXYLim(xlim, ylim, add = ac)
 
     checkmate::reportAssertions(ac)
 
@@ -783,9 +795,13 @@ setMethod("plotEIC", "featureGroups", function(obj, rtWindow = 30, mzWindow = 0.
         par(omd = c(0, 1 - lw, 0, 1), new = TRUE)
     }
 
-    ymax <- plotLimits$maxInt * 1.1
+    if (is.null(xlim))
+        xlim <- plotLimits$rtRange
+    if (is.null(ylim))
+        ylim <- c(0, plotLimits$maxInt * 1.1)
+
     plot(0, type = "n", main = title, xlab = sprintf("Retention time (%s)", if (retMin) "min." else "sec."), ylab = "Intensity",
-         xlim = plotLimits$rtRange, ylim = c(0, ymax), ...)
+         xlim = xlim, ylim = ylim, ...)
 
     if (showProgress)
         prog <- txtProgressBar(0, gCount, style = 3)
@@ -861,7 +877,7 @@ setMethod("plotEIC", "featureGroups", function(obj, rtWindow = 30, mzWindow = 0.
                     antxt <- paste(antxt, sprintf("%.4f", gInfo[grp, "mzs"]), sep = "\n")
 
                 if (nzchar(antxt))
-                    text(rt, intRange[2] + ymax * 0.02, antxt)
+                    text(rt, intRange[2] + ylim[2] * 0.02, antxt)
             }
         }
 
@@ -886,64 +902,17 @@ setMethod("plotEIC", "featureGroups", function(obj, rtWindow = 30, mzWindow = 0.
 #'   between up to five replicate groups.
 #' @template plotvenn-ret
 #' @export
-setMethod("plotVenn", "featureGroups", function(obj, which, ...)
+setMethod("plotVenn", "featureGroups", function(obj, which = NULL, ...)
 {
-    checkmate::assertCharacter(which, min.chars = 1, null.ok = TRUE)
-
-    if (length(obj) == 0)
-        stop("Can't plot empty feature groups object")
-
+    rGroups <- replicateGroups(obj)
     if (is.null(which))
-        which <- unique(analysisInfo(obj)$group)
+        which <- rGroups
+    checkmate::assertSubset(which, rGroups, empty.ok = FALSE)
 
-    nwhich <- length(which)
-    if (nwhich > 5)
-        stop("Cannot draw more than five groups")
-
-    fill <- getBrewerPal(nwhich, "Paired")
-    vennArgs <- list(category = which, lty = rep("blank", nwhich), alpha = rep(0.5, nwhich),
-                     cex = 1.5, cat.cex = 1.5, fill = fill)
-    vennArgs <- modifyList(vennArgs, list(...))
-
-    # get list of feature groups per replicate group
     fGroupsList <- lapply(which, function(w) replicateGroupFilter(obj, w, verbose = FALSE))
-    areas <- lengths(fGroupsList)
-    allFGNames <- lapply(fGroupsList, names)
-    getIntersectCounts <- function(inters) sapply(inters, function(i) length(Reduce(intersect, allFGNames[i])))
-
-    grid::grid.newpage() # need to clear plot region manually
-    # plot.new()
-
-    if (nwhich == 1)
-        gRet <- do.call(draw.single.venn, c(list(area = areas), vennArgs))
-    else if (nwhich == 2)
-    {
-        icounts <- getIntersectCounts(list(c(1, 2)))
-        gRet <- do.call(draw.pairwise.venn, c(areas, icounts,
-                                              list(rotation.degree = if (areas[1] < areas[2]) 180 else 0), vennArgs))
-    }
-    else if (nwhich == 3)
-    {
-        icounts <- getIntersectCounts(list(c(1, 2), c(2, 3), c(1, 3), c(1, 2, 3)))
-        gRet <- do.call(draw.triple.venn, c(areas, icounts, vennArgs))
-    }
-    else if (nwhich == 4)
-    {
-        icounts <- getIntersectCounts(list(c(1, 2), c(1, 3), c(1, 4), c(2, 3), c(2, 4), c(3, 4),
-                                           c(1, 2, 3), c(1, 2, 4), c(1, 3, 4), c(2, 3, 4), c(1, 2, 3, 4)))
-        gRet <- do.call(draw.quad.venn, c(areas, icounts, vennArgs))
-    }
-    else if (nwhich == 5)
-    {
-        icounts <- getIntersectCounts(list(c(1, 2), c(1, 3), c(1, 4), c(1, 5), c(2, 3), c(2, 4), c(2, 5), c(3, 4),
-                                           c(3, 5), c(4, 5), c(1, 2, 3), c(1, 2, 4), c(1, 2, 5), c(1, 3, 4), c(1, 3, 5),
-                                           c(1, 4, 5), c(2, 3, 4), c(2, 3, 5), c(2, 4, 5), c(3, 4, 5),
-                                           c(1, 2, 3, 4), c(1, 2, 3, 5), c(1, 2, 4, 5), c(1, 3, 4, 5), c(2, 3, 4, 5),
-                                           c(1, 2, 3, 4, 5)))
-        gRet <- do.call(draw.quintuple.venn, c(areas, icounts, vennArgs))
-    }
-
-    invisible(list(gList = gRet, areas = areas, intersectionCounts = icounts))
+    makeVennPlot(lapply(fGroupsList, names), which, lengths(fGroupsList),
+                 function(obj1, obj2) intersect(obj1, obj2),
+                 length, ...)
 })
 
 #' @describeIn featureGroups plots an UpSet diagram (using the
@@ -956,13 +925,17 @@ setMethod("plotVenn", "featureGroups", function(obj, which, ...)
 #'   \insertRef{Lex2014}{patRoon}
 #'
 #' @export
-setMethod("plotUpSet", "featureGroups", function(obj, which = replicateGroups(obj), nsets = length(which),
+setMethod("plotUpSet", "featureGroups", function(obj, which = NULL, nsets = length(which),
                                                  nintersects = NA, ...)
 {
     rGroups <- replicateGroups(obj)
+    if (is.null(which))
+        which <- rGroups
 
     ac <- checkmate::makeAssertCollection()
     checkmate::assertSubset(which, rGroups, empty.ok = FALSE, add = ac)
+    checkmate::assertCount(nsets, positive = TRUE)
+    checkmate::assertCount(nintersects, positive = TRUE, na.ok = TRUE)
     checkmate::reportAssertions(ac)
 
     if (length(obj) == 0)
@@ -972,6 +945,10 @@ setMethod("plotUpSet", "featureGroups", function(obj, which = replicateGroups(ob
 
     gt <- as.data.table(obj, average = TRUE)
     gt[, (which) := lapply(.SD, function(x) as.integer(x > 0)), .SDcols = which]
+
+    if (sum(sapply(gt[, which, with = FALSE], function(x) any(x>0))) < 2)
+        stop("Need at least two replicate groups with non-zero intensities")
+
     UpSetR::upset(gt, nsets = nsets, nintersects = nintersects, ...)
 })
 
@@ -989,13 +966,14 @@ setMethod("unique", "featureGroups", function(x, which, relativeTo = NULL, outer
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertCharacter(which, min.len = 1, min.chars = 1, any.missing = FALSE, add = ac)
+    checkmate::assertSubset(which, replicateGroups(x), empty.ok = FALSE, add = ac)
     checkmate::assertCharacter(relativeTo, min.len = 1, min.chars = 1, any.missing = FALSE,
                                null.ok = TRUE, add = ac)
     checkmate::assertFlag(outer, add = ac)
     checkmate::reportAssertions(ac)
 
     if (is.null(relativeTo))
-        relativeTo <- unique(analysisInfo(x)$group)
+        relativeTo <- replicateGroups(x)
     else
     {
         relativeTo <- union(which, relativeTo)
@@ -1032,6 +1010,7 @@ setMethod("overlap", "featureGroups", function(fGroups, which, exclusive)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertCharacter(which, min.len = 2, min.chars = 1, any.missing = FALSE, add = ac)
+    checkmate::assertSubset(which, replicateGroups(fGroups), empty.ok = FALSE, add = ac)
     checkmate::assertFlag(exclusive, add = ac)
     checkmate::reportAssertions(ac)
 

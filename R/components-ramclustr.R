@@ -116,7 +116,7 @@ generateComponentsRAMClustR <- function(fGroups, st = NULL, sr = NULL, maxt = 12
     printf("Annotating components...\n")
 
     # UNDONE: make optional?
-    RC <- do.call(RAMClustR::do.findmain, c(list(ramclustObj = RC, plot.findmain = FALSE, writeMat = FALSE), FMMainArgs))
+    RC <- do.call(RAMClustR::do.findmain, c(list(ramclustObj = RC, plot.findmain = FALSE, writeMat = FALSE, writeMS = FALSE), FMMainArgs))
 
     comps <- lapply(RC$M.ann, as.data.table)
 

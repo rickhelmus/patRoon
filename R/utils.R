@@ -174,7 +174,7 @@ generateAnalysisInfo <- function(paths, groups = "", refs = "", fileTypes = c("B
     checkmate::assertCharacter(refs, min.len = 1, add = ac)
     checkmate::assertSubset(fileTypes, c("Bruker", "mzXML", "mzML"), empty.ok = FALSE, add = ac)
     checkmate::reportAssertions(ac)
-    
+
     fileExts <- c(Bruker = ".d", mzXML = ".mzXML", mzML = ".mzML")
     fileTypes <- fileExts[fileTypes] # rename to file extensions
 
@@ -217,7 +217,7 @@ generateAnalysisInfo <- function(paths, groups = "", refs = "", fileTypes = c("B
 generateAnalysisInfoFromEnviMass <- function(path)
 {
     checkmate::assertDirectoryExists(path, access = "r")
-    
+
     enviSInfo <- fread(file.path(path, "dataframes", "measurements"))[Type %in% c("sample", "blank")]
 
     enviSInfo[, DT := as.POSIXct(paste(Date, Time, sep = " "))]
@@ -401,7 +401,7 @@ normalize <- function(x, minMax)
         minv <- min(xn)
         if (!minMax)
             minv <- min(minv, 0) # force minMax if min <0
-        
+
         xn <- xn - minv
         xn <- xn / max(xn)
     }
@@ -414,14 +414,66 @@ normalize <- function(x, minMax)
 # from https://stackoverflow.com/a/38228840
 countCharInStr <- function(str, ch) sum(charToRaw(str) == charToRaw(ch))
 
-makeMSPlot <- function(spec, fragInfo, ..., extraHeightInch = 0)
+makeVennPlot <- function(plotObjects, categories, areas, intersectFunc,
+                         intersectLenFunc, ...)
+{
+    nobj <- length(plotObjects)
+    areas <- unname(areas) # do.call below won't work with names
+
+    if (all(areas == 0))
+        stop("Cannot plot Venn when all objects are empty")
+
+    fill <- getBrewerPal(nobj, "Paired")
+    vennArgs <- list(category = categories, lty = rep("blank", nobj), alpha = rep(0.5, nobj),
+                     cex = 1.5, cat.cex = 1.5, fill = fill)
+    vennArgs <- modifyList(vennArgs, list(...))
+
+    getIntersectCounts <- function(inters) sapply(inters,
+                                                  function(i) intersectLenFunc(Reduce(intersectFunc, plotObjects[i])))
+
+    grid::grid.newpage() # need to clear plot region manually
+    # plot.new()
+
+    if (nobj == 1)
+        gRet <- do.call(draw.single.venn, c(list(area = areas), vennArgs))
+    else if (nobj == 2)
+    {
+        icounts <- getIntersectCounts(list(c(1, 2)))
+        gRet <- do.call(draw.pairwise.venn, c(areas, icounts,
+                                              list(rotation.degree = if (areas[1] < areas[2]) 180 else 0), vennArgs))
+    }
+    else if (nobj == 3)
+    {
+        icounts <- getIntersectCounts(list(c(1, 2), c(2, 3), c(1, 3), c(1, 2, 3)))
+        gRet <- do.call(draw.triple.venn, c(areas, icounts, vennArgs))
+    }
+    else if (nobj == 4)
+    {
+        icounts <- getIntersectCounts(list(c(1, 2), c(1, 3), c(1, 4), c(2, 3), c(2, 4), c(3, 4),
+                                           c(1, 2, 3), c(1, 2, 4), c(1, 3, 4), c(2, 3, 4), c(1, 2, 3, 4)))
+        gRet <- do.call(draw.quad.venn, c(areas, icounts, vennArgs))
+    }
+    else if (nobj == 5)
+    {
+        icounts <- getIntersectCounts(list(c(1, 2), c(1, 3), c(1, 4), c(1, 5), c(2, 3), c(2, 4), c(2, 5), c(3, 4),
+                                           c(3, 5), c(4, 5), c(1, 2, 3), c(1, 2, 4), c(1, 2, 5), c(1, 3, 4), c(1, 3, 5),
+                                           c(1, 4, 5), c(2, 3, 4), c(2, 3, 5), c(2, 4, 5), c(3, 4, 5),
+                                           c(1, 2, 3, 4), c(1, 2, 3, 5), c(1, 2, 4, 5), c(1, 3, 4, 5), c(2, 3, 4, 5),
+                                           c(1, 2, 3, 4, 5)))
+        gRet <- do.call(draw.quintuple.venn, c(areas, icounts, vennArgs))
+    }
+
+    invisible(list(gList = gRet, areas = areas, intersectionCounts = icounts))
+}
+
+makeMSPlot <- function(spec, fragInfo, xlim, ylim, ..., extraHeightInch = 0)
 {
     hasFragInfo <- !is.null(fragInfo) && nrow(fragInfo) > 0
     plotData <- copy(spec)
-    
+
     # default colour/line width
     plotData[, c("colour", "lwd") := .("grey", 1)]
-    
+
     if (hasFragInfo)
     {
         fragPlotData <- copy(fragInfo)
@@ -430,20 +482,20 @@ makeMSPlot <- function(spec, fragInfo, ..., extraHeightInch = 0)
         {
             fragPlotData <- copy(fragInfo)
             fragPlotData[, mergedBy := sapply(mergedBy, function(mb) wrapStr(paste0(unlist(mb), collapse = ", "), 10))]
-            
+
             mbsUnique <- unique(fragPlotData$mergedBy)
             # order from small to big based on number of commas
             mbsUnique <- mbsUnique[order(sapply(mbsUnique, countCharInStr, ch = ",", USE.NAMES = FALSE))]
             mbCombCols <- setNames(getBrewerPal(length(mbsUnique), "Paired"), mbsUnique)
-            
+
             fragPlotData[nzchar(mergedBy), c("colour", "lwd") := .(mbCombCols[match(mergedBy, mbsUnique)], 2)]
             setnames(fragPlotData, "mergedBy", "legend")
         }
         else
             fragPlotData[, c("colour", "lwd", "legend") := .("blue", 2, "assigned")] # nothing merged, just mark all annotated blue
-        
+
         fragPlotData[, formWidth := strwidth(formula, units = "inches")]
-        
+
         # add PLIndex to merge
         plotData[, PLIndex := seq_len(nrow(plotData))]
         plotData[fragPlotData, c("colour", "lwd", "formula", "formWidth", "legend") :=
@@ -451,10 +503,15 @@ makeMSPlot <- function(spec, fragInfo, ..., extraHeightInch = 0)
                        ifelse(is.na(i.lwd), lwd, i.lwd),
                        i.formula, i.formWidth, i.legend), on = "PLIndex"]
     }
-    
+
     # mark precursor
     plotData[precursor == TRUE, c("colour", "lwd", "legend") := .("red", 2, "precursor")]
-    
+
+    if (is.null(xlim))
+        xlim <- range(plotData$mz) * c(0.9, 1.1)
+    else
+        plotData <- plotData[numGTE(mz, xlim[1]) & numLTE(mz, xlim[2])] # remove any peaks outisde plotting range
+
     doLegend <- !is.null(plotData[["legend"]]) && any(!is.na(plotData[["legend"]]) & nzchar(plotData[["legend"]]))
     if (doLegend)
     {
@@ -466,43 +523,48 @@ makeMSPlot <- function(spec, fragInfo, ..., extraHeightInch = 0)
             legend(x, y, legTab$legend, col = legTab$colour, xpd = NA, bty = "n",
                    text.col = legTab$colour, lty = 1, cex = 0.75, ...)
         }
-        
+
         plot.new()
         leg <- makeLegend(0, 0, plot = FALSE)
         lw <- grconvertX(leg$rect$w, to = "ndc") - grconvertX(0, to = "ndc")
         oldp <- par(omd = c(0, 1 - lw, 0, 1), new = TRUE)
     }
-    
-    formWidths <- if (!is.null(plotData[["formWidth"]])) plotData$formWidth else rep(0, nrow(plotData))
-    formWidths[is.na(formWidths)] <- 0
-    
-    # see how much extra vertical space is needed by formula labels
-    # get character widths (assuming that height of vertically plotted text is the same)
-    pheight <- par("din")[2] # plot dev height in inches
-    relFormHeights <- formWidths / pheight
-    
-    ym <- max(plotData$intensity) # 'regular' plot height in user coordinates, not considering any labels etc
-    relIntHeights <- plotData$intensity / ym
-    maxRelH <- max(relFormHeights + relIntHeights)
-    
-    ym <- ym * maxRelH * 1.05 # enlarge y limit and add some extra spacing
-    
-    if (extraHeightInch > 0)
-        ym <- ym * (1 + (extraHeightInch / pheight))
-    
-    plot(0, xlab = "m/z", ylab = "Intensity", xlim = range(plotData$mz) * c(0.9, 1.1), ylim = c(0, ym),
-         type = "n", bty = "l", ...)    
-    
+
+    if (is.null(ylim))
+    {
+        formWidths <- if (!is.null(plotData[["formWidth"]])) plotData$formWidth else rep(0, nrow(plotData))
+        formWidths[is.na(formWidths)] <- 0
+
+        # see how much extra vertical space is needed by formula labels
+        # get character widths (assuming that height of vertically plotted text is the same)
+        pheight <- par("din")[2] # plot dev height in inches
+        relFormHeights <- formWidths / pheight
+
+        ym <- max(plotData$intensity) # 'regular' plot height in user coordinates, not considering any labels etc
+        relIntHeights <- plotData$intensity / ym
+        maxRelH <- max(relFormHeights + relIntHeights)
+
+        ym <- ym * maxRelH * 1.05 # enlarge y limit and add some extra spacing
+
+        if (extraHeightInch > 0)
+            ym <- ym * (1 + (extraHeightInch / pheight))
+
+        ylim <- c(0, ym)
+    }
+
+    plot(0, xlab = "m/z", ylab = "Intensity", xlim = xlim, ylim = ylim,
+         type = "n", bty = "l", ...)
+
     for (i in seq_len(nrow(plotData)))
     {
         segments(plotData[[i, "mz"]], 0, plotData[[i, "mz"]], plotData[[i, "intensity"]],
                  col = plotData[[i, "colour"]], lwd = plotData[[i, "lwd"]])
-        
+
         if (!is.null(plotData[["formula"]]) && !is.na(plotData[[i, "formula"]]))
-            text(plotData[[i, "mz"]], plotData[[i, "intensity"]] + (ym * 0.02),
+            text(plotData[[i, "mz"]], plotData[[i, "intensity"]] + (ylim[2] * 0.02),
                  plotData[[i, "formula"]], srt = 90, adj = 0)
     }
-    
+
     if (doLegend)
     {
         makeLegend(par("usr")[2], par("usr")[4])
@@ -542,7 +604,7 @@ makeMSPlotGG <- function(spec, fragInfo, ...)
         plotData[!is.na(fiInd), lwd := 2]
         plotData[!is.na(fiInd), text := fragInfo$formula[fiInd]]
     }
-    
+
     # mark precursor
     plotData[precursor == TRUE, c("colour", "lab", "lwd", "text") :=
                  .("red", "precursor", 2, "")]
@@ -572,7 +634,7 @@ doDynamicTreeCut <- function(dendro, maxTreeHeight, deepSplit,
     else
         ret <- dynamicTreeCut::cutreeDynamicTree(dendro = dendro, maxTreeHeight = maxTreeHeight,
                                                  deepSplit = deepSplit, minModuleSize = minModuleSize)
-    
+
     return(ret)
 }
 
@@ -626,7 +688,7 @@ getMoleculesFromSMILES <- function(SMILES, doTyping = FALSE, emptyIfFails = FALS
         }
         return(ret)
     })
-    
+
     return(mols)
 }
 
@@ -635,17 +697,17 @@ getMostIntenseAnaWithMSMS <- function(fGroups, MSPeakLists, groupName)
     gTable <- groups(fGroups)
     anaInfo <- analysisInfo(fGroups)
     pLists <- peakLists(MSPeakLists)
-    
+
     ogind <- order(-gTable[[groupName]])
     oanalyses <- anaInfo$analysis[ogind] # analyses ordered from highest to lowest intensity
-    
+
     # filter out analyses without MS/MS
     oanalyses <- sapply(oanalyses, function(a) if (!is.null(pLists[[a]][[groupName]][["MSMS"]])) a else "", USE.NAMES = FALSE)
     oanalyses <- oanalyses[oanalyses != ""]
-    
+
     if (length(oanalyses) < 1)
         return(NULL)
-    
+
     return(oanalyses[[1]])
 }
 
@@ -673,15 +735,15 @@ tabularRD <- function(df, ...)
 {
     align <- function(x) if (is.numeric(x)) "r" else "l"
     col_align <- vapply(df, align, character(1))
-    
+
     # add headers
     df <- rbind(sprintf("\\strong{%s}", names(df)), df)
-    
+
     cols <- lapply(df, format, ...)
-    
+
     contents <- do.call("paste",
                         c(cols, list(sep = " \\tab ", collapse = "\\cr\n  ")))
-    
+
     paste("\\tabular{", paste(col_align, collapse = ""), "}{\n  ",
           contents, "\n}\n", sep = "")
 }
@@ -696,14 +758,14 @@ makeClassHierarchy <- function(class, showParents)
 
     ret <- c(list(name = class),
              lapply(names(subcl), makeClassHierarchy, showParents = FALSE))
-    
+
     if (showParents)
     {
         pars <- selectSuperClasses(class)
         if (length(pars) > 0)
             ret <- c(list(name = paste0(pars, collapse = ", ")), list(ret))
     }
-    
+
     return(ret)
 }
 
@@ -712,7 +774,7 @@ printClassHierarchy <- function(class, showParents = TRUE, RD = FALSE)
     doPrintTxt <- function(cl, level)
     {
         indent <- strrep(" ", (level + 1) * 2)
-        
+
         if (level > 0)
             cat(paste0(indent, "|-- ", cl$name))
         else
@@ -725,23 +787,23 @@ printClassHierarchy <- function(class, showParents = TRUE, RD = FALSE)
                 doPrintTxt(clsub, level + 1)
         }
     }
-    
+
     doPrintRD <- function(cl, level)
     {
         indent <- strrep(" ", (level + 1) * 2)
-        
+
         printf("%s%s\\item{%s}\n", if (level == 0) "\\itemize{\n" else "", indent, cl$name)
 
         more <- any(sapply(cl, is.list))
         if (more)
             cat(paste0(indent, "\\itemize{\n"))
-        
+
         for (clsub in cl)
         {
             if (is.list(clsub))
                 doPrintRD(clsub, level + 1)
         }
-        
+
         if (more)
             cat(paste0(indent, "}\n"))
         if (level == 0)
@@ -750,23 +812,23 @@ printClassHierarchy <- function(class, showParents = TRUE, RD = FALSE)
 
     hier <- makeClassHierarchy(class, showParents)
     hasParents <- hier$name != class
-    
+
     if (RD)
     {
         hier <- rapply(hier, function(h) sprintf("\\code{\\link{%s}}", h),
                        classes = "character", how = "replace")
-        
+
         # if parents are shown make the second line (ie this class) bold
         if (hasParents)
             hier[[2]]$name <- sprintf("\\strong{%s}", hier[[2]]$name)
         else
             hier$name <- sprintf("\\strong{%s}", hier$name)
-        
+
         doPrintRD(hier, 0)
     }
     else
         doPrintTxt(hier, 0)
-    
+
     invisible(NULL)
 }
 
@@ -774,7 +836,7 @@ getAllMethods <- function(gen)
 {
     # automatically retrieve defined methods for a generic and create document
     # links. This only works if the arguments of the method are named obj, objX or x.
-    
+
     cl <- showMethods(gen, where = "package:patRoon", inherited = FALSE, printTo = FALSE,
                       classes = getClasses(asNamespace("patRoon")))
     cl <- cl[grepl("obj.*|x=", cl)]
@@ -782,6 +844,6 @@ getAllMethods <- function(gen)
     # cl <- cl[!grepl("ANY", cl)]
     cl <- gsub(" ", "", cl)
     cl <- gsub(",$", "", cl)
-    
+
     return(cl[order(tolower(cl))])
 }

@@ -139,13 +139,14 @@ getMFFragmentInfo <- function(spec, mfResult, adduct)
     fi <- unlist(strsplit(mfResult$FormulasOfExplPeaks, "[;:]")) # split into list with subsequent m/z / formula pairs
 
     ret <- data.table(mz = as.numeric(fi[c(TRUE, FALSE)]),
-                      formula = cleanFragFormulas(fi[c(FALSE, TRUE)]),
-                      score = as.numeric(unlist(strsplit(mfResult$FragmenterScore_Values, ";"))))
+                      formula = cleanFragFormulas(fi[c(FALSE, TRUE)]))
+    if (!is.null(mfResult[["FragmenterScore_Values"]]))
+        ret[, score := as.numeric(unlist(strsplit(mfResult$FragmenterScore_Values, ";")))]
     ionform <- calculateIonFormula(mfResult$MolecularFormula, adduct)
     ret[, neutral_loss := sapply(formula, subtractFormula, formula1 = ionform)]
     ret[, PLIndex := sapply(mz, function(omz) which.min(abs(omz - spec$mz)))]
     ret[, intensity := spec$intensity[PLIndex]]
-    setcolorder(ret, c("mz", "formula", "neutral_loss", "intensity", "score", "PLIndex"))
+    setcolorder(ret, c("mz", "formula", "neutral_loss", "intensity"))
 
     return(ret)
 }
@@ -213,7 +214,8 @@ processMFResults <- function(metf, spec, adduct, db, topMost, lfile = "")
 
         # make character: needed for getMFFragmentInfo()
         # note: this column is not present in empty tables so can't do this with colClasses
-        metf[, FragmenterScore_Values := as.character(FragmenterScore_Values)]
+        if (!is.null(metf[["FragmenterScore_Values"]]))
+            metf[, FragmenterScore_Values := as.character(FragmenterScore_Values)]
 
         # fill in fragment info
         # NOTE: double wrap in list to nest table
@@ -353,7 +355,7 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
     aapply(checkmate::assertCount, . ~ topMost + maxCandidatesToStop, positive = TRUE, fixed = list(add = ac))
     aapply(checkmate::assertFlag, . ~ addTrivialNames, fixed = list(add = ac))
     checkmate::assertString(chemSpiderToken, add = ac)
-    checkmate::assertChoice(database, c("pubchem", "chemspider", "kegg", "sdf", "psv", "csv"), add = ac)
+    checkmate::assertChoice(database, c("pubchem", "chemspider", "kegg", "sdf", "psv", "csv", "toxcast"), add = ac)
     checkmate::assert(checkmate::checkFlag(extendedPubChem),
                       checkmate::checkChoice(extendedPubChem, "auto"),
                       .var.name = "extendedPubChem")
@@ -364,8 +366,8 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
            names = "unique", null.ok = TRUE, fixed = list(add = ac))
 
     compsScores <- compoundScorings("metfrag", database)
-    isLocalDB <- database %in% c("sdf", "psv", "csv")
-    allScoringNames <- union(compsScores$name, compsScores$metfrag)
+    isLocalDB <- database %in% c("sdf", "psv", "csv", "toxcast")
+    allScoringNames <- union(compsScores$name, compsScores$metfrag)        
     # allow freely definable scorings from local databases
     if (!isLocalDB)
         checkmate::assertSubset(scoreTypes, allScoringNames, add = ac)
@@ -395,7 +397,8 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
                        kegg = "KEGG",
                        sdf = "LocalSDF",
                        psv = "LocalPSV",
-                       csv = "LocalCSV")
+                       csv = "LocalCSV",
+                       toxcast = "LocalCSV")
     if (database == "PubChem" && extendedPubChem) # can't seem to combine this conditional in above switch...
         database <- "ExtendedPubChem"
 

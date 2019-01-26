@@ -8,7 +8,8 @@ message("Plotting components...")
 prog <- txtProgressBar(0, length(rmdVars$components), style = 3, file = stderr())
 allPlots <- vector("character", length(rmdVars$components) * 2)
 curPlotInd <- 0
-plotPath <- getPlotPath()
+plotPathFull <- getPlotPath(FALSE)
+plotPathLink <- getPlotPath(TRUE)
 
 # HACK: this should be replaced some proper inheritance/methods at some point
 isHClust <- inherits(rmdVars$components, "componentsIntClust")
@@ -19,13 +20,13 @@ if (isHClust)
 for (ci in seq_len(cCount))
 {
     curPlotInd <- curPlotInd + 1
-    allPlots[curPlotInd] <- file.path(plotPath, sprintf("component_spec_%d.png", ci))
+    allPlots[curPlotInd] <- file.path(plotPathFull, sprintf("component_spec_%d.png", ci))
     makePlot(allPlots[curPlotInd], 7, 4.5, bg = NA, plotSpec(rmdVars$components, ci,
                                    main = sprintf("ret: %.1f; m/z: %.4f - %.4f",
                                                   cInfo$ret[ci], min(cTable[[ci]]$mz), max(cTable[[ci]]$mz))))
 
     curPlotInd <- curPlotInd + 1
-    allPlots[curPlotInd] <- file.path(plotPath, sprintf("component_eic_%d.png", ci))
+    allPlots[curPlotInd] <- file.path(plotPathFull, sprintf("component_eic_%d.png", ci))
     makePlot(allPlots[curPlotInd], 7, 4.5, bg = NA,
              plotEIC(rmdVars$components, ci, rmdVars$fGroups,
                      rtWindow = rmdVars$EICRtWindow,
@@ -35,12 +36,12 @@ for (ci in seq_len(cCount))
     if (isHClust)
     {
         curPlotInd <- curPlotInd + 1
-        allPlots[curPlotInd] <- file.path(plotPath, sprintf("component_int_norm_%d.png", ci))
+        allPlots[curPlotInd] <- file.path(plotPathFull, sprintf("component_int_norm_%d.png", ci))
         makePlot(allPlots[curPlotInd], 3.3, 3.3, bg = NA,
                  plotInt(rmdVars$components, index = ci, main = "normalized"))
         
         curPlotInd <- curPlotInd + 1
-        allPlots[curPlotInd] <- file.path(plotPath, sprintf("component_int_abs_%d.png", ci))
+        allPlots[curPlotInd] <- file.path(plotPathFull, sprintf("component_int_abs_%d.png", ci))
         fg <- fGroups[, unique(cTable[[ci]]$group)]
         makePlot(allPlots[curPlotInd], 3.3, 3.3, bg = NA,
                  plotInt(fg, average = clProps$average, main = "absolute"))
@@ -87,8 +88,8 @@ plot(components)
 
 ```{r echo=FALSE}
 compSeq <- seq_len(cCount)
-sppaths <- file.path(plotPath, sprintf("component_spec_%d.png", compSeq))
-eicpaths <- file.path(plotPath, sprintf("component_eic_%d.png", compSeq))
+sppaths <- file.path(plotPathLink, sprintf("component_spec_%d.png", compSeq))
+eicpaths <- file.path(plotPathLink, sprintf("component_eic_%d.png", compSeq))
 
 if (rmdVars$selfContained)
 {
@@ -111,8 +112,8 @@ compTable <- data.table(component = names(rmdVars$components),
                              
 if (isHClust)
 {
-    intnpaths <- file.path(plotPath, sprintf("component_int_norm_%d.png", compSeq))
-    intapaths <- file.path(plotPath, sprintf("component_int_abs_%d.png", compSeq))
+    intnpaths <- file.path(plotPathLink, sprintf("component_int_norm_%d.png", compSeq))
+    intapaths <- file.path(plotPathLink, sprintf("component_int_abs_%d.png", compSeq))
     
     if (rmdVars$selfContained)
     {

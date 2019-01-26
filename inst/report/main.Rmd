@@ -18,9 +18,14 @@ if (rmdVars$optimizePng)
     knitr::opts_chunk$set(pngquant = "")
 
 # utility funcs for plotting
-getPlotPath <- function()
+getPlotPath <- function(link)
 {
-    ret <- if (rmdVars$selfContained) "." else file.path(rmdVars$outPath, "report_files", "plots")
+    if (rmdVars$selfContained)
+        ret <- "."
+    else if (link)
+        ret <- file.path("report_files", "plots")
+    else
+        ret <- file.path(rmdVars$outPath, "report_files", "plots")
     mkdirp(ret)
     return(ret)
 }
@@ -36,7 +41,8 @@ imgTags <- function(img)
 {
     if (rmdVars$selfContained)
         return(sprintf("<img src=%s></img>", img))
-    return(sprintf("<img src=file://%s></img>", img))
+    # return(sprintf("<img src=file://%s></img>", img))
+    return(sprintf("<img src='%s'></img>", img))
 }
 ```
 

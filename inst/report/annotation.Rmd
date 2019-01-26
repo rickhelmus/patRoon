@@ -136,10 +136,11 @@ message("Generating spectra...")
 prog <- txtProgressBar(0, length(plotGroups), style = 3, file = stderr())
 
 allPlots <- vector("character", 0)
-plotPath <- getPlotPath()
+plotPathFull <- getPlotPath(FALSE)
+plotPathLink <- getPlotPath(TRUE)
 for (grpi in seq_along(plotGroups))
 {
-    plotf <- file.path(plotPath, sprintf("eic_%i.png", grpi))
+    plotf <- file.path(plotPathFull, sprintf("eic_%i.png", grpi))
     allPlots[length(allPlots) + 1] <- plotf
     makePlot(plotf, 5, 4.5,
              plotEIC(rmdVars$fGroups[, plotGroups[grpi]], rmdVars$EICRtWindow,
@@ -151,7 +152,7 @@ for (grpi in seq_along(plotGroups))
         compsSeq <- seq_len(nrow(compTable[[plotGroups[grpi]]]))
         allPlots <- c(allPlots, sapply(compsSeq, function(compi)
         {
-            ret <- file.path(plotPath, sprintf("compscore_%d_%d.png", grpi, compi))
+            ret <- file.path(plotPathFull, sprintf("compscore_%d_%d.png", grpi, compi))
             makePlot(ret, 4.5, 4.5, bg = NA,
                      plotScores(rmdVars$compounds, compi, plotGroups[grpi], rmdVars$compoundNormalizeScores,
                                 rmdVars$compoundExclNormScores))
@@ -160,7 +161,7 @@ for (grpi in seq_along(plotGroups))
 
         allPlots <- c(allPlots, sapply(compsSeq, function(compi)
         {
-            ret <- file.path(plotPath, sprintf("compspec_%d_%d.png", grpi, compi))
+            ret <- file.path(plotPathFull, sprintf("compspec_%d_%d.png", grpi, compi))
             makePlot(ret, 7, 4.5, bg = NA, plotSpec(rmdVars$compounds, compi,  plotGroups[grpi],
                                                     rmdVars$MSPeakLists, rmdVars$formulas,
                                                     FALSE))
@@ -169,7 +170,7 @@ for (grpi in seq_along(plotGroups))
         
         allPlots <- c(allPlots, sapply(compsSeq, function(compi)
         {
-            ret <- file.path(plotPath, sprintf("compstruct_%d_%d.png", grpi, compi))
+            ret <- file.path(plotPathFull, sprintf("compstruct_%d_%d.png", grpi, compi))
             makePlot(ret, 3, 3, bg = NA, plotStructure(rmdVars$compounds, compi, plotGroups[grpi], width = 150, height = 150))
             return(ret)
         }))
@@ -177,14 +178,14 @@ for (grpi in seq_along(plotGroups))
     
     if (plotGroups[grpi] %in% compsClustFGroups)
     {
-        plotf <- file.path(plotPath, sprintf("dendro_%d.png", grpi))
+        plotf <- file.path(plotPathFull, sprintf("dendro_%d.png", grpi))
         makePlot(plotf, 8, 4.5, plot(rmdVars$compsCluster, groupName = plotGroups[grpi]))
         allPlots <- c(allPlots, plotf)
         
         ct <- cutClusters(rmdVars$compsCluster)[[plotGroups[grpi]]]
         allPlots <- c(allPlots, sapply(seq_along(unique(ct)), function(cli)
         {
-            ret <- file.path(plotPath, sprintf("mcs_%d_%d.png", grpi, cli))
+            ret <- file.path(plotPathFull, sprintf("mcs_%d_%d.png", grpi, cli))
             makePlot(ret, 3, 3, plotStructure(rmdVars$compsCluster, plotGroups[grpi], cli,
                                               100, 100))
             return(ret)
@@ -196,7 +197,7 @@ for (grpi in seq_along(plotGroups))
         precursors <- unique(rmdVars$formulas[[plotGroups[grpi]]][byMSMS == TRUE, formula])
         allPlots <- c(allPlots, sapply(precursors, function(prec)
         {
-            ret <- file.path(plotPath, sprintf("formspec_%d_%s.png", grpi, prec))
+            ret <- file.path(plotPathFull, sprintf("formspec_%d_%s.png", grpi, prec))
             makePlot(ret, 6, 4.5, plotSpec(rmdVars$formulas, prec, plotGroups[grpi], MSPeakLists = rmdVars$MSPeakLists))
             return(ret)
         }))
@@ -224,9 +225,9 @@ for (grpi in seq_along(plotGroups))
 
 ### EIC {{ data-width=100 .annotationClass .EIC-{ grpi } }}
 
-![]({ plotPath }/eic_{ grpi }.png)
+![]({ plotPathFull }/eic_{ grpi }.png)
 
-", grpi = grpi, plotPath = plotPath)
+", grpi = grpi, plotPath = plotPathFull)
 }
 
 # stuff everything together: https://stackoverflow.com/a/21730473
@@ -250,9 +251,9 @@ compoundsDT <- rbindlist(lapply(compFGroups, function(grp)
 
     ct <- compTable[[grp]]
     
-    sppaths <- file.path(plotPath, sprintf("compspec_%d_%d.png", grpi, seq_len(nrow(ct))))
-    scpaths <- file.path(plotPath, sprintf("compscore_%d_%d.png", grpi, seq_len(nrow(ct))))
-    stpaths <- file.path(plotPath, sprintf("compstruct_%d_%d.png", grpi, seq_len(nrow(ct))))
+    sppaths <- file.path(plotPathLink, sprintf("compspec_%d_%d.png", grpi, seq_len(nrow(ct))))
+    scpaths <- file.path(plotPathLink, sprintf("compscore_%d_%d.png", grpi, seq_len(nrow(ct))))
+    stpaths <- file.path(plotPathLink, sprintf("compstruct_%d_%d.png", grpi, seq_len(nrow(ct))))
         
     if (rmdVars$selfContained)
     {
@@ -297,7 +298,7 @@ formulasDT <- rbindlist(lapply(formFGroups, function(grp)
     grpi <- which(plotGroups == grp)
     precursors <- unique(rmdVars$formulas[[grp]][byMSMS == TRUE, formula])
     
-    sppaths <- file.path(plotPath, sprintf("formspec_%d_%s.png", grpi, precursors))
+    sppaths <- file.path(plotPathLink, sprintf("formspec_%d_%s.png", grpi, precursors))
     if (rmdVars$selfContained)
         sppaths <- sapply(sppaths, knitr::image_uri)
 
@@ -346,7 +347,7 @@ for (i in seq_along(compsClustFGroups))
     rmdTexts[i] <-
         paste0(glue::glue(compClustTempl, grpi = grpi,
                           grp = plotGroups[grpi],
-                          plotPath = plotPath,
+                          plotPath = plotPathFull,
                           mcs = paste0(glue::glue("![]({ plotPath }/mcs_{ grpi }_{ cli }.png)",
                                                   grpi = grpi, cli = seq_len(length(unique(ct)))),
                                        collapse = "\n")),

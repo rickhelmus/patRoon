@@ -16,6 +16,8 @@ general
         - utils? EICs with export/vdiffr?
         - test MS peak lists deisotoping?
 - somehow integrate convertMSFiles() in newProject()? And other file types?
+- newProject(): generate Rmd?
+
 
 docs
 - More vignettes
@@ -51,6 +53,7 @@ MSPeakLists
 - collapse averagedPeakLists
 - test avg params
 - add pruneMissingPrecursorMS to filter()?
+- filter by MSMS
 
 
 compounds
@@ -61,6 +64,7 @@ compounds
 - MetFrag: (buggy) trivial name fetching not needed anymore?
 - convert score csv to internal data?
 - SIRIUS: use --auto-charge instead of manually fixing charge of fragments (or not? conflicting docs on what it does)
+- document database="toxcast"?
 
 
 formulas

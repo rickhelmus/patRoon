@@ -84,7 +84,7 @@ plists <- generateMSPeakLists(fGroups, "brukerfmf", avgFGroupParams = avgPListPa
 {{ endCodeBlock() }}
 {{ optionalCodeBlock(formulaOpts$algo == "GenForm") }}
 formulas <- generateFormulas(fGroups, "genform", plists, maxMzDev = 5,
-                             adduct = "{{ if (polarity == 'positive') 'M+H' else 'M-H' }}", elements = "CHNOP",
+                             adduct = "{{ if (polarity == 'positive') '[M+H]+' else '[M-H]-' }}", elements = "CHNOP",
                              calculateFeatures = TRUE, featThreshold = 0.75)
 {{ endCodeBlock() }}
 {{ optionalCodeBlock(formulaOpts$algo == "Bruker") }}
@@ -102,7 +102,7 @@ formulas <- generateFormulas(fGroups, "sirius", plists, maxMzDev = 5,
 {{ optionalCodeBlock(identOpts$algo == "MetFrag") }}
 compounds <- generateCompounds(fGroups, plists, "metfrag", method = "CL", dbRelMzDev = 5,
                                fragRelMzDev = 5, fragAbsMzDev = 0.002,
-                               adduct = {{ if (polarity == "positive") "[M+H]+" else "[M-H]-" }}, database = "pubchem", maxCandidatesToStop = 2500)
+                               adduct = "{{ if (polarity == 'positive') '[M+H]+' else '[M-H]-' }}", database = "pubchem", maxCandidatesToStop = 2500)
 compounds <- addFormulaScoring(compounds, formulas, TRUE) {{ optionalLine(formulaOpts$algo != "") }}
 {{ endCodeBlock() }}
 {{ optionalCodeBlock(identOpts$algo == "SIRIUS") }}

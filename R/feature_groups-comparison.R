@@ -321,7 +321,7 @@ setMethod("consensus", "featureGroupsComparison", function(obj, relAbundance = 0
             for (anai in seq_along(ftinds))
             {
                 if (ftinds[anai] != 0)
-                    set(adjF[[anai]], as.integer(ftinds[anai]), "consFGroup", colnames(compFeatInds)[compfgi])
+                    set(adjF[[anaInfo$analysis[anai]]], as.integer(ftinds[anai]), "consFGroup", colnames(compFeatInds)[compfgi])
             }
         }
 

@@ -53,7 +53,7 @@ doCreateProject <- function(destination, scriptFile, createRStudioProj, generate
     analyses[, group := ifelse(!nzchar(group), analysis, group)]
 
     # Make analysis table
-    if (generateAnaInfo != "none")
+    if (generateAnaInfo == "table")
         write.csv(analyses[, c("path", "analysis", "group", "ref")], file.path(destination, analysisTableFile),
                   row.names = FALSE)
 
@@ -269,7 +269,7 @@ newProject <- function()
                 showDialog("No script file", "Please select a destination script file!", "")
             else if (input$generateAnaInfo != "none" && nrow(rValues$analyses) == 0)
                 showDialog("No analyses selected", "Please select some analyses!", "")
-            else if (input$generateAnaInfo != "none" && file.exists(file.path(input$destinationPath, input$analysisTableFile)) &&
+            else if (input$generateAnaInfo == "table" && file.exists(file.path(input$destinationPath, input$analysisTableFile)) &&
                      !showQuestion("Analysis table file already exists",
                                    sprintf("Analysis table file already exists: '%s'.\nOverwrite?",
                                            file.path(input$destinationPath, input$analysisTableFile)),

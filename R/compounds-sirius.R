@@ -179,6 +179,7 @@ generateCompoundsSirius <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct =
             {
                 warning(sprintf("Restarting failed SIRIUS for %s - exit: %d (retry %d/%d)",
                                 cmd$gName, exitStatus, retries+1, errorRetries))
+                unlink(cmd$outPath, TRUE)
                 return(TRUE)
             }
             stop(sprintf("Fatal: Failed to execute SIRIUS for %s - exit code: %d\nCommand: %s", cmd$gName, exitStatus,

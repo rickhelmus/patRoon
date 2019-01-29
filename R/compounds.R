@@ -101,12 +101,7 @@ setMethod("[", c("compounds", "ANY", "missing", "missing"), function(x, i, ...)
 {
     if (!missing(i))
     {
-        assertSubsetArg(i)
-
-        if (!is.character(i))
-            i <- groupNames(x)[i]
-
-        i <- i[i %in% groupNames(x)]
+        i <- assertSubsetArgAndToChr(i, groupNames(x))
         x@compounds <- x@compounds[i]
     }
 

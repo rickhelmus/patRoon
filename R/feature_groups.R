@@ -164,24 +164,16 @@ setMethod("removeGroups", "featureGroups", function(fGroups, indices)
 setMethod("[", c("featureGroups", "ANY", "ANY", "missing"), function(x, i, j, ...)
 {
     if (!missing(i))
-        assertSubsetArg(i)
-    if (!missing(j))
-        assertSubsetArg(j)
-
-    toNumIndex <- function(ind, names)
     {
-        if (typeof(ind) == "character")
-            return(match(ind, names))
-        if (typeof(ind) == "logical")
-            return(which(ind))
-        return(ind)
+        i <- assertSubsetArgAndToChr(i, analyses(x))
+        x <- removeAnalyses(x, which(!analyses(x) %in% i))
     }
 
-    if (!missing(i))
-        x <- removeAnalyses(x, setdiff(seq_len(nrow(x@analysisInfo)), toNumIndex(i, x@analysisInfo$analysis)))
-
     if (!missing(j))
-        x <- removeGroups(x, setdiff(seq_len(ncol(x@groups)), toNumIndex(j, colnames(x@groups))))
+    {
+        j <- assertSubsetArgAndToChr(j, names(x))
+        x <- removeGroups(x, which(!names(x) %in% j))
+    }
 
     return(removeEmptyGroups(x))
 })

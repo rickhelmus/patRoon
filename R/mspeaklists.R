@@ -132,17 +132,11 @@ setMethod("[", c("MSPeakLists", "ANY", "ANY", "missing"), function(x, i, j, ...,
 {
     checkmate::assertFlag(reAverage)
 
-    if (!missing(i))
-        assertSubsetArg(i)
-    if (!missing(j))
-        assertSubsetArg(j)
-
     # non-existing indices result in NULL values --> prune
 
     if (!missing(i))
     {
-        if (!is.character(i))
-            i <- analyses(x)[i]
+        i <- assertSubsetArgAndToChr(i, analyses(x))
         x@peakLists <- pruneList(x@peakLists[i])
 
         # update group averaged peak lists
@@ -152,8 +146,7 @@ setMethod("[", c("MSPeakLists", "ANY", "ANY", "missing"), function(x, i, j, ...,
 
     if (!missing(j))
     {
-        if (!is.character(j))
-            j <- groupNames(x)[j]
+        j <- assertSubsetArgAndToChr(j, groupNames(x))
         x@peakLists <- sapply(x@peakLists, function(a) return(pruneList(a[j])),
                               simplify = FALSE)
         x@peakLists <- pruneList(x@peakLists, TRUE)
@@ -173,7 +166,7 @@ setMethod("[[", c("MSPeakLists", "ANY", "ANY"), function(x, i, j)
 {
     assertExtractArg(i)
     if (!missing(j))
-        assertSubsetArg(j)
+        assertExtractArg(j)
 
     if (!missing(j))
     {

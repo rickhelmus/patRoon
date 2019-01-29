@@ -160,12 +160,7 @@ setMethod("[", c("features", "ANY", "missing", "missing"), function(x, i, ...)
 {
     if (!missing(i))
     {
-        assertSubsetArg(i)
-
-        if (!is.character(i))
-            i <- analyses(x)[i]
-
-        i <- i[i %in% analyses(x)]
+        i <- assertSubsetArgAndToChr(i, analyses(x))
         x@features <- x@features[i]
         x@analysisInfo <- x@analysisInfo[x@analysisInfo$analysis %in% i, ]
     }

@@ -123,12 +123,7 @@ setMethod("[", c("compoundsCluster", "ANY", "missing", "missing"), function(x, i
 {
     if (!missing(i))
     {
-        assertSubsetArg(i)
-        
-        if (!is.character(i))
-            i <- groupNames(x)[i]
-        
-        i <- i[i %in% groupNames(x)]
+        i <- assertSubsetArgAndToChr(i, groupNames(x))
         x@clusters <- x@clusters[i]
         x@SMILES <- x@SMILES[i]
         x@cutClusters <- x@cutClusters[i]

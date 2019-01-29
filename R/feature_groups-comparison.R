@@ -41,12 +41,7 @@ setMethod("[", c("featureGroupsComparison", "ANY", "missing", "missing"), functi
 {
     if (!missing(i))
     {
-        assertSubsetArg(i)
-
-        if (!is.character(i))
-            i <- names(x)[i]
-
-        i <- i[i %in% names(x)]
+        i <- assertSubsetArgAndToChr(i, names(x))
         x@fGroupsList <- x@fGroupsList[i]
         x@comparedFGroups <- x@comparedFGroups[i]
     }

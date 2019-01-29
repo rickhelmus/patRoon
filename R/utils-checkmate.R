@@ -136,11 +136,11 @@ checkCSVFile <- function(x, cols)
 assertCSVFile <- checkmate::makeAssertionFunction(checkCSVFile)
 
 # used for "[" methods
-checkSubsetArg <- function(x)
+checkSubsetArg <- function(x, choices)
 {
-    ret <- checkmate::checkIntegerish(x, lower = 0)
+    ret <- checkmate::checkIntegerish(x)
     if (!isTRUE(ret))
-        ret <- checkmate::checkCharacter(x)
+        ret <- checkmate::checkCharacter(x, choices)
     if (!isTRUE(ret))
         ret <- checkmate::checkLogical(x)
     if (!isTRUE(ret))
@@ -148,6 +148,15 @@ checkSubsetArg <- function(x)
     return(ret)
 }
 assertSubsetArg <- checkmate::makeAssertionFunction(checkSubsetArg)
+
+assertSubsetArgAndToChr <- function(x, choices, .var.name = checkmate::vname(x), add = NULL)
+{
+    assertSubsetArg(x, choices, .var.name, add)
+    if (!is.character(x))
+        x <- choices[x]
+    x <- intersect(x, choices)
+    return(x)
+}
 
 # used for "[[" methods
 checkExtractArg <- function(x)

@@ -120,9 +120,9 @@ setMethod("show", "components", function(object)
 setMethod("[", c("components", "ANY", "ANY", "missing"), function(x, i, j, ...)
 {
     if (!missing(i))
-        assertSubsetArg(i)
+        i <- assertSubsetArgAndToChr(i, names(x))
     if (!missing(j))
-        assertSubsetArg(j)
+        j <- assertSubsetArgAndToChr(j, groupNames(x))
 
     # non-existing indices result in NULL values --> prune
 
@@ -132,16 +132,12 @@ setMethod("[", c("components", "ANY", "ANY", "missing"), function(x, i, j, ...)
 
     if (!missing(i))
     {
-        if (!is.character(i))
-            i <- names(x)[i]
         x@components <- pruneList(x@components[i])
         x@componentInfo <- x@componentInfo[name %in% i]
     }
 
     if (!missing(j))
     {
-        if (!is.character(j))
-            j <- groupNames(x)[j]
         x@components <- sapply(x@components, function(cmp) cmp[group %in% j],
                                simplify = FALSE)
         x@components <- x@components[sapply(x@components, nrow) > 0]

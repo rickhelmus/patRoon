@@ -119,12 +119,8 @@ setMethod("show", "formulas", function(object)
 setMethod("[", c("formulas", "ANY", "missing", "missing"), function(x, i, j, ...)
 {
     if (!missing(i))
-        assertSubsetArg(i)
-
-    if (!missing(i))
     {
-        if (!is.character(i))
-            i <- groupNames(x)[i]
+        i <- assertSubsetArgAndToChr(i, groupNames(x))
         x@featureFormulas <- sapply(x@featureFormulas, function(a) pruneList(a[i]),
                                     simplify = FALSE)
         x@featureFormulas <- pruneList(x@featureFormulas, TRUE)

@@ -355,7 +355,7 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
     aapply(checkmate::assertCount, . ~ topMost + maxCandidatesToStop, positive = TRUE, fixed = list(add = ac))
     aapply(checkmate::assertFlag, . ~ addTrivialNames, fixed = list(add = ac))
     checkmate::assertString(chemSpiderToken, add = ac)
-    checkmate::assertChoice(database, c("pubchem", "chemspider", "kegg", "sdf", "psv", "csv", "toxcast"), add = ac)
+    checkmate::assertChoice(database, c("pubchem", "chemspider", "kegg", "sdf", "psv", "csv", "comptox"), add = ac)
     checkmate::assert(checkmate::checkFlag(extendedPubChem),
                       checkmate::checkChoice(extendedPubChem, "auto"),
                       .var.name = "extendedPubChem")
@@ -366,7 +366,7 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
            names = "unique", null.ok = TRUE, fixed = list(add = ac))
 
     compsScores <- compoundScorings("metfrag", database)
-    isLocalDB <- database %in% c("sdf", "psv", "csv", "toxcast")
+    isLocalDB <- database %in% c("sdf", "psv", "csv", "comptox")
     allScoringNames <- union(compsScores$name, compsScores$metfrag)        
     # allow freely definable scorings from local databases
     if (!isLocalDB)
@@ -398,7 +398,7 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
                        sdf = "LocalSDF",
                        psv = "LocalPSV",
                        csv = "LocalCSV",
-                       toxcast = "LocalCSV")
+                       comptox = "LocalCSV")
     if (database == "PubChem" && extendedPubChem) # can't seem to combine this conditional in above switch...
         database <- "ExtendedPubChem"
 

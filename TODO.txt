@@ -68,6 +68,7 @@ compounds
 - convert score csv to internal data?
 - SIRIUS: use --auto-charge instead of manually fixing charge of fragments (or not? conflicting docs on what it does)
 - document database="toxcast"?
+- fix MF landing page for local databases
 
 
 formulas

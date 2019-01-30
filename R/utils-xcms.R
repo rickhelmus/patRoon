@@ -11,6 +11,7 @@ setMethod("getXCMSSet", "features", function(obj, exportedData, verbose)
     # generate dummy XCMS set, based on https://groups.google.com/forum/m/#!topic/xcms/CGC0SKMVhAQ
 
     checkmate::assertFlag(exportedData)
+    checkmate::assertFlag(verbose)
 
     xs <- new(getClassDef("xcmsSet", package = "xcms"))
     anaInfo <- analysisInfo(obj)
@@ -69,9 +70,10 @@ setMethod("getXCMSSet", "featuresXCMS", function(obj, exportedData, verbose)
 
 #' @rdname getXCMSSet
 #' @export
-setMethod("getXCMSSet", "featureGroups", function(obj, exportedData, verbose)
+setMethod("getXCMSSet", "featureGroups", function(obj, exportedData, verbose = TRUE)
 {
     checkmate::assertFlag(exportedData)
+    checkmate::assertFlag(verbose)
 
     fTable <- featureTable(obj)
 
@@ -144,7 +146,7 @@ setMethod("getXCMSSet", "featureGroupsXCMS", function(obj, exportedData, verbose
 
     if (length(filepaths(obj@xs)) != length(anaInfo$analysis) ||
         !all(simplifyAnalysisNames(filepaths(obj@xs)) == anaInfo$analysis))
-        return(callNextMethod(obj, exportedData, verbose)) # files changed, need to update group statistics which is rather complex so just fallback
+        return(callNextMethod(obj, exportedData, verbose = verbose)) # files changed, need to update group statistics which is rather complex so just fallback
 
     return(obj@xs)
 })

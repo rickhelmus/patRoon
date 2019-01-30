@@ -17,6 +17,8 @@ general
         - test MS peak lists deisotoping?
 - somehow integrate convertMSFiles() in newProject()? And other file types?
 - newProject(): generate Rmd?
+- algorithmObject() generic
+- test negative subset indices
 
 
 docs
@@ -44,6 +46,7 @@ features
 - removeRefAnalyses TRUE by default (or if blank filter is specified?)?
 - Fix plotUpSet with <2 rgroups
 - as.data.table for fGroups is slow?
+- tests to verify getXCMSSet...
 
 
 MSPeakLists
@@ -81,8 +84,13 @@ formulas
 
 components
 - mass defect components
+- CAMERA: test new filtering options
 
 
 reporting
 - add more options to reportPlots argument of reportMD()?
 - reportPDF/reportMD: MS only formulas are not reported?
+
+
+Cleanup
+- Reduce non-exported class only methods

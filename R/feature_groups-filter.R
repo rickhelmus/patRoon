@@ -103,10 +103,10 @@ blankFilter <- function(fGroups, threshold, negate = FALSE)
     }))
 }
 
-abundanceFilter <- function(fGroups, relThreshold = 0, absThreshold = 0, negate = FALSE)
+abundanceFilter <- function(fGroups, relThreshold = 0, absThreshold = 0, negate = FALSE, verbose = TRUE)
 {
     absThreshold <- max(absThreshold, relThreshold * nrow(analysisInfo(fGroups)))
-    return(doFilter(fGroups, "abundance", c(absThreshold, negate), function(fGroups)
+    return(doFilter(fGroups, "abundance", c(absThreshold, negate), verbose = verbose, function(fGroups)
     {
         gTable <- groups(fGroups)
         pred <- function(x) sum(x > 0) >= absThreshold

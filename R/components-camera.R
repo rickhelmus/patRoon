@@ -20,17 +20,29 @@ setMethod("initialize", "componentsCamera",
 #' @param onlyIsotopes Logical value. If \code{TRUE} only isotopes are
 #'   considered when generating components (faster). Corresponds to \code{quick}
 #'   argument of \code{\link[CAMERA:annotate-methods]{CAMERA::annotate}}.
+#' @param minSize The minimum size of a component. Smaller components than this
+#'   size will be removed. See note below.
+#' @param ubiquitous If \code{TRUE}: ensure that all feature groups within a
+#'   component are present in the same analyses. See note below.
+#'
+#' @note For \code{generateComponentsCAMERA}: the \code{minSize} and
+#'   \code{ubiquitous} arguments provide additional filtering functionality not
+#'   provided by \pkg{CAMERA}. Consequently, their default values may produce
+#'   different results compared to regular output from \code{CAMERA}.
 #'
 #' @references \addCitations{CAMERA}{1}
 #'
 #' @rdname component-generation
 #' @export
-generateComponentsCAMERA <- function(fGroups, ionization, onlyIsotopes = FALSE, extraOpts = NULL)
+generateComponentsCAMERA <- function(fGroups, ionization, onlyIsotopes = FALSE,
+                                     minSize = 2, ubiquitous = TRUE, extraOpts = NULL)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
     checkmate::assertChoice(ionization, c("positive", "negative"), add = ac)
     checkmate::assertFlag(onlyIsotopes, add = ac)
+    checkmate::assertCount(minSize, add = ac)
+    checkmate::assertFlag(ubiquitous, add = ac)
     checkmate::assertList(extraOpts, any.missing = FALSE, names = "unique", null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
 
@@ -38,7 +50,7 @@ generateComponentsCAMERA <- function(fGroups, ionization, onlyIsotopes = FALSE, 
         return(componentsCamera(componentInfo = data.table(), components = list(),
                                 xsa = new("xsAnnotate")))
 
-    hash <- makeHash(fGroups, ionization, onlyIsotopes, extraOpts)
+    hash <- makeHash(fGroups, ionization, onlyIsotopes, minSize, anaAbundance, extraOpts)
     cd <- loadCacheData("componentsCAMERA", hash)
     if (!is.null(cd))
         return(cd)
@@ -100,16 +112,28 @@ generateComponentsCAMERA <- function(fGroups, ionization, onlyIsotopes = FALSE, 
     anPList[, pcgroup := paste0("CMP", pcgroup)]
     comps <- split(anPList, by = "pcgroup", keep.by = FALSE)
 
-    # add intensities. NOTE: CAMERA selects for each pcgroup one representative
-    # sample
+    # store before filtering/pruning below
+    cmpanalyses <- setNames(anaInfo$analysis[unlist(an@psSamples)], names(comps))
+    
+    # Filter non-abundant feature groups from components and add intensities.
+    # NOTE: CAMERA selects for each pcgroup one representative sample
     cnames <- names(comps)
-    comps <- sapply(seq_along(comps), function(cmpi)
+    comps <- pruneList(setNames(sapply(seq_along(comps), function(cmpi)
     {
+        cmp <- comps[[cmpi]]
+        if (ubiquitous)
+        {
+            fgCmp <- removeEmptyAnalyses(fGroups[, cmp$group])
+            fgCmp <- abundanceFilter(fgCmp, 1, verbose = FALSE)
+            cmp <- cmp[group %in% names(fgCmp)]
+        }
+        if (minSize > 0 && nrow(cmp) < minSize)
+            return(cmp[0])
+            
         anai <- an@psSamples[[cmpi]]
-        comps[[cmpi]][, "intensity" := unlist(gTable[anai, comps[[cmpi]]$group, with = FALSE])]
-    }, simplify = FALSE)
-    names(comps) <- cnames
-
+        cmp[, "intensity" := unlist(gTable[anai, cmp$group, with = FALSE])]
+    }, simplify = FALSE), cnames), checkZeroRows = TRUE)
+    
     rets <- lapply(comps, function(cm) gInfo[cm$group, "rts"])
     if (!is.null(adTable))
     {
@@ -126,8 +150,7 @@ generateComponentsCAMERA <- function(fGroups, ionization, onlyIsotopes = FALSE, 
 
     cInfo <- data.table(name = names(comps), cmp_ret = sapply(rets, mean),
                         cmp_retsd = sapply(rets, sd), neutral_mass = Ms,
-                        analysis = anaInfo$analysis[unlist(an@psSamples)],
-                        size = sapply(comps, nrow))
+                        analysis = cmpanalyses[names(comps)], size = sapply(comps, nrow))
 
 
     # UNDONE: keep n=1 sized components?

@@ -15,7 +15,7 @@
 \S4method{generateComponents}{featureGroups}(fGroups, algorithm, ...)
 
 generateComponentsCAMERA(fGroups, ionization, onlyIsotopes = FALSE,
-  extraOpts = NULL)
+  minSize = 2, ubiquitous = TRUE, extraOpts = NULL)
 
 generateComponentsIntClust(fGroups, method = "complete",
   metric = "euclidean", normFunc = max, average = TRUE,
@@ -48,6 +48,12 @@ should be \code{"positive"} or \code{"negative"}.}
 \item{onlyIsotopes}{Logical value. If \code{TRUE} only isotopes are
 considered when generating components (faster). Corresponds to \code{quick}
 argument of \code{\link[CAMERA:annotate-methods]{CAMERA::annotate}}.}
+
+\item{minSize}{The minimum size of a component. Smaller components than this
+size will be removed. See note below.}
+
+\item{ubiquitous}{If \code{TRUE}: ensure that all feature groups within a
+component are present in the same analyses. See note below.}
 
 \item{extraOpts}{Named character vector with extra arguments directly passed
 to \code{\link{homol.search}} (\code{generateComponentsNontarget}) or
@@ -167,6 +173,12 @@ and reduce the data size and thus complexity.
   (\emph{e.g.} adducts or isotopes). This method uses the
   \code{\link[RAMClustR]{ramclustR}} functions for generating the components, whereas
   \code{\link[RAMClustR]{do.findmain}} is used for annotation.
+}
+\note{
+For \code{generateComponentsCAMERA}: the \code{minSize} and
+  \code{ubiquitous} arguments provide additional filtering functionality not
+  provided by \pkg{CAMERA}. Consequently, their default values may produce
+  different results compared to regular output from \code{CAMERA}.
 }
 \references{
 \addCitations{CAMERA}{1}

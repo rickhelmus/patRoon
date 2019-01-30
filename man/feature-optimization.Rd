@@ -9,7 +9,7 @@
 \alias{optimizeFeatureFinding}
 \alias{generateFeatureOptPSet}
 \alias{getDefFeaturesOptParamRanges}
-\title{Optimizatation of feature finding and grouping parameters}
+\title{Optimization of feature finding and grouping parameters}
 \usage{
 optimizeFeatureGrouping(features, algorithm, ...,
   templateParams = list(), paramRanges = list(), maxIterations = 50,
@@ -78,7 +78,7 @@ The \code{optimizeFeatureFinding} and \code{optimizeFeatureGrouping}
   return their results in a \code{\link{optimizationResult}} object.
 }
 \description{
-Automatic optimizatation of feature finding and grouping parameters through
+Automatic optimization of feature finding and grouping parameters through
 Design of Experiments (DoE).
 }
 \details{

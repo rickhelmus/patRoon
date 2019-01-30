@@ -18,7 +18,7 @@ getXCMSSet(obj, ..., verbose = TRUE)
 
 \S4method{getXCMSSet}{featuresXCMS}(obj, exportedData, verbose)
 
-\S4method{getXCMSSet}{featureGroups}(obj, exportedData, verbose)
+\S4method{getXCMSSet}{featureGroups}(obj, exportedData, verbose = TRUE)
 
 \S4method{getXCMSSet}{featureGroupsXCMS}(obj, exportedData, verbose)
 }

@@ -70,8 +70,8 @@
   useGGPlot2 = FALSE)
 
 \S4method{plotSpec}{compounds}(obj, index, groupName, MSPeakLists,
-  formulas = NULL, plotStruct = TRUE, useGGPlot2 = FALSE,
-  xlim = NULL, ylim = NULL, ...)
+  formulas = NULL, plotStruct = TRUE, title = NULL,
+  useGGPlot2 = FALSE, xlim = NULL, ylim = NULL, ...)
 
 \S4method{plotVenn}{compounds}(obj, ..., labels = NULL,
   vennArgs = NULL)
@@ -187,6 +187,9 @@ generate the candidate}
 
 \item{plotStruct}{If \code{TRUE} then the candidate structure is drawn in the
 spectrum.}
+
+\item{title}{The title of the plot. If \code{NULL} a title will be
+automatically made.}
 
 \item{xlim, ylim}{Sets the plot size limits used by
 \code{\link[graphics]{plot}}. Set to \code{NULL} for automatic plot sizing.}

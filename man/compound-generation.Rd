@@ -286,7 +286,7 @@ before feature groups have been prioritized.
   numberPatents        \tab PubChemNumberPatents                             \tab pubchem           \cr
   pubMedReferences     \tab PubChemNumberPubMedReferences                    \tab pubchem           \cr
   pubMedReferences     \tab ChemSpiderNumberPubMedReferences                 \tab chemspider        \cr
-  pubMedReferences     \tab NUMBER_OF_PUBMED_ARTICLES                        \tab toxcast           \cr
+  pubMedReferences     \tab NUMBER_OF_PUBMED_ARTICLES                        \tab comptox           \cr
   extReferenceCount    \tab ChemSpiderNumberExternalReferences               \tab chemspider        \cr
   dataSourceCount      \tab ChemSpiderDataSourceCount                        \tab chemspider        \cr
   referenceCount       \tab ChemSpiderReferenceCount                         \tab chemspider        \cr
@@ -295,16 +295,16 @@ before feature groups have been prioritized.
   smartsExclusionScore \tab SmartsSubstructureExclusionScore                 \tab                   \cr
   suspectListScore     \tab SuspectListScore                                 \tab                   \cr
   retentionTimeScore   \tab RetentionTimeScore                               \tab                   \cr
-  CPDATCount           \tab CPDAT_COUNT                                      \tab toxcast           \cr
-  TOXCASTActive        \tab TOXCAST_PERCENT_ACTIVE                           \tab toxcast           \cr
-  dataSources          \tab DATA_SOURCES                                     \tab toxcast           \cr
-  pubChemDataSources   \tab PUBCHEM_DATA_SOURCES                             \tab toxcast           \cr
-  EXPOCASTPredExpo     \tab EXPOCAST_MEDIAN_EXPOSURE_PREDICTION_MG/KG-BW/DAY \tab toxcast           \cr
-  ECOTOX               \tab ECOTOX                                           \tab toxcast           \cr
-  NORMANSUSDAT         \tab NORMANSUSDAT                                     \tab toxcast           \cr
-  MASSBANKEU           \tab MASSBANKEU                                       \tab toxcast           \cr
-  TOX21SL              \tab TOX21SL                                          \tab toxcast           \cr
-  TOXCAST              \tab TOXCAST                                          \tab toxcast           
+  CPDATCount           \tab CPDAT_COUNT                                      \tab comptox           \cr
+  TOXCASTActive        \tab TOXCAST_PERCENT_ACTIVE                           \tab comptox           \cr
+  dataSources          \tab DATA_SOURCES                                     \tab comptox           \cr
+  pubChemDataSources   \tab PUBCHEM_DATA_SOURCES                             \tab comptox           \cr
+  EXPOCASTPredExpo     \tab EXPOCAST_MEDIAN_EXPOSURE_PREDICTION_MG/KG-BW/DAY \tab comptox           \cr
+  ECOTOX               \tab ECOTOX                                           \tab comptox           \cr
+  NORMANSUSDAT         \tab NORMANSUSDAT                                     \tab comptox           \cr
+  MASSBANKEU           \tab MASSBANKEU                                       \tab comptox           \cr
+  TOX21SL              \tab TOX21SL                                          \tab comptox           \cr
+  TOXCAST              \tab TOXCAST                                          \tab comptox           
 }
 
  In addition, the \code{compoundScorings} function is also

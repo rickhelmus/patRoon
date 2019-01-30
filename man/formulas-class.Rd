@@ -159,6 +159,8 @@ results for the complete feature group will be plotted.}
 \item{MSPeakLists}{The \code{\link{MSPeakLists}} object that was used to
 generate the candidate}
 
+\item{title}{The title of the plot.}
+
 \item{useGGPlot2}{If \code{TRUE} then \pkg{\link{ggplot2}} is used for
 plotting, otherwise base plot used. For \code{plotSpec}, \code{ggplot2}
 allows nicely repelled text for annotation. However, base plot is generally

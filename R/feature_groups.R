@@ -141,6 +141,7 @@ setMethod("removeAnalyses", "featureGroups", function(fGroups, indices)
             fGroups@ftindex <- fGroups@ftindex[-indices]
         }
         fGroups@analysisInfo <- fGroups@analysisInfo[-indices, ]
+        fGroups@features <- fGroups@features[-indices]
     }
     return(fGroups)
 })

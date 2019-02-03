@@ -16,8 +16,6 @@ NULL
 #'   for each feature group.
 #' @slot avgPeakListArgs A \code{list} with arguments used to generate feature
 #'   group averaged MS(/MS) peak lists.
-#' @slot algorithm The algorithm that was used to generate the MS peak lists.
-#'   Use the \code{algorithm} method for access.
 #'
 #' @templateVar seli analyses
 #' @templateVar selOrderi analyses()

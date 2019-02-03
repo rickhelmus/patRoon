@@ -208,9 +208,6 @@ merge similar components.
 
 \item{\code{componentInfo}}{A \code{\link{data.table}} containing general information
 for each component. Use the \code{componentInfo} method for access.}
-
-\item{\code{algorithm}}{The algorithm that was used to generate the components. Use
-the \code{algorithm} method for access.}
 }}
 
 \note{

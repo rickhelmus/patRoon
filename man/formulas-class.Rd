@@ -282,9 +282,6 @@ candidates between different \code{formula} objects.
 \describe{
 \item{\code{formulas,featureFormulas}}{Lists of all generated formulae. Use the
 \code{formulaTable} method for access.}
-
-\item{\code{algorithm}}{The algorithm that was used for generation of formulae. Use
-the \code{algorithm} method for access.}
 }}
 
 \note{

@@ -17,8 +17,6 @@ orderComponentsNames <- function(n) order(nchar(n), n)
 #'   \code{componentTable} method for access.
 #' @slot componentInfo A \code{\link{data.table}} containing general information
 #'   for each component. Use the \code{componentInfo} method for access.
-#' @slot algorithm The algorithm that was used to generate the components. Use
-#'   the \code{algorithm} method for access.
 #'
 #' @param obj,object,x The \code{component} object.
 #' @param index The index of the component. Can be a numeric index or a

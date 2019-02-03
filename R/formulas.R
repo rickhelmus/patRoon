@@ -11,8 +11,6 @@ NULL
 #'
 #' @slot formulas,featureFormulas Lists of all generated formulae. Use the
 #'   \code{formulaTable} method for access.
-#' @slot algorithm The algorithm that was used for generation of formulae. Use
-#'   the \code{algorithm} method for access.
 #'
 #' @param obj,x,object,formulas The \code{formulas} object.
 #' @param \dots For \code{plotSpec}: Further arguments passed to

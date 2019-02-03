@@ -181,9 +181,6 @@ for each feature group.}
 
 \item{\code{avgPeakListArgs}}{A \code{list} with arguments used to generate feature
 group averaged MS(/MS) peak lists.}
-
-\item{\code{algorithm}}{The algorithm that was used to generate the MS peak lists.
-Use the \code{algorithm} method for access.}
 }}
 
 \section{S4 class hierarchy}{

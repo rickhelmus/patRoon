@@ -27,7 +27,6 @@ docs
 - Reference docs
     - Examples?
 - update tutorial
-- remove old algorithm slot descriptions
 
 
 features

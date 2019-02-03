@@ -66,7 +66,7 @@ setGeneric("identifiers", function(compounds) standardGeneric("identifiers"))
 setGeneric("addFormulaScoring", function(compounds, formulas, updateScore = FALSE,
                                          formulaScoreWeight = 1) standardGeneric("addFormulaScoring"))
 setGeneric("plotScores", function(obj, index, groupName, normalizeScores = "max",
-                                  excludeNormScores = NULL, useGGPlot2 = FALSE) standardGeneric("plotScores"))
+                                  excludeNormScores = NULL, onlyUsed = TRUE, useGGPlot2 = FALSE) standardGeneric("plotScores"))
 setGeneric("settings", function(compoundsMF) standardGeneric("settings"))
 
 ### clustering
@@ -278,13 +278,14 @@ setGeneric("reportCSV", function(fGroups, path = "report", reportFGroupsAsRows =
                                  retMin = TRUE, clearPath = FALSE) standardGeneric("reportCSV"))
 setGeneric("reportPDF", function(fGroups, path = "report", reportFGroups = TRUE,
                                  formulas = NULL, reportFormulaSpectra = TRUE, compounds = NULL, compoundNormalizeScores = "max",
-                                 compoundExclNormScores = "score", compsCluster = NULL, components = NULL, MSPeakLists = NULL, retMin = TRUE,
+                                 compoundExclNormScores = "score", compoundOnlyUsedScorings = TRUE,
+                                 compsCluster = NULL, components = NULL, MSPeakLists = NULL, retMin = TRUE,
                                  EICGrid = c(2, 1), EICRtWindow = 20, EICMzWindow = 0.005, EICTopMost = NULL,
                                  EICOnlyPresent = TRUE, clearPath = FALSE) standardGeneric("reportPDF"))
 setGeneric("reportMD", function(fGroups, path = "report", reportPlots = c("chord", "venn", "upset", "eics", "formulas"),
                                 formulas = NULL, compounds = NULL, compoundNormalizeScores = "max", compoundExclNormScores = "score",
-                                compsCluster = NULL, includeMFWebLinks = "compounds", components = NULL,
-                                interactiveHeat = FALSE, MSPeakLists = NULL, retMin = TRUE,
+                                compoundOnlyUsedScorings = TRUE, compsCluster = NULL, includeMFWebLinks = "compounds",
+                                components = NULL, interactiveHeat = FALSE, MSPeakLists = NULL, retMin = TRUE,
                                 EICRtWindow = 20, EICMzWindow = 0.005, EICTopMost = NULL, EICOnlyPresent = TRUE,
                                 selfContained = TRUE, optimizePng = FALSE, maxProcAmount = getOption("patRoon.maxProcAmount"),
                                 clearPath = FALSE, openReport = TRUE) standardGeneric("reportMD"))

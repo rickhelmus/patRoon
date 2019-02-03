@@ -21,19 +21,21 @@
 \S4method{reportPDF}{featureGroups}(fGroups, path = "report",
   reportFGroups = TRUE, formulas = NULL, reportFormulaSpectra = TRUE,
   compounds = NULL, compoundNormalizeScores = "max",
-  compoundExclNormScores = "score", compsCluster = NULL,
-  components = NULL, MSPeakLists = NULL, retMin = TRUE,
-  EICGrid = c(2, 1), EICRtWindow = 20, EICMzWindow = 0.005,
-  EICTopMost = NULL, EICOnlyPresent = TRUE, clearPath = FALSE)
+  compoundExclNormScores = "score", compoundOnlyUsedScorings = TRUE,
+  compsCluster = NULL, components = NULL, MSPeakLists = NULL,
+  retMin = TRUE, EICGrid = c(2, 1), EICRtWindow = 20,
+  EICMzWindow = 0.005, EICTopMost = NULL, EICOnlyPresent = TRUE,
+  clearPath = FALSE)
 
 \S4method{reportMD}{featureGroups}(fGroups, path = "report",
   reportPlots = c("chord", "venn", "upset", "eics", "formulas"),
   formulas = NULL, compounds = NULL, compoundNormalizeScores = "max",
-  compoundExclNormScores = "score", compsCluster = NULL,
-  includeMFWebLinks = "compounds", components = NULL,
-  interactiveHeat = FALSE, MSPeakLists = NULL, retMin = TRUE,
-  EICRtWindow = 20, EICMzWindow = 0.005, EICTopMost = NULL,
-  EICOnlyPresent = TRUE, selfContained = TRUE, optimizePng = FALSE,
+  compoundExclNormScores = "score", compoundOnlyUsedScorings = TRUE,
+  compsCluster = NULL, includeMFWebLinks = "compounds",
+  components = NULL, interactiveHeat = FALSE, MSPeakLists = NULL,
+  retMin = TRUE, EICRtWindow = 20, EICMzWindow = 0.005,
+  EICTopMost = NULL, EICOnlyPresent = TRUE, selfContained = TRUE,
+  optimizePng = FALSE,
   maxProcAmount = getOption("patRoon.maxProcAmount"),
   clearPath = FALSE, openReport = TRUE)
 }
@@ -89,6 +91,10 @@ by the \code{compoundExclNormScores} argument.}
 available) for candidate formulae will be reported. Specifying
 \code{formulas} and setting this argument to \code{FALSE} still allows
 further annotation of compound MS/MS spectra.}
+
+\item{compoundOnlyUsedScorings}{If \code{TRUE} then only scorings are plotted
+that actually have been used to rank data (see the \code{scoreTypes}
+argument to \code{\link{generateCompoundsMetfrag}} for more details).}
 
 \item{MSPeakLists}{A \code{\link{MSPeakLists}} object that is
 \emph{mandatory} when spectra for formulae and/or compounds will be

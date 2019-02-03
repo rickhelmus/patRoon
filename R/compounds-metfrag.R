@@ -295,8 +295,9 @@ processMFResults <- function(comptab, spec, adduct, db, topMost, lfile = "")
 #'   and \command{MetFrag} specific names are accepted (\emph{i.e.} \code{name}
 #'   and \code{metfrag} columns returned by \code{compoundScorings}). When a
 #'   local database is used, the name should match what is given there
-#'   (\code{e.g} column names when \code{database=csv}). Sets the
-#'   \option{MetFragScoreTypes} option.
+#'   (\code{e.g} column names when \code{database=csv}). Note that MetFrag may
+#'   still report other scoring data, however, these are not used for ranking.
+#'   Sets the \option{MetFragScoreTypes} option.
 #' @param scoreWeights Numeric vector containing weights of the used scoring
 #'   types. Order is the same as set in \code{scoreTypes}. Values are recycled
 #'   if necessary. Sets the \option{MetFragScoreWeights} option.
@@ -410,17 +411,17 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
         database <- "ExtendedPubChem"
 
     rownames(compsScores) <- compsScores$name
-    scoreTypes <- setdiff(scoreTypes, c("score", "Score")) # final score is to be determined
-    isSimplScore <- scoreTypes %in% compsScores$name
+    scoreTypesMF <- setdiff(scoreTypes, c("score", "Score")) # final score is to be determined
+    isSimplScore <- scoreTypesMF %in% compsScores$name
     if (any(isSimplScore))
-        scoreTypes[isSimplScore] <- compsScores[scoreTypes[isSimplScore], "metfrag"]
+        scoreTypesMF[isSimplScore] <- compsScores[scoreTypesMF[isSimplScore], "metfrag"]
 
     mfSettings <- list(DatabaseSearchRelativeMassDeviation = dbRelMzDev,
                        FragmentPeakMatchRelativeMassDeviation = fragRelMzDev,
                        FragmentPeakMatchAbsoluteMassDeviation = fragAbsMzDev,
                        PrecursorIonType = as.character(adduct, format = "metfrag"),
-                       MetFragDatabaseType = database, MetFragScoreTypes = scoreTypes,
-                       MetFragScoreWeights = rep(scoreWeights, length.out = length(scoreTypes)),
+                       MetFragDatabaseType = database, MetFragScoreTypes = scoreTypesMF,
+                       MetFragScoreWeights = rep(scoreWeights, length.out = length(scoreTypesMF)),
                        MetFragPreProcessingCandidateFilter = preProcessingFilters,
                        MetFragPostProcessingCandidateFilter = postProcessingFilters,
                        MaxCandidateLimitToStop = maxCandidatesToStop)
@@ -581,7 +582,13 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
     if (is.null(cachedSet))
         saveCacheSet("compoundsMetFrag", resultHashes[resultHashes != ""], setHash, cacheDB)
 
-    return(compoundsMF(compounds = lapply(results, "[[", "comptab"),
+    # convert scoreTypes to generic names
+    scoreTypes <- union(scoreTypes, "score") # ensure final score is in and remove duplicates
+    isMFScore <- scoreTypes %in% compsScores$metfrag
+    if (any(isMFScore))
+        scoreTypes[isMFScore] <- compsScores[match(scoreTypes[isMFScore], compsScores$metfrag), "name"]
+    
+    return(compoundsMF(compounds = lapply(results, "[[", "comptab"), scoreTypes = scoreTypes,
                        scoreRanges = lapply(results, "[[", "scRanges"),
                        settings = mfSettings))
 }

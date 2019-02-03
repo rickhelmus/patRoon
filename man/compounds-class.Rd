@@ -66,7 +66,7 @@
   height = 500, useGGPlot2 = FALSE)
 
 \S4method{plotScores}{compounds}(obj, index, groupName,
-  normalizeScores = "max", excludeNormScores = NULL,
+  normalizeScores = "max", excludeNormScores = NULL, onlyUsed = TRUE,
   useGGPlot2 = FALSE)
 
 \S4method{plotSpec}{compounds}(obj, index, groupName, MSPeakLists,
@@ -185,6 +185,10 @@ use of \code{filter}).}
 scoring names that should \emph{not} be normalized. Set to \code{NULL} to
 normalize all scorings. Note that whether any normalization occurs is set
 by the \code{excludeNormScores} argument.}
+
+\item{onlyUsed}{If \code{TRUE} then only scorings are plotted that actually
+have been used to rank data (see the \code{scoreTypes} argument to
+\code{\link{generateCompoundsMetfrag}} for more details).}
 
 \item{MSPeakLists}{The \code{\link{MSPeakLists}} object that was used to
 generate the candidate}
@@ -341,6 +345,9 @@ objects.
 \describe{
 \item{\code{compounds}}{Lists of all generated compounds. Use the \code{compounds}
 method for access.}
+
+\item{\code{scoreTypes}}{A \code{character} with all the score types that were used
+when generating the compounds.}
 
 \item{\code{scoreRanges}}{The original min/max values of all scorings when candidate
 results were generated. This is used for normalization.}

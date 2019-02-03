@@ -11,6 +11,8 @@ NULL
 #'
 #' @slot compounds Lists of all generated compounds. Use the \code{compounds}
 #'   method for access.
+#' @slot scoreTypes A \code{character} with all the score types that were used
+#'   when generating the compounds.
 #' @slot scoreRanges The original min/max values of all scorings when candidate
 #'   results were generated. This is used for normalization.
 #'
@@ -45,7 +47,7 @@ NULL
 #'
 #' @export
 compounds <- setClass("compounds",
-                      slots = c(compounds = "list", scoreRanges = "list"),
+                      slots = c(compounds = "list", scoreTypes = "character", scoreRanges = "list"),
                       contains = "workflowStep")
 
 #' @rdname compounds-class
@@ -462,18 +464,24 @@ setMethod("plotStructure", "compounds", function(obj, index, groupName, width = 
 
 #' @describeIn compounds Plots a barplot with scoring of a candidate compound.
 #'
+#' @param onlyUsed If \code{TRUE} then only scorings are plotted that actually
+#'   have been used to rank data (see the \code{scoreTypes} argument to
+#'   \code{\link{generateCompoundsMetfrag}} for more details).
+#'
 #' @templateVar normParam normalizeScores
 #' @templateVar excludeParam excludeNormScores
 #' @template comp_norm
 #'
 #' @aliases plotScores
 #' @export
-setMethod("plotScores", "compounds", function(obj, index, groupName, normalizeScores, excludeNormScores, useGGPlot2)
+setMethod("plotScores", "compounds", function(obj, index, groupName, normalizeScores, excludeNormScores,
+                                              onlyUsed, useGGPlot2)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertCount(index, positive = TRUE, add = ac)
     checkmate::assertString(groupName, min.chars = 1, add = ac)
     checkmate::assertChoice(normalizeScores, c("none", "max", "minmax"))
+    checkmate::assertFlag(onlyUsed, add = ac)
     checkmate::assertFlag(useGGPlot2, add = ac)
     checkmate::reportAssertions(ac)
 
@@ -483,18 +491,20 @@ setMethod("plotScores", "compounds", function(obj, index, groupName, normalizeSc
         return(NULL)
 
     mcn <- mergedCompoundNames(obj)
-
+    
     if (normalizeScores != "none")
         compTable <- normalizeCompScores(compTable, obj@scoreRanges[[groupName]], mcn, normalizeScores == "minmax", excludeNormScores)
 
     scoreCols <- getAllCompCols(c(getCompScoreColNames(), getCompSuspectListColNames()), names(compTable), mcn)
+    if (onlyUsed)
+        scoreCols <- intersect(scoreCols, obj@scoreTypes)
     scores <- setnames(transpose(compTable[index, scoreCols, with = FALSE]), "score")
     scores[, type := scoreCols]
     scores <- scores[!is.na(score)]
 
     if (length(mcn) > 1)
     {
-        scores[, merged := "both"]
+        scores[, merged := "consensus"]
         for (n in mcn)
         {
             withM <- which(grepl(paste0("-", n), scores[["type"]], fixed = TRUE))
@@ -1037,12 +1047,17 @@ setMethod("consensus", "compounds", function(obj, ..., compThreshold = 0.0,
 
     printf("Determining coverage and final scores... ")
 
-    # rename & merge score ranges
-    scRanges <- mapply(allCompounds, compNames, SIMPLIFY = FALSE, FUN = function(cmp, cn)
+    # rename & merge score types and ranges
+    scoreTypes <- Reduce(union, mapply(allCompounds, compNames, FUN = function(cmp, cn)
+    {
+        paste0(cmp@scoreTypes, "-", cn)
+    }))
+    scoreTypes <- union(scoreTypes, "score")
+    
+    scRanges <- Reduce(modifyList, mapply(allCompounds, compNames, SIMPLIFY = FALSE, FUN = function(cmp, cn)
     {
         lapply(cmp@scoreRanges, function(scrg) setNames(scrg, paste0(names(scrg), "-", cn)))
-    })
-    scRanges <- Reduce(modifyList, scRanges)
+    }))
     
     # Determine coverage of compounds between objects and the merged score. The score column can be
     # used for the former as there is guaranteed to be one for each merged object.
@@ -1097,7 +1112,7 @@ setMethod("consensus", "compounds", function(obj, ..., compThreshold = 0.0,
     if (length(mCompList) > 0)
         mCompList <- mCompList[sapply(mCompList, function(r) !is.null(r) && nrow(r) > 0, USE.NAMES = FALSE)]
 
-    return(compoundsConsensus(compounds = mCompList, scoreRanges = scRanges,
+    return(compoundsConsensus(compounds = mCompList, scoreTypes = scoreTypes, scoreRanges = scRanges,
                               algorithm = paste0(unique(sapply(allCompounds, algorithm)), collapse = ", "),
                               mergedCompNames = compNames))
 })

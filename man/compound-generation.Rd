@@ -120,8 +120,9 @@ token} that should be set when the ChemSpider database is used. Sets the
 and \command{MetFrag} specific names are accepted (\emph{i.e.} \code{name}
 and \code{metfrag} columns returned by \code{compoundScorings}). When a
 local database is used, the name should match what is given there
-(\code{e.g} column names when \code{database=csv}). Sets the
-\option{MetFragScoreTypes} option.}
+(\code{e.g} column names when \code{database=csv}). Note that MetFrag may
+still report other scoring data, however, these are not used for ranking.
+Sets the \option{MetFragScoreTypes} option.}
 
 \item{scoreWeights}{Numeric vector containing weights of the used scoring
 types. Order is the same as set in \code{scoreTypes}. Values are recycled

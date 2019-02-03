@@ -42,6 +42,9 @@ NULL
 #' @param EICRtWindow,EICMzWindow,EICTopMost,EICOnlyPresent Plotting parameters
 #'   passed to \code{\link{plotEIC}} (\emph{i.e.} \code{rtWindow},
 #'   \code{mzWindow}, \code{topMost} and \code{onlyPresent} arguments).
+#' @param compoundOnlyUsedScorings If \code{TRUE} then only scorings are plotted
+#'   that actually have been used to rank data (see the \code{scoreTypes}
+#'   argument to \code{\link{generateCompoundsMetfrag}} for more details).
 #' @param clearPath If \code{TRUE} then the destination path will be
 #'   (recursively) removed prior to reporting.
 #'
@@ -320,7 +323,7 @@ reportCompoundTable <- function(fGroups, path, compounds, normalizeScores, exclu
 
 reportCompoundSpectra <- function(fGroups, path, MSPeakLists, compounds, compsCluster,
                                   formulas, EICRtWindow, EICMzWindow, retMin,
-                                  EICTopMost, EICs, normalizeScores)
+                                  EICTopMost, EICs, normalizeScores, exclNormScores, onlyUsedScorings)
 {
     printf("Exporting compound identification MS/MS spectra...\n")
 
@@ -370,7 +373,7 @@ reportCompoundSpectra <- function(fGroups, path, MSPeakLists, compounds, compsCl
                 plotSpec(compounds, idi, grp, MSPeakLists = MSPeakLists, formulas = formulas)
 
                 screen(scr[3])
-                plotScores(compounds, idi, grp, normalizeScores)
+                plotScores(compounds, idi, grp, normalizeScores, exclNormScores, onlyUsedScorings)
 
                 screen(scr[4])
                 
@@ -597,13 +600,14 @@ setMethod("reportCSV", "featureGroups", function(fGroups, path, reportFGroupsAsR
 setMethod("reportPDF", "featureGroups", function(fGroups, path, reportFGroups,
                                                  formulas, reportFormulaSpectra,
                                                  compounds, compoundNormalizeScores, compoundExclNormScores,
-                                                 compsCluster, components, MSPeakLists, retMin, EICGrid,
+                                                 compoundOnlyUsedScorings, compsCluster,
+                                                 components, MSPeakLists, retMin, EICGrid,
                                                  EICRtWindow, EICMzWindow, EICTopMost, EICOnlyPresent, clearPath)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertPathForOutput(path, overwrite = TRUE, add = ac)
     aapply(checkmate::assertFlag, . ~ reportFGroups + reportFormulaSpectra +
-               retMin + EICOnlyPresent + clearPath,
+               compoundOnlyUsedScorings + retMin + EICOnlyPresent + clearPath,
            fixed = list(add = ac))
     aapply(checkmate::assertClass, . ~ formulas + compounds + compsCluster + components + MSPeakLists,
            c("formulas", "compounds", "compoundsCluster", "components", "MSPeakLists"),
@@ -649,7 +653,7 @@ setMethod("reportPDF", "featureGroups", function(fGroups, path, reportFGroups,
         p <- file.path(path, "compounds")
         mkdirp(p)
         reportCompoundSpectra(fGroups, p, MSPeakLists, compounds, compsCluster, formulas, EICRtWindow, EICMzWindow, retMin,
-                              EICTopMost, EICs, compoundNormalizeScores)
+                              EICTopMost, EICs, compoundNormalizeScores, compoundExclNormScores, compoundOnlyUsedScorings)
     }
 
     if (!is.null(compsCluster))
@@ -706,6 +710,7 @@ setMethod("reportPDF", "featureGroups", function(fGroups, path, reportFGroups,
 #' @export
 setMethod("reportMD", "featureGroups", function(fGroups, path, reportPlots, formulas,
                                                 compounds, compoundNormalizeScores, compoundExclNormScores,
+                                                compoundOnlyUsedScorings,
                                                 compsCluster, includeMFWebLinks, components, interactiveHeat,
                                                 MSPeakLists, retMin, EICRtWindow, EICMzWindow,
                                                 EICTopMost, EICOnlyPresent, selfContained,
@@ -717,7 +722,7 @@ setMethod("reportMD", "featureGroups", function(fGroups, path, reportPlots, form
     checkmate::assertPathForOutput(path, overwrite = TRUE, add = ac)
     reportPlots <- checkmate::matchArg(reportPlots, c("none", "chord", "venn", "upset", "eics", "formulas"),
                                        several.ok = TRUE, add = ac)
-    aapply(checkmate::assertFlag, . ~ interactiveHeat + retMin + EICOnlyPresent +
+    aapply(checkmate::assertFlag, . ~ compoundOnlyUsedScorings + interactiveHeat + retMin + EICOnlyPresent +
                selfContained + optimizePng + clearPath + openReport,
            fixed = list(add = ac))
     aapply(checkmate::assertClass, . ~ formulas + compounds + components + MSPeakLists,
@@ -772,6 +777,7 @@ setMethod("reportMD", "featureGroups", function(fGroups, path, reportPlots, form
                     compounds = compounds, compsCluster = compsCluster, includeMFWebLinks = includeMFWebLinks,
                     MSPeakLists = MSPeakLists, formulas = formulas,
                     compoundNormalizeScores = compoundNormalizeScores, compoundExclNormScores = compoundExclNormScores,
+                    compoundOnlyUsedScorings = compoundOnlyUsedScorings,
                     components = components, interactiveHeat = interactiveHeat, selfContained = selfContained,
                     optimizePng = optimizePng, maxProcAmount = maxProcAmount)
 

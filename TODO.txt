@@ -71,7 +71,8 @@ compounds
 - document database="comptox"?
 - fix MF landing page for local databases
 - SIRIUS: topMostFormulas argument
-
+- test score normalization?
+- as.data.table(): only include scorings for ranking and option to normalize
 
 formulas
 - DBE calculation for SIRIUS?
@@ -95,7 +96,6 @@ reporting
 - reportPDF/reportMD: MS only formulas are not reported?
 - JS EIC annotation
 - topMost compound candidates
-- only report scorings that have been used by MetFrag (by default)
 
 
 Cleanup

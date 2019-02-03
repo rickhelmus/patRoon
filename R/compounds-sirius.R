@@ -211,7 +211,7 @@ generateCompoundsSirius <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct =
     if (is.null(cachedSet))
         saveCacheSet("compoundsSirius", resultHashes[resultHashes != ""], setHash, cacheDB)
 
-    return(compounds(compounds = lapply(ret, "[[", "comptab"),
+    return(compounds(compounds = lapply(ret, "[[", "comptab"), scoreTypes = "score",
                      scoreRanges = lapply(ret, "[[", "scRanges"),
                      algorithm = "SIRIUS"))
 }

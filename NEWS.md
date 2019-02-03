@@ -2,6 +2,8 @@
 
 ## February 2019
 * Compound scorings are now normalized towards their original min/max values. This ensures that the `score` column of MetFrag results stays correct.
+* plotScores(): Option to only report scorings that have been used for ranking
+
 
 ## January 2019
 * minSize and ubiquitous arguments for CAMERA component generation. See ?generateComponentsCamera.

@@ -4,6 +4,7 @@
 * Compound scorings are now normalized towards their original min/max values. This ensures that the `score` column of MetFrag results stays correct.
 * plotScores(): Option to only report scorings that have been used for ranking
 * as.data.table()/as.data.frame() method for compounds: optionally normalize scores.
+* reportPDF()/reportMD() now report only 5 top most candidate compounds by default (controlled by compoundTopMost argument).
 
 
 ## January 2019

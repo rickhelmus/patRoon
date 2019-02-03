@@ -22,20 +22,20 @@
   reportFGroups = TRUE, formulas = NULL, reportFormulaSpectra = TRUE,
   compounds = NULL, compoundNormalizeScores = "max",
   compoundExclNormScores = "score", compoundOnlyUsedScorings = TRUE,
-  compsCluster = NULL, components = NULL, MSPeakLists = NULL,
-  retMin = TRUE, EICGrid = c(2, 1), EICRtWindow = 20,
-  EICMzWindow = 0.005, EICTopMost = NULL, EICOnlyPresent = TRUE,
-  clearPath = FALSE)
+  compoundTopMost = 5, compsCluster = NULL, components = NULL,
+  MSPeakLists = NULL, retMin = TRUE, EICGrid = c(2, 1),
+  EICRtWindow = 20, EICMzWindow = 0.005, EICTopMost = NULL,
+  EICOnlyPresent = TRUE, clearPath = FALSE)
 
 \S4method{reportMD}{featureGroups}(fGroups, path = "report",
   reportPlots = c("chord", "venn", "upset", "eics", "formulas"),
   formulas = NULL, compounds = NULL, compoundNormalizeScores = "max",
   compoundExclNormScores = "score", compoundOnlyUsedScorings = TRUE,
-  compsCluster = NULL, includeMFWebLinks = "compounds",
-  components = NULL, interactiveHeat = FALSE, MSPeakLists = NULL,
-  retMin = TRUE, EICRtWindow = 20, EICMzWindow = 0.005,
-  EICTopMost = NULL, EICOnlyPresent = TRUE, selfContained = TRUE,
-  optimizePng = FALSE,
+  compoundTopMost = 5, compsCluster = NULL,
+  includeMFWebLinks = "compounds", components = NULL,
+  interactiveHeat = FALSE, MSPeakLists = NULL, retMin = TRUE,
+  EICRtWindow = 20, EICMzWindow = 0.005, EICTopMost = NULL,
+  EICOnlyPresent = TRUE, selfContained = TRUE, optimizePng = FALSE,
   maxProcAmount = getOption("patRoon.maxProcAmount"),
   clearPath = FALSE, openReport = TRUE)
 }
@@ -95,6 +95,10 @@ further annotation of compound MS/MS spectra.}
 \item{compoundOnlyUsedScorings}{If \code{TRUE} then only scorings are plotted
 that actually have been used to rank data (see the \code{scoreTypes}
 argument to \code{\link{generateCompoundsMetfrag}} for more details).}
+
+\item{compoundTopMost}{Only this amount of top ranked candidate compounds are
+reported. Lower values may significantly speed up reporting. Set to
+\code{NULL} to ignore.}
 
 \item{MSPeakLists}{A \code{\link{MSPeakLists}} object that is
 \emph{mandatory} when spectra for formulae and/or compounds will be

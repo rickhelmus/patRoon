@@ -48,7 +48,8 @@
 \S4method{$}{compounds}(x, name)
 
 \S4method{as.data.table}{compounds}(x, fGroups = NULL,
-  fragments = FALSE)
+  fragments = FALSE, normalizeScores = "none",
+  excludeNormScores = NULL)
 
 \S4method{identifiers}{compounds}(compounds)
 
@@ -105,6 +106,21 @@ information (retention and \emph{m/z} values).}
 
 \item{fragments}{If \code{TRUE} then information on annotated fragments will
 be included.}
+
+\item{normalizeScores}{A \code{character} that specifies how normalization of
+compound scorings occurs. Either \code{"none"} (no normalization),
+\code{"max"} (normalize to max value) or \code{"minmax"} (perform min-max
+normalization). Note that normalization of negative scores (e.g. output by
+SIRIUS) is always performed as min-max. Furthermore, currently
+normalization takes the original scoring min/max values into account when
+candidates were generated. Thus, normalization is not affected when
+candidate results were removed after they were generated (\emph{e.g.} by
+use of \code{filter}).}
+
+\item{excludeNormScores}{A \code{character} vector specifying any compound
+scoring names that should \emph{not} be normalized. Set to \code{NULL} to
+normalize all scorings. Note that whether any normalization occurs is set
+by the \code{excludeNormScores} argument.}
 
 \item{minExplainedPeaks, minScore, minFragScore, minFormulaScore}{Minimal number
 of explained peaks, overall score, in-silico fragmentation score and
@@ -170,21 +186,6 @@ should be plotted.}
 plotting, otherwise base plot used. For \code{plotSpec}, \code{ggplot2}
 allows nicely repelled text for annotation. However, base plot is generally
 faster.}
-
-\item{normalizeScores}{A \code{character} that specifies how normalization of
-compound scorings occurs. Either \code{"none"} (no normalization),
-\code{"max"} (normalize to max value) or \code{"minmax"} (perform min-max
-normalization). Note that normalization of negative scores (e.g. output by
-SIRIUS) is always performed as min-max. Furthermore, currently
-normalization takes the original scoring min/max values into account when
-candidates were generated. Thus, normalization is not affected when
-candidate results were removed after they were generated (\emph{e.g.} by
-use of \code{filter}).}
-
-\item{excludeNormScores}{A \code{character} vector specifying any compound
-scoring names that should \emph{not} be normalized. Set to \code{NULL} to
-normalize all scorings. Note that whether any normalization occurs is set
-by the \code{excludeNormScores} argument.}
 
 \item{onlyUsed}{If \code{TRUE} then only scorings are plotted that actually
 have been used to rank data (see the \code{scoreTypes} argument to

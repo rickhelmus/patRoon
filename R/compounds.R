@@ -42,6 +42,10 @@ NULL
 #'
 #' @template useGGplot2
 #'
+#' @templateVar normParam normalizeScores
+#' @templateVar excludeParam excludeNormScores
+#' @template comp_norm
+#'
 #' @templateVar class compounds
 #' @template class-hierarchy
 #'
@@ -133,16 +137,32 @@ setMethod("$", "compounds", function(x, name)
 #' @template as_data_table-args
 #'
 #' @export
-setMethod("as.data.table", "compounds", function(x, fGroups = NULL, fragments = FALSE)
+setMethod("as.data.table", "compounds", function(x, fGroups = NULL, fragments = FALSE, normalizeScores = "none",
+                                                 excludeNormScores = NULL)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", null.ok = TRUE, add = ac)
     checkmate::assertFlag(fragments, add = ac)
+    checkmate::assertChoice(normalizeScores, c("none", "max", "minmax"))
+    checkmate::assertCharacter(excludeNormScores, min.chars = 1, null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
+
+    mcn <- mergedCompoundNames(x)
+    cTable <- compoundTable(x)
+    if (normalizeScores != "none")
+    {
+        cTable <- mapply(cTable, groupNames(x), SIMPLIFY = FALSE, FUN = function(ct, grp)
+        {
+            if (normalizeScores != "none")
+                ct <- normalizeCompScores(ct, x@scoreRanges[[grp]], mcn,
+                                          normalizeScores == "minmax", excludeNormScores)
+            return(ct)
+        })
+    }
 
     if (fragments)
     {
-        ret <- rbindlist(lapply(compoundTable(x), function(ct)
+        ret <- rbindlist(lapply(cTable, function(ct)
         {
             ct <- copy(ct)
             ct[, row := seq_len(nrow(ct))]
@@ -156,7 +176,7 @@ setMethod("as.data.table", "compounds", function(x, fGroups = NULL, fragments = 
         }), idcol = "group", fill = TRUE)
     }
     else
-        ret <- rbindlist(compoundTable(x), idcol = "group", fill = TRUE)
+        ret <- rbindlist(cTable, idcol = "group", fill = TRUE)
 
     if (!is.null(fGroups))
     {
@@ -259,7 +279,7 @@ setMethod("filter", "compounds", function(obj, minExplainedPeaks = NULL, minScor
                                               .SDcols = cols]]
             }
         }
-        
+
         if (nrow(cmpTable) == 0)
             return(cmpTable)
 
@@ -477,10 +497,6 @@ setMethod("plotStructure", "compounds", function(obj, index, groupName, width = 
 #'   have been used to rank data (see the \code{scoreTypes} argument to
 #'   \code{\link{generateCompoundsMetfrag}} for more details).
 #'
-#' @templateVar normParam normalizeScores
-#' @templateVar excludeParam excludeNormScores
-#' @template comp_norm
-#'
 #' @aliases plotScores
 #' @export
 setMethod("plotScores", "compounds", function(obj, index, groupName, normalizeScores, excludeNormScores,
@@ -490,6 +506,7 @@ setMethod("plotScores", "compounds", function(obj, index, groupName, normalizeSc
     checkmate::assertCount(index, positive = TRUE, add = ac)
     checkmate::assertString(groupName, min.chars = 1, add = ac)
     checkmate::assertChoice(normalizeScores, c("none", "max", "minmax"))
+    checkmate::assertCharacter(excludeNormScores, min.chars = 1, null.ok = TRUE, add = ac)
     checkmate::assertFlag(onlyUsed, add = ac)
     checkmate::assertFlag(useGGPlot2, add = ac)
     checkmate::reportAssertions(ac)
@@ -500,7 +517,7 @@ setMethod("plotScores", "compounds", function(obj, index, groupName, normalizeSc
         return(NULL)
 
     mcn <- mergedCompoundNames(obj)
-    
+
     if (normalizeScores != "none")
         compTable <- normalizeCompScores(compTable, obj@scoreRanges[[groupName]], mcn, normalizeScores == "minmax", excludeNormScores)
 
@@ -1062,12 +1079,12 @@ setMethod("consensus", "compounds", function(obj, ..., compThreshold = 0.0,
         paste0(cmp@scoreTypes, "-", cn)
     }))
     scoreTypes <- union(scoreTypes, "score")
-    
+
     scRanges <- Reduce(modifyList, mapply(allCompounds, compNames, SIMPLIFY = FALSE, FUN = function(cmp, cn)
     {
         lapply(cmp@scoreRanges, function(scrg) setNames(scrg, paste0(names(scrg), "-", cn)))
     }))
-    
+
     # Determine coverage of compounds between objects and the merged score. The score column can be
     # used for the former as there is guaranteed to be one for each merged object.
     for (grpi in seq_along(mCompList))

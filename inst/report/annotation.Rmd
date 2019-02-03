@@ -266,9 +266,14 @@ compoundsDT <- rbindlist(lapply(compFGroups, function(grp)
                         function(compi) paste0(getCompInfoList(ct, compi, TRUE, mn), collapse = "<br>"))
     infoTexts <- sprintf("<div style='max-width: 300px; max-height: 432px; border: 1px solid black; border-style: dotted; margin: 1px; padding: 1px; overflow: auto; white-space: nowrap; }'>%s</div>", infoTexts)
     
-    fiTables <- sapply(ct$fragInfo, function(fi) knitr::kable(fi[, -"PLIndex"], "html") %>%
+    fiTables <- sapply(ct$fragInfo, function(fi)
+    {
+        if (is.null(fi) || nrow(fi) == 0)
+            return("")
+        knitr::kable(fi[, -"PLIndex"], "html") %>%
                            kableExtra::kable_styling(font_size = 11) %>%
-                           kableExtra::scroll_box(extra_css = "overflow: auto; height: 125px;"))
+                           kableExtra::scroll_box(extra_css = "overflow: auto; height: 125px;")
+    })
     
     return(data.table(group = grpi,
                       "#" = seq_len(nrow(ct)),

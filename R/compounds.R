@@ -376,6 +376,15 @@ setMethod("addFormulaScoring", "compounds", function(compounds, formulas, update
     close(prog)
 
     compounds@compounds <- cTable
+    compounds@scoreRanges <- mapply(compounds@scoreRanges, cTable, SIMPLIFY = FALSE, FUN = function(sc, ct)
+    {
+        ret <- c(sc, list(formulaScore = range(ct$formulaScore)))
+        # extend score range if necessary
+        ret$score <- c(min(ret$score, ct$score, na.rm = TRUE),
+                       max(ret$score, ct$score, na.rm = TRUE))
+        return(ret)
+    })
+    compounds@scoreTypes <- union(compounds@scoreTypes, "formulaScore")
 
     return(compounds)
 })

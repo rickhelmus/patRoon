@@ -220,70 +220,70 @@ If any errors related to \command{DCOM} appear it might be necessary to
   \command{GenForm} without commandline options) which can be set by the
   \code{extraOpts} parameter.
 
- \preformatted{Formula calculation from MS and MS/MS data as described in
-Meringer et al (2011) MATCH Commun Math Comput Chem 65: 259-290
-Usage: GenForm ms=<filename> [msms=<filename>] [out=<filename>]
-        [exist[=mv]] [m=<number>] [ion=-e|+e|-H|+H|+Na] [cha=<number>]
-        [ppm=<number>] [msmv=ndp|nsse|nsae] [acc=<number>] [rej=<number>]
-        [thms=<number>] [thmsms=<number>] [thcomb=<number>]
-        [sort[=ppm|msmv|msmsmv|combmv]] [el=<elements> [oc]] [ff=<fuzzy formula>]
-        [vsp[=<even|odd>]] [vsm2mv[=<value>]] [vsm2ap2[=<value>]] [hcf]
-        [wm[=lin|sqrt|log]] [wi[=lin|sqrt|log]] [exp=<number>] [oei]
-        [dbeexc=<number>] [ivsm2mv=<number>] [vsm2ap2=<number>]
-        [oms[=<filename>]] [omsms[=<filename>]] [oclean[=<filename>]]
-        [analyze [loss] [intens]] [dbe] [cm] [pc] [sc]
-Explanation:
-        ms      : filename of MS data (*.txt)
-        msms    : filename of MS/MS data (*.txt)
-        out     : output generated formulas
-        exist   : allow only molecular formulas for that at least one
-                  structural formula exists;overrides vsp, vsm2mv, vsm2ap2;
-                  argument mv enables multiple valencies for P and S
-        m       : experimental molecular mass (default: mass of MS basepeak)
-        ion     : type of ion measured (default: M+H)
-        ppm     : accuracy of measurement in parts per million (default: 5)
-        msmv    : MS match value based on normalized dot product, normalized
-                  sum of squared or absolute errors (default: nsae)
-        acc     : allowed deviation for full acceptance of MS/MS peak in ppm
-                  (default: 2)
-        rej     : allowed deviation for total rejection of MS/MS peak in ppm
-                  (default: 4)
-        thms    : threshold for the MS match value
-        thmsms  : threshold for the MS/MS match value
-        thcomb  : threshold for the combined match value
-        sort    : sort generated formulas according to mass deviation in ppm,
-                  MS match value, MS/MS match value or combined match value
-        el      : used chemical elements (default: CHBrClFINOPSSi)
-        oc      : only organic compounds, i.e. with at least one C atom
-        ff      : overwrites el and oc and uses fuzzy formula for limits of
-                  element multiplicities
-        het     : formulas must have at least one hetero atom
-        vsp     : valency sum parity (even for graphical formulas)
-        vsm2mv  : lower bound for valency sum - 2 * maximum valency
-                  (>=0 for graphical formulas)
-        vsm2ap2 : lower bound for valency sum - 2 * number of atoms + 2
-                  (>=0 for graphical connected formulas)
-        hcf     : apply Heuerding-Clerc filter
-        wm      : m/z weighting for MS/MS match value
-        wi      : intensity weighting for MS/MS match value
-        exp     : exponent used, when wi is set to log
-        oei     : allow odd electron ions for explaining MS/MS peaks
-        dbeexc  : excess of double bond equivalent for ions
-        ivsm2mv : lower bound for valency sum - 2 * maximum valency
-                  for fragment ions
-        ivsm2ap2: lower bound for valency sum - 2 * number of atoms + 2
-                  for fragment ions
-        oms     : write scaled MS peaks to output
-        omsms   : write weighted MS/MS peaks to output
-        oclean  : write explained MS/MS peaks to output
-        analyze : write explanations for MS/MS peaks to output
-        loss    : for analyzing MS/MS peaks write losses instead of fragments
-        intens  : write intensities of MS/MS peaks to output
-        dbe     : write double bond equivalents to output
-        cm      : write calculated ion masses to output
-        pc      : output match values in percent
-        sc      : strip calculated isotope distributions
-        noref   : hide the reference information
+ \preformatted{Formula calculation from MS and MS/MS data as described in
+Meringer et al (2011) MATCH Commun Math Comput Chem 65: 259-290
+Usage: GenForm ms=<filename> [msms=<filename>] [out=<filename>]
+        [exist[=mv]] [m=<number>] [ion=-e|+e|-H|+H|+Na] [cha=<number>]
+        [ppm=<number>] [msmv=ndp|nsse|nsae] [acc=<number>] [rej=<number>]
+        [thms=<number>] [thmsms=<number>] [thcomb=<number>]
+        [sort[=ppm|msmv|msmsmv|combmv]] [el=<elements> [oc]] [ff=<fuzzy formula>]
+        [vsp[=<even|odd>]] [vsm2mv[=<value>]] [vsm2ap2[=<value>]] [hcf]
+        [wm[=lin|sqrt|log]] [wi[=lin|sqrt|log]] [exp=<number>] [oei]
+        [dbeexc=<number>] [ivsm2mv=<number>] [vsm2ap2=<number>]
+        [oms[=<filename>]] [omsms[=<filename>]] [oclean[=<filename>]]
+        [analyze [loss] [intens]] [dbe] [cm] [pc] [sc]
+Explanation:
+        ms      : filename of MS data (*.txt)
+        msms    : filename of MS/MS data (*.txt)
+        out     : output generated formulas
+        exist   : allow only molecular formulas for that at least one
+                  structural formula exists;overrides vsp, vsm2mv, vsm2ap2;
+                  argument mv enables multiple valencies for P and S
+        m       : experimental molecular mass (default: mass of MS basepeak)
+        ion     : type of ion measured (default: M+H)
+        ppm     : accuracy of measurement in parts per million (default: 5)
+        msmv    : MS match value based on normalized dot product, normalized
+                  sum of squared or absolute errors (default: nsae)
+        acc     : allowed deviation for full acceptance of MS/MS peak in ppm
+                  (default: 2)
+        rej     : allowed deviation for total rejection of MS/MS peak in ppm
+                  (default: 4)
+        thms    : threshold for the MS match value
+        thmsms  : threshold for the MS/MS match value
+        thcomb  : threshold for the combined match value
+        sort    : sort generated formulas according to mass deviation in ppm,
+                  MS match value, MS/MS match value or combined match value
+        el      : used chemical elements (default: CHBrClFINOPSSi)
+        oc      : only organic compounds, i.e. with at least one C atom
+        ff      : overwrites el and oc and uses fuzzy formula for limits of
+                  element multiplicities
+        het     : formulas must have at least one hetero atom
+        vsp     : valency sum parity (even for graphical formulas)
+        vsm2mv  : lower bound for valency sum - 2 * maximum valency
+                  (>=0 for graphical formulas)
+        vsm2ap2 : lower bound for valency sum - 2 * number of atoms + 2
+                  (>=0 for graphical connected formulas)
+        hcf     : apply Heuerding-Clerc filter
+        wm      : m/z weighting for MS/MS match value
+        wi      : intensity weighting for MS/MS match value
+        exp     : exponent used, when wi is set to log
+        oei     : allow odd electron ions for explaining MS/MS peaks
+        dbeexc  : excess of double bond equivalent for ions
+        ivsm2mv : lower bound for valency sum - 2 * maximum valency
+                  for fragment ions
+        ivsm2ap2: lower bound for valency sum - 2 * number of atoms + 2
+                  for fragment ions
+        oms     : write scaled MS peaks to output
+        omsms   : write weighted MS/MS peaks to output
+        oclean  : write explained MS/MS peaks to output
+        analyze : write explanations for MS/MS peaks to output
+        loss    : for analyzing MS/MS peaks write losses instead of fragments
+        intens  : write intensities of MS/MS peaks to output
+        dbe     : write double bond equivalents to output
+        cm      : write calculated ion masses to output
+        pc      : output match values in percent
+        sc      : strip calculated isotope distributions
+        noref   : hide the reference information
 }
 }
 

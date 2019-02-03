@@ -8,12 +8,18 @@ processSiriusCompounds <- function(cmd, exitStatus, retries)
     # format is resultno_specname_compoundname
     resultPath <- file.path(cmd$outPath, sprintf("1_%s_%s", basename(tools::file_path_sans_ext(cmd$msFName)), cmd$cmpName))
 
+    results <- data.table()
+    scRanges <- list()
+    
     summary <- file.path(resultPath, "summary_csi_fingerid.csv")
     if (file.exists(summary)) # csi:fingerid got any results?
     {
         results <- fread(summary)
-
-        # UNDONE: this shouldn't be necessary anymore as SIRIUS already limits to given amount of top ranked.
+        
+        # NOTE: so far SIRIUS only has one score
+        if (nrow(results) > 0)
+            scRanges <- list(score = range(results$score))
+        
         if (!is.null(cmd$topMost))
         {
             if (nrow(results) > cmd$topMost)
@@ -55,11 +61,10 @@ processSiriusCompounds <- function(cmd, exitStatus, retries)
 
         results[, database := cmd$database]
     }
-    else
-        results <- data.table()
 
-    saveCacheData("compoundsSirius", results, cmd$hash, cmd$cacheDB)
-    return(results)
+    ret <- list(comptab = results, scRanges = scRanges)
+    saveCacheData("compoundsSirius", ret, cmd$hash, cmd$cacheDB)
+    return(ret)
 }
 
 #' @details \code{generateCompoundsSirius} uses
@@ -197,14 +202,16 @@ generateCompoundsSirius <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct =
 
     # prune empty/NULL results
     if (length(ret) > 0)
-        ret <- ret[sapply(ret, function(r) !is.null(r) && nrow(r) > 0, USE.NAMES = FALSE)]
+        ret <- ret[sapply(ret, function(r) !is.null(r$comptab) && nrow(r$comptab) > 0, USE.NAMES = FALSE)]
 
     ngrp <- length(ret)
-    printf("Loaded %d compounds from %d features (%.2f%%).\n", sum(unlist(lapply(ret, nrow))),
+    printf("Loaded %d compounds from %d features (%.2f%%).\n", sum(unlist(lapply(ret, function(r) nrow(r$comptab)))),
            ngrp, if (gCount == 0) 0 else ngrp * 100 / gCount)
 
     if (is.null(cachedSet))
         saveCacheSet("compoundsSirius", resultHashes[resultHashes != ""], setHash, cacheDB)
 
-    return(compounds(compounds = ret, algorithm = "SIRIUS"))
+    return(compounds(compounds = lapply(ret, "[[", "comptab"),
+                     scoreRanges = lapply(ret, "[[", "scRanges"),
+                     algorithm = "SIRIUS"))
 }

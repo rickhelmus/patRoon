@@ -1,5 +1,8 @@
 # patRoon 0.1.0.9000
 
+## February 2019
+* Compound scorings are now normalized towards their original min/max values. This ensures that the `score` column of MetFrag results stays correct.
+
 ## January 2019
 * minSize and ubiquitous arguments for CAMERA component generation. See ?generateComponentsCamera.
 * Various tweaks for plotEIC() and plotSpec() methods

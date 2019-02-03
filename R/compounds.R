@@ -11,11 +11,11 @@ NULL
 #'
 #' @slot compounds Lists of all generated compounds. Use the \code{compounds}
 #'   method for access.
-#' @slot algorithm The algorithm that was used for generation of compounds. Use
-#'   the \code{algorithm} method for access.
+#' @slot scoreRanges The original min/max values of all scorings when candidate
+#'   results were generated. This is used for normalization.
+#'
 #' @param formulas The \code{\link{formulas}} object that should be used for
 #'   scoring/annotation. For \code{plotSpec}: set to \code{NULL} to ignore.
-#'
 #' @param obj,object,x,compounds The \code{compound} object.
 #' @param index The numeric index of the candidate structure. Multiple indices
 #'   (\emph{i.e.} vector with length >=2) may be specified for
@@ -45,7 +45,7 @@ NULL
 #'
 #' @export
 compounds <- setClass("compounds",
-                      slots = c(compounds = "list"),
+                      slots = c(compounds = "list", scoreRanges = "list"),
                       contains = "workflowStep")
 
 #' @rdname compounds-class
@@ -485,7 +485,7 @@ setMethod("plotScores", "compounds", function(obj, index, groupName, normalizeSc
     mcn <- mergedCompoundNames(obj)
 
     if (normalizeScores != "none")
-        compTable <- normalizeCompScores(compTable, mcn, normalizeScores == "minmax", excludeNormScores)
+        compTable <- normalizeCompScores(compTable, obj@scoreRanges[[groupName]], mcn, normalizeScores == "minmax", excludeNormScores)
 
     scoreCols <- getAllCompCols(c(getCompScoreColNames(), getCompSuspectListColNames()), names(compTable), mcn)
     scores <- setnames(transpose(compTable[index, scoreCols, with = FALSE]), "score")
@@ -880,7 +880,7 @@ setMethod("mergedCompoundNames", "compoundsConsensus", function(compounds) compo
 #' @export
 setMethod("consensus", "compounds", function(obj, ..., compThreshold = 0.0,
                                              uniqueFrom = NULL, uniqueOuter = FALSE,
-                                             minMaxNormalization = TRUE, mergeScoresFunc = sum)
+                                             minMaxNormalization = FALSE, mergeScoresFunc = sum)
 {
     allCompounds <- c(list(obj), list(...))
 
@@ -1037,6 +1037,13 @@ setMethod("consensus", "compounds", function(obj, ..., compThreshold = 0.0,
 
     printf("Determining coverage and final scores... ")
 
+    # rename & merge score ranges
+    scRanges <- mapply(allCompounds, compNames, SIMPLIFY = FALSE, FUN = function(cmp, cn)
+    {
+        lapply(cmp@scoreRanges, function(scrg) setNames(scrg, paste0(names(scrg), "-", cn)))
+    })
+    scRanges <- Reduce(modifyList, scRanges)
+    
     # Determine coverage of compounds between objects and the merged score. The score column can be
     # used for the former as there is guaranteed to be one for each merged object.
     for (grpi in seq_along(mCompList))
@@ -1080,6 +1087,7 @@ setMethod("consensus", "compounds", function(obj, ..., compThreshold = 0.0,
                 set(mCompList[[grpi]], r, "score", mergeScoresFunc(scoreRow))
             }
             setorder(mCompList[[grpi]], -score)
+            scRanges[[names(mCompList)[grpi]]]$score <- range(mCompList[[grpi]]$score)
         }
     }
 
@@ -1089,7 +1097,8 @@ setMethod("consensus", "compounds", function(obj, ..., compThreshold = 0.0,
     if (length(mCompList) > 0)
         mCompList <- mCompList[sapply(mCompList, function(r) !is.null(r) && nrow(r) > 0, USE.NAMES = FALSE)]
 
-    return(compoundsConsensus(compounds = mCompList, algorithm = paste0(unique(sapply(allCompounds, algorithm)), collapse = ", "),
+    return(compoundsConsensus(compounds = mCompList, scoreRanges = scRanges,
+                              algorithm = paste0(unique(sapply(allCompounds, algorithm)), collapse = ", "),
                               mergedCompNames = compNames))
 })
 

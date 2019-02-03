@@ -388,7 +388,7 @@ allSame <- function(l)
     return(TRUE)
 }
 
-normalize <- function(x, minMax)
+normalize <- function(x, minMax, xrange = range(x, na.rm = TRUE))
 {
     xn <- x[!is.na(x)]
     if (length(xn) == 0 || all(xn == 0))
@@ -398,12 +398,11 @@ normalize <- function(x, minMax)
         xn <- rep(as(1, typeof(xn[[1]])), length(xn))
     else
     {
-        minv <- min(xn)
+        minv <- xrange[1]
         if (!minMax)
             minv <- min(minv, 0) # force minMax if min <0
 
-        xn <- xn - minv
-        xn <- xn / max(xn)
+        xn <- (xn - minv) / (xrange[2] - minv)
     }
 
     x[!is.na(x)] <- xn

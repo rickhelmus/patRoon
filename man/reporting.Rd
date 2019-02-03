@@ -66,7 +66,11 @@ reported. Specify \code{NULL} to skip reporting a particular object.}
 compound scorings occurs. Either \code{"none"} (no normalization),
 \code{"max"} (normalize to max value) or \code{"minmax"} (perform min-max
 normalization). Note that normalization of negative scores (e.g. output by
-SIRIUS) is always performed as min-max.}
+SIRIUS) is always performed as min-max. Furthermore, currently
+normalization takes the original scoring min/max values into account when
+candidates were generated. Thus, normalization is not affected when
+candidate results were removed after they were generated (\emph{e.g.} by
+use of \code{filter}).}
 
 \item{compoundExclNormScores}{A \code{character} vector specifying any compound
 scoring names that should \emph{not} be normalized. Set to \code{NULL} to

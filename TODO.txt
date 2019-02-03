@@ -19,6 +19,7 @@ general
 - newProject(): generate Rmd?
 - algorithmObject() generic
 - test negative subset indices
+- plotSpec(): subscript formulas
 
 
 docs
@@ -26,6 +27,7 @@ docs
 - Reference docs
     - Examples?
 - update tutorial
+- remove old algorithm slot descriptions
 
 
 features
@@ -67,8 +69,9 @@ compounds
 - MetFrag: (buggy) trivial name fetching not needed anymore?
 - convert score csv to internal data?
 - SIRIUS: use --auto-charge instead of manually fixing charge of fragments (or not? conflicting docs on what it does)
-- document database="toxcast"?
+- document database="comptox"?
 - fix MF landing page for local databases
+- SIRIUS: topMostFormulas argument
 
 
 formulas
@@ -91,6 +94,9 @@ components
 reporting
 - add more options to reportPlots argument of reportMD()?
 - reportPDF/reportMD: MS only formulas are not reported?
+- JS EIC annotation
+- topMost compound candidates
+- only report scorings that have been used by MetFrag (by default)
 
 
 Cleanup

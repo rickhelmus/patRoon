@@ -297,9 +297,10 @@ reportCompoundTable <- function(fGroups, path, compounds, normalizeScores, exclu
         cutcl <- cutClusters(compsCluster)
     
     if (normalizeScores != "none")
-        compTable <- sapply(compTable, normalizeCompScores, mCompNames = mcn,
-                            minMaxNormalization = normalizeScores == "minmax", exclude = excludeNormScores,
-                            simplify = FALSE)
+        compTable <- mapply(compTable, compounds@scoreRanges, FUN = normalizeCompScores,
+                            MoreArgs = list(mCompNames = mcn, minMaxNormalization = normalizeScores == "minmax",
+                                            exclude = excludeNormScores),
+                            SIMPLIFY = FALSE)
 
     for (grp in names(compTable))
     {

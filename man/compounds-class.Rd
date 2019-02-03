@@ -80,8 +80,8 @@
   nsets = length(list(...)) + 1, nintersects = NA, upsetArgs = NULL)
 
 \S4method{consensus}{compounds}(obj, ..., compThreshold = 0,
-  uniqueFrom = NULL, uniqueOuter = FALSE, minMaxNormalization = TRUE,
-  mergeScoresFunc = sum)
+  uniqueFrom = NULL, uniqueOuter = FALSE,
+  minMaxNormalization = FALSE, mergeScoresFunc = sum)
 }
 \arguments{
 \item{obj, object, x, compounds}{The \code{compound} object.}
@@ -175,7 +175,11 @@ faster.}
 compound scorings occurs. Either \code{"none"} (no normalization),
 \code{"max"} (normalize to max value) or \code{"minmax"} (perform min-max
 normalization). Note that normalization of negative scores (e.g. output by
-SIRIUS) is always performed as min-max.}
+SIRIUS) is always performed as min-max. Furthermore, currently
+normalization takes the original scoring min/max values into account when
+candidates were generated. Thus, normalization is not affected when
+candidate results were removed after they were generated (\emph{e.g.} by
+use of \code{filter}).}
 
 \item{excludeNormScores}{A \code{character} vector specifying any compound
 scoring names that should \emph{not} be normalized. Set to \code{NULL} to
@@ -338,8 +342,8 @@ objects.
 \item{\code{compounds}}{Lists of all generated compounds. Use the \code{compounds}
 method for access.}
 
-\item{\code{algorithm}}{The algorithm that was used for generation of compounds. Use
-the \code{algorithm} method for access.}
+\item{\code{scoreRanges}}{The original min/max values of all scorings when candidate
+results were generated. This is used for normalization.}
 }}
 
 \section{S4 class hierarchy}{

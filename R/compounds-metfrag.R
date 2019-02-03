@@ -205,46 +205,53 @@ generateMetFragRunData <- function(fGroups, MSPeakLists, mfSettings, topMost, id
     return(ret[!sapply(ret, is.null)])
 }
 
-processMFResults <- function(metf, spec, adduct, db, topMost, lfile = "")
+processMFResults <- function(comptab, spec, adduct, db, topMost, lfile = "")
 {
-    if (nrow(metf) > 0)
+    scRanges <- list()
+    
+    if (nrow(comptab) > 0)
     {
-        if (!is.null(topMost) && nrow(metf) > topMost)
-            metf <- metf[seq_len(topMost)]
+        compsc <- compoundScorings("metfrag")
+        compsc <- compsc[compsc$metfrag %in% names(comptab), ]
+        
+        if (nrow(compsc) > 0)
+        {
+            # fix up score and suspect list columns: dash --> 0
+            # NOTE: do as.numeric as values with '-' will cause the column to be a character
+            comptab[, (compsc$metfrag) := lapply(.SD, function(x) as.numeric(ifelse(x == "-", 0, x))),
+                    .SDcols = compsc$metfrag]
+            
+            scRanges <- setNames(lapply(compsc$metfrag, function(sc) range(comptab[[sc]])),
+                                 compsc$name)
+        }
+        
+        if (!is.null(topMost) && nrow(comptab) > topMost)
+            comptab <- comptab[seq_len(topMost)]
 
         # make character: needed for getMFFragmentInfo()
         # note: this column is not present in empty tables so can't do this with colClasses
-        if (!is.null(metf[["FragmenterScore_Values"]]))
-            metf[, FragmenterScore_Values := as.character(FragmenterScore_Values)]
+        if (!is.null(comptab[["FragmenterScore_Values"]]))
+            comptab[, FragmenterScore_Values := as.character(FragmenterScore_Values)]
 
         # fill in fragment info
         # NOTE: double wrap in list to nest table
         if (!is.null(lfile))
             cat(sprintf("\n%s - Done! Processing frags...\n", date()), file = lfile, append = TRUE)
-        for (r in seq_len(nrow(metf)))
-            set(metf, r, "fragInfo", list(list(getMFFragmentInfo(spec, metf[r], adduct))))
+        for (r in seq_len(nrow(comptab)))
+            set(comptab, r, "fragInfo", list(list(getMFFragmentInfo(spec, comptab[r], adduct))))
         if (!is.null(lfile))
             cat(sprintf("\n%s - Done!\n", date()), file = lfile, append = TRUE)
 
         # unify column names & filter unnecessary columns
-        metf <- unifyMFNames(metf)
+        comptab <- unifyMFNames(comptab)
 
-        # fix up score and suspect list columns: dash --> 0
-        scoreSuspCols <- c(getCompScoreColNames(), getCompSuspectListColNames())
-        scoreSuspCols <- scoreSuspCols[scoreSuspCols %in% names(metf)]
-        if (length(scoreSuspCols) > 0)
-        {
-            # NOTE: do as.numeric as values with - will cause the column to be a character
-            metf[, (scoreSuspCols) := lapply(.SD, function(x) as.numeric(ifelse(x == "-", 0, x))), .SDcols = scoreSuspCols]
-        }
+        if (!is.null(comptab[["CASRN"]]))
+            comptab[, CASRN := sub("CASRN:", "", CASRN, fixed = TRUE)] # remove "CASRN" prefix
 
-        if (!is.null(metf[["CASRN"]]))
-            metf[, CASRN := sub("CASRN:", "", CASRN, fixed = TRUE)] # remove "CASRN" prefix
-
-        metf[, database := db]
+        comptab[, database := db]
     }
 
-    return(metf)
+    return(list(comptab = comptab, scRanges = scRanges))
 }
 
 #' @details \code{generateCompoundsMetfrag} uses the \pkg{metfRag} package for
@@ -440,12 +447,12 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
     cachedResults <- sapply(runData, function(rd)
     {
         resultHashes[rd$gName] <<- rd$hash
-        metf <- NULL
+        comptab <- NULL
         if (!is.null(cachedSet))
-            metf <- cachedSet[[rd$hash]]
-        if (is.null(metf))
-            metf <- loadCacheData("compoundsMetFrag", rd$hash, cacheDB)
-        return(metf)
+            comptab <- cachedSet[[rd$hash]]
+        if (is.null(comptab))
+            comptab <- loadCacheData("compoundsMetFrag", rd$hash, cacheDB)
+        return(comptab)
     }, simplify = FALSE)
     cachedResults <- cachedResults[!sapply(cachedResults, is.null)]
 
@@ -471,21 +478,21 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
                          initMetFragCLCommand(rd$mfSettings, rd$spec, mfBin, logf)))
             })
 
-            ret <- executeMultiProcess(cmdQueue, finishHandler = function(cmd, exitStatus, retries)
+            results <- executeMultiProcess(cmdQueue, finishHandler = function(cmd, exitStatus, retries)
             {
                 if (!is.null(cmd$stderrFile))
                     cat(sprintf("\n%s - Done with MF! Reading results...\n", date()), file = cmd$stderrFile, append = TRUE)
-                metf <- fread(cmd$outFile, colClasses = c(Identifier = "character"))
+                comptab <- fread(cmd$outFile, colClasses = c(Identifier = "character"))
                 if (!is.null(cmd$stderrFile))
                     cat(sprintf("\n%s - Done! Processing results...\n", date()), file = cmd$stderrFile, append = TRUE)
-                metf <- processMFResults(metf, cmd$spec, adduct, database, topMost, cmd$stderrFile)
+                procres <- processMFResults(comptab, cmd$spec, adduct, database, topMost, cmd$stderrFile)
                 if (!is.null(cmd$stderrFile))
                     cat(sprintf("\n%s - Done! Caching results...\n", date()), file = cmd$stderrFile, append = TRUE)
-                saveCacheData("compoundsMetFrag", metf, cmd$hash, cacheDB)
+                saveCacheData("compoundsMetFrag", procres, cmd$hash, cacheDB)
                 if (!is.null(cmd$stderrFile))
                     cat(sprintf("\n%s - Done!\n", date()), file = cmd$stderrFile, append = TRUE)
 
-                return(metf)
+                return(procres)
             }, timeoutHandler = function(cmd, retries)
             {
                 if (retries >= timeoutRetries)
@@ -518,36 +525,36 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
         {
             prog <- txtProgressBar(0, gCount, style = 3)
 
-            ret <- lapply(runData, function(rd)
+            results <- lapply(runData, function(rd)
             {
                 rd$mfSettings$PeakList <- as.matrix(rd$spec[, c("mz", "intensity")])
-                metf <- metfRag::run.metfrag(rd$mfSettings)
+                comptab <- metfRag::run.metfrag(rd$mfSettings)
                 jgc() # hopefully reduce some memory usage
 
-                if (nrow(metf) > 0)
+                if (nrow(comptab) > 0)
                 {
                     if (addTrivialNames && rd$mfSettings$MetFragDatabaseType %in% c("PubChem", "ExtendedPubChem"))
                     {
                         # fetching trivial names may sometimes fail with connection error, just ignore this for now
-                        tryCatch(metf <<- metfRag::add.trivialname.pubchem(metf), error = function(e) metf$TrivialName <<- NA)
+                        tryCatch(comptab <<- metfRag::add.trivialname.pubchem(comptab), error = function(e) comptab$TrivialName <<- NA)
                     }
 
-                    metf <- unFactorDF(metf)
-                    metf <- as.data.table(metf)
+                    comptab <- unFactorDF(comptab)
+                    comptab <- as.data.table(comptab)
 
-                    metf <- processMFResults(metf, rd$spec, adduct, database, topMost)
+                    procres <- processMFResults(comptab, rd$spec, adduct, database, topMost)
 
                     # BUG: metfRag seems to give second duplicate results where only NoExplPeaks may differ and have an incorrect value.
                     # for now, just remove all duplicates and re-assign NoExplPeaks
-                    metf <- metf[!duplicated(identifier)]
-                    metf[, explainedPeaks := sapply(fragInfo, nrow)]
+                    procres$comptab <- procres$comptab[!duplicated(identifier)]
+                    procres$comptab[, explainedPeaks := sapply(fragInfo, nrow)]
                 }
 
-                saveCacheData("compoundsMetFrag", metf, rd$hash, cacheDB)
+                saveCacheData("compoundsMetFrag", procres, rd$hash, cacheDB)
 
                 setTxtProgressBar(prog, match(rd$gName, gNames))
 
-                return(metf)
+                return(procres)
             })
 
             setTxtProgressBar(prog, gCount)
@@ -555,24 +562,26 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
         }
     }
     else
-        ret <- list()
+        results <- list()
 
     if (length(cachedResults) > 0)
     {
-        ret <- c(ret, cachedResults)
-        ret <- ret[intersect(gNames, names(ret))] # re-order
+        results <- c(results, cachedResults)
+        results <- results[intersect(gNames, names(results))] # re-order
     }
 
     # prune empty/NULL results
-    if (length(ret) > 0)
-        ret <- ret[sapply(ret, function(r) !is.null(r) && nrow(r) > 0, USE.NAMES = FALSE)]
+    if (length(results) > 0)
+        results <- results[sapply(results, function(r) !is.null(r$comptab) && nrow(r$comptab) > 0, USE.NAMES = FALSE)]
 
-    ngrp <- length(ret)
-    printf("Loaded %d compounds from %d features (%.2f%%).\n", sum(unlist(lapply(ret, nrow))),
+    ngrp <- length(results)
+    printf("Loaded %d compounds from %d features (%.2f%%).\n", sum(unlist(lapply(results, function(r) nrow(r$comptab)))),
            ngrp, if (gCount == 0) 0 else ngrp * 100 / gCount)
 
     if (is.null(cachedSet))
         saveCacheSet("compoundsMetFrag", resultHashes[resultHashes != ""], setHash, cacheDB)
 
-    return(compoundsMF(compounds = ret, settings = mfSettings))
+    return(compoundsMF(compounds = lapply(results, "[[", "comptab"),
+                       scoreRanges = lapply(results, "[[", "scRanges"),
+                       settings = mfSettings))
 }

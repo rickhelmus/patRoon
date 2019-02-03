@@ -87,18 +87,23 @@ getCompScoreColNames <- function() unique(compoundScorings(includeSuspectLists =
 getCompSuspectListColNames <- function() setdiff(unique(compoundScorings(includeSuspectLists = TRUE)$name),
                                                  getCompScoreColNames())
 
-normalizeCompScores <- function(compResults, mCompNames, minMaxNormalization, exclude = NULL)
+normalizeCompScores <- function(compResults, scoreRanges, mCompNames, minMaxNormalization, exclude = NULL)
 {
     compResults <- copy(compResults)
     columns <- names(compResults)
     scoreCols <- getAllCompCols(getCompScoreColNames(), columns, mCompNames)
 
     if (!is.null(exclude))
-        scoreCols <- scoreCols[!scoreCols %in% exclude]
+        scoreCols <- scoreCols[!scoreCols %in% getAllCompCols(exclude, columns, mCompNames)]
 
     if (length(scoreCols) > 0)
-        compResults[, (scoreCols) := lapply(.SD, normalize, minMax = minMaxNormalization), .SDcols = scoreCols]
-
+    {
+        scoreRanges <- scoreRanges[scoreCols]
+        compResults[, (scoreCols) := mapply(.SD, scoreRanges, SIMPLIFY = FALSE,
+                                            FUN = function(sc, scr) normalize(sc, minMaxNormalization, scr)),
+                                            .SDcols = scoreCols]
+    }
+    
     return(compResults)
 }
 
@@ -225,7 +230,7 @@ getCompInfoText <- function(compResults, compIndex, addHTMLURL, normalizeScores,
     columns <- names(compResults)
 
     if (normalizeScores)
-        compResults <- normalizeCompScores(compResults, mCompNames, FALSE) # UNDONE: select normalization method?
+        compResults <- normalizeCompScores(compResults, mCompNames, FALSE) # UNDONE: select normalization method? Add scoreranges
 
     resultRow <- compResults[compIndex, ]
 
@@ -471,7 +476,7 @@ setMethod("compoundViewer", c("featureGroups", "MSPeakLists", "compounds"), func
 
             ct <- compTable[[rValues$currentFGroup]]
             if (input$normalizeScores)
-                ct <- normalizeCompScores(ct, mergedCompoundNames(compounds), FALSE) # UNDONE: select normalization method?
+                ct <- normalizeCompScores(ct, mergedCompoundNames(compounds), FALSE) # UNDONE: select normalization method? Add scoreranges
 
             ret <- ct[pr[1]:pr[2], ]
 

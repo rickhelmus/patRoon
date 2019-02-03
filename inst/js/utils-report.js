@@ -5,15 +5,10 @@ function getAnnotationPageElement()
 
 function showEICs(group)
 {
-    const annElements = document.getElementsByClassName('annotationClass');
-    const EICId = "EIC-" + group;
-    for (var i=0; i<annElements.length; i++)
-    {
-        if (annElements[i].classList.contains(EICId))
-            annElements[i].style.display = 'flex';
-    }
-    
-    document.getElementsByClassName("noAnnotationSelected")[0].style.display = 'none';    
+    el = document.getElementById("EIC");
+    el.style.display = "flex";
+    el.src = EICPaths[parseInt(group) - 1];
+    document.getElementById("noAnnotationSelected").style.display = 'none';
 }
 
 function showAnnotation(group, type)
@@ -27,7 +22,7 @@ function showAnnotation(group, type)
     qu = "#" + type + "Table .dataTable";
     $(qu).DataTable().column(0).search("^" + group + "$", true, false).draw();
     $(qu).DataTable().columns.adjust().draw();
-    
+
     selectFGroupRow(group);
 }
 
@@ -37,7 +32,7 @@ function showCompoundsCluster(group)
     const annElements = document.getElementsByClassName('annotationClass');
     for (var i=0; i<annElements.length; i++)
         annElements[i].style.display = (annElements[i].classList.contains(type)) ? 'flex' : 'none';
-    
+
     showEICs(group);
     selectFGroupRow(group);
 }

@@ -8,8 +8,6 @@ Annotation {data-orientation=rows}
 ### feature groups { data-width=300 }
 
 ```{r echo=FALSE}
-showButton <- function(title, jsFunc, arg1, arg2) sprintf("<button onclick=\"%s('%s', '%s');\" style=\"padding: 0px 3px 0px 3px\">%s</button>", jsFunc, arg1, arg2, title)
-
 compFGroups <- compsClustFGroups <- formFGroups <- componentFGroups <- mfWebFGroups <- character()
 if (!is.null(rmdVars$compounds))
 {
@@ -64,11 +62,16 @@ allGroups <- unique(c(plotGroups, componentFGroups, mfWebFGroups))
 fGroupsSpecDT <- data.table(group = allGroups, rt = round(rmdVars$gInfo[allGroups, "rts"], 2),
                             mz = round(rmdVars$gInfo[allGroups, "mzs"], 5))
 
+showButton <- function(title, jsFunc, ...)
+{
+    args <- paste0("'", unlist(list(...)), "'", collapse = ", ")
+    sprintf("<button onclick=\"%s(%s);\" style=\"padding: 0px 3px 0px 3px\">%s</button>", jsFunc, args, title)
+}
 maybeAddButton <- function(grpi, subGroups, ...) if (allGroups[grpi] %in% subGroups) showButton(...) else "^"
 
 compButtons <- sapply(seq_along(allGroups), function(gi) maybeAddButton(gi, compFGroups, "compounds", "showAnnotation", gi, "compounds"))
 compCLButtons <- sapply(seq_along(allGroups), function(gi) maybeAddButton(gi, compsClustFGroups,
-                                                                          "compounds clust", "showCompoundsCluster", gi, ""))
+                                                                          "compounds clust", "showCompoundsCluster", gi))
 formButtons <- sapply(seq_along(allGroups), function(gi) maybeAddButton(gi, formFGroups, "formulas",
                                                                         "showAnnotation", gi, "formulas"))
 mfWebButtons <- sapply(seq_along(allGroups), function(gi) maybeAddButton(gi, mfWebFGroups, "MetFrag web",
@@ -124,9 +127,10 @@ DT::datatable(fGroupsSpecDT,
               escape = FALSE, rownames = FALSE, elementId = "fGroupsTable")
 ```
 
-### { .noAnnotationSelected data-width=100 }
+### EIC { data-width=100 }
 
-<div>Push a **show** button to view annotation data for a feature group.</div>
+<img id=EIC style="display:none;"></img>
+<div id=noAnnotationSelected>Push a **show** button to view annotation data for a feature group.</div>
 
 
 ```{r allCompPlots, fig.keep='none', eval=length(plotGroups) > 0}
@@ -213,25 +217,13 @@ if (rmdVars$optimizePng && length(allPlots > 0))
 
 
 ```{r echo=FALSE, eval=length(plotGroups) > 0}
-rmdTexts <- vector("character", length = length(plotGroups))
-
-message("Generating annotation EIC layout...")
-# prog <- txtProgressBar(0, length(plotGroups), style = 3, file = stderr())
-
-for (grpi in seq_along(plotGroups))
-{
-    rmdTexts[grpi] <- glue::glue("
-
-
-### EIC {{ data-width=100 .annotationClass .EIC-{ grpi } }}
-
-![]({ plotPathFull }/eic_{ grpi }.png)
-
-", grpi = grpi, plotPath = plotPathFull)
-}
+paths <- file.path(plotPathLink, sprintf("eic_%d.png", seq_along(plotGroups)))
+if (rmdVars$selfContained)
+    paths <- sapply(paths, knitr::image_uri)
 
 # stuff everything together: https://stackoverflow.com/a/21730473
-rmdText <- paste0(rmdTexts, collapse = "\n")
+rmdText <- sprintf("<script>var EICPaths = [ %s ];</script>",
+                   paste0("'", paths, "'", collapse = ", "))
 ```
 
 `r if (length(plotGroups) > 0) rmdText`

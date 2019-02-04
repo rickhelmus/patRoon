@@ -58,6 +58,8 @@ MSPeakLists
 - test avg params
 - add pruneMissingPrecursorMS to filter()?
 - filter by MSMS
+- metadata for Bruker peaklists?
+- metadata generic()?
 
 
 compounds

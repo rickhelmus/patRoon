@@ -176,6 +176,9 @@ given feature group.
 \item{\code{peakLists}}{Contains a list of all MS (and MS/MS) peak lists. Use the
 \code{peakLists} method for access.}
 
+\item{\code{metadata}}{Metadata for all spectra used to generate peak lists. Follows
+the format of the \code{peakLists} slot.}
+
 \item{\code{averagedPeakLists}}{A \code{list} with averaged MS (and MS/MS) peak lists
 for each feature group.}
 

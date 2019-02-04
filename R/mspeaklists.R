@@ -12,6 +12,8 @@ NULL
 #'
 #' @slot peakLists Contains a list of all MS (and MS/MS) peak lists. Use the
 #'   \code{peakLists} method for access.
+#' @slot metadata Metadata for all spectra used to generate peak lists. Follows
+#'   the format of the \code{peakLists} slot.
 #' @slot averagedPeakLists A \code{list} with averaged MS (and MS/MS) peak lists
 #'   for each feature group.
 #' @slot avgPeakListArgs A \code{list} with arguments used to generate feature
@@ -31,7 +33,7 @@ NULL
 #' @param obj,x,object The \code{\link{MSPeakLists}} object to access.
 #' @export
 MSPeakLists <- setClass("MSPeakLists",
-                        slots = c(peakLists = "list", averagedPeakLists = "list", avgPeakListArgs = "list"),
+                        slots = c(peakLists = "list", metadata = "list", averagedPeakLists = "list", avgPeakListArgs = "list"),
                         contains = "workflowStep")
 
 

@@ -32,7 +32,7 @@ generateMSPeakListsMzR <- function(fGroups, maxRtMSWidth = 20, precursorMzWindow
     assertAvgPListParams(avgFeatParams, add = ac)
     assertAvgPListParams(avgFGroupParams, add = ac)
     checkmate::reportAssertions(ac)
-    
+
     ftindex <- groupFeatIndex(fGroups)
     fTable <- featureTable(fGroups)
     anaInfo <- analysisInfo(fGroups)
@@ -40,7 +40,7 @@ generateMSPeakListsMzR <- function(fGroups, maxRtMSWidth = 20, precursorMzWindow
     gCount <- length(fGroups)
     gNames <- names(fGroups)
     anaCount <- nrow(anaInfo)
-    
+
     if (gCount == 0)
         return(MSPeakLists(algorithm = "mzR"))
 
@@ -56,9 +56,10 @@ generateMSPeakListsMzR <- function(fGroups, maxRtMSWidth = 20, precursorMzWindow
     avgFeatParamsMS$pruneMissingPrecursor <- avgFeatParams$pruneMissingPrecursorMS
     avgFeatParamsMSMS$pruneMissingPrecursor <- FALSE
     avgFeatParamsMSMS$retainPrecursor <- avgFeatParams$retainPrecursorMSMS
-    
+
     # structure: [[analysis]][[fGroup]][[MSType]][[MSPeak]]
     plists <- list()
+    metadata <- list()
 
     # if topMost is specified, make list (topAna) of topMost intense analyses
     if (!is.null(topMost) && topMost > 0)
@@ -99,7 +100,7 @@ generateMSPeakListsMzR <- function(fGroups, maxRtMSWidth = 20, precursorMzWindow
 
             if (is.null(results))
             {
-                results <- list()
+                results <- list(plists = list(), metatadata = list())
 
                 rtRange <- c(ft$retmin, ft$retmax)
                 if (!is.null(maxRtMSWidth) && diff(rtRange) > maxRtMSWidth)
@@ -109,22 +110,26 @@ generateMSPeakListsMzR <- function(fGroups, maxRtMSWidth = 20, precursorMzWindow
                     spectra <- loadSpectra(fp, verbose = FALSE)
 
                 # NOTE: precursor is set here only for precursor assignment,
-                # keeping precursorMzWindow unset makes sure that no spectra
-                # selection is made.
-                results$MS <- do.call(averageSpectraMZR,
-                                      c(list(spectra = spectra, rtRange = rtRange, precursor = ft$mz), avgFeatParamsMS))
+                # keeping precursorMzWindow unset for the header makes sure that
+                # no spectra selection is made.
+                results$metadata$MS <- getSpectraHeader(spectra, rtRange, 1, NULL, NULL)
+                results$plists$MS <- do.call(averageSpectraMZR,
+                                      c(list(spectra = spectra, hd = results$metadata$MS, precursor = ft$mz), avgFeatParamsMS))
 
-                stopifnot(!is.null(ft$mz))
-                MSMS <- do.call(averageSpectraMZR, c(list(spectra = spectra, rtRange = rtRange, MSLevel = 2,
-                                                          precursor = ft$mz, precursorMzWindow = precursorMzWindow),
+                hdMSMS <- getSpectraHeader(spectra, rtRange, 2, ft$mz, precursorMzWindow)
+                MSMS <- do.call(averageSpectraMZR, c(list(spectra = spectra, hd = hdMSMS, precursor = ft$mz),
                                                      avgFeatParamsMSMS))
                 if (nrow(MSMS) > 0)
-                    results$MSMS <- MSMS
-                
+                {
+                    results$plists$MSMS <- MSMS
+                    results$metadata$MSMS <- hdMSMS
+                }
+
                 saveCacheData("MSPeakListsMzR", results, hash, cacheDB)
             }
 
-            plists[[ana]][[grp]] <- results
+            plists[[ana]][[grp]] <- results$plists
+            metadata[[ana]][[grp]] <- results$metadata
 
             setTxtProgressBar(prog, grpi)
         }
@@ -135,6 +140,6 @@ generateMSPeakListsMzR <- function(fGroups, maxRtMSWidth = 20, precursorMzWindow
 
     if (is.null(cachedSet))
         saveCacheSet("MSPeakListsMzR", resultHashes[seq_len(resultHashCount)], setHash, cacheDB)
-    
-    return(MSPeakLists(peakLists = plists, avgPeakListArgs = avgFGroupParams, algorithm = "mzR"))
+
+    return(MSPeakLists(peakLists = plists, metadata = metadata, avgPeakListArgs = avgFGroupParams, algorithm = "mzR"))
 }

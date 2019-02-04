@@ -393,26 +393,30 @@ setMethod("filter", "formulas", function(obj, minExplainedFragPeaks = NULL, elem
 #' @param analysis A \code{character} specifying the analysis for which the
 #'   annotated spectrum should be plotted. If \code{NULL} then annotation
 #'   results for the complete feature group will be plotted.
-#' @param title The title of the plot.
+#' @param title The title of the plot. Set to \code{NULL} for an automatically
+#'   generated title.
 #'
 #' @template plotSpec-args
 #'
 #' @template useGGplot2
 #'
 #' @template plot-lim
+#' 
+#' @template fsubscript_source
 #'
 #' @return \code{plotSpec} will return a \code{\link[=ggplot2]{ggplot object}}
 #'   if \code{useGGPlot2} is \code{TRUE}.
 #'
 #' @export
 setMethod("plotSpec", "formulas", function(obj, precursor, groupName, analysis = NULL, MSPeakLists,
-                                           title = precursor, useGGPlot2 = FALSE, xlim = NULL, ylim = NULL, ...)
+                                           title = NULL, useGGPlot2 = FALSE, xlim = NULL, ylim = NULL, ...)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertString(precursor, min.chars = 1, add = ac)
     checkmate::assertString(groupName, min.chars = 1, add = ac)
     checkmate::assertString(analysis, min.chars = 1, null.ok = TRUE, add = ac)
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
+    checkmate::assertString(title, null.ok = TRUE, add = ac)
     checkmate::assertFlag(useGGPlot2, add = ac)
     assertXYLim(xlim, ylim, add = ac)
     checkmate::reportAssertions(ac)
@@ -435,6 +439,9 @@ setMethod("plotSpec", "formulas", function(obj, precursor, groupName, analysis =
 
     fi <- getFragmentInfoFromForms(spec, formTable)
 
+    if (is.null(title))
+        title <- subscriptFormula(precursor)
+    
     if (useGGPlot2)
         return(makeMSPlotGG(spec, fi) + ggtitle(title))
 

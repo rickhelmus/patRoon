@@ -631,6 +631,8 @@ setMethod("plotScores", "compounds", function(obj, index, groupName, normalizeSc
 #'   spectrum.
 #' @param title The title of the plot. If \code{NULL} a title will be
 #'   automatically made.
+#'   
+#' @template fsubscript_source
 #'
 #' @template plot-lim
 #'
@@ -682,9 +684,9 @@ setMethod("plotSpec", "compounds", function(obj, index, groupName, MSPeakLists, 
     if (is.null(title))
     {
         if (!is.null(compr$compoundName) && !is.na(compr$compoundName) && nzchar(compr$compoundName))
-            title <- sprintf("%s (%s)", compr$compoundName, compr$formula)
+            title <- subscriptFormula(compr$formula, prefix = paste(compr$compoundName, "("), postfix = ")")
         else
-            title <- compr$formula
+            title <- subscriptFormula(compr$formula)
     }
 
     if (!useGGPlot2)

@@ -17,7 +17,7 @@ general
         - test MS peak lists deisotoping?
 - somehow integrate convertMSFiles() in newProject()? And other file types?
 - newProject(): generate Rmd?
-- algorithmObject() generic
+- algorithmObject() generic: for xset, xsa, rc, ...
 - test negative subset indices
 - plotSpec(): subscript formulas
 
@@ -43,7 +43,7 @@ features
     - get rid of getXCMSSet() calls?
     - cache?
 - progressbar and parallel enviPick
-- OpenMS: Support newest grouper?
+- OpenMS: Support newest grouper? Update tests to newest version
 - removeRefAnalyses TRUE by default (or if blank filter is specified?)?
 - Fix plotUpSet with <2 rgroups
 - as.data.table for fGroups is slow?
@@ -59,7 +59,7 @@ MSPeakLists
 - add pruneMissingPrecursorMS to filter()?
 - filter by MSMS
 - metadata for Bruker peaklists?
-- metadata generic()?
+- metadata() generic?
 
 
 compounds
@@ -98,8 +98,7 @@ components
 reporting
 - add more options to reportPlots argument of reportMD()?
 - reportPDF/reportMD: MS only formulas are not reported?
-- JS EIC annotation
-- topMost compound candidates
+- fix mergedBy in fraginfo tables
 
 
 Cleanup

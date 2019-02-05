@@ -315,15 +315,18 @@ newProject <- function()
             {
                 files <- list.files(anaDir, "\\.(mzML|mzXML|d)$", full.names = TRUE)
 
-                dt <- data.table(path = dirname(files), analysis = simplifyAnalysisNames(files),
-                                  group = "", ref = "", ext = tools::file_ext(files))
-                dt[ext == "d", ext := "bruker"]
-                dt[, type := paste0(.SD$ext, collapse = ", "), by = .(path, analysis)]
-                dt[, ext := NULL]
-                dt <- unique(dt, by = c("analysis", "path"))
-                setcolorder(dt, c("analysis", "type", "group", "ref", "path"))
-
-                rValues$analyses <- rbind(rValues$analyses, dt)
+                if (length(files) > 0)
+                {
+                    dt <- data.table(path = dirname(files), analysis = simplifyAnalysisNames(files),
+                                     group = "", ref = "", ext = tools::file_ext(files))
+                    dt[ext == "d", ext := "bruker"]
+                    dt[, type := paste0(.SD$ext, collapse = ", "), by = .(path, analysis)]
+                    dt[, ext := NULL]
+                    dt <- unique(dt, by = c("analysis", "path"))
+                    setcolorder(dt, c("analysis", "type", "group", "ref", "path"))
+                    
+                    rValues$analyses <- rbind(rValues$analyses, dt)
+                }
             }
         })
 
@@ -335,7 +338,7 @@ newProject <- function()
                                    error = function(e) FALSE)
                 if (is.logical(csvTab))
                     showDialog("Error", "Failed to open/parse selected csv file!", "")
-                else
+                else if (nrow(csvTab) > 0)
                 {
                     exts <- mapply(csvTab$analysis, csvTab$path, FUN = function(ana, path)
                     {

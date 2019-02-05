@@ -327,7 +327,8 @@ formulasDT <- rbindlist(lapply(formFGroups, function(grp)
 DT::datatable(formulasDT, options = list(scrollX = TRUE, scrollY = "600px", deferRender = TRUE,
                                          dom = "lrtp", pageLength = 25, autoWidth = TRUE,
                                          ordering = FALSE,
-                                         columnDefs = list(list(visible = FALSE, targets = 0))),
+                                         columnDefs = list(list(visible = FALSE, targets = 0),
+                                                           list(width = "300px", targets = 2))),
               rownames = FALSE, escape = FALSE, elementId = "formulasTable")
 
 ```

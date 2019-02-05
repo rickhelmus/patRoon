@@ -21,6 +21,8 @@ general
 - test negative subset indices
 - plotSpec(): always show non-annotated in legend
 - ref --> blank
+- newProject(): add empty anaInfo with comments if no analyses are selected
+- convertMSFiles(): hint if dirs should be TRUE? Or do it automatically if a file is a dir?
 
 
 docs

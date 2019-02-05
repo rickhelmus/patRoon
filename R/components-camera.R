@@ -50,7 +50,7 @@ generateComponentsCAMERA <- function(fGroups, ionization, onlyIsotopes = FALSE,
         return(componentsCamera(componentInfo = data.table(), components = list(),
                                 xsa = new("xsAnnotate")))
 
-    hash <- makeHash(fGroups, ionization, onlyIsotopes, minSize, anaAbundance, extraOpts)
+    hash <- makeHash(fGroups, ionization, onlyIsotopes, minSize, ubiquitous, extraOpts)
     cd <- loadCacheData("componentsCAMERA", hash)
     if (!is.null(cd))
         return(cd)

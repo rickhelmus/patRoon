@@ -106,6 +106,16 @@ sortFormula <- function(formula)
 
 simplifyFormula <- function(formula) sortFormula(formula)
 
+# Based on chemistry2expression() from ReSOLUTION package
+# (authors: Emma Schymanski / Steffen Neumann). See https://github.com/schymane/ReSOLUTION/
+subscriptFormula <- function(formulas, prefix = "", postfix = "", parse = TRUE)
+{
+    exprs <- sub("\\*$", "", gsub("([0-9]+)", "[\\1]*", formulas))
+    if (parse)
+        return(parse(text = sprintf('"%s" * %s * "%s"', prefix, exprs, postfix)))
+    return(exprs)
+}
+
 averageFormulas <- function(formulas)
 {
     fltab <- rbindlist(lapply(formulas, function(f) as.list(splitFormulaToList(f))), fill = TRUE)

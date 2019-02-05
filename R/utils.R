@@ -561,7 +561,7 @@ makeMSPlot <- function(spec, fragInfo, xlim, ylim, ..., extraHeightInch = 0)
 
         if (!is.null(plotData[["formula"]]) && !is.na(plotData[[i, "formula"]]))
             text(plotData[[i, "mz"]], plotData[[i, "intensity"]] + (ylim[2] * 0.02),
-                 plotData[[i, "formula"]], srt = 90, adj = 0)
+                 subscriptFormula(plotData[[i, "formula"]]), srt = 90, adj = 0)
     }
 
     if (doLegend)
@@ -601,7 +601,7 @@ makeMSPlotGG <- function(spec, fragInfo, ...)
         }
 
         plotData[!is.na(fiInd), lwd := 2]
-        plotData[!is.na(fiInd), text := fragInfo$formula[fiInd]]
+        plotData[!is.na(fiInd), text := subscriptFormula(fragInfo$formula[fiInd], parse = FALSE)]
     }
 
     # mark precursor
@@ -611,7 +611,7 @@ makeMSPlotGG <- function(spec, fragInfo, ...)
     ggplot(plotData, aes_string(x = "mz", y = 0, label = "text")) + xlim(range(spec$mz) * c(0.9, 1.1)) +
         geom_segment(aes_string(xend = "mz", yend = "intensity",
                                 colour = "lab", size = "lwd")) + scale_size(range = c(0.5, 2), guide = FALSE) +
-        ggrepel::geom_text_repel(aes_string(y = "intensity", angle = 0), min.segment.length = 0.1,
+        ggrepel::geom_text_repel(aes_string(y = "intensity", angle = 0), min.segment.length = 0.1, parse = TRUE,
                                  nudge_y = grid::convertUnit(grid::unit(5, "mm"), "npc", valueOnly = TRUE), size = 3.2) +
         xlab("m/z") + ylab("Intensity") +
         cowplot::theme_cowplot(font_size = 12) + theme(legend.position = "bottom", legend.title = element_blank())

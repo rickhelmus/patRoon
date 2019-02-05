@@ -6,6 +6,7 @@
 * as.data.table()/as.data.frame() method for compounds: optionally normalize scores.
 * reportPDF()/reportMD() now report only 5 top most candidate compounds by default (controlled by compoundTopMost argument).
 * metadata for MS peak lists
+* `plotSpec()` now displays subscripted formulae
 
 
 ## January 2019

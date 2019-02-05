@@ -19,7 +19,8 @@ general
 - newProject(): generate Rmd?
 - algorithmObject() generic
 - test negative subset indices
-- plotSpec(): subscript formulas
+- plotSpec(): always show non-annotated in legend
+- ref --> blank
 
 
 docs
@@ -60,6 +61,8 @@ MSPeakLists
 - filter by MSMS
 - metadata for Bruker peaklists?
 - metadata generic()?
+- maxRtMSWidth --> maxMSRtWidth
+
 
 
 compounds
@@ -87,7 +90,7 @@ formulas
     - or simply don't and mention limitation in doc? (one limitation: filtering)
 - OM reporting
 - as.data.table: option to average per replicate group?
-- note/warning on GF slowness with high masses
+- note/warning on GF slowness with high masses --> enable timeout
 
 
 components
@@ -100,6 +103,7 @@ reporting
 - reportPDF/reportMD: MS only formulas are not reported?
 - JS EIC annotation
 - topMost compound candidates
+- fix headings components
 
 
 Cleanup

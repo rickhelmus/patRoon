@@ -125,9 +125,13 @@ if (isHClust)
 } else
     compTable[, spectrum := imgTags(sppaths)]
 
+initDT <- DT::JS("function(settings, json) {",
+                 "setTimeout(function() {",
+                 "$(\"#componentsTable .dataTable\").DataTable().columns.adjust().draw(); }",
+                 ", 25); }")
 DT::datatable(compTable, options = list(scrollX = TRUE, scrollY = "800px", deferRender = TRUE,
                                         dom = "lrtip", pageLength = 25, autoWidth = FALSE,
-                                        ordering = FALSE),
-              class = "striped row-border",
+                                        initComplete = initDT, ordering = FALSE),
+              class = "striped row-border", elementId = "componentsTable",
               rownames = FALSE, escape = FALSE)
 ```

@@ -101,7 +101,6 @@ reporting
 - add more options to reportPlots argument of reportMD()?
 - reportPDF/reportMD: MS only formulas are not reported?
 - fix headings components
-- fix mergedBy in fraginfo tables
 
 
 Cleanup

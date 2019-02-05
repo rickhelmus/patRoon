@@ -262,7 +262,10 @@ compoundsDT <- rbindlist(lapply(compFGroups, function(grp)
     {
         if (is.null(fi) || nrow(fi) == 0)
             return("")
-        knitr::kable(fi[, -"PLIndex"], "html") %>%
+        fi <- fi[, -"PLIndex"]
+        if (!is.null(fi[["mergedBy"]]))
+            fi[, mergedBy := sapply(mergedBy, function(mb) paste0(unlist(mb), collapse = ", "))]
+        knitr::kable(fi, "html") %>%
                            kableExtra::kable_styling(font_size = 11) %>%
                            kableExtra::scroll_box(extra_css = "overflow: auto; height: 125px;")
     })
@@ -305,10 +308,13 @@ formulasDT <- rbindlist(lapply(formFGroups, function(grp)
     
     fiTables <- sapply(precursors, function(prec)
     {
-        knitr::kable(getFragmentInfoFromForms(rmdVars$MSPeakLists[[grp]][["MSMS"]],
-                                              rmdVars$formulas[[grp]][formula == prec])[, -"PLIndex"], "html") %>%
-                           kableExtra::kable_styling(font_size = 11) %>%
-                           kableExtra::scroll_box(extra_css = "overflow: auto; height: 125px;")
+        fi <- getFragmentInfoFromForms(rmdVars$MSPeakLists[[grp]][["MSMS"]],
+                                       rmdVars$formulas[[grp]][formula == prec])[, -"PLIndex"]
+        if (!is.null(fi[["mergedBy"]]))
+            fi[, mergedBy := sapply(mergedBy, function(mb) paste0(unlist(mb), collapse = ", "))]
+        knitr::kable(fi, "html") %>%
+            kableExtra::kable_styling(font_size = 11) %>%
+            kableExtra::scroll_box(extra_css = "overflow: auto; height: 125px;")
     })
     
     ret <- data.table(group = grpi,

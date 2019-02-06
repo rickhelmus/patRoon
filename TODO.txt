@@ -19,7 +19,10 @@ general
 - newProject(): generate Rmd?
 - algorithmObject() generic: for xset, xsa, rc, ...
 - test negative subset indices
-- plotSpec(): subscript formulas
+- plotSpec(): always show non-annotated in legend
+- ref --> blank
+- newProject(): add empty anaInfo with comments if no analyses are selected
+- convertMSFiles(): hint if dirs should be TRUE? Or do it automatically if a file is a dir?
 
 
 docs
@@ -59,6 +62,7 @@ MSPeakLists
 - add pruneMissingPrecursorMS to filter()?
 - filter by MSMS
 - metadata for Bruker peaklists?
+- maxRtMSWidth --> maxMSRtWidth
 - metadata() generic?
 
 
@@ -87,7 +91,7 @@ formulas
     - or simply don't and mention limitation in doc? (one limitation: filtering)
 - OM reporting
 - as.data.table: option to average per replicate group?
-- note/warning on GF slowness with high masses
+- note/warning on GF slowness with high masses --> enable timeout
 
 
 components
@@ -99,7 +103,7 @@ components
 reporting
 - add more options to reportPlots argument of reportMD()?
 - reportPDF/reportMD: MS only formulas are not reported?
-- fix mergedBy in fraginfo tables
+- fix headings components
 
 
 Cleanup

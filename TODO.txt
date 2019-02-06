@@ -51,6 +51,7 @@ features
 - Fix plotUpSet with <2 rgroups
 - as.data.table for fGroups is slow?
 - tests to verify getXCMSSet...
+- pre/post intensity filter or another way to deal with order dependency
 
 
 MSPeakLists
@@ -64,6 +65,7 @@ MSPeakLists
 - metadata for Bruker peaklists?
 - maxRtMSWidth --> maxMSRtWidth
 - metadata() generic?
+- Default isolation window should be 4?
 
 
 compounds

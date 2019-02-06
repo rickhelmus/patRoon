@@ -231,7 +231,7 @@ replicateGroupFilter <- function(fGroups, rGroups, negate = FALSE, verbose = TRU
 #'   this step.
 #' @param
 #' relAbundance,absAbundance,interRelRGroupAbundance,interAbsRGroupAbundance
-#' Minimal overall relative/absolute abundance for a feature group to be present
+#' Minimum overall relative/absolute abundance for a feature group to be present
 #' within all analyses/replicate groups.
 #' @param intraRGroupAbundance Minimum relative abundance (0-1) that a feature
 #'   group should be present within a replicate group. Set to \code{NULL} to

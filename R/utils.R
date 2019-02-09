@@ -851,3 +851,5 @@ getAllMethods <- function(gen)
 
     return(cl[order(tolower(cl))])
 }
+
+NULLToZero <- function(x) ifelse(sapply(x, is.null), 0, x)

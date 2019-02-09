@@ -125,7 +125,7 @@ The next step is to perform some basic rule based filtering with the `filter()` 
 In this tutorial we will filter grouped features (or 'feature groups') based on a minimal intensity, minimal abundance within replicates and absence within blanks. Finally, we will also remove any feature groups eluting before roughly the dead volume of the system: 
 
 ```{r filter}
-fGroups <- filter(fGroups, intensityThreshold = 10000, intraRGroupAbundance = 1,
+fGroups <- filter(fGroups, absMinIntensity = 10000, intraRGroupAbundance = 1,
                   minBlankThreshold = 5, repetitions = 2, retentionRange = c(110, -1))
 ```
 

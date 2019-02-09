@@ -54,7 +54,7 @@ fGroups <- groupFeatures(fList, "xcms", rtalign = TRUE, retcorArgs = list(method
 {{ endCodeBlock() }}
 
 # Basic rule based filtering
-fGroups <- filter(fGroups, intensityThreshold = {{ filterFGroupsOpts$intThr }}, intraRGroupAbundance = {{ filterFGroupsOpts$replThr }},
+fGroups <- filter(fGroups, absMinIntensity = {{ filterFGroupsOpts$intThr }}, intraRGroupAbundance = {{ filterFGroupsOpts$replThr }},
                   minBlankThreshold = {{ filterFGroupsOpts$blankThr }}, repetitions = {{ filterFGroupsOpts$filterRepetitions }})
 {{ optionalCodeBlock(doMSPeakFind) }}
 

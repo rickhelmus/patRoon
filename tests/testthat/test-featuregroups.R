@@ -90,7 +90,7 @@ minInt <- function(fg)
 }
 
 test_that("basic filtering", {
-    expect_gte(minInt(filter(fgOpenMS, intensityThreshold = 500)), 500)
+    expect_gte(minInt(filter(fgOpenMS, absMinIntensity = 500)), 500)
 
     expect_range(groupInfo(filter(fgOpenMS, retentionRange = c(120, 200)))$rts, range(120, 200))
     expect_equivalent(filter(fgOpenMS, retentionRange = c(0, -1)), fgOpenMS)
@@ -107,13 +107,13 @@ test_that("basic filtering", {
     expect_known_output(filter(fgOpenMS, interAbsRGroupAbundance = 2), testFile("fgf-inter_abs_rg", text = TRUE))
     expect_known_output(filter(fgOpenMS, intraRGroupAbundance = 1), testFile("fgf-intra_rg", text = TRUE))
     expect_known_output(filter(fgOpenMS, minBlankThreshold = 5), testFile("fgf-bl", text = TRUE))
-    expect_known_output(filter(fgOpenMS, intensityThreshold = 500, minBlankThreshold = 5,
+    expect_known_output(filter(fgOpenMS, absMinIntensity = 500, minBlankThreshold = 5,
                                retentionRange = c(120, -1), intraRGroupAbundance = 1),
                         testFile("fgf-combi", text = TRUE))
-    expect_known_output(filter(fgOpenMS, intensityThreshold = 500, minBlankThreshold = 5,
+    expect_known_output(filter(fgOpenMS, absMinIntensity = 500, minBlankThreshold = 5,
                                retentionRange = c(120, -1), intraRGroupAbundance = 1, negate = TRUE),
                         testFile("fgf-combi-neg", text = TRUE))
-    expect_length(filter(fgOpenMSEmpty, intensityThreshold = 500, minBlankThreshold = 5,
+    expect_length(filter(fgOpenMSEmpty, absMinIntensity = 500, minBlankThreshold = 5,
                          retentionRange = c(120, -1), intraRGroupAbundance = 1), 0)
 })
 

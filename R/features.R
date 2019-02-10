@@ -83,17 +83,22 @@ setMethod("replicateGroups", "features", function(obj) unique(analysisInfo(obj)$
 #' @export
 setMethod("as.data.table", "features", function(x) rbindlist(featureTable(x), idcol = "analysis", fill = TRUE))
 
-#' @describeIn features Performs common rule based filtering of features.
-#' @param intensityThreshold Minimum intensity of a feature. Set to \code{NULL}
-#'   to ignore.
-#' @inheritParams filter,featureGroups-method
+#' @describeIn features Performs common rule based filtering of features. Note
+#'   that this (and much more) functionality is also provided by the
+#'   \code{filter} method defined for \code{\link{featureGroups}}. However,
+#'   filtering a \code{features} object may be useful to avoid grouping large
+#'   amounts of features.
+#' @templateVar feat TRUE
+#' @template feat-filter-args
 #' @export
-setMethod("filter", "features", function(obj, intensityThreshold = NULL, retentionRange = NULL,
-                                         mzRange = NULL, chromWidthRange = NULL, negate = FALSE)
+setMethod("filter", "features", function(obj, absMinIntensity = NULL, relMinIntensity = NULL,
+                                         retentionRange = NULL, mzRange = NULL, mzDefectRange = NULL,
+                                         chromWidthRange = NULL, negate = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertNumber(intensityThreshold, lower = 0, finite = TRUE, null.ok = TRUE, add = ac)
-    aapply(assertRange, . ~ retentionRange + mzRange + chromWidthRange, null.ok = TRUE, fixed = list(add = ac))
+    aapply(checkmate::assertNumber, . ~ absMinIntensity + relMinIntensity, lower = 0, finite = TRUE,
+           null.ok = TRUE, fixed = list(add = ac))
+    aapply(assertRange, . ~ retentionRange + mzRange + mzDefectRange + chromWidthRange, null.ok = TRUE, fixed = list(add = ac))
     checkmate::assertFlag(negate, add = ac)
     checkmate::reportAssertions(ac)
 
@@ -102,7 +107,7 @@ setMethod("filter", "features", function(obj, intensityThreshold = NULL, retenti
 
     oldn <- length(obj)
 
-    hash <- makeHash(obj, intensityThreshold, retentionRange, mzRange, chromWidthRange, negate)
+    hash <- makeHash(obj, absMinIntensity, relMinIntensity, retentionRange, mzRange, mzDefectRange, chromWidthRange, negate)
     cache <- loadCacheData("filterFeatures", hash)
     if (!is.null(cache))
         obj <- cache
@@ -110,29 +115,33 @@ setMethod("filter", "features", function(obj, intensityThreshold = NULL, retenti
     {
         anaInfo <- analysisInfo(obj)
 
-        intPred <- if (!negate) function(x) x >= intensityThreshold else function(x) x < intensityThreshold
-        rangePred <- function(x, range)
-        {
-            if (range[2] < 0)
-                numGTE(x, range[1])
-            else
-                numGTE(x, range[1]) & numLTE(x, range[2])
-        }
+        absIntPred <- if (!negate) function(x) x >= absMinIntensity else function(x) x < absMinIntensity
+        relIntPred <- if (!negate) function(x, m) (x / m) >= relMinIntensity else function(x, m) (x / m) < relMinIntensity
+        rangePred <- function(x, range) numGTE(x, range[1]) & numLTE(x, range[2])
 
         if (negate)
             rangePred <- Negate(rangePred)
 
         for (ana in analyses(obj))
         {
-            if (!is.null(intensityThreshold))
-                obj@features[[ana]] <- obj@features[[ana]][intPred(intensity)]
+            if (!is.null(absMinIntensity))
+                obj@features[[ana]] <- obj@features[[ana]][absIntPred(intensity)]
 
+            if (!is.null(relMinIntensity))
+            {
+                maxInt <- max(obj@features[[ana]]$intensity)
+                obj@features[[ana]] <- obj@features[[ana]][relIntPred(intensity, maxInt)]
+            }
+            
             if (!is.null(retentionRange))
                 obj@features[[ana]] <- obj@features[[ana]][rangePred(ret, retentionRange)]
 
             if (!is.null(mzRange))
                 obj@features[[ana]] <- obj@features[[ana]][rangePred(mz, mzRange)]
 
+            if (!is.null(mzDefectRange))
+                obj@features[[ana]] <- obj@features[[ana]][rangePred(mz - floor(mz), mzDefectRange)]
+            
             if (!is.null(chromWidthRange))
                 obj@features[[ana]] <- obj@features[[ana]][rangePred(retmax - retmin, chromWidthRange)]
         }

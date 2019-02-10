@@ -271,10 +271,6 @@ replicateGroupFilter <- function(fGroups, rGroups, negate = FALSE, verbose = TRU
 #'   Furthermore, feature groups that are left completely empty (\emph{i.e.} all
 #'   intensities are zero) will be automatically removed.
 #'
-#' @param absMinIntensity,relMinIntensity Minimum absolute/relative intensity
-#'   for a features to be kept. The relative intensity is determined from the
-#'   feature with highest intensity. Set to \samp{0} or \code{NULL} to skip this
-#'   step.
 #' @param preAbsMinIntensity,preRelMinIntensity As
 #'   \code{absMinIntensity}/\code{relMinIntensity}, but applied \emph{before}
 #'   any other filters. This is typically used to speed-up subsequent filter
@@ -305,21 +301,15 @@ replicateGroupFilter <- function(fGroups, rGroups, negate = FALSE, verbose = TRU
 #'   that of the blank are kept. The relative intensity values between blanks
 #'   and non-blanks are determined from the mean of all non-zero blank
 #'   intensities. Set to \code{NULL} to skip this step.
-#' @param retentionRange,mzRange,mzDefectRange,chromWidthRange Range of
-#'   retention time (in seconds), \emph{m/z}, mass defect (defined as the
-#'   decimal part of \emph{m/z} values) or chromatographic peak width (in
-#'   seconds), respectively. Features outside this range will be removed. Should
-#'   be a numeric vector with length of two containing the min/max values. The
-#'   maximum can be \code{Inf} to specify no maximum range. Set to \code{NULL}
-#'   to skip this step.
 #' @param removeBlanks Set to \code{TRUE} to remove all analyses that belong to
 #'   replicate groups that are specified as a reference in the
 #'   \link{analysis-information}. This is useful to simplify the analyses in the
 #'   specified \code{\link{featureGroups}} object after blank subtraction. When
 #'   both \code{blankThreshold} and this argument are set, blank subtraction is
 #'   performed prior to removing any analyses.
-#' @param negate If set to \code{TRUE} then filtering operations are performed
-#'   in opposite manner.
+#'
+#' @templateVar feat FALSE
+#' @template feat-filter-args
 #'
 #' @section Filter order: When multiple arguments are specified to
 #'   \code{filter}, multiple filters are applied in sequence. Since some of

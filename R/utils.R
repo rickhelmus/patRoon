@@ -853,3 +853,4 @@ getAllMethods <- function(gen)
 }
 
 NULLToZero <- function(x) if (is.null(x)) 0 else x
+zeroToNULL <- function(x) if (is.numeric(x) && x == 0) NULL else x

@@ -1,32 +1,46 @@
 #' @include main.R
 NULL
 
-getScriptCode <- function(destination, generateAnaInfo, analysisTableFile, analyses, DAMethod, dataPretreatments,
-                          featFinder, featGrouper, intThreshold, replThreshold,
-                          blankThreshold, filterRepetitions, peakListGenerator, precursorMzWindow, formulaGenerator,
-                          compIdentifier, componentGenerator, polarity, reportFormats)
+getScriptCode <- function(input, analyses)
 {
     optionalCodeBlock <- function(e) if (e) "<<startCodeBlock>>" else "<<skipCodeBlock>>"
     endCodeBlock <- function() "<<endCodeBlock>>"
     optionalLine <- function(e) if (!e) "<<skipThisLine>>" else ""
 
     # Can't set lists in template() call (bug?)
-    dataPretreatmentOpts = list(DAMethod = DAMethod, steps = dataPretreatments)
-    featFinderOpts = list(algo = featFinder)
-    featGrouperOpts = list(algo = featGrouper)
-    filterFGroupsOpts = list(intThr = intThreshold, replThr = replThreshold,
-                             blankThr = blankThreshold, filterRepetitions = filterRepetitions)
-    peakListOpts = list(algo = peakListGenerator)
-    formulaOpts = list(algo = formulaGenerator)
-    identOpts = list(algo = compIdentifier)
-    componentOpts = list(algo = componentGenerator)
-    sldest <- gsub("\\", "/", destination, fixed = TRUE) # BUG: tmpl() seems to eat backslashes!? Convert to forward slashes for now
+    dataPretreatmentOpts = list(DAMethod = input$DAMethod, steps = input$dataPretreatments)
+    featFinderOpts = list(algo = input$featFinder)
+    featGrouperOpts = list(algo = input$featGrouper)
+
+    filterFGroupsOpts = list(preIntThr = input$preIntThr, intThr = input$intThr,
+                             repAbundance = input$repAbundance, maxRepRSD = input$maxRepRSD,
+                             blankThr = input$blankThr, removeBlanks = input$removeBlanks)
+    filterFGroupsOpts <- lapply(filterFGroupsOpts, function(x) if (is.numeric(x) && x == 0) "NULL" else x)
+
+    retRange <- c(input[["retention-min"]], input[["retention-max"]])
+    if (all(retRange == 0))
+        retRange <- NULL
+    else if (retRange[2] == 0)
+        retRange[2] <- -1
+    mzRange <- c(input[["mz-min"]], input[["mz-max"]])
+    if (all(mzRange == 0))
+        mzRange <- NULL
+    else if (mzRange[2] == 0)
+        mzRange[2] <- -1
+    filterFGroupsOpts$retRange <- retRange; filterFGroupsOpts$mzRange <- mzRange
+
+    peakListOpts = list(algo = input$peakListGen)
+    formulaOpts = list(algo = input$formulaGen)
+    identOpts = list(algo = input$compIdent)
+    componentOpts = list(algo = input$components)
+    sldest <- gsub("\\", "/", input$destinationPath, fixed = TRUE) # BUG: tmpl() seems to eat backslashes!? Convert to forward slashes for now
+
     template <- tmpl(readAllFile(system.file("templates", "main_script.R", package = "patRoon")),
-                     destination = sldest, generateAnaInfo = generateAnaInfo, analysisTableFile = analysisTableFile,
+                     destination = sldest, generateAnaInfo = input$generateAnaInfo, analysisTableFile = input$analysisTableFile,
                      analyses = analyses,
-                     doMSPeakFind = formulaGenerator != "" || compIdentifier != "",
-                     precursorMzWindow = precursorMzWindow,
-                     polarity = polarity, reportFormats = reportFormats)
+                     doMSPeakFind = input$formulaGen != "" || input$compIdent != "",
+                     precursorMzWindow = input$precursorMzWindow,
+                     polarity = input$polarity, reportFormats = input$report)
 
     ret <- template
 
@@ -42,46 +56,40 @@ getScriptCode <- function(destination, generateAnaInfo, analysisTableFile, analy
     return(ret)
 }
 
-doCreateProject <- function(destination, scriptFile, createRStudioProj, generateAnaInfo, analyses, analysisTableFile,
-                            DAMethod, dataPretreatments, featFinder, featGrouper, intThreshold,
-                            replThreshold, blankThreshold, filterRepetitions, peakListGenerator, precursorMzWindow,
-                            formulaGenerator, compIdentifier, componentGenerator, polarity, reportFormats)
+doCreateProject <- function(input, analyses)
 {
-    mkdirp(destination)
+    mkdirp(input$destinationPath)
 
     analyses <- copy(analyses)
     analyses[, group := ifelse(!nzchar(group), analysis, group)]
 
     # Make analysis table
-    if (generateAnaInfo == "table")
-        write.csv(analyses[, c("path", "analysis", "group", "ref")], file.path(destination, analysisTableFile),
-                  row.names = FALSE)
+    if (input$generateAnaInfo == "table")
+        write.csv(analyses[, c("path", "analysis", "group", "ref")],
+                  file.path(input$destinationPath, input$analysisTableFile), row.names = FALSE)
 
-    code <- getScriptCode(destination, generateAnaInfo, analysisTableFile, analyses, DAMethod, dataPretreatments,
-                          featFinder, featGrouper, intThreshold, replThreshold, blankThreshold,
-                          filterRepetitions, peakListGenerator, precursorMzWindow, formulaGenerator,
-                          compIdentifier, componentGenerator, polarity, reportFormats)
-    if (is.null(scriptFile))
+    code <- getScriptCode(input, analyses)
+    if (input$outputScriptTo == "curFile")
     {
         # insert at end of current document
-        insertText(Inf, code, getSourceEditorContext()$id)
+        rstudioapi::insertText(Inf, code, getSourceEditorContext()$id)
     }
     else
     {
-        sp <- file.path(destination, scriptFile)
-        writeChar(code, file.path(destination, scriptFile))
+        sp <- file.path(input$destinationPath, input$scriptFile)
+        writeChar(code, sp)
 
-        if (createRStudioProj)
+        if (input$createRStudioProj)
         {
-            rstudioapi::initializeProject(destination)
-            rstudioapi::openProject(destination)
+            rstudioapi::initializeProject(input$destinationPath)
+            rstudioapi::openProject(input$destinationPath)
         }
         else
-            navigateToFile(sp)
+            rstudioapi::navigateToFile(sp)
     }
 }
 
-getNewProjectUI <- function()
+getNewProjectUI <- function(destPath)
 {
     textNote <- function(txt) div(style = "margin: 8px 0 12px; font-size: small", txt)
     fileSelect <- function(idText, idButton, label, value = "")
@@ -92,6 +100,13 @@ getNewProjectUI <- function()
             actionButton(idButton, "", icon("folder-open"), style = "margin: 25px 0 0 15px")
         )
     }
+    rangeNumeric <- function(id, label, minVal = 0, maxVal = 0, ...)
+    {
+        fillRow(
+            numericInput(paste0(id, "-min"), paste("Min.", label), value = minVal, ..., width = "95%"),
+            numericInput(paste0(id, "-max"), paste("Max.", label), value = maxVal, ..., width = "100%")
+        )
+    }
 
     miniPage(
         gadgetTitleBar("Create project tool", right = miniTitleBarButton("create", "Create", TRUE)),
@@ -100,14 +115,15 @@ getNewProjectUI <- function()
             miniTabPanel("Destination", icon = icon("save"),
                          miniContentPanel(
                              fillCol(
-                                 fileSelect("destinationPath", "projectDestButton", "Project destination", "~/"),
+                                 fileSelect("destinationPath", "projectDestButton", "Project destination",
+                                            if (is.null(destPath)) "~/" else destPath),
                                  fillRow(
                                      radioButtons("outputScriptTo", "Insert code into", c("New file" = "newFile",
                                                                                           "Current file" = "curFile")),
                                      conditionalPanel(
                                          condition = "input.outputScriptTo == \"newFile\"",
                                          textInput("scriptFile", "Script file", "process.R"),
-                                         checkboxInput("createRStudioProj", "Create RStudio project", value = TRUE)
+                                         checkboxInput("createRStudioProj", "Create (and open) RStudio project", value = TRUE)
                                      )
                                  )
                              )
@@ -224,10 +240,25 @@ getNewProjectUI <- function()
             miniTabPanel("Miscellaneous", icon = icon("sliders"),
                          miniContentPanel(
                              fillCol(
-                                 numericInput("intThr", "Intensity threshold", 1E4, 0, step = 1000, width = "100%"),
-                                 numericInput("replThr", "Min. replicate abundance", 0.75, 0, 1.0, 0.1, width = "100%"),
-                                 numericInput("blankThr", "Min. blank threshold", 5, 0, step = 1, width = "100%"),
-                                 numericInput("filterRepetitions", "Repetitions", 2, 1, step = 1, width = "100%")
+                                 height = 50,
+                                 strong("Set below values to zero to disable a particular filter.")
+                             ),
+                             fillCol(
+                                 height = 325,
+                                 fillRow(
+                                     numericInput("preIntThr", "Pre-Intensity threshold", 1E2, 0, step = 100, width = "95%"),
+                                     numericInput("intThr", "Intensity threshold", 1E4, 0, step = 1000, width = "100%")
+                                 ),
+                                 fillRow(
+                                     numericInput("repAbundance", "Min. replicate abundance (relative)", 1, 0, 1.0, 0.1, width = "95%"),
+                                     numericInput("maxRepRSD", "Max. replicate intensity RSD", 0.75, 0, step = 0.1, width = "100%")
+                                 ),
+                                 fillRow(
+                                     numericInput("blankThr", "Min. blank threshold", 5, 0, step = 1, width = "95%"),
+                                     checkboxInput("removeBlanks", "Discard blanks after filtering", TRUE)
+                                 ),
+                                 rangeNumeric("retention", "retention time (s)", step = 10),
+                                 rangeNumeric("mz", "m/z", step = 10)
                              )
                          )
             )
@@ -241,12 +272,15 @@ getNewProjectUI <- function()
 #'   parameters. This function requires to be run within a
 #'   \href{https://www.rstudio.com/}{RStudio} session. The resulting script is
 #'   either added to the current open file or to a new file. The
-#'   \link[=analysis-information]{analysis information} will be written to a \file{.csv}
-#'   file so that it can easily be modified afterwards.
+#'   \link[=analysis-information]{analysis information} will be written to a
+#'   \file{.csv} file so that it can easily be modified afterwards.
+#'
+#' @param destPath Set destination path value to this value (useful for
+#'   debugging). Set to \code{NULL} for a default value.
 #'
 #' @rdname GUI-utils
 #' @export
-newProject <- function()
+newProject <- function(destPath = NULL)
 {
     # UNDONE: warning/message about empty groups
 
@@ -283,13 +317,7 @@ newProject <- function()
             {}
             else
             {
-                doCreateProject(input$destinationPath,
-                                if (input$outputScriptTo == "curFile") NULL else input$scriptFile,
-                                input$createRStudioProj, input$generateAnaInfo, rValues$analyses,
-                                input$analysisTableFile, input$DAMethod, input$pretreat, input$featFinder,
-                                input$featGrouper, input$intThr, input$replThr, input$blankThr, input$filterRepetitions,
-                                input$peakListGen, input$precursorMzWindow, input$formulaGen, input$compIdent, input$components,
-                                input$polarity, input$report)
+                doCreateProject(input, rValues$analyses)
                 stopApp(TRUE)
             }
         })
@@ -324,7 +352,7 @@ newProject <- function()
                     dt[, ext := NULL]
                     dt <- unique(dt, by = c("analysis", "path"))
                     setcolorder(dt, c("analysis", "type", "group", "ref", "path"))
-                    
+
                     rValues$analyses <- rbind(rValues$analyses, dt)
                 }
             }
@@ -334,8 +362,9 @@ newProject <- function()
             csvFile <- selectFile(path = "~/", filter = "csv files (*.csv)")
             if (!is.null(csvFile))
             {
-                csvTab <- tryCatch(fread(csvFile, select = c("path", "analysis", "group", "ref")),
-                                   error = function(e) FALSE)
+                csvTab <- tryCatch(fread(csvFile, select = c("path", "analysis", "group", "ref"),
+                                         colClasses = "character"),
+                                   error = function(e) FALSE, warning = function(w) FALSE)
                 if (is.logical(csvTab))
                     showDialog("Error", "Failed to open/parse selected csv file!", "")
                 else if (nrow(csvTab) > 0)
@@ -382,6 +411,6 @@ newProject <- function()
         })
     }
 
-    runGadget(getNewProjectUI(), server, viewer = dialogViewer("Create new project", width = 800, height = 600))
+    runGadget(getNewProjectUI(destPath), server, viewer = dialogViewer("Create new project", width = 800, height = 600))
     # runGadget(getNewProjectUI(), server, viewer = paneViewer())
 }

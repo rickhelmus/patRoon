@@ -54,8 +54,10 @@ fGroups <- groupFeatures(fList, "xcms", rtalign = TRUE, retcorArgs = list(method
 {{ endCodeBlock() }}
 
 # Basic rule based filtering
-fGroups <- filter(fGroups, absMinIntensity = {{ filterFGroupsOpts$intThr }}, relMinReplicateAbundance = {{ filterFGroupsOpts$replThr }},
-                  maxReplicateRSD = {{ filterFGroupsOpts$maxReplRSD }}, blankThreshold = {{ filterFGroupsOpts$blankThr }})
+fGroups <- filter(fGroups, preAbsMinIntensity = {{ filterFGroupsOpts$preIntThr }}, absMinIntensity = {{ filterFGroupsOpts$intThr }},
+                  relMinReplicateAbundance = {{ filterFGroupsOpts$repAbundance }}, maxReplicateRSD = {{ filterFGroupsOpts$maxRepRSD }},
+                  blankThreshold = {{ filterFGroupsOpts$blankThr }}, removeBlanks = {{ filterFGroupsOpts$removeBlanks }},
+                  retentionRange = {{ if (is.null(filterFGroupsOpts$retRange)) "NULL" else paste0("c(", paste0(filterFGroupsOpts$retRange, collapse = ", "), ")") }}, mzRange = {{ if (is.null(filterFGroupsOpts$mzRange)) "NULL" else paste0("c(", paste0(filterFGroupsOpts$mzRange, collapse = ", "), ")") }})
 {{ optionalCodeBlock(doMSPeakFind) }}
 
 # Retrieve MS peak lists
@@ -145,6 +147,6 @@ reportPDF(fGroups, path = "report", reportFGroups = TRUE, formulas = {{ if (form
 reportMD(fGroups, path = "report", reportPlots = c("chord", "venn", "upset", "eics", "formulas"), formulas = {{ if (formulaOpts$algo != "") "formulas" else "NULL" }},
          compounds = {{ if (identOpts$algo != "") "compounds" else "NULL" }}, compoundNormalizeScores = "max",
          components = {{ if (componentOpts$algo != "") "components" else "NULL" }}, MSPeakLists = {{ if (formulaOpts$algo != "" || identOpts$algo != "") "plists" else "NULL" }},
-         selfContained = TRUE, openReport = TRUE)
+         selfContained = FALSE, openReport = TRUE)
 
 {{ endCodeBlock() }}

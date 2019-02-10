@@ -7,6 +7,17 @@
 * reportPDF()/reportMD() now report only 5 top most candidate compounds by default (controlled by compoundTopMost argument).
 * metadata for MS peak lists
 * `plotSpec()` now displays subscripted formulae
+* **IMPORTANT** Several major changes were made to the `filter()` methods for `features` and `featureGroups`. Please carefully read the updated documentation for these methods! (i.e. `` ?`filter,features-method` `` and `` ?`filter,featureGroups-method` ``).
+    * Most argument have been renamed for consistency, simplicity and clarity.
+    * The order when multiple filters are specified to the `featureGroups` method was adjusted, notably to improve reliability of blank filtration. Again, please see `` ?`filter,featureGroups-method` ``.
+    * The following new filters were added:
+        * mass defect range (`mzDefectRange` argument)
+        * maximum relative standard deviation (RSD) of intensities between replicates (`maxReplicateIntRSD` argument)
+        * minimum number of features within analyses (`absMinFeatures` and `relMinFeatures` arguments).
+        * pre-intensity filters (`preAbsMinIntensity` and `preRelMinIntensity` arguments)
+        * most existing filters now accept both relative and absolute values.
+    * The script generation functionality of `newScript()` has been updated and supports more filter types.
+    * The `repetitions` argument is not needed anymore for the new algorithm and has been removed.
 
 
 ## January 2019

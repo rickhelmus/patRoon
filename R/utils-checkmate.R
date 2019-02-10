@@ -165,7 +165,7 @@ checkExtractArg <- function(x)
     if (!isTRUE(ret))
         ret <- checkmate::checkString(x)
     if (!isTRUE(ret))
-        ret <- "Should be valid numeric or character skalar"
+        ret <- "Should be valid numeric or character scalar"
     return(ret)
 }
 assertExtractArg <- checkmate::makeAssertionFunction(checkExtractArg)

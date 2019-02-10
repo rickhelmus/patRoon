@@ -131,29 +131,35 @@ analyses(obj)
 groupNames(obj)
 
 # S4 method for MSPeakLists
-algorithm(obj)
-
-# S4 method for MSPeakLists
 length(x)
 
 # S4 method for MSPeakLists
 show(object)
 
 # S4 method for MSPeakLists,ANY,ANY,missing
-[(x, i, j, ..., drop = TRUE)
+[(x, i, j, ..., reAverage = TRUE,
+  drop = TRUE)
 
 # S4 method for MSPeakLists,ANY,ANY
 [[(x, i, j)
 
 # S4 method for MSPeakLists
+$(x, name)
+
+# S4 method for MSPeakLists
+as.data.table(x, fGroups = NULL,
+  averaged = TRUE)
+
+# S4 method for MSPeakLists
 filter(obj, absMSIntThr = NULL,
   absMSMSIntThr = NULL, relMSIntThr = NULL, relMSMSIntThr = NULL,
   topMSPeaks = NULL, topMSMSPeaks = NULL, deIsotopeMS = FALSE,
-  deIsotopeMSMS = FALSE)
+  deIsotopeMSMS = FALSE, retainPrecursorMSMS = TRUE)
 
 # S4 method for MSPeakLists
 plotSpec(obj, groupName, analysis = NULL,
-  MSLevel = 2, useGGPlot2 = FALSE)</pre>
+  MSLevel = 1, title = NULL, useGGPlot2 = FALSE, xlim = NULL,
+  ylim = NULL, ...)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -166,11 +172,35 @@ plotSpec(obj, groupName, analysis = NULL,
       <th>i, j</th>
       <td><p>A numeric or character value which is used to select analyses/feature groups by
 their index or name, respectively (for the order/names see <code>analyses()/groupNames()</code>).<br /><br /> For <code>[</code>: Can also be logical to perform logical selection
-(similar to regular vectors). If missing all analyses/feature groups are selected.<br /><br /> For <code>[[</code>: should be a skalar value. If <code>j</code> is not specified, <code>i</code> selects by feature groups instead.</p></td>
+(similar to regular vectors). If missing all analyses/feature groups are selected.<br /><br /> For <code>[[</code>: should be a scalar value. If <code>j</code> is not specified, <code>i</code> selects by feature groups instead.</p></td>
+    </tr>
+    <tr>
+      <th>&#8230;</th>
+      <td><p>Further arguments passed to <code><a href='https://www.rdocumentation.org/packages/graphics/topics/plot'>plot</a></code>.</p></td>
+    </tr>
+    <tr>
+      <th>reAverage</th>
+      <td><p>Set to <code>TRUE</code> to regenerate averaged MS peak lists
+after subsetting analyses.</p></td>
     </tr>
     <tr>
       <th>drop</th>
       <td><p>ignored.</p></td>
+    </tr>
+    <tr>
+      <th>name</th>
+      <td><p>The feature group name (partially matched).</p></td>
+    </tr>
+    <tr>
+      <th>fGroups</th>
+      <td><p>The <code><a href='featureGroups-class.html'>featureGroups</a></code> object that was used to
+generate this object. If not <code>NULL</code> it is used to add feature group
+information (retention and <em>m/z</em> values).</p></td>
+    </tr>
+    <tr>
+      <th>averaged</th>
+      <td><p>If <code>TRUE</code> then feature group averaged peak list data is
+used.</p></td>
     </tr>
     <tr>
       <th>absMSIntThr, absMSMSIntThr, relMSIntThr, relMSMSIntThr</th>
@@ -190,6 +220,12 @@ presence of isotopic peaks (e.g. MetFrag for MS/MS). Note that
 <code>getMzRPeakLists</code> does not (yet) support flagging of isotopes.</p></td>
     </tr>
     <tr>
+      <th>retainPrecursorMSMS</th>
+      <td><p>If <code>TRUE</code> then precursor peaks will never be
+filtered out from MS/MS peak lists (note that precursors are never removed
+from MS peak lists).</p></td>
+    </tr>
+    <tr>
       <th>groupName</th>
       <td><p>The name of the feature group for which a plot should be
 made.</p></td>
@@ -204,11 +240,21 @@ made.</p></td>
       <td><p>The MS level: <samp>1</samp> for regular MS, <samp>2</samp> for MSMS.</p></td>
     </tr>
     <tr>
+      <th>title</th>
+      <td><p>The title of the plot. If <code>NULL</code> a title will be
+automatically made.</p></td>
+    </tr>
+    <tr>
       <th>useGGPlot2</th>
       <td><p>If <code>TRUE</code> then <span class="pkg">ggplot2</span> is used for
 plotting, otherwise base plot used. For <code>plotSpec</code>, <code>ggplot2</code>
 allows nicely repelled text for annotation. However, base plot is generally
 faster.</p></td>
+    </tr>
+    <tr>
+      <th>xlim, ylim</th>
+      <td><p>Sets the plot size limits used by
+<code><a href='https://www.rdocumentation.org/packages/graphics/topics/plot'>plot</a></code>. Set to <code>NULL</code> for automatic plot sizing.</p></td>
     </tr>
     </table>
     
@@ -244,8 +290,6 @@ MS peak lists.</p></li>
 analyses for which data is present in this object.</p></li>
 <li><p><code>groupNames</code>: returns a <code>character</code> vector with the names of the
 feature groups for which data is present in this object.</p></li>
-<li><p><code>algorithm</code>: Retrieve the algorithm (a character string) used to
-generate the MS peak lists.</p></li>
 <li><p><code>length</code>: Obtain total number of <em>m/z</em> values.</p></li>
 <li><p><code>show</code>: Shows summary information for this object.</p></li>
 <li><p><code>[</code>: Subset on analyses/feature groups.</p></li>
@@ -253,10 +297,12 @@ generate the MS peak lists.</p></li>
 lists. If the second argument (<code>j</code>) is not specified the averaged peak
 lists for the group specified by the first argument (<code>i</code>) will be
 returned.</p></li>
-<li><p><code>filter</code>: provides post filtering of generated MS
-peak lists, which may further enhance quality of subsequent workflow steps
-(<em>e.g.</em> formulae calculation and compounds identification) and/or
-speed up these processes.</p></li>
+<li><p><code>$</code>: Extract group averaged MS peaklists for a feature group.</p></li>
+<li><p><code>as.data.table</code>: Returns all MS peak list data in a table.</p></li>
+<li><p><code>filter</code>: provides post filtering of generated MS peak lists,
+which may further enhance quality of subsequent workflow steps (<em>e.g.</em>
+formulae calculation and compounds identification) and/or speed up these
+processes.</p></li>
 <li><p><code>plotSpec</code>: Plots a spectrum using MS or MS/MS peak lists for a
 given feature group.</p></li>
 </ul>
@@ -267,13 +313,21 @@ given feature group.</p></li>
     <dl class='dl-horizontal'>
 <dt><code>peakLists</code></dt><dd><p>Contains a list of all MS (and MS/MS) peak lists. Use the
 <code>peakLists</code> method for access.</p></dd>
+    <dt><code>metadata</code></dt><dd><p>Metadata for all spectra used to generate peak lists. Follows
+the format of the <code>peakLists</code> slot.</p></dd>
     <dt><code>averagedPeakLists</code></dt><dd><p>A <code>list</code> with averaged MS (and MS/MS) peak lists
 for each feature group.</p></dd>
     <dt><code>avgPeakListArgs</code></dt><dd><p>A <code>list</code> with arguments used to generate feature
 group averaged MS(/MS) peak lists.</p></dd>
-    <dt><code>algorithm</code></dt><dd><p>The algorithm that was used to generate the MS peak lists.
-Use the <code>algorithm</code> method for access.</p></dd>
 </dl>
+    
+    <h2 class="hasAnchor" id="s-class-hierarchy"><a class="anchor" href="#s-class-hierarchy"></a>S4 class hierarchy</h2>
+
+    <p></p><ul>
+<li><p><code><a href='workflowStep-class.html'>workflowStep</a></code></p><ul>
+<li><p><strong><code>MSPeakLists</code></strong></p></li>
+</ul></li>
+</ul>
     
 
   </div>
@@ -289,6 +343,8 @@ Use the <code>algorithm</code> method for access.</p></dd>
       <li><a href="#methods-by-generic-">Methods (by generic)</a></li>
 
       <li><a href="#slots">Slots</a></li>
+
+      <li><a href="#s-class-hierarchy">S4 class hierarchy</a></li>
           </ul>
 
   </div>

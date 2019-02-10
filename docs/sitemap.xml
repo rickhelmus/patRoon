@@ -16,6 +16,12 @@
     <loc>https://rickhelmus.github.io/patRoon/reference/MSPeakLists-generation.html</loc>
   </url>
   <url>
+    <loc>https://rickhelmus.github.io/patRoon/reference/adduct-class.html</loc>
+  </url>
+  <url>
+    <loc>https://rickhelmus.github.io/patRoon/reference/adduct-utils.html</loc>
+  </url>
+  <url>
     <loc>https://rickhelmus.github.io/patRoon/reference/analysis-information.html</loc>
   </url>
   <url>
@@ -101,6 +107,9 @@
   </url>
   <url>
     <loc>https://rickhelmus.github.io/patRoon/reference/target-screening.html</loc>
+  </url>
+  <url>
+    <loc>https://rickhelmus.github.io/patRoon/reference/workflowStep-class.html</loc>
   </url>
   <url>
     <loc>https://rickhelmus.github.io/patRoon/articles/tutorial.html</loc>

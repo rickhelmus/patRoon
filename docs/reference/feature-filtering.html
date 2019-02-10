@@ -117,13 +117,16 @@
     </div>
 
     <pre class="usage"><span class='co'># S4 method for featureGroups</span>
-<span class='fu'><a href='generics.html'>filter</a></span>(<span class='no'>obj</span>, <span class='kw'>intensityThreshold</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>relAbundance</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>absAbundance</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>interRelRGroupAbundance</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>interAbsRGroupAbundance</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>intraRGroupAbundance</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>minBlankThreshold</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>retentionRange</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>mzRange</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>chromWidthRange</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>rGroups</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>removeRefAnalyses</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>repetitions</span> <span class='kw'>=</span> <span class='fl'>2</span>,
-  <span class='kw'>negate</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+<span class='fu'><a href='generics.html'>filter</a></span>(<span class='no'>obj</span>, <span class='kw'>absMinIntensity</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>relMinIntensity</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>preAbsMinIntensity</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>preRelMinIntensity</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>absMinAnalyses</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>relMinAnalyses</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>absMinReplicates</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>relMinReplicates</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>absMinFeatures</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>relMinFeatures</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>absMinReplicateAbundance</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>relMinReplicateAbundance</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>maxReplicateIntRSD</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>blankThreshold</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>retentionRange</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>mzRange</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>mzDefectRange</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>chromWidthRange</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>rGroups</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>removeBlanks</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>negate</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
 
 <span class='co'># S4 method for featureGroups</span>
 <span class='fu'>replicateGroupSubtract</span>(<span class='no'>fGroups</span>, <span class='no'>rGroups</span>,
@@ -133,36 +136,73 @@
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>intensityThreshold</th>
-      <td><p>Minimum intensity. Set to 0 or <code>NULL</code> to skip
-this step.</p></td>
-    </tr>
-    <tr>
-      <th>relAbundance, absAbundance, interRelRGroupAbundance, interAbsRGroupAbundance</th>
-      <td><p>Minimal overall relative/absolute abundance for a feature group to be present
-within all analyses/replicate groups.</p></td>
-    </tr>
-    <tr>
-      <th>intraRGroupAbundance</th>
-      <td><p>Minimum relative abundance (0-1) that a feature
-group should be present within a replicate group. Set to <code>NULL</code> to
-skip this step.</p></td>
-    </tr>
-    <tr>
-      <th>minBlankThreshold</th>
-      <td><p>Feature groups that are also present in reference
-analyses (see <a href='analysis-information.html'>analysis info</a>) are filtered out
-unless their relative intensity is above this threshold. Set to <code>NULL</code>
+      <th>absMinIntensity, relMinIntensity</th>
+      <td><p>Minimum absolute/relative intensity
+for features to be kept. The relative intensity is determined from the
+feature with highest intensity (of all features from all groups).
+Set to <samp>0</samp> or <code>NULL</code>
 to skip this step.</p></td>
     </tr>
     <tr>
-      <th>retentionRange, mzRange, chromWidthRange</th>
-      <td><p>Range of retention time (in
-seconds), <em>m/z</em> or chromatographic peak width (in seconds),
-respectively. Features outside this range will be removed. Should be a
-numeric vector with length of two containing the min/max values. If the max
-value is set to a value below 0 then no maximum is assumed. Set to
-<code>NULL</code> to skip this step.</p></td>
+      <th>preAbsMinIntensity, preRelMinIntensity</th>
+      <td><p>As
+<code>absMinIntensity</code>/<code>relMinIntensity</code>, but applied <em>before</em>
+any other filters. This is typically used to speed-up subsequent filter
+steps. However, care must be taken that a sufficiently low value is choosen
+that is not expected to affect subsequent filtering steps. See below why
+this may be important.</p></td>
+    </tr>
+    <tr>
+      <th>absMinAnalyses, relMinAnalyses</th>
+      <td><p>Feature groups are only kept when they
+contain data for at least this (absolute or relative) amount of analyses.
+Set to <code>NULL</code> to ignore.</p></td>
+    </tr>
+    <tr>
+      <th>absMinReplicates, relMinReplicates</th>
+      <td><p>Feature groups are only kept when
+they contain data for at least this (absolute or relative) amount of
+replicates. Set to <code>NULL</code> to ignore.</p></td>
+    </tr>
+    <tr>
+      <th>absMinFeatures, relMinFeatures</th>
+      <td><p>Analyses are only kept when they contain
+at least this (absolute or relative) amount of features. Set to <code>NULL</code>
+to ignore.</p></td>
+    </tr>
+    <tr>
+      <th>absMinReplicateAbundance, relMinReplicateAbundance</th>
+      <td><p>Minimum
+absolute/relative abundance that a grouped feature should be present within
+a replicate group. If this mimimum is not met all features within the
+replicate group are removed. Set to <code>NULL</code> to skip this step.</p></td>
+    </tr>
+    <tr>
+      <th>maxReplicateIntRSD</th>
+      <td><p>Maximum relative standard deviation (RSD) of
+intensity values for features within a replicate group. If the RSD is above
+this value all features within the replicate group are removed. Set to
+<code>NULL</code> to ignore.</p></td>
+    </tr>
+    <tr>
+      <th>blankThreshold</th>
+      <td><p>Feature groups that are also present in blank analyses
+(see <a href='analysis-information.html'>analysis info</a>) are filtered out unless
+their relative intensity is above this threshold. For instance, a value of
+<samp>5</samp> means that only features with an intensity five times higher than
+that of the blank are kept. The relative intensity values between blanks
+and non-blanks are determined from the mean of all non-zero blank
+intensities. Set to <code>NULL</code> to skip this step.</p></td>
+    </tr>
+    <tr>
+      <th>retentionRange, mzRange, mzDefectRange, chromWidthRange</th>
+      <td><p>Range of
+retention time (in seconds), <em>m/z</em>, mass defect (defined as the
+decimal part of <em>m/z</em> values) or chromatographic peak width (in
+seconds), respectively. Features outside this range will be removed. Should
+be a numeric vector with length of two containing the min/max values. The
+maximum can be <code>Inf</code> to specify no maximum range. Set to <code>NULL</code>
+to skip this step.</p></td>
     </tr>
     <tr>
       <th>rGroups</th>
@@ -170,19 +210,13 @@ value is set to a value below 0 then no maximum is assumed. Set to
 (<code>filter</code>) or subtracted from (<code>replicateGroupSubtract</code>).</p></td>
     </tr>
     <tr>
-      <th>removeRefAnalyses</th>
-      <td><p>Set to <code>TRUE</code> to remove all analyses that
-belong to replicate groups that are specified as a reference in the
+      <th>removeBlanks</th>
+      <td><p>Set to <code>TRUE</code> to remove all analyses that belong to
+replicate groups that are specified as a reference in the
 <a href='analysis-information.html'>analysis-information</a>. This is useful to simplify the analyses in the
-specified <code><a href='featureGroups-class.html'>featureGroups</a></code> object after blank subtraction.
-Consequently, when both <code>minBlankThreshold</code> and this argument are set,
-blank subtraction is performed prior to removing any analyses.</p></td>
-    </tr>
-    <tr>
-      <th>repetitions</th>
-      <td><p>Sometimes more feature groups may be removed by repeating
-filtering steps after another. Usually a value of two is enough to filter
-the maximum amount of feature groups.</p></td>
+specified <code><a href='featureGroups-class.html'>featureGroups</a></code> object after blank subtraction. When
+both <code>blankThreshold</code> and this argument are set, blank subtraction is
+performed prior to removing any analyses.</p></td>
     </tr>
     <tr>
       <th>negate</th>
@@ -196,7 +230,7 @@ applied.</p></td>
     </tr>
     <tr>
       <th>threshold</th>
-      <td><p>Minimal relative threshold (compared to mean intensity of
+      <td><p>Minimum relative threshold (compared to mean intensity of
 replicate group being subtracted) for a feature group to be <em>not</em>
 removed. When <samp>0</samp> a feature group is always removed when present in
 the given replicate groups.</p></td>
@@ -213,11 +247,47 @@ the given replicate groups.</p></td>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p><code>filter</code> performs common rule based filtering of feature groups
-  such as blank subtraction, minimum intensity and minimal replicate
-  abundance.</p>
+  such as blank subtraction, minimum intensity and minimum replicate
+  abundance. Removing of features occurs by zeroing their intensity values.
+  Furthermore, feature groups that are left completely empty (<em>i.e.</em> all
+  intensities are zero) will be automatically removed.</p>
 <p><code>replicateGroupSubtract</code> removes feature groups present in a
   given set of replicate groups (unless intensities are above a given
   threshold). The replicate groups that are subtracted will be removed.</p>
+    
+    <h2 class="hasAnchor" id="filter-order"><a class="anchor" href="#filter-order"></a>Filter order</h2>
+
+    <p>When multiple arguments are specified to
+  <code>filter</code>, multiple filters are applied in sequence. Since some of
+  these filters may affect each other, choosing their order correctly may be
+  important for effective data filtering. For instance, when an intensity
+  filter removes features from blank analyses, a subsequent blank filter may
+  not adequately perform blank subtraction. Similarly, when intensity and
+  blank filters are executed after the replicate abundance filter it may be
+  necessary to ensure minimum replicate abundance again as the intensity and
+  blank filters may have removed some features within a replicate group.</p>
+<p>With this in mind, filters (if specified) occurs in the following order:</p>
+<p></p><ol>
+<li><p>Pre-Intensity filters (<em>i.e.</em> <code>preAbsMinIntensity</code> and
+  <code>preRelMinIntensity</code>).</p></li>
+<li><p>Chromatography and mass filters (<em>i.e</em> <code>retentionRange</code>,
+  <code>mzRange</code>, <code>mzDefectRange</code> and <code>chromWidthRange</code>).</p></li>
+<li><p>Replicate abundance filters (<em>i.e.</em>
+  <code>absMinReplicateAbundance</code>, <code>relMinReplicateAbundance</code> and
+  <code>maxReplicateIntRSD</code>).</p></li>
+<li><p>Blank filter (<em>i.e.</em> blankThreshold).</p></li>
+<li><p>Intensity filters (<em>i.e.</em> <code>absMinIntensity</code> and
+  <code>relMinIntensity</code>).</p></li>
+<li><p>Replicate abundance filters (2nd time, only if previous filters
+  affected results).</p></li>
+<li><p>General abundance filters (<em>i.e.</em> <code>absMinAnalyses</code>,
+  <code>relMinAnalyses</code>, <code>absMinReplicates</code>, <code>relMinReplicates</code>,
+  <code>absMinFeatures</code> and <code>relMinFeatures</code>).</p></li>
+<li><p>Replicate group filter (<em>i.e.</em> <code>rGroups</code>) and blank
+  analyses removal (<em>i.e.</em> if <code>removeBlanks=TRUE</code>).</p></li>
+</ol>
+    <p>If another filtering order is desired then <code>filter</code> should be called
+  multiple times with only one filter argument at a time.</p>
     
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
@@ -234,6 +304,8 @@ the given replicate groups.</p></td>
       <li><a href="#value">Value</a></li>
 
       <li><a href="#details">Details</a></li>
+
+      <li><a href="#filter-order">Filter order</a></li>
 
       <li><a href="#see-also">See also</a></li>
           </ul>

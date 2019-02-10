@@ -132,16 +132,18 @@ identified compounds.</p>
 <span class='fu'>reportPDF</span>(<span class='no'>fGroups</span>, <span class='kw'>path</span> <span class='kw'>=</span> <span class='st'>"report"</span>,
   <span class='kw'>reportFGroups</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>formulas</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>reportFormulaSpectra</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>compounds</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>compoundNormalizeScores</span> <span class='kw'>=</span> <span class='st'>"max"</span>,
-  <span class='kw'>compoundExclNormScores</span> <span class='kw'>=</span> <span class='st'>"score"</span>, <span class='kw'>compsCluster</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>components</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>MSPeakLists</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>retMin</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>EICGrid</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>2</span>, <span class='fl'>1</span>), <span class='kw'>EICRtWindow</span> <span class='kw'>=</span> <span class='fl'>20</span>, <span class='kw'>EICMzWindow</span> <span class='kw'>=</span> <span class='fl'>0.005</span>,
-  <span class='kw'>EICTopMost</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>EICOnlyPresent</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>clearPath</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+  <span class='kw'>compoundExclNormScores</span> <span class='kw'>=</span> <span class='st'>"score"</span>, <span class='kw'>compoundOnlyUsedScorings</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>compoundTopMost</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>compsCluster</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>components</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>MSPeakLists</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>retMin</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>EICGrid</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>2</span>, <span class='fl'>1</span>),
+  <span class='kw'>EICRtWindow</span> <span class='kw'>=</span> <span class='fl'>20</span>, <span class='kw'>EICMzWindow</span> <span class='kw'>=</span> <span class='fl'>0.005</span>, <span class='kw'>EICTopMost</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>EICOnlyPresent</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>clearPath</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
 
 <span class='co'># S4 method for featureGroups</span>
 <span class='fu'>reportMD</span>(<span class='no'>fGroups</span>, <span class='kw'>path</span> <span class='kw'>=</span> <span class='st'>"report"</span>,
   <span class='kw'>reportPlots</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"chord"</span>, <span class='st'>"venn"</span>, <span class='st'>"upset"</span>, <span class='st'>"eics"</span>, <span class='st'>"formulas"</span>),
   <span class='kw'>formulas</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>compounds</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>compoundNormalizeScores</span> <span class='kw'>=</span> <span class='st'>"max"</span>,
-  <span class='kw'>compoundExclNormScores</span> <span class='kw'>=</span> <span class='st'>"score"</span>, <span class='kw'>compsCluster</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>compoundExclNormScores</span> <span class='kw'>=</span> <span class='st'>"score"</span>, <span class='kw'>compoundOnlyUsedScorings</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>compoundTopMost</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>compsCluster</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>includeMFWebLinks</span> <span class='kw'>=</span> <span class='st'>"compounds"</span>, <span class='kw'>components</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>interactiveHeat</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>MSPeakLists</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>retMin</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>EICRtWindow</span> <span class='kw'>=</span> <span class='fl'>20</span>, <span class='kw'>EICMzWindow</span> <span class='kw'>=</span> <span class='fl'>0.005</span>, <span class='kw'>EICTopMost</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
@@ -196,7 +198,11 @@ reported. Specify <code>NULL</code> to skip reporting a particular object.</p></
 compound scorings occurs. Either <code>"none"</code> (no normalization),
 <code>"max"</code> (normalize to max value) or <code>"minmax"</code> (perform min-max
 normalization). Note that normalization of negative scores (e.g. output by
-SIRIUS) is always performed as min-max.</p></td>
+SIRIUS) is always performed as min-max. Furthermore, currently
+normalization takes the original scoring min/max values into account when
+candidates were generated. Thus, normalization is not affected when
+candidate results were removed after they were generated (<em>e.g.</em> by
+use of <code>filter</code>).</p></td>
     </tr>
     <tr>
       <th>compoundExclNormScores</th>
@@ -225,6 +231,18 @@ by the <code>compoundExclNormScores</code> argument.</p></td>
 available) for candidate formulae will be reported. Specifying
 <code>formulas</code> and setting this argument to <code>FALSE</code> still allows
 further annotation of compound MS/MS spectra.</p></td>
+    </tr>
+    <tr>
+      <th>compoundOnlyUsedScorings</th>
+      <td><p>If <code>TRUE</code> then only scorings are plotted
+that actually have been used to rank data (see the <code>scoreTypes</code>
+argument to <code><a href='compound-generation.html'>generateCompoundsMetfrag</a></code> for more details).</p></td>
+    </tr>
+    <tr>
+      <th>compoundTopMost</th>
+      <td><p>Only this amount of top ranked candidate compounds are
+reported. Lower values may significantly speed up reporting. Set to
+<code>NULL</code> to ignore.</p></td>
     </tr>
     <tr>
       <th>MSPeakLists</th>
@@ -291,11 +309,6 @@ usually close to the amount of CPU cores.</p></td>
       <th>openReport</th>
       <td><p>If set to <code>TRUE</code> then the output report file will be
 opened with the system browser.</p></td>
-    </tr>
-    <tr>
-      <th>reportChord</th>
-      <td><p>If <code>TRUE</code> then a chord diagram for all feature groups
-is plotted (data will be averaged among replicates).</p></td>
     </tr>
     </table>
     

@@ -106,7 +106,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Base features class</h1>
-    <small class="dont-index">Source: <a href='https://github.com/rickhelmus/patRoon/blob/master/R/features.R'><code>R/features.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/rickhelmus/patRoon/blob/master/R/features.R'><code>R/features.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/features-bruker.R'><code>R/features-bruker.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/features-envipick.R'><code>R/features-envipick.R</code></a>, and 3 more</small>
     <div class="hidden name"><code>features-class.Rd</code></div>
     </div>
 
@@ -135,9 +135,12 @@ analyses(obj)
 replicateGroups(obj)
 
 # S4 method for features
-filter(obj, intensityThreshold = NULL,
-  retentionRange = NULL, mzRange = NULL, chromWidthRange = NULL,
-  negate = FALSE)
+as.data.table(x)
+
+# S4 method for features
+filter(obj, absMinIntensity = NULL,
+  relMinIntensity = NULL, retentionRange = NULL, mzRange = NULL,
+  mzDefectRange = NULL, chromWidthRange = NULL, negate = FALSE)
 
 # S4 method for features,ANY,missing,missing
 [(x, i, j, ..., drop = TRUE)
@@ -146,7 +149,13 @@ filter(obj, intensityThreshold = NULL,
 [[(x, i)
 
 # S4 method for features
-$(x, name)</pre>
+$(x, name)
+
+# S4 method for featuresXCMS,ANY,missing,missing
+[(x, i, j, ..., drop = TRUE)
+
+# S4 method for featuresXCMS
+filter(obj, ...)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -156,18 +165,22 @@ $(x, name)</pre>
       <td><p><code>features</code> object to be accessed</p></td>
     </tr>
     <tr>
-      <th>intensityThreshold</th>
-      <td><p>Minimum intensity of a feature. Set to <code>NULL</code>
-to ignore.</p></td>
+      <th>absMinIntensity, relMinIntensity</th>
+      <td><p>Minimum absolute/relative intensity
+for features to be kept. The relative intensity is determined from the
+feature with highest intensity (within the same analysis).
+Set to <samp>0</samp> or <code>NULL</code>
+to skip this step.</p></td>
     </tr>
     <tr>
-      <th>retentionRange, mzRange, chromWidthRange</th>
-      <td><p>Range of retention time (in
-seconds), <em>m/z</em> or chromatographic peak width (in seconds),
-respectively. Features outside this range will be removed. Should be a
-numeric vector with length of two containing the min/max values. If the max
-value is set to a value below 0 then no maximum is assumed. Set to
-<code>NULL</code> to skip this step.</p></td>
+      <th>retentionRange, mzRange, mzDefectRange, chromWidthRange</th>
+      <td><p>Range of
+retention time (in seconds), <em>m/z</em>, mass defect (defined as the
+decimal part of <em>m/z</em> values) or chromatographic peak width (in
+seconds), respectively. Features outside this range will be removed. Should
+be a numeric vector with length of two containing the min/max values. The
+maximum can be <code>Inf</code> to specify no maximum range. Set to <code>NULL</code>
+to skip this step.</p></td>
     </tr>
     <tr>
       <th>negate</th>
@@ -178,7 +191,11 @@ in opposite manner.</p></td>
       <th>i</th>
       <td><p>A numeric or character value which is used to select analyses by
 their index or name, respectively (for the order/names see <code><a href='generics.html'>analyses()</a></code>).<br /><br /> For <code>[</code>: Can also be logical to perform logical selection
-(similar to regular vectors). If missing all analyses are selected.<br /><br /> For <code>[[</code>: should be a skalar value.</p></td>
+(similar to regular vectors). If missing all analyses are selected.<br /><br /> For <code>[[</code>: should be a scalar value.</p></td>
+    </tr>
+    <tr>
+      <th>&#8230;</th>
+      <td><p>Ignored.</p></td>
     </tr>
     <tr>
       <th>drop, j</th>
@@ -218,7 +235,12 @@ and derived objects are created by 'feature finders' such as
 analyses for which data is present in this object.</p></li>
 <li><p><code>replicateGroups</code>: returns a <code>character</code> vector with the names of the
 replicate groups for which data is present in this object.</p></li>
-<li><p><code>filter</code>: Performs common rule based filtering of features.</p></li>
+<li><p><code>as.data.table</code>: Returns all feature data in a table.</p></li>
+<li><p><code>filter</code>: Performs common rule based filtering of features. Note
+that this (and much more) functionality is also provided by the
+<code>filter</code> method defined for <code><a href='featureGroups-class.html'>featureGroups</a></code>. However,
+filtering a <code>features</code> object may be useful to avoid grouping large
+amounts of features.</p></li>
 <li><p><code>[</code>: Subset on analyses.</p></li>
 <li><p><code>[[</code>: Extract a feature table for an analysis.</p></li>
 <li><p><code>$</code>: Extract a feature table for an analysis.</p></li>
@@ -233,6 +255,22 @@ replicate groups for which data is present in this object.</p></li>
     <dt><code>analysisInfo</code></dt><dd><p>Analysis group information. Use the <code>analysisInfo</code> method
 for access.</p></dd>
 </dl>
+    
+    <h2 class="hasAnchor" id="s-class-hierarchy"><a class="anchor" href="#s-class-hierarchy"></a>S4 class hierarchy</h2>
+
+    <p></p><ul>
+<li><p><code><a href='workflowStep-class.html'>workflowStep</a></code></p><ul>
+<li><p><strong><code>features</code></strong></p><ul>
+<li><p><code><a href='featureGroups-compare.html'>featuresFromFeatGroups</a></code></p></li>
+<li><p><code><a href='featureGroups-compare.html'>featuresConsensus</a></code></p></li>
+<li><p><code>featuresBruker</code></p></li>
+<li><p><code>featuresEnviPick</code></p></li>
+<li><p><code>featuresOpenMS</code></p></li>
+<li><p><code><a href='target-screening.html'>featuresBrukerTASQ</a></code></p></li>
+<li><p><code>featuresXCMS</code></p></li>
+</ul></li>
+</ul></li>
+</ul>
     
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
@@ -252,6 +290,8 @@ for access.</p></dd>
       <li><a href="#methods-by-generic-">Methods (by generic)</a></li>
 
       <li><a href="#slots">Slots</a></li>
+
+      <li><a href="#s-class-hierarchy">S4 class hierarchy</a></li>
 
       <li><a href="#see-also">See also</a></li>
           </ul>

@@ -122,16 +122,16 @@ experiment (DoE).</p>
 <span class='fu'><a href='generics.html'>algorithm</a></span>(<span class='no'>obj</span>)
 
 <span class='co'># S4 method for optimizationResult</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/length'>length</a></span>(<span class='no'>x</span>)
+<span class='fu'><a href='generics.html'>length</a></span>(<span class='no'>x</span>)
 
 <span class='co'># S4 method for optimizationResult</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/lengths'>lengths</a></span>(<span class='no'>x</span>, <span class='kw'>use.names</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+<span class='fu'><a href='generics.html'>lengths</a></span>(<span class='no'>x</span>, <span class='kw'>use.names</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
 
 <span class='co'># S4 method for optimizationResult</span>
-<span class='fu'>show</span>(<span class='no'>object</span>)
+<span class='fu'><a href='generics.html'>show</a></span>(<span class='no'>object</span>)
 
 <span class='co'># S4 method for optimizationResult,ANY</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/graphics/topics/plot'>plot</a></span>(<span class='no'>x</span>, <span class='no'>paramSet</span>, <span class='no'>DoEIteration</span>,
+<span class='fu'><a href='generics.html'>plot</a></span>(<span class='no'>x</span>, <span class='no'>paramSet</span>, <span class='no'>DoEIteration</span>,
   <span class='kw'>paramsToPlot</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>maxCols</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"contour"</span>,
   <span class='kw'>image</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>contours</span> <span class='kw'>=</span> <span class='st'>"colors"</span>, <span class='no'>...</span>)
 
@@ -252,14 +252,14 @@ response.</p></dd>
 <span class='co'># ftOpt is an optimization object.</span>
 
 <span class='co'># plot contour of all parameter pairs from the first parameter set/iteration.</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/graphics/topics/plot'>plot</a></span>(<span class='no'>ftOpt</span>, <span class='kw'>paramSet</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>DoEIteration</span> <span class='kw'>=</span> <span class='fl'>1</span>)
+<span class='fu'><a href='generics.html'>plot</a></span>(<span class='no'>ftOpt</span>, <span class='kw'>paramSet</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>DoEIteration</span> <span class='kw'>=</span> <span class='fl'>1</span>)
 
 <span class='co'># as above, but only plot two parameter pairs</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/graphics/topics/plot'>plot</a></span>(<span class='no'>ftOpt</span>, <span class='kw'>paramSet</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>DoEIteration</span> <span class='kw'>=</span> <span class='fl'>1</span>,
+<span class='fu'><a href='generics.html'>plot</a></span>(<span class='no'>ftOpt</span>, <span class='kw'>paramSet</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>DoEIteration</span> <span class='kw'>=</span> <span class='fl'>1</span>,
      <span class='kw'>paramsToPlot</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"mzPPM"</span>, <span class='st'>"chromFWHM"</span>), <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"chromFWHM"</span>, <span class='st'>"chromSNR"</span>)))
 
 <span class='co'># plot 3d perspective plots</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/graphics/topics/plot'>plot</a></span>(<span class='no'>ftOpt</span>, <span class='kw'>paramSet</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>DoEIteration</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"persp"</span>)
+<span class='fu'><a href='generics.html'>plot</a></span>(<span class='no'>ftOpt</span>, <span class='kw'>paramSet</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>DoEIteration</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"persp"</span>)
 <span class='co'># }</span># NOT RUN {
 # }
 </pre>

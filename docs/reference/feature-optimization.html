@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Optimizatation of feature finding and grouping parameters — feature-optimization • patRoon</title>
+<title>Optimization of feature finding and grouping parameters — feature-optimization • patRoon</title>
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -30,9 +30,9 @@
 
 
 
-<meta property="og:title" content="Optimizatation of feature finding and grouping parameters — feature-optimization" />
+<meta property="og:title" content="Optimization of feature finding and grouping parameters — feature-optimization" />
 
-<meta property="og:description" content="Automatic optimizatation of feature finding and grouping parameters through
+<meta property="og:description" content="Automatic optimization of feature finding and grouping parameters through
 Design of Experiments (DoE)." />
 <meta name="twitter:card" content="summary" />
 
@@ -106,14 +106,14 @@ Design of Experiments (DoE)." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Optimizatation of feature finding and grouping parameters</h1>
+    <h1>Optimization of feature finding and grouping parameters</h1>
     <small class="dont-index">Source: <a href='https://github.com/rickhelmus/patRoon/blob/master/R/main.R'><code>R/main.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/feature_groups-optimize.R'><code>R/feature_groups-optimize.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/features-optimize.R'><code>R/features-optimize.R</code></a></small>
     <div class="hidden name"><code>feature-optimization.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>Automatic optimizatation of feature finding and grouping parameters through
+    <p>Automatic optimization of feature finding and grouping parameters through
 Design of Experiments (DoE).</p>
     
     </div>
@@ -138,6 +138,11 @@ Design of Experiments (DoE).</p>
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>features</th>
+      <td><p>A <code><a href='features-class.html'>features</a></code> object with the features that should
+be used to optimize grouping.</p></td>
+    </tr>
     <tr>
       <th>algorithm</th>
       <td><p>Which algorithm should be used for feature finding/grouping
@@ -175,6 +180,11 @@ optimization procedures. In IPO this was fixed to <samp>50</samp>.</p></td>
 optimization model</code> section below.</p></td>
     </tr>
     <tr>
+      <th>anaInfo</th>
+      <td><p><a href='analysis-information.html'>Analysis info table</a> (passed
+to <code><a href='feature-finding.html'>findFeatures</a></code>).</p></td>
+    </tr>
+    <tr>
       <th>isoIdent</th>
       <td><p>Sets the algorithm used to identify isotopes. Valid values
 are: <code>"IPO"</code>, <code>"CAMERA"</code> and <code>"OpenMS"</code>. The latter can only
@@ -195,11 +205,6 @@ if <code>isoIdent="IPO"</code>. Valid values: <code>"none"</code>,
     <tr>
       <th>method</th>
       <td><p>Method used by XCMS to find features (only if <code>algorithm="xcms"</code>).</p></td>
-    </tr>
-    <tr>
-      <th>analysisInfo</th>
-      <td><p><a href='analysis-information.html'>Analysis info table</a> (passed
-to <code><a href='feature-finding.html'>findFeatures</a></code>).</p></td>
     </tr>
     </table>
     
@@ -290,14 +295,14 @@ finding/grouping.</p></li>
     <p>The <code>optimizeFeatureFinding</code> and
   <code>optimizeFeatureGrouping</code> are the functions to be used to optimize
   parameters for feature finding and grouping, respectively. These functions
-  are analogous to <code>optimizeXcmsSet</code> and
-  <code>optimizeRetGroup</code> from <span class="pkg">IPO</span>.</p>
+  are analogous to <code><a href='https://www.rdocumentation.org/packages/IPO/topics/optimizeXcmsSet'>optimizeXcmsSet</a></code> and
+  <code><a href='https://www.rdocumentation.org/packages/IPO/topics/optimizeRetGroup'>optimizeRetGroup</a></code> from <span class="pkg">IPO</span>.</p>
 <p>The <code>generateFeatureOptPSet</code> and <code>generateFGroupsOptPSet</code> functions
   may be used to generate a parameter set for feature finding and grouping,
   respectively. Some algorithm dependent default parameter optimization ranges
   will be returned. These functions are analogous to
-  <code>getDefaultXcmsSetStartingParams</code> and
-  <code>getDefaultRetGroupStartingParams</code> from <span class="pkg">IPO</span>. However,
+  <code><a href='https://www.rdocumentation.org/packages/IPO/topics/getDefaultXcmsSetStartingParams'>getDefaultXcmsSetStartingParams</a></code> and
+  <code><a href='https://www.rdocumentation.org/packages/IPO/topics/getDefaultRetGroupStartingParams'>getDefaultRetGroupStartingParams</a></code> from <span class="pkg">IPO</span>. However,
   unlike their IPO counterparts, these functions will not output default fixed
   values. The <code>generateFGroupsOptPSet</code> will only generate defaults for
   density grouping if <code>algorithm="xcms"</code>.</p>
@@ -358,7 +363,7 @@ doi: <a href='http://doi.org/10.1186/s12859-015-0562-8'>10.1186/s12859-015-0562-
                                       <span class='kw'>retcorArgs</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"obiwarp"</span>)))
 
 <span class='co'># plot contour of first parameter set/DoE iteration</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/graphics/topics/plot'>plot</a></span>(<span class='no'>ftOpt</span>, <span class='kw'>paramSet</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>DoEIteration</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"contour"</span>)
+<span class='fu'><a href='generics.html'>plot</a></span>(<span class='no'>ftOpt</span>, <span class='kw'>paramSet</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>DoEIteration</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"contour"</span>)
 
 <span class='co'># generate parameter set with some predefined and custom parameters to be</span>
 <span class='co'># optimized.</span>

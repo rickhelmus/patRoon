@@ -122,10 +122,11 @@ groups.</p>
 <span class='fu'>generateFormulas</span>(<span class='no'>fGroups</span>, <span class='no'>algorithm</span>, <span class='no'>...</span>)
 
 <span class='fu'>generateFormulasDA</span>(<span class='no'>fGroups</span>, <span class='kw'>precursorMzSearchWindow</span> <span class='kw'>=</span> <span class='fl'>0.002</span>,
-  <span class='kw'>MSMode</span> <span class='kw'>=</span> <span class='st'>"both"</span>, <span class='kw'>featThreshold</span> <span class='kw'>=</span> <span class='fl'>0.75</span>, <span class='kw'>save</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>close</span> <span class='kw'>=</span> <span class='no'>save</span>)
+  <span class='kw'>MSMode</span> <span class='kw'>=</span> <span class='st'>"both"</span>, <span class='no'>adduct</span>, <span class='kw'>featThreshold</span> <span class='kw'>=</span> <span class='fl'>0.75</span>, <span class='kw'>save</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>close</span> <span class='kw'>=</span> <span class='no'>save</span>)
 
 <span class='fu'>generateFormulasGenForm</span>(<span class='no'>fGroups</span>, <span class='no'>MSPeakLists</span>, <span class='kw'>maxMzDev</span> <span class='kw'>=</span> <span class='fl'>5</span>,
-  <span class='kw'>adduct</span> <span class='kw'>=</span> <span class='st'>"M+H"</span>, <span class='kw'>elements</span> <span class='kw'>=</span> <span class='st'>"CHNOP"</span>, <span class='kw'>hetero</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>oc</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>adduct</span> <span class='kw'>=</span> <span class='st'>"[M+H]+"</span>, <span class='kw'>elements</span> <span class='kw'>=</span> <span class='st'>"CHNOP"</span>, <span class='kw'>hetero</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>oc</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>extraOpts</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>calculateFeatures</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>featThreshold</span> <span class='kw'>=</span> <span class='fl'>0.75</span>,
   <span class='kw'>MSMode</span> <span class='kw'>=</span> <span class='st'>"both"</span>, <span class='kw'>maxProcAmount</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/options'>getOption</a></span>(<span class='st'>"patRoon.maxProcAmount"</span>),
   <span class='kw'>maxCmdsPerProc</span> <span class='kw'>=</span> <span class='fl'>25</span>)
@@ -134,8 +135,9 @@ groups.</p>
 
 <span class='fu'>generateFormulasSirius</span>(<span class='no'>fGroups</span>, <span class='no'>MSPeakLists</span>, <span class='kw'>maxMzDev</span> <span class='kw'>=</span> <span class='fl'>5</span>,
   <span class='kw'>adduct</span> <span class='kw'>=</span> <span class='st'>"[M+H]+"</span>, <span class='kw'>elements</span> <span class='kw'>=</span> <span class='st'>"CHNOP"</span>, <span class='kw'>profile</span> <span class='kw'>=</span> <span class='st'>"qtof"</span>,
-  <span class='kw'>database</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>noise</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>calculateFeatures</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>featThreshold</span> <span class='kw'>=</span> <span class='fl'>0.75</span>, <span class='kw'>logPath</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/file.path'>file.path</a></span>(<span class='st'>"log"</span>, <span class='st'>"sirius"</span>),
+  <span class='kw'>database</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>noise</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>topMost</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='kw'>extraOpts</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>calculateFeatures</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>featThreshold</span> <span class='kw'>=</span> <span class='fl'>0.75</span>,
+  <span class='kw'>logPath</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/file.path'>file.path</a></span>(<span class='st'>"log"</span>, <span class='st'>"sirius"</span>),
   <span class='kw'>maxProcAmount</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/options'>getOption</a></span>(<span class='st'>"patRoon.maxProcAmount"</span>))</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -175,6 +177,12 @@ Formulae calculated from MS data that were also generated from MS/MS data
 will be removed.</p></td>
     </tr>
     <tr>
+      <th>adduct</th>
+      <td><p>An <code><a href='adduct-class.html'>adduct</a></code> object (or something that can be
+converted to it with <code><a href='adduct-utils.html'>as.adduct</a></code>). Examples: <code>"[M-H]-"</code>,
+<code>"[M+Na]+"</code>.</p></td>
+    </tr>
+    <tr>
       <th>featThreshold</th>
       <td><p>If <code>calculateFeatures=TRUE</code>: minimum presence
 (<samp>0-1</samp>) of a formula in all features before it is considered as a
@@ -204,19 +212,6 @@ the supplied <code>fGroups</code>.</p></td>
 <code class='command'>SIRIUS</code>, respectively.</p></td>
     </tr>
     <tr>
-      <th>adduct</th>
-      <td><p>Sets the adduct form of measured ions. For
-<code>generateFormulasGenForm</code> the format is without brackets and charges
-(based on
-<a href='http://fiehnlab.ucdavis.edu/staff/kind/Metabolomics/MS-Adduct-Calculator'>this
- website</a>), examples: <code>"M+H"</code>, <code>"M-H"</code>, <code>"M+Na"</code>,
-<code>"M-e"</code>. For <code>generateFormulasSirius</code> the format is with brackets
-and charge, for example: <code>"[M+H]+"</code>, <code>"[M-H]-"</code>,
-<code>"[M+Na]+"</code>, <code>"[M]+"</code>. Sets the <span class="option">ion</span> and <span class="option">--ion</span>
-commandline options for <code class='command'>GenForm</code> and <code class='command'>SIRIUS</code>,
-respectively.</p></td>
-    </tr>
-    <tr>
       <th>elements</th>
       <td><p>Elements to be considered for formulae calculation. This will
 heavily affects the number of candidates! Always try to work with a minimal
@@ -242,8 +237,9 @@ carbon atom). Sets the <span class="option">oc</span> commandline option.</p></t
     <tr>
       <th>extraOpts</th>
       <td><p>An optional character vector with any other commandline
-options that will be passed to <code class='command'>GenForm</code>. See the <code>GenForm
-options</code> section for all available commandline options.</p></td>
+options that will be passed to <code class='command'>GenForm</code> or <code class='command'>SIRIUS</code>. See
+the <code>GenForm options</code> section/SIRIUS manual for all available
+commandline options.</p></td>
     </tr>
     <tr>
       <th>calculateFeatures</th>
@@ -279,6 +275,11 @@ option.</p></td>
       <th>noise</th>
       <td><p>Median intensity of the noise (<code>NULL</code> ignores this
 parameter). Sets the <span class="option">--noise</span> commandline option.</p></td>
+    </tr>
+    <tr>
+      <th>topMost</th>
+      <td><p>Only keep this number of candidates (per feature group) with
+highest score. Sets the <span class="option">--candidates</span> commandline option.</p></td>
     </tr>
     <tr>
       <th>logPath</th>
@@ -347,7 +348,11 @@ DataAnalysis always occurs on 'feature level'.</p>
     
     <h2 class="hasAnchor" id="note"><a class="anchor" href="#note"></a>Note</h2>
 
-    <p><code>generateFormulasGenForm</code> always sets the <span class="option">exist</span> and
+    <p>If any errors related to <code class='command'>DCOM</code> appear it might be necessary to
+  terminate DataAnalysis (note that DataAnalysis might still be running as a
+  background process). The <code class='command'>ProcessCleaner</code> application installed
+  with DataAnalayis can be used for this.</p>
+<p><code>generateFormulasGenForm</code> always sets the <span class="option">exist</span> and
   <span class="option">oei</span> <code class='command'>GenForm</code> commandline options.</p>
     
     <h2 class="hasAnchor" id="scorings"><a class="anchor" href="#scorings"></a>Scorings</h2>
@@ -369,6 +374,77 @@ DataAnalysis always occurs on 'feature level'.</p>
 <tr><td>-</td><td>How well MS/MS data matches</td><td></td><td>score</td><td>-</td></tr>
 <tr><td>score</td><td>Score</td><td>Overall MS formula score</td><td></td><td></td></tr>
 </table></p>
+    
+    <h2 class="hasAnchor" id="genform-options"><a class="anchor" href="#genform-options"></a>GenForm options</h2>
+
+    <p>Below is a list of options (generated by running
+  <code class='command'>GenForm</code> without commandline options) which can be set by the
+  <code>extraOpts</code> parameter.</p>
+<p></p><pre>Formula calculation from MS and MS/MS data as described in
+Meringer et al (2011) MATCH Commun Math Comput Chem 65: 259-290
+Usage: GenForm ms=&lt;filename&gt; [msms=&lt;filename&gt;] [out=&lt;filename&gt;]
+        [exist[=mv]] [m=&lt;number&gt;] [ion=-e|+e|-H|+H|+Na] [cha=&lt;number&gt;]
+        [ppm=&lt;number&gt;] [msmv=ndp|nsse|nsae] [acc=&lt;number&gt;] [rej=&lt;number&gt;]
+        [thms=&lt;number&gt;] [thmsms=&lt;number&gt;] [thcomb=&lt;number&gt;]
+        [sort[=ppm|msmv|msmsmv|combmv]] [el=&lt;elements&gt; [oc]] [ff=&lt;fuzzy formula&gt;]
+        [vsp[=&lt;even|odd&gt;]] [vsm2mv[=&lt;value&gt;]] [vsm2ap2[=&lt;value&gt;]] [hcf]
+        [wm[=lin|sqrt|log]] [wi[=lin|sqrt|log]] [exp=&lt;number&gt;] [oei]
+        [dbeexc=&lt;number&gt;] [ivsm2mv=&lt;number&gt;] [vsm2ap2=&lt;number&gt;]
+        [oms[=&lt;filename&gt;]] [omsms[=&lt;filename&gt;]] [oclean[=&lt;filename&gt;]]
+        [analyze [loss] [intens]] [dbe] [cm] [pc] [sc]
+Explanation:
+        ms      : filename of MS data (*.txt)
+        msms    : filename of MS/MS data (*.txt)
+        out     : output generated formulas
+        exist   : allow only molecular formulas for that at least one
+                  structural formula exists;overrides vsp, vsm2mv, vsm2ap2;
+                  argument mv enables multiple valencies for P and S
+        m       : experimental molecular mass (default: mass of MS basepeak)
+        ion     : type of ion measured (default: M+H)
+        ppm     : accuracy of measurement in parts per million (default: 5)
+        msmv    : MS match value based on normalized dot product, normalized
+                  sum of squared or absolute errors (default: nsae)
+        acc     : allowed deviation for full acceptance of MS/MS peak in ppm
+                  (default: 2)
+        rej     : allowed deviation for total rejection of MS/MS peak in ppm
+                  (default: 4)
+        thms    : threshold for the MS match value
+        thmsms  : threshold for the MS/MS match value
+        thcomb  : threshold for the combined match value
+        sort    : sort generated formulas according to mass deviation in ppm,
+                  MS match value, MS/MS match value or combined match value
+        el      : used chemical elements (default: CHBrClFINOPSSi)
+        oc      : only organic compounds, i.e. with at least one C atom
+        ff      : overwrites el and oc and uses fuzzy formula for limits of
+                  element multiplicities
+        het     : formulas must have at least one hetero atom
+        vsp     : valency sum parity (even for graphical formulas)
+        vsm2mv  : lower bound for valency sum - 2 * maximum valency
+                  (&gt;=0 for graphical formulas)
+        vsm2ap2 : lower bound for valency sum - 2 * number of atoms + 2
+                  (&gt;=0 for graphical connected formulas)
+        hcf     : apply Heuerding-Clerc filter
+        wm      : m/z weighting for MS/MS match value
+        wi      : intensity weighting for MS/MS match value
+        exp     : exponent used, when wi is set to log
+        oei     : allow odd electron ions for explaining MS/MS peaks
+        dbeexc  : excess of double bond equivalent for ions
+        ivsm2mv : lower bound for valency sum - 2 * maximum valency
+                  for fragment ions
+        ivsm2ap2: lower bound for valency sum - 2 * number of atoms + 2
+                  for fragment ions
+        oms     : write scaled MS peaks to output
+        omsms   : write weighted MS/MS peaks to output
+        oclean  : write explained MS/MS peaks to output
+        analyze : write explanations for MS/MS peaks to output
+        loss    : for analyzing MS/MS peaks write losses instead of fragments
+        intens  : write intensities of MS/MS peaks to output
+        dbe     : write double bond equivalents to output
+        cm      : write calculated ion masses to output
+        pc      : output match values in percent
+        sc      : strip calculated isotope distributions
+        noref   : hide the reference information
+</pre>
     
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
@@ -406,6 +482,8 @@ doi: <a href='http://doi.org/10.1093/bioinformatics/btn603'>10.1093/bioinformati
       <li><a href="#note">Note</a></li>
 
       <li><a href="#scorings">Scorings</a></li>
+
+      <li><a href="#genform-options">GenForm options</a></li>
 
       <li><a href="#references">References</a></li>
 

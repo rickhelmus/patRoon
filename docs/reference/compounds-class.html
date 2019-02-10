@@ -106,7 +106,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Compound lists class</h1>
-    <small class="dont-index">Source: <a href='https://github.com/rickhelmus/patRoon/blob/master/R/compounds.R'><code>R/compounds.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/compounds-cluster.R'><code>R/compounds-cluster.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/rickhelmus/patRoon/blob/master/R/compounds.R'><code>R/compounds.R</code></a></small>
     <div class="hidden name"><code>compounds-class.Rd</code></div>
     </div>
 
@@ -141,12 +141,18 @@ show(object)
 $(x, name)
 
 # S4 method for compounds
+as.data.table(x, fGroups = NULL,
+  fragments = FALSE, normalizeScores = "none",
+  excludeNormScores = NULL)
+
+# S4 method for compounds
 identifiers(compounds)
 
 # S4 method for compounds
 filter(obj, minExplainedPeaks = NULL,
   minScore = NULL, minFragScore = NULL, minFormulaScore = NULL,
-  topMost = NULL)
+  scoreLimits = NULL, elements = NULL, fragElements = NULL,
+  lossElements = NULL, topMost = NULL)
 
 # S4 method for compounds
 addFormulaScoring(compounds, formulas,
@@ -161,20 +167,26 @@ plotStructure(obj, index, groupName, width = 500,
 
 # S4 method for compounds
 plotScores(obj, index, groupName,
-  normalizeScores = "max", excludeNormScores = NULL,
+  normalizeScores = "max", excludeNormScores = NULL, onlyUsed = TRUE,
   useGGPlot2 = FALSE)
 
 # S4 method for compounds
 plotSpec(obj, index, groupName, MSPeakLists,
-  formulas = NULL, plotStruct = TRUE, useGGPlot2 = FALSE)
+  formulas = NULL, plotStruct = TRUE, title = NULL,
+  useGGPlot2 = FALSE, xlim = NULL, ylim = NULL, ...)
+
+# S4 method for compounds
+plotVenn(obj, ..., labels = NULL,
+  vennArgs = NULL)
+
+# S4 method for compounds
+plotUpSet(obj, ..., labels = NULL,
+  nsets = length(list(...)) + 1, nintersects = NA, upsetArgs = NULL)
 
 # S4 method for compounds
 consensus(obj, ..., compThreshold = 0,
-  minMaxNormalization = TRUE, mergeScoresFunc = sum)
-
-# S4 method for compoundsCluster,ANY,missing,missing
-[(x, i, j, ...,
-  drop = TRUE)</pre>
+  uniqueFrom = NULL, uniqueOuter = FALSE,
+  minMaxNormalization = FALSE, mergeScoresFunc = sum)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -187,12 +199,13 @@ consensus(obj, ..., compThreshold = 0,
       <th>i</th>
       <td><p>A numeric or character value which is used to select feature groups by
 their index or name, respectively (for the order/names see <code><a href='generics.html'>groupNames()</a></code>).<br /><br /> For <code>[</code>: Can also be logical to perform logical selection
-(similar to regular vectors). If missing all feature groups are selected.<br /><br /> For <code>[[</code>: should be a skalar value.</p></td>
+(similar to regular vectors). If missing all feature groups are selected.<br /><br /> For <code>[[</code>: should be a scalar value.</p></td>
     </tr>
     <tr>
       <th>&#8230;</th>
-      <td><p><code>compounds</code> objects that should be used to generate the
-consensus.</p></td>
+      <td><p>For <code>plotSpec</code>: Further arguments passed to
+  <code><a href='https://www.rdocumentation.org/packages/graphics/topics/plot'>plot</a></code>.</p>
+<p>Others: Any further (and unique) <code>compounds</code> objects.</p></td>
     </tr>
     <tr>
       <th>drop, j</th>
@@ -203,10 +216,75 @@ consensus.</p></td>
       <td><p>The feature group name (partially matched).</p></td>
     </tr>
     <tr>
+      <th>fGroups</th>
+      <td><p>The <code><a href='featureGroups-class.html'>featureGroups</a></code> object that was used to
+generate this object. If not <code>NULL</code> it is used to add feature group
+information (retention and <em>m/z</em> values).</p></td>
+    </tr>
+    <tr>
+      <th>fragments</th>
+      <td><p>If <code>TRUE</code> then information on annotated fragments will
+be included.</p></td>
+    </tr>
+    <tr>
+      <th>normalizeScores</th>
+      <td><p>A <code>character</code> that specifies how normalization of
+compound scorings occurs. Either <code>"none"</code> (no normalization),
+<code>"max"</code> (normalize to max value) or <code>"minmax"</code> (perform min-max
+normalization). Note that normalization of negative scores (e.g. output by
+SIRIUS) is always performed as min-max. Furthermore, currently
+normalization takes the original scoring min/max values into account when
+candidates were generated. Thus, normalization is not affected when
+candidate results were removed after they were generated (<em>e.g.</em> by
+use of <code>filter</code>).</p></td>
+    </tr>
+    <tr>
+      <th>excludeNormScores</th>
+      <td><p>A <code>character</code> vector specifying any compound
+scoring names that should <em>not</em> be normalized. Set to <code>NULL</code> to
+normalize all scorings. Note that whether any normalization occurs is set
+by the <code>excludeNormScores</code> argument.</p></td>
+    </tr>
+    <tr>
       <th>minExplainedPeaks, minScore, minFragScore, minFormulaScore</th>
       <td><p>Minimal number
 of explained peaks, overall score, in-silico fragmentation score and
-formula score, respectively. Set to <code>NULL</code> to ignore.</p></td>
+formula score, respectively. Set to <code>NULL</code> to ignore. The
+<code>scoreLimits</code> argument allows for more advanced score filtering.</p></td>
+    </tr>
+    <tr>
+      <th>scoreLimits</th>
+      <td><p>Filter results by their scores. Should be a named
+<code>list</code> that contains two-sized numeric vectors with the
+minimum/maximum value of a score (use <code>-Inf</code>/<code>Inf</code> for no
+limits). The names of each element should follow the values returned by
+<code><a href='compound-generation.html'>compoundScorings</a>()$name</code>. For instance,
+<code>scoreLimits=list(numberPatents=c(10, Inf))</code> specifies that
+<code>numberPatents</code> should be at least <samp>10</samp>. For more details of
+scorings see <code><a href='compound-generation.html'>compoundScorings</a></code>. Note that a result without a
+specified scoring is never removed. Set to <code>NULL</code> to skip this filter.</p></td>
+    </tr>
+    <tr>
+      <th>elements</th>
+      <td><p>Only retain candidate formulae (neutral form) that match a
+given elemental restriction. The format of <code>elements</code> is a
+<code>character</code> string with elements that should be present where each
+element is followed by a valid amount or a range thereof. If no number is
+specified then <samp>1</samp> is assumed. For instance,
+<code>elements="C1-10H2-20O0-2P"</code>, specifies that <samp>1-10</samp>, <samp>2-20</samp>,
+<samp>0-2</samp> and <samp>1</samp> carbon, hydrogen, oxygen and phosphorus atoms
+should be present, respectively. When <code>length(elements)&gt;1</code> formulas
+are tested to follow at least one of the given elemental restrictions. For
+instance, <code>elements=c("P", "S")</code> specifies that either one phosphorus
+or one sulphur atom should be present. Set to <code>NULL</code> to ignore this
+filter.</p></td>
+    </tr>
+    <tr>
+      <th>fragElements, lossElements</th>
+      <td><p>Specifies elemental restrictions for
+fragment or neutral loss formulae (charged form). Candidates are retained
+if at least one of the fragment formulae follow the given restrictions. See
+<code>elements</code> for the used format.</p></td>
     </tr>
     <tr>
       <th>topMost</th>
@@ -215,9 +293,8 @@ score. Set to <code>NULL</code> to ignore.</p></td>
     </tr>
     <tr>
       <th>formulas</th>
-      <td><p>The <code><a href='formulas-class.html'>formulas</a></code> object that should be
-used for scoring/annotation. For <code>plotSpec</code>: set to <code>NULL</code> to
-ignore.</p></td>
+      <td><p>The <code><a href='formulas-class.html'>formulas</a></code> object that should be used for
+scoring/annotation. For <code>plotSpec</code>: set to <code>NULL</code> to ignore.</p></td>
     </tr>
     <tr>
       <th>updateScore</th>
@@ -258,19 +335,10 @@ allows nicely repelled text for annotation. However, base plot is generally
 faster.</p></td>
     </tr>
     <tr>
-      <th>normalizeScores</th>
-      <td><p>A <code>character</code> that specifies how normalization of
-compound scorings occurs. Either <code>"none"</code> (no normalization),
-<code>"max"</code> (normalize to max value) or <code>"minmax"</code> (perform min-max
-normalization). Note that normalization of negative scores (e.g. output by
-SIRIUS) is always performed as min-max.</p></td>
-    </tr>
-    <tr>
-      <th>excludeNormScores</th>
-      <td><p>A <code>character</code> vector specifying any compound
-scoring names that should <em>not</em> be normalized. Set to <code>NULL</code> to
-normalize all scorings. Note that whether any normalization occurs is set
-by the <code>excludeNormScores</code> argument.</p></td>
+      <th>onlyUsed</th>
+      <td><p>If <code>TRUE</code> then only scorings are plotted that actually
+have been used to rank data (see the <code>scoreTypes</code> argument to
+<code><a href='compound-generation.html'>generateCompoundsMetfrag</a></code> for more details).</p></td>
     </tr>
     <tr>
       <th>MSPeakLists</th>
@@ -283,9 +351,58 @@ generate the candidate</p></td>
 spectrum.</p></td>
     </tr>
     <tr>
+      <th>title</th>
+      <td><p>The title of the plot. If <code>NULL</code> a title will be
+automatically made.</p></td>
+    </tr>
+    <tr>
+      <th>xlim, ylim</th>
+      <td><p>Sets the plot size limits used by
+<code><a href='https://www.rdocumentation.org/packages/graphics/topics/plot'>plot</a></code>. Set to <code>NULL</code> for automatic plot sizing.</p></td>
+    </tr>
+    <tr>
+      <th>labels</th>
+      <td><p>A <code>character</code> with names to use for labelling. If
+<code>NULL</code> labels are automatically generated.</p></td>
+    </tr>
+    <tr>
+      <th>vennArgs</th>
+      <td><p>A <code>list</code> with further arguments passed to
+<span class="pkg">VennDiagram</span> plotting functions. Set to <code>NULL</code> to ignore.</p></td>
+    </tr>
+    <tr>
+      <th>nsets</th>
+      <td><p>See <code><a href='https://www.rdocumentation.org/packages/UpSetR/topics/upset'>upset</a></code>.</p></td>
+    </tr>
+    <tr>
+      <th>nintersects</th>
+      <td><p>See <code><a href='https://www.rdocumentation.org/packages/UpSetR/topics/upset'>upset</a></code>.</p></td>
+    </tr>
+    <tr>
+      <th>upsetArgs</th>
+      <td><p>A list with any further arguments to be passed to
+<code><a href='https://www.rdocumentation.org/packages/UpSetR/topics/upset'>upset</a></code>. Set to <code>NULL</code> to ignore.</p></td>
+    </tr>
+    <tr>
       <th>compThreshold</th>
       <td><p>Minimal fraction (0-1) that a candidate must be present
 within all given <code>compounds</code> objects.</p></td>
+    </tr>
+    <tr>
+      <th>uniqueFrom</th>
+      <td><p>Set this argument to only retain compounds that are unique
+within one or more of the objects for which the consensus is made.
+Selection is done by setting the value of <code>uniqueFrom</code> to a
+<code>logical</code> (values are recycled), <code>numeric</code> (select by index) or a
+<code>character</code> (as obtained with <code><a href='generics.html'>algorithm(obj)</a></code>). For
+<code>logical</code> and <code>numeric</code> values the order corresponds to the order
+of the objects given for the consensus. Set to <code>NULL</code> to ignore.</p></td>
+    </tr>
+    <tr>
+      <th>uniqueOuter</th>
+      <td><p>If <code>uniqueFrom</code> is not <code>NULL</code> and if
+<code>uniqueOuter=TRUE</code>: only retain data that are also unique between
+objects specified in <code>uniqueFrom</code>.</p></td>
     </tr>
     <tr>
       <th>minMaxNormalization</th>
@@ -314,6 +431,16 @@ normalized.</p></td>
   with formula scoring.</p>
 <p><code>getMCS</code> returns an <a href='https://CRAN.R-project.org/package=rcdk'><span class="pkg">rcdk</span></a> molecule object
   (<code>IAtomContainer</code>).</p>
+<p><code>plotVenn</code> (invisibly) returns a list with the following fields:</p><ul>
+<li><p><code>gList</code> the <code>gList</code> object that was returned by
+  the utilized <span class="pkg">VennDiagram</span> plotting function.</p></li>
+<li><p><code>areas</code> The total area for each plotted group.</p></li>
+<li><p><code>intersectionCounts</code> The number of intersections between groups.</p></li>
+</ul>
+
+<p>The order for the <code>areas</code> and <code>intersectionCounts</code> fields is the same as the parameter order
+from the used plotting function (see <em>e.g.</em> <code>draw.pairwise.venn</code> and
+<code>draw.triple.venn</code>).</p>
 <p><code>consensus</code> returns a <code>compounds</code> object that is produced
   by merging multiple specified <code>compounds</code> objects.</p>
     
@@ -335,6 +462,7 @@ feature groups for which data is present in this object.</p></li>
 <li><p><code>[</code>: Subset on feature groups.</p></li>
 <li><p><code>[[</code>: Extract a compound table for a feature group.</p></li>
 <li><p><code>$</code>: Extract a compound table for a feature group.</p></li>
+<li><p><code>as.data.table</code>: Returns all MS peak list data in a table.</p></li>
 <li><p><code>identifiers</code>: Returns a list containing for each feature group a
 character vector with database identifiers for all candidate compounds. The
 list is named by feature group names, and is typically used with the
@@ -355,11 +483,17 @@ substructure (MCS) of the selected candidates is drawn.</p></li>
 <li><p><code>plotScores</code>: Plots a barplot with scoring of a candidate compound.</p></li>
 <li><p><code>plotSpec</code>: Plots an annotated spectrum for a given candidate
 compound of a feature group.</p></li>
+<li><p><code>plotVenn</code>: plots a Venn diagram (using <span class="pkg">VennDiagram</span>)
+outlining unique and shared compound candidates of up to five different
+<code>compounds</code> objects. Comparison is made on <code>InChIKey1</code>.</p></li>
+<li><p><code>plotUpSet</code>: plots an UpSet diagram (using the
+<code><a href='https://www.rdocumentation.org/packages/UpSetR/topics/upset'>upset</a></code> function) outlining unique and shared compound
+candidates between different <code>compounds</code> objects. Comparison is made
+on <code>InChIKey1</code>.</p></li>
 <li><p><code>consensus</code>: Generates a consensus from multiple <code>compounds</code>
 objects. The compound results will be merged and optionally compounds will
 be filtered by their occurrence throughout the specified <code>compounds</code>
 objects.</p></li>
-<li><p><code>[</code>: Subset on feature groups.</p></li>
 </ul>
     
     <h2 class="hasAnchor" id="slots"><a class="anchor" href="#slots"></a>Slots</h2>
@@ -368,13 +502,43 @@ objects.</p></li>
     <dl class='dl-horizontal'>
 <dt><code>compounds</code></dt><dd><p>Lists of all generated compounds. Use the <code>compounds</code>
 method for access.</p></dd>
-    <dt><code>algorithm</code></dt><dd><p>The algorithm that was used for generation of compounds. Use
-the <code>algorithm</code> method for access.</p></dd>
+    <dt><code>scoreTypes</code></dt><dd><p>A <code>character</code> with all the score types that were used
+when generating the compounds.</p></dd>
+    <dt><code>scoreRanges</code></dt><dd><p>The original min/max values of all scorings when candidate
+results were generated. This is used for normalization.</p></dd>
 </dl>
+    
+    <h2 class="hasAnchor" id="s-class-hierarchy"><a class="anchor" href="#s-class-hierarchy"></a>S4 class hierarchy</h2>
+
+    <p></p><ul>
+<li><p><code><a href='workflowStep-class.html'>workflowStep</a></code></p><ul>
+<li><p><strong><code>compounds</code></strong></p><ul>
+<li><p><code>compoundsConsensus</code></p></li>
+<li><p><code><a href='compoundsMF-class.html'>compoundsMF</a></code></p></li>
+</ul></li>
+</ul></li>
+</ul>
+    
+    <h2 class="hasAnchor" id="source"><a class="anchor" href="#source"></a>Source</h2>
+
+    <p>Subscripting of formulae for plots generated by
+  <code>plotSpec</code> is based on the <code>chemistry2expression</code> function from
+  the <a href='https://github.com/schymane/ReSOLUTION'>ReSOLUTION</a> package.</p>
     
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
     <p>Guha, R. (2007). 'Chemical Informatics Functionality in R'. Journal of Statistical Software 6(18)</p>
+<p>Conway JR, Lex A, Gehlenborg N (2017).
+&#8220;UpSetR: an R package for the visualization of intersecting sets and their properties.&#8221;
+<em>Bioinformatics</em>, <b>33</b>(18), 2938-2940.
+doi: <a href='http://doi.org/10.1093/bioinformatics/btx364'>10.1093/bioinformatics/btx364</a>
+, <a href='http://dx.doi.org/10.1093/bioinformatics/btx364'>http://dx.doi.org/10.1093/bioinformatics/btx364</a>.
+ <br /><br />
+  Lex A, Gehlenborg N, Strobelt H, Vuillemot R, Pfister H (2014).
+&#8220;UpSet: Visualization of Intersecting Sets.&#8221;
+<em>IEEE Transactions on Visualization and Computer Graphics</em>, <b>20</b>(12), 1983--1992.
+doi: <a href='http://doi.org/10.1109/tvcg.2014.2346248'>10.1109/tvcg.2014.2346248</a>
+, <a href='https://doi.org/10.1109/tvcg.2014.2346248'>https://doi.org/10.1109/tvcg.2014.2346248</a>.</p>
     
 
   </div>
@@ -390,6 +554,10 @@ the <code>algorithm</code> method for access.</p></dd>
       <li><a href="#methods-by-generic-">Methods (by generic)</a></li>
 
       <li><a href="#slots">Slots</a></li>
+
+      <li><a href="#s-class-hierarchy">S4 class hierarchy</a></li>
+
+      <li><a href="#source">Source</a></li>
 
       <li><a href="#references">References</a></li>
           </ul>

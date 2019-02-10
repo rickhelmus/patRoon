@@ -126,7 +126,7 @@ interface (GUI).</p>
 <span class='fu'>compoundViewer</span>(<span class='no'>fGroups</span>,
   <span class='no'>MSPeakLists</span>, <span class='no'>compounds</span>)
 
-<span class='fu'>newProject</span>()</pre>
+<span class='fu'>newProject</span>(<span class='kw'>destPath</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -155,6 +155,11 @@ groups are considered to be kept.</p></td>
       <th>compounds</th>
       <td><p>A <code><a href='compounds-class.html'>compounds</a></code> object.</p></td>
     </tr>
+    <tr>
+      <th>destPath</th>
+      <td><p>Set destination path value to this value (useful for
+debugging). Set to <code>NULL</code> for a default value.</p></td>
+    </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
@@ -165,7 +170,7 @@ groups are considered to be kept.</p></td>
   subsequent calls to <code>checkChromatograms</code> in order to restore the
   keep/not keep state from a previous call. To actually remove unwanted
   feature groups the object should be subset by the subsetting
-  (<code><a href='https://www.rdocumentation.org/packages/base/topics/Extract'>[</a></code>) operator to which the return value should be passed as
+  (<code><a href='generics.html'>[</a></code>) operator to which the return value should be passed as
   the second parameter.</p>
     
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
@@ -188,8 +193,8 @@ groups are considered to be kept.</p></td>
   parameters. This function requires to be run within a
   <a href='https://www.rstudio.com/'>RStudio</a> session. The resulting script is
   either added to the current open file or to a new file. The
-  <a href='analysis-information.html'>analysis information</a> will be written to a <code class="file">.csv</code>
-  file so that it can easily be modified afterwards.</p>
+  <a href='analysis-information.html'>analysis information</a> will be written to a
+  <code class="file">.csv</code> file so that it can easily be modified afterwards.</p>
     
 
   </div>

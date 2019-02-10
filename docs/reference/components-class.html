@@ -107,7 +107,7 @@ components commonly include adducts, isotopes and homologues." />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Component class</h1>
-    <small class="dont-index">Source: <a href='https://github.com/rickhelmus/patRoon/blob/master/R/components.R'><code>R/components.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/rickhelmus/patRoon/blob/master/R/components.R'><code>R/components.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/components-camera.R'><code>R/components-camera.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/components-ramclustr.R'><code>R/components-ramclustr.R</code></a></small>
     <div class="hidden name"><code>components-class.Rd</code></div>
     </div>
 
@@ -149,11 +149,18 @@ show(object)
 $(x, name)
 
 # S4 method for components
+as.data.table(x)
+
+# S4 method for components
+filter(obj, size = NULL, adducts = NULL,
+  isotopes = NULL, rtIncrement = NULL, mzIncrement = NULL)
+
+# S4 method for components
 findFGroup(obj, fGroup)
 
 # S4 method for components
 plotSpec(obj, index, markFGroup = NULL,
-  useGGPlot2 = FALSE, ...)
+  useGGPlot2 = FALSE, xlim = NULL, ylim = NULL, ...)
 
 # S4 method for components
 plotEIC(obj, index, fGroups, rtWindow = 5, ...)
@@ -172,16 +179,18 @@ consensus(obj, ...)</pre>
       <th>i, j</th>
       <td><p>A numeric or character value which is used to select components/feature groups by
 their index or name, respectively (for the order/names see <code>names()/groupNames()</code>).<br /><br /> For <code>[</code>: Can also be logical to perform logical selection
-(similar to regular vectors). If missing all components/feature groups are selected.<br /><br /> For <code>[[</code>: should be a skalar value. <code>j</code> is optional.</p></td>
+(similar to regular vectors). If missing all components/feature groups are selected.<br /><br /> For <code>[[</code>: should be a scalar value. <code>j</code> is optional.</p></td>
     </tr>
     <tr>
       <th>&#8230;</th>
       <td><p>For <code>plotEIC</code>: Further (optional) arguments passed to the
-<code>plotEIC</code> method for the <code><a href='featureGroups-class.html'>featureGroups</a></code> class. Note that
-the <code>colourBy</code>, <code>showPeakArea</code>, <code>showFGroupRect</code> and
-<code>topMost</code> arguments cannot be set as these are set by this method. For
-<code>consensus</code>: <code>components</code> objects that should be used to generate
-the consensus.</p></td>
+  <code>plotEIC</code> method for the <code><a href='featureGroups-class.html'>featureGroups</a></code> class. Note that
+  the <code>colourBy</code>, <code>showPeakArea</code>, <code>showFGroupRect</code> and
+  <code>topMost</code> arguments cannot be set as these are set by this method.</p>
+<p>For <code>plotSpec</code>: Further arguments passed to
+  <code><a href='https://www.rdocumentation.org/packages/graphics/topics/plot'>plot</a></code>.</p>
+<p>For <code>consensus</code>: <code>components</code> objects that should be used to
+  generate the consensus.</p></td>
     </tr>
     <tr>
       <th>drop</th>
@@ -190,6 +199,37 @@ the consensus.</p></td>
     <tr>
       <th>name</th>
       <td><p>The component name (partially matched).</p></td>
+    </tr>
+    <tr>
+      <th>size</th>
+      <td><p>Should be a two sized vector with the minimum/maximum size of a
+component. Set to <code>NULL</code> to ignore.</p></td>
+    </tr>
+    <tr>
+      <th>adducts</th>
+      <td><p>Remove any feature groups within components that do not match
+given adduct rules. If <code>adducts</code> is a logical then only results are
+kept when an adduct is assigned (<code>adducts=TRUE</code>) or not assigned
+(<code>adducts=FALSE</code>). Otherwise, if <code>adducts</code> contains one or more
+<code><a href='adduct-class.html'>adduct</a></code> objects (or something that can be converted to it with
+<code><a href='adduct-utils.html'>as.adduct</a></code>) then only results are kept that match the given
+adducts. Set to <code>NULL</code> to ignore this filter.</p></td>
+    </tr>
+    <tr>
+      <th>isotopes</th>
+      <td><p>Only keep results that match a given isotope rule. If
+<code>isotopes</code> is a logical then only results are kept with
+(<code>isotopes=TRUE</code>) or without (<code>isotopes=FALSE</code>) isotope
+assignment. Otherwise <code>isotopes</code> should be a numeric vector with
+isotope identifiers to keep (<em>e.g.</em> <samp>0</samp> for monoisotopic results,
+<samp>1</samp> for <samp>M+1</samp> results etc.). Set to <code>NULL</code> to ignore this
+filter.</p></td>
+    </tr>
+    <tr>
+      <th>rtIncrement, mzIncrement</th>
+      <td><p>Should be a two sized vector with the
+minimum/maximum retention or mz increment of a homologous series. Set to
+<code>NULL</code> to ignore.</p></td>
     </tr>
     <tr>
       <th>fGroup</th>
@@ -216,6 +256,11 @@ allows nicely repelled text for annotation. However, base plot is generally
 faster.</p></td>
     </tr>
     <tr>
+      <th>xlim, ylim</th>
+      <td><p>Sets the plot size limits used by
+<code><a href='https://www.rdocumentation.org/packages/graphics/topics/plot'>plot</a></code>. Set to <code>NULL</code> for automatic plot sizing.</p></td>
+    </tr>
+    <tr>
       <th>fGroups</th>
       <td><p>The <code><a href='featureGroups-class.html'>featureGroups</a></code> object that was used to
 generate the components.</p></td>
@@ -229,12 +274,12 @@ generate the components.</p></td>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>The subset operator (<code>"["</code>) and <code>filter</code> method
-  return the data subset in an object from the <code>componentsReduced</code>
-  class. This object does not contain any algorithm specific data and as
-  such, algorithm specific methods (<em>e.g.</em> <code>treeCut</code>) will not work
-  on this object. The reason for this is that it is often very difficult or
-  impossible to subset the algorithmic data.</p>
+    <p>The subset operator (<code>"["</code>) and <code>filter</code> method return the
+  data subset in an object from the <code>componentsReduced</code> class. This
+  object does not contain any algorithm specific data and as such, algorithm
+  specific methods (<em>e.g.</em> <code>treeCut</code>) will not work on this object.
+  The reason for this is that it is often very difficult or impossible to
+  subset the algorithmic data.</p>
 <p><code>consensus</code> returns a <code>components</code> object that is produced
   by merging multiple specified <code>components</code> objects.</p>
     
@@ -261,6 +306,8 @@ feature groups for which data is present in this object.</p></li>
 <li><p><code>[</code>: Subset on components/feature groups.</p></li>
 <li><p><code>[[</code>: Extracts a component table, optionally filtered by a feature group.</p></li>
 <li><p><code>$</code>: Extracts a component table by component name.</p></li>
+<li><p><code>as.data.table</code>: Returns all component data in a table.</p></li>
+<li><p><code>filter</code>: Provides rule based filtering for components.</p></li>
 <li><p><code>findFGroup</code>: Returns the component id(s) to which a feature group
 belongs.</p></li>
 <li><p><code>plotSpec</code>: Plot a <em>pseudo</em> mass spectrum for a single
@@ -280,9 +327,26 @@ merge similar components.</p></li>
 <code>componentTable</code> method for access.</p></dd>
     <dt><code>componentInfo</code></dt><dd><p>A <code>data.table</code> containing general information
 for each component. Use the <code>componentInfo</code> method for access.</p></dd>
-    <dt><code>algorithm</code></dt><dd><p>The algorithm that was used to generate the components. Use
-the <code>algorithm</code> method for access.</p></dd>
 </dl>
+    
+    <h2 class="hasAnchor" id="note"><a class="anchor" href="#note"></a>Note</h2>
+
+    <p><code>filter</code> Applies only those filters for which a component has data
+  available. For instance, filtering by adduct will only filter any results
+  within a component if that component contains adduct information.</p>
+    
+    <h2 class="hasAnchor" id="s-class-hierarchy"><a class="anchor" href="#s-class-hierarchy"></a>S4 class hierarchy</h2>
+
+    <p></p><ul>
+<li><p><code><a href='workflowStep-class.html'>workflowStep</a></code></p><ul>
+<li><p><strong><code>components</code></strong></p><ul>
+<li><p><code>componentsReduced</code></p></li>
+<li><p><code>componentsCamera</code></p></li>
+<li><p><code><a href='componentsIntClust-class.html'>componentsIntClust</a></code></p></li>
+<li><p><code>componentsRC</code></p></li>
+</ul></li>
+</ul></li>
+</ul>
     
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
@@ -302,6 +366,10 @@ the <code>algorithm</code> method for access.</p></dd>
       <li><a href="#methods-by-generic-">Methods (by generic)</a></li>
 
       <li><a href="#slots">Slots</a></li>
+
+      <li><a href="#note">Note</a></li>
+
+      <li><a href="#s-class-hierarchy">S4 class hierarchy</a></li>
 
       <li><a href="#see-also">See also</a></li>
           </ul>

@@ -354,7 +354,15 @@ methodology and instrumentation.</p>
 
     <p><code>findFeaturesBruker</code> only works with Bruker data files (<code>.d</code>
   extension) and requires Bruker DataAnalysis and the <span class="pkg">RDCOMClient</span>
-  package to be installed.</p>
+  package to be installed. Furthermore, DataAnalysis combines multiple
+  related masses in a feature (<em>e.g.</em> isotopes, adducts) but does not
+  report the actual (monoisotopic) mass of the feature. Therefore, it is
+  simply assumed that the feature mass equals that of the highest intensity
+  mass peak.</p>
+<p>If any errors related to <code class='command'>DCOM</code> appear it might be necessary to
+  terminate DataAnalysis (note that DataAnalysis might still be running as a
+  background process). The <code class='command'>ProcessCleaner</code> application installed
+  with DataAnalayis can be used for this.</p>
 <p><code>findFeaturesEnviPick</code> Requires analysis files to be in the
   <code>mzXML</code> format.</p>
 <p>The file format of analyses for <code>findFeaturesOpenMS</code> must be

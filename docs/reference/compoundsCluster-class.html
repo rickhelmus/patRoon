@@ -118,46 +118,50 @@ candidate structures within <code><a href='compounds-class.html'>compounds</a></
     
     </div>
 
-    <pre class="usage"><span class='co'># S4 method for compoundsCluster</span>
-<span class='fu'><a href='generics.html'>clusters</a></span>(<span class='no'>obj</span>)
+    <pre class="usage"># S4 method for compoundsCluster
+clusters(obj)
 
-<span class='co'># S4 method for compoundsCluster</span>
-<span class='fu'><a href='generics.html'>cutClusters</a></span>(<span class='no'>obj</span>)
+# S4 method for compoundsCluster
+cutClusters(obj)
 
-<span class='co'># S4 method for compoundsCluster</span>
-<span class='fu'><a href='generics.html'>clusterProperties</a></span>(<span class='no'>obj</span>)
+# S4 method for compoundsCluster
+clusterProperties(obj)
 
-<span class='co'># S4 method for compoundsCluster</span>
-<span class='fu'><a href='generics.html'>groupNames</a></span>(<span class='no'>obj</span>)
+# S4 method for compoundsCluster
+groupNames(obj)
 
-<span class='co'># S4 method for compoundsCluster</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/length'>length</a></span>(<span class='no'>x</span>)
+# S4 method for compoundsCluster
+length(x)
 
-<span class='co'># S4 method for compoundsCluster</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/lengths'>lengths</a></span>(<span class='no'>x</span>, <span class='kw'>use.names</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+# S4 method for compoundsCluster
+lengths(x, use.names = TRUE)
 
-<span class='co'># S4 method for compoundsCluster</span>
-<span class='fu'>show</span>(<span class='no'>object</span>)
+# S4 method for compoundsCluster
+show(object)
 
-<span class='co'># S4 method for compoundsCluster</span>
-<span class='fu'><a href='generics.html'>treeCut</a></span>(<span class='no'>obj</span>, <span class='kw'>k</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>h</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='no'>groupName</span>)
+# S4 method for compoundsCluster,ANY,missing,missing
+[(x, i, j, ...,
+  drop = TRUE)
 
-<span class='co'># S4 method for compoundsCluster</span>
-<span class='fu'><a href='generics.html'>treeCutDynamic</a></span>(<span class='no'>obj</span>, <span class='no'>maxTreeHeight</span>, <span class='no'>deepSplit</span>,
-  <span class='no'>minModuleSize</span>, <span class='no'>groupName</span>)
+# S4 method for compoundsCluster
+treeCut(obj, k = NULL, h = NULL,
+  groupName)
 
-<span class='co'># S4 method for compoundsCluster,ANY</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/graphics/topics/plot'>plot</a></span>(<span class='no'>x</span>, <span class='no'>groupName</span>, <span class='kw'>pal</span> <span class='kw'>=</span> <span class='st'>"Paired"</span>,
-  <span class='kw'>colourBranches</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/lengths'>lengths</a></span>(<span class='no'>x</span>)[<span class='no'>groupName</span>] <span class='kw'>&lt;</span> <span class='fl'>50</span>,
-  <span class='kw'>showLegend</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/lengths'>lengths</a></span>(<span class='no'>x</span>)[<span class='no'>groupName</span>] <span class='kw'>&lt;</span> <span class='fl'>20</span>, <span class='no'>...</span>)
+# S4 method for compoundsCluster
+treeCutDynamic(obj, maxTreeHeight, deepSplit,
+  minModuleSize, groupName)
 
-<span class='co'># S4 method for compoundsCluster</span>
-<span class='fu'><a href='generics.html'>getMCS</a></span>(<span class='no'>obj</span>, <span class='no'>groupName</span>, <span class='no'>cluster</span>)
+# S4 method for compoundsCluster,ANY
+plot(x, groupName, pal = "Paired",
+  colourBranches = lengths(x)[groupName] < 50,
+  showLegend = lengths(x)[groupName] < 20, ...)
 
-<span class='co'># S4 method for compoundsCluster</span>
-<span class='fu'><a href='generics.html'>plotStructure</a></span>(<span class='no'>obj</span>, <span class='no'>groupName</span>, <span class='no'>cluster</span>,
-  <span class='kw'>width</span> <span class='kw'>=</span> <span class='fl'>500</span>, <span class='kw'>height</span> <span class='kw'>=</span> <span class='fl'>500</span>, <span class='kw'>withTitle</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
+# S4 method for compoundsCluster
+getMCS(obj, groupName, cluster)
+
+# S4 method for compoundsCluster
+plotStructure(obj, groupName, cluster,
+  width = 500, height = 500, withTitle = TRUE)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -170,6 +174,20 @@ candidate structures within <code><a href='compounds-class.html'>compounds</a></
       <th>use.names</th>
       <td><p>A logical value specifying whether the returned vector
 should be named with the feature group names.</p></td>
+    </tr>
+    <tr>
+      <th>i</th>
+      <td><p>A numeric or character value which is used to select feature groups by
+their index or name, respectively (for the order/names see <code><a href='generics.html'>groupNames()</a></code>). Can also be logical to perform logical selection
+(similar to regular vectors). If missing all feature groups are selected.</p></td>
+    </tr>
+    <tr>
+      <th>&#8230;</th>
+      <td><p>Any arguments directly given to <code><a href='https://www.rdocumentation.org/packages/stats/topics/dendrogram'>plot.dendrogram</a></code>.</p></td>
+    </tr>
+    <tr>
+      <th>drop, j</th>
+      <td><p>ignored.</p></td>
     </tr>
     <tr>
       <th>k, h</th>
@@ -204,10 +222,6 @@ their colours. By default <code>TRUE</code> for small amount of clusters to avoi
 overflowing the plot.</p></td>
     </tr>
     <tr>
-      <th>&#8230;</th>
-      <td><p>Any arguments directly given to <code><a href='https://www.rdocumentation.org/packages/stats/topics/dendrogram'>plot.dendrogram</a></code>.</p></td>
-    </tr>
-    <tr>
       <th>cluster</th>
       <td><p>A numeric value specifying the cluster.</p></td>
     </tr>
@@ -219,16 +233,6 @@ should be plotted.</p></td>
     <tr>
       <th>withTitle</th>
       <td><p>A logical value specifying whether a title should be added.</p></td>
-    </tr>
-    <tr>
-      <th>drop, j</th>
-      <td><p>ignored.</p></td>
-    </tr>
-    <tr>
-      <th>i</th>
-      <td><p>A numeric or character value which is used to select feature groups by
-their index or name, respectively (for the order/names see <code><a href='generics.html'>groupNames()</a></code>). Can also be logical to perform logical selection
-(similar to regular vectors). If missing all feature groups are selected.</p></td>
     </tr>
     </table>
     
@@ -261,6 +265,7 @@ feature groups for which data is present in this object.</p></li>
 <li><p><code>lengths</code>: Returns a <code>vector</code> with the number of
 clusters per feature group.</p></li>
 <li><p><code>show</code>: Show summary information for this object.</p></li>
+<li><p><code>[</code>: Subset on feature groups.</p></li>
 <li><p><code>treeCut</code>: Manually (re-)cut a dendrogram that was
 generated for a feature group.</p></li>
 <li><p><code>treeCutDynamic</code>: Automatically (re-)cut a dendrogram that was

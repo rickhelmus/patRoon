@@ -109,6 +109,86 @@
     <div id="patroon-0-1-0-9000" class="section level1">
 <h1 class="page-header">
 <a href="#patroon-0-1-0-9000" class="anchor"></a>patRoon 0.1.0.9000</h1>
+<div id="february-2019" class="section level2">
+<h2 class="hasAnchor">
+<a href="#february-2019" class="anchor"></a>February 2019</h2>
+<ul>
+<li>Compound scorings are now normalized towards their original min/max values. This ensures that the <code>score</code> column of MetFrag results stays correct.</li>
+<li>plotScores(): Option to only report scorings that have been used for ranking</li>
+<li>as.data.table()/as.data.frame() method for compounds: optionally normalize scores.</li>
+<li>reportPDF()/reportMD() now report only 5 top most candidate compounds by default (controlled by compoundTopMost argument).</li>
+<li>metadata for MS peak lists</li>
+<li>
+<code><a href="../reference/generics.html">plotSpec()</a></code> now displays subscripted formulae</li>
+<li>
+<strong>IMPORTANT</strong> Several major changes were made to the <code><a href="../reference/generics.html">filter()</a></code> methods for <code>features</code> and <code>featureGroups</code>. Please carefully read the updated documentation for these methods! (i.e. <code><a href="../reference/features-class.html">?`filter,features-method`</a></code> and <code><a href="../reference/feature-filtering.html">?`filter,featureGroups-method`</a></code>).
+<ul>
+<li>Most argument have been renamed for consistency, simplicity and clarity.</li>
+<li>The order when multiple filters are specified to the <code>featureGroups</code> method was adjusted, notably to improve reliability of blank filtration. Again, please see <code><a href="../reference/feature-filtering.html">?`filter,featureGroups-method`</a></code>.</li>
+<li>The following new filters were added:
+<ul>
+<li>mass defect range (<code>mzDefectRange</code> argument)</li>
+<li>maximum relative standard deviation (RSD) of intensities between replicates (<code>maxReplicateIntRSD</code> argument)</li>
+<li>minimum number of features within analyses (<code>absMinFeatures</code> and <code>relMinFeatures</code> arguments).</li>
+<li>pre-intensity filters (<code>preAbsMinIntensity</code> and <code>preRelMinIntensity</code> arguments)</li>
+<li>most existing filters now accept both relative and absolute values.</li>
+</ul>
+</li>
+<li>The script generation functionality of <code>newScript()</code> has been updated and supports more filter types.</li>
+<li>The <code>repetitions</code> argument is not needed anymore for the new algorithm and has been removed.</li>
+</ul>
+</li>
+</ul>
+</div>
+<div id="january-2019" class="section level2">
+<h2 class="hasAnchor">
+<a href="#january-2019" class="anchor"></a>January 2019</h2>
+<ul>
+<li>minSize and ubiquitous arguments for CAMERA component generation. See ?generateComponentsCamera.</li>
+<li>Various tweaks for plotEIC() and plotSpec() methods</li>
+<li>Various small additions to newProject()</li>
+<li>
+<code><a href="../reference/reporting.html">reportMD()</a></code>: added table with annotated fragments for compounds/formulas</li>
+<li>
+<code><a href="../reference/generics.html">consensus()</a></code> updates
+<ul>
+<li>
+<code><a href="../reference/generics.html">consensus()</a></code> methods now support extracting unique data. This also replaces the <code><a href="https://www.rdocumentation.org/packages/base/topics/unique">unique()</a></code> method that was defined for <code>featureGroupsComparison</code>.</li>
+<li>
+<code><a href="../reference/featureGroups-compare.html">comparison()</a></code> now automatically determines object names from algorithm (consistency with <code><a href="../reference/generics.html">consensus()</a></code> method for other objects).</li>
+<li>Fixed: coverage calculation for consensus formulas now correctly based on precursor overlap (was overlap of precursor+fragment).<br>
+</li>
+</ul>
+</li>
+<li>
+<code><a href="../reference/generics.html">plotVenn()</a></code> and <code><a href="../reference/generics.html">plotUpSet()</a></code> methods to compare different compounds or formulas objects.</li>
+<li>
+<code><a href="../reference/generics.html">filter()</a></code> method for components.</li>
+<li>DataAnalysis formula generation: fixed neutral formula calculation if <code>MSMode="msms"</code>, now needs <code>adduct</code> argument.</li>
+<li>Neutral loss filter for compounds.</li>
+<li>
+<strong>IMPORTANT</strong> Adduct specification is now simplified and more generic by usage of a new <code>adduct</code> class. This means that <code><a href="../reference/compound-generation.html">generateCompounds()</a></code> and <code><a href="../reference/formula-generation.html">generateFormulas()</a></code> now expect slightly differing arguments. Please see their manual pages.</li>
+<li>Workaround for homologous series generation with nontarget (see <a href="https://github.com/blosloos/nontarget/issues/6" class="uri">https://github.com/blosloos/nontarget/issues/6</a>)</li>
+<li>Improvements to terminate background commandline processes when e.g. R is terminated.</li>
+<li>
+<code><a href="../reference/clearCache.html">clearCache()</a></code> now supports removal of caches via regular expressions.</li>
+<li>Added/Improved <code>topMost</code> and <code>extraOpts</code> arguments for SIRIUS formula/compound generation.</li>
+<li>Annotated fragments from SIRIUS compounds now correctly contain charged molecular form.</li>
+<li>
+<code><a href="../reference/generics.html">filter()</a></code> method for compounds now support generic scoring filtering and on elements of precursor and fragment formulae.</li>
+<li>
+<strong>IMPORTANT</strong> Several changes were made to the MetFrag compound generation interface in order to simplify it and make it more generic. See <code><a href="../reference/compound-generation.html">?generateCompounds</a></code> for more details (notably the Scorings section).</li>
+<li>More MS peak list updates
+<ul>
+<li>Precursor peaks are now flagged in MS peak list data and <code><a href="../reference/generics.html">plotSpec()</a></code>
+</li>
+<li>Prune MS peak lists (not MS/MS) if no precursor could be determined (enabled by default, see <code>pruneMissingPrecursorMS</code> option in <code><a href="../reference/MSPeakLists-generation.html">?generateMSPeakLists</a></code>).</li>
+<li>Better retain precursor peaks after filtering steps: only intensity thresholds may remove precursors (always for MS data, optional for MS/MS with <code>retainPrecursorMSMS</code> function arguments, see <code><a href="../reference/MSPeakLists-class.html">?MSPeakLists</a></code> and <code><a href="../reference/MSPeakLists-generation.html">?generateMSPeakLists</a></code>).</li>
+</ul>
+</li>
+<li>All major workflow classes now have <code><a href="../reference/generics.html">algorithm()</a></code> and <code>as.data.table()/as.data.frame()</code> methods. The latter replaces and enhances the <code>makeTable()</code> (<code>formulas</code> class) and <code>groupTable()</code> (<code>featureGroups</code> class) methods.</li>
+</ul>
+</div>
 <div id="decomber-2018" class="section level2">
 <h2 class="hasAnchor">
 <a href="#decomber-2018" class="anchor"></a>Decomber 2018</h2>
@@ -121,14 +201,14 @@
 <li>
 <code><a href="../reference/bruker-utils.html">revertDAAnalyses()</a></code> function: brings back set of Bruker analyses to their unprocessed state.</li>
 <li>Minimum intensity arguments for Bruker DataAnalysis MS peak lists.</li>
-<li>Slightly different <code>doFMF</code> beahviour for DataAnalysis feature finding.</li>
+<li>Slightly different <code>doFMF</code> behaviour for DataAnalysis feature finding.</li>
 </ul>
 </li>
 <li>Several important updates were made to fomula calculation functionality.
 <ul>
 <li>The interface has been simplified as the functionality from the <code>formula</code> and <code>formulaConsensus</code> classes are now merged: there is no need to call <code><a href="../reference/generics.html">consensus()</a></code> anymore after <code><a href="../reference/formula-generation.html">generateFormulas()</a></code>.</li>
 <li>Formulae can now directly be calculated for feature groups by using group averaged MS peak lists (by setting <code>calculateFeatures=FALSE</code>). This can greatly speed up calulcation, especially with many analyses.</li>
-<li>The new <code><a href="../reference/generics.html">filter()</a></code> and <code>as.data.table()</code>/<code>as.data.frame</code> methods bring new functionalities related to filtering, extracting data and performing several processing steps commonly performed for organic matter (OM) characterization.</li>
+<li>The new <code><a href="../reference/generics.html">filter()</a></code> and <code><a href="../reference/generics.html">as.data.table()</a></code>/<code>as.data.frame</code> methods bring new functionalities related to filtering, extracting data and performing several processing steps commonly performed for organic matter (OM) characterization.</li>
 <li>Other updates on formulas
 <ul>
 <li>length now returns number of unique precursor formulas (was total number of results)</li>

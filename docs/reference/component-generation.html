@@ -122,7 +122,7 @@ isotopes, adducts and homologues) to assist and simplify compound annotation.</p
 <span class='fu'>generateComponents</span>(<span class='no'>fGroups</span>, <span class='no'>algorithm</span>, <span class='no'>...</span>)
 
 <span class='fu'>generateComponentsCAMERA</span>(<span class='no'>fGroups</span>, <span class='no'>ionization</span>, <span class='kw'>onlyIsotopes</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>extraOpts</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
+  <span class='kw'>minSize</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>ubiquitous</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>extraOpts</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
 
 <span class='fu'>generateComponentsIntClust</span>(<span class='no'>fGroups</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"complete"</span>,
   <span class='kw'>metric</span> <span class='kw'>=</span> <span class='st'>"euclidean"</span>, <span class='kw'>normFunc</span> <span class='kw'>=</span> <span class='no'>max</span>, <span class='kw'>average</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
@@ -130,7 +130,8 @@ isotopes, adducts and homologues) to assist and simplify compound annotation.</p
 
 <span class='fu'>generateComponentsNontarget</span>(<span class='no'>fGroups</span>, <span class='no'>ionization</span>, <span class='kw'>rtRange</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(-<span class='fl'>120</span>, <span class='fl'>120</span>),
   <span class='kw'>mzRange</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>5</span>, <span class='fl'>120</span>), <span class='kw'>elements</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"C"</span>, <span class='st'>"H"</span>, <span class='st'>"O"</span>), <span class='kw'>maxRTDev</span> <span class='kw'>=</span> <span class='fl'>30</span>,
-  <span class='kw'>maxMzDev</span> <span class='kw'>=</span> <span class='fl'>0.002</span>, <span class='kw'>extraOpts</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
+  <span class='kw'>maxMzDev</span> <span class='kw'>=</span> <span class='fl'>0.002</span>, <span class='kw'>extraOpts</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>traceHack</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/all'>all</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/Version'>R.Version</a></span>()[<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"major"</span>, <span class='st'>"minor"</span>)] <span class='kw'>&gt;=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>3</span>, <span class='fl'>4</span>)))
 
 <span class='fu'>generateComponentsRAMClustR</span>(<span class='no'>fGroups</span>, <span class='kw'>st</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>sr</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>maxt</span> <span class='kw'>=</span> <span class='fl'>12</span>,
   <span class='kw'>hmax</span> <span class='kw'>=</span> <span class='fl'>0.3</span>, <span class='kw'>normalize</span> <span class='kw'>=</span> <span class='st'>"TIC"</span>, <span class='no'>ionization</span>, <span class='kw'>absMzDev</span> <span class='kw'>=</span> <span class='fl'>0.002</span>,
@@ -166,6 +167,16 @@ should be <code>"positive"</code> or <code>"negative"</code>.</p></td>
       <td><p>Logical value. If <code>TRUE</code> only isotopes are
 considered when generating components (faster). Corresponds to <code>quick</code>
 argument of <code><a href='https://www.rdocumentation.org/packages/CAMERA/topics/annotate-methods'>CAMERA::annotate</a></code>.</p></td>
+    </tr>
+    <tr>
+      <th>minSize</th>
+      <td><p>The minimum size of a component. Smaller components than this
+size will be removed. See note below.</p></td>
+    </tr>
+    <tr>
+      <th>ubiquitous</th>
+      <td><p>If <code>TRUE</code>: ensure that all feature groups within a
+component are present in the same analyses. See note below.</p></td>
     </tr>
     <tr>
       <th>extraOpts</th>
@@ -230,9 +241,16 @@ deviation for detection of homologues within series. These arguments set
 the <code>rttol</code> and <code>mztol</code> arguments of <code>homol.search</code>.</p></td>
     </tr>
     <tr>
+      <th>traceHack</th>
+      <td><p>Currently <code>homol.search</code> does not work with <span style="R">R</span>
+<samp>&gt;3.3.3</samp>. This flag, which is enabled by default on these R versions,
+implements a (messy) workaround
+(<a href='https://github.com/blosloos/nontarget/issues/6'>more details here</a>).</p></td>
+    </tr>
+    <tr>
       <th>st, sr, maxt, hmax, normalize</th>
       <td><p>Arguments to tune the behaviour of feature
-group clustering. See their documentation from <code>ramclustR</code>.
+group clustering. See their documentation from <code><a href='https://www.rdocumentation.org/packages/RAMClustR/topics/ramclustR'>ramclustR</a></code>.
 When <code>st</code> is <code>NULL</code> it will be automatically calculated as the
 half of the median for all chromatographic peak widths.</p></td>
     </tr>
@@ -240,18 +258,18 @@ half of the median for all chromatographic peak widths.</p></td>
       <th>absMzDev, relMzDev</th>
       <td><p>Maximum absolute/relative <em>m/z</em> deviation for
 annotation. Passed as the <code>mzabs.error</code> and <code>ppm.error</code> arguments
-to <code>do.findmain</code>.</p></td>
+to <code><a href='https://www.rdocumentation.org/packages/RAMClustR/topics/do.findmain'>do.findmain</a></code>.</p></td>
     </tr>
     <tr>
       <th>RCExperimentVals</th>
       <td><p>A named <code>list</code> containing two more <code>list</code>s:
 <code>design</code> and <code>instrument</code>. These are used to construct the
-<code>ExpDes</code> argument passed to <code>ramclustR</code>.</p></td>
+<code>ExpDes</code> argument passed to <code><a href='https://www.rdocumentation.org/packages/RAMClustR/topics/ramclustR'>ramclustR</a></code>.</p></td>
     </tr>
     <tr>
       <th>extraOptsRC, extraOptsFM</th>
       <td><p>Named <code>list</code> with further arguments to be
-passed to <code>ramclustR</code> and <code>do.findmain</code>.
+passed to <code><a href='https://www.rdocumentation.org/packages/RAMClustR/topics/ramclustR'>ramclustR</a></code> and <code><a href='https://www.rdocumentation.org/packages/RAMClustR/topics/do.findmain'>do.findmain</a></code>.
 Set to <code>NULL</code> to ignore.</p></td>
     </tr>
     </table>
@@ -301,14 +319,20 @@ and reduce the data size and thus complexity.</p>
   components from feature groups which follow similar chromatographic
   retention profiles, but are not necessarily restricted to known rules
   (<em>e.g.</em> adducts or isotopes). This method uses the
-  <code>ramclustR</code> functions for generating the components, whereas
-  <code>do.findmain</code> is used for annotation.</p>
+  <code><a href='https://www.rdocumentation.org/packages/RAMClustR/topics/ramclustR'>ramclustR</a></code> functions for generating the components, whereas
+  <code><a href='https://www.rdocumentation.org/packages/RAMClustR/topics/do.findmain'>do.findmain</a></code> is used for annotation.</p>
+    
+    <h2 class="hasAnchor" id="note"><a class="anchor" href="#note"></a>Note</h2>
+
+    <p>For <code>generateComponentsCAMERA</code>: the <code>minSize</code> and
+  <code>ubiquitous</code> arguments provide additional filtering functionality not
+  provided by <span class="pkg">CAMERA</span>. Consequently, their default values may produce
+  different results compared to regular output from <code>CAMERA</code>.</p>
     
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
     <p>Kuhl, C., Tautenhahn, R., Boettcher, C., Larson, T. R. and Neumann, S. CAMERA: an integrated strategy for compound spectra extraction and annotation of liquid chromatography/mass spectrometry data sets. Analytical Chemistry, 84:283-289 (2012)</p>
-<p>Martin Loos (2016). nontarget: Detecting Isotope, Adduct and Homologue Relations in LC-MS Data. R package version 1.9. https://CRAN.R-project.org/package=nontarget <br /><br />
-  Loos, M., Gerber, C., Corona, F., Hollender, J., Singer, H. (2015). 
+<p>Martin Loos (2016). nontarget: Detecting Isotope, Adduct and Homologue Relations in LC-MS Data. R package version 1.9. https://CRAN.R-project.org/package=nontarget <br /><br /> Loos, M., Gerber, C., Corona, F., Hollender, J., Singer, H. (2015). 
 			Accelerated isotope fine structure calculation using pruned transition trees, 
 			Analytical Chemistry 87(11), 5738-5744.</p>
 <p>Broeckling, Heuberger CD, Prince AL, Ingelsson JA, Prenni E, E. J (2013).
@@ -329,6 +353,8 @@ and reduce the data size and thus complexity.</p>
       <li><a href="#value">Value</a></li>
 
       <li><a href="#details">Details</a></li>
+
+      <li><a href="#note">Note</a></li>
 
       <li><a href="#references">References</a></li>
           </ul>

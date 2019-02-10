@@ -128,8 +128,9 @@ results.</p>
       <td><p>This argument describes what should be done. When <code>what =
 NULL</code> this function will list which tables are present along with an
 indication of their size (database rows). If <code>what = "all"</code> then the
-complete file will be removed. Finally, <code>what</code> can be a character
-vector with table names that should be removed.</p></td>
+complete file will be removed. Otherwise, <code>what</code> should be a character
+string (a regular expression) that is used to match the table names that
+should be removed.</p></td>
     </tr>
     <tr>
       <th>file</th>

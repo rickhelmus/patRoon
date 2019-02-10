@@ -166,7 +166,7 @@ Using the data from the MS peaklists generated during the previous step we can g
 
 ```{r formulas,results='hide'}
 formulas <- generateFormulas(fGroups, "genform", plists, maxMzDev = 5,
-                             adduct = "M+H", elements = "CHNOPSCl",
+                             adduct = "[M+H]+", elements = "CHNOPSCl",
                              calculateFeatures = TRUE, featThreshold = 0.75)
 formulas
 ```

@@ -107,7 +107,7 @@ groups." />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Automatic compound identification</h1>
-    <small class="dont-index">Source: <a href='https://github.com/rickhelmus/patRoon/blob/master/R/main.R'><code>R/main.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/compounds.R'><code>R/compounds.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/compounds-metfrag.R'><code>R/compounds-metfrag.R</code></a>, and 2 more</small>
+    <small class="dont-index">Source: <a href='https://github.com/rickhelmus/patRoon/blob/master/R/main.R'><code>R/main.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/compounds.R'><code>R/compounds.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/compounds-metfrag.R'><code>R/compounds-metfrag.R</code></a>, and 3 more</small>
     <div class="hidden name"><code>compound-generation.Rd</code></div>
     </div>
 
@@ -125,10 +125,10 @@ groups.</p>
 <span class='fu'>generateCompoundsMetfrag</span>(<span class='no'>fGroups</span>, <span class='no'>MSPeakLists</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"CL"</span>,
   <span class='kw'>logPath</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/file.path'>file.path</a></span>(<span class='st'>"log"</span>, <span class='st'>"metfrag"</span>), <span class='kw'>timeout</span> <span class='kw'>=</span> <span class='fl'>300</span>,
   <span class='kw'>timeoutRetries</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>errorRetries</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>topMost</span> <span class='kw'>=</span> <span class='fl'>100</span>,
-  <span class='kw'>dbRelMzDev</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>fragRelMzDev</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>fragAbsMzDev</span> <span class='kw'>=</span> <span class='fl'>0.002</span>, <span class='no'>isPositive</span>,
-  <span class='no'>adduct</span>, <span class='kw'>database</span> <span class='kw'>=</span> <span class='st'>"PubChem"</span>, <span class='kw'>chemSpiderToken</span> <span class='kw'>=</span> <span class='st'>""</span>,
-  <span class='kw'>scoreTypes</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"FragmenterScore"</span>, <span class='st'>"OfflineMetFusionScore"</span>),
-  <span class='kw'>scoreWeights</span> <span class='kw'>=</span> <span class='fl'>1</span>,
+  <span class='kw'>dbRelMzDev</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>fragRelMzDev</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>fragAbsMzDev</span> <span class='kw'>=</span> <span class='fl'>0.002</span>, <span class='no'>adduct</span>,
+  <span class='kw'>database</span> <span class='kw'>=</span> <span class='st'>"pubchem"</span>, <span class='kw'>extendedPubChem</span> <span class='kw'>=</span> <span class='st'>"auto"</span>,
+  <span class='kw'>chemSpiderToken</span> <span class='kw'>=</span> <span class='st'>""</span>, <span class='kw'>scoreTypes</span> <span class='kw'>=</span> <span class='fu'>compoundScorings</span>(<span class='st'>"metfrag"</span>,
+  <span class='no'>database</span>, <span class='kw'>onlyDefault</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)$<span class='no'>name</span>, <span class='kw'>scoreWeights</span> <span class='kw'>=</span> <span class='fl'>1</span>,
   <span class='kw'>preProcessingFilters</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"UnconnectedCompoundFilter"</span>, <span class='st'>"IsotopeFilter"</span>),
   <span class='kw'>postProcessingFilters</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"InChIKeyFilter"</span>),
   <span class='kw'>maxCandidatesToStop</span> <span class='kw'>=</span> <span class='fl'>2500</span>, <span class='kw'>addTrivialNames</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
@@ -138,8 +138,13 @@ groups.</p>
 <span class='fu'>generateCompoundsSirius</span>(<span class='no'>fGroups</span>, <span class='no'>MSPeakLists</span>, <span class='kw'>maxMzDev</span> <span class='kw'>=</span> <span class='fl'>5</span>,
   <span class='kw'>adduct</span> <span class='kw'>=</span> <span class='st'>"[M+H]+"</span>, <span class='kw'>elements</span> <span class='kw'>=</span> <span class='st'>"CHNOP"</span>, <span class='kw'>profile</span> <span class='kw'>=</span> <span class='st'>"qtof"</span>,
   <span class='kw'>formulaDatabase</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>fingerIDDatabase</span> <span class='kw'>=</span> <span class='st'>"pubchem"</span>, <span class='kw'>noise</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>errorRetries</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>topMost</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='kw'>logPath</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/file.path'>file.path</a></span>(<span class='st'>"log"</span>,
-  <span class='st'>"sirius"</span>), <span class='kw'>maxProcAmount</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/options'>getOption</a></span>(<span class='st'>"patRoon.maxProcAmount"</span>))</pre>
+  <span class='kw'>errorRetries</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>topMost</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='kw'>extraOpts</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>logPath</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/file.path'>file.path</a></span>(<span class='st'>"log"</span>, <span class='st'>"sirius"</span>),
+  <span class='kw'>maxProcAmount</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/options'>getOption</a></span>(<span class='st'>"patRoon.maxProcAmount"</span>))
+
+<span class='fu'>compoundScorings</span>(<span class='kw'>algorithm</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>database</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>includeSuspectLists</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>onlyDefault</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>includeNoDB</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -197,9 +202,11 @@ may be useful to handle e.g. connection errors.</p></td>
     <tr>
       <th>topMost</th>
       <td><p>Only keep this number of candidates (per feature group) with
-highest score. Set to <code>NULL</code> to always keep all candidates, however,
+highest score.</p>
+<p>For <code class='command'>MetFrag</code>: Set to <code>NULL</code> to always keep all candidates, however,
 please note that this may result in significant usage of CPU/RAM resources
-for large numbers of candidates.</p></td>
+for large numbers of candidates.</p>
+<p>For <code class='command'>SIRIUS</code>: Sets the <span class="option">--candidates</span> commandline option.</p></td>
     </tr>
     <tr>
       <th>dbRelMzDev</th>
@@ -217,30 +224,30 @@ Sets the <span class="option">FragmentPeakMatchRelativeMassDeviation</span> opti
 Sets the <span class="option">FragmentPeakMatchAbsoluteMassDeviation</span> option.</p></td>
     </tr>
     <tr>
-      <th>isPositive</th>
-      <td><p>Set to <code>TRUE</code> for data measured with positive
-ionization. Sets the <span class="option">IsPositiveIonMode</span> option.</p></td>
-    </tr>
-    <tr>
       <th>adduct</th>
-      <td><p>The assumed MS adduct. For <code>generateCompoundsMetfrag</code>: a
-numeric value (<em>e.g.</em> <samp>1</samp> for [M+H]+, <samp>-1</samp> for [M-H]- and
-<samp>0</samp> for [M]+/-, see the
-<a href='http://c-ruttkies.github.io/MetFrag/projects/metfragcl/'>MetFrag CL</a>
-homepage for more). Please note that <code>isPositive</code> also needs to be
-set. For <code>generateCompoundsSirius</code>, a character string such as
-<code>"[M+H]+"</code>, <code>"[M-H]-"</code>, <code>"[M+Na]+"</code> and <code>"[M]+"</code>. Sets
-the <span class="option">PrecursorIonMode</span> and <span class="option">--ion</span> options, respectively.</p></td>
+      <td><p>An <code><a href='adduct-class.html'>adduct</a></code> object (or something that can be
+converted to it with <code><a href='adduct-utils.html'>as.adduct</a></code>). Examples: <code>"[M-H]-"</code>,
+<code>"[M+Na]+"</code>.</p></td>
     </tr>
     <tr>
       <th>database</th>
-      <td><p>Compound database to use. Valid values are: <code>"PubChem"</code>,
-<code>"ExtendedPubChem"</code>, <code>"ChemSpider"</code> and <code>"KEGG"</code>. The
-<code>"ExtendedPubChem"</code> is a PubChem database which includes number of
-patents and references information, which an be used for further scoring
-(see <code>scoreTypes</code> parameter.) In order to use the <code>ChemSpider</code>
-database the <code>chemSpiderToken</code> should be set. Sets the
-<span class="option">MetFragDatabaseType</span> option.</p></td>
+      <td><p>Compound database to use. Valid values are: <code>"pubchem"</code>,
+  <code>"chemspider"</code>, <code>"kegg"</code>, <code>"sdf"</code>, <code>"psv"</code> and
+  <code>"csv"</code>.</p>
+<p>For compound generation: note that when <code>database="chemspider"</code>, the
+  <code>chemSpiderToken</code> argument should be set. Similarly, when a local database is
+  set (<em>i.e.</em> <code>sdf</code>, <code>psv</code>, <code>csv</code>) the
+  <code>LocalDatabasePath</code> value should be set in <code>extraOpts</code>. Sets the
+  <code>MetFragDatabaseType</code> option.</p></td>
+    </tr>
+    <tr>
+      <th>extendedPubChem</th>
+      <td><p>If <code>database="pubchem"</code>: whether to use the
+<em>extended</em> database that includes information for compound scoring
+(<em>i.e.</em> number of patents/PubMed references). Note that downloading
+candidates from this database might take extra time. Valid values are:
+<code>FALSE</code> (never use it), <code>TRUE</code> (always use it) or <code>"auto"</code>
+(default, use if specified scorings demand it).</p></td>
     </tr>
     <tr>
       <th>chemSpiderToken</th>
@@ -251,20 +258,14 @@ token</a> that should be set when the ChemSpider database is used. Sets the
     </tr>
     <tr>
       <th>scoreTypes</th>
-      <td><p>A character vector defining the scoring methods
-(<em>e.g.</em> <code>"FragmenterScore"</code>, <code>"OfflineMetFusionScore"</code>,
-<code>"RetentionTimeScore"</code>). Some methods require further options to be
-set. Additional scoring methods become available when the
-<span class="option">"ExtendedPubChem"</span> (<em>i.e.</em> <span class="option">"PubChemNumberPatents"</span> and
-<span class="option">"PubChemNumberPubMedReferences"</span>) or <span class="option">"ChemSpider"</span>
-(<em>i.e.</em> <span class="option">"ChemSpiderReferenceCount"</span>,
-<span class="option">"ChemSpiderNumberExternalReferences"</span>,
-<span class="option">"ChemSpiderRSCCount"</span>, <span class="option">"ChemSpiderNumberPubMedReferences"</span>
-and <span class="option">"ChemSpiderDataSourceCount"</span>) database type is used. For all
-scoring types and more information refer to the <code>Candidate Scores</code>
-section on the
-<a href='http://c-ruttkies.github.io/MetFrag/projects/metfragr/'>MetFragR
-homepage</a>. Sets the <span class="option">MetFragScoreTypes</span> option.</p></td>
+      <td><p>A character vector defining the scoring types. See the
+<code>Scorings</code> section below for more information. Note that both generic
+and <code class='command'>MetFrag</code> specific names are accepted (<em>i.e.</em> <code>name</code>
+and <code>metfrag</code> columns returned by <code>compoundScorings</code>). When a
+local database is used, the name should match what is given there
+(<code>e.g</code> column names when <code>database=csv</code>). Note that MetFrag may
+still report other scoring data, however, these are not used for ranking.
+Sets the <span class="option">MetFragScoreTypes</span> option.</p></td>
     </tr>
     <tr>
       <th>scoreWeights</th>
@@ -312,11 +313,14 @@ were generated by SIRIUS+CSI:FingerID. Sets the
     </tr>
     <tr>
       <th>extraOpts</th>
-      <td><p>A named <code>list</code> containing further settings to be passed
-to <code>run.metfrag</code>. See the
-<a href='http://c-ruttkies.github.io/MetFrag/projects/metfragr/'>MetFragR</a> and
-<a href='http://c-ruttkies.github.io/MetFrag/projects/metfragcl/'>MetFrag CL</a>
-homepages for all available options.</p></td>
+      <td><p>For <code class='command'>MetFrag</code>: A named <code>list</code> containing
+  further settings to be passed to <code><a href='https://www.rdocumentation.org/packages/metfRag/topics/run.metfrag'>run.metfrag</a></code>. See
+  the <a href='http://c-ruttkies.github.io/MetFrag/projects/metfragr/'>MetFragR</a>
+  and <a href='http://c-ruttkies.github.io/MetFrag/projects/metfragcl/'>MetFrag
+  CL</a> homepages for all available options.</p>
+<p>For <code class='command'>SIRIUS</code>: a <code>character</code> vector with any extra commandline
+  parameters. See the SIRIUS manual for more details.</p>
+<p>Set to <code>NULL</code> to ignore.</p></td>
     </tr>
     <tr>
       <th>maxProcAmount</th>
@@ -365,6 +369,13 @@ is also <code>NULL</code>. Sets the <span class="option">--fingerid-db</span> op
       <td><p>Median intensity of the noise (<code>NULL</code> ignores this
 parameter). Sets the <span class="option">--noise</span> commandline option.</p></td>
     </tr>
+    <tr>
+      <th>includeSuspectLists, onlyDefault, includeNoDB</th>
+      <td><p>A logical specifying
+whether scoring terms releated to suspect lists, default scoring terms and
+non-database specific scoring terms should be included in the output,
+respectively.</p></td>
+    </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
@@ -373,6 +384,9 @@ parameter). Sets the <span class="option">--noise</span> commandline option.</p>
   object.</p>
 <p><code>generateCompoundsSirius</code> returns a <code><a href='compounds-class.html'>compounds</a></code>
   object.</p>
+<p><code>compoundScorings</code> returns a <code>data.frame</code> with information
+  on which scoring terms are used, what their algorithm specific name is and
+  other information such as to which database they apply and short remarks.</p>
     
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
@@ -415,11 +429,66 @@ before feature groups have been prioritized.</p>
   in-silico predicted MS/MS fragments and if the PubChem database is used, on
   the number of references in patents. This method requires the availability
   of MS/MS data, and feature groups without it will be ignored.</p>
+<p><code>compoundScorings</code> displays an overview of scorings may be
+  applied to rank candidate compounds (see <code>Scorings</code> section below).</p>
     
-    <h2 class="hasAnchor" id="note"><a class="anchor" href="#note"></a>Note</h2>
+    <h2 class="hasAnchor" id="scorings"><a class="anchor" href="#scorings"></a>Scorings</h2>
 
-    <p>At this point only mass spectrometric data from the most intense
-  feature is used for compound identification.</p>
+    <p>Each algorithm implements their own scoring system. Their
+  names have been simplified and harmonized where possible and are used for
+  reporting and in the case <code class='command'>MetFrag</code> is used to specify how
+  compounds should be scored (<code>scoreTypes</code> argument). The
+  <code>compoundScorings</code> function can be used to get an overview of both the
+  algorithm specific and generic scoring names. For instance, the table below
+  shows all scorings for <code class='command'>MetFrag</code>: (some columns are omitted)</p>
+<p></p><table class='table'>
+<tr><td></td><td></td><td><strong>name</strong></td></tr>
+<tr><td></td><td></td><td><strong>metfrag</strong></td></tr>
+<tr><td></td><td></td><td><strong>database</strong></td></tr>
+<tr><td></td><td></td><td>score</td></tr>
+<tr><td>Score</td><td></td><td></td></tr>
+<tr><td>fragScore</td><td>FragmenterScore</td><td></td></tr>
+<tr><td></td><td>metFusionScore</td><td>OfflineMetFusionScore</td></tr>
+<tr><td></td><td></td><td>individualMoNAScore</td></tr>
+<tr><td>OfflineIndividualMoNAScore</td><td></td><td></td></tr>
+<tr><td>numberPatents</td><td>PubChemNumberPatents</td><td>pubchem</td></tr>
+<tr><td></td><td>pubMedReferences</td><td>PubChemNumberPubMedReferences</td></tr>
+<tr><td>pubchem</td><td></td><td>pubMedReferences</td></tr>
+<tr><td>ChemSpiderNumberPubMedReferences</td><td>chemspider</td><td></td></tr>
+<tr><td>pubMedReferences</td><td>NUMBER_OF_PUBMED_ARTICLES</td><td>comptox</td></tr>
+<tr><td></td><td>extReferenceCount</td><td>ChemSpiderNumberExternalReferences</td></tr>
+<tr><td>chemspider</td><td></td><td>dataSourceCount</td></tr>
+<tr><td>ChemSpiderDataSourceCount</td><td>chemspider</td><td></td></tr>
+<tr><td>referenceCount</td><td>ChemSpiderReferenceCount</td><td>chemspider</td></tr>
+<tr><td></td><td>RSCCount</td><td>ChemSpiderRSCCount</td></tr>
+<tr><td>chemspider</td><td></td><td>smartsInclusionScore</td></tr>
+<tr><td>SmartsSubstructureInclusionScore</td><td></td><td></td></tr>
+<tr><td>smartsExclusionScore</td><td>SmartsSubstructureExclusionScore</td><td></td></tr>
+<tr><td></td><td>suspectListScore</td><td>SuspectListScore</td></tr>
+<tr><td></td><td></td><td>retentionTimeScore</td></tr>
+<tr><td>RetentionTimeScore</td><td></td><td></td></tr>
+<tr><td>CPDATCount</td><td>CPDAT_COUNT</td><td>comptox</td></tr>
+<tr><td></td><td>TOXCASTActive</td><td>TOXCAST_PERCENT_ACTIVE</td></tr>
+<tr><td>comptox</td><td></td><td>dataSources</td></tr>
+<tr><td>DATA_SOURCES</td><td>comptox</td><td></td></tr>
+<tr><td>pubChemDataSources</td><td>PUBCHEM_DATA_SOURCES</td><td>comptox</td></tr>
+<tr><td></td><td>EXPOCASTPredExpo</td><td>EXPOCAST_MEDIAN_EXPOSURE_PREDICTION_MG/KG-BW/DAY</td></tr>
+<tr><td>comptox</td><td></td><td>ECOTOX</td></tr>
+<tr><td>ECOTOX</td><td>comptox</td><td></td></tr>
+<tr><td>NORMANSUSDAT</td><td>NORMANSUSDAT</td><td>comptox</td></tr>
+<tr><td></td><td>MASSBANKEU</td><td>MASSBANKEU</td></tr>
+<tr><td>comptox</td><td></td><td>TOX21SL</td></tr>
+<tr><td>TOX21SL</td><td>comptox</td><td></td></tr>
+<tr><td>TOXCAST</td><td>TOXCAST</td><td>comptox</td></tr>
+</table>
+    <p>In addition, the <code>compoundScorings</code> function is also
+  useful to programatically generate  a set of scorings to be used by
+  <code class='command'>MetFrag</code>. For instance, the following can be given to the
+  <code>scoreTypes</code> argument to use all default scorings for PubChem:
+  <code>compoundScorings("metfrag", "pubchem", onlyDefault=TRUE)$name</code>.</p>
+<p>For all <code class='command'>MetFrag</code> scoring types refer to the <code>Candidate Scores</code>
+  section on the <a href='http://c-ruttkies.github.io/MetFrag/projects/metfragr/'>MetFragR
+  homepage</a>.</p>
     
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
@@ -460,7 +529,7 @@ doi: <a href='http://doi.org/10.1093/bioinformatics/btn603'>10.1093/bioinformati
 
       <li><a href="#details">Details</a></li>
 
-      <li><a href="#note">Note</a></li>
+      <li><a href="#scorings">Scorings</a></li>
 
       <li><a href="#references">References</a></li>
 

@@ -32,7 +32,7 @@
 
 <meta property="og:title" content="Miscellaneous generics — generics" />
 
-<meta property="og:description" content="Various (S4) generic functions provide a common interface for common tasks
+<meta property="og:description" content="Various (S4) generic functions providing a common interface for common tasks
 such as plotting and filtering data. The actual functionality and function
 arguments are often specific for the implemented methods, for this reason,
 please refer to the linked method documentation for each generic." />
@@ -115,7 +115,7 @@ please refer to the linked method documentation for each generic." />
 
     <div class="ref-description">
     
-    <p>Various (S4) generic functions provide a common interface for common tasks
+    <p>Various (S4) generic functions providing a common interface for common tasks
 such as plotting and filtering data. The actual functionality and function
 arguments are often specific for the implemented methods, for this reason,
 please refer to the linked method documentation for each generic.</p>
@@ -156,7 +156,7 @@ please refer to the linked method documentation for each generic.</p>
 
 <span class='fu'>plotStructure</span>(<span class='no'>obj</span>, <span class='no'>...</span>)
 
-<span class='fu'>plotVenn</span>(<span class='no'>obj</span>, <span class='kw'>which</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)
+<span class='fu'>plotVenn</span>(<span class='no'>obj</span>, <span class='no'>...</span>)
 
 <span class='fu'>plotUpSet</span>(<span class='no'>obj</span>, <span class='no'>...</span>)
 
@@ -190,10 +190,6 @@ represent non-shared data.</p></td>
 retention time scatter plots.</p></td>
     </tr>
     <tr>
-      <th>which</th>
-      <td><p>What should be plotted. See method documentation for specifics.</p></td>
-    </tr>
-    <tr>
       <th>k, h</th>
       <td><p>Desired numbers of clusters. See <code><a href='https://www.rdocumentation.org/packages/stats/topics/cutree'>cutree</a></code>.</p></td>
     </tr>
@@ -202,101 +198,143 @@ retention time scatter plots.</p></td>
       <td><p>Arguments used by
 <code>cutreeDynamicTree</code>.</p></td>
     </tr>
-    <tr>
-      <th>which</th>
-      <td><p>What should be plotted. See method documentation for specifics.</p></td>
-    </tr>
     </table>
     
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p><code>analysisInfo</code> returns the <a href='analysis-information.html'>analysis information</a> from an object.</p>
-    <ul>
-<li><p>Methods are defined for: <code><a href='featureGroups-class.html'>featureGroups</a></code>, <code><a href='features-class.html'>features</a></code>.</p></li>
+<ul>
+<li><p>Methods are defined for: <code><a href='featureGroups-class.html'>featureGroups</a></code>; <code><a href='features-class.html'>features</a></code>.</p></li>
 </ul>
     <p><code>analyses</code> returns a <code>character</code> vector with the analyses for which data is present in this object.</p>
-    <ul>
-<li><p>Methods are defined for: <code><a href='featureGroups-class.html'>featureGroups</a></code>, <code><a href='features-class.html'>features</a></code>, <code><a href='formulas-class.html'>formulas</a></code>, <code><a href='MSPeakLists-class.html'>MSPeakLists</a></code>.</p></li>
+<ul>
+<li><p>Methods are defined for: <code><a href='featureGroups-class.html'>featureGroups</a></code>; <code><a href='features-class.html'>features</a></code>; <code><a href='formulas-class.html'>formulas</a></code>; <code><a href='MSPeakLists-class.html'>MSPeakLists</a></code>.</p></li>
 </ul>
-    <p><code>algorithm</code> returns the algorithm that was used to generate an object.</p>
-    <ul>
-<li><p>Methods are defined for: <code><a href='components-class.html'>components</a></code>, <code><a href='compounds-class.html'>compounds</a></code>, <code><a href='formulas-class.html'>formulas</a></code>, <code><a href='MSPeakLists-class.html'>MSPeakLists</a></code>, <code><a href='optimizationResult-class.html'>optimizationResult</a></code>.</p></li>
+    <p><code>algorithm</code> returns the algorithm that was used to generate the object.</p>
+<ul>
+<li><p>Methods are defined for: <code><a href='components-class.html'>components</a></code>; <code><a href='compounds-class.html'>compounds</a></code>; <code><a href='formulas-class.html'>formulas</a></code>; <code><a href='optimizationResult-class.html'>optimizationResult</a></code>; <code><a href='workflowStep-class.html'>workflowStep</a></code>.</p></li>
 </ul>
     <p><code>clusterProperties</code> Obtain a list with properties of the generated cluster(s).</p>
-    <ul>
-<li><p>Methods are defined for: <code><a href='componentsIntClust-class.html'>componentsIntClust</a></code>, <code><a href='compoundsCluster-class.html'>compoundsCluster</a></code>.</p></li>
+<ul>
+<li><p>Methods are defined for: <code><a href='componentsIntClust-class.html'>componentsIntClust</a></code>; <code><a href='compoundsCluster-class.html'>compoundsCluster</a></code>.</p></li>
 </ul>
     <p><code>clusters</code> Obtain clustering object(s).</p>
-    <ul>
-<li><p>Methods are defined for: <code><a href='componentsIntClust-class.html'>componentsIntClust</a></code>, <code><a href='compoundsCluster-class.html'>compoundsCluster</a></code>.</p></li>
+<ul>
+<li><p>Methods are defined for: <code><a href='componentsIntClust-class.html'>componentsIntClust</a></code>; <code><a href='compoundsCluster-class.html'>compoundsCluster</a></code>.</p></li>
 </ul>
     <p><code>cutClusters</code> Returns assigned cluster indices of a cut cluster.</p>
-    <ul>
-<li><p>Methods are defined for: <code><a href='componentsIntClust-class.html'>componentsIntClust</a></code>, <code><a href='compoundsCluster-class.html'>compoundsCluster</a></code>.</p></li>
+<ul>
+<li><p>Methods are defined for: <code><a href='componentsIntClust-class.html'>componentsIntClust</a></code>; <code><a href='compoundsCluster-class.html'>compoundsCluster</a></code>.</p></li>
 </ul>
     <p><code>consensus</code> combines and merges data from various algorithms to generate a consensus.</p>
-    <ul>
-<li><p>Methods are defined for: <code><a href='components-class.html'>components</a></code>, <code><a href='compounds-class.html'>compounds</a></code>, <code><a href='featureGroups-compare.html'>featureGroupsComparison</a></code>, <code><a href='formulas-class.html'>formulas</a></code>.</p></li>
+<ul>
+<li><p>Methods are defined for: <code><a href='components-class.html'>components</a></code>; <code><a href='compounds-class.html'>compounds</a></code>; <code><a href='featureGroups-compare.html'>featureGroupsComparison</a></code>; <code><a href='formulas-class.html'>formulas</a></code>.</p></li>
 </ul>
     <p><code>featureTable</code> returns feature information.</p>
-    <ul>
-<li><p>Methods are defined for: <code><a href='featureGroups-class.html'>featureGroups</a></code>, <code><a href='features-class.html'>features</a></code>.</p></li>
+<ul>
+<li><p>Methods are defined for: <code><a href='featureGroups-class.html'>featureGroups</a></code>; <code><a href='features-class.html'>features</a></code>.</p></li>
 </ul>
     <p><code>filter</code> provides various functionality to do post-filtering of data.</p>
-    <ul>
-<li><p>Methods are defined for: <code><a href='compounds-class.html'>compounds</a></code>, <code><a href='feature-filtering.html'>featureGroups</a></code>, <code><a href='features-class.html'>features</a></code>, <code>featuresXCMS</code>, <code><a href='formulas-class.html'>formulas</a></code>, <code><a href='MSPeakLists-class.html'>MSPeakLists</a></code>.</p></li>
+<ul>
+<li><p>Methods are defined for: <code><a href='components-class.html'>components</a></code>; <code><a href='compounds-class.html'>compounds</a></code>; <code><a href='feature-filtering.html'>featureGroups</a></code>; <code><a href='features-class.html'>features</a></code>; <code><a href='features-class.html'>featuresXCMS</a></code>; <code><a href='formulas-class.html'>formulas</a></code>; <code><a href='MSPeakLists-class.html'>MSPeakLists</a></code>.</p></li>
 </ul>
     <p><code>getFeatures</code> returns the object's <code><a href='features-class.html'>features</a></code> object.</p>
-    <ul>
+<ul>
 <li><p>Methods are defined for: <code><a href='featureGroups-class.html'>featureGroups</a></code>.</p></li>
 </ul>
     <p><code>getMCS</code> Calculcates the maximum common substructure.</p>
-    <ul>
-<li><p>Methods are defined for: <code><a href='compounds-class.html'>compounds</a></code>, <code><a href='compoundsCluster-class.html'>compoundsCluster</a></code>.</p></li>
+<ul>
+<li><p>Methods are defined for: <code><a href='compounds-class.html'>compounds</a></code>; <code><a href='compoundsCluster-class.html'>compoundsCluster</a></code>.</p></li>
 </ul>
     <p><code>groupNames</code> returns a <code>character</code> vector with the names of the feature groups for which data is present in this object.</p>
-    <ul>
-<li><p>Methods are defined for: <code><a href='components-class.html'>components</a></code>, <code><a href='compounds-class.html'>compounds</a></code>, <code><a href='compoundsCluster-class.html'>compoundsCluster</a></code>, <code><a href='featureGroups-class.html'>featureGroups</a></code>, <code><a href='formulas-class.html'>formulas</a></code>, <code><a href='MSPeakLists-class.html'>MSPeakLists</a></code>.</p></li>
+<ul>
+<li><p>Methods are defined for: <code><a href='components-class.html'>components</a></code>; <code><a href='compounds-class.html'>compounds</a></code>; <code><a href='compoundsCluster-class.html'>compoundsCluster</a></code>; <code><a href='featureGroups-class.html'>featureGroups</a></code>; <code><a href='formulas-class.html'>formulas</a></code>; <code><a href='MSPeakLists-class.html'>MSPeakLists</a></code>.</p></li>
 </ul>
     <p><code>plotChord</code> plots a Chord diagram to assess overlapping data.</p>
-    <ul>
-<li><p>Methods are defined for: <code><a href='featureGroups-class.html'>featureGroups</a></code>, <code><a href='featureGroups-compare.html'>featureGroupsComparison</a></code>.</p></li>
+<ul>
+<li><p>Methods are defined for: <code><a href='featureGroups-class.html'>featureGroups</a></code>; <code><a href='featureGroups-compare.html'>featureGroupsComparison</a></code>.</p></li>
 </ul>
     <p><code>plotEIC</code> plots extracted ion chromatogram(s).</p>
-    <ul>
-<li><p>Methods are defined for: <code><a href='components-class.html'>components</a></code>, <code><a href='featureGroups-class.html'>featureGroups</a></code>.</p></li>
+<ul>
+<li><p>Methods are defined for: <code><a href='components-class.html'>components</a></code>; <code><a href='featureGroups-class.html'>featureGroups</a></code>.</p></li>
 </ul>
     <p><code>plotInt</code> plots the intensity of all contained features.</p>
-    <ul>
-<li><p>Methods are defined for: <code><a href='componentsIntClust-class.html'>componentsIntClust</a></code>, <code><a href='featureGroups-class.html'>featureGroups</a></code>.</p></li>
+<ul>
+<li><p>Methods are defined for: <code><a href='componentsIntClust-class.html'>componentsIntClust</a></code>; <code><a href='featureGroups-class.html'>featureGroups</a></code>.</p></li>
 </ul>
     <p><code>plotSpec</code> plots a (annotated) spectrum.</p>
-    <ul>
-<li><p>Methods are defined for: <code><a href='components-class.html'>components</a></code>, <code><a href='compounds-class.html'>compounds</a></code>, <code><a href='formulas-class.html'>formulas</a></code>, <code><a href='MSPeakLists-class.html'>MSPeakLists</a></code>.</p></li>
+<ul>
+<li><p>Methods are defined for: <code><a href='components-class.html'>components</a></code>; <code><a href='compounds-class.html'>compounds</a></code>; <code><a href='formulas-class.html'>formulas</a></code>; <code><a href='MSPeakLists-class.html'>MSPeakLists</a></code>.</p></li>
 </ul>
     <p><code>plotStructure</code> plots a chemical structure.</p>
-    <ul>
-<li><p>Methods are defined for: <code><a href='compounds-class.html'>compounds</a></code>, <code><a href='compoundsCluster-class.html'>compoundsCluster</a></code>.</p></li>
+<ul>
+<li><p>Methods are defined for: <code><a href='compounds-class.html'>compounds</a></code>; <code><a href='compoundsCluster-class.html'>compoundsCluster</a></code>.</p></li>
 </ul>
     <p><code>plotVenn</code> plots a Venn diagram to assess unique and overlapping data.</p>
-    <ul>
-<li><p>Methods are defined for: <code><a href='featureGroups-class.html'>featureGroups</a></code>, <code><a href='featureGroups-compare.html'>featureGroupsComparison</a></code>.</p></li>
+<ul>
+<li><p>Methods are defined for: <code><a href='compounds-class.html'>compounds</a></code>; <code><a href='featureGroups-class.html'>featureGroups</a></code>; <code><a href='featureGroups-compare.html'>featureGroupsComparison</a></code>; <code><a href='formulas-class.html'>formulas</a></code>.</p></li>
 </ul>
     <p><code>plotUpSet</code> plots an UpSet diagram to assess unique and overlapping data.</p>
-    <ul>
-<li><p>Methods are defined for: <code><a href='featureGroups-class.html'>featureGroups</a></code>, <code><a href='featureGroups-compare.html'>featureGroupsComparison</a></code>.</p></li>
+<ul>
+<li><p>Methods are defined for: <code><a href='compounds-class.html'>compounds</a></code>; <code><a href='featureGroups-class.html'>featureGroups</a></code>; <code><a href='featureGroups-compare.html'>featureGroupsComparison</a></code>; <code><a href='formulas-class.html'>formulas</a></code>.</p></li>
 </ul>
     <p><code>replicateGroups</code> returns a <code>character</code> vector with the analyses for which data is present in this object.</p>
-    <ul>
-<li><p>Methods are defined for: <code><a href='featureGroups-class.html'>featureGroups</a></code>, <code><a href='features-class.html'>features</a></code>.</p></li>
+<ul>
+<li><p>Methods are defined for: <code><a href='featureGroups-class.html'>featureGroups</a></code>; <code><a href='features-class.html'>features</a></code>.</p></li>
 </ul>
     <p><code>treeCut</code> Manually cut a cluster.</p>
-    <ul>
-<li><p>Methods are defined for: <code><a href='componentsIntClust-class.html'>componentsIntClust</a></code>, <code><a href='compoundsCluster-class.html'>compoundsCluster</a></code>.</p></li>
+<ul>
+<li><p>Methods are defined for: <code><a href='componentsIntClust-class.html'>componentsIntClust</a></code>; <code><a href='compoundsCluster-class.html'>compoundsCluster</a></code>.</p></li>
 </ul>
     <p><code>treeCutDynamic</code> Automatically cut a cluster.</p>
-    <ul>
-<li><p>Methods are defined for: <code><a href='componentsIntClust-class.html'>componentsIntClust</a></code>, <code><a href='compoundsCluster-class.html'>compoundsCluster</a></code>.</p></li>
+<ul>
+<li><p>Methods are defined for: <code><a href='componentsIntClust-class.html'>componentsIntClust</a></code>; <code><a href='compoundsCluster-class.html'>compoundsCluster</a></code>.</p></li>
+</ul>
+    
+    <h2 class="hasAnchor" id="other-generics"><a class="anchor" href="#other-generics"></a>Other generics</h2>
+
+    <p>Below are methods that are defined for existing
+  generics (<em>e.g.</em> defined in <code>base</code>). Please see method specific
+  documentation for more details.</p>
+<p><code>[</code> Subsets data within an object.</p>
+<ul>
+<li><p>Methods are defined for: <code><a href='components-class.html'>components,ANY,ANY,missing</a></code>; <code><a href='compounds-class.html'>compounds,ANY,missing,missing</a></code>; <code><a href='compoundsCluster-class.html'>compoundsCluster,ANY,missing,missing</a></code>; <code><a href='featureGroups-class.html'>featureGroups,ANY,ANY,missing</a></code>; <code><a href='featureGroupsComparison-class.html'>featureGroupsComparison,ANY,missing,missing</a></code>; <code><a href='features-class.html'>features,ANY,missing,missing</a></code>; <code><a href='features-class.html'>featuresXCMS,ANY,missing,missing</a></code>; <code><a href='formulas-class.html'>formulas,ANY,missing,missing</a></code>; <code><a href='MSPeakLists-class.html'>MSPeakLists,ANY,ANY,missing</a></code>.</p></li>
+</ul>
+    <p><code>[[</code> Extract data from an object.</p>
+<ul>
+<li><p>Methods are defined for: <code><a href='components-class.html'>components,ANY,ANY</a></code>; <code><a href='compounds-class.html'>compounds,ANY,missing</a></code>; <code><a href='featureGroups-class.html'>featureGroups,ANY,ANY</a></code>; <code><a href='featureGroupsComparison-class.html'>featureGroupsComparison,ANY,missing</a></code>; <code><a href='features-class.html'>features,ANY,missing</a></code>; <code><a href='formulas-class.html'>formulas,ANY,ANY</a></code>; <code><a href='MSPeakLists-class.html'>MSPeakLists,ANY,ANY</a></code>.</p></li>
+</ul>
+    <p><code>$</code> Extract data from an object.</p>
+<ul>
+<li><p>Methods are defined for: <code><a href='components-class.html'>components</a></code>; <code><a href='compounds-class.html'>compounds</a></code>; <code><a href='featureGroups-class.html'>featureGroups</a></code>; <code><a href='featureGroupsComparison-class.html'>featureGroupsComparison</a></code>; <code><a href='features-class.html'>features</a></code>; <code><a href='formulas-class.html'>formulas</a></code>; <code><a href='MSPeakLists-class.html'>MSPeakLists</a></code>.</p></li>
+</ul>
+    <p><code>as.data.table</code> Converts an object to a table (<code>data.table</code>).</p>
+<ul>
+<li><p>Methods are defined for: <code><a href='components-class.html'>components</a></code>; <code><a href='compounds-class.html'>compounds</a></code>; <code><a href='featureGroups-class.html'>featureGroups</a></code>; <code><a href='features-class.html'>features</a></code>; <code><a href='formulas-class.html'>formulas</a></code>; <code><a href='MSPeakLists-class.html'>MSPeakLists</a></code>; <code><a href='workflowStep-class.html'>workflowStep</a></code>.</p></li>
+</ul>
+    <p><code>as.data.frame</code> Converts an object to a table (<code>data.frame</code>).</p>
+<ul>
+<li><p>Methods are defined for: <code><a href='workflowStep-class.html'>workflowStep</a></code>.</p></li>
+</ul>
+    <p><code>length</code> Returns the length of an object.</p>
+<ul>
+<li><p>Methods are defined for: <code><a href='components-class.html'>components</a></code>; <code><a href='compounds-class.html'>compounds</a></code>; <code><a href='compoundsCluster-class.html'>compoundsCluster</a></code>; <code><a href='featureGroups-class.html'>featureGroups</a></code>; <code><a href='featureGroupsComparison-class.html'>featureGroupsComparison</a></code>; <code><a href='features-class.html'>features</a></code>; <code><a href='formulas-class.html'>formulas</a></code>; <code><a href='MSPeakLists-class.html'>MSPeakLists</a></code>; <code><a href='optimizationResult-class.html'>optimizationResult</a></code>.</p></li>
+</ul>
+    <p><code>lengths</code> Returns the lengths of elements within this object.</p>
+<ul>
+<li><p>Methods are defined for: <code><a href='compoundsCluster-class.html'>compoundsCluster</a></code>; <code><a href='optimizationResult-class.html'>optimizationResult</a></code>.</p></li>
+</ul>
+    <p><code>names</code> Return names for this object.</p>
+<ul>
+<li><p>Methods are defined for: <code><a href='components-class.html'>components</a></code>; <code><a href='featureGroups-class.html'>featureGroups</a></code>; <code><a href='featureGroupsComparison-class.html'>featureGroupsComparison</a></code>.</p></li>
+</ul>
+    <p><code>plot</code> Generates a plot for an object.</p>
+<ul>
+<li><p>Methods are defined for: <code><a href='componentsIntClust-class.html'>componentsIntClust,ANY</a></code>; <code><a href='compoundsCluster-class.html'>compoundsCluster,ANY</a></code>; <code><a href='featureGroups-class.html'>featureGroups,ANY</a></code>; <code><a href='featureGroups-compare.html'>featureGroupsComparison,ANY</a></code>; <code><a href='optimizationResult-class.html'>optimizationResult,ANY</a></code>.</p></li>
+</ul>
+    <p><code>show</code> Prints information about this object.</p>
+<ul>
+<li><p>Methods are defined for: <code><a href='adduct-class.html'>adduct</a></code>; <code><a href='components-class.html'>components</a></code>; <code><a href='compounds-class.html'>compounds</a></code>; <code><a href='compoundsCluster-class.html'>compoundsCluster</a></code>; <code><a href='featureGroups-class.html'>featureGroups</a></code>; <code><a href='features-class.html'>features</a></code>; <code><a href='formulas-class.html'>formulas</a></code>; <code><a href='MSPeakLists-class.html'>MSPeakLists</a></code>; <code><a href='optimizationResult-class.html'>optimizationResult</a></code>; <code><a href='workflowStep-class.html'>workflowStep</a></code>.</p></li>
 </ul>
     
 
@@ -307,6 +345,8 @@ retention time scatter plots.</p></td>
       <li><a href="#arguments">Arguments</a></li>
       
       <li><a href="#details">Details</a></li>
+
+      <li><a href="#other-generics">Other generics</a></li>
           </ul>
 
   </div>

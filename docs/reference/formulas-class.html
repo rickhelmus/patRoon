@@ -149,20 +149,25 @@ as.data.table(x, fGroups = NULL, average = FALSE,
   maxFormulas = NULL, maxFragFormulas = NULL)
 
 # S4 method for formulas
-as.data.frame(x, row.names = NULL,
-  optional = FALSE, ...)
-
-# S4 method for formulas
 filter(obj, minExplainedFragPeaks = NULL,
   elements = NULL, fragElements = NULL, lossElements = NULL,
   topMost = NULL, scoreLimits = NULL, OM = NULL)
 
 # S4 method for formulas
 plotSpec(obj, precursor, groupName, analysis = NULL,
-  MSPeakLists, useGGPlot2 = FALSE)
+  MSPeakLists, title = NULL, useGGPlot2 = FALSE, xlim = NULL,
+  ylim = NULL, ...)
 
 # S4 method for formulas
-consensus(obj, ..., formThreshold = 0)</pre>
+plotVenn(obj, ..., labels = NULL, vennArgs = NULL)
+
+# S4 method for formulas
+plotUpSet(obj, ..., labels = NULL,
+  nsets = length(list(...)) + 1, nintersects = NA, upsetArgs = NULL)
+
+# S4 method for formulas
+consensus(obj, ..., formThreshold = 0,
+  uniqueFrom = NULL, uniqueOuter = FALSE)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -180,13 +185,13 @@ for feature groups.</p></td>
       <th>i, j</th>
       <td><p>A numeric or character value which is used to select analyses/feature groups by
 their index or name, respectively (for the order/names see <code>analyses()/groupNames()</code>).<br /><br /> For <code>[</code>: Can also be logical to perform logical selection
-(similar to regular vectors). If missing all analyses/feature groups are selected.<br /><br /> For <code>[[</code>: should be a skalar value. If <code>j</code> is not specified, <code>i</code> selects by feature groups instead.</p></td>
+(similar to regular vectors). If missing all analyses/feature groups are selected.<br /><br /> For <code>[[</code>: should be a scalar value. If <code>j</code> is not specified, <code>i</code> selects by feature groups instead.</p></td>
     </tr>
     <tr>
       <th>&#8230;</th>
-      <td><p><code>consensus</code>: One or more <code>formulas</code> objects that should be used to
-generate the consensus.</p>
-<p><code>as.data.frame</code>: Arguments passed to <code>as.data.table</code>.</p></td>
+      <td><p>For <code>plotSpec</code>: Further arguments passed to
+  <code><a href='https://www.rdocumentation.org/packages/graphics/topics/plot'>plot</a></code>.</p>
+<p>Others: Any further (and unique) <code>formulas</code> objects.</p></td>
     </tr>
     <tr>
       <th>drop</th>
@@ -199,8 +204,8 @@ generate the consensus.</p>
     <tr>
       <th>fGroups</th>
       <td><p>The <code><a href='featureGroups-class.html'>featureGroups</a></code> object that was used to
-generate this <code>formulas</code> object. If not <code>NULL</code> it is used to add
-feature group information (retention and <em>m/z</em> values).</p></td>
+generate this object. If not <code>NULL</code> it is used to add feature group
+information (retention and <em>m/z</em> values).</p></td>
     </tr>
     <tr>
       <th>average</th>
@@ -223,7 +228,7 @@ elements.</p></td>
     </tr>
     <tr>
       <th>OM</th>
-      <td><p>For <code>as.data.table</code>/<code>as.data.frame</code>: if set to <code>TRUE</code> several columns
+      <td><p>For <code>as.data.table</code>: if set to <code>TRUE</code> several columns
   with information relevant for organic matter (OM) characterization will be
   added (e.g. elemental ratios, classification). This will also make sure
   that <code>countElements</code> contains at least C, H, N, O, P and S.</p>
@@ -238,10 +243,6 @@ formulae (or fragment formulae) per feature group. Set to <code>NULL</code> to
 ignore.</p></td>
     </tr>
     <tr>
-      <th>row.names, optional</th>
-      <td><p>Ignored.</p></td>
-    </tr>
-    <tr>
       <th>minExplainedFragPeaks</th>
       <td><p>Minimum number of fragment peaks that are
 explained. Setting this to <samp>1</samp> will remove any MS only formula
@@ -249,23 +250,24 @@ results. Set to <code>NULL</code> to ignore.</p></td>
     </tr>
     <tr>
       <th>elements</th>
-      <td><p>Only retain candidate formulae that match a given elemental
-restriction. The format of <code>elements</code> is a <code>character</code> string
-with elements that should be present where each element is followed by a
-valid amount or a range thereof. If no number is specified then <samp>1</samp> is
-assumed. For instance, <code>elements="C1-10H2-20O0-2P"</code>, specifies that
-<samp>1-10</samp>, <samp>2-20</samp>, <samp>0-2</samp> and <samp>1</samp> carbon, hydrogen, oxygen
-and phosphorus atoms should be present, respectively. When
-<code>length(elements)&gt;1</code> formulas are tested to follow at least one of the
-given elemental restrictions. For instance, <code>elements=c("P", "S")</code>
-specifies that either one phosphorus or sulphur atom should be present. Set
-to <code>NULL</code> to ignore this filter.</p></td>
+      <td><p>Only retain candidate formulae (neutral form) that match a
+given elemental restriction. The format of <code>elements</code> is a
+<code>character</code> string with elements that should be present where each
+element is followed by a valid amount or a range thereof. If no number is
+specified then <samp>1</samp> is assumed. For instance,
+<code>elements="C1-10H2-20O0-2P"</code>, specifies that <samp>1-10</samp>, <samp>2-20</samp>,
+<samp>0-2</samp> and <samp>1</samp> carbon, hydrogen, oxygen and phosphorus atoms
+should be present, respectively. When <code>length(elements)&gt;1</code> formulas
+are tested to follow at least one of the given elemental restrictions. For
+instance, <code>elements=c("P", "S")</code> specifies that either one phosphorus
+or one sulphur atom should be present. Set to <code>NULL</code> to ignore this
+filter.</p></td>
     </tr>
     <tr>
       <th>fragElements, lossElements</th>
       <td><p>Specifies elemental restrictions for
-fragment or neutral loss formulas. Candidates are retained if at least one
-of the fragment/neutral loss formulae follow the given restrictions. See
+fragment or neutral loss formulae (charged form). Candidates are retained
+if at least one of the fragment formulae follow the given restrictions. See
 <code>elements</code> for the used format.</p></td>
     </tr>
     <tr>
@@ -282,8 +284,8 @@ limits). The names of each element should follow the values returned by
 <code><a href='formula-generation.html'>formulaScorings</a>()$name</code>. For instance,
 <code>scoreLimits=list(isoScore=c(0.5, Inf))</code> specifies that the isotopic
 match score should be at least <samp>0.5</samp>. More details of scorings can be
-obtained with <code><a href='formula-generation.html'>formulaScorings</a></code>. Set to <code>NULL</code> to skip
-this filter.</p></td>
+obtained with <code><a href='formula-generation.html'>formulaScorings</a></code>. Note that a result without a
+specified scoring is never removed. Set to <code>NULL</code> to skip this filter.</p></td>
     </tr>
     <tr>
       <th>precursor</th>
@@ -307,6 +309,11 @@ results for the complete feature group will be plotted.</p></td>
 generate the candidate</p></td>
     </tr>
     <tr>
+      <th>title</th>
+      <td><p>The title of the plot. Set to <code>NULL</code> for an automatically
+generated title.</p></td>
+    </tr>
+    <tr>
       <th>useGGPlot2</th>
       <td><p>If <code>TRUE</code> then <span class="pkg">ggplot2</span> is used for
 plotting, otherwise base plot used. For <code>plotSpec</code>, <code>ggplot2</code>
@@ -314,11 +321,51 @@ allows nicely repelled text for annotation. However, base plot is generally
 faster.</p></td>
     </tr>
     <tr>
+      <th>xlim, ylim</th>
+      <td><p>Sets the plot size limits used by
+<code><a href='https://www.rdocumentation.org/packages/graphics/topics/plot'>plot</a></code>. Set to <code>NULL</code> for automatic plot sizing.</p></td>
+    </tr>
+    <tr>
+      <th>labels</th>
+      <td><p>A <code>character</code> with names to use for labelling. If
+<code>NULL</code> labels are automatically generated.</p></td>
+    </tr>
+    <tr>
+      <th>vennArgs</th>
+      <td><p>A <code>list</code> with further arguments passed to
+<span class="pkg">VennDiagram</span> plotting functions. Set to <code>NULL</code> to ignore.</p></td>
+    </tr>
+    <tr>
+      <th>nsets, nintersects</th>
+      <td><p>See <code><a href='https://www.rdocumentation.org/packages/UpSetR/topics/upset'>upset</a></code>.</p></td>
+    </tr>
+    <tr>
+      <th>upsetArgs</th>
+      <td><p>A list with any further arguments to be passed to
+<code><a href='https://www.rdocumentation.org/packages/UpSetR/topics/upset'>upset</a></code>. Set to <code>NULL</code> to ignore.</p></td>
+    </tr>
+    <tr>
       <th>formThreshold</th>
       <td><p>Fractional minimum amount (0-1) of which a formula
 candidate should be present within all objects. For instance, a value of
 <samp>0.5</samp> means that a particular formula should be present in at least
 <samp>50%</samp> of all objects.</p></td>
+    </tr>
+    <tr>
+      <th>uniqueFrom</th>
+      <td><p>Set this argument to only retain formulas that are unique
+within one or more of the objects for which the consensus is made.
+Selection is done by setting the value of <code>uniqueFrom</code> to a
+<code>logical</code> (values are recycled), <code>numeric</code> (select by index) or a
+<code>character</code> (as obtained with <code><a href='generics.html'>algorithm(obj)</a></code>). For
+<code>logical</code> and <code>numeric</code> values the order corresponds to the order
+of the objects given for the consensus. Set to <code>NULL</code> to ignore.</p></td>
+    </tr>
+    <tr>
+      <th>uniqueOuter</th>
+      <td><p>If <code>uniqueFrom</code> is not <code>NULL</code> and if
+<code>uniqueOuter=TRUE</code>: only retain data that are also unique between
+objects specified in <code>uniqueFrom</code>.</p></td>
     </tr>
     </table>
     
@@ -332,6 +379,16 @@ candidate should be present within all objects. For instance, a value of
 <p><code>filter</code> returns a filtered <code>formulas</code> object.</p>
 <p><code>plotSpec</code> will return a <code>ggplot object</code>
   if <code>useGGPlot2</code> is <code>TRUE</code>.</p>
+<p><code>plotVenn</code> (invisibly) returns a list with the following fields:</p><ul>
+<li><p><code>gList</code> the <code>gList</code> object that was returned by
+  the utilized <span class="pkg">VennDiagram</span> plotting function.</p></li>
+<li><p><code>areas</code> The total area for each plotted group.</p></li>
+<li><p><code>intersectionCounts</code> The number of intersections between groups.</p></li>
+</ul>
+
+<p>The order for the <code>areas</code> and <code>intersectionCounts</code> fields is the same as the parameter order
+from the used plotting function (see <em>e.g.</em> <code>draw.pairwise.venn</code> and
+<code>draw.triple.venn</code>).</p>
 <p><code>consensus</code> returns a <code>formulas</code> object that is produced by
   merging results from multiple <code>formulas</code> objects.</p>
     
@@ -360,10 +417,15 @@ formula table for the feature group specified by <code>j</code> is returned.</p>
 <li><p><code>$</code>: Extract a formula table for a feature group.</p></li>
 <li><p><code>as.data.table</code>: Generates a table with all candidate formulae for each
 feature group and other information such as element counts.</p></li>
-<li><p><code>as.data.frame</code>: Same as <code>as.data.table</code>, but returns a <code>data.frame</code>.</p></li>
 <li><p><code>filter</code>: Performs rule based filtering on formula results.</p></li>
 <li><p><code>plotSpec</code>: Plots an annotated spectrum for a given candidate
 formula of a feature or feature group.</p></li>
+<li><p><code>plotVenn</code>: plots a Venn diagram (using <span class="pkg">VennDiagram</span>)
+outlining unique and shared formula candidates of up to five different
+<code>formulas</code> objects.</p></li>
+<li><p><code>plotUpSet</code>: plots an UpSet diagram (using the
+<code><a href='https://www.rdocumentation.org/packages/UpSetR/topics/upset'>upset</a></code> function) outlining unique and shared formula
+candidates between different <code>formula</code> objects.</p></li>
 <li><p><code>consensus</code>: Generates a consensus of results from multiple
 <code>formulas</code> objects.</p></li>
 </ul>
@@ -374,8 +436,6 @@ formula of a feature or feature group.</p></li>
     <dl class='dl-horizontal'>
 <dt><code>formulas,featureFormulas</code></dt><dd><p>Lists of all generated formulae. Use the
 <code>formulaTable</code> method for access.</p></dd>
-    <dt><code>algorithm</code></dt><dd><p>The algorithm that was used for generation of formulae. Use
-the <code>algorithm</code> method for access.</p></dd>
 </dl>
     
     <h2 class="hasAnchor" id="note"><a class="anchor" href="#note"></a>Note</h2>
@@ -390,6 +450,17 @@ the <code>algorithm</code> method for access.</p></dd>
   classification is performed by the rules described in Abdulla 2013.
   Filtering of OM related molecules is performed as described in Koch 2006
   and Kujawinski 2006. (see references).</p>
+<p>Subscripting of formulae for plots generated by
+  <code>plotSpec</code> is based on the <code>chemistry2expression</code> function from
+  the <a href='https://github.com/schymane/ReSOLUTION'>ReSOLUTION</a> package.</p>
+    
+    <h2 class="hasAnchor" id="s-class-hierarchy"><a class="anchor" href="#s-class-hierarchy"></a>S4 class hierarchy</h2>
+
+    <p></p><ul>
+<li><p><code><a href='workflowStep-class.html'>workflowStep</a></code></p><ul>
+<li><p><strong><code>formulas</code></strong></p></li>
+</ul></li>
+</ul>
     
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
@@ -416,6 +487,17 @@ doi: <a href='http://doi.org/10.1002/rcm.2386'>10.1002/rcm.2386</a>
 <em>Analytical Chemistry</em>, <b>78</b>(13), 4363--4373.
 doi: <a href='http://doi.org/10.1021/ac0600306'>10.1021/ac0600306</a>
 , <a href='https://doi.org/10.1021/ac0600306'>https://doi.org/10.1021/ac0600306</a>.</p>
+<p>Conway JR, Lex A, Gehlenborg N (2017).
+&#8220;UpSetR: an R package for the visualization of intersecting sets and their properties.&#8221;
+<em>Bioinformatics</em>, <b>33</b>(18), 2938-2940.
+doi: <a href='http://doi.org/10.1093/bioinformatics/btx364'>10.1093/bioinformatics/btx364</a>
+, <a href='http://dx.doi.org/10.1093/bioinformatics/btx364'>http://dx.doi.org/10.1093/bioinformatics/btx364</a>.
+ <br /><br />
+  Lex A, Gehlenborg N, Strobelt H, Vuillemot R, Pfister H (2014).
+&#8220;UpSet: Visualization of Intersecting Sets.&#8221;
+<em>IEEE Transactions on Visualization and Computer Graphics</em>, <b>20</b>(12), 1983--1992.
+doi: <a href='http://doi.org/10.1109/tvcg.2014.2346248'>10.1109/tvcg.2014.2346248</a>
+, <a href='https://doi.org/10.1109/tvcg.2014.2346248'>https://doi.org/10.1109/tvcg.2014.2346248</a>.</p>
     
 
   </div>
@@ -435,6 +517,8 @@ doi: <a href='http://doi.org/10.1021/ac0600306'>10.1021/ac0600306</a>
       <li><a href="#note">Note</a></li>
 
       <li><a href="#source">Source</a></li>
+
+      <li><a href="#s-class-hierarchy">S4 class hierarchy</a></li>
 
       <li><a href="#references">References</a></li>
           </ul>

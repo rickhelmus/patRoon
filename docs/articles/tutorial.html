@@ -74,7 +74,7 @@
       <h1>patRoon tutorial</h1>
                         <h4 class="author">Rick Helmus</h4>
             
-            <h4 class="date">2018-12-29</h4>
+            <h4 class="date">2019-02-10</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/rickhelmus/patRoon/blob/master/vignettes/tutorial.Rmd"><code>vignettes/tutorial.Rmd</code></a></small>
       <div class="hidden name"><code>tutorial.Rmd</code></div>
@@ -164,25 +164,27 @@ pre, code {
 <p>In this tutorial we will use the <a href="http://openms.de/">OpenMS</a> software to find features:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1">fList &lt;-<span class="st"> </span><span class="kw"><a href="../reference/feature-finding.html">findFeatures</a></span>(anaInfo, <span class="st">"openms"</span>, <span class="dt">mzPPM =</span> <span class="dv">5</span>)</a></code></pre></div>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">fList</a>
-<a class="sourceLine" id="cb5-2" data-line-number="2"><span class="co">#&gt; A features object ('featuresOpenMS')</span></a>
-<a class="sourceLine" id="cb5-3" data-line-number="3"><span class="co">#&gt; Total feature count: 2662</span></a>
-<a class="sourceLine" id="cb5-4" data-line-number="4"><span class="co">#&gt; Average feature count/analysis: 444</span></a>
-<a class="sourceLine" id="cb5-5" data-line-number="5"><span class="co">#&gt; Analyses: solvent-1, solvent-2, solvent-3, standard-1, standard-2, standard-3 (6 total)</span></a>
-<a class="sourceLine" id="cb5-6" data-line-number="6"><span class="co">#&gt; Replicate groups: solvent, standard (2 total)</span></a>
-<a class="sourceLine" id="cb5-7" data-line-number="7"><span class="co">#&gt; Replicate groups used as ref: solvent (1 total)</span></a>
-<a class="sourceLine" id="cb5-8" data-line-number="8"><span class="co">#&gt; Object size (indication): 436.6 kB</span></a></code></pre></div>
+<a class="sourceLine" id="cb5-2" data-line-number="2"><span class="co">#&gt; A featuresOpenMS object (derived from features -&gt; workflowStep)</span></a>
+<a class="sourceLine" id="cb5-3" data-line-number="3"><span class="co">#&gt; Object size (indication): 436.9 kB</span></a>
+<a class="sourceLine" id="cb5-4" data-line-number="4"><span class="co">#&gt; Algorithm: openms</span></a>
+<a class="sourceLine" id="cb5-5" data-line-number="5"><span class="co">#&gt; Total feature count: 2662</span></a>
+<a class="sourceLine" id="cb5-6" data-line-number="6"><span class="co">#&gt; Average feature count/analysis: 444</span></a>
+<a class="sourceLine" id="cb5-7" data-line-number="7"><span class="co">#&gt; Analyses: solvent-1, solvent-2, solvent-3, standard-1, standard-2, standard-3 (6 total)</span></a>
+<a class="sourceLine" id="cb5-8" data-line-number="8"><span class="co">#&gt; Replicate groups: solvent, standard (2 total)</span></a>
+<a class="sourceLine" id="cb5-9" data-line-number="9"><span class="co">#&gt; Replicate groups used as ref: solvent (1 total)</span></a></code></pre></div>
 <p>After some processing time (especially for larger datasets), the next step is to <em>group features</em>. During this step, features from different analysis are grouped by alignment of their retention times and <em>m/z</em> data. This alignment is necessary because it is common that instrumental error will result in (slight) variations for these data between analyses.</p>
 <p>To group features the <code><a href="../reference/feature-grouping.html">groupFeatures()</a></code> function is used, which has similar argument requirements as <code>findFeatures</code> and many more options to tune the process.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1">fGroups &lt;-<span class="st"> </span><span class="kw"><a href="../reference/feature-grouping.html">groupFeatures</a></span>(fList, <span class="st">"openms"</span>)</a>
 <a class="sourceLine" id="cb6-2" data-line-number="2">fGroups</a>
-<a class="sourceLine" id="cb6-3" data-line-number="3"><span class="co">#&gt; A feature groups object ('featureGroupsOpenMS')</span></a>
-<a class="sourceLine" id="cb6-4" data-line-number="4"><span class="co">#&gt; Feature groups: M79_R20_1, M79_R20_2, M79_R112_3, M79_R8_4, M85_R113_5, M85_R14_6, ... (639 total)</span></a>
-<a class="sourceLine" id="cb6-5" data-line-number="5"><span class="co">#&gt; Analyses: solvent-1, solvent-2, solvent-3, standard-1, standard-2, standard-3 (6 total)</span></a>
-<a class="sourceLine" id="cb6-6" data-line-number="6"><span class="co">#&gt; Replicate groups: solvent, standard (2 total)</span></a>
-<a class="sourceLine" id="cb6-7" data-line-number="7"><span class="co">#&gt; Replicate groups used as ref: solvent (1 total)</span></a>
-<a class="sourceLine" id="cb6-8" data-line-number="8"><span class="co">#&gt; Object size (indication): 805.5 kB</span></a></code></pre></div>
-<p>The <code><a href="../reference/featureGroups-class.html">groupTable()</a></code> function can be used to have a look at generated feature groups and their intensities (<em>i.e.</em> peak heights) across all analyses:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/head">head</a></span>(<span class="kw"><a href="../reference/featureGroups-class.html">groupTable</a></span>(fGroups))</a>
+<a class="sourceLine" id="cb6-3" data-line-number="3"><span class="co">#&gt; A featureGroupsOpenMS object (derived from featureGroups -&gt; workflowStep)</span></a>
+<a class="sourceLine" id="cb6-4" data-line-number="4"><span class="co">#&gt; Object size (indication): 805.9 kB</span></a>
+<a class="sourceLine" id="cb6-5" data-line-number="5"><span class="co">#&gt; Algorithm: openms</span></a>
+<a class="sourceLine" id="cb6-6" data-line-number="6"><span class="co">#&gt; Feature groups: M79_R20_1, M79_R20_2, M79_R112_3, M79_R8_4, M85_R113_5, M85_R14_6, ... (639 total)</span></a>
+<a class="sourceLine" id="cb6-7" data-line-number="7"><span class="co">#&gt; Analyses: solvent-1, solvent-2, solvent-3, standard-1, standard-2, standard-3 (6 total)</span></a>
+<a class="sourceLine" id="cb6-8" data-line-number="8"><span class="co">#&gt; Replicate groups: solvent, standard (2 total)</span></a>
+<a class="sourceLine" id="cb6-9" data-line-number="9"><span class="co">#&gt; Replicate groups used as ref: solvent (1 total)</span></a></code></pre></div>
+<p>The <code><a href="../reference/generics.html">as.data.table()</a></code> function can be used to have a look at generated feature groups and their intensities (<em>i.e.</em> peak heights) across all analyses:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/head">head</a></span>(<span class="kw"><a href="../reference/generics.html">as.data.table</a></span>(fGroups))</a>
 <a class="sourceLine" id="cb7-2" data-line-number="2"><span class="co">#&gt;         group        ret       mz solvent-1 solvent-2 solvent-3 standard-1 standard-2 standard-3</span></a>
 <a class="sourceLine" id="cb7-3" data-line-number="3"><span class="co">#&gt; 1:  M79_R20_1  19.637963 78.99679      7464      6796      7320       5268       6912       6812</span></a>
 <a class="sourceLine" id="cb7-4" data-line-number="4"><span class="co">#&gt; 2:  M79_R20_2  19.804059 79.02095         0         0         0      10540       7040       2036</span></a>
@@ -196,22 +198,19 @@ pre, code {
 <a href="#data-cleanup" class="anchor"></a>Data cleanup</h2>
 <p>The next step is to perform some basic rule based filtering with the <code><a href="../reference/generics.html">filter()</a></code> function. As its name suggests this function has several way to filter data. It is a so called <em>generic</em> function and <em>methods</em> exists for various data types, such as the feature groups object (<code>fGroups</code>) that was made in the previous section.</p>
 <p>In this tutorial we will filter grouped features (or ‘feature groups’) based on a minimal intensity, minimal abundance within replicates and absence within blanks. Finally, we will also remove any feature groups eluting before roughly the dead volume of the system:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1">fGroups &lt;-<span class="st"> </span><span class="kw"><a href="../reference/generics.html">filter</a></span>(fGroups, <span class="dt">intensityThreshold =</span> <span class="dv">10000</span>, <span class="dt">intraRGroupAbundance =</span> <span class="dv">1</span>,</a>
-<a class="sourceLine" id="cb8-2" data-line-number="2">                  <span class="dt">minBlankThreshold =</span> <span class="dv">5</span>, <span class="dt">repetitions =</span> <span class="dv">2</span>, <span class="dt">retentionRange =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">110</span>, <span class="dv">-1</span>))</a>
-<a class="sourceLine" id="cb8-3" data-line-number="3"><span class="co">#&gt; Applying intensity filter... Done! Filtered 430 (67.29%) groups. Remaining: 209.</span></a>
-<a class="sourceLine" id="cb8-4" data-line-number="4"><span class="co">#&gt; Applying retention filter... Done! Filtered 169 (80.86%) groups. Remaining: 40.</span></a>
-<a class="sourceLine" id="cb8-5" data-line-number="5"><span class="co">#&gt; filter repetition 1/2</span></a>
-<a class="sourceLine" id="cb8-6" data-line-number="6"><span class="co">#&gt; Applying replicate filter... Done! Filtered 9 (22.50%) groups. Remaining: 31.</span></a>
-<a class="sourceLine" id="cb8-7" data-line-number="7"><span class="co">#&gt; Applying blank filter... Done! Filtered 0 (0.00%) groups. Remaining: 31.</span></a>
-<a class="sourceLine" id="cb8-8" data-line-number="8"><span class="co">#&gt; filter repetition 2/2</span></a>
-<a class="sourceLine" id="cb8-9" data-line-number="9"><span class="co">#&gt; Applying replicate filter... Done! Filtered 0 (0.00%) groups. Remaining: 31.</span></a>
-<a class="sourceLine" id="cb8-10" data-line-number="10"><span class="co">#&gt; Applying blank filter... Done! Filtered 0 (0.00%) groups. Remaining: 31.</span></a></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1">fGroups &lt;-<span class="st"> </span><span class="kw"><a href="../reference/generics.html">filter</a></span>(fGroups, <span class="dt">absMinIntensity =</span> <span class="dv">10000</span>, <span class="dt">relMinReplicateAbundance =</span> <span class="dv">1</span>,</a>
+<a class="sourceLine" id="cb8-2" data-line-number="2">                  <span class="dt">maxReplicateIntRSD =</span> <span class="fl">0.75</span>, <span class="dt">blankThreshold =</span> <span class="dv">5</span>, <span class="dt">retentionRange =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="dv">110</span>, <span class="ot">Inf</span>))</a>
+<a class="sourceLine" id="cb8-3" data-line-number="3"><span class="co">#&gt; Applying retention filter... Done! Filtered 532 (83.26%) groups. Remaining: 107.</span></a>
+<a class="sourceLine" id="cb8-4" data-line-number="4"><span class="co">#&gt; Applying replicate abundance filter... Done! Filtered 42 (39.25%) groups. Remaining: 65.</span></a>
+<a class="sourceLine" id="cb8-5" data-line-number="5"><span class="co">#&gt; Applying blank filter... Done! Filtered 15 (23.08%) groups. Remaining: 50.</span></a>
+<a class="sourceLine" id="cb8-6" data-line-number="6"><span class="co">#&gt; Applying intensity filter... Done! Filtered 20 (40.00%) groups. Remaining: 30.</span></a>
+<a class="sourceLine" id="cb8-7" data-line-number="7"><span class="co">#&gt; Applying replicate abundance filter... Done! Filtered 1 (3.33%) groups. Remaining: 29.</span></a></code></pre></div>
 <p>As can been from above command this will remove quite a large part our data. However, in our experience using the right settings is a very effective way to separate interesting data from the rest. Some hints on this process:</p>
 <ul>
-<li>The intensity filter is an effective way to remove not oly ‘noisy’ data, but can also be used to remove any low intensity peaks which are very likely to miss any MS/MS data (assuming you are interested in this and data has been recorded with it).</li>
-<li>The <code>intraRGroupAbundance</code> argument specifies a fraction to which a feature group should be minimally present within all replicates. This is a <em>very</em> effective filter in removing any outliers or features which don’t actually represent a well defined chromatographic peak, but perhaps are just part of another peak or simply noise.</li>
-<li>The <code>minBlankThreshold</code> argument is used for blank subtraction. In the above example, any features with an intensity less than five times compared to the average intensity in blanks will be removed.</li>
-<li>The <code>repetitions</code> argument is used to repeat some of the filter steps to make sure that all the data is really filtered out. A value of two is usually sufficient.</li>
+<li>The intensity filter is an effective way to remove not only ‘noisy’ data, but can also be used to remove any low intensity peaks which are very likely to miss any MS/MS data (assuming you are interested in this and data has been recorded with it).</li>
+<li>The <code>relMinReplicateAbundance</code> argument specifies a fraction to which a feature should be minimally present within a replicate group. This is a <em>very</em> effective filter in removing any outliers or features which don’t actually represent a well defined chromatographic peak, but perhaps are just part of another peak or simply noise.</li>
+<li>The <code>maxReplicateIntRSD</code> argument specifies the maximum relative standard deviation (RSD) of feature intensities within a replicate group.</li>
+<li>The <code>blankThreshold</code> argument is used for blank subtraction. In the above example, any features with an intensity less than five times compared to the average intensity in blanks will be removed.</li>
 </ul>
 <p>Finally, we can have a quick look at our data by plotting some nice extracted ion chromatograms (EICs) for all remaining feature groups:</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="kw"><a href="../reference/generics.html">plotEIC</a></span>(fGroups, <span class="dt">colourBy =</span> <span class="st">"fGroups"</span>, <span class="dt">showFGroupRect =</span> <span class="ot">FALSE</span>, <span class="dt">showPeakArea =</span> <span class="ot">TRUE</span>,</a>
@@ -228,19 +227,20 @@ pre, code {
 <a class="sourceLine" id="cb10-2" data-line-number="2">plists &lt;-<span class="st"> </span><span class="kw"><a href="../reference/MSPeakLists-generation.html">generateMSPeakLists</a></span>(fGroups, <span class="st">"mzr"</span>, <span class="dt">maxRtMSWidth =</span> <span class="dv">20</span>, <span class="dt">precursorMzWindow =</span> <span class="dv">8</span>,</a>
 <a class="sourceLine" id="cb10-3" data-line-number="3">                              <span class="dt">avgFeatParams =</span> avgPListParams, <span class="dt">avgFGroupParams =</span> avgPListParams)</a></code></pre></div>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1">plists</a>
-<a class="sourceLine" id="cb11-2" data-line-number="2"><span class="co">#&gt; A MSPeakLists object ('MSPeakLists')</span></a>
-<a class="sourceLine" id="cb11-3" data-line-number="3"><span class="co">#&gt; Total peak count: 5426 (MS: 4430 - MS/MS: 996)</span></a>
-<a class="sourceLine" id="cb11-4" data-line-number="4"><span class="co">#&gt; Average peak count/analysis: 1809 (MS: 1477 - MS/MS: 332)</span></a>
-<a class="sourceLine" id="cb11-5" data-line-number="5"><span class="co">#&gt; Total peak lists: 183 (MS: 93 - MS/MS: 90)</span></a>
-<a class="sourceLine" id="cb11-6" data-line-number="6"><span class="co">#&gt; Average peak lists/analysis: 61 (MS: 31 - MS/MS: 30)</span></a>
-<a class="sourceLine" id="cb11-7" data-line-number="7"><span class="co">#&gt; Object size (indication): 505.1 kB</span></a></code></pre></div>
+<a class="sourceLine" id="cb11-2" data-line-number="2"><span class="co">#&gt; A MSPeakLists object (derived from workflowStep)</span></a>
+<a class="sourceLine" id="cb11-3" data-line-number="3"><span class="co">#&gt; Object size (indication): 2.5 MB</span></a>
+<a class="sourceLine" id="cb11-4" data-line-number="4"><span class="co">#&gt; Algorithm: mzR</span></a>
+<a class="sourceLine" id="cb11-5" data-line-number="5"><span class="co">#&gt; Total peak count: 5114 (MS: 4154 - MS/MS: 960)</span></a>
+<a class="sourceLine" id="cb11-6" data-line-number="6"><span class="co">#&gt; Average peak count/analysis: 1705 (MS: 1385 - MS/MS: 320)</span></a>
+<a class="sourceLine" id="cb11-7" data-line-number="7"><span class="co">#&gt; Total peak lists: 171 (MS: 87 - MS/MS: 84)</span></a>
+<a class="sourceLine" id="cb11-8" data-line-number="8"><span class="co">#&gt; Average peak lists/analysis: 57 (MS: 29 - MS/MS: 28)</span></a></code></pre></div>
 </div>
 <div id="formula-calculation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#formula-calculation" class="anchor"></a>Formula calculation</h2>
 <p>Using the data from the MS peaklists generated during the previous step we can generate a list of formula candidates for each feature group based on measured <em>m/z</em> values, isotopic patterns and presence of MS/MS fragments. In this tutorial we will use this data as an extra hint to score canddiate chemical structures generated during the next step. The command below will use <a href="https://sourceforge.net/projects/genform/">GenForm</a> to perform this step:</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1">formulas &lt;-<span class="st"> </span><span class="kw"><a href="../reference/formula-generation.html">generateFormulas</a></span>(fGroups, <span class="st">"genform"</span>, plists, <span class="dt">maxMzDev =</span> <span class="dv">5</span>,</a>
-<a class="sourceLine" id="cb12-2" data-line-number="2">                             <span class="dt">adduct =</span> <span class="st">"M+H"</span>, <span class="dt">elements =</span> <span class="st">"CHNOPSCl"</span>,</a>
+<a class="sourceLine" id="cb12-2" data-line-number="2">                             <span class="dt">adduct =</span> <span class="st">"[M+H]+"</span>, <span class="dt">elements =</span> <span class="st">"CHNOPSCl"</span>,</a>
 <a class="sourceLine" id="cb12-3" data-line-number="3">                             <span class="dt">calculateFeatures =</span> <span class="ot">TRUE</span>, <span class="dt">featThreshold =</span> <span class="fl">0.75</span>)</a>
 <a class="sourceLine" id="cb12-4" data-line-number="4">formulas</a></code></pre></div>
 <p>Note that we limited to only to the the elements C, H, N, O, P, S and Cl. It is highly recommended to limit the elements (by default it is just C, H, N, O and P) as this can significantly reduce processing time and improbable formula candidates. In this tutorial we already knew which compounds to expect so the choice was easy, but often a good guess can be made in advance.</p>
@@ -253,21 +253,17 @@ pre, code {
 <div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/options">options</a></span>(<span class="dt">patRoon.path.metFragCL =</span> <span class="st">"~/MetFrag2.4.3-CL.jar"</span>) <span class="co"># change to the full path of the MetFrag CLI jar file</span></a></code></pre></div>
 <p>Then <code><a href="../reference/compound-generation.html">generateCompounds()</a></code> is used to execute MetFrag and generate the <code>compounds</code>.</p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1">compounds &lt;-<span class="st"> </span><span class="kw"><a href="../reference/compound-generation.html">generateCompounds</a></span>(fGroups, plists, <span class="st">"metfrag"</span>, <span class="dt">topMost =</span> <span class="dv">25</span>,</a>
-<a class="sourceLine" id="cb14-2" data-line-number="2">                               <span class="dt">adduct =</span> <span class="dv">1</span>, <span class="dt">isPositive =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb14-3" data-line-number="3">                               <span class="dt">database =</span> <span class="st">"ExtendedPubChem"</span>, <span class="dt">maxCandidatesToStop =</span> <span class="dv">5000</span>,</a>
-<a class="sourceLine" id="cb14-4" data-line-number="4">                               <span class="dt">scoreTypes =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"FragmenterScore"</span>, <span class="st">"OfflineMetFusionScore"</span>,</a>
-<a class="sourceLine" id="cb14-5" data-line-number="5">                                              <span class="st">"PubChemNumberPatents"</span>,</a>
-<a class="sourceLine" id="cb14-6" data-line-number="6">                                              <span class="st">"PubChemNumberPubMedReferences"</span>))</a></code></pre></div>
+<a class="sourceLine" id="cb14-2" data-line-number="2">                               <span class="dt">adduct =</span> <span class="st">"[M+H]+"</span>, <span class="dt">database =</span> <span class="st">"pubchem"</span>, <span class="dt">maxCandidatesToStop =</span> <span class="dv">5000</span>)</a></code></pre></div>
 <div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" data-line-number="1">compounds</a>
-<a class="sourceLine" id="cb15-2" data-line-number="2"><span class="co">#&gt; A compounds object (compoundsMF)</span></a>
-<a class="sourceLine" id="cb15-3" data-line-number="3"><span class="co">#&gt; Algorithm: MetFrag</span></a>
-<a class="sourceLine" id="cb15-4" data-line-number="4"><span class="co">#&gt; Number of feature groups with compounds in this object: 25</span></a>
-<a class="sourceLine" id="cb15-5" data-line-number="5"><span class="co">#&gt; Number of compounds: 609 (total), 24.4 (mean), 9 - 25 (min - max)</span></a>
-<a class="sourceLine" id="cb15-6" data-line-number="6"><span class="co">#&gt; Object size (indication): 1.9 MB</span></a>
+<a class="sourceLine" id="cb15-2" data-line-number="2"><span class="co">#&gt; A compoundsMF object (derived from compounds -&gt; workflowStep)</span></a>
+<a class="sourceLine" id="cb15-3" data-line-number="3"><span class="co">#&gt; Object size (indication): 1.9 MB</span></a>
+<a class="sourceLine" id="cb15-4" data-line-number="4"><span class="co">#&gt; Algorithm: metfrag</span></a>
+<a class="sourceLine" id="cb15-5" data-line-number="5"><span class="co">#&gt; Number of feature groups with compounds in this object: 23</span></a>
+<a class="sourceLine" id="cb15-6" data-line-number="6"><span class="co">#&gt; Number of compounds: 559 (total), 24.3 (mean), 9 - 25 (min - max)</span></a>
 <a class="sourceLine" id="cb15-7" data-line-number="7"><span class="kw"><a href="../reference/generics.html">plotSpec</a></span>(compounds, <span class="dv">1</span>, <span class="st">"M120_R328_91"</span>, plists)</a></code></pre></div>
 <p><img src="tutorial_files/figure-html/unnamed-chunk-6-1.png" width="384"></p>
 <p>While <code><a href="../reference/compound-generation.html">generateCompounds()</a></code> is running a list of candidate compound structures will be downloaded for every feature group (in this case from PubChem) and ranked according to various scoring parameters.</p>
-<p>As with previous described workfow functions, there are many different arguments that can specified to modify the behaviour when generating compounds. In brief, here we limit the number to the top 25 candidates (this will save a lot of processing time), specify that we are primarily interested in protonated ions and use the extended PubChem database so that we can score on number of patents and PubMed references along with scoring for similarity to in-silico generated MS/MS spectra (<code>FragmenterScore</code>) and MassBank derived mass spectra (<code>OfflineMetFusionScore</code>).</p>
+<p>As with previous described workfow functions, there are many different arguments that can specified to modify the behaviour when generating compounds. In brief, here we limit the number to the top 25 candidates (this will save a lot of processing time), specify that we are primarily interested in protonated ions and use the pubchem database.</p>
 <p>As a side note: this is often one of the most time consuming steps during the workflow. For this reason, and in order to not ‘abuse’ the server used by MetFrag, you should always take care to prioritize your data before running this function.</p>
 <p>In the previous step we generated candidate formulas for all feature groups. These can be used to add yet another scoring parameter so we can assess if the formula part of a candidate structure makes sense:</p>
 <div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" data-line-number="1">compounds &lt;-<span class="st"> </span><span class="kw"><a href="../reference/compounds-class.html">addFormulaScoring</a></span>(compounds, formulas, <span class="dt">updateScore =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
@@ -279,11 +275,11 @@ pre, code {
 <p>Generating components is performed with the <code><a href="../reference/component-generation.html">generateComponents()</a></code> function:</p>
 <div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" data-line-number="1">components &lt;-<span class="st"> </span><span class="kw"><a href="../reference/component-generation.html">generateComponents</a></span>(fGroups, <span class="st">"camera"</span>, <span class="dt">ionization =</span> <span class="st">"positive"</span>)</a></code></pre></div>
 <div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" data-line-number="1">components</a>
-<a class="sourceLine" id="cb18-2" data-line-number="2"><span class="co">#&gt; A components object (componentsCamera)</span></a>
-<a class="sourceLine" id="cb18-3" data-line-number="3"><span class="co">#&gt; Algorithm: CAMERA</span></a>
-<a class="sourceLine" id="cb18-4" data-line-number="4"><span class="co">#&gt; Components: CMP1, CMP2, CMP3, CMP4, CMP5, CMP6, ... (22 total)</span></a>
-<a class="sourceLine" id="cb18-5" data-line-number="5"><span class="co">#&gt; Number of feature groups in components: 31 (total), 1.4 (mean), 1 - 3 (min - max)</span></a>
-<a class="sourceLine" id="cb18-6" data-line-number="6"><span class="co">#&gt; Object size (indication): 532.6 kB</span></a>
+<a class="sourceLine" id="cb18-2" data-line-number="2"><span class="co">#&gt; A componentsCamera object (derived from components -&gt; workflowStep)</span></a>
+<a class="sourceLine" id="cb18-3" data-line-number="3"><span class="co">#&gt; Object size (indication): 481.4 kB</span></a>
+<a class="sourceLine" id="cb18-4" data-line-number="4"><span class="co">#&gt; Algorithm: camera</span></a>
+<a class="sourceLine" id="cb18-5" data-line-number="5"><span class="co">#&gt; Components: CMP2, CMP3, CMP5, CMP7, CMP12, CMP13, ... (8 total)</span></a>
+<a class="sourceLine" id="cb18-6" data-line-number="6"><span class="co">#&gt; Number of feature groups in components: 17 (total), 2.1 (mean), 2 - 3 (min - max)</span></a>
 <a class="sourceLine" id="cb18-7" data-line-number="7"><span class="kw"><a href="../reference/generics.html">plotSpec</a></span>(components, <span class="st">"CMP17"</span>)</a></code></pre></div>
 <p><img src="tutorial_files/figure-html/unnamed-chunk-8-1.png" width="480"></p>
 <div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" data-line-number="1"><span class="kw"><a href="../reference/generics.html">plotEIC</a></span>(components, <span class="st">"CMP17"</span>, fGroups)</a></code></pre></div>
@@ -329,7 +325,7 @@ pre, code {
 <a class="sourceLine" id="cb21-10" data-line-number="10"><span class="co">#&gt; 6:             8-quinolol 185 146.0600 M146_R185_175 184.9442 146.0599 -0.05576015 -1.716667e-04         0         0         0      24516      25100      24172</span></a></code></pre></div>
 <div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" data-line-number="1">fGroupsScreening &lt;-<span class="st"> </span><span class="kw"><a href="../reference/target-screening.html">groupFeaturesScreening</a></span>(fGroups, scr)</a>
 <a class="sourceLine" id="cb22-2" data-line-number="2"><span class="co">#&gt; Converting screening results to feature groups... Done!</span></a>
-<a class="sourceLine" id="cb22-3" data-line-number="3"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/head">head</a></span>(<span class="kw"><a href="../reference/featureGroups-class.html">groupTable</a></span>(fGroupsScreening))</a>
+<a class="sourceLine" id="cb22-3" data-line-number="3"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/head">head</a></span>(<span class="kw"><a href="../reference/generics.html">as.data.table</a></span>(fGroupsScreening))</a>
 <a class="sourceLine" id="cb22-4" data-line-number="4"><span class="co">#&gt;                     group      ret       mz solvent-1 solvent-2 solvent-3 standard-1 standard-2 standard-3</span></a>
 <a class="sourceLine" id="cb22-5" data-line-number="5"><span class="co">#&gt; 1:       1H-benzotriazole 327.9651 120.0555         0         0         0      55936      61668      59624</span></a>
 <a class="sourceLine" id="cb22-6" data-line-number="6"><span class="co">#&gt; 2: 2-methylamino-pyridine 115.7685 109.0759         0         0         0      12064      12080      12356</span></a>

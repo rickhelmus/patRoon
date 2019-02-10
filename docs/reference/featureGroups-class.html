@@ -106,7 +106,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Base class for grouped features.</h1>
-    <small class="dont-index">Source: <a href='https://github.com/rickhelmus/patRoon/blob/master/R/feature_groups.R'><code>R/feature_groups.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/rickhelmus/patRoon/blob/master/R/feature_groups.R'><code>R/feature_groups.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/feature_groups-bruker.R'><code>R/feature_groups-bruker.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/feature_groups-envimass.R'><code>R/feature_groups-envimass.R</code></a>, and 3 more</small>
     <div class="hidden name"><code>featureGroups-class.Rd</code></div>
     </div>
 
@@ -165,7 +165,8 @@ $(x, name)
 export(fGroups, type, out)
 
 # S4 method for featureGroups
-groupTable(fGroups, average = FALSE)
+as.data.table(x, average = FALSE,
+  features = FALSE)
 
 # S4 method for featureGroups,ANY
 plot(x, retMin = TRUE, ...)
@@ -184,13 +185,13 @@ plotEIC(obj, rtWindow = 30, mzWindow = 0.005,
   showPeakArea = FALSE, showFGroupRect = TRUE, title = NULL,
   colourBy = c("none", "rGroups", "fGroups"), showLegend = TRUE,
   onlyPresent = TRUE, annotate = c("none", "ret", "mz"),
-  showProgress = FALSE, ...)
+  showProgress = FALSE, xlim = NULL, ylim = NULL, ...)
 
 # S4 method for featureGroups
 plotVenn(obj, which = NULL, ...)
 
 # S4 method for featureGroups
-plotUpSet(obj, which = replicateGroups(obj),
+plotUpSet(obj, which = NULL,
   nsets = length(which), nintersects = NA, ...)
 
 # S4 method for featureGroups
@@ -214,7 +215,7 @@ regression(fGroups)</pre>
       <th>i, j</th>
       <td><p>A numeric or character value which is used to select analyses/feature groups by
 their index or name, respectively (for the order/names see <code>analyses()/names()</code>).<br /><br /> For <code>[</code>: Can also be logical to perform logical selection
-(similar to regular vectors). If missing all analyses/feature groups are selected.<br /><br /> For <code>[[</code>: should be a skalar value. If <code>j</code> is not specified, <code>i</code> selects by feature groups instead.</p></td>
+(similar to regular vectors). If missing all analyses/feature groups are selected.<br /><br /> For <code>[[</code>: should be a scalar value. If <code>j</code> is not specified, <code>i</code> selects by feature groups instead.</p></td>
     </tr>
     <tr>
       <th>&#8230;</th>
@@ -245,6 +246,11 @@ ProfileAnalysis), <code>"brukertasq"</code> (Bruker TASQ) or <code>"mzmine"</cod
     <tr>
       <th>average</th>
       <td><p>Average data within replicate groups.</p></td>
+    </tr>
+    <tr>
+      <th>features</th>
+      <td><p>If <code>TRUE</code> then feature specific data will be added. If
+<code>average=TRUE</code> this data will be averaged for each feature group.</p></td>
     </tr>
     <tr>
       <th>retMin</th>
@@ -344,8 +350,14 @@ displayed when all EICs are being plot. Set to <code>"none"</code> to disable an
 annotation.</p></td>
     </tr>
     <tr>
+      <th>xlim, ylim</th>
+      <td><p>Sets the plot size limits used by
+<code><a href='https://www.rdocumentation.org/packages/graphics/topics/plot'>plot</a></code>. Set to <code>NULL</code> for automatic plot sizing.</p></td>
+    </tr>
+    <tr>
       <th>which</th>
-      <td><p>A character vector with replicate groups used for comparison.</p></td>
+      <td><p>A character vector with replicate groups used for comparison.
+For plotting functions: set to <code>NULL</code> for all replicate groups.</p></td>
     </tr>
     <tr>
       <th>nsets, nintersects</th>
@@ -376,7 +388,7 @@ not unique to the given replicate groups.</p></td>
     <p><code>plotVenn</code> (invisibly) returns a list with the following fields:</p><ul>
 <li><p><code>gList</code> the <code>gList</code> object that was returned by
   the utilized <span class="pkg">VennDiagram</span> plotting function.</p></li>
-<li><p><code>areas</code> The total area (<em>i.e.</em> feature group count) for each plotted group.</p></li>
+<li><p><code>areas</code> The total area for each plotted group.</p></li>
 <li><p><code>intersectionCounts</code> The number of intersections between groups.</p></li>
 </ul>
 
@@ -420,8 +432,8 @@ replicate groups for which data is present in this object.</p></li>
 is readable to Bruker ProfileAnalysis (a 'bucket table'), Bruker TASQ (an
 analyte database) or that is suitable as input for the <code>Targeted peak
 detection</code> functionality of <a href='http://mzmine.github.io/'>MZmine</a>.</p></li>
-<li><p><code>groupTable</code>: Obtain summary table (a <code>data.table</code>)
-with retention, <em>m/z</em> and intensity information.</p></li>
+<li><p><code>as.data.table</code>: Obtain a summary table (a <code>data.table</code>)
+with retention, <em>m/z</em>, intensity and optionally other feature data.</p></li>
 <li><p><code>plot</code>: Generates an <em>m/z</em> <em>vs</em> retention time plot
 for all featue groups.</p></li>
 <li><p><code>plotInt</code>: Generates a line plot for the (averaged) intensity
@@ -468,6 +480,22 @@ row within the feature table of the analysis (see
 <code><a href='generics.html'>featureTable</a></code>).</p></dd>
 </dl>
     
+    <h2 class="hasAnchor" id="s-class-hierarchy"><a class="anchor" href="#s-class-hierarchy"></a>S4 class hierarchy</h2>
+
+    <p></p><ul>
+<li><p><code><a href='workflowStep-class.html'>workflowStep</a></code></p><ul>
+<li><p><strong><code><a href='features-class.html'>features</a></code></strong></p><ul>
+<li><p><code><a href='featureGroups-compare.html'>featuresFromFeatGroups</a></code></p></li>
+<li><p><code><a href='featureGroups-compare.html'>featuresConsensus</a></code></p></li>
+<li><p><code><a href='features-class.html'>featuresBruker</a></code></p></li>
+<li><p><code><a href='features-class.html'>featuresEnviPick</a></code></p></li>
+<li><p><code><a href='features-class.html'>featuresOpenMS</a></code></p></li>
+<li><p><code><a href='target-screening.html'>featuresBrukerTASQ</a></code></p></li>
+<li><p><code><a href='features-class.html'>featuresXCMS</a></code></p></li>
+</ul></li>
+</ul></li>
+</ul>
+    
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
     <p>Gu, Z. (2014) circlize implements and enhances circular visualization in R. Bioinformatics.</p>
@@ -497,6 +525,8 @@ doi: <a href='http://doi.org/10.1109/tvcg.2014.2346248'>10.1109/tvcg.2014.234624
       <li><a href="#methods-by-generic-">Methods (by generic)</a></li>
 
       <li><a href="#slots">Slots</a></li>
+
+      <li><a href="#s-class-hierarchy">S4 class hierarchy</a></li>
 
       <li><a href="#references">References</a></li>
           </ul>

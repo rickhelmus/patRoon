@@ -121,14 +121,13 @@
   <span class='kw'>groupArgs</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='kw'>rtalign</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>))
 
 <span class='co'># S4 method for featureGroupsComparison,ANY</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/graphics/topics/plot'>plot</a></span>(<span class='no'>x</span>, <span class='kw'>retMin</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='no'>...</span>)
+<span class='fu'><a href='generics.html'>plot</a></span>(<span class='no'>x</span>, <span class='kw'>retMin</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='no'>...</span>)
 
 <span class='co'># S4 method for featureGroupsComparison</span>
 <span class='fu'><a href='generics.html'>plotVenn</a></span>(<span class='no'>obj</span>, <span class='kw'>which</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)
 
 <span class='co'># S4 method for featureGroupsComparison</span>
-<span class='fu'><a href='generics.html'>plotUpSet</a></span>(<span class='no'>obj</span>, <span class='kw'>which</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/names'>names</a></span>(<span class='no'>obj</span>),
-  <span class='no'>...</span>)
+<span class='fu'><a href='generics.html'>plotUpSet</a></span>(<span class='no'>obj</span>, <span class='kw'>which</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)
 
 <span class='co'># S4 method for featureGroupsComparison</span>
 <span class='fu'><a href='generics.html'>plotChord</a></span>(<span class='no'>obj</span>, <span class='kw'>addSelfLinks</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
@@ -136,10 +135,7 @@
 
 <span class='co'># S4 method for featureGroupsComparison</span>
 <span class='fu'><a href='generics.html'>consensus</a></span>(<span class='no'>obj</span>, <span class='kw'>relAbundance</span> <span class='kw'>=</span> <span class='fl'>0</span>,
-  <span class='kw'>absAbundance</span> <span class='kw'>=</span> <span class='fl'>0</span>)
-
-<span class='co'># S4 method for featureGroupsComparison</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/unique'>unique</a></span>(<span class='no'>x</span>, <span class='no'>which</span>, <span class='no'>...</span>)</pre>
+  <span class='kw'>absAbundance</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>uniqueFrom</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>uniqueOuter</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -147,14 +143,14 @@
     <tr>
       <th>&#8230;</th>
       <td><p>For <code>comparison</code>: <code>featureGroups</code> objects that should
-be compared. Objects may be labeled by naming the parameters, otherwise
-labels are automatically determined. For <code>plot</code>, <code>plotVenn</code>,
-<code>plotChord</code>, <code>unique</code>: further options passed to <code>plot</code>,
-<span class="pkg">VennDiagram</span> plotting functions (<em>e.g.</em>
-<code>draw.pairwise.venn</code>), <code>chordDiagram</code> and
-<code>unique</code> (<code>featureGroups</code> signature), respectively. For
-<code>plotUpSet</code>: any further arguments passed to the <code>plotUpSet</code>
-method defined for <code><a href='featureGroups-class.html'>featureGroups</a></code>.</p></td>
+  be compared. Objects are automatically labelled by their
+  <code><a href='generics.html'>algorithm</a></code>.</p>
+<p>For <code>plot</code>, <code>plotVenn</code>, <code>plotChord</code>: further options passed
+  to <code>plot</code>, <span class="pkg">VennDiagram</span> plotting functions (<em>e.g.</em>
+  <code>draw.pairwise.venn</code>) and <code>chordDiagram</code>
+  respectively.</p>
+<p>For <code>plotUpSet</code>: any further arguments passed to the <code>plotUpSet</code>
+  method defined for <code><a href='featureGroups-class.html'>featureGroups</a></code>.</p></td>
     </tr>
     <tr>
       <th>groupAlgo</th>
@@ -195,7 +191,24 @@ retention time scatter plots.</p></td>
       <th>relAbundance, absAbundance</th>
       <td><p>Feature groups with relative/absolute
 abundance below this number will be removed from the consensus. Set to
-<code>0</code> for no limits.</p></td>
+<code>0</code> for no limits. Limits cannot be set when <code>uniqueFrom</code> is not
+<code>NULL</code>.</p></td>
+    </tr>
+    <tr>
+      <th>uniqueFrom</th>
+      <td><p>Set this argument to only retain feature groups that are unique
+within one or more of the objects for which the consensus is made.
+Selection is done by setting the value of <code>uniqueFrom</code> to a
+<code>logical</code> (values are recycled), <code>numeric</code> (select by index) or a
+<code>character</code> (as obtained with <code><a href='generics.html'>algorithm(obj)</a></code>). For
+<code>logical</code> and <code>numeric</code> values the order corresponds to the order
+of the objects given for the consensus. Set to <code>NULL</code> to ignore.</p></td>
+    </tr>
+    <tr>
+      <th>uniqueOuter</th>
+      <td><p>If <code>uniqueFrom</code> is not <code>NULL</code> and if
+<code>uniqueOuter=TRUE</code>: only retain data that are also unique between
+objects specified in <code>uniqueFrom</code>.</p></td>
     </tr>
     </table>
     
@@ -206,15 +219,15 @@ abundance below this number will be removed from the consensus. Set to
 <p><code>plotVenn</code> (invisibly) returns a list with the following fields:</p><ul>
 <li><p><code>gList</code> the <code>gList</code> object that was returned by
   the utilized <span class="pkg">VennDiagram</span> plotting function.</p></li>
-<li><p><code>areas</code> The total area (<em>i.e.</em> feature group count) for each plotted group.</p></li>
+<li><p><code>areas</code> The total area for each plotted group.</p></li>
 <li><p><code>intersectionCounts</code> The number of intersections between groups.</p></li>
 </ul>
 
 <p>The order for the <code>areas</code> and <code>intersectionCounts</code> fields is the same as the parameter order
 from the used plotting function (see <em>e.g.</em> <code>draw.pairwise.venn</code> and
 <code>draw.triple.venn</code>).</p>
-<p><code>consensus</code> returns a <code><a href='featureGroups-class.html'>featureGroups</a></code>
-  object with a consensus from the compared feature groups.</p>
+<p><code>consensus</code> returns a <code><a href='featureGroups-class.html'>featureGroups</a></code> object with a
+  consensus from the compared feature groups.</p>
     
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
@@ -239,8 +252,6 @@ output and generate a consensus.</p>
   of feature groups.</p>
 <p><code>consensus</code> combines all compared feature groups and averages
   their retention, <em>m/z</em> and intensity data.</p>
-<p><code>unique</code> returns unique feature groups from one or more
-  compared feature groups.</p>
     
 
   </div>

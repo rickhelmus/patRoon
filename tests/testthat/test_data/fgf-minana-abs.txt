@@ -1,4 +1,1 @@
-filter repetition 1/2
-Applying abundance filter... Done! Filtered 168 (26.09%) groups. Remaining: 476.
-filter repetition 2/2
-Applying abundance filter... Done! Filtered 0 (0.00%) groups. Remaining: 476.
+Applying minimum analyses filter... Done! Filtered 168 (26.09%) groups. Remaining: 476.

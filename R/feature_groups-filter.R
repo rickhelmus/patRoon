@@ -96,9 +96,8 @@ blankFilter <- function(fGroups, threshold, negate = FALSE)
 
         for (ref in allRefs)
         {
-            samplesWithRef <- which(sapply(refGroups, function(refs) ref %in% refs))
-            refSamples <- which(anaInfo$group == ref)
-            thr <- fGroups@groups[refSamples, lapply(.SD, function(x)
+            refAnalyses <- which(anaInfo$group == ref)
+            thr <- fGroups@groups[refAnalyses, lapply(.SD, function(x)
             {
                 m <- mean(x[x > 0])
                 if (is.na(m))

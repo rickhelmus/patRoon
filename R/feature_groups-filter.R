@@ -47,7 +47,8 @@ doFilter <- function(fGroups, what, hashParam, func, cacheCateg = what, verbose 
     if (verbose)
     {
         newn <- ncol(ret@groups)
-        printf("Done! Filtered %d (%.2f%%) groups. Remaining: %d.\n", oldn - newn, (1-(newn/oldn))*100, newn)
+        printf("Done! Filtered %d (%.2f%%) groups. Remaining: %d.\n", oldn - newn,
+               if (oldn > 0) (1-(newn/oldn))*100 else 0, newn)
     }
 
     return(ret)
@@ -58,7 +59,7 @@ intensityFilter <- function(fGroups, absThreshold, relThreshold, negate = FALSE)
     threshold <- getHighestAbsValue(absThreshold, relThreshold, max(groups(fGroups)))
     if (threshold == 0)
         return(fGroups)
-    
+
     return(doFilter(fGroups, "intensity", c(threshold, negate), function(fGroups)
     {
         compF <- if (negate) function(x) x >= threshold else function(x) x < threshold
@@ -120,46 +121,55 @@ minAnalysesFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, negat
         return(fGroups)
     return(doFilter(fGroups, "minimum analyses", c(threshold, negate), verbose = verbose, function(fGroups)
     {
-        gTable <- groups(fGroups)
         pred <- function(x) sum(x > 0) >= threshold
         if (negate)
             pred <- Negate(pred)
-        return(fGroups[, sapply(gTable, pred, USE.NAMES = FALSE)])
+        return(fGroups[, sapply(groups(fGroups), pred, USE.NAMES = FALSE)])
     }, "minAnalyses"))
 }
 
-interReplicateAbundanceFilter <- function(fGroups, relThreshold = 0, absThreshold = 0, negate = FALSE, verbose = TRUE)
+minReplicatesFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, negate = FALSE, verbose = TRUE)
 {
-    anaInfo <- analysisInfo(fGroups)
-    rGroups <- unique(anaInfo$group)
-    absThreshold <- max(absThreshold, relThreshold * length(rGroups))
-    groupNames <- eval(colnames(fGroups@groups))
+    threshold <- getHighestAbsValue(absThreshold, relThreshold, length(replicateGroups(fGroups)))
+    if (threshold == 0)
+        return(fGroups)
 
-    return(doFilter(fGroups, "inter replicate abundance", c(absThreshold, negate), function(fGroups)
+    rGroupsAna <- analysisInfo(fGroups)$group
+
+    return(doFilter(fGroups, "minimum replicates", c(threshold, negate), function(fGroups)
     {
-        fGroups@groups[, group := fGroups@analysisInfo$group]
-
-        pred <- function(x) length(unique(anaInfo$group[which(x > 0)])) >= absThreshold
+        pred <- function(x) length(unique(rGroupsAna[x > 0])) >= threshold
         if (negate)
             pred <- Negate(pred)
 
-        fGroups@groups[, (groupNames) := lapply(.SD, function(x) if (pred(x)) x else 0),
-                       .SDcols = groupNames]
+        return(fGroups[, sapply(groups(fGroups), pred, USE.NAMES = FALSE)])
+    }, "minReplicates", verbose))
+}
 
-        fGroups@groups[, group := NULL]
+minFeaturesFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, negate = FALSE, verbose = TRUE)
+{
+    threshold <- getHighestAbsValue(absThreshold, relThreshold, length(fGroups))
+    if (threshold == 0)
+        return(fGroups)
 
-        return(updateFeatIndex(removeEmptyGroups(fGroups)))
-    }, "inter_rgroup_abundance", verbose))
+    return(doFilter(fGroups, "minimum features", c(threshold, negate), function(fGroups)
+    {
+        pred <- function(x) sum(x > 0) >= threshold
+        if (negate)
+            pred <- Negate(pred)
+
+        return(fGroups[sapply(transpose(groups(fGroups)), pred, USE.NAMES = FALSE)])
+    }, "minReplicates", verbose))
 }
 
 replicateAbundanceFilter <- function(fGroups, absThreshold, relThreshold, maxRSD, negate = FALSE)
 {
     if (NULLToZero(absThreshold) == 0 && NULLToZero(relThreshold) == 0 && NULLToZero(maxRSD) == 0)
         return(fGroups) # all thresholds NULL/0
-    
+
     gNames <- names(fGroups)
     rGroupsAna <- fGroups@analysisInfo$group
-    
+
     doThr <- !is.null(absThreshold) || !is.null(relThreshold)
     if (doThr)
     {
@@ -169,8 +179,8 @@ replicateAbundanceFilter <- function(fGroups, absThreshold, relThreshold, maxRSD
         else
             thresholds <- setNames(rep(absThreshold, length(replicateGroups(fGroups))), replicateGroups(fGroups))
     }
-    
-    return(doFilter(fGroups, "replicate abundance", c(thresholds, maxRSD, negate), function(fGroups)
+
+    return(doFilter(fGroups, "replicate abundance", c(absThreshold, relThreshold, maxRSD, negate), function(fGroups)
     {
         # add replicate groups temporarily
         fGroups@groups[, group := rGroupsAna]
@@ -180,7 +190,7 @@ replicateAbundanceFilter <- function(fGroups, absThreshold, relThreshold, maxRSD
             ret <- TRUE
             if (doThr)
                 ret <- sum(x > 0) >= thresholds[[rg]]
-            if (ret && NULLToZero(maxRSD) != 0)
+            if (ret && NULLToZero(maxRSD) != 0 && any(x > 0))
                 ret <- (sd(x) / mean(x)) < maxRSD # UNDONE: remove zero's?
             return(ret)
         }
@@ -211,7 +221,7 @@ retentionMzFilter <- function(fGroups, range, negate, what)
                             retention = fGroups@groupInfo$rts,
                             mz = fGroups@groupInfo$mzs,
                             mzDefect = fGroups@groupInfo$mzs - floor(fGroups@groupInfo$mzs))
-        
+
         return(fGroups[, pred(checkVals)])
     }))
 }
@@ -222,7 +232,7 @@ chromWidthFilter <- function(fGroups, range, negate)
     fTable <- featureTable(fGroups)
     anaInfo <- analysisInfo(fGroups)
     gNames <- names(fGroups)
-    
+
     return(doFilter(fGroups, "chromwidth", c(range, negate), function(fGroups)
     {
         pred <- function(finds)
@@ -238,12 +248,12 @@ chromWidthFilter <- function(fGroups, range, negate)
                 return(numGTE(cwidths, range[1]))
             return(numGTE(cwidths, range[1]) & numLTE(cwidths, range[2]))
         }
-        
+
         if (negate)
             pred <- Negate(pred)
-        
+
         fGroups@groups[, (gNames) := lapply(seq_along(.SD), function(n) ifelse(pred(ftindex[[n]]), .SD[[n]], 0))]
-    
+
         return(updateFeatIndex(removeEmptyGroups(fGroups)))
     }))
 }
@@ -312,88 +322,52 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertNumber, . ~ absMinIntensity + relMinIntensity + preAbsMinIntensity + preRelMinIntensity +
                absMinAnalyses + relMinAnalyses + absMinReplicates + relMinReplicates + absMinFeatures + relMinFeatures +
-               absMinReplicateAbundance + relMinReplicateAbundance + maxReplicateRSD + 
+               absMinReplicateAbundance + relMinReplicateAbundance + maxReplicateRSD +
                blankThreshold,
            lower = 0, finite = TRUE, null.ok = TRUE, fixed = list(add = ac))
     aapply(assertRange, . ~ retentionRange + mzRange + mzDefectRange + chromWidthRange, null.ok = TRUE, fixed = list(add = ac))
     checkmate::assertCharacter(rGroups, min.chars = 1, min.len = 1, any.missing = FALSE, null.ok = TRUE, add = ac)
     aapply(checkmate::assertFlag, . ~ removeBlanks + negate, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
-    
+
     if (length(obj) == 0)
         return(obj)
-    
+
     maybeDoFilter <- function(func, arg1, ..., otherArgs = list())
     {
         args <- c(list(arg1), ...)
         if (any(!sapply(args, is.null)))
-            return(do.call(func, c(list(obj, negate = negate), args, otherArgs)))
+            return(do.call(func, c(list(obj, arg1, ..., negate = negate), otherArgs)))
         return(obj)
     }
-    
+
     obj <- maybeDoFilter(intensityFilter, preAbsMinIntensity, preRelMinIntensity)
-    
+
     obj <- maybeDoFilter(retentionMzFilter, retentionRange, otherArgs = list(what = "retention"))
     obj <- maybeDoFilter(retentionMzFilter, mzRange, otherArgs = list(what = "mz"))
     obj <- maybeDoFilter(retentionMzFilter, mzDefectRange, otherArgs = list(what = "mzDefect"))
     obj <- maybeDoFilter(chromWidthFilter, chromWidthRange)
-    
+
     # replicate round #1
     obj <- maybeDoFilter(replicateAbundanceFilter, absMinReplicateAbundance, relMinReplicateAbundance, maxReplicateRSD)
+    lenAfter <- length(obj)
 
     obj <- maybeDoFilter(blankFilter, blankThreshold)
     obj <- maybeDoFilter(intensityFilter, absMinIntensity, relMinIntensity)
 
-    # replicate round #2    
-    obj <- maybeDoFilter(replicateAbundanceFilter, absMinReplicateAbundance, relMinReplicateAbundance, maxReplicateRSD)
-    
-    
+    # replicate round #2 (only do if previous filters affected results)
+    if (length(obj) != lenAfter)
+        obj <- maybeDoFilter(replicateAbundanceFilter, absMinReplicateAbundance, relMinReplicateAbundance, maxReplicateRSD)
+
+
     obj <- maybeDoFilter(minAnalysesFilter, absMinAnalyses, relMinAnalyses)
     obj <- maybeDoFilter(minReplicatesFilter, absMinReplicates, relMinReplicates)
     obj <- maybeDoFilter(minFeaturesFilter, absMinFeatures, relMinFeatures)
-    
+
     obj <- maybeDoFilter(replicateGroupFilter, rGroups)
-    if (removeRefAnalyses)
+    if (removeBlanks)
         obj <- replicateGroupFilter(obj, unique(analysisInfo(obj)$ref), negate = !negate)
-    
-    if (FALSE)
-    {
-    
-    # make sure that both absolute and relative abundances are set when only one of them is specified
-    # if (!is.null(relAbundance) && is.null(absAbundance))
-    #     absAbundance <- 0
-    # if (is.null(relAbundance) && !is.null(absAbundance))
-    #     relAbundance <- 0
-    # if (!is.null(interRelRGroupAbundance) && is.null(interAbsRGroupAbundance))
-    #     interAbsRGroupAbundance <- 0
-    # if (is.null(interRelRGroupAbundance) && !is.null(interAbsRGroupAbundance))
-    #     interRelRGroupAbundance <- 0
 
-    if (!is.null(relAbundance) || !is.null(interRelRGroupAbundance) ||
-        !is.null(intraRGroupAbundance) || !is.null(minBlankThreshold))
-    {
-        for (n in seq_len(repetitions))
-        {
-            if (repetitions > 1)
-                printf("filter repetition %d/%d\n", n, repetitions)
-            if (!is.null(relAbundance))
-                obj <- abundanceFilter(obj, relAbundance, absAbundance, negate)
-            if (!is.null(interRelRGroupAbundance))
-                obj <- interReplicateAbundanceFilter(obj, interRelRGroupAbundance, interAbsRGroupAbundance, negate)
-            if (!is.null(intraRGroupAbundance))
-                obj <- intraReplicateFilter(obj, intraRGroupAbundance, negate)
-            if (!is.null(minBlankThreshold))
-                obj <- blankFilter(obj, minBlankThreshold, negate)
-        }
-    }
-
-    if (!is.null(rGroups))
-        obj <- replicateGroupFilter(obj, rGroups, negate)
-    
-    if (removeRefAnalyses)
-        obj <- replicateGroupFilter(obj, unique(analysisInfo(obj)$ref), negate = !negate)
-    }
-    
     return(obj)
 })
 
@@ -415,26 +389,26 @@ setMethod("replicateGroupSubtract", "featureGroups", function(fGroups, rGroups, 
     checkmate::assertCharacter(rGroups, min.chars = 1, add = ac)
     checkmate::assertNumber(threshold, lower = 0, finite = TRUE, add = ac)
     checkmate::reportAssertions(ac)
-    
+
     if (length(fGroups) == 0)
         return(fGroups)
-    
+
     checkIntensities <- threshold > 0
     gNames <- names(fGroups)
     fGroups@groups <- copy(fGroups@groups)
-    
+
     filteredGroups <- replicateGroupFilter(fGroups, rGroups, verbose = FALSE)
     sharedGroups <- gNames[gNames %in% names(filteredGroups)]
-    
+
     if (length(sharedGroups) == 0)
         return(fGroups)
-    
+
     if (checkIntensities)
     {
         avgGroups <- averageGroups(filteredGroups)
         thrs <- sapply(avgGroups, max) * threshold
     }
-    
+
     for (b in sharedGroups)
     {
         if (checkIntensities)
@@ -442,6 +416,6 @@ setMethod("replicateGroupSubtract", "featureGroups", function(fGroups, rGroups, 
         else
             fGroups@groups[, (b) := 0] # no threshold, zero-out everything
     }
-    
+
     return(replicateGroupFilter(updateFeatIndex(removeEmptyGroups(fGroups)), rGroups, negate = TRUE, verbose = FALSE))
 })

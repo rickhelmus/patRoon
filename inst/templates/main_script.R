@@ -54,8 +54,8 @@ fGroups <- groupFeatures(fList, "xcms", rtalign = TRUE, retcorArgs = list(method
 {{ endCodeBlock() }}
 
 # Basic rule based filtering
-fGroups <- filter(fGroups, absMinIntensity = {{ filterFGroupsOpts$intThr }}, intraRGroupAbundance = {{ filterFGroupsOpts$replThr }},
-                  minBlankThreshold = {{ filterFGroupsOpts$blankThr }}, repetitions = {{ filterFGroupsOpts$filterRepetitions }})
+fGroups <- filter(fGroups, absMinIntensity = {{ filterFGroupsOpts$intThr }}, relMinReplicateAbundance = {{ filterFGroupsOpts$replThr }},
+                  maxReplicateRSD = {{ filterFGroupsOpts$maxReplRSD }}, blankThreshold = {{ filterFGroupsOpts$blankThr }})
 {{ optionalCodeBlock(doMSPeakFind) }}
 
 # Retrieve MS peak lists

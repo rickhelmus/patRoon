@@ -17,7 +17,7 @@
 \S4method{compoundViewer}{featureGroups,MSPeakLists,compounds}(fGroups,
   MSPeakLists, compounds)
 
-newProject()
+newProject(destPath = NULL)
 }
 \arguments{
 \item{fGroups}{A \code{\link{featureGroups}} object.}
@@ -33,6 +33,9 @@ groups are considered to be kept.}
 \item{MSPeakLists}{A \code{\link{MSPeakLists}} object.}
 
 \item{compounds}{A \code{\link{compounds}} object.}
+
+\item{destPath}{Set destination path value to this value (useful for
+debugging). Set to \code{NULL} for a default value.}
 }
 \value{
 \code{checkChromatograms} returns a logical vector for all feature
@@ -69,6 +72,6 @@ The \code{newProject} function is used to quickly generate a
   parameters. This function requires to be run within a
   \href{https://www.rstudio.com/}{RStudio} session. The resulting script is
   either added to the current open file or to a new file. The
-  \link[=analysis-information]{analysis information} will be written to a \file{.csv}
-  file so that it can easily be modified afterwards.
+  \link[=analysis-information]{analysis information} will be written to a
+  \file{.csv} file so that it can easily be modified afterwards.
 }

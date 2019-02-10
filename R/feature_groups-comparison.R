@@ -279,7 +279,7 @@ setMethod("consensus", "featureGroupsComparison", function(obj, relAbundance = 0
     comparedFGroups <- obj@comparedFGroups
     
     if (relAbundance > 0 || absAbundance > 0)
-        comparedFGroups <- abundanceFilter(comparedFGroups, relAbundance, absAbundance)
+        comparedFGroups <- minAnalysesFilter(comparedFGroups, absAbundance, relAbundance, verbose = FALSE)
 
     if (!is.null(uniqueFrom))
     {

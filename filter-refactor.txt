@@ -1,0 +1,42 @@
+- pre intensity
+- retention, mz, mzDefect, chrom width ranges
+- replicate #1
+- blank
+- post intensity
+- replicate #2
+- abundances
+- rGroups
+- removeRefAnalyses
+
+...
+
+- move/copy rGroups to subset?
+- add quantitative value for replicate filter? --> maxReplicateRSD
+- new naming for filters:
+    - absMinAnalyses / relMinAnalyses
+    - absMinReplicates / relMinReplicates
+    - absMinFeatures / relMinFeatures
+    - absMinReplicateAbundance / relMinReplicateAbundance
+    - 
+    - absMinIntensity / relMinIntensity
+    - preAbsMinIntensity / preRelMinIntensity
+    - 
+    - blankThreshold
+    - removeBlanks
+    - 
+    - maxReplicateRSD
+    - 
+    - mzDefectRange
+
+
+NOTES
+- blank filter needs pre intensity for getting rid of too low blank signals, however, blank threshold might also take care of that
+- replicate filter should be done before blank filter for better accuracy of blank removal
+- replicate filter should be done again after intensities/abundances/blank removal in case any of the features within replicate are now removed.
+- rGroups/removeRefAnalyses should be done after blank filter to avoid not being able to detect blank signals
+    - what about between replicate filters? I guess before them
+- repetitions can be removed(?)
+    - not really since abundances can influence each other, but blank filter doesn't have to be repeated?
+    - mention that repetitions now only covers abundance filters (and rename argument?)
+    - or it's not needed afterall? replicate filter should be before other abundances, as they cannot affect replicate
+- replicate #1 does only blanks?

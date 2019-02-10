@@ -42,9 +42,9 @@
 
 \S4method{as.data.table}{features}(x)
 
-\S4method{filter}{features}(obj, intensityThreshold = NULL,
-  retentionRange = NULL, mzRange = NULL, chromWidthRange = NULL,
-  negate = FALSE)
+\S4method{filter}{features}(obj, absMinIntensity = NULL,
+  relMinIntensity = NULL, retentionRange = NULL, mzRange = NULL,
+  mzDefectRange = NULL, chromWidthRange = NULL, negate = FALSE)
 
 \S4method{[}{features,ANY,missing,missing}(x, i, j, ..., drop = TRUE)
 
@@ -59,22 +59,26 @@
 \arguments{
 \item{obj, x, object}{\code{features} object to be accessed}
 
-\item{intensityThreshold}{Minimum intensity of a feature. Set to \code{NULL}
-to ignore.}
+\item{absMinIntensity, relMinIntensity}{Minimum absolute/relative intensity
+for features to be kept. The relative intensity is determined from the
+feature with highest intensity (within the same analysis).
+Set to \samp{0} or \code{NULL}
+to skip this step.}
 
-\item{retentionRange, mzRange, chromWidthRange}{Range of retention time (in
-seconds), \emph{m/z} or chromatographic peak width (in seconds),
-respectively. Features outside this range will be removed. Should be a
-numeric vector with length of two containing the min/max values. If the max
-value is set to a value below 0 then no maximum is assumed. Set to
-\code{NULL} to skip this step.}
+\item{retentionRange, mzRange, mzDefectRange, chromWidthRange}{Range of
+retention time (in seconds), \emph{m/z}, mass defect (defined as the
+decimal part of \emph{m/z} values) or chromatographic peak width (in
+seconds), respectively. Features outside this range will be removed. Should
+be a numeric vector with length of two containing the min/max values. The
+maximum can be \code{Inf} to specify no maximum range. Set to \code{NULL}
+to skip this step.}
 
 \item{negate}{If set to \code{TRUE} then filtering operations are performed
 in opposite manner.}
 
 \item{i}{A numeric or character value which is used to select analyses by
 their index or name, respectively (for the order/names see \code{analyses()}).\cr\cr For \code{[}: Can also be logical to perform logical selection
-(similar to regular vectors). If missing all analyses are selected.\cr\cr For \code{[[}: should be a skalar value.}
+(similar to regular vectors). If missing all analyses are selected.\cr\cr For \code{[[}: should be a scalar value.}
 
 \item{\dots}{Ignored.}
 
@@ -119,7 +123,11 @@ replicate groups for which data is present in this object.
 
 \item \code{as.data.table}: Returns all feature data in a table.
 
-\item \code{filter}: Performs common rule based filtering of features.
+\item \code{filter}: Performs common rule based filtering of features. Note
+that this (and much more) functionality is also provided by the
+\code{filter} method defined for \code{\link{featureGroups}}. However,
+filtering a \code{features} object may be useful to avoid grouping large
+amounts of features.
 
 \item \code{[}: Subset on analyses.
 

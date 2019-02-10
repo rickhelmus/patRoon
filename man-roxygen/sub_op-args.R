@@ -8,7 +8,7 @@
 #' <% if (!exists("noextract")) fmt <- paste0(fmt, "\\cr\\cr For \\code{{[}}:") %>
 #' <% fmt <- paste(fmt, "Can also be logical to perform logical selection
 #' (similar to regular vectors). If missing all { sel } are selected.") %>
-#' <% if (!exists("noextract")) fmt <- paste0(fmt, "\\cr\\cr For \\code{{[[}}: should be a skalar value.") %>
+#' <% if (!exists("noextract")) fmt <- paste0(fmt, "\\cr\\cr For \\code{{[[}}: should be a scalar value.") %>
 #' 
 #' <% optFmt <- "If \\code{{j}} is not specified, \\code{{i}} selects by { selj } instead." %>
 #' <% if (exists("optionalji")) fmt <- paste(fmt, optFmt) %>

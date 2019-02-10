@@ -1,0 +1,1 @@
+Applying minimum analyses filter... Done! Filtered 168 (26.09%) groups. Remaining: 476.

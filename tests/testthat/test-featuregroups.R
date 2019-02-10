@@ -52,12 +52,12 @@ test_that("exporting works", {
 
 test_that("as.data.table works", {
     expect_equal(nrow(as.data.table(fgOpenMS)), length(fgOpenMS))
-    
+
     # first 3 cols contain general info, then rep group ints
     expect_equal(ncol(as.data.table(fgOpenMS, average = TRUE)), 3 + length(unique(getTestAnaInfo()$group)))
-    
+
     expect_range(nrow(as.data.table(fgOpenMS, features = TRUE)), length(fgOpenMS) * c(1, length(analyses(fgOpenMS))))
-    
+
     expect_equal(nrow(as.data.table(fgOpenMSEmpty, average = TRUE)), 0)
     expect_equal(nrow(as.data.table(fgOpenMSEmpty, features = TRUE)), 0)
     expect_equal(nrow(as.data.table(fgOpenMSEmpty, average = TRUE, features = TRUE)), 0)
@@ -82,39 +82,54 @@ test_that("overlap works", {
     expect_length(overlap(fgOpenMSEmpty, which = c("standard", "solvent")), 0)
 })
 
-minInt <- function(fg)
+minInt <- function(fg, rel)
 {
     # collapse to vector with use.names = FALSE: https://stackoverflow.com/a/12796124/9264518
     g <- unlist(groups(fg), use.names = FALSE)
-    min(g[g != 0])
+    if (rel)
+        return(min(g[g != 0]) / max(g))
+    return(min(g[g != 0]))
 }
 
 test_that("basic filtering", {
-    expect_gte(minInt(filter(fgOpenMS, intensityThreshold = 500)), 500)
+    expect_gte(minInt(filter(fgOpenMS, absMinIntensity = 1500), FALSE), 1500)
+    expect_gte(minInt(filter(fgOpenMS, relMinIntensity = 0.2), TRUE), 0.2)
+    expect_gte(minInt(filter(fgOpenMS, preAbsMinIntensity = 1500), FALSE), 1500)
+    expect_gte(minInt(filter(fgOpenMS, preRelMinIntensity = 0.2), TRUE), 0.2)
 
-    expect_range(groupInfo(filter(fgOpenMS, retentionRange = c(120, 200)))$rts, range(120, 200))
-    expect_equivalent(filter(fgOpenMS, retentionRange = c(0, -1)), fgOpenMS)
-    expect_range(groupInfo(filter(fgOpenMS, mzRange = c(200, 300)))$mzs, range(200, 300))
-    expect_equivalent(filter(fgOpenMS, mzRange = c(0, -1)), fgOpenMS)
+    expect_range(groupInfo(filter(fgOpenMS, retentionRange = c(120, 200)))$rts, c(120, 200))
+    expect_equivalent(filter(fgOpenMS, retentionRange = c(0, Inf)), fgOpenMS)
+    expect_range(groupInfo(filter(fgOpenMS, mzRange = c(200, 300)))$mzs, c(200, 300))
+    expect_equivalent(filter(fgOpenMS, mzRange = c(0, Inf)), fgOpenMS)
+    expect_range(groupInfo(filter(fgOpenMS, mzDefectRange = c(0.1, 0.2)))$mzs %% 1, c(0.1, 0.2))
+    expect_equivalent(filter(fgOpenMS, mzDefectRange = c(0, 1)), fgOpenMS)
     expect_lt(length(filter(fgOpenMS, chromWidthRange = c(0, 30))), length(fgOpenMS))
-    expect_equivalent(filter(fgOpenMS, chromWidthRange = c(0, -1)), fgOpenMS)
+    expect_equivalent(filter(fgOpenMS, chromWidthRange = c(0, Inf)), fgOpenMS)
 
-    expect_identical(unique(analysisInfo(filter(fgOpenMS, rGroups = "standard"))$group), "standard")
-    expect_identical(unique(analysisInfo(filter(fgOpenMS, removeRefAnalyses = TRUE))$group), "standard")
-    expect_known_output(filter(fgOpenMS, relAbundance = 0.5), testFile("fgf-relabu", text = TRUE))
-    expect_known_output(filter(fgOpenMS, absAbundance = 3), testFile("fgf-absabu", text = TRUE))
-    expect_known_output(filter(fgOpenMS, interRelRGroupAbundance = 1), testFile("fgf-inter_rel_rg", text = TRUE))
-    expect_known_output(filter(fgOpenMS, interAbsRGroupAbundance = 2), testFile("fgf-inter_abs_rg", text = TRUE))
-    expect_known_output(filter(fgOpenMS, intraRGroupAbundance = 1), testFile("fgf-intra_rg", text = TRUE))
-    expect_known_output(filter(fgOpenMS, minBlankThreshold = 5), testFile("fgf-bl", text = TRUE))
-    expect_known_output(filter(fgOpenMS, intensityThreshold = 500, minBlankThreshold = 5,
-                               retentionRange = c(120, -1), intraRGroupAbundance = 1),
+    expect_identical(replicateGroups(filter(fgOpenMS, rGroups = "standard")), "standard")
+    expect_identical(replicateGroups(filter(fgOpenMS, removeBlanks = TRUE)), "standard")
+    expect_identical(replicateGroups(removeEmptyAnalyses(filter(fgOpenMS, relMinFeatures = 0.75))), "standard")
+    expect_identical(replicateGroups(removeEmptyAnalyses(filter(fgOpenMS, absMinFeatures = 450))), "standard")
+    expect_identical(replicateGroups(removeEmptyAnalyses(filter(fgOpenMS, blankThreshold = 1E6))), "standard")
+
+    expect_known_output(filter(fgOpenMS, relMinAnalyses = 0.5), testFile("fgf-minana-rel", text = TRUE))
+    expect_known_output(filter(fgOpenMS, absMinAnalyses = 3), testFile("fgf-minana-abs", text = TRUE))
+    expect_known_output(filter(fgOpenMS, relMinReplicates = 1), testFile("fgf-minrep-rel", text = TRUE))
+    expect_known_output(filter(fgOpenMS, absMinReplicates = 2), testFile("fgf-minrep-abs", text = TRUE))
+    expect_known_output(filter(fgOpenMS, relMinFeatures = 0.75), testFile("fgf-minfeat-rel", text = TRUE))
+    expect_known_output(filter(fgOpenMS, absMinFeatures = 450), testFile("fgf-minfeat-abs", text = TRUE))
+    expect_known_output(filter(fgOpenMS, relMinReplicateAbundance = 1), testFile("fgf-minrepabu-rel", text = TRUE))
+    expect_known_output(filter(fgOpenMS, absMinReplicateAbundance = 3), testFile("fgf-minrepabu-abs", text = TRUE))
+    expect_known_output(filter(fgOpenMS, maxReplicateIntRSD = 0.5), testFile("fgf-reprsd", text = TRUE))
+    expect_known_output(filter(fgOpenMS, blankThreshold = 5), testFile("fgf-bl", text = TRUE))
+    expect_known_output(filter(fgOpenMS, absMinIntensity = 1500, blankThreshold = 5,
+                               retentionRange = c(120, Inf), relMinReplicateAbundance = 1),
                         testFile("fgf-combi", text = TRUE))
-    expect_known_output(filter(fgOpenMS, intensityThreshold = 500, minBlankThreshold = 5,
-                               retentionRange = c(120, -1), intraRGroupAbundance = 1, negate = TRUE),
+    expect_known_output(filter(fgOpenMS, absMinIntensity = 1500, blankThreshold = 5,
+                               retentionRange = c(120, Inf), relMinReplicateAbundance = 1, negate = TRUE),
                         testFile("fgf-combi-neg", text = TRUE))
-    expect_length(filter(fgOpenMSEmpty, intensityThreshold = 500, minBlankThreshold = 5,
-                         retentionRange = c(120, -1), intraRGroupAbundance = 1), 0)
+    expect_length(filter(fgOpenMSEmpty, absMinIntensity = 1500, blankThreshold = 5,
+                         retentionRange = c(120, Inf), relMinReplicateAbundance = 1), 0)
 })
 
 test_that("replicate group subtraction", {
@@ -153,7 +168,7 @@ test_that("verify feature group comparison", {
     expect_length(fGConsOneEmpty, length(fgOpenMS))
     expect_length(fgCompBothEmpty, 2)
     expect_length(fGConsBothEmpty, 0)
-    
+
     expect_equal(length(consensus(fGCompOpenMS, uniqueFrom = 1)) +
                  length(consensus(fGCompOpenMS, uniqueFrom = 2)) +
                  length(consensus(fGCompOpenMS, relAbundance = 1)), length(fGCons))

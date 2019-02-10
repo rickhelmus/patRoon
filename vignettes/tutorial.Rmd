@@ -125,16 +125,16 @@ The next step is to perform some basic rule based filtering with the `filter()` 
 In this tutorial we will filter grouped features (or 'feature groups') based on a minimal intensity, minimal abundance within replicates and absence within blanks. Finally, we will also remove any feature groups eluting before roughly the dead volume of the system: 
 
 ```{r filter}
-fGroups <- filter(fGroups, intensityThreshold = 10000, intraRGroupAbundance = 1,
-                  minBlankThreshold = 5, repetitions = 2, retentionRange = c(110, -1))
+fGroups <- filter(fGroups, absMinIntensity = 10000, relMinReplicateAbundance = 1,
+                  maxReplicateIntRSD = 0.75, blankThreshold = 5, retentionRange = c(110, Inf))
 ```
 
 As can been from above command this will remove quite a large part our data. However, in our experience using the right settings is a very effective way to separate interesting data from the rest. Some hints on this process:
 
-* The intensity filter is an effective way to remove not oly 'noisy' data, but can also be used to remove any low intensity peaks which are very likely to miss any MS/MS data (assuming you are interested in this and data has been recorded with it).
-* The `intraRGroupAbundance` argument specifies a fraction to which a feature group should be minimally present within all replicates. This is a _very_ effective filter in removing any outliers or features which don't actually represent a well defined chromatographic peak, but perhaps are just part of another peak or simply noise.
-* The `minBlankThreshold` argument is used for blank subtraction. In the above example, any features with an intensity less than five times compared to the average intensity in blanks will be removed.
-* The `repetitions` argument is used to repeat some of the filter steps to make sure that all the data is really filtered out. A value of two is usually sufficient.
+* The intensity filter is an effective way to remove not only 'noisy' data, but can also be used to remove any low intensity peaks which are very likely to miss any MS/MS data (assuming you are interested in this and data has been recorded with it).
+* The `relMinReplicateAbundance` argument specifies a fraction to which a feature should be minimally present within a replicate group. This is a _very_ effective filter in removing any outliers or features which don't actually represent a well defined chromatographic peak, but perhaps are just part of another peak or simply noise.
+* The `maxReplicateIntRSD` argument specifies the maximum relative standard deviation (RSD) of feature intensities within a replicate group.
+* The `blankThreshold` argument is used for blank subtraction. In the above example, any features with an intensity less than five times compared to the average intensity in blanks will be removed.
 
 Finally, we can have a quick look at our data by plotting some nice extracted ion chromatograms (EICs) for all remaining feature groups:
 

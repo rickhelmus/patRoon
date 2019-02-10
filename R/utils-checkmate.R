@@ -3,8 +3,8 @@ assertHasNames <- checkmate::makeAssertionFunction(checkHasNames)
 
 checkRange <- function(x, null.ok = FALSE)
 {
-    ret <- checkmate::checkNumeric(x, any.missing = FALSE, finite = TRUE, len = 2, null.ok = null.ok)
-    if (isTRUE(ret) && !is.null(x) && x[2] != -1 && x[1] > x[2])
+    ret <- checkmate::checkNumeric(x, any.missing = FALSE, lower = 0, len = 2, null.ok = null.ok)
+    if (isTRUE(ret) && !is.null(x) && x[1] > x[2])
         ret <- paste0("lower range (", x[1], ") higher than upper (", x[2], ")")
     return(ret)
 }
@@ -165,7 +165,7 @@ checkExtractArg <- function(x)
     if (!isTRUE(ret))
         ret <- checkmate::checkString(x)
     if (!isTRUE(ret))
-        ret <- "Should be valid numeric or character skalar"
+        ret <- "Should be valid numeric or character scalar"
     return(ret)
 }
 assertExtractArg <- checkmate::makeAssertionFunction(checkExtractArg)

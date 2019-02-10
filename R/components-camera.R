@@ -124,7 +124,7 @@ generateComponentsCAMERA <- function(fGroups, ionization, onlyIsotopes = FALSE,
         if (ubiquitous)
         {
             fgCmp <- removeEmptyAnalyses(fGroups[, cmp$group])
-            fgCmp <- abundanceFilter(fgCmp, 1, verbose = FALSE)
+            fgCmp <- minAnalysesFilter(fgCmp, relThreshold = 1, verbose = FALSE)
             cmp <- cmp[group %in% names(fgCmp)]
         }
         if (minSize > 0 && nrow(cmp) < minSize)

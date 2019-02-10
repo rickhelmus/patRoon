@@ -988,7 +988,7 @@ setMethod("unique", "featureGroups", function(x, which, relativeTo = NULL, outer
 
     # remove all that is in at least 2 replicate groups
     if (outer && length(which) > 1)
-        ret <- interReplicateAbundanceFilter(ret, absThreshold = 2, negate = TRUE, verbose = FALSE)
+        ret <- minReplicatesFilter(ret, absThreshold = 2, negate = TRUE, verbose = FALSE)
 
     return(ret)
 })
@@ -1018,7 +1018,7 @@ setMethod("overlap", "featureGroups", function(fGroups, which, exclusive)
     else
         ret <- replicateGroupFilter(fGroups, which, verbose = FALSE)
 
-    ret <- interReplicateAbundanceFilter(ret, relThreshold = 1, verbose = FALSE)
+    ret <- minReplicatesFilter(ret, relThreshold = 1, verbose = FALSE)
 
     return(ret)
 })

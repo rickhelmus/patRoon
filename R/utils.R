@@ -611,14 +611,14 @@ makeMSPlotGG <- function(spec, fragInfo, ...)
     ret <- ggplot(plotData, aes_string(x = "mz", y = 0, label = "text")) + xlim(range(spec$mz) * c(0.9, 1.1)) +
         geom_segment(aes_string(xend = "mz", yend = "intensity",
                                 colour = "lab", size = "lwd")) + scale_size(range = c(0.5, 2), guide = FALSE)
-    
+
     if (any(nzchar(plotData$text))) # BUG: throws errors when parse=TRUE and all labels are empty
         ret <- ret + ggrepel::geom_text_repel(aes_string(y = "intensity", angle = 0), min.segment.length = 0.1, parse = TRUE,
                                               nudge_y = grid::convertUnit(grid::unit(5, "mm"), "npc", valueOnly = TRUE), size = 3.2)
 
     ret <- ret + xlab("m/z") + ylab("Intensity") +
         cowplot::theme_cowplot(font_size = 12) + theme(legend.position = "bottom", legend.title = element_blank())
-    
+
     return(ret)
 }
 
@@ -851,3 +851,6 @@ getAllMethods <- function(gen)
 
     return(cl[order(tolower(cl))])
 }
+
+NULLToZero <- function(x) if (is.null(x)) 0 else x
+zeroToNULL <- function(x) if (is.numeric(x) && x == 0) NULL else x

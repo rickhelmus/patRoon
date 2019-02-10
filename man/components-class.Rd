@@ -71,7 +71,7 @@
 
 \item{i, j}{A numeric or character value which is used to select components/feature groups by
 their index or name, respectively (for the order/names see \code{names()/groupNames()}).\cr\cr For \code{[}: Can also be logical to perform logical selection
-(similar to regular vectors). If missing all components/feature groups are selected.\cr\cr For \code{[[}: should be a skalar value. \code{j} is optional.}
+(similar to regular vectors). If missing all components/feature groups are selected.\cr\cr For \code{[[}: should be a scalar value. \code{j} is optional.}
 
 \item{\dots}{For \code{plotEIC}: Further (optional) arguments passed to the
   \code{plotEIC} method for the \code{\link{featureGroups}} class. Note that

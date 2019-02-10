@@ -120,7 +120,7 @@ test_that("basic filtering", {
     expect_known_output(filter(fgOpenMS, absMinFeatures = 450), testFile("fgf-minfeat-abs", text = TRUE))
     expect_known_output(filter(fgOpenMS, relMinReplicateAbundance = 1), testFile("fgf-minrepabu-rel", text = TRUE))
     expect_known_output(filter(fgOpenMS, absMinReplicateAbundance = 3), testFile("fgf-minrepabu-abs", text = TRUE))
-    expect_known_output(filter(fgOpenMS, maxReplicateRSD = 0.5), testFile("fgf-reprsd", text = TRUE))
+    expect_known_output(filter(fgOpenMS, maxReplicateIntRSD = 0.5), testFile("fgf-reprsd", text = TRUE))
     expect_known_output(filter(fgOpenMS, blankThreshold = 5), testFile("fgf-bl", text = TRUE))
     expect_known_output(filter(fgOpenMS, absMinIntensity = 1500, blankThreshold = 5,
                                retentionRange = c(120, -1), relMinReplicateAbundance = 1),

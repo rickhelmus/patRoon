@@ -161,9 +161,9 @@ minFeaturesFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, negat
     }, "minReplicates", verbose))
 }
 
-replicateAbundanceFilter <- function(fGroups, absThreshold, relThreshold, maxRSD, negate = FALSE)
+replicateAbundanceFilter <- function(fGroups, absThreshold, relThreshold, maxIntRSD, negate = FALSE)
 {
-    if (NULLToZero(absThreshold) == 0 && NULLToZero(relThreshold) == 0 && NULLToZero(maxRSD) == 0)
+    if (NULLToZero(absThreshold) == 0 && NULLToZero(relThreshold) == 0 && NULLToZero(maxIntRSD) == 0)
         return(fGroups) # all thresholds NULL/0
 
     gNames <- names(fGroups)
@@ -179,7 +179,7 @@ replicateAbundanceFilter <- function(fGroups, absThreshold, relThreshold, maxRSD
             thresholds <- setNames(rep(absThreshold, length(replicateGroups(fGroups))), replicateGroups(fGroups))
     }
 
-    return(doFilter(fGroups, "replicate abundance", c(absThreshold, relThreshold, maxRSD, negate), function(fGroups)
+    return(doFilter(fGroups, "replicate abundance", c(absThreshold, relThreshold, maxIntRSD, negate), function(fGroups)
     {
         # add replicate groups temporarily
         fGroups@groups[, group := rGroupsAna]
@@ -189,8 +189,8 @@ replicateAbundanceFilter <- function(fGroups, absThreshold, relThreshold, maxRSD
             ret <- TRUE
             if (doThr)
                 ret <- sum(x > 0) >= thresholds[[rg]]
-            if (ret && NULLToZero(maxRSD) != 0 && any(x > 0))
-                ret <- (sd(x) / mean(x)) < maxRSD # UNDONE: remove zero's?
+            if (ret && NULLToZero(maxIntRSD) != 0 && any(x > 0))
+                ret <- (sd(x) / mean(x)) < maxIntRSD # UNDONE: remove zero's?
             return(ret)
         }
         if (negate)
@@ -313,7 +313,7 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
                                               absMinReplicates = NULL, relMinReplicates = NULL,
                                               absMinFeatures = NULL, relMinFeatures = NULL,
                                               absMinReplicateAbundance = NULL, relMinReplicateAbundance = NULL,
-                                              maxReplicateRSD = NULL, blankThreshold = NULL,
+                                              maxReplicateIntRSD = NULL, blankThreshold = NULL,
                                               retentionRange = NULL, mzRange = NULL, mzDefectRange = NULL,
                                               chromWidthRange = NULL, rGroups = NULL, removeBlanks = FALSE,
                                               negate = FALSE)
@@ -321,7 +321,7 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertNumber, . ~ absMinIntensity + relMinIntensity + preAbsMinIntensity + preRelMinIntensity +
                absMinAnalyses + relMinAnalyses + absMinReplicates + relMinReplicates + absMinFeatures + relMinFeatures +
-               absMinReplicateAbundance + relMinReplicateAbundance + maxReplicateRSD +
+               absMinReplicateAbundance + relMinReplicateAbundance + maxReplicateIntRSD +
                blankThreshold,
            lower = 0, finite = TRUE, null.ok = TRUE, fixed = list(add = ac))
     aapply(assertRange, . ~ retentionRange + mzRange + mzDefectRange + chromWidthRange, null.ok = TRUE, fixed = list(add = ac))
@@ -348,7 +348,7 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
     obj <- maybeDoFilter(chromWidthFilter, chromWidthRange)
 
     # replicate round #1
-    obj <- maybeDoFilter(replicateAbundanceFilter, absMinReplicateAbundance, relMinReplicateAbundance, maxReplicateRSD)
+    obj <- maybeDoFilter(replicateAbundanceFilter, absMinReplicateAbundance, relMinReplicateAbundance, maxReplicateIntRSD)
     lenAfter <- length(obj)
 
     obj <- maybeDoFilter(blankFilter, blankThreshold)
@@ -356,7 +356,7 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
 
     # replicate round #2 (only do if previous filters affected results)
     if (length(obj) != lenAfter)
-        obj <- maybeDoFilter(replicateAbundanceFilter, absMinReplicateAbundance, relMinReplicateAbundance, maxReplicateRSD)
+        obj <- maybeDoFilter(replicateAbundanceFilter, absMinReplicateAbundance, relMinReplicateAbundance, maxReplicateIntRSD)
 
 
     obj <- maybeDoFilter(minAnalysesFilter, absMinAnalyses, relMinAnalyses)

@@ -55,7 +55,7 @@ fGroups <- groupFeatures(fList, "xcms", rtalign = TRUE, retcorArgs = list(method
 
 # Basic rule based filtering
 fGroups <- filter(fGroups, preAbsMinIntensity = {{ filterFGroupsOpts$preIntThr }}, absMinIntensity = {{ filterFGroupsOpts$intThr }},
-                  relMinReplicateAbundance = {{ filterFGroupsOpts$repAbundance }}, maxReplicateRSD = {{ filterFGroupsOpts$maxRepRSD }},
+                  relMinReplicateAbundance = {{ filterFGroupsOpts$repAbundance }}, maxReplicateIntRSD = {{ filterFGroupsOpts$maxRepRSD }},
                   blankThreshold = {{ filterFGroupsOpts$blankThr }}, removeBlanks = {{ filterFGroupsOpts$removeBlanks }},
                   retentionRange = {{ if (is.null(filterFGroupsOpts$retRange)) "NULL" else paste0("c(", paste0(filterFGroupsOpts$retRange, collapse = ", "), ")") }}, mzRange = {{ if (is.null(filterFGroupsOpts$mzRange)) "NULL" else paste0("c(", paste0(filterFGroupsOpts$mzRange, collapse = ", "), ")") }})
 {{ optionalCodeBlock(doMSPeakFind) }}

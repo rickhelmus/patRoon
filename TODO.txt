@@ -54,10 +54,9 @@ features
 - as.data.table for fGroups is slow?
 - tests to verify getXCMSSet...
 - filter()
-    - pre/post intensity filter or another way to deal with order dependency
     - Use Inf instead of -1 for range filters
     - document which filters work on feature level (e.g. chromWidth)
-    - remove zero values for maxReplicateRSD?
+    - remove zero values for maxReplicateIntRSD?
 
 
 MSPeakLists

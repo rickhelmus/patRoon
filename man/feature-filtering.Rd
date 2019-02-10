@@ -8,53 +8,81 @@
 \alias{replicateGroupSubtract}
 \title{Filtering of grouped features}
 \usage{
-\S4method{filter}{featureGroups}(obj, intensityThreshold = NULL,
-  relAbundance = NULL, absAbundance = NULL,
-  interRelRGroupAbundance = NULL, interAbsRGroupAbundance = NULL,
-  intraRGroupAbundance = NULL, minBlankThreshold = NULL,
-  retentionRange = NULL, mzRange = NULL, chromWidthRange = NULL,
-  rGroups = NULL, removeRefAnalyses = FALSE, repetitions = 2,
-  negate = FALSE)
+\S4method{filter}{featureGroups}(obj, absMinIntensity = NULL,
+  relMinIntensity = NULL, preAbsMinIntensity = NULL,
+  preRelMinIntensity = NULL, absMinAnalyses = NULL,
+  relMinAnalyses = NULL, absMinReplicates = NULL,
+  relMinReplicates = NULL, absMinFeatures = NULL,
+  relMinFeatures = NULL, absMinReplicateAbundance = NULL,
+  relMinReplicateAbundance = NULL, maxReplicateIntRSD = NULL,
+  blankThreshold = NULL, retentionRange = NULL, mzRange = NULL,
+  mzDefectRange = NULL, chromWidthRange = NULL, rGroups = NULL,
+  removeBlanks = FALSE, negate = FALSE)
 
 \S4method{replicateGroupSubtract}{featureGroups}(fGroups, rGroups,
   threshold = 0)
 }
 \arguments{
-\item{intensityThreshold}{Minimum intensity. Set to 0 or \code{NULL} to skip
-this step.}
-
-\item{relAbundance, absAbundance, interRelRGroupAbundance, interAbsRGroupAbundance}{Minimal overall relative/absolute abundance for a feature group to be present
-within all analyses/replicate groups.}
-
-\item{intraRGroupAbundance}{Minimum relative abundance (0-1) that a feature
-group should be present within a replicate group. Set to \code{NULL} to
-skip this step.}
-
-\item{minBlankThreshold}{Feature groups that are also present in reference
-analyses (see \link[=analysis-information]{analysis info}) are filtered out
-unless their relative intensity is above this threshold. Set to \code{NULL}
+\item{absMinIntensity, relMinIntensity}{Minimum absolute/relative intensity
+for features to be kept. The relative intensity is determined from the
+feature with highest intensity (of all features from all groups).
+Set to \samp{0} or \code{NULL}
 to skip this step.}
 
-\item{retentionRange, mzRange, chromWidthRange}{Range of retention time (in
-seconds), \emph{m/z} or chromatographic peak width (in seconds),
-respectively. Features outside this range will be removed. Should be a
-numeric vector with length of two containing the min/max values. If the max
-value is set to a value below 0 then no maximum is assumed. Set to
-\code{NULL} to skip this step.}
+\item{preAbsMinIntensity, preRelMinIntensity}{As
+\code{absMinIntensity}/\code{relMinIntensity}, but applied \emph{before}
+any other filters. This is typically used to speed-up subsequent filter
+steps. However, care must be taken that a sufficiently low value is choosen
+that is not expected to affect subsequent filtering steps. See below why
+this may be important.}
+
+\item{absMinAnalyses, relMinAnalyses}{Feature groups are only kept when they
+contain data for at least this (absolute or relative) amount of analyses.
+Set to \code{NULL} to ignore.}
+
+\item{absMinReplicates, relMinReplicates}{Feature groups are only kept when
+they contain data for at least this (absolute or relative) amount of
+replicates. Set to \code{NULL} to ignore.}
+
+\item{absMinFeatures, relMinFeatures}{Analyses are only kept when they contain
+at least this (absolute or relative) amount of features. Set to \code{NULL}
+to ignore.}
+
+\item{absMinReplicateAbundance, relMinReplicateAbundance}{Minimum
+absolute/relative abundance that a grouped feature should be present within
+a replicate group. If this mimimum is not met all features within the
+replicate group are removed. Set to \code{NULL} to skip this step.}
+
+\item{maxReplicateIntRSD}{Maximum relative standard deviation (RSD) of
+intensity values for features within a replicate group. If the RSD is above
+this value all features within the replicate group are removed. Set to
+\code{NULL} to ignore.}
+
+\item{blankThreshold}{Feature groups that are also present in blank analyses
+(see \link[=analysis-information]{analysis info}) are filtered out unless
+their relative intensity is above this threshold. For instance, a value of
+\samp{5} means that only features with an intensity five times higher than
+that of the blank are kept. The relative intensity values between blanks
+and non-blanks are determined from the mean of all non-zero blank
+intensities. Set to \code{NULL} to skip this step.}
+
+\item{retentionRange, mzRange, mzDefectRange, chromWidthRange}{Range of
+retention time (in seconds), \emph{m/z}, mass defect (defined as the
+decimal part of \emph{m/z} values) or chromatographic peak width (in
+seconds), respectively. Features outside this range will be removed. Should
+be a numeric vector with length of two containing the min/max values. The
+maximum can be \code{Inf} to specify no maximum range. Set to \code{NULL}
+to skip this step.}
 
 \item{rGroups}{A character vector of replicate groups that should be kept
 (\code{filter}) or subtracted from (\code{replicateGroupSubtract}).}
 
-\item{removeRefAnalyses}{Set to \code{TRUE} to remove all analyses that
-belong to replicate groups that are specified as a reference in the
+\item{removeBlanks}{Set to \code{TRUE} to remove all analyses that belong to
+replicate groups that are specified as a reference in the
 \link{analysis-information}. This is useful to simplify the analyses in the
-specified \code{\link{featureGroups}} object after blank subtraction.
-Consequently, when both \code{minBlankThreshold} and this argument are set,
-blank subtraction is performed prior to removing any analyses.}
-
-\item{repetitions}{Sometimes more feature groups may be removed by repeating
-filtering steps after another. Usually a value of two is enough to filter
-the maximum amount of feature groups.}
+specified \code{\link{featureGroups}} object after blank subtraction. When
+both \code{blankThreshold} and this argument are set, blank subtraction is
+performed prior to removing any analyses.}
 
 \item{negate}{If set to \code{TRUE} then filtering operations are performed
 in opposite manner.}
@@ -62,7 +90,7 @@ in opposite manner.}
 \item{fGroups, obj}{\code{\link{featureGroups}} object to which the filter is
 applied.}
 
-\item{threshold}{Minimal relative threshold (compared to mean intensity of
+\item{threshold}{Minimum relative threshold (compared to mean intensity of
 replicate group being subtracted) for a feature group to be \emph{not}
 removed. When \samp{0} a feature group is always removed when present in
 the given replicate groups.}
@@ -78,13 +106,61 @@ Basic rule based filtering of feature groups.
 }
 \details{
 \code{filter} performs common rule based filtering of feature groups
-  such as blank subtraction, minimum intensity and minimal replicate
-  abundance.
+  such as blank subtraction, minimum intensity and minimum replicate
+  abundance. Removing of features occurs by zeroing their intensity values.
+  Furthermore, feature groups that are left completely empty (\emph{i.e.} all
+  intensities are zero) will be automatically removed.
 
 \code{replicateGroupSubtract} removes feature groups present in a
   given set of replicate groups (unless intensities are above a given
   threshold). The replicate groups that are subtracted will be removed.
 }
+\section{Filter order}{
+ When multiple arguments are specified to
+  \code{filter}, multiple filters are applied in sequence. Since some of
+  these filters may affect each other, choosing their order correctly may be
+  important for effective data filtering. For instance, when an intensity
+  filter removes features from blank analyses, a subsequent blank filter may
+  not adequately perform blank subtraction. Similarly, when intensity and
+  blank filters are executed after the replicate abundance filter it may be
+  necessary to ensure minimum replicate abundance again as the intensity and
+  blank filters may have removed some features within a replicate group.
+
+  With this in mind, filters (if specified) occurs in the following order:
+
+  \enumerate{
+
+  \item Pre-Intensity filters (\emph{i.e.} \code{preAbsMinIntensity} and
+  \code{preRelMinIntensity}).
+
+  \item Chromatography and mass filters (\emph{i.e} \code{retentionRange},
+  \code{mzRange}, \code{mzDefectRange} and \code{chromWidthRange}).
+
+  \item Replicate abundance filters (\emph{i.e.}
+  \code{absMinReplicateAbundance}, \code{relMinReplicateAbundance} and
+  \code{maxReplicateIntRSD}).
+
+  \item Blank filter (\emph{i.e.} blankThreshold).
+
+  \item Intensity filters (\emph{i.e.} \code{absMinIntensity} and
+  \code{relMinIntensity}).
+
+  \item Replicate abundance filters (2nd time, only if previous filters
+  affected results).
+
+  \item General abundance filters (\emph{i.e.} \code{absMinAnalyses},
+  \code{relMinAnalyses}, \code{absMinReplicates}, \code{relMinReplicates},
+  \code{absMinFeatures} and \code{relMinFeatures}).
+
+  \item Replicate group filter (\emph{i.e.} \code{rGroups}) and blank
+  analyses removal (\emph{i.e.} if \code{removeBlanks=TRUE}).
+
+  }
+
+  If another filtering order is desired then \code{filter} should be called
+  multiple times with only one filter argument at a time.
+}
+
 \seealso{
 \code{\link{featureGroups-class}}
 

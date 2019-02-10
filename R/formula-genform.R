@@ -185,7 +185,6 @@ processGenFormResultFile <- function(file, isMSMS, adduct)
     {
         forms <- fread(file, header = FALSE)
         setnames(forms, c("neutral_formula", "dbe", "formula_mz", "error", "isoScore"))
-        forms[, neutral_formula := Vectorize(sortFormula)(neutral_formula)] # GenForm doesn't seem to use Hill sorting
         forms[, byMSMS := FALSE]
     }
     else
@@ -194,6 +193,7 @@ processGenFormResultFile <- function(file, isMSMS, adduct)
     if (is.null(forms))
         return(NULL)
 
+    forms[, neutral_formula := sapply(neutral_formula, sortFormula)] # GenForm doesn't seem to use Hill sorting
     forms[, formula := calculateIonFormula(neutral_formula, adduct)]
 
     # set correct column types

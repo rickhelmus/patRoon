@@ -24,9 +24,9 @@ mergeFragInfo <- function(fiLeft, fiRight, leftName, rightName)
         fiRight[, mergedBy := list(list(rightName))]
 
     # for overlap: just add label
-    fiLeft <- merge(fiLeft, fiRight[, c("PLIndex", "mergedBy"), with = FALSE], all = FALSE, by = "PLIndex")
-    fiLeft[is.na(mergedBy.y), mergedBy := mergedBy.x]
-    fiLeft[is.na(mergedBy.x), mergedBy := mergedBy.y]
+    fiLeft <- merge(fiLeft, fiRight[, c("PLIndex", "mergedBy"), with = FALSE], all.x = TRUE, by = "PLIndex")
+    fiLeft[is.na(mergedBy.y) | !nzchar(mergedBy.y) | sapply(mergedBy.y, is.null), mergedBy := mergedBy.x]
+    fiLeft[is.na(mergedBy.x) | !nzchar(mergedBy.x) | sapply(mergedBy.x, is.null), mergedBy := mergedBy.y]
     fiLeft[!is.na(mergedBy.x) & !is.na(mergedBy.y),
            mergedBy := lapply(seq_along(mergedBy.x), function(i) list(unique(c(mergedBy.x[[i]], mergedBy.y[[i]]))))]
     fiLeft[, c("mergedBy.x", "mergedBy.y") := NULL]

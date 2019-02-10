@@ -343,7 +343,7 @@ reportCompoundSpectra <- function(fGroups, path, MSPeakLists, compounds, compsCl
     }
 
     if (!is.null(topMost))
-        compounds = filter(compounds, topMost = topMost)
+        compounds <- filter(compounds, topMost = topMost)
 
     if (!is.null(compsCluster))
         cutcl <- cutClusters(compsCluster)

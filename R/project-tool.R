@@ -21,12 +21,12 @@ getScriptCode <- function(input, analyses)
     if (all(retRange == 0))
         retRange <- NULL
     else if (retRange[2] == 0)
-        retRange[2] <- -1
+        retRange[2] <- Inf
     mzRange <- c(input[["mz-min"]], input[["mz-max"]])
     if (all(mzRange == 0))
         mzRange <- NULL
     else if (mzRange[2] == 0)
-        mzRange[2] <- -1
+        mzRange[2] <- Inf
     filterFGroupsOpts$retRange <- retRange; filterFGroupsOpts$mzRange <- mzRange
 
     peakListOpts = list(algo = input$peakListGen)

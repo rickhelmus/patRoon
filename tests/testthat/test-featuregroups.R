@@ -98,13 +98,13 @@ test_that("basic filtering", {
     expect_gte(minInt(filter(fgOpenMS, preRelMinIntensity = 0.2), TRUE), 0.2)
 
     expect_range(groupInfo(filter(fgOpenMS, retentionRange = c(120, 200)))$rts, range(120, 200))
-    expect_equivalent(filter(fgOpenMS, retentionRange = c(0, -1)), fgOpenMS)
+    expect_equivalent(filter(fgOpenMS, retentionRange = c(0, Inf)), fgOpenMS)
     expect_range(groupInfo(filter(fgOpenMS, mzRange = c(200, 300)))$mzs, range(200, 300))
-    expect_equivalent(filter(fgOpenMS, mzRange = c(0, -1)), fgOpenMS)
+    expect_equivalent(filter(fgOpenMS, mzRange = c(0, Inf)), fgOpenMS)
     expect_range(groupInfo(filter(fgOpenMS, mzDefectRange = c(0.1, 0.2)))$mzs %% 1, range(0.1, 0.2))
     expect_equivalent(filter(fgOpenMS, mzDefectRange = c(0, 1)), fgOpenMS)
     expect_lt(length(filter(fgOpenMS, chromWidthRange = c(0, 30))), length(fgOpenMS))
-    expect_equivalent(filter(fgOpenMS, chromWidthRange = c(0, -1)), fgOpenMS)
+    expect_equivalent(filter(fgOpenMS, chromWidthRange = c(0, Inf)), fgOpenMS)
 
     expect_identical(replicateGroups(filter(fgOpenMS, rGroups = "standard")), "standard")
     expect_identical(replicateGroups(filter(fgOpenMS, removeBlanks = TRUE)), "standard")
@@ -123,13 +123,13 @@ test_that("basic filtering", {
     expect_known_output(filter(fgOpenMS, maxReplicateIntRSD = 0.5), testFile("fgf-reprsd", text = TRUE))
     expect_known_output(filter(fgOpenMS, blankThreshold = 5), testFile("fgf-bl", text = TRUE))
     expect_known_output(filter(fgOpenMS, absMinIntensity = 1500, blankThreshold = 5,
-                               retentionRange = c(120, -1), relMinReplicateAbundance = 1),
+                               retentionRange = c(120, Inf), relMinReplicateAbundance = 1),
                         testFile("fgf-combi", text = TRUE))
     expect_known_output(filter(fgOpenMS, absMinIntensity = 1500, blankThreshold = 5,
-                               retentionRange = c(120, -1), relMinReplicateAbundance = 1, negate = TRUE),
+                               retentionRange = c(120, Inf), relMinReplicateAbundance = 1, negate = TRUE),
                         testFile("fgf-combi-neg", text = TRUE))
     expect_length(filter(fgOpenMSEmpty, absMinIntensity = 1500, blankThreshold = 5,
-                         retentionRange = c(120, -1), relMinReplicateAbundance = 1), 0)
+                         retentionRange = c(120, Inf), relMinReplicateAbundance = 1), 0)
 })
 
 test_that("replicate group subtraction", {

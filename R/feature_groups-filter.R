@@ -208,10 +208,7 @@ retentionMzFilter <- function(fGroups, range, negate, what)
 {
     return(doFilter(fGroups, what, c(range, negate), function(fGroups)
     {
-        if (range[2] < 0)
-            pred <- function(x) numGTE(x, range[1])
-        else
-            pred <- function(x) numGTE(x, range[1]) & numLTE(x, range[2])
+        pred <- function(x) numGTE(x, range[1]) & numLTE(x, range[2])
 
         if (negate)
             pred <- Negate(pred)
@@ -243,8 +240,6 @@ chromWidthFilter <- function(fGroups, range, negate)
                 else
                     diff(unlist(fTable[[anaInfo$analysis[i]]][finds[i], c("retmin", "retmax")]))
             }, USE.NAMES = FALSE)
-            if (range[2] < 0)
-                return(numGTE(cwidths, range[1]))
             return(numGTE(cwidths, range[1]) & numLTE(cwidths, range[2]))
         }
 
@@ -274,8 +269,8 @@ replicateGroupFilter <- function(fGroups, rGroups, negate = FALSE, verbose = TRU
 #'   such as blank subtraction, minimum intensity and minimal replicate
 #'   abundance.
 #'
-#' @param absMinIntensity Minimum intensity for a features to be kept . Set to 0 or \code{NULL} to skip
-#'   this step.
+#' @param absMinIntensity Minimum intensity for a features to be kept . Set to 0
+#'   or \code{NULL} to skip this step.
 #' @param
 #' relAbundance,absAbundance,interRelRGroupAbundance,interAbsRGroupAbundance
 #' Minimum overall relative/absolute abundance for a feature group to be present
@@ -290,9 +285,9 @@ replicateGroupFilter <- function(fGroups, rGroups, negate = FALSE, verbose = TRU
 #' @param retentionRange,mzRange,chromWidthRange Range of retention time (in
 #'   seconds), \emph{m/z} or chromatographic peak width (in seconds),
 #'   respectively. Features outside this range will be removed. Should be a
-#'   numeric vector with length of two containing the min/max values. If the max
-#'   value is set to a value below 0 then no maximum is assumed. Set to
-#'   \code{NULL} to skip this step.
+#'   numeric vector with length of two containing the min/max values. \code{Inf}
+#'   can be specified for no maximum range. Set to \code{NULL} to skip this
+#'   step.
 #' @param removeRefAnalyses Set to \code{TRUE} to remove all analyses that
 #'   belong to replicate groups that are specified as a reference in the
 #'   \link{analysis-information}. This is useful to simplify the analyses in the

@@ -126,7 +126,7 @@ In this tutorial we will filter grouped features (or 'feature groups') based on 
 
 ```{r filter}
 fGroups <- filter(fGroups, absMinIntensity = 10000, relMinReplicateAbundance = 1,
-                  maxReplicateIntRSD = 0.75, blankThreshold = 5, retentionRange = c(110, -1))
+                  maxReplicateIntRSD = 0.75, blankThreshold = 5, retentionRange = c(110, Inf))
 ```
 
 As can been from above command this will remove quite a large part our data. However, in our experience using the right settings is a very effective way to separate interesting data from the rest. Some hints on this process:

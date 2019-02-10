@@ -86,14 +86,7 @@ setMethod("as.data.table", "features", function(x) rbindlist(featureTable(x), id
 #' @describeIn features Performs common rule based filtering of features.
 #' @param intensityThreshold Minimum intensity of a feature. Set to \code{NULL}
 #'   to ignore.
-#' @param retentionRange,mzRange,chromWidthRange Range of retention time (in
-#'   seconds), \emph{m/z} or chromatographic peak width (in seconds),
-#'   respectively. Features outside this range will be removed. Should be a
-#'   numeric vector with length of two containing the min/max values. If the max
-#'   value is set to a value below 0 then no maximum is assumed. Set to
-#'   \code{NULL} to skip this step.
-#' @param negate If set to \code{TRUE} then filtering operations are performed
-#'   in opposite manner.
+#' @inheritParams filter,featureGroups-method
 #' @export
 setMethod("filter", "features", function(obj, intensityThreshold = NULL, retentionRange = NULL,
                                          mzRange = NULL, chromWidthRange = NULL, negate = FALSE)

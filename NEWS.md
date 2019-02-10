@@ -18,6 +18,7 @@
         * most existing filters now accept both relative and absolute values.
     * The script generation functionality of `newScript()` has been updated and supports more filter types.
     * The `repetitions` argument is not needed anymore for the new algorithm and has been removed.
+    * `Inf` values now should be used to specify no maximum for range filters (was `-1`).
 
 
 ## January 2019

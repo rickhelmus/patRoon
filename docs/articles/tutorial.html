@@ -74,7 +74,7 @@
       <h1>patRoon tutorial</h1>
                         <h4 class="author">Rick Helmus</h4>
             
-            <h4 class="date">2019-02-10</h4>
+            <h4 class="date">2019-02-11</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/rickhelmus/patRoon/blob/master/vignettes/tutorial.Rmd"><code>vignettes/tutorial.Rmd</code></a></small>
       <div class="hidden name"><code>tutorial.Rmd</code></div>
@@ -122,13 +122,13 @@ pre, code {
 <a class="sourceLine" id="cb1-6" data-line-number="6">dataDir &lt;-<span class="st"> </span>patRoonData<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/patRoonData/topics/patRoonData">exampleDataPath</a></span>() <span class="co"># path to example data files</span></a></code></pre></div>
 <p>The next step is to generate information ncessary for the analysis. To do so, we need to specify the names and file locations of the analyses, to which <em>replicate group</em> they belong and which replicate group(s) should be used for blank subtraction. To do so, we can use the <code><a href="../reference/analysis-information.html">generateAnalysisInfo()</a></code> utility function which automatically generates a suitable <code>data.frame</code> for us from given analyses:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw"><a href="../reference/analysis-information.html">generateAnalysisInfo</a></span>(dataDir)</a>
-<a class="sourceLine" id="cb2-2" data-line-number="2"><span class="co">#&gt;                                                                 path   analysis      group ref</span></a>
-<a class="sourceLine" id="cb2-3" data-line-number="3"><span class="co">#&gt; 1 /home/rick/R/x86_64-suse-linux-gnu-library/3.5/patRoonData/extdata  solvent-1  solvent-1    </span></a>
-<a class="sourceLine" id="cb2-4" data-line-number="4"><span class="co">#&gt; 2 /home/rick/R/x86_64-suse-linux-gnu-library/3.5/patRoonData/extdata  solvent-2  solvent-2    </span></a>
-<a class="sourceLine" id="cb2-5" data-line-number="5"><span class="co">#&gt; 3 /home/rick/R/x86_64-suse-linux-gnu-library/3.5/patRoonData/extdata  solvent-3  solvent-3    </span></a>
-<a class="sourceLine" id="cb2-6" data-line-number="6"><span class="co">#&gt; 4 /home/rick/R/x86_64-suse-linux-gnu-library/3.5/patRoonData/extdata standard-1 standard-1    </span></a>
-<a class="sourceLine" id="cb2-7" data-line-number="7"><span class="co">#&gt; 5 /home/rick/R/x86_64-suse-linux-gnu-library/3.5/patRoonData/extdata standard-2 standard-2    </span></a>
-<a class="sourceLine" id="cb2-8" data-line-number="8"><span class="co">#&gt; 6 /home/rick/R/x86_64-suse-linux-gnu-library/3.5/patRoonData/extdata standard-3 standard-3</span></a></code></pre></div>
+<a class="sourceLine" id="cb2-2" data-line-number="2"><span class="co">#&gt;                                                                   path   analysis      group ref</span></a>
+<a class="sourceLine" id="cb2-3" data-line-number="3"><span class="co">#&gt; 1 C:/Users/Rick Helmus/Documents/R/win-library/3.5/patRoonData/extdata  solvent-1  solvent-1    </span></a>
+<a class="sourceLine" id="cb2-4" data-line-number="4"><span class="co">#&gt; 2 C:/Users/Rick Helmus/Documents/R/win-library/3.5/patRoonData/extdata  solvent-2  solvent-2    </span></a>
+<a class="sourceLine" id="cb2-5" data-line-number="5"><span class="co">#&gt; 3 C:/Users/Rick Helmus/Documents/R/win-library/3.5/patRoonData/extdata  solvent-3  solvent-3    </span></a>
+<a class="sourceLine" id="cb2-6" data-line-number="6"><span class="co">#&gt; 4 C:/Users/Rick Helmus/Documents/R/win-library/3.5/patRoonData/extdata standard-1 standard-1    </span></a>
+<a class="sourceLine" id="cb2-7" data-line-number="7"><span class="co">#&gt; 5 C:/Users/Rick Helmus/Documents/R/win-library/3.5/patRoonData/extdata standard-2 standard-2    </span></a>
+<a class="sourceLine" id="cb2-8" data-line-number="8"><span class="co">#&gt; 6 C:/Users/Rick Helmus/Documents/R/win-library/3.5/patRoonData/extdata standard-3 standard-3</span></a></code></pre></div>
 <p>As you can see the generated <code>data.frame</code> consists of four columns:</p>
 <ul>
 <li>
@@ -146,13 +146,13 @@ pre, code {
 <a class="sourceLine" id="cb3-2" data-line-number="2">                                <span class="dt">groups =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/rep">rep</a></span>(<span class="st">"solvent"</span>, <span class="dv">3</span>), <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/rep">rep</a></span>(<span class="st">"standard"</span>, <span class="dv">3</span>)),</a>
 <a class="sourceLine" id="cb3-3" data-line-number="3">                                <span class="dt">refs =</span> <span class="st">"solvent"</span>)</a>
 <a class="sourceLine" id="cb3-4" data-line-number="4">anaInfo</a>
-<a class="sourceLine" id="cb3-5" data-line-number="5"><span class="co">#&gt;                                                                 path   analysis    group     ref</span></a>
-<a class="sourceLine" id="cb3-6" data-line-number="6"><span class="co">#&gt; 1 /home/rick/R/x86_64-suse-linux-gnu-library/3.5/patRoonData/extdata  solvent-1  solvent solvent</span></a>
-<a class="sourceLine" id="cb3-7" data-line-number="7"><span class="co">#&gt; 2 /home/rick/R/x86_64-suse-linux-gnu-library/3.5/patRoonData/extdata  solvent-2  solvent solvent</span></a>
-<a class="sourceLine" id="cb3-8" data-line-number="8"><span class="co">#&gt; 3 /home/rick/R/x86_64-suse-linux-gnu-library/3.5/patRoonData/extdata  solvent-3  solvent solvent</span></a>
-<a class="sourceLine" id="cb3-9" data-line-number="9"><span class="co">#&gt; 4 /home/rick/R/x86_64-suse-linux-gnu-library/3.5/patRoonData/extdata standard-1 standard solvent</span></a>
-<a class="sourceLine" id="cb3-10" data-line-number="10"><span class="co">#&gt; 5 /home/rick/R/x86_64-suse-linux-gnu-library/3.5/patRoonData/extdata standard-2 standard solvent</span></a>
-<a class="sourceLine" id="cb3-11" data-line-number="11"><span class="co">#&gt; 6 /home/rick/R/x86_64-suse-linux-gnu-library/3.5/patRoonData/extdata standard-3 standard solvent</span></a></code></pre></div>
+<a class="sourceLine" id="cb3-5" data-line-number="5"><span class="co">#&gt;                                                                   path   analysis    group     ref</span></a>
+<a class="sourceLine" id="cb3-6" data-line-number="6"><span class="co">#&gt; 1 C:/Users/Rick Helmus/Documents/R/win-library/3.5/patRoonData/extdata  solvent-1  solvent solvent</span></a>
+<a class="sourceLine" id="cb3-7" data-line-number="7"><span class="co">#&gt; 2 C:/Users/Rick Helmus/Documents/R/win-library/3.5/patRoonData/extdata  solvent-2  solvent solvent</span></a>
+<a class="sourceLine" id="cb3-8" data-line-number="8"><span class="co">#&gt; 3 C:/Users/Rick Helmus/Documents/R/win-library/3.5/patRoonData/extdata  solvent-3  solvent solvent</span></a>
+<a class="sourceLine" id="cb3-9" data-line-number="9"><span class="co">#&gt; 4 C:/Users/Rick Helmus/Documents/R/win-library/3.5/patRoonData/extdata standard-1 standard solvent</span></a>
+<a class="sourceLine" id="cb3-10" data-line-number="10"><span class="co">#&gt; 5 C:/Users/Rick Helmus/Documents/R/win-library/3.5/patRoonData/extdata standard-2 standard solvent</span></a>
+<a class="sourceLine" id="cb3-11" data-line-number="11"><span class="co">#&gt; 6 C:/Users/Rick Helmus/Documents/R/win-library/3.5/patRoonData/extdata standard-3 standard solvent</span></a></code></pre></div>
 <p>Note that we set the reference for the solvents to themself. This will remove any features from the solvents, which is generally fine as we are usually not interested in the blanks anyway.</p>
 <p>Depending on your preference, it may be preferred to export the <code>data.frame</code> to a <em>.csv</em> file for larger project so it can be easily edited, for instance, with graphical tools such as Excel. Alternatively, the <code><a href="../reference/GUI-utils.html">newProject()</a></code> function can be used to make this process even easier (briefly discussed <a href="#newProject">here</a>).</p>
 </div>
@@ -228,7 +228,7 @@ pre, code {
 <a class="sourceLine" id="cb10-3" data-line-number="3">                              <span class="dt">avgFeatParams =</span> avgPListParams, <span class="dt">avgFGroupParams =</span> avgPListParams)</a></code></pre></div>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1">plists</a>
 <a class="sourceLine" id="cb11-2" data-line-number="2"><span class="co">#&gt; A MSPeakLists object (derived from workflowStep)</span></a>
-<a class="sourceLine" id="cb11-3" data-line-number="3"><span class="co">#&gt; Object size (indication): 2.5 MB</span></a>
+<a class="sourceLine" id="cb11-3" data-line-number="3"><span class="co">#&gt; Object size (indication): 2.8 MB</span></a>
 <a class="sourceLine" id="cb11-4" data-line-number="4"><span class="co">#&gt; Algorithm: mzR</span></a>
 <a class="sourceLine" id="cb11-5" data-line-number="5"><span class="co">#&gt; Total peak count: 5114 (MS: 4154 - MS/MS: 960)</span></a>
 <a class="sourceLine" id="cb11-6" data-line-number="6"><span class="co">#&gt; Average peak count/analysis: 1705 (MS: 1385 - MS/MS: 320)</span></a>
@@ -256,7 +256,7 @@ pre, code {
 <a class="sourceLine" id="cb14-2" data-line-number="2">                               <span class="dt">adduct =</span> <span class="st">"[M+H]+"</span>, <span class="dt">database =</span> <span class="st">"pubchem"</span>, <span class="dt">maxCandidatesToStop =</span> <span class="dv">5000</span>)</a></code></pre></div>
 <div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" data-line-number="1">compounds</a>
 <a class="sourceLine" id="cb15-2" data-line-number="2"><span class="co">#&gt; A compoundsMF object (derived from compounds -&gt; workflowStep)</span></a>
-<a class="sourceLine" id="cb15-3" data-line-number="3"><span class="co">#&gt; Object size (indication): 1.9 MB</span></a>
+<a class="sourceLine" id="cb15-3" data-line-number="3"><span class="co">#&gt; Object size (indication): 2 MB</span></a>
 <a class="sourceLine" id="cb15-4" data-line-number="4"><span class="co">#&gt; Algorithm: metfrag</span></a>
 <a class="sourceLine" id="cb15-5" data-line-number="5"><span class="co">#&gt; Number of feature groups with compounds in this object: 23</span></a>
 <a class="sourceLine" id="cb15-6" data-line-number="6"><span class="co">#&gt; Number of compounds: 559 (total), 24.3 (mean), 9 - 25 (min - max)</span></a>
@@ -276,7 +276,7 @@ pre, code {
 <div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" data-line-number="1">components &lt;-<span class="st"> </span><span class="kw"><a href="../reference/component-generation.html">generateComponents</a></span>(fGroups, <span class="st">"camera"</span>, <span class="dt">ionization =</span> <span class="st">"positive"</span>)</a></code></pre></div>
 <div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" data-line-number="1">components</a>
 <a class="sourceLine" id="cb18-2" data-line-number="2"><span class="co">#&gt; A componentsCamera object (derived from components -&gt; workflowStep)</span></a>
-<a class="sourceLine" id="cb18-3" data-line-number="3"><span class="co">#&gt; Object size (indication): 481.4 kB</span></a>
+<a class="sourceLine" id="cb18-3" data-line-number="3"><span class="co">#&gt; Object size (indication): 481.3 kB</span></a>
 <a class="sourceLine" id="cb18-4" data-line-number="4"><span class="co">#&gt; Algorithm: camera</span></a>
 <a class="sourceLine" id="cb18-5" data-line-number="5"><span class="co">#&gt; Components: CMP2, CMP3, CMP5, CMP7, CMP12, CMP13, ... (8 total)</span></a>
 <a class="sourceLine" id="cb18-6" data-line-number="6"><span class="co">#&gt; Number of feature groups in components: 17 (total), 2.1 (mean), 2 - 3 (min - max)</span></a>

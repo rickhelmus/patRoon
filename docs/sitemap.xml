@@ -4,18 +4,6 @@
     <loc>https://rickhelmus.github.io/patRoon/index.html</loc>
   </url>
   <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/COMStop.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/GUI-utils.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/MSPeakLists-class.html</loc>
-  </url>
-  <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/MSPeakLists-generation.html</loc>
-  </url>
-  <url>
     <loc>https://rickhelmus.github.io/patRoon/reference/adduct-class.html</loc>
   </url>
   <url>
@@ -53,6 +41,9 @@
   </url>
   <url>
     <loc>https://rickhelmus.github.io/patRoon/reference/compoundsMF-class.html</loc>
+  </url>
+  <url>
+    <loc>https://rickhelmus.github.io/patRoon/reference/COMStop.html</loc>
   </url>
   <url>
     <loc>https://rickhelmus.github.io/patRoon/reference/convertMSFiles.html</loc>
@@ -95,6 +86,15 @@
   </url>
   <url>
     <loc>https://rickhelmus.github.io/patRoon/reference/getXCMSSet.html</loc>
+  </url>
+  <url>
+    <loc>https://rickhelmus.github.io/patRoon/reference/GUI-utils.html</loc>
+  </url>
+  <url>
+    <loc>https://rickhelmus.github.io/patRoon/reference/MSPeakLists-class.html</loc>
+  </url>
+  <url>
+    <loc>https://rickhelmus.github.io/patRoon/reference/MSPeakLists-generation.html</loc>
   </url>
   <url>
     <loc>https://rickhelmus.github.io/patRoon/reference/optimizationResult-class.html</loc>

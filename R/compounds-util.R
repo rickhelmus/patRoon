@@ -23,19 +23,24 @@ mergeFragInfo <- function(fiLeft, fiRight, leftName, rightName)
     if (is.null(fiRight[["mergedBy"]]))
         fiRight[, mergedBy := list(list(rightName))]
 
-    # for overlap: just add label
-    fiLeft <- merge(fiLeft, fiRight[, c("PLIndex", "mergedBy"), with = FALSE], all.x = TRUE, by = "PLIndex")
-    fiLeft[is.na(mergedBy.y) | !nzchar(mergedBy.y) | sapply(mergedBy.y, is.null), mergedBy := mergedBy.x]
-    fiLeft[is.na(mergedBy.x) | !nzchar(mergedBy.x) | sapply(mergedBy.x, is.null), mergedBy := mergedBy.y]
-    fiLeft[!is.na(mergedBy.x) & !is.na(mergedBy.y),
-           mergedBy := lapply(seq_along(mergedBy.x), function(i) list(unique(c(mergedBy.x[[i]], mergedBy.y[[i]]))))]
-    fiLeft[, c("mergedBy.x", "mergedBy.y") := NULL]
-
-    # add unique
-    fiUnique <- fiRight[!PLIndex %in% fiLeft$PLIndex]
-    if (nrow(fiUnique) > 0)
-        fiLeft <- rbind(fiLeft, fiUnique, fill = TRUE)
-
+    if (nrow(fiLeft) == 0)
+        fiLeft <- fiRight
+    else if (nrow(fiRight) > 0)
+    {
+        # for overlap: just add label
+        fiLeft <- merge(fiLeft, fiRight[, c("PLIndex", "mergedBy"), with = FALSE], all.x = TRUE, by = "PLIndex")
+        fiLeft[is.na(mergedBy.y) | !nzchar(mergedBy.y) | sapply(mergedBy.y, is.null), mergedBy := list(mergedBy.x)]
+        fiLeft[is.na(mergedBy.x) | !nzchar(mergedBy.x) | sapply(mergedBy.x, is.null), mergedBy := list(mergedBy.y)]
+        fiLeft[!is.na(mergedBy.x) & !is.na(mergedBy.y),
+               mergedBy := lapply(seq_along(mergedBy.x), function(i) list(unique(c(mergedBy.x[[i]], mergedBy.y[[i]]))))]
+        fiLeft[, c("mergedBy.x", "mergedBy.y") := NULL]
+        
+        # add unique
+        fiUnique <- fiRight[!PLIndex %in% fiLeft$PLIndex]
+        if (nrow(fiUnique) > 0)
+            fiLeft <- rbind(fiLeft, fiUnique, fill = TRUE)
+    }
+    
     return(fiLeft)
 }
 

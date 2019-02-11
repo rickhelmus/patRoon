@@ -1,7 +1,7 @@
 yesNo <- function(...) menu(c("Yes", "No"), ...) == 1
 packageInstalled <- function(pkg) requireNamespace(pkg, quietly = TRUE)
 
-checkPackages <- function(pkgs, ask = TRUE, bioc = FALSE)
+checkPackages <- function(pkgs, ask = TRUE, bioc = FALSE, ...)
 {
     notInstalled <- pkgs[!sapply(pkgs, packageInstalled)]
     if (length(notInstalled) == 0)
@@ -10,11 +10,11 @@ checkPackages <- function(pkgs, ask = TRUE, bioc = FALSE)
     if (ask && !yesNo(title = paste0("Install the following required packages?\n",
                                      paste0(notInstalled, collapse = ", "))))
         stop("Aborted. Please install the package(s) manually.")
-
+    
     if (bioc)
-        BiocManager::install(notInstalled, ask = FALSE)
+        BiocManager::install(notInstalled, ask = FALSE, ...)
     else
-        install.packages(notInstalled)
+        install.packages(notInstalled, ...)
 }
 
 needOptionalPackage <- function(pkg, msg)
@@ -51,7 +51,7 @@ installPackages <- function()
     checkPackages(c("mzR", "xcms", "CAMERA"), bioc = TRUE)
     
     if (needOptionalPackage("RDCOMClient", "This is only required for interfacing with Bruker DataAnalysis."))
-        checkPackages("RDCOMClient", ask = FALSE)
+        checkPackages("RDCOMClient", ask = FALSE, repos = "http://www.omegahat.net/R")
     
     if (needOptionalPackage("RAMClustR", paste("This package may be used for componentization (e.g. grouping adducts/isotopes).",
                                                "To install this package R tools is required and will be installed automatically if not yet installed.")))
@@ -61,7 +61,7 @@ installPackages <- function()
             installr::install.rtools(check = FALSE, GUI = FALSE)
         remotes::install_github("cbroeckl/RAMClustR", build_vignettes = TRUE, dependencies = TRUE)
     }
-
+    
     # UNDONE: check JAVA
 }
 
@@ -79,7 +79,7 @@ installExtDeps <- function(extPath)
     
     hasOpenMS <- system2("FeatureFinderMetabo", "--help", stdout = FALSE, stderr = FALSE) == 0
     
-    mfBin <- path.expand(getOption("patRoon.path.metFragCL"))
+    mfBin <- path.expand(getOption("patRoon.path.metFragCL", ""))
     hasMF <- !is.null(mfBin) && nzchar(mfBin) && file.exists(mfBin)
     
     
@@ -100,7 +100,7 @@ installExtDeps <- function(extPath)
         if ("MetFrag CL" %in% instWhat)
         {
             url <- "http://msbi.ipb-halle.de/~cruttkie/metfrag/MetFrag2.4.5-CL.jar"
-            dest <- file.path(extPath, basename(url))
+            dest <- normalizePath(file.path(extPath, basename(url)), winslash = "/")
             if (download.file(url, dest) != 0)
                 warning(paste("Failed to download MetFrag CL from ", url))
             else
@@ -116,7 +116,7 @@ installExtDeps <- function(extPath)
             else
             {
                 unzip(dest, exdir = extPath)
-                zipdest <- file.path(extPath, "sirius-win64-headless-4.0.1")
+                zipdest <- normalizePath(file.path(extPath, "sirius-win64-headless-4.0.1"), winslash = "/")
                 if (!file.exists(zipdest))
                     warning(paste("Failed to extract SIRIUS to ", extPath))
                 else
@@ -134,7 +134,7 @@ installExtDeps <- function(extPath)
             else
             {
                 unzip(dest, exdir = extPath)
-                zipdest <- file.path(extPath, "pngquant")
+                zipdest <- normalizePath(file.path(extPath, "pngquant"), winslash = "/")
                 if (!file.exists(zipdest))
                     warning(paste("Failed to extract pngquant to ", extPath))
                 else
@@ -165,7 +165,7 @@ installPatRoon <- function(what = c("packages", "external_deps", "patRoon"),
     
     if (!is.character(extDepPath) || length(extDepPath) > 1)
         stop("extDepPath must be valid character string.")
-
+    
     if ("packages" %in% what)
         installPackages()
     if ("external_deps" %in% what)

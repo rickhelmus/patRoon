@@ -671,7 +671,7 @@ setMethod("plotSpec", "compounds", function(obj, index, groupName, MSPeakLists, 
         if (is.null(fi))
         {
             fi <- ft
-            fi[, mergedBy := list(list(algorithm(formulas)))]
+            fi[, mergedBy := algorithm(formulas)]
         }
         else
             fi <- mergeFragInfo(fi, getFragmentInfoFromForms(spec, ft),
@@ -958,7 +958,7 @@ setMethod("consensus", "compounds", function(obj, ..., compThreshold = 0.0,
     # avoid duplicates and set merged by field of fragInfo.
     allCompTables <- lapply(seq_along(allCompounds), function(cmpi)
     {
-        mergedBy <- list(list(compNames[[cmpi]])) # wrap in a double list as we want it to be a list of characters
+        mergedBy <- compNames[[cmpi]]
 
         return(lapply(compoundTable(allCompounds[[cmpi]]), function(ct)
         {

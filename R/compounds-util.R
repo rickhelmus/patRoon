@@ -19,9 +19,9 @@ mergeFragInfo <- function(fiLeft, fiRight, leftName, rightName)
     fiLeft <- copy(fiLeft); fiRight <- copy(fiRight)
 
     if (is.null(fiLeft[["mergedBy"]]))
-        fiLeft[, mergedBy := list(list(leftName))]
+        fiLeft[, mergedBy := leftName]
     if (is.null(fiRight[["mergedBy"]]))
-        fiRight[, mergedBy := list(list(rightName))]
+        fiRight[, mergedBy := rightName]
 
     if (nrow(fiLeft) == 0)
         fiLeft <- fiRight
@@ -29,10 +29,9 @@ mergeFragInfo <- function(fiLeft, fiRight, leftName, rightName)
     {
         # for overlap: just add label
         fiLeft <- merge(fiLeft, fiRight[, c("PLIndex", "mergedBy"), with = FALSE], all.x = TRUE, by = "PLIndex")
-        fiLeft[is.na(mergedBy.y) | !nzchar(mergedBy.y) | sapply(mergedBy.y, is.null), mergedBy := list(mergedBy.x)]
-        fiLeft[is.na(mergedBy.x) | !nzchar(mergedBy.x) | sapply(mergedBy.x, is.null), mergedBy := list(mergedBy.y)]
-        fiLeft[!is.na(mergedBy.x) & !is.na(mergedBy.y),
-               mergedBy := lapply(seq_along(mergedBy.x), function(i) list(unique(c(mergedBy.x[[i]], mergedBy.y[[i]]))))]
+        fiLeft[is.na(mergedBy.y), mergedBy := mergedBy.x]
+        fiLeft[is.na(mergedBy.x), mergedBy := mergedBy.y]
+        fiLeft[!is.na(mergedBy.x) & !is.na(mergedBy.y), mergedBy := paste(mergedBy.x, mergedBy.y, sep = ",")]
         fiLeft[, c("mergedBy.x", "mergedBy.y") := NULL]
         
         # add unique
@@ -598,7 +597,7 @@ setMethod("compoundViewer", c("featureGroups", "MSPeakLists", "compounds"), func
                     if (!is.null(fi$score) && !is.na(fi$score[infoi]))
                         htext <- paste0(htext, sprintf("<br>score: %f", fi$score[infoi]))
                     if (!is.null(fi$mergedBy))
-                        htext <- paste0(htext, sprintf("<br>merged by: %s", paste0(unlist(fi$mergedBy[[infoi]]), collapse = ",")))
+                        htext <- paste0(htext, sprintf("<br>merged by: %s", fi$mergedBy[[infoi]]))
                 }
 
                 p <- add_trace(p, x = rep(spec$mz[i], 2), y = c(0, spec$intensity[i]),

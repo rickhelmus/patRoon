@@ -357,7 +357,7 @@ getFragmentInfoFromForms <- function(spec, fragFormTable)
     fi[, intensity := spec$intensity[PLIndex]]
 
     if (!is.null(fragFormTable[["mergedBy"]]))
-        fi[, mergedBy := list(strsplit(fragFormTable$mergedBy, ",", fixed = TRUE))]
+        fi[, mergedBy := fragFormTable$mergedBy]
 
     return(fi)
 }

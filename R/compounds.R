@@ -624,8 +624,79 @@ setMethod("plotScores", "compounds", function(obj, index, groupName, normalizeSc
     }
 })
 
+#' @describeIn compounds Returns an MS/MS peak list annotated with data from a
+#'   given candidate compound for a feature group.
+#'
+#' @param onlyAnnotated Set to \code{TRUE} to filter out any peaks that could
+#'   not be annotated.
+#' 
+#' @export
+setMethod("annotatedPeakList", "compounds", function(obj, index, groupName, MSPeakLists, formulas = NULL,
+                                                     onlyAnnotated = FALSE)
+{
+    checkmate::assertClass(formulas, "formulas", null.ok = TRUE)
+    
+    allFGroups <- groupNames(obj)
+    if (!is.null(formulas))
+        allFGroups <- union(allFGroups, groupNames(formulas))
+    
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertCount(index, positive = TRUE, add = ac)
+    assertChoiceSilent(groupName, allFGroups, add = ac)
+    checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
+    checkmate::assertFlag(onlyAnnotated, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    spec <- MSPeakLists[[groupName]][["MSMS"]]
+    if (is.null(spec))
+        return(NULL)
+    
+    spec <- copy(spec)
+    spec[, PLIndex := seq_len(nrow(spec))] # for merging
+    
+    compTable <- compoundTable(obj)[[groupName]]
+    fragInfo <- NULL
+    if (!is.null(compTable) && nrow(compTable) > 0)
+    {
+        compr <- compTable[index, ]
+        fragInfo <- compr$fragInfo[[1]]
+    }   
+    
+    formTable <- formulas[[groupName]]
+    if (!is.null(formTable))
+    {
+        formTable <- formTable[byMSMS == TRUE & neutral_formula == compr$formula]
+        if (nrow(formTable) > 0)
+        {
+            formFragInfo <- getFragmentInfoFromForms(spec, formTable)
+            if (is.null(fragInfo))
+            {
+                fragInfo <- formFragInfo
+                fragInfo[, mergedBy := algorithm(formulas)]
+            }
+            else
+                fragInfo <- mergeFragInfo(fragInfo, formFragInfo, algorithm(obj), algorithm(formulas))
+        }
+    }
+    
+    if (!is.null(fragInfo) && nrow(fragInfo) > 0)
+        spec <- merge(spec, fragInfo[, -c("intensity", "mz")], all.x = TRUE, by = "PLIndex")
+    
+    spec <- spec[, PLIndex := NULL]
+    
+    if (onlyAnnotated)
+    {
+        if (is.null(spec[["formula"]]))
+            spec <- spec[0]
+        else
+            spec <- spec[!is.na(formula)]
+    }
+    
+    return(spec[])
+})
+
 #' @describeIn compounds Plots an annotated spectrum for a given candidate
-#'   compound of a feature group.
+#'   compound for a feature group.
 #'
 #' @param plotStruct If \code{TRUE} then the candidate structure is drawn in the
 #'   spectrum.

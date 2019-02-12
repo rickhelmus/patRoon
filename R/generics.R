@@ -151,6 +151,11 @@ setGeneric("experimentInfo", function(object, paramSet, DoEIteration) standardGe
 NULL
 
 
+#' @templateVar func algorithm
+#' @templateVar desc returns the algorithm that was used to generate the object.
+#' @template generics
+setGeneric("algorithm", function(obj) standardGeneric("algorithm"))
+
 #' @templateVar func analysisInfo
 #' @templateVar desc returns the \link[=analysis-information]{analysis information} from an object.
 #' @template generics
@@ -161,10 +166,10 @@ setGeneric("analysisInfo", function(obj) standardGeneric("analysisInfo"))
 #' @template generics
 setGeneric("analyses", function(obj) standardGeneric("analyses"))
 
-#' @templateVar func algorithm
-#' @templateVar desc returns the algorithm that was used to generate the object.
+#' @templateVar func annotatedPeakList
+#' @templateVar desc returns an annotated MS peak list.
 #' @template generics
-setGeneric("algorithm", function(obj) standardGeneric("algorithm"))
+setGeneric("annotatedPeakList", function(obj, ...) standardGeneric("annotatedPeakList"))
 
 #' @templateVar func clusterProperties
 #' @templateVar desc Obtain a list with properties of the generated cluster(s).

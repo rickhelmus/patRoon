@@ -385,6 +385,63 @@ setMethod("filter", "formulas", function(obj, minExplainedFragPeaks = NULL, elem
     return(obj)
 })
 
+#' @describeIn formulas Returns an MS/MS peak list annotated with data from a
+#'   given candidate formula.
+#'
+#' @param onlyAnnotated Set to \code{TRUE} to filter out any peaks that could
+#'   not be annotated.
+#' 
+#' @export
+setMethod("annotatedPeakList", "formulas", function(obj, precursor, groupName, analysis = NULL, MSPeakLists,
+                                                    onlyAnnotated = FALSE)
+{
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertString(precursor, min.chars = 1, add = ac)
+    assertChoiceSilent(groupName, groupNames(obj), add = ac)
+    checkmate::assertString(analysis, min.chars = 1, null.ok = TRUE, add = ac)
+    checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
+    checkmate::assertFlag(onlyAnnotated, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    if (!is.null(analysis))
+    {
+        formTable <- obj[[analysis, groupName]]
+        spec <- MSPeakLists[[analysis, groupName]][["MSMS"]]
+    }
+    else
+    {
+        formTable <- obj[[groupName]]
+        spec <- MSPeakLists[[groupName]][["MSMS"]]
+    }
+    
+    if (is.null(spec))
+        return(NULL)
+    
+    formTable <- formTable[byMSMS == TRUE & formula == precursor]
+    if (nrow(formTable) > 0)
+    {
+        formTable <- formTable[formula == precursor]
+        if (nrow(formTable) > 0)
+        {
+            fragInfo <- getFragmentInfoFromForms(spec, formTable)
+            spec <- copy(spec)
+            spec[, PLIndex := seq_len(nrow(spec))] # for merging
+            spec <- merge(spec, fragInfo[, -c("intensity", "mz")], all.x = TRUE, by = "PLIndex")
+            spec <- spec[, PLIndex := NULL]
+        }
+    }
+    
+    if (onlyAnnotated)
+    {
+        if (is.null(spec[["formula"]]))
+            spec <- spec[0]
+        else
+            spec <- spec[!is.na(formula)]
+    }
+    
+    return(spec[])
+})
+
 #' @describeIn formulas Plots an annotated spectrum for a given candidate
 #'   formula of a feature or feature group.
 #'

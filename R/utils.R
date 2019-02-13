@@ -465,46 +465,44 @@ makeVennPlot <- function(plotObjects, categories, areas, intersectFunc,
     invisible(list(gList = gRet, areas = areas, intersectionCounts = icounts))
 }
 
-makeMSPlot <- function(spec, fragInfo, xlim, ylim, ..., extraHeightInch = 0)
+getMSPlotData <- function(spec)
 {
-    hasFragInfo <- !is.null(fragInfo) && nrow(fragInfo) > 0
+    hasFragInfo <- !is.null(spec[["formula"]])
     plotData <- copy(spec)
 
     # default colour/line width
-    plotData[, c("colour", "lwd") := .("grey", 1)]
-
+    plotData[, c("colour", "lwd", "legend") := .("grey", 1, "unassigned")]
+    
     if (hasFragInfo)
     {
-        fragPlotData <- copy(fragInfo)
-        isMerged <- hasFragInfo && !is.null(fragInfo[["mergedBy"]])
-        if (isMerged)
+        isAnnotated <- plotData[!is.na(formula), which = TRUE]
+        if (!is.null(spec[["mergedBy"]]))
         {
-            fragPlotData <- copy(fragInfo)
-            fragPlotData[, mergedBy := sapply(mergedBy, wrapStr, width = 10)]
-
-            mbsUnique <- unique(fragPlotData$mergedBy)
+            plotData[isAnnotated, legend := sapply(mergedBy, wrapStr, width = 10)]
+            
+            mbsUnique <- unique(plotData$legend)
             # order from small to big based on number of commas
             mbsUnique <- mbsUnique[order(sapply(mbsUnique, countCharInStr, ch = ",", USE.NAMES = FALSE))]
             mbCombCols <- setNames(getBrewerPal(length(mbsUnique), "Paired"), mbsUnique)
-
-            fragPlotData[nzchar(mergedBy), c("colour", "lwd") := .(mbCombCols[match(mergedBy, mbsUnique)], 2)]
-            setnames(fragPlotData, "mergedBy", "legend")
+            
+            plotData[isAnnotated, c("colour", "lwd") := .(mbCombCols[match(legend, mbsUnique)], 2)]
         }
         else
-            fragPlotData[, c("colour", "lwd", "legend") := .("blue", 2, "assigned")] # nothing merged, just mark all annotated blue
-
-        fragPlotData[, formWidth := strwidth(formula, units = "inches")]
-
-        # add PLIndex to merge
-        plotData[, PLIndex := seq_len(nrow(plotData))]
-        plotData[fragPlotData, c("colour", "lwd", "formula", "formWidth", "legend") :=
-                     .(ifelse(is.na(i.colour), colour, i.colour),
-                       ifelse(is.na(i.lwd), lwd, i.lwd),
-                       i.formula, i.formWidth, i.legend), on = "PLIndex"]
+            plotData[isAnnotated, c("colour", "lwd", "legend") := .("blue", 2, "assigned")] # nothing merged, just mark all annotated blue
     }
-
+    
     # mark precursor
     plotData[precursor == TRUE, c("colour", "lwd", "legend") := .("red", 2, "precursor")]
+    
+    return(plotData)
+}
+
+# spec may be annotated
+makeMSPlot <- function(spec, xlim, ylim, ..., extraHeightInch = 0)
+{
+    plotData <- getMSPlotData(spec)
+    if (!is.null(plotData[["formula"]]))
+        plotData[!is.na(formula), formWidth := strwidth(formula, units = "inches")]
 
     if (is.null(xlim))
         xlim <- range(plotData$mz) * c(0.9, 1.1)
@@ -571,46 +569,16 @@ makeMSPlot <- function(spec, fragInfo, xlim, ylim, ..., extraHeightInch = 0)
     }
 }
 
-makeMSPlotGG <- function(spec, fragInfo, ...)
+makeMSPlotGG <- function(spec, ...)
 {
-    hasFragInfo <- !is.null(fragInfo) && nrow(fragInfo) > 0
-    if (hasFragInfo && !is.null(fragInfo[["mergedBy"]]))
-    {
-        allMergedBy <- fragInfo[["mergedBy"]]
-        mbsUnique <- unique(allMergedBy)
-        # order from small to big based on number of commas
-        mbsUnique <- mbsUnique[order(sapply(mbsUnique, countCharInStr, ch = ",", USE.NAMES = FALSE))]
-        mbCombCols <- getBrewerPal(length(mbsUnique), "Paired")
-    }
+    plotData <- getMSPlotData(spec)
+    
+    if (!is.null(plotData[["formula"]]))
+        plotData[!is.na(formula), formula := subscriptFormula(formula, parse = FALSE)]
 
-    plotData <- copy(spec)
-
-    plotData[, c("colour", "lab", "lwd", "text") := .("grey", "unassigned", 0.5, "")]
-    if (hasFragInfo)
-    {
-        plotData[, fiInd := sapply(seq_len(nrow(spec)), function(r) match(r, fragInfo$PLIndex))]
-        if (!is.null(fragInfo[["mergedBy"]]))
-        {
-            plotData[!is.na(fiInd), colour := mbCombCols[match(allMergedBy[fiInd], mbsUnique)]]
-            plotData[!is.na(fiInd), lab := allMergedBy[fiInd]]
-        }
-        else
-        {
-            plotData[!is.na(fiInd), colour := "blue"]
-            plotData[!is.na(fiInd), lab := "assigned"]
-        }
-
-        plotData[!is.na(fiInd), lwd := 2]
-        plotData[!is.na(fiInd), text := subscriptFormula(fragInfo$formula[fiInd], parse = FALSE)]
-    }
-
-    # mark precursor
-    plotData[precursor == TRUE, c("colour", "lab", "lwd", "text") :=
-                 .("red", "precursor", 2, "")]
-
-    ret <- ggplot(plotData, aes_string(x = "mz", y = 0, label = "text")) + xlim(range(spec$mz) * c(0.9, 1.1)) +
+    ret <- ggplot(plotData, aes_string(x = "mz", y = 0, label = "formula")) + xlim(range(spec$mz) * c(0.9, 1.1)) +
         geom_segment(aes_string(xend = "mz", yend = "intensity",
-                                colour = "lab", size = "lwd")) + scale_size(range = c(0.5, 2), guide = FALSE)
+                                colour = "legend", size = "lwd")) + scale_size(range = c(0.5, 2), guide = FALSE)
 
     if (any(nzchar(plotData$text))) # BUG: throws errors when parse=TRUE and all labels are empty
         ret <- ret + ggrepel::geom_text_repel(aes_string(y = "intensity", angle = 0), min.segment.length = 0.1, parse = TRUE,

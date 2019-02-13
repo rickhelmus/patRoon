@@ -732,22 +732,7 @@ setMethod("plotSpec", "compounds", function(obj, index, groupName, MSPeakLists, 
         fTable <- NULL
 
     compr <- compTable[index, ]
-    spec <- MSPeakLists[[groupName]][["MSMS"]]
-
-    # merge formulas
-    fi <- compr$fragInfo[[1]]
-    if (!is.null(fTable) && nrow(fTable) > 0)
-    {
-        ft <- fTable[neutral_formula == compr$formula]
-        if (is.null(fi))
-        {
-            fi <- ft
-            fi[, mergedBy := algorithm(formulas)]
-        }
-        else
-            fi <- mergeFragInfo(fi, getFragmentInfoFromForms(spec, ft),
-                                algorithm(obj), algorithm(formulas))
-    }
+    spec <- annotatedPeakList(obj, index, groupName, MSPeakLists, formulas)
 
     if (plotStruct)
         mol <- getMoleculesFromSMILES(compr$SMILES)
@@ -767,10 +752,10 @@ setMethod("plotSpec", "compounds", function(obj, index, groupName, MSPeakLists, 
         if (plotStruct && isValidMol(mol))
         {
             molHInch <- 1.5
-            makeMSPlot(spec, fi, xlim, ylim, main = title, ..., extraHeightInch = molHInch)
+            makeMSPlot(spec, xlim, ylim, main = title, ..., extraHeightInch = molHInch)
         }
         else
-            makeMSPlot(spec, fi, xlim, ylim, main = title, ...)
+            makeMSPlot(spec, xlim, ylim, main = title, ...)
 
         # draw structure
         if (plotStruct && isValidMol(mol))
@@ -819,7 +804,7 @@ setMethod("plotSpec", "compounds", function(obj, index, groupName, MSPeakLists, 
     }
     else
     {
-        MSPlot <- makeMSPlotGG(spec, fi) + ggtitle(title)
+        MSPlot <- makeMSPlotGG(spec) + ggtitle(title)
 
         if (plotStruct && isValidMol(mol))
         {

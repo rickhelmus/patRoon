@@ -478,31 +478,15 @@ setMethod("plotSpec", "formulas", function(obj, precursor, groupName, analysis =
     assertXYLim(xlim, ylim, add = ac)
     checkmate::reportAssertions(ac)
 
-    if (!is.null(analysis))
-    {
-        formTable <- obj[[analysis, groupName]]
-        spec <- MSPeakLists[[analysis, groupName]][["MSMS"]]
-    }
-    else
-    {
-        formTable <- obj[[groupName]]
-        spec <- MSPeakLists[[groupName]][["MSMS"]]
-    }
-
-    formTable <- formTable[byMSMS == TRUE & formula == precursor]
-
-    if (nrow(formTable) == 0 || is.null(spec))
-        return(NULL)
-
-    fi <- getFragmentInfoFromForms(spec, formTable)
-
     if (is.null(title))
         title <- subscriptFormula(precursor)
+
+    spec <- annotatedPeakList(obj, precursor, groupName, analysis, MSPeakLists)
     
     if (useGGPlot2)
-        return(makeMSPlotGG(spec, fi) + ggtitle(title))
+        return(makeMSPlotGG(spec) + ggtitle(title))
 
-    makeMSPlot(spec, fi, xlim, ylim, ..., main = title)
+    makeMSPlot(spec, xlim, ylim, ..., main = title)
 })
 
 #' @describeIn formulas plots a Venn diagram (using \pkg{\link{VennDiagram}})

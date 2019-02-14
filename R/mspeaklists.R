@@ -381,9 +381,9 @@ setMethod("plotSpec", "MSPeakLists", function(obj, groupName, analysis = NULL, M
     }
 
     if (useGGPlot2)
-        return(makeMSPlotGG(spec, NULL) + ggtitle(title))
+        return(makeMSPlotGG(spec) + ggtitle(title))
 
-    makeMSPlot(spec, NULL, xlim, ylim, main = title, ...)
+    makeMSPlot(spec, xlim, ylim, main = title, ...)
 })
 
 

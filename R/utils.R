@@ -573,18 +573,25 @@ makeMSPlotGG <- function(spec, ...)
 {
     plotData <- getMSPlotData(spec)
     
-    if (!is.null(plotData[["formula"]]))
+    # BUG: throws errors when parse=TRUE and all labels are empty
+    if (!is.null(plotData$formula) && any(!is.na(plotData$formula)))
+    {
+        # convert NAs to empty strings to avoid warnings with ggrepel
         plotData[!is.na(formula), formula := subscriptFormula(formula, parse = FALSE)]
-
-    ret <- ggplot(plotData, aes_string(x = "mz", y = 0, label = "formula")) + xlim(range(spec$mz) * c(0.9, 1.1)) +
-        geom_segment(aes_string(xend = "mz", yend = "intensity",
-                                colour = "legend", size = "lwd")) + scale_size(range = c(0.5, 2), guide = FALSE)
-
-    if (any(nzchar(plotData$text))) # BUG: throws errors when parse=TRUE and all labels are empty
-        ret <- ret + ggrepel::geom_text_repel(aes_string(y = "intensity", angle = 0), min.segment.length = 0.1, parse = TRUE,
-                                              nudge_y = grid::convertUnit(grid::unit(5, "mm"), "npc", valueOnly = TRUE), size = 3.2)
-
-    ret <- ret + xlab("m/z") + ylab("Intensity") +
+        # BUG: ggrepel warns about NAs, but when replacing this with empty
+        # characters or space the text entries are simply removed. for now just
+        # use a dummy expression...
+        plotData[is.na(formula), formula := "plain()"]
+        ret <- ggplot(plotData, aes_string(x = "mz", y = 0, label = "formula")) +
+            ggrepel::geom_text_repel(aes_string(y = "intensity", angle = 0), min.segment.length = 0.1, parse = TRUE,
+                                     nudge_y = grid::convertUnit(grid::unit(5, "mm"), "npc", valueOnly = TRUE), size = 3.2)
+    }
+    else
+        ret <- ggplot(plotData, aes_string(x = "mz", y = 0))
+    
+    ret <- ret + xlim(range(spec$mz) * c(0.9, 1.1)) +
+        geom_segment(aes_string(xend = "mz", yend = "intensity", colour = "legend", size = "lwd")) +
+        scale_size(range = c(0.5, 2), guide = FALSE) + xlab("m/z") + ylab("Intensity") +
         cowplot::theme_cowplot(font_size = 12) + theme(legend.position = "bottom", legend.title = element_blank())
 
     return(ret)

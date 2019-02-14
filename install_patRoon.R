@@ -1,7 +1,32 @@
-yesNo <- function(...) menu(c("Yes", "No"), ...) == 1
-packageInstalled <- function(pkg) requireNamespace(pkg, quietly = TRUE)
+# TODO
+# - convert to wizard style?
+# - shiny/tcltk GUI?
+# - credit installr
+# - put helper functions in separate environment
 
-checkPackages <- function(pkgs, ask = TRUE, bioc = FALSE, ...)
+# force forward slash so we don't have to escape text written to files
+fixPath <- function(p) normalizePath(p, winslash = "/", mustWork = FALSE)
+
+yesNo <- function(title, ...) menu(c("Yes", "No"), title = title, ...) == 1
+packageInstalled <- function(pkg) requireNamespace(pkg, quietly = TRUE)
+packageLogFile <- function(instPath) file.path(instPath, "package_install.txt")
+
+ensureInstPath <- function(instPath)
+{
+    if (!dir.exists(instPath))
+    {
+        if (!dir.create(instPath, recursive = TRUE))
+            stop(sprintf("Failed to create external dependency directory '%s'", instPath))
+    }
+}
+
+printHeader <- function(txt)
+{
+    hd <- rep("-", 10)
+    cat(hd, txt, hd, sep = "\n")
+}
+
+checkPackages <- function(pkgs, instPath, ask = TRUE, type = "installp", ghRepos = NULL, ...)
 {
     notInstalled <- pkgs[!sapply(pkgs, packageInstalled)]
     if (length(notInstalled) == 0)
@@ -11,10 +36,44 @@ checkPackages <- function(pkgs, ask = TRUE, bioc = FALSE, ...)
                                      paste0(notInstalled, collapse = ", "))))
         stop("Aborted. Please install the package(s) manually.")
     
-    if (bioc)
-        BiocManager::install(notInstalled, ask = FALSE, ...)
+    notInstalled <- as.list(notInstalled)
+    if (type == "bioc")
+    {
+        cmd <- "BiocManager::install"
+        args <- c(notInstalled, list(ask = FALSE), list(...))
+    }
+    else if (type == "gh")
+    {
+        cmd <- "remotes::install_github"
+        args <- c(paste(ghRepos, notInstalled, sep = "/"), list(...))
+    }
     else
-        install.packages(notInstalled, ...)
+    {
+        cmd <- "install.packages"
+        args <- c(notInstalled, list(...))
+    }
+    
+    argNames <- names(args)
+    argVals <- ifelse(sapply(args, is.character), paste0("\"", args, "\""), as.character(args))
+    argsTxt <- paste0(ifelse(nzchar(argNames), paste0(argNames, " = "), ""), argVals, collapse = ", ")
+    cat(sprintf("Installing packages:\n%s(%s)\n", cmd, argsTxt))
+    
+    ensureInstPath(instPath)
+    sink(packageLogFile(instPath), append = TRUE)
+    # eval(parse()): make sure we can call namespace prefixed functions
+    ret <- tryCatch(do.call(eval(parse(text = cmd)), args), error = function(e) paste("Error:", e),
+                    warning = function(w) paste("Warning:", w))
+    sink()
+        
+    if (is.character(ret))
+    {
+        cat(ret); cat("\n")
+        stop(paste(sprintf("There were errors/warnings during package installation. Please review the output in the console and log file ('%s').",
+                           packageLogFile(instPath)),
+                   sprintf("Alternatively, try to install the following packages manually with '%s':\n%s", cmd,
+                           paste0(notInstalled, collapse = ", ")),
+                   sep = "\n"))
+    }
 }
 
 needOptionalPackage <- function(pkg, msg)
@@ -23,84 +82,160 @@ needOptionalPackage <- function(pkg, msg)
                yesNo(title = sprintf("The optional package '%s' is not installed. %s\nInstall?", pkg, msg)))
 }
 
-addToRProfile <- function(setOpts)
+# From utils.R
+getCommandWithOptPath <- function(cmd, opt)
 {
-    alreadySet <- sapply(names(setOpts), function(o) nzchar(getOption(o, default = "")), USE.NAMES = FALSE)
+    if (Sys.info()[["sysname"]] == "Windows")
+        cmd <- paste0(cmd, ".exe") # add file extension for Windows
     
-    if (any(alreadySet))
+    opt <- paste0("patRoon.path.", opt)
+    path <- getOption(opt)
+    if (!is.null(path) && nzchar(path))
     {
-        if (!yesNo(title = sprintf("NOTE: the following options are already set: %s\nDo you still want to add them to your ~/.Rprofile?",
-                                   names(setOpts)[alreadySet])))
-            setOpts <- setOpts[!alreadySet]
+        ret <- file.path(path.expand(path), cmd)
+        if (!file.exists(ret))
+            return("")
+        return(ret)
     }
     
+    # assume command is in PATH --> no need to add path
+    if (!nzchar(Sys.which(cmd)))
+        return("")
+    
+    return(cmd)
+}
+
+addToRProfile <- function(setOpts, JavaPath)
+{
     if (length(setOpts) > 0)
     {
-        cat(c(paste0("\n\n# Automatically added by install_patRoon R script on ", date()),
-              sprintf("options(%s = \"%s\")", names(setOpts), setOpts)),
-            file = "~/.Rprofile", append = TRUE, sep = "\n")
+        alreadySet <- sapply(names(setOpts), function(o) nzchar(getOption(o, default = "")), USE.NAMES = FALSE)
+        if (any(alreadySet))
+        {
+            if (!yesNo(title = sprintf("NOTE: the following options are already set: %s\nDo you still want to add them to your ~/.Rprofile?",
+                                       paste0(names(setOpts)[alreadySet], collapse = ", "))))
+                setOpts <- setOpts[!alreadySet]
+        }
+    }
+    
+    if (length(setOpts) > 0 || nzchar(JavaPath))
+    {
+        RProfPath <- "~/.Rprofile"
+        ownRProfPath <- "~/.Rprofile-patRoon.R"
+
+        # use a marker in options to see if everything was loaded        
+        optMarker <- "patRoon.Rprof"
+        setOpts <- c(setOpts, setNames(TRUE, optMarker))
+        options(setNames(list(FALSE), optMarker))
         
-        # also set in local session
-        do.call(options, as.list(setOpts))
+        RProfFile <- paste(paste0("# Automatically generated by the install_patRoon R script on ", date()),
+                           "This file should not be modified and should be loaded by ~/.Rprofile.",
+                           sprintf("options(%s = \"%s\")", names(setOpts), setOpts), sep = "\n")
+        if (nzchar(JavaPath))
+            RProfFile <- paste(RProfFile, sprintf("Sys.setenv(PATH = paste(Sys.getenv('PATH'), '%s', sep = ';'))",
+                                                  fixPath(file.path(JavaPath, "bin"))),
+                               sep = "\n")
+        
+        cat(c(paste0("# Automatically generated by the install_patRoon R script on ", date()),
+              "This file should not be modified and should be loaded by ~/.Rprofile.",
+              sprintf("options(%s = \"%s\")", names(setOpts), setOpts)),
+            file = ownRProfPath, sep = "\n")
+        
+        # source it: make sure it works and set options in this environment
+        sret <- tryCatch(suppressWarnings(source(ownRProfPath, local = TRUE)), error = function(e) FALSE)
+        if (is.logical(sret) || !getOption(optMarker, FALSE))
+            stop("Failed to generate proper Rprofile settings")
+        
+        if (file.exists(RProfPath))
+        {
+            # there is an ~/.Rprofile: see if it already loads our file (because the installer was already executed before)
+            options(setNames(list(FALSE), optMarker))
+            sret <- tryCatch(suppressWarnings(source(RProfPath, local = TRUE)), error = function(e) FALSE)
+            if (is.logical(sret))
+                stop("Failed to load current Rprofile!")
+            
+            if (!getOption(optMarker, FALSE))
+            {
+                cat(c(paste("\n# Automatically added by install_patRoon script on ", date()),
+                      sprintf("if (file.exists('%s'))", ownRProfPath),
+                      sprintf("    source('%s')", ownRProfPath)),
+                      file = RProfPath, sep = "\n", append = TRUE)
+            }
+        }
     }
 }
 
-installPackages <- function()
+# returns TRUE if Java path needs to be added to Rprofile
+installPrerequisites <- function(instPath)
 {
-    checkPackages(c("installr", "BiocManager"))
-    checkPackages(c("mzR", "xcms", "CAMERA"), bioc = TRUE)
+    printHeader("Installing prerequisites...")
     
-    if (needOptionalPackage("RDCOMClient", "This is only required for interfacing with Bruker DataAnalysis."))
-        checkPackages("RDCOMClient", ask = FALSE, repos = "http://www.omegahat.net/R")
+    ret <- FALSE
     
-    if (needOptionalPackage("RAMClustR", paste("This package may be used for componentization (e.g. grouping adducts/isotopes).",
-                                               "To install this package R tools is required and will be installed automatically if not yet installed.")))
+    checkPackages(c("installr", "BiocManager", "rJava", "remotes", "pkgbuild"), instPath)
+    
+    # see if Java can be executed (e.g. necessary for MetFrag) and can be loaded (e.g. needed for RCDK)
+    hasJava <- suppressWarnings(system2("java", "-version", stdout = FALSE, stderr = FALSE) == 0) &&
+        tryCatch(rJava::.jinit(), error = function(e) -1) == 0
+    if (!hasJava)
     {
-        checkPackages(c("remotes", "pkgbuild"), ask = FALSE)
-        if (!pkgbuild::check_rtools())
-            installr::install.rtools(check = FALSE, GUI = FALSE)
-        remotes::install_github("cbroeckl/RAMClustR", build_vignettes = TRUE, dependencies = TRUE)
+        ensureInstPath(instPath)
+        
+        if (yesNo(paste("Could not detect a suitable Java JDK. Do you want automatically install it?",
+                        "(The JDK will only be accessible from R and not interfere with the rest of your system)",
+                        sep = "\n")))
+            ret <- installr::install.jdk(path = instPath)
     }
     
-    # UNDONE: check JAVA
+    if (!suppressMessages(pkgbuild::has_rtools()))
+    {
+        if (!yesNo("Rtools doesn't seem to be installed. This is necessary to proceed the installation. Do you want to install Rtools now?"))
+            stop("Please install Rtools manually and re-run the installer.")
+        # NOTE: set keep_install_file to avoid long delays after installation
+        installr::install.rtools(check = FALSE, GUI = FALSE, keep_install_file = TRUE)
+    }
+    
+    return(ret)
 }
 
-installExtDeps <- function(extPath)
+# returns which options should be set in Rprofile
+installExtDeps <- function(instPath)
 {
-    if (Sys.info()[["machine"]] != "x86-64")
-        warning("This script probbaly only works well on a 64 bit system!")
+    printHeader("Installing external dependencies...")
     
-    extPath <- normalizePath(extPath, mustWork = FALSE)
-    if (!dir.exists(extPath))
-    {
-        if (!dir.create(extPath))
-            stop(sprintf("Failed to create external dependency directory '%s'", extPath))
-    }
+    setOpts <- character()
     
-    hasOpenMS <- system2("FeatureFinderMetabo", "--help", stdout = FALSE, stderr = FALSE) == 0
+    extDeps <- data.frame(name = c("ProteoWizard", "OpenMS", "SIRIUS", "pngquant"),
+                          command = c("msconvert", "FeatureFinderMetabo", "sirius-64", "pngquant"),
+                          copt = c("pwiz", "OpenMS", "SIRIUS", "pngquant"),
+                          stringsAsFactors = FALSE)
+    extDeps$path <- mapply(extDeps$command, extDeps$copt, FUN = getCommandWithOptPath)
+    extDeps <- rbind(extDeps, list(name = "MetFrag CL", command = "", copt = "",
+                                   path = getOption("patRoon.path.metFragCL", "")))
     
-    mfBin <- path.expand(getOption("patRoon.path.metFragCL", ""))
-    hasMF <- !is.null(mfBin) && nzchar(mfBin) && file.exists(mfBin)
+    present <- nzchar(extDeps$path)
+    choices <- paste(extDeps$name, ifelse(present, "(seems installed)", "(doesn't seem to be installed)"))
+    instWhat <- select.list(choices, choices[!present], TRUE, graphics = FALSE,
+                            title = "Which external dependencies should be installed?")
     
-    
-    
-    instChoices <- c(if (hasOpenMS) "OpenMS (seems already installed)" else "(not installed)",
-                     "MetFrag CL", "SIRIUS", "pngquant")
-    instWhat <- select.list(instChoices, preselect = if (!hasOpenMS) instChoices[1],
-                            title = "Which external dependencies should be installed?",
-                            graphics = FALSE, multiple = TRUE)
+    # convert back to simple names
+    instWhat <- extDeps$name[choices %in% instWhat]
     
     if (length(instWhat) > 0)
     {
-        if (any(grepl("OpenMS", instWhat)))
-            installr::install.URL("https://github.com/OpenMS/OpenMS/releases/download/Release2.4.0/OpenMS-2.4.0-Win64.exe", message = FALSE)
-        
-        setOpts <- character()
+        ensureInstPath(instPath)
+
+        if ("OpenMS" %in% instWhat)
+        {
+            # NOTE: set keep_install_file to avoid long delays after installation
+            installr::install.URL("https://github.com/OpenMS/OpenMS/releases/download/Release2.4.0/OpenMS-2.4.0-Win64.exe",
+                                  message = FALSE, keep_install_file = TRUE)
+        }
         
         if ("MetFrag CL" %in% instWhat)
         {
             url <- "http://msbi.ipb-halle.de/~cruttkie/metfrag/MetFrag2.4.5-CL.jar"
-            dest <- normalizePath(file.path(extPath, basename(url)), winslash = "/")
+            dest <- fixPath(file.path(instPath, basename(url)))
             if (download.file(url, dest) != 0)
                 warning(paste("Failed to download MetFrag CL from ", url))
             else
@@ -110,15 +245,15 @@ installExtDeps <- function(extPath)
         if ("SIRIUS" %in% instWhat)
         {
             url <- "https://bio.informatik.uni-jena.de/repository/dist-release-local/de/unijena/bioinf/ms/sirius/4.0.1/sirius-4.0.1-win64-headless.zip"
-            dest <- file.path(extPath, basename(url))
+            dest <- file.path(instPath, basename(url))
             if (download.file(url, dest) != 0)
                 warning(paste("Failed to download SIRIUS from ", url))
             else
             {
-                unzip(dest, exdir = extPath)
-                zipdest <- normalizePath(file.path(extPath, "sirius-win64-headless-4.0.1"), winslash = "/")
+                unzip(dest, exdir = instPath)
+                zipdest <- fixPath(file.path(instPath, "sirius-win64-headless-4.0.1"))
                 if (!file.exists(zipdest))
-                    warning(paste("Failed to extract SIRIUS to ", extPath))
+                    warning(paste("Failed to extract SIRIUS to ", instPath))
                 else
                     setOpts <- c(setOpts, patRoon.path.SIRIUS = zipdest)
                 unlink(dest)
@@ -128,50 +263,93 @@ installExtDeps <- function(extPath)
         if ("pngquant" %in% instWhat)
         {
             url <- "https://pngquant.org/pngquant-windows.zip"
-            dest <- file.path(extPath, basename(url))
+            dest <- file.path(instPath, basename(url))
             if (download.file(url, dest) != 0)
                 warning(paste("Failed to download pngquant from ", url))
             else
             {
-                unzip(dest, exdir = extPath)
-                zipdest <- normalizePath(file.path(extPath, "pngquant"), winslash = "/")
+                unzip(dest, exdir = instPath)
+                zipdest <- fixPath(file.path(instPath, "pngquant"))
                 if (!file.exists(zipdest))
-                    warning(paste("Failed to extract pngquant to ", extPath))
+                    warning(paste("Failed to extract pngquant to ", instPath))
                 else
                     setOpts <- c(setOpts, patRoon.path.pngquant = zipdest)
                 unlink(dest)
             }
         }
         
-        if (length(setOpts) > 0 && yesNo(title = "Do you want to add the location of the downloaded tools to ~/.Rprofile (so you don't need to specify them manually with options())?"))
-            addToRProfile(setOpts)
+        if ("ProteoWizard" %in% instWhat &&
+            yesNo(title = paste("Due to license agreement restrictions ProteoWizard cannot be installed automatically at this point.",
+                                "Do you want to open the webpage so that you can download and install ProteoWizard manually?",
+                                sep = "\n")))
+        {
+            browseURL("http://proteowizard.sourceforge.net/download.html")
+            while(!yesNo(title = "Did you install ProteoWizard and are ready to continue the patRoon installation?")) {}
+        }
     }
+    
+    return(setOpts)
 }
 
-installPatRoonPackages <- function(exampleData)
+installRDeps <- function(instPath)
 {
-    remotes::install_github("rickhelmus/patRoon")
+    printHeader("Pre-Installing R dependencies...")
+    
+    checkPackages(c("mzR", "xcms", "CAMERA"), instPath, type = "bioc")
+    
+    if (needOptionalPackage("RDCOMClient", "This is only required for interfacing with Bruker DataAnalysis."))
+        checkPackages("RDCOMClient", instPath, ask = FALSE, repos = "http://www.omegahat.net/R")
+    
+    if (needOptionalPackage("RAMClustR", "This package may be used for componentization (e.g. grouping adducts/isotopes)."))
+        checkPackages("RAMClustR", instPath, ask = FALSE, type = "gh", ghRepos = "cbroeckl", build_vignettes = TRUE, dependencies = TRUE)
+}
+
+installPatRoonPackages <- function(instPath, exampleData)
+{
+    printHeader("Installing patRoon R package(s)...")
+    
+    checkPackages("patRoon", instPath, ask = FALSE, type = "gh", ghRepos = "rickhelmus")
     if (exampleData)
-        remotes::install_github("rickhelmus/patRoonData")
+        checkPackages("patRoonData", instPath, ask = FALSE, type = "gh", ghRepos = "rickhelmus")
     invisible(NULL)
 }
 
-installPatRoon <- function(what = c("packages", "external_deps", "patRoon"),
-                           extDepPath = "~/patRoon-dependencies", exampleData = TRUE)
+installPatRoon <- function(what = c("prereq", "external_deps", "packages", "patRoon"),
+                           instPath = "~/patRoon-install", exampleData = TRUE)
 {
-    validWhat <- c("packages", "external_deps", "patRoon")
+    if (Sys.info()[["sysname"]] != "Windows" || Sys.info()[["machine"]] != "x86-64")
+        stop("Sorry, this script only works on a 64 bit Windows system at the moment.")
+    
+    validWhat <- c("prereq", "external_deps", "packages", "patRoon")
     if (!is.character(what) || any(!what %in% validWhat))
         stop(sprintf("what must be a subset of (%s)", paste0(validWhat, collapse = ", ")))
     
-    if (!is.character(extDepPath) || length(extDepPath) > 1)
-        stop("extDepPath must be valid character string.")
+    if (!is.character(instPath) || length(instPath) > 1)
+        stop("instPath must be valid character string.")
     
-    if ("packages" %in% what)
-        installPackages()
+    instPath <- fixPath(instPath)
+    
+    didJava <- FALSE; setOpts <- character()
+    if ("prereq" %in% what)
+        didJava <- installPrerequisites(instPath)
     if ("external_deps" %in% what)
-        installExtDeps(extDepPath)
+        setOpts <- installExtDeps(instPath)
+    if ("packages" %in% what)
+        installRDeps(instPath)
     if ("patRoon" %in% what)
-        installPatRoonPackages(exampleData)
+        installPatRoonPackages(instPath, exampleData)
+    
+    if ((didJava || length(setOpts) > 0) &&
+        yesNo(paste("The installer can add code to your ~/.Rprofile file to automatically configure the location of downloaded tools and/or Java.",
+                    "An additional file will be created (~/Rprofile-patRoon.R) that will set the necessary options and is sourced from your ~/.Rprofile",
+                    "If you do not do this you will have to set the location of downloaded tools (e.g. MetFrag, SIRIUS) and/or Java manually (not recommended)",
+                    "Continue?",
+                    sep = "\n")))
+    {
+        jPath <- Sys.getenv("JAVA_HOME") # should be set by installr
+        addToRProfile(setOpts, if (didJava) jPath else "")
+    }
+        
     
     cat("All done! You may need to restart R.")
     invisible(NULL)

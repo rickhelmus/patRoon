@@ -258,12 +258,14 @@ compoundsDT <- rbindlist(lapply(compFGroups, function(grp)
                         function(compi) paste0(getCompInfoList(ct, compi, TRUE, mn), collapse = "<br>"))
     infoTexts <- sprintf("<div style='max-width: 300px; max-height: 432px; border: 1px solid black; border-style: dotted; margin: 1px; padding: 1px; overflow: auto; white-space: nowrap; }'>%s</div>", infoTexts)
     
-    fiTables <- sapply(ct$fragInfo, function(fi)
+    fiTables <- sapply(seq_along(nrow(ct)), function(compi)
     {
-        if (is.null(fi) || nrow(fi) == 0)
+        apl <- annotatedPeakList(rmdVars$compounds, index = compi, groupName = grp,
+                                 MSPeakLists = rmdVars$MSPeakLists, formulas = rmdVars$formulas,
+                                 onlyAnnotated = TRUE)
+        if (is.null(apl) || nrow(apl) == 0)
             return("")
-        fi <- fi[, -"PLIndex"]
-        knitr::kable(fi, "html") %>%
+        knitr::kable(apl, "html") %>%
                            kableExtra::kable_styling(font_size = 11) %>%
                            kableExtra::scroll_box(extra_css = "overflow: auto; height: 125px;")
     })
@@ -306,9 +308,12 @@ formulasDT <- rbindlist(lapply(formFGroups, function(grp)
     
     fiTables <- sapply(precursors, function(prec)
     {
-        fi <- getFragmentInfoFromForms(rmdVars$MSPeakLists[[grp]][["MSMS"]],
-                                       rmdVars$formulas[[grp]][formula == prec])[, -"PLIndex"]
-        knitr::kable(fi, "html") %>%
+        apl <- annotatedPeakList(rmdVars$formulas, precursor = prec, groupName = grp,
+                                 MSPeakLists = rmdVars$MSPeakLists, onlyAnnotated = TRUE)
+        if (is.null(apl) || nrow(apl) == 0)
+            return("")
+        
+        knitr::kable(apl, "html") %>%
             kableExtra::kable_styling(font_size = 11) %>%
             kableExtra::scroll_box(extra_css = "overflow: auto; height: 125px;")
     })

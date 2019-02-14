@@ -50,7 +50,7 @@
 * All major workflow classes now have `algorithm()` and `as.data.table()/as.data.frame()` methods. The latter replaces and enhances the `makeTable()` (`formulas` class) and `groupTable()` (`featureGroups` class) methods.
 
 
-## Decomber 2018
+## December 2018
 * Moved OpenMS XML writing code from `R` to `C++`: significantly reduces time required for grouping large amount of features.
 * Several updates for functionality that uses Bruker DataAnalyses
     * Improved verification and consistency for handling processed data from DataAnalysis

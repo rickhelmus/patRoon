@@ -202,6 +202,26 @@ test_that("consensus works", {
     expect_length(consensus(compsMFEmptyPL, compsSIREmptyPL, uniqueFrom = 1, uniqueOuter = TRUE), 0)
 })
 
+if (doMetFrag && doSIRIUS)
+{
+    anPL <- annotatedPeakList(compsCons, index = 1, groupName = groupNames(compsCons)[2],
+                              MSPeakLists = plists, formulas = forms)
+    anPLOnly <- annotatedPeakList(compsCons, index = 1, groupName = groupNames(compsCons)[2],
+                                  MSPeakLists = plists, formulas = forms, onlyAnnotated = TRUE)
+}
+
+test_that("annotation works", {
+    skip_if_not(doMetFrag && doSIRIUS)
+    
+    expect_lt(nrow(anPLOnly), nrow(anPL))
+    expect_true(any(is.na(anPL$formula)))
+    expect_false(any(is.na(anPLOnly$formula)))
+    expect_true(all(compsCons[[2]]$fragInfo[[1]]$formula %in% anPLOnly$formula))
+    expect_true(any(grepl("metfrag", anPLOnly$mergedBy)))
+    expect_true(any(grepl("SIRIUS", anPLOnly$mergedBy)))
+    expect_true(any(grepl("GenForm", anPLOnly$mergedBy)))
+})
+
 test_that("reporting works", {
     skip_if_not(hasCompounds)
 

@@ -176,6 +176,24 @@ test_that("consensus works", {
     expect_length(consensus(formsGFEmpty, formsSIREmpty, uniqueFrom = 1, uniqueOuter = TRUE), 0)
 })
 
+if (doSIRIUS)
+{
+    anPL <- annotatedPeakList(fCons, precursor = "C9H8NO", groupName = groupNames(fCons)[4], MSPeakLists = plists)
+    anPLOnly <- annotatedPeakList(fCons, precursor = "C9H8NO", groupName = groupNames(fCons)[4],
+                                  MSPeakLists = plists, onlyAnnotated = TRUE)
+}
+
+test_that("annotation works", {
+    skip_if_not(doSIRIUS)
+    
+    expect_lt(nrow(anPLOnly), nrow(anPL))
+    expect_true(any(is.na(anPL$formula)))
+    expect_false(any(is.na(anPLOnly$formula)))
+    expect_true(all(fCons[[4]]$frag_formula %in% anPLOnly$formula))
+    expect_true(any(grepl("GenForm", anPLOnly$mergedBy)))
+    expect_true(any(grepl("SIRIUS", anPLOnly$mergedBy)))
+})
+
 test_that("reporting works", {
     expect_error(reportCSV(fGroups, getWorkPath(), formulas = formsGF), NA)
     for (grp in groupNames(formsGF))

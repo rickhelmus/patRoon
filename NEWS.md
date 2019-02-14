@@ -19,7 +19,8 @@
     * The script generation functionality of `newScript()` has been updated and supports more filter types.
     * The `repetitions` argument is not needed anymore for the new algorithm and has been removed.
     * `Inf` values now should be used to specify no maximum for range filters (was `-1`).
-* Fixed: GenForm now always uses Hill sorting.     
+* Fixed: GenForm now always uses Hill sorting.
+* `annotatedPeakList()` method for `formulas` and `compounds`. Also used by `reportMD` for improved annotation peak tables.
 
 
 ## January 2019

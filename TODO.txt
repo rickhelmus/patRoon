@@ -24,6 +24,7 @@ general
     - add empty anaInfo with comments if no analyses are selected
     - check if RStudio is running
 - convertMSFiles(): hint if dirs should be TRUE? Or do it automatically if a file is a dir?
+- update tests for new OpenMS/MetFrag
 
 
 docs
@@ -79,7 +80,6 @@ compounds
 - convert score csv to internal data?
 - SIRIUS: use --auto-charge instead of manually fixing charge of fragments (or not? conflicting docs on what it does)
 - document database="comptox"?
-- fix MF landing page for local databases
 - SIRIUS: topMostFormulas argument
 - test score normalization?
 - add new MF stat and other scorings

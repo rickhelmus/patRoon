@@ -213,7 +213,9 @@ buildMFLandingURL <- function(mfSettings, peakList, precursorMz)
 
     if (mfSettings$MetFragDatabaseType == "ExtendedPubChem")
         mfSettings$MetFragDatabaseType <- "PubChem" # user should tick box for now...
-
+    else if (!mfSettings$MetFragDatabaseType %in% c("KEGG", "PubChem", "ChemSpider", "LipidMaps", "MetaCyc", "LocalInChI", "LocalSDF"))
+        mfSettings$MetFragDatabaseType <- NULL # not all databases are supported yet.
+    
     # Allowed parameters: list taken from error page when unsupported parameter is given
     mfSettings <- mfSettings[names(mfSettings) %in%
                                  c("FragmentPeakMatchAbsoluteMassDeviation", "FragmentPeakMatchRelativeMassDeviation",

@@ -21,6 +21,8 @@
     * `Inf` values now should be used to specify no maximum for range filters (was `-1`).
 * Fixed: GenForm now always uses Hill sorting.
 * `annotatedPeakList()` method for `formulas` and `compounds`. Also used by `reportMD` for improved annotation peak tables.
+* Tweaked default mzR MS peak lists settings (halved `maxRtMSWidth` and `precursorMzWindow`)
+* Fixed: Make sure that MetFrag web doesn't try to set unsupported database
 
 
 ## January 2019

@@ -9,7 +9,7 @@ general
 - negate for all filter methods
 - make algorithm names more consistent
 - convertMSFiles(): add DA functionality
-- suspect screening: add MS/MS qualifiers
+- suspect screening: add MS/MS qualifiers, calculate ion masses
 - DA
     - generateMSPeakListsDA: find precursor masses with larger window
     - tests

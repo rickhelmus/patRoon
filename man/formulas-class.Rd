@@ -16,6 +16,7 @@
 \alias{$,formulas-method}
 \alias{as.data.table,formulas-method}
 \alias{filter,formulas-method}
+\alias{annotatedPeakList,formulas-method}
 \alias{plotSpec,formulas-method}
 \alias{plotVenn,formulas-method}
 \alias{plotUpSet,formulas-method}
@@ -47,6 +48,9 @@
 \S4method{filter}{formulas}(obj, minExplainedFragPeaks = NULL,
   elements = NULL, fragElements = NULL, lossElements = NULL,
   topMost = NULL, scoreLimits = NULL, OM = NULL)
+
+\S4method{annotatedPeakList}{formulas}(obj, precursor, groupName,
+  analysis = NULL, MSPeakLists, onlyAnnotated = FALSE)
 
 \S4method{plotSpec}{formulas}(obj, precursor, groupName, analysis = NULL,
   MSPeakLists, title = NULL, useGGPlot2 = FALSE, xlim = NULL,
@@ -159,6 +163,9 @@ results for the complete feature group will be plotted.}
 \item{MSPeakLists}{The \code{\link{MSPeakLists}} object that was used to
 generate the candidate}
 
+\item{onlyAnnotated}{Set to \code{TRUE} to filter out any peaks that could
+not be annotated.}
+
 \item{title}{The title of the plot. Set to \code{NULL} for an automatically
 generated title.}
 
@@ -262,6 +269,9 @@ formula table for the feature group specified by \code{j} is returned.
 feature group and other information such as element counts.
 
 \item \code{filter}: Performs rule based filtering on formula results.
+
+\item \code{annotatedPeakList}: Returns an MS/MS peak list annotated with data from a
+given candidate formula.
 
 \item \code{plotSpec}: Plots an annotated spectrum for a given candidate
 formula of a feature or feature group.

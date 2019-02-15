@@ -25,6 +25,7 @@
 \alias{plotStructure,compounds-method}
 \alias{plotScores,compounds-method}
 \alias{plotScores}
+\alias{annotatedPeakList,compounds-method}
 \alias{plotSpec,compounds-method}
 \alias{plotVenn,compounds-method}
 \alias{plotUpSet,compounds-method}
@@ -69,6 +70,9 @@
 \S4method{plotScores}{compounds}(obj, index, groupName,
   normalizeScores = "max", excludeNormScores = NULL, onlyUsed = TRUE,
   useGGPlot2 = FALSE)
+
+\S4method{annotatedPeakList}{compounds}(obj, index, groupName, MSPeakLists,
+  formulas = NULL, onlyAnnotated = FALSE)
 
 \S4method{plotSpec}{compounds}(obj, index, groupName, MSPeakLists,
   formulas = NULL, plotStruct = TRUE, title = NULL,
@@ -193,6 +197,9 @@ have been used to rank data (see the \code{scoreTypes} argument to
 
 \item{MSPeakLists}{The \code{\link{MSPeakLists}} object that was used to
 generate the candidate}
+
+\item{onlyAnnotated}{Set to \code{TRUE} to filter out any peaks that could
+not be annotated.}
 
 \item{plotStruct}{If \code{TRUE} then the candidate structure is drawn in the
 spectrum.}
@@ -323,8 +330,11 @@ substructure (MCS) of the selected candidates is drawn.
 
 \item \code{plotScores}: Plots a barplot with scoring of a candidate compound.
 
+\item \code{annotatedPeakList}: Returns an MS/MS peak list annotated with data from a
+given candidate compound for a feature group.
+
 \item \code{plotSpec}: Plots an annotated spectrum for a given candidate
-compound of a feature group.
+compound for a feature group.
 
 \item \code{plotVenn}: plots a Venn diagram (using \pkg{\link{VennDiagram}})
 outlining unique and shared compound candidates of up to five different

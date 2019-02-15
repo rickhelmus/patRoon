@@ -2,9 +2,10 @@
 % Please edit documentation in R/generics.R
 \name{generics}
 \alias{generics}
+\alias{algorithm}
 \alias{analysisInfo}
 \alias{analyses}
-\alias{algorithm}
+\alias{annotatedPeakList}
 \alias{clusterProperties}
 \alias{clusters}
 \alias{cutClusters}
@@ -36,11 +37,13 @@
 \alias{show}
 \title{Miscellaneous generics}
 \usage{
+algorithm(obj)
+
 analysisInfo(obj)
 
 analyses(obj)
 
-algorithm(obj)
+annotatedPeakList(obj, ...)
 
 clusterProperties(obj)
 
@@ -105,6 +108,12 @@ arguments are often specific for the implemented methods, for this reason,
 please refer to the linked method documentation for each generic.
 }
 \details{
+\code{algorithm} returns the algorithm that was used to generate the object.
+
+\itemize{
+    \item Methods are defined for: \code{\link[=algorithm,components-method]{components}}; \code{\link[=algorithm,compounds-method]{compounds}}; \code{\link[=algorithm,formulas-method]{formulas}}; \code{\link[=algorithm,optimizationResult-method]{optimizationResult}}; \code{\link[=algorithm,workflowStep-method]{workflowStep}}.
+}
+
 \code{analysisInfo} returns the \link[=analysis-information]{analysis information} from an object.
 
 \itemize{
@@ -117,10 +126,10 @@ please refer to the linked method documentation for each generic.
     \item Methods are defined for: \code{\link[=analyses,featureGroups-method]{featureGroups}}; \code{\link[=analyses,features-method]{features}}; \code{\link[=analyses,formulas-method]{formulas}}; \code{\link[=analyses,MSPeakLists-method]{MSPeakLists}}.
 }
 
-\code{algorithm} returns the algorithm that was used to generate the object.
+\code{annotatedPeakList} returns an annotated MS peak list.
 
 \itemize{
-    \item Methods are defined for: \code{\link[=algorithm,components-method]{components}}; \code{\link[=algorithm,compounds-method]{compounds}}; \code{\link[=algorithm,formulas-method]{formulas}}; \code{\link[=algorithm,optimizationResult-method]{optimizationResult}}; \code{\link[=algorithm,workflowStep-method]{workflowStep}}.
+    \item Methods are defined for: \code{\link[=annotatedPeakList,compounds-method]{compounds}}; \code{\link[=annotatedPeakList,formulas-method]{formulas}}.
 }
 
 \code{clusterProperties} Obtain a list with properties of the generated cluster(s).

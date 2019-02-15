@@ -20,7 +20,7 @@ NULL
 #'
 #' @rdname MSPeakLists-generation
 #' @export
-generateMSPeakListsMzR <- function(fGroups, maxRtMSWidth = 20, precursorMzWindow = 8, topMost = NULL,
+generateMSPeakListsMzR <- function(fGroups, maxRtMSWidth = 10, precursorMzWindow = 4, topMost = NULL,
                                    avgFeatParams = getDefAvgPListParams(),
                                    avgFGroupParams = getDefAvgPListParams())
 {

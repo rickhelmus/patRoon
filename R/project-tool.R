@@ -220,7 +220,7 @@ getNewProjectUI <- function(destPath)
                                                      "mzR", multiple = FALSE, width = "95%"),
                                          conditionalPanel(
                                              condition = "input.peakListGen == \"mzR\"",
-                                             numericInput("precursorMzWindow", "MS/MS precursor m/z search window", 8, width = "100%"),
+                                             numericInput("precursorMzWindow", "MS/MS precursor m/z search window", 4, width = "100%"),
                                              textNote("The precursor m/z search window applied when finding MS/MS spectra. Set to zero for DIA experiments.")
                                          )
                                      )

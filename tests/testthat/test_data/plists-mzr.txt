@@ -1,1 +1,1 @@
-A MSPeakLists object (derived from workflowStep)Algorithm: mzRTotal peak count: 14436 (MS: 14385 - MS/MS: 51)Average peak count/analysis: 7218 (MS: 7192 - MS/MS: 26)Total peak lists: 152 (MS: 142 - MS/MS: 10)Average peak lists/analysis: 76 (MS: 71 - MS/MS: 5)
+A MSPeakLists object (derived from workflowStep)Algorithm: mzRTotal peak count: 12929 (MS: 12878 - MS/MS: 51)Average peak count/analysis: 6464 (MS: 6439 - MS/MS: 26)Total peak lists: 151 (MS: 142 - MS/MS: 9)Average peak lists/analysis: 76 (MS: 71 - MS/MS: 4)

@@ -65,7 +65,7 @@ avgPListParams <- getDefAvgPListParams(clusterMzWindow = 0.005)
 {{ endCodeBlock() }}
 {{ optionalCodeBlock(doMSPeakFind && peakListOpts$algo == "mzR") }}
 # NOTE: please check all arguments, especially precursorMzWindow!
-plists <- generateMSPeakLists(fGroups, "mzr", maxRtMSWidth = 20, precursorMzWindow = {{ if (precursorMzWindow == 0) "NULL" else precursorMzWindow }},
+plists <- generateMSPeakLists(fGroups, "mzr", maxRtMSWidth = 10, precursorMzWindow = {{ if (precursorMzWindow == 0) "NULL" else precursorMzWindow }},
                               avgFeatParams = avgPListParams, avgFGroupParams = avgPListParams)
 {{ endCodeBlock() }}
 {{ optionalCodeBlock(doMSPeakFind && peakListOpts$algo == "Bruker" && featFinderOpts$algo != "Bruker") }}

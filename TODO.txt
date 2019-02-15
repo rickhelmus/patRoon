@@ -19,7 +19,6 @@ general
 - newProject(): generate Rmd?
 - algorithmObject() generic: for xset, xsa, rc, ...
 - test negative subset indices
-- plotSpec(): always show non-annotated in legend
 - ref --> blank
 - newProject()
     - add empty anaInfo with comments if no analyses are selected
@@ -69,7 +68,6 @@ MSPeakLists
 - metadata for Bruker peaklists?
 - maxRtMSWidth --> maxMSRtWidth
 - metadata() generic?
-- Default isolation window should be 4? Also change newProject()
 
 
 compounds
@@ -109,7 +107,6 @@ components
 reporting
 - add more options to reportPlots argument of reportMD()?
 - reportPDF/reportMD: MS only formulas are not reported?
-- more complete fragInfo tables (formulas, precursors)
 
 
 Cleanup

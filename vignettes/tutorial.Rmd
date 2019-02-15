@@ -153,7 +153,7 @@ The `generateMSPeakLists()` will perform this action for us and will generate so
 
 ```{r MSPeakLists,results='hide'}
 avgPListParams <- getDefAvgPListParams(clusterMzWindow = 0.005)
-plists <- generateMSPeakLists(fGroups, "mzr", maxRtMSWidth = 20, precursorMzWindow = 8,
+plists <- generateMSPeakLists(fGroups, "mzr", maxRtMSWidth = 10, precursorMzWindow = 4,
                               avgFeatParams = avgPListParams, avgFGroupParams = avgPListParams)
 ```
 ```{r}

@@ -25,7 +25,7 @@ NULL
 #'
 #' @rdname MSPeakLists-generation
 #' @export
-generateMSPeakListsDA <- function(fGroups, bgsubtr = TRUE, maxRtMSWidth = 20, minMSIntensity = 500,
+generateMSPeakListsDA <- function(fGroups, bgsubtr = TRUE, maxRtMSWidth = 10, minMSIntensity = 500,
                                   minMSMSIntensity = 500,  clear = TRUE, close = TRUE, save = close,
                                   MSMSType = "MSMS", avgFGroupParams = getDefAvgPListParams())
 {

@@ -2,6 +2,8 @@
 # - convert to wizard style?
 # - shiny/tcltk GUI?
 # - optionally don't unload packages? optionally clear symbols?
+# - warn old pwiz?  --> current give priority to registry
+# - backup ~/.Rprofile
 
 
 # put utility functions in separate environment
@@ -22,6 +24,8 @@ utils <- setRefClass("utilsInst", methods = list(
             return(nzchar(system.file(package = pkg)))
         requireNamespace(pkg, quietly = TRUE)
     },
+    
+    packagesNotInstalled = function(pkgs) pkgs[!sapply(pkgs, utils$packageInstalled)],
     
     ensureInstPath = function(instPath)
     {
@@ -56,7 +60,7 @@ utils <- setRefClass("utilsInst", methods = list(
         if (force)
             notInstalled <- pkgs
         else
-            notInstalled <- pkgs[!sapply(pkgs, utils$packageInstalled)]
+            notInstalled <- packagesNotInstalled(pkgs)
         
         if (length(notInstalled) == 0)
             return(NULL)
@@ -227,14 +231,99 @@ utils <- setRefClass("utilsInst", methods = list(
         }
     },
     
-    # returns TRUE if Java path needs to be added to Rprofile
-    installPrerequisites = function(instPath, lib)
+    findPWiz = function()
     {
-        printHeader("Installing prerequisites...")
+        # try to find ProteoWizard
+        # Inspired by scan_registry_for_rtools() from pkgload
+        
+        key <- "Software\\Classes\\Applications\\seems.exe\\shell\\open\\command"
+        reg <- tryCatch(utils::readRegistry(key, "HCU"), error = function(e) NULL)
+        
+        # not sure if this might occur
+        if (is.null(reg))
+            reg <- tryCatch(utils::readRegistry(key, "HLM"), error = function(e) NULL)
+        
+        if (!is.null(reg))
+        {
+            path <- tryCatch(dirname(sub("\"([^\"]*)\".*", "\\1", reg[[1]])), error = function(e) NULL)
+            if (!is.null(path) && file.exists(file.path(path, "msconvert.exe"))) # extra check: see if msconvert is there
+                return(path)
+        }
+        
+        # check PATH
+        ppath <- dirname(Sys.which("msconvert.exe"))
+        if (nzchar(ppath))
+            return(ppath)
+        
+        return(NULL)
+    },
+    
+    installRDeps = function(lib)
+    {
+        printHeader("Pre-Installing R dependencies...")
+        
+        packagesCRAN <- packagesNotInstalled(c("installr", "BiocManager", "rJava", "remotes", "pkgbuild"))
+        packagesBioC <- packagesNotInstalled(c("mzR", "xcms", "CAMERA"))
+        optPackages <- packagesNotInstalled(c("RDCOMClient", "RAMClustR"))
+        mandatoryPackages <- c(packagesCRAN, packagesBioC)
+        
+        if (length(c(mandatoryPackages, optPackages)) == 0)
+        
+        choices <- c(mandatory = "Only mandatory packages",
+                     RDCOMClient = "RDCOMClient (required for Bruker DataAnalysis integration)",
+                     RAMClustR = "RAMClustR (for componentization and e.g. adduct/isotope annotation)",
+                     all = "All")
+
+        choices <- character()
+        if (length(mandatoryPackages) > 0)
+            choices <- c(choices, mandatory = "Only mandatory packages")
+        if ("RDCOMClient" %in% optPackages)
+            choices <- c(choices, RDCOMClient = "RDCOMClient (required for Bruker DataAnalysis integration)")
+        if ("RAMClustR" %in% optPackages)
+            choices <- c(choices, RAMClustR = "RAMClustR (for componentization and e.g. adduct/isotope annotation)")
+        if (length(choices) > 1)
+            choices <- c(choices, all = "All")
+        else if (length(choices) == 0)
+        {
+            cat("All R pre-dependencies already installed\n")
+            return(NULL)
+        }
+
+        if (length(mandatoryPackages) > 0)
+            cat("The following packages mandatory packages will be installed:",
+                paste0(mandatoryPackages, collapse = ", "),
+                sep = "\n")
+        
+        instWhat <- select.list(choices, multiple = TRUE, graphics = FALSE,
+                                title = "Which of the following R packages do you want to install?")
+        instWhat <- names(instWhat)
+
+        if (length(mandatoryPackages) > 0)
+        {
+            if (is.null(instWhat))
+                stop("Please install the mandatory packages manually.")
+            
+            checkPackages(packagesCRAN, lib, ask = FALSE)
+            checkPackages(packagesBioC, lib, ask = FALSE, type = "bioc")
+        }
+            
+        if (!is.null(instWhat))
+        {
+            if (any(c("all", "RDCOMClient") %in% instWhat))
+                checkPackages("RDCOMClient", lib, ask = FALSE, repos = "http://www.omegahat.net/R")
+            
+            if (any(c("all", "RAMClustR") %in% instWhat))
+                checkPackages("RAMClustR", lib, ask = FALSE, type = "gh", ghRepos = "cbroeckl", build_vignettes = TRUE, dependencies = TRUE)            
+        }
+
+    },
+    
+    # returns TRUE if Java path needs to be added to Rprofile
+    installExtDeps = function(instPath)
+    {
+        printHeader("Installing external dependencies...")
         
         ret <- FALSE
-        
-        checkPackages(c("installr", "BiocManager", "rJava", "remotes", "pkgbuild"), lib)
         
         # see if Java can be executed (e.g. necessary for MetFrag) and can be loaded (e.g. needed for RCDK)
         hasJava <- suppressWarnings(system2("java", "-version", stdout = FALSE, stderr = FALSE) == 0) &&
@@ -248,6 +337,8 @@ utils <- setRefClass("utilsInst", methods = list(
                 ensureInstPath(instPath)
                 ret <- installr::install.jdk(path = instPath)
             }
+            else
+                cat("NOTE: Please make sure to install a proper JDK before loading patRoon.\n")
         }
         
         if (!suppressMessages(pkgbuild::has_rtools()))
@@ -262,7 +353,7 @@ utils <- setRefClass("utilsInst", methods = list(
     },
     
     # returns which options should be set in Rprofile
-    installExtDeps = function(instPath)
+    installTools = function(instPath)
     {
         printHeader("Installing external dependencies...")
         
@@ -273,6 +364,8 @@ utils <- setRefClass("utilsInst", methods = list(
                               copt = c("pwiz", "OpenMS", "SIRIUS", "pngquant"),
                               stringsAsFactors = FALSE)
         extDeps$path <- mapply(extDeps$command, extDeps$copt, FUN = utils$getCommandWithOptPath)
+        extDeps$path[1] <- findPWiz()
+        
         extDeps <- rbind(extDeps, list(name = "MetFrag CL", command = "", copt = "",
                                        path = getOption("patRoon.path.metFragCL", "")))
         
@@ -357,23 +450,23 @@ utils <- setRefClass("utilsInst", methods = list(
             {
                 browseURL("http://proteowizard.sourceforge.net/download.html")
                 while(!yesNo(title = "Did you install ProteoWizard and are ready to continue the patRoon installation?")) {}
+                
+                pwiz <- findPWiz()
+                while(is.null(pwiz) &&
+                      !yesNo("Failed to find ProteoWizard. If you continue now you will have to set the patRoon.pwiz.path option manually using options(). Continue?"))
+                {
+                    pwiz <- findPWiz()
+                }
+                
+                if (!is.null(pwiz))
+                {
+                    cat(paste("\nNOTE: Found ProteoWizard at", pwiz, "\n\n"))
+                    setOpts <- c(setOpts, list(patRoon.path.pwiz = pwiz))
+                }
             }
         }
         
         return(setOpts)
-    },
-    
-    installRDeps = function(lib)
-    {
-        printHeader("Pre-Installing R dependencies...")
-        
-        checkPackages(c("mzR", "xcms", "CAMERA"), lib, type = "bioc")
-        
-        if (needOptionalPackage("RDCOMClient", "This is only required for interfacing with Bruker DataAnalysis."))
-            checkPackages("RDCOMClient", lib, ask = FALSE, repos = "http://www.omegahat.net/R")
-        
-        if (needOptionalPackage("RAMClustR", "This package may be used for componentization (e.g. grouping adducts/isotopes)."))
-            checkPackages("RAMClustR", lib, ask = FALSE, type = "gh", ghRepos = "cbroeckl", build_vignettes = TRUE, dependencies = TRUE)
     },
     
     installPatRoonPackages = function(exampleData, lib, force)
@@ -388,14 +481,14 @@ utils <- setRefClass("utilsInst", methods = list(
 ))()
 
 
-installPatRoon <- function(what = c("prereq", "external_deps", "packages", "patRoon"),
+installPatRoon <- function(what = c("packages", "tools", "deps", "patRoon"),
                            instPath = "~/patRoon-install", exampleData = TRUE,
                            lib = NULL, force = FALSE)
 {
     if (Sys.info()[["sysname"]] != "Windows" || Sys.info()[["machine"]] != "x86-64")
         stop("Sorry, this script only works on a 64 bit Windows system at the moment.")
     
-    validWhat <- c("prereq", "external_deps", "packages", "patRoon")
+    validWhat <- c("packages", "tools", "deps", "patRoon")
     if (!is.character(what) || any(!what %in% validWhat))
         stop(sprintf("what must be a subset of (%s)", paste0(validWhat, collapse = ", ")))
     
@@ -420,10 +513,12 @@ installPatRoon <- function(what = c("prereq", "external_deps", "packages", "patR
     instPath <- utils$fixPath(instPath)
     
     didJava <- FALSE; setOpts <- list()
-    if ("prereq" %in% what)
-        didJava <- utils$installPrerequisites(instPath, lib)
-    if ("external_deps" %in% what)
-        setOpts <- utils$installExtDeps(instPath)
+    if ("packages" %in% what)
+        utils$installRDeps(lib)
+    if ("deps" %in% what)
+        didJava <- utils$installExtDeps(instPath)
+    if ("tools" %in% what)
+        setOpts <- utils$installTools(instPath)
     
     if ((didJava || length(setOpts) > 0) &&
         utils$yesNo(paste("The installer can add code to your ~/.Rprofile file to automatically configure the location of downloaded tools and/or Java.",
@@ -436,8 +531,7 @@ installPatRoon <- function(what = c("prereq", "external_deps", "packages", "patR
         utils$addToRProfile(setOpts, if (didJava) jPath else "")
     }
         
-    if ("packages" %in% what)
-        utils$installRDeps(lib)
+    
     if ("patRoon" %in% what)
         utils$installPatRoonPackages(exampleData, lib, force)
     

@@ -22,8 +22,8 @@ generateComponentsIntClust(fGroups, method = "complete",
   maxTreeHeight = 1, deepSplit = TRUE, minModuleSize = 1)
 
 generateComponentsNontarget(fGroups, ionization, rtRange = c(-120, 120),
-  mzRange = c(5, 120), elements = c("C", "H", "O"), maxRTDev = 30,
-  maxMzDev = 0.002, extraOpts = NULL,
+  mzRange = c(5, 120), elements = c("C", "H", "O"), rtDev = 30,
+  absMzDev = 0.002, extraOpts = NULL,
   traceHack = all(R.Version()[c("major", "minor")] >= c(3, 4)))
 
 generateComponentsRAMClustR(fGroups, st = NULL, sr = NULL, maxt = 12,
@@ -93,9 +93,13 @@ arguments of \code{\link{homol.search}}.}
 detection of repeating units. Sets the \code{elements} argument of
 \code{\link{homol.search}} function.}
 
-\item{maxRTDev, maxMzDev}{Maximum retention and (absolute) \emph{m/z}
+\item{rtDev, absMzDev}{Maximum retention and (absolute) \emph{m/z}
 deviation for detection of homologues within series. These arguments set
 the \code{rttol} and \code{mztol} arguments of \code{\link{homol.search}}.}
+
+\item{absMzDev, relMzDev}{Maximum absolute/relative \emph{m/z} deviation for
+annotation. Passed as the \code{mzabs.error} and \code{ppm.error} arguments
+to \code{\link[RAMClustR]{do.findmain}}.}
 
 \item{traceHack}{Currently \code{\link{homol.search}} does not work with \R
 \samp{>3.3.3}. This flag, which is enabled by default on these R versions,
@@ -106,10 +110,6 @@ implements a (messy) workaround
 group clustering. See their documentation from \code{\link[RAMClustR]{ramclustR}}.
 When \code{st} is \code{NULL} it will be automatically calculated as the
 half of the median for all chromatographic peak widths.}
-
-\item{absMzDev, relMzDev}{Maximum absolute/relative \emph{m/z} deviation for
-annotation. Passed as the \code{mzabs.error} and \code{ppm.error} arguments
-to \code{\link[RAMClustR]{do.findmain}}.}
 
 \item{RCExperimentVals}{A named \code{list} containing two more \code{list}s:
 \code{design} and \code{instrument}. These are used to construct the

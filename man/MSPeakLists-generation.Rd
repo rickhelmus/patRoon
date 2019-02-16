@@ -14,7 +14,7 @@
 \usage{
 \S4method{generateMSPeakLists}{featureGroups}(fGroups, algorithm, ...)
 
-generateMSPeakListsDA(fGroups, bgsubtr = TRUE, maxRtMSWidth = 20,
+generateMSPeakListsDA(fGroups, bgsubtr = TRUE, maxMSRtWindow = 5,
   minMSIntensity = 500, minMSMSIntensity = 500, clear = TRUE,
   close = TRUE, save = close, MSMSType = "MSMS",
   avgFGroupParams = getDefAvgPListParams())
@@ -23,8 +23,8 @@ generateMSPeakListsDAFMF(fGroups, minMSIntensity = 500,
   minMSMSIntensity = 500, close = TRUE, save = close,
   avgFGroupParams = getDefAvgPListParams())
 
-generateMSPeakListsMzR(fGroups, maxRtMSWidth = 20,
-  precursorMzWindow = 8, topMost = NULL,
+generateMSPeakListsMzR(fGroups, maxMSRtWindow = 5,
+  precursorMzWindow = 4, topMost = NULL,
   avgFeatParams = getDefAvgPListParams(),
   avgFGroupParams = getDefAvgPListParams())
 
@@ -46,9 +46,9 @@ used: \code{"bruker"}, \code{"brukerfmf"}, \code{"mzr"}}
 \item{bgsubtr}{If \code{TRUE} background will be subtracted using the
 'spectral' algorithm.}
 
-\item{maxRtMSWidth}{Maximum total chromatographic peak width (seconds) used
-for spectrum averaging. If \code{NULL} all spectra from a feature will be
-taken into account. Lower to decrease processing time.}
+\item{maxMSRtWindow}{Maximum chromatographic peak window used for spectrum
+averaging (in seconds, +/- retention time). If \code{NULL} all spectra from
+a feature will be taken into account. Lower to decrease processing time.}
 
 \item{minMSIntensity, minMSMSIntensity}{Minimum intensity for peak lists
 obtained with DataAnalysis. Highly recommended to set \samp{>0} as DA tends
@@ -69,10 +69,11 @@ MRM/AutoMSMS or \code{"BBCID"} for broadband CID.}
 
 \item{precursorMzWindow}{The \emph{m/z} window (in Da) to find MS/MS spectra
 of a precursor. This is typically used for Data-Dependent like MS/MS data
-and should correspond to the isolation \emph{m/z} width that was used to
-collect the data. For Data-Independent MS/MS experiments, where precursor
-ions are not isolated prior to fragmentation (\emph{e.g.} bbCID, MSe,
-all-ion, ...) the value should be \code{NULL}.}
+and should correspond to the isolation \emph{m/z} window (\emph{i.e.} +/-
+the precursor \emph{m/z}) that was used to collect the data. For
+Data-Independent MS/MS experiments, where precursor ions are not isolated
+prior to fragmentation (\emph{e.g.} bbCID, MSe, all-ion, ...) the value
+should be \code{NULL}.}
 
 \item{topMost}{Only extract MS peak lists from a maximum of \code{topMost}
 analyses with highest intensity. If \code{NULL} all analyses will be used.}
@@ -155,10 +156,13 @@ If any errors related to \command{DCOM} appear it might be necessary to
   the following values: \itemize{
 
   \item \code{clusterMzWindow} \emph{m/z} window (in Da) used for clustering
-  \emph{m/z} values when spectra are averaged. Too small windows will prevent
-  clustering \emph{m/z} values (thus erroneously creating 'extra' values),
-  whereas too big windows may cluster unrelated \emph{m/z} values from
-  different or even the same spectrum together.
+  \emph{m/z} values when spectra are averaged. For \code{method="hclust"}
+  this corresponds to the cluster height, while for \code{method="distance"}
+  this value is used to find nearby masses (+/- window).  Too small windows
+  will prevent clustering \emph{m/z} values (thus erroneously treating equal
+  masses along spectra as different), whereas too big windows may cluster
+  unrelated \emph{m/z} values from different or even the same spectrum
+  together.
 
   \item \code{topMost} Only retain this maximum number of MS peaks when
   generating averaged spectra. Lowering this number may exclude more
@@ -200,7 +204,7 @@ If any errors related to \command{DCOM} appear it might be necessary to
   Note that when Bruker algorithms are used these parameters only control
   generation of feature groups averaged peak lists: how peak lists for
   features are generated is controlled by DataAnalysis.
-  
+
   The \code{getDefAvgPListParams} function can be used to generate a default
   parameter list. The current defaults are:
 

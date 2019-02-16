@@ -18,7 +18,7 @@ generateFormulasDA(fGroups, precursorMzSearchWindow = 0.002,
   MSMode = "both", adduct, featThreshold = 0.75, save = TRUE,
   close = save)
 
-generateFormulasGenForm(fGroups, MSPeakLists, maxMzDev = 5,
+generateFormulasGenForm(fGroups, MSPeakLists, relMzDev = 5,
   adduct = "[M+H]+", elements = "CHNOP", hetero = TRUE, oc = FALSE,
   extraOpts = NULL, calculateFeatures = TRUE, featThreshold = 0.75,
   MSMode = "both", maxProcAmount = getOption("patRoon.maxProcAmount"),
@@ -26,7 +26,7 @@ generateFormulasGenForm(fGroups, MSPeakLists, maxMzDev = 5,
 
 formulaScorings()
 
-generateFormulasSirius(fGroups, MSPeakLists, maxMzDev = 5,
+generateFormulasSirius(fGroups, MSPeakLists, relMzDev = 5,
   adduct = "[M+H]+", elements = "CHNOP", profile = "qtof",
   database = NULL, noise = NULL, topMost = 100, extraOpts = NULL,
   calculateFeatures = TRUE, featThreshold = 0.75,
@@ -46,9 +46,10 @@ used: \code{"bruker"}, \code{"genform"}, \code{"sirius"}}
 \item{...}{Any parameters to be passed to the selected formula generation
 algorithm.}
 
-\item{precursorMzSearchWindow}{Maximum \emph{m/z} deviation (Da) to find back feature data
-of precursor/parent ions from MS/MS spectra (this data is not readily
-available from \command{SmartFormula3D} results).}
+\item{precursorMzSearchWindow}{Search window for \emph{m/z} values (+/- the
+feature \emph{m/z}) used to find back feature data of precursor/parent ions
+from MS/MS spectra (this data is not readily available from
+\command{SmartFormula3D} results).}
 
 \item{MSMode}{Whether formulae should be generated only from MS data
 (\code{"ms"}), MS/MS data (\code{"msms"}) or both (\code{"both"}). Using
@@ -77,9 +78,9 @@ likely what you want as otherwise any processed data is lost.}
 \item{MSPeakLists}{An \code{\link{MSPeakLists}} object that was generated for
 the supplied \code{fGroups}.}
 
-\item{maxMzDev}{Maximum deviation between the measured and candidate formula
-\emph{m/z} values (in ppm). Sets the \option{ppm} and
-\option{--ppm-max} commandline options for \command{GenForm} and
+\item{relMzDev}{Maximum relative deviation between the measured and candidate
+formula \emph{m/z} values (in ppm). Sets the \option{ppm}
+and \option{--ppm-max} commandline options for \command{GenForm} and
 \command{SIRIUS}, respectively.}
 
 \item{elements}{Elements to be considered for formulae calculation. This will

@@ -851,7 +851,6 @@ setMethod("plotEIC", "featureGroups", function(obj, rtWindow = 30, mzWindow = 0.
 
         if (showFGroupRect || !"none" %in% annotate)
         {
-            mzRange <- gInfo[grpi, "mzs"] + c(-mzWindow, mzWindow)
             intRange <- c(0, max(fts[anaIndsToPlot[[grp]], intensity], na.rm = TRUE))
 
             if (showFGroupRect)

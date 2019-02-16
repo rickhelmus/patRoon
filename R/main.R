@@ -83,8 +83,8 @@ NULL
 #'   cores available. Default is set by \code{\link[parallel]{detectCores}}.
 #'
 #'   \item \code{patRoon.path.pwiz}: The path in which the \command{ProteoWizard}
-#'   binaries are installed. Only need to be set if not yet in \option{PATH}. 
-#'   
+#'   binaries are installed. Only need to be set if not yet in \option{PATH}.
+#'
 #'   \item \code{patRoon.path.GenForm}: The path to the \command{GenForm}
 #'   executable. If not set (the default) the internal \code{GenForm} binary is
 #'   used. Only set if you want to override the executable.
@@ -397,9 +397,9 @@ NULL
 #'   lists should be extracted.
 #' @param topMost Only extract MS peak lists from a maximum of \code{topMost}
 #'   analyses with highest intensity. If \code{NULL} all analyses will be used.
-#' @param maxRtMSWidth Maximum total chromatographic peak width (seconds) used
-#'   for spectrum averaging. If \code{NULL} all spectra from a feature will be
-#'   taken into account. Lower to decrease processing time.
+#' @param maxMSRtWindow Maximum chromatographic peak window used for spectrum
+#'   averaging (in seconds, +/- retention time). If \code{NULL} all spectra from
+#'   a feature will be taken into account. Lower to decrease processing time.
 #' @param minMSIntensity,minMSMSIntensity Minimum intensity for peak lists
 #'   obtained with DataAnalysis. Highly recommended to set \samp{>0} as DA tends
 #'   to report many very low intensity peaks.
@@ -420,10 +420,13 @@ NULL
 #'   the following values: \itemize{
 #'
 #'   \item \code{clusterMzWindow} \emph{m/z} window (in Da) used for clustering
-#'   \emph{m/z} values when spectra are averaged. Too small windows will prevent
-#'   clustering \emph{m/z} values (thus erroneously creating 'extra' values),
-#'   whereas too big windows may cluster unrelated \emph{m/z} values from
-#'   different or even the same spectrum together.
+#'   \emph{m/z} values when spectra are averaged. For \code{method="hclust"}
+#'   this corresponds to the cluster height, while for \code{method="distance"}
+#'   this value is used to find nearby masses (+/- window).  Too small windows
+#'   will prevent clustering \emph{m/z} values (thus erroneously treating equal
+#'   masses along spectra as different), whereas too big windows may cluster
+#'   unrelated \emph{m/z} values from different or even the same spectrum
+#'   together.
 #'
 #'   \item \code{topMost} Only retain this maximum number of MS peaks when
 #'   generating averaged spectra. Lowering this number may exclude more
@@ -465,11 +468,12 @@ NULL
 #'   Note that when Bruker algorithms are used these parameters only control
 #'   generation of feature groups averaged peak lists: how peak lists for
 #'   features are generated is controlled by DataAnalysis.
-#'   
+#'
 #'   The \code{getDefAvgPListParams} function can be used to generate a default
 #'   parameter list. The current defaults are:
-#'   
-#' @eval paste0("@@section Peak list averaging parameters:", getDefAvgPListParamsRD())
+#'
+#' @eval paste0("@@section Peak list averaging parameters:",
+#'   getDefAvgPListParamsRD())
 #'
 #' @return A \code{\link{MSPeakLists}} object that can be used for formulae
 #'   calculation and compound identification.
@@ -549,7 +553,7 @@ NULL
 #'
 #' @templateVar genForm TRUE
 #' @template form-args
-#' 
+#'
 #' @template adduct-arg
 #'
 #' @template multiProc-args
@@ -604,11 +608,11 @@ NULL
 #'   may be useful to handle e.g. connection errors.
 #' @param topMost Only keep this number of candidates (per feature group) with
 #'   highest score.
-#'   
+#'
 #'   For \command{MetFrag}: Set to \code{NULL} to always keep all candidates, however,
 #'   please note that this may result in significant usage of CPU/RAM resources
 #'   for large numbers of candidates.
-#'   
+#'
 #'   For \command{SIRIUS}: Sets the \option{--candidates} commandline option.
 #'
 #' @param extraOpts For \command{MetFrag}: A named \code{list} containing

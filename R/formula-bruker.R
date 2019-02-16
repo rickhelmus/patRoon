@@ -24,9 +24,10 @@ simplifyDAFormula <- function(formula)
 #'   \code{\link{findFeaturesBruker}}. Unlike other algorithms, there is no
 #'   prior need to generate \code{\link[=MSPeakLists]{MS peak lists}}.
 #'
-#' @param precursorMzSearchWindow Maximum \emph{m/z} deviation (Da) to find back feature data
-#'   of precursor/parent ions from MS/MS spectra (this data is not readily
-#'   available from \command{SmartFormula3D} results).
+#' @param precursorMzSearchWindow Search window for \emph{m/z} values (+/- the
+#'   feature \emph{m/z}) used to find back feature data of precursor/parent ions
+#'   from MS/MS spectra (this data is not readily available from
+#'   \command{SmartFormula3D} results).
 #'
 #' @template dasaveclose-args
 #'

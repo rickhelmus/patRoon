@@ -88,7 +88,7 @@ processSiriusFormulas <- function(cmd, exitStatus, retries)
 #'
 #' @rdname formula-generation
 #' @export
-generateFormulasSirius <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct = "[M+H]+", elements = "CHNOP",
+generateFormulasSirius <- function(fGroups, MSPeakLists, relMzDev = 5, adduct = "[M+H]+", elements = "CHNOP",
                                    profile = "qtof", database = NULL, noise = NULL, topMost = 100,
                                    extraOpts = NULL, calculateFeatures = TRUE, featThreshold = 0.75,
                                    logPath = file.path("log", "sirius"), maxProcAmount = getOption("patRoon.maxProcAmount"))
@@ -96,7 +96,7 @@ generateFormulasSirius <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct = 
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
-    checkmate::assertNumber(maxMzDev, lower = 0, finite = TRUE, add = ac)
+    checkmate::assertNumber(relMzDev, lower = 0, finite = TRUE, add = ac)
     aapply(checkmate::assertString, . ~ elements + profile, fixed = list(add = ac))
     checkmate::assertString(database, null.ok = TRUE, add = ac)
     checkmate::assertNumber(noise, lower = 0, finite = TRUE, null.ok = TRUE, add = ac)
@@ -108,7 +108,7 @@ generateFormulasSirius <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct = 
     checkmate::reportAssertions(ac)
 
     adduct <- checkAndToAdduct(adduct)
-    
+
     anaInfo <- analysisInfo(fGroups)
     fTable <- featureTable(fGroups)
     featIndex <- groupFeatIndex(fGroups)
@@ -118,7 +118,7 @@ generateFormulasSirius <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct = 
     gCount <- length(fGroups)
 
     cacheDB <- openCacheDBScope() # open manually so caching code doesn't need to on each R/W access
-    baseHash <- makeHash(profile, adduct, maxMzDev, elements, database, noise, topMost, extraOpts)
+    baseHash <- makeHash(profile, adduct, relMzDev, elements, database, noise, topMost, extraOpts)
     setHash <- makeHash(fGroups, MSPeakLists, baseHash)
     cachedSet <- loadCacheSet("formulasSirius", setHash, cacheDB)
     formHashes <- character(0)
@@ -153,7 +153,7 @@ generateFormulasSirius <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct = 
             plmz <- groupPeakLists[[grp]][["MS"]][precursor == TRUE, mz]
 
             cmd <- getSiriusCommand(plmz, groupPeakLists[[grp]][["MS"]], groupPeakLists[[grp]][["MSMS"]], profile,
-                                    adduct, maxMzDev, elements, database, noise, FALSE, NULL, topMost, extraOpts)
+                                    adduct, relMzDev, elements, database, noise, FALSE, NULL, topMost, extraOpts)
             logf <- if (!is.null(logPath)) file.path(logPath, paste0("sirius-form-", grp, ".txt")) else NULL
             logfe <- if (!is.null(logPath)) file.path(logPath, paste0("sirius-form-err-", grp, ".txt")) else NULL
 
@@ -189,7 +189,7 @@ generateFormulasSirius <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct = 
 
         # prune after combining with cached results: these may also contain zero row results
         ret <- pruneList(ret, checkZeroRows = TRUE)
-        
+
         printf("Loaded %d formulas for %d %s (%.2f%%).\n", countUniqueFormulas(ret),
                ngrp, if (calculateFeatures) "features" else "feature groups",
                if (gCount == 0) 0 else ngrp * 100 / gCount)

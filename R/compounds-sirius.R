@@ -10,16 +10,16 @@ processSiriusCompounds <- function(cmd, exitStatus, retries)
 
     results <- data.table()
     scRanges <- list()
-    
+
     summary <- file.path(resultPath, "summary_csi_fingerid.csv")
     if (file.exists(summary)) # csi:fingerid got any results?
     {
         results <- fread(summary)
-        
+
         # NOTE: so far SIRIUS only has one score
         if (nrow(results) > 0)
             scRanges <- list(score = range(results$score))
-        
+
         if (!is.null(cmd$topMost))
         {
             if (nrow(results) > cmd$topMost)
@@ -97,7 +97,7 @@ processSiriusCompounds <- function(cmd, exitStatus, retries)
 #'
 #' @rdname compound-generation
 #' @export
-generateCompoundsSirius <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct = "[M+H]+", elements = "CHNOP",
+generateCompoundsSirius <- function(fGroups, MSPeakLists, relMzDev = 5, adduct = "[M+H]+", elements = "CHNOP",
                                     profile = "qtof", formulaDatabase = NULL, fingerIDDatabase = "pubchem",
                                     noise = NULL, errorRetries = 2, topMost = 100, extraOpts = NULL,
                                     logPath = file.path("log", "sirius"),
@@ -106,7 +106,7 @@ generateCompoundsSirius <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct =
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
-    checkmate::assertNumber(maxMzDev, lower = 0, finite = TRUE, add = ac)
+    checkmate::assertNumber(relMzDev, lower = 0, finite = TRUE, add = ac)
     aapply(checkmate::assertString, . ~ elements + profile + fingerIDDatabase, fixed = list(add = ac))
     checkmate::assertString(formulaDatabase, null.ok = TRUE, add = ac)
     checkmate::assertNumber(noise, lower = 0, finite = TRUE, null.ok = TRUE, add = ac)
@@ -127,7 +127,7 @@ generateCompoundsSirius <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct =
     gInfo <- groupInfo(fGroups)
 
     cacheDB <- openCacheDBScope()
-    setHash <- makeHash(fGroups, MSPeakLists, profile, adduct, maxMzDev, elements, formulaDatabase,
+    setHash <- makeHash(fGroups, MSPeakLists, profile, adduct, relMzDev, elements, formulaDatabase,
                         fingerIDDatabase, noise, topMost, extraOpts)
     cachedSet <- loadCacheSet("compoundsSirius", setHash, cacheDB)
     resultHashes <- vector("character", gCount)
@@ -145,12 +145,12 @@ generateCompoundsSirius <- function(fGroups, MSPeakLists, maxMzDev = 5, adduct =
         if (length(plmz) == 0)
             return(NULL)
 
-        hash <- makeHash(plmz, plist, profile, adduct, maxMzDev, elements,
+        hash <- makeHash(plmz, plist, profile, adduct, relMzDev, elements,
                          formulaDatabase, fingerIDDatabase, noise, topMost, extraOpts)
         resultHashes[[grp]] <<- hash
 
         cmd <- getSiriusCommand(plmz, plist$MS, plist$MSMS, profile,
-                                adduct, maxMzDev, elements, formulaDatabase, noise, TRUE,
+                                adduct, relMzDev, elements, formulaDatabase, noise, TRUE,
                                 fingerIDDatabase, topMost, extraOpts)
         db <- if (!is.null(fingerIDDatabase)) fingerIDDatabase else if (!is.null(formulaDatabase)) formulaDatabase else "pubchem"
         logf <- if (!is.null(logPath)) file.path(logPath, paste0("sirius-comp-", grp, ".txt")) else NULL

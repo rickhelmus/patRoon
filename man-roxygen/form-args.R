@@ -1,6 +1,6 @@
-#' @param maxMzDev Maximum deviation between the measured and candidate formula
-#'   \emph{m/z} values (in ppm). Sets the <%=if (genForm) "\\option{ppm} and
-#'   \\option{--ppm-max} commandline options for \\command{GenForm} and
+#' @param relMzDev Maximum relative deviation between the measured and candidate
+#'   formula \emph{m/z} values (in ppm). Sets the <%=if (genForm) "\\option{ppm}
+#'   and \\option{--ppm-max} commandline options for \\command{GenForm} and
 #'   \\command{SIRIUS}, respectively." else "\\option{--ppm-max} commandline
 #'   option." %>
 #' @param elements Elements to be considered for formulae calculation. This will

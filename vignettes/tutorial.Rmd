@@ -153,7 +153,7 @@ The `generateMSPeakLists()` will perform this action for us and will generate so
 
 ```{r MSPeakLists,results='hide'}
 avgPListParams <- getDefAvgPListParams(clusterMzWindow = 0.005)
-plists <- generateMSPeakLists(fGroups, "mzr", maxRtMSWidth = 10, precursorMzWindow = 4,
+plists <- generateMSPeakLists(fGroups, "mzr", maxMSRtWindow = 5, precursorMzWindow = 4,
                               avgFeatParams = avgPListParams, avgFGroupParams = avgPListParams)
 ```
 ```{r}
@@ -165,7 +165,7 @@ plists
 Using the data from the MS peaklists generated during the previous step we can generate a list of formula candidates for each feature group based on measured _m/z_ values, isotopic patterns and presence of MS/MS fragments. In this tutorial we will use this data as an extra hint to score canddiate chemical structures generated during the next step. The command below will use [GenForm] to perform this step: 
 
 ```{r formulas,results='hide'}
-formulas <- generateFormulas(fGroups, "genform", plists, maxMzDev = 5,
+formulas <- generateFormulas(fGroups, "genform", plists, relMzDev = 5,
                              adduct = "[M+H]+", elements = "CHNOPSCl",
                              calculateFeatures = TRUE, featThreshold = 0.75)
 formulas

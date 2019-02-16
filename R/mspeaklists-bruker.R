@@ -25,7 +25,7 @@ NULL
 #'
 #' @rdname MSPeakLists-generation
 #' @export
-generateMSPeakListsDA <- function(fGroups, bgsubtr = TRUE, maxRtMSWidth = 10, minMSIntensity = 500,
+generateMSPeakListsDA <- function(fGroups, bgsubtr = TRUE, maxMSRtWindow = 5, minMSIntensity = 500,
                                   minMSMSIntensity = 500,  clear = TRUE, close = TRUE, save = close,
                                   MSMSType = "MSMS", avgFGroupParams = getDefAvgPListParams())
 {
@@ -35,7 +35,7 @@ generateMSPeakListsDA <- function(fGroups, bgsubtr = TRUE, maxRtMSWidth = 10, mi
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
     aapply(checkmate::assertFlag, . ~ bgsubtr + clear + save, fixed = list(add = ac))
-    aapply(checkmate::assertNumber, . ~ maxRtMSWidth + minMSIntensity + minMSMSIntensity,
+    aapply(checkmate::assertNumber, . ~ maxMSRtWindow + minMSIntensity + minMSMSIntensity,
            lower = 0, finite = TRUE, null.ok = TRUE, fixed = list(add = ac))
     checkmate::assertChoice(MSMSType, c("MSMS", "BBCID"), add = ac)
     assertAvgPListParams(avgFGroupParams, add = ac)
@@ -43,7 +43,7 @@ generateMSPeakListsDA <- function(fGroups, bgsubtr = TRUE, maxRtMSWidth = 10, mi
     checkmate::reportAssertions(ac)
 
     cacheDB <- openCacheDBScope()
-    baseHash <- makeHash(fGroups, bgsubtr, maxRtMSWidth, minMSIntensity, minMSMSIntensity, MSMSType)
+    baseHash <- makeHash(fGroups, bgsubtr, maxMSRtWindow, minMSIntensity, minMSMSIntensity, MSMSType)
 
     ftindex <- groupFeatIndex(fGroups)
     fTable <- featureTable(fGroups)
@@ -93,7 +93,7 @@ generateMSPeakListsDA <- function(fGroups, bgsubtr = TRUE, maxRtMSWidth = 10, mi
             DAEICs <- generateDAEICsForPeakLists(DA, ana, anaInfo$path[anai], bgsubtr, MSMSType,
                                                  uncachedGNames, featInfo, DAFind)
 
-            DASpecs <- generateDASpecsForPeakLists(DA, maxRtMSWidth, MSMSType, uncachedGNames, featInfo,
+            DASpecs <- generateDASpecsForPeakLists(DA, maxMSRtWindow, MSMSType, uncachedGNames, featInfo,
                                                    DAEICs, DAFind)
 
             printf("Loading all MS peak lists for %d feature groups in analysis '%s'...\n", length(uncachedGNames), ana)

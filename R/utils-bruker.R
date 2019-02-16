@@ -118,11 +118,11 @@ setDAMethod <- function(anaInfo, method, close = TRUE)
     checkmate::assertDirectoryExists(method, add = ac)
     checkmate::assertFlag(close, add = ac)
     checkmate::reportAssertions(ac)
-    
+
     DA <- getDAApplication()
     method <- normalizePath(method)
     hideDAInScope()
-    
+
     for (i in seq_len(nrow(anaInfo)))
     {
         printf("Setting DA method of analysis '%s' to %s (%d/%d)...\n", anaInfo$analysis[i], method, i, nrow(anaInfo))
@@ -151,21 +151,21 @@ revertDAAnalyses <- function(anaInfo, close = TRUE, save = close)
     assertAnalysisInfo(anaInfo, "d", add = ac)
     assertDACloseSaveArgs(close, save, add = ac)
     checkmate::reportAssertions(ac)
-    
+
     DA <- getDAApplication()
     hideDAInScope()
-    
+
     for (i in seq_len(nrow(anaInfo)))
     {
         printf("Reverting DA analysis '%s' (%d/%d)...\n", anaInfo$analysis[i], i, nrow(anaInfo))
-        
+
         ind <- getDAFileIndex(DA, anaInfo$analysis[i], anaInfo$path[i])
         if (ind == -1)
             next
         DA[["Analyses"]][[ind]]$LoadRawData()
         closeSaveDAFile(DA, ind, close, save)
     }
-    
+
     invisible(NULL)
 }
 
@@ -181,7 +181,7 @@ recalibrarateDAFiles <- function(anaInfo, close = TRUE, save = close)
     assertAnalysisInfo(anaInfo, "d")
     assertDACloseSaveArgs(close, save, add = ac)
     checkmate::reportAssertions(ac)
-    
+
     DA <- getDAApplication()
     hideDAInScope()
 
@@ -218,7 +218,7 @@ recalibrarateDAFiles <- function(anaInfo, close = TRUE, save = close)
 getDACalibrationError <- function(anaInfo)
 {
     assertAnalysisInfo(anaInfo, "d")
-    
+
     DA <- getDAApplication()
     hideDAInScope()
 
@@ -382,7 +382,7 @@ addDAEIC <- function(analysis, path, mz, mzWindow = 0.005, ctype = "EIC", mtype 
     checkmate::assertFlag(hideDA, add = ac)
     assertDACloseSaveArgs(close, save, add = ac)
     checkmate::reportAssertions(ac)
-    
+
     DA <- getDAApplication()
 
     if (hideDA)
@@ -425,7 +425,7 @@ addAllDAEICs <- function(fGroups, mzWindow = 0.005, ctype = "EIC", bgsubtr = FAL
     aapply(checkmate::assertFlag, . ~ bgsubtr + name + hideDA, fixed = list(add = ac))
     assertDACloseSaveArgs(close, save, add = ac)
     checkmate::reportAssertions(ac)
-    
+
     gInfo <- groupInfo(fGroups)
     gNames <- names(fGroups)
     gCount <- length(fGroups)
@@ -436,36 +436,36 @@ addAllDAEICs <- function(fGroups, mzWindow = 0.005, ctype = "EIC", bgsubtr = FAL
 
     if (gCount == 0)
         invisible(return(NULL))
-    
+
     DA <- getDAApplication()
-    
+
     if (hideDA)
         hideDAInScope()
-    
+
     printf("Adding EICs for %d feature groups in DataAnalysis...\n", gCount)
     prog <- txtProgressBar(0, anaCount, style = 3)
-    
+
     for (anai in seq_len(anaCount))
     {
         ind <- getDAFileIndex(DA, anaInfo$analysis[anai], anaInfo$path[anai])
-        
+
         if (ind == -1)
             next
-                
+
         grpsInAna <- seq_len(gCount)
         if (onlyPresent)
             grpsInAna <- grpsInAna[sapply(grpsInAna, function(i) ftInd[[i]][anai] != 0)]
-        
+
         eics <- sapply(grpsInAna, function(grpi)
         {
             makeDAEIC(gInfo[grpi, "mzs"], mzWindow, ctype, bgsubtr = bgsubtr)
         }, USE.NAMES = FALSE)
 
-        chroms <- DA[["Analyses"]][[ind]][["Chromatograms"]]        
+        chroms <- DA[["Analyses"]][[ind]][["Chromatograms"]]
         oldEICCount <- chroms$Count()
         chroms$AddChromatograms(eics)
         newEICCount <- chroms$Count()
-        
+
         if (!is.null(name) && name)
         {
             if ((newEICCount - oldEICCount) != length(grpsInAna))
@@ -476,15 +476,15 @@ addAllDAEICs <- function(fGroups, mzWindow = 0.005, ctype = "EIC", bgsubtr = FAL
                     chroms[[eici]][["Name_"]] <- gNames[eici - oldEICCount]
             }
         }
-        
+
         closeSaveDAFile(DA, ind, close, save)
-        
+
         setTxtProgressBar(prog, anai)
     }
-    
+
     setTxtProgressBar(prog, anaCount)
     close(prog)
-    
+
     invisible(NULL)
 }
 
@@ -492,7 +492,7 @@ clearDAChromsAndSpecs <- function(DA, gNames, DAFind)
 {
     # check if s matches our naming format
     isFGroupName <- function(s) any(!is.na(pmatch(gNames, s)))
-    
+
     chroms <- DA[["Analyses"]][[DAFind]][["Chromatograms"]]
     ccount <- chroms$Count()
     if (ccount > 0)
@@ -503,7 +503,7 @@ clearDAChromsAndSpecs <- function(DA, gNames, DAFind)
                 chroms$DeleteChromatogram(i)
         }
     }
-    
+
     specs <- DA[["Analyses"]][[DAFind]][["Spectra"]]
     scount <- specs$Count()
     if (scount > 0)
@@ -519,7 +519,7 @@ clearDAChromsAndSpecs <- function(DA, gNames, DAFind)
 generateDAEICsForPeakLists <- function(DA, ana, path, bgsubtr, MSMSType, gNames, featInfo, DAFind)
 {
     cat("Adding EICs for spectra generation... ")
-    
+
     # add general TIC MS chromatogram used for generating MS spectra
     MSEIC <- addDAEIC(ana, path, 0, 0.005, "TIC", "MS", bgsubtr = bgsubtr, name = "MS TIC", hideDA = FALSE)
     stopifnot(!is.null(MSEIC))
@@ -530,7 +530,7 @@ generateDAEICsForPeakLists <- function(DA, ana, path, bgsubtr, MSMSType, gNames,
         fmz <- featInfo[group == g, mz]
         makeDAEIC(fmz, 0.005, "TIC", MSMSType, bgsubtr = bgsubtr, fragpath = fmz)
     }, simplify = TRUE, USE.NAMES = FALSE) # NOTE: simplify/USE.NAMES have to be this way to not get strange DCOM errors.
-    
+
     chroms <- DA[["Analyses"]][[DAFind]][["Chromatograms"]]
     oldEICCount <- chroms$Count()
     chroms$AddChromatograms(eics)
@@ -540,50 +540,50 @@ generateDAEICsForPeakLists <- function(DA, ana, path, bgsubtr, MSMSType, gNames,
     if (newEICCount > oldEICCount)
     {
         gCount <- length(gNames)
-        
+
         # not all MSMS EICs may have been added when no MSMS data exists, find back which were added
         curgrpi <- 1
         for (eic in seq(oldEICCount + 1, newEICCount))
         {
             eicMz <- as.numeric(chroms[[eic]][["Definition"]][["MSFilter"]][["FragmentationPath"]])
-            
+
             while (curgrpi <= gCount && !numEQ(featInfo[group == gNames[curgrpi], mz], eicMz, tol = 5e-3))
                 curgrpi <- curgrpi + 1
-            
+
             if (curgrpi > gCount)
                 break
-            
+
             MSMSEICs[[gNames[curgrpi]]] <- eic
             chroms[[eic]][["Name_"]] <- sprintf("%s - %s", gNames[curgrpi], MSMSType)
             curgrpi <- curgrpi + 1
         }
     }
-    
+
     cat("Done!\n")
-    
+
     return(list(MSEIC = MSEIC, MSMSEICs = MSMSEICs))
 }
 
-generateDASpecsForPeakLists <- function(DA, maxRtMSWidth, MSMSType, gNames, featInfo, DAEICs, DAFind)
+generateDASpecsForPeakLists <- function(DA, maxMSRtWindow, MSMSType, gNames, featInfo, DAEICs, DAFind)
 {
     chroms <- DA[["Analyses"]][[DAFind]][["Chromatograms"]]
     specs <- DA[["Analyses"]][[DAFind]][["Spectra"]]
-    
+
     addSpectrum <- function(eic, grp, rt, rtmin, rtmax, mz, mtype)
     {
-        if (!is.null(maxRtMSWidth) && diff(c(rtmin, rtmax)) > maxRtMSWidth)
+        if (!is.null(maxMSRtWindow) && diff(c(rtmin, rtmax) * 2) > maxMSRtWindow*2)
         {
-            rtmin <- max(rtmin, rt - maxRtMSWidth/2)
-            rtmax <- min(rtmax, rt + maxRtMSWidth/2)
+            rtmin <- max(rtmin, rt - maxMSRtWindow)
+            rtmax <- min(rtmax, rt + maxMSRtWindow)
         }
-        
+
         chroms[[eic]]$ClearRangeSelections()
         chroms[[eic]]$AddRangeSelection(rtmin/60, rtmax/60, 0, 0) # divide by 60: seconds to minutes
-        
+
         oldSpecCount <- specs$Count()
         chroms[[eic]]$AverageMassSpectrum(1, 0)
         newSpecCount <- specs$Count()
-        
+
         if (oldSpecCount != newSpecCount)
         {
             # HACK HACK HACK: changing the name of a spectrum throws an error but actually seems to work,
@@ -591,44 +591,44 @@ generateDASpecsForPeakLists <- function(DA, maxRtMSWidth, MSMSType, gNames, feat
             tryCatch(specs[[newSpecCount]][["Name"]] <- sprintf("%s - %s", grp, mtype), error = function(e) e)
             return(newSpecCount)
         }
-        
+
         return(NA)
     }
-    
+
     gCount <- length(gNames)
     printf("Adding spectra for %d feature groups...\n", gCount)
     prog <- txtProgressBar(0, gCount, style=3)
-    
+
     MSSpecs <- list(); MSMSSpecs <- list()
     for (grpi in seq_along(gNames))
     {
         grp <- gNames[grpi]
         fi <- featInfo[group == grp]
-        
+
         spec <- addSpectrum(DAEICs$MSEIC, grp, fi$ret, fi$retmin, fi$retmax, fi$mz, "MS")
         if (is.na(spec))
             warning(sprintf("Failed to add MS spectrum for group %s, analysis %s, m/z %f", grp,
                             DA[["Analyses"]][[DAFind]][["Spectra"]]$Name, fi$mz))
         else
             MSSpecs[[grp]] <- spec
-        
+
         if (!is.null(DAEICs$MSMSEICs[[grp]]))
         {
             spec <- addSpectrum(DAEICs$MSMSEICs[[grp]], grp, fi$ret, fi$retmin, fi$retmax, fi$mz, MSMSType)
             if (!is.na(spec))
                 MSMSSpecs[[grp]] <- spec
         }
-        
+
         setTxtProgressBar(prog, grpi)
     }
-    
+
     setTxtProgressBar(prog, gCount)
     close(prog)
-    
+
     cat("Deconvoluting spectra ...")
     specs$Deconvolute()
     cat("Done!\n")
-    
+
     return(list(MSSpecs = MSSpecs, MSMSSpecs = MSMSSpecs))
 }
 
@@ -651,11 +651,11 @@ getDAPeakList <- function(findDA, ind, useFMF, getMSMS, minInt)
     cnames <- intersect(cnames, c("m/z", "I", "Cmpnt."))
     hasCmpnt <- "Cmpnt." %in% cnames
     newNames <- c("mz", "intensity", if (hasCmpnt) "cmp" else character())
-    
+
     # force colclasses to prevent warnings, make sure iso compounds designated as 'NA' are still interpreted as a value
     plist <- fread(pfile, colClasses = if (hasCmpnt) c(`Cmpnt.` = "character") else NULL, na.strings = NULL,
                    select = cnames, col.names = newNames)
-        
+
     unlink(pfile) # amount of peaklists may be large, remove temp files straight away
 
     return(plist[intensity >= minInt])
@@ -666,7 +666,7 @@ checkDAFMFCompounds <- function(DA, featTable, analysisInd, verify)
     cmpds <- DA[["Analyses"]][[analysisInd]][["Compounds"]]
     cCount <- cmpds[["Count"]]
     ret <- TRUE
-    
+
     if (cCount < nrow(featTable))
         ret <- sprintf("Number of DataAnalysis compounds is less than number of features for analysis %s!",
                        DA[["Analyses"]][[analysisInd]][["Name"]])
@@ -683,9 +683,9 @@ checkDAFMFCompounds <- function(DA, featTable, analysisInd, verify)
             }
         }
     }
-    
+
     if (verify && !isTRUE(ret))
         stop(paste(ret, "Please re-run FMF by calling findFeatures with doFMF=\"force\"."))
-    
+
     return(isTRUE(ret))
 }

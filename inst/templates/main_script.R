@@ -65,11 +65,11 @@ avgPListParams <- getDefAvgPListParams(clusterMzWindow = 0.005)
 {{ endCodeBlock() }}
 {{ optionalCodeBlock(doMSPeakFind && peakListOpts$algo == "mzR") }}
 # NOTE: please check all arguments, especially precursorMzWindow!
-plists <- generateMSPeakLists(fGroups, "mzr", maxRtMSWidth = 10, precursorMzWindow = {{ if (precursorMzWindow == 0) "NULL" else precursorMzWindow }},
+plists <- generateMSPeakLists(fGroups, "mzr", maxMSRtWindow = 5, precursorMzWindow = {{ if (precursorMzWindow == 0) "NULL" else precursorMzWindow }},
                               avgFeatParams = avgPListParams, avgFGroupParams = avgPListParams)
 {{ endCodeBlock() }}
 {{ optionalCodeBlock(doMSPeakFind && peakListOpts$algo == "Bruker" && featFinderOpts$algo != "Bruker") }}
-plists <- generateMSPeakLists(fGroups, "bruker", bgsubtr = TRUE, MSMSType = "MSMS", avgFGroupParams = avgPListParams)
+plists <- generateMSPeakLists(fGroups, "bruker", maxMSRtWindow = 5, bgsubtr = TRUE, MSMSType = "MSMS", avgFGroupParams = avgPListParams)
 {{ endCodeBlock() }}
 {{ optionalCodeBlock(doMSPeakFind && peakListOpts$algo == "Bruker" && featFinderOpts$algo == "Bruker") }}
 plists <- generateMSPeakLists(fGroups, "brukerfmf", avgFGroupParams = avgPListParams)
@@ -85,7 +85,7 @@ plists <- generateMSPeakLists(fGroups, "brukerfmf", avgFGroupParams = avgPListPa
 # Calculate all formulas
 {{ endCodeBlock() }}
 {{ optionalCodeBlock(formulaOpts$algo == "GenForm") }}
-formulas <- generateFormulas(fGroups, "genform", plists, maxMzDev = 5,
+formulas <- generateFormulas(fGroups, "genform", plists, relMzDev = 5,
                              adduct = "{{ if (polarity == 'positive') '[M+H]+' else '[M-H]-' }}", elements = "CHNOP",
                              calculateFeatures = TRUE, featThreshold = 0.75)
 {{ endCodeBlock() }}
@@ -93,7 +93,7 @@ formulas <- generateFormulas(fGroups, "genform", plists, maxMzDev = 5,
 formulas <- generateFormulas(fGroups, "bruker", precursorMzSearchWindow = 0.002, featThreshold = 0.75)
 {{ endCodeBlock() }}
 {{ optionalCodeBlock(formulaOpts$algo == "SIRIUS") }}
-formulas <- generateFormulas(fGroups, "sirius", plists, maxMzDev = 5,
+formulas <- generateFormulas(fGroups, "sirius", plists, relMzDev = 5,
                              adduct = "{{ if (polarity == 'positive') '[M+H]+' else '[M-H]-' }}", elements = "CHNOP",
                              profile = "qtof", calculateFeatures = TRUE, featThreshold = 0.75)
 {{ endCodeBlock() }}
@@ -108,7 +108,7 @@ compounds <- generateCompounds(fGroups, plists, "metfrag", method = "CL", dbRelM
 compounds <- addFormulaScoring(compounds, formulas, TRUE) {{ optionalLine(formulaOpts$algo != "") }}
 {{ endCodeBlock() }}
 {{ optionalCodeBlock(identOpts$algo == "SIRIUS") }}
-compounds <- generateCompounds(fGroups, plists, "sirius", maxMzDev = 5,
+compounds <- generateCompounds(fGroups, plists, "sirius", relMzDev = 5,
                                adduct = "{{ if (polarity == 'positive') '[M+H]+' else '[M-H]-' }}", elements = "CHNOP", profile = "qtof",
                                fingerIDDatabase = "pubchem")
 {{ endCodeBlock() }}
@@ -124,8 +124,8 @@ components <- generateComponents(fGroups, "camera", ionization = "{{ polarity }}
 {{ endCodeBlock() }}
 {{ optionalCodeBlock(componentOpts$algo == "nontarget") }}
 components <- generateComponents(fGroups, "nontarget", ionization = "{{ polarity }}", rtRange = c(-120, 120),
-                                 mzRange = c(5, 120), elements = c("C", "H", "O"), maxRTDev = 30,
-                                 maxMzDev = 0.002)
+                                 mzRange = c(5, 120), elements = c("C", "H", "O"), rtDev = 30,
+                                 absMzDev = 0.002)
 {{ endCodeBlock() }}
 {{ optionalCodeBlock(length(reportFormats) > 0) }}
 

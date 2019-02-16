@@ -1,6 +1,5 @@
 general
 - more withr wrapping? (dev, par)
-- windows
 - fillPeaks for CAMERA (and RAMClustR?)
 - remove XCMS EIC loading (and update checkChromatograms())
 - support fastcluster for compounds clustering/int component clusters?
@@ -56,6 +55,7 @@ features
 - filter()
     - document which filters work on feature level (e.g. chromWidth)
     - remove zero values for maxReplicateIntRSD?
+- plot() colours
 
 
 MSPeakLists
@@ -67,7 +67,6 @@ MSPeakLists
 - add pruneMissingPrecursorMS to filter()?
 - filter by MSMS
 - metadata for Bruker peaklists?
-- maxRtMSWidth --> maxMSRtWidth
 - metadata() generic?
 
 
@@ -111,3 +110,7 @@ reporting
 
 Cleanup
 - Reduce non-exported class only methods
+
+
+Future
+- msPurity integration

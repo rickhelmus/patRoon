@@ -59,16 +59,17 @@ setMethod("initialize", "featuresOpenMS",
 #' @param MZScoring13C Use the 13C isotope as the expected shift for isotope
 #'   mass traces. See
 #'   \href{http://ftp.mi.fu-berlin.de/pub/OpenMS/release2.1.0-documentation/html/TOPP_FeatureFinderMetabo.html}{FeatureFinderMetabo}.
-#'   Sets \code{algorithm:ffm:mz_scoring_13C}.
+#'    Sets \code{algorithm:ffm:mz_scoring_13C}.
 #' @param useSmoothedInts If \code{TRUE} then use LOWESS intensities instead of
 #'   raw intensities. Sets the \code{algorithm:ffm:use_smoothed_intensities}
 #'   option.
 #' @param extraOpts Named character \code{vector} containing extra options that
 #'   will be passed to \code{FeatureFinderMetabo}. Any options specified here
 #'   will override any of the above.
-#' @param intSearchRTWindow Retention time window (in seconds) that is used to
-#'   find the closest data point to the retention time to obtain the intensity
-#'   of a feature (this is needed since OpenMS does not provide this data).
+#' @param intSearchRTWindow Retention time window (in seconds, +/- feature
+#'   retention time) that is used to find the closest data point to the
+#'   retention time to obtain the intensity of a feature (this is needed since
+#'   OpenMS does not provide this data).
 #' @template multiProc-args
 #'
 #' @template refs-openms

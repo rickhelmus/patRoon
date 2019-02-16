@@ -13,20 +13,21 @@ NULL
 #'
 #' @param precursorMzWindow The \emph{m/z} window (in Da) to find MS/MS spectra
 #'   of a precursor. This is typically used for Data-Dependent like MS/MS data
-#'   and should correspond to the isolation \emph{m/z} width that was used to
-#'   collect the data. For Data-Independent MS/MS experiments, where precursor
-#'   ions are not isolated prior to fragmentation (\emph{e.g.} bbCID, MSe,
-#'   all-ion, ...) the value should be \code{NULL}.
+#'   and should correspond to the isolation \emph{m/z} window (\emph{i.e.} +/-
+#'   the precursor \emph{m/z}) that was used to collect the data. For
+#'   Data-Independent MS/MS experiments, where precursor ions are not isolated
+#'   prior to fragmentation (\emph{e.g.} bbCID, MSe, all-ion, ...) the value
+#'   should be \code{NULL}.
 #'
 #' @rdname MSPeakLists-generation
 #' @export
-generateMSPeakListsMzR <- function(fGroups, maxRtMSWidth = 10, precursorMzWindow = 4, topMost = NULL,
+generateMSPeakListsMzR <- function(fGroups, maxMSRtWindow = 5, precursorMzWindow = 4, topMost = NULL,
                                    avgFeatParams = getDefAvgPListParams(),
                                    avgFGroupParams = getDefAvgPListParams())
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
-    checkmate::assertNumber(maxRtMSWidth, lower = 1, finite = TRUE, null.ok = TRUE, add = ac)
+    checkmate::assertNumber(maxMSRtWindow, lower = 1, finite = TRUE, null.ok = TRUE, add = ac)
     checkmate::assertNumber(precursorMzWindow, lower = 0, finite = TRUE, null.ok = TRUE, add = ac)
     checkmate::assertCount(topMost, positive = TRUE, null.ok = TRUE, add = ac)
     assertAvgPListParams(avgFeatParams, add = ac)
@@ -45,7 +46,7 @@ generateMSPeakListsMzR <- function(fGroups, maxRtMSWidth = 10, precursorMzWindow
         return(MSPeakLists(algorithm = "mzR"))
 
     cacheDB <- openCacheDBScope()
-    setHash <- makeHash(fGroups, maxRtMSWidth, precursorMzWindow, topMost, avgFeatParams)
+    setHash <- makeHash(fGroups, maxMSRtWindow, precursorMzWindow, topMost, avgFeatParams)
     cachedSet <- loadCacheSet("MSPeakListsMzR", setHash, cacheDB)
     resultHashes <- vector("character", anaCount * gCount)
     resultHashCount <- 0
@@ -71,7 +72,7 @@ generateMSPeakListsMzR <- function(fGroups, maxRtMSWidth = 10, precursorMzWindow
         fp <- getMzMLOrMzXMLAnalysisPath(ana, anaInfo$path[anai])
         spectra <- NULL
 
-        baseHash <- makeHash(ana, maxRtMSWidth, precursorMzWindow, topMost, avgFeatParams)
+        baseHash <- makeHash(ana, maxMSRtWindow, precursorMzWindow, topMost, avgFeatParams)
 
         printf("Loading all MS peak lists for %d feature groups in analysis '%s'...\n", gCount, ana)
         prog <- txtProgressBar(0, gCount, style = 3)
@@ -103,8 +104,8 @@ generateMSPeakListsMzR <- function(fGroups, maxRtMSWidth = 10, precursorMzWindow
                 results <- list(plists = list(), metatadata = list())
 
                 rtRange <- c(ft$retmin, ft$retmax)
-                if (!is.null(maxRtMSWidth) && diff(rtRange) > maxRtMSWidth)
-                    rtRange <- c(max(rtRange[1], ft$ret - maxRtMSWidth/2), min(rtRange[2], ft$ret + maxRtMSWidth/2))
+                if (!is.null(maxMSRtWindow) && diff(rtRange) > maxMSRtWindow*2)
+                    rtRange <- c(max(rtRange[1], ft$ret - maxMSRtWindow), min(rtRange[2], ft$ret + maxMSRtWindow))
 
                 if (is.null(spectra))
                     spectra <- loadSpectra(fp, verbose = FALSE)

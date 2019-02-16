@@ -107,13 +107,14 @@ NULL
 #'   value of the target). In addition, a column \code{"rt"} can be used to
 #'   specify the retention time (if unspecified no retention times are checked).
 #' @param rtWindow,mzWindow The retention time window (in seconds) and
-#'   \emph{m/z} window that will be used for matching a target.
+#'   \emph{m/z} window that will be used for matching a target (+/- feature
+#'   data).
 #'
 #' @return \code{screenTargets} will return a table (a \code{\link{data.table}})
-#'   with detected targets and details such as retention and \emph{m/z}
-#'   values. If a target is matched on multiple features/feature groups then
-#'   each hit is reported as a separate row. In case concentration values were
-#'   specified in the \link[=analysis-information]{analysis info} then the
+#'   with detected targets and details such as retention and \emph{m/z} values.
+#'   If a target is matched on multiple features/feature groups then each hit is
+#'   reported as a separate row. In case concentration values were specified in
+#'   the \link[=analysis-information]{analysis info} then the
 #'   \code{featureGroups} method will also report correlation coefficients
 #'   (\code{'RSQ'} column) calculated from the linear regression between
 #'   intensity values and specified concentrations.

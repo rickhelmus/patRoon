@@ -23,7 +23,7 @@ NULL
 #' @param elements A character vector with elements to be considered for
 #'   detection of repeating units. Sets the \code{elements} argument of
 #'   \code{\link{homol.search}} function.
-#' @param maxRTDev,maxMzDev Maximum retention and (absolute) \emph{m/z}
+#' @param rtDev,absMzDev Maximum retention and (absolute) \emph{m/z}
 #'   deviation for detection of homologues within series. These arguments set
 #'   the \code{rttol} and \code{mztol} arguments of \code{\link{homol.search}}.
 #' @param traceHack Currently \code{\link{homol.search}} does not work with \R
@@ -36,7 +36,7 @@ NULL
 #' @rdname component-generation
 #' @export
 generateComponentsNontarget <- function(fGroups, ionization, rtRange = c(-120, 120), mzRange = c(5, 120),
-                                        elements = c("C", "H", "O"), maxRTDev = 30, maxMzDev = 0.002,
+                                        elements = c("C", "H", "O"), rtDev = 30, absMzDev = 0.002,
                                         extraOpts = NULL,
                                         traceHack = all(R.Version()[c("major", "minor")] >= c(3, 4)))
 {
@@ -46,8 +46,8 @@ generateComponentsNontarget <- function(fGroups, ionization, rtRange = c(-120, 1
     checkmate::assertNumeric(rtRange, finite = TRUE, any.missing = FALSE, len = 2, add = ac)
     checkmate::assertNumeric(mzRange, lower = 0, finite = TRUE, any.missing = FALSE, len = 2, add = ac)
     checkmate::assertCharacter(elements, min.chars = 1, any.missing = FALSE, min.len = 1, add = ac)
-    checkmate::assertNumber(maxRTDev, lower = 0, finite = TRUE, add = ac)
-    checkmate::assertNumber(maxMzDev, lower = 0, finite = TRUE, add = ac)
+    checkmate::assertNumber(rtDev, lower = 0, finite = TRUE, add = ac)
+    checkmate::assertNumber(absMzDev, lower = 0, finite = TRUE, add = ac)
     checkmate::assertList(extraOpts, any.missing = FALSE, names = "unique", null.ok = TRUE, add = ac)
     checkmate::assertFlag(traceHack, add = ac)
     checkmate::reportAssertions(ac)
@@ -55,7 +55,7 @@ generateComponentsNontarget <- function(fGroups, ionization, rtRange = c(-120, 1
     if (length(fGroups) == 0)
         return(components(componentInfo = data.table(), components = list(), algorithm = "nontarget"))
 
-    hash <- makeHash(fGroups, ionization, rtRange, mzRange, elements, maxRTDev, maxMzDev, extraOpts)
+    hash <- makeHash(fGroups, ionization, rtRange, mzRange, elements, rtDev, absMzDev, extraOpts)
     cd <- loadCacheData("componentsNontarget", hash)
     if (!is.null(cd))
         return(cd)
@@ -79,7 +79,7 @@ generateComponentsNontarget <- function(fGroups, ionization, rtRange = c(-120, 1
 
     homArgs <- list(isotopes = isotopes, elements = elements, minmz = mzRange[1],
                      maxmz = mzRange[2], minrt = rtRange[1], maxrt = rtRange[2], ppm = FALSE,
-                     mztol = maxMzDev, rttol = maxRTDev)
+                     mztol = absMzDev, rttol = rtDev)
     if (!is.null(extraOpts))
         homArgs <- modifyList(homArgs, extraOpts)
 
@@ -92,14 +92,14 @@ generateComponentsNontarget <- function(fGroups, ionization, rtRange = c(-120, 1
 
         if (traceHack)
             suppressMessages(trace(nontarget::homol.search, function() {})) # put in dummy trace
-        
+
         # UNDONE: find some way to differentiate between actual errors?
         hom <- tryCatch(do.call(nontarget::homol.search, c(list(gt), homArgs)),
                         error = function(e) FALSE)
 
         if (traceHack)
             suppressMessages(untrace(nontarget::homol.search))
-        
+
         if (is.logical(hom))
             return(NULL) # no results
 
@@ -144,8 +144,8 @@ generateComponentsNontarget <- function(fGroups, ionization, rtRange = c(-120, 1
             if (r == ro)
                 next
 
-            if (abs(compTab[["m/z increment"]][r] - compTab[["m/z increment"]][ro]) > maxMzDev ||
-                abs(compTab[["RT increment"]][r] - compTab[["RT increment"]][ro]) > maxRTDev)
+            if (abs(compTab[["m/z increment"]][r] - compTab[["m/z increment"]][ro]) > absMzDev ||
+                abs(compTab[["RT increment"]][r] - compTab[["RT increment"]][ro]) > rtDev)
                 next # different series
 
             otherSeries <- compTab[["groups"]][[ro]][[1]]
@@ -160,7 +160,7 @@ generateComponentsNontarget <- function(fGroups, ionization, rtRange = c(-120, 1
             missingG <- setdiff(series, otherSeries)
             missingOtherG <- setdiff(otherSeries, series)
 
-            mzWithin <- function(mz1, mz2) numLTE(abs(mz1 - mz2), (compTab[["m/z increment"]][r] - maxMzDev))
+            mzWithin <- function(mz1, mz2) numLTE(abs(mz1 - mz2), (compTab[["m/z increment"]][r] - absMzDev))
 
             if (any(sapply(missingG, function(mg) any(mzWithin(gInfo[mg, "mzs"], gInfo[otherSeries, "mzs"])))) ||
                 any(sapply(missingOtherG, function(mg) any(mzWithin(gInfo[mg, "mzs"], gInfo[series, "mzs"])))))

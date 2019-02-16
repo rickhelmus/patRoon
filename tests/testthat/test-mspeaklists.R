@@ -9,20 +9,24 @@ if (doDATests())
     # compounds, forcing other calls (from features/formulas tests) to re-run
     # FMF
     fgDA <- groupFeatures(findFeatures(getDAAnaInfo()[2, ], "bruker"), "openms")
-    
+
     # NOTE: set bgsubtr to FALSE: subtraction might remove pecursor peaks of
     # (often wrong) low intensity features and result in warnings during
     # averaging
     plistsDA <- generateMSPeakLists(fgDA, "bruker", save = FALSE, bgsubtr = FALSE)
     plistsDAEmpty <- generateMSPeakLists(fgDA["nope"], "bruker", save = FALSE, bgsubtr = FALSE)
-    
+
     fgDA2 <- groupFeatures(findFeatures(getDAAnaInfo()[1, ], "bruker"), "openms")
     plistsDAFMF <- generateMSPeakLists(fgDA2, "brukerfmf")
 }
 
+# remove Ion Mobility data as it inconsistently is present or not
+plistsNoIM <- plists
+plistsNoIM@metadata <- lapply(plistsNoIM@metadata, function(mda) lapply(mda, function(mdf) lapply(mdf, function(mds) mds[, setdiff(names(mds), "ionMobilityDriftTime"), with = FALSE])))
+
 test_that("verify generation of MS peak lists", {
-    expect_known_value(plists, testFile("plists-mzr"))
-    
+    expect_known_value(plistsNoIM, testFile("plists-mzr"))
+
     skip_if_not(doDATests())
     expect_known_value(plistsDA, testFile("plists-DA"))
     expect_known_value(plistsDAFMF, testFile("plists-DAFMF"))
@@ -30,7 +34,7 @@ test_that("verify generation of MS peak lists", {
 
 test_that("verify show output", {
     expect_known_show(plists, testFile("plists-mzr", text = TRUE))
-    
+
     skip_if_not(doDATests())
     expect_known_show(plistsDA, testFile("plists-DA", text = TRUE))
     expect_known_show(plistsDAFMF, testFile("plists-DAFMF", text = TRUE))
@@ -39,7 +43,7 @@ test_that("verify show output", {
 checkMinInt <- function(plists, relative, doMSMS)
 {
     plists <- removePrecursors(plists)
-    
+
     minIntPL <- function(pl)
     {
         if (!doMSMS)
@@ -48,16 +52,16 @@ checkMinInt <- function(plists, relative, doMSMS)
             ints <- pl$MSMS$intensity
         else
             return(NA)
-        
+
         if (length(ints) == 0)
             return(NA)
-        
+
         ret <- min(ints)
         if (relative)
             ret <- ret / max(ints)
         return(ret)
     }
-    
+
     ftMin <- min(sapply(peakLists(plists), function(ana) min(sapply(ana, minIntPL), na.rm = TRUE)), na.rm = TRUE)
     fgMin <- min(sapply(averagedPeakLists(plists), minIntPL), na.rm = TRUE)
     return(min(ftMin, fgMin))
@@ -99,7 +103,7 @@ test_that("empty object", {
     expect_length(generateMSPeakLists(getEmptyTestFGroups(), "mzr"), 0)
     expect_lt(length(plistsEmptyMS), length(plists))
     expect_gt(length(plistsEmptyMS), 0)
-    
+
     skip_if_not(doDATests())
     expect_length(plistsDAEmpty, 0)
 })
@@ -114,13 +118,13 @@ test_that("basic functionality", {
     expect_equivalent(groupNames(plists[, c(FALSE, TRUE)]), groupNames(plists)[c(FALSE, TRUE)])
     expect_equal(length(plists[FALSE]), 0)
     expect_length(plistsEmpty[1:5], 0)
-    
+
     expect_equivalent(plists[[2, 15]], peakLists(plists)[[2]][[groupNames(plists)[15]]])
     expect_equivalent(plists[[analyses(plists)[2], groupNames(plists)[15]]], peakLists(plists)[[2]][[groupNames(plists)[15]]])
-    
+
     expect_equivalent(plists[[20]], averagedPeakLists(plists)[[groupNames(plists)[20]]])
     expect_equivalent(plists[[groupNames(plists)[20]]], averagedPeakLists(plists)[[groupNames(plists)[20]]])
-    
+
     expect_equal(nrow(as.data.table(plists, averaged = TRUE)),
                  sum(unlist(recursiveApplyDT(averagedPeakLists(plists), nrow))))
     expect_equal(nrow(as.data.table(plists, averaged = FALSE)), length(plists))

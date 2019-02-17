@@ -99,8 +99,6 @@ formulas
 
 components
 - mass defect components
-- CAMERA: test new filtering options
-- bring ubiquitous flag to RC and make sure that all features share at least one analysis instead of all? --> intraAbundanceFilter
 
 
 reporting

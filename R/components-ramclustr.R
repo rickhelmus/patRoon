@@ -38,6 +38,7 @@ setMethod("initialize", "componentsRC",
 #' @export
 generateComponentsRAMClustR <- function(fGroups, st = NULL, sr = NULL, maxt = 12, hmax = 0.3,
                                         normalize = "TIC", ionization, absMzDev = 0.002, relMzDev = 5,
+                                        minSize = 2, relMinReplicates = 0.5,
                                         RCExperimentVals = list(design = list(platform = "LC-MS"),
                                                                 instrument = list(ionization = ionization, MSlevs = 1)),
                                         extraOptsRC = NULL, extraOptsFM = NULL)
@@ -51,6 +52,8 @@ generateComponentsRAMClustR <- function(fGroups, st = NULL, sr = NULL, maxt = 12
     checkmate::assertChoice(ionization, c("positive", "negative"), add = ac)
     checkmate::assertNumber(absMzDev, lower = 0, finite = TRUE, add = ac)
     checkmate::assertNumber(relMzDev, lower = 0, finite = TRUE, add = ac)
+    checkmate::assertCount(minSize, positive = TRUE, add = ac)
+    checkmate::assertNumber(relMinReplicates, lower = 0, finite = TRUE, add = ac)
     checkmate::assertList(RCExperimentVals, any.missing = FALSE, names = "unique", add = ac)
     checkmate::assertList(extraOptsRC, any.missing = FALSE, names = "unique", null.ok = TRUE, add = ac)
     checkmate::assertList(extraOptsFM, any.missing = FALSE, names = "unique", null.ok = TRUE, add = ac)
@@ -67,10 +70,11 @@ generateComponentsRAMClustR <- function(fGroups, st = NULL, sr = NULL, maxt = 12
     fTable <- featureTable(fGroups)
     anaInfo <- analysisInfo(fGroups)
 
-    RCMainArgs <- c(list(st = st, sr = sr, maxt = maxt, hmax = hmax, normalize = normalize), extraOptsRC)
+    RCMainArgs <- c(list(st = st, sr = sr, maxt = maxt, hmax = hmax, normalize = normalize,
+                         minModuleSize = minSize), extraOptsRC)
     FMMainArgs <- c(list(mode = ionization, mzabs.error = absMzDev, ppm.error = relMzDev), extraOptsFM)
 
-    hash <- makeHash(fGroups, RCMainArgs, FMMainArgs)
+    hash <- makeHash(fGroups, minSize, relMinReplicates, RCMainArgs, FMMainArgs)
     cd <- loadCacheData("componentsRC", hash)
     if (!is.null(cd))
         return(cd)
@@ -138,16 +142,34 @@ generateComponentsRAMClustR <- function(fGroups, st = NULL, sr = NULL, maxt = 12
         setcolorder(comps[[cmi]], c("rt", "mz", "intensity", "intensity_rel", "group",
                                     "isogroup", "isonr", "charge", "adduct_ion", "ppm"))
     })
-
-    names(comps) <- RC$cmpd # UNDONE: standardize naming?
-
-    # seems to overall ppm (M.ppm) value was forgotten, make it here
+    names(comps) <- paste0("CMP", seq_along(comps))
+    
+    # seems the overall ppm (M.ppm) value was forgotten, make it here
     Mppm <- RC$M.ppm.findmain
     Mppm[!RC$use.findmain] <- RC$M.ppm.ramclustr[!RC$use.findmain]
-
+    
     # UNDONE: include both main+ramclust results?
-    cInfo <- data.table(name = RC$cmpd, cmp_ret = RC$clrt, cmp_retsd = RC$clrtsd, neutral_mass = RC$M, cmp_ppm = Mppm,
-                        size = sapply(comps, nrow))
+    cInfo <- data.table(name = names(comps), cmp_ret = RC$clrt, cmp_retsd = RC$clrtsd,
+                        neutral_mass = RC$M, cmp_ppm = Mppm, size = sapply(comps, nrow))
+    
+    # filter components if necessary (do this afterwards as order had to be retained)
+    if (relMinReplicates > 0)
+    {
+        comps <- pruneList(lapply(comps, function(cmp)
+        {
+            fgCmp <- removeEmptyAnalyses(fGroups[, cmp$group])
+            fgCmp <- minReplicatesFilter(fgCmp, relThreshold = relMinReplicates, verbose = FALSE)
+            return(cmp[group %in% names(fgCmp)])
+        }), checkZeroRows = TRUE)
+        
+        if (length(comps) != nrow(cInfo))
+        {
+            # update if components were filtered
+            cInfo <- cInfo[name %in% names(comps)]
+            names(comps) <- paste0("CMP", seq_along(comps))
+            cInfo[, name := names(comps)]
+        }
+    }
 
     ret <- componentsRC(RC = RC, components = comps, componentInfo = cInfo)
     saveCacheData("componentsRC", ret, hash)

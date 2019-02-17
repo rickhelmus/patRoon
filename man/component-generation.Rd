@@ -15,7 +15,7 @@
 \S4method{generateComponents}{featureGroups}(fGroups, algorithm, ...)
 
 generateComponentsCAMERA(fGroups, ionization, onlyIsotopes = FALSE,
-  minSize = 2, ubiquitous = TRUE, extraOpts = NULL)
+  minSize = 2, relMinReplicates = 0.5, extraOpts = NULL)
 
 generateComponentsIntClust(fGroups, method = "complete",
   metric = "euclidean", normFunc = max, average = TRUE,
@@ -28,9 +28,10 @@ generateComponentsNontarget(fGroups, ionization, rtRange = c(-120, 120),
 
 generateComponentsRAMClustR(fGroups, st = NULL, sr = NULL, maxt = 12,
   hmax = 0.3, normalize = "TIC", ionization, absMzDev = 0.002,
-  relMzDev = 5, RCExperimentVals = list(design = list(platform =
-  "LC-MS"), instrument = list(ionization = ionization, MSlevs = 1)),
-  extraOptsRC = NULL, extraOptsFM = NULL)
+  relMzDev = 5, minSize = 2, relMinReplicates = 0.5,
+  RCExperimentVals = list(design = list(platform = "LC-MS"), instrument =
+  list(ionization = ionization, MSlevs = 1)), extraOptsRC = NULL,
+  extraOptsFM = NULL)
 }
 \arguments{
 \item{fGroups}{\code{\link{featureGroups}} object for which components should
@@ -50,10 +51,15 @@ considered when generating components (faster). Corresponds to \code{quick}
 argument of \code{\link[CAMERA:annotate-methods]{CAMERA::annotate}}.}
 
 \item{minSize}{The minimum size of a component. Smaller components than this
-size will be removed. See note below.}
+size will be removed. For \code{RAMClustR}: sets the \code{minModuleSize}
+argument to \code{\link[RAMClustR]{ramclustR}}. See note below.}
 
-\item{ubiquitous}{If \code{TRUE}: ensure that all feature groups within a
-component are present in the same analyses. See note below.}
+\item{relMinReplicates}{Feature groups within a component are only kept when
+they contain data for at least this (relative) amount of replicate
+analyses. For instance, \samp{0.5} means that at least half of the
+replicates should contain data for a particular feature group in a
+component. In this calculation replicates that are fully absent within a
+component are not taken in to account. See note below.}
 
 \item{extraOpts}{Named character vector with extra arguments directly passed
 to \code{\link{homol.search}} (\code{generateComponentsNontarget}) or
@@ -175,10 +181,13 @@ and reduce the data size and thus complexity.
   \code{\link[RAMClustR]{do.findmain}} is used for annotation.
 }
 \note{
-For \code{generateComponentsCAMERA}: the \code{minSize} and
-  \code{ubiquitous} arguments provide additional filtering functionality not
-  provided by \pkg{CAMERA}. Consequently, their default values may produce
-  different results compared to regular output from \code{CAMERA}.
+For \code{generateComponentsCAMERA} and
+  \code{generateComponentsRAMClustR}: the \code{minSize} and
+  \code{relMinReplicates} arguments provide additional filtering
+  functionality not provided by \pkg{CAMERA} or \pkg{RAMClustR} (except
+  \code{minSize}). Note that these filters are enabled by default, hence,
+  final results may be different than what CAMERA/RAMClustR normally
+  would return.
 }
 \references{
 \addCitations{CAMERA}{1}

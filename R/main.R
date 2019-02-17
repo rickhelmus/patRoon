@@ -670,6 +670,15 @@ NULL
 #'   be generated.
 #' @param ionization Which ionization polarity was used to generate the data:
 #'   should be \code{"positive"} or \code{"negative"}.
+#' @param minSize The minimum size of a component. Smaller components than this
+#'   size will be removed. For \code{RAMClustR}: sets the \code{minModuleSize}
+#'   argument to \code{\link[RAMClustR]{ramclustR}}. See note below.
+#' @param relMinReplicates Feature groups within a component are only kept when
+#'   they contain data for at least this (relative) amount of replicate
+#'   analyses. For instance, \samp{0.5} means that at least half of the
+#'   replicates should contain data for a particular feature group in a
+#'   component. In this calculation replicates that are fully absent within a
+#'   component are not taken in to account. See note below.
 #' @param extraOpts Named character vector with extra arguments directly passed
 #'   to \code{\link{homol.search}} (\code{generateComponentsNontarget}) or
 #'   \code{\link[CAMERA:annotate-methods]{CAMERA::annotate}}
@@ -677,6 +686,14 @@ NULL
 #'
 #' @return A \code{\link{components}} (derived) object containing all generated
 #'   components.
+#'
+#' @note For \code{generateComponentsCAMERA} and
+#'   \code{generateComponentsRAMClustR}: the \code{minSize} and
+#'   \code{relMinReplicates} arguments provide additional filtering
+#'   functionality not provided by \pkg{CAMERA} or \pkg{RAMClustR} (except
+#'   \code{minSize}). Note that these filters are enabled by default, hence,
+#'   final results may be different than what CAMERA/RAMClustR normally
+#'   would return.
 #'
 #' @name component-generation
 NULL

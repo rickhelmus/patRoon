@@ -3,12 +3,10 @@ general
 - fillPeaks for CAMERA (and RAMClustR?)
 - remove XCMS EIC loading (and update checkChromatograms())
 - support fastcluster for compounds clustering/int component clusters?
-- data.table: add '[]' at the end of (exported) functions when ':=' was used (print bug workaround)
 - setAs() for as.data.table()/as.data.frame() methods
 - negate for all filter methods
 - make algorithm names more consistent
 - convertMSFiles(): add DA functionality
-- suspect screening: add MS/MS qualifiers, calculate ion masses
 - DA
     - generateMSPeakListsDA: find precursor masses with larger window
     - tests
@@ -48,7 +46,6 @@ features
     - cache?
 - progressbar and parallel enviPick
 - OpenMS: Support newest grouper? Update tests to newest version
-- removeRefAnalyses TRUE by default (or if blank filter is specified?)?
 - Fix plotUpSet with <2 rgroups
 - as.data.table for fGroups is slow?
 - tests to verify getXCMSSet...
@@ -112,3 +109,4 @@ Cleanup
 
 Future
 - msPurity integration
+- suspect screening: add MS/MS qualifiers, calculate ion masses

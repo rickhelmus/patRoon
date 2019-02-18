@@ -50,7 +50,7 @@
 
 \S4method{as.data.table}{compounds}(x, fGroups = NULL,
   fragments = FALSE, normalizeScores = "none",
-  excludeNormScores = NULL)
+  excludeNormScores = c("score", "individualMoNAScore"))
 
 \S4method{identifiers}{compounds}(compounds)
 
@@ -68,8 +68,8 @@
   height = 500, useGGPlot2 = FALSE)
 
 \S4method{plotScores}{compounds}(obj, index, groupName,
-  normalizeScores = "max", excludeNormScores = NULL, onlyUsed = TRUE,
-  useGGPlot2 = FALSE)
+  normalizeScores = "max", excludeNormScores = c("score",
+  "individualMoNAScore"), onlyUsed = TRUE, useGGPlot2 = FALSE)
 
 \S4method{annotatedPeakList}{compounds}(obj, index, groupName, MSPeakLists,
   formulas = NULL, onlyAnnotated = FALSE)
@@ -123,8 +123,10 @@ use of \code{filter}).}
 
 \item{excludeNormScores}{A \code{character} vector specifying any compound
 scoring names that should \emph{not} be normalized. Set to \code{NULL} to
-normalize all scorings. Note that whether any normalization occurs is set
-by the \code{excludeNormScores} argument.}
+normalize all scorings. By default \code{score} and
+\code{individualMoNAScore} are set to mimic the behaviour of the MetFrag web
+interface. Note that whether any normalization occurs is set by the
+\code{excludeNormScores} argument.}
 
 \item{minExplainedPeaks, minScore, minFragScore, minFormulaScore}{Minimal number
 of explained peaks, overall score, in-silico fragmentation score and

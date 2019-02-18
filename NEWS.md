@@ -29,6 +29,7 @@
 * CAMERA and RAMClustR components: both now have `minSize` and `relMinReplicates` (replaces `ubiquitous` for CAMERA) arguments. Note that their defaults may filter out (feature groups from) components. See their documentation for more info.
 * Changed capitalisation of MetFrag CL location option from `patRoon.path.metFragCL` to `patRoon.path.MetFragCL`. The old name still works for backward compatability.
 * Documented usage of the CompTox database with MetFrag. See `?generateCompounds`.
+* Default normalization of MetFrag scorings now follows MetFrag web behaviour.
 
 
 ## January 2019

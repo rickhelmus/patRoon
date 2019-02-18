@@ -1,6 +1,6 @@
 context("compounds clustering")
 
-hasMetfrag <- !is.null(getOption("patRoon.path.metFragCL")) && nzchar(getOption("patRoon.path.metFragCL"))
+hasMetfrag <- !is.null(getOption("patRoon.path.MetFragCL")) && nzchar(getOption("patRoon.path.MetFragCL"))
 
 if (hasMetfrag)
 {

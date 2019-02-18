@@ -68,7 +68,6 @@ MSPeakLists
 
 
 compounds
-- patRoon.path.metFragCL --> patRoon.path.MetFragCL
 - clarify that sirius headless 4.0 now also works
 - do something with sirius fingerprints?
 - fix compoundViewer

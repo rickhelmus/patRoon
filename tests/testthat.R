@@ -3,7 +3,7 @@ library(patRoon)
 
 envOpts <- Sys.getenv(c("PATROON_METFRAG", "PATROON_SIRIUS"))
 if (nzchar(envOpts[["PATROON_METFRAG"]]))
-    options(patRoon.path.metFragCL = envOpts[["PATROON_METFRAG"]])
+    options(patRoon.path.MetFragCL = envOpts[["PATROON_METFRAG"]])
 if (nzchar(envOpts[["PATROON_SIRIUS"]]))
     options(patRoon.path.SIRIUS = envOpts[["PATROON_SIRIUS"]])
 

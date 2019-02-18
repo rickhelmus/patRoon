@@ -89,7 +89,7 @@ NULL
 #'   executable. If not set (the default) the internal \code{GenForm} binary is
 #'   used. Only set if you want to override the executable.
 #'
-#'   \item \code{patRoon.path.metFragCL}: The complete file path to the metFrag
+#'   \item \code{patRoon.path.MetFragCL}: The complete file path to the metFrag
 #'   CL \file{jar} file that \emph{must} be set when using
 #'   \code{\link{generateCompoundsMetfrag}}. Example:
 #'   \code{"C:/MetFrag2.4.2-CL.jar"}.

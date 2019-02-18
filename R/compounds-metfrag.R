@@ -280,6 +280,10 @@ processMFResults <- function(comptab, spec, adduct, db, topMost, lfile = "")
 #'   Sets the \option{FragmentPeakMatchRelativeMassDeviation} option.
 #' @param fragAbsMzDev Absolute mass deviation (in Da) for fragment matching.
 #'   Sets the \option{FragmentPeakMatchAbsoluteMassDeviation} option.
+#' @param database Compound database to use. Valid values are: \code{"pubchem"},
+#'   \code{"chemspider"}, \code{"toxcast"}, \code{"kegg"}, \code{"sdf"},
+#'   \code{"psv"} and \code{"csv"}. See section below for more information. Sets
+#'   the \code{MetFragDatabaseType} option.
 #' @param extendedPubChem If \code{database="pubchem"}: whether to use the
 #'   \emph{extended} database that includes information for compound scoring
 #'   (\emph{i.e.} number of patents/PubMed references). Note that downloading
@@ -330,6 +334,26 @@ processMFResults <- function(comptab, spec, adduct, db, topMost, lfile = "")
 #'
 #' @return \code{generateCompoundsMetFrag} returns a \code{\link{compoundsMF}}
 #'   object.
+#'
+#' @section Usage of MetFrag databases: When \code{database="chemspider"}
+#'   setting the \code{chemSpiderToken} argument is mandatory.
+#'
+#'   When a local database is set (\emph{i.e.} \code{sdf}, \code{psv},
+#'   \code{csv}, \code{toxcast}) the file location of the database should be set
+#'   in the \code{LocalDatabasePath} value via the \code{extraOpts} argument or
+#'   using the \code{patRoon.path.MetFragCompTox} option (only when
+#'   \code{database="comptox"}).
+#'
+#'   Examples: \verb{options(patRoon.path.MetFragCompTox =
+#'   "C:/DSSTox_01May18_Full_SelectMetaDataPlus.csv")} \verb{extraOpts =
+#'   list(LocalDatabasePath = \"C:/myDB.csv\")}.
+#'
+#'   Note that for \code{database="comptox"} currently only scorings from the
+#'   \file{SelectMetaData} and \file{SelectMetaDataPlus} files are supported.
+#'   These files can be obtained from
+#'   \url{https://epa.figshare.com/articles/CompTox_Chemicals_Dashboard_Metadata_Files_for_Integration_with_MetFrag/7525199}.
+#'   Note that only recent \command{MetFrag} versions (>= \samp{2.4.5}) support
+#'   these libraries.
 #'
 #' @references \insertRef{Ruttkies2016}{patRoon}
 #'
@@ -383,7 +407,25 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
     checkmate::reportAssertions(ac)
 
     adduct <- checkAndToAdduct(adduct)
-
+    
+    extDB <- if (!is.null(extraOpts)) extraOpts[["LocalDatabasePath"]] else NULL
+    if (database == "comptox" && is.null(extDB))
+    {
+        extDB <- getOption("patRoon.path.MetFragCompTox", NULL)
+        if (!is.null(extDB))
+            extraOpts <- modifyList(if (!is.null(extraOpts)) extraOpts else list(), list(LocalDatabasePath = extDB))
+    }
+        
+    if (is.null(extDB) || !file.exists(extDB))
+    {
+        ex <- "as part of the extraOpts argument, e.g. extraOpts = list(LocalDatabasePath = \"C:/DSSTox_01May18_Full_SelectMetaDataPlus.csv\")"
+        if (database == "comptox")
+            stop(paste("No (valid) external database file set. This should be either set as an option, e.g.",
+                       "options(patRoon.path.MetFragCompTox = \"C:/DSSTox_01May18_Full_SelectMetaDataPlus.csv\") or", ex))
+        
+        stop(paste("No external database file set. This should be set", ex))
+    }
+    
     anaInfo <- analysisInfo(fGroups)
     ftind <- groupFeatIndex(fGroups)
     gTable <- groups(fGroups)

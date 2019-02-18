@@ -74,7 +74,6 @@ compounds
 - MetFrag: (buggy) trivial name fetching not needed anymore?
 - convert score csv to internal data?
 - SIRIUS: use --auto-charge instead of manually fixing charge of fragments (or not? conflicting docs on what it does)
-- document database="comptox"?
 - SIRIUS: topMostFormulas argument
 - test score normalization?
 - add new MF stat and other scorings

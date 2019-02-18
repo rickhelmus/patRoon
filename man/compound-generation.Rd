@@ -74,9 +74,9 @@ may be useful to handle e.g. connection errors.}
 \item{topMost}{Only keep this number of candidates (per feature group) with
   highest score.
 
-  For \command{MetFrag}: Set to \code{NULL} to always keep all candidates, however,
-  please note that this may result in significant usage of CPU/RAM resources
-  for large numbers of candidates.
+  For \command{MetFrag}: Set to \code{NULL} to always keep all candidates,
+  however, please note that this may result in significant usage of CPU/RAM
+  resources for large numbers of candidates.
 
   For \command{SIRIUS}: Sets the \option{--candidates} commandline option.}
 
@@ -94,14 +94,9 @@ converted to it with \code{\link{as.adduct}}). Examples: \code{"[M-H]-"},
 \code{"[M+Na]+"}.}
 
 \item{database}{Compound database to use. Valid values are: \code{"pubchem"},
-  \code{"chemspider"}, \code{"kegg"}, \code{"sdf"}, \code{"psv"} and
-  \code{"csv"}.
-
-  For compound generation: note that when \code{database="chemspider"}, the
-  \code{chemSpiderToken} argument should be set. Similarly, when a local database is
-  set (\emph{i.e.} \code{sdf}, \code{psv}, \code{csv}) the
-  \code{LocalDatabasePath} value should be set in \code{extraOpts}. Sets the
-  \code{MetFragDatabaseType} option.}
+\code{"chemspider"}, \code{"toxcast"}, \code{"kegg"}, \code{"sdf"},
+\code{"psv"} and \code{"csv"}. See section below for more information. Sets
+the \code{MetFragDatabaseType} option.}
 
 \item{extendedPubChem}{If \code{database="pubchem"}: whether to use the
 \emph{extended} database that includes information for compound scoring
@@ -314,9 +309,32 @@ before feature groups have been prioritized.
   \code{scoreTypes} argument to use all default scorings for PubChem:
   \code{compoundScorings("metfrag", "pubchem", onlyDefault=TRUE)$name}.
 
-  For all \command{MetFrag} scoring types refer to the \verb{Candidate Scores}
-  section on the \href{http://c-ruttkies.github.io/MetFrag/projects/metfragr/}{MetFragR
+  For all \command{MetFrag} scoring types refer to the \verb{Candidate
+  Scores} section on the
+  \href{http://c-ruttkies.github.io/MetFrag/projects/metfragr/}{MetFragR
   homepage}.
+}
+
+\section{Usage of MetFrag databases}{
+ When \code{database="chemspider"}
+  setting the \code{chemSpiderToken} argument is mandatory.
+
+  When a local database is set (\emph{i.e.} \code{sdf}, \code{psv},
+  \code{csv}, \code{toxcast}) the file location of the database should be set
+  in the \code{LocalDatabasePath} value via the \code{extraOpts} argument or
+  using the \code{patRoon.path.MetFragCompTox} option (only when
+  \code{database="comptox"}).
+
+  Examples: \verb{options(patRoon.path.MetFragCompTox =
+  "C:/DSSTox_01May18_Full_SelectMetaDataPlus.csv")} \verb{extraOpts =
+  list(LocalDatabasePath = \"C:/myDB.csv\")}.
+
+  Note that for \code{database="comptox"} currently only scorings from the
+  \file{SelectMetaData} and \file{SelectMetaDataPlus} files are supported.
+  These files can be obtained from
+  \url{https://epa.figshare.com/articles/CompTox_Chemicals_Dashboard_Metadata_Files_for_Integration_with_MetFrag/7525199}.
+  Note that only recent \command{MetFrag} versions (>= \samp{2.4.5}) support
+  these libraries.
 }
 
 \references{

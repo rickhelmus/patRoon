@@ -6,7 +6,8 @@
 \alias{patRoon-package}
 \title{Workflow solutions for mass-spectrometry based non-target analysis.}
 \description{
-\Sexpr[results=text,echo=FALSE]{packageDescription("patRoon", fields = "Description")}
+\Sexpr[results=text,echo=FALSE]{packageDescription("patRoon", fields =
+"Description")}
 }
 \section{Package options}{
 
@@ -29,17 +30,22 @@
   should be initiated in parallel. A good starting point is the number of
   cores available. Default is set by \code{\link[parallel]{detectCores}}.
 
-  \item \code{patRoon.path.pwiz}: The path in which the \command{ProteoWizard}
-  binaries are installed. Only need to be set if not yet in \option{PATH}.
+  \item \code{patRoon.path.pwiz}: The path in which the
+  \command{ProteoWizard} binaries are installed. Only need to be set if not
+  yet in \option{PATH}.
 
   \item \code{patRoon.path.GenForm}: The path to the \command{GenForm}
   executable. If not set (the default) the internal \code{GenForm} binary is
   used. Only set if you want to override the executable.
 
-  \item \code{patRoon.path.metFragCL}: The complete file path to the metFrag
+  \item \code{patRoon.path.MetFragCL}: The complete file path to the MetFrag
   CL \file{jar} file that \emph{must} be set when using
   \code{\link{generateCompoundsMetfrag}}. Example:
   \code{"C:/MetFrag2.4.2-CL.jar"}.
+
+  \item \code{patRoon.path.MetFragCompTox}: The complete file path to the
+  CompTox database \file{csv} file. See \code{\link{generateCompounds}} for
+  more details.
 
   \item \code{patRoon.path.SIRIUS}: The directory in which SIRIUS is
   installed. Unless the binaries can be located via the \option{PATH}

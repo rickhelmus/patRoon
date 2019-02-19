@@ -30,6 +30,7 @@
 * Changed capitalisation of MetFrag CL location option from `patRoon.path.metFragCL` to `patRoon.path.MetFragCL`. The old name still works for backward compatability.
 * Documented usage of the CompTox database with MetFrag. See `?generateCompounds`.
 * Default normalization of MetFrag scorings now follows MetFrag web behaviour.
+* `topMostFormulas` argument for SIRIUS compound generation.
 
 
 ## January 2019

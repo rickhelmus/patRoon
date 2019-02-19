@@ -30,8 +30,8 @@ generateCompoundsMetfrag(fGroups, MSPeakLists, method = "CL",
 generateCompoundsSirius(fGroups, MSPeakLists, relMzDev = 5,
   adduct = "[M+H]+", elements = "CHNOP", profile = "qtof",
   formulaDatabase = NULL, fingerIDDatabase = "pubchem", noise = NULL,
-  errorRetries = 2, topMost = 100, extraOpts = NULL,
-  logPath = file.path("log", "sirius"),
+  errorRetries = 2, topMost = 100, topMostFormulas = 5,
+  extraOpts = NULL, logPath = file.path("log", "sirius"),
   maxProcAmount = getOption("patRoon.maxProcAmount"))
 
 compoundScorings(algorithm = NULL, database = NULL,
@@ -72,13 +72,9 @@ before completely skipping the metFrag query for a feature group. Also see
 may be useful to handle e.g. connection errors.}
 
 \item{topMost}{Only keep this number of candidates (per feature group) with
-  highest score.
-
-  For \command{MetFrag}: Set to \code{NULL} to always keep all candidates,
-  however, please note that this may result in significant usage of CPU/RAM
-  resources for large numbers of candidates.
-
-  For \command{SIRIUS}: Sets the \option{--candidates} commandline option.}
+highest score. Set to \code{NULL} to always keep all candidates,
+however, please note that this may result in significant usage of CPU/RAM
+resources for large numbers of candidates.}
 
 \item{dbRelMzDev}{Relative mass deviation (in ppm) for database search. Sets
 the \option{DatabaseSearchRelativeMassDeviation} option.}
@@ -196,6 +192,10 @@ is also \code{NULL}. Sets the \option{--fingerid-db} option.}
 
 \item{noise}{Median intensity of the noise (\code{NULL} ignores this
 parameter). Sets the \option{--noise} commandline option.}
+
+\item{topMostFormulas}{Do not return more than this number of candidate
+formulae. Note that only compounds for these formulae will be searched.
+Sets the \option{--candidates} commandline option.}
 
 \item{includeSuspectLists, onlyDefault, includeNoDB}{A logical specifying
 whether scoring terms releated to suspect lists, default scoring terms and
@@ -341,8 +341,7 @@ before feature groups have been prioritized.
 \insertRef{Ruttkies2016}{patRoon}
 
 \insertRef{Duhrkop2015}{patRoon} \cr\cr
-  \insertRef{Duhrkop2015-2}{patRoon} \cr\cr
-  \insertRef{Bcker2008}{patRoon}
+  \insertRef{Duhrkop2015-2}{patRoon} \cr\cr \insertRef{Bcker2008}{patRoon}
 }
 \seealso{
 \code{\link{compounds-class}}

@@ -204,8 +204,6 @@ processGenFormResultFile <- function(file, isMSMS, adduct)
     if (isMSMS)
         forms[, neutral_loss := as.character(Vectorize(subtractFormula)(formula, frag_formula))]
 
-    forms <- rankFormulaTable(forms)
-
     return(if (nrow(forms) > 0) forms else NULL)
 }
 
@@ -355,6 +353,8 @@ generateFormulasGenForm <- function(fGroups, MSPeakLists, relMzDev = 5, adduct =
             }, simplify = FALSE)
         }
 
+        MSForms <- lapply(MSForms, rankFormulaTable)
+        
         return(MSForms)
     }
 

@@ -220,6 +220,8 @@ setMethod("identifiers", "compounds", function(compounds)
 #'   specified scoring is never removed. Set to \code{NULL} to skip this filter.
 #' @param topMost Only keep a maximum of \code{topMost} candidates with highest
 #'   score. Set to \code{NULL} to ignore.
+#' @param negate If \code{TRUE} then filters are applied in opposite manner. For
+#'   \code{topMost} this means that the least scoring candidates are returned.
 #'
 #' @template element-args
 #'
@@ -228,7 +230,8 @@ setMethod("identifiers", "compounds", function(compounds)
 #' @export
 setMethod("filter", "compounds", function(obj, minExplainedPeaks = NULL, minScore = NULL, minFragScore = NULL,
                                           minFormulaScore = NULL, scoreLimits = NULL, elements = NULL,
-                                          fragElements = NULL, lossElements = NULL, topMost = NULL)
+                                          fragElements = NULL, lossElements = NULL, topMost = NULL,
+                                          negate = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertCount, . ~ minExplainedPeaks + topMost, positive = c(FALSE, TRUE),
@@ -244,6 +247,7 @@ setMethod("filter", "compounds", function(obj, minExplainedPeaks = NULL, minScor
     }
     aapply(checkmate::assertCharacter, . ~ elements + fragElements + lossElements,
            min.chars = 1, min.len = 1, null.ok = TRUE, fixed = list(add = ac))
+    checkmate::assertFlag(negate, add = ac)
     checkmate::reportAssertions(ac)
 
     cat("Filtering compounds... ")
@@ -252,8 +256,11 @@ setMethod("filter", "compounds", function(obj, minExplainedPeaks = NULL, minScor
     filterMinCols <- function(cmpTable, col, minVal)
     {
         cols <- getAllCompCols(col, names(cmpTable), mCompNames)
+        pred <- function(cl) is.na(cl) | cl >= minVal
+        if (negate)
+            pred <- Negate(pred)
         for (cl in cols)
-            cmpTable <- cmpTable[is.na(get(cl)) | get(cl) >= minVal]
+            cmpTable <- cmpTable[pred(get(cl))]
         return(cmpTable)
     }
 
@@ -274,9 +281,13 @@ setMethod("filter", "compounds", function(obj, minExplainedPeaks = NULL, minScor
                 cols <- getAllCompCols(sc, names(cmpTable), mCompNames)
                 if (length(cols) == 0)
                     next
-                cmpTable <- cmpTable[cmpTable[, do.call(pmin, c(.SD, list(na.rm = TRUE))) >= scoreLimits[[sc]][1] &
-                                                  do.call(pmax, c(.SD, list(na.rm = TRUE))) <= scoreLimits[[sc]][2],
-                                              .SDcols = cols]]
+                
+                keep <- cmpTable[, do.call(pmin, c(.SD, list(na.rm = TRUE))) >= scoreLimits[[sc]][1] &
+                                     do.call(pmax, c(.SD, list(na.rm = TRUE))) <= scoreLimits[[sc]][2],
+                                 .SDcols = cols]
+                if (negate)
+                    keep <- !keep
+                cmpTable <- cmpTable[keep]
             }
         }
 
@@ -284,7 +295,12 @@ setMethod("filter", "compounds", function(obj, minExplainedPeaks = NULL, minScor
             return(cmpTable)
 
         if (!is.null(elements))
-            cmpTable <- cmpTable[sapply(formula, checkFormula, elements)]
+        {
+            keep <- sapply(cmpTable$formula, checkFormula, elements)
+            if (negate)
+                keep <- !keep
+            cmpTable <- cmpTable[keep]
+        }
         if (!is.null(fragElements) || !is.null(lossElements))
         {
             keep <- sapply(cmpTable$fragInfo, function(fi)
@@ -297,11 +313,18 @@ setMethod("filter", "compounds", function(obj, minExplainedPeaks = NULL, minScor
                     return(FALSE)
                 return(TRUE)
             })
+            if (negate)
+                keep <- !keep
             cmpTable <- cmpTable[keep]
         }
 
-        if (!is.null(topMost) && nrow(cmpTable) > topMost)
-            cmpTable <- cmpTable[seq_len(topMost)]
+        if (!is.null(topMost))
+        {
+            if (negate)
+                cmpTable <- tail(cmpTable, topMost)
+            else
+                cmpTable <- head(cmpTable, topMost)
+        }
 
         return(cmpTable)
     }, simplify = FALSE)

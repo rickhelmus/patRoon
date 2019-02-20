@@ -80,36 +80,63 @@ test_that("filtering works", {
 
     expect_lte(length(filter(comps, topMost = 1)), length(fGroupsSub))
     expect_lte(length(filter(comps, topMost = 5)), 5 * length(fGroupsSub))
+    expect_lte(length(filter(comps, topMost = 1, negate = TRUE)), length(fGroupsSub))
+    expect_lte(length(filter(comps, topMost = 5, negate = TRUE)), 5 * length(fGroupsSub))
+    expect_true(all(as.data.table(filter(comps, topMost = 1))$score >
+                        as.data.table(filter(comps, topMost = 1, negate = TRUE))$score))
+    
     expect_lte(length(filter(comps, minExplainedPeaks = 2)), length(comps))
     expect_length(filter(comps, minExplainedPeaks = 1E6), 0)
     expect_length(filter(compsEmpty, minExplainedPeaks = 2, topMost = 1), 0)
     expect_equivalent(filter(comps, scoreLimits = list(fragScore = c(-Inf, Inf))), comps)
-
+    expect_lte(length(filter(comps, minExplainedPeaks = 2, negate = TRUE)), length(comps))
+    expect_equivalent(filter(comps, minExplainedPeaks = 1E6, negate = TRUE), comps)
+    expect_length(filter(compsEmpty, minExplainedPeaks = 2, topMost = 1, negate = TRUE), 0)
+    expect_length(filter(comps, scoreLimits = list(fragScore = c(-Inf, Inf)), negate = TRUE), 0)
+    
     expect_length(filter(comps, elements = "C1-100"), length(comps)) # all should contain carbon
     expect_length(filter(comps, elements = c("Na1-100", "C1-100")), length(comps)) # no sodium, but carbon should be there
     expect_length(filter(comps, elements = c("H1-100", "C1-100")), length(comps)) # presence of both shouldn't affect results
     expect_length(filter(comps, elements = "Na1-100"), 0) # no sodium
     expect_length(filter(comps, elements = "Na0-100"), length(comps)) # no sodium, but optional
-
+    expect_length(filter(comps, elements = "C1-100", negate = TRUE), 0)
+    expect_length(filter(comps, elements = c("Na1-100", "C1-100"), negate = TRUE), 0)
+    expect_length(filter(comps, elements = c("H1-100", "C1-100"), negate = TRUE), 0)
+    expect_length(filter(comps, elements = "Na1-100", negate = TRUE), length(comps))
+    expect_length(filter(comps, elements = "Na0-100", negate = TRUE), 0)
+    
     expect_lte(length(filter(compsExplained, fragElements = "C1-100")), length(compsExplained))
-    expect_lt(length(filter(compsExplained, fragElements = "C")), length(compsExplained)) # fragments may contain only single carbon
+    expect_length(filter(compsExplained, fragElements = "C"), 0) # fragments may contain only single carbon
     expect_length(filter(compsExplained, fragElements = "Na1-100"), 0)
     expect_length(filter(compsExplained, fragElements = "Na0-100"), length(compsExplained))
-
+    expect_lte(length(filter(compsExplained, fragElements = "C1-100", negate = TRUE)), length(compsExplained))
+    expect_length(filter(compsExplained, fragElements = "C", negate = TRUE), length(compsExplained))
+    expect_length(filter(compsExplained, fragElements = "Na1-100", negate = TRUE), length(compsExplained))
+    expect_length(filter(compsExplained, fragElements = "Na0-100", negate = TRUE), 0)
+    
     expect_length(filter(compsExplained, lossElements = "C0-100"), length(compsExplained))
     expect_length(filter(compsExplained, lossElements = "Na0-100"), length(compsExplained))
     expect_gt(length(filter(compsExplained, lossElements = "C1-100")), 0) # NL might be empty, at least some should contain carbon though!
     expect_length(filter(compsExplained, lossElements = "Na1-100"), 0) # no sodium
-
+    expect_length(filter(compsExplained, lossElements = "C0-100", negate = TRUE), 0)
+    expect_length(filter(compsExplained, lossElements = "Na0-100", negate = TRUE), 0)
+    expect_gt(length(filter(compsExplained, lossElements = "C1-100", negate = TRUE)), 0)
+    expect_length(filter(compsExplained, lossElements = "Na1-100", negate = TRUE), length(compsExplained))
+    
     skip_if_not(doMetFrag)
-    expect_lt(length(filter(compsMFIso, minScore = 2)), length(compsMFIso))
+    expect_lt(length(filter(compsMFIso, minScore = 0.75)), length(compsMFIso))
+    expect_lt(length(filter(compsMFIso, minScore = 0.75, negate = TRUE)), length(compsMFIso))
     expect_lt(length(filter(compsMFIso, minFragScore = 200)), length(compsMFIso))
-    expect_lt(length(filter(compsMFIso, scoreLimits = list(fragScore = c(200, Inf)))),
+    expect_lt(length(filter(compsMFIso, minFragScore = 200, negate = TRUE)), length(compsMFIso))
+    expect_lt(length(filter(compsMFIso, scoreLimits = list(fragScore = c(200, Inf)), negate = TRUE)),
               length(compsMFIso))
 
     skip_if_not(doSIRIUS)
     expect_lt(length(filter(compsSIR, minScore = -200)), length(compsSIR))
+    expect_lt(length(filter(compsSIR, minScore = -200, negate = TRUE)), length(compsSIR))
     expect_lt(length(filter(compsSIR, scoreLimits = list(score = c(-200, Inf)))), length(compsSIR))
+    expect_lt(length(filter(compsSIR, scoreLimits = list(score = c(-200, Inf)), negate = TRUE)),
+              length(compsSIR))
 })
 
 test_that("basic subsetting", {

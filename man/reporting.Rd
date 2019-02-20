@@ -15,27 +15,30 @@
   reportFGroupsAsRows = TRUE, reportFGroupsAnalysisInfo = TRUE,
   reportFGroupsRetMz = TRUE, reportFeatures = FALSE, formulas = NULL,
   compounds = NULL, compoundNormalizeScores = "max",
-  compoundExclNormScores = "score", compsCluster = NULL,
-  components = NULL, retMin = TRUE, clearPath = FALSE)
+  compoundExclNormScores = c("score", "individualMoNAScore"),
+  compsCluster = NULL, components = NULL, retMin = TRUE,
+  clearPath = FALSE)
 
 \S4method{reportPDF}{featureGroups}(fGroups, path = "report",
   reportFGroups = TRUE, formulas = NULL, reportFormulaSpectra = TRUE,
   compounds = NULL, compoundNormalizeScores = "max",
-  compoundExclNormScores = "score", compoundOnlyUsedScorings = TRUE,
-  compoundTopMost = 5, compsCluster = NULL, components = NULL,
-  MSPeakLists = NULL, retMin = TRUE, EICGrid = c(2, 1),
-  EICRtWindow = 20, EICMzWindow = 0.005, EICTopMost = NULL,
-  EICOnlyPresent = TRUE, clearPath = FALSE)
+  compoundExclNormScores = c("score", "individualMoNAScore"),
+  compoundOnlyUsedScorings = TRUE, compoundTopMost = 5,
+  compsCluster = NULL, components = NULL, MSPeakLists = NULL,
+  retMin = TRUE, EICGrid = c(2, 1), EICRtWindow = 20,
+  EICMzWindow = 0.005, EICTopMost = NULL, EICOnlyPresent = TRUE,
+  clearPath = FALSE)
 
 \S4method{reportMD}{featureGroups}(fGroups, path = "report",
   reportPlots = c("chord", "venn", "upset", "eics", "formulas"),
   formulas = NULL, compounds = NULL, compoundNormalizeScores = "max",
-  compoundExclNormScores = "score", compoundOnlyUsedScorings = TRUE,
-  compoundTopMost = 5, compsCluster = NULL,
-  includeMFWebLinks = "compounds", components = NULL,
-  interactiveHeat = FALSE, MSPeakLists = NULL, retMin = TRUE,
-  EICRtWindow = 20, EICMzWindow = 0.005, EICTopMost = NULL,
-  EICOnlyPresent = TRUE, selfContained = TRUE, optimizePng = FALSE,
+  compoundExclNormScores = c("score", "individualMoNAScore"),
+  compoundOnlyUsedScorings = TRUE, compoundTopMost = 5,
+  compsCluster = NULL, includeMFWebLinks = "compounds",
+  components = NULL, interactiveHeat = FALSE, MSPeakLists = NULL,
+  retMin = TRUE, EICRtWindow = 20, EICMzWindow = 0.005,
+  EICTopMost = NULL, EICOnlyPresent = TRUE, selfContained = TRUE,
+  optimizePng = FALSE,
   maxProcAmount = getOption("patRoon.maxProcAmount"),
   clearPath = FALSE, openReport = TRUE)
 }
@@ -76,8 +79,10 @@ use of \code{filter}).}
 
 \item{compoundExclNormScores}{A \code{character} vector specifying any compound
 scoring names that should \emph{not} be normalized. Set to \code{NULL} to
-normalize all scorings. Note that whether any normalization occurs is set
-by the \code{compoundExclNormScores} argument.}
+normalize all scorings. By default \code{score} and
+\code{individualMoNAScore} are set to mimic the behaviour of the MetFrag web
+interface. Note that whether any normalization occurs is set by the
+\code{compoundExclNormScores} argument.}
 
 \item{retMin}{If \code{TRUE} then report retention times in minutes
 (otehrwise seconds).}

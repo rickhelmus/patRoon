@@ -19,7 +19,7 @@ knitr::opts_chunk$set(
 )
 
 options("patRoon.cache.fileName" = "~/werk/tutorial.sqlite")
-options(patRoon.path.metFragCL = "~/werk/MetFrag2.4.3-CL.jar")
+options(patRoon.path.MetFragCL = "~/werk/MetFrag2.4.3-CL.jar")
 
 options(width=250) # big nr to avoid wrapping text in code chunks
 ```
@@ -180,7 +180,7 @@ The `generateFormulas()` function returns an object that contains formula candid
 Now it is time to actually see what compounds we may be dealing with. In this tutorial we will use [MetFrag] to come up with a list of possible candidates structures for each feature group. Before we can start you have to download the [MetFrag CLI jar file][MetFragCL] and specify its file location: 
 
 ```{r MF_opt,eval=FALSE}
-options(patRoon.path.metFragCL = "~/MetFrag2.4.3-CL.jar") # change to the full path of the MetFrag CLI jar file
+options(patRoon.path.MetFragCL = "~/MetFrag2.4.3-CL.jar") # change to the full path of the MetFrag CLI jar file
 ```
 
 

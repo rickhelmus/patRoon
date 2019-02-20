@@ -16,7 +16,7 @@ plistsEmpty <- getEmptyPLists()
 plistsEmptyMS <- removeMSPlists(plists, "MS")
 fGroupsEmpty <- getEmptyTestFGroups()
 
-doMetFrag <- !is.null(getOption("patRoon.path.metFragCL")) && nzchar(getOption("patRoon.path.metFragCL"))
+doMetFrag <- !is.null(getOption("patRoon.path.MetFragCL")) && nzchar(getOption("patRoon.path.MetFragCL"))
 doSIRIUS <- !is.null(getOption("patRoon.path.SIRIUS")) && nzchar(getOption("patRoon.path.SIRIUS"))
 
 callMF <- function(fGroups, plists, db = mfTestDBPath, to = 300)

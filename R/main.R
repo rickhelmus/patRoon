@@ -60,7 +60,8 @@ NULL
 
 #' Workflow solutions for mass-spectrometry based non-target analysis.
 #'
-#' \Sexpr[results=text,echo=FALSE]{packageDescription("patRoon", fields = "Description")}
+#' \Sexpr[results=text,echo=FALSE]{packageDescription("patRoon", fields =
+#' "Description")}
 #'
 #' @section Package options:
 #'
@@ -82,17 +83,22 @@ NULL
 #'   should be initiated in parallel. A good starting point is the number of
 #'   cores available. Default is set by \code{\link[parallel]{detectCores}}.
 #'
-#'   \item \code{patRoon.path.pwiz}: The path in which the \command{ProteoWizard}
-#'   binaries are installed. Only need to be set if not yet in \option{PATH}.
+#'   \item \code{patRoon.path.pwiz}: The path in which the
+#'   \command{ProteoWizard} binaries are installed. Only need to be set if not
+#'   yet in \option{PATH}.
 #'
 #'   \item \code{patRoon.path.GenForm}: The path to the \command{GenForm}
 #'   executable. If not set (the default) the internal \code{GenForm} binary is
 #'   used. Only set if you want to override the executable.
 #'
-#'   \item \code{patRoon.path.metFragCL}: The complete file path to the metFrag
+#'   \item \code{patRoon.path.MetFragCL}: The complete file path to the MetFrag
 #'   CL \file{jar} file that \emph{must} be set when using
 #'   \code{\link{generateCompoundsMetfrag}}. Example:
 #'   \code{"C:/MetFrag2.4.2-CL.jar"}.
+#'
+#'   \item \code{patRoon.path.MetFragCompTox}: The complete file path to the
+#'   CompTox database \file{csv} file. See \code{\link{generateCompounds}} for
+#'   more details.
 #'
 #'   \item \code{patRoon.path.SIRIUS}: The directory in which SIRIUS is
 #'   installed. Unless the binaries can be located via the \option{PATH}
@@ -116,7 +122,7 @@ NULL
 #'   instead.
 #'
 #'   }
-#'
+#'   
 "_PACKAGE"
 
 #' Analysis information
@@ -595,25 +601,12 @@ NULL
 #'   only the remaining feature groups in the subset are considered.
 #' @param MSPeakLists A \code{\link{MSPeakLists}} object that was generated for
 #'   the supplied \code{fGroups}.
-#' @param database Compound database to use. Valid values are: \code{"pubchem"},
-#'   \code{"chemspider"}, \code{"kegg"}, \code{"sdf"}, \code{"psv"} and
-#'   \code{"csv"}.
-#'
-#'   For compound generation: note that when \code{database="chemspider"}, the
-#'   \code{chemSpiderToken} argument should be set. Similarly, when a local database is
-#'   set (\emph{i.e.} \code{sdf}, \code{psv}, \code{csv}) the
-#'   \code{LocalDatabasePath} value should be set in \code{extraOpts}. Sets the
-#'   \code{MetFragDatabaseType} option.
 #' @param errorRetries Maximum number of retries after an error occurred. This
 #'   may be useful to handle e.g. connection errors.
 #' @param topMost Only keep this number of candidates (per feature group) with
-#'   highest score.
-#'
-#'   For \command{MetFrag}: Set to \code{NULL} to always keep all candidates, however,
-#'   please note that this may result in significant usage of CPU/RAM resources
-#'   for large numbers of candidates.
-#'
-#'   For \command{SIRIUS}: Sets the \option{--candidates} commandline option.
+#'   highest score. Set to \code{NULL} to always keep all candidates,
+#'   however, please note that this may result in significant usage of CPU/RAM
+#'   resources for large numbers of candidates.
 #'
 #' @param extraOpts For \command{MetFrag}: A named \code{list} containing
 #'   further settings to be passed to \code{\link[metfRag]{run.metfrag}}. See
@@ -647,8 +640,9 @@ NULL
 #'   \code{scoreTypes} argument to use all default scorings for PubChem:
 #'   \code{compoundScorings("metfrag", "pubchem", onlyDefault=TRUE)$name}.
 #'
-#'   For all \command{MetFrag} scoring types refer to the \verb{Candidate Scores}
-#'   section on the \href{http://c-ruttkies.github.io/MetFrag/projects/metfragr/}{MetFragR
+#'   For all \command{MetFrag} scoring types refer to the \verb{Candidate
+#'   Scores} section on the
+#'   \href{http://c-ruttkies.github.io/MetFrag/projects/metfragr/}{MetFragR
 #'   homepage}.
 #'
 #' @seealso \code{\link{compounds-class}}

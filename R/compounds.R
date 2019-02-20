@@ -138,7 +138,7 @@ setMethod("$", "compounds", function(x, name)
 #'
 #' @export
 setMethod("as.data.table", "compounds", function(x, fGroups = NULL, fragments = FALSE, normalizeScores = "none",
-                                                 excludeNormScores = NULL)
+                                                 excludeNormScores = c("score", "individualMoNAScore"))
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", null.ok = TRUE, add = ac)

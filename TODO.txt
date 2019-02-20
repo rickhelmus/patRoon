@@ -7,19 +7,14 @@ general
 - negate for all filter methods
 - make algorithm names more consistent
 - convertMSFiles(): add DA functionality
-- DA
-    - generateMSPeakListsDA: find precursor masses with larger window
-    - tests
-        - utils? EICs with export/vdiffr?
-        - test MS peak lists deisotoping?
-- somehow integrate convertMSFiles() in newProject()? And other file types?
-- newProject(): generate Rmd?
 - algorithmObject() generic: for xset, xsa, rc, ...
 - test negative subset indices
 - ref --> blank
 - newProject()
     - add empty anaInfo with comments if no analyses are selected
     - check if RStudio is running
+    - generate Rmd?
+    - somehow integrate convertMSFiles() in newProject()? And other file types?
 - convertMSFiles(): hint if dirs should be TRUE? Or do it automatically if a file is a dir?
 - update tests for new OpenMS/MetFrag
 
@@ -46,7 +41,6 @@ features
     - cache?
 - progressbar and parallel enviPick
 - OpenMS: Support newest grouper? Update tests to newest version
-- Fix plotUpSet with <2 rgroups
 - as.data.table for fGroups is slow?
 - tests to verify getXCMSSet...
 - filter()
@@ -61,6 +55,11 @@ MSPeakLists
 - report spectra/tables?
 - collapse averagedPeakLists
 - test avg params
+- DA
+    - generateMSPeakListsDA: find precursor masses with larger window
+    - tests
+        - utils? EICs with export/vdiffr?
+        - test MS peak lists deisotoping?
 - add pruneMissingPrecursorMS to filter()?
 - filter by MSMS
 - metadata for Bruker peaklists?
@@ -68,18 +67,14 @@ MSPeakLists
 
 
 compounds
-- patRoon.path.metFragCL --> patRoon.path.MetFragCL
 - clarify that sirius headless 4.0 now also works
 - do something with sirius fingerprints?
 - fix compoundViewer
 - MetFrag: (buggy) trivial name fetching not needed anymore?
 - convert score csv to internal data?
 - SIRIUS: use --auto-charge instead of manually fixing charge of fragments (or not? conflicting docs on what it does)
-- document database="comptox"?
-- SIRIUS: topMostFormulas argument
 - test score normalization?
-- add new MF stat and other scorings
-- don't normalize scorings that are not by MetFrag? (e.g. OfflineIndividualMoNAScore)
+- add new MF stat and other scorings and make sure default normalization equals that of MF web
 
 
 formulas

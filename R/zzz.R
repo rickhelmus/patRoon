@@ -5,7 +5,8 @@ defaultPkgOpts <- function(pkgname)
                 maxProcAmount = parallel::detectCores(),
                 path.pwiz = "",
                 path.GenForm = "",
-                path.metFragCL = "",
+                path.MetFragCL = getOption("patRoon.path.metFragCL", ""), # backwards compat
+                path.MetFragCompTox = "",
                 path.SIRIUS = "",
                 path.OpenMS = "",
                 path.pngquant = "")

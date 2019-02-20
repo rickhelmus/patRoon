@@ -367,7 +367,7 @@ utils <- setRefClass("utilsInst", methods = list(
         extDeps$path[1] <- findPWiz()
         
         extDeps <- rbind(extDeps, list(name = "MetFrag CL", command = "", copt = "",
-                                       path = getOption("patRoon.path.metFragCL", "")))
+                                       path = getOption("patRoon.path.MetFragCL", "")))
         
         present <- nzchar(extDeps$path) & file.exists(extDeps$path)
         instChoices <- paste(extDeps$name, ifelse(present, "(seems installed)", "(doesn't seem to be installed)"))
@@ -404,7 +404,7 @@ utils <- setRefClass("utilsInst", methods = list(
                 if (download.file(url, dest) != 0)
                     warning(paste("Failed to download MetFrag CL from ", url))
                 else
-                    setOpts <- c(setOpts, list(patRoon.path.metFragCL = dest))
+                    setOpts <- c(setOpts, list(patRoon.path.MetFragCL = dest))
             }
             
             if ("SIRIUS" %in% instWhat)

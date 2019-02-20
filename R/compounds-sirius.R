@@ -90,16 +90,18 @@ processSiriusCompounds <- function(cmd, exitStatus, retries)
 #'   \command{CSI:FingerID}. If \code{NULL}, the value of the
 #'   \code{formulaDatabase} parameter will be used or \code{"pubchem"} when that
 #'   is also \code{NULL}. Sets the \option{--fingerid-db} option.
+#' @param topMostFormulas Do not return more than this number of candidate
+#'   formulae. Note that only compounds for these formulae will be searched.
+#'   Sets the \option{--candidates} commandline option.
 #'
 #' @references \insertRef{Duhrkop2015}{patRoon} \cr\cr
-#'   \insertRef{Duhrkop2015-2}{patRoon} \cr\cr
-#'   \insertRef{Bcker2008}{patRoon}
+#'   \insertRef{Duhrkop2015-2}{patRoon} \cr\cr \insertRef{Bcker2008}{patRoon}
 #'
 #' @rdname compound-generation
 #' @export
 generateCompoundsSirius <- function(fGroups, MSPeakLists, relMzDev = 5, adduct = "[M+H]+", elements = "CHNOP",
                                     profile = "qtof", formulaDatabase = NULL, fingerIDDatabase = "pubchem",
-                                    noise = NULL, errorRetries = 2, topMost = 100, extraOpts = NULL,
+                                    noise = NULL, errorRetries = 2, topMost = 100, topMostFormulas = 5, extraOpts = NULL,
                                     logPath = file.path("log", "sirius"),
                                     maxProcAmount = getOption("patRoon.maxProcAmount"))
 {
@@ -112,6 +114,7 @@ generateCompoundsSirius <- function(fGroups, MSPeakLists, relMzDev = 5, adduct =
     checkmate::assertNumber(noise, lower = 0, finite = TRUE, null.ok = TRUE, add = ac)
     checkmate::assertCount(errorRetries, add = ac)
     checkmate::assertCount(topMost, positive = TRUE, add = ac)
+    checkmate::assertCount(topMostFormulas, positive = TRUE, add = ac)
     checkmate::assertCharacter(extraOpts, null.ok = TRUE, add = ac)
     assertMultiProcArgs(logPath, maxProcAmount, add = ac)
     checkmate::reportAssertions(ac)
@@ -128,7 +131,7 @@ generateCompoundsSirius <- function(fGroups, MSPeakLists, relMzDev = 5, adduct =
 
     cacheDB <- openCacheDBScope()
     setHash <- makeHash(fGroups, MSPeakLists, profile, adduct, relMzDev, elements, formulaDatabase,
-                        fingerIDDatabase, noise, topMost, extraOpts)
+                        fingerIDDatabase, noise, topMost, topMostFormulas, extraOpts)
     cachedSet <- loadCacheSet("compoundsSirius", setHash, cacheDB)
     resultHashes <- vector("character", gCount)
     names(resultHashes) <- gNames
@@ -146,12 +149,13 @@ generateCompoundsSirius <- function(fGroups, MSPeakLists, relMzDev = 5, adduct =
             return(NULL)
 
         hash <- makeHash(plmz, plist, profile, adduct, relMzDev, elements,
-                         formulaDatabase, fingerIDDatabase, noise, topMost, extraOpts)
+                         formulaDatabase, fingerIDDatabase, noise, topMost,
+                         topMostFormulas, extraOpts)
         resultHashes[[grp]] <<- hash
 
         cmd <- getSiriusCommand(plmz, plist$MS, plist$MSMS, profile,
                                 adduct, relMzDev, elements, formulaDatabase, noise, TRUE,
-                                fingerIDDatabase, topMost, extraOpts)
+                                fingerIDDatabase, topMostFormulas, extraOpts)
         db <- if (!is.null(fingerIDDatabase)) fingerIDDatabase else if (!is.null(formulaDatabase)) formulaDatabase else "pubchem"
         logf <- if (!is.null(logPath)) file.path(logPath, paste0("sirius-comp-", grp, ".txt")) else NULL
         logfe <- if (!is.null(logPath)) file.path(logPath, paste0("sirius-comp-err-", grp, ".txt")) else NULL

@@ -2,8 +2,10 @@
 # - convert to wizard style?
 # - shiny/tcltk GUI?
 # - optionally don't unload packages? optionally clear symbols?
-# - warn old pwiz?  --> current give priority to registry
+# - warn old pwiz?  --> currently give priority to registry
 # - backup ~/.Rprofile
+# - allow patRoon GitHub installation of regardless of repos?
+# - Print instructions if user does not want to edit Rprofile. Always generate patRoon Rprof script?
 
 
 # put utility functions in separate environment
@@ -27,13 +29,28 @@ utils <- setRefClass("utilsInst", methods = list(
     
     packagesNotInstalled = function(pkgs) pkgs[!sapply(pkgs, utils$packageInstalled)],
     
-    ensureInstPath = function(instPath)
+    instPathRLib = function(instPath) file.path(instPath, "library"),
+    
+    ensureInstPath = function(instPath, rlib = FALSE)
     {
+        if (rlib)
+            instPath <- instPathRLib(instPath)
         if (!dir.exists(instPath))
         {
             if (!dir.create(instPath, recursive = TRUE))
                 stop(sprintf("Failed to create external dependency directory '%s'", instPath))
         }
+    },
+    
+    getLibPaths = function(instPath, pkgWhere)
+    {
+        lpaths <- .libPaths()
+        if (pkgWhere == "pDepsIso")
+        {
+            utils$ensureInstPath(instPath, TRUE)
+            lpaths <- c(utils$instPathRLib(instPath), .libPaths())
+        }
+        return(lpaths)
     },
     
     unloadAllPackages = function()
@@ -55,7 +72,7 @@ utils <- setRefClass("utilsInst", methods = list(
         cat(hd, txt, hd, sep = "\n")
     },
     
-    checkPackages = function(pkgs, lib, ask = TRUE, type = "installp", ghRepos = NULL, force = FALSE, ...)
+    checkPackages = function(pkgs, pkgWhere, ask = TRUE, type = "installp", repos = NULL, force = FALSE, ...)
     {
         if (force)
             notInstalled <- pkgs
@@ -69,25 +86,37 @@ utils <- setRefClass("utilsInst", methods = list(
                                          paste0(notInstalled, collapse = ", "))))
             stop("Aborted. Please install the package(s) manually.")
         
-        if (type == "bioc")
+        if (pkgWhere == "normal")
         {
-            cmd <- "BiocManager::install"
-            args <- list(notInstalled, ask = TRUE)
-        }
-        else if (type == "gh")
-        {
-            cmd <- "remotes::install_github"
-            args <- c(list(paste(ghRepos, notInstalled, sep = "/")), list(upgrade_dependencies = FALSE, force = force))
+            if (type == "bioc")
+            {
+                cmd <- "BiocManager::install"
+                args <- list(notInstalled, ask = TRUE)
+            }
+            else if (type == "gh")
+            {
+                cmd <- "remotes::install_github"
+                args <- c(list(paste(repos, notInstalled, sep = "/")), list(upgrade_dependencies = FALSE, force = force))
+            }
+            else
+            {
+                cmd <- "install.packages"
+                args <- list(notInstalled)
+                if (!is.null(repos))
+                    args <- c(args, list(repos = repos))
+            }
         }
         else
         {
             cmd <- "install.packages"
-            args <- list(notInstalled)
+            args <- c(list(repos = "https://rickhelmus.github.io/patRoonDeps/", type = "binary"),
+                      list(notInstalled))
+            
+            # shouldn't be necessary as .libPaths was already set
+            # if (pkgWhere == "pDepsIso")
+            #     args <- c(args, list(lib = instPathRLib(instPath)))
         }
-        
         args <- c(args, list(...))
-        if (!is.null(lib))
-            args <- c(args, list(lib = lib))
         
         argNames <- names(args)
         argVals <- quoteVariables(args)
@@ -145,7 +174,7 @@ utils <- setRefClass("utilsInst", methods = list(
         return(cmd)
     },
     
-    addToRProfile = function(setOpts, JavaPath)
+    addToRProfile = function(instPath, setOpts, JavaPath, pkgWhere)
     {
         # UNDONE: need this?
         if (FALSE && length(setOpts) > 0)
@@ -159,7 +188,7 @@ utils <- setRefClass("utilsInst", methods = list(
             }
         }
         
-        if (length(setOpts) > 0 || nzchar(JavaPath))
+        if (length(setOpts) > 0 || nzchar(JavaPath) || pkgWhere == "pDepsIso")
         {
             RProfPath <- "~/.Rprofile"
             ownRProfPath <- "~/.Rprofile-patRoon.R"
@@ -175,7 +204,9 @@ utils <- setRefClass("utilsInst", methods = list(
             if (nzchar(JavaPath))
                 RProfFile <- c(RProfFile, sprintf("Sys.setenv(PATH = paste(Sys.getenv('PATH'), '%s', sep = ';'))",
                                                   fixPath(file.path(JavaPath, "bin"))))
-
+            if (pkgWhere == "pDepsIso") # UNDONE: add before or after existing lib paths?
+                RProfFile <- c(RProfFile, sprintf(".libPaths(c(.libPaths(), \"%s\"))",
+                                                  fixPath(instPathRLib(instPath))))
             if (file.exists(ownRProfPath))
             {
                 # file already exists, make sure to retain options that are already set
@@ -188,8 +219,8 @@ utils <- setRefClass("utilsInst", methods = list(
                 f <- f[!grepl("^#", f)] # remove comments
                 if (length(setOpts) > 0)
                     f <- f[!grepl(paste0(names(setOpts), collapse = "|"), f)]
-                if (nzchar(JavaPath))
-                    f <- f[!grepl("Sys.setenv", f)]
+                if (pkgWhere == "pDepsIso")
+                    f <- f[!grepl("libPaths", f)]
                 
                 if (length(f) > 0)
                     RProfFile <- c(RProfFile, f) # add the rest of the existing contents
@@ -258,9 +289,12 @@ utils <- setRefClass("utilsInst", methods = list(
         return(NULL)
     },
     
-    installRDeps = function(lib)
+    installRDeps = function(instPath, pkgWhere)
     {
         printHeader("Pre-Installing R dependencies...")
+        
+        curLPaths <- .libPaths(); on.exit(.libPaths(curLPaths))
+        .libPaths(getLibPaths(instPath, pkgWhere))
         
         packagesCRAN <- packagesNotInstalled(c("installr", "BiocManager", "rJava", "remotes", "pkgbuild"))
         packagesBioC <- packagesNotInstalled(c("mzR", "xcms", "CAMERA"))
@@ -303,23 +337,23 @@ utils <- setRefClass("utilsInst", methods = list(
             if (is.null(instWhat))
                 stop("Please install the mandatory packages manually.")
             
-            checkPackages(packagesCRAN, lib, ask = FALSE)
-            checkPackages(packagesBioC, lib, ask = FALSE, type = "bioc")
+            checkPackages(packagesCRAN, pkgWhere, ask = FALSE)
+            checkPackages(packagesBioC, pkgWhere, ask = FALSE, type = "bioc")
         }
             
         if (!is.null(instWhat))
         {
             if (any(c("all", "RDCOMClient") %in% instWhat))
-                checkPackages("RDCOMClient", lib, ask = FALSE, repos = "http://www.omegahat.net/R")
+                checkPackages("RDCOMClient", pkgWhere, ask = FALSE, repos = "http://www.omegahat.net/R")
             
             if (any(c("all", "RAMClustR") %in% instWhat))
-                checkPackages("RAMClustR", lib, ask = FALSE, type = "gh", ghRepos = "cbroeckl", build_vignettes = TRUE, dependencies = TRUE)            
+                checkPackages("RAMClustR", pkgWhere, ask = FALSE, type = "gh", repos = "cbroeckl", build_vignettes = TRUE, dependencies = TRUE)            
         }
 
     },
     
     # returns TRUE if Java path needs to be added to Rprofile
-    installExtDeps = function(instPath)
+    installExtDeps = function(instPath, pkgWhere)
     {
         printHeader("Installing external dependencies...")
         
@@ -341,7 +375,8 @@ utils <- setRefClass("utilsInst", methods = list(
                 cat("NOTE: Please make sure to install a proper JDK before loading patRoon.\n")
         }
         
-        if (!suppressMessages(pkgbuild::has_rtools()))
+        # UNDONE: re-enable if we allow github installation of patRoon regardless of repos
+        if (pkgWhere == "normal" && !suppressMessages(pkgbuild::has_rtools()))
         {
             if (!yesNo("Rtools doesn't seem to be installed. This is necessary to proceed the installation. Do you want to install Rtools now?"))
                 stop("Please install Rtools manually and re-run the installer.")
@@ -355,7 +390,7 @@ utils <- setRefClass("utilsInst", methods = list(
     # returns which options should be set in Rprofile
     installTools = function(instPath)
     {
-        printHeader("Installing external dependencies...")
+        printHeader("Installing external tools...")
         
         setOpts <- list()
         
@@ -364,7 +399,10 @@ utils <- setRefClass("utilsInst", methods = list(
                               copt = c("pwiz", "OpenMS", "SIRIUS", "pngquant"),
                               stringsAsFactors = FALSE)
         extDeps$path <- mapply(extDeps$command, extDeps$copt, FUN = utils$getCommandWithOptPath)
-        extDeps$path[1] <- findPWiz()
+        
+        pwiz <- findPWiz()
+        if (!is.null(pwiz))
+            extDeps$path[1] <- findPWiz()
         
         extDeps <- rbind(extDeps, list(name = "MetFrag CL", command = "", copt = "",
                                        path = getOption("patRoon.path.MetFragCL", "")))
@@ -469,13 +507,16 @@ utils <- setRefClass("utilsInst", methods = list(
         return(setOpts)
     },
     
-    installPatRoonPackages = function(exampleData, lib, force)
+    installPatRoonPackages = function(instPath, exampleData, pkgWhere, force)
     {
         printHeader("Installing patRoon R package(s)...")
         
-        checkPackages("patRoon", lib, ask = FALSE, type = "gh", ghRepos = "rickhelmus", force = force)
+        curLPaths <- .libPaths(); on.exit(.libPaths(curLPaths))
+        .libPaths(getLibPaths(instPath, pkgWhere))
+        
+        checkPackages("patRoon", pkgWhere, ask = FALSE, type = "gh", repos = "rickhelmus", force = force)
         if (exampleData)
-            checkPackages("patRoonData", lib, ask = FALSE, type = "gh", ghRepos = "rickhelmus", force = force)
+            checkPackages("patRoonData", pkgWhere, ask = FALSE, type = "gh", repos = "rickhelmus", force = force)
         invisible(NULL)
     }
 ))()
@@ -483,7 +524,7 @@ utils <- setRefClass("utilsInst", methods = list(
 
 installPatRoon <- function(what = c("packages", "tools", "deps", "patRoon"),
                            instPath = "~/patRoon-install", exampleData = TRUE,
-                           lib = NULL, force = FALSE)
+                           force = FALSE)
 {
     if (Sys.info()[["sysname"]] != "Windows" || Sys.info()[["machine"]] != "x86-64")
         stop("Sorry, this script only works on a 64 bit Windows system at the moment.")
@@ -505,22 +546,45 @@ installPatRoon <- function(what = c("packages", "tools", "deps", "patRoon"),
         paste("  - what:", paste0(what, collapse = ", ")),
         paste("  - Installation path for external dependencies:", instPath),
         paste("  - Install patRoon example data:", exampleData),
-        paste("  - R library location:", if (is.null(lib)) "default" else paste0(lib, collapse = ", ")),
         sep = "\n")
     
     cat("\nNOTE: It is best to run this in a _fresh_ R session!\n")
     
     instPath <- utils$fixPath(instPath)
     
+    if (any(c("packages", "patRoon") %in% what))
+    {
+        # UNDONE: add option to always install patRoon from GH?
+        
+        cat("patRoon and its R package dependencies can either be installed from regular repositories (CRAN, BioConductor)",
+            "or from the patRoonDeps repository. The former ensures that you will always get the latest package versions.",
+            "On the other hand, using the patRoonDeps repository minimizes the risk on installation errors.",
+            "Furthermore, when using the patRoonDeps repository you can choose to use a local R library which is only used",
+            "if specified explicitly and will therefore not interfere with your current installed packages.",
+            "NOTE: patRoon deps currently only works with R 3.5.\n")
+        
+        choices <- c(pDepsIso = "Install from patRoonDeps repository (inside an isolated R library)",
+                     pDeps = "Install from patRoonDeps repository (inside your default R library)",
+                     normal = "Install from standard repositories (CRAN, BioConductor, GitHub)")
+        pkgWhere <- menu(choices, title = "(From) Where do you want to install patRoon and its dependencies? If unsure, choose 1.")
+        
+        if (pkgWhere == 0)
+            stop("Aborted")
+        
+        pkgWhere <- names(choices)[pkgWhere]
+    }
+    
+    
     didJava <- FALSE; setOpts <- list()
     if ("packages" %in% what)
-        utils$installRDeps(lib)
+        utils$installRDeps(instPath, pkgWhere)
     if ("deps" %in% what)
-        didJava <- utils$installExtDeps(instPath)
+        didJava <- utils$installExtDeps(instPath, pkgWhere)
+    
     if ("tools" %in% what)
         setOpts <- utils$installTools(instPath)
     
-    if ((didJava || length(setOpts) > 0) &&
+    if ((didJava || length(setOpts) > 0 || pkgWhere == "pDepsIso") &&
         utils$yesNo(paste("The installer can add code to your ~/.Rprofile file to automatically configure the location of downloaded tools and/or Java.",
                           "An additional file will be created (~/Rprofile-patRoon.R) that will set the necessary options and is sourced from your ~/.Rprofile",
                           "If you do not do this you will have to set the location of downloaded tools (e.g. MetFrag, SIRIUS) and/or Java manually (not recommended)",
@@ -528,14 +592,18 @@ installPatRoon <- function(what = c("packages", "tools", "deps", "patRoon"),
                           sep = "\n")))
     {
         jPath <- Sys.getenv("JAVA_HOME") # should be set by installr
-        utils$addToRProfile(setOpts, if (didJava) jPath else "")
+        utils$addToRProfile(instPath, setOpts, if (didJava) jPath else "", pkgWhere)
     }
-        
     
     if ("patRoon" %in% what)
-        utils$installPatRoonPackages(exampleData, lib, force)
+        utils$installPatRoonPackages(instPath, exampleData, pkgWhere, force) 
     
     utils$printHeader("All done! You may need to restart R.")
+    
+    # if (pkgWhere == "pDepsIso")
+    #     cat("IMPORTANT: Packages where installed in a separate R library.",
+    #         "Please make sure that you add the following line to your script before trying to load patRoon:",
+    #         sprintf(".libPaths(c(\"%s\", .libPaths()))", utils$instPathRLib(instPath)))
     
     invisible(NULL)
 }

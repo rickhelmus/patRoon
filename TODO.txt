@@ -6,7 +6,6 @@ general
 - setAs() for as.data.table()/as.data.frame() methods
 - negate for all filter methods
 - make algorithm names more consistent
-- convertMSFiles(): add DA functionality
 - algorithmObject() generic: for xset, xsa, rc, ...
 - test negative subset indices
 - ref --> blank
@@ -15,7 +14,10 @@ general
     - check if RStudio is running
     - generate Rmd?
     - somehow integrate convertMSFiles() in newProject()? And other file types?
-- convertMSFiles(): hint if dirs should be TRUE? Or do it automatically if a file is a dir?
+- convertMSFiles()
+    - hint if dirs should be TRUE? Or do it automatically if a file is a dir?
+    - add DA functionality?
+    - check registry for location on windows
 - update tests for new OpenMS/MetFrag
 
 

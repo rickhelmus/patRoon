@@ -75,6 +75,7 @@ compounds
 - SIRIUS: use --auto-charge instead of manually fixing charge of fragments (or not? conflicting docs on what it does)
 - test score normalization?
 - add new MF stat and other scorings and make sure default normalization equals that of MF web
+- improve formula scoring
 
 
 formulas
@@ -96,6 +97,8 @@ components
 reporting
 - add more options to reportPlots argument of reportMD()?
 - reportPDF/reportMD: MS only formulas are not reported?
+- don't plot UpSet and Chord if <3 rGroups?
+- subscripted formulas in annotated peak list?
 
 
 Cleanup

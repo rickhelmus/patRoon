@@ -6,6 +6,7 @@
 # - backup ~/.Rprofile
 # - allow patRoon GitHub installation of regardless of repos?
 # - Print instructions if user does not want to edit Rprofile. Always generate patRoon Rprof script?
+# - Always move Rprof marker to end of file
 
 
 # put utility functions in separate environment
@@ -174,7 +175,7 @@ utils <- setRefClass("utilsInst", methods = list(
         return(cmd)
     },
     
-    addToRProfile = function(instPath, setOpts, JavaPath, pkgWhere)
+    addToRProfile = function(instPath, setOpts, JavaPath, isolatedPackages)
     {
         # UNDONE: need this?
         if (FALSE && length(setOpts) > 0)
@@ -188,7 +189,7 @@ utils <- setRefClass("utilsInst", methods = list(
             }
         }
         
-        if (length(setOpts) > 0 || nzchar(JavaPath) || pkgWhere == "pDepsIso")
+        if (length(setOpts) > 0 || nzchar(JavaPath) || isolatedPackages)
         {
             RProfPath <- "~/.Rprofile"
             ownRProfPath <- "~/.Rprofile-patRoon.R"
@@ -204,7 +205,7 @@ utils <- setRefClass("utilsInst", methods = list(
             if (nzchar(JavaPath))
                 RProfFile <- c(RProfFile, sprintf("Sys.setenv(PATH = paste(Sys.getenv('PATH'), '%s', sep = ';'))",
                                                   fixPath(file.path(JavaPath, "bin"))))
-            if (pkgWhere == "pDepsIso") # UNDONE: add before or after existing lib paths?
+            if (isolatedPackages) # UNDONE: add before or after existing lib paths?
                 RProfFile <- c(RProfFile, sprintf(".libPaths(c(.libPaths(), \"%s\"))",
                                                   fixPath(instPathRLib(instPath))))
             if (file.exists(ownRProfPath))
@@ -219,7 +220,7 @@ utils <- setRefClass("utilsInst", methods = list(
                 f <- f[!grepl("^#", f)] # remove comments
                 if (length(setOpts) > 0)
                     f <- f[!grepl(paste0(names(setOpts), collapse = "|"), f)]
-                if (pkgWhere == "pDepsIso")
+                if (isolatedPackages)
                     f <- f[!grepl("libPaths", f)]
                 
                 if (length(f) > 0)
@@ -353,7 +354,7 @@ utils <- setRefClass("utilsInst", methods = list(
     },
     
     # returns TRUE if Java path needs to be added to Rprofile
-    installExtDeps = function(instPath, pkgWhere)
+    installExtDeps = function(instPath, checkRtools)
     {
         printHeader("Installing external dependencies...")
         
@@ -375,8 +376,7 @@ utils <- setRefClass("utilsInst", methods = list(
                 cat("NOTE: Please make sure to install a proper JDK before loading patRoon.\n")
         }
         
-        # UNDONE: re-enable if we allow github installation of patRoon regardless of repos
-        if (pkgWhere == "normal" && !suppressMessages(pkgbuild::has_rtools()))
+        if (checkRtools && !suppressMessages(pkgbuild::has_rtools()))
         {
             if (!yesNo("Rtools doesn't seem to be installed. This is necessary to proceed the installation. Do you want to install Rtools now?"))
                 stop("Please install Rtools manually and re-run the installer.")
@@ -406,12 +406,14 @@ utils <- setRefClass("utilsInst", methods = list(
         
         extDeps <- rbind(extDeps, list(name = "MetFrag CL", command = "", copt = "",
                                        path = getOption("patRoon.path.MetFragCL", "")))
+        extDeps <- rbind(extDeps, list(name = "MetFrag CompTox DB", command = "", copt = "",
+                                       path = getOption("patRoon.path.MetFragCompTox", "")))
         
         present <- nzchar(extDeps$path) & file.exists(extDeps$path)
         instChoices <- paste(extDeps$name, ifelse(present, "(seems installed)", "(doesn't seem to be installed)"))
         choices <- c(instChoices, "Missing", "All", "None")
         instWhat <- select.list(choices, instChoices[!present], TRUE, graphics = FALSE,
-                                title = "Which external dependencies should be installed?")
+                                title = "Which external tools should be installed?")
         
         if ("All" %in% instWhat)
             instWhat <- instChoices
@@ -426,6 +428,29 @@ utils <- setRefClass("utilsInst", methods = list(
         
         if (length(instWhat) > 0)
         {
+            downloadFile <- function(what, url, doUnzip)
+            {
+                dest <- file.path(instPath, basename(url))
+                if (download.file(url, dest) != 0)
+                {
+                    warning(sprintf("Failed to download %s from '%s'", what, url))
+                    return(NULL)
+                }
+                else if (doUnzip)
+                {
+                    zipdest <- fixPath(file.path(instPath, tools::file_path_sans_ext(basename(url))))
+                    unzip(dest, exdir = zipdest)
+                    if (!file.exists(zipdest))
+                    {
+                        warning(paste("Failed to extract %s to '%s'", what, instPath))
+                        return(NULL)
+                    }
+                    unlink(dest)
+                    return(zipdest)
+                }
+                return(dest)
+            }
+            
             ensureInstPath(instPath)
             
             if ("OpenMS" %in% instWhat)
@@ -437,48 +462,35 @@ utils <- setRefClass("utilsInst", methods = list(
             
             if ("MetFrag CL" %in% instWhat)
             {
-                url <- "http://msbi.ipb-halle.de/~cruttkie/metfrag/MetFrag2.4.5-CL.jar"
-                dest <- fixPath(file.path(instPath, basename(url)))
-                if (download.file(url, dest) != 0)
-                    warning(paste("Failed to download MetFrag CL from ", url))
-                else
-                    setOpts <- c(setOpts, list(patRoon.path.MetFragCL = dest))
+                down <- downloadFile("MetFrag CL", "http://msbi.ipb-halle.de/~cruttkie/metfrag/MetFrag2.4.5-CL.jar", FALSE)
+                if (!is.null(down))
+                    setOpts <- c(setOpts, list(patRoon.path.MetFragCL = down))
+            }
+            
+            if ("MetFrag CompTox DB" %in% instWhat)
+            {
+                down <- downloadFile("MetFrag CompTox database", "ftp://newftp.epa.gov/COMPTOX/Sustainable_Chemistry_Data/Chemistry_Dashboard/MetFrag_metadata_files/DSSTox_01May18_Full_SelectMetaDataPlus.zip",
+                                     TRUE)
+                if (!is.null(down))
+                {
+                    setOpts <- c(setOpts,
+                                 list(patRoon.path.MetFragCompTox = fixPath(file.path(down, "DSSTox_01May18_Full_SelectMetaDataPlus.csv"))))
+                }
             }
             
             if ("SIRIUS" %in% instWhat)
             {
-                url <- "https://bio.informatik.uni-jena.de/repository/dist-release-local/de/unijena/bioinf/ms/sirius/4.0.1/sirius-4.0.1-win64-headless.zip"
-                dest <- file.path(instPath, basename(url))
-                if (download.file(url, dest) != 0)
-                    warning(paste("Failed to download SIRIUS from ", url))
-                else
-                {
-                    unzip(dest, exdir = instPath)
-                    zipdest <- fixPath(file.path(instPath, "sirius-win64-headless-4.0.1"))
-                    if (!file.exists(zipdest))
-                        warning(paste("Failed to extract SIRIUS to ", instPath))
-                    else
-                        setOpts <- c(setOpts, list(patRoon.path.SIRIUS = zipdest))
-                    unlink(dest)
-                }
+                down <- downloadFile("SIRIUS", "https://bio.informatik.uni-jena.de/repository/dist-release-local/de/unijena/bioinf/ms/sirius/4.0.1/sirius-4.0.1-win64-headless.zip",
+                                     TRUE)
+                if (!is.null(down))
+                    setOpts <- c(setOpts, list(patRoon.path.SIRIUS = fixPath(file.path(down, "sirius-win64-4.0.1"))))
             }
             
             if ("pngquant" %in% instWhat)
             {
-                url <- "https://pngquant.org/pngquant-windows.zip"
-                dest <- file.path(instPath, basename(url))
-                if (download.file(url, dest) != 0)
-                    warning(paste("Failed to download pngquant from ", url))
-                else
-                {
-                    unzip(dest, exdir = instPath)
-                    zipdest <- fixPath(file.path(instPath, "pngquant"))
-                    if (!file.exists(zipdest))
-                        warning(paste("Failed to extract pngquant to ", instPath))
-                    else
-                        setOpts <- c(setOpts, list(patRoon.path.pngquant = zipdest))
-                    unlink(dest)
-                }
+                down <- downloadFile("SIRIUS", "https://pngquant.org/pngquant-windows.zip", TRUE)
+                if (!is.null(down))
+                    setOpts <- c(setOpts, list(patRoon.path.pngquant = fixPath(file.path(down, "pngquant"))))
             }
             
             if ("ProteoWizard" %in% instWhat &&
@@ -552,6 +564,7 @@ installPatRoon <- function(what = c("packages", "tools", "deps", "patRoon"),
     
     instPath <- utils$fixPath(instPath)
     
+    pkgWhere <- "normal"
     if (any(c("packages", "patRoon") %in% what))
     {
         # UNDONE: add option to always install patRoon from GH?
@@ -574,12 +587,14 @@ installPatRoon <- function(what = c("packages", "tools", "deps", "patRoon"),
         pkgWhere <- names(choices)[pkgWhere]
     }
     
-    
     didJava <- FALSE; setOpts <- list()
     if ("packages" %in% what)
         utils$installRDeps(instPath, pkgWhere)
     if ("deps" %in% what)
-        didJava <- utils$installExtDeps(instPath, pkgWhere)
+    {
+        # UNDONE: enable Rtools if we allow github installation of patRoon regardless of repos
+        didJava <- utils$installExtDeps(instPath, "patRoon" %in% what && pkgWhere == "normal")
+    }
     
     if ("tools" %in% what)
         setOpts <- utils$installTools(instPath)
@@ -592,7 +607,7 @@ installPatRoon <- function(what = c("packages", "tools", "deps", "patRoon"),
                           sep = "\n")))
     {
         jPath <- Sys.getenv("JAVA_HOME") # should be set by installr
-        utils$addToRProfile(instPath, setOpts, if (didJava) jPath else "", pkgWhere)
+        utils$addToRProfile(instPath, setOpts, if (didJava) jPath else "", pkgWhere == "pDepsIso")
     }
     
     if ("patRoon" %in% what)

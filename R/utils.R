@@ -111,7 +111,7 @@ executeCommand <- function(cmd, args = character(), ...)
     return(system2(cmd, sapply(args, shQuote), ...))
 }
 
-getCommandWithOptPath <- function(cmd, opt)
+getCommandWithOptPath <- function(cmd, opt, verify = TRUE)
 {
     if (Sys.info()[["sysname"]] == "Windows")
         cmd <- paste0(cmd, ".exe") # add file extension for Windows
@@ -122,13 +122,22 @@ getCommandWithOptPath <- function(cmd, opt)
     {
         ret <- file.path(path.expand(path), cmd)
         if (!file.exists(ret))
-            stop(sprintf("Cannot find '%s'. Is the option '%s' set correctly?", ret, opt))
+        {
+            if (verify)
+                stop(sprintf("Cannot find '%s'. Is the option '%s' set correctly?", ret, opt))
+            return(NULL)
+        }
+            
         return(ret)
     }
 
     # assume command is in PATH --> no need to add path
     if (!nzchar(Sys.which(cmd)))
-        stop(sprintf("Cannot find '%s'. Either add the correct file location to the PATH environment variable or set '%s' with option().", cmd, opt))
+    {
+        if (verify)
+            stop(sprintf("Cannot find '%s'. Either add the correct file location to the PATH environment variable or set '%s' with option().", cmd, opt))
+        return(NULL)
+    }
 
     return(cmd)
 }
@@ -829,3 +838,54 @@ getAllMethods <- function(gen)
 
 NULLToZero <- function(x) if (is.null(x)) 0 else x
 zeroToNULL <- function(x) if (is.numeric(x) && x == 0) NULL else x
+
+#' Verifies if all dependencies are installed properly and instructs the user if
+#' this is not the case.
+#' @export
+verifyDependencies <- function()
+{
+    # UNDONE: for now just check one command-line tool of a software package
+    # UNDONE: skip GenForm for now? Should be present as embedded binary.
+    
+    OK <- TRUE
+    check <- function(name, path, opt)
+    {
+        pleaseSet <- sprintf("Please set the '%s' option.", opt)
+        printf("Checking %s... ", name)
+        if (is.null(path) || !nzchar(path))
+        {
+            cat("not found or configured", pleaseSet, "\n")
+            OK <<- FALSE
+        }
+        else
+        {
+            # NOTE: dirname point to current path if getCommandWithOptPath() found it in PATH
+            dn <- dirname(path)
+            if ((nzchar(dn) && dn != "." && !file.exists(path)) || !nzchar(Sys.which(path)))
+            {
+                cat("configured path does not exist!", pleaseSet, "\n")
+                OK <<- FALSE
+            }
+            else if (nzchar(dn) && dn != ".")
+                printf("found in '%s'\n", dn)
+            else
+                cat("found!\n")
+        }
+    }
+    
+    check("ProteoWizard", getCommandWithOptPath("msconvert", "pwiz", verify = FALSE), "patRoon.path.pwiz")
+    check("OpenMS", getCommandWithOptPath("FeatureFinderMetabo", "OpenMS", verify = FALSE), "patRoon.path.OpenMS")
+    check("pngquant", getCommandWithOptPath("pngquant", "pngquant", verify = FALSE), "patRoon.path.pngquant")
+    check("SIRIUS", getCommandWithOptPath(getSiriusBin(), "SIRIUS", verify = FALSE), "patRoon.path.SIRIUS")
+    check("MetFrag CL", getOption("patRoon.path.MetFragCL"), "patRoon.path.MetFragCL")
+    check("MetFrag CompTox Database", getOption("patRoon.path.MetFragCompTox"), "patRoon.path.MetFragCompTox")
+    
+    if (!OK)
+        cat("\nSome dependencies were not found. Please make sure that their file locations are configured properly.",
+            "For instance, run the following to set the location of MetFragCL:",
+            sprintf("options(patRoon.path.MetFragCL = \"C:/MetFrag2.4.5-CL.jar\")"),
+            "\nPlease see ?patRoon for more information on how to configure patRoon options.",
+            sep = "\n")
+    
+    invisible(NULL)
+}

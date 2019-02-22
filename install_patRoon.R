@@ -269,11 +269,17 @@ utils <- setRefClass("utilsInst", methods = list(
         options(setNames(list(NULL), optMarker))
     },
     
-    findPWiz = function()
+    findPWizPath = function()
     {
         # try to find ProteoWizard
-        # Inspired by scan_registry_for_rtools() from pkgload
+        # order: options --> win registry --> PATH
+        # the PATH is searched last because OpenMS might have added its own old version.
         
+        path <- getOption("patRoon.path.pwiz")
+        if (!is.null(path))
+            return(path)
+        
+        # Inspired by scan_registry_for_rtools() from pkgload
         key <- "Software\\Classes\\Applications\\seems.exe\\shell\\open\\command"
         reg <- tryCatch(utils::readRegistry(key, "HCU"), error = function(e) NULL)
         
@@ -289,9 +295,9 @@ utils <- setRefClass("utilsInst", methods = list(
         }
         
         # check PATH
-        ppath <- dirname(Sys.which("msconvert.exe"))
-        if (nzchar(ppath))
-            return(ppath)
+        path <- dirname(Sys.which("msconvert.exe"))
+        if (nzchar(path))
+            return(path)
         
         return(NULL)
     },
@@ -406,9 +412,9 @@ utils <- setRefClass("utilsInst", methods = list(
                               stringsAsFactors = FALSE)
         extDeps$path <- mapply(extDeps$command, extDeps$copt, FUN = utils$getCommandWithOptPath)
         
-        pwiz <- findPWiz()
-        if (!is.null(pwiz))
-            extDeps$path[1] <- findPWiz()
+        pwiz <- findPWizPath()
+        if (!is.null(pwiz) && !nzchar(extDeps$path[1]))
+            extDeps$path[1] <- pwiz
         
         extDeps <- rbind(extDeps, list(name = "MetFrag CL", command = "", copt = "",
                                        path = getOption("patRoon.path.MetFragCL", "")))
@@ -507,11 +513,11 @@ utils <- setRefClass("utilsInst", methods = list(
                 browseURL("http://proteowizard.sourceforge.net/download.html")
                 while(!yesNo(title = "Did you install ProteoWizard and are ready to continue the patRoon installation?")) {}
                 
-                pwiz <- findPWiz()
+                pwiz <- findPWizPath()
                 while(is.null(pwiz) &&
                       !yesNo("Failed to find ProteoWizard. If you continue now you will have to set the patRoon.pwiz.path option manually using options(). Continue?"))
                 {
-                    pwiz <- findPWiz()
+                    pwiz <- findPWizPath()
                 }
                 
                 if (!is.null(pwiz))

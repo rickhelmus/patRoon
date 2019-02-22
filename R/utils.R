@@ -111,6 +111,7 @@ executeCommand <- function(cmd, args = character(), ...)
     return(system2(cmd, sapply(args, shQuote), ...))
 }
 
+# NOTE: keep in sync with install-patRoon version
 getCommandWithOptPath <- function(cmd, opt, verify = TRUE)
 {
     if (Sys.info()[["sysname"]] == "Windows")
@@ -140,6 +141,44 @@ getCommandWithOptPath <- function(cmd, opt, verify = TRUE)
     }
 
     return(cmd)
+}
+
+# NOTE: keep in sync with install-patRoon version
+findPWizPath <- function()
+{
+    # try to find ProteoWizard
+    # order: options --> win registry --> PATH
+    # the PATH is searched last because OpenMS might have added its own old version.
+    
+    path <- getOption("patRoon.path.pwiz")
+    if (!is.null(path) && nzchar(path))
+        return(path)
+    
+    if (Sys.info()[["sysname"]] == "Windows")
+    {
+        # Inspired by scan_registry_for_rtools() from pkgload
+        key <- "Software\\Classes\\Applications\\seems.exe\\shell\\open\\command"
+        reg <- tryCatch(utils::readRegistry(key, "HCU"), error = function(e) NULL)
+        
+        # not sure if this might occur
+        if (is.null(reg))
+            reg <- tryCatch(utils::readRegistry(key, "HLM"), error = function(e) NULL)
+        
+        if (!is.null(reg))
+        {
+            path <- tryCatch(dirname(sub("\"([^\"]*)\".*", "\\1", reg[[1]])), error = function(e) NULL)
+            if (!is.null(path) && file.exists(file.path(path, "msconvert.exe"))) # extra check: see if msconvert is there
+                return(path)
+        }
+    }
+    
+    # check PATH
+    msc <- if (Sys.info()[["sysname"]] == "Windows") "msconvert.exe" else "msconvert"
+    path <- dirname(Sys.which(msc))
+    if (nzchar(path))
+        return(path)
+    
+    return(NULL)
 }
 
 # From http://stackoverflow.com/a/30835971
@@ -848,20 +887,31 @@ verifyDependencies <- function()
     # UNDONE: skip GenForm for now? Should be present as embedded binary.
     
     OK <- TRUE
-    check <- function(name, path, opt)
+    check <- function(name, path, opt, isDir = FALSE)
     {
         pleaseSet <- sprintf("Please set the '%s' option.", opt)
         printf("Checking %s... ", name)
         if (is.null(path) || !nzchar(path))
         {
-            cat("not found or configured", pleaseSet, "\n")
+            cat("not found or configured.", pleaseSet, "\n")
             OK <<- FALSE
+        }
+        else if (isDir)
+        {
+            if (!dir.exists(path))
+            {
+                cat("configured directory path does not exist!", pleaseSet, "\n")
+                OK <<- FALSE
+            }
+            else
+                printf("found directory '%s'\n", path)
         }
         else
         {
             # NOTE: dirname point to current path if getCommandWithOptPath() found it in PATH
             dn <- dirname(path)
-            if ((nzchar(dn) && dn != "." && !file.exists(path)) || !nzchar(Sys.which(path)))
+            # if ((nzchar(dn) && dn != "." && !file.exists(path)) || !nzchar(Sys.which(path)))
+            if (nzchar(dn) && dn != "." && !file.exists(path))
             {
                 cat("configured path does not exist!", pleaseSet, "\n")
                 OK <<- FALSE
@@ -873,7 +923,7 @@ verifyDependencies <- function()
         }
     }
     
-    check("ProteoWizard", getCommandWithOptPath("msconvert", "pwiz", verify = FALSE), "patRoon.path.pwiz")
+    check("ProteoWizard", findPWizPath(), "patRoon.path.pwiz", isDir = TRUE)
     check("OpenMS", getCommandWithOptPath("FeatureFinderMetabo", "OpenMS", verify = FALSE), "patRoon.path.OpenMS")
     check("pngquant", getCommandWithOptPath("pngquant", "pngquant", verify = FALSE), "patRoon.path.pngquant")
     check("SIRIUS", getCommandWithOptPath(getSiriusBin(), "SIRIUS", verify = FALSE), "patRoon.path.SIRIUS")

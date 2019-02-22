@@ -16,7 +16,6 @@ general
     - somehow integrate convertMSFiles() in newProject()? And other file types?
 - convertMSFiles()
     - add DA functionality?
-    - check registry for location on windows
 - update tests for new OpenMS/MetFrag
 
 

@@ -7,7 +7,11 @@ convertMSFilesPWiz <- function(inFiles, outFiles, to, filters, extraOpts,
     if (!is.null(extraOpts))
         mainArgs <- c(mainArgs, extraOpts)
 
-    msc <- getCommandWithOptPath("msconvert", "pwiz")
+    pwpath <- findPWizPath()
+    if (is.null(pwpath) || !file.exists(file.path(pwpath, "msconvert")))
+        stop("Could not find ProteoWizard. You may set its location in the patRoon.path.pwiz option. See ?patRoon for more details.")
+    msc <- file.path(pwpath, "msconvert")
+    
     cmdQueue <- lapply(seq_along(inFiles), function(fi)
     {
         basef <- basename(tools::file_path_sans_ext(inFiles[fi]))

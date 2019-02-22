@@ -35,7 +35,8 @@
 * `reportPDF()`/`reportMD()` now report only 5 top most candidate formulae by default (controlled by `formulasTopMost` argument).
 * Added `verifyDependencies()` function to let the user verify if external tools can be found.
 * The meaning of the `dirs` argument to `convertMSFiles()` was slightly changed: if `TRUE` (the default) the input can either be paths to analyses files or to directories containing the analyses files.
-* More effective locating ProteoWizard binaries by using the Windows registry. 
+* More effective locating ProteoWizard binaries by using the Windows registry.
+* Nicer default graphics for `featureGroups` method for `plot()`. 
 
 
 ## January 2019

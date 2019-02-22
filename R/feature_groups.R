@@ -384,19 +384,25 @@ setMethod("as.data.table", "featureGroups", function(x, average = FALSE, feature
     return(ret[])
 })
 
-#' @describeIn featureGroups Generates an \emph{m/z} \emph{vs} retention time plot
-#'   for all featue groups.
+#' @describeIn featureGroups Generates an \emph{m/z} \emph{vs} retention time
+#'   plot for all featue groups.
+#' @param col,pch Passed to \code{\link[graphics]{plot}}. If \code{col=NULL}
+#'   then colours are automatically generated.
 #' @export
-setMethod("plot", "featureGroups", function(x, retMin = TRUE, ...)
+setMethod("plot", "featureGroups", function(x, retMin = TRUE, col = NULL, pch = 16, ...)
 {
     checkmate::assertFlag(retMin)
 
     if (length(x) == 0)
         plot(0, type = "n", ...)
     else
+    {
+        if (is.null(col))
+            col <- colorRampPalette(brewer.pal(12, "Paired"))(length(x))
         plot(if (retMin) x@groupInfo$rts / 60 else x@groupInfo$rts, x@groupInfo$mzs,
              xlab = if (retMin) "retention (min)" else "retention (s)",
-             ylab = "m/z", ...)
+             ylab = "m/z", col = col, pch = pch, ...)
+    }
 })
 
 #' @describeIn featureGroups Generates a line plot for the (averaged) intensity

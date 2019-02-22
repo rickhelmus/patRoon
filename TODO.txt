@@ -15,7 +15,6 @@ general
     - generate Rmd?
     - somehow integrate convertMSFiles() in newProject()? And other file types?
 - convertMSFiles()
-    - hint if dirs should be TRUE? Or do it automatically if a file is a dir?
     - add DA functionality?
     - check registry for location on windows
 - update tests for new OpenMS/MetFrag
@@ -94,6 +93,7 @@ formulas
 
 components
 - mass defect components
+- RC: check spearmans correlation
 
 
 reporting

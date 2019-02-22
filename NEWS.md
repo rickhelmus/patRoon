@@ -4,7 +4,7 @@
 * Compound scorings are now normalized towards their original min/max values. This ensures that the `score` column of MetFrag results stays correct.
 * plotScores(): Option to only report scorings that have been used for ranking
 * as.data.table()/as.data.frame() method for compounds: optionally normalize scores.
-* reportPDF()/reportMD() now report only 5 top most candidate compounds by default (controlled by compoundTopMost argument).
+* `reportPDF()`/`reportMD()` now report only 5 top most candidate compounds by default (controlled by `compoundsTopMost` argument).
 * metadata for MS peak lists
 * `plotSpec()` now displays subscripted formulae
 * **IMPORTANT** Several major changes were made to the `filter()` methods for `features` and `featureGroups`. Please carefully read the updated documentation for these methods! (i.e. `` ?`filter,features-method` `` and `` ?`filter,featureGroups-method` ``).
@@ -32,6 +32,7 @@
 * Default normalization of MetFrag scorings now follows MetFrag web behaviour.
 * `topMostFormulas` argument for SIRIUS compound generation.
 * Fixed GenForm ranking in case both MS and MS/MS formulae are present.
+* `reportPDF()`/`reportMD()` now report only 5 top most candidate formulae by default (controlled by `formulasTopMost` argument).
 
 
 ## January 2019

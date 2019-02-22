@@ -36,7 +36,8 @@
 * Added `verifyDependencies()` function to let the user verify if external tools can be found.
 * The meaning of the `dirs` argument to `convertMSFiles()` was slightly changed: if `TRUE` (the default) the input can either be paths to analyses files or to directories containing the analyses files.
 * More effective locating ProteoWizard binaries by using the Windows registry.
-* Nicer default graphics for `featureGroups` method for `plot()`. 
+* Nicer default graphics for `featureGroups` method for `plot()`.
+* `reportMD()`: Don't plot Chord if <3 (non-empty) replicate groups are available. 
 
 
 ## January 2019

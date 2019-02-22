@@ -97,7 +97,6 @@ components
 reporting
 - add more options to reportPlots argument of reportMD()?
 - reportPDF/reportMD: MS only formulas are not reported?
-- don't plot UpSet and Chord if <3 rGroups?
 - subscripted formulas in annotated peak list?
 
 

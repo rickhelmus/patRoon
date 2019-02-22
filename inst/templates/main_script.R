@@ -15,6 +15,11 @@ anaInfo <- generateAnalysisInfo(paths = c({{ paste0("\"", unique(analyses$path),
                                 groups = c({{ paste0("\"", analyses$group, "\"", collapse = ", ") }}),
                                 refs = c({{ paste0("\"", analyses$ref, "\"", collapse = ", ") }}))
 {{ endCodeBlock() }}
+{{ optionalCodeBlock(generateAnaInfo == "none") }}
+
+# NOTE: please set anaInfo to a valid data.frame with analysis information. See ?`analysis-information` for more details.
+anaInfo <- data.frame(path = character(), analysis = character(), group = character(), ref = character())
+{{ endCodeBlock() }}
 {{ optionalCodeBlock(dataPretreatmentOpts$DAMethod != "" || length(dataPretreatmentOpts$steps) > 0) }}
 
 # Set to FALSE to skip data pretreatment (e.g. calibration, export, ...)

@@ -10,8 +10,6 @@ general
 - test negative subset indices
 - ref --> blank
 - newProject()
-    - add empty anaInfo with comments if no analyses are selected
-    - check if RStudio is running
     - generate Rmd?
     - somehow integrate convertMSFiles() in newProject()? And other file types?
 - convertMSFiles()

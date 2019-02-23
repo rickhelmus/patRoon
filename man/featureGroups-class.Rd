@@ -83,7 +83,8 @@
 \S4method{as.data.table}{featureGroups}(x, average = FALSE,
   features = FALSE)
 
-\S4method{plot}{featureGroups,ANY}(x, retMin = TRUE, ...)
+\S4method{plot}{featureGroups,ANY}(x, retMin = TRUE, col = NULL,
+  pch = 16, ...)
 
 \S4method{plotInt}{featureGroups}(obj, average = FALSE, ...)
 
@@ -139,6 +140,9 @@ ProfileAnalysis), \code{"brukertasq"} (Bruker TASQ) or \code{"mzmine"}
 \code{average=TRUE} this data will be averaged for each feature group.}
 
 \item{retMin}{Plot retention time in minutes (instead of seconds).}
+
+\item{col, pch}{Passed to \code{\link[graphics]{plot}}. If \code{col=NULL}
+then colours are automatically generated.}
 
 \item{addSelfLinks}{If \code{TRUE} then 'self-links' are added which
 represent non-shared data.}
@@ -290,8 +294,8 @@ detection} functionality of \href{http://mzmine.github.io/}{MZmine}.
 \item \code{as.data.table}: Obtain a summary table (a \code{\link{data.table}})
 with retention, \emph{m/z}, intensity and optionally other feature data.
 
-\item \code{plot}: Generates an \emph{m/z} \emph{vs} retention time plot
-for all featue groups.
+\item \code{plot}: Generates an \emph{m/z} \emph{vs} retention time
+plot for all featue groups.
 
 \item \code{plotInt}: Generates a line plot for the (averaged) intensity
 of feature groups within all analyses

@@ -7,7 +7,11 @@ convertMSFilesPWiz <- function(inFiles, outFiles, to, filters, extraOpts,
     if (!is.null(extraOpts))
         mainArgs <- c(mainArgs, extraOpts)
 
-    msc <- getCommandWithOptPath("msconvert", "pwiz")
+    pwpath <- findPWizPath()
+    if (is.null(pwpath) || !file.exists(file.path(pwpath, "msconvert")))
+        stop("Could not find ProteoWizard. You may set its location in the patRoon.path.pwiz option. See ?patRoon for more details.")
+    msc <- file.path(pwpath, "msconvert")
+    
     cmdQueue <- lapply(seq_along(inFiles), function(fi)
     {
         basef <- basename(tools::file_path_sans_ext(inFiles[fi]))
@@ -56,14 +60,12 @@ convertMSFilesOpenMS <- function(inFiles, outFiles, to, extraOpts, logPath, maxP
 #' when ProteoWizard is used for conversion, most major (closed) vendor formats
 #' are supported for input files.
 #'
-#' @param files A \code{character} vector with input files. Alternatively, if
-#'   \code{dirs=TRUE}, then a \code{character} vector with one or more
-#'   directories from which input files are automatically selected.
+#' @param files,dirs The \code{files} argument should be a \code{character}
+#'   vector with input files. If \code{files} contains directories and
+#'   \code{dirs=TRUE} then files from these directories are also considered.
 #' @param outPath A character vector specifying directories that should be used
 #'   for the output. Will be re-cycled if necessary. If \code{NULL}, output
 #'   directories will be kept the same as the input directories.
-#' @param dirs If \code{TRUE} the \code{files} argument specifies directories
-#'   from which input files should be selected.
 #' @param from One or more input formats (see below). These are used to find
 #'   analyses when \code{dirs=TRUE}.
 #' @param to Output format: \code{"mzXML"} or \code{"mzML"}.
@@ -74,28 +76,35 @@ convertMSFilesOpenMS <- function(inFiles, outFiles, to, extraOpts, logPath, maxP
 #' @param filters When \code{algorithm="pwiz"}: a \code{character} vector
 #'   specifying one or more filters. Can be used for peak picking to obtain
 #'   centroided data (see examples). The elements of the specified vector are
-#'   directly passed to the
-#'   \code{--filter} option (see
+#'   directly passed to the \code{--filter} option (see
 #'   \href{http://proteowizard.sourceforge.net/tools/filters.html}{here})
 #' @param extraOpts A \code{character} vector specifying any extra commandline
 #'   parameters passed to \command{msConvert} or \command{FileConverter}. Set to
 #'   \code{NULL} to ignore. For options: see
 #'   \href{http://ftp.mi.fu-berlin.de/pub/OpenMS/release-documentation/html/TOPP_FileConverter.html}{FileConverter}
-#'   and
+#'    and
 #'   \href{http://proteowizard.sourceforge.net/tools/msconvert.html}{msConvert}.
 #'
 #' @template multiProc-args
 #'
 #' @section Conversion formats: Input and output formats include \code{mzXML}
 #'   and \code{mzML}. In addition, when ProteoWizard is used, the following
-#'   vendor input formats may be chosen (specified with the \code{from} argument):
-#'   \itemize{
+#'   vendor input formats may be chosen (specified with the \code{from}
+#'   argument): \itemize{
+#'
 #'   \item \code{thermo}: Thermo \file{.RAW} files.
-#'   \item \code{bruker}: Bruker \file{.d}, \file{.yep}, \file{.baf} and \file{.fid} files.
+#'
+#'   \item \code{bruker}: Bruker \file{.d}, \file{.yep}, \file{.baf} and
+#'   \file{.fid} files.
+#'
 #'   \item \code{agilent}: Agilent \file{.d} files.
+#'
 #'   \item \code{ab}: AB Sciex \file{.wiff} files.
+#'
 #'   \item \code{waters} Waters \file{.RAW} files.
+#'
 #'   }
+#'
 #'   Note that the actual supported file formats depend on the ProteoWizard
 #'   installation (see
 #'   \href{http://proteowizard.sourceforge.net/formats/index.html}{here}).
@@ -115,7 +124,7 @@ convertMSFilesOpenMS <- function(inFiles, outFiles, to, extraOpts, logPath, maxP
 #'   \insertRef{Chambers2012}{patRoon}
 #'
 #' @export
-convertMSFiles <- function(files, outPath = NULL, dirs = FALSE,
+convertMSFiles <- function(files, outPath = NULL, dirs = TRUE,
                            from = c("thermo", "bruker", "agilent", "ab", "waters", "mzXML", "mzML"),
                            to = "mzML", overWrite = FALSE, algorithm = "pwiz",
                            filters = NULL, extraOpts = NULL,
@@ -140,7 +149,7 @@ convertMSFiles <- function(files, outPath = NULL, dirs = FALSE,
                                     several.ok = TRUE, add = ac)
     else # OpenMS
         from <- checkmate::matchArg(from, c("mzXML", "mzML"), several.ok = TRUE, add = ac)
-
+    
     if (dirs)
     {
         allExts <- list(thermo = ".raw",
@@ -150,11 +159,18 @@ convertMSFiles <- function(files, outPath = NULL, dirs = FALSE,
                         waters = ".raw",
                         mzXML = ".mzXML",
                         mzML = ".mzML")
-        fExt <- unique(unlist(sapply(from, function(f) allExts[[f]], USE.NAMES = FALSE)))
-        files <- unique(unlist(sapply(fExt,
-                                      function(e) list.files(files, full.names = TRUE,
-                                                             pattern = paste0("*\\", e, "$", collapse = " "),
-                                                             ignore.case = TRUE))))
+        
+        dirs <- files[file.info(files, extra_cols = FALSE)$isdir]
+        
+        # UNDONE: is agilent .d also a directory?
+        if ("bruker" %in% from)
+            dirs <- dirs[!grepl("(\\.d)$", files)] # filter out .d analyses "files" (=in reality directories)
+        
+        fExts <- unique(unlist(allExts[from]))
+        dirFiles <- list.files(dirs, full.names = TRUE, pattern = paste0("*\\", fExts, "$", collapse = "|"),
+                               ignore.case = TRUE)
+        
+        files <- union(dirFiles, setdiff(files, dirs))
     }
 
     if (is.null(outPath))

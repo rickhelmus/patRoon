@@ -45,9 +45,9 @@ NULL
 #' @param compoundOnlyUsedScorings If \code{TRUE} then only scorings are plotted
 #'   that actually have been used to rank data (see the \code{scoreTypes}
 #'   argument to \code{\link{generateCompoundsMetfrag}} for more details).
-#' @param compoundTopMost Only this amount of top ranked candidate compounds are
-#'   reported. Lower values may significantly speed up reporting. Set to
-#'   \code{NULL} to ignore.
+#' @param formulasTopMost,compoundTopMost Only this amount of top ranked
+#'   candidate formulae/compounds are reported. Lower values may significantly
+#'   speed up reporting. Set to \code{NULL} to ignore.
 #' @param clearPath If \code{TRUE} then the destination path will be
 #'   (recursively) removed prior to reporting.
 #'
@@ -235,7 +235,7 @@ reportFormulaTable <- function(fGroups, formulas, path, retMin)
     printf("Done!\n")
 }
 
-reportFormulaSpectra <- function(fGroups, path, formulas, MSPeakLists, EICRtWindow, EICMzWindow, retMin,
+reportFormulaSpectra <- function(fGroups, path, formulas, topMost, MSPeakLists, EICRtWindow, EICMzWindow, retMin,
                                  EICTopMost, EICs)
 {
     printf("Exporting formula MS/MS spectra...\n")
@@ -251,6 +251,9 @@ reportFormulaSpectra <- function(fGroups, path, formulas, MSPeakLists, EICRtWind
     if (length(formulas) == 0)
         invisible(return(NULL))
 
+    if (!is.null(topMost))
+        formulas <- filter(formulas, topMost = topMost)
+    
     formGroups <- groupNames(formulas)
     fcount <- length(formGroups)
     prog <- txtProgressBar(0, fcount, style = 3)
@@ -604,7 +607,7 @@ setMethod("reportCSV", "featureGroups", function(fGroups, path, reportFGroupsAsR
 #' @aliases reportPDF
 #' @export
 setMethod("reportPDF", "featureGroups", function(fGroups, path, reportFGroups,
-                                                 formulas, reportFormulaSpectra,
+                                                 formulas, formulasTopMost, reportFormulaSpectra,
                                                  compounds, compoundNormalizeScores, compoundExclNormScores,
                                                  compoundOnlyUsedScorings, compoundTopMost, compsCluster,
                                                  components, MSPeakLists, retMin, EICGrid,
@@ -620,10 +623,10 @@ setMethod("reportPDF", "featureGroups", function(fGroups, path, reportFGroups,
            null.ok = TRUE, fixed = list(add = ac))
     assertNormalizationMethod(compoundNormalizeScores, add = ac)
     checkmate::assertCharacter(compoundExclNormScores, min.chars = 1, null.ok = TRUE, add = ac)
-    checkmate::assertCount(compoundTopMost, positive = TRUE, null.ok = TRUE, add = ac)
+    aapply(checkmate::assertCount, . ~ formulasTopMost + compoundTopMost + EICTopMost,
+           positive = TRUE, null.ok = TRUE, fixed = list(add = ac))
     checkmate::assertIntegerish(EICGrid, lower = 1, any.missing = FALSE, len = 2, add = ac)
     aapply(checkmate::assertNumber, . ~ EICRtWindow + EICMzWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
-    checkmate::assertCount(EICTopMost, positive = TRUE, null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
 
     if (!reportFGroups && is.null(formulas) && is.null(compounds) && is.null(components))
@@ -716,7 +719,7 @@ setMethod("reportPDF", "featureGroups", function(fGroups, path, reportFGroups,
 #' @rdname reporting
 #' @aliases reportMD
 #' @export
-setMethod("reportMD", "featureGroups", function(fGroups, path, reportPlots, formulas,
+setMethod("reportMD", "featureGroups", function(fGroups, path, reportPlots, formulas, formulasTopMost,
                                                 compounds, compoundNormalizeScores, compoundExclNormScores,
                                                 compoundOnlyUsedScorings, compoundTopMost,
                                                 compsCluster, includeMFWebLinks, components, interactiveHeat,
@@ -738,10 +741,10 @@ setMethod("reportMD", "featureGroups", function(fGroups, path, reportPlots, form
            null.ok = TRUE, fixed = list(add = ac))
     assertNormalizationMethod(compoundNormalizeScores, add = ac)
     checkmate::assertCharacter(compoundExclNormScores, min.chars = 1, null.ok = TRUE, add = ac)
-    checkmate::assertCount(compoundTopMost, positive = TRUE, null.ok = TRUE, add = ac)
+    aapply(checkmate::assertCount, . ~ formulasTopMost + compoundTopMost + EICTopMost,
+           positive = TRUE, null.ok = TRUE, fixed = list(add = ac))
     checkmate::assertChoice(includeMFWebLinks, c("compounds", "MSMS", "none"), add = ac)
     aapply(checkmate::assertNumber, . ~ EICRtWindow + EICMzWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
-    checkmate::assertCount(EICTopMost, positive = TRUE, null.ok = TRUE, add = ac)
     checkmate::assertCount(maxProcAmount, positive = TRUE, add = ac)
     checkmate::reportAssertions(ac)
 
@@ -780,6 +783,8 @@ setMethod("reportMD", "featureGroups", function(fGroups, path, reportPlots, form
         cat("Done!\n")
     }
 
+    if (!is.null(formulas) && !is.null(formulasTopMost))
+        formulas <- filter(formulas, topMost = formulasTopMost)
     if (!is.null(compounds) && !is.null(compoundTopMost))
         compounds <- filter(compounds, topMost = compoundTopMost)
 

@@ -282,6 +282,8 @@ getNewProjectUI <- function(destPath)
 #' @export
 newProject <- function(destPath = NULL)
 {
+    rstudioapi::verifyAvailable()
+    
     # UNDONE: warning/message about empty groups
 
     hotOpts <- list(rowHeaderWidth = 40, readOnly = TRUE,

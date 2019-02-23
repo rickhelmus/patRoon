@@ -4,23 +4,20 @@
 \alias{convertMSFiles}
 \title{Conversion of analyses between several open and closed data formats}
 \usage{
-convertMSFiles(files, outPath = NULL, dirs = FALSE,
-  from = c("thermo", "bruker", "agilent", "ab", "waters", "mzXML",
-  "mzML"), to = "mzML", overWrite = FALSE, algorithm = "pwiz",
-  filters = NULL, extraOpts = NULL, logPath = file.path("log",
-  "convert"), maxProcAmount = getOption("patRoon.maxProcAmount"))
+convertMSFiles(files, outPath = NULL, dirs = TRUE, from = c("thermo",
+  "bruker", "agilent", "ab", "waters", "mzXML", "mzML"), to = "mzML",
+  overWrite = FALSE, algorithm = "pwiz", filters = NULL,
+  extraOpts = NULL, logPath = file.path("log", "convert"),
+  maxProcAmount = getOption("patRoon.maxProcAmount"))
 }
 \arguments{
-\item{files}{A \code{character} vector with input files. Alternatively, if
-\code{dirs=TRUE}, then a \code{character} vector with one or more
-directories from which input files are automatically selected.}
+\item{files, dirs}{The \code{files} argument should be a \code{character}
+vector with input files. If \code{files} contains directories and
+\code{dirs=TRUE} then files from these directories are also considered.}
 
 \item{outPath}{A character vector specifying directories that should be used
 for the output. Will be re-cycled if necessary. If \code{NULL}, output
 directories will be kept the same as the input directories.}
-
-\item{dirs}{If \code{TRUE} the \code{files} argument specifies directories
-from which input files should be selected.}
 
 \item{from}{One or more input formats (see below). These are used to find
 analyses when \code{dirs=TRUE}.}
@@ -36,15 +33,14 @@ ProteoWizard) or \code{"openms"} (uses \command{FileConverter} of OpenMS).}
 \item{filters}{When \code{algorithm="pwiz"}: a \code{character} vector
 specifying one or more filters. Can be used for peak picking to obtain
 centroided data (see examples). The elements of the specified vector are
-directly passed to the
-\code{--filter} option (see
+directly passed to the \code{--filter} option (see
 \href{http://proteowizard.sourceforge.net/tools/filters.html}{here})}
 
 \item{extraOpts}{A \code{character} vector specifying any extra commandline
 parameters passed to \command{msConvert} or \command{FileConverter}. Set to
 \code{NULL} to ignore. For options: see
 \href{http://ftp.mi.fu-berlin.de/pub/OpenMS/release-documentation/html/TOPP_FileConverter.html}{FileConverter}
-and
+ and
 \href{http://proteowizard.sourceforge.net/tools/msconvert.html}{msConvert}.}
 
 \item{logPath}{Destination directory for log files with output from executed
@@ -67,14 +63,22 @@ are supported for input files.
 \section{Conversion formats}{
  Input and output formats include \code{mzXML}
   and \code{mzML}. In addition, when ProteoWizard is used, the following
-  vendor input formats may be chosen (specified with the \code{from} argument):
-  \itemize{
+  vendor input formats may be chosen (specified with the \code{from}
+  argument): \itemize{
+
   \item \code{thermo}: Thermo \file{.RAW} files.
-  \item \code{bruker}: Bruker \file{.d}, \file{.yep}, \file{.baf} and \file{.fid} files.
+
+  \item \code{bruker}: Bruker \file{.d}, \file{.yep}, \file{.baf} and
+  \file{.fid} files.
+
   \item \code{agilent}: Agilent \file{.d} files.
+
   \item \code{ab}: AB Sciex \file{.wiff} files.
+
   \item \code{waters} Waters \file{.RAW} files.
+
   }
+
   Note that the actual supported file formats depend on the ProteoWizard
   installation (see
   \href{http://proteowizard.sourceforge.net/formats/index.html}{here}).

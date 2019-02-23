@@ -101,7 +101,7 @@ anyOverlap <- rGroupLen > 1 &&
     length(unique(rmdVars$fGroups, which = replicateGroups(rmdVars$fGroups), outer = TRUE)) < length(rmdVars$fGroups)
 if (length(rmdVars$fGroups) > 0 && anyOverlap && rGroupLenNonEmpty > 1)
 {
-    doPlotChord <- "chord" %in% rmdVars$reportPlots
+    doPlotChord <- "chord" %in% rmdVars$reportPlots && rGroupLenNonEmpty > 2
     doPlotVenn <- "venn" %in% rmdVars$reportPlots && rGroupLen < 6
     doPlotUpSet <- "upset" %in% rmdVars$reportPlots
 } else

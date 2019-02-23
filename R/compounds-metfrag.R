@@ -509,7 +509,7 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
                 mkdirp(logPath)
             mfBin <- path.expand(getOption("patRoon.path.MetFragCL"))
             if (is.null(mfBin) || !nzchar(mfBin) || !file.exists(mfBin))
-                stop("Please set the 'metFragCL' option with a (correct) path to the metFrag CL jar file. Example: options(patRoon.path.MetFragCL = \"C:/MetFrag2.4.2-CL.jar\")")
+                stop("Please set the 'MetFragCL' option with a (correct) path to the metFrag CL jar file. Example: options(patRoon.path.MetFragCL = \"C:/MetFrag2.4.2-CL.jar\")")
 
             if (!nzchar(Sys.which("java")))
                 stop("Please make sure that java is installed and its location is correctly set in PATH.")

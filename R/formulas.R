@@ -266,8 +266,8 @@ setMethod("as.data.table", "formulas", function(x, fGroups = NULL, average = FAL
 #' @param minExplainedFragPeaks Minimum number of fragment peaks that are
 #'   explained. Setting this to \samp{1} will remove any MS only formula
 #'   results. Set to \code{NULL} to ignore.
-#' @param topMost Only retain no more than this amount of best ranked candidates
-#'   for each feature group.
+#' @param topMost Retain no more than this amount of best ranked (or worst
+#'   ranked if \code{negate=TRUE}) candidates for each feature group.
 #' @param scoreLimits Filter results by their scores. Should be a named
 #'   \code{list} that contains two-sized numeric vectors with the
 #'   minimum/maximum value of a score (use \code{-Inf}/\code{Inf} for no
@@ -277,7 +277,7 @@ setMethod("as.data.table", "formulas", function(x, fGroups = NULL, average = FAL
 #'   match score should be at least \samp{0.5}. More details of scorings can be
 #'   obtained with \code{\link{formulaScorings}}. Note that a result without a
 #'   specified scoring is never removed. Set to \code{NULL} to skip this filter.
-#'
+#' @param negate If \code{TRUE} then filters are applied in opposite manner.
 #' @template element-args
 #'
 #' @note \code{filter} does not modify any formula results for features (if
@@ -289,7 +289,7 @@ setMethod("as.data.table", "formulas", function(x, fGroups = NULL, average = FAL
 setMethod("filter", "formulas", function(obj, minExplainedFragPeaks = NULL, elements = NULL,
                                          fragElements = NULL, lossElements = NULL,
                                          topMost = NULL, scoreLimits = NULL,
-                                         OM = NULL)
+                                         OM = FALSE, negate = FALSE)
 {
     scCols <- formulaScorings()$name
 
@@ -299,12 +299,13 @@ setMethod("filter", "formulas", function(obj, minExplainedFragPeaks = NULL, elem
     aapply(checkmate::assertCharacter, . ~ elements + fragElements + lossElements,
            min.chars = 1, min.len = 1, null.ok = TRUE, fixed = list(add = ac))
     checkmate::assertList(scoreLimits, null.ok = TRUE, types = "numeric", add = ac)
+    
     if (!is.null(scoreLimits))
     {
         checkmate::assertNames(names(scoreLimits), type = "unique", subset.of = scCols, add = ac)
         checkmate::qassertr(scoreLimits, "N2")
     }
-    checkmate::assertLogical(OM, null.ok = TRUE)
+    aapply(checkmate::assertFlag, . ~ OM + negate, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
 
     cat("Filtering formulas... ")
@@ -315,26 +316,41 @@ setMethod("filter", "formulas", function(obj, minExplainedFragPeaks = NULL, elem
         formTable <- obj[[grp]]
         if (!is.null(minExplainedFragPeaks) && minExplainedFragPeaks > 0)
         {
-            formTable <- formTable[byMSMS == TRUE]
-            if (nrow(formTable) == 0)
-                return(formTable)
+            ft <- formTable[byMSMS == TRUE]
+            if (nrow(ft) == 0)
+                return(if (negate) formTable else ft)
+            formTable <- ft
             fragCounts <- formTable[, ifelse(byMSMS, length(frag_formula), 0L), by = "formula"][[2]]
-            formTable <- formTable[fragCounts >= minExplainedFragPeaks]
+            if (negate)
+                formTable <- formTable[fragCounts < minExplainedFragPeaks]
+            else
+                formTable <- formTable[fragCounts >= minExplainedFragPeaks]
         }
 
         if (!is.null(elements))
-            formTable <- formTable[sapply(neutral_formula, checkFormula, elements)]
+        {
+            keep <- sapply(formTable$neutral_formula, checkFormula, elements, negate = negate)
+            formTable <- formTable[keep]
+        }
         if ((!is.null(fragElements) || !is.null(lossElements)))
         {
-            formTable <- formTable[byMSMS == TRUE]
-            if (nrow(formTable) == 0)
-                return(formTable)
+            ft <- formTable[byMSMS == TRUE]
+            if (nrow(ft) == 0)
+                return(if (negate) formTable else ft)
+            formTable <- ft
             if (!is.null(fragElements))
-                formTable <- formTable[formTable[, rep(any(sapply(frag_formula, checkFormula, fragElements)), .N),
-                                                 by = "formula"][[2]]]
+            {
+                keep <- formTable[, rep(any(sapply(frag_formula, checkFormula, fragElements, negate = negate)), .N),
+                                  by = "formula"][[2]]
+                formTable <- formTable[keep]
+            }
+            
             if (!is.null(lossElements))
-                formTable <- formTable[formTable[, rep(any(sapply(neutral_loss, checkFormula, lossElements)), .N),
-                                                 by = "formula"][[2]]]
+            {
+                keep <- formTable[, rep(any(sapply(neutral_loss, checkFormula, lossElements, negate = negate)), .N),
+                                  by = "formula"][[2]]
+                formTable <- formTable[keep]
+            }
         }
 
         if (!is.null(scoreLimits))
@@ -344,13 +360,14 @@ setMethod("filter", "formulas", function(obj, minExplainedFragPeaks = NULL, elem
                 cols <- getAllFormulasCols(sc, names(formTable))
                 if (length(cols) == 0)
                     next
-                formTable <- formTable[formTable[, do.call(pmin, c(.SD, list(na.rm = TRUE))) >= scoreLimits[[sc]][1] &
-                                                   do.call(pmax, c(.SD, list(na.rm = TRUE))) <= scoreLimits[[sc]][2],
-                                                 .SDcols = cols]]
+                keep <- formTable[, do.call(pmin, c(.SD, list(na.rm = TRUE))) >= scoreLimits[[sc]][1] &
+                                      do.call(pmax, c(.SD, list(na.rm = TRUE))) <= scoreLimits[[sc]][2],
+                                  .SDcols = cols]
+                formTable <- formTable[if (negate) !keep else keep]
             }
         }
 
-        if (!is.null(OM) && OM)
+        if (OM)
         {
             fElTable <- addElementInfoToFormTable(copy(formTable), NULL, NULL, OM = TRUE)
             keep <- fElTable[,
@@ -368,12 +385,15 @@ setMethod("filter", "formulas", function(obj, minExplainedFragPeaks = NULL, elem
                          HC <= 2.2 &
                          OC <= 1.2 &
                          NC <= 0.5]
-            formTable <- formTable[keep]
+            formTable <- formTable[if (negate) !keep else keep]
         }
 
         if (!is.null(topMost))
         {
-            unFormNrs <- formTable[, match(formula, unique(.SD$formula))]
+            unForms <- unique(formTable$formula)
+            unFormNrs <- formTable[, match(formula, unForms)]
+            if (negate)
+                unFormNrs <- length(unForms) - (unFormNrs - 1)
             formTable <- formTable[unFormNrs <= topMost]
         }
 

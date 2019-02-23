@@ -84,39 +84,73 @@ test_that("basic subsetting", {
 
 test_that("filtering works", {
     expect_true(all(as.data.table(filter(formsGF, minExplainedFragPeaks = 1))$byMSMS))
+    expect_true(all(!as.data.table(filter(formsGF, minExplainedFragPeaks = 1, negate = TRUE))$byMSMS))
     expect_lt(length(filter(formsGF, minExplainedFragPeaks = 2)),
               length(filter(formsGF, minExplainedFragPeaks = 1)))
-    expect_equal(length(filter(formsGFMS, minExplainedFragPeaks = 1)), 0)
+    expect_gt(length(filter(formsGF, minExplainedFragPeaks = 2, negate = TRUE)),
+              length(filter(formsGF, minExplainedFragPeaks = 1, negate = TRUE)))
+    expect_length(filter(formsGFMS, minExplainedFragPeaks = 1), 0)
+    expect_length(filter(formsGFMS, minExplainedFragPeaks = 1, negate = TRUE), length(formsGFMS))
 
     expect_length(filter(formsGF, elements = "C1-100"), length(formsGFOC)) # all should contain carbon
+    expect_length(filter(formsGFOC, elements = "C1-100", negate = TRUE), 0)
     expect_length(filter(formsGF, elements = c("Na1-100", "C1-100")), length(formsGFOC)) # no sodium, but carbon should be there
+    expect_length(filter(formsGFOC, elements = c("Na1-100", "C1-100"), negate = TRUE), length(formsGFOC)) # no sodium
     expect_length(filter(formsGF, elements = c("H0-100", "C1-100")), length(formsGF)) # presence of both shouldn't affect results
+    expect_length(filter(formsGF, elements = c("H90-100", "C0-100"), negate = TRUE), length(formsGF)) # all formulae shouldn't have 90-100 Hs
     expect_length(filter(formsGF, elements = "Na1-100"), 0) # no sodium
+    expect_length(filter(formsGF, elements = "Na1-100", negate = TRUE), length(formsGF))
     expect_length(filter(formsGF, elements = "Na0-100"), length(formsGF)) # no sodium, but optional
+    expect_length(filter(formsGF, elements = "Na0-100", negate = TRUE), 0)
 
     # same for fragments
     expect_lte(length(filter(formsGFOC, fragElements = "C1-100")),
                length(filter(formsGFOC, minExplainedFragPeaks = 1)))
-    expect_lt(length(filter(formsGFWithMSMS, fragElements = "C")), length(formsGFWithMSMS)) # fragments may contain only single carbon
+    expect_lte(length(filter(formsGFOC, fragElements = "C1-100", negate = TRUE)),
+               length(filter(formsGFOC, minExplainedFragPeaks = 1)))
+    expect_lt(length(filter(formsGFWithMSMS, fragElements = "C")),
+              length(formsGFWithMSMS)) # fragments may contain only single carbon
+    expect_length(filter(formsGFWithMSMS, fragElements = "C", negate = TRUE),
+                  length(formsGFWithMSMS))
     expect_length(filter(formsGFWithMSMS, fragElements = "Na1-100"), 0)
+    expect_length(filter(formsGFWithMSMS, fragElements = "Na1-100", negate = TRUE), length(formsGFWithMSMS))
     expect_length(filter(formsGFWithMSMS, fragElements = "Na0-100"), length(formsGFWithMSMS))
+    expect_length(filter(formsGFWithMSMS, fragElements = "Na0-100", negate = TRUE), 0)
     expect_length(filter(formsGFMS, fragElements = "C0-100"), 0) # no MS/MS
+    expect_length(filter(formsGFMS, fragElements = "C0-100", negate = TRUE), length(formsGFMS))
 
     expect_length(filter(formsGFWithMSMS, lossElements = "C0-100"), length(formsGFWithMSMS))
+    expect_length(filter(formsGFWithMSMS, lossElements = "C0-100", negate = TRUE), 0)
     expect_length(filter(formsGFWithMSMS, lossElements = "Na0-100"), length(formsGFWithMSMS))
+    expect_length(filter(formsGFWithMSMS, lossElements = "Na0-100", negate = TRUE), 0)
     expect_gt(length(filter(formsGFWithMSMS, lossElements = "C1-100")), 0) # NL might be empty, at least some should contain carbon though!
+    expect_gt(length(filter(formsGFWithMSMS, lossElements = "C1-100", negate = TRUE)), 0)
     expect_length(filter(formsGFWithMSMS, lossElements = "Na1-100"), 0) # no sodium
+    expect_length(filter(formsGFWithMSMS, lossElements = "Na1-100", negate = TRUE), length(formsGFWithMSMS))
     expect_length(filter(formsGFMS, lossElements = "C0-100"), 0) # no MS/MS
+    expect_length(filter(formsGFMS, lossElements = "C0-100", negate = TRUE), length(formsGFMS))
 
     expect_equal(length(filter(formsGF, topMost = 1)), length(groupNames(formsGF)))
+    expect_equal(length(filter(formsGF, topMost = 1, negate = TRUE)), length(groupNames(formsGF)))
     expect_range(length(filter(formsGF, topMost = 2)),
                  c(length(groupNames(formsGF)), length(groupNames(formsGF)) * 2))
-
+    expect_range(length(filter(formsGF, topMost = 2, negate = TRUE)),
+                 c(length(groupNames(formsGF)), length(groupNames(formsGF)) * 2))
+    expect_true(all(unique(as.data.table(filter(formsGFMS, topMost = 1))$isoScore) >=
+                        unique(as.data.table(filter(formsGFMS, topMost = 1, negate = TRUE))$isoScore)))
+    
     expect_equivalent(filter(formsGF, scoreLimits = list(isoScore = c(-Inf, Inf))), formsGF)
+    expect_length(filter(formsGF, scoreLimits = list(isoScore = c(-Inf, Inf)), negate = TRUE), 0)
     expect_lt(length(filter(formsGF, scoreLimits = list(isoScore = c(0.1, Inf)))), length(formsGF))
-    expect_length(filter(formsGF, scoreLimits = list(MSMSScore = c(0, Inf))), length(formsGFWithMSMS)) # should filter away MS only formulas
+    expect_lt(length(filter(formsGF, scoreLimits = list(isoScore = c(0.1, Inf)), negate = TRUE)), length(formsGF))
+    expect_length(filter(formsGF, scoreLimits = list(MSMSScore = c(0, Inf))),
+                  length(formsGFWithMSMS)) # should filter away MS only formulas
+    expect_length(filter(formsGF, scoreLimits = list(MSMSScore = c(0, Inf)), negate = TRUE), 0)
 
     expect_lt(length(filter(formsGF, OM = TRUE)), length(formsGF))
+    expect_lt(length(filter(formsGF, OM = TRUE, negate = TRUE)), length(formsGF))
+    expect_length(formsGF, sum(length(filter(formsGF, OM = TRUE)),
+                               length(filter(formsGF, OM = TRUE, negate = TRUE))))
 })
 
 OMTab <- as.data.table(formsGF, OM = TRUE)

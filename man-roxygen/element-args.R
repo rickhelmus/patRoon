@@ -12,5 +12,6 @@
 #'   filter.
 #' @param fragElements,lossElements Specifies elemental restrictions for
 #'   fragment or neutral loss formulae (charged form). Candidates are retained
-#'   if at least one of the fragment formulae follow the given restrictions. See
-#'   \code{elements} for the used format.
+#'   if at least one of the fragment formulae follow (or not follow if
+#'   \code{negate=TRUE}) the given restrictions. See \code{elements} for the
+#'   used format.

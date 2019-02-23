@@ -47,7 +47,7 @@
 
 \S4method{filter}{formulas}(obj, minExplainedFragPeaks = NULL,
   elements = NULL, fragElements = NULL, lossElements = NULL,
-  topMost = NULL, scoreLimits = NULL, OM = NULL)
+  topMost = NULL, scoreLimits = NULL, OM = FALSE, negate = FALSE)
 
 \S4method{annotatedPeakList}{formulas}(obj, precursor, groupName,
   analysis = NULL, MSPeakLists, onlyAnnotated = FALSE)
@@ -134,11 +134,12 @@ filter.}
 
 \item{fragElements, lossElements}{Specifies elemental restrictions for
 fragment or neutral loss formulae (charged form). Candidates are retained
-if at least one of the fragment formulae follow the given restrictions. See
-\code{elements} for the used format.}
+if at least one of the fragment formulae follow (or not follow if
+\code{negate=TRUE}) the given restrictions. See \code{elements} for the
+used format.}
 
-\item{topMost}{Only retain no more than this amount of best ranked candidates
-for each feature group.}
+\item{topMost}{Retain no more than this amount of best ranked (or worst
+ranked if \code{negate=TRUE}) candidates for each feature group.}
 
 \item{scoreLimits}{Filter results by their scores. Should be a named
 \code{list} that contains two-sized numeric vectors with the
@@ -149,6 +150,8 @@ limits). The names of each element should follow the values returned by
 match score should be at least \samp{0.5}. More details of scorings can be
 obtained with \code{\link{formulaScorings}}. Note that a result without a
 specified scoring is never removed. Set to \code{NULL} to skip this filter.}
+
+\item{negate}{If \code{TRUE} then filters are applied in opposite manner.}
 
 \item{precursor}{The formula of the precursor (in ionic form, \emph{i.e.} as
 detected by the MS).}

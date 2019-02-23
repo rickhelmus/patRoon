@@ -57,7 +57,7 @@
 \S4method{filter}{compounds}(obj, minExplainedPeaks = NULL,
   minScore = NULL, minFragScore = NULL, minFormulaScore = NULL,
   scoreLimits = NULL, elements = NULL, fragElements = NULL,
-  lossElements = NULL, topMost = NULL)
+  lossElements = NULL, topMost = NULL, negate = FALSE)
 
 \S4method{addFormulaScoring}{compounds}(compounds, formulas,
   updateScore = FALSE, formulaScoreWeight = 1)
@@ -128,7 +128,7 @@ normalize all scorings. By default \code{score} and
 interface. Note that whether any normalization occurs is set by the
 \code{excludeNormScores} argument.}
 
-\item{minExplainedPeaks, minScore, minFragScore, minFormulaScore}{Minimal number
+\item{minExplainedPeaks, minScore, minFragScore, minFormulaScore}{Minimum number
 of explained peaks, overall score, in-silico fragmentation score and
 formula score, respectively. Set to \code{NULL} to ignore. The
 \code{scoreLimits} argument allows for more advanced score filtering.}
@@ -158,11 +158,14 @@ filter.}
 
 \item{fragElements, lossElements}{Specifies elemental restrictions for
 fragment or neutral loss formulae (charged form). Candidates are retained
-if at least one of the fragment formulae follow the given restrictions. See
-\code{elements} for the used format.}
+if at least one of the fragment formulae follow (or not follow if
+\code{negate=TRUE}) the given restrictions. See \code{elements} for the
+used format.}
 
 \item{topMost}{Only keep a maximum of \code{topMost} candidates with highest
-score. Set to \code{NULL} to ignore.}
+score (or least highest if \code{negate=TRUE}). Set to \code{NULL} to ignore.}
+
+\item{negate}{If \code{TRUE} then filters are applied in opposite manner.}
 
 \item{formulas}{The \code{\link{formulas}} object that should be used for
 scoring/annotation. For \code{plotSpec}: set to \code{NULL} to ignore.}

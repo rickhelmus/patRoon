@@ -655,7 +655,8 @@ setMethod("reportPDF", "featureGroups", function(fGroups, path, reportFGroups,
     {
         p <- file.path(path, "formulas")
         mkdirp(p)
-        reportFormulaSpectra(fGroups, p, formulas, MSPeakLists, EICRtWindow, EICMzWindow, retMin, EICTopMost, EICs)
+        reportFormulaSpectra(fGroups, p, formulas, formulasTopMost, MSPeakLists,
+                             EICRtWindow, EICMzWindow, retMin, EICTopMost, EICs)
     }
 
     if (!is.null(compounds))

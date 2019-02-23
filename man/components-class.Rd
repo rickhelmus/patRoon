@@ -55,7 +55,8 @@
 \S4method{as.data.table}{components}(x)
 
 \S4method{filter}{components}(obj, size = NULL, adducts = NULL,
-  isotopes = NULL, rtIncrement = NULL, mzIncrement = NULL)
+  isotopes = NULL, rtIncrement = NULL, mzIncrement = NULL,
+  negate = FALSE)
 
 \S4method{findFGroup}{components}(obj, fGroup)
 
@@ -110,6 +111,8 @@ filter.}
 \item{rtIncrement, mzIncrement}{Should be a two sized vector with the
 minimum/maximum retention or mz increment of a homologous series. Set to
 \code{NULL} to ignore.}
+
+\item{negate}{If \code{TRUE} then filters are applied in opposite manner.}
 
 \item{fGroup}{The name (thus a character) of the feature group that should be
 searched for.}

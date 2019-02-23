@@ -32,6 +32,7 @@
 * Default normalization of MetFrag scorings now follows MetFrag web behaviour.
 * `topMostFormulas` argument for SIRIUS compound generation.
 * Fixed GenForm ranking in case both MS and MS/MS formulae are present.
+* All `filter()` methods now support negation by `negate` argument.
 
 
 ## January 2019

@@ -68,30 +68,57 @@ test_that("basic subsetting", {
 test_that("filtering works", {
     expect_length(filter(compsRC, size = c(0, 100)), length(compsRC))
     expect_length(filter(compsRC, size = c(50, 100)), 0)
-
+    expect_length(filter(compsRC, size = c(0, 100), negate = TRUE), 0)
+    expect_length(filter(compsRC, size = c(50, 100), negate = TRUE), length(compsRC))
+    
     expect_length(filter(compsEmpty, size = c(0, 100)), 0)
+    expect_length(filter(compsEmpty, size = c(0, 100), negate = TRUE), 0)
 
     # shouldn't filter if related data is not there
     expect_equal(groupNames(filter(compsInt, adducts = TRUE)), groupNames(compsInt))
     expect_equal(groupNames(filter(compsInt, isotopes = TRUE)), groupNames(compsInt))
-
+    expect_equal(groupNames(filter(compsInt, adducts = TRUE, negate = TRUE)), groupNames(compsInt))
+    expect_equal(groupNames(filter(compsInt, isotopes = TRUE, negate = TRUE)), groupNames(compsInt))
+    
     expect_lt(length(groupNames(filter(compsRC, adducts = TRUE))), length(groupNames(compsRC)))
     expect_lt(length(groupNames(filter(compsRC, adducts = FALSE))), length(groupNames(compsRC)))
     expect_lt(length(groupNames(filter(compsRC, adducts = "[M+H]+"))), length(groupNames(compsRC)))
     expect_true(all(sapply(componentTable(filter(compsRC, adducts = "[M+H]+")),
-                           function(cmp) all(cmp$adduct_ion == "[M+H]+"))))
-
+                           function(cmp) all(!is.na(cmp$adduct_ion) & cmp$adduct_ion == "[M+H]+"))))
+    expect_equivalent(filter(compsRC, adducts = FALSE, negate = FALSE),
+                      filter(compsRC, adducts = TRUE, negate = TRUE))
+    expect_equivalent(filter(compsRC, adducts = TRUE, negate = TRUE),
+                      filter(compsRC, adducts = FALSE, negate = FALSE))
+    expect_setequal(groupNames(compsRC),
+                    c(groupNames(filter(compsRC, adducts = "[M+H]+")),
+                      groupNames(filter(compsRC, adducts = "[M+H]+", negate = TRUE))))
+    expect_true(all(sapply(componentTable(filter(compsRC, adducts = "[M+H]+", negate = TRUE)),
+                           function(cmp) all(is.na(cmp$adduct_ion) | cmp$adduct_ion != "[M+H]+"))))
+    
     expect_lt(length(groupNames(filter(compsRC, isotopes = TRUE))), length(groupNames(compsRC)))
     expect_lt(length(groupNames(filter(compsRC, isotopes = FALSE))), length(groupNames(compsRC)))
     expect_lt(length(groupNames(filter(compsRC, isotopes = 0:1))), length(groupNames(compsRC)))
     expect_true(all(sapply(componentTable(filter(compsRC, isotopes = 0)),
-                           function(cmp) all(cmp$isonr == 0))))
+                           function(cmp) all(!is.na(cmp$isonr) & cmp$isonr == 0))))
+    expect_equivalent(filter(compsRC, isotopes = FALSE, negate = FALSE),
+                      filter(compsRC, isotopes = TRUE, negate = TRUE))
+    expect_equivalent(filter(compsRC, isotopes = TRUE, negate = TRUE),
+                      filter(compsRC, isotopes = FALSE, negate = FALSE))
+    expect_setequal(groupNames(compsRC),
+                    c(groupNames(filter(compsRC, isotopes = 0)),
+                      groupNames(filter(compsRC, isotopes = 0, negate = TRUE))))
+    expect_true(all(sapply(componentTable(filter(compsRC, isotopes = 0, negate = TRUE)),
+                           function(cmp) all(is.na(cmp$isonr) | cmp$isonr != 0))))
 
     skip_if(length(compsNT) == 0)
     expect_length(filter(compsNT, rtIncrement = c(0, 1000)), length(compsNT))
     expect_length(filter(compsNT, rtIncrement = c(100, 1000)), 0)
     expect_length(filter(compsNT, mzIncrement = c(0, 1000)), length(compsNT))
     expect_length(filter(compsNT, mzIncrement = c(1000, 10000)), 0)
+    expect_length(filter(compsNT, rtIncrement = c(0, 1000), negate = TRUE), 0)
+    expect_length(filter(compsNT, rtIncrement = c(100, 1000), negate = TRUE), length(compsNT))
+    expect_length(filter(compsNT, mzIncrement = c(0, 1000), negate = TRUE), 0)
+    expect_length(filter(compsNT, mzIncrement = c(1000, 10000), negate = TRUE), length(compsNT))
 })
 
 test_that("basic usage works", {

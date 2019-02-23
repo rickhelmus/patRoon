@@ -4,7 +4,6 @@ general
 - remove XCMS EIC loading (and update checkChromatograms())
 - support fastcluster for compounds clustering/int component clusters?
 - setAs() for as.data.table()/as.data.frame() methods
-- negate for all filter methods
 - make algorithm names more consistent
 - convertMSFiles(): add DA functionality
 - algorithmObject() generic: for xset, xsa, rc, ...

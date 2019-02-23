@@ -199,6 +199,7 @@ setMethod("as.data.table", "components", function(x)
 #' @param rtIncrement,mzIncrement Should be a two sized vector with the
 #'   minimum/maximum retention or mz increment of a homologous series. Set to
 #'   \code{NULL} to ignore.
+#' @param negate If \code{TRUE} then filters are applied in opposite manner.
 #'
 #' @note \code{filter} Applies only those filters for which a component has data
 #'   available. For instance, filtering by adduct will only filter any results
@@ -207,7 +208,7 @@ setMethod("as.data.table", "components", function(x)
 #' @export
 setMethod("filter", "components", function(obj, size = NULL, adducts = NULL,
                                            isotopes = NULL, rtIncrement = NULL,
-                                           mzIncrement = NULL)
+                                           mzIncrement = NULL, negate = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertIntegerish(size, lower = 0, any.missing = FALSE, len = 2, null.ok = TRUE, add = ac)
@@ -216,6 +217,7 @@ setMethod("filter", "components", function(obj, size = NULL, adducts = NULL,
                       .var.name = isotopes)
     checkmate::assertNumeric(rtIncrement, lower = 0, any.missing = FALSE, len = 2, null.ok = TRUE, add = ac)
     checkmate::assertNumeric(mzIncrement, lower = 0, any.missing = FALSE, len = 2, null.ok = TRUE, add = ac)
+    checkmate::assertFlag(negate, add = ac)
     checkmate::reportAssertions(ac)
 
     if (!is.null(adducts) && !is.logical(adducts))
@@ -233,21 +235,29 @@ setMethod("filter", "components", function(obj, size = NULL, adducts = NULL,
             # formatting.
 
             if (is.logical(adducts) && adducts)
-                cmp <- cmp[!is.na(adduct_ion)]
+                keep <- !is.na(cmp$adduct_ion)
             else if (is.logical(adducts) && !adducts)
-                cmp <- cmp[is.na(adduct_ion)]
+                keep <- is.na(cmp$adduct_ion)
             else
-                cmp <- cmp[adduct_ion %in% adducts]
+                keep <- cmp$adduct_ion %in% adducts
+            
+            if (negate)
+                keep <- !keep
+            cmp <- cmp[keep]
         }
 
         if (!is.null(isotopes) && !is.null(cmp[["isonr"]]))
         {
             if (is.logical(isotopes) && isotopes)
-                cmp <- cmp[!is.na(isonr)]
+                keep <- !is.na(cmp$isonr)
             else if (is.logical(isotopes) && !isotopes)
-                cmp <- cmp[is.na(isonr)]
+                keep <- is.na(cmp$isonr)
             else
-                cmp <- cmp[isonr %in% isotopes]
+                keep <- cmp$isonr %in% isotopes
+            
+            if (negate)
+                keep <- !keep
+            cmp <- cmp[keep]
         }
 
         return(cmp)
@@ -260,15 +270,19 @@ setMethod("filter", "components", function(obj, size = NULL, adducts = NULL,
         obj@componentInfo <- obj@componentInfo[name %in% names(obj@components)]
         obj@componentInfo[, size := sapply(obj@components, nrow)] # update in case groups were filtered away
 
+        inRange <- function(x, range) x >= range[1] & x <= range[2]
+        if (negate)
+            inRange <- Negate(inRange)
+        
         if (!is.null(size))
         {
             csize <- size # rename for DT
-            obj@componentInfo <- obj@componentInfo[size >= csize[1] & size <= csize[2]]
+            obj@componentInfo <- obj@componentInfo[inRange(size, csize)]
         }
         if (!is.null(rtIncrement) && !is.null(obj@componentInfo[["rt_increment"]]))
-            obj@componentInfo <- obj@componentInfo[rt_increment >= rtIncrement[1] & rt_increment <= rtIncrement[2]]
+            obj@componentInfo <- obj@componentInfo[inRange(rt_increment, rtIncrement)]
         if (!is.null(mzIncrement) && !is.null(obj@componentInfo[["mz_increment"]]))
-            obj@componentInfo <- obj@componentInfo[mz_increment >= mzIncrement[1] & mz_increment <= mzIncrement[2]]
+            obj@componentInfo <- obj@componentInfo[inRange(mz_increment, mzIncrement)]
 
         obj@components <- obj@components[names(obj@components) %in% obj@componentInfo$name]
     }

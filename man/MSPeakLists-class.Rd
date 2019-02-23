@@ -44,7 +44,7 @@
 \S4method{filter}{MSPeakLists}(obj, absMSIntThr = NULL,
   absMSMSIntThr = NULL, relMSIntThr = NULL, relMSMSIntThr = NULL,
   topMSPeaks = NULL, topMSMSPeaks = NULL, deIsotopeMS = FALSE,
-  deIsotopeMSMS = FALSE, retainPrecursorMSMS = TRUE)
+  deIsotopeMSMS = FALSE, retainPrecursorMSMS = TRUE, negate = FALSE)
 
 \S4method{plotSpec}{MSPeakLists}(obj, groupName, analysis = NULL,
   MSLevel = 1, title = NULL, useGGPlot2 = FALSE, xlim = NULL,
@@ -86,7 +86,10 @@ presence of isotopic peaks (e.g. MetFrag for MS/MS). Note that
 
 \item{retainPrecursorMSMS}{If \code{TRUE} then precursor peaks will never be
 filtered out from MS/MS peak lists (note that precursors are never removed
-from MS peak lists).}
+from MS peak lists). The \code{negate} argument does not affect this
+setting.}
+
+\item{negate}{If \code{TRUE} then filters are applied in opposite manner.}
 
 \item{groupName}{The name of the feature group for which a plot should be
 made.}

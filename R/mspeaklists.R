@@ -247,19 +247,22 @@ setMethod("as.data.table", "MSPeakLists", function(x, fGroups = NULL, averaged =
 #'   \code{getMzRPeakLists} does not (yet) support flagging of isotopes.
 #' @param retainPrecursorMSMS If \code{TRUE} then precursor peaks will never be
 #'   filtered out from MS/MS peak lists (note that precursors are never removed
-#'   from MS peak lists).
+#'   from MS peak lists). The \code{negate} argument does not affect this
+#'   setting.
+#' @param negate If \code{TRUE} then filters are applied in opposite manner.
 #'
 #' @export
 setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntThr = NULL, relMSIntThr = NULL,
                                             relMSMSIntThr = NULL, topMSPeaks = NULL, topMSMSPeaks = NULL,
-                                            deIsotopeMS = FALSE, deIsotopeMSMS = FALSE, retainPrecursorMSMS = TRUE)
+                                            deIsotopeMS = FALSE, deIsotopeMSMS = FALSE, retainPrecursorMSMS = TRUE,
+                                            negate = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertNumber, . ~ absMSIntThr + absMSMSIntThr + relMSIntThr + relMSMSIntThr,
            lower = 0, finite = TRUE, null.ok = TRUE, fixed = list(add = ac))
     aapply(checkmate::assertCount, . ~ topMSPeaks + topMSMSPeaks, positive = TRUE,
            null.ok = TRUE, fixed = list(add = ac))
-    aapply(checkmate::assertFlag, . ~ deIsotopeMS + deIsotopeMSMS + retainPrecursorMSMS, fixed = list(add = ac))
+    aapply(checkmate::assertFlag, . ~ deIsotopeMS + deIsotopeMSMS + retainPrecursorMSMS + negate, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
 
     if (length(obj) == 0)
@@ -284,10 +287,10 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
         {
             ret <- list()
             if (!is.null(pl[[grpi]][["MS"]]))
-                ret$MS <- doMSPeakListFilter(pl[[grpi]]$MS, absMSIntThr, relMSIntThr, topMSPeaks, deIsotopeMS, TRUE)
+                ret$MS <- doMSPeakListFilter(pl[[grpi]]$MS, absMSIntThr, relMSIntThr, topMSPeaks, deIsotopeMS, TRUE, negate)
             if (!is.null(pl[[grpi]][["MSMS"]]))
                 ret$MSMS <- doMSPeakListFilter(pl[[grpi]]$MSMS, absMSMSIntThr, relMSMSIntThr, topMSMSPeaks,
-                                               deIsotopeMSMS, retainPrecursorMSMS)
+                                               deIsotopeMSMS, retainPrecursorMSMS, negate)
 
             setTxtProgressBar(prog, grpi)
 

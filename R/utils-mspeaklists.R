@@ -168,13 +168,13 @@ assignPrecursorToMSPeakList <- function(MSPeakList, precursorMZ)
     return(MSPeakList)
 }
 
-deIsotopeMSPeakList <- function(MSPeakList)
+deIsotopeMSPeakList <- function(MSPeakList, negate)
 {
     if (nrow(MSPeakList) == 0)
         return(MSPeakList)
     
     if (is.null(MSPeakList[["cmp"]]))
-        stop("No istope information available. Note that this is currently only implemented for DataAnalysis peak lists (if configured properly, see ?generateMSPeakLists.")
+        stop("No isotope information available. Note that this is currently only implemented for DataAnalysis peak lists (if configured properly, see ?generateMSPeakLists.")
     
     # make sure most intense ions top the table
     MSPeakList <- MSPeakList[order(mz, -intensity)]
@@ -199,31 +199,39 @@ deIsotopeMSPeakList <- function(MSPeakList)
         return(TRUE)
     }, USE.NAMES = FALSE)
     
+    if (negate)
+        unique_iso <- !unique_iso
+    
     return(MSPeakList[unique_iso])
 }
 
-doMSPeakListFilter <- function(pList, absIntThr, relIntThr, topMost, deIsotope, retainPrecursor)
+doMSPeakListFilter <- function(pList, absIntThr, relIntThr, topMost, deIsotope, retainPrecursor, negate)
 {
     if (retainPrecursor)
         prec <- pList[precursor == TRUE]
     
+    intPred <- if (negate) function(i, t) i < t else function(i, t) i >= t
+    
     if (!is.null(absIntThr))
-        pList <- pList[intensity >= absIntThr]
+        pList <- pList[intPred(intensity, absIntThr)]
     
     if (!is.null(relIntThr) && nrow(pList) > 0)
     {
         thr <- max(pList$intensity) * relIntThr
-        pList <- pList[intensity >= thr]
+        pList <- pList[intPred(intensity, thr)]
     }
     
     if (!is.null(topMost) && nrow(pList) > topMost)
     {
-        ord <- order(-pList$intensity)
+        if (negate)
+            ord <- order(-pList$intensity)
+        else
+            ord <- order(-pList$intensity)
         pList <- pList[ord[seq_len(topMost)]]
     }
     
     if (deIsotope)
-        pList <- deIsotopeMSPeakList(pList)
+        pList <- deIsotopeMSPeakList(pList, negate)
     
     # re-add precursor if necessary
     if (retainPrecursor && nrow(prec) > 0 && !any(pList$precursor))

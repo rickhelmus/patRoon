@@ -40,11 +40,13 @@ test_that("verify show output", {
     expect_known_show(plistsDAFMF, testFile("plists-DAFMF", text = TRUE))
 })
 
-checkMinInt <- function(plists, relative, doMSMS)
+checkIntLimit <- function(plists, relative, doMin, doMSMS)
 {
     plists <- removePrecursors(plists)
 
-    minIntPL <- function(pl)
+    lim <- if (doMin) min else max
+    
+    intPLLimit <- function(pl)
     {
         if (!doMSMS)
             ints <- pl$MS$intensity
@@ -56,21 +58,22 @@ checkMinInt <- function(plists, relative, doMSMS)
         if (length(ints) == 0)
             return(NA)
 
-        ret <- min(ints)
+        ret <- lim(ints)
         if (relative)
             ret <- ret / max(ints)
         return(ret)
     }
 
-    ftMin <- min(sapply(peakLists(plists), function(ana) min(sapply(ana, minIntPL), na.rm = TRUE)), na.rm = TRUE)
-    fgMin <- min(sapply(averagedPeakLists(plists), minIntPL), na.rm = TRUE)
-    return(min(ftMin, fgMin))
+    ftLim <- lim(sapply(peakLists(plists), function(ana) lim(sapply(ana, intPLLimit), na.rm = TRUE)), na.rm = TRUE)
+    fgLim <- lim(sapply(averagedPeakLists(plists), intPLLimit), na.rm = TRUE)
+    return(lim(ftLim, fgLim))
 }
 
-checkMaxPeaks <- function(plists, doMSMS)
+checkPeaksLimit <- function(plists, doMin, doMSMS)
 {
+    lim <- if (doMin) min else max
     pl <- peakLists(removePrecursors(plists))
-    return(max(sapply(pl, function(ana) max(sapply(ana, function(grp)
+    return(lim(sapply(pl, function(ana) lim(sapply(ana, function(grp)
     {
         if (!doMSMS)
             return(nrow(grp$MS))
@@ -82,12 +85,21 @@ checkMaxPeaks <- function(plists, doMSMS)
 }
 
 test_that("filtering", {
-    expect_gte(checkMinInt(filter(plists, absMSIntThr = 500), FALSE, FALSE), 500)
-    expect_gte(checkMinInt(filter(plists, absMSMSIntThr = 500), FALSE, TRUE), 500)
-    expect_gte(checkMinInt(filter(plists, relMSIntThr = 0.2), TRUE, FALSE), 0.2)
-    expect_gte(checkMinInt(filter(plists, relMSMSIntThr = 0.2), TRUE, TRUE), 0.2)
-    expect_lte(checkMaxPeaks(filter(plists, topMSPeaks = 10), FALSE), 10)
-    expect_lte(checkMaxPeaks(filter(plists, topMSMSPeaks = 10), TRUE), 10)
+    expect_gte(checkIntLimit(filter(plists, absMSIntThr = 500), FALSE, TRUE, FALSE), 500)
+    expect_gte(checkIntLimit(filter(plists, absMSMSIntThr = 500), FALSE, TRUE, TRUE), 500)
+    expect_gte(checkIntLimit(filter(plists, absMSIntThr = 500, negate = TRUE), FALSE, FALSE, FALSE), 500)
+    expect_gte(checkIntLimit(filter(plists, absMSMSIntThr = 500, negate = TRUE), FALSE, FALSE, TRUE), 500)
+    
+    expect_gte(checkIntLimit(filter(plists, relMSIntThr = 0.2), TRUE, TRUE, FALSE), 0.2)
+    expect_gte(checkIntLimit(filter(plists, relMSMSIntThr = 0.2), TRUE, TRUE, TRUE), 0.2)
+    expect_gte(checkIntLimit(filter(plists, relMSIntThr = 0.2, negate = TRUE), TRUE, FALSE, FALSE), 0.2)
+    expect_gte(checkIntLimit(filter(plists, relMSMSIntThr = 0.2, negate = TRUE), TRUE, FALSE, TRUE), 0.2)
+    
+    expect_lte(checkPeaksLimit(filter(plists, topMSPeaks = 10), FALSE, FALSE), 10)
+    expect_lte(checkPeaksLimit(filter(plists, topMSMSPeaks = 10), FALSE, TRUE), 10)
+    expect_lte(checkPeaksLimit(filter(plists, topMSPeaks = 10, negate = TRUE), TRUE, FALSE), 10)
+    expect_lte(checkPeaksLimit(filter(plists, topMSMSPeaks = 10, negate = TRUE), TRUE, TRUE), 10)
+    
     expect_lte(length(filter(plists, topMSMSPeaks = 10, retainPrecursorMSMS = FALSE)),
                length(filter(plists, topMSMSPeaks = 10)))
     # UNDONE: deisotope?

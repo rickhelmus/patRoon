@@ -263,9 +263,14 @@ compoundsDT <- rbindlist(lapply(compFGroups, function(grp)
         apl <- annotatedPeakList(rmdVars$compounds, index = compi, groupName = grp,
                                  MSPeakLists = rmdVars$MSPeakLists, formulas = rmdVars$formulas,
                                  onlyAnnotated = TRUE)
+        
         if (is.null(apl) || nrow(apl) == 0)
             return("")
-        knitr::kable(apl, "html") %>%
+        
+        apl[, formula := subscriptFormulaHTML(formula)]
+        apl[, neutral_loss := subscriptFormulaHTML(neutral_loss)]
+        
+        knitr::kable(apl, "html", escape = FALSE) %>%
                            kableExtra::kable_styling(font_size = 11) %>%
                            kableExtra::scroll_box(extra_css = "overflow: auto; height: 125px;")
     })
@@ -313,7 +318,10 @@ formulasDT <- rbindlist(lapply(formFGroups, function(grp)
         if (is.null(apl) || nrow(apl) == 0)
             return("")
         
-        knitr::kable(apl, "html") %>%
+        apl[, formula := subscriptFormulaHTML(formula)]
+        apl[, neutral_loss := subscriptFormulaHTML(neutral_loss)]
+        
+        knitr::kable(apl, "html", escape = FALSE) %>%
             kableExtra::kable_styling(font_size = 11) %>%
             kableExtra::scroll_box(extra_css = "overflow: auto; height: 125px;")
     })

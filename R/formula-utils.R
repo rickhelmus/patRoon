@@ -116,6 +116,9 @@ subscriptFormula <- function(formulas, prefix = "", postfix = "", parse = TRUE)
     return(exprs)
 }
 
+# as above, but for HTML
+subscriptFormulaHTML <- function(formulas) gsub("([0-9]+)", "<sub>\\1</sub>", formulas)
+
 averageFormulas <- function(formulas)
 {
     fltab <- rbindlist(lapply(formulas, function(f) as.list(splitFormulaToList(f))), fill = TRUE)

@@ -94,7 +94,7 @@ components
 reporting
 - add more options to reportPlots argument of reportMD()?
 - reportPDF/reportMD: MS only formulas are not reported?
-- subscripted formulas in annotated peak list?
+    - report them as usual but without annotated spectrum/peak list? same with compounds?
 
 
 Cleanup

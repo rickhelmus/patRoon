@@ -205,7 +205,7 @@ setMethod("identifiers", "compounds", function(compounds)
 #' @describeIn compounds Provides rule based filtering for generated compounds.
 #'   Useful to eliminate unlikely candidates and speed up further processing.
 #'
-#' @param minExplainedPeaks,minScore,minFragScore,minFormulaScore Minimal number
+#' @param minExplainedPeaks,minScore,minFragScore,minFormulaScore Minimum number
 #'   of explained peaks, overall score, in-silico fragmentation score and
 #'   formula score, respectively. Set to \code{NULL} to ignore. The
 #'   \code{scoreLimits} argument allows for more advanced score filtering.
@@ -219,9 +219,8 @@ setMethod("identifiers", "compounds", function(compounds)
 #'   scorings see \code{\link{compoundScorings}}. Note that a result without a
 #'   specified scoring is never removed. Set to \code{NULL} to skip this filter.
 #' @param topMost Only keep a maximum of \code{topMost} candidates with highest
-#'   score. Set to \code{NULL} to ignore.
-#' @param negate If \code{TRUE} then filters are applied in opposite manner. For
-#'   \code{topMost} this means that the least scoring candidates are returned.
+#'   score (or least highest if \code{negate=TRUE}). Set to \code{NULL} to ignore.
+#' @param negate If \code{TRUE} then filters are applied in opposite manner.
 #'
 #' @template element-args
 #'
@@ -296,9 +295,7 @@ setMethod("filter", "compounds", function(obj, minExplainedPeaks = NULL, minScor
 
         if (!is.null(elements))
         {
-            keep <- sapply(cmpTable$formula, checkFormula, elements)
-            if (negate)
-                keep <- !keep
+            keep <- sapply(cmpTable$formula, checkFormula, elements, negate = negate)
             cmpTable <- cmpTable[keep]
         }
         if (!is.null(fragElements) || !is.null(lossElements))
@@ -307,14 +304,12 @@ setMethod("filter", "compounds", function(obj, minExplainedPeaks = NULL, minScor
             {
                 if (nrow(fi) == 0)
                     return(FALSE)
-                if (!is.null(fragElements) && !any(sapply(fi$formula, checkFormula, fragElements)))
+                if (!is.null(fragElements) && !any(sapply(fi$formula, checkFormula, fragElements, negate = negate)))
                     return(FALSE)
-                if (!is.null(lossElements) && !any(sapply(fi$neutral_loss, checkFormula, lossElements)))
+                if (!is.null(lossElements) && !any(sapply(fi$neutral_loss, checkFormula, lossElements, negate = negate)))
                     return(FALSE)
                 return(TRUE)
             })
-            if (negate)
-                keep <- !keep
             cmpTable <- cmpTable[keep]
         }
 

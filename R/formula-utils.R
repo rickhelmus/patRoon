@@ -394,7 +394,7 @@ getAllMergedFormulasCols <- function(allCols)
 
 getFormInfoList <- function(formTable, precursor)
 {
-    formTable <- formTable[byMSMS == TRUE & formula == precursor]
+    formTable <- formTable[formula == precursor]
 
     if (nrow(formTable) == 0)
         return(NULL)
@@ -403,9 +403,7 @@ getFormInfoList <- function(formTable, precursor)
 
     addValText <- function(curText, fmt, col)
     {
-        # get all columns matching value of 'col' as prefix: merged names after
-        # consensus will have format 'col-X'.
-        cols <- grep(paste0("^", col), names(precInfo), value = TRUE)
+        cols <- getAllFormulasCols(col, names(precInfo))
 
         ret <- character()
         for (cl in cols)
@@ -423,7 +421,7 @@ getFormInfoList <- function(formTable, precursor)
 
     ret <- character()
 
-    ret <- addValText(ret, "%s", "formula")
+    ret <- addValText(ret, "%s", "formula_mz")
     ret <- addValText(ret, "%s", "neutral_formula")
     ret <- addValText(ret, "%.2f ppm", "error")
     ret <- addValText(ret, "%.1f", "mSigma")

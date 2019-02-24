@@ -47,7 +47,6 @@ if (rmdVars$includeMFWebLinks != "none")
 if (!is.null(rmdVars$formulas) && "formulas" %in% rmdVars$reportPlots)
 {
     formFGroups <- groupNames(rmdVars$formulas)
-    formFGroups <- formFGroups[sapply(formFGroups, function(grp) any(rmdVars$formulas[[grp]]$byMSMS))]
     formFGroups <- intersect(formFGroups, rmdVars$groupNames)
 }
 if (!is.null(rmdVars$components))
@@ -133,97 +132,111 @@ DT::datatable(fGroupsSpecDT,
 <div id=noAnnotationSelected>Push a **show** button to view annotation data for a feature group.</div>
 
 
-```{r allCompPlots, fig.keep='none', eval=length(plotGroups) > 0}
+```{r allAnnPlots, fig.keep='none', eval=length(plotGroups) > 0}
 # Generate all plots in advance, since having many code chunks will cause a lot of overhead.
 
 message("Generating spectra...")
 prog <- txtProgressBar(0, length(plotGroups), style = 3, file = stderr())
 
-allPlots <- vector("character", 0)
 plotPathFull <- getPlotPath(FALSE)
 plotPathLink <- getPlotPath(TRUE)
-for (grpi in seq_along(plotGroups))
+
+allPlots <- lapply(seq_along(plotGroups), function(grpi)
 {
+    grpPlots <- list()
+    
+    grp <- plotGroups[grpi]
     plotf <- file.path(plotPathFull, sprintf("eic_%i.png", grpi))
-    allPlots[length(allPlots) + 1] <- plotf
+    grpPlots[["EIC"]] <- plotf
     makePlot(plotf, 5, 4.5,
              plotEIC(rmdVars$fGroups[, plotGroups[grpi]], rmdVars$EICRtWindow,
                      rmdVars$EICMzWindow, rmdVars$retMin,
                      rmdVars$EICTopMost, rmdVars$EICs, colourBy = "rGroup", title = ""))
     
-    if (plotGroups[grpi] %in% compFGroups)
+    # may be generated if necessary
+    unAnnotatedMSSpec <- file.path(plotPathFull, sprintf("spec_%d.png", grpi))
+    
+    if (grp %in% compFGroups)
     {
-        compsSeq <- seq_len(nrow(compTable[[plotGroups[grpi]]]))
-        allPlots <- c(allPlots, sapply(compsSeq, function(compi)
+        cTable <- compTable[[grp]]
+        compsSeq <- seq_len(nrow(cTable))
+        grpPlots[["compoundScores"]] <- sapply(compsSeq, function(compi)
         {
             ret <- file.path(plotPathFull, sprintf("compscore_%d_%d.png", grpi, compi))
             makePlot(ret, 4.5, 4.5, bg = NA,
-                     plotScores(rmdVars$compounds, compi, plotGroups[grpi], rmdVars$compoundNormalizeScores,
+                     plotScores(rmdVars$compounds, compi, grp, rmdVars$compoundNormalizeScores,
                                 rmdVars$compoundExclNormScores, rmdVars$compoundOnlyUsedScorings))
             return(ret)
-        }))
-
-        allPlots <- c(allPlots, sapply(compsSeq, function(compi)
+        })
+        
+        grpPlots[["compoundSpectra"]] <- sapply(compsSeq, function(compi)
         {
             ret <- file.path(plotPathFull, sprintf("compspec_%d_%d.png", grpi, compi))
-            makePlot(ret, 7, 4.5, bg = NA, plotSpec(rmdVars$compounds, compi,  plotGroups[grpi],
+            makePlot(ret, 7, 4.5, bg = NA, plotSpec(rmdVars$compounds, compi,  grp,
                                                     rmdVars$MSPeakLists, rmdVars$formulas,
                                                     FALSE))
             return(ret)
-        }))
+        })
         
-        allPlots <- c(allPlots, sapply(compsSeq, function(compi)
+        grpPlots[["compoundStructs"]] <- sapply(compsSeq, function(compi)
         {
             ret <- file.path(plotPathFull, sprintf("compstruct_%d_%d.png", grpi, compi))
-            makePlot(ret, 3, 3, bg = NA, plotStructure(rmdVars$compounds, compi, plotGroups[grpi], width = 150, height = 150))
+            makePlot(ret, 3, 3, bg = NA, plotStructure(rmdVars$compounds, compi, grp, width = 150, height = 150))
             return(ret)
-        }))
+        })
     }
     
-    if (plotGroups[grpi] %in% compsClustFGroups)
+    if (grp %in% compsClustFGroups)
     {
         plotf <- file.path(plotPathFull, sprintf("dendro_%d.png", grpi))
-        makePlot(plotf, 8, 4.5, plot(rmdVars$compsCluster, groupName = plotGroups[grpi]))
-        allPlots <- c(allPlots, plotf)
+        makePlot(plotf, 8, 4.5, plot(rmdVars$compsCluster, groupName = grp))
+        grpPlots[["compClustDendro"]] <- plotf
         
-        ct <- cutClusters(rmdVars$compsCluster)[[plotGroups[grpi]]]
-        allPlots <- c(allPlots, sapply(seq_along(unique(ct)), function(cli)
+        ct <- cutClusters(rmdVars$compsCluster)[[grp]]
+        grpPlots[["compClustMCS"]] <- sapply(seq_along(unique(ct)), function(cli)
         {
             ret <- file.path(plotPathFull, sprintf("mcs_%d_%d.png", grpi, cli))
-            makePlot(ret, 3, 3, plotStructure(rmdVars$compsCluster, plotGroups[grpi], cli,
+            makePlot(ret, 3, 3, plotStructure(rmdVars$compsCluster, grp, cli,
                                               100, 100))
             return(ret)
-        }))
+        })
     }
     
-    if (plotGroups[grpi] %in% formFGroups)
+    if (grp %in% formFGroups)
     {
-        precursors <- unique(rmdVars$formulas[[plotGroups[grpi]]][byMSMS == TRUE, formula])
-        allPlots <- c(allPlots, sapply(precursors, function(prec)
+        precursors <- unique(rmdVars$formulas[[grp]][["formula"]])
+        grpPlots[["formulaSpecs"]] <- sapply(precursors, function(prec)
         {
+            anPList <- annotatedPeakList(rmdVars$formulas, prec, grp,
+                                         MSPeakLists = rmdVars$MSPeakLists, onlyAnnotated = TRUE)
+            if (is.null(anPList))
+                return("") # No MS/MS data available
+            
             ret <- file.path(plotPathFull, sprintf("formspec_%d_%s.png", grpi, prec))
-            makePlot(ret, 6, 4.5, plotSpec(rmdVars$formulas, prec, plotGroups[grpi], MSPeakLists = rmdVars$MSPeakLists))
+            makePlot(ret, 6, 4.5, plotSpec(rmdVars$formulas, prec, grp, MSPeakLists = rmdVars$MSPeakLists))
             return(ret)
-        }))
+        })
     }
     
     setTxtProgressBar(prog, grpi)
-}
+    
+    return(grpPlots)
+})
 close(prog)
 
-if (rmdVars$optimizePng && length(allPlots > 0))
-    optimizePngPlots(allPlots, stderr(), rmdVars$maxProcAmount)
+ap <- unlist(allPlots); ap <- ap[nzchar(ap)]
+if (rmdVars$optimizePng && length(ap > 0))
+    optimizePngPlots(ap, stderr(), rmdVars$maxProcAmount)
+
+if (rmdVars$selfContained)
+    allPlots <- rapply(allPlots, function(ap) sapply(ap, function(p) if (nzchar(p)) knitr::image_uri(p) else ""), how = "replace")
 ```
 
 
 ```{r echo=FALSE, eval=length(plotGroups) > 0}
-paths <- file.path(plotPathLink, sprintf("eic_%d.png", seq_along(plotGroups)))
-if (rmdVars$selfContained)
-    paths <- sapply(paths, knitr::image_uri)
-
 # stuff everything together: https://stackoverflow.com/a/21730473
 rmdText <- sprintf("<script>var EICPaths = [ %s ];</script>",
-                   paste0("'", paths, "'", collapse = ", "))
+                   paste0("'", sapply(allPlots, "[[", "EIC"), "'", collapse = ", "))
 ```
 
 `r if (length(plotGroups) > 0) rmdText`
@@ -243,17 +256,6 @@ compoundsDT <- rbindlist(lapply(compFGroups, function(grp)
 
     ct <- compTable[[grp]]
     
-    sppaths <- file.path(plotPathLink, sprintf("compspec_%d_%d.png", grpi, seq_len(nrow(ct))))
-    scpaths <- file.path(plotPathLink, sprintf("compscore_%d_%d.png", grpi, seq_len(nrow(ct))))
-    stpaths <- file.path(plotPathLink, sprintf("compstruct_%d_%d.png", grpi, seq_len(nrow(ct))))
-        
-    if (rmdVars$selfContained)
-    {
-        sppaths <- sapply(sppaths, knitr::image_uri)
-        scpaths <- sapply(scpaths, knitr::image_uri)
-        stpaths <- sapply(stpaths, knitr::image_uri)
-    }
-    
     infoTexts <- sapply(seq_len(nrow(ct)),
                         function(compi) paste0(getCompInfoList(ct, compi, TRUE, mn), collapse = "<br>"))
     infoTexts <- sprintf("<div style='max-width: 300px; max-height: 432px; border: 1px solid black; border-style: dotted; margin: 1px; padding: 1px; overflow: auto; white-space: nowrap; }'>%s</div>", infoTexts)
@@ -265,7 +267,7 @@ compoundsDT <- rbindlist(lapply(compFGroups, function(grp)
                                  onlyAnnotated = TRUE)
         
         if (is.null(apl) || nrow(apl) == 0)
-            return("")
+            return("<div align=\"center\">No annotation available.</div>")
         
         apl[, formula := subscriptFormulaHTML(formula)]
         apl[, neutral_loss := subscriptFormulaHTML(neutral_loss)]
@@ -277,16 +279,15 @@ compoundsDT <- rbindlist(lapply(compFGroups, function(grp)
     
     return(data.table(group = grpi,
                       "#" = seq_len(nrow(ct)),
-                      compound = paste0(imgTags(stpaths), "<br>", infoTexts),
-                      spectrum = paste0(imgTags(sppaths), "<br>", fiTables),
-                      scores = imgTags(scpaths)))
+                      compound = paste0(imgTags(allPlots[[grpi]]$compoundStructs), "<br>", infoTexts),
+                      spectrum = paste0(imgTags(allPlots[[grpi]]$compoundSpectra), "<br>", fiTables),
+                      scores = imgTags(allPlots[[grpi]]$compoundScores)))
 }))
 
 DT::datatable(compoundsDT, options = list(scrollX = TRUE, scrollY = "600px", deferRender = TRUE,
                                           dom = "lrtp", pageLength = 25, autoWidth = TRUE,
                                           ordering = FALSE,
-                                          columnDefs = list(list(visible = FALSE, targets = 0),
-                                                            list(className = "dt-center", targets = 3))),
+                                          columnDefs = list(list(visible = FALSE, targets = 0))),
               rownames = FALSE, escape = FALSE, elementId = "compoundsTable")
 ```
 
@@ -301,22 +302,19 @@ DT::datatable(compoundsDT, options = list(scrollX = TRUE, scrollY = "600px", def
 formulasDT <- rbindlist(lapply(formFGroups, function(grp)
 {
     grpi <- which(plotGroups == grp)
-    precursors <- unique(rmdVars$formulas[[grp]][byMSMS == TRUE, formula])
+    precursors <- unique(rmdVars$formulas[[grp]][["formula"]])
     
-    sppaths <- file.path(plotPathLink, sprintf("formspec_%d_%s.png", grpi, precursors))
-    if (rmdVars$selfContained)
-        sppaths <- sapply(sppaths, knitr::image_uri)
-
     infoTexts <- sapply(precursors,
                         function(prec) paste0(getFormInfoList(rmdVars$formulas[[grp]], prec),
                                                               collapse = "<br>"))
+    infoTexts <- sprintf("<div style='max-width: 300px; max-height: 432px; border: 1px solid black; border-style: dotted; margin: 1px; padding: 1px; overflow: auto; white-space: nowrap; }'>%s</div>", infoTexts)
     
     fiTables <- sapply(precursors, function(prec)
     {
         apl <- annotatedPeakList(rmdVars$formulas, precursor = prec, groupName = grp,
                                  MSPeakLists = rmdVars$MSPeakLists, onlyAnnotated = TRUE)
         if (is.null(apl) || nrow(apl) == 0)
-            return("")
+            return("<div align=\"center\">No annotation available.</div>")
         
         apl[, formula := subscriptFormulaHTML(formula)]
         apl[, neutral_loss := subscriptFormulaHTML(neutral_loss)]
@@ -327,7 +325,8 @@ formulasDT <- rbindlist(lapply(formFGroups, function(grp)
     })
     
     ret <- data.table(group = grpi,
-                      spectrum = paste0(imgTags(sppaths), "<br>", fiTables),
+                      formula = subscriptFormulaHTML(precursors),
+                      spectrum = paste0(imgTags(allPlots[[grpi]]$formulaSpecs), "<br>", fiTables),
                       info = infoTexts)
 
     return(ret)
@@ -336,8 +335,7 @@ formulasDT <- rbindlist(lapply(formFGroups, function(grp)
 DT::datatable(formulasDT, options = list(scrollX = TRUE, scrollY = "600px", deferRender = TRUE,
                                          dom = "lrtp", pageLength = 25, autoWidth = TRUE,
                                          ordering = FALSE,
-                                         columnDefs = list(list(visible = FALSE, targets = 0),
-                                                           list(width = "300px", targets = 2))),
+                                         columnDefs = list(list(visible = FALSE, targets = 0))),
               rownames = FALSE, escape = FALSE, elementId = "formulasTable")
 
 ```
@@ -358,11 +356,9 @@ for (i in seq_along(compsClustFGroups))
     
     ct <- cutcl[[plotGroups[grpi]]]
     rmdTexts[i] <-
-        paste0(glue::glue(compClustTempl, grpi = grpi,
-                          grp = plotGroups[grpi],
-                          plotPath = plotPathFull,
-                          mcs = paste0(glue::glue("![]({ plotPath }/mcs_{ grpi }_{ cli }.png)",
-                                                  grpi = grpi, cli = seq_len(length(unique(ct)))),
+        paste0(glue::glue(compClustTempl,
+                          dendro = allPlots[[grpi]]$compClustDendro,
+                          mcs = paste0(sprintf("![](%s)", allPlots[[grpi]]$compClustMCS),
                                        collapse = "\n")),
                collapse = "\n")
 }

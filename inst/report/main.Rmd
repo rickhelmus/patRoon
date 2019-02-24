@@ -40,9 +40,13 @@ makePlot <- function(out, w, h, expr, bg = "white")
 imgTags <- function(img) 
 {
     if (rmdVars$selfContained)
-        return(sprintf("<img src=%s></img>", img))
-    # return(sprintf("<img src=file://%s></img>", img))
-    return(sprintf("<img src='%s'></img>", img))
+        ret <- sprintf("<img src=%s></img>", img)
+    else
+    {
+        # return(sprintf("<img src=file://%s></img>", img))
+        ret <- sprintf("<img src='%s'></img>", img)
+    }
+    return(ifelse(nzchar(img), ret, ""))
 }
 ```
 

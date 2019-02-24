@@ -2,7 +2,7 @@
 
 ### Dendrogram { grp } {{ .annotationClass .compscl_ann-{ grpi } }}
 
-![]({ plotPath }/dendro_{ grpi }.png)
+![]({ dendro })
 
 ## {{ .annotationClass .compscl_ann-{ grpi } }}
 

@@ -254,6 +254,8 @@ test_that("plotting works", {
     expect_plot(print(plotSpec(formsGFWithMSMS, plotPrec, groupNames(formsGFWithMSMS)[1], MSPeakLists = plists,
                                useGGPlot2 = TRUE)))
     
+    expect_doppel("form-scores", function() plotScores(formsGFWithMSMS, plotPrec, groupNames(formsGFWithMSMS)[1]))
+    
     skip_if_not(doSIRIUS)
     expect_doppel("venn", function() plotVenn(formsGF, formsSIR))
     expect_error(plotVenn(formsGFEmpty, formsSIREmpty))

@@ -18,6 +18,7 @@
 \alias{plotChord}
 \alias{plotEIC}
 \alias{plotInt}
+\alias{plotScores}
 \alias{plotSpec}
 \alias{plotStructure}
 \alias{plotVenn}
@@ -68,6 +69,8 @@ plotChord(obj, addSelfLinks = FALSE, addRetMzPlots = TRUE, ...)
 plotEIC(obj, ...)
 
 plotInt(obj, ...)
+
+plotScores(obj, ...)
 
 plotSpec(obj, ...)
 
@@ -202,6 +205,12 @@ please refer to the linked method documentation for each generic.
 
 \itemize{
     \item Methods are defined for: \code{\link[=plotInt,componentsIntClust-method]{componentsIntClust}}; \code{\link[=plotInt,featureGroups-method]{featureGroups}}.
+}
+
+\code{plotScores} plots candidate scorings.
+
+\itemize{
+    \item Methods are defined for: \code{\link[=plotScores,compounds-method]{compounds}}; \code{\link[=plotScores,formulas-method]{formulas}}.
 }
 
 \code{plotSpec} plots a (annotated) spectrum.

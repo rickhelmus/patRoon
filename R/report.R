@@ -51,10 +51,10 @@ NULL
 #' @param clearPath If \code{TRUE} then the destination path will be
 #'   (recursively) removed prior to reporting.
 #'
-#' @templateVar normParam compoundNormalizeScores
-#' @templateVar excludeParam compoundExclNormScores
-#' @template comp_norm
-#'
+#' @templateVar normParam compoundNormalizeScores,formulasNormalizeScores
+#' @templateVar excludeParam compoundExclNormScores,formulasExclNormScores
+#' @template norm-args
+#' 
 #' @note Any formulae and compounds for feature groups which are not present
 #'   within \code{fGroups} (\emph{i.e.} because it has been subset afterwards)
 #'   will not be reported.
@@ -95,6 +95,14 @@ optimizePngPlots <- function(plotFiles, progressOut, maxProcAmount)
     }, progressOut = progressOut, maxProcAmount = maxProcAmount)
 
     invisible(NULL)
+}
+
+textPlot <- function(txt)
+{
+    withr::with_par(list(mar = c(0, 2, 0, 0)), {
+        plot(1:10, 1:10, ann = FALSE, xaxt = "n", yaxt = "n", xlab = "", ylab = "", type = "n", adj = 1, bty = "n") # empty dummy plot
+        text(1, 5, txt, adj = 0, cex = 0.8)
+    })
 }
 
 reportFGroupTable <- function(fGroups, path, fGroupsAsRows, reportAnalysisInfo, reportRetMz, retMin)
@@ -217,7 +225,7 @@ reportFeatureTable <- function(fGroups, path, retMin)
     close(prog)
 }
 
-reportFormulaTable <- function(fGroups, formulas, path, retMin)
+reportFormulaTable <- function(fGroups, path, formulas, normalizeScores, excludeNormScores)
 {
     printf("Exporting formula table...")
 
@@ -228,15 +236,19 @@ reportFormulaTable <- function(fGroups, formulas, path, retMin)
         if (grp %in% gNames && nrow(formulas[[grp]]) > 0)
         {
             out <- file.path(path, sprintf("%s-%s.csv", class(fGroups), grp))
-            write.csv(formulas[[grp]], out)
+            
+            ft <- formulas[[grp]]
+            if (normalizeScores != "none")
+                ft <- normalizeFormScores(ft, formulas@scoreRanges[[grp]], normalizeScores == "minmax", excludeNormScores)
+            write.csv(ft, out)
         }
     }
 
     printf("Done!\n")
 }
 
-reportFormulaSpectra <- function(fGroups, path, formulas, topMost, MSPeakLists, EICRtWindow, EICMzWindow, retMin,
-                                 EICTopMost, EICs)
+reportFormulaSpectra <- function(fGroups, path, formulas, topMost, normalizeScores, excludeNormScores,
+                                 MSPeakLists, EICRtWindow, EICMzWindow, retMin, EICTopMost, EICs)
 {
     printf("Exporting formula MS/MS spectra...\n")
 
@@ -260,27 +272,44 @@ reportFormulaSpectra <- function(fGroups, path, formulas, topMost, MSPeakLists, 
 
     for (grp in formGroups)
     {
-        ft <- formulas[[grp]][byMSMS == TRUE]
+        ft <- formulas[[grp]]
 
         if (nrow(ft) > 0)
         {
             grpi <- match(grp, gNames)
 
             out <- file.path(path, sprintf("%s-%s.pdf", class(fGroups), grp))
-            pdf(out, paper = "a4", pointsize = 10, width = 8, height = 11)
+            # a4r: width=11.69, height=8.27
+            pdf(out, paper = "a4r", pointsize = 10, width = 11, height = 8)
 
             plotEIC(fGroups[, grp], EICRtWindow, EICMzWindow, retMin, EICTopMost, EICs)
 
-            layout(matrix(1:16, 4, 4, byrow = TRUE), widths = c(2, 1, 2, 1))
-
             for (precursor in unique(ft$formula))
             {
-                plotSpec(formulas, precursor, grp, MSPeakLists = MSPeakLists)
+                # NOTE: layout/mfrow/mfcol doesn't work because of the legend positioning (thinks 2 plots are made...)
+                
+                scr <- split.screen(c(2, 1))
+                scr <- c(scr, split.screen(c(1, 2), screen = scr[2]))
+                
+                screen(scr[1])
+                
+                if (is.null(MSPeakLists[[grp]][["MSMS"]]))
+                {
+                    # no MSMS spectrum, i.e. MS only formula
+                    textPlot("No MS/MS data available.")
+                }
+                else
+                    plotSpec(formulas, precursor, grp, MSPeakLists = MSPeakLists)
+                
+                screen(scr[3])
+                plotScores(formulas, precursor, grp, normalizeScores = normalizeScores,
+                           excludeNormScores = excludeNormScores)
+                
+                screen(scr[4])
+                
+                textPlot(paste0(getFormInfoList(formulas[[grp]], precursor), collapse = "\n"))
 
-                oldp <- par(mar = c(0, 2, 0, 0))
-                plot(1:10, 1:10, ann = FALSE, xaxt = "n", yaxt = "n", xlab = "", ylab = "", type = "n", adj = 1, bty = "n") # empty dummy plot
-                text(1, 5, paste0(getFormInfoList(formulas[[grp]], precursor), collapse = "\n"), adj = 0, cex = 0.8)
-                par(oldp)
+                close.screen(scr)
             }
             dev.off()
         }
@@ -370,7 +399,6 @@ reportCompoundSpectra <- function(fGroups, path, MSPeakLists, compounds, compsCl
 
             plotEIC(fGroups[, fgrpi], EICRtWindow, EICMzWindow, retMin, EICTopMost, EICs)
 
-            ncols <- 2
             for (idi in seq_len(nrow(compTable[[grp]])))
             {
                 # NOTE: layout/mfrow/mfcol doesn't work because of the legend positioning (thinks 2 plots are made...)
@@ -392,10 +420,7 @@ reportCompoundSpectra <- function(fGroups, path, MSPeakLists, compounds, compsCl
                 if (!is.null(compsCluster) && !is.null(cutcl[[grp]]))
                     txt <- paste(txt, sprintf("cluster: %d", cutcl[[grp]][idi]), sep = "\n")
 
-                oldp <- par(mar = c(0, 2, 0, 0))
-                plot(1:10, 1:10, ann = FALSE, xaxt = "n", yaxt = "n", xlab = "", ylab = "", type = "n", adj = 1, bty = "n") # empty dummy plot
-                text(1, 5, txt, adj = 0, cex = 0.8)
-                par(oldp)
+                textPlot(txt)
 
                 close.screen(scr)
             }
@@ -550,7 +575,8 @@ reportComponentPlots <- function(fGroups, path, components, EICRtWindow, EICMzWi
 #' @export
 setMethod("reportCSV", "featureGroups", function(fGroups, path, reportFGroupsAsRows, reportFGroupsAnalysisInfo,
                                                  reportFGroupsRetMz, reportFeatures,
-                                                 formulas, compounds, compoundNormalizeScores, compoundExclNormScores,
+                                                 formulas, formulasNormalizeScores, formulasExclNormScores,
+                                                 compounds, compoundNormalizeScores, compoundExclNormScores,
                                                  compsCluster, components, retMin, clearPath)
 {
     ac <- checkmate::makeAssertCollection()
@@ -561,8 +587,9 @@ setMethod("reportCSV", "featureGroups", function(fGroups, path, reportFGroupsAsR
     aapply(checkmate::assertClass, . ~ formulas + compounds + compsCluster + components,
            c("formulas", "compounds", "compoundsCluster", "components"),
            null.ok = TRUE, fixed = list(add = ac))
-    assertNormalizationMethod(compoundNormalizeScores, add = ac)
-    checkmate::assertCharacter(compoundExclNormScores, min.chars = 1, null.ok = TRUE, add = ac)
+    aapply(assertNormalizationMethod, . ~ formulasNormalizeScores + compoundNormalizeScores, fixed = list(add = ac))
+    aapply(checkmate::assertCharacter, . ~ formulasExclNormScores + compoundExclNormScores,
+           min.chars = 1, null.ok = TRUE, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
 
     prepareReportPath(path, clearPath)
@@ -580,7 +607,7 @@ setMethod("reportCSV", "featureGroups", function(fGroups, path, reportFGroupsAsR
     {
         p <- file.path(path, "formulas")
         mkdirp(p)
-        reportFormulaTable(fGroups, formulas, p, retMin)
+        reportFormulaTable(fGroups, p, formulas, formulasNormalizeScores, formulasExclNormScores)
     }
 
     if (!is.null(compounds))
@@ -607,7 +634,8 @@ setMethod("reportCSV", "featureGroups", function(fGroups, path, reportFGroupsAsR
 #' @aliases reportPDF
 #' @export
 setMethod("reportPDF", "featureGroups", function(fGroups, path, reportFGroups,
-                                                 formulas, formulasTopMost, reportFormulaSpectra,
+                                                 formulas, formulasTopMost, formulasNormalizeScores,
+                                                 formulasExclNormScores, reportFormulaSpectra,
                                                  compounds, compoundNormalizeScores, compoundExclNormScores,
                                                  compoundOnlyUsedScorings, compoundTopMost, compsCluster,
                                                  components, MSPeakLists, retMin, EICGrid,
@@ -621,8 +649,9 @@ setMethod("reportPDF", "featureGroups", function(fGroups, path, reportFGroups,
     aapply(checkmate::assertClass, . ~ formulas + compounds + compsCluster + components + MSPeakLists,
            c("formulas", "compounds", "compoundsCluster", "components", "MSPeakLists"),
            null.ok = TRUE, fixed = list(add = ac))
-    assertNormalizationMethod(compoundNormalizeScores, add = ac)
-    checkmate::assertCharacter(compoundExclNormScores, min.chars = 1, null.ok = TRUE, add = ac)
+    aapply(assertNormalizationMethod, . ~ formulasNormalizeScores + compoundNormalizeScores, fixed = list(add = ac))
+    aapply(checkmate::assertCharacter, . ~ formulasExclNormScores + compoundExclNormScores,
+           min.chars = 1, null.ok = TRUE, fixed = list(add = ac))
     aapply(checkmate::assertCount, . ~ formulasTopMost + compoundTopMost + EICTopMost,
            positive = TRUE, null.ok = TRUE, fixed = list(add = ac))
     checkmate::assertIntegerish(EICGrid, lower = 1, any.missing = FALSE, len = 2, add = ac)
@@ -655,7 +684,8 @@ setMethod("reportPDF", "featureGroups", function(fGroups, path, reportFGroups,
     {
         p <- file.path(path, "formulas")
         mkdirp(p)
-        reportFormulaSpectra(fGroups, p, formulas, formulasTopMost, MSPeakLists,
+        reportFormulaSpectra(fGroups, p, formulas, formulasTopMost, formulasNormalizeScores,
+                             formulasExclNormScores, MSPeakLists,
                              EICRtWindow, EICMzWindow, retMin, EICTopMost, EICs)
     }
 
@@ -721,6 +751,7 @@ setMethod("reportPDF", "featureGroups", function(fGroups, path, reportFGroups,
 #' @aliases reportMD
 #' @export
 setMethod("reportMD", "featureGroups", function(fGroups, path, reportPlots, formulas, formulasTopMost,
+                                                formulasNormalizeScores, formulasExclNormScores,
                                                 compounds, compoundNormalizeScores, compoundExclNormScores,
                                                 compoundOnlyUsedScorings, compoundTopMost,
                                                 compsCluster, includeMFWebLinks, components, interactiveHeat,
@@ -740,8 +771,9 @@ setMethod("reportMD", "featureGroups", function(fGroups, path, reportPlots, form
     aapply(checkmate::assertClass, . ~ formulas + compounds + components + MSPeakLists,
            c("formulas", "compounds", "components", "MSPeakLists"),
            null.ok = TRUE, fixed = list(add = ac))
-    assertNormalizationMethod(compoundNormalizeScores, add = ac)
-    checkmate::assertCharacter(compoundExclNormScores, min.chars = 1, null.ok = TRUE, add = ac)
+    aapply(assertNormalizationMethod, . ~ formulasNormalizeScores + compoundNormalizeScores, fixed = list(add = ac))
+    aapply(checkmate::assertCharacter, . ~ formulasExclNormScores + compoundExclNormScores,
+           min.chars = 1, null.ok = TRUE, fixed = list(add = ac))
     aapply(checkmate::assertCount, . ~ formulasTopMost + compoundTopMost + EICTopMost,
            positive = TRUE, null.ok = TRUE, fixed = list(add = ac))
     checkmate::assertChoice(includeMFWebLinks, c("compounds", "MSMS", "none"), add = ac)
@@ -793,8 +825,8 @@ setMethod("reportMD", "featureGroups", function(fGroups, path, reportPlots, form
                     reportPlots = reportPlots, EICRtWindow = EICRtWindow, EICMzWindow = EICMzWindow,
                     retMin = retMin, EICTopMost = EICTopMost, EICOnlyPresent = EICOnlyPresent, EICs = EICs,
                     compounds = compounds, compsCluster = compsCluster, includeMFWebLinks = includeMFWebLinks,
-                    MSPeakLists = MSPeakLists, formulas = formulas,
-                    compoundNormalizeScores = compoundNormalizeScores, compoundExclNormScores = compoundExclNormScores,
+                    MSPeakLists = MSPeakLists, formulas = formulas, formulasNormalizeScores = formulasNormalizeScores,
+                    formulasExclNormScores = formulasExclNormScores, compoundNormalizeScores = compoundNormalizeScores, compoundExclNormScores = compoundExclNormScores,
                     compoundOnlyUsedScorings = compoundOnlyUsedScorings,
                     components = components, interactiveHeat = interactiveHeat, selfContained = selfContained,
                     optimizePng = optimizePng, maxProcAmount = maxProcAmount)

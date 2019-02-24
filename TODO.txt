@@ -93,7 +93,7 @@ components
 
 reporting
 - add more options to reportPlots argument of reportMD()?
-- reportPDF/reportMD: plot formula scores
+- reportPDF/reportMD: compoundTopMost vs compoundsTopMost etc
 
 
 Cleanup

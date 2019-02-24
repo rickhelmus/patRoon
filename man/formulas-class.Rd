@@ -17,6 +17,8 @@
 \alias{as.data.table,formulas-method}
 \alias{filter,formulas-method}
 \alias{annotatedPeakList,formulas-method}
+\alias{plotScores,formulas-method}
+\alias{plotScores}
 \alias{plotSpec,formulas-method}
 \alias{plotVenn,formulas-method}
 \alias{plotUpSet,formulas-method}
@@ -51,6 +53,10 @@
 
 \S4method{annotatedPeakList}{formulas}(obj, precursor, groupName,
   analysis = NULL, MSPeakLists, onlyAnnotated = FALSE)
+
+\S4method{plotScores}{formulas}(obj, precursor, groupName,
+  analysis = NULL, normalizeScores = "max", excludeNormScores = NULL,
+  useGGPlot2 = FALSE)
 
 \S4method{plotSpec}{formulas}(obj, precursor, groupName, analysis = NULL,
   MSPeakLists, title = NULL, useGGPlot2 = FALSE, xlim = NULL,
@@ -169,13 +175,30 @@ generate the candidate}
 \item{onlyAnnotated}{Set to \code{TRUE} to filter out any peaks that could
 not be annotated.}
 
-\item{title}{The title of the plot. Set to \code{NULL} for an automatically
-generated title.}
+\item{normalizeScores}{A \code{character} that specifies how normalization of
+compound scorings occurs. Either \code{"none"} (no normalization),
+\code{"max"} (normalize to max value) or \code{"minmax"} (perform min-max
+normalization). Note that normalization of negative scores (e.g. output by
+SIRIUS) is always performed as min-max. Furthermore, currently
+normalization takes the original scoring min/max values into account when
+candidates were generated. Thus, normalization is not affected when
+candidate results were removed after they were generated (\emph{e.g.} by
+use of \code{filter}).}
+
+\item{excludeNormScores}{A \code{character} vector specifying any compound
+scoring names that should \emph{not} be normalized. Set to \code{NULL} to
+normalize all scorings. By default \code{score} and
+\code{individualMoNAScore} are set to mimic the behaviour of the MetFrag web
+interface. Note that whether any normalization occurs is set by the
+\code{excludeNormScores} argument.}
 
 \item{useGGPlot2}{If \code{TRUE} then \pkg{\link{ggplot2}} is used for
 plotting, otherwise base plot used. For \code{plotSpec}, \code{ggplot2}
 allows nicely repelled text for annotation. However, base plot is generally
 faster.}
+
+\item{title}{The title of the plot. Set to \code{NULL} for an automatically
+generated title.}
 
 \item{xlim, ylim}{Sets the plot size limits used by
 \code{\link[graphics]{plot}}. Set to \code{NULL} for automatic plot sizing.}
@@ -276,6 +299,8 @@ feature group and other information such as element counts.
 \item \code{annotatedPeakList}: Returns an MS/MS peak list annotated with data from a
 given candidate formula.
 
+\item \code{plotScores}: Plots a barplot with scoring of a candidate compound.
+
 \item \code{plotSpec}: Plots an annotated spectrum for a given candidate
 formula of a feature or feature group.
 
@@ -296,6 +321,9 @@ candidates between different \code{formula} objects.
 \describe{
 \item{\code{formulas,featureFormulas}}{Lists of all generated formulae. Use the
 \code{formulaTable} method for access.}
+
+\item{\code{scoreRanges}}{The original min/max values of all scorings when candidate
+results were generated. This is used for normalization.}
 }}
 
 \note{

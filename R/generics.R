@@ -65,9 +65,6 @@ setGeneric("mergedCompoundNames", function(compounds) standardGeneric("mergedCom
 setGeneric("identifiers", function(compounds) standardGeneric("identifiers"))
 setGeneric("addFormulaScoring", function(compounds, formulas, updateScore = FALSE,
                                          formulaScoreWeight = 1) standardGeneric("addFormulaScoring"))
-setGeneric("plotScores", function(obj, index, groupName, normalizeScores = "max",
-                                  excludeNormScores = c("score", "individualMoNAScore"), onlyUsed = TRUE,
-                                  useGGPlot2 = FALSE) standardGeneric("plotScores"))
 setGeneric("settings", function(compoundsMF) standardGeneric("settings"))
 
 ### clustering
@@ -236,6 +233,11 @@ setGeneric("plotEIC", function(obj, ...) standardGeneric("plotEIC"))
 #' @template generics
 setGeneric("plotInt", function(obj, ...) standardGeneric("plotInt"))
 
+#' @templateVar func plotScores
+#' @templateVar desc plots candidate scorings.
+#' @template generics
+setGeneric("plotScores", function(obj, ...) standardGeneric("plotScores"))
+
 #' @templateVar func plotSpec
 #' @templateVar desc plots a (annotated) spectrum.
 #' @template generics
@@ -280,12 +282,15 @@ setGeneric("checkChromatograms", function(fGroups, mzWindow = 0.005, enabledFGro
 setGeneric("compoundViewer", function(fGroups, MSPeakLists, compounds) standardGeneric("compoundViewer"))
 setGeneric("reportCSV", function(fGroups, path = "report", reportFGroupsAsRows = TRUE, reportFGroupsAnalysisInfo = TRUE,
                                  reportFGroupsRetMz = TRUE, reportFeatures = FALSE, formulas = NULL,
+                                 formulasNormalizeScores = "max", formulasExclNormScores = NULL,
                                  compounds = NULL, compoundNormalizeScores = "max",
                                  compoundExclNormScores = c("score", "individualMoNAScore"),
                                  compsCluster = NULL, components = NULL,
                                  retMin = TRUE, clearPath = FALSE) standardGeneric("reportCSV"))
 setGeneric("reportPDF", function(fGroups, path = "report", reportFGroups = TRUE,
-                                 formulas = NULL, formulasTopMost = 5, reportFormulaSpectra = TRUE,
+                                 formulas = NULL, formulasTopMost = 5,
+                                 formulasNormalizeScores = "max", formulasExclNormScores = NULL,
+                                 reportFormulaSpectra = TRUE,
                                  compounds = NULL, compoundNormalizeScores = "max",
                                  compoundExclNormScores = c("score", "individualMoNAScore"),
                                  compoundOnlyUsedScorings = TRUE, compoundTopMost = 5,
@@ -293,7 +298,9 @@ setGeneric("reportPDF", function(fGroups, path = "report", reportFGroups = TRUE,
                                  EICGrid = c(2, 1), EICRtWindow = 20, EICMzWindow = 0.005, EICTopMost = NULL,
                                  EICOnlyPresent = TRUE, clearPath = FALSE) standardGeneric("reportPDF"))
 setGeneric("reportMD", function(fGroups, path = "report", reportPlots = c("chord", "venn", "upset", "eics", "formulas"),
-                                formulas = NULL, formulasTopMost = 5, compounds = NULL, compoundNormalizeScores = "max",
+                                formulas = NULL, formulasTopMost = 5,
+                                formulasNormalizeScores = "max", formulasExclNormScores = NULL,
+                                compounds = NULL, compoundNormalizeScores = "max",
                                 compoundExclNormScores = c("score", "individualMoNAScore"),
                                 compoundOnlyUsedScorings = TRUE, compoundTopMost = 5, compsCluster = NULL,
                                 includeMFWebLinks = "compounds", components = NULL, interactiveHeat = FALSE,

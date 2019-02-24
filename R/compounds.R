@@ -44,7 +44,7 @@ NULL
 #'
 #' @templateVar normParam normalizeScores
 #' @templateVar excludeParam excludeNormScores
-#' @template comp_norm
+#' @template norm-args
 #'
 #' @templateVar class compounds
 #' @template class-hierarchy
@@ -517,8 +517,9 @@ setMethod("plotStructure", "compounds", function(obj, index, groupName, width = 
 #'
 #' @aliases plotScores
 #' @export
-setMethod("plotScores", "compounds", function(obj, index, groupName, normalizeScores, excludeNormScores,
-                                              onlyUsed, useGGPlot2)
+setMethod("plotScores", "compounds", function(obj, index, groupName, normalizeScores = "max",
+                                              excludeNormScores = c("score", "individualMoNAScore"),
+                                              onlyUsed = TRUE, useGGPlot2 = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertCount(index, positive = TRUE, add = ac)
@@ -531,7 +532,7 @@ setMethod("plotScores", "compounds", function(obj, index, groupName, normalizeSc
 
     compTable <- compoundTable(obj)[[groupName]]
 
-    if (is.null(compTable) || nrow(compTable) == 0)
+    if (is.null(compTable) || nrow(compTable) == 0 || index > nrow(compTable))
         return(NULL)
 
     mcn <- mergedCompoundNames(obj)
@@ -542,104 +543,8 @@ setMethod("plotScores", "compounds", function(obj, index, groupName, normalizeSc
     scoreCols <- getAllCompCols(c(getCompScoreColNames(), getCompSuspectListColNames()), names(compTable), mcn)
     if (onlyUsed)
         scoreCols <- intersect(scoreCols, obj@scoreTypes)
-    scores <- setnames(transpose(compTable[index, scoreCols, with = FALSE]), "score")
-    scores[, type := scoreCols]
-    scores <- scores[!is.na(score)]
-
-    if (length(mcn) > 1)
-    {
-        scores[, merged := "consensus"]
-        for (n in mcn)
-        {
-            withM <- which(grepl(paste0("-", n), scores[["type"]], fixed = TRUE))
-            set(scores, withM, "merged", n)
-            set(scores, withM, "type", gsub(paste0("-", n), "", scores[["type"]][withM]))
-        }
-    }
-
-    if (!useGGPlot2)
-    {
-        oldp <- par(no.readonly = TRUE)
-        maxStrW <- max(strwidth(unique(scores$type), units = 'in', cex = 0.9)) + 0.5
-        omai <- par("mai")
-        par(mai = c(maxStrW, 0.5, omai[3], 0))
-
-        if (length(mcn) > 1)
-            cols <- getBrewerPal(length(mcn), "Paired")
-        else
-            cols <- getBrewerPal(nrow(scores), "Paired")
-
-        bpargs <- list(las = 2, col = cols, border = cols, cex.axis = 0.9, xpd = TRUE)
-
-        if (length(mcn) > 1)
-        {
-            scSplit <- split(scores, by = "type", keep.by = FALSE)
-            scSplit <- sapply(names(scSplit), function(mb) setnames(scSplit[[mb]], "score", mb), simplify = FALSE) # assign column names
-
-            plotTab <- Reduce(function(left, right)
-            {
-                merge(left, right, by = "merged", all = TRUE)
-            }, scSplit)
-
-            plot.new()
-
-            makeLegend <- function(x, y, ...) legend(x, y, plotTab$merged, col = cols, lwd = 1, xpd = NA, ncol = 1,
-                                                     cex = 0.75, bty = "n", ...)
-
-            # auto legend positioning: https://stackoverflow.com/a/34624632/9264518
-            leg <- makeLegend(0, 0, plot = FALSE)
-            # lh <- (grconvertY(leg$rect$h, to = "ndc") - grconvertY(0, to = "ndc")) * 1.75
-            # par(omd = c(0, 1, 0, 1 - lh), new = TRUE)
-            lw <- (grconvertX(leg$rect$w, to = "ndc") - grconvertX(0, to = "ndc"))
-            par(omd = c(0, 1 - lw, 0, 1), new = TRUE)
-            bpvals <- as.matrix(plotTab[, -"merged"])
-            bp <- do.call(barplot, c(list(bpvals, beside = TRUE), bpargs))
-            bpsc <- as.vector(bpvals)
-            # legend("top", plotTab$merged, col = cols, lwd = 1, inset = c(0, -0.2), xpd = NA, horiz = TRUE, cex = 0.75)
-            # makeLegend(0, par("usr")[4] + lh)
-            makeLegend(par("usr")[2], par("usr")[4])
-        }
-        else
-        {
-            bp <- do.call(barplot, c(list(scores$score, names.arg = scores$type), bpargs))
-            bpsc <- scores$score
-        }
-
-        text(bp, bpsc, labels = round(bpsc, 2), pos = 3, cex = 0.8, xpd = TRUE)
-
-        par(oldp)
-    }
-    else
-    {
-        scorePlot <- ggplot(scores, aes_string(x = "type", y = "score")) +
-            cowplot::theme_cowplot(font_size = 12) +
-            theme(axis.title.y = element_blank(), axis.title.x = element_blank(), # axis.text.y = element_blank(), axis.ticks.y = element_blank(),
-                  legend.position = "top", legend.title = element_blank(), axis.text.x = element_text(angle = 90, hjust = 1)) +
-            guides(colour = guide_legend(nrow = 3, ncol = 2, byrow = TRUE))
-
-
-        if (length(mcn) > 1)
-            scorePlot <- scorePlot + geom_bar(stat = "identity", position = "dodge",
-                                              aes_string(colour = "merged", fill = "merged"))
-        else
-        {
-            scorePlot <- scorePlot +
-                geom_bar(stat = "identity", aes_string(colour = "type", fill = "type")) +
-                theme(legend.position = "none")
-        }
-
-        # scorePlot <- scorePlot + coord_flip()
-
-        return(scorePlot)
-        # scorePlot <- ggplot(scores, aes_string(x = "type", y = "score")) +
-        #     geom_bar(stat = "identity", position = "dodge", aes_string(colour = "merged", fill = "merged")) +
-        #     theme_cowplot(font_size = 12) +
-        #     theme(axis.title.y = element_blank(), axis.title.x = element_blank(), # axis.text.y = element_blank(), axis.ticks.y = element_blank(),
-        #           legend.position = "top", legend.title = element_blank()) +
-        #     # geom_text(aes(label = round(score, 2)), position = position_dodge(width = 0.5)) +
-        #     #guides(colour = guide_legend(nrow = 3, ncol = 3, byrow = TRUE)) +
-        #     coord_flip()
-    }
+    
+    makeScoresPlot(compTable[index, scoreCols, with = FALSE], mcn, useGGPlot2)
 })
 
 #' @describeIn compounds Returns an MS/MS peak list annotated with data from a

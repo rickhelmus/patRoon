@@ -205,6 +205,17 @@ allPlots <- lapply(seq_along(plotGroups), function(grpi)
     if (grp %in% formFGroups)
     {
         precursors <- unique(rmdVars$formulas[[grp]][["formula"]])
+        
+        grpPlots[["formulaScores"]] <- sapply(precursors, function(prec)
+        {
+            ret <- file.path(plotPathFull, sprintf("formscore_%d_%s.png", grpi, prec))
+            makePlot(ret, 4.5, 4.5, bg = NA,
+                     plotScores(rmdVars$formulas, prec, grp,
+                                normalizeScores = rmdVars$formulasNormalizeScores,
+                                excludeNormScores = rmdVars$formulasExclNormScores))
+            return(ret)
+        })
+        
         grpPlots[["formulaSpecs"]] <- sapply(precursors, function(prec)
         {
             anPList <- annotatedPeakList(rmdVars$formulas, prec, grp,
@@ -327,7 +338,7 @@ formulasDT <- rbindlist(lapply(formFGroups, function(grp)
     ret <- data.table(group = grpi,
                       formula = subscriptFormulaHTML(precursors),
                       spectrum = paste0(imgTags(allPlots[[grpi]]$formulaSpecs), "<br>", fiTables),
-                      info = infoTexts)
+                      scores = paste0(imgTags(allPlots[[grpi]]$formulaScores), "<br>", infoTexts))
 
     return(ret)
 }))

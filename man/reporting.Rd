@@ -14,6 +14,7 @@
 \S4method{reportCSV}{featureGroups}(fGroups, path = "report",
   reportFGroupsAsRows = TRUE, reportFGroupsAnalysisInfo = TRUE,
   reportFGroupsRetMz = TRUE, reportFeatures = FALSE, formulas = NULL,
+  formulasNormalizeScores = "max", formulasExclNormScores = NULL,
   compounds = NULL, compoundNormalizeScores = "max",
   compoundExclNormScores = c("score", "individualMoNAScore"),
   compsCluster = NULL, components = NULL, retMin = TRUE,
@@ -21,6 +22,7 @@
 
 \S4method{reportPDF}{featureGroups}(fGroups, path = "report",
   reportFGroups = TRUE, formulas = NULL, formulasTopMost = 5,
+  formulasNormalizeScores = "max", formulasExclNormScores = NULL,
   reportFormulaSpectra = TRUE, compounds = NULL,
   compoundNormalizeScores = "max", compoundExclNormScores = c("score",
   "individualMoNAScore"), compoundOnlyUsedScorings = TRUE,
@@ -31,14 +33,16 @@
 
 \S4method{reportMD}{featureGroups}(fGroups, path = "report",
   reportPlots = c("chord", "venn", "upset", "eics", "formulas"),
-  formulas = NULL, formulasTopMost = 5, compounds = NULL,
-  compoundNormalizeScores = "max", compoundExclNormScores = c("score",
-  "individualMoNAScore"), compoundOnlyUsedScorings = TRUE,
-  compoundTopMost = 5, compsCluster = NULL,
-  includeMFWebLinks = "compounds", components = NULL,
-  interactiveHeat = FALSE, MSPeakLists = NULL, retMin = TRUE,
-  EICRtWindow = 20, EICMzWindow = 0.005, EICTopMost = NULL,
-  EICOnlyPresent = TRUE, selfContained = TRUE, optimizePng = FALSE,
+  formulas = NULL, formulasTopMost = 5,
+  formulasNormalizeScores = "max", formulasExclNormScores = NULL,
+  compounds = NULL, compoundNormalizeScores = "max",
+  compoundExclNormScores = c("score", "individualMoNAScore"),
+  compoundOnlyUsedScorings = TRUE, compoundTopMost = 5,
+  compsCluster = NULL, includeMFWebLinks = "compounds",
+  components = NULL, interactiveHeat = FALSE, MSPeakLists = NULL,
+  retMin = TRUE, EICRtWindow = 20, EICMzWindow = 0.005,
+  EICTopMost = NULL, EICOnlyPresent = TRUE, selfContained = TRUE,
+  optimizePng = FALSE,
   maxProcAmount = getOption("patRoon.maxProcAmount"),
   clearPath = FALSE, openReport = TRUE)
 }
@@ -67,7 +71,7 @@ features.}
 \code{\link{compoundsCluster}}, \code{\link{components}}) that should be
 reported. Specify \code{NULL} to skip reporting a particular object.}
 
-\item{compoundNormalizeScores}{A \code{character} that specifies how normalization of
+\item{compoundNormalizeScores, formulasNormalizeScores}{A \code{character} that specifies how normalization of
 compound scorings occurs. Either \code{"none"} (no normalization),
 \code{"max"} (normalize to max value) or \code{"minmax"} (perform min-max
 normalization). Note that normalization of negative scores (e.g. output by
@@ -77,12 +81,12 @@ candidates were generated. Thus, normalization is not affected when
 candidate results were removed after they were generated (\emph{e.g.} by
 use of \code{filter}).}
 
-\item{compoundExclNormScores}{A \code{character} vector specifying any compound
+\item{compoundExclNormScores, formulasExclNormScores}{A \code{character} vector specifying any compound
 scoring names that should \emph{not} be normalized. Set to \code{NULL} to
 normalize all scorings. By default \code{score} and
 \code{individualMoNAScore} are set to mimic the behaviour of the MetFrag web
 interface. Note that whether any normalization occurs is set by the
-\code{compoundExclNormScores} argument.}
+\code{compoundExclNormScores,formulasExclNormScores} argument.}
 
 \item{retMin}{If \code{TRUE} then report retention times in minutes
 (otehrwise seconds).}

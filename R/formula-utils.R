@@ -268,6 +268,48 @@ rankFormulaTable <- function(formTable)
     return(formTable)
 }
 
+getPrecursorFormScores <- function(formTable, scoreCols)
+{
+    # formula tables may contain multiple lines for a precursor candidate: each
+    # for every annotated fragment. The scorings, however, should be the same
+    # for each candidate. Nevertheless, when dealing with consensus results,
+    # scorings are not homogeneous if a fragment is not annotated by all
+    # algorithms. For this reason try to find the first non-NA value from all
+    # rows.
+    return(formTable[, lapply(.SD, function(x) { xn <- x[!is.na(x)]; if (length(xn) > 0) xn[1] else x[1] }),
+                     by = "formula", .SDcols = scoreCols])
+}
+
+normalizeFormScores <- function(formResults, scoreRanges, minMaxNormalization, exclude = NULL)
+{
+    columns <- names(formResults)
+    scoreCols <- getAllFormulasCols(formulaScorings()$name, columns)
+    
+    if (!is.null(exclude))
+        scoreCols <- scoreCols[!scoreCols %in% getAllFormulasCols(exclude, columns)]
+    
+    if (length(scoreCols) > 0)
+    {
+        scoreRanges <- scoreRanges[scoreCols]
+        sc <- getPrecursorFormScores(formResults, scoreCols)
+        sc[, (scoreCols) := mapply(.SD, scoreRanges, SIMPLIFY = FALSE,
+                                   FUN = function(sc, scr) normalize(sc, minMaxNormalization, scr)),
+           .SDcols = scoreCols]
+        # add/merge normalized columns and restore original column order
+        formResults <- formResults[, setdiff(columns, scoreCols), with = FALSE][sc, on = "formula"][, columns, with = FALSE]
+    }
+    
+    return(formResults)
+}
+
+calculateFormScoreRanges <- function(formTable)
+{
+    scoreCols <- getAllFormulasCols(formulaScorings()$name, names(formTable))
+    return(setNames(lapply(scoreCols,
+                           function(sc) if (any(!is.na(formTable[[sc]]))) range(formTable[[sc]], na.rm = TRUE) else c(NA, NA)),
+                    scoreCols))
+}
+
 generateFormConsensusForGroup <- function(formAnaList, formThreshold)
 {
     # merge all together

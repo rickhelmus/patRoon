@@ -11,7 +11,9 @@ NULL
 #'
 #' @slot formulas,featureFormulas Lists of all generated formulae. Use the
 #'   \code{formulaTable} method for access.
-#'
+#' @slot scoreRanges The original min/max values of all scorings when candidate
+#'   results were generated. This is used for normalization.
+#' 
 #' @param obj,x,object,formulas The \code{formulas} object.
 #' @param \dots For \code{plotSpec}: Further arguments passed to
 #'   \code{\link[graphics]{plot}}.
@@ -35,6 +37,10 @@ NULL
 #' @templateVar optionalji TRUE
 #' @templateVar dollarOpName feature group
 #' @template sub_op-args
+#' 
+#' @templateVar normParam normalizeScores
+#' @templateVar excludeParam excludeNormScores
+#' @template norm-args
 #'
 #' @section Source: Calculation of the aromaticity index (AI) and related double
 #'   bond equivalents (DBE_AI) is performed as described in Koch 2015. Formula
@@ -51,8 +57,18 @@ NULL
 #' @template class-hierarchy
 #'
 #' @export
-formulas <- setClass("formulas", slots = c(formulas = "list", featureFormulas = "list"),
+formulas <- setClass("formulas", slots = c(formulas = "list", featureFormulas = "list", scoreRanges = "list"),
                      contains = "workflowStep")
+
+setMethod("initialize", "formulas", function(.Object, ...)
+{
+    .Object <- callNextMethod(.Object, ...)
+    
+    # NOTE: change this if topMost filter for formulas is ever implemented
+    .Object@scoreRanges <- sapply(.Object@formulas, calculateFormScoreRanges, simplify = FALSE)
+    
+    return(.Object)
+})
 
 #' @describeIn formulas Accessor method to obtain generated formulae.
 #'
@@ -462,6 +478,44 @@ setMethod("annotatedPeakList", "formulas", function(obj, precursor, groupName, a
     return(spec[])
 })
 
+#' @describeIn formulas Plots a barplot with scoring of a candidate compound.
+#'
+#' @aliases plotScores
+#' @export
+setMethod("plotScores", "formulas", function(obj, precursor, groupName, analysis = NULL,
+                                             normalizeScores = "max",
+                                             excludeNormScores = NULL, useGGPlot2 = FALSE)
+{
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertString(precursor, min.chars = 1, add = ac)
+    checkmate::assertString(groupName, min.chars = 1, add = ac)
+    checkmate::assertString(analysis, min.chars = 1, null.ok = TRUE, add = ac)
+    checkmate::assertChoice(normalizeScores, c("none", "max", "minmax"))
+    checkmate::assertCharacter(excludeNormScores, min.chars = 1, null.ok = TRUE, add = ac)
+    checkmate::assertFlag(useGGPlot2, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    if (!is.null(analysis))
+        formTable <- obj[[analysis, groupName]]
+    else
+        formTable <- obj[[groupName]]
+    
+    if (is.null(formTable) || nrow(formTable) == 0 || !precursor %in% formTable$formula)
+        return(NULL)
+    
+    mcn <- character()
+    if (!is.null(formTable[["mergedBy"]]))
+        mcn <- unique(unlist(strsplit(formTable$mergedBy, ",", fixed = TRUE)))
+    
+    if (normalizeScores != "none")
+        formTable <- normalizeFormScores(formTable, obj@scoreRanges[[groupName]],
+                                         normalizeScores == "minmax", excludeNormScores)
+
+    scoreCols <- getAllFormulasCols(formulaScorings()$name, names(formTable))
+    scoreTable <- getPrecursorFormScores(formTable[formula == precursor], scoreCols)[, scoreCols, with = FALSE]
+    makeScoresPlot(scoreTable, mcn, useGGPlot2)
+})
+
 #' @describeIn formulas Plots an annotated spectrum for a given candidate
 #'   formula of a feature or feature group.
 #'
@@ -745,6 +799,8 @@ setMethod("consensus", "formulas", function(obj, ..., formThreshold = 0,
         consFormulaList[[grpi]] <- rankFormulaTable(consFormulaList[[grpi]])
     }
 
+    consFormulaList <- pruneList(consFormulaList, checkZeroRows = TRUE)
+    
     cat("Done!\n")
 
     return(formulas(formulas = consFormulaList, featureFormulas = list(),

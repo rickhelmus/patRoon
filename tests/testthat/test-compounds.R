@@ -100,7 +100,7 @@ test_that("filtering works", {
     expect_length(filter(comps, elements = "Na1-100"), 0) # no sodium
     expect_length(filter(comps, elements = "Na0-100"), length(comps)) # no sodium, but optional
     expect_length(filter(comps, elements = "C1-100", negate = TRUE), 0)
-    expect_length(filter(comps, elements = c("Na1-100", "C1-100"), negate = TRUE), 0)
+    expect_length(filter(comps, elements = c("Na1-100", "C1-100"), negate = TRUE), length(comps))
     expect_length(filter(comps, elements = c("H1-100", "C1-100"), negate = TRUE), 0)
     expect_length(filter(comps, elements = "Na1-100", negate = TRUE), length(comps))
     expect_length(filter(comps, elements = "Na0-100", negate = TRUE), 0)

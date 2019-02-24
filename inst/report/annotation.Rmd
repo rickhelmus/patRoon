@@ -368,6 +368,8 @@ for (i in seq_along(compsClustFGroups))
     ct <- cutcl[[plotGroups[grpi]]]
     rmdTexts[i] <-
         paste0(glue::glue(compClustTempl,
+                          grpi = grpi,
+                          grp = plotGroups[grpi],
                           dendro = allPlots[[grpi]]$compClustDendro,
                           mcs = paste0(sprintf("![](%s)", allPlots[[grpi]]$compClustMCS),
                                        collapse = "\n")),

@@ -143,7 +143,7 @@ setMethod("as.data.table", "compounds", function(x, fGroups = NULL, fragments = 
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", null.ok = TRUE, add = ac)
     checkmate::assertFlag(fragments, add = ac)
-    checkmate::assertChoice(normalizeScores, c("none", "max", "minmax"))
+    assertNormalizationMethod(normalizeScores, add = ac)
     checkmate::assertCharacter(excludeNormScores, min.chars = 1, null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
 
@@ -153,10 +153,8 @@ setMethod("as.data.table", "compounds", function(x, fGroups = NULL, fragments = 
     {
         cTable <- mapply(cTable, groupNames(x), SIMPLIFY = FALSE, FUN = function(ct, grp)
         {
-            if (normalizeScores != "none")
-                ct <- normalizeCompScores(ct, x@scoreRanges[[grp]], mcn,
-                                          normalizeScores == "minmax", excludeNormScores)
-            return(ct)
+            return(normalizeCompScores(ct, x@scoreRanges[[grp]], mcn,
+                                       normalizeScores == "minmax", excludeNormScores))
         })
     }
 

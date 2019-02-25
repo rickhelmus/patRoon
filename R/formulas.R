@@ -213,7 +213,8 @@ setMethod("$", "formulas", function(x, name)
 #' @export
 setMethod("as.data.table", "formulas", function(x, fGroups = NULL, average = FALSE, countElements = NULL,
                                                 countFragElements = NULL, OM = FALSE,
-                                                maxFormulas = NULL, maxFragFormulas = NULL)
+                                                maxFormulas = NULL, maxFragFormulas = NULL,
+                                                normalizeScores = "none", excludeNormScores = NULL)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", null.ok = TRUE, add = ac)
@@ -221,12 +222,24 @@ setMethod("as.data.table", "formulas", function(x, fGroups = NULL, average = FAL
     checkmate::assertCharacter(countElements, min.chars = 1, any.missing = FALSE, null.ok = TRUE, add = ac)
     checkmate::assertCharacter(countFragElements, min.chars = 1, any.missing = FALSE, null.ok = TRUE, add = ac)
     checkmate::assertFlag(OM, add = ac)
+    assertNormalizationMethod(normalizeScores, add = ac)
+    checkmate::assertCharacter(excludeNormScores, min.chars = 1, null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
 
-    ret <- rbindlist(formulaTable(x), fill = TRUE, idcol = "group")
+    fTable <- formulaTable(x)
+    if (normalizeScores != "none")
+    {
+        fTable <- mapply(fTable, groupNames(x), SIMPLIFY = FALSE, FUN = function(ft, grp)
+        {
+            return(normalizeFormScores(ft, x@scoreRanges[[grp]],
+                                       normalizeScores == "minmax", excludeNormScores))
+        })
+    }
+    
+    ret <- rbindlist(fTable, fill = TRUE, idcol = "group")
     if (length(ret) == 0)
         return(ret)
-
+    
     if (!is.null(fGroups))
     {
         ret[, c("ret", "mz") := groupInfo(fGroups)[group, ]]

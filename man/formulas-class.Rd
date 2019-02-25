@@ -45,7 +45,8 @@
 
 \S4method{as.data.table}{formulas}(x, fGroups = NULL, average = FALSE,
   countElements = NULL, countFragElements = NULL, OM = FALSE,
-  maxFormulas = NULL, maxFragFormulas = NULL)
+  maxFormulas = NULL, maxFragFormulas = NULL,
+  normalizeScores = "none", excludeNormScores = NULL)
 
 \S4method{filter}{formulas}(obj, minExplainedFragPeaks = NULL,
   elements = NULL, fragElements = NULL, lossElements = NULL,
@@ -121,6 +122,25 @@ elements.}
 formulae (or fragment formulae) per feature group. Set to \code{NULL} to
 ignore.}
 
+\item{normalizeScores}{A \code{character} that specifies how normalization of
+compound scorings occurs. Either \code{"none"} (no normalization),
+\code{"max"} (normalize to max value) or \code{"minmax"} (perform min-max
+normalization). Note that normalization of negative scores (e.g. output by
+SIRIUS) is always performed as min-max. Furthermore, currently
+normalization takes the original scoring min/max values into account when
+candidates were generated. Thus, normalization is not affected when
+candidate results were removed after they were generated (\emph{e.g.} by
+use of \code{filter}).}
+
+\item{excludeNormScores}{A \code{character} vector specifying any compound
+  scoring names that should \emph{not} be normalized. Set to \code{NULL} to
+  normalize all scorings. Note that whether any normalization occurs is set
+  by the \code{excludeNormScores} argument.
+
+  For \code{compounds}: By default \code{score} and
+  \code{individualMoNAScore} are set to mimic the behaviour of the MetFrag
+  web interface.}
+
 \item{minExplainedFragPeaks}{Minimum number of fragment peaks that are
 explained. Setting this to \samp{1} will remove any MS only formula
 results. Set to \code{NULL} to ignore.}
@@ -174,23 +194,6 @@ generate the candidate}
 
 \item{onlyAnnotated}{Set to \code{TRUE} to filter out any peaks that could
 not be annotated.}
-
-\item{normalizeScores}{A \code{character} that specifies how normalization of
-compound scorings occurs. Either \code{"none"} (no normalization),
-\code{"max"} (normalize to max value) or \code{"minmax"} (perform min-max
-normalization). Note that normalization of negative scores (e.g. output by
-SIRIUS) is always performed as min-max. Furthermore, currently
-normalization takes the original scoring min/max values into account when
-candidates were generated. Thus, normalization is not affected when
-candidate results were removed after they were generated (\emph{e.g.} by
-use of \code{filter}).}
-
-\item{excludeNormScores}{A \code{character} vector specifying any compound
-scoring names that should \emph{not} be normalized. Set to \code{NULL} to
-normalize all scorings. By default \code{score} and
-\code{individualMoNAScore} are set to mimic the behaviour of the MetFrag web
-interface. Note that whether any normalization occurs is set by the
-\code{excludeNormScores} argument.}
 
 \item{useGGPlot2}{If \code{TRUE} then \pkg{\link{ggplot2}} is used for
 plotting, otherwise base plot used. For \code{plotSpec}, \code{ggplot2}

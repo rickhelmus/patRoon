@@ -82,11 +82,13 @@ candidate results were removed after they were generated (\emph{e.g.} by
 use of \code{filter}).}
 
 \item{compoundExclNormScores, formulasExclNormScores}{A \code{character} vector specifying any compound
-scoring names that should \emph{not} be normalized. Set to \code{NULL} to
-normalize all scorings. By default \code{score} and
-\code{individualMoNAScore} are set to mimic the behaviour of the MetFrag web
-interface. Note that whether any normalization occurs is set by the
-\code{compoundExclNormScores,formulasExclNormScores} argument.}
+  scoring names that should \emph{not} be normalized. Set to \code{NULL} to
+  normalize all scorings. Note that whether any normalization occurs is set
+  by the \code{compoundExclNormScores,formulasExclNormScores} argument.
+
+  For \code{compounds}: By default \code{score} and
+  \code{individualMoNAScore} are set to mimic the behaviour of the MetFrag
+  web interface.}
 
 \item{retMin}{If \code{TRUE} then report retention times in minutes
 (otehrwise seconds).}

@@ -122,11 +122,13 @@ candidate results were removed after they were generated (\emph{e.g.} by
 use of \code{filter}).}
 
 \item{excludeNormScores}{A \code{character} vector specifying any compound
-scoring names that should \emph{not} be normalized. Set to \code{NULL} to
-normalize all scorings. By default \code{score} and
-\code{individualMoNAScore} are set to mimic the behaviour of the MetFrag web
-interface. Note that whether any normalization occurs is set by the
-\code{excludeNormScores} argument.}
+  scoring names that should \emph{not} be normalized. Set to \code{NULL} to
+  normalize all scorings. Note that whether any normalization occurs is set
+  by the \code{excludeNormScores} argument.
+
+  For \code{compounds}: By default \code{score} and
+  \code{individualMoNAScore} are set to mimic the behaviour of the MetFrag
+  web interface.}
 
 \item{minExplainedPeaks, minScore, minFragScore, minFormulaScore}{Minimum number
 of explained peaks, overall score, in-silico fragmentation score and

@@ -160,6 +160,8 @@ test_that("as.data.table() works", {
     expect_setequal(as.data.table(formsGF, maxFormulas = 1)$group, groupNames(formsGF))
     expect_setequal(as.data.table(formsGF, maxFragFormulas = 1)$group, groupNames(formsGF))
     expect_setequal(as.data.table(formsGF, maxFormulas = 1, maxFragFormulas = 1)$group, groupNames(formsGF))
+    
+    expect_range(as.data.table(formsGF, normalizeScores = "max")$isoScore, c(0, 1))
 
     expect_equal(uniqueN(as.data.table(formsGF, maxFormulas = 1),
                          by = c("group", "formula")),

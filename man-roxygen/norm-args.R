@@ -9,7 +9,9 @@
 #'   use of \code{filter}).
 #' @param <%=excludeParam%> A \code{character} vector specifying any compound
 #'   scoring names that should \emph{not} be normalized. Set to \code{NULL} to
-#'   normalize all scorings. By default \code{score} and
-#'   \code{individualMoNAScore} are set to mimic the behaviour of the MetFrag web
-#'   interface. Note that whether any normalization occurs is set by the
-#'   \code{<%=excludeParam%>} argument.
+#'   normalize all scorings. Note that whether any normalization occurs is set
+#'   by the \code{<%=excludeParam%>} argument.
+#'
+#'   For \code{compounds}: By default \code{score} and
+#'   \code{individualMoNAScore} are set to mimic the behaviour of the MetFrag
+#'   web interface.

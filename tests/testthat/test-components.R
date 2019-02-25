@@ -22,7 +22,9 @@ compsEmpty <- components()
 
 test_that("components generation works", {
     # For RC/CAM: don't store their internal objects as they contain irreproducible file names
-    expect_known_value(list(componentTable(compsRC), componentInfo(compsRC)), testFile("components-rc"))
+    # For RC: don't check attributes as they seem irreproducible
+    expect_known_value(list(componentTable(compsRC), componentInfo(compsRC)), testFile("components-rc"),
+                       check.attributes = FALSE)
     expect_known_value(list(componentTable(compsCAM), componentInfo(compsCAM)), testFile("components-cam"))
     expect_known_value(compsInt, testFile("components-int"))
     

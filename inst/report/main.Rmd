@@ -133,7 +133,7 @@ plotVenn(rmdVars$fGroups)
 plotUpSet(rmdVars$fGroups)
 ```
 
-`r if ("eics" %in% rmdVars$reportPlots) "EICs\n===\n"`
+`r if (doEICs) "EICs\n===\n"`
 ```{r eval=doEICs}
 message("Plotting EICs...")
 prog <- txtProgressBar(0, length(rmdVars$fGroups), style = 3, file = stderr())

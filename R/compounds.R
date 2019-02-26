@@ -497,14 +497,11 @@ setMethod("plotStructure", "compounds", function(obj, index, groupName, width = 
     else
         mol <- getMoleculesFromSMILES(compTable$SMILES[index], emptyIfFails = TRUE)[[1]]
 
+    img <- getRCDKStructurePlot(mol, width, height, transparent = FALSE)
     if (useGGPlot2)
-    {
-        raster <- rcdk::view.image.2d(mol, rcdk::get.depictor(width, height))
-        img <- magick::image_trim(magick::image_read(raster))
         cowplot::ggdraw() + cowplot::draw_image(img)
-    }
     else
-        rcdkplot(mol, width, height)
+        plot(img)
 })
 
 #' @describeIn compounds Plots a barplot with scoring of a candidate compound.
@@ -681,12 +678,7 @@ setMethod("plotSpec", "compounds", function(obj, index, groupName, MSPeakLists, 
         # draw structure
         if (plotStruct && isValidMol(mol))
         {
-            raster <- rcdk::view.image.2d(mol[[1]], rcdk::get.depictor(100, 100))
-            if (!isEmptyMol(mol[[1]]))
-            {
-                img <- magick::image_trim(magick::image_read(raster))
-                img <- magick::image_transparent(img, "white")
-            }
+            img <- getRCDKStructurePlot(mol[[1]], 100, 100)
 
             dpi <- (par("cra")/par("cin"))[1]
 
@@ -729,8 +721,7 @@ setMethod("plotSpec", "compounds", function(obj, index, groupName, MSPeakLists, 
 
         if (plotStruct && isValidMol(mol))
         {
-            raster <- rcdk::view.image.2d(mol[[1]], rcdk::get.depictor(100, 100))
-            img <- magick::image_trim(magick::image_read(raster))
+            img <- getRCDKStructurePlot(mol[[1]], 100, 100, transparent = FALSE)
 
             # positioning if legend is on top... doesn't work too well :(
             # mar <- 7

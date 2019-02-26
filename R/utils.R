@@ -297,26 +297,28 @@ generateAnalysisInfoFromEnviMass <- function(path)
     return(ret)
 }
 
-# from: http://www.cureffi.org/2013/09/23/a-quick-intro-to-chemical-informatics-in-r/
-rcdkplot <- function(molecule, width = 500, height = 500)
+# based on http://www.cureffi.org/2013/09/23/a-quick-intro-to-chemical-informatics-in-r/
+getRCDKStructurePlot <- function(molecule, width = 500, height = 500, trim = TRUE, transparent = TRUE)
 {
     # drawing unconnected is not supported. Assume these are salts and we can just draw largest instead
     # UNDONE: is this still relevant?
     # if (!is.connected(molecule))
     #     molecule <- get.largest.component(molecule)
-
-    temp <- rcdk::view.image.2d(molecule, rcdk::get.depictor(width, height)) # get Java representation into an image matrix.
-    # plot(NA, NA, xlim = c(1, 10), ylim = c(1, 10), xaxt = 'n', yaxt = 'n', xlab = '', ylab = '') # create an empty plot
-    # rasterImage(temp, 1, 1, 10, 10) # boundaries of raster: xmin, ymin, xmax, ymax. here i set them equal to plot boundaries
-    # grid::grid.newpage()
-    # grid::grid.raster(temp)
-
-    img <- magick::image_read(temp)
-    # trim image before plotting it
+    
+    img <- rcdk::view.image.2d(molecule, rcdk::get.depictor(width, height)) # get Java representation into an image matrix.
+    img <- magick::image_read(img)
+    
     if (!isEmptyMol(molecule))
-        img <- magick::image_transparent(magick::image_trim(img), "white")
-    plot(img)
+    {
+        if (trim)
+            img <- magick::image_trim(img)
+        if (transparent)
+            img <- magick::image_transparent(img, "white")
+    }
+    
+    return(img)
 }
+
 
 unFactorDF <- function(df)
 {

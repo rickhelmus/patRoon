@@ -197,9 +197,9 @@ setMethod("plot", "compoundsCluster", function(x, groupName, pal = "Paired",
 #' @export
 setMethod("getMCS", "compoundsCluster", function(obj, groupName, cluster)
 {
-    ac <- checkmate::makeAssertCollection()
-    assertChoiceSilent(groupName, names(obj@clusters), add = ac)
+    assertChoiceSilent(groupName, names(obj@clusters))
     
+    ac <- checkmate::makeAssertCollection()
     cc <- obj@cutClusters[[groupName]]
     nclust <- length(unique(cc))
     checkmate::assertInt(cluster, lower = 0, upper = nclust)
@@ -238,12 +238,13 @@ setMethod("plotStructure", "compoundsCluster", function(obj, groupName, cluster,
                                                         withTitle = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
+    assertChoiceSilent(groupName, names(obj@clusters), add = ac)
     aapply(checkmate::assertNumber, . ~ width + height, lower = 0, finite = TRUE,
            fixed = list(add = ac))
     checkmate::assertFlag(withTitle, add = ac)
     checkmate::reportAssertions(ac)
     
-    rcdkplot(getMCS(obj, groupName, cluster), width, height)
+    plot(getRCDKStructurePlot(getMCS(obj, groupName, cluster), width, height))
     
     if (withTitle)
     {

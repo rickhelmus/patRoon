@@ -61,8 +61,7 @@ compoundScorings <- function(algorithm = NULL, database = NULL, includeSuspectLi
 {
     algos <- c("metfrag", "sirius")
     
-    ret <- read.csv(system.file("misc", "compounds-scorings.csv", package = "patRoon"),
-                    stringsAsFactors = FALSE)
+    ret <- compScorings # stored inside R/sysdata.rda
     
     ac <- checkmate::makeAssertCollection()
     checkmate::assertChoice(algorithm, algos, null.ok = TRUE, add = ac)

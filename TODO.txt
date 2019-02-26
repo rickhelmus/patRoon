@@ -67,7 +67,6 @@ compounds
 - do something with sirius fingerprints?
 - fix compoundViewer
 - MetFrag: (buggy) trivial name fetching not needed anymore?
-- convert score csv to internal data?
 - SIRIUS: use --auto-charge instead of manually fixing charge of fragments (or not? conflicting docs on what it does)
 - test score normalization?
 - add new MF stat and other scorings and make sure default normalization equals that of MF web

@@ -12,6 +12,7 @@
 ^tests/testthat/cache\.sqlite$
 ^\.travis\.yml$
 ^appveyor\.yml$
+^av_trigger_deps\.ps1$
 ^Dockerfile$
 ^install_deps\.R$
 ^\.dockerignore$

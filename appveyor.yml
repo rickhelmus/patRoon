@@ -53,6 +53,8 @@ environment:
     BIOC_USE_DEVEL: FALSE
     _R_CHECK_FORCE_SUGGESTS_: FALSE
     R_CHECK_ARGS: --no-build-vignettes --no-manual --no-multiarch
+    av_token:
+      secure: JJT6ZdxNWo6wf+xPRwfOXAXW1M65jtdzRXCKFGarzzQ=
 
 build_script:
     - travis-tool.sh install_bioc mzR xcms CAMERA
@@ -84,6 +86,7 @@ on_failure:
 on_success:
   # NOTE: disable coverage compiler flags as they don't work with GenForm
   - Rscript -e "options(covr.flags = list(CXXFLAGS = '', LDFLAGS = '')); covr::codecov()"
+  - ps: .\
 
 on_finish:
   - ps: (New-Object 'System.Net.WebClient').UploadFile("https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)", "$($env:PATROON_JUNIT)")

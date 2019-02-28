@@ -86,7 +86,7 @@ on_failure:
 on_success:
   # NOTE: disable coverage compiler flags as they don't work with GenForm
   - Rscript -e "options(covr.flags = list(CXXFLAGS = '', LDFLAGS = '')); covr::codecov()"
-  - ps: .\
+  - ps: .\av_trigger_deps.ps1
 
 on_finish:
   - ps: (New-Object 'System.Net.WebClient').UploadFile("https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)", "$($env:PATROON_JUNIT)")

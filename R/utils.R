@@ -157,8 +157,8 @@ findPWizPath <- function()
     if (Sys.info()[["sysname"]] == "Windows")
     {
         # Inspired by scan_registry_for_rtools() from pkgload
-        key <- "Software\\Classes\\Applications\\seems.exe\\shell\\open\\command"
-        reg <- tryCatch(utils::readRegistry(key, "HCU"), error = function(e) NULL)
+        key <- "Directory\\shell\\Open with SeeMS\\command"
+        reg <- tryCatch(utils::readRegistry(key, "HCR"), error = function(e) NULL)
         
         # not sure if this might occur
         if (is.null(reg))

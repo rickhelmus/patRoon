@@ -280,7 +280,7 @@ utils <- setRefClass("utilsInst", methods = list(
             return(path)
         
         # Inspired by scan_registry_for_rtools() from pkgload
-        key <- "Software\\Classes\\Applications\\seems.exe\\shell\\open\\command"
+        key <- "Directory\\shell\\Open with SeeMS\\command"
         reg <- tryCatch(utils::readRegistry(key, "HCU"), error = function(e) NULL)
         
         # not sure if this might occur

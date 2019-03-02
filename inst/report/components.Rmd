@@ -21,30 +21,31 @@ for (ci in seq_len(cCount))
 {
     curPlotInd <- curPlotInd + 1
     allPlots[curPlotInd] <- file.path(plotPathFull, sprintf("component_spec_%d.png", ci))
-    makePlot(allPlots[curPlotInd], 7, 4.5, bg = NA, plotSpec(rmdVars$components, ci,
-                                   main = sprintf("ret: %.1f; m/z: %.4f - %.4f",
-                                                  cInfo$ret[ci], min(cTable[[ci]]$mz), max(cTable[[ci]]$mz))))
+    makeCachedPlot(allPlots[curPlotInd], "plotSpec",
+                   list(rmdVars$components, ci,
+                        main = sprintf("ret: %.1f; m/z: %.4f - %.4f", cInfo$ret[ci], min(cTable[[ci]]$mz), max(cTable[[ci]]$mz))),
+                        7, 4.5, bg = NA, cacheDB = rmdVars$cacheDB)
 
     curPlotInd <- curPlotInd + 1
     allPlots[curPlotInd] <- file.path(plotPathFull, sprintf("component_eic_%d.png", ci))
-    makePlot(allPlots[curPlotInd], 7, 4.5, bg = NA,
-             plotEIC(rmdVars$components, ci, rmdVars$fGroups,
-                     rtWindow = rmdVars$EICRtWindow,
-                     mzWindow = rmdVars$EICMzWindow, retMin = rmdVars$retMin,
-                     EICs = rmdVars$EICs))
+    makeCachedPlot(allPlots[curPlotInd], "plotEIC",
+                   list(rmdVars$components, ci, rmdVars$fGroups, rtWindow = rmdVars$EICRtWindow,
+                        mzWindow = rmdVars$EICMzWindow, retMin = rmdVars$retMin, EICs = rmdVars$EICs),
+                   7, 4.5, bg = NA, cacheDB = rmdVars$cacheDB)
     
     if (isHClust)
     {
         curPlotInd <- curPlotInd + 1
         allPlots[curPlotInd] <- file.path(plotPathFull, sprintf("component_int_norm_%d.png", ci))
-        makePlot(allPlots[curPlotInd], 3.3, 3.3, bg = NA,
-                 plotInt(rmdVars$components, index = ci, main = "normalized"))
+        makeCachedPlot(allPlots[curPlotInd], "plotInt",
+                       list(rmdVars$components, index = ci, main = "normalized"),
+                       3.3, 3.3, bg = NA, cacheDB = rmdVars$cacheDB)
         
         curPlotInd <- curPlotInd + 1
         allPlots[curPlotInd] <- file.path(plotPathFull, sprintf("component_int_abs_%d.png", ci))
         fg <- fGroups[, unique(cTable[[ci]]$group)]
-        makePlot(allPlots[curPlotInd], 3.3, 3.3, bg = NA,
-                 plotInt(fg, average = clProps$average, main = "absolute"))
+        makeCachedPlot(allPlots[curPlotInd], "plotInt", list(fg, average = clProps$average, main = "absolute"),
+                       3.3, 3.3, bg = NA, cacheDB = rmdVars$cacheDB)
     }
     
     setTxtProgressBar(prog, ci)

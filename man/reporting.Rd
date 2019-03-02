@@ -44,7 +44,7 @@
   EICTopMost = NULL, EICOnlyPresent = TRUE, selfContained = TRUE,
   optimizePng = FALSE,
   maxProcAmount = getOption("patRoon.maxProcAmount"),
-  clearPath = FALSE, openReport = TRUE)
+  clearPath = FALSE, openReport = TRUE, noDate = FALSE)
 }
 \arguments{
 \item{fGroups}{The \code{\link{featureGroups}} object that should be used for
@@ -156,6 +156,11 @@ usually close to the amount of CPU cores.}
 
 \item{openReport}{If set to \code{TRUE} then the output report file will be
 opened with the system browser.}
+
+\item{noDate}{If \code{TRUE} then the current date is not added to the
+report. This is mainly used for testing and its main purpose is to
+guarentees equal report files when `reportMD()` is called multiple times
+with equal arguments.}
 }
 \description{
 Functionality to report data produced by most workflow steps such as

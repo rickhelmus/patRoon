@@ -1,5 +1,9 @@
 # patRoon 0.1.0.9000
 
+## March 2019
+* `reportMD()`: most time consuming plots are now cached. Hence, re-reporting should be signficiantly faster now.
+
+
 ## February 2019
 * Compound scorings are now normalized towards their original min/max values. This ensures that the `score` column of MetFrag results stays correct.
 * plotScores(): Option to only report scorings that have been used for ranking

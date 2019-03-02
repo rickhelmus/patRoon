@@ -448,6 +448,12 @@ setMethod("plotSpec", "components", function(obj, index, markFGroup = NULL, useG
     }
 })
 
+setMethod("plotSpecHash", "components", function(obj, index, markFGroup = NULL, useGGPlot2 = FALSE,
+                                                 xlim = NULL, ylim = NULL, ...)
+{
+    return(makeHash(obj[[index]], markFGroup, title, useGGPlot2, xlim, ylim, ...))
+})
+
 #' @describeIn components Plot an extracted ion chromatogram (EIC) for all
 #'   feature groups within a single component.
 #' @param fGroups The \code{\link{featureGroups}} object that was used to
@@ -486,6 +492,18 @@ setMethod("plotEIC", "components", function(obj, index, fGroups, rtWindow = 5, .
     if (length(fGroups) > 0)
         plotEIC(fGroups, rtWindow = rtWindow, colourBy = colourBy, showPeakArea = showPeakArea,
                 showFGroupRect = showFGroupRect, topMost = topMost, ...)
+})
+
+setMethod("plotEICHash", "components", function(obj, index, fGroups, rtWindow = 5, ...)
+{
+    comp <- componentTable(obj)[[index]]
+    if (!is.null(comp[["hsnr"]])) # homologues?
+    {
+        rGroups <- unique(comp$rGroup)
+        fGroups <- replicateGroupFilter(fGroups, rGroups, verbose = FALSE)
+    }
+    fGroups <- fGroups[, unique(comp$group)]
+    makeHash(comp, fGroups, rtWindow, ...)
 })
 
 #' @describeIn components Generates a consensus from multiple \code{components}

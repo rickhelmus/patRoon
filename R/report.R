@@ -97,6 +97,21 @@ optimizePngPlots <- function(plotFiles, progressOut, maxProcAmount)
     invisible(NULL)
 }
 
+makeCachedPlot <- function(out, plotFunc, plotArgs, w, h, bg = "white", cacheDB)
+{
+    hash <- do.call(paste0(plotFunc, "Hash"), plotArgs)
+    cache <- loadCacheData("reportPlots", hash, cacheDB)
+    
+    if (!is.null(cache))
+        writeBin(cache, out)
+    else
+    {
+        withr::with_png(out, width = w, height = h, units = "in", res = 72, bg = bg,
+                        code = do.call(plotFunc, plotArgs))
+        saveCacheData("reportPlots", readBin(out, "raw", file.info(out)$size), hash, cacheDB)
+    }
+}
+
 textPlot <- function(txt)
 {
     withr::with_par(list(mar = c(0, 2, 0, 0)), {
@@ -742,6 +757,10 @@ setMethod("reportPDF", "featureGroups", function(fGroups, path, reportFGroups,
 #'   usually close to the amount of CPU cores.
 #' @param openReport If set to \code{TRUE} then the output report file will be
 #'   opened with the system browser.
+#' @param noDate If \code{TRUE} then the current date is not added to the
+#'   report. This is mainly used for testing and its main purpose is to
+#'   guarentees equal report files when `reportMD()` is called multiple times
+#'   with equal arguments.
 #'
 #' @references Creating MetFrag landing page URLs based on code from
 #'   \href{https://github.com/Treutler/MetFamily}{MetFamily} R package. \cr\cr
@@ -757,7 +776,7 @@ setMethod("reportMD", "featureGroups", function(fGroups, path, reportPlots, form
                                                 compsCluster, includeMFWebLinks, components, interactiveHeat,
                                                 MSPeakLists, retMin, EICRtWindow, EICMzWindow,
                                                 EICTopMost, EICOnlyPresent, selfContained,
-                                                optimizePng, maxProcAmount, clearPath, openReport)
+                                                optimizePng, maxProcAmount, clearPath, openReport, noDate)
 {
     # UNDONE: mention pandoc win limits
 
@@ -766,7 +785,7 @@ setMethod("reportMD", "featureGroups", function(fGroups, path, reportPlots, form
     reportPlots <- checkmate::matchArg(reportPlots, c("none", "chord", "venn", "upset", "eics", "formulas"),
                                        several.ok = TRUE, add = ac)
     aapply(checkmate::assertFlag, . ~ compoundOnlyUsedScorings + interactiveHeat + retMin + EICOnlyPresent +
-               selfContained + optimizePng + clearPath + openReport,
+               selfContained + optimizePng + clearPath + openReport + noDate,
            fixed = list(add = ac))
     aapply(checkmate::assertClass, . ~ formulas + compounds + components + MSPeakLists,
            c("formulas", "compounds", "components", "MSPeakLists"),
@@ -829,7 +848,8 @@ setMethod("reportMD", "featureGroups", function(fGroups, path, reportPlots, form
                     formulasExclNormScores = formulasExclNormScores, compoundNormalizeScores = compoundNormalizeScores, compoundExclNormScores = compoundExclNormScores,
                     compoundOnlyUsedScorings = compoundOnlyUsedScorings,
                     components = components, interactiveHeat = interactiveHeat, selfContained = selfContained,
-                    optimizePng = optimizePng, maxProcAmount = maxProcAmount)
+                    optimizePng = optimizePng, maxProcAmount = maxProcAmount,
+                    noDate = noDate)
 
     # HACK: not sure what exactly happens here, but... kableExtra adds latex
     # dependencies by default, which then may cause serious memory leakage when
@@ -838,7 +858,10 @@ setMethod("reportMD", "featureGroups", function(fGroups, path, reportPlots, form
     on.exit(knitr::knit_meta_add(knitMeta), add = TRUE)
 
     outputFile <- file.path(path, "report.html")
-    withr::with_options(list(DT.warn.size = FALSE),
+    
+    # normalize cache path so it can be used in report working directory
+    withr::with_options(list(DT.warn.size = FALSE,
+                             patRoon.cache.fileName = normalizePath(getOption("patRoon.cache.fileName"))),
                         rmarkdown::render(file.path(workPath, "main.Rmd"), output_file = outputFile,
                                           output_options = list(self_contained = selfContained),
                                           quiet = TRUE))

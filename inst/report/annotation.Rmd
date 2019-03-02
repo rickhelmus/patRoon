@@ -148,13 +148,10 @@ allPlots <- lapply(seq_along(plotGroups), function(grpi)
     grp <- plotGroups[grpi]
     plotf <- file.path(plotPathFull, sprintf("eic_%i.png", grpi))
     grpPlots[["EIC"]] <- plotf
-    makePlot(plotf, 5, 4.5,
-             plotEIC(rmdVars$fGroups[, plotGroups[grpi]], rmdVars$EICRtWindow,
-                     rmdVars$EICMzWindow, rmdVars$retMin,
-                     rmdVars$EICTopMost, rmdVars$EICs, colourBy = "rGroup", title = ""))
-    
-    # may be generated if necessary
-    unAnnotatedMSSpec <- file.path(plotPathFull, sprintf("spec_%d.png", grpi))
+    makeCachedPlot(plotf, "plotEIC", list(rmdVars$fGroups[, plotGroups[grpi]], rmdVars$EICRtWindow,
+                                          rmdVars$EICMzWindow, rmdVars$retMin,
+                                          rmdVars$EICTopMost, rmdVars$EICs, colourBy = "rGroup", title = ""),
+                   5, 4.5, cacheDB = rmdVars$cacheDB)
     
     if (grp %in% compFGroups)
     {
@@ -163,25 +160,26 @@ allPlots <- lapply(seq_along(plotGroups), function(grpi)
         grpPlots[["compoundScores"]] <- sapply(compsSeq, function(compi)
         {
             ret <- file.path(plotPathFull, sprintf("compscore_%d_%d.png", grpi, compi))
-            makePlot(ret, 4.5, 4.5, bg = NA,
-                     plotScores(rmdVars$compounds, compi, grp, rmdVars$compoundNormalizeScores,
-                                rmdVars$compoundExclNormScores, rmdVars$compoundOnlyUsedScorings))
+            makeCachedPlot(ret, "plotScores", list(rmdVars$compounds, compi, grp, rmdVars$compoundNormalizeScores,
+                                                   rmdVars$compoundExclNormScores, rmdVars$compoundOnlyUsedScorings),
+                           4.5, 4.5, bg = NA, cacheDB = rmdVars$cacheDB)
             return(ret)
         })
         
         grpPlots[["compoundSpectra"]] <- sapply(compsSeq, function(compi)
         {
             ret <- file.path(plotPathFull, sprintf("compspec_%d_%d.png", grpi, compi))
-            makePlot(ret, 7, 4.5, bg = NA, plotSpec(rmdVars$compounds, compi,  grp,
-                                                    rmdVars$MSPeakLists, rmdVars$formulas,
-                                                    FALSE))
+            makeCachedPlot(ret, "plotSpec", list(rmdVars$compounds, compi,  grp, rmdVars$MSPeakLists,
+                                                 rmdVars$formulas, FALSE),
+                           7, 4.5, bg = NA, cacheDB = rmdVars$cacheDB)
             return(ret)
         })
         
         grpPlots[["compoundStructs"]] <- sapply(compsSeq, function(compi)
         {
             ret <- file.path(plotPathFull, sprintf("compstruct_%d_%d.png", grpi, compi))
-            makePlot(ret, 3, 3, bg = NA, plotStructure(rmdVars$compounds, compi, grp, width = 150, height = 150))
+            makeCachedPlot(ret, "plotStructure", list(rmdVars$compounds, compi, grp, width = 150, height = 150),
+                           3, 3, bg = NA, cacheDB = rmdVars$cacheDB)
             return(ret)
         })
     }
@@ -189,15 +187,15 @@ allPlots <- lapply(seq_along(plotGroups), function(grpi)
     if (grp %in% compsClustFGroups)
     {
         plotf <- file.path(plotPathFull, sprintf("dendro_%d.png", grpi))
-        makePlot(plotf, 8, 4.5, plot(rmdVars$compsCluster, groupName = grp))
+        makeCachedPlot(plotf, "plot", list(rmdVars$compsCluster, groupName = grp), 8, 4.5, cacheDB = rmdVars$cacheDB)
         grpPlots[["compClustDendro"]] <- plotf
         
         ct <- cutClusters(rmdVars$compsCluster)[[grp]]
         grpPlots[["compClustMCS"]] <- sapply(seq_along(unique(ct)), function(cli)
         {
             ret <- file.path(plotPathFull, sprintf("mcs_%d_%d.png", grpi, cli))
-            makePlot(ret, 3, 3, plotStructure(rmdVars$compsCluster, grp, cli,
-                                              100, 100))
+            makeCachedPlot(ret, "plotStructure", list(rmdVars$compsCluster, grp, cli, 100, 100),
+                           3, 3, cacheDB = rmdVars$cacheDB)
             return(ret)
         })
     }
@@ -209,10 +207,10 @@ allPlots <- lapply(seq_along(plotGroups), function(grpi)
         grpPlots[["formulaScores"]] <- sapply(precursors, function(prec)
         {
             ret <- file.path(plotPathFull, sprintf("formscore_%d_%s.png", grpi, prec))
-            makePlot(ret, 4.5, 4.5, bg = NA,
-                     plotScores(rmdVars$formulas, prec, grp,
-                                normalizeScores = rmdVars$formulasNormalizeScores,
-                                excludeNormScores = rmdVars$formulasExclNormScores))
+            makeCachedPlot(ret, "plotScores", list(rmdVars$formulas, prec, grp,
+                                                   normalizeScores = rmdVars$formulasNormalizeScores,
+                                                   excludeNormScores = rmdVars$formulasExclNormScores),
+                           4.5, 4.5, bg = NA, cacheDB = rmdVars$cacheDB)
             return(ret)
         })
         
@@ -224,7 +222,8 @@ allPlots <- lapply(seq_along(plotGroups), function(grpi)
                 return("") # No MS/MS data available
             
             ret <- file.path(plotPathFull, sprintf("formspec_%d_%s.png", grpi, prec))
-            makePlot(ret, 6, 4.5, plotSpec(rmdVars$formulas, prec, grp, MSPeakLists = rmdVars$MSPeakLists))
+            makeCachedPlot(ret, "plotSpec", list(rmdVars$formulas, prec, grp, MSPeakLists = rmdVars$MSPeakLists),
+                           6, 4.5, cacheDB = rmdVars$cacheDB)
             return(ret)
         })
     }

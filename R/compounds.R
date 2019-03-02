@@ -497,11 +497,20 @@ setMethod("plotStructure", "compounds", function(obj, index, groupName, width = 
     else
         mol <- getMoleculesFromSMILES(compTable$SMILES[index], emptyIfFails = TRUE)[[1]]
 
-    img <- getRCDKStructurePlot(mol, width, height, transparent = FALSE)
+    img <- getRCDKStructurePlot(mol, width, height)
     if (useGGPlot2)
         cowplot::ggdraw() + cowplot::draw_image(img)
     else
         plot(img)
+})
+
+setMethod("plotStructureHash", "compounds", function(obj, index, groupName, width = 500,
+                                                     height = 500, useGGPlot2 = FALSE)
+{
+    compTable <- compoundTable(obj)[[groupName]]
+    if (is.null(compTable) || nrow(compTable) == 0)
+        return(NULL)
+    return(makeHash(compTable$SMILES[index], width, height, useGGPlot2))
 })
 
 #' @describeIn compounds Plots a barplot with scoring of a candidate compound.
@@ -540,6 +549,20 @@ setMethod("plotScores", "compounds", function(obj, index, groupName, normalizeSc
         scoreCols <- intersect(scoreCols, obj@scoreTypes)
     
     makeScoresPlot(compTable[index, scoreCols, with = FALSE], mcn, useGGPlot2)
+})
+
+setMethod("plotScoresHash", "compounds", function(obj, index, groupName, normalizeScores = "max",
+                                                  excludeNormScores = c("score", "individualMoNAScore"),
+                                                  onlyUsed = TRUE, useGGPlot2 = FALSE)
+{
+    compTable <- compoundTable(obj)[[groupName]]
+    if (is.null(compTable) || nrow(compTable) == 0 || index > nrow(compTable))
+        return(NULL)
+    
+    if (normalizeScores == "none")
+        compTable <- compTable[index]
+    
+    return(makeHash(index, compTable, normalizeScores, excludeNormScores, onlyUsed, useGGPlot2))
 })
 
 #' @describeIn compounds Returns an MS/MS peak list annotated with data from a
@@ -774,6 +797,18 @@ setMethod("plotSpec", "compounds", function(obj, index, groupName, MSPeakLists, 
         # gridExtra::grid.arrange(MSPlot, structPlot, scorePlot, layout_matrix = matrix(c(1, 2, 1, 3, 1, 3), ncol = 2, byrow = TRUE), widths = c(2, 1))
 
     }
+})
+
+setMethod("plotSpecHash", "compounds", function(obj, index, groupName, MSPeakLists, formulas = NULL,
+                                                plotStruct = TRUE, title = NULL, useGGPlot2 = FALSE, xlim = NULL,
+                                                ylim = NULL, ...)
+{
+    compTable <- compoundTable(obj)[[groupName]]
+    if (is.null(compTable) || nrow(compTable) == 0)
+        return(NULL)
+    
+    return(makeHash(compTable[index, ], annotatedPeakList(obj, index, groupName, MSPeakLists, formulas),
+                    plotStruct, title, useGGPlot2, xlim, ylim, ...))
 })
 
 #' @describeIn compounds plots a Venn diagram (using \pkg{\link{VennDiagram}})

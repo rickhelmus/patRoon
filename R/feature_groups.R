@@ -441,6 +441,8 @@ setMethod("plotInt", "featureGroups", function(obj, average = FALSE, ...)
         lines(x = px, y = gTable[[i]])
 })
 
+setMethod("plotIntHash", "featureGroups", function(obj, average = FALSE, ...) makeHash(allArgs()))
+
 #' @describeIn featureGroups Generates a chord diagram which can be used to
 #'   visualize shared presence of feature groups between analyses or replicate
 #'   groups. In addition, analyses/replicates sharing similar properties
@@ -893,6 +895,20 @@ setMethod("plotEIC", "featureGroups", function(obj, rtWindow = 30, mzWindow = 0.
     }
 
     par(oldp)
+})
+
+setMethod("plotEICHash", "featureGroups", function(obj, rtWindow = 30, mzWindow = 0.005, retMin = FALSE, topMost = NULL,
+                                                   EICs = NULL, showPeakArea = FALSE, showFGroupRect = TRUE,
+                                                   title = NULL, colourBy = c("none", "rGroups", "fGroups"),
+                                                   showLegend = TRUE, onlyPresent = TRUE,
+                                                   annotate = c("none", "ret", "mz"), showProgress = FALSE,
+                                                   xlim = NULL, ylim = NULL, ...)
+{
+    colourBy <- checkmate::matchArg(colourBy, c("none", "rGroups", "fGroups"))
+    annotate <- checkmate::matchArg(annotate, c("none", "ret", "mz"), several.ok = TRUE)
+    if ("none" %in% annotate)
+        annotate <- "none"
+    makeHash(allArgs(FALSE))
 })
 
 #' @describeIn featureGroups plots a Venn diagram (using

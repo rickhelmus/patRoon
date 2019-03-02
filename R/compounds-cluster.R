@@ -189,6 +189,14 @@ setMethod("plot", "compoundsCluster", function(x, groupName, pal = "Paired",
     invisible(NULL)
 })
 
+setMethod("plotHash", "compoundsCluster", function(x, groupName, pal = "Paired",
+                                                   colourBranches = lengths(x)[groupName] < 50,
+                                                   showLegend = lengths(x)[groupName] < 20, ...)
+{
+    makeHash(as.dendrogram(x@clusters[[groupName]]), x@cutClusters[[groupName]], pal,
+                           colourBranches, showLegend, ...)
+})
+
 #' @describeIn compoundsCluster Calculates the maximum common substructure (MCS)
 #'   for all candidate structures within a specified cluster. This method uses
 #'   the \code{\link{get.mcs}} function from \CRANpkg{rcdk}.
@@ -252,6 +260,18 @@ setMethod("plotStructure", "compoundsCluster", function(obj, groupName, cluster,
         title(sprintf("cluster %d (n=%d)", cluster, count))
     }
 })
+
+setMethod("plotStructureHash", "compoundsCluster", function(obj, groupName, cluster,
+                                                            width = 500, height = 500,
+                                                            withTitle = TRUE)
+{
+    cc <- obj@cutClusters[[groupName]]
+    ret <- makeHash(obj@SMILES[[groupName]][cc == cluster], width, height)
+    if (withTitle)
+        ret <- makeHash(ret, sum(obj@cutClusters[[groupName]] == cluster))
+    return(ret)
+})
+
 
 #' @details \code{makeHCluster} performs hierarchical clustering of all
 #'   structure candidates for each feature group within a

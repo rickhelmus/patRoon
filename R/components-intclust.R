@@ -176,6 +176,12 @@ setMethod("plotInt", "componentsIntClust", function(obj, index, ...)
     invisible(NULL)
 })
 
+setMethod("plotIntHash", "componentsIntClust", function(obj, index, ...)
+{
+    plotm <- obj@clusterm[rownames(obj@clusterm) %in% rownames(obj@gInfo)[obj@cutClusters == index], , drop = FALSE]
+    return(makeHash(plotm, ...))
+})
+
 #' @describeIn componentsIntClust generates a dendrogram from a given cluster
 #'   object and optionally highlights resulting branches when the cluster is
 #'   cut.

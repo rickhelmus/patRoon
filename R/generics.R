@@ -307,7 +307,15 @@ setGeneric("reportMD", function(fGroups, path = "report", reportPlots = c("chord
                                 MSPeakLists = NULL, retMin = TRUE, EICRtWindow = 20, EICMzWindow = 0.005,
                                 EICTopMost = NULL, EICOnlyPresent = TRUE, selfContained = TRUE, optimizePng = FALSE,
                                 maxProcAmount = getOption("patRoon.maxProcAmount"),
-                                clearPath = FALSE, openReport = TRUE) standardGeneric("reportMD"))
+                                clearPath = FALSE, openReport = TRUE, noDate = FALSE) standardGeneric("reportMD"))
+
+# Used for reporting
+setGeneric("plotHash", function(x, ...) standardGeneric("plotHash"))
+setGeneric("plotSpecHash", function(obj, ...) standardGeneric("plotSpecHash"))
+setGeneric("plotScoresHash", function(obj, ...) standardGeneric("plotScoresHash"))
+setGeneric("plotStructureHash", function(obj, ...) standardGeneric("plotStructureHash"))
+setGeneric("plotEICHash", function(obj, ...) standardGeneric("plotEICHash"))
+setGeneric("plotIntHash", function(obj, ...) standardGeneric("plotIntHash"))
 
 
 #' @templateVar func [

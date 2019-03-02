@@ -529,6 +529,24 @@ setMethod("plotScores", "formulas", function(obj, precursor, groupName, analysis
     makeScoresPlot(scoreTable, mcn, useGGPlot2)
 })
 
+setMethod("plotScoresHash", "formulas", function(obj, precursor, groupName, analysis = NULL,
+                                                 normalizeScores = "max",
+                                                 excludeNormScores = NULL, useGGPlot2 = FALSE)
+{
+    if (!is.null(analysis))
+        formTable <- obj[[analysis, groupName]]
+    else
+        formTable <- obj[[groupName]]
+    if (is.null(formTable) || nrow(formTable) == 0 || !precursor %in% formTable$formula)
+        return(NULL)
+    
+    mb <- formTable[["mergedBy"]]
+    if (normalizeScores == "none")
+        formTable <- formTable[formula == precursor]
+    
+    return(makeHash(precursor, formTable, formTable$mb, normalizeScores, excludeNormScores, useGGPlot2))
+})
+
 #' @describeIn formulas Plots an annotated spectrum for a given candidate
 #'   formula of a feature or feature group.
 #'
@@ -574,6 +592,13 @@ setMethod("plotSpec", "formulas", function(obj, precursor, groupName, analysis =
         return(makeMSPlotGG(spec) + ggtitle(title))
 
     makeMSPlot(spec, xlim, ylim, ..., main = title)
+})
+
+setMethod("plotSpecHash", "formulas", function(obj, precursor, groupName, analysis = NULL, MSPeakLists,
+                                               title = NULL, useGGPlot2 = FALSE, xlim = NULL, ylim = NULL, ...)
+{
+    return(makeHash(precursor, annotatedPeakList(obj, precursor, groupName, analysis, MSPeakLists),
+                    title, useGGPlot2, xlim, ylim, ...))
 })
 
 #' @describeIn formulas plots a Venn diagram (using \pkg{\link{VennDiagram}})

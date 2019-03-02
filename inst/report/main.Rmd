@@ -1,7 +1,7 @@
 ---
 title: "report"
 author: "`r getPackageName(create = FALSE)`"
-date: "`r date()`"
+date: "`r if (!rmdVars$noDate) date() else '' `"
 output:
     flexdashboard::flex_dashboard:
         vertical_layout: scroll
@@ -28,13 +28,6 @@ getPlotPath <- function(link)
         ret <- file.path(rmdVars$outPath, "report_files", "plots")
     mkdirp(ret)
     return(ret)
-}
-
-makePlot <- function(out, w, h, expr, bg = "white")
-{
-    png(out, w, h, units = "in", res = 72, bg = bg)
-    eval(expr)
-    dev.off()
 }
 
 imgTags <- function(img) 

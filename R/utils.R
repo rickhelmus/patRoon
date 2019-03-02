@@ -994,7 +994,7 @@ verifyDependencies <- function()
                 OK <<- FALSE
             }
             else
-                printf("found directory '%s'\n", path)
+                printf("found! (directory '%s')\n", path)
         }
         else
         {
@@ -1007,7 +1007,7 @@ verifyDependencies <- function()
                 OK <<- FALSE
             }
             else if (nzchar(dn) && dn != ".")
-                printf("found in '%s'\n", dn)
+                printf("found! (in '%s')\n", dn)
             else
                 cat("found!\n")
         }

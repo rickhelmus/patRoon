@@ -128,7 +128,7 @@ getCommandWithOptPath <- function(cmd, opt, verify = TRUE)
                 stop(sprintf("Cannot find '%s'. Is the option '%s' set correctly?", ret, opt))
             return(NULL)
         }
-            
+
         return(ret)
     }
 
@@ -149,21 +149,21 @@ findPWizPath <- function()
     # try to find ProteoWizard
     # order: options --> win registry --> PATH
     # the PATH is searched last because OpenMS might have added its own old version.
-    
+
     path <- getOption("patRoon.path.pwiz")
     if (!is.null(path) && nzchar(path))
         return(path)
-    
+
     if (Sys.info()[["sysname"]] == "Windows")
     {
         # Inspired by scan_registry_for_rtools() from pkgload
         key <- "Directory\\shell\\Open with SeeMS\\command"
         reg <- tryCatch(utils::readRegistry(key, "HCR"), error = function(e) NULL)
-        
+
         # not sure if this might occur
         if (is.null(reg))
             reg <- tryCatch(utils::readRegistry(key, "HLM"), error = function(e) NULL)
-        
+
         if (!is.null(reg))
         {
             path <- tryCatch(dirname(sub("\"([^\"]*)\".*", "\\1", reg[[1]])), error = function(e) NULL)
@@ -171,13 +171,13 @@ findPWizPath <- function()
                 return(path)
         }
     }
-    
+
     # check PATH
     msc <- if (Sys.info()[["sysname"]] == "Windows") "msconvert.exe" else "msconvert"
     path <- dirname(Sys.which(msc))
     if (nzchar(path))
         return(path)
-    
+
     return(NULL)
 }
 
@@ -209,26 +209,21 @@ line2user <- function(line, side)
 #'   and references, respectively (will be recycled). If \code{groups} is an
 #'   empty character string (\code{""}) the analysis name will be set as
 #'   replicate group.
-#' @param fileTypes A character vector of analyses file types. Valid values are:
+#' @param formats A character vector of analyses file types. Valid values are:
 #'   \code{Bruker}, \code{mzXML} and \code{mzML}.
 #'
 #' @rdname analysis-information
 #' @export
-generateAnalysisInfo <- function(paths, groups = "", refs = "", fileTypes = c("Bruker", "mzXML", "mzML"))
+generateAnalysisInfo <- function(paths, groups = "", refs = "", formats = MSFileFormats())
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertDirectoryExists(paths, access = "r", add = ac)
     checkmate::assertCharacter(groups, min.len = 1, add = ac)
     checkmate::assertCharacter(refs, min.len = 1, add = ac)
-    checkmate::assertSubset(fileTypes, c("Bruker", "mzXML", "mzML"), empty.ok = FALSE, add = ac)
+    checkmate::assertSubset(formats, MSFileFormats(), empty.ok = FALSE, add = ac)
     checkmate::reportAssertions(ac)
 
-    fileExts <- c(Bruker = ".d", mzXML = ".mzXML", mzML = ".mzML")
-    fileTypes <- fileExts[fileTypes] # rename to file extensions
-
-    # escape dots for regex
-    exts <- gsub(".", "\\.", fileTypes, fixed = TRUE)
-    files <- as.vector(unlist(Vectorize(list.files)(paths, exts, full.names = TRUE)))
+    files <- listMSFiles(paths, formats)
 
     if (length(files) == 0)
     {
@@ -236,20 +231,12 @@ generateAnalysisInfo <- function(paths, groups = "", refs = "", fileTypes = c("B
         return(NULL)
     }
 
-    if (".d" %in% fileTypes)
-    {
-        # filter out directories unless they end with .d
-        files <- files[grepl("(\\.d)$", files) | !file.info(files, extra_cols = FALSE)$isdir]
-
-        # filter out any non directory files that end with .d
-        files <- files[!grepl("(\\.d)$", files) | file.info(files, extra_cols = FALSE)$isdir]
-    }
-    else
-        files <- files[!file.info(files, extra_cols = FALSE)$isdir] # filter out directories
-
-    ret <- data.frame(path = dirname(files), analysis = simplifyAnalysisNames(files), group = groups, ref = refs, stringsAsFactors = FALSE)
+    ret <- data.frame(path = dirname(files), analysis = simplifyAnalysisNames(files), stringsAsFactors = FALSE)
     ret <- ret[!duplicated(ret[, c("path", "analysis")]), ]
-    ret$group <- ifelse(!nzchar(ret$group), ret$analysis, ret$group)
+
+    # set after duplicate removal
+    ret$group <- ifelse(!nzchar(groups), ret$analysis, groups)
+    ret$ref <- refs
 
     return(ret)
 }
@@ -304,10 +291,10 @@ getRCDKStructurePlot <- function(molecule, width = 500, height = 500, trim = TRU
     # UNDONE: is this still relevant?
     # if (!is.connected(molecule))
     #     molecule <- get.largest.component(molecule)
-    
+
     img <- rcdk::view.image.2d(molecule, rcdk::get.depictor(width, height)) # get Java representation into an image matrix.
     img <- magick::image_read(img)
-    
+
     if (!isEmptyMol(molecule))
     {
         if (trim)
@@ -315,7 +302,7 @@ getRCDKStructurePlot <- function(molecule, width = 500, height = 500, trim = TRU
         if (transparent)
             img <- magick::image_transparent(img, "white")
     }
-    
+
     return(img)
 }
 
@@ -522,28 +509,28 @@ getMSPlotData <- function(spec)
 
     # default colour/line width
     plotData[, c("colour", "lwd", "legend") := .("grey", 1, "unassigned")]
-    
+
     if (hasFragInfo)
     {
         isAnnotated <- plotData[!is.na(formula), which = TRUE]
         if (!is.null(spec[["mergedBy"]]))
         {
             plotData[isAnnotated, legend := sapply(mergedBy, wrapStr, width = 10)]
-            
+
             mbsUnique <- unique(plotData$legend)
             # order from small to big based on number of commas
             mbsUnique <- mbsUnique[order(sapply(mbsUnique, countCharInStr, ch = ",", USE.NAMES = FALSE))]
             mbCombCols <- setNames(getBrewerPal(length(mbsUnique), "Paired"), mbsUnique)
-            
+
             plotData[isAnnotated, c("colour", "lwd") := .(mbCombCols[match(legend, mbsUnique)], 2)]
         }
         else
             plotData[isAnnotated, c("colour", "lwd", "legend") := .("blue", 2, "assigned")] # nothing merged, just mark all annotated blue
     }
-    
+
     # mark precursor
     plotData[precursor == TRUE, c("colour", "lwd", "legend") := .("red", 2, "precursor")]
-    
+
     return(plotData)
 }
 
@@ -552,7 +539,7 @@ makeScoresPlot <- function(scoreTable, mcn, useGGPlot2)
     scores <- setnames(transpose(scoreTable), "score")
     scores[, type := names(scoreTable)]
     scores <- scores[!is.na(score)]
-    
+
     if (length(mcn) > 1)
     {
         scores[, merged := "consensus"]
@@ -563,36 +550,36 @@ makeScoresPlot <- function(scoreTable, mcn, useGGPlot2)
             set(scores, withM, "type", gsub(paste0("-", n), "", scores[["type"]][withM]))
         }
     }
-    
+
     if (!useGGPlot2)
     {
         oldp <- par(no.readonly = TRUE)
         maxStrW <- max(strwidth(unique(scores$type), units = 'in', cex = 0.9)) + 0.5
         omai <- par("mai")
         par(mai = c(maxStrW, 0.5, omai[3], 0))
-        
+
         if (length(mcn) > 1)
             cols <- getBrewerPal(length(mcn), "Paired")
         else
             cols <- getBrewerPal(nrow(scores), "Paired")
-        
+
         bpargs <- list(las = 2, col = cols, border = cols, cex.axis = 0.9, xpd = TRUE)
-        
+
         if (length(mcn) > 1)
         {
             scSplit <- split(scores, by = "type", keep.by = FALSE)
             scSplit <- sapply(names(scSplit), function(mb) setnames(scSplit[[mb]], "score", mb), simplify = FALSE) # assign column names
-            
+
             plotTab <- Reduce(function(left, right)
             {
                 merge(left, right, by = "merged", all = TRUE)
             }, scSplit)
-            
+
             plot.new()
-            
+
             makeLegend <- function(x, y, ...) legend(x, y, plotTab$merged, col = cols, lwd = 1, xpd = NA, ncol = 1,
                                                      cex = 0.75, bty = "n", ...)
-            
+
             # auto legend positioning: https://stackoverflow.com/a/34624632/9264518
             leg <- makeLegend(0, 0, plot = FALSE)
             lw <- (grconvertX(leg$rect$w, to = "ndc") - grconvertX(0, to = "ndc"))
@@ -607,9 +594,9 @@ makeScoresPlot <- function(scoreTable, mcn, useGGPlot2)
             bp <- do.call(barplot, c(list(scores$score, names.arg = scores$type), bpargs))
             bpsc <- scores$score
         }
-        
+
         text(bp, bpsc, labels = round(bpsc, 2), pos = 3, cex = 0.8, xpd = TRUE)
-        
+
         par(oldp)
     }
     else
@@ -619,8 +606,8 @@ makeScoresPlot <- function(scoreTable, mcn, useGGPlot2)
             theme(axis.title.y = element_blank(), axis.title.x = element_blank(), # axis.text.y = element_blank(), axis.ticks.y = element_blank(),
                   legend.position = "top", legend.title = element_blank(), axis.text.x = element_text(angle = 90, hjust = 1)) +
             guides(colour = guide_legend(nrow = 3, ncol = 2, byrow = TRUE))
-        
-        
+
+
         if (length(mcn) > 1)
             scorePlot <- scorePlot + geom_bar(stat = "identity", position = "dodge",
                                               aes_string(colour = "merged", fill = "merged"))
@@ -630,7 +617,7 @@ makeScoresPlot <- function(scoreTable, mcn, useGGPlot2)
                 geom_bar(stat = "identity", aes_string(colour = "type", fill = "type")) +
                 theme(legend.position = "none")
         }
-        
+
         return(scorePlot)
     }
 }
@@ -710,7 +697,7 @@ makeMSPlot <- function(spec, xlim, ylim, ..., extraHeightInch = 0)
 makeMSPlotGG <- function(spec, ...)
 {
     plotData <- getMSPlotData(spec)
-    
+
     # BUG: throws errors when parse=TRUE and all labels are empty
     if (!is.null(plotData$formula) && any(!is.na(plotData$formula)))
     {
@@ -726,7 +713,7 @@ makeMSPlotGG <- function(spec, ...)
     }
     else
         ret <- ggplot(plotData, aes_string(x = "mz", y = 0))
-    
+
     ret <- ret + xlim(range(spec$mz) * c(0.9, 1.1)) +
         geom_segment(aes_string(xend = "mz", yend = "intensity", colour = "legend", size = "lwd")) +
         scale_size(range = c(0.5, 2), guide = FALSE) + xlab("m/z") + ylab("Intensity") +
@@ -975,7 +962,7 @@ verifyDependencies <- function()
 {
     # UNDONE: for now just check one command-line tool of a software package
     # UNDONE: skip GenForm for now? Should be present as embedded binary.
-    
+
     OK <- TRUE
     check <- function(name, path, opt, isDir = FALSE)
     {
@@ -1012,21 +999,21 @@ verifyDependencies <- function()
                 cat("found!\n")
         }
     }
-    
+
     check("ProteoWizard", findPWizPath(), "patRoon.path.pwiz", isDir = TRUE)
     check("OpenMS", getCommandWithOptPath("FeatureFinderMetabo", "OpenMS", verify = FALSE), "patRoon.path.OpenMS")
     check("pngquant", getCommandWithOptPath("pngquant", "pngquant", verify = FALSE), "patRoon.path.pngquant")
     check("SIRIUS", getCommandWithOptPath(getSiriusBin(), "SIRIUS", verify = FALSE), "patRoon.path.SIRIUS")
     check("MetFrag CL", getOption("patRoon.path.MetFragCL"), "patRoon.path.MetFragCL")
     check("MetFrag CompTox Database", getOption("patRoon.path.MetFragCompTox"), "patRoon.path.MetFragCompTox")
-    
+
     if (!OK)
         cat("\nSome dependencies were not found. Please make sure that their file locations are configured properly.",
             "For instance, run the following to set the location of MetFragCL:",
             sprintf("options(patRoon.path.MetFragCL = \"C:/MetFrag2.4.5-CL.jar\")"),
             "\nPlease see ?patRoon for more information on how to configure patRoon options.",
             sep = "\n")
-    
+
     invisible(NULL)
 }
 
@@ -1035,19 +1022,19 @@ allArgs <- function(origValues = FALSE)
 {
     # get formals for parent function
     parent_formals <- formals(sys.function(sys.parent(n = 1)))
-    
+
     # Get names of implied arguments
     fnames <- names(parent_formals)
-    
+
     # Remove '...' from list of parameter names if it exists
     fnames <- fnames[-which(fnames == '...')]
-    
+
     # Get currently set values for named variables in the parent frame
     args <- evalq(as.list(environment()), envir = parent.frame())
-    
+
     # Get the list of variables defined in '...'
     args <- c(args[fnames], evalq(list(...), envir = parent.frame()))
-    
+
     if(origValues)
     {
         # get default values
@@ -1057,6 +1044,6 @@ allArgs <- function(origValues = FALSE)
         setargs <- evalq(as.list(match.call())[-1], envir = parent.frame())
         args[names(setargs)] <- setargs
     }
-    
+
     return(args)
 }

@@ -19,14 +19,36 @@ MSFileExtensions <- function()
 #'   input formats (see below).
 #' @rdname convertMSFiles
 #' @export
-MSFileFormats <- function() names(MSFileExtensions())
+MSFileFormats <- function(algorithm = "pwiz")
+{
+    checkmate::assertChoice(algorithm, c("pwiz", "openms"))
+    if (algorithm == "pwiz")
+        return(names(MSFileExtensions()))
+    return(c("mzXML", "mzML")) # OpenMS
+}
 
 listMSFiles <- function(dirs, from)
 {
     allExts <- MSFileExtensions()
     allExts <- unique(unlist(allExts[from]))
-    return(list.files(dirs, full.names = TRUE, pattern = paste0("*\\.", allExts, "$", collapse = "|"),
-                      ignore.case = TRUE))
+
+    files <- list.files(dirs, full.names = TRUE, pattern = paste0("*\\.", allExts, "$", collapse = "|"),
+                        ignore.case = TRUE)
+
+    isDir <- file.info(files, extra_cols = FALSE)$isdir
+    if ("bruker" %in% from)
+    {
+        isD <- grepl("(\\.d)$", files)
+        # filter out directories unless they end with .d
+        files <- files[isD | !isDir]
+
+        # filter out any non directory files that end with .d
+        files <- files[!isD | isDir]
+    }
+    else
+        files <- files[!isDir]
+
+    return(files)
 }
 
 convertMSFilesPWiz <- function(inFiles, outFiles, to, filters, extraOpts,
@@ -156,7 +178,7 @@ convertMSFilesOpenMS <- function(inFiles, outFiles, to, extraOpts, logPath, maxP
 #' @rdname convertMSFiles
 #' @export
 convertMSFiles <- function(files, outPath = NULL, dirs = TRUE,
-                           from = MSFileFormats(), to = "mzML",
+                           from = MSFileFormats(algorithm), to = "mzML",
                            overWrite = FALSE, algorithm = "pwiz",
                            filters = NULL, extraOpts = NULL,
                            logPath = file.path("log", "convert"),

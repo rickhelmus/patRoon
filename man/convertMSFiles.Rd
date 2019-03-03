@@ -2,12 +2,15 @@
 % Please edit documentation in R/convert.R
 \name{convertMSFiles}
 \alias{convertMSFiles}
-\title{Conversion of analyses between several open and closed data formats}
+\alias{MSFileFormats}
+\title{MS data conversion}
 \usage{
-convertMSFiles(files, outPath = NULL, dirs = TRUE, from = c("thermo",
-  "bruker", "agilent", "ab", "waters", "mzXML", "mzML"), to = "mzML",
-  overWrite = FALSE, algorithm = "pwiz", filters = NULL,
-  extraOpts = NULL, logPath = file.path("log", "convert"),
+MSFileFormats()
+
+convertMSFiles(files, outPath = NULL, dirs = TRUE,
+  from = MSFileFormats(), to = "mzML", overWrite = FALSE,
+  algorithm = "pwiz", filters = NULL, extraOpts = NULL,
+  logPath = file.path("log", "convert"),
   maxProcAmount = getOption("patRoon.maxProcAmount"))
 }
 \arguments{
@@ -52,13 +55,20 @@ Usually a number close to the amount of physical cores yields most
 efficient results.}
 }
 \description{
-This function converts the data format of an analysis to another. It either
-uses tools from \href{http://proteowizard.sourceforge.net/}{ProteoWizard}
-(\command{msConvert} command) or \href{http://www.openms.de/}{OpenMS}
-(\command{FileConverter} command) to perform the conversion. The supported
-input and output formats include \file{mzXML} and \file{.mzML}. Furthermore,
-when ProteoWizard is used for conversion, most major (closed) vendor formats
-are supported for input files.
+Conversion of MS analysis files between several open and closed data formats.
+}
+\details{
+\code{MSFileFormats} returns a \code{character} with all supported
+  input formats (see below).
+
+\code{convertMSFiles} converts the data format of an analysis to
+  another. It either uses tools from
+  \href{http://proteowizard.sourceforge.net/}{ProteoWizard}
+  (\command{msConvert} command) or \href{http://www.openms.de/}{OpenMS}
+  (\command{FileConverter} command) to perform the conversion. The supported
+  input and output formats include \file{mzXML} and \file{.mzML}.
+  Furthermore, when ProteoWizard is used for conversion, major (closed)
+  vendor formats are supported for input files.
 }
 \section{Conversion formats}{
  Input and output formats include \code{mzXML}

@@ -2,6 +2,7 @@
 
 export(COMStop)
 export(GenFormAdducts)
+export(MSFileFormats)
 export(MetFragAdducts)
 export(addAllDAEICs)
 export(addDAEIC)

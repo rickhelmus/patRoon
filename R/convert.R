@@ -1,3 +1,34 @@
+#' MS data conversion
+#'
+#' Conversion of MS analysis files between several open and closed data formats.
+#' @name convertMSFiles
+NULL
+
+MSFileExtensions <- function()
+{
+    list(thermo = "raw",
+         bruker = c("d", "yep", "baf", "fid"),
+         agilent = "d",
+         ab = "wiff",
+         waters = "raw",
+         mzXML = "mzXML",
+         mzML = "mzML")
+}
+
+#' @details \code{MSFileFormats} returns a \code{character} with all supported
+#'   input formats (see below).
+#' @rdname convertMSFiles
+#' @export
+MSFileFormats <- function() names(MSFileExtensions())
+
+listMSFiles <- function(dirs, from)
+{
+    allExts <- MSFileExtensions()
+    allExts <- unique(unlist(allExts[from]))
+    return(list.files(dirs, full.names = TRUE, pattern = paste0("*\\.", allExts, "$", collapse = "|"),
+                      ignore.case = TRUE))
+}
+
 convertMSFilesPWiz <- function(inFiles, outFiles, to, filters, extraOpts,
                                logPath, maxProcAmount)
 {
@@ -11,7 +42,7 @@ convertMSFilesPWiz <- function(inFiles, outFiles, to, filters, extraOpts,
     if (is.null(pwpath) || !file.exists(file.path(pwpath, "msconvert")))
         stop("Could not find ProteoWizard. You may set its location in the patRoon.path.pwiz option. See ?patRoon for more details.")
     msc <- file.path(pwpath, "msconvert")
-    
+
     cmdQueue <- lapply(seq_along(inFiles), function(fi)
     {
         basef <- basename(tools::file_path_sans_ext(inFiles[fi]))
@@ -50,15 +81,14 @@ convertMSFilesOpenMS <- function(inFiles, outFiles, to, extraOpts, logPath, maxP
     invisible(NULL)
 }
 
-#' Conversion of analyses between several open and closed data formats
-#'
-#' This function converts the data format of an analysis to another. It either
-#' uses tools from \href{http://proteowizard.sourceforge.net/}{ProteoWizard}
-#' (\command{msConvert} command) or \href{http://www.openms.de/}{OpenMS}
-#' (\command{FileConverter} command) to perform the conversion. The supported
-#' input and output formats include \file{mzXML} and \file{.mzML}. Furthermore,
-#' when ProteoWizard is used for conversion, most major (closed) vendor formats
-#' are supported for input files.
+#' @details \code{convertMSFiles} converts the data format of an analysis to
+#'   another. It either uses tools from
+#'   \href{http://proteowizard.sourceforge.net/}{ProteoWizard}
+#'   (\command{msConvert} command) or \href{http://www.openms.de/}{OpenMS}
+#'   (\command{FileConverter} command) to perform the conversion. The supported
+#'   input and output formats include \file{mzXML} and \file{.mzML}.
+#'   Furthermore, when ProteoWizard is used for conversion, major (closed)
+#'   vendor formats are supported for input files.
 #'
 #' @param files,dirs The \code{files} argument should be a \code{character}
 #'   vector with input files. If \code{files} contains directories and
@@ -123,10 +153,11 @@ convertMSFilesOpenMS <- function(inFiles, outFiles, to, extraOpts, logPath, maxP
 #' @references \insertRef{Rst2016}{patRoon} \cr\cr
 #'   \insertRef{Chambers2012}{patRoon}
 #'
+#' @rdname convertMSFiles
 #' @export
 convertMSFiles <- function(files, outPath = NULL, dirs = TRUE,
-                           from = c("thermo", "bruker", "agilent", "ab", "waters", "mzXML", "mzML"),
-                           to = "mzML", overWrite = FALSE, algorithm = "pwiz",
+                           from = MSFileFormats(), to = "mzML",
+                           overWrite = FALSE, algorithm = "pwiz",
                            filters = NULL, extraOpts = NULL,
                            logPath = file.path("log", "convert"),
                            maxProcAmount = getOption("patRoon.maxProcAmount"))
@@ -149,27 +180,16 @@ convertMSFiles <- function(files, outPath = NULL, dirs = TRUE,
                                     several.ok = TRUE, add = ac)
     else # OpenMS
         from <- checkmate::matchArg(from, c("mzXML", "mzML"), several.ok = TRUE, add = ac)
-    
+
     if (dirs)
     {
-        allExts <- list(thermo = ".raw",
-                        bruker = c(".d", "yep", "baf", "fid"),
-                        agilent = ".d",
-                        ab = ".wiff",
-                        waters = ".raw",
-                        mzXML = ".mzXML",
-                        mzML = ".mzML")
-        
         dirs <- files[file.info(files, extra_cols = FALSE)$isdir]
-        
+
         # UNDONE: is agilent .d also a directory?
         if ("bruker" %in% from)
-            dirs <- dirs[!grepl("(\\.d)$", files)] # filter out .d analyses "files" (=in reality directories)
-        
-        fExts <- unique(unlist(allExts[from]))
-        dirFiles <- list.files(dirs, full.names = TRUE, pattern = paste0("*\\", fExts, "$", collapse = "|"),
-                               ignore.case = TRUE)
-        
+            dirs <- dirs[!grepl("(\\.d)$", files)] # filter out .d analyses "files" (are actually directories)
+
+        dirFiles <- listMSFiles(dirs, from)
         files <- union(dirFiles, setdiff(files, dirs))
     }
 

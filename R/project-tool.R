@@ -133,15 +133,22 @@ getNewProjectUI <- function(destPath)
             miniTabPanel("Analyses", icon = icon("folder-open"),
                          miniContentPanel(
                              fillCol(
-                                 flex = c(NA, 1),
+                                 flex = c(NA, NA, 1),
                                  fillRow(
-                                     height = 125,
+                                     height = 110,
                                      radioButtons("generateAnaInfo", "Generate analysis information",
                                                   c("None" = "none", "From new csv file" = "table",
                                                     "Load in script" = "script")),
                                      conditionalPanel(
                                          condition = "input.generateAnaInfo == \"table\"",
                                          textInput("analysisTableFile", "Analysis table output file", "analyses.csv")
+                                     )
+                                 ),
+                                 conditionalPanel(
+                                     condition = "input.generateAnaInfo != \"none\"",
+                                     fillRow(
+                                         height = 30,
+                                         textNote("Make sure to consider data conversion if data files are not yet in mzXML/mzML format.")
                                      )
                                  ),
                                  conditionalPanel(
@@ -283,7 +290,7 @@ getNewProjectUI <- function(destPath)
 newProject <- function(destPath = NULL)
 {
     rstudioapi::verifyAvailable()
-    
+
     # UNDONE: warning/message about empty groups
 
     hotOpts <- list(rowHeaderWidth = 40, readOnly = TRUE,
@@ -295,7 +302,7 @@ newProject <- function(destPath = NULL)
 
     server <- function(input, output, session)
     {
-        rValues <- reactiveValues(analyses = data.table(analysis = character(0), type = character(0),
+        rValues <- reactiveValues(analyses = data.table(analysis = character(0), format = character(0),
                                                         group = character(0), ref = character(0), path = character(0)))
 
         observeEvent(input$create, {
@@ -343,17 +350,23 @@ newProject <- function(destPath = NULL)
             anaDir <- selectDirectory(path = "~/")
             if (!is.null(anaDir))
             {
-                files <- list.files(anaDir, "\\.(mzML|mzXML|d)$", full.names = TRUE)
+                files <- listMSFiles(anaDir, MSFileTypes())
 
                 if (length(files) > 0)
                 {
                     dt <- data.table(path = dirname(files), analysis = simplifyAnalysisNames(files),
-                                     group = "", ref = "", ext = tools::file_ext(files))
-                    dt[ext == "d", ext := "bruker"]
-                    dt[, type := paste0(.SD$ext, collapse = ", "), by = .(path, analysis)]
-                    dt[, ext := NULL]
+                                     group = "", ref = "")
+
+                    fExts <- MSFileExtensions()
+                    dt[, format := sapply(tools::file_ext(files), function(ext)
+                    {
+                        paste0(names(fExts)[sapply(fExts, function(e) ext %in% e)], collapse = "/")
+                    })]
+
+
+                    dt[, format := paste0(.SD$format, collapse = ", "), by = .(path, analysis)]
                     dt <- unique(dt, by = c("analysis", "path"))
-                    setcolorder(dt, c("analysis", "type", "group", "ref", "path"))
+                    setcolorder(dt, c("analysis", "format", "group", "ref", "path"))
 
                     rValues$analyses <- rbind(rValues$analyses, dt)
                 }
@@ -371,20 +384,20 @@ newProject <- function(destPath = NULL)
                     showDialog("Error", "Failed to open/parse selected csv file!", "")
                 else if (nrow(csvTab) > 0)
                 {
-                    exts <- mapply(csvTab$analysis, csvTab$path, FUN = function(ana, path)
+                    msExts <- MSFileExtensions()
+                    formats <- mapply(csvTab$analysis, csvTab$path, FUN = function(ana, path)
                     {
                         fp <- file.path(path, ana)
-                        ret <- c("mzML", "mzXML", "d")
-                        ret <- ret[file.exists(paste0(fp, ".", ret))]
-                        ret[ret == "d"] <- "bruker"
-                        return(paste0(ret, collapse = ", "))
+                        ret <- names(msExts)[(sapply(msExts, function(e) any(file.exists(paste0(fp, ".", e)))))]
+                        ret <- paste0(ret, collapse = ", ")
+                        return(if (length(ret) > 0) ret else "")
                     })
 
-                    csvTab[, type := exts]
+                    csvTab[, format := formats]
+                    csvTab <- csvTab[nzchar(format)] # prune unknown files (might have been removed?)
                     rValues$analyses <- rbind(rValues$analyses, csvTab)
                 }
             }
-
         })
 
         observeEvent(input$removeAnalyses, {

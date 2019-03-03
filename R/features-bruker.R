@@ -44,7 +44,7 @@ findFeaturesBruker <- function(analysisInfo, doFMF = "auto", startRange = 0, end
                                save = TRUE, close = save, verbose = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
-    assertAnalysisInfo(analysisInfo, "d", add = ac)
+    assertAnalysisInfo(analysisInfo, "bruker", add = ac)
     checkmate::assertChoice(doFMF, c("auto", "force"), add = ac)
     checkmate::assertNumber(startRange, lower = 0, finite = TRUE, add = ac)
     checkmate::assertNumber(endRange, lower = 0, finite = TRUE, add = ac)
@@ -81,11 +81,11 @@ getDAFeatures <- function(DA, analysis, path, doFMF, startRange, endRange, close
         ccount <- cmpds[["Count"]]
 
         execFMF <- doFMF == "force" || ccount == 0
-        
+
         # ensure that all DA compounds are from FMF
         if (!execFMF)
             execFMF <- any(sapply(seq_len(ccount), function(ci) cmpds[[ci]][["SeparationType"]] != "MolFeature"))
-        
+
         if (execFMF)
         {
             if (verbose)
@@ -146,7 +146,7 @@ getDAFeatures <- function(DA, analysis, path, doFMF, startRange, endRange, close
 
         ret <- dt[seq_len(dtCount)]
         saveCacheData("featuresBruker", ret, hash)
-        
+
         closeSaveDAFile(DA, ind, close, save)
     }
 

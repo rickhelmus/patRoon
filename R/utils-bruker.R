@@ -114,7 +114,7 @@ closeSaveDAFile <- function(DA, DAFind, close, save)
 setDAMethod <- function(anaInfo, method, close = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
-    assertAnalysisInfo(anaInfo, "d", add = ac)
+    assertAnalysisInfo(anaInfo, "bruker", add = ac)
     checkmate::assertDirectoryExists(method, add = ac)
     checkmate::assertFlag(close, add = ac)
     checkmate::reportAssertions(ac)
@@ -148,7 +148,7 @@ setDAMethod <- function(anaInfo, method, close = TRUE)
 revertDAAnalyses <- function(anaInfo, close = TRUE, save = close)
 {
     ac <- checkmate::makeAssertCollection()
-    assertAnalysisInfo(anaInfo, "d", add = ac)
+    assertAnalysisInfo(anaInfo, "bruker", add = ac)
     assertDACloseSaveArgs(close, save, add = ac)
     checkmate::reportAssertions(ac)
 
@@ -178,7 +178,7 @@ revertDAAnalyses <- function(anaInfo, close = TRUE, save = close)
 recalibrarateDAFiles <- function(anaInfo, close = TRUE, save = close)
 {
     ac <- checkmate::makeAssertCollection()
-    assertAnalysisInfo(anaInfo, "d")
+    assertAnalysisInfo(anaInfo, "bruker")
     assertDACloseSaveArgs(close, save, add = ac)
     checkmate::reportAssertions(ac)
 
@@ -217,7 +217,7 @@ recalibrarateDAFiles <- function(anaInfo, close = TRUE, save = close)
 #' @export
 getDACalibrationError <- function(anaInfo)
 {
-    assertAnalysisInfo(anaInfo, "d")
+    assertAnalysisInfo(anaInfo, "bruker")
 
     DA <- getDAApplication()
     hideDAInScope()
@@ -263,7 +263,7 @@ getDACalibrationError <- function(anaInfo)
 exportDAFiles <- function(anaInfo, format = "mzML", exportLine = TRUE, outPath = anaInfo$path, overWrite = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
-    assertAnalysisInfo(anaInfo, "d", add = ac)
+    assertAnalysisInfo(anaInfo, "bruker", add = ac)
     checkmate::assertChoice(format, c("mzML", "mzXML", "mzData"), add = ac)
     checkmate::assertFlag(exportLine, add = ac)
     checkmate::assertCharacter(outPath, min.chars = 1, min.len = 1, add = ac)

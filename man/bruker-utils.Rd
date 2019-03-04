@@ -149,3 +149,4 @@ required to be installed.
 \seealso{
 \code{\link{analysis-information}}
 }
+\keyword{internal}

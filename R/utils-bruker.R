@@ -56,6 +56,7 @@ getDAApplication <- function()
     return(RDCOMClient::COMCreate("BDal.DataAnalysis.Application"))
 }
 
+# if path=NULL, analysis should be complete file path
 getDAFileIndex <- function(DA, analysis, path, openFileIfClosed = TRUE)
 {
     getFIndex <- function()
@@ -78,7 +79,9 @@ getDAFileIndex <- function(DA, analysis, path, openFileIfClosed = TRUE)
     ret <- getFIndex()
     if (ret == -1 && openFileIfClosed) # File is not yet open?
     {
-        DA[["Analyses"]]$Open(getBrukerAnalysisPath(analysis, path))
+        if (!is.null(path))
+            analysis <- getBrukerAnalysisPath(analysis, path)
+        DA[["Analyses"]]$Open(analysis)
         ret <- getFIndex()
     }
 
@@ -259,9 +262,12 @@ getDACalibrationError <- function(anaInfo)
 #' @param overWrite If \code{TRUE} existing files will be overwritten.
 #'
 #' @rdname bruker-utils
+#' @keywords internal
 #' @export
 exportDAFiles <- function(anaInfo, format = "mzML", exportLine = TRUE, outPath = anaInfo$path, overWrite = FALSE)
 {
+    .Deprecated("convertMSFiles")
+
     ac <- checkmate::makeAssertCollection()
     assertAnalysisInfo(anaInfo, "bruker", add = ac)
     checkmate::assertChoice(format, c("mzML", "mzXML", "mzData"), add = ac)

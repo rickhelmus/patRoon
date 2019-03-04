@@ -1,6 +1,7 @@
 #' MS data conversion
 #'
 #' Conversion of MS analysis files between several open and closed data formats.
+#'
 #' @name convertMSFiles
 NULL
 
@@ -24,7 +25,9 @@ MSFileFormats <- function(algorithm = "pwiz")
     checkmate::assertChoice(algorithm, c("pwiz", "openms"))
     if (algorithm == "pwiz")
         return(names(MSFileExtensions()))
-    return(c("mzXML", "mzML")) # OpenMS
+    else if (algorithm == "openms")
+        return(c("mzXML", "mzML"))
+    return("bruker") # algorithm == "bruker"
 }
 
 filterMSFileDirs <- function(files, from)
@@ -54,9 +57,16 @@ listMSFiles <- function(dirs, from)
     return(filterMSFileDirs(files, from))
 }
 
-convertMSFilesPWiz <- function(inFiles, outFiles, to, filters, extraOpts,
+convertMSFilesPWiz <- function(inFiles, outFiles, to, centroid, filters, extraOpts,
                                logPath, maxProcAmount)
 {
+    if (centroid != FALSE)
+    {
+        if (is.null(filters))
+            filters <- character()
+        filters <- c(filters, if (centroid == "vendor") "peakPicking vendor" else "peakPicking")
+    }
+
     mainArgs <- paste0("--", to)
     if (!is.null(filters))
         mainArgs <- c(mainArgs, sapply(filters, function(f) c("--filter", f)))
@@ -106,14 +116,42 @@ convertMSFilesOpenMS <- function(inFiles, outFiles, to, extraOpts, logPath, maxP
     invisible(NULL)
 }
 
+convertMSFilesBruker <- function(inFiles, outFiles, to, centroid)
+{
+    # expConstant <- if (format == "mzXML") DAConstants$daMzXML else if (format == "mzData") DAConstants$daMzData else DAConstants$daMzML
+    expConstant <- if (format == "mzXML") DAConstants$daMzXML else DAConstants$daMzML
+    expSpecConstant <- if (centroid) DAConstants$daLine else DAConstants$daProfile
+
+    DA <- getDAApplication()
+    hideDAInScope()
+
+    fCount <- length(inFiles)
+    prog <- txtProgressBar(0, fCount, style = 3)
+
+    for (i in seq_len(fCount))
+    {
+        ind <- getDAFileIndex(DA, inFiles, NULL)
+        if (ind == -1)
+            warning(paste("Failed to open file in DataAnalysis:", inFiles[i]))
+        else
+            DA[["Analyses"]][[ind]]$Export(outFiles[i], expConstant, expSpecConstant)
+
+        setTxtProgressBar(prog, i)
+    }
+
+    setTxtProgressBar(prog, fCount)
+
+    invisible(NULL)
+}
+
 #' @details \code{convertMSFiles} converts the data format of an analysis to
-#'   another. It either uses tools from
+#'   another. It uses tools from
 #'   \href{http://proteowizard.sourceforge.net/}{ProteoWizard}
-#'   (\command{msConvert} command) or \href{http://www.openms.de/}{OpenMS}
-#'   (\command{FileConverter} command) to perform the conversion. The supported
-#'   input and output formats include \file{mzXML} and \file{.mzML}.
-#'   Furthermore, when ProteoWizard is used for conversion, major (closed)
-#'   vendor formats are supported for input files.
+#'   (\command{msConvert} command), \href{http://www.openms.de/}{OpenMS}
+#'   (\command{FileConverter} command) or Bruker DataAnalysis to perform the
+#'   conversion. Supported input and output formats include \file{mzXML},
+#'   \file{.mzML} and several vendor formats, depending on which algorithm is
+#'   used.
 #'
 #' @param files,dirs The \code{files} argument should be a \code{character}
 #'   vector with input files. If \code{files} contains directories and
@@ -127,15 +165,19 @@ convertMSFilesOpenMS <- function(inFiles, outFiles, to, extraOpts, logPath, maxP
 #'   retrieve input files. Either this argument or \code{files} (or both) should
 #'   be set (\emph{i.e.} not \code{NULL}).
 #' @param from One or more input formats (see below). These are used to find
-#'   analyses when \code{dirs=TRUE}.
+#'   analyses when \code{dirs=TRUE} or \code{anaInfo} is set.
 #' @param to Output format: \code{"mzXML"} or \code{"mzML"}.
 #' @param overWrite Should existing destination file be overwritten
 #'   (\code{TRUE}) or not (\code{FALSE})?
 #' @param algorithm Either \code{"pwiz"} (uses \command{msConvert} of
-#'   ProteoWizard) or \code{"openms"} (uses \command{FileConverter} of OpenMS).
+#'   ProteoWizard), \code{"openms"} (uses \command{FileConverter} of OpenMS) or
+#'   \code{"bruker"} (uses DataAnalysis).
+#' @param centroid Set to \code{TRUE} to enable centroiding (not supported if
+#'   \code{algorithm="openms"}). In addition, when \code{algorithm="pwiz"} the
+#'   value may be \code{"vendor"} to perform centroiding with the vendor
+#'   algorithm.
 #' @param filters When \code{algorithm="pwiz"}: a \code{character} vector
-#'   specifying one or more filters. Can be used for peak picking to obtain
-#'   centroided data (see examples). The elements of the specified vector are
+#'   specifying one or more filters. The elements of the specified vector are
 #'   directly passed to the \code{--filter} option (see
 #'   \href{http://proteowizard.sourceforge.net/tools/filters.html}{here})
 #' @param extraOpts A \code{character} vector specifying any extra commandline
@@ -147,26 +189,37 @@ convertMSFilesOpenMS <- function(inFiles, outFiles, to, extraOpts, logPath, maxP
 #'
 #' @template multiProc-args
 #'
-#' @section Conversion formats: Input and output formats include \code{mzXML}
-#'   and \code{mzML}. In addition, when ProteoWizard is used, the following
-#'   vendor input formats may be chosen (specified with the \code{from}
-#'   argument): \itemize{
+#' @section Conversion formats: Possible output formats (\code{to} argument) are
+#'   \code{mzXML} and \code{mzML}.
 #'
-#'   \item \code{thermo}: Thermo \file{.RAW} files.
+#'   Possible input formats (\code{from} argument) depend on the algorithm that
+#'   was chosen and may include:
+#'
+#'   \itemize{
+#'
+#'   \item \code{thermo}: Thermo \file{.RAW} files (only
+#'   \code{algorithm="pwiz"}).
 #'
 #'   \item \code{bruker}: Bruker \file{.d}, \file{.yep}, \file{.baf} and
-#'   \file{.fid} files.
+#'   \file{.fid} files (only \code{algorithm="pwiz"} or
+#'   \code{algorithm="bruker"}).
 #'
-#'   \item \code{agilent}: Agilent \file{.d} files.
+#'   \item \code{agilent}: Agilent \file{.d} files (only
+#'   \code{algorithm="pwiz"}).
 #'
-#'   \item \code{ab}: AB Sciex \file{.wiff} files.
+#'   \item \code{ab}: AB Sciex \file{.wiff} files (only
+#'   \code{algorithm="pwiz"}).
 #'
-#'   \item \code{waters} Waters \file{.RAW} files.
+#'   \item \code{waters} Waters \file{.RAW} files (only
+#'   \code{algorithm="pwiz"}).
+#'
+#'   \item \code{mzXML}/\code{mzML}: Open format \file{.mzXML}/\file{.mzML}
+#'   files (only \code{algorithm="pwiz"} or \code{algorithm="openms"}).
 #'
 #'   }
 #'
-#'   Note that the actual supported file formats depend on the ProteoWizard
-#'   installation (see
+#'   Note that the actual supported file formats of ProteoWizard depend on how
+#'   it was installed (see
 #'   \href{http://proteowizard.sourceforge.net/formats/index.html}{here}).
 #'
 #' @examples \dontrun{
@@ -177,7 +230,7 @@ convertMSFilesOpenMS <- function(inFiles, outFiles, to, extraOpts, logPath, maxP
 #' # store the files in analyses/mzml. During conversion files are centroided by
 #' # the peakPicking filter and only MS 1 data is kept.
 #' convertMSFiles("analyses/raw", "analyses/mzml", dirs = TRUE, from = "thermo",
-#'                filters = c("peakPicking vendor", "msLevel 1"))
+#'                centroid = "vendor", filters = "msLevel 1")
 #' }
 #'
 #' @references \insertRef{Rst2016}{patRoon} \cr\cr
@@ -188,6 +241,7 @@ convertMSFilesOpenMS <- function(inFiles, outFiles, to, extraOpts, logPath, maxP
 convertMSFiles <- function(files = NULL, outPath = NULL, dirs = TRUE,
                            anaInfo = NULL, from = MSFileFormats(algorithm), to = "mzML",
                            overWrite = FALSE, algorithm = "pwiz",
+                           centroid = algorithm != "openms",
                            filters = NULL, extraOpts = NULL,
                            logPath = file.path("log", "convert"),
                            maxProcAmount = getOption("patRoon.maxProcAmount"))
@@ -199,17 +253,27 @@ convertMSFiles <- function(files = NULL, outPath = NULL, dirs = TRUE,
     checkmate::assertFlag(dirs, add = ac)
     checkmate::assertChoice(to, c("mzXML", "mzML"), add = ac) # UNDONE: enough for now?
     checkmate::assertFlag(overWrite, add = ac)
-    checkmate::assertChoice(algorithm, c("pwiz", "openms"), add = ac)
+    checkmate::assertChoice(algorithm, c("pwiz", "openms", "bruker"), add = ac)
+    checkmate::assert(checkmate::checkFlag(centroid),
+                      checkmate::checkSetEqual(centroid, "vendor"),
+                      .var.name = centroid)
     checkmate::assertCharacter(filters, min.chars = 1, null.ok = TRUE, add = ac)
     checkmate::assertCharacter(extraOpts, null.ok = TRUE, add = ac)
     assertMultiProcArgs(logPath, maxProcAmount, add = ac)
     checkmate::reportAssertions(ac)
 
+    if (centroid != FALSE && algorithm == "openms")
+        stop("Centroiding with OpenMS is currently not supported.")
+    else if (centroid == "vendor" && algorithm != "pwiz")
+        stop("Vendor centroiding is only supported when algorithm=\"pwiz\"")
+
     if (algorithm == "pwiz")
         from <- checkmate::matchArg(from, c("thermo", "bruker", "agilent", "ab", "waters", "mzXML", "mzML"),
                                     several.ok = TRUE, add = ac)
-    else # OpenMS
+    else if (algorithm == "openms")
         from <- checkmate::matchArg(from, c("mzXML", "mzML"), several.ok = TRUE, add = ac)
+    else # bruker
+        from <- checkmate::matchArg(from, "bruker", add = ac)
 
     assertAnalysisInfo(anaInfo, from, null.ok = !is.null(files), add = ac)
 
@@ -271,8 +335,10 @@ convertMSFiles <- function(files = NULL, outPath = NULL, dirs = TRUE,
     if (length(files) > 0)
     {
         if (algorithm == "pwiz")
-            convertMSFilesPWiz(files, output, to, filters, extraOpts, logPath, maxProcAmount)
-        else # OpenMS
+            convertMSFilesPWiz(files, output, to, centroid, filters, extraOpts, logPath, maxProcAmount)
+        else if (algorithm == "openms")
             convertMSFilesOpenMS(files, output, to, extraOpts, logPath, maxProcAmount)
+        else # bruker
+            convertMSFilesBruker(files, output, to, centroid)
     }
 }

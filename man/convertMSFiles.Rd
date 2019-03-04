@@ -9,13 +9,15 @@ MSFileFormats(algorithm = "pwiz")
 
 convertMSFiles(files = NULL, outPath = NULL, dirs = TRUE,
   anaInfo = NULL, from = MSFileFormats(algorithm), to = "mzML",
-  overWrite = FALSE, algorithm = "pwiz", filters = NULL,
-  extraOpts = NULL, logPath = file.path("log", "convert"),
+  overWrite = FALSE, algorithm = "pwiz", centroid = algorithm !=
+  "openms", filters = NULL, extraOpts = NULL,
+  logPath = file.path("log", "convert"),
   maxProcAmount = getOption("patRoon.maxProcAmount"))
 }
 \arguments{
 \item{algorithm}{Either \code{"pwiz"} (uses \command{msConvert} of
-ProteoWizard) or \code{"openms"} (uses \command{FileConverter} of OpenMS).}
+ProteoWizard), \code{"openms"} (uses \command{FileConverter} of OpenMS) or
+\code{"bruker"} (uses DataAnalysis).}
 
 \item{files, dirs}{The \code{files} argument should be a \code{character}
 vector with input files. If \code{files} contains directories and
@@ -32,16 +34,20 @@ retrieve input files. Either this argument or \code{files} (or both) should
 be set (\emph{i.e.} not \code{NULL}).}
 
 \item{from}{One or more input formats (see below). These are used to find
-analyses when \code{dirs=TRUE}.}
+analyses when \code{dirs=TRUE} or \code{anaInfo} is set.}
 
 \item{to}{Output format: \code{"mzXML"} or \code{"mzML"}.}
 
 \item{overWrite}{Should existing destination file be overwritten
 (\code{TRUE}) or not (\code{FALSE})?}
 
+\item{centroid}{Set to \code{TRUE} to enable centroiding (not supported if
+\code{algorithm="openms"}). In addition, when \code{algorithm="pwiz"} the
+value may be \code{"vendor"} to perform centroiding with the vendor
+algorithm.}
+
 \item{filters}{When \code{algorithm="pwiz"}: a \code{character} vector
-specifying one or more filters. Can be used for peak picking to obtain
-centroided data (see examples). The elements of the specified vector are
+specifying one or more filters. The elements of the specified vector are
 directly passed to the \code{--filter} option (see
 \href{http://proteowizard.sourceforge.net/tools/filters.html}{here})}
 
@@ -68,35 +74,46 @@ Conversion of MS analysis files between several open and closed data formats.
   input formats (see below).
 
 \code{convertMSFiles} converts the data format of an analysis to
-  another. It either uses tools from
+  another. It uses tools from
   \href{http://proteowizard.sourceforge.net/}{ProteoWizard}
-  (\command{msConvert} command) or \href{http://www.openms.de/}{OpenMS}
-  (\command{FileConverter} command) to perform the conversion. The supported
-  input and output formats include \file{mzXML} and \file{.mzML}.
-  Furthermore, when ProteoWizard is used for conversion, major (closed)
-  vendor formats are supported for input files.
+  (\command{msConvert} command), \href{http://www.openms.de/}{OpenMS}
+  (\command{FileConverter} command) or Bruker DataAnalysis to perform the
+  conversion. Supported input and output formats include \file{mzXML},
+  \file{.mzML} and several vendor formats, depending on which algorithm is
+  used.
 }
 \section{Conversion formats}{
- Input and output formats include \code{mzXML}
-  and \code{mzML}. In addition, when ProteoWizard is used, the following
-  vendor input formats may be chosen (specified with the \code{from}
-  argument): \itemize{
+ Possible output formats (\code{to} argument) are
+  \code{mzXML} and \code{mzML}.
 
-  \item \code{thermo}: Thermo \file{.RAW} files.
+  Possible input formats (\code{from} argument) depend on the algorithm that
+  was chosen and may include:
+
+  \itemize{
+
+  \item \code{thermo}: Thermo \file{.RAW} files (only
+  \code{algorithm="pwiz"}).
 
   \item \code{bruker}: Bruker \file{.d}, \file{.yep}, \file{.baf} and
-  \file{.fid} files.
+  \file{.fid} files (only \code{algorithm="pwiz"} or
+  \code{algorithm="bruker"}).
 
-  \item \code{agilent}: Agilent \file{.d} files.
+  \item \code{agilent}: Agilent \file{.d} files (only
+  \code{algorithm="pwiz"}).
 
-  \item \code{ab}: AB Sciex \file{.wiff} files.
+  \item \code{ab}: AB Sciex \file{.wiff} files (only
+  \code{algorithm="pwiz"}).
 
-  \item \code{waters} Waters \file{.RAW} files.
+  \item \code{waters} Waters \file{.RAW} files (only
+  \code{algorithm="pwiz"}).
+
+  \item \code{mzXML}/\code{mzML}: Open format \file{.mzXML}/\file{.mzML}
+  files (only \code{algorithm="pwiz"} or \code{algorithm="openms"}).
 
   }
 
-  Note that the actual supported file formats depend on the ProteoWizard
-  installation (see
+  Note that the actual supported file formats of ProteoWizard depend on how
+  it was installed (see
   \href{http://proteowizard.sourceforge.net/formats/index.html}{here}).
 }
 
@@ -109,7 +126,7 @@ convertMSFiles("standard-1.mzXML", to = "mzML", algorithm = "openms")
 # store the files in analyses/mzml. During conversion files are centroided by
 # the peakPicking filter and only MS 1 data is kept.
 convertMSFiles("analyses/raw", "analyses/mzml", dirs = TRUE, from = "thermo",
-               filters = c("peakPicking vendor", "msLevel 1"))
+               centroid = "vendor", filters = "msLevel 1")
 }
 
 }

@@ -20,18 +20,24 @@ anaInfo <- generateAnalysisInfo(paths = c({{ paste0("\"", unique(analyses$path),
 # NOTE: please set anaInfo to a valid data.frame with analysis information. See ?`analysis-information` for more details.
 anaInfo <- data.frame(path = character(), analysis = character(), group = character(), ref = character())
 {{ endCodeBlock() }}
-{{ optionalCodeBlock(dataPretreatmentOpts$DAMethod != "" || length(dataPretreatmentOpts$steps) > 0) }}
+{{ optionalCodeBlock(preTreatOpts$do) }}
 
 # Set to FALSE to skip data pretreatment (e.g. calibration, export, ...)
 doDataPretreatment <- TRUE
 if (doDataPretreatment)
 {
-{{ endCodeBlock() }}
-    setDAMethod(anaInfo, "{{ dataPretreatmentOpts$DAMethod }}") {{ optionalLine(dataPretreatmentOpts$DAMethod != "") }}
-    recalibrarateDAFiles(anaInfo) {{ optionalLine("recalibrate" %in% dataPretreatmentOpts$steps) }}
-    exportDAFiles(anaInfo, format = "mzML") {{ optionalLine("expMzML" %in% dataPretreatmentOpts$steps) }}
-    exportDAFiles(anaInfo, format = "mzXML") {{ optionalLine("expMzXML" %in% dataPretreatmentOpts$steps) }}
-} {{ optionalLine(dataPretreatmentOpts$DAMethod != "" || length(dataPretreatmentOpts$steps) > 0) }}
+    {{ endCodeBlock() }}
+    setDAMethod(anaInfo, "{{ preTreatOpts$DAMethod }}") {{ optionalLine(nzchar(preTreatOpts$DAMethod)) }}
+    recalibrarateDAFiles(anaInfo) {{ optionalLine(preTreatOpts$doDACalib) }}
+    {{ optionalCodeBlock(nzchar(preTreatOpts$convAlgo) && "mzML" %in% preTreatOpts$convTo) }}
+    convertMSFiles(anaInfo = anaInfo, from = c({{ paste0('"', preTreatOpts$convFrom, '"', collapse = ", ") }}),
+                   to = "mzML", agorithm = "{{ preTreatOpts$convAlgo }}", centroid = {{ preTreatOpts$centroid }})
+    {{ endCodeBlock() }}
+    {{ optionalCodeBlock(nzchar(preTreatOpts$convAlgo) && "mzXML" %in% preTreatOpts$convTo) }}
+    convertMSFiles(anaInfo = anaInfo, from = c({{ paste0('"', preTreatOpts$convFrom, '"', collapse = ", ") }}),
+                   to = "mzXML", agorithm = "{{ preTreatOpts$convAlgo }}")
+    {{ endCodeBlock() }}
+} {{ optionalLine(preTreatOpts$do) }}
 
 # Find all features.
 {{ optionalCodeBlock(featFinderOpts$algo == "OpenMS") }}

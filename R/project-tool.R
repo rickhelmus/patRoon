@@ -7,8 +7,21 @@ getScriptCode <- function(input, analyses)
     endCodeBlock <- function() "<<endCodeBlock>>"
     optionalLine <- function(e) if (!e) "<<skipThisLine>>" else ""
 
+    if (input$peakPicking)
+        centroid <- if (input$peakPickingVendor) "\"vendor\"" else TRUE
+    else
+        centroid <- FALSE
+
+    convFrom <- ""
+    if (nzchar(input$convAlgo))
+        convFrom <- if (length(input$convFrom) > 0) input$convFrom else MSFileFormats(input$convAlgo)
+
     # Can't set lists in template() call (bug?)
-    dataPretreatmentOpts = list(DAMethod = input$DAMethod, steps = input$dataPretreatments)
+    preTreatOpts = list(convAlgo = input$convAlgo,
+                        convFrom = convFrom,
+                        convTo = input$convTo, centroid = centroid,
+                        DAMethod = input$DAMethod, doDACalib = input$doDACalib,
+                        do = nzchar(input$convAlgo) || nzchar(input$DAMethod) || input$doDACalib)
     featFinderOpts = list(algo = input$featFinder)
     featGrouperOpts = list(algo = input$featGrouper)
 
@@ -53,6 +66,9 @@ getScriptCode <- function(input, analyses)
     # remove disabled optional lines
     ret <- gsub("([\n]*).*<<skipThisLine>>[.\r]*\n?", "\\1", ret, perl = TRUE)
 
+    # carriage returns seem to mess up cat when writing code
+    ret <- gsub("[\r]", "", ret)
+
     return(ret)
 }
 
@@ -77,7 +93,7 @@ doCreateProject <- function(input, analyses)
     else
     {
         sp <- file.path(input$destinationPath, input$scriptFile)
-        writeChar(code, sp)
+        cat(code, file = sp, sep = "")
 
         if (input$createRStudioProj)
         {
@@ -167,25 +183,65 @@ getNewProjectUI <- function(destPath)
                              )
                          )
             ),
-            miniTabPanel("Bruker data pretreatment", icon = icon("upload"),
+            miniTabPanel("Data pre-treatment", icon = icon("upload"),
                          miniContentPanel(
                              fillCol(
                                  flex = NA,
+                                 height = 220,
+                                 fillRow(
+                                     height = 75,
+                                     selectInput("convAlgo", "Data Conversion Algorithm", c("None" = "", "ProteoWizard" = "pwiz",
+                                                                                            "Bruker DataAnalysis" = "bruker",
+                                                                                            "OpenMS" = "openms"),
+                                                 width = "100%")
+                                 ),
+                                 conditionalPanel(
+                                     "input.convAlgo != \"\"",
+                                     fillRow(
+                                         height = 90,
+                                         fillCol(
+                                             flex = c(1, NA),
+                                             selectInput("convFrom", "Input format(s)", MSFileFormats(), multiple = TRUE,
+                                                         width = "95%"),
+                                             textNote("Leave blank to select all supported formats")
+                                         ),
+                                         fillCol(
+                                             flex = c(1, NA),
+                                             selectInput("convTo", "Output format(s)", c("mzML", "mzXML"), multiple = TRUE,
+                                                         selected = "mzML", width = "100%"),
+                                             textNote("enviPick/XCMS support mzXML, XCMS/OpenMS support mzML")
+                                         )
+                                     )
+                                 ),
+                                 conditionalPanel(
+                                     "input.convAlgo == \"pwiz\" || input.convAlgo == \"bruker\"",
+                                     fillRow(
+                                         height = 60,
+                                         checkboxInput("peakPicking", "Perform peak picking (line spectra)", value = TRUE),
+                                         conditionalPanel(
+                                             condition = "input.convAlgo == \"pwiz\"",
+                                             checkboxInput("peakPickingVendor", "Use vendor algorithm for peak picking", value = TRUE)
+                                         )
+                                     )
+                                 )
+                             ),
+                             hr(),
+                             fillCol(
+                                 flex = NA,
+                                 height = 70,
+                                 strong("Bruker DataAnalysis options"),
+                                 textNote("Only supported with bruker datafiles and if DataAnalysis is installed.")
+                             ),
+                             fillCol(
+                                 flex = NA,
+                                 height = 120,
                                  fillCol(
                                      flex = c(1, NA),
                                      height = 90,
-                                     fileSelect("DAMethod", "DAMethodButton", "Set DataAnalysis method to"),
+                                     fileSelect("DAMethod", "DAMethodButton", "Set DataAnalysis method"),
                                      textNote("Leaving this blank will not set any method")
                                  ),
-                                 fillCol(
-                                     flex = c(1, NA),
-                                     height = 90,
-                                     selectInput("pretreat", "Pretreatment steps", c("Recalibration" = "recalibrate",
-                                                                                     "Export mzML" = "expMzML",
-                                                                                     "Export mzXML" = "expMzXML"),
-                                                 multiple = TRUE, width = "100%"),
-                                     textNote("enviPick needs mzXML, XCMS and OpenMS need mzML")
-                                 )
+                                 checkboxInput("doDACalib", "Perform m/z re-calibration")
                              )
                          )
             ),
@@ -403,6 +459,20 @@ newProject <- function(destPath = NULL)
         observeEvent(input$removeAnalyses, {
             rValues$analyses <- rValues$analyses[-seq.int(input$analysesHot_select$select$r,
                                                           input$analysesHot_select$select$r2)]
+        })
+
+        observeEvent(input$convAlgo, {
+            from <- switch(input$convAlgo,
+                           pwiz = MSFileFormats("pwiz"),
+                           bruker = "bruker",
+                           openms = MSFileFormats("openms"),
+                           ""
+                   )
+            sel <- ""
+            if (nzchar(input$convAlgo))
+                sel <- MSFileFormats(input$convAlgo, input$convAlgo != "openms")
+
+            updateSelectInput(session, "convFrom", choices = from, selected = sel)
         })
 
         observeEvent(input$DAMethodButton, {

@@ -2,6 +2,10 @@
 #'
 #' Conversion of MS analysis files between several open and closed data formats.
 #'
+#' @param algorithm Either \code{"pwiz"} (implemented by \command{msConvert} of
+#'   ProteoWizard), \code{"openms"} (implemented by \command{FileConverter} of
+#'   OpenMS) or \code{"bruker"} (implemented by DataAnalysis).
+#'
 #' @name convertMSFiles
 NULL
 
@@ -18,16 +22,25 @@ MSFileExtensions <- function()
 
 #' @details \code{MSFileFormats} returns a \code{character} with all supported
 #'   input formats (see below).
+#' @param vendor If \code{TRUE} only vendor formats are returned.
 #' @rdname convertMSFiles
 #' @export
-MSFileFormats <- function(algorithm = "pwiz")
+MSFileFormats <- function(algorithm = "pwiz", vendor = FALSE)
 {
-    checkmate::assertChoice(algorithm, c("pwiz", "openms"))
+    checkmate::assertChoice(algorithm, c("pwiz", "openms", "bruker"))
+    checkmate::assertFlag(vendor)
+
     if (algorithm == "pwiz")
-        return(names(MSFileExtensions()))
+        ret <- names(MSFileExtensions())
     else if (algorithm == "openms")
-        return(c("mzXML", "mzML"))
-    return("bruker") # algorithm == "bruker"
+        ret <- c("mzXML", "mzML")
+    else # algorithm == "bruker"
+        ret <- "bruker"
+
+    if (vendor)
+        ret <- setdiff(ret, c("mzXML", "mzML"))
+
+    return(ret)
 }
 
 filterMSFileDirs <- function(files, from)
@@ -169,9 +182,6 @@ convertMSFilesBruker <- function(inFiles, outFiles, to, centroid)
 #' @param to Output format: \code{"mzXML"} or \code{"mzML"}.
 #' @param overWrite Should existing destination file be overwritten
 #'   (\code{TRUE}) or not (\code{FALSE})?
-#' @param algorithm Either \code{"pwiz"} (uses \command{msConvert} of
-#'   ProteoWizard), \code{"openms"} (uses \command{FileConverter} of OpenMS) or
-#'   \code{"bruker"} (uses DataAnalysis).
 #' @param centroid Set to \code{TRUE} to enable centroiding (not supported if
 #'   \code{algorithm="openms"}). In addition, when \code{algorithm="pwiz"} the
 #'   value may be \code{"vendor"} to perform centroiding with the vendor
@@ -239,7 +249,7 @@ convertMSFilesBruker <- function(inFiles, outFiles, to, centroid)
 #' @rdname convertMSFiles
 #' @export
 convertMSFiles <- function(files = NULL, outPath = NULL, dirs = TRUE,
-                           anaInfo = NULL, from = MSFileFormats(algorithm), to = "mzML",
+                           anaInfo = NULL, from = MSFileFormats(algorithm, vendor = TRUE), to = "mzML",
                            overWrite = FALSE, algorithm = "pwiz",
                            centroid = algorithm != "openms",
                            filters = NULL, extraOpts = NULL,
@@ -274,6 +284,14 @@ convertMSFiles <- function(files = NULL, outPath = NULL, dirs = TRUE,
         from <- checkmate::matchArg(from, c("mzXML", "mzML"), several.ok = TRUE, add = ac)
     else # bruker
         from <- checkmate::matchArg(from, "bruker", add = ac)
+
+    ofrom <- from
+    from <- setdiff(from, to)
+    if (length(from) < length(ofrom))
+        warning(paste("Skipping input formats that are also specified as output: ",
+                      paste0(setdiff(ofrom, from), collapse = ", ")))
+    if (length(from) == 0)
+        stop("No (valid) input formats specified.")
 
     assertAnalysisInfo(anaInfo, from, null.ok = !is.null(files), add = ac)
 

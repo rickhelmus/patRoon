@@ -5,19 +5,21 @@
 \alias{MSFileFormats}
 \title{MS data conversion}
 \usage{
-MSFileFormats(algorithm = "pwiz")
+MSFileFormats(algorithm = "pwiz", vendor = FALSE)
 
 convertMSFiles(files = NULL, outPath = NULL, dirs = TRUE,
-  anaInfo = NULL, from = MSFileFormats(algorithm), to = "mzML",
-  overWrite = FALSE, algorithm = "pwiz", centroid = algorithm !=
-  "openms", filters = NULL, extraOpts = NULL,
+  anaInfo = NULL, from = MSFileFormats(algorithm, vendor = TRUE),
+  to = "mzML", overWrite = FALSE, algorithm = "pwiz",
+  centroid = algorithm != "openms", filters = NULL, extraOpts = NULL,
   logPath = file.path("log", "convert"),
   maxProcAmount = getOption("patRoon.maxProcAmount"))
 }
 \arguments{
-\item{algorithm}{Either \code{"pwiz"} (uses \command{msConvert} of
-ProteoWizard), \code{"openms"} (uses \command{FileConverter} of OpenMS) or
-\code{"bruker"} (uses DataAnalysis).}
+\item{algorithm}{Either \code{"pwiz"} (implemented by \command{msConvert} of
+ProteoWizard), \code{"openms"} (implemented by \command{FileConverter} of
+OpenMS) or \code{"bruker"} (implemented by DataAnalysis).}
+
+\item{vendor}{If \code{TRUE} only vendor formats are returned.}
 
 \item{files, dirs}{The \code{files} argument should be a \code{character}
 vector with input files. If \code{files} contains directories and

@@ -10,7 +10,6 @@ general
 - ref --> blank
 - newProject()
     - generate Rmd?
-    - somehow integrate convertMSFiles() in newProject()? And other file types?
 - convertMSFiles()
     - Agilent .d is also a directory?
 - update tests for new OpenMS/MetFrag

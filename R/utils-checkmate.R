@@ -19,8 +19,11 @@ checkChoiceSilent <- function(x, ch)
 }
 assertChoiceSilent <- checkmate::makeAssertionFunction(checkChoiceSilent)
 
-assertAnalysisInfo <- function(x, allowedFormats = NULL, .var.name = checkmate::vname(x), add = NULL)
+assertAnalysisInfo <- function(x, allowedFormats = NULL, null.ok = FALSE, .var.name = checkmate::vname(x), add = NULL)
 {
+    if (is.null(x) && null.ok)
+        return(TRUE)
+
     if (!is.null(add))
         mc <- length(add$getMessages())
 
@@ -39,20 +42,25 @@ assertAnalysisInfo <- function(x, allowedFormats = NULL, .var.name = checkmate::
 
         exts <- unique(unlist(MSFileExtensions()[allowedFormats]))
 
-        res <- FALSE
+        existFiles <- rep(FALSE, length(x$analysis))
         for (e in exts)
         {
-            p <- file.path(x$path, paste0(x$analysis, ".", e))
-            if (e == "d") # UNDONE: also OK for Agilent?
-                res <- checkmate::checkDirectoryExists(p)
-            else
-                res <- checkmate::checkFileExists(p)
+            for (i in seq_along(x$analysis))
+            {
+                if (existFiles[i])
+                    next
+                p <- file.path(x$path[i], paste0(x$analysis[i], ".", e))
+                if (e == "d") # UNDONE: also OK for Agilent?
+                    existFiles[i] <- checkmate::testDirectoryExists(p)
+                else
+                    existFiles[i] <- checkmate::testFileExists(p)
+            }
 
-            if (!isTRUE(res))
+            if (all(existFiles))
                 break
         }
 
-        if (!isTRUE(res))
+        if (any(!existFiles))
             checkmate::makeAssertion(x, sprintf("No analyses found with correct data format (valid: %s)",
                                                 paste0(allowedFormats, collapse = ", ")),
                                      var.name = .var.name, collection = add)

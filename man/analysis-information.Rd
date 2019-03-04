@@ -7,7 +7,7 @@
 \title{Analysis information}
 \usage{
 generateAnalysisInfo(paths, groups = "", refs = "",
-  fileTypes = c("Bruker", "mzXML", "mzML"))
+  formats = MSFileFormats())
 
 generateAnalysisInfoFromEnviMass(path)
 }
@@ -20,7 +20,7 @@ and references, respectively (will be recycled). If \code{groups} is an
 empty character string (\code{""}) the analysis name will be set as
 replicate group.}
 
-\item{fileTypes}{A character vector of analyses file types. Valid values are:
+\item{formats}{A character vector of analyses file types. Valid values are:
 \code{Bruker}, \code{mzXML} and \code{mzML}.}
 
 \item{path}{The path of the enviMass project.}

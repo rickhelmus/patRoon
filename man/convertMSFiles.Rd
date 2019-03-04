@@ -5,22 +5,31 @@
 \alias{MSFileFormats}
 \title{MS data conversion}
 \usage{
-MSFileFormats()
+MSFileFormats(algorithm = "pwiz")
 
-convertMSFiles(files, outPath = NULL, dirs = TRUE,
-  from = MSFileFormats(), to = "mzML", overWrite = FALSE,
-  algorithm = "pwiz", filters = NULL, extraOpts = NULL,
-  logPath = file.path("log", "convert"),
+convertMSFiles(files = NULL, outPath = NULL, dirs = TRUE,
+  anaInfo = NULL, from = MSFileFormats(algorithm), to = "mzML",
+  overWrite = FALSE, algorithm = "pwiz", filters = NULL,
+  extraOpts = NULL, logPath = file.path("log", "convert"),
   maxProcAmount = getOption("patRoon.maxProcAmount"))
 }
 \arguments{
+\item{algorithm}{Either \code{"pwiz"} (uses \command{msConvert} of
+ProteoWizard) or \code{"openms"} (uses \command{FileConverter} of OpenMS).}
+
 \item{files, dirs}{The \code{files} argument should be a \code{character}
 vector with input files. If \code{files} contains directories and
-\code{dirs=TRUE} then files from these directories are also considered.}
+\code{dirs=TRUE} then files from these directories are also considered. An
+alternative method to specify input files is by the \code{anaInfo}
+argument. If the latter is specified \code{files} may be \code{NULL}.}
 
 \item{outPath}{A character vector specifying directories that should be used
 for the output. Will be re-cycled if necessary. If \code{NULL}, output
 directories will be kept the same as the input directories.}
+
+\item{anaInfo}{An \link[=analysis-information]{analysis info table} used to
+retrieve input files. Either this argument or \code{files} (or both) should
+be set (\emph{i.e.} not \code{NULL}).}
 
 \item{from}{One or more input formats (see below). These are used to find
 analyses when \code{dirs=TRUE}.}
@@ -29,9 +38,6 @@ analyses when \code{dirs=TRUE}.}
 
 \item{overWrite}{Should existing destination file be overwritten
 (\code{TRUE}) or not (\code{FALSE})?}
-
-\item{algorithm}{Either \code{"pwiz"} (uses \command{msConvert} of
-ProteoWizard) or \code{"openms"} (uses \command{FileConverter} of OpenMS).}
 
 \item{filters}{When \code{algorithm="pwiz"}: a \code{character} vector
 specifying one or more filters. Can be used for peak picking to obtain

@@ -27,14 +27,8 @@ MSFileFormats <- function(algorithm = "pwiz")
     return(c("mzXML", "mzML")) # OpenMS
 }
 
-listMSFiles <- function(dirs, from)
+filterMSFileDirs <- function(files, from)
 {
-    allExts <- MSFileExtensions()
-    allExts <- unique(unlist(allExts[from]))
-
-    files <- list.files(dirs, full.names = TRUE, pattern = paste0("*\\.", allExts, "$", collapse = "|"),
-                        ignore.case = TRUE)
-
     isDir <- file.info(files, extra_cols = FALSE)$isdir
     if ("bruker" %in% from)
     {
@@ -47,8 +41,17 @@ listMSFiles <- function(dirs, from)
     }
     else
         files <- files[!isDir]
+}
 
-    return(files)
+listMSFiles <- function(dirs, from)
+{
+    allExts <- MSFileExtensions()
+    allExts <- unique(unlist(allExts[from]))
+
+    files <- list.files(dirs, full.names = TRUE, pattern = paste0("*\\.", allExts, "$", collapse = "|"),
+                        ignore.case = TRUE)
+
+    return(filterMSFileDirs(files, from))
 }
 
 convertMSFilesPWiz <- function(inFiles, outFiles, to, filters, extraOpts,
@@ -114,10 +117,15 @@ convertMSFilesOpenMS <- function(inFiles, outFiles, to, extraOpts, logPath, maxP
 #'
 #' @param files,dirs The \code{files} argument should be a \code{character}
 #'   vector with input files. If \code{files} contains directories and
-#'   \code{dirs=TRUE} then files from these directories are also considered.
+#'   \code{dirs=TRUE} then files from these directories are also considered. An
+#'   alternative method to specify input files is by the \code{anaInfo}
+#'   argument. If the latter is specified \code{files} may be \code{NULL}.
 #' @param outPath A character vector specifying directories that should be used
 #'   for the output. Will be re-cycled if necessary. If \code{NULL}, output
 #'   directories will be kept the same as the input directories.
+#' @param anaInfo An \link[=analysis-information]{analysis info table} used to
+#'   retrieve input files. Either this argument or \code{files} (or both) should
+#'   be set (\emph{i.e.} not \code{NULL}).
 #' @param from One or more input formats (see below). These are used to find
 #'   analyses when \code{dirs=TRUE}.
 #' @param to Output format: \code{"mzXML"} or \code{"mzML"}.
@@ -177,18 +185,18 @@ convertMSFilesOpenMS <- function(inFiles, outFiles, to, extraOpts, logPath, maxP
 #'
 #' @rdname convertMSFiles
 #' @export
-convertMSFiles <- function(files, outPath = NULL, dirs = TRUE,
-                           from = MSFileFormats(algorithm), to = "mzML",
+convertMSFiles <- function(files = NULL, outPath = NULL, dirs = TRUE,
+                           anaInfo = NULL, from = MSFileFormats(algorithm), to = "mzML",
                            overWrite = FALSE, algorithm = "pwiz",
                            filters = NULL, extraOpts = NULL,
                            logPath = file.path("log", "convert"),
                            maxProcAmount = getOption("patRoon.maxProcAmount"))
 {
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertCharacter(files, min.len = 1, min.chars = 1, add = ac)
+    checkmate::assertCharacter(files, min.len = 1, min.chars = 1, null.ok = !is.null(anaInfo), add = ac)
     checkmate::assertCharacter(outPath, min.chars = 1, min.len = 1, null.ok = TRUE, add = ac)
     assertCanCreateDirs(outPath, add = ac)
-    checkmate::assertLogical(dirs, add = ac)
+    checkmate::assertFlag(dirs, add = ac)
     checkmate::assertChoice(to, c("mzXML", "mzML"), add = ac) # UNDONE: enough for now?
     checkmate::assertFlag(overWrite, add = ac)
     checkmate::assertChoice(algorithm, c("pwiz", "openms"), add = ac)
@@ -203,16 +211,32 @@ convertMSFiles <- function(files, outPath = NULL, dirs = TRUE,
     else # OpenMS
         from <- checkmate::matchArg(from, c("mzXML", "mzML"), several.ok = TRUE, add = ac)
 
-    if (dirs)
+    assertAnalysisInfo(anaInfo, from, null.ok = !is.null(files), add = ac)
+
+    if (!is.null(files))
     {
-        dirs <- files[file.info(files, extra_cols = FALSE)$isdir]
+        if (dirs)
+        {
+            dirs <- files[file.info(files, extra_cols = FALSE)$isdir]
 
-        # UNDONE: is agilent .d also a directory?
-        if ("bruker" %in% from)
-            dirs <- dirs[!grepl("(\\.d)$", files)] # filter out .d analyses "files" (are actually directories)
+            # UNDONE: is agilent .d also a directory?
+            if ("bruker" %in% from)
+                dirs <- dirs[!grepl("(\\.d)$", files)] # filter out .d analyses "files" (are actually directories)
 
-        dirFiles <- listMSFiles(dirs, from)
-        files <- union(dirFiles, setdiff(files, dirs))
+            dirFiles <- listMSFiles(dirs, from)
+            files <- union(dirFiles, setdiff(files, dirs))
+        }
+    }
+    else
+        files <- character()
+
+    if (!is.null(anaInfo))
+    {
+        fExts <- unique(unlist(MSFileExtensions()[from]))
+        afiles <- paste0(file.path(anaInfo$path, anaInfo$analysis), ".", fExts)
+        afiles <- afiles[file.exists(afiles)]
+        afiles <- filterMSFileDirs(afiles, from)
+        files <- c(files, afiles)
     }
 
     if (is.null(outPath))

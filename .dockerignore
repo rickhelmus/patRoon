@@ -1,6 +1,7 @@
 *
 !inst/**
 !R/*.R
+!R/*.rda
 !man/*
 !src/*.R
 !src/Makevars

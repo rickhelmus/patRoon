@@ -189,7 +189,7 @@ replicateAbundanceFilter <- function(fGroups, absThreshold, relThreshold, maxInt
             ret <- TRUE
             if (doThr)
                 ret <- sum(x > 0) >= thresholds[[rg]]
-            if (ret && NULLToZero(maxIntRSD) != 0 && any(x > 0))
+            if (ret && length(x) > 1 && NULLToZero(maxIntRSD) != 0 && any(x > 0))
                 ret <- (sd(x) / mean(x)) < maxIntRSD # UNDONE: remove zero's?
             return(ret)
         }

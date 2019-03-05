@@ -44,9 +44,10 @@ doDATests <- function() !is.null(getOption("patRoon.test.DAAnalyses"))
 
 makeMZXMLs <- function(anaInfo)
 {
-    convertMSFiles(paste0(anaInfo$path, "/", anaInfo$analysis, ".mzML"), getWorkPath(), to = "mzXML", algorithm = "openms",
-                   logPath = NULL)
-    return(getTestAnaInfo(getWorkPath()))
+    convertMSFiles(anaInfo = anaInfo, from = "mzML", outPath = getWorkPath(), to = "mzXML",
+                   algorithm = "openms", logPath = NULL)
+    anaInfo$path <- getWorkPath()
+    return(anaInfo)
 }
 
 expect_file <- function(object, file, removeIfExists = TRUE)

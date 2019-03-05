@@ -249,7 +249,7 @@ convertMSFilesBruker <- function(inFiles, outFiles, to, centroid)
 #' @rdname convertMSFiles
 #' @export
 convertMSFiles <- function(files = NULL, outPath = NULL, dirs = TRUE,
-                           anaInfo = NULL, from = MSFileFormats(algorithm, vendor = TRUE), to = "mzML",
+                           anaInfo = NULL, from = MSFileFormats(algorithm, vendor = algorithm != "openms"), to = "mzML",
                            overWrite = FALSE, algorithm = "pwiz",
                            centroid = algorithm != "openms",
                            filters = NULL, extraOpts = NULL,
@@ -277,22 +277,25 @@ convertMSFiles <- function(files = NULL, outPath = NULL, dirs = TRUE,
     else if (centroid == "vendor" && algorithm != "pwiz")
         stop("Vendor centroiding is only supported when algorithm=\"pwiz\"")
 
-    if (algorithm == "pwiz")
-        from <- checkmate::matchArg(from, c("thermo", "bruker", "agilent", "ab", "waters", "mzXML", "mzML"),
-                                    several.ok = TRUE, add = ac)
-    else if (algorithm == "openms")
-        from <- checkmate::matchArg(from, c("mzXML", "mzML"), several.ok = TRUE, add = ac)
-    else # bruker
-        from <- checkmate::matchArg(from, "bruker", add = ac)
-
-    ofrom <- from
-    from <- setdiff(from, to)
-    if (length(from) < length(ofrom))
-        warning(paste("Skipping input formats that are also specified as output: ",
-                      paste0(setdiff(ofrom, from), collapse = ", ")))
-    if (length(from) == 0)
-        stop("No (valid) input formats specified.")
-
+    if (dirs || !is.null(anaInfo)) # from arg needs to be used?
+    {
+        if (algorithm == "pwiz")
+            from <- checkmate::matchArg(from, c("thermo", "bruker", "agilent", "ab", "waters", "mzXML", "mzML"),
+                                        several.ok = TRUE, add = ac)
+        else if (algorithm == "openms")
+            from <- checkmate::matchArg(from, c("mzXML", "mzML"), several.ok = TRUE, add = ac)
+        else # bruker
+            from <- checkmate::matchArg(from, "bruker", add = ac)
+        
+        ofrom <- from
+        from <- setdiff(from, to)
+        if (length(from) < length(ofrom))
+            warning(paste("Skipping input formats that are also specified as output: ",
+                          paste0(setdiff(ofrom, from), collapse = ", ")))
+        if (length(from) == 0)
+            stop("No (valid) input formats specified.")
+    }
+    
     assertAnalysisInfo(anaInfo, from, null.ok = !is.null(files), add = ac)
 
     if (!is.null(files))

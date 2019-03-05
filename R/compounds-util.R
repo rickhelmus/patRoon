@@ -61,7 +61,7 @@ compoundScorings <- function(algorithm = NULL, database = NULL, includeSuspectLi
 {
     algos <- c("metfrag", "sirius")
     
-    ret <- compScorings # stored inside R/sysdata.rda
+    ret <- patRoon:::compScorings # stored inside R/sysdata.rda
     
     ac <- checkmate::makeAssertCollection()
     checkmate::assertChoice(algorithm, algos, null.ok = TRUE, add = ac)

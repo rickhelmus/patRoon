@@ -70,7 +70,7 @@ prepareReportPath <- function(path, clear)
     mkdirp(path)
 }
 
-optimizePngPlots <- function(plotFiles, progressOut, maxProcAmount)
+optimizePngPlots <- function(plotFiles, maxProcAmount)
 {
     plotsPerBlock <- 50
     blocks <- ceiling(length(plotFiles) / plotsPerBlock)

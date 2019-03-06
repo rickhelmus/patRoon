@@ -218,8 +218,8 @@ components <- generateComponents(fGroups, "camera", ionization = "positive")
 ```
 ```{r fig.width=5,fig.height=4}
 components
-plotSpec(components, "CMP17")
-plotEIC(components, "CMP17", fGroups)
+plotSpec(components, "CMP6")
+plotEIC(components, "CMP6", fGroups)
 ```
 
 ## Reporting

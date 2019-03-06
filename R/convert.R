@@ -139,7 +139,7 @@ convertMSFilesBruker <- function(inFiles, outFiles, to, centroid)
     hideDAInScope()
 
     fCount <- length(inFiles)
-    prog <- txtProgressBar(0, fCount, style = 3)
+    prog <- openProgBar(0, fCount)
 
     for (i in seq_len(fCount))
     {

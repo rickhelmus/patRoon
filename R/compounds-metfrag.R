@@ -566,7 +566,7 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
         }
         else
         {
-            prog <- txtProgressBar(0, gCount, style = 3)
+            prog <- openProgBar(0, gCount)
 
             results <- lapply(runData, function(rd)
             {

@@ -108,7 +108,7 @@ getDAFeatures <- function(DA, analysis, path, doFMF, startRange, endRange, close
         if (verbose && ccount > 0)
         {
             printf("Loading %d features from DataAnalysis...\n", ccount, analysis)
-            prog <- txtProgressBar(0, ccount, style=3)
+            prog <- openProgBar(0, ccount)
         }
 
         dt <- data.table(ID=numeric(ccount), ret=numeric(ccount), mz=numeric(ccount), intensity=numeric(ccount), peak_score=numeric(ccount),

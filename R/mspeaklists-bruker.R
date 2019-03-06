@@ -97,7 +97,7 @@ generateMSPeakListsDA <- function(fGroups, bgsubtr = TRUE, maxMSRtWindow = 5, mi
                                                    DAEICs, DAFind)
 
             printf("Loading all MS peak lists for %d feature groups in analysis '%s'...\n", length(uncachedGNames), ana)
-            prog <- txtProgressBar(0, length(uncachedGNames), style = 3)
+            prog <- openProgBar(0, length(uncachedGNames))
 
             uncachedResults <- setNames(lapply(seq_along(uncachedGNames), function(grpi)
             {
@@ -200,7 +200,7 @@ generateMSPeakListsDAFMF <- function(fGroups, minMSIntensity = 500, minMSMSInten
         }
 
         printf("Loading all MS peak lists for %d feature groups in analysis '%s'...\n", gcount, ana)
-        prog <- txtProgressBar(0, gcount, style=3)
+        prog <- openProgBar(0, gcount)
 
         for (grpi in seq_len(gcount))
         {

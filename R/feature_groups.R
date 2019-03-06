@@ -805,7 +805,7 @@ setMethod("plotEIC", "featureGroups", function(obj, rtWindow = 30, mzWindow = 0.
          xlim = xlim, ylim = ylim, ...)
 
     if (showProgress)
-        prog <- txtProgressBar(0, gCount, style = 3)
+        prog <- openProgBar(0, gCount)
 
     for (grp in fGroupsInPlot)
     {

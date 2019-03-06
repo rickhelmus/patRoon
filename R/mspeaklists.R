@@ -280,7 +280,7 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
         if (gCount == 0)
             return(pl)
 
-        prog <- txtProgressBar(0, gCount, style = 3)
+        prog <- openProgBar(0, gCount)
 
         pln <- names(pl)
         pl <- lapply(seq_along(pl), function(grpi)

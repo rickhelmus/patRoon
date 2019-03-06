@@ -129,7 +129,7 @@ plotUpSet(rmdVars$fGroups)
 `r if (doEICs) "EICs\n===\n"`
 ```{r eval=doEICs}
 message("Plotting EICs...")
-prog <- txtProgressBar(0, length(rmdVars$fGroups), style = 3, file = stderr())
+prog <- openProgBar(0, length(rmdVars$fGroups))
 
 for (grpi in seq_len(length(rmdVars$fGroups)))
 {

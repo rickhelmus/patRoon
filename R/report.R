@@ -92,7 +92,7 @@ optimizePngPlots <- function(plotFiles, progressOut, maxProcAmount)
         qplots <- paste0(tools::file_path_sans_ext(plots), "-fs8.png")
         qexist <- file.exists(qplots)
         file.rename(qplots[qexist], plots[qexist])
-    }, progressOut = progressOut, maxProcAmount = maxProcAmount)
+    }, maxProcAmount = maxProcAmount)
 
     invisible(NULL)
 }
@@ -197,7 +197,7 @@ reportFGroupPlots <- function(fGroups, path, plotGrid, rtWindow, mzWindow, retMi
     plotEIC(fGroups, rtWindow, mzWindow, retMin, 1, EICs, TRUE, FALSE)
 
     par(mfrow = plotGrid)
-    prog <- txtProgressBar(0, gCount, style=3)
+    prog <- openProgBar(0, gCount)
     for (grpi in seq_len(gCount))
     {
         plotEIC(fGroups[, grpi], rtWindow, mzWindow, retMin, topMost, EICs, onlyPresent = onlyPresent, colourBy = "rGroups")
@@ -222,7 +222,7 @@ reportFeatureTable <- function(fGroups, path, retMin)
     fTable <- featureTable(fGroups)
 
     fcount <- length(fTable)
-    prog <- txtProgressBar(0, fcount, style = 3)
+    prog <- openProgBar(0, fcount)
 
     for (anai in seq_along(fTable))
     {
@@ -283,7 +283,7 @@ reportFormulaSpectra <- function(fGroups, path, formulas, topMost, normalizeScor
     
     formGroups <- groupNames(formulas)
     fcount <- length(formGroups)
-    prog <- txtProgressBar(0, fcount, style = 3)
+    prog <- openProgBar(0, fcount)
 
     for (grp in formGroups)
     {
@@ -397,7 +397,7 @@ reportCompoundSpectra <- function(fGroups, path, MSPeakLists, compounds, compsCl
 
     compTable <- compoundTable(compounds)
     idcount <- length(compTable)
-    prog <- txtProgressBar(0, idcount, style = 3)
+    prog <- openProgBar(0, idcount)
 
     for (gi in seq_along(compTable))
     {
@@ -464,7 +464,7 @@ reportCompoundClusters <- function(fGroups, compsCluster, path)
         invisible(return(NULL))
     }
 
-    prog <- txtProgressBar(0, ccount, style = 3)
+    prog <- openProgBar(0, ccount)
 
     for (gi in seq_along(cutcl))
     {
@@ -520,7 +520,7 @@ reportComponentPlots <- function(fGroups, path, components, EICRtWindow, EICMzWi
     cInfo <- componentInfo(components)
     cTable <- componentTable(components)
 
-    prog <- txtProgressBar(0, length(components), style = 3)
+    prog <- openProgBar(0, length(components))
 
     pdf(file.path(path, "components.pdf"), paper = "a4", pointsize = 10, width = 8, height = 11)
 
@@ -861,7 +861,8 @@ setMethod("reportMD", "featureGroups", function(fGroups, path, reportPlots, form
     
     # normalize cache path so it can be used in report working directory
     withr::with_options(list(DT.warn.size = FALSE,
-                             patRoon.cache.fileName = normalizePath(getOption("patRoon.cache.fileName"))),
+                             patRoon.cache.fileName = normalizePath(getOption("patRoon.cache.fileName")),
+                             patRoon.progress.opts = list(file = stderr())),
                         rmarkdown::render(file.path(workPath, "main.Rmd"), output_file = outputFile,
                                           output_options = list(self_contained = selfContained),
                                           quiet = TRUE))

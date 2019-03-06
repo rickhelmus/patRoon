@@ -380,7 +380,7 @@ setMethod("addFormulaScoring", "compounds", function(compounds, formulas, update
     }
 
     printf("Adding formula scoring...\n")
-    prog <- txtProgressBar(0, length(cTable), style = 3)
+    prog <- openProgBar(0, length(cTable))
 
     cTable <- lapply(seq_along(cTable), function(grpi)
     {

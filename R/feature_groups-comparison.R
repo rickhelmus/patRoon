@@ -373,7 +373,7 @@ setMethod("consensus", "featureGroupsComparison", function(obj, relAbundance = 0
 
     # Generate consensus feature group tables from consensus features from the consFGroup assignment
     cat("Generating consensus feature groups...\n")
-    prog <- txtProgressBar(0, nrow(anaInfo), style = 3)
+    prog <- openProgBar(0, nrow(anaInfo))
     for (anai in seq_len(nrow(anaInfo)))
     {
         cfts <- consFeatures[[anaInfo$analysis[anai]]]

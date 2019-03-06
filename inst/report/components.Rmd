@@ -5,7 +5,7 @@ cNames <- names(rmdVars$components)
 cCount <- length(rmdVars$components)
 
 message("Plotting components...")
-prog <- txtProgressBar(0, length(rmdVars$components), style = 3, file = stderr())
+prog <- openProgBar(0, length(rmdVars$components))
 allPlots <- vector("character", length(rmdVars$components) * 2)
 curPlotInd <- 0
 plotPathFull <- getPlotPath(FALSE)
@@ -54,7 +54,7 @@ for (ci in seq_len(cCount))
 close(prog)
 
 if (rmdVars$optimizePng && curPlotInd > 0)
-    optimizePngPlots(allPlots, stderr(), rmdVars$maxProcAmount)
+    optimizePngPlots(allPlots, rmdVars$maxProcAmount)
 ```
 
 

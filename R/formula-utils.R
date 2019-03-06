@@ -366,7 +366,7 @@ generateGroupFormulasByConsensus <- function(formList, formThreshold)
         formCons <- list()
     else if (is.null(formCons))
     {
-        prog <- txtProgressBar(0, gCount, style = 3)
+        prog <- openProgBar(0, gCount)
 
         formCons <- lapply(seq_len(gCount), function(grpi)
         {

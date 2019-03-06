@@ -8,8 +8,8 @@
 MSFileFormats(algorithm = "pwiz", vendor = FALSE)
 
 convertMSFiles(files = NULL, outPath = NULL, dirs = TRUE,
-  anaInfo = NULL, from = MSFileFormats(algorithm, vendor = TRUE),
-  to = "mzML", overWrite = FALSE, algorithm = "pwiz",
+  anaInfo = NULL, from = MSFileFormats(algorithm, vendor = algorithm !=
+  "openms"), to = "mzML", overWrite = FALSE, algorithm = "pwiz",
   centroid = algorithm != "openms", filters = NULL, extraOpts = NULL,
   logPath = file.path("log", "convert"),
   maxProcAmount = getOption("patRoon.maxProcAmount"))

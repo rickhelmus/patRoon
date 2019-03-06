@@ -109,7 +109,7 @@ averageMSPeakLists <- function(peakLists, clusterMzWindow, topMost, minIntensity
         avgPLists <- list()
     else if (is.null(avgPLists))
     {
-        prog <- txtProgressBar(0, gCount, style = 3)
+        prog <- openProgBar(0, gCount)
         
         avgPLists <- lapply(seq_len(gCount), function(grpi)
         {

@@ -136,7 +136,7 @@ DT::datatable(fGroupsSpecDT,
 # Generate all plots in advance, since having many code chunks will cause a lot of overhead.
 
 message("Generating spectra...")
-prog <- txtProgressBar(0, length(plotGroups), style = 3, file = stderr())
+prog <- openProgBar(0, length(plotGroups))
 
 plotPathFull <- getPlotPath(FALSE)
 plotPathLink <- getPlotPath(TRUE)
@@ -236,7 +236,7 @@ close(prog)
 
 ap <- unlist(allPlots); ap <- ap[nzchar(ap)]
 if (rmdVars$optimizePng && length(ap > 0))
-    optimizePngPlots(ap, stderr(), rmdVars$maxProcAmount)
+    optimizePngPlots(ap, rmdVars$maxProcAmount)
 
 if (rmdVars$selfContained)
     allPlots <- rapply(allPlots, function(ap) sapply(ap, function(p) if (nzchar(p)) knitr::image_uri(p) else ""), how = "replace")
@@ -356,7 +356,7 @@ DT::datatable(formulasDT, options = list(scrollX = TRUE, scrollY = "600px", defe
 rmdTexts <- vector("character", length = length(compsClustFGroups))
 
 message("Generating compounds cluster layout... ", appendLF = FALSE)
-# prog <- txtProgressBar(0, length(plotGroups), style = 3, file = stderr())
+# prog <- openProgBar(0, length(plotGroups))
 compClustTempl <- readAllFile(system.file("templates", "comp-cluster.Rmd", package = "patRoon"))
 
 cutcl <- cutClusters(rmdVars$compsCluster)

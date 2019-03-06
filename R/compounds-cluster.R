@@ -328,7 +328,7 @@ setMethod("makeHCluster", "compounds", function(obj, method, fpType = "extended"
                    simplify = FALSE) 
     
     cat("Performing clustering ...\n")
-    prog <- txtProgressBar(0, length(mols), style = 3)
+    prog <- openProgBar(0, length(mols))
     clust <- lapply(seq_along(mols), function(i)
     {
         if (length(mols[[i]]) < 2)
@@ -350,7 +350,7 @@ setMethod("makeHCluster", "compounds", function(obj, method, fpType = "extended"
     close(prog)
     
     cat("Performing dynamic tree cutting ...\n")
-    prog <- txtProgressBar(0, length(clust), style = 3)
+    prog <- openProgBar(0, length(clust))
     cutClusters <- lapply(seq_along(clust), function(ci)
     {
         dendro <- clust[[ci]]

@@ -1047,3 +1047,10 @@ allArgs <- function(origValues = FALSE)
 
     return(args)
 }
+
+openProgBar <- function(min = 0, max, style = 3, ...)
+{
+    progOpts <- list(min = min, max = max, style = style, ...)
+    progOpts <- modifyList(progOpts, getOption("patRoon.progress.opts", list()))
+    return(do.call(txtProgressBar, progOpts))
+}

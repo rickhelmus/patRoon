@@ -75,7 +75,7 @@ generateMSPeakListsMzR <- function(fGroups, maxMSRtWindow = 5, precursorMzWindow
         baseHash <- makeHash(ana, maxMSRtWindow, precursorMzWindow, topMost, avgFeatParams)
 
         printf("Loading all MS peak lists for %d feature groups in analysis '%s'...\n", gCount, ana)
-        prog <- txtProgressBar(0, gCount, style = 3)
+        prog <- openProgBar(0, gCount)
 
         for (grpi in seq_along(ftindex))
         {

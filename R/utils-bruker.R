@@ -447,7 +447,7 @@ addAllDAEICs <- function(fGroups, mzWindow = 0.005, ctype = "EIC", bgsubtr = FAL
         hideDAInScope()
 
     printf("Adding EICs for %d feature groups in DataAnalysis...\n", gCount)
-    prog <- txtProgressBar(0, anaCount, style = 3)
+    prog <- openProgBar(0, anaCount)
 
     for (anai in seq_len(anaCount))
     {
@@ -601,7 +601,7 @@ generateDASpecsForPeakLists <- function(DA, maxMSRtWindow, MSMSType, gNames, fea
 
     gCount <- length(gNames)
     printf("Adding spectra for %d feature groups...\n", gCount)
-    prog <- txtProgressBar(0, gCount, style=3)
+    prog <- openProgBar(0, gCount)
 
     MSSpecs <- list(); MSMSSpecs <- list()
     for (grpi in seq_along(gNames))

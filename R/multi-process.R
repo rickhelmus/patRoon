@@ -21,7 +21,7 @@ executeMultiProcess2 <- function(commandQueue, finishHandler,
                                 timeoutHandler = function(...) TRUE,
                                 errorHandler = defMultiProcErrorHandler,
                                 procTimeout = NULL, printOutput = FALSE, printError = FALSE,
-                                showProgress = TRUE, progressOut = "", waitTimeout = 50,
+                                showProgress = TRUE, waitTimeout = 50,
                                 maxProcAmount = getOption("patRoon.maxProcAmount"),
                                 maxCmdsPerProc = 1, delayBetweenProc = 0)
 {
@@ -36,7 +36,7 @@ executeMultiProcess2 <- function(commandQueue, finishHandler,
     names(ret) <- names(commandQueue)
 
     if (showProgress)
-        prog <- txtProgressBar(0, totCmdCount, style = 3, file = progressOut)
+        prog <- openProgBar(0, totCmdCount)
 
     nextCommand <- 1
     finishedCommands <- 0

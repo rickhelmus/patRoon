@@ -77,7 +77,7 @@ generateFormulasDA <- function(fGroups, precursorMzSearchWindow = 0.002, MSMode 
 
         cmpds <- DA[["Analyses"]][[DAAnaInd]][["Compounds"]]
 
-        prog <- txtProgressBar(0, gCount, style=3)
+        prog <- openProgBar(0, gCount)
 
         for (grpi in seq_len(gCount))
         {

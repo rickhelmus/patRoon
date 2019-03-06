@@ -65,7 +65,7 @@ importFeatureGroupsEnviMass <- function(path, feat, positive)
     ftind <- copy(groups)
 
     gcount <- ncol(groups)
-    prog <- txtProgressBar(0, gcount, style = 3)
+    prog <- openProgBar(0, gcount)
 
     for (grpi in seq_along(groups))
     {

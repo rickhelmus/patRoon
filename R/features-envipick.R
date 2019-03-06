@@ -80,7 +80,7 @@ importFeaturesEnviMass <- function(analysisInfo, enviProjPath)
 
     fts <- list()
     scount <- nrow(analysisInfo)
-    prog <- txtProgressBar(0, scount, style = 3)
+    prog <- openProgBar(0, scount)
 
     for (i in seq_len(nrow(analysisInfo)))
     {

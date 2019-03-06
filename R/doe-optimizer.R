@@ -73,7 +73,7 @@ DoEOptimizer$methods(
         print(rsm::decode.data(design))
         printf("---\n")
 
-        prog <- txtProgressBar(0, length(tasks), style = 3)
+        prog <- openProgBar(0, length(tasks))
 
         response <- rbindlist(lapply(tasks, function(task)
         {

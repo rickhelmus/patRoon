@@ -13,7 +13,6 @@ general
 - convertMSFiles()
     - Agilent .d is also a directory?
 - update tests for new OpenMS/MetFrag
-- configurable scroll bar style and/or style 1 for knitr
 
 
 docs

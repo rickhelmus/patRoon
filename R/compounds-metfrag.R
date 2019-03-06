@@ -416,7 +416,7 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
             extraOpts <- modifyList(if (!is.null(extraOpts)) extraOpts else list(), list(LocalDatabasePath = extDB))
     }
         
-    if (is.null(extDB) || !file.exists(extDB))
+    if (isLocalDB && (is.null(extDB) || !file.exists(extDB)))
     {
         ex <- "as part of the extraOpts argument, e.g. extraOpts = list(LocalDatabasePath = \"C:/DSSTox_01May18_Full_SelectMetaDataPlus.csv\")"
         if (database == "comptox")

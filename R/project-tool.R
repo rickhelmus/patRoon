@@ -8,7 +8,7 @@ getScriptCode <- function(input, analyses)
     optionalLine <- function(e) if (!e) "<<skipThisLine>>" else ""
 
     if (input$peakPicking)
-        centroid <- if (input$peakPickingVendor) "\"vendor\"" else TRUE
+        centroid <- if (input$peakPickingVendor && input$convAlgo == "pwiz") "\"vendor\"" else TRUE
     else
         centroid <- FALSE
 
@@ -406,7 +406,7 @@ newProject <- function(destPath = NULL)
             anaDir <- selectDirectory(path = "~/")
             if (!is.null(anaDir))
             {
-                files <- listMSFiles(anaDir, MSFileTypes())
+                files <- listMSFiles(anaDir, MSFileFormats())
 
                 if (length(files) > 0)
                 {

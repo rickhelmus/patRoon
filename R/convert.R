@@ -87,7 +87,7 @@ convertMSFilesPWiz <- function(inFiles, outFiles, to, centroid, filters, extraOp
         mainArgs <- c(mainArgs, extraOpts)
 
     pwpath <- findPWizPath()
-    if (is.null(pwpath) || !file.exists(file.path(pwpath, "msconvert")))
+    if (is.null(pwpath) || !file.exists(file.path(pwpath, paste0("msconvert", if (Sys.info()[["sysname"]] == "Windows") ".exe" else ""))))
         stop("Could not find ProteoWizard. You may set its location in the patRoon.path.pwiz option. See ?patRoon for more details.")
     msc <- file.path(pwpath, "msconvert")
 
@@ -131,8 +131,8 @@ convertMSFilesOpenMS <- function(inFiles, outFiles, to, extraOpts, logPath, maxP
 
 convertMSFilesBruker <- function(inFiles, outFiles, to, centroid)
 {
-    # expConstant <- if (format == "mzXML") DAConstants$daMzXML else if (format == "mzData") DAConstants$daMzData else DAConstants$daMzML
-    expConstant <- if (format == "mzXML") DAConstants$daMzXML else DAConstants$daMzML
+    # expConstant <- if (to == "mzXML") DAConstants$daMzXML else if (to == "mzData") DAConstants$daMzData else DAConstants$daMzML
+    expConstant <- if (to == "mzXML") DAConstants$daMzXML else DAConstants$daMzML
     expSpecConstant <- if (centroid) DAConstants$daLine else DAConstants$daProfile
 
     DA <- getDAApplication()
@@ -143,7 +143,7 @@ convertMSFilesBruker <- function(inFiles, outFiles, to, centroid)
 
     for (i in seq_len(fCount))
     {
-        ind <- getDAFileIndex(DA, inFiles, NULL)
+        ind <- getDAFileIndex(DA, inFiles[i], NULL)
         if (ind == -1)
             warning(paste("Failed to open file in DataAnalysis:", inFiles[i]))
         else
@@ -318,7 +318,7 @@ convertMSFiles <- function(files = NULL, outPath = NULL, dirs = TRUE,
     if (!is.null(anaInfo))
     {
         fExts <- unique(unlist(MSFileExtensions()[from]))
-        afiles <- paste0(file.path(anaInfo$path, anaInfo$analysis), ".", fExts)
+        afiles <- unlist(Map(anaInfo$path, anaInfo$analysis, f = function(p, a) paste0(file.path(p, a), ".", fExts)))
         afiles <- afiles[file.exists(afiles)]
         afiles <- filterMSFileDirs(afiles, from)
         files <- c(files, afiles)

@@ -31,11 +31,11 @@ if (doDataPretreatment)
     recalibrarateDAFiles(anaInfo) {{ optionalLine(preTreatOpts$doDACalib) }}
     {{ optionalCodeBlock(nzchar(preTreatOpts$convAlgo) && "mzML" %in% preTreatOpts$convTo) }}
     convertMSFiles(anaInfo = anaInfo, from = c({{ paste0('"', preTreatOpts$convFrom, '"', collapse = ", ") }}),
-                   to = "mzML", agorithm = "{{ preTreatOpts$convAlgo }}", centroid = {{ preTreatOpts$centroid }})
+                   to = "mzML", algorithm = "{{ preTreatOpts$convAlgo }}", centroid = {{ preTreatOpts$centroid }})
     {{ endCodeBlock() }}
     {{ optionalCodeBlock(nzchar(preTreatOpts$convAlgo) && "mzXML" %in% preTreatOpts$convTo) }}
     convertMSFiles(anaInfo = anaInfo, from = c({{ paste0('"', preTreatOpts$convFrom, '"', collapse = ", ") }}),
-                   to = "mzXML", agorithm = "{{ preTreatOpts$convAlgo }}")
+                   to = "mzXML", algorithm = "{{ preTreatOpts$convAlgo }}", centroid = {{ preTreatOpts$centroid }})
     {{ endCodeBlock() }}
 } {{ optionalLine(preTreatOpts$do) }}
 

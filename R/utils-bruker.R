@@ -59,18 +59,17 @@ getDAApplication <- function()
 # if path=NULL, analysis should be complete file path
 getDAFileIndex <- function(DA, analysis, path, openFileIfClosed = TRUE)
 {
+    if (!is.null(path))
+        analysis <- getBrukerAnalysisPath(analysis, path)
+    
     getFIndex <- function()
     {
         openCount <- DA[["Analyses"]][["Count"]]
 
-        if (openCount > 0)
+        for (i in seq_len(openCount))
         {
-            afile <- getBrukerAnalysisPath(analysis, path)
-            for (i in 1:openCount)
-            {
-                if (DA[["Analyses"]][[i]][["Path"]] == afile)
-                    return(i)
-            }
+            if (DA[["Analyses"]][[i]][["Path"]] == analysis)
+                return(i)
         }
 
         return(-1)
@@ -79,14 +78,13 @@ getDAFileIndex <- function(DA, analysis, path, openFileIfClosed = TRUE)
     ret <- getFIndex()
     if (ret == -1 && openFileIfClosed) # File is not yet open?
     {
-        if (!is.null(path))
-            analysis <- getBrukerAnalysisPath(analysis, path)
+
         DA[["Analyses"]]$Open(analysis)
         ret <- getFIndex()
     }
 
     if (ret == -1 && openFileIfClosed)
-        warning(sprintf("Failed to open '%s'", getBrukerAnalysisPath(analysis, path)))
+        warning(sprintf("Failed to open '%s'", analysis))
 
     return(ret)
 }

@@ -8,6 +8,7 @@ if (nzchar(envOpts[["PATROON_SIRIUS"]]))
     options(patRoon.path.SIRIUS = envOpts[["PATROON_SIRIUS"]])
 
 options(patRoon.clearCache = TRUE)
+options(patRoon.progress.opts = list(style = 1))
 
 # https://github.com/r-lib/devtools/issues/1526
 Sys.unsetenv("R_TESTS")

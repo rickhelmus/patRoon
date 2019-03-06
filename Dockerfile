@@ -38,6 +38,7 @@ RUN wget http://msbi.ipb-halle.de/~cruttkie/metfrag/MetFrag2.4.3-CL.jar && \
     unzip sirius-4.0.1-linux64-headless.zip && rm sirius-4.0.1-linux64-headless.zip && \
     echo 'options(patRoon.path.metFragCL = "~/MetFrag2.4.3-CL.jar")' >> .Rprofile && \
     echo 'options(patRoon.path.SIRIUS = "~/sirius-linux64-headless-4.0.1/bin")' >> .Rprofile && \
+    echo 'options(patRoon.progress.opts = list(style = 1))' >> .Rprofile && \
     Rscript install_deps.R && rm -f ~/install_deps.R ~/DESCRIPTION
 
 ADD --chown=patRoon . patRoon

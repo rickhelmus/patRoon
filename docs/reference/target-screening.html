@@ -149,7 +149,8 @@ specify the retention time (if unspecified no retention times are checked).</p><
     <tr>
       <th>rtWindow, mzWindow</th>
       <td><p>The retention time window (in seconds) and
-<em>m/z</em> window that will be used for matching a target.</p></td>
+<em>m/z</em> window that will be used for matching a target (+/- feature
+data).</p></td>
     </tr>
     <tr>
       <th>fGroups</th>
@@ -175,10 +176,10 @@ information</a>.</p></td>
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p><code>screenTargets</code> will return a table (a <code>data.table</code>)
-  with detected targets and details such as retention and <em>m/z</em>
-  values. If a target is matched on multiple features/feature groups then
-  each hit is reported as a separate row. In case concentration values were
-  specified in the <a href='analysis-information.html'>analysis info</a> then the
+  with detected targets and details such as retention and <em>m/z</em> values.
+  If a target is matched on multiple features/feature groups then each hit is
+  reported as a separate row. In case concentration values were specified in
+  the <a href='analysis-information.html'>analysis info</a> then the
   <code>featureGroups</code> method will also report correlation coefficients
   (<code>'RSQ'</code> column) calculated from the linear regression between
   intensity values and specified concentrations.</p>

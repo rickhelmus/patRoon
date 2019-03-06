@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Conversion of analyses between several open and closed data formats — convertMSFiles • patRoon</title>
+<title>MS data conversion — convertMSFiles • patRoon</title>
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -30,15 +30,9 @@
 
 
 
-<meta property="og:title" content="Conversion of analyses between several open and closed data formats — convertMSFiles" />
+<meta property="og:title" content="MS data conversion — convertMSFiles" />
 
-<meta property="og:description" content="This function converts the data format of an analysis to another. It either
-uses tools from ProteoWizard
-(msConvert command) or OpenMS
-(FileConverter command) to perform the conversion. The supported
-input and output formats include mzXML and .mzML. Furthermore,
-when ProteoWizard is used for conversion, most major (closed) vendor formats
-are supported for input files." />
+<meta property="og:description" content="Conversion of MS analysis files between several open and closed data formats." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -111,37 +105,46 @@ are supported for input files." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Conversion of analyses between several open and closed data formats</h1>
+    <h1>MS data conversion</h1>
     <small class="dont-index">Source: <a href='https://github.com/rickhelmus/patRoon/blob/master/R/convert.R'><code>R/convert.R</code></a></small>
     <div class="hidden name"><code>convertMSFiles.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>This function converts the data format of an analysis to another. It either
-uses tools from <a href='http://proteowizard.sourceforge.net/'>ProteoWizard</a>
-(<code class='command'>msConvert</code> command) or <a href='http://www.openms.de/'>OpenMS</a>
-(<code class='command'>FileConverter</code> command) to perform the conversion. The supported
-input and output formats include <code class="file">mzXML</code> and <code class="file">.mzML</code>. Furthermore,
-when ProteoWizard is used for conversion, most major (closed) vendor formats
-are supported for input files.</p>
+    <p>Conversion of MS analysis files between several open and closed data formats.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>convertMSFiles</span>(<span class='no'>files</span>, <span class='kw'>outPath</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>dirs</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>from</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"thermo"</span>, <span class='st'>"bruker"</span>, <span class='st'>"agilent"</span>, <span class='st'>"ab"</span>, <span class='st'>"waters"</span>, <span class='st'>"mzXML"</span>,
-  <span class='st'>"mzML"</span>), <span class='kw'>to</span> <span class='kw'>=</span> <span class='st'>"mzML"</span>, <span class='kw'>overWrite</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>algorithm</span> <span class='kw'>=</span> <span class='st'>"pwiz"</span>,
-  <span class='kw'>filters</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>extraOpts</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>logPath</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/file.path'>file.path</a></span>(<span class='st'>"log"</span>,
-  <span class='st'>"convert"</span>), <span class='kw'>maxProcAmount</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/options'>getOption</a></span>(<span class='st'>"patRoon.maxProcAmount"</span>))</pre>
+    <pre class="usage"><span class='fu'>MSFileFormats</span>(<span class='kw'>algorithm</span> <span class='kw'>=</span> <span class='st'>"pwiz"</span>, <span class='kw'>vendor</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+
+<span class='fu'>convertMSFiles</span>(<span class='kw'>files</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>outPath</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>dirs</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>anaInfo</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>from</span> <span class='kw'>=</span> <span class='fu'>MSFileFormats</span>(<span class='no'>algorithm</span>, <span class='kw'>vendor</span> <span class='kw'>=</span> <span class='no'>algorithm</span> <span class='kw'>!=</span>
+  <span class='st'>"openms"</span>), <span class='kw'>to</span> <span class='kw'>=</span> <span class='st'>"mzML"</span>, <span class='kw'>overWrite</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>algorithm</span> <span class='kw'>=</span> <span class='st'>"pwiz"</span>,
+  <span class='kw'>centroid</span> <span class='kw'>=</span> <span class='no'>algorithm</span> <span class='kw'>!=</span> <span class='st'>"openms"</span>, <span class='kw'>filters</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>extraOpts</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>logPath</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/file.path'>file.path</a></span>(<span class='st'>"log"</span>, <span class='st'>"convert"</span>),
+  <span class='kw'>maxProcAmount</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/options'>getOption</a></span>(<span class='st'>"patRoon.maxProcAmount"</span>))</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>files</th>
-      <td><p>A <code>character</code> vector with input files. Alternatively, if
-<code>dirs=TRUE</code>, then a <code>character</code> vector with one or more
-directories from which input files are automatically selected.</p></td>
+      <th>algorithm</th>
+      <td><p>Either <code>"pwiz"</code> (implemented by <code class='command'>msConvert</code> of
+ProteoWizard), <code>"openms"</code> (implemented by <code class='command'>FileConverter</code> of
+OpenMS) or <code>"bruker"</code> (implemented by DataAnalysis).</p></td>
+    </tr>
+    <tr>
+      <th>vendor</th>
+      <td><p>If <code>TRUE</code> only vendor formats are returned.</p></td>
+    </tr>
+    <tr>
+      <th>files, dirs</th>
+      <td><p>The <code>files</code> argument should be a <code>character</code>
+vector with input files. If <code>files</code> contains directories and
+<code>dirs=TRUE</code> then files from these directories are also considered. An
+alternative method to specify input files is by the <code>anaInfo</code>
+argument. If the latter is specified <code>files</code> may be <code>NULL</code>.</p></td>
     </tr>
     <tr>
       <th>outPath</th>
@@ -150,14 +153,15 @@ for the output. Will be re-cycled if necessary. If <code>NULL</code>, output
 directories will be kept the same as the input directories.</p></td>
     </tr>
     <tr>
-      <th>dirs</th>
-      <td><p>If <code>TRUE</code> the <code>files</code> argument specifies directories
-from which input files should be selected.</p></td>
+      <th>anaInfo</th>
+      <td><p>An <a href='analysis-information.html'>analysis info table</a> used to
+retrieve input files. Either this argument or <code>files</code> (or both) should
+be set (<em>i.e.</em> not <code>NULL</code>).</p></td>
     </tr>
     <tr>
       <th>from</th>
       <td><p>One or more input formats (see below). These are used to find
-analyses when <code>dirs=TRUE</code>.</p></td>
+analyses when <code>dirs=TRUE</code> or <code>anaInfo</code> is set.</p></td>
     </tr>
     <tr>
       <th>to</th>
@@ -169,17 +173,17 @@ analyses when <code>dirs=TRUE</code>.</p></td>
 (<code>TRUE</code>) or not (<code>FALSE</code>)?</p></td>
     </tr>
     <tr>
-      <th>algorithm</th>
-      <td><p>Either <code>"pwiz"</code> (uses <code class='command'>msConvert</code> of
-ProteoWizard) or <code>"openms"</code> (uses <code class='command'>FileConverter</code> of OpenMS).</p></td>
+      <th>centroid</th>
+      <td><p>Set to <code>TRUE</code> to enable centroiding (not supported if
+<code>algorithm="openms"</code>). In addition, when <code>algorithm="pwiz"</code> the
+value may be <code>"vendor"</code> to perform centroiding with the vendor
+algorithm.</p></td>
     </tr>
     <tr>
       <th>filters</th>
       <td><p>When <code>algorithm="pwiz"</code>: a <code>character</code> vector
-specifying one or more filters. Can be used for peak picking to obtain
-centroided data (see examples). The elements of the specified vector are
-directly passed to the
-<code>--filter</code> option (see
+specifying one or more filters. The elements of the specified vector are
+directly passed to the <code>--filter</code> option (see
 <a href='http://proteowizard.sourceforge.net/tools/filters.html'>here</a>)</p></td>
     </tr>
     <tr>
@@ -188,7 +192,7 @@ directly passed to the
 parameters passed to <code class='command'>msConvert</code> or <code class='command'>FileConverter</code>. Set to
 <code>NULL</code> to ignore. For options: see
 <a href='http://ftp.mi.fu-berlin.de/pub/OpenMS/release-documentation/html/TOPP_FileConverter.html'>FileConverter</a>
-and
+ and
 <a href='http://proteowizard.sourceforge.net/tools/msconvert.html'>msConvert</a>.</p></td>
     </tr>
     <tr>
@@ -205,18 +209,42 @@ efficient results.</p></td>
     </tr>
     </table>
     
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p><code>MSFileFormats</code> returns a <code>character</code> with all supported
+  input formats (see below).</p>
+<p><code>convertMSFiles</code> converts the data format of an analysis to
+  another. It uses tools from
+  <a href='http://proteowizard.sourceforge.net/'>ProteoWizard</a>
+  (<code class='command'>msConvert</code> command), <a href='http://www.openms.de/'>OpenMS</a>
+  (<code class='command'>FileConverter</code> command) or Bruker DataAnalysis to perform the
+  conversion. Supported input and output formats include <code class="file">mzXML</code>,
+  <code class="file">.mzML</code> and several vendor formats, depending on which algorithm is
+  used.</p>
+    
     <h2 class="hasAnchor" id="conversion-formats"><a class="anchor" href="#conversion-formats"></a>Conversion formats</h2>
 
-    <p>Input and output formats include <code>mzXML</code>
-  and <code>mzML</code>. In addition, when ProteoWizard is used, the following
-  vendor input formats may be chosen (specified with the <code>from</code> argument):</p><ul>
-<li><p><code>thermo</code>: Thermo <code class="file">.RAW</code> files.</p></li>
-<li><p><code>bruker</code>: Bruker <code class="file">.d</code>, <code class="file">.yep</code>, <code class="file">.baf</code> and <code class="file">.fid</code> files.</p></li>
-<li><p><code>agilent</code>: Agilent <code class="file">.d</code> files.</p></li>
-<li><p><code>ab</code>: AB Sciex <code class="file">.wiff</code> files.</p></li>
-<li><p><code>waters</code> Waters <code class="file">.RAW</code> files.</p></li>
-</ul><p>Note that the actual supported file formats depend on the ProteoWizard
-  installation (see
+    <p>Possible output formats (<code>to</code> argument) are
+  <code>mzXML</code> and <code>mzML</code>.</p>
+<p>Possible input formats (<code>from</code> argument) depend on the algorithm that
+  was chosen and may include:</p>
+<p></p><ul>
+<li><p><code>thermo</code>: Thermo <code class="file">.RAW</code> files (only
+  <code>algorithm="pwiz"</code>).</p></li>
+<li><p><code>bruker</code>: Bruker <code class="file">.d</code>, <code class="file">.yep</code>, <code class="file">.baf</code> and
+  <code class="file">.fid</code> files (only <code>algorithm="pwiz"</code> or
+  <code>algorithm="bruker"</code>).</p></li>
+<li><p><code>agilent</code>: Agilent <code class="file">.d</code> files (only
+  <code>algorithm="pwiz"</code>).</p></li>
+<li><p><code>ab</code>: AB Sciex <code class="file">.wiff</code> files (only
+  <code>algorithm="pwiz"</code>).</p></li>
+<li><p><code>waters</code> Waters <code class="file">.RAW</code> files (only
+  <code>algorithm="pwiz"</code>).</p></li>
+<li><p><code>mzXML</code>/<code>mzML</code>: Open format <code class="file">.mzXML</code>/<code class="file">.mzML</code>
+  files (only <code>algorithm="pwiz"</code> or <code>algorithm="openms"</code>).</p></li>
+</ul>
+    <p>Note that the actual supported file formats of ProteoWizard depend on how
+  it was installed (see
   <a href='http://proteowizard.sourceforge.net/formats/index.html'>here</a>).</p>
     
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
@@ -243,7 +271,7 @@ doi: <a href='http://doi.org/10.1038/nbt.2377'>10.1038/nbt.2377</a>
 <span class='co'># store the files in analyses/mzml. During conversion files are centroided by</span>
 <span class='co'># the peakPicking filter and only MS 1 data is kept.</span>
 <span class='fu'>convertMSFiles</span>(<span class='st'>"analyses/raw"</span>, <span class='st'>"analyses/mzml"</span>, <span class='kw'>dirs</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>from</span> <span class='kw'>=</span> <span class='st'>"thermo"</span>,
-               <span class='kw'>filters</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"peakPicking vendor"</span>, <span class='st'>"msLevel 1"</span>))
+               <span class='kw'>centroid</span> <span class='kw'>=</span> <span class='st'>"vendor"</span>, <span class='kw'>filters</span> <span class='kw'>=</span> <span class='st'>"msLevel 1"</span>)
 <span class='co'># }</span># NOT RUN {
 # }
 </pre>
@@ -253,6 +281,8 @@ doi: <a href='http://doi.org/10.1038/nbt.2377'>10.1038/nbt.2377</a>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
       
+      <li><a href="#details">Details</a></li>
+
       <li><a href="#conversion-formats">Conversion formats</a></li>
 
       <li><a href="#references">References</a></li>

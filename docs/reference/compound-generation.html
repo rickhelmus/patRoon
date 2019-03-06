@@ -135,11 +135,11 @@ groups.</p>
   <span class='kw'>identifiers</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>extraOpts</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>maxProcAmount</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/options'>getOption</a></span>(<span class='st'>"patRoon.maxProcAmount"</span>))
 
-<span class='fu'>generateCompoundsSirius</span>(<span class='no'>fGroups</span>, <span class='no'>MSPeakLists</span>, <span class='kw'>maxMzDev</span> <span class='kw'>=</span> <span class='fl'>5</span>,
+<span class='fu'>generateCompoundsSirius</span>(<span class='no'>fGroups</span>, <span class='no'>MSPeakLists</span>, <span class='kw'>relMzDev</span> <span class='kw'>=</span> <span class='fl'>5</span>,
   <span class='kw'>adduct</span> <span class='kw'>=</span> <span class='st'>"[M+H]+"</span>, <span class='kw'>elements</span> <span class='kw'>=</span> <span class='st'>"CHNOP"</span>, <span class='kw'>profile</span> <span class='kw'>=</span> <span class='st'>"qtof"</span>,
   <span class='kw'>formulaDatabase</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>fingerIDDatabase</span> <span class='kw'>=</span> <span class='st'>"pubchem"</span>, <span class='kw'>noise</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>errorRetries</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>topMost</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='kw'>extraOpts</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>logPath</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/file.path'>file.path</a></span>(<span class='st'>"log"</span>, <span class='st'>"sirius"</span>),
+  <span class='kw'>errorRetries</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>topMost</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='kw'>topMostFormulas</span> <span class='kw'>=</span> <span class='fl'>5</span>,
+  <span class='kw'>extraOpts</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>logPath</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/file.path'>file.path</a></span>(<span class='st'>"log"</span>, <span class='st'>"sirius"</span>),
   <span class='kw'>maxProcAmount</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/options'>getOption</a></span>(<span class='st'>"patRoon.maxProcAmount"</span>))
 
 <span class='fu'>compoundScorings</span>(<span class='kw'>algorithm</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>database</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
@@ -202,11 +202,9 @@ may be useful to handle e.g. connection errors.</p></td>
     <tr>
       <th>topMost</th>
       <td><p>Only keep this number of candidates (per feature group) with
-highest score.</p>
-<p>For <code class='command'>MetFrag</code>: Set to <code>NULL</code> to always keep all candidates, however,
-please note that this may result in significant usage of CPU/RAM resources
-for large numbers of candidates.</p>
-<p>For <code class='command'>SIRIUS</code>: Sets the <span class="option">--candidates</span> commandline option.</p></td>
+highest score. Set to <code>NULL</code> to always keep all candidates,
+however, please note that this may result in significant usage of CPU/RAM
+resources for large numbers of candidates.</p></td>
     </tr>
     <tr>
       <th>dbRelMzDev</th>
@@ -232,13 +230,9 @@ converted to it with <code><a href='adduct-utils.html'>as.adduct</a></code>). Ex
     <tr>
       <th>database</th>
       <td><p>Compound database to use. Valid values are: <code>"pubchem"</code>,
-  <code>"chemspider"</code>, <code>"kegg"</code>, <code>"sdf"</code>, <code>"psv"</code> and
-  <code>"csv"</code>.</p>
-<p>For compound generation: note that when <code>database="chemspider"</code>, the
-  <code>chemSpiderToken</code> argument should be set. Similarly, when a local database is
-  set (<em>i.e.</em> <code>sdf</code>, <code>psv</code>, <code>csv</code>) the
-  <code>LocalDatabasePath</code> value should be set in <code>extraOpts</code>. Sets the
-  <code>MetFragDatabaseType</code> option.</p></td>
+<code>"chemspider"</code>, <code>"toxcast"</code>, <code>"kegg"</code>, <code>"sdf"</code>,
+<code>"psv"</code> and <code>"csv"</code>. See section below for more information. Sets
+the <code>MetFragDatabaseType</code> option.</p></td>
     </tr>
     <tr>
       <th>extendedPubChem</th>
@@ -329,9 +323,9 @@ Usually a number close to the amount of physical cores yields most
 efficient results.</p></td>
     </tr>
     <tr>
-      <th>maxMzDev</th>
-      <td><p>Maximum deviation between the measured and candidate formula
-<em>m/z</em> values (in ppm). Sets the <span class="option">--ppm-max</span> commandline
+      <th>relMzDev</th>
+      <td><p>Maximum relative deviation between the measured and candidate
+formula <em>m/z</em> values (in ppm). Sets the <span class="option">--ppm-max</span> commandline
 option.</p></td>
     </tr>
     <tr>
@@ -368,6 +362,12 @@ is also <code>NULL</code>. Sets the <span class="option">--fingerid-db</span> op
       <th>noise</th>
       <td><p>Median intensity of the noise (<code>NULL</code> ignores this
 parameter). Sets the <span class="option">--noise</span> commandline option.</p></td>
+    </tr>
+    <tr>
+      <th>topMostFormulas</th>
+      <td><p>Do not return more than this number of candidate
+formulae. Note that only compounds for these formulae will be searched.
+Sets the <span class="option">--candidates</span> commandline option.</p></td>
     </tr>
     <tr>
       <th>includeSuspectLists, onlyDefault, includeNoDB</th>
@@ -486,9 +486,29 @@ before feature groups have been prioritized.</p>
   <code class='command'>MetFrag</code>. For instance, the following can be given to the
   <code>scoreTypes</code> argument to use all default scorings for PubChem:
   <code>compoundScorings("metfrag", "pubchem", onlyDefault=TRUE)$name</code>.</p>
-<p>For all <code class='command'>MetFrag</code> scoring types refer to the <code>Candidate Scores</code>
-  section on the <a href='http://c-ruttkies.github.io/MetFrag/projects/metfragr/'>MetFragR
+<p>For all <code class='command'>MetFrag</code> scoring types refer to the <code>Candidate
+  Scores</code> section on the
+  <a href='http://c-ruttkies.github.io/MetFrag/projects/metfragr/'>MetFragR
   homepage</a>.</p>
+    
+    <h2 class="hasAnchor" id="usage-of-metfrag-databases"><a class="anchor" href="#usage-of-metfrag-databases"></a>Usage of MetFrag databases</h2>
+
+    <p>When <code>database="chemspider"</code>
+  setting the <code>chemSpiderToken</code> argument is mandatory.</p>
+<p>When a local database is set (<em>i.e.</em> <code>sdf</code>, <code>psv</code>,
+  <code>csv</code>, <code>toxcast</code>) the file location of the database should be set
+  in the <code>LocalDatabasePath</code> value via the <code>extraOpts</code> argument or
+  using the <code>patRoon.path.MetFragCompTox</code> option (only when
+  <code>database="comptox"</code>).</p>
+<p>Examples: <code>options(patRoon.path.MetFragCompTox =
+  "C:/DSSTox_01May18_Full_SelectMetaDataPlus.csv")</code> <code>extraOpts =
+  list(LocalDatabasePath = \"C:/myDB.csv\")</code>.</p>
+<p>Note that for <code>database="comptox"</code> currently only scorings from the
+  <code class="file">SelectMetaData</code> and <code class="file">SelectMetaDataPlus</code> files are supported.
+  These files can be obtained from
+  <a href='https://epa.figshare.com/articles/CompTox_Chemicals_Dashboard_Metadata_Files_for_Integration_with_MetFrag/7525199'>https://epa.figshare.com/articles/CompTox_Chemicals_Dashboard_Metadata_Files_for_Integration_with_MetFrag/7525199</a>.
+  Note that only recent <code class='command'>MetFrag</code> versions (&gt;= <samp>2.4.5</samp>) support
+  these libraries.</p>
     
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
@@ -507,8 +527,7 @@ ISBN 978-3-319-16706-0.
 <em>Proceedings of the National Academy of Sciences</em>, <b>112</b>(41), 12580--12585.
 doi: <a href='http://doi.org/10.1073/pnas.1509788112'>10.1073/pnas.1509788112</a>
 .
- <br /><br />
-  Bocker S, Letzel MC, Liptak Z, Pervukhin A (2008).
+ <br /><br /> Bocker S, Letzel MC, Liptak Z, Pervukhin A (2008).
 &#8220;SIRIUS: decomposing isotope patterns for metabolite identification.&#8221;
 <em>Bioinformatics</em>, <b>25</b>(2), 218--224.
 doi: <a href='http://doi.org/10.1093/bioinformatics/btn603'>10.1093/bioinformatics/btn603</a>
@@ -530,6 +549,8 @@ doi: <a href='http://doi.org/10.1093/bioinformatics/btn603'>10.1093/bioinformati
       <li><a href="#details">Details</a></li>
 
       <li><a href="#scorings">Scorings</a></li>
+
+      <li><a href="#usage-of-metfrag-databases">Usage of MetFrag databases</a></li>
 
       <li><a href="#references">References</a></li>
 

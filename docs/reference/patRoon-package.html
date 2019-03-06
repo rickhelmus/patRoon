@@ -145,15 +145,20 @@ data preparation and cleanup, plotting results and automatic reporting.</p>
 <li><p><code>patRoon.maxProcAmount</code>: The maximum number of processes that
   should be initiated in parallel. A good starting point is the number of
   cores available. Default is set by <code><a href='https://www.rdocumentation.org/packages/parallel/topics/detectCores'>detectCores</a></code>.</p></li>
-<li><p><code>patRoon.path.pwiz</code>: The path in which the <code class='command'>ProteoWizard</code>
-  binaries are installed. Only need to be set if not yet in <span class="option">PATH</span>.</p></li>
+<li><p><code>patRoon.path.pwiz</code>: The path in which the
+  <code class='command'>ProteoWizard</code> binaries are installed. If unset an attempt is made
+  to find this directory from the Windows registry and <span class="option">PATH</span>
+  environment variable.</p></li>
 <li><p><code>patRoon.path.GenForm</code>: The path to the <code class='command'>GenForm</code>
   executable. If not set (the default) the internal <code>GenForm</code> binary is
   used. Only set if you want to override the executable.</p></li>
-<li><p><code>patRoon.path.metFragCL</code>: The complete file path to the metFrag
+<li><p><code>patRoon.path.MetFragCL</code>: The complete file path to the MetFrag
   CL <code class="file">jar</code> file that <em>must</em> be set when using
   <code><a href='compound-generation.html'>generateCompoundsMetfrag</a></code>. Example:
   <code>"C:/MetFrag2.4.2-CL.jar"</code>.</p></li>
+<li><p><code>patRoon.path.MetFragCompTox</code>: The complete file path to the
+  CompTox database <code class="file">csv</code> file. See <code><a href='compound-generation.html'>generateCompounds</a></code> for
+  more details.</p></li>
 <li><p><code>patRoon.path.SIRIUS</code>: The directory in which SIRIUS is
   installed. Unless the binaries can be located via the <span class="option">PATH</span>
   environment variable, this <em>must</em> be set when using

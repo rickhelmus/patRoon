@@ -109,6 +109,34 @@
     <div id="patroon-0-1-0-9000" class="section level1">
 <h1 class="page-header">
 <a href="#patroon-0-1-0-9000" class="anchor"></a>patRoon 0.1.0.9000</h1>
+<div id="march-2019" class="section level2">
+<h2 class="hasAnchor">
+<a href="#march-2019" class="anchor"></a>March 2019</h2>
+<ul>
+<li>
+<code><a href="../reference/reporting.html">reportMD()</a></code>: most time consuming plots are now cached. Hence, re-reporting should be signficiantly faster now.</li>
+<li>Updates to MS data file conversion:
+<ul>
+<li>
+<code><a href="../reference/convertMSFiles.html">convertMSFiles()</a></code> now (optionally) takes analysis information (<code>anaInfo</code>) for file input.</li>
+<li>
+<code><a href="../reference/convertMSFiles.html">convertMSFiles()</a></code> now supports Bruker DataAnalysis as conversion algorithm (replaces now deprecated <code><a href="../reference/bruker-utils.html">exportDAFiles()</a></code> function).</li>
+<li>
+<code><a href="../reference/convertMSFiles.html">MSFileFormats()</a></code> function to list supported input conversion formats.</li>
+<li>
+<code><a href="../reference/analysis-information.html">generateAnalysisInfo()</a></code> now recognizes more file formats. This is mainly useful so its output can be used with <code><a href="../reference/convertMSFiles.html">convertMSFiles()</a></code>.</li>
+<li>
+<code><a href="../reference/convertMSFiles.html">convertMSFiles()</a></code> now has the <code>centroid</code> argument to more easily perform centroiding.</li>
+</ul>
+</li>
+<li>Updates to <code><a href="../reference/GUI-utils.html">newProject()</a></code>:
+<ul>
+<li>The analyses selector recognizes more data file formats. This way you can select analyses that have not been converted yet.</li>
+<li>Data pre-treatment options now include more sophisticated file conversion options (<em>e.g.</em> using ProteoWizard). This and the new analysis selector functionality ensures that data files in all major vendor formats do not have to be converted prior to generating a script.</li>
+</ul>
+</li>
+</ul>
+</div>
 <div id="february-2019" class="section level2">
 <h2 class="hasAnchor">
 <a href="#february-2019" class="anchor"></a>February 2019</h2>
@@ -116,7 +144,8 @@
 <li>Compound scorings are now normalized towards their original min/max values. This ensures that the <code>score</code> column of MetFrag results stays correct.</li>
 <li>plotScores(): Option to only report scorings that have been used for ranking</li>
 <li>as.data.table()/as.data.frame() method for compounds: optionally normalize scores.</li>
-<li>reportPDF()/reportMD() now report only 5 top most candidate compounds by default (controlled by compoundTopMost argument).</li>
+<li>
+<code><a href="../reference/reporting.html">reportPDF()</a></code>/<code><a href="../reference/reporting.html">reportMD()</a></code> now report only 5 top most candidate compounds by default (controlled by <code>compoundsTopMost</code> argument).</li>
 <li>metadata for MS peak lists</li>
 <li>
 <code><a href="../reference/generics.html">plotSpec()</a></code> now displays subscripted formulae</li>
@@ -141,6 +170,34 @@
 </ul>
 </li>
 <li>Fixed: GenForm now always uses Hill sorting.</li>
+<li>
+<code><a href="../reference/generics.html">annotatedPeakList()</a></code> method for <code>formulas</code> and <code>compounds</code>. Also used by <code>reportMD</code> for improved annotation peak tables.</li>
+<li>Tweaked default mzR MS peak lists settings (halved <code>maxRtMSWidth</code> and <code>precursorMzWindow</code>)</li>
+<li>Fixed: Make sure that MetFrag web doesn’t try to set unsupported database</li>
+<li>
+<strong>IMPORTANT</strong> Several changes were made to improve clarity and consensistency for arguments that specify retention/mz windows or allowable deviations.
+<ul>
+<li>Functions with changed argument names: <code>generateComponentsNontarget</code>, <code>generateComponentsRAMClustR</code>, <code>generateCompoundsSirius</code>, <code>generateFormulasGenForm</code>, <code>generateFormulasSirius</code>, <code>generateMSPeakListsDA</code>, <code>generateMSPeakListsMzR</code>, <code>importFeatureGroupsBrukerPA</code>
+</li>
+<li>The <code>maxRtMSWidth</code> argument to <code>generateMSPeakListsDA</code>, <code>generateMSPeakListsMzR</code> (now <code>maxMSRtWindow</code>) now specifies a retention time window (\emph{i.e.} +/- retention time feature) instead of total retention width around a feature. Hence, <em>current input values should be halved</em>.</li>
+</ul>
+</li>
+<li>CAMERA and RAMClustR components: both now have <code>minSize</code> and <code>relMinReplicates</code> (replaces <code>ubiquitous</code> for CAMERA) arguments. Note that their defaults may filter out (feature groups from) components. See their documentation for more info.</li>
+<li>Changed capitalisation of MetFrag CL location option from <code>patRoon.path.metFragCL</code> to <code>patRoon.path.MetFragCL</code>. The old name still works for backward compatability.</li>
+<li>Documented usage of the CompTox database with MetFrag. See <code><a href="../reference/compound-generation.html">?generateCompounds</a></code>.</li>
+<li>Default normalization of MetFrag scorings now follows MetFrag web behaviour.</li>
+<li>
+<code>topMostFormulas</code> argument for SIRIUS compound generation.</li>
+<li>Fixed GenForm ranking in case both MS and MS/MS formulae are present.</li>
+<li>
+<code><a href="../reference/reporting.html">reportPDF()</a></code>/<code><a href="../reference/reporting.html">reportMD()</a></code> now report only 5 top most candidate formulae by default (controlled by <code>formulasTopMost</code> argument).</li>
+<li>Added <code><a href="../reference/verifyDependencies.html">verifyDependencies()</a></code> function to let the user verify if external tools can be found.</li>
+<li>The meaning of the <code>dirs</code> argument to <code><a href="../reference/convertMSFiles.html">convertMSFiles()</a></code> was slightly changed: if <code>TRUE</code> (the default) the input can either be paths to analyses files or to directories containing the analyses files.</li>
+<li>More effective locating ProteoWizard binaries by using the Windows registry.</li>
+<li>Nicer default graphics for <code>featureGroups</code> method for <code><a href="../reference/generics.html">plot()</a></code>.</li>
+<li>
+<code><a href="../reference/reporting.html">reportMD()</a></code>: Don’t plot Chord if &lt;3 (non-empty) replicate groups are available.</li>
+<li>All <code><a href="../reference/generics.html">filter()</a></code> methods now support negation by <code>negate</code> argument.</li>
 </ul>
 </div>
 <div id="january-2019" class="section level2">
@@ -192,9 +249,9 @@
 <li>All major workflow classes now have <code><a href="../reference/generics.html">algorithm()</a></code> and <code>as.data.table()/as.data.frame()</code> methods. The latter replaces and enhances the <code>makeTable()</code> (<code>formulas</code> class) and <code>groupTable()</code> (<code>featureGroups</code> class) methods.</li>
 </ul>
 </div>
-<div id="decomber-2018" class="section level2">
+<div id="december-2018" class="section level2">
 <h2 class="hasAnchor">
-<a href="#decomber-2018" class="anchor"></a>Decomber 2018</h2>
+<a href="#december-2018" class="anchor"></a>December 2018</h2>
 <ul>
 <li>Moved OpenMS XML writing code from <code>R</code> to <code>C++</code>: significantly reduces time required for grouping large amount of features.</li>
 <li>Several updates for functionality that uses Bruker DataAnalyses

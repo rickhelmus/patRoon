@@ -146,12 +146,22 @@ $(x, name)
 # S4 method for formulas
 as.data.table(x, fGroups = NULL, average = FALSE,
   countElements = NULL, countFragElements = NULL, OM = FALSE,
-  maxFormulas = NULL, maxFragFormulas = NULL)
+  maxFormulas = NULL, maxFragFormulas = NULL,
+  normalizeScores = "none", excludeNormScores = NULL)
 
 # S4 method for formulas
 filter(obj, minExplainedFragPeaks = NULL,
   elements = NULL, fragElements = NULL, lossElements = NULL,
-  topMost = NULL, scoreLimits = NULL, OM = NULL)
+  topMost = NULL, scoreLimits = NULL, OM = FALSE, negate = FALSE)
+
+# S4 method for formulas
+annotatedPeakList(obj, precursor, groupName,
+  analysis = NULL, MSPeakLists, onlyAnnotated = FALSE)
+
+# S4 method for formulas
+plotScores(obj, precursor, groupName,
+  analysis = NULL, normalizeScores = "max", excludeNormScores = NULL,
+  useGGPlot2 = FALSE)
 
 # S4 method for formulas
 plotSpec(obj, precursor, groupName, analysis = NULL,
@@ -243,6 +253,28 @@ formulae (or fragment formulae) per feature group. Set to <code>NULL</code> to
 ignore.</p></td>
     </tr>
     <tr>
+      <th>normalizeScores</th>
+      <td><p>A <code>character</code> that specifies how normalization of
+compound scorings occurs. Either <code>"none"</code> (no normalization),
+<code>"max"</code> (normalize to max value) or <code>"minmax"</code> (perform min-max
+normalization). Note that normalization of negative scores (e.g. output by
+SIRIUS) is always performed as min-max. Furthermore, currently
+normalization takes the original scoring min/max values into account when
+candidates were generated. Thus, normalization is not affected when
+candidate results were removed after they were generated (<em>e.g.</em> by
+use of <code>filter</code>).</p></td>
+    </tr>
+    <tr>
+      <th>excludeNormScores</th>
+      <td><p>A <code>character</code> vector specifying any compound
+  scoring names that should <em>not</em> be normalized. Set to <code>NULL</code> to
+  normalize all scorings. Note that whether any normalization occurs is set
+  by the <code>excludeNormScores</code> argument.</p>
+<p>For <code>compounds</code>: By default <code>score</code> and
+  <code>individualMoNAScore</code> are set to mimic the behaviour of the MetFrag
+  web interface.</p></td>
+    </tr>
+    <tr>
       <th>minExplainedFragPeaks</th>
       <td><p>Minimum number of fragment peaks that are
 explained. Setting this to <samp>1</samp> will remove any MS only formula
@@ -267,13 +299,14 @@ filter.</p></td>
       <th>fragElements, lossElements</th>
       <td><p>Specifies elemental restrictions for
 fragment or neutral loss formulae (charged form). Candidates are retained
-if at least one of the fragment formulae follow the given restrictions. See
-<code>elements</code> for the used format.</p></td>
+if at least one of the fragment formulae follow (or not follow if
+<code>negate=TRUE</code>) the given restrictions. See <code>elements</code> for the
+used format.</p></td>
     </tr>
     <tr>
       <th>topMost</th>
-      <td><p>Only retain no more than this amount of best ranked candidates
-for each feature group.</p></td>
+      <td><p>Retain no more than this amount of best ranked (or worst
+ranked if <code>negate=TRUE</code>) candidates for each feature group.</p></td>
     </tr>
     <tr>
       <th>scoreLimits</th>
@@ -286,6 +319,10 @@ limits). The names of each element should follow the values returned by
 match score should be at least <samp>0.5</samp>. More details of scorings can be
 obtained with <code><a href='formula-generation.html'>formulaScorings</a></code>. Note that a result without a
 specified scoring is never removed. Set to <code>NULL</code> to skip this filter.</p></td>
+    </tr>
+    <tr>
+      <th>negate</th>
+      <td><p>If <code>TRUE</code> then filters are applied in opposite manner.</p></td>
     </tr>
     <tr>
       <th>precursor</th>
@@ -309,9 +346,9 @@ results for the complete feature group will be plotted.</p></td>
 generate the candidate</p></td>
     </tr>
     <tr>
-      <th>title</th>
-      <td><p>The title of the plot. Set to <code>NULL</code> for an automatically
-generated title.</p></td>
+      <th>onlyAnnotated</th>
+      <td><p>Set to <code>TRUE</code> to filter out any peaks that could
+not be annotated.</p></td>
     </tr>
     <tr>
       <th>useGGPlot2</th>
@@ -319,6 +356,11 @@ generated title.</p></td>
 plotting, otherwise base plot used. For <code>plotSpec</code>, <code>ggplot2</code>
 allows nicely repelled text for annotation. However, base plot is generally
 faster.</p></td>
+    </tr>
+    <tr>
+      <th>title</th>
+      <td><p>The title of the plot. Set to <code>NULL</code> for an automatically
+generated title.</p></td>
     </tr>
     <tr>
       <th>xlim, ylim</th>
@@ -418,6 +460,9 @@ formula table for the feature group specified by <code>j</code> is returned.</p>
 <li><p><code>as.data.table</code>: Generates a table with all candidate formulae for each
 feature group and other information such as element counts.</p></li>
 <li><p><code>filter</code>: Performs rule based filtering on formula results.</p></li>
+<li><p><code>annotatedPeakList</code>: Returns an MS/MS peak list annotated with data from a
+given candidate formula.</p></li>
+<li><p><code>plotScores</code>: Plots a barplot with scoring of a candidate compound.</p></li>
 <li><p><code>plotSpec</code>: Plots an annotated spectrum for a given candidate
 formula of a feature or feature group.</p></li>
 <li><p><code>plotVenn</code>: plots a Venn diagram (using <span class="pkg">VennDiagram</span>)
@@ -436,6 +481,8 @@ candidates between different <code>formula</code> objects.</p></li>
     <dl class='dl-horizontal'>
 <dt><code>formulas,featureFormulas</code></dt><dd><p>Lists of all generated formulae. Use the
 <code>formulaTable</code> method for access.</p></dd>
+    <dt><code>scoreRanges</code></dt><dd><p>The original min/max values of all scorings when candidate
+results were generated. This is used for normalization.</p></dd>
 </dl>
     
     <h2 class="hasAnchor" id="note"><a class="anchor" href="#note"></a>Note</h2>

@@ -154,7 +154,7 @@ as.data.table(x, fGroups = NULL,
 filter(obj, absMSIntThr = NULL,
   absMSMSIntThr = NULL, relMSIntThr = NULL, relMSMSIntThr = NULL,
   topMSPeaks = NULL, topMSMSPeaks = NULL, deIsotopeMS = FALSE,
-  deIsotopeMSMS = FALSE, retainPrecursorMSMS = TRUE)
+  deIsotopeMSMS = FALSE, retainPrecursorMSMS = TRUE, negate = FALSE)
 
 # S4 method for MSPeakLists
 plotSpec(obj, groupName, analysis = NULL,
@@ -223,7 +223,12 @@ presence of isotopic peaks (e.g. MetFrag for MS/MS). Note that
       <th>retainPrecursorMSMS</th>
       <td><p>If <code>TRUE</code> then precursor peaks will never be
 filtered out from MS/MS peak lists (note that precursors are never removed
-from MS peak lists).</p></td>
+from MS peak lists). The <code>negate</code> argument does not affect this
+setting.</p></td>
+    </tr>
+    <tr>
+      <th>negate</th>
+      <td><p>If <code>TRUE</code> then filters are applied in opposite manner.</p></td>
     </tr>
     <tr>
       <th>groupName</th>

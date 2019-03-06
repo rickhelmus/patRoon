@@ -169,7 +169,8 @@ as.data.table(x, average = FALSE,
   features = FALSE)
 
 # S4 method for featureGroups,ANY
-plot(x, retMin = TRUE, ...)
+plot(x, retMin = TRUE, col = NULL,
+  pch = 16, ...)
 
 # S4 method for featureGroups
 plotInt(obj, average = FALSE, ...)
@@ -255,6 +256,11 @@ ProfileAnalysis), <code>"brukertasq"</code> (Bruker TASQ) or <code>"mzmine"</cod
     <tr>
       <th>retMin</th>
       <td><p>Plot retention time in minutes (instead of seconds).</p></td>
+    </tr>
+    <tr>
+      <th>col, pch</th>
+      <td><p>Passed to <code><a href='https://www.rdocumentation.org/packages/graphics/topics/plot'>plot</a></code>. If <code>col=NULL</code>
+then colours are automatically generated.</p></td>
     </tr>
     <tr>
       <th>addSelfLinks</th>
@@ -434,8 +440,8 @@ analyte database) or that is suitable as input for the <code>Targeted peak
 detection</code> functionality of <a href='http://mzmine.github.io/'>MZmine</a>.</p></li>
 <li><p><code>as.data.table</code>: Obtain a summary table (a <code>data.table</code>)
 with retention, <em>m/z</em>, intensity and optionally other feature data.</p></li>
-<li><p><code>plot</code>: Generates an <em>m/z</em> <em>vs</em> retention time plot
-for all featue groups.</p></li>
+<li><p><code>plot</code>: Generates an <em>m/z</em> <em>vs</em> retention time
+plot for all featue groups.</p></li>
 <li><p><code>plotInt</code>: Generates a line plot for the (averaged) intensity
 of feature groups within all analyses</p></li>
 <li><p><code>plotChord</code>: Generates a chord diagram which can be used to

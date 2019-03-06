@@ -267,7 +267,7 @@ isotope intensities. See
       <td><p>Use the 13C isotope as the expected shift for isotope
 mass traces. See
 <a href='http://ftp.mi.fu-berlin.de/pub/OpenMS/release2.1.0-documentation/html/TOPP_FeatureFinderMetabo.html'>FeatureFinderMetabo</a>.
-Sets <code>algorithm:ffm:mz_scoring_13C</code>.</p></td>
+ Sets <code>algorithm:ffm:mz_scoring_13C</code>.</p></td>
     </tr>
     <tr>
       <th>useSmoothedInts</th>
@@ -283,9 +283,10 @@ will override any of the above.</p></td>
     </tr>
     <tr>
       <th>intSearchRTWindow</th>
-      <td><p>Retention time window (in seconds) that is used to
-find the closest data point to the retention time to obtain the intensity
-of a feature (this is needed since OpenMS does not provide this data).</p></td>
+      <td><p>Retention time window (in seconds, +/- feature
+retention time) that is used to find the closest data point to the
+retention time to obtain the intensity of a feature (this is needed since
+OpenMS does not provide this data).</p></td>
     </tr>
     <tr>
       <th>logPath</th>

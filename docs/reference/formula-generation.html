@@ -125,7 +125,7 @@ groups.</p>
   <span class='kw'>MSMode</span> <span class='kw'>=</span> <span class='st'>"both"</span>, <span class='no'>adduct</span>, <span class='kw'>featThreshold</span> <span class='kw'>=</span> <span class='fl'>0.75</span>, <span class='kw'>save</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>close</span> <span class='kw'>=</span> <span class='no'>save</span>)
 
-<span class='fu'>generateFormulasGenForm</span>(<span class='no'>fGroups</span>, <span class='no'>MSPeakLists</span>, <span class='kw'>maxMzDev</span> <span class='kw'>=</span> <span class='fl'>5</span>,
+<span class='fu'>generateFormulasGenForm</span>(<span class='no'>fGroups</span>, <span class='no'>MSPeakLists</span>, <span class='kw'>relMzDev</span> <span class='kw'>=</span> <span class='fl'>5</span>,
   <span class='kw'>adduct</span> <span class='kw'>=</span> <span class='st'>"[M+H]+"</span>, <span class='kw'>elements</span> <span class='kw'>=</span> <span class='st'>"CHNOP"</span>, <span class='kw'>hetero</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>oc</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>extraOpts</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>calculateFeatures</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>featThreshold</span> <span class='kw'>=</span> <span class='fl'>0.75</span>,
   <span class='kw'>MSMode</span> <span class='kw'>=</span> <span class='st'>"both"</span>, <span class='kw'>maxProcAmount</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/options'>getOption</a></span>(<span class='st'>"patRoon.maxProcAmount"</span>),
@@ -133,7 +133,7 @@ groups.</p>
 
 <span class='fu'>formulaScorings</span>()
 
-<span class='fu'>generateFormulasSirius</span>(<span class='no'>fGroups</span>, <span class='no'>MSPeakLists</span>, <span class='kw'>maxMzDev</span> <span class='kw'>=</span> <span class='fl'>5</span>,
+<span class='fu'>generateFormulasSirius</span>(<span class='no'>fGroups</span>, <span class='no'>MSPeakLists</span>, <span class='kw'>relMzDev</span> <span class='kw'>=</span> <span class='fl'>5</span>,
   <span class='kw'>adduct</span> <span class='kw'>=</span> <span class='st'>"[M+H]+"</span>, <span class='kw'>elements</span> <span class='kw'>=</span> <span class='st'>"CHNOP"</span>, <span class='kw'>profile</span> <span class='kw'>=</span> <span class='st'>"qtof"</span>,
   <span class='kw'>database</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>noise</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>topMost</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='kw'>extraOpts</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>calculateFeatures</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>featThreshold</span> <span class='kw'>=</span> <span class='fl'>0.75</span>,
@@ -163,9 +163,10 @@ algorithm.</p></td>
     </tr>
     <tr>
       <th>precursorMzSearchWindow</th>
-      <td><p>Maximum <em>m/z</em> deviation (Da) to find back feature data
-of precursor/parent ions from MS/MS spectra (this data is not readily
-available from <code class='command'>SmartFormula3D</code> results).</p></td>
+      <td><p>Search window for <em>m/z</em> values (+/- the
+feature <em>m/z</em>) used to find back feature data of precursor/parent ions
+from MS/MS spectra (this data is not readily available from
+<code class='command'>SmartFormula3D</code> results).</p></td>
     </tr>
     <tr>
       <th>MSMode</th>
@@ -205,10 +206,10 @@ likely what you want as otherwise any processed data is lost.</p></td>
 the supplied <code>fGroups</code>.</p></td>
     </tr>
     <tr>
-      <th>maxMzDev</th>
-      <td><p>Maximum deviation between the measured and candidate formula
-<em>m/z</em> values (in ppm). Sets the <span class="option">ppm</span> and
-<span class="option">--ppm-max</span> commandline options for <code class='command'>GenForm</code> and
+      <th>relMzDev</th>
+      <td><p>Maximum relative deviation between the measured and candidate
+formula <em>m/z</em> values (in ppm). Sets the <span class="option">ppm</span>
+and <span class="option">--ppm-max</span> commandline options for <code class='command'>GenForm</code> and
 <code class='command'>SIRIUS</code>, respectively.</p></td>
     </tr>
     <tr>

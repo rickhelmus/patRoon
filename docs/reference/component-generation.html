@@ -122,22 +122,23 @@ isotopes, adducts and homologues) to assist and simplify compound annotation.</p
 <span class='fu'>generateComponents</span>(<span class='no'>fGroups</span>, <span class='no'>algorithm</span>, <span class='no'>...</span>)
 
 <span class='fu'>generateComponentsCAMERA</span>(<span class='no'>fGroups</span>, <span class='no'>ionization</span>, <span class='kw'>onlyIsotopes</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>minSize</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>ubiquitous</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>extraOpts</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
+  <span class='kw'>minSize</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>relMinReplicates</span> <span class='kw'>=</span> <span class='fl'>0.5</span>, <span class='kw'>extraOpts</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
 
 <span class='fu'>generateComponentsIntClust</span>(<span class='no'>fGroups</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"complete"</span>,
   <span class='kw'>metric</span> <span class='kw'>=</span> <span class='st'>"euclidean"</span>, <span class='kw'>normFunc</span> <span class='kw'>=</span> <span class='no'>max</span>, <span class='kw'>average</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>maxTreeHeight</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>deepSplit</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>minModuleSize</span> <span class='kw'>=</span> <span class='fl'>1</span>)
 
 <span class='fu'>generateComponentsNontarget</span>(<span class='no'>fGroups</span>, <span class='no'>ionization</span>, <span class='kw'>rtRange</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(-<span class='fl'>120</span>, <span class='fl'>120</span>),
-  <span class='kw'>mzRange</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>5</span>, <span class='fl'>120</span>), <span class='kw'>elements</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"C"</span>, <span class='st'>"H"</span>, <span class='st'>"O"</span>), <span class='kw'>maxRTDev</span> <span class='kw'>=</span> <span class='fl'>30</span>,
-  <span class='kw'>maxMzDev</span> <span class='kw'>=</span> <span class='fl'>0.002</span>, <span class='kw'>extraOpts</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>mzRange</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>5</span>, <span class='fl'>120</span>), <span class='kw'>elements</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"C"</span>, <span class='st'>"H"</span>, <span class='st'>"O"</span>), <span class='kw'>rtDev</span> <span class='kw'>=</span> <span class='fl'>30</span>,
+  <span class='kw'>absMzDev</span> <span class='kw'>=</span> <span class='fl'>0.002</span>, <span class='kw'>extraOpts</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>traceHack</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/all'>all</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/Version'>R.Version</a></span>()[<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"major"</span>, <span class='st'>"minor"</span>)] <span class='kw'>&gt;=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>3</span>, <span class='fl'>4</span>)))
 
 <span class='fu'>generateComponentsRAMClustR</span>(<span class='no'>fGroups</span>, <span class='kw'>st</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>sr</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>maxt</span> <span class='kw'>=</span> <span class='fl'>12</span>,
   <span class='kw'>hmax</span> <span class='kw'>=</span> <span class='fl'>0.3</span>, <span class='kw'>normalize</span> <span class='kw'>=</span> <span class='st'>"TIC"</span>, <span class='no'>ionization</span>, <span class='kw'>absMzDev</span> <span class='kw'>=</span> <span class='fl'>0.002</span>,
-  <span class='kw'>relMzDev</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>RCExperimentVals</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='kw'>design</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='kw'>platform</span> <span class='kw'>=</span>
-  <span class='st'>"LC-MS"</span>), <span class='kw'>instrument</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='kw'>ionization</span> <span class='kw'>=</span> <span class='no'>ionization</span>, <span class='kw'>MSlevs</span> <span class='kw'>=</span> <span class='fl'>1</span>)),
-  <span class='kw'>extraOptsRC</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>extraOptsFM</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
+  <span class='kw'>relMzDev</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>minSize</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>relMinReplicates</span> <span class='kw'>=</span> <span class='fl'>0.5</span>,
+  <span class='kw'>RCExperimentVals</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='kw'>design</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='kw'>platform</span> <span class='kw'>=</span> <span class='st'>"LC-MS"</span>), <span class='kw'>instrument</span> <span class='kw'>=</span>
+  <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='kw'>ionization</span> <span class='kw'>=</span> <span class='no'>ionization</span>, <span class='kw'>MSlevs</span> <span class='kw'>=</span> <span class='fl'>1</span>)), <span class='kw'>extraOptsRC</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>extraOptsFM</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -171,12 +172,17 @@ argument of <code><a href='https://www.rdocumentation.org/packages/CAMERA/topics
     <tr>
       <th>minSize</th>
       <td><p>The minimum size of a component. Smaller components than this
-size will be removed. See note below.</p></td>
+size will be removed. For <code>RAMClustR</code>: sets the <code>minModuleSize</code>
+argument to <code><a href='https://www.rdocumentation.org/packages/RAMClustR/topics/ramclustR'>ramclustR</a></code>. See note below.</p></td>
     </tr>
     <tr>
-      <th>ubiquitous</th>
-      <td><p>If <code>TRUE</code>: ensure that all feature groups within a
-component are present in the same analyses. See note below.</p></td>
+      <th>relMinReplicates</th>
+      <td><p>Feature groups within a component are only kept when
+they contain data for at least this (relative) amount of replicate
+analyses. For instance, <samp>0.5</samp> means that at least half of the
+replicates should contain data for a particular feature group in a
+component. In this calculation replicates that are fully absent within a
+component are not taken in to account. See note below.</p></td>
     </tr>
     <tr>
       <th>extraOpts</th>
@@ -235,10 +241,16 @@ detection of repeating units. Sets the <code>elements</code> argument of
 <code>homol.search</code> function.</p></td>
     </tr>
     <tr>
-      <th>maxRTDev, maxMzDev</th>
+      <th>rtDev, absMzDev</th>
       <td><p>Maximum retention and (absolute) <em>m/z</em>
 deviation for detection of homologues within series. These arguments set
 the <code>rttol</code> and <code>mztol</code> arguments of <code>homol.search</code>.</p></td>
+    </tr>
+    <tr>
+      <th>absMzDev, relMzDev</th>
+      <td><p>Maximum absolute/relative <em>m/z</em> deviation for
+annotation. Passed as the <code>mzabs.error</code> and <code>ppm.error</code> arguments
+to <code><a href='https://www.rdocumentation.org/packages/RAMClustR/topics/do.findmain'>do.findmain</a></code>.</p></td>
     </tr>
     <tr>
       <th>traceHack</th>
@@ -253,12 +265,6 @@ implements a (messy) workaround
 group clustering. See their documentation from <code><a href='https://www.rdocumentation.org/packages/RAMClustR/topics/ramclustR'>ramclustR</a></code>.
 When <code>st</code> is <code>NULL</code> it will be automatically calculated as the
 half of the median for all chromatographic peak widths.</p></td>
-    </tr>
-    <tr>
-      <th>absMzDev, relMzDev</th>
-      <td><p>Maximum absolute/relative <em>m/z</em> deviation for
-annotation. Passed as the <code>mzabs.error</code> and <code>ppm.error</code> arguments
-to <code><a href='https://www.rdocumentation.org/packages/RAMClustR/topics/do.findmain'>do.findmain</a></code>.</p></td>
     </tr>
     <tr>
       <th>RCExperimentVals</th>
@@ -324,10 +330,13 @@ and reduce the data size and thus complexity.</p>
     
     <h2 class="hasAnchor" id="note"><a class="anchor" href="#note"></a>Note</h2>
 
-    <p>For <code>generateComponentsCAMERA</code>: the <code>minSize</code> and
-  <code>ubiquitous</code> arguments provide additional filtering functionality not
-  provided by <span class="pkg">CAMERA</span>. Consequently, their default values may produce
-  different results compared to regular output from <code>CAMERA</code>.</p>
+    <p>For <code>generateComponentsCAMERA</code> and
+  <code>generateComponentsRAMClustR</code>: the <code>minSize</code> and
+  <code>relMinReplicates</code> arguments provide additional filtering
+  functionality not provided by <span class="pkg">CAMERA</span> or <span class="pkg">RAMClustR</span> (except
+  <code>minSize</code>). Note that these filters are enabled by default, hence,
+  final results may be different than what CAMERA/RAMClustR normally
+  would return.</p>
     
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 

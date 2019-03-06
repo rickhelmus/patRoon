@@ -2,6 +2,15 @@
 
 ## March 2019
 * `reportMD()`: most time consuming plots are now cached. Hence, re-reporting should be signficiantly faster now.
+* Updates to MS data file conversion:
+    * `convertMSFiles()` now (optionally) takes analysis information (`anaInfo`) for file input.
+    * `convertMSFiles()` now supports Bruker DataAnalysis as conversion algorithm (replaces now deprecated `exportDAFiles()` function).
+    * `MSFileFormats()` function to list supported input conversion formats.
+    * `generateAnalysisInfo()` now recognizes more file formats. This is mainly useful so its output can be used with `convertMSFiles()`.
+    * `convertMSFiles()` now has the `centroid` argument to more easily perform centroiding.
+* Updates to `newProject()`:
+    * The analyses selector recognizes more data file formats. This way you can select analyses that have not been converted yet.
+    * Data pre-treatment options now include more sophisticated file conversion options (_e.g._ using ProteoWizard). This and the new analysis selector functionality ensures that data files in all major vendor formats do not have to be converted prior to generating a script.
 
 
 ## February 2019

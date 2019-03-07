@@ -587,6 +587,8 @@ setMethod("plotSpec", "formulas", function(obj, precursor, groupName, analysis =
         title <- subscriptFormula(precursor)
 
     spec <- annotatedPeakList(obj, precursor, groupName, analysis, MSPeakLists)
+    if (is.null(spec))
+        return(NULL)
     
     if (useGGPlot2)
         return(makeMSPlotGG(spec) + ggtitle(title))

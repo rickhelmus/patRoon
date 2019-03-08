@@ -464,7 +464,7 @@ NULL
 #'   precursor is not found.
 #'
 #'   \item \code{retainPrecursorMSMS} For MS/MS data only: if \code{TRUE} then
-#'   always retain the precursor mass peak event it is not amongst the
+#'   always retain the precursor mass peak even if is not amongst the
 #'   \code{topMost} peaks. Note that MS precursor mass peaks are always kept.
 #'   Furthermore, note that precursor peaks in both MS and MS/MS data may still
 #'   be removed by intensity thresholds (this is unlike the

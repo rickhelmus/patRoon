@@ -365,7 +365,7 @@ utils <- setRefClass("utilsInst", methods = list(
         }
 
         if (length(mandatoryPackages) > 0)
-            cat("The following packages mandatory packages will be installed:",
+            cat("The following mandatory packages will be installed:",
                 paste0(mandatoryPackages, collapse = ", "),
                 sep = "\n")
         

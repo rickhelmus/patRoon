@@ -8,8 +8,6 @@ general
 - algorithmObject() generic: for xset, xsa, rc, ...
 - test negative subset indices
 - ref --> blank
-- newProject()
-    - generate Rmd?
 - convertMSFiles()
     - Agilent .d is also a directory?
 - update tests for new OpenMS/MetFrag
@@ -36,7 +34,7 @@ features
     - get rid of getXCMSSet() calls?
     - cache?
 - progressbar and parallel enviPick
-- OpenMS: Support newest grouper? Update tests to newest version
+- OpenMS: Support newest grouper? Update tests to newest version, fix URLs in docs
 - as.data.table for fGroups is slow?
 - tests to verify getXCMSSet...
 - filter()
@@ -56,7 +54,6 @@ MSPeakLists
     - tests
         - utils? EICs with export/vdiffr?
         - test MS peak lists deisotoping?
-- add pruneMissingPrecursorMS to filter()?
 - filter by MSMS
 - metadata for Bruker peaklists?
 - metadata() generic?
@@ -102,3 +99,4 @@ Cleanup
 Future
 - msPurity integration
 - suspect screening: add MS/MS qualifiers, calculate ion masses
+- newProject(): generate Rmd?

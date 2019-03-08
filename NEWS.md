@@ -11,6 +11,8 @@
 * Updates to `newProject()`:
     * The analyses selector recognizes more data file formats. This way you can select analyses that have not been converted yet.
     * Data pre-treatment options now include more sophisticated file conversion options (_e.g._ using ProteoWizard). This and the new analysis selector functionality ensures that data files in all major vendor formats do not have to be converted prior to generating a script.
+    * Re-organized tabs to mirror non-target workflow.
+    * Suspsect screening support.
 
 
 ## February 2019

@@ -50,7 +50,7 @@ getScriptCode <- function(input, analyses)
 
     template <- tmpl(readAllFile(system.file("templates", "main_script.R", package = "patRoon")),
                      destination = sldest, generateAnaInfo = input$generateAnaInfo, analysisTableFile = input$analysisTableFile,
-                     analyses = analyses,
+                     analyses = analyses, suspectList = input$suspectList,
                      doMSPeakFind = input$formulaGen != "" || input$compIdent != "",
                      precursorMzWindow = input$precursorMzWindow,
                      polarity = input$polarity, reportFormats = input$report)
@@ -230,7 +230,7 @@ getNewProjectUI <- function(destPath)
                                  flex = NA,
                                  height = 70,
                                  strong("Bruker DataAnalysis options"),
-                                 textNote("Only supported with bruker datafiles and if DataAnalysis is installed.")
+                                 textNote("Only supported with bruker data and if DataAnalysis is installed.")
                              ),
                              fillCol(
                                  flex = NA,
@@ -245,19 +245,53 @@ getNewProjectUI <- function(destPath)
                              )
                          )
             ),
-            miniTabPanel("Workflow", icon = icon("code-fork"),
+            miniTabPanel("Features", icon = icon("chart-area"),
+                         miniContentPanel(
+                             fillRow(
+                                 height = 75,
+                                 selectInput("featFinder", "Feature finder", c("OpenMS", "XCMS", "enviPick",
+                                                                               "Bruker DataAnalysis" = "Bruker"),
+                                             "OpenMS", FALSE, width = "95%"),
+                                 selectInput("featGrouper", "Feature grouper", c("OpenMS", "XCMS"),
+                                             "OpenMS", FALSE, width = "100%")
+                             ),
+                             fillCol(
+                                 flex = c(1, NA),
+                                 height = 90,
+                                 fileSelect("suspectList", "suspectListButton", "Suspect list"),
+                                 textNote("Leave blank for no suspect screening (i.e. perform full non-target analysis)")
+                             ),
+                             hr(),
+                             fillCol(
+                                 flex = NA,
+                                 height = 70,
+                                 strong("Post-Filtering of feature groups"),
+                                 textNote("Set below values to zero to disable a particular filter.")
+                             ),
+                             fillCol(
+                                 height = 325,
+                                 fillRow(
+                                     numericInput("preIntThr", "Pre-Intensity threshold", 1E2, 0, step = 100, width = "95%"),
+                                     numericInput("intThr", "Intensity threshold", 1E4, 0, step = 1000, width = "100%")
+                                 ),
+                                 fillRow(
+                                     numericInput("repAbundance", "Min. replicate abundance (relative)", 1, 0, 1.0, 0.1, width = "95%"),
+                                     numericInput("maxRepRSD", "Max. replicate intensity RSD", 0.75, 0, step = 0.1, width = "100%")
+                                 ),
+                                 fillRow(
+                                     numericInput("blankThr", "Min. blank threshold", 5, 0, step = 1, width = "95%"),
+                                     checkboxInput("removeBlanks", "Discard blanks after filtering", TRUE)
+                                 ),
+                                 rangeNumeric("retention", "retention time (s)", step = 10),
+                                 rangeNumeric("mz", "m/z", step = 10)
+                             )
+                         )
+            ),
+            miniTabPanel("Annotation", icon = icon("chart-bar"),
                          miniContentPanel(
                              fillCol(
                                  flex = NA,
 
-                                 fillRow(
-                                     height = 75,
-                                     selectInput("featFinder", "Feature finder", c("OpenMS", "XCMS", "enviPick",
-                                                                                   "Bruker DataAnalysis" = "Bruker"),
-                                                 "OpenMS", FALSE, width = "95%"),
-                                     selectInput("featGrouper", "Feature grouper", c("OpenMS", "XCMS"),
-                                                 "OpenMS", FALSE, width = "100%")
-                                 ),
                                  fillRow(
                                      height = 90,
                                      fillCol(
@@ -292,36 +326,17 @@ getNewProjectUI <- function(destPath)
                                      condition = "input.formulaGen != \"\" || input.compIdent == \"\" || input.components != \"\"",
                                      selectInput("polarity", "Polarity", c("positive", "negative"), "positive",
                                                  multiple = FALSE, width = "100%")
-                                 ),
-                                 checkboxGroupInput("report", "Report generation",
-                                                    c("CSV (text tables)" = "CSV", "PDF (basic plots)" = "PDF",
-                                                      "HTML (easy browsable plots, bit slower to PDF)" = "MD"),
-                                                    c("CSV", "MD"))
+                                 )
                              )
                          )
             ),
-            miniTabPanel("Miscellaneous", icon = icon("sliders"),
+            miniTabPanel("Reporting", icon = icon("file-medical-alt"), # scroll, paperclip, newspaper, file-medical-alt, 
                          miniContentPanel(
                              fillCol(
-                                 height = 50,
-                                 strong("Set below values to zero to disable a particular filter.")
-                             ),
-                             fillCol(
-                                 height = 325,
-                                 fillRow(
-                                     numericInput("preIntThr", "Pre-Intensity threshold", 1E2, 0, step = 100, width = "95%"),
-                                     numericInput("intThr", "Intensity threshold", 1E4, 0, step = 1000, width = "100%")
-                                 ),
-                                 fillRow(
-                                     numericInput("repAbundance", "Min. replicate abundance (relative)", 1, 0, 1.0, 0.1, width = "95%"),
-                                     numericInput("maxRepRSD", "Max. replicate intensity RSD", 0.75, 0, step = 0.1, width = "100%")
-                                 ),
-                                 fillRow(
-                                     numericInput("blankThr", "Min. blank threshold", 5, 0, step = 1, width = "95%"),
-                                     checkboxInput("removeBlanks", "Discard blanks after filtering", TRUE)
-                                 ),
-                                 rangeNumeric("retention", "retention time (s)", step = 10),
-                                 rangeNumeric("mz", "m/z", step = 10)
+                                 checkboxGroupInput("report", "Report generation",
+                                                    c("CSV (text tables)" = "CSV", "PDF (basic plots)" = "PDF",
+                                                      "HTML (easy browsable plots, bit slower than PDF)" = "MD"),
+                                                    c("CSV", "MD"), width = "100%")
                              )
                          )
             )
@@ -388,7 +403,7 @@ newProject <- function(destPath = NULL)
         })
 
         observeEvent(input$projectDestButton, {
-            dest <- selectDirectory("Select destination directory", path = input$destinationPath)
+            dest <- rstudioapi::selectDirectory("Select destination directory", path = input$destinationPath)
             if (!is.null(dest))
                 updateTextInput(session, "destinationPath", value = dest)
         })
@@ -403,7 +418,7 @@ newProject <- function(destPath = NULL)
         })
 
         observeEvent(input$addAnalysesDir, {
-            anaDir <- selectDirectory(path = "~/")
+            anaDir <- rstudioapi::selectDirectory(path = "~/")
             if (!is.null(anaDir))
             {
                 files <- listMSFiles(anaDir, MSFileFormats())
@@ -430,7 +445,7 @@ newProject <- function(destPath = NULL)
         })
 
         observeEvent(input$addAnalysesCSV, {
-            csvFile <- selectFile(path = "~/", filter = "csv files (*.csv)")
+            csvFile <- rstudioapi::selectFile(path = "~/", filter = "csv files (*.csv)")
             if (!is.null(csvFile))
             {
                 csvTab <- tryCatch(fread(csvFile, select = c("path", "analysis", "group", "ref"),
@@ -476,13 +491,30 @@ newProject <- function(destPath = NULL)
         })
 
         observeEvent(input$DAMethodButton, {
-            dm <- selectDirectory("Select DataAnalysis method")
+            dm <- rstudioapi::selectDirectory("Select DataAnalysis method")
             if (!is.null(dm))
             {
                 if (!file.exists(file.path(dm, "DataAnalysis.method")))
                     showDialog("Invalid DataAnalysis method", "Please select a valid DataAnalysis method!", "")
                 else
                     updateTextInput(session, "DAMethod", value = dm)
+            }
+        })
+        
+        observeEvent(input$suspectListButton, {
+            sl <- rstudioapi::selectFile("Select suspect list", filter = "csv files (*.csv)")
+            if (!is.null(sl))
+            {
+                csvTab <- tryCatch(fread(sl, select = c("name", "mz"),
+                                         colClasses = c("character", "numeric")),
+                                   error = function(e) FALSE, warning = function(w) FALSE)
+                
+                if (is.logical(csvTab))
+                    showDialog("Error", "Failed to open/parse selected csv file! The CSV file should have the following columns: name, mz and (optionally) rt.", "")
+                else if (nrow(csvTab) == 0)
+                    showDialog("Error", "The selected files seems to be empty.", "")
+                else
+                    updateTextInput(session, "suspectList", value = sl)
             }
         })
 

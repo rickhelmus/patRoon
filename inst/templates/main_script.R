@@ -69,6 +69,13 @@ fGroups <- filter(fGroups, preAbsMinIntensity = {{ filterFGroupsOpts$preIntThr }
                   relMinReplicateAbundance = {{ filterFGroupsOpts$repAbundance }}, maxReplicateIntRSD = {{ filterFGroupsOpts$maxRepRSD }},
                   blankThreshold = {{ filterFGroupsOpts$blankThr }}, removeBlanks = {{ filterFGroupsOpts$removeBlanks }},
                   retentionRange = {{ if (is.null(filterFGroupsOpts$retRange)) "NULL" else paste0("c(", paste0(filterFGroupsOpts$retRange, collapse = ", "), ")") }}, mzRange = {{ if (is.null(filterFGroupsOpts$mzRange)) "NULL" else paste0("c(", paste0(filterFGroupsOpts$mzRange, collapse = ", "), ")") }})
+{{ optionalCodeBlock(nzchar(suspectList)) }}
+
+# Filter feature groups by suspects
+suspFile <- read.csv("{{ suspectList }}", stringsAsFactors = FALSE)
+scr <- screenTargets(fGroups, suspFile, rtWindow = 12, mzWindow = 0.005)
+fGroups <- groupFeaturesScreening(fGroups, scr)
+{{ endCodeBlock() }}
 {{ optionalCodeBlock(doMSPeakFind) }}
 
 # Retrieve MS peak lists

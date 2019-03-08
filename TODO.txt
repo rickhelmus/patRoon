@@ -1,7 +1,6 @@
 general
 - more withr wrapping? (dev, par)
 - fillPeaks for CAMERA (and RAMClustR?)
-- remove XCMS EIC loading (and update checkChromatograms())
 - support fastcluster for compounds clustering/int component clusters?
 - setAs() for as.data.table()/as.data.frame() methods
 - make algorithm names more consistent

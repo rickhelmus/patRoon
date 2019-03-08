@@ -55,13 +55,16 @@ getEICUI <- function(rtRange, mzWindow)
                         radioButtons("retUnit", "Retention unit", c("Seconds", "Minutes")),
                         numericInput("mzWindow", "m/z width", mzWindow, 0.0001, 1, 0.001),
 
-                        div(
-                            title = "Total retention time range plotted relative to group",
-                            numericInput("rtRange", "Plot range (%)", 100, 0, 100, 10)
-                        ),
+                        # UNDONE disabled for now
+                        # div(
+                        #     title = "Total retention time range plotted relative to group",
+                        #     numericInput("rtRange", "Plot range (%)", 100, 0, 100, 10)
+                        # ),
                         div(
                             title = "Retention time offset for default zoomed group",
-                            numericInput("rtZWindow", "Zoom window (s)", 20, 0, rtRange, step = 2)
+                            # UNDONE disabled for now
+                            # numericInput("rtZWindow", "Zoom window (s)", 20, 0, rtRange, step = 2)
+                            numericInput("rtZWindow", "Zoom window (s)", 20, 0, step = 2)
                         ),
 
                         checkboxGroupInput("showWhat", "Show groups", showOpts, showOpts)
@@ -144,37 +147,14 @@ setMethod("checkChromatograms", "featureGroups", function(fGroups, mzWindow, ena
     if (is.null(enabledFGroups))
         enabledFGroups <- rep(TRUE, nrow(gInfo))
 
-    xrs <- loadXCMSRaw(anaInfo$analysis, anaInfo$path)
-    # specs <- loadAllSpectra(anaInfo$analysis, anaInfo$path)
+    # UNDONE disabled for now
+    # rtRange <- max(sapply(xrs, function(xr) xr@scantime[length(xr@scantime)]))
+    rtRange <- 1
 
-    rtRange <- max(sapply(xrs, function(xr) xr@scantime[length(xr@scantime)]))
-    # rtRange <- max(sapply(specs, function(s) max(s$header$retentionTime)))
-
-    anaHashes <- list()
-
-    EICPreviews <- lapply(seq_along(gTable), function(g)
-    {
-        # take analysis with highest intensity
-        anai <- order(-gTable[[g]])[1]
-        ana <- anaInfo$analysis[anai]
-
-        fti <- ftindex[[g]][anai]
-
-        if (fti != 0)
-            rtRange <- unlist(fTable[[ana]][fti, .(retmin, retmax)]) + c(-10, 10)
-        else # feature not present, just make up EIC range
-            rtRange <- gInfo[g, "rts"] + c(-30, 30)
-
-        mzRange <- gInfo[g, "mzs"] + c(-mzWindow, mzWindow)
-        if (is.null(anaHashes[[ana]]))
-            anaHashes[[ana]] <<- makeFileHash(getMzMLOrMzXMLAnalysisPath(ana, anaInfo$path[anai]))
-        return(loadXCMSEICFromRaw(xrs[[ana]], rtRange, mzRange))
-        # return(getEIC(specs[[ana]], rtRange, c(gInfo[g, "mzs"] - mzWindow, gInfo[g, "mzs"] + mzWindow)))
-        # rtRange <- c(max(0, rtRange[1]), min(xrs[[ana]]@scantime[length(xrs[[ana]]@scantime)], rtRange[2]))
-        # EIC <- rawEIC(xrs[[ana]], mzrange = c(gInfo[g, "mzs"] - mzWindow, gInfo[g, "mzs"] + mzWindow), rtrange = rtRange)
-        # return(data.frame(time = xrs[[ana]]@scantime[EIC$scan], intensity = EIC$intensity))
-    })
-
+    EICPreviews <- getEICsForFGroups(fGroups, 10, mzWindow, topMost = 1, onlyPresent = FALSE)
+    # format is in [[ana]][[fGroup]], since we only took top most intensive we can throw away the ana dimension
+    EICPreviews <- Reduce(modifyList, EICPreviews)
+    
     hotOpts <- list(rowHeaderWidth = 40, readOnly = TRUE, disableVisualSelection = "area",
                     columnSorting = TRUE, sortIndicator = TRUE, selectCallback = TRUE,
                     currentRowClassName = "currentRow", stretchH = "all",
@@ -228,20 +208,14 @@ setMethod("checkChromatograms", "featureGroups", function(fGroups, mzWindow, ena
                         maxRt = max(fts[, retmax], na.rm = TRUE),
                         maxInt = max(fts[, intensity], na.rm = TRUE))
 
-            rtwin <- max(input$rtRange * rtRange / 100, input$rtZWindow)
-            ret$data <- lapply(rValues$enabledAnalyses, function(ana)
-            {
-                mzRange <- gInfo[g, "mzs"] + c(-input$mzWindow, input$mzWindow)
-                if (is.null(anaHashes[[ana]]))
-                {
-                    anai <- match(ana, anaInfo$analysis)
-                    anaHashes[[ana]] <<- makeFileHash(getMzMLOrMzXMLAnalysisPath(ana, anaInfo$path[anai]))
-                }
-
-                loadXCMSEICFromRaw(xrs[[ana]], c(ret$minRt - rtwin, ret$maxRt + rtwin), mzRange)
-                # getEIC(specs[[ana]], c(ret$minRt - rtwin, ret$maxRt + rtwin),
-                #        c(gInfo[g, "mzs"] - input$mzWindow, gInfo[g, "mzs"] + input$mzWindow))
-            })
+            # UNDONE disabled for now
+            # rtwin <- max(input$rtRange * rtRange / 100, input$rtZWindow)
+            rtwin <- input$rtZWindow
+            
+            EICs <- getEICsForFGroups(fGroups[rValues$enabledAnalyses, g], rtwin, input$mzWindow,
+                                      topMost = NULL, onlyPresent = FALSE)
+            # EICs are in [[ana]][[fgroup]] --> only have one fgroup so get rid of that dimension
+            ret$data <- lapply(EICs, "[[", 1)
 
             ret$peaks <- fts[, c("retmin", "retmax")]
             ret$zoomRtRange <- c(ret$minRt - input$rtZWindow, ret$maxRt + input$rtZWindow)

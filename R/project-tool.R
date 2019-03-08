@@ -6,6 +6,11 @@ getScriptCode <- function(input, analyses)
     optionalCodeBlock <- function(e) if (e) "<<startCodeBlock>>" else "<<skipCodeBlock>>"
     endCodeBlock <- function() "<<endCodeBlock>>"
     optionalLine <- function(e) if (!e) "<<skipThisLine>>" else ""
+    header <- function(title)
+    {
+        hd <- paste("#", strrep("-", 25))
+        paste(hd, paste("#", title), hd, sep = "\n")
+    }
 
     if (input$peakPicking)
         centroid <- if (input$peakPickingVendor && input$convAlgo == "pwiz") "\"vendor\"" else TRUE

@@ -2,6 +2,10 @@
 
 library(patRoon)
 
+
+{{ header("initialization") }}
+
+
 workPath <- "{{ destination }}"
 setwd(workPath)
 {{ optionalCodeBlock(generateAnaInfo == "table") }}
@@ -22,7 +26,7 @@ anaInfo <- data.frame(path = character(), analysis = character(), group = charac
 {{ endCodeBlock() }}
 {{ optionalCodeBlock(preTreatOpts$do) }}
 
-# Set to FALSE to skip data pretreatment (e.g. calibration, export, ...)
+# Set to FALSE to skip data pre-treatment
 doDataPretreatment <- TRUE
 if (doDataPretreatment)
 {
@@ -38,6 +42,10 @@ if (doDataPretreatment)
                    to = "mzXML", algorithm = "{{ preTreatOpts$convAlgo }}", centroid = {{ preTreatOpts$centroid }})
     {{ endCodeBlock() }}
 } {{ optionalLine(preTreatOpts$do) }}
+
+
+{{ header("features") }}
+
 
 # Find all features.
 {{ optionalCodeBlock(featFinderOpts$algo == "OpenMS") }}
@@ -78,11 +86,14 @@ fGroups <- groupFeaturesScreening(fGroups, scr)
 {{ endCodeBlock() }}
 {{ optionalCodeBlock(doMSPeakFind) }}
 
+
+{{ header("annotation") }}
+
+
 # Retrieve MS peak lists
 avgPListParams <- getDefAvgPListParams(clusterMzWindow = 0.005)
 {{ endCodeBlock() }}
 {{ optionalCodeBlock(doMSPeakFind && peakListOpts$algo == "mzR") }}
-# NOTE: please check all arguments, especially precursorMzWindow!
 plists <- generateMSPeakLists(fGroups, "mzr", maxMSRtWindow = 5, precursorMzWindow = {{ if (precursorMzWindow == 0) "NULL" else precursorMzWindow }},
                               avgFeatParams = avgPListParams, avgFGroupParams = avgPListParams)
 {{ endCodeBlock() }}
@@ -100,7 +111,7 @@ plists <- generateMSPeakLists(fGroups, "brukerfmf", avgFGroupParams = avgPListPa
 {{ endCodeBlock() }}
 {{ optionalCodeBlock(formulaOpts$algo != "") }}
 
-# Calculate all formulas
+# Calculate formula candidates
 {{ endCodeBlock() }}
 {{ optionalCodeBlock(formulaOpts$algo == "GenForm") }}
 formulas <- generateFormulas(fGroups, "genform", plists, relMzDev = 5,
@@ -117,7 +128,7 @@ formulas <- generateFormulas(fGroups, "sirius", plists, relMzDev = 5,
 {{ endCodeBlock() }}
 {{ optionalCodeBlock(identOpts$algo != "") }}
 
-# Perform automatic compound identification
+# Find compound structure candidates
 {{ endCodeBlock() }}
 {{ optionalCodeBlock(identOpts$algo == "MetFrag") }}
 compounds <- generateCompounds(fGroups, plists, "metfrag", method = "CL", dbRelMzDev = 5,
@@ -147,7 +158,10 @@ components <- generateComponents(fGroups, "nontarget", ionization = "{{ polarity
 {{ endCodeBlock() }}
 {{ optionalCodeBlock(length(reportFormats) > 0) }}
 
-# Report & export results
+
+{{ header("reporting") }}
+
+
 {{ endCodeBlock() }}
 {{ optionalCodeBlock("CSV" %in% reportFormats) }}
 reportCSV(fGroups, path = "report", reportFeatures = FALSE, formulas = {{ if (formulaOpts$algo != "") "formulas" else "NULL" }},

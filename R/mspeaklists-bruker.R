@@ -139,7 +139,7 @@ generateMSPeakListsDA <- function(fGroups, bgsubtr = TRUE, maxMSRtWindow = 5, mi
 
     peakLists <- pruneList(setNames(peakLists, anaInfo$analysis))
 
-    return(MSPeakLists(peakLists = peakLists, metadata = list(), avgPeakListArgs = avgFGroupParams, algorithm = "Bruker_DataAnalysis"))
+    return(MSPeakLists(peakLists = peakLists, metadata = list(), avgPeakListArgs = avgFGroupParams, algorithm = "bruker"))
 }
 
 #' @details \code{generateMSPeakListsDAFMF} is similar to \code{generateMSPeakListsDA},

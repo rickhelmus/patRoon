@@ -43,7 +43,7 @@ generateMSPeakListsMzR <- function(fGroups, maxMSRtWindow = 5, precursorMzWindow
     anaCount <- nrow(anaInfo)
 
     if (gCount == 0)
-        return(MSPeakLists(algorithm = "mzR"))
+        return(MSPeakLists(algorithm = "mzr"))
 
     cacheDB <- openCacheDBScope()
     setHash <- makeHash(fGroups, maxMSRtWindow, precursorMzWindow, topMost, avgFeatParams)
@@ -142,5 +142,5 @@ generateMSPeakListsMzR <- function(fGroups, maxMSRtWindow = 5, precursorMzWindow
     if (is.null(cachedSet))
         saveCacheSet("MSPeakListsMzR", resultHashes[seq_len(resultHashCount)], setHash, cacheDB)
 
-    return(MSPeakLists(peakLists = plists, metadata = metadata, avgPeakListArgs = avgFGroupParams, algorithm = "mzR"))
+    return(MSPeakLists(peakLists = plists, metadata = metadata, avgPeakListArgs = avgFGroupParams, algorithm = "mzr"))
 }

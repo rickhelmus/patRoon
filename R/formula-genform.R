@@ -394,5 +394,5 @@ generateFormulasGenForm <- function(fGroups, MSPeakLists, relMzDev = 5, adduct =
         formTable <- list()
     }
 
-    return(formulas(formulas = groupFormulas, featureFormulas = formTable, algorithm = "GenForm"))
+    return(formulas(formulas = groupFormulas, featureFormulas = formTable, algorithm = "genform"))
 }

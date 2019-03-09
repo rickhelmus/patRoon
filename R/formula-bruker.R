@@ -251,5 +251,5 @@ generateFormulasDA <- function(fGroups, precursorMzSearchWindow = 0.002, MSMode 
     else
         groupFormulas <- list()
 
-    return(formulas(formulas = groupFormulas, featureFormulas = fTable, algorithm = "Bruker_DataAnalysis"))
+    return(formulas(formulas = groupFormulas, featureFormulas = fTable, algorithm = "bruker"))
 }

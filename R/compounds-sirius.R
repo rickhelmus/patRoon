@@ -217,5 +217,5 @@ generateCompoundsSirius <- function(fGroups, MSPeakLists, relMzDev = 5, adduct =
 
     return(compounds(compounds = lapply(ret, "[[", "comptab"), scoreTypes = "score",
                      scoreRanges = lapply(ret, "[[", "scRanges"),
-                     algorithm = "SIRIUS"))
+                     algorithm = "sirius"))
 }

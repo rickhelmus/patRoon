@@ -3,7 +3,6 @@ general
 - fillPeaks for CAMERA (and RAMClustR?)
 - support fastcluster for compounds clustering/int component clusters?
 - setAs() for as.data.table()/as.data.frame() methods
-- make algorithm names more consistent
 - algorithmObject() generic: for xset, xsa, rc, ...
 - test negative subset indices
 - ref --> blank
@@ -26,10 +25,8 @@ features
 - feature optim:
     - docs
         - mention parameters default unless specified
-    - qualitative optim?
     - keep retcor_done?
     - get rid of getXCMSSet() calls?
-    - cache?
 - parallel enviPick
 - OpenMS: Support newest grouper? Update tests to newest version, fix URLs in docs
 - as.data.table for fGroups is slow?

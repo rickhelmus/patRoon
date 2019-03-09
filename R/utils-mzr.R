@@ -90,7 +90,7 @@ getEICsForFGroups <- function(fGroups, rtWindow, mzWindow, topMost, onlyPresent)
         }
         else
             topAnalysesInd <- seq_len(nrow(anaInfo))
-
+        
         if (onlyPresent)
             topAnalysesInd <- topAnalysesInd[gTable[[fg]][topAnalysesInd] != 0]
 

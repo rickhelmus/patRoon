@@ -246,8 +246,8 @@ test_that("annotation works", {
     expect_false(any(is.na(anPLOnly$formula)))
     expect_true(all(compsCons[[2]]$fragInfo[[1]]$formula %in% anPLOnly$formula))
     expect_true(any(grepl("metfrag", anPLOnly$mergedBy)))
-    expect_true(any(grepl("SIRIUS", anPLOnly$mergedBy)))
-    expect_true(any(grepl("GenForm", anPLOnly$mergedBy)))
+    expect_true(any(grepl("sirius", anPLOnly$mergedBy)))
+    expect_true(any(grepl("genform", anPLOnly$mergedBy)))
 })
 
 test_that("reporting works", {

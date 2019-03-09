@@ -94,14 +94,16 @@ getEICsForFGroups <- function(fGroups, rtWindow, mzWindow, topMost, onlyPresent)
         if (onlyPresent)
             topAnalysesInd <- topAnalysesInd[gTable[[fg]][topAnalysesInd] != 0]
 
-        rtr <- c(min(sapply(topAnalysesInd,
-                            function(anai) getFTCol(fg, anai, "retmin")),
-                     na.rm = TRUE),
-                 max(sapply(topAnalysesInd,
-                            function(anai) getFTCol(fg, anai, "retmax")),
-                     na.rm = TRUE))
-        if (any(is.na(rtr)))
+        rtrMins <- sapply(topAnalysesInd, function(anai) getFTCol(fg, anai, "retmin"))
+        rtrMins <- rtrMins[!is.na(rtrMins)]
+        rtrMaxs <- sapply(topAnalysesInd, function(anai) getFTCol(fg, anai, "retmax"))
+        rtrMaxs <- rtrMaxs[!is.na(rtrMaxs)]
+        
+        if (length(rtrMins) > 0 && length(rtrMaxs) > 0)
+            rtr <- min(rtrMins, rtrMaxs)
+        else
             rtr <- gInfo[fg, "rts"]
+        
         rtr <- rtr + c(-rtWindow, rtWindow)
 
         doEICs[[fg]] <- anaInfo$analysis[topAnalysesInd]

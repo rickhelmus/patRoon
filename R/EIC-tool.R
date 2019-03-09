@@ -192,16 +192,26 @@ setMethod("checkChromatograms", "featureGroups", function(fGroups, mzWindow, ena
             if (is.null(g) || !nzchar(g))
                 return(NULL)
 
-            fts <- rbindlist(sapply(rValues$enabledAnalyses, function(ana)
+            getFTData <- function(ana)
             {
-                ftind <- ftindex[[g]][match(ana, anaInfo$analysis)]
-                if (ftind == 0)
-                    return(data.table(ret=NA, retmin=NA, retmax=NA, mz=NA))
-                return(fTable[[ana]][ftind])
-            }, simplify = F), fill = TRUE)
+                    ftind <- ftindex[[g]][match(ana, anaInfo$analysis)]
+                    if (ftind == 0)
+                        return(data.table(ret=NA, retmin=NA, retmax=NA, mz=NA))
+                    return(fTable[[ana]][ftind])
+            }
+            fts <- rbindlist(sapply(rValues$enabledAnalyses, getFTData, simplify = FALSE), fill = TRUE)
 
             if (all(is.na(fts$ret)))
-                return(NULL) # no features present in current set of analyses
+            {
+                # no features present in current set of analyses
+                # try to fall back to disabled analyses
+                disAna <- setdiff(anaInfo$analysis, rValues$enabledAnalyses)
+                if (length(disAna) > 0)
+                    fts <- rbindlist(sapply(disAna, getFTData, simplify = FALSE), fill = TRUE)
+                
+                if (length(disAna) == 0 || all(is.na(fts$ret)))
+                    return(NULL) # still no luck
+            }
 
             ret <- list(avgRt = mean(fts[, ret], na.rm = TRUE),
                         minRt = min(fts[, retmin], na.rm = TRUE),
@@ -212,8 +222,12 @@ setMethod("checkChromatograms", "featureGroups", function(fGroups, mzWindow, ena
             # rtwin <- max(input$rtRange * rtRange / 100, input$rtZWindow)
             rtwin <- input$rtZWindow
             
-            EICs <- getEICsForFGroups(fGroups[rValues$enabledAnalyses, g], rtwin, input$mzWindow,
-                                      topMost = NULL, onlyPresent = FALSE)
+            # subset fGroups. NOTE: don't use [ operator to avoid removing empty groups
+            fg <- removeAnalyses(fGroups, match(setdiff(anaInfo$analysis, rValues$enabledAnalyses),
+                                                anaInfo$analysis))
+            fg <- removeGroups(fg, which(g != names(fGroups)))
+            
+            EICs <- getEICsForFGroups(fg, rtwin, input$mzWindow, topMost = NULL, onlyPresent = FALSE)
             # EICs are in [[ana]][[fgroup]] --> only have one fgroup so get rid of that dimension
             ret$data <- lapply(EICs, "[[", 1)
 

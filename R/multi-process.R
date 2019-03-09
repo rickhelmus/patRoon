@@ -4,20 +4,7 @@ defMultiProcErrorHandler <- function(cmd, exitStatus, ...)
                  cmd$command, paste0(cmd$args, collapse = " "), exitStatus))
 }
 
-executeMultiProcess <- function(...)
-{
-    # wrap the actual code here so we can act on user interrupts: calling gc()
-    # afterwards makes sure processes are cleaned up
-    tryCatch(executeMultiProcess2(...), interrupt = function(e)
-    {
-        invisible(capture.output(gc(verbose = FALSE)))
-        # re-throw: Thanks to @gaborcsardi (https://github.com/r-lib/processx/issues/171)
-        signalCondition(e)
-        invokeRestart("abort")
-    })
-}
-
-executeMultiProcess2 <- function(commandQueue, finishHandler,
+executeMultiProcess <- function(commandQueue, finishHandler,
                                 timeoutHandler = function(...) TRUE,
                                 errorHandler = defMultiProcErrorHandler,
                                 procTimeout = NULL, printOutput = FALSE, printError = FALSE,
@@ -41,6 +28,15 @@ executeMultiProcess2 <- function(commandQueue, finishHandler,
     nextCommand <- 1
     finishedCommands <- 0
     lastCommandTime <- 0 # at which time (in ms) the last command was started
+    
+    # clear up stale processes: see https://github.com/r-lib/processx/issues/171
+    on.exit({
+        for (pi in seq_along(runningProcs))
+        {
+            if (!is.null(runningProcs[[pi]]) && runningProcInfo[[pi]]$running)
+                runningProcs[[pi]]$kill()
+        }
+    }, add = TRUE)
 
     while (nextCommand <= totCmdCount || any(sapply(runningProcInfo, function(rp) !is.null(rp) && rp$running)))
     {

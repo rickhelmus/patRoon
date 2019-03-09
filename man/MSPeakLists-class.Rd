@@ -44,7 +44,8 @@
 \S4method{filter}{MSPeakLists}(obj, absMSIntThr = NULL,
   absMSMSIntThr = NULL, relMSIntThr = NULL, relMSMSIntThr = NULL,
   topMSPeaks = NULL, topMSMSPeaks = NULL, deIsotopeMS = FALSE,
-  deIsotopeMSMS = FALSE, retainPrecursorMSMS = TRUE, negate = FALSE)
+  deIsotopeMSMS = FALSE, withMSMS = FALSE,
+  retainPrecursorMSMS = TRUE, negate = FALSE)
 
 \S4method{plotSpec}{MSPeakLists}(obj, groupName, analysis = NULL,
   MSLevel = 1, title = NULL, useGGPlot2 = FALSE, xlim = NULL,
@@ -83,6 +84,10 @@ with highest intensity. \code{NULL} to consider all.}
 peak lists. This may improve data processing steps which do not assume the
 presence of isotopic peaks (e.g. MetFrag for MS/MS). Note that
 \code{getMzRPeakLists} does not (yet) support flagging of isotopes.}
+
+\item{withMSMS}{If set to \code{TRUE} then only results will be retained for
+which MS/MS data is available. if \code{negate=TRUE} then only results
+\emph{without} MS/MS data will be retained.}
 
 \item{retainPrecursorMSMS}{If \code{TRUE} then precursor peaks will never be
 filtered out from MS/MS peak lists (note that precursors are never removed

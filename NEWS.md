@@ -14,6 +14,7 @@
     * Re-organized tabs to mirror non-target workflow.
     * Suspect screening support.
     * Improved layout of output script.
+* `withMSMS` filter for MS peak lists.
 
 
 ## February 2019

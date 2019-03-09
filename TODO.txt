@@ -50,7 +50,6 @@ MSPeakLists
     - tests
         - utils? EICs with export/vdiffr?
         - test MS peak lists deisotoping?
-- filter by MSMS
 - metadata for Bruker peaklists?
 - metadata() generic?
 

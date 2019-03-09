@@ -100,7 +100,7 @@ getEICsForFGroups <- function(fGroups, rtWindow, mzWindow, topMost, onlyPresent)
         rtrMaxs <- rtrMaxs[!is.na(rtrMaxs)]
         
         if (length(rtrMins) > 0 && length(rtrMaxs) > 0)
-            rtr <- min(rtrMins, rtrMaxs)
+            rtr <- c(min(rtrMins), max(rtrMaxs))
         else
             rtr <- gInfo[fg, "rts"]
         

@@ -224,7 +224,7 @@ doMSPeakListFilter <- function(pList, absIntThr, relIntThr, topMost, deIsotope, 
     if (!is.null(topMost) && nrow(pList) > topMost)
     {
         if (negate)
-            ord <- order(-pList$intensity)
+            ord <- order(pList$intensity)
         else
             ord <- order(-pList$intensity)
         pList <- pList[ord[seq_len(topMost)]]

@@ -2,6 +2,15 @@
 #' @include workflow-step.R
 NULL
 
+printFeatStats <- function(fList)
+{
+    fCounts <- sapply(fList, nrow)
+    fTotCount <- sum(fCounts)
+    printf("Feature statistics:\n")
+    printf("%s: %d (%.1f%%)\n", names(fList), fCounts, if (fTotCount == 0) 0 else fCounts * 100 / fTotCount)
+    printf("Total: %d\n", fTotCount)
+}
+
 #' Base features class
 #'
 #' Holds information for all features present within a set of analysis.

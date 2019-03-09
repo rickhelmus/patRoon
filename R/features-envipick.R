@@ -21,40 +21,44 @@ setMethod("initialize", "featuresEnviPick",
 findFeaturesEnviPick <- function(analysisInfo, ..., verbose = TRUE)
 {
     assertAnalysisInfo(analysisInfo, "mzXML")
-
+    
+    anaCount <- nrow(analysisInfo)
     ret <- featuresEnviPick(analysisInfo = analysisInfo)
 
     if (verbose)
-        cat("Finding features with enviPick...\n===========\n")
+    {
+        printf("Finding features with enviPick for %d analyses ...\n", anaCount)
+        prog <- openProgBar(0, anaCount)
+    }
 
     fts <- list()
-    for (i in seq_len(nrow(analysisInfo)))
+    for (i in seq_len(anaCount))
     {
-        if (verbose)
-            printf("Loading features with envipick from analysis '%s'... \n", analysisInfo$analysis[i])
-
-        # UNDONE: use makeFileHash instead?
-        hash <- makeHash(analysisInfo$analysis[i], analysisInfo$path[i], list(...))
+        fp <- getMzXMLAnalysisPath(analysisInfo$analysis[i], analysisInfo$path[i])
+        hash <- makeHash(makeFileHash(fp), list(...))
         f <- loadCacheData("featuresEnviPick", hash)
 
         if (is.null(f))
         {
-            fp <- getMzXMLAnalysisPath(analysisInfo$analysis[i], analysisInfo$path[i])
             invisible(capture.output(ep <- enviPickwrap(fp, ...)))
             f <- importEnviPickPeakList(ep$Peaklist)
             saveCacheData("featuresEnviPick", f, hash)
         }
 
         fts[[analysisInfo$analysis[i]]] <- f
-
+        
         if (verbose)
-            cat("Done!\n")
+            setTxtProgressBar(prog, i)
     }
 
     ret@features <- fts
 
     if (verbose)
-        cat("\n===========\nDone!\n")
+    {
+        close(prog)
+        printf("Done!\n")
+        printFeatStats(fts)
+    }
 
     return(ret)
 }

@@ -57,17 +57,18 @@ findFeaturesXCMS <- function(analysisInfo, method = "centWave", ..., verbose = T
     checkmate::assertString(method, min.chars = 1, add = ac)
     checkmate::reportAssertions(ac)
 
-    hash <- makeHash(analysisInfo, list(...)) # UNDONE: better hash?
+    files <- sapply(seq_len(nrow(analysisInfo)),
+                    function(i) getMzMLOrMzXMLAnalysisPath(analysisInfo$analysis[i], analysisInfo$path[i]),
+                    USE.NAMES = FALSE)
+    
+    hash <- makeHash(analysisInfo, do.call(makeFileHash, as.list(files)), method, list(...))
     cachef <- loadCacheData("featuresXCMS", hash)
     if (!is.null(cachef))
         return(cachef)
 
     if (verbose)
-        cat("Finding features with XCMS...\n===========\n")
+        printf("Finding features with XCMS for %d analyses ...\n", nrow(analysisInfo))
 
-    files <- sapply(seq_len(nrow(analysisInfo)),
-                    function(i) getMzMLOrMzXMLAnalysisPath(analysisInfo$analysis[i], analysisInfo$path[i]),
-                    USE.NAMES = FALSE)
     if (verbose)
         xs <- xcmsSet(files, analysisInfo$analysis, analysisInfo$group, method = method, ...)
     else
@@ -78,7 +79,10 @@ findFeaturesXCMS <- function(analysisInfo, method = "centWave", ..., verbose = T
     saveCacheData("featuresXCMS", ret, hash)
 
     if (verbose)
-        cat("\n===========\nDone!\n")
+    {
+        printf("Done!\n")
+        printFeatStats(ret@features)
+    }
 
     return(ret)
 }

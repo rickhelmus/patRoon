@@ -20,10 +20,8 @@ docs
 
 
 features
-- file hashes for findFeaturesXCMS/EnviPick
 - importFeatures() function (analog to importFeatureGroups)
 - getXcmsSet --> export
-- groupFeaturesScreening functionality for features?
 - integrate OpenMS feature scoring and isotopes and PPS in general (also include filters?)
 - feature optim:
     - docs
@@ -32,14 +30,13 @@ features
     - keep retcor_done?
     - get rid of getXCMSSet() calls?
     - cache?
-- progressbar and parallel enviPick
+- parallel enviPick
 - OpenMS: Support newest grouper? Update tests to newest version, fix URLs in docs
 - as.data.table for fGroups is slow?
 - tests to verify getXCMSSet...
 - filter()
     - document which filters work on feature level (e.g. chromWidth)
     - remove zero values for maxReplicateIntRSD?
-- xcms does mzXML?
 
 
 MSPeakLists

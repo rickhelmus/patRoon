@@ -157,11 +157,8 @@ findFeaturesOpenMS <- function(analysisInfo, noiseThrInt = 1000, chromSNR = 3, c
 
     if (verbose)
     {
-        fCounts <- sapply(fList, nrow)
-        fTotCount <- sum(fCounts)
-        printf("Done! Feature statistics:\n")
-        printf("%s: %d (%.1f%%)\n", analysisInfo$analysis, fCounts, if (fTotCount == 0) 0 else fCounts * 100 / fTotCount)
-        printf("Total: %d\n", fTotCount)
+        printf("Done!\n")
+        printFeatStats(fList)
     }
 
     return(featuresOpenMS(analysisInfo = analysisInfo, features = fList))

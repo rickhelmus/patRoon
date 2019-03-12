@@ -69,7 +69,7 @@ GenFormAdducts <- function()
 
         list("M-3H", "", "H3", "-3", 1),
         list("M-2H", "", "H2", "-2", 1),
-        list("M-H2O-H", "", "H", "-1", 1),
+        list("M-H2O-H", "", "H3O", "-1", 1), # BUG: currently in GF as M-H
         list("M-H", "", "H", "-1", 1),
         list("M+Na-2H", "Na", "H2", "-1", 1),
         list("M+Cl", "Cl", "", "-1", 1),

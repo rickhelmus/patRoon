@@ -444,7 +444,7 @@ setMethod("compoundViewer", c("featureGroups", "MSPeakLists", "compounds"), func
     for (g in seq_along(compTable))
         compTable[[g]]$structure <- NA
 
-    addResourcePath("struct", tempdir())
+    addResourcePath("struct", tempdir(TRUE))
 
     getPageRange <- function(group, page, resultsPerPage)
     {

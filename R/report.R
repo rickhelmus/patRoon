@@ -809,7 +809,7 @@ setMethod("reportMD", "featureGroups", function(fGroups, path, reportPlots, form
 
     prepareReportPath(path, clearPath)
 
-    workPath <- file.path(tempdir(), "report")
+    workPath <- file.path(tempdir(TRUE), "report")
     unlink(workPath, TRUE)
     mkdirp(workPath)
 

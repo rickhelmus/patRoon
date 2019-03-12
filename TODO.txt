@@ -72,6 +72,7 @@ formulas
 - OM reporting
 - as.data.table: option to average per replicate group?
 - note/warning on GF slowness with high masses --> enable timeout
+- reporting incorrect GF adducts
 
 
 components

@@ -511,7 +511,7 @@ newProject <- function(destPath = NULL)
             if (!is.null(sl))
             {
                 csvTab <- tryCatch(fread(sl, select = c("name", "mz"),
-                                         colClasses = c("character", "numeric")),
+                                         colClasses = c(name = "character", mz = "numeric")),
                                    error = function(e) FALSE, warning = function(w) FALSE)
                 
                 if (is.logical(csvTab))

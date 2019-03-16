@@ -28,7 +28,7 @@ features
     - keep retcor_done?
     - get rid of getXCMSSet() calls?
 - parallel enviPick
-- OpenMS: Support newest grouper? Update tests to newest version, fix URLs in docs
+- OpenMS: Support newest grouper? Update tests to newest version
 - as.data.table for fGroups is slow?
 - tests to verify getXCMSSet...
 - filter()

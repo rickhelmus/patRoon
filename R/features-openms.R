@@ -11,7 +11,7 @@ setMethod("initialize", "featuresOpenMS",
 
 
 #' @details \code{findFeaturesOpenMS} uses the
-#'   \href{http://ftp.mi.fu-berlin.de/pub/OpenMS/release2.1.0-documentation/html/TOPP_FeatureFinderMetabo.html}{FeatureFinderMetabo}
+#'   \href{https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/TOPP_FeatureFinderMetabo.html}{FeatureFinderMetabo}
 #'    TOPP tool (see \url{http://www.openms.de}).
 #'
 #' @note The file format of analyses for \code{findFeaturesOpenMS} must be
@@ -32,7 +32,7 @@ setMethod("initialize", "featuresOpenMS",
 #'   \code{algorithm:mtd:reestimate_mt_sd}.
 #' @param traceTermCriterion,traceTermOutliers,minSampleRate Termination
 #'   criterion for the extension of mass traces. See
-#'   \href{http://ftp.mi.fu-berlin.de/pub/OpenMS/release2.1.0-documentation/html/TOPP_FeatureFinderMetabo.html}{FeatureFinderMetabo}.
+#'   \href{https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/TOPP_FeatureFinderMetabo.html}{FeatureFinderMetabo}.
 #'    Sets the \code{algorithm:mtd:trace_termination_criterion},
 #'   \code{algorithm:mtd:trace_termination_outliers} and
 #'   \code{algorithm:mtd:min_sample_rate} options, respectively.
@@ -42,7 +42,7 @@ setMethod("initialize", "featuresOpenMS",
 #'   \code{algorithm:mtd:min_trace_length}, respectively.
 #' @param widthFiltering,minFWHM,maxFWHM Enable filtering of unlikely peak
 #'   widths. See
-#'   \href{http://ftp.mi.fu-berlin.de/pub/OpenMS/release2.1.0-documentation/html/TOPP_FeatureFinderMetabo.html}{FeatureFinderMetabo}.
+#'   \href{https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/TOPP_FeatureFinderMetabo.html}{FeatureFinderMetabo}.
 #'    Sets \code{algorithm:epd:width_filtering}, \code{algorithm:epd:min_fwhm}
 #'   and \code{algorithm:epd:max_fwhm}, respectively.
 #' @param traceSNRFiltering If \code{TRUE} then apply post-filtering by
@@ -54,11 +54,11 @@ setMethod("initialize", "featuresOpenMS",
 #'   options, respectively.
 #' @param isotopeFilteringModel Remove/score candidate assemblies based on
 #'   isotope intensities. See
-#'   \href{http://ftp.mi.fu-berlin.de/pub/OpenMS/release2.1.0-documentation/html/TOPP_FeatureFinderMetabo.html}{FeatureFinderMetabo}.
+#'   \href{https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/TOPP_FeatureFinderMetabo.html}{FeatureFinderMetabo}.
 #'    Sets the \code{algorithm:ffm:isotope_filtering_model} option.
 #' @param MZScoring13C Use the 13C isotope as the expected shift for isotope
 #'   mass traces. See
-#'   \href{http://ftp.mi.fu-berlin.de/pub/OpenMS/release2.1.0-documentation/html/TOPP_FeatureFinderMetabo.html}{FeatureFinderMetabo}.
+#'   \href{https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/TOPP_FeatureFinderMetabo.html}{FeatureFinderMetabo}.
 #'    Sets \code{algorithm:ffm:mz_scoring_13C}.
 #' @param useSmoothedInts If \code{TRUE} then use LOWESS intensities instead of
 #'   raw intensities. Sets the \code{algorithm:ffm:use_smoothed_intensities}

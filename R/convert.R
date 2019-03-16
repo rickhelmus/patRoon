@@ -193,7 +193,7 @@ convertMSFilesBruker <- function(inFiles, outFiles, to, centroid)
 #' @param extraOpts A \code{character} vector specifying any extra commandline
 #'   parameters passed to \command{msConvert} or \command{FileConverter}. Set to
 #'   \code{NULL} to ignore. For options: see
-#'   \href{http://ftp.mi.fu-berlin.de/pub/OpenMS/release-documentation/html/TOPP_FileConverter.html}{FileConverter}
+#'   \href{https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/TOPP_FileConverter.html}{FileConverter}
 #'    and
 #'   \href{http://proteowizard.sourceforge.net/tools/msconvert.html}{msConvert}.
 #'
@@ -286,7 +286,7 @@ convertMSFiles <- function(files = NULL, outPath = NULL, dirs = TRUE,
             from <- checkmate::matchArg(from, c("mzXML", "mzML"), several.ok = TRUE, add = ac)
         else # bruker
             from <- checkmate::matchArg(from, "bruker", add = ac)
-        
+
         ofrom <- from
         from <- setdiff(from, to)
         if (length(from) < length(ofrom))
@@ -295,7 +295,7 @@ convertMSFiles <- function(files = NULL, outPath = NULL, dirs = TRUE,
         if (length(from) == 0)
             stop("No (valid) input formats specified.")
     }
-    
+
     assertAnalysisInfo(anaInfo, from, null.ok = !is.null(files), add = ac)
 
     if (!is.null(files))

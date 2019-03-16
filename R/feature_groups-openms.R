@@ -13,11 +13,11 @@ setMethod("initialize", "featureGroupsOpenMS",
 #' @details \code{groupFeaturesOpenMS} uses the OpenMS tools for grouping of
 #'   features (see \url{http://www.openms.de}). Retention times may be aligned
 #'   by the
-#'   \href{http://ftp.mi.fu-berlin.de/pub/OpenMS/release2.1.0-documentation/html/TOPP_MapAlignerPoseClustering.html}{MapAlignerPoseClustering}
+#'   \href{https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/TOPP_MapAlignerPoseClustering.html}{MapAlignerPoseClustering}
 #'    TOPP tool. Grouping is achieved by either the
-#'   \href{http://ftp.mi.fu-berlin.de/pub/OpenMS/release2.1.0-documentation/html/TOPP_FeatureLinkerUnlabeled.html}{FeatureLinkerUnlabeled}
+#'   \href{https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/TOPP_FeatureLinkerUnlabeled.html}{FeatureLinkerUnlabeled}
 #'    or
-#'   \href{http://ftp.mi.fu-berlin.de/pub/OpenMS/release2.1.0-documentation/html/TOPP_FeatureLinkerUnlabeledQT.html}{FeatureLinkerUnlabeledQT}
+#'   \href{https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/TOPP_FeatureLinkerUnlabeledQT.html}{FeatureLinkerUnlabeledQT}
 #'    TOPP tools.
 #'
 #' @param QT If enabled, use \code{FeatureLinkerUnlabeledQT} instead of

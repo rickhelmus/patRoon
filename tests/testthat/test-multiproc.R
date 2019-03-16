@@ -13,7 +13,7 @@ px <- paste0(
 # retries: check if it can succeed after handler is called (e.g. by ensuring in handler command can actually run)
 # further: different amount of maxprocs? check output/error (is this actually used?)
 
-performMPTest <- function(len, fail = numeric(), timeout = numeric(), failFirst = FALSE,
+performMPTest <- function(len, fail = numeric(), timeout = numeric(), failFirst = FALSE, delay = FALSE,
                           errorHandler = function(...) FALSE, timeoutHandler = function(...) FALSE, ...)
 {
     if (Sys.info()[["sysname"]] == "Windows")
@@ -21,6 +21,7 @@ performMPTest <- function(len, fail = numeric(), timeout = numeric(), failFirst 
         shFile <- tempfile("makefile", fileext = ".bat")
         cat("if not exist %1 (SET ret=1) else (SET ret=0)",
             "echo y > %1",
+            if (delay) paste(px, "sleep 2") else "",
             if (failFirst) "exit /b %ret%" else "", # will fail if file didn't exist yet (i.e. first time it's executed)
             sep = "\n", file = shFile)
     }
@@ -31,28 +32,31 @@ performMPTest <- function(len, fail = numeric(), timeout = numeric(), failFirst 
             "test -f $1",
             "ret=$?",
             "echo y > $1",
+            if (delay) paste(px, "sleep 2") else "",
             if (failFirst) "exit $ret" else "", # will fail if file didn't exist yet (i.e. first time it's executed)
             sep = "\n", file = shFile)
         Sys.chmod(shFile)
     }
-    
+
     cmdQueue <- setNames(lapply(seq_len(len), function(i)
     {
         if (i %in% fail)
             return(list(command = px, args = c("return", "2")))
         else if (i %in% timeout)
             return(list(command = px, args = c("sleep", 60)))
-        
+
         testFile <- tempfile("mptest")
         list(command = shFile, args = testFile, outFile = testFile, index = i)
     }), as.character(seq_len(len)))
-    
-    res <- executeMultiProcess(cmdQueue, function(cmd) { cmd }, procTimeout = 3, showProgress = FALSE,
+
+    ct <- curTimeMS()
+    res <- executeMultiProcess(cmdQueue, function(cmd) { cmd }, procTimeout = 5, showProgress = FALSE,
                                errorHandler = errorHandler, timeoutHandler = timeoutHandler, ...)
-    
+    printf("time: %.2f\n", curTimeMS() - ct)
+
     if (failFirst)
         fail <- timeout <- numeric()
-    
+
     succeeded <- setdiff(seq_len(len), c(fail, timeout))
     if (length(succeeded) > 0)
     {
@@ -61,7 +65,7 @@ performMPTest <- function(len, fail = numeric(), timeout = numeric(), failFirst 
         expect_true(all(file.exists(sapply(res[succeeded], "[[", "outFile"))))
         expect_equal(sapply(cmdQueue[succeeded], "[[", "index"), sapply(res[succeeded], "[[", "index"))
     }
-    
+
     failed <- c(fail, timeout)
     if (length(failed) > 0)
         expect_true(all(sapply(res[failed], is.null)))
@@ -77,7 +81,7 @@ test_that("multi-process functionality", {
     performMPTest(10, batchSize = 20)
     performMPTest(10, maxProcAmount = 1) # maxProcAmount>1 by default
     performMPTest(3, failFirst = TRUE, errorHandler = ehandler)
-    
+
     performMPTest(10, fail = c(2, 8))
     performMPTest(10, fail = c(2, 8), batchSize = 3)
     performMPTest(10, fail = c(2, 8), maxProcAmount = 1)
@@ -85,7 +89,7 @@ test_that("multi-process functionality", {
     performMPTest(10, fail = c(1, 10))
     performMPTest(2, fail = c(1, 2))
     performMPTest(4, fail = c(1, 2), batchSize = 2)
-    
+
     performMPTest(10, timeout = c(2, 8))
     performMPTest(10, timeout = c(2, 8), batchSize = 3)
     performMPTest(10, timeout = c(2, 8), maxProcAmount = 1)
@@ -93,4 +97,6 @@ test_that("multi-process functionality", {
     performMPTest(10, timeout = c(1, 10))
     performMPTest(2, timeout = c(1, 2))
     performMPTest(4, timeout = c(1, 2), batchSize = 2)
+    performMPTest(4, delay = TRUE) # delay is below timeout, shouldn't fail
+    performMPTest(4, delay = TRUE, batchSize = 4, maxProcAmount = 1) # batch process will take longer
 })

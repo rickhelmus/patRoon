@@ -38,8 +38,7 @@ retries)}. The \code{exitStatus} argument is the exit code of the command
 \code{timeoutHandler}.}
 
 \item{procTimeout}{The maximum time a process may consume before a timeout
-occurs (in seconds). Note that when \code{batchSize>1} this value holds for
-\emph{all} commands executed in a batch. Set to \code{NULL} to disable
+occurs (in seconds). Set to \code{NULL} to disable
 timeouts.}
 
 \item{printOutput, printError}{Set to \code{TRUE} to print stdout/stderr

@@ -70,9 +70,11 @@ initCommand <- function(commandQueue, cmdInds, sucDir, printOutput, printError)
     ret <- list()
     ret$procArgs <- procArgs
     ret$cmdIndRange <- c(cmdInds[1], cmdInds[ncmd])
+    ret$finished <- rep(FALSE, ncmd) # only used for timeout checking
     ret$failed <- rep(FALSE, ncmd)
     ret$timedOut <- rep(FALSE, ncmd)
     ret$timeOutRetries <- rep(0, ncmd)
+    ret$startTime <- Sys.time()
     ret$noResRetries <- rep(0, ncmd)
     ret$running <- TRUE
 
@@ -81,7 +83,7 @@ initCommand <- function(commandQueue, cmdInds, sucDir, printOutput, printError)
 
 maybeRestartCommand <- function(commandQueue, procInfo, sucDir, exitStatus, timeoutHandler, errorHandler)
 {
-    restarted <- FALSE
+    restart <- FALSE
     cmdInds <- seq(procInfo$cmdIndRange[1], procInfo$cmdIndRange[2])
     ncmd <- length(cmdInds)
 
@@ -141,15 +143,16 @@ maybeRestartCommand <- function(commandQueue, procInfo, sucDir, exitStatus, time
                 pa <- makeCommandList(commandQueue[seq(reStartInd, ncmd)],
                                       seq(cmdInds[reStartInd], cmdInds[ncmd]), sucDir)
                 procInfo$procArgs <- modifyList(procInfo$procArgs, pa)
+                procInfo$startTime <- Sys.time()
             }
 
-            restarted <- TRUE
+            restart <- TRUE
         }
 
         break
     }
 
-    return(list(procInfo = procInfo, restarted = restarted))
+    return(list(procInfo = procInfo, restart = restart))
 }
 
 defMultiProcErrorHandler <- function(cmd, exitStatus, ...)
@@ -202,8 +205,7 @@ defMultiProcErrorHandler <- function(cmd, exitStatus, ...)
 #'   (may be \code{NA} in rare cases this is unknown). Other arguments are as
 #'   \code{timeoutHandler}.
 #' @param procTimeout The maximum time a process may consume before a timeout
-#'   occurs (in seconds). Note that when \code{batchSize>1} this value holds for
-#'   \emph{all} commands executed in a batch. Set to \code{NULL} to disable
+#'   occurs (in seconds). Set to \code{NULL} to disable
 #'   timeouts.
 #' @param printOutput,printError Set to \code{TRUE} to print stdout/stderr
 #'   output to the console. Currently unused and untested.
@@ -349,28 +351,39 @@ executeMultiProcess <- function(commandQueue, finishHandler,
                 }
 
             }
-            else if (!is.null(procTimeout) && runningProcInfo[[pi]]$running &&
-                     (Sys.time() - runningProcs[[pi]]$get_start_time()) > procTimeout)
+            else if (!is.null(procTimeout) && runningProcInfo[[pi]]$running)
             {
-                runningProcs[[pi]]$kill()
-                runningProcs[[pi]]$wait()
+                # check for timeouts
+                kill <- FALSE
 
-                if (length(cmdInds) == 1)
-                    runningProcInfo[[pi]]$timedOut[1] <- TRUE
-                else
+                if (length(cmdInds) > 1)
                 {
-                    starti <- tail(which(runningProcInfo[[pi]]$failed), 1)
-                    if (length(starti) == 0)
-                        starti <- 0
-                    for (i in seq(starti + 1, length(cmdInds)))
+                    # for batch execution: update start time if a new command was started
+
+                    for (i in seq_along(cmdInds))
                     {
-                        # assume that the first that did not succeed is the one we just killed.
-                        if (!file.exists(file.path(sucDir, cmdInds[i])))
+                        if (runningProcInfo[[pi]]$failed[i] || runningProcInfo[[pi]]$finished[i])
+                            next
+
+                        if (file.exists(file.path(sucDir, cmdInds[i])))
                         {
-                            runningProcInfo[[pi]]$timedOut[i] <- TRUE
-                            break
+                            runningProcInfo[[pi]]$finished[i] <- TRUE # now finished
+                            runningProcInfo[[pi]]$startTime <- Sys.time()
                         }
+                        else if ((Sys.time() - runningProcInfo[[pi]]$startTime) > procTimeout)
+                            runningProcInfo[[pi]]$timedOut[i] <- kill <- TRUE
+
+                        break
                     }
+                }
+                else
+                    runningProcInfo[[pi]]$timedOut[1] <- kill <-
+                        (Sys.time() - runningProcInfo[[pi]]$startTime) > procTimeout
+
+                if (kill)
+                {
+                    runningProcs[[pi]]$kill()
+                    runningProcs[[pi]]$wait()
                 }
             }
         }

@@ -116,7 +116,7 @@ runGenForm <- function(gfBin, mainArgs, featMZs, groupPeakLists, doMSMS, hashes,
                 f <- data.table()
             saveCacheData("formulasGenForm", f, cmd$hash, cacheDB)
             return(f)
-        }, maxProcAmount = maxProcAmount, waitTimeout = 10, maxCmdsPerProc = maxCmdsPerProc)
+        }, maxProcAmount = maxProcAmount, waitTimeout = 10, batchSize = batchSize)
     }
 
     if (length(cachedResults) > 0)
@@ -354,7 +354,7 @@ generateFormulasGenForm <- function(fGroups, MSPeakLists, relMzDev = 5, adduct =
         }
 
         MSForms <- lapply(MSForms, rankFormulaTable)
-        
+
         return(MSForms)
     }
 

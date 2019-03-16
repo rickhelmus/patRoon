@@ -2,11 +2,11 @@ makeCommandList <- function(commandQueue, cmdInds, sucDir)
 {
     ncmd <- length(commandQueue)
     ret <- list()
-    
+
     if (ncmd > 1)
     {
         # execute multiple processes at once
-        
+
         cmdList <- sapply(commandQueue,
                           function(cmd) paste(shQuote(cmd$command), paste0(shQuote(cmd$args), collapse = " "),
                                               sep = " "))
@@ -14,26 +14,31 @@ makeCommandList <- function(commandQueue, cmdInds, sucDir)
         if (Sys.info()[["sysname"]] == "Windows")
         {
             # on Windows we easily reach the commandline text limit --> execute as batch file
-            
+
             # fail with last exit code if a command failed: see https://stackoverflow.com/questions/734598/how-do-i-make-a-batch-file-terminate-upon-encountering-an-error
-            ORDoExit <- "|| exit /b %errorlevel%"
-            
+            # NOTE: need to enable delayed expension and use exclamation marks for current errorlevel expansion.
+            ORDoExit <- "|| exit /b !errorlevel!"
+
             # mark success of a command by creating an empty file named after the command index
             ANDMarkSucceed <- paste("&& type NUL >", file.path(sucDir, cmdInds))
-            
+
+            # use call in order to be able to execute batch files
+            cmdList <- paste("call", cmdList)
+
             shFile <- tempfile(fileext = ".bat")
-            write(paste(cmdList, ANDMarkSucceed, ORDoExit, collapse = "\n"), shFile)
+            cat("SETLOCAL EnableDelayedExpansion",
+                paste(cmdList, ANDMarkSucceed, ORDoExit, collapse = "\n"),
+                sep = "\n", file = shFile)
             ret$command <- shFile
         }
         else
         {
-            # not supported anymore by processx :(
+            # not supported anymore by processx :( --> call sh instead for nix
             # ret$commandline <- paste0(cmdList, collapse = " ; ")
-            
+
             ORDoExit <- "|| exit $?"
             ANDMarkSucceed <- paste("&& touch", file.path(sucDir, cmdInds))
-            
-            # --> call sh instead for nix
+
             ret$command <- "/bin/sh"
             ret$args <- c("-c", paste0(cmdList, ANDMarkSucceed, ORDoExit, collapse = " && "))
         }
@@ -46,7 +51,7 @@ makeCommandList <- function(commandQueue, cmdInds, sucDir)
         if (!is.null(commandQueue[[1]]$stderrFile))
             ret$stderr <- commandQueue[[1]]$stderrFile
     }
-    
+
     return(ret)
 }
 
@@ -54,14 +59,14 @@ initCommand <- function(commandQueue, cmdInds, sucDir, printOutput, printError)
 {
     procArgs <- makeCommandList(commandQueue, cmdInds, sucDir)
     procArgs <- c(procArgs, list(cleanup_tree = TRUE, supervise = TRUE))
-    
+
     if (printOutput)
         procArgs <- c(procArgs, stdout = "|")
     if (printError)
         procArgs <- c(procArgs, stderr = "|")
-    
+
     ncmd <- length(commandQueue)
-    
+
     ret <- list()
     ret$procArgs <- procArgs
     ret$cmdIndRange <- c(cmdInds[1], cmdInds[ncmd])
@@ -70,7 +75,7 @@ initCommand <- function(commandQueue, cmdInds, sucDir, printOutput, printError)
     ret$timeOutRetries <- rep(0, ncmd)
     ret$noResRetries <- rep(0, ncmd)
     ret$running <- TRUE
-    
+
     return(ret)
 }
 
@@ -79,26 +84,26 @@ maybeRestartCommand <- function(commandQueue, procInfo, sucDir, exitStatus, time
     restarted <- FALSE
     cmdInds <- seq(procInfo$cmdIndRange[1], procInfo$cmdIndRange[2])
     ncmd <- length(cmdInds)
-    
+
     starti <- tail(which(procInfo$failed), 1)
     if (length(starti) == 0)
         starti <- 0
-    
+
     for (i in seq(starti + 1, ncmd))
     {
         # succeeded?
         if (ncmd > 1 && file.exists(file.path(sucDir, cmdInds[i])))
             next
-        
+
         # already marked as failed during a previous restart?
         if (procInfo$failed[i])
             next
-        
+
         # timed out?
         if (procInfo$timedOut[i])
             retry <- timeoutHandler(cmd = commandQueue[[i]],
                                     retries = procInfo$timeOutRetries[i])
-        else    
+        else
         {
             # we can assume that only the last process in sequence
             # has failed. Hence the exit status must correspond to
@@ -106,12 +111,12 @@ maybeRestartCommand <- function(commandQueue, procInfo, sucDir, exitStatus, time
             retry <- errorHandler(cmd = commandQueue[[i]], exitStatus = exitStatus,
                                   retries = procInfo$noResRetries[i])
         }
-        
+
         if (retry)
         {
             # Prevents occasional Windows error: "The requested operation cannot be performed on a file with a user-mapped section open"
             Sys.sleep(1)
-            
+
             if (procInfo$timedOut[i])
             {
                 procInfo$timeOutRetries[i] <- procInfo$timeOutRetries[i] + 1
@@ -119,7 +124,7 @@ maybeRestartCommand <- function(commandQueue, procInfo, sucDir, exitStatus, time
             }
             else
                 procInfo$noResRetries[i] <- procInfo$noResRetries[i] + 1
-            
+
             reStartInd <- i
         }
         else
@@ -127,7 +132,7 @@ maybeRestartCommand <- function(commandQueue, procInfo, sucDir, exitStatus, time
             procInfo$failed[i] <- TRUE
             reStartInd <- i + 1
         }
-        
+
         if (reStartInd <= ncmd)
         {
             if (reStartInd != 1)
@@ -137,13 +142,13 @@ maybeRestartCommand <- function(commandQueue, procInfo, sucDir, exitStatus, time
                                       seq(cmdInds[reStartInd], cmdInds[ncmd]), sucDir)
                 procInfo$procArgs <- modifyList(procInfo$procArgs, pa)
             }
-            
+
             restarted <- TRUE
         }
-        
+
         break
     }
-    
+
     return(list(procInfo = procInfo, restarted = restarted))
 }
 
@@ -229,14 +234,14 @@ executeMultiProcess <- function(commandQueue, finishHandler,
 
     ret <- vector("list", totCmdCount)
     names(ret) <- names(commandQueue)
-    
+
     if (showProgress)
         prog <- openProgBar(0, totCmdCount)
 
     nextCommand <- 1
     finishedCommands <- 0
     lastCommandTime <- 0 # at which time (in ms) the last command was started
-    
+
     # clear up stale processes: see https://github.com/r-lib/processx/issues/171
     on.exit({
         for (pi in seq_along(runningProcs))
@@ -248,9 +253,9 @@ executeMultiProcess <- function(commandQueue, finishHandler,
 
     sucDir <- tempfile("suc")
     dir.create(sucDir)
-    
+
     procFinished <- function(pi) !is.null(runningProcs[[pi]]) && !runningProcs[[pi]]$is_alive() && runningProcInfo[[pi]]$running
-    
+
     while (nextCommand <= totCmdCount || any(sapply(runningProcInfo, function(rp) !is.null(rp) && rp$running)))
     {
         for (pi in seq_along(runningProcs))
@@ -259,11 +264,11 @@ executeMultiProcess <- function(commandQueue, finishHandler,
 
             if (!is.null(runningProcs[[pi]]))
                 cmdInds <- seq(runningProcInfo[[pi]]$cmdIndRange[1], runningProcInfo[[pi]]$cmdIndRange[2])
-            
+
             if (finishedRunning)
             {
                 ncmd <- length(cmdInds)
-                
+
                 # NOTE: as per docs get_exit_status() might return NA, in this
                 # case check if a command failed (by checking for missing
                 # success marker files)
@@ -271,13 +276,13 @@ executeMultiProcess <- function(commandQueue, finishHandler,
                 # markers. Fix this? So far never had NA exit statuses in that
                 # situation.
                 exitStatus <- runningProcs[[pi]]$get_exit_status()
-                
+
                 if (is.na(exitStatus) || exitStatus != 0) # something (may have) failed?
                 {
                     maybe <- maybeRestartCommand(commandQueue[cmdInds], runningProcInfo[[pi]], sucDir, exitStatus,
                                                  timeoutHandler, errorHandler)
                     runningProcInfo[[pi]] <- maybe$procInfo # might have been updated
-                    
+
                     if (maybe$restart)
                     {
                         runningProcs[[pi]] <- do.call(process$new, runningProcInfo[[pi]]$procArgs)
@@ -285,7 +290,7 @@ executeMultiProcess <- function(commandQueue, finishHandler,
                     }
                 }
             }
-            
+
             if (is.null(runningProcs[[pi]]) || finishedRunning)
             {
                 finishedProc <- runningProcs[[pi]]
@@ -300,7 +305,7 @@ executeMultiProcess <- function(commandQueue, finishHandler,
                         if (diffTime < delayBetweenProc)
                             Sys.sleep((delayBetweenProc - diffTime) / 1000)
                     }
-                    
+
                     if (batchSize == 1)
                         ncmd <- 1
                     else
@@ -340,16 +345,16 @@ executeMultiProcess <- function(commandQueue, finishHandler,
                 {
                     inds <- cmdInds[!finishedProcInfo$failed]
                     if (length(inds) > 0)
-                        ret[inds] <- lapply(inds, function(ci) finishHandler(cmd = commandQueue[[ci]]))    
+                        ret[inds] <- lapply(inds, function(ci) finishHandler(cmd = commandQueue[[ci]]))
                 }
-                    
+
             }
             else if (!is.null(procTimeout) && runningProcInfo[[pi]]$running &&
                      (Sys.time() - runningProcs[[pi]]$get_start_time()) > procTimeout)
             {
                 runningProcs[[pi]]$kill()
                 runningProcs[[pi]]$wait()
-                
+
                 if (length(cmdInds) == 1)
                     runningProcInfo[[pi]]$timedOut[1] <- TRUE
                 else
@@ -396,7 +401,7 @@ executeMultiProcess <- function(commandQueue, finishHandler,
             }
         }
     }
-    
+
     # get rid of potentially large amount of temporary files
     unlink(sucDir, recursive = TRUE)
 

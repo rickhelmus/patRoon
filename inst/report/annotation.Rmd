@@ -239,15 +239,19 @@ if (rmdVars$optimizePng && length(ap > 0))
     optimizePngPlots(ap, rmdVars$maxProcAmount)
 
 if (rmdVars$selfContained)
+{
     allPlots <- rapply(allPlots, function(ap) sapply(ap, function(p) if (nzchar(p)) knitr::image_uri(p) else ""), how = "replace")
-```
+    EICPaths <- sapply(allPlots, "[[", "EIC")
+} else
+{
+    EICPaths <- file.path(plotPathLink, basename(sapply(allPlots, "[[", "EIC")))
+}
 
-
-```{r echo=FALSE, eval=length(plotGroups) > 0}
 # stuff everything together: https://stackoverflow.com/a/21730473
 rmdText <- sprintf("<script>var EICPaths = [ %s ];</script>",
-                   paste0("'", sapply(allPlots, "[[", "EIC"), "'", collapse = ", "))
+                   paste0("'", EICPaths, "'", collapse = ", "))
 ```
+
 
 `r if (length(plotGroups) > 0) rmdText`
 

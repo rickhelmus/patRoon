@@ -70,12 +70,13 @@ makeGenFormCmdQueue <- function(gfBin, mainArgs, groupPeakLists, workFiles, hash
             args <- c(args, sprintf("msms=%s", workFiles[[grp]]$MSMSFile), "analyze")
         }
 
-        return(list(command = gfBin, args = args, outFile = workFiles[[grp]]$outFile, hash = hashes[grp]))
+        return(list(command = gfBin, args = args, outFile = workFiles[[grp]]$outFile,
+                    hash = hashes[grp], group = grp))
     }, simplify = FALSE))
 }
 
 runGenForm <- function(gfBin, mainArgs, featMZs, groupPeakLists, doMSMS, hashes, cachedSet,
-                       workFiles, gNames, adduct, maxProcAmount, batchSize)
+                       workFiles, gNames, adduct, maxProcAmount, batchSize, timeout, ana)
 {
     cacheDB <- openCacheDBScope()
 
@@ -116,7 +117,14 @@ runGenForm <- function(gfBin, mainArgs, featMZs, groupPeakLists, doMSMS, hashes,
                 f <- data.table()
             saveCacheData("formulasGenForm", f, cmd$hash, cacheDB)
             return(f)
-        }, maxProcAmount = maxProcAmount, waitTimeout = 10, batchSize = batchSize)
+        }, timeoutHandler = function(cmd, retries)
+        {
+            warning(paste("Formula calculation timed out for", cmd$group,
+                          if (!is.null(ana)) sprintf("(analysis '%s')", ana) else ""),
+                    call. = FALSE)
+            return(FALSE)
+        }, maxProcAmount = maxProcAmount, waitTimeout = 10, batchSize = batchSize,
+        procTimeout = timeout)
     }
 
     if (length(cachedResults) > 0)
@@ -218,19 +226,32 @@ processGenFormResultFile <- function(file, isMSMS, adduct)
 #'   \command{GenForm} without commandline options) which can be set by the
 #'   \code{extraOpts} parameter.
 #'
-#' @eval paste0("@@section GenForm options: \\preformatted{", patRoon:::readAllFile(system.file("misc",
-#'    "genform.txt", package = "patRoon")), "}")
+#' @eval paste0("@@section GenForm options: \\preformatted{",
+#'   patRoon:::readAllFile(system.file("misc", "genform.txt", package =
+#'   "patRoon")), "}")
 #'
 #' @param hetero Only consider formulae with at least one hetero atom. Sets the
 #'   \option{het} commandline option.
 #' @param oc Only consider organic formulae (\emph{i.e.} with at least one
 #'   carbon atom). Sets the \option{oc} commandline option.
-#' @param batchSize Maximum number of commands that should be combined for
-#'   each executed process. Combining commands with short runtimes (such as
-#'   \command{GenForm}) can significantly increase parallel performance.
+#' @param timeout Maximum time (in seconds) that a \command{GenForm} command is
+#'   allowed to execute. If this time is exceeded a warning is emitted and the
+#'   command is terminated. See the notes section for more information on the
+#'   need of timeouts.
+#' @param batchSize Maximum number of \command{GenForm} commands that should be
+#'   run sequentially in each parallel process Combining commands with short
+#'   runtimes (such as \command{GenForm}) can significantly increase parallel
+#'   performance. For more information see \code{\link{executeMultiProcess}}.
 #'
 #' @note \code{generateFormulasGenForm} always sets the \option{exist} and
 #'   \option{oei} \command{GenForm} commandline options.
+#'
+#'   Formula calculation with \command{GenForm} may produce an excessive number
+#'   of candidates for high \emph{m/z} values (\emph{e.g.} above 600) and/or
+#'   many elemental combinations (set by \code{elements}). In this scenario
+#'   formula calculation may need a very long time. Timeouts are used to avoid
+#'   excessive computational times by terminating long running commands (set by
+#'   the \code{timeout} argument).
 #'
 #' @references \insertRef{Meringer2011}{patRoon}
 #'
@@ -239,12 +260,13 @@ processGenFormResultFile <- function(file, isMSMS, adduct)
 generateFormulasGenForm <- function(fGroups, MSPeakLists, relMzDev = 5, adduct = "[M+H]+",
                                     elements = "CHNOP", hetero = TRUE, oc = FALSE, extraOpts = NULL,
                                     calculateFeatures = TRUE, featThreshold = 0.75, MSMode = "both",
-                                    maxProcAmount = getOption("patRoon.maxProcAmount"), batchSize = 25)
+                                    timeout = 120, maxProcAmount = getOption("patRoon.maxProcAmount"),
+                                    batchSize = 25)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
-    checkmate::assertNumber(relMzDev, lower = 0, finite = TRUE, add = ac)
+    aapply(checkmate::assertNumber, . ~ relMzDev + timeout, lower = 0, finite = TRUE, fixed = list(add = ac))
     aapply(checkmate::assertString, . ~ elements, fixed = list(add = ac))
     aapply(checkmate::assertFlag, . ~ hetero + oc + calculateFeatures, fixed = list(add = ac))
     checkmate::assertNumber(featThreshold, lower = 0, finite = TRUE, null.ok = TRUE, add = ac)
@@ -317,7 +339,8 @@ generateFormulasGenForm <- function(fGroups, MSPeakLists, relMzDev = 5, adduct =
         {
             printf(startMsg, "MS")
             MSForms <- runGenForm(gfBin, mainArgs, featMZs, groupPeakLists, FALSE, MSHashes,
-                                  cachedSet, workFiles, gNames, adduct, maxProcAmount, batchSize)
+                                  cachedSet, workFiles, gNames, adduct, maxProcAmount,
+                                  batchSize, timeout, ana)
 
             printf(endMsg, countUniqueFormulas(MSForms), "MS", length(MSForms),
                    if (gCount == 0) 0 else length(MSForms) * 100 / gCount)
@@ -328,7 +351,8 @@ generateFormulasGenForm <- function(fGroups, MSPeakLists, relMzDev = 5, adduct =
             printf(startMsg, "MS/MS")
 
             MSMSForms <- runGenForm(gfBin, mainArgs, featMZs, groupPeakLists[doGNames], TRUE, MSMSHashes,
-                                    cachedSet, workFiles, gNames, adduct, maxProcAmount, batchSize)
+                                    cachedSet, workFiles, gNames, adduct, maxProcAmount, batchSize,
+                                    timeout, ana)
 
             printf(endMsg, countUniqueFormulas(MSMSForms), "MS/MS", length(MSMSForms),
                    if (gCount == 0) 0 else length(MSMSForms) * 100 / gCount)

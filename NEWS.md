@@ -15,6 +15,7 @@
     * Suspect screening support.
     * Improved layout of output script.
 * `withMSMS` filter for MS peak lists.
+* Timeout for formula calculation with GenForm to avoid excessive calculation times. 
 
 
 ## February 2019

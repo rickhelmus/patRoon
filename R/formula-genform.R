@@ -75,7 +75,7 @@ makeGenFormCmdQueue <- function(gfBin, mainArgs, groupPeakLists, workFiles, hash
 }
 
 runGenForm <- function(gfBin, mainArgs, featMZs, groupPeakLists, doMSMS, hashes, cachedSet,
-                       workFiles, gNames, adduct, maxProcAmount, maxCmdsPerProc)
+                       workFiles, gNames, adduct, maxProcAmount, batchSize)
 {
     cacheDB <- openCacheDBScope()
 
@@ -225,7 +225,7 @@ processGenFormResultFile <- function(file, isMSMS, adduct)
 #'   \option{het} commandline option.
 #' @param oc Only consider organic formulae (\emph{i.e.} with at least one
 #'   carbon atom). Sets the \option{oc} commandline option.
-#' @param maxCmdsPerProc Maximum number of commands that should be combined for
+#' @param batchSize Maximum number of commands that should be combined for
 #'   each executed process. Combining commands with short runtimes (such as
 #'   \command{GenForm}) can significantly increase parallel performance.
 #'
@@ -239,7 +239,7 @@ processGenFormResultFile <- function(file, isMSMS, adduct)
 generateFormulasGenForm <- function(fGroups, MSPeakLists, relMzDev = 5, adduct = "[M+H]+",
                                     elements = "CHNOP", hetero = TRUE, oc = FALSE, extraOpts = NULL,
                                     calculateFeatures = TRUE, featThreshold = 0.75, MSMode = "both",
-                                    maxProcAmount = getOption("patRoon.maxProcAmount"), maxCmdsPerProc = 25)
+                                    maxProcAmount = getOption("patRoon.maxProcAmount"), batchSize = 25)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
@@ -250,7 +250,7 @@ generateFormulasGenForm <- function(fGroups, MSPeakLists, relMzDev = 5, adduct =
     checkmate::assertNumber(featThreshold, lower = 0, finite = TRUE, null.ok = TRUE, add = ac)
     checkmate::assertChoice(MSMode, c("ms", "msms", "both"), add = ac)
     checkmate::assertList(extraOpts, any.missing = FALSE, names = "unique", null.ok = TRUE, add = ac)
-    aapply(checkmate::assertCount, . ~ maxProcAmount + maxCmdsPerProc, positive = TRUE, fixed = list(add = ac))
+    aapply(checkmate::assertCount, . ~ maxProcAmount + batchSize, positive = TRUE, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
 
     adduct <- checkAndToAdduct(adduct)
@@ -317,7 +317,7 @@ generateFormulasGenForm <- function(fGroups, MSPeakLists, relMzDev = 5, adduct =
         {
             printf(startMsg, "MS")
             MSForms <- runGenForm(gfBin, mainArgs, featMZs, groupPeakLists, FALSE, MSHashes,
-                                  cachedSet, workFiles, gNames, adduct, maxProcAmount, maxCmdsPerProc)
+                                  cachedSet, workFiles, gNames, adduct, maxProcAmount, batchSize)
 
             printf(endMsg, countUniqueFormulas(MSForms), "MS", length(MSForms),
                    if (gCount == 0) 0 else length(MSForms) * 100 / gCount)
@@ -328,7 +328,7 @@ generateFormulasGenForm <- function(fGroups, MSPeakLists, relMzDev = 5, adduct =
             printf(startMsg, "MS/MS")
 
             MSMSForms <- runGenForm(gfBin, mainArgs, featMZs, groupPeakLists[doGNames], TRUE, MSMSHashes,
-                                    cachedSet, workFiles, gNames, adduct, maxProcAmount, maxCmdsPerProc)
+                                    cachedSet, workFiles, gNames, adduct, maxProcAmount, batchSize)
 
             printf(endMsg, countUniqueFormulas(MSMSForms), "MS/MS", length(MSMSForms),
                    if (gCount == 0) 0 else length(MSMSForms) * 100 / gCount)

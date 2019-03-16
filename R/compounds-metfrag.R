@@ -521,7 +521,7 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
                          initMetFragCLCommand(rd$mfSettings, rd$spec, mfBin, logf)))
             })
 
-            results <- executeMultiProcess(cmdQueue, finishHandler = function(cmd, exitStatus, retries)
+            results <- executeMultiProcess(cmdQueue, finishHandler = function(cmd)
             {
                 if (!is.null(cmd$stderrFile))
                     cat(sprintf("\n%s - Done with MF! Reading results...\n", date()), file = cmd$stderrFile, append = TRUE)
@@ -548,7 +548,7 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
                 return(TRUE)
             }, errorHandler = function(cmd, exitStatus, retries)
             {
-                if (exitStatus <= 6) # some error thrown by MF
+                if (!is.na(exitStatus) && exitStatus <= 6) # some error thrown by MF
                 {
                     if (retries >= errorRetries)
                     {

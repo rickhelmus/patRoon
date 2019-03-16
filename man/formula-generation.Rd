@@ -22,7 +22,7 @@ generateFormulasGenForm(fGroups, MSPeakLists, relMzDev = 5,
   adduct = "[M+H]+", elements = "CHNOP", hetero = TRUE, oc = FALSE,
   extraOpts = NULL, calculateFeatures = TRUE, featThreshold = 0.75,
   MSMode = "both", maxProcAmount = getOption("patRoon.maxProcAmount"),
-  maxCmdsPerProc = 25)
+  batchSize = 25)
 
 formulaScorings()
 
@@ -112,7 +112,7 @@ features prior to feature group assignment (see details).}
 Usually a number close to the amount of physical cores yields most
 efficient results.}
 
-\item{maxCmdsPerProc}{Maximum number of commands that should be combined for
+\item{batchSize}{Maximum number of commands that should be combined for
 each executed process. Combining commands with short runtimes (such as
 \command{GenForm}) can significantly increase parallel performance.}
 

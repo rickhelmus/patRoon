@@ -15,8 +15,8 @@
   reportFGroupsAsRows = TRUE, reportFGroupsAnalysisInfo = TRUE,
   reportFGroupsRetMz = TRUE, reportFeatures = FALSE, formulas = NULL,
   formulasNormalizeScores = "max", formulasExclNormScores = NULL,
-  compounds = NULL, compoundNormalizeScores = "max",
-  compoundExclNormScores = c("score", "individualMoNAScore"),
+  compounds = NULL, compoundsNormalizeScores = "max",
+  compoundsExclNormScores = c("score", "individualMoNAScore"),
   compsCluster = NULL, components = NULL, retMin = TRUE,
   clearPath = FALSE)
 
@@ -24,20 +24,21 @@
   reportFGroups = TRUE, formulas = NULL, formulasTopMost = 5,
   formulasNormalizeScores = "max", formulasExclNormScores = NULL,
   reportFormulaSpectra = TRUE, compounds = NULL,
-  compoundNormalizeScores = "max", compoundExclNormScores = c("score",
-  "individualMoNAScore"), compoundOnlyUsedScorings = TRUE,
-  compoundTopMost = 5, compsCluster = NULL, components = NULL,
-  MSPeakLists = NULL, retMin = TRUE, EICGrid = c(2, 1),
-  EICRtWindow = 20, EICMzWindow = 0.005, EICTopMost = NULL,
-  EICOnlyPresent = TRUE, clearPath = FALSE)
+  compoundsNormalizeScores = "max",
+  compoundsExclNormScores = c("score", "individualMoNAScore"),
+  compoundsOnlyUsedScorings = TRUE, compoundsTopMost = 5,
+  compsCluster = NULL, components = NULL, MSPeakLists = NULL,
+  retMin = TRUE, EICGrid = c(2, 1), EICRtWindow = 20,
+  EICMzWindow = 0.005, EICTopMost = NULL, EICOnlyPresent = TRUE,
+  clearPath = FALSE)
 
 \S4method{reportMD}{featureGroups}(fGroups, path = "report",
   reportPlots = c("chord", "venn", "upset", "eics", "formulas"),
   formulas = NULL, formulasTopMost = 5,
   formulasNormalizeScores = "max", formulasExclNormScores = NULL,
-  compounds = NULL, compoundNormalizeScores = "max",
-  compoundExclNormScores = c("score", "individualMoNAScore"),
-  compoundOnlyUsedScorings = TRUE, compoundTopMost = 5,
+  compounds = NULL, compoundsNormalizeScores = "max",
+  compoundsExclNormScores = c("score", "individualMoNAScore"),
+  compoundsOnlyUsedScorings = TRUE, compoundsTopMost = 5,
   compsCluster = NULL, includeMFWebLinks = "compounds",
   components = NULL, interactiveHeat = FALSE, MSPeakLists = NULL,
   retMin = TRUE, EICRtWindow = 20, EICMzWindow = 0.005,
@@ -71,7 +72,7 @@ features.}
 \code{\link{compoundsCluster}}, \code{\link{components}}) that should be
 reported. Specify \code{NULL} to skip reporting a particular object.}
 
-\item{compoundNormalizeScores, formulasNormalizeScores}{A \code{character} that specifies how normalization of
+\item{compoundsNormalizeScores, formulasNormalizeScores}{A \code{character} that specifies how normalization of
 compound scorings occurs. Either \code{"none"} (no normalization),
 \code{"max"} (normalize to max value) or \code{"minmax"} (perform min-max
 normalization). Note that normalization of negative scores (e.g. output by
@@ -81,10 +82,10 @@ candidates were generated. Thus, normalization is not affected when
 candidate results were removed after they were generated (\emph{e.g.} by
 use of \code{filter}).}
 
-\item{compoundExclNormScores, formulasExclNormScores}{A \code{character} vector specifying any compound
+\item{compoundsExclNormScores, formulasExclNormScores}{A \code{character} vector specifying any compound
   scoring names that should \emph{not} be normalized. Set to \code{NULL} to
   normalize all scorings. Note that whether any normalization occurs is set
-  by the \code{compoundExclNormScores,formulasExclNormScores} argument.
+  by the \code{compoundsExclNormScores,formulasExclNormScores} argument.
 
   For \code{compounds}: By default \code{score} and
   \code{individualMoNAScore} are set to mimic the behaviour of the MetFrag
@@ -98,7 +99,7 @@ use of \code{filter}).}
 
 \item{reportFGroups}{If \code{TRUE} then feature group data will be reported.}
 
-\item{formulasTopMost, compoundTopMost}{Only this amount of top ranked
+\item{formulasTopMost, compoundsTopMost}{Only this amount of top ranked
 candidate formulae/compounds are reported. Lower values may significantly
 speed up reporting. Set to \code{NULL} to ignore.}
 
@@ -107,7 +108,7 @@ available) for candidate formulae will be reported. Specifying
 \code{formulas} and setting this argument to \code{FALSE} still allows
 further annotation of compound MS/MS spectra.}
 
-\item{compoundOnlyUsedScorings}{If \code{TRUE} then only scorings are plotted
+\item{compoundsOnlyUsedScorings}{If \code{TRUE} then only scorings are plotted
 that actually have been used to rank data (see the \code{scoreTypes}
 argument to \code{\link{generateCompoundsMetfrag}} for more details).}
 

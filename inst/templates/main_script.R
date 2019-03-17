@@ -165,19 +165,19 @@ components <- generateComponents(fGroups, "nontarget", ionization = "{{ polarity
 {{ endCodeBlock() }}
 {{ optionalCodeBlock("CSV" %in% reportFormats) }}
 reportCSV(fGroups, path = "report", reportFeatures = FALSE, formulas = {{ if (formulaOpts$algo != "") "formulas" else "NULL" }},
-          compounds = {{ if (identOpts$algo != "") "compounds" else "NULL" }}, compoundNormalizeScores = "max",
+          compounds = {{ if (identOpts$algo != "") "compounds" else "NULL" }}, compoundsNormalizeScores = "max",
           components = {{ if (componentOpts$algo != "") "components" else "NULL" }})
 
 {{ endCodeBlock() }}
 {{ optionalCodeBlock("PDF" %in% reportFormats) }}
 reportPDF(fGroups, path = "report", reportFGroups = TRUE, formulas = {{ if (formulaOpts$algo != "") "formulas" else "NULL" }}, reportFormulaSpectra = TRUE,
-          compounds = {{ if (identOpts$algo != "") "compounds" else "NULL" }}, compoundNormalizeScores = "max",
+          compounds = {{ if (identOpts$algo != "") "compounds" else "NULL" }}, compoundsNormalizeScores = "max",
           components = {{ if (componentOpts$algo != "") "components" else "NULL" }}, MSPeakLists = {{ if (formulaOpts$algo != "" || identOpts$algo != "") "plists" else "NULL" }})
 
 {{ endCodeBlock() }}
 {{ optionalCodeBlock("MD" %in% reportFormats) }}
 reportMD(fGroups, path = "report", reportPlots = c("chord", "venn", "upset", "eics", "formulas"), formulas = {{ if (formulaOpts$algo != "") "formulas" else "NULL" }},
-         compounds = {{ if (identOpts$algo != "") "compounds" else "NULL" }}, compoundNormalizeScores = "max",
+         compounds = {{ if (identOpts$algo != "") "compounds" else "NULL" }}, compoundsNormalizeScores = "max",
          components = {{ if (componentOpts$algo != "") "components" else "NULL" }}, MSPeakLists = {{ if (formulaOpts$algo != "" || identOpts$algo != "") "plists" else "NULL" }},
          selfContained = FALSE, openReport = TRUE)
 

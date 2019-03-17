@@ -160,8 +160,8 @@ allPlots <- lapply(seq_along(plotGroups), function(grpi)
         grpPlots[["compoundScores"]] <- sapply(compsSeq, function(compi)
         {
             ret <- file.path(plotPathFull, sprintf("compscore_%d_%d.png", grpi, compi))
-            makeCachedPlot(ret, "plotScores", list(rmdVars$compounds, compi, grp, rmdVars$compoundNormalizeScores,
-                                                   rmdVars$compoundExclNormScores, rmdVars$compoundOnlyUsedScorings),
+            makeCachedPlot(ret, "plotScores", list(rmdVars$compounds, compi, grp, rmdVars$compoundsNormalizeScores,
+                                                   rmdVars$compoundsExclNormScores, rmdVars$compoundsOnlyUsedScorings),
                            4.5, 4.5, bg = NA, cacheDB = rmdVars$cacheDB)
             return(ret)
         })

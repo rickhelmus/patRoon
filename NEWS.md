@@ -17,6 +17,7 @@
 * `withMSMS` filter for MS peak lists.
 * Timeout for formula calculation with GenForm to avoid excessive calculation times.
 * `importFeatures()` generic function
+* Reporting functions renamed arguments related to compounds reporting (e.g. compoundTopMost to compound**s**TopMost)
 
 
 ## February 2019

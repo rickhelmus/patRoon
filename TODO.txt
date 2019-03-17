@@ -19,7 +19,7 @@ docs
 
 
 features
-- getXcmsSet --> export
+- getXcmsSet --> export?
 - integrate OpenMS feature scoring and isotopes and PPS in general (also include filters?)
 - feature optim:
     - docs
@@ -80,7 +80,6 @@ components
 
 reporting
 - add more options to reportPlots argument of reportMD()?
-- reportPDF/reportMD: compoundTopMost vs compoundsTopMost etc
 
 
 Cleanup

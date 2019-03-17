@@ -611,8 +611,8 @@ NULL
 #'
 #' @param extraOpts For \command{MetFrag}: A named \code{list} containing
 #'   further settings to be passed to \code{\link[metfRag]{run.metfrag}}. See
-#'   the \href{http://c-ruttkies.github.io/MetFrag/projects/metfragr/}{MetFragR}
-#'   and \href{http://c-ruttkies.github.io/MetFrag/projects/metfragcl/}{MetFrag
+#'   the \href{http://ipb-halle.github.io/MetFrag/projects/metfragr/}{MetFragR}
+#'   and \href{http://ipb-halle.github.io/MetFrag/projects/metfragcl/}{MetFrag
 #'   CL} homepages for all available options.
 #'
 #'   For \command{SIRIUS}: a \code{character} vector with any extra commandline
@@ -643,7 +643,7 @@ NULL
 #'
 #'   For all \command{MetFrag} scoring types refer to the \verb{Candidate
 #'   Scores} section on the
-#'   \href{http://c-ruttkies.github.io/MetFrag/projects/metfragr/}{MetFragR
+#'   \href{http://ipb-halle.github.io/MetFrag/projects/metfragr/}{MetFragR
 #'   homepage}.
 #'
 #' @seealso \code{\link{compounds-class}}

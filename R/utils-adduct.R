@@ -104,7 +104,7 @@ GenFormAdducts <- function()
 #' @export
 MetFragAdducts <- function()
 {
-    # from http://c-ruttkies.github.io/MetFrag/projects/metfragcl/ and Constants.java in MetFragLib
+    # from http://ipb-halle.github.io/MetFrag/projects/metfragcl/ and Constants.java in MetFragLib
     ret <- rbindlist(list(
         list(1, "[M+H]+", "H", "", 1),
         list(18, "[M+NH4]+", "NH4", "", 1),
@@ -175,7 +175,7 @@ as.adduct <- function(x, format = "generic", isPositive = NULL)
     {
         if (!grepl("^\\[.+\\].*[\\+\\-]{1}", x))
             stop("Wrong format! (forgot brackets or charge?)")
-        
+
         if (format == "sirius")
             mult <- charge <- 1
         else

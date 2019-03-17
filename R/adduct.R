@@ -4,7 +4,7 @@ NULL
 # Notes on general format:
 # SIRIUS: [M+ADDUCT]+/-; [M-ADDUCT]+/-; [M]+/- (only single charge)
 # GenForm: predefined list: see msaddion.cpp. Ex: +H, -H, -e, M+3H, 2M+H, M+2K-H
-# MetFrag: adduct = addition/subtraction mass, isPositive = T/F --> see http://c-ruttkies.github.io/MetFrag/projects/metfragcl/
+# MetFrag: adduct = addition/subtraction mass, isPositive = T/F --> see http://ipb-halle.github.io/MetFrag/projects/metfragcl/
 
 
 #' Generic adduct class

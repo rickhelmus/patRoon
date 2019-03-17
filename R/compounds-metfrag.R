@@ -208,23 +208,23 @@ generateMetFragRunData <- function(fGroups, MSPeakLists, mfSettings, topMost, id
 processMFResults <- function(comptab, spec, adduct, db, topMost, lfile = "")
 {
     scRanges <- list()
-    
+
     if (nrow(comptab) > 0)
     {
         compsc <- compoundScorings("metfrag")
         compsc <- compsc[compsc$metfrag %in% names(comptab), ]
-        
+
         if (nrow(compsc) > 0)
         {
             # fix up score and suspect list columns: dash --> 0
             # NOTE: do as.numeric as values with '-' will cause the column to be a character
             comptab[, (compsc$metfrag) := lapply(.SD, function(x) as.numeric(ifelse(x == "-", 0, x))),
                     .SDcols = compsc$metfrag]
-            
+
             scRanges <- setNames(lapply(compsc$metfrag, function(sc) range(comptab[[sc]])),
                                  compsc$name)
         }
-        
+
         if (!is.null(topMost) && nrow(comptab) > topMost)
             comptab <- comptab[seq_len(topMost)]
 
@@ -254,10 +254,10 @@ processMFResults <- function(comptab, spec, adduct, db, topMost, lfile = "")
     return(list(comptab = comptab, scRanges = scRanges))
 }
 
-#' @details \code{generateCompoundsMetfrag} uses the \pkg{metfRag} package for
-#'   compound identification (see \url{http://c-ruttkies.github.io/MetFrag/}).
-#'   Several online compound databases such as
-#'   \href{https://pubchem.ncbi.nlm.nih.gov/}{PubChem} and
+#' @details \code{generateCompoundsMetfrag} uses the \pkg{metfRag} package or
+#'   \command{MetFrag CL} for compound identification (see
+#'   \url{http://ipb-halle.github.io/MetFrag/}). Several online compound
+#'   databases such as \href{https://pubchem.ncbi.nlm.nih.gov/}{PubChem} and
 #'   \href{http://www.chemspider.com/}{ChemSpider} may be chosen for retrieval
 #'   of candidate structures. In addition, many options exist to score and
 #'   filter resulting data, and it is highly suggested to optimize these to
@@ -311,7 +311,7 @@ processMFResults <- function(comptab, spec, adduct, db, topMost, lfile = "")
 #'   \code{"ElementExclusionFilter"}). Some methods require further options to
 #'   be set. For all filters and more information refer to the \verb{Candidate
 #'   Filters} section on the
-#'   \href{http://c-ruttkies.github.io/MetFrag/projects/metfragr/}{MetFragR
+#'   \href{http://ipb-halle.github.io/MetFrag/projects/metfragr/}{MetFragR
 #'   homepage}. Sets the \option{MetFragPreProcessingCandidateFilter} and
 #'   \code{MetFragPostProcessingCandidateFilter} options.
 #' @param maxCandidatesToStop If more than this number of candidate structures
@@ -352,7 +352,7 @@ processMFResults <- function(comptab, spec, adduct, db, topMost, lfile = "")
 #'   \file{SelectMetaData} and \file{SelectMetaDataPlus} files are supported.
 #'   These files can be obtained from
 #'   \url{https://epa.figshare.com/articles/CompTox_Chemicals_Dashboard_Metadata_Files_for_Integration_with_MetFrag/7525199}.
-#'   Note that only recent \command{MetFrag} versions (>= \samp{2.4.5}) support
+#'    Note that only recent \command{MetFrag} versions (>= \samp{2.4.5}) support
 #'   these libraries.
 #'
 #' @references \insertRef{Ruttkies2016}{patRoon}
@@ -399,7 +399,7 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
 
     compsScores <- compoundScorings("metfrag", database)
     isLocalDB <- database %in% c("sdf", "psv", "csv", "comptox")
-    allScoringNames <- union(compsScores$name, compsScores$metfrag)        
+    allScoringNames <- union(compsScores$name, compsScores$metfrag)
     # allow freely definable scorings from local databases
     if (!isLocalDB)
         checkmate::assertSubset(scoreTypes, allScoringNames, add = ac)
@@ -407,7 +407,7 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
     checkmate::reportAssertions(ac)
 
     adduct <- checkAndToAdduct(adduct)
-    
+
     extDB <- if (!is.null(extraOpts)) extraOpts[["LocalDatabasePath"]] else NULL
     if (database == "comptox" && is.null(extDB))
     {
@@ -415,17 +415,17 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
         if (!is.null(extDB))
             extraOpts <- modifyList(if (!is.null(extraOpts)) extraOpts else list(), list(LocalDatabasePath = extDB))
     }
-        
+
     if (isLocalDB && (is.null(extDB) || !file.exists(extDB)))
     {
         ex <- "as part of the extraOpts argument, e.g. extraOpts = list(LocalDatabasePath = \"C:/DSSTox_01May18_Full_SelectMetaDataPlus.csv\")"
         if (database == "comptox")
             stop(paste("No (valid) external database file set. This should be either set as an option, e.g.",
                        "options(patRoon.path.MetFragCompTox = \"C:/DSSTox_01May18_Full_SelectMetaDataPlus.csv\") or", ex))
-        
+
         stop(paste("No external database file set. This should be set", ex))
     }
-    
+
     anaInfo <- analysisInfo(fGroups)
     ftind <- groupFeatIndex(fGroups)
     gTable <- groups(fGroups)
@@ -629,7 +629,7 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
     isMFScore <- scoreTypes %in% compsScores$metfrag
     if (any(isMFScore))
         scoreTypes[isMFScore] <- compsScores[match(scoreTypes[isMFScore], compsScores$metfrag), "name"]
-    
+
     return(compoundsMF(compounds = lapply(results, "[[", "comptab"), scoreTypes = scoreTypes,
                        scoreRanges = lapply(results, "[[", "scRanges"),
                        settings = mfSettings))

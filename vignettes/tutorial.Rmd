@@ -304,5 +304,5 @@ unlink("log", TRUE)
 [ProteoWizard]: http://proteowizard.sourceforge.net/
 [OpenMS]: http://openms.de/
 [GenForm]: https://sourceforge.net/projects/genform/
-[MetFrag]: http://c-ruttkies.github.io/MetFrag/
-[MetFragCL]: http://c-ruttkies.github.io/MetFrag/projects/metfragcl/
+[MetFrag]: http://ipb-halle.github.io/MetFrag/
+[MetFragCL]: http://ipb-halle.github.io/MetFrag/projects/metfragcl/

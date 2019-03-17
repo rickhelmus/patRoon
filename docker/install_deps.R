@@ -13,7 +13,7 @@ devtools::install_github("rickhelmus/patRoonData", upgrade_dependencies = FALSE)
 # devtools::install_github("lionel-/freetypeharfbuzz", upgrade_dependencies = FALSE)
 # devtools::install_github("lionel-/vdiffr", upgrade_dependencies = FALSE)
 install.packages("vdiffr")
-devtools::install_github("mllg/checkmate", upgrade_dependencies = FALSE)
+# devtools::install_github("mllg/checkmate", upgrade_dependencies = FALSE)
 
 install.packages("desc")
 dp <- desc::desc_get_deps()

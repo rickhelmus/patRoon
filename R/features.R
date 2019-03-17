@@ -141,7 +141,7 @@ setMethod("filter", "features", function(obj, absMinIntensity = NULL, relMinInte
                 maxInt <- max(obj@features[[ana]]$intensity)
                 obj@features[[ana]] <- obj@features[[ana]][relIntPred(intensity, maxInt)]
             }
-            
+
             if (!is.null(retentionRange))
                 obj@features[[ana]] <- obj@features[[ana]][rangePred(ret, retentionRange)]
 
@@ -150,7 +150,7 @@ setMethod("filter", "features", function(obj, absMinIntensity = NULL, relMinInte
 
             if (!is.null(mzDefectRange))
                 obj@features[[ana]] <- obj@features[[ana]][rangePred(mz - floor(mz), mzDefectRange)]
-            
+
             if (!is.null(chromWidthRange))
                 obj@features[[ana]] <- obj@features[[ana]][rangePred(retmax - retmin, chromWidthRange)]
         }
@@ -259,4 +259,25 @@ findFeatures <- function(analysisInfo, algorithm, ..., verbose = TRUE)
                 stop("Invalid algorithm! Should be: bruker, openms, xcms or envipick"))
 
     f(analysisInfo, ..., verbose = verbose)
+}
+
+#' @templateVar func importFeatures
+#' @templateVar what import features
+#' @templateVar ex1 importFeaturesXCMS
+#' @templateVar ex2 importFeaturesEnviMass
+#' @templateVar algos xcms,envimass
+#' @template generic-algo
+#'
+#' @rdname feature-finding
+#' @export
+importFeatures <- function(analysisInfo, type, ...)
+{
+    assertAnalysisInfo(analysisInfo)
+
+    f <- switch(type,
+                xcms = importFeaturesXCMS,
+                envimass = importFeaturesEnviMass,
+                stop("Invalid algorithm! Should be: xcms or envimass"))
+
+    f(analysisInfo = analysisInfo, ...)
 }

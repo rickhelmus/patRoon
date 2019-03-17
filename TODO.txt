@@ -19,7 +19,6 @@ docs
 
 
 features
-- importFeatures() function (analog to importFeatureGroups)
 - getXcmsSet --> export
 - integrate OpenMS feature scoring and isotopes and PPS in general (also include filters?)
 - feature optim:
@@ -28,7 +27,7 @@ features
     - keep retcor_done?
     - get rid of getXCMSSet() calls?
 - parallel enviPick
-- OpenMS: Support newest grouper? Update tests to newest version
+- OpenMS: Support newest grouper?
 - as.data.table for fGroups is slow?
 - tests to verify getXCMSSet...
 - filter()

@@ -123,7 +123,7 @@ NULL
 #'   instead.
 #'
 #'   }
-#'   
+#'
 "_PACKAGE"
 
 #' Analysis information
@@ -183,8 +183,8 @@ NULL
 #' @param analysisInfo \link[=analysis-information]{Analysis info table}.
 #' @param ... further parameters passed to \code{\link[xcms]{xcmsSet}}
 #'   (\code{findFeaturesXCMS}), \code{\link[enviPick]{enviPickwrap}}
-#'   (\code{featurefinderEnviPick}) or to selected feature finding algorithms
-#'   (\code{findFeatures}).
+#'   (\code{featurefinderEnviPick}) or to selected feature finding or importing
+#'   algorithms (\code{findFeatures} and \code{importFeatures}).
 #' @param verbose If set to \code{FALSE} then no text output is shown.
 #'
 #' @name feature-finding

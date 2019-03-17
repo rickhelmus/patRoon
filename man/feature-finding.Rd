@@ -4,6 +4,7 @@
 \name{feature-finding}
 \alias{feature-finding}
 \alias{findFeatures}
+\alias{importFeatures}
 \alias{findFeaturesBruker}
 \alias{findFeaturesEnviPick}
 \alias{importFeaturesEnviMass}
@@ -13,6 +14,8 @@
 \title{Finding features}
 \usage{
 findFeatures(analysisInfo, algorithm, ..., verbose = TRUE)
+
+importFeatures(analysisInfo, type, ...)
 
 findFeaturesBruker(analysisInfo, doFMF = "auto", startRange = 0,
   endRange = 0, save = TRUE, close = save, verbose = TRUE)
@@ -45,8 +48,8 @@ used: \code{"bruker"}, \code{"openms"}, \code{"xcms"}, \code{"envipick"}}
 
 \item{...}{further parameters passed to \code{\link[xcms]{xcmsSet}}
 (\code{findFeaturesXCMS}), \code{\link[enviPick]{enviPickwrap}}
-(\code{featurefinderEnviPick}) or to selected feature finding algorithms
-(\code{findFeatures}).}
+(\code{featurefinderEnviPick}) or to selected feature finding or importing
+algorithms (\code{findFeatures} and \code{importFeatures}).}
 
 \item{verbose}{If set to \code{FALSE} then no text output is shown.}
 
@@ -148,6 +151,9 @@ efficient results.}
 \code{\link[xcms:findPeaks-methods]{xcms::findPeaks}}}
 
 \item{xs}{An \code{\link{xcmsSet}} object.}
+
+\item{algorithm}{A character string describing the algorithm that should be
+used: \code{"xcms"}, \code{"envimass"}}
 }
 \value{
 An object of a class which is derived from \code{\link{features}}.
@@ -171,6 +177,13 @@ methodology and instrumentation.
   by algorithm specific functions such as \code{findFeaturesOpenMS} and
   \code{findFeaturesBruker}. While these functions may be called directly,
   \code{findFeatures} provides a generic interface and is therefore usually
+  preferred.
+
+\code{importFeatures} is a generic function that will import features
+  using one of the supported algorithms. The actual functionality is provided
+  by algorithm specific functions such as \code{importFeaturesXCMS} and
+  \code{importFeaturesEnviMass}. While these functions may be called directly,
+  \code{importFeatures} provides a generic interface and is therefore usually
   preferred.
 
 \code{findFeaturesBruker} uses the 'Find Molecular Features' (FMF)

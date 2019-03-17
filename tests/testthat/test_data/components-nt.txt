@@ -1,1 +1,1 @@
-A components object (derived from workflowStep)Algorithm: nontargetComponents: CMP1, CMP2, CMP3, CMP4, CMP5, CMP6 (6 total)Number of feature groups in components: 66 (total), 11.0 (mean), 10 - 14 (min - max)
+A components object (derived from workflowStep)Algorithm: nontargetComponents: CMP1, CMP2, CMP3 (3 total)Number of feature groups in components: 34 (total), 11.3 (mean), 10 - 14 (min - max)

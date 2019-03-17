@@ -1,1 +1,1 @@
-A componentsCamera object (derived from components -> workflowStep)Algorithm: cameraComponents: CMP1, CMP2, CMP3, CMP4, CMP5, CMP6, ... (7 total)Number of feature groups in components: 30 (total), 4.3 (mean), 2 - 9 (min - max)
+A componentsCamera object (derived from components -> workflowStep)Algorithm: cameraComponents: CMP1, CMP2, CMP3, CMP4, CMP5, CMP6, ... (8 total)Number of feature groups in components: 32 (total), 4.0 (mean), 2 - 9 (min - max)

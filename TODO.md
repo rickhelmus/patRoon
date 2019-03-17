@@ -6,7 +6,6 @@
 - ref --> blank
 - convertMSFiles()
     - Agilent .d is also a directory?
-- update tests for new OpenMS/MetFrag
 
 
 ## docs
@@ -14,6 +13,7 @@
 - Reference docs
     - Examples?
 - update tutorial
+- improve instructions for MF and SIRIUS installation?
 
 
 ## features
@@ -23,7 +23,6 @@
         - mention parameters default unless specified
     - keep retcor_done?
     - get rid of getXCMSSet() calls?
-- OpenMS: Support newest grouper?
 - tests to verify getXCMSSet...
 - rename screenTargets?
 - filter()
@@ -40,12 +39,12 @@
 
 
 ## compounds
-- clarify that sirius headless 4.0 now also works
 - MetFrag: (buggy) trivial name fetching not needed anymore?
 - SIRIUS: use --auto-charge instead of manually fixing charge of fragments (or not? conflicting docs on what it does)
 - test score normalization?
 - add new MF stat and other scorings and make sure default normalization equals that of MF web
 - improve formula scoring
+- update tests for new MetFrag
 
 
 ## formulas
@@ -84,6 +83,8 @@
 
 - integrate OpenMS feature scoring and isotopes and PPS in general (also include filters?)
 - parallel enviPick
+- OpenMS MetaboliteAdductDecharger support?
+- OpenMS: Support KD grouper?
 
 
 ## MSPeakLists

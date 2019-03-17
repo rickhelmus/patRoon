@@ -2,6 +2,7 @@ context("MS peak lists")
 
 fGroups <- getTestFGroups()[4:5, 1:100]
 plists <- generateMSPeakLists(fGroups, "mzr")
+plistsMSMS <- filter(plists, withMSMS = TRUE)
 
 if (doDATests())
 {
@@ -45,7 +46,7 @@ checkIntLimit <- function(plists, relative, doMin, doMSMS, plistsOrig = NULL)
     plists <- removePrecursors(plists)
 
     lim <- if (doMin) min else max
-    
+
     intPLLimit <- function(pl, plorig = NULL)
     {
         if (!doMSMS && !is.null(pl[["MS"]]))
@@ -69,7 +70,7 @@ checkIntLimit <- function(plists, relative, doMin, doMSMS, plistsOrig = NULL)
         ret <- lim(ints)
         if (relative)
             ret <- ret / max(intsorig)
-            
+
         return(ret)
     }
 
@@ -77,13 +78,13 @@ checkIntLimit <- function(plists, relative, doMin, doMSMS, plistsOrig = NULL)
     {
         intPLLimit(plists[[ana, grp]], if (!is.null(plistsOrig)) plistsOrig[[ana, grp]] else NULL)
     }), na.rm = TRUE)), na.rm = TRUE)
-    
+
     fgLim <- lim(sapply(names(plists@averagedPeakLists), function(grp)
     {
         intPLLimit(plists[[grp]], if (!is.null(plistsOrig)) plistsOrig[[grp]] else NULL)
     }), na.rm = TRUE)
-    
-    
+
+
     return(lim(ftLim, fgLim))
 }
 
@@ -107,22 +108,21 @@ test_that("filtering", {
     expect_gte(checkIntLimit(filter(plists, absMSMSIntThr = 2500), FALSE, TRUE, TRUE), 2500)
     expect_lte(checkIntLimit(filter(plists, absMSIntThr = 2500, negate = TRUE), FALSE, FALSE, FALSE), 2500)
     expect_lte(checkIntLimit(filter(plists, absMSMSIntThr = 2500, negate = TRUE), FALSE, FALSE, TRUE), 2500)
-    
+
     expect_gte(checkIntLimit(filter(plists, relMSIntThr = 0.2), TRUE, TRUE, FALSE, plists), 0.2)
     expect_gte(checkIntLimit(filter(plists, relMSMSIntThr = 0.2), TRUE, TRUE, TRUE, plists), 0.2)
     expect_lte(checkIntLimit(filter(plists, relMSIntThr = 0.2, negate = TRUE), TRUE, FALSE, FALSE, plists), 0.2)
     expect_lte(checkIntLimit(filter(plists, relMSMSIntThr = 0.2, negate = TRUE), TRUE, FALSE, TRUE, plists), 0.2)
-    
+
     expect_lte(checkPeaksLimit(filter(plists, topMSPeaks = 5), FALSE, FALSE), 5)
     expect_lte(checkPeaksLimit(filter(plists, topMSMSPeaks = 5), FALSE, TRUE), 5)
     expect_lte(checkPeaksLimit(filter(plists, topMSPeaks = 5, negate = TRUE), FALSE, FALSE), 5)
     expect_lte(checkPeaksLimit(filter(plists, topMSMSPeaks = 5, negate = TRUE), FALSE, TRUE), 5)
-    
-    expect_true(all(sapply(averagedPeakLists(filter(plists, withMSMS = TRUE)),
-                           function(pl) !is.null(pl[["MSMS"]]))))
+
+    expect_true(all(sapply(averagedPeakLists(plistsMSMS), function(pl) !is.null(pl[["MSMS"]]))))
     expect_true(all(sapply(averagedPeakLists(filter(plists, withMSMS = TRUE, negate = TRUE)),
                            function(pl) is.null(pl[["MSMS"]]))))
-    
+
     expect_lte(length(filter(plists, topMSMSPeaks = 5, retainPrecursorMSMS = FALSE)),
                length(filter(plists, topMSMSPeaks = 5)))
     # UNDONE: deisotope?
@@ -170,11 +170,11 @@ test_that("basic functionality", {
 test_that("plotting works", {
     expect_doppel("mspl-spec-ms", function() plotSpec(plists, groupName = groupNames(plists)[70],
                                                       analysis = analyses(plists)[1], MSLevel = 1))
-    expect_doppel("mspl-spec-msms", function() plotSpec(plists, groupName = groupNames(plists)[70],
-                                                        analysis = analyses(plists)[1], MSLevel = 2))
+    expect_doppel("mspl-spec-msms", function() plotSpec(plistsMSMS, groupName = groupNames(plistsMSMS)[2],
+                                                        analysis = analyses(plistsMSMS)[1], MSLevel = 2))
     expect_doppel("mspl-spec-avg-ms", function() plotSpec(plists, groupName = groupNames(plists)[70],
                                                           MSLevel = 1))
-    expect_doppel("mspl-spec-avg-msms", function() plotSpec(plists, groupName = groupNames(plists)[70],
+    expect_doppel("mspl-spec-avg-msms", function() plotSpec(plistsMSMS, groupName = groupNames(plistsMSMS)[2],
                                                             MSLevel = 2))
 
     expect_plot(print(plotSpec(plists, groupName = groupNames(plists)[70],

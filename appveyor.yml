@@ -12,7 +12,7 @@ install:
     - ps: mkdir -Force c:\deps
     - ps: >-
         if (-Not (Test-Path C:\deps\openms.exe)) {
-            Invoke-WebRequest https://github.com/OpenMS/OpenMS/releases/download/Release2.3.0/OpenMS-2.3.0-Win64.exe -OutFile "C:\deps\openms.exe"
+            Invoke-WebRequest https://abibuilder.informatik.uni-tuebingen.de/archive/openms/OpenMSInstaller/release/2.4.0/OpenMS-2.4.0-Win64.exe -OutFile "C:\deps\openms.exe"
         }
         C:\deps\openms.exe /S
     - ps: >-
@@ -69,8 +69,8 @@ build_script:
     - travis-tool.sh install_deps
 
 test_script:
-    - set PATH=C:\Program Files\OpenMS-2.3.0\bin;%PATH%
-    - set OPENMS_DATA_PATH=C:\Program Files\OpenMS-2.3.0\share\OpenMS
+    - set PATH=C:\Program Files\OpenMS-2.4.0\bin;%PATH%
+    - set OPENMS_DATA_PATH=C:\Program Files\OpenMS-2.4.0\share\OpenMS
     - set PATROON_METFRAG=C:\deps\MetFrag2.4.3-CL.jar
     - set PATROON_SIRIUS=C:\deps\sirius-win64-headless-4.0.1
     - set PATROON_JUNIT=%APPVEYOR_BUILD_FOLDER%\junit.xml

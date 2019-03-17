@@ -108,8 +108,8 @@ test_that("basic filtering", {
 
     expect_identical(replicateGroups(filter(fgOpenMS, rGroups = "standard")), "standard")
     expect_identical(replicateGroups(filter(fgOpenMS, removeBlanks = TRUE)), "standard")
-    expect_identical(replicateGroups(removeEmptyAnalyses(filter(fgOpenMS, relMinFeatures = 0.75))), "standard")
-    expect_identical(replicateGroups(removeEmptyAnalyses(filter(fgOpenMS, absMinFeatures = 450))), "standard")
+    expect_identical(replicateGroups(removeEmptyAnalyses(filter(fgOpenMS, relMinFeatures = 0.7))), "standard")
+    expect_identical(replicateGroups(removeEmptyAnalyses(filter(fgOpenMS, absMinFeatures = 400))), "standard")
     expect_identical(replicateGroups(removeEmptyAnalyses(filter(fgOpenMS, blankThreshold = 1E6))), "standard")
 
     expect_known_output(filter(fgOpenMS, relMinAnalyses = 0.5), testFile("fgf-minana-rel", text = TRUE))

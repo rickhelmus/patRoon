@@ -21,8 +21,8 @@ RUN apt-get update -y && \
         r-bioc-biocparallel r-bioc-affy r-bioc-biocgenerics r-bioc-biobase \
         r-bioc-rbgl r-bioc-s4vectors r-bioc-biocparallel r-bioc-multtest && \
     mkdir -p $SETUPDIR && \
-    wget -P $SETUPDIR https://github.com/OpenMS/OpenMS/releases/download/Release2.3.0/OpenMS-2.3.0-Linux.deb && \
-    apt-get install -y --no-install-recommends $SETUPDIR/OpenMS-2.3.0-Linux.deb && \
+    wget -P $SETUPDIR https://abibuilder.informatik.uni-tuebingen.de/archive/openms/OpenMSInstaller/release/2.4.0/OpenMS-2.4.0-Debian-Linux-x86_64.deb && \
+    apt-get install -y --no-install-recommends $SETUPDIR/OpenMS-2.4.0-Debian-Linux-x86_64.deb && \
     rm -rf $SETUPDIR && \
     useradd -ms /bin/bash patRoon && \
     addgroup patRoon staff && \

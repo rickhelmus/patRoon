@@ -136,7 +136,7 @@ setMethod("checkChromatograms", "featureGroups", function(fGroups, mzWindow, ena
     checkmate::assertNumber(mzWindow, lower = 0, finite = TRUE, add = ac)
     checkmate::assertCharacter(enabledFGroups, null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
-    
+
     fTable <- featureTable(fGroups)
     anaInfo <- analysisInfo(fGroups)
     gInfo <- groupInfo(fGroups)
@@ -154,7 +154,7 @@ setMethod("checkChromatograms", "featureGroups", function(fGroups, mzWindow, ena
     EICPreviews <- getEICsForFGroups(fGroups, 10, mzWindow, topMost = 1, onlyPresent = FALSE)
     # format is in [[ana]][[fGroup]], since we only took top most intensive we can throw away the ana dimension
     EICPreviews <- Reduce(modifyList, EICPreviews)
-    
+
     hotOpts <- list(rowHeaderWidth = 40, readOnly = TRUE, disableVisualSelection = "area",
                     columnSorting = TRUE, sortIndicator = TRUE, selectCallback = TRUE,
                     currentRowClassName = "currentRow", stretchH = "all",
@@ -208,7 +208,7 @@ setMethod("checkChromatograms", "featureGroups", function(fGroups, mzWindow, ena
                 disAna <- setdiff(anaInfo$analysis, rValues$enabledAnalyses)
                 if (length(disAna) > 0)
                     fts <- rbindlist(sapply(disAna, getFTData, simplify = FALSE), fill = TRUE)
-                
+
                 if (length(disAna) == 0 || all(is.na(fts$ret)))
                     return(NULL) # still no luck
             }
@@ -221,12 +221,12 @@ setMethod("checkChromatograms", "featureGroups", function(fGroups, mzWindow, ena
             # UNDONE disabled for now
             # rtwin <- max(input$rtRange * rtRange / 100, input$rtZWindow)
             rtwin <- input$rtZWindow
-            
+
             # subset fGroups. NOTE: don't use [ operator to avoid removing empty groups
             fg <- removeAnalyses(fGroups, match(setdiff(anaInfo$analysis, rValues$enabledAnalyses),
                                                 anaInfo$analysis))
             fg <- removeGroups(fg, which(g != names(fGroups)))
-            
+
             EICs <- getEICsForFGroups(fg, rtwin, input$mzWindow, topMost = NULL, onlyPresent = FALSE)
             # EICs are in [[ana]][[fgroup]] --> only have one fgroup so get rid of that dimension
             ret$data <- lapply(EICs, "[[", 1)
@@ -246,10 +246,11 @@ setMethod("checkChromatograms", "featureGroups", function(fGroups, mzWindow, ena
 
         fGroupData <- reactive({
             # initialize data
-            ret <- data.frame(group = rownames(gInfo), EIC = sapply(seq_len(nrow(gInfo)),
-                                                                    function(i) jsonlite::toJSON(list(values = EICPreviews[[i]]$intensity,
-                                                                                                      xvalues = EICPreviews[[i]]$time,
-                                                                                                      options = list(type = "line", height = 50)))),
+            ret <- data.frame(group = rownames(gInfo),
+                              EIC = sapply(rownames(gInfo),
+                                           function(g) jsonlite::toJSON(list(values = EICPreviews[[g]]$intensity,
+                                                                             xvalues = EICPreviews[[g]]$time,
+                                                                             options = list(type = "line", height = 50)))),
                               keep = rValues$enabledHotFGroups, retention = gInfo$rts, mz = gInfo$mzs, stringsAsFactors = FALSE)
             ret[, unique(anaInfo$group)] <- t(avgGTable)
             ret[, "retention"] <- if (input$retUnit == "Minutes") gInfo$rts / 60 else gInfo$rts

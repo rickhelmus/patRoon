@@ -2,9 +2,8 @@ options(Ncpus = 3)
 
 install.packages("devtools")
 
-source("https://bioconductor.org/biocLite.R")
-biocLite(c("mzR", "xcms", "CAMERA"))
-biocLite(c("Rdisop", "InterpretMSSpectrum")) # need to install these deps manually (why??)
+BiocManager::install(c("mzR", "xcms", "CAMERA"))
+BiocManager::install(c("Rdisop", "InterpretMSSpectrum")) # need to install these deps manually (why??)
 
 # devtools::install_github("cbroeckl/RAMClustR@0370902", upgrade_dependencies = FALSE)
 devtools::install_github("cbroeckl/RAMClustR", upgrade_dependencies = FALSE)

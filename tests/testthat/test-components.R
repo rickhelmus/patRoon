@@ -168,7 +168,7 @@ test_that("plotting works", {
     # expect_doppel("compon-spec-mark", function() plotSpec(compsNT, 1, markFGroup = names(fGroups)[1]))
     expect_plot(plotSpec(compsRC, 1))
     expect_plot(plotSpec(compsRC, 1, markFGroup = names(fGroupsSimple)[1]))
-    expect_plot(print(plotSpec(compsRC, 1, useGGPlot2 = TRUE)))
+    expect_ggplot(plotSpec(compsRC, 1, useGGPlot2 = TRUE))
     expect_doppel("eic-component", function() plotEIC(compsRC, 1, fGroupsSimple))
 
     expect_plot(plot(compsInt))

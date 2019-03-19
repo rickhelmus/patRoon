@@ -253,8 +253,8 @@ test_that("plotting works", {
     # expect_doppel("spec-gg", plotSpec(formsGFWithMSMS, fTable[byMSMS == TRUE, formula][1],
     #                                                 fTable[byMSMS == TRUE, group][1], plists,
     #                                                 useGGPlot2 = TRUE))
-    expect_plot(print(plotSpec(formsGFWithMSMS, plotPrec, groupNames(formsGFWithMSMS)[1], MSPeakLists = plists,
-                               useGGPlot2 = TRUE)))
+    expect_ggplot(plotSpec(formsGFWithMSMS, plotPrec, groupNames(formsGFWithMSMS)[1], MSPeakLists = plists,
+                           useGGPlot2 = TRUE))
     
     expect_doppel("form-scores", function() plotScores(formsGFWithMSMS, plotPrec, groupNames(formsGFWithMSMS)[1]))
     

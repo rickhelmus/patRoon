@@ -16,8 +16,8 @@ install:
         }
         C:\deps\openms.exe /S
     - ps: >-
-        if (-Not (Test-Path C:\deps\MetFrag2.4.3-CL.jar)) {
-            Invoke-WebRequest http://msbi.ipb-halle.de/~cruttkie/metfrag/MetFrag2.4.3-CL.jar -OutFile "C:\deps\MetFrag2.4.3-CL.jar"
+        if (-Not (Test-Path C:\deps\MetFrag2.4.5-CL.jar)) {
+            Invoke-WebRequest http://msbi.ipb-halle.de/~cruttkie/metfrag/MetFrag2.4.5-CL.jar -OutFile "C:\deps\MetFrag2.4.5-CL.jar"
         }
     - ps: >-
         if (-Not (Test-Path C:\deps\sirius-win64-headless-4.0.1)) {
@@ -71,7 +71,7 @@ build_script:
 test_script:
     - set PATH=C:\Program Files\OpenMS-2.4.0\bin;%PATH%
     - set OPENMS_DATA_PATH=C:\Program Files\OpenMS-2.4.0\share\OpenMS
-    - set PATROON_METFRAG=C:\deps\MetFrag2.4.3-CL.jar
+    - set PATROON_METFRAG=C:\deps\MetFrag2.4.5-CL.jar
     - set PATROON_SIRIUS=C:\deps\sirius-win64-headless-4.0.1
     - set PATROON_JUNIT=%APPVEYOR_BUILD_FOLDER%\junit.xml
     # HACK for SIRIUS

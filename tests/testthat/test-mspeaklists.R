@@ -180,11 +180,11 @@ test_that("plotting works", {
     expect_ggplot(plotSpec(plists, groupName = groupNames(plists)[70],
                            analysis = analyses(plists)[1], MSLevel = 1,
                            useGGPlot2 = TRUE))
-    expect_ggplot(plotSpec(plists, groupName = groupNames(plists)[70],
-                           analysis = analyses(plists)[1], MSLevel = 2,
+    expect_ggplot(plotSpec(plistsMSMS, groupName = groupNames(plistsMSMS)[2],
+                           analysis = analyses(plistsMSMS)[1], MSLevel = 2,
                            useGGPlot2 = TRUE))
     expect_ggplot(plotSpec(plists, groupName = groupNames(plists)[70], MSLevel = 1,
                            useGGPlot2 = TRUE))
-    expect_ggplot(plotSpec(plists, groupName = groupNames(plists)[70], MSLevel = 2,
+    expect_ggplot(plotSpec(plistsMSMS, groupName = groupNames(plistsMSMS)[2], MSLevel = 2,
                            useGGPlot2 = TRUE))
 })

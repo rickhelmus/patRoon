@@ -18,8 +18,7 @@ knitr::opts_chunk$set(
   message = FALSE
 )
 
-options("patRoon.cache.fileName" = "~/werk/tutorial.sqlite")
-options(patRoon.path.MetFragCL = "~/werk/MetFrag2.4.3-CL.jar")
+options(patRoon.cache.fileName = "~/tutorial.sqlite")
 
 options(width=250) # big nr to avoid wrapping text in code chunks
 ```
@@ -37,12 +36,64 @@ The intro ...
 
 ### Workflow
 
-## Data preparation
+## Data
+
 In this tutorial we will use example data provided within the [patRoonData] package. Please make sure this package is installed (see the [readme] for brief installation instructions). The example dataset contains LC-MS data for a standard mixture with known composition ('standard-X') and a blank solvent ('solvent-X'), both in triplicate. While this may not seem like the most exciting data, it does allow to demonstrate the most important functionalities of `patRoon`.
 
-The provided analyses already have been exported to an open format (_.mzML_) and are ready to use. For your own data it may be necessary to first perform mass recalibration and data export using external tools such as [ProteoWizard] or vendor software (`patRoon` supplies several utilities for Bruker data, see the bruker-utils reference documentation) to _mzML_ or _mzXML_ files.
+The provided analyses already have been exported to an open format (_.mzML_) and are ready to use. For your own data it may be necessary to first  export your data to _mzXML_ or _mzML_ and perform other data pre-treatment steps such as mass recalibration. This can be done using the tools from [ProteoWizard] or software from your mass spectrometer vendor. Alternatively, `patRoon` can do this automatically for your analyses with the `convertMSFiles()` function. Please see the reference manual or other vignettes for its usage.
 
 ## New project
+
+Whenever you start a new non-target analysis it is highly recommended to start this from a fresh _project directory_. This directory will contain your `R` processing script(s) and any other output generated during the workflow. Note that this directory does not have to contain the raw MS data files. In fact, keeping these files separate may be handy, for instance, if you want to run multiple non-target analyses on these files or store the analysis files on a shared location.
+
+Starting a new project typically conists of
+
+1. Creating a new directory (unsurprisingly!)
+2. Changing the active working directory to he project directory (e.g. with `setwd()`).
+3. Create (or copy) an `R` processing script.
+
+Note that step 2 is important as any output files (e.g. reports and cached results) are stored to the current working directory by default. Consequenly, always take care to ensure that this directory is active, for instance, after restarting `R`.
+
+Steps 1-3 can be easily performed with the `newProject()` function. Alternatively, you can of course also perform these steps yourself. Both approaches will be discussed in the next sections.
+
+### Automatic project creation
+
+Ensure that RStudio is active and start the new project utility:
+
+```{r eval=FALSE}
+patRoon::newProject()
+```
+
+> NOTE: Currently `newProject()` _only_ works when using RStudio.
+
+A dialog should pop-up where you can specify where and how the new project will be generated, which analyses you want to include and define a basic workflow. Based on this input a new project with a template script will be automatically generated.
+
+For this tutorial make the following selections
+* **Destination tab** Select your desired location of the new project. Leave other settings as they are.
+* **Analyses tab** Here you normally select your analyses. However, for this tutorial simply select the _Example data_ option.
+* **Data pre-treatment tab** Since the example data is already ready to use you can simply skip this tab.
+* **Features tab** Leave the default OpenMS algorithm for feature finding and grouping.
+* **Annotation tab** Select _GenForm_, _MetFrag_ and _mzR_ for the formula generation, compound identification and peak list generator options, respectively (note that the last will become visible when selecting either of the other options). Select _RAMClustR_ for component generation.
+* **Reporting tab** You can leave any defaults here.
+
+### Manual project creation
+
+For RStudio users it is easiest to simply create a new RStudio project (e.g. _File_ --> _New Project_). This will create a new directory and ensure that the working directory is set whenever you re-open this project from RStudio. Alternatively, you can do this manually, for intance:
+```{r eval=FALSE}
+projDir <- "~/myProjectDir"
+dir.create(projDir)
+setwd(projDir)
+```
+
+The next step is to create a new `R` script. For this tutorial simply copy the script that is shown in the next section to a new `.R` file.
+
+### Template R script
+
+After you ran `newProject()` the file below will be created. Before running this script, however, we still have to add and modify some of its code. In the next sections you will learn more about each part of the script, make the necessary changes and run its code.
+
+```{r eval=FALSE}
+# insert template script here
+```
 
 To start a new non-target analysis it is highly recommended to create a new directory. We will refer to this directory as the _project directory_. This directory typically contains:
 

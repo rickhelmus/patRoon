@@ -44,7 +44,6 @@
 - test score normalization?
 - add new MF stat and other scorings and make sure default normalization equals that of MF web
 - improve formula scoring
-- update tests for new MetFrag
 
 
 ## formulas

@@ -108,6 +108,21 @@ expect_plot <- function(object)
     invisible(act$val)
 }
 
+expect_ggplot <- function(object)
+{
+    act <- quasi_label(rlang::enquo(object))
+    expect(!is.null(object), "NULL plot")
+    
+    if (!is.null(object))
+    {
+        tf <- tempfile()
+        withr::with_png(tf, print(object))
+        expect(file.exists(tf), "failed to generate plot")
+    }
+    
+    invisible(act$val)
+}
+
 # noDate should be TRUE for consistent report generation (ie when verifying cached report)
 makeReportMD <- function(fGroups, ...) reportMD(fGroups, getWorkPath(), openReport = FALSE, noDate = TRUE, ...)
 expect_reportMD <- function(object)

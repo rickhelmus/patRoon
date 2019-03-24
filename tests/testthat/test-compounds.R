@@ -282,7 +282,7 @@ test_that("plotting works", {
     expect_doppel("compound-spec", function() plotSpec(compsMFIso, 1, names(compoundTable(compsMFIso))[1], plists, plotStruct = FALSE))
     expect_plot(plotSpec(compsMFIso, 1, names(compoundTable(compsMFIso))[1], plists, plotStruct = TRUE))
     # expect_doppel("spec-gg", plotSpec(compsMFIso, 1, names(compoundTable(compsMFIso))[1], plists, useGGPlot2 = TRUE))
-    expect_plot(print(plotSpec(compsMFIso, 1, names(compoundTable(compsMFIso))[1], plists, useGGPlot2 = TRUE)))
+    expect_ggplot(plotSpec(compsMFIso, 1, names(compoundTable(compsMFIso))[1], plists, useGGPlot2 = TRUE))
 
     # plotStructure gives an empty plot??
     # expect_doppel("struct", function() plotStructure(compsMFIso, 1, names(compoundTable(compsMFIso))[1]))

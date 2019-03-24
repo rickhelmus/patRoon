@@ -19,6 +19,13 @@ anaInfo <- generateAnalysisInfo(paths = c({{ paste0("\"", unique(analyses$path),
                                 groups = c({{ paste0("\"", analyses$group, "\"", collapse = ", ") }}),
                                 refs = c({{ paste0("\"", analyses$ref, "\"", collapse = ", ") }}))
 {{ endCodeBlock() }}
+{{ optionalCodeBlock(generateAnaInfo == "example") }}
+
+# Take example data from patRoonData package (triplicate solvent blank + triplicate standard)
+anaInfo <- generateAnalysisInfo(paths = patRoonData::exampleDataPath(),
+                                groups = c(rep("solvent", 3), rep("standard", 3)),
+                                refs = "solvent")
+{{ endCodeBlock() }}
 {{ optionalCodeBlock(generateAnaInfo == "none") }}
 
 # NOTE: please set anaInfo to a valid data.frame with analysis information. See ?`analysis-information` for more details.

@@ -156,31 +156,38 @@ getNewProjectUI <- function(destPath)
                              fillCol(
                                  flex = c(NA, NA, 1),
                                  fillRow(
-                                     height = 110,
+                                     height = 120,
                                      radioButtons("generateAnaInfo", "Generate analysis information",
                                                   c("None" = "none", "From new csv file" = "table",
-                                                    "Load in script" = "script")),
+                                                    "Load in script" = "script", "Example data" = "example")),
                                      conditionalPanel(
                                          condition = "input.generateAnaInfo == \"table\"",
                                          textInput("analysisTableFile", "Analysis table output file", "analyses.csv")
                                      )
                                  ),
                                  conditionalPanel(
-                                     condition = "input.generateAnaInfo != \"none\"",
+                                     condition = "input.generateAnaInfo == \"table\" || input.generateAnaInfo == \"script\"",
                                      fillRow(
                                          height = 30,
                                          textNote("Make sure to consider data conversion if data files are not yet in mzXML/mzML format.")
                                      )
                                  ),
                                  conditionalPanel(
-                                     condition = "input.generateAnaInfo != \"none\"",
+                                     condition = "input.generateAnaInfo == \"example\"",
+                                     fillRow(
+                                         height = 30,
+                                         textNote("Make sure that the patRoonData package is installed.")
+                                     )
+                                 ),
+                                 conditionalPanel(
+                                     condition = "input.generateAnaInfo == \"table\" || input.generateAnaInfo == \"script\"",
                                      rHandsontableOutput("analysesHot")
                                  )
                              )
                          ),
 
                          conditionalPanel(
-                             condition = "input.generateAnaInfo != \"none\"",
+                             condition = "input.generateAnaInfo == \"table\" || input.generateAnaInfo == \"script\"",
                              miniButtonBlock(
                                  actionButton("addAnalysesDir", "Add analyses from directory ..."),
                                  actionButton("addAnalysesCSV", "Add analyses from csv file ..."),
@@ -386,7 +393,7 @@ newProject <- function(destPath = NULL)
                 showDialog("Invalid destination", "Please select a destination path!", "")
             else if (input$outputScriptTo != "curFile" && input$scriptFile == "")
                 showDialog("No script file", "Please select a destination script file!", "")
-            else if (input$generateAnaInfo != "none" && nrow(rValues$analyses) == 0)
+            else if (input$generateAnaInfo %in% c("table", "script") && nrow(rValues$analyses) == 0)
                 showDialog("No analyses selected", "Please select some analyses!", "")
             else if (input$generateAnaInfo == "table" && file.exists(file.path(input$destinationPath, input$analysisTableFile)) &&
                      !showQuestion("Analysis table file already exists",

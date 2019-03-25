@@ -44,7 +44,9 @@ The intro ...
 
 ## Data
 
-In this tutorial we will use example data provided within the [patRoonData] package. Please make sure this package is installed (see the [readme] for brief installation instructions). The example data set contains LC-MS data for a standard mixture with known composition ('standard-X') and a blank solvent ('solvent-X'), both in triplicate. While this may not seem like the most exciting data, it does allow to demonstrate the most important functionalities of `patRoon`.
+In this tutorial we will use example data provided within the [patRoonData] package. Please make sure this package is installed (see the [readme] for brief installation instructions). The example dataset contains LC-MS data for a standard mixture with known composition ('standard-X') and a blank solvent ('solvent-X'), both in triplicate. While this may not seem like the most exciting data, it does allow to demonstrate the most important functionalities of `patRoon`.
+
+<!-- UNDONE: Move/Refer below to other vignette -->
 
 The provided analyses already have been exported to an open format (_.mzML_) and are ready to use. For your own data it may be necessary to first  export your data to _mzXML_ or _mzML_ and perform other data pre-treatment steps such as mass re-calibration. This can be done using the tools from [ProteoWizard] or software from your mass spectrometer vendor. Alternatively, `patRoon` can do this automatically for your analyses with the `convertMSFiles()` function. Please see the reference manual or other vignettes for its usage.
 
@@ -55,7 +57,7 @@ Whenever you start a new non-target analysis it is highly recommended to start t
 Starting a new project typically consists of
 
 1. Creating a new directory (unsurprisingly!)
-2. Changing the active working directory to he project directory (e.g. with `setwd()`).
+2. Changing the active working directory to the project directory (e.g. with `setwd()`).
 3. Create (or copy) an `R` processing script.
 
 Note that step 2 is important as any output files (e.g. reports and cached results) are stored to the current working directory by default. Consequently, always take care to ensure that this directory is active, for instance, after restarting `R`.
@@ -75,6 +77,7 @@ patRoon::newProject()
 A dialog should pop-up where you can specify where and how the new project will be generated, which analyses you want to include and define a basic workflow. Based on this input a new project with a template script will be automatically generated.
 
 For this tutorial make the following selections
+
 * **Destination tab** Select your desired location of the new project. Leave other settings as they are.
 * **Analyses tab** Here you normally select your analyses. However, for this tutorial simply select the _Example data_ option.
 * **Data pre-treatment tab** Since the example data is already ready to use you can simply skip this tab.
@@ -84,7 +87,8 @@ For this tutorial make the following selections
 
 ### Manual project creation
 
-For RStudio users it is easiest to simply create a new RStudio project (e.g. _File_ --> _New Project_). This will create a new directory and ensure that the working directory is set whenever you re-open this project from RStudio. Alternatively, you can do this manually, for instance:
+For RStudio users it is easiest to simply create a new RStudio project (e.g. _File_ --> _New Project_). This will create a new directory and ensure that the working directory is set whenever you re-open it. Alternatively, you can do this manually, for instance:
+
 ```{r eval=FALSE}
 projDir <- "~/myProjectDir"
 dir.create(projDir)
@@ -109,7 +113,7 @@ In this section the script that was generated will be discussed in more detail..
 
 The first part of the script loads `patRoon`, makes sure the current working directory is set correctly and loads information about or analyses. This part in your script looks more or less like this:
 
-```{r init,eval=FALSE,eval=-4}
+```{r init,eval=FALSE}
 library(patRoon)
 
 workPath <- "C:/my_project"
@@ -122,7 +126,21 @@ anaInfo <- generateAnalysisInfo(paths = patRoonData::exampleDataPath(),
                                 refs = "solvent")
 ```
 
+```{r init,include=FALSE}
+# negative numeric eval option to disable lines is useless nowadays as it
+# visually comments out the code --> guess we need two blocks
+# https://github.com/yihui/knitr/issues/558
+
+library(patRoon)
+
+# Take example data from patRoonData package (triplicate solvent blank + triplicate standard)
+anaInfo <- generateAnalysisInfo(paths = patRoonData::exampleDataPath(),
+                                groups = c(rep("solvent", 3), rep("standard", 3)),
+                                refs = "solvent")
+```
+
 After you ran this part the analysis information should be stored in the `anaInfo` variable. This information is important as it will be required for subsequent steps in the workflow. Lets peek at its contents:
+
 ```{r anaInfo}
 anaInfo
 ```
@@ -147,7 +165,7 @@ In this tutorial the analysis information was generated by the `generateAnalysis
 
 The first step of a LC-MS non-target analysis workflow is typically the extraction of so called 'features'. While sometimes slightly different definitions are used, a feature can be seen as a single peak within an extracted ion chromatogram. For a complex sample it is not uncommon that hundreds to thousands of features can extracted. Because these large numbers this process is typically automatized nowadays.
 
-To obtain all the features within your data set the `findFeatures` function is used. This function requires data on the analysis information (`anaInfo` variable created earlier) and the desired algorithm that should be used. On top of that there are many more options that can significantly influence the feature finding process, hence, it is important to evaluate results afterwards.
+To obtain all the features within your dataset the `findFeatures` function is used. This function requires data on the analysis information (`anaInfo` variable created earlier) and the desired algorithm that should be used. On top of that there are many more options that can significantly influence the feature finding process, hence, it is important to evaluate results afterwards.
 
 In this tutorial we will use the [OpenMS] software to find features and stick to default parameters:
 
@@ -155,7 +173,7 @@ In this tutorial we will use the [OpenMS] software to find features and stick to
 fList <- findFeatures(anaInfo, "openms")
 ```
 
-After some processing time (especially for larger data sets), the next step is to _group features_. During this step, features from different analysis are grouped, optionally after alignment of their retention times. This grouping is necessary because it is common that instrumental errors will result in (slight) variations in both retention time and _m/z_ values which may complicate comparison of features between analyses. The resulting groups are referred to as **feature groups** and are crucial input for subsequent workflow steps.
+After some processing time (especially for larger datasets), the next step is to _group features_. During this step, features from different analysis are grouped, optionally after alignment of their retention times. This grouping is necessary because it is common that instrumental errors will result in (slight) variations in both retention time and _m/z_ values which may complicate comparison of features between analyses. The resulting groups are referred to as **feature groups** and are crucial input for subsequent workflow steps.
 
 To group features the `groupFeatures()` function is used, which has similar argument requirements as `findFeatures()` and likewise has many more options to tune the process. 
 
@@ -165,7 +183,7 @@ fGroups <- groupFeatures(fList, "openms")
 
 ### Data clean-up
 
-The next step is to perform some basic rule based filtering with the filter() function. As its name suggests this function has several way to filter data. It is a so called generic function and methods exists for various data types, such as the feature groups object (fGroups) that was made in the previous section.
+The next step is to perform some basic rule based filtering with the filter() function. As its name suggests this function has several ways to filter data. It is a so called generic function and methods exists for various data types, such as the feature groups object that was made in the previous section (stored in the the `fGroups` variable).
 
 ```{r filtering}
 fGroups <- filter(fGroups, preAbsMinIntensity = 100, absMinIntensity = 10000,
@@ -175,16 +193,18 @@ fGroups <- filter(fGroups, preAbsMinIntensity = 100, absMinIntensity = 10000,
 ```
 
 
-During filtering features will be removed if:
+The following filterings steps will be performed:
 
-* Their intensity is below a defined intensity threshold (set by `absMinIntensity`). This filter is an effective way to remove not only 'noisy' data, but can also be used to remove any low intensity features which likely miss MS/MS data (assuming you are interested in this and data has been recorded with it).
-* They are not ubiquitously present in (part of) replicate analyses. This is controlled by setting `relMinReplicateAbundance`. The value is relative, for instance, a value of `0.5` would mean that a feature needs to be present in half of the replicates. In this tutorial we use a value of `1` which means that a feature should be present in all replicate samples. This is a _very_ effective filter in removing any outliers or features which don't actually represent a well defined chromatographic peak, but perhaps are just part of another peak or are simply noise.
-* Similarly, the `maxReplicateIntRSD` setting controls the maximum relative standard deviation (RSD) of the intensity of features within a replicate group.
-* Features that do not have a significantly higher intensity than the blank intensity are removed. This is controlled by `blankThreshold`: the given value of `5` means that the intensity of a feature needs to be at least five times higher compared to the (average) blank signal.
+* Features are removed if their intensity is below a defined intensity threshold (set by `absMinIntensity`). This filter is an effective way to  not only remove 'noisy' data, but, for instance, can also be used to remove any low intensity features which likely miss MS/MS data.
+* If a feature is not ubiquitously present in (part of) replicate analyses it will be filtered out from that replicate group. This is controlled by setting `relMinReplicateAbundance`. The value is relative, for instance, a value of `0.5` would mean that a feature needs to be present in half of the replicates. In this tutorial we use a value of `1` which means that a feature should be present in all replicate samples. This is a _very_ effective filter in removing any outliers, for instance, caused by features which don't actually represent a well defined chromatographic peak.
+* Similarly, features with within a replicate group are removed if the relative standard deviation (RSD) of their intensities exceeds that of the value set by the `maxReplicateIntRSD` argument.
+* Features are filtered out that do not have a significantly higher intensity than the blank intensity. This is controlled by `blankThreshold`: the given value of `5` means that the intensity of a feature needs to be at least five times higher compared to the (average) blank signal.
 
-The `removeBlanks` argument tells will remove all blank analyses after filtering. The `retentionRange` and `mzRange` arguments are not used here, but could be used to filter out any features outside a give retention or _m/z_ range. There are many more filters, see `?filter()` for more information.
+The `removeBlanks` argument tells will remove all blank analyses after filtering. The `retentionRange` and `mzRange` arguments are not used here, but could be used to filter out any features outside a give retention or _m/z_ range. There are many more filters: see `?filter()` for more information.
 
-As you have noticed quite a large part of the features are removed as a result of the filtering step. However, using the right settings is a very effective way to separate interesting data from the rest.
+As you may have noticed quite a large part of the features are removed as a result of the filtering step. However, using the right settings is a very effective way to separate interesting data from the rest.
+
+<!-- UNDONE: add link below to other vignette when it contains prioritization -->
 
 The next logical step in a non-target workflow is often to perform further prioritization of data. However, this will not be necessary in this tutorial as our samples are just known standard mixtures.
 
@@ -219,7 +239,7 @@ plotEIC(fGroups, colourBy = "fGroups", showFGroupRect = FALSE, showPeakArea = TR
 
 ### MS peak lists
 
-Having obtained a good data set with features of interest, we can start moving to figuring out what these may be. Before performing any identification steps, however, the first step is to extract all relevant MS data. The tutorial data was obtained with data-dependent MS/MS, so in the ideal case we can obtain both MS and MS/MS data for each feature group.
+Having obtained a good dataset with features of interest, we can start moving to figuring out what these may be. Before performing any identification steps, however, the first step is to extract all relevant MS data. The tutorial data was obtained with data-dependent MS/MS, so in the ideal case we can obtain both MS and MS/MS data for each feature group.
 
 The `generateMSPeakLists()` function will perform this action for us and will generate so called _MS peak lists_ in the process. These lists are basically (averaged) spectra in a tabular form. The command below will use the _mzR_ algorithm to do so:
 

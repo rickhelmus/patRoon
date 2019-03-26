@@ -13,12 +13,10 @@ vignette: >
 
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
-  collapse = TRUE,
   comment = "#>",
   warning = FALSE,
   error = FALSE,
-  message = FALSE,
-  results = "hold"
+  message = FALSE
 )
 
 options(patRoon.cache.fileName = "~/tutorial.sqlite")
@@ -126,7 +124,7 @@ anaInfo <- generateAnalysisInfo(paths = patRoonData::exampleDataPath(),
                                 refs = "solvent")
 ```
 
-```{r init,include=FALSE}
+```{r doInit,include=FALSE}
 # negative numeric eval option to disable lines is useless nowadays as it
 # visually comments out the code --> guess we need two blocks
 # https://github.com/yihui/knitr/issues/558
@@ -239,9 +237,9 @@ plotEIC(fGroups, colourBy = "fGroups", showFGroupRect = FALSE, showPeakArea = TR
 
 ### MS peak lists
 
-Having obtained a good dataset with features of interest, we can start moving to figuring out what these may be. Before performing any identification steps, however, the first step is to extract all relevant MS data. The tutorial data was obtained with data-dependent MS/MS, so in the ideal case we can obtain both MS and MS/MS data for each feature group.
+After obtaining a good dataset with features of interest we can start moving to find their chemical identity. Before doing so, however, the first step is to extract all relevant MS data that will be used for annotation. The tutorial data was obtained with data-dependent MS/MS, so in the ideal case we can obtain both MS and MS/MS data for each feature group.
 
-The `generateMSPeakLists()` function will perform this action for us and will generate so called _MS peak lists_ in the process. These lists are basically (averaged) spectra in a tabular form. The command below will use the _mzR_ algorithm to do so:
+The `generateMSPeakLists()` function will perform this action for us and will generate so called _MS peak lists_ in the process. These lists are basically (averaged) spectra in a tabular form. We will use the _mzR_ algorithm to do so:
 
 ```{r MSPeakLists}
 avgPListParams <- getDefAvgPListParams(clusterMzWindow = 0.002)
@@ -251,16 +249,17 @@ mslists <- generateMSPeakLists(fGroups, "mzr", maxMSRtWindow = 5, precursorMzWin
 
 Note that we lowered the `clusterMzWindow` value to _0.002_. This window is used during averaging to cluster similar _m/z_ values together. In general the better the resolution of your MS instrument, the lower the value can be set.
 
-To clean up the peak lists we can use the `filter()` generic function again:
+Similar to feature groups the `filter()` generic function can be used to clean up the peak lists afterwards:
+
 ```{r MSPLF}
 mslists <- filter(mslists, relMSMSIntThr = 0.02, topMSMSPeaks = 10)
 ```
 
-Afterwards all mass peaks with intensities below 2% are removed and only the ten most intense mass peaks are retained.
+Here, all MS/MS mass peaks with intensities below 2% are removed and from the remaining no more than the ten most intense mass peaks are retained.
 
 ### Formula calculation
 
-Using the data from the MS peak lists generated during the previous step we can generate a list of formula candidates for each feature group based on measured _m/z_ values, isotopic patterns and presence of MS/MS fragments. In this tutorial we will use this data as an extra hint to score candidate chemical structures generated during the next step. The command below will use [GenForm] to perform this step. Again running this code may take some time.
+Using the data from the MS peak lists generated during the previous step we can generate a list of formula candidates for each feature group which is based on measured _m/z_ values, isotopic patterns and presence of MS/MS fragments. In this tutorial we will use this data as an extra hint to score candidate chemical structures generated during the next step. The command below will use [GenForm] to perform this step. Again running this code may take some time.
 
 ```{r formulas}
 formulas <- generateFormulas(fGroups, "genform", mslists, relMzDev = 5,
@@ -271,11 +270,13 @@ formulas
 
 Note that you need to change the elements parameter to this function to make sure that formulae with sulfur and chloride (S/Cl) are also accepted. It is highly recommended to limit the elements (by default it is just C, H, N, O and P) as this can significantly reduce processing time and improbable formula candidates. In this tutorial we already knew which compounds to expect so the choice was easy, but often a good guess can be made in advance.
 
-> NOTE The `generateFormulas()` function returns an object that contains formula candidates assigned for each feature group. In the above call the `calculateFeatures` argument is set to `TRUE`: by doing so formulae are first calculated for individual features within a feature group. These results are then used to generate a consensus candidate formula list for each feature group. During this process any outliers (defined by `featThreshold`) are automatically removed. In contrast, setting `calculateFeatures` to `FALSE` will calculate formulae directly for feature groups using group averaged MS peak lists. This will be significantly faster, but might produce (slightly) less accurate results.
+> NOTE The `generateFormulas()` function returns an object that contains formula candidates assigned for each feature group. In the above call the `calculateFeatures` argument is set to `TRUE`: by doing so formulae are first calculated for individual features within a feature group. These results are then used to generate a consensus candidate formula list for the complete feature group. During this process any outliers (defined by `featThreshold`) are automatically removed. In contrast, setting `calculateFeatures` to `FALSE` will calculate formulae directly for feature groups (by using MS peak lists that have been averaged for the whole group). This will be significantly faster, but might produce (slightly) less accurate results.
 
 ### Compound identification
 
-Now it is time to actually see what compounds we may be dealing with. In this tutorial we will use [MetFrag] to come up with a list of possible candidates structures for each feature group. Before we can start you have to download the [MetFrag CLI jar file][MetFragCL] and specify its file location: 
+<!-- Move MF installation to front? -->
+
+Now it is time to actually see what compounds we may be dealing with. In this tutorial we will use [MetFrag] to come up with a list of possible candidates structures for each feature group. Before we can start you have to make sure that MetFrag can be found by `patRoon`. Download the [MetFrag CLI jar file][MetFragCL] and specify its file location: 
 
 ```{r MF_opt,eval=FALSE}
 # change to the full path of the MetFrag CL jar file
@@ -294,8 +295,7 @@ While `generateCompounds()` is running a list of candidate compound structures w
 
 In this case we are using the [PubChem] database to retrieve candidates. Other commonly databases are [ChemSpider] and EPA's [CompTox]. See `?generateCompounds()` for more information on possible databases and many other parameters that can be set.
 
-Note that you may get several warnings() for feature groups for which no compounds could be searched. This is because we set a hard limit with the `maxCandidatesToStop` argument. Increasing this value is tempting, however, the compounds are searched through an online database and processing thousands of candidates takes too much time (and is not nice towards the servers running MetFrag!). An obvious drawback is that you will not get any results for feature groups with many candidates (however, these are generally difficult to sort out anyway!).
-
+Note that you may get several warnings for feature groups for which no compounds could be searched. Usually this is because we set a hard limit with the `maxCandidatesToStop` argument. Increasing this value is tempting, however, the compounds are searched through an online database and processing thousands of candidates takes too much time (and is not nice towards the servers running MetFrag!). An obvious drawback is that you will not get any results for feature groups with many candidates (however, these are generally difficult to sort out anyway!).
 
 > NOTE This is often one of the most time consuming steps during the workflow. For this reason, and in order to not 'abuse' the servers used by MetFrag, you should always take care to prioritize your data before running this function!
 
@@ -328,7 +328,7 @@ plotSpec(compounds, 1, "M120_R328_81", mslists)
 
 ## Components
 
-So far we mainly dealt with feature groups as if they are separate chemical compounds. However, formation of multiple ionization adducts (_e.g._ from sodium and potassium), isotopologues and/or in-source fragments may yield multiple _m/z_ values for the same compound. As a result, multiple feature groups will be  describing the same chemical compound. To reduce this complexity it is useful to generate so called _components_ which are basically groups of feature groups which are likely to be the same compound (based on _e.g._ similarity of retention profiles). If possible feature groups present in a component are annotated based on known chemical rules, which may further help compound identification.
+So far we mainly dealt with feature groups as if they are separate chemical compounds. However, formation of multiple ionization adducts (_e.g._ from sodium and potassium), isotopologues and/or in-source fragments may yield multiple _m/z_ values for the same compound. As a result, multiple feature groups may be describing the same chemical compound. To reduce this complexity it is useful to generate so called _components_ which are basically groups of feature groups which are likely to be the same compound (based on _e.g._ similarity of retention profiles). Afterwards,  feature groups present in a component are annotated based on known chemical rules, which may further help compound identification.
 
 Generating components is performed with the `generateComponents()` function:
 
@@ -344,7 +344,7 @@ plotSpec(components, "CMP6")
 plotEIC(components, "CMP6", fGroups)
 ```
 
-> NOTE The componentization process must currently be seen as a tool to provide hints how different grouped features _may_ be related to each other. Hence, results should always be checked manually, for instance, by the above commands or with the reports generated in the next step. For this reason, grouped features that were annotated (e.g. adducts, fragments) should not be blindly removed. 
+> NOTE The componentization process must currently be seen as a tool to provide hints on how different features _may_ be related to each other. Hence, results should always be checked manually, for instance, by the above commands or with the reports generated in the next step. For this reason, features that were annotated as e.g. adducts or fragments should not be blindly removed.
 
 ## Reporting
 
@@ -359,15 +359,30 @@ reportPDF(fGroups, path = "report", reportFGroups = TRUE, formulas = formulas, r
           compounds = compounds, compoundsNormalizeScores = "max",
           components = components, MSPeakLists = mslists)
 
-reportMD(fGroups, path = "report", reportPlots = c("chord", "venn", "upset", "eics", "formulas"), formulas = formulas,
-         compounds = compounds, compoundsNormalizeScores = "max",
+reportMD(fGroups, path = "report", reportPlots = c("chord", "venn", "upset", "eics", "formulas"),
+         formulas = formulas, compounds = compounds, compoundsNormalizeScores = "max",
          components = components, MSPeakLists = mslists,
          selfContained = FALSE, openReport = TRUE)
 ```
 
 The output of `reportMD()` can be viewed [here](../examples/report.html).
 
-Note that these functions can be called at any time during the workflow. This may be especially useful if you want evaluate results during optimization or exploring the various algorithms available.
+Note that these functions can be called at any time during the workflow. This may be especially useful if you want evaluate results during optimization or exploring the various algorithms and their parameters. In this case you can simply cherry pick the data that you want to report, for instance:
+
+```{r eval=FALSE}
+# only report feature groups (i.e. the bare minimum)
+reportCSV(fGroups, path = "report", reportFeatures = FALSE)
+
+# report compounds. Note that MSPeakLists (mslists variable) are required for formula/compound reporting
+reportPDF(fGroups, path = "report", reportFGroups = TRUE,
+          compounds = compounds, compoundsNormalizeScores = "max",
+          MSPeakLists = mslists)
+
+# only report components
+reportMD(fGroups, path = "report", reportPlots = c("chord", "venn", "upset", "eics"),
+         components = components
+         selfContained = FALSE, openReport = TRUE)
+```
 
 ```{r echo=FALSE,eval=pkgdown::in_pkgdown()}
 # do the actual reporting here
@@ -391,7 +406,6 @@ callr::rscript(tempScript, show = FALSE)
 ## Final script
 
 ```{r scriptPost,code=readLines("script-post.R"),eval=FALSE}
-# insert script here
 ```
 
 

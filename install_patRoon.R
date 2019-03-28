@@ -622,7 +622,6 @@ installPatRoon <- function(what = c("packages", "tools", "deps", "patRoon"),
     if (!is.null(jPath) || length(setOpts) > 0 || pkgWhere == "pDepsIso")
 
     {
-        jPath <- Sys.getenv("JAVA_HOME") # should be set by installr
         ownRProfPath <- utils$makeOwnRProfile(instPath, setOpts, jPath, pkgWhere == "pDepsIso")
         
         cat("An R script that will set all necessary options to use the installed dependencies was automatically generated.",

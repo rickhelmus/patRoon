@@ -179,7 +179,7 @@ To group features the `groupFeatures()` function is used, which has similar argu
 fGroups <- groupFeatures(fList, "openms")
 ```
 
-### Data clean-up
+### Data clean-up {#data-cleanup}
 
 The next step is to perform some basic rule based filtering with the filter() function. As its name suggests this function has several ways to filter data. It is a so called generic function and methods exists for various data types, such as the feature groups object that was made in the previous section (stored in the the `fGroups` variable).
 
@@ -265,7 +265,6 @@ Using the data from the MS peak lists generated during the previous step we can 
 formulas <- generateFormulas(fGroups, "genform", mslists, relMzDev = 5,
                              adduct = "[M+H]+", elements = "CHNOPSCl",
                              calculateFeatures = TRUE, featThreshold = 0.75)
-formulas
 ```
 
 Note that you need to change the elements parameter to this function to make sure that formulae with sulfur and chloride (S/Cl) are also accepted. It is highly recommended to limit the elements (by default it is just C, H, N, O and P) as this can significantly reduce processing time and improbable formula candidates. In this tutorial we already knew which compounds to expect so the choice was easy, but often a good guess can be made in advance.
@@ -274,7 +273,7 @@ Note that you need to change the elements parameter to this function to make sur
 
 ### Compound identification
 
-<!-- Move MF installation to front? -->
+<!-- UNDONE Move MF installation to front? -->
 
 Now it is time to actually see what compounds we may be dealing with. In this tutorial we will use [MetFrag] to come up with a list of possible candidates structures for each feature group. Before we can start you have to make sure that MetFrag can be found by `patRoon`. Download the [MetFrag CLI jar file][MetFragCL] and specify its file location: 
 

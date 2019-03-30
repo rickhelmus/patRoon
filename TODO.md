@@ -6,6 +6,7 @@
 - ref --> blank
 - convertMSFiles()
     - Agilent .d is also a directory?
+- consistent src file names, split utils?
 
 
 ## docs
@@ -52,7 +53,7 @@
 - how to handle ranking of consensus results?
     - rank by one normalized column per algo? (GenForm: either MS_match or comb_match)
     - or simply don't and mention limitation in doc? (one limitation: filtering)
-- reporting incorrect GF adducts
+- reporting incorrect GF adducts --> fix in src
 
 
 ## components
@@ -61,6 +62,7 @@
 
 ## reporting
 - add more options to reportPlots argument of reportMD()?
+- reportMD() --> reportHTML()
 
 
 ## Cleanup

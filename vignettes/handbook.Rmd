@@ -112,7 +112,69 @@ plotSpec(compounds, ...) # likewise but for compound annotation.
 
 The next sections will further detail on how to actually perform the non-target workflow steps and use their output.
 
-## Preparation
+## Preparing the workflow
+
+### Data pre-treatment
+
+Prior to performing the actual non-target data processing workflow some preparations often need to be made. Often data has to be pre-treated, for instance, by converting it to an open format that is usable for subsequent workflow steps or to perform mass re-calibration. Some common functions are listed below.
+
+Task                                |  Function                | Algorithms | Supported file formats
+------------------------------------| ------------------------ | -------------------------------------- | -------
+Conversion                          | `convertMSFiles()`       | [OpenMS], [ProteoWizard], DataAnalysis | All common (algorithm dependent)
+Advanced (e.g. spectral filtering)  | `convertMSFiles()`       | [ProteoWizard]                         | All common
+Mass re-calibration                 | `recalibrarateDAFiles()` | DataAnalysis                           | Bruker
+
+The `convertMSFiles()` function supports conversion between many different file formats typically used in non-target analysis. Furthermore, other pre-treatment steps are available (e.g. centroiding, filtering) when the [ProteoWizard] algorithm is used. For an overview of these functionalities see the [MsConvert documentation]. Some examples:
+
+```{r convert,eval=FALSE}
+# Converts a single mzXML file to mzML format
+convertMSFiles("standard-1.mzXML", to = "mzML", algorithm = "openms")
+
+# Converts all Thermo files with ProteoWizard (the default) in the analyses/raw
+# directory and stores the mzML files in analyses/raw. Afterwards, only MS1
+# spectra are retained.
+convertMSFiles("analyses/raw", "analyses/mzml", from = "thermo",
+               centroid = "vendor", filters = "msLevel 1")
+```
+
+> **_NOTE_** Most algorithms require the _mzML_ or _mzXML_ file format and additionally require that mass peaks have been centroided. When using the ProteoWizard algorithm (the default), centroiding by vendor algorithms is generally recommended (i.e. by setting `centroid="vendor"` as shown in the above example).
+
+When Bruker MS data is used it can be automatically re-calibrated to improve its mass accuracy. Often this is preceeded by calling the `setDAMethod()` function to set a DataAnalysis method to all files in order to configure automatic re-calibration. The `recalibrarateDAFiles()` function performs the actual re-calibration. The `getDACalibrationError()` function can be used at anytime to request the current calibration error of each analysis. An example of these functions is shown below.
+
+```{r brukerCalib,eval=FALSE}
+# anaInfo is a data.frame with information on analyses (see next section)
+setDAMethod(anaInfo, "path/to/DAMethod.m") # configure Bruker files with given method that has automatic calibration setup
+recalibrarateDAFiles(anaInfo) # trigger re-calibration for each analysis
+getDACalibrationError(anaInfo) # get calibration error for each analysis (NOTE: also shown when previous function is finished)
+```
+
+### Analysis information
+
+The final bits of preparation is constructing the information for the analyses that need to be processed. In `patRoon` this is referred to as the _analysis information_ and often stored in a variable `anaInfo` (of course you are free to choose a different name!). The analysis information should be a `data.frame` with the following columns:
+
+* **path**: the directory path of the file containing the analysis data
+* **analysis**: the name of the analysis. This should be the file name _without_ file extension.
+* **group**: to which _replicate group_ the analysis belongs. All analysis which are replicates of each other get the same name.
+* **ref**: which replicate group should be used for blank subtraction.
+* **conc** (optional, advanced) A numeric value describing the concentration or any other value for which the intensity in this sample may correlate, for instance, dilution factor, sampling time etc. This column is only required when using the `regression()` function (see `?regression` for more information).
+
+<!-- UNDONE: tutorial link? -->
+
+The `generateAnalysisInfo()` function can be used to (semi-)automatically generate a suitable `data.frame` that contains all the required information for a set of analysis. For, instance, the following line was used in the tutorial:
+
+```{r genAnaInfo,eval=FALSE}
+# Take example data from patRoonData package (triplicate solvent blank + triplicate standard)
+anaInfo <- generateAnalysisInfo(paths = patRoonData::exampleDataPath(),
+                                groups = c(rep("solvent", 3), rep("standard", 3)),
+                                refs = "solvent")
+```
+
+Alternatively, the `newProject()` function discussed in the next section can be used to interactively construct this information.
+
+### Automatic project generation with newProject()
+
+
+The previous sections already highlighted some steps necessary when starting a new data processing workflow. In general, when starting a new project analyses have to be selected and pre-treated......
 
 - pre-treat
   - algorithms and their selection (for conversion)

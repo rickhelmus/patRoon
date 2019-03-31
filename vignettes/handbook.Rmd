@@ -1,0 +1,198 @@
+---
+title: "patRoon handbook"
+author: "Rick Helmus"
+date: "`r Sys.Date()`"
+output:
+    rmarkdown::html_vignette:
+        mathjax: null
+        toc: yes
+        toc_dept: 3
+        number_sections: true
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+
+# Introduction
+
+
+# Workflow
+
+- overview of generator functions
+- usage of algorithms: algorithm arg vs specific fun
+- S4 classes?: common output, hierarchy, generics, ...
+
+## Concepts
+
+- show images of feature definition etc?
+
+In a non-target workflow both chromatographic and mass spectral data is automatically processed in order to provide a comprehensive chemical characterization of your samples. While the exact workflow is typically dependent on the type of study, it generally involves of the following steps:
+
+```{r workflow,echo=FALSE}
+# UNDONE: show componentization alongside annotation (if possible)
+
+DiagrammeR::grViz("
+digraph rmarkdown {
+graph [ rankdir = LR ]
+node [ shape = box,
+       fixedsize = true,
+       width = 2.2,
+       height = 1,
+       fontsize = 18,
+       fillcolor = darkseagreen1,
+       style = filled ]
+'Data pre-treatment' -> Features -> Annotation -> Componentization -> Reporting [ arrowhead = vee ]
+}
+", height = 100, width = 750)
+```
+
+During **data pre-treatment** raw MS data is prepared for further analysis. A common need for this step is to convert the data to an open format so that other tools are able to process it. Other pre-treatment steps may involve re-calibration of _m/z_ data or performing advanced filtering operations.
+
+The next step is to extract **features** from the data. While different terminologies are used, a feature in `patRoon` refers to a single chromatographic peak in an extracted ion chromatogram for a single _m/z_ value (within a defined tolerance). Hence, a feature contains both chromatographic data (e.g. retention time and peak height) and mass spectral data (e.g. the accurate _m/z_). Note that with mass spectrometry multiple _m/z_ values may be detected for a single compound as a result of adduct formation, natural isotopes and/or in-source fragments. Some algorithms may try to combine these different masses in a single feature. However, in `patRoon` we generally assume this is not the case (and may optionally be done afterwards during the componentization step described below). Features are sometimes simply referred to as 'peaks'.
+
+Features are found per analysis. Hence, in order to compare a feature across analyses, the next step is to group them. This step is essential as it finds equal features even if their retention time or _m/z_ values slightly differ due to analytical variability. The resulting **feature groups** are crucial input for subsequent workflow steps. Prior to grouping, _retention time alignment_ between analyses may be performed to improve grouping of features, especially when processing multiple analysis batches at once. Outside `patRoon` feature groups may also be defined as _profiles_, _aligned_ or _grouped features_ or _buckets_.
+
+Depending on the study type, **suspect screening** is then performed to limit the features that should be considered for further processing. As its name suggests, with suspect screening only those features which are suspected to be present are considered for further processing. These suspects are retrieved from a suspect list which contains the _m/z_ and (optionally) retention times for each suspect. Typical suspect lists may be composed from databases with known pollutants or from predicted transformation products. Note that for a 'full' non-target analysis no suspect screening is performed, hence, this step is simply omitted and all features are to be considered.
+
+After features have been collected the next step typically involves **annotation**. During this step MS and MS/MS data are collected in so called **MS peak lists**, which are then used as input for formula and compound annotation. Formula annotation involves automatic calculation of possible formulae for each feature based on its _m/z_, isotopic pattern and MS/MS fragments, whereas compound annotation (or identification) involves the assignment of actual chemical structures to each feature. Note that during formula and compound annotation typically multiple candidates are assigned to a single feature. To assist interpretation of this data each candidate is therefore ranked on characteristics such as isotopic fit, number of explained MS/MS fragments and metadata from an online database such as number of scientific references or presence in common suspect lists.
+
+Besides annotation, another step to perform after extraction of features is **componentization**. A **component** is defined as a collection of multiple feature groups that are somehow related to each other. Typical exmples are features that belong to the same chemical compound (i.e. with different _m/z_ values but equal retention time), such as adducts, isotopes and in-source fragments. Other examples are homologues series and features that display a similar intensity trend across samples.
+
+The final step of the workflow is to **report** the data. During this step all data from the workflow is reported graphically or in a text file format suitable to be loaded by other tools. Interactive reports can also be made which typically greatly improve data interpretation.
+
+To summarize:
+
+* **Data-pretreatment** involves preparing raw MS data for further processing (e.g. conversion to an open format)
+* **Features** describe chromatographic and _m/z_ information (or 'peaks') in all analyses.
+* A **feature group** consists of equal features across analyses.
+* With **suspect screening** only features that are considered to be on a suspect list are considered further in the workflow.
+* **MS peak lists** Summarizes all MS and MS/MS data that will be used for subsequent annotation.
+* During **formula** and **compound annotation** candidate formulae/structures will be assigned and ranked for each feature.
+* **Componentization** involves consolidating different feature groups that have a relationship to each other in to a single component.
+* **Reporting** is performed as the final step to assist interpretation of the data generated during the workflow.
+
+<!-- UNDONE: add link to example workflows? -->
+
+Note that `patRoon` supports flexible composition of workflows. In the end, the inclusion of each step is only necessary if a further steps depends on its data. Hence, since annotation and componentization do not depend on each other they can be executed in different order or simply be omitted.
+
+## Generating workflow data
+
+Each step in the non-target workflow is performed by a function that perform the heavy lifting of a workflow step behind the scenes and finally return the results. An important goal of `patRoon` is to support multiple algorithms for each workflow step, hence, when such a function is called you have to specify which algorithm you want to use. The available algorithms and their characteristics will be discussed in the next sections. An overview of all functions involved in generating workflow data is shown in the table below.
+
+Workflow step         | Function                                          | Output S4 class
+--------------------- | ------------------------------------------------- | ------------
+Data pre-treatment    | `convertMSFiles()`, ...                           | -
+Finding features      | `findFeatures()`                                  | `features`
+Grouping features     | `groupFeatures()`                                 | `featureGroups`
+Suspect screening     | `screenTargets()` + `groupFeaturesScreening()`    | `featureGroups` 
+MS peak lists         | `generateMSPeakLists()`                           | `MSPeakLists`
+Formula annotation    | `generateFormulas()`                              | `formulas`
+Compound annotation   | `generateCompounds()`                             | `compounds`
+Componentization      | `generateComponents()`                            | `components`
+
+All of these functions store their output in objects derived from so called S4 classes. Knowing the details about the S4 class system of `R` is generally not important when using `patRoon` (and well written resources are available if you want to know more). In brief, usage of this class system allows a general data format that is used irrespective of the algorithm that was used to generate the data. For instance, when features have been found by [OpenMS] or [XCMS] they both return the same data format.
+
+Another advantage of the S4 class system is the usage of so called _generic functions_. To put simply: a generic function performs a certain task for different types of data objects. A good example is the `plotSpec()` function which plots an (annotated) spectrum from data of MS peak lists or from formula or compound annotation:
+
+```{r plotSpec,eval=FALSE}
+plotSpec(mslists, ...) # plot raw MS spectrum
+plotSpec(formulas, ...) # plot annotated spectrum from formula annotation data
+plotSpec(compounds, ...) # likewise but for compound annotation.
+```
+
+The next sections will further detail on how to actually perform the non-target workflow steps and use their output.
+
+## Preparation
+
+- pre-treat
+  - algorithms and their selection (for conversion)
+  - Bruker: m/z calibration (and checking errors)
+- analysis info
+  - generateAnalysisInfo()
+- newProject() (or somewhere else?)
+
+## Features
+
+- Table with algorithms and remarks about their selection
+- Process: extract features --> align RT --> group (--> suspect screening)
+
+## Annotation
+
+- Adducts: conversion
+
+### MS peak lists
+
+- Table with algorithms and remarks about their selection
+- Process: extract MS and MS/MS spectra per feature --> average --> average per group
+
+### Formulae
+
+- Table with algorithms and remarks about their selection
+- Process: Calculate per feature (in)directly
+- MS and MS/MS only
+- OM rules: as.data.table() and filter()
+
+### Compounds
+
+- Table with algorithms and remarks about their selection
+- database selection (MF) --> PC, CS (set key), CT (set opt), csv etc (set path)
+- Process: download candidates --> rank candidates on X, Y, Z (--> add formula scoring)
+- Timeouts & error handling
+- Advanced?: RT/suspect scoring
+
+## Components
+
+- Table with algorithms and remarks about their selection
+
+### RT components
+
+- CAMERA and RAMClustR
+
+### Homologues series
+
+- nontarget
+- linking/merging
+
+### Intensity clustering
+
+- Principle
+- Cluster selection, normalization etc
+
+## Reporting
+
+# Advanced usage
+
+## Filtering and inspecting data
+
+- Filtering data: overview common filters, (fGroup) filtering order?, subsetting data
+- Inspecting data: extraction operator, as.data.table(), specific accessors (e.g. groupInfo()), plotting?
+
+## Feature parameter optimization
+
+- Principle, IPO reference, extensions
+- param sets, qualitiative optimization, generation of pSets
+- Perform with subset of analyses
+- Using results: get optimized object, best results, plot results
+
+## Algorithm consensus
+
+- fGroup comparison
+- consensus selection (overlap/unique)
+
+## Compound clustering
+
+- Principle
+- Cluster selection, MCS plotting
+- methods
+
+## Caching

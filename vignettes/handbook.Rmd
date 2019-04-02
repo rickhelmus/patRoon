@@ -22,6 +22,9 @@ knitr::opts_chunk$set(
 )
 ```
 
+```{css code=readLines("styles.css"),echo=FALSE}
+```
+
 
 # Introduction
 
@@ -91,7 +94,7 @@ Each step in the non-target workflow is performed by a function that perform the
 
 Workflow step         | Function                                          | Output S4 class
 --------------------- | ------------------------------------------------- | ------------
-Data pre-treatment    | `convertMSFiles()`, ...                           | -
+Data pre-treatment    | `convertMSFiles()`, `recalibrarateDAFiles()`      | -
 Finding features      | `findFeatures()`                                  | `features`
 Grouping features     | `groupFeatures()`                                 | `featureGroups`
 Suspect screening     | `screenTargets()` + `groupFeaturesScreening()`    | `featureGroups` 
@@ -173,17 +176,34 @@ Alternatively, the `newProject()` function discussed in the next section can be 
 
 ### Automatic project generation with newProject()
 
+The previous sections already highlighted some steps that have to be performed prior to starting a new non-target analysis workflow: data pre-treatment and gathering information on the analysis. Most of the times you will put this and other `R` code a script file so you can re-call what you have done before (i.e. reproducbile research).
 
-The previous sections already highlighted some steps necessary when starting a new data processing workflow. In general, when starting a new project analyses have to be selected and pre-treated......
+The `newProject()` function can be used to setup a new project. When you run this function it will launch a small tool (see screenshot below) where you can select your analyses and configure the various workflow steps which you want to execute (e.g. data pre-treatment, finding features, annotation etc). After setting everything up the function will generate a template script which can easily be edited afterwards. In addition, you have the option to create a new RStudio project, which is advantegeous as it neatly seperates your data processing work from the rest.
 
-- pre-treat
-  - algorithms and their selection (for conversion)
-  - Bruker: m/z calibration (and checking errors)
-- analysis info
-  - generateAnalysisInfo()
-- newProject() (or somewhere else?)
+![](newp.png){width=450px}
+
+> **_NOTE_** At the moment `newProject()` _only_ works with (recent) versions of RStudio.
+
 
 ## Features
+
+<!-- UNDONE: enviMass? -->
+
+Algorithm ID | Usage | Remarks
+------------ | ----- | ------
+[OpenMS] | `findFeatures(algorithm = "openms", ...)` | Uses the [FeatureFinderMetabo] algorithm
+[XCMS] | `findFeatures(algorithm = "xcms", ...)` | Uses `xcms::xcmsSet()` function
+[XCMS] (import) | `importFeatures(algorithm = "xcms")` | Imports an existing `xcmsSet` object.
+[enviPick] | `findFeatures(algorithm = "envipick")` | Uses `enviPick::enviPickwrap()`
+DataAnalysis | `findFeatures(algorithm = "bruker")` | Uses Find Molecular Features from DataAnalysis (Bruker only)
+
+
+Algorithm ID | Usage | Remarks
+------------ | ----- | ------
+[OpenMS] | `groupFeatures(algorithm = "openms", ...)` | Uses the [FeatureFinderMetabo] algorithm
+[XCMS] | `groupFeatures(algorithm = "xcms", ...)` | Uses `xcms::group()` function
+
+
 
 - Table with algorithms and remarks about their selection
 - Process: extract features --> align RT --> group (--> suspect screening)
@@ -258,3 +278,6 @@ The previous sections already highlighted some steps necessary when starting a n
 - methods
 
 ## Caching
+
+```{r child="refs.Rmd"}
+```

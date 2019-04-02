@@ -30,18 +30,9 @@ options(width=1500) # big nr to avoid wrapping text in code chunks
 doCompounds <- FALSE # curl::has_internet()
 ```
 
-<style>
-pre, code {
-    white-space: pre !important;
-    overflow-x: auto !important;
-    max-height: 275px;
-    overflow-y: auto;
-}
-blockquote {
-    background-color: aliceblue;
-    padding: 0.25em 0.75em;
-}
-</style>
+```{css code=readLines("styles.css"),echo=FALSE}
+```
+
 
 # Introduction
 
@@ -447,14 +438,5 @@ In the previous sections the different parts of the processing script were discu
 <!-- UNDONE: next steps section -->
 
 
-[patroonData]: https://github.com/rickhelmus/patRoonData
-[readme]: https://rickhelmus.github.io/patRoon/
-[ProteoWizard]: http://proteowizard.sourceforge.net/
-[OpenMS]: http://openms.de/
-[mzR]: https://bioconductor.org/packages/release/bioc/html/mzR.html
-[GenForm]: https://sourceforge.net/projects/genform/
-[MetFrag]: http://ipb-halle.github.io/MetFrag/
-[MetFragCL]: http://ipb-halle.github.io/MetFrag/projects/metfragcl/
-[PubChem]: https://pubchem.ncbi.nlm.nih.gov/
-[ChemSpider]: http://www.chemspider.com/
-[CompTox]: https://comptox.epa.gov/dashboard
+```{r child="refs.Rmd"}
+```

@@ -1,0 +1,13 @@
+[patroonData]: https://github.com/rickhelmus/patRoonData
+[readme]: https://rickhelmus.github.io/patRoon/
+[ProteoWizard]: http://proteowizard.sourceforge.net/
+[OpenMS]: http://openms.de/
+[mzR]: https://bioconductor.org/packages/release/bioc/html/mzR.html
+[GenForm]: https://sourceforge.net/projects/genform/
+[MetFrag]: http://ipb-halle.github.io/MetFrag/
+[MetFragCL]: http://ipb-halle.github.io/MetFrag/projects/metfragcl/
+[PubChem]: https://pubchem.ncbi.nlm.nih.gov/
+[ChemSpider]: http://www.chemspider.com/
+[CompTox]: https://comptox.epa.gov/dashboard
+[XCMS]: https://www.bioconductor.org/packages/release/bioc/html/xcms.html
+[enviPick]: https://cran.r-project.org/web/packages/enviPick/index.html

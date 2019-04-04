@@ -2,16 +2,13 @@
 title: "patRoon handbook"
 author: "Rick Helmus"
 date: "`r Sys.Date()`"
-output:
-    rmarkdown::html_vignette:
-        mathjax: null
-        toc: yes
-        toc_dept: 3
-        number_sections: true
+header-includes:
+    - \usepackage{fvextra}
+    - \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
 vignette: >
-  %\VignetteIndexEntry{Vignette Title}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+    %\VignetteIndexEntry{Vignette Title}
+    %\VignetteEngine{knitr::rmarkdown}
+    %\VignetteEncoding{UTF-8}
 ---
 
 
@@ -46,18 +43,58 @@ In a non-target workflow both chromatographic and mass spectral data is automati
 
 DiagrammeR::grViz("
 digraph rmarkdown {
-graph [ rankdir = LR ]
-node [ shape = box,
-       fixedsize = true,
-       width = 2.2,
-       height = 1,
-       fontsize = 18,
-       fillcolor = darkseagreen1,
-       style = filled ]
-'Data pre-treatment' -> Features -> Annotation -> Componentization -> Reporting [ arrowhead = vee ]
-}
-", height = 100, width = 750)
+  graph [ rankdir = LR, compound = true ]
+  node [ shape = box,
+         fixedsize = true,
+         width = 2.6,
+         height = 1,
+         fontsize = 20,
+         fillcolor = darkseagreen1,
+         style = filled ]
+
+  subgraph cluster1 {
+    color=blue;
+    'Data pre-treatment' -> 'Find features'
+    'Find features' -> 'Group features'
+    'Group features' -> 'MS peak lists'
+  }
+  
+  subgraph cluster2 {
+    'Suspect screening' -> 'Group features'
+    'Find features' -> 'Suspect screening' [style=invis];
+    'Group features' -> 'Suspect screening'
+  }
+  
+  subgraph cluster3 {
+    color=green;
+    //edge [dir=none]
+    'Formula annotation'  'Compound Annotation'  Componentization
+  }
+  
+  subgraph cluster4 {
+    Reporting
+  }
+  
+  'MS peak lists' -> 'Formula annotation' [ltail=cluster1, lhead=cluster3]
+  'Group features' -> Reporting [ltail=cluster1, lhead=cluster4]
+  'Formula annotation' -> Reporting [ltail=cluster3, lhead=cluster4]
+  
+  
+  /*'Group features' -> Annotation;
+  'Group features' -> Componentization;
+  
+  Annotation -> Componentization;
+  Componentization -> Annotation;
+  
+  Annotation -> Reporting;
+  Componentization -> Reporting;*/
+}", height = 250, width = 750)
 ```
+
+
+<!-- UNDONE: optional lines (scheme/text below) -->
+
+Note that `patRoon` supports flexible composition of workflows. In the scheme above you can recognize optional steps by a _XXX line/arrow_. Furthermore, the inclusion of each step is only necessary if a further steps depends on its data. For instance, annotation and componentization do not depend on each other and can therefore be executed in any different order or simply be omitted. A brief descripton of all steps is given below. 
 
 During **data pre-treatment** raw MS data is prepared for further analysis. A common need for this step is to convert the data to an open format so that other tools are able to process it. Other pre-treatment steps may involve re-calibration of _m/z_ data or performing advanced filtering operations.
 
@@ -86,7 +123,6 @@ To summarize:
 
 <!-- UNDONE: add link to example workflows? -->
 
-Note that `patRoon` supports flexible composition of workflows. In the end, the inclusion of each step is only necessary if a further steps depends on its data. Hence, since annotation and componentization do not depend on each other they can be executed in different order or simply be omitted.
 
 ## Generating workflow data
 
@@ -189,7 +225,7 @@ The `newProject()` function can be used to setup a new project. When you run thi
 
 <!-- UNDONE: enviMass? -->
 
-Algorithm ID | Usage | Remarks
+Algorithm | Usage | Remarks
 ------------ | ----- | ------
 [OpenMS] | `findFeatures(algorithm = "openms", ...)` | Uses the [FeatureFinderMetabo] algorithm
 [XCMS] | `findFeatures(algorithm = "xcms", ...)` | Uses `xcms::xcmsSet()` function
@@ -198,10 +234,12 @@ Algorithm ID | Usage | Remarks
 DataAnalysis | `findFeatures(algorithm = "bruker")` | Uses Find Molecular Features from DataAnalysis (Bruker only)
 
 
-Algorithm ID | Usage | Remarks
------------- | ----- | ------
+Algorithm | Usage | Remarks
+--------- | ----- | ------
 [OpenMS] | `groupFeatures(algorithm = "openms", ...)` | Uses the [FeatureFinderMetabo] algorithm
 [XCMS] | `groupFeatures(algorithm = "xcms", ...)` | Uses `xcms::group()` function
+ProfileAnalysis | `importFeatureGroups(algorithm = "brukerpa", ...)` | Import `.csv` file exported from Bruker ProfileAnalysis
+TASQ | `importFeatureGroups(algorithm = "brukertasq", ...)` | Imports a _Global result table_ (exported to Excel file and then saved as `.csv` file)
 
 
 
@@ -279,5 +317,5 @@ Algorithm ID | Usage | Remarks
 
 ## Caching
 
-```{r child="refs.Rmd"}
+```{r child="shared/refs.Rmd"}
 ```

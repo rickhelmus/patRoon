@@ -2,16 +2,13 @@
 title: "patRoon tutorial"
 author: "Rick Helmus"
 date: "`r Sys.Date()`"
-output:
-    rmarkdown::html_vignette:
-        mathjax: null
-        toc: yes
-        toc_dept: 3
-        number_sections: true
+header-includes:
+    - \usepackage{fvextra}
+    - \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
 vignette: >
-  %\VignetteIndexEntry{patRoon tutorial}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+    %\VignetteIndexEntry{patRoon tutorial}
+    %\VignetteEngine{knitr::rmarkdown}
+    %\VignetteEncoding{UTF-8}
 ---
 
 ```{r setup, include = FALSE}
@@ -438,5 +435,5 @@ In the previous sections the different parts of the processing script were discu
 <!-- UNDONE: next steps section -->
 
 
-```{r child="refs.Rmd"}
+```{r child="shared/refs.Rmd"}
 ```

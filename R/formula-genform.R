@@ -271,7 +271,7 @@ generateFormulasGenForm <- function(fGroups, MSPeakLists, relMzDev = 5, adduct =
     aapply(checkmate::assertFlag, . ~ hetero + oc + calculateFeatures, fixed = list(add = ac))
     checkmate::assertNumber(featThreshold, lower = 0, finite = TRUE, null.ok = TRUE, add = ac)
     checkmate::assertChoice(MSMode, c("ms", "msms", "both"), add = ac)
-    checkmate::assertList(extraOpts, any.missing = FALSE, names = "unique", null.ok = TRUE, add = ac)
+    checkmate::assertCharacter(extraOpts, null.ok = TRUE, add = ac)
     aapply(checkmate::assertCount, . ~ maxProcAmount + batchSize, positive = TRUE, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
 

@@ -345,7 +345,7 @@ Note that compound annotation is normally not dependent upon formula annotation.
 Algorithm    | Usage                                            | Remarks
 ------------ | ---------------------------------------------    | -----------------------------------------------------
 [mzR]        | `generateMSPeakLists(algorithm = "mzr", ...)`    | Uses [mzR] for spectra retrieval. Recommended default.
-DataAnalysis | `generateMSPeakLists(algorithm = "bruker", ...)` | Loads data from automaticallt generated MS and MS/MS spectra in DataAnalysis
+DataAnalysis | `generateMSPeakLists(algorithm = "bruker", ...)` | Loads data after automatically generating MS and MS/MS spectra in DataAnalysis
 DataAnalysis FMF | `generateMSPeakLists(algorithm = "brukerfmf", ...)` | Uses spectra from the  _find molecular features_ algorithm.
 
 The recommended default algorithm is `mzr`: this algorithm is generally faster and is not limited to a vendor data format as it will read the open `mzML` and `mzXML` file formats. On the other hand, when DataAnalysis is used with Bruker data the spectra can be automatically background subtracted and there is no need for file conversion. Note that the `brukerfmf` algorithm only works when `findFeatures()` was called with the `bruker` algorithm.
@@ -391,13 +391,53 @@ avgPListParams <- getDefAvgPListParams(clusterMzWindow = 0.001)
 plists <- generateMSPeakLists(fGroups, "mzr", avgFeatParams = avgPListParams, avgFGroupParams = avgPListParams)
 ```
 
-
 ### Formulae
 
-- Table with algorithms and remarks about their selection
-- Process: Calculate per feature (in)directly
-- MS and MS/MS only
-- OM rules: as.data.table() and filter()
+Formulae can be automatically calculated for all features using the `generateFormulas()` function. The following algorithms are currently supported:
+
+Algorithm    | Usage                                          | Remarks
+------------ | ---------------------------------------------- | ------------------------------------------------
+[GenForm]    | `generateFormulas(algorithm = "genform", ...)` | Bundled with `patRoon`. Reasonable default.
+[SIRIUS]     | `generateFormulas(algorithm = "sirius", ...)`  | Requires MS/MS data.
+DataAnalysis | `generateFormulas(algorithm = "bruker", ...)`  | Requires FMF features (i.e. `findFeatures(algorithm = "bruker", ...)`). MS peak lists are not needed. Uses _SmartFormula_ algorithms.
+
+Calculation with [GenForm] is often a good default. It is fast and basic rules can be applied to filter out obvious non-existing formulae. More thorough calculation is performed with [SIRIUS]: this algorithm often yields fewer and often more plausible results. However, [SIRIUS] requires MS/MS data (hence features without will not have results) and formula prediction may not work well for compounds that structurally deviate from the training sets used by [SIRIUS]. Calculation with DataAnalysis is only possible when features are obtained with DataAnalysis as well. An advantage is that analysis files do not have to be converted and no MS peak generation is necessary, however, compared to other algorithms calculation is often relative slow.
+
+There are two methods for formula assignment:
+
+1. Formulae are first calculated for each individual feature within a feature group. These results are then pooled, outliers are removed and remaining formulae are assigned to the feature group (i.e. `calculateFeatures = TRUE`).
+2. Formulae are directly calculated for each feature group by using group averaged peak lists (see previous section) (i.e. `calculateFeatures = FALSE`).
+
+The first method is more thorough and the possibility to remove outliers may sometimes result in better formula assignment. However, the second method is much faster and generally recommended for large number of analyses.
+
+By default formulae are calculated using _only_ MS data and using _both_ MS and MS/MS data (duplicates are removed). An advantage of this approach is that formulae can still be assigned even when no MS/MS data is available. However, a disadvantage is that formulae needs to be calculated twice. The `MSMode` argument (listed below) can be used to customize this behaviour. Note that SIRIUS only works with MS/MS data, hence, the behaviour of this algorithm is fixed.
+
+An overview of common parameters that are typically set to customize formula calculation is listed below.
+
+<!-- UNDONE: link to adduct section -->
+
+Argument          | Algorithm(s) | Remarks
+----------------- | ------------ | ------------------------------------------------------------------------------------
+relMzDev          | `genform`, `sirius` | The maximum relative _m/z_ deviation for a formula to be considered (in _ppm_).
+elements          | `genform`, `sirius` | Which elements to consider. By default `"CHNOP"`. Try to limit possible elements as much as possible.
+calculateFeatures | `genform`, `sirius` | Whether formulae should be calculated first for all features (see discussion above) (always `TRUE` with DataAnalysis).
+featThreshold     | All                 | Minimum relative amount (_0-1_) amongst all features within a feature group that a formula candidate should be present (e.g. _1_ means that a candidate is only considered if it was assigned to all features). 
+adduct            | `genform`, `sirius` | The adduct to consider for calculation (e.g. `"[M+H]+"`, `"[M-H]-"`).
+MSMode            | `genform`, `bruker` | Whether formulae should be generated only from MS data (`"ms"`), MS/MS data (`"msms"`) or both (`"both"`). The latter is default, see discussion above.
+profile           | `sirius`            | Instrument profile, e.g. `"qtof"`, `"orbitrap"`, `"fticr"`.
+
+Some typical examples:
+
+```{r forms,eval=FALSE}
+formulasGF <- generateFormulas(fGroups, "genform", mslists) # GenForm, default settings
+formulasGF2 <- generateFormulas(fGroups, "genform", mslists, calculateFeatures = FALSE) # direct feature group assignment (faster)
+formulasSIR <- generateFormulas(fGroups, "sirius", mslists, elements = "CHNOPSClBr") # SIRIUS, common elements for pollutant
+formulasSIR2 <- generateFormulas(fGroups, "sirius", adduct = "[M-H]-") # SIRIUS, negative ionization
+formulasBr <- generateFormulas(fGroups, "bruker", MSMode = "MSMS") # Only consider MSMS data (SmartFormula3D)
+```
+
+
+- OM rules: as.data.table() and filter() --> OM section in advanced?
 
 ### Compounds
 

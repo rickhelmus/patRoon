@@ -39,8 +39,6 @@ knitr::opts_chunk$set(
 In a non-target workflow both chromatographic and mass spectral data is automatically processed in order to provide a comprehensive chemical characterization of your samples. While the exact workflow is typically dependent on the type of study, it generally involves of the following steps:
 
 ```{r workflow,echo=FALSE}
-# UNDONE: show componentization alongside annotation (if possible)
-
 DiagrammeR::grViz("
 digraph rmarkdown {
   graph [ rankdir = LR, compound = true ]
@@ -67,7 +65,6 @@ digraph rmarkdown {
   
   subgraph cluster3 {
     color=green;
-    //edge [dir=none]
     'Formula annotation'  'Compound Annotation'  Componentization
   }
   
@@ -78,16 +75,6 @@ digraph rmarkdown {
   'MS peak lists' -> 'Formula annotation' [ltail=cluster1, lhead=cluster3]
   'Group features' -> Reporting [ltail=cluster1, lhead=cluster4]
   'Formula annotation' -> Reporting [ltail=cluster3, lhead=cluster4]
-  
-  
-  /*'Group features' -> Annotation;
-  'Group features' -> Componentization;
-  
-  Annotation -> Componentization;
-  Componentization -> Annotation;
-  
-  Annotation -> Reporting;
-  Componentization -> Reporting;*/
 }", height = 250, width = 750)
 ```
 
@@ -225,35 +212,185 @@ The `newProject()` function can be used to setup a new project. When you run thi
 
 <!-- UNDONE: enviMass? -->
 
-Algorithm | Usage | Remarks
------------- | ----- | ------
-[OpenMS] | `findFeatures(algorithm = "openms", ...)` | Uses the [FeatureFinderMetabo] algorithm
-[XCMS] | `findFeatures(algorithm = "xcms", ...)` | Uses `xcms::xcmsSet()` function
-[XCMS] (import) | `importFeatures(algorithm = "xcms")` | Imports an existing `xcmsSet` object.
-[enviPick] | `findFeatures(algorithm = "envipick")` | Uses `enviPick::enviPickwrap()`
-DataAnalysis | `findFeatures(algorithm = "bruker")` | Uses Find Molecular Features from DataAnalysis (Bruker only)
+Collecting features from the analyses consists of finding all features, grouping them across analyses (optionally after retention time alignment) and finally, if desired suspect screening: 
 
+```{r featWorkflow,echo=FALSE}
+DiagrammeR::grViz("
+digraph rmarkdown {
+  graph [ rankdir = LR, compound = true ]
+  node [ shape = box,
+         fixedsize = true,
+         width = 2.2,
+         height = 1,
+         fontsize = 18,
+         fillcolor = darkseagreen1,
+         style = filled ]
+
+    'Find features' -> 'Group features'
+    'Suspect screening'  [shape=ellipse, fillcolor = lightcyan]
+    'Group features' -> 'Suspect screening' [dir=both]
+}", height = 100, width = 500)
+```
+
+### Finding and grouping features
+
+Several algorithms are available for finding features. These are listed in the table below alongside their usage and general remarks.
+
+Algorithm       | Usage                                     | Remarks
+--------------- | ----------------------------------------- | --------------
+[OpenMS]        | `findFeatures(algorithm = "openms", ...)` | Uses the [FeatureFinderMetabo] algorithm
+[XCMS]          | `findFeatures(algorithm = "xcms", ...)`   | Uses `xcms::xcmsSet()` function
+[XCMS] (import) | `importFeatures(algorithm = "xcms")`      | Imports an existing `xcmsSet` object.
+[enviPick]      | `findFeatures(algorithm = "envipick")`    | Uses `enviPick::enviPickwrap()`
+DataAnalysis    | `findFeatures(algorithm = "bruker")`      | Uses Find Molecular Features from DataAnalysis (Bruker only)
+
+<!-- UNDONE: link to fOpt? -->
+
+In our experience the performance of these algorithms heavily depend on the data and parameter settings that are used. Since obtaining a good feature dataset is crucial for the rest of the workflow, it is highly recommended to experiment with different settings. Some common parameters to look at are listed in the table below. However, there are many more (advanced) parameters that can be set, please see the reference documentation for these (e.g. `?findFeatures`).
+
+Algorithm      | Common parameters
+-------------- | ---------------------------------------------------------------------------------
+[OpenMS]       | `noiseThrInt`, `chromSNR`, `chromFWHM`, `mzPPM`, `minFWHM`, `maxFWHM` (see `?findFeatures`)
+[XCMS]         | `min_peakwidth`, `mzdiff`, `prefilter`, `noise` (assuming default `centWave` algorithm, see `?findPeaks.centWave`)
+[enviPick]     | `dmzgap`, `dmzdens`, `drtgap`, `drtsmall`, `drtdens`, `drtfill`, `drttotal`, `minpeak`, `minint`, `maxint` (see `?enviPickwrap`)
+DataAnalysis   | See _Find_ -> _Parameteres..._ -> _Molecular Features_ in DataAnalysis.
+
+> **_NOTE_** DataAnalysis feature settings have to be configured in DataAnalysis prior to calling `findFeatures()`.
+
+Similarly, for grouping features across analyses several algorithms are supported.
 
 Algorithm | Usage | Remarks
---------- | ----- | ------
+--------- | ----------------- | -------------------------------------
 [OpenMS] | `groupFeatures(algorithm = "openms", ...)` | Uses the [FeatureFinderMetabo] algorithm
 [XCMS] | `groupFeatures(algorithm = "xcms", ...)` | Uses `xcms::group()` function
 ProfileAnalysis | `importFeatureGroups(algorithm = "brukerpa", ...)` | Import `.csv` file exported from Bruker ProfileAnalysis
 TASQ | `importFeatureGroups(algorithm = "brukertasq", ...)` | Imports a _Global result table_ (exported to Excel file and then saved as `.csv` file)
 
+Just like finding features, each algorithm has their own set of parameters. Often the defaults are a good start but it is recommended to have look at them. See `?groupFeatures` for more details.
 
+Some examples of finding and grouping features are shown below.
+
+<!-- UNDONE: enable this for testing? -->
+
+```{r feat,eval=FALSE}
+# The anaInfo variable contains analysis information, see the previous section
+
+# Finding features
+fListOMS <- findFeatures(anaInfo, "openms") # OpenMS, with default settings
+fListOMS2 <- findFeatures(anaInfo, "openms", noiseThrInt = 500, chromSNR = 10) # OpenMS, adjusted minimum intensity and S/N
+fListXCMS <- findFeatures(anaInfo, "xcms", min_peakwidth = 10) # XCMS
+fListXCMS2 <- importFeatures(anaInfo, "xcms", xset) # import XCMS xcmsSet object
+fListEP <- findFeatures(anaInfo, "envipick", minint = 1E3) # enviPick
+
+# Grouping features
+fGroupsOMS <- groupFeatures(fListOMS, "openms") # OpenMS grouping, default settings
+fGroupsOMS2 <- groupFeatures(fListOMS2, "openms", rtalign = FALSE) # OpenMS grouping, no RT alignment
+fGroupsOMS3 <- groupFeatures(fListXCMS, "openms", maxGroupRT = 6) # group XCMS features with OpenMS, adjusted grouping parameter
+fGroupsXCMS <- groupFeatures(fListEP, "xcms", minfrac = 0) # group enviPick features with XCMS, disable minfrac
+```
+
+### Suspect screening
+
+After features have been grouped suspect screening may be performed to eliminate any feature groups with _m/z_ and (optionally) retention properties not present in a given suspect list. A typical workflow looks like this:
+
+```{r susp,eval=FALSE}
+targets <- data.frame(name = c("susp1", "susp2", "susp3"),
+                      mz = c(100.1034, 250.0456, 300.1234),
+                      stringsAsFactors = FALSE)
+scr <- screenTargets(fGroups, targets)
+fGroupsSusp <- groupFeaturesScreening(fGroups, scr)
+```
+
+<!-- UNDONE: make this interactive -->
+
+This will perform the following steps:
+
+1. Create a suspect list. A suspect list is a `data.frame` with mandatory `name` and `mz` columns. Optionally, it may also contain an `rt` column for retention times (in seconds). In reality loading such a table is easiest from a _.csv_ file with e.g. `read.csv()`.
+2. Screen a feature groups object for the suspects. The return value will be a `data.frame` with results.
+3. Use the screening results to filter the original feature groups and store the results in `fGroupsSusp`.
 
 - Table with algorithms and remarks about their selection
 - Process: extract features --> align RT --> group (--> suspect screening)
 
 ## Annotation
 
-- Adducts: conversion
+The annotation consists of collecting MS peak lists and then formula and/or compound annotation:
+
+```{r annWorkflow,echo=FALSE}
+DiagrammeR::grViz("
+digraph rmarkdown {
+  graph [ rankdir = LR ]
+  node [ shape = box,
+         fixedsize = true,
+         width = 2.3,
+         height = 1,
+         fontsize = 18,
+         fillcolor = darkseagreen1,
+         style = filled ]
+
+    'MS peak lists' -> 'Formula annotation'
+    'MS peak lists' -> 'Compound annotation'
+    'Formula annotation':e -> 'Compound annotation':e [style = dotted, constraint = false]
+}", height = 160, width = 500)
+```
+
+Note that compound annotation is normally not dependent upon formula annotation. However, formula data can be used to improve ranking of candidates afterwards by the `addFormulaScoring()` function, which will be discussed later in this section.
+
+### Adducts
+
+- Adducts: conversion --> Move to advanced? Also because components are a bit involved.
 
 ### MS peak lists
 
-- Table with algorithms and remarks about their selection
-- Process: extract MS and MS/MS spectra per feature --> average --> average per group
+Algorithm    | Usage                                            | Remarks
+------------ | ---------------------------------------------    | -----------------------------------------------------
+[mzR]        | `generateMSPeakLists(algorithm = "mzr", ...)`    | Uses [mzR] for spectra retrieval. Recommended default.
+DataAnalysis | `generateMSPeakLists(algorithm = "bruker", ...)` | Loads data from automaticallt generated MS and MS/MS spectra in DataAnalysis
+DataAnalysis FMF | `generateMSPeakLists(algorithm = "brukerfmf", ...)` | Uses spectra from the  _find molecular features_ algorithm.
+
+The recommended default algorithm is `mzr`: this algorithm is generally faster and is not limited to a vendor data format as it will read the open `mzML` and `mzXML` file formats. On the other hand, when DataAnalysis is used with Bruker data the spectra can be automatically background subtracted and there is no need for file conversion. Note that the `brukerfmf` algorithm only works when `findFeatures()` was called with the `bruker` algorithm.
+
+<!-- UNDONE: Add images here? -->
+
+When `generateMSPeakists()` is called it will
+
+1. Find all MS and MS/MS spectra that 'belong' to a feature. For MS spectra this means that all spectra close to the retention time of a feature will be collected. In addition, for MS/MS normally only spectra will be considered that have a precursor mass close to that of the feature (however, this can be disabled for data that was recorded with data independent acquisition (DIA, MS^E, bbCID, ...)).
+2. Average all MS and MS/MS spectra to produce peak lists for each feature.
+3. Average all peak lists for features within the same group.
+
+Formula calculation uses either data from (2) or (3) (i.e. trade-off between accuracy and speed), whereas compound annotation will always use data from (3) to limit required resources and processing time.
+
+There are several common function arguments to `generateMSPeakLists()` that can be used to optimize its behaviour:
+
+<!-- UNDONE: add topMost for Bruker when it's there -->
+
+Argument | Algorithm(s) | Remarks
+-------- | ------------ | ------------------------------------------------------------------------------------
+maxMSRtWindow | `mzr`, `bruker` | Maximum time window +/- the feature retention time (in seconds) to collect spectra for averaging. Higher values may significantly increase processing times.
+precursorMzWindow | 'mzr' | Maximum precursor _m/z_ search window to find MS/MS spectra. Set to `NULL` to disable (i.e. for DIA experiments).
+topMost | `mzr` | Only retain feature data for no more than this amount analyses with highest intensity. For instance, a value of _1_ will only keep peak lists for the feature with highest intensity in a feature group.  
+bgsubtr | `bruker` | Perform background subtraction (if the spectra type supports this, e.g. MS and bbCID)
+minMSIntensity, minMSMSIntensity | `bruker`, `brukerfmf` | Minimum MS and MS/MS intensity. Note that DataAnalysis reports many zero intensity peaks so a value of at least _1_ is recommended.
+MSMSType | `bruker` | The type of spectra that should be used for MSMS: `"BBCID"` for bbCID experiments, otherwise `"MSMS"` (the default).
+
+In addition, several parameters can be set that affect spectral averaging. These parameters are passed as a `list` to the `avgFeatParams` (`mzr` algorithm only) and `avgFGroupParams` arguments, which affect averaging of feature and feature group data, respectively. Some typical parameters include:
+
+* `clusterMzWindow`: Maximum _m/z_ window used to cluster mass peaks when averaging. The better the MS resolution, the lower this value should be.
+* `topMost`: Retain no more than this amount of most intense mass peaks. Useful to filter out 'noisy' peaks.
+* `minIntensityPre` / `minIntensityPost`: Mass peaks below this intensity will be removed before/after averaging.
+
+See `?generateMSPeakLists` for all possible parameters.
+
+A suitable list object to set averaging parameters can be obtained with the `getDefAvgPListParams()` function.
+
+```{r avgMSPLParamas,eval=FALSE}
+# lower default clustering window, other settings remain default
+avgPListParams <- getDefAvgPListParams(clusterMzWindow = 0.001)
+
+# Apply to both feature and feature group averaging
+plists <- generateMSPeakLists(fGroups, "mzr", avgFeatParams = avgPListParams, avgFGroupParams = avgPListParams)
+```
+
 
 ### Formulae
 

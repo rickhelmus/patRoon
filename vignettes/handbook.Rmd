@@ -367,7 +367,7 @@ There are several common function arguments to `generateMSPeakLists()` that can 
 Argument | Algorithm(s) | Remarks
 -------- | ------------ | ------------------------------------------------------------------------------------
 maxMSRtWindow | `mzr`, `bruker` | Maximum time window +/- the feature retention time (in seconds) to collect spectra for averaging. Higher values may significantly increase processing times.
-precursorMzWindow | 'mzr' | Maximum precursor _m/z_ search window to find MS/MS spectra. Set to `NULL` to disable (i.e. for DIA experiments).
+precursorMzWindow | `mzr` | Maximum precursor _m/z_ search window to find MS/MS spectra. Set to `NULL` to disable (i.e. for DIA experiments).
 topMost | `mzr` | Only retain feature data for no more than this amount analyses with highest intensity. For instance, a value of _1_ will only keep peak lists for the feature with highest intensity in a feature group.  
 bgsubtr | `bruker` | Perform background subtraction (if the spectra type supports this, e.g. MS and bbCID)
 minMSIntensity, minMSMSIntensity | `bruker`, `brukerfmf` | Minimum MS and MS/MS intensity. Note that DataAnalysis reports many zero intensity peaks so a value of at least _1_ is recommended.
@@ -441,6 +441,19 @@ formulasBr <- generateFormulas(fGroups, "bruker", MSMode = "MSMS") # Only consid
 
 ### Compounds
 
+An important step in a typical non-target workflow is structural identification for features of interest. Afterall, this information may finally reveal _what_ a feature is. Structure annotation is a complex procedure, which currently heavily relies on spectral libraries and compound databases. As such, if the 'right' chemical compound does not exist in the database used, it is impossible to assign the correct structure. Luckily, several large databases such as [PubChem] and [ChemSpider] are openly available which both currently contain more than 70 million compound records.
+
+Structure assignment in `patRoon` is performed automatically for all feature groups with the `generateCompounds()` function. Currently, this function supports two algorithms:
+
+Algorithm                    | Usage                                           | Remarks
+---------------------------- | ----------------------------------------------- | ------------------------------------------------
+[MetFrag]                    | `generateCompounds(algorithm = "metfrag", ...)` | Supports many databases (including custom) and scorings for candidate ranking.
+[SIRIUS] with [CSI:FingerID] | `generateCompounds(algorithm = "sirius", ...)`  | Incorporates prior comprohensive formula calculations.
+
+Compound annotation is often a relative time and resource intensive procedure. Unlike formula annotation, it is therefore not possible to annotate features individually, and candidate assignment is based on feature group averaged peak lists. Nevertheless, it is not uncommon that this is the most time consuming step in the workflow. For this reason, prioritization of features is highly important, even more so when an online database is used for compound retrieval.
+
+
+
 - Table with algorithms and remarks about their selection
 - database selection (MF) --> PC, CS (set key), CT (set opt), csv etc (set path)
 - Process: download candidates --> rank candidates on X, Y, Z (--> add formula scoring)
@@ -493,6 +506,9 @@ formulasBr <- generateFormulas(fGroups, "bruker", MSMode = "MSMS") # Only consid
 - methods
 
 ## Caching
+
+## Parallelization
+
 
 ```{r child="shared/refs.Rmd"}
 ```

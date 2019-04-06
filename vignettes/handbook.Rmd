@@ -17,6 +17,8 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
+
+library(patRoon)
 ```
 
 ```{css code=readLines("styles.css"),echo=FALSE}
@@ -393,6 +395,8 @@ plists <- generateMSPeakLists(fGroups, "mzr", avgFeatParams = avgPListParams, av
 
 ### Formulae
 
+- GF and high m/z values?
+
 Formulae can be automatically calculated for all features using the `generateFormulas()` function. The following algorithms are currently supported:
 
 Algorithm    | Usage                                          | Remarks
@@ -441,7 +445,9 @@ formulasBr <- generateFormulas(fGroups, "bruker", MSMode = "MSMS") # Only consid
 
 ### Compounds
 
-An important step in a typical non-target workflow is structural identification for features of interest. Afterall, this information may finally reveal _what_ a feature is. Structure annotation is a complex procedure, which currently heavily relies on spectral libraries and compound databases. As such, if the 'right' chemical compound does not exist in the database used, it is impossible to assign the correct structure. Luckily, several large databases such as [PubChem] and [ChemSpider] are openly available which both currently contain more than 70 million compound records.
+- Advanced?: RT/suspect scoring
+
+An important step in a typical non-target workflow is structural identification for features of interest. Afterall, this information may finally reveal _what_ a feature is. The first step is to find all possible structures in a database that may be assigned to the feature (based on e.g. monoisotopic mass or formula). These candidates are then scored to rank likely candidates, for instance, on correspondence with in-silico or library MS/MS spectra and environmental relevance. 
 
 Structure assignment in `patRoon` is performed automatically for all feature groups with the `generateCompounds()` function. Currently, this function supports two algorithms:
 
@@ -450,15 +456,101 @@ Algorithm                    | Usage                                           |
 [MetFrag]                    | `generateCompounds(algorithm = "metfrag", ...)` | Supports many databases (including custom) and scorings for candidate ranking.
 [SIRIUS] with [CSI:FingerID] | `generateCompounds(algorithm = "sirius", ...)`  | Incorporates prior comprohensive formula calculations.
 
-Compound annotation is often a relative time and resource intensive procedure. Unlike formula annotation, it is therefore not possible to annotate features individually, and candidate assignment is based on feature group averaged peak lists. Nevertheless, it is not uncommon that this is the most time consuming step in the workflow. For this reason, prioritization of features is highly important, even more so when an online database is used for compound retrieval.
+Compound annotation is often a relative time and resource intensive procedure. For this reason, features are not annotated individually, but instead a feature group as a whole is annotated, which generally saves significant amounts of computational requirements. Nevertheless, it is not uncommon that this is the most time consuming step in the workflow. For this reason, prioritization of features is highly important, even more so to avoid 'abusing' servers when an online database is used for compound retrieval.
 
+Selecting the right database is important for proper candidate assignment. Afterall, if the 'right' chemical compound is not present in the used database, it is impossible to assign the correct structure. Luckily, however, several large databases such as [PubChem] and [ChemSpider] are openly available which contain tens of millions of compounds. On the other hand, these databases may also lead to many unlikely candidates and therefore more specialized (or custom databases) may be preferred. Which database will be used is dictated by the `database` argument to `generateCompounds()`, currently the following options exist:
 
+<!-- UNDONE: add missing databases (e.g. FOR-IDENT) when support is added -->
 
-- Table with algorithms and remarks about their selection
-- database selection (MF) --> PC, CS (set key), CT (set opt), csv etc (set path)
-- Process: download candidates --> rank candidates on X, Y, Z (--> add formula scoring)
-- Timeouts & error handling
-- Advanced?: RT/suspect scoring
+Database            | Algorithm(s)            | Remarks
+------------------- | ----------------------- | -----------------------
+`pubchem`           | `"metfrag"`, `"sirius"` | [PubChem] is currently the largest compound database and is used by default.
+`chemspider`        | `"metfrag"`             | [ChemSpider] is another large database. Requires security token from [here](http://www.chemspider.com/AboutServices.aspx) (see next section).
+`comptox`           | `"metfrag"`             | The EPA [CompTox] contains many compounds and scorings relevant to environmental studies. Needs manual download (see next section).
+`kegg`              | `"metfrag"`, `"sirius"` | The [KEGG] database for biological compounds
+`hmdb`              | `"metfrag"`, `"sirius"` | The [HMDB] contains many human metabolites.
+`bio`               | `"sirius"`              | Selects all supports biological databases.
+`csv`, `psv`, `sdf` | `"metfrag"`             | Custom database (see next section). [CSV example][csvDB-ex].
+
+#### Configuring MetFrag databases and scoring
+
+Some extra configuration may be necessary when using certain databases with MetFrag. In order to use the ChemSpider database a [security token](http://www.chemspider.com/AboutServices.aspx) should be requested and set with the `chemSpiderToken` argument to `generateCompounds()`. The CompTox database needs to be manually downloaded from [here][CompTox-dl] (currently only the _SelectMetaData_ and _SelectMetaDataPlus_ databases are supported). The file location of this and other local databases (`csv`, `psv`, `sdf`) needs to be manually configured, see the examples below and/or `?generateCompounds` for more information on how to do this.
+
+```{r compDB,eval=FALSE}
+# PubChem: the default
+compsMF <- generateCompounds(fGroups, mslists, "metfrag", adduct = "[M+H]+")
+
+# ChemSpider: needs security token
+compsMF2 <- generateCompounds(fGroups, mslists, "metfrag", database = "chemspider",
+                              chemSpiderToken = "MY_TOKEN_HERE", adduct = "[M+H]+")
+
+# CompTox: set global option to database path
+options(patRoon.path.MetFragCompTox = "~/DSSTox_01May18_Full_SelectMetaDataPlus.csv")
+compsMF3 <- generateCompounds(fGroups, mslists, "metfrag", database = "comptox", adduct = "[M+H]+")
+
+# CompTox: set database location without global option
+compsMF4 <- generateCompounds(fGroups, mslists, "metfrag", database = "comptox", adduct = "[M+H]+",
+                              extraOpts = list(LocalDatabasePath = "~/DSSTox_01May18_Full_SelectMetaDataPlus.csv"))
+
+# Same, but for custom database
+compsMF5 <- generateCompounds(fGroups, mslists, "metfrag", database = "csv", adduct = "[M+H]+",
+                              extraOpts = list(LocalDatabasePath = "~/mydb.csv"))
+```
+
+An example of a custom _.csv_ database can be found [here][csvDB-ex].
+
+With MetFrag compound databases are not only used to retrieve candidate structures but are also used to obtain metadata for further ranking. Each database has its own scorings, a table with currently supported scorings can be obtained with the `compoundScorings()` function (some columns omitted):
+
+```{r compSc,echo=FALSE}
+k <- knitr::kable(compoundScorings()[, c("name", "metfrag", "database", "default")], "html")
+k <- kableExtra::kable_styling(k, font_size = 11)
+kableExtra::scroll_box(k, extra_css = "overflow-y: auto; height: 350px;")
+```
+
+The first two columns contain the generic and original MetFrag naming schemes for each scoring type. While both naming schemes can be used, the generic is often shorter and harmonized with other algorithms (e.g. SIRIUS). The _database_ column specifies for which databases a particular scoring is available (empty if not database specific). Most scorings are selected by default (as specified by the _default_ column), however, this behaviour can be customized by using the `scoreTypes` argument:
+
+```{r compCustSc,eval=FALSE}
+# Only in-silico and PubChem number of patents scorings
+compsMF1 <- generateCompounds(fGroups, mslists, "metfrag", adduct = "[M+H]+",
+                              scoreTypes = c("fragScore" "numberPatents"))
+
+# Custom scoring in custom database
+compsMF2 <- generateCompounds(fGroups, mslists, "metfrag", adduct = "[M+H]+",
+                              database = "csv", adduct = "[M+H]+",
+                              extraOpts = list(LocalDatabasePath = "~/mydb.csv"),
+                              scoreTypes = c("fragScore", "myScore", "myScore2"))
+```
+
+By default ranking is performed with equal weight (i.e. _1_) for all scorings. This can be changed by the `scoreWeights` argument, which should be a `vector` containing the weights for all scorings following the order of `scoreTypes`, for instance:
+
+```{r compCustScW,eval=FALSE}
+compsMF <- generateCompounds(fGroups, mslists, "metfrag", adduct = "[M+H]+",
+                             scoreTypes = c("fragScore" "numberPatents"),
+                             scoreWeights = c(1, 2))
+```
+
+Sometimes thousands or more structural candidates are found when annotating a feature group. In this situation processing all these candidates will too involving (especially when external databases are used). To avoid this a default cut-off is set: when the number of candidates exceed a certain amount the search will be aborted and no results will be reported for that feature group. The maximum number of candidates can be set with the `maxCandidatesToStop` argument. The default value is relative conservative, especially for local databases it may be useful to increase this number.
+
+#### Timeout and error handling
+
+The use of online databases has the drawback that an error may occur, for instance, as a result of a connection error. Furthermore, MetFrag typically returns an error when too many candidates are found (as set by the `maxCandidatesToStop` argument). By default processing is restarted if an error has occurred (configured by the `errorRetries` argument). Similarly, the `timeoutRetries` and `timeout` arguments can be used to avoid being 'stuck' on obtaining results, for instance, due to an unstable internet connection.
+
+If no compounds could be assigned due to an error a warning will be issued. In this case it is best to see what went wrong by manually checking the log files, which by default are stored in the _log/metfrag_ folder.
+
+#### Formula scoring
+
+Ranking of candidate structures may further be improved by incorporating formula information by using the `addFormulaScoring()` function:
+
+```{r addFormSc,eval=FALSE}
+comps <- addFormulaScoring(coms, formulas, updateScore = TRUE)
+```
+
+Here, corresponding formula and explained fragments will be used to calculate a _formulaScore_ for each candidate. Note that SIRIUS candidates are already based on calculated formulae, hence, running this function on SIRIUS results is less sensable unless scoring from another formula calculation algorithm is desired.
+
+#### Further options and parameters
+
+There are _many_ more options and parameters that affect compound annotation. For a full overview please have a look at the reference manual (e.g. by running `?generateCompounds`).
+
 
 ## Components
 

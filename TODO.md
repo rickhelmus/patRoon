@@ -43,6 +43,9 @@
 - SIRIUS: use --auto-charge instead of manually fixing charge of fragments (or not? conflicting docs on what it does)
 - test score normalization?
 - add new MF stat and other scorings and make sure default normalization equals that of MF web
+- MF: add support for all databases
+- Fix MF database section in docs
+- timeouts for SIRIUS?
 - improve formula scoring
 
 

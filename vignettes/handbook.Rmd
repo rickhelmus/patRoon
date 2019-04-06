@@ -552,13 +552,35 @@ Here, corresponding formula and explained fragments will be used to calculate a 
 There are _many_ more options and parameters that affect compound annotation. For a full overview please have a look at the reference manual (e.g. by running `?generateCompounds`).
 
 
-## Components
+## Componentization
 
-- Table with algorithms and remarks about their selection
+In `patRoon` _componentization_ refers to grouping related feature groups together in components. Currently there are three different methodologies to generate components:
 
-### RT components
+* Similarity on chromatographic elution profiles: feature groups with similar chromatographic behaviour which are assuming to be the same chemical compound (e.g. adducts or isotopologues).
+* Homologous series: features with increasing _m/z_ and retention time.
+* Intensity profiles: features that follow a similar intensity profile in the analyses.
 
-- CAMERA and RAMClustR
+The following algorithms are currently supported:
+
+Algorithm            | Usage                                              | Remarks
+-------------------- | -------------------------------------------------- | --------------------------------------------
+[CAMERA]             | `generateComponents(algorithm = "camera", ...)`    | Clusters feature groups with similar chromatographic elution profiles and annotate by known chemical rules (adducts, isotopologues, in-source fragments).
+[RAMClustR]          | `generateComponents(algorithm = "ramclustr", ...)` | As above.
+[nontarget]          | `generateComponents(algorithm = "nontarget", ...)` | Uses the [nontarget] R package to perform unsupervised homologous series detection.
+Intensity clustering | `generateComponents(algorithm = "intclust", ...)`  | Groups features with similar intensity profiles across analyses by hierarchical clustering.
+
+> **_NOTE_** Componentization is a complex process and currently still in a relative young development phase. As such, functionality and interface are planned to be further improved and results obtained now should always be manually checked.
+
+### Componentization of features with similar chromatography
+
+Isotopes, adducts and in-source fragments typically result in detection of multiple mass peaks by the mass spectrometer for a single chemical compound. While some feature finding algorithms already try to collapse (some of) these in to a single feature, this process is often incomplete (if performed at all) and it is not uncommon that multiple features will describe the same compound. To overcome this complexity the algorithms from [CAMERA] and [RAMClustR] can be used to group features that undergo highly similar chromatographic behaviour but have different _m/z_ values. Basic chemical rules are then applied to the resulting components to annotate adducts, in-source fragments and isotopologues, which may be highly useful for general identification purposes.
+
+<!-- UNDONE: hint/link to reporting for checking results -->
+
+Note that this process requires careful tuning. In our experience the current default settings may significantly 'over-cluster' features that (clearly visibly) do not belong to each other. For this reason, you are advised to optimize and verify the various parameters supported by both algorithms (see e.g. `?generateComponents`).
+
+Note that both algorithms were primarily designed for datasets where features are generally present in the majority of the analyses (as is relatively common in metabolomics). For environmental analyses, however, this is often not the case. As a result, it may happen that not all features from the feature groups within a component share their presence in the same analyses. In reality, this situation would be fairly unusual, and it is likely that such features actually do not belong to the same component. An extra filter option was added to improve such scenarios: after componentization all features are checked to have a minimal presence across all analyses within the component. This is configured by the `relMinReplicates` argument of `generateComponents()`, which specifies the relative number of replicate groups in which a feature should be present. For instance, when this value is _0.5_ (the default), a feature must be present in at least half of all replicate groups present in the component.
+
 
 ### Homologues series
 

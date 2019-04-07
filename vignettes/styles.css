@@ -9,3 +9,7 @@ blockquote {
     background-color: aliceblue;
     padding: 0.25em 0.75em;
 }
+
+p.caption {
+  font-size: 0.8em;
+}

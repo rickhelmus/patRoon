@@ -61,7 +61,7 @@ digraph rmarkdown {
   
   subgraph cluster2 {
     'Suspect screening' -> 'Group features'
-    'Find features' -> 'Suspect screening' [style=invis];
+    'Find features' -> 'Suspect screening' [style=invis]
     'Group features' -> 'Suspect screening'
   }
   
@@ -571,7 +571,7 @@ Intensity clustering | `generateComponents(algorithm = "intclust", ...)`  | Grou
 
 > **_NOTE_** Componentization is a complex process and currently still in a relative young development phase. As such, functionality and interface are planned to be further improved and results obtained now should always be manually checked.
 
-### Componentization of features with similar chromatography
+### Componentization of features with similar chromatographic behaviour
 
 Isotopes, adducts and in-source fragments typically result in detection of multiple mass peaks by the mass spectrometer for a single chemical compound. While some feature finding algorithms already try to collapse (some of) these in to a single feature, this process is often incomplete (if performed at all) and it is not uncommon that multiple features will describe the same compound. To overcome this complexity the algorithms from [CAMERA] and [RAMClustR] can be used to group features that undergo highly similar chromatographic behaviour but have different _m/z_ values. Basic chemical rules are then applied to the resulting components to annotate adducts, in-source fragments and isotopologues, which may be highly useful for general identification purposes.
 
@@ -584,8 +584,55 @@ Note that both algorithms were primarily designed for datasets where features ar
 
 ### Homologues series
 
-- nontarget
-- linking/merging
+Homologues series can be automatically detected by interfacing with the [nontarget] R package. Components are made from feature groups that show increasing _m/z_ and retention time values. Series are first detected within each replicate group. Afterwards, series between replicates are linked
+in case (partial) overlap occurs and this overlap consists of the _same_ feature groups (see figure below). Linked series are then finally merged if this will not cause any conflicts with other series: such a conflict typically occurs when two series are not only linked to each other.
+
+```{r HS,echo=FALSE,fig.cap="**Linking of homologues series** top: partial overlap and will be linked; bottom: no linkage due to different feature in overlapping series."}
+DiagrammeR::grViz("
+digraph rmarkdown {
+  graph [ rankdir = LR, compound = true, style = invis ]
+  node [ shape = oval,
+         fixedsize = true,
+         width = 2.3,
+         height = 0.8,
+         fontsize = 25,
+         fillcolor = darkseagreen1,
+         style = filled ]
+
+  subgraph cluster3 {
+    I [fillcolor=skyblue]; J [fillcolor=skyblue]; K [fillcolor=skyblue]
+    G -> H -> I -> J -> K [style=invis]
+  }
+
+  subgraph cluster4 {
+    _I [label=I, fillcolor=skyblue]; X [fillcolor=indianred1]; _K [label=K, fillcolor=skyblue]
+    _I -> X -> _K -> L [style=invis]
+  }
+
+  H -> _I [ltail=cluster3, lhead=cluster4, style=invis]
+  
+  I -> _I [constraint=false, style=dashed, arrowhead=none]
+  K -> _K [constraint=false, style=dashed, arrowhead=none]
+  
+  subgraph cluster1 {
+    C [fillcolor=skyblue]; D [fillcolor=skyblue]
+    A -> B -> C -> D [style=invis]
+  }
+
+  subgraph cluster2 {
+    _C [label=C, fillcolor=skyblue]; _D [label=D, fillcolor=skyblue]
+    _C -> _D -> E -> F [style=invis]
+  }
+  
+  B -> _C [ltail=cluster1, lhead=cluster2, style=invis]
+
+  C -> _C [constraint=false, style=dashed, arrowhead=none]
+  D -> _D [constraint=false, style=dashed, arrowhead=none]
+}", height = 250, width = 600)
+```
+
+
+- view links
 
 ### Intensity clustering
 

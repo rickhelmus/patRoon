@@ -231,7 +231,7 @@ digraph rmarkdown {
     'Find features' -> 'Group features'
     'Suspect screening'  [shape=ellipse, fillcolor = lightcyan]
     'Group features' -> 'Suspect screening' [dir=both]
-}", height = 100, width = 500)
+}", height = 70, width = 500)
 ```
 
 ### Finding and grouping features
@@ -333,7 +333,7 @@ digraph rmarkdown {
     'MS peak lists' -> 'Formula annotation'
     'MS peak lists' -> 'Compound annotation'
     'Formula annotation':e -> 'Compound annotation':e [style = dotted, constraint = false]
-}", height = 160, width = 500)
+}", height = 120, width = 500)
 ```
 
 Note that compound annotation is normally not dependent upon formula annotation. However, formula data can be used to improve ranking of candidates afterwards by the `addFormulaScoring()` function, which will be discussed later in this section.
@@ -366,14 +366,14 @@ There are several common function arguments to `generateMSPeakLists()` that can 
 
 <!-- UNDONE: add topMost for Bruker when it's there -->
 
-Argument | Algorithm(s) | Remarks
--------- | ------------ | ------------------------------------------------------------------------------------
-maxMSRtWindow | `mzr`, `bruker` | Maximum time window +/- the feature retention time (in seconds) to collect spectra for averaging. Higher values may significantly increase processing times.
-precursorMzWindow | `mzr` | Maximum precursor _m/z_ search window to find MS/MS spectra. Set to `NULL` to disable (i.e. for DIA experiments).
-topMost | `mzr` | Only retain feature data for no more than this amount analyses with highest intensity. For instance, a value of _1_ will only keep peak lists for the feature with highest intensity in a feature group.  
-bgsubtr | `bruker` | Perform background subtraction (if the spectra type supports this, e.g. MS and bbCID)
+Argument                         | Algorithm(s) | Remarks
+-------------------------------- | --------------------- | ----------------------------------------------------------------------
+maxMSRtWindow                    | `mzr`, `bruker`       | Maximum time window +/- the feature retention time (in seconds) to collect spectra for averaging. Higher values may significantly increase processing times.
+precursorMzWindow                | `mzr`                 | Maximum precursor _m/z_ search window to find MS/MS spectra. Set to `NULL` to disable (i.e. for DIA experiments).
+topMost                          | `mzr`                 | Only retain feature data for no more than this amount analyses with highest intensity. For instance, a value of _1_ will only keep peak lists for the feature with highest intensity in a feature group.  
+bgsubtr                          | `bruker`              | Perform background subtraction (if the spectra type supports this, e.g. MS and bbCID)
 minMSIntensity, minMSMSIntensity | `bruker`, `brukerfmf` | Minimum MS and MS/MS intensity. Note that DataAnalysis reports many zero intensity peaks so a value of at least _1_ is recommended.
-MSMSType | `bruker` | The type of spectra that should be used for MSMS: `"BBCID"` for bbCID experiments, otherwise `"MSMS"` (the default).
+MSMSType                         | `bruker`              | The type of spectra that should be used for MSMS: `"BBCID"` for bbCID experiments, otherwise `"MSMS"` (the default).
 
 In addition, several parameters can be set that affect spectral averaging. These parameters are passed as a `list` to the `avgFeatParams` (`mzr` algorithm only) and `avgFGroupParams` arguments, which affect averaging of feature and feature group data, respectively. Some typical parameters include:
 
@@ -569,7 +569,7 @@ Algorithm            | Usage                                              | Rema
 [nontarget]          | `generateComponents(algorithm = "nontarget", ...)` | Uses the [nontarget] R package to perform unsupervised homologous series detection.
 Intensity clustering | `generateComponents(algorithm = "intclust", ...)`  | Groups features with similar intensity profiles across analyses by hierarchical clustering.
 
-> **_NOTE_** Componentization is a complex process and currently still in a relative young development phase. As such, functionality and interface are planned to be further improved and results obtained now should always be manually checked.
+> **_NOTE_** Componentization is a complex process and currently still in a relative young development phase. As such, its functionality and interface are planned to be further improved and results obtained now should always be manually checked.
 
 ### Componentization of features with similar chromatographic behaviour
 
@@ -577,15 +577,41 @@ Isotopes, adducts and in-source fragments typically result in detection of multi
 
 <!-- UNDONE: hint/link to reporting for checking results -->
 
-Note that this process requires careful tuning. In our experience the current default settings may significantly 'over-cluster' features that (clearly visibly) do not belong to each other. For this reason, you are advised to optimize and verify the various parameters supported by both algorithms (see e.g. `?generateComponents`).
+Some common function arguments to `generateComponents()` are listed below. Note that careful tuning for some of these is required to obtain useful results. In our experience the current default settings may significantly 'over-cluster' features that (clearly visibly) do not belong to each other. For this reason, you are advised to optimize and verify the various parameters supported by both algorithms. For a complete listing all arguments see the reference manual (e.g. `?generateComponents`).
+
+Argument                     | Algorithm                 | Remarks
+---------------------------- | ------------------------- | --------------------------------------------------------------------
+`ionization`                 | `"camera"`, `"ramclustr"` | Ionization mode: `"positive"` or `"negative"`
+`minSize`                    | `"camera"`, `"ramclustr"` | Minimum component size. Smaller components will be removed.
+`relMinReplicates`           | `"camera"`, `"ramclustr"` | See below.
+`st`, `sr`, `maxt`, `hmax`   | `"ramclustr"`             | Common parameters to influence clustering of [RAMClustR]. See `?ramclustR` for details.
+`extraOpts`                  | `"camera"`                | A list with extra argument passed to the `annotate()` function from [CAMERA].
+`extraOptsRC`, `extraOptsFM` | `"ramclustr"`             | A list with extra arguments passed to the `ramclustR()` and `do.findmain()` functions from [RAMClustR].
 
 Note that both algorithms were primarily designed for datasets where features are generally present in the majority of the analyses (as is relatively common in metabolomics). For environmental analyses, however, this is often not the case. As a result, it may happen that not all features from the feature groups within a component share their presence in the same analyses. In reality, this situation would be fairly unusual, and it is likely that such features actually do not belong to the same component. An extra filter option was added to improve such scenarios: after componentization all features are checked to have a minimal presence across all analyses within the component. This is configured by the `relMinReplicates` argument of `generateComponents()`, which specifies the relative number of replicate groups in which a feature should be present. For instance, when this value is _0.5_ (the default), a feature must be present in at least half of all replicate groups present in the component.
+
+Some example usage is shown below.
+
+```{r chromComps,eval=FALSE}
+# Use CAMERA with defaults
+componCAM <- generateComponents(fGroups, "camera", ionization = "positive")
+
+# CAMERA with customized settings
+componCAM2 <- generateComponents(fGroups, "camera", ionization = "positive",
+                                 extraOpts = list(mzabs = 0.001, sigma = 5))
+
+# Use RAMClustR with customized parameters
+componRC <- generateComponents(fGroups, "ramclustr", ionization = "positive", hmax = 0.4,
+                               extraOptsRC = list(cor.method = "spearman"),
+                               extraOptsFM = list(ppm.error = 5))
+```
 
 
 ### Homologues series
 
-Homologues series can be automatically detected by interfacing with the [nontarget] R package. Components are made from feature groups that show increasing _m/z_ and retention time values. Series are first detected within each replicate group. Afterwards, series between replicates are linked
-in case (partial) overlap occurs and this overlap consists of the _same_ feature groups (see figure below). Linked series are then finally merged if this will not cause any conflicts with other series: such a conflict typically occurs when two series are not only linked to each other.
+- view links
+
+Homologues series can be automatically detected by interfacing with the [nontarget] R package. Components are made from feature groups that show increasing _m/z_ and retention time values. Series are first detected within each replicate group. Afterwards, series from all replicates are linked in case (partial) overlap occurs and this overlap consists of the _same_ feature groups (see figure below). Linked series are then finally merged if this will not cause any conflicts with other series: such a conflict typically occurs when two series are not only linked to each other.
 
 ```{r HS,echo=FALSE,fig.cap="**Linking of homologues series** top: partial overlap and will be linked; bottom: no linkage due to different feature in overlapping series."}
 DiagrammeR::grViz("
@@ -631,13 +657,58 @@ digraph rmarkdown {
 }", height = 250, width = 600)
 ```
 
+Common function arguments to `generateComponents()` are listed below.
 
-- view links
+Argument             | Remarks
+-------------------- | -----------------------------------------------------------------------
+`ionization`         | Ionization mode: `"positive"` or `"negative"`
+`rtRange`, `mzRange` | Retention and _m/z_ increment range. Retention times can be negative to allow series with increasing _m/z_ values and decreasing retention times.
+`elements`           | Vector with elements to consider.
+`rtDev`, `absMzDev`  | Maximum retention time and _m/z_ deviation.
+`extraOpts`          | List with extra arguments passed to the `homol.search()` function.
+
+```{r compsNT,eval=FALSE}
+# default settings
+componNT <- generateComponents(fGroups, "nontarget", ionization = "positive")
+
+# customized settings
+componNT2 <- generateComponents(fGroups, "nontarget", ionization = "positive",
+                                elements = c("C", "H"), rtRange = c(-60, 60))
+```
 
 ### Intensity clustering
 
-- Principle
-- Cluster selection, normalization etc
+<!-- UNDONE: refs? -->
+
+Whereas previous componentization methods utilized chemical properties to relate features, intensity clustering uses a statistical approach. This methodology is especially useful to find features that show similar trends in the analysed samples. Intensities for all features are first normalized and thereafter hierarchical clustering is performed to find features that show similar intensity profiles across analyses. Components are then formed from automatically assigned clusters (using the [dynamicTreeCut] R package, however, assignment can be changed afterwards).
+
+Some common arguments to `generateComponents()` are listed below. It is recommended to test various settings (especially for `method`) to optimize the clustering results.
+
+Argument                                      | Default          | Remarks
+--------------------------------------------- | ---------------- | ---------------------------------------------------------------
+`method`                                      | `"complete"`     | Clustering method. See `?hclust`
+`metric`                                      | `"euclidean"`    | Metric used to calculate the distance matrix. See `?daisy`.
+`normFunc`                                    | `max`            | Function used to normalize data. Feature intensities within a feature group are divided by the result of when this function is called with their intensity values.
+`average`                                     | `TRUE`           | Whether intensities of replicates should first be averaged.
+`maxTreeHeight`, `deepSplit`, `minModuleSize` | `1`, `TRUE`, `1` | Used for dynamic cluster assignment. See `?cutreeDynamicTree`.
+
+The resulting components are stored in an object from the `componentsIntClust` S4 class. Several methods are defined that can be used on such objects to re-assign clusters, perform plotting operations and so on. Below are some examples. More info can be found in the reference manual (e.g. `?componentsIntClust`).
+
+```{r intClust,eval=FALSE}
+# generate components with default settings
+componInt <- generateComponents(fGroups, "intclust")
+
+# manually re-assign clusters
+componInt <- treeCut(componInt, k = 10)
+
+# automatic re-assignment of clusters (adjusted max tree height)
+componInt <- treeCutDynamic(componInt, maxTreeHeight = 0.7)
+
+plot(componInt) # plot dendrogram
+plotHeatMap(componInt) # plot heatmap
+plotHeatMap(componInt, interactive = TRUE) # interactive heatmap
+plotSilhouettes(componInt, 2:10) # plot silhouettes (e.g. to obtain ideal cluster amount)
+```
 
 ## Reporting
 

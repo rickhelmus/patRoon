@@ -40,6 +40,8 @@ library(patRoon)
 
 In a non-target workflow both chromatographic and mass spectral data is automatically processed in order to provide a comprehensive chemical characterization of your samples. While the exact workflow is typically dependent on the type of study, it generally involves of the following steps:
 
+<!-- UNDONE: include other data processing steps here? -->
+
 ```{r workflow,echo=FALSE}
 DiagrammeR::grViz("
 digraph rmarkdown {
@@ -176,7 +178,7 @@ recalibrarateDAFiles(anaInfo) # trigger re-calibration for each analysis
 getDACalibrationError(anaInfo) # get calibration error for each analysis (NOTE: also shown when previous function is finished)
 ```
 
-### Analysis information
+### Analysis information {#anaInfo}
 
 The final bits of preparation is constructing the information for the analyses that need to be processed. In `patRoon` this is referred to as the _analysis information_ and often stored in a variable `anaInfo` (of course you are free to choose a different name!). The analysis information should be a `data.frame` with the following columns:
 
@@ -211,6 +213,8 @@ The `newProject()` function can be used to setup a new project. When you run thi
 
 
 ## Features
+
+- export()
 
 <!-- UNDONE: enviMass? -->
 
@@ -571,7 +575,7 @@ Intensity clustering | `generateComponents(algorithm = "intclust", ...)`  | Grou
 
 > **_NOTE_** Componentization is a complex process and currently still in a relative young development phase. As such, its functionality and interface are planned to be further improved and results obtained now should always be manually checked.
 
-### Componentization of features with similar chromatographic behaviour
+### Features with similar chromatographic behaviour
 
 Isotopes, adducts and in-source fragments typically result in detection of multiple mass peaks by the mass spectrometer for a single chemical compound. While some feature finding algorithms already try to collapse (some of) these in to a single feature, this process is often incomplete (if performed at all) and it is not uncommon that multiple features will describe the same compound. To overcome this complexity the algorithms from [CAMERA] and [RAMClustR] can be used to group features that undergo highly similar chromatographic behaviour but have different _m/z_ values. Basic chemical rules are then applied to the resulting components to annotate adducts, in-source fragments and isotopologues, which may be highly useful for general identification purposes.
 
@@ -710,14 +714,65 @@ plotHeatMap(componInt, interactive = TRUE) # interactive heatmap
 plotSilhouettes(componInt, 2:10) # plot silhouettes (e.g. to obtain ideal cluster amount)
 ```
 
+## Inspecting data
+
+The previous sections mainly discussed how to create workflow data. The next sections will discuss how to _use_ the data.
+
+Several generic functions exist that can be used to inspect data that is stored in a particular object (e.g. features, compounds etc):
+
+Generic                                             | Classes                       | Remarks
+--------------------------------------------------- | ----------------------------- | --------------------------------------------------------
+`length()`                                          | All                           | Returns the length of the object (e.g. number of features, compounds etc)
+`groupNames()`                                      | All                           | Returns all the unique identitifiers (or names) of the feature groups for which this object contains results.
+`names()`                                           | `featureGroups`, `components` | Returns names of the feature groups (similar to `groupNames()) or components
+`show()`                                            | All                           | Prints general information.
+`"[["` / `"$"` operators                            | All                           | Extract general information, see below.
+`as.data.table()` / `as.data.frame()`               | All                           | Convert data to a `data.table` or `data.frame`.
+`analysisInfo()`, `analyses()`, `replicateGroups()` | `features`, `featureGroups`   | Returns the [analysis information](#anaInfo), analyses and replicate groups for which this object contains data.
+`groupInfo()`                                       | `featureGroups`               | Returns feature group information (_m/z_ and retention time values).
+`annotatedPeakList()`                               | `formulas`, `compounds`       | Returns a table with annotated mass peaks (see below).
+
+The common `R` extraction operators `"[["`, `"$"` can be used to obtain data for a particular feature groups, analyses etc:
+
+```{r extrOp,eval=FALSE}
+# Feature table
+fList[["analysis-1"]] # index by analysis name
+fList[[1]] # or numeric index
+
+# Feature group intensities
+fGroups[["M109_R116_56"]]
+fGroups[[1, "M109_R116_56"]] # only first analysis
+
+# obtains list with MS and MS/MS peak lists
+mslists[["M109_R116_56"]] # group averaged data
+mslists[["analysis-1", "M109_R116_56"]] # feature data
+
+# get all formula candidates for a feature (group)
+formulas[["M109_R116_56"]] # group averaged data
+formulas[[1, "M109_R116_56"]] # feature data (if available, i.e. calculateFeatures=TRUE)
+
+# get all compound candidates for a feature group
+compounds[["M109_R116_56"]]
+
+# get a table with information of a component
+components[["CMP1"]]
+components[["CMP1", 1]] # only for first feature group in component
+```
+
+
+## Filtering and subsetting
+
+- Filtering data: overview common filters, (fGroup) filtering order?, subsetting data
+- overlap/unique here?
+
+
+## Visualization
+
+- plotMCS
+
 ## Reporting
 
 # Advanced usage
-
-## Filtering and inspecting data
-
-- Filtering data: overview common filters, (fGroup) filtering order?, subsetting data
-- Inspecting data: extraction operator, as.data.table(), specific accessors (e.g. groupInfo()), plotting?
 
 ## Feature parameter optimization
 

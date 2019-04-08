@@ -762,9 +762,9 @@ components[["CMP1", 1]] # only for first feature group in component
 
 A more sophisticated way to obtain data from a workflow object is to use `as.data.table()` or `as.data.frame()`. These functions will convert _all_ information within the object to a table (`data.table` or `data.frame`) and allow various options to add extra information. An advantage is that this common data format can be used with many other functions within `R`. The output is in a [tidy format](https://r4ds.had.co.nz/tidy-data.html).
 
-> **_NOTE_** If you are not familiar with `data.table` see [data.table]. Briefly, this is a more efficient and largely compatible alternative to the regular `data.frame`.
+> **_NOTE_** If you are not familiar with `data.table` and want to know more see [data.table]. Briefly, this is a more efficient and largely compatible alternative to the regular `data.frame`.
 
-> **_NOTE_** Internally `as.data.frame()` simply calls `as.data.table()`, for this reason, the reference documentation only lists the former.
+> **_NOTE_** The `as.data.frame()` methods defined in `patRoon` simply convert the results from `as.data.table()`, hence, both functions are equal in their usage and are defined for the same object classes.
 
 Some typical examples are shown below.
 
@@ -792,7 +792,7 @@ as.data.table(formulas, countElements = c("C", "H"))
 as.data.table(formulas, maxFormulas = 1, maxFragFormulas = 1)
 # add various information for organic matter characterization (common elemental
 # counts/ratios, classifications etc)
-as.data.table(formulas, maxFormulas = 1, OM = TRUE)
+as.data.table(formulas, OM = TRUE)
 
 # Returns all compound candidates for each feature group with scoring and other metadata
 as.data.table(compounds)
@@ -803,6 +803,23 @@ as.data.table(compounds, fragments) # include information of all annotated fragm
 as.data.table(components)
 ```
 
+Finally, the `annotatedPeakList()` function is useful inspect annotation results for a formula or compound candidate:
+
+```{r annPList,eval=FALSE}
+# formula annotation for for a formula candidate of feature group M109_R116_56
+annotatedPeakList(compounds, precursor = "C6H9N2", groupName = "M109_R116_56",
+                  MSPeakLists = mslists)
+# only include annotated mass peaks
+annotatedPeakList(compounds, index = 1, groupName = "M109_R116_56",
+                  MSPeakLists = mslists, onlyAnnotated = TRUE)
+
+# compound annotation for first candidate of feature group M109_R116_56
+annotatedPeakList(compounds, index = 1, groupName = "M109_R116_56",
+                  MSPeakLists = mslists)
+# include formula annotations
+annotatedPeakList(compounds, index = 1, groupName = "M109_R116_56",
+                  MSPeakLists = mslists, formulas = formulas)
+```
 
 ## Filtering and subsetting
 

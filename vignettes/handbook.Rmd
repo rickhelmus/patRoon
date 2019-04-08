@@ -721,18 +721,19 @@ The previous sections mainly discussed how to create workflow data. The next sec
 Several generic functions exist that can be used to inspect data that is stored in a particular object (e.g. features, compounds etc):
 
 Generic                                             | Classes                       | Remarks
---------------------------------------------------- | ----------------------------- | --------------------------------------------------------
+--------------------------------------------------- | ----------------------------- | ------------------------------------------
 `length()`                                          | All                           | Returns the length of the object (e.g. number of features, compounds etc)
 `groupNames()`                                      | All                           | Returns all the unique identitifiers (or names) of the feature groups for which this object contains results.
-`names()`                                           | `featureGroups`, `components` | Returns names of the feature groups (similar to `groupNames()) or components
+`names()`                                           | `featureGroups`, `components` | Returns names of the feature groups (similar to `groupNames()`) or components
 `show()`                                            | All                           | Prints general information.
 `"[["` / `"$"` operators                            | All                           | Extract general information, see below.
-`as.data.table()` / `as.data.frame()`               | All                           | Convert data to a `data.table` or `data.frame`.
-`analysisInfo()`, `analyses()`, `replicateGroups()` | `features`, `featureGroups`   | Returns the [analysis information](#anaInfo), analyses and replicate groups for which this object contains data.
+`as.data.table()` / `as.data.frame()`               | All                           | Convert data to a `data.table` or `data.frame`, see below.
+`analysisInfo()`, `analyses()`, `replicateGroups()` | `features`, `featureGroups`   | Returns the [analysis information](#anaInfo), analyses or replicate groups for which this object contains data.
 `groupInfo()`                                       | `featureGroups`               | Returns feature group information (_m/z_ and retention time values).
+`componentInfo()`                                   | `components`                  | Returns information for all components.
 `annotatedPeakList()`                               | `formulas`, `compounds`       | Returns a table with annotated mass peaks (see below).
 
-The common `R` extraction operators `"[["`, `"$"` can be used to obtain data for a particular feature groups, analyses etc:
+The common `R` extraction operators `"[["`, `"$"` can be used to obtain data for a particular feature groups, analysis etc:
 
 ```{r extrOp,eval=FALSE}
 # Feature table
@@ -757,6 +758,49 @@ compounds[["M109_R116_56"]]
 # get a table with information of a component
 components[["CMP1"]]
 components[["CMP1", 1]] # only for first feature group in component
+```
+
+A more sophisticated way to obtain data from a workflow object is to use `as.data.table()` or `as.data.frame()`. These functions will convert _all_ information within the object to a table (`data.table` or `data.frame`) and allow various options to add extra information. An advantage is that this common data format can be used with many other functions within `R`. The output is in a [tidy format](https://r4ds.had.co.nz/tidy-data.html).
+
+> **_NOTE_** If you are not familiar with `data.table` see [data.table]. Briefly, this is a more efficient and largely compatible alternative to the regular `data.frame`.
+
+> **_NOTE_** Internally `as.data.frame()` simply calls `as.data.table()`, for this reason, the reference documentation only lists the former.
+
+Some typical examples are shown below.
+
+```{r asDT,eval=FALSE}
+# obtain table with all features
+as.data.table(fList)
+as.data.frame(fList) # ditto, but in classic data.frame format
+
+# Returns group info and intensity values for each feature group
+as.data.table(fGroups)
+as.data.table(fGroups, average = TRUE) # average intensities for replicates
+as.data.table(fGroups, features) # also include feature information
+
+# Returns all peak lists for each feature group
+as.data.table(mslists)
+as.data.table(mslists, averaged = FALSE) # ditto, but for each feature
+as.data.table(mslists, fGroups = fGroups) # add feature group information
+
+# Returns all formula candidates for each feature group with scoring
+# information, neutral loss etc
+as.data.table(formulas)
+# include carbon and hydrogen elemental counts: useful to construct van Krevelen plots
+as.data.table(formulas, countElements = c("C", "H"))
+# report only top precursor and fragment formula. This yields in one row per feature group.
+as.data.table(formulas, maxFormulas = 1, maxFragFormulas = 1)
+# add various information for organic matter characterization (common elemental
+# counts/ratios, classifications etc)
+as.data.table(formulas, maxFormulas = 1, OM = TRUE)
+
+# Returns all compound candidates for each feature group with scoring and other metadata
+as.data.table(compounds)
+as.data.table(compounds, fGroups = fGroups) # add feature group informaion
+as.data.table(compounds, fragments) # include information of all annotated fragments
+
+# Returns table with all components (including feature group info, annotations etc)
+as.data.table(components)
 ```
 
 

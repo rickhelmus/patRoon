@@ -29,6 +29,7 @@
     - document which filters work on feature level (e.g. chromWidth)
     - remove zero values for maxReplicateIntRSD?
 - fList --> features?
+- move rGroups from filter() to subset?
 
 
 ## MSPeakLists
@@ -57,6 +58,7 @@
     - rank by one normalized column per algo? (GenForm: either MS_match or comb_match)
     - or simply don't and mention limitation in doc? (one limitation: filtering)
 - reporting incorrect GF adducts
+- minExplainedFragPeaks -> minExplainedPeaks?
 
 
 ## components

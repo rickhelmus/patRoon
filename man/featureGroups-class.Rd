@@ -351,7 +351,7 @@ row within the feature table of the analysis (see
 }}
 
 \section{S4 class hierarchy}{
- \itemize{   \item{\code{\link{workflowStep}}}   \itemize{     \item{\strong{\code{\link{features}}}}     \itemize{       \item{\code{\link{featuresFromFeatGroups}}}       \item{\code{\link{featuresConsensus}}}       \item{\code{\link{featuresBruker}}}       \item{\code{\link{featuresEnviPick}}}       \item{\code{\link{featuresOpenMS}}}       \item{\code{\link{featuresBrukerTASQ}}}       \item{\code{\link{featuresXCMS}}}     }   } }
+ \itemize{   \item{\code{\link{workflowStep}}}   \itemize{     \item{\strong{\code{\link{featureGroups}}}}     \itemize{       \item{\code{\link{featureGroupsBruker}}}       \item{\code{\link{featureGroupsConsensus}}}       \item{\code{\link{featureGroupsEnviMass}}}       \item{\code{\link{featureGroupsOpenMS}}}       \item{\code{\link{featureGroupsScreening}}}       \item{\code{\link{featureGroupsBrukerTASQ}}}       \item{\code{\link{featureGroupsXCMS}}}     }   } }
 }
 
 \references{

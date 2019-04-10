@@ -48,7 +48,7 @@ NULL
 #'   row within the feature table of the analysis (see
 #'   \code{\link{featureTable}}).
 #'
-#' @templateVar class features
+#' @templateVar class featureGroups
 #' @template class-hierarchy
 #'
 #' @export

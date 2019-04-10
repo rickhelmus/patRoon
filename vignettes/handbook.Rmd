@@ -28,13 +28,10 @@ library(patRoon)
 # Introduction
 
 
-# Workflow
+# Workflow concepts
 
-- overview of generator functions
 - usage of algorithms: algorithm arg vs specific fun
 - S4 classes?: common output, hierarchy, generics, ...
-
-## Concepts
 
 - show images of feature definition etc?
 
@@ -86,7 +83,6 @@ digraph rmarkdown {
 <!-- UNDONE: optional lines (scheme/text below) -->
 
 Note that `patRoon` supports flexible composition of workflows. In the scheme above you can recognize optional steps by a _XXX line/arrow_. Furthermore, the inclusion of each step is only necessary if a further steps depends on its data. For instance, annotation and componentization do not depend on each other and can therefore be executed in any different order or simply be omitted. A brief descripton of all steps is given below. 
-
 During **data pre-treatment** raw MS data is prepared for further analysis. A common need for this step is to convert the data to an open format so that other tools are able to process it. Other pre-treatment steps may involve re-calibration of _m/z_ data or performing advanced filtering operations.
 
 The next step is to extract **features** from the data. While different terminologies are used, a feature in `patRoon` refers to a single chromatographic peak in an extracted ion chromatogram for a single _m/z_ value (within a defined tolerance). Hence, a feature contains both chromatographic data (e.g. retention time and peak height) and mass spectral data (e.g. the accurate _m/z_). Note that with mass spectrometry multiple _m/z_ values may be detected for a single compound as a result of adduct formation, natural isotopes and/or in-source fragments. Some algorithms may try to combine these different masses in a single feature. However, in `patRoon` we generally assume this is not the case (and may optionally be done afterwards during the componentization step described below). Features are sometimes simply referred to as 'peaks'.
@@ -115,9 +111,9 @@ To summarize:
 <!-- UNDONE: add link to example workflows? -->
 
 
-## Generating workflow data
+# Generating workflow data
 
-Each step in the non-target workflow is performed by a function that perform the heavy lifting of a workflow step behind the scenes and finally return the results. An important goal of `patRoon` is to support multiple algorithms for each workflow step, hence, when such a function is called you have to specify which algorithm you want to use. The available algorithms and their characteristics will be discussed in the next sections. An overview of all functions involved in generating workflow data is shown in the table below.
+Each step in the non-target workflow is performed by a function that performs the heavy lifting of a workflow step behind the scenes and finally return the results. An important goal of `patRoon` is to support multiple algorithms for each workflow step, hence, when such a function is called you have to specify which algorithm you want to use. The available algorithms and their characteristics will be discussed in the next sections. An overview of all functions involved in generating workflow data is shown in the table below.
 
 Workflow step         | Function                                          | Output S4 class
 --------------------- | ------------------------------------------------- | ------------
@@ -135,14 +131,17 @@ All of these functions store their output in objects derived from so called S4 c
 Another advantage of the S4 class system is the usage of so called _generic functions_. To put simply: a generic function performs a certain task for different types of data objects. A good example is the `plotSpec()` function which plots an (annotated) spectrum from data of MS peak lists or from formula or compound annotation:
 
 ```{r plotSpec,eval=FALSE}
+# mslists, formulas, compounds contain results for MS peak lists and
+# formula/compound annotations, respectively.
+
 plotSpec(mslists, ...) # plot raw MS spectrum
 plotSpec(formulas, ...) # plot annotated spectrum from formula annotation data
 plotSpec(compounds, ...) # likewise but for compound annotation.
 ```
 
-The next sections will further detail on how to actually perform the non-target workflow steps and use their output.
+The next sections will further detail on how to actually perform the non-target workflow steps to generate data.
 
-## Preparing the workflow
+## Preparations
 
 ### Data pre-treatment
 
@@ -167,7 +166,7 @@ convertMSFiles("analyses/raw", "analyses/mzml", from = "thermo",
                centroid = "vendor", filters = "msLevel 1")
 ```
 
-> **_NOTE_** Most algorithms require the _mzML_ or _mzXML_ file format and additionally require that mass peaks have been centroided. When using the ProteoWizard algorithm (the default), centroiding by vendor algorithms is generally recommended (i.e. by setting `centroid="vendor"` as shown in the above example).
+> **_NOTE_** Most algorithms further down the workflow require the _mzML_ or _mzXML_ file format and additionally require that mass peaks have been centroided. When using the ProteoWizard algorithm (the default), centroiding by vendor algorithms is generally recommended (i.e. by setting `centroid="vendor"` as shown in the above example).
 
 When Bruker MS data is used it can be automatically re-calibrated to improve its mass accuracy. Often this is preceeded by calling the `setDAMethod()` function to set a DataAnalysis method to all files in order to configure automatic re-calibration. The `recalibrarateDAFiles()` function performs the actual re-calibration. The `getDACalibrationError()` function can be used at anytime to request the current calibration error of each analysis. An example of these functions is shown below.
 
@@ -348,8 +347,8 @@ Note that compound annotation is normally not dependent upon formula annotation.
 
 ### MS peak lists
 
-Algorithm    | Usage                                            | Remarks
------------- | ---------------------------------------------    | -----------------------------------------------------
+Algorithm    | Usage                                                   | Remarks
+------------ | ------------------------------------------------------- | -----------------------------------------------------
 [mzR]        | `generateMSPeakLists(algorithm = "mzr", ...)`    | Uses [mzR] for spectra retrieval. Recommended default.
 DataAnalysis | `generateMSPeakLists(algorithm = "bruker", ...)` | Loads data after automatically generating MS and MS/MS spectra in DataAnalysis
 DataAnalysis FMF | `generateMSPeakLists(algorithm = "brukerfmf", ...)` | Uses spectra from the  _find molecular features_ algorithm.
@@ -370,7 +369,7 @@ There are several common function arguments to `generateMSPeakLists()` that can 
 
 <!-- UNDONE: add topMost for Bruker when it's there -->
 
-Argument                         | Algorithm(s) | Remarks
+Argument                         | Algorithm(s)          | Remarks
 -------------------------------- | --------------------- | ----------------------------------------------------------------------
 maxMSRtWindow                    | `mzr`, `bruker`       | Maximum time window +/- the feature retention time (in seconds) to collect spectra for averaging. Higher values may significantly increase processing times.
 precursorMzWindow                | `mzr`                 | Maximum precursor _m/z_ search window to find MS/MS spectra. Set to `NULL` to disable (i.e. for DIA experiments).
@@ -424,8 +423,8 @@ An overview of common parameters that are typically set to customize formula cal
 
 <!-- UNDONE: link to adduct section -->
 
-Argument          | Algorithm(s) | Remarks
------------------ | ------------ | ------------------------------------------------------------------------------------
+Argument          | Algorithm(s)        | Remarks
+----------------- | ------------------- | -------------------------------------------------------------------------------
 relMzDev          | `genform`, `sirius` | The maximum relative _m/z_ deviation for a formula to be considered (in _ppm_).
 elements          | `genform`, `sirius` | Which elements to consider. By default `"CHNOP"`. Try to limit possible elements as much as possible.
 calculateFeatures | `genform`, `sirius` | Whether formulae should be calculated first for all features (see discussion above) (always `TRUE` with DataAnalysis).
@@ -714,7 +713,11 @@ plotHeatMap(componInt, interactive = TRUE) # interactive heatmap
 plotSilhouettes(componInt, 2:10) # plot silhouettes (e.g. to obtain ideal cluster amount)
 ```
 
-## Inspecting data
+# Processing workflow data
+
+- overlap/unique methods somewhere?
+
+## Inspecting results
 
 The previous sections mainly discussed how to create workflow data. The next sections will discuss how to _use_ the data.
 
@@ -821,17 +824,79 @@ annotatedPeakList(compounds, index = 1, groupName = "M109_R116_56",
                   MSPeakLists = mslists, formulas = formulas)
 ```
 
-## Filtering and subsetting
+## Filtering
 
-- Filtering data: overview common filters, (fGroup) filtering order?, subsetting data
-- overlap/unique here?
+- Filtering data: overview common filters, (fGroup) filtering order?
+
+### Features
+
+- Mainly fGroups of interest
+
+Filter                                     | Classes                     | Remarks
+------------------------------------------ | --------------------------- | ---------------------------------------------------------
+`absMinIntensity`, `relMinIntensity`       | `features`, `featureGroups` | Minimum intensity
+`preAbsMinIntensity`, `preRelMinIntensity` | `featureGroups`             | Minimum intensity prior to other filtering (see below)
+`retentionRange`, `mzRange`, `mzDefectRange`, `chromWidthRange` | `features`, `featureGroups` | Filter by feature properties
+`absMinAnalyses`, `relMinAnalyses`         | `featureGroups`             | Minimum feature abundance in all analyses
+`absMinReplicates`, `relMinReplicates`     | `featureGroups`             | Minimum feature abundance in different replicates
+`absMinFeatures`, `relMinFeatures`         | `featureGroups`             | Only keep analyses with at least this amount of features 
+`absMinReplicateAbundance`, `relMinReplicateAbundance` | `featureGroups` | Minimum feature abundance in a replicate group
+`maxReplicateIntRSD`                       | `featureGroups`             | Maximum relative standard deviation of feature intensities in a replicate group.
+`blankThreshold`                           | `featureGroups`             | Minimum intensity factor above blank intensity
+`rGroups`                                  | `featureGroups`             | Only keep (feature of) these replicate groups
+
+### Annotation
+
+- MSPeakLists: retain precursor
+
+Filter                                        | Classes                        | Remarks
+--------------------------------------------- | ------------------------------ | -------------------------------------------------
+`absMSIntThr`, `absMSMSIntThr`, `relMSIntThr`, `relMSMSIntThr` | `MSPeakLists` | Minimum intensity of mass peaks
+`topMSPeaks`, `topMSMSPeaks`                  | `MSPeakLists`                  | Only keep most intense mass peaks
+`withMSMS`                                    | `MSPeakLists`                  | Only keep results with MS/MS data
+`minExplainedFragPeaks`, `minExplainedPeaks`  | `formulas` / `compounds`       | Minimum number of annotated mass peaks
+`elements`, `fragElements`, `lossElements`    | `formulas`, `compounds`        | Restrain elemental composition
+`topMost`                                     | `formulas`, `compounds`        | Only keep highest ranked candidates 
+`minScore`, `minFragScore`, `minFormulaScore` | `compounds`                    | Minimum compound scorings
+`scoreLimits`                                 | `formulas`, `compounds`        | Minimum/Maximum scorings
+`OM`                                          | `formulas`                     | Only keep candidates with likely elemental composition found in organic matter
+
+### Components
+
+- note about presence of data
+
+Filter                       | Remarks
+---------------------------- | -----------------
+`size`                       | Minimum component size
+`adducts`, `isotopes`        | Filter features by adduct/istopes annotation
+`rtIncrement`, `mzIncrement` | Filter homologs by retention/mz increment range
+
+### Negation
+
+
+## Subsetting
+
+
+### Prioritization workflow
 
 
 ## Visualization
 
+### Features
+
+
+### Annotation
+
 - plotMCS
 
+
+### Components
+
+- separate section(s) needed?
+
+
 ## Reporting
+
 
 # Advanced usage
 

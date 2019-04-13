@@ -1026,9 +1026,110 @@ componInt <- filter(componInt, minSize = 5, negate = TRUE)
 
 ## Subsetting
 
+The previous section discussed the `filter()` generic function to perform various data cleaning operations. A more generic way to select data is by _subsetting_: here you can manually specify which parts of an object should be retained. Subsetting is supported for all workflow objects and is performed by the R subset operator (`"["`). This operator either subsets by one or two arguments, which are referred to as the `i` and `j` arguments.
+
+Class           | Argument `i`   | Argument `j`   | Remarks
+--------------- | -------------- | -------------- | ------------------------------------------------
+`features`      | analyses       |                |
+`featureGroups` | analyses       | feature groups |
+`MSPeakLists`   | analyses       | feature groups | peak lists for feature groups will be re-averaged when subset on analyses (by default)
+`formulas`      | feature groups |                | 
+`compounds`     | feature groups |                |
+`components`    | components     | feature groups |
+
+For objects that support two-dimensional subsetting (e.g. `featureGroups`, `MSPeakLists`), either the `i` or `j` argument is optional. Furthermore, unlike subsetting a `data.frame`, the position of `i` and `j` does not change when only one argument is specified:
+
+```{r subsetArgs,eval=FALSE}
+df[1, 1] # subset data.frame by first row/column
+df[1] # subset by first column
+df[1, ] # subset by first row
+
+fGroups[1, 1] # subset by first analysis/feature group
+fGroups[, 1] # subset by first feature group (i.e. column)
+fGroups[1] # subset by first analysis (i.e. row)
+```
+
+The subset operator allows three types of input:
+
+- A logical vector: elements are selected if corresponding values are `TRUE`.
+- A numeric vector: select elements by numeric index.
+- A character vector: select elements by their name.
+
+When a logical vector is used as input it will be re-cycled if necessary. For instance, the following will select by the first, third, fifth, etc. analysis.
+
+```{r subsetCyc,eval=FALSE}
+fGroups[c(TRUE, FALSE)]
+```
+
+In order to select by a `character` you will need to know the names for each element. These can, for instance, be obtained by the `groupNames()` (feature group names), `analyses()` (analysis names) and `names()` (names for components or feature groups for `featureGroups` objects) generic functions.
+
+Some more examples of common subsetting operations are shown below.
+
+```{r subsetting,eval=FALSE}
+# select first three analyses
+fList[1:3]
+
+# select first three analyses and first 500 feature groups
+fGroups[1:3, 1:500]
+
+# select all feature groups from first component
+fGroupsNT <- fGroups[, componNT[[1]]$group]
+
+# only keep feature groups with formula annotation results
+fGroupsForms <- fGroups[, groupNames(formulas)]
+
+# only keep feature groups with either formula or compound annotation results
+fGroupsAnn <- fGroups[, union(groupNames(formulas), groupNames(compounds))]
+
+# select first 15 components
+componCAM[1:15]
+
+# select by name
+componCAM[c("CMP1", "CMP5")]
+
+# only retain feature groups in components for which compound annotations are
+# available
+componCAM[, groupNames(compounds)]
+```
 
 ### Prioritization workflow
 
+An important use case of subsetting is prioritization of data. For instance, after statistical analysis only certain feature groups are deemed relevant for the rest of the workflow. A common prioritization workflow is illustrated below:
+
+```{r prioriWorkflow,echo=FALSE}
+DiagrammeR::grViz("
+digraph rmarkdown {
+  graph [ rankdir = LR ]
+  node [ shape = box,
+         fixedsize = true,
+         width = 2.3,
+         height = 1,
+         fontsize = 18,
+         fillcolor = darkseagreen1,
+         style = filled ]
+
+    'Object conversion' -> 'Prioritization' -> Subsetting
+}", height = 120, width = 500)
+```
+
+During the first step the workflow object is converted to a suitable format, most often using the `as.data.frame()` function. The converted data is then used as input for the prioritization strategy. Finally, these results are then used to select the data of interest in the original object.
+
+A very simplified example of such a process is shown below.
+
+```{r prioriEx,eval=FALSE}
+featTab <- as.data.frame(fGroups, average = TRUE)
+
+# prioritization: sort by (averaged) intensity of the "sample" replicate group
+# (from high to low) and then obtain the feature group identifiers of the top 5.
+featTab <- featTab[order(featTab$standard, decreasing = TRUE), ]
+groupsOfInterest <- featTab$group[1:5]
+
+# subset the original data
+fGroups <- fGroups[, groupsOfInterest]
+
+# fGroups now only contains the feature groups for which intensity values in the
+# "sample" replicate group were in the top 5
+```
 
 ## Visualization
 

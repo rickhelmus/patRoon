@@ -61,14 +61,14 @@ fList <- findFeatures(anaInfo, "openms")
 {{ endCodeBlock() }}
 {{ optionalCodeBlock(featFinderOpts$algo == "XCMS") }}
 # NOTE: see XCMS manual for many more options
-fList <- featureFinder(anaInfo, "xcms", method = "centWave")
+fList <- findFeatures(anaInfo, "xcms", method = "centWave")
 {{ endCodeBlock() }}
 {{ optionalCodeBlock(featFinderOpts$algo == "enviPick") }}
 # NOTE: see enviPickWrap manual for many more options
-fList <- featureFinder(anaInfo, "envipick")
+fList <- findFeatures(anaInfo, "envipick")
 {{ endCodeBlock() }}
 {{ optionalCodeBlock(featFinderOpts$algo == "Bruker") }}
-fList <- featureFinder(anaInfo, "bruker", doFMF = "auto")
+fList <- findFeatures(anaInfo, "bruker", doFMF = "auto")
 {{ endCodeBlock() }}
 
 # Group and align features between analysis

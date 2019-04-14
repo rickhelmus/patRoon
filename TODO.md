@@ -49,6 +49,7 @@
 - Fix MF database section in docs
 - timeouts for SIRIUS?
 - improve formula scoring
+- plotHeatMap() / plotSilhouettes() for comp clusters?
 
 
 ## formulas

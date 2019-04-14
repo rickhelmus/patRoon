@@ -681,7 +681,7 @@ componNT2 <- generateComponents(fGroups, "nontarget", ionization = "positive",
                                 elements = c("C", "H"), rtRange = c(-60, 60))
 ```
 
-### Intensity clustering
+### Intensity clustering {#intclust}
 
 <!-- UNDONE: refs? -->
 
@@ -1023,7 +1023,7 @@ compounds <- filter(compounds, topMost = 15, negate = TRUE)
 componInt <- filter(componInt, minSize = 5, negate = TRUE)
 ```
 
-## Subsetting
+## Subsetting {#subset}
 
 The previous section discussed the `filter()` generic function to perform various data cleaning operations. A more generic way to select data is by _subsetting_: here you can manually specify which parts of an object should be retained. Subsetting is supported for all workflow objects and is performed by the R subset operator (`"["`). This operator either subsets by one or two arguments, which are referred to as the `i` and `j` arguments.
 
@@ -1169,10 +1169,23 @@ Argument                                      | Generic                   | Rema
 `formulas`                                    | `plotSpec()`              | Whether `formula` annotation should be added (only `compounds`)
 `plotStruct`                                  | `plotSpec()`              | Whether the structure should be added to the plot (only `compounds`)
 
+Note that we can use [subsetting](#subset) to select which feature data we want to plot, e.g.
+
+```{r plotEICSub,eval=FALSE}
+plotEIC(fGroups[4:6]) # only plot EICs from 4th-6th analyses.
+plotEIC(fGroups[, 1]) # only plot all features of first group
+```
 
 The `plotStructure()` function will draw a chemical structure for a compound candidate. In addition, this function can draw the maximum common substructure (MCS) of multiple candidates in order to assess common structural features.
 
-Some common and less common plotting operations are shown below.
+```{r plotStruct,eval=FALSE}
+# structure for first candidate
+plotStructure(compounds, index = 1, groupName = "M109_R116_61")
+# MCS for first three candidates
+plotStructure(compounds, index = 1:3, groupName = "M109_R116_61")
+```
+
+Some other common and less common plotting operations are shown below.
 
 ```{r plotFeatAnn,eval=FALSE}
 plot(fGroups) # simple scatter plot of retention and m/z values
@@ -1186,7 +1199,6 @@ plotEIC(fGroups,
         showPeakArea = TRUE, # show integrated areas
         showFGroupRect = FALSE,
         showLegend = FALSE) # no legend (too busy for many feature groups)
-# subsetting is useful to only draw some feature data
 plotEIC(fGroups[, 1], # only plot all features of first group
         colourBy = "rGroup") # and mark them individually per replicate group
 
@@ -1201,11 +1213,6 @@ plotSpec(compounds, index = 1, groupName = "M109_R116_61", MSPeakLists = plists,
 # custom intensity range (e.g. to zoom in)
 plotSpec(compounds, index = 1, groupName = "M109_R116_61", MSPeakLists = plists,
          ylim = c(0, 5000))
-
-# structure for first candidate
-plotStructure(compounds, index = 1, groupName = "M109_R116_61")
-# MCS for first three candidates
-plotStructure(compounds, index = 1:3, groupName = "M109_R116_61")
 ```
 
 ### Comparing data
@@ -1220,15 +1227,27 @@ Generic     | Classes
 
 The most simple comparison plot is a Venn diagram (i.e. `plotVenn()`). This function is especially useful for two or three-way comparisons. More complex comparisons are better visualized with [UpSet] diagrams (i.e. `plotUpSet()`). Finally, chord diagrams (i.e. `plotChord()`) provide visually pleasant diagrams to assess overlap between data.
 
-These functions can either be used to compare feature data or compare different objects of the same type. The former is typically used to compare overlap or uniqueness between features in different replicate groups, whereas comparison between objects is useful to visualize algorithmic differences (see [algorithm consensus](#consensus) for more advanced usage).
+<!-- UNDONE: also link to overllap/unique -->
+
+These functions can either be used to compare feature data or different objects of the same type. The former is typically used to compare overlap or uniqueness between features in different replicate groups, whereas comparison between objects is useful to visualize differences in algorithmic output (see [algorithm consensus](#consensus) for more advanced functionality to do so).
 
 As usual, some examples are shown below.
 
 ```{r plotComp,eval=FALSE}
+plotUpSet(fGroups) # compare replicate groups
+plotVenn(fGroups, which = c("repl1", "repl2")) # compare some replicate groups
+plotChord(fGroups)
+
+# compare MetFrag and SIRIUS results
+plotVenn(compoundsMF, compoundsSIR)
+plotVenn(compoundsMF, compoundsSIR,
+         labels = c("MF", "SIR")) # manual labelling
 
 ```
 
 ### Hierarchical clustering results
+
+In `patRoon` hierarchical clustering is used to generate components based on their intensity profiles (see [intensity clustering](#intclust)) and to cluster candidate compounds with similar chemical structure (see [compound clustering](#compclust). The functions below can be used to visualize their results.
 
 Generic             | Classes                                  | Remarks
 ------------------- | ---------------------------------------- | --------------------------------------------------
@@ -1257,7 +1276,7 @@ Generic             | Classes                                  | Remarks
 - fGroup comparison
 - consensus selection (overlap/unique)
 
-## Compound clustering
+## Compound clustering {#compclust}
 
 - Principle
 - Cluster selection, MCS plotting

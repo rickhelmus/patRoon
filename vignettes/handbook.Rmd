@@ -697,7 +697,7 @@ Argument                                      | Default          | Remarks
 `average`                                     | `TRUE`           | Whether intensities of replicates should first be averaged.
 `maxTreeHeight`, `deepSplit`, `minModuleSize` | `1`, `TRUE`, `1` | Used for dynamic cluster assignment. See `?cutreeDynamicTree`.
 
-The resulting components are stored in an object from the `componentsIntClust` S4 class. Several methods are defined that can be used on such objects to re-assign clusters, perform plotting operations and so on. Below are some examples. More info can be found in the reference manual (e.g. `?componentsIntClust`).
+The resulting components are stored in an object from the `componentsIntClust` S4 class. Several methods are defined that can be used on such objects to re-assign clusters, perform plotting operations and so on. Below are some examples. For plotting see the relevant [visualization section](#plotClust). More info can be found in the reference manual (e.g. `?componentsIntClust`).
 
 ```{r intClust,eval=FALSE}
 # generate components with default settings
@@ -708,11 +708,6 @@ componInt <- treeCut(componInt, k = 10)
 
 # automatic re-assignment of clusters (adjusted max tree height)
 componInt <- treeCutDynamic(componInt, maxTreeHeight = 0.7)
-
-plot(componInt) # plot dendrogram
-plotHeatMap(componInt) # plot heatmap
-plotHeatMap(componInt, interactive = TRUE) # interactive heatmap
-plotSilhouettes(componInt, 2:10) # plot silhouettes (e.g. to obtain ideal cluster amount)
 ```
 
 # Processing workflow data
@@ -722,6 +717,8 @@ plotSilhouettes(componInt, 2:10) # plot silhouettes (e.g. to obtain ideal cluste
 The previous chapter mainly discussed how to create workflow data. This chapter will discuss how to _use_ the data.
 
 ## Inspecting results
+
+- add also non-workflow classes? (e.g. compclust->groupNames)
 
 Several generic functions exist that can be used to inspect data that is stored in a particular object (e.g. features, compounds etc):
 
@@ -1162,7 +1159,7 @@ Argument                                      | Generic                   | Rema
 `title`                                       | `plotEIC()`, `plotSpec()` | Override plot title
 `colourBy`                                    | `plotEIC()`               | Colour individual feature groups (`"fGroups"`) or replicate groups (`"rGroups"`). By default nothing is coloured (`"none"`)
 `showLegend`                                  | `plotEIC()`               | Display a legend? (only if `colourBy!="none"`)
-`onlyPresent`                                 | `plotEIC()`               | Only plot EICs in analyses where a feature was detected? Setting to `FALSE` is useful to inspect if a feature was 'missed'.
+`onlyPresent`                                 | `plotEIC()`               | Only plot EICs for analyses where a feature was detected? Setting to `FALSE` is useful to inspect if a feature was 'missed'.
 `xlim`, `ylim`                                | `plotEIC()`, `plotSpec()` | Override x/y axis ranges, i.e. to manually set plotting range.
 `groupName`, `analysis`, `precursor`, `index` | `plotSpec()`              | What to plot. See examples below.
 `MSLevel`                                     | `plotSpec()`              | Whether to plot an MS or MS/MS spectrum (only `MSPeakLists`)
@@ -1225,9 +1222,9 @@ Generic     | Classes
 `plotUpSet` | `featureGroups`, `featureGroupsComparison`, `formulas`, `compounds` 
 `plotChord` | `featureGroups`, `featureGroupsComparison`
 
-The most simple comparison plot is a Venn diagram (i.e. `plotVenn()`). This function is especially useful for two or three-way comparisons. More complex comparisons are better visualized with [UpSet] diagrams (i.e. `plotUpSet()`). Finally, chord diagrams (i.e. `plotChord()`) provide visually pleasant diagrams to assess overlap between data.
+The most simple comparison plot is a Venn diagram (i.e. `plotVenn()`). This function is especially useful for two or three-way comparisons. More complex comparisons are better visualized with [UpSet] diagrams (i.e. `plotUpSet()`). Finally, chord diagrams (i.e. `plotChord()`) provide visually pleasing diagrams to assess overlap between data.
 
-<!-- UNDONE: also link to overllap/unique -->
+<!-- UNDONE: also link to overlap/unique -->
 
 These functions can either be used to compare feature data or different objects of the same type. The former is typically used to compare overlap or uniqueness between features in different replicate groups, whereas comparison between objects is useful to visualize differences in algorithmic output (see [algorithm consensus](#consensus) for more advanced functionality to do so).
 
@@ -1236,18 +1233,20 @@ As usual, some examples are shown below.
 ```{r plotComp,eval=FALSE}
 plotUpSet(fGroups) # compare replicate groups
 plotVenn(fGroups, which = c("repl1", "repl2")) # compare some replicate groups
-plotChord(fGroups)
+plotChord(fGroups, average = TRUE) # overlap between replicate groups
+# compare with custom made groups: surface and ground
+plotChord(fGroups, outer = c(sw1 = "surface", sw2 = "surface", sw3 = "surface",
+                             gw1 = "ground", gw2 = "ground", gw3 = "ground"))
 
 # compare MetFrag and SIRIUS results
 plotVenn(compoundsMF, compoundsSIR)
 plotVenn(compoundsMF, compoundsSIR,
          labels = c("MF", "SIR")) # manual labelling
-
 ```
 
-### Hierarchical clustering results
+### Hierarchical clustering results {#plotClust}
 
-In `patRoon` hierarchical clustering is used to generate components based on their intensity profiles (see [intensity clustering](#intclust)) and to cluster candidate compounds with similar chemical structure (see [compound clustering](#compclust). The functions below can be used to visualize their results.
+In `patRoon` hierarchical clustering is used to generate components based on their intensity profiles (see [intensity clustering](#intclust)) and to cluster candidate compounds with similar chemical structure (see [compound clustering](#compclust)). The functions below can be used to visualize their results.
 
 Generic             | Classes                                  | Remarks
 ------------------- | ---------------------------------------- | --------------------------------------------------
@@ -1258,9 +1257,54 @@ Generic             | Classes                                  | Remarks
 `plotStructure()`   | `compoundsCluster`                       | Plots the maximum common substructure (MCS) of a cluster
 
 
+```{r plotClust,eval=FALSE}
+plot(componInt) # dendrogram
+plot(compsClust, groupName = "M109_R116_64") # dendrogram for clustered compounds
+
+plotInt(componInt, index = 2) # intensities of 2nd cluster
+plotHeatMap(componInt) # plot heatmap
+plotHeatMap(componInt, interactive = TRUE) # interactive heatmap
+plotSilhouettes(componInt, 2:10) # plot silhouettes (e.g. to obtain ideal cluster amount)
+```
 
 ## Reporting
 
+The previous sections showed various functionalies to inspect and visualize results. An easy and automated way to do this automatically is by using the _reporting_ functionality of `patRoon`. The following three reporting functions are available:
+
+- `reportCSV()`: exports workflow data to comma-separated value (csv) files
+- `reportPDF()`: generates simple reports by plotting workflow data in portable document files (PDFs)
+- `reportMD()`: generates interactive and easily explorable reports
+
+There are many different arguments available to configure the reporting process. Some common arguments are listed below; for a complete listing see the reference manual (e.g. `?reporting`).
+
+Argument                              | Functions                   | Remarks
+------------------------------------- | --------------------------- | ----------------------------------------------------------
+`fGroups`, `formulas`, `compounds`, `formulas`, `components`, `compsCluster` | All | Objects to plot. Only `fGroups` is mandatory.
+`MSPeakLists`                         | `reportPDF()`, `reportMD()` | The `MSPeakLists` object that was used to generate annotation data. Only needs to be specified if `formulas` or `compounds` are reported.
+`path`                                | All                         | Directory path where report files will be stored (`"report"` by default).
+`formulasTopMost`, `compoundsTopMost` | `reportPDF()`, `reportMD()` | Report no more than this amount of highest ranked candidates.
+`EICOnlyPresent`                      | `reportPDF()`, `reportMD()` | Only plot an EIC for an analysis if a feature was detected.
+`selfContained`                       | `reportMD()`                | Outputs to a single and self contained `.html` file. Handy to share reports, but not recommended for large amounts of data.
+
+Which data will be reported is fully configurable. The only workflow object that must be specified are the feature groups (i.e. with the `fGroups` argument), all other data (e.g. `compounds`, `components`) are optional. This means that reporting can be performed at every stage during the workflow, which, for instance, can be useful to quickly inspect results when testing out various settings to generate workflow data.
+
+When formula or compound results are reported with `reportPDF()` or `reportMD()` then only the top ranked candidates are considered. This limtation is often necessary as reporting many candidates will take considerable time. By default the top 5 for each feature group are reported, however, this number can be changed with the `formulasTopMost` and `compoundsTopMost` arguments.
+
+Some typical examples:
+
+```{r reporting,eval=FALSE}
+reportMD(fGroups) # simple interactive report with feature data
+# generate PDFs with feature and compound annotation data
+reportPDF(fGroups, compounds = compounds, MSPeakLists = mslists)
+reportCSV(fGroups, path = "myReport") # change destination path
+
+# generate report with all workflow types and increase maximum number of
+# compound candidates to top 10
+reportMD(fGroups, formulas = formulas, compounds = compounds,
+         components = componCAM, MSPeakLists = mslists,
+         compsCluster = compsClust,
+         compoundsTopMost = 10)
+```
 
 # Advanced usage
 

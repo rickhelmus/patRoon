@@ -1,0 +1,23 @@
+# Advanced usage
+
+## Feature parameter optimization
+
+- Principle, IPO reference, extensions
+- param sets, qualitiative optimization, generation of pSets
+- Perform with subset of analyses
+- Using results: get optimized object, best results, plot results
+
+## Algorithm consensus {#consensus}
+
+- fGroup comparison
+- consensus selection (overlap/unique)
+
+## Compound clustering {#compclust}
+
+- Principle
+- Cluster selection, MCS plotting
+- methods
+
+## Caching
+
+## Parallelization

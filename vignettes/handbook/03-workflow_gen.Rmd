@@ -1,0 +1,601 @@
+# Generating workflow data
+
+Each step in the non-target workflow is performed by a function that performs the heavy lifting of a workflow step behind the scenes and finally return the results. An important goal of `patRoon` is to support multiple algorithms for each workflow step, hence, when such a function is called you have to specify which algorithm you want to use. The available algorithms and their characteristics will be discussed in the next sections. An overview of all functions involved in generating workflow data is shown in the table below.
+
+Workflow step         | Function                                          | Output S4 class
+--------------------- | ------------------------------------------------- | ------------
+Data pre-treatment    | `convertMSFiles()`, `recalibrarateDAFiles()`      | -
+Finding features      | `findFeatures()`                                  | `features`
+Grouping features     | `groupFeatures()`                                 | `featureGroups`
+Suspect screening     | `screenTargets()` + `groupFeaturesScreening()`    | `featureGroups` 
+MS peak lists         | `generateMSPeakLists()`                           | `MSPeakLists`
+Formula annotation    | `generateFormulas()`                              | `formulas`
+Compound annotation   | `generateCompounds()`                             | `compounds`
+Componentization      | `generateComponents()`                            | `components`
+
+All of these functions store their output in objects derived from so called S4 classes. Knowing the details about the S4 class system of `R` is generally not important when using `patRoon` (and well written resources are available if you want to know more). In brief, usage of this class system allows a general data format that is used irrespective of the algorithm that was used to generate the data. For instance, when features have been found by [OpenMS] or [XCMS] they both return the same data format.
+
+Another advantage of the S4 class system is the usage of so called _generic functions_. To put simply: a generic function performs a certain task for different types of data objects. A good example is the `plotSpec()` function which plots an (annotated) spectrum from data of MS peak lists or from formula or compound annotation:
+
+```{r plotSpec,eval=FALSE}
+# mslists, formulas, compounds contain results for MS peak lists and
+# formula/compound annotations, respectively.
+
+plotSpec(mslists, ...) # plot raw MS spectrum
+plotSpec(formulas, ...) # plot annotated spectrum from formula annotation data
+plotSpec(compounds, ...) # likewise but for compound annotation.
+```
+
+The next sections will further detail on how to actually perform the non-target workflow steps to generate data.
+
+## Preparations
+
+### Data pre-treatment
+
+Prior to performing the actual non-target data processing workflow some preparations often need to be made. Often data has to be pre-treated, for instance, by converting it to an open format that is usable for subsequent workflow steps or to perform mass re-calibration. Some common functions are listed below.
+
+Task                                |  Function                | Algorithms | Supported file formats
+------------------------------------| ------------------------ | -------------------------------------- | -------
+Conversion                          | `convertMSFiles()`       | [OpenMS], [ProteoWizard], DataAnalysis | All common (algorithm dependent)
+Advanced (e.g. spectral filtering)  | `convertMSFiles()`       | [ProteoWizard]                         | All common
+Mass re-calibration                 | `recalibrarateDAFiles()` | DataAnalysis                           | Bruker
+
+The `convertMSFiles()` function supports conversion between many different file formats typically used in non-target analysis. Furthermore, other pre-treatment steps are available (e.g. centroiding, filtering) when the [ProteoWizard] algorithm is used. For an overview of these functionalities see the [MsConvert documentation]. Some examples:
+
+```{r convert,eval=FALSE}
+# Converts a single mzXML file to mzML format
+convertMSFiles("standard-1.mzXML", to = "mzML", algorithm = "openms")
+
+# Converts all Thermo files with ProteoWizard (the default) in the analyses/raw
+# directory and stores the mzML files in analyses/raw. Afterwards, only MS1
+# spectra are retained.
+convertMSFiles("analyses/raw", "analyses/mzml", from = "thermo",
+               centroid = "vendor", filters = "msLevel 1")
+```
+
+> **_NOTE_** Most algorithms further down the workflow require the _mzML_ or _mzXML_ file format and additionally require that mass peaks have been centroided. When using the ProteoWizard algorithm (the default), centroiding by vendor algorithms is generally recommended (i.e. by setting `centroid="vendor"` as shown in the above example).
+
+When Bruker MS data is used it can be automatically re-calibrated to improve its mass accuracy. Often this is preceeded by calling the `setDAMethod()` function to set a DataAnalysis method to all files in order to configure automatic re-calibration. The `recalibrarateDAFiles()` function performs the actual re-calibration. The `getDACalibrationError()` function can be used at anytime to request the current calibration error of each analysis. An example of these functions is shown below.
+
+```{r brukerCalib,eval=FALSE}
+# anaInfo is a data.frame with information on analyses (see next section)
+setDAMethod(anaInfo, "path/to/DAMethod.m") # configure Bruker files with given method that has automatic calibration setup
+recalibrarateDAFiles(anaInfo) # trigger re-calibration for each analysis
+getDACalibrationError(anaInfo) # get calibration error for each analysis (NOTE: also shown when previous function is finished)
+```
+
+### Analysis information {#anaInfo}
+
+The final bits of preparation is constructing the information for the analyses that need to be processed. In `patRoon` this is referred to as the _analysis information_ and often stored in a variable `anaInfo` (of course you are free to choose a different name!). The analysis information should be a `data.frame` with the following columns:
+
+* **path**: the directory path of the file containing the analysis data
+* **analysis**: the name of the analysis. This should be the file name _without_ file extension.
+* **group**: to which _replicate group_ the analysis belongs. All analysis which are replicates of each other get the same name.
+* **ref**: which replicate group should be used for blank subtraction.
+* **conc** (optional, advanced) A numeric value describing the concentration or any other value for which the intensity in this sample may correlate, for instance, dilution factor, sampling time etc. This column is only required when using the `regression()` function (see `?regression` for more information).
+
+<!-- UNDONE: tutorial link? -->
+
+The `generateAnalysisInfo()` function can be used to (semi-)automatically generate a suitable `data.frame` that contains all the required information for a set of analysis. For, instance, the following line was used in the tutorial:
+
+```{r genAnaInfo,eval=FALSE}
+# Take example data from patRoonData package (triplicate solvent blank + triplicate standard)
+anaInfo <- generateAnalysisInfo(paths = patRoonData::exampleDataPath(),
+                                groups = c(rep("solvent", 3), rep("standard", 3)),
+                                refs = "solvent")
+```
+
+Alternatively, the `newProject()` function discussed in the next section can be used to interactively construct this information.
+
+### Automatic project generation with newProject()
+
+The previous sections already highlighted some steps that have to be performed prior to starting a new non-target analysis workflow: data pre-treatment and gathering information on the analysis. Most of the times you will put this and other `R` code a script file so you can re-call what you have done before (i.e. reproducbile research).
+
+The `newProject()` function can be used to setup a new project. When you run this function it will launch a small tool (see screenshot below) where you can select your analyses and configure the various workflow steps which you want to execute (e.g. data pre-treatment, finding features, annotation etc). After setting everything up the function will generate a template script which can easily be edited afterwards. In addition, you have the option to create a new RStudio project, which is advantegeous as it neatly seperates your data processing work from the rest.
+
+![](newp.png){width=450px}
+
+> **_NOTE_** At the moment `newProject()` _only_ works with (recent) versions of RStudio.
+
+
+## Features
+
+- export()
+
+<!-- UNDONE: enviMass? -->
+
+Collecting features from the analyses consists of finding all features, grouping them across analyses (optionally after retention time alignment) and finally, if desired suspect screening: 
+
+```{r featWorkflow,echo=FALSE}
+DiagrammeR::grViz("
+digraph rmarkdown {
+  graph [ rankdir = LR, compound = true ]
+  node [ shape = box,
+         fixedsize = true,
+         width = 2.2,
+         height = 1,
+         fontsize = 18,
+         fillcolor = darkseagreen1,
+         style = filled ]
+
+    'Find features' -> 'Group features'
+    'Suspect screening'  [shape=ellipse, fillcolor = lightcyan]
+    'Group features' -> 'Suspect screening' [dir=both]
+}", height = 70, width = 500)
+```
+
+### Finding and grouping features
+
+Several algorithms are available for finding features. These are listed in the table below alongside their usage and general remarks.
+
+Algorithm       | Usage                                     | Remarks
+--------------- | ----------------------------------------- | --------------
+[OpenMS]        | `findFeatures(algorithm = "openms", ...)` | Uses the [FeatureFinderMetabo] algorithm
+[XCMS]          | `findFeatures(algorithm = "xcms", ...)`   | Uses `xcms::xcmsSet()` function
+[XCMS] (import) | `importFeatures(algorithm = "xcms")`      | Imports an existing `xcmsSet` object.
+[enviPick]      | `findFeatures(algorithm = "envipick")`    | Uses `enviPick::enviPickwrap()`
+DataAnalysis    | `findFeatures(algorithm = "bruker")`      | Uses Find Molecular Features from DataAnalysis (Bruker only)
+
+<!-- UNDONE: link to fOpt? -->
+
+In our experience the performance of these algorithms heavily depend on the data and parameter settings that are used. Since obtaining a good feature dataset is crucial for the rest of the workflow, it is highly recommended to experiment with different settings. Some common parameters to look at are listed in the table below. However, there are many more (advanced) parameters that can be set, please see the reference documentation for these (e.g. `?findFeatures`).
+
+Algorithm      | Common parameters
+-------------- | ---------------------------------------------------------------------------------
+[OpenMS]       | `noiseThrInt`, `chromSNR`, `chromFWHM`, `mzPPM`, `minFWHM`, `maxFWHM` (see `?findFeatures`)
+[XCMS]         | `min_peakwidth`, `mzdiff`, `prefilter`, `noise` (assuming default `centWave` algorithm, see `?findPeaks.centWave`)
+[enviPick]     | `dmzgap`, `dmzdens`, `drtgap`, `drtsmall`, `drtdens`, `drtfill`, `drttotal`, `minpeak`, `minint`, `maxint` (see `?enviPickwrap`)
+DataAnalysis   | See _Find_ -> _Parameteres..._ -> _Molecular Features_ in DataAnalysis.
+
+> **_NOTE_** DataAnalysis feature settings have to be configured in DataAnalysis prior to calling `findFeatures()`.
+
+Similarly, for grouping features across analyses several algorithms are supported.
+
+Algorithm | Usage | Remarks
+--------- | ----------------- | -------------------------------------
+[OpenMS] | `groupFeatures(algorithm = "openms", ...)` | Uses the [FeatureFinderMetabo] algorithm
+[XCMS] | `groupFeatures(algorithm = "xcms", ...)` | Uses `xcms::group()` function
+ProfileAnalysis | `importFeatureGroups(algorithm = "brukerpa", ...)` | Import `.csv` file exported from Bruker ProfileAnalysis
+TASQ | `importFeatureGroups(algorithm = "brukertasq", ...)` | Imports a _Global result table_ (exported to Excel file and then saved as `.csv` file)
+
+Just like finding features, each algorithm has their own set of parameters. Often the defaults are a good start but it is recommended to have look at them. See `?groupFeatures` for more details.
+
+Some examples of finding and grouping features are shown below.
+
+<!-- UNDONE: enable this for testing? -->
+
+```{r feat,eval=FALSE}
+# The anaInfo variable contains analysis information, see the previous section
+
+# Finding features
+fListOMS <- findFeatures(anaInfo, "openms") # OpenMS, with default settings
+fListOMS2 <- findFeatures(anaInfo, "openms", noiseThrInt = 500, chromSNR = 10) # OpenMS, adjusted minimum intensity and S/N
+fListXCMS <- findFeatures(anaInfo, "xcms", min_peakwidth = 10) # XCMS
+fListXCMS2 <- importFeatures(anaInfo, "xcms", xset) # import XCMS xcmsSet object
+fListEP <- findFeatures(anaInfo, "envipick", minint = 1E3) # enviPick
+
+# Grouping features
+fGroupsOMS <- groupFeatures(fListOMS, "openms") # OpenMS grouping, default settings
+fGroupsOMS2 <- groupFeatures(fListOMS2, "openms", rtalign = FALSE) # OpenMS grouping, no RT alignment
+fGroupsOMS3 <- groupFeatures(fListXCMS, "openms", maxGroupRT = 6) # group XCMS features with OpenMS, adjusted grouping parameter
+fGroupsXCMS <- groupFeatures(fListEP, "xcms", minfrac = 0) # group enviPick features with XCMS, disable minfrac
+```
+
+### Suspect screening
+
+After features have been grouped suspect screening may be performed to eliminate any feature groups with _m/z_ and (optionally) retention properties not present in a given suspect list. A typical workflow looks like this:
+
+```{r susp,eval=FALSE}
+targets <- data.frame(name = c("susp1", "susp2", "susp3"),
+                      mz = c(100.1034, 250.0456, 300.1234),
+                      stringsAsFactors = FALSE)
+scr <- screenTargets(fGroups, targets)
+fGroupsSusp <- groupFeaturesScreening(fGroups, scr)
+```
+
+<!-- UNDONE: make this interactive -->
+
+This will perform the following steps:
+
+1. Create a suspect list. A suspect list is a `data.frame` with mandatory `name` and `mz` columns. Optionally, it may also contain an `rt` column for retention times (in seconds). In reality loading such a table is easiest from a _.csv_ file with e.g. `read.csv()`.
+2. Screen a feature groups object for the suspects. The return value will be a `data.frame` with results.
+3. Use the screening results to filter the original feature groups and store the results in `fGroupsSusp`.
+
+- Table with algorithms and remarks about their selection
+- Process: extract features --> align RT --> group (--> suspect screening)
+
+## Annotation
+
+The annotation consists of collecting MS peak lists and then formula and/or compound annotation:
+
+```{r annWorkflow,echo=FALSE}
+DiagrammeR::grViz("
+digraph rmarkdown {
+  graph [ rankdir = LR ]
+  node [ shape = box,
+         fixedsize = true,
+         width = 2.3,
+         height = 1,
+         fontsize = 18,
+         fillcolor = darkseagreen1,
+         style = filled ]
+
+    'MS peak lists' -> 'Formula annotation'
+    'MS peak lists' -> 'Compound annotation'
+    'Formula annotation':e -> 'Compound annotation':e [style = dotted, constraint = false]
+}", height = 120, width = 500)
+```
+
+Note that compound annotation is normally not dependent upon formula annotation. However, formula data can be used to improve ranking of candidates afterwards by the `addFormulaScoring()` function, which will be discussed later in this section.
+
+### Adducts
+
+- Adducts: conversion --> Move to advanced? Also because components are a bit involved.
+
+### MS peak lists
+
+Algorithm    | Usage                                                   | Remarks
+------------ | ------------------------------------------------------- | -----------------------------------------------------
+[mzR]        | `generateMSPeakLists(algorithm = "mzr", ...)`    | Uses [mzR] for spectra retrieval. Recommended default.
+DataAnalysis | `generateMSPeakLists(algorithm = "bruker", ...)` | Loads data after automatically generating MS and MS/MS spectra in DataAnalysis
+DataAnalysis FMF | `generateMSPeakLists(algorithm = "brukerfmf", ...)` | Uses spectra from the  _find molecular features_ algorithm.
+
+The recommended default algorithm is `mzr`: this algorithm is generally faster and is not limited to a vendor data format as it will read the open `mzML` and `mzXML` file formats. On the other hand, when DataAnalysis is used with Bruker data the spectra can be automatically background subtracted and there is no need for file conversion. Note that the `brukerfmf` algorithm only works when `findFeatures()` was called with the `bruker` algorithm.
+
+<!-- UNDONE: Add images here? -->
+
+When `generateMSPeakists()` is called it will
+
+1. Find all MS and MS/MS spectra that 'belong' to a feature. For MS spectra this means that all spectra close to the retention time of a feature will be collected. In addition, for MS/MS normally only spectra will be considered that have a precursor mass close to that of the feature (however, this can be disabled for data that was recorded with data independent acquisition (DIA, MS^E, bbCID, ...)).
+2. Average all MS and MS/MS spectra to produce peak lists for each feature.
+3. Average all peak lists for features within the same group.
+
+Formula calculation uses either data from (2) or (3) (i.e. trade-off between accuracy and speed), whereas compound annotation will always use data from (3) to limit required resources and processing time.
+
+There are several common function arguments to `generateMSPeakLists()` that can be used to optimize its behaviour:
+
+<!-- UNDONE: add topMost for Bruker when it's there -->
+
+Argument                         | Algorithm(s)          | Remarks
+-------------------------------- | --------------------- | ----------------------------------------------------------------------
+maxMSRtWindow                    | `mzr`, `bruker`       | Maximum time window +/- the feature retention time (in seconds) to collect spectra for averaging. Higher values may significantly increase processing times.
+precursorMzWindow                | `mzr`                 | Maximum precursor _m/z_ search window to find MS/MS spectra. Set to `NULL` to disable (i.e. for DIA experiments).
+topMost                          | `mzr`                 | Only retain feature data for no more than this amount analyses with highest intensity. For instance, a value of _1_ will only keep peak lists for the feature with highest intensity in a feature group.  
+bgsubtr                          | `bruker`              | Perform background subtraction (if the spectra type supports this, e.g. MS and bbCID)
+minMSIntensity, minMSMSIntensity | `bruker`, `brukerfmf` | Minimum MS and MS/MS intensity. Note that DataAnalysis reports many zero intensity peaks so a value of at least _1_ is recommended.
+MSMSType                         | `bruker`              | The type of spectra that should be used for MSMS: `"BBCID"` for bbCID experiments, otherwise `"MSMS"` (the default).
+
+In addition, several parameters can be set that affect spectral averaging. These parameters are passed as a `list` to the `avgFeatParams` (`mzr` algorithm only) and `avgFGroupParams` arguments, which affect averaging of feature and feature group data, respectively. Some typical parameters include:
+
+* `clusterMzWindow`: Maximum _m/z_ window used to cluster mass peaks when averaging. The better the MS resolution, the lower this value should be.
+* `topMost`: Retain no more than this amount of most intense mass peaks. Useful to filter out 'noisy' peaks.
+* `minIntensityPre` / `minIntensityPost`: Mass peaks below this intensity will be removed before/after averaging.
+
+See `?generateMSPeakLists` for all possible parameters.
+
+A suitable list object to set averaging parameters can be obtained with the `getDefAvgPListParams()` function.
+
+```{r avgMSPLParamas,eval=FALSE}
+# lower default clustering window, other settings remain default
+avgPListParams <- getDefAvgPListParams(clusterMzWindow = 0.001)
+
+# Apply to both feature and feature group averaging
+plists <- generateMSPeakLists(fGroups, "mzr", avgFeatParams = avgPListParams, avgFGroupParams = avgPListParams)
+```
+
+### Formulae
+
+- GF and high m/z values?
+
+Formulae can be automatically calculated for all features using the `generateFormulas()` function. The following algorithms are currently supported:
+
+Algorithm    | Usage                                          | Remarks
+------------ | ---------------------------------------------- | ------------------------------------------------
+[GenForm]    | `generateFormulas(algorithm = "genform", ...)` | Bundled with `patRoon`. Reasonable default.
+[SIRIUS]     | `generateFormulas(algorithm = "sirius", ...)`  | Requires MS/MS data.
+DataAnalysis | `generateFormulas(algorithm = "bruker", ...)`  | Requires FMF features (i.e. `findFeatures(algorithm = "bruker", ...)`). MS peak lists are not needed. Uses _SmartFormula_ algorithms.
+
+Calculation with [GenForm] is often a good default. It is fast and basic rules can be applied to filter out obvious non-existing formulae. More thorough calculation is performed with [SIRIUS]: this algorithm often yields fewer and often more plausible results. However, [SIRIUS] requires MS/MS data (hence features without will not have results) and formula prediction may not work well for compounds that structurally deviate from the training sets used by [SIRIUS]. Calculation with DataAnalysis is only possible when features are obtained with DataAnalysis as well. An advantage is that analysis files do not have to be converted and no MS peak generation is necessary, however, compared to other algorithms calculation is often relative slow.
+
+There are two methods for formula assignment:
+
+1. Formulae are first calculated for each individual feature within a feature group. These results are then pooled, outliers are removed and remaining formulae are assigned to the feature group (i.e. `calculateFeatures = TRUE`).
+2. Formulae are directly calculated for each feature group by using group averaged peak lists (see previous section) (i.e. `calculateFeatures = FALSE`).
+
+The first method is more thorough and the possibility to remove outliers may sometimes result in better formula assignment. However, the second method is much faster and generally recommended for large number of analyses.
+
+By default formulae are calculated using _only_ MS data and using _both_ MS and MS/MS data (duplicates are removed). An advantage of this approach is that formulae can still be assigned even when no MS/MS data is available. However, a disadvantage is that formulae needs to be calculated twice. The `MSMode` argument (listed below) can be used to customize this behaviour. Note that SIRIUS only works with MS/MS data, hence, the behaviour of this algorithm is fixed.
+
+An overview of common parameters that are typically set to customize formula calculation is listed below.
+
+<!-- UNDONE: link to adduct section -->
+
+Argument          | Algorithm(s)        | Remarks
+----------------- | ------------------- | -------------------------------------------------------------------------------
+relMzDev          | `genform`, `sirius` | The maximum relative _m/z_ deviation for a formula to be considered (in _ppm_).
+elements          | `genform`, `sirius` | Which elements to consider. By default `"CHNOP"`. Try to limit possible elements as much as possible.
+calculateFeatures | `genform`, `sirius` | Whether formulae should be calculated first for all features (see discussion above) (always `TRUE` with DataAnalysis).
+featThreshold     | All                 | Minimum relative amount (_0-1_) amongst all features within a feature group that a formula candidate should be present (e.g. _1_ means that a candidate is only considered if it was assigned to all features). 
+adduct            | `genform`, `sirius` | The adduct to consider for calculation (e.g. `"[M+H]+"`, `"[M-H]-"`).
+MSMode            | `genform`, `bruker` | Whether formulae should be generated only from MS data (`"ms"`), MS/MS data (`"msms"`) or both (`"both"`). The latter is default, see discussion above.
+profile           | `sirius`            | Instrument profile, e.g. `"qtof"`, `"orbitrap"`, `"fticr"`.
+
+Some typical examples:
+
+```{r forms,eval=FALSE}
+formulasGF <- generateFormulas(fGroups, "genform", mslists) # GenForm, default settings
+formulasGF2 <- generateFormulas(fGroups, "genform", mslists, calculateFeatures = FALSE) # direct feature group assignment (faster)
+formulasSIR <- generateFormulas(fGroups, "sirius", mslists, elements = "CHNOPSClBr") # SIRIUS, common elements for pollutant
+formulasSIR2 <- generateFormulas(fGroups, "sirius", adduct = "[M-H]-") # SIRIUS, negative ionization
+formulasBr <- generateFormulas(fGroups, "bruker", MSMode = "MSMS") # Only consider MSMS data (SmartFormula3D)
+```
+
+
+- OM rules: as.data.table() and filter() --> OM section in advanced?
+
+### Compounds
+
+- Advanced?: RT/suspect scoring
+
+An important step in a typical non-target workflow is structural identification for features of interest. Afterall, this information may finally reveal _what_ a feature is. The first step is to find all possible structures in a database that may be assigned to the feature (based on e.g. monoisotopic mass or formula). These candidates are then scored to rank likely candidates, for instance, on correspondence with in-silico or library MS/MS spectra and environmental relevance. 
+
+Structure assignment in `patRoon` is performed automatically for all feature groups with the `generateCompounds()` function. Currently, this function supports two algorithms:
+
+Algorithm                    | Usage                                           | Remarks
+---------------------------- | ----------------------------------------------- | ------------------------------------------------
+[MetFrag]                    | `generateCompounds(algorithm = "metfrag", ...)` | Supports many databases (including custom) and scorings for candidate ranking.
+[SIRIUS] with [CSI:FingerID] | `generateCompounds(algorithm = "sirius", ...)`  | Incorporates prior comprohensive formula calculations.
+
+Compound annotation is often a relative time and resource intensive procedure. For this reason, features are not annotated individually, but instead a feature group as a whole is annotated, which generally saves significant amounts of computational requirements. Nevertheless, it is not uncommon that this is the most time consuming step in the workflow. For this reason, prioritization of features is highly important, even more so to avoid 'abusing' servers when an online database is used for compound retrieval.
+
+Selecting the right database is important for proper candidate assignment. Afterall, if the 'right' chemical compound is not present in the used database, it is impossible to assign the correct structure. Luckily, however, several large databases such as [PubChem] and [ChemSpider] are openly available which contain tens of millions of compounds. On the other hand, these databases may also lead to many unlikely candidates and therefore more specialized (or custom databases) may be preferred. Which database will be used is dictated by the `database` argument to `generateCompounds()`, currently the following options exist:
+
+<!-- UNDONE: add missing databases (e.g. FOR-IDENT) when support is added -->
+
+Database            | Algorithm(s)            | Remarks
+------------------- | ----------------------- | -----------------------
+`pubchem`           | `"metfrag"`, `"sirius"` | [PubChem] is currently the largest compound database and is used by default.
+`chemspider`        | `"metfrag"`             | [ChemSpider] is another large database. Requires security token from [here](http://www.chemspider.com/AboutServices.aspx) (see next section).
+`comptox`           | `"metfrag"`             | The EPA [CompTox] contains many compounds and scorings relevant to environmental studies. Needs manual download (see next section).
+`kegg`              | `"metfrag"`, `"sirius"` | The [KEGG] database for biological compounds
+`hmdb`              | `"metfrag"`, `"sirius"` | The [HMDB] contains many human metabolites.
+`bio`               | `"sirius"`              | Selects all supports biological databases.
+`csv`, `psv`, `sdf` | `"metfrag"`             | Custom database (see next section). [CSV example][csvDB-ex].
+
+#### Configuring MetFrag databases and scoring
+
+Some extra configuration may be necessary when using certain databases with MetFrag. In order to use the ChemSpider database a [security token](http://www.chemspider.com/AboutServices.aspx) should be requested and set with the `chemSpiderToken` argument to `generateCompounds()`. The CompTox database needs to be manually downloaded from [here][CompTox-dl] (currently only the _SelectMetaData_ and _SelectMetaDataPlus_ databases are supported). The file location of this and other local databases (`csv`, `psv`, `sdf`) needs to be manually configured, see the examples below and/or `?generateCompounds` for more information on how to do this.
+
+```{r compDB,eval=FALSE}
+# PubChem: the default
+compsMF <- generateCompounds(fGroups, mslists, "metfrag", adduct = "[M+H]+")
+
+# ChemSpider: needs security token
+compsMF2 <- generateCompounds(fGroups, mslists, "metfrag", database = "chemspider",
+                              chemSpiderToken = "MY_TOKEN_HERE", adduct = "[M+H]+")
+
+# CompTox: set global option to database path
+options(patRoon.path.MetFragCompTox = "~/DSSTox_01May18_Full_SelectMetaDataPlus.csv")
+compsMF3 <- generateCompounds(fGroups, mslists, "metfrag", database = "comptox", adduct = "[M+H]+")
+
+# CompTox: set database location without global option
+compsMF4 <- generateCompounds(fGroups, mslists, "metfrag", database = "comptox", adduct = "[M+H]+",
+                              extraOpts = list(LocalDatabasePath = "~/DSSTox_01May18_Full_SelectMetaDataPlus.csv"))
+
+# Same, but for custom database
+compsMF5 <- generateCompounds(fGroups, mslists, "metfrag", database = "csv", adduct = "[M+H]+",
+                              extraOpts = list(LocalDatabasePath = "~/mydb.csv"))
+```
+
+An example of a custom _.csv_ database can be found [here][csvDB-ex].
+
+With MetFrag compound databases are not only used to retrieve candidate structures but are also used to obtain metadata for further ranking. Each database has its own scorings, a table with currently supported scorings can be obtained with the `compoundScorings()` function (some columns omitted):
+
+```{r compSc,echo=FALSE}
+k <- knitr::kable(compoundScorings()[, c("name", "metfrag", "database", "default")],
+                  if (knitr::is_html_output()) "html" else "latex")
+if (knitr::is_html_output())
+{
+    k <- kableExtra::kable_styling(k, font_size = 11)
+    k <- kableExtra::scroll_box(k, extra_css = "overflow-y: auto; height: 350px;")
+}
+k
+```
+
+The first two columns contain the generic and original MetFrag naming schemes for each scoring type. While both naming schemes can be used, the generic is often shorter and harmonized with other algorithms (e.g. SIRIUS). The _database_ column specifies for which databases a particular scoring is available (empty if not database specific). Most scorings are selected by default (as specified by the _default_ column), however, this behaviour can be customized by using the `scoreTypes` argument:
+
+```{r compCustSc,eval=FALSE}
+# Only in-silico and PubChem number of patents scorings
+compsMF1 <- generateCompounds(fGroups, mslists, "metfrag", adduct = "[M+H]+",
+                              scoreTypes = c("fragScore" "numberPatents"))
+
+# Custom scoring in custom database
+compsMF2 <- generateCompounds(fGroups, mslists, "metfrag", adduct = "[M+H]+",
+                              database = "csv", adduct = "[M+H]+",
+                              extraOpts = list(LocalDatabasePath = "~/mydb.csv"),
+                              scoreTypes = c("fragScore", "myScore", "myScore2"))
+```
+
+By default ranking is performed with equal weight (i.e. _1_) for all scorings. This can be changed by the `scoreWeights` argument, which should be a `vector` containing the weights for all scorings following the order of `scoreTypes`, for instance:
+
+```{r compCustScW,eval=FALSE}
+compsMF <- generateCompounds(fGroups, mslists, "metfrag", adduct = "[M+H]+",
+                             scoreTypes = c("fragScore" "numberPatents"),
+                             scoreWeights = c(1, 2))
+```
+
+Sometimes thousands or more structural candidates are found when annotating a feature group. In this situation processing all these candidates will too involving (especially when external databases are used). To avoid this a default cut-off is set: when the number of candidates exceed a certain amount the search will be aborted and no results will be reported for that feature group. The maximum number of candidates can be set with the `maxCandidatesToStop` argument. The default value is relative conservative, especially for local databases it may be useful to increase this number.
+
+#### Timeout and error handling
+
+The use of online databases has the drawback that an error may occur, for instance, as a result of a connection error. Furthermore, MetFrag typically returns an error when too many candidates are found (as set by the `maxCandidatesToStop` argument). By default processing is restarted if an error has occurred (configured by the `errorRetries` argument). Similarly, the `timeoutRetries` and `timeout` arguments can be used to avoid being 'stuck' on obtaining results, for instance, due to an unstable internet connection.
+
+If no compounds could be assigned due to an error a warning will be issued. In this case it is best to see what went wrong by manually checking the log files, which by default are stored in the _log/metfrag_ folder.
+
+#### Formula scoring
+
+Ranking of candidate structures may further be improved by incorporating formula information by using the `addFormulaScoring()` function:
+
+```{r addFormSc,eval=FALSE}
+comps <- addFormulaScoring(coms, formulas, updateScore = TRUE)
+```
+
+Here, corresponding formula and explained fragments will be used to calculate a _formulaScore_ for each candidate. Note that SIRIUS candidates are already based on calculated formulae, hence, running this function on SIRIUS results is less sensable unless scoring from another formula calculation algorithm is desired.
+
+#### Further options and parameters
+
+There are _many_ more options and parameters that affect compound annotation. For a full overview please have a look at the reference manual (e.g. by running `?generateCompounds`).
+
+
+## Componentization
+
+In `patRoon` _componentization_ refers to grouping related feature groups together in components. Currently there are three different methodologies to generate components:
+
+* Similarity on chromatographic elution profiles: feature groups with similar chromatographic behaviour which are assuming to be the same chemical compound (e.g. adducts or isotopologues).
+* Homologous series: features with increasing _m/z_ and retention time.
+* Intensity profiles: features that follow a similar intensity profile in the analyses.
+
+The following algorithms are currently supported:
+
+Algorithm            | Usage                                              | Remarks
+-------------------- | -------------------------------------------------- | --------------------------------------------
+[CAMERA]             | `generateComponents(algorithm = "camera", ...)`    | Clusters feature groups with similar chromatographic elution profiles and annotate by known chemical rules (adducts, isotopologues, in-source fragments).
+[RAMClustR]          | `generateComponents(algorithm = "ramclustr", ...)` | As above.
+[nontarget]          | `generateComponents(algorithm = "nontarget", ...)` | Uses the [nontarget] R package to perform unsupervised homologous series detection.
+Intensity clustering | `generateComponents(algorithm = "intclust", ...)`  | Groups features with similar intensity profiles across analyses by hierarchical clustering.
+
+> **_NOTE_** Componentization is a complex process and currently still in a relative young development phase. As such, its functionality and interface are planned to be further improved and results obtained now should always be manually checked.
+
+### Features with similar chromatographic behaviour
+
+Isotopes, adducts and in-source fragments typically result in detection of multiple mass peaks by the mass spectrometer for a single chemical compound. While some feature finding algorithms already try to collapse (some of) these in to a single feature, this process is often incomplete (if performed at all) and it is not uncommon that multiple features will describe the same compound. To overcome this complexity the algorithms from [CAMERA] and [RAMClustR] can be used to group features that undergo highly similar chromatographic behaviour but have different _m/z_ values. Basic chemical rules are then applied to the resulting components to annotate adducts, in-source fragments and isotopologues, which may be highly useful for general identification purposes.
+
+<!-- UNDONE: hint/link to reporting for checking results -->
+
+Some common function arguments to `generateComponents()` are listed below. Note that careful tuning for some of these is required to obtain useful results. In our experience the current default settings may significantly 'over-cluster' features that (clearly visibly) do not belong to each other. For this reason, you are advised to optimize and verify the various parameters supported by both algorithms. For a complete listing all arguments see the reference manual (e.g. `?generateComponents`).
+
+Argument                     | Algorithm                 | Remarks
+---------------------------- | ------------------------- | --------------------------------------------------------------------
+`ionization`                 | `"camera"`, `"ramclustr"` | Ionization mode: `"positive"` or `"negative"`
+`minSize`                    | `"camera"`, `"ramclustr"` | Minimum component size. Smaller components will be removed.
+`relMinReplicates`           | `"camera"`, `"ramclustr"` | See below.
+`st`, `sr`, `maxt`, `hmax`   | `"ramclustr"`             | Common parameters to influence clustering of [RAMClustR]. See `?ramclustR` for details.
+`extraOpts`                  | `"camera"`                | A list with extra argument passed to the `annotate()` function from [CAMERA].
+`extraOptsRC`, `extraOptsFM` | `"ramclustr"`             | A list with extra arguments passed to the `ramclustR()` and `do.findmain()` functions from [RAMClustR].
+
+Note that both algorithms were primarily designed for datasets where features are generally present in the majority of the analyses (as is relatively common in metabolomics). For environmental analyses, however, this is often not the case. As a result, it may happen that not all features from the feature groups within a component share their presence in the same analyses. In reality, this situation would be fairly unusual, and it is likely that such features actually do not belong to the same component. An extra filter option was added to improve such scenarios: after componentization all features are checked to have a minimal presence across all analyses within the component. This is configured by the `relMinReplicates` argument of `generateComponents()`, which specifies the relative number of replicate groups in which a feature should be present. For instance, when this value is _0.5_ (the default), a feature must be present in at least half of all replicate groups present in the component.
+
+Some example usage is shown below.
+
+```{r chromComps,eval=FALSE}
+# Use CAMERA with defaults
+componCAM <- generateComponents(fGroups, "camera", ionization = "positive")
+
+# CAMERA with customized settings
+componCAM2 <- generateComponents(fGroups, "camera", ionization = "positive",
+                                 extraOpts = list(mzabs = 0.001, sigma = 5))
+
+# Use RAMClustR with customized parameters
+componRC <- generateComponents(fGroups, "ramclustr", ionization = "positive", hmax = 0.4,
+                               extraOptsRC = list(cor.method = "spearman"),
+                               extraOptsFM = list(ppm.error = 5))
+```
+
+
+### Homologues series
+
+- view links
+
+Homologues series can be automatically detected by interfacing with the [nontarget] R package. Components are made from feature groups that show increasing _m/z_ and retention time values. Series are first detected within each replicate group. Afterwards, series from all replicates are linked in case (partial) overlap occurs and this overlap consists of the _same_ feature groups (see figure below). Linked series are then finally merged if this will not cause any conflicts with other series: such a conflict typically occurs when two series are not only linked to each other.
+
+```{r HS,echo=FALSE,fig.cap="**Linking of homologues series** top: partial overlap and will be linked; bottom: no linkage due to different feature in overlapping series."}
+DiagrammeR::grViz("
+digraph rmarkdown {
+  graph [ rankdir = LR, compound = true, style = invis ]
+  node [ shape = oval,
+         fixedsize = true,
+         width = 2.3,
+         height = 0.8,
+         fontsize = 25,
+         fillcolor = darkseagreen1,
+         style = filled ]
+
+  subgraph cluster3 {
+    I [fillcolor=skyblue]; J [fillcolor=skyblue]; K [fillcolor=skyblue]
+    G -> H -> I -> J -> K [style=invis]
+  }
+
+  subgraph cluster4 {
+    _I [label=I, fillcolor=skyblue]; X [fillcolor=indianred1]; _K [label=K, fillcolor=skyblue]
+    _I -> X -> _K -> L [style=invis]
+  }
+
+  H -> _I [ltail=cluster3, lhead=cluster4, style=invis]
+  
+  I -> _I [constraint=false, style=dashed, arrowhead=none]
+  K -> _K [constraint=false, style=dashed, arrowhead=none]
+  
+  subgraph cluster1 {
+    C [fillcolor=skyblue]; D [fillcolor=skyblue]
+    A -> B -> C -> D [style=invis]
+  }
+
+  subgraph cluster2 {
+    _C [label=C, fillcolor=skyblue]; _D [label=D, fillcolor=skyblue]
+    _C -> _D -> E -> F [style=invis]
+  }
+  
+  B -> _C [ltail=cluster1, lhead=cluster2, style=invis]
+
+  C -> _C [constraint=false, style=dashed, arrowhead=none]
+  D -> _D [constraint=false, style=dashed, arrowhead=none]
+}", height = 250, width = 600)
+```
+
+Common function arguments to `generateComponents()` are listed below.
+
+Argument             | Remarks
+-------------------- | -----------------------------------------------------------------------
+`ionization`         | Ionization mode: `"positive"` or `"negative"`
+`rtRange`, `mzRange` | Retention and _m/z_ increment range. Retention times can be negative to allow series with increasing _m/z_ values and decreasing retention times.
+`elements`           | Vector with elements to consider.
+`rtDev`, `absMzDev`  | Maximum retention time and _m/z_ deviation.
+`extraOpts`          | List with extra arguments passed to the `homol.search()` function.
+
+```{r compsNT,eval=FALSE}
+# default settings
+componNT <- generateComponents(fGroups, "nontarget", ionization = "positive")
+
+# customized settings
+componNT2 <- generateComponents(fGroups, "nontarget", ionization = "positive",
+                                elements = c("C", "H"), rtRange = c(-60, 60))
+```
+
+### Intensity clustering {#intclust}
+
+<!-- UNDONE: refs? -->
+
+Whereas previous componentization methods utilized chemical properties to relate features, intensity clustering uses a statistical approach. This methodology is especially useful to find features that show similar trends in the analysed samples. Intensities for all features are first normalized and thereafter hierarchical clustering is performed to find features that show similar intensity profiles across analyses. Components are then formed from automatically assigned clusters (using the [dynamicTreeCut] R package, however, assignment can be changed afterwards).
+
+Some common arguments to `generateComponents()` are listed below. It is recommended to test various settings (especially for `method`) to optimize the clustering results.
+
+Argument                                      | Default          | Remarks
+--------------------------------------------- | ---------------- | ---------------------------------------------------------------
+`method`                                      | `"complete"`     | Clustering method. See `?hclust`
+`metric`                                      | `"euclidean"`    | Metric used to calculate the distance matrix. See `?daisy`.
+`normFunc`                                    | `max`            | Function used to normalize data. Feature intensities within a feature group are divided by the result of when this function is called with their intensity values.
+`average`                                     | `TRUE`           | Whether intensities of replicates should first be averaged.
+`maxTreeHeight`, `deepSplit`, `minModuleSize` | `1`, `TRUE`, `1` | Used for dynamic cluster assignment. See `?cutreeDynamicTree`.
+
+The resulting components are stored in an object from the `componentsIntClust` S4 class. Several methods are defined that can be used on such objects to re-assign clusters, perform plotting operations and so on. Below are some examples. For plotting see the relevant [visualization section](#plotClust). More info can be found in the reference manual (e.g. `?componentsIntClust`).
+
+```{r intClust,eval=FALSE}
+# generate components with default settings
+componInt <- generateComponents(fGroups, "intclust")
+
+# manually re-assign clusters
+componInt <- treeCut(componInt, k = 10)
+
+# automatic re-assignment of clusters (adjusted max tree height)
+componInt <- treeCutDynamic(componInt, maxTreeHeight = 0.7)
+```

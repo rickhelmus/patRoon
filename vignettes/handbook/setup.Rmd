@@ -1,0 +1,14 @@
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+
+library(patRoon)
+```
+
+```{css code=readLines(file.path(vignDir, "styles.css")),echo=FALSE,eval=knitr::is_html_output()}
+```
+
+```{r child=file.path("..", "shared", "refs.Rmd")}
+```

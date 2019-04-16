@@ -6,6 +6,7 @@
 - ref --> blank
 - convertMSFiles()
     - Agilent .d is also a directory?
+- harmonize consensus argument names, add rel/abs support for all?
 
 
 ## docs

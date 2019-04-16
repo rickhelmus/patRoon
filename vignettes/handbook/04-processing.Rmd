@@ -501,7 +501,7 @@ plotSpec(compounds, index = 1, groupName = "M109_R116_61", MSPeakLists = plists,
          ylim = c(0, 5000))
 ```
 
-### Comparing data
+### Comparing data {#visComp}
 
 There are three functions that can be used to asses overlap and uniqueness between data:
 

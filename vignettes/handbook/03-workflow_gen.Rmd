@@ -333,7 +333,7 @@ formulasBr <- generateFormulas(fGroups, "bruker", MSMode = "MSMS") # Only consid
 
 - OM rules: as.data.table() and filter() --> OM section in advanced?
 
-### Compounds
+### Compounds {#compounds}
 
 - Advanced?: RT/suspect scoring
 

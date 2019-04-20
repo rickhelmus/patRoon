@@ -157,4 +157,32 @@ For a complete overview see the reference manual (`?compoundsCluster`).
 
 ## Caching
 
+In `patRoon` lengthy processing operations such as finding features and generating annotation data is _cached_. This means that when you run such a calculation again (without changing any parameters), the data is simply loaded from the cache data instead of re-generating it. This in turn is very useful, for instance, if you have closed your R session and want to continue with data processing at a later stage.
+
+The cache data is stored in a [sqlite] database file. This file is stored by default under the name `cache.sqlite` in the current working directory (for this reason it is very important to always restore your working directory!). However, the name and location can be changed by setting a global package option:
+
+```{r cacheFile,eval=FALSE}
+options(patRoon.cache.fileName = "~/myCacheFile.sqlite")
+```
+
+For instance, this might be useful if you want to use a shared cache file between projects.
+
+After a while you may see that your cache file can get quite large. This is especially true when testing different parameters to optimize your workflow. Furthermore, you may want to clear the cache after you have updated `patRoon` and want to make sure that the latest code is used to generate the data. At any point you can simply remove the cache file. A more fine tuned approach which doesn't wipe all your cached data is by using the `clearCache()` function. With this function you can selectively remove parts of the cache file. The function has two arguments: `what`, which specifies what should be removed, and `file` which specifies the path to the cache file. The latter only needs to be specified if you want to manage a different cache file.
+
+In order to figure what is in the cache you can run `clearCache()` without any arguments:
+
+<!-- UNDONE: point to some useful cache file, possibly update next example -->
+
+```{r clearCache}
+clearCache()
+```
+
+Using this output you can re-run the function again, for instance:
+
+```{r clearCache2,eval=FALSE}
+clearCache("featuresOpenMS")
+clearCache(c("featureGroupsOpenMS", "formulasGenForm")) # clear multiple
+clearCache("all") # same as simply removing the file
+```
+
 ## Parallelization

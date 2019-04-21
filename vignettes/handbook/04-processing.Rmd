@@ -251,8 +251,6 @@ compounds <- filter(compounds,
 
 ### Components
 
-- note about presence of data
-
 Finally several filters are available for components:
 
 Filter                       | Remarks
@@ -423,8 +421,6 @@ fGroups <- fGroups[, groupsOfInterest]
 
 ### Features and annatation data
 
-- highlight subsetting
-
 Several generic functions are available to visualize feature and annotation data:
 
 Generic           | Classes                                              | Remarks
@@ -556,7 +552,60 @@ plotHeatMap(componInt, interactive = TRUE) # interactive heatmap
 plotSilhouettes(componInt, 2:10) # plot silhouettes (e.g. to obtain ideal cluster amount)
 ```
 
-## Reporting
+### Interactive plotting of chromatography data
+
+The `plotEIC()` function introduced before can be used to visualize chromatography data for one or more features. An interactive alternative is to call the `checkChromatograms()` function. This function will launch a GUI that allows you to browse through all features and inspect their EICs. Simply pass in the `featureGroups` object you want to inspect:
+
+```{r checkChrom1,eval=FALSE}
+checkChromatograms(fGroups)
+```
+
+Note that this tool does not work well yet with large number of analyses/features. For this reason, it may be worthwile to launch it with subsets of your data, e.g.
+
+```{r checkChrom2,eval=FALSE}
+checkChromatograms(fGroups[1:3, 1:250]) # only first 3 analyses and their first 500 feature groups
+```
+
+Another purpose of the `checkChromatograms()` function is to remove 'bad' features (e.g. those which are probably not really features, but just noise). The workflow for this is:
+
+1. Launch `checkChromatograms()` and remove any unwanted feature groups by disabling the _keep_ checkbox.
+2. Store the result of the `checkChromatograms()` function to a variable.
+3. Use this variable to subset the original feature groups.
+
+To do so:
+
+```{r checkChrom3,eval=FALSE}
+keep <- checkChromatograms(fGroups)
+fGroups <- fGroups[, keep]
+```
+
+Note that when you re-run `checkChromatograms()` you can restore the state of which feature groups should be kept/removed by passing the previous result to the  function:
+
+```{r checkChrom4,eval=FALSE}
+keep <- checkChromatograms(fGroups) # select feature groups
+
+# continue at a later stage
+keep <- checkChromatograms(fGroups, enabledFGroups = keep)
+```
+
+> **_NOTE_** Again, `checkChromatograms()` may be slow when processing larger datasets. The [reporting functionalities](#report) provide a good alternative to quickly get an overviewing of all EIC data.
+
+### Generating EICs in DataAnalysis
+
+If you have Bruker data and the DataAnalysis software installed, you can automatically add EIC data in a DataAnalysis session. The `addDAEIC()` will do this for a single _m/z_ in one analysis, whereas the `addAllDAEICs()` function adds EICs for all features in a `featureGroups` object.
+
+```{r addDAEIC,eval=FALSE}
+# add a single EIC with background subtraction
+addDAEIC("mysample", "~/path/to/sample", mz = 120.1234, bgsubtr = TRUE)
+# add TIC for MS/MS signal of precursor 120.1234 (value of mz is ignored for TICs)
+addDAEIC("mysample", "~/path/to/sample", mz = 100, ctype = "TIC",
+         mtype = "MSMS", fragpath = "120.1234", name = "MSMS 120")
+
+addAllDAEICs(fGroups) # add EICs for all features
+addAllDAEICs(fGroups[, 1:50]) # as usual, subsetting can be used for partial data
+```
+
+## Reporting {#report}
 
 The previous sections showed various functionalies to inspect and visualize results. An easy and automated way to do this automatically is by using the _reporting_ functionality of `patRoon`. The following three reporting functions are available:
 

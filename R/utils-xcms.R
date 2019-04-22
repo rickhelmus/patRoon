@@ -56,7 +56,7 @@ setMethod("getXCMSSet", "features", function(obj, exportedData, verbose)
 
 #' @rdname getXCMSSet
 #' @export
-setMethod("getXCMSSet", "featuresOpenMS", function(obj, exportedData, verbose)
+setMethod("getXCMSSet", "featuresOpenMS", function(obj, exportedData, verbose = FALSE)
 {
     return(callNextMethod(obj, TRUE, verbose = verbose))
 })
@@ -177,22 +177,22 @@ loadXCMSRaw <- function(analyses, paths, cacheDB = NULL, verbose = TRUE)
 #                         title = NULL, add = FALSE, col = "black", fillAlpha = 0.35, ...)
 # {
 #     fillCol <- adjustcolor(col, alpha.f = fillAlpha)
-# 
+#
 #     # plot limits
 #     if (is.null(rtRange))
 #         rtRange <- range(EIC$time) + c(-30, 30)
 #     if (is.null(intRange))
 #         intRange <- c(0, max(EIC$intensity))
-# 
+#
 #     if (is.null(title))
 #         title <- sprintf("EIC plot m/z %s", paste0(attr(EIC, "mzRange"), collapse = " - "))
-# 
+#
 #     if (!add)
 #         plot(0, type = "n", main = title, xlab = if (retMin) "Minutes" else "Seconds", ylab = "Intensity",
 #              xlim = rtRange, ylim = intRange, ...)
-# 
+#
 #     points(if (retMin) EIC$time / 60 else EIC$time, EIC$intensity, type = "l", col = col)
-# 
+#
 #     if (!is.null(fillRange))
 #     {
 #         EICFill <- EIC[numGTE(EIC$time, fillRange[1]) & numLTE(EIC$time, fillRange[2]), ]

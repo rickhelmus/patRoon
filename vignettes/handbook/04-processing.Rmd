@@ -1,19 +1,17 @@
 # Processing workflow data
 
-- overlap/unique methods somewhere?
-
 The previous chapter mainly discussed how to create workflow data. This chapter will discuss how to _use_ the data.
 
 ## Inspecting results
 
 - add also non-workflow classes? (e.g. compclust->groupNames)
-- algorithm()?
 
 Several generic functions exist that can be used to inspect data that is stored in a particular object (e.g. features, compounds etc):
 
 Generic                                             | Classes                       | Remarks
 --------------------------------------------------- | ----------------------------- | ------------------------------------------
 `length()`                                          | All                           | Returns the length of the object (e.g. number of features, compounds etc)
+`algorithm()`                                       | All                           | Returns the name of the algorithm used to generate the object. 
 `groupNames()`                                      | All                           | Returns all the unique identitifiers (or names) of the feature groups for which this object contains results.
 `names()`                                           | `featureGroups`, `components` | Returns names of the feature groups (similar to `groupNames()`) or components
 `show()`                                            | All                           | Prints general information.
@@ -414,6 +412,41 @@ fGroups <- fGroups[, groupsOfInterest]
 # "sample" replicate group were in the top 5
 ```
 
+## Unique and overlapping features {#unOv}
+
+Often an analysis batch is composed of different sample groups, such as different treatments, influent/effluent etc. In such scenarios it may be highly interesting to evaluate uniqueness or overlap between these samples. Furthermore, extracting overlapping or unique features is a simple but effective prioritization strategy.
+
+The `overlap()` and `unique()` functions can be used to extract overlapping and unique features between replicate groups, respectively. Both functions return a subset of the given `featureGroups` object. An overview of their arguments is given below.
+
+Argument     | Function(s)             | Remarks
+------------ | ----------------------- | ----------------------------------------------------------------
+`which`      | `unique()`, `overlap()` | The replicate groups to compare.
+`relativeTo` | `unique()`              | Only return unique features compared to these replicate groups (`NULL` for all). Replicate groups in `which` are ignored.
+`outer`      | `unique()`              | If `TRUE` then only return features which are _also_ unique among the compared replicates groups.
+`exclusive`  | `overlap`               | Only keep features that _only_ overlap between the compared replicate groups.
+
+Some examples:
+
+```{r compUn,eval=FALSE}
+# only keep features uniquely present in replicate group "repl1"
+fGroupsUn1 <- unique(fGroups, which = "repl1")
+# only keep features in repl1/repl2 which are not in repl3
+fGroupsUn2 <- unique(fGroups, which = c("repl1", "repl2"),
+                     relativeTo = "repl3")
+# only keep features that are only present in repl1 OR repl2
+fGroupsUn3 <- unique(fGroups, which = c("repl1", "repl2"),
+                     outer = TRUE)
+
+# only keep features overlapping in repl1/repl2
+fGroupsOv1 <- overlap(fGroups, which = c("repl1", "repl2"))
+# only keep features overlapping in repl1/repl2 AND are not present in any other
+# replicate group
+fGroupsOv2 <- overlap(fGroups, which = c("repl1", "repl2"),
+                      exclusive = TRUE)
+```
+
+In addition, several plotting functions are [discussed in the next section](#visComp) that visualize overlap and uniqueness of features.
+
 ## Visualization
 
 - Optimization results here?
@@ -499,7 +532,7 @@ plotSpec(compounds, index = 1, groupName = "M109_R116_61", MSPeakLists = plists,
 
 ### Comparing data {#visComp}
 
-There are three functions that can be used to asses overlap and uniqueness between data:
+There are three functions that can be used to visualize overlap and uniqueness between data:
 
 Generic     | Classes
 ----------- | ------------------------------------------------------------------- 
@@ -509,9 +542,7 @@ Generic     | Classes
 
 The most simple comparison plot is a Venn diagram (i.e. `plotVenn()`). This function is especially useful for two or three-way comparisons. More complex comparisons are better visualized with [UpSet] diagrams (i.e. `plotUpSet()`). Finally, chord diagrams (i.e. `plotChord()`) provide visually pleasing diagrams to assess overlap between data.
 
-<!-- UNDONE: also link to overlap/unique -->
-
-These functions can either be used to compare feature data or different objects of the same type. The former is typically used to compare overlap or uniqueness between features in different replicate groups, whereas comparison between objects is useful to visualize differences in algorithmic output (see [algorithm consensus](#consensus) for more advanced functionality to do so).
+These functions can either be used to compare feature data or different objects of the same type. The former is typically used to compare overlap or uniqueness between features in different replicate groups, whereas comparison between objects is useful to visualize differences in algorithmic output. Besides visualization, note that both operations can also be performed to modify or combine objects (see [unique and overlapping features](#unOv) and [algorithm consensus](#consensus)).
 
 As usual, some examples are shown below.
 

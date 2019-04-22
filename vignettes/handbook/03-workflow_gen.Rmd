@@ -201,9 +201,6 @@ This will perform the following steps:
 2. Screen a feature groups object for the suspects. The return value will be a `data.frame` with results.
 3. Use the screening results to filter the original feature groups and store the results in `fGroupsSusp`.
 
-- Table with algorithms and remarks about their selection
-- Process: extract features --> align RT --> group (--> suspect screening)
-
 ## Annotation
 
 The annotation consists of collecting MS peak lists and then formula and/or compound annotation:
@@ -286,6 +283,7 @@ plists <- generateMSPeakLists(fGroups, "mzr", avgFeatParams = avgPListParams, av
 ### Formulae
 
 - GF and high m/z values?
+- OM rules: as.data.table() and filter() --> OM section in advanced?
 
 Formulae can be automatically calculated for all features using the `generateFormulas()` function. The following algorithms are currently supported:
 
@@ -304,7 +302,7 @@ There are two methods for formula assignment:
 
 The first method is more thorough and the possibility to remove outliers may sometimes result in better formula assignment. However, the second method is much faster and generally recommended for large number of analyses.
 
-By default formulae are calculated using _only_ MS data and using _both_ MS and MS/MS data (duplicates are removed). An advantage of this approach is that formulae can still be assigned even when no MS/MS data is available. However, a disadvantage is that formulae needs to be calculated twice. The `MSMode` argument (listed below) can be used to customize this behaviour. Note that SIRIUS only works with MS/MS data, hence, the behaviour of this algorithm is fixed.
+By default, formulae are calculated first by using _only_ MS data and then by using _both_ MS and MS/MS data (duplicates are removed). An advantage of this approach is that formulae can still be assigned even when no MS/MS data is available. However, a disadvantage is that formulae needs to be calculated twice. The `MSMode` argument (listed below) can be used to customize this behaviour. Note that SIRIUS only works with MS/MS data, hence, the behaviour of this algorithm is fixed.
 
 An overview of common parameters that are typically set to customize formula calculation is listed below.
 
@@ -329,9 +327,6 @@ formulasSIR <- generateFormulas(fGroups, "sirius", mslists, elements = "CHNOPSCl
 formulasSIR2 <- generateFormulas(fGroups, "sirius", adduct = "[M-H]-") # SIRIUS, negative ionization
 formulasBr <- generateFormulas(fGroups, "bruker", MSMode = "MSMS") # Only consider MSMS data (SmartFormula3D)
 ```
-
-
-- OM rules: as.data.table() and filter() --> OM section in advanced?
 
 ### Compounds {#compounds}
 

@@ -74,8 +74,6 @@ The final bits of preparation is constructing the information for the analyses t
 * **ref**: which replicate group should be used for blank subtraction.
 * **conc** (optional, advanced) A numeric value describing the concentration or any other value for which the intensity in this sample may correlate, for instance, dilution factor, sampling time etc. This column is only required when using the `regression()` function (see `?regression` for more information).
 
-<!-- UNDONE: tutorial link? -->
-
 The `generateAnalysisInfo()` function can be used to (semi-)automatically generate a suitable `data.frame` that contains all the required information for a set of analysis. For, instance, the following line was used in the tutorial:
 
 ```{r genAnaInfo,eval=FALSE}
@@ -99,10 +97,6 @@ The `newProject()` function can be used to setup a new project. When you run thi
 
 
 ## Features
-
-- export()
-
-<!-- UNDONE: enviMass? -->
 
 Collecting features from the analyses consists of finding all features, grouping them across analyses (optionally after retention time alignment) and finally, if desired suspect screening: 
 
@@ -136,9 +130,7 @@ Algorithm       | Usage                                     | Remarks
 [enviPick]      | `findFeatures(algorithm = "envipick")`    | Uses `enviPick::enviPickwrap()`
 DataAnalysis    | `findFeatures(algorithm = "bruker")`      | Uses Find Molecular Features from DataAnalysis (Bruker only)
 
-<!-- UNDONE: link to fOpt? -->
-
-In our experience the performance of these algorithms heavily depend on the data and parameter settings that are used. Since obtaining a good feature dataset is crucial for the rest of the workflow, it is highly recommended to experiment with different settings. Some common parameters to look at are listed in the table below. However, there are many more (advanced) parameters that can be set, please see the reference documentation for these (e.g. `?findFeatures`).
+Most often the performance of these algorithms heavily depend on the data and parameter settings that are used. Since obtaining a good feature dataset is crucial for the rest of the workflow, it is highly recommended to experiment with different settings (this process can also be automated, see [the feature optimization section](#fOpt) for more details). Some common parameters to look at are listed in the table below. However, there are many more (advanced) parameters that can be set, please see the reference documentation for these (e.g. `?findFeatures`).
 
 Algorithm      | Common parameters
 -------------- | ---------------------------------------------------------------------------------
@@ -225,10 +217,6 @@ digraph rmarkdown {
 
 Note that compound annotation is normally not dependent upon formula annotation. However, formula data can be used to improve ranking of candidates afterwards by the `addFormulaScoring()` function, which will be discussed later in this section.
 
-### Adducts
-
-- Adducts: conversion --> Move to advanced? Also because components are a bit involved.
-
 ### MS peak lists
 
 Algorithm    | Usage                                                   | Remarks
@@ -239,15 +227,13 @@ DataAnalysis FMF | `generateMSPeakLists(algorithm = "brukerfmf", ...)` | Uses sp
 
 The recommended default algorithm is `mzr`: this algorithm is generally faster and is not limited to a vendor data format as it will read the open `mzML` and `mzXML` file formats. On the other hand, when DataAnalysis is used with Bruker data the spectra can be automatically background subtracted and there is no need for file conversion. Note that the `brukerfmf` algorithm only works when `findFeatures()` was called with the `bruker` algorithm.
 
-<!-- UNDONE: Add images here? -->
-
 When `generateMSPeakists()` is called it will
 
 1. Find all MS and MS/MS spectra that 'belong' to a feature. For MS spectra this means that all spectra close to the retention time of a feature will be collected. In addition, for MS/MS normally only spectra will be considered that have a precursor mass close to that of the feature (however, this can be disabled for data that was recorded with data independent acquisition (DIA, MS^E, bbCID, ...)).
 2. Average all MS and MS/MS spectra to produce peak lists for each feature.
 3. Average all peak lists for features within the same group.
 
-Formula calculation uses either data from (2) or (3) (i.e. trade-off between accuracy and speed), whereas compound annotation will always use data from (3) to limit required resources and processing time.
+Data from either (2) or (3) is used for subsequent annotation steps. Formula calculation can use either (as a trade-off between possibly more accurate results by outlier removal _vs_ speed), whereas compound annotation will always use data from (3) since annotating single features (as opposed to their groups) would take a very long time.
 
 There are several common function arguments to `generateMSPeakLists()` that can be used to optimize its behaviour:
 
@@ -282,8 +268,7 @@ plists <- generateMSPeakLists(fGroups, "mzr", avgFeatParams = avgPListParams, av
 
 ### Formulae
 
-- GF and high m/z values?
-- OM rules: as.data.table() and filter() --> OM section in advanced?
+<!-- UNDONE: GF and high m/z values? OM rules: as.data.table() and filter() --> OM section in advanced? -->
 
 Formulae can be automatically calculated for all features using the `generateFormulas()` function. The following algorithms are currently supported:
 
@@ -329,8 +314,6 @@ formulasBr <- generateFormulas(fGroups, "bruker", MSMode = "MSMS") # Only consid
 ```
 
 ### Compounds {#compounds}
-
-- Advanced?: RT/suspect scoring
 
 An important step in a typical non-target workflow is structural identification for features of interest. Afterall, this information may finally reveal _what_ a feature is. The first step is to find all possible structures in a database that may be assigned to the feature (based on e.g. monoisotopic mass or formula). These candidates are then scored to rank likely candidates, for instance, on correspondence with in-silico or library MS/MS spectra and environmental relevance. 
 
@@ -459,13 +442,11 @@ Algorithm            | Usage                                              | Rema
 [nontarget]          | `generateComponents(algorithm = "nontarget", ...)` | Uses the [nontarget] R package to perform unsupervised homologous series detection.
 Intensity clustering | `generateComponents(algorithm = "intclust", ...)`  | Groups features with similar intensity profiles across analyses by hierarchical clustering.
 
-> **_NOTE_** Componentization is a complex process and currently still in a relative young development phase. As such, its functionality and interface are planned to be further improved and results obtained now should always be manually checked.
+> **_NOTE_** Componentization is a complex process and currently still in a relative young development phase. As such, its functionality and interface are planned to be further improved and results obtained now should always be manually checked, for instance, by using the [reporting functions](#report).
 
 ### Features with similar chromatographic behaviour
 
 Isotopes, adducts and in-source fragments typically result in detection of multiple mass peaks by the mass spectrometer for a single chemical compound. While some feature finding algorithms already try to collapse (some of) these in to a single feature, this process is often incomplete (if performed at all) and it is not uncommon that multiple features will describe the same compound. To overcome this complexity the algorithms from [CAMERA] and [RAMClustR] can be used to group features that undergo highly similar chromatographic behaviour but have different _m/z_ values. Basic chemical rules are then applied to the resulting components to annotate adducts, in-source fragments and isotopologues, which may be highly useful for general identification purposes.
-
-<!-- UNDONE: hint/link to reporting for checking results -->
 
 Some common function arguments to `generateComponents()` are listed below. Note that careful tuning for some of these is required to obtain useful results. In our experience the current default settings may significantly 'over-cluster' features that (clearly visibly) do not belong to each other. For this reason, you are advised to optimize and verify the various parameters supported by both algorithms. For a complete listing all arguments see the reference manual (e.g. `?generateComponents`).
 
@@ -499,7 +480,7 @@ componRC <- generateComponents(fGroups, "ramclustr", ionization = "positive", hm
 
 ### Homologues series
 
-- view links
+<!-- UNDONE: view links? -->
 
 Homologues series can be automatically detected by interfacing with the [nontarget] R package. Components are made from feature groups that show increasing _m/z_ and retention time values. Series are first detected within each replicate group. Afterwards, series from all replicates are linked in case (partial) overlap occurs and this overlap consists of the _same_ feature groups (see figure below). Linked series are then finally merged if this will not cause any conflicts with other series: such a conflict typically occurs when two series are not only linked to each other.
 

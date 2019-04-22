@@ -1,5 +1,9 @@
 # Advanced usage
 
+### Adducts
+
+- Adducts: conversion --> Move to advanced? Also because components are a bit involved.
+
 ## Feature parameter optimization {#fOpt}
 
 Many different parameters exist that may affect the output quality of feature finding and grouping. To avoid time consuming manual experimentation, functionality is provided to largely automate the optimization process. The methodology, which uses design of experiments (DoE), is based on the excellent [Isotopologue Parameter Optimization (IPO)](IPO) R package. The functionality of this package is directly integrated in patRoon. Some functionality was added or changed, the most important being support for other feature finding and grouping algorithms besides [XCMS] and basic optimization support for qualitative parameters. Nevertheless, the core optimization algorithms are largely untouched.

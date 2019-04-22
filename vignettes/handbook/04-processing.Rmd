@@ -4,7 +4,7 @@ The previous chapter mainly discussed how to create workflow data. This chapter 
 
 ## Inspecting results
 
-- add also non-workflow classes? (e.g. compclust->groupNames)
+<!-- UNDONE: add also non-workflow classes? (e.g. compclust->groupNames) -->
 
 Several generic functions exist that can be used to inspect data that is stored in a particular object (e.g. features, compounds etc):
 
@@ -194,8 +194,6 @@ fGroups <- filter(fGroups, rGroups = c("repl1", "repl2"))
 
 ### Annotation
 
-- MSPeakLists: retain precursor
-
 There are various filters available for handling annotation data:
 
 Filter                                        | Classes                        | Remarks
@@ -332,9 +330,9 @@ fGroups[1] # subset by first analysis (i.e. row)
 
 The subset operator allows three types of input:
 
-- A logical vector: elements are selected if corresponding values are `TRUE`.
-- A numeric vector: select elements by numeric index.
-- A character vector: select elements by their name.
+* A logical vector: elements are selected if corresponding values are `TRUE`.
+* A numeric vector: select elements by numeric index.
+* A character vector: select elements by their name.
 
 When a logical vector is used as input it will be re-cycled if necessary. For instance, the following will select by the first, third, fifth, etc. analysis.
 
@@ -448,9 +446,6 @@ fGroupsOv2 <- overlap(fGroups, which = c("repl1", "repl2"),
 In addition, several plotting functions are [discussed in the next section](#visComp) that visualize overlap and uniqueness of features.
 
 ## Visualization
-
-- Optimization results here?
-- Link to compound clust/consensus sections
 
 ### Features and annatation data
 
@@ -640,9 +635,9 @@ addAllDAEICs(fGroups[, 1:50]) # as usual, subsetting can be used for partial dat
 
 The previous sections showed various functionalies to inspect and visualize results. An easy and automated way to do this automatically is by using the _reporting_ functionality of `patRoon`. The following three reporting functions are available:
 
-- `reportCSV()`: exports workflow data to comma-separated value (csv) files
-- `reportPDF()`: generates simple reports by plotting workflow data in portable document files (PDFs)
-- `reportMD()`: generates interactive and easily explorable reports
+* `reportCSV()`: exports workflow data to comma-separated value (csv) files
+* `reportPDF()`: generates simple reports by plotting workflow data in portable document files (PDFs)
+* `reportMD()`: generates interactive and easily explorable reports
 
 There are many different arguments available to configure the reporting process. Some common arguments are listed below; for a complete listing see the reference manual (e.g. `?reporting`).
 

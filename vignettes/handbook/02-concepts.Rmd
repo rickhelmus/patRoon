@@ -1,9 +1,9 @@
 # Workflow concepts
 
-- usage of algorithms: algorithm arg vs specific fun
-- S4 classes?: common output, hierarchy, generics, ...
-- show images of feature definition etc?
-    - take out reporting?
+<!-- UNDONE: -->
+<!-- - usage of algorithms: algorithm arg vs specific fun -->
+<!-- - S4 classes?: common output, hierarchy, generics, ... -->
+<!-- - show images of feature definition etc? -->
     
 In a non-target workflow both chromatographic and mass spectral data is automatically processed in order to provide a comprehensive chemical characterization of your samples. While the exact workflow is typically dependent on the type of study, it generally involves of the following steps:
     
@@ -12,7 +12,7 @@ In a non-target workflow both chromatographic and mass spectral data is automati
 ```{r workflow,echo=FALSE}
 DiagrammeR::grViz("
 digraph rmarkdown {
-  graph [ rankdir = LR, compound = true ]
+  graph [ rankdir = LR, compound = true, style = invis ]
   node [ shape = box,
          fixedsize = true,
          width = 2.6,
@@ -22,36 +22,34 @@ digraph rmarkdown {
          style = filled ]
 
   subgraph cluster1 {
-    color=blue;
     'Data pre-treatment' -> 'Find features'
     'Find features' -> 'Group features'
-    'Group features' -> 'MS peak lists'
   }
   
   subgraph cluster2 {
-    'Suspect screening' -> 'Group features'
+    'Suspect screening' -> 'Group features' [minlen=3, style=dashed]
     'Find features' -> 'Suspect screening' [style=invis]
-    'Group features' -> 'Suspect screening'
+    'Group features' -> 'Suspect screening' [style=dashed]
   }
   
   subgraph cluster3 {
-    color=green;
-    'Formula annotation'  'Compound Annotation'  Componentization
+    graph [style = dashed ]
+    color=blue
+    'MS peak lists' 'Formula annotation'  'Compound Annotation'
   }
-  
+
   subgraph cluster4 {
-    Reporting
+    Componentization
   }
   
-  'MS peak lists' -> 'Formula annotation' [ltail=cluster1, lhead=cluster3]
-  'Group features' -> Reporting [ltail=cluster1, lhead=cluster4]
-  'Formula annotation' -> Reporting [ltail=cluster3, lhead=cluster4]
+  'Group features' -> 'Formula annotation' [ltail=cluster1, lhead=cluster3, style=dashed]
+  'Group features' -> 'Componentization' [ltail=cluster1, lhead=cluster4, style=dashed]
+  
 }", height = 250, width = 750)
 ```
 
-<!-- UNDONE: optional lines (scheme/text below) -->
-    
-Note that `patRoon` supports flexible composition of workflows. In the scheme above you can recognize optional steps by a _XXX line/arrow_. Furthermore, the inclusion of each step is only necessary if a further steps depends on its data. For instance, annotation and componentization do not depend on each other and can therefore be executed in any different order or simply be omitted. A brief descripton of all steps is given below. 
+Note that `patRoon` supports flexible composition of workflows. In the scheme above you can recognize optional steps by a _dashed line_. The inclusion of each step is only necessary if a further steps depends on its data. For instance, annotation and componentization do not depend on each other and can therefore be executed in any order or simply be omitted. A brief descripton of all steps is given below.
+
 During **data pre-treatment** raw MS data is prepared for further analysis. A common need for this step is to convert the data to an open format so that other tools are able to process it. Other pre-treatment steps may involve re-calibration of _m/z_ data or performing advanced filtering operations.
 
 The next step is to extract **features** from the data. While different terminologies are used, a feature in `patRoon` refers to a single chromatographic peak in an extracted ion chromatogram for a single _m/z_ value (within a defined tolerance). Hence, a feature contains both chromatographic data (e.g. retention time and peak height) and mass spectral data (e.g. the accurate _m/z_). Note that with mass spectrometry multiple _m/z_ values may be detected for a single compound as a result of adduct formation, natural isotopes and/or in-source fragments. Some algorithms may try to combine these different masses in a single feature. However, in `patRoon` we generally assume this is not the case (and may optionally be done afterwards during the componentization step described below). Features are sometimes simply referred to as 'peaks'.
@@ -64,8 +62,6 @@ After features have been collected the next step typically involves **annotation
 
 Besides annotation, another step to perform after extraction of features is **componentization**. A **component** is defined as a collection of multiple feature groups that are somehow related to each other. Typical exmples are features that belong to the same chemical compound (i.e. with different _m/z_ values but equal retention time), such as adducts, isotopes and in-source fragments. Other examples are homologues series and features that display a similar intensity trend across samples.
 
-The final step of the workflow is to **report** the data. During this step all data from the workflow is reported graphically or in a text file format suitable to be loaded by other tools. Interactive reports can also be made which typically greatly improve data interpretation.
-
 To summarize:
     
 * **Data-pretreatment** involves preparing raw MS data for further processing (e.g. conversion to an open format)
@@ -75,6 +71,5 @@ To summarize:
 * **MS peak lists** Summarizes all MS and MS/MS data that will be used for subsequent annotation.
 * During **formula** and **compound annotation** candidate formulae/structures will be assigned and ranked for each feature.
 * **Componentization** involves consolidating different feature groups that have a relationship to each other in to a single component.
-* **Reporting** is performed as the final step to assist interpretation of the data generated during the workflow.
 
-<!-- UNDONE: add link to example workflows? -->
+The next chapters will discuss how to generate this data and process it.

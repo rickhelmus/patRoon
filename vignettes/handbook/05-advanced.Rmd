@@ -1,6 +1,6 @@
 # Advanced usage
 
-## Feature parameter optimization
+## Feature parameter optimization {#fOpt}
 
 Many different parameters exist that may affect the output quality of feature finding and grouping. To avoid time consuming manual experimentation, functionality is provided to largely automate the optimization process. The methodology, which uses design of experiments (DoE), is based on the excellent [Isotopologue Parameter Optimization (IPO)](IPO) R package. The functionality of this package is directly integrated in patRoon. Some functionality was added or changed, the most important being support for other feature finding and grouping algorithms besides [XCMS] and basic optimization support for qualitative parameters. Nevertheless, the core optimization algorithms are largely untouched.
 
@@ -84,6 +84,26 @@ plot(ftOpt, paramSet = 1, DoEIteration = 1, type = "persp") # pretty perspective
 ```
 
 Please refer to the reference manual for more methods to inspect optimization results (e.g. `?optimizationResult`).
+
+## Exporting and converting feature data
+
+The feature group data obtained during the workflow can be exported to various formats with the `export()` generic function. There are currently three formats supported: `"brukerpa"` (Bruker ProfileAnalysis), `"brukertasq"` (Bruker TASQ) and `"mzmine"` (mzMine). The former exports a 'bucket table' which can be loaded in ProfileAnalysis, the second and third export a target list that can be processed with TASQ and mzMine, respectively.
+
+<!-- UNDONE: update when XCMS3 support is available -->
+
+The `getXCMSSet()` function converts a `features` or `featureGroups` object to an `xcmsSet` object which can be used for further processing with [xcms] (the new XCMS3 interface is not yet supported).
+
+Some examples for these functions are shown below.
+
+```{r fExpConv,eval=FALSE}
+export(fGroups, "brukertasq", out = "my_targets.csv")
+
+# convert features to xcmsSet.
+# NOTE: exportedData should only be FALSE when the analysis data files cannot be
+# loaded by XCMS (e.g. when obtained with DataAnalysis)
+xset <- getXCMSSet(fList, exportedData = TRUE)
+xsetg <- getXCMSSet(fGroups, exportedData = TRUE) # get grouped xcmsSet
+```
 
 ## Algorithm consensus {#consensus}
 

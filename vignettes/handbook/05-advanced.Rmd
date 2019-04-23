@@ -1,8 +1,44 @@
 # Advanced usage
 
-### Adducts
+## Adducts {#adducts}
 
-- Adducts: conversion --> Move to advanced? Also because components are a bit involved.
+When generating formulae and compound annotations and some other functionalities it is required to specify the adduct species. Behind the scenes, different algorithms typically use different formats. For instance, in order to specify a protonated species...
+
+* `GenForm` either accepts `"M+H"` and `"+H"`
+* `MetFrag` either accepts the numeric code `1` or `"[M+H]+"`
+* `SIRIUS` accepts `"[M+H]+"`
+
+In addition, most algorithms only accept a limited set of possible adducts, which do not necessarily all overlap with each other. The `GenFormAdducts()` and `MetFragAdducts()` functions list the possible adducts for `GenForm` and `MetFrag`, respectively.
+
+In order to simplify the situation `patRoon` internally uses its own format and converts it automatically to the algorithm specific format when necessary. Furthermore, during conversion it checks if the specified adduct format is actually allowed by the algorithm. Adducts in `patRoon` are stored in the `adduct` S4 class. Objects from this class specify which elements are added and/or subtracted, the final charge and the number of molecules present in the adduct (e.g. _2_ for a dimer).
+
+```{r adduct1,eval=FALSE}
+adduct(add = "H") # [M+H]+
+adduct(sub = "H", charge = -1) # [M-H]-
+adduct(add = "K", sub = "H2", charge = -1) # [M+K-H2]+
+adduct(add = "H3", charge = 3) # [M+H3]3+
+adduct(add = "H", molMult = 2) # [2M+H]+
+```
+
+A more easy way to generate adduct objects is by using the `as.adduct()` function:
+
+```{r adduct2,eval=FALSE}
+as.adduct("[M+H]+")
+as.adduct("[M+H2]2+")
+as.adduct("[2M+H]+")
+as.adduct("[M-H]-")
+as.adduct("+H", format = "genform")
+as.adduct(1, isPositive = TRUE, format = "metfrag")
+```
+
+In fact, the `adduct` argument to workflow functions such as `generateFormulas()` and `generateCompounds()` is automatically converted to an `adduct` class with the `as.adduct()` function if necessary:
+
+```{r adduct3,eval=FALSE}
+formulas <- generateFormulas(..., adduct = adduct(sub = "H", charge = -1))
+formulas <- generateFormulas(..., adduct = "[M-H]-") # same as above
+```
+
+More details can be found in the reference manual (`?adduct` and ``?`adduct-utils` ``).
 
 ## Feature parameter optimization {#fOpt}
 

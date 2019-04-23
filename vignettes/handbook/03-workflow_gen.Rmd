@@ -291,15 +291,13 @@ By default, formulae are calculated first by using _only_ MS data and then by us
 
 An overview of common parameters that are typically set to customize formula calculation is listed below.
 
-<!-- UNDONE: link to adduct section -->
-
 Argument          | Algorithm(s)        | Remarks
 ----------------- | ------------------- | -------------------------------------------------------------------------------
 relMzDev          | `genform`, `sirius` | The maximum relative _m/z_ deviation for a formula to be considered (in _ppm_).
 elements          | `genform`, `sirius` | Which elements to consider. By default `"CHNOP"`. Try to limit possible elements as much as possible.
 calculateFeatures | `genform`, `sirius` | Whether formulae should be calculated first for all features (see discussion above) (always `TRUE` with DataAnalysis).
 featThreshold     | All                 | Minimum relative amount (_0-1_) amongst all features within a feature group that a formula candidate should be present (e.g. _1_ means that a candidate is only considered if it was assigned to all features). 
-adduct            | `genform`, `sirius` | The adduct to consider for calculation (e.g. `"[M+H]+"`, `"[M-H]-"`).
+adduct            | `genform`, `sirius` | The adduct to consider for calculation (e.g. `"[M+H]+"`, `"[M-H]-"`, more details in the [adduct section](#adducts)).
 MSMode            | `genform`, `bruker` | Whether formulae should be generated only from MS data (`"ms"`), MS/MS data (`"msms"`) or both (`"both"`). The latter is default, see discussion above.
 profile           | `sirius`            | Instrument profile, e.g. `"qtof"`, `"orbitrap"`, `"fticr"`.
 

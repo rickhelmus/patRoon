@@ -40,7 +40,7 @@ Conversion                          | `convertMSFiles()`       | [OpenMS], [Prot
 Advanced (e.g. spectral filtering)  | `convertMSFiles()`       | [ProteoWizard]                         | All common
 Mass re-calibration                 | `recalibrarateDAFiles()` | DataAnalysis                           | Bruker
 
-The `convertMSFiles()` function supports conversion between many different file formats typically used in non-target analysis. Furthermore, other pre-treatment steps are available (e.g. centroiding, filtering) when the [ProteoWizard] algorithm is used. For an overview of these functionalities see the [MsConvert documentation]. Some examples:
+The `convertMSFiles()` function supports conversion between many different file formats typically used in non-target analysis. Furthermore, other pre-treatment steps are available (e.g. centroiding, filtering) when the [ProteoWizard] algorithm is used. For an overview of these functionalities see the [MsConvert documentation](http://proteowizard.sourceforge.net/tools/msconvert.html). Some examples:
 
 ```{r convert,eval=FALSE}
 # Converts a single mzXML file to mzML format
@@ -145,7 +145,7 @@ Similarly, for grouping features across analyses several algorithms are supporte
 
 Algorithm | Usage | Remarks
 --------- | ----------------- | -------------------------------------
-[OpenMS] | `groupFeatures(algorithm = "openms", ...)` | Uses the [FeatureFinderMetabo] algorithm
+[OpenMS] | `groupFeatures(algorithm = "openms", ...)` | Uses the [FeatureLinkerUnlabeled] algorithm (and [MapAlignerPoseClustering] for retention alignment)
 [XCMS] | `groupFeatures(algorithm = "xcms", ...)` | Uses `xcms::group()` function
 ProfileAnalysis | `importFeatureGroups(algorithm = "brukerpa", ...)` | Import `.csv` file exported from Bruker ProfileAnalysis
 TASQ | `importFeatureGroups(algorithm = "brukertasq", ...)` | Imports a _Global result table_ (exported to Excel file and then saved as `.csv` file)
@@ -268,7 +268,7 @@ plists <- generateMSPeakLists(fGroups, "mzr", avgFeatParams = avgPListParams, av
 
 ### Formulae
 
-<!-- UNDONE: GF and high m/z values? OM rules: as.data.table() and filter() --> OM section in advanced? -->
+<!-- UNDONE: GF and high m/z values? OM rules: as.data.table() and filter() -> OM section in advanced? -->
 
 Formulae can be automatically calculated for all features using the `generateFormulas()` function. The following algorithms are currently supported:
 

@@ -377,7 +377,7 @@ An important use case of subsetting is prioritization of data. For instance, aft
 
 ```{r prioriWorkflow,echo=FALSE}
 DiagrammeR::grViz("
-digraph rmarkdown {
+digraph Prioritization {
   graph [ rankdir = LR ]
   node [ shape = box,
          fixedsize = true,

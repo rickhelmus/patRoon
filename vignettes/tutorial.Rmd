@@ -24,7 +24,7 @@ options(patRoon.progress.opts = list(style = 1, width = 80))
 
 options(width=1500) # big nr to avoid wrapping text in code chunks
 
-doCompounds <- FALSE # curl::has_internet()
+doCompounds <- TRUE # curl::has_internet()
 ```
 
 ```{css code=readLines("styles.css"),echo=FALSE}

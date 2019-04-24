@@ -11,11 +11,11 @@ In a non-target workflow both chromatographic and mass spectral data is automati
     
 ```{r workflow,echo=FALSE}
 DiagrammeR::grViz("
-digraph rmarkdown {
+digraph workflow {
   graph [ rankdir = LR, compound = true, style = invis ]
   node [ shape = box,
          fixedsize = true,
-         width = 2.6,
+         width = 2.8,
          height = 1,
          fontsize = 20,
          fillcolor = darkseagreen1,

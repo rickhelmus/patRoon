@@ -1,8 +1,13 @@
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
-  collapse = TRUE,
+  collapse = FALSE,
   comment = "#>"
 )
+
+options(patRoon.cache.fileName = "~/tutorial.sqlite")
+options(patRoon.progress.opts = list(style = 1, width = 80))
+options(width=1500) # big nr to avoid wrapping text in code chunks
+
 
 library(patRoon)
 ```

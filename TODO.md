@@ -45,6 +45,7 @@
 - test score normalization?
 - add new MF stat and other scorings and make sure default normalization equals that of MF web
 - improve formula scoring
+- do something about negative H explained fragments by MF?
 
 
 ## formulas

@@ -91,7 +91,7 @@ The previous sections already highlighted some steps that have to be performed p
 
 The `newProject()` function can be used to setup a new project. When you run this function it will launch a small tool (see screenshot below) where you can select your analyses and configure the various workflow steps which you want to execute (e.g. data pre-treatment, finding features, annotation etc). After setting everything up the function will generate a template script which can easily be edited afterwards. In addition, you have the option to create a new RStudio project, which is advantegeous as it neatly seperates your data processing work from the rest.
 
-![](newp.png){width=450px}
+![](../newp.png){width=450px}
 
 > **_NOTE_** At the moment `newProject()` _only_ works with (recent) versions of RStudio.
 
@@ -137,7 +137,7 @@ Algorithm      | Common parameters
 [OpenMS]       | `noiseThrInt`, `chromSNR`, `chromFWHM`, `mzPPM`, `minFWHM`, `maxFWHM` (see `?findFeatures`)
 [XCMS]         | `min_peakwidth`, `mzdiff`, `prefilter`, `noise` (assuming default `centWave` algorithm, see `?findPeaks.centWave`)
 [enviPick]     | `dmzgap`, `dmzdens`, `drtgap`, `drtsmall`, `drtdens`, `drtfill`, `drttotal`, `minpeak`, `minint`, `maxint` (see `?enviPickwrap`)
-DataAnalysis   | See _Find_ -> _Parameteres..._ -> _Molecular Features_ in DataAnalysis.
+DataAnalysis   | See _Find_ -> _Parameters..._ -> _Molecular Features_ in DataAnalysis.
 
 > **_NOTE_** DataAnalysis feature settings have to be configured in DataAnalysis prior to calling `findFeatures()`.
 
@@ -221,8 +221,8 @@ Note that compound annotation is normally not dependent upon formula annotation.
 
 Algorithm    | Usage                                                   | Remarks
 ------------ | ------------------------------------------------------- | -----------------------------------------------------
-[mzR]        | `generateMSPeakLists(algorithm = "mzr", ...)`    | Uses [mzR] for spectra retrieval. Recommended default.
-DataAnalysis | `generateMSPeakLists(algorithm = "bruker", ...)` | Loads data after automatically generating MS and MS/MS spectra in DataAnalysis
+[mzR]        | `generateMSPeakLists(algorithm = "mzr", ...)`           | Uses [mzR] for spectra retrieval. Recommended default.
+DataAnalysis | `generateMSPeakLists(algorithm = "bruker", ...)`        | Loads data after automatically generating MS and MS/MS spectra in DataAnalysis
 DataAnalysis FMF | `generateMSPeakLists(algorithm = "brukerfmf", ...)` | Uses spectra from the  _find molecular features_ algorithm.
 
 The recommended default algorithm is `mzr`: this algorithm is generally faster and is not limited to a vendor data format as it will read the open `mzML` and `mzXML` file formats. On the other hand, when DataAnalysis is used with Bruker data the spectra can be automatically background subtracted and there is no need for file conversion. Note that the `brukerfmf` algorithm only works when `findFeatures()` was called with the `bruker` algorithm.
@@ -268,8 +268,6 @@ plists <- generateMSPeakLists(fGroups, "mzr", avgFeatParams = avgPListParams, av
 
 ### Formulae
 
-<!-- UNDONE: GF and high m/z values? OM rules: as.data.table() and filter() -> OM section in advanced? -->
-
 Formulae can be automatically calculated for all features using the `generateFormulas()` function. The following algorithms are currently supported:
 
 Algorithm    | Usage                                          | Remarks
@@ -278,7 +276,7 @@ Algorithm    | Usage                                          | Remarks
 [SIRIUS]     | `generateFormulas(algorithm = "sirius", ...)`  | Requires MS/MS data.
 DataAnalysis | `generateFormulas(algorithm = "bruker", ...)`  | Requires FMF features (i.e. `findFeatures(algorithm = "bruker", ...)`). MS peak lists are not needed. Uses _SmartFormula_ algorithms.
 
-Calculation with [GenForm] is often a good default. It is fast and basic rules can be applied to filter out obvious non-existing formulae. More thorough calculation is performed with [SIRIUS]: this algorithm often yields fewer and often more plausible results. However, [SIRIUS] requires MS/MS data (hence features without will not have results) and formula prediction may not work well for compounds that structurally deviate from the training sets used by [SIRIUS]. Calculation with DataAnalysis is only possible when features are obtained with DataAnalysis as well. An advantage is that analysis files do not have to be converted and no MS peak generation is necessary, however, compared to other algorithms calculation is often relative slow.
+Calculation with [GenForm] is often a good default. It is fast and basic rules can be applied to filter out obvious non-existing formulae. A possible drawback of GenForm, however, is that may become slow when many candidates are calculated, for instance, due to a relative high feature _m/z_ (e.g. >600) or loose elemental restricitions. More thorough calculation is performed with [SIRIUS]: this algorithm often yields fewer and often more plausible results. However, [SIRIUS] requires MS/MS data (hence features without will not have results) and formula prediction may not work well for compounds that structurally deviate from the training sets used by [SIRIUS]. Calculation with DataAnalysis is only possible when features are obtained with DataAnalysis as well. An advantage is that analysis files do not have to be converted and no MS peak generation is necessary, however, compared to other algorithms calculation is often relative slow.
 
 There are two methods for formula assignment:
 

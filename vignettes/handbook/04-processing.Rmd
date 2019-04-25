@@ -4,8 +4,6 @@ The previous chapter mainly discussed how to create workflow data. This chapter 
 
 ## Inspecting results
 
-<!-- UNDONE: add also non-workflow classes? (e.g. compclust->groupNames) -->
-
 Several generic functions exist that can be used to inspect data that is stored in a particular object (e.g. features, compounds etc):
 
 Generic                                             | Classes                       | Remarks
@@ -550,9 +548,8 @@ plotChord(fGroups, outer = c(sw1 = "surface", sw2 = "surface", sw3 = "surface",
                              gw1 = "ground", gw2 = "ground", gw3 = "ground"))
 
 # compare MetFrag and SIRIUS results
-plotVenn(compoundsMF, compoundsSIR)
-plotVenn(compoundsMF, compoundsSIR,
-         labels = c("MF", "SIR")) # manual labelling
+plotVenn(compsMF, compsSIR)
+plotVenn(compsMF, compsSIR, labels = c("MF", "SIR")) # manual labelling
 ```
 
 ### Hierarchical clustering results {#plotClust}

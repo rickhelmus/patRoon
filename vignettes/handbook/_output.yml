@@ -1,2 +1,6 @@
 bookdown::gitbook:
     split_by: section
+    config:
+        sharing: no
+        toc:
+            collapse: no

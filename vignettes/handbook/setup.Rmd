@@ -1,4 +1,8 @@
 ```{r setup, include = FALSE}
+
+# otherwise Linux will get into memory troubles...
+knitr::knit_meta("latex_dependency", clean = TRUE)
+
 knitr::opts_chunk$set(
   collapse = FALSE,
   comment = "#>"
@@ -10,6 +14,33 @@ options(width=1500) # big nr to avoid wrapping text in code chunks
 
 
 library(patRoon)
+
+if (FALSE)
+{
+# try to sync with tutorial so cache can be re-used
+anaInfo <- generateAnalysisInfo(paths = patRoonData::exampleDataPath(),
+                                groups = c(rep("solvent", 3), rep("standard", 3)),
+                                refs = "solvent")
+
+fList <- findFeatures(anaInfo, "openms")
+fGroups <- groupFeatures(fList, "openms")
+fGroups <- filter(fGroups, preAbsMinIntensity = 100, absMinIntensity = 10000,
+                  relMinReplicateAbundance = 1, maxReplicateIntRSD = 0.75,
+                  blankThreshold = 5, removeBlanks = TRUE,
+                  retentionRange = NULL, mzRange = NULL)
+avgPListParams <- getDefAvgPListParams(clusterMzWindow = 0.002)
+mslists <- generateMSPeakLists(fGroups, "mzr", maxMSRtWindow = 5, precursorMzWindow = 4,
+                              avgFeatParams = avgPListParams, avgFGroupParams = avgPListParams)
+mslists <- filter(mslists, relMSMSIntThr = 0.02, topMSMSPeaks = 10)
+formulas <- generateFormulas(fGroups, "genform", mslists, relMzDev = 5,
+                             adduct = "[M+H]+", elements = "CHNOPSCl",
+                             calculateFeatures = TRUE, featThreshold = 0.75)
+compsMF <- generateCompounds(fGroups, mslists, "metfrag", method = "CL",
+                             dbRelMzDev = 5, fragRelMzDev = 5, fragAbsMzDev = 0.002,
+                             adduct = "[M+H]+", database = "pubchem", maxCandidatesToStop = 5000)
+compsSIR <- generateCompounds(fGroups, mslists)
+componNT <- generateComponents(fGroups, "nontarget", ionization = "positive")
+}
 ```
 
 ```{css code=readLines(file.path(vignDir, "styles.css")),echo=FALSE,eval=knitr::is_html_output()}

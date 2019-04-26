@@ -25,7 +25,9 @@
     - keep retcor_done?
     - get rid of getXCMSSet() calls?
 - tests to verify getXCMSSet...
-- rename screenTargets?
+- suspect screening
+    - rename screenTargets?
+    - Keep RSQ? Or extend with conc?
 - filter()
     - document which filters work on feature level (e.g. chromWidth)
     - remove zero values for maxReplicateIntRSD?

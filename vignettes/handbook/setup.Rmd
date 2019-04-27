@@ -5,41 +5,56 @@ knitr::knit_meta("latex_dependency", clean = TRUE)
 
 knitr::opts_chunk$set(
   collapse = FALSE,
-  comment = "#>"
+  comment = "#>",
+  fig.width = 6, fig.height = 4, out.width = "60%"
 )
 
 options(patRoon.cache.fileName = "~/tutorial.sqlite")
 options(patRoon.progress.opts = list(style = 1, width = 80))
 options(width=1500) # big nr to avoid wrapping text in code chunks
 
-
 library(patRoon)
 
-if (FALSE)
+runData <- TRUE
+if (runData)
 {
-# try to sync with tutorial so cache can be re-used
-anaInfo <- generateAnalysisInfo(paths = patRoonData::exampleDataPath(),
-                                groups = c(rep("solvent", 3), rep("standard", 3)),
-                                refs = "solvent")
+    # try to sync with tutorial so cache can be re-used
+    anaInfo <- generateAnalysisInfo(paths = patRoonData::exampleDataPath(),
+                                    groups = c(rep("solvent", 3), rep("standard", 3)),
+                                    refs = "solvent")
+    anaInfoRG <- generateAnalysisInfo(paths = patRoonData::exampleDataPath(),
+                                      groups = paste0("repl", rep(1:3, 2)))
+    
+    fList <- findFeatures(anaInfo, "openms")
+    fGroups <- fGroupsUF <- groupFeatures(fList, "openms")
+    fGroups <- filter(fGroups, preAbsMinIntensity = 100, absMinIntensity = 10000,
+                      relMinReplicateAbundance = 1, maxReplicateIntRSD = 0.75,
+                      blankThreshold = 5, removeBlanks = TRUE,
+                      retentionRange = c(120, Inf), mzRange = NULL)
 
-fList <- findFeatures(anaInfo, "openms")
-fGroups <- groupFeatures(fList, "openms")
-fGroups <- filter(fGroups, preAbsMinIntensity = 100, absMinIntensity = 10000,
-                  relMinReplicateAbundance = 1, maxReplicateIntRSD = 0.75,
-                  blankThreshold = 5, removeBlanks = TRUE,
-                  retentionRange = NULL, mzRange = NULL)
-avgPListParams <- getDefAvgPListParams(clusterMzWindow = 0.002)
-mslists <- generateMSPeakLists(fGroups, "mzr", maxMSRtWindow = 5, precursorMzWindow = 4,
-                              avgFeatParams = avgPListParams, avgFGroupParams = avgPListParams)
-mslists <- filter(mslists, relMSMSIntThr = 0.02, topMSMSPeaks = 10)
-formulas <- generateFormulas(fGroups, "genform", mslists, relMzDev = 5,
-                             adduct = "[M+H]+", elements = "CHNOPSCl",
-                             calculateFeatures = TRUE, featThreshold = 0.75)
-compsMF <- generateCompounds(fGroups, mslists, "metfrag", method = "CL",
-                             dbRelMzDev = 5, fragRelMzDev = 5, fragAbsMzDev = 0.002,
-                             adduct = "[M+H]+", database = "pubchem", maxCandidatesToStop = 5000)
-compsSIR <- generateCompounds(fGroups, mslists)
-componNT <- generateComponents(fGroups, "nontarget", ionization = "positive")
+    fListRG <- findFeatures(anaInfoRG, "openms")
+    fGroupsRG <- groupFeatures(fListRG, "openms")
+    fGroupsRG <- filter(fGroupsRG, preAbsMinIntensity = 100, absMinIntensity = 10000)
+    
+    
+    avgPListParams <- getDefAvgPListParams(clusterMzWindow = 0.002)
+    mslists <- generateMSPeakLists(fGroups, "mzr", maxMSRtWindow = 5, precursorMzWindow = 4,
+                                   avgFeatParams = avgPListParams, avgFGroupParams = avgPListParams)
+    mslists <- filter(mslists, relMSMSIntThr = 0.02, topMSMSPeaks = 10)
+    formulas <- generateFormulas(fGroups, "genform", mslists, relMzDev = 5,
+                                 adduct = "[M+H]+", elements = "CHNOPSCl",
+                                 calculateFeatures = TRUE, featThreshold = 0.75)
+    compsMF <- compounds <-
+        generateCompounds(fGroups, mslists, "metfrag", method = "CL",
+                          dbRelMzDev = 5, fragRelMzDev = 5, fragAbsMzDev = 0.002,
+                          adduct = "[M+H]+", database = "pubchem", maxCandidatesToStop = 5000)
+    compsSIR <- generateCompounds(fGroups, mslists, "sirius")
+    componCAM <- generateComponents(fGroups, "camera", ionization = "positive")
+    
+    saveRDS(list(fList = fList, fGroups = fGroups, fGroupsUF = fGroupsUF, fListRG = fListRG,
+                 fGroupsRG = fGroupsRG, mslists = mslists, formulas = formulas, compsMF = compsMF,
+                 compsSIR = compsSIR, componCAM = componCAM),
+            "~/handbook-obj.Rds")
 }
 ```
 

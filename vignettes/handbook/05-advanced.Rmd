@@ -231,8 +231,6 @@ After a while you may see that your cache file can get quite large. This is espe
 
 In order to figure what is in the cache you can run `clearCache()` without any arguments:
 
-<!-- UNDONE: point to some useful cache file, possibly update next example, partial matching -->
-
 ```{r clearCache}
 clearCache()
 ```
@@ -242,6 +240,7 @@ Using this output you can re-run the function again, for instance:
 ```{r clearCache2,eval=FALSE}
 clearCache("featuresOpenMS")
 clearCache(c("featureGroupsOpenMS", "formulasGenForm")) # clear multiple
+clearCache("OpenMS") # clear all with OpenMS in name (ie partial matched)
 clearCache("all") # same as simply removing the file
 ```
 

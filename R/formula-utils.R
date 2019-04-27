@@ -2,19 +2,21 @@ splitFormulaToList <- function(formula)
 {
     if (!nzchar(formula))
         return(list())
+    
+    # NOTE: dash ('-') added to [:digit:] to allow minus sign (which MF manages to report once in a while...)
 
     # split string in pairs of elements+element counts (and optionally isotopic info), e.g.: { "C30", "^13C2" }
-    spltform <- unlist(regmatches(formula, gregexpr("(\\^[[:digit:]]+)?[[:upper:]]{1}[[:lower:]]?[[:digit:]]*", formula)))
+    spltform <- unlist(regmatches(formula, gregexpr("(\\^[[:digit:]-]+)?[[:upper:]]{1}[[:lower:]]?[[:digit:]-]*", formula)))
 
     # add '1' to pairs without a count, e.g. "Br" --> "Br1"
-    reglist <- regexpr("[[:digit:]]+$", spltform)
+    reglist <- regexpr("[[:digit:]-]+$", spltform)
     spltform[reglist == -1] <- paste0(spltform[reglist == -1], "1")
 
     # extract all element counts
-    ret <- as.numeric(unlist(regmatches(spltform, gregexpr("[[:digit:]]+$", spltform))))
+    ret <- as.numeric(unlist(regmatches(spltform, gregexpr("[[:digit:]-]+$", spltform))))
 
     # extract all elements (ie remove all counts)
-    names(ret) <- gsub("[[:digit:]]+$", "", spltform)
+    names(ret) <- gsub("[[:digit:]-]+$", "", spltform)
 
     if (any(duplicated(names(ret))))
     {
@@ -110,7 +112,7 @@ simplifyFormula <- function(formula) sortFormula(formula)
 # (authors: Emma Schymanski / Steffen Neumann). See https://github.com/schymane/ReSOLUTION/
 subscriptFormula <- function(formulas, prefix = "", postfix = "", parse = TRUE)
 {
-    exprs <- sub("\\*$", "", gsub("([0-9]+)", "[\\1]*", formulas))
+    exprs <- sub("\\*$", "", gsub("([[:digit:]-]+)", "[\\1]*", formulas))
     if (parse)
         return(parse(text = sprintf('"%s" * %s * "%s"', prefix, exprs, postfix)))
     return(exprs)

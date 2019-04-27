@@ -217,6 +217,13 @@ test_that("plotting works", {
     expect_doppel("chord-def", function() plotChord(fgOpenMS))
     expect_doppel("chord-selflinks", function() plotChord(fgOpenMS, addSelfLinks = TRUE))
     expect_doppel("chord-nortmz", function() plotChord(fgOpenMS, addRetMzPlots = FALSE))
+    expect_doppel("chord-outer", function() plotChord(fgOpenMS,
+                                                      outerGroups = c("standard-1" = "grp1",
+                                                                      "standard-2" = "grp2",
+                                                                      "standard-3" = "grp2",
+                                                                      "solvent-1" = "grp3",
+                                                                      "solvent-2" = "grp4",
+                                                                      "solvent-3" = "grp5")))
     expect_doppel("chord-comp", function() plotChord(fGCompOpenMS))
     expect_error(plotChord(unique(fgOpenMS, which = replicateGroups(fgOpenMS), outer = TRUE),
                            average = TRUE)) # stops with nothing to plot: no overlap

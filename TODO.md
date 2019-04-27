@@ -7,6 +7,7 @@
 - convertMSFiles()
     - Agilent .d is also a directory?
 - harmonize consensus argument names, add rel/abs support for all?
+- consistent src file names, split utils?
 
 
 ## docs
@@ -51,6 +52,7 @@
 - timeouts for SIRIUS?
 - improve formula scoring
 - plotHeatMap() / plotSilhouettes() for comp clusters?
+- do something about negative H explained fragments by MF?
 
 
 ## formulas
@@ -59,8 +61,8 @@
 - how to handle ranking of consensus results?
     - rank by one normalized column per algo? (GenForm: either MS_match or comb_match)
     - or simply don't and mention limitation in doc? (one limitation: filtering)
-- reporting incorrect GF adducts
 - minExplainedFragPeaks -> minExplainedPeaks?
+- reporting incorrect GF adducts --> fix in src
 
 
 ## components
@@ -69,6 +71,7 @@
 
 ## reporting
 - add more options to reportPlots argument of reportMD()?
+- reportMD() --> reportHTML()
 
 
 ## Cleanup

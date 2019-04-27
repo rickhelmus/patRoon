@@ -580,7 +580,7 @@ setMethod("plotChord", "featureGroups", function(obj, addSelfLinks = FALSE, addR
     else
         linkColors <- chordTable[, colFunc(value)]
 
-    cdf <- chordDiagram(chordTable, annotationTrack = c("grid", "axis"),
+    cdf <- chordDiagram(chordTable[, 1:3], annotationTrack = c("grid", "axis"),
                         preAllocateTracks = tracks,
                         grid.col = getBrewerPal(nsamp, "Dark2"),
                         col = linkColors,

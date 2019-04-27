@@ -231,7 +231,7 @@ After a while you may see that your cache file can get quite large. This is espe
 
 In order to figure what is in the cache you can run `clearCache()` without any arguments:
 
-<!-- UNDONE: point to some useful cache file, possibly update next example -->
+<!-- UNDONE: point to some useful cache file, possibly update next example, partial matching -->
 
 ```{r clearCache}
 clearCache()

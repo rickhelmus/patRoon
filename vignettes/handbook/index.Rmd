@@ -4,12 +4,8 @@ author: "Rick Helmus"
 date: "`r Sys.Date()`"
 ---
 
-
-# heuh
-
-## bah
-
-heh
+```{r child="01-intro.Rmd"}
+```
 
 ```{r include=FALSE}
 vignDir <- ".."

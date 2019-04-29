@@ -76,8 +76,9 @@ For some parameters it is recommended or even necessary to set hard limits on th
 
 ```{r fOptPRanges,eval=FALSE}
 # set minimum intensity threshold (but no max)
-ftOpt <- optimizeFeatureFinding(anaInfo, "openms", pSet,
-                                paramRanges = list(noiseThrInt = c(500, Inf)))
+ftOpt <- optimizeFeatureFinding(anaInfo, "openms",
+                                list(noiseThrInt = c(1000, 5000), # initial testing range
+                                paramRanges = list(noiseThrInt = c(500, Inf))) # never test below 500
 ```
 
 Depending on the used algorithm, several default absolute limits are imposed. These may be obtained with the `getDefFeaturesOptParamRanges()` and `getDefFGroupsOptParamRanges()` functions. 
@@ -107,18 +108,22 @@ The results of an optimization process are stored in objects from the S4 `optimi
 
 The `optimizedParameters()` function is used to inspect the best parameter settings. Similarly, the `optimizedObject()` function can be used to obtain the object that was created with these settings (i.e. a `features` or `featureGroups` object).
 
-```{r fOptProc,eval=FALSE}
+```{r fOptProc1,eval=runData}
 optimizedParameters(ftOpt) # best settings for whole experiment
+optimizedObject(ftOpt) # features object with best settings for whole experiment
+```
+
+Results can also be obtained for specific parameter sets/iterations.
+
+```{r fOptProc,eval=FALSE}
 optimizedParameters(ftOpt, 1) # best settings for first parameter set
 optimizedParameters(ftOpt, 1, 1) # best settings for first parameter set and experiment iteration
-
-optimizedObject(ftOpt) # features object with best settings for whole experiment
 optimizedObject(ftOpt, 1) # features object with best settings for first parameter set
 ```
 
 The `plot()` function can be used to visualize optimization results. This function will plot graphs for results of all tested parameter pairs. The graphs can be contour, image or perspective plots (as specified by the `type` argument).
 
-```{r fOptPlot,eval=FALSE}
+```{r fOptPlot,eval=runData,out.width="70%"}
 plot(ftOpt, paramSet = 1, DoEIteration = 1) # contour plots for first param set/experiment
 plot(ftOpt, paramSet = 1, DoEIteration = 1, type = "persp") # pretty perspective plots
 ```

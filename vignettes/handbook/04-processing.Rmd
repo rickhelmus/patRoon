@@ -22,30 +22,25 @@ Generic                                             | Classes                   
 
 The common `R` extraction operators `"[["`, `"$"` can be used to obtain data for a particular feature groups, analysis etc:
 
-```{r extrOp,eval=FALSE}
-# Feature table
-fList[["analysis-1"]] # index by analysis name
-fList[[1]] # or numeric index
+```{r extrOp,eval=runData}
+# Feature table (only first columns for readability)
+fList[["standard-1"]][, 1:6]
 
 # Feature group intensities
-fGroups[["M120_R328_81"]]
-fGroups$M120_R328_81 # as above
+fGroups$M120_R328_81
 fGroups[[1, "M120_R328_81"]] # only first analysis
 
-# obtains list with MS and MS/MS peak lists
-mslists[["M120_R328_81"]] # group averaged data
-mslists[["analysis-1", "M120_R328_81"]] # feature data
+# obtains list MS/MS peak list  (feature group averaged datas)
+mslists[["M120_R328_81"]]$MSMS
 
-# get all formula candidates for a feature (group)
-formulas[["M120_R328_81"]] # group averaged data
-formulas[[1, "M120_R328_81"]] # feature data (if available, i.e. calculateFeatures=TRUE)
+# get all formula candidates for a feature group
+formulas[["M120_R328_81"]][, 1:7]
 
 # get all compound candidates for a feature group
-compounds[["M120_R328_81"]]
+compounds[["M120_R328_81"]][, 1:4]
 
 # get a table with information of a component
-components[["CMP1"]]
-components[["CMP1", 1]] # only for first feature group in component
+components[["CMP7"]][, 1:6]
 ```
 
 A more sophisticated way to obtain data from a workflow object is to use `as.data.table()` or `as.data.frame()`. These functions will convert _all_ information within the object to a table (`data.table` or `data.frame`) and allow various options to add extra information. An advantage is that this common data format can be used with many other functions within `R`. The output is in a [tidy format](https://r4ds.had.co.nz/tidy-data.html).
@@ -56,57 +51,70 @@ A more sophisticated way to obtain data from a workflow object is to use `as.dat
 
 Some typical examples are shown below.
 
-```{r asDT,eval=FALSE}
-# obtain table with all features
-as.data.table(fList)
-as.data.frame(fList) # ditto, but in classic data.frame format
+```{r asDT,eval=runData}
+# obtain table with all features (only first columns for readability)
+as.data.table(fList)[, 1:6]
 
 # Returns group info and intensity values for each feature group
-as.data.table(fGroups)
 as.data.table(fGroups, average = TRUE) # average intensities for replicates
-as.data.table(fGroups, features) # also include feature information
 
 # Returns all peak lists for each feature group
 as.data.table(mslists)
-as.data.table(mslists, averaged = FALSE) # ditto, but for each feature
-as.data.table(mslists, fGroups = fGroups) # add feature group information
 
 # Returns all formula candidates for each feature group with scoring
 # information, neutral loss etc
-as.data.table(formulas)
-# include carbon and hydrogen elemental counts: useful to construct van Krevelen plots
-as.data.table(formulas, countElements = c("C", "H"))
+as.data.table(formulas)[, 1:6]
+
+# Returns all compound candidates for each feature group with scoring and other metadata
+as.data.table(compounds)[, 1:4]
+
+# Returns table with all components (including feature group info, annotations etc)
+as.data.table(components)[, 1:6]
+```
+
+Finally, the `annotatedPeakList()` function is useful to inspect annotation results for a formula or compound candidate:
+
+```{r annPList,eval=runData}
+# formula annotations for for a formula candidate of feature group M120_R328_81
+annotatedPeakList(formulas, precursor = "C6H6N3", groupName = "M120_R328_81",
+                  MSPeakLists = mslists)
+
+# compound annotation for first candidate of feature group M120_R328_81
+annotatedPeakList(compounds, index = 1, groupName = "M120_R328_81",
+                  MSPeakLists = mslists)
+```
+
+
+More advanced examples for these functions are shown below.
+
+
+```{r inspEx,eval=FALSE}
+# Feature table, can also be accessed by numeric index
+fList[[1]]
+mslists[["standard-1", "M120_R328_81"]] # feature data (instead of feature group averaged)
+formulas[[1, "M120_R328_81"]] # feature data (if available, i.e. calculateFeatures=TRUE)
+components[["CMP1", 1]] # only for first feature group in component
+
+as.data.frame(fList) # classic data.frame format, works for all objects
+as.data.table(fGroups) # return non-averaged intensities (default)
+as.data.table(fGroups, features = TRUE) # include feature information
+as.data.table(mslists, averaged = FALSE) # peak lists each feature
+as.data.table(mslists, fGroups = fGroups) # add feature group information
+
+as.data.table(formulas, countElements = c("C", "H")) # include C/H counts (e.g. for van Krevelen plots)
 # report only top precursor and fragment formula. This yields in one row per feature group.
 as.data.table(formulas, maxFormulas = 1, maxFragFormulas = 1)
 # add various information for organic matter characterization (common elemental
 # counts/ratios, classifications etc)
 as.data.table(formulas, OM = TRUE)
 
-# Returns all compound candidates for each feature group with scoring and other metadata
-as.data.table(compounds)
 as.data.table(compounds, fGroups = fGroups) # add feature group informaion
-as.data.table(compounds, fragments) # include information of all annotated fragments
+as.data.table(compounds, fragments = TRUE) # include information of all annotated fragments
 
-# Returns table with all components (including feature group info, annotations etc)
-as.data.table(components)
-```
-
-Finally, the `annotatedPeakList()` function is useful to inspect annotation results for a formula or compound candidate:
-
-```{r annPList,eval=FALSE}
-# formula annotation for for a formula candidate of feature group M120_R328_81
-annotatedPeakList(compounds, precursor = "C6H9N2", groupName = "M120_R328_81",
-                  MSPeakLists = mslists)
-# only include annotated mass peaks
+annotatedPeakList(formulas, precursor = "C6H6N3", groupName = "M120_R328_81",
+                  MSPeakLists = mslists, onlyAnnotated = TRUE) # only include annotated peaks
 annotatedPeakList(compounds, index = 1, groupName = "M120_R328_81",
-                  MSPeakLists = mslists, onlyAnnotated = TRUE)
-
-# compound annotation for first candidate of feature group M120_R328_81
-annotatedPeakList(compounds, index = 1, groupName = "M120_R328_81",
-                  MSPeakLists = mslists)
-# include formula annotations
-annotatedPeakList(compounds, index = 1, groupName = "M120_R328_81",
-                  MSPeakLists = mslists, formulas = formulas)
+                  MSPeakLists = mslists, formulas = formulas) # include formula annotations
 ```
 
 ## Filtering
@@ -268,10 +276,10 @@ componRC <- filter(componRC, adducts = TRUE)
 componRC <- filter(componRC, adducts = c("[M+H]+", "[M+Na]+"))
 
 # remove all features not recognized as isotopes
-componRC <- filter(componCAM, isotopes = FALSE)
+componRC <- filter(componRC, isotopes = FALSE)
 
 # only keep monoisotopic mass
-componRC <- filter(componCAM, isotopes = 0)
+componRC <- filter(componRC, isotopes = 0)
 
 # min/max rt/mz increments for homologs
 componNT <- filter(componNT, rtIncrement = c(10, 30),
@@ -359,14 +367,14 @@ fGroupsForms <- fGroups[, groupNames(formulas)]
 fGroupsAnn <- fGroups[, union(groupNames(formulas), groupNames(compounds))]
 
 # select first 15 components
-componCAM[1:15]
+components[1:15]
 
 # select by name
-componCAM[c("CMP1", "CMP5")]
+components[c("CMP1", "CMP5")]
 
 # only retain feature groups in components for which compound annotations are
 # available
-componCAM[, groupNames(compounds)]
+components[, groupNames(compounds)]
 ```
 
 ### Prioritization workflow
@@ -509,7 +517,7 @@ plotEIC(fGroups,
         showLegend = FALSE) # no legend (too busy for many feature groups)
 plotEIC(fGroups[, 1], # only plot all features of first group
         colourBy = "rGroup") # and mark them individually per replicate group
-plotEIC(componCAM, index = 7, fGroups = fGroups) # EICs from a component
+plotEIC(components, index = 7, fGroups = fGroups) # EICs from a component
 
 
 plotSpec(mslists, "M120_R328_81") # non-annotated MS spectrum
@@ -523,7 +531,7 @@ plotSpec(compounds, index = 1, groupName = "M120_R328_81", MSPeakLists = mslists
 # custom intensity range (e.g. to zoom in)
 plotSpec(compounds, index = 1, groupName = "M120_R328_81", MSPeakLists = mslists,
          ylim = c(0, 5000), plotStruct = FALSE)
-plotSpec(componCAM, index = 7) # component spectrum
+plotSpec(components, index = 7) # component spectrum
 ```
 
 ### Comparing data {#visComp}
@@ -551,10 +559,9 @@ fGroups <- fGroupsRG
 plotUpSet(fGroups) # compare replicate groups
 plotVenn(fGroups, which = c("repl1", "repl2")) # compare some replicate groups
 plotChord(fGroups, average = TRUE) # overlap between replicate groups
-plotChord(fGroups, average = FALSE) # overlap between analyses
-# compare with custom made groups: surface and ground
+# compare with custom made groups
 plotChord(fGroups, average = TRUE,
-          outer = c(repl1 = "grp1", repl2 = "grp1", repl3 = "grp2"))
+          outer = c(repl1 = "grp1", repl2 = "grp1", repl3 = "grp2", repl4 = "grp3"))
 
 # compare MetFrag and SIRIUS results
 plotVenn(compsMF, compsSIR,
@@ -578,14 +585,14 @@ Generic             | Classes                                  | Remarks
 `plotStructure()`   | `compoundsCluster`                       | Plots the maximum common substructure (MCS) of a cluster
 
 
-```{r plotClust,eval=FALSE}
+```{r plotClust,eval=runData}
 plot(componInt) # dendrogram
-plot(compsClust, groupName = "M109_R116_64") # dendrogram for clustered compounds
+plot(compsClust, groupName = "M120_R328_81") # dendrogram for clustered compounds
 
-plotInt(componInt, index = 2) # intensities of 2nd cluster
+plotInt(componInt, index = 4) # intensities of 4th cluster
 plotHeatMap(componInt) # plot heatmap
 plotHeatMap(componInt, interactive = TRUE) # interactive heatmap
-plotSilhouettes(componInt, 2:10) # plot silhouettes (e.g. to obtain ideal cluster amount)
+plotSilhouettes(componInt, 5:20) # plot silhouettes (e.g. to obtain ideal cluster amount)
 ```
 
 ### Interactive plotting of chromatography data
@@ -675,7 +682,7 @@ reportCSV(fGroups, path = "myReport") # change destination path
 # generate report with all workflow types and increase maximum number of
 # compound candidates to top 10
 reportMD(fGroups, formulas = formulas, compounds = compounds,
-         components = componCAM, MSPeakLists = mslists,
+         components = components, MSPeakLists = mslists,
          compsCluster = compsClust,
          compoundsTopMost = 10)
 ```

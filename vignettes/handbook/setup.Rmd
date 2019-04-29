@@ -6,12 +6,14 @@ knitr::knit_meta("latex_dependency", clean = TRUE)
 knitr::opts_chunk$set(
   collapse = FALSE,
   comment = "#>",
-  fig.width = 6, fig.height = 4, out.width = "60%"
+  fig.width = 6, fig.height = 4, out.width = "50%",
+  warning = FALSE, message = FALSE
 )
 
 options(patRoon.cache.fileName = "~/tutorial.sqlite")
 options(patRoon.progress.opts = list(style = 1, width = 80))
 options(width=1500) # big nr to avoid wrapping text in code chunks
+options(datatable.print.nrows = 15)
 
 library(patRoon)
 
@@ -23,7 +25,10 @@ if (runData)
                                     groups = c(rep("solvent", 3), rep("standard", 3)),
                                     refs = "solvent")
     anaInfoRG <- generateAnalysisInfo(paths = patRoonData::exampleDataPath(),
-                                      groups = paste0("repl", rep(1:3, 2)))
+                                      groups = c(rep("repl1", 2),
+                                                 rep("repl2", 2),
+                                                 rep("repl3", 1),
+                                                 rep("repl4", 1)))
     
     fList <- findFeatures(anaInfo, "openms")
     fGroups <- fGroupsUF <- groupFeatures(fList, "openms")
@@ -49,11 +54,20 @@ if (runData)
                           dbRelMzDev = 5, fragRelMzDev = 5, fragAbsMzDev = 0.002,
                           adduct = "[M+H]+", database = "pubchem", maxCandidatesToStop = 5000)
     compsSIR <- generateCompounds(fGroups, mslists, "sirius")
-    componCAM <- generateComponents(fGroups, "camera", ionization = "positive")
+    
+    componCAM <- components <- generateComponents(fGroups, "camera", ionization = "positive")
+    componInt <- generateComponents(fGroupsRG, "intclust")
+    
+    compsClust <- makeHCluster(compsMF)
+    
+    pSet <- generateFeatureOptPSet("openms")
+    ftOpt <- optimizeFeatureFinding(anaInfo[1:2,], "openms", pSet,
+                                    paramRanges = list(noiseThrInt = c(500, Inf)))
     
     saveRDS(list(fList = fList, fGroups = fGroups, fGroupsUF = fGroupsUF, fListRG = fListRG,
                  fGroupsRG = fGroupsRG, mslists = mslists, formulas = formulas, compsMF = compsMF,
-                 compsSIR = compsSIR, componCAM = componCAM),
+                 compsSIR = compsSIR, componCAM = componCAM, componInt = componInt, compsClust = compsClust,
+                 ftOpt = ftOpt),
             "~/handbook-obj.Rds")
 }
 ```

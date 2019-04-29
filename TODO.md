@@ -8,6 +8,8 @@
     - Agilent .d is also a directory?
 - harmonize consensus argument names, add rel/abs support for all?
 - consistent src file names, split utils?
+- improve default plotting for plotInt and cluster plot functions
+- better error reporting for multiproc commands
 
 
 ## docs

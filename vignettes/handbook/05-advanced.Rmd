@@ -15,7 +15,7 @@ In order to simplify the situation `patRoon` internally uses its own format and 
 ```{r adduct1,eval=FALSE}
 adduct(add = "H") # [M+H]+
 adduct(sub = "H", charge = -1) # [M-H]-
-adduct(add = "K", sub = "H2", charge = -1) # [M+K-H2]+
+adduct(add = "K", sub = "H2", charge = -1) # [M+K-H2]-
 adduct(add = "H3", charge = 3) # [M+H3]3+
 adduct(add = "H", molMult = 2) # [2M+H]+
 ```

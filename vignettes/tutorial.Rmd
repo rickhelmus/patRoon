@@ -35,7 +35,7 @@ doCompounds <- TRUE # curl::has_internet()
 
 <!-- UNDONE: link to advanced vignette -->
 
-In this tutorial you will learn how to perform a simply non-target analysis with `patRoon`. This tutorial is not meant to give a detailed overview of `patRoon`. Instead, it serves as a quick introduction on how to use `patRoon` to setup and perform a full non-target analysis workflow.
+In this tutorial you will learn how to perform a simple non-target analysis with `patRoon`. This tutorial is not meant to give a detailed overview of `patRoon`. Instead, it serves as a quick introduction on how to use `patRoon` to setup and perform a full non-target analysis workflow.
 
 The workflow in this tutorial consists of the following steps:
 

@@ -29,3 +29,5 @@
 [FeatureLinkerUnlabeled]: https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/TOPP_FeatureLinkerUnlabeled.html
 [MapAlignerPoseClustering]: https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/TOPP_MapAlignerPoseClustering.html
 [UpSet]: https://caleydo.org/tools/upset/
+[tutorial]: https://rickhelmus.github.io/patRoon/articles/tutorial.html
+[reference]: https://rickhelmus.github.io/patRoon/reference/index.html

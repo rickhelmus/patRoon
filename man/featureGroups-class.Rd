@@ -83,10 +83,11 @@
 \S4method{as.data.table}{featureGroups}(x, average = FALSE,
   features = FALSE)
 
-\S4method{plot}{featureGroups,ANY}(x, retMin = TRUE, col = NULL,
+\S4method{plot}{featureGroups,ANY}(x, retMin = FALSE, col = NULL,
   pch = 16, ...)
 
-\S4method{plotInt}{featureGroups}(obj, average = FALSE, ...)
+\S4method{plotInt}{featureGroups}(obj, average = FALSE, pch = 20,
+  type = "b", lty = 3, col = NULL, ...)
 
 \S4method{plotChord}{featureGroups}(obj, addSelfLinks = FALSE,
   addRetMzPlots = TRUE, average = FALSE, outerGroups = NULL,
@@ -119,10 +120,10 @@ their index or name, respectively (for the order/names see \code{analyses()/name
 (similar to regular vectors). If missing all analyses/feature groups are selected.\cr\cr For \code{[[}: should be a scalar value. If \code{j} is not specified, \code{i} selects by feature groups instead.}
 
 \item{\dots}{Ignored for \code{"["} operator or passed to
-\code{\link[graphics]{plot}} (\code{plot}, \code{plotInt} and
-\code{plotEIC}), \pkg{\link{VennDiagram}} plotting functions
-(\code{plotVenn}), \code{\link{chordDiagram}} (\code{plotChord}) or
-\code{\link[UpSetR]{upset}} (\code{plotUpSet}).}
+\code{\link[graphics]{plot}} (\code{plot} and \code{plotEIC}),
+\code{\link[graphics]{lines}} (\code{plotInt}), \pkg{\link{VennDiagram}}
+plotting functions (\code{plotVenn}), \code{\link{chordDiagram}}
+(\code{plotChord}) or \code{\link[UpSetR]{upset}} (\code{plotUpSet}).}
 
 \item{drop}{ignored.}
 
@@ -141,8 +142,10 @@ ProfileAnalysis), \code{"brukertasq"} (Bruker TASQ) or \code{"mzmine"}
 
 \item{retMin}{Plot retention time in minutes (instead of seconds).}
 
-\item{col, pch}{Passed to \code{\link[graphics]{plot}}. If \code{col=NULL}
-then colours are automatically generated.}
+\item{col}{Colour(s) used. If \code{col=NULL} then colours are automatically
+generated.}
+
+\item{pch}{Passed to \code{\link[graphics]{plot}}.}
 
 \item{addSelfLinks}{If \code{TRUE} then 'self-links' are added which
 represent non-shared data.}

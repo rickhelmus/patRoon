@@ -71,8 +71,7 @@ setGeneric("settings", function(compoundsMF) standardGeneric("settings"))
 
 setGeneric("makeHCluster", function(obj, method = "complete", ...) standardGeneric("makeHCluster"))
 
-setGeneric("plotHeatMap", function(obj, col = colorRampPalette(c("black", "yellow"))(100),
-                                   interactive = FALSE, ...) standardGeneric("plotHeatMap"))
+setGeneric("plotHeatMap", function(obj, ...) standardGeneric("plotHeatMap"))
 setGeneric("plotSilhouettes", function(obj, kSeq, ...) standardGeneric("plotSilhouettes"))
 
 ### target screening

@@ -28,17 +28,18 @@
 \S4method{treeCutDynamic}{componentsIntClust}(obj, maxTreeHeight,
   deepSplit, minModuleSize)
 
-\S4method{plotHeatMap}{componentsIntClust}(obj,
-  col = colorRampPalette(c("black", "yellow"))(100),
-  interactive = FALSE, ...)
+\S4method{plotHeatMap}{componentsIntClust}(obj, interactive = FALSE,
+  col = NULL, margins = c(6, 2), ...)
 
-\S4method{plotInt}{componentsIntClust}(obj, index, ...)
+\S4method{plotInt}{componentsIntClust}(obj, index, pch = 20,
+  type = "b", lty = 3, col = NULL, ...)
 
 \S4method{plot}{componentsIntClust,ANY}(x, pal = "Paired",
   numericLabels = TRUE, colourBranches = length(x) < 50,
   showLegend = length(x) < 20, ...)
 
-\S4method{plotSilhouettes}{componentsIntClust}(obj, kSeq, ...)
+\S4method{plotSilhouettes}{componentsIntClust}(obj, kSeq, pch = 16,
+  type = "b", ...)
 }
 \arguments{
 \item{k, h}{Desired number of clusters or tree height to be used for cutting
@@ -48,17 +49,18 @@ Analogous to \code{\link{cutree}}.}
 \item{maxTreeHeight, deepSplit, minModuleSize}{Arguments used by
 \code{\link{cutreeDynamicTree}}.}
 
-\item{col}{Colours used for drawing the heatmap. See \code{\link{heatmap}} /
-\code{\link{d3heatmap}}.}
-
 \item{interactive}{If \code{TRUE} an interactive heatmap will be drawn (with
 \code{\link{d3heatmap}}).}
 
-\item{\dots}{Further options passed to \code{\link{heatmap}} /
+\item{margins}{Passed to \code{\link{heatmap.2}}}
+
+\item{\dots}{Further options passed to \code{\link{heatmap.2}} /
 \code{\link{d3heatmap}} (\code{plotHeatMap}), \code{\link{plot.dendrogram}}
 (\code{plot}) or \code{\link[graphics]{plot}} (\code{plotInt}).}
 
 \item{index}{Numeric component/cluster index.}
+
+\item{pch, type}{Passed to \code{\link[graphics]{plot}}.}
 
 \item{x, obj}{A \code{componentsIntClust} object.}
 
@@ -80,7 +82,7 @@ overflowing the plot.}
 average silhouette width calculation.}
 }
 \value{
-\code{plotHeatMap} returns the same as \code{\link{heatmap}} or
+\code{plotHeatMap} returns the same as \code{\link{heatmap.2}} or
   \code{\link{d3heatmap}}.
 }
 \description{
@@ -111,7 +113,7 @@ the \code{\link{cutreeDynamicTree}} function from
 \pkg{\link{dynamicTreeCut}}.
 
 \item \code{plotHeatMap}: draws a heatmap using the
-\code{\link{heatmap}} or \code{\link{d3heatmap}} function.
+\code{\link{heatmap.2}} or \code{\link{d3heatmap}} function.
 
 \item \code{plotInt}: makes a plot for all (normalized) intensity
 profiles of the feature groups within a given cluster.

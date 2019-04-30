@@ -44,7 +44,7 @@ genIntComponentInfo <- function(cutClusters)
 #'   clustering.
 #'
 #' @param x,obj A \code{componentsIntClust} object.
-#' @param \dots Further options passed to \code{\link{heatmap}} /
+#' @param \dots Further options passed to \code{\link{heatmap.2}} /
 #'   \code{\link{d3heatmap}} (\code{plotHeatMap}), \code{\link{plot.dendrogram}}
 #'   (\code{plot}) or \code{\link[graphics]{plot}} (\code{plotInt}).
 #'
@@ -129,49 +129,54 @@ setMethod("treeCutDynamic", "componentsIntClust", function(obj, maxTreeHeight, d
 })
 
 #' @describeIn componentsIntClust draws a heatmap using the
-#'   \code{\link{heatmap}} or \code{\link{d3heatmap}} function.
-#' @param col Colours used for drawing the heatmap. See \code{\link{heatmap}} /
-#'   \code{\link{d3heatmap}}.
+#'   \code{\link{heatmap.2}} or \code{\link{d3heatmap}} function.
 #' @param interactive If \code{TRUE} an interactive heatmap will be drawn (with
 #'   \code{\link{d3heatmap}}).
-#' @return \code{plotHeatMap} returns the same as \code{\link{heatmap}} or
+#' @param margins Passed to \code{\link{heatmap.2}}
+#' @return \code{plotHeatMap} returns the same as \code{\link{heatmap.2}} or
 #'   \code{\link{d3heatmap}}.
 #' @aliases plotHeatMap
 #' @export
-setMethod("plotHeatMap", "componentsIntClust", function(obj, col, interactive, ...)
+setMethod("plotHeatMap", "componentsIntClust", function(obj, interactive = FALSE, col = NULL, margins = c(6, 2),  ...)
 {
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertCharacter(col, min.chars = 1, any.missing = FALSE, add = ac)
     checkmate::assertFlag(interactive, add = ac)
     checkmate::reportAssertions(ac)
 
+    if (is.null(col))
+        col <- colorRampPalette(c("blue", "yellow", "red"))(300)
+    
     if (interactive)
         d3heatmap::d3heatmap(obj@clusterm, Colv = NA, distfun = function(d) dist(d, obj@properties$metric),
                              hclustfun = function(h) hclust(h, obj@properties$method),
                              scale = "none", colors = col, ...)
     else
-        heatmap(obj@clusterm, Colv = NA, distfun = function(d) dist(d, obj@properties$metric),
-                hclustfun = function(h) hclust(h, obj@properties$method),
-                scale = "none", col = col, ...)
+        gplots::heatmap.2(obj@clusterm, Colv = NA, distfun = function(d) dist(d, obj@properties$metric),
+                          hclustfun = function(h) hclust(h, obj@properties$method),
+                          scale = "none", col = col, dendrogram = "row", ylab = "feature groups",
+                          labRow = FALSE, margins = margins, ...)
 })
 
 #' @describeIn componentsIntClust makes a plot for all (normalized) intensity
 #'   profiles of the feature groups within a given cluster.
 #' @param index Numeric component/cluster index.
 #' @export
-setMethod("plotInt", "componentsIntClust", function(obj, index, ...)
+setMethod("plotInt", "componentsIntClust", function(obj, index, pch = 20, type = "b",
+                                                    lty = 3, col = NULL, ...)
 {
     checkmate::assertInt(index, lower = 1, upper = length(obj@cutClusters), null.ok = TRUE)
 
     plotm <- obj@clusterm[rownames(obj@clusterm) %in% rownames(obj@gInfo)[obj@cutClusters == index], , drop = FALSE]
     nsamp <- ncol(plotm)
 
-    plot(x = c(0, nsamp), y = c(0, max(plotm)), type = "n", xlab = "", ylab = "normalized intensity", xaxt = "n", ...)
+    plot(x = c(0, nsamp), y = c(0, max(plotm)), type = "n", xlab = "", ylab = "normalized intensity", xaxt = "n")
     axis(1, seq_len(nsamp), colnames(plotm), las = 2)
 
+    if (is.null(col))
+        col <- colorRampPalette(brewer.pal(12, "Paired"))(length(plotm))
     px <- seq_len(nsamp)
     for (i in seq_len(nrow(plotm)))
-        lines(x = px, y = plotm[i, ])
+        lines(x = px, y = plotm[i, ], pch = pch, type = type, lty = lty, col = col[i], ...)
 
     invisible(NULL)
 })
@@ -208,9 +213,10 @@ setMethod("plot", "componentsIntClust", function(x, pal = "Paired", numericLabel
 #'   clusters.
 #' @param kSeq An integer vector containing the sequence that should be used for
 #'   average silhouette width calculation.
+#' @param pch,type Passed to \code{\link[graphics]{plot}}.
 #' @export
 #' @aliases plotSilhouettes
-setMethod("plotSilhouettes", "componentsIntClust", function(obj, kSeq, ...)
+setMethod("plotSilhouettes", "componentsIntClust", function(obj, kSeq, pch = 16, type = "b", ...)
 {
     checkmate::assertIntegerish(kSeq, lower = 2, any.missing = FALSE)
 
@@ -223,7 +229,7 @@ setMethod("plotSilhouettes", "componentsIntClust", function(obj, kSeq, ...)
         summary(sil)$avg.width
     })
 
-    plot(x = kSeq, y = meanws, pch = 16, type = "b", xaxt = "none",
+    plot(x = kSeq, y = meanws, pch = pch, type = type, xaxt = "none",
          xlab = "cluster k", ylab = "mean silhouette width", ...)
     axis(1, kSeq)
     abline(v = kSeq[which.max(meanws)], lty = 2)

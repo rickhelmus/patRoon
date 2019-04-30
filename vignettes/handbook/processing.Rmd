@@ -505,7 +505,6 @@ Some other common and less common plotting operations are shown below.
 
 ```{r plotFeatAnn,eval=runData}
 plot(fGroups) # simple scatter plot of retention and m/z values
-plotInt(fGroups) # simple line plot of all intensities
 
 plotEIC(fGroups) # plot EICs for all features
 # get overview of all feature groups
@@ -588,10 +587,15 @@ Generic             | Classes                                  | Remarks
 ```{r plotClust,eval=runData}
 plot(componInt) # dendrogram
 plot(compsClust, groupName = "M120_R328_81") # dendrogram for clustered compounds
-
 plotInt(componInt, index = 4) # intensities of 4th cluster
+```
+
+```{r plotClust2,eval=runData,fig.height=6}
 plotHeatMap(componInt) # plot heatmap
-plotHeatMap(componInt, interactive = TRUE) # interactive heatmap
+```
+
+```{r plotClust3,eval=runData}
+plotHeatMap(componInt, interactive = TRUE) # interactive heatmap (with zoom-in!)
 plotSilhouettes(componInt, 5:20) # plot silhouettes (e.g. to obtain ideal cluster amount)
 ```
 

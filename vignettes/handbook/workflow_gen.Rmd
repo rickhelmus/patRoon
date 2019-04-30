@@ -156,8 +156,6 @@ Just like finding features, each algorithm has their own set of parameters. Ofte
 
 Some examples of finding and grouping features are shown below.
 
-<!-- UNDONE: enable this for testing? -->
-
 ```{r feat,eval=FALSE}
 # The anaInfo variable contains analysis information, see the previous section
 

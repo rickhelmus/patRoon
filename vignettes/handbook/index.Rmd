@@ -4,7 +4,7 @@ author: "Rick Helmus"
 date: "`r Sys.Date()`"
 ---
 
-```{r child="01-intro.Rmd"}
+```{r child="intro.Rmd"}
 ```
 
 ```{r include=FALSE}

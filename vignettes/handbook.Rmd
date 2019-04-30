@@ -16,18 +16,21 @@ vignDir <- "."
 ```{r child="handbook/setup.Rmd"}
 ```
 
-```{r child="handbook/01-intro.Rmd"}
+```{r child="handbook/intro.Rmd"}
 ```
 
-```{r child="handbook/02-concepts.Rmd"}
+```{r child="handbook/installation.Rmd"}
 ```
 
-```{r child="handbook/03-workflow_gen.Rmd"}
+```{r child="handbook/concepts.Rmd"}
 ```
 
-```{r child="handbook/04-processing.Rmd"}
+```{r child="handbook/workflow_gen.Rmd"}
 ```
 
-```{r child="handbook/05-advanced.Rmd"}
+```{r child="handbook/processing.Rmd"}
+```
+
+```{r child="handbook/advanced.Rmd"}
 ```
 

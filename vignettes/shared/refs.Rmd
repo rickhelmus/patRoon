@@ -31,3 +31,7 @@
 [UpSet]: https://caleydo.org/tools/upset/
 [tutorial]: https://rickhelmus.github.io/patRoon/articles/tutorial.html
 [reference]: https://rickhelmus.github.io/patRoon/reference/index.html
+[miniCRAN]: https://github.com/andrie/miniCRAN
+[Rtools]: https://cran.r-project.org/bin/windows/Rtools/
+[JavaJDK]: https://www.oracle.com/technetwork/java/javase/downloads/index.html
+[pngquant]: https://pngquant.org/

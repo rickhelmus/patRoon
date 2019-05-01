@@ -235,6 +235,7 @@ generateAnalysisInfo <- function(paths, groups = "", refs = "", formats = MSFile
     ret <- ret[!duplicated(ret[, c("path", "analysis")]), ]
 
     # set after duplicate removal
+    groups <- rep(groups, length.out = nrow(ret))
     ret$group <- ifelse(!nzchar(groups), ret$analysis, groups)
     ret$ref <- refs
 

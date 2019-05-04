@@ -73,7 +73,7 @@ AddIon::AddIon(const string strName)
 		{"M+2Na-H", "Na2", "H", "+1", "1"},
 		{"M+IsoProp+H", "C3H10O", "", "+1", "1"}, //IsoProp=C3H9O(?)
 		{"M+ACN+Na", "C2H3NNa", "", "+1", "1"},
-		{"M+2K-H", "K", "H", "+1", "1"},
+		{"M+2K-H", "K2", "H", "+1", "1"},
 		{"M+DMSO+H", "C2H7OS", "", "+1", "1"}, //DMSO=C2H6OS
 		{"M+2ACN+H", "C4H7N2", "", "+1", "1"},
 		{"M+IsoProp+Na+H", "C3H10ONa", "", "+1", "1"},
@@ -86,7 +86,7 @@ AddIon::AddIon(const string strName)
 
 		{"M-3H", "", "H3", "-3", "1"},
 		{"M-2H", "", "H2", "-2", "1"},
-		{"M-H2O-H", "", "H", "-1", "1"},
+		{"M-H2O-H", "", "H3", "-1", "1"},
 		{"M-H", "", "H", "-1", "1"},
 		{"M+Na-2H", "Na", "H2", "-1", "1"},
 		{"M+Cl", "Cl", "", "-1", "1"},

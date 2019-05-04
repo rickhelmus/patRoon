@@ -49,12 +49,10 @@
 
 
 ## formulas
-- set column order?
 - customize/document ranking column order? (only do rank for sirius?)
 - how to handle ranking of consensus results?
     - rank by one normalized column per algo? (GenForm: either MS_match or comb_match)
     - or simply don't and mention limitation in doc? (one limitation: filtering)
-- reporting incorrect GF adducts --> fix in src
 
 
 ## components

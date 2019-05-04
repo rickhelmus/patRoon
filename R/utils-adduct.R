@@ -56,7 +56,7 @@ GenFormAdducts <- function()
         list("M+2Na-H", "Na2", "H", "+1", 1),
         list("M+IsoProp+H", "C3H10O", "", "+1", 1), # IsoProp=C3H9O(?)
         list("M+ACN+Na", "C2H3NNa", "", "+1", 1),
-        list("M+2K-H", "K", "H", "+1", 1), # UNDONE: should be K2
+        list("M+2K-H", "K2", "H", "+1", 1),
         list("M+DMSO+H", "C2H7OS", "", "+1", 1), # DMSO=C2H6OS
         list("M+2ACN+H", "C4H7N2", "", "+1", 1),
         list("M+IsoProp+Na+H", "C3H10ONa", "", "+1", 1),
@@ -69,7 +69,7 @@ GenFormAdducts <- function()
 
         list("M-3H", "", "H3", "-3", 1),
         list("M-2H", "", "H2", "-2", 1),
-        list("M-H2O-H", "", "H3O", "-1", 1), # BUG: currently in GF as M-H
+        list("M-H2O-H", "", "H3O", "-1", 1),
         list("M-H", "", "H", "-1", 1),
         list("M+Na-2H", "Na", "H2", "-1", 1),
         list("M+Cl", "Cl", "", "-1", 1),

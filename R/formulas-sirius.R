@@ -223,7 +223,7 @@ generateFormulasSirius <- function(fGroups, MSPeakLists, relMzDev = 5, adduct = 
             saveCacheSet("formulasGenForm", formHashes, setHash, cacheDB)
 
         if (length(formTable) > 0)
-            groupFormulas <- generateGroupFormulasByConsensus(formTable, featThreshold)
+            groupFormulas <- generateGroupFormulasByConsensus(formTable, featThreshold, gNames)
         else
             groupFormulas <- list()
     }

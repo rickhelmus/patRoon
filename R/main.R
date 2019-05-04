@@ -541,11 +541,15 @@ NULL
 #' @param MSPeakLists An \code{\link{MSPeakLists}} object that was generated for
 #'   the supplied \code{fGroups}.
 #' @param MSMode Whether formulae should be generated only from MS data
-#'   (\code{"ms"}), MS/MS data (\code{"msms"}) or both (\code{"both"}). Using
-#'   the latter option, unique formulae from MS data will still be reported if
-#'   not predicted from MS/MS data (\emph{e.g.} due to poor/missing MS/MS data).
-#'   Formulae calculated from MS data that were also generated from MS/MS data
-#'   will be removed.
+#'   (\code{"ms"}), MS/MS data (\code{"msms"}) or both (\code{"both"}).
+#'
+#'   For \command{GenForm} selecting \code{"both"} will fall back to formula
+#'   calculation with only MS data in case no MS/MS data is available.
+#'
+#'   For calulation with Bruker DataAnalysis selecting \code{"both"} will
+#'   calculate formulae from MS data \emph{and} MS/MS data and combines the
+#'   results (duplicated formulae are removed). This is useful when poor MS/MS
+#'   data would exclude proper candidates.
 #' @param calculateFeatures If \code{TRUE} fomulae are first calculated for all
 #'   features prior to feature group assignment (see details).
 #' @param featThreshold If \code{calculateFeatures=TRUE}: minimum presence

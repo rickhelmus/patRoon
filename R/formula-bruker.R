@@ -53,6 +53,7 @@ generateFormulasDA <- function(fGroups, precursorMzSearchWindow = 0.002, MSMode 
     ftind <- groupFeatIndex(fGroups)
     gTable <- groups(fGroups)
     gCount <- length(fGroups)
+    gNames <- names(fGroups)
 
     hideDAInScope()
 
@@ -81,7 +82,7 @@ generateFormulasDA <- function(fGroups, precursorMzSearchWindow = 0.002, MSMode 
 
         for (grpi in seq_len(gCount))
         {
-            grp <- colnames(gTable)[grpi]
+            grp <- gNames[grpi]
             fti <- ftind[[grp]][anai]
 
             if (fti == 0)
@@ -247,7 +248,7 @@ generateFormulasDA <- function(fGroups, precursorMzSearchWindow = 0.002, MSMode 
     fTable <- pruneList(sapply(fTable, function(ft) ft[sapply(ft, nrow) > 0], simplify = FALSE), TRUE)
 
     if (length(fTable) > 0)
-        groupFormulas <- generateGroupFormulasByConsensus(fTable, featThreshold)
+        groupFormulas <- generateGroupFormulasByConsensus(fTable, featThreshold, gNames)
     else
         groupFormulas <- list()
 

@@ -100,7 +100,7 @@ checkPackage <- function(pkg, gh = NULL)
     if (!requireNamespace(pkg, quietly = TRUE))
     {
         if (!is.null(gh))
-            stop(sprintf("Please install %s from github: devtools::install_github('%s')", pkg, gh))
+            stop(sprintf("Please install %s from github: remotes::install_github('%s')", pkg, gh))
         else
             stop(sprintf("Please install %s: install.packages('%s')", pkg, pkg))
     }

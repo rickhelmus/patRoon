@@ -353,7 +353,7 @@ generateFormConsensusForGroup <- function(formAnaList, formThreshold)
     return(formTable)
 }
 
-generateGroupFormulasByConsensus <- function(formList, formThreshold)
+generateGroupFormulasByConsensus <- function(formList, formThreshold, origGNames)
 {
     cat("Generating feature group formula consensus...\n")
 
@@ -381,6 +381,9 @@ generateGroupFormulasByConsensus <- function(formList, formThreshold)
         })
         names(formCons) <- gNames
         formCons <- pruneList(formCons, checkZeroRows = TRUE)
+        
+        # fix order
+        formCons <- formCons[intersect(origGNames, names(formCons))]
 
         setTxtProgressBar(prog, gCount)
         close(prog)

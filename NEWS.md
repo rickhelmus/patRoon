@@ -1,5 +1,9 @@
 # patRoon 0.1.0.9000
 
+## May 2019
+
+* `GenForm` formula calculation with `MSMode="both"` (the default): instead of repeating calculations with and without MS/MS data and combining the data, it now simply does either of the two depending on MS/MS data availability. The old behavior turned out to be redundant, hence, calculation is now a bit faster.
+
 ## March 2019
 * `reportMD()`: most time consuming plots are now cached. Hence, re-reporting should be signficiantly faster now.
 * Updates to MS data file conversion:

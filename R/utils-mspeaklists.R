@@ -27,17 +27,26 @@ getDefAvgPListParamsRD <- function()
     return(paste0("\\code{", names(def), "=", def, "}", collapse = "; "))
 }
 
-#' @details The \code{getDefIsolatePrecParams} is used to create a parameter list
-#'   for isolating the precursor and its isotopes (discussed below).
-#' @rdname MSPeakLists
+#' @details The \code{getDefIsolatePrecParams} is used to create a parameter
+#'   list for isolating the precursor and its isotopes (see \verb{Isolating precursor data}).
+#' @rdname MSPeakLists-class
 #' @export
 getDefIsolatePrecParams <- function(...)
 {
     def <- list(maxIsotopes = 5,
                 mzDefectRange = c(-0.01, 0.01),
                 intRange = c(0.001, 2),
-                z = 1)
+                z = 1,
+                maxGap = 2)
     return(modifyList(def, list(...)))
+}
+
+# For docs
+getDefIsolatePrecParamsRD <- function()
+{
+    def <- getDefIsolatePrecParams()
+    def <- sapply(def, function(v) if (length(v) == 2) sprintf("c(%s, %s)", v[1], v[2]) else as.character(v))
+    return(paste0("\\code{", names(def), "=", def, "}", collapse = "; "))
 }
 
 # align & average spectra by clustering or between peak distances
@@ -51,7 +60,7 @@ averageSpectra <- function(spectra, clusterMzWindow, topMost, minIntensityPre, m
     spectra <- lapply(spectra, function(s)
     {
         s <- s[intensity >= minIntensityPre]
-        
+
         if (nrow(s) > topMost)
         {
             ord <- order(-s$intensity)
@@ -62,13 +71,13 @@ averageSpectra <- function(spectra, clusterMzWindow, topMost, minIntensityPre, m
         }
         return(s)
     })
-    
+
     spcomb <- rbindlist(spectra, idcol = "spid")
     setorder(spcomb, mz)
-    
+
     if (nrow(spcomb) < 2 || length(spectra) < 2)
         return(spcomb[, -"spid"])
-    
+
     if (method == "hclust")
     {
         mzd <- dist(spcomb$mz)
@@ -80,13 +89,13 @@ averageSpectra <- function(spectra, clusterMzWindow, topMost, minIntensityPre, m
         mzdiff <- abs(diff(spcomb$mz))
         spcomb[, cluster := 1 + c(0, cumsum(mzdiff > clusterMzWindow))]
     }
-    
+
     if (any(spcomb[, .(dup = anyDuplicated(spid)), key = cluster][["dup"]] > 0))
         warning("During spectral averaging multiple masses from the same spectrum were clustered, consider tweaking clusterMzWindow!\n")
-    
+
     spcount <- length(spectra)
     ret <- spcomb[, .(mz = avgFun(mz), intensity = sum(intensity) / spcount), by = cluster][, cluster := NULL]
-    
+
     # update precursor flags
     precMZs <- spcomb[precursor == TRUE, mz]
     if (length(precMZs) > 0)
@@ -94,13 +103,13 @@ averageSpectra <- function(spectra, clusterMzWindow, topMost, minIntensityPre, m
     else
         precMZ <- -1
     ret <- assignPrecursorToMSPeakList(ret, precMZ)
-    
+
     # post intensity filter
     ret <- ret[intensity >= minIntensityPost]
-    
+
     if (pruneMissingPrecursor && !any(ret$precursor))
         return(emptyMSPeakList())
-    
+
     return(ret)
 }
 
@@ -108,12 +117,12 @@ averageMSPeakLists <- function(peakLists, clusterMzWindow, topMost, minIntensity
                                avgFun, method, pruneMissingPrecursorMS, retainPrecursorMSMS)
 {
     # UNDONE: use cache sets?
-    
+
     cat("Generating averaged peak lists for all feature groups...\n")
-    
+
     hash <- makeHash(peakLists, clusterMzWindow, topMost, minIntensityPre, avgFun, method)
     avgPLists <- loadCacheData("MSPeakListsAvg", hash)
-    
+
     # figure out feature groups from (non-averaged) peak lists
     gNames <- unique(unlist(sapply(peakLists, names, simplify = FALSE), use.names = FALSE))
     gCount <- length(gNames)
@@ -123,7 +132,7 @@ averageMSPeakLists <- function(peakLists, clusterMzWindow, topMost, minIntensity
     else if (is.null(avgPLists))
     {
         prog <- openProgBar(0, gCount)
-        
+
         avgPLists <- lapply(seq_len(gCount), function(grpi)
         {
             plistsMS <- lapply(peakLists, function(pl) pl[[gNames[grpi]]][["MS"]])
@@ -135,26 +144,26 @@ averageMSPeakLists <- function(peakLists, clusterMzWindow, topMost, minIntensity
             plistsMSMS <- pruneList(plistsMSMS, checkZeroRows = TRUE)
             avgPLMSMS <- averageSpectra(plistsMSMS, clusterMzWindow, topMost, minIntensityPre, minIntensityPost,
                                         avgFun, method, FALSE, retainPrecursorMSMS)
-            
+
             results <- pruneList(list(MS = if (nrow(avgPLMS) > 0) avgPLMS else NULL,
                                       MSMS = if (nrow(avgPLMSMS) > 0) avgPLMSMS else NULL))
 
             if (!any(avgPLMS$precursor))
                 warning(sprintf("Couldn't find back any precursor m/z from (averaged) MS peak list of group %s!", gNames[grpi]))
-            
+
             setTxtProgressBar(prog, grpi)
             return(results)
         })
         names(avgPLists) <- gNames
-        
+
         setTxtProgressBar(prog, gCount)
         close(prog)
-        
+
         saveCacheData("MSPeakListsAvg", avgPLists, hash)
     }
     else
         cat("Done!\n")
-    
+
     return(avgPLists)
 }
 
@@ -185,22 +194,22 @@ deIsotopeMSPeakList <- function(MSPeakList, negate)
 {
     if (nrow(MSPeakList) == 0)
         return(MSPeakList)
-    
+
     if (is.null(MSPeakList[["cmp"]]))
         stop("No isotope information available. Note that this is currently only implemented for DataAnalysis peak lists (if configured properly, see ?generateMSPeakLists.")
-    
+
     # make sure most intense ions top the table
     MSPeakList <- MSPeakList[order(mz, -intensity)]
-    
+
     unique_iso <- sapply(seq_along(MSPeakList$cmp), function(i)
     {
         # first and unassigned compounds are always unique
         if (i == 1 || MSPeakList$cmp[i] == "")
             return(TRUE)
-        
+
         # peak may belong to multiple isotope compounds (separated by whitespace)
         cmp <- strsplit(MSPeakList$cmp[i], "\\s+")
-        
+
         # isotope compound present before this entry?
         othercmp <- MSPeakList[seq_len(i - 1)][cmp != ""]$cmp
         for (ocmp in othercmp)
@@ -208,31 +217,31 @@ deIsotopeMSPeakList <- function(MSPeakList, negate)
             if (any(cmp %in% strsplit(ocmp, "\\s+")))
                 return(FALSE)
         }
-        
+
         return(TRUE)
     }, USE.NAMES = FALSE)
-    
+
     if (negate)
         unique_iso <- !unique_iso
-    
+
     return(MSPeakList[unique_iso])
 }
 
 doMSPeakListFilter <- function(pList, absIntThr, relIntThr, topMost, deIsotope, retainPrecursor, negate)
 {
     ret <- pList
-    
+
     intPred <- if (negate) function(i, t) i < t else function(i, t) i >= t
-    
+
     if (!is.null(absIntThr))
         ret <- ret[intPred(intensity, absIntThr)]
-    
+
     if (!is.null(relIntThr) && nrow(ret) > 0)
     {
         thr <- max(ret$intensity) * relIntThr
         ret <- ret[intPred(intensity, thr)]
     }
-    
+
     if (!is.null(topMost) && nrow(ret) > topMost)
     {
         if (negate)
@@ -241,10 +250,10 @@ doMSPeakListFilter <- function(pList, absIntThr, relIntThr, topMost, deIsotope, 
             ord <- order(-ret$intensity)
         ret <- ret[ord[seq_len(topMost)]]
     }
-    
+
     if (deIsotope)
         ret <- deIsotopeMSPeakList(ret, negate)
-    
+
     # re-add precursor if necessary
     if (retainPrecursor && !any(ret$precursor))
     {
@@ -255,7 +264,35 @@ doMSPeakListFilter <- function(pList, absIntThr, relIntThr, topMost, deIsotope, 
             setorderv(ret, "mz")
         }
     }
-    
+
     return(ret)
 }
 
+isolatePrecInMSPeakList <- function(plist, isolatePrec, negate)
+{
+    prec <- plist[precursor == TRUE]
+    if (nrow(prec) == 1) # 0 if no precursor
+    {
+        s <- seq_len(isolatePrec$maxIsotopes) / isolatePrec$z
+        mzranges <- matrix(c(s + isolatePrec$mzDefectRange[1] * s,
+                             s + isolatePrec$mzDefectRange[2] * s), ncol = 2) + prec$mz
+        keep <- plist[, precursor | (
+            # only keep peaks with reasonable intensities
+            intensity %between% (isolatePrec$intRange * prec$intensity) &
+
+            # only keep with reasonably close m/z to precursor, taking
+            # in to account larger windows for larger distances
+            inrange(mz, mzranges[, 1], mzranges[, 2]))]
+        plist <- plist[if (negate) !keep else keep]
+
+        # remove gaps
+        gaps <- plist[round(mz - shift(mz)) > isolatePrec$maxGap, which = TRUE]
+        if (length(gaps) > 0)
+        {
+            sq <- seq_len(gaps[1] - 1)
+            plist <- plist[if (negate) -sq else sq]
+        }
+    }
+
+    return(plist)
+}

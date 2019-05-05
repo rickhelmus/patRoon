@@ -203,15 +203,16 @@ assertPListIsolatePrecParams <- function(x, .var.name = checkmate::vname(x), add
 {
     if (is.null(x))
         return(NULL)
-    
+
     checkmate::assertList(x, names = "unique", .var.name = .var.name) # no add: should fail
-    
+
     assertVal <- function(f, v, ...) f(x[[v]], ..., .var.name = paste0(.var.name, "$", v), add = add)
-    
+
     assertVal(checkmate::assertCount, "maxIsotopes")
     assertVal(checkmate::assertNumeric, "mzDefectRange", any.missing = FALSE, len = 2, finite = TRUE)
     assertVal(checkmate::assertNumeric, "intRange", any.missing = FALSE, len = 2, finite = TRUE)
     assertVal(checkmate::assertCount, "z", positive = TRUE)
+    assertVal(checkmate::assertCount, "maxGap", positive = TRUE)
 }
 
 # from https://github.com/mllg/checkmate/issues/115

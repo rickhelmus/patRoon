@@ -38,9 +38,7 @@ writeGenFormFiles <- function(MSPList, MSMSPList, workFiles)
     writePList <- function(f, pl) fwrite(pl[, c("mz", "intensity")], f, quote = FALSE,
                                          sep = "\t", row.names = FALSE, col.names = FALSE)
 
-    # file may have been already created when calculating MS only formulas
-    if (!file.exists(workFiles$MSFile))
-        writePList(workFiles$MSFile, MSPList)
+    writePList(workFiles$MSFile, MSPList)
 
     if (!is.null(MSMSPList))
         writePList(workFiles$MSMSFile, MSMSPList)
@@ -72,8 +70,9 @@ makeGenFormCmdQueue <- function(gfBin, mainArgs, groupPeakLists, workFiles, hash
     }, simplify = FALSE))
 }
 
-runGenForm <- function(gfBin, mainArgs, featMZs, groupPeakLists, MSMode, hashes, cachedSet,
-                       workFiles, gNames, adduct, maxProcAmount, batchSize, timeout, ana)
+runGenForm <- function(gfBin, mainArgs, featMZs, groupPeakLists, MSMode, isolatePrec,
+                       hashes, cachedSet, workFiles, gNames, adduct, maxProcAmount,
+                       batchSize, timeout, ana)
 {
     cacheDB <- openCacheDBScope()
 
@@ -99,9 +98,16 @@ runGenForm <- function(gfBin, mainArgs, featMZs, groupPeakLists, MSMode, hashes,
     }
 
     for (grp in doGNames)
-        writeGenFormFiles(groupPeakLists[[grp]][["MS"]],
-                          if (MSMode != "ms") groupPeakLists[[grp]][["MSMS"]] else NULL,
+    {
+
+        plms <- groupPeakLists[[grp]][["MS"]]
+        if (is.logical(isolatePrec) && isolatePrec)
+            isolatePrec <- getDefIsolatePrecParams(z = abs(adduct@charge))
+        if (!is.logical(isolatePrec)) # i.e. not FALSE
+            plms <- isolatePrecInMSPeakList(plms, isolatePrec, negate = FALSE)
+        writeGenFormFiles(plms, if (MSMode != "ms") groupPeakLists[[grp]][["MSMS"]] else NULL,
                           workFiles[[grp]])
+    }
 
     cmdQueue <- makeGenFormCmdQueue(gfBin, mainArgs, groupPeakLists[doGNames],
                                     workFiles[doGNames], hashes, MSMode)
@@ -183,7 +189,7 @@ processGenFormMSMSResultFile <- function(file)
     formsMSMS[, precursorGroup := NULL]
 
     formsMSMS[!is.na(frag_formula), frag_formula := Vectorize(sortFormula)(frag_formula)] # GenForm doesn't seem to use Hill sorting
-    
+
     # clear out MSMS scores for formulae w/out MSMS explanations
     # UNDONE: do we need to discern candidates w/out MSMS data and w/ MSMS data but no explanations?
     formsMSMS[byMSMS == FALSE, c("MSMSScore", "combMatch") := NA_real_]
@@ -222,9 +228,9 @@ processGenFormResultFile <- function(file, isMSMS, adduct)
 
     # set nice column order
     setcolorder(forms, c("neutral_formula", "formula", "formula_mz", "error", "dbe", "isoScore", "byMSMS"))
-    
+
     forms <- rankFormulaTable(forms)
-    
+
     return(forms)
 }
 
@@ -247,6 +253,16 @@ processGenFormResultFile <- function(file, isMSMS, adduct)
 #'   \option{het} commandline option.
 #' @param oc Only consider organic formulae (\emph{i.e.} with at least one
 #'   carbon atom). Sets the \option{oc} commandline option.
+#' @param isolatePrec Settings used for isolation of precursor mass peaks and
+#'   their isotopes. This isolation is highly important for accurate isotope
+#'   scoring of candidates, as non-relevant mass peaks will dramatically
+#'   decrease the score. The value of \code{isolatePrec} should either be a
+#'   \code{list} with parameters (see the
+#'   \code{\link[=filter,MSPeakLists-method]{filter method}} for
+#'   \code{MSPeakLists} for more details), \code{TRUE} for default parameters
+#'   (the \code{z} parameter is automatically deduced from the \code{adduct}
+#'   argument) or \code{FALSE} for no isolation (\emph{e.g.} when you already
+#'   performed isolation with the \code{filter} method).
 #' @param timeout Maximum time (in seconds) that a \command{GenForm} command is
 #'   allowed to execute. If this time is exceeded a warning is emitted and the
 #'   command is terminated. See the notes section for more information on the
@@ -273,8 +289,8 @@ processGenFormResultFile <- function(file, isMSMS, adduct)
 generateFormulasGenForm <- function(fGroups, MSPeakLists, relMzDev = 5, adduct = "[M+H]+",
                                     elements = "CHNOP", hetero = TRUE, oc = FALSE, extraOpts = NULL,
                                     calculateFeatures = TRUE, featThreshold = 0.75, MSMode = "both",
-                                    timeout = 120, maxProcAmount = getOption("patRoon.maxProcAmount"),
-                                    batchSize = 25)
+                                    isolatePrec = TRUE, timeout = 120,
+                                    maxProcAmount = getOption("patRoon.maxProcAmount"), batchSize = 25)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
@@ -286,6 +302,10 @@ generateFormulasGenForm <- function(fGroups, MSPeakLists, relMzDev = 5, adduct =
     checkmate::assertChoice(MSMode, c("ms", "msms", "both"), add = ac)
     checkmate::assertCharacter(extraOpts, null.ok = TRUE, add = ac)
     aapply(checkmate::assertCount, . ~ maxProcAmount + batchSize, positive = TRUE, fixed = list(add = ac))
+
+    if (!is.logical(isolatePrec))
+         assertPListIsolatePrecParams(isolatePrec, add = ac)
+
     checkmate::reportAssertions(ac)
 
     adduct <- checkAndToAdduct(adduct)
@@ -316,7 +336,7 @@ generateFormulasGenForm <- function(fGroups, MSPeakLists, relMzDev = 5, adduct =
     formTable <- list()
     cacheDB <- openCacheDBScope() # open manually so caching code doesn't need to on each R/W access
     baseHash <- makeHash(mainArgs)
-    setHash <- makeHash(fGroups, MSPeakLists, MSMode, baseHash)
+    setHash <- makeHash(fGroups, MSPeakLists, MSMode, isolatePrec, baseHash)
     cachedSet <- loadCacheSet("formulasGenForm", setHash, cacheDB)
     formHashes <- character(0)
     gfBin <- getGenFormBin()
@@ -330,20 +350,20 @@ generateFormulasGenForm <- function(fGroups, MSPeakLists, relMzDev = 5, adduct =
         formHashes <<- c(formHashes, hashes)
 
         workFiles <- sapply(doGNames, function(g) makeGenFormFilesNames(), simplify = FALSE)
-        
+
         if (!is.null(ana))
             printf("Loading all formulas for analysis '%s'...\n", ana)
         else
             printf("Loading all formulas...\n")
-        
-        forms <- runGenForm(gfBin, mainArgs, featMZs, groupPeakLists, MSMode, hashes,
-                            cachedSet, workFiles, gNames, adduct, maxProcAmount,
+
+        forms <- runGenForm(gfBin, mainArgs, featMZs, groupPeakLists, MSMode, isolatePrec,
+                            hashes, cachedSet, workFiles, gNames, adduct, maxProcAmount,
                             batchSize, timeout, ana)
-        
+
         printf("Loaded %d formulas for %d %s (%.2f%%).\n", countUniqueFormulas(forms), length(forms),
                if (!is.null(ana)) "features" else "feature groups",
                if (gCount == 0) 0 else length(forms) * 100 / gCount)
-        
+
         return(forms)
     }
 

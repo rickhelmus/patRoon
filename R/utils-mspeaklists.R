@@ -286,7 +286,7 @@ isolatePrecInMSPeakList <- function(plist, isolatePrec, negate)
         plist <- plist[if (negate) !keep else keep]
 
         # remove gaps
-        gaps <- plist[round(mz - shift(mz)) > isolatePrec$maxGap, which = TRUE]
+        gaps <- plist[round(mz - shift(mz)) > (isolatePrec$maxGap / isolatePrec$z), which = TRUE]
         if (length(gaps) > 0)
         {
             sq <- seq_len(gaps[1] - 1)

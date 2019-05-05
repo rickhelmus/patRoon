@@ -209,13 +209,14 @@ group averaged MS(/MS) peak lists.}
 \section{Isolating precursor data}{
  Formula calculation typically relies on
   evaluating the measured isotopic pattern from the precursor to score
-  candidates. Since the MS1 spectra, which are used to obtain this isotopic
-  pattern, are typically very 'noisy' due to background and co-eluting ions,
-  an additional filtering step is recommended prior to formula calculation.
-  During this precursor isolation step all mass peaks are removed that are
-  (1) not the precursor and (2) not likely to be an isotopologue of the
-  precursor. To determine potential isotopic peaks the following parameters
-  are used:
+  candidates. Some algorithms (currently only \command{GenForm}) penalize
+  candidates if mass peaks are present in MS1 spectra that do not contribute
+  to the isotopic pattern. Since these spectra are typically very 'noisy' due
+  to background and co-eluting ions, an additional filtering step may be
+  recommended prior to formula calculation. During this precursor isolation
+  step all mass peaks are removed that are (1) not the precursor and (2) not
+  likely to be an isotopologue of the precursor. To determine potential
+  isotopic peaks the following parameters are used:
 
   \itemize{
 
@@ -243,8 +244,10 @@ group averaged MS(/MS) peak lists.}
   \code{M+1} etc. Note that the \code{mzDefectRange} is adjusted accordingly
   (\emph{e.g.} halved if \code{z=2}).
 
-  \item \code{maxGap} If the \emph{m/z} difference to the previous peak
-  exceeds this value then this and all next peaks will be removed.
+  \item \code{maxGap} The maximum number of missing adjacent isotopic peaks
+  ('gaps'). If the (rounded) \emph{m/z} difference to the previous peak
+  exceeds this value then this and all next peaks will be removed. Similar to
+  \code{z}, the maximum gap is automatically adjusted for \code{charge}.
 
   }
 

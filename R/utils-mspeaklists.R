@@ -27,6 +27,19 @@ getDefAvgPListParamsRD <- function()
     return(paste0("\\code{", names(def), "=", def, "}", collapse = "; "))
 }
 
+#' @details The \code{getDefIsolatePrecParams} is used to create a parameter list
+#'   for isolating the precursor and its isotopes (discussed below).
+#' @rdname MSPeakLists
+#' @export
+getDefIsolatePrecParams <- function(...)
+{
+    def <- list(maxIsotopes = 5,
+                mzDefectRange = c(-0.01, 0.01),
+                intRange = c(0.001, 2),
+                z = 1)
+    return(modifyList(def, list(...)))
+}
+
 # align & average spectra by clustering or between peak distances
 # code inspired from msProcess R package: https://github.com/zeehio/msProcess
 averageSpectra <- function(spectra, clusterMzWindow, topMost, minIntensityPre, minIntensityPost,
@@ -207,39 +220,42 @@ deIsotopeMSPeakList <- function(MSPeakList, negate)
 
 doMSPeakListFilter <- function(pList, absIntThr, relIntThr, topMost, deIsotope, retainPrecursor, negate)
 {
-    if (retainPrecursor)
-        prec <- pList[precursor == TRUE]
+    ret <- pList
     
     intPred <- if (negate) function(i, t) i < t else function(i, t) i >= t
     
     if (!is.null(absIntThr))
-        pList <- pList[intPred(intensity, absIntThr)]
+        ret <- ret[intPred(intensity, absIntThr)]
     
-    if (!is.null(relIntThr) && nrow(pList) > 0)
+    if (!is.null(relIntThr) && nrow(ret) > 0)
     {
-        thr <- max(pList$intensity) * relIntThr
-        pList <- pList[intPred(intensity, thr)]
+        thr <- max(ret$intensity) * relIntThr
+        ret <- ret[intPred(intensity, thr)]
     }
     
-    if (!is.null(topMost) && nrow(pList) > topMost)
+    if (!is.null(topMost) && nrow(ret) > topMost)
     {
         if (negate)
-            ord <- order(pList$intensity)
+            ord <- order(ret$intensity)
         else
-            ord <- order(-pList$intensity)
-        pList <- pList[ord[seq_len(topMost)]]
+            ord <- order(-ret$intensity)
+        ret <- ret[ord[seq_len(topMost)]]
     }
     
     if (deIsotope)
-        pList <- deIsotopeMSPeakList(pList, negate)
+        ret <- deIsotopeMSPeakList(ret, negate)
     
     # re-add precursor if necessary
-    if (retainPrecursor && nrow(prec) > 0 && !any(pList$precursor))
+    if (retainPrecursor && !any(ret$precursor))
     {
-        pList <- rbind(pList, prec)
-        setorderv(pList, "mz")
+        prec <- pList[precursor == TRUE]
+        if (nrow(prec) > 0)
+        {
+            ret <- rbind(ret, prec)
+            setorderv(ret, "mz")
+        }
     }
     
-    return(pList)
+    return(ret)
 }
 

@@ -37,6 +37,7 @@
 - collapse averagedPeakLists
 - test avg params
 - metadata() generic?
+- change subset arg order?
 
 
 ## compounds

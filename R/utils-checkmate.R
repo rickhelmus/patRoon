@@ -199,6 +199,21 @@ assertAvgPListParams <- function(x, .var.name = checkmate::vname(x), add = NULL)
     assertVal(checkmate::assertFlag, "retainPrecursorMSMS")
 }
 
+assertPListIsolatePrecParams <- function(x, .var.name = checkmate::vname(x), add = NULL)
+{
+    if (is.null(x))
+        return(NULL)
+    
+    checkmate::assertList(x, names = "unique", .var.name = .var.name) # no add: should fail
+    
+    assertVal <- function(f, v, ...) f(x[[v]], ..., .var.name = paste0(.var.name, "$", v), add = add)
+    
+    assertVal(checkmate::assertCount, "maxIsotopes")
+    assertVal(checkmate::assertNumeric, "mzDefectRange", any.missing = FALSE, len = 2, finite = TRUE)
+    assertVal(checkmate::assertNumeric, "intRange", any.missing = FALSE, len = 2, finite = TRUE)
+    assertVal(checkmate::assertCount, "z", positive = TRUE)
+}
+
 # from https://github.com/mllg/checkmate/issues/115
 aapply = function(fun, formula, ..., fixed = list())
 {

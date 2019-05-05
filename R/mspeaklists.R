@@ -241,6 +241,10 @@ setMethod("as.data.table", "MSPeakLists", function(x, fGroups = NULL, averaged =
 #'   intensity threshold for MS or MS/MS peak lists. \code{NULL} for none.
 #' @param topMSPeaks,topMSMSPeaks Only consider this amount of MS or MS/MS peaks
 #'   with highest intensity. \code{NULL} to consider all.
+#' @param isolatePrec If not \code{NULL} then a \code{list} with parameters used
+#'   for isolating the precursor and its isotopes in MS peak lists (see below).
+#'   Alternatively, \code{TRUE} to apply the filter with default settings (as
+#'   given with \code{getDefIsolatePrecParams}).
 #' @param deIsotopeMS,deIsotopeMSMS Remove any isotopic peaks in MS or MS/MS
 #'   peak lists. This may improve data processing steps which do not assume the
 #'   presence of isotopic peaks (e.g. MetFrag for MS/MS). Note that
@@ -254,17 +258,63 @@ setMethod("as.data.table", "MSPeakLists", function(x, fGroups = NULL, averaged =
 #'   setting.
 #' @param negate If \code{TRUE} then filters are applied in opposite manner.
 #'
+#' @section Isolating precursor data: Formula calculation typically relies on
+#'   evaluating the measured isotopic pattern from the precursor to score
+#'   candidates. Since the MS1 spectra, which are used to obtain this isotopic
+#'   pattern, are typically very 'noisy' due to background and co-eluting ions,
+#'   an additional filtering step is recommended prior to formula calculation.
+#'   During this precursor isolation step all mass peaks are removed that are
+#'   (1) not the precursor and (2) not likely to be an isotopologue of the
+#'   precursor. To determine this the following parameters exist:
+#'
+#'   \itemize{
+#'
+#'   \item \code{maxIsotopes} The maximum number of isotopes to consider. For
+#'   instance, a value of \samp{5} means that \code{M+0} (\emph{i.e.} the
+#'   monoisoptic peak) till \code{M+5} is considered. All mass peaks outside
+#'   this range are removed.
+#'
+#'   \item \code{mzDefectRange} A two-sized \code{vector} specifying the minimum
+#'   (can be negative) and maximum \emph{m/z} defect deviation compared to the
+#'   precursor \emph{m/z} defect. When chlorinated, brominated or other
+#'   compounds with strong \emph{m/z} defect in their isotopologues are to be
+#'   considered a higher range may be desired. On the other hand, for natural
+#'   compounds this range may be tightened. Note that the search range is
+#'   propegated with increasing distance from the precursor, \emph{e.g.} the
+#'   search range is doubled for \code{M+2}, tripled for \code{M+3} etc.
+#'
+#'   \item \code{intRange} A two-sized \code{vector} specifying the minimum and
+#'   maximum relative intensity range compared to the precursor. For instance,
+#'   \code{c(0.001, 2)} removes all peaks that have an intensity below 0.1% are
+#'   above 200% of that of the precursor.
+#'
+#'   \item \code{z} The \code{z} value (\emph{i.e. absolute charge) to be
+#'   considerd. For instance, a value of \code{2} would look for \code{M+0.5},
+#'   \code{M+1} etc. Note that the \code{mzDefectRange} is adjusted accordingly
+#'   (\emph{e.g.} halved if \code{z=2}).
+#'
+#'   }
+#'   
+#'   The default values can be obtained with the \code{getDefIsolatePrecParams} function:
+#'   
+#'   @eval paste0("@@section Isolating precursor data:",
+#'      getDefAvgPListParamsRD())
+#'
 #' @export
 setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntThr = NULL, relMSIntThr = NULL,
                                             relMSMSIntThr = NULL, topMSPeaks = NULL, topMSMSPeaks = NULL,
-                                            deIsotopeMS = FALSE, deIsotopeMSMS = FALSE, withMSMS = FALSE,
-                                            retainPrecursorMSMS = TRUE, negate = FALSE)
+                                            isolatePrec = NULL, deIsotopeMS = FALSE, deIsotopeMSMS = FALSE,
+                                            withMSMS = FALSE, retainPrecursorMSMS = TRUE, negate = FALSE)
 {
+    if (is.logical(isolatePrec) && isolatePrec == TRUE)
+        isolatePrec <- getDefIsolatePrecParams()
+    
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertNumber, . ~ absMSIntThr + absMSMSIntThr + relMSIntThr + relMSMSIntThr,
            lower = 0, finite = TRUE, null.ok = TRUE, fixed = list(add = ac))
     aapply(checkmate::assertCount, . ~ topMSPeaks + topMSMSPeaks, positive = TRUE,
            null.ok = TRUE, fixed = list(add = ac))
+    assertPListIsolatePrecParams(isolatePrec, add = ac)
     aapply(checkmate::assertFlag, . ~ deIsotopeMS + deIsotopeMSMS + withMSMS + retainPrecursorMSMS + negate, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
 
@@ -272,7 +322,7 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
         return(obj)
 
     hash <- makeHash(obj, absMSIntThr, absMSMSIntThr, relMSIntThr, relMSMSIntThr,
-                     topMSPeaks, topMSMSPeaks, deIsotopeMS, deIsotopeMSMS,
+                     topMSPeaks, topMSMSPeaks, isolatePrec, deIsotopeMS, deIsotopeMSMS,
                      withMSMS, retainPrecursorMSMS, negate)
     cache <- loadCacheData("filterMSPeakLists", hash)
     if (!is.null(cache))
@@ -304,6 +354,25 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
                 ret$MSMS <- doMSPeakListFilter(pl[[grpi]]$MSMS, absMSMSIntThr, relMSMSIntThr, topMSMSPeaks,
                                                deIsotopeMSMS, retainPrecursorMSMS, negate)
 
+            if (!is.null(isolatePrec))
+            {
+                # UNDONE: negate
+                prec <- ret$MS[precursor == TRUE]
+                if (nrow(prec) == 1) # 0 if no precursor
+                {
+                    s <- seq_len(isolatePrec$maxIsotopes) / isolatePrec$z
+                    mzranges <- matrix(c(s + isolatePrec$mzDefectRange[1] * s,
+                                         s + isolatePrec$mzDefectRange[2] * s), ncol = 2) + prec$mz
+                    ret$MS <- ret$MS[precursor | (
+                        # only keep peaks with reasonable intensities
+                        intensity %between% (isolatePrec$intRange * prec$intensity) &
+                            
+                        # only keep with reasonably close m/z to precursor, taking
+                        # in to account larger windows for larger distances
+                        mz %inrange% mzranges)]
+                }
+            }
+            
             setTxtProgressBar(prog, grpi)
 
             return(pruneList(ret, checkZeroRows = TRUE))

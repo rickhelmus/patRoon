@@ -119,7 +119,8 @@ formulas <- generateFormulas(fGroups, "genform", plists, relMzDev = 5,
                              calculateFeatures = TRUE, featThreshold = 0.75)
 {{ endCodeBlock() }}
 {{ optionalCodeBlock(formulaOpts$algo == "Bruker") }}
-formulas <- generateFormulas(fGroups, "bruker", precursorMzSearchWindow = 0.002, featThreshold = 0.75)
+formulas <- generateFormulas(fGroups, "bruker", precursorMzSearchWindow = 0.002, featThreshold = 0.75,
+                             adduct = "{{ if (polarity == 'positive') '[M+H]+' else '[M-H]-' }}")
 {{ endCodeBlock() }}
 {{ optionalCodeBlock(formulaOpts$algo == "SIRIUS") }}
 formulas <- generateFormulas(fGroups, "sirius", plists, relMzDev = 5,

@@ -57,6 +57,7 @@
 - how to handle ranking of consensus results?
     - rank by one normalized column per algo? (GenForm: either MS_match or comb_match)
     - or simply don't and mention limitation in doc? (one limitation: filtering)
+- average scores for feature consensus?
 
 
 ## components

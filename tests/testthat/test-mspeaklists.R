@@ -125,6 +125,14 @@ test_that("filtering", {
 
     expect_lte(length(filter(plists, topMSMSPeaks = 5, retainPrecursorMSMS = FALSE)),
                length(filter(plists, topMSMSPeaks = 5)))
+
+    # isotopes for MS peak lists should not exceed M+5 (default)
+    expect_lte(max(as.data.table(filter(
+        plists, isolatePrec = getDefIsolatePrecParams()))[type == "MS", diff(range(mz)), by = "group"][[2]]), 5)
+    # half with z=2
+    expect_lte(max(as.data.table(filter(
+        plists, isolatePrec = getDefIsolatePrecParams(z=2)))[type == "MS", diff(range(mz)), by = "group"][[2]]), 2.5)
+
     # UNDONE: deisotope?
 })
 

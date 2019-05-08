@@ -15,7 +15,6 @@
 #' @import enviPick
 #' @import DBI
 #' @import RSQLite
-#' @import utils
 #' @import rhandsontable
 #' @import RColorBrewer
 #' @import shiny

@@ -337,17 +337,19 @@ generateFormConsensusForGroup <- function(formAnaList, formThreshold)
             formTable <- formTable[anaCoverage >= formThreshold] # Apply coverage filter
 
         # remove MS only formulas if MS/MS candidate is also present (do after
-        # coverage filter as is explained above).
+        # coverage filter).
         MSMSForms <- unique(formTable[byMSMS == TRUE, formula])
         formTable <- formTable[byMSMS == TRUE | !formula %in% MSMSForms]
 
-        # rank before duplicate removal: make sure to retain best scored candidate
+        # rank before duplicate removal and score averaging: make sure to retain best scored candidate
         formTable <- rankFormulaTable(formTable)
-
+        
+        # average scorings
+        avCols <- intersect(c(formulaScorings()$name, "error", "frag_error"), names(formTable))
+        formTable[, (avCols) := lapply(.SD, mean), by = byCols, .SDcols = avCols]
+        
         # Remove duplicate entries (do this after coverage!)
         formTable <- unique(formTable, by = byCols)
-
-        formTable[, "analysis" := NULL]
     }
 
     return(formTable)

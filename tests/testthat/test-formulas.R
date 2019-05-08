@@ -141,8 +141,8 @@ test_that("filtering works", {
     
     expect_equivalent(filter(formsGF, scoreLimits = list(isoScore = c(-Inf, Inf))), formsGF)
     expect_length(filter(formsGF, scoreLimits = list(isoScore = c(-Inf, Inf)), negate = TRUE), 0)
-    expect_lt(length(filter(formsGF, scoreLimits = list(isoScore = c(0.1, Inf)))), length(formsGF))
-    expect_lt(length(filter(formsGF, scoreLimits = list(isoScore = c(0.1, Inf)), negate = TRUE)), length(formsGF))
+    expect_lt(length(filter(formsGF, scoreLimits = list(isoScore = c(0.7, Inf)))), length(formsGF))
+    expect_lt(length(filter(formsGF, scoreLimits = list(isoScore = c(0.7, Inf)), negate = TRUE)), length(formsGF))
     expect_length(filter(formsGF, scoreLimits = list(MSMSScore = c(0, Inf))),
                   length(formsGFWithMSMS)) # should filter away MS only formulas
     expect_length(filter(formsGF, scoreLimits = list(MSMSScore = c(0, Inf)), negate = TRUE), 0)

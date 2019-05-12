@@ -704,7 +704,8 @@ setMethod("plotUpSet", "formulas", function(obj, ..., labels = NULL, nsets = len
 #'
 #' @export
 setMethod("consensus", "formulas", function(obj, ..., formThreshold = 0,
-                                            uniqueFrom = NULL, uniqueOuter = FALSE)
+                                            uniqueFrom = NULL, uniqueOuter = FALSE,
+                                            rankWeights = 1)
 {
     allFormulas <- c(list(obj), list(...))
 
@@ -712,6 +713,7 @@ setMethod("consensus", "formulas", function(obj, ..., formThreshold = 0,
     checkmate::assertList(allFormulas, types = "formulas", min.len = 2, any.missing = FALSE,
                           unique = TRUE, .var.name = "...", add = ac)
     checkmate::assertNumber(formThreshold, lower = 0, finite = TRUE, add = ac)
+    checkmate::assertNumber(rankWeights, lower = 0, finite = TRUE, add = ac)
     checkmate::reportAssertions(ac)
 
     allFormNames <- make.unique(sapply(allFormulas, algorithm))
@@ -720,12 +722,17 @@ setMethod("consensus", "formulas", function(obj, ..., formThreshold = 0,
     if (!is.null(uniqueFrom) && formThreshold != 0)
         stop("Cannot apply both unique and abundance filters simultaneously.")
 
+    rankWeights <- rep(rankWeights, length.out = length(allFormulas))
+    
     allFormulasLists <- sapply(seq_along(allFormulas), function(fi)
     {
         return(lapply(formulaTable(allFormulas[[fi]]), function(ft)
         {
             ret <- copy(ft)
             ret[, mergedBy := allFormNames[fi]]
+            ranks <- seq_len(length(unique(ret$formula)))
+            ret[, rank := ranks[.GRP], by = "formula"]
+            ret[, rankscore := (.N - (rank - 1)) / .N * rankWeights[fi]]
             setnames(ret, paste0(names(ret), "-", allFormNames[fi]))
             return(ret)
         }))
@@ -768,6 +775,7 @@ setMethod("consensus", "formulas", function(obj, ..., formThreshold = 0,
                 mergeCols <- c("formula", "byMSMS") # put byMSMS in there anyway in case only left/right has MSMS
                 if (haveLeftMSMS && haveRightMSMS)
                     mergeCols <- c(mergeCols, "frag_formula")
+                
                 mTable <- merge(consFormulaList[[grp]], rightFList[[grp]], all = TRUE,
                                 by.x = paste0(mergeCols, "-", leftName),
                                 by.y = paste0(mergeCols, "-", rightName))
@@ -836,7 +844,12 @@ setMethod("consensus", "formulas", function(obj, ..., formThreshold = 0,
             consFormulaList[[grpi]] <- consFormulaList[[grpi]][consFormulaList[[grpi]][, keep(mergedBy), by = "formula"][[2]]]
         }
 
-        consFormulaList[[grpi]] <- rankFormulaTable(consFormulaList[[grpi]])
+        rnames <- getAllFormulasCols("rankscore", names(consFormulaList[[grpi]]))
+        consFormulaList[[grpi]][, rankscore := rowSums(.SD, na.rm = TRUE) / length(rnames), .SDcols = rnames]
+        setorderv(consFormulaList[[grpi]], "rankscore", order = -1)
+        consFormulaList[[grpi]][, c(rnames, "rankscore") := NULL]
+        
+        # consFormulaList[[grpi]] <- rankFormulaTable(consFormulaList[[grpi]])
     }
 
     consFormulaList <- pruneList(consFormulaList, checkZeroRows = TRUE)

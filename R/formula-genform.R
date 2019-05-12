@@ -222,7 +222,11 @@ processGenFormResultFile <- function(file, isMSMS, adduct)
                            "frag_dbe", "MSMSScore", "combMatch"), names(forms))
     for (col in numCols)
         set(forms, j = col, value = as.numeric(forms[[col]]))
-
+    
+    chrCols <- intersect(c("formula", "frag_formula", "neutral_formula"), names(forms))
+    for (col in chrCols)
+        set(forms, j = col, value = as.character(forms[[col]]))
+    
     if (!is.null(forms[["frag_formula"]]))
         forms[byMSMS == TRUE, neutral_loss := as.character(Vectorize(subtractFormula)(formula, frag_formula))]
 

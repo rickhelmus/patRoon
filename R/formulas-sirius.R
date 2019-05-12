@@ -8,7 +8,7 @@ NULL
 processSiriusFormulas <- function(cmd, exitStatus, retries)
 {
     noResult <- forms <- data.table(neutral_formula = character(0), formula = character(0),
-                                    adduct = character(0), rank = integer(0), score = numeric(0), MSMSScore = numeric(0),
+                                    adduct = character(0), score = numeric(0), MSMSScore = numeric(0),
                                     isoScore = numeric(0), byMSMS = logical(0),
                                     frag_neutral_formula = character(0), frag_formula = character(0),
                                     frag_mz = numeric(0), frag_formula_mz = numeric(0), frag_intensity = numeric(0),
@@ -50,6 +50,7 @@ processSiriusFormulas <- function(cmd, exitStatus, retries)
             forms[, frag_formula := calculateIonFormula(frag_neutral_formula, cmd$adduct)]
             forms[, neutral_loss := as.character(Vectorize(subtractFormula)(formula, frag_formula))]
             forms[, byMSMS := TRUE]
+            forms[, rank := NULL]
 
             # Precursor is always present in MS/MS spectrum: it's added by
             # SIRIUS if necessarily (with zero intensity). Remove it and use its
@@ -58,7 +59,7 @@ processSiriusFormulas <- function(cmd, exitStatus, retries)
             forms <- forms[frag_intensity != 0 | formula != frag_formula]
 
             # set nice column order
-            setcolorder(forms, c("neutral_formula", "formula", "adduct", "rank", "score", "MSMSScore", "isoScore", "byMSMS",
+            setcolorder(forms, c("neutral_formula", "formula", "adduct", "score", "MSMSScore", "isoScore", "byMSMS",
                                  "frag_neutral_formula", "frag_formula", "frag_mz", "frag_formula_mz", "frag_intensity", "neutral_loss",
                                  "explainedPeaks", "explainedIntensity"))
 

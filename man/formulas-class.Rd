@@ -69,7 +69,7 @@
   nsets = length(list(...)) + 1, nintersects = NA, upsetArgs = NULL)
 
 \S4method{consensus}{formulas}(obj, ..., formThreshold = 0,
-  uniqueFrom = NULL, uniqueOuter = FALSE)
+  uniqueFrom = NULL, uniqueOuter = FALSE, rankWeights = 1)
 }
 \arguments{
 \item{obj, x, object, formulas}{The \code{formulas} object.}
@@ -233,6 +233,11 @@ of the objects given for the consensus. Set to \code{NULL} to ignore.}
 \item{uniqueOuter}{If \code{uniqueFrom} is not \code{NULL} and if
 \code{uniqueOuter=TRUE}: only retain data that are also unique between
 objects specified in \code{uniqueFrom}.}
+
+\item{rankWeights}{A numeric vector with weights of to calulcate the mean
+ranking score for each candidate. The value will be re-cycled if necessary,
+hence, the default value of \samp{1} means equal weights for all considered
+objects.}
 }
 \value{
 \code{formulaTable} returns a \code{list} containing for each feature
@@ -316,7 +321,13 @@ outlining unique and shared formula candidates of up to five different
 candidates between different \code{formula} objects.
 
 \item \code{consensus}: Generates a consensus of results from multiple
-\code{formulas} objects.
+\code{formulas} objects. In order to rank the consensus candidates, first
+each of the candidates are scored based on their original ranking
+(the scores are normalized and the highest ranked candidate gets value
+\samp{1}). The (weighted) mean is then calculated for all scorings of each
+candidate to derive the final ranking (if an object lacks the candidate its
+score will be \samp{0}). The original rankings for each object is stored in
+the \code{rank} columns.
 }}
 
 \section{Slots}{

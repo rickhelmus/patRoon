@@ -6,6 +6,7 @@
     * `GenForm` formula calculation with `MSMode="both"` (the default): instead of repeating calculations with and without MS/MS data and combining the data, it now simply does either of the two depending on MS/MS data availability. The old behavior turned out to be redundant, hence, calculation is now a bit faster.
     * `GenForm` now perform _precursor isolation_ to cleanup MS1 data prior to formula calculation. During this step any mass peaks that are unlikely part of the isotopic pattern of the feature are removed, which otherwise would penalize the isotopic scoring. The result is that isotopic scoring is dramatically improved now. This filter step is part of new filter functionality for `MSPeakLists`, see `?MSPeakLists` and `?generateFormulas` for more information.
     * When formula consensus are made from multiple features the scorings and mass errors are now averaged (instead of taking the values from the best ranked feature).
+    * Improved ranking of candidates from a consensus of multiple formula objects (see `?formulas`).
 
 ## March 2019
 * `reportMD()`: most time consuming plots are now cached. Hence, re-reporting should be signficiantly faster now.

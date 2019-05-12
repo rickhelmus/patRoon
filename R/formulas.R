@@ -13,7 +13,7 @@ NULL
 #'   \code{formulaTable} method for access.
 #' @slot scoreRanges The original min/max values of all scorings when candidate
 #'   results were generated. This is used for normalization.
-#' 
+#'
 #' @param obj,x,object,formulas The \code{formulas} object.
 #' @param \dots For \code{plotSpec}: Further arguments passed to
 #'   \code{\link[graphics]{plot}}.
@@ -37,7 +37,7 @@ NULL
 #' @templateVar optionalji TRUE
 #' @templateVar dollarOpName feature group
 #' @template sub_op-args
-#' 
+#'
 #' @templateVar normParam normalizeScores
 #' @templateVar excludeParam excludeNormScores
 #' @template norm-args
@@ -63,10 +63,10 @@ formulas <- setClass("formulas", slots = c(formulas = "list", featureFormulas = 
 setMethod("initialize", "formulas", function(.Object, ...)
 {
     .Object <- callNextMethod(.Object, ...)
-    
+
     # NOTE: change this if topMost filter for formulas is ever implemented
     .Object@scoreRanges <- sapply(.Object@formulas, calculateFormScoreRanges, simplify = FALSE)
-    
+
     return(.Object)
 })
 
@@ -235,11 +235,11 @@ setMethod("as.data.table", "formulas", function(x, fGroups = NULL, average = FAL
                                        normalizeScores == "minmax", excludeNormScores))
         })
     }
-    
+
     ret <- rbindlist(fTable, fill = TRUE, idcol = "group")
     if (length(ret) == 0)
         return(ret)
-    
+
     if (!is.null(fGroups))
     {
         ret[, c("ret", "mz") := groupInfo(fGroups)[group, ]]
@@ -328,7 +328,7 @@ setMethod("filter", "formulas", function(obj, minExplainedFragPeaks = NULL, elem
     aapply(checkmate::assertCharacter, . ~ elements + fragElements + lossElements,
            min.chars = 1, min.len = 1, null.ok = TRUE, fixed = list(add = ac))
     checkmate::assertList(scoreLimits, null.ok = TRUE, types = "numeric", add = ac)
-    
+
     if (!is.null(scoreLimits))
     {
         checkmate::assertNames(names(scoreLimits), type = "unique", subset.of = scCols, add = ac)
@@ -373,7 +373,7 @@ setMethod("filter", "formulas", function(obj, minExplainedFragPeaks = NULL, elem
                                   by = "formula"][[2]]
                 formTable <- formTable[keep]
             }
-            
+
             if (!is.null(lossElements))
             {
                 keep <- formTable[, rep(any(sapply(neutral_loss, checkFormula, lossElements, negate = negate)), .N),
@@ -439,7 +439,7 @@ setMethod("filter", "formulas", function(obj, minExplainedFragPeaks = NULL, elem
 #'
 #' @param onlyAnnotated Set to \code{TRUE} to filter out any peaks that could
 #'   not be annotated.
-#' 
+#'
 #' @export
 setMethod("annotatedPeakList", "formulas", function(obj, precursor, groupName, analysis = NULL, MSPeakLists,
                                                     onlyAnnotated = FALSE)
@@ -451,7 +451,7 @@ setMethod("annotatedPeakList", "formulas", function(obj, precursor, groupName, a
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
     checkmate::assertFlag(onlyAnnotated, add = ac)
     checkmate::reportAssertions(ac)
-    
+
     if (!is.null(analysis))
     {
         formTable <- obj[[analysis, groupName]]
@@ -462,10 +462,10 @@ setMethod("annotatedPeakList", "formulas", function(obj, precursor, groupName, a
         formTable <- obj[[groupName]]
         spec <- MSPeakLists[[groupName]][["MSMS"]]
     }
-    
+
     if (is.null(spec))
         return(NULL)
-    
+
     formTable <- formTable[byMSMS == TRUE & formula == precursor]
     if (nrow(formTable) > 0)
     {
@@ -479,7 +479,7 @@ setMethod("annotatedPeakList", "formulas", function(obj, precursor, groupName, a
             spec <- spec[, PLIndex := NULL]
         }
     }
-    
+
     if (onlyAnnotated)
     {
         if (is.null(spec[["formula"]]))
@@ -487,7 +487,7 @@ setMethod("annotatedPeakList", "formulas", function(obj, precursor, groupName, a
         else
             spec <- spec[!is.na(formula)]
     }
-    
+
     return(spec[])
 })
 
@@ -507,19 +507,19 @@ setMethod("plotScores", "formulas", function(obj, precursor, groupName, analysis
     checkmate::assertCharacter(excludeNormScores, min.chars = 1, null.ok = TRUE, add = ac)
     checkmate::assertFlag(useGGPlot2, add = ac)
     checkmate::reportAssertions(ac)
-    
+
     if (!is.null(analysis))
         formTable <- obj[[analysis, groupName]]
     else
         formTable <- obj[[groupName]]
-    
+
     if (is.null(formTable) || nrow(formTable) == 0 || !precursor %in% formTable$formula)
         return(NULL)
-    
+
     mcn <- character()
     if (!is.null(formTable[["mergedBy"]]))
         mcn <- unique(unlist(strsplit(formTable$mergedBy, ",", fixed = TRUE)))
-    
+
     if (normalizeScores != "none")
         formTable <- normalizeFormScores(formTable, obj@scoreRanges[[groupName]],
                                          normalizeScores == "minmax", excludeNormScores)
@@ -539,11 +539,11 @@ setMethod("plotScoresHash", "formulas", function(obj, precursor, groupName, anal
         formTable <- obj[[groupName]]
     if (is.null(formTable) || nrow(formTable) == 0 || !precursor %in% formTable$formula)
         return(NULL)
-    
+
     mb <- formTable[["mergedBy"]]
     if (normalizeScores == "none")
         formTable <- formTable[formula == precursor]
-    
+
     return(makeHash(precursor, formTable, formTable$mb, normalizeScores, excludeNormScores, useGGPlot2))
 })
 
@@ -563,7 +563,7 @@ setMethod("plotScoresHash", "formulas", function(obj, precursor, groupName, anal
 #' @template useGGplot2
 #'
 #' @template plot-lim
-#' 
+#'
 #' @template fsubscript_source
 #'
 #' @return \code{plotSpec} will return a \code{\link[=ggplot2]{ggplot object}}
@@ -589,7 +589,7 @@ setMethod("plotSpec", "formulas", function(obj, precursor, groupName, analysis =
     spec <- annotatedPeakList(obj, precursor, groupName, analysis, MSPeakLists)
     if (is.null(spec))
         return(NULL)
-    
+
     if (useGGPlot2)
         return(makeMSPlotGG(spec) + ggtitle(title))
 
@@ -689,12 +689,22 @@ setMethod("plotUpSet", "formulas", function(obj, ..., labels = NULL, nsets = len
 })
 
 #' @describeIn formulas Generates a consensus of results from multiple
-#'   \code{formulas} objects.
+#'   \code{formulas} objects. In order to rank the consensus candidates, first
+#'   each of the candidates are scored based on their original ranking
+#'   (the scores are normalized and the highest ranked candidate gets value
+#'   \samp{1}). The (weighted) mean is then calculated for all scorings of each
+#'   candidate to derive the final ranking (if an object lacks the candidate its
+#'   score will be \samp{0}). The original rankings for each object is stored in
+#'   the \code{rank} columns.
 #'
 #' @param formThreshold Fractional minimum amount (0-1) of which a formula
 #'   candidate should be present within all objects. For instance, a value of
 #'   \samp{0.5} means that a particular formula should be present in at least
 #'   \samp{50\%} of all objects.
+#' @param rankWeights A numeric vector with weights of to calulcate the mean
+#'   ranking score for each candidate. The value will be re-cycled if necessary,
+#'   hence, the default value of \samp{1} means equal weights for all considered
+#'   objects.
 #'
 #' @templateVar what formulas
 #' @template consensus-unique-args
@@ -723,7 +733,7 @@ setMethod("consensus", "formulas", function(obj, ..., formThreshold = 0,
         stop("Cannot apply both unique and abundance filters simultaneously.")
 
     rankWeights <- rep(rankWeights, length.out = length(allFormulas))
-    
+
     allFormulasLists <- sapply(seq_along(allFormulas), function(fi)
     {
         return(lapply(formulaTable(allFormulas[[fi]]), function(ft)
@@ -775,7 +785,7 @@ setMethod("consensus", "formulas", function(obj, ..., formThreshold = 0,
                 mergeCols <- c("formula", "byMSMS") # put byMSMS in there anyway in case only left/right has MSMS
                 if (haveLeftMSMS && haveRightMSMS)
                     mergeCols <- c(mergeCols, "frag_formula")
-                
+
                 mTable <- merge(consFormulaList[[grp]], rightFList[[grp]], all = TRUE,
                                 by.x = paste0(mergeCols, "-", leftName),
                                 by.y = paste0(mergeCols, "-", rightName))
@@ -848,12 +858,12 @@ setMethod("consensus", "formulas", function(obj, ..., formThreshold = 0,
         consFormulaList[[grpi]][, rankscore := rowSums(.SD, na.rm = TRUE) / length(rnames), .SDcols = rnames]
         setorderv(consFormulaList[[grpi]], "rankscore", order = -1)
         consFormulaList[[grpi]][, c(rnames, "rankscore") := NULL]
-        
+
         # consFormulaList[[grpi]] <- rankFormulaTable(consFormulaList[[grpi]])
     }
 
     consFormulaList <- pruneList(consFormulaList, checkZeroRows = TRUE)
-    
+
     cat("Done!\n")
 
     return(formulas(formulas = consFormulaList, featureFormulas = list(),

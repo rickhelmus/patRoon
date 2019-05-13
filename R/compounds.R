@@ -278,7 +278,7 @@ setMethod("filter", "compounds", function(obj, minExplainedPeaks = NULL, minScor
                 cols <- getAllCompCols(sc, names(cmpTable), mCompNames)
                 if (length(cols) == 0)
                     next
-                
+
                 keep <- cmpTable[, do.call(pmin, c(.SD, list(na.rm = TRUE))) >= scoreLimits[[sc]][1] &
                                      do.call(pmax, c(.SD, list(na.rm = TRUE))) <= scoreLimits[[sc]][2],
                                  .SDcols = cols]
@@ -547,7 +547,7 @@ setMethod("plotScores", "compounds", function(obj, index, groupName, normalizeSc
     scoreCols <- getAllCompCols(c(getCompScoreColNames(), getCompSuspectListColNames()), names(compTable), mcn)
     if (onlyUsed)
         scoreCols <- intersect(scoreCols, obj@scoreTypes)
-    
+
     makeScoresPlot(compTable[index, scoreCols, with = FALSE], mcn, useGGPlot2)
 })
 
@@ -558,10 +558,10 @@ setMethod("plotScoresHash", "compounds", function(obj, index, groupName, normali
     compTable <- compoundTable(obj)[[groupName]]
     if (is.null(compTable) || nrow(compTable) == 0 || index > nrow(compTable))
         return(NULL)
-    
+
     if (normalizeScores == "none")
         compTable <- compTable[index]
-    
+
     return(makeHash(index, compTable, normalizeScores, excludeNormScores, onlyUsed, useGGPlot2))
 })
 
@@ -570,39 +570,39 @@ setMethod("plotScoresHash", "compounds", function(obj, index, groupName, normali
 #'
 #' @param onlyAnnotated Set to \code{TRUE} to filter out any peaks that could
 #'   not be annotated.
-#' 
+#'
 #' @export
 setMethod("annotatedPeakList", "compounds", function(obj, index, groupName, MSPeakLists, formulas = NULL,
                                                      onlyAnnotated = FALSE)
 {
     checkmate::assertClass(formulas, "formulas", null.ok = TRUE)
-    
+
     allFGroups <- groupNames(obj)
     if (!is.null(formulas))
         allFGroups <- union(allFGroups, groupNames(formulas))
-    
+
     ac <- checkmate::makeAssertCollection()
     checkmate::assertCount(index, positive = TRUE, add = ac)
     assertChoiceSilent(groupName, allFGroups, add = ac)
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
     checkmate::assertFlag(onlyAnnotated, add = ac)
     checkmate::reportAssertions(ac)
-    
+
     spec <- MSPeakLists[[groupName]][["MSMS"]]
     if (is.null(spec))
         return(NULL)
-    
+
     spec <- copy(spec)
     spec[, PLIndex := seq_len(nrow(spec))] # for merging
-    
+
     compTable <- compoundTable(obj)[[groupName]]
     fragInfo <- NULL
     if (!is.null(compTable) && nrow(compTable) > 0)
     {
         compr <- compTable[index, ]
         fragInfo <- compr$fragInfo[[1]]
-    }   
-    
+    }
+
     formTable <- formulas[[groupName]]
     if (!is.null(formTable))
     {
@@ -619,12 +619,12 @@ setMethod("annotatedPeakList", "compounds", function(obj, index, groupName, MSPe
                 fragInfo <- mergeFragInfo(fragInfo, formFragInfo, algorithm(obj), algorithm(formulas))
         }
     }
-    
+
     if (!is.null(fragInfo) && nrow(fragInfo) > 0)
         spec <- merge(spec, fragInfo[, -c("intensity", "mz")], all.x = TRUE, by = "PLIndex")
-    
+
     spec <- spec[, PLIndex := NULL]
-    
+
     if (onlyAnnotated)
     {
         if (is.null(spec[["formula"]]))
@@ -632,7 +632,7 @@ setMethod("annotatedPeakList", "compounds", function(obj, index, groupName, MSPe
         else
             spec <- spec[!is.na(formula)]
     }
-    
+
     return(spec[])
 })
 
@@ -643,7 +643,7 @@ setMethod("annotatedPeakList", "compounds", function(obj, index, groupName, MSPe
 #'   spectrum.
 #' @param title The title of the plot. If \code{NULL} a title will be
 #'   automatically made.
-#'   
+#'
 #' @template fsubscript_source
 #'
 #' @template plot-lim
@@ -806,7 +806,7 @@ setMethod("plotSpecHash", "compounds", function(obj, index, groupName, MSPeakLis
     compTable <- compoundTable(obj)[[groupName]]
     if (is.null(compTable) || nrow(compTable) == 0)
         return(NULL)
-    
+
     return(makeHash(compTable[index, ], annotatedPeakList(obj, index, groupName, MSPeakLists, formulas),
                     plotStruct, title, useGGPlot2, xlim, ylim, ...))
 })
@@ -898,10 +898,8 @@ setMethod("plotUpSet", "compounds", function(obj, ..., labels = NULL, nsets = le
 setMethod("mergedCompoundNames", "compounds", function(compounds) character(0))
 setMethod("mergedCompoundNames", "compoundsConsensus", function(compounds) compounds@mergedCompNames)
 
-#' @describeIn compounds Generates a consensus from multiple \code{compounds}
-#'   objects. The compound results will be merged and optionally compounds will
-#'   be filtered by their occurrence throughout the specified \code{compounds}
-#'   objects.
+#' @templateVar what compounds
+#' @template consensus-form_comp
 #'
 #' @param compThreshold Minimal fraction (0-1) that a candidate must be present
 #'   within all given \code{compounds} objects.
@@ -921,7 +919,8 @@ setMethod("mergedCompoundNames", "compoundsConsensus", function(compounds) compo
 #' @export
 setMethod("consensus", "compounds", function(obj, ..., compThreshold = 0.0,
                                              uniqueFrom = NULL, uniqueOuter = FALSE,
-                                             minMaxNormalization = FALSE, mergeScoresFunc = sum)
+                                             minMaxNormalization = FALSE,
+                                             rankWeights = 1)
 {
     allCompounds <- c(list(obj), list(...))
 
@@ -929,12 +928,13 @@ setMethod("consensus", "compounds", function(obj, ..., compThreshold = 0.0,
     checkmate::assertList(allCompounds, types = "compounds", min.len = 2, any.missing = FALSE,
                           unique = TRUE, .var.name = "...", add = ac)
     checkmate::assertNumber(compThreshold, lower = 0, finite = TRUE, add = ac)
-    checkmate::assertFunction(mergeScoresFunc, add = ac)
+    checkmate::assertNumber(rankWeights, lower = 0, finite = TRUE, add = ac)
     checkmate::reportAssertions(ac)
 
     if (!is.null(uniqueFrom) && compThreshold != 0)
         stop("Cannot apply both unique and abundance filters simultaneously.")
 
+    rankWeights <- rep(rankWeights, length.out = length(allCompounds))
     compNames <- sapply(allCompounds, algorithm)
     if (anyDuplicated(compNames))
     {
@@ -979,6 +979,9 @@ setMethod("consensus", "compounds", function(obj, ..., compThreshold = 0.0,
             }
 
             ret[, mergedBy := compNames[cmpi]]
+            ret[, rank := seq_len(.N)]
+            ret[, rankscore := (.N - (rank - 1)) / .N * rankWeights[cmpi]]
+
             setnames(ret, paste0(names(ret), "-", compNames[[cmpi]]))
 
             return(ret)
@@ -1083,7 +1086,6 @@ setMethod("consensus", "compounds", function(obj, ..., compThreshold = 0.0,
     {
         paste0(cmp@scoreTypes, "-", cn)
     }))
-    scoreTypes <- union(scoreTypes, "score")
 
     scRanges <- Reduce(modifyList, mapply(allCompounds, compNames, SIMPLIFY = FALSE, FUN = function(cmp, cn)
     {
@@ -1120,21 +1122,10 @@ setMethod("consensus", "compounds", function(obj, ..., compThreshold = 0.0,
             mCompList[[grpi]] <- mCompList[[grpi]][mCompList[[grpi]][, sapply(mergedBy, keep)]]
         }
 
-        # set scores after filtering: otherwise normalized values are out of date
-        scoreCols <- grep("score-", colnames(mCompList[[grpi]]), value = TRUE)
-        if (length(scoreCols) > 0 && nrow(mCompList[[grpi]]) > 0)
-        {
-            scores <- mCompList[[grpi]][, lapply(.SD, normalize, minMax = minMaxNormalization), .SDcols = scoreCols]
-
-            for (r in seq_len(nrow(mCompList[[grpi]])))
-            {
-                scoreRow <- scores[r]
-                scoreRow[is.na(scoreRow)] <- 0
-                set(mCompList[[grpi]], r, "score", mergeScoresFunc(scoreRow))
-            }
-            setorder(mCompList[[grpi]], -score)
-            scRanges[[names(mCompList)[grpi]]]$score <- range(mCompList[[grpi]]$score)
-        }
+        rnames <- getAllCompCols("rankscore", names(mCompList[[grpi]]), compNames)
+        mCompList[[grpi]][, rankscore := rowSums(.SD, na.rm = TRUE) / length(rnames), .SDcols = rnames]
+        setorderv(mCompList[[grpi]], "rankscore", order = -1)
+        mCompList[[grpi]][, c(rnames, "rankscore") := NULL]
     }
 
     cat("Done!\n")

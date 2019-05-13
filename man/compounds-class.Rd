@@ -86,7 +86,7 @@
 
 \S4method{consensus}{compounds}(obj, ..., compThreshold = 0,
   uniqueFrom = NULL, uniqueOuter = FALSE,
-  minMaxNormalization = FALSE, mergeScoresFunc = sum)
+  minMaxNormalization = FALSE, rankWeights = 1)
 }
 \arguments{
 \item{obj, object, x, compounds}{The \code{compound} object.}
@@ -250,6 +250,11 @@ of (merged) scoring columns. \code{FALSE} will apply normalization to the
 maximum value. Scorings with negative values will always be min-max
 normalized.}
 
+\item{rankWeights}{A numeric vector with weights of to calulcate the mean
+ranking score for each candidate. The value will be re-cycled if necessary,
+hence, the default value of \samp{1} means equal weights for all considered
+objects.}
+
 \item{mergeScoresFunc}{Function used to calculate the total score for all
 (merged) score columns.}
 }
@@ -352,10 +357,14 @@ outlining unique and shared compound candidates of up to five different
 candidates between different \code{compounds} objects. Comparison is made
 on \code{InChIKey1}.
 
-\item \code{consensus}: Generates a consensus from multiple \code{compounds}
-objects. The compound results will be merged and optionally compounds will
-be filtered by their occurrence throughout the specified \code{compounds}
-objects.
+\item \code{consensus}: Generates a consensus of results from multiple
+objects. In order to rank the consensus candidates, first
+each of the candidates are scored based on their original ranking
+(the scores are normalized and the highest ranked candidate gets value
+\samp{1}). The (weighted) mean is then calculated for all scorings of each
+candidate to derive the final ranking (if an object lacks the candidate its
+score will be \samp{0}). The original rankings for each object is stored in
+the \code{rank} columns.
 }}
 
 \section{Slots}{

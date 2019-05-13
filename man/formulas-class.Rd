@@ -321,7 +321,7 @@ outlining unique and shared formula candidates of up to five different
 candidates between different \code{formula} objects.
 
 \item \code{consensus}: Generates a consensus of results from multiple
-\code{formulas} objects. In order to rank the consensus candidates, first
+objects. In order to rank the consensus candidates, first
 each of the candidates are scored based on their original ranking
 (the scores are normalized and the highest ranked candidate gets value
 \samp{1}). The (weighted) mean is then calculated for all scorings of each

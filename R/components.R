@@ -451,7 +451,7 @@ setMethod("plotSpec", "components", function(obj, index, markFGroup = NULL, useG
 setMethod("plotSpecHash", "components", function(obj, index, markFGroup = NULL, useGGPlot2 = FALSE,
                                                  xlim = NULL, ylim = NULL, ...)
 {
-    return(makeHash(obj[[index]], markFGroup, title, useGGPlot2, xlim, ylim, ...))
+    return(makeHash(obj[[index]], markFGroup, useGGPlot2, xlim, ylim, ...))
 })
 
 #' @describeIn components Plot an extracted ion chromatogram (EIC) for all

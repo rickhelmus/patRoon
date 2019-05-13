@@ -12,3 +12,5 @@ if (doDATests())
     revertDAAnalyses(getDAAnaInfo())
     clearCache("featuresBruker")
 }
+
+options(datatable.auto.index = FALSE) # should make tests more reproducible

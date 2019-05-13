@@ -346,9 +346,10 @@ recursiveApplyDT <- function(l, f, appl = lapply, ...)
     return(rec(l))
 }
 
-stripDTRef <- function(dt)
+prepareDTForComparison <- function(dt)
 {
     setattr(dt, ".internal.selfref", NULL)
+    setindex(dt, NULL)
 }
 
 getCSVStr <- function(df, ...)

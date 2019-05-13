@@ -7,7 +7,7 @@ makeHash <- function(...)
     args <- list(...)
 
     # strip DT self refs as they sometimes mess up hashing
-    args <- recursiveApplyDT(args, function(dt) stripDTRef(copy(dt)), sapply, simplify = FALSE)
+    args <- recursiveApplyDT(args, function(dt) prepareDTForComparison(copy(dt)), sapply, simplify = FALSE)
 
     return(digest::digest(args, algo = "xxhash64"))
 }

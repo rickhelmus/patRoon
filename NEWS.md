@@ -8,6 +8,7 @@
     * When formula consensus are made from multiple features the scorings and mass errors are now averaged (instead of taking the values from the best ranked feature).
     * Improved ranking of candidates from a consensus of multiple formula objects (see `?formulas`).
 * Consensus for compounds are now similarly ranked as formulas.
+* More consistent minimum abundance arguments for `consensus()` (`absMinAbundance` and `relMinAbundance`)
 
 ## March 2019
 * `reportMD()`: most time consuming plots are now cached. Hence, re-reporting should be signficiantly faster now.

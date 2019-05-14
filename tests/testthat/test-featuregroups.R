@@ -163,7 +163,7 @@ test_that("verify feature group comparison", {
 
     expect_known_value(groups(fGCons), testFile("fg-comp-cons"))
 
-    expect_lt(length(consensus(fGCompOpenMS, relAbundance = 1)), length(fGCons))
+    expect_lt(length(consensus(fGCompOpenMS, relMinAbundance = 1)), length(fGCons))
     expect_length(fgCompOneEmpty, 2)
     expect_length(fGConsOneEmpty, length(fgOpenMS))
     expect_length(fgCompBothEmpty, 2)
@@ -171,9 +171,9 @@ test_that("verify feature group comparison", {
 
     expect_equal(length(consensus(fGCompOpenMS, uniqueFrom = 1)) +
                  length(consensus(fGCompOpenMS, uniqueFrom = 2)) +
-                 length(consensus(fGCompOpenMS, relAbundance = 1)), length(fGCons))
+                 length(consensus(fGCompOpenMS, relMinAbundance = 1)), length(fGCons))
     expect_equal(length(consensus(fGCompOpenMS, uniqueFrom = 1:2, uniqueOuter = TRUE)) +
-                 length(consensus(fGCompOpenMS, relAbundance = 1)), length(fGCons))
+                 length(consensus(fGCompOpenMS, relMinAbundance = 1)), length(fGCons))
     expect_length(consensus(fGCompOpenMS, uniqueFrom = 1:2), length(fGCons))
     expect_lt(length(consensus(fGCompOpenMS, uniqueFrom = 1:2, uniqueOuter = TRUE)), length(fGCons))
     expect_length(consensus(fgCompBothEmpty, uniqueFrom = 1), 0)
@@ -244,7 +244,7 @@ test_that("plotting works", {
                  length(filter(fgOpenMS, rGroups = "standard")))
     expect_equal(expect_plot(plotVenn(fGCompOpenMS))$areas[2], length(fgXCMS))
     expect_equal(expect_plot(plotVenn(fGCompOpenMS))$intersectionCounts,
-                 length(consensus(fGCompOpenMS, relAbundance = 1)))
+                 length(consensus(fGCompOpenMS, relMinAbundance = 1)))
 
     # vdiffr doesn't work with UpSet
     expect_plot(plotUpSet(fgOpenMS))

@@ -216,14 +216,14 @@ test_that("consensus works", {
     skip_if_not(doMetFrag && doSIRIUS)
     expect_known_value(compsCons, testFile("compounds-cons"))
     expect_known_show(compsCons, testFile("compounds-cons", text = TRUE))
-    expect_lt(length(consensus(compsMF, compsSIR, compThreshold = 1)), length(compsCons))
+    expect_lt(length(consensus(compsMF, compsSIR, relMinAbundance = 1)), length(compsCons))
     expect_length(consensus(compsMFEmptyPL, compsSIREmptyPL), 0)
     
     expect_equal(length(consensus(compsMF, compsSIR, uniqueFrom = 1)) +
                  length(consensus(compsMF, compsSIR, uniqueFrom = 2)) +
-                 length(consensus(compsMF, compsSIR, compThreshold = 1)), length(compsCons))
+                 length(consensus(compsMF, compsSIR, relMinAbundance = 1)), length(compsCons))
     expect_equal(length(consensus(compsMF, compsSIR, uniqueFrom = 1:2, uniqueOuter = TRUE)) +
-                 length(consensus(compsMF, compsSIR, compThreshold = 1)), length(compsCons))
+                 length(consensus(compsMF, compsSIR, relMinAbundance = 1)), length(compsCons))
     expect_length(consensus(compsMF, compsSIR, uniqueFrom = 1:2), length(compsCons))
     expect_lt(length(consensus(compsMF, compsSIR, uniqueFrom = 1:2, uniqueOuter = TRUE)), length(compsCons))
     expect_length(consensus(compsMFEmptyPL, compsSIREmptyPL, uniqueFrom = 1), 0)
@@ -296,7 +296,7 @@ test_that("plotting works", {
     expect_equal(expect_plot(plotVenn(compsMF, compsSIREmpty))$areas[1], length(compsMF))
     expect_equal(expect_plot(plotVenn(compsMFEmpty, compsSIR))$areas[2], length(compsSIR))
     expect_equal(expect_plot(plotVenn(compsMF, compsSIR))$intersectionCounts,
-                 length(consensus(compsMF, compsSIR, compThreshold = 1)))
+                 length(consensus(compsMF, compsSIR, relMinAbundance = 1)))
     expect_equal(expect_plot(plotVenn(compsMF, compsSIREmpty))$intersectionCounts, 0)
     
     expect_plot(plotUpSet(compsMF, compsSIR))

@@ -84,8 +84,8 @@
 \S4method{plotUpSet}{compounds}(obj, ..., labels = NULL,
   nsets = length(list(...)) + 1, nintersects = NA, upsetArgs = NULL)
 
-\S4method{consensus}{compounds}(obj, ..., compThreshold = 0,
-  uniqueFrom = NULL, uniqueOuter = FALSE,
+\S4method{consensus}{compounds}(obj, ..., absMinAbundance = NULL,
+  relMinAbundance = NULL, uniqueFrom = NULL, uniqueOuter = FALSE,
   minMaxNormalization = FALSE, rankWeights = 1)
 }
 \arguments{
@@ -230,8 +230,12 @@ automatically made.}
 \item{upsetArgs}{A list with any further arguments to be passed to
 \code{\link[UpSetR]{upset}}. Set to \code{NULL} to ignore.}
 
-\item{compThreshold}{Minimal fraction (0-1) that a candidate must be present
-within all given \code{compounds} objects.}
+\item{absMinAbundance, relMinAbundance}{Minimum absolute or relative
+(\samp{0-1}) abundance across objects for a result to be kept. For
+instance, \code{relMinAbundance=0.5} means that a result should be present
+in at least half of the number of compared objects. Set to \samp{NULL} to
+ignore and keep all results. Limits cannot be set when \code{uniqueFrom} is
+not \code{NULL}.}
 
 \item{uniqueFrom}{Set this argument to only retain compounds that are unique
 within one or more of the objects for which the consensus is made.

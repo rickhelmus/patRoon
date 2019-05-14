@@ -30,8 +30,9 @@
 \S4method{plotChord}{featureGroupsComparison}(obj, addSelfLinks = FALSE,
   addRetMzPlots = TRUE, ...)
 
-\S4method{consensus}{featureGroupsComparison}(obj, relAbundance = 0,
-  absAbundance = 0, uniqueFrom = NULL, uniqueOuter = FALSE)
+\S4method{consensus}{featureGroupsComparison}(obj,
+  absMinAbundance = NULL, relMinAbundance = NULL, uniqueFrom = NULL,
+  uniqueOuter = FALSE)
 }
 \arguments{
 \item{\dots}{For \code{comparison}: \code{featureGroups} objects that should
@@ -67,10 +68,12 @@ represent non-shared data.}
 \item{addRetMzPlots}{Set to \code{TRUE} to enable \emph{m/z} \emph{vs}
 retention time scatter plots.}
 
-\item{relAbundance, absAbundance}{Feature groups with relative/absolute
-abundance below this number will be removed from the consensus. Set to
-\code{0} for no limits. Limits cannot be set when \code{uniqueFrom} is not
-\code{NULL}.}
+\item{absMinAbundance, relMinAbundance}{Minimum absolute or relative
+(\samp{0-1}) abundance across objects for a result to be kept. For
+instance, \code{relMinAbundance=0.5} means that a result should be present
+in at least half of the number of compared objects. Set to \samp{NULL} to
+ignore and keep all results. Limits cannot be set when \code{uniqueFrom} is
+not \code{NULL}.}
 
 \item{uniqueFrom}{Set this argument to only retain feature groups that are unique
 within one or more of the objects for which the consensus is made.

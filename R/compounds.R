@@ -901,8 +901,6 @@ setMethod("mergedCompoundNames", "compoundsConsensus", function(compounds) compo
 #' @templateVar what compounds
 #' @template consensus-form_comp
 #'
-#' @param compThreshold Minimal fraction (0-1) that a candidate must be present
-#'   within all given \code{compounds} objects.
 #' @param mergeScoresFunc Function used to calculate the total score for all
 #'   (merged) score columns.
 #' @param minMaxNormalization Set to \code{TRUE} to apply min-max normalization
@@ -911,13 +909,14 @@ setMethod("mergedCompoundNames", "compoundsConsensus", function(compounds) compo
 #'   normalized.
 #'
 #' @templateVar what compounds
-#' @template consensus-unique-args
+#' @template consensus-common-args
 #'
 #' @return \code{consensus} returns a \code{compounds} object that is produced
 #'   by merging multiple specified \code{compounds} objects.
 #'
 #' @export
-setMethod("consensus", "compounds", function(obj, ..., compThreshold = 0.0,
+setMethod("consensus", "compounds", function(obj, ..., absMinAbundance = NULL,
+                                             relMinAbundance = NULL,
                                              uniqueFrom = NULL, uniqueOuter = FALSE,
                                              minMaxNormalization = FALSE,
                                              rankWeights = 1)
@@ -927,12 +926,8 @@ setMethod("consensus", "compounds", function(obj, ..., compThreshold = 0.0,
     ac <- checkmate::makeAssertCollection()
     checkmate::assertList(allCompounds, types = "compounds", min.len = 2, any.missing = FALSE,
                           unique = TRUE, .var.name = "...", add = ac)
-    checkmate::assertNumber(compThreshold, lower = 0, finite = TRUE, add = ac)
     checkmate::assertNumber(rankWeights, lower = 0, finite = TRUE, add = ac)
     checkmate::reportAssertions(ac)
-
-    if (!is.null(uniqueFrom) && compThreshold != 0)
-        stop("Cannot apply both unique and abundance filters simultaneously.")
 
     rankWeights <- rep(rankWeights, length.out = length(allCompounds))
     compNames <- sapply(allCompounds, algorithm)
@@ -955,8 +950,10 @@ setMethod("consensus", "compounds", function(obj, ..., compThreshold = 0.0,
         compNames <- make.unique(compNames)
     }
 
-    assertConsUniqueArgs(uniqueFrom, uniqueOuter, compNames)
+    assertConsCommonArgs(absMinAbundance, relMinAbundance, uniqueFrom, uniqueOuter, compNames)
 
+    relMinAbundance <- max(NULLToZero(absMinAbundance) / length(allCompounds), NULLToZero(relMinAbundance))
+    
     # initialize all compound objects for merge: copy them, rename columns to
     # avoid duplicates and set merged by field of fragInfo.
     allCompTables <- lapply(seq_along(allCompounds), function(cmpi)
@@ -1106,8 +1103,8 @@ setMethod("consensus", "compounds", function(obj, ..., compThreshold = 0.0,
 
         mCompList[[grpi]][, coverage := sapply(mergedBy, function(mb) (countCharInStr(mb, ",") + 1) / length(allCompounds))]
 
-        if (compThreshold > 0)
-            mCompList[[grpi]] <- mCompList[[grpi]][coverage >= compThreshold]
+        if (relMinAbundance > 0)
+            mCompList[[grpi]] <- mCompList[[grpi]][coverage >= relMinAbundance]
         else if (!is.null(uniqueFrom))
         {
             if (!is.character(uniqueFrom))

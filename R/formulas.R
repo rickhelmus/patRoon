@@ -688,22 +688,18 @@ setMethod("plotUpSet", "formulas", function(obj, ..., labels = NULL, nsets = len
     do.call(UpSetR::upset, c(list(formTab, nsets = nsets, nintersects = nintersects), upsetArgs))
 })
 
-#' @templateVar what compounds
+#' @templateVar what formulas
 #' @template consensus-form_comp
 #'
-#' @param formThreshold Fractional minimum amount (0-1) of which a formula
-#'   candidate should be present within all objects. For instance, a value of
-#'   \samp{0.5} means that a particular formula should be present in at least
-#'   \samp{50\%} of all objects.
-#'
 #' @templateVar what formulas
-#' @template consensus-unique-args
+#' @template consensus-common-args
 #'
 #' @return \code{consensus} returns a \code{formulas} object that is produced by
 #'   merging results from multiple \code{formulas} objects.
 #'
 #' @export
-setMethod("consensus", "formulas", function(obj, ..., formThreshold = 0,
+setMethod("consensus", "formulas", function(obj, ..., absMinAbundance = NULL,
+                                            relMinAbundance = NULL,
                                             uniqueFrom = NULL, uniqueOuter = FALSE,
                                             rankWeights = 1)
 {
@@ -712,16 +708,14 @@ setMethod("consensus", "formulas", function(obj, ..., formThreshold = 0,
     ac <- checkmate::makeAssertCollection()
     checkmate::assertList(allFormulas, types = "formulas", min.len = 2, any.missing = FALSE,
                           unique = TRUE, .var.name = "...", add = ac)
-    checkmate::assertNumber(formThreshold, lower = 0, finite = TRUE, add = ac)
     checkmate::assertNumber(rankWeights, lower = 0, finite = TRUE, add = ac)
     checkmate::reportAssertions(ac)
 
     allFormNames <- make.unique(sapply(allFormulas, algorithm))
-    assertConsUniqueArgs(uniqueFrom, uniqueOuter, allFormNames)
+    assertConsCommonArgs(absMinAbundance, relMinAbundance, uniqueFrom, uniqueOuter, allFormNames)
 
-    if (!is.null(uniqueFrom) && formThreshold != 0)
-        stop("Cannot apply both unique and abundance filters simultaneously.")
-
+    relMinAbundance <- max(NULLToZero(absMinAbundance) / length(allFormulas), NULLToZero(relMinAbundance))
+    
     rankWeights <- rep(rankWeights, length.out = length(allFormulas))
 
     allFormulasLists <- sapply(seq_along(allFormulas), function(fi)
@@ -827,8 +821,8 @@ setMethod("consensus", "formulas", function(obj, ..., formThreshold = 0,
 
         consFormulaList[[grpi]][, coverage := length(unique(unlist(strsplit(mergedBy, ",")))) / length(allFormulas), by = "formula"]
 
-        if (formThreshold > 0)
-            consFormulaList[[grpi]] <- consFormulaList[[grpi]][coverage >= formThreshold]
+        if (relMinAbundance > 0)
+            consFormulaList[[grpi]] <- consFormulaList[[grpi]][coverage >= relMinAbundance]
         else if (!is.null(uniqueFrom))
         {
             if (!is.character(uniqueFrom))

@@ -233,20 +233,16 @@ setMethod("plotChord", "featureGroupsComparison",
 #' @details \code{consensus} combines all compared feature groups and averages
 #'   their retention, \emph{m/z} and intensity data.
 #'
-#' @param relAbundance,absAbundance Feature groups with relative/absolute
-#'   abundance below this number will be removed from the consensus. Set to
-#'   \code{0} for no limits. Limits cannot be set when \code{uniqueFrom} is not
-#'   \code{NULL}.
-#'   
 #' @templateVar what feature groups
-#' @template consensus-unique-args
+#' @template consensus-common-args
 #'
 #' @return \code{consensus} returns a \code{\link{featureGroups}} object with a
 #'   consensus from the compared feature groups.
 #'
 #' @rdname featureGroups-compare
 #' @export
-setMethod("consensus", "featureGroupsComparison", function(obj, relAbundance = 0, absAbundance = 0,
+setMethod("consensus", "featureGroupsComparison", function(obj, absMinAbundance = NULL,
+                                                           relMinAbundance = NULL,
                                                            uniqueFrom = NULL, uniqueOuter = FALSE)
 {
     # available info:
@@ -255,9 +251,7 @@ setMethod("consensus", "featureGroupsComparison", function(obj, relAbundance = 0
     # - original features --> from original feature groups
 
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertNumber(relAbundance, lower = 0, finite = TRUE, add = ac)
-    checkmate::assertNumber(absAbundance, lower = 0, finite = TRUE, add = ac)
-    assertConsUniqueArgs(uniqueFrom, uniqueOuter, names(obj), add = ac)
+    assertConsCommonArgs(absMinAbundance, relMinAbundance, uniqueFrom, uniqueOuter, names(obj), add = ac)
     checkmate::reportAssertions(ac)
 
     allAnaInfos <- lapply(obj@fGroupsList, analysisInfo)
@@ -266,9 +260,6 @@ setMethod("consensus", "featureGroupsComparison", function(obj, relAbundance = 0
     if (!all(sapply(allAnaInfos[-1], identical, allAnaInfos[[1]]))) # from https://stackoverflow.com/a/30850654
         stop("This function only works with feature groups with equal analyses")
 
-    if (!is.null(uniqueFrom) && (relAbundance != 0 || absAbundance != 0))
-        stop("Cannot apply both unique and abundance filters simultaneously.")
-    
     anaInfo <- allAnaInfos[[1]]
 
     # synchronize analyses
@@ -278,8 +269,8 @@ setMethod("consensus", "featureGroupsComparison", function(obj, relAbundance = 0
     fGroupsList <- obj@fGroupsList
     comparedFGroups <- obj@comparedFGroups
     
-    if (relAbundance > 0 || absAbundance > 0)
-        comparedFGroups <- minAnalysesFilter(comparedFGroups, absAbundance, relAbundance, verbose = FALSE)
+    if (!is.null(absMinAbundance) || !is.null(relMinAbundance))
+        comparedFGroups <- minAnalysesFilter(comparedFGroups, absMinAbundance, relMinAbundance, verbose = FALSE)
 
     if (!is.null(uniqueFrom))
     {

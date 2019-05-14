@@ -198,14 +198,14 @@ test_that("consensus works", {
     expect_known_value(fCons, testFile("formulas-cons"))
     expect_known_show(fCons, testFile("formulas-cons", text = TRUE))
     expect_setequal(groupNames(consensus(formsGF, formsSIR)), union(groupNames(formsGF), groupNames(formsSIR)))
-    expect_lt(length(consensus(formsGF, formsSIR, formThreshold = 1)), length(fCons))
+    expect_lt(length(consensus(formsGF, formsSIR, relMinAbundance = 1)), length(fCons))
     expect_length(consensus(formsGFEmpty, formsSIREmpty), 0)
     
     expect_equal(length(consensus(formsGF, formsSIR, uniqueFrom = 1)) +
                  length(consensus(formsGF, formsSIR, uniqueFrom = 2)) +
-                 length(consensus(formsGF, formsSIR, formThreshold = 1)), length(fCons))
+                 length(consensus(formsGF, formsSIR, relMinAbundance = 1)), length(fCons))
     expect_equal(length(consensus(formsGF, formsSIR, uniqueFrom = 1:2, uniqueOuter = TRUE)) +
-                 length(consensus(formsGF, formsSIR, formThreshold = 1)), length(fCons))
+                 length(consensus(formsGF, formsSIR, relMinAbundance = 1)), length(fCons))
     expect_length(consensus(formsGF, formsSIR, uniqueFrom = 1:2), length(fCons))
     expect_lt(length(consensus(formsGF, formsSIR, uniqueFrom = 1:2, uniqueOuter = TRUE)), length(fCons))
     expect_length(consensus(formsGFEmpty, formsSIREmpty, uniqueFrom = 1), 0)
@@ -265,7 +265,7 @@ test_that("plotting works", {
     expect_equal(expect_plot(plotVenn(formsGF, formsSIREmpty))$areas[1], length(formsGF))
     expect_equal(expect_plot(plotVenn(formsGFEmpty, formsSIR))$areas[2], length(formsSIR))
     expect_equal(expect_plot(plotVenn(formsGF, formsSIR))$intersectionCounts,
-                 length(consensus(formsGF, formsSIR, formThreshold = 1)))
+                 length(consensus(formsGF, formsSIR, relMinAbundance = 1)))
     expect_equal(expect_plot(plotVenn(formsGF, formsSIREmpty))$intersectionCounts, 0)
     
     expect_plot(plotUpSet(formsGF, formsSIR))

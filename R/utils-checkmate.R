@@ -121,13 +121,18 @@ assertXYLim <- function(x, ylim, .var.name = checkmate::vname(x), add = NULL)
     checkmate::assertNumeric(ylim, finite = TRUE, .var.name = "ylim", len = 2, null.ok = TRUE, add = add)
 }
 
-assertConsUniqueArgs <- function(x, uniqueOuter, objNames, .var.name = checkmate::vname(x), add = NULL)
+assertConsCommonArgs <- function(absMinAbundance, relMinAbundance, uniqueFrom, uniqueOuter, objNames, add = NULL)
 {
-    checkmate::assert(checkmate::checkLogical(x, min.len = 1, max.len = length(objNames), any.missing = FALSE, null.ok = TRUE),
-                      checkmate::checkIntegerish(x, lower = 1, upper = length(objNames), any.missing = FALSE),
-                      checkmate::checkSubset(x, objNames, empty.ok = FALSE),
-                      .var.name = .var.name)
+    checkmate::assertNumber(absMinAbundance, .var.name = "absMinAbundance", null.ok = TRUE, add = ac)
+    checkmate::assertNumber(relMinAbundance, .var.name = "relMinAbundance", null.ok = TRUE, add = ac)
+    checkmate::assert(checkmate::checkLogical(uniqueFrom, min.len = 1, max.len = length(objNames), any.missing = FALSE, null.ok = TRUE),
+                      checkmate::checkIntegerish(uniqueFrom, lower = 1, upper = length(objNames), any.missing = FALSE),
+                      checkmate::checkSubset(uniqueFrom, objNames, empty.ok = FALSE),
+                      .var.name = "uniqueFrom")
     checkmate::assertFlag(uniqueOuter, .var.name = "uniqueOuter", add = add)
+    
+    if (!is.null(uniqueFrom) && (!is.null(absMinAbundance) || !is.null(relMinAbundance)))
+        stop("Cannot apply both unique and abundance filters simultaneously.")
 }
 
 checkCSVFile <- function(x, cols)

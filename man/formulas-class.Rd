@@ -68,8 +68,9 @@
 \S4method{plotUpSet}{formulas}(obj, ..., labels = NULL,
   nsets = length(list(...)) + 1, nintersects = NA, upsetArgs = NULL)
 
-\S4method{consensus}{formulas}(obj, ..., formThreshold = 0,
-  uniqueFrom = NULL, uniqueOuter = FALSE, rankWeights = 1)
+\S4method{consensus}{formulas}(obj, ..., absMinAbundance = NULL,
+  relMinAbundance = NULL, uniqueFrom = NULL, uniqueOuter = FALSE,
+  rankWeights = 1)
 }
 \arguments{
 \item{obj, x, object, formulas}{The \code{formulas} object.}
@@ -217,10 +218,12 @@ generated title.}
 \item{upsetArgs}{A list with any further arguments to be passed to
 \code{\link[UpSetR]{upset}}. Set to \code{NULL} to ignore.}
 
-\item{formThreshold}{Fractional minimum amount (0-1) of which a formula
-candidate should be present within all objects. For instance, a value of
-\samp{0.5} means that a particular formula should be present in at least
-\samp{50\%} of all objects.}
+\item{absMinAbundance, relMinAbundance}{Minimum absolute or relative
+(\samp{0-1}) abundance across objects for a result to be kept. For
+instance, \code{relMinAbundance=0.5} means that a result should be present
+in at least half of the number of compared objects. Set to \samp{NULL} to
+ignore and keep all results. Limits cannot be set when \code{uniqueFrom} is
+not \code{NULL}.}
 
 \item{uniqueFrom}{Set this argument to only retain formulas that are unique
 within one or more of the objects for which the consensus is made.

@@ -339,8 +339,8 @@ generateFormulasGenForm <- function(fGroups, MSPeakLists, relMzDev = 5, adduct =
 
     formTable <- list()
     cacheDB <- openCacheDBScope() # open manually so caching code doesn't need to on each R/W access
-    baseHash <- makeHash(mainArgs)
-    setHash <- makeHash(fGroups, MSPeakLists, MSMode, isolatePrec, baseHash)
+    baseHash <- makeHash(mainArgs, MSMode, isolatePrec)
+    setHash <- makeHash(fGroups, MSPeakLists, baseHash)
     cachedSet <- loadCacheSet("formulasGenForm", setHash, cacheDB)
     formHashes <- character(0)
     gfBin <- getGenFormBin()

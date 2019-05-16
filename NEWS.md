@@ -9,6 +9,8 @@
     * Improved ranking of candidates from a consensus of multiple formula objects (see `?formulas`).
 * Consensus for compounds are now similarly ranked as formulas.
 * More consistent minimum abundance arguments for `consensus()` (`absMinAbundance` and `relMinAbundance`)
+* `MetFrag`: for-ident database and new statistical scores are now supported
+
 
 ## March 2019
 * `reportMD()`: most time consuming plots are now cached. Hence, re-reporting should be signficiantly faster now.

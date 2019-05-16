@@ -52,26 +52,33 @@ unifyMFNames <- function(mfr)
                  Identifier = "identifier",
                  PubChemNumberPatents = "numberPatents",
                  fragInfo = "fragInfo", # keep it
-                 PubChemNumberPubMedReferences = "pubMedReferences",
-                 ChemSpiderNumberPubMedReferences = "pubMedReferences",
                  FragmenterScore = "fragScore",
                  MolecularFormula = "formula",
-                 XlogP3 = "XlogP",
-                 CHEMSPIDER_XLOGP = "XlogP",
                  TrivialName = "compoundName",
                  CompoundName = "compoundName",
                  IUPACName = "compoundName",
+                 
+                 # PubChem
+                 XlogP3 = "XlogP",
+                 PubChemNumberPubMedReferences = "pubMedReferences",
+                 ChemSpiderNumberPubMedReferences = "pubMedReferences",
+                 
+                 # ChemSpider
+                 CHEMSPIDER_XLOGP = "XlogP",
                  CHEMSPIDER_ALOGP = "AlogP",
                  ChemSpiderNumberExternalReferences = "extReferenceCount",
                  ChemSpiderDataSourceCount = "dataSourceCount",
                  ChemSpiderReferenceCount = "referenceCount",
                  ChemSpiderRSCCount = "RSCCount",
+                 
                  OfflineMetFusionScore = "metFusionScore",
                  OfflineIndividualMoNAScore = "individualMoNAScore",
                  SmartsSubstructureInclusionScore = "smartsInclusionScore",
                  SmartsSubstructureExclusionScore = "smartsExclusionScore",
                  SuspectListScore = "suspectListScore",
                  RetentionTimeScore = "retentionTimeScore",
+                 AutomatedPeakFingerprintAnnotationScore = "peakFingerprintScore",
+                 AutomatedLossFingerprintAnnotationScore = "lossFingerprintScore",
 
                  # Dashboard variables
                  CASRN_DTXSID = "CASRN",
@@ -87,7 +94,11 @@ unifyMFNames <- function(mfr)
                  PUBCHEM_DATA_SOURCES = "pubChemDataSources",
                  TOX21SL = "TOX21SL",
                  "EXPOCAST_MEDIAN_EXPOSURE_PREDICTION_MG/KG-BW/DAY" = "EXPOCASTPredExpo",
-                 TOXCAST = "TOXCAST"
+                 TOXCAST = "TOXCAST",
+                 
+                 # FOR-IDENT
+                 ForIdentTonnage = "tonnage",
+                 ForIdentCategories = "categories"
                  )
 
     unNames <- unNames[names(unNames) %in% names(mfr)] # filter out missing
@@ -281,9 +292,9 @@ processMFResults <- function(comptab, spec, adduct, db, topMost, lfile = "")
 #' @param fragAbsMzDev Absolute mass deviation (in Da) for fragment matching.
 #'   Sets the \option{FragmentPeakMatchAbsoluteMassDeviation} option.
 #' @param database Compound database to use. Valid values are: \code{"pubchem"},
-#'   \code{"chemspider"}, \code{"toxcast"}, \code{"kegg"}, \code{"sdf"},
-#'   \code{"psv"} and \code{"csv"}. See section below for more information. Sets
-#'   the \code{MetFragDatabaseType} option.
+#'   \code{"chemspider"}, \code{"for-ident"}, \code{"toxcast"}, \code{"kegg"},
+#'   \code{"sdf"}, \code{"psv"} and \code{"csv"}. See section below for more
+#'   information. Sets the \code{MetFragDatabaseType} option.
 #' @param extendedPubChem If \code{database="pubchem"}: whether to use the
 #'   \emph{extended} database that includes information for compound scoring
 #'   (\emph{i.e.} number of patents/PubMed references). Note that downloading
@@ -387,7 +398,7 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
     aapply(checkmate::assertCount, . ~ topMost + maxCandidatesToStop, positive = TRUE, fixed = list(add = ac))
     aapply(checkmate::assertFlag, . ~ addTrivialNames, fixed = list(add = ac))
     checkmate::assertString(chemSpiderToken, add = ac)
-    checkmate::assertChoice(database, c("pubchem", "chemspider", "kegg", "sdf", "psv", "csv", "comptox"), add = ac)
+    checkmate::assertChoice(database, c("pubchem", "chemspider", "kegg", "for-ident", "sdf", "psv", "csv", "comptox"), add = ac)
     checkmate::assert(checkmate::checkFlag(extendedPubChem),
                       checkmate::checkChoice(extendedPubChem, "auto"),
                       .var.name = "extendedPubChem")
@@ -445,6 +456,7 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
                        pubchem = "PubChem",
                        chemspider = "ChemSpider",
                        kegg = "KEGG",
+                       "for-ident" = "FOR-IDENT",
                        sdf = "LocalSDF",
                        psv = "LocalPSV",
                        csv = "LocalCSV",

@@ -36,7 +36,6 @@
 
 ## MSPeakLists
 - isotope tagging is lost after averaging
-- most intense analysis as alternative to averaging?
 - collapse averagedPeakLists
 - test avg params
 - metadata() generic?
@@ -47,7 +46,6 @@
 - MetFrag: (buggy) trivial name fetching not needed anymore?
 - SIRIUS: use --auto-charge instead of manually fixing charge of fragments (or not? conflicting docs on what it does)
 - test score normalization?
-- add new MF stat and other scorings and make sure default normalization equals that of MF web
 - improve formula scoring
 - do something about negative H explained fragments by MF?
 
@@ -109,6 +107,7 @@
 
 - do something with sirius fingerprints?
 - fix compoundViewer
+- add new MF HD scorings and make sure default normalization equals that of MF web
 
 
 ## components

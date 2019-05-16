@@ -90,9 +90,9 @@ converted to it with \code{\link{as.adduct}}). Examples: \code{"[M-H]-"},
 \code{"[M+Na]+"}.}
 
 \item{database}{Compound database to use. Valid values are: \code{"pubchem"},
-\code{"chemspider"}, \code{"toxcast"}, \code{"kegg"}, \code{"sdf"},
-\code{"psv"} and \code{"csv"}. See section below for more information. Sets
-the \code{MetFragDatabaseType} option.}
+\code{"chemspider"}, \code{"for-ident"}, \code{"toxcast"}, \code{"kegg"},
+\code{"sdf"}, \code{"psv"} and \code{"csv"}. See section below for more
+information. Sets the \code{MetFragDatabaseType} option.}
 
 \item{extendedPubChem}{If \code{database="pubchem"}: whether to use the
 \emph{extended} database that includes information for compound scoring
@@ -300,7 +300,9 @@ before feature groups have been prioritized.
   NORMANSUSDAT         \tab NORMANSUSDAT                                     \tab comptox           \cr
   MASSBANKEU           \tab MASSBANKEU                                       \tab comptox           \cr
   TOX21SL              \tab TOX21SL                                          \tab comptox           \cr
-  TOXCAST              \tab TOXCAST                                          \tab comptox           
+  TOXCAST              \tab TOXCAST                                          \tab comptox           \cr
+  peakFingerprintScore \tab AutomatedPeakFingerprintAnnotationScore          \tab                   \cr
+  lossFingerprintScore \tab AutomatedLossFingerprintAnnotationScore          \tab                   
 }
 
  In addition, the \code{compoundScorings} function is also

@@ -190,6 +190,9 @@ getCompInfoList <- function(compResults, compIndex, addHTMLURL, mCompNames)
     # Dashboard
     ctext <- addValText(ctext, "%s", c("CASRN", "QCLevel"))
 
+    # FOR-IDENT
+    ctext <- addValText(ctext, "%s", c("tonnage", "categories"))
+    
     return(ctext)
 }
 

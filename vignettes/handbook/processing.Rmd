@@ -1,0 +1,692 @@
+# Processing workflow data
+
+The previous chapter mainly discussed how to create workflow data. This chapter will discuss how to _use_ the data.
+
+## Inspecting results
+
+Several generic functions exist that can be used to inspect data that is stored in a particular object (e.g. features, compounds etc):
+
+Generic                                             | Classes                       | Remarks
+--------------------------------------------------- | ----------------------------- | ------------------------------------------
+`length()`                                          | All                           | Returns the length of the object (e.g. number of features, compounds etc)
+`algorithm()`                                       | All                           | Returns the name of the algorithm used to generate the object. 
+`groupNames()`                                      | All                           | Returns all the unique identitifiers (or names) of the feature groups for which this object contains results.
+`names()`                                           | `featureGroups`, `components` | Returns names of the feature groups (similar to `groupNames()`) or components
+`show()`                                            | All                           | Prints general information.
+`"[["` / `"$"` operators                            | All                           | Extract general information, see below.
+`as.data.table()` / `as.data.frame()`               | All                           | Convert data to a `data.table` or `data.frame`, see below.
+`analysisInfo()`, `analyses()`, `replicateGroups()` | `features`, `featureGroups`   | Returns the [analysis information](#anaInfo), analyses or replicate groups for which this object contains data.
+`groupInfo()`                                       | `featureGroups`               | Returns feature group information (_m/z_ and retention time values).
+`componentInfo()`                                   | `components`                  | Returns information for all components.
+`annotatedPeakList()`                               | `formulas`, `compounds`       | Returns a table with annotated mass peaks (see below).
+
+The common `R` extraction operators `"[["`, `"$"` can be used to obtain data for a particular feature groups, analysis etc:
+
+```{r extrOp,eval=runData}
+# Feature table (only first columns for readability)
+fList[["standard-1"]][, 1:6]
+
+# Feature group intensities
+fGroups$M120_R328_81
+fGroups[[1, "M120_R328_81"]] # only first analysis
+
+# obtains list MS/MS peak list  (feature group averaged datas)
+mslists[["M120_R328_81"]]$MSMS
+
+# get all formula candidates for a feature group
+formulas[["M120_R328_81"]][, 1:7]
+
+# get all compound candidates for a feature group
+compounds[["M120_R328_81"]][, 1:4]
+
+# get a table with information of a component
+components[["CMP7"]][, 1:6]
+```
+
+A more sophisticated way to obtain data from a workflow object is to use `as.data.table()` or `as.data.frame()`. These functions will convert _all_ information within the object to a table (`data.table` or `data.frame`) and allow various options to add extra information. An advantage is that this common data format can be used with many other functions within `R`. The output is in a [tidy format](https://r4ds.had.co.nz/tidy-data.html).
+
+> **_NOTE_** If you are not familiar with `data.table` and want to know more see [data.table]. Briefly, this is a more efficient and largely compatible alternative to the regular `data.frame`.
+
+> **_NOTE_** The `as.data.frame()` methods defined in `patRoon` simply convert the results from `as.data.table()`, hence, both functions are equal in their usage and are defined for the same object classes.
+
+Some typical examples are shown below.
+
+```{r asDT,eval=runData}
+# obtain table with all features (only first columns for readability)
+as.data.table(fList)[, 1:6]
+
+# Returns group info and intensity values for each feature group
+as.data.table(fGroups, average = TRUE) # average intensities for replicates
+
+# Returns all peak lists for each feature group
+as.data.table(mslists)
+
+# Returns all formula candidates for each feature group with scoring
+# information, neutral loss etc
+as.data.table(formulas)[, 1:6]
+
+# Returns all compound candidates for each feature group with scoring and other metadata
+as.data.table(compounds)[, 1:4]
+
+# Returns table with all components (including feature group info, annotations etc)
+as.data.table(components)[, 1:6]
+```
+
+Finally, the `annotatedPeakList()` function is useful to inspect annotation results for a formula or compound candidate:
+
+```{r annPList,eval=runData}
+# formula annotations for for a formula candidate of feature group M120_R328_81
+annotatedPeakList(formulas, precursor = "C6H6N3", groupName = "M120_R328_81",
+                  MSPeakLists = mslists)
+
+# compound annotation for first candidate of feature group M120_R328_81
+annotatedPeakList(compounds, index = 1, groupName = "M120_R328_81",
+                  MSPeakLists = mslists)
+```
+
+
+More advanced examples for these functions are shown below.
+
+
+```{r inspEx,eval=FALSE}
+# Feature table, can also be accessed by numeric index
+fList[[1]]
+mslists[["standard-1", "M120_R328_81"]] # feature data (instead of feature group averaged)
+formulas[[1, "M120_R328_81"]] # feature data (if available, i.e. calculateFeatures=TRUE)
+components[["CMP1", 1]] # only for first feature group in component
+
+as.data.frame(fList) # classic data.frame format, works for all objects
+as.data.table(fGroups) # return non-averaged intensities (default)
+as.data.table(fGroups, features = TRUE) # include feature information
+as.data.table(mslists, averaged = FALSE) # peak lists each feature
+as.data.table(mslists, fGroups = fGroups) # add feature group information
+
+as.data.table(formulas, countElements = c("C", "H")) # include C/H counts (e.g. for van Krevelen plots)
+# report only top precursor and fragment formula. This yields in one row per feature group.
+as.data.table(formulas, maxFormulas = 1, maxFragFormulas = 1)
+# add various information for organic matter characterization (common elemental
+# counts/ratios, classifications etc)
+as.data.table(formulas, OM = TRUE)
+
+as.data.table(compounds, fGroups = fGroups) # add feature group informaion
+as.data.table(compounds, fragments = TRUE) # include information of all annotated fragments
+
+annotatedPeakList(formulas, precursor = "C6H6N3", groupName = "M120_R328_81",
+                  MSPeakLists = mslists, onlyAnnotated = TRUE) # only include annotated peaks
+annotatedPeakList(compounds, index = 1, groupName = "M120_R328_81",
+                  MSPeakLists = mslists, formulas = formulas) # include formula annotations
+```
+
+## Filtering
+
+During a non-target workflow it is not uncommon that some kind of data-cleanup is necessary. Datasets are often highly complex, which makes separating data of interest from the rest highly important. Furthermore, general cleanup typically improves the quality of the dataset, for instance by removing low scoring annotation results or features that are unlikely to be 'correct' (e.g. noise or present in blanks). For this reason `patRoon` supports _many_ different filters that easily clean data produced during the workflow in a highly customizable way.
+
+All major workflow objects (e.g. `featureGroups`, `compounds`, `components` etc.) support filtering operations by the `filter()` generic. This function takes the object to be filtered as first argument and any remaining arguments describe the desired filter options. The `filter()` generic function then returns the modified object back. Some examples are shown below.
+
+```{r filtGen,eval=FALSE}
+# remove low intensity (<500) features
+features <- filter(features, absMinIntensity = 500)
+
+# remove features with intensities lower than 5 times the blank
+fGroups <- filter(fGroups, blankThreshold = 5)
+
+# only retain compounds with >1 explained MS/MS peaks
+compounds <- filter(compounds, minExplainedPeaks = 1)
+```
+
+The following sections will provide a more detailed overview of available data filters.
+
+### Features
+
+There are many filters available for feature data:
+
+Filter                                     | Classes                     | Remarks
+------------------------------------------ | --------------------------- | ---------------------------------------------------------
+`absMinIntensity`, `relMinIntensity`       | `features`, `featureGroups` | Minimum intensity
+`preAbsMinIntensity`, `preRelMinIntensity` | `featureGroups`             | Minimum intensity prior to other filtering (see below)
+`retentionRange`, `mzRange`, `mzDefectRange`, `chromWidthRange` | `features`, `featureGroups` | Filter by feature properties
+`absMinAnalyses`, `relMinAnalyses`         | `featureGroups`             | Minimum feature abundance in all analyses
+`absMinReplicates`, `relMinReplicates`     | `featureGroups`             | Minimum feature abundance in different replicates
+`absMinFeatures`, `relMinFeatures`         | `featureGroups`             | Only keep analyses with at least this amount of features 
+`absMinReplicateAbundance`, `relMinReplicateAbundance` | `featureGroups` | Minimum feature abundance in a replicate group
+`maxReplicateIntRSD`                       | `featureGroups`             | Maximum relative standard deviation of feature intensities in a replicate group.
+`blankThreshold`                           | `featureGroups`             | Minimum intensity factor above blank intensity
+`rGroups`                                  | `featureGroups`             | Only keep (features of) these replicate groups
+
+Application of filters to feature data is important for (environmental) non-target analysis. Especially blank and replicate filters (i.e. `blankThreshold` and `absMinReplicateAbundance`/`relMinReplicateAbundance`) are important filters and are highly recommended to always apply for cleaning up your dataset.
+
+All filters are available for feature group data, whereas only a subset is available for feature objects. The main reason is that other filters need grouping of features between analyses. Regardless, in `patRoon` filtering feature data is less important, and typically only needed when the number of features are extremely large and direct grouping is undesired.
+
+From the table above you can notice that many filters concern both _absolute_ and _relative_ data (i.e. as prefixed with `abs` and `rel`). When a relative filter is used the value is scaled between _0_ and _1_. For instance:
+
+```{r filtFeatRel,eval=FALSE}
+# remove features not present in at least half of the analyses within a replicate group
+fGroups <- filter(fGroups, relMinReplicateAbundance = 0.5)
+```
+
+An advantage of relative filters is that you will not have to worry about the data size involved. For instance, in the above example the filter always takes half of the number of analyses within a replicate group, even when replicate groups have different number of analyses.
+
+Note that multiple filters can be specified at once. Especially for feature group data the order of filtering may impact the final results, this is explained further in the reference manual (i.e. ``?`feature-filtering` ``).
+
+Some examples are shown below.
+
+```{r filtFeat,eval=FALSE}
+# filter features prior to grouping: remove any features eluting before first 2 minutes
+fList <- filter(fList, retentionRange = c(120, Inf))
+
+# common filters for feature groups
+fGroups <- filter(fGroups,
+                  absMinIntensity = 500, # remove features <500 intensity
+                  relMinReplicateAbundance = 1, # features should be in all analysis of replicate groups
+                  maxReplicateIntRSD = 0.75, # remove features with intensity RSD in replicates >75%
+                  blankThreshold = 5, # remove features <5x intensity of (average) blank intensity
+                  removeBlanks = TRUE) # remove blank analyses from object afterwards
+
+# filter by feature properties
+fGroups <- filter(mzDefectRange = c(0.8, 0.9),
+                  chromWidthRange = c(6, 120))
+
+# remove features not present in at least 3 analyses
+fGroups <- filter(fGroups, absMinAnalyses = 3)
+
+# remove features not present in at least 20% of all replicate groups
+fGroups <- filter(fGroups, relMinReplicates = 0.2)
+
+# only keep data present in replicate groups "repl1" and "repl2"
+# all other features and analyses will be removed
+fGroups <- filter(fGroups, rGroups = c("repl1", "repl2"))
+```
+
+
+### Annotation
+
+There are various filters available for handling annotation data:
+
+Filter                                        | Classes                        | Remarks
+--------------------------------------------- | ------------------------------ | -------------------------------------------------
+`absMSIntThr`, `absMSMSIntThr`, `relMSIntThr`, `relMSMSIntThr` | `MSPeakLists` | Minimum intensity of mass peaks
+`topMSPeaks`, `topMSMSPeaks`                  | `MSPeakLists`                  | Only keep most intense mass peaks
+`withMSMS`                                    | `MSPeakLists`                  | Only keep results with MS/MS data
+`minExplainedFragPeaks`, `minExplainedPeaks`  | `formulas` / `compounds`       | Minimum number of annotated mass peaks
+`elements`, `fragElements`, `lossElements`    | `formulas`, `compounds`        | Restrain elemental composition
+`topMost`                                     | `formulas`, `compounds`        | Only keep highest ranked candidates 
+`minScore`, `minFragScore`, `minFormulaScore` | `compounds`                    | Minimum compound scorings
+`scoreLimits`                                 | `formulas`, `compounds`        | Minimum/Maximum scorings
+`OM`                                          | `formulas`                     | Only keep candidates with likely elemental composition found in organic matter
+
+Several intensity related filters are available to clean-up MS peak list data. For instance, the `topMSPeaks`/`topMSMSPeaks` filters provide a simple way to remove noisy data by only retaining a defined number of most intense mass peaks. Note that none of these filters will remove the mass peak of the feature from its MS peak list.
+
+The filters applicable to formula and compound annotation generally concern minimal scoring or chemical properties. The former is useful to remove unlikely candidates, whereas the second is useful to focus on certain study specific chemical properties (e.g. known neutral losses).
+
+Common examples are shown below.
+
+```{r filtAnn,eval=FALSE}
+# intensity filtering
+mslists <- filter(mslists,
+                  absMSIntThr = 500, # minimum MS mass peak intensity of 500
+                  relMSMSIntThr = 0.1) # minimum MS/MS mass peak intensity of 10%
+
+# only retain 10 most intens mass peaks
+# (feature mass is always retained)
+mslists <- filter(mslists, topMSPeaks = 10)
+
+# only keep formulae with 1-10 sulphur or phosphorus elements
+formulas <- filter(formulas, elements = c("S1-10", "P1-10"))
+
+# only keep candidates with MS/MS fragments that contain 1-10 carbons and 0-2 oxygens
+formulas <- filter(formulas, fragElements = "C1-10O0-2")
+
+# only keep candidates with CO2 neutral loss
+formulas <- filter(formulas, lossElements = "CO2")
+
+# only keep the 15 highest ranked candidates with at least 1 annotated MS/MS peak
+compounds <- filter(compounds, minExplainedPeaks = 1, topMost = 15)
+
+# minimum in-silico score
+compounds <- filter(compounds, minFragScore = 10)
+
+# candidate should be referenced in at least 1 patent
+# (only works if database lists number of patents, e.g. PubChem)
+compounds <- filter(compounds,
+                    scoreLimits = list(numberPatents = c(1, Inf))
+```
+
+### Components
+
+Finally several filters are available for components:
+
+Filter                       | Remarks
+---------------------------- | -----------------
+`size`                       | Minimum component size
+`adducts`, `isotopes`        | Filter features by adduct/istopes annotation
+`rtIncrement`, `mzIncrement` | Filter homologs by retention/mz increment range
+
+Note that these filters are only applied if the components contain the data the filter works on. For instance, filtering by adducts will _not_ affect components obtained from homologous series.
+
+As before, some typical examples are shown below.
+
+```{r filtComp,eval=FALSE}
+# only keep components with at least 4 features
+componInt <- filter(componInt, minSize = 4)
+
+# remove all features from components are not annotated as an adduct
+componRC <- filter(componRC, adducts = TRUE)
+
+# only keep protonated and sodium adducts
+componRC <- filter(componRC, adducts = c("[M+H]+", "[M+Na]+"))
+
+# remove all features not recognized as isotopes
+componRC <- filter(componRC, isotopes = FALSE)
+
+# only keep monoisotopic mass
+componRC <- filter(componRC, isotopes = 0)
+
+# min/max rt/mz increments for homologs
+componNT <- filter(componNT, rtIncrement = c(10, 30),
+                   mzIncrement = c(16, 50))
+```
+
+> **_NOTE_** As mentioned before, components are still in a relative young development phase and results should always be verified!
+
+### Negation
+
+All filters support _negation_: if enabled all specified filters will be executed in an opposite manner. Negation may not be so commonly used, but allows greater flexibility which is sometimes needed for advanced filtering steps. Furthermore, it is also useful to specifically isolate the data that otherwise would have been removed. Some examples are shown below.
+
+```{r filtNeg,eval=FALSE}
+# keep all features/analyses _not_ present from replicate groups "repl1" and "repl2"
+fGroups <- filter(fGroups, rGroups = c("repl1", "repl2"), negate = TRUE)
+
+# only retain features with a mass defect outside 0.8-0.9
+fGroups <- filter(mzDefectRange = c(0.8, 0.9), negate = TRUE)
+
+# remove candidates with CO2 neutral loss
+formulas <- filter(formulas, lossElements = "CO2", negate = TRUE)
+
+# select 15 worst ranked candidates
+compounds <- filter(compounds, topMost = 15, negate = TRUE)
+
+# only keep components with <5 features
+componInt <- filter(componInt, minSize = 5, negate = TRUE)
+```
+
+## Subsetting {#subset}
+
+The previous section discussed the `filter()` generic function to perform various data cleaning operations. A more generic way to select data is by _subsetting_: here you can manually specify which parts of an object should be retained. Subsetting is supported for all workflow objects and is performed by the R subset operator (`"["`). This operator either subsets by one or two arguments, which are referred to as the `i` and `j` arguments.
+
+Class           | Argument `i`   | Argument `j`   | Remarks
+--------------- | -------------- | -------------- | ------------------------------------------------
+`features`      | analyses       |                |
+`featureGroups` | analyses       | feature groups |
+`MSPeakLists`   | analyses       | feature groups | peak lists for feature groups will be re-averaged when subset on analyses (by default)
+`formulas`      | feature groups |                | 
+`compounds`     | feature groups |                |
+`components`    | components     | feature groups |
+
+For objects that support two-dimensional subsetting (e.g. `featureGroups`, `MSPeakLists`), either the `i` or `j` argument is optional. Furthermore, unlike subsetting a `data.frame`, the position of `i` and `j` does not change when only one argument is specified:
+
+```{r subsetArgs,eval=FALSE}
+df[1, 1] # subset data.frame by first row/column
+df[1] # subset by first column
+df[1, ] # subset by first row
+
+fGroups[1, 1] # subset by first analysis/feature group
+fGroups[, 1] # subset by first feature group (i.e. column)
+fGroups[1] # subset by first analysis (i.e. row)
+```
+
+The subset operator allows three types of input:
+
+* A logical vector: elements are selected if corresponding values are `TRUE`.
+* A numeric vector: select elements by numeric index.
+* A character vector: select elements by their name.
+
+When a logical vector is used as input it will be re-cycled if necessary. For instance, the following will select by the first, third, fifth, etc. analysis.
+
+```{r subsetCyc,eval=FALSE}
+fGroups[c(TRUE, FALSE)]
+```
+
+In order to select by a `character` you will need to know the names for each element. These can, for instance, be obtained by the `groupNames()` (feature group names), `analyses()` (analysis names) and `names()` (names for components or feature groups for `featureGroups` objects) generic functions.
+
+Some more examples of common subsetting operations are shown below.
+
+```{r subsetting,eval=FALSE}
+# select first three analyses
+fList[1:3]
+
+# select first three analyses and first 500 feature groups
+fGroups[1:3, 1:500]
+
+# select all feature groups from first component
+fGroupsNT <- fGroups[, componNT[[1]]$group]
+
+# only keep feature groups with formula annotation results
+fGroupsForms <- fGroups[, groupNames(formulas)]
+
+# only keep feature groups with either formula or compound annotation results
+fGroupsAnn <- fGroups[, union(groupNames(formulas), groupNames(compounds))]
+
+# select first 15 components
+components[1:15]
+
+# select by name
+components[c("CMP1", "CMP5")]
+
+# only retain feature groups in components for which compound annotations are
+# available
+components[, groupNames(compounds)]
+```
+
+### Prioritization workflow
+
+An important use case of subsetting is prioritization of data. For instance, after statistical analysis only certain feature groups are deemed relevant for the rest of the workflow. A common prioritization workflow is illustrated below:
+
+```{r prioriWorkflow,echo=FALSE}
+DiagrammeR::grViz("
+digraph Prioritization {
+  graph [ rankdir = LR ]
+  node [ shape = box,
+         fixedsize = true,
+         width = 2.3,
+         height = 1,
+         fontsize = 18,
+         fillcolor = darkseagreen1,
+         style = filled ]
+
+    'Object conversion' -> 'Prioritization' -> Subsetting
+}", height = 120, width = 500)
+```
+
+During the first step the workflow object is converted to a suitable format, most often using the `as.data.frame()` function. The converted data is then used as input for the prioritization strategy. Finally, these results are then used to select the data of interest in the original object.
+
+A very simplified example of such a process is shown below.
+
+```{r prioriEx,eval=FALSE}
+featTab <- as.data.frame(fGroups, average = TRUE)
+
+# prioritization: sort by (averaged) intensity of the "sample" replicate group
+# (from high to low) and then obtain the feature group identifiers of the top 5.
+featTab <- featTab[order(featTab$standard, decreasing = TRUE), ]
+groupsOfInterest <- featTab$group[1:5]
+
+# subset the original data
+fGroups <- fGroups[, groupsOfInterest]
+
+# fGroups now only contains the feature groups for which intensity values in the
+# "sample" replicate group were in the top 5
+```
+
+## Unique and overlapping features {#unOv}
+
+Often an analysis batch is composed of different sample groups, such as different treatments, influent/effluent etc. In such scenarios it may be highly interesting to evaluate uniqueness or overlap between these samples. Furthermore, extracting overlapping or unique features is a simple but effective prioritization strategy.
+
+The `overlap()` and `unique()` functions can be used to extract overlapping and unique features between replicate groups, respectively. Both functions return a subset of the given `featureGroups` object. An overview of their arguments is given below.
+
+Argument     | Function(s)             | Remarks
+------------ | ----------------------- | ----------------------------------------------------------------
+`which`      | `unique()`, `overlap()` | The replicate groups to compare.
+`relativeTo` | `unique()`              | Only return unique features compared to these replicate groups (`NULL` for all). Replicate groups in `which` are ignored.
+`outer`      | `unique()`              | If `TRUE` then only return features which are _also_ unique among the compared replicates groups.
+`exclusive`  | `overlap`               | Only keep features that _only_ overlap between the compared replicate groups.
+
+Some examples:
+
+```{r compUn,eval=FALSE}
+# only keep features uniquely present in replicate group "repl1"
+fGroupsUn1 <- unique(fGroups, which = "repl1")
+# only keep features in repl1/repl2 which are not in repl3
+fGroupsUn2 <- unique(fGroups, which = c("repl1", "repl2"),
+                     relativeTo = "repl3")
+# only keep features that are only present in repl1 OR repl2
+fGroupsUn3 <- unique(fGroups, which = c("repl1", "repl2"),
+                     outer = TRUE)
+
+# only keep features overlapping in repl1/repl2
+fGroupsOv1 <- overlap(fGroups, which = c("repl1", "repl2"))
+# only keep features overlapping in repl1/repl2 AND are not present in any other
+# replicate group
+fGroupsOv2 <- overlap(fGroups, which = c("repl1", "repl2"),
+                      exclusive = TRUE)
+```
+
+In addition, several plotting functions are [discussed in the next section](#visComp) that visualize overlap and uniqueness of features.
+
+## Visualization
+
+### Features and annatation data
+
+Several generic functions are available to visualize feature and annotation data:
+
+Generic           | Classes                                              | Remarks
+----------------- | ---------------------------------------------------- | ---------------------------------------------------------------
+`plot()`          | `featureGroups`, `featureGroupsComparison`           | Scatter plot for retention and _m/z_ values
+`plotInt()`       | `featureGroups`                                      | Intensity profiles across analyses
+`plotEIC()`       | `featureGroups`, `components`                        | Plot extracted ion chromatograms (EICs)
+`plotSpec()`      | `MSPeakLists`, `formulas`, `compounds`, `components` | Plots (annotated) spectra
+`plotStructure()` | `compounds`                                          | Draws candidate structures
+`plotScores()`    | `formulas`, `compounds`                              | Barplot for candidate scoring
+
+The most common plotting functions are `plotEIC()`, which plots chromatographic data for features, and `plotSpec()`, which will plot (annotated) spectra. An overview of their most important function arguments are shown below.
+
+Argument                                      | Generic                   | Remarks
+--------------------------------------------- | ------------------------- | -------------------------------------------------------------------
+`rtWindow`                                    | `plotEIC()`               | Extra time (in s) +/- retention limits of plotted features (useful to zoom out)
+`mzWindow`                                    | `plotEIC()`               | m/z width of EICs (in Da)
+`retMin`                                      | `plotEIC()`               | If `TRUE` plot retention times in minutes
+`topMost`                                     | `plotEIC()`               | Only draw this amount of highest intensity features in each group.
+`showPeakArea`, `showFGroupRect`              | `plotEIC()`               | Fill peak areas / draw rectangles around feature groups?
+`title`                                       | `plotEIC()`, `plotSpec()` | Override plot title
+`colourBy`                                    | `plotEIC()`               | Colour individual feature groups (`"fGroups"`) or replicate groups (`"rGroups"`). By default nothing is coloured (`"none"`)
+`showLegend`                                  | `plotEIC()`               | Display a legend? (only if `colourBy!="none"`)
+`onlyPresent`                                 | `plotEIC()`               | Only plot EICs for analyses where a feature was detected? Setting to `FALSE` is useful to inspect if a feature was 'missed'.
+`xlim`, `ylim`                                | `plotEIC()`, `plotSpec()` | Override x/y axis ranges, i.e. to manually set plotting range.
+`groupName`, `analysis`, `precursor`, `index` | `plotSpec()`              | What to plot. See examples below.
+`MSLevel`                                     | `plotSpec()`              | Whether to plot an MS or MS/MS spectrum (only `MSPeakLists`)
+`formulas`                                    | `plotSpec()`              | Whether `formula` annotation should be added (only `compounds`)
+`plotStruct`                                  | `plotSpec()`              | Whether the structure should be added to the plot (only `compounds`)
+
+Note that we can use [subsetting](#subset) to select which feature data we want to plot, e.g.
+
+```{r plotEICSub,eval=runData}
+plotEIC(fGroups[1:2]) # only plot EICs from first and second analyses.
+plotEIC(fGroups[, 1]) # only plot all features of first group
+```
+
+The `plotStructure()` function will draw a chemical structure for a compound candidate. In addition, this function can draw the maximum common substructure (MCS) of multiple candidates in order to assess common structural features.
+
+```{r plotStruct,eval=runData,out.width="25%",fig.show="hold"}
+# structure for first candidate
+plotStructure(compounds, index = 1, groupName = "M120_R328_81")
+# MCS for first three candidates
+plotStructure(compounds, index = 1:3, groupName = "M120_R328_81")
+```
+
+Some other common and less common plotting operations are shown below.
+
+```{r plotFeatAnn,eval=runData}
+plot(fGroups) # simple scatter plot of retention and m/z values
+
+plotEIC(fGroups) # plot EICs for all features
+# get overview of all feature groups
+plotEIC(fGroups,
+        colourBy = "fGroup", # unique colour for each group
+        topMost = 1, # only most intense feature in each group
+        showPeakArea = TRUE, # show integrated areas
+        showFGroupRect = FALSE,
+        showLegend = FALSE) # no legend (too busy for many feature groups)
+plotEIC(fGroups[, 1], # only plot all features of first group
+        colourBy = "rGroup") # and mark them individually per replicate group
+plotEIC(components, index = 7, fGroups = fGroups) # EICs from a component
+
+
+plotSpec(mslists, "M120_R328_81") # non-annotated MS spectrum
+plotSpec(mslists, "M120_R328_81", MSLevel = 2) # non-annotated MS/MS spectrum
+# formula annotated spectrum
+plotSpec(formulas, precursor = "C6H9N2", groupName = "M120_R328_81",
+         MSPeakLists = mslists)
+# compound annotated spectrum, with added formula annotations
+plotSpec(compounds, index = 1, groupName = "M120_R328_81", MSPeakLists = mslists,
+         formulas = formulas)
+# custom intensity range (e.g. to zoom in)
+plotSpec(compounds, index = 1, groupName = "M120_R328_81", MSPeakLists = mslists,
+         ylim = c(0, 5000), plotStruct = FALSE)
+plotSpec(components, index = 7) # component spectrum
+```
+
+### Comparing data {#visComp}
+
+There are three functions that can be used to visualize overlap and uniqueness between data:
+
+Generic     | Classes
+----------- | ------------------------------------------------------------------- 
+`plotVenn`  | `featureGroups`, `featureGroupsComparison`, `formulas`, `compounds` 
+`plotUpSet` | `featureGroups`, `featureGroupsComparison`, `formulas`, `compounds` 
+`plotChord` | `featureGroups`, `featureGroupsComparison`
+
+The most simple comparison plot is a Venn diagram (i.e. `plotVenn()`). This function is especially useful for two or three-way comparisons. More complex comparisons are better visualized with [UpSet] diagrams (i.e. `plotUpSet()`). Finally, chord diagrams (i.e. `plotChord()`) provide visually pleasing diagrams to assess overlap between data.
+
+These functions can either be used to compare feature data or different objects of the same type. The former is typically used to compare overlap or uniqueness between features in different replicate groups, whereas comparison between objects is useful to visualize differences in algorithmic output. Besides visualization, note that both operations can also be performed to modify or combine objects (see [unique and overlapping features](#unOv) and [algorithm consensus](#consensus)).
+
+As usual, some examples are shown below.
+
+```{r prePlotComp,include=FALSE,eval=runData}
+fGroupsO <- fGroups
+fGroups <- fGroupsRG
+```
+
+```{r plotComp,eval=runData}
+plotUpSet(fGroups) # compare replicate groups
+plotVenn(fGroups, which = c("repl1", "repl2")) # compare some replicate groups
+plotChord(fGroups, average = TRUE) # overlap between replicate groups
+# compare with custom made groups
+plotChord(fGroups, average = TRUE,
+          outer = c(repl1 = "grp1", repl2 = "grp1", repl3 = "grp2", repl4 = "grp3"))
+
+# compare MetFrag and SIRIUS results
+plotVenn(compsMF, compsSIR,
+         labels = c("MF", "SIR")) # manual labeling
+```
+
+```{r postPlotComp,include=FALSE,eval=runData}
+fGroups <- fGroupsO
+```
+
+### Hierarchical clustering results {#plotClust}
+
+In `patRoon` hierarchical clustering is used to generate components based on their intensity profiles (see [intensity clustering](#intclust)) and to cluster candidate compounds with similar chemical structure (see [compound clustering](#compclust)). The functions below can be used to visualize their results.
+
+Generic             | Classes                                  | Remarks
+------------------- | ---------------------------------------- | --------------------------------------------------
+`plot()`            | `componentsIntClust`, `compoundsCluster` | Plots a dendrogram
+`plotInt()`         | `componentsIntClust`                     | Plots normalized intensity profiles in a cluster
+`plotHeatMap()`     | `componentsIntClust`                     | Plots an heatmap
+`plotSilhouettes()` | `componentsIntClust`                     | Plot silhouette information to determine the cluster amount
+`plotStructure()`   | `compoundsCluster`                       | Plots the maximum common substructure (MCS) of a cluster
+
+
+```{r plotClust,eval=runData}
+plot(componInt) # dendrogram
+plot(compsClust, groupName = "M120_R328_81") # dendrogram for clustered compounds
+plotInt(componInt, index = 4) # intensities of 4th cluster
+```
+
+```{r plotClust2,eval=runData,fig.height=6}
+plotHeatMap(componInt) # plot heatmap
+```
+
+```{r plotClust3,eval=runData}
+plotHeatMap(componInt, interactive = TRUE) # interactive heatmap (with zoom-in!)
+plotSilhouettes(componInt, 5:20) # plot silhouettes (e.g. to obtain ideal cluster amount)
+```
+
+### Interactive plotting of chromatography data
+
+The `plotEIC()` function introduced before can be used to visualize chromatography data for one or more features. An interactive alternative is to call the `checkChromatograms()` function. This function will launch a GUI that allows you to browse through all features and inspect their EICs. Simply pass in the `featureGroups` object you want to inspect:
+
+```{r checkChrom1,eval=FALSE}
+checkChromatograms(fGroups)
+```
+
+Note that this tool does not work well yet with large number of analyses/features. For this reason, it may be worthwile to launch it with subsets of your data, e.g.
+
+```{r checkChrom2,eval=FALSE}
+checkChromatograms(fGroups[1:3, 1:250]) # only first 3 analyses and their first 500 feature groups
+```
+
+Another purpose of the `checkChromatograms()` function is to remove 'bad' features (e.g. those which are probably not really features, but just noise). The workflow for this is:
+
+1. Launch `checkChromatograms()` and remove any unwanted feature groups by disabling the _keep_ checkbox.
+2. Store the result of the `checkChromatograms()` function to a variable.
+3. Use this variable to subset the original feature groups.
+
+To do so:
+
+```{r checkChrom3,eval=FALSE}
+keep <- checkChromatograms(fGroups)
+fGroups <- fGroups[, keep]
+```
+
+Note that when you re-run `checkChromatograms()` you can restore the state of which feature groups should be kept/removed by passing the previous result to the  function:
+
+```{r checkChrom4,eval=FALSE}
+keep <- checkChromatograms(fGroups) # select feature groups
+
+# continue at a later stage
+keep <- checkChromatograms(fGroups, enabledFGroups = keep)
+```
+
+> **_NOTE_** Again, `checkChromatograms()` may be slow when processing larger datasets. The [reporting functionalities](#report) provide a good alternative to quickly get an overview of all EIC data.
+
+### Generating EICs in DataAnalysis
+
+If you have Bruker data and the DataAnalysis software installed, you can automatically add EIC data in a DataAnalysis session. The `addDAEIC()` will do this for a single _m/z_ in one analysis, whereas the `addAllDAEICs()` function adds EICs for all features in a `featureGroups` object.
+
+```{r addDAEIC,eval=FALSE}
+# add a single EIC with background subtraction
+addDAEIC("mysample", "~/path/to/sample", mz = 120.1234, bgsubtr = TRUE)
+# add TIC for MS/MS signal of precursor 120.1234 (value of mz is ignored for TICs)
+addDAEIC("mysample", "~/path/to/sample", mz = 100, ctype = "TIC",
+         mtype = "MSMS", fragpath = "120.1234", name = "MSMS 120")
+
+addAllDAEICs(fGroups) # add EICs for all features
+addAllDAEICs(fGroups[, 1:50]) # as usual, subsetting can be used for partial data
+```
+
+## Reporting {#report}
+
+The previous sections showed various functionalies to inspect and visualize results. An easy and automated way to do this automatically is by using the _reporting_ functionality of `patRoon`. The following three reporting functions are available:
+
+* `reportCSV()`: exports workflow data to comma-separated value (csv) files
+* `reportPDF()`: generates simple reports by plotting workflow data in portable document files (PDFs)
+* `reportMD()`: generates interactive and easily explorable reports
+
+There are many different arguments available to configure the reporting process. Some common arguments are listed below; for a complete listing see the reference manual (e.g. `?reporting`).
+
+Argument                              | Functions                   | Remarks
+------------------------------------- | --------------------------- | ----------------------------------------------------------
+`fGroups`, `formulas`, `compounds`, `formulas`, `components`, `compsCluster` | All | Objects to plot. Only `fGroups` is mandatory.
+`MSPeakLists`                         | `reportPDF()`, `reportMD()` | The `MSPeakLists` object that was used to generate annotation data. Only needs to be specified if `formulas` or `compounds` are reported.
+`path`                                | All                         | Directory path where report files will be stored (`"report"` by default).
+`formulasTopMost`, `compoundsTopMost` | `reportPDF()`, `reportMD()` | Report no more than this amount of highest ranked candidates.
+`EICOnlyPresent`                      | `reportPDF()`, `reportMD()` | Only plot an EIC for an analysis if a feature was detected.
+`selfContained`                       | `reportMD()`                | Outputs to a single and self contained `.html` file. Handy to share reports, but not recommended for large amounts of data.
+
+Which data will be reported is fully configurable. The only workflow object that must be specified are the feature groups (i.e. with the `fGroups` argument), all other data (e.g. `compounds`, `components`) are optional. This means that reporting can be performed at every stage during the workflow, which, for instance, can be useful to quickly inspect results when testing out various settings to generate workflow data.
+
+When formula or compound results are reported with `reportPDF()` or `reportMD()` then only the top ranked candidates are considered. This limtation is often necessary as reporting many candidates will take considerable time. By default the top 5 for each feature group are reported, however, this number can be changed with the `formulasTopMost` and `compoundsTopMost` arguments.
+
+Some typical examples:
+
+```{r reporting,eval=FALSE}
+reportMD(fGroups) # simple interactive report with feature data
+# generate PDFs with feature and compound annotation data
+reportPDF(fGroups, compounds = compounds, MSPeakLists = mslists)
+reportCSV(fGroups, path = "myReport") # change destination path
+
+# generate report with all workflow types and increase maximum number of
+# compound candidates to top 10
+reportMD(fGroups, formulas = formulas, compounds = compounds,
+         components = components, MSPeakLists = mslists,
+         compsCluster = compsClust,
+         compoundsTopMost = 10)
+```

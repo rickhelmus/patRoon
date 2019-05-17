@@ -46,6 +46,7 @@ Imports:
     xcms,
     cluster,
     fastcluster,
+    gplots,
     d3heatmap,
     dynamicTreeCut,
     dendextend,
@@ -86,7 +87,8 @@ Suggests:
     vdiffr,
     patRoonData,
     devtools,
-    covr
+    covr,
+    DiagrammeR
 LinkingTo:
     Rcpp
 RdMacros:

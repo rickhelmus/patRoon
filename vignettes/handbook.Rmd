@@ -1,0 +1,36 @@
+---
+title: "patRoon handbook"
+author: "Rick Helmus"
+date: "`r Sys.Date()`"
+header-includes:
+- \usepackage{fvextra}
+- \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
+vignette: |
+  %\VignetteIndexEntry{Vignette Title} %\VignetteEngine{knitr::rmarkdown} %\VignetteEncoding{UTF-8}
+---
+
+```{r include=FALSE}
+vignDir <- "."
+```
+
+```{r child="handbook/setup.Rmd"}
+```
+
+```{r child="handbook/intro.Rmd"}
+```
+
+```{r child="handbook/installation.Rmd"}
+```
+
+```{r child="handbook/concepts.Rmd"}
+```
+
+```{r child="handbook/workflow_gen.Rmd"}
+```
+
+```{r child="handbook/processing.Rmd"}
+```
+
+```{r child="handbook/advanced.Rmd"}
+```
+

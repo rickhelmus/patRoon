@@ -14,7 +14,7 @@ getXCMSSet(obj, ..., verbose = TRUE)
 
 \S4method{getXCMSSet}{features}(obj, exportedData, verbose)
 
-\S4method{getXCMSSet}{featuresOpenMS}(obj, exportedData, verbose)
+\S4method{getXCMSSet}{featuresOpenMS}(obj, exportedData, verbose = FALSE)
 
 \S4method{getXCMSSet}{featuresXCMS}(obj, exportedData, verbose)
 

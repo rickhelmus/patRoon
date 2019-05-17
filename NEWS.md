@@ -12,6 +12,13 @@
 * `MetFrag`: for-ident database and new statistical scores are now supported
 
 
+## April 2019
+
+* Misc small tweaks and fixes for `newProject()` (e.g. loading of example data).
+* Improved graphical output of various common plotting functions.
+* Updated tutorial vignette and added handbook
+
+
 ## March 2019
 * `reportMD()`: most time consuming plots are now cached. Hence, re-reporting should be signficiantly faster now.
 * Updates to MS data file conversion:

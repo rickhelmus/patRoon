@@ -1,0 +1,14 @@
+# Introduction
+
+Nowadays there are various software tools available to process data from non-target analysis (NTA) experiments. Individual tools such as [ProteoWizard], [XCMS], [OpenMS], [MetFrag] and mass spectrometry vendor tools are often combined to perform a complete data processing workflow. During this workflow, raw data files may undergo pre-treatment (e.g. conversion), chromatographic and mass spectral data are combined to extract so called _features_ (or 'peaks') and finally annotation is performed to elucidate chemical identities. The aim of `patRoon` is to harmonize the many available tools in order to provide a consistent user interface without the need to know all the details of each individual software tool and remove the need for tedious conversion of data when multiple tools are used. The name is derived from a Dutch word that means _pattern_ and may also be an acronym for _hyPhenated mAss specTROmetry nOn-target aNalysis_. The workflow of non-target analysis is typically highly dependent on several factors such as the analytical instrumentation used and requirements of the study. For this reason, `patRoon` does not enforce a certain workflow. Instead, most workflow steps are optional, are highly configurable and algorithms can easily be mixed or even combined. Furthermore, `patRoon` supplies a straightforward interface to easily inspect, select, visualize and report all data that is generated during the workflow.
+
+The documentation of `patRoon` consists of three parts:
+
+1. A tutorial (accessible at [here][tutorial])
+2. This handbook
+3. The reference manual (accessible in `R` with ``?`patRoon-package` `` or online [here][reference])
+
+New users are highly recommended to start with the tutorial: this document provides an interactive introduction in performing a basic NTA processing workflow with `patRoon`. The handbook provides a more thorough overview of all concepts, functionalities and provides instructions and many examples on working with `patRoon`. Finally, the reference manual provides all the gritty details for all functionalities, and is meant if you want to know more details or need a quick reminder how a function should be used. 
+
+
+

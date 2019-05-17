@@ -18,11 +18,15 @@ NULL
 #' @param fGroups,obj,x,object \code{featureGroups} object to be accessed.
 #' @param retMin Plot retention time in minutes (instead of seconds).
 #' @param \dots Ignored for \code{"["} operator or passed to
-#'   \code{\link[graphics]{plot}} (\code{plot}, \code{plotInt} and
-#'   \code{plotEIC}), \pkg{\link{VennDiagram}} plotting functions
-#'   (\code{plotVenn}), \code{\link{chordDiagram}} (\code{plotChord}) or
-#'   \code{\link[UpSetR]{upset}} (\code{plotUpSet}).
+#'   \code{\link[graphics]{plot}} (\code{plot} and \code{plotEIC}),
+#'   \code{\link[graphics]{lines}} (\code{plotInt}), \pkg{\link{VennDiagram}}
+#'   plotting functions (\code{plotVenn}), \code{\link{chordDiagram}}
+#'   (\code{plotChord}) or \code{\link[UpSetR]{upset}} (\code{plotUpSet}).
 #' @param average Average data within replicate groups.
+#' @param pch,type,lty Common plotting parameters passed to \emph{e.g.}
+#'   \code{\link[graphics]{plot}}.
+#' @param col Colour(s) used. If \code{col=NULL} then colours are automatically
+#'   generated.
 #' @param which A character vector with replicate groups used for comparison.
 #'   For plotting functions: set to \code{NULL} for all replicate groups.
 #'
@@ -48,7 +52,7 @@ NULL
 #'   row within the feature table of the analysis (see
 #'   \code{\link{featureTable}}).
 #'
-#' @templateVar class features
+#' @templateVar class featureGroups
 #' @template class-hierarchy
 #'
 #' @export
@@ -386,10 +390,8 @@ setMethod("as.data.table", "featureGroups", function(x, average = FALSE, feature
 
 #' @describeIn featureGroups Generates an \emph{m/z} \emph{vs} retention time
 #'   plot for all featue groups.
-#' @param col,pch Passed to \code{\link[graphics]{plot}}. If \code{col=NULL}
-#'   then colours are automatically generated.
 #' @export
-setMethod("plot", "featureGroups", function(x, retMin = TRUE, col = NULL, pch = 16, ...)
+setMethod("plot", "featureGroups", function(x, retMin = FALSE, col = NULL, pch = 16, ...)
 {
     checkmate::assertFlag(retMin)
 
@@ -400,7 +402,7 @@ setMethod("plot", "featureGroups", function(x, retMin = TRUE, col = NULL, pch = 
         if (is.null(col))
             col <- colorRampPalette(brewer.pal(12, "Paired"))(length(x))
         plot(if (retMin) x@groupInfo$rts / 60 else x@groupInfo$rts, x@groupInfo$mzs,
-             xlab = if (retMin) "retention (min)" else "retention (s)",
+             xlab = if (retMin) "Retention time (min)" else "Retention time (sec.)",
              ylab = "m/z", col = col, pch = pch, ...)
     }
 })
@@ -408,7 +410,7 @@ setMethod("plot", "featureGroups", function(x, retMin = TRUE, col = NULL, pch = 
 #' @describeIn featureGroups Generates a line plot for the (averaged) intensity
 #'   of feature groups within all analyses
 #' @export
-setMethod("plotInt", "featureGroups", function(obj, average = FALSE, ...)
+setMethod("plotInt", "featureGroups", function(obj, average = FALSE, pch = 20, type = "b", lty = 3, col = NULL, ...)
 {
     checkmate::assertFlag(average)
 
@@ -433,12 +435,15 @@ setMethod("plotInt", "featureGroups", function(obj, average = FALSE, ...)
 
     nsamp <- length(snames)
 
-    plot(x = c(0, nsamp), y = c(0, max(gTable)), type = "n", xlab = "", ylab = "intensity", xaxt = "n", ...)
+    plot(x = c(0, nsamp), y = c(0, max(gTable)), type = "n", xlab = "", ylab = "Intensity", xaxt = "n")
     axis(1, seq_len(nsamp), snames, las = 2)
 
+    if (is.null(col))
+        col <- colorRampPalette(brewer.pal(12, "Paired"))(length(gTable))
+    
     px <- seq_len(nsamp)
     for (i in seq_along(gTable))
-        lines(x = px, y = gTable[[i]])
+        lines(x = px, y = gTable[[i]], type = type, pch = pch, lty = lty, col = col[i], ...)
 })
 
 setMethod("plotIntHash", "featureGroups", function(obj, average = FALSE, ...) makeHash(allArgs()))

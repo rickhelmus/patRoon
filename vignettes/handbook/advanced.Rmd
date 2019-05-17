@@ -1,0 +1,263 @@
+# Advanced usage
+
+## Adducts {#adducts}
+
+When generating formulae and compound annotations and some other functionalities it is required to specify the adduct species. Behind the scenes, different algorithms typically use different formats. For instance, in order to specify a protonated species...
+
+* `GenForm` either accepts `"M+H"` and `"+H"`
+* `MetFrag` either accepts the numeric code `1` or `"[M+H]+"`
+* `SIRIUS` accepts `"[M+H]+"`
+
+In addition, most algorithms only accept a limited set of possible adducts, which do not necessarily all overlap with each other. The `GenFormAdducts()` and `MetFragAdducts()` functions list the possible adducts for `GenForm` and `MetFrag`, respectively.
+
+In order to simplify the situation `patRoon` internally uses its own format and converts it automatically to the algorithm specific format when necessary. Furthermore, during conversion it checks if the specified adduct format is actually allowed by the algorithm. Adducts in `patRoon` are stored in the `adduct` S4 class. Objects from this class specify which elements are added and/or subtracted, the final charge and the number of molecules present in the adduct (e.g. _2_ for a dimer).
+
+```{r adduct1,eval=FALSE}
+adduct(add = "H") # [M+H]+
+adduct(sub = "H", charge = -1) # [M-H]-
+adduct(add = "K", sub = "H2", charge = -1) # [M+K-H2]-
+adduct(add = "H3", charge = 3) # [M+H3]3+
+adduct(add = "H", molMult = 2) # [2M+H]+
+```
+
+A more easy way to generate adduct objects is by using the `as.adduct()` function:
+
+```{r adduct2,eval=FALSE}
+as.adduct("[M+H]+")
+as.adduct("[M+H2]2+")
+as.adduct("[2M+H]+")
+as.adduct("[M-H]-")
+as.adduct("+H", format = "genform")
+as.adduct(1, isPositive = TRUE, format = "metfrag")
+```
+
+In fact, the `adduct` argument to workflow functions such as `generateFormulas()` and `generateCompounds()` is automatically converted to an `adduct` class with the `as.adduct()` function if necessary:
+
+```{r adduct3,eval=FALSE}
+formulas <- generateFormulas(..., adduct = adduct(sub = "H", charge = -1))
+formulas <- generateFormulas(..., adduct = "[M-H]-") # same as above
+```
+
+More details can be found in the reference manual (`?adduct` and ``?`adduct-utils` ``).
+
+## Feature parameter optimization {#fOpt}
+
+Many different parameters exist that may affect the output quality of feature finding and grouping. To avoid time consuming manual experimentation, functionality is provided to largely automate the optimization process. The methodology, which uses design of experiments (DoE), is based on the excellent [Isotopologue Parameter Optimization (IPO)](IPO) R package. The functionality of this package is directly integrated in patRoon. Some functionality was added or changed, the most important being support for other feature finding and grouping algorithms besides [XCMS] and basic optimization support for qualitative parameters. Nevertheless, the core optimization algorithms are largely untouched.
+
+This section will introduce the most important concepts and functionalities. Please see the reference manual for more information (e.g. `` ?`feature-optimization` ``).
+
+### Parameter sets
+
+Before starting an optimization experiment we have to define _parameter sets_. These sets contain the parameters and (initial) numeric ranges that should be tested. A parameter set is defined as a regular `list`, and can be easily constructed with the `generateFeatureOptPSet()` and  `generateFGroupsOptPSet()` functions (for feature finding and feature grouping, respectively).
+
+```{r fOptPSet,eval=FALSE}
+pSet <- generateFeatureOptPSet("openms") # default test set for OpenMS
+pSet <- generateFeatureOptPSet("openms", chromSNR = c(5, 10)) # add parameter
+# of course manually making a list is also possible (e.g. if you don't want to test the default parameters)
+pSet <- list(noiseThrInt = c(1000, 5000))
+```
+
+When a parameter set has been defined it should be used as input for the `optimizeFeatureFinding()` or `optimizeFeatureGrouping()` functions.
+
+```{r fDoOpt,eval=FALSE}
+ftOpt <- optimizeFeatureFinding(anaInfo, "openms", pSet)
+fgOpt <- optimizeFeatureGrouping(fList, "openms", pSet) # fList is an existing features object
+```
+
+Similar to `findFeatures()`, the first argument to `optimizeFeatureFinding()` should be the [analysis information](#anaInfo). Note that it is not uncommon to perform the optimization with only a subset of (representative) analyses (i.e. to reduce processing time).
+
+```{r fDoOpt2,eval=FALSE}
+ftOpt <- optimizeFeatureFinding(anaInfo[1:2, ], "openms", pSet) # only use first two analyses
+```
+
+From the parameter set a design of experiment will be automatically created. Obviously, the more parameters are specified, the longer such an experiment will take. After an experiment has finished, the optimization algorithm will start a new experiment where numeric ranges for each parameter are increased or decreased in order to more accurately find optimum values. Hence, the numeric ranges specified in the parameter set are only _initial_ ranges, and will be changed in subsequent experiments. After each experiment iteration the results will be evaluated and a new experiment will be started as long as better results were obtained during the last experiment (although there is a hard limit defined by the `maxIterations` argument).
+
+For some parameters it is recommended or even necessary to set hard limits on the numeric ranges that are allowed to be tested. For instance, setting a minimum feature intensity threshold is highly recommended to avoid excessive processing time and potentially suboptimal results due to excessive amounts of resulting features. Configuring absolute parameter ranges is done by setting the `paramRanges` argument.
+
+```{r fOptPRanges,eval=FALSE}
+# set minimum intensity threshold (but no max)
+ftOpt <- optimizeFeatureFinding(anaInfo, "openms",
+                                list(noiseThrInt = c(1000, 5000), # initial testing range
+                                paramRanges = list(noiseThrInt = c(500, Inf))) # never test below 500
+```
+
+Depending on the used algorithm, several default absolute limits are imposed. These may be obtained with the `getDefFeaturesOptParamRanges()` and `getDefFGroupsOptParamRanges()` functions. 
+
+The common operation is to optimize numeric parameters. However, parameters that are not numeric (i.e. _qualitative_) need a different approach. In this case you will need to define multiple parameter sets, where each set defines a different qualitative value.
+
+```{r fOptQual,eval=FALSE}
+ftOpt <- optimizeFeatureFinding(anaInfo, "openms",
+                                list(chromFWHM = c(4, 8), isotopeFilteringModel = "metabolites (5% RMS)"),
+                                list(chromFWHM = c(4, 8), isotopeFilteringModel = "metabolites (2% RMS)"))
+```
+
+In the above example there are two parameter sets: both define the numeric `chromFWHM` parameter, whereas the qualitative `isotopeFilteringModel` parameter has a different value for each. Note that we had to specify the `chromFWHM` twice, this can be remediated by using the `templateParams` argument:
+
+```{r fOptQualT,eval=FALSE}
+ftOpt <- optimizeFeatureFinding(anaInfo, "openms",
+                                list(isotopeFilteringModel = "metabolites (5% RMS)"),
+                                list(isotopeFilteringModel = "metabolites (2% RMS)"),
+                                templateParams = list(chromFWHM = c(4, 8)))
+```
+
+As its name suggests, the `templateParams` argument serves as a template parameter set, and its values are essentially combined with each given parameter set. Note that current support for optimizing qualitative parameters is relatively basic and time consuming. This is because tests are essentially repeated for each parameter set (e.g. in the above example the `chromFWHM` parameter is optimized twice, each time with a different value for `isotopeFilteringModel`).
+
+### Processing optmization results
+
+The results of an optimization process are stored in objects from the S4 `optimizationResult` class. Several methods are defined to inspect and visualize these results.
+
+The `optimizedParameters()` function is used to inspect the best parameter settings. Similarly, the `optimizedObject()` function can be used to obtain the object that was created with these settings (i.e. a `features` or `featureGroups` object).
+
+```{r fOptProc1,eval=runData}
+optimizedParameters(ftOpt) # best settings for whole experiment
+optimizedObject(ftOpt) # features object with best settings for whole experiment
+```
+
+Results can also be obtained for specific parameter sets/iterations.
+
+```{r fOptProc,eval=FALSE}
+optimizedParameters(ftOpt, 1) # best settings for first parameter set
+optimizedParameters(ftOpt, 1, 1) # best settings for first parameter set and experiment iteration
+optimizedObject(ftOpt, 1) # features object with best settings for first parameter set
+```
+
+The `plot()` function can be used to visualize optimization results. This function will plot graphs for results of all tested parameter pairs. The graphs can be contour, image or perspective plots (as specified by the `type` argument).
+
+```{r fOptPlot,eval=runData,out.width="70%"}
+plot(ftOpt, paramSet = 1, DoEIteration = 1) # contour plots for first param set/experiment
+plot(ftOpt, paramSet = 1, DoEIteration = 1, type = "persp") # pretty perspective plots
+```
+
+Please refer to the reference manual for more methods to inspect optimization results (e.g. `?optimizationResult`).
+
+## Exporting and converting feature data
+
+The feature group data obtained during the workflow can be exported to various formats with the `export()` generic function. There are currently three formats supported: `"brukerpa"` (Bruker ProfileAnalysis), `"brukertasq"` (Bruker TASQ) and `"mzmine"` (mzMine). The former exports a 'bucket table' which can be loaded in ProfileAnalysis, the second and third export a target list that can be processed with TASQ and mzMine, respectively.
+
+<!-- UNDONE: update when XCMS3 support is available -->
+
+The `getXCMSSet()` function converts a `features` or `featureGroups` object to an `xcmsSet` object which can be used for further processing with [xcms] (the new XCMS3 interface is not yet supported).
+
+Some examples for these functions are shown below.
+
+```{r fExpConv,eval=FALSE}
+export(fGroups, "brukertasq", out = "my_targets.csv")
+
+# convert features to xcmsSet.
+# NOTE: exportedData should only be FALSE when the analysis data files cannot be
+# loaded by XCMS (e.g. when obtained with DataAnalysis)
+xset <- getXCMSSet(fList, exportedData = TRUE)
+xsetg <- getXCMSSet(fGroups, exportedData = TRUE) # get grouped xcmsSet
+```
+
+## Algorithm consensus {#consensus}
+
+With `patRoon` you have the option to choose between several algorithms for most workflow steps. Each algorithm is typically characterized by its efficiency, robustness, and may be optimized towards certain data properties. Comparing their output is therefore advantegeuous in order to design an optimum workflow. The `consensus()` generic function will compare different results from different algorithms and returns a _consensus_, which may be based on minimal overlap, uniqueness or simply a combination of all results from involved objects. The output from the `consensus()` function is of similar type as the input types and is therefore compatible to any 'regular' further data processing operations (e.g. input for other workflow steps or plotting). Note that a consensus can also be made from objects generated by the same algorithm, for instance, to compare or combine results obtained with different parameters (e.g. different databases used for compound annotation).
+
+The `consensus()` generic is defined for most workflow objects. Some of its common function arguments are listed below.
+
+Argument      | Classes                                            | Remarks
+------------- | -------------------------------------------------- | -------------------------------------------------------------
+`obj`, `...`  | All                                                | Two or more objects (of the same type) that should be compared to generate the consensus.
+`compThreshold`, `relAbundance`, `absAbundance`, `formThreshold`   | `compounds`, `formulas`, `featureGroupsComparison` | The minimum overlap (relative/absolute) for a result (feature, candidate) to be kept.
+`uniqueFrom`  | `compounds`, `formulas`, `featureGroupsComparison` | Only keep _unique_ results from specified objects.
+`uniqueOuter` | `compounds`, `formulas`, `featureGroupsComparison` | Should be combined with `uniqueFrom`. If `TRUE` then only results are kept which are _also_ unique between the objects specified with `uniqueFrom`.
+
+Note that current support for generating a consensus between `components` objects is very simplistic; here results are not compared, but the consensus simply consists a combination of all the components from each object.
+
+Generating a consensus for feature groups involves first generating a `featureGroupsComparison` object. This step is necessary since (small) deviations between retention times and/or mass values reported by different feature finding/grouping algorithms complicates a direct comparison. The comparison objects are made by the `comparison()` function, and its results can be visualized by the plotting functions discussed [in the previous chapter](#visComp).
+
+Some examples are shown below
+
+```{r consensus,eval=FALSE}
+compoundsCons <- consensus(compoundsMF, compoundsSIR) # combine MetFrag/SIRIUS results
+compoundsCons <- consensus(compoundsMF, compoundsSIR,
+                           compThreshold = 1) # only keep results that overlap
+
+fGroupComp <- comparison(fGroupsXCMS, fGroupsOpenMS, fGroupsEnviPick,
+                         groupAlgo = "openms")
+plotVenn(fGroupComp) # visualize overlap/uniqueness
+fGroupsCons <- consensus(fGroupComp,
+                         uniqueFrom = 1:2) # only keep results unique in OpenMS+XCMS
+fGroupsCons <- consensus(fGroupComp,
+                         uniqueFrom = 1:2,
+                         uniqueOuter = TRUE) # as above, but also exclude any overlap between OpenMS/XCMS
+```
+
+## Compound clustering {#compclust}
+
+When large databases such as [PubChem] or [ChemSpider] are used for compound annotation, it is common to find _many_ candidate structures for even a single feature. While choosing the right scoring settings can significantly improve their ranking, it is still very much possible that many candidates of potential interest remain. In this situation it might help to perform _compound clustering_. During this process, all candidates for a feature are clustered hierarchically on basis of similar chemical structure. From the resulting cluster the _maximum common substructure_ (MCS) can be derived, which represents the largest possible substructure that 'fit' in all candidates. By visual inspection of the MCS it may be possible to identify likely common structural properties of a feature.
+
+In order to perform compound clustering the `makeHCluster()` generic function should be used. This function heavily relies on chemical fingerprinting functionality provided by [rcdk].
+
+```{r cClust,eval=FALSE}
+compounds <- generateCompounds(...) # get our compounds
+compsClust <- makeHCluster(compounds)
+```
+
+This function accepts several arguments to fine tune the clustering process:
+
+* `method`: the clustering method (e.g. `"complete"` (default), `"ward.D2"`), see `?hclust` for options
+* `fpType`: finger printing type (`"extended"` by default), see `?get.fingerprint`
+* `fpSimMethod`: similarity method for generating the distance method (`"tanimoto"` by default), see `?fp.sim.matrix`
+
+For all arguments see the reference manual (`?makeHClust`).
+
+The resulting object is of type `compoundsCluster`. Several methods are defined to modify and inspect these results:
+
+```{r cClustObj,eval=FALSE}
+# plot MCS of first cluster from candidates of M109_R116_61
+plotStructure(compsClust, groupName = "M109_R116_61", 1)
+
+# plot dendrogram
+plot(compsClust, groupName = "M109_R116_61")
+
+# re-assign clusters for a feature group
+compsClust <- treeCut(compsClust, k = 5, groupName = "M109_R116_61")
+# ditto, but automatic cluster determination
+compsClust <- treeCutDynamic(compsClust, minModuleSize = 3, groupName = "M109_R116_61")
+```
+
+For a complete overview see the reference manual (`?compoundsCluster`).
+
+## Caching
+
+In `patRoon` lengthy processing operations such as finding features and generating annotation data is _cached_. This means that when you run such a calculation again (without changing any parameters), the data is simply loaded from the cache data instead of re-generating it. This in turn is very useful, for instance, if you have closed your R session and want to continue with data processing at a later stage.
+
+The cache data is stored in a [sqlite] database file. This file is stored by default under the name `cache.sqlite` in the current working directory (for this reason it is very important to always restore your working directory!). However, the name and location can be changed by setting a global package option:
+
+```{r cacheFile,eval=FALSE}
+options(patRoon.cache.fileName = "~/myCacheFile.sqlite")
+```
+
+For instance, this might be useful if you want to use a shared cache file between projects.
+
+After a while you may see that your cache file can get quite large. This is especially true when testing different parameters to optimize your workflow. Furthermore, you may want to clear the cache after you have updated `patRoon` and want to make sure that the latest code is used to generate the data. At any point you can simply remove the cache file. A more fine tuned approach which doesn't wipe all your cached data is by using the `clearCache()` function. With this function you can selectively remove parts of the cache file. The function has two arguments: `what`, which specifies what should be removed, and `file` which specifies the path to the cache file. The latter only needs to be specified if you want to manage a different cache file.
+
+In order to figure what is in the cache you can run `clearCache()` without any arguments:
+
+```{r clearCache}
+clearCache()
+```
+
+Using this output you can re-run the function again, for instance:
+
+```{r clearCache2,eval=FALSE}
+clearCache("featuresOpenMS")
+clearCache(c("featureGroupsOpenMS", "formulasGenForm")) # clear multiple
+clearCache("OpenMS") # clear all with OpenMS in name (ie partial matched)
+clearCache("all") # same as simply removing the file
+```
+
+## Parallelization
+
+`patRoon` relies on several external (command-line) utilities to generate workflow data such as `MetFrag CL`, `OpenMS` and `SIRIUS`. When these tools are used for obtaining results for a large number of features it may take a long time before processing is finished. In order to speed this up these commands are executed in _parallel_. Running several commands simultenously is especially advantageous on multi core CPUs.
+
+The number of commands to run in parallel is by default equal to the number of available cores/threads.
+You may want to change this amount, for instance, when you don't want to dedicate all of your computers resources to `patRoon`. This can either be done by changing a global package option, which affects all operations, or when executing a single workflow step.
+
+```{r par,eval=FALSE}
+options(patRoon.maxProcAmount = 3) # execute max 3 commands in parallel
+formulas <- generateFormulas(..., maxProcAmount = 3) # ditto, but only for this function
+```
+

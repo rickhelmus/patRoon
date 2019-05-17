@@ -1,0 +1,8 @@
+rmarkdown::html_vignette:
+    mathjax: null
+    toc: yes
+    toc_dept: 4
+    number_sections: true
+pdf_document:
+    number_sections: yes
+    toc: yes

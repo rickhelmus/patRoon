@@ -6,8 +6,11 @@
 - ref --> blank
 - convertMSFiles()
     - Agilent .d is also a directory?
+- harmonize consensus argument names, add rel/abs support for all?
 - consistent src file names, split utils?
 - newProject(): don't necessarily add MSPeakLists when DA formulas are choosen
+- improve default plotting for plotInt and cluster plot functions
+- better error reporting for multiproc commands
 
 
 ## docs
@@ -32,6 +35,8 @@
 - filter()
     - document which filters work on feature level (e.g. chromWidth)
     - remove zero values for maxReplicateIntRSD?
+- fList --> features?
+- move rGroups from filter() to subset?
 
 
 ## MSPeakLists
@@ -46,12 +51,18 @@
 - MetFrag: (buggy) trivial name fetching not needed anymore?
 - SIRIUS: use --auto-charge instead of manually fixing charge of fragments (or not? conflicting docs on what it does)
 - test score normalization?
+- add new MF stat and other scorings and make sure default normalization equals that of MF web
+- MF: add support for all databases
+- Fix MF database section in docs
+- timeouts for SIRIUS?
 - improve formula scoring
+- plotHeatMap() / plotSilhouettes() for comp clusters?
 - do something about negative H explained fragments by MF?
 
 
 ## formulas
 - customize/document ranking column order? (only do rank for sirius?)
+- minExplainedFragPeaks -> minExplainedPeaks?
 
 
 ## components

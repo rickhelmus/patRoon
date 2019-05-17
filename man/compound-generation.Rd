@@ -322,14 +322,14 @@ before feature groups have been prioritized.
   setting the \code{chemSpiderToken} argument is mandatory.
 
   When a local database is set (\emph{i.e.} \code{sdf}, \code{psv},
-  \code{csv}, \code{toxcast}) the file location of the database should be set
+  \code{csv}, \code{comptox}) the file location of the database should be set
   in the \code{LocalDatabasePath} value via the \code{extraOpts} argument or
   using the \code{patRoon.path.MetFragCompTox} option (only when
   \code{database="comptox"}).
 
-  Examples: \verb{options(patRoon.path.MetFragCompTox =
-  "C:/DSSTox_01May18_Full_SelectMetaDataPlus.csv")} \verb{extraOpts =
-  list(LocalDatabasePath = \"C:/myDB.csv\")}.
+  Examples:
+  \verb{options(patRoon.path.MetFragCompTox = "C:/DSSTox_01May18_Full_SelectMetaDataPlus.csv")}
+  \verb{extraOpts = list(LocalDatabasePath = "C:/myDB.csv")}.
 
   Note that for \code{database="comptox"} currently only scorings from the
   \file{SelectMetaData} and \file{SelectMetaDataPlus} files are supported.

@@ -324,13 +324,14 @@ Compound annotation is often a relative time and resource intensive procedure. F
 
 Selecting the right database is important for proper candidate assignment. Afterall, if the 'right' chemical compound is not present in the used database, it is impossible to assign the correct structure. Luckily, however, several large databases such as [PubChem] and [ChemSpider] are openly available which contain tens of millions of compounds. On the other hand, these databases may also lead to many unlikely candidates and therefore more specialized (or custom databases) may be preferred. Which database will be used is dictated by the `database` argument to `generateCompounds()`, currently the following options exist:
 
-<!-- UNDONE: add missing databases (e.g. FOR-IDENT) when support is added -->
+<!-- UNDONE: add missing databases when support is added -->
 
 Database            | Algorithm(s)            | Remarks
 ------------------- | ----------------------- | -----------------------
 `pubchem`           | `"metfrag"`, `"sirius"` | [PubChem] is currently the largest compound database and is used by default.
 `chemspider`        | `"metfrag"`             | [ChemSpider] is another large database. Requires security token from [here](http://www.chemspider.com/AboutServices.aspx) (see next section).
 `comptox`           | `"metfrag"`             | The EPA [CompTox] contains many compounds and scorings relevant to environmental studies. Needs manual download (see next section).
+`for-ident`         | `"metfrag"`             | The [FOR-IDENT] (STOFF-IDENT) database for water related substances.
 `kegg`              | `"metfrag"`, `"sirius"` | The [KEGG] database for biological compounds
 `hmdb`              | `"metfrag"`, `"sirius"` | The [HMDB] contains many human metabolites.
 `bio`               | `"sirius"`              | Selects all supports biological databases.

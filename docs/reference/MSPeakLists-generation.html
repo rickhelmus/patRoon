@@ -81,6 +81,21 @@
 <li>
   <a href="../articles/tutorial.html">Tutorial</a>
 </li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Handbook
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../handbook_bd/introduction.html">Book format</a>
+    </li>
+    <li>
+      <a href="../articles/handbook.html">Single page</a>
+    </li>
+  </ul>
+</li>
 <li>
   <a href="../news/index.html">Changelog</a>
 </li>
@@ -310,7 +325,7 @@ groups.</p>
   lists (<em>e.g.</em> formulae calulcation) will still skip calculation if a
   precursor is not found.</p></li>
 <li><p><code>retainPrecursorMSMS</code> For MS/MS data only: if <code>TRUE</code> then
-  always retain the precursor mass peak event it is not amongst the
+  always retain the precursor mass peak even if is not amongst the
   <code>topMost</code> peaks. Note that MS precursor mass peaks are always kept.
   Furthermore, note that precursor peaks in both MS and MS/MS data may still
   be removed by intensity thresholds (this is unlike the

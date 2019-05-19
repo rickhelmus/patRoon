@@ -83,6 +83,21 @@ groups." />
 <li>
   <a href="../articles/tutorial.html">Tutorial</a>
 </li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Handbook
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../handbook_bd/introduction.html">Book format</a>
+    </li>
+    <li>
+      <a href="../articles/handbook.html">Single page</a>
+    </li>
+  </ul>
+</li>
 <li>
   <a href="../news/index.html">Changelog</a>
 </li>
@@ -137,12 +152,12 @@ groups.</p>
   <span class='no'>deepSplit</span>, <span class='no'>minModuleSize</span>)
 
 <span class='co'># S4 method for componentsIntClust</span>
-<span class='fu'>plotHeatMap</span>(<span class='no'>obj</span>,
-  <span class='kw'>col</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/grDevices/topics/colorRamp'>colorRampPalette</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"black"</span>, <span class='st'>"yellow"</span>))(<span class='fl'>100</span>),
-  <span class='kw'>interactive</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='no'>...</span>)
+<span class='fu'>plotHeatMap</span>(<span class='no'>obj</span>, <span class='kw'>interactive</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>col</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>margins</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>6</span>, <span class='fl'>2</span>), <span class='no'>...</span>)
 
 <span class='co'># S4 method for componentsIntClust</span>
-<span class='fu'><a href='generics.html'>plotInt</a></span>(<span class='no'>obj</span>, <span class='no'>index</span>, <span class='no'>...</span>)
+<span class='fu'><a href='generics.html'>plotInt</a></span>(<span class='no'>obj</span>, <span class='no'>index</span>, <span class='kw'>pch</span> <span class='kw'>=</span> <span class='fl'>20</span>,
+  <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"b"</span>, <span class='kw'>lty</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>col</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)
 
 <span class='co'># S4 method for componentsIntClust,ANY</span>
 <span class='fu'><a href='generics.html'>plot</a></span>(<span class='no'>x</span>, <span class='kw'>pal</span> <span class='kw'>=</span> <span class='st'>"Paired"</span>,
@@ -150,7 +165,8 @@ groups.</p>
   <span class='kw'>showLegend</span> <span class='kw'>=</span> <span class='fu'><a href='generics.html'>length</a></span>(<span class='no'>x</span>) <span class='kw'>&lt;</span> <span class='fl'>20</span>, <span class='no'>...</span>)
 
 <span class='co'># S4 method for componentsIntClust</span>
-<span class='fu'>plotSilhouettes</span>(<span class='no'>obj</span>, <span class='no'>kSeq</span>, <span class='no'>...</span>)</pre>
+<span class='fu'>plotSilhouettes</span>(<span class='no'>obj</span>, <span class='no'>kSeq</span>, <span class='kw'>pch</span> <span class='kw'>=</span> <span class='fl'>16</span>,
+  <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"b"</span>, <span class='no'>...</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -167,24 +183,27 @@ Analogous to <code><a href='https://www.rdocumentation.org/packages/stats/topics
 <code>cutreeDynamicTree</code>.</p></td>
     </tr>
     <tr>
-      <th>col</th>
-      <td><p>Colours used for drawing the heatmap. See <code><a href='https://www.rdocumentation.org/packages/stats/topics/heatmap'>heatmap</a></code> /
-<code>d3heatmap</code>.</p></td>
-    </tr>
-    <tr>
       <th>interactive</th>
       <td><p>If <code>TRUE</code> an interactive heatmap will be drawn (with
 <code>d3heatmap</code>).</p></td>
     </tr>
     <tr>
+      <th>margins</th>
+      <td><p>Passed to <code>heatmap.2</code></p></td>
+    </tr>
+    <tr>
       <th>&#8230;</th>
-      <td><p>Further options passed to <code><a href='https://www.rdocumentation.org/packages/stats/topics/heatmap'>heatmap</a></code> /
+      <td><p>Further options passed to <code>heatmap.2</code> /
 <code>d3heatmap</code> (<code>plotHeatMap</code>), <code><a href='https://www.rdocumentation.org/packages/stats/topics/dendrogram'>plot.dendrogram</a></code>
 (<code>plot</code>) or <code><a href='https://www.rdocumentation.org/packages/graphics/topics/plot'>plot</a></code> (<code>plotInt</code>).</p></td>
     </tr>
     <tr>
       <th>index</th>
       <td><p>Numeric component/cluster index.</p></td>
+    </tr>
+    <tr>
+      <th>pch, type</th>
+      <td><p>Passed to <code><a href='https://www.rdocumentation.org/packages/graphics/topics/plot'>plot</a></code>.</p></td>
     </tr>
     <tr>
       <th>x, obj</th>
@@ -221,7 +240,7 @@ average silhouette width calculation.</p></td>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p><code>plotHeatMap</code> returns the same as <code><a href='https://www.rdocumentation.org/packages/stats/topics/heatmap'>heatmap</a></code> or
+    <p><code>plotHeatMap</code> returns the same as <code>heatmap.2</code> or
   <code>d3heatmap</code>.</p>
     
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
@@ -244,7 +263,7 @@ clustering was performed.</p></li>
 the <code>cutreeDynamicTree</code> function from
 <span class="pkg">dynamicTreeCut</span>.</p></li>
 <li><p><code>plotHeatMap</code>: draws a heatmap using the
-<code><a href='https://www.rdocumentation.org/packages/stats/topics/heatmap'>heatmap</a></code> or <code>d3heatmap</code> function.</p></li>
+<code>heatmap.2</code> or <code>d3heatmap</code> function.</p></li>
 <li><p><code>plotInt</code>: makes a plot for all (normalized) intensity
 profiles of the feature groups within a given cluster.</p></li>
 <li><p><code>plot</code>: generates a dendrogram from a given cluster
@@ -285,7 +304,7 @@ clustering.</p></dd>
 Gunten U, McArdell CS, Hollender J (2018).
 &#8220;Non-target screening to trace ozonation transformation products in a wastewater treatment train including different post-treatments.&#8221;
 <em>Water Research</em>, <b>142</b>, 267--278.
-doi: <a href='http://doi.org/10.1016/j.watres.2018.05.045'>10.1016/j.watres.2018.05.045</a>
+doi: <a href='https://doi.org/10.1016/j.watres.2018.05.045'>10.1016/j.watres.2018.05.045</a>
 .</p>
     
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>

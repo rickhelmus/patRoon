@@ -78,6 +78,21 @@
 <li>
   <a href="../articles/tutorial.html">Tutorial</a>
 </li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Handbook
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../handbook_bd/introduction.html">Book format</a>
+    </li>
+    <li>
+      <a href="../articles/handbook.html">Single page</a>
+    </li>
+  </ul>
+</li>
 <li>
   <a href="../news/index.html">Changelog</a>
 </li>
@@ -109,6 +124,35 @@
     <div id="patroon-0-1-0-9000" class="section level1">
 <h1 class="page-header">
 <a href="#patroon-0-1-0-9000" class="anchor"></a>patRoon 0.1.0.9000</h1>
+<div id="may-2019" class="section level2">
+<h2 class="hasAnchor">
+<a href="#may-2019" class="anchor"></a>May 2019</h2>
+<ul>
+<li>Formula updates
+<ul>
+<li>
+<code>GenForm</code> formula calculation with <code>MSMode="both"</code> (the default): instead of repeating calculations with and without MS/MS data and combining the data, it now simply does either of the two depending on MS/MS data availability. The old behavior turned out to be redundant, hence, calculation is now a bit faster.</li>
+<li>
+<code>GenForm</code> now perform <em>precursor isolation</em> to cleanup MS1 data prior to formula calculation. During this step any mass peaks that are unlikely part of the isotopic pattern of the feature are removed, which otherwise would penalize the isotopic scoring. The result is that isotopic scoring is dramatically improved now. This filter step is part of new filter functionality for <code>MSPeakLists</code>, see <code><a href="../reference/MSPeakLists-class.html">?MSPeakLists</a></code> and <code><a href="../reference/formula-generation.html">?generateFormulas</a></code> for more information.</li>
+<li>When formula consensus are made from multiple features the scorings and mass errors are now averaged (instead of taking the values from the best ranked feature).</li>
+<li>Improved ranking of candidates from a consensus of multiple formula objects (see <code><a href="../reference/formulas-class.html">?formulas</a></code>).</li>
+</ul>
+</li>
+<li>Consensus for compounds are now similarly ranked as formulas.</li>
+<li>More consistent minimum abundance arguments for <code><a href="../reference/generics.html">consensus()</a></code> (<code>absMinAbundance</code> and <code>relMinAbundance</code>)</li>
+<li>
+<code>MetFrag</code>: for-ident database and new statistical scores are now supported</li>
+</ul>
+</div>
+<div id="april-2019" class="section level2">
+<h2 class="hasAnchor">
+<a href="#april-2019" class="anchor"></a>April 2019</h2>
+<ul>
+<li>Misc small tweaks and fixes for <code><a href="../reference/GUI-utils.html">newProject()</a></code> (e.g. loading of example data).</li>
+<li>Improved graphical output of various common plotting functions.</li>
+<li>Updated tutorial vignette and added handbook</li>
+</ul>
+</div>
 <div id="march-2019" class="section level2">
 <h2 class="hasAnchor">
 <a href="#march-2019" class="anchor"></a>March 2019</h2>
@@ -133,8 +177,17 @@
 <ul>
 <li>The analyses selector recognizes more data file formats. This way you can select analyses that have not been converted yet.</li>
 <li>Data pre-treatment options now include more sophisticated file conversion options (<em>e.g.</em> using ProteoWizard). This and the new analysis selector functionality ensures that data files in all major vendor formats do not have to be converted prior to generating a script.</li>
+<li>Re-organized tabs to mirror non-target workflow.</li>
+<li>Suspect screening support.</li>
+<li>Improved layout of output script.</li>
 </ul>
 </li>
+<li>
+<code>withMSMS</code> filter for MS peak lists.</li>
+<li>Timeout for formula calculation with GenForm to avoid excessive calculation times.</li>
+<li>
+<code><a href="../reference/feature-finding.html">importFeatures()</a></code> generic function</li>
+<li>Reporting functions renamed arguments related to compounds reporting (e.g. compoundTopMost to compound<strong>s</strong>TopMost)</li>
 </ul>
 </div>
 <div id="february-2019" class="section level2">

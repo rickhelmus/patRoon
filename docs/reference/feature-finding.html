@@ -81,6 +81,21 @@
 <li>
   <a href="../articles/tutorial.html">Tutorial</a>
 </li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Handbook
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../handbook_bd/introduction.html">Book format</a>
+    </li>
+    <li>
+      <a href="../articles/handbook.html">Single page</a>
+    </li>
+  </ul>
+</li>
 <li>
   <a href="../news/index.html">Changelog</a>
 </li>
@@ -117,6 +132,8 @@
     </div>
 
     <pre class="usage"><span class='fu'>findFeatures</span>(<span class='no'>analysisInfo</span>, <span class='no'>algorithm</span>, <span class='no'>...</span>, <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+
+<span class='fu'>importFeatures</span>(<span class='no'>analysisInfo</span>, <span class='no'>type</span>, <span class='no'>...</span>)
 
 <span class='fu'>findFeaturesBruker</span>(<span class='no'>analysisInfo</span>, <span class='kw'>doFMF</span> <span class='kw'>=</span> <span class='st'>"auto"</span>, <span class='kw'>startRange</span> <span class='kw'>=</span> <span class='fl'>0</span>,
   <span class='kw'>endRange</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>save</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>close</span> <span class='kw'>=</span> <span class='no'>save</span>, <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
@@ -157,8 +174,8 @@ used: <code>"bruker"</code>, <code>"openms"</code>, <code>"xcms"</code>, <code>"
       <th>...</th>
       <td><p>further parameters passed to <code><a href='https://www.rdocumentation.org/packages/xcms/topics/xcmsSet'>xcmsSet</a></code>
 (<code>findFeaturesXCMS</code>), <code><a href='https://www.rdocumentation.org/packages/enviPick/topics/enviPickwrap'>enviPickwrap</a></code>
-(<code>featurefinderEnviPick</code>) or to selected feature finding algorithms
-(<code>findFeatures</code>).</p></td>
+(<code>featurefinderEnviPick</code>) or to selected feature finding or importing
+algorithms (<code>findFeatures</code> and <code>importFeatures</code>).</p></td>
     </tr>
     <tr>
       <th>verbose</th>
@@ -222,7 +239,7 @@ m/z variance during mass trace collection stage. Sets
       <th>traceTermCriterion, traceTermOutliers, minSampleRate</th>
       <td><p>Termination
 criterion for the extension of mass traces. See
-<a href='http://ftp.mi.fu-berlin.de/pub/OpenMS/release2.1.0-documentation/html/TOPP_FeatureFinderMetabo.html'>FeatureFinderMetabo</a>.
+<a href='https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/TOPP_FeatureFinderMetabo.html'>FeatureFinderMetabo</a>.
  Sets the <code>algorithm:mtd:trace_termination_criterion</code>,
 <code>algorithm:mtd:trace_termination_outliers</code> and
 <code>algorithm:mtd:min_sample_rate</code> options, respectively.</p></td>
@@ -238,7 +255,7 @@ criterion for the extension of mass traces. See
       <th>widthFiltering, minFWHM, maxFWHM</th>
       <td><p>Enable filtering of unlikely peak
 widths. See
-<a href='http://ftp.mi.fu-berlin.de/pub/OpenMS/release2.1.0-documentation/html/TOPP_FeatureFinderMetabo.html'>FeatureFinderMetabo</a>.
+<a href='https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/TOPP_FeatureFinderMetabo.html'>FeatureFinderMetabo</a>.
  Sets <code>algorithm:epd:width_filtering</code>, <code>algorithm:epd:min_fwhm</code>
 and <code>algorithm:epd:max_fwhm</code>, respectively.</p></td>
     </tr>
@@ -259,14 +276,14 @@ options, respectively.</p></td>
       <th>isotopeFilteringModel</th>
       <td><p>Remove/score candidate assemblies based on
 isotope intensities. See
-<a href='http://ftp.mi.fu-berlin.de/pub/OpenMS/release2.1.0-documentation/html/TOPP_FeatureFinderMetabo.html'>FeatureFinderMetabo</a>.
+<a href='https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/TOPP_FeatureFinderMetabo.html'>FeatureFinderMetabo</a>.
  Sets the <code>algorithm:ffm:isotope_filtering_model</code> option.</p></td>
     </tr>
     <tr>
       <th>MZScoring13C</th>
       <td><p>Use the 13C isotope as the expected shift for isotope
 mass traces. See
-<a href='http://ftp.mi.fu-berlin.de/pub/OpenMS/release2.1.0-documentation/html/TOPP_FeatureFinderMetabo.html'>FeatureFinderMetabo</a>.
+<a href='https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/TOPP_FeatureFinderMetabo.html'>FeatureFinderMetabo</a>.
  Sets <code>algorithm:ffm:mz_scoring_13C</code>.</p></td>
     </tr>
     <tr>
@@ -309,6 +326,11 @@ efficient results.</p></td>
       <th>xs</th>
       <td><p>An <code>xcmsSet</code> object.</p></td>
     </tr>
+    <tr>
+      <th>algorithm</th>
+      <td><p>A character string describing the algorithm that should be
+used: <code>"xcms"</code>, <code>"envimass"</code></p></td>
+    </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
@@ -332,6 +354,12 @@ methodology and instrumentation.</p>
   <code>findFeaturesBruker</code>. While these functions may be called directly,
   <code>findFeatures</code> provides a generic interface and is therefore usually
   preferred.</p>
+<p><code>importFeatures</code> is a generic function that will import features
+  using one of the supported algorithms. The actual functionality is provided
+  by algorithm specific functions such as <code>importFeaturesXCMS</code> and
+  <code>importFeaturesEnviMass</code>. While these functions may be called directly,
+  <code>importFeatures</code> provides a generic interface and is therefore usually
+  preferred.</p>
 <p><code>findFeaturesBruker</code> uses the 'Find Molecular Features' (FMF)
   algorithm of Bruker DataAnalysis vendor software to find features. The
   resulting 'compounds' are then transferred from DataAnalysis and stored as
@@ -343,7 +371,7 @@ methodology and instrumentation.</p>
   generated by the <span class="pkg">enviMass</span> package. NOTE: this functionality has only
   been tested with older versions of <span class="pkg">enviMass</span>.</p>
 <p><code>findFeaturesOpenMS</code> uses the
-  <a href='http://ftp.mi.fu-berlin.de/pub/OpenMS/release2.1.0-documentation/html/TOPP_FeatureFinderMetabo.html'>FeatureFinderMetabo</a>
+  <a href='https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/TOPP_FeatureFinderMetabo.html'>FeatureFinderMetabo</a>
    TOPP tool (see <a href='http://www.openms.de'>http://www.openms.de</a>).</p>
 <p><code>findFeaturesXCMS</code> uses the <code><a href='https://www.rdocumentation.org/packages/xcms/topics/xcmsSet'>xcmsSet</a></code>
   function from the <span class="pkg">xcms</span> package to find features.</p>
@@ -378,7 +406,7 @@ methodology and instrumentation.</p>
     <p>Rost HL, Sachsenberg T, Aiche S, Bielow C, Weisser H, Aicheler F, Andreotti S, Ehrlich H, Gutenbrunner P, Kenar E, Liang X, Nahnsen S, Nilse L, Pfeuffer J, Rosenberger G, Rurik M, Schmitt U, Veit J, Walzer M, Wojnar D, Wolski WE, Schilling O, Choudhary JS, Malmstrom L, Aebersold R, Reinert K, Kohlbacher O (2016).
 &#8220;OpenMS: a flexible open-source software platform for mass spectrometry data analysis.&#8221;
 <em>Nature Methods</em>, <b>13</b>(9), 741--748.
-doi: <a href='http://doi.org/10.1038/nmeth.3959'>10.1038/nmeth.3959</a>
+doi: <a href='https://doi.org/10.1038/nmeth.3959'>10.1038/nmeth.3959</a>
 .
  <br /><br />
   <a href='https://pugixml.org/'>pugixml</a> (via <a href='http://www.rcpp.org/'>Rcpp</a>) is used to process OpenMS XML output. <br /><br />

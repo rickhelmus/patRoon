@@ -18,3 +18,5 @@
 ^\.dockerignore$
 ^\.circleci$
 ^codecov\.yml$
+^TODO.md
+^gen_site.R

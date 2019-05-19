@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>5.1 Inspecting results | patRoon handbook</title>
+  <meta name="description" content="5.1 Inspecting results | patRoon handbook" />
+  <meta name="generator" content="bookdown 0.10.2 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="5.1 Inspecting results | patRoon handbook" />
+  <meta property="og:type" content="book" />
+  
+  
+  
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="5.1 Inspecting results | patRoon handbook" />
+  
+  
+  
+
+<meta name="author" content="Rick Helmus" />
+
+
+<meta name="date" content="2019-05-18" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="processing-workflow-data.html">
+<link rel="next" href="filtering.html">
+<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+
+
+
+
+
+
+
+<script src="libs/htmlwidgets-1.3/htmlwidgets.js"></script>
+<script src="libs/viz-0.3/viz.js"></script>
+<link href="libs/DiagrammeR-styles-0.2/styles.css" rel="stylesheet" />
+<script src="libs/grViz-binding-1.0.1/grViz.js"></script>
+<script src="libs/kePrint-0.0.1/kePrint.js"></script>
+<script src="libs/d3-3.5.3/./d3.min.js"></script>
+<link href="libs/d3heatmapcore-0.0.0/heatmapcore.css" rel="stylesheet" />
+<script src="libs/d3heatmapcore-0.0.0/heatmapcore.js"></script>
+<script src="libs/d3-tip-0.6.6/index.js"></script>
+<script src="libs/d3heatmap-binding-0.6.1.2/d3heatmap.js"></script>
+
+
+<style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li class="chapter" data-level="1" data-path="introduction.html"><a href="introduction.html"><i class="fa fa-check"></i><b>1</b> Introduction</a></li>
+<li class="chapter" data-level="2" data-path="installation.html"><a href="installation.html"><i class="fa fa-check"></i><b>2</b> Installation</a><ul>
+<li class="chapter" data-level="2.1" data-path="automatic-installation-windows-only.html"><a href="automatic-installation-windows-only.html"><i class="fa fa-check"></i><b>2.1</b> Automatic installation (Windows only)</a></li>
+<li class="chapter" data-level="2.2" data-path="manual-installation.html"><a href="manual-installation.html"><i class="fa fa-check"></i><b>2.2</b> Manual installation</a><ul>
+<li class="chapter" data-level="2.2.1" data-path="manual-installation.html"><a href="manual-installation.html#r-prerequisites"><i class="fa fa-check"></i><b>2.2.1</b> R prerequisites</a></li>
+<li class="chapter" data-level="2.2.2" data-path="manual-installation.html"><a href="manual-installation.html#other-dependencies"><i class="fa fa-check"></i><b>2.2.2</b> Other dependencies</a></li>
+<li class="chapter" data-level="2.2.3" data-path="manual-installation.html"><a href="manual-installation.html#patroon-installation"><i class="fa fa-check"></i><b>2.2.3</b> patRoon installation</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="workflow-concepts.html"><a href="workflow-concepts.html"><i class="fa fa-check"></i><b>3</b> Workflow concepts</a></li>
+<li class="chapter" data-level="4" data-path="generating-workflow-data.html"><a href="generating-workflow-data.html"><i class="fa fa-check"></i><b>4</b> Generating workflow data</a><ul>
+<li class="chapter" data-level="4.1" data-path="preparations.html"><a href="preparations.html"><i class="fa fa-check"></i><b>4.1</b> Preparations</a><ul>
+<li class="chapter" data-level="4.1.1" data-path="preparations.html"><a href="preparations.html#data-pre-treatment"><i class="fa fa-check"></i><b>4.1.1</b> Data pre-treatment</a></li>
+<li class="chapter" data-level="4.1.2" data-path="preparations.html"><a href="preparations.html#anaInfo"><i class="fa fa-check"></i><b>4.1.2</b> Analysis information</a></li>
+<li class="chapter" data-level="4.1.3" data-path="preparations.html"><a href="preparations.html#automatic-project-generation-with-newproject"><i class="fa fa-check"></i><b>4.1.3</b> Automatic project generation with newProject()</a></li>
+</ul></li>
+<li class="chapter" data-level="4.2" data-path="features.html"><a href="features.html"><i class="fa fa-check"></i><b>4.2</b> Features</a><ul>
+<li class="chapter" data-level="4.2.1" data-path="features.html"><a href="features.html#finding-and-grouping-features"><i class="fa fa-check"></i><b>4.2.1</b> Finding and grouping features</a></li>
+<li class="chapter" data-level="4.2.2" data-path="features.html"><a href="features.html#suspect-screening"><i class="fa fa-check"></i><b>4.2.2</b> Suspect screening</a></li>
+</ul></li>
+<li class="chapter" data-level="4.3" data-path="annotation.html"><a href="annotation.html"><i class="fa fa-check"></i><b>4.3</b> Annotation</a><ul>
+<li class="chapter" data-level="4.3.1" data-path="annotation.html"><a href="annotation.html#ms-peak-lists"><i class="fa fa-check"></i><b>4.3.1</b> MS peak lists</a></li>
+<li class="chapter" data-level="4.3.2" data-path="annotation.html"><a href="annotation.html#formulae"><i class="fa fa-check"></i><b>4.3.2</b> Formulae</a></li>
+<li class="chapter" data-level="4.3.3" data-path="annotation.html"><a href="annotation.html#compounds"><i class="fa fa-check"></i><b>4.3.3</b> Compounds</a></li>
+</ul></li>
+<li class="chapter" data-level="4.4" data-path="componentization.html"><a href="componentization.html"><i class="fa fa-check"></i><b>4.4</b> Componentization</a><ul>
+<li class="chapter" data-level="4.4.1" data-path="componentization.html"><a href="componentization.html#features-with-similar-chromatographic-behaviour"><i class="fa fa-check"></i><b>4.4.1</b> Features with similar chromatographic behaviour</a></li>
+<li class="chapter" data-level="4.4.2" data-path="componentization.html"><a href="componentization.html#homologues-series"><i class="fa fa-check"></i><b>4.4.2</b> Homologues series</a></li>
+<li class="chapter" data-level="4.4.3" data-path="componentization.html"><a href="componentization.html#intclust"><i class="fa fa-check"></i><b>4.4.3</b> Intensity clustering</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="processing-workflow-data.html"><a href="processing-workflow-data.html"><i class="fa fa-check"></i><b>5</b> Processing workflow data</a><ul>
+<li class="chapter" data-level="5.1" data-path="inspecting-results.html"><a href="inspecting-results.html"><i class="fa fa-check"></i><b>5.1</b> Inspecting results</a></li>
+<li class="chapter" data-level="5.2" data-path="filtering.html"><a href="filtering.html"><i class="fa fa-check"></i><b>5.2</b> Filtering</a><ul>
+<li class="chapter" data-level="5.2.1" data-path="filtering.html"><a href="filtering.html#features-1"><i class="fa fa-check"></i><b>5.2.1</b> Features</a></li>
+<li class="chapter" data-level="5.2.2" data-path="filtering.html"><a href="filtering.html#annotation-1"><i class="fa fa-check"></i><b>5.2.2</b> Annotation</a></li>
+<li class="chapter" data-level="5.2.3" data-path="filtering.html"><a href="filtering.html#components"><i class="fa fa-check"></i><b>5.2.3</b> Components</a></li>
+<li class="chapter" data-level="5.2.4" data-path="filtering.html"><a href="filtering.html#negation"><i class="fa fa-check"></i><b>5.2.4</b> Negation</a></li>
+</ul></li>
+<li class="chapter" data-level="5.3" data-path="subset.html"><a href="subset.html"><i class="fa fa-check"></i><b>5.3</b> Subsetting</a><ul>
+<li class="chapter" data-level="5.3.1" data-path="subset.html"><a href="subset.html#prioritization-workflow"><i class="fa fa-check"></i><b>5.3.1</b> Prioritization workflow</a></li>
+</ul></li>
+<li class="chapter" data-level="5.4" data-path="unOv.html"><a href="unOv.html"><i class="fa fa-check"></i><b>5.4</b> Unique and overlapping features</a></li>
+<li class="chapter" data-level="5.5" data-path="visualization.html"><a href="visualization.html"><i class="fa fa-check"></i><b>5.5</b> Visualization</a><ul>
+<li class="chapter" data-level="5.5.1" data-path="visualization.html"><a href="visualization.html#features-and-annatation-data"><i class="fa fa-check"></i><b>5.5.1</b> Features and annatation data</a></li>
+<li class="chapter" data-level="5.5.2" data-path="visualization.html"><a href="visualization.html#visComp"><i class="fa fa-check"></i><b>5.5.2</b> Comparing data</a></li>
+<li class="chapter" data-level="5.5.3" data-path="visualization.html"><a href="visualization.html#plotClust"><i class="fa fa-check"></i><b>5.5.3</b> Hierarchical clustering results</a></li>
+<li class="chapter" data-level="5.5.4" data-path="visualization.html"><a href="visualization.html#interactive-plotting-of-chromatography-data"><i class="fa fa-check"></i><b>5.5.4</b> Interactive plotting of chromatography data</a></li>
+<li class="chapter" data-level="5.5.5" data-path="visualization.html"><a href="visualization.html#generating-eics-in-dataanalysis"><i class="fa fa-check"></i><b>5.5.5</b> Generating EICs in DataAnalysis</a></li>
+</ul></li>
+<li class="chapter" data-level="5.6" data-path="report.html"><a href="report.html"><i class="fa fa-check"></i><b>5.6</b> Reporting</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="advanced-usage.html"><a href="advanced-usage.html"><i class="fa fa-check"></i><b>6</b> Advanced usage</a><ul>
+<li class="chapter" data-level="6.1" data-path="adducts.html"><a href="adducts.html"><i class="fa fa-check"></i><b>6.1</b> Adducts</a></li>
+<li class="chapter" data-level="6.2" data-path="fOpt.html"><a href="fOpt.html"><i class="fa fa-check"></i><b>6.2</b> Feature parameter optimization</a><ul>
+<li class="chapter" data-level="6.2.1" data-path="fOpt.html"><a href="fOpt.html#parameter-sets"><i class="fa fa-check"></i><b>6.2.1</b> Parameter sets</a></li>
+<li class="chapter" data-level="6.2.2" data-path="fOpt.html"><a href="fOpt.html#processing-optmization-results"><i class="fa fa-check"></i><b>6.2.2</b> Processing optmization results</a></li>
+</ul></li>
+<li class="chapter" data-level="6.3" data-path="exporting-and-converting-feature-data.html"><a href="exporting-and-converting-feature-data.html"><i class="fa fa-check"></i><b>6.3</b> Exporting and converting feature data</a></li>
+<li class="chapter" data-level="6.4" data-path="consensus.html"><a href="consensus.html"><i class="fa fa-check"></i><b>6.4</b> Algorithm consensus</a></li>
+<li class="chapter" data-level="6.5" data-path="compclust.html"><a href="compclust.html"><i class="fa fa-check"></i><b>6.5</b> Compound clustering</a></li>
+<li class="chapter" data-level="6.6" data-path="caching.html"><a href="caching.html"><i class="fa fa-check"></i><b>6.6</b> Caching</a></li>
+<li class="chapter" data-level="6.7" data-path="parallelization.html"><a href="parallelization.html"><i class="fa fa-check"></i><b>6.7</b> Parallelization</a></li>
+</ul></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">patRoon handbook</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="inspecting-results" class="section level2">
+<h2><span class="header-section-number">5.1</span> Inspecting results</h2>
+<p>Several generic functions exist that can be used to inspect data that is stored in a particular object (e.g. features, compounds etc):</p>
+<table>
+<colgroup>
+<col width="41%" />
+<col width="23%" />
+<col width="34%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Generic</th>
+<th>Classes</th>
+<th>Remarks</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>length()</code></td>
+<td>All</td>
+<td>Returns the length of the object (e.g. number of features, compounds etc)</td>
+</tr>
+<tr class="even">
+<td><code>algorithm()</code></td>
+<td>All</td>
+<td>Returns the name of the algorithm used to generate the object.</td>
+</tr>
+<tr class="odd">
+<td><code>groupNames()</code></td>
+<td>All</td>
+<td>Returns all the unique identitifiers (or names) of the feature groups for which this object contains results.</td>
+</tr>
+<tr class="even">
+<td><code>names()</code></td>
+<td><code>featureGroups</code>, <code>components</code></td>
+<td>Returns names of the feature groups (similar to <code>groupNames()</code>) or components</td>
+</tr>
+<tr class="odd">
+<td><code>show()</code></td>
+<td>All</td>
+<td>Prints general information.</td>
+</tr>
+<tr class="even">
+<td><code>&quot;[[&quot;</code> / <code>&quot;$&quot;</code> operators</td>
+<td>All</td>
+<td>Extract general information, see below.</td>
+</tr>
+<tr class="odd">
+<td><code>as.data.table()</code> / <code>as.data.frame()</code></td>
+<td>All</td>
+<td>Convert data to a <code>data.table</code> or <code>data.frame</code>, see below.</td>
+</tr>
+<tr class="even">
+<td><code>analysisInfo()</code>, <code>analyses()</code>, <code>replicateGroups()</code></td>
+<td><code>features</code>, <code>featureGroups</code></td>
+<td>Returns the <a href="preparations.html#anaInfo">analysis information</a>, analyses or replicate groups for which this object contains data.</td>
+</tr>
+<tr class="odd">
+<td><code>groupInfo()</code></td>
+<td><code>featureGroups</code></td>
+<td>Returns feature group information (<em>m/z</em> and retention time values).</td>
+</tr>
+<tr class="even">
+<td><code>componentInfo()</code></td>
+<td><code>components</code></td>
+<td>Returns information for all components.</td>
+</tr>
+<tr class="odd">
+<td><code>annotatedPeakList()</code></td>
+<td><code>formulas</code>, <code>compounds</code></td>
+<td>Returns a table with annotated mass peaks (see below).</td>
+</tr>
+</tbody>
+</table>
+<p>The common <code>R</code> extraction operators <code>&quot;[[&quot;</code>, <code>&quot;$&quot;</code> can be used to obtain data for a particular feature groups, analysis etc:</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Feature table (only first columns for readability)</span>
+fList[[<span class="st">&quot;standard-1&quot;</span>]][, <span class="dv">1</span><span class="op">:</span><span class="dv">6</span>]</code></pre>
+<pre><code>#&gt;                          ID       ret        mz      area    retmin    retmax
+#&gt;   1: f_12023031591332938897  19.00698  78.99684  65793.40  13.01202  29.99700
+#&gt;   2:  f_9468007164354365926  20.00598  79.02098 125354.00  13.01202  29.99700
+#&gt;   3: f_14716248154094373004   8.01600  79.02101 188046.00   3.03000  12.01302
+#&gt;   4: f_10722753113604835535 112.34220  79.02103  71169.00 106.55400 147.51600
+#&gt;   5:  f_5538859798307434813 111.64380  84.95950  54875.10 105.15180 599.87400
+#&gt;  ---                                                                         
+#&gt; 433:  f_3315422005162484031  11.01402 295.22387   9514.48   9.01602  13.01202
+#&gt; 434:  f_9303020272825416339  13.01202 296.92038  37753.40  10.01502  15.01098
+#&gt; 435: f_11526314104159707253  12.01302 297.16751  17366.10   9.01602  15.01098
+#&gt; 436: f_13443907472484778662  11.01402 297.20368  13996.00   9.01602  14.01102
+#&gt; 437: f_16381015260814786306  12.01302 299.12581  13630.40   9.01602  15.01098</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Feature group intensities</span>
+fGroups<span class="op">$</span>M120_R328_<span class="dv">81</span></code></pre>
+<pre><code>#&gt; [1] 55936 61668 59624</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">fGroups[[<span class="dv">1</span>, <span class="st">&quot;M120_R328_81&quot;</span>]] <span class="co"># only first analysis</span></code></pre>
+<pre><code>#&gt; [1] 55936</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># obtains list MS/MS peak list  (feature group averaged datas)</span>
+mslists[[<span class="st">&quot;M120_R328_81&quot;</span>]]<span class="op">$</span>MSMS</code></pre>
+<pre><code>#&gt;           mz intensity precursor
+#&gt; 1:  92.04936  9426.556     FALSE
+#&gt; 2: 118.08606  2167.444     FALSE
+#&gt; 3: 120.05549 43949.222      TRUE
+#&gt; 4: 121.05850  3397.556     FALSE</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># get all formula candidates for a feature group</span>
+formulas[[<span class="st">&quot;M120_R328_81&quot;</span>]][, <span class="dv">1</span><span class="op">:</span><span class="dv">7</span>]</code></pre>
+<pre><code>#&gt;      analysis neutral_formula formula formula_mz    error dbe  isoScore
+#&gt; 1: standard-1          C6H5N3  C6H6N3   120.0556 1.266667   6 0.9905167
+#&gt; 2: standard-1          C6H5N3  C6H6N3   120.0556 1.266667   6 0.9905167</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># get all compound candidates for a feature group</span>
+compounds[[<span class="st">&quot;M120_R328_81&quot;</span>]][, <span class="dv">1</span><span class="op">:</span><span class="dv">4</span>]</code></pre>
+<pre><code>#&gt;      explainedPeaks    score neutralMass                     SMILES
+#&gt;   1:              1 3.322371     119.048          C1=CC2=NNN=C2C=C1
+#&gt;   2:              1 1.644567     119.048        C1=CC=C2C(=C1)N2N=N
+#&gt;   3:              1 1.522632     119.048 C1=CC(=N)C(=[N+]=[N-])C=C1
+#&gt;   4:              1 1.490700     119.048   C1=CC=C2C(=C1)[N-]N[N-]2
+#&gt;   5:              1 1.488898     119.048        C1=CC=C(C=C1)N2N=N2
+#&gt;  ---                                                               
+#&gt;  96:              1 1.018037     119.048     C1=CC2=CN=N[C@@H]2N=C1
+#&gt;  97:              1 1.017415     119.048        C1=C(NC=N1)/C=C/C#N
+#&gt;  98:              1 1.016333     119.048          C=CN1C=C(N=N1)C#C
+#&gt;  99:              1 1.016333     119.048          C=CN1C(=CN=N1)C#C
+#&gt; 100:              1 1.012478     119.048          C=NC1=C(C=NN1)C#C</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># get a table with information of a component</span>
+components[[<span class="st">&quot;CMP7&quot;</span>]][, <span class="dv">1</span><span class="op">:</span><span class="dv">6</span>]</code></pre>
+<pre><code>#&gt;            group       rt       mz isotopes adnr adduct_rule
+#&gt; 1: M254_R321_484 320.2038 254.0596             1           1
+#&gt; 2: M276_R321_550 320.6412 276.0415             1           6</code></pre>
+<p>A more sophisticated way to obtain data from a workflow object is to use <code>as.data.table()</code> or <code>as.data.frame()</code>. These functions will convert <em>all</em> information within the object to a table (<code>data.table</code> or <code>data.frame</code>) and allow various options to add extra information. An advantage is that this common data format can be used with many other functions within <code>R</code>. The output is in a <a href="https://r4ds.had.co.nz/tidy-data.html">tidy format</a>.</p>
+<blockquote>
+<p><strong><em>NOTE</em></strong> If you are not familiar with <code>data.table</code> and want to know more see <a href="https://github.com/Rdatatable/data.table/wiki">data.table</a>. Briefly, this is a more efficient and largely compatible alternative to the regular <code>data.frame</code>.</p>
+</blockquote>
+<blockquote>
+<p><strong><em>NOTE</em></strong> The <code>as.data.frame()</code> methods defined in <code>patRoon</code> simply convert the results from <code>as.data.table()</code>, hence, both functions are equal in their usage and are defined for the same object classes.</p>
+</blockquote>
+<p>Some typical examples are shown below.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># obtain table with all features (only first columns for readability)</span>
+<span class="kw">as.data.table</span>(fList)[, <span class="dv">1</span><span class="op">:</span><span class="dv">6</span>]</code></pre>
+<pre><code>#&gt;         analysis                     ID       ret        mz     area     retmin
+#&gt;    1:  solvent-1 f_10351788968371089569  19.10298  78.99678  73929.3  13.108980
+#&gt;    2:  solvent-1 f_16694602598393725262  14.10798  84.95948 941557.0   3.922998
+#&gt;    3:  solvent-1 f_16523688405266050456 112.97220  84.95949  47558.8 105.301800
+#&gt;    4:  solvent-1  f_9689755464465118514  13.10898  88.95255  34552.7   7.114020
+#&gt;    5:  solvent-1 f_17560714647781001091   2.52900  88.96823  14710.1   1.732002
+#&gt;   ---                                                                          
+#&gt; 2440: standard-3 f_15282483386828802607  12.14898 294.93888 350965.0   9.151020
+#&gt; 2441: standard-3 f_11386497235695192726  11.14998 295.18863  10705.6   9.151020
+#&gt; 2442: standard-3 f_15421390979136458371  13.14798 296.92039  42195.9  10.150980
+#&gt; 2443: standard-3 f_13099381545075521207  11.14998 297.16737  15177.6   9.151020
+#&gt; 2444: standard-3  f_8558183876474907835  11.14998 297.20377  16678.1   9.151020</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Returns group info and intensity values for each feature group</span>
+<span class="kw">as.data.table</span>(fGroups, <span class="dt">average =</span> <span class="ot">TRUE</span>) <span class="co"># average intensities for replicates</span></code></pre>
+<pre><code>#&gt;             group      ret       mz standard
+#&gt;  1:  M120_R328_81 327.9955 120.0555 59076.00
+#&gt;  2: M134_R399_118 398.6365 134.0712 78472.00
+#&gt;  3: M135_R261_123 260.5933 135.1014 16325.33
+#&gt;  4: M137_R303_127 302.7823 137.0708 43810.67
+#&gt;  5: M146_R185_153 185.2398 146.0599 23716.00
+#&gt; ---                                         
+#&gt; 23: M237_R510_445 510.3882 237.1026 60214.67
+#&gt; 24: M242_R461_459 460.6473 242.2848 78576.00
+#&gt; 25: M254_R321_484 320.7174 254.0598 33440.00
+#&gt; 26: M276_R321_550 320.9508 276.0416 10876.00
+#&gt; 27: M279_R284_557 283.9626 279.0915 42941.33</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Returns all peak lists for each feature group</span>
+<span class="kw">as.data.table</span>(mslists)</code></pre>
+<pre><code>#&gt;               group type        mz intensity precursor
+#&gt;    1:  M120_R328_81   MS  84.95945  2526.560     FALSE
+#&gt;    2:  M120_R328_81   MS  87.08025  1148.153     FALSE
+#&gt;    3:  M120_R328_81   MS  88.96826  3891.785     FALSE
+#&gt;    4:  M120_R328_81   MS  93.00016  1235.728     FALSE
+#&gt;    5:  M120_R328_81   MS  97.96859  1412.052     FALSE
+#&gt;   ---                                                 
+#&gt; 1306: M279_R284_557 MSMS 156.01134 17220.356     FALSE
+#&gt; 1307: M279_R284_557 MSMS 186.03329 19167.422     FALSE
+#&gt; 1308: M279_R284_557 MSMS 204.04394  7115.156     FALSE
+#&gt; 1309: M279_R284_557 MSMS 213.11359  3676.444     FALSE
+#&gt; 1310: M279_R284_557 MSMS 279.09140  2027.244      TRUE</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Returns all formula candidates for each feature group with scoring</span>
+<span class="co"># information, neutral loss etc</span>
+<span class="kw">as.data.table</span>(formulas)[, <span class="dv">1</span><span class="op">:</span><span class="dv">6</span>]</code></pre>
+<pre><code>#&gt;              group   analysis neutral_formula     formula formula_mz      error
+#&gt;   1:  M120_R328_81 standard-1          C6H5N3      C6H6N3   120.0556  1.2666667
+#&gt;   2:  M120_R328_81 standard-1          C6H5N3      C6H6N3   120.0556  1.2666667
+#&gt;   3: M134_R399_118 standard-3          C7H7N3      C7H8N3   134.0713  0.3500000
+#&gt;   4: M134_R399_118 standard-3          C7H7N3      C7H8N3   134.0713  0.6666667
+#&gt;   5: M134_R399_118 standard-3          C7H7N3      C7H8N3   134.0713  0.6666667
+#&gt;  ---                                                                           
+#&gt; 248: M279_R284_557 standard-1      C2H15N8O6P  C2H16N8O6P   279.0925  2.8000000
+#&gt; 249: M279_R284_557 standard-1      C2H15N8O6P  C2H16N8O6P   279.0925  2.8000000
+#&gt; 250: M279_R284_557 standard-1      C2H15N8O6P  C2H16N8O6P   279.0925  2.8000000
+#&gt; 251: M279_R284_557 standard-3     C12H20ClO3P C12H21ClO3P   279.0911 -1.3333333
+#&gt; 252: M279_R284_557 standard-3     C13H20Cl2O2 C13H21Cl2O2   279.0913 -0.7000000</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Returns all compound candidates for each feature group with scoring and other metadata</span>
+<span class="kw">as.data.table</span>(compounds)[, <span class="dv">1</span><span class="op">:</span><span class="dv">4</span>]</code></pre>
+<pre><code>#&gt;               group explainedPeaks    score neutralMass
+#&gt;    1:  M120_R328_81              1 3.322371     119.048
+#&gt;    2:  M120_R328_81              1 1.644567     119.048
+#&gt;    3:  M120_R328_81              1 1.522632     119.048
+#&gt;    4:  M120_R328_81              1 1.490700     119.048
+#&gt;    5:  M120_R328_81              1 1.488898     119.048
+#&gt;   ---                                                  
+#&gt; 2096: M254_R321_484              4 1.556392     253.052
+#&gt; 2097: M254_R321_484              4 1.556392     253.052
+#&gt; 2098: M254_R321_484              4 1.556392     253.052
+#&gt; 2099: M254_R321_484              3 1.555734     253.052
+#&gt; 2100: M254_R321_484              4 1.551167     253.052</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Returns table with all components (including feature group info, annotations etc)</span>
+<span class="kw">as.data.table</span>(components)[, <span class="dv">1</span><span class="op">:</span><span class="dv">6</span>]</code></pre>
+<pre><code>#&gt;     name  cmp_ret cmp_retsd neutral_mass   analysis size
+#&gt;  1: CMP1 560.3138 0.3277624         &lt;NA&gt; standard-2    2
+#&gt;  2: CMP1 560.3138 0.3277624         &lt;NA&gt; standard-2    2
+#&gt;  3: CMP2 328.4513 0.6446699         &lt;NA&gt; standard-3    2
+#&gt;  4: CMP2 328.4513 0.6446699         &lt;NA&gt; standard-3    2
+#&gt;  5: CMP3 424.2700 0.0000000    182.07092 standard-1    2
+#&gt;  6: CMP3 424.2700 0.0000000    182.07092 standard-1    2
+#&gt;  7: CMP4 593.5129 0.3296681         &lt;NA&gt; standard-1    2
+#&gt;  8: CMP4 593.5129 0.3296681         &lt;NA&gt; standard-1    2
+#&gt;  9: CMP5 301.6178 1.0152257         &lt;NA&gt; standard-3    3
+#&gt; 10: CMP5 301.6178 1.0152257         &lt;NA&gt; standard-3    3
+#&gt; 11: CMP5 301.6178 1.0152257         &lt;NA&gt; standard-3    3
+#&gt; 12: CMP6 215.1077 0.4942076     107.0977 standard-3    2
+#&gt; 13: CMP6 215.1077 0.4942076     107.0977 standard-3    2
+#&gt; 14: CMP7 320.8341 0.1649877    253.05231 standard-2    2
+#&gt; 15: CMP7 320.8341 0.1649877    253.05231 standard-2    2</code></pre>
+<p>Finally, the <code>annotatedPeakList()</code> function is useful to inspect annotation results for a formula or compound candidate:</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># formula annotations for for a formula candidate of feature group M120_R328_81</span>
+<span class="kw">annotatedPeakList</span>(formulas, <span class="dt">precursor =</span> <span class="st">&quot;C6H6N3&quot;</span>, <span class="dt">groupName =</span> <span class="st">&quot;M120_R328_81&quot;</span>,
+                  <span class="dt">MSPeakLists =</span> mslists)</code></pre>
+<pre><code>#&gt;           mz intensity precursor formula neutral_loss
+#&gt; 1:  92.04936  9426.556     FALSE   C6H6N           N2
+#&gt; 2: 118.08606  2167.444     FALSE    &lt;NA&gt;         &lt;NA&gt;
+#&gt; 3: 120.05549 43949.222      TRUE  C6H6N3             
+#&gt; 4: 121.05850  3397.556     FALSE    &lt;NA&gt;         &lt;NA&gt;</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># compound annotation for first candidate of feature group M120_R328_81</span>
+<span class="kw">annotatedPeakList</span>(compounds, <span class="dt">index =</span> <span class="dv">1</span>, <span class="dt">groupName =</span> <span class="st">&quot;M120_R328_81&quot;</span>,
+                  <span class="dt">MSPeakLists =</span> mslists)</code></pre>
+<pre><code>#&gt;           mz intensity precursor formula neutral_loss score
+#&gt; 1:  92.04936  9426.556     FALSE   C6H6N           N2  1022
+#&gt; 2: 118.08606  2167.444     FALSE    &lt;NA&gt;         &lt;NA&gt;    NA
+#&gt; 3: 120.05549 43949.222      TRUE    &lt;NA&gt;         &lt;NA&gt;    NA
+#&gt; 4: 121.05850  3397.556     FALSE    &lt;NA&gt;         &lt;NA&gt;    NA</code></pre>
+<p>More advanced examples for these functions are shown below.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Feature table, can also be accessed by numeric index</span>
+fList[[<span class="dv">1</span>]]
+mslists[[<span class="st">&quot;standard-1&quot;</span>, <span class="st">&quot;M120_R328_81&quot;</span>]] <span class="co"># feature data (instead of feature group averaged)</span>
+formulas[[<span class="dv">1</span>, <span class="st">&quot;M120_R328_81&quot;</span>]] <span class="co"># feature data (if available, i.e. calculateFeatures=TRUE)</span>
+components[[<span class="st">&quot;CMP1&quot;</span>, <span class="dv">1</span>]] <span class="co"># only for first feature group in component</span>
+
+<span class="kw">as.data.frame</span>(fList) <span class="co"># classic data.frame format, works for all objects</span>
+<span class="kw">as.data.table</span>(fGroups) <span class="co"># return non-averaged intensities (default)</span>
+<span class="kw">as.data.table</span>(fGroups, <span class="dt">features =</span> <span class="ot">TRUE</span>) <span class="co"># include feature information</span>
+<span class="kw">as.data.table</span>(mslists, <span class="dt">averaged =</span> <span class="ot">FALSE</span>) <span class="co"># peak lists each feature</span>
+<span class="kw">as.data.table</span>(mslists, <span class="dt">fGroups =</span> fGroups) <span class="co"># add feature group information</span>
+
+<span class="kw">as.data.table</span>(formulas, <span class="dt">countElements =</span> <span class="kw">c</span>(<span class="st">&quot;C&quot;</span>, <span class="st">&quot;H&quot;</span>)) <span class="co"># include C/H counts (e.g. for van Krevelen plots)</span>
+<span class="co"># report only top precursor and fragment formula. This yields in one row per feature group.</span>
+<span class="kw">as.data.table</span>(formulas, <span class="dt">maxFormulas =</span> <span class="dv">1</span>, <span class="dt">maxFragFormulas =</span> <span class="dv">1</span>)
+<span class="co"># add various information for organic matter characterization (common elemental</span>
+<span class="co"># counts/ratios, classifications etc)</span>
+<span class="kw">as.data.table</span>(formulas, <span class="dt">OM =</span> <span class="ot">TRUE</span>)
+
+<span class="kw">as.data.table</span>(compounds, <span class="dt">fGroups =</span> fGroups) <span class="co"># add feature group informaion</span>
+<span class="kw">as.data.table</span>(compounds, <span class="dt">fragments =</span> <span class="ot">TRUE</span>) <span class="co"># include information of all annotated fragments</span>
+
+<span class="kw">annotatedPeakList</span>(formulas, <span class="dt">precursor =</span> <span class="st">&quot;C6H6N3&quot;</span>, <span class="dt">groupName =</span> <span class="st">&quot;M120_R328_81&quot;</span>,
+                  <span class="dt">MSPeakLists =</span> mslists, <span class="dt">onlyAnnotated =</span> <span class="ot">TRUE</span>) <span class="co"># only include annotated peaks</span>
+<span class="kw">annotatedPeakList</span>(compounds, <span class="dt">index =</span> <span class="dv">1</span>, <span class="dt">groupName =</span> <span class="st">&quot;M120_R328_81&quot;</span>,
+                  <span class="dt">MSPeakLists =</span> mslists, <span class="dt">formulas =</span> formulas) <span class="co"># include formula annotations</span></code></pre>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="processing-workflow-data.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="filtering.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": false,
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"download": null,
+"toc": {
+"collapse": false
+}
+});
+});
+</script>
+
+</body>
+
+</html>

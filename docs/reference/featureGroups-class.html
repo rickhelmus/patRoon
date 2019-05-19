@@ -81,6 +81,21 @@
 <li>
   <a href="../articles/tutorial.html">Tutorial</a>
 </li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Handbook
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../handbook_bd/introduction.html">Book format</a>
+    </li>
+    <li>
+      <a href="../articles/handbook.html">Single page</a>
+    </li>
+  </ul>
+</li>
 <li>
   <a href="../news/index.html">Changelog</a>
 </li>
@@ -169,11 +184,12 @@ as.data.table(x, average = FALSE,
   features = FALSE)
 
 # S4 method for featureGroups,ANY
-plot(x, retMin = TRUE, col = NULL,
+plot(x, retMin = FALSE, col = NULL,
   pch = 16, ...)
 
 # S4 method for featureGroups
-plotInt(obj, average = FALSE, ...)
+plotInt(obj, average = FALSE, pch = 20,
+  type = "b", lty = 3, col = NULL, ...)
 
 # S4 method for featureGroups
 plotChord(obj, addSelfLinks = FALSE,
@@ -221,10 +237,10 @@ their index or name, respectively (for the order/names see <code>analyses()/name
     <tr>
       <th>&#8230;</th>
       <td><p>Ignored for <code>"["</code> operator or passed to
-<code><a href='https://www.rdocumentation.org/packages/graphics/topics/plot'>plot</a></code> (<code>plot</code>, <code>plotInt</code> and
-<code>plotEIC</code>), <span class="pkg">VennDiagram</span> plotting functions
-(<code>plotVenn</code>), <code>chordDiagram</code> (<code>plotChord</code>) or
-<code><a href='https://www.rdocumentation.org/packages/UpSetR/topics/upset'>upset</a></code> (<code>plotUpSet</code>).</p></td>
+<code><a href='https://www.rdocumentation.org/packages/graphics/topics/plot'>plot</a></code> (<code>plot</code> and <code>plotEIC</code>),
+<code><a href='https://www.rdocumentation.org/packages/graphics/topics/lines'>lines</a></code> (<code>plotInt</code>), <span class="pkg">VennDiagram</span>
+plotting functions (<code>plotVenn</code>), <code>chordDiagram</code>
+(<code>plotChord</code>) or <code><a href='https://www.rdocumentation.org/packages/UpSetR/topics/upset'>upset</a></code> (<code>plotUpSet</code>).</p></td>
     </tr>
     <tr>
       <th>drop</th>
@@ -258,9 +274,14 @@ ProfileAnalysis), <code>"brukertasq"</code> (Bruker TASQ) or <code>"mzmine"</cod
       <td><p>Plot retention time in minutes (instead of seconds).</p></td>
     </tr>
     <tr>
-      <th>col, pch</th>
-      <td><p>Passed to <code><a href='https://www.rdocumentation.org/packages/graphics/topics/plot'>plot</a></code>. If <code>col=NULL</code>
-then colours are automatically generated.</p></td>
+      <th>col</th>
+      <td><p>Colour(s) used. If <code>col=NULL</code> then colours are automatically
+generated.</p></td>
+    </tr>
+    <tr>
+      <th>pch, type, lty</th>
+      <td><p>Common plotting parameters passed to <em>e.g.</em>
+<code><a href='https://www.rdocumentation.org/packages/graphics/topics/plot'>plot</a></code>.</p></td>
     </tr>
     <tr>
       <th>addSelfLinks</th>
@@ -490,14 +511,14 @@ row within the feature table of the analysis (see
 
     <p></p><ul>
 <li><p><code><a href='workflowStep-class.html'>workflowStep</a></code></p><ul>
-<li><p><strong><code><a href='features-class.html'>features</a></code></strong></p><ul>
-<li><p><code><a href='featureGroups-compare.html'>featuresFromFeatGroups</a></code></p></li>
-<li><p><code><a href='featureGroups-compare.html'>featuresConsensus</a></code></p></li>
-<li><p><code><a href='features-class.html'>featuresBruker</a></code></p></li>
-<li><p><code><a href='features-class.html'>featuresEnviPick</a></code></p></li>
-<li><p><code><a href='features-class.html'>featuresOpenMS</a></code></p></li>
-<li><p><code><a href='target-screening.html'>featuresBrukerTASQ</a></code></p></li>
-<li><p><code><a href='features-class.html'>featuresXCMS</a></code></p></li>
+<li><p><strong><code>featureGroups</code></strong></p><ul>
+<li><p><code>featureGroupsBruker</code></p></li>
+<li><p><code><a href='featureGroups-compare.html'>featureGroupsConsensus</a></code></p></li>
+<li><p><code>featureGroupsEnviMass</code></p></li>
+<li><p><code>featureGroupsOpenMS</code></p></li>
+<li><p><code><a href='target-screening.html'>featureGroupsScreening</a></code></p></li>
+<li><p><code><a href='target-screening.html'>featureGroupsBrukerTASQ</a></code></p></li>
+<li><p><code>featureGroupsXCMS</code></p></li>
 </ul></li>
 </ul></li>
 </ul>
@@ -508,13 +529,13 @@ row within the feature table of the analysis (see
 <p>Conway JR, Lex A, Gehlenborg N (2017).
 &#8220;UpSetR: an R package for the visualization of intersecting sets and their properties.&#8221;
 <em>Bioinformatics</em>, <b>33</b>(18), 2938-2940.
-doi: <a href='http://doi.org/10.1093/bioinformatics/btx364'>10.1093/bioinformatics/btx364</a>
+doi: <a href='https://doi.org/10.1093/bioinformatics/btx364'>10.1093/bioinformatics/btx364</a>
 , <a href='http://dx.doi.org/10.1093/bioinformatics/btx364'>http://dx.doi.org/10.1093/bioinformatics/btx364</a>.
  <br /><br />
   Lex A, Gehlenborg N, Strobelt H, Vuillemot R, Pfister H (2014).
 &#8220;UpSet: Visualization of Intersecting Sets.&#8221;
 <em>IEEE Transactions on Visualization and Computer Graphics</em>, <b>20</b>(12), 1983--1992.
-doi: <a href='http://doi.org/10.1109/tvcg.2014.2346248'>10.1109/tvcg.2014.2346248</a>
+doi: <a href='https://doi.org/10.1109/tvcg.2014.2346248'>10.1109/tvcg.2014.2346248</a>
 , <a href='https://doi.org/10.1109/tvcg.2014.2346248'>https://doi.org/10.1109/tvcg.2014.2346248</a>.</p>
     
 

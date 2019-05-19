@@ -1,7 +1,7 @@
 ---
 title: "patRoon handbook"
 author: "Rick Helmus"
-date: "`r Sys.Date()`"
+date: "`r Sys.Date()`"  
 header-includes:
 - \usepackage{fvextra}
 - \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
@@ -10,27 +10,27 @@ vignette: |
 ---
 
 ```{r include=FALSE}
-vignDir <- "."
+vignDir <- normalizePath(".")
 ```
 
-```{r child="handbook/setup.Rmd"}
+```{r child="handbook/_setup.Rmd"}
 ```
 
-```{r child="handbook/intro.Rmd"}
+```{r child="handbook/_intro.Rmd"}
 ```
 
-```{r child="handbook/installation.Rmd"}
+```{r child="handbook/_installation.Rmd"}
 ```
 
-```{r child="handbook/concepts.Rmd"}
+```{r child="handbook/_concepts.Rmd"}
 ```
 
-```{r child="handbook/workflow_gen.Rmd"}
+```{r child="handbook/_workflow_gen.Rmd"}
 ```
 
-```{r child="handbook/processing.Rmd"}
+```{r child="handbook/_processing.Rmd"}
 ```
 
-```{r child="handbook/advanced.Rmd"}
+```{r child="handbook/_advanced.Rmd"}
 ```
 

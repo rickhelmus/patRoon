@@ -82,6 +82,21 @@ featureGroups object." />
 <li>
   <a href="../articles/tutorial.html">Tutorial</a>
 </li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Handbook
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../handbook_bd/introduction.html">Book format</a>
+    </li>
+    <li>
+      <a href="../articles/handbook.html">Single page</a>
+    </li>
+  </ul>
+</li>
 <li>
   <a href="../news/index.html">Changelog</a>
 </li>
@@ -107,7 +122,7 @@ featureGroups object." />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Class containing MS Peak Lists</h1>
-    <small class="dont-index">Source: <a href='https://github.com/rickhelmus/patRoon/blob/master/R/mspeaklists.R'><code>R/mspeaklists.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/rickhelmus/patRoon/blob/master/R/mspeaklists.R'><code>R/mspeaklists.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/utils-mspeaklists.R'><code>R/utils-mspeaklists.R</code></a></small>
     <div class="hidden name"><code>MSPeakLists-class.Rd</code></div>
     </div>
 
@@ -153,13 +168,16 @@ as.data.table(x, fGroups = NULL,
 # S4 method for MSPeakLists
 filter(obj, absMSIntThr = NULL,
   absMSMSIntThr = NULL, relMSIntThr = NULL, relMSMSIntThr = NULL,
-  topMSPeaks = NULL, topMSMSPeaks = NULL, deIsotopeMS = FALSE,
-  deIsotopeMSMS = FALSE, retainPrecursorMSMS = TRUE, negate = FALSE)
+  topMSPeaks = NULL, topMSMSPeaks = NULL, isolatePrec = NULL,
+  deIsotopeMS = FALSE, deIsotopeMSMS = FALSE, withMSMS = FALSE,
+  retainPrecursorMSMS = TRUE, negate = FALSE)
 
 # S4 method for MSPeakLists
 plotSpec(obj, groupName, analysis = NULL,
   MSLevel = 1, title = NULL, useGGPlot2 = FALSE, xlim = NULL,
-  ylim = NULL, ...)</pre>
+  ylim = NULL, ...)
+
+getDefIsolatePrecParams(...)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -213,11 +231,25 @@ intensity threshold for MS or MS/MS peak lists. <code>NULL</code> for none.</p><
 with highest intensity. <code>NULL</code> to consider all.</p></td>
     </tr>
     <tr>
+      <th>isolatePrec</th>
+      <td><p>If not <code>NULL</code> then value should be a <code>list</code> with
+parameters used for isolating the precursor and its isotopes in MS peak
+lists (see <code>Isolating precursor data</code>). Alternatively, <code>TRUE</code> to
+apply the filter with default settings (as given with
+<code>getDefIsolatePrecParams</code>).</p></td>
+    </tr>
+    <tr>
       <th>deIsotopeMS, deIsotopeMSMS</th>
       <td><p>Remove any isotopic peaks in MS or MS/MS
 peak lists. This may improve data processing steps which do not assume the
 presence of isotopic peaks (e.g. MetFrag for MS/MS). Note that
 <code>getMzRPeakLists</code> does not (yet) support flagging of isotopes.</p></td>
+    </tr>
+    <tr>
+      <th>withMSMS</th>
+      <td><p>If set to <code>TRUE</code> then only results will be retained for
+which MS/MS data is available. if <code>negate=TRUE</code> then only results
+<em>without</em> MS/MS data will be retained.</p></td>
     </tr>
     <tr>
       <th>retainPrecursorMSMS</th>
@@ -284,6 +316,8 @@ faster.</p></td>
 
     <p>Objects for this class are returned by <a href='MSPeakLists-generation.html'>MS peak
 lists generators</a>.</p>
+<p>The <code>getDefIsolatePrecParams</code> is used to create a parameter
+  list for isolating the precursor and its isotopes (see <code>Isolating precursor data</code>).</p>
     
     <h2 class="hasAnchor" id="methods-by-generic-"><a class="anchor" href="#methods-by-generic-"></a>Methods (by generic)</h2>
 
@@ -326,6 +360,49 @@ for each feature group.</p></dd>
 group averaged MS(/MS) peak lists.</p></dd>
 </dl>
     
+    <h2 class="hasAnchor" id="isolating-precursor-data"><a class="anchor" href="#isolating-precursor-data"></a>Isolating precursor data</h2>
+
+    <p>Formula calculation typically relies on
+  evaluating the measured isotopic pattern from the precursor to score
+  candidates. Some algorithms (currently only <code class='command'>GenForm</code>) penalize
+  candidates if mass peaks are present in MS1 spectra that do not contribute
+  to the isotopic pattern. Since these spectra are typically very 'noisy' due
+  to background and co-eluting ions, an additional filtering step may be
+  recommended prior to formula calculation. During this precursor isolation
+  step all mass peaks are removed that are (1) not the precursor and (2) not
+  likely to be an isotopologue of the precursor. To determine potential
+  isotopic peaks the following parameters are used:</p>
+<p></p><ul>
+<li><p><code>maxIsotopes</code> The maximum number of isotopes to consider. For
+  instance, a value of <samp>5</samp> means that <code>M+0</code> (<em>i.e.</em> the
+  monoisoptic peak) till <code>M+5</code> is considered. All mass peaks outside
+  this range are removed.</p></li>
+<li><p><code>mzDefectRange</code> A two-sized <code>vector</code> specifying the minimum
+  (can be negative) and maximum <em>m/z</em> defect deviation compared to the
+  precursor <em>m/z</em> defect. When chlorinated, brominated or other
+  compounds with strong <em>m/z</em> defect in their isotopologues are to be
+  considered a higher range may be desired. On the other hand, for natural
+  compounds this range may be tightened. Note that the search range is
+  propegated with increasing distance from the precursor, <em>e.g.</em> the
+  search range is doubled for <code>M+2</code>, tripled for <code>M+3</code> etc.</p></li>
+<li><p><code>intRange</code> A two-sized <code>vector</code> specifying the minimum and
+  maximum relative intensity range compared to the precursor. For instance,
+  <code><a href='https://www.rdocumentation.org/packages/base/topics/c'>c(0.001, 2)</a></code> removes all peaks that have an intensity below 0.1% are
+  above 200% of that of the precursor.</p></li>
+<li><p><code>z</code> The <code>z</code> value (<em>i.e.</em> absolute charge) to be
+  considerd. For instance, a value of <code>2</code> would look for <code>M+0.5</code>,
+  <code>M+1</code> etc. Note that the <code>mzDefectRange</code> is adjusted accordingly
+  (<em>e.g.</em> halved if <code>z=2</code>).</p></li>
+<li><p><code>maxGap</code> The maximum number of missing adjacent isotopic peaks
+  ('gaps'). If the (rounded) <em>m/z</em> difference to the previous peak
+  exceeds this value then this and all next peaks will be removed. Similar to
+  <code>z</code>, the maximum gap is automatically adjusted for <code>charge</code>.</p></li>
+</ul>
+    <p>These parameters should be in a <code>list</code> that is passed to the
+  <code>isolatePrec</code> argument to <code>filter</code>. The default values can be
+  obtained with the <code>getDefIsolatePrecParams</code> function:</p>
+<p><code>maxIsotopes=5</code>; <code>mzDefectRange=c(-0.01, 0.01)</code>; <code>intRange=c(0.001, 2)</code>; <code>z=1</code>; <code>maxGap=2</code></p>
+    
     <h2 class="hasAnchor" id="s-class-hierarchy"><a class="anchor" href="#s-class-hierarchy"></a>S4 class hierarchy</h2>
 
     <p></p><ul>
@@ -348,6 +425,8 @@ group averaged MS(/MS) peak lists.</p></dd>
       <li><a href="#methods-by-generic-">Methods (by generic)</a></li>
 
       <li><a href="#slots">Slots</a></li>
+
+      <li><a href="#isolating-precursor-data">Isolating precursor data</a></li>
 
       <li><a href="#s-class-hierarchy">S4 class hierarchy</a></li>
           </ul>

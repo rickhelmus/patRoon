@@ -82,6 +82,21 @@ groups." />
 <li>
   <a href="../articles/tutorial.html">Tutorial</a>
 </li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Handbook
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../handbook_bd/introduction.html">Book format</a>
+    </li>
+    <li>
+      <a href="../articles/handbook.html">Single page</a>
+    </li>
+  </ul>
+</li>
 <li>
   <a href="../news/index.html">Changelog</a>
 </li>
@@ -128,8 +143,8 @@ groups.</p>
 <span class='fu'>generateFormulasGenForm</span>(<span class='no'>fGroups</span>, <span class='no'>MSPeakLists</span>, <span class='kw'>relMzDev</span> <span class='kw'>=</span> <span class='fl'>5</span>,
   <span class='kw'>adduct</span> <span class='kw'>=</span> <span class='st'>"[M+H]+"</span>, <span class='kw'>elements</span> <span class='kw'>=</span> <span class='st'>"CHNOP"</span>, <span class='kw'>hetero</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>oc</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>extraOpts</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>calculateFeatures</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>featThreshold</span> <span class='kw'>=</span> <span class='fl'>0.75</span>,
-  <span class='kw'>MSMode</span> <span class='kw'>=</span> <span class='st'>"both"</span>, <span class='kw'>maxProcAmount</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/options'>getOption</a></span>(<span class='st'>"patRoon.maxProcAmount"</span>),
-  <span class='kw'>maxCmdsPerProc</span> <span class='kw'>=</span> <span class='fl'>25</span>)
+  <span class='kw'>MSMode</span> <span class='kw'>=</span> <span class='st'>"both"</span>, <span class='kw'>isolatePrec</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>timeout</span> <span class='kw'>=</span> <span class='fl'>120</span>,
+  <span class='kw'>maxProcAmount</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/options'>getOption</a></span>(<span class='st'>"patRoon.maxProcAmount"</span>), <span class='kw'>batchSize</span> <span class='kw'>=</span> <span class='fl'>25</span>)
 
 <span class='fu'>formulaScorings</span>()
 
@@ -171,11 +186,13 @@ from MS/MS spectra (this data is not readily available from
     <tr>
       <th>MSMode</th>
       <td><p>Whether formulae should be generated only from MS data
-(<code>"ms"</code>), MS/MS data (<code>"msms"</code>) or both (<code>"both"</code>). Using
-the latter option, unique formulae from MS data will still be reported if
-not predicted from MS/MS data (<em>e.g.</em> due to poor/missing MS/MS data).
-Formulae calculated from MS data that were also generated from MS/MS data
-will be removed.</p></td>
+  (<code>"ms"</code>), MS/MS data (<code>"msms"</code>) or both (<code>"both"</code>).</p>
+<p>For <code class='command'>GenForm</code> selecting <code>"both"</code> will fall back to formula
+  calculation with only MS data in case no MS/MS data is available.</p>
+<p>For calulation with Bruker DataAnalysis selecting <code>"both"</code> will
+  calculate formulae from MS data <em>and</em> MS/MS data and combines the
+  results (duplicated formulae are removed). This is useful when poor MS/MS
+  data would exclude proper candidates.</p></td>
     </tr>
     <tr>
       <th>adduct</th>
@@ -248,16 +265,37 @@ commandline options.</p></td>
 features prior to feature group assignment (see details).</p></td>
     </tr>
     <tr>
+      <th>isolatePrec</th>
+      <td><p>Settings used for isolation of precursor mass peaks and
+their isotopes. This isolation is highly important for accurate isotope
+scoring of candidates, as non-relevant mass peaks will dramatically
+decrease the score. The value of <code>isolatePrec</code> should either be a
+<code>list</code> with parameters (see the
+<code><a href='MSPeakLists-class.html'>filter method</a></code> for
+<code>MSPeakLists</code> for more details), <code>TRUE</code> for default parameters
+(the <code>z</code> parameter is automatically deduced from the <code>adduct</code>
+argument) or <code>FALSE</code> for no isolation (<em>e.g.</em> when you already
+performed isolation with the <code>filter</code> method).</p></td>
+    </tr>
+    <tr>
+      <th>timeout</th>
+      <td><p>Maximum time (in seconds) that a <code class='command'>GenForm</code> command is
+allowed to execute. If this time is exceeded a warning is emitted and the
+command is terminated. See the notes section for more information on the
+need of timeouts.</p></td>
+    </tr>
+    <tr>
       <th>maxProcAmount</th>
       <td><p>Maximum number of processes to run for parallelization.
 Usually a number close to the amount of physical cores yields most
 efficient results.</p></td>
     </tr>
     <tr>
-      <th>maxCmdsPerProc</th>
-      <td><p>Maximum number of commands that should be combined for
-each executed process. Combining commands with short runtimes (such as
-<code class='command'>GenForm</code>) can significantly increase parallel performance.</p></td>
+      <th>batchSize</th>
+      <td><p>Maximum number of <code class='command'>GenForm</code> commands that should be
+run sequentially in each parallel process Combining commands with short
+runtimes (such as <code class='command'>GenForm</code>) can significantly increase parallel
+performance. For more information see <code><a href='executeMultiProcess.html'>executeMultiProcess</a></code>.</p></td>
     </tr>
     <tr>
       <th>profile</th>
@@ -304,19 +342,21 @@ used to further improve formula assignment and ranking.</p>
 <p>When DataAnalysis is used for formula generation or
 <code>calculateFeatures=TRUE</code> formulae are first calculated for each feature.
 The results are then combined for final assignment of candidate formulae for
-each feature group (if a formula was found in multiple features within the
-group, the reported scorings and other values are those from the best ranked
-feature). The calculation of formulae on 'feature level' might result in a
-more thorough formula search and better removal of outliers (controlled by
-<code>featThreshold</code> argument). In contrast, when calculations occur on
-'feature group level' (<em>i.e.</em> <code>calculateFeatures=FALSE</code>), formulae
-are directly assigned to each feature group (by using group averaged peak MS
-lists), which significantly reduces processing time is, especially with many
-analyses. Note that in both situations subsequent algorithms that use formula
-data (<em>e.g.</em> <code><a href='compounds-class.html'>addFormulaScoring</a></code> and <a href='reporting.html'>reporting</a>
-functions) only use formula data that was eventually assigned to feature
-groups. Furthermore, please note that calculation of formulae with
-DataAnalysis always occurs on 'feature level'.</p>
+each feature group. If a formula was found in multiple features within the
+group, the reported scorings and mass errors are averaged and other numeric
+values are those from the best ranked feature (the analysis of this feature
+is stored in the <code>"analysis"</code> column). The calculation of formulae on
+'feature level' might result in a more thorough formula search and better
+removal of outliers (controlled by <code>featThreshold</code> argument). In
+contrast, when calculations occur on 'feature group level' (<em>i.e.</em>
+<code>calculateFeatures=FALSE</code>), formulae are directly assigned to each
+feature group (by using group averaged peak MS lists), which significantly
+reduces processing time is, especially with many analyses. Note that in both
+situations subsequent algorithms that use formula data (<em>e.g.</em>
+<code><a href='compounds-class.html'>addFormulaScoring</a></code> and <a href='reporting.html'>reporting</a> functions) only use
+formula data that was eventually assigned to feature groups. Furthermore,
+please note that calculation of formulae with DataAnalysis always occurs on
+'feature level'.</p>
 <p><code>generateFormulas</code> is a generic function that will generate formulae
   using one of the supported algorithms. The actual functionality is provided
   by algorithm specific functions such as <code>generateFormulasDA</code> and
@@ -355,6 +395,12 @@ DataAnalysis always occurs on 'feature level'.</p>
   with DataAnalayis can be used for this.</p>
 <p><code>generateFormulasGenForm</code> always sets the <span class="option">exist</span> and
   <span class="option">oei</span> <code class='command'>GenForm</code> commandline options.</p>
+<p>Formula calculation with <code class='command'>GenForm</code> may produce an excessive number
+  of candidates for high <em>m/z</em> values (<em>e.g.</em> above 600) and/or
+  many elemental combinations (set by <code>elements</code>). In this scenario
+  formula calculation may need a very long time. Timeouts are used to avoid
+  excessive computational times by terminating long running commands (set by
+  the <code>timeout</code> argument).</p>
     
     <h2 class="hasAnchor" id="scorings"><a class="anchor" href="#scorings"></a>Scorings</h2>
 
@@ -460,7 +506,7 @@ ISBN 978-3-319-16706-0.
   Bocker S, Letzel MC, Liptak Z, Pervukhin A (2008).
 &#8220;SIRIUS: decomposing isotope patterns for metabolite identification.&#8221;
 <em>Bioinformatics</em>, <b>25</b>(2), 218--224.
-doi: <a href='http://doi.org/10.1093/bioinformatics/btn603'>10.1093/bioinformatics/btn603</a>
+doi: <a href='https://doi.org/10.1093/bioinformatics/btn603'>10.1093/bioinformatics/btn603</a>
 .</p>
     
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>

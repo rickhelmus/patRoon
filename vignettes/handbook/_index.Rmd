@@ -1,0 +1,15 @@
+---
+title: "patRoon handbook"
+author: "Rick Helmus"
+date: "`r Sys.Date()`"
+---
+
+```{r child="_intro.Rmd"}
+```
+
+```{r include=FALSE}
+vignDir <- normalizePath("..")
+```
+
+```{r child="_setup.Rmd"}
+```

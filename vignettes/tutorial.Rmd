@@ -22,6 +22,9 @@ knitr::opts_chunk$set(
 options(patRoon.cache.fileName = "~/tutorial.sqlite")
 options(patRoon.progress.opts = list(style = 1, width = 80))
 
+if (pkgdown::in_pkgdown() && file.exists("~/.Rprofile"))
+  source("~/.Rprofile")
+
 options(width=1500) # big nr to avoid wrapping text in code chunks
 
 doCompounds <- TRUE # curl::has_internet()
@@ -435,5 +438,5 @@ In the previous sections the different parts of the processing script were discu
 <!-- UNDONE: next steps section -->
 
 
-```{r child="shared/refs.Rmd"}
+```{r child="shared/_refs.Rmd"}
 ```

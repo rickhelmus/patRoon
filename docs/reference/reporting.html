@@ -83,6 +83,21 @@ identified compounds." />
 <li>
   <a href="../articles/tutorial.html">Tutorial</a>
 </li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Handbook
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../handbook_bd/introduction.html">Book format</a>
+    </li>
+    <li>
+      <a href="../articles/handbook.html">Single page</a>
+    </li>
+  </ul>
+</li>
 <li>
   <a href="../news/index.html">Changelog</a>
 </li>
@@ -125,8 +140,8 @@ identified compounds.</p>
   <span class='kw'>reportFGroupsAsRows</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>reportFGroupsAnalysisInfo</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>reportFGroupsRetMz</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>reportFeatures</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>formulas</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>formulasNormalizeScores</span> <span class='kw'>=</span> <span class='st'>"max"</span>, <span class='kw'>formulasExclNormScores</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>compounds</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>compoundNormalizeScores</span> <span class='kw'>=</span> <span class='st'>"max"</span>,
-  <span class='kw'>compoundExclNormScores</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"score"</span>, <span class='st'>"individualMoNAScore"</span>),
+  <span class='kw'>compounds</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>compoundsNormalizeScores</span> <span class='kw'>=</span> <span class='st'>"max"</span>,
+  <span class='kw'>compoundsExclNormScores</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"score"</span>, <span class='st'>"individualMoNAScore"</span>),
   <span class='kw'>compsCluster</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>components</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>retMin</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>clearPath</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
 
@@ -135,21 +150,22 @@ identified compounds.</p>
   <span class='kw'>reportFGroups</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>formulas</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>formulasTopMost</span> <span class='kw'>=</span> <span class='fl'>5</span>,
   <span class='kw'>formulasNormalizeScores</span> <span class='kw'>=</span> <span class='st'>"max"</span>, <span class='kw'>formulasExclNormScores</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>reportFormulaSpectra</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>compounds</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>compoundNormalizeScores</span> <span class='kw'>=</span> <span class='st'>"max"</span>, <span class='kw'>compoundExclNormScores</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"score"</span>,
-  <span class='st'>"individualMoNAScore"</span>), <span class='kw'>compoundOnlyUsedScorings</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>compoundTopMost</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>compsCluster</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>components</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>MSPeakLists</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>retMin</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>EICGrid</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>2</span>, <span class='fl'>1</span>),
-  <span class='kw'>EICRtWindow</span> <span class='kw'>=</span> <span class='fl'>20</span>, <span class='kw'>EICMzWindow</span> <span class='kw'>=</span> <span class='fl'>0.005</span>, <span class='kw'>EICTopMost</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>EICOnlyPresent</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>clearPath</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+  <span class='kw'>compoundsNormalizeScores</span> <span class='kw'>=</span> <span class='st'>"max"</span>,
+  <span class='kw'>compoundsExclNormScores</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"score"</span>, <span class='st'>"individualMoNAScore"</span>),
+  <span class='kw'>compoundsOnlyUsedScorings</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>compoundsTopMost</span> <span class='kw'>=</span> <span class='fl'>5</span>,
+  <span class='kw'>compsCluster</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>components</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>MSPeakLists</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>retMin</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>EICGrid</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>2</span>, <span class='fl'>1</span>), <span class='kw'>EICRtWindow</span> <span class='kw'>=</span> <span class='fl'>20</span>,
+  <span class='kw'>EICMzWindow</span> <span class='kw'>=</span> <span class='fl'>0.005</span>, <span class='kw'>EICTopMost</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>EICOnlyPresent</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>clearPath</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
 
 <span class='co'># S4 method for featureGroups</span>
 <span class='fu'>reportMD</span>(<span class='no'>fGroups</span>, <span class='kw'>path</span> <span class='kw'>=</span> <span class='st'>"report"</span>,
   <span class='kw'>reportPlots</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"chord"</span>, <span class='st'>"venn"</span>, <span class='st'>"upset"</span>, <span class='st'>"eics"</span>, <span class='st'>"formulas"</span>),
   <span class='kw'>formulas</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>formulasTopMost</span> <span class='kw'>=</span> <span class='fl'>5</span>,
   <span class='kw'>formulasNormalizeScores</span> <span class='kw'>=</span> <span class='st'>"max"</span>, <span class='kw'>formulasExclNormScores</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>compounds</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>compoundNormalizeScores</span> <span class='kw'>=</span> <span class='st'>"max"</span>,
-  <span class='kw'>compoundExclNormScores</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"score"</span>, <span class='st'>"individualMoNAScore"</span>),
-  <span class='kw'>compoundOnlyUsedScorings</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>compoundTopMost</span> <span class='kw'>=</span> <span class='fl'>5</span>,
+  <span class='kw'>compounds</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>compoundsNormalizeScores</span> <span class='kw'>=</span> <span class='st'>"max"</span>,
+  <span class='kw'>compoundsExclNormScores</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"score"</span>, <span class='st'>"individualMoNAScore"</span>),
+  <span class='kw'>compoundsOnlyUsedScorings</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>compoundsTopMost</span> <span class='kw'>=</span> <span class='fl'>5</span>,
   <span class='kw'>compsCluster</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>includeMFWebLinks</span> <span class='kw'>=</span> <span class='st'>"compounds"</span>,
   <span class='kw'>components</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>interactiveHeat</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>MSPeakLists</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>retMin</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>EICRtWindow</span> <span class='kw'>=</span> <span class='fl'>20</span>, <span class='kw'>EICMzWindow</span> <span class='kw'>=</span> <span class='fl'>0.005</span>,
@@ -200,7 +216,7 @@ features.</p></td>
 reported. Specify <code>NULL</code> to skip reporting a particular object.</p></td>
     </tr>
     <tr>
-      <th>compoundNormalizeScores, formulasNormalizeScores</th>
+      <th>compoundsNormalizeScores, formulasNormalizeScores</th>
       <td><p>A <code>character</code> that specifies how normalization of
 compound scorings occurs. Either <code>"none"</code> (no normalization),
 <code>"max"</code> (normalize to max value) or <code>"minmax"</code> (perform min-max
@@ -212,11 +228,11 @@ candidate results were removed after they were generated (<em>e.g.</em> by
 use of <code>filter</code>).</p></td>
     </tr>
     <tr>
-      <th>compoundExclNormScores, formulasExclNormScores</th>
+      <th>compoundsExclNormScores, formulasExclNormScores</th>
       <td><p>A <code>character</code> vector specifying any compound
   scoring names that should <em>not</em> be normalized. Set to <code>NULL</code> to
   normalize all scorings. Note that whether any normalization occurs is set
-  by the <code>compoundExclNormScores,formulasExclNormScores</code> argument.</p>
+  by the <code>compoundsExclNormScores,formulasExclNormScores</code> argument.</p>
 <p>For <code>compounds</code>: By default <code>score</code> and
   <code>individualMoNAScore</code> are set to mimic the behaviour of the MetFrag
   web interface.</p></td>
@@ -236,7 +252,7 @@ use of <code>filter</code>).</p></td>
       <td><p>If <code>TRUE</code> then feature group data will be reported.</p></td>
     </tr>
     <tr>
-      <th>formulasTopMost, compoundTopMost</th>
+      <th>formulasTopMost, compoundsTopMost</th>
       <td><p>Only this amount of top ranked
 candidate formulae/compounds are reported. Lower values may significantly
 speed up reporting. Set to <code>NULL</code> to ignore.</p></td>
@@ -249,7 +265,7 @@ available) for candidate formulae will be reported. Specifying
 further annotation of compound MS/MS spectra.</p></td>
     </tr>
     <tr>
-      <th>compoundOnlyUsedScorings</th>
+      <th>compoundsOnlyUsedScorings</th>
       <td><p>If <code>TRUE</code> then only scorings are plotted
 that actually have been used to rank data (see the <code>scoreTypes</code>
 argument to <code><a href='compound-generation.html'>generateCompoundsMetfrag</a></code> for more details).</p></td>

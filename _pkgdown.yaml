@@ -4,18 +4,35 @@ template:
     params:
         bootswatch: flatly
 navbar:
-    title: patRoon
-    type: default
+  structure:
     left:
-      - icon: fa-home fa-lg
-        href: index.html
-      - text: Reference
-        href: reference/index.html
-      - text: Tutorial
-        href: articles/tutorial.html
-      - text: Changelog
-        href: news/index.html
-        
-    right:
-      - icon: fa-github fa-lg
-        href: https://github.com/rickhelmus/patRoon
+    - home
+    - reference
+    - tutorial
+    - handbook
+    - news
+    right: github
+  components:
+    articles: ~
+    home:
+      icon: fa-home fa-lg
+      href: index.html
+    reference:
+      text: Reference
+      href: reference/index.html
+    tutorial:
+      text: Tutorial
+      href: articles/tutorial.html
+    handbook:
+      text: Handbook
+      menu:
+      - text: Book format
+        href: handbook_bd/introduction.html
+      - text: Single page
+        href: articles/handbook.html
+    news:
+      text: Changelog
+      href: news/index.html
+    github:
+      icon: fa-github fa-lg
+      href: https://github.com/rickhelmus/patRoon

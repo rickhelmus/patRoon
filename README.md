@@ -42,71 +42,12 @@ Currently most functionalities have been implemented. On the short term the main
 
 ## Installation
 
-Prior to installation you have to make several software packages dependencies are installed.
-
-### R Dependencies
-
-Most `R` package dependencies are installed automatically. However, it may be necessary to manually install the following [Bioconductor] dependencies:
-
-```r
-source("https://bioconductor.org/biocLite.R")
-biocLite(c("mzR", "xcms", "CAMERA"))
-```
-
-In addition, the following optional `R` packages may also need to be installed:
-
-``` r
-install.packages("RDCOMClient") # required for DataAnalysis functionality
-
-install.packages("devtools") # needed only if not already installed
-devtools::install_github("cbroeckl/RAMClustR", build_vignettes = TRUE, dependencies = TRUE)
-devtools::install_github("c-ruttkies/MetFragR/metfRag") # only when using the R interface (not by default)
-```
-
-Note that in order to fulfill installation of the `rJava` package dependency you may need to setup a proper JDK (see for instance [the rJava website][rJava]).
-
-Finally, Windows users need to make sure that [Rtools] is installed.
-
-### Other dependencies
-
-Depending on which functionality is used, the following (optional) external dependencies should be installed:
-
-* [OpenMS]
-* [SIRIUS]
-* [MetFrag CL][MetFrag-CL] (required if the command-line version of MetFrag is used, the default)
-* [pngquant] (required for `reportMD` with `optimizePng` argument set to `TRUE`)
-
-The location of the OpenMS, SIRIUS and pngquant binaries should either be set within the _PATH_ environment variable (the OpenMS installer will do this automatically). Alternatively, one or more of the `R` options should be set below.
-
-```r
-options("patRoon.path.SIRIUS" = "~/C:/sirius-win64-3.5.1") # location where SIRIUS was extracted
-options("patRoon.path.OpenMS" = "/usr/local/bin") # directory with the OpenMS binaries
-options("patRoon.path.pngquant" = "~/pngquant") # directory containing pngquant binary
-options("patRoon.path.metFragCL" = "~/MetFrag2.4.2-CL.jar") # full location to the jar file
-```
-
-Please note that the location of the MetFrag CL jar file should always be set manually.
-
-
-### patRoon installation
-
-Finally, you can install patRoon from github with:
-
-``` r
-install.packages("devtools") # needed only if not already installed
-devtools::install_github("rickhelmus/patRoon")
-devtools::install_github("rickhelmus/patRoonData") # example data used by tutorial
-```
-
-In some cases the `patRoon` installation may fail with an error telling you that `SVN` is absent. In this case you may have better luck by changing to the [remotes] package:
-
-``` r
-install.packages("remotes")
-remotes::install_github("rickhelmus/patRoon")
-```
+`patRoon` itself can be installed as any other R package, however, since it is dependent on several other software tools some extra steps are required for the installation. Please see the [installation section in the handbook][handbook-inst] for more information.
 
 
 ## Getting started
+
+For a very quick start:
 
 ``` r
 library(patRoon)
@@ -115,9 +56,7 @@ newProject()
 
 The `newProject()` function will pop-up a dialog screen (requires [R Studio][RStudio]!) which will allow you to quickly select the analyses and common workflow options to subsequently generate a template `R` processing script.
 
-However, for a better guide to get started it is recommended to read the [tutorial] (work in progress).
-
-Finally, the [reference] outlines all the details of the `patRoon` package.
+However, for a better guide to get started it is recommended to read the [tutorial]. Afterwards the [handbook] is a recommended read if you want to know more about advanced usage of `patRoon`. Finally, the [reference] outlines all the details of the `patRoon` package.
 
 [R]: https://www.r-project.org/
 [XCMS]: https://github.com/sneumann/xcms
@@ -137,6 +76,8 @@ Finally, the [reference] outlines all the details of the `patRoon` package.
 [Bioconductor]: https://www.bioconductor.org
 [rJava]: http://www.rforge.net/rJava/
 [tutorial]: https://rickhelmus.github.io/patRoon/articles/tutorial.html
+[handbook]: https://rickhelmus.github.io/patRoon/handbook_bd/introduction.html
+[handbook-inst]: https://rickhelmus.github.io/patRoon/articles/handbook.html#installation
 [reference]: https://rickhelmus.github.io/patRoon/reference/index.html
 [remotes]: https://github.com/r-lib/remotes#readme
 [Rtools]: https://cran.r-project.org/bin/windows/Rtools/

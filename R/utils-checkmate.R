@@ -27,8 +27,21 @@ assertAnalysisInfo <- function(x, allowedFormats = NULL, null.ok = FALSE, .var.n
     if (!is.null(add))
         mc <- length(add$getMessages())
 
-    checkmate::assertDataFrame(x, types = "character", any.missing = FALSE, min.rows = 1, .var.name = .var.name, add = add)
+    checkmate::assertDataFrame(x, min.rows = 1, .var.name = .var.name, add = add)
     assertHasNames(x, c("path", "analysis", "group", "ref"), .var.name = .var.name, add = add)
+
+    assertCharField <- function(f) checkmate::assertCharacter(x[[f]], .var.name = sprintf("%s[\"%s\"]", .var.name, f), add = add)
+    assertCharField("path")
+    assertCharField("analysis")
+    assertCharField("group")
+    assertCharField("ref")
+
+    checkmate::assert(
+        checkmate::checkNull(x[["conc"]]),
+        checkmate::checkCharacter(x[["conc"]]),
+        checkmate::checkNumeric(x[["conc"]]),
+        .var.name = sprintf("%s[[\"conc\"", .var.name)
+    )
 
     # only continue if previous assertions didn't fail: x needs to be used as list which otherwise gives error
     # NOTE: this is only applicable if add != NULL, otherwise previous assertions will throw errors
@@ -67,6 +80,23 @@ assertAnalysisInfo <- function(x, allowedFormats = NULL, null.ok = FALSE, .var.n
     }
 
     invisible(NULL)
+}
+
+assertAndPrepareAnaInfo <- function(x, ..., add = NULL)
+{
+    if (!is.null(x))
+        x <- unFactorDF(x)
+
+    if (!is.null(add))
+        mc <- length(add$getMessages())
+
+    assertAnalysisInfo(x, ..., add = add)
+
+    if ((is.null(add) || length(add$getMessages()) == mc) &&
+        (!is.null(x) && !is.null(x[["conc"]])))
+        x[["conc"]] <- as.numeric(x[["conc"]])
+
+    return(x)
 }
 
 assertCanCreateDir <- function(x, .var.name = checkmate::vname(x), add = NULL)
@@ -130,7 +160,7 @@ assertConsCommonArgs <- function(absMinAbundance, relMinAbundance, uniqueFrom, u
                       checkmate::checkSubset(uniqueFrom, objNames, empty.ok = FALSE),
                       .var.name = "uniqueFrom")
     checkmate::assertFlag(uniqueOuter, .var.name = "uniqueOuter", add = add)
-    
+
     if (!is.null(uniqueFrom) && (!is.null(absMinAbundance) || !is.null(relMinAbundance)))
         stop("Cannot apply both unique and abundance filters simultaneously.")
 }

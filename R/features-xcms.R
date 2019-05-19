@@ -53,14 +53,14 @@ setMethod("filter", "featuresXCMS", function(obj, ...)
 findFeaturesXCMS <- function(analysisInfo, method = "centWave", ..., verbose = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
-    assertAnalysisInfo(analysisInfo, c("mzXML", "mzML"), add = ac)
+    analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, c("mzXML", "mzML"), add = ac)
     checkmate::assertString(method, min.chars = 1, add = ac)
     checkmate::reportAssertions(ac)
 
     files <- sapply(seq_len(nrow(analysisInfo)),
                     function(i) getMzMLOrMzXMLAnalysisPath(analysisInfo$analysis[i], analysisInfo$path[i]),
                     USE.NAMES = FALSE)
-    
+
     hash <- makeHash(analysisInfo, do.call(makeFileHash, as.list(files)), method, list(...))
     cachef <- loadCacheData("featuresXCMS", hash)
     if (!is.null(cachef))
@@ -99,7 +99,7 @@ importFeaturesXCMS <- function(xs, analysisInfo)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(xs, "xcmsSet", add = ac)
-    assertAnalysisInfo(analysisInfo, c("mzXML", "mzML"), add = ac)
+    analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, c("mzXML", "mzML"), add = ac)
     checkmate::reportAssertions(ac)
 
     plist <- as.data.table(peaks(xs))

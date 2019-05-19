@@ -61,7 +61,7 @@ getDAFileIndex <- function(DA, analysis, path, openFileIfClosed = TRUE)
 {
     if (!is.null(path))
         analysis <- getBrukerAnalysisPath(analysis, path)
-    
+
     getFIndex <- function()
     {
         openCount <- DA[["Analyses"]][["Count"]]
@@ -115,7 +115,7 @@ closeSaveDAFile <- function(DA, DAFind, close, save)
 setDAMethod <- function(anaInfo, method, close = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
-    assertAnalysisInfo(anaInfo, "bruker", add = ac)
+    anaInfo <- assertAndPrepareAnaInfo(anaInfo, "bruker", add = ac)
     checkmate::assertDirectoryExists(method, add = ac)
     checkmate::assertFlag(close, add = ac)
     checkmate::reportAssertions(ac)
@@ -149,7 +149,7 @@ setDAMethod <- function(anaInfo, method, close = TRUE)
 revertDAAnalyses <- function(anaInfo, close = TRUE, save = close)
 {
     ac <- checkmate::makeAssertCollection()
-    assertAnalysisInfo(anaInfo, "bruker", add = ac)
+    anaInfo <- assertAndPrepareAnaInfo(anaInfo, "bruker", add = ac)
     assertDACloseSaveArgs(close, save, add = ac)
     checkmate::reportAssertions(ac)
 
@@ -179,7 +179,7 @@ revertDAAnalyses <- function(anaInfo, close = TRUE, save = close)
 recalibrarateDAFiles <- function(anaInfo, close = TRUE, save = close)
 {
     ac <- checkmate::makeAssertCollection()
-    assertAnalysisInfo(anaInfo, "bruker")
+    anaInfo <- assertAndPrepareAnaInfo(anaInfo, "bruker")
     assertDACloseSaveArgs(close, save, add = ac)
     checkmate::reportAssertions(ac)
 
@@ -218,7 +218,7 @@ recalibrarateDAFiles <- function(anaInfo, close = TRUE, save = close)
 #' @export
 getDACalibrationError <- function(anaInfo)
 {
-    assertAnalysisInfo(anaInfo, "bruker")
+    anaInfo <- assertAndPrepareAnaInfo(anaInfo, "bruker")
 
     DA <- getDAApplication()
     hideDAInScope()
@@ -267,7 +267,7 @@ exportDAFiles <- function(anaInfo, format = "mzML", exportLine = TRUE, outPath =
     .Deprecated("convertMSFiles")
 
     ac <- checkmate::makeAssertCollection()
-    assertAnalysisInfo(anaInfo, "bruker", add = ac)
+    anaInfo <- assertAndPrepareAnaInfo(anaInfo, "bruker", add = ac)
     checkmate::assertChoice(format, c("mzML", "mzXML", "mzData"), add = ac)
     checkmate::assertFlag(exportLine, add = ac)
     checkmate::assertCharacter(outPath, min.chars = 1, min.len = 1, add = ac)

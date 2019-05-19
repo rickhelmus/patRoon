@@ -249,7 +249,7 @@ setMethod("screenTargets", "features", function(obj, targets, rtWindow, mzWindow
 #' @export
 findFeatures <- function(analysisInfo, algorithm, ..., verbose = TRUE)
 {
-    assertAnalysisInfo(analysisInfo)
+    analysisInfo <- assertAndPrepareAnaInfo(analysisInfo)
 
     f <- switch(algorithm,
                 bruker = findFeaturesBruker,
@@ -272,7 +272,7 @@ findFeatures <- function(analysisInfo, algorithm, ..., verbose = TRUE)
 #' @export
 importFeatures <- function(analysisInfo, type, ...)
 {
-    assertAnalysisInfo(analysisInfo)
+    analysisInfo <- assertAndPrepareAnaInfo(analysisInfo)
 
     f <- switch(type,
                 xcms = importFeaturesXCMS,

@@ -40,7 +40,7 @@ importFeatureGroupsBrukerTASQ <- function(path, analysisInfo)
 
     ac <- checkmate::makeAssertCollection()
     assertCSVFile(path, selCols, add = ac)
-    assertAnalysisInfo(analysisInfo, "bruker", add = ac)
+    analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, "bruker", add = ac)
     checkmate::reportAssertions(ac)
 
     tExport <- fread(path, select = selCols)

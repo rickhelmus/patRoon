@@ -20,8 +20,8 @@ setMethod("initialize", "featuresEnviPick",
 #' @export
 findFeaturesEnviPick <- function(analysisInfo, ..., verbose = TRUE)
 {
-    assertAnalysisInfo(analysisInfo, "mzXML")
-    
+    analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, "mzXML")
+
     anaCount <- nrow(analysisInfo)
     ret <- featuresEnviPick(analysisInfo = analysisInfo)
 
@@ -46,7 +46,7 @@ findFeaturesEnviPick <- function(analysisInfo, ..., verbose = TRUE)
         }
 
         fts[[analysisInfo$analysis[i]]] <- f
-        
+
         if (verbose)
             setTxtProgressBar(prog, i)
     }
@@ -73,7 +73,7 @@ findFeaturesEnviPick <- function(analysisInfo, ..., verbose = TRUE)
 importFeaturesEnviMass <- function(analysisInfo, enviProjPath)
 {
     ac <- checkmate::makeAssertCollection()
-    assertAnalysisInfo(analysisInfo, "mzXML", add = ac)
+    analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, "mzXML", add = ac)
     checkmate::assertDirectoryExists(enviProjPath, "r", add = ac)
     checkmate::assertDirectoryExists(file.path(enviProjPath, "peaklist"), "r", .var.name = "enviProjPath", add = ac)
     checkmate::reportAssertions(ac)

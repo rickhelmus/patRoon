@@ -44,7 +44,7 @@ findFeaturesBruker <- function(analysisInfo, doFMF = "auto", startRange = 0, end
                                save = TRUE, close = save, verbose = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
-    assertAnalysisInfo(analysisInfo, "bruker", add = ac)
+    analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, "bruker", add = ac)
     checkmate::assertChoice(doFMF, c("auto", "force"), add = ac)
     checkmate::assertNumber(startRange, lower = 0, finite = TRUE, add = ac)
     checkmate::assertNumber(endRange, lower = 0, finite = TRUE, add = ac)

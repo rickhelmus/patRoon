@@ -86,7 +86,7 @@ findFeaturesOpenMS <- function(analysisInfo, noiseThrInt = 1000, chromSNR = 3, c
                                verbose = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
-    assertAnalysisInfo(analysisInfo, "mzML", add = ac)
+    analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, "mzML", add = ac)
     aapply(checkmate::assertNumber, . ~ noiseThrInt + chromSNR + chromFWHM + mzPPM + minSampleRate +
                minTraceLength + minFWHM + maxFWHM + localRTRange + localMZRange + intSearchRTWindow,
            lower = 0, finite = TRUE, fixed = list(add = ac))

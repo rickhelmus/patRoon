@@ -296,7 +296,7 @@ convertMSFiles <- function(files = NULL, outPath = NULL, dirs = TRUE,
             stop("No (valid) input formats specified.")
     }
 
-    assertAnalysisInfo(anaInfo, from, null.ok = !is.null(files), add = ac)
+    anaInfo <- assertAndPrepareAnaInfo(anaInfo, from, null.ok = !is.null(files), add = ac)
 
     if (!is.null(files))
     {

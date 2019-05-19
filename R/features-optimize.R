@@ -150,7 +150,7 @@ optimizeFeatureFinding <- function(anaInfo, algorithm, ..., templateParams = lis
     params <- list(...)
 
     ac <- checkmate::makeAssertCollection()
-    assertAnalysisInfo(anaInfo, add = ac)
+    anaInfo <- assertAndPrepareAnaInfo(anaInfo, add = ac)
     checkmate::assertChoice(algorithm, c("openms", "xcms", "envipick"), add = ac)
     assertOptimArgs(params, templateParams, paramRanges, maxIterations, maxModelDeviation, ac)
     checkmate::assertChoice(isoIdent, c("IPO", "CAMERA", "OpenMS"), add = ac)

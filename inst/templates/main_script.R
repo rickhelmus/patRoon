@@ -11,7 +11,7 @@ setwd(workPath)
 {{ optionalCodeBlock(generateAnaInfo == "table") }}
 
 # Load analysis table
-anaInfo <- read.csv("{{ analysisTableFile }}", stringsAsFactors = FALSE, colClasses = "character")
+anaInfo <- read.csv("{{ analysisTableFile }}")
 {{ endCodeBlock() }}
 {{ optionalCodeBlock(generateAnaInfo == "script") }}
 

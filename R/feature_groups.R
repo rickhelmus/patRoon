@@ -322,20 +322,37 @@ setMethod("export", "featureGroups", function(fGroups, type, out)
 #'   with retention, \emph{m/z}, intensity and optionally other feature data.
 #' @param features If \code{TRUE} then feature specific data will be added. If
 #'   \code{average=TRUE} this data will be averaged for each feature group.
+#' @param regression Set to \code{TRUE} to add regression data for each feature
+#'   group. For this a linear model is created (intensity/area \emph{vs}
+#'   concentration). The concentration is derived from the \code{conc} column
+#'   that must be specified as part of the \link[=analysis-information]{analysis
+#'   information}. From this model the intercept, slope and R2 is added to the
+#'   output. In addition, when \code{features=TRUE}, concentrations for each
+#'   feature are added. Note that no regression information is added when no
+#'   \code{conc} column is present in the analysis information or when less than
+#'   two values are specified (\emph{i.e.} the minimum amount).
 #' @export
-setMethod("as.data.table", "featureGroups", function(x, average = FALSE, features = FALSE)
+setMethod("as.data.table", "featureGroups", function(x, average = FALSE, features = FALSE, regression = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertFlag(average, add = ac)
     checkmate::assertFlag(features, add = ac)
+    checkmate::assertFlag(regression, add = ac)
     checkmate::reportAssertions(ac)
 
     if (length(x) == 0)
         return(data.table(mz = numeric(), ret = numeric(), group = character()))
 
+    if (features && average && regression)
+        stop("Cannot add regression data for averaged features.")
+
     anaInfo <- analysisInfo(x)
     gNames <- names(x)
     gInfo <- groupInfo(x)
+    doConc <- regression && !is.null(anaInfo[["conc"]]) && sum(!is.na(anaInfo[["conc"]]) > 1)
+
+    if (regression && is.null(anaInfo[["conc"]]))
+        warning("No concentration information specified in the analysis information (i.e. conc column, see ?`analysis-information`)")
 
     if (features)
     {
@@ -350,6 +367,10 @@ setMethod("as.data.table", "featureGroups", function(x, average = FALSE, feature
                 fTable[[s]][ftindex[[grp]][match(s, snames)]]
             }), idcol = "analysis")
         }), idcol = "group")
+
+        if (doConc)
+            ret[, conc := anaInfo$conc[analysis]]
+
         ret[, analysis := snames[analysis]]
         ret[, group := gNames[group]]
 
@@ -359,6 +380,25 @@ setMethod("as.data.table", "featureGroups", function(x, average = FALSE, feature
             numCols <- setdiff(names(ret), c("group"))
             ret[, (numCols) := lapply(.SD, mean), .SDcols = numCols, by = "group"]
             ret <- unique(ret, by = "group")
+        }
+        else
+        {
+            doConc <- doConc && length(snames) > 1
+            if (doConc)
+            {
+                ret[, c("RSQ", "intercept", "slope") :=
+                        {
+                            notna <- !is.na(conc)
+                            if (sum(notna) < 2)
+                                NA_real_
+                            else
+                            {
+                                reg <- summary(lm(intensity[notna] ~ conc[notna]))
+                                list(reg[["r.squared"]], reg[["coefficients"]][1, 1], reg[["coefficients"]][2, 1])
+                            }
+                        }, by = group]
+                ret[, conc_reg := (intensity - intercept) / slope] # y = ax+b
+            }
         }
 
         ret[, c("group_ret", "group_mz") := gInfo[group, c("rts", "mzs")]]
@@ -370,19 +410,35 @@ setMethod("as.data.table", "featureGroups", function(x, average = FALSE, feature
         {
             gTable <- averageGroups(x)
             snames <- unique(anaInfo$group)
+            if (doConc)
+                concs <- anaInfo[!duplicated(anaInfo$group), "conc"] # conc should be same for all replicates
         }
         else
         {
             gTable <- groups(x)
             snames <- anaInfo$analysis
+            if (doConc)
+                concs <- anaInfo$conc
         }
 
         ret <- transpose(gTable)
         setnames(ret, snames)
 
-        ret <- insertDTColumn(ret, "mz", gInfo$mzs, 1)
-        ret <- insertDTColumn(ret, "ret", gInfo$rts, 1)
-        ret <- insertDTColumn(ret, "group", rownames(gInfo), 1)
+        doConc <- doConc && length(snames) > 1 && sum(!is.na(concs)) > 1
+        if (doConc)
+        {
+            notna <- !is.na(concs)
+            notnaconcs <- concs[notna]
+            regr <- lapply(gTable, function(grp) summary(lm(grp[notna] ~ notnaconcs)))
+
+            ret[!sapply(regr, is.null), c("RSQ", "intercept", "slope") :=
+                    .(sapply(regr, "[[", "r.squared"),
+                      sapply(regr, function(r) r$coefficients[1, 1]),
+                      sapply(regr, function(r) r$coefficients[2, 1]))]
+        }
+
+        ret[, c("group", "ret", "mz") := .(gNames, gInfo$rts, gInfo$mzs)]
+        setcolorder(ret, c("group", "ret", "mz"))
     }
 
     return(ret[])
@@ -440,7 +496,7 @@ setMethod("plotInt", "featureGroups", function(obj, average = FALSE, pch = 20, t
 
     if (is.null(col))
         col <- colorRampPalette(brewer.pal(12, "Paired"))(length(gTable))
-    
+
     px <- seq_len(nsamp)
     for (i in seq_along(gTable))
         lines(x = px, y = gTable[[i]], type = type, pch = pch, lty = lty, col = col[i], ...)

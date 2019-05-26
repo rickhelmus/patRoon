@@ -81,7 +81,7 @@
 \S4method{export}{featureGroups}(fGroups, type, out)
 
 \S4method{as.data.table}{featureGroups}(x, average = FALSE,
-  features = FALSE)
+  features = FALSE, regression = FALSE)
 
 \S4method{plot}{featureGroups,ANY}(x, retMin = FALSE, col = NULL,
   pch = 16, ...)
@@ -139,6 +139,16 @@ ProfileAnalysis), \code{"brukertasq"} (Bruker TASQ) or \code{"mzmine"}
 
 \item{features}{If \code{TRUE} then feature specific data will be added. If
 \code{average=TRUE} this data will be averaged for each feature group.}
+
+\item{regression}{Set to \code{TRUE} to add regression data for each feature
+group. For this a linear model is created (intensity/area \emph{vs}
+concentration). The concentration is derived from the \code{conc} column
+that must be specified as part of the \link[=analysis-information]{analysis
+information}. From this model the intercept, slope and R2 is added to the
+output. In addition, when \code{features=TRUE}, concentrations for each
+feature are added. Note that no regression information is added when no
+\code{conc} column is present in the analysis information or when less than
+two values are specified (\emph{i.e.} the minimum amount).}
 
 \item{retMin}{Plot retention time in minutes (instead of seconds).}
 

@@ -38,6 +38,7 @@
     - remove zero values for maxReplicateIntRSD?
 - fList --> features?
 - move rGroups from filter() to subset?
+- as.data.table() and others: optionally report areas instead of intensities
 
 
 ## MSPeakLists

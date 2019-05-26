@@ -4,6 +4,13 @@ fList <- findFeatures(getTestAnaInfo(), "openms", logPath = NULL)
 fgOpenMS <- groupFeatures(fList, "openms")
 fgXCMS <- groupFeatures(fList, "xcms")
 
+# fList with dummy concs
+anaInfoConc <- cbind(getTestAnaInfo(), list(conc = c(NA, NA, NA, 1, 2, 3)))
+# modify replicate groups so we can test averaging
+anaInfoConc$group[grepl("standard", anaInfoConc$group)] <- c("standard-1", "standard-2", "standard-2")
+fListConc <- findFeatures(anaInfoConc, "openms", logPath = NULL)
+fgOpenMSConc <- groupFeatures(fListConc, "openms")
+
 fListEmpty <- findFeatures(getTestAnaInfo(), "openms", noiseThrInt = 1E9, logPath = NULL)
 fgOpenMSEmpty <- groupFeatures(fListEmpty, "openms")
 fgXCMSEmpty <- groupFeatures(fListEmpty, "xcms")
@@ -50,6 +57,7 @@ test_that("exporting works", {
     expect_error(export(fgOpenMSEmpty, "brukerpa", expfile))
 })
 
+regr <- as.data.table(fgOpenMSConc, features = TRUE, regression = TRUE)
 test_that("as.data.table works", {
     expect_equal(nrow(as.data.table(fgOpenMS)), length(fgOpenMS))
 
@@ -57,6 +65,16 @@ test_that("as.data.table works", {
     expect_equal(ncol(as.data.table(fgOpenMS, average = TRUE)), 3 + length(unique(getTestAnaInfo()$group)))
 
     expect_range(nrow(as.data.table(fgOpenMS, features = TRUE)), length(fgOpenMS) * c(1, length(analyses(fgOpenMS))))
+
+    expect_warning(as.data.table(fgOpenMS, regression = TRUE)) # no conc specified
+    checkmate::expect_names(names(regr), must.include = "RSQ")
+    checkmate::expect_names(names(as.data.table(fgOpenMSConc, features = FALSE, regression = TRUE)),
+                            must.include = "RSQ")
+    checkmate::expect_names(names(as.data.table(fgOpenMSConc, features = FALSE, average = TRUE,
+                                                regression = TRUE)), must.include = "RSQ")
+    expect_true(all(is.na(regr$conc) | is.na(regr$conc_reg) | regr$RSQ < 0.9 |
+                        abs(regr$conc - regr$conc_reg) < 0.5)) # calculated concentrations should be somewhat close
+
 
     expect_equal(nrow(as.data.table(fgOpenMSEmpty, average = TRUE)), 0)
     expect_equal(nrow(as.data.table(fgOpenMSEmpty, features = TRUE)), 0)

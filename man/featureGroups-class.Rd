@@ -36,8 +36,6 @@
 \alias{unique,featureGroups-method}
 \alias{overlap,featureGroups-method}
 \alias{overlap}
-\alias{regression,featureGroups-method}
-\alias{regression}
 \alias{featureGroupsBruker-class}
 \alias{featureGroupsBruker}
 \alias{featureGroupsEnviMass-class}
@@ -109,8 +107,6 @@
   outer = FALSE)
 
 \S4method{overlap}{featureGroups}(fGroups, which, exclusive = FALSE)
-
-\S4method{regression}{featureGroups}(fGroups)
 }
 \arguments{
 \item{fGroups, obj, x, object}{\code{featureGroups} object to be accessed.}
@@ -142,13 +138,14 @@ ProfileAnalysis), \code{"brukertasq"} (Bruker TASQ) or \code{"mzmine"}
 
 \item{regression}{Set to \code{TRUE} to add regression data for each feature
 group. For this a linear model is created (intensity/area \emph{vs}
-concentration). The concentration is derived from the \code{conc} column
-that must be specified as part of the \link[=analysis-information]{analysis
-information}. From this model the intercept, slope and R2 is added to the
-output. In addition, when \code{features=TRUE}, concentrations for each
-feature are added. Note that no regression information is added when no
-\code{conc} column is present in the analysis information or when less than
-two values are specified (\emph{i.e.} the minimum amount).}
+concentration). The model concentrations (e.g. of a set of standards) is
+derived from the \code{conc} column of the
+\link[=analysis-information]{analysis information}. From this model the
+intercept, slope and R2 is added to the output. In addition, when
+\code{features=TRUE}, concentrations for each feature are added. Note that
+no regression information is added when no \code{conc} column is present in
+the analysis information or when less than two concentrations are specified
+(\emph{i.e.} the minimum amount).}
 
 \item{retMin}{Plot retention time in minutes (instead of seconds).}
 
@@ -250,9 +247,6 @@ not unique to the given replicate groups.}
 The order for the \code{areas} and \code{intersectionCounts} fields is the same as the parameter order
 from the used plotting function (see \emph{e.g.} \code{\link{draw.pairwise.venn}} and
 \code{\link{draw.triple.venn}}).
-
-\code{regression} returns a \code{data.frame} containing retention,
-  \emph{m/z}, R squared, intercepts and slopes for all feature groups.
 }
 \description{
 This class holds all the information for grouped features.
@@ -336,11 +330,6 @@ present in one or more specified replicate group(s).
 
 \item \code{overlap}: Obtain a subset with feature groups that overlap
 between a set of specified replicate group(s).
-
-\item \code{regression}: Performs linear regression for all detected feature
-groups within specified analyses. The analyses to be used (\emph{e.g.} a
-set of standards) must have the \code{conc} column set in the
-\link{analysis-information} that was used to generate the feature groups.
 }}
 
 \section{Slots}{

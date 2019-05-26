@@ -73,8 +73,8 @@ Most functionality requires the data files to be in either the
   each analysis. The \code{ref} column should also be present, however, these
   may contain empty character strings (\code{""}) for analyses where no blank
   subtraction should occur. The \code{conc} column is only required when
-  using the \code{\link{regression}} method and optional for the
-  \code{\link{screenTargets}} method.
+  obtaining regression information is desired with the
+  \code{\link[=as.data.table,featureGroups-method]{as.data.table}} method.
 
 \code{generateAnalysisInfo} is an utility function that automatically
   generates an analysis information object. It will collect all datafiles

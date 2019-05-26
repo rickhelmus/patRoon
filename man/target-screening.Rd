@@ -58,11 +58,7 @@ information}.}
 \code{screenTargets} will return a table (a \code{\link{data.table}})
   with detected targets and details such as retention and \emph{m/z} values.
   If a target is matched on multiple features/feature groups then each hit is
-  reported as a separate row. In case concentration values were specified in
-  the \link[=analysis-information]{analysis info} then the
-  \code{featureGroups} method will also report correlation coefficients
-  (\code{'RSQ'} column) calculated from the linear regression between
-  intensity values and specified concentrations.
+  reported as a separate row.
 
 \code{groupFeaturesScreening} returns a modified \code{featureGroups}
   object in which those feature groups that were not matched by any targets

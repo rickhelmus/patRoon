@@ -324,13 +324,14 @@ setMethod("export", "featureGroups", function(fGroups, type, out)
 #'   \code{average=TRUE} this data will be averaged for each feature group.
 #' @param regression Set to \code{TRUE} to add regression data for each feature
 #'   group. For this a linear model is created (intensity/area \emph{vs}
-#'   concentration). The concentration is derived from the \code{conc} column
-#'   that must be specified as part of the \link[=analysis-information]{analysis
-#'   information}. From this model the intercept, slope and R2 is added to the
-#'   output. In addition, when \code{features=TRUE}, concentrations for each
-#'   feature are added. Note that no regression information is added when no
-#'   \code{conc} column is present in the analysis information or when less than
-#'   two values are specified (\emph{i.e.} the minimum amount).
+#'   concentration). The model concentrations (e.g. of a set of standards) is
+#'   derived from the \code{conc} column of the
+#'   \link[=analysis-information]{analysis information}. From this model the
+#'   intercept, slope and R2 is added to the output. In addition, when
+#'   \code{features=TRUE}, concentrations for each feature are added. Note that
+#'   no regression information is added when no \code{conc} column is present in
+#'   the analysis information or when less than two concentrations are specified
+#'   (\emph{i.e.} the minimum amount).
 #' @export
 setMethod("as.data.table", "featureGroups", function(x, average = FALSE, features = FALSE, regression = FALSE)
 {
@@ -1118,15 +1119,8 @@ setMethod("screenTargets", "featureGroups", function(obj, targets, rtWindow, mzW
     gTable <- groups(obj)
     gInfo <- groupInfo(obj)
     anaInfo <- analysisInfo(obj)
-    hasConc <- "conc" %in% colnames(anaInfo)
 
     targets$name <- as.character(targets$name) # in case factors are given
-
-    if (hasConc)
-    {
-        anaInfo$conc <- as.numeric(anaInfo$conc)
-        concs <- anaInfo$conc[!is.na(anaInfo$conc)]
-    }
 
     retlist <- lapply(seq_len(nrow(targets)), function (ti)
     {
@@ -1149,12 +1143,6 @@ setMethod("screenTargets", "featureGroups", function(obj, targets, rtWindow, mzW
                               group = g, exp_rt = gi[g, "rts"], exp_mz = gi[g, "mzs"],
                               d_rt = if (hasRT) gi[g, "rts"] - targets$rt[ti] else NA, d_mz = gi[g, "mzs"] - targets$mz[ti])
 
-            if (hasConc && !all(is.na(anaInfo$conc)))
-            {
-                ints <- gTable[[g]][!is.na(anaInfo$conc)]
-                ret[, RSQ := summary(lm(concs ~ ints))$r.squared]
-            }
-
             for (anai in seq_len(nrow(anaInfo)))
                 set(ret, 1L, anaInfo$analysis[anai], gTable[[g]][anai])
 
@@ -1166,34 +1154,6 @@ setMethod("screenTargets", "featureGroups", function(obj, targets, rtWindow, mzW
     targetsn <- nrow(targets)
     foundn <- targetsn - sum(is.na(ret$group))
     printf("Found %d/%d targets (%.2f%%)\n", foundn, targetsn, foundn * 100 / targetsn)
-
-    return(ret)
-})
-
-#' @describeIn featureGroups Performs linear regression for all detected feature
-#'   groups within specified analyses. The analyses to be used (\emph{e.g.} a
-#'   set of standards) must have the \code{conc} column set in the
-#'   \link{analysis-information} that was used to generate the feature groups.
-#' @return \code{regression} returns a \code{data.frame} containing retention,
-#'   \emph{m/z}, R squared, intercepts and slopes for all feature groups.
-#' @aliases regression
-#' @export
-setMethod("regression", "featureGroups", function(fGroups)
-{
-    anaInfo <- analysisInfo(fGroups)
-    anaInfo$conc <- as.numeric(anaInfo$conc)
-    concs <- anaInfo$conc[!is.na(anaInfo$conc)]
-    ret <- groupInfo(fGroups) # UNDONE: use as.data.table
-
-    regr <- lapply(groups(fGroups), function(grp)
-    {
-        ints <- grp[!is.na(anaInfo$conc)]
-        summary(lm(concs ~ ints))
-    })
-
-    ret$RSQ <- sapply(regr, "[[", "r.squared")
-    ret$intercept <- sapply(regr, function(r) r$coefficients[1, 1])
-    ret$slope <- sapply(regr, function(r) r$coefficients[2, 1])
 
     return(ret)
 })

@@ -42,10 +42,10 @@ setMethod("initialize", "featureGroupsScreening",
 setMethod("groupFeaturesScreening", "featureGroups", function(fGroups, scr)
 {
     checkmate::assertDataFrame(scr)
-    
+
     if (is.null(scr[["group"]]))
         stop("This function only accepts screening results obtained from feature groups (thus not from features objects)")
-    
+
     cat("Converting screening results to feature groups... ")
 
     if (any(is.na(scr$group)))
@@ -62,8 +62,6 @@ setMethod("groupFeaturesScreening", "featureGroups", function(fGroups, scr)
     gInfo <- data.frame(rts = scr$exp_rt, mzs = scr$exp_mz, row.names = gNames)
 
     rmcols <- c("name", "rt", "mz", "group", "d_rt", "d_mz", "exp_rt", "exp_mz")
-    if ("RSQ" %in% colnames(scr))
-        rmcols <- c(rmcols, "RSQ")
     groups <- transpose(as.data.table(scr)[, -rmcols, with = FALSE])
     setnames(groups, gNames)
 

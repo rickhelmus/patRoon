@@ -10,6 +10,7 @@
 * Consensus for compounds are now similarly ranked as formulas.
 * More consistent minimum abundance arguments for `consensus()` (`absMinAbundance` and `relMinAbundance`)
 * `MetFrag`: for-ident database and new statistical scores are now supported
+* `as.data.table()` / `as.data.frame()` for `featureGroups` now optionally reports regression information, which may be useful for quantitative purposes. This replaces the (defunct) `regression()` method and limited support from `screenTargets()`.
 
 
 ## April 2019

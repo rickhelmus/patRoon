@@ -18,7 +18,6 @@ setGeneric("unique", function(x, incomparables = FALSE, ...) standardGeneric("un
 setGeneric("overlap", function(fGroups, which, exclusive = FALSE) standardGeneric("overlap"))
 setGeneric("comparison", function(..., groupAlgo,
                                   groupArgs = list(rtalign = FALSE)) standardGeneric("comparison"), signature = "...")
-setGeneric("regression", function(fGroups) standardGeneric("regression"))
 setGeneric("groupFeatures", function(feat, algorithm, ...) standardGeneric("groupFeatures"))
 setGeneric("generateConsensusXML", function(feat, out, rtalign, QT, maxAlignRT, maxAlignMZ, maxGroupRT, maxGroupMZ, verbose) standardGeneric("generateConsensusXML"))
 setGeneric("groupFeaturesScreening", function(fGroups, scr) standardGeneric("groupFeaturesScreening"))
@@ -110,11 +109,7 @@ NULL
 #' @return \code{screenTargets} will return a table (a \code{\link{data.table}})
 #'   with detected targets and details such as retention and \emph{m/z} values.
 #'   If a target is matched on multiple features/feature groups then each hit is
-#'   reported as a separate row. In case concentration values were specified in
-#'   the \link[=analysis-information]{analysis info} then the
-#'   \code{featureGroups} method will also report correlation coefficients
-#'   (\code{'RSQ'} column) calculated from the linear regression between
-#'   intensity values and specified concentrations.
+#'   reported as a separate row.
 #'
 #' @rdname target-screening
 setGeneric("screenTargets", function(obj, targets, rtWindow = 12, mzWindow = 0.005) standardGeneric("screenTargets"))

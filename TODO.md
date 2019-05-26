@@ -15,11 +15,9 @@
 
 
 ## docs
-- More vignettes
-- Reference docs
-    - Examples?
-- update tutorial
 - improve instructions for MF and SIRIUS installation?
+- handbook
+    - semi-quant advanced section
 
 
 ## features

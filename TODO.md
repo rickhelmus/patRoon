@@ -6,7 +6,6 @@
 - ref --> blank
 - convertMSFiles()
     - Agilent .d is also a directory?
-- harmonize consensus argument names, add rel/abs support for all?
 - consistent src file names, split utils?
 - newProject(): don't necessarily add MSPeakLists when DA formulas are choosen
 - improve default plotting for plotInt and cluster plot functions
@@ -30,7 +29,6 @@
 - tests to verify getXCMSSet...
 - suspect screening
     - rename screenTargets?
-    - Keep RSQ? Or extend with conc?
 - filter()
     - document which filters work on feature level (e.g. chromWidth)
     - remove zero values for maxReplicateIntRSD?
@@ -51,9 +49,6 @@
 - MetFrag: (buggy) trivial name fetching not needed anymore?
 - SIRIUS: use --auto-charge instead of manually fixing charge of fragments (or not? conflicting docs on what it does)
 - test score normalization?
-- add new MF stat and other scorings and make sure default normalization equals that of MF web
-- MF: add support for all databases
-- Fix MF database section in docs
 - timeouts for SIRIUS?
 - improve formula scoring
 - plotHeatMap() / plotSilhouettes() for comp clusters?

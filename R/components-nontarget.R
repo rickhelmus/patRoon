@@ -130,7 +130,7 @@ generateComponentsNontarget <- function(fGroups, ionization, rtRange = c(-120, 1
     if (nrow(compTab) == 0)
         return(components(componentInfo = data.table(), components = list(), algorithm = "nontarget"))
 
-    # check if we can merge series
+    # check which series should be linked
     compTab[, links := list(list())]
 
     for (r in seq_len(nrow(compTab)))
@@ -185,26 +185,26 @@ generateComponentsNontarget <- function(fGroups, ionization, rtRange = c(-120, 1
             next # already merged
 
         links <- compTab[["links"]][[r]]
-        if (length(links) == 1)
+        
+        for (other in links)
         {
-            otherLinks <- compTab[["links"]][[links[1]]]
-            if (length(otherLinks) == 1 && otherLinks[1] == r)
+            otherLinks <- compTab[["links"]][[other]]
+            if (length(links) == length(otherLinks) && all(otherLinks == r | otherLinks %in% links))
             {
                 # merge groups
-                mGroups <- union(compTab[["groups"]][[r]][[1]], compTab[["groups"]][[links[1]]][[1]])
+                mGroups <- union(compTab[["groups"]][[r]][[1]], compTab[["groups"]][[other]][[1]])
                 mGroups <- mGroups[order(gInfo[mGroups, "mzs"])] # make sure order stays correct
                 set(compTab, r, "groups", list(list(list(mGroups))))
-
+                
                 # mark presence
-                l <- links[1] # BUG: cannot use "links" name in next line?
-                lc <- compTab[l, presentRGroups, with = FALSE]
+                lc <- compTab[other, presentRGroups, with = FALSE]
                 for (rg in presentRGroups)
                 {
                     if (!is.null(lc[[rg]][[1]]))
                         set(compTab, r, rg, list(list(lc[[rg]][[1]]))) # need to rewrap it in a list?
                 }
-
-                set(compTab, links[1], "keep", FALSE) # remove other
+                
+                set(compTab, other, "keep", FALSE) # remove other
                 set(compTab, r, "links", list(list(integer()))) # unlink
             }
         }

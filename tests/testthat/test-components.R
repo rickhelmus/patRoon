@@ -175,4 +175,6 @@ test_that("plotting works", {
     expect_doppel("component-ic-int", function() plotInt(compsInt, index = 1))
     expect_doppel("component-ic-sil", function() plotSilhouettes(compsInt, 2:6))
     expect_doppel("component-ic-heat", function() plotHeatMap(compsInt, interactive = FALSE))
+    
+    # UNDONE: test plotGraph, when vdiffr supports it (https://github.com/r-lib/vdiffr/issues/60)
 })

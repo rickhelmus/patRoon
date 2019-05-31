@@ -50,7 +50,8 @@ orderComponentsNames <- function(n) order(nchar(n), n)
 #' @templateVar class components
 #' @template class-hierarchy
 #'
-#' @seealso \link{component-generation} and \code{\link{componentsIntClust}}
+#' @seealso \link{component-generation},  \code{\link{componentsNT}} and
+#'   \code{\link{componentsIntClust}}
 #'
 #' @export
 components <- setClass("components",

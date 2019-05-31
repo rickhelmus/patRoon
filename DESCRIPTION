@@ -50,6 +50,8 @@ Imports:
     d3heatmap,
     dynamicTreeCut,
     dendextend,
+    igraph,
+    visNetwork,
     rJava,
     rcdk,
     fingerprint,

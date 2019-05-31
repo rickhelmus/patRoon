@@ -49,6 +49,7 @@ setGeneric("generateMSPeakLists", function(fGroups, algorithm, ...) standardGene
 setGeneric("componentTable", function(obj) standardGeneric("componentTable"))
 setGeneric("componentInfo", function(obj) standardGeneric("componentInfo"))
 setGeneric("findFGroup", function(obj, fGroup) standardGeneric("findFGroup"))
+setGeneric("plotGraph", function(obj, onlyLinked = TRUE) standardGeneric("plotGraph"))
 setGeneric("generateComponents", function(fGroups, algorithm, ...) standardGeneric("generateComponents"))
 
 ### Formulas

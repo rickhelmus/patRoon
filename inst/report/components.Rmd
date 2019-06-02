@@ -13,6 +13,7 @@ plotPathLink <- getPlotPath(TRUE)
 
 # HACK: this should be replaced some proper inheritance/methods at some point
 isHClust <- inherits(rmdVars$components, "componentsIntClust")
+isHomol <- inherits(rmdVars$components, "componentsNT")
 
 if (isHClust)
     clProps <- clusterProperties(rmdVars$components)
@@ -68,18 +69,32 @@ rmdText <- knitr::knit(text = glue::glue("
 ### heatmap
 
 { ticks } {{r fig.width=6, fig.height=5}}
-plotHeatMap(components, interactive = { inter })
+plotHeatMap(rmdVars$components, interactive = { inter })
 { ticks }
 
 ### dendrogram
 
 { ticks } {{r fig.width=6, fig.height=5}}
-plot(components)
+plot(rmdVars$components)
 { ticks }
 
 ", ticks = "```", inter = as.character(rmdVars$interactiveHeat)))
 ```
-`r if (isHClust) rmdText`
+
+```{r echo=FALSE,eval=isHomol}
+rmdText <- knitr::knit(text = glue::glue("
+##
+
+### Linked series
+
+{ ticks } {{r}}
+plotGraph(rmdVars$components, onlyLinked = TRUE)
+{ ticks }
+
+", ticks = "```"))
+```
+
+`r if (isHClust || isHomol) rmdText`
 
 ## { .components }
 

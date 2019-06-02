@@ -97,6 +97,11 @@ if (!is.null(rmdVars$components))
         return(wrapStr(paste0(sapply(cmps, function(cmpi)
         {
             cline <- cTable[[cmpi]][group == grp]
+            if (nrow(cline) > 1) # might happen if there are multiple rGroups involved with NT components
+            {
+                cline[, rGroup := paste0(rGroup, collapse = "/")]
+                cline <- cline[1]
+            }
             cline <- cline[, sapply(cline, function(x) !is.na(x) && nzchar(x),
                                     USE.NAMES = FALSE), with = FALSE]
             annColsPresent <- annCols[annCols %in% names(cline)]

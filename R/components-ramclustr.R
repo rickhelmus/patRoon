@@ -43,8 +43,6 @@ generateComponentsRAMClustR <- function(fGroups, st = NULL, sr = NULL, maxt = 12
                                                                 instrument = list(ionization = ionization, MSlevs = 1)),
                                         extraOptsRC = NULL, extraOptsFM = NULL)
 {
-    checkPackage("RAMClustR", "cbroeckl/RAMClustR")
-
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
     aapply(checkmate::assertNumber, . ~ st + sr + maxt + hmax, lower = 0, null.ok = TRUE, fixed = list(add = ac))

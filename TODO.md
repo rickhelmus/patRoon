@@ -17,6 +17,7 @@
 - improve instructions for MF and SIRIUS installation?
 - handbook
     - semi-quant advanced section
+    - NT components graph plotting
 
 
 ## features
@@ -58,6 +59,7 @@
 ## formulas
 - customize/document ranking column order? (only do rank for sirius?)
 - minExplainedFragPeaks -> minExplainedPeaks?
+- Improve formula scoring for compounds
 
 
 ## components

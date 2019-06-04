@@ -344,11 +344,6 @@ utils <- setRefClass("utilsInst", methods = list(
         
         if (length(c(mandatoryPackages, optPackages)) == 0)
         
-        choices <- c(mandatory = "Only mandatory packages",
-                     RDCOMClient = "RDCOMClient (required for Bruker DataAnalysis integration)",
-                     RAMClustR = "RAMClustR (for componentization and e.g. adduct/isotope annotation)",
-                     all = "All")
-
         choices <- character()
         if (length(mandatoryPackages) > 0)
             choices <- c(choices, mandatory = "Only mandatory packages")

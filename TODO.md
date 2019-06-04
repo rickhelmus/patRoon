@@ -10,6 +10,7 @@
 - newProject(): don't necessarily add MSPeakLists when DA formulas are choosen
 - improve default plotting for plotInt and cluster plot functions
 - better error reporting for multiproc commands
+- get RAMClustR from CRAN
 - ref -> blank
 
 

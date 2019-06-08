@@ -7,7 +7,7 @@
 #'    \code{group} column for all  analyses considered to be belonging to the same
 #'    replicate group should have an equal (but unique) value. Used for \emph{e.g.}
 #'    avaraging and \code{\link[=filter,featureGroups-method]{filter}}.
-#'    \item \code{blank}}: all analyses within this replicate group are used by
+#'    \item \code{blank}: all analyses within this replicate group are used by
 #'    \code{\link[=filter,featureGroups-method]{filter}} for blank subtraction.
 #'    Multiple entries can be entered by separation with a comma.
 #'    \item \code{conc} a numeric value specifying the 'concentration' of the analysis.

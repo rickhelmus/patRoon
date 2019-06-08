@@ -7,7 +7,6 @@
 \alias{revertDAAnalyses}
 \alias{recalibrarateDAFiles}
 \alias{getDACalibrationError}
-\alias{exportDAFiles}
 \alias{addDAEIC}
 \alias{addAllDAEICs}
 \title{Bruker DataAnalysis utilities}
@@ -21,9 +20,6 @@ revertDAAnalyses(anaInfo, close = TRUE, save = close)
 recalibrarateDAFiles(anaInfo, close = TRUE, save = close)
 
 getDACalibrationError(anaInfo)
-
-exportDAFiles(anaInfo, format = "mzML", exportLine = TRUE,
-  outPath = anaInfo$path, overWrite = FALSE)
 
 addDAEIC(analysis, path, mz, mzWindow = 0.005, ctype = "EIC",
   mtype = "MS", polarity = "both", bgsubtr = FALSE, fragpath = "",
@@ -44,19 +40,6 @@ prevents that many analyses might be opened simultaneously in DataAnalysis,
 which otherwise may use excessive memory or become slow. By default
 \code{save} is \code{TRUE} when \code{close} is \code{TRUE}, which is
 likely what you want as otherwise any processed data is lost.}
-
-\item{format}{The output format of exported files. Should be either
-\code{"mzXML"}, \code{"mzML"} or \code{"mzData"}.}
-
-\item{exportLine}{Export line spectra (\code{TRUE}) or profile spectra
-(\code{FALSE}). Usually line spectra are preferred, since profile spectra
-use signficantly more disk space and increase required memory during
-processing.}
-
-\item{outPath}{Character vector of output paths for exported analyses. Will
-be recycled if necessary.}
-
-\item{overWrite}{If \code{TRUE} existing files will be overwritten.}
 
 \item{analysis}{Analysis name (without file extension).}
 
@@ -136,9 +119,6 @@ required to be installed.
 \code{getDACalibrationError} is used to obtain the standard
   deviation of the current mass calibration (in ppm).
 
-\code{exportDAFiles} will export a set of analyses either in
-  \file{.mzXML} or \file{.mzML} formats.
-
 \code{addDAEIC} adds an Extracted Ion Chromatogram (EIC) or other
   chromatographic trace to a given analysis which can be used directly with
   DataAnalysis.
@@ -149,4 +129,3 @@ required to be installed.
 \seealso{
 \code{\link{analysis-information}}
 }
-\keyword{internal}

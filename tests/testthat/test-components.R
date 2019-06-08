@@ -27,7 +27,7 @@ test_that("components generation works", {
                        check.attributes = FALSE)
     expect_known_value(list(componentTable(compsCAM), componentInfo(compsCAM)), testFile("components-cam"))
     expect_known_value(compsInt, testFile("components-int"))
-    
+
     expect_length(compsEmpty, 0)
     expect_length(generateComponents(fGroupsEmpty, "ramclustr", ionization = "positive"), 0)
     expect_length(generateComponents(fGroupsEmpty, "camera", ionization = "positive"), 0)
@@ -36,7 +36,7 @@ test_that("components generation works", {
     expect_lt(length(compsRCMR), length(compsRC))
     expect_lt(length(compsCAMMR), length(compsCAM))
     expect_gte(min(componentInfo(compsCAMSize)$size), 3)
-    
+
     skip_if(length(compsNT) == 0)
     expect_known_value(compsNT, testFile("components-nt"))
     expect_length(generateComponents(fGroupsEmpty, "nontarget", ionization = "positive"), 0)
@@ -72,7 +72,7 @@ test_that("filtering works", {
     expect_length(filter(compsRC, size = c(50, 100)), 0)
     expect_length(filter(compsRC, size = c(0, 100), negate = TRUE), 0)
     expect_length(filter(compsRC, size = c(50, 100), negate = TRUE), length(compsRC))
-    
+
     expect_length(filter(compsEmpty, size = c(0, 100)), 0)
     expect_length(filter(compsEmpty, size = c(0, 100), negate = TRUE), 0)
 
@@ -81,7 +81,7 @@ test_that("filtering works", {
     expect_equal(groupNames(filter(compsInt, isotopes = TRUE)), groupNames(compsInt))
     expect_equal(groupNames(filter(compsInt, adducts = TRUE, negate = TRUE)), groupNames(compsInt))
     expect_equal(groupNames(filter(compsInt, isotopes = TRUE, negate = TRUE)), groupNames(compsInt))
-    
+
     expect_lt(length(groupNames(filter(compsRC, adducts = TRUE))), length(groupNames(compsRC)))
     expect_lt(length(groupNames(filter(compsRC, adducts = FALSE))), length(groupNames(compsRC)))
     expect_lt(length(groupNames(filter(compsRC, adducts = "[M+H]+"))), length(groupNames(compsRC)))
@@ -96,7 +96,7 @@ test_that("filtering works", {
                       groupNames(filter(compsRC, adducts = "[M+H]+", negate = TRUE))))
     expect_true(all(sapply(componentTable(filter(compsRC, adducts = "[M+H]+", negate = TRUE)),
                            function(cmp) all(is.na(cmp$adduct_ion) | cmp$adduct_ion != "[M+H]+"))))
-    
+
     expect_lt(length(groupNames(filter(compsRC, isotopes = TRUE))), length(groupNames(compsRC)))
     expect_lt(length(groupNames(filter(compsRC, isotopes = FALSE))), length(groupNames(compsRC)))
     expect_lt(length(groupNames(filter(compsRC, isotopes = 0:1))), length(groupNames(compsRC)))
@@ -153,13 +153,13 @@ test_that("reporting works", {
 
     # UNDONE: setting reportPlots="none" in combination with plotting components
     # crashes pandoc2, using "eics" for now...
-    expect_reportMD(makeReportMD(fGroupsSimple, reportPlots = "eics", components = compsRC))
+    expect_reportHTML(makeReportHTML(fGroupsSimple, reportPlots = "eics", components = compsRC))
 })
 
 test_that("reporting empty object works", {
     expect_error(reportCSV(fGroupsSimple, getWorkPath(), components = compsEmpty), NA)
     expect_error(reportPDF(fGroupsSimple, getWorkPath(), reportFGroups = FALSE, components = compsEmpty), NA)
-    expect_reportMD(makeReportMD(fGroupsSimple, reportPlots = "none", components = compsEmpty))
+    expect_reportHTML(makeReportHTML(fGroupsSimple, reportPlots = "none", components = compsEmpty))
 })
 
 test_that("plotting works", {
@@ -175,6 +175,6 @@ test_that("plotting works", {
     expect_doppel("component-ic-int", function() plotInt(compsInt, index = 1))
     expect_doppel("component-ic-sil", function() plotSilhouettes(compsInt, 2:6))
     expect_doppel("component-ic-heat", function() plotHeatMap(compsInt, interactive = FALSE))
-    
+
     # UNDONE: test plotGraph, when vdiffr supports it (https://github.com/r-lib/vdiffr/issues/60)
 })

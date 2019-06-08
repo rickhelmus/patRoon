@@ -2,7 +2,9 @@
 
 ## June 2019
 
-* **IMPORTANT** The column to specify replicate groups for blank subtraction in the analysis information is re-named from `ref` to `blank`. Similarly, the `refs` argument to `generateAnalysisInfo()` is now called `blanks`.
+* **IMPORTANT** Several things are renamed for clarity/consistency
+    * The column to specify replicate groups for blank subtraction in the analysis information is re-named from `ref` to `blank`. Similarly, the `refs` argument to `generateAnalysisInfo()` is now called `blanks`.
+    * `reportMD()` is renamed to `reportHTML()`
 
 ## May 2019
 

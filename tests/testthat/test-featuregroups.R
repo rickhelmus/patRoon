@@ -208,21 +208,21 @@ test_that("reporting works", {
 
     expect_file(reportPDF(subFGroups, getWorkPath()), getWorkPath(sprintf("%s.pdf", class(subFGroups))))
 
-    expect_reportMD(makeReportMD(subFGroups))
+    expect_reportHTML(makeReportHTML(subFGroups))
 
     # skip if pngquant is not specified and not in PATH
     # assign condition to variable as expression seems to be to complicated for skip...
     havePngQuant <- (!is.null(getOption("patRoon.path.pngquant")) && nzchar(getOption("patRoon.path.pngquant"))) ||
         nzchar(Sys.which(sprintf("pngquant%s", if (Sys.info()[["sysname"]] == "Windows") ".exe" else "")))
     skip_if_not(havePngQuant)
-    expect_error(reportMD(subFGroups, getWorkPath("pngquant"), optimizePng = TRUE, openReport = FALSE), NA)
+    expect_error(reportHTML(subFGroups, getWorkPath("pngquant"), optimizePng = TRUE, openReport = FALSE), NA)
     expect_lt(file.size(getWorkPath("pngquant", "report.html")), file.size(getWorkPath("report.html")))
 })
 
 test_that("reporting with empty object works", {
     expect_error(reportCSV(fgOpenMSEmpty, getWorkPath(), reportFeatures = TRUE), NA)
     expect_error(reportPDF(fgOpenMSEmpty, getWorkPath()), NA)
-    expect_reportMD(makeReportMD(fgOpenMSEmpty))
+    expect_reportHTML(makeReportHTML(fgOpenMSEmpty))
 })
 
 test_that("plotting works", {

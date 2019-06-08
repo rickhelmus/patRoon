@@ -112,33 +112,33 @@ expect_ggplot <- function(object)
 {
     act <- quasi_label(rlang::enquo(object))
     expect(!is.null(object), "NULL plot")
-    
+
     if (!is.null(object))
     {
         tf <- tempfile()
         withr::with_png(tf, print(object))
         expect(file.exists(tf), "failed to generate plot")
     }
-    
+
     invisible(act$val)
 }
 
 # noDate should be TRUE for consistent report generation (ie when verifying cached report)
-makeReportMD <- function(fGroups, ...) reportMD(fGroups, getWorkPath(), openReport = FALSE, noDate = TRUE, ...)
-expect_reportMD <- function(object)
+makeReportHTML <- function(fGroups, ...) reportHTML(fGroups, getWorkPath(), openReport = FALSE, noDate = TRUE, ...)
+expect_reportHTML <- function(object)
 {
     # generate report twice: without and with cache
     withr::with_options(list(patRoon.cache.mode = "save"), act <- quasi_label(rlang::enquo(object)))
     rpFile <- getWorkPath("report.html")
     expect(file.exists(rpFile), "failed to generate report")
-    
+
     if (file.exists(rpFile))
     {
         rpHash <- makeFileHash(rpFile)
         act <- quasi_label(rlang::enquo(object))
         expect(rpHash == makeFileHash(rpFile), "cached report differs")
     }
-    
+
     invisible(act$val)
 }
 

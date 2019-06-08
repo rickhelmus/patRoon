@@ -183,10 +183,10 @@ reportPDF(fGroups, path = "report", reportFGroups = TRUE, formulas = {{ if (form
           components = {{ if (componentOpts$algo != "") "components" else "NULL" }}, MSPeakLists = {{ if (formulaOpts$algo != "" || identOpts$algo != "") "mslists" else "NULL" }})
 
 {{ endCodeBlock() }}
-{{ optionalCodeBlock("MD" %in% reportFormats) }}
-reportMD(fGroups, path = "report", reportPlots = c("chord", "venn", "upset", "eics", "formulas"),
-         formulas = {{ if (formulaOpts$algo != "") "formulas" else "NULL" }}, compounds = {{ if (identOpts$algo != "") "compounds" else "NULL" }}, compoundsNormalizeScores = "max",
-         components = {{ if (componentOpts$algo != "") "components" else "NULL" }}, MSPeakLists = {{ if (formulaOpts$algo != "" || identOpts$algo != "") "mslists" else "NULL" }},
-         selfContained = FALSE, openReport = TRUE)
+{{ optionalCodeBlock("HTML" %in% reportFormats) }}
+reportHTML(fGroups, path = "report", reportPlots = c("chord", "venn", "upset", "eics", "formulas"),
+           formulas = {{ if (formulaOpts$algo != "") "formulas" else "NULL" }}, compounds = {{ if (identOpts$algo != "") "compounds" else "NULL" }}, compoundsNormalizeScores = "max",
+           components = {{ if (componentOpts$algo != "") "components" else "NULL" }}, MSPeakLists = {{ if (formulaOpts$algo != "" || identOpts$algo != "") "mslists" else "NULL" }},
+           selfContained = FALSE, openReport = TRUE)
 
 {{ endCodeBlock() }}

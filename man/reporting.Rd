@@ -7,8 +7,8 @@
 \alias{reportCSV}
 \alias{reportPDF,featureGroups-method}
 \alias{reportPDF}
-\alias{reportMD,featureGroups-method}
-\alias{reportMD}
+\alias{reportHTML,featureGroups-method}
+\alias{reportHTML}
 \title{Report feature group data}
 \usage{
 \S4method{reportCSV}{featureGroups}(fGroups, path = "report",
@@ -32,7 +32,7 @@
   EICMzWindow = 0.005, EICTopMost = NULL, EICOnlyPresent = TRUE,
   clearPath = FALSE)
 
-\S4method{reportMD}{featureGroups}(fGroups, path = "report",
+\S4method{reportHTML}{featureGroups}(fGroups, path = "report",
   reportPlots = c("chord", "venn", "upset", "eics", "formulas"),
   formulas = NULL, formulasTopMost = 5,
   formulasNormalizeScores = "max", formulasExclNormScores = NULL,
@@ -160,7 +160,7 @@ opened with the system browser.}
 
 \item{noDate}{If \code{TRUE} then the current date is not added to the
 report. This is mainly used for testing and its main purpose is to
-guarentees equal report files when `reportMD()` is called multiple times
+guarentees equal report files when `reportHTML()` is called multiple times
 with equal arguments.}
 }
 \description{
@@ -174,7 +174,7 @@ used to report various data on features and feature groups. In addition,
 these functions may be used for reporting formulae and/or compounds that were
 generated for the specified feature groups. Data can be reported in tabular
 form (\emph{i.e.} \file{.csv} files) by \code{reportCSV} or graphically by
-\code{reportPDF} and \code{reportMD}. The latter functions will plot for
+\code{reportPDF} and \code{reportHTML}. The latter functions will plot for
 instance chromatograms and annotated mass spectra, which are useful to get a
 graphical overview of results.
 
@@ -189,11 +189,11 @@ compounds, clustering) that are desired to be reported need to be specified.
 
 \code{reportPDF} will report graphical data (\emph{e.g.}
   chromatograms and mass spectra) within PDF files. Compared
-  to \code{reportMD} this function may be faster and yield smaller report
+  to \code{reportHTML} this function may be faster and yield smaller report
   files, however, its functionality is a bit more basic and generated data is
   more 'scattered' around.
 
-\code{reportMD} will report graphical data (\emph{e.g.}
+\code{reportHTML} will report graphical data (\emph{e.g.}
   chromatograms and mass spectra) and summary information in an easy
   browsable \code{HTML} file using \link{rmarkdown}, \link{flexdashboard} and
   \link{knitr}.

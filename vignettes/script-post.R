@@ -75,7 +75,7 @@ reportPDF(fGroups, path = "report", reportFGroups = TRUE, formulas = formulas, r
           compounds = compounds, compoundsNormalizeScores = "max",
           components = components, MSPeakLists = mslists)
 
-reportMD(fGroups, path = "report", reportPlots = c("chord", "venn", "upset", "eics", "formulas"), formulas = formulas,
-         compounds = compounds, compoundsNormalizeScores = "max",
-         components = components, MSPeakLists = mslists,
-         selfContained = FALSE, openReport = TRUE)
+reportHTML(fGroups, path = "report", reportPlots = c("chord", "venn", "upset", "eics", "formulas"), formulas = formulas,
+           compounds = compounds, compoundsNormalizeScores = "max",
+           components = components, MSPeakLists = mslists,
+           selfContained = FALSE, openReport = TRUE)

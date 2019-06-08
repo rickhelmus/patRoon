@@ -342,13 +342,13 @@ getNewProjectUI <- function(destPath)
                              )
                          )
             ),
-            miniTabPanel("Reporting", icon = icon("file-medical-alt"), # scroll, paperclip, newspaper, file-medical-alt, 
+            miniTabPanel("Reporting", icon = icon("file-medical-alt"), # scroll, paperclip, newspaper, file-medical-alt,
                          miniContentPanel(
                              fillCol(
                                  checkboxGroupInput("report", "Report generation",
                                                     c("CSV (text tables)" = "CSV", "PDF (basic plots)" = "PDF",
-                                                      "HTML (easy browsable plots, bit slower than PDF)" = "MD"),
-                                                    c("CSV", "MD"), width = "100%")
+                                                      "HTML (easy browsable plots, bit slower than PDF)" = "HTML"),
+                                                    c("CSV", "HTML"), width = "100%")
                              )
                          )
             )
@@ -512,7 +512,7 @@ newProject <- function(destPath = NULL)
                     updateTextInput(session, "DAMethod", value = dm)
             }
         })
-        
+
         observeEvent(input$suspectListButton, {
             sl <- rstudioapi::selectFile("Select suspect list", filter = "csv files (*.csv)")
             if (!is.null(sl))
@@ -520,7 +520,7 @@ newProject <- function(destPath = NULL)
                 csvTab <- tryCatch(fread(sl, select = c("name", "mz"),
                                          colClasses = c(name = "character", mz = "numeric")),
                                    error = function(e) FALSE, warning = function(w) FALSE)
-                
+
                 if (is.logical(csvTab))
                     showDialog("Error", "Failed to open/parse selected csv file! The CSV file should have the following columns: name, mz and (optionally) rt.", "")
                 else if (nrow(csvTab) == 0)

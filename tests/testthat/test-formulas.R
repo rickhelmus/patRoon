@@ -138,7 +138,7 @@ test_that("filtering works", {
                  c(length(groupNames(formsGF)), length(groupNames(formsGF)) * 2))
     expect_true(all(unique(as.data.table(filter(formsGFMS, topMost = 1))$isoScore) >=
                         unique(as.data.table(filter(formsGFMS, topMost = 1, negate = TRUE))$isoScore)))
-    
+
     expect_equivalent(filter(formsGF, scoreLimits = list(isoScore = c(-Inf, Inf))), formsGF)
     expect_length(filter(formsGF, scoreLimits = list(isoScore = c(-Inf, Inf)), negate = TRUE), 0)
     expect_lt(length(filter(formsGF, scoreLimits = list(isoScore = c(0.7, Inf)))), length(formsGF))
@@ -160,7 +160,7 @@ test_that("as.data.table() works", {
     expect_setequal(as.data.table(formsGF, maxFormulas = 1)$group, groupNames(formsGF))
     expect_setequal(as.data.table(formsGF, maxFragFormulas = 1)$group, groupNames(formsGF))
     expect_setequal(as.data.table(formsGF, maxFormulas = 1, maxFragFormulas = 1)$group, groupNames(formsGF))
-    
+
     expect_range(as.data.table(formsGF, normalizeScores = "max")$isoScore, c(0, 1))
 
     expect_equal(uniqueN(as.data.table(formsGF, maxFormulas = 1),
@@ -200,7 +200,7 @@ test_that("consensus works", {
     expect_setequal(groupNames(consensus(formsGF, formsSIR)), union(groupNames(formsGF), groupNames(formsSIR)))
     expect_lt(length(consensus(formsGF, formsSIR, relMinAbundance = 1)), length(fCons))
     expect_length(consensus(formsGFEmpty, formsSIREmpty), 0)
-    
+
     expect_equal(length(consensus(formsGF, formsSIR, uniqueFrom = 1)) +
                  length(consensus(formsGF, formsSIR, uniqueFrom = 2)) +
                  length(consensus(formsGF, formsSIR, relMinAbundance = 1)), length(fCons))
@@ -221,7 +221,7 @@ if (doSIRIUS)
 
 test_that("annotation works", {
     skip_if_not(doSIRIUS)
-    
+
     expect_lt(nrow(anPLOnly), nrow(anPL))
     expect_true(any(is.na(anPL$formula)))
     expect_false(any(is.na(anPLOnly$formula)))
@@ -240,8 +240,8 @@ test_that("reporting works", {
     for (grp in groupNames(formsGFWithMSMS))
         checkmate::expect_file_exists(getWorkPath("formulas", sprintf("%s-%s.pdf", class(fGroups), grp)))
 
-    expect_reportMD(makeReportMD(fGroups, reportPlots = "formulas",
-                                 formulas = formsGFWithMSMS, MSPeakLists = plists))
+    expect_reportHTML(makeReportHTML(fGroups, reportPlots = "formulas",
+                                     formulas = formsGFWithMSMS, MSPeakLists = plists))
 })
 
 plotPrec <- formsGFWithMSMS[[1]][["formula"]][1]
@@ -255,9 +255,9 @@ test_that("plotting works", {
     #                                                 useGGPlot2 = TRUE))
     expect_ggplot(plotSpec(formsGFWithMSMS, plotPrec, groupNames(formsGFWithMSMS)[1], MSPeakLists = plists,
                            useGGPlot2 = TRUE))
-    
+
     expect_doppel("form-scores", function() plotScores(formsGFWithMSMS, plotPrec, groupNames(formsGFWithMSMS)[1]))
-    
+
     skip_if_not(doSIRIUS)
     expect_doppel("venn", function() plotVenn(formsGF, formsSIR))
     expect_error(plotVenn(formsGFEmpty, formsSIREmpty))
@@ -267,7 +267,7 @@ test_that("plotting works", {
     expect_equal(expect_plot(plotVenn(formsGF, formsSIR))$intersectionCounts,
                  length(consensus(formsGF, formsSIR, relMinAbundance = 1)))
     expect_equal(expect_plot(plotVenn(formsGF, formsSIREmpty))$intersectionCounts, 0)
-    
+
     expect_plot(plotUpSet(formsGF, formsSIR))
     expect_error(plotUpSet(formsGFEmpty, formsSIREmpty))
     expect_error(plotUpSet(formsGF, formsSIREmpty))

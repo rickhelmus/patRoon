@@ -120,6 +120,7 @@ Collate:
     'compounds-sirius.R'
     'compounds-util.R'
     'convert.R'
+    'deprecated.R'
     'utils-IPO.R'
     'doe-optimizer.R'
     'feature_groups-bruker.R'

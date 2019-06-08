@@ -12,7 +12,7 @@ NULL
 #' these functions may be used for reporting formulae and/or compounds that were
 #' generated for the specified feature groups. Data can be reported in tabular
 #' form (\emph{i.e.} \file{.csv} files) by \code{reportCSV} or graphically by
-#' \code{reportPDF} and \code{reportMD}. The latter functions will plot for
+#' \code{reportPDF} and \code{reportHTML}. The latter functions will plot for
 #' instance chromatograms and annotated mass spectra, which are useful to get a
 #' graphical overview of results.
 #'
@@ -638,7 +638,7 @@ setMethod("reportCSV", "featureGroups", function(fGroups, path, reportFGroupsAsR
 
 #' @details \code{reportPDF} will report graphical data (\emph{e.g.}
 #'   chromatograms and mass spectra) within PDF files. Compared
-#'   to \code{reportMD} this function may be faster and yield smaller report
+#'   to \code{reportHTML} this function may be faster and yield smaller report
 #'   files, however, its functionality is a bit more basic and generated data is
 #'   more 'scattered' around.
 #'
@@ -724,7 +724,8 @@ setMethod("reportPDF", "featureGroups", function(fGroups, path, reportFGroups,
         reportComponentPlots(fGroups, path, components, EICRtWindow, EICMzWindow, retMin, EICs)
 })
 
-#' @details \code{reportMD} will report graphical data (\emph{e.g.}
+
+#' @details \code{reportHTML} will report graphical data (\emph{e.g.}
 #'   chromatograms and mass spectra) and summary information in an easy
 #'   browsable \code{HTML} file using \link{rmarkdown}, \link{flexdashboard} and
 #'   \link{knitr}.
@@ -759,7 +760,7 @@ setMethod("reportPDF", "featureGroups", function(fGroups, path, reportFGroups,
 #'   opened with the system browser.
 #' @param noDate If \code{TRUE} then the current date is not added to the
 #'   report. This is mainly used for testing and its main purpose is to
-#'   guarentees equal report files when `reportMD()` is called multiple times
+#'   guarentees equal report files when `reportHTML()` is called multiple times
 #'   with equal arguments.
 #'
 #' @references Creating MetFrag landing page URLs based on code from
@@ -767,16 +768,16 @@ setMethod("reportPDF", "featureGroups", function(fGroups, path, reportFGroups,
 #'   \addCitations{knitr}{2} \cr\cr \addCitations{knitr}{3}
 #'
 #' @rdname reporting
-#' @aliases reportMD
+#' @aliases reportHTML
 #' @export
-setMethod("reportMD", "featureGroups", function(fGroups, path, reportPlots, formulas, formulasTopMost,
-                                                formulasNormalizeScores, formulasExclNormScores,
-                                                compounds, compoundsNormalizeScores, compoundsExclNormScores,
-                                                compoundsOnlyUsedScorings, compoundsTopMost,
-                                                compsCluster, includeMFWebLinks, components, interactiveHeat,
-                                                MSPeakLists, retMin, EICRtWindow, EICMzWindow,
-                                                EICTopMost, EICOnlyPresent, selfContained,
-                                                optimizePng, maxProcAmount, clearPath, openReport, noDate)
+setMethod("reportHTML", "featureGroups", function(fGroups, path, reportPlots, formulas, formulasTopMost,
+                                                  formulasNormalizeScores, formulasExclNormScores,
+                                                  compounds, compoundsNormalizeScores, compoundsExclNormScores,
+                                                  compoundsOnlyUsedScorings, compoundsTopMost,
+                                                  compsCluster, includeMFWebLinks, components, interactiveHeat,
+                                                  MSPeakLists, retMin, EICRtWindow, EICMzWindow,
+                                                  EICTopMost, EICOnlyPresent, selfContained,
+                                                  optimizePng, maxProcAmount, clearPath, openReport, noDate)
 {
     # UNDONE: mention pandoc win limits
 

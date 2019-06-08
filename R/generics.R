@@ -292,17 +292,17 @@ setGeneric("reportPDF", function(fGroups, path = "report", reportFGroups = TRUE,
                                  compsCluster = NULL, components = NULL, MSPeakLists = NULL, retMin = TRUE,
                                  EICGrid = c(2, 1), EICRtWindow = 20, EICMzWindow = 0.005, EICTopMost = NULL,
                                  EICOnlyPresent = TRUE, clearPath = FALSE) standardGeneric("reportPDF"))
-setGeneric("reportMD", function(fGroups, path = "report", reportPlots = c("chord", "venn", "upset", "eics", "formulas"),
-                                formulas = NULL, formulasTopMost = 5,
-                                formulasNormalizeScores = "max", formulasExclNormScores = NULL,
-                                compounds = NULL, compoundsNormalizeScores = "max",
-                                compoundsExclNormScores = c("score", "individualMoNAScore"),
-                                compoundsOnlyUsedScorings = TRUE, compoundsTopMost = 5, compsCluster = NULL,
-                                includeMFWebLinks = "compounds", components = NULL, interactiveHeat = FALSE,
-                                MSPeakLists = NULL, retMin = TRUE, EICRtWindow = 20, EICMzWindow = 0.005,
-                                EICTopMost = NULL, EICOnlyPresent = TRUE, selfContained = TRUE, optimizePng = FALSE,
-                                maxProcAmount = getOption("patRoon.maxProcAmount"),
-                                clearPath = FALSE, openReport = TRUE, noDate = FALSE) standardGeneric("reportMD"))
+setGeneric("reportHTML", function(fGroups, path = "report", reportPlots = c("chord", "venn", "upset", "eics", "formulas"),
+                                  formulas = NULL, formulasTopMost = 5,
+                                  formulasNormalizeScores = "max", formulasExclNormScores = NULL,
+                                  compounds = NULL, compoundsNormalizeScores = "max",
+                                  compoundsExclNormScores = c("score", "individualMoNAScore"),
+                                  compoundsOnlyUsedScorings = TRUE, compoundsTopMost = 5, compsCluster = NULL,
+                                  includeMFWebLinks = "compounds", components = NULL, interactiveHeat = FALSE,
+                                  MSPeakLists = NULL, retMin = TRUE, EICRtWindow = 20, EICMzWindow = 0.005,
+                                  EICTopMost = NULL, EICOnlyPresent = TRUE, selfContained = TRUE, optimizePng = FALSE,
+                                  maxProcAmount = getOption("patRoon.maxProcAmount"),
+                                  clearPath = FALSE, openReport = TRUE, noDate = FALSE) standardGeneric("reportHTML"))
 
 # Used for reporting
 setGeneric("plotHash", function(x, ...) standardGeneric("plotHash"))

@@ -84,7 +84,7 @@ test_that("filtering works", {
     expect_lte(length(filter(comps, topMost = 5, negate = TRUE)), 5 * length(fGroupsSub))
     expect_true(all(as.data.table(filter(comps, topMost = 1))$score >
                         as.data.table(filter(comps, topMost = 1, negate = TRUE))$score))
-    
+
     expect_lte(length(filter(comps, minExplainedPeaks = 2)), length(comps))
     expect_length(filter(comps, minExplainedPeaks = 1E6), 0)
     expect_length(filter(compsEmpty, minExplainedPeaks = 2, topMost = 1), 0)
@@ -93,7 +93,7 @@ test_that("filtering works", {
     expect_equivalent(filter(comps, minExplainedPeaks = 1E6, negate = TRUE), comps)
     expect_length(filter(compsEmpty, minExplainedPeaks = 2, topMost = 1, negate = TRUE), 0)
     expect_length(filter(comps, scoreLimits = list(fragScore = c(-Inf, Inf)), negate = TRUE), 0)
-    
+
     expect_length(filter(comps, elements = "C1-100"), length(comps)) # all should contain carbon
     expect_length(filter(comps, elements = c("Na1-100", "C1-100")), length(comps)) # no sodium, but carbon should be there
     expect_length(filter(comps, elements = c("H1-100", "C1-100")), length(comps)) # presence of both shouldn't affect results
@@ -104,7 +104,7 @@ test_that("filtering works", {
     expect_length(filter(comps, elements = c("H1-100", "C1-100"), negate = TRUE), 0)
     expect_length(filter(comps, elements = "Na1-100", negate = TRUE), length(comps))
     expect_length(filter(comps, elements = "Na0-100", negate = TRUE), 0)
-    
+
     expect_lte(length(filter(compsExplained, fragElements = "C1-100")), length(compsExplained))
     expect_length(filter(compsExplained, fragElements = "C"), 0) # fragments may contain only single carbon
     expect_length(filter(compsExplained, fragElements = "Na1-100"), 0)
@@ -113,7 +113,7 @@ test_that("filtering works", {
     expect_length(filter(compsExplained, fragElements = "C", negate = TRUE), length(compsExplained))
     expect_length(filter(compsExplained, fragElements = "Na1-100", negate = TRUE), length(compsExplained))
     expect_length(filter(compsExplained, fragElements = "Na0-100", negate = TRUE), 0)
-    
+
     expect_length(filter(compsExplained, lossElements = "C0-100"), length(compsExplained))
     expect_length(filter(compsExplained, lossElements = "Na0-100"), length(compsExplained))
     expect_gt(length(filter(compsExplained, lossElements = "C1-100")), 0) # NL might be empty, at least some should contain carbon though!
@@ -122,7 +122,7 @@ test_that("filtering works", {
     expect_length(filter(compsExplained, lossElements = "Na0-100", negate = TRUE), 0)
     expect_gt(length(filter(compsExplained, lossElements = "C1-100", negate = TRUE)), 0)
     expect_length(filter(compsExplained, lossElements = "Na1-100", negate = TRUE), length(compsExplained))
-    
+
     skip_if_not(doMetFrag)
     expect_lt(length(filter(compsMFIso, minScore = 0.75)), length(compsMFIso))
     expect_lt(length(filter(compsMFIso, minScore = 0.75, negate = TRUE)), length(compsMFIso))
@@ -218,7 +218,7 @@ test_that("consensus works", {
     expect_known_show(compsCons, testFile("compounds-cons", text = TRUE))
     expect_lt(length(consensus(compsMF, compsSIR, relMinAbundance = 1)), length(compsCons))
     expect_length(consensus(compsMFEmptyPL, compsSIREmptyPL), 0)
-    
+
     expect_equal(length(consensus(compsMF, compsSIR, uniqueFrom = 1)) +
                  length(consensus(compsMF, compsSIR, uniqueFrom = 2)) +
                  length(consensus(compsMF, compsSIR, relMinAbundance = 1)), length(compsCons))
@@ -240,7 +240,7 @@ if (doMetFrag && doSIRIUS)
 
 test_that("annotation works", {
     skip_if_not(doMetFrag && doSIRIUS)
-    
+
     expect_lt(nrow(anPLOnly), nrow(anPL))
     expect_true(any(is.na(anPL$formula)))
     expect_false(any(is.na(anPLOnly$formula)))
@@ -262,8 +262,8 @@ test_that("reporting works", {
     for (grp in names(compoundTable(comps)))
         checkmate::expect_file_exists(getWorkPath("compounds", sprintf("%s-%s.pdf", class(fGroups), grp)))
 
-    expect_reportMD(makeReportMD(fGroups, reportPlots = "none",
-                                 compounds = comps, MSPeakLists = plists))
+    expect_reportHTML(makeReportHTML(fGroups, reportPlots = "none",
+                                     compounds = comps, MSPeakLists = plists))
 })
 
 test_that("reporting empty objects works", {
@@ -271,8 +271,8 @@ test_that("reporting empty objects works", {
     expect_error(reportCSV(fGroups, getWorkPath(), compounds = compsEmpty), NA)
     expect_error(reportPDF(fGroups, getWorkPath(), reportFGroups = FALSE, compounds = compsEmpty,
                            MSPeakLists = plistsEmpty), NA)
-    expect_reportMD(makeReportMD(fGroups, reportPlots = "none",
-                                 compounds = compsEmpty, MSPeakLists = plistsEmpty))
+    expect_reportHTML(makeReportHTML(fGroups, reportPlots = "none",
+                                     compounds = compsEmpty, MSPeakLists = plistsEmpty))
 })
 
 test_that("plotting works", {
@@ -288,7 +288,7 @@ test_that("plotting works", {
     # expect_doppel("struct", function() plotStructure(compsMFIso, 1, names(compoundTable(compsMFIso))[1]))
     expect_plot(plotStructure(compsMFIso, 1, names(compoundTable(compsMFIso))[1]))
     expect_doppel("scores", function() plotScores(compsMFIso, 1, names(compoundTable(compsMFIso))[1]))
-    
+
     skip_if_not(doSIRIUS)
     expect_doppel("venn", function() plotVenn(compsMF, compsSIR))
     expect_error(plotVenn(compsMFEmpty, compsSIREmpty))
@@ -298,7 +298,7 @@ test_that("plotting works", {
     expect_equal(expect_plot(plotVenn(compsMF, compsSIR))$intersectionCounts,
                  length(consensus(compsMF, compsSIR, relMinAbundance = 1)))
     expect_equal(expect_plot(plotVenn(compsMF, compsSIREmpty))$intersectionCounts, 0)
-    
+
     expect_plot(plotUpSet(compsMF, compsSIR))
     expect_error(plotUpSet(compsMFEmpty, compsSIREmpty))
     expect_error(plotUpSet(compsMF, compsSIREmpty))

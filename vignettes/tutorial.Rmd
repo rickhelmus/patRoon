@@ -102,7 +102,7 @@ For this tutorial make the following selections
 * **Data pre-treatment tab** Since the example data is already ready to use you can simply skip this tab.
 * **Features tab** Leave the default OpenMS algorithm for feature finding and grouping.
 * **Annotation tab** Select _GenForm_, _MetFrag_ and _mzR_ for the formula generation, compound identification and peak list generator options, respectively (note that the last will become visible when selecting either of the other options). Select _RAMClustR_ for component generation.
-* **Reporting tab** Make sure all options are enabled (the `reportPDF()` and `reportMD()` functions largely overlap each other in functionality, but are both enabled for demonstration purposes).
+* **Reporting tab** Make sure all options are enabled (the `reportPDF()` and `reportHTML()` functions largely overlap each other in functionality, but are both enabled for demonstration purposes).
 
 ## Manual project creation
 
@@ -372,7 +372,7 @@ plotEIC(components, "CMP6", fGroups)
 
 # Reporting
 
-The last step of the workflow is typically reporting data: during this step all the collected data is transformed to graphical plots (`reportPDF()` and `reportMD()`) or tabular csv data (`reportCSV()`).
+The last step of the workflow is typically reporting data: during this step all the collected data is transformed to graphical plots (`reportPDF()` and `reportHTML()`) or tabular csv data (`reportCSV()`).
 
 ```{r eval=FALSE}
 reportCSV(fGroups, path = "report", reportFeatures = FALSE, formulas = formulas,
@@ -383,13 +383,13 @@ reportPDF(fGroups, path = "report", reportFGroups = TRUE, formulas = formulas, r
           compounds = compounds, compoundsNormalizeScores = "max",
           components = components, MSPeakLists = mslists)
 
-reportMD(fGroups, path = "report", reportPlots = c("chord", "venn", "upset", "eics", "formulas"),
-         formulas = formulas, compounds = compounds, compoundsNormalizeScores = "max",
-         components = components, MSPeakLists = mslists,
-         selfContained = FALSE, openReport = TRUE)
+reportHTML(fGroups, path = "report", reportPlots = c("chord", "venn", "upset", "eics", "formulas"),
+           formulas = formulas, compounds = compounds, compoundsNormalizeScores = "max",
+           components = components, MSPeakLists = mslists,
+           selfContained = FALSE, openReport = TRUE)
 ```
 
-The output of `reportMD()` can be viewed [here](../examples/report.html).
+The output of `reportHTML()` can be viewed [here](../examples/report.html).
 
 Note that these functions can be called at any time during the workflow. This may be especially useful if you want evaluate results during optimization or exploring the various algorithms and their parameters. In this case you can simply cherry pick the data that you want to report, for instance:
 
@@ -403,15 +403,15 @@ reportPDF(fGroups, path = "report", reportFGroups = TRUE,
           MSPeakLists = mslists)
 
 # only report components
-reportMD(fGroups, path = "report", reportPlots = c("chord", "venn", "upset", "eics"),
-         components = components
-         selfContained = FALSE, openReport = TRUE)
+reportHTML(fGroups, path = "report", reportPlots = c("chord", "venn", "upset", "eics"),
+           components = components
+           selfContained = FALSE, openReport = TRUE)
 ```
 
 ```{r echo=FALSE,eval=pkgdown::in_pkgdown()}
 # do the actual reporting here
 
-# ugly work around for nested rmarkdown call made by reportMD; based on https://gist.github.com/jennybc/1f747c5bb84aa9be9c3c
+# ugly work around for nested rmarkdown call made by reportHTML; based on https://gist.github.com/jennybc/1f747c5bb84aa9be9c3c
 tempF <- tempfile(); tempScript <- tempfile(fileext = ".R")
 save(fGroups, formulas, compounds, components, mslists, file = tempF)
 writeLines(sprintf('
@@ -420,8 +420,8 @@ setwd("%s")
 load("%s")
 options("patRoon.cache.fileName" = "%s")
 #options(patRoon.path.pngquant = "~/werk/pngquant/")
-reportMD(fGroups, path = "../docs/examples", formulas = formulas, compounds = compounds,
-         components = components, MSPeakLists = mslists, optimizePng = TRUE, openReport = FALSE)
+reportHTML(fGroups, path = "../docs/examples", formulas = formulas, compounds = compounds,
+           components = components, MSPeakLists = mslists, optimizePng = TRUE, openReport = FALSE)
 ', gsub("\\", "/", getwd(), fixed = TRUE), gsub("\\", "/", tempF, fixed = TRUE), getOption("patRoon.cache.fileName")), con = tempScript)
 # devtools::clean_source(tempScript, quiet = TRUE)
 callr::rscript(tempScript, show = FALSE)

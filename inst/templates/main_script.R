@@ -17,19 +17,19 @@ anaInfo <- read.csv("{{ analysisTableFile }}")
 
 anaInfo <- generateAnalysisInfo(paths = c({{ paste0("\"", unique(analyses$path), "\"", collapse = ", ") }}),
                                 groups = c({{ paste0("\"", analyses$group, "\"", collapse = ", ") }}),
-                                refs = c({{ paste0("\"", analyses$ref, "\"", collapse = ", ") }}))
+                                blanks = c({{ paste0("\"", analyses$blank, "\"", collapse = ", ") }}))
 {{ endCodeBlock() }}
 {{ optionalCodeBlock(generateAnaInfo == "example") }}
 
 # Take example data from patRoonData package (triplicate solvent blank + triplicate standard)
 anaInfo <- generateAnalysisInfo(paths = patRoonData::exampleDataPath(),
                                 groups = c(rep("solvent", 3), rep("standard", 3)),
-                                refs = "solvent")
+                                blanks = "solvent")
 {{ endCodeBlock() }}
 {{ optionalCodeBlock(generateAnaInfo == "none") }}
 
 # NOTE: please set anaInfo to a valid data.frame with analysis information. See ?`analysis-information` for more details.
-anaInfo <- data.frame(path = character(), analysis = character(), group = character(), ref = character())
+anaInfo <- data.frame(path = character(), analysis = character(), group = character(), blank = character())
 {{ endCodeBlock() }}
 {{ optionalCodeBlock(preTreatOpts$do) }}
 

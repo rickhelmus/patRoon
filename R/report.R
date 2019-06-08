@@ -136,7 +136,7 @@ reportFGroupTable <- function(fGroups, path, fGroupsAsRows, reportAnalysisInfo, 
 
     if (reportAnalysisInfo)
     {
-        gTable <- insertDTColumn(gTable, "ref", anaInfo$ref, 1)
+        gTable <- insertDTColumn(gTable, "blank", anaInfo$blank, 1)
         gTable <- insertDTColumn(gTable, "replicate_group", anaInfo$group, 1)
     }
 
@@ -148,7 +148,7 @@ reportFGroupTable <- function(fGroups, path, fGroupsAsRows, reportAnalysisInfo, 
 
         rnames <- rownames(gInfo)
         if (reportAnalysisInfo)
-            rnames <- c("replicate_group", "ref", rnames)
+            rnames <- c("replicate_group", "blank", rnames)
 
         if (reportRetMz)
         {
@@ -163,7 +163,7 @@ reportFGroupTable <- function(fGroups, path, fGroupsAsRows, reportAnalysisInfo, 
         {
             gi <- setnames(transpose(gInfo[, c("rts", "mzs")]), rownames(gInfo))
             if (reportAnalysisInfo) # add two dummy columns
-                gi <- cbind(replicate_group = "", ref = "", gi)
+                gi <- cbind(replicate_group = "", blank = "", gi)
 
             gTable <- rbind(gi, gTable)
             rnames <- c("retention", "mz", anaInfo$analysis)

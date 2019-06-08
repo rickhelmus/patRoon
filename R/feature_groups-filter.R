@@ -78,13 +78,13 @@ blankFilter <- function(fGroups, threshold, negate = FALSE)
     rGroups <- unique(anaInfo$group)
 
     # multiple groups may be specified separated by comma
-    refGroups <- sapply(anaInfo$ref, function(rg) strsplit(rg, ","), USE.NAMES = FALSE)
-    allRefs <- unique(unlist(refGroups))
-    allRefs <- allRefs[allRefs %in% rGroups]
+    blankGroups <- sapply(anaInfo$blank, function(rg) strsplit(rg, ","), USE.NAMES = FALSE)
+    allBlanks <- unique(unlist(blankGroups))
+    allBlanks <- allBlanks[allBlanks %in% rGroups]
 
-    if (length(allRefs) == 0)
+    if (length(allBlanks) == 0)
     {
-        warning("No suitable reference analyses found, skipping blank filter...")
+        warning("No suitable blank analyses found, skipping blank filter...")
         return(fGroups)
     }
 
@@ -94,10 +94,10 @@ blankFilter <- function(fGroups, threshold, negate = FALSE)
         if (negate)
             pred <- Negate(pred)
 
-        for (ref in allRefs)
+        for (bl in allBlanks)
         {
-            refAnalyses <- which(anaInfo$group == ref)
-            thr <- fGroups@groups[refAnalyses, lapply(.SD, function(x)
+            blAnalyses <- which(anaInfo$group == bl)
+            thr <- fGroups@groups[blAnalyses, lapply(.SD, function(x)
             {
                 m <- mean(x[x > 0])
                 if (is.na(m))
@@ -302,7 +302,7 @@ replicateGroupFilter <- function(fGroups, rGroups, negate = FALSE, verbose = TRU
 #'   and non-blanks are determined from the mean of all non-zero blank
 #'   intensities. Set to \code{NULL} to skip this step.
 #' @param removeBlanks Set to \code{TRUE} to remove all analyses that belong to
-#'   replicate groups that are specified as a reference in the
+#'   replicate groups that are specified as a blank in the
 #'   \link{analysis-information}. This is useful to simplify the analyses in the
 #'   specified \code{\link{featureGroups}} object after blank subtraction. When
 #'   both \code{blankThreshold} and this argument are set, blank subtraction is
@@ -416,7 +416,7 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
 
     obj <- maybeDoFilter(replicateGroupFilter, rGroups)
     if (removeBlanks)
-        obj <- replicateGroupFilter(obj, unique(analysisInfo(obj)$ref), negate = !negate)
+        obj <- replicateGroupFilter(obj, unique(analysisInfo(obj)$blank), negate = !negate)
 
     return(obj)
 })

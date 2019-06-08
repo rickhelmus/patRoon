@@ -205,7 +205,7 @@ line2user <- function(line, side)
 #'
 #' @param paths A character vector containing one or more file paths that should
 #'   be used for finding the analyses.
-#' @param groups,refs An (optional) character vector containing replicate groups
+#' @param groups,blanks An (optional) character vector containing replicate groups
 #'   and references, respectively (will be recycled). If \code{groups} is an
 #'   empty character string (\code{""}) the analysis name will be set as
 #'   replicate group.
@@ -214,12 +214,12 @@ line2user <- function(line, side)
 #'
 #' @rdname analysis-information
 #' @export
-generateAnalysisInfo <- function(paths, groups = "", refs = "", formats = MSFileFormats())
+generateAnalysisInfo <- function(paths, groups = "", blanks = "", formats = MSFileFormats())
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertDirectoryExists(paths, access = "r", add = ac)
     checkmate::assertCharacter(groups, min.len = 1, add = ac)
-    checkmate::assertCharacter(refs, min.len = 1, add = ac)
+    checkmate::assertCharacter(blanks, min.len = 1, add = ac)
     checkmate::assertSubset(formats, MSFileFormats(), empty.ok = FALSE, add = ac)
     checkmate::reportAssertions(ac)
 
@@ -237,7 +237,7 @@ generateAnalysisInfo <- function(paths, groups = "", refs = "", formats = MSFile
     # set after duplicate removal
     groups <- rep(groups, length.out = nrow(ret))
     ret$group <- ifelse(!nzchar(groups), ret$analysis, groups)
-    ret$ref <- refs
+    ret$blank <- blanks
 
     return(ret)
 }
@@ -262,25 +262,25 @@ generateAnalysisInfoFromEnviMass <- function(path)
     blanks <- enviSInfo[enviSInfo$Type == "blank", ]
     if (nrow(blanks) > 0)
     {
-        blanks[, ref := paste0("blank", match(DT, unique(DT)))] # add unique date+time identifier
-        enviSInfo[, ref := sapply(DT, function(dt)
+        blanks[, blank := paste0("blank", match(DT, unique(DT)))] # add unique date+time identifier
+        enviSInfo[, blank := sapply(DT, function(dt)
         {
             bls <- blanks[DT <= dt]
             if (nrow(bls) > 0)
-                return(bls[which.max(bls$DT), ref])
+                return(bls[which.max(bls$DT), blank])
             else
                 return("")
         })]
 
-        enviSInfo[Type == "blank", group := ref]
+        enviSInfo[Type == "blank", group := blank]
     }
     else
-        enviSInfo[, ref := ""]
+        enviSInfo[, blank := ""]
 
     enviSInfo[group == "FALSE", group := ""]
 
     ret <- data.frame(path = file.path(path, "files"), analysis = enviSInfo$ID, group = enviSInfo$group,
-                      ref = enviSInfo$ref, stringsAsFactors = FALSE)
+                      blank = enviSInfo$blank, stringsAsFactors = FALSE)
 
     return(ret)
 }
@@ -404,10 +404,10 @@ getStrListWithMax <- function(l, m, collapse)
 showAnaInfo <- function(anaInfo)
 {
     rGroups <- unique(anaInfo$group)
-    refGroups <- unique(anaInfo$ref)
+    blGroups <- unique(anaInfo$blank)
     printf("Analyses: %s (%d total)\n", getStrListWithMax(anaInfo$analysis, 6, ", "), nrow(anaInfo))
     printf("Replicate groups: %s (%d total)\n", getStrListWithMax(rGroups, 8, ", "), length(rGroups))
-    printf("Replicate groups used as ref: %s (%d total)\n", getStrListWithMax(refGroups, 8, ", "), length(refGroups))
+    printf("Replicate groups used as blank: %s (%d total)\n", getStrListWithMax(blGroups, 8, ", "), length(blGroups))
 }
 
 showObjectSize <- function(object) printf("Object size (indication): %s\n", format(object.size(object), "auto", "SI"))

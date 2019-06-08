@@ -28,13 +28,13 @@ assertAnalysisInfo <- function(x, allowedFormats = NULL, null.ok = FALSE, .var.n
         mc <- length(add$getMessages())
 
     checkmate::assertDataFrame(x, min.rows = 1, .var.name = .var.name, add = add)
-    assertHasNames(x, c("path", "analysis", "group", "ref"), .var.name = .var.name, add = add)
+    assertHasNames(x, c("path", "analysis", "group", "blank"), .var.name = .var.name, add = add)
 
     assertCharField <- function(f) checkmate::assertCharacter(x[[f]], .var.name = sprintf("%s[\"%s\"]", .var.name, f), add = add)
     assertCharField("path")
     assertCharField("analysis")
     assertCharField("group")
-    assertCharField("ref")
+    assertCharField("blank")
 
     checkmate::assert(
         checkmate::checkNull(x[["conc"]]),
@@ -90,6 +90,12 @@ assertAndPrepareAnaInfo <- function(x, ..., add = NULL)
     if (!is.null(add))
         mc <- length(add$getMessages())
 
+    if (checkmate::checkDataFrame(x) && is.null(x[["blank"]]) && !is.null(x[["ref"]]))
+    {
+        warning("The usage of a 'ref' column in the analysis information is deprecated. Please re-name this column to 'blank'.")
+        setnames(x, "ref", "blank")
+    }
+    
     assertAnalysisInfo(x, ..., add = add)
 
     if ((is.null(add) || length(add$getMessages()) == mc) &&

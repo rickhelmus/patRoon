@@ -3,7 +3,7 @@ getTestDataPath <- function() "test_data"
 testFile <- function(f, ..., text = FALSE) file.path(getTestDataPath(), paste0(f, ..., if (!text) ".Rds" else ".txt", collapse = ""))
 getTestAnaInfo <- function(path = patRoonData::exampleDataPath()) generateAnalysisInfo(path,
                                                                                        groups = c(rep("solvent", 3), rep("standard", 3)),
-                                                                                       refs = "solvent")
+                                                                                       blanks = "solvent")
 getTestFGroups <- function(anaInfo = getTestAnaInfo(), ...) groupFeatures(findFeatures(anaInfo, "openms", logPath = NULL, ...), "openms")
 getEmptyTestFGroups <- function() getTestFGroups()[, "none"]
 getEmptyPLists <- function() MSPeakLists(algorithm = "none")
@@ -37,7 +37,7 @@ getDAAnaInfo <- function()
     if (is.null(path))
         return(NULL)
     return(generateAnalysisInfo(path, groups = c(rep("standard", 3), rep("solvent", 3)),
-                                refs = "solvent"))
+                                blanks = "solvent"))
 }
 
 doDATests <- function() !is.null(getOption("patRoon.test.DAAnalyses"))

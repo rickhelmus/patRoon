@@ -72,7 +72,7 @@ setMethod("featureTable", "features", function(obj) obj@features)
 #' @return \code{analysisInfo}: A \code{data.frame} containing a column with
 #'   analysis name (\code{analysis}), its path (\code{path}), and other columns
 #'   such as replicate group name (\code{group}) and blank reference
-#'   (\code{ref}).
+#'   (\code{blank}).
 #' @export
 setMethod("analysisInfo", "features", function(obj) obj@analysisInfo)
 

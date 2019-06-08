@@ -93,7 +93,7 @@ their index or name, respectively (for the order/names see \code{analyses()}).\c
 \code{analysisInfo}: A \code{data.frame} containing a column with
   analysis name (\code{analysis}), its path (\code{path}), and other columns
   such as replicate group name (\code{group}) and blank reference
-  (\code{ref}).
+  (\code{blank}).
 }
 \description{
 Holds information for all features present within a set of analysis.

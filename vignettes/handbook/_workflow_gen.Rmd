@@ -71,7 +71,7 @@ The final bits of preparation is constructing the information for the analyses t
 * **path**: the directory path of the file containing the analysis data
 * **analysis**: the name of the analysis. This should be the file name _without_ file extension.
 * **group**: to which _replicate group_ the analysis belongs. All analysis which are replicates of each other get the same name.
-* **ref**: which replicate group should be used for blank subtraction.
+* **blank**: which replicate group should be used for blank subtraction.
 * **conc** (optional, advanced) A numeric value describing the concentration or any other value for which the intensity in this sample may correlate, for instance, dilution factor, sampling time etc. This column is only required when you want to obtain quantitative information (e.g. concentrations) using the `as.data.table()` method function (see `?featureGroups` for more information).
 
 The `generateAnalysisInfo()` function can be used to (semi-)automatically generate a suitable `data.frame` that contains all the required information for a set of analysis. For, instance, the following line was used in the tutorial:
@@ -80,7 +80,7 @@ The `generateAnalysisInfo()` function can be used to (semi-)automatically genera
 # Take example data from patRoonData package (triplicate solvent blank + triplicate standard)
 generateAnalysisInfo(paths = patRoonData::exampleDataPath(),
                      groups = c(rep("solvent", 3), rep("standard", 3)),
-                     refs = "solvent")
+                     blanks = "solvent")
 ```
 
 Alternatively, the `newProject()` function discussed in the next section can be used to interactively construct this information.

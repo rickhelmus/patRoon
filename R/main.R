@@ -155,7 +155,7 @@ NULL
 #'   without its file extension.
 #'
 #'   The \code{group} column is \emph{mandatory} and needs to be filled in for
-#'   each analysis. The \code{ref} column should also be present, however, these
+#'   each analysis. The \code{blank} column should also be present, however, these
 #'   may contain empty character strings (\code{""}) for analyses where no blank
 #'   subtraction should occur. The \code{conc} column is only required when
 #'   obtaining regression information is desired with the

@@ -11,7 +11,7 @@
 - improve default plotting for plotInt and cluster plot functions
 - better error reporting for multiproc commands
 - get RAMClustR from CRAN?
-- ref -> blank
+- set max processes to threads-1?
 
 
 ## docs
@@ -60,7 +60,6 @@
 ## formulas
 - customize/document ranking column order? (only do rank for sirius?)
 - minExplainedFragPeaks -> minExplainedPeaks?
-- Improve formula scoring for compounds
 
 
 ## components

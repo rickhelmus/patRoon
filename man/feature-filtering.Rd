@@ -78,7 +78,7 @@ to skip this step.}
 (\code{filter}) or subtracted from (\code{replicateGroupSubtract}).}
 
 \item{removeBlanks}{Set to \code{TRUE} to remove all analyses that belong to
-replicate groups that are specified as a reference in the
+replicate groups that are specified as a blank in the
 \link{analysis-information}. This is useful to simplify the analyses in the
 specified \code{\link{featureGroups}} object after blank subtraction. When
 both \code{blankThreshold} and this argument are set, blank subtraction is

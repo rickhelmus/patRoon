@@ -267,7 +267,7 @@ setMethod("checkChromatograms", "featureGroups", function(fGroups, mzWindow, ena
         analysesData <- reactive({
             return(data.frame(color = anaColors, analysis = anaInfo$analysis,
                               enabled = rValues$enabledHotAnalyses,
-                              group = anaInfo$group, ref = anaInfo$ref, stringsAsFactors = FALSE))
+                              group = anaInfo$group, blank = anaInfo$blank, stringsAsFactors = FALSE))
         })
 
         observeEvent(input$toggleGroup, {

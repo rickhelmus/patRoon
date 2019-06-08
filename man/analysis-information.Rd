@@ -6,7 +6,7 @@
 \alias{generateAnalysisInfoFromEnviMass}
 \title{Analysis information}
 \usage{
-generateAnalysisInfo(paths, groups = "", refs = "",
+generateAnalysisInfo(paths, groups = "", blanks = "",
   formats = MSFileFormats())
 
 generateAnalysisInfoFromEnviMass(path)
@@ -15,7 +15,7 @@ generateAnalysisInfoFromEnviMass(path)
 \item{paths}{A character vector containing one or more file paths that should
 be used for finding the analyses.}
 
-\item{groups, refs}{An (optional) character vector containing replicate groups
+\item{groups, blanks}{An (optional) character vector containing replicate groups
 and references, respectively (will be recycled). If \code{groups} is an
 empty character string (\code{""}) the analysis name will be set as
 replicate group.}
@@ -37,23 +37,6 @@ Several properties need to be known about analyses that should be
   with an 'analysis info' object, which is a \code{data.frame} containing the
   following columns:
 
-\itemize{
-   \item \code{path} the full path to the analysis.
-   \item \code{analysis} the filename \strong{without} extension. Must be \strong{unique},
-   even if the \code{path} is different.
-   \item \code{group} name of \emph{replicate group}. A replicate group is used
-   to group analyses together that are replicates of each other. Thus, the
-   \code{group} column for all  analyses considered to be belonging to the same
-   replicate group should have an equal (but unique) value. Used for \emph{e.g.}
-   avaraging and \code{\link[=filter,featureGroups-method]{filter}}.
-   \item \code{ref} name of the \emph{reference}: all analyses within this
-   replicate group are used by \code{\link[=filter,featureGroups-method]{filter}}
-   for blank subtraction. Multiple entries can be entered by separation with a comma.
-   \item \code{conc} a numeric value specifying the 'concentration' of the analysis.
-   This can be actually any kind of quantitative value such as exposure time,
-   dilution factor or anything else which may be used to form a linear relationship.
-}
-
 Most functionality requires the data files to be in either the
   \file{.mzXML} or \file{.mzML} format. Functionality that utilizes Bruker
   DataAnalysis (\emph{e.g.} \code{\link{findFeaturesBruker}}) may only work
@@ -70,7 +53,7 @@ Most functionality requires the data files to be in either the
   without its file extension.
 
   The \code{group} column is \emph{mandatory} and needs to be filled in for
-  each analysis. The \code{ref} column should also be present, however, these
+  each analysis. The \code{blank} column should also be present, however, these
   may contain empty character strings (\code{""}) for analyses where no blank
   subtraction should occur. The \code{conc} column is only required when
   obtaining regression information is desired with the

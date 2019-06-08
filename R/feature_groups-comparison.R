@@ -150,7 +150,7 @@ convertFeatureGroupsToFeatures <- function(fGroupsList)
         flist[[fGNames[fgi]]] <- ft
     }
 
-    anaInfo <- data.frame(analysis = fGNames, group = fGNames, ref = "", path = ".", stringsAsFactors = FALSE)
+    anaInfo <- data.frame(analysis = fGNames, group = fGNames, blank = "", path = ".", stringsAsFactors = FALSE)
 
     return(featuresFromFeatGroups(features = flist, analysisInfo = anaInfo))
 }

@@ -1,5 +1,9 @@
 # patRoon 0.1.0.9000
 
+## June 2019
+
+* **IMPORTANT** The column to specify replicate groups for blank subtraction in the analysis information is re-named from `ref` to `blank`. Similarly, the `refs` argument to `generateAnalysisInfo()` is now called `blanks`.
+
 ## May 2019
 
 * Formula updates

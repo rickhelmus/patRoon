@@ -86,7 +86,7 @@ doCreateProject <- function(input, analyses)
 
     # Make analysis table
     if (input$generateAnaInfo == "table")
-        write.csv(analyses[, c("path", "analysis", "group", "ref")],
+        write.csv(analyses[, c("path", "analysis", "group", "blank")],
                   file.path(input$destinationPath, input$analysisTableFile), row.names = FALSE)
 
     code <- getScriptCode(input, analyses)
@@ -386,7 +386,7 @@ newProject <- function(destPath = NULL)
     server <- function(input, output, session)
     {
         rValues <- reactiveValues(analyses = data.table(analysis = character(0), format = character(0),
-                                                        group = character(0), ref = character(0), path = character(0)))
+                                                        group = character(0), blank = character(0), path = character(0)))
 
         observeEvent(input$create, {
             if (input$destinationPath == "")
@@ -425,7 +425,7 @@ newProject <- function(destPath = NULL)
             if (input$analysesHot$params$maxRows > 0)
             {
                 df <- hot_to_r(input$analysesHot)
-                rValues$analyses[, c("group", "ref") := .(df$group, df$ref)]
+                rValues$analyses[, c("group", "blank") := .(df$group, df$blank)]
             }
         })
 
@@ -438,7 +438,7 @@ newProject <- function(destPath = NULL)
                 if (length(files) > 0)
                 {
                     dt <- data.table(path = dirname(files), analysis = simplifyAnalysisNames(files),
-                                     group = "", ref = "")
+                                     group = "", blank = "")
 
                     fExts <- MSFileExtensions()
                     dt[, format := sapply(tools::file_ext(files), function(ext)
@@ -449,7 +449,7 @@ newProject <- function(destPath = NULL)
 
                     dt[, format := paste0(.SD$format, collapse = ", "), by = .(path, analysis)]
                     dt <- unique(dt, by = c("analysis", "path"))
-                    setcolorder(dt, c("analysis", "format", "group", "ref", "path"))
+                    setcolorder(dt, c("analysis", "format", "group", "blank", "path"))
 
                     rValues$analyses <- rbind(rValues$analyses, dt)
                 }
@@ -460,7 +460,7 @@ newProject <- function(destPath = NULL)
             csvFile <- rstudioapi::selectFile(path = "~/", filter = "csv files (*.csv)")
             if (!is.null(csvFile))
             {
-                csvTab <- tryCatch(fread(csvFile, select = c("path", "analysis", "group", "ref"),
+                csvTab <- tryCatch(fread(csvFile, select = c("path", "analysis", "group", "blank"),
                                          colClasses = "character"),
                                    error = function(e) FALSE, warning = function(w) FALSE)
                 if (is.logical(csvTab))
@@ -534,7 +534,7 @@ newProject <- function(destPath = NULL)
             hot <- do.call(rhandsontable,
                            c(list(rValues$analyses, height = 350, maxRows = nrow(rValues$analyses)),
                              hotOpts)) %>%
-                hot_col(c("group", "ref"), readOnly = FALSE, type = "text")
+                hot_col(c("group", "blank"), readOnly = FALSE, type = "text")
 
             return(hot)
         })

@@ -28,7 +28,7 @@ if (runData)
     # try to sync with tutorial so cache can be re-used
     anaInfo <- generateAnalysisInfo(paths = patRoonData::exampleDataPath(),
                                     groups = c(rep("solvent", 3), rep("standard", 3)),
-                                    refs = "solvent")
+                                    blanks = "solvent")
     anaInfoRG <- generateAnalysisInfo(paths = patRoonData::exampleDataPath(),
                                       groups = c(rep("repl1", 2),
                                                  rep("repl2", 2),

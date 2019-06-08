@@ -14,7 +14,7 @@ setwd(workPath)
 # Take example data from patRoonData package (triplicate solvent blank + triplicate standard)
 anaInfo <- generateAnalysisInfo(paths = patRoonData::exampleDataPath(),
                                 groups = c(rep("solvent", 3), rep("standard", 3)),
-                                refs = "solvent")
+                                blanks = "solvent")
 
 
 # -------------------------

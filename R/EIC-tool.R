@@ -347,7 +347,7 @@ setMethod("checkChromatograms", "featureGroups", function(fGroups, mzWindow, ena
         output$plotInteractive <- renderPlotly({
             pinfo <- plotInfo()
             p <- plot_ly(type="scatter", mode = "lines", hoverinfo = "none") %>%
-                config(displaylogo = FALSE, scrollZoom = TRUE, collaborate = FALSE,
+                config(displaylogo = FALSE, scrollZoom = TRUE,
                        modeBarButtonsToRemove = c("hoverClosestCartesian", "hoverCompareCartesian"))
 
             if (!is.null(pinfo)) # NULL if no data (no active group, no enabled analyses, ...)

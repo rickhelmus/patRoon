@@ -585,7 +585,7 @@ setMethod("compoundViewer", c("featureGroups", "MSPeakLists", "compounds"), func
             fi <- fragmentInfo()
 
             p <- plot_ly(type="scatter", mode = "lines", hoverinfo = "text") %>%
-                config(displaylogo = FALSE, scrollZoom = TRUE, collaborate = FALSE,
+                config(displaylogo = FALSE, scrollZoom = TRUE,
                        modeBarButtonsToRemove = c("hoverClosestCartesian", "hoverCompareCartesian"))
 
             for (i in seq_len(nrow(spec)))

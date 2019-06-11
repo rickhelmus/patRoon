@@ -376,8 +376,10 @@ newProject <- function(destPath = NULL)
 
     # UNDONE: warning/message about empty groups
 
+    # NOTE: disable column sorting so we don't have to worry about getting correct row index
+    # (https://github.com/jrowen/rhandsontable/issues/257)
     hotOpts <- list(rowHeaderWidth = 40, readOnly = TRUE,
-                    columnSorting = TRUE, sortIndicator = TRUE, selectCallback = TRUE,
+                    columnSorting = FALSE, sortIndicator = TRUE, selectCallback = TRUE,
                     currentRowClassName = "currentRow", stretchH = "all",
                     preventOverflow = "horizontal", multiSelect = TRUE,
                     outsideClickDeselects = FALSE,

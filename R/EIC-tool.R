@@ -181,7 +181,7 @@ setMethod("checkChromatograms", "featureGroups", function(fGroups, mzWindow, ena
         getCurrentAnalysis <- reactive({
             if (is.null(input$analysesHot_select))
                 return(anaInfo$analysis[1])
-            return(anaInfo$analysis[input$analysesHot_select$select$r])
+            return(anaInfo$analysis[input$analysesHot_select$select$rAll[1]])
         })
 
         plotInfo <- reactive({
@@ -271,17 +271,17 @@ setMethod("checkChromatograms", "featureGroups", function(fGroups, mzWindow, ena
         })
 
         observeEvent(input$toggleGroup, {
-            ind <- input$groupHot_select$select$r
+            ind <- input$groupHot_select$select$rAll[1]
             rValues$enabledHotFGroups[ind] <- !rValues$enabledHotFGroups[ind]
         })
-
+    
         observeEvent(input$applyClose, {
             enabledFGroups <<- rValues$enabledFGroups
             stopApp()
         })
 
         observeEvent(input$groupHot_select$select$r, {
-            rValues$currentFGroup <- rownames(gInfo)[input$groupHot_select$select$r]
+            rValues$currentFGroup <- rownames(gInfo)[input$groupHot_select$select$rAll[1]]
         })
 
         observeEvent(input$addDAEICs, {

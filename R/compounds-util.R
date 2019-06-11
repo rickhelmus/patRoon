@@ -533,14 +533,14 @@ setMethod("compoundViewer", c("featureGroups", "MSPeakLists", "compounds"), func
         })
 
         observeEvent(input$groupHot_select$select$r, {
-            rValues$currentFGroup <- rownames(gInfo)[input$groupHot_select$select$r]
+            rValues$currentFGroup <- rownames(gInfo)[input$groupHot_select$select$rAll[1]]
             rValues$currentResult <- 1
             updateSelectInput(session, "page", choices = generatePageLabels(rValues$currentFGroup, rValues$resultsPerPage))
         })
 
         observeEvent(input$metFragHot_select$select$r, {
             pr <- getPageRange(rValues$currentFGroup, rValues$currentPage, rValues$resultsPerPage)
-            rValues$currentResult <- input$metFragHot_select$select$r + pr[1] - 1
+            rValues$currentResult <- input$metFragHot_select$select$rAll[1] + pr[1] - 1
         })
 
         output$groupHot <- renderRHandsontable({

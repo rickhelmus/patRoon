@@ -5,6 +5,7 @@
 * **IMPORTANT** Several things are renamed for clarity/consistency
     * The column to specify replicate groups for blank subtraction in the analysis information is re-named from `ref` to `blank`. Similarly, the `refs` argument to `generateAnalysisInfo()` is now called `blanks`.
     * `reportMD()` is renamed to `reportHTML()`
+* Fixed incorrect selection after feature table (or other interactive tables) have been manually re-ordered (reported by Thanh Wang)
 
 ## May 2019
 

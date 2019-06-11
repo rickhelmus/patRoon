@@ -159,7 +159,8 @@ setMethod("checkChromatograms", "featureGroups", function(fGroups, mzWindow, ena
                     columnSorting = TRUE, sortIndicator = TRUE, selectCallback = TRUE,
                     currentRowClassName = "currentRow", stretchH = "all",
                     preventOverflow = "horizontal", multiSelect = FALSE,
-                    outsideClickDeselects = FALSE, manualColumnResize = TRUE)
+                    outsideClickDeselects = FALSE, manualColumnResize = TRUE,
+                    rowHeaders = NULL)
 
     anaColors <- colorRampPalette(brewer.pal(12, "Paired"))(nrow(anaInfo))
     anaColorsTrans <- adjustcolor(anaColors, alpha.f = 0.5)

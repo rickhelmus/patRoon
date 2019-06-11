@@ -11,6 +11,7 @@
 - better error reporting for multiproc commands
 - get RAMClustR from CRAN?
 - set max processes to threads-1?
+- newProject(): fix multi line delete
 
 
 ## docs

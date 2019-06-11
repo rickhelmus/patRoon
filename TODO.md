@@ -3,7 +3,6 @@
 ## general
 - more withr wrapping? (dev, par)
 - test negative subset indices
-- ref --> blank
 - convertMSFiles()
     - Agilent .d is also a directory?
 - consistent src file names, split utils?
@@ -22,13 +21,12 @@
 
 
 ## features
-- getXcmsSet --> export?
 - feature optim:
     - docs
         - mention parameters default unless specified
     - keep retcor_done?
     - get rid of getXCMSSet() calls?
-- tests to verify getXCMSSet...
+- tests to verify getXCMSSet
 - suspect screening
     - rename screenTargets?
 - filter()
@@ -68,7 +66,6 @@
 
 ## reporting
 - add more options to reportPlots argument of reportMD()?
-- reportMD() --> reportHTML()
 
 
 ## Cleanup

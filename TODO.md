@@ -11,7 +11,6 @@
 - better error reporting for multiproc commands
 - get RAMClustR from CRAN?
 - set max processes to threads-1?
-- newProject(): fix multi line delete
 
 
 ## docs
@@ -83,6 +82,8 @@
 - fillPeaks for CAMERA (and RAMClustR?)
 - support fastcluster for compounds clustering/int component clusters?
 - algorithmObject() generic: for xset, xsa, rc, ...
+- newProject(): fix multi line delete (when possible)
+
 
 ## Features
 

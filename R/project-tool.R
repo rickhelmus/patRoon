@@ -378,10 +378,12 @@ newProject <- function(destPath = NULL)
 
     # NOTE: disable column sorting so we don't have to worry about getting correct row index
     # (https://github.com/jrowen/rhandsontable/issues/257)
+    # NOTE: set selectionMode to range as only row series can currently be queried
+    # (https://github.com/jrowen/rhandsontable/issues/313)
     hotOpts <- list(rowHeaderWidth = 40, readOnly = TRUE,
                     columnSorting = FALSE, sortIndicator = TRUE, selectCallback = TRUE,
                     currentRowClassName = "currentRow", stretchH = "all",
-                    preventOverflow = "horizontal", multiSelect = TRUE,
+                    preventOverflow = "horizontal", selectionMode = "range",
                     outsideClickDeselects = FALSE,
                     contextMenu = FALSE, manualColumnResize = TRUE)
 

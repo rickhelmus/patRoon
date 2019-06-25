@@ -91,12 +91,14 @@ suspFile <- read.csv("{{ suspectList }}", stringsAsFactors = FALSE)
 scr <- screenTargets(fGroups, suspFile, rtWindow = 12, mzWindow = 0.005)
 fGroups <- groupFeaturesScreening(fGroups, scr)
 {{ endCodeBlock() }}
-{{ optionalCodeBlock(doMSPeakFind) }}
+{{ optionalCodeBlock(doMSPeakFind || formulaOpts$algo != "" || identOpts$algo != "" || componentOpts$algo != "") }}
 
 
 {{ header("annotation") }}
 
 
+{{ endCodeBlock() }}
+{{ optionalCodeBlock(doMSPeakFind) }}
 # Retrieve MS peak lists
 avgPListParams <- getDefAvgPListParams(clusterMzWindow = 0.005)
 {{ endCodeBlock() }}

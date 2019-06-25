@@ -56,7 +56,7 @@ getScriptCode <- function(input, analyses)
     template <- tmpl(readAllFile(system.file("templates", "main_script.R", package = "patRoon")),
                      destination = sldest, generateAnaInfo = input$generateAnaInfo, analysisTableFile = input$analysisTableFile,
                      analyses = analyses, suspectList = input$suspectList,
-                     doMSPeakFind = input$formulaGen != "" || input$compIdent != "",
+                     doMSPeakFind = (input$formulaGen != "" && input$formulaGen != "Bruker") || input$compIdent != "",
                      precursorMzWindow = input$precursorMzWindow,
                      polarity = input$polarity, reportFormats = input$report)
 
@@ -321,7 +321,7 @@ getNewProjectUI <- function(destPath)
                                              c("None" = "", "RAMClustR", "CAMERA", "nontarget"),
                                              multiple = FALSE, width = "100%"),
                                  conditionalPanel(
-                                     condition = "input.formulaGen != \"\" || input.compIdent != \"\"",
+                                     condition = "(input.formulaGen != \"\" && input.formulaGen != \"Bruker\") || input.compIdent != \"\"",
                                      fillRow(
                                          height = 90,
                                          selectInput("peakListGen", "Peak list generator",

@@ -6,7 +6,6 @@
 - convertMSFiles()
     - Agilent .d is also a directory?
 - consistent src file names, split utils?
-- newProject(): don't necessarily add MSPeakLists when DA formulas are choosen
 - improve default plotting for plotInt and cluster plot functions
 - multiproc
     - better error reporting

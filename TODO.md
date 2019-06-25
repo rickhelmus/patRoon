@@ -8,9 +8,11 @@
 - consistent src file names, split utils?
 - newProject(): don't necessarily add MSPeakLists when DA formulas are choosen
 - improve default plotting for plotInt and cluster plot functions
-- better error reporting for multiproc commands
+- multiproc
+    - better error reporting
+    - log executed command
 - get RAMClustR from CRAN?
-- set max processes to threads-1?
+- set max processes to threads-1? --> decide after bench
 
 
 ## docs
@@ -57,7 +59,6 @@
 
 ## formulas
 - customize/document ranking column order? (only do rank for sirius?)
-- minExplainedFragPeaks -> minExplainedPeaks?
 
 
 ## components

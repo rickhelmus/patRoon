@@ -16,7 +16,7 @@ formsGF <- generateFormulas(fGroups, "genform", plists)
 formsGFEmpty <- generateFormulas(fGroupsEmpty, "genform", plistsEmpty)
 formsGFEmptyPL <- generateFormulas(fGroups, "genform", plistsEmpty)
 formsGFEmptyPLMS <- generateFormulas(fGroups, "genform", plistsEmptyMS)
-formsGFWithMSMS <- filter(formsGF, minExplainedFragPeaks = 1)
+formsGFWithMSMS <- filter(formsGF, minExplainedPeaks = 1)
 formsGFOC <- generateFormulas(fGroups, "genform", plists, oc = TRUE)
 formsGFMS <- generateFormulas(fGroups, "genform", plists, MSMode = "ms")
 
@@ -83,14 +83,14 @@ test_that("basic subsetting", {
 })
 
 test_that("filtering works", {
-    expect_true(all(as.data.table(filter(formsGF, minExplainedFragPeaks = 1))$byMSMS))
-    expect_true(all(!as.data.table(filter(formsGF, minExplainedFragPeaks = 1, negate = TRUE))$byMSMS))
-    expect_lt(length(filter(formsGF, minExplainedFragPeaks = 2)),
-              length(filter(formsGF, minExplainedFragPeaks = 1)))
-    expect_gt(length(filter(formsGF, minExplainedFragPeaks = 2, negate = TRUE)),
-              length(filter(formsGF, minExplainedFragPeaks = 1, negate = TRUE)))
-    expect_length(filter(formsGFMS, minExplainedFragPeaks = 1), 0)
-    expect_length(filter(formsGFMS, minExplainedFragPeaks = 1, negate = TRUE), length(formsGFMS))
+    expect_true(all(as.data.table(filter(formsGF, minExplainedPeaks = 1))$byMSMS))
+    expect_true(all(!as.data.table(filter(formsGF, minExplainedPeaks = 1, negate = TRUE))$byMSMS))
+    expect_lt(length(filter(formsGF, minExplainedPeaks = 2)),
+              length(filter(formsGF, minExplainedPeaks = 1)))
+    expect_gt(length(filter(formsGF, minExplainedPeaks = 2, negate = TRUE)),
+              length(filter(formsGF, minExplainedPeaks = 1, negate = TRUE)))
+    expect_length(filter(formsGFMS, minExplainedPeaks = 1), 0)
+    expect_length(filter(formsGFMS, minExplainedPeaks = 1, negate = TRUE), length(formsGFMS))
 
     expect_length(filter(formsGF, elements = "C1-100"), length(formsGFOC)) # all should contain carbon
     expect_length(filter(formsGFOC, elements = "C1-100", negate = TRUE), 0)
@@ -105,9 +105,9 @@ test_that("filtering works", {
 
     # same for fragments
     expect_lte(length(filter(formsGFOC, fragElements = "C1-100")),
-               length(filter(formsGFOC, minExplainedFragPeaks = 1)))
+               length(filter(formsGFOC, minExplainedPeaks = 1)))
     expect_lte(length(filter(formsGFOC, fragElements = "C1-100", negate = TRUE)),
-               length(filter(formsGFOC, minExplainedFragPeaks = 1)))
+               length(filter(formsGFOC, minExplainedPeaks = 1)))
     expect_lt(length(filter(formsGFWithMSMS, fragElements = "C")),
               length(formsGFWithMSMS)) # fragments may contain only single carbon
     expect_length(filter(formsGFWithMSMS, fragElements = "C", negate = TRUE),

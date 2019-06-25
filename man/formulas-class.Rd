@@ -48,7 +48,7 @@
   maxFormulas = NULL, maxFragFormulas = NULL,
   normalizeScores = "none", excludeNormScores = NULL)
 
-\S4method{filter}{formulas}(obj, minExplainedFragPeaks = NULL,
+\S4method{filter}{formulas}(obj, minExplainedPeaks = NULL,
   elements = NULL, fragElements = NULL, lossElements = NULL,
   topMost = NULL, scoreLimits = NULL, OM = FALSE, negate = FALSE)
 
@@ -142,7 +142,7 @@ use of \code{filter}).}
   \code{individualMoNAScore} are set to mimic the behaviour of the MetFrag
   web interface.}
 
-\item{minExplainedFragPeaks}{Minimum number of fragment peaks that are
+\item{minExplainedPeaks}{Minimum number of fragment peaks that are
 explained. Setting this to \samp{1} will remove any MS only formula
 results. Set to \code{NULL} to ignore.}
 

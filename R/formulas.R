@@ -292,7 +292,7 @@ setMethod("as.data.table", "formulas", function(x, fGroups = NULL, average = FAL
 
 #' @describeIn formulas Performs rule based filtering on formula results.
 #'
-#' @param minExplainedFragPeaks Minimum number of fragment peaks that are
+#' @param minExplainedPeaks Minimum number of fragment peaks that are
 #'   explained. Setting this to \samp{1} will remove any MS only formula
 #'   results. Set to \code{NULL} to ignore.
 #' @param topMost Retain no more than this amount of best ranked (or worst
@@ -315,7 +315,7 @@ setMethod("as.data.table", "formulas", function(x, fGroups = NULL, average = FAL
 #' @return \code{filter} returns a filtered \code{\link{formulas}} object.
 #'
 #' @export
-setMethod("filter", "formulas", function(obj, minExplainedFragPeaks = NULL, elements = NULL,
+setMethod("filter", "formulas", function(obj, minExplainedPeaks = NULL, elements = NULL,
                                          fragElements = NULL, lossElements = NULL,
                                          topMost = NULL, scoreLimits = NULL,
                                          OM = FALSE, negate = FALSE)
@@ -323,7 +323,7 @@ setMethod("filter", "formulas", function(obj, minExplainedFragPeaks = NULL, elem
     scCols <- formulaScorings()$name
 
     ac <- checkmate::makeAssertCollection()
-    aapply(checkmate::assertCount, . ~ topMost + minExplainedFragPeaks,
+    aapply(checkmate::assertCount, . ~ topMost + minExplainedPeaks,
            positive = c(TRUE, FALSE), null.ok = TRUE, fixed = list(add = ac))
     aapply(checkmate::assertCharacter, . ~ elements + fragElements + lossElements,
            min.chars = 1, min.len = 1, null.ok = TRUE, fixed = list(add = ac))
@@ -343,7 +343,7 @@ setMethod("filter", "formulas", function(obj, minExplainedFragPeaks = NULL, elem
     obj@formulas <- pruneList(sapply(groupNames(obj), function(grp)
     {
         formTable <- obj[[grp]]
-        if (!is.null(minExplainedFragPeaks) && minExplainedFragPeaks > 0)
+        if (!is.null(minExplainedPeaks) && minExplainedPeaks > 0)
         {
             ft <- formTable[byMSMS == TRUE]
             if (nrow(ft) == 0)
@@ -351,9 +351,9 @@ setMethod("filter", "formulas", function(obj, minExplainedFragPeaks = NULL, elem
             formTable <- ft
             fragCounts <- formTable[, ifelse(byMSMS, length(frag_formula), 0L), by = "formula"][[2]]
             if (negate)
-                formTable <- formTable[fragCounts < minExplainedFragPeaks]
+                formTable <- formTable[fragCounts < minExplainedPeaks]
             else
-                formTable <- formTable[fragCounts >= minExplainedFragPeaks]
+                formTable <- formTable[fragCounts >= minExplainedPeaks]
         }
 
         if (!is.null(elements))

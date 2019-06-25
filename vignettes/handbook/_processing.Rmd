@@ -207,7 +207,7 @@ Filter                                        | Classes                        |
 `absMSIntThr`, `absMSMSIntThr`, `relMSIntThr`, `relMSMSIntThr` | `MSPeakLists` | Minimum intensity of mass peaks
 `topMSPeaks`, `topMSMSPeaks`                  | `MSPeakLists`                  | Only keep most intense mass peaks
 `withMSMS`                                    | `MSPeakLists`                  | Only keep results with MS/MS data
-`minExplainedFragPeaks`, `minExplainedPeaks`  | `formulas` / `compounds`       | Minimum number of annotated mass peaks
+`minExplainedPeaks`                           | `formulas` / `compounds`       | Minimum number of annotated mass peaks
 `elements`, `fragElements`, `lossElements`    | `formulas`, `compounds`        | Restrain elemental composition
 `topMost`                                     | `formulas`, `compounds`        | Only keep highest ranked candidates 
 `minScore`, `minFragScore`, `minFormulaScore` | `compounds`                    | Minimum compound scorings

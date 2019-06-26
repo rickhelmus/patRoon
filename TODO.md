@@ -50,7 +50,6 @@
 - test score normalization?
 - timeouts for SIRIUS?
 - improve formula scoring
-- plotHeatMap() / plotSilhouettes() for comp clusters?
 - do something about negative H explained fragments by MF?
 
 

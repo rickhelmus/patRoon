@@ -17,6 +17,7 @@
 \alias{plot,compoundsCluster,ANY-method}
 \alias{getMCS,compoundsCluster-method}
 \alias{plotStructure,compoundsCluster-method}
+\alias{plotSilhouettes,compoundsCluster-method}
 \title{Compounds cluster class}
 \usage{
 \S4method{clusters}{compoundsCluster}(obj)
@@ -50,6 +51,9 @@
 
 \S4method{plotStructure}{compoundsCluster}(obj, groupName, cluster,
   width = 500, height = 500, withTitle = TRUE)
+
+\S4method{plotSilhouettes}{compoundsCluster}(obj, groupName, kSeq,
+  pch = 16, type = "b", ...)
 }
 \arguments{
 \item{obj, x, object}{A \code{compoundsCluster} object.}
@@ -61,7 +65,8 @@ should be named with the feature group names.}
 their index or name, respectively (for the order/names see \code{groupNames()}). Can also be logical to perform logical selection
 (similar to regular vectors). If missing all feature groups are selected.}
 
-\item{\dots}{Any arguments directly given to \code{\link{plot.dendrogram}}.}
+\item{\dots}{Further arguments passed directly to the plotting function
+(\code{plot} or \code{\link{plot.dendrogram}}).}
 
 \item{drop, j}{ignored.}
 
@@ -91,6 +96,11 @@ overflowing the plot.}
 should be plotted.}
 
 \item{withTitle}{A logical value specifying whether a title should be added.}
+
+\item{kSeq}{An integer vector containing the sequence that should be used for
+average silhouette width calculation.}
+
+\item{pch, type}{Passed to \code{\link[graphics]{plot}}.}
 }
 \value{
 \code{cutTree} and \code{cutTreeDynamic} return the modified
@@ -148,6 +158,11 @@ the \code{\link{get.mcs}} function from \CRANpkg{rcdk}.
 
 \item \code{plotStructure}: Plots the maximum common substructure (MCS) for
 all candidate structures within a specified cluster.
+
+\item \code{plotSilhouettes}: Plots the average silhouette width when the
+clusters are cut by a sequence of k numbers. The k value with the highest
+value (marked in the plot) may be considered as the optimal number of
+clusters.
 }}
 
 \section{Slots}{
@@ -155,6 +170,8 @@ all candidate structures within a specified cluster.
 \describe{
 \item{\code{clusters}}{A \code{list} with \code{\link{hclust}} objects for each
 feature group.}
+
+\item{\code{dists}}{A \code{list} with distance matrices for each feature group.}
 
 \item{\code{SMILES}}{A \code{list} containing a vector with \code{SMILES} for all
 candidate structures per feature group.}

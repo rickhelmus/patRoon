@@ -8,6 +8,7 @@
     *  `filter()` method for `formulas`: `minExplainedFragPeaks` is now called `minExplainedPeaks`
 * Fixed incorrect selection after feature table (or other interactive tables) have been manually re-ordered (reported by Thanh Wang)
 * `groups()` and `as.data.table()` methods for `featureGroups`: optionally consider feature areas instead of peak intensities.
+* `plotSilhouettes()` method for `compoundsCluster`
 
 ## May 2019
 

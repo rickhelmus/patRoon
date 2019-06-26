@@ -34,6 +34,7 @@ NULL
 #'
 #' @slot clusters A \code{list} with \code{\link{hclust}} objects for each
 #'   feature group.
+#' @slot dists A \code{list} with distance matrices for each feature group.
 #' @slot SMILES A \code{list} containing a vector with \code{SMILES} for all
 #'   candidate structures per feature group.
 #' @slot cutClusters A \code{list} with assigned clusters for all candidates per
@@ -44,6 +45,8 @@ NULL
 #' @param obj,x,object A \code{compoundsCluster} object.
 #' @param groupName A character specifying the feature group name.
 #' @param cluster A numeric value specifying the cluster.
+#' @param \dots Further arguments passed directly to the plotting function
+#'   (\code{plot} or \code{\link{plot.dendrogram}}).
 #'
 #' @templateVar seli feature groups
 #' @templateVar selOrderi groupNames()
@@ -55,7 +58,7 @@ NULL
 #'
 #' @export
 compoundsCluster <- setClass("compoundsCluster",
-                             slots = c(clusters = "list", SMILES = "list", cutClusters = "list",
+                             slots = c(clusters = "list", dists = "list", SMILES = "list", cutClusters = "list",
                                        properties = "list"))
 
 #' @describeIn compoundsCluster Accessor method to the \code{clusters} slot.
@@ -176,6 +179,7 @@ setMethod("treeCutDynamic", "compoundsCluster", function(obj, maxTreeHeight, dee
 
 #' @describeIn compoundsCluster Plot the dendrogram for clustered compounds of a
 #'   feature group. Clusters are highlighted using \CRANpkg{dendextend}.
+#' @templateVar withoutDots TRUE
 #' @template plot_clust
 #' @export
 setMethod("plot", "compoundsCluster", function(x, groupName, pal = "Paired",
@@ -210,7 +214,7 @@ setMethod("getMCS", "compoundsCluster", function(obj, groupName, cluster)
     ac <- checkmate::makeAssertCollection()
     cc <- obj@cutClusters[[groupName]]
     nclust <- length(unique(cc))
-    checkmate::assertInt(cluster, lower = 0, upper = nclust)
+    checkmate::assertInt(cluster, lower = 0, upper = nclust, add = ac)
     checkmate::reportAssertions(ac)
 
     mols <- getMoleculesFromSMILES(obj@SMILES[[groupName]][cc == cluster], doTyping = TRUE,
@@ -272,6 +276,16 @@ setMethod("plotStructureHash", "compoundsCluster", function(obj, groupName, clus
     return(ret)
 })
 
+#' @templateVar class compoundsCluster
+#' @template plotsil
+#' @export
+setMethod("plotSilhouettes", "compoundsCluster", function(obj, kSeq, groupName, pch = 16, type = "b", ...)
+{
+    assertChoiceSilent(groupName, names(obj@clusters))
+    checkmate::assertIntegerish(kSeq, lower = 2, any.missing = FALSE)
+    doPlotSilhouettes(obj@clusters[[groupName]], obj@dists[[groupName]], kSeq, pch, type, ...)
+    invisible(NULL)
+})
 
 #' @details \code{makeHCluster} performs hierarchical clustering of all
 #'   structure candidates for each feature group within a
@@ -327,46 +341,57 @@ setMethod("makeHCluster", "compounds", function(obj, method, fpType = "extended"
                                                                   doTyping = TRUE, emptyIfFails = TRUE),
                    simplify = FALSE) 
     
-    cat("Performing clustering ...\n")
+    cat("Calculating distances ...\n")
     prog <- openProgBar(0, length(mols))
-    clust <- lapply(seq_along(mols), function(i)
+    
+    dists <- lapply(seq_along(mols), function(i)
     {
         if (length(mols[[i]]) < 2)
             return(NULL) # need multiple candidates to cluster
         
         fps <- lapply(mols[[i]], rcdk::get.fingerprint, type = fpType)
         dist <- as.dist(1 - fingerprint::fp.sim.matrix(fps, method = fpSimMethod))
-        
-        hc <- hclust(dist, method)
         setTxtProgressBar(prog, i)
-        
+        return(dist)
+    })
+    hasDist <- !sapply(dists, is.null)
+    dists <- dists[hasDist]
+    setTxtProgressBar(prog, length(obj))
+    close(prog)
+    
+    cat("Performing clustering ...\n")
+    prog <- openProgBar(0, length(dists))
+    
+    clusts <- lapply(seq_along(dists), function(di)
+    {
+        hc <- hclust(dists[[di]], method)
+        setTxtProgressBar(prog, di)
         return(hc)
     })
-    
-    hasClust <- !sapply(clust, is.null)
-    clust <- clust[hasClust]
     
     setTxtProgressBar(prog, length(obj))
     close(prog)
     
     cat("Performing dynamic tree cutting ...\n")
-    prog <- openProgBar(0, length(clust))
-    cutClusters <- lapply(seq_along(clust), function(ci)
+    prog <- openProgBar(0, length(clusts))
+    cutClusters <- lapply(seq_along(clusts), function(ci)
     {
-        dendro <- clust[[ci]]
+        dendro <- clusts[[ci]]
         ret <- doDynamicTreeCut(dendro, maxTreeHeight, deepSplit, minModuleSize)
         setTxtProgressBar(prog, ci)
         return(ret)
     })
 
-    setTxtProgressBar(prog, length(clust))
+    setTxtProgressBar(prog, length(clusts))
     close(prog)
     
-    gNames <- names(compTable)[hasClust]
-    names(clust) <- gNames
+    gNames <- names(compTable)[hasDist]
+    names(clusts) <- gNames
+    names(dists) <- gNames
     names(cutClusters) <- gNames
     
-    ret <- compoundsCluster(clusters = clust, SMILES = sapply(compTable, "[[", "SMILES", simplify = FALSE),
+    ret <- compoundsCluster(clusters = clusts, dists = dists,
+                            SMILES = sapply(compTable, "[[", "SMILES", simplify = FALSE),
                             cutClusters = cutClusters,
                             properties = list(method = method, fpType = fpType,
                                               fpSimMethod = fpSimMethod))

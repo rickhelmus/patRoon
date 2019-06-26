@@ -772,6 +772,24 @@ plotDendroWithClusters <- function(dendro, ct, pal, colourBranches, showLegend, 
         plot(dendro, ...)
 }
 
+doPlotSilhouettes <- function(clust, distm, kSeq, pch = 16, type = "b", ...)
+{
+    if (length(distm) == 1)
+        stop("Need >2 clustered compounds")
+    
+    meanws <- sapply(kSeq, function(k)
+    {
+        sil <- silhouette(cutree(clust, k = k), distm)
+        summary(sil)$avg.width
+    })
+    
+    plot(x = kSeq, y = meanws, pch = pch, type = type, xaxt = "none",
+         xlab = "cluster k", ylab = "mean silhouette width", ...)
+    axis(1, kSeq)
+    abline(v = kSeq[which.max(meanws)], lty = 2)
+}
+
+
 isValidMol <- function(mol) !is.null(mol) # && !is.na(mol)
 emptyMol <- function() rcdk::parse.smiles("")[[1]]
 isEmptyMol <- function(mol) rcdk::get.atom.count(mol) == 0

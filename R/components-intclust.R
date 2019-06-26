@@ -207,33 +207,14 @@ setMethod("plot", "componentsIntClust", function(x, pal = "Paired", numericLabel
     invisible(NULL)
 })
 
-#' @describeIn componentsIntClust Plots the average silhouette width when the
-#'   clusters are cut by a sequence of k numbers. The k value with the highest
-#'   value (marked in the plot) may be considered as the optimal number of
-#'   clusters.
-#' @param kSeq An integer vector containing the sequence that should be used for
-#'   average silhouette width calculation.
-#' @param pch,type Passed to \code{\link[graphics]{plot}}.
+
+#' @templateVar class componentsIntClust
+#' @template plotsil
 #' @export
-#' @aliases plotSilhouettes
 setMethod("plotSilhouettes", "componentsIntClust", function(obj, kSeq, pch = 16, type = "b", ...)
 {
     checkmate::assertIntegerish(kSeq, lower = 2, any.missing = FALSE)
-
-    silInfo <- vector("list", length(kSeq))
-    maxmw <- maxk <- NULL
-
-    meanws <- sapply(kSeq, function(k)
-    {
-        sil <- silhouette(cutree(obj@clust, k = k), obj@distm)
-        summary(sil)$avg.width
-    })
-
-    plot(x = kSeq, y = meanws, pch = pch, type = type, xaxt = "none",
-         xlab = "cluster k", ylab = "mean silhouette width", ...)
-    axis(1, kSeq)
-    abline(v = kSeq[which.max(meanws)], lty = 2)
-
+    doPlotSilhouettes(obj@clust, obj@distm, kSeq, pch, type, ...)
     invisible(NULL)
 })
 

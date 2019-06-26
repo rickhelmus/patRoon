@@ -28,7 +28,7 @@
   deepSplit, minModuleSize)
 
 \S4method{plotHeatMap}{componentsIntClust}(obj, interactive = FALSE,
-  col = NULL, margins = c(6, 2), ...)
+  col = NULL, margins = c(6, 2), cexCol = 1, ...)
 
 \S4method{plotInt}{componentsIntClust}(obj, index, pch = 20,
   type = "b", lty = 3, col = NULL, ...)
@@ -51,7 +51,7 @@ Analogous to \code{\link{cutree}}.}
 \item{interactive}{If \code{TRUE} an interactive heatmap will be drawn (with
 \code{\link{d3heatmap}}).}
 
-\item{margins}{Passed to \code{\link{heatmap.2}}}
+\item{margins, cexCol}{Passed to \code{\link{heatmap.2}}}
 
 \item{\dots}{Further options passed to \code{\link{heatmap.2}} /
 \code{\link{d3heatmap}} (\code{plotHeatMap}), \code{\link{plot.dendrogram}}

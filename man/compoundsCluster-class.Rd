@@ -52,7 +52,7 @@
 \S4method{plotStructure}{compoundsCluster}(obj, groupName, cluster,
   width = 500, height = 500, withTitle = TRUE)
 
-\S4method{plotSilhouettes}{compoundsCluster}(obj, groupName, kSeq,
+\S4method{plotSilhouettes}{compoundsCluster}(obj, kSeq, groupName,
   pch = 16, type = "b", ...)
 }
 \arguments{

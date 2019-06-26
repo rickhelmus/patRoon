@@ -132,12 +132,13 @@ setMethod("treeCutDynamic", "componentsIntClust", function(obj, maxTreeHeight, d
 #'   \code{\link{heatmap.2}} or \code{\link{d3heatmap}} function.
 #' @param interactive If \code{TRUE} an interactive heatmap will be drawn (with
 #'   \code{\link{d3heatmap}}).
-#' @param margins Passed to \code{\link{heatmap.2}}
+#' @param margins,cexCol Passed to \code{\link{heatmap.2}}
 #' @return \code{plotHeatMap} returns the same as \code{\link{heatmap.2}} or
 #'   \code{\link{d3heatmap}}.
 #' @aliases plotHeatMap
 #' @export
-setMethod("plotHeatMap", "componentsIntClust", function(obj, interactive = FALSE, col = NULL, margins = c(6, 2),  ...)
+setMethod("plotHeatMap", "componentsIntClust", function(obj, interactive = FALSE, col = NULL,
+                                                        margins = c(6, 2), cexCol = 1,  ...)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertFlag(interactive, add = ac)
@@ -154,7 +155,7 @@ setMethod("plotHeatMap", "componentsIntClust", function(obj, interactive = FALSE
         gplots::heatmap.2(obj@clusterm, Colv = NA, distfun = function(d) dist(d, obj@properties$metric),
                           hclustfun = function(h) hclust(h, obj@properties$method),
                           scale = "none", col = col, dendrogram = "row", ylab = "feature groups",
-                          labRow = FALSE, margins = margins, ...)
+                          labRow = FALSE, margins = margins, cexCol = cexCol, ...)
 })
 
 #' @describeIn componentsIntClust makes a plot for all (normalized) intensity

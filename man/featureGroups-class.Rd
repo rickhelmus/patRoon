@@ -70,7 +70,8 @@
 
 \S4method{groupFeatIndex}{featureGroups}(fGroups)
 
-\S4method{[}{featureGroups,ANY,ANY,missing}(x, i, j, ..., drop = TRUE)
+\S4method{[}{featureGroups,ANY,ANY,missing}(x, i, j, ..., rGroups,
+  drop = TRUE)
 
 \S4method{[[}{featureGroups,ANY,ANY}(x, i, j)
 
@@ -123,6 +124,10 @@ their index or name, respectively (for the order/names see \code{analyses()/name
 \code{\link[graphics]{lines}} (\code{plotInt}), \pkg{\link{VennDiagram}}
 plotting functions (\code{plotVenn}), \code{\link{chordDiagram}}
 (\code{plotChord}) or \code{\link[UpSetR]{upset}} (\code{plotUpSet}).}
+
+\item{rGroups}{An optional \code{character} vector: if specified only keep
+results for the given replicate groups (equivalent to the \code{rGroups}
+argument to \code{\link[=filter,featureGroups-method]{filter}}).}
 
 \item{drop}{ignored.}
 

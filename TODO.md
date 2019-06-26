@@ -5,7 +5,6 @@
 - convertMSFiles()
     - Agilent .d is also a directory?
 - consistent src file names, split utils?
-- improve default plotting for plotInt and cluster plot functions
 - multiproc
     - better error reporting
     - log executed command
@@ -39,7 +38,6 @@
 - collapse averagedPeakLists
 - test avg params
 - metadata() generic?
-- change subset arg order?
 
 
 ## compounds
@@ -79,6 +77,7 @@
 - algorithmObject() generic: for xset, xsa, rc, ...
 - newProject(): fix multi line delete (when possible)
 - more withr wrapping? (dev, par)
+- improve default plotting for plotInt and cluster plot functions
 
 
 ## Features

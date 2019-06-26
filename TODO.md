@@ -32,8 +32,6 @@
 - filter()
     - document which filters work on feature level (e.g. chromWidth)
     - remove zero values for maxReplicateIntRSD?
-- fList --> features?
-- move rGroups from filter() to subset?
 
 
 ## MSPeakLists

@@ -131,6 +131,7 @@ test_that("basic filtering", {
     expect_equivalent(filter(fgOpenMS, chromWidthRange = c(0, Inf)), fgOpenMS)
 
     expect_identical(replicateGroups(filter(fgOpenMS, rGroups = "standard")), "standard")
+    expect_identical(replicateGroups(fgOpenMS[, rGroups = "standard"]), "standard")
     expect_identical(replicateGroups(filter(fgOpenMS, removeBlanks = TRUE)), "standard")
     expect_identical(replicateGroups(removeEmptyAnalyses(filter(fgOpenMS, relMinFeatures = 0.7))), "standard")
     expect_identical(replicateGroups(removeEmptyAnalyses(filter(fgOpenMS, absMinFeatures = 400))), "standard")

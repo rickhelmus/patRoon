@@ -191,9 +191,15 @@ setMethod("removeGroups", "featureGroups", function(fGroups, indices)
 })
 
 #' @describeIn featureGroups Subset on analyses/feature groups.
+#' @param rGroups An optional \code{character} vector: if specified only keep
+#'   results for the given replicate groups (equivalent to the \code{rGroups}
+#'   argument to \code{\link[=filter,featureGroups-method]{filter}}).
 #' @export
-setMethod("[", c("featureGroups", "ANY", "ANY", "missing"), function(x, i, j, ...)
+setMethod("[", c("featureGroups", "ANY", "ANY", "missing"), function(x, i, j, ..., rGroups, drop = TRUE)
 {
+    if (!missing(rGroups))
+        x <- filter(x, rGroups = rGroups)
+    
     if (!missing(i))
     {
         i <- assertSubsetArgAndToChr(i, analyses(x))

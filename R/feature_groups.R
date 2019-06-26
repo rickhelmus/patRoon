@@ -23,6 +23,8 @@ NULL
 #'   plotting functions (\code{plotVenn}), \code{\link{chordDiagram}}
 #'   (\code{plotChord}) or \code{\link[UpSetR]{upset}} (\code{plotUpSet}).
 #' @param average Average data within replicate groups.
+#' @param areas If set to \code{TRUE} then areas are considered instead of peak
+#'   intensities.
 #' @param pch,type,lty Common plotting parameters passed to \emph{e.g.}
 #'   \code{\link[graphics]{plot}}.
 #' @param col Colour(s) used. If \code{col=NULL} then colours are automatically
@@ -111,7 +113,31 @@ setMethod("show", "featureGroups", function(object)
 #' @describeIn featureGroups Accessor for \code{groups} slot.
 #' @aliases groups
 #' @export
-setMethod("groups", "featureGroups", function(object) object@groups)
+setMethod("groups", "featureGroups", function(object, areas = FALSE)
+{
+    checkmate::assertFlag(areas)
+    
+    if (areas)
+    {
+        anaInfo <- analysisInfo(object)
+        ret <- copy(object@groups)
+        ftindex <- object@ftindex
+        fTable <- featureTable(object)
+        for (cl in seq_along(ret))
+        {
+            ftinds <- ftindex[[cl]]
+            anainds <- seq_len(nrow(ret))[ftinds != 0]
+            ftinds <- ftinds[ftinds != 0]
+            as <- mapply(anainds, ftinds, SIMPLIFY = TRUE, FUN = function(a, i)
+            {
+                fTable[[anaInfo$analysis[a]]][["area"]][i] 
+            })
+            set(ret, anainds, cl, as)
+        }
+        return(ret)
+    }
+    return(object@groups)
+})
 
 #' @describeIn featureGroups Obtain analysisInfo (see analysisInfo slot in \code{\link{features}}).
 #' @export
@@ -231,13 +257,13 @@ setMethod("removeEmptyAnalyses", "featureGroups", function(fGroups)
     return(fGroups)
 })
 
-setMethod("averageGroups", "featureGroups", function(fGroups)
+setMethod("averageGroups", "featureGroups", function(fGroups, areas)
 {
-    gTable <- copy(groups(fGroups))
+    gTable <- copy(groups(fGroups, areas))
     if (nrow(gTable) == 0)
         return()
 
-    gNames <- colnames(groups(fGroups))
+    gNames <- names(fGroups)
     anaInfo <- analysisInfo(fGroups)
 
     gTable[, sgroup := anaInfo$group]
@@ -246,7 +272,7 @@ setMethod("averageGroups", "featureGroups", function(fGroups)
     gTable <- unique(gTable, by = "sgroup")
     gTable[, sgroup := NULL]
 
-    return(gTable)
+    return(gTable[])
 })
 
 setMethod("updateFeatIndex", "featureGroups", function(fGroups)
@@ -323,9 +349,9 @@ setMethod("export", "featureGroups", function(fGroups, type, out)
 #' @param features If \code{TRUE} then feature specific data will be added. If
 #'   \code{average=TRUE} this data will be averaged for each feature group.
 #' @param regression Set to \code{TRUE} to add regression data for each feature
-#'   group. For this a linear model is created (intensity/area \emph{vs}
-#'   concentration). The model concentrations (e.g. of a set of standards) is
-#'   derived from the \code{conc} column of the
+#'   group. For this a linear model is created (intensity/area [dependning on
+#'   \code{areas} argument] \emph{vs} concentration). The model concentrations
+#'   (e.g. of a set of standards) is derived from the \code{conc} column of the
 #'   \link[=analysis-information]{analysis information}. From this model the
 #'   intercept, slope and R2 is added to the output. In addition, when
 #'   \code{features=TRUE}, concentrations for each feature are added. Note that
@@ -333,10 +359,11 @@ setMethod("export", "featureGroups", function(fGroups, type, out)
 #'   the analysis information or when less than two concentrations are specified
 #'   (\emph{i.e.} the minimum amount).
 #' @export
-setMethod("as.data.table", "featureGroups", function(x, average = FALSE, features = FALSE, regression = FALSE)
+setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas = FALSE, features = FALSE, regression = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertFlag(average, add = ac)
+    checkmate::assertFlag(areas, add = ac)
     checkmate::assertFlag(features, add = ac)
     checkmate::assertFlag(regression, add = ac)
     checkmate::reportAssertions(ac)
@@ -409,14 +436,14 @@ setMethod("as.data.table", "featureGroups", function(x, average = FALSE, feature
     {
         if (average)
         {
-            gTable <- averageGroups(x)
+            gTable <- averageGroups(x, areas)
             snames <- unique(anaInfo$group)
             if (doConc)
                 concs <- anaInfo[!duplicated(anaInfo$group), "conc"] # conc should be same for all replicates
         }
         else
         {
-            gTable <- groups(x)
+            gTable <- groups(x, areas)
             snames <- anaInfo$analysis
             if (doConc)
                 concs <- anaInfo$conc

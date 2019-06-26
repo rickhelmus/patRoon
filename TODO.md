@@ -1,7 +1,6 @@
 # Release
 
 ## general
-- more withr wrapping? (dev, par)
 - test negative subset indices
 - convertMSFiles()
     - Agilent .d is also a directory?
@@ -35,7 +34,6 @@
     - remove zero values for maxReplicateIntRSD?
 - fList --> features?
 - move rGroups from filter() to subset?
-- as.data.table() and others: optionally report areas instead of intensities
 
 
 ## MSPeakLists
@@ -65,7 +63,7 @@
 
 
 ## reporting
-- add more options to reportPlots argument of reportMD()?
+- add more options to reportPlots argument of reportHTML()?
 
 
 ## Cleanup
@@ -83,6 +81,7 @@
 - support fastcluster for compounds clustering/int component clusters?
 - algorithmObject() generic: for xset, xsa, rc, ...
 - newProject(): fix multi line delete (when possible)
+- more withr wrapping? (dev, par)
 
 
 ## Features

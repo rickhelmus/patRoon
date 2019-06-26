@@ -70,6 +70,14 @@ expect_range <- function(object, r)
     invisible(act$val)
 }
 
+expect_gt_or_zero <- function(object, expected)
+{
+    act <- quasi_label(rlang::enquo(object))
+    expect(all(object == 0 | object > expected), "object not greater than or zero")
+    browser()
+    invisible(act$val)
+}
+
 expect_known_show <- function(object, file)
 {
     act <- quasi_label(rlang::enquo(object))

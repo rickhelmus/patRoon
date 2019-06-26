@@ -58,7 +58,7 @@
 
 \S4method{show}{featureGroups}(object)
 
-\S4method{groups}{featureGroups}(object)
+\S4method{groups}{featureGroups}(object, areas = FALSE)
 
 \S4method{analysisInfo}{featureGroups}(obj)
 
@@ -79,7 +79,7 @@
 \S4method{export}{featureGroups}(fGroups, type, out)
 
 \S4method{as.data.table}{featureGroups}(x, average = FALSE,
-  features = FALSE, regression = FALSE)
+  areas = FALSE, features = FALSE, regression = FALSE)
 
 \S4method{plot}{featureGroups,ANY}(x, retMin = FALSE, col = NULL,
   pch = 16, ...)
@@ -109,6 +109,9 @@
 \S4method{overlap}{featureGroups}(fGroups, which, exclusive = FALSE)
 }
 \arguments{
+\item{areas}{If set to \code{TRUE} then areas are considered instead of peak
+intensities.}
+
 \item{fGroups, obj, x, object}{\code{featureGroups} object to be accessed.}
 
 \item{i, j}{A numeric or character value which is used to select analyses/feature groups by
@@ -137,9 +140,9 @@ ProfileAnalysis), \code{"brukertasq"} (Bruker TASQ) or \code{"mzmine"}
 \code{average=TRUE} this data will be averaged for each feature group.}
 
 \item{regression}{Set to \code{TRUE} to add regression data for each feature
-group. For this a linear model is created (intensity/area \emph{vs}
-concentration). The model concentrations (e.g. of a set of standards) is
-derived from the \code{conc} column of the
+group. For this a linear model is created (intensity/area [dependning on
+\code{areas} argument] \emph{vs} concentration). The model concentrations
+(e.g. of a set of standards) is derived from the \code{conc} column of the
 \link[=analysis-information]{analysis information}. From this model the
 intercept, slope and R2 is added to the output. In addition, when
 \code{features=TRUE}, concentrations for each feature are added. Note that

@@ -4,14 +4,14 @@ if (!isGeneric("plot"))
 
 ### Feature groups
 
-setGeneric("groups", function(object) standardGeneric("groups"))
+setGeneric("groups", function(object, ...) standardGeneric("groups"))
 setGeneric("groupFeatIndex", function(fGroups) standardGeneric("groupFeatIndex"))
 setGeneric("groupInfo", function(fGroups) standardGeneric("groupInfo"))
 setGeneric("removeAnalyses", function(fGroups, indices) standardGeneric("removeAnalyses"))
 setGeneric("removeGroups", function(fGroups, indices) standardGeneric("removeGroups"))
 setGeneric("removeEmptyGroups", function(fGroups) standardGeneric("removeEmptyGroups"))
 setGeneric("removeEmptyAnalyses", function(fGroups) standardGeneric("removeEmptyAnalyses"))
-setGeneric("averageGroups", function(fGroups) standardGeneric("averageGroups"))
+setGeneric("averageGroups", function(fGroups, areas = FALSE) standardGeneric("averageGroups"))
 setGeneric("updateFeatIndex", function(fGroups) standardGeneric("updateFeatIndex"))
 setGeneric("export", function(fGroups, type, out) standardGeneric("export"))
 setGeneric("unique", function(x, incomparables = FALSE, ...) standardGeneric("unique"))

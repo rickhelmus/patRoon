@@ -324,7 +324,7 @@ executeMultiProcess <- function(commandQueue, finishHandler,
 
                     cs <- seq(nextCommand, nextCommand + (ncmd - 1))
                     runningProcInfo[[pi]] <- initCommand(commandQueue[cs], cs, sucDir, printOutput, printError)
-                    runningProcs[[pi]] <- do.call(process$new, runningProcInfo[[pi]]$procArgs)
+                    runningProcs[[pi]] <- do.call(processx::process$new, runningProcInfo[[pi]]$procArgs)
 
                     # printf("started %d-%d on slot %d\n", nextCommand, runningProcInfo[[pi]]$cmdIndRange[2], pi)
                     lastCommandTime <- curTimeMS()

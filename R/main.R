@@ -3,26 +3,12 @@
 #' @importFrom graphics plot axis barplot close.screen grconvertX grconvertY grid layout legend lines par plot.new points polygon rasterImage rect screen segments split.screen strwidth text title xinch yinch
 #' @importFrom grDevices adjustcolor colorRampPalette dev.off pdf png
 #' @importFrom stats cutree dist hclust heatmap lm median rect.hclust sd setNames
-#' @importFrom VennDiagram draw.pairwise.venn draw.single.venn draw.triple.venn draw.quad.venn draw.quintuple.venn
-#' @importFrom plotly plot_ly add_trace plotlyOutput renderPlotly ggplotly config
-#' @importFrom mzR openMSfile peaks header close
 #' @importFrom xcms phenoData phenoData<- filepaths filepaths<- xcmsRaw peaks peaks<- profinfo profinfo<- groupidx xcmsSet group retcor groupval groupnames rawEIC sampnames groupidx<-
-#' @importFrom fst compress_fst decompress_fst
-#' @importFrom processx process poll
 #' @importFrom Rdpack reprompt
 #' @importClassesFrom CAMERA xsAnnotate
 #' @import data.table
-#' @import enviPick
-#' @import DBI
-#' @import RSQLite
-#' @import rhandsontable
-#' @import RColorBrewer
 #' @import shiny
-#' @import miniUI
-#' @import rstudioapi
 #' @import cluster
-#' @import templates
-#' @import circlize
 #' @import ggplot2
 NULL # need this for doc generation
 

@@ -490,7 +490,7 @@ setMethod("plot", "featureGroups", function(x, retMin = FALSE, col = NULL, pch =
     else
     {
         if (is.null(col))
-            col <- colorRampPalette(brewer.pal(12, "Paired"))(length(x))
+            col <- colorRampPalette(RColorBrewer::brewer.pal(12, "Paired"))(length(x))
         plot(if (retMin) x@groupInfo$rts / 60 else x@groupInfo$rts, x@groupInfo$mzs,
              xlab = if (retMin) "Retention time (min)" else "Retention time (sec.)",
              ylab = "m/z", col = col, pch = pch, ...)
@@ -529,7 +529,7 @@ setMethod("plotInt", "featureGroups", function(obj, average = FALSE, pch = 20, t
     axis(1, seq_len(nsamp), snames, las = 2)
 
     if (is.null(col))
-        col <- colorRampPalette(brewer.pal(12, "Paired"))(length(gTable))
+        col <- colorRampPalette(RColorBrewer::brewer.pal(12, "Paired"))(length(gTable))
 
     px <- seq_len(nsamp)
     for (i in seq_along(gTable))
@@ -649,7 +649,7 @@ setMethod("plotChord", "featureGroups", function(obj, addSelfLinks = FALSE, addR
         og <- outerGroups[remainingSN] # outer groups assigned to each remaining sample
         gaps <- rep(1, length(og)) # initialize gaps
         gaps[cumsum(sapply(unique(og), function(x) length(og[og == x])))] <- 8 # make gap bigger after each outer group
-        circos.par(gap.after = gaps)
+        circlize::circos.par(gap.after = gaps)
     }
 
     if (all(chordTable$value == 0))
@@ -662,32 +662,32 @@ setMethod("plotChord", "featureGroups", function(obj, addSelfLinks = FALSE, addR
         tracks = c(tracks, list(list(track.height = 0.1, track.margin = c(0.08, 0))))
 
     maxv <- max(if (hasOuter) chordTable[groupFrom != groupTo, value] else chordTable$value)
-    colFunc <- colorRamp2(maxv * seq(0, 1, 0.25),
-                          c("blue4", "deepskyblue1", "green", "orange", "red"),
-                          transparency = 0.5)
+    colFunc <- circlize::colorRamp2(maxv * seq(0, 1, 0.25),
+                                    c("blue4", "deepskyblue1", "green", "orange", "red"),
+                                    transparency = 0.5)
 
     if (hasOuter && addIntraOuterGroupLinks)
     {
-        colFuncWithin <- colorRamp2(range(chordTable[groupFrom == groupTo, value]),
+        colFuncWithin <- circlize::colorRamp2(range(chordTable[groupFrom == groupTo, value]),
                                     c("grey80", "grey60"), transparency = 0.7)
         linkColors <- chordTable[, ifelse(groupFrom == groupTo, colFuncWithin(value), colFunc(value))]
     }
     else
         linkColors <- chordTable[, colFunc(value)]
 
-    cdf <- chordDiagram(chordTable[, 1:3], annotationTrack = c("grid", "axis"),
-                        preAllocateTracks = tracks,
-                        grid.col = getBrewerPal(nsamp, "Dark2"),
-                        col = linkColors,
-                        annotationTrackHeight = c(0.1, 0.09),
-                        ...)
+    cdf <- circlize::chordDiagram(chordTable[, 1:3], annotationTrack = c("grid", "axis"),
+                                  preAllocateTracks = tracks,
+                                  grid.col = getBrewerPal(nsamp, "Dark2"),
+                                  col = linkColors,
+                                  annotationTrackHeight = c(0.1, 0.09),
+                                  ...)
 
-    circos.track(track.index = length(tracks) + 1, panel.fun = function(x, y)
+    circlize::circos.track(track.index = length(tracks) + 1, panel.fun = function(x, y)
     {
-        sector.index <- get.cell.meta.data("sector.index")
-        xlim <- get.cell.meta.data("xlim")
-        ylim <- get.cell.meta.data("ylim")
-        circos.text(mean(xlim), mean(ylim), sector.index, col = "white", cex = 1, niceFacing = TRUE)
+        sector.index <- circlize::get.cell.meta.data("sector.index")
+        xlim <- circlize::get.cell.meta.data("xlim")
+        ylim <- circlize::get.cell.meta.data("ylim")
+        circlize::circos.text(mean(xlim), mean(ylim), sector.index, col = "white", cex = 1, niceFacing = TRUE)
     }, bg.border = NA)
 
     if (addRetMzPlots)
@@ -699,12 +699,12 @@ setMethod("plotChord", "featureGroups", function(obj, addSelfLinks = FALSE, addR
         }, simplify = FALSE), idcol = "sname")
         retMz$rts <- retMz$rts / max(retMz$rts) # normalize
 
-        circos.track(fa = retMz$sname, x = retMz$rts, y = retMz$mzs, ylim = c(0, max(retMz$mzs)), track.index = length(tracks),
-                     panel.fun = function(x, y)
-                     {
-                         x <- x / (max(x) / get.cell.meta.data("xrange"))
-                         circos.points(x, y, cex = 0.5, col = "blue", pch = 16)
-                     })
+        circlize::circos.track(fa = retMz$sname, x = retMz$rts, y = retMz$mzs, ylim = c(0, max(retMz$mzs)), track.index = length(tracks),
+                               panel.fun = function(x, y)
+                               {
+                                   x <- x / (max(x) / circlize::get.cell.meta.data("xrange"))
+                                   circlize::circos.points(x, y, cex = 0.5, col = "blue", pch = 16)
+                               })
     }
 
     if (hasOuter)
@@ -714,11 +714,11 @@ setMethod("plotChord", "featureGroups", function(obj, addSelfLinks = FALSE, addR
 
         ogcol <- getBrewerPal(length(finalOuterGroups), "Paired")
         for (ogi in seq_along(finalOuterGroups))
-            highlight.sector(unique(finalChordTable[groupFrom == finalOuterGroups[ogi], from]), track.index = 1, col = ogcol[ogi],
-                             text = finalOuterGroups[ogi], cex = 1, text.col = "white", niceFacing = TRUE)
+            circlize::highlight.sector(unique(finalChordTable[groupFrom == finalOuterGroups[ogi], from]), track.index = 1, col = ogcol[ogi],
+                                       text = finalOuterGroups[ogi], cex = 1, text.col = "white", niceFacing = TRUE)
     }
 
-    circos.clear()
+    circlize::circos.clear()
 })
 
 #' @describeIn featureGroups Plots extracted ion chromatograms (EICs) of feature
@@ -808,12 +808,12 @@ setMethod("plotEIC", "featureGroups", function(obj, rtWindow = 30, mzWindow = 0.
 
     if (colourBy == "rGroups")
     {
-        EICColors <- colorRampPalette(brewer.pal(12, "Paired"))(length(rGroups))
+        EICColors <- colorRampPalette(RColorBrewer::brewer.pal(12, "Paired"))(length(rGroups))
         names(EICColors) <- rGroups
     }
     else if (colourBy == "fGroups")
     {
-        EICColors <- colorRampPalette(brewer.pal(12, "Paired"))(gCount)
+        EICColors <- colorRampPalette(RColorBrewer::brewer.pal(12, "Paired"))(gCount)
         names(EICColors) <- gNames
     }
     else

@@ -174,7 +174,7 @@ setMethod("plotInt", "componentsIntClust", function(obj, index, pch = 20, type =
     axis(1, seq_len(nsamp), colnames(plotm), las = 2)
 
     if (is.null(col))
-        col <- colorRampPalette(brewer.pal(12, "Paired"))(length(plotm))
+        col <- colorRampPalette(RColorBrewer::brewer.pal(12, "Paired"))(length(plotm))
     px <- seq_len(nsamp)
     for (i in seq_len(nrow(plotm)))
         lines(x = px, y = plotm[i, ], pch = pch, type = type, lty = lty, col = col[i], ...)

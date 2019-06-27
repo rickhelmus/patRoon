@@ -287,7 +287,7 @@ executeMultiProcess <- function(commandQueue, finishHandler,
 
                     if (maybe$restart)
                     {
-                        runningProcs[[pi]] <- do.call(process$new, runningProcInfo[[pi]]$procArgs)
+                        runningProcs[[pi]] <- do.call(processx::process$new, runningProcInfo[[pi]]$procArgs)
                         finishedRunning <- FALSE
                     }
                 }
@@ -391,7 +391,7 @@ executeMultiProcess <- function(commandQueue, finishHandler,
         if (printOutput || printError)
         {
             rp <- pruneList(runningProcs)
-            pl <- poll(rp, waitTimeout)
+            pl <- processx::poll(rp, waitTimeout)
 
             for (pi in seq_along(rp))
             {

@@ -8,6 +8,10 @@
 - multiproc
     - better error reporting
     - log executed command
+    - --> capture output/stderr and manually store log file
+        - combine stdout/stderr in one file and autocheck if it needs to be dumped
+        - prefix with command
+        - error reporting: print max 10? lines from stderr?, print link to log file?
 - get RAMClustR from CRAN?
 - set max processes to threads-1? --> decide after bench
 

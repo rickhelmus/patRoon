@@ -16,8 +16,8 @@ makeFileHash <- function(...) digest::digest(sapply(list(...), digest::digest, f
 
 # storing/retrieving R objects: http://jfaganuk.github.io/2015/01/12/storing-r-objects-in-sqlite-tables/
 
-openCacheDB <- function(file = getCacheFile()) dbConnect(SQLite(), file)
-closeCacheDB <- function(db) dbDisconnect(db)
+openCacheDB <- function(file = getCacheFile()) DBI::dbConnect(RSQLite::SQLite(), file)
+closeCacheDB <- function(db) DBI::dbDisconnect(db)
 openCacheDBScope <- withr::local_(function(x, file = getCacheFile()) openCacheDB(file), function(x) closeCacheDB(x))
 
 loadCacheData <- function(category, hashes, dbArg = NULL)
@@ -32,23 +32,23 @@ loadCacheData <- function(category, hashes, dbArg = NULL)
 
     ret <- NULL
 
-    if (nrow(dbGetQuery(db, sprintf("SELECT 1 FROM sqlite_master WHERE type='table' AND name='%s'", category))) > 0)
+    if (nrow(DBI::dbGetQuery(db, sprintf("SELECT 1 FROM sqlite_master WHERE type='table' AND name='%s'", category))) > 0)
     {
         if (length(hashes) == 1) # select only one?
         {
-            df <- dbGetQuery(db, sprintf("SELECT data FROM %s WHERE hash='%s'", category, hashes))
+            df <- DBI::dbGetQuery(db, sprintf("SELECT data FROM %s WHERE hash='%s'", category, hashes))
 
             if (nrow(df) > 0)
-                ret <- lapply(df$data, function(x) unserialize(decompress_fst(x)))[[1]]
+                ret <- lapply(df$data, function(x) unserialize(fst::decompress_fst(x)))[[1]]
         }
         else
         {
-            df <- dbGetQuery(db, sprintf("SELECT hash,data FROM %s WHERE hash IN (%s)", category,
-                                         paste0(sprintf("'%s'", hashes), collapse = ",")))
+            df <- DBI::dbGetQuery(db, sprintf("SELECT hash,data FROM %s WHERE hash IN (%s)", category,
+                                              paste0(sprintf("'%s'", hashes), collapse = ",")))
 
             if (nrow(df) > 0)
             {
-                ret <- lapply(df$data, function(x) unserialize(decompress_fst(x)))
+                ret <- lapply(df$data, function(x) unserialize(fst::decompress_fst(x)))
                 if (length(ret) > 0)
                     names(ret) <- df$hash
             }
@@ -68,18 +68,18 @@ saveCacheData <- function(category, data, hash, dbArg = NULL)
     else
         db <- dbArg
 
-    dbExecute(db, sprintf("CREATE TABLE IF NOT EXISTS %s (hash TEXT UNIQUE, data BLOB)", category))
+    DBI::dbExecute(db, sprintf("CREATE TABLE IF NOT EXISTS %s (hash TEXT UNIQUE, data BLOB)", category))
 
-    df <- data.frame(d = I(list(compress_fst(serialize(data, NULL, xdr = FALSE)))))
+    df <- data.frame(d = I(list(fst::compress_fst(serialize(data, NULL, xdr = FALSE)))))
 
     # From https://stackoverflow.com/a/7353236: update if already exists, otherwise insert
-    dbExecute(db, sprintf("INSERT OR IGNORE INTO %s VALUES ('%s', :d)", category, hash), params=df)
-    dbExecute(db, sprintf("UPDATE %s SET data=(:d) WHERE changes()=0 AND hash='%s'", category, hash), params=df)
+    DBI::dbExecute(db, sprintf("INSERT OR IGNORE INTO %s VALUES ('%s', :d)", category, hash), params=df)
+    DBI::dbExecute(db, sprintf("UPDATE %s SET data=(:d) WHERE changes()=0 AND hash='%s'", category, hash), params=df)
 
     # remove first row (from https://www.experts-exchange.com/questions/24926777/Delete-first-row-of-table.html) if
     # too many rows
-    if (dbGetQuery(db, sprintf("SELECT Count(*) FROM %s", category))[[1]] > getMaxCacheEntries())
-        dbExecute(db, sprintf("DELETE FROM %s WHERE ROWID in (SELECT min(ROWID) FROM %s)", category, category))
+    if (DBI::dbGetQuery(db, sprintf("SELECT Count(*) FROM %s", category))[[1]] > getMaxCacheEntries())
+        DBI::dbExecute(db, sprintf("DELETE FROM %s WHERE ROWID in (SELECT min(ROWID) FROM %s)", category, category))
 }
 
 loadCacheSet <- function(category, setHash, dbArg = NULL)
@@ -156,13 +156,13 @@ clearCache <- function(what = NULL, file = NULL)
     else
     {
         db <- openCacheDBScope(file = file)
-        tables <- dbListTables(db)
+        tables <- DBI::dbListTables(db)
 
         if (length(tables) == 0)
             printf("Cache file is empty, nothing to do ...\n")
         else if (is.null(what) || !nzchar(what))
         {
-            tableRows <- unlist(sapply(tables, function(tab) dbGetQuery(db, sprintf("SELECT Count(*) FROM %s", tab))))
+            tableRows <- unlist(sapply(tables, function(tab) DBI::dbGetQuery(db, sprintf("SELECT Count(*) FROM %s", tab))))
             printf("Please specify which cache you want to remove. Available are:\n%s",
                    paste0(sprintf("- %s (%d rows)\n", tables, tableRows), collapse = ""))
             printf("- all (removes complete cache database)\n")
@@ -175,8 +175,8 @@ clearCache <- function(what = NULL, file = NULL)
             else
             {
                 for (tab in matchedTables)
-                    dbExecute(db, sprintf("DROP TABLE IF EXISTS %s", tab))
-                dbExecute(db, "VACUUM")
+                    DBI::dbExecute(db, sprintf("DROP TABLE IF EXISTS %s", tab))
+                DBI::dbExecute(db, "VACUUM")
                 printf("Removed caches: %s\n", paste0(matchedTables, collapse = ", "))
             }
         }

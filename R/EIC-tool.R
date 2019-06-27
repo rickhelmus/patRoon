@@ -83,7 +83,7 @@ getEICUI <- function(rtRange, mzWindow)
                 fillCol(
                     div(
                         style = "border: 1px solid black; margin: 5px;",
-                        rHandsontableOutput("groupHot")
+                        rhandsontable::rHandsontableOutput("groupHot")
                     )
                 ),
 
@@ -94,7 +94,7 @@ getEICUI <- function(rtRange, mzWindow)
                 fillCol(
                     div(
                         style = "border: 1px solid black; margin: 5px;",
-                        rHandsontableOutput("analysesHot")
+                        rhandsontable::rHandsontableOutput("analysesHot")
                     )
                 )
             )
@@ -162,7 +162,7 @@ setMethod("checkChromatograms", "featureGroups", function(fGroups, mzWindow, ena
                     outsideClickDeselects = FALSE, manualColumnResize = TRUE,
                     rowHeaders = NULL)
 
-    anaColors <- colorRampPalette(brewer.pal(12, "Paired"))(nrow(anaInfo))
+    anaColors <- colorRampPalette(RColorBrewer::brewer.pal(12, "Paired"))(nrow(anaInfo))
     anaColorsTrans <- adjustcolor(anaColors, alpha.f = 0.5)
 
     server <- function(input, output, session)
@@ -322,13 +322,13 @@ setMethod("checkChromatograms", "featureGroups", function(fGroups, mzWindow, ena
             # HACK: input$groupHot$params$maxRows: make sure we don't have empty table as hot_to_r errors otherwise
             if (input$groupHot$params$maxRows > 0)
             {
-                df <- hot_to_r(input$groupHot)
+                df <- rhandsontable::hot_to_r(input$groupHot)
                 rValues$enabledFGroups[match(df$group, rownames(gInfo))] <- df$keep
             }
         })
 
         observeEvent(input$analysesHot, {
-            df <- hot_to_r(input$analysesHot)
+            df <- rhandsontable::hot_to_r(input$analysesHot)
             ea <- df[df[["enabled"]] == TRUE, "analysis"]
             if (!isTRUE(all.equal(ea, rValues$enabledAnalyses)))
                 rValues$enabledAnalyses <- ea
@@ -340,16 +340,16 @@ setMethod("checkChromatograms", "featureGroups", function(fGroups, mzWindow, ena
 
         output$plot <- renderUI({
             if (input$plotType == "Interactive")
-                tagList(plotlyOutput("plotInteractive", height = "100%"))
+                tagList(plotly::plotlyOutput("plotInteractive", height = "100%"))
             else
                 tagList(plotOutput("plotStatic", height = "100%"))
         })
 
-        output$plotInteractive <- renderPlotly({
+        output$plotInteractive <- plotly::renderPlotly({
             pinfo <- plotInfo()
-            p <- plot_ly(type="scatter", mode = "lines", hoverinfo = "none") %>%
-                config(displaylogo = FALSE, scrollZoom = TRUE,
-                       modeBarButtonsToRemove = c("hoverClosestCartesian", "hoverCompareCartesian"))
+            p <- plotly::plot_ly(type="scatter", mode = "lines", hoverinfo = "none") %>%
+                plotly::config(displaylogo = FALSE, scrollZoom = TRUE,
+                               modeBarButtonsToRemove = c("hoverClosestCartesian", "hoverCompareCartesian"))
 
             if (!is.null(pinfo)) # NULL if no data (no active group, no enabled analyses, ...)
             {
@@ -357,10 +357,10 @@ setMethod("checkChromatograms", "featureGroups", function(fGroups, mzWindow, ena
 
                 for (i in seq_along(pinfo$data))
                 {
-                    p <- add_trace(p, x = pinfo$data[[i]]$time, y = pinfo$data[[i]]$intensity,
-                                   name = ea[i],
-                                   line = list(width = if (getCurrentAnalysis() == anaInfo$analysis[i]) 2 else 1,
-                                               color = anaColors[i]))
+                    p <- plotly::add_trace(p, x = pinfo$data[[i]]$time, y = pinfo$data[[i]]$intensity,
+                                           name = ea[i],
+                                           line = list(width = if (getCurrentAnalysis() == anaInfo$analysis[i]) 2 else 1,
+                                                       color = anaColors[i]))
 
                     if (getCurrentAnalysis() == ea[i])
                     {
@@ -370,8 +370,9 @@ setMethod("checkChromatograms", "featureGroups", function(fGroups, mzWindow, ena
                         if (!is.na(pmin))
                         {
                             sdata <- pinfo$data[[i]][numGTE(pinfo$data[[i]]$time, pmin) & numLTE(pinfo$data[[i]]$time, pmax), ]
-                            p <- add_trace(p, x = sdata$time, y = sdata$intensity,
-                                           mode = "none", fill = "tozeroy", fillcolor = anaColorsTrans[i])
+                            p <- plotly::add_trace(p, x = sdata$time, y = sdata$intensity,
+                                                   mode = "none", fill = "tozeroy",
+                                                   fillcolor = anaColorsTrans[i])
                         }
                     }
                 }
@@ -431,17 +432,17 @@ setMethod("checkChromatograms", "featureGroups", function(fGroups, mzWindow, ena
 
         })
 
-        output$groupHot <- renderRHandsontable({
+        output$groupHot <- rhandsontable::renderRHandsontable({
             gData <- fGroupData()
 
-            hot <- do.call(rhandsontable,
+            hot <- do.call(rhandsontable::rhandsontable,
                            c(list(gData, colHeaders = c("Feature group", "EIC max", "Keep", "Retention", "m/z", unique(anaInfo$group)),
                                   width = NULL, height = 250, maxRows = nrow(gData)),
                              hotOpts)) %>%
-                hot_cols(valign = "htMiddle", fixedColumnsLeft = 2) %>%
-                hot_rows(rowHeights = 50) %>%
-                hot_col("Keep", readOnly = FALSE, halign = "htCenter") %>%
-                hot_col("EIC max", renderer = htmlwidgets::JS("renderSparkline"))
+                rhandsontable::hot_cols(valign = "htMiddle", fixedColumnsLeft = 2) %>%
+                rhandsontable::hot_rows(rowHeights = 50) %>%
+                rhandsontable::hot_col("Keep", readOnly = FALSE, halign = "htCenter") %>%
+                rhandsontable::hot_col("EIC max", renderer = htmlwidgets::JS("renderSparkline"))
 
             hot$x$contextMenu <- list(items = list(
                 addEICsEnabled = list(
@@ -485,12 +486,12 @@ setMethod("checkChromatograms", "featureGroups", function(fGroups, mzWindow, ena
             return(hot)
         })
 
-        output$analysesHot <- renderRHandsontable({
-            hot <- do.call(rhandsontable,
+        output$analysesHot <- rhandsontable::renderRHandsontable({
+            hot <- do.call(rhandsontable::rhandsontable,
                            c(list(analysesData(), height = 250, maxRows = nrow(analysesData())),
                              hotOpts)) %>%
-                hot_col("enabled", readOnly = FALSE, halign = "htCenter") %>%
-                hot_col("color", renderer = "function (instance, td, row, col, prop, value, cellProperties)
+                rhandsontable::hot_col("enabled", readOnly = FALSE, halign = "htCenter") %>%
+                rhandsontable::hot_col("color", renderer = "function (instance, td, row, col, prop, value, cellProperties)
                         { td.style.background = value; }")
 
             hot$x$contextMenu <- list(items = list(

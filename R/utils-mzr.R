@@ -9,17 +9,17 @@ loadSpectra <- function(path, rtRange = NULL, verbose = TRUE, cacheDB = NULL)
     {
         if (verbose)
             printf("Loading raw spectra for '%s'...\n", path)
-        msf <- openMSfile(path)
-        hd <- as.data.table(header(msf))
+        msf <- mzR::openMSfile(path)
+        hd <- as.data.table(mzR::header(msf))
 
         if (is.null(rtRange))
-            ps <- peaks(msf) # load all
+            ps <- mzR::peaks(msf) # load all
         else
-            ps <- peaks(msf, hd[numGTE(retentionTime, rtRange[1]) & numLTE(retentionTime, rtRange[2]), seqNum])
+            ps <- mzR::peaks(msf, hd[numGTE(retentionTime, rtRange[1]) & numLTE(retentionTime, rtRange[2]), seqNum])
 
         spectra <- lapply(ps, function(spec) setnames(as.data.table(spec), c("mz", "intensity")))
         ret <- list(header = hd, spectra = spectra)
-        close(msf)
+        mzR::close(msf)
         saveCacheData("specData", ret, hash)
     }
 

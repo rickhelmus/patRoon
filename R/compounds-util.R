@@ -371,14 +371,14 @@ getCompViewerUI <- function(pageChoices)
                 fillCol(
                     div(
                         style = "border: 1px solid black; margin: 5px;",
-                        rHandsontableOutput("groupHot")
+                        rhandsontable::rHandsontableOutput("groupHot")
                     )
                 ),
 
                 fillCol(
                     div(
                         style = "border: 1px solid black; margin: 5px;",
-                        rHandsontableOutput("metFragHot")
+                        rhandsontable::rHandsontableOutput("metFragHot")
                     )
                 )
             ),
@@ -389,7 +389,7 @@ getCompViewerUI <- function(pageChoices)
                 flex = c(2, NA, 1),
 
                 fillCol(
-                    plotlyOutput("spectrum", height = "100%")
+                    plotly::plotlyOutput("spectrum", height = "100%")
                 ),
 
                 fillCol(
@@ -543,11 +543,11 @@ setMethod("compoundViewer", c("featureGroups", "MSPeakLists", "compounds"), func
             rValues$currentResult <- input$metFragHot_select$select$rAll[1] + pr[1] - 1
         })
 
-        output$groupHot <- renderRHandsontable({
+        output$groupHot <- rhandsontable::renderRHandsontable({
             gData <- data.frame(group = rownames(gInfo), retention = gInfo$rts, mz = gInfo$mzs, stringsAsFactors = FALSE)
             gData[, unique(anaInfo$group)] <- t(avgGTable)
 
-            hot <- do.call(rhandsontable,
+            hot <- do.call(rhandsontable::rhandsontable,
                            c(list(gData, colHeaders = c("Feature group", "Retention", "m/z", unique(anaInfo$group)),
                                   width = NULL, height = 400, maxRows = nrow(gData)),
                              hotOpts))
@@ -555,12 +555,12 @@ setMethod("compoundViewer", c("featureGroups", "MSPeakLists", "compounds"), func
             return(hot)
         })
 
-        output$metFragHot <- renderRHandsontable({
+        output$metFragHot <- rhandsontable::renderRHandsontable({
             cd <- compData()
-            hot <- do.call(rhandsontable, c(list(cd, width = NULL, height = 400, maxRows = nrow(cd),
+            hot <- do.call(rhandsontable::rhandsontable, c(list(cd, width = NULL, height = 400, maxRows = nrow(cd),
                                                  rowHeaders = seq_len(nrow(cd))), hotOpts)) %>%
-                hot_rows(rowHeights = 100) %>%
-                hot_col("structure", width = 110, renderer = "
+                rhandsontable::hot_rows(rowHeights = 100) %>%
+                rhandsontable::hot_col("structure", width = 110, renderer = "
                         function(instance, td, row, col, prop, value, cellProperties)
                         {
                             var escaped = Handsontable.helper.stringify(value),
@@ -580,13 +580,13 @@ setMethod("compoundViewer", c("featureGroups", "MSPeakLists", "compounds"), func
             return(hot)
         })
 
-        output$spectrum <- renderPlotly({
+        output$spectrum <- plotly::renderPlotly({
             spec <- pLists[[rValues$currentFGroup]][["MSMS"]]
             fi <- fragmentInfo()
 
-            p <- plot_ly(type="scatter", mode = "lines", hoverinfo = "text") %>%
-                config(displaylogo = FALSE, scrollZoom = TRUE,
-                       modeBarButtonsToRemove = c("hoverClosestCartesian", "hoverCompareCartesian"))
+            p <- plotly::plot_ly(type="scatter", mode = "lines", hoverinfo = "text") %>%
+                plotly::config(displaylogo = FALSE, scrollZoom = TRUE,
+                               modeBarButtonsToRemove = c("hoverClosestCartesian", "hoverCompareCartesian"))
 
             for (i in seq_len(nrow(spec)))
             {
@@ -604,11 +604,11 @@ setMethod("compoundViewer", c("featureGroups", "MSPeakLists", "compounds"), func
                         htext <- paste0(htext, sprintf("<br>merged by: %s", fi$mergedBy[[infoi]]))
                 }
 
-                p <- add_trace(p, x = rep(spec$mz[i], 2), y = c(0, spec$intensity[i]),
-                               line = list(color = if (infoi) "blue" else "grey",
-                                           width = if (infoi) 3 else 1),
-                               hoverinfo = if (infoi) "text" else "none",
-                               text = htext)
+                p <- plotly::add_trace(p, x = rep(spec$mz[i], 2), y = c(0, spec$intensity[i]),
+                                       line = list(color = if (infoi) "blue" else "grey",
+                                                   width = if (infoi) 3 else 1),
+                                       hoverinfo = if (infoi) "text" else "none",
+                                       text = htext)
             }
 
             p <- plotly::layout(p, showlegend = FALSE, dragmode = "pan", plot_bgcolor = "#F5FFFA",

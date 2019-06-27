@@ -372,14 +372,14 @@ pasteNonEmpty <- function(..., collapse = NULL)
 
 getBrewerPal <- function(n, name)
 {
-    maxn <- brewer.pal.info[name, "maxcolors"]
+    maxn <- RColorBrewer::brewer.pal.info[name, "maxcolors"]
     if (n > maxn)
-        return(colorRampPalette(brewer.pal(maxn, name))(n))
+        return(colorRampPalette(RColorBrewer::brewer.pal(maxn, name))(n))
 
     if (n < 3)
-        return(brewer.pal(3, name)[seq_len(n)])
+        return(RColorBrewer::brewer.pal(3, name)[seq_len(n)])
 
-    return(brewer.pal(n, name))
+    return(RColorBrewer::brewer.pal(n, name))
 }
 
 getArgNames <- function(...)
@@ -477,19 +477,19 @@ makeVennPlot <- function(plotObjects, categories, areas, intersectFunc,
     else if (nobj == 2)
     {
         icounts <- getIntersectCounts(list(c(1, 2)))
-        gRet <- do.call(draw.pairwise.venn, c(areas, icounts,
-                                              list(rotation.degree = if (areas[1] < areas[2]) 180 else 0), vennArgs))
+        gRet <- do.call(VennDiagram::draw.pairwise.venn,
+                        c(areas, icounts, list(rotation.degree = if (areas[1] < areas[2]) 180 else 0), vennArgs))
     }
     else if (nobj == 3)
     {
         icounts <- getIntersectCounts(list(c(1, 2), c(2, 3), c(1, 3), c(1, 2, 3)))
-        gRet <- do.call(draw.triple.venn, c(areas, icounts, vennArgs))
+        gRet <- do.call(VennDiagram::draw.triple.venn, c(areas, icounts, vennArgs))
     }
     else if (nobj == 4)
     {
         icounts <- getIntersectCounts(list(c(1, 2), c(1, 3), c(1, 4), c(2, 3), c(2, 4), c(3, 4),
                                            c(1, 2, 3), c(1, 2, 4), c(1, 3, 4), c(2, 3, 4), c(1, 2, 3, 4)))
-        gRet <- do.call(draw.quad.venn, c(areas, icounts, vennArgs))
+        gRet <- do.call(VennDiagram::draw.quad.venn, c(areas, icounts, vennArgs))
     }
     else if (nobj == 5)
     {
@@ -498,7 +498,7 @@ makeVennPlot <- function(plotObjects, categories, areas, intersectFunc,
                                            c(1, 4, 5), c(2, 3, 4), c(2, 3, 5), c(2, 4, 5), c(3, 4, 5),
                                            c(1, 2, 3, 4), c(1, 2, 3, 5), c(1, 2, 4, 5), c(1, 3, 4, 5), c(2, 3, 4, 5),
                                            c(1, 2, 3, 4, 5)))
-        gRet <- do.call(draw.quintuple.venn, c(areas, icounts, vennArgs))
+        gRet <- do.call(VennDiagram::draw.quintuple.venn, c(areas, icounts, vennArgs))
     }
 
     invisible(list(gList = gRet, areas = areas, intersectionCounts = icounts))

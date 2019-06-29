@@ -4,12 +4,15 @@
 \alias{patRoon-deprecated}
 \alias{reportMD}
 \alias{exportDAFiles}
+\alias{screenTargets}
 \title{Deprecated and renamed functions.}
 \usage{
 reportMD(...)
 
 exportDAFiles(anaInfo, format = "mzML", exportLine = TRUE,
   outPath = anaInfo$path, overWrite = FALSE)
+
+screenTargets(obj, targets, rtWindow, mzWindow)
 }
 \arguments{
 \item{\dots}{Passed to successor function.}
@@ -37,5 +40,7 @@ future.
 
 \code{exportDAFiles} will export a set of analyses either in
   \file{.mzXML} or \file{.mzML} formats.
+
+Please use \code{\link{screenSuspects}} instead.
 }
 \keyword{internal}

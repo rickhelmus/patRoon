@@ -2,7 +2,7 @@
 #' @include feature_groups.R
 NULL
 
-#' @rdname target-screening
+#' @rdname suspect-screening
 featureGroupsScreening <- setClass("featureGroupsScreening", contains = "featureGroups")
 
 setMethod("initialize", "featureGroupsScreening",
@@ -11,32 +11,32 @@ setMethod("initialize", "featureGroupsScreening",
 
 # UNDONE: make sure (document) that analyte names should be file compatible names
 
-#' @details \code{groupFeaturesScreening} uses results from \code{screenTargets}
+#' @details \code{groupFeaturesScreening} uses results from \code{screenSuspects}
 #'   to transform an existing \code{\link{featureGroups}} object by (1) renaming
-#'   any matched feature groups by the respective name of the target and (2)
+#'   any matched feature groups by the respective name of the suspect and (2)
 #'   filtering out any feature groups that were not matched. A common workflow
 #'   is to first obtain and group features (with \emph{e.g.}
 #'   \code{\link{findFeatures}} and \code{\link{groupFeatures}}), screen them
-#'   with \code{screenTargets}, convert the \code{featureGroups} object that was
+#'   with \code{screenSuspects}, convert the \code{featureGroups} object that was
 #'   used for screening with this method function and continue any further
 #'   workflow steps such as compound identification as with 'regular'
 #'   \code{featureGroups}.
 #'
 #' @param fGroups The \code{\link{featureGroups}} object that should be
 #'   transformed (and was used to obtain the screening results).
-#' @param scr The screening results table returned by \code{screenTargets}.
+#' @param scr The screening results table returned by \code{screenSuspects}.
 #'
 #' @return \code{groupFeaturesScreening} returns a modified \code{featureGroups}
-#'   object in which those feature groups that were not matched by any targets
-#'   are removed and others renamed by the respective target name. In case of
-#'   duplicate target results, feature group names are made unique with
+#'   object in which those feature groups that were not matched by any suspects
+#'   are removed and others renamed by the respective suspect name. In case of
+#'   duplicate suspect results, feature group names are made unique with
 #'   \code{\link{make.unique}}.
 #'
 #' @note Please note that \code{groupFeaturesScreening} method can only
 #'   transform the \code{featureGroups} object that was used to obtain the given
 #'   screening results.
 #'
-#' @rdname target-screening
+#' @rdname suspect-screening
 #' @aliases groupFeaturesScreening
 #' @export
 setMethod("groupFeaturesScreening", "featureGroups", function(fGroups, scr)

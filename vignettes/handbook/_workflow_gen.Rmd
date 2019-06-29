@@ -7,7 +7,7 @@ Workflow step         | Function                                          | Outp
 Data pre-treatment    | `convertMSFiles()`, `recalibrarateDAFiles()`      | -
 Finding features      | `findFeatures()`                                  | `features`
 Grouping features     | `groupFeatures()`                                 | `featureGroups`
-Suspect screening     | `screenTargets()` + `groupFeaturesScreening()`    | `featureGroups` 
+Suspect screening     | `screenSuspects()` + `groupFeaturesScreening()`   | `featureGroups` 
 MS peak lists         | `generateMSPeakLists()`                           | `MSPeakLists`
 Formula annotation    | `generateFormulas()`                              | `formulas`
 Compound annotation   | `generateCompounds()`                             | `compounds`
@@ -178,10 +178,10 @@ fGroupsXCMS <- groupFeatures(fListEP, "xcms", minfrac = 0) # group enviPick feat
 After features have been grouped suspect screening may be performed to eliminate any feature groups with _m/z_ and (optionally) retention properties not present in a given suspect list. A typical workflow looks like this:
 
 ```{r susp,eval=FALSE}
-targets <- data.frame(name = c("susp1", "susp2", "susp3"),
-                      mz = c(100.1034, 250.0456, 300.1234),
-                      stringsAsFactors = FALSE)
-scr <- screenTargets(fGroups, targets)
+suspects <- data.frame(name = c("susp1", "susp2", "susp3"),
+                       mz = c(100.1034, 250.0456, 300.1234),
+                       stringsAsFactors = FALSE)
+scr <- screenSuspects(fGroups, suspects)
 fGroupsSusp <- groupFeaturesScreening(fGroups, scr)
 ```
 

@@ -2,11 +2,11 @@
 % Please edit documentation in R/generics.R, R/features.R, R/feature_groups.R,
 %   R/feature_groups-screening.R, R/feature_groups-tasq.R, R/features-tasq.R
 \docType{methods}
-\name{target-screening}
-\alias{target-screening}
-\alias{screenTargets}
-\alias{screenTargets,features-method}
-\alias{screenTargets,featureGroups-method}
+\name{suspect-screening}
+\alias{suspect-screening}
+\alias{screenSuspects}
+\alias{screenSuspects,features-method}
+\alias{screenSuspects,featureGroups-method}
 \alias{featureGroupsScreening-class}
 \alias{featureGroupsScreening}
 \alias{groupFeaturesScreening,featureGroups-method}
@@ -18,12 +18,12 @@
 \alias{featuresBrukerTASQ}
 \title{Target and suspect screening}
 \usage{
-screenTargets(obj, targets, rtWindow = 12, mzWindow = 0.005)
+screenSuspects(obj, suspects, rtWindow = 12, mzWindow = 0.005)
 
-\S4method{screenTargets}{features}(obj, targets, rtWindow = 12,
+\S4method{screenSuspects}{features}(obj, suspects, rtWindow = 12,
   mzWindow = 0.005)
 
-\S4method{screenTargets}{featureGroups}(obj, targets, rtWindow = 12,
+\S4method{screenSuspects}{featureGroups}(obj, suspects, rtWindow = 12,
   mzWindow = 0.005)
 
 \S4method{groupFeaturesScreening}{featureGroups}(fGroups, scr)
@@ -34,19 +34,19 @@ importFeatureGroupsBrukerTASQ(path, analysisInfo)
 \item{obj}{The object that should be screened (\emph{i.e.}
 \code{\link{features}} or \code{\link{featureGroups}}).}
 
-\item{targets}{A \code{data.frame} consisting of mandatory columns
-\code{"name"} (the targeted analyte name) and \code{"mz"} (the \emph{m/z}
-value of the target). In addition, a column \code{"rt"} can be used to
+\item{suspects}{A \code{data.frame} consisting of mandatory columns
+\code{"name"} (the analyte name) and \code{"mz"} (the \emph{m/z}
+value of the suspect). In addition, a column \code{"rt"} can be used to
 specify the retention time (if unspecified no retention times are checked).}
 
 \item{rtWindow, mzWindow}{The retention time window (in seconds) and
-\emph{m/z} window that will be used for matching a target (+/- feature
+\emph{m/z} window that will be used for matching a suspect (+/- feature
 data).}
 
 \item{fGroups}{The \code{\link{featureGroups}} object that should be
 transformed (and was used to obtain the screening results).}
 
-\item{scr}{The screening results table returned by \code{screenTargets}.}
+\item{scr}{The screening results table returned by \code{screenSuspects}.}
 
 \item{path}{The file path to an Excel export of the Global results table from
 TASQ, converted to \file{.csv} format.}
@@ -55,15 +55,15 @@ TASQ, converted to \file{.csv} format.}
 information}.}
 }
 \value{
-\code{screenTargets} will return a table (a \code{\link{data.table}})
-  with detected targets and details such as retention and \emph{m/z} values.
-  If a target is matched on multiple features/feature groups then each hit is
+\code{screenSuspects} will return a table (a \code{\link{data.table}})
+  with detected suspects and details such as retention and \emph{m/z} values.
+  If a suspect is matched on multiple features/feature groups then each hit is
   reported as a separate row.
 
 \code{groupFeaturesScreening} returns a modified \code{featureGroups}
-  object in which those feature groups that were not matched by any targets
-  are removed and others renamed by the respective target name. In case of
-  duplicate target results, feature group names are made unique with
+  object in which those feature groups that were not matched by any suspects
+  are removed and others renamed by the respective suspect name. In case of
+  duplicate suspect results, feature group names are made unique with
   \code{\link{make.unique}}.
 
 \code{importFeatureGroupsBrukerTASQ} returns a new
@@ -71,7 +71,7 @@ information}.}
   Bruker TASQ.
 }
 \description{
-Utilities to screen for targets with known or suspected identity.
+Utilities to screen for analytes with known or suspected identity.
 }
 \details{
 Besides 'full non-target analysis', where compounds may be identitified with
@@ -79,17 +79,17 @@ little to no prior knowledge, a common strategy is to screen for compounds
 with known or suspected identity. This may be a generally favourable approach
 if possible, as it can significantly reduce the load on data interpretation.
 
-\code{screenTargets} will screen a set of targets (provided as a
+\code{screenSuspects} will screen a set of suspects (provided as a
   \code{data.frame}) within an \code{\link{features}} or
   \code{\link{featureGroups}} object.
 
-\code{groupFeaturesScreening} uses results from \code{screenTargets}
+\code{groupFeaturesScreening} uses results from \code{screenSuspects}
   to transform an existing \code{\link{featureGroups}} object by (1) renaming
-  any matched feature groups by the respective name of the target and (2)
+  any matched feature groups by the respective name of the suspect and (2)
   filtering out any feature groups that were not matched. A common workflow
   is to first obtain and group features (with \emph{e.g.}
   \code{\link{findFeatures}} and \code{\link{groupFeatures}}), screen them
-  with \code{screenTargets}, convert the \code{featureGroups} object that was
+  with \code{screenSuspects}, convert the \code{featureGroups} object that was
   used for screening with this method function and continue any further
   workflow steps such as compound identification as with 'regular'
   \code{featureGroups}.
@@ -105,9 +105,9 @@ if possible, as it can significantly reduce the load on data interpretation.
 }
 \note{
 Both \code{groupFeaturesScreening} and
-  \code{importFeatureGroupsBrukerTASQ} use names from targets as feature
-  group names, therefore, it is important that these are file-compatible
-  names when \link[=reporting]{reporting data}.
+  \code{importFeatureGroupsBrukerTASQ} use names from targets/suspects as
+  feature group names, therefore, it is important that these are
+  file-compatible names when \link[=reporting]{reporting data}.
 
 Please note that \code{groupFeaturesScreening} method can only
   transform the \code{featureGroups} object that was used to obtain the given

@@ -1,6 +1,6 @@
 #' @include feature_groups.R
 
-#' @rdname target-screening
+#' @rdname suspect-screening
 featureGroupsBrukerTASQ <- setClass("featureGroupsBrukerTASQ", contains = "featureGroups")
 
 setMethod("initialize", "featureGroupsBrukerTASQ",
@@ -32,7 +32,7 @@ setMethod("initialize", "featureGroupsBrukerTASQ",
 #'   ion chromatograms (with \code{\link{plotEIC}}) the integrated
 #'   chromatographic peak range shown is incorrect.
 #'
-#' @rdname target-screening
+#' @rdname suspect-screening
 #' @export
 importFeatureGroupsBrukerTASQ <- function(path, analysisInfo)
 {

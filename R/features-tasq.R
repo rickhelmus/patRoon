@@ -1,6 +1,6 @@
 #' @include features.R
 
-#' @rdname target-screening
+#' @rdname suspect-screening
 featuresBrukerTASQ <- setClass("featuresBrukerTASQ", contains = "features")
 
 setMethod("initialize", "featuresBrukerTASQ",

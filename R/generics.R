@@ -74,11 +74,11 @@ setGeneric("makeHCluster", function(obj, method = "complete", ...) standardGener
 setGeneric("plotHeatMap", function(obj, ...) standardGeneric("plotHeatMap"))
 setGeneric("plotSilhouettes", function(obj, kSeq, ...) standardGeneric("plotSilhouettes"))
 
-### target screening
+### suspect screening
 
 #' Target and suspect screening
 #'
-#' Utilities to screen for targets with known or suspected identity.
+#' Utilities to screen for analytes with known or suspected identity.
 #'
 #' Besides 'full non-target analysis', where compounds may be identitified with
 #' little to no prior knowledge, a common strategy is to screen for compounds
@@ -86,34 +86,34 @@ setGeneric("plotSilhouettes", function(obj, kSeq, ...) standardGeneric("plotSilh
 #' if possible, as it can significantly reduce the load on data interpretation.
 #'
 #' @note Both \code{groupFeaturesScreening} and
-#'   \code{importFeatureGroupsBrukerTASQ} use names from targets as feature
-#'   group names, therefore, it is important that these are file-compatible
-#'   names when \link[=reporting]{reporting data}.
+#'   \code{importFeatureGroupsBrukerTASQ} use names from targets/suspects as
+#'   feature group names, therefore, it is important that these are
+#'   file-compatible names when \link[=reporting]{reporting data}.
 #'
-#' @name target-screening
+#' @name suspect-screening
 NULL
 
-#' @details \code{screenTargets} will screen a set of targets (provided as a
+#' @details \code{screenSuspects} will screen a set of suspects (provided as a
 #'   \code{data.frame}) within an \code{\link{features}} or
 #'   \code{\link{featureGroups}} object.
 #'
 #' @param obj The object that should be screened (\emph{i.e.}
 #'   \code{\link{features}} or \code{\link{featureGroups}}).
-#' @param targets A \code{data.frame} consisting of mandatory columns
-#'   \code{"name"} (the targeted analyte name) and \code{"mz"} (the \emph{m/z}
-#'   value of the target). In addition, a column \code{"rt"} can be used to
+#' @param suspects A \code{data.frame} consisting of mandatory columns
+#'   \code{"name"} (the analyte name) and \code{"mz"} (the \emph{m/z}
+#'   value of the suspect). In addition, a column \code{"rt"} can be used to
 #'   specify the retention time (if unspecified no retention times are checked).
 #' @param rtWindow,mzWindow The retention time window (in seconds) and
-#'   \emph{m/z} window that will be used for matching a target (+/- feature
+#'   \emph{m/z} window that will be used for matching a suspect (+/- feature
 #'   data).
 #'
-#' @return \code{screenTargets} will return a table (a \code{\link{data.table}})
-#'   with detected targets and details such as retention and \emph{m/z} values.
-#'   If a target is matched on multiple features/feature groups then each hit is
+#' @return \code{screenSuspects} will return a table (a \code{\link{data.table}})
+#'   with detected suspects and details such as retention and \emph{m/z} values.
+#'   If a suspect is matched on multiple features/feature groups then each hit is
 #'   reported as a separate row.
 #'
-#' @rdname target-screening
-setGeneric("screenTargets", function(obj, targets, rtWindow = 12, mzWindow = 0.005) standardGeneric("screenTargets"))
+#' @rdname suspect-screening
+setGeneric("screenSuspects", function(obj, suspects, rtWindow = 12, mzWindow = 0.005) standardGeneric("screenSuspects"))
 
 
 ### Optimization

@@ -2,7 +2,7 @@ context("formulas")
 
 fGroups <- getTestFGroups(getTestAnaInfo()[4:5, ])
 # convert to screening results to simplify things a bit
-fGroups <- groupFeaturesScreening(fGroups, screenTargets(fGroups, patRoonData::targets))
+fGroups <- groupFeaturesScreening(fGroups, screenSuspects(fGroups, patRoonData::targets))
 
 fGroupsEmpty <- getEmptyTestFGroups()
 plists <- generateMSPeakLists(fGroups, "mzr")

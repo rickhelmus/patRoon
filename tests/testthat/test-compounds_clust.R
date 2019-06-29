@@ -5,7 +5,7 @@ hasMetfrag <- !is.null(getOption("patRoon.path.MetFragCL")) && nzchar(getOption(
 if (hasMetfrag)
 {
     fGroups <- getTestFGroups(getTestAnaInfo()[4, ])
-    fGroups <- groupFeaturesScreening(fGroups, screenTargets(fGroups, patRoonData::targets))[1:5]
+    fGroups <- groupFeaturesScreening(fGroups, screenSuspects(fGroups, patRoonData::targets))[1:5]
     plists <- generateMSPeakLists(fGroups, "mzr")
     compounds <- generateCompounds(fGroups, plists, "metfrag", adduct = "[M+H]+",
                                    database = "csv", scoreTypes = "fragScore",
@@ -54,7 +54,7 @@ test_that("plotting works", {
     # these don't play well with vdiffr...
     expect_plot(plot(compsClust, groupName = firstGroup))
     expect_plot(plotStructure(compsClust, groupName = firstGroup, cluster = 1))
-    
+
     # expect_doppel("compounds-clust-sil", function() plotSilhouettes(compsClust, kSeq = 2:6, groupName = firstGroup))
     # UNDONE: currently all clusters have only two compounds so can't plot silhouette which needs >2
     expect_error(plotSilhouettes(compsClust, kSeq = 2:6, groupName = firstGroup))

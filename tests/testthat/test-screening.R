@@ -1,8 +1,8 @@
 context("screening")
 
 fGroups <- getTestFGroups(getTestAnaInfo())
-scr <- screenTargets(fGroups, patRoonData::targets)
-scrF <- screenTargets(getFeatures(fGroups), patRoonData::targets)
+scr <- screenSuspects(fGroups, patRoonData::targets)
+scrF <- screenSuspects(getFeatures(fGroups), patRoonData::targets)
 
 test_that("target screening is OK", {
     expect_equal(nrow(scr), nrow(patRoonData::targets))
@@ -10,8 +10,8 @@ test_that("target screening is OK", {
     expect_known_value(scr, testFile("screening"))
     expect_known_value(scrF[, -"feature"], testFile("screening-feat"))
     expect_length(groupFeaturesScreening(fGroups, scr), nrow(patRoonData::targets))
-    
+
     # check suspects without retention
-    expect_gte(nrow(screenTargets(fGroups, patRoonData::targets[, -3])), nrow(scr))
-    expect_gte(nrow(screenTargets(getFeatures(fGroups), patRoonData::targets[, -3])), nrow(scrF))
+    expect_gte(nrow(screenSuspects(fGroups, patRoonData::targets[, -3])), nrow(scr))
+    expect_gte(nrow(screenSuspects(getFeatures(fGroups), patRoonData::targets[, -3])), nrow(scrF))
 })

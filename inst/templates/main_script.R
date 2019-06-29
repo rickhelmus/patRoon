@@ -88,7 +88,7 @@ fGroups <- filter(fGroups, preAbsMinIntensity = {{ filterFGroupsOpts$preIntThr }
 
 # Filter feature groups by suspects
 suspFile <- read.csv("{{ suspectList }}", stringsAsFactors = FALSE)
-scr <- screenTargets(fGroups, suspFile, rtWindow = 12, mzWindow = 0.005)
+scr <- screenSuspects(fGroups, suspFile, rtWindow = 12, mzWindow = 0.005)
 fGroups <- groupFeaturesScreening(fGroups, scr)
 {{ endCodeBlock() }}
 {{ optionalCodeBlock(doMSPeakFind || formulaOpts$algo != "" || identOpts$algo != "" || componentOpts$algo != "") }}

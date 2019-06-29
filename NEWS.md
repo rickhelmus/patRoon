@@ -6,6 +6,7 @@
     * The column to specify replicate groups for blank subtraction in the analysis information is re-named from `ref` to `blank`. Similarly, the `refs` argument to `generateAnalysisInfo()` is now called `blanks`.
     * `reportMD()` is renamed to `reportHTML()`
     *  `filter()` method for `formulas`: `minExplainedFragPeaks` is now called `minExplainedPeaks`
+    * `screenTargets` and its `targets` parameter have been renamed to `screenSuspects()` / `suspects`
 * Fixed incorrect selection after feature table (or other interactive tables) have been manually re-ordered (reported by Thanh Wang)
 * `groups()` and `as.data.table()` methods for `featureGroups`: optionally consider feature areas instead of peak intensities.
 * `plotSilhouettes()` method for `compoundsCluster`

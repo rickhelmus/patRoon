@@ -194,40 +194,40 @@ setMethod("$", "features", function(x, name)
     eval(substitute(x@features$NAME_ARG, list(NAME_ARG = name)))
 })
 
-#' @rdname target-screening
+#' @rdname suspect-screening
 #' @export
-setMethod("screenTargets", "features", function(obj, targets, rtWindow, mzWindow)
+setMethod("screenSuspects", "features", function(obj, suspects, rtWindow, mzWindow)
 {
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertDataFrame(targets, any.missing = FALSE, min.rows = 1, add = add)
-    assertHasNames(targets, c("name", "mz"), add = ac)
+    checkmate::assertDataFrame(suspects, any.missing = FALSE, min.rows = 1, add = add)
+    assertHasNames(suspects, c("name", "mz"), add = ac)
     aapply(checkmate::assertNumber, . ~ rtWindow + mzWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
 
     fTable <- featureTable(obj)
     anaInfo <- analysisInfo(obj)
 
-    retlist <- lapply(seq_len(nrow(targets)), function(ti)
+    retlist <- lapply(seq_len(nrow(suspects)), function(ti)
     {
-        hasRT <- !is.null(targets$rt) && !is.na(targets$rt[ti])
+        hasRT <- !is.null(suspects$rt) && !is.na(suspects$rt[ti])
 
         rbindlist(lapply(names(fTable), function(ana)
         {
             if (hasRT)
-                fts <- fTable[[ana]][numLTE(abs(ret - targets$rt[ti]), rtWindow) & numLTE(abs(mz - targets$mz[ti]), mzWindow), ]
+                fts <- fTable[[ana]][numLTE(abs(ret - suspects$rt[ti]), rtWindow) & numLTE(abs(mz - suspects$mz[ti]), mzWindow), ]
             else
-                fts <- fTable[[ana]][numLTE(abs(mz - targets$mz[ti]), mzWindow), ]
+                fts <- fTable[[ana]][numLTE(abs(mz - suspects$mz[ti]), mzWindow), ]
 
             if (nrow(fts) == 0) # no results? --> add NA result
-                return(data.table(name = targets$name[ti], rt = if (hasRT) targets$rt[ti] else NA,
-                                  mz = targets$mz[ti], analysis = ana,
+                return(data.table(name = suspects$name[ti], rt = if (hasRT) suspects$rt[ti] else NA,
+                                  mz = suspects$mz[ti], analysis = ana,
                                   feature = NA, d_rt = NA, d_mz = NA, intensity = NA, area = NA))
 
             return(rbindlist(lapply(seq_len(nrow(fts)), function(i)
             {
-                data.table(name = targets$name[ti], rt = if (hasRT) targets$rt[ti] else NA, mz = targets$mz[ti], analysis = ana,
-                           feature = fts[["ID"]][i], d_rt = if (hasRT) fts[["ret"]][i] - targets$rt[ti] else NA,
-                           d_mz = fts[["mz"]][i] - targets$mz[ti], intensity = fts[["intensity"]][i],
+                data.table(name = suspects$name[ti], rt = if (hasRT) suspects$rt[ti] else NA, mz = suspects$mz[ti], analysis = ana,
+                           feature = fts[["ID"]][i], d_rt = if (hasRT) fts[["ret"]][i] - suspects$rt[ti] else NA,
+                           d_mz = fts[["mz"]][i] - suspects$mz[ti], intensity = fts[["intensity"]][i],
                            area = if (is.null(fts[["area"]][i])) 0 else fts[["area"]][i])
             })))
 

@@ -3,7 +3,7 @@ context("compounds")
 fGroups <- getTestFGroups(getTestAnaInfo()[4, ])
 
 # convert to screening results to simplify things a bit
-fGroups <- groupFeaturesScreening(fGroups, screenTargets(fGroups, patRoonData::targets))
+fGroups <- groupFeaturesScreening(fGroups, screenSuspects(fGroups, patRoonData::targets))
 
 mfTestDBPath <- file.path(getTestDataPath(), "test-mf-db.csv")
 mfTestDB <- fread(mfTestDBPath)

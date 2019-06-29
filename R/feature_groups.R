@@ -116,7 +116,7 @@ setMethod("show", "featureGroups", function(object)
 setMethod("groups", "featureGroups", function(object, areas = FALSE)
 {
     checkmate::assertFlag(areas)
-    
+
     if (areas)
     {
         anaInfo <- analysisInfo(object)
@@ -130,7 +130,7 @@ setMethod("groups", "featureGroups", function(object, areas = FALSE)
             ftinds <- ftinds[ftinds != 0]
             as <- mapply(anainds, ftinds, SIMPLIFY = TRUE, FUN = function(a, i)
             {
-                fTable[[anaInfo$analysis[a]]][["area"]][i] 
+                fTable[[anaInfo$analysis[a]]][["area"]][i]
             })
             set(ret, anainds, cl, as)
         }
@@ -199,7 +199,7 @@ setMethod("[", c("featureGroups", "ANY", "ANY", "missing"), function(x, i, j, ..
 {
     if (!missing(rGroups))
         x <- filter(x, rGroups = rGroups)
-    
+
     if (!missing(i))
     {
         i <- assertSubsetArgAndToChr(i, analyses(x))
@@ -1139,13 +1139,13 @@ setMethod("overlap", "featureGroups", function(fGroups, which, exclusive)
     return(ret)
 })
 
-#' @rdname target-screening
+#' @rdname suspect-screening
 #' @export
-setMethod("screenTargets", "featureGroups", function(obj, targets, rtWindow, mzWindow)
+setMethod("screenSuspects", "featureGroups", function(obj, suspects, rtWindow, mzWindow)
 {
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertDataFrame(targets, any.missing = FALSE, min.rows = 1, add = ac)
-    assertHasNames(targets, c("name", "mz"), add = ac)
+    checkmate::assertDataFrame(suspects, any.missing = FALSE, min.rows = 1, add = ac)
+    assertHasNames(suspects, c("name", "mz"), add = ac)
     aapply(checkmate::assertNumber, . ~ rtWindow + mzWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
 
@@ -1153,28 +1153,28 @@ setMethod("screenTargets", "featureGroups", function(obj, targets, rtWindow, mzW
     gInfo <- groupInfo(obj)
     anaInfo <- analysisInfo(obj)
 
-    targets$name <- as.character(targets$name) # in case factors are given
+    suspects$name <- as.character(suspects$name) # in case factors are given
 
-    retlist <- lapply(seq_len(nrow(targets)), function (ti)
+    retlist <- lapply(seq_len(nrow(suspects)), function (ti)
     {
-        hasRT <- !is.null(targets$rt) && !is.na(targets$rt[ti])
+        hasRT <- !is.null(suspects$rt) && !is.na(suspects$rt[ti])
 
         # find related feature group(s)
         gi <- gInfo
         if (hasRT)
-            gi <- gInfo[numLTE(abs(gInfo$rts - targets$rt[ti]), rtWindow) & numLTE(abs(gInfo$mzs - targets$mz[ti]), mzWindow), ]
+            gi <- gInfo[numLTE(abs(gInfo$rts - suspects$rt[ti]), rtWindow) & numLTE(abs(gInfo$mzs - suspects$mz[ti]), mzWindow), ]
         else
-            gi <- gInfo[numLTE(abs(gInfo$mzs - targets$mz[ti]), mzWindow), ]
+            gi <- gInfo[numLTE(abs(gInfo$mzs - suspects$mz[ti]), mzWindow), ]
 
         if (nrow(gi) == 0) # no results? --> add NA result
-            return(data.table(name = targets$name[ti], rt = if (hasRT) targets$rt[ti] else NA, mz = targets$mz[ti],
+            return(data.table(name = suspects$name[ti], rt = if (hasRT) suspects$rt[ti] else NA, mz = suspects$mz[ti],
                               group = NA, exp_rt = NA, exp_mz = NA, d_rt = NA, d_mz = NA))
 
         return(rbindlist(lapply(rownames(gi), function(g)
         {
-            ret <- data.table(name = targets$name[ti], rt = if (hasRT) targets$rt[ti] else NA, mz = targets$mz[ti],
+            ret <- data.table(name = suspects$name[ti], rt = if (hasRT) suspects$rt[ti] else NA, mz = suspects$mz[ti],
                               group = g, exp_rt = gi[g, "rts"], exp_mz = gi[g, "mzs"],
-                              d_rt = if (hasRT) gi[g, "rts"] - targets$rt[ti] else NA, d_mz = gi[g, "mzs"] - targets$mz[ti])
+                              d_rt = if (hasRT) gi[g, "rts"] - suspects$rt[ti] else NA, d_mz = gi[g, "mzs"] - suspects$mz[ti])
 
             for (anai in seq_len(nrow(anaInfo)))
                 set(ret, 1L, anaInfo$analysis[anai], gTable[[g]][anai])
@@ -1184,9 +1184,9 @@ setMethod("screenTargets", "featureGroups", function(obj, targets, rtWindow, mzW
     })
 
     ret <- rbindlist(retlist, fill = TRUE)
-    targetsn <- nrow(targets)
-    foundn <- targetsn - sum(is.na(ret$group))
-    printf("Found %d/%d targets (%.2f%%)\n", foundn, targetsn, foundn * 100 / targetsn)
+    suspectsn <- nrow(suspects)
+    foundn <- suspectsn - sum(is.na(ret$group))
+    printf("Found %d/%d suspects (%.2f%%)\n", foundn, suspectsn, foundn * 100 / suspectsn)
 
     return(ret)
 })

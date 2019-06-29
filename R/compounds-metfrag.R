@@ -57,12 +57,12 @@ unifyMFNames <- function(mfr)
                  TrivialName = "compoundName",
                  CompoundName = "compoundName",
                  IUPACName = "compoundName",
-                 
+
                  # PubChem
                  XlogP3 = "XlogP",
                  PubChemNumberPubMedReferences = "pubMedReferences",
                  ChemSpiderNumberPubMedReferences = "pubMedReferences",
-                 
+
                  # ChemSpider
                  CHEMSPIDER_XLOGP = "XlogP",
                  CHEMSPIDER_ALOGP = "AlogP",
@@ -70,7 +70,7 @@ unifyMFNames <- function(mfr)
                  ChemSpiderDataSourceCount = "dataSourceCount",
                  ChemSpiderReferenceCount = "referenceCount",
                  ChemSpiderRSCCount = "RSCCount",
-                 
+
                  OfflineMetFusionScore = "metFusionScore",
                  OfflineIndividualMoNAScore = "individualMoNAScore",
                  SmartsSubstructureInclusionScore = "smartsInclusionScore",
@@ -95,7 +95,7 @@ unifyMFNames <- function(mfr)
                  TOX21SL = "TOX21SL",
                  "EXPOCAST_MEDIAN_EXPOSURE_PREDICTION_MG/KG-BW/DAY" = "EXPOCASTPredExpo",
                  TOXCAST = "TOXCAST",
-                 
+
                  # FOR-IDENT
                  ForIdentTonnage = "tonnage",
                  ForIdentCategories = "categories"
@@ -183,7 +183,7 @@ initMetFragCLCommand <- function(mfSettings, spec, mfBin, logFile)
 
     close(paramCon)
 
-    return(list(command = "java", args = c("-jar", mfBin, paramFile), stderrFile = logFile, outFile = outFile))
+    return(list(command = "java", args = c("-jar", mfBin, paramFile), logFile = logFile, outFile = outFile))
 }
 
 generateMetFragRunData <- function(fGroups, MSPeakLists, mfSettings, topMost, identifiers, method, addTrivialNames)
@@ -535,24 +535,15 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
 
             results <- executeMultiProcess(cmdQueue, finishHandler = function(cmd)
             {
-                if (!is.null(cmd$stderrFile))
-                    cat(sprintf("\n%s - Done with MF! Reading results...\n", date()), file = cmd$stderrFile, append = TRUE)
                 comptab <- fread(cmd$outFile, colClasses = c(Identifier = "character"))
-                if (!is.null(cmd$stderrFile))
-                    cat(sprintf("\n%s - Done! Processing results...\n", date()), file = cmd$stderrFile, append = TRUE)
                 procres <- processMFResults(comptab, cmd$spec, adduct, database, topMost, cmd$stderrFile)
-                if (!is.null(cmd$stderrFile))
-                    cat(sprintf("\n%s - Done! Caching results...\n", date()), file = cmd$stderrFile, append = TRUE)
                 saveCacheData("compoundsMetFrag", procres, cmd$hash, cacheDB)
-                if (!is.null(cmd$stderrFile))
-                    cat(sprintf("\n%s - Done!\n", date()), file = cmd$stderrFile, append = TRUE)
-
                 return(procres)
             }, timeoutHandler = function(cmd, retries)
             {
                 if (retries >= timeoutRetries)
                 {
-                    warning(sprintf("Could not run MetFrag for %s: timeout", cmd$gName))
+                    warning(sprintf("Could not run MetFrag for %s: timeout. Log: %s", cmd$gName, cmd$logFile))
                     return(FALSE)
                 }
                 warning(sprintf("Restarting timed out MetFrag command for %s (retry %d/%d)",
@@ -564,7 +555,8 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
                 {
                     if (retries >= errorRetries)
                     {
-                        warning(sprintf("Could not run MetFrag for %s - exit code: %d", cmd$gName, exitStatus))
+                        warning(sprintf("Could not run MetFrag for %s - exit code: %d - Log: %s",
+                                        cmd$gName, exitStatus, cmd$logFile))
                         return(FALSE)
                     }
                     warning(sprintf("Restarting failed MetFrag command for %s - exit: %d (retry %d/%d)",
@@ -573,7 +565,8 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
                 }
 
                 # some other error (e.g. java not present)
-                stop(sprintf("Fatal: Failed to execute MetFragCL for %s - exit code: %d", cmd$gName, exitStatus))
+                stop(sprintf("Fatal: Failed to execute MetFragCL for %s - exit code: %d - Log: %s",
+                             cmd$gName, exitStatus, cmd$logFile))
             }, maxProcAmount = maxProcAmount, procTimeout = timeout, delayBetweenProc = 1000)
         }
         else

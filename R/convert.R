@@ -94,10 +94,8 @@ convertMSFilesPWiz <- function(inFiles, outFiles, to, centroid, filters, extraOp
     cmdQueue <- lapply(seq_along(inFiles), function(fi)
     {
         basef <- basename(tools::file_path_sans_ext(inFiles[fi]))
-
         logf <- if (!is.null(logPath)) file.path(logPath, paste0("pwiz-", basef, ".txt")) else NULL
-        logfe <- if (!is.null(logPath)) file.path(logPath, paste0("pwiz-", basef, "-err.txt")) else NULL
-        return(list(stdoutFile = logf, stderrFile = logfe, command = msc,
+        return(list(logFile = logf, command = msc,
                     args = c(inFiles[fi], "--outfile", outFiles[fi],
                              "-o", dirname(outFiles[fi]), mainArgs)))
     })
@@ -118,9 +116,7 @@ convertMSFilesOpenMS <- function(inFiles, outFiles, to, extraOpts, logPath, maxP
     {
         basef <- basename(tools::file_path_sans_ext(inFiles[fi]))
         logf <- if (!is.null(logPath)) file.path(logPath, paste0("openms-", basef, ".txt")) else NULL
-        logfe <- if (!is.null(logPath)) file.path(logPath, paste0("openms-", basef, "-err.txt")) else NULL
-
-        return(list(stdoutFile = logf, stderrFile = logfe, command = msc,
+        return(list(logFile = logf, command = msc,
                     args = c("-in", inFiles[fi], "-out", outFiles[fi], mainArgs)))
     })
 

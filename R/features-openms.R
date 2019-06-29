@@ -120,7 +120,7 @@ findFeaturesOpenMS <- function(analysisInfo, noiseThrInt = 1000, chromSNR = 3, c
 
         logf <- if (!is.null(logPath)) file.path(logPath, paste0("ffm-", analysisInfo$analysis[anai], ".txt")) else NULL
 
-        return(c(list(hash = hash, dataFile = dfile, featFile = ffile, stdoutFile = logf), cmd))
+        return(c(list(hash = hash, dataFile = dfile, featFile = ffile, logFile = logf), cmd))
     })
     names(cmdQueue) <- analysisInfo$analysis
 

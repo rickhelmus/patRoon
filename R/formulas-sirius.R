@@ -156,10 +156,9 @@ generateFormulasSirius <- function(fGroups, MSPeakLists, relMzDev = 5, adduct = 
             cmd <- getSiriusCommand(plmz, groupPeakLists[[grp]][["MS"]], groupPeakLists[[grp]][["MSMS"]], profile,
                                     adduct, relMzDev, elements, database, noise, FALSE, NULL, topMost, extraOpts)
             logf <- if (!is.null(logPath)) file.path(logPath, paste0("sirius-form-", grp, ".txt")) else NULL
-            logfe <- if (!is.null(logPath)) file.path(logPath, paste0("sirius-form-err-", grp, ".txt")) else NULL
 
-            return(c(list(hash = hashes[grp], adduct = adduct, cacheDB = cacheDB, stdoutFile = logf,
-                          stderrFile = logfe, gName = grp), cmd))
+            return(c(list(hash = hashes[grp], adduct = adduct, cacheDB = cacheDB, logFile = logf,
+                          gName = grp), cmd))
         }, simplify = FALSE))
 
         if (length(cmdQueue) > 0)
@@ -169,8 +168,8 @@ generateFormulasSirius <- function(fGroups, MSPeakLists, relMzDev = 5, adduct = 
 
             ret <- executeMultiProcess(cmdQueue, processSiriusFormulas, errorHandler = function(cmd, exitStatus, retries)
             {
-                stop(sprintf("Fatal: Failed to execute SIRIUS for %s - exit code: %d\nCommand: %s", cmd$gName, exitStatus,
-                             paste(cmd$command, paste0(cmd$args, collapse = " "))))
+                stop(sprintf("Fatal: Failed to execute SIRIUS for %s - exit code: %d - Log: %s", cmd$gName,
+                             exitStatus, cmd$logFile))
             }, maxProcAmount = maxProcAmount)
 
             ngrp <- length(ret)

@@ -2,6 +2,7 @@
 NULL
 
 printf <- function(...) cat(sprintf(...), sep = "")
+fprintf <- function(file, ..., append = FALSE) cat(sprintf(...), sep = "", file = file, append = append)
 
 if (!exists("hasName")) # should be defined in latest R versions
     hasName <- function(x, name) return(name %in% names(x))
@@ -776,13 +777,13 @@ doPlotSilhouettes <- function(clust, distm, kSeq, pch = 16, type = "b", ...)
 {
     if (length(distm) == 1)
         stop("Need >2 clustered compounds")
-    
+
     meanws <- sapply(kSeq, function(k)
     {
         sil <- silhouette(cutree(clust, k = k), distm)
         summary(sil)$avg.width
     })
-    
+
     plot(x = kSeq, y = meanws, pch = pch, type = type, xaxt = "none",
          xlab = "cluster k", ylab = "mean silhouette width", ...)
     axis(1, kSeq)

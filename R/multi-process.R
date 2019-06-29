@@ -46,10 +46,8 @@ makeCommandList <- function(commandQueue, cmdInds, sucDir)
     else
     {
         ret[c("command", "args")] <- commandQueue[[1]][c("command", "args")]
-        if (!is.null(commandQueue[[1]]$stdoutFile))
-            ret$stdout <- commandQueue[[1]]$stdoutFile
-        if (!is.null(commandQueue[[1]]$stderrFile))
-            ret$stderr <- commandQueue[[1]]$stderrFile
+        if (!is.null(commandQueue[[1]]$logFile))
+            ret[c("stdout", "stderr")] <- "|"
     }
 
     return(ret)
@@ -244,12 +242,28 @@ executeMultiProcess <- function(commandQueue, finishHandler,
     finishedCommands <- 0
     lastCommandTime <- 0 # at which time (in ms) the last command was started
 
+    doLog <- any(sapply(commandQueue, function(q) !is.null(q$logFile)))
+    stopifnot(batchSize == 1 || (!doLog && !printOutput || !printError))
+
     # clear up stale processes: see https://github.com/r-lib/processx/issues/171
     on.exit({
         for (pi in seq_along(runningProcs))
         {
             if (!is.null(runningProcs[[pi]]) && runningProcInfo[[pi]]$running)
                 runningProcs[[pi]]$kill()
+        }
+
+        if (doLog)
+        {
+            for (cmd in commandQueue)
+            {
+                if (!is.null(cmd$logFile))
+                {
+                    fprintf(cmd$logFile, "command: %s\nargs: %s\n", cmd$command, paste0(cmd$args, collapse = " "))
+                    fprintf(cmd$logFile, "\n---\n\noutput:\n%s\n\nstandard error output:\n%s\n",
+                            cmd$stdoutLog, cmd$stderrLog, append = TRUE)
+                }
+            }
         }
     }, add = TRUE)
 
@@ -258,6 +272,16 @@ executeMultiProcess <- function(commandQueue, finishHandler,
 
     procFinished <- function(pi) !is.null(runningProcs[[pi]]) && !runningProcs[[pi]]$is_alive() && runningProcInfo[[pi]]$running
 
+    doProcessOut <- function(txt, print)
+    {
+        if (print)
+            cat(txt)
+        if (doLog)
+            return(txt)
+    }
+    processOutput <- function() doProcessOut(rp[[pi]]$read_output(), printOutput)
+    processError <- function() doProcessOut(rp[[pi]]$read_error(), printError)
+
     while (nextCommand <= totCmdCount || any(sapply(runningProcInfo, function(rp) !is.null(rp) && rp$running)))
     {
         for (pi in seq_along(runningProcs))
@@ -265,7 +289,17 @@ executeMultiProcess <- function(commandQueue, finishHandler,
             finishedRunning <- procFinished(pi)
 
             if (!is.null(runningProcs[[pi]]))
+            {
                 cmdInds <- seq(runningProcInfo[[pi]]$cmdIndRange[1], runningProcInfo[[pi]]$cmdIndRange[2])
+
+                # NOTE: logging/printing currently doesn't work in batch mode
+                if (printOutput || printError || doLog)
+                {
+                    cind <- runningProcInfo[[pi]]$cmdIndRange[1]
+                    commandQueue[[cind]]$stdoutLog <- paste0(commandQueue[[cind]]$stdoutLog, processOutput())
+                    commandQueue[[cind]]$stderrLog <- paste0(commandQueue[[cind]]$stderrLog, processError())
+                }
+            }
 
             if (finishedRunning)
             {
@@ -388,17 +422,37 @@ executeMultiProcess <- function(commandQueue, finishHandler,
             }
         }
 
-        if (printOutput || printError)
+        if (printOutput || printError || doLog)
         {
             rp <- pruneList(runningProcs)
             pl <- processx::poll(rp, waitTimeout)
 
+            if (FALSE)
+            {
             for (pi in seq_along(rp))
             {
+                if (doLog) # NOTE: logging currently doesn't work in batch mode
+                    cind <- runningProcInfo[[pi]]$cmdIndRange[1]
+
                 if (pl[[pi]][["output"]] == "ready")
-                    cat(rp[[pi]]$read_output_lines())
+                {
+                    txt <- rp[[pi]]$read_output()
+
+                    if (printOutput)
+                        cat(txt)
+                    if (doLog)
+                        commandQueue[[cind]]$stdoutLog <- paste0(commandQueue[[cind]]$stdoutLog, txt)
+
+                }
                 if (pl[[pi]][["error"]] == "ready")
-                    cat(rp[[pi]]$read_error_lines())
+                {
+                    txt <- rp[[pi]]$read_error()
+                    if (printError)
+                        cat(txt)
+                    if (doLog)
+                        commandQueue[[cind]]$stderrLog <- paste0(commandQueue[[cind]]$stderrLog, txt)
+                }
+            }
             }
         }
         else

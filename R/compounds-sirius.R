@@ -158,11 +158,8 @@ generateCompoundsSirius <- function(fGroups, MSPeakLists, relMzDev = 5, adduct =
                                 fingerIDDatabase, topMostFormulas, extraOpts)
         db <- if (!is.null(fingerIDDatabase)) fingerIDDatabase else if (!is.null(formulaDatabase)) formulaDatabase else "pubchem"
         logf <- if (!is.null(logPath)) file.path(logPath, paste0("sirius-comp-", grp, ".txt")) else NULL
-        logfe <- if (!is.null(logPath)) file.path(logPath, paste0("sirius-comp-err-", grp, ".txt")) else NULL
-
         return(c(list(hash = hash, adduct = adduct, cacheDB = cacheDB, MSMSSpec = plist$MSMS,
-                      database = db, topMost = topMost, stdoutFile = logf, stderrFile = logfe,
-                      gName = grp), cmd))
+                      database = db, topMost = topMost, logFile = logf, gName = grp), cmd))
     }, simplify = FALSE)
     cmdQueue <- cmdQueue[!sapply(cmdQueue, is.null)]
 
@@ -191,8 +188,8 @@ generateCompoundsSirius <- function(fGroups, MSPeakLists, relMzDev = 5, adduct =
                 unlink(cmd$outPath, TRUE)
                 return(TRUE)
             }
-            stop(sprintf("Fatal: Failed to execute SIRIUS for %s - exit code: %d\nCommand: %s", cmd$gName, exitStatus,
-                         paste(cmd$command, paste0(cmd$args, collapse = " "))))
+            stop(sprintf("Fatal: Failed to execute SIRIUS for %s - exit code: %d\nLog: %s", cmd$gName, exitStatus,
+                         cmd$logFile))
         }, maxProcAmount = maxProcAmount)
     }
     else

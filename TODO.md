@@ -116,3 +116,5 @@
 ## Reporting
 - report spectra/tables?
 
+## TPs
+- Suspects --> BT --> MF DB/suspect list (opt combine with precursors)

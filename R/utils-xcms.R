@@ -3,6 +3,99 @@
 #' @include features-xcms.R
 #' @include feature_groups.R
 #' @include feature_groups-xcms.R
+NULL
+
+# internal functions copied from XCMS (https://github.com/sneumann/xcms)
+# UNDONE: would be nice to not need this, e.g. by improving xcms interop
+XCMSInternal <- setRefClass("XCMSInternal", methods = list(
+
+    .PROCSTEP.PEAK.DETECTION = function() "Peak detection",
+    .PROCSTEP.PEAK.GROUPING = function() "Peak grouping",
+    .PROCSTEP.RTIME.CORRECTION = function() "Retention time correction",
+
+    .featureIDs = function(x, prefix = "FT") {
+        sprintf(paste0(prefix, "%0", ceiling(log10(x + 1L)), "d"), 1:x)
+    },
+
+    .update_feature_definitions = function(x, original_names, subset_names) {
+        x$peakidx <- lapply(x$peakidx, function(z) {
+            idx <- base::match(original_names[z], subset_names)
+            idx[!is.na(idx)]
+        })
+        x[lengths(x$peakidx) > 0, ]
+    }
+
+))()
+
+readMSDataForXCMS3 <- function(anaInfo)
+{
+    anaFiles <- mapply(anaInfo$analysis, anaInfo$path, FUN = getMzMLOrMzXMLAnalysisPath)
+    return(MSnbase::readMSData(files = anaFiles,
+                               pdata = new("NAnnotatedDataFrame",
+                                           data.frame(sample_name = anaInfo$analysis,
+                                                      sample_group = anaInfo$group,
+                                                      stringsAsFactors = FALSE)),
+                               mode = "onDisk"))
+}
+
+makeXCMSGroups <- function(fGroups, verbose = TRUE)
+{
+    fTable <- featureTable(fGroups)
+
+    # add unique feat IDs (corresponding to ftindex)
+    combfts <- lapply(copy(fTable), function(f) f[, ftID := seq_len(.N)])
+    names(combfts) <- NULL # get rid of file names ...
+    combfts <- rbindlist(combfts, idcol = "sind") # ... so that rbindlist will generate numeric IDs
+    # combfts should now be aligned with peak table of xcms set
+
+    combfts[, xsID := seq_len(.N)] # ID corresponding to XCMS peaks
+
+    gTable <- groups(fGroups)
+    ftind <- copy(groupFeatIndex(fGroups))
+    anaInfo <- analysisInfo(fGroups)
+
+    if (verbose)
+        cat("Making group index table\n")
+
+    setkeyv(combfts, c("sind", "ftID"))
+    idx <- lapply(seq_along(ftind), function(g)
+    {
+        fti <- data.table(ftID = ftind[[g]], sind = seq_along(ftind[[g]]))
+        setkeyv(fti, c("sind", "ftID"))
+        # join by sample ID and by feat ID so that we end up with a dt having only
+        # relevant rows for the IDs given in ftind
+        combfts[fti, nomatch = 0][["xsID"]] # xsID is the XCMS peak ID
+    })
+
+    if (verbose)
+        cat("Making groups...\n")
+
+    repGroups <- replicateGroups(fGroups)
+    grps <- rbindlist(lapply(seq_along(ftind), function(g)
+    {
+        fprops <- rbindlist(lapply(seq_len(nrow(anaInfo)), function(s)
+        {
+            fi <- ftind[[g]][s]
+            if (fi == 0)
+                data.table(mz = NA, ret = NA)
+            else
+                fTable[[anaInfo$analysis[s]]][fi, c("mz", "ret")]
+        }))
+
+        ret <- data.table(mzmed = median(fprops[["mz"]], na.rm = TRUE), mzmin = min(fprops[["mz"]], na.rm = TRUE),
+                          mzmax = max(fprops[["mz"]], na.rm = TRUE), rtmed = median(fprops[["ret"]], na.rm = TRUE),
+                          rtmin = min(fprops[["ret"]], na.rm = TRUE), rtmax = max(fprops[["ret"]], na.rm = TRUE),
+                          npeaks = sum(ftind[[g]] != 0))
+
+        # add counts per sample group
+        ret[, (repGroups) := lapply(repGroups, function(rg) sum(ftind[[g]][rg == anaInfo$group] != 0))]
+
+        return(ret)
+    }))
+
+    return(list(groups = grps, idx = idx))
+}
+
 
 #' @rdname getXCMSSet
 #' @export
@@ -75,63 +168,13 @@ setMethod("getXCMSSet", "featureGroups", function(obj, exportedData, verbose = T
     checkmate::assertFlag(exportedData)
     checkmate::assertFlag(verbose)
 
-    fTable <- featureTable(obj)
-
-    # add unique feat IDs (corresponding to ftindex)
-    combfts <- lapply(copy(fTable), function(f) f[, ftID := seq_len(.N)])
-    names(combfts) <- NULL # get rid of file names ...
-    combfts <- rbindlist(combfts, idcol = "sind") # ... so that rbindlist will generate numeric IDs
-    # combfts should now be aligned with peak table of xcms set
-
-    combfts[, xsID := seq_len(.N)] # ID corresponding to XCMS peaks
-
-    gTable <- groups(obj)
-    ftind <- copy(groupFeatIndex(obj))
-    anaInfo <- analysisInfo(obj)
-
     if (verbose)
         cat("Getting ungrouped xcmsSet...\n")
     xs <- getXCMSSet(getFeatures(obj), exportedData, verbose = verbose)
 
-    if (verbose)
-        cat("Making group index table\n")
-
-    setkeyv(combfts, c("sind", "ftID"))
-    groupidx(xs) <- lapply(seq_along(ftind), function(g)
-    {
-        fti <- data.table(ftID = ftind[[g]], sind = seq_along(ftind[[g]]))
-        setkeyv(fti, c("sind", "ftID"))
-        # join by sample ID and by feat ID so that we end up with a dt having only
-        # relevant rows for the IDs given in ftind
-        combfts[fti, nomatch = 0][["xsID"]] # xsID is the XCMS peak ID
-    })
-
-    if (verbose)
-        cat("Making groups...\n")
-
-    # generate xcmsSet group matrix
-    grps <- matrix(unlist(sapply(seq_along(ftind), function(g)
-    {
-        fprops <- matrix(unlist(sapply(seq_len(nrow(anaInfo)), function(s)
-        {
-            fi <- ftind[[g]][s]
-            if (fi == 0)
-                list(NA, NA)
-            else
-                fTable[[anaInfo$analysis[s]]][fi, c("mz", "ret")]
-        }), use.names = FALSE), ncol = 2, byrow = TRUE, dimnames = list(NULL, c("mz", "ret")))
-
-        list(mzmed = median(fprops[, "mz"], na.rm = TRUE), mzmin = min(fprops[, "mz"], na.rm = TRUE),
-             mzmax = max(fprops[, "mz"], na.rm = TRUE), rtmed = median(fprops[, "ret"], na.rm = TRUE),
-             rtmin = min(fprops[, "ret"], na.rm = TRUE), rtmax = max(fprops[, "ret"], na.rm = TRUE),
-             npeaks = sum(ftind[[g]] != 0))
-    }, simplify = FALSE), use.names = FALSE), ncol = 7, byrow = TRUE, dimnames = list(NULL, c("mzmed", "mzmin", "mzmax", "rtmed", "rtmin", "rtmax", "npeaks")))
-
-    # add counts per sample group
-    xcms::groups(xs) <- cbind(grps, sapply(unique(anaInfo$group), function(sg)
-    {
-        sapply(seq_along(ftind), function(g) sum(ftind[[g]][sg == anaInfo$group] != 0))
-    }))
+    xsgrps <- makeXCMSGroups(obj, verbose)
+    xcms::groupidx(xs) <- xsgrps$idx
+    xcms::groups(xs) <- as.matrix(xsgrps$groups)
 
     return(xs)
 })
@@ -149,6 +192,97 @@ setMethod("getXCMSSet", "featureGroupsXCMS", function(obj, exportedData, verbose
         return(callNextMethod(obj, exportedData, verbose = verbose)) # files changed, need to update group statistics which is rather complex so just fallback
 
     return(obj@xs)
+})
+
+setMethod("getXCMSnExp", "features", function(obj, verbose)
+{
+    rawData <- readMSDataForXCMS3(analysisInfo(obj))
+
+    msLevel = 1L # UNDONE?
+
+    # this is mainly based on xcms:::.peaks_to_result()
+    xph <- new("XProcessHistory", param = NULL, date = date(),
+               type = XCMSInternal$.PROCSTEP.PEAK.DETECTION(),
+               fileIndex = seq_along(analyses(obj)),
+               msLevel = msLevel)
+    ret <- as(rawData, "XCMSnExp")
+    ret@.processHistory <- c(xcms::processHistory(ret), list(xph))
+
+    if (length(obj) > 0)
+    {
+        fTable <- featureTable(obj)
+
+        # use unname: get numeric id column
+        allFeats <- rbindlist(lapply(unname(fTable), function(ft)
+        {
+            if (nrow(ft) > 0)
+                data.table(mz = ft$mz, mzmin = ft$mzmin, mzmax = ft$mzmax, rt = ft$ret,
+                           rtmin = ft$retmin, rtmax = ft$retmax, maxo = ft$intensity, into = ft$area)
+            else
+                data.table(mz = numeric(), mzmin = numeric(), mzmax = numeric(), rt = numeric(),
+                           rtmin = numeric(), rtmax = numeric(), maxo = numeric(), into = numeric(),
+                           sample = numeric())
+        }), idcol = "sample")
+        setcolorder(allFeats, setdiff(names(allFeats), "sample")) # move sample col to end
+
+        allFeats <- as.matrix(allFeats)
+        rownames(allFeats) <- XCMSInternal$.featureIDs(nrow(allFeats), "CP")
+
+        xcms::chromPeaks(ret) <- allFeats
+        xcms::chromPeakData(ret)$ms_level <- msLevel
+        xcms::chromPeakData(ret)$is_filled <- FALSE
+    }
+
+    return(ret)
+})
+
+setMethod("getXCMSnExp", "featuresXCMS3", function(obj, verbose)
+{
+    return(obj@xdata)
+})
+
+setMethod("getXCMSnExp", "featureGroups", function(obj, verbose)
+{
+    if (verbose)
+        cat("Getting ungrouped XCMSnExp...\n")
+
+    msLevel = 1L # UNDONE?
+
+    xdata <- getXCMSnExp(getFeatures(obj), verbose = verbose)
+
+    xsgrps <- makeXCMSGroups(obj, verbose)
+    xsgrps$groups[, peakidx := list(xsgrps$idx)]
+
+    # this is mainly based on xcms::groupChromPeaks()
+
+    grps <- as(xsgrps$groups, "DataFrame")
+    if (!all(xcms::chromPeakData(xdata)$ms_level %in% msLevel))
+        df <- XCMSInternal$.update_feature_definitions(grps, rownames(chromPeaks(xdata, msLevel = msLevel)),
+                                                 rownames(chromPeaks(xdata)))
+    rownames(grps) <- XCMSInternal$.featureIDs(nrow(grps))
+    xcms::featureDefinitions(xdata) <- grps
+
+    xph <- new("XProcessHistory", param = NULL, date = date(),
+               type = XCMSInternal$.PROCSTEP.PEAK.GROUPING(),
+               fileIndex = seq_along(analyses(obj)),
+               msLevel = msLevel)
+    xdata@.processHistory <- c(xcms::processHistory(xdata), list(xph))
+
+    return(xdata)
+})
+
+setMethod("getXCMSnExp", "featureGroupsXCMS3", function(obj, verbose)
+{
+    # first see if we can just return the embedded xcms object
+    # NOTE: we can't do this if analyses have been subset
+
+    anaInfo <- analysisInfo(obj)
+
+    if (length(filepaths(obj@xs)) != length(anaInfo$analysis) ||
+        !all(simplifyAnalysisNames(filepaths(obj@xs)) == anaInfo$analysis))
+        return(callNextMethod(obj, verbose = verbose))
+
+    return(obj@xdata)
 })
 
 loadXCMSRaw <- function(analyses, paths, cacheDB = NULL, verbose = TRUE)
@@ -169,6 +303,22 @@ loadXCMSRaw <- function(analyses, paths, cacheDB = NULL, verbose = TRUE)
     })
     names(ret) <- analyses
     return(ret)
+}
+
+importXCMSPeaks <- function(peaks, analysisInfo)
+{
+    plist <- as.data.table(peaks)
+
+    feat <- lapply(seq_len(nrow(analysisInfo)), function(sind)
+    {
+        ret <- plist[sample == sind]
+        ret[, ID := seq_len(nrow(ret))]
+        setnames(ret, c("rt", "rtmin", "rtmax", "maxo", "into"), c("ret", "retmin", "retmax", "intensity", "area"))
+        return(ret[, c("mz", "mzmin", "mzmax", "ret", "retmin", "retmax", "intensity", "area", "ID")])
+    })
+    names(feat) <- analysisInfo$analysis
+
+    return(feat)
 }
 
 # UNDONE: use with feature group plot EIC plotting

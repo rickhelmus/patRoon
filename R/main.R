@@ -5,6 +5,7 @@
 #' @importFrom stats cutree dist hclust heatmap lm median rect.hclust sd setNames
 #' @importFrom xcms phenoData phenoData<- filepaths filepaths<- xcmsRaw peaks peaks<- profinfo profinfo<- groupidx xcmsSet group retcor groupval groupnames rawEIC sampnames groupidx<-
 #' @importFrom Rdpack reprompt
+#' @importClassesFrom xcms XProcessHistory
 #' @importClassesFrom CAMERA xsAnnotate
 #' @import data.table
 #' @import shiny

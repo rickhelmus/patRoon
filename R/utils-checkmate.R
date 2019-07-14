@@ -10,6 +10,20 @@ checkRange <- function(x, null.ok = FALSE)
 }
 assertRange <- checkmate::makeAssertionFunction(checkRange)
 
+checkS4 <- function(x, null.ok = FALSE)
+{
+    if (is.null(x))
+    {
+        if (null.ok)
+            return(TRUE)
+        return("object is NULL")
+    }
+    if (!isS4(x))
+        return("object is not an S4 object")
+    return(TRUE)
+}
+assertS4 <- checkmate::makeAssertionFunction(checkS4)
+
 checkChoiceSilent <- function(x, ch)
 {
     ret <- checkmate::checkString(x, min.chars = 1)
@@ -95,7 +109,7 @@ assertAndPrepareAnaInfo <- function(x, ..., add = NULL)
         warning("The usage of a 'ref' column in the analysis information is deprecated. Please re-name this column to 'blank'.")
         setnames(x, "ref", "blank")
     }
-    
+
     assertAnalysisInfo(x, ..., add = add)
 
     if ((is.null(add) || length(add$getMessages()) == mc) &&

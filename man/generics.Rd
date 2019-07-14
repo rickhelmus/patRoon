@@ -168,7 +168,7 @@ please refer to the linked method documentation for each generic.
 \code{filter} provides various functionality to do post-filtering of data.
 
 \itemize{
-    \item Methods are defined for: \code{\link[=filter,components-method]{components}}; \code{\link[=filter,compounds-method]{compounds}}; \code{\link[=filter,featureGroups-method]{featureGroups}}; \code{\link[=filter,features-method]{features}}; \code{\link[=filter,featuresXCMS-method]{featuresXCMS}}; \code{\link[=filter,formulas-method]{formulas}}; \code{\link[=filter,MSPeakLists-method]{MSPeakLists}}.
+    \item Methods are defined for: \code{\link[=filter,components-method]{components}}; \code{\link[=filter,compounds-method]{compounds}}; \code{\link[=filter,featureGroups-method]{featureGroups}}; \code{\link[=filter,features-method]{features}}; \code{\link[=filter,featuresXCMS-method]{featuresXCMS}}; \code{\link[=filter,featuresXCMS3-method]{featuresXCMS3}}; \code{\link[=filter,formulas-method]{formulas}}; \code{\link[=filter,MSPeakLists-method]{MSPeakLists}}.
 }
 
 \code{getFeatures} returns the object's \code{\link{features}} object.
@@ -263,7 +263,7 @@ please refer to the linked method documentation for each generic.
  \code{[} Subsets data within an object.
 
 \itemize{
-    \item Methods are defined for: \code{\link[=[,components,ANY,ANY,missing-method]{components,ANY,ANY,missing}}; \code{\link[=[,compounds,ANY,missing,missing-method]{compounds,ANY,missing,missing}}; \code{\link[=[,compoundsCluster,ANY,missing,missing-method]{compoundsCluster,ANY,missing,missing}}; \code{\link[=[,featureGroups,ANY,ANY,missing-method]{featureGroups,ANY,ANY,missing}}; \code{\link[=[,featureGroupsComparison,ANY,missing,missing-method]{featureGroupsComparison,ANY,missing,missing}}; \code{\link[=[,features,ANY,missing,missing-method]{features,ANY,missing,missing}}; \code{\link[=[,featuresXCMS,ANY,missing,missing-method]{featuresXCMS,ANY,missing,missing}}; \code{\link[=[,formulas,ANY,missing,missing-method]{formulas,ANY,missing,missing}}; \code{\link[=[,MSPeakLists,ANY,ANY,missing-method]{MSPeakLists,ANY,ANY,missing}}.
+    \item Methods are defined for: \code{\link[=[,components,ANY,ANY,missing-method]{components,ANY,ANY,missing}}; \code{\link[=[,compounds,ANY,missing,missing-method]{compounds,ANY,missing,missing}}; \code{\link[=[,compoundsCluster,ANY,missing,missing-method]{compoundsCluster,ANY,missing,missing}}; \code{\link[=[,featureGroups,ANY,ANY,missing-method]{featureGroups,ANY,ANY,missing}}; \code{\link[=[,featureGroupsComparison,ANY,missing,missing-method]{featureGroupsComparison,ANY,missing,missing}}; \code{\link[=[,features,ANY,missing,missing-method]{features,ANY,missing,missing}}; \code{\link[=[,featuresXCMS,ANY,missing,missing-method]{featuresXCMS,ANY,missing,missing}}; \code{\link[=[,featuresXCMS3,ANY,missing,missing-method]{featuresXCMS3,ANY,missing,missing}}; \code{\link[=[,formulas,ANY,missing,missing-method]{formulas,ANY,missing,missing}}; \code{\link[=[,MSPeakLists,ANY,ANY,missing-method]{MSPeakLists,ANY,ANY,missing}}.
 }
 
  \code{[[} Extract data from an object.

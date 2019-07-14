@@ -28,6 +28,7 @@
 - filter()
     - document which filters work on feature level (e.g. chromWidth)
     - remove zero values for maxReplicateIntRSD?
+- importFeaturesXCMS/importFeaturesXCMS3/importFeatureGroupsXCMS: get rid of anaInfo arg requirement? (or make import func?)
 
 
 ## MSPeakLists

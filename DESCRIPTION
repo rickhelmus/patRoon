@@ -43,6 +43,7 @@ Imports:
     fst,
     processx,
     tools,
+    MSnbase,
     xcms,
     cluster,
     fastcluster,
@@ -144,6 +145,7 @@ Collate:
     'features-optimize-xcms.R'
     'features-tasq.R'
     'features-xcms.R'
+    'features-xcms3.R'
     'formula-bruker.R'
     'formula-genform.R'
     'formula-utils.R'

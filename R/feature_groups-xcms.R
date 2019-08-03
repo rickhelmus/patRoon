@@ -36,7 +36,7 @@ groupFeaturesXCMS <- function(feat, rtalign = TRUE, exportedData = TRUE, groupAr
 
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(feat, "features", add = ac)
-    aapply(checkmate::assertFlag, . ~ rtalign + exportedData, fixed = list(add = ac))
+    aapply(checkmate::assertFlag, . ~ rtalign + exportedData + verbose, fixed = list(add = ac))
     aapply(checkmate::assertList, . ~ groupArgs + retcorArgs, any.missing = FALSE, names = "unique", fixed = list(add = ac))
     checkmate::reportAssertions(ac)
 

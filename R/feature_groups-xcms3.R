@@ -89,7 +89,7 @@ getFeatIndicesFromXCMSnExp <- function(xdata)
     plist <- as.data.table(xcms::chromPeaks(xdata))
     plist[, subind := seq_len(.N), by = "sample"]
 
-    xdftidx <- xcms::featureValues(xdata)
+    xdftidx <- xcms::featureValues(xdata, value = "index")
     ret <- as.data.table(t(xdftidx))
 
     for (grp in seq_along(ret))
@@ -117,7 +117,7 @@ importFeatureGroupsXCMS3FromFeat <- function(xdata, analysisInfo, feat)
                               ftindex = setnames(getFeatIndicesFromXCMSnExp(xdata), gNames)))
 }
 
-#' @details \code{importFeatureGroupsXCMS} converts grouped features from an
+#' @details \code{importFeatureGroupsXCMS3} converts grouped features from an
 #'   \code{\link{xcmsSet}} object (from the \pkg{xcms} package).
 #'
 #' @param xs An \code{\link{xcmsSet}} object.
@@ -135,20 +135,18 @@ importFeatureGroupsXCMS3 <- function(xdata, analysisInfo)
     if (length(xcms::hasFeatures(xdata)) == 0)
         stop("Provided XCMS data does not contain any grouped features!")
 
-    feat <- importFeaturesXCMS(xdata, analysisInfo)
-    return(importFeatureGroupsXCMSFromFeat(xdata, anaInfo, feat))
+    feat <- importFeaturesXCMS3(xdata, analysisInfo)
+    return(importFeatureGroupsXCMS3FromFeat(xdata, anaInfo, feat))
 }
 
 setMethod("removeGroups", "featureGroupsXCMS3", function(fGroups, indices)
 {
+    keep <- setdiff(seq_len(length(fGroups)), indices)
     fGroups <- callNextMethod(fGroups, indices)
 
     # update XCMSnExp
     if (length(indices) > 0)
-    {
-        xcms::groups(fGroups@xs) <- xcms::groups(fGroups@xs)[-indices, , drop = FALSE]
-        groupidx(fGroups@xs) <- groupidx(fGroups@xs)[-indices]
-    }
+        fGroups@xdata <- xcms::filterFeatureDefinitions(fGroups@xdata, keep)
 
     return(fGroups)
 })

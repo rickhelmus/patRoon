@@ -74,7 +74,6 @@ expect_gt_or_zero <- function(object, expected)
 {
     act <- quasi_label(rlang::enquo(object))
     expect(all(object == 0 | object > expected), "object not greater than or zero")
-    browser()
     invisible(act$val)
 }
 

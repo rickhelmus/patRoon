@@ -1194,8 +1194,8 @@ setMethod("screenSuspects", "featureGroups", function(obj, suspects, rtWindow, m
 #' @templateVar func groupFeatures
 #' @templateVar what group features
 #' @templateVar ex1 groupFeaturesOpenMS
-#' @templateVar ex2 groupFeaturesXCMS
-#' @templateVar algos openms,xcms
+#' @templateVar ex2 groupFeaturesXCMS3
+#' @templateVar algos openms,xcms,xcms3
 #' @template generic-algo
 #'
 #' @rdname feature-grouping
@@ -1206,7 +1206,8 @@ setMethod("groupFeatures", "features", function(feat, algorithm, ..., verbose = 
     f <- switch(algorithm,
                 openms = groupFeaturesOpenMS,
                 xcms = groupFeaturesXCMS,
-                stop("Invalid algorithm! Should be: openms or xcms"))
+                xcms3 = groupFeaturesXCMS3,
+                stop("Invalid algorithm! Should be: openms, xcms or xcms3"))
 
     f(feat, ..., verbose = verbose)
 })

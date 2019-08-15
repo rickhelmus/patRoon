@@ -13,7 +13,7 @@ setMethod("initialize", "featuresXCMS3",
 setMethod("[", c("featuresXCMS3", "ANY", "missing", "missing"), function(x, i, j, ..., drop = TRUE)
 {
     x <- callNextMethod(x, i, j, ..., drop)
-    x@xdata <- x@xdata[, analyses(x)]
+    x@xdata <- xcms::filterFile(analyses(x))
     return(x)
 })
 
@@ -24,7 +24,7 @@ setMethod("filter", "featuresXCMS3", function(obj, ...)
     obj <- callNextMethod(obj, ...)
 
     # check if amount of features (peaks) changed (e.g. due to filtering), if so update
-    if (length(obj) != nrow(peaks(obj@xdata)))
+    if (length(obj) != nrow(xcms::chromPeaks(obj@xdata)))
     {
         cat("Updating XCMS object...\n")
         # NOTE: use base method to force update as overloaded method simply returns @xdata slot

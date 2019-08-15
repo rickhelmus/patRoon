@@ -5,6 +5,7 @@ anaInfoOne <- getTestAnaInfo()[4, ]
 
 ffOpenMS <- findFeatures(anaInfo, "openms", logPath = NULL)
 ffXCMS <- findFeatures(anaInfoOne, "xcms")
+ffXCMS3 <- findFeatures(anaInfoOne, "xcms3")
 
 # generate mzXML files for enviPick
 exDataFiles <- list.files(patRoonData::exampleDataPath(), "\\.mzML$", full.names = TRUE)
@@ -30,6 +31,7 @@ test_that("verify feature finder output", {
     expect_known_value(sapply(featureTable(ffOpenMS), function(fts) fts[, -"ID"], simplify = FALSE),
                        testFile("ff-openms"), tolerance = 1E-5) # increased tolerance value for win/lin deviations
     expect_known_value(featureTable(ffXCMS), testFile("ff-xcms"))
+    expect_known_value(featureTable(ffXCMS3), testFile("ff-xcms3"))
     expect_known_value(featureTable(ffEP), testFile("ff-envipick"))
 
     skip_if_not(doDATests())
@@ -39,6 +41,7 @@ test_that("verify feature finder output", {
 test_that("verify show output", {
     expect_known_show(ffOpenMS, testFile("ff-show-openms", text = TRUE))
     expect_known_show(ffXCMS, testFile("ff-show-xcms", text = TRUE))
+    expect_known_show(ffXCMS3, testFile("ff-show-xcms3", text = TRUE))
     expect_known_show(ffEP, testFile("ff-show-envipick", text = TRUE))
 
     skip_if_not(doDATests())

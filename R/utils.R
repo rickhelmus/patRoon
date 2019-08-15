@@ -1075,3 +1075,5 @@ openProgBar <- function(min = 0, max, style = 3, ...)
     progOpts <- modifyList(progOpts, getOption("patRoon.progress.opts", list()))
     return(do.call(txtProgressBar, progOpts))
 }
+
+verboseCall <- function(f, a, v) if (v) do.call(f, a) else suppressMessages(invisible(do.call(f, a)))

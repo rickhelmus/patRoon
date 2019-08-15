@@ -135,6 +135,7 @@ Collate:
     'feature_groups-screening.R'
     'feature_groups-tasq.R'
     'feature_groups-xcms.R'
+    'feature_groups-xcms3.R'
     'utils-bruker.R'
     'features-bruker.R'
     'features-envipick.R'

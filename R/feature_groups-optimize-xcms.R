@@ -41,7 +41,8 @@ featureGroupsOptimizerXCMS$methods(
         if (param %in% c("profStep", "minfrac"))
         {
             if (bounds[2] > 1)
-            {  # 1 is max value for profStep
+            {
+                # 1 is max value for profStep
                 bounds <- round(c(1-(diff(bounds)*0.8), 1), 2)
                 printf("profStep or minfrac greater 1, decreasing to %s\n", bounds)
             }

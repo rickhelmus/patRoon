@@ -95,13 +95,14 @@ optimizeFeatureGrouping <- function(features, algorithm, ..., templateParams = l
 
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(features, "features", add = ac)
-    checkmate::assertChoice(algorithm, c("openms", "xcms"), add = ac)
+    checkmate::assertChoice(algorithm, c("openms", "xcms", "xcms3"), add = ac)
     assertOptimArgs(params, templateParams, paramRanges, maxIterations, maxModelDeviation, ac)
     checkmate::reportAssertions(ac)
 
     go <- switch(algorithm,
                  openms = featureGroupsOptimizerOpenMS,
-                 xcms = featureGroupsOptimizerXCMS)
+                 xcms = featureGroupsOptimizerXCMS,
+                 xcms3 = featureGroupsOptimizerXCMS3)
 
     go <- go$new(features = features, algorithm = algorithm)
     result <- go$optimize(params, templateParams, paramRanges, maxIterations, maxModelDeviation)
@@ -114,11 +115,12 @@ optimizeFeatureGrouping <- function(features, algorithm, ..., templateParams = l
 #' @export
 generateFGroupsOptPSet <- function(algorithm, ...)
 {
-    checkmate::assertChoice(algorithm, c("openms", "xcms"))
+    checkmate::assertChoice(algorithm, c("openms", "xcms", "xcms3"))
 
     f <- switch(algorithm,
                 openms = generateFGroupsOptPSetOpenMS,
-                xcms = generateFGroupsOptPSetXCMS)
+                xcms = generateFGroupsOptPSetXCMS,
+                xcms3 = generateFGroupsOptPSetXCMS3)
 
     defs <- f(...)
     return(modifyList(defs, list(...)))
@@ -128,10 +130,12 @@ generateFGroupsOptPSet <- function(algorithm, ...)
 #' @export
 getDefFGroupsOptParamRanges <- function(algorithm)
 {
-    checkmate::assertChoice(algorithm, c("openms", "xcms"))
+    checkmate::assertChoice(algorithm, c("openms", "xcms", "xcms3"))
 
     if (algorithm == "openms")
         return(getDefFGroupsOptParamRangesOpenMS())
-
-    return(getDefFGroupsOptParamRangesXCMS())
+    if (algorithm == "xcms")
+        return(getDefFGroupsOptParamRangesXCMS())
+    # if (algorithm == "xcms3")
+    return(getDefFGroupsOptParamRangesXCMS3())
 }

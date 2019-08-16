@@ -58,7 +58,7 @@ groupFeaturesXCMS3 <- function(feat, rtalign = TRUE,
     if (rtalign)
     {
         # group prior to alignment when using the peaks group algorithm
-        if (is(groupParam, getClass("PeakGroupsParam", where = "xcms")))
+        if (isXCMSClass(groupParam, "PeakGroupsParam"))
         {
             if (verbose)
                 cat("Performing grouping prior to retention time alignment...\n")

@@ -1077,3 +1077,11 @@ openProgBar <- function(min = 0, max, style = 3, ...)
 }
 
 verboseCall <- function(f, a, v) if (v) do.call(f, a) else suppressMessages(invisible(do.call(f, a)))
+
+setListNamesIfPresent <- function(l, o, n)
+{
+    pr <- o %in% names(l)
+    o <- o[pr]; n <- n[pr]
+    names(l)[match(o, names(l))] <- n
+    return(l)
+}

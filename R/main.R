@@ -176,6 +176,9 @@ NULL
 #'   algorithms (\code{findFeatures} and \code{importFeatures}).
 #' @param verbose If set to \code{FALSE} then no text output is shown.
 #'
+#' @note The file format of analyses for \code{findFeaturesXCMS} and
+#'   \code{findFeaturesXCMS3} must be \code{mzML} or \code{mzXML}.
+#'
 #' @name feature-finding
 #' @return An object of a class which is derived from \code{\link{features}}.
 #' @seealso \code{\link{features-class}} and \code{\link{analysis-information}}

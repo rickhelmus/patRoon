@@ -104,14 +104,11 @@ extra parameters to be used by \code{\link[xcms:group-methods]{xcms::group}} and
 
 \item{analysisInfo}{A \code{data.frame} with \link[=analysis-information]{analysis info}.}
 
-\item{exportedData}{Set to \code{TRUE} if analyses were exported as
-\code{mzXML} or \code{mzML} files.}
+\item{groupParam, retAlignParam}{parameter object that is directly passed to
+\code{\link[xcms:groupChromPeaks]{xcms::groupChromPeaks}} and
+\code{\link[xcms:adjustRtime]{xcms::adjustRtime}}, respectively.}
 
-\item{groupArgs, retcorArgs}{named \code{character vector} that can contain
-extra parameters to be used by \code{\link[xcms:group-methods]{xcms::group}} and
-\code{\link[xcms:retcor-methods]{xcms::retcor}}, respectively.}
-
-\item{xs}{An \code{\link{xcmsSet}} object.}
+\item{xdata}{An \code{\link{XCMSnExp}} object.}
 
 \item{analysisInfo}{A \code{data.frame} with \link[=analysis-information]{analysis info}.}
 }
@@ -189,15 +186,16 @@ optimal settings often depend on applied methodology and instrumentation.
 \code{importFeatureGroupsXCMS} converts grouped features from an
   \code{\link{xcmsSet}} object (from the \pkg{xcms} package).
 
-\code{groupFeaturesXCMS} uses the \pkg{xcms} package for grouping of
-  features. Grouping of features and alignment of their retention times are
-  performed with the \code{\link[xcms:group-methods]{xcms::group}} and
-  \code{\link[xcms:retcor-methods]{xcms::retcor}} functions, respectively.
-  Both functions have an extensive list of parameters to modify their
-  behaviour and may therefore be used to potentially optimize results.
+\code{groupFeaturesXCMS3} uses the new interface from the \pkg{xcms}
+  package for grouping of features. Grouping of features and alignment of
+  their retention times are performed with the
+  \code{\link[xcms:groupChromPeaks]{xcms::groupChromPeaks}} and
+  \code{\link[xcms:adjustRtime]{xcms::adjustRtime}} functions, respectively.
+  Both of these functions support an extensive amount of parameters that
+  modify their behaviour and may therefore require optimization.
 
-\code{importFeatureGroupsXCMS} converts grouped features from an
-  \code{\link{xcmsSet}} object (from the \pkg{xcms} package).
+\code{importFeatureGroupsXCMS3} converts grouped features from an
+  \code{\link{XCMSnExp}} object (from the \pkg{xcms} package).
 }
 \references{
 \insertRef{Rst2016}{patRoon} \cr\cr
@@ -210,8 +208,7 @@ optimal settings often depend on applied methodology and instrumentation.
   \addCitations{xcms}{2} \cr\cr
   \addCitations{xcms}{3}
 
-\addCitations{xcms}{1} \cr\cr
-  \addCitations{xcms}{2} \cr\cr
+\addCitations{xcms}{1} \cr\cr \addCitations{xcms}{2} \cr\cr
   \addCitations{xcms}{3}
 }
 \seealso{

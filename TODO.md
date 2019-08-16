@@ -14,6 +14,8 @@
 - handbook
     - semi-quant advanced section
     - NT components graph plotting
+    - xcms3
+- fix devtools::check_man() issues
 
 
 ## features

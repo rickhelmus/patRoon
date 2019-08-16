@@ -38,9 +38,6 @@ setMethod("filter", "featuresXCMS", function(obj, ...)
 #' @details \code{findFeaturesXCMS} uses the \code{\link[xcms]{xcmsSet}}
 #'   function from the \pkg{xcms} package to find features.
 #'
-#' @note The file format of analyses for \code{findFeaturesXCMS} must be
-#'   \code{mzML} or \code{mzXML}.
-#'
 #' @param method The method setting used by XCMS peak finding, see
 #'   \code{\link[xcms:findPeaks-methods]{xcms::findPeaks}}
 #'

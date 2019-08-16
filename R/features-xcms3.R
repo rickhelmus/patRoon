@@ -38,9 +38,6 @@ setMethod("filter", "featuresXCMS3", function(obj, ...)
 #' @details \code{findFeaturesXCMS3} uses the new \code{xcms3} interface from
 #'   the \pkg{xcms} package to find features.
 #'
-#' @note The file format of analyses for \code{findFeaturesXCMS3} must be
-#'   \code{mzML} or \code{mzXML}.
-#'
 #' @param param The method parameters used by XCMS peak finding, see
 #'   \code{\link[xcms:findChromPeaks]{xcms::findChromPeaks}}
 #'

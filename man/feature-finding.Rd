@@ -231,6 +231,9 @@ methodology and instrumentation.
   to a new \code{\link{features}} object.
 }
 \note{
+The file format of analyses for \code{findFeaturesXCMS} and
+  \code{findFeaturesXCMS3} must be \code{mzML} or \code{mzXML}.
+
 \code{findFeaturesBruker} only works with Bruker data files (\code{.d}
   extension) and requires Bruker DataAnalysis and the \pkg{RDCOMClient}
   package to be installed. Furthermore, DataAnalysis combines multiple
@@ -251,12 +254,6 @@ The file format of analyses for \code{findFeaturesOpenMS} must be
   \file{mzML}. This functionality has been tested with OpenMS version >= 2.0.
   Please make sure it is installed and its binaries are added to the PATH
   environment variable or the \code{patRoon.path.OpenMS} option is set.
-
-The file format of analyses for \code{findFeaturesXCMS} must be
-  \code{mzML} or \code{mzXML}.
-
-The file format of analyses for \code{findFeaturesXCMS3} must be
-  \code{mzML} or \code{mzXML}.
 }
 \references{
 \insertRef{Rst2016}{patRoon} \cr\cr

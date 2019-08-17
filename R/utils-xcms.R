@@ -27,6 +27,8 @@ XCMSInternal <- setRefClass("XCMSInternal", methods = list(
 
 ))()
 
+isXCMSClass <- function(cl, name) is(cl, getClass(name, where = "xcms"))
+
 readMSDataForXCMS3 <- function(anaInfo)
 {
     anaFiles <- mapply(anaInfo$analysis, anaInfo$path, FUN = getMzMLOrMzXMLAnalysisPath)

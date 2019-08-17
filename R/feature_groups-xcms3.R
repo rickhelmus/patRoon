@@ -10,21 +10,19 @@ setMethod("initialize", "featureGroupsXCMS3",
           function(.Object, ...) callNextMethod(.Object, algorithm = "xcms3", ...))
 
 
-#' @details \code{groupFeaturesXCMS} uses the \pkg{xcms} package for grouping of
-#'   features. Grouping of features and alignment of their retention times are
-#'   performed with the \code{\link[xcms:group-methods]{xcms::group}} and
-#'   \code{\link[xcms:retcor-methods]{xcms::retcor}} functions, respectively.
-#'   Both functions have an extensive list of parameters to modify their
-#'   behaviour and may therefore be used to potentially optimize results.
+#' @details \code{groupFeaturesXCMS3} uses the new interface from the \pkg{xcms}
+#'   package for grouping of features. Grouping of features and alignment of
+#'   their retention times are performed with the
+#'   \code{\link[xcms:groupChromPeaks]{xcms::groupChromPeaks}} and
+#'   \code{\link[xcms:adjustRtime]{xcms::adjustRtime}} functions, respectively.
+#'   Both of these functions support an extensive amount of parameters that
+#'   modify their behaviour and may therefore require optimization.
 #'
-#' @param exportedData Set to \code{TRUE} if analyses were exported as
-#'   \code{mzXML} or \code{mzML} files.
-#' @param groupArgs,retcorArgs named \code{character vector} that can contain
-#'   extra parameters to be used by \code{\link[xcms:group-methods]{xcms::group}} and
-#'   \code{\link[xcms:retcor-methods]{xcms::retcor}}, respectively.
+#' @param groupParam,retAlignParam parameter object that is directly passed to
+#'   \code{\link[xcms:groupChromPeaks]{xcms::groupChromPeaks}} and
+#'   \code{\link[xcms:adjustRtime]{xcms::adjustRtime}}, respectively.
 #'
-#' @references \addCitations{xcms}{1} \cr\cr
-#'   \addCitations{xcms}{2} \cr\cr
+#' @references \addCitations{xcms}{1} \cr\cr \addCitations{xcms}{2} \cr\cr
 #'   \addCitations{xcms}{3}
 #'
 #' @rdname feature-grouping
@@ -60,7 +58,7 @@ groupFeaturesXCMS3 <- function(feat, rtalign = TRUE,
     if (rtalign)
     {
         # group prior to alignment when using the peaks group algorithm
-        if (is(groupParam, getClass("PeakGroupsParam", where = "xcms")))
+        if (isXCMSClass(groupParam, "PeakGroupsParam"))
         {
             if (verbose)
                 cat("Performing grouping prior to retention time alignment...\n")
@@ -118,9 +116,9 @@ importFeatureGroupsXCMS3FromFeat <- function(xdata, analysisInfo, feat)
 }
 
 #' @details \code{importFeatureGroupsXCMS3} converts grouped features from an
-#'   \code{\link{xcmsSet}} object (from the \pkg{xcms} package).
+#'   \code{\link{XCMSnExp}} object (from the \pkg{xcms} package).
 #'
-#' @param xs An \code{\link{xcmsSet}} object.
+#' @param xdata An \code{\link{XCMSnExp}} object.
 #' @param analysisInfo A \code{data.frame} with \link[=analysis-information]{analysis info}.
 #'
 #' @rdname feature-grouping

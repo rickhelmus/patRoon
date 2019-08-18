@@ -131,7 +131,7 @@ generateFGroupsOptPSetXCMS <- function(...)
             retcorArgs$span <- c(0.1, 0.3)
         }
         else
-            stop("Only obiwarp and loess alignment methods supported.")
+            stop("Only obiwarp and loess alignment methods are supported.")
     }
 
     return(list(groupArgs = groupArgs, retcorArgs = retcorArgs))

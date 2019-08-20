@@ -71,7 +71,7 @@ makeGenFormCmdQueue <- function(gfBin, mainArgs, groupPeakLists, workFiles, hash
 }
 
 runGenForm <- function(gfBin, mainArgs, featMZs, groupPeakLists, MSMode, isolatePrec,
-                       hashes, cachedSet, workFiles, gNames, adduct, maxProcAmount,
+                       hashes, cachedSet, workFiles, gNames, adduct, topMost, maxProcAmount,
                        batchSize, timeout, ana)
 {
     cacheDB <- openCacheDBScope()
@@ -117,7 +117,7 @@ runGenForm <- function(gfBin, mainArgs, featMZs, groupPeakLists, MSMode, isolate
     {
         ret <- executeMultiProcess(cmdQueue, function(cmd)
         {
-            f <- processGenFormResultFile(cmd$outFile, cmd$isMSMS, adduct)
+            f <- processGenFormResultFile(cmd$outFile, cmd$isMSMS, adduct, topMost)
             if (is.null(f))
                 f <- data.table()
             else if (MSMode == "msms")
@@ -188,8 +188,6 @@ processGenFormMSMSResultFile <- function(file)
     formsMSMS[, byMSMS := !is.na(frag_formula)]
     formsMSMS[, precursorGroup := NULL]
 
-    formsMSMS[!is.na(frag_formula), frag_formula := Vectorize(sortFormula)(frag_formula)] # GenForm doesn't seem to use Hill sorting
-
     # clear out MSMS scores for formulae w/out MSMS explanations
     # UNDONE: do we need to discern candidates w/out MSMS data and w/ MSMS data but no explanations?
     formsMSMS[byMSMS == FALSE, c("MSMSScore", "combMatch") := NA_real_]
@@ -197,7 +195,7 @@ processGenFormMSMSResultFile <- function(file)
     return(formsMSMS)
 }
 
-processGenFormResultFile <- function(file, isMSMS, adduct)
+processGenFormResultFile <- function(file, isMSMS, adduct, topMost)
 {
     if (file.size(file) == 0)
         return(NULL)
@@ -214,6 +212,15 @@ processGenFormResultFile <- function(file, isMSMS, adduct)
     if (is.null(forms) || nrow(forms) == 0)
         return(NULL)
 
+    forms <- rankFormulaTable(forms)
+    
+    # select topMost after ranking
+    if (!is.null(topMost) && uniqueN(forms, by = "neutral_formula") > topMost)
+    {
+        forms[, unFormID := .GRP, by = "neutral_formula"]
+        forms <- forms[unFormID <= topMost][, unFormID := NULL]
+    }
+    
     forms[, neutral_formula := sapply(neutral_formula, sortFormula)] # GenForm doesn't seem to use Hill sorting
     forms[, formula := calculateIonFormula(neutral_formula, adduct)]
 
@@ -228,12 +235,13 @@ processGenFormResultFile <- function(file, isMSMS, adduct)
         set(forms, j = col, value = as.character(forms[[col]]))
     
     if (!is.null(forms[["frag_formula"]]))
+    {
         forms[byMSMS == TRUE, neutral_loss := as.character(Vectorize(subtractFormula)(formula, frag_formula))]
+        forms[byMSMS == TRUE, frag_formula := Vectorize(sortFormula)(frag_formula)]
+    }
 
     # set nice column order
     setcolorder(forms, c("neutral_formula", "formula", "formula_mz", "error", "dbe", "isoScore", "byMSMS"))
-
-    forms <- rankFormulaTable(forms)
 
     return(forms)
 }
@@ -293,7 +301,7 @@ processGenFormResultFile <- function(file, isMSMS, adduct)
 generateFormulasGenForm <- function(fGroups, MSPeakLists, relMzDev = 5, adduct = "[M+H]+",
                                     elements = "CHNOP", hetero = TRUE, oc = FALSE, extraOpts = NULL,
                                     calculateFeatures = TRUE, featThreshold = 0.75, MSMode = "both",
-                                    isolatePrec = TRUE, timeout = 120,
+                                    isolatePrec = TRUE, timeout = 120, topMost = 50,
                                     maxProcAmount = getOption("patRoon.maxProcAmount"), batchSize = 25)
 {
     ac <- checkmate::makeAssertCollection()
@@ -305,6 +313,7 @@ generateFormulasGenForm <- function(fGroups, MSPeakLists, relMzDev = 5, adduct =
     checkmate::assertNumber(featThreshold, lower = 0, finite = TRUE, null.ok = TRUE, add = ac)
     checkmate::assertChoice(MSMode, c("ms", "msms", "both"), add = ac)
     checkmate::assertCharacter(extraOpts, null.ok = TRUE, add = ac)
+    checkmate::assertCount(topMost, positive = TRUE, add = ac)
     aapply(checkmate::assertCount, . ~ maxProcAmount + batchSize, positive = TRUE, fixed = list(add = ac))
 
     if (!is.logical(isolatePrec))
@@ -361,8 +370,8 @@ generateFormulasGenForm <- function(fGroups, MSPeakLists, relMzDev = 5, adduct =
             printf("Loading all formulas...\n")
 
         forms <- runGenForm(gfBin, mainArgs, featMZs, groupPeakLists, MSMode, isolatePrec,
-                            hashes, cachedSet, workFiles, gNames, adduct, maxProcAmount,
-                            batchSize, timeout, ana)
+                            hashes, cachedSet, workFiles, gNames, adduct, topMost,
+                            maxProcAmount, batchSize, timeout, ana)
 
         printf("Loaded %d formulas for %d %s (%.2f%%).\n", countUniqueFormulas(forms), length(forms),
                if (!is.null(ana)) "features" else "feature groups",

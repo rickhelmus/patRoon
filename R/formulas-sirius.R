@@ -78,9 +78,6 @@ processSiriusFormulas <- function(cmd, exitStatus, retries)
 #'   patterns will be used for scoring candidates. Note that \command{SIRIUS}
 #'   requires availability of MS/MS data.
 #'
-#' @param topMost Only keep this number of candidates (per feature group) with
-#'   highest score. Sets the \option{--candidates} commandline option.
-#'
 #' @templateVar ident FALSE
 #' @template sirius-args
 #'

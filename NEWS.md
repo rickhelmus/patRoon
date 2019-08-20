@@ -1,5 +1,9 @@
 # patRoon 0.1.0.9000
 
+## Augustus 2019
+
+* `topMost` argument for GenForm formula calculation.
+
 ## June 2019
 
 * **IMPORTANT** Several things are renamed for clarity/consistency

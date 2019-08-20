@@ -548,7 +548,10 @@ NULL
 #'   options that will be passed to \command{GenForm} or \command{SIRIUS}. See
 #'   the \verb{GenForm options} section/SIRIUS manual for all available
 #'   commandline options.
-#'
+#' @param topMost Only keep this number of candidates (per feature group) with
+#'   highest score. For \command{SIRIUS}: Sets the \option{--candidates}
+#'   commandline option.
+#' 
 #' @templateVar genForm TRUE
 #' @template form-args
 #'

@@ -404,7 +404,7 @@ executeMultiProcess <- function(commandQueue, finishHandler,
                             runningProcInfo[[pi]]$finished[i] <- TRUE # now finished
                             runningProcInfo[[pi]]$startTime <- Sys.time()
                         }
-                        else if ((Sys.time() - runningProcInfo[[pi]]$startTime) > procTimeout)
+                        else if (difftime(Sys.time(), runningProcInfo[[pi]]$startTime, units = "secs")[[1]] > procTimeout)
                             runningProcInfo[[pi]]$timedOut[i] <- kill <- TRUE
 
                         break
@@ -412,7 +412,7 @@ executeMultiProcess <- function(commandQueue, finishHandler,
                 }
                 else
                     runningProcInfo[[pi]]$timedOut[1] <- kill <-
-                        (Sys.time() - runningProcInfo[[pi]]$startTime) > procTimeout
+                        difftime(Sys.time(), runningProcInfo[[pi]]$startTime, units = "secs") > procTimeout
 
                 if (kill)
                 {

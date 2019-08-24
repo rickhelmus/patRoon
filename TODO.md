@@ -24,6 +24,7 @@
         - mention parameters default unless specified
     - keep retcor_done?
     - get rid of getXCMSSet() calls?
+    - XCMS opt: loess --> peakgroups, consistent method specification for default optim args between feature groups/features
 - tests to verify getXCMSSet
 - suspect screening
     - rename patRoonData::targets
@@ -31,7 +32,6 @@
     - document which filters work on feature level (e.g. chromWidth)
     - remove zero values for maxReplicateIntRSD?
 - importFeaturesXCMS/importFeaturesXCMS3/importFeatureGroupsXCMS: get rid of anaInfo arg requirement? (or make import func?)
-- XCMS opt: loess --> peakgroups?
 
 
 ## MSPeakLists

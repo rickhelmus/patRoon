@@ -124,35 +124,42 @@ digraph Features {
 
 Several algorithms are available for finding features. These are listed in the table below alongside their usage and general remarks.
 
-Algorithm       | Usage                                     | Remarks
---------------- | ----------------------------------------- | --------------
-[OpenMS]        | `findFeatures(algorithm = "openms", ...)` | Uses the [FeatureFinderMetabo] algorithm
-[XCMS]          | `findFeatures(algorithm = "xcms", ...)`   | Uses `xcms::xcmsSet()` function
-[XCMS] (import) | `importFeatures(algorithm = "xcms")`      | Imports an existing `xcmsSet` object.
-[enviPick]      | `findFeatures(algorithm = "envipick")`    | Uses `enviPick::enviPickwrap()`
-DataAnalysis    | `findFeatures(algorithm = "bruker")`      | Uses Find Molecular Features from DataAnalysis (Bruker only)
+Algorithm        | Usage                                       | Remarks
+---------------- | ------------------------------------------- | --------------
+[OpenMS]         | `findFeatures(algorithm = "openms", ...)`   | Uses the [FeatureFinderMetabo] algorithm
+[XCMS]           | `findFeatures(algorithm = "xcms", ...)`     | Uses `xcms::xcmsSet()` function
+[XCMS] (import)  | `importFeatures(algorithm = "xcms", ...)`   | Imports an existing `xcmsSet` object.
+[XCMS3]          | `findFeatures(algorithm = "xcms3", ...)`    | Uses `xcms::findChromPeaks()` from the new XCMS3 interface
+[XCMS3] (import) | `importFeatures(algorithm = "xcms3", ...)`  | Imports an existing `XCMSnExp` object.
+[enviPick]       | `findFeatures(algorithm = "envipick", ...)` | Uses `enviPick::enviPickwrap()`
+DataAnalysis     | `findFeatures(algorithm = "bruker", ...)`   | Uses Find Molecular Features from DataAnalysis (Bruker only)
 
 Most often the performance of these algorithms heavily depend on the data and parameter settings that are used. Since obtaining a good feature dataset is crucial for the rest of the workflow, it is highly recommended to experiment with different settings (this process can also be automated, see [the feature optimization section](#fOpt) for more details). Some common parameters to look at are listed in the table below. However, there are many more (advanced) parameters that can be set, please see the reference documentation for these (e.g. `?findFeatures`).
 
-Algorithm      | Common parameters
--------------- | ---------------------------------------------------------------------------------
-[OpenMS]       | `noiseThrInt`, `chromSNR`, `chromFWHM`, `mzPPM`, `minFWHM`, `maxFWHM` (see `?findFeatures`)
-[XCMS]         | `min_peakwidth`, `mzdiff`, `prefilter`, `noise` (assuming default `centWave` algorithm, see `?findPeaks.centWave`)
-[enviPick]     | `dmzgap`, `dmzdens`, `drtgap`, `drtsmall`, `drtdens`, `drtfill`, `drttotal`, `minpeak`, `minint`, `maxint` (see `?enviPickwrap`)
-DataAnalysis   | See _Find_ -> _Parameters..._ -> _Molecular Features_ in DataAnalysis.
+Algorithm        | Common parameters
+---------------- | ---------------------------------------------------------------------------------
+[OpenMS]         | `noiseThrInt`, `chromSNR`, `chromFWHM`, `mzPPM`, `minFWHM`, `maxFWHM` (see `?findFeatures`)
+[XCMS] / [XCMS3] | `peakwidth`, `mzdiff`, `prefilter`, `noise` (assuming default `centWave` algorithm, see `?findPeaks.centWave` / `?CentWaveParam`)
+[enviPick]       | `dmzgap`, `dmzdens`, `drtgap`, `drtsmall`, `drtdens`, `drtfill`, `drttotal`, `minpeak`, `minint`, `maxint` (see `?enviPickwrap`)
+DataAnalysis     | See _Find_ -> _Parameters..._ -> _Molecular Features_ in DataAnalysis.
 
 > **_NOTE_** DataAnalysis feature settings have to be configured in DataAnalysis prior to calling `findFeatures()`.
 
 Similarly, for grouping features across analyses several algorithms are supported.
 
-Algorithm | Usage | Remarks
---------- | ----------------- | -------------------------------------
-[OpenMS] | `groupFeatures(algorithm = "openms", ...)` | Uses the [FeatureLinkerUnlabeled] algorithm (and [MapAlignerPoseClustering] for retention alignment)
-[XCMS] | `groupFeatures(algorithm = "xcms", ...)` | Uses `xcms::group()` function
-ProfileAnalysis | `importFeatureGroups(algorithm = "brukerpa", ...)` | Import `.csv` file exported from Bruker ProfileAnalysis
-TASQ | `importFeatureGroups(algorithm = "brukertasq", ...)` | Imports a _Global result table_ (exported to Excel file and then saved as `.csv` file)
+Algorithm        | Usage                                                    | Remarks
+---------------- | -------------------------------------------------------- | -------------------------------------
+[OpenMS]         | `groupFeatures(algorithm = "openms", ...)`               | Uses the [FeatureLinkerUnlabeled] algorithm (and [MapAlignerPoseClustering] for retention alignment)
+[XCMS]           | `groupFeatures(algorithm = "xcms", ...)`                 | Uses `xcms::group()` `xcms::retcor()` functions
+[XCMS] (import)  | `importFeatureGroupsXCMS(...)`                           | Imports an existing `xcmsSet` object.
+[XCMS3]          | `groupFeatures(algorithm = "xcms3", ...)`                | Uses `xcms::groupChromPeaks()` and `xcms::adjustRtime()` functions
+[XCMS3] (import) | `importFeatureGroupsXCMS3(...)`                          | Imports an existing `XCMSnExp` object.
+ProfileAnalysis  | `importFeatureGroups(algorithm = "brukerpa", ...)`       | Import `.csv` file exported from Bruker ProfileAnalysis
+TASQ             | `importFeatureGroups(algorithm = "brukertasq", ...)`     | Imports a _Global result table_ (exported to Excel file and then saved as `.csv` file)
 
 Just like finding features, each algorithm has their own set of parameters. Often the defaults are a good start but it is recommended to have look at them. See `?groupFeatures` for more details.
+
+When using the [XCMS] algorithms both the 'classical' interface and latest `XCMS3` interfaces are supported. Currently, both interfaces are mostly the same regarding functionalities and implementation. However, since future developments of XCMS are primarily focused the latter this interface is recommended.
 
 Some examples of finding and grouping features are shown below.
 
@@ -162,15 +169,19 @@ Some examples of finding and grouping features are shown below.
 # Finding features
 fListOMS <- findFeatures(anaInfo, "openms") # OpenMS, with default settings
 fListOMS2 <- findFeatures(anaInfo, "openms", noiseThrInt = 500, chromSNR = 10) # OpenMS, adjusted minimum intensity and S/N
-fListXCMS <- findFeatures(anaInfo, "xcms", min_peakwidth = 10) # XCMS
-fListXCMS2 <- importFeatures(anaInfo, "xcms", xset) # import XCMS xcmsSet object
+fListXCMS <- findFeatures(anaInfo, "xcms", ppm = 10) # XCMS
+fListXCMSImp <- importFeatures(anaInfo, "xcms", xset) # import XCMS xcmsSet object
+fListXCMS3 <- findFeatures(anaInfo, "xcms3", CentWaveParam(peakwidth = c(5, 15))) # XCMS3
 fListEP <- findFeatures(anaInfo, "envipick", minint = 1E3) # enviPick
 
 # Grouping features
 fGroupsOMS <- groupFeatures(fListOMS, "openms") # OpenMS grouping, default settings
 fGroupsOMS2 <- groupFeatures(fListOMS2, "openms", rtalign = FALSE) # OpenMS grouping, no RT alignment
 fGroupsOMS3 <- groupFeatures(fListXCMS, "openms", maxGroupRT = 6) # group XCMS features with OpenMS, adjusted grouping parameter
-fGroupsXCMS <- groupFeatures(fListEP, "xcms", minfrac = 0) # group enviPick features with XCMS, disable minfrac
+# group enviPick features with XCMS3, disable minFraction
+fGroupsXCMS <- groupFeatures(fListEP, "xcms3",
+                             xcms::PeakDensityParam(sampleGroups = analInfo$group,
+                                                    minFraction = 0))
 ```
 
 ### Suspect screening

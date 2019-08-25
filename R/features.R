@@ -271,11 +271,11 @@ findFeatures <- function(analysisInfo, algorithm, ..., verbose = TRUE)
 #'
 #' @rdname feature-finding
 #' @export
-importFeatures <- function(analysisInfo, type, ...)
+importFeatures <- function(analysisInfo, algorithm, ...)
 {
     analysisInfo <- assertAndPrepareAnaInfo(analysisInfo)
 
-    f <- switch(type,
+    f <- switch(algorithm,
                 xcms = importFeaturesXCMS,
                 xcms3 = importFeaturesXCMS3,
                 envimass = importFeaturesEnviMass,

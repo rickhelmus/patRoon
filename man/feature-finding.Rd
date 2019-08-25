@@ -18,7 +18,7 @@
 \usage{
 findFeatures(analysisInfo, algorithm, ..., verbose = TRUE)
 
-importFeatures(analysisInfo, type, ...)
+importFeatures(analysisInfo, algorithm, ...)
 
 findFeaturesBruker(analysisInfo, doFMF = "auto", startRange = 0,
   endRange = 0, save = TRUE, close = save, verbose = TRUE)

@@ -233,7 +233,7 @@ NULL
 #' Compared to IPO, the following functionality was added or changed:
 #' \itemize{
 #'   \item The code was made more generic in order to include support for other
-#' feature finding/grouping algorithms (\emph{e.g.} OpenMS, enviPick).
+#' feature finding/grouping algorithms (\emph{e.g.} OpenMS, enviPick, XCMS3).
 #'   \item The methodology of \command{FeatureFinderMetabo} (OpenMS) may be used
 #'   to find isotopes.
 #'   \item The
@@ -247,7 +247,8 @@ NULL
 #' finding/grouping.
 #'   \item More consistent output using S4 classes (\emph{i.e.}
 #' \code{\link{optimizationResult}} class).
-#'   \item Experiments are not (yet) executed in parallel.
+#'   \item Experiments are not (yet) executed in parallel (although feature
+#'   finding or grouping may be if the algorithm supports it).
 #' }
 #'
 #'
@@ -303,6 +304,26 @@ NULL
 #'
 #'   Using multiple parameter sets with differing fixed values allows
 #'   optimization of qualitative values (see examples below).
+#'   
+#'   The parameters specified in parameter sets are directly passed through
+#'   the \code{\link{findFeatures}} or \code{\link{groupFeatures}} functions.
+#'   Hence, grouping and retention time alignment parameters used by XCMS should
+#'   (still) be set through the \code{groupArgs} and \code{retcorArgs}
+#'   parameters.
+#'   
+#'   \strong{NOTE:} For XCMS3, which normally uses parameter classes for
+#'   settings its options, the parameters must be defined in a named list like
+#'   any other algorithm. The set parameters are then used to automatically
+#'   constructor of the right parameter class object (e.g.
+#'   \code{\link{CentWaveParam}}, \code{\link{ObiwarpParam}}). For
+#'   grouping/alignment sets, these parameters need to be specified in nested
+#'   lists called \code{groupParams} and \code{retAlignParams}, respectively
+#'   (similar to \code{groupArgs}/\code{retcorArgs} for
+#'   \code{algorithm="xcms"}). Finally, the underlying XCMS method to be used
+#'   should be defined in the parameter set (\emph{i.e.} by setting the
+#'   \code{method} field for feature parameter sets and the \code{groupMethod}
+#'   and \code{retAlignMethod} for grouping/aligning parameter sets). See the
+#'   examples below for more details.
 #'
 #'   \strong{NOTE:} Similar to IPO, the \code{peakwidth} and \code{prefilter}
 #'   parameters for XCMS feature finding should be split in two different
@@ -349,12 +370,6 @@ NULL
 #'   \samp{0} means that experimental values will always be favored when leading
 #'   to improved responses, whereas \code{1} will effectively disable this
 #'   procedure (and return to 'regular' IPO behaviour).
-#'
-#' @note The parameters specified in parameter sets are directly passed through
-#'   the \code{\link{findFeatures}} or \code{\link{groupFeatures}} functions.
-#'   Hence, grouping and retention time alignment parameters used by XCMS should
-#'   (still) be set through the \code{groupArgs} and \code{retcorArgs}
-#'   parameters.
 #'
 #' @return The \code{optimizeFeatureFinding} and \code{optimizeFeatureGrouping}
 #'   return their results in a \code{\link{optimizationResult}} object.

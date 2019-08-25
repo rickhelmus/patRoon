@@ -172,7 +172,7 @@ test_that("replicate group subtraction", {
 fGCompOpenMS <- comparison(openms = fgOpenMS, xcms = fgXCMS, groupAlgo = "openms")
 fGCons <- consensus(fGCompOpenMS)
 fGCompXCMS <- comparison(openms = fgOpenMS, xcms = fgXCMS, groupAlgo = "xcms")
-fGCompXCMS3 <- comparison(openms = fgOpenMS, xcms = fgXCMS, groupAlgo = "xcms3")
+# fGCompXCMS3 <- comparison(openms = fgOpenMS, xcms = fgXCMS, groupAlgo = "xcms3")
 fgCompOneEmpty <- comparison(openms = fgOpenMS, xcms = fgXCMSEmpty, groupAlgo = "openms")
 fGConsOneEmpty <- consensus(fgCompOneEmpty)
 fgCompBothEmpty <- comparison(openms = fgOpenMSEmpty, xcms = fgXCMSEmpty, groupAlgo = "openms")
@@ -184,7 +184,7 @@ test_that("verify feature group comparison", {
 
     expect_named(fGCompOpenMS, c("openms", "xcms"))
     expect_named(fGCompXCMS, c("openms", "xcms"))
-    expect_named(fGCompXCMS3, c("openms", "xcms"))
+    # expect_named(fGCompXCMS3, c("openms", "xcms"))
     expect_named(fGCompOpenMS[1], "openms")
     expect_named(fGCompOpenMS[2], "xcms")
 

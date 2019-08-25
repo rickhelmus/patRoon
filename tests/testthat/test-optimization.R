@@ -10,14 +10,17 @@ epAnaInfo <- makeMZXMLs(anaInfoOne)
 file.copy(patRoon:::getMzMLAnalysisPath(anaInfoOne$analysis[1], anaInfoOne$path[1]), epAnaInfo$path[1])
 
 ffOptOpenMS <- optimizeFeatureFinding(anaInfo, "openms", list(chromFWHM = c(5, 10), mzPPM = c(5, 15)))
-ffOptXCMS <- optimizeFeatureFinding(anaInfo, "xcms", list(mzdiff = c(0.002, 0.006)))
+# disable 'old' xcms for now to save testing time (both interfaces are fairly similar anyway)
+# ffOptXCMS <- optimizeFeatureFinding(anaInfo, "xcms", list(mzdiff = c(0.002, 0.006)))
+ffOptXCMS3 <- optimizeFeatureFinding(anaInfo, "xcms3", list(mzdiff = c(0.002, 0.006)))
 ffOptEnviPick <- optimizeFeatureFinding(epAnaInfo, "envipick", list(drtsmall = c(10, 30)))
 
 suppressWarnings(ffOptEmpty <- optimizeFeatureFinding(anaInfo, "openms", list(chromFWHM = c(5, 10), noiseThrInt = 1E9)))
 
 fgOptOpenMS <- optimizeFeatureGrouping(optimizedObject(ffOptOpenMS), "openms", list(maxGroupMZ = c(0.002, 0.007)))
-fgOptXCMS <- optimizeFeatureGrouping(optimizedObject(ffOptXCMS), "xcms", list(groupArgs = list(bw = c(22, 28)),
-                                                                              retcorArgs = list(method = "obiwarp")))
+# fgOptXCMS <- optimizeFeatureGrouping(optimizedObject(ffOptXCMS), "xcms", list(groupArgs = list(bw = c(22, 28)),
+#                                                                               retcorArgs = list(method = "obiwarp")))
+fgOptXCMS3 <- optimizeFeatureGrouping(optimizedObject(ffOptXCMS3), "xcms3", list(groupParams = list(bw = c(22, 28))))
 
 # don't want to compare resulting object as it may be irreproducible due to file paths etc
 expInfoNoObject <- function(...)
@@ -31,9 +34,12 @@ test_that("verify feature optimization output", {
     expect_known_value(expInfoNoObject(ffOptOpenMS, 1, 1), testFile("ff-opt-oms"))
     expect_known_show(ffOptOpenMS, testFile("ff-opt-oms-show", text = TRUE))
 
-    expect_known_value(expInfoNoObject(ffOptXCMS, 1, 1), testFile("ff-opt-xcms"))
-    expect_known_show(ffOptXCMS, testFile("ff-opt-xcms-show", text = TRUE))
+    # expect_known_value(expInfoNoObject(ffOptXCMS, 1, 1), testFile("ff-opt-xcms"))
+    # expect_known_show(ffOptXCMS, testFile("ff-opt-xcms-show", text = TRUE))
 
+    expect_known_value(expInfoNoObject(ffOptXCMS3, 1, 1), testFile("ff-opt-xcms3"))
+    expect_known_show(ffOptXCMS3, testFile("ff-opt-xcms3-show", text = TRUE))
+    
     expect_known_value(expInfoNoObject(ffOptEnviPick, 1, 1), testFile("ff-opt-ep"))
     expect_known_show(ffOptEnviPick, testFile("ff-opt-ep-show", text = TRUE))
 
@@ -44,13 +50,19 @@ test_that("verify feature group optimization output", {
     expect_known_value(expInfoNoObject(fgOptOpenMS, 1, 1), testFile("fg-opt-oms"))
     expect_known_show(fgOptOpenMS, testFile("fg-opt-oms-show", text = TRUE))
 
-    expect_known_value(expInfoNoObject(fgOptXCMS, 1, 1), testFile("fg-opt-xcms"))
-    expect_known_show(fgOptXCMS, testFile("fg-opt-xcms-show", text = TRUE))
+    # expect_known_value(expInfoNoObject(fgOptXCMS, 1, 1), testFile("fg-opt-xcms"))
+    # expect_known_show(fgOptXCMS, testFile("fg-opt-xcms-show", text = TRUE))
+    
+    expect_known_value(expInfoNoObject(fgOptXCMS3, 1, 1), testFile("fg-opt-xcms3"))
+    expect_known_show(fgOptXCMS3, testFile("fg-opt-xcms3-show", text = TRUE))
 })
 
 test_that("default param generators", {
     checkmate::expect_list(generateFeatureOptPSet("xcms"), min.len = 1, names = "unique")
     checkmate::expect_list(generateFeatureOptPSet("xcms", method = "matchedFilter"),
+                           min.len = 1, names = "unique")
+    checkmate::expect_list(generateFeatureOptPSet("xcms3"), min.len = 1, names = "unique")
+    checkmate::expect_list(generateFeatureOptPSet("xcms3", method = "matchedFilter"),
                            min.len = 1, names = "unique")
     checkmate::expect_list(generateFeatureOptPSet("openms"), min.len = 1, names = "unique")
     checkmate::expect_list(generateFeatureOptPSet("envipick"), min.len = 1, names = "unique")
@@ -59,14 +71,21 @@ test_that("default param generators", {
     checkmate::expect_list(generateFGroupsOptPSet("xcms", groupArgs = list(method = "nearest"),
                                                   retcorArgs = list(method = "loess")),
                            min.len = 1, names = "unique")
+    checkmate::expect_list(generateFGroupsOptPSet("xcms3"), min.len = 1, names = "unique")
+    checkmate::expect_list(generateFGroupsOptPSet("xcms3", groupMethod = "nearest",
+                                                  retAlignMethod = "peakgroups"),
+                           min.len = 1, names = "unique")
     checkmate::expect_list(generateFGroupsOptPSet("openms"), min.len = 1, names = "unique")
 
     checkmate::expect_list(getDefFeaturesOptParamRanges("xcms"), min.len = 1, names = "unique")
     checkmate::expect_list(getDefFeaturesOptParamRanges("xcms", "matchedFilter"), min.len = 1, names = "unique")
+    checkmate::expect_list(getDefFeaturesOptParamRanges("xcms3"), min.len = 1, names = "unique")
+    checkmate::expect_list(getDefFeaturesOptParamRanges("xcms3", "matchedFilter"), min.len = 1, names = "unique")
     checkmate::expect_list(getDefFeaturesOptParamRanges("openms"), min.len = 1, names = "unique")
     checkmate::expect_list(getDefFeaturesOptParamRanges("envipick"))
 
     checkmate::expect_list(getDefFGroupsOptParamRanges("xcms"), min.len = 1, names = "unique")
+    checkmate::expect_list(getDefFGroupsOptParamRanges("xcms3"), min.len = 1, names = "unique")
     checkmate::expect_list(getDefFGroupsOptParamRanges("openms"), min.len = 1, names = "unique")
 })
 
@@ -106,7 +125,7 @@ if (verifyWithIPO)
 
     # only optimize one param
     IPOParamsFeat <- sapply(IPOParamsFeat, function(p) if (is.numeric(p) && length(p) == 2) mean(p) else p,
-                        simplify = FALSE)
+                            simplify = FALSE)
     IPOParamsFeat$min_peakwidth <- c(4, 12)
     IPOResultFeat <- IPO::optimizeXcmsSet(paste0(file.path(anaInfo$path, anaInfo$analysis), ".mzML"),
                                           IPOParamsFeat, nSlaves = 1, plot = FALSE)

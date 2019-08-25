@@ -57,11 +57,28 @@ pSet <- generateFeatureOptPSet("openms", chromSNR = c(5, 10)) # add parameter
 pSet <- list(noiseThrInt = c(1000, 5000))
 ```
 
+When optimizing with [XCMS] a few things have to be considered. First of all, when using the XCMS3 interface (i.e. `algorithm="xcms3"`) the underlying method that should be used for finding and grouping features and retention alignment should be set. In case these are not set default methods will be used.
+
+```{r fOptPSetXCMS1,eval=FALSE}
+pSet <- list(method = "centWave", ppm = c(2, 8))
+pSet <- list(ppm = c(2, 8)) # same: centWave is default
+
+# get defaults, but for different grouping/alignment methods
+pSetFG <- generateFGroupsOptPSet("xcms3", groupMethod = "nearest", retAlignMethod = "peakgroups")
+```
+
+In addition, when optimizing feature grouping (both XCMS interfaces) we need to set the grouping and retention alignment parameters in two different nested lists: these are `groupArgs`/`retcorArgs` (`algorithm="xcms"`) and `groupParams`/`retAlignParams` (`algorithm="xcms3"`). 
+
+```{r fOptPSetXCMS2,eval=FALSE}
+pSetFG <- list(groupParams = list(bw = c(20, 30))) # xcms3
+pSetFG <- list(retcorArgs = list(gapInit = c(0, 7))) # xcms
+```
+
 When a parameter set has been defined it should be used as input for the `optimizeFeatureFinding()` or `optimizeFeatureGrouping()` functions.
 
 ```{r fDoOpt,eval=FALSE}
 ftOpt <- optimizeFeatureFinding(anaInfo, "openms", pSet)
-fgOpt <- optimizeFeatureGrouping(fList, "openms", pSet) # fList is an existing features object
+fgOpt <- optimizeFeatureGrouping(fList, "openms", pSetFG) # fList is an existing features object
 ```
 
 Similar to `findFeatures()`, the first argument to `optimizeFeatureFinding()` should be the [analysis information](#anaInfo). Note that it is not uncommon to perform the optimization with only a subset of (representative) analyses (i.e. to reduce processing time).
@@ -134,9 +151,7 @@ Please refer to the reference manual for more methods to inspect optimization re
 
 The feature group data obtained during the workflow can be exported to various formats with the `export()` generic function. There are currently three formats supported: `"brukerpa"` (Bruker ProfileAnalysis), `"brukertasq"` (Bruker TASQ) and `"mzmine"` (mzMine). The former exports a 'bucket table' which can be loaded in ProfileAnalysis, the second and third export a target list that can be processed with TASQ and mzMine, respectively.
 
-<!-- UNDONE: update when XCMS3 support is available -->
-
-The `getXCMSSet()` function converts a `features` or `featureGroups` object to an `xcmsSet` object which can be used for further processing with [xcms] (the new XCMS3 interface is not yet supported).
+The `getXCMSSet()` function converts a `features` or `featureGroups` object to an `xcmsSet` object which can be used for further processing with [xcms]. Similarly, the `getXCMSnExp()` function can be used for conversion to an XCMS3 style `XCMSnExp` object. 
 
 Some examples for these functions are shown below.
 
@@ -148,6 +163,11 @@ export(fGroups, "brukertasq", out = "my_targets.csv")
 # loaded by XCMS (e.g. when obtained with DataAnalysis)
 xset <- getXCMSSet(fList, exportedData = TRUE)
 xsetg <- getXCMSSet(fGroups, exportedData = TRUE) # get grouped xcmsSet
+
+# using the new XCMS3 interface
+# NOTE: for XCMS3 data currently always has to be exported
+xdata <- getXCMSnExp(fList)
+xdata <- getXCMSnExp(fGroups)
 ```
 
 ## Algorithm consensus {#consensus}

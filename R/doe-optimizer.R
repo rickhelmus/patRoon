@@ -147,10 +147,11 @@ DoEOptimizer$methods(
             }
 
             runParams <- runParamsNoCall <- utilsIPO$decodeAll(vals, params$to_optimize)
+            runParams <- combineParams(runParams, params$no_optimization)
 
             # re-run as object wasn't stored
             runParams <- convertOptToCallParams(runParams)
-            result$finalResult <- calculateResponse(combineParams(runParams, params$no_optimization), 1, TRUE)
+            result$finalResult <- calculateResponse(runParams, 1, TRUE)
             result$finalResult$parameters <- runParams
             result$finalResult$score <- getFinalScore(result$response[, -"score"], result$finalResult$response)
 

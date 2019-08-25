@@ -14,6 +14,8 @@
 - handbook
     - semi-quant advanced section
     - NT components graph plotting
+    - xcms3
+- fix devtools::check_man() issues
 
 
 ## features
@@ -22,12 +24,15 @@
         - mention parameters default unless specified
     - keep retcor_done?
     - get rid of getXCMSSet() calls?
+    - XCMS opt: loess --> peakgroups, consistent method specification for default optim args between feature groups/features
 - tests to verify getXCMSSet
 - suspect screening
     - rename patRoonData::targets
 - filter()
     - document which filters work on feature level (e.g. chromWidth)
     - remove zero values for maxReplicateIntRSD?
+- importFeaturesXCMS/importFeaturesXCMS3/importFeatureGroupsXCMS: get rid of anaInfo arg requirement? (or make import func?)
+- comparison(): support xcms3? (needs missing support for missing raw data)
 
 
 ## MSPeakLists

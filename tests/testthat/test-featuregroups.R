@@ -3,6 +3,7 @@ context("feature groups")
 fList <- findFeatures(getTestAnaInfo(), "openms", logPath = NULL)
 fgOpenMS <- groupFeatures(fList, "openms")
 fgXCMS <- groupFeatures(fList, "xcms")
+fgXCMS3 <- groupFeatures(fList, "xcms3")
 
 # fList with dummy concs
 anaInfoConc <- cbind(getTestAnaInfo(), list(conc = c(NA, NA, NA, 1, 2, 3)))
@@ -14,20 +15,24 @@ fgOpenMSConc <- groupFeatures(fListConc, "openms")
 fListEmpty <- findFeatures(getTestAnaInfo(), "openms", noiseThrInt = 1E9, logPath = NULL)
 fgOpenMSEmpty <- groupFeatures(fListEmpty, "openms")
 fgXCMSEmpty <- groupFeatures(fListEmpty, "xcms")
+fgXCMS3Empty <- groupFeatures(fListEmpty, "xcms3")
 
 test_that("verify feature grouping output", {
     expect_known_value(groups(fgOpenMS), testFile("fg-openms"))
     expect_known_value(groups(fgXCMS), testFile("fg-xcms"))
+    expect_known_value(groups(fgXCMS3), testFile("fg-xcms3"))
 })
 
 test_that("verify show output", {
     expect_known_show(fgOpenMS, testFile("fg-show-openms", text = TRUE))
     expect_known_show(fgXCMS, testFile("fg-show-xcms", text = TRUE))
+    expect_known_show(fgXCMS3, testFile("fg-show-xcms3", text = TRUE))
 })
 
 test_that("empty objects work", {
     expect_length(fgOpenMSEmpty, 0)
     expect_length(fgXCMSEmpty, 0)
+    expect_length(fgXCMS3Empty, 0)
 })
 
 test_that("basic subsetting", {
@@ -167,6 +172,7 @@ test_that("replicate group subtraction", {
 fGCompOpenMS <- comparison(openms = fgOpenMS, xcms = fgXCMS, groupAlgo = "openms")
 fGCons <- consensus(fGCompOpenMS)
 fGCompXCMS <- comparison(openms = fgOpenMS, xcms = fgXCMS, groupAlgo = "xcms")
+# fGCompXCMS3 <- comparison(openms = fgOpenMS, xcms = fgXCMS, groupAlgo = "xcms3")
 fgCompOneEmpty <- comparison(openms = fgOpenMS, xcms = fgXCMSEmpty, groupAlgo = "openms")
 fGConsOneEmpty <- consensus(fgCompOneEmpty)
 fgCompBothEmpty <- comparison(openms = fgOpenMSEmpty, xcms = fgXCMSEmpty, groupAlgo = "openms")
@@ -178,6 +184,7 @@ test_that("verify feature group comparison", {
 
     expect_named(fGCompOpenMS, c("openms", "xcms"))
     expect_named(fGCompXCMS, c("openms", "xcms"))
+    # expect_named(fGCompXCMS3, c("openms", "xcms"))
     expect_named(fGCompOpenMS[1], "openms")
     expect_named(fGCompOpenMS[2], "xcms")
 

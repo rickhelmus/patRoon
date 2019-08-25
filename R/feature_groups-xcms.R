@@ -36,7 +36,7 @@ groupFeaturesXCMS <- function(feat, rtalign = TRUE, exportedData = TRUE, groupAr
 
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(feat, "features", add = ac)
-    aapply(checkmate::assertFlag, . ~ rtalign + exportedData, fixed = list(add = ac))
+    aapply(checkmate::assertFlag, . ~ rtalign + exportedData + verbose, fixed = list(add = ac))
     aapply(checkmate::assertList, . ~ groupArgs + retcorArgs, any.missing = FALSE, names = "unique", fixed = list(add = ac))
     checkmate::reportAssertions(ac)
 
@@ -87,15 +87,15 @@ groupFeaturesXCMS <- function(feat, rtalign = TRUE, exportedData = TRUE, groupAr
 getFeatIndicesFromXS <- function(xs)
 {
     plist <- as.data.table(peaks(xs))
-    plist[, subind := seq_len(.N), by="sample"]
+    plist[, subind := seq_len(.N), by = "sample"]
 
     xsftidx <- groupval(xs)
     ret <- as.data.table(t(xsftidx))
 
     for (grp in seq_along(ret))
     {
-        idx <- plist[ret[, grp, with=F][[1]], subind]
-        set(ret, j=grp, value=idx)
+        idx <- plist[ret[, grp, with = FALSE][[1]], subind]
+        set(ret, j = grp, value = idx)
     }
 
     ret[is.na(ret)] <- 0

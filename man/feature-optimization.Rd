@@ -94,7 +94,7 @@ principle algorithm workings are nearly identical.
 Compared to IPO, the following functionality was added or changed:
 \itemize{
   \item The code was made more generic in order to include support for other
-feature finding/grouping algorithms (\emph{e.g.} OpenMS, enviPick).
+feature finding/grouping algorithms (\emph{e.g.} OpenMS, enviPick, XCMS3).
   \item The methodology of \command{FeatureFinderMetabo} (OpenMS) may be used
   to find isotopes.
   \item The
@@ -108,15 +108,9 @@ easily (see \verb{examples}).
 finding/grouping.
   \item More consistent output using S4 classes (\emph{i.e.}
 \code{\link{optimizationResult}} class).
-  \item Experiments are not (yet) executed in parallel.
+  \item Experiments are not (yet) executed in parallel (although feature
+  finding or grouping may be if the algorithm supports it).
 }
-}
-\note{
-The parameters specified in parameter sets are directly passed through
-  the \code{\link{findFeatures}} or \code{\link{groupFeatures}} functions.
-  Hence, grouping and retention time alignment parameters used by XCMS should
-  (still) be set through the \code{groupArgs} and \code{retcorArgs}
-  parameters.
 }
 \section{Parameter sets}{
  Which parameters should be optimized is determined
@@ -150,6 +144,26 @@ The parameters specified in parameter sets are directly passed through
 
   Using multiple parameter sets with differing fixed values allows
   optimization of qualitative values (see examples below).
+  
+  The parameters specified in parameter sets are directly passed through
+  the \code{\link{findFeatures}} or \code{\link{groupFeatures}} functions.
+  Hence, grouping and retention time alignment parameters used by XCMS should
+  (still) be set through the \code{groupArgs} and \code{retcorArgs}
+  parameters.
+  
+  \strong{NOTE:} For XCMS3, which normally uses parameter classes for
+  settings its options, the parameters must be defined in a named list like
+  any other algorithm. The set parameters are then used to automatically
+  constructor of the right parameter class object (e.g.
+  \code{\link{CentWaveParam}}, \code{\link{ObiwarpParam}}). For
+  grouping/alignment sets, these parameters need to be specified in nested
+  lists called \code{groupParams} and \code{retAlignParams}, respectively
+  (similar to \code{groupArgs}/\code{retcorArgs} for
+  \code{algorithm="xcms"}). Finally, the underlying XCMS method to be used
+  should be defined in the parameter set (\emph{i.e.} by setting the
+  \code{method} field for feature parameter sets and the \code{groupMethod}
+  and \code{retAlignMethod} for grouping/aligning parameter sets). See the
+  examples below for more details.
 
   \strong{NOTE:} Similar to IPO, the \code{peakwidth} and \code{prefilter}
   parameters for XCMS feature finding should be split in two different
@@ -226,6 +240,12 @@ ftOpt2 <- optimizeFeatureFinding(anaInfo, "openms",
 fgOpt <- optimizeFeatureGrouping(optimizedObject(ftOpt), "xcms",
                                  list(groupArgs = list(bw = c(22, 28)),
                                       retcorArgs = list(method = "obiwarp")))
+
+# same, but using the XCMS3 interface
+fgOpt2 <- optimizeFeatureGrouping(optimizedObject(ftOpt), "xcms3",
+                                  list(groupMethod = "density", groupParams = list(bw = c(22, 28)),
+                                       retAlignMethod = "obiwarp"))
+
 
 # plot contour of first parameter set/DoE iteration
 plot(ftOpt, paramSet = 1, DoEIteration = 1, type = "contour")

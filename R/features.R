@@ -241,7 +241,7 @@ setMethod("screenSuspects", "features", function(obj, suspects, rtWindow, mzWind
 #' @templateVar what find features
 #' @templateVar ex1 findFeaturesOpenMS
 #' @templateVar ex2 findFeaturesBruker
-#' @templateVar algos bruker,openms,xcms,envipick
+#' @templateVar algos bruker,openms,xcms,xcms3,envipick
 #' @template generic-algo
 #'
 #' @rdname feature-finding
@@ -255,6 +255,7 @@ findFeatures <- function(analysisInfo, algorithm, ..., verbose = TRUE)
                 bruker = findFeaturesBruker,
                 openms = findFeaturesOpenMS,
                 xcms = findFeaturesXCMS,
+                xcms3 = findFeaturesXCMS3,
                 envipick = findFeaturesEnviPick,
                 stop("Invalid algorithm! Should be: bruker, openms, xcms or envipick"))
 
@@ -265,17 +266,18 @@ findFeatures <- function(analysisInfo, algorithm, ..., verbose = TRUE)
 #' @templateVar what import features
 #' @templateVar ex1 importFeaturesXCMS
 #' @templateVar ex2 importFeaturesEnviMass
-#' @templateVar algos xcms,envimass
+#' @templateVar algos xcms,xcms3,envimass
 #' @template generic-algo
 #'
 #' @rdname feature-finding
 #' @export
-importFeatures <- function(analysisInfo, type, ...)
+importFeatures <- function(analysisInfo, algorithm, ...)
 {
     analysisInfo <- assertAndPrepareAnaInfo(analysisInfo)
 
-    f <- switch(type,
+    f <- switch(algorithm,
                 xcms = importFeaturesXCMS,
+                xcms3 = importFeaturesXCMS3,
                 envimass = importFeaturesEnviMass,
                 stop("Invalid algorithm! Should be: xcms or envimass"))
 

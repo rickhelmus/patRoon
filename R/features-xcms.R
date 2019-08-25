@@ -38,9 +38,6 @@ setMethod("filter", "featuresXCMS", function(obj, ...)
 #' @details \code{findFeaturesXCMS} uses the \code{\link[xcms]{xcmsSet}}
 #'   function from the \pkg{xcms} package to find features.
 #'
-#' @note The file format of analyses for \code{findFeaturesXCMS} must be
-#'   \code{mzML} or \code{mzXML}.
-#'
 #' @param method The method setting used by XCMS peak finding, see
 #'   \code{\link[xcms:findPeaks-methods]{xcms::findPeaks}}
 #'
@@ -55,6 +52,7 @@ findFeaturesXCMS <- function(analysisInfo, method = "centWave", ..., verbose = T
     ac <- checkmate::makeAssertCollection()
     analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, c("mzXML", "mzML"), add = ac)
     checkmate::assertString(method, min.chars = 1, add = ac)
+    checkmate::assertFlag(verbose, add = ac)
     checkmate::reportAssertions(ac)
 
     files <- sapply(seq_len(nrow(analysisInfo)),
@@ -102,18 +100,7 @@ importFeaturesXCMS <- function(xs, analysisInfo)
     analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, c("mzXML", "mzML"), add = ac)
     checkmate::reportAssertions(ac)
 
-    plist <- as.data.table(peaks(xs))
-    snames <- sampnames(xs)
-    feat <- list()
-
-    feat <- lapply(seq_along(snames), function(sind)
-    {
-        ret <- plist[sample == sind]
-        ret[, ID := seq_len(nrow(ret))]
-        setnames(ret, c("rt", "rtmin", "rtmax", "maxo", "into"), c("ret", "retmin", "retmax", "intensity", "area"))
-        return(ret[, c("mz", "mzmin", "mzmax", "ret", "retmin", "retmax", "intensity", "area", "ID")])
-    })
-    names(feat) <- snames
+    feat <- importXCMSPeaks(xcms::peaks(xs), analysisInfo)
 
     return(featuresXCMS(xs = xs, features = feat, analysisInfo = analysisInfo))
 }

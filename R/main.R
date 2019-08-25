@@ -5,6 +5,7 @@
 #' @importFrom stats cutree dist hclust heatmap lm median rect.hclust sd setNames
 #' @importFrom xcms phenoData phenoData<- filepaths filepaths<- xcmsRaw peaks peaks<- profinfo profinfo<- groupidx xcmsSet group retcor groupval groupnames rawEIC sampnames groupidx<-
 #' @importFrom Rdpack reprompt
+#' @importClassesFrom xcms XProcessHistory
 #' @importClassesFrom CAMERA xsAnnotate
 #' @import data.table
 #' @import shiny
@@ -16,6 +17,9 @@ NULL # need this for doc generation
 #' @importFrom checkmate makeAssertion vname
 #' @importFrom withr defer
 NULL
+
+# workaround to make sure XCMS3 can find these functions (UNDONE: report this!)
+#' @importFrom MSnbase selectFeatureData centroided
 
 # UNDONE: rstudioapi optional?
 
@@ -172,6 +176,9 @@ NULL
 #'   algorithms (\code{findFeatures} and \code{importFeatures}).
 #' @param verbose If set to \code{FALSE} then no text output is shown.
 #'
+#' @note The file format of analyses for \code{findFeaturesXCMS} and
+#'   \code{findFeaturesXCMS3} must be \code{mzML} or \code{mzXML}.
+#'
 #' @name feature-finding
 #' @return An object of a class which is derived from \code{\link{features}}.
 #' @seealso \code{\link{features-class}} and \code{\link{analysis-information}}
@@ -226,7 +233,7 @@ NULL
 #' Compared to IPO, the following functionality was added or changed:
 #' \itemize{
 #'   \item The code was made more generic in order to include support for other
-#' feature finding/grouping algorithms (\emph{e.g.} OpenMS, enviPick).
+#' feature finding/grouping algorithms (\emph{e.g.} OpenMS, enviPick, XCMS3).
 #'   \item The methodology of \command{FeatureFinderMetabo} (OpenMS) may be used
 #'   to find isotopes.
 #'   \item The
@@ -240,7 +247,8 @@ NULL
 #' finding/grouping.
 #'   \item More consistent output using S4 classes (\emph{i.e.}
 #' \code{\link{optimizationResult}} class).
-#'   \item Experiments are not (yet) executed in parallel.
+#'   \item Experiments are not (yet) executed in parallel (although feature
+#'   finding or grouping may be if the algorithm supports it).
 #' }
 #'
 #'
@@ -296,6 +304,26 @@ NULL
 #'
 #'   Using multiple parameter sets with differing fixed values allows
 #'   optimization of qualitative values (see examples below).
+#'   
+#'   The parameters specified in parameter sets are directly passed through
+#'   the \code{\link{findFeatures}} or \code{\link{groupFeatures}} functions.
+#'   Hence, grouping and retention time alignment parameters used by XCMS should
+#'   (still) be set through the \code{groupArgs} and \code{retcorArgs}
+#'   parameters.
+#'   
+#'   \strong{NOTE:} For XCMS3, which normally uses parameter classes for
+#'   settings its options, the parameters must be defined in a named list like
+#'   any other algorithm. The set parameters are then used to automatically
+#'   constructor of the right parameter class object (e.g.
+#'   \code{\link{CentWaveParam}}, \code{\link{ObiwarpParam}}). For
+#'   grouping/alignment sets, these parameters need to be specified in nested
+#'   lists called \code{groupParams} and \code{retAlignParams}, respectively
+#'   (similar to \code{groupArgs}/\code{retcorArgs} for
+#'   \code{algorithm="xcms"}). Finally, the underlying XCMS method to be used
+#'   should be defined in the parameter set (\emph{i.e.} by setting the
+#'   \code{method} field for feature parameter sets and the \code{groupMethod}
+#'   and \code{retAlignMethod} for grouping/aligning parameter sets). See the
+#'   examples below for more details.
 #'
 #'   \strong{NOTE:} Similar to IPO, the \code{peakwidth} and \code{prefilter}
 #'   parameters for XCMS feature finding should be split in two different
@@ -342,12 +370,6 @@ NULL
 #'   \samp{0} means that experimental values will always be favored when leading
 #'   to improved responses, whereas \code{1} will effectively disable this
 #'   procedure (and return to 'regular' IPO behaviour).
-#'
-#' @note The parameters specified in parameter sets are directly passed through
-#'   the \code{\link{findFeatures}} or \code{\link{groupFeatures}} functions.
-#'   Hence, grouping and retention time alignment parameters used by XCMS should
-#'   (still) be set through the \code{groupArgs} and \code{retcorArgs}
-#'   parameters.
 #'
 #' @return The \code{optimizeFeatureFinding} and \code{optimizeFeatureGrouping}
 #'   return their results in a \code{\link{optimizationResult}} object.

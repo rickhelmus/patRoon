@@ -151,7 +151,7 @@ optimizeFeatureFinding <- function(anaInfo, algorithm, ..., templateParams = lis
 
     ac <- checkmate::makeAssertCollection()
     anaInfo <- assertAndPrepareAnaInfo(anaInfo, add = ac)
-    checkmate::assertChoice(algorithm, c("openms", "xcms", "envipick"), add = ac)
+    checkmate::assertChoice(algorithm, c("openms", "xcms", "xcms3", "envipick"), add = ac)
     assertOptimArgs(params, templateParams, paramRanges, maxIterations, maxModelDeviation, ac)
     checkmate::assertChoice(isoIdent, c("IPO", "CAMERA", "OpenMS"), add = ac)
     checkmate::assertChoice(checkPeakShape, c("none", "borderIntensity", "sinusCurve", "normalDistr"), add = ac)
@@ -164,6 +164,7 @@ optimizeFeatureFinding <- function(anaInfo, algorithm, ..., templateParams = lis
     fo <- switch(algorithm,
                  openms = featuresOptimizerOpenMS,
                  xcms = featuresOptimizerXCMS,
+                 xcms3 = featuresOptimizerXCMS3,
                  envipick = featuresOptimizerEnviPick)
 
     fo <- fo$new(anaInfo = anaInfo, algorithm = algorithm, isoIdent = isoIdent,
@@ -180,13 +181,14 @@ optimizeFeatureFinding <- function(anaInfo, algorithm, ..., templateParams = lis
 generateFeatureOptPSet <- function(algorithm, method = "centWave", ...)
 {
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertChoice(algorithm, c("openms", "xcms", "envipick"), add = ac)
+    checkmate::assertChoice(algorithm, c("openms", "xcms", "xcms3", "envipick"), add = ac)
     checkmate::assertString(method, min.chars = 1, add = ac)
     checkmate::reportAssertions(ac)
 
     f <- switch(algorithm,
                 openms = generateFeatureOptPSetOpenMS,
                 xcms = generateFeatureOptPSetXCMS,
+                xcms3 = generateFeatureOptPSetXCMS3,
                 envipick = generateFeatureOptPSetEnviPick)
 
     defs <- f(method)
@@ -197,11 +199,13 @@ generateFeatureOptPSet <- function(algorithm, method = "centWave", ...)
 #' @export
 getDefFeaturesOptParamRanges <- function(algorithm, method = "centWave")
 {
-    checkmate::assertChoice(algorithm, c("openms", "xcms", "envipick"))
+    checkmate::assertChoice(algorithm, c("openms", "xcms", "xcms3", "envipick"))
 
     if (algorithm == "openms")
         return(getDefFeaturesOptParamRangesOpenMS())
     else if (algorithm == "xcms")
         return(getDefFeaturesOptParamRangesXCMS(method))
+    else if (algorithm == "xcms3")
+        return(getDefFeaturesOptParamRangesXCMS3(method))
     return(getDefFeaturesOptParamRangesEnviPick())
 }

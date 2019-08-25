@@ -43,6 +43,7 @@ Imports:
     fst,
     processx,
     tools,
+    MSnbase,
     xcms,
     cluster,
     fastcluster,
@@ -131,9 +132,11 @@ Collate:
     'feature_groups-optimize.R'
     'feature_groups-optimize-openms.R'
     'feature_groups-optimize-xcms.R'
+    'feature_groups-optimize-xcms3.R'
     'feature_groups-screening.R'
     'feature_groups-tasq.R'
     'feature_groups-xcms.R'
+    'feature_groups-xcms3.R'
     'utils-bruker.R'
     'features-bruker.R'
     'features-envipick.R'
@@ -142,8 +145,10 @@ Collate:
     'features-optimize-envipick.R'
     'features-optimize-openms.R'
     'features-optimize-xcms.R'
+    'features-optimize-xcms3.R'
     'features-tasq.R'
     'features-xcms.R'
+    'features-xcms3.R'
     'formula-bruker.R'
     'formula-genform.R'
     'formula-utils.R'

@@ -17,6 +17,12 @@ fgOpt <- optimizeFeatureGrouping(optimizedObject(ftOpt), "xcms",
                                  list(groupArgs = list(bw = c(22, 28)),
                                       retcorArgs = list(method = "obiwarp")))
 
+# same, but using the XCMS3 interface
+fgOpt2 <- optimizeFeatureGrouping(optimizedObject(ftOpt), "xcms3",
+                                  list(groupMethod = "density", groupParams = list(bw = c(22, 28)),
+                                       retAlignMethod = "obiwarp"))
+
+
 # plot contour of first parameter set/DoE iteration
 plot(ftOpt, paramSet = 1, DoEIteration = 1, type = "contour")
 

@@ -38,6 +38,8 @@ setGeneric("replicateGroupSubtract", function(fGroups, rGroups, threshold = 0) s
 #'
 setGeneric("getXCMSSet", function(obj, ..., verbose = TRUE) standardGeneric("getXCMSSet"))
 
+setGeneric("getXCMSnExp", function(obj, verbose = TRUE) standardGeneric("getXCMSnExp"))
+
 ### MS Peak Lists
 
 setGeneric("peakLists", function(obj) standardGeneric("peakLists"))

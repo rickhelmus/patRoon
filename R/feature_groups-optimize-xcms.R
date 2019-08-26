@@ -124,14 +124,14 @@ generateFGroupsOptPSetXCMS <- function(...)
                                                             euc = list(c(0.7, 1.1), c(1.5, 2.1)))
             retcorArgs$profStep <- c(0.7, 1)
         }
-        else if (retcorMethod == "loess")
+        else if (retcorMethod == "peakgroups")
         {
             retcorArgs$missing <- c(1, 3)
             retcorArgs$extra <- c(1, 3)
             retcorArgs$span <- c(0.1, 0.3)
         }
         else
-            stop("Only obiwarp and loess alignment methods are supported.")
+            stop("Only obiwarp and peakgroups alignment methods are supported.")
     }
 
     return(list(groupArgs = groupArgs, retcorArgs = retcorArgs))

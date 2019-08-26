@@ -69,7 +69,7 @@ test_that("default param generators", {
 
     checkmate::expect_list(generateFGroupsOptPSet("xcms"), min.len = 1, names = "unique")
     checkmate::expect_list(generateFGroupsOptPSet("xcms", groupArgs = list(method = "nearest"),
-                                                  retcorArgs = list(method = "loess")),
+                                                  retcorArgs = list(method = "peakgroups")),
                            min.len = 1, names = "unique")
     checkmate::expect_list(generateFGroupsOptPSet("xcms3"), min.len = 1, names = "unique")
     checkmate::expect_list(generateFGroupsOptPSet("xcms3", groupMethod = "nearest",

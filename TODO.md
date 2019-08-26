@@ -24,7 +24,6 @@
         - mention parameters default unless specified
     - keep retcor_done?
     - get rid of getXCMSSet() calls?
-    - XCMS opt: consistent method specification for default optim args between feature groups/features
 - tests to verify getXCMSSet
 - suspect screening
     - rename patRoonData::targets

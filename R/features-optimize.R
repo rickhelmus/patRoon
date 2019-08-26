@@ -178,12 +178,9 @@ optimizeFeatureFinding <- function(anaInfo, algorithm, ..., templateParams = lis
 #' @param method Method used by XCMS to find features (only if \code{algorithm="xcms"}).
 #' @rdname feature-optimization
 #' @export
-generateFeatureOptPSet <- function(algorithm, method = "centWave", ...)
+generateFeatureOptPSet <- function(algorithm, ...)
 {
-    ac <- checkmate::makeAssertCollection()
-    checkmate::assertChoice(algorithm, c("openms", "xcms", "xcms3", "envipick"), add = ac)
-    checkmate::assertString(method, min.chars = 1, add = ac)
-    checkmate::reportAssertions(ac)
+    checkmate::assertChoice(algorithm, c("openms", "xcms", "xcms3", "envipick"))
 
     f <- switch(algorithm,
                 openms = generateFeatureOptPSetOpenMS,
@@ -191,7 +188,7 @@ generateFeatureOptPSet <- function(algorithm, method = "centWave", ...)
                 xcms3 = generateFeatureOptPSetXCMS3,
                 envipick = generateFeatureOptPSetEnviPick)
 
-    defs <- f(method)
+    defs <- f(...)
     return(modifyList(defs, list(...)))
 }
 

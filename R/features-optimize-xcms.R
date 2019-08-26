@@ -98,27 +98,37 @@ featuresOptimizerXCMS$methods(
     }
 )
 
-generateFeatureOptPSetXCMS <- function(method)
+generateFeatureOptPSetXCMS <- function(...)
 {
+    givenArgs <- list(...)
+    ret <- list()
+
+    # NOTE: method will be added to returned pset by generateFeatureOptPSet() if
+    # already specified.
+    if (!is.null(givenArgs[["method"]]))
+        method <- givenArgs[["method"]]
+    else
+        method <- ret$method <- "centWave"
+    
     if (method == "centWave")
     {
         # CHANGED: tightened ranges bit for modern equipment (ie smaller peakwidths and mz ranges)
-        ret <- list(min_peakwidth = c(4, 12), 
-                    max_peakwidth = c(35, 65), 
-                    ppm = c(5, 15),
-                    mzdiff = c(-0.001, 0.01))
+        ret <- c(ret, list(min_peakwidth = c(4, 12), 
+                           max_peakwidth = c(35, 65), 
+                           ppm = c(5, 15),
+                           mzdiff = c(-0.001, 0.01)))
     }
     else if (method == "matchedFilter")
     {
-        ret <- list(fwhm = c(25, 35), 
-                    snthresh = c(3, 17), 
-                    step = c(0.05, 0.15), 
-                    steps = c(1, 3))
+        ret <- c(ret, list(fwhm = c(25, 35), 
+                           snthresh = c(3, 17), 
+                           step = c(0.05, 0.15), 
+                           steps = c(1, 3)))
     }
     else
         stop("Only centWave and matchedFilter methods supported")
     
-    return(c(list(method = method), ret))
+    return(ret)
 }
 
 getDefFeaturesOptParamRangesXCMS <- function(method)

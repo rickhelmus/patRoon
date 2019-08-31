@@ -48,7 +48,7 @@ unifyMFNames <- function(mfr)
                  InChIKey = "InChIKey",
                  InChIKey2 = "InChIKey2",
                  InChIKey1 = "InChIKey1",
-                 InChI = "InChi",
+                 InChI = "InChI",
                  Identifier = "identifier",
                  PubChemNumberPatents = "numberPatents",
                  fragInfo = "fragInfo", # keep it

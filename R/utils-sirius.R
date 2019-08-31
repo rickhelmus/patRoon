@@ -50,7 +50,7 @@ unifySirNames <- function(sir)
     unNames <- c(# MonoisotopicMass = "neutralMass", UNDONE
                  smiles = "SMILES",
                  inchikey2D = "InChIKey1",
-                 inchi = "InChi",
+                 inchi = "InChI",
                  pubchemids = "identifier",
                  PubChemNumberPatents = "numberPatents",
                  score = "score",

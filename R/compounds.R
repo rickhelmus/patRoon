@@ -952,7 +952,7 @@ setMethod("consensus", "compounds", function(obj, ..., absMinAbundance = NULL,
     assertConsCommonArgs(absMinAbundance, relMinAbundance, uniqueFrom, uniqueOuter, compNames)
 
     relMinAbundance <- max(NULLToZero(absMinAbundance) / length(allCompounds), NULLToZero(relMinAbundance))
-    
+
     # initialize all compound objects for merge: copy them, rename columns to
     # avoid duplicates and set merged by field of fragInfo.
     allCompTables <- lapply(seq_along(allCompounds), function(cmpi)
@@ -985,7 +985,7 @@ setMethod("consensus", "compounds", function(obj, ..., absMinAbundance = NULL,
     })
 
     # columns that should be unique (fragInfo and InChIKey1 are dealt separately)
-    uniqueCols <- c("SMILES", "formula", "InChi", "InChIKey2", "InChIKey", "neutralMass")
+    uniqueCols <- c("SMILES", "formula", "InChI", "InChIKey2", "InChIKey", "neutralMass")
 
     leftName <- compNames[[1]]
     mCompList <- allCompTables[[1]]

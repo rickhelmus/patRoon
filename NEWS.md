@@ -51,7 +51,9 @@
 ## August 2019
 
 * `topMost` argument for GenForm formula calculation.
-* Added XCMS3 support for finding and grouping features, importing/exisiting data and parameter optimization (i.e. mostly on-par with classic XCMS support). 
+* Added XCMS3 support for finding and grouping features, importing/exisiting data and parameter optimization (i.e. mostly on-par with classic XCMS support).
+* Changed compound result column name from InChi to InChI
+
 
 ## June 2019
 

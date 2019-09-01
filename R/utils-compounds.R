@@ -35,13 +35,13 @@ mergeFragInfo <- function(fiLeft, fiRight, leftName, rightName)
         fiLeft[is.na(mergedBy.x), mergedBy := mergedBy.y]
         fiLeft[!is.na(mergedBy.x) & !is.na(mergedBy.y), mergedBy := paste(mergedBy.x, mergedBy.y, sep = ",")]
         fiLeft[, c("mergedBy.x", "mergedBy.y") := NULL]
-        
+
         # add unique
         fiUnique <- fiRight[!PLIndex %in% fiLeft$PLIndex]
         if (nrow(fiUnique) > 0)
             fiLeft <- rbind(fiLeft, fiUnique, fill = TRUE)
     }
-    
+
     return(fiLeft)
 }
 
@@ -62,15 +62,15 @@ compoundScorings <- function(algorithm = NULL, database = NULL, includeSuspectLi
                              onlyDefault = FALSE, includeNoDB = TRUE)
 {
     algos <- c("metfrag", "sirius")
-    
-    ret <- compScorings # stored inside R/sysdata.rda
-    
+
+    ret <- patRoon:::compScorings # stored inside R/sysdata.rda
+
     ac <- checkmate::makeAssertCollection()
     checkmate::assertChoice(algorithm, algos, null.ok = TRUE, add = ac)
     checkmate::assertString(database, na.ok = FALSE, null.ok = TRUE, add = ac)
     checkmate::assertFlag(includeSuspectLists, add = ac)
     checkmate::reportAssertions(ac)
-    
+
     if (!is.null(algorithm))
         ret <- ret[nzchar(ret[[algorithm]]), names(ret) != setdiff(algos, algorithm)]
     if (!is.null(database))
@@ -84,7 +84,7 @@ compoundScorings <- function(algorithm = NULL, database = NULL, includeSuspectLi
         ret <- ret[!ret$suspect_list, ]
     if (onlyDefault)
         ret <- ret[ret$default, ]
-    
+
     return(ret)
 }
 
@@ -108,7 +108,7 @@ normalizeCompScores <- function(compResults, scoreRanges, mCompNames, minMaxNorm
                                             FUN = function(sc, scr) normalize(sc, minMaxNormalization, scr)),
                                             .SDcols = scoreCols]
     }
-    
+
     return(compResults)
 }
 
@@ -205,7 +205,10 @@ getCompInfoList <- function(compResults, compIndex, addHTMLURL, mCompNames)
 
     # FOR-IDENT
     ctext <- addValText(ctext, "%s", c("tonnage", "categories"))
-    
+
+    # TP prediction DB
+    ctext <- addValText(ctext, "%s", c("precursor", "reaction", "enzymes"))
+
     return(ctext)
 }
 
@@ -230,7 +233,7 @@ buildMFLandingURL <- function(mfSettings, peakList, precursorMz)
         mfSettings$MetFragDatabaseType <- "PubChem" # user should tick box for now...
     else if (!mfSettings$MetFragDatabaseType %in% c("KEGG", "PubChem", "ChemSpider", "LipidMaps", "MetaCyc", "LocalInChI", "LocalSDF"))
         mfSettings$MetFragDatabaseType <- NULL # not all databases are supported yet.
-    
+
     # Allowed parameters: list taken from error page when unsupported parameter is given
     mfSettings <- mfSettings[names(mfSettings) %in%
                                  c("FragmentPeakMatchAbsoluteMassDeviation", "FragmentPeakMatchRelativeMassDeviation",

@@ -141,7 +141,19 @@ unifyMFNames <- function(mfr)
 
                  # FOR-IDENT
                  ForIdentTonnage = "tonnage",
-                 ForIdentCategories = "categories"
+                 ForIdentCategories = "categories",
+
+                 # database generated from TP prediction
+                 precursor = "precursor",
+                 ALogP = "ALogP",
+                 Reaction = "reaction",
+                 "Enzyme(s)" = "enzymes",
+                 Biosystem = "biosystem",
+                 "Precursor InChI" = "precursorInChI",
+                 "Precursor InChIKey" = "precursorInChIKey",
+                 "Precursor ALogP" = "precursorALogP",
+                 "Precursor MonoisotopicMass" = "precursorNeutralMass"
+
                  )
 
     unNames <- unNames[names(unNames) %in% names(mfr)] # filter out missing

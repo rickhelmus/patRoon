@@ -342,8 +342,6 @@ utils <- setRefClass("utilsInst", methods = list(
         optPackages <- packagesNotInstalled(c("RDCOMClient", "RAMClustR"))
         mandatoryPackages <- c(packagesCRAN, packagesBioC)
         
-        if (length(c(mandatoryPackages, optPackages)) == 0)
-        
         choices <- character()
         if (length(mandatoryPackages) > 0)
             choices <- c(choices, mandatory = "Only mandatory packages")

@@ -20,7 +20,7 @@ loadSpectra <- function(path, rtRange = NULL, verbose = TRUE, cacheDB = NULL)
         spectra <- lapply(ps, function(spec) setnames(as.data.table(spec), c("mz", "intensity")))
         ret <- list(header = hd, spectra = spectra)
         mzR::close(msf)
-        saveCacheData("specData", ret, hash)
+        saveCacheData("specData", ret, hash, cacheDB)
     }
 
     return(ret)

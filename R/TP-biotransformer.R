@@ -1,6 +1,24 @@
 #' @include main.R
 NULL
 
+# UNDONE: move
+#' @export
+TPPredictions <- setClass("TPPredictions",
+                          slots = c(suspects = "data.table", predictions = "list"),
+                          contains = c("VIRTUAL", "workflowStep"))
+
+setMethod("suspects", "TPPredictions", function(pred) pred@suspects)
+
+setMethod("predictions", "TPPredictions", function(pred) pred@predictions)
+
+
+#' @export
+TPPredictionsBT <- setClass("TPPredictionsBT", contains = "TPPredictions")
+
+setMethod("initialize", "TPPredictionsBT",
+          function(.Object, ...) callNextMethod(.Object, algorithm = "biotransformer", ...))
+
+
 getBTBin <- function()
 {
     ret <- path.expand(getOption("patRoon.path.BioTransformer", ""))
@@ -115,12 +133,10 @@ predictTPsBioTransformer <- function(suspects, type = "env", steps = 2, extraOpt
         results <- results[intersect(suspects$name, names(results))] # re-order
     }
 
-    # UNDONE: make nice S4 class?
-
-    return(results)
+    return(TPPredictionsBT(suspects = suspects, predictions = results))
 }
 
-convertTPPredictionToMFDB <- function(pred, out)
+setMethod("convertToMFDB", "TPPredictionsBT", function(pred, out)
 {
     pred <- pruneList(pred, checkZeroRows = TRUE)
 
@@ -161,4 +177,4 @@ convertTPPredictionToMFDB <- function(pred, out)
     predAll[, Identifier := paste0("TP", seq_len(nrow(predAll)))]
 
     fwrite(predAll, out)
-}
+})

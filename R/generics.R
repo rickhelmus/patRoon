@@ -105,6 +105,12 @@ setGeneric("setObjects", function(obj) standardGeneric("setObjects"))
 setGeneric("sets", function(obj) standardGeneric("sets"))
 setGeneric("unset", function(obj, set) standardGeneric("unset"))
 
+### TP prediction
+
+setGeneric("suspects", function(pred) standardGeneric("suspects"))
+setGeneric("predictions", function(pred) standardGeneric("predictions"))
+setGeneric("convertToMFDB", function(pred, out) standardGeneric("convertToMFDB"))
+
 ### suspect screening
 
 setGeneric("screenSuspects", function(fGroups, suspects, rtWindow = 12, mzWindow = 0.005, adduct = NULL,

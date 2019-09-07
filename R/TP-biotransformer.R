@@ -54,6 +54,11 @@ predictTPsBioTransformer <- function(suspects, type = "env", steps = 2, extraOpt
 
     suspects <- as.data.table(suspects)
 
+    if (any(!nzchar(suspects$name)))
+        stop("'name' column contains one ore more empty values")
+    if (any(!nzchar(suspects$SMILES)))
+        stop("'SMILES' column contains one ore more empty values")
+    
     cacheDB <- openCacheDBScope()
     baseHash <- makeHash(type, steps, extraOpts)
     setHash <- makeHash(suspects, baseHash)

@@ -57,6 +57,39 @@ processBTResults <- function(cmd)
     return(ret)
 }
 
+collapseBTResults <- function(pred)
+{
+    pred <- lapply(pred, function(p)
+    {
+        # merge duplicate compound rows, which can occur due to consecutive
+        # reactions giving the same TP
+        p <- copy(p)
+        col <- "Precursor ID"
+        p[!nzchar(get(col)), (col) := "parent"]
+        p[, (col) := paste0(get(col), collapse = "/"), by = "InChIKey"]
+        p <- unique(p, by = "InChIKey")
+    })
+    
+    predAll <- rbindlist(pred, idcol = "precursor")
+    
+    # seems the same as "Metabolite ID" column(?)
+    predAll[, `cdk:Title` := NULL]
+    
+    # merge precursor and sub-precursor (ie from consecutive reactions)
+    predAll[, precursor := paste0(precursor, " (", `Precursor ID`, ")")]
+
+    # combine equal TPs from different precursors
+    predAll[, precursor := paste0(precursor, collapse = ","), by = "InChIKey"]
+    # ... and remove now duplicates
+    predAll <- unique(predAll, by = "InChIKey")
+
+    # Assign some unique identifier
+    predAll[, Identifier := paste0("TP", seq_len(nrow(predAll)))]
+    
+    return(predAll)    
+}
+
+#' @export
 predictTPsBioTransformer <- function(suspects, type = "env", steps = 2, extraOpts = NULL,
                                      logPath = file.path("log", "biotransformer"),
                                      maxProcAmount = getOption("patRoon.maxProcAmount"))
@@ -133,25 +166,17 @@ predictTPsBioTransformer <- function(suspects, type = "env", steps = 2, extraOpt
         results <- results[intersect(suspects$name, names(results))] # re-order
     }
 
+    results <- pruneList(results, checkZeroRows = TRUE)
+    
     return(TPPredictionsBT(suspects = suspects, predictions = results))
 }
 
+#' @export
 setMethod("convertToMFDB", "TPPredictionsBT", function(pred, out)
 {
-    pred <- pruneList(pred, checkZeroRows = TRUE)
-
-    pred <- lapply(pred, function(p)
-    {
-        # merge duplicate compound rows, which can occur due to consecutive
-        # reactions giving the same TP
-        p <- copy(p)
-        col <- "Precursor ID"
-        p[!nzchar(get(col)), (col) := "parent"]
-        p[, (col) := paste0(get(col), collapse = "/"), by = "InChIKey"]
-        p <- unique(p, by = "InChIKey")
-    })
-
-    predAll <- rbindlist(pred, idcol = "precursor")
+    checkmate::assertPathForOutput(out, overwrite = TRUE) # NOTE: assert doesn't work on Windows...
+    
+    predAll <- collapseBTResults(pred@predictions)
 
     # set to MetFrag style names, also ensure that minimally required columns are present
     setnames(predAll,
@@ -161,20 +186,21 @@ setMethod("convertToMFDB", "TPPredictionsBT", function(pred, out)
     # Add required InChIKey1 column
     predAll[, InChIKey1 := sub("\\-.*", "", InChIKey)]
 
-    # seems the same as "Metabolite ID" column(?)
-    predAll[, `cdk:Title` := NULL]
-
-    # merge precursor and sub-precursor (ie from consecutive reactions)
-    predAll[, precursor := paste0(precursor, " (", `Precursor ID`, ")")]
-    predAll[, `Precursor ID` := NULL]
-
-    # combine equal TPs from different precursors
-    predAll[, precursor := paste0(precursor, collapse = ","), by = "InChIKey"]
-    # ... and remove duplicates to not bother MetFrag with them
-    predAll <- unique(predAll, by = "InChIKey")
-
-    # Assign some unique identifier
-    predAll[, Identifier := paste0("TP", seq_len(nrow(predAll)))]
-
     fwrite(predAll, out)
+})
+
+#' @export
+setMethod("convertToSuspects", "TPPredictionsBT", function(pred, adduct, tidy)
+{
+    adduct <- checkAndToAdduct(adduct)
+    checkmate::assertFlag(tidy)
+    
+    predAll <- collapseBTResults(pred@predictions)[, c("Identifier", "Molecular formula")]
+    setnames(predAll, "Identifier", "name")
+    
+    predAll[, `Add/uct formula` := calculateIonFormula(`Molecular formula`, adduct)]
+    predAll[, mz := sapply(`Adduct formula`, function(f) rcdk::get.formula(f, adduct@charge)@mass)]
+    if (tidy)
+        predAll <- predAll[, c("name", "mz", with = FALSE)]
+    return(predAll)
 })

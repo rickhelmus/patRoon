@@ -31,7 +31,7 @@ getBTBin <- function()
     return(ret)
 }
 
-initBTCommand <- function(SMILES, type, steps, extraOpts, btBin, logFile)
+initBTCommand <- function(precursor, SMILES, type, steps, extraOpts, btBin, logFile)
 {
     outFile <- tempfile("btresults", fileext = ".csv")
 
@@ -42,7 +42,7 @@ initBTCommand <- function(SMILES, type, steps, extraOpts, btBin, logFile)
               "-ocsv", outFile,
               extraOpts)
 
-    return(list(command = "java", args = c("-jar", btBin, args), logFile = logFile, outFile = outFile, SMILES = SMILES))
+    return(list(command = "java", args = c("-jar", btBin, args), logFile = logFile, outFile = outFile, precursor = precursor, SMILES = SMILES))
 }
 
 processBTResults <- function(cmd)
@@ -50,10 +50,14 @@ processBTResults <- function(cmd)
     if (!file.exists(cmd$outFile))
         return(data.table()) # no results
 
-    ret <- fread(cmd$outFile, colClasses = c("Precursor ID" = "character"))
+    ret <- fread(cmd$outFile, colClasses = c("Precursor ID" = "character", Synonyms = "character"))
 
     # UNDONE: transform column names, more?
 
+    
+    # Assign some unique identifier
+    ret[, Identifier := paste0(cmd$precursor, "-TP", seq_len(nrow(ret)))]
+    
     return(ret)
 }
 
@@ -83,9 +87,6 @@ collapseBTResults <- function(pred)
     # ... and remove now duplicates
     predAll <- unique(predAll, by = "InChIKey")
 
-    # Assign some unique identifier
-    predAll[, Identifier := paste0("TP", seq_len(nrow(predAll)))]
-    
     return(predAll)    
 }
 
@@ -141,7 +142,7 @@ predictTPsBioTransformer <- function(suspects, type = "env", steps = 2, extraOpt
     cmdQueue <- mapply(doSuspects$name, doSuspects$SMILES, SIMPLIFY = FALSE, FUN = function(n, sm)
     {
         logf <- if (!is.null(logPath)) file.path(logPath, paste0("biotr-", n, ".txt")) else NULL
-        initBTCommand(sm, type = type, steps = steps, extraOpts = extraOpts, btBin = btBin, logFile = logf)
+        initBTCommand(n, sm, type = type, steps = steps, extraOpts = extraOpts, btBin = btBin, logFile = logf)
     })
     names(cmdQueue) <- doSuspects$name
 
@@ -172,35 +173,80 @@ predictTPsBioTransformer <- function(suspects, type = "env", steps = 2, extraOpt
 }
 
 #' @export
-setMethod("convertToMFDB", "TPPredictionsBT", function(pred, out)
+setMethod("convertToMFDB", "TPPredictionsBT", function(pred, out, includePrec)
 {
-    checkmate::assertPathForOutput(out, overwrite = TRUE) # NOTE: assert doesn't work on Windows...
+    # rinchi: remotes::install_github("CDK-R/rinchi", INSTALL_opts = "--no-multiarch")
+    checkPackage("rinchi", "CDK-R/rinchi")
+    
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertPathForOutput(out, overwrite = TRUE, add = ac) # NOTE: assert doesn't work on Windows...
+    checkmate::assertFlag(includePrec, add = ac)
+    checkmate::reportAssertions(ac)
     
     predAll <- collapseBTResults(pred@predictions)
 
-    # set to MetFrag style names, also ensure that minimally required columns are present
+    # set to MetFrag style names
     setnames(predAll,
              c("Synonyms", "Molecular formula", "Major Isotope Mass", "Precursor Major Isotope Mass"),
              c("CompoundName", "MolecularFormula", "MonoisotopicMass", "Precursor MonoisotopicMass"))
 
+
+    predAll[, SMILES := sapply(rinchi::parse.inchi(InChI), rcdk::get.smiles)]
+        
+    if (includePrec)
+    {
+        precs <- copy(suspects(pred))
+        setnames(precs, "name", "Identifier")
+        precs[, CompoundName := Identifier]
+        
+        mols <- getMoleculesFromSMILES(precs$SMILES, doTyping = TRUE, doIsotopes = TRUE)
+        precs[, MolecularFormula := sapply(mols, function(m) rcdk::get.mol2formula(m)@string)]
+        precs[, MonoisotopicMass := sapply(mols, rcdk::get.exact.mass)]
+        
+        precs[, InChI := sapply(SMILES, rinchi::get.inchi)]
+        precs[, InChIKey := sapply(SMILES, rinchi::get.inchi.key)]
+        
+        predAll <- rbind(precs, predAll, fill = TRUE)
+        
+    }
+    
     # Add required InChIKey1 column
     predAll[, InChIKey1 := sub("\\-.*", "", InChIKey)]
 
+    # equalize identifiers and name's, if there is no name yet
+    predAll[!nzchar(CompoundName), CompoundName := Identifier]
+    
     fwrite(predAll, out)
 })
 
 #' @export
-setMethod("convertToSuspects", "TPPredictionsBT", function(pred, adduct, tidy)
+setMethod("convertToSuspects", "TPPredictionsBT", function(pred, adduct, includePrec, tidy)
 {
     adduct <- checkAndToAdduct(adduct)
-    checkmate::assertFlag(tidy)
+    
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertFlag(includePrec, add = ac)
+    checkmate::assertFlag(tidy, add = ac)
+    checkmate::reportAssertions(ac)
     
     predAll <- collapseBTResults(pred@predictions)[, c("Identifier", "Molecular formula")]
     setnames(predAll, "Identifier", "name")
     
-    predAll[, `Add/uct formula` := calculateIonFormula(`Molecular formula`, adduct)]
+    predAll[, `Adduct formula` := calculateIonFormula(`Molecular formula`, adduct)]
     predAll[, mz := sapply(`Adduct formula`, function(f) rcdk::get.formula(f, adduct@charge)@mass)]
+    
+    if (includePrec)
+    {
+        precs <- copy(suspects(pred))
+        precs[, `Molecular formula` := sapply(getMoleculesFromSMILES(SMILES), function(mol) rcdk::get.mol2formula(mol)@string)]
+        precs[, `Adduct formula` := calculateIonFormula(`Molecular formula`, adduct)]
+        precs[, mz := sapply(`Adduct formula`, function(f) rcdk::get.formula(f, adduct@charge)@mass)]
+        
+        predAll <- rbind(precs, predAll, fill = TRUE)
+    }
+
     if (tidy)
-        predAll <- predAll[, c("name", "mz", with = FALSE)]
+        predAll <- predAll[, c("name", "mz"), with = FALSE]
+    
     return(predAll)
 })

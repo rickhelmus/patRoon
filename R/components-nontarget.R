@@ -124,7 +124,7 @@ generateComponentsNontarget <- function(fGroups, ionization, rtRange = c(-120, 1
     checkmate::reportAssertions(ac)
 
     if (length(fGroups) == 0)
-        return(components(componentInfo = data.table(), components = list(), algorithm = "nontarget"))
+        return(componentsNT(componentInfo = data.table(), components = list()))
 
     hash <- makeHash(fGroups, ionization, rtRange, mzRange, elements, rtDev, absMzDev, extraOpts)
     cd <- loadCacheData("componentsNontarget", hash)

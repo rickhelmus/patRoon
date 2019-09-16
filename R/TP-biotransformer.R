@@ -50,10 +50,17 @@ processBTResults <- function(cmd)
     if (!file.exists(cmd$outFile))
         return(data.table()) # no results
 
-    ret <- fread(cmd$outFile, colClasses = c("Precursor ID" = "character", Synonyms = "character"))
+    ret <- fread(cmd$outFile, colClasses = c("Precursor ID" = "character", Synonyms = "character",
+                                             "Molecular formula" = "character"))
 
     # UNDONE: transform column names, more?
 
+    # seems the same as "Metabolite ID" column(?)
+    ret[, `cdk:Title` := NULL]
+    
+    # BUG: BT somestimes doesn't fill in the formula. Calculate them manually
+    ret[!nzchar(`Molecular formula`),
+        `Molecular formula` := sapply(InChI, function(i) rcdk::get.mol2formula(rinchi::parse.inchi(i)[[1]])@string)]
     
     # Assign some unique identifier
     ret[, Identifier := paste0(cmd$precursor, "-TP", seq_len(nrow(ret)))]
@@ -76,9 +83,6 @@ collapseBTResults <- function(pred)
     
     predAll <- rbindlist(pred, idcol = "precursor")
     
-    # seems the same as "Metabolite ID" column(?)
-    predAll[, `cdk:Title` := NULL]
-    
     # merge precursor and sub-precursor (ie from consecutive reactions)
     predAll[, precursor := paste0(precursor, " (", `Precursor ID`, ")")]
 
@@ -95,6 +99,9 @@ predictTPsBioTransformer <- function(suspects, type = "env", steps = 2, extraOpt
                                      logPath = file.path("log", "biotransformer"),
                                      maxProcAmount = getOption("patRoon.maxProcAmount"))
 {
+    # UNDONE: as long as BT may return empty formulas we need this
+    checkPackage("rinchi", "CDK-R/rinchi")
+    
     ac <- checkmate::makeAssertCollection()
     checkmate::assertDataFrame(suspects, any.missing = FALSE, min.rows = 1, add = ac)
     assertHasNames(suspects, c("name", "SMILES"), add = ac)
@@ -168,6 +175,7 @@ predictTPsBioTransformer <- function(suspects, type = "env", steps = 2, extraOpt
     }
 
     results <- pruneList(results, checkZeroRows = TRUE)
+    suspects <- suspects[name %in% names(results)]
     
     return(TPPredictionsBT(suspects = suspects, predictions = results))
 }
@@ -229,18 +237,36 @@ setMethod("convertToSuspects", "TPPredictionsBT", function(pred, adduct, include
     checkmate::assertFlag(tidy, add = ac)
     checkmate::reportAssertions(ac)
     
-    predAll <- collapseBTResults(pred@predictions)[, c("Identifier", "Molecular formula")]
+    # predAll <- rbindlist(predictions(pred))[, c("Identifier", "Molecular formula")]
+    predAll <- rbindlist(predictions(pred))
+    # UNDONE: remove me
+    predAll[!nzchar(`Molecular formula`),
+            `Molecular formula` := sapply(InChI, function(i) rcdk::get.mol2formula(rinchi::parse.inchi(i)[[1]])@string)]
+    predAll <- predAll[, c("Identifier", "Major Isotope Mass")]
     setnames(predAll, "Identifier", "name")
     
-    predAll[, `Adduct formula` := calculateIonFormula(`Molecular formula`, adduct)]
-    predAll[, mz := sapply(`Adduct formula`, function(f) rcdk::get.formula(f, adduct@charge)@mass)]
+    # calculate adduct m/z to make subsequent ion calculations faster
+    # NOTE: rcdk::get.formula makes elemental counts absolute
+    addMZ <- 0
+    getMZ <- function(form, charge = 0) rcdk::get.formula(form, charge)@mass
+    if (length(adduct@add) > 0 && length(adduct@sub) > 0) # NOTE: add charge once
+        addMZ <- sum(sapply(adduct@add, getMZ, charge = adduct@charge)) - sum(sapply(adduct@sub, getMZ))
+    else if (length(adduct@add) > 0)
+        addMZ <- sum(sapply(adduct@add, getMZ, charge = adduct@charge))
+    else if (length(adduct@sub) > 0)
+        addMZ <- -(sum(sapply(adduct@sub, getMZ, charge = adduct@charge)))
+    
+    # predAll[, `Adduct formula` := calculateIonFormula(`Molecular formula`, adduct)]
+    # predAll[, mz := sapply(`Adduct formula`, function(f) rcdk::get.formula(f, adduct@charge)@mass)]
+    predAll[, mz := `Major Isotope Mass` + addMZ]
     
     if (includePrec)
     {
         precs <- copy(suspects(pred))
-        precs[, `Molecular formula` := sapply(getMoleculesFromSMILES(SMILES), function(mol) rcdk::get.mol2formula(mol)@string)]
-        precs[, `Adduct formula` := calculateIonFormula(`Molecular formula`, adduct)]
-        precs[, mz := sapply(`Adduct formula`, function(f) rcdk::get.formula(f, adduct@charge)@mass)]
+        precs[, mz := sapply(getMoleculesFromSMILES(SMILES, doTyping = TRUE, doIsotopes = TRUE), rcdk::get.exact.mass) + addMZ]
+        # precs[, `Molecular formula` := sapply(getMoleculesFromSMILES(SMILES), function(mol) rcdk::get.mol2formula(mol)@string)]
+        # precs[, `Adduct formula` := calculateIonFormula(`Molecular formula`, adduct)]
+        # precs[, mz := sapply(`Adduct formula`, function(f) rcdk::get.formula(f, adduct@charge)@mass)]
         
         predAll <- rbind(precs, predAll, fill = TRUE)
     }

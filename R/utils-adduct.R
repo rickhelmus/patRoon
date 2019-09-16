@@ -186,7 +186,7 @@ doAsAdduct <- memoise(function(x, format, isPositive, charge)
 
 doCalculateIonFormula <- memoise(function(formula, adduct)
 {
-    checkmate::assertCharacter(formula, min.chars = 1)
+    checkmate::assertCharacter(formula)
     adduct <- checkAndToAdduct(adduct)
     
     sapply(formula, function(f)

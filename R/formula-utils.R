@@ -1,7 +1,7 @@
 splitFormulaToList <- function(formula)
 {
     if (!nzchar(formula))
-        return(list())
+        return(numeric())
     
     # NOTE: dash ('-') added to [:digit:] to allow minus sign (which MF manages to report once in a while...)
 

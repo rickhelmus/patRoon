@@ -50,6 +50,8 @@ generateComponentsTPs <- function(fGroups, pred, adduct, mzWindow = 0.005, rGrou
     
     
     suspList <- convertToSuspects(pred, adduct)
+    
+    printf("Screening precursors and TPs...\n")
     screening <- screenSuspects(fGroups, suspList, mzWindow = mzWindow)
     screening <- screening[!is.na(group)] # remove non-hits
     susps <- suspects(pred)
@@ -78,31 +80,21 @@ generateComponentsTPs <- function(fGroups, pred, adduct, mzWindow = 0.005, rGrou
         comps <- rbindlist(lapply(split(scrP, by = "group"), function(scrRow)
         {
             # UNDONE: do more checks etc
-            return(merge(scrTP, preds, by.x = "name", by.y = "Identifier"))
-        }), idcol = "precursor_fgroup")
-    }), idcol = "pred_susp_name")
+            
+            ret <- merge(scrTP, preds, by.x = "name", by.y = "Identifier")
+            setnames(ret, c("name", "group"), c("TP_name", "TP_group"))
+            return(ret)
+        }), idcol = "precursor_group")
+    }), idcol = "precursor_susp_name")
 
-    compList <- split(compTab, by = c("pred_susp_name", "precursor_fgroup"))
-    
-    browser()
-    
-    # gInfo <- groupInfo(fGroups)
-    # gNames <- names(fGroups)
-    # comps <- mapply(gNames, split(gInfo, gNames), SIMPLIFY = FALSE, FUN = function(gName, gInfoRow)
-    # {
-    #     susps <- suspects(pred)[numLTE(abs(gInfoRow$mzs - mz), mzWindow)]
-    #     if (nrow(susps) == 0) # precursor not found
-    #         return(NULL)
-    #     
-    #     
-    # })
-    
-    
-    for (suspmz in suspects(pred)$mz)
-    {
-        
-    }
-    
+    compList <- split(compTab, by = c("precursor_susp_name", "precursor_group"), keep.by = FALSE)
+    names(compList) <- paste0("CMP", seq_along(compList))
+
+    compInfo <- unique(compTab[, c("precursor_susp_name", "precursor_group")])
+    compInfo[, name := names(compList)]
+    compInfo[, size := sapply(compList, nrow)]
+
+    ret <- componentsTPs(componentInfo = compInfo, components = compList)    
     saveCacheData("componentsTPs", ret, hash)
     
     return(ret)

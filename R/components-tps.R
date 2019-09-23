@@ -27,7 +27,6 @@ generateComponentsTPs <- function(fGroups, pred, adduct, mzWindow = 0.005, rGrou
     if (!is.null(rGroupsEff))
         checkmate::assertSubset(rGroupsEff, empty.ok = FALSE, choices = rGroups, add = ac)
     
-    
     checkmate::reportAssertions(ac)
     
     adduct <- checkAndToAdduct(adduct)
@@ -35,7 +34,7 @@ generateComponentsTPs <- function(fGroups, pred, adduct, mzWindow = 0.005, rGrou
     if (length(fGroups) == 0)
         return(componentsTPs(componentInfo = data.table(), components = list()))
     
-    hash <- makeHash(fGroups, rGroupsIn, rGroupsEff)
+    hash <- makeHash(fGroups, pred, adduct, mzWindow, rGroupsIn, rGroupsEff, inThreshold, effThreshold)
     cd <- loadCacheData("componentsTPs", hash)
     if (!is.null(cd))
         return(cd)
@@ -80,6 +79,8 @@ generateComponentsTPs <- function(fGroups, pred, adduct, mzWindow = 0.005, rGrou
         comps <- rbindlist(lapply(split(scrP, by = "group"), function(scrRow)
         {
             # UNDONE: do more checks etc
+            # UNDONE: omit precursor columns? Or move to compInfo?
+            # UNDONE: make column names more clear (e.g. from suspects)
             
             ret <- merge(scrTP, preds, by.x = "name", by.y = "Identifier")
             setnames(ret, c("name", "group"), c("TP_name", "TP_group"))
@@ -87,12 +88,18 @@ generateComponentsTPs <- function(fGroups, pred, adduct, mzWindow = 0.005, rGrou
         }), idcol = "precursor_group")
     }), idcol = "precursor_susp_name")
 
+    
+    compTab[, links := list(list(unique(name))), by = c("TP_name", "TP_group")]
+    
+    browser()
+    
     compList <- split(compTab, by = c("precursor_susp_name", "precursor_group"), keep.by = FALSE)
     names(compList) <- paste0("CMP", seq_along(compList))
 
     compInfo <- unique(compTab[, c("precursor_susp_name", "precursor_group")])
     compInfo[, name := names(compList)]
     compInfo[, size := sapply(compList, nrow)]
+    setcolorder(compInfo, "name")
 
     ret <- componentsTPs(componentInfo = compInfo, components = compList)    
     saveCacheData("componentsTPs", ret, hash)

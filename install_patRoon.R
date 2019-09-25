@@ -402,10 +402,10 @@ utils <- setRefClass("utilsInst", methods = list(
                             sep = "\n")))
             {
                 ensureInstPath(instPath)
-                url <- "https://download.java.net/openjdk/jdk11/ri/openjdk-11+28_windows-x64_bin.zip"
-                down <- downloadFile(instPath, "Open JDK 11", url, TRUE)
+                url <- "https://download.java.net/java/GA/jdk13/5b8a42f3905b406298b72d750b6919f6/33/GPL/openjdk-13_windows-x64_bin.zip"
+                down <- downloadFile(instPath, "Open JDK 13", url, TRUE)
                 if (!is.null(down))
-                    return(down)
+                    return(paste0(down, "/jdk-13"))
                 
             }
             else

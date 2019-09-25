@@ -72,6 +72,7 @@ Imports:
     rmarkdown,
     flexdashboard,
     DT,
+    magrittr,
     kableExtra,
     R.utils,
     magick,

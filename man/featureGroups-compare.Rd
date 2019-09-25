@@ -49,7 +49,8 @@
 
 \item{groupAlgo}{The \code{\link[=feature-grouping]{feature grouping
 algorithm}} that should be used for grouping \emph{pseudo} features (see
-details). Valid values are: \code{"xcms"} or \code{"openms"}.}
+details). Valid values are: \code{"xcms"} or \code{"openms"}. Note:
+\code{xcms3} is not (yet) supported.}
 
 \item{groupArgs}{A \code{list} containing further parameters for
 \code{\link[=feature-grouping]{feature grouping}}.}
@@ -119,9 +120,10 @@ The \code{comparison} method generates a
   feature groups and generating a consensus. Internally, this function will
   collapse each feature groups object to \emph{pseudo} features objects by
   averaging their retention times, \emph{m/z} values and intensities, where
-  each original feature groups object becomes an 'analysis'. All \emph{pseudo}
-  features are then grouped using \link[=feature-grouping]{regular feature
-  grouping algorithms} so that a comparison can be made.
+  each original feature groups object becomes an 'analysis'. All
+  \emph{pseudo} features are then grouped using
+  \link[=feature-grouping]{regular feature grouping algorithms} so that a
+  comparison can be made.
 
 \code{plot} generates an \emph{m/z} \emph{vs} retention time plot.
 

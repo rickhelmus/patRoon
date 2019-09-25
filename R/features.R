@@ -204,6 +204,11 @@ setMethod("screenSuspects", "features", function(obj, suspects, rtWindow, mzWind
     aapply(checkmate::assertNumber, . ~ rtWindow + mzWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
 
+    hash <- makeHash(obj, suspects, rtWindow, mzWindow)
+    cd <- loadCacheData("screenSuspectsFT", hash)
+    if (!is.null(cd))
+        return(cd)
+    
     fTable <- featureTable(obj)
     anaInfo <- analysisInfo(obj)
 
@@ -234,7 +239,10 @@ setMethod("screenSuspects", "features", function(obj, suspects, rtWindow, mzWind
         }))
     })
 
-    return(rbindlist(retlist, fill = TRUE))
+    ret <- rbindlist(retlist, fill = TRUE)
+    saveCacheData("screenSuspectsFT", ret, hash)
+    
+    return(ret)
 })
 
 #' @templateVar func findFeatures

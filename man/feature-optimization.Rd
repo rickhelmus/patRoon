@@ -24,7 +24,7 @@ optimizeFeatureFinding(anaInfo, algorithm, ..., templateParams = list(),
   else "IPO", checkPeakShape = "none", CAMERAOpts = list(),
   maxIterations = 50, maxModelDeviation = 0.1)
 
-generateFeatureOptPSet(algorithm, method = "centWave", ...)
+generateFeatureOptPSet(algorithm, ...)
 
 getDefFeaturesOptParamRanges(algorithm, method = "centWave")
 }

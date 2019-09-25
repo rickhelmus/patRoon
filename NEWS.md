@@ -1,6 +1,13 @@
 # patRoon 0.1.0.9000
 
-## Augustus 2019
+## September 2019
+
+* Caching support for suspect screening
+* Updated/Fixed JDK installation for installation script
+* Fixed missing pipe operator import (`%>%`)
+
+
+## August 2019
 
 * `topMost` argument for GenForm formula calculation.
 * Added XCMS3 support for finding and grouping features, importing/exisiting data and parameter optimization (i.e. mostly on-par with classic XCMS support). 

@@ -1149,6 +1149,11 @@ setMethod("screenSuspects", "featureGroups", function(obj, suspects, rtWindow, m
     aapply(checkmate::assertNumber, . ~ rtWindow + mzWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
 
+    hash <- makeHash(obj, suspects, rtWindow, mzWindow)
+    cd <- loadCacheData("screenSuspectsFG", hash)
+    if (!is.null(cd))
+        return(cd)
+    
     gTable <- groups(obj)
     gInfo <- groupInfo(obj)
     anaInfo <- analysisInfo(obj)
@@ -1188,6 +1193,8 @@ setMethod("screenSuspects", "featureGroups", function(obj, suspects, rtWindow, m
     foundn <- suspectsn - sum(is.na(ret$group))
     printf("Found %d/%d suspects (%.2f%%)\n", foundn, suspectsn, foundn * 100 / suspectsn)
 
+    saveCacheData("screenSuspectsFG", ret, hash)
+    
     return(ret)
 })
 

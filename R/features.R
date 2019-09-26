@@ -211,6 +211,8 @@ setMethod("screenSuspects", "features", function(obj, suspects, rtWindow, mzWind
     
     fTable <- featureTable(obj)
     anaInfo <- analysisInfo(obj)
+    
+    prog <- openProgBar(0, nrow(suspects))
 
     retlist <- lapply(seq_len(nrow(suspects)), function(ti)
     {
@@ -228,17 +230,22 @@ setMethod("screenSuspects", "features", function(obj, suspects, rtWindow, mzWind
                                   mz = suspects$mz[ti], analysis = ana,
                                   feature = NA, d_rt = NA, d_mz = NA, intensity = NA, area = NA))
 
-            return(rbindlist(lapply(seq_len(nrow(fts)), function(i)
+            hits <- rbindlist(lapply(seq_len(nrow(fts)), function(i)
             {
                 data.table(name = suspects$name[ti], rt = if (hasRT) suspects$rt[ti] else NA, mz = suspects$mz[ti], analysis = ana,
                            feature = fts[["ID"]][i], d_rt = if (hasRT) fts[["ret"]][i] - suspects$rt[ti] else NA,
                            d_mz = fts[["mz"]][i] - suspects$mz[ti], intensity = fts[["intensity"]][i],
                            area = if (is.null(fts[["area"]][i])) 0 else fts[["area"]][i])
-            })))
+            }))
 
+            setTxtProgressBar(prog, ti)
+            return(hits)
         }))
     })
 
+    setTxtProgressBar(prog, nrow(suspects))
+    close(prog)
+    
     ret <- rbindlist(retlist, fill = TRUE)
     saveCacheData("screenSuspectsFT", ret, hash)
     

@@ -2,7 +2,7 @@
 
 ## September 2019
 
-* Caching support for suspect screening
+* Caching and progress bar support for suspect screening
 * Updated/Fixed JDK installation for installation script
 * Fixed missing pipe operator import (`%>%`)
 

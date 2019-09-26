@@ -1160,7 +1160,9 @@ setMethod("screenSuspects", "featureGroups", function(obj, suspects, rtWindow, m
 
     suspects$name <- as.character(suspects$name) # in case factors are given
 
-    retlist <- lapply(seq_len(nrow(suspects)), function (ti)
+    prog <- openProgBar(0, nrow(suspects))
+    
+    retlist <- lapply(seq_len(nrow(suspects)), function(ti)
     {
         hasRT <- !is.null(suspects$rt) && !is.na(suspects$rt[ti])
 
@@ -1175,7 +1177,7 @@ setMethod("screenSuspects", "featureGroups", function(obj, suspects, rtWindow, m
             return(data.table(name = suspects$name[ti], rt = if (hasRT) suspects$rt[ti] else NA, mz = suspects$mz[ti],
                               group = NA, exp_rt = NA, exp_mz = NA, d_rt = NA, d_mz = NA))
 
-        return(rbindlist(lapply(rownames(gi), function(g)
+        hits <- rbindlist(lapply(rownames(gi), function(g)
         {
             ret <- data.table(name = suspects$name[ti], rt = if (hasRT) suspects$rt[ti] else NA, mz = suspects$mz[ti],
                               group = g, exp_rt = gi[g, "rts"], exp_mz = gi[g, "mzs"],
@@ -1185,10 +1187,16 @@ setMethod("screenSuspects", "featureGroups", function(obj, suspects, rtWindow, m
                 set(ret, 1L, anaInfo$analysis[anai], gTable[[g]][anai])
 
             return(ret)
-        }), fill = TRUE))
+        }), fill = TRUE)
+        
+        setTxtProgressBar(prog, ti)
+        return(hits)
     })
-
     ret <- rbindlist(retlist, fill = TRUE)
+    
+    setTxtProgressBar(prog, nrow(suspects))
+    close(prog)
+    
     suspectsn <- nrow(suspects)
     foundn <- suspectsn - sum(is.na(ret$group))
     printf("Found %d/%d suspects (%.2f%%)\n", foundn, suspectsn, foundn * 100 / suspectsn)

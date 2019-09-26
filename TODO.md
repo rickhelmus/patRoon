@@ -7,6 +7,7 @@
 - consistent src file names, split utils?
 - get RAMClustR from CRAN?
 - set max processes to threads-1? --> decide after bench
+- convertMSFiles: check if input exists
 
 
 ## docs
@@ -27,6 +28,7 @@
 - tests to verify getXCMSSet
 - suspect screening
     - rename patRoonData::targets
+    - rename groupFeaturesScreening?
 - filter()
     - document which filters work on feature level (e.g. chromWidth)
     - remove zero values for maxReplicateIntRSD?
@@ -87,6 +89,7 @@
 - parallel enviPick
 - OpenMS MetaboliteAdductDecharger support?
 - OpenMS: Support KD grouper?
+- suspect screening: tag fGroups with suspect instead of converting fGroups object (and add filter to remove non-hits)
 
 
 ## MSPeakLists

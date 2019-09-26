@@ -212,6 +212,8 @@ setMethod("screenSuspects", "features", function(obj, suspects, rtWindow, mzWind
     fTable <- featureTable(obj)
     anaInfo <- analysisInfo(obj)
     
+    suspects$name <- as.character(suspects$name) # in case factors are given
+    
     prog <- openProgBar(0, nrow(suspects))
 
     retlist <- lapply(seq_len(nrow(suspects)), function(ti)

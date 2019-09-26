@@ -1,6 +1,8 @@
 #' @include main.R
 NULL
 
+# UNDONE: precursor --> parent?
+
 # UNDONE: move
 #' @export
 TPPredictions <- setClass("TPPredictions",
@@ -92,6 +94,13 @@ collapseBTResults <- function(pred)
     predAll <- unique(predAll, by = "InChIKey")
 
     return(predAll)    
+}
+
+getPrecursorSuspList <- function(pred, adduct)
+{
+    addMZ <- adductMZDelta(adduct)
+    ret <- copy(suspects(pred))
+    ret[, mz := sapply(getMoleculesFromSMILES(SMILES, doTyping = TRUE, doIsotopes = TRUE), rcdk::get.exact.mass) + addMZ]
 }
 
 #' @export
@@ -246,33 +255,21 @@ setMethod("convertToSuspects", "TPPredictionsBT", function(pred, adduct, include
     setnames(predAll, "Identifier", "name")
     
     # calculate adduct m/z to make subsequent ion calculations faster
-    # NOTE: rcdk::get.formula makes elemental counts absolute
-    addMZ <- 0
-    getMZ <- function(form, charge = 0) rcdk::get.formula(form, charge)@mass
-    if (length(adduct@add) > 0 && length(adduct@sub) > 0) # NOTE: add charge once
-        addMZ <- sum(sapply(adduct@add, getMZ, charge = adduct@charge)) - sum(sapply(adduct@sub, getMZ))
-    else if (length(adduct@add) > 0)
-        addMZ <- sum(sapply(adduct@add, getMZ, charge = adduct@charge))
-    else if (length(adduct@sub) > 0)
-        addMZ <- -(sum(sapply(adduct@sub, getMZ, charge = adduct@charge)))
-    
-    # predAll[, `Adduct formula` := calculateIonFormula(`Molecular formula`, adduct)]
-    # predAll[, mz := sapply(`Adduct formula`, function(f) rcdk::get.formula(f, adduct@charge)@mass)]
+    addMZ <- adductMZDelta(adduct)
     predAll[, mz := `Major Isotope Mass` + addMZ]
     
     if (includePrec)
-    {
-        precs <- copy(suspects(pred))
-        precs[, mz := sapply(getMoleculesFromSMILES(SMILES, doTyping = TRUE, doIsotopes = TRUE), rcdk::get.exact.mass) + addMZ]
-        # precs[, `Molecular formula` := sapply(getMoleculesFromSMILES(SMILES), function(mol) rcdk::get.mol2formula(mol)@string)]
-        # precs[, `Adduct formula` := calculateIonFormula(`Molecular formula`, adduct)]
-        # precs[, mz := sapply(`Adduct formula`, function(f) rcdk::get.formula(f, adduct@charge)@mass)]
-        
-        predAll <- rbind(precs, predAll, fill = TRUE)
-    }
+        predAll <- rbind(getPrecursorSuspList(pred, adduct), predAll, fill = TRUE)
 
     if (tidy)
         predAll <- predAll[, c("name", "mz"), with = FALSE]
     
     return(predAll)
+})
+
+setMethod("linkPrecursorsToFGroups", "TPPredictionsBT", function(pred, fGroups, adduct, mzWindow)
+{
+    suspList <- getPrecursorSuspList(pred, adduct)
+    scr <- screenSuspects(fGroups, suspList, mzWindow = mzWindow)
+    return(scr[, c("name", "group")])
 })

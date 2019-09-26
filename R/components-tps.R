@@ -48,19 +48,19 @@ generateComponentsTPs <- function(fGroups, pred, adduct, mzWindow = 0.005, rGrou
     #       - filter TPs (retention, intensity, ...)
     
     
-    suspList <- convertToSuspects(pred, adduct)
-    
-    printf("Screening precursors and TPs...\n")
-    screening <- screenSuspects(fGroups, suspList, mzWindow = mzWindow)
-    screening <- screening[!is.na(group)] # remove non-hits
-    susps <- suspects(pred)
-    screeningPrec <- screening[name %in% susps$name]
-    screeningTPs <- screening[!name %in% susps$name]
+    suspList <- convertToSuspects(pred, adduct, includePrec = FALSE)
 
+    printf("Screening TPs...\n")
+    
+    screeningTPs <- screenSuspects(fGroups, suspList, mzWindow = mzWindow)
+    screeningTPs <- screeningTPs[!is.na(group)] # remove non-hits
+    susps <- suspects(pred)
+    precGroups <- linkPrecursorsToFGroups(pred, fGroups, adduct, mzWindow)
+    
     if (!is.null(rGroupsIn))
     {
         fg <- replicateGroupSubtract(fGroups, rGroupsEff, inThreshold)
-        screeningPrec <- screeningPrec[group %in% names(fg)]
+        precGroups <- precGroups[group %in% names(fg)]
     }
     if (!is.null(rGroupsEff))
     {
@@ -70,7 +70,7 @@ generateComponentsTPs <- function(fGroups, pred, adduct, mzWindow = 0.005, rGrou
     
     compTab <- rbindlist(mapply(susps$name, predictions(pred), SIMPLIFY = FALSE, FUN = function(pname, preds)
     {
-        scrP <- screeningPrec[screeningPrec$name == pname]
+        scrP <- precGroups[precGroups$name == pname]
         scrTP <- screeningTPs[name %in% preds$Identifier]
         
         if (nrow(scrP) == 0 || nrow(scrTP) == 0)

@@ -59,6 +59,7 @@ generateComponentsTPs <- function(fGroups, pred, adduct, mzWindow = 0.005, rGrou
     
     if (!is.null(rGroupsIn))
     {
+        # UNDONE: or isolate rGroup?
         fg <- replicateGroupSubtract(fGroups, rGroupsEff, inThreshold)
         precGroups <- precGroups[group %in% names(fg)]
     }

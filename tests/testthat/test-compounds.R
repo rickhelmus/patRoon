@@ -299,7 +299,7 @@ test_that("plotting works", {
                  length(consensus(compsMF, compsSIR, relMinAbundance = 1)))
     expect_equal(expect_plot(plotVenn(compsMF, compsSIREmpty))$intersectionCounts, 0)
 
-    expect_plot(plotUpSet(compsMF, compsSIR))
+    expect_ggplot(plotUpSet(compsMF, compsSIR))
     expect_error(plotUpSet(compsMFEmpty, compsSIREmpty))
     expect_error(plotUpSet(compsMF, compsSIREmpty))
 })

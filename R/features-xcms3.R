@@ -13,7 +13,7 @@ setMethod("initialize", "featuresXCMS3",
 setMethod("[", c("featuresXCMS3", "ANY", "missing", "missing"), function(x, i, j, ..., drop = TRUE)
 {
     x <- callNextMethod(x, i, j, ..., drop)
-    x@xdata <- xcms::filterFile(analyses(x))
+    x@xdata <- xcms::filterFile(x@xdata, analyses(x))
     return(x)
 })
 

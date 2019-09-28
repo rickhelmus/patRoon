@@ -383,12 +383,16 @@ getBrewerPal <- function(n, name)
     return(RColorBrewer::brewer.pal(n, name))
 }
 
-getArgNames <- function(...)
+getArgNames <- function(..., def = NULL)
 {
     args <- sapply(substitute(list(...))[-1], deparse)
     n <- names(args)
+    if (is.null(def))
+        def <- args
     if (!is.null(n))
-        args <- ifelse(n != "", n, args)
+        args <- ifelse(nzchar(n), n, def)
+    else if (!is.null(def))
+        args <- def
     return(args)
 }
 

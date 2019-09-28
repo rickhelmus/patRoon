@@ -36,8 +36,9 @@
 }
 \arguments{
 \item{\dots}{For \code{comparison}: \code{featureGroups} objects that should
-  be compared. Objects are automatically labelled by their
-  \code{\link{algorithm}}.
+  be compared. If the arguments are named (\emph{e.g.} \code{myGroups =
+  fGroups}) then these are used for labelling, otherwise objects are
+  automatically labelled by their \code{\link{algorithm}}.
 
   For \code{plot}, \code{plotVenn}, \code{plotChord}: further options passed
   to \code{plot}, \pkg{\link{VennDiagram}} plotting functions (\emph{e.g.}

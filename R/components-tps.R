@@ -76,15 +76,19 @@ generateComponentsTPs <- function(fGroups, pred, adduct, mzWindow = 0.005, rGrou
         
         if (nrow(scrP) == 0 || nrow(scrTP) == 0)
             return(NULL)
+
+        keepCols <- c("name", "group", "mz", "exp_rt", "exp_mz")
+        scrTP <- scrTP[, keepCols, with = FALSE]
+        setnames(scrTP, keepCols, c("TP_name", "TP_group", "TP_mz", "rt", "mz"))
         
+        # limit columns a bit to not bloat components too much
+        # UNDONE: column selection OK?
+        preds <- preds[, c("Identifier", "InChIKey", "Molecular formula", "Major Isotope Mass")]
+                
         comps <- rbindlist(lapply(split(scrP, by = "group"), function(scrRow)
         {
             # UNDONE: do more checks etc
-            # UNDONE: omit precursor columns? Or move to compInfo?
-            # UNDONE: make column names more clear (e.g. from suspects)
-            
-            ret <- merge(scrTP, preds, by.x = "name", by.y = "Identifier")
-            setnames(ret, c("name", "group"), c("TP_name", "TP_group"))
+            ret <- merge(scrTP, preds, by.x = "TP_name", by.y = "Identifier")
             return(ret)
         }), idcol = "precursor_group")
     }), idcol = "precursor_susp_name")

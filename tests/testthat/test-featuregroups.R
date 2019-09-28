@@ -279,8 +279,8 @@ test_that("plotting works", {
                  length(consensus(fGCompOpenMS, relMinAbundance = 1)))
 
     # vdiffr doesn't work with UpSet
-    expect_plot(plotUpSet(fgOpenMS))
-    expect_plot(plotUpSet(fGCompOpenMS))
+    expect_ggplot(plotUpSet(fgOpenMS))
+    expect_ggplot(plotUpSet(fGCompOpenMS))
 })
 
 test_that("plotting empty objects works", {
@@ -302,6 +302,6 @@ test_that("plotting empty objects works", {
     expect_error(plotVenn(fgCompBothEmpty))
 
     expect_error(plotUpSet(fgOpenMSEmpty))
-    expect_plot(plotUpSet(fGConsOneEmpty))
+    expect_ggplot(plotUpSet(fGConsOneEmpty))
     expect_error(plotUpSet(fgCompBothEmpty))
 })

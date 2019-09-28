@@ -268,7 +268,7 @@ test_that("plotting works", {
                  length(consensus(formsGF, formsSIR, relMinAbundance = 1)))
     expect_equal(expect_plot(plotVenn(formsGF, formsSIREmpty))$intersectionCounts, 0)
 
-    expect_plot(plotUpSet(formsGF, formsSIR))
+    expect_ggplot(plotUpSet(formsGF, formsSIR))
     expect_error(plotUpSet(formsGFEmpty, formsSIREmpty))
     expect_error(plotUpSet(formsGF, formsSIREmpty))
 })

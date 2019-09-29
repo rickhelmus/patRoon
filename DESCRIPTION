@@ -143,6 +143,7 @@ Collate:
     'check_components.R'
     'check_features.R'
     'RcppExports.R'
+    'TP.R'
     'TP-biotransformer.R'
     'workflow-step-set.R'
     'features-set.R'

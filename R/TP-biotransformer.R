@@ -1,18 +1,8 @@
 #' @include main.R
+#' @include TP.R
 NULL
 
 # UNDONE: precursor --> parent?
-
-# UNDONE: move
-#' @export
-TPPredictions <- setClass("TPPredictions",
-                          slots = c(suspects = "data.table", predictions = "list"),
-                          contains = c("VIRTUAL", "workflowStep"))
-
-setMethod("suspects", "TPPredictions", function(pred) pred@suspects)
-
-setMethod("predictions", "TPPredictions", function(pred) pred@predictions)
-
 
 #' @export
 TPPredictionsBT <- setClass("TPPredictionsBT", contains = "TPPredictions")

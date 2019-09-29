@@ -78,11 +78,6 @@ setMethod("componentTable", "components", function(obj) obj@components)
 #' @export
 setMethod("componentInfo", "components", function(obj) obj@componentInfo)
 
-#' @describeIn components Retrieve the algorithm (a character string) used to
-#'   generate components.
-#' @export
-setMethod("algorithm", "components", function(obj) obj@algorithm)
-
 #' @templateVar class components
 #' @templateVar what feature groups
 #' @template strmethod

@@ -203,7 +203,18 @@ setMethod("convertToMFDB", "TPPredictionsBT", function(pred, out, includePrec)
              c("formula", "mass", "Precursor Major Isotope Mass"),
              c("MolecularFormula", "MonoisotopicMass", "Precursor MonoisotopicMass"))
 
-    predAll[, SMILES := sapply(rinchi::parse.inchi(InChI), rcdk::get.smiles)]
+    mols <- suppressWarnings(rinchi::parse.inchi(predAll$InChI))
+    nullMols <- which(sapply(mols, is.null))
+    if (length(nullMols) > 0)
+    {
+        warning(paste("Failed to convert some InChI strings:\n",
+                      paste0(sprintf("%s (%s)\n", predAll$InChI[nullMols], predAll$name[nullMols]),
+                             collapse = "\n")))
+        predAll <- predAll[-nullMols]
+        mols <- mols[-nullMols]
+    }
+    
+    predAll[, SMILES := sapply(mols, rcdk::get.smiles)]
         
     if (includePrec)
     {

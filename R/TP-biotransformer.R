@@ -47,15 +47,21 @@ processBTResults <- function(cmd)
 
     # UNDONE: transform column names, more?
 
-    # seems the same as "Metabolite ID" column(?)
-    ret[, `cdk:Title` := NULL]
+    # Simplify/harmonize columns a bit
+    setnames(ret,
+             c("Molecular formula", "Major Isotope Mass"),
+             c("formula", "mass"))
+    
+    # No need for these...
+    # NOTE: cdk:Title seems the same as "Metabolite ID" column(?)
+    ret[, c("Synonyms", "PUBCHEM_CID", "cdk:Title") := NULL]
     
     # BUG: BT somestimes doesn't fill in the formula. Calculate them manually
-    ret[!nzchar(`Molecular formula`),
-        `Molecular formula` := sapply(InChI, function(i) rcdk::get.mol2formula(rinchi::parse.inchi(i)[[1]])@string)]
+    ret[!nzchar(formula),
+        formula := sapply(InChI, function(i) rcdk::get.mol2formula(rinchi::parse.inchi(i)[[1]])@string)]
     
     # Assign some unique identifier
-    ret[, Identifier := paste0(cmd$precursor, "-TP", seq_len(nrow(ret)))]
+    ret[, name := paste0(cmd$precursor, "-TP", seq_len(nrow(ret)))]
     
     return(ret)
 }
@@ -194,9 +200,8 @@ setMethod("convertToMFDB", "TPPredictionsBT", function(pred, out, includePrec)
 
     # set to MetFrag style names
     setnames(predAll,
-             c("Synonyms", "Molecular formula", "Major Isotope Mass", "Precursor Major Isotope Mass"),
-             c("CompoundName", "MolecularFormula", "MonoisotopicMass", "Precursor MonoisotopicMass"))
-
+             c("formula", "mass", "Precursor Major Isotope Mass"),
+             c("MolecularFormula", "MonoisotopicMass", "Precursor MonoisotopicMass"))
 
     predAll[, SMILES := sapply(rinchi::parse.inchi(InChI), rcdk::get.smiles)]
         
@@ -220,8 +225,8 @@ setMethod("convertToMFDB", "TPPredictionsBT", function(pred, out, includePrec)
     # Add required InChIKey1 column
     predAll[, InChIKey1 := sub("\\-.*", "", InChIKey)]
 
-    # equalize identifiers and name's, if there is no name yet
-    predAll[!nzchar(CompoundName), CompoundName := Identifier]
+    # equalize identifiers and name's
+    predAll[, CompoundName := Identifier]
     
     fwrite(predAll, out)
 })
@@ -239,14 +244,13 @@ setMethod("convertToSuspects", "TPPredictionsBT", function(pred, adduct, include
     # predAll <- rbindlist(predictions(pred))[, c("Identifier", "Molecular formula")]
     predAll <- rbindlist(predictions(pred))
     # UNDONE: remove me
-    predAll[!nzchar(`Molecular formula`),
-            `Molecular formula` := sapply(InChI, function(i) rcdk::get.mol2formula(rinchi::parse.inchi(i)[[1]])@string)]
-    predAll <- predAll[, c("Identifier", "Major Isotope Mass")]
-    setnames(predAll, "Identifier", "name")
+    # predAll[!nzchar(`Molecular formula`),
+    #         `Molecular formula` := sapply(InChI, function(i) rcdk::get.mol2formula(rinchi::parse.inchi(i)[[1]])@string)]
+    predAll <- predAll[, c("name", "mass")]
     
     # calculate adduct m/z to make subsequent ion calculations faster
     addMZ <- adductMZDelta(adduct)
-    predAll[, mz := `Major Isotope Mass` + addMZ]
+    predAll[, mz := mass + addMZ]
     
     if (includePrec)
         predAll <- rbind(getPrecursorSuspList(pred, adduct), predAll, fill = TRUE)

@@ -88,23 +88,31 @@ generateComponentsTPs <- function(fGroups, pred, adduct, mzWindow = 0.005, rGrou
         comps <- rbindlist(lapply(split(scrP, by = "group"), function(scrRow)
         {
             # UNDONE: do more checks etc
-            ret <- merge(scrTP, preds, by.x = "TP_name", by.y = "Identifier")
+            ret <- merge(scrTP, preds, by.x = "TP_name", by.y = "name")
             return(ret)
         }), idcol = "precursor_group")
     }), idcol = "precursor_susp_name")
 
-    compTab[, name := paste0("CMP", .GRP), by = c("precursor_susp_name", "precursor_group")]
-    compTab[, links := list(list(unique(name))), by = c("TP_name", "TP_group")] # link to other components having this TP
-    compTab[, links := mapply(links, name, FUN = setdiff)] # remove self-links
+    if (nrow(compTab) > 0)
+    {
+        compTab[, name := paste0("CMP", .GRP), by = c("precursor_susp_name", "precursor_group")]
+        compTab[, links := list(list(unique(name))), by = c("TP_name", "TP_group")] # link to other components having this TP
+        compTab[, links := mapply(links, name, FUN = setdiff)] # remove self-links
+        
+        compList <- split(compTab[, -"name"], by = c("precursor_susp_name", "precursor_group"), keep.by = FALSE)
+        
+        compInfo <- unique(compTab[, c("name", "precursor_susp_name", "precursor_group")])
+        compInfo[, size := sapply(compList, nrow)]
+        setcolorder(compInfo, "name")
+        
+        names(compList) <- compInfo$name
+    }
+    else
+    {
+        compInfo <- data.table()
+        compList <- list()
+    }
     
-    compList <- split(compTab[, -"name"], by = c("precursor_susp_name", "precursor_group"), keep.by = FALSE)
-    
-    compInfo <- unique(compTab[, c("name", "precursor_susp_name", "precursor_group")])
-    compInfo[, size := sapply(compList, nrow)]
-    setcolorder(compInfo, "name")
-    
-    names(compList) <- compInfo$name
-
     ret <- componentsTPs(componentInfo = compInfo, components = compList)    
     saveCacheData("componentsTPs", ret, hash)
     

@@ -10,6 +10,13 @@ NULL
 #' Objects for this class are returned by \link[=MSPeakLists-generation]{MS peak
 #' lists generators}.
 #'
+#' @param MSLevel The MS level: \samp{1} for regular MS, \samp{2} for MSMS.
+#' @param \dots Further arguments passed to \code{\link[graphics]{plot}}
+#'   (\code{plotSpec}) or \code{\link{SpectrumSimilarity}}
+#'   (\code{spectrumSimilarity}).
+#'   
+#' @template plot-lim
+#' 
 #' @slot peakLists Contains a list of all MS (and MS/MS) peak lists. Use the
 #'   \code{peakLists} method for access.
 #' @slot metadata Metadata for all spectra used to generate peak lists. Follows
@@ -492,10 +499,8 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
 #'   made.
 #' @param analysis The name of the analysis for which a plot should be made. If
 #'   \code{NULL} then data from the feature group averaged peak list is used.
-#' @param MSLevel The MS level: \samp{1} for regular MS, \samp{2} for MSMS.
 #' @param title The title of the plot. If \code{NULL} a title will be
 #'   automatically made.
-#' @param \dots Further arguments passed to \code{\link[graphics]{plot}}.
 #'
 #' @template useGGplot2
 #'
@@ -531,6 +536,59 @@ setMethod("plotSpectrum", "MSPeakLists", function(obj, groupName, analysis = NUL
         return(makeMSPlotGG(getMSPlotData(spec, 2)) + ggtitle(title))
 
     makeMSPlot(getMSPlotData(spec, 2), mincex, xlim, ylim, main = title, ...)
+})
+
+#' @describeIn MSPeakLists Calculates and plots the spectral similarity between
+#'   two spectra. For this the \code{\link{SpectrumSimilarity}} function is used
+#'   of the \CRANpkg{OrgMassSpecR} package.
+#'
+#' @param groupName1,groupName2 The names of the feature groups for which the
+#'   comparison should be made.
+#' @param analysis1,analysis2 The name of the analysis for the comparison. If
+#'   \code{NULL} then data from the feature group averaged peak list is used.
+#' @param doPlot Set to \code{TRUE} to make a head-to-tail plot. Otherwise only
+#'   the similarity will be returned.
+#' @param absMzDev Maximum deviation for \emph{m/z} alignment (in Da). Sets the
+#'   \code{t} argument of \code{\link{SpectrumSimilarity}}.
+#' @param relMinIntensity Relative intensity threshold. Sets the \code{b}
+#'   argument of \code{\link{SpectrumSimilarity}}.
+#'
+#' @return \code{spectrumSimilarity} returns the same as
+#'   \code{\link{SpectrumSimilarity}}.
+
+#' @aliases spectrumSimilarity
+#' @export
+setMethod("spectrumSimilarity", "MSPeakLists", function(obj, groupName1, groupName2,
+                                                        analysis1 = NULL, analysis2 = NULL,
+                                                        MSLevel = 1, doPlot = TRUE, absMzDev = 0.005,
+                                                        relMinIntensity = 10, xlim = NULL,
+                                                        ylim = c(0, 100), ...)
+{
+    ac <- checkmate::makeAssertCollection()
+    aapply(checkmate::assertChoice, . ~ groupName1 + groupName2,
+           fixed = list(choices = groupNames(obj), add = ac))
+    aapply(checkmate::assertChoice, . ~ analysis1 + analysis2, null.ok = TRUE,
+           fixed = list(choices = analyses(obj), add = ac))
+    checkmate::assertChoice(MSLevel, 1:2, add = ac)
+    checkmate::assertFlag(doPlot)
+    aapply(checkmate::assertNumber, . ~ absMzDev + relMinIntensity, lower = 0, finite = TRUE,
+           fixed = list(add = ac))
+    assertXYLim(xlim, ylim, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    if (length(obj) == 0)
+        return(NULL)
+    
+    spec1 <- getSpec(obj, groupName1, MSLevel, analysis1)
+    spec2 <- getSpec(obj, groupName2, MSLevel, analysis2)
+    if (is.null(spec1) || is.null(spec2))
+        return(NULL)
+    
+    if (is.null(xlim))
+        xlim <- c(min(spec1$mz, spec2$mz), max(spec1$mz, spec2$mz))
+    
+    return(OrgMassSpecR::SpectrumSimilarity(spec1, spec2, t = absMzDev, b = relMinIntensity,
+                                            print.graphic = doPlot, xlim = xlim, ylim, ...))
 })
 
 

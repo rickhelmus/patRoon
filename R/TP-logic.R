@@ -40,6 +40,13 @@ TPPredictionsLogic <- setClass("TPPredictionsLogic", contains = "TPPredictions")
 setMethod("initialize", "TPPredictionsLogic",
           function(.Object, ...) callNextMethod(.Object, algorithm = "logic", ...))
 
+setMethod("linkPrecursorsToFGroups", "TPPredictionsLogic", function(pred, fGroups, adduct, mzWindow)
+{
+    # here we can just link directly (ie suspects are the groups)
+    return(data.table(name = suspects(pred)$name,
+                      group = suspects(pred)$name))
+})
+
 #' @export
 predictTPsLogic <- function(fGroups, adduct, minMass = 40)
 {

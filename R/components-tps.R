@@ -11,7 +11,7 @@ setMethod("initialize", "componentsTPs",
 
 #' @export
 generateComponentsTPs <- function(fGroups, pred, adduct, mzWindow = 0.005, rGroupsIn = NULL, rGroupsEff = NULL,
-                                  inThreshold = 0, effThreshold = 0)
+                                  inThreshold = 0, effThreshold = 0, minRTDiff = 20)
 {
     checkmate::assertClass(fGroups, "featureGroups")
 
@@ -20,7 +20,8 @@ generateComponentsTPs <- function(fGroups, pred, adduct, mzWindow = 0.005, rGrou
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(pred, "TPPredictions")
     
-    aapply(checkmate::assertNumber, . ~ mzWindow + inThreshold, effThreshold, lower = 0, finite = TRUE, fixed = list(add = ac))
+    aapply(checkmate::assertNumber, . ~ mzWindow + inThreshold, effThreshold + minRTDiff,
+           lower = 0, finite = TRUE, fixed = list(add = ac))
     
     if (!is.null(rGroupsIn))
         checkmate::assertSubset(rGroupsIn, empty.ok = FALSE, choices = rGroups, add = ac)
@@ -69,6 +70,8 @@ generateComponentsTPs <- function(fGroups, pred, adduct, mzWindow = 0.005, rGrou
         screeningTPs <- screeningTPs[group %in% names(fg)]
     }
     
+    gInfo <- groupInfo(fGroups)
+    
     compTab <- rbindlist(mapply(susps$name, predictions(pred), SIMPLIFY = FALSE, FUN = function(pname, preds)
     {
         scrP <- precGroups[precGroups$name == pname]
@@ -83,13 +86,20 @@ generateComponentsTPs <- function(fGroups, pred, adduct, mzWindow = 0.005, rGrou
         
         # limit columns a bit to not bloat components too much
         # UNDONE: column selection OK?
-        prCols <- c("name", "InChIKey", "formula", "mass")
+        prCols <- c("name", "InChIKey", "formula", "mass", "RTDir")
         preds <- preds[, intersect(names(preds), prCols), with = FALSE]
-                
+
         comps <- rbindlist(lapply(split(scrP, by = "group"), function(scrRow)
         {
             # UNDONE: do more checks etc
             ret <- merge(scrTP, preds, by.x = "TP_name", by.y = "name")
+            
+            if (minRTDiff > 0)
+            {
+                rtDiffs <- ret$rt - gInfo[scrRow$group, "rts"]
+                ret[, keep := RTDir == 0 | abs(rtDiffs) <= minRTDiff | (rtDiffs < 0 & RTDir < 0) | (rtDiffs > 0 & RTDir > 0)]
+            }
+            
             return(ret)
         }), idcol = "precursor_group")
     }), idcol = "precursor_susp_name")

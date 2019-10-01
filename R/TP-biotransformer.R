@@ -63,6 +63,8 @@ processBTResults <- function(cmd)
     # Assign some unique identifier
     ret[, name := paste0(cmd$precursor, "-TP", seq_len(nrow(ret)))]
     
+    ret[, RTDir := ifelse(ALogP < `Precursor ALogP`, -1, 1)]
+    
     return(ret)
 }
 

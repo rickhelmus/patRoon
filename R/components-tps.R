@@ -72,18 +72,19 @@ generateComponentsTPs <- function(fGroups, pred, adduct, mzWindow = 0.005, rGrou
     compTab <- rbindlist(mapply(susps$name, predictions(pred), SIMPLIFY = FALSE, FUN = function(pname, preds)
     {
         scrP <- precGroups[precGroups$name == pname]
-        scrTP <- screeningTPs[name %in% preds$Identifier]
+        scrTP <- screeningTPs[name %in% preds$name]
         
         if (nrow(scrP) == 0 || nrow(scrTP) == 0)
             return(NULL)
 
-        keepCols <- c("name", "group", "mz", "exp_rt", "exp_mz")
-        scrTP <- scrTP[, keepCols, with = FALSE]
-        setnames(scrTP, keepCols, c("TP_name", "TP_group", "TP_mz", "rt", "mz"))
+        rnCols <- c("name", "mz", "exp_rt", "exp_mz")
+        scrTP <- scrTP[, c("group", rnCols), with = FALSE]
+        setnames(scrTP, rnCols, c("TP_name", "TP_mz", "rt", "mz"))
         
         # limit columns a bit to not bloat components too much
         # UNDONE: column selection OK?
-        preds <- preds[, c("Identifier", "InChIKey", "Molecular formula", "Major Isotope Mass")]
+        prCols <- c("name", "InChIKey", "formula", "mass")
+        preds <- preds[, intersect(names(preds), prCols), with = FALSE]
                 
         comps <- rbindlist(lapply(split(scrP, by = "group"), function(scrRow)
         {
@@ -96,7 +97,7 @@ generateComponentsTPs <- function(fGroups, pred, adduct, mzWindow = 0.005, rGrou
     if (nrow(compTab) > 0)
     {
         compTab[, name := paste0("CMP", .GRP), by = c("precursor_susp_name", "precursor_group")]
-        compTab[, links := list(list(unique(name))), by = c("TP_name", "TP_group")] # link to other components having this TP
+        compTab[, links := list(list(unique(name))), by = c("TP_name", "group")] # link to other components having this TP
         compTab[, links := mapply(links, name, FUN = setdiff)] # remove self-links
         
         compList <- split(compTab[, -"name"], by = c("precursor_susp_name", "precursor_group"), keep.by = FALSE)

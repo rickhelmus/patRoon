@@ -9,27 +9,29 @@ getTPLogicTransformations <- function()
     # UNDONE: cite 10.1021/acs.analchem.5b02905
     
     ret <- rbindlist(list(
-        list("hydroxylation", "O", "", TRUE),
-        list("demethylation", "", "CH2", TRUE),
-        list("deethylation", "", "C2H4", TRUE),
-        list("dehydrogenation", "H2", "", TRUE), # UNDONE: isn't this hydrogenation (and vice versa)?
-        list("hydrogenation", "", "H2", TRUE),
-        list("dehydration", "", "H2O", TRUE),
-        list("chlorine_reduction", "H", "Cl", TRUE),
-        list("acetylation", "C2H2O", "", TRUE),
-        list("deacetylation", "", "C2H2O", TRUE),
-        list("glucuronidation", "C6H8O6", "", TRUE),
-        list("deglucuronidation", "", "C8H8O6", FALSE),
-        list("sulfonation", "SO3", "", TRUE),
-        list("desulfonation", "", "SO3", TRUE)
+        list("hydroxylation", "O", "", -1),
+        list("demethylation", "", "CH2", -1),
+        list("deethylation", "", "C2H4", -1),
+        list("dehydrogenation", "H2", "", -1), # UNDONE: isn't this hydrogenation (and vice versa)?
+        list("hydrogenation", "", "H2", -1),
+        list("dehydration", "", "H2O", -1),
+        list("chlorine_reduction", "H", "Cl", -1),
+        list("acetylation", "C2H2O", "", -1),
+        list("deacetylation", "", "C2H2O", -1),
+        list("glucuronidation", "C6H8O6", "", -1),
+        list("deglucuronidation", "", "C8H8O6", 0), # UNDONE: or RTDir=1
+        list("sulfonation", "SO3", "", -1),
+        list("desulfonation", "", "SO3", -1)
     ))
-    setnames(ret, c("reaction", "add", "sub", "lowerRT"))
+    
+    # RTDir: -1: <= precursor; 0: no check; 1: >= precursor
+    setnames(ret, c("reaction", "add", "sub", "RTDir"))
     
     getMZ <- function(f) rcdk::get.formula(f)@mass
     
-    ret[, delta_mz := 0]
-    ret[nzchar(add), delta_mz := sapply(add, getMZ)]
-    ret[nzchar(sub), delta_mz := delta_mz - sapply(sub, getMZ)]
+    ret[, deltaMZ := 0]
+    ret[nzchar(add), deltaMZ := sapply(add, getMZ)]
+    ret[nzchar(sub), deltaMZ := deltaMZ - sapply(sub, getMZ)]
     
     return(ret[])
 }
@@ -70,9 +72,9 @@ predictTPsLogic <- function(fGroups, adduct, minMass = 40)
         
         ret <- data.table(name = paste0(suspects$name[si], "-",
                                               transformations$reaction),
-                          mass = mass + transformations$delta_mz,
-                          mz = suspects$mz[si] + transformations$delta_mz,
-                          lowerRT = transformations$lowerRT)
+                          mass = mass + transformations$deltaMZ,
+                          mz = suspects$mz[si] + transformations$deltaMZ,
+                          RTDir = transformations$RTDir)
         ret <- ret[mass >= minMass]
         
         # UNDONE: more checks (e.g. formulas)

@@ -122,9 +122,9 @@ setMethod("show", "formulas", function(object)
     printf("  - Average formulas per feature: %.1f\n", mft)
 
     gft <- formulaTable(object)
-    mfg <- if (length(gft) > 0) sapply(gft, nrow) else 0
+    mfg <- if (length(gft) > 0) sapply(gft, function(ft) length(unique(ft$formula))) else 0
     printf("Formulas assigned to feature groups:\n")
-    printf("  - Total formula count: %d\n", length(object))
+    printf("  - Total formula count: %d\n", sum(mfg))
     printf("  - Average formulas per feature group: %.1f\n", mean(mfg))
 })
 

@@ -28,6 +28,7 @@
 \alias{export}
 \alias{as.data.table,featureGroups-method}
 \alias{plot,featureGroups,ANY-method}
+\alias{plotUnique,featureGroups-method}
 \alias{plotInt,featureGroups-method}
 \alias{plotChord,featureGroups-method}
 \alias{plotEIC,featureGroups-method}
@@ -86,6 +87,9 @@
 
 \S4method{plot}{featureGroups,ANY}(x, retMin = FALSE, col = NULL,
   pch = 16, ...)
+
+\S4method{plotUnique}{featureGroups}(obj, which = NULL,
+  plotOverlapping = TRUE, retMin = FALSE, showLegend = TRUE, ...)
 
 \S4method{plotInt}{featureGroups}(obj, average = FALSE, pch = 20,
   type = "b", lty = 3, col = NULL, ...)
@@ -165,6 +169,14 @@ generated.}
 \item{pch, type, lty}{Common plotting parameters passed to \emph{e.g.}
 \code{\link[graphics]{plot}}.}
 
+\item{which}{A character vector with replicate groups used for comparison.
+For plotting functions: set to \code{NULL} for all replicate groups.}
+
+\item{showLegend}{If \code{TRUE} a legend will be shown with either replicate
+groups (\code{colourBy} == \code{"rGroups"}) or feature groups
+(\code{colourBy} == \code{"fGroups"}). If \code{colourBy} is \code{"none"}
+no legend will be shown.}
+
 \item{addSelfLinks}{If \code{TRUE} then 'self-links' are added which
 represent non-shared data.}
 
@@ -210,11 +222,6 @@ the plot: \code{"none"} for a single colour or
 \code{"rGroups"}/\code{"fGroups"} for a distinct colour per
 replicate/feature group.}
 
-\item{showLegend}{If \code{TRUE} a legend will be shown with either replicate
-groups (\code{colourBy} == \code{"rGroups"}) or feature groups
-(\code{colourBy} == \code{"fGroups"}). If \code{colourBy} is \code{"none"}
-no legend will be shown.}
-
 \item{onlyPresent}{If \code{TRUE} then EICs will only be generated for
 analyses in which a particular feature group was detected. Disabling this
 option might be useful to see if any features were 'missed'.}
@@ -228,9 +235,6 @@ annotation.}
 
 \item{xlim, ylim}{Sets the plot size limits used by
 \code{\link[graphics]{plot}}. Set to \code{NULL} for automatic plot sizing.}
-
-\item{which}{A character vector with replicate groups used for comparison.
-For plotting functions: set to \code{NULL} for all replicate groups.}
 
 \item{nsets, nintersects}{See \code{\link[UpSetR]{upset}}.}
 
@@ -313,6 +317,9 @@ detection} functionality of \href{http://mzmine.github.io/}{MZmine}.
 with retention, \emph{m/z}, intensity and optionally other feature data.
 
 \item \code{plot}: Generates an \emph{m/z} \emph{vs} retention time
+plot for all featue groups.
+
+\item \code{plotUnique}: Generates an \emph{m/z} \emph{vs} retention time
 plot for all featue groups.
 
 \item \code{plotInt}: Generates a line plot for the (averaged) intensity

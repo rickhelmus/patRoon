@@ -497,6 +497,78 @@ setMethod("plot", "featureGroups", function(x, retMin = FALSE, col = NULL, pch =
     }
 })
 
+#' @describeIn featureGroups Generates an \emph{m/z} \emph{vs} retention time
+#'   plot for all featue groups.
+#' @export
+setMethod("plotUnique", "featureGroups", function(obj, which, plotOverlapping, retMin, showLegend, ...)
+{
+    rGroups <- replicateGroups(obj)
+    if (is.null(which))
+        which <- rGroups
+    
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertSubset(which, rGroups, empty.ok = FALSE, add = ac)
+    aapply(checkmate::assertFlag, . ~ plotOverlapping + retMin + showLegend, fixed = list(add = ac))
+    checkmate::reportAssertions(ac)
+    
+    
+    if (length(obj) == 0)
+        plot(0, type = "n", ...)
+    else
+    {
+        obj <- replicateGroupFilter(obj, which, verbose = FALSE)
+        cols <- colorRampPalette(RColorBrewer::brewer.pal(12, "Paired"))(length(which) + 1)
+        pchs <- seq_len(length(cols)) + 14
+        
+        uniqueGNames <- setNames(lapply(seq_along(which), function(rgi) data.table(group = names(unique(obj, which = which[rgi])),
+                                                                                   col = cols[rgi], pch = pchs[rgi])), which)
+        uniqueGNames <- uniqueGNames[lengths(uniqueGNames) > 0]
+        colorTab <- rbindlist(uniqueGNames)
+        legText <- names(uniqueGNames)
+        
+        if (plotOverlapping)
+        {
+            ovGNames <- setdiff(names(obj), colorTab$group)
+            if (length(ovGNames) > 0)
+            {
+                colorTab <- rbind(colorTab, data.table(group = ovGNames,
+                                                       col = cols[length(which) + 1],
+                                                       pch = pchs[length(which) + 1]))
+                legText <- c(legText, "(partial) overlap")
+            }
+        }
+        else
+            obj <- obj[, colorTab$group] # omit overlapping
+        
+        colorTab <- colorTab[match(names(obj), group)] # put in original order
+        
+        oldp <- par(no.readonly = TRUE)
+        if (showLegend)
+        {
+            makeLegend <- function(x, y, ...)
+            {
+                return(legend(x, y, legText, col = colorTab$col, pch = colorTab$pch,
+                              text.col = colorTab$col, lty = 1,
+                              xpd = NA, ncol = 1, cex = 0.75, bty = "n", ...))
+            }
+            
+            plot.new()
+            leg <- makeLegend(0, 0, plot = FALSE)
+            lw <- (grconvertX(leg$rect$w, to = "ndc") - grconvertX(0, to = "ndc"))
+            par(omd = c(0, 1 - lw, 0, 1), new = TRUE)
+        }
+        
+        plot(if (retMin) obj@groupInfo$rts / 60 else obj@groupInfo$rts, obj@groupInfo$mzs,
+             xlab = if (retMin) "Retention time (min)" else "Retention time (sec.)",
+             ylab = "m/z", col = colorTab$col, pch = colorTab$pch, ...)
+
+        if (showLegend)
+            makeLegend(par("usr")[2], par("usr")[4])
+        
+        par(oldp)
+    }
+})
+
 #' @describeIn featureGroups Generates a line plot for the (averaged) intensity
 #'   of feature groups within all analyses
 #' @export

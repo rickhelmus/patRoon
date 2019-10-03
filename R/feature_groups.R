@@ -520,11 +520,23 @@ setMethod("plotUnique", "featureGroups", function(obj, which, plotOverlapping, r
         cols <- setNames(colorRampPalette(RColorBrewer::brewer.pal(12, "Paired"))(length(labels)), labels)
         pchs <- setNames(seq_len(length(labels)) + 14, labels)
         
-        uniqueGNames <- setNames(lapply(seq_along(which), function(rgi) data.table(group = names(unique(obj, which = which[rgi])),
-                                                                                   col = cols[rgi], pch = pchs[rgi])), which)
-        areEmpty <- lengths(uniqueGNames) == 0
-        labels <- setdiff(labels, names(uniqueGNames[areEmpty]))
-        uniqueGNames <- uniqueGNames[!areEmpty]
+        uniqueFGs <- setNames(lapply(which, function(rg) unique(obj, which = rg)), which)
+        # uniqueGNames <- setNames(lapply(seq_along(which), function(rgi) data.table(group = names(unique(obj, which = which[rgi])),
+        #                                                                            col = cols[rgi], pch = pchs[rgi])), which)
+        
+        areEmpty <- lengths(uniqueFGs) == 0
+        labels <- setdiff(labels, names(uniqueFGs[areEmpty]))
+        uniqueFGs <- uniqueFGs[!areEmpty]
+
+        uniqueGNames <- mapply(uniqueFGs, names(uniqueFGs), SIMPLIFY = FALSE,
+                               FUN = function(fg, rg) data.table(group = names(fg), col = cols[rg], pch = pchs[rg]))
+        names(uniqueFGs) <- names(uniqueFGs)
+                
+        # uniqueGNames <- setNames(lapply(seq_along(which), function(rgi) data.table(group = names(unique(obj, which = which[rgi])),
+        #                                                                            col = cols[rgi], pch = pchs[rgi])), which)
+        
+        # uniqueGNames <- uniqueGNames[!areEmpty]
+        
         colorTab <- rbindlist(uniqueGNames)
         
         if (plotOverlapping)

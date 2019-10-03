@@ -511,34 +511,35 @@ setMethod("plotUnique", "featureGroups", function(obj, which, plotOverlapping, r
     aapply(checkmate::assertFlag, . ~ plotOverlapping + retMin + showLegend, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
     
-    
     if (length(obj) == 0)
         plot(0, type = "n", ...)
     else
     {
         obj <- replicateGroupFilter(obj, which, verbose = FALSE)
-        cols <- colorRampPalette(RColorBrewer::brewer.pal(12, "Paired"))(length(which) + 1)
-        pchs <- seq_len(length(cols)) + 14
+        labels <- c(which, "overlap")
+        cols <- setNames(colorRampPalette(RColorBrewer::brewer.pal(12, "Paired"))(length(labels)), labels)
+        pchs <- setNames(seq_len(length(labels)) + 14, labels)
         
         uniqueGNames <- setNames(lapply(seq_along(which), function(rgi) data.table(group = names(unique(obj, which = which[rgi])),
                                                                                    col = cols[rgi], pch = pchs[rgi])), which)
-        uniqueGNames <- uniqueGNames[lengths(uniqueGNames) > 0]
+        areEmpty <- lengths(uniqueGNames) == 0
+        labels <- setdiff(labels, names(uniqueGNames[areEmpty]))
+        uniqueGNames <- uniqueGNames[!areEmpty]
         colorTab <- rbindlist(uniqueGNames)
-        legText <- names(uniqueGNames)
         
         if (plotOverlapping)
         {
             ovGNames <- setdiff(names(obj), colorTab$group)
             if (length(ovGNames) > 0)
-            {
                 colorTab <- rbind(colorTab, data.table(group = ovGNames,
                                                        col = cols[length(which) + 1],
                                                        pch = pchs[length(which) + 1]))
-                legText <- c(legText, "(partial) overlap")
-            }
         }
         else
+        {
             obj <- obj[, colorTab$group] # omit overlapping
+            labels <- setdiff(labels, "overlap")
+        }
         
         colorTab <- colorTab[match(names(obj), group)] # put in original order
         
@@ -547,8 +548,8 @@ setMethod("plotUnique", "featureGroups", function(obj, which, plotOverlapping, r
         {
             makeLegend <- function(x, y, ...)
             {
-                return(legend(x, y, legText, col = colorTab$col, pch = colorTab$pch,
-                              text.col = colorTab$col, lty = 1,
+                return(legend(x, y, labels, col = cols[labels], pch = pchs[labels],
+                              text.col = cols[labels], lty = 1,
                               xpd = NA, ncol = 1, cex = 0.75, bty = "n", ...))
             }
             

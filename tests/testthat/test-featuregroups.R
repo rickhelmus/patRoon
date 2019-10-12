@@ -241,6 +241,8 @@ test_that("reporting with empty object works", {
 
 test_that("plotting works", {
     expect_doppel("retmz", function() plot(fgOpenMS))
+    expect_doppel("retmz-singlec", function() plot(fgOpenMS, colourBy = "none", col = "blue"))
+    expect_doppel("retmz-rgroups", function() plot(fgOpenMS, colourBy = "rGroups"))
     expect_doppel("retmz-comp", function() plot(fGCompOpenMS))
 
     expect_doppel("intensity-def", function() plotInt(fgOpenMS))
@@ -285,6 +287,7 @@ test_that("plotting works", {
 
 test_that("plotting empty objects works", {
     expect_doppel("retmz-empty", function() plot(fgOpenMSEmpty))
+    expect_doppel("retmz-empty", function() plot(fgOpenMSEmpty, colourBy = "rGroups"))
     expect_doppel("retmz", function() plot(fGConsOneEmpty)) # should be same as fgOpenMS
     expect_doppel("retmz-comp-empty", function() plot(fgCompBothEmpty))
 

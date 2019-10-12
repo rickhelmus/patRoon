@@ -1,8 +1,12 @@
 # patRoon 0.1.0.9000
 
+## October 2019
+
+* `plot()` for `featureGroups` can now highlight unique/shared features across replicates (suggested by V Albergamo)
+
 ## September 2019
 
-* Labels for objects in a `featureGroupsComparison` can be labelled (useful for e.g. plotting)
+* Labels for objects in a `featureGroupsComparison` can be customized (useful for e.g. plotting)
 * Caching and progress bar support for suspect screening
 * Updated/Fixed JDK installation for installation script
 * Fixed missing pipe operator import (`%>%`)

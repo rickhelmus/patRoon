@@ -26,11 +26,19 @@ NULL
 #' @param areas If set to \code{TRUE} then areas are considered instead of peak
 #'   intensities.
 #' @param pch,type,lty Common plotting parameters passed to \emph{e.g.}
-#'   \code{\link[graphics]{plot}}.
+#'   \code{\link[graphics]{plot}}. For \code{plot}: if \code{pch=NULL} then
+#'   values are automatically assigned.
 #' @param col Colour(s) used. If \code{col=NULL} then colours are automatically
 #'   generated.
 #' @param which A character vector with replicate groups used for comparison.
 #'   For plotting functions: set to \code{NULL} for all replicate groups.
+#' @param colourBy Sets the automatic colour selection: \code{"none"} for a
+#'   single colour or \code{"rGroups"}/\code{"fGroups"} for a distinct colour
+#'   per replicate/feature group.
+#' @param showLegend If \code{TRUE} a legend will be shown with either replicate
+#'   groups (\code{colourBy == "rGroups"}) or feature groups (\code{colourBy ==
+#'   "fGroups"}, only for \code{plotEIC}). If \code{colourBy} is \code{"none"}
+#'   no legend will be shown.
 #'
 #' @templateVar seli analyses
 #' @templateVar selOrderi analyses()
@@ -479,89 +487,90 @@ setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas =
 })
 
 #' @describeIn featureGroups Generates an \emph{m/z} \emph{vs} retention time
-#'   plot for all featue groups.
+#'   plot for all featue groups. Optionally highlights unique/overlapping
+#'   presence amongst replicate groups.
+#' @param onlyUnique If \code{TRUE} and \code{colourBy="rGroups"} then only
+#'   feature groups that are unique to a replicate group are plotted.
 #' @export
-setMethod("plot", "featureGroups", function(x, retMin = FALSE, col = NULL, pch = 16, ...)
+setMethod("plot", "featureGroups", function(x, colourBy = "fGroups",
+                                            onlyUnique = FALSE, retMin = FALSE,
+                                            showLegend = TRUE, col = NULL,
+                                            pch = NULL, ...)
 {
-    checkmate::assertFlag(retMin)
-
-    if (length(x) == 0)
-        plot(0, type = "n", ...)
-    else
-    {
-        if (is.null(col))
-            col <- colorRampPalette(RColorBrewer::brewer.pal(12, "Paired"))(length(x))
-        plot(if (retMin) x@groupInfo$rts / 60 else x@groupInfo$rts, x@groupInfo$mzs,
-             xlab = if (retMin) "Retention time (min)" else "Retention time (sec.)",
-             ylab = "m/z", col = col, pch = pch, ...)
-    }
-})
-
-#' @describeIn featureGroups Generates an \emph{m/z} \emph{vs} retention time
-#'   plot for all featue groups.
-#' @export
-setMethod("plotUnique", "featureGroups", function(obj, which, plotOverlapping, retMin, showLegend, ...)
-{
-    rGroups <- replicateGroups(obj)
+    rGroups <- replicateGroups(x)
     if (is.null(which))
         which <- rGroups
     
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertSubset(which, rGroups, empty.ok = FALSE, add = ac)
-    aapply(checkmate::assertFlag, . ~ plotOverlapping + retMin + showLegend, fixed = list(add = ac))
+    aapply(checkmate::assertFlag, . ~ onlyUnique + retMin + showLegend, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
     
-    if (length(obj) == 0)
+    if (length(x) == 0)
         plot(0, type = "n", ...)
     else
     {
-        obj <- replicateGroupFilter(obj, which, verbose = FALSE)
-        labels <- c(which, "overlap")
-        cols <- setNames(colorRampPalette(RColorBrewer::brewer.pal(12, "Paired"))(length(labels)), labels)
-        pchs <- setNames(seq_len(length(labels)) + 14, labels)
-        
-        uniqueFGs <- setNames(lapply(which, function(rg) unique(obj, which = rg)), which)
-        # uniqueGNames <- setNames(lapply(seq_along(which), function(rgi) data.table(group = names(unique(obj, which = which[rgi])),
-        #                                                                            col = cols[rgi], pch = pchs[rgi])), which)
-        
-        areEmpty <- lengths(uniqueFGs) == 0
-        labels <- setdiff(labels, names(uniqueFGs[areEmpty]))
-        uniqueFGs <- uniqueFGs[!areEmpty]
+        if (colourBy == "fGroups" || colourBy == "none")
+        {
+            if (is.null(col))
+                col <- if (colourBy == "fGroups") colorRampPalette(RColorBrewer::brewer.pal(12, "Paired"))(length(x)) else "black"
+            if (is.null(pch))
+                pch <- 16
+            
+            showLegend <- FALSE # UNDONE: also for fGroups (ie as with plotEIC() ?)
+        }
+        else if (colourBy == "rGroups")
+        {
+            labels <- c(replicateGroups(x), "overlap")
+            
+            if (is.null(col))
+                labCol <- colorRampPalette(RColorBrewer::brewer.pal(12, "Paired"))(length(labels))
+            else
+                labCol <- rep(col, length.out = length(labels))
+            names(labCol) <- labels
 
-        uniqueGNames <- mapply(uniqueFGs, names(uniqueFGs), SIMPLIFY = FALSE,
-                               FUN = function(fg, rg) data.table(group = names(fg), col = cols[rg], pch = pchs[rg]))
-        names(uniqueFGs) <- names(uniqueFGs)
-                
-        # uniqueGNames <- setNames(lapply(seq_along(which), function(rgi) data.table(group = names(unique(obj, which = which[rgi])),
-        #                                                                            col = cols[rgi], pch = pchs[rgi])), which)
-        
-        # uniqueGNames <- uniqueGNames[!areEmpty]
-        
-        colorTab <- rbindlist(uniqueGNames)
-        
-        if (plotOverlapping)
-        {
-            ovGNames <- setdiff(names(obj), colorTab$group)
-            if (length(ovGNames) > 0)
-                colorTab <- rbind(colorTab, data.table(group = ovGNames,
-                                                       col = cols[length(which) + 1],
-                                                       pch = pchs[length(which) + 1]))
+            if (is.null(pch))
+            {
+                # prefer closed symbols (15-25)
+                ll <- length(labels)
+                if (ll < (25-15))
+                    labPch <- seq_len(ll) + 14
+                else if (ll <= 25)
+                    labPch <- seq_len(ll)
+                else
+                    labPch <- rep(16, ll) # just stick with one
+            }
+            else
+                labPch <- rep(pch, length.out = length(labels))
+            names(labPch) <- labels
+            
+            # get averaged intensities for each rGroup and omit initial name/rt/mz columns
+            gTable <- as.data.table(x, average = TRUE)[, -(seq_len(3))]
+            
+            for (r in seq_len(nrow(gTable)))
+            {
+                present <- which(gTable[r] != 0)
+                set(gTable, r, "label", if (length(present) > 1) "overlap" else labels[present])
+            }
+
+            if (onlyUnique)
+            {
+                keep <- gTable$label != "overlap"
+                gTable <- gTable[keep]; x <- x[, keep]
+            }
+
+            # remove unassigned (e.g. rGroups without unique feature groups)
+            labels <- labels[labels %in% gTable$label]
+            
+            col <- labCol[gTable$label]; pch <- labPch[gTable$label]
         }
-        else
-        {
-            obj <- obj[, colorTab$group] # omit overlapping
-            labels <- setdiff(labels, "overlap")
-        }
-        
-        colorTab <- colorTab[match(names(obj), group)] # put in original order
-        
+
         oldp <- par(no.readonly = TRUE)
         if (showLegend)
         {
             makeLegend <- function(x, y, ...)
             {
-                return(legend(x, y, labels, col = cols[labels], pch = pchs[labels],
-                              text.col = cols[labels], lty = 1,
+                return(legend(x, y, labels, col = labCol[labels], pch = labPch[labels],
+                              text.col = labCol[labels], 
                               xpd = NA, ncol = 1, cex = 0.75, bty = "n", ...))
             }
             
@@ -571,10 +580,10 @@ setMethod("plotUnique", "featureGroups", function(obj, which, plotOverlapping, r
             par(omd = c(0, 1 - lw, 0, 1), new = TRUE)
         }
         
-        plot(if (retMin) obj@groupInfo$rts / 60 else obj@groupInfo$rts, obj@groupInfo$mzs,
+        plot(if (retMin) x@groupInfo$rts / 60 else x@groupInfo$rts, x@groupInfo$mzs,
              xlab = if (retMin) "Retention time (min)" else "Retention time (sec.)",
-             ylab = "m/z", col = colorTab$col, pch = colorTab$pch, ...)
-
+             ylab = "m/z", col = col, pch = pch, ...)
+        
         if (showLegend)
             makeLegend(par("usr")[2], par("usr")[4])
         
@@ -826,14 +835,6 @@ setMethod("plotChord", "featureGroups", function(obj, addSelfLinks = FALSE, addR
 #'   it.
 #' @param title Character string used for title of the plot. If \code{NULL} a
 #'   title will be automatically generated.
-#' @param colourBy How to colour different extracted ion chromatograms within
-#'   the plot: \code{"none"} for a single colour or
-#'   \code{"rGroups"}/\code{"fGroups"} for a distinct colour per
-#'   replicate/feature group.
-#' @param showLegend If \code{TRUE} a legend will be shown with either replicate
-#'   groups (\code{colourBy} == \code{"rGroups"}) or feature groups
-#'   (\code{colourBy} == \code{"fGroups"}). If \code{colourBy} is \code{"none"}
-#'   no legend will be shown.
 #' @param onlyPresent If \code{TRUE} then EICs will only be generated for
 #'   analyses in which a particular feature group was detected. Disabling this
 #'   option might be useful to see if any features were 'missed'.

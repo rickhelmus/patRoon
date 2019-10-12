@@ -805,7 +805,7 @@ setMethod("reportHTML", "featureGroups", function(fGroups, path, reportPlots, fo
         reportPlots <- ""
 
     if (is.null(MSPeakLists) &&
-        ((!is.null(formulas) && reportFormulaSpectra) || !is.null(compounds)))
+        ((!is.null(formulas) && "formulas" %in% reportPlots) || !is.null(compounds)))
         stop("MSPeakLists is NULL, please specify when reporting formula and/or compounds")
 
     prepareReportPath(path, clearPath)

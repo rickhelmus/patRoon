@@ -388,37 +388,39 @@ addAllDAEICs <- function(fGroups, mzWindow = 0.005, ctype = "EIC", bgsubtr = FAL
 
     for (anai in seq_len(anaCount))
     {
-        ind <- getDAFileIndex(DA, anaInfo$analysis[anai], anaInfo$path[anai])
-
-        if (ind == -1)
-            next
-
         grpsInAna <- seq_len(gCount)
         if (onlyPresent)
             grpsInAna <- grpsInAna[sapply(grpsInAna, function(i) ftInd[[i]][anai] != 0)]
 
-        eics <- sapply(grpsInAna, function(grpi)
+        if (length(grpsInAna) > 0)
         {
-            makeDAEIC(gInfo[grpi, "mzs"], mzWindow, ctype, bgsubtr = bgsubtr)
-        }, USE.NAMES = FALSE)
-
-        chroms <- DA[["Analyses"]][[ind]][["Chromatograms"]]
-        oldEICCount <- chroms$Count()
-        chroms$AddChromatograms(eics)
-        newEICCount <- chroms$Count()
-
-        if (!is.null(name) && name)
-        {
-            if ((newEICCount - oldEICCount) != length(grpsInAna))
-                warning("Failed to add some EICs, cannot set names.")
-            else
+            ind <- getDAFileIndex(DA, anaInfo$analysis[anai], anaInfo$path[anai])
+            if (ind != -1)
             {
-                for (eici in seq(oldEICCount+1, newEICCount))
-                    chroms[[eici]][["Name_"]] <- gNames[eici - oldEICCount]
+                eics <- sapply(grpsInAna, function(grpi)
+                {
+                    makeDAEIC(gInfo[grpi, "mzs"], mzWindow, ctype, bgsubtr = bgsubtr)
+                }, USE.NAMES = FALSE)
+                
+                chroms <- DA[["Analyses"]][[ind]][["Chromatograms"]]
+                oldEICCount <- chroms$Count()
+                chroms$AddChromatograms(eics)
+                newEICCount <- chroms$Count()
+                
+                if (!is.null(name) && name)
+                {
+                    if ((newEICCount - oldEICCount) != length(grpsInAna))
+                        warning("Failed to add some EICs, cannot set names.")
+                    else
+                    {
+                        for (eici in seq(oldEICCount+1, newEICCount))
+                            chroms[[eici]][["Name_"]] <- gNames[eici - oldEICCount]
+                    }
+                }
+                
+                closeSaveDAFile(DA, ind, close, save)
             }
         }
-
-        closeSaveDAFile(DA, ind, close, save)
 
         setTxtProgressBar(prog, anai)
     }

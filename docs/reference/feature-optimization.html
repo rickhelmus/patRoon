@@ -8,21 +8,25 @@
 
 <title>Optimization of feature finding and grouping parameters — feature-optimization • patRoon</title>
 
+
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
 
-<!-- sticky kit -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script>
+<!-- headroom.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -30,11 +34,12 @@
 
 
 
-<meta property="og:title" content="Optimization of feature finding and grouping parameters — feature-optimization" />
 
+<meta property="og:title" content="Optimization of feature finding and grouping parameters — feature-optimization" />
 <meta property="og:description" content="Automatic optimization of feature finding and grouping parameters through
 Design of Experiments (DoE)." />
 <meta name="twitter:card" content="summary" />
+
 
 
 
@@ -46,6 +51,7 @@ Design of Experiments (DoE)." />
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
+
 
 
   </head>
@@ -101,7 +107,6 @@ Design of Experiments (DoE)." />
   <a href="../news/index.html">Changelog</a>
 </li>
       </ul>
-      
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/rickhelmus/patRoon">
@@ -116,6 +121,7 @@ Design of Experiments (DoE)." />
 </div><!--/.navbar -->
 
       
+
       </header>
 
 <div class="row">
@@ -127,29 +133,27 @@ Design of Experiments (DoE)." />
     </div>
 
     <div class="ref-description">
-    
     <p>Automatic optimization of feature finding and grouping parameters through
 Design of Experiments (DoE).</p>
-    
     </div>
 
     <pre class="usage"><span class='fu'>optimizeFeatureGrouping</span>(<span class='no'>features</span>, <span class='no'>algorithm</span>, <span class='no'>...</span>,
-  <span class='kw'>templateParams</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(), <span class='kw'>paramRanges</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(), <span class='kw'>maxIterations</span> <span class='kw'>=</span> <span class='fl'>50</span>,
+  <span class='kw'>templateParams</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(), <span class='kw'>paramRanges</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(), <span class='kw'>maxIterations</span> <span class='kw'>=</span> <span class='fl'>50</span>,
   <span class='kw'>maxModelDeviation</span> <span class='kw'>=</span> <span class='fl'>0.1</span>)
 
 <span class='fu'>generateFGroupsOptPSet</span>(<span class='no'>algorithm</span>, <span class='no'>...</span>)
 
 <span class='fu'>getDefFGroupsOptParamRanges</span>(<span class='no'>algorithm</span>)
 
-<span class='fu'>optimizeFeatureFinding</span>(<span class='no'>anaInfo</span>, <span class='no'>algorithm</span>, <span class='no'>...</span>, <span class='kw'>templateParams</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(),
-  <span class='kw'>paramRanges</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(), <span class='kw'>isoIdent</span> <span class='kw'>=</span> <span class='kw'>if</span> (<span class='no'>algorithm</span> <span class='kw'>==</span> <span class='st'>"openms"</span>) <span class='st'>"OpenMS"</span>
-  <span class='kw'>else</span> <span class='st'>"IPO"</span>, <span class='kw'>checkPeakShape</span> <span class='kw'>=</span> <span class='st'>"none"</span>, <span class='kw'>CAMERAOpts</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(),
+<span class='fu'>optimizeFeatureFinding</span>(<span class='no'>anaInfo</span>, <span class='no'>algorithm</span>, <span class='no'>...</span>, <span class='kw'>templateParams</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
+  <span class='kw'>paramRanges</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(), <span class='kw'>isoIdent</span> <span class='kw'>=</span> <span class='kw'>if</span> (<span class='no'>algorithm</span> <span class='kw'>==</span> <span class='st'>"openms"</span>) <span class='st'>"OpenMS"</span>
+  <span class='kw'>else</span> <span class='st'>"IPO"</span>, <span class='kw'>checkPeakShape</span> <span class='kw'>=</span> <span class='st'>"none"</span>, <span class='kw'>CAMERAOpts</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(),
   <span class='kw'>maxIterations</span> <span class='kw'>=</span> <span class='fl'>50</span>, <span class='kw'>maxModelDeviation</span> <span class='kw'>=</span> <span class='fl'>0.1</span>)
 
-<span class='fu'>generateFeatureOptPSet</span>(<span class='no'>algorithm</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"centWave"</span>, <span class='no'>...</span>)
+<span class='fu'>generateFeatureOptPSet</span>(<span class='no'>algorithm</span>, <span class='no'>...</span>)
 
 <span class='fu'>getDefFeaturesOptParamRanges</span>(<span class='no'>algorithm</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"centWave"</span>)</pre>
-    
+
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
@@ -164,7 +168,7 @@ be used to optimize grouping.</p></td>
 (passed to <code><a href='feature-finding.html'>findFeatures</a></code>/<code><a href='feature-grouping.html'>groupFeatures</a></code>).</p></td>
     </tr>
     <tr>
-      <th>&#8230;</th>
+      <th>...</th>
       <td><p>One or more lists with parameter sets (see below) (for
 <code>optimizeFeatureFinding</code> and <code>optimizeFeatureGrouping</code>).
 Alternatively, named arguments that set (and possibly override) the
@@ -215,19 +219,18 @@ if <code>isoIdent="IPO"</code>. Valid values: <code>"none"</code>,
     <tr>
       <th>CAMERAOpts</th>
       <td><p>A <code>list</code> with additional arguments passed to
-<code><a href='https://www.rdocumentation.org/packages/CAMERA/topics/findIsotopes-methods'>CAMERA::findIsotopes</a></code> when <code>isoIdent="CAMERA"</code>.</p></td>
+<code><a href='https://rdrr.io/pkg/CAMERA/man/findIsotopes-methods.html'>CAMERA::findIsotopes</a></code> when <code>isoIdent="CAMERA"</code>.</p></td>
     </tr>
     <tr>
       <th>method</th>
       <td><p>Method used by XCMS to find features (only if <code>algorithm="xcms"</code>).</p></td>
     </tr>
     </table>
-    
+
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>The <code>optimizeFeatureFinding</code> and <code>optimizeFeatureGrouping</code>
   return their results in a <code><a href='optimizationResult-class.html'>optimizationResult</a></code> object.</p>
-    
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>Many different parameters exist that may affect the output quality of feature
@@ -240,7 +243,7 @@ integrated in patRoon. Some functionality was added or changed, however, the
 principle algorithm workings are nearly identical.</p>
 <p>Compared to IPO, the following functionality was added or changed:</p><ul>
 <li><p>The code was made more generic in order to include support for other
-feature finding/grouping algorithms (<em>e.g.</em> OpenMS, enviPick).</p></li>
+feature finding/grouping algorithms (<em>e.g.</em> OpenMS, enviPick, XCMS3).</p></li>
 <li><p>The methodology of <code class='command'>FeatureFinderMetabo</code> (OpenMS) may be used
   to find isotopes.</p></li>
 <li><p>The
@@ -254,30 +257,23 @@ easily (see <code>examples</code>).</p></li>
 finding/grouping.</p></li>
 <li><p>More consistent output using S4 classes (<em>i.e.</em>
 <code><a href='optimizationResult-class.html'>optimizationResult</a></code> class).</p></li>
-<li><p>Experiments are not (yet) executed in parallel.</p></li>
+<li><p>Experiments are not (yet) executed in parallel (although feature
+  finding or grouping may be if the algorithm supports it).</p></li>
 </ul>
-    
-    <h2 class="hasAnchor" id="note"><a class="anchor" href="#note"></a>Note</h2>
 
-    <p>The parameters specified in parameter sets are directly passed through
-  the <code><a href='feature-finding.html'>findFeatures</a></code> or <code><a href='feature-grouping.html'>groupFeatures</a></code> functions.
-  Hence, grouping and retention time alignment parameters used by XCMS should
-  (still) be set through the <code>groupArgs</code> and <code>retcorArgs</code>
-  parameters.</p>
-    
     <h2 class="hasAnchor" id="parameter-sets"><a class="anchor" href="#parameter-sets"></a>Parameter sets</h2>
 
     <p>Which parameters should be optimized is determined
   by a <em>parameter set</em>. A set is defined by a named <code>list</code>
   containing the minimum and maximum starting range for each parameter that
-  should be tested. For instance, the set <code><a href='https://www.rdocumentation.org/packages/base/topics/list'>list(chromFWHM = c(5, 10),
+  should be tested. For instance, the set <code><a href='https://rdrr.io/r/base/list.html'>list(chromFWHM = c(5, 10),
   mzPPM = c(5, 15))</a></code> specifies that the <code>chromFWHM</code> and <code>mzPPM</code>
   parameters (used by OpenMS feature finding) should be optimized within a
   range of <samp>5</samp>-<samp>10</samp> and <samp>5</samp>-<samp>15</samp>, respectively. Note that
   this range may be increased or decreased after a DoE iteration in order to
   find a better optimum. The absolute limits are controlled by the
   <code>paramRanges</code> function argument.</p>
-<p>Multiple parameter sets may be specified (<em>i.e.</em> through the &#8230;
+<p>Multiple parameter sets may be specified (<em>i.e.</em> through the ...
   function argument). In this situation, the optimization algorithm is
   repeated for each set, and the final optimum is determined from the parameter
   set with the best response. The <code>templateParams</code> function argument may
@@ -290,11 +286,29 @@ finding/grouping.</p></li>
   feature finding/grouping functions should also be defined in a (template)
   parameter set. Which parameters should be optimized is determined whether
   its value is specified as a vector range or a single fixed value.
-  For instance, when a set is defined as <code><a href='https://www.rdocumentation.org/packages/base/topics/list'>list(chromFWHM = c(5, 10),
+  For instance, when a set is defined as <code><a href='https://rdrr.io/r/base/list.html'>list(chromFWHM = c(5, 10),
   mzPPM = 5)</a></code>, only the <code>chromFWHM</code> parameter is optimized, whereas
   <code>mzPPM</code> is kept constant at <samp>5</samp>.</p>
 <p>Using multiple parameter sets with differing fixed values allows
-  optimization of qualitative values (see examples below).</p>
+  optimization of qualitative values (see examples below).</p>  
+<p>The parameters specified in parameter sets are directly passed through
+  the <code><a href='feature-finding.html'>findFeatures</a></code> or <code><a href='feature-grouping.html'>groupFeatures</a></code> functions.
+  Hence, grouping and retention time alignment parameters used by XCMS should
+  (still) be set through the <code>groupArgs</code> and <code>retcorArgs</code>
+  parameters.</p>  
+<p><strong>NOTE:</strong> For XCMS3, which normally uses parameter classes for
+  settings its options, the parameters must be defined in a named list like
+  any other algorithm. The set parameters are then used to automatically
+  constructor of the right parameter class object (e.g.
+  <code>CentWaveParam</code>, <code>ObiwarpParam</code>). For
+  grouping/alignment sets, these parameters need to be specified in nested
+  lists called <code>groupParams</code> and <code>retAlignParams</code>, respectively
+  (similar to <code>groupArgs</code>/<code>retcorArgs</code> for
+  <code>algorithm="xcms"</code>). Finally, the underlying XCMS method to be used
+  should be defined in the parameter set (<em>i.e.</em> by setting the
+  <code>method</code> field for feature parameter sets and the <code>groupMethod</code>
+  and <code>retAlignMethod</code> for grouping/aligning parameter sets). See the
+  examples below for more details.</p>
 <p><strong>NOTE:</strong> Similar to IPO, the <code>peakwidth</code> and <code>prefilter</code>
   parameters for XCMS feature finding should be split in two different
   values:</p><ul>
@@ -304,7 +318,7 @@ finding/grouping.</p></li>
     are split in <code>prefilter</code> and <code>value_of_prefilter</code>,
     respectively.</p></li>
 </ul>
-    
+
     <h2 class="hasAnchor" id="functions"><a class="anchor" href="#functions"></a>Functions</h2>
 
     <p>The <code>optimizeFeatureFinding</code> and
@@ -326,7 +340,6 @@ finding/grouping.</p></li>
   parameter ranges for feature finding and grouping, respectively. These
   functions are useful if you want to set the <code>paramRanges</code> function
   argument.</p>
-    
     <h2 class="hasAnchor" id="potential-suboptimal-results-by-optimization-model"><a class="anchor" href="#potential-suboptimal-results-by-optimization-model"></a>Potential suboptimal results by optimization model</h2>
 
     <p>After each
@@ -341,12 +354,10 @@ finding/grouping.</p></li>
   <samp>0</samp> means that experimental values will always be favored when leading
   to improved responses, whereas <code>1</code> will effectively disable this
   procedure (and return to 'regular' IPO behaviour).</p>
-    
     <h2 class="hasAnchor" id="source"><a class="anchor" href="#source"></a>Source</h2>
 
     <p>The code and methodology is a direct adaptation from the
   <a href='https://github.com/rietho/IPO'>IPO R package</a>.</p>
-    
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
     <p>Libiseller G, Dvorzak M, Kleb U, Gander E, Eisenberg T, Madeo F, Neumann S, Trausinger G, Sinner F, Pieber T, Magnes C (2015).
@@ -354,64 +365,597 @@ finding/grouping.</p></li>
 <em>BMC Bioinformatics</em>, <b>16</b>(1).
 doi: <a href='https://doi.org/10.1186/s12859-015-0562-8'>10.1186/s12859-015-0562-8</a>
 , <a href='https://doi.org/10.1186/s12859-015-0562-8'>https://doi.org/10.1186/s12859-015-0562-8</a>.</p>
-    
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><span class='co'># NOT RUN {</span>
-<span class='co'># example data from patRoonData package</span>
-<span class='no'>dataDir</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>patRoonData</span><span class='kw ns'>::</span><span class='fu'><a href='https://www.rdocumentation.org/packages/patRoonData/topics/patRoonData'>exampleDataPath</a></span>()
+    <pre class="examples"><div class='input'><span class='co'># example data from patRoonData package</span>
+<span class='no'>dataDir</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>patRoonData</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/patRoonData/man/patRoonData.html'>exampleDataPath</a></span>()
 <span class='no'>anaInfo</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='analysis-information.html'>generateAnalysisInfo</a></span>(<span class='no'>dataDir</span>)
 <span class='no'>anaInfo</span> <span class='kw'>&lt;-</span> <span class='no'>anaInfo</span>[<span class='fl'>1</span>:<span class='fl'>2</span>, ] <span class='co'># only focus on first two analyses (e.g. training set)</span>
 
 <span class='co'># optimize mzPPM and chromFWHM parameters</span>
-<span class='no'>ftOpt</span> <span class='kw'>&lt;-</span> <span class='fu'>optimizeFeatureFinding</span>(<span class='no'>anaInfo</span>, <span class='st'>"openms"</span>, <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='kw'>mzPPM</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>5</span>, <span class='fl'>10</span>), <span class='kw'>chromFWHM</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>4</span>, <span class='fl'>8</span>)))
-
+<span class='no'>ftOpt</span> <span class='kw'>&lt;-</span> <span class='fu'>optimizeFeatureFinding</span>(<span class='no'>anaInfo</span>, <span class='st'>"openms"</span>, <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>mzPPM</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>5</span>, <span class='fl'>10</span>), <span class='kw'>chromFWHM</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>4</span>, <span class='fl'>8</span>)))</div><div class='output co'>#&gt; Starting new DoE (iteration 1):
+#&gt; mzPPM: c(5, 10)
+#&gt; chromFWHM: c(4, 8)
+#&gt; ---
+#&gt; Design:
+#&gt;    run.order std.order mzPPM chromFWHM Block
+#&gt; 1          1         1   5.0         4     1
+#&gt; 2          2         2  10.0         4     1
+#&gt; 3          3         3   5.0         8     1
+#&gt; 4          4         4  10.0         8     1
+#&gt; 5          5         5   7.5         6     1
+#&gt; 6          1         1   5.0         6     2
+#&gt; 7          2         2  10.0         6     2
+#&gt; 8          3         3   7.5         4     2
+#&gt; 9          4         4   7.5         8     2
+#&gt; 10         5         5   7.5         6     2
+#&gt; ---
+#&gt;   |                                                                              |                                                                      |   0%  |                                                                              |=======                                                               |  10%  |                                                                              |==============                                                        |  20%  |                                                                              |=====================                                                 |  30%  |                                                                              |============================                                          |  40%  |                                                                              |===================================                                   |  50%  |                                                                              |==========================================                            |  60%  |                                                                              |=================================================                     |  70%  |                                                                              |========================================================              |  80%  |                                                                              |===============================================================       |  90%  |                                                                              |======================================================================| 100%
+#&gt; 
+#&gt; ---
+#&gt; Response:
+#&gt;     featureCount nonRP RP      PPS experiment    score
+#&gt;  1:          759   134 67 33.50000          1 33.50000
+#&gt;  2:          769   133 68 34.76692          2 34.76692
+#&gt;  3:          644   135 51 19.26667          3 19.26667
+#&gt;  4:          658   134 54 21.76119          4 21.76119
+#&gt;  5:          732   149 60 24.16107          5 24.16107
+#&gt;  6:          727   149 59 23.36242          6 23.36242
+#&gt;  7:          741   144 61 25.84028          7 25.84028
+#&gt;  8:          765   126 67 35.62698          8 35.62698
+#&gt;  9:          649   134 54 21.76119          9 21.76119
+#&gt; 10:          732   149 60 24.16107         10 24.16107
+#&gt; ---
+#&gt; Best params: mzPPM: 9; chromFWHM: 4; logPath: NULL; 
+#&gt; Best results: featureCount: 770; nonRP: 130; RP: 67; PPS: 34.5307692307692; 
+#&gt; ---
+#&gt; Starting new DoE (iteration 2):
+#&gt; mzPPM: c(6.5, 11.5)
+#&gt; chromFWHM: c(2, 6)
+#&gt; ---
+#&gt; Design:
+#&gt;    run.order std.order mzPPM chromFWHM Block
+#&gt; 1          1         1   6.5         2     1
+#&gt; 2          2         2  11.5         2     1
+#&gt; 3          3         3   6.5         6     1
+#&gt; 4          4         4  11.5         6     1
+#&gt; 5          5         5   9.0         4     1
+#&gt; 6          1         1   6.5         4     2
+#&gt; 7          2         2  11.5         4     2
+#&gt; 8          3         3   9.0         2     2
+#&gt; 9          4         4   9.0         6     2
+#&gt; 10         5         5   9.0         4     2
+#&gt; ---
+#&gt;   |                                                                              |                                                                      |   0%  |                                                                              |=======                                                               |  10%  |                                                                              |==============                                                        |  20%  |                                                                              |=====================                                                 |  30%  |                                                                              |============================                                          |  40%  |                                                                              |===================================                                   |  50%  |                                                                              |==========================================                            |  60%  |                                                                              |=================================================                     |  70%  |                                                                              |========================================================              |  80%  |                                                                              |===============================================================       |  90%  |                                                                              |======================================================================| 100%
+#&gt; 
+#&gt; ---
+#&gt; Response:
+#&gt;     featureCount nonRP RP      PPS experiment    score
+#&gt;  1:          679    97 52 27.87629          1 27.87629
+#&gt;  2:          684    97 52 27.87629          2 27.87629
+#&gt;  3:          730   148 60 24.32432          3 24.32432
+#&gt;  4:          746   144 61 25.84028          4 25.84028
+#&gt;  5:          770   130 67 34.53077          5 34.53077
+#&gt;  6:          763   129 67 34.79845          6 34.79845
+#&gt;  7:          770   132 68 35.03030          7 35.03030
+#&gt;  8:          682    97 52 27.87629          8 27.87629
+#&gt;  9:          738   148 60 24.32432          9 24.32432
+#&gt; 10:          770   130 67 34.53077         10 34.53077
+#&gt; ---
+#&gt; Best params: mzPPM: 11.5; chromFWHM: 3.8; logPath: NULL; 
+#&gt; Best results: featureCount: 767; nonRP: 132; RP: 68; PPS: 35.030303030303; 
+#&gt; ---
+#&gt; Starting new DoE (iteration 3):
+#&gt; mzPPM: c(9, 14)
+#&gt; chromFWHM: c(2.2, 5.4)
+#&gt; ---
+#&gt; Design:
+#&gt;    run.order std.order mzPPM chromFWHM Block
+#&gt; 1          1         1   9.0       2.2     1
+#&gt; 2          2         2  14.0       2.2     1
+#&gt; 3          3         3   9.0       5.4     1
+#&gt; 4          4         4  14.0       5.4     1
+#&gt; 5          5         5  11.5       3.8     1
+#&gt; 6          1         1   9.0       3.8     2
+#&gt; 7          2         2  14.0       3.8     2
+#&gt; 8          3         3  11.5       2.2     2
+#&gt; 9          4         4  11.5       5.4     2
+#&gt; 10         5         5  11.5       3.8     2
+#&gt; ---
+#&gt;   |                                                                              |                                                                      |   0%  |                                                                              |=======                                                               |  10%  |                                                                              |==============                                                        |  20%  |                                                                              |=====================                                                 |  30%  |                                                                              |============================                                          |  40%  |                                                                              |===================================                                   |  50%  |                                                                              |==========================================                            |  60%  |                                                                              |=================================================                     |  70%  |                                                                              |========================================================              |  80%  |                                                                              |===============================================================       |  90%  |                                                                              |======================================================================| 100%
+#&gt; 
+#&gt; ---
+#&gt; Response:
+#&gt;     featureCount nonRP RP      PPS experiment    score
+#&gt;  1:          686    98 52 27.59184          1 27.59184
+#&gt;  2:          686    90 53 31.21111          2 31.21111
+#&gt;  3:          748   146 61 25.48630          3 25.48630
+#&gt;  4:          757   143 64 28.64336          4 28.64336
+#&gt;  5:          767   132 68 35.03030          5 35.03030
+#&gt;  6:          766   134 68 34.50746          6 34.50746
+#&gt;  7:          767   128 70 38.28125          7 38.28125
+#&gt;  8:          686    91 52 29.71429          8 29.71429
+#&gt;  9:          754   143 63 27.75524          9 27.75524
+#&gt; 10:          767   132 68 35.03030         10 35.03030
+#&gt; ---
+#&gt; Best params: mzPPM: 14; chromFWHM: 3.64; logPath: NULL; 
+#&gt; Best results: featureCount: 761; nonRP: 116; RP: 70; PPS: 42.2413793103448; 
+#&gt; ---
+#&gt; Starting new DoE (iteration 4):
+#&gt; mzPPM: c(11.5, 16.5)
+#&gt; chromFWHM: c(2.36, 4.92)
+#&gt; ---
+#&gt; Design:
+#&gt;    run.order std.order mzPPM chromFWHM Block
+#&gt; 1          1         1  11.5      2.36     1
+#&gt; 2          2         2  16.5      2.36     1
+#&gt; 3          3         3  11.5      4.92     1
+#&gt; 4          4         4  16.5      4.92     1
+#&gt; 5          5         5  14.0      3.64     1
+#&gt; 6          1         1  11.5      3.64     2
+#&gt; 7          2         2  16.5      3.64     2
+#&gt; 8          3         3  14.0      2.36     2
+#&gt; 9          4         4  14.0      4.92     2
+#&gt; 10         5         5  14.0      3.64     2
+#&gt; ---
+#&gt;   |                                                                              |                                                                      |   0%  |                                                                              |=======                                                               |  10%  |                                                                              |==============                                                        |  20%  |                                                                              |=====================                                                 |  30%  |                                                                              |============================                                          |  40%  |                                                                              |===================================                                   |  50%  |                                                                              |==========================================                            |  60%  |                                                                              |=================================================                     |  70%  |                                                                              |========================================================              |  80%  |                                                                              |===============================================================       |  90%  |                                                                              |======================================================================| 100%
+#&gt; 
+#&gt; ---
+#&gt; Response:
+#&gt;     featureCount nonRP RP      PPS experiment    score
+#&gt;  1:          685    89 52 30.38202          1 30.38202
+#&gt;  2:          686    88 53 31.92045          2 31.92045
+#&gt;  3:          771   128 68 36.12500          3 36.12500
+#&gt;  4:          773   131 70 37.40458          4 37.40458
+#&gt;  5:          761   116 70 42.24138          5 42.24138
+#&gt;  6:          762   120 68 38.53333          6 38.53333
+#&gt;  7:          762   115 71 43.83478          7 43.83478
+#&gt;  8:          685    88 53 31.92045          8 31.92045
+#&gt;  9:          772   125 70 39.20000          9 39.20000
+#&gt; 10:          761   116 70 42.24138         10 42.24138
+#&gt; ---
+#&gt; Best params: mzPPM: 15.25; chromFWHM: 3.896; logPath: NULL; 
+#&gt; Best results: featureCount: 771; nonRP: 123; RP: 71; PPS: 40.9837398373984; 
+#&gt; ---
+#&gt; ===
+#&gt; DONE!
+#&gt; Best parameter set: 1
+#&gt; Best DoE iteration: 4</div><div class='input'>
 <span class='co'># optimize chromFWHM and isotopeFilteringModel (a qualitative parameter)</span>
 <span class='no'>ftOpt2</span> <span class='kw'>&lt;-</span> <span class='fu'>optimizeFeatureFinding</span>(<span class='no'>anaInfo</span>, <span class='st'>"openms"</span>,
-                                 <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='kw'>isotopeFilteringModel</span> <span class='kw'>=</span> <span class='st'>"metabolites (5% RMS)"</span>),
-                                 <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='kw'>isotopeFilteringModel</span> <span class='kw'>=</span> <span class='st'>"metabolites (2% RMS)"</span>),
-                                 <span class='kw'>templateParams</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='kw'>chromFWHM</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>4</span>, <span class='fl'>8</span>)))
-
+                                 <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>isotopeFilteringModel</span> <span class='kw'>=</span> <span class='st'>"metabolites (5% RMS)"</span>),
+                                 <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>isotopeFilteringModel</span> <span class='kw'>=</span> <span class='st'>"metabolites (2% RMS)"</span>),
+                                 <span class='kw'>templateParams</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>chromFWHM</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>4</span>, <span class='fl'>8</span>)))</div><div class='output co'>#&gt; Starting new DoE (parameter set 1/2, iteration 1):
+#&gt; chromFWHM: c(4, 8)
+#&gt; isotopeFilteringModel: metabolites (5% RMS)
+#&gt; ---
+#&gt; Design:
+#&gt;   run.order chromFWHM
+#&gt; 1         1     -1.00
+#&gt; 2         2     -0.75
+#&gt; 3         3     -0.50
+#&gt; 4         4     -0.25
+#&gt; 5         5      0.00
+#&gt; 6         6      0.25
+#&gt; 7         7      0.50
+#&gt; 8         8      0.75
+#&gt; 9         9      1.00
+#&gt; ---
+#&gt;   |                                                                              |                                                                      |   0%  |                                                                              |========                                                              |  11%  |                                                                              |================                                                      |  22%  |                                                                              |=======================                                               |  33%  |                                                                              |===============================                                       |  44%  |                                                                              |=======================================                               |  56%  |                                                                              |===============================================                       |  67%  |                                                                              |======================================================                |  78%  |                                                                              |==============================================================        |  89%  |                                                                              |======================================================================| 100%
+#&gt; 
+#&gt; ---
+#&gt; Response:
+#&gt;    featureCount nonRP RP      PPS experiment    score
+#&gt; 1:          769   133 68 34.76692          1 34.76692
+#&gt; 2:          769   135 68 34.25185          2 34.25185
+#&gt; 3:          757   148 62 25.97297          3 25.97297
+#&gt; 4:          748   145 62 26.51034          4 26.51034
+#&gt; 5:          741   144 61 25.84028          5 25.84028
+#&gt; 6:          730   139 61 26.76978          6 26.76978
+#&gt; 7:          666   128 54 22.78125          7 22.78125
+#&gt; 8:          664   138 55 21.92029          8 21.92029
+#&gt; 9:          658   134 54 21.76119          9 21.76119
+#&gt; ---
+#&gt; Best params: chromFWHM: 4; isotopeFilteringModel: metabolites (5% RMS); logPath: NULL; 
+#&gt; Best results: featureCount: 769; nonRP: 133; RP: 68; PPS: 34.7669172932331; 
+#&gt; ---
+#&gt; Starting new DoE (parameter set 1/2, iteration 2):
+#&gt; chromFWHM: c(2, 6)
+#&gt; isotopeFilteringModel: metabolites (5% RMS)
+#&gt; ---
+#&gt; Design:
+#&gt;   run.order chromFWHM
+#&gt; 1         1     -1.00
+#&gt; 2         2     -0.75
+#&gt; 3         3     -0.50
+#&gt; 4         4     -0.25
+#&gt; 5         5      0.00
+#&gt; 6         6      0.25
+#&gt; 7         7      0.50
+#&gt; 8         8      0.75
+#&gt; 9         9      1.00
+#&gt; ---
+#&gt;   |                                                                              |                                                                      |   0%  |                                                                              |========                                                              |  11%  |                                                                              |================                                                      |  22%  |                                                                              |=======================                                               |  33%  |                                                                              |===============================                                       |  44%  |                                                                              |=======================================                               |  56%  |                                                                              |===============================================                       |  67%  |                                                                              |======================================================                |  78%  |                                                                              |==============================================================        |  89%  |                                                                              |======================================================================| 100%
+#&gt; Modelled parameter optimum yields significantly lower experimental score: 27.9/34.5
+#&gt; Taking data from best experimental value (38.1) instead...
+#&gt; 
+#&gt; ---
+#&gt; Response:
+#&gt;    featureCount nonRP RP      PPS experiment    score
+#&gt; 1:          682    97 52 27.87629          1 27.87629
+#&gt; 2:          685    88 52 30.72727          2 30.72727
+#&gt; 3:          744   101 62 38.05941          3 38.05941
+#&gt; 4:          755   124 68 37.29032          4 37.29032
+#&gt; 5:          769   133 68 34.76692          5 34.76692
+#&gt; 6:          769   135 68 34.25185          6 34.25185
+#&gt; 7:          757   148 62 25.97297          7 25.97297
+#&gt; 8:          748   145 62 26.51034          8 26.51034
+#&gt; 9:          741   144 61 25.84028          9 25.84028
+#&gt; ---
+#&gt; Best params: chromFWHM: 3; isotopeFilteringModel: metabolites (5% RMS); logPath: NULL; 
+#&gt; Best results: featureCount: 744; nonRP: 101; RP: 62; PPS: 38.0594059405941; 
+#&gt; ---
+#&gt; Starting new DoE (parameter set 1/2, iteration 3):
+#&gt; chromFWHM: c(1, 5)
+#&gt; isotopeFilteringModel: metabolites (5% RMS)
+#&gt; ---
+#&gt; Design:
+#&gt;   run.order chromFWHM
+#&gt; 1         1     -1.00
+#&gt; 2         2     -0.75
+#&gt; 3         3     -0.50
+#&gt; 4         4     -0.25
+#&gt; 5         5      0.00
+#&gt; 6         6      0.25
+#&gt; 7         7      0.50
+#&gt; 8         8      0.75
+#&gt; 9         9      1.00
+#&gt; ---
+#&gt;   |                                                                              |                                                                      |   0%  |                                                                              |========                                                              |  11%  |                                                                              |================                                                      |  22%  |                                                                              |=======================                                               |  33%  |                                                                              |===============================                                       |  44%  |                                                                              |=======================================                               |  56%  |                                                                              |===============================================                       |  67%  |                                                                              |======================================================                |  78%  |                                                                              |==============================================================        |  89%  |                                                                              |======================================================================| 100%
+#&gt; Modelled parameter optimum yields significantly lower experimental score: 26.0/33.7
+#&gt; Taking data from best experimental value (38.1) instead...
+#&gt; 
+#&gt; ---
+#&gt; Response:
+#&gt;    featureCount nonRP RP      PPS experiment    score
+#&gt; 1:          713   100 52 27.04000          1 27.04000
+#&gt; 2:          684    90 52 30.04444          2 30.04444
+#&gt; 3:          682    97 52 27.87629          3 27.87629
+#&gt; 4:          685    88 52 30.72727          4 30.72727
+#&gt; 5:          744   101 62 38.05941          5 38.05941
+#&gt; 6:          755   124 68 37.29032          6 37.29032
+#&gt; 7:          769   133 68 34.76692          7 34.76692
+#&gt; 8:          769   135 68 34.25185          8 34.25185
+#&gt; 9:          757   148 62 25.97297          9 25.97297
+#&gt; ---
+#&gt; Best params: chromFWHM: 3; isotopeFilteringModel: metabolites (5% RMS); logPath: NULL; 
+#&gt; Best results: featureCount: 744; nonRP: 101; RP: 62; PPS: 38.0594059405941; 
+#&gt; ---
+#&gt; Starting new DoE (parameter set 2/2, iteration 1):
+#&gt; chromFWHM: c(4, 8)
+#&gt; isotopeFilteringModel: metabolites (2% RMS)
+#&gt; ---
+#&gt; Design:
+#&gt;   run.order chromFWHM
+#&gt; 1         1     -1.00
+#&gt; 2         2     -0.75
+#&gt; 3         3     -0.50
+#&gt; 4         4     -0.25
+#&gt; 5         5      0.00
+#&gt; 6         6      0.25
+#&gt; 7         7      0.50
+#&gt; 8         8      0.75
+#&gt; 9         9      1.00
+#&gt; ---
+#&gt;   |                                                                              |                                                                      |   0%  |                                                                              |========                                                              |  11%  |                                                                              |================                                                      |  22%  |                                                                              |=======================                                               |  33%  |                                                                              |===============================                                       |  44%  |                                                                              |=======================================                               |  56%  |                                                                              |===============================================                       |  67%  |                                                                              |======================================================                |  78%  |                                                                              |==============================================================        |  89%  |                                                                              |======================================================================| 100%
+#&gt; 
+#&gt; ---
+#&gt; Response:
+#&gt;    featureCount nonRP RP      PPS experiment    score
+#&gt; 1:          769   133 68 34.76692          1 34.76692
+#&gt; 2:          769   135 68 34.25185          2 34.25185
+#&gt; 3:          757   148 62 25.97297          3 25.97297
+#&gt; 4:          748   145 62 26.51034          4 26.51034
+#&gt; 5:          741   144 61 25.84028          5 25.84028
+#&gt; 6:          730   139 61 26.76978          6 26.76978
+#&gt; 7:          667   129 53 21.77519          7 21.77519
+#&gt; 8:          665   139 54 20.97842          8 20.97842
+#&gt; 9:          659   135 53 20.80741          9 20.80741
+#&gt; ---
+#&gt; Best params: chromFWHM: 4; isotopeFilteringModel: metabolites (2% RMS); logPath: NULL; 
+#&gt; Best results: featureCount: 769; nonRP: 133; RP: 68; PPS: 34.7669172932331; 
+#&gt; ---
+#&gt; Starting new DoE (parameter set 2/2, iteration 2):
+#&gt; chromFWHM: c(2, 6)
+#&gt; isotopeFilteringModel: metabolites (2% RMS)
+#&gt; ---
+#&gt; Design:
+#&gt;   run.order chromFWHM
+#&gt; 1         1     -1.00
+#&gt; 2         2     -0.75
+#&gt; 3         3     -0.50
+#&gt; 4         4     -0.25
+#&gt; 5         5      0.00
+#&gt; 6         6      0.25
+#&gt; 7         7      0.50
+#&gt; 8         8      0.75
+#&gt; 9         9      1.00
+#&gt; ---
+#&gt;   |                                                                              |                                                                      |   0%  |                                                                              |========                                                              |  11%  |                                                                              |================                                                      |  22%  |                                                                              |=======================                                               |  33%  |                                                                              |===============================                                       |  44%  |                                                                              |=======================================                               |  56%  |                                                                              |===============================================                       |  67%  |                                                                              |======================================================                |  78%  |                                                                              |==============================================================        |  89%  |                                                                              |======================================================================| 100%
+#&gt; Modelled parameter optimum yields significantly lower experimental score: 26.5/33.1
+#&gt; Taking data from best experimental value (37.3) instead...
+#&gt; 
+#&gt; ---
+#&gt; Response:
+#&gt;    featureCount nonRP RP      PPS experiment    score
+#&gt; 1:          683    98 51 26.54082          1 26.54082
+#&gt; 2:          686    89 51 29.22472          2 29.22472
+#&gt; 3:          745   102 61 36.48039          3 36.48039
+#&gt; 4:          755   124 68 37.29032          4 37.29032
+#&gt; 5:          769   133 68 34.76692          5 34.76692
+#&gt; 6:          769   135 68 34.25185          6 34.25185
+#&gt; 7:          757   148 62 25.97297          7 25.97297
+#&gt; 8:          748   145 62 26.51034          8 26.51034
+#&gt; 9:          741   144 61 25.84028          9 25.84028
+#&gt; ---
+#&gt; Best params: chromFWHM: 3.5; isotopeFilteringModel: metabolites (2% RMS); logPath: NULL; 
+#&gt; Best results: featureCount: 755; nonRP: 124; RP: 68; PPS: 37.2903225806452; 
+#&gt; ---
+#&gt; Starting new DoE (parameter set 2/2, iteration 3):
+#&gt; chromFWHM: c(1.5, 5.5)
+#&gt; isotopeFilteringModel: metabolites (2% RMS)
+#&gt; ---
+#&gt; Design:
+#&gt;   run.order chromFWHM
+#&gt; 1         1     -1.00
+#&gt; 2         2     -0.75
+#&gt; 3         3     -0.50
+#&gt; 4         4     -0.25
+#&gt; 5         5      0.00
+#&gt; 6         6      0.25
+#&gt; 7         7      0.50
+#&gt; 8         8      0.75
+#&gt; 9         9      1.00
+#&gt; ---
+#&gt;   |                                                                              |                                                                      |   0%  |                                                                              |========                                                              |  11%  |                                                                              |================                                                      |  22%  |                                                                              |=======================                                               |  33%  |                                                                              |===============================                                       |  44%  |                                                                              |=======================================                               |  56%  |                                                                              |===============================================                       |  67%  |                                                                              |======================================================                |  78%  |                                                                              |==============================================================        |  89%  |                                                                              |======================================================================| 100%
+#&gt; Modelled parameter optimum yields significantly lower experimental score: 28.6/31.2
+#&gt; Taking data from best experimental value (37.3) instead...
+#&gt; 
+#&gt; ---
+#&gt; Response:
+#&gt;    featureCount nonRP RP      PPS experiment    score
+#&gt; 1:          685    91 51 28.58242          1 28.58242
+#&gt; 2:          683    98 51 26.54082          2 26.54082
+#&gt; 3:          686    89 51 29.22472          3 29.22472
+#&gt; 4:          745   102 61 36.48039          4 36.48039
+#&gt; 5:          755   124 68 37.29032          5 37.29032
+#&gt; 6:          769   133 68 34.76692          6 34.76692
+#&gt; 7:          769   135 68 34.25185          7 34.25185
+#&gt; 8:          757   148 62 25.97297          8 25.97297
+#&gt; 9:          748   145 62 26.51034          9 26.51034
+#&gt; ---
+#&gt; Best params: chromFWHM: 3.5; isotopeFilteringModel: metabolites (2% RMS); logPath: NULL; 
+#&gt; Best results: featureCount: 755; nonRP: 124; RP: 68; PPS: 37.2903225806452; 
+#&gt; ---
+#&gt; ===
+#&gt; DONE!
+#&gt; Best parameter set: 1
+#&gt; Best DoE iteration: 2</div><div class='input'>
 <span class='co'># perform grouping optimization with optimized features object</span>
 <span class='no'>fgOpt</span> <span class='kw'>&lt;-</span> <span class='fu'>optimizeFeatureGrouping</span>(<span class='fu'>optimizedObject</span>(<span class='no'>ftOpt</span>), <span class='st'>"xcms"</span>,
-                                 <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='kw'>groupArgs</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='kw'>bw</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>22</span>, <span class='fl'>28</span>)),
-                                      <span class='kw'>retcorArgs</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"obiwarp"</span>)))
+                                 <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>groupArgs</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>bw</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>22</span>, <span class='fl'>28</span>)),
+                                      <span class='kw'>retcorArgs</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"obiwarp"</span>)))</div><div class='output co'>#&gt; Starting new DoE (iteration 1):
+#&gt; bw: c(22, 28)
+#&gt; ---
+#&gt; Design:
+#&gt;   run.order    bw
+#&gt; 1         1 -1.00
+#&gt; 2         2 -0.75
+#&gt; 3         3 -0.50
+#&gt; 4         4 -0.25
+#&gt; 5         5  0.00
+#&gt; 6         6  0.25
+#&gt; 7         7  0.50
+#&gt; 8         8  0.75
+#&gt; 9         9  1.00
+#&gt; ---
+#&gt;   |                                                                              |                                                                      |   0%  |                                                                              |========                                                              |  11%  |                                                                              |================                                                      |  22%  |                                                                              |=======================                                               |  33%  |                                                                              |===============================                                       |  44%  |                                                                              |=======================================                               |  56%  |                                                                              |===============================================                       |  67%  |                                                                              |======================================================                |  78%  |                                                                              |==============================================================        |  89%  |                                                                              |======================================================================| 100%
+#&gt; 
+#&gt; ---
+#&gt; Response:
+#&gt;    exp_index good_groups bad_groups       GS      RCS retcor_done experiment
+#&gt; 1:         1         118        156 89.25641 12.42890           1          1
+#&gt; 2:         2         118        156 89.25641 12.42890           1          2
+#&gt; 3:         3         118        155 89.83226 12.37278           1          3
+#&gt; 4:         4         118        155 89.83226 12.37278           1          4
+#&gt; 5:         5         118        155 89.83226 12.37278           1          5
+#&gt; 6:         6         118        155 89.83226 12.37278           1          6
+#&gt; 7:         7         118        155 89.83226 12.37278           1          7
+#&gt; 8:         8         118        155 89.83226 12.37278           1          8
+#&gt; 9:         9         118        155 89.83226 12.37278           1          9
+#&gt;    score
+#&gt; 1:     1
+#&gt; 2:     1
+#&gt; 3:     1
+#&gt; 4:     1
+#&gt; 5:     1
+#&gt; 6:     1
+#&gt; 7:     1
+#&gt; 8:     1
+#&gt; 9:     1
+#&gt; ---
+#&gt; Best params: groupArgs: list(bw = 28); retcorArgs: list(method = "obiwarp"); 
+#&gt; Best results: exp_index: 1; good_groups: 118; bad_groups: 155; GS: 89.8322580645161; RCS: 12.372780214535; retcor_done: 1; 
+#&gt; ---
+#&gt; Starting new DoE (iteration 2):
+#&gt; bw: c(21.4, 28.6)
+#&gt; ---
+#&gt; Design:
+#&gt;   run.order    bw
+#&gt; 1         1 -1.00
+#&gt; 2         2 -0.75
+#&gt; 3         3 -0.50
+#&gt; 4         4 -0.25
+#&gt; 5         5  0.00
+#&gt; 6         6  0.25
+#&gt; 7         7  0.50
+#&gt; 8         8  0.75
+#&gt; 9         9  1.00
+#&gt; ---
+#&gt;   |                                                                              |                                                                      |   0%  |                                                                              |========                                                              |  11%  |                                                                              |================                                                      |  22%  |                                                                              |=======================                                               |  33%  |                                                                              |===============================                                       |  44%  |                                                                              |=======================================                               |  56%  |                                                                              |===============================================                       |  67%  |                                                                              |======================================================                |  78%  |                                                                              |==============================================================        |  89%  |                                                                              |======================================================================| 100%
+#&gt; 
+#&gt; ---
+#&gt; Response:
+#&gt;    exp_index good_groups bad_groups       GS      RCS retcor_done experiment
+#&gt; 1:         1         118        156 89.25641 12.42890           1          1
+#&gt; 2:         2         118        156 89.25641 12.42890           1          2
+#&gt; 3:         3         118        156 89.25641 12.42890           1          3
+#&gt; 4:         4         118        155 89.83226 12.37278           1          4
+#&gt; 5:         5         118        155 89.83226 12.37278           1          5
+#&gt; 6:         6         118        155 89.83226 12.37278           1          6
+#&gt; 7:         7         118        155 89.83226 12.37278           1          7
+#&gt; 8:         8         118        155 89.83226 12.37278           1          8
+#&gt; 9:         9         118        155 89.83226 12.37278           1          9
+#&gt;    score
+#&gt; 1:     1
+#&gt; 2:     1
+#&gt; 3:     1
+#&gt; 4:     1
+#&gt; 5:     1
+#&gt; 6:     1
+#&gt; 7:     1
+#&gt; 8:     1
+#&gt; 9:     1
+#&gt; ---
+#&gt; Best params: groupArgs: list(bw = 28.6); retcorArgs: list(method = "obiwarp"); 
+#&gt; Best results: exp_index: 1; good_groups: 118; bad_groups: 155; GS: 89.8322580645161; RCS: 12.372780214535; retcor_done: 1; 
+#&gt; ---
+#&gt; ===
+#&gt; DONE!
+#&gt; Best parameter set: 1
+#&gt; Best DoE iteration: 1</div><div class='input'>
+<span class='co'># same, but using the XCMS3 interface</span>
+<span class='no'>fgOpt2</span> <span class='kw'>&lt;-</span> <span class='fu'>optimizeFeatureGrouping</span>(<span class='fu'>optimizedObject</span>(<span class='no'>ftOpt</span>), <span class='st'>"xcms3"</span>,
+                                  <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>groupMethod</span> <span class='kw'>=</span> <span class='st'>"density"</span>, <span class='kw'>groupParams</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>bw</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>22</span>, <span class='fl'>28</span>)),
+                                       <span class='kw'>retAlignMethod</span> <span class='kw'>=</span> <span class='st'>"obiwarp"</span>))</div><div class='output co'>#&gt; Starting new DoE (iteration 1):
+#&gt; groupMethod: density
+#&gt; retAlignMethod: obiwarp
+#&gt; bw: c(22, 28)
+#&gt; ---
+#&gt; Design:
+#&gt;   run.order    bw
+#&gt; 1         1 -1.00
+#&gt; 2         2 -0.75
+#&gt; 3         3 -0.50
+#&gt; 4         4 -0.25
+#&gt; 5         5  0.00
+#&gt; 6         6  0.25
+#&gt; 7         7  0.50
+#&gt; 8         8  0.75
+#&gt; 9         9  1.00
+#&gt; ---
+#&gt;   |                                                                              |                                                                      |   0%  |                                                                              |========                                                              |  11%  |                                                                              |================                                                      |  22%  |                                                                              |=======================                                               |  33%  |                                                                              |===============================                                       |  44%  |                                                                              |=======================================                               |  56%  |                                                                              |===============================================                       |  67%  |                                                                              |======================================================                |  78%  |                                                                              |==============================================================        |  89%  |                                                                              |======================================================================| 100%
+#&gt; 
+#&gt; ---
+#&gt; Response:
+#&gt;    exp_index good_groups bad_groups      GS      RCS retcor_done experiment
+#&gt; 1:         1         224         50 1003.52 31.27914           1          1
+#&gt; 2:         2         224         50 1003.52 31.27914           1          2
+#&gt; 3:         3         224         50 1003.52 31.27914           1          3
+#&gt; 4:         4         223         50  994.58 31.35164           1          4
+#&gt; 5:         5         223         50  994.58 31.35164           1          5
+#&gt; 6:         6         223         50  994.58 31.35164           1          6
+#&gt; 7:         7         223         50  994.58 31.35164           1          7
+#&gt; 8:         8         223         50  994.58 31.35164           1          8
+#&gt; 9:         9         223         50  994.58 31.35164           1          9
+#&gt;    score
+#&gt; 1:     1
+#&gt; 2:     1
+#&gt; 3:     1
+#&gt; 4:     1
+#&gt; 5:     1
+#&gt; 6:     1
+#&gt; 7:     1
+#&gt; 8:     1
+#&gt; 9:     1
+#&gt; ---
+#&gt; Best params: groupParam: new("PeakDensityParam", sampleGroups = c("solvent-1", "solvent-2"), bw = 28, minFraction = 0.5, minSamples = 1, binSize = 0.25, maxFeatures = 50, .__classVersion__ = new("Versions", .Data = list(c(0, 0, 1), c(0, 0, 1)))); retAlignParam: new("ObiwarpParam", binSize = 1, centerSample = integer(0), response = 1, distFun = "cor_opt", gapInit = numeric(0), gapExtend = numeric(0), factorDiag = 2, factorGap = 1, localAlignment = FALSE, initPenalty = 0, subset = integer(0), subsetAdjust = "average", .__classVersion__ = new("Versions", .Data = list(c(0, 0, 1), c(0, 0, 1)))); 
+#&gt; Best results: exp_index: 1; good_groups: 223; bad_groups: 50; GS: 994.58; RCS: 31.3516395860705; retcor_done: 1; 
+#&gt; ---
+#&gt; Starting new DoE (iteration 2):
+#&gt; bw: c(21.4, 28.6)
+#&gt; groupMethod: density
+#&gt; retAlignMethod: obiwarp
+#&gt; ---
+#&gt; Design:
+#&gt;   run.order    bw
+#&gt; 1         1 -1.00
+#&gt; 2         2 -0.75
+#&gt; 3         3 -0.50
+#&gt; 4         4 -0.25
+#&gt; 5         5  0.00
+#&gt; 6         6  0.25
+#&gt; 7         7  0.50
+#&gt; 8         8  0.75
+#&gt; 9         9  1.00
+#&gt; ---
+#&gt;   |                                                                              |                                                                      |   0%  |                                                                              |========                                                              |  11%  |                                                                              |================                                                      |  22%  |                                                                              |=======================                                               |  33%  |                                                                              |===============================                                       |  44%  |                                                                              |=======================================                               |  56%  |                                                                              |===============================================                       |  67%  |                                                                              |======================================================                |  78%  |                                                                              |==============================================================        |  89%  |                                                                              |======================================================================| 100%
+#&gt; 
+#&gt; ---
+#&gt; Response:
+#&gt;    exp_index good_groups bad_groups      GS      RCS retcor_done experiment
+#&gt; 1:         1         224         50 1003.52 31.27914           1          1
+#&gt; 2:         2         224         50 1003.52 31.27914           1          2
+#&gt; 3:         3         224         50 1003.52 31.27914           1          3
+#&gt; 4:         4         223         50  994.58 31.35164           1          4
+#&gt; 5:         5         223         50  994.58 31.35164           1          5
+#&gt; 6:         6         223         50  994.58 31.35164           1          6
+#&gt; 7:         7         223         50  994.58 31.35164           1          7
+#&gt; 8:         8         223         50  994.58 31.35164           1          8
+#&gt; 9:         9         223         50  994.58 31.35164           1          9
+#&gt;    score
+#&gt; 1:     1
+#&gt; 2:     1
+#&gt; 3:     1
+#&gt; 4:     1
+#&gt; 5:     1
+#&gt; 6:     1
+#&gt; 7:     1
+#&gt; 8:     1
+#&gt; 9:     1
+#&gt; ---
+#&gt; Best params: groupParam: new("PeakDensityParam", sampleGroups = c("solvent-1", "solvent-2"), bw = 28.6, minFraction = 0.5, minSamples = 1, binSize = 0.25, maxFeatures = 50, .__classVersion__ = new("Versions", .Data = list(c(0, 0, 1), c(0, 0, 1)))); retAlignParam: new("ObiwarpParam", binSize = 1, centerSample = integer(0), response = 1, distFun = "cor_opt", gapInit = numeric(0), gapExtend = numeric(0), factorDiag = 2, factorGap = 1, localAlignment = FALSE, initPenalty = 0, subset = integer(0), subsetAdjust = "average", .__classVersion__ = new("Versions", .Data = list(c(0, 0, 1), c(0, 0, 1)))); 
+#&gt; Best results: exp_index: 1; good_groups: 223; bad_groups: 50; GS: 994.58; RCS: 31.3516395860705; retcor_done: 1; 
+#&gt; ---
+#&gt; ===
+#&gt; DONE!
+#&gt; Best parameter set: 1
+#&gt; Best DoE iteration: 1</div><div class='input'>
 
 <span class='co'># plot contour of first parameter set/DoE iteration</span>
-<span class='fu'><a href='generics.html'>plot</a></span>(<span class='no'>ftOpt</span>, <span class='kw'>paramSet</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>DoEIteration</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"contour"</span>)
-
+<span class='fu'><a href='generics.html'>plot</a></span>(<span class='no'>ftOpt</span>, <span class='kw'>paramSet</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>DoEIteration</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"contour"</span>)</div><div class='img'><img src='feature-optimization-1.png' alt='' width='700' height='433' /></div><div class='input'>
 <span class='co'># generate parameter set with some predefined and custom parameters to be</span>
 <span class='co'># optimized.</span>
-<span class='no'>pSet</span> <span class='kw'>&lt;-</span> <span class='fu'>generateFeatureOptPSet</span>(<span class='st'>"openms"</span>, <span class='kw'>chromSNR</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='fl'>3</span>, <span class='fl'>9</span>),
-                               <span class='kw'>useSmoothedInts</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
-<span class='co'># }</span></pre>
+<span class='no'>pSet</span> <span class='kw'>&lt;-</span> <span class='fu'>generateFeatureOptPSet</span>(<span class='st'>"openms"</span>, <span class='kw'>chromSNR</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>3</span>, <span class='fl'>9</span>),
+                               <span class='kw'>useSmoothedInts</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
-      
       <li><a href="#value">Value</a></li>
-
       <li><a href="#details">Details</a></li>
-
-      <li><a href="#note">Note</a></li>
-
       <li><a href="#parameter-sets">Parameter sets</a></li>
-
       <li><a href="#functions">Functions</a></li>
-
       <li><a href="#potential-suboptimal-results-by-optimization-model">Potential suboptimal results by optimization model</a></li>
-
       <li><a href="#source">Source</a></li>
-
       <li><a href="#references">References</a></li>
-      
       <li><a href="#examples">Examples</a></li>
     </ul>
 
   </div>
 </div>
+
 
       <footer>
       <div class="copyright">
@@ -419,13 +963,16 @@ doi: <a href='https://doi.org/10.1186/s12859-015-0562-8'>10.1186/s12859-015-0562
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.3.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
 </div>
+
       </footer>
    </div>
 
   
 
+
   </body>
 </html>
+
 

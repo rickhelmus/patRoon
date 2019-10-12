@@ -7,8 +7,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>patRoon tutorial • patRoon</title>
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous">
-<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- sticky kit --><script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous">
+<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
 <script src="../pkgdown.js"></script><meta property="og:title" content="patRoon tutorial">
 <meta property="og:description" content="">
 <meta name="twitter:card" content="summary">
@@ -83,6 +84,7 @@
 <!--/.navbar -->
 
       
+
       </header><script src="tutorial_files/htmlwidgets-1.3/htmlwidgets.js"></script><script src="tutorial_files/viz-0.3/viz.js"></script><link href="tutorial_files/DiagrammeR-styles-0.2/styles.css" rel="stylesheet">
 <script src="tutorial_files/grViz-binding-1.0.1/grViz.js"></script><div class="row">
   <div class="col-md-9 contents">
@@ -90,7 +92,7 @@
       <h1>patRoon tutorial</h1>
                         <h4 class="author">Rick Helmus</h4>
             
-            <h4 class="date">2019-05-18</h4>
+            <h4 class="date">2019-10-12</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/rickhelmus/patRoon/blob/master/vignettes/tutorial.Rmd"><code>vignettes/tutorial.Rmd</code></a></small>
       <div class="hidden name"><code>tutorial.Rmd</code></div>
@@ -122,8 +124,8 @@ p.caption {
 <!-- UNDONE: link to advanced vignette -->
 <p>In this tutorial you will learn how to perform a simple non-target analysis with <code>patRoon</code>. This tutorial is not meant to give a detailed overview of <code>patRoon</code>. Instead, it serves as a quick introduction on how to use <code>patRoon</code> to setup and perform a full non-target analysis workflow.</p>
 <p>The workflow in this tutorial consists of the following steps:</p>
-<div id="htmlwidget-676866be3032e418c8ab" style="width:750px;height:100px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-676866be3032e418c8ab">{"x":{"diagram":"\ndigraph rmarkdown {\ngraph [ rankdir = LR ]\nnode [ shape = box,\n       fixedsize = true,\n       width = 2.2,\n       height = 1,\n       fontsize = 18,\n       fillcolor = darkseagreen1,\n       style = filled ]\n\"New project\" -> Features -> Annotation -> Reporting [ arrowhead = vee ]\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-4ff6946647601be51ffa" style="width:750px;height:100px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-4ff6946647601be51ffa">{"x":{"diagram":"\ndigraph rmarkdown {\ngraph [ rankdir = LR ]\nnode [ shape = box,\n       fixedsize = true,\n       width = 2.2,\n       height = 1,\n       fontsize = 18,\n       fillcolor = darkseagreen1,\n       style = filled ]\n\"New project\" -> Features -> Annotation -> Reporting [ arrowhead = vee ]\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 </div>
 <div id="data" class="section level1">
 <h1 class="hasAnchor">
@@ -139,7 +141,7 @@ p.caption {
 <p>Starting a new project typically consists of</p>
 <ol style="list-style-type: decimal">
 <li>Creating a new directory (unsurprisingly!)</li>
-<li>Changing the active working directory to the project directory (e.g. with <code><a href="https://www.rdocumentation.org/packages/base/topics/getwd">setwd()</a></code>).</li>
+<li>Changing the active working directory to the project directory (e.g. with <code><a href="https://rdrr.io/r/base/getwd.html">setwd()</a></code>).</li>
 <li>Create (or copy) an <code>R</code> processing script.</li>
 </ol>
 <p>Note that step 2 is important as any output files (e.g. reports and cached results) are stored to the current working directory by default. Consequently, always take care to ensure that this directory is active, for instance, after restarting <code>R</code>.</p>
@@ -148,7 +150,7 @@ p.caption {
 <h2 class="hasAnchor">
 <a href="#automatic-project-creation" class="anchor"></a>Automatic project creation</h2>
 <p>Ensure that RStudio is active and start the new project utility:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1">patRoon<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/patRoon/topics/GUI-utils">newProject</a></span>()</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1">patRoon<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/patRoon/man/GUI-utils.html">newProject</a></span>()</a></code></pre></div>
 <blockquote>
 <p><strong><em>NOTE</em></strong> Currently <code><a href="../reference/GUI-utils.html">newProject()</a></code> <em>only</em> works when using RStudio.</p>
 </blockquote>
@@ -167,7 +169,7 @@ p.caption {
 <li>
 <strong>Annotation tab</strong> Select <em>GenForm</em>, <em>MetFrag</em> and <em>mzR</em> for the formula generation, compound identification and peak list generator options, respectively (note that the last will become visible when selecting either of the other options). Select <em>RAMClustR</em> for component generation.</li>
 <li>
-<strong>Reporting tab</strong> Make sure all options are enabled (the <code><a href="../reference/reporting.html">reportPDF()</a></code> and <code><a href="../reference/reporting.html">reportMD()</a></code> functions largely overlap each other in functionality, but are both enabled for demonstration purposes).</li>
+<strong>Reporting tab</strong> Make sure all options are enabled (the <code><a href="../reference/reporting.html">reportPDF()</a></code> and <code><a href="../reference/reporting.html">reportHTML()</a></code> functions largely overlap each other in functionality, but are both enabled for demonstration purposes).</li>
 </ul>
 </div>
 <div id="manual-project-creation" class="section level2">
@@ -175,8 +177,8 @@ p.caption {
 <a href="#manual-project-creation" class="anchor"></a>Manual project creation</h2>
 <p>For RStudio users it is easiest to simply create a new RStudio project (e.g. <em>File</em> –&gt; <em>New Project</em>). This will create a new directory and ensure that the working directory is set whenever you re-open it. Alternatively, you can do this manually, for instance:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1">projDir &lt;-<span class="st"> "~/myProjectDir"</span></a>
-<a class="sourceLine" id="cb2-2" data-line-number="2"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/files2">dir.create</a></span>(projDir)</a>
-<a class="sourceLine" id="cb2-3" data-line-number="3"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/getwd">setwd</a></span>(projDir)</a></code></pre></div>
+<a class="sourceLine" id="cb2-2" data-line-number="2"><span class="kw"><a href="https://rdrr.io/r/base/files2.html">dir.create</a></span>(projDir)</a>
+<a class="sourceLine" id="cb2-3" data-line-number="3"><span class="kw"><a href="https://rdrr.io/r/base/getwd.html">setwd</a></span>(projDir)</a></code></pre></div>
 <p>The next step is to create a new <code>R</code> script. For this tutorial simply copy the script that is shown in the next section to a new <code>.R</code> file.</p>
 </div>
 <div id="template-r-script" class="section level2">
@@ -185,7 +187,7 @@ p.caption {
 <p>After you ran <code><a href="../reference/GUI-utils.html">newProject()</a></code> the file below will be created. Before running this script, however, we still have to add and modify some of its code. In the next sections you will learn more about each part of the script, make the necessary changes and run its code.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="co">## Script automatically generated on Mon Mar 25 08:24:32 2019</span></a>
 <a class="sourceLine" id="cb3-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb3-3" data-line-number="3"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(patRoon)</a>
+<a class="sourceLine" id="cb3-3" data-line-number="3"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(patRoon)</a>
 <a class="sourceLine" id="cb3-4" data-line-number="4"></a>
 <a class="sourceLine" id="cb3-5" data-line-number="5"></a>
 <a class="sourceLine" id="cb3-6" data-line-number="6"><span class="co"># -------------------------</span></a>
@@ -194,12 +196,12 @@ p.caption {
 <a class="sourceLine" id="cb3-9" data-line-number="9"></a>
 <a class="sourceLine" id="cb3-10" data-line-number="10"></a>
 <a class="sourceLine" id="cb3-11" data-line-number="11">workPath &lt;-<span class="st"> "C:/myproject"</span></a>
-<a class="sourceLine" id="cb3-12" data-line-number="12"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/getwd">setwd</a></span>(workPath)</a>
+<a class="sourceLine" id="cb3-12" data-line-number="12"><span class="kw"><a href="https://rdrr.io/r/base/getwd.html">setwd</a></span>(workPath)</a>
 <a class="sourceLine" id="cb3-13" data-line-number="13"></a>
 <a class="sourceLine" id="cb3-14" data-line-number="14"><span class="co"># Take example data from patRoonData package (triplicate solvent blank + triplicate standard)</span></a>
-<a class="sourceLine" id="cb3-15" data-line-number="15">anaInfo &lt;-<span class="st"> </span><span class="kw"><a href="../reference/analysis-information.html">generateAnalysisInfo</a></span>(<span class="dt">paths =</span> patRoonData<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/patRoonData/topics/patRoonData">exampleDataPath</a></span>(),</a>
-<a class="sourceLine" id="cb3-16" data-line-number="16">                                <span class="dt">groups =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/rep">rep</a></span>(<span class="st">"solvent"</span>, <span class="dv">3</span>), <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/rep">rep</a></span>(<span class="st">"standard"</span>, <span class="dv">3</span>)),</a>
-<a class="sourceLine" id="cb3-17" data-line-number="17">                                <span class="dt">refs =</span> <span class="st">"solvent"</span>)</a>
+<a class="sourceLine" id="cb3-15" data-line-number="15">anaInfo &lt;-<span class="st"> </span><span class="kw"><a href="../reference/analysis-information.html">generateAnalysisInfo</a></span>(<span class="dt">paths =</span> patRoonData<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/patRoonData/man/patRoonData.html">exampleDataPath</a></span>(),</a>
+<a class="sourceLine" id="cb3-16" data-line-number="16">                                <span class="dt">groups =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"solvent"</span>, <span class="dv">3</span>), <span class="kw"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"standard"</span>, <span class="dv">3</span>)),</a>
+<a class="sourceLine" id="cb3-17" data-line-number="17">                                <span class="dt">blanks =</span> <span class="st">"solvent"</span>)</a>
 <a class="sourceLine" id="cb3-18" data-line-number="18"></a>
 <a class="sourceLine" id="cb3-19" data-line-number="19"></a>
 <a class="sourceLine" id="cb3-20" data-line-number="20"><span class="co"># -------------------------</span></a>
@@ -263,10 +265,10 @@ p.caption {
 <a class="sourceLine" id="cb3-78" data-line-number="78">          <span class="dt">compounds =</span> compounds, <span class="dt">compoundsNormalizeScores =</span> <span class="st">"max"</span>,</a>
 <a class="sourceLine" id="cb3-79" data-line-number="79">          <span class="dt">components =</span> components, <span class="dt">MSPeakLists =</span> mslists)</a>
 <a class="sourceLine" id="cb3-80" data-line-number="80"></a>
-<a class="sourceLine" id="cb3-81" data-line-number="81"><span class="kw"><a href="../reference/reporting.html">reportMD</a></span>(fGroups, <span class="dt">path =</span> <span class="st">"report"</span>, <span class="dt">reportPlots =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"chord"</span>, <span class="st">"venn"</span>, <span class="st">"upset"</span>, <span class="st">"eics"</span>, <span class="st">"formulas"</span>), <span class="dt">formulas =</span> formulas,</a>
-<a class="sourceLine" id="cb3-82" data-line-number="82">         <span class="dt">compounds =</span> compounds, <span class="dt">compoundsNormalizeScores =</span> <span class="st">"max"</span>,</a>
-<a class="sourceLine" id="cb3-83" data-line-number="83">         <span class="dt">components =</span> components, <span class="dt">MSPeakLists =</span> mslists,</a>
-<a class="sourceLine" id="cb3-84" data-line-number="84">         <span class="dt">selfContained =</span> <span class="ot">FALSE</span>, <span class="dt">openReport =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
+<a class="sourceLine" id="cb3-81" data-line-number="81"><span class="kw"><a href="../reference/reporting.html">reportHTML</a></span>(fGroups, <span class="dt">path =</span> <span class="st">"report"</span>, <span class="dt">reportPlots =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"chord"</span>, <span class="st">"venn"</span>, <span class="st">"upset"</span>, <span class="st">"eics"</span>, <span class="st">"formulas"</span>), <span class="dt">formulas =</span> formulas,</a>
+<a class="sourceLine" id="cb3-82" data-line-number="82">           <span class="dt">compounds =</span> compounds, <span class="dt">compoundsNormalizeScores =</span> <span class="st">"max"</span>,</a>
+<a class="sourceLine" id="cb3-83" data-line-number="83">           <span class="dt">components =</span> components, <span class="dt">MSPeakLists =</span> mslists,</a>
+<a class="sourceLine" id="cb3-84" data-line-number="84">           <span class="dt">selfContained =</span> <span class="ot">FALSE</span>, <span class="dt">openReport =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
 </div>
 </div>
 <div id="workflow" class="section level1">
@@ -277,19 +279,19 @@ p.caption {
 <h2 class="hasAnchor">
 <a href="#initialization" class="anchor"></a>Initialization</h2>
 <p>The first part of the script loads <code>patRoon</code>, makes sure the current working directory is set correctly and loads information about the analyses. This part in your script looks more or less like this:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(patRoon)</a>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(patRoon)</a>
 <a class="sourceLine" id="cb4-2" data-line-number="2"></a>
 <a class="sourceLine" id="cb4-3" data-line-number="3">workPath &lt;-<span class="st"> "C:/my_project"</span></a>
-<a class="sourceLine" id="cb4-4" data-line-number="4"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/getwd">setwd</a></span>(workPath)</a>
+<a class="sourceLine" id="cb4-4" data-line-number="4"><span class="kw"><a href="https://rdrr.io/r/base/getwd.html">setwd</a></span>(workPath)</a>
 <a class="sourceLine" id="cb4-5" data-line-number="5"></a>
 <a class="sourceLine" id="cb4-6" data-line-number="6"></a>
 <a class="sourceLine" id="cb4-7" data-line-number="7"><span class="co"># Take example data from patRoonData package (triplicate solvent blank + triplicate standard)</span></a>
-<a class="sourceLine" id="cb4-8" data-line-number="8">anaInfo &lt;-<span class="st"> </span><span class="kw"><a href="../reference/analysis-information.html">generateAnalysisInfo</a></span>(<span class="dt">paths =</span> patRoonData<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/patRoonData/topics/patRoonData">exampleDataPath</a></span>(),</a>
-<a class="sourceLine" id="cb4-9" data-line-number="9">                                <span class="dt">groups =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/rep">rep</a></span>(<span class="st">"solvent"</span>, <span class="dv">3</span>), <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/rep">rep</a></span>(<span class="st">"standard"</span>, <span class="dv">3</span>)),</a>
-<a class="sourceLine" id="cb4-10" data-line-number="10">                                <span class="dt">refs =</span> <span class="st">"solvent"</span>)</a></code></pre></div>
+<a class="sourceLine" id="cb4-8" data-line-number="8">anaInfo &lt;-<span class="st"> </span><span class="kw"><a href="../reference/analysis-information.html">generateAnalysisInfo</a></span>(<span class="dt">paths =</span> patRoonData<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/patRoonData/man/patRoonData.html">exampleDataPath</a></span>(),</a>
+<a class="sourceLine" id="cb4-9" data-line-number="9">                                <span class="dt">groups =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"solvent"</span>, <span class="dv">3</span>), <span class="kw"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"standard"</span>, <span class="dv">3</span>)),</a>
+<a class="sourceLine" id="cb4-10" data-line-number="10">                                <span class="dt">blanks =</span> <span class="st">"solvent"</span>)</a></code></pre></div>
 <p>After you ran this part the analysis information should be stored in the <code>anaInfo</code> variable. This information is important as it will be required for subsequent steps in the workflow. Lets peek at its contents:</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">anaInfo</a></code></pre></div>
-<pre><code>#&gt;                                                                 path   analysis    group     ref
+<pre><code>#&gt;                                                                 path   analysis    group   blank
 #&gt; 1 /home/rick/R/x86_64-suse-linux-gnu-library/3.6/patRoonData/extdata  solvent-1  solvent solvent
 #&gt; 2 /home/rick/R/x86_64-suse-linux-gnu-library/3.6/patRoonData/extdata  solvent-2  solvent solvent
 #&gt; 3 /home/rick/R/x86_64-suse-linux-gnu-library/3.6/patRoonData/extdata  solvent-3  solvent solvent
@@ -305,15 +307,15 @@ p.caption {
 <li>
 <em>group</em>: to which <em>replicate group</em> the analysis belongs. All analysis which are replicates of each other get the same name.</li>
 <li>
-<em>ref</em>: which replicate group should be used for blank subtraction.</li>
+<em>blank</em>: which replicate group should be used for blank subtraction.</li>
 </ul>
 <p>The latter two columns are especially important for <a href="#data-cleanup">data cleanup</a>, which will be discussed later. For now keep in mind that the analyses for the solvents and standards each belong to a different replicate group (<code>"solvent"</code> and <code>"standard"</code>) and that the solvents should be used for blank subtraction.</p>
-<p>In this tutorial the analysis information was generated by the <code><a href="../reference/analysis-information.html">generateAnalysisInfo()</a></code> function. This function will scan a given directory for MS data files and automatically fill in the <code>path</code> and <code>analysis</code> columns from this information. In addition, you can pass replicate group and blank reference information to this function as was done in the code above.</p>
+<p>In this tutorial the analysis information was generated by the <code><a href="../reference/analysis-information.html">generateAnalysisInfo()</a></code> function. This function will scan a given directory for MS data files and automatically fill in the <code>path</code> and <code>analysis</code> columns from this information. In addition, you can pass replicate group and blank information to this function as was done in the code above.</p>
 <blockquote>
 <p><strong><em>NOTE</em></strong> Of course nothing stops you from creating a <code>data.frame</code> with analysis information manually within <code>R</code> or load the information from a <em>csv</em> file. In fact, when you create a new project with <code><a href="../reference/GUI-utils.html">newProject()</a></code> you can select to generate a separate <em>csv</em> file with analysis information (i.e. by filling in the right information in the analysis tab).</p>
 </blockquote>
 <blockquote>
-<p><strong><em>NOTE</em></strong> The reference blanks for the solvent analyses are set to themselves. This will remove any features from the solvents later in the workflow, which is generally fine as we are usually not interested in the blanks anyway.</p>
+<p><strong><em>NOTE</em></strong> The blanks for the solvent analyses are set to themselves. This will remove any features from the solvents later in the workflow, which is generally fine as we are usually not interested in the blanks anyway.</p>
 </blockquote>
 </div>
 </div>
@@ -374,9 +376,9 @@ p.caption {
 #&gt; Feature groups: M109_R116_56, M120_R328_81, M134_R399_118, M135_R261_123, M137_R303_127, M142_R116_141, ... (34 total)
 #&gt; Analyses: standard-1, standard-2, standard-3 (3 total)
 #&gt; Replicate groups: standard (1 total)
-#&gt; Replicate groups used as ref: solvent (1 total)</code></pre>
+#&gt; Replicate groups used as blank: solvent (1 total)</code></pre>
 <p>Furthermore, the <code><a href="../reference/generics.html">as.data.table()</a></code> function can be used to have a look at generated feature groups and their intensities (<em>i.e.</em> peak heights) across all analyses:</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/head">head</a></span>(<span class="kw"><a href="../reference/generics.html">as.data.table</a></span>(fGroups))</a></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="kw"><a href="../reference/generics.html">as.data.table</a></span>(fGroups))</a></code></pre></div>
 <pre><code>#&gt;            group      ret       mz standard-1 standard-2 standard-3
 #&gt; 1:  M109_R116_56 116.0809 109.0759      12064      12080      10996
 #&gt; 2:  M120_R328_81 327.9955 120.0555      55936      61668      59624
@@ -385,7 +387,7 @@ p.caption {
 #&gt; 5: M137_R303_127 302.7823 137.0708      40272      46436      44724
 #&gt; 6: M142_R116_141 116.0809 141.9584      26424      25876      27816</code></pre>
 <p>An overview of group properties is returned by the <code><a href="../reference/featureGroups-class.html">groupInfo()</a></code> method:</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/head">head</a></span>(<span class="kw"><a href="../reference/featureGroups-class.html">groupInfo</a></span>(fGroups))</a></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="kw"><a href="../reference/featureGroups-class.html">groupInfo</a></span>(fGroups))</a></code></pre></div>
 <pre><code>#&gt;                    rts      mzs
 #&gt; M109_R116_56  116.0809 109.0759
 #&gt; M120_R328_81  327.9955 120.0555
@@ -418,27 +420,41 @@ p.caption {
 #&gt; Loading all MS peak lists for 34 feature groups in analysis 'standard-3'...
 #&gt; ================================================================================
 #&gt; Generating averaged peak lists for all feature groups...
-#&gt; Done!</code></pre>
+#&gt; ================================================================================</code></pre>
 <p>Note that we lowered the <code>clusterMzWindow</code> value to <em>0.002</em>. This window is used during averaging to cluster similar <em>m/z</em> values together. In general the better the resolution of your MS instrument, the lower the value can be set.</p>
 <p>Similar to feature groups the <code><a href="../reference/generics.html">filter()</a></code> generic function can be used to clean up the peak lists afterwards:</p>
 <div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" data-line-number="1">mslists &lt;-<span class="st"> </span><span class="kw"><a href="../reference/generics.html">filter</a></span>(mslists, <span class="dt">relMSMSIntThr =</span> <span class="fl">0.02</span>, <span class="dt">topMSMSPeaks =</span> <span class="dv">10</span>)</a></code></pre></div>
+<pre><code>#&gt; Filtering MS peak lists for 34 feature groups in analysis 'standard-1'...
+#&gt; ================================================================================
+#&gt; Filtering MS peak lists for 34 feature groups in analysis 'standard-2'...
+#&gt; ================================================================================
+#&gt; Filtering MS peak lists for 34 feature groups in analysis 'standard-3'...
+#&gt; ================================================================================
+#&gt; Generating averaged peak lists for all feature groups...
+#&gt; ================================================================================
+#&gt; Filtering averaged MS peak lists for 34 feature groups...
+#&gt; ================================================================================
+#&gt; Done! Filtered 345 (5.34%) MS peaks. Remaining: 6120</code></pre>
 <p>Here, all MS/MS mass peaks with intensities below 2% are removed and from the remaining peaks no more than the ten most intense are retained.</p>
 </div>
 <div id="formula-calculation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#formula-calculation" class="anchor"></a>Formula calculation</h2>
 <p>Using the data from the MS peak lists generated during the previous step we can generate a list of formula candidates for each feature group which is based on measured <em>m/z</em> values, isotopic patterns and presence of MS/MS fragments. In this tutorial we will use this data as an extra hint to score candidate chemical structures generated during the next step. The command below will use <a href="https://sourceforge.net/projects/genform/">GenForm</a> to perform this step. Again running this code may take some time.</p>
-<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" data-line-number="1">formulas &lt;-<span class="st"> </span><span class="kw"><a href="../reference/formula-generation.html">generateFormulas</a></span>(fGroups, <span class="st">"genform"</span>, mslists, <span class="dt">relMzDev =</span> <span class="dv">5</span>,</a>
-<a class="sourceLine" id="cb22-2" data-line-number="2">                             <span class="dt">adduct =</span> <span class="st">"[M+H]+"</span>, <span class="dt">elements =</span> <span class="st">"CHNOPSCl"</span>,</a>
-<a class="sourceLine" id="cb22-3" data-line-number="3">                             <span class="dt">calculateFeatures =</span> <span class="ot">TRUE</span>, <span class="dt">featThreshold =</span> <span class="fl">0.75</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb23-1" data-line-number="1">formulas &lt;-<span class="st"> </span><span class="kw"><a href="../reference/formula-generation.html">generateFormulas</a></span>(fGroups, <span class="st">"genform"</span>, mslists, <span class="dt">relMzDev =</span> <span class="dv">5</span>,</a>
+<a class="sourceLine" id="cb23-2" data-line-number="2">                             <span class="dt">adduct =</span> <span class="st">"[M+H]+"</span>, <span class="dt">elements =</span> <span class="st">"CHNOPSCl"</span>,</a>
+<a class="sourceLine" id="cb23-3" data-line-number="3">                             <span class="dt">calculateFeatures =</span> <span class="ot">TRUE</span>, <span class="dt">featThreshold =</span> <span class="fl">0.75</span>)</a></code></pre></div>
 <pre><code>#&gt; Loading all formulas for analysis 'standard-1'...
+#&gt; ================================================================================
 #&gt; Loaded 176 formulas for 32 features (94.12%).
 #&gt; Loading all formulas for analysis 'standard-2'...
+#&gt; ================================================================================
 #&gt; Loaded 177 formulas for 32 features (94.12%).
 #&gt; Loading all formulas for analysis 'standard-3'...
+#&gt; ================================================================================
 #&gt; Loaded 172 formulas for 32 features (94.12%).
 #&gt; Generating feature group formula consensus...
-#&gt; Done!</code></pre>
+#&gt; ================================================================================</code></pre>
 <p>Note that you need to change the elements parameter to this function to make sure that formulae with sulfur and chloride (S/Cl) are also accepted. It is highly recommended to limit the elements (by default it is just C, H, N, O and P) as this can significantly reduce processing time and improbable formula candidates. In this tutorial we already knew which compounds to expect so the choice was easy, but often a good guess can be made in advance.</p>
 <blockquote>
 <p><strong><em>NOTE</em></strong> The <code><a href="../reference/formula-generation.html">generateFormulas()</a></code> function returns an object that contains formula candidates assigned for each feature group. In the above call the <code>calculateFeatures</code> argument is set to <code>TRUE</code>: by doing so formulae are first calculated for individual features within a feature group. These results are then used to generate a consensus candidate formula list for the complete feature group. During this process any outliers (defined by <code>featThreshold</code>) are automatically removed. In contrast, setting <code>calculateFeatures</code> to <code>FALSE</code> will calculate formulae directly for feature groups (by using MS peak lists that have been averaged for the whole group). This will be significantly faster, but might produce (slightly) less accurate results.</p>
@@ -449,12 +465,12 @@ p.caption {
 <a href="#compound-identification" class="anchor"></a>Compound identification</h2>
 <!-- UNDONE Move MF installation to front? -->
 <p>Now it is time to actually see what compounds we may be dealing with. In this tutorial we will use <a href="http://ipb-halle.github.io/MetFrag/">MetFrag</a> to come up with a list of possible candidates structures for each feature group. Before we can start you have to make sure that MetFrag can be found by <code>patRoon</code>. Download the <a href="http://ipb-halle.github.io/MetFrag/projects/metfragcl/">MetFrag CLI jar file</a> and specify its file location:</p>
-<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb24-1" data-line-number="1"><span class="co"># change to the full path of the MetFrag CL jar file</span></a>
-<a class="sourceLine" id="cb24-2" data-line-number="2"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/options">options</a></span>(<span class="dt">patRoon.path.MetFragCL =</span> <span class="st">"~/MetFrag2.4.5-CL.jar"</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb25-1" data-line-number="1"><span class="co"># change to the full path of the MetFrag CL jar file</span></a>
+<a class="sourceLine" id="cb25-2" data-line-number="2"><span class="kw"><a href="https://rdrr.io/r/base/options.html">options</a></span>(<span class="dt">patRoon.path.MetFragCL =</span> <span class="st">"~/MetFrag2.4.5-CL.jar"</span>)</a></code></pre></div>
 <p>Then <code><a href="../reference/compound-generation.html">generateCompounds()</a></code> is used to execute MetFrag and generate the <code>compounds</code>.</p>
-<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb25-1" data-line-number="1">compounds &lt;-<span class="st"> </span><span class="kw"><a href="../reference/compound-generation.html">generateCompounds</a></span>(fGroups, mslists, <span class="st">"metfrag"</span>, <span class="dt">method =</span> <span class="st">"CL"</span>,</a>
-<a class="sourceLine" id="cb25-2" data-line-number="2">                               <span class="dt">dbRelMzDev =</span> <span class="dv">5</span>, <span class="dt">fragRelMzDev =</span> <span class="dv">5</span>, <span class="dt">fragAbsMzDev =</span> <span class="fl">0.002</span>,</a>
-<a class="sourceLine" id="cb25-3" data-line-number="3">                               <span class="dt">adduct =</span> <span class="st">"[M+H]+"</span>, <span class="dt">database =</span> <span class="st">"pubchem"</span>, <span class="dt">maxCandidatesToStop =</span> <span class="dv">5000</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb26-1" data-line-number="1">compounds &lt;-<span class="st"> </span><span class="kw"><a href="../reference/compound-generation.html">generateCompounds</a></span>(fGroups, mslists, <span class="st">"metfrag"</span>, <span class="dt">method =</span> <span class="st">"CL"</span>,</a>
+<a class="sourceLine" id="cb26-2" data-line-number="2">                               <span class="dt">dbRelMzDev =</span> <span class="dv">5</span>, <span class="dt">fragRelMzDev =</span> <span class="dv">5</span>, <span class="dt">fragAbsMzDev =</span> <span class="fl">0.002</span>,</a>
+<a class="sourceLine" id="cb26-3" data-line-number="3">                               <span class="dt">adduct =</span> <span class="st">"[M+H]+"</span>, <span class="dt">database =</span> <span class="st">"pubchem"</span>, <span class="dt">maxCandidatesToStop =</span> <span class="dv">5000</span>)</a></code></pre></div>
 <pre><code>#&gt; Identifying 34 feature groups with MetFrag...
 #&gt; ================================================================================
 #&gt; Loaded 2209 compounds from 23 features (67.65%).</code></pre>
@@ -467,7 +483,7 @@ p.caption {
 <p><strong><em>NOTE</em></strong> This is often one of the most time consuming steps during the workflow. For this reason, and in order to not ‘abuse’ the servers used by MetFrag, you should always take care to prioritize your data before running this function!</p>
 </blockquote>
 <p>Finally we use the <code><a href="../reference/compounds-class.html">addFormulaScoring()</a></code> function to improve ranking of candidates by incorporating the formula calculation data from the previous step.</p>
-<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb27-1" data-line-number="1">compounds &lt;-<span class="st"> </span><span class="kw"><a href="../reference/compounds-class.html">addFormulaScoring</a></span>(compounds, formulas, <span class="dt">updateScore =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb28-1" data-line-number="1">compounds &lt;-<span class="st"> </span><span class="kw"><a href="../reference/compounds-class.html">addFormulaScoring</a></span>(compounds, formulas, <span class="dt">updateScore =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
 <pre><code>#&gt; Adding formula scoring...
 #&gt; ================================================================================</code></pre>
 </div>
@@ -475,17 +491,17 @@ p.caption {
 <h2 class="hasAnchor">
 <a href="#inspecting-results-1" class="anchor"></a>Inspecting results</h2>
 <p>Similar as feature groups we can quickly peek at some results:</p>
-<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb29-1" data-line-number="1">mslists</a></code></pre></div>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb30-1" data-line-number="1">mslists</a></code></pre></div>
 <pre><code>#&gt; A MSPeakLists object (derived from workflowStep)
-#&gt; Object size (indication): 2.5 MB
+#&gt; Object size (indication): 2.7 MB
 #&gt; Algorithm: mzr
 #&gt; Total peak count: 6120 (MS: 5528 - MS/MS: 592)
 #&gt; Average peak count/analysis: 2040 (MS: 1843 - MS/MS: 197)
 #&gt; Total peak lists: 185 (MS: 102 - MS/MS: 83)
 #&gt; Average peak lists/analysis: 62 (MS: 34 - MS/MS: 28)</code></pre>
-<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb31-1" data-line-number="1">formulas</a></code></pre></div>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb32-1" data-line-number="1">formulas</a></code></pre></div>
 <pre><code>#&gt; A formulas object (derived from workflowStep)
-#&gt; Object size (indication): 851.8 kB
+#&gt; Object size (indication): 862.8 kB
 #&gt; Algorithm: genform
 #&gt; Formulas assigned to features:
 #&gt;   - Total formula count: 525
@@ -493,14 +509,14 @@ p.caption {
 #&gt;   - Average formulas per feature: 5.5
 #&gt; Formulas assigned to feature groups:
 #&gt;   - Total formula count: 131
-#&gt;   - Average formulas per feature group: 9.0</code></pre>
-<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb33-1" data-line-number="1">compounds</a></code></pre></div>
+#&gt;   - Average formulas per feature group: 4.1</code></pre>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb34-1" data-line-number="1">compounds</a></code></pre></div>
 <pre><code>#&gt; A compoundsMF object (derived from compounds -&gt; workflowStep)
 #&gt; Object size (indication): 7.1 MB
 #&gt; Algorithm: metfrag
 #&gt; Number of feature groups with compounds in this object: 23
 #&gt; Number of compounds: 2209 (total), 96.0 (mean), 9 - 100 (min - max)</code></pre>
-<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb35-1" data-line-number="1"><span class="kw"><a href="../reference/generics.html">as.data.table</a></span>(mslists)</a></code></pre></div>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb36-1" data-line-number="1"><span class="kw"><a href="../reference/generics.html">as.data.table</a></span>(mslists)</a></code></pre></div>
 <pre><code>#&gt;              group type        mz  intensity precursor
 #&gt;    1: M109_R116_56   MS  79.02100  2390.4646     FALSE
 #&gt;    2: M109_R116_56   MS  84.95949  3745.9596     FALSE
@@ -513,7 +529,7 @@ p.caption {
 #&gt; 1670: M293_R11_583   MS 290.26895 20768.1905     FALSE
 #&gt; 1671: M293_R11_583   MS 293.20852  6051.2698      TRUE
 #&gt; 1672: M293_R11_583   MS 294.93889 54849.9683     FALSE</code></pre>
-<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb37-1" data-line-number="1"><span class="kw"><a href="../reference/generics.html">as.data.table</a></span>(formulas)</a></code></pre></div>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb38-1" data-line-number="1"><span class="kw"><a href="../reference/generics.html">as.data.table</a></span>(formulas)</a></code></pre></div>
 <pre><code>#&gt;              group   analysis neutral_formula     formula formula_mz     error dbe  isoScore byMSMS MSMSScore  combMatch   frag_mz frag_formula frag_dbe frag_formula_mz frag_error neutral_loss anaCoverage
 #&gt;   1:  M109_R116_56 standard-3          C6H8N2      C6H9N2   109.0760  0.500000   4 0.9276200   TRUE   0.65486 0.60746667  78.03366        C5H4N      4.5        78.03383  2.4666667         CH5N           1
 #&gt;   2:  M109_R116_56 standard-3          C6H8N2      C6H9N2   109.0760  0.500000   4 0.9276200   TRUE   0.65486 0.60746667  92.04948        C6H6N      4.5        92.04948 -1.9666667          H3N           1
@@ -526,24 +542,24 @@ p.caption {
 #&gt; 285:  M293_R11_583 standard-1       C8H25N10P   C8H26N10P   293.2074 -3.833333   2 0.8785700  FALSE        NA         NA        NA         &lt;NA&gt;       NA              NA         NA         &lt;NA&gt;           1
 #&gt; 286:  M293_R11_583 standard-1       C14H24N6O   C14H25N6O   293.2084 -0.300000   6 0.8325800  FALSE        NA         NA        NA         &lt;NA&gt;       NA              NA         NA         &lt;NA&gt;           1
 #&gt; 287:  M293_R11_583 standard-1      C14H32N2S2  C14H33N2S2   293.2080 -1.900000   0 0.7638500  FALSE        NA         NA        NA         &lt;NA&gt;       NA              NA         NA         &lt;NA&gt;           1</code></pre>
-<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb39-1" data-line-number="1"><span class="kw"><a href="../reference/generics.html">as.data.table</a></span>(compounds)</a></code></pre></div>
-<pre><code>#&gt;               group explainedPeaks    score neutralMass                               SMILES                    InChIKey  InChIKey2      InChIKey1                                                                                       InChi identifier numberPatents pubMedReferences fragScore     formula XlogP                                          compoundName metFusionScore        database formulaScore
-#&gt;    1:  M109_R116_56              2 3.325726     108.069                        CCC1=NC=CC=N1 RILVNLMOTMFTMQ-UHFFFAOYSA-N UHFFFAOYSA RILVNLMOTMFTMQ                                            InChI=1S/C6H8N2/c1-2-6-7-4-3-5-8-6/h3-5H,2H2,1H3   12343986          2999                1  252.3074      C6H8N2   0.4                                     2-ethylpyrimidine       1.623878 ExtendedPubChem          2.0
-#&gt;    2:  M109_R116_56              3 3.521840     108.069                    C1=CC=C(C(=C1)N)N GEYOCULIXLDCMW-UHFFFAOYSA-N UHFFFAOYSA GEYOCULIXLDCMW                                              InChI=1S/C6H8N2/c7-5-3-1-2-4-6(5)8/h1-4H,7-8H2       7243             0              867  247.0388      C6H8N2   0.1                                   benzene-1,2-diamine       1.644436 ExtendedPubChem          2.5
-#&gt;    3:  M109_R116_56              3 3.313812     108.069                      C1=CC(=CC=C1N)N CBCKQZAAMUWICA-UHFFFAOYSA-N UHFFFAOYSA CBCKQZAAMUWICA                                              InChI=1S/C6H8N2/c7-5-1-2-6(8)4-3-5/h1-4H,7-8H2       7814             0              665  247.0388      C6H8N2  -0.3                                   benzene-1,4-diamine       1.691148 ExtendedPubChem          2.5
-#&gt;    4:  M109_R116_56              3 3.209633     108.069                      C1=CC=C(C=C1)NN HKOOXMFOFWEVGF-UHFFFAOYSA-N UHFFFAOYSA HKOOXMFOFWEVGF                                              InChI=1S/C6H8N2/c7-8-6-4-2-1-3-5-6/h1-5,8H,7H2       7516             0              542  279.4383      C6H8N2   1.2                                       phenylhydrazine       1.603814 ExtendedPubChem          2.5
-#&gt;    5:  M109_R116_56              3 2.987435     108.069                      CC1=NC(=CC=C1)N QUXLCYFNVNNRBE-UHFFFAOYSA-N UHFFFAOYSA QUXLCYFNVNNRBE                                       InChI=1S/C6H8N2/c1-5-3-2-4-6(7)8-5/h2-4H,1H3,(H2,7,8)      15765             0               24  368.6322      C6H8N2   0.4                               6-methylpyridin-2-amine       1.871524 ExtendedPubChem          2.5
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb40-1" data-line-number="1"><span class="kw"><a href="../reference/generics.html">as.data.table</a></span>(compounds)</a></code></pre></div>
+<pre><code>#&gt;               group explainedPeaks    score neutralMass                               SMILES                    InChIKey  InChIKey2      InChIKey1                                                                                       InChi identifier numberPatents fragScore     formula                                          compoundName XlogP pubMedReferences metFusionScore        database formulaScore
+#&gt;    1:  M109_R116_56              3 4.521840    108.0687                    C1=CC=C(C(=C1)N)N GEYOCULIXLDCMW-UHFFFAOYSA-N UHFFFAOYSA GEYOCULIXLDCMW                                              InChI=1S/C6H8N2/c7-5-3-1-2-4-6(5)8/h1-4H,7-8H2       7243        102825  247.0388      C6H8N2                                   benzene-1,2-diamine   0.1              867       1.644436 ExtendedPubChem          2.5
+#&gt;    2:  M109_R116_56              3 4.007526    108.0687                      C1=CC(=CC=C1N)N CBCKQZAAMUWICA-UHFFFAOYSA-N UHFFFAOYSA CBCKQZAAMUWICA                                              InChI=1S/C6H8N2/c7-5-1-2-6(8)4-3-5/h1-4H,7-8H2       7814         71094  247.0388      C6H8N2                                   benzene-1,4-diamine  -0.3              667       1.691148 ExtendedPubChem          2.5
+#&gt;    3:  M109_R116_56              3 3.490549    108.0687                      C1=CC=C(C=C1)NN HKOOXMFOFWEVGF-UHFFFAOYSA-N UHFFFAOYSA HKOOXMFOFWEVGF                                              InChI=1S/C6H8N2/c7-8-6-4-2-1-3-5-6/h1-5,8H,7H2       7516         28648  279.4383      C6H8N2                                       phenylhydrazine   1.2              544       1.603814 ExtendedPubChem          2.5
+#&gt;    4:  M109_R116_56              3 3.312536    108.0687                    C1=CC(=CC(=C1)N)N WZCQRUWWHSTZEM-UHFFFAOYSA-N UHFFFAOYSA WZCQRUWWHSTZEM                                              InChI=1S/C6H8N2/c7-5-2-1-3-6(8)4-5/h1-4H,7-8H2       7935         51001  247.0388      C6H8N2                                   benzene-1,3-diamine  -0.3              252       1.651999 ExtendedPubChem          2.5
+#&gt;    5:  M109_R116_56              3 3.028563    108.0687                      CC1=NC(=CC=C1)N QUXLCYFNVNNRBE-UHFFFAOYSA-N UHFFFAOYSA QUXLCYFNVNNRBE                                       InChI=1S/C6H8N2/c1-5-3-2-4-6(7)8-5/h2-4H,1H3,(H2,7,8)      15765          4229  368.6322      C6H8N2                               6-methylpyridin-2-amine   0.4               24       1.871524 ExtendedPubChem          2.5
 #&gt;   ---                                                                                                                                                                                                                                                                                                                                                                                                                 
-#&gt; 2205: M254_R321_484              4 2.181392     253.052   COC1=CC=C(C=C1)NS(=O)(=O)C2=CC=NN2 JWANIVJIFJZUMY-UHFFFAOYSA-N UHFFFAOYSA JWANIVJIFJZUMY InChI=1S/C10H11N3O3S/c1-16-9-4-2-8(3-5-9)13-17(14,15)10-6-7-11-12-10/h2-7,13H,1H3,(H,11,12)  102691599             0                0  159.3668 C10H11N3O3S   1.0         N-(4-methoxyphenyl)-1H-pyrazole-5-sulfonamide       6.849610 ExtendedPubChem          2.5
-#&gt; 2206: M254_R321_484              4 2.181392     253.052   COC1=CC=CC(=C1)NS(=O)(=O)C2=CC=NN2 CNICMNKFXYFOBR-UHFFFAOYSA-N UHFFFAOYSA CNICMNKFXYFOBR InChI=1S/C10H11N3O3S/c1-16-9-4-2-3-8(7-9)13-17(14,15)10-5-6-11-12-10/h2-7,13H,1H3,(H,11,12)  102691596             0                0  159.3668 C10H11N3O3S   1.0         N-(3-methoxyphenyl)-1H-pyrazole-5-sulfonamide       6.849610 ExtendedPubChem          2.5
-#&gt; 2207: M254_R321_484              4 2.181392     253.052     COC1=CC=CC=C1NS(=O)(=O)C2=CC=NN2 GNMZLAFZJMTIPD-UHFFFAOYSA-N UHFFFAOYSA GNMZLAFZJMTIPD InChI=1S/C10H11N3O3S/c1-16-9-5-3-2-4-8(9)13-17(14,15)10-6-7-11-12-10/h2-7,13H,1H3,(H,11,12)  102691445             0                0  159.3668 C10H11N3O3S   1.0         N-(2-methoxyphenyl)-1H-pyrazole-5-sulfonamide       6.849610 ExtendedPubChem          2.5
-#&gt; 2208: M254_R321_484              3 2.055734     253.052   CNC1=CC=C(C=C1)S(=O)(=O)NC2=NOC=C2 BOSOQXXRBHATMB-UHFFFAOYSA-N UHFFFAOYSA BOSOQXXRBHATMB InChI=1S/C10H11N3O3S/c1-11-8-2-4-9(5-3-8)17(14,15)13-10-6-7-16-12-10/h2-7,11H,1H3,(H,12,13)   62904140             0                0  125.7622 C10H11N3O3S   1.2 4-(methylamino)-N-(1,2-oxazol-3-yl)benzenesulfonamide       8.170868 ExtendedPubChem          2.0
-#&gt; 2209: M254_R321_484              4 2.176167     253.052 C1=CC=C(C(=C1)N)S(=O)(=O)CC(=O)NCC#N UDPVKDMPDOBBRE-UHFFFAOYSA-N UHFFFAOYSA UDPVKDMPDOBBRE  InChI=1S/C10H11N3O3S/c11-5-6-13-10(14)7-17(15,16)9-4-2-1-3-8(9)12/h1-4H,6-7,12H2,(H,13,14)   61369708             0                0  203.6742 C10H11N3O3S   0.2    2-(2-aminophenyl)sulfonyl-N-(cyanomethyl)acetamide       5.056078 ExtendedPubChem          2.5</code></pre>
-<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb41-1" data-line-number="1"><span class="kw"><a href="../reference/generics.html">plotSpec</a></span>(mslists, <span class="st">"M186_R265_296"</span>, <span class="dt">MSLevel =</span> <span class="dv">2</span>)</a></code></pre></div>
+#&gt; 2205: M254_R321_484              4 2.181392    253.0521   COC1=CC=C(C=C1)NS(=O)(=O)C2=CC=NN2 JWANIVJIFJZUMY-UHFFFAOYSA-N UHFFFAOYSA JWANIVJIFJZUMY InChI=1S/C10H11N3O3S/c1-16-9-4-2-8(3-5-9)13-17(14,15)10-6-7-11-12-10/h2-7,13H,1H3,(H,11,12)  102691599             0  159.3668 C10H11N3O3S         N-(4-methoxyphenyl)-1H-pyrazole-5-sulfonamide   1.0                0       6.849610 ExtendedPubChem          2.5
+#&gt; 2206: M254_R321_484              4 2.181392    253.0521   COC1=CC=CC(=C1)NS(=O)(=O)C2=CC=NN2 CNICMNKFXYFOBR-UHFFFAOYSA-N UHFFFAOYSA CNICMNKFXYFOBR InChI=1S/C10H11N3O3S/c1-16-9-4-2-3-8(7-9)13-17(14,15)10-5-6-11-12-10/h2-7,13H,1H3,(H,11,12)  102691596             0  159.3668 C10H11N3O3S         N-(3-methoxyphenyl)-1H-pyrazole-5-sulfonamide   1.0                0       6.849610 ExtendedPubChem          2.5
+#&gt; 2207: M254_R321_484              4 2.181392    253.0521     COC1=CC=CC=C1NS(=O)(=O)C2=CC=NN2 GNMZLAFZJMTIPD-UHFFFAOYSA-N UHFFFAOYSA GNMZLAFZJMTIPD InChI=1S/C10H11N3O3S/c1-16-9-5-3-2-4-8(9)13-17(14,15)10-6-7-11-12-10/h2-7,13H,1H3,(H,11,12)  102691445             0  159.3668 C10H11N3O3S         N-(2-methoxyphenyl)-1H-pyrazole-5-sulfonamide   1.0                0       6.849610 ExtendedPubChem          2.5
+#&gt; 2208: M254_R321_484              3 2.055734    253.0521   CNC1=CC=C(C=C1)S(=O)(=O)NC2=NOC=C2 BOSOQXXRBHATMB-UHFFFAOYSA-N UHFFFAOYSA BOSOQXXRBHATMB InChI=1S/C10H11N3O3S/c1-11-8-2-4-9(5-3-8)17(14,15)13-10-6-7-16-12-10/h2-7,11H,1H3,(H,12,13)   62904140             0  125.7622 C10H11N3O3S 4-(methylamino)-N-(1,2-oxazol-3-yl)benzenesulfonamide   1.2                0       8.170868 ExtendedPubChem          2.0
+#&gt; 2209: M254_R321_484              4 2.176167    253.0521 C1=CC=C(C(=C1)N)S(=O)(=O)CC(=O)NCC#N UDPVKDMPDOBBRE-UHFFFAOYSA-N UHFFFAOYSA UDPVKDMPDOBBRE  InChI=1S/C10H11N3O3S/c11-5-6-13-10(14)7-17(15,16)9-4-2-1-3-8(9)12/h1-4H,6-7,12H2,(H,13,14)   61369708             0  203.6742 C10H11N3O3S    2-(2-aminophenyl)sulfonyl-N-(cyanomethyl)acetamide   0.2                0       5.056078 ExtendedPubChem          2.5</code></pre>
+<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb42-1" data-line-number="1"><span class="kw"><a href="../reference/generics.html">plotSpec</a></span>(mslists, <span class="st">"M186_R265_296"</span>, <span class="dt">MSLevel =</span> <span class="dv">2</span>)</a></code></pre></div>
 <p><img src="tutorial_files/figure-html/plotSpec-1.png" width="576"></p>
-<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb42-1" data-line-number="1"><span class="kw"><a href="../reference/generics.html">plotSpec</a></span>(formulas, <span class="st">"C6H9N2"</span>, <span class="st">"M109_R116_56"</span>, <span class="dt">MSPeakLists =</span> mslists)</a></code></pre></div>
+<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb43-1" data-line-number="1"><span class="kw"><a href="../reference/generics.html">plotSpec</a></span>(formulas, <span class="st">"C6H9N2"</span>, <span class="st">"M109_R116_56"</span>, <span class="dt">MSPeakLists =</span> mslists)</a></code></pre></div>
 <p><img src="tutorial_files/figure-html/plotSpec-2.png" width="576"></p>
-<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb43-1" data-line-number="1"><span class="kw"><a href="../reference/generics.html">plotSpec</a></span>(compounds, <span class="dv">1</span>, <span class="st">"M120_R328_81"</span>, mslists)</a></code></pre></div>
+<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb44-1" data-line-number="1"><span class="kw"><a href="../reference/generics.html">plotSpec</a></span>(compounds, <span class="dv">1</span>, <span class="st">"M120_R328_81"</span>, mslists)</a></code></pre></div>
 <p><img src="tutorial_files/figure-html/plotSpec-3.png" width="576"></p>
 </div>
 </div>
@@ -552,17 +568,30 @@ p.caption {
 <a href="#components" class="anchor"></a>Components</h1>
 <p>So far we mainly dealt with feature groups as if they are separate chemical compounds. However, formation of multiple ionization adducts (<em>e.g.</em> from sodium and potassium), isotopologues and/or in-source fragments may yield multiple <em>m/z</em> values for the same compound. As a result, multiple feature groups may be describing the same chemical compound. To reduce this complexity it is useful to generate so called <em>components</em> which are basically groups of feature groups which are likely to be the same compound (based on <em>e.g.</em> similarity of retention profiles). Afterwards, feature groups present in a component are annotated based on known chemical rules, which may further help compound identification.</p>
 <p>Generating components is performed with the <code><a href="../reference/component-generation.html">generateComponents()</a></code> function:</p>
-<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb44-1" data-line-number="1">components &lt;-<span class="st"> </span><span class="kw"><a href="../reference/component-generation.html">generateComponents</a></span>(fGroups, <span class="st">"ramclustr"</span>, <span class="dt">ionization =</span> <span class="st">"positive"</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb45-1" data-line-number="1">components &lt;-<span class="st"> </span><span class="kw"><a href="../reference/component-generation.html">generateComponents</a></span>(fGroups, <span class="st">"ramclustr"</span>, <span class="dt">ionization =</span> <span class="st">"positive"</span>)</a></code></pre></div>
+<pre><code>#&gt; Generating components with RAMClustR...
+#&gt;   organizing dataset 
+#&gt;   normalizing dataset 
+#&gt; calculating ramclustR similarity: nblocks =  1 
+#&gt; 1  RAMClust feature similarity matrix calculated and stored: 
+#&gt; RAMClust distances converted to distance object 
+#&gt; fastcluster based clustering complete 
+#&gt; dynamicTreeCut based pruning complete 
+#&gt; RAMClust has condensed 34 features into 11 spectra 
+#&gt; collapsing feature into spectral signal intensities 
+#&gt; Annotating components...
+#&gt; 10 of 11 
+#&gt; finished</code></pre>
 <p>The results can be inspected similarly as seen before:</p>
-<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb45-1" data-line-number="1">components</a></code></pre></div>
+<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb47-1" data-line-number="1">components</a></code></pre></div>
 <pre><code>#&gt; A componentsRC object (derived from components -&gt; workflowStep)
 #&gt; Object size (indication): 213.1 kB
 #&gt; Algorithm: ramclustr
 #&gt; Components: CMP1, CMP2, CMP3, CMP4, CMP5, CMP6, ... (11 total)
 #&gt; Number of feature groups in components: 28 (total), 2.5 (mean), 2 - 5 (min - max)</code></pre>
-<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb47-1" data-line-number="1"><span class="kw"><a href="../reference/generics.html">plotSpec</a></span>(components, <span class="st">"CMP6"</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb49-1" data-line-number="1"><span class="kw"><a href="../reference/generics.html">plotSpec</a></span>(components, <span class="st">"CMP6"</span>)</a></code></pre></div>
 <p><img src="tutorial_files/figure-html/unnamed-chunk-4-1.png" width="480"></p>
-<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb48-1" data-line-number="1"><span class="kw"><a href="../reference/generics.html">plotEIC</a></span>(components, <span class="st">"CMP6"</span>, fGroups)</a></code></pre></div>
+<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb50-1" data-line-number="1"><span class="kw"><a href="../reference/generics.html">plotEIC</a></span>(components, <span class="st">"CMP6"</span>, fGroups)</a></code></pre></div>
 <p><img src="tutorial_files/figure-html/unnamed-chunk-4-2.png" width="480"></p>
 <blockquote>
 <p><strong><em>NOTE</em></strong> The componentization process must currently be seen as a tool to provide hints on how different features <em>may</em> be related to each other. Hence, results should always be checked manually, for instance, by the above commands or with the reports generated in the next step. For this reason, features that were annotated as e.g. adducts or fragments should not be blindly removed.</p>
@@ -571,124 +600,125 @@ p.caption {
 <div id="reporting" class="section level1">
 <h1 class="hasAnchor">
 <a href="#reporting" class="anchor"></a>Reporting</h1>
-<p>The last step of the workflow is typically reporting data: during this step all the collected data is transformed to graphical plots (<code><a href="../reference/reporting.html">reportPDF()</a></code> and <code><a href="../reference/reporting.html">reportMD()</a></code>) or tabular csv data (<code><a href="../reference/reporting.html">reportCSV()</a></code>).</p>
-<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb49-1" data-line-number="1"><span class="kw"><a href="../reference/reporting.html">reportCSV</a></span>(fGroups, <span class="dt">path =</span> <span class="st">"report"</span>, <span class="dt">reportFeatures =</span> <span class="ot">FALSE</span>, <span class="dt">formulas =</span> formulas,</a>
-<a class="sourceLine" id="cb49-2" data-line-number="2">          <span class="dt">compounds =</span> compounds, <span class="dt">compoundsNormalizeScores =</span> <span class="st">"max"</span>,</a>
-<a class="sourceLine" id="cb49-3" data-line-number="3">          <span class="dt">components =</span> components)</a>
-<a class="sourceLine" id="cb49-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb49-5" data-line-number="5"><span class="kw"><a href="../reference/reporting.html">reportPDF</a></span>(fGroups, <span class="dt">path =</span> <span class="st">"report"</span>, <span class="dt">reportFGroups =</span> <span class="ot">TRUE</span>, <span class="dt">formulas =</span> formulas, <span class="dt">reportFormulaSpectra =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb49-6" data-line-number="6">          <span class="dt">compounds =</span> compounds, <span class="dt">compoundsNormalizeScores =</span> <span class="st">"max"</span>,</a>
-<a class="sourceLine" id="cb49-7" data-line-number="7">          <span class="dt">components =</span> components, <span class="dt">MSPeakLists =</span> mslists)</a>
-<a class="sourceLine" id="cb49-8" data-line-number="8"></a>
-<a class="sourceLine" id="cb49-9" data-line-number="9"><span class="kw"><a href="../reference/reporting.html">reportMD</a></span>(fGroups, <span class="dt">path =</span> <span class="st">"report"</span>, <span class="dt">reportPlots =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"chord"</span>, <span class="st">"venn"</span>, <span class="st">"upset"</span>, <span class="st">"eics"</span>, <span class="st">"formulas"</span>),</a>
-<a class="sourceLine" id="cb49-10" data-line-number="10">         <span class="dt">formulas =</span> formulas, <span class="dt">compounds =</span> compounds, <span class="dt">compoundsNormalizeScores =</span> <span class="st">"max"</span>,</a>
-<a class="sourceLine" id="cb49-11" data-line-number="11">         <span class="dt">components =</span> components, <span class="dt">MSPeakLists =</span> mslists,</a>
-<a class="sourceLine" id="cb49-12" data-line-number="12">         <span class="dt">selfContained =</span> <span class="ot">FALSE</span>, <span class="dt">openReport =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
-<p>The output of <code><a href="../reference/reporting.html">reportMD()</a></code> can be viewed <a href="../examples/report.html">here</a>.</p>
+<p>The last step of the workflow is typically reporting data: during this step all the collected data is transformed to graphical plots (<code><a href="../reference/reporting.html">reportPDF()</a></code> and <code><a href="../reference/reporting.html">reportHTML()</a></code>) or tabular csv data (<code><a href="../reference/reporting.html">reportCSV()</a></code>).</p>
+<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb51-1" data-line-number="1"><span class="kw"><a href="../reference/reporting.html">reportCSV</a></span>(fGroups, <span class="dt">path =</span> <span class="st">"report"</span>, <span class="dt">reportFeatures =</span> <span class="ot">FALSE</span>, <span class="dt">formulas =</span> formulas,</a>
+<a class="sourceLine" id="cb51-2" data-line-number="2">          <span class="dt">compounds =</span> compounds, <span class="dt">compoundsNormalizeScores =</span> <span class="st">"max"</span>,</a>
+<a class="sourceLine" id="cb51-3" data-line-number="3">          <span class="dt">components =</span> components)</a>
+<a class="sourceLine" id="cb51-4" data-line-number="4"></a>
+<a class="sourceLine" id="cb51-5" data-line-number="5"><span class="kw"><a href="../reference/reporting.html">reportPDF</a></span>(fGroups, <span class="dt">path =</span> <span class="st">"report"</span>, <span class="dt">reportFGroups =</span> <span class="ot">TRUE</span>, <span class="dt">formulas =</span> formulas, <span class="dt">reportFormulaSpectra =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb51-6" data-line-number="6">          <span class="dt">compounds =</span> compounds, <span class="dt">compoundsNormalizeScores =</span> <span class="st">"max"</span>,</a>
+<a class="sourceLine" id="cb51-7" data-line-number="7">          <span class="dt">components =</span> components, <span class="dt">MSPeakLists =</span> mslists)</a>
+<a class="sourceLine" id="cb51-8" data-line-number="8"></a>
+<a class="sourceLine" id="cb51-9" data-line-number="9"><span class="kw"><a href="../reference/reporting.html">reportHTML</a></span>(fGroups, <span class="dt">path =</span> <span class="st">"report"</span>, <span class="dt">reportPlots =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"chord"</span>, <span class="st">"venn"</span>, <span class="st">"upset"</span>, <span class="st">"eics"</span>, <span class="st">"formulas"</span>),</a>
+<a class="sourceLine" id="cb51-10" data-line-number="10">           <span class="dt">formulas =</span> formulas, <span class="dt">compounds =</span> compounds, <span class="dt">compoundsNormalizeScores =</span> <span class="st">"max"</span>,</a>
+<a class="sourceLine" id="cb51-11" data-line-number="11">           <span class="dt">components =</span> components, <span class="dt">MSPeakLists =</span> mslists,</a>
+<a class="sourceLine" id="cb51-12" data-line-number="12">           <span class="dt">selfContained =</span> <span class="ot">FALSE</span>, <span class="dt">openReport =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
+<p>The output of <code><a href="../reference/reporting.html">reportHTML()</a></code> can be viewed <a href="../examples/report.html">here</a>.</p>
 <p>Note that these functions can be called at any time during the workflow. This may be especially useful if you want evaluate results during optimization or exploring the various algorithms and their parameters. In this case you can simply cherry pick the data that you want to report, for instance:</p>
-<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb50-1" data-line-number="1"><span class="co"># only report feature groups (i.e. the bare minimum)</span></a>
-<a class="sourceLine" id="cb50-2" data-line-number="2"><span class="kw"><a href="../reference/reporting.html">reportCSV</a></span>(fGroups, <span class="dt">path =</span> <span class="st">"report"</span>, <span class="dt">reportFeatures =</span> <span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb50-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb50-4" data-line-number="4"><span class="co"># report compounds. Note that MSPeakLists (mslists variable) are required for formula/compound reporting</span></a>
-<a class="sourceLine" id="cb50-5" data-line-number="5"><span class="kw"><a href="../reference/reporting.html">reportPDF</a></span>(fGroups, <span class="dt">path =</span> <span class="st">"report"</span>, <span class="dt">reportFGroups =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb50-6" data-line-number="6">          <span class="dt">compounds =</span> compounds, <span class="dt">compoundsNormalizeScores =</span> <span class="st">"max"</span>,</a>
-<a class="sourceLine" id="cb50-7" data-line-number="7">          <span class="dt">MSPeakLists =</span> mslists)</a>
-<a class="sourceLine" id="cb50-8" data-line-number="8"></a>
-<a class="sourceLine" id="cb50-9" data-line-number="9"><span class="co"># only report components</span></a>
-<a class="sourceLine" id="cb50-10" data-line-number="10"><span class="kw"><a href="../reference/reporting.html">reportMD</a></span>(fGroups, <span class="dt">path =</span> <span class="st">"report"</span>, <span class="dt">reportPlots =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"chord"</span>, <span class="st">"venn"</span>, <span class="st">"upset"</span>, <span class="st">"eics"</span>),</a>
-<a class="sourceLine" id="cb50-11" data-line-number="11">         <span class="dt">components =</span> components</a>
-<a class="sourceLine" id="cb50-12" data-line-number="12">         <span class="dt">selfContained =</span> <span class="ot">FALSE</span>, <span class="dt">openReport =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb52-1" data-line-number="1"><span class="co"># only report feature groups (i.e. the bare minimum)</span></a>
+<a class="sourceLine" id="cb52-2" data-line-number="2"><span class="kw"><a href="../reference/reporting.html">reportCSV</a></span>(fGroups, <span class="dt">path =</span> <span class="st">"report"</span>, <span class="dt">reportFeatures =</span> <span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb52-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb52-4" data-line-number="4"><span class="co"># report compounds. Note that MSPeakLists (mslists variable) are required for formula/compound reporting</span></a>
+<a class="sourceLine" id="cb52-5" data-line-number="5"><span class="kw"><a href="../reference/reporting.html">reportPDF</a></span>(fGroups, <span class="dt">path =</span> <span class="st">"report"</span>, <span class="dt">reportFGroups =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb52-6" data-line-number="6">          <span class="dt">compounds =</span> compounds, <span class="dt">compoundsNormalizeScores =</span> <span class="st">"max"</span>,</a>
+<a class="sourceLine" id="cb52-7" data-line-number="7">          <span class="dt">MSPeakLists =</span> mslists)</a>
+<a class="sourceLine" id="cb52-8" data-line-number="8"></a>
+<a class="sourceLine" id="cb52-9" data-line-number="9"><span class="co"># only report components</span></a>
+<a class="sourceLine" id="cb52-10" data-line-number="10"><span class="kw"><a href="../reference/reporting.html">reportHTML</a></span>(fGroups, <span class="dt">path =</span> <span class="st">"report"</span>, <span class="dt">reportPlots =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"chord"</span>, <span class="st">"venn"</span>, <span class="st">"upset"</span>, <span class="st">"eics"</span>),</a>
+<a class="sourceLine" id="cb52-11" data-line-number="11">           <span class="dt">components =</span> components</a>
+<a class="sourceLine" id="cb52-12" data-line-number="12">           <span class="dt">selfContained =</span> <span class="ot">FALSE</span>, <span class="dt">openReport =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
 </div>
 <div id="final-script" class="section level1">
 <h1 class="hasAnchor">
 <a href="#final-script" class="anchor"></a>Final script</h1>
 <p>In the previous sections the different parts of the processing script were discussed and where necessary modified. As a reference, the final script look similar ot this:</p>
-<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb51-1" data-line-number="1"><span class="co">## Script automatically generated on Mon Mar 25 08:24:32 2019</span></a>
-<a class="sourceLine" id="cb51-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb51-3" data-line-number="3"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(patRoon)</a>
-<a class="sourceLine" id="cb51-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb51-5" data-line-number="5"></a>
-<a class="sourceLine" id="cb51-6" data-line-number="6"><span class="co"># -------------------------</span></a>
-<a class="sourceLine" id="cb51-7" data-line-number="7"><span class="co"># initialization</span></a>
-<a class="sourceLine" id="cb51-8" data-line-number="8"><span class="co"># -------------------------</span></a>
-<a class="sourceLine" id="cb51-9" data-line-number="9"></a>
-<a class="sourceLine" id="cb51-10" data-line-number="10"></a>
-<a class="sourceLine" id="cb51-11" data-line-number="11">workPath &lt;-<span class="st"> "C:/myproject"</span></a>
-<a class="sourceLine" id="cb51-12" data-line-number="12"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/getwd">setwd</a></span>(workPath)</a>
-<a class="sourceLine" id="cb51-13" data-line-number="13"></a>
-<a class="sourceLine" id="cb51-14" data-line-number="14"><span class="co"># Take example data from patRoonData package (triplicate solvent blank + triplicate standard)</span></a>
-<a class="sourceLine" id="cb51-15" data-line-number="15">anaInfo &lt;-<span class="st"> </span><span class="kw"><a href="../reference/analysis-information.html">generateAnalysisInfo</a></span>(<span class="dt">paths =</span> patRoonData<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/patRoonData/topics/patRoonData">exampleDataPath</a></span>(),</a>
-<a class="sourceLine" id="cb51-16" data-line-number="16">                                <span class="dt">groups =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/rep">rep</a></span>(<span class="st">"solvent"</span>, <span class="dv">3</span>), <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/rep">rep</a></span>(<span class="st">"standard"</span>, <span class="dv">3</span>)),</a>
-<a class="sourceLine" id="cb51-17" data-line-number="17">                                <span class="dt">refs =</span> <span class="st">"solvent"</span>)</a>
-<a class="sourceLine" id="cb51-18" data-line-number="18"></a>
-<a class="sourceLine" id="cb51-19" data-line-number="19"></a>
-<a class="sourceLine" id="cb51-20" data-line-number="20"><span class="co"># -------------------------</span></a>
-<a class="sourceLine" id="cb51-21" data-line-number="21"><span class="co"># features</span></a>
-<a class="sourceLine" id="cb51-22" data-line-number="22"><span class="co"># -------------------------</span></a>
-<a class="sourceLine" id="cb51-23" data-line-number="23"></a>
-<a class="sourceLine" id="cb51-24" data-line-number="24"></a>
-<a class="sourceLine" id="cb51-25" data-line-number="25"><span class="co"># Find all features.</span></a>
-<a class="sourceLine" id="cb51-26" data-line-number="26"><span class="co"># </span><span class="al">NOTE</span><span class="co">: see manual for many more options</span></a>
-<a class="sourceLine" id="cb51-27" data-line-number="27">fList &lt;-<span class="st"> </span><span class="kw"><a href="../reference/feature-finding.html">findFeatures</a></span>(anaInfo, <span class="st">"openms"</span>)</a>
-<a class="sourceLine" id="cb51-28" data-line-number="28"></a>
-<a class="sourceLine" id="cb51-29" data-line-number="29"><span class="co"># Group and align features between analysis</span></a>
-<a class="sourceLine" id="cb51-30" data-line-number="30">fGroups &lt;-<span class="st"> </span><span class="kw"><a href="../reference/feature-grouping.html">groupFeatures</a></span>(fList, <span class="st">"openms"</span>)</a>
-<a class="sourceLine" id="cb51-31" data-line-number="31"></a>
-<a class="sourceLine" id="cb51-32" data-line-number="32"><span class="co"># Basic rule based filtering</span></a>
-<a class="sourceLine" id="cb51-33" data-line-number="33">fGroups &lt;-<span class="st"> </span><span class="kw"><a href="../reference/generics.html">filter</a></span>(fGroups, <span class="dt">preAbsMinIntensity =</span> <span class="dv">100</span>, <span class="dt">absMinIntensity =</span> <span class="dv">10000</span>,</a>
-<a class="sourceLine" id="cb51-34" data-line-number="34">                  <span class="dt">relMinReplicateAbundance =</span> <span class="dv">1</span>, <span class="dt">maxReplicateIntRSD =</span> <span class="fl">0.75</span>,</a>
-<a class="sourceLine" id="cb51-35" data-line-number="35">                  <span class="dt">blankThreshold =</span> <span class="dv">5</span>, <span class="dt">removeBlanks =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb51-36" data-line-number="36">                  <span class="dt">retentionRange =</span> <span class="ot">NULL</span>, <span class="dt">mzRange =</span> <span class="ot">NULL</span>)</a>
-<a class="sourceLine" id="cb51-37" data-line-number="37"></a>
-<a class="sourceLine" id="cb51-38" data-line-number="38"></a>
-<a class="sourceLine" id="cb51-39" data-line-number="39"><span class="co"># -------------------------</span></a>
-<a class="sourceLine" id="cb51-40" data-line-number="40"><span class="co"># annotation</span></a>
-<a class="sourceLine" id="cb51-41" data-line-number="41"><span class="co"># -------------------------</span></a>
-<a class="sourceLine" id="cb51-42" data-line-number="42"></a>
-<a class="sourceLine" id="cb51-43" data-line-number="43"></a>
-<a class="sourceLine" id="cb51-44" data-line-number="44"><span class="co"># Retrieve MS peak lists</span></a>
-<a class="sourceLine" id="cb51-45" data-line-number="45">avgPListParams &lt;-<span class="st"> </span><span class="kw"><a href="../reference/MSPeakLists-generation.html">getDefAvgPListParams</a></span>(<span class="dt">clusterMzWindow =</span> <span class="fl">0.002</span>)</a>
-<a class="sourceLine" id="cb51-46" data-line-number="46">mslists &lt;-<span class="st"> </span><span class="kw"><a href="../reference/MSPeakLists-generation.html">generateMSPeakLists</a></span>(fGroups, <span class="st">"mzr"</span>, <span class="dt">maxMSRtWindow =</span> <span class="dv">5</span>, <span class="dt">precursorMzWindow =</span> <span class="dv">4</span>,</a>
-<a class="sourceLine" id="cb51-47" data-line-number="47">                               <span class="dt">avgFeatParams =</span> avgPListParams, <span class="dt">avgFGroupParams =</span> avgPListParams)</a>
-<a class="sourceLine" id="cb51-48" data-line-number="48">mslists &lt;-<span class="st"> </span><span class="kw"><a href="../reference/generics.html">filter</a></span>(mslists, <span class="dt">relMSMSIntThr =</span> <span class="fl">0.02</span>, <span class="dt">topMSMSPeaks =</span> <span class="dv">10</span>)</a>
-<a class="sourceLine" id="cb51-49" data-line-number="49"></a>
-<a class="sourceLine" id="cb51-50" data-line-number="50"><span class="co"># Calculate formula candidates</span></a>
-<a class="sourceLine" id="cb51-51" data-line-number="51">formulas &lt;-<span class="st"> </span><span class="kw"><a href="../reference/formula-generation.html">generateFormulas</a></span>(fGroups, <span class="st">"genform"</span>, mslists, <span class="dt">relMzDev =</span> <span class="dv">5</span>,</a>
-<a class="sourceLine" id="cb51-52" data-line-number="52">                             <span class="dt">adduct =</span> <span class="st">"[M+H]+"</span>, <span class="dt">elements =</span> <span class="st">"CHNOPSCl"</span>,</a>
-<a class="sourceLine" id="cb51-53" data-line-number="53">                             <span class="dt">calculateFeatures =</span> <span class="ot">TRUE</span>, <span class="dt">featThreshold =</span> <span class="fl">0.75</span>)</a>
-<a class="sourceLine" id="cb51-54" data-line-number="54"></a>
-<a class="sourceLine" id="cb51-55" data-line-number="55"><span class="co"># Find compound structure candidates</span></a>
-<a class="sourceLine" id="cb51-56" data-line-number="56">compounds &lt;-<span class="st"> </span><span class="kw"><a href="../reference/compound-generation.html">generateCompounds</a></span>(fGroups, mslists, <span class="st">"metfrag"</span>, <span class="dt">method =</span> <span class="st">"CL"</span>, <span class="dt">dbRelMzDev =</span> <span class="dv">5</span>,</a>
-<a class="sourceLine" id="cb51-57" data-line-number="57">                               <span class="dt">fragRelMzDev =</span> <span class="dv">5</span>, <span class="dt">fragAbsMzDev =</span> <span class="fl">0.002</span>,</a>
-<a class="sourceLine" id="cb51-58" data-line-number="58">                               <span class="dt">adduct =</span> <span class="st">"[M+H]+"</span>, <span class="dt">database =</span> <span class="st">"pubchem"</span>, <span class="dt">maxCandidatesToStop =</span> <span class="dv">5000</span>)</a>
-<a class="sourceLine" id="cb51-59" data-line-number="59">compounds &lt;-<span class="st"> </span><span class="kw"><a href="../reference/compounds-class.html">addFormulaScoring</a></span>(compounds, formulas, <span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb51-60" data-line-number="60"></a>
-<a class="sourceLine" id="cb51-61" data-line-number="61"><span class="co"># Perform automatic generation of components</span></a>
-<a class="sourceLine" id="cb51-62" data-line-number="62">components &lt;-<span class="st"> </span><span class="kw"><a href="../reference/component-generation.html">generateComponents</a></span>(fGroups, <span class="st">"ramclustr"</span>, <span class="dt">ionization =</span> <span class="st">"positive"</span>)</a>
-<a class="sourceLine" id="cb51-63" data-line-number="63"></a>
-<a class="sourceLine" id="cb51-64" data-line-number="64"></a>
-<a class="sourceLine" id="cb51-65" data-line-number="65"><span class="co"># -------------------------</span></a>
-<a class="sourceLine" id="cb51-66" data-line-number="66"><span class="co"># reporting</span></a>
-<a class="sourceLine" id="cb51-67" data-line-number="67"><span class="co"># -------------------------</span></a>
-<a class="sourceLine" id="cb51-68" data-line-number="68"></a>
-<a class="sourceLine" id="cb51-69" data-line-number="69"></a>
-<a class="sourceLine" id="cb51-70" data-line-number="70"><span class="kw"><a href="../reference/reporting.html">reportCSV</a></span>(fGroups, <span class="dt">path =</span> <span class="st">"report"</span>, <span class="dt">reportFeatures =</span> <span class="ot">FALSE</span>, <span class="dt">formulas =</span> formulas,</a>
-<a class="sourceLine" id="cb51-71" data-line-number="71">          <span class="dt">compounds =</span> compounds, <span class="dt">compoundsNormalizeScores =</span> <span class="st">"max"</span>,</a>
-<a class="sourceLine" id="cb51-72" data-line-number="72">          <span class="dt">components =</span> components)</a>
-<a class="sourceLine" id="cb51-73" data-line-number="73"></a>
-<a class="sourceLine" id="cb51-74" data-line-number="74"><span class="kw"><a href="../reference/reporting.html">reportPDF</a></span>(fGroups, <span class="dt">path =</span> <span class="st">"report"</span>, <span class="dt">reportFGroups =</span> <span class="ot">TRUE</span>, <span class="dt">formulas =</span> formulas, <span class="dt">reportFormulaSpectra =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb51-75" data-line-number="75">          <span class="dt">compounds =</span> compounds, <span class="dt">compoundsNormalizeScores =</span> <span class="st">"max"</span>,</a>
-<a class="sourceLine" id="cb51-76" data-line-number="76">          <span class="dt">components =</span> components, <span class="dt">MSPeakLists =</span> mslists)</a>
-<a class="sourceLine" id="cb51-77" data-line-number="77"></a>
-<a class="sourceLine" id="cb51-78" data-line-number="78"><span class="kw"><a href="../reference/reporting.html">reportMD</a></span>(fGroups, <span class="dt">path =</span> <span class="st">"report"</span>, <span class="dt">reportPlots =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">"chord"</span>, <span class="st">"venn"</span>, <span class="st">"upset"</span>, <span class="st">"eics"</span>, <span class="st">"formulas"</span>), <span class="dt">formulas =</span> formulas,</a>
-<a class="sourceLine" id="cb51-79" data-line-number="79">         <span class="dt">compounds =</span> compounds, <span class="dt">compoundsNormalizeScores =</span> <span class="st">"max"</span>,</a>
-<a class="sourceLine" id="cb51-80" data-line-number="80">         <span class="dt">components =</span> components, <span class="dt">MSPeakLists =</span> mslists,</a>
-<a class="sourceLine" id="cb51-81" data-line-number="81">         <span class="dt">selfContained =</span> <span class="ot">FALSE</span>, <span class="dt">openReport =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb53-1" data-line-number="1"><span class="co">## Script automatically generated on Mon Mar 25 08:24:32 2019</span></a>
+<a class="sourceLine" id="cb53-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb53-3" data-line-number="3"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(patRoon)</a>
+<a class="sourceLine" id="cb53-4" data-line-number="4"></a>
+<a class="sourceLine" id="cb53-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb53-6" data-line-number="6"><span class="co"># -------------------------</span></a>
+<a class="sourceLine" id="cb53-7" data-line-number="7"><span class="co"># initialization</span></a>
+<a class="sourceLine" id="cb53-8" data-line-number="8"><span class="co"># -------------------------</span></a>
+<a class="sourceLine" id="cb53-9" data-line-number="9"></a>
+<a class="sourceLine" id="cb53-10" data-line-number="10"></a>
+<a class="sourceLine" id="cb53-11" data-line-number="11">workPath &lt;-<span class="st"> "C:/myproject"</span></a>
+<a class="sourceLine" id="cb53-12" data-line-number="12"><span class="kw"><a href="https://rdrr.io/r/base/getwd.html">setwd</a></span>(workPath)</a>
+<a class="sourceLine" id="cb53-13" data-line-number="13"></a>
+<a class="sourceLine" id="cb53-14" data-line-number="14"><span class="co"># Take example data from patRoonData package (triplicate solvent blank + triplicate standard)</span></a>
+<a class="sourceLine" id="cb53-15" data-line-number="15">anaInfo &lt;-<span class="st"> </span><span class="kw"><a href="../reference/analysis-information.html">generateAnalysisInfo</a></span>(<span class="dt">paths =</span> patRoonData<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/patRoonData/man/patRoonData.html">exampleDataPath</a></span>(),</a>
+<a class="sourceLine" id="cb53-16" data-line-number="16">                                <span class="dt">groups =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"solvent"</span>, <span class="dv">3</span>), <span class="kw"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="st">"standard"</span>, <span class="dv">3</span>)),</a>
+<a class="sourceLine" id="cb53-17" data-line-number="17">                                <span class="dt">blanks =</span> <span class="st">"solvent"</span>)</a>
+<a class="sourceLine" id="cb53-18" data-line-number="18"></a>
+<a class="sourceLine" id="cb53-19" data-line-number="19"></a>
+<a class="sourceLine" id="cb53-20" data-line-number="20"><span class="co"># -------------------------</span></a>
+<a class="sourceLine" id="cb53-21" data-line-number="21"><span class="co"># features</span></a>
+<a class="sourceLine" id="cb53-22" data-line-number="22"><span class="co"># -------------------------</span></a>
+<a class="sourceLine" id="cb53-23" data-line-number="23"></a>
+<a class="sourceLine" id="cb53-24" data-line-number="24"></a>
+<a class="sourceLine" id="cb53-25" data-line-number="25"><span class="co"># Find all features.</span></a>
+<a class="sourceLine" id="cb53-26" data-line-number="26"><span class="co"># </span><span class="al">NOTE</span><span class="co">: see manual for many more options</span></a>
+<a class="sourceLine" id="cb53-27" data-line-number="27">fList &lt;-<span class="st"> </span><span class="kw"><a href="../reference/feature-finding.html">findFeatures</a></span>(anaInfo, <span class="st">"openms"</span>)</a>
+<a class="sourceLine" id="cb53-28" data-line-number="28"></a>
+<a class="sourceLine" id="cb53-29" data-line-number="29"><span class="co"># Group and align features between analysis</span></a>
+<a class="sourceLine" id="cb53-30" data-line-number="30">fGroups &lt;-<span class="st"> </span><span class="kw"><a href="../reference/feature-grouping.html">groupFeatures</a></span>(fList, <span class="st">"openms"</span>)</a>
+<a class="sourceLine" id="cb53-31" data-line-number="31"></a>
+<a class="sourceLine" id="cb53-32" data-line-number="32"><span class="co"># Basic rule based filtering</span></a>
+<a class="sourceLine" id="cb53-33" data-line-number="33">fGroups &lt;-<span class="st"> </span><span class="kw"><a href="../reference/generics.html">filter</a></span>(fGroups, <span class="dt">preAbsMinIntensity =</span> <span class="dv">100</span>, <span class="dt">absMinIntensity =</span> <span class="dv">10000</span>,</a>
+<a class="sourceLine" id="cb53-34" data-line-number="34">                  <span class="dt">relMinReplicateAbundance =</span> <span class="dv">1</span>, <span class="dt">maxReplicateIntRSD =</span> <span class="fl">0.75</span>,</a>
+<a class="sourceLine" id="cb53-35" data-line-number="35">                  <span class="dt">blankThreshold =</span> <span class="dv">5</span>, <span class="dt">removeBlanks =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb53-36" data-line-number="36">                  <span class="dt">retentionRange =</span> <span class="ot">NULL</span>, <span class="dt">mzRange =</span> <span class="ot">NULL</span>)</a>
+<a class="sourceLine" id="cb53-37" data-line-number="37"></a>
+<a class="sourceLine" id="cb53-38" data-line-number="38"></a>
+<a class="sourceLine" id="cb53-39" data-line-number="39"><span class="co"># -------------------------</span></a>
+<a class="sourceLine" id="cb53-40" data-line-number="40"><span class="co"># annotation</span></a>
+<a class="sourceLine" id="cb53-41" data-line-number="41"><span class="co"># -------------------------</span></a>
+<a class="sourceLine" id="cb53-42" data-line-number="42"></a>
+<a class="sourceLine" id="cb53-43" data-line-number="43"></a>
+<a class="sourceLine" id="cb53-44" data-line-number="44"><span class="co"># Retrieve MS peak lists</span></a>
+<a class="sourceLine" id="cb53-45" data-line-number="45">avgPListParams &lt;-<span class="st"> </span><span class="kw"><a href="../reference/MSPeakLists-generation.html">getDefAvgPListParams</a></span>(<span class="dt">clusterMzWindow =</span> <span class="fl">0.002</span>)</a>
+<a class="sourceLine" id="cb53-46" data-line-number="46">mslists &lt;-<span class="st"> </span><span class="kw"><a href="../reference/MSPeakLists-generation.html">generateMSPeakLists</a></span>(fGroups, <span class="st">"mzr"</span>, <span class="dt">maxMSRtWindow =</span> <span class="dv">5</span>, <span class="dt">precursorMzWindow =</span> <span class="dv">4</span>,</a>
+<a class="sourceLine" id="cb53-47" data-line-number="47">                               <span class="dt">avgFeatParams =</span> avgPListParams, <span class="dt">avgFGroupParams =</span> avgPListParams)</a>
+<a class="sourceLine" id="cb53-48" data-line-number="48">mslists &lt;-<span class="st"> </span><span class="kw"><a href="../reference/generics.html">filter</a></span>(mslists, <span class="dt">relMSMSIntThr =</span> <span class="fl">0.02</span>, <span class="dt">topMSMSPeaks =</span> <span class="dv">10</span>)</a>
+<a class="sourceLine" id="cb53-49" data-line-number="49"></a>
+<a class="sourceLine" id="cb53-50" data-line-number="50"><span class="co"># Calculate formula candidates</span></a>
+<a class="sourceLine" id="cb53-51" data-line-number="51">formulas &lt;-<span class="st"> </span><span class="kw"><a href="../reference/formula-generation.html">generateFormulas</a></span>(fGroups, <span class="st">"genform"</span>, mslists, <span class="dt">relMzDev =</span> <span class="dv">5</span>,</a>
+<a class="sourceLine" id="cb53-52" data-line-number="52">                             <span class="dt">adduct =</span> <span class="st">"[M+H]+"</span>, <span class="dt">elements =</span> <span class="st">"CHNOPSCl"</span>,</a>
+<a class="sourceLine" id="cb53-53" data-line-number="53">                             <span class="dt">calculateFeatures =</span> <span class="ot">TRUE</span>, <span class="dt">featThreshold =</span> <span class="fl">0.75</span>)</a>
+<a class="sourceLine" id="cb53-54" data-line-number="54"></a>
+<a class="sourceLine" id="cb53-55" data-line-number="55"><span class="co"># Find compound structure candidates</span></a>
+<a class="sourceLine" id="cb53-56" data-line-number="56">compounds &lt;-<span class="st"> </span><span class="kw"><a href="../reference/compound-generation.html">generateCompounds</a></span>(fGroups, mslists, <span class="st">"metfrag"</span>, <span class="dt">method =</span> <span class="st">"CL"</span>, <span class="dt">dbRelMzDev =</span> <span class="dv">5</span>,</a>
+<a class="sourceLine" id="cb53-57" data-line-number="57">                               <span class="dt">fragRelMzDev =</span> <span class="dv">5</span>, <span class="dt">fragAbsMzDev =</span> <span class="fl">0.002</span>,</a>
+<a class="sourceLine" id="cb53-58" data-line-number="58">                               <span class="dt">adduct =</span> <span class="st">"[M+H]+"</span>, <span class="dt">database =</span> <span class="st">"pubchem"</span>, <span class="dt">maxCandidatesToStop =</span> <span class="dv">5000</span>)</a>
+<a class="sourceLine" id="cb53-59" data-line-number="59">compounds &lt;-<span class="st"> </span><span class="kw"><a href="../reference/compounds-class.html">addFormulaScoring</a></span>(compounds, formulas, <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb53-60" data-line-number="60"></a>
+<a class="sourceLine" id="cb53-61" data-line-number="61"><span class="co"># Perform automatic generation of components</span></a>
+<a class="sourceLine" id="cb53-62" data-line-number="62">components &lt;-<span class="st"> </span><span class="kw"><a href="../reference/component-generation.html">generateComponents</a></span>(fGroups, <span class="st">"ramclustr"</span>, <span class="dt">ionization =</span> <span class="st">"positive"</span>)</a>
+<a class="sourceLine" id="cb53-63" data-line-number="63"></a>
+<a class="sourceLine" id="cb53-64" data-line-number="64"></a>
+<a class="sourceLine" id="cb53-65" data-line-number="65"><span class="co"># -------------------------</span></a>
+<a class="sourceLine" id="cb53-66" data-line-number="66"><span class="co"># reporting</span></a>
+<a class="sourceLine" id="cb53-67" data-line-number="67"><span class="co"># -------------------------</span></a>
+<a class="sourceLine" id="cb53-68" data-line-number="68"></a>
+<a class="sourceLine" id="cb53-69" data-line-number="69"></a>
+<a class="sourceLine" id="cb53-70" data-line-number="70"><span class="kw"><a href="../reference/reporting.html">reportCSV</a></span>(fGroups, <span class="dt">path =</span> <span class="st">"report"</span>, <span class="dt">reportFeatures =</span> <span class="ot">FALSE</span>, <span class="dt">formulas =</span> formulas,</a>
+<a class="sourceLine" id="cb53-71" data-line-number="71">          <span class="dt">compounds =</span> compounds, <span class="dt">compoundsNormalizeScores =</span> <span class="st">"max"</span>,</a>
+<a class="sourceLine" id="cb53-72" data-line-number="72">          <span class="dt">components =</span> components)</a>
+<a class="sourceLine" id="cb53-73" data-line-number="73"></a>
+<a class="sourceLine" id="cb53-74" data-line-number="74"><span class="kw"><a href="../reference/reporting.html">reportPDF</a></span>(fGroups, <span class="dt">path =</span> <span class="st">"report"</span>, <span class="dt">reportFGroups =</span> <span class="ot">TRUE</span>, <span class="dt">formulas =</span> formulas, <span class="dt">reportFormulaSpectra =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb53-75" data-line-number="75">          <span class="dt">compounds =</span> compounds, <span class="dt">compoundsNormalizeScores =</span> <span class="st">"max"</span>,</a>
+<a class="sourceLine" id="cb53-76" data-line-number="76">          <span class="dt">components =</span> components, <span class="dt">MSPeakLists =</span> mslists)</a>
+<a class="sourceLine" id="cb53-77" data-line-number="77"></a>
+<a class="sourceLine" id="cb53-78" data-line-number="78"><span class="kw"><a href="../reference/reporting.html">reportHTML</a></span>(fGroups, <span class="dt">path =</span> <span class="st">"report"</span>, <span class="dt">reportPlots =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"chord"</span>, <span class="st">"venn"</span>, <span class="st">"upset"</span>, <span class="st">"eics"</span>, <span class="st">"formulas"</span>), <span class="dt">formulas =</span> formulas,</a>
+<a class="sourceLine" id="cb53-79" data-line-number="79">           <span class="dt">compounds =</span> compounds, <span class="dt">compoundsNormalizeScores =</span> <span class="st">"max"</span>,</a>
+<a class="sourceLine" id="cb53-80" data-line-number="80">           <span class="dt">components =</span> components, <span class="dt">MSPeakLists =</span> mslists,</a>
+<a class="sourceLine" id="cb53-81" data-line-number="81">           <span class="dt">selfContained =</span> <span class="ot">FALSE</span>, <span class="dt">openReport =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
 <!-- UNDONE: next steps section -->
 </div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
+
         <div id="tocnav">
       <h2 class="hasAnchor">
 <a href="#tocnav" class="anchor"></a>Contents</h2>
@@ -731,17 +761,20 @@ p.caption {
 </div>
 
 
+
       <footer><div class="copyright">
   <p>Developed by Rick Helmus.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.3.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
 </div>
+
       </footer>
 </div>
 
   
+
 
   </body>
 </html>

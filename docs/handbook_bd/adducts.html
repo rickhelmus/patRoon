@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>6.1 Adducts | patRoon handbook</title>
   <meta name="description" content="6.1 Adducts | patRoon handbook" />
-  <meta name="generator" content="bookdown 0.10.2 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.13 and GitBook 2.6.7" />
 
   <meta property="og:title" content="6.1 Adducts | patRoon handbook" />
   <meta property="og:type" content="book" />
@@ -24,15 +24,15 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2019-05-18" />
+<meta name="date" content="2019-10-12" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="advanced-usage.html">
-<link rel="next" href="fOpt.html">
+<link rel="prev" href="advanced-usage.html"/>
+<link rel="next" href="fOpt.html"/>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -65,7 +65,6 @@ a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
 a.sourceLine:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode { white-space: pre; position: relative; }
-div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
@@ -226,21 +225,21 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul>
 <p>In addition, most algorithms only accept a limited set of possible adducts, which do not necessarily all overlap with each other. The <code>GenFormAdducts()</code> and <code>MetFragAdducts()</code> functions list the possible adducts for <code>GenForm</code> and <code>MetFrag</code>, respectively.</p>
 <p>In order to simplify the situation <code>patRoon</code> internally uses its own format and converts it automatically to the algorithm specific format when necessary. Furthermore, during conversion it checks if the specified adduct format is actually allowed by the algorithm. Adducts in <code>patRoon</code> are stored in the <code>adduct</code> S4 class. Objects from this class specify which elements are added and/or subtracted, the final charge and the number of molecules present in the adduct (e.g. <em>2</em> for a dimer).</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">adduct</span>(<span class="dt">add =</span> <span class="st">&quot;H&quot;</span>) <span class="co"># [M+H]+</span>
-<span class="kw">adduct</span>(<span class="dt">sub =</span> <span class="st">&quot;H&quot;</span>, <span class="dt">charge =</span> <span class="dv">-1</span>) <span class="co"># [M-H]-</span>
-<span class="kw">adduct</span>(<span class="dt">add =</span> <span class="st">&quot;K&quot;</span>, <span class="dt">sub =</span> <span class="st">&quot;H2&quot;</span>, <span class="dt">charge =</span> <span class="dv">-1</span>) <span class="co"># [M+K-H2]-</span>
-<span class="kw">adduct</span>(<span class="dt">add =</span> <span class="st">&quot;H3&quot;</span>, <span class="dt">charge =</span> <span class="dv">3</span>) <span class="co"># [M+H3]3+</span>
-<span class="kw">adduct</span>(<span class="dt">add =</span> <span class="st">&quot;H&quot;</span>, <span class="dt">molMult =</span> <span class="dv">2</span>) <span class="co"># [2M+H]+</span></code></pre>
+<div class="sourceCode" id="cb96"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb96-1" data-line-number="1"><span class="kw">adduct</span>(<span class="dt">add =</span> <span class="st">&quot;H&quot;</span>) <span class="co"># [M+H]+</span></a>
+<a class="sourceLine" id="cb96-2" data-line-number="2"><span class="kw">adduct</span>(<span class="dt">sub =</span> <span class="st">&quot;H&quot;</span>, <span class="dt">charge =</span> <span class="dv">-1</span>) <span class="co"># [M-H]-</span></a>
+<a class="sourceLine" id="cb96-3" data-line-number="3"><span class="kw">adduct</span>(<span class="dt">add =</span> <span class="st">&quot;K&quot;</span>, <span class="dt">sub =</span> <span class="st">&quot;H2&quot;</span>, <span class="dt">charge =</span> <span class="dv">-1</span>) <span class="co"># [M+K-H2]-</span></a>
+<a class="sourceLine" id="cb96-4" data-line-number="4"><span class="kw">adduct</span>(<span class="dt">add =</span> <span class="st">&quot;H3&quot;</span>, <span class="dt">charge =</span> <span class="dv">3</span>) <span class="co"># [M+H3]3+</span></a>
+<a class="sourceLine" id="cb96-5" data-line-number="5"><span class="kw">adduct</span>(<span class="dt">add =</span> <span class="st">&quot;H&quot;</span>, <span class="dt">molMult =</span> <span class="dv">2</span>) <span class="co"># [2M+H]+</span></a></code></pre></div>
 <p>A more easy way to generate adduct objects is by using the <code>as.adduct()</code> function:</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">as.adduct</span>(<span class="st">&quot;[M+H]+&quot;</span>)
-<span class="kw">as.adduct</span>(<span class="st">&quot;[M+H2]2+&quot;</span>)
-<span class="kw">as.adduct</span>(<span class="st">&quot;[2M+H]+&quot;</span>)
-<span class="kw">as.adduct</span>(<span class="st">&quot;[M-H]-&quot;</span>)
-<span class="kw">as.adduct</span>(<span class="st">&quot;+H&quot;</span>, <span class="dt">format =</span> <span class="st">&quot;genform&quot;</span>)
-<span class="kw">as.adduct</span>(<span class="dv">1</span>, <span class="dt">isPositive =</span> <span class="ot">TRUE</span>, <span class="dt">format =</span> <span class="st">&quot;metfrag&quot;</span>)</code></pre>
+<div class="sourceCode" id="cb97"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb97-1" data-line-number="1"><span class="kw">as.adduct</span>(<span class="st">&quot;[M+H]+&quot;</span>)</a>
+<a class="sourceLine" id="cb97-2" data-line-number="2"><span class="kw">as.adduct</span>(<span class="st">&quot;[M+H2]2+&quot;</span>)</a>
+<a class="sourceLine" id="cb97-3" data-line-number="3"><span class="kw">as.adduct</span>(<span class="st">&quot;[2M+H]+&quot;</span>)</a>
+<a class="sourceLine" id="cb97-4" data-line-number="4"><span class="kw">as.adduct</span>(<span class="st">&quot;[M-H]-&quot;</span>)</a>
+<a class="sourceLine" id="cb97-5" data-line-number="5"><span class="kw">as.adduct</span>(<span class="st">&quot;+H&quot;</span>, <span class="dt">format =</span> <span class="st">&quot;genform&quot;</span>)</a>
+<a class="sourceLine" id="cb97-6" data-line-number="6"><span class="kw">as.adduct</span>(<span class="dv">1</span>, <span class="dt">isPositive =</span> <span class="ot">TRUE</span>, <span class="dt">format =</span> <span class="st">&quot;metfrag&quot;</span>)</a></code></pre></div>
 <p>In fact, the <code>adduct</code> argument to workflow functions such as <code>generateFormulas()</code> and <code>generateCompounds()</code> is automatically converted to an <code>adduct</code> class with the <code>as.adduct()</code> function if necessary:</p>
-<pre class="sourceCode r"><code class="sourceCode r">formulas &lt;-<span class="st"> </span><span class="kw">generateFormulas</span>(..., <span class="dt">adduct =</span> <span class="kw">adduct</span>(<span class="dt">sub =</span> <span class="st">&quot;H&quot;</span>, <span class="dt">charge =</span> <span class="dv">-1</span>))
-formulas &lt;-<span class="st"> </span><span class="kw">generateFormulas</span>(..., <span class="dt">adduct =</span> <span class="st">&quot;[M-H]-&quot;</span>) <span class="co"># same as above</span></code></pre>
+<div class="sourceCode" id="cb98"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb98-1" data-line-number="1">formulas &lt;-<span class="st"> </span><span class="kw">generateFormulas</span>(..., <span class="dt">adduct =</span> <span class="kw">adduct</span>(<span class="dt">sub =</span> <span class="st">&quot;H&quot;</span>, <span class="dt">charge =</span> <span class="dv">-1</span>))</a>
+<a class="sourceLine" id="cb98-2" data-line-number="2">formulas &lt;-<span class="st"> </span><span class="kw">generateFormulas</span>(..., <span class="dt">adduct =</span> <span class="st">&quot;[M-H]-&quot;</span>) <span class="co"># same as above</span></a></code></pre></div>
 <p>More details can be found in the reference manual (<code>?adduct</code> and <code>?`adduct-utils`</code>).</p>
 </div>
             </section>

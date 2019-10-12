@@ -8,21 +8,25 @@
 
 <title>Formula lists class — formulas-class • patRoon</title>
 
+
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
 
-<!-- sticky kit -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script>
+<!-- headroom.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -30,10 +34,11 @@
 
 
 
-<meta property="og:title" content="Formula lists class — formulas-class" />
 
+<meta property="og:title" content="Formula lists class — formulas-class" />
 <meta property="og:description" content="Contains data of generated chemical formulae for given feature groups." />
 <meta name="twitter:card" content="summary" />
+
 
 
 
@@ -45,6 +50,7 @@
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
+
 
 
   </head>
@@ -100,7 +106,6 @@
   <a href="../news/index.html">Changelog</a>
 </li>
       </ul>
-      
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/rickhelmus/patRoon">
@@ -115,6 +120,7 @@
 </div><!--/.navbar -->
 
       
+
       </header>
 
 <div class="row">
@@ -126,9 +132,7 @@
     </div>
 
     <div class="ref-description">
-    
     <p>Contains data of generated chemical formulae for given feature groups.</p>
-    
     </div>
 
     <pre class="usage"># S4 method for formulas
@@ -165,7 +169,7 @@ as.data.table(x, fGroups = NULL, average = FALSE,
   normalizeScores = "none", excludeNormScores = NULL)
 
 # S4 method for formulas
-filter(obj, minExplainedFragPeaks = NULL,
+filter(obj, minExplainedPeaks = NULL,
   elements = NULL, fragElements = NULL, lossElements = NULL,
   topMost = NULL, scoreLimits = NULL, OM = FALSE, negate = FALSE)
 
@@ -194,7 +198,7 @@ plotUpSet(obj, ..., labels = NULL,
 consensus(obj, ..., absMinAbundance = NULL,
   relMinAbundance = NULL, uniqueFrom = NULL, uniqueOuter = FALSE,
   rankWeights = 1)</pre>
-    
+
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
@@ -214,9 +218,9 @@ their index or name, respectively (for the order/names see <code>analyses()/grou
 (similar to regular vectors). If missing all analyses/feature groups are selected.<br /><br /> For <code>[[</code>: should be a scalar value. If <code>j</code> is not specified, <code>i</code> selects by feature groups instead.</p></td>
     </tr>
     <tr>
-      <th>&#8230;</th>
+      <th>...</th>
       <td><p>For <code>plotSpec</code>: Further arguments passed to
-  <code><a href='https://www.rdocumentation.org/packages/graphics/topics/plot'>plot</a></code>.</p>
+  <code><a href='https://rdrr.io/r/graphics/plot.html'>plot</a></code>.</p>
 <p>Others: Any further (and unique) <code>formulas</code> objects.</p></td>
     </tr>
     <tr>
@@ -245,7 +249,7 @@ per feature group when performing elemental characterization.</p></td>
       <th>countElements, countFragElements</th>
       <td><p>A <code>character</code> vector with
 elements that should be counted for each MS(/MS) formula candidate. For
-instance, <code><a href='https://www.rdocumentation.org/packages/base/topics/c'>c("C", "H")</a></code> adds columns for both carbon and hydrogen
+instance, <code><a href='https://rdrr.io/r/base/c.html'>c("C", "H")</a></code> adds columns for both carbon and hydrogen
 amounts of each formula. Note that the neutral formula
 (<code>neutral_formula</code> column) is used to count elements of non-fragmented
 formulae, whereas the charged formula of fragments (<code>frag_formula</code>
@@ -291,7 +295,7 @@ use of <code>filter</code>).</p></td>
   web interface.</p></td>
     </tr>
     <tr>
-      <th>minExplainedFragPeaks</th>
+      <th>minExplainedPeaks</th>
       <td><p>Minimum number of fragment peaks that are
 explained. Setting this to <samp>1</samp> will remove any MS only formula
 results. Set to <code>NULL</code> to ignore.</p></td>
@@ -381,7 +385,7 @@ generated title.</p></td>
     <tr>
       <th>xlim, ylim</th>
       <td><p>Sets the plot size limits used by
-<code><a href='https://www.rdocumentation.org/packages/graphics/topics/plot'>plot</a></code>. Set to <code>NULL</code> for automatic plot sizing.</p></td>
+<code><a href='https://rdrr.io/r/graphics/plot.html'>plot</a></code>. Set to <code>NULL</code> for automatic plot sizing.</p></td>
     </tr>
     <tr>
       <th>labels</th>
@@ -395,12 +399,12 @@ generated title.</p></td>
     </tr>
     <tr>
       <th>nsets, nintersects</th>
-      <td><p>See <code><a href='https://www.rdocumentation.org/packages/UpSetR/topics/upset'>upset</a></code>.</p></td>
+      <td><p>See <code><a href='https://rdrr.io/pkg/UpSetR/man/upset.html'>upset</a></code>.</p></td>
     </tr>
     <tr>
       <th>upsetArgs</th>
       <td><p>A list with any further arguments to be passed to
-<code><a href='https://www.rdocumentation.org/packages/UpSetR/topics/upset'>upset</a></code>. Set to <code>NULL</code> to ignore.</p></td>
+<code><a href='https://rdrr.io/pkg/UpSetR/man/upset.html'>upset</a></code>. Set to <code>NULL</code> to ignore.</p></td>
     </tr>
     <tr>
       <th>absMinAbundance, relMinAbundance</th>
@@ -435,7 +439,7 @@ hence, the default value of <samp>1</samp> means equal weights for all considere
 objects.</p></td>
     </tr>
     </table>
-    
+
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p><code>formulaTable</code> returns a <code>list</code> containing for each feature
@@ -458,15 +462,14 @@ from the used plotting function (see <em>e.g.</em> <code>draw.pairwise.venn</cod
 <code>draw.triple.venn</code>).</p>
 <p><code>consensus</code> returns a <code>formulas</code> object that is produced by
   merging results from multiple <code>formulas</code> objects.</p>
-    
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p><code>formulas</code> objects are obtained from <a href='formula-generation.html'>formula
 generators</a>.</p>
-    
     <h2 class="hasAnchor" id="methods-by-generic-"><a class="anchor" href="#methods-by-generic-"></a>Methods (by generic)</h2>
 
-    <ul>
+    
+<ul>
 <li><p><code>formulaTable</code>: Accessor method to obtain generated formulae.</p></li>
 <li><p><code>algorithm</code>: Accessor method for the algorithm (a character
 string) used to generate formulae.</p></li>
@@ -494,7 +497,7 @@ formula of a feature or feature group.</p></li>
 outlining unique and shared formula candidates of up to five different
 <code>formulas</code> objects.</p></li>
 <li><p><code>plotUpSet</code>: plots an UpSet diagram (using the
-<code><a href='https://www.rdocumentation.org/packages/UpSetR/topics/upset'>upset</a></code> function) outlining unique and shared formula
+<code><a href='https://rdrr.io/pkg/UpSetR/man/upset.html'>upset</a></code> function) outlining unique and shared formula
 candidates between different <code>formula</code> objects.</p></li>
 <li><p><code>consensus</code>: Generates a consensus of results from multiple
 objects. In order to rank the consensus candidates, first
@@ -505,22 +508,22 @@ candidate to derive the final ranking (if an object lacks the candidate its
 score will be <samp>0</samp>). The original rankings for each object is stored in
 the <code>rank</code> columns.</p></li>
 </ul>
-    
     <h2 class="hasAnchor" id="slots"><a class="anchor" href="#slots"></a>Slots</h2>
 
     
-    <dl class='dl-horizontal'>
+
+<dl class='dl-horizontal'>
 <dt><code>formulas,featureFormulas</code></dt><dd><p>Lists of all generated formulae. Use the
 <code>formulaTable</code> method for access.</p></dd>
-    <dt><code>scoreRanges</code></dt><dd><p>The original min/max values of all scorings when candidate
+
+<dt><code>scoreRanges</code></dt><dd><p>The original min/max values of all scorings when candidate
 results were generated. This is used for normalization.</p></dd>
+
 </dl>
-    
     <h2 class="hasAnchor" id="note"><a class="anchor" href="#note"></a>Note</h2>
 
     <p><code>filter</code> does not modify any formula results for features (if
   present).</p>
-    
     <h2 class="hasAnchor" id="source"><a class="anchor" href="#source"></a>Source</h2>
 
     <p>Calculation of the aromaticity index (AI) and related double
@@ -531,7 +534,6 @@ results were generated. This is used for normalization.</p></dd>
 <p>Subscripting of formulae for plots generated by
   <code>plotSpec</code> is based on the <code>chemistry2expression</code> function from
   the <a href='https://github.com/schymane/ReSOLUTION'>ReSOLUTION</a> package.</p>
-    
     <h2 class="hasAnchor" id="s-class-hierarchy"><a class="anchor" href="#s-class-hierarchy"></a>S4 class hierarchy</h2>
 
     <p></p><ul>
@@ -539,7 +541,7 @@ results were generated. This is used for normalization.</p></dd>
 <li><p><strong><code>formulas</code></strong></p></li>
 </ul></li>
 </ul>
-    
+
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
     <p>Koch BP, Dittmar T (2015).
@@ -576,33 +578,25 @@ doi: <a href='https://doi.org/10.1093/bioinformatics/btx364'>10.1093/bioinformat
 <em>IEEE Transactions on Visualization and Computer Graphics</em>, <b>20</b>(12), 1983--1992.
 doi: <a href='https://doi.org/10.1109/tvcg.2014.2346248'>10.1109/tvcg.2014.2346248</a>
 , <a href='https://doi.org/10.1109/tvcg.2014.2346248'>https://doi.org/10.1109/tvcg.2014.2346248</a>.</p>
-    
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
-      
       <li><a href="#value">Value</a></li>
-
       <li><a href="#details">Details</a></li>
-
       <li><a href="#methods-by-generic-">Methods (by generic)</a></li>
-
       <li><a href="#slots">Slots</a></li>
-
       <li><a href="#note">Note</a></li>
-
       <li><a href="#source">Source</a></li>
-
       <li><a href="#s-class-hierarchy">S4 class hierarchy</a></li>
-
       <li><a href="#references">References</a></li>
-          </ul>
+    </ul>
 
   </div>
 </div>
+
 
       <footer>
       <div class="copyright">
@@ -610,13 +604,16 @@ doi: <a href='https://doi.org/10.1109/tvcg.2014.2346248'>10.1109/tvcg.2014.23462
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.3.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
 </div>
+
       </footer>
    </div>
 
   
 
+
   </body>
 </html>
+
 

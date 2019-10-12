@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>6.5 Compound clustering | patRoon handbook</title>
   <meta name="description" content="6.5 Compound clustering | patRoon handbook" />
-  <meta name="generator" content="bookdown 0.10.2 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.13 and GitBook 2.6.7" />
 
   <meta property="og:title" content="6.5 Compound clustering | patRoon handbook" />
   <meta property="og:type" content="book" />
@@ -24,15 +24,15 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2019-05-18" />
+<meta name="date" content="2019-10-12" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="consensus.html">
-<link rel="next" href="caching.html">
+<link rel="prev" href="consensus.html"/>
+<link rel="next" href="caching.html"/>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -65,7 +65,6 @@ a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
 a.sourceLine:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode { white-space: pre; position: relative; }
-div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
@@ -220,8 +219,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h2><span class="header-section-number">6.5</span> Compound clustering</h2>
 <p>When large databases such as <a href="https://pubchem.ncbi.nlm.nih.gov/">PubChem</a> or <a href="http://www.chemspider.com/">ChemSpider</a> are used for compound annotation, it is common to find <em>many</em> candidate structures for even a single feature. While choosing the right scoring settings can significantly improve their ranking, it is still very much possible that many candidates of potential interest remain. In this situation it might help to perform <em>compound clustering</em>. During this process, all candidates for a feature are clustered hierarchically on basis of similar chemical structure. From the resulting cluster the <em>maximum common substructure</em> (MCS) can be derived, which represents the largest possible substructure that ‘fit’ in all candidates. By visual inspection of the MCS it may be possible to identify likely common structural properties of a feature.</p>
 <p>In order to perform compound clustering the <code>makeHCluster()</code> generic function should be used. This function heavily relies on chemical fingerprinting functionality provided by <a href="https://github.com/CDK-R/cdkr">rcdk</a>.</p>
-<pre class="sourceCode r"><code class="sourceCode r">compounds &lt;-<span class="st"> </span><span class="kw">generateCompounds</span>(...) <span class="co"># get our compounds</span>
-compsClust &lt;-<span class="st"> </span><span class="kw">makeHCluster</span>(compounds)</code></pre>
+<div class="sourceCode" id="cb116"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb116-1" data-line-number="1">compounds &lt;-<span class="st"> </span><span class="kw">generateCompounds</span>(...) <span class="co"># get our compounds</span></a>
+<a class="sourceLine" id="cb116-2" data-line-number="2">compsClust &lt;-<span class="st"> </span><span class="kw">makeHCluster</span>(compounds)</a></code></pre></div>
 <p>This function accepts several arguments to fine tune the clustering process:</p>
 <ul>
 <li><code>method</code>: the clustering method (e.g. <code>&quot;complete&quot;</code> (default), <code>&quot;ward.D2&quot;</code>), see <code>?hclust</code> for options</li>
@@ -230,16 +229,16 @@ compsClust &lt;-<span class="st"> </span><span class="kw">makeHCluster</span>(co
 </ul>
 <p>For all arguments see the reference manual (<code>?makeHClust</code>).</p>
 <p>The resulting object is of type <code>compoundsCluster</code>. Several methods are defined to modify and inspect these results:</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># plot MCS of first cluster from candidates of M109_R116_61</span>
-<span class="kw">plotStructure</span>(compsClust, <span class="dt">groupName =</span> <span class="st">&quot;M109_R116_61&quot;</span>, <span class="dv">1</span>)
-
-<span class="co"># plot dendrogram</span>
-<span class="kw">plot</span>(compsClust, <span class="dt">groupName =</span> <span class="st">&quot;M109_R116_61&quot;</span>)
-
-<span class="co"># re-assign clusters for a feature group</span>
-compsClust &lt;-<span class="st"> </span><span class="kw">treeCut</span>(compsClust, <span class="dt">k =</span> <span class="dv">5</span>, <span class="dt">groupName =</span> <span class="st">&quot;M109_R116_61&quot;</span>)
-<span class="co"># ditto, but automatic cluster determination</span>
-compsClust &lt;-<span class="st"> </span><span class="kw">treeCutDynamic</span>(compsClust, <span class="dt">minModuleSize =</span> <span class="dv">3</span>, <span class="dt">groupName =</span> <span class="st">&quot;M109_R116_61&quot;</span>)</code></pre>
+<div class="sourceCode" id="cb117"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb117-1" data-line-number="1"><span class="co"># plot MCS of first cluster from candidates of M109_R116_61</span></a>
+<a class="sourceLine" id="cb117-2" data-line-number="2"><span class="kw">plotStructure</span>(compsClust, <span class="dt">groupName =</span> <span class="st">&quot;M109_R116_61&quot;</span>, <span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb117-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb117-4" data-line-number="4"><span class="co"># plot dendrogram</span></a>
+<a class="sourceLine" id="cb117-5" data-line-number="5"><span class="kw">plot</span>(compsClust, <span class="dt">groupName =</span> <span class="st">&quot;M109_R116_61&quot;</span>)</a>
+<a class="sourceLine" id="cb117-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb117-7" data-line-number="7"><span class="co"># re-assign clusters for a feature group</span></a>
+<a class="sourceLine" id="cb117-8" data-line-number="8">compsClust &lt;-<span class="st"> </span><span class="kw">treeCut</span>(compsClust, <span class="dt">k =</span> <span class="dv">5</span>, <span class="dt">groupName =</span> <span class="st">&quot;M109_R116_61&quot;</span>)</a>
+<a class="sourceLine" id="cb117-9" data-line-number="9"><span class="co"># ditto, but automatic cluster determination</span></a>
+<a class="sourceLine" id="cb117-10" data-line-number="10">compsClust &lt;-<span class="st"> </span><span class="kw">treeCutDynamic</span>(compsClust, <span class="dt">minModuleSize =</span> <span class="dv">3</span>, <span class="dt">groupName =</span> <span class="st">&quot;M109_R116_61&quot;</span>)</a></code></pre></div>
 <p>For a complete overview see the reference manual (<code>?compoundsCluster</code>).</p>
 </div>
             </section>

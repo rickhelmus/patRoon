@@ -202,8 +202,8 @@ setMethod("convertToMFDB", "TPPredictionsBT", function(pred, out, includePrec)
 
     # set to MetFrag style names
     setnames(predAll,
-             c("formula", "mass", "Precursor Major Isotope Mass"),
-             c("MolecularFormula", "MonoisotopicMass", "Precursor MonoisotopicMass"))
+             c("name", "formula", "mass", "Precursor Major Isotope Mass"),
+             c("Identifier", "MolecularFormula", "MonoisotopicMass", "Precursor MonoisotopicMass"))
 
     mols <- suppressWarnings(rinchi::parse.inchi(predAll$InChI))
     nullMols <- which(sapply(mols, is.null))
@@ -232,7 +232,6 @@ setMethod("convertToMFDB", "TPPredictionsBT", function(pred, out, includePrec)
         precs[, InChIKey := sapply(SMILES, rinchi::get.inchi.key)]
         
         predAll <- rbind(precs, predAll, fill = TRUE)
-        
     }
     
     # Add required InChIKey1 column
@@ -248,5 +247,6 @@ setMethod("linkPrecursorsToFGroups", "TPPredictionsBT", function(pred, fGroups, 
 {
     suspList <- getPrecursorSuspList(pred, adduct)
     scr <- screenSuspects(fGroups, suspList, mzWindow = mzWindow)
+    scr <- scr[!is.na(group)] # remove non-hits
     return(scr[, c("name", "group")])
 })

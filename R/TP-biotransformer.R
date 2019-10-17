@@ -250,3 +250,47 @@ setMethod("linkPrecursorsToFGroups", "TPPredictionsBT", function(pred, fGroups, 
     scr <- scr[!is.na(group)] # remove non-hits
     return(scr[, c("name", "group")])
 })
+
+#' @export
+setMethod("filter", "TPPredictionsBT", function(obj, removeEqualFormulas = FALSE, negate = FALSE)
+{
+    # UNDONE: move to base class?
+    
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertFlag(removeEqualFormulas, add = ac)
+    checkmate::assertFlag(negate, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    if (length(obj) == 0)
+        return(obj)
+    
+    oldn <- length(obj)
+    
+    hash <- makeHash(obj, removeEqualFormulas, negate)
+    cache <- loadCacheData("filterTPs", hash)
+    if (!is.null(cache))
+        obj <- cache
+    else
+    {
+        if (removeEqualFormulas)
+        {
+            mols <- getMoleculesFromSMILES(obj@suspects$SMILES, doTyping = TRUE, doIsotopes = TRUE)
+            pforms <- sapply(mols, function(m) rcdk::get.mol2formula(m)@string)
+            obj@predictions <- mapply(pforms, obj@predictions, SIMPLIFY = FALSE, FUN = function(pform, pred)
+            {
+                if (negate)
+                    return(pred[formula == pform])
+                return(pred[formula != pform])
+            })
+        }
+        
+        obj@predictions <- pruneList(obj@predictions, checkZeroRows = TRUE)
+        
+        saveCacheData("filterTPs", obj, hash)
+    }
+    
+    newn <- length(obj)
+    printf("Done! Filtered %d (%.2f%%) TPs. Remaining: %d\n", oldn - newn, if (oldn == 0) 0 else (1-(newn/oldn))*100, newn)
+    
+    return(obj)
+})

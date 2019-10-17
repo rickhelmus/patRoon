@@ -107,7 +107,8 @@ Imports:
     yaml,
     keys,
     backports,
-    shinyjs
+    shinyjs,
+    OrgMassSpecR
 Suggests: 
     RDCOMClient,
     metfRag,

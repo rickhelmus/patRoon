@@ -10,15 +10,18 @@ setMethod("initialize", "componentsTPs",
 
 
 #' @export
-generateComponentsTPs <- function(fGroups, pred, adduct, mzWindow = 0.005, rGroupsIn = NULL, rGroupsEff = NULL,
+generateComponentsTPs <- function(fGroups, pred, MSPeakLists, adduct, mzWindow = 0.005, rGroupsIn = NULL, rGroupsEff = NULL,
                                   inThreshold = 0, effThreshold = 0, minRTDiff = 20)
 {
+    # UNDONE: optionally remove TPs with equal formula as parent (how likely are these?)
+    
     checkmate::assertClass(fGroups, "featureGroups")
 
     rGroups <- replicateGroups(fGroups)
     
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(pred, "TPPredictions")
+    checkmate::assertClass(MSPeakLists, "MSPeakLists")
     
     aapply(checkmate::assertNumber, . ~ mzWindow + inThreshold, effThreshold + minRTDiff,
            lower = 0, finite = TRUE, fixed = list(add = ac))
@@ -97,8 +100,33 @@ generateComponentsTPs <- function(fGroups, pred, adduct, mzWindow = 0.005, rGrou
             if (minRTDiff > 0)
             {
                 rtDiffs <- ret$rt - gInfo[scrRow$group, "rts"]
-                ret[, keep := RTDir == 0 | abs(rtDiffs) <= minRTDiff | (rtDiffs < 0 & RTDir < 0) | (rtDiffs > 0 & RTDir > 0)]
+                ret <- ret[RTDir == 0 | abs(rtDiffs) <= minRTDiff | (rtDiffs < 0 & RTDir < 0) | (rtDiffs > 0 & RTDir > 0)]
             }
+
+            precMSMS <- MSPeakLists[[scrRow$group]][["MSMS"]]
+            if (!is.null(precMSMS))
+            {
+                getSim <- function(g, shift)
+                {
+                    TPMSMS <- MSPeakLists[[g]][["MSMS"]]
+                    if (!is.null(TPMSMS)) # UNDONE: make some arguments configurable
+                    {
+                        if (shift)
+                            shift <- diff(gInfo[c(scrRow$group, g), "mzs"])
+                        else
+                            shift <- 0
+                        
+                        return(spectrumSimilarity(MSPeakLists, scrRow$group, g, MSLevel = 2, doPlot = FALSE, mzShift = shift))
+                    }
+                        
+                    return(NA)
+                }
+
+                ret[, specSimilarity := sapply(group, getSim, shift = FALSE)]
+                ret[, specSimilarityShift := sapply(group, getSim, shift = TRUE)]
+            }
+            else
+                ret[, c("specSimilarity", "specSimilarityShift") := NA]
             
             return(ret)
         }), idcol = "precursor_group")

@@ -552,6 +552,10 @@ setMethod("plotSpectrum", "MSPeakLists", function(obj, groupName, analysis = NUL
 #'   \code{t} argument of \code{\link{SpectrumSimilarity}}.
 #' @param relMinIntensity Relative intensity threshold. Sets the \code{b}
 #'   argument of \code{\link{SpectrumSimilarity}}.
+#' @param omitPrecursor If \code{TRUE} then the precursor mass peak is removed
+#'   prior the comparison.
+#' @param mzShift A number that is added to all mass peaks of the second peak
+#'   list. Useful for \emph{e.g.} comparing precursor/parent MS/MS peaks.
 #'
 #' @return \code{spectrumSimilarity} returns the same as
 #'   \code{\link{SpectrumSimilarity}}.
@@ -559,10 +563,10 @@ setMethod("plotSpectrum", "MSPeakLists", function(obj, groupName, analysis = NUL
 #' @aliases spectrumSimilarity
 #' @export
 setMethod("spectrumSimilarity", "MSPeakLists", function(obj, groupName1, groupName2,
-                                                        analysis1 = NULL, analysis2 = NULL,
-                                                        MSLevel = 1, doPlot = TRUE, absMzDev = 0.005,
-                                                        relMinIntensity = 10, xlim = NULL,
-                                                        ylim = c(0, 100), ...)
+                                                        analysis1, analysis2,
+                                                        MSLevel, doPlot, absMzDev,
+                                                        relMinIntensity, omitPrecursor,
+                                                        mzShift, xlim, ylim, ...)
 {
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertChoice, . ~ groupName1 + groupName2,
@@ -570,9 +574,10 @@ setMethod("spectrumSimilarity", "MSPeakLists", function(obj, groupName1, groupNa
     aapply(checkmate::assertChoice, . ~ analysis1 + analysis2, null.ok = TRUE,
            fixed = list(choices = analyses(obj), add = ac))
     checkmate::assertChoice(MSLevel, 1:2, add = ac)
-    checkmate::assertFlag(doPlot)
+    aapply(checkmate::assertFlag, . ~ doPlot + omitPrecursor, fixed = list(add = ac))
     aapply(checkmate::assertNumber, . ~ absMzDev + relMinIntensity, lower = 0, finite = TRUE,
            fixed = list(add = ac))
+    checkmate::assertNumber(mzShift, finite = TRUE, add = ac)
     assertXYLim(xlim, ylim, add = ac)
     checkmate::reportAssertions(ac)
     
@@ -583,6 +588,18 @@ setMethod("spectrumSimilarity", "MSPeakLists", function(obj, groupName1, groupNa
     spec2 <- getSpec(obj, groupName2, MSLevel, analysis2)
     if (is.null(spec1) || is.null(spec2))
         return(NULL)
+    
+    if (omitPrecursor)
+    {
+        spec1 <- spec1[precursor == FALSE]
+        spec2 <- spec2[precursor == FALSE]
+    }
+    
+    if (mzShift != 0)
+    {
+        spec2 <- copy(spec2)
+        spec2[, mz := mz + mzShift]
+    }
     
     if (is.null(xlim))
         xlim <- c(min(spec1$mz, spec2$mz), max(spec1$mz, spec2$mz))

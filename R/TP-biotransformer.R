@@ -82,12 +82,15 @@ collapseBTResults <- function(pred)
     })
     
     predAll <- rbindlist(pred, idcol = "precursor")
-    
+
     # merge precursor and sub-precursor (ie from consecutive reactions)
     predAll[, precursor := paste0(precursor, " (", `Precursor ID`, ")")]
 
     # combine equal TPs from different precursors
-    predAll[, precursor := paste0(precursor, collapse = ","), by = "InChIKey"]
+    predAll[, c("name", "precursor") := .(paste0(name, collapse = ","),
+                                          paste0(precursor, collapse = ",")),
+            by = "InChIKey"]
+    
     # ... and remove now duplicates
     predAll <- unique(predAll, by = "InChIKey")
 
@@ -190,6 +193,8 @@ predictTPsBioTransformer <- function(suspects, type = "env", steps = 2, extraOpt
 #' @export
 setMethod("convertToMFDB", "TPPredictionsBT", function(pred, out, includePrec)
 {
+    # UNDONE: cache?
+    
     # rinchi: remotes::install_github("CDK-R/rinchi", INSTALL_opts = "--no-multiarch")
     checkPackage("rinchi", "CDK-R/rinchi")
     
@@ -198,28 +203,35 @@ setMethod("convertToMFDB", "TPPredictionsBT", function(pred, out, includePrec)
     checkmate::assertFlag(includePrec, add = ac)
     checkmate::reportAssertions(ac)
     
+    cat("Collapsing results... ")
     predAll <- collapseBTResults(pred@predictions)
+    cat("Done!\n")
 
     # set to MetFrag style names
     setnames(predAll,
              c("name", "formula", "mass", "Precursor Major Isotope Mass"),
              c("Identifier", "MolecularFormula", "MonoisotopicMass", "Precursor MonoisotopicMass"))
 
+    
+    cat("Calculating SMILES... ")
     mols <- suppressWarnings(rinchi::parse.inchi(predAll$InChI))
     nullMols <- which(sapply(mols, is.null))
     if (length(nullMols) > 0)
     {
         warning(paste("Failed to convert some InChI strings:\n",
-                      paste0(sprintf("%s (%s)\n", predAll$InChI[nullMols], predAll$name[nullMols]),
+                      paste0(sprintf("%s (%s)\n", predAll$InChI[nullMols], predAll$Identifier[nullMols]),
                              collapse = "\n")))
         predAll <- predAll[-nullMols]
         mols <- mols[-nullMols]
     }
     
     predAll[, SMILES := sapply(mols, rcdk::get.smiles)]
+    cat("Done!\n")
         
     if (includePrec)
     {
+        cat("Adding and calculating precursor information... ")
+        
         precs <- copy(suspects(pred))
         setnames(precs, "name", "Identifier")
         precs[, CompoundName := Identifier]
@@ -232,15 +244,20 @@ setMethod("convertToMFDB", "TPPredictionsBT", function(pred, out, includePrec)
         precs[, InChIKey := sapply(SMILES, rinchi::get.inchi.key)]
         
         predAll <- rbind(precs, predAll, fill = TRUE)
+        
+        cat("Done!\n")
     }
     
     # Add required InChIKey1 column
     predAll[, InChIKey1 := sub("\\-.*", "", InChIKey)]
 
-    # equalize identifiers and name's
+    # equalize identifiers and names
     predAll[, CompoundName := Identifier]
     
-    fwrite(predAll, out)
+    keepCols <- c("Identifier", "MolecularFormula", "MonoisotopicMass", "Precursor MonoisotopicMass",
+                  "InChI", "InChIKey", "InChIKey1", "ALogP") # UNDONE: more?
+    
+    fwrite(predAll[, keepCols, with = FALSE], out)
 })
 
 setMethod("linkPrecursorsToFGroups", "TPPredictionsBT", function(pred, fGroups, adduct, mzWindow)

@@ -272,6 +272,10 @@ Other changes
 * `concs` option for `generateAnalysisInfo()` to set concentration data
 * Components for homologous series new report links as character string indices instead of numeric indices.
 
+## October 2019
+
+* Components for homologous series new report links as character string indices instead of numeric indices.
+
 ## September 2019
 
 * Labels for objects in a `featureGroupsComparison` can be customized (useful for e.g. plotting)

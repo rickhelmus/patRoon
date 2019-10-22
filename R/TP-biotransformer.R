@@ -105,23 +105,39 @@ getPrecursorSuspList <- function(pred, adduct)
 }
 
 #' @export
-predictTPsBioTransformer <- function(suspects, type = "env", steps = 2, extraOpts = NULL,
+predictTPsBioTransformer <- function(suspects = NULL, compounds = NULL, type = "env", steps = 2,
+                                     extraOpts = NULL,
                                      logPath = file.path("log", "biotransformer"),
                                      maxProcAmount = getOption("patRoon.maxProcAmount"))
 {
     # UNDONE: as long as BT may return empty formulas we need this
     checkPackage("rinchi", "CDK-R/rinchi")
     
+    if (is.null(suspects) && is.null(compounds))
+        stop("Specify at least either the suspects or compounds argument.")
+    
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertDataFrame(suspects, any.missing = FALSE, min.rows = 1, add = ac)
-    assertHasNames(suspects, c("name", "SMILES"), add = ac)
+    checkmate::assertDataFrame(suspects, any.missing = FALSE, min.rows = 1, null.ok = TRUE, add = ac)
+    if (!is.null(suspects))
+        assertHasNames(suspects, c("name", "SMILES"), add = ac)
+    checkmate::assertClass(compounds, "compounds", null.ok = TRUE, add = ac)
     checkmate::assertChoice(type, c("ecbased", "cyp450", "phaseII", "hgut", "superbio", "allHuman", "env"), add = ac)
     checkmate::assertCount(steps, positive = TRUE, add = ac)
     checkmate::assertCharacter(extraOpts, null.ok = TRUE, add = ac)
     assertMultiProcArgs(logPath, maxProcAmount, add = ac)
     checkmate::reportAssertions(ac)
 
-    suspects <- as.data.table(suspects)
+    suspects <- if (!is.null(suspects)) as.data.table(suspects) else data.table()
+    
+    if (!is.null(compounds))
+    {
+        compTab <- as.data.table(compounds)
+        if (!is.null(compTab[["compoundName"]]))
+            compTab[, name := ifelse(nzchar(compoundName), compoundName, identifier)]
+        else
+            setnames(compTab, "Identifier", "name")
+        suspects <- rbind(suspects, compTab[, c("name", "SMILES"), with = FALSE])
+    }
 
     if (any(!nzchar(suspects$name)))
         stop("'name' column contains one ore more empty values")

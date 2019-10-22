@@ -161,7 +161,8 @@ if (!is.null(rmdVars$components))
     annCols <- c("isogroup", "isonr", "charge", "ppm", # RAMClustR
                  "isotopes", "adnr", "adduct_rule", "adduct_charge", "adduct_nmol", "M_adduct", # CAMERA
                  "adduct_ion", # RC/CAMERA
-                 "hsnr", "rGroup") # nontarget
+                 "hsnr", "rGroup", # nontarget
+                 "TP_name") # TPs
     
     fGroupsSpecDT[, components := sapply(group, function(grp)
     {

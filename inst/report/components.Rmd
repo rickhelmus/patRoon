@@ -21,6 +21,7 @@ plotPathLink <- getPlotPath(TRUE)
 isHClust <- inherits(rmdVars$components, "componentsIntClust")
 isHomol <- inherits(rmdVars$components, "componentsNT")
 isSet <- inherits(rmdVars$components, "componentsSet")
+isTP <- inherits(rmdVars$components, "componentsTPs")
 
 if (isHClust)
     clProps <- clusterProperties(rmdVars$components)
@@ -116,7 +117,7 @@ makeCompDT <- function(s, scrollY)
     
     sppaths <- file.path(plotPathLink, sprintf("component_spec_%d.png", compInds))
     eicpaths <- file.path(plotPathLink, sprintf("component_eic_%d.png", compInds))
-    
+
     if (rmdVars$selfContained)
     {
         sppaths <- sapply(sppaths, knitr::image_uri)
@@ -136,6 +137,13 @@ makeCompDT <- function(s, scrollY)
                             info = infoTables,
                             EIC = imgTags(eicpaths))
     
+    if (isTP)
+    {
+        cmpInfo <- componentInfo(rmdVars$components)
+        compTable[, component := sprintf("%s<br>(%s - %s)", component, cmpInfo$precursor_susp_name,
+                                         cmpInfo$precursor_group)]
+    }
+
     if (isHClust)
     {
         intnpaths <- file.path(plotPathLink, sprintf("component_int_norm_%d.png", compInds))

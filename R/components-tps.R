@@ -49,12 +49,12 @@ setMethod("plotGraph", "componentsTPs", function(obj, onlyLinked)
 })
 
 #' @export
-generateComponentsTPs <- function(fGroups, pred, MSPeakLists, adduct, mzWindow = 0.005, rGroupsIn = NULL, rGroupsEff = NULL,
-                                  inThreshold = 0, effThreshold = 0, minRTDiff = 20)
+generateComponentsTPs <- function(fGroups, pred, MSPeakLists, adduct, mzWindow = 0.005,
+                                  fGroupsPrec = fGroups, fGroupsTPs = fGroups, minRTDiff = 20)
 {
     # UNDONE: optionally remove TPs with equal formula as parent (how likely are these?)
     
-    checkmate::assertClass(fGroups, "featureGroups")
+    aapply(checkmate::assertClass, . ~ fGroups + fGroupsPrec + fGroupsTPs, "featureGroups")
 
     rGroups <- replicateGroups(fGroups)
     
@@ -62,13 +62,8 @@ generateComponentsTPs <- function(fGroups, pred, MSPeakLists, adduct, mzWindow =
     checkmate::assertClass(pred, "TPPredictions")
     checkmate::assertClass(MSPeakLists, "MSPeakLists")
     
-    aapply(checkmate::assertNumber, . ~ mzWindow + inThreshold, effThreshold + minRTDiff,
+    aapply(checkmate::assertNumber, . ~ mzWindow + minRTDiff,
            lower = 0, finite = TRUE, fixed = list(add = ac))
-    
-    if (!is.null(rGroupsIn))
-        checkmate::assertSubset(rGroupsIn, empty.ok = FALSE, choices = rGroups, add = ac)
-    if (!is.null(rGroupsEff))
-        checkmate::assertSubset(rGroupsEff, empty.ok = FALSE, choices = rGroups, add = ac)
     
     checkmate::reportAssertions(ac)
     
@@ -77,7 +72,7 @@ generateComponentsTPs <- function(fGroups, pred, MSPeakLists, adduct, mzWindow =
     if (length(fGroups) == 0)
         return(componentsTPs(componentInfo = data.table(), components = list()))
     
-    hash <- makeHash(fGroups, pred, adduct, mzWindow, rGroupsIn, rGroupsEff, inThreshold, effThreshold)
+    hash <- makeHash(fGroups, pred, adduct, mzWindow, fGroupsPrec, fGroupsTPs)
     cd <- loadCacheData("componentsTPs", hash)
     if (!is.null(cd))
         return(cd)
@@ -95,22 +90,10 @@ generateComponentsTPs <- function(fGroups, pred, MSPeakLists, adduct, mzWindow =
 
     printf("Screening TPs...\n")
     
-    screeningTPs <- screenSuspects(fGroups, suspList, mzWindow = mzWindow)
+    screeningTPs <- screenSuspects(fGroupsTPs, suspList, mzWindow = mzWindow)
     screeningTPs <- screeningTPs[!is.na(group)] # remove non-hits
     susps <- suspects(pred)
-    precGroups <- linkPrecursorsToFGroups(pred, fGroups, adduct, mzWindow)
-    
-    if (!is.null(rGroupsIn))
-    {
-        # UNDONE: or isolate rGroup?
-        fg <- replicateGroupSubtract(fGroups, rGroupsEff, inThreshold)
-        precGroups <- precGroups[group %in% names(fg)]
-    }
-    if (!is.null(rGroupsEff))
-    {
-        fg <- replicateGroupSubtract(fGroups, rGroupsIn, effThreshold)
-        screeningTPs <- screeningTPs[group %in% names(fg)]
-    }
+    precGroups <- linkPrecursorsToFGroups(pred, fGroupsPrec, adduct, mzWindow)
     
     gInfo <- groupInfo(fGroups)
     

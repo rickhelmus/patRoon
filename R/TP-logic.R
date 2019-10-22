@@ -44,9 +44,10 @@ setMethod("initialize", "TPPredictionsLogic",
 
 setMethod("linkPrecursorsToFGroups", "TPPredictionsLogic", function(pred, fGroups, adduct, mzWindow)
 {
+    susp <- suspects(pred)[name %in% names(fGroups)]
     # here we can just link directly (ie suspects are the groups)
-    return(data.table(name = suspects(pred)$name,
-                      group = suspects(pred)$name))
+    return(data.table(name = susp$name,
+                      group = susp$name))
 })
 
 #' @export

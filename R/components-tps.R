@@ -2,6 +2,7 @@
 #' @include components.R
 NULL
 
+#' @template components_noint
 #' @export
 componentsTPs <- setClass("componentsTPs", contains = "components")
 
@@ -96,6 +97,7 @@ generateComponentsTPs <- function(fGroups, pred, MSPeakLists, adduct, mzWindow =
         {
             # UNDONE: do more checks etc
             ret <- merge(scrTP, preds, by.x = "TP_name", by.y = "name")
+            ret[, intensity := 1]
             
             if (minRTDiff > 0)
             {

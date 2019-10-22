@@ -96,7 +96,14 @@ generateComponentsTPs <- function(fGroups, pred, MSPeakLists, adduct, mzWindow =
         comps <- rbindlist(lapply(split(scrP, by = "group"), function(scrRow)
         {
             # UNDONE: do more checks etc
+            
             ret <- merge(scrTP, preds, by.x = "TP_name", by.y = "name")
+            
+            # merge rows with duplicate fGroups, for instance, caused by different TPs with equal mass
+            ret[, TP_name := paste0(TP_name, collapse = ","), by = "group"]
+            ret <- unique(ret, by = "group")
+
+            # dummy intensity value so e.g. plotSpec works            
             ret[, intensity := 1]
             
             if (minRTDiff > 0)

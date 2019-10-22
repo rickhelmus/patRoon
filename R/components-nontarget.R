@@ -319,7 +319,8 @@ generateComponentsNontarget <- function(fGroups, ionization, rtRange = c(-120, 1
         }), fill = TRUE)
         setorderv(ret, c("hsnr"))
     })
-    names(comps) <- paste0("CMP", seq_along(comps))
+    cNames <- paste0("CMP", seq_along(comps))
+    names(comps) <- cNames
 
     cInfo <- copy(compTab)
     cInfo[, c("groups", "HS cluster") := NULL]
@@ -332,6 +333,10 @@ generateComponentsNontarget <- function(fGroups, ionization, rtRange = c(-120, 1
     # convert from fgroup lists to logical presence
     for (rg in presentRGroups)
         set(cInfo, j = rg, value = !sapply(cInfo[[rg]], is.null))
+    
+    # Convert numeric links to component names. This also keeps links alive
+    # after subsetting
+    cInfo[, links := lapply(links, function(l) cNames[l])]
 
     ret <- componentsNT(componentInfo = cInfo, components = comps)
     saveCacheData("componentsNontarget", ret, hash)

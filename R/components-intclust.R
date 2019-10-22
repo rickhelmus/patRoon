@@ -54,9 +54,8 @@ genIntComponentInfo <- function(cutClusters)
 #'
 #' @seealso \code{\link{components}} and \link{component-generation}
 #'
-#' @note The intensity values for components (used by \code{plotSpectrum}) are set
-#'   to a dummy value (1) as no single intensity value exists for this kind of
-#'   components.
+#' @template components_noint
+#' 
 #' @export
 componentsIntClust <- setClass("componentsIntClust",
                                slots = c(clusterm = "matrix", distm = "dissimilarity", clust = "hclust",

@@ -1,5 +1,6 @@
 #' @include main.R
 #' @include components.R
+#' @include utils-components.R
 NULL
 
 #' @template components_noint
@@ -9,6 +10,43 @@ componentsTPs <- setClass("componentsTPs", contains = "components")
 setMethod("initialize", "componentsTPs",
           function(.Object, ...) callNextMethod(.Object, ..., algorithm = "tp"))
 
+
+#' @describeIn componentsTPs Returns all component data in a table.
+#' @export
+setMethod("as.data.table", "componentsTPs", function(x)
+{
+    # as regular method, but get rid of double links column when merging
+    # components / componentInfo
+    
+    x@componentInfo <- x@componentInfo[, -"links"]
+    ret <- callNextMethod(x)
+    
+    return(ret)
+})
+
+#' @describeIn componentsTPs Plots an interactive network graph for linked
+#'   components. Components are linked when (partial) overlap occurs of their
+#'   containing transformation products. The graph is constructed with the
+#'   \pkg{\link{igraph}} package and rendered with \pkg{\link{visNetwork}}.
+#'
+#' @param obj The \code{componentsTPs} object to plot.
+#'
+#' @template plotGraph
+#'
+#' @export
+setMethod("plotGraph", "componentsTPs", function(obj, onlyLinked)
+{
+    checkmate::assertFlag(onlyLinked)
+    
+    cInfo <- componentInfo(obj)
+    cTable <- componentTable(obj)
+    
+    titles <- sprintf("<b>%s</b> (%s - %s)<br>TPs: <i>%s (%s)</i>",
+                      names(obj), cInfo$precursor_susp_name, cInfo$precursor_group,
+                      sapply(cTable, function(cmp) paste0(cmp$TP_name, collapse = ", ")),
+                      sapply(cTable, function(cmp) paste0(unique(cmp$group), collapse = ", ")))
+    makeGraph(obj, onlyLinked, titles)
+})
 
 #' @export
 generateComponentsTPs <- function(fGroups, pred, MSPeakLists, adduct, mzWindow = 0.005, rGroupsIn = NULL, rGroupsEff = NULL,
@@ -151,6 +189,7 @@ generateComponentsTPs <- function(fGroups, pred, MSPeakLists, adduct, mzWindow =
         
         compInfo <- unique(compTab[, c("name", "precursor_susp_name", "precursor_group")])
         compInfo[, size := sapply(compList, nrow)]
+        compInfo[, links := lapply(compList, function(cmp) unique(unlist(cmp$links)))] # overal links
         setcolorder(compInfo, "name")
         
         names(compList) <- compInfo$name
@@ -161,7 +200,7 @@ generateComponentsTPs <- function(fGroups, pred, MSPeakLists, adduct, mzWindow =
         compList <- list()
     }
     
-    ret <- componentsTPs(componentInfo = compInfo, components = compList)    
+    ret <- componentsTPs(componentInfo = compInfo[], components = compList)
     saveCacheData("componentsTPs", ret, hash)
     
     return(ret)

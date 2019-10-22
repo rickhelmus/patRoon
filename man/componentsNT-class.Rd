@@ -5,15 +5,14 @@
 \alias{componentsNT-class}
 \alias{componentsNT}
 \alias{plotGraph,componentsNT-method}
-\alias{plotGraph}
 \title{Components class for homologous series.}
 \usage{
 \S4method{plotGraph}{componentsNT}(obj, onlyLinked = TRUE)
 }
 \arguments{
-\item{obj}{The \code{componentsRC} object to plot.}
+\item{obj}{The \code{componentsNT} object to plot.}
 
-\item{onlyLinked}{If \code{TRUE} then only series with links are plotted.}
+\item{onlyLinked}{If \code{TRUE} then only components with links are plotted.}
 }
 \value{
 \code{plotGraph} returns the result of \code{\link{visNetwork}}.

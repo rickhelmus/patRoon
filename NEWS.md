@@ -1,5 +1,10 @@
 # patRoon 0.1.0.9000
 
+## October 2019
+
+* Fixed: `convertMSFiles` correctly checks if input exists
+
+
 ## September 2019
 
 * Labels for objects in a `featureGroupsComparison` can be labelled (useful for e.g. plotting)

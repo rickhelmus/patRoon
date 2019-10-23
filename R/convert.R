@@ -329,7 +329,7 @@ convertMSFiles <- function(files = NULL, outPath = NULL, dirs = TRUE,
 
     # NOTE: use normalizePath() here to convert to backslashes on Windows: needed by msconvert
     outPath <- normalizePath(rep(outPath, length.out = length(files)), mustWork = TRUE)
-    files <- normalizePath(files, mustWork = TRUE)
+    files <- normalizePath(files, mustWork = FALSE) # no mustWork, file existance will be checked later
 
     basef <- basename(tools::file_path_sans_ext(files))
     output <- normalizePath(file.path(outPath, paste0(basef, ".", to)),

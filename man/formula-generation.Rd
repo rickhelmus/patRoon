@@ -22,7 +22,7 @@ generateFormulasGenForm(fGroups, MSPeakLists, relMzDev = 5,
   adduct = "[M+H]+", elements = "CHNOP", hetero = TRUE, oc = FALSE,
   extraOpts = NULL, calculateFeatures = TRUE, featThreshold = 0.75,
   MSMode = "both", isolatePrec = TRUE, timeout = 120, topMost = 50,
-  maxProcAmount = getOption("patRoon.maxProcAmount"), batchSize = 25)
+  maxProcAmount = getOption("patRoon.maxProcAmount"), batchSize = 8)
 
 formulaScorings()
 
@@ -137,7 +137,7 @@ Usually a number close to the amount of physical cores yields most
 efficient results.}
 
 \item{batchSize}{Maximum number of \command{GenForm} commands that should be
-run sequentially in each parallel process Combining commands with short
+run sequentially in each parallel process. Combining commands with short
 runtimes (such as \command{GenForm}) can significantly increase parallel
 performance. For more information see \code{\link{executeMultiProcess}}.}
 

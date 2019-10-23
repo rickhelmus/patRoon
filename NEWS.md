@@ -3,7 +3,10 @@
 ## October 2019
 
 * Fixed: `convertMSFiles` correctly checks if input exists
-* `maxProcAmount` (i.e. number of parallel processes) now defaults to amount of physical cores instead of total number of CPU threads.
+* Specific optimizations after benchmarking results:
+    * `maxProcAmount` (i.e. number of parallel processes) now defaults to amount of physical cores instead of total number of CPU threads.
+    * Decreased `batchSize` to `8` for GenForm formula calculation.
+
 
 
 ## September 2019

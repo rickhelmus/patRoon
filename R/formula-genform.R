@@ -280,7 +280,7 @@ processGenFormResultFile <- function(file, isMSMS, adduct, topMost)
 #'   command is terminated. See the notes section for more information on the
 #'   need of timeouts.
 #' @param batchSize Maximum number of \command{GenForm} commands that should be
-#'   run sequentially in each parallel process Combining commands with short
+#'   run sequentially in each parallel process. Combining commands with short
 #'   runtimes (such as \command{GenForm}) can significantly increase parallel
 #'   performance. For more information see \code{\link{executeMultiProcess}}.
 #'
@@ -302,7 +302,7 @@ generateFormulasGenForm <- function(fGroups, MSPeakLists, relMzDev = 5, adduct =
                                     elements = "CHNOP", hetero = TRUE, oc = FALSE, extraOpts = NULL,
                                     calculateFeatures = TRUE, featThreshold = 0.75, MSMode = "both",
                                     isolatePrec = TRUE, timeout = 120, topMost = 50,
-                                    maxProcAmount = getOption("patRoon.maxProcAmount"), batchSize = 25)
+                                    maxProcAmount = getOption("patRoon.maxProcAmount"), batchSize = 8)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)

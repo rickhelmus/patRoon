@@ -71,7 +71,8 @@ NULL
 #'
 #'   \item \code{patRoon.maxProcAmount}: The maximum number of processes that
 #'   should be initiated in parallel. A good starting point is the number of
-#'   cores available. Default is set by \code{\link[parallel]{detectCores}}.
+#'   physical cores, which is the default as detected by
+#'   \code{\link[parallel]{detectCores}}.
 #'
 #'   \item \code{patRoon.path.pwiz}: The path in which the
 #'   \command{ProteoWizard} binaries are installed. If unset an attempt is made

@@ -6,8 +6,6 @@
     - Agilent .d is also a directory?
 - consistent src file names, split utils?
 - get RAMClustR from CRAN?
-- set max processes to threads-1? --> decide after bench
-- convertMSFiles: check if input exists
 
 
 ## docs

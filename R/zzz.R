@@ -2,7 +2,7 @@ defaultPkgOpts <- function(pkgname)
 {
     ret <- list(cache.mode = "both",
                 cache.fileName = "cache.sqlite",
-                maxProcAmount = parallel::detectCores(),
+                maxProcAmount = parallel::detectCores(logical = FALSE),
                 path.pwiz = "",
                 path.GenForm = "",
                 path.MetFragCL = getOption("patRoon.path.metFragCL", ""), # backwards compat

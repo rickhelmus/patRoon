@@ -273,7 +273,7 @@ clearCache("all") # same as simply removing the file
 
 `patRoon` relies on several external (command-line) utilities to generate workflow data such as `MetFrag CL`, `OpenMS` and `SIRIUS`. When these tools are used for obtaining results for a large number of features it may take a long time before processing is finished. In order to speed this up these commands are executed in _parallel_. Running several commands simultenously is especially advantageous on multi core CPUs.
 
-The number of commands to run in parallel is by default equal to the number of available cores/threads.
+The number of commands to run in parallel is by default equal to the number of physical cores.
 You may want to change this amount, for instance, when you don't want to dedicate all of your computers resources to `patRoon`. This can either be done by changing a global package option, which affects all operations, or when executing a single workflow step.
 
 ```{r par,eval=FALSE}

@@ -3,6 +3,7 @@
 ## October 2019
 
 * Fixed: `convertMSFiles` correctly checks if input exists
+* `maxProcAmount` (i.e. number of parallel processes) now defaults to amount of physical cores instead of total number of CPU threads.
 
 
 ## September 2019

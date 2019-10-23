@@ -14,8 +14,6 @@ setGeneric("removeEmptyAnalyses", function(fGroups) standardGeneric("removeEmpty
 setGeneric("averageGroups", function(fGroups, areas = FALSE) standardGeneric("averageGroups"))
 setGeneric("updateFeatIndex", function(fGroups) standardGeneric("updateFeatIndex"))
 setGeneric("export", function(fGroups, type, out) standardGeneric("export"))
-setGeneric("plotUnique", function(obj, which = NULL, plotOverlapping = TRUE,
-                                  retMin = FALSE, showLegend = TRUE, ...) standardGeneric("plotUnique"))
 setGeneric("unique", function(x, incomparables = FALSE, ...) standardGeneric("unique"))
 setGeneric("overlap", function(fGroups, which, exclusive = FALSE) standardGeneric("overlap"))
 setGeneric("comparison", function(..., groupAlgo,

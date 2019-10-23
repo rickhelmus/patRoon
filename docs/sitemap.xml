@@ -40,6 +40,9 @@
     <loc>https://rickhelmus.github.io/patRoon/reference/componentsIntClust-class.html</loc>
   </url>
   <url>
+    <loc>https://rickhelmus.github.io/patRoon/reference/componentsNT-class.html</loc>
+  </url>
+  <url>
     <loc>https://rickhelmus.github.io/patRoon/reference/compound-generation.html</loc>
   </url>
   <url>
@@ -103,13 +106,16 @@
     <loc>https://rickhelmus.github.io/patRoon/reference/optimizationResult-class.html</loc>
   </url>
   <url>
+    <loc>https://rickhelmus.github.io/patRoon/reference/patRoon-deprecated.html</loc>
+  </url>
+  <url>
     <loc>https://rickhelmus.github.io/patRoon/reference/patRoon-package.html</loc>
   </url>
   <url>
     <loc>https://rickhelmus.github.io/patRoon/reference/reporting.html</loc>
   </url>
   <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/target-screening.html</loc>
+    <loc>https://rickhelmus.github.io/patRoon/reference/suspect-screening.html</loc>
   </url>
   <url>
     <loc>https://rickhelmus.github.io/patRoon/reference/verifyDependencies.html</loc>

@@ -8,21 +8,25 @@
 
 <title>Class containing MS Peak Lists — MSPeakLists-class • patRoon</title>
 
+
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
 
-<!-- sticky kit -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script>
+<!-- headroom.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -30,11 +34,12 @@
 
 
 
-<meta property="og:title" content="Class containing MS Peak Lists — MSPeakLists-class" />
 
+<meta property="og:title" content="Class containing MS Peak Lists — MSPeakLists-class" />
 <meta property="og:description" content="Contains all MS (and MS/MS where available) peak lists for a
 featureGroups object." />
 <meta name="twitter:card" content="summary" />
+
 
 
 
@@ -46,6 +51,7 @@ featureGroups object." />
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
+
 
 
   </head>
@@ -101,7 +107,6 @@ featureGroups object." />
   <a href="../news/index.html">Changelog</a>
 </li>
       </ul>
-      
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/rickhelmus/patRoon">
@@ -116,6 +121,7 @@ featureGroups object." />
 </div><!--/.navbar -->
 
       
+
       </header>
 
 <div class="row">
@@ -127,10 +133,8 @@ featureGroups object." />
     </div>
 
     <div class="ref-description">
-    
     <p>Contains all MS (and MS/MS where available) peak lists for a
 <code><a href='featureGroups-class.html'>featureGroups</a></code> object.</p>
-    
     </div>
 
     <pre class="usage"># S4 method for MSPeakLists
@@ -178,7 +182,7 @@ plotSpec(obj, groupName, analysis = NULL,
   ylim = NULL, ...)
 
 getDefIsolatePrecParams(...)</pre>
-    
+
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
@@ -193,8 +197,8 @@ their index or name, respectively (for the order/names see <code>analyses()/grou
 (similar to regular vectors). If missing all analyses/feature groups are selected.<br /><br /> For <code>[[</code>: should be a scalar value. If <code>j</code> is not specified, <code>i</code> selects by feature groups instead.</p></td>
     </tr>
     <tr>
-      <th>&#8230;</th>
-      <td><p>Further arguments passed to <code><a href='https://www.rdocumentation.org/packages/graphics/topics/plot'>plot</a></code>.</p></td>
+      <th>...</th>
+      <td><p>Further arguments passed to <code><a href='https://rdrr.io/r/graphics/plot.html'>plot</a></code>.</p></td>
     </tr>
     <tr>
       <th>reAverage</th>
@@ -291,10 +295,10 @@ faster.</p></td>
     <tr>
       <th>xlim, ylim</th>
       <td><p>Sets the plot size limits used by
-<code><a href='https://www.rdocumentation.org/packages/graphics/topics/plot'>plot</a></code>. Set to <code>NULL</code> for automatic plot sizing.</p></td>
+<code><a href='https://rdrr.io/r/graphics/plot.html'>plot</a></code>. Set to <code>NULL</code> for automatic plot sizing.</p></td>
     </tr>
     </table>
-    
+
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p><code>peakLists</code> returns a nested list containing MS (and MS/MS where
@@ -311,17 +315,16 @@ faster.</p></td>
   averaged peak lists in a similar format as <code>peakLists</code>.</p>
 <p><code>plotSpec</code> will return a <code>ggplot object</code>
   if <code>useGGPlot2</code> is <code>TRUE</code>.</p>
-    
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>Objects for this class are returned by <a href='MSPeakLists-generation.html'>MS peak
 lists generators</a>.</p>
 <p>The <code>getDefIsolatePrecParams</code> is used to create a parameter
   list for isolating the precursor and its isotopes (see <code>Isolating precursor data</code>).</p>
-    
     <h2 class="hasAnchor" id="methods-by-generic-"><a class="anchor" href="#methods-by-generic-"></a>Methods (by generic)</h2>
 
-    <ul>
+    
+<ul>
 <li><p><code>peakLists</code>: Accessor method to obtain the MS peak lists.</p></li>
 <li><p><code>averagedPeakLists</code>: Accessor method to obtain the feature group averaged
 MS peak lists.</p></li>
@@ -345,21 +348,24 @@ processes.</p></li>
 <li><p><code>plotSpec</code>: Plots a spectrum using MS or MS/MS peak lists for a
 given feature group.</p></li>
 </ul>
-    
     <h2 class="hasAnchor" id="slots"><a class="anchor" href="#slots"></a>Slots</h2>
 
     
-    <dl class='dl-horizontal'>
+
+<dl class='dl-horizontal'>
 <dt><code>peakLists</code></dt><dd><p>Contains a list of all MS (and MS/MS) peak lists. Use the
 <code>peakLists</code> method for access.</p></dd>
-    <dt><code>metadata</code></dt><dd><p>Metadata for all spectra used to generate peak lists. Follows
+
+<dt><code>metadata</code></dt><dd><p>Metadata for all spectra used to generate peak lists. Follows
 the format of the <code>peakLists</code> slot.</p></dd>
-    <dt><code>averagedPeakLists</code></dt><dd><p>A <code>list</code> with averaged MS (and MS/MS) peak lists
+
+<dt><code>averagedPeakLists</code></dt><dd><p>A <code>list</code> with averaged MS (and MS/MS) peak lists
 for each feature group.</p></dd>
-    <dt><code>avgPeakListArgs</code></dt><dd><p>A <code>list</code> with arguments used to generate feature
+
+<dt><code>avgPeakListArgs</code></dt><dd><p>A <code>list</code> with arguments used to generate feature
 group averaged MS(/MS) peak lists.</p></dd>
+
 </dl>
-    
     <h2 class="hasAnchor" id="isolating-precursor-data"><a class="anchor" href="#isolating-precursor-data"></a>Isolating precursor data</h2>
 
     <p>Formula calculation typically relies on
@@ -387,7 +393,7 @@ group averaged MS(/MS) peak lists.</p></dd>
   search range is doubled for <code>M+2</code>, tripled for <code>M+3</code> etc.</p></li>
 <li><p><code>intRange</code> A two-sized <code>vector</code> specifying the minimum and
   maximum relative intensity range compared to the precursor. For instance,
-  <code><a href='https://www.rdocumentation.org/packages/base/topics/c'>c(0.001, 2)</a></code> removes all peaks that have an intensity below 0.1% are
+  <code><a href='https://rdrr.io/r/base/c.html'>c(0.001, 2)</a></code> removes all peaks that have an intensity below 0.1% are
   above 200% of that of the precursor.</p></li>
 <li><p><code>z</code> The <code>z</code> value (<em>i.e.</em> absolute charge) to be
   considerd. For instance, a value of <code>2</code> would look for <code>M+0.5</code>,
@@ -398,11 +404,11 @@ group averaged MS(/MS) peak lists.</p></dd>
   exceeds this value then this and all next peaks will be removed. Similar to
   <code>z</code>, the maximum gap is automatically adjusted for <code>charge</code>.</p></li>
 </ul>
-    <p>These parameters should be in a <code>list</code> that is passed to the
+
+<p>These parameters should be in a <code>list</code> that is passed to the
   <code>isolatePrec</code> argument to <code>filter</code>. The default values can be
   obtained with the <code>getDefIsolatePrecParams</code> function:</p>
 <p><code>maxIsotopes=5</code>; <code>mzDefectRange=c(-0.01, 0.01)</code>; <code>intRange=c(0.001, 2)</code>; <code>z=1</code>; <code>maxGap=2</code></p>
-    
     <h2 class="hasAnchor" id="s-class-hierarchy"><a class="anchor" href="#s-class-hierarchy"></a>S4 class hierarchy</h2>
 
     <p></p><ul>
@@ -410,29 +416,24 @@ group averaged MS(/MS) peak lists.</p></dd>
 <li><p><strong><code>MSPeakLists</code></strong></p></li>
 </ul></li>
 </ul>
-    
+
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
-      
       <li><a href="#value">Value</a></li>
-
       <li><a href="#details">Details</a></li>
-
       <li><a href="#methods-by-generic-">Methods (by generic)</a></li>
-
       <li><a href="#slots">Slots</a></li>
-
       <li><a href="#isolating-precursor-data">Isolating precursor data</a></li>
-
       <li><a href="#s-class-hierarchy">S4 class hierarchy</a></li>
-          </ul>
+    </ul>
 
   </div>
 </div>
+
 
       <footer>
       <div class="copyright">
@@ -440,13 +441,16 @@ group averaged MS(/MS) peak lists.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.3.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
 </div>
+
       </footer>
    </div>
 
   
 
+
   </body>
 </html>
+
 

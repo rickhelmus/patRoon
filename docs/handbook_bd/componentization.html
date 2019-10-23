@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>4.4 Componentization | patRoon handbook</title>
   <meta name="description" content="4.4 Componentization | patRoon handbook" />
-  <meta name="generator" content="bookdown 0.10.2 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.13 and GitBook 2.6.7" />
 
   <meta property="og:title" content="4.4 Componentization | patRoon handbook" />
   <meta property="og:type" content="book" />
@@ -24,15 +24,15 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2019-05-18" />
+<meta name="date" content="2019-10-12" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="annotation.html">
-<link rel="next" href="processing-workflow-data.html">
+<link rel="prev" href="annotation.html"/>
+<link rel="next" href="processing-workflow-data.html"/>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -65,7 +65,6 @@ a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
 a.sourceLine:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode { white-space: pre; position: relative; }
-div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
@@ -316,25 +315,25 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </table>
 <p>Note that both algorithms were primarily designed for datasets where features are generally present in the majority of the analyses (as is relatively common in metabolomics). For environmental analyses, however, this is often not the case. As a result, it may happen that not all features from the feature groups within a component share their presence in the same analyses. In reality, this situation would be fairly unusual, and it is likely that such features actually do not belong to the same component. An extra filter option was added to improve such scenarios: after componentization all features are checked to have a minimal presence across all analyses within the component. This is configured by the <code>relMinReplicates</code> argument of <code>generateComponents()</code>, which specifies the relative number of replicate groups in which a feature should be present. For instance, when this value is <em>0.5</em> (the default), a feature must be present in at least half of all replicate groups present in the component.</p>
 <p>Some example usage is shown below.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Use CAMERA with defaults</span>
-componCAM &lt;-<span class="st"> </span><span class="kw">generateComponents</span>(fGroups, <span class="st">&quot;camera&quot;</span>, <span class="dt">ionization =</span> <span class="st">&quot;positive&quot;</span>)
-
-<span class="co"># CAMERA with customized settings</span>
-componCAM2 &lt;-<span class="st"> </span><span class="kw">generateComponents</span>(fGroups, <span class="st">&quot;camera&quot;</span>, <span class="dt">ionization =</span> <span class="st">&quot;positive&quot;</span>,
-                                 <span class="dt">extraOpts =</span> <span class="kw">list</span>(<span class="dt">mzabs =</span> <span class="fl">0.001</span>, <span class="dt">sigma =</span> <span class="dv">5</span>))
-
-<span class="co"># Use RAMClustR with customized parameters</span>
-componRC &lt;-<span class="st"> </span><span class="kw">generateComponents</span>(fGroups, <span class="st">&quot;ramclustr&quot;</span>, <span class="dt">ionization =</span> <span class="st">&quot;positive&quot;</span>, <span class="dt">hmax =</span> <span class="fl">0.4</span>,
-                               <span class="dt">extraOptsRC =</span> <span class="kw">list</span>(<span class="dt">cor.method =</span> <span class="st">&quot;spearman&quot;</span>),
-                               <span class="dt">extraOptsFM =</span> <span class="kw">list</span>(<span class="dt">ppm.error =</span> <span class="dv">5</span>))</code></pre>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" data-line-number="1"><span class="co"># Use CAMERA with defaults</span></a>
+<a class="sourceLine" id="cb20-2" data-line-number="2">componCAM &lt;-<span class="st"> </span><span class="kw">generateComponents</span>(fGroups, <span class="st">&quot;camera&quot;</span>, <span class="dt">ionization =</span> <span class="st">&quot;positive&quot;</span>)</a>
+<a class="sourceLine" id="cb20-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb20-4" data-line-number="4"><span class="co"># CAMERA with customized settings</span></a>
+<a class="sourceLine" id="cb20-5" data-line-number="5">componCAM2 &lt;-<span class="st"> </span><span class="kw">generateComponents</span>(fGroups, <span class="st">&quot;camera&quot;</span>, <span class="dt">ionization =</span> <span class="st">&quot;positive&quot;</span>,</a>
+<a class="sourceLine" id="cb20-6" data-line-number="6">                                 <span class="dt">extraOpts =</span> <span class="kw">list</span>(<span class="dt">mzabs =</span> <span class="fl">0.001</span>, <span class="dt">sigma =</span> <span class="dv">5</span>))</a>
+<a class="sourceLine" id="cb20-7" data-line-number="7"></a>
+<a class="sourceLine" id="cb20-8" data-line-number="8"><span class="co"># Use RAMClustR with customized parameters</span></a>
+<a class="sourceLine" id="cb20-9" data-line-number="9">componRC &lt;-<span class="st"> </span><span class="kw">generateComponents</span>(fGroups, <span class="st">&quot;ramclustr&quot;</span>, <span class="dt">ionization =</span> <span class="st">&quot;positive&quot;</span>, <span class="dt">hmax =</span> <span class="fl">0.4</span>,</a>
+<a class="sourceLine" id="cb20-10" data-line-number="10">                               <span class="dt">extraOptsRC =</span> <span class="kw">list</span>(<span class="dt">cor.method =</span> <span class="st">&quot;spearman&quot;</span>),</a>
+<a class="sourceLine" id="cb20-11" data-line-number="11">                               <span class="dt">extraOptsFM =</span> <span class="kw">list</span>(<span class="dt">ppm.error =</span> <span class="dv">5</span>))</a></code></pre></div>
 </div>
 <div id="homologues-series" class="section level3">
 <h3><span class="header-section-number">4.4.2</span> Homologues series</h3>
 <!-- UNDONE: view links? -->
 <p>Homologues series can be automatically detected by interfacing with the <a href="https://cran.r-project.org/web/packages/nontarget/index.html">nontarget</a> R package. Components are made from feature groups that show increasing <em>m/z</em> and retention time values. Series are first detected within each replicate group. Afterwards, series from all replicates are linked in case (partial) overlap occurs and this overlap consists of the <em>same</em> feature groups (see figure below). Linked series are then finally merged if this will not cause any conflicts with other series: such a conflict typically occurs when two series are not only linked to each other.</p>
 <div class="figure"><span id="fig:HS"></span>
-<div id="htmlwidget-c7a7a92a03fba5aa1626" style="width:600px;height:250px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-c7a7a92a03fba5aa1626">{"x":{"diagram":"\ndigraph Homologs {\n  graph [ rankdir = LR, compound = true, style = invis ]\n  node [ shape = oval,\n         fixedsize = true,\n         width = 2.3,\n         height = 0.8,\n         fontsize = 25,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n  subgraph cluster3 {\n    I [fillcolor=skyblue]; J [fillcolor=skyblue]; K [fillcolor=skyblue]\n    G -> H -> I -> J -> K [style=invis]\n  }\n\n  subgraph cluster4 {\n    _I [label=I, fillcolor=skyblue]; X [fillcolor=indianred1]; _K [label=K, fillcolor=skyblue]\n    _I -> X -> _K -> L [style=invis]\n  }\n\n  H -> _I [ltail=cluster3, lhead=cluster4, style=invis]\n  \n  I -> _I [constraint=false, style=dashed, arrowhead=none]\n  K -> _K [constraint=false, style=dashed, arrowhead=none]\n  \n  subgraph cluster1 {\n    C [fillcolor=skyblue]; D [fillcolor=skyblue]\n    A -> B -> C -> D [style=invis]\n  }\n\n  subgraph cluster2 {\n    _C [label=C, fillcolor=skyblue]; _D [label=D, fillcolor=skyblue]\n    _C -> _D -> E -> F [style=invis]\n  }\n  \n  B -> _C [ltail=cluster1, lhead=cluster2, style=invis]\n\n  C -> _C [constraint=false, style=dashed, arrowhead=none]\n  D -> _D [constraint=false, style=dashed, arrowhead=none]\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-d8e32d77c92468c65d27" style="width:600px;height:250px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-d8e32d77c92468c65d27">{"x":{"diagram":"\ndigraph Homologs {\n  graph [ rankdir = LR, compound = true, style = invis ]\n  node [ shape = oval,\n         fixedsize = true,\n         width = 2.3,\n         height = 0.8,\n         fontsize = 25,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n  subgraph cluster3 {\n    I [fillcolor=skyblue]; J [fillcolor=skyblue]; K [fillcolor=skyblue]\n    G -> H -> I -> J -> K [style=invis]\n  }\n\n  subgraph cluster4 {\n    _I [label=I, fillcolor=skyblue]; X [fillcolor=indianred1]; _K [label=K, fillcolor=skyblue]\n    _I -> X -> _K -> L [style=invis]\n  }\n\n  H -> _I [ltail=cluster3, lhead=cluster4, style=invis]\n  \n  I -> _I [constraint=false, style=dashed, arrowhead=none]\n  K -> _K [constraint=false, style=dashed, arrowhead=none]\n  \n  subgraph cluster1 {\n    C [fillcolor=skyblue]; D [fillcolor=skyblue]\n    A -> B -> C -> D [style=invis]\n  }\n\n  subgraph cluster2 {\n    _C [label=C, fillcolor=skyblue]; _D [label=D, fillcolor=skyblue]\n    _C -> _D -> E -> F [style=invis]\n  }\n  \n  B -> _C [ltail=cluster1, lhead=cluster2, style=invis]\n\n  C -> _C [constraint=false, style=dashed, arrowhead=none]\n  D -> _D [constraint=false, style=dashed, arrowhead=none]\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 <p class="caption">
 Figure 4.1: <strong>Linking of homologues series</strong> top: partial overlap and will be linked; bottom: no linkage due to different feature in overlapping series.
 </p>
@@ -374,12 +373,12 @@ Figure 4.1: <strong>Linking of homologues series</strong> top: partial overlap a
 </tr>
 </tbody>
 </table>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># default settings</span>
-componNT &lt;-<span class="st"> </span><span class="kw">generateComponents</span>(fGroups, <span class="st">&quot;nontarget&quot;</span>, <span class="dt">ionization =</span> <span class="st">&quot;positive&quot;</span>)
-
-<span class="co"># customized settings</span>
-componNT2 &lt;-<span class="st"> </span><span class="kw">generateComponents</span>(fGroups, <span class="st">&quot;nontarget&quot;</span>, <span class="dt">ionization =</span> <span class="st">&quot;positive&quot;</span>,
-                                <span class="dt">elements =</span> <span class="kw">c</span>(<span class="st">&quot;C&quot;</span>, <span class="st">&quot;H&quot;</span>), <span class="dt">rtRange =</span> <span class="kw">c</span>(<span class="op">-</span><span class="dv">60</span>, <span class="dv">60</span>))</code></pre>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" data-line-number="1"><span class="co"># default settings</span></a>
+<a class="sourceLine" id="cb21-2" data-line-number="2">componNT &lt;-<span class="st"> </span><span class="kw">generateComponents</span>(fGroups, <span class="st">&quot;nontarget&quot;</span>, <span class="dt">ionization =</span> <span class="st">&quot;positive&quot;</span>)</a>
+<a class="sourceLine" id="cb21-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb21-4" data-line-number="4"><span class="co"># customized settings</span></a>
+<a class="sourceLine" id="cb21-5" data-line-number="5">componNT2 &lt;-<span class="st"> </span><span class="kw">generateComponents</span>(fGroups, <span class="st">&quot;nontarget&quot;</span>, <span class="dt">ionization =</span> <span class="st">&quot;positive&quot;</span>,</a>
+<a class="sourceLine" id="cb21-6" data-line-number="6">                                <span class="dt">elements =</span> <span class="kw">c</span>(<span class="st">&quot;C&quot;</span>, <span class="st">&quot;H&quot;</span>), <span class="dt">rtRange =</span> <span class="kw">c</span>(<span class="op">-</span><span class="dv">60</span>, <span class="dv">60</span>))</a></code></pre></div>
 </div>
 <div id="intclust" class="section level3">
 <h3><span class="header-section-number">4.4.3</span> Intensity clustering</h3>
@@ -428,14 +427,14 @@ componNT2 &lt;-<span class="st"> </span><span class="kw">generateComponents</spa
 </tbody>
 </table>
 <p>The resulting components are stored in an object from the <code>componentsIntClust</code> S4 class. Several methods are defined that can be used on such objects to re-assign clusters, perform plotting operations and so on. Below are some examples. For plotting see the relevant <a href="visualization.html#plotClust">visualization section</a>. More info can be found in the reference manual (e.g. <code>?componentsIntClust</code>).</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># generate components with default settings</span>
-componInt &lt;-<span class="st"> </span><span class="kw">generateComponents</span>(fGroups, <span class="st">&quot;intclust&quot;</span>)
-
-<span class="co"># manually re-assign clusters</span>
-componInt &lt;-<span class="st"> </span><span class="kw">treeCut</span>(componInt, <span class="dt">k =</span> <span class="dv">10</span>)
-
-<span class="co"># automatic re-assignment of clusters (adjusted max tree height)</span>
-componInt &lt;-<span class="st"> </span><span class="kw">treeCutDynamic</span>(componInt, <span class="dt">maxTreeHeight =</span> <span class="fl">0.7</span>)</code></pre>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" data-line-number="1"><span class="co"># generate components with default settings</span></a>
+<a class="sourceLine" id="cb22-2" data-line-number="2">componInt &lt;-<span class="st"> </span><span class="kw">generateComponents</span>(fGroups, <span class="st">&quot;intclust&quot;</span>)</a>
+<a class="sourceLine" id="cb22-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb22-4" data-line-number="4"><span class="co"># manually re-assign clusters</span></a>
+<a class="sourceLine" id="cb22-5" data-line-number="5">componInt &lt;-<span class="st"> </span><span class="kw">treeCut</span>(componInt, <span class="dt">k =</span> <span class="dv">10</span>)</a>
+<a class="sourceLine" id="cb22-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb22-7" data-line-number="7"><span class="co"># automatic re-assignment of clusters (adjusted max tree height)</span></a>
+<a class="sourceLine" id="cb22-8" data-line-number="8">componInt &lt;-<span class="st"> </span><span class="kw">treeCutDynamic</span>(componInt, <span class="dt">maxTreeHeight =</span> <span class="fl">0.7</span>)</a></code></pre></div>
 
 </div>
 </div>

@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>2.2 Manual installation | patRoon handbook</title>
   <meta name="description" content="2.2 Manual installation | patRoon handbook" />
-  <meta name="generator" content="bookdown 0.10.2 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.13 and GitBook 2.6.7" />
 
   <meta property="og:title" content="2.2 Manual installation | patRoon handbook" />
   <meta property="og:type" content="book" />
@@ -24,15 +24,15 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2019-05-18" />
+<meta name="date" content="2019-10-12" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="automatic-installation-windows-only.html">
-<link rel="next" href="workflow-concepts.html">
+<link rel="prev" href="automatic-installation-windows-only.html"/>
+<link rel="next" href="workflow-concepts.html"/>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -65,7 +65,6 @@ a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
 a.sourceLine:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode { white-space: pre; position: relative; }
-div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
@@ -228,17 +227,17 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h3><span class="header-section-number">2.2.1</span> R prerequisites</h3>
 <p>When installing <code>patRoon</code> Windows users have the option to install from a customized (<a href="https://github.com/andrie/miniCRAN">miniCRAN</a>) repository (<code>patRoonDeps</code>). This repository provides a central repository for <code>patRoon</code> and all its R packages. An advantage is that installation will be faster and you will not need to install <a href="https://cran.r-project.org/bin/windows/Rtools/">Rtools</a>. Note that you will need to have the latest <code>R</code> version installed in order to use this repository.</p>
 <p>When you decide to use the <code>patRoonDeps</code> repository you can simply <em>skip</em> this step. <strong>Otherwise</strong> (i.e. you will use regular repositories instead), execute the following:</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">install.packages</span>(<span class="kw">c</span>(<span class="st">&quot;BiocManager&quot;</span>, <span class="st">&quot;remotes&quot;</span>))
-BiocManager<span class="op">::</span><span class="kw">install</span>(<span class="st">&quot;CAMERA&quot;</span>)
-
-<span class="co"># only needed for Bruker DataAnalysis integration</span>
-<span class="kw">install.packages</span>(<span class="st">&quot;RDCOMClient&quot;</span>, <span class="dt">repos =</span> <span class="st">&quot;http://www.omegahat.net/R&quot;</span>)
-
-<span class="co"># only needed for RAMClustR integration</span>
-remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;cbroeckl/RAMClustR&quot;</span>)
-
-<span class="co"># only when using the R interface (not recommended by default)</span>
-remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;c-ruttkies/MetFragR/metfRag&quot;</span>)</code></pre>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw">install.packages</span>(<span class="kw">c</span>(<span class="st">&quot;BiocManager&quot;</span>, <span class="st">&quot;remotes&quot;</span>))</a>
+<a class="sourceLine" id="cb2-2" data-line-number="2">BiocManager<span class="op">::</span><span class="kw">install</span>(<span class="st">&quot;CAMERA&quot;</span>)</a>
+<a class="sourceLine" id="cb2-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb2-4" data-line-number="4"><span class="co"># only needed for Bruker DataAnalysis integration</span></a>
+<a class="sourceLine" id="cb2-5" data-line-number="5"><span class="kw">install.packages</span>(<span class="st">&quot;RDCOMClient&quot;</span>, <span class="dt">repos =</span> <span class="st">&quot;http://www.omegahat.net/R&quot;</span>)</a>
+<a class="sourceLine" id="cb2-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb2-7" data-line-number="7"><span class="co"># only needed for RAMClustR integration</span></a>
+<a class="sourceLine" id="cb2-8" data-line-number="8">remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;cbroeckl/RAMClustR&quot;</span>)</a>
+<a class="sourceLine" id="cb2-9" data-line-number="9"></a>
+<a class="sourceLine" id="cb2-10" data-line-number="10"><span class="co"># only when using the R interface (not recommended by default)</span></a>
+<a class="sourceLine" id="cb2-11" data-line-number="11">remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;c-ruttkies/MetFragR/metfRag&quot;</span>)</a></code></pre></div>
 <p>Note that the latter three commands concern installation of <em>optional</em> packages. If you are unsure, you probably want to install RAMClustR but not any of the others.</p>
 </div>
 <div id="other-dependencies" class="section level3">
@@ -291,29 +290,29 @@ remotes<span class="op">::</span><span class="kw">install_github</span>(<span cl
 </tbody>
 </table>
 <p>After installation you may need to configure the file path to ProteoWizard, OpenMS, SIRIUS, MetFrag, the MetFrag CompTox DB and/or pngquant (normally ProteoWizard and OpenMS should be automatically found). To configure their file locations you should set some global package options with the <code>option()</code> R function, for instance:</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">options</span>(<span class="dt">patRoon.path.pwiz =</span> <span class="st">&quot;C:/ProteoWizard&quot;</span>) <span class="co"># location of ProteoWizard installation folder</span>
-<span class="kw">options</span>(<span class="dt">patRoon.path.SIRIUS =</span> <span class="st">&quot;C:/sirius-win64-3.5.1&quot;</span>) <span class="co"># location where SIRIUS was extracted</span>
-<span class="kw">options</span>(<span class="dt">patRoon.path.OpenMS =</span> <span class="st">&quot;/usr/local/bin&quot;</span>) <span class="co"># directory with the OpenMS binaries</span>
-<span class="kw">options</span>(<span class="dt">patRoon.path.pngquant =</span> <span class="st">&quot;~/pngquant&quot;</span>) <span class="co"># directory containing pngquant binary</span>
-<span class="kw">options</span>(<span class="dt">patRoon.path.MetFragCL =</span> <span class="st">&quot;~/MetFrag2.4.5-CL.jar&quot;</span>) <span class="co"># full location to the jar file</span>
-<span class="kw">options</span>(<span class="dt">patRoon.path.MetFragCompTox =</span> <span class="st">&quot;C:/DSSTox_01May18_Full_SelectMetaDataPlus.csv&quot;</span>) <span class="co"># full location to desired CompTox CSV file</span></code></pre>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="kw">options</span>(<span class="dt">patRoon.path.pwiz =</span> <span class="st">&quot;C:/ProteoWizard&quot;</span>) <span class="co"># location of ProteoWizard installation folder</span></a>
+<a class="sourceLine" id="cb3-2" data-line-number="2"><span class="kw">options</span>(<span class="dt">patRoon.path.SIRIUS =</span> <span class="st">&quot;C:/sirius-win64-3.5.1&quot;</span>) <span class="co"># location where SIRIUS was extracted</span></a>
+<a class="sourceLine" id="cb3-3" data-line-number="3"><span class="kw">options</span>(<span class="dt">patRoon.path.OpenMS =</span> <span class="st">&quot;/usr/local/bin&quot;</span>) <span class="co"># directory with the OpenMS binaries</span></a>
+<a class="sourceLine" id="cb3-4" data-line-number="4"><span class="kw">options</span>(<span class="dt">patRoon.path.pngquant =</span> <span class="st">&quot;~/pngquant&quot;</span>) <span class="co"># directory containing pngquant binary</span></a>
+<a class="sourceLine" id="cb3-5" data-line-number="5"><span class="kw">options</span>(<span class="dt">patRoon.path.MetFragCL =</span> <span class="st">&quot;~/MetFrag2.4.5-CL.jar&quot;</span>) <span class="co"># full location to the jar file</span></a>
+<a class="sourceLine" id="cb3-6" data-line-number="6"><span class="kw">options</span>(<span class="dt">patRoon.path.MetFragCompTox =</span> <span class="st">&quot;C:/DSSTox_01May18_Full_SelectMetaDataPlus.csv&quot;</span>) <span class="co"># full location to desired CompTox CSV file</span></a></code></pre></div>
 <p>These commands have to be executed everytime you start a new R session (e.g. as part of your script). However, it is probably easier to add them to your <code>~/.Rprofile</code> file so that they are executed automatically when you start R. If you don’t have this file yet you can simply create it yourself (for more information see e.g. <a href="https://stackoverflow.com/a/46819910">this SO answer</a>).</p>
 </div>
 <div id="patroon-installation" class="section level3">
 <h3><span class="header-section-number">2.2.3</span> patRoon installation</h3>
 <p>Finally, it is time to install <code>patRoon</code> itself. As mentioned before, Windows users (who have the latest <code>R</code> version) can install <code>patRoon</code> and all its package dependencies from the <code>patRoonDeps</code> repository:</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># install from patRoonDeps (only Windows with latest R version)</span>
-<span class="kw">install.packages</span>(<span class="st">&quot;patRoon&quot;</span>, <span class="dt">repos =</span> <span class="st">&quot;https://rickhelmus.github.io/patRoonDeps/&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;binary&quot;</span>)
-
-<span class="co"># optional, data for tutorial</span>
-<span class="kw">install.packages</span>(<span class="st">&quot;patRoonData&quot;</span>, <span class="dt">repos =</span> <span class="st">&quot;https://rickhelmus.github.io/patRoonDeps/&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;binary&quot;</span>)</code></pre>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="co"># install from patRoonDeps (only Windows with latest R version)</span></a>
+<a class="sourceLine" id="cb4-2" data-line-number="2"><span class="kw">install.packages</span>(<span class="st">&quot;patRoon&quot;</span>, <span class="dt">repos =</span> <span class="st">&quot;https://rickhelmus.github.io/patRoonDeps/&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;binary&quot;</span>)</a>
+<a class="sourceLine" id="cb4-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb4-4" data-line-number="4"><span class="co"># optional, data for tutorial</span></a>
+<a class="sourceLine" id="cb4-5" data-line-number="5"><span class="kw">install.packages</span>(<span class="st">&quot;patRoonData&quot;</span>, <span class="dt">repos =</span> <span class="st">&quot;https://rickhelmus.github.io/patRoonDeps/&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;binary&quot;</span>)</a></code></pre></div>
 <p><strong>Otherwise</strong>, installation occurs directly from GitHub:</p>
-<pre class="sourceCode r"><code class="sourceCode r">remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;rickhelmus/patRoon&quot;</span>)
-
-<span class="co"># optional, data for tutorial</span>
-remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;rickhelmus/patRoonData&quot;</span>) <span class="co"># example data used by tutorial</span></code></pre>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;rickhelmus/patRoon&quot;</span>)</a>
+<a class="sourceLine" id="cb5-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb5-3" data-line-number="3"><span class="co"># optional, data for tutorial</span></a>
+<a class="sourceLine" id="cb5-4" data-line-number="4">remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;rickhelmus/patRoonData&quot;</span>) <span class="co"># example data used by tutorial</span></a></code></pre></div>
 <p>Afterwards, you can run the <code>verifyDependencies()</code> function to see if <code>patRoon</code> can find all its dependencies (you may need to restart R beforehand)</p>
-<pre class="sourceCode r"><code class="sourceCode r">patRoon<span class="op">::</span><span class="kw">verifyDependencies</span>()</code></pre>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1">patRoon<span class="op">::</span><span class="kw">verifyDependencies</span>()</a></code></pre></div>
 
 </div>
 </div>

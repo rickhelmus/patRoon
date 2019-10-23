@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>4 Generating workflow data | patRoon handbook</title>
   <meta name="description" content="4 Generating workflow data | patRoon handbook" />
-  <meta name="generator" content="bookdown 0.10.2 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.13 and GitBook 2.6.7" />
 
   <meta property="og:title" content="4 Generating workflow data | patRoon handbook" />
   <meta property="og:type" content="book" />
@@ -24,15 +24,15 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2019-05-18" />
+<meta name="date" content="2019-10-12" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="workflow-concepts.html">
-<link rel="next" href="preparations.html">
+<link rel="prev" href="workflow-concepts.html"/>
+<link rel="next" href="preparations.html"/>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -65,7 +65,6 @@ a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
 a.sourceLine:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode { white-space: pre; position: relative; }
-div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
@@ -220,6 +219,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h1><span class="header-section-number">4</span> Generating workflow data</h1>
 <p>Each step in the non-target workflow is performed by a function that performs the heavy lifting of a workflow step behind the scenes and finally return the results. An important goal of <code>patRoon</code> is to support multiple algorithms for each workflow step, hence, when such a function is called you have to specify which algorithm you want to use. The available algorithms and their characteristics will be discussed in the next sections. An overview of all functions involved in generating workflow data is shown in the table below.</p>
 <table>
+<colgroup>
+<col width="25%" />
+<col width="59%" />
+<col width="14%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th>Workflow step</th>
@@ -245,7 +249,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </tr>
 <tr class="even">
 <td>Suspect screening</td>
-<td><code>screenTargets()</code> + <code>groupFeaturesScreening()</code></td>
+<td><code>screenSuspects()</code> + <code>groupFeaturesScreening()</code></td>
 <td><code>featureGroups</code></td>
 </tr>
 <tr class="odd">
@@ -272,12 +276,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </table>
 <p>All of these functions store their output in objects derived from so called S4 classes. Knowing the details about the S4 class system of <code>R</code> is generally not important when using <code>patRoon</code> (and well written resources are available if you want to know more). In brief, usage of this class system allows a general data format that is used irrespective of the algorithm that was used to generate the data. For instance, when features have been found by <a href="http://openms.de/">OpenMS</a> or <a href="https://www.bioconductor.org/packages/release/bioc/html/xcms.html">XCMS</a> they both return the same data format.</p>
 <p>Another advantage of the S4 class system is the usage of so called <em>generic functions</em>. To put simply: a generic function performs a certain task for different types of data objects. A good example is the <code>plotSpec()</code> function which plots an (annotated) spectrum from data of MS peak lists or from formula or compound annotation:</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># mslists, formulas, compounds contain results for MS peak lists and</span>
-<span class="co"># formula/compound annotations, respectively.</span>
-
-<span class="kw">plotSpec</span>(mslists, ...) <span class="co"># plot raw MS spectrum</span>
-<span class="kw">plotSpec</span>(formulas, ...) <span class="co"># plot annotated spectrum from formula annotation data</span>
-<span class="kw">plotSpec</span>(compounds, ...) <span class="co"># likewise but for compound annotation.</span></code></pre>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="co"># mslists, formulas, compounds contain results for MS peak lists and</span></a>
+<a class="sourceLine" id="cb7-2" data-line-number="2"><span class="co"># formula/compound annotations, respectively.</span></a>
+<a class="sourceLine" id="cb7-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb7-4" data-line-number="4"><span class="kw">plotSpec</span>(mslists, ...) <span class="co"># plot raw MS spectrum</span></a>
+<a class="sourceLine" id="cb7-5" data-line-number="5"><span class="kw">plotSpec</span>(formulas, ...) <span class="co"># plot annotated spectrum from formula annotation data</span></a>
+<a class="sourceLine" id="cb7-6" data-line-number="6"><span class="kw">plotSpec</span>(compounds, ...) <span class="co"># likewise but for compound annotation.</span></a></code></pre></div>
 <p>The next sections will further detail on how to actually perform the non-target workflow steps to generate data.</p> 
 </div>
             </section>

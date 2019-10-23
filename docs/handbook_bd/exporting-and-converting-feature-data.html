@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>6.3 Exporting and converting feature data | patRoon handbook</title>
   <meta name="description" content="6.3 Exporting and converting feature data | patRoon handbook" />
-  <meta name="generator" content="bookdown 0.10.2 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.13 and GitBook 2.6.7" />
 
   <meta property="og:title" content="6.3 Exporting and converting feature data | patRoon handbook" />
   <meta property="og:type" content="book" />
@@ -24,15 +24,15 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2019-05-18" />
+<meta name="date" content="2019-10-12" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="fOpt.html">
-<link rel="next" href="consensus.html">
+<link rel="prev" href="fOpt.html"/>
+<link rel="next" href="consensus.html"/>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -65,7 +65,6 @@ a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
 a.sourceLine:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode { white-space: pre; position: relative; }
-div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
@@ -219,16 +218,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="exporting-and-converting-feature-data" class="section level2">
 <h2><span class="header-section-number">6.3</span> Exporting and converting feature data</h2>
 <p>The feature group data obtained during the workflow can be exported to various formats with the <code>export()</code> generic function. There are currently three formats supported: <code>&quot;brukerpa&quot;</code> (Bruker ProfileAnalysis), <code>&quot;brukertasq&quot;</code> (Bruker TASQ) and <code>&quot;mzmine&quot;</code> (mzMine). The former exports a ‘bucket table’ which can be loaded in ProfileAnalysis, the second and third export a target list that can be processed with TASQ and mzMine, respectively.</p>
-<!-- UNDONE: update when XCMS3 support is available -->
-<p>The <code>getXCMSSet()</code> function converts a <code>features</code> or <code>featureGroups</code> object to an <code>xcmsSet</code> object which can be used for further processing with <a href="https://www.bioconductor.org/packages/release/bioc/html/xcms.html">xcms</a> (the new XCMS3 interface is not yet supported).</p>
+<p>The <code>getXCMSSet()</code> function converts a <code>features</code> or <code>featureGroups</code> object to an <code>xcmsSet</code> object which can be used for further processing with <a href="https://www.bioconductor.org/packages/release/bioc/html/xcms.html">xcms</a>. Similarly, the <code>getXCMSnExp()</code> function can be used for conversion to an XCMS3 style <code>XCMSnExp</code> object.</p>
 <p>Some examples for these functions are shown below.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">export</span>(fGroups, <span class="st">&quot;brukertasq&quot;</span>, <span class="dt">out =</span> <span class="st">&quot;my_targets.csv&quot;</span>)
-
-<span class="co"># convert features to xcmsSet.</span>
-<span class="co"># </span><span class="al">NOTE</span><span class="co">: exportedData should only be FALSE when the analysis data files cannot be</span>
-<span class="co"># loaded by XCMS (e.g. when obtained with DataAnalysis)</span>
-xset &lt;-<span class="st"> </span><span class="kw">getXCMSSet</span>(fList, <span class="dt">exportedData =</span> <span class="ot">TRUE</span>)
-xsetg &lt;-<span class="st"> </span><span class="kw">getXCMSSet</span>(fGroups, <span class="dt">exportedData =</span> <span class="ot">TRUE</span>) <span class="co"># get grouped xcmsSet</span></code></pre>
+<div class="sourceCode" id="cb114"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb114-1" data-line-number="1"><span class="kw">export</span>(fGroups, <span class="st">&quot;brukertasq&quot;</span>, <span class="dt">out =</span> <span class="st">&quot;my_targets.csv&quot;</span>)</a>
+<a class="sourceLine" id="cb114-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb114-3" data-line-number="3"><span class="co"># convert features to xcmsSet.</span></a>
+<a class="sourceLine" id="cb114-4" data-line-number="4"><span class="co"># </span><span class="al">NOTE</span><span class="co">: exportedData should only be FALSE when the analysis data files cannot be</span></a>
+<a class="sourceLine" id="cb114-5" data-line-number="5"><span class="co"># loaded by XCMS (e.g. when obtained with DataAnalysis)</span></a>
+<a class="sourceLine" id="cb114-6" data-line-number="6">xset &lt;-<span class="st"> </span><span class="kw">getXCMSSet</span>(fList, <span class="dt">exportedData =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb114-7" data-line-number="7">xsetg &lt;-<span class="st"> </span><span class="kw">getXCMSSet</span>(fGroups, <span class="dt">exportedData =</span> <span class="ot">TRUE</span>) <span class="co"># get grouped xcmsSet</span></a>
+<a class="sourceLine" id="cb114-8" data-line-number="8"></a>
+<a class="sourceLine" id="cb114-9" data-line-number="9"><span class="co"># using the new XCMS3 interface</span></a>
+<a class="sourceLine" id="cb114-10" data-line-number="10"><span class="co"># </span><span class="al">NOTE</span><span class="co">: for XCMS3 data currently always has to be exported</span></a>
+<a class="sourceLine" id="cb114-11" data-line-number="11">xdata &lt;-<span class="st"> </span><span class="kw">getXCMSnExp</span>(fList)</a>
+<a class="sourceLine" id="cb114-12" data-line-number="12">xdata &lt;-<span class="st"> </span><span class="kw">getXCMSnExp</span>(fGroups)</a></code></pre></div>
 </div>
             </section>
 

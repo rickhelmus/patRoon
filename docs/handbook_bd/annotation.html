@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>4.3 Annotation | patRoon handbook</title>
   <meta name="description" content="4.3 Annotation | patRoon handbook" />
-  <meta name="generator" content="bookdown 0.10.2 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.13 and GitBook 2.6.7" />
 
   <meta property="og:title" content="4.3 Annotation | patRoon handbook" />
   <meta property="og:type" content="book" />
@@ -24,15 +24,15 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2019-05-18" />
+<meta name="date" content="2019-10-12" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="features.html">
-<link rel="next" href="componentization.html">
+<link rel="prev" href="features.html"/>
+<link rel="next" href="componentization.html"/>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -65,7 +65,6 @@ a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
 a.sourceLine:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode { white-space: pre; position: relative; }
-div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
@@ -219,8 +218,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="annotation" class="section level2">
 <h2><span class="header-section-number">4.3</span> Annotation</h2>
 <p>The annotation consists of collecting MS peak lists and then formula and/or compound annotation:</p>
-<div id="htmlwidget-d558566e1ddce2175d00" style="width:500px;height:120px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-d558566e1ddce2175d00">{"x":{"diagram":"\ndigraph Annotation {\n  graph [ rankdir = LR ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.3,\n         height = 1,\n         fontsize = 18,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"MS peak lists\" -> \"Formula annotation\"\n    \"MS peak lists\" -> \"Compound annotation\"\n    \"Formula annotation\":e -> \"Compound annotation\":e [style = dotted, constraint = false]\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-98c7a384725c5ac55c0a" style="width:500px;height:120px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-98c7a384725c5ac55c0a">{"x":{"diagram":"\ndigraph Annotation {\n  graph [ rankdir = LR ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.3,\n         height = 1,\n         fontsize = 18,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"MS peak lists\" -> \"Formula annotation\"\n    \"MS peak lists\" -> \"Compound annotation\"\n    \"Formula annotation\":e -> \"Compound annotation\":e [style = dotted, constraint = false]\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 <p>Note that compound annotation is normally not dependent upon formula annotation. However, formula data can be used to improve ranking of candidates afterwards by the <code>addFormulaScoring()</code> function, which will be discussed later in this section.</p>
 <div id="ms-peak-lists" class="section level3">
 <h3><span class="header-section-number">4.3.1</span> MS peak lists</h3>
@@ -319,11 +318,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul>
 <p>See <code>?generateMSPeakLists</code> for all possible parameters.</p>
 <p>A suitable list object to set averaging parameters can be obtained with the <code>getDefAvgPListParams()</code> function.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># lower default clustering window, other settings remain default</span>
-avgPListParams &lt;-<span class="st"> </span><span class="kw">getDefAvgPListParams</span>(<span class="dt">clusterMzWindow =</span> <span class="fl">0.001</span>)
-
-<span class="co"># Apply to both feature and feature group averaging</span>
-plists &lt;-<span class="st"> </span><span class="kw">generateMSPeakLists</span>(fGroups, <span class="st">&quot;mzr&quot;</span>, <span class="dt">avgFeatParams =</span> avgPListParams, <span class="dt">avgFGroupParams =</span> avgPListParams)</code></pre>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1"><span class="co"># lower default clustering window, other settings remain default</span></a>
+<a class="sourceLine" id="cb14-2" data-line-number="2">avgPListParams &lt;-<span class="st"> </span><span class="kw">getDefAvgPListParams</span>(<span class="dt">clusterMzWindow =</span> <span class="fl">0.001</span>)</a>
+<a class="sourceLine" id="cb14-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb14-4" data-line-number="4"><span class="co"># Apply to both feature and feature group averaging</span></a>
+<a class="sourceLine" id="cb14-5" data-line-number="5">plists &lt;-<span class="st"> </span><span class="kw">generateMSPeakLists</span>(fGroups, <span class="st">&quot;mzr&quot;</span>, <span class="dt">avgFeatParams =</span> avgPListParams, <span class="dt">avgFGroupParams =</span> avgPListParams)</a></code></pre></div>
 </div>
 <div id="formulae" class="section level3">
 <h3><span class="header-section-number">4.3.2</span> Formulae</h3>
@@ -420,11 +419,11 @@ plists &lt;-<span class="st"> </span><span class="kw">generateMSPeakLists</span>
 </tbody>
 </table>
 <p>Some typical examples:</p>
-<pre class="sourceCode r"><code class="sourceCode r">formulasGF &lt;-<span class="st"> </span><span class="kw">generateFormulas</span>(fGroups, <span class="st">&quot;genform&quot;</span>, mslists) <span class="co"># GenForm, default settings</span>
-formulasGF2 &lt;-<span class="st"> </span><span class="kw">generateFormulas</span>(fGroups, <span class="st">&quot;genform&quot;</span>, mslists, <span class="dt">calculateFeatures =</span> <span class="ot">FALSE</span>) <span class="co"># direct feature group assignment (faster)</span>
-formulasSIR &lt;-<span class="st"> </span><span class="kw">generateFormulas</span>(fGroups, <span class="st">&quot;sirius&quot;</span>, mslists, <span class="dt">elements =</span> <span class="st">&quot;CHNOPSClBr&quot;</span>) <span class="co"># SIRIUS, common elements for pollutant</span>
-formulasSIR2 &lt;-<span class="st"> </span><span class="kw">generateFormulas</span>(fGroups, <span class="st">&quot;sirius&quot;</span>, <span class="dt">adduct =</span> <span class="st">&quot;[M-H]-&quot;</span>) <span class="co"># SIRIUS, negative ionization</span>
-formulasBr &lt;-<span class="st"> </span><span class="kw">generateFormulas</span>(fGroups, <span class="st">&quot;bruker&quot;</span>, <span class="dt">MSMode =</span> <span class="st">&quot;MSMS&quot;</span>) <span class="co"># Only consider MSMS data (SmartFormula3D)</span></code></pre>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" data-line-number="1">formulasGF &lt;-<span class="st"> </span><span class="kw">generateFormulas</span>(fGroups, <span class="st">&quot;genform&quot;</span>, mslists) <span class="co"># GenForm, default settings</span></a>
+<a class="sourceLine" id="cb15-2" data-line-number="2">formulasGF2 &lt;-<span class="st"> </span><span class="kw">generateFormulas</span>(fGroups, <span class="st">&quot;genform&quot;</span>, mslists, <span class="dt">calculateFeatures =</span> <span class="ot">FALSE</span>) <span class="co"># direct feature group assignment (faster)</span></a>
+<a class="sourceLine" id="cb15-3" data-line-number="3">formulasSIR &lt;-<span class="st"> </span><span class="kw">generateFormulas</span>(fGroups, <span class="st">&quot;sirius&quot;</span>, mslists, <span class="dt">elements =</span> <span class="st">&quot;CHNOPSClBr&quot;</span>) <span class="co"># SIRIUS, common elements for pollutant</span></a>
+<a class="sourceLine" id="cb15-4" data-line-number="4">formulasSIR2 &lt;-<span class="st"> </span><span class="kw">generateFormulas</span>(fGroups, <span class="st">&quot;sirius&quot;</span>, <span class="dt">adduct =</span> <span class="st">&quot;[M-H]-&quot;</span>) <span class="co"># SIRIUS, negative ionization</span></a>
+<a class="sourceLine" id="cb15-5" data-line-number="5">formulasBr &lt;-<span class="st"> </span><span class="kw">generateFormulas</span>(fGroups, <span class="st">&quot;bruker&quot;</span>, <span class="dt">MSMode =</span> <span class="st">&quot;MSMS&quot;</span>) <span class="co"># Only consider MSMS data (SmartFormula3D)</span></a></code></pre></div>
 </div>
 <div id="compounds" class="section level3">
 <h3><span class="header-section-number">4.3.3</span> Compounds</h3>
@@ -518,24 +517,24 @@ formulasBr &lt;-<span class="st"> </span><span class="kw">generateFormulas</span
 <div id="configuring-metfrag-databases-and-scoring" class="section level4">
 <h4><span class="header-section-number">4.3.3.1</span> Configuring MetFrag databases and scoring</h4>
 <p>Some extra configuration may be necessary when using certain databases with MetFrag. In order to use the ChemSpider database a <a href="http://www.chemspider.com/AboutServices.aspx">security token</a> should be requested and set with the <code>chemSpiderToken</code> argument to <code>generateCompounds()</code>. The CompTox database needs to be manually downloaded from <a href="https://epa.figshare.com/articles/CompTox_Chemicals_Dashboard_Metadata_Files_for_Integration_with_MetFrag/7525199">here</a> (currently only the <em>SelectMetaData</em> and <em>SelectMetaDataPlus</em> databases are supported). The file location of this and other local databases (<code>csv</code>, <code>psv</code>, <code>sdf</code>) needs to be manually configured, see the examples below and/or <code>?generateCompounds</code> for more information on how to do this.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># PubChem: the default</span>
-compsMF &lt;-<span class="st"> </span><span class="kw">generateCompounds</span>(fGroups, mslists, <span class="st">&quot;metfrag&quot;</span>, <span class="dt">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>)
-
-<span class="co"># ChemSpider: needs security token</span>
-compsMF2 &lt;-<span class="st"> </span><span class="kw">generateCompounds</span>(fGroups, mslists, <span class="st">&quot;metfrag&quot;</span>, <span class="dt">database =</span> <span class="st">&quot;chemspider&quot;</span>,
-                              <span class="dt">chemSpiderToken =</span> <span class="st">&quot;MY_TOKEN_HERE&quot;</span>, <span class="dt">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>)
-
-<span class="co"># CompTox: set global option to database path</span>
-<span class="kw">options</span>(<span class="dt">patRoon.path.MetFragCompTox =</span> <span class="st">&quot;~/DSSTox_01May18_Full_SelectMetaDataPlus.csv&quot;</span>)
-compsMF3 &lt;-<span class="st"> </span><span class="kw">generateCompounds</span>(fGroups, mslists, <span class="st">&quot;metfrag&quot;</span>, <span class="dt">database =</span> <span class="st">&quot;comptox&quot;</span>, <span class="dt">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>)
-
-<span class="co"># CompTox: set database location without global option</span>
-compsMF4 &lt;-<span class="st"> </span><span class="kw">generateCompounds</span>(fGroups, mslists, <span class="st">&quot;metfrag&quot;</span>, <span class="dt">database =</span> <span class="st">&quot;comptox&quot;</span>, <span class="dt">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>,
-                              <span class="dt">extraOpts =</span> <span class="kw">list</span>(<span class="dt">LocalDatabasePath =</span> <span class="st">&quot;~/DSSTox_01May18_Full_SelectMetaDataPlus.csv&quot;</span>))
-
-<span class="co"># Same, but for custom database</span>
-compsMF5 &lt;-<span class="st"> </span><span class="kw">generateCompounds</span>(fGroups, mslists, <span class="st">&quot;metfrag&quot;</span>, <span class="dt">database =</span> <span class="st">&quot;csv&quot;</span>, <span class="dt">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>,
-                              <span class="dt">extraOpts =</span> <span class="kw">list</span>(<span class="dt">LocalDatabasePath =</span> <span class="st">&quot;~/mydb.csv&quot;</span>))</code></pre>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" data-line-number="1"><span class="co"># PubChem: the default</span></a>
+<a class="sourceLine" id="cb16-2" data-line-number="2">compsMF &lt;-<span class="st"> </span><span class="kw">generateCompounds</span>(fGroups, mslists, <span class="st">&quot;metfrag&quot;</span>, <span class="dt">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>)</a>
+<a class="sourceLine" id="cb16-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb16-4" data-line-number="4"><span class="co"># ChemSpider: needs security token</span></a>
+<a class="sourceLine" id="cb16-5" data-line-number="5">compsMF2 &lt;-<span class="st"> </span><span class="kw">generateCompounds</span>(fGroups, mslists, <span class="st">&quot;metfrag&quot;</span>, <span class="dt">database =</span> <span class="st">&quot;chemspider&quot;</span>,</a>
+<a class="sourceLine" id="cb16-6" data-line-number="6">                              <span class="dt">chemSpiderToken =</span> <span class="st">&quot;MY_TOKEN_HERE&quot;</span>, <span class="dt">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>)</a>
+<a class="sourceLine" id="cb16-7" data-line-number="7"></a>
+<a class="sourceLine" id="cb16-8" data-line-number="8"><span class="co"># CompTox: set global option to database path</span></a>
+<a class="sourceLine" id="cb16-9" data-line-number="9"><span class="kw">options</span>(<span class="dt">patRoon.path.MetFragCompTox =</span> <span class="st">&quot;~/DSSTox_01May18_Full_SelectMetaDataPlus.csv&quot;</span>)</a>
+<a class="sourceLine" id="cb16-10" data-line-number="10">compsMF3 &lt;-<span class="st"> </span><span class="kw">generateCompounds</span>(fGroups, mslists, <span class="st">&quot;metfrag&quot;</span>, <span class="dt">database =</span> <span class="st">&quot;comptox&quot;</span>, <span class="dt">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>)</a>
+<a class="sourceLine" id="cb16-11" data-line-number="11"></a>
+<a class="sourceLine" id="cb16-12" data-line-number="12"><span class="co"># CompTox: set database location without global option</span></a>
+<a class="sourceLine" id="cb16-13" data-line-number="13">compsMF4 &lt;-<span class="st"> </span><span class="kw">generateCompounds</span>(fGroups, mslists, <span class="st">&quot;metfrag&quot;</span>, <span class="dt">database =</span> <span class="st">&quot;comptox&quot;</span>, <span class="dt">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>,</a>
+<a class="sourceLine" id="cb16-14" data-line-number="14">                              <span class="dt">extraOpts =</span> <span class="kw">list</span>(<span class="dt">LocalDatabasePath =</span> <span class="st">&quot;~/DSSTox_01May18_Full_SelectMetaDataPlus.csv&quot;</span>))</a>
+<a class="sourceLine" id="cb16-15" data-line-number="15"></a>
+<a class="sourceLine" id="cb16-16" data-line-number="16"><span class="co"># Same, but for custom database</span></a>
+<a class="sourceLine" id="cb16-17" data-line-number="17">compsMF5 &lt;-<span class="st"> </span><span class="kw">generateCompounds</span>(fGroups, mslists, <span class="st">&quot;metfrag&quot;</span>, <span class="dt">database =</span> <span class="st">&quot;csv&quot;</span>, <span class="dt">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>,</a>
+<a class="sourceLine" id="cb16-18" data-line-number="18">                              <span class="dt">extraOpts =</span> <span class="kw">list</span>(<span class="dt">LocalDatabasePath =</span> <span class="st">&quot;~/mydb.csv&quot;</span>))</a></code></pre></div>
 <p>An example of a custom <em>.csv</em> database can be found <a href="https://raw.githubusercontent.com/rickhelmus/patRoon/master/tests/testthat/test_data/test-mf-db-isomers.csv">here</a>.</p>
 <p>With MetFrag compound databases are not only used to retrieve candidate structures but are also used to obtain metadata for further ranking. Each database has its own scorings, a table with currently supported scorings can be obtained with the <code>compoundScorings()</code> function (some columns omitted):</p>
 <div style="border: 1px solid #ddd; padding: 5px; overflow-y: auto; height: 350px;">
@@ -955,19 +954,19 @@ FALSE
 </table>
 </div>
 <p>The first two columns contain the generic and original MetFrag naming schemes for each scoring type. While both naming schemes can be used, the generic is often shorter and harmonized with other algorithms (e.g. SIRIUS). The <em>database</em> column specifies for which databases a particular scoring is available (empty if not database specific). Most scorings are selected by default (as specified by the <em>default</em> column), however, this behaviour can be customized by using the <code>scoreTypes</code> argument:</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Only in-silico and PubChem number of patents scorings</span>
-compsMF1 &lt;-<span class="st"> </span><span class="kw">generateCompounds</span>(fGroups, mslists, <span class="st">&quot;metfrag&quot;</span>, <span class="dt">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>,
-                              <span class="dt">scoreTypes =</span> <span class="kw">c</span>(<span class="st">&quot;fragScore&quot;</span> <span class="st">&quot;numberPatents&quot;</span>))
-
-<span class="co"># Custom scoring in custom database</span>
-compsMF2 &lt;-<span class="st"> </span><span class="kw">generateCompounds</span>(fGroups, mslists, <span class="st">&quot;metfrag&quot;</span>, <span class="dt">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>,
-                              <span class="dt">database =</span> <span class="st">&quot;csv&quot;</span>, <span class="dt">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>,
-                              <span class="dt">extraOpts =</span> <span class="kw">list</span>(<span class="dt">LocalDatabasePath =</span> <span class="st">&quot;~/mydb.csv&quot;</span>),
-                              <span class="dt">scoreTypes =</span> <span class="kw">c</span>(<span class="st">&quot;fragScore&quot;</span>, <span class="st">&quot;myScore&quot;</span>, <span class="st">&quot;myScore2&quot;</span>))</code></pre>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" data-line-number="1"><span class="co"># Only in-silico and PubChem number of patents scorings</span></a>
+<a class="sourceLine" id="cb17-2" data-line-number="2">compsMF1 &lt;-<span class="st"> </span><span class="kw">generateCompounds</span>(fGroups, mslists, <span class="st">&quot;metfrag&quot;</span>, <span class="dt">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>,</a>
+<a class="sourceLine" id="cb17-3" data-line-number="3">                              <span class="dt">scoreTypes =</span> <span class="kw">c</span>(<span class="st">&quot;fragScore&quot;</span> <span class="st">&quot;numberPatents&quot;</span>))</a>
+<a class="sourceLine" id="cb17-4" data-line-number="4"></a>
+<a class="sourceLine" id="cb17-5" data-line-number="5"><span class="co"># Custom scoring in custom database</span></a>
+<a class="sourceLine" id="cb17-6" data-line-number="6">compsMF2 &lt;-<span class="st"> </span><span class="kw">generateCompounds</span>(fGroups, mslists, <span class="st">&quot;metfrag&quot;</span>, <span class="dt">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>,</a>
+<a class="sourceLine" id="cb17-7" data-line-number="7">                              <span class="dt">database =</span> <span class="st">&quot;csv&quot;</span>, <span class="dt">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>,</a>
+<a class="sourceLine" id="cb17-8" data-line-number="8">                              <span class="dt">extraOpts =</span> <span class="kw">list</span>(<span class="dt">LocalDatabasePath =</span> <span class="st">&quot;~/mydb.csv&quot;</span>),</a>
+<a class="sourceLine" id="cb17-9" data-line-number="9">                              <span class="dt">scoreTypes =</span> <span class="kw">c</span>(<span class="st">&quot;fragScore&quot;</span>, <span class="st">&quot;myScore&quot;</span>, <span class="st">&quot;myScore2&quot;</span>))</a></code></pre></div>
 <p>By default ranking is performed with equal weight (i.e. <em>1</em>) for all scorings. This can be changed by the <code>scoreWeights</code> argument, which should be a <code>vector</code> containing the weights for all scorings following the order of <code>scoreTypes</code>, for instance:</p>
-<pre class="sourceCode r"><code class="sourceCode r">compsMF &lt;-<span class="st"> </span><span class="kw">generateCompounds</span>(fGroups, mslists, <span class="st">&quot;metfrag&quot;</span>, <span class="dt">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>,
-                             <span class="dt">scoreTypes =</span> <span class="kw">c</span>(<span class="st">&quot;fragScore&quot;</span> <span class="st">&quot;numberPatents&quot;</span>),
-                             <span class="dt">scoreWeights =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))</code></pre>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" data-line-number="1">compsMF &lt;-<span class="st"> </span><span class="kw">generateCompounds</span>(fGroups, mslists, <span class="st">&quot;metfrag&quot;</span>, <span class="dt">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>,</a>
+<a class="sourceLine" id="cb18-2" data-line-number="2">                             <span class="dt">scoreTypes =</span> <span class="kw">c</span>(<span class="st">&quot;fragScore&quot;</span> <span class="st">&quot;numberPatents&quot;</span>),</a>
+<a class="sourceLine" id="cb18-3" data-line-number="3">                             <span class="dt">scoreWeights =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))</a></code></pre></div>
 <p>Sometimes thousands or more structural candidates are found when annotating a feature group. In this situation processing all these candidates will too involving (especially when external databases are used). To avoid this a default cut-off is set: when the number of candidates exceed a certain amount the search will be aborted and no results will be reported for that feature group. The maximum number of candidates can be set with the <code>maxCandidatesToStop</code> argument. The default value is relative conservative, especially for local databases it may be useful to increase this number.</p>
 </div>
 <div id="timeout-and-error-handling" class="section level4">
@@ -978,7 +977,7 @@ compsMF2 &lt;-<span class="st"> </span><span class="kw">generateCompounds</span>
 <div id="formula-scoring" class="section level4">
 <h4><span class="header-section-number">4.3.3.3</span> Formula scoring</h4>
 <p>Ranking of candidate structures may further be improved by incorporating formula information by using the <code>addFormulaScoring()</code> function:</p>
-<pre class="sourceCode r"><code class="sourceCode r">comps &lt;-<span class="st"> </span><span class="kw">addFormulaScoring</span>(coms, formulas, <span class="dt">updateScore =</span> <span class="ot">TRUE</span>)</code></pre>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" data-line-number="1">comps &lt;-<span class="st"> </span><span class="kw">addFormulaScoring</span>(coms, formulas, <span class="dt">updateScore =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
 <p>Here, corresponding formula and explained fragments will be used to calculate a <em>formulaScore</em> for each candidate. Note that SIRIUS candidates are already based on calculated formulae, hence, running this function on SIRIUS results is less sensable unless scoring from another formula calculation algorithm is desired.</p>
 </div>
 <div id="further-options-and-parameters" class="section level4">

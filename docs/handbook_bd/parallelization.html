@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>6.7 Parallelization | patRoon handbook</title>
   <meta name="description" content="6.7 Parallelization | patRoon handbook" />
-  <meta name="generator" content="bookdown 0.10.2 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.13 and GitBook 2.6.7" />
 
   <meta property="og:title" content="6.7 Parallelization | patRoon handbook" />
   <meta property="og:type" content="book" />
@@ -24,14 +24,14 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2019-05-18" />
+<meta name="date" content="2019-10-12" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="caching.html">
+<link rel="prev" href="caching.html"/>
 
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -65,7 +65,6 @@ a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
 a.sourceLine:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode { white-space: pre; position: relative; }
-div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
@@ -221,8 +220,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p><code>patRoon</code> relies on several external (command-line) utilities to generate workflow data such as <code>MetFrag CL</code>, <code>OpenMS</code> and <code>SIRIUS</code>. When these tools are used for obtaining results for a large number of features it may take a long time before processing is finished. In order to speed this up these commands are executed in <em>parallel</em>. Running several commands simultenously is especially advantageous on multi core CPUs.</p>
 <p>The number of commands to run in parallel is by default equal to the number of available cores/threads.
 You may want to change this amount, for instance, when you don’t want to dedicate all of your computers resources to <code>patRoon</code>. This can either be done by changing a global package option, which affects all operations, or when executing a single workflow step.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">options</span>(<span class="dt">patRoon.maxProcAmount =</span> <span class="dv">3</span>) <span class="co"># execute max 3 commands in parallel</span>
-formulas &lt;-<span class="st"> </span><span class="kw">generateFormulas</span>(..., <span class="dt">maxProcAmount =</span> <span class="dv">3</span>) <span class="co"># ditto, but only for this function</span></code></pre>
+<div class="sourceCode" id="cb122"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb122-1" data-line-number="1"><span class="kw">options</span>(<span class="dt">patRoon.maxProcAmount =</span> <span class="dv">3</span>) <span class="co"># execute max 3 commands in parallel</span></a>
+<a class="sourceLine" id="cb122-2" data-line-number="2">formulas &lt;-<span class="st"> </span><span class="kw">generateFormulas</span>(..., <span class="dt">maxProcAmount =</span> <span class="dv">3</span>) <span class="co"># ditto, but only for this function</span></a></code></pre></div>
 
 </div>
 <!-- </div> -->

@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>6.6 Caching | patRoon handbook</title>
   <meta name="description" content="6.6 Caching | patRoon handbook" />
-  <meta name="generator" content="bookdown 0.10.2 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.13 and GitBook 2.6.7" />
 
   <meta property="og:title" content="6.6 Caching | patRoon handbook" />
   <meta property="og:type" content="book" />
@@ -24,15 +24,15 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2019-05-18" />
+<meta name="date" content="2019-10-12" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="compclust.html">
-<link rel="next" href="parallelization.html">
+<link rel="prev" href="compclust.html"/>
+<link rel="next" href="parallelization.html"/>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -65,7 +65,6 @@ a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
 a.sourceLine:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode { white-space: pre; position: relative; }
-div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
@@ -220,41 +219,40 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h2><span class="header-section-number">6.6</span> Caching</h2>
 <p>In <code>patRoon</code> lengthy processing operations such as finding features and generating annotation data is <em>cached</em>. This means that when you run such a calculation again (without changing any parameters), the data is simply loaded from the cache data instead of re-generating it. This in turn is very useful, for instance, if you have closed your R session and want to continue with data processing at a later stage.</p>
 <p>The cache data is stored in a <a href="https://www.sqlite.org/index.html">sqlite</a> database file. This file is stored by default under the name <code>cache.sqlite</code> in the current working directory (for this reason it is very important to always restore your working directory!). However, the name and location can be changed by setting a global package option:</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">options</span>(<span class="dt">patRoon.cache.fileName =</span> <span class="st">&quot;~/myCacheFile.sqlite&quot;</span>)</code></pre>
+<div class="sourceCode" id="cb118"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb118-1" data-line-number="1"><span class="kw">options</span>(<span class="dt">patRoon.cache.fileName =</span> <span class="st">&quot;~/myCacheFile.sqlite&quot;</span>)</a></code></pre></div>
 <p>For instance, this might be useful if you want to use a shared cache file between projects.</p>
 <p>After a while you may see that your cache file can get quite large. This is especially true when testing different parameters to optimize your workflow. Furthermore, you may want to clear the cache after you have updated <code>patRoon</code> and want to make sure that the latest code is used to generate the data. At any point you can simply remove the cache file. A more fine tuned approach which doesn’t wipe all your cached data is by using the <code>clearCache()</code> function. With this function you can selectively remove parts of the cache file. The function has two arguments: <code>what</code>, which specifies what should be removed, and <code>file</code> which specifies the path to the cache file. The latter only needs to be specified if you want to manage a different cache file.</p>
 <p>In order to figure what is in the cache you can run <code>clearCache()</code> without any arguments:</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">clearCache</span>()</code></pre>
+<div class="sourceCode" id="cb119"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb119-1" data-line-number="1"><span class="kw">clearCache</span>()</a></code></pre></div>
 <pre><code>#&gt; Please specify which cache you want to remove. Available are:
-#&gt; - EICData (6 rows)
-#&gt; - MSPeakListsAvg (10 rows)
-#&gt; - MSPeakListsMzR (868 rows)
-#&gt; - componentsCAMERA (4 rows)
-#&gt; - componentsNontarget (1 rows)
-#&gt; - componentsRC (2 rows)
+#&gt; - EICData (3 rows)
+#&gt; - MSPeakListsAvg (4 rows)
+#&gt; - MSPeakListsMzR (104 rows)
+#&gt; - componentsCAMERA (1 rows)
+#&gt; - componentsRC (1 rows)
 #&gt; - compoundsCluster (1 rows)
-#&gt; - compoundsMetFrag (39 rows)
-#&gt; - compoundsSirius (60 rows)
-#&gt; - featureGroupsOpenMS (5 rows)
-#&gt; - featuresOpenMS (584 rows)
-#&gt; - filterFGroups_blank (4 rows)
-#&gt; - filterFGroups_intensity (18 rows)
-#&gt; - filterFGroups_minReplicates (64 rows)
-#&gt; - filterFGroups_replicateAbundance (8 rows)
-#&gt; - filterFGroups_replicate_group (40 rows)
-#&gt; - filterFGroups_retention (4 rows)
-#&gt; - filterMSPeakLists (6 rows)
-#&gt; - formulasFGroupConsensus (6 rows)
-#&gt; - formulasGenForm (1071 rows)
-#&gt; - mzREIC (395 rows)
+#&gt; - compoundsMetFrag (25 rows)
+#&gt; - compoundsSirius (28 rows)
+#&gt; - featureGroupsOpenMS (2 rows)
+#&gt; - featuresOpenMS (256 rows)
+#&gt; - filterFGroups_blank (2 rows)
+#&gt; - filterFGroups_intensity (5 rows)
+#&gt; - filterFGroups_minReplicates (25 rows)
+#&gt; - filterFGroups_replicateAbundance (4 rows)
+#&gt; - filterFGroups_replicate_group (13 rows)
+#&gt; - filterFGroups_retention (1 rows)
+#&gt; - filterMSPeakLists (2 rows)
+#&gt; - formulasFGroupConsensus (2 rows)
+#&gt; - formulasGenForm (104 rows)
+#&gt; - mzREIC (266 rows)
 #&gt; - reportPlots (529 rows)
 #&gt; - specData (6 rows)
 #&gt; - all (removes complete cache database)</code></pre>
 <p>Using this output you can re-run the function again, for instance:</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">clearCache</span>(<span class="st">&quot;featuresOpenMS&quot;</span>)
-<span class="kw">clearCache</span>(<span class="kw">c</span>(<span class="st">&quot;featureGroupsOpenMS&quot;</span>, <span class="st">&quot;formulasGenForm&quot;</span>)) <span class="co"># clear multiple</span>
-<span class="kw">clearCache</span>(<span class="st">&quot;OpenMS&quot;</span>) <span class="co"># clear all with OpenMS in name (ie partial matched)</span>
-<span class="kw">clearCache</span>(<span class="st">&quot;all&quot;</span>) <span class="co"># same as simply removing the file</span></code></pre>
+<div class="sourceCode" id="cb121"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb121-1" data-line-number="1"><span class="kw">clearCache</span>(<span class="st">&quot;featuresOpenMS&quot;</span>)</a>
+<a class="sourceLine" id="cb121-2" data-line-number="2"><span class="kw">clearCache</span>(<span class="kw">c</span>(<span class="st">&quot;featureGroupsOpenMS&quot;</span>, <span class="st">&quot;formulasGenForm&quot;</span>)) <span class="co"># clear multiple</span></a>
+<a class="sourceLine" id="cb121-3" data-line-number="3"><span class="kw">clearCache</span>(<span class="st">&quot;OpenMS&quot;</span>) <span class="co"># clear all with OpenMS in name (ie partial matched)</span></a>
+<a class="sourceLine" id="cb121-4" data-line-number="4"><span class="kw">clearCache</span>(<span class="st">&quot;all&quot;</span>) <span class="co"># same as simply removing the file</span></a></code></pre></div>
 </div>
             </section>
 

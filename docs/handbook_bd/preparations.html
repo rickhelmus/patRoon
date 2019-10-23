@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>4.1 Preparations | patRoon handbook</title>
   <meta name="description" content="4.1 Preparations | patRoon handbook" />
-  <meta name="generator" content="bookdown 0.10.2 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.13 and GitBook 2.6.7" />
 
   <meta property="og:title" content="4.1 Preparations | patRoon handbook" />
   <meta property="og:type" content="book" />
@@ -24,15 +24,15 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2019-05-18" />
+<meta name="date" content="2019-10-12" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="generating-workflow-data.html">
-<link rel="next" href="features.html">
+<link rel="prev" href="generating-workflow-data.html"/>
+<link rel="next" href="features.html"/>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -65,7 +65,6 @@ a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
 a.sourceLine:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode { white-space: pre; position: relative; }
-div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
@@ -258,22 +257,22 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </tbody>
 </table>
 <p>The <code>convertMSFiles()</code> function supports conversion between many different file formats typically used in non-target analysis. Furthermore, other pre-treatment steps are available (e.g. centroiding, filtering) when the <a href="http://proteowizard.sourceforge.net/">ProteoWizard</a> algorithm is used. For an overview of these functionalities see the <a href="http://proteowizard.sourceforge.net/tools/msconvert.html">MsConvert documentation</a>. Some examples:</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Converts a single mzXML file to mzML format</span>
-<span class="kw">convertMSFiles</span>(<span class="st">&quot;standard-1.mzXML&quot;</span>, <span class="dt">to =</span> <span class="st">&quot;mzML&quot;</span>, <span class="dt">algorithm =</span> <span class="st">&quot;openms&quot;</span>)
-
-<span class="co"># Converts all Thermo files with ProteoWizard (the default) in the analyses/raw</span>
-<span class="co"># directory and stores the mzML files in analyses/raw. Afterwards, only MS1</span>
-<span class="co"># spectra are retained.</span>
-<span class="kw">convertMSFiles</span>(<span class="st">&quot;analyses/raw&quot;</span>, <span class="st">&quot;analyses/mzml&quot;</span>, <span class="dt">from =</span> <span class="st">&quot;thermo&quot;</span>,
-               <span class="dt">centroid =</span> <span class="st">&quot;vendor&quot;</span>, <span class="dt">filters =</span> <span class="st">&quot;msLevel 1&quot;</span>)</code></pre>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1"><span class="co"># Converts a single mzXML file to mzML format</span></a>
+<a class="sourceLine" id="cb8-2" data-line-number="2"><span class="kw">convertMSFiles</span>(<span class="st">&quot;standard-1.mzXML&quot;</span>, <span class="dt">to =</span> <span class="st">&quot;mzML&quot;</span>, <span class="dt">algorithm =</span> <span class="st">&quot;openms&quot;</span>)</a>
+<a class="sourceLine" id="cb8-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb8-4" data-line-number="4"><span class="co"># Converts all Thermo files with ProteoWizard (the default) in the analyses/raw</span></a>
+<a class="sourceLine" id="cb8-5" data-line-number="5"><span class="co"># directory and stores the mzML files in analyses/raw. Afterwards, only MS1</span></a>
+<a class="sourceLine" id="cb8-6" data-line-number="6"><span class="co"># spectra are retained.</span></a>
+<a class="sourceLine" id="cb8-7" data-line-number="7"><span class="kw">convertMSFiles</span>(<span class="st">&quot;analyses/raw&quot;</span>, <span class="st">&quot;analyses/mzml&quot;</span>, <span class="dt">from =</span> <span class="st">&quot;thermo&quot;</span>,</a>
+<a class="sourceLine" id="cb8-8" data-line-number="8">               <span class="dt">centroid =</span> <span class="st">&quot;vendor&quot;</span>, <span class="dt">filters =</span> <span class="st">&quot;msLevel 1&quot;</span>)</a></code></pre></div>
 <blockquote>
 <p><strong><em>NOTE</em></strong> Most algorithms further down the workflow require the <em>mzML</em> or <em>mzXML</em> file format and additionally require that mass peaks have been centroided. When using the ProteoWizard algorithm (the default), centroiding by vendor algorithms is generally recommended (i.e. by setting <code>centroid=&quot;vendor&quot;</code> as shown in the above example).</p>
 </blockquote>
 <p>When Bruker MS data is used it can be automatically re-calibrated to improve its mass accuracy. Often this is preceeded by calling the <code>setDAMethod()</code> function to set a DataAnalysis method to all files in order to configure automatic re-calibration. The <code>recalibrarateDAFiles()</code> function performs the actual re-calibration. The <code>getDACalibrationError()</code> function can be used at anytime to request the current calibration error of each analysis. An example of these functions is shown below.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># anaInfo is a data.frame with information on analyses (see next section)</span>
-<span class="kw">setDAMethod</span>(anaInfo, <span class="st">&quot;path/to/DAMethod.m&quot;</span>) <span class="co"># configure Bruker files with given method that has automatic calibration setup</span>
-<span class="kw">recalibrarateDAFiles</span>(anaInfo) <span class="co"># trigger re-calibration for each analysis</span>
-<span class="kw">getDACalibrationError</span>(anaInfo) <span class="co"># get calibration error for each analysis (</span><span class="al">NOTE</span><span class="co">: also shown when previous function is finished)</span></code></pre>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="co"># anaInfo is a data.frame with information on analyses (see next section)</span></a>
+<a class="sourceLine" id="cb9-2" data-line-number="2"><span class="kw">setDAMethod</span>(anaInfo, <span class="st">&quot;path/to/DAMethod.m&quot;</span>) <span class="co"># configure Bruker files with given method that has automatic calibration setup</span></a>
+<a class="sourceLine" id="cb9-3" data-line-number="3"><span class="kw">recalibrarateDAFiles</span>(anaInfo) <span class="co"># trigger re-calibration for each analysis</span></a>
+<a class="sourceLine" id="cb9-4" data-line-number="4"><span class="kw">getDACalibrationError</span>(anaInfo) <span class="co"># get calibration error for each analysis (</span><span class="al">NOTE</span><span class="co">: also shown when previous function is finished)</span></a></code></pre></div>
 </div>
 <div id="anaInfo" class="section level3">
 <h3><span class="header-section-number">4.1.2</span> Analysis information</h3>
@@ -282,15 +281,15 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><strong>path</strong>: the directory path of the file containing the analysis data</li>
 <li><strong>analysis</strong>: the name of the analysis. This should be the file name <em>without</em> file extension.</li>
 <li><strong>group</strong>: to which <em>replicate group</em> the analysis belongs. All analysis which are replicates of each other get the same name.</li>
-<li><strong>ref</strong>: which replicate group should be used for blank subtraction.</li>
-<li><strong>conc</strong> (optional, advanced) A numeric value describing the concentration or any other value for which the intensity in this sample may correlate, for instance, dilution factor, sampling time etc. This column is only required when using the <code>regression()</code> function (see <code>?regression</code> for more information).</li>
+<li><strong>blank</strong>: which replicate group should be used for blank subtraction.</li>
+<li><strong>conc</strong> (optional, advanced) A numeric value describing the concentration or any other value for which the intensity in this sample may correlate, for instance, dilution factor, sampling time etc. This column is only required when you want to obtain quantitative information (e.g. concentrations) using the <code>as.data.table()</code> method function (see <code>?featureGroups</code> for more information).</li>
 </ul>
 <p>The <code>generateAnalysisInfo()</code> function can be used to (semi-)automatically generate a suitable <code>data.frame</code> that contains all the required information for a set of analysis. For, instance, the following line was used in the tutorial:</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Take example data from patRoonData package (triplicate solvent blank + triplicate standard)</span>
-<span class="kw">generateAnalysisInfo</span>(<span class="dt">paths =</span> patRoonData<span class="op">::</span><span class="kw">exampleDataPath</span>(),
-                     <span class="dt">groups =</span> <span class="kw">c</span>(<span class="kw">rep</span>(<span class="st">&quot;solvent&quot;</span>, <span class="dv">3</span>), <span class="kw">rep</span>(<span class="st">&quot;standard&quot;</span>, <span class="dv">3</span>)),
-                     <span class="dt">refs =</span> <span class="st">&quot;solvent&quot;</span>)</code></pre>
-<pre><code>#&gt;                                                                 path   analysis    group     ref
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1"><span class="co"># Take example data from patRoonData package (triplicate solvent blank + triplicate standard)</span></a>
+<a class="sourceLine" id="cb10-2" data-line-number="2"><span class="kw">generateAnalysisInfo</span>(<span class="dt">paths =</span> patRoonData<span class="op">::</span><span class="kw">exampleDataPath</span>(),</a>
+<a class="sourceLine" id="cb10-3" data-line-number="3">                     <span class="dt">groups =</span> <span class="kw">c</span>(<span class="kw">rep</span>(<span class="st">&quot;solvent&quot;</span>, <span class="dv">3</span>), <span class="kw">rep</span>(<span class="st">&quot;standard&quot;</span>, <span class="dv">3</span>)),</a>
+<a class="sourceLine" id="cb10-4" data-line-number="4">                     <span class="dt">blanks =</span> <span class="st">&quot;solvent&quot;</span>)</a></code></pre></div>
+<pre><code>#&gt;                                                                 path   analysis    group   blank
 #&gt; 1 /home/rick/R/x86_64-suse-linux-gnu-library/3.6/patRoonData/extdata  solvent-1  solvent solvent
 #&gt; 2 /home/rick/R/x86_64-suse-linux-gnu-library/3.6/patRoonData/extdata  solvent-2  solvent solvent
 #&gt; 3 /home/rick/R/x86_64-suse-linux-gnu-library/3.6/patRoonData/extdata  solvent-3  solvent solvent

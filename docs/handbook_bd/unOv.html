@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>5.4 Unique and overlapping features | patRoon handbook</title>
   <meta name="description" content="5.4 Unique and overlapping features | patRoon handbook" />
-  <meta name="generator" content="bookdown 0.10.2 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.13 and GitBook 2.6.7" />
 
   <meta property="og:title" content="5.4 Unique and overlapping features | patRoon handbook" />
   <meta property="og:type" content="book" />
@@ -24,15 +24,15 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2019-05-18" />
+<meta name="date" content="2019-10-12" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="subset.html">
-<link rel="next" href="visualization.html">
+<link rel="prev" href="subset.html"/>
+<link rel="next" href="visualization.html"/>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -65,7 +65,6 @@ a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
 a.sourceLine:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode { white-space: pre; position: relative; }
-div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
@@ -257,21 +256,21 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </tbody>
 </table>
 <p>Some examples:</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># only keep features uniquely present in replicate group &quot;repl1&quot;</span>
-fGroupsUn1 &lt;-<span class="st"> </span><span class="kw">unique</span>(fGroups, <span class="dt">which =</span> <span class="st">&quot;repl1&quot;</span>)
-<span class="co"># only keep features in repl1/repl2 which are not in repl3</span>
-fGroupsUn2 &lt;-<span class="st"> </span><span class="kw">unique</span>(fGroups, <span class="dt">which =</span> <span class="kw">c</span>(<span class="st">&quot;repl1&quot;</span>, <span class="st">&quot;repl2&quot;</span>),
-                     <span class="dt">relativeTo =</span> <span class="st">&quot;repl3&quot;</span>)
-<span class="co"># only keep features that are only present in repl1 OR repl2</span>
-fGroupsUn3 &lt;-<span class="st"> </span><span class="kw">unique</span>(fGroups, <span class="dt">which =</span> <span class="kw">c</span>(<span class="st">&quot;repl1&quot;</span>, <span class="st">&quot;repl2&quot;</span>),
-                     <span class="dt">outer =</span> <span class="ot">TRUE</span>)
-
-<span class="co"># only keep features overlapping in repl1/repl2</span>
-fGroupsOv1 &lt;-<span class="st"> </span><span class="kw">overlap</span>(fGroups, <span class="dt">which =</span> <span class="kw">c</span>(<span class="st">&quot;repl1&quot;</span>, <span class="st">&quot;repl2&quot;</span>))
-<span class="co"># only keep features overlapping in repl1/repl2 AND are not present in any other</span>
-<span class="co"># replicate group</span>
-fGroupsOv2 &lt;-<span class="st"> </span><span class="kw">overlap</span>(fGroups, <span class="dt">which =</span> <span class="kw">c</span>(<span class="st">&quot;repl1&quot;</span>, <span class="st">&quot;repl2&quot;</span>),
-                      <span class="dt">exclusive =</span> <span class="ot">TRUE</span>)</code></pre>
+<div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb64-1" data-line-number="1"><span class="co"># only keep features uniquely present in replicate group &quot;repl1&quot;</span></a>
+<a class="sourceLine" id="cb64-2" data-line-number="2">fGroupsUn1 &lt;-<span class="st"> </span><span class="kw">unique</span>(fGroups, <span class="dt">which =</span> <span class="st">&quot;repl1&quot;</span>)</a>
+<a class="sourceLine" id="cb64-3" data-line-number="3"><span class="co"># only keep features in repl1/repl2 which are not in repl3</span></a>
+<a class="sourceLine" id="cb64-4" data-line-number="4">fGroupsUn2 &lt;-<span class="st"> </span><span class="kw">unique</span>(fGroups, <span class="dt">which =</span> <span class="kw">c</span>(<span class="st">&quot;repl1&quot;</span>, <span class="st">&quot;repl2&quot;</span>),</a>
+<a class="sourceLine" id="cb64-5" data-line-number="5">                     <span class="dt">relativeTo =</span> <span class="st">&quot;repl3&quot;</span>)</a>
+<a class="sourceLine" id="cb64-6" data-line-number="6"><span class="co"># only keep features that are only present in repl1 OR repl2</span></a>
+<a class="sourceLine" id="cb64-7" data-line-number="7">fGroupsUn3 &lt;-<span class="st"> </span><span class="kw">unique</span>(fGroups, <span class="dt">which =</span> <span class="kw">c</span>(<span class="st">&quot;repl1&quot;</span>, <span class="st">&quot;repl2&quot;</span>),</a>
+<a class="sourceLine" id="cb64-8" data-line-number="8">                     <span class="dt">outer =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb64-9" data-line-number="9"></a>
+<a class="sourceLine" id="cb64-10" data-line-number="10"><span class="co"># only keep features overlapping in repl1/repl2</span></a>
+<a class="sourceLine" id="cb64-11" data-line-number="11">fGroupsOv1 &lt;-<span class="st"> </span><span class="kw">overlap</span>(fGroups, <span class="dt">which =</span> <span class="kw">c</span>(<span class="st">&quot;repl1&quot;</span>, <span class="st">&quot;repl2&quot;</span>))</a>
+<a class="sourceLine" id="cb64-12" data-line-number="12"><span class="co"># only keep features overlapping in repl1/repl2 AND are not present in any other</span></a>
+<a class="sourceLine" id="cb64-13" data-line-number="13"><span class="co"># replicate group</span></a>
+<a class="sourceLine" id="cb64-14" data-line-number="14">fGroupsOv2 &lt;-<span class="st"> </span><span class="kw">overlap</span>(fGroups, <span class="dt">which =</span> <span class="kw">c</span>(<span class="st">&quot;repl1&quot;</span>, <span class="st">&quot;repl2&quot;</span>),</a>
+<a class="sourceLine" id="cb64-15" data-line-number="15">                      <span class="dt">exclusive =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
 <p>In addition, several plotting functions are <a href="visualization.html#visComp">discussed in the next section</a> that visualize overlap and uniqueness of features.</p>
 </div>
             </section>

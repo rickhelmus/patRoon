@@ -6,12 +6,11 @@
 * Specific optimizations after benchmarking results:
     * `maxProcAmount` (i.e. number of parallel processes) now defaults to amount of physical cores instead of total number of CPU threads.
     * Decreased `batchSize` to `8` for GenForm formula calculation.
-
-
+* `plot()` for `featureGroups` can now highlight unique/shared features across replicates (suggested by V Albergamo)
 
 ## September 2019
 
-* Labels for objects in a `featureGroupsComparison` can be labelled (useful for e.g. plotting)
+* Labels for objects in a `featureGroupsComparison` can be customized (useful for e.g. plotting)
 * Caching and progress bar support for suspect screening
 * Updated/Fixed JDK installation for installation script
 * Fixed missing pipe operator import (`%>%`)

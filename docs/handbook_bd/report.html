@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>5.6 Reporting | patRoon handbook</title>
   <meta name="description" content="5.6 Reporting | patRoon handbook" />
-  <meta name="generator" content="bookdown 0.10.2 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.13 and GitBook 2.6.7" />
 
   <meta property="og:title" content="5.6 Reporting | patRoon handbook" />
   <meta property="og:type" content="book" />
@@ -24,15 +24,15 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2019-05-18" />
+<meta name="date" content="2019-10-12" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="visualization.html">
-<link rel="next" href="advanced-usage.html">
+<link rel="prev" href="visualization.html"/>
+<link rel="next" href="advanced-usage.html"/>
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -65,7 +65,6 @@ a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
 a.sourceLine:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode { white-space: pre; position: relative; }
-div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
@@ -222,14 +221,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <ul>
 <li><code>reportCSV()</code>: exports workflow data to comma-separated value (csv) files</li>
 <li><code>reportPDF()</code>: generates simple reports by plotting workflow data in portable document files (PDFs)</li>
-<li><code>reportMD()</code>: generates interactive and easily explorable reports</li>
+<li><code>reportHTML()</code>: generates interactive and easily explorable reports</li>
 </ul>
 <p>There are many different arguments available to configure the reporting process. Some common arguments are listed below; for a complete listing see the reference manual (e.g. <code>?reporting</code>).</p>
 <table>
 <colgroup>
-<col width="30%" />
-<col width="22%" />
-<col width="47%" />
+<col width="29%" />
+<col width="23%" />
+<col width="46%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -246,7 +245,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </tr>
 <tr class="even">
 <td><code>MSPeakLists</code></td>
-<td><code>reportPDF()</code>, <code>reportMD()</code></td>
+<td><code>reportPDF()</code>, <code>reportHTML()</code></td>
 <td>The <code>MSPeakLists</code> object that was used to generate annotation data. Only needs to be specified if <code>formulas</code> or <code>compounds</code> are reported.</td>
 </tr>
 <tr class="odd">
@@ -256,35 +255,35 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </tr>
 <tr class="even">
 <td><code>formulasTopMost</code>, <code>compoundsTopMost</code></td>
-<td><code>reportPDF()</code>, <code>reportMD()</code></td>
+<td><code>reportPDF()</code>, <code>reportHTML()</code></td>
 <td>Report no more than this amount of highest ranked candidates.</td>
 </tr>
 <tr class="odd">
 <td><code>EICOnlyPresent</code></td>
-<td><code>reportPDF()</code>, <code>reportMD()</code></td>
+<td><code>reportPDF()</code>, <code>reportHTML()</code></td>
 <td>Only plot an EIC for an analysis if a feature was detected.</td>
 </tr>
 <tr class="even">
 <td><code>selfContained</code></td>
-<td><code>reportMD()</code></td>
+<td><code>reportHTML()</code></td>
 <td>Outputs to a single and self contained <code>.html</code> file. Handy to share reports, but not recommended for large amounts of data.</td>
 </tr>
 </tbody>
 </table>
 <p>Which data will be reported is fully configurable. The only workflow object that must be specified are the feature groups (i.e. with the <code>fGroups</code> argument), all other data (e.g. <code>compounds</code>, <code>components</code>) are optional. This means that reporting can be performed at every stage during the workflow, which, for instance, can be useful to quickly inspect results when testing out various settings to generate workflow data.</p>
-<p>When formula or compound results are reported with <code>reportPDF()</code> or <code>reportMD()</code> then only the top ranked candidates are considered. This limtation is often necessary as reporting many candidates will take considerable time. By default the top 5 for each feature group are reported, however, this number can be changed with the <code>formulasTopMost</code> and <code>compoundsTopMost</code> arguments.</p>
+<p>When formula or compound results are reported with <code>reportPDF()</code> or <code>reportHTML()</code> then only the top ranked candidates are considered. This limtation is often necessary as reporting many candidates will take considerable time. By default the top 5 for each feature group are reported, however, this number can be changed with the <code>formulasTopMost</code> and <code>compoundsTopMost</code> arguments.</p>
 <p>Some typical examples:</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">reportMD</span>(fGroups) <span class="co"># simple interactive report with feature data</span>
-<span class="co"># generate PDFs with feature and compound annotation data</span>
-<span class="kw">reportPDF</span>(fGroups, <span class="dt">compounds =</span> compounds, <span class="dt">MSPeakLists =</span> mslists)
-<span class="kw">reportCSV</span>(fGroups, <span class="dt">path =</span> <span class="st">&quot;myReport&quot;</span>) <span class="co"># change destination path</span>
-
-<span class="co"># generate report with all workflow types and increase maximum number of</span>
-<span class="co"># compound candidates to top 10</span>
-<span class="kw">reportMD</span>(fGroups, <span class="dt">formulas =</span> formulas, <span class="dt">compounds =</span> compounds,
-         <span class="dt">components =</span> components, <span class="dt">MSPeakLists =</span> mslists,
-         <span class="dt">compsCluster =</span> compsClust,
-         <span class="dt">compoundsTopMost =</span> <span class="dv">10</span>)</code></pre>
+<div class="sourceCode" id="cb95"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb95-1" data-line-number="1"><span class="kw">reportHTML</span>(fGroups) <span class="co"># simple interactive report with feature data</span></a>
+<a class="sourceLine" id="cb95-2" data-line-number="2"><span class="co"># generate PDFs with feature and compound annotation data</span></a>
+<a class="sourceLine" id="cb95-3" data-line-number="3"><span class="kw">reportPDF</span>(fGroups, <span class="dt">compounds =</span> compounds, <span class="dt">MSPeakLists =</span> mslists)</a>
+<a class="sourceLine" id="cb95-4" data-line-number="4"><span class="kw">reportCSV</span>(fGroups, <span class="dt">path =</span> <span class="st">&quot;myReport&quot;</span>) <span class="co"># change destination path</span></a>
+<a class="sourceLine" id="cb95-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb95-6" data-line-number="6"><span class="co"># generate report with all workflow types and increase maximum number of</span></a>
+<a class="sourceLine" id="cb95-7" data-line-number="7"><span class="co"># compound candidates to top 10</span></a>
+<a class="sourceLine" id="cb95-8" data-line-number="8"><span class="kw">reportHTML</span>(fGroups, <span class="dt">formulas =</span> formulas, <span class="dt">compounds =</span> compounds,</a>
+<a class="sourceLine" id="cb95-9" data-line-number="9">           <span class="dt">components =</span> components, <span class="dt">MSPeakLists =</span> mslists,</a>
+<a class="sourceLine" id="cb95-10" data-line-number="10">           <span class="dt">compsCluster =</span> compsClust,</a>
+<a class="sourceLine" id="cb95-11" data-line-number="11">           <span class="dt">compoundsTopMost =</span> <span class="dv">10</span>)</a></code></pre></div>
 
 </div>
 <!-- </div> -->

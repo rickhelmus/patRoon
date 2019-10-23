@@ -279,24 +279,24 @@ findFeatures <- function(analysisInfo, algorithm, ..., verbose = TRUE)
     f(analysisInfo, ..., verbose = verbose)
 }
 
-#' @templateVar func importFeatures
-#' @templateVar what import features
-#' @templateVar ex1 importFeaturesXCMS
-#' @templateVar ex2 importFeaturesEnviMass
-#' @templateVar algos xcms,xcms3,envimass
-#' @template generic-algo
+#' @details \code{importFeatures} is a generic function to import feature groups
+#'   produced by other software. The actual functionality is provided by
+#'   specific functions such as \code{importFeaturesXCMS} and
+#'   \code{importFeaturesEnviMass}.
+#' @param type What type of data should be imported: \code{"xcms"},
+#'   \code{"xcms3"} or \code{"envimass"}.
 #'
 #' @rdname feature-finding
 #' @export
-importFeatures <- function(analysisInfo, algorithm, ...)
+importFeatures <- function(analysisInfo, type, ...)
 {
     analysisInfo <- assertAndPrepareAnaInfo(analysisInfo)
 
-    f <- switch(algorithm,
+    f <- switch(type,
                 xcms = importFeaturesXCMS,
                 xcms3 = importFeaturesXCMS3,
                 envimass = importFeaturesEnviMass,
-                stop("Invalid algorithm! Should be: xcms or envimass"))
+                stop("Invalid algorithm! Should be: xcms, xcms3 or envimass"))
 
     f(analysisInfo = analysisInfo, ...)
 }

@@ -99,13 +99,14 @@ arguments of \code{\link{homol.search}}.}
 detection of repeating units. Sets the \code{elements} argument of
 \code{\link{homol.search}} function.}
 
-\item{rtDev, absMzDev}{Maximum retention and (absolute) \emph{m/z}
-deviation for detection of homologues within series. These arguments set
-the \code{rttol} and \code{mztol} arguments of \code{\link{homol.search}}.}
+\item{rtDev, absMzDev, relMzDev}{Maximum deviation for retention time or
+  absolute/relative \emph{m/z}.
 
-\item{absMzDev, relMzDev}{Maximum absolute/relative \emph{m/z} deviation for
-annotation. Passed as the \code{mzabs.error} and \code{ppm.error} arguments
-to \code{\link[RAMClustR]{do.findmain}}.}
+  For \code{generateComponentsRAMClustR}: Sets the \code{mzabs.error} and
+  \code{ppm.error} arguments to \code{\link[RAMClustR]{do.findmain}}.
+
+  For \code{generateComponentsNontarget}: Sets the \code{rttol} and
+  \code{mztol} arguments of \code{\link{homol.search}}.}
 
 \item{traceHack}{Currently \code{\link{homol.search}} does not work with \R
 \samp{>3.3.3}. This flag, which is enabled by default on these R versions,
@@ -186,8 +187,8 @@ For \code{generateComponentsCAMERA} and
   \code{relMinReplicates} arguments provide additional filtering
   functionality not provided by \pkg{CAMERA} or \pkg{RAMClustR} (except
   \code{minSize}). Note that these filters are enabled by default, hence,
-  final results may be different than what CAMERA/RAMClustR normally
-  would return.
+  final results may be different than what CAMERA/RAMClustR normally would
+  return.
 }
 \references{
 \addCitations{CAMERA}{1}

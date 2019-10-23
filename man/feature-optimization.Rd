@@ -32,8 +32,8 @@ getDefFeaturesOptParamRanges(algorithm, method = "centWave")
 \item{features}{A \code{\link{features}} object with the features that should
 be used to optimize grouping.}
 
-\item{algorithm}{Which algorithm should be used for feature finding/grouping
-(passed to \code{\link{findFeatures}}/\code{\link{groupFeatures}}).}
+\item{algorithm}{The algorithm used for finding or grouping features (see
+\code{\link{findFeatures}} and \code{\link{groupFeatures}}).}
 
 \item{\dots}{One or more lists with parameter sets (see below) (for
 \code{optimizeFeatureFinding} and \code{optimizeFeatureGrouping}).

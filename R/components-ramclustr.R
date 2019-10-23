@@ -21,9 +21,6 @@ setMethod("initialize", "componentsRC",
 #'   group clustering. See their documentation from \code{\link[RAMClustR]{ramclustR}}.
 #'   When \code{st} is \code{NULL} it will be automatically calculated as the
 #'   half of the median for all chromatographic peak widths.
-#' @param absMzDev,relMzDev Maximum absolute/relative \emph{m/z} deviation for
-#'   annotation. Passed as the \code{mzabs.error} and \code{ppm.error} arguments
-#'   to \code{\link[RAMClustR]{do.findmain}}.
 #' @param RCExperimentVals A named \code{list} containing two more \code{list}s:
 #'   \code{design} and \code{instrument}. These are used to construct the
 #'   \code{ExpDes} argument passed to \code{\link[RAMClustR]{ramclustR}}.

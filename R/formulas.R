@@ -493,7 +493,6 @@ setMethod("annotatedPeakList", "formulas", function(obj, precursor, groupName, a
 
 #' @describeIn formulas Plots a barplot with scoring of a candidate compound.
 #'
-#' @aliases plotScores
 #' @export
 setMethod("plotScores", "formulas", function(obj, precursor, groupName, analysis = NULL,
                                              normalizeScores = "max",

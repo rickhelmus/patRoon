@@ -51,6 +51,9 @@ Analogous to \code{\link{cutree}}.}
 \item{interactive}{If \code{TRUE} an interactive heatmap will be drawn (with
 \code{\link{d3heatmap}}).}
 
+\item{col}{The colour used for plotting. Set to \code{NULL} for automatic
+colours.}
+
 \item{margins, cexCol}{Passed to \code{\link{heatmap.2}}}
 
 \item{\dots}{Further options passed to \code{\link{heatmap.2}} /
@@ -60,6 +63,8 @@ Analogous to \code{\link{cutree}}.}
 \item{index}{Numeric component/cluster index.}
 
 \item{pch, type}{Passed to \code{\link[graphics]{plot}}.}
+
+\item{lty}{Passed to \code{\link{lines}}.}
 
 \item{x, obj}{A \code{componentsIntClust} object.}
 

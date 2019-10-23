@@ -44,6 +44,8 @@ genIntComponentInfo <- function(cutClusters)
 #'   clustering.
 #'
 #' @param x,obj A \code{componentsIntClust} object.
+#' @param col The colour used for plotting. Set to \code{NULL} for automatic
+#'   colours.
 #' @param \dots Further options passed to \code{\link{heatmap.2}} /
 #'   \code{\link{d3heatmap}} (\code{plotHeatMap}), \code{\link{plot.dendrogram}}
 #'   (\code{plot}) or \code{\link[graphics]{plot}} (\code{plotInt}).
@@ -161,6 +163,7 @@ setMethod("plotHeatMap", "componentsIntClust", function(obj, interactive = FALSE
 #' @describeIn componentsIntClust makes a plot for all (normalized) intensity
 #'   profiles of the feature groups within a given cluster.
 #' @param index Numeric component/cluster index.
+#' @param lty Passed to \code{\link{lines}}.
 #' @export
 setMethod("plotInt", "componentsIntClust", function(obj, index, pch = 20, type = "b",
                                                     lty = 3, col = NULL, ...)

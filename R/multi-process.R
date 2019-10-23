@@ -165,7 +165,7 @@ defMultiProcErrorHandler <- function(cmd, exitStatus, ...)
 #'
 #' This function executes a given queue with system commands in parallel to
 #' speed up computation. Commands are executed in the background using the
-#' \pkg{\link{processx}} package. A configurable maximum amount of processes are
+#' \pkg{processx} package. A configurable maximum amount of processes are
 #' created to execute multiple commands in parallel.
 #'
 #' Multiple commands may be executed in sequence that are launched from a single

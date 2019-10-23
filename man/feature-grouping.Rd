@@ -63,9 +63,10 @@ file from Bruker ProfileAnalysis, for \code{importFeatureGroupsBrukerTASQ}
 an exported global result table (converted to \file{.csv}) and for
 \code{importFeatureGroupsEnviMass} the path of the enviMass project.}
 
-\item{type}{The type of data to be imported: \code{brukerpa} for Bruker
-ProfileAnalysis, \code{brukertasq} for Bruker TASQ or \code{envimass} for
-\pkg{enviMass}.}
+\item{type}{Which file type should be imported or exported: \code{"brukerpa"}
+(Bruker ProfileAnalysis), \code{"brukertasq"} (Bruker TASQ),
+\code{envimass} (\pkg{enviMass}, only import) or \code{"mzmine"} (MZMine,
+only export).}
 
 \item{rtWindow, mzWindow, intWindow}{Search window values for retention time
 (seconds), \emph{m/z} (Da) and intensity used to find back features within
@@ -109,8 +110,6 @@ extra parameters to be used by \code{\link[xcms:group-methods]{xcms::group}} and
 \code{\link[xcms:adjustRtime]{xcms::adjustRtime}}, respectively.}
 
 \item{xdata}{An \code{\link{XCMSnExp}} object.}
-
-\item{analysisInfo}{A \code{data.frame} with \link[=analysis-information]{analysis info}.}
 }
 \value{
 An object of a class which is derived from

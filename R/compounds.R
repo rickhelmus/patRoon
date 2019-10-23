@@ -519,7 +519,6 @@ setMethod("plotStructureHash", "compounds", function(obj, index, groupName, widt
 #'   have been used to rank data (see the \code{scoreTypes} argument to
 #'   \code{\link{generateCompoundsMetfrag}} for more details).
 #'
-#' @aliases plotScores
 #' @export
 setMethod("plotScores", "compounds", function(obj, index, groupName, normalizeScores = "max",
                                               excludeNormScores = c("score", "individualMoNAScore"),
@@ -901,8 +900,6 @@ setMethod("mergedCompoundNames", "compoundsConsensus", function(compounds) compo
 #' @templateVar what compounds
 #' @template consensus-form_comp
 #'
-#' @param mergeScoresFunc Function used to calculate the total score for all
-#'   (merged) score columns.
 #' @param minMaxNormalization Set to \code{TRUE} to apply min-max normalization
 #'   of (merged) scoring columns. \code{FALSE} will apply normalization to the
 #'   maximum value. Scorings with negative values will always be min-max

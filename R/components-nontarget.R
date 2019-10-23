@@ -97,9 +97,6 @@ setMethod("plotGraph", "componentsNT", function(obj, onlyLinked)
 #' @param elements A character vector with elements to be considered for
 #'   detection of repeating units. Sets the \code{elements} argument of
 #'   \code{\link{homol.search}} function.
-#' @param rtDev,absMzDev Maximum retention and (absolute) \emph{m/z}
-#'   deviation for detection of homologues within series. These arguments set
-#'   the \code{rttol} and \code{mztol} arguments of \code{\link{homol.search}}.
 #' @param traceHack Currently \code{\link{homol.search}} does not work with \R
 #'   \samp{>3.3.3}. This flag, which is enabled by default on these R versions,
 #'   implements a (messy) workaround

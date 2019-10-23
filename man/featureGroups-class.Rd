@@ -139,10 +139,6 @@ argument to \code{\link[=filter,featureGroups-method]{filter}}).}
 
 \item{name}{The feature group name (partially matched).}
 
-\item{type}{Which file type should be exported: \code{"brukerpa"} (Bruker
-ProfileAnalysis), \code{"brukertasq"} (Bruker TASQ) or \code{"mzmine"}
-(MZMine).}
-
 \item{out}{The destination file for the exported data.}
 
 \item{average}{Average data within replicate groups.}

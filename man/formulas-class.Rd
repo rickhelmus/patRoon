@@ -18,7 +18,6 @@
 \alias{filter,formulas-method}
 \alias{annotatedPeakList,formulas-method}
 \alias{plotScores,formulas-method}
-\alias{plotScores}
 \alias{plotSpec,formulas-method}
 \alias{plotVenn,formulas-method}
 \alias{plotUpSet,formulas-method}

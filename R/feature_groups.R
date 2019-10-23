@@ -296,9 +296,6 @@ setMethod("updateFeatIndex", "featureGroups", function(fGroups)
 #'   is readable to Bruker ProfileAnalysis (a 'bucket table'), Bruker TASQ (an
 #'   analyte database) or that is suitable as input for the \verb{Targeted peak
 #'   detection} functionality of \href{http://mzmine.github.io/}{MZmine}.
-#' @param type Which file type should be exported: \code{"brukerpa"} (Bruker
-#'   ProfileAnalysis), \code{"brukertasq"} (Bruker TASQ) or \code{"mzmine"}
-#'   (MZMine).
 #' @param out The destination file for the exported data.
 #' @aliases export
 #' @export
@@ -1322,9 +1319,6 @@ setMethod("groupFeatures", "features", function(feat, algorithm, ..., verbose = 
 #'   file from Bruker ProfileAnalysis, for \code{importFeatureGroupsBrukerTASQ}
 #'   an exported global result table (converted to \file{.csv}) and for
 #'   \code{importFeatureGroupsEnviMass} the path of the enviMass project.
-#' @param type The type of data to be imported: \code{brukerpa} for Bruker
-#'   ProfileAnalysis, \code{brukertasq} for Bruker TASQ or \code{envimass} for
-#'   \pkg{enviMass}.
 #'
 #' @rdname feature-grouping
 #' @export

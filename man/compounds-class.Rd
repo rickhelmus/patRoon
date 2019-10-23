@@ -24,7 +24,6 @@
 \alias{getMCS,compounds-method}
 \alias{plotStructure,compounds-method}
 \alias{plotScores,compounds-method}
-\alias{plotScores}
 \alias{annotatedPeakList,compounds-method}
 \alias{plotSpec,compounds-method}
 \alias{plotVenn,compounds-method}
@@ -258,9 +257,6 @@ normalized.}
 ranking score for each candidate. The value will be re-cycled if necessary,
 hence, the default value of \samp{1} means equal weights for all considered
 objects.}
-
-\item{mergeScoresFunc}{Function used to calculate the total score for all
-(merged) score columns.}
 }
 \value{
 \code{plotSpec} and \code{plotStructure} will return a

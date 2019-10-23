@@ -131,7 +131,7 @@ groups.
   are generated in advance by Bruker DataAnalysis, no further parameters
   exist to customize its operation.
 
-\code{generateMSPeakListsMzR} uses the \pkg{\link{mzR}} package to
+\code{generateMSPeakListsMzR} uses the \pkg{mzR} package to
   extract MS peak lists. For this analyses should be either in \file{.mzXML}
   or \file{.mzML} format. This function averages multiple spectra over a
   chromatgraphic peak to improve accuracy.

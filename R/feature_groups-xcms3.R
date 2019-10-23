@@ -119,7 +119,6 @@ importFeatureGroupsXCMS3FromFeat <- function(xdata, analysisInfo, feat)
 #'   \code{\link{XCMSnExp}} object (from the \pkg{xcms} package).
 #'
 #' @param xdata An \code{\link{XCMSnExp}} object.
-#' @param analysisInfo A \code{data.frame} with \link[=analysis-information]{analysis info}.
 #'
 #' @rdname feature-grouping
 #' @export

@@ -18,7 +18,7 @@
 \usage{
 findFeatures(analysisInfo, algorithm, ..., verbose = TRUE)
 
-importFeatures(analysisInfo, algorithm, ...)
+importFeatures(analysisInfo, type, ...)
 
 findFeaturesBruker(analysisInfo, doFMF = "auto", startRange = 0,
   endRange = 0, save = TRUE, close = save, verbose = TRUE)
@@ -60,6 +60,9 @@ used: \code{"bruker"}, \code{"openms"}, \code{"xcms"}, \code{"xcms3"}, \code{"en
 algorithms (\code{findFeatures} and \code{importFeatures}).}
 
 \item{verbose}{If set to \code{FALSE} then no text output is shown.}
+
+\item{type}{What type of data should be imported: \code{"xcms"},
+\code{"xcms3"} or \code{"envimass"}.}
 
 \item{doFMF}{Run the 'Find Molecular Features' algorithm before loading
 compounds. Valid options are: \code{"auto"} (run FMF automatically if
@@ -164,9 +167,6 @@ efficient results.}
 \code{\link[xcms:findChromPeaks]{xcms::findChromPeaks}}}
 
 \item{xdata}{An \code{\link{XCMSnExp}} object.}
-
-\item{algorithm}{A character string describing the algorithm that should be
-used: \code{"xcms"}, \code{"xcms3"}, \code{"envimass"}}
 }
 \value{
 An object of a class which is derived from \code{\link{features}}.
@@ -192,12 +192,10 @@ methodology and instrumentation.
   \code{findFeatures} provides a generic interface and is therefore usually
   preferred.
 
-\code{importFeatures} is a generic function that will import features
-  using one of the supported algorithms. The actual functionality is provided
-  by algorithm specific functions such as \code{importFeaturesXCMS} and
-  \code{importFeaturesEnviMass}. While these functions may be called directly,
-  \code{importFeatures} provides a generic interface and is therefore usually
-  preferred.
+\code{importFeatures} is a generic function to import feature groups
+  produced by other software. The actual functionality is provided by
+  specific functions such as \code{importFeaturesXCMS} and
+  \code{importFeaturesEnviMass}.
 
 \code{findFeaturesBruker} uses the 'Find Molecular Features' (FMF)
   algorithm of Bruker DataAnalysis vendor software to find features. The

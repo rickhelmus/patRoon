@@ -67,7 +67,7 @@ setMethod("plotGraph", "componentsNT", function(obj, onlyLinked)
     nodes[, shape := "circle"]
 
     infos <- obj@componentInfo[match(nodes$id, name), c("rt_increment", "mz_increment", "size"), with = FALSE]
-    hsFGroups <- sapply(nodes$id, function(cmp) paste0(obj[[cmp]]$group, collapse = ", "))
+    hsFGroups <- sapply(nodes$id, function(cmp) paste0(unique(obj[[cmp]]$group), collapse = ", "))
     hsRGroups <- sapply(nodes$id, function(cmp) paste0(unique(obj[[cmp]]$rGroup), collapse = ", "))
     nodes[, title := sprintf("<b>%s</b> (RT: %.2f; m/z: %.4f; #%d)<br>fGroups: <i>%s</i><br>rGroups: <i>%s</i>",
                              nodes$label, infos$rt_increment, infos$mz_increment, infos$size, hsFGroups, hsRGroups)]
@@ -202,7 +202,7 @@ generateComponentsNontarget <- function(fGroups, ionization, rtRange = c(-120, 1
         return(components(componentInfo = data.table(), components = list(), algorithm = "nontarget"))
 
     # check which series should be linked
-    compTab[, links := list(list())]
+    compTab[, links := list(list(integer()))]
 
     for (r in seq_len(nrow(compTab)))
     {
@@ -226,23 +226,23 @@ generateComponentsNontarget <- function(fGroups, ionization, rtRange = c(-120, 1
 
             otherMzRange <- range(gInfo[otherSeries, "mzs"])
 
-            # check for conflicts: groups that are not present in both and with
-            # m/z values within the m/z range of the series
+            # check for conflicts: groups that are not present in both but with
+            # m/z values close or equal to those groups that are present
             missingG <- setdiff(series, otherSeries)
             missingOtherG <- setdiff(otherSeries, series)
 
-            mzWithin <- function(mz1, mz2) numLTE(abs(mz1 - mz2), (compTab[["m/z increment"]][r] - absMzDev))
-
-            if (any(sapply(missingG, function(mg) any(mzWithin(gInfo[mg, "mzs"], gInfo[otherSeries, "mzs"])))) ||
-                any(sapply(missingOtherG, function(mg) any(mzWithin(gInfo[mg, "mzs"], gInfo[series, "mzs"])))))
+            mzSame <- function(mz1, mz2) numLTE(abs(mz1 - mz2), absMzDev)
+            
+            if (any(sapply(missingG, function(mg) any(mzSame(gInfo[mg, "mzs"], gInfo[otherSeries, "mzs"])))) ||
+                any(sapply(missingOtherG, function(mg) any(mzSame(gInfo[mg, "mzs"], gInfo[series, "mzs"])))))
                 next
-
+            
             links <- c(links, ro)
         }
 
         set(compTab, r, "links", list(list(links)))
     }
-
+    
     presentRGroups <- rGroups[sapply(rGroups, function(rg) !is.null(compTab[[rg]]))]
 
     # merge any pairs of series that are just pointing to each other: they are
@@ -276,7 +276,7 @@ generateComponentsNontarget <- function(fGroups, ionization, rtRange = c(-120, 1
                 }
                 
                 set(compTab, other, "keep", FALSE) # remove other
-                set(compTab, r, "links", list(list(integer()))) # unlink
+                set(compTab, r, "links", list(list(setdiff(links, other)))) # unlink
             }
         }
     }
@@ -290,7 +290,13 @@ generateComponentsNontarget <- function(fGroups, ionization, rtRange = c(-120, 1
         links <- compTab[["links"]][[r]]
         if (length(links) > 0)
         {
-            newLinks <- sapply(links, function(l) compTab[IDs == l, which = TRUE])
+            # no sapply: this may return integer(0) for removed links and therefore make it a list
+            # --> use lapply and convert from list afterwards
+            newLinks <- lapply(links, function(l) compTab[IDs == l, which = TRUE])
+            newLinks <- newLinks[lengths(newLinks) > 0] # length will be zero if linked series was removed
+            newLinks <- unlist(newLinks)
+            if (is.null(newLinks)) # no links anymore?
+                newLinks <- integer()
             set(compTab, r, "links", list(list(newLinks)))
         }
     }

@@ -7,6 +7,11 @@
     * `maxProcAmount` (i.e. number of parallel processes) now defaults to amount of physical cores instead of total number of CPU threads.
     * Decreased `batchSize` to `8` for GenForm formula calculation.
 * `plot()` for `featureGroups` can now highlight unique/shared features across replicates (suggested by V Albergamo)
+* Linking of homologous series:
+    * Improved info descriptions for `plotGraph()`
+    * Series are now properly unlinked when merging (was too greedy)
+    * Better algorithm to detect conflicting series
+    * Fixed bug when updating removed links
 
 ## September 2019
 

@@ -60,7 +60,7 @@ Software                         | Remarks
 [SIRIUS]                         | For formula and/or compound annotation.
 [pngquant]                       | Used to reduce size of HTML reports, definitely optional.
 
-After installation you may need to configure the file path to ProteoWizard, OpenMS, SIRIUS, MetFrag, the MetFrag CompTox DB and/or pngquant (normally ProteoWizard and OpenMS should be automatically found). To configure their file locations you should set some global package options with the `option()` R function, for instance:
+After installation you may need to configure the file path to ProteoWizard, OpenMS, SIRIUS, MetFrag, the MetFrag CompTox DB and/or pngquant (normally ProteoWizard and OpenMS should be automatically found). To configure their file locations you should set some global package options with the `options()` R function, for instance:
 
 ```{r, eval=FALSE}
 options(patRoon.path.pwiz = "C:/ProteoWizard") # location of ProteoWizard installation folder

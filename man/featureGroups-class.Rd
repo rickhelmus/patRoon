@@ -144,7 +144,7 @@ argument to \code{\link[=filter,featureGroups-method]{filter}}).}
 \code{average=TRUE} this data will be averaged for each feature group.}
 
 \item{regression}{Set to \code{TRUE} to add regression data for each feature
-group. For this a linear model is created (intensity/area [dependning on
+group. For this a linear model is created (intensity/area [depending on
 \code{areas} argument] \emph{vs} concentration). The model concentrations
 (e.g. of a set of standards) is derived from the \code{conc} column of the
 \link[=analysis-information]{analysis information}. From this model the

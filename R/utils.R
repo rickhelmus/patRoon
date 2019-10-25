@@ -137,7 +137,7 @@ getCommandWithOptPath <- function(cmd, opt, verify = TRUE)
     if (!nzchar(Sys.which(cmd)))
     {
         if (verify)
-            stop(sprintf("Cannot find '%s'. Either add the correct file location to the PATH environment variable or set '%s' with option().", cmd, opt))
+            stop(sprintf("Cannot find '%s'. Either add the correct file location to the PATH environment variable or set '%s' with options().", cmd, opt))
         return(NULL)
     }
 

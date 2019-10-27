@@ -46,7 +46,17 @@ if (runData)
     fGroupsRG <- groupFeatures(fListRG, "openms")
     fGroupsRG <- filter(fGroupsRG, preAbsMinIntensity = 100, absMinIntensity = 10000)
     
-    
+    anaInfoConc <- generateAnalysisInfo(paths = patRoonData::exampleDataPath(),
+                                        groups = c(rep("solvent", 3), rep("standard", 3)),
+                                        blanks = "solvent",
+                                        concs = c(NA, NA, NA, 1, 2, 3))
+    fListConc <- findFeatures(anaInfoConc, "openms")
+    fGroupsConc <- groupFeatures(fListConc, "openms")
+    fGroupsConc <- filter(fGroupsConc, preAbsMinIntensity = 100, absMinIntensity = 10000,
+                          relMinReplicateAbundance = 1, maxReplicateIntRSD = 0.75,
+                          blankThreshold = 5, removeBlanks = TRUE,
+                          retentionRange = c(120, Inf), mzRange = NULL)
+        
     avgPListParams <- getDefAvgPListParams(clusterMzWindow = 0.002)
     mslists <- generateMSPeakLists(fGroups, "mzr", maxMSRtWindow = 5, precursorMzWindow = 4,
                                    avgFeatParams = avgPListParams, avgFGroupParams = avgPListParams)
@@ -62,6 +72,7 @@ if (runData)
     
     componCAM <- components <- generateComponents(fGroups, "camera", ionization = "positive")
     componInt <- generateComponents(fGroupsRG, "intclust")
+    componNT <- generateComponents(fGroupsUF, "nontarget", extraOpts = list(minlength=3), ionization = "positive")
     
     compsClust <- makeHCluster(compsMF)
     
@@ -71,7 +82,8 @@ if (runData)
     
     # saveRDS(list(fList = fList, fGroups = fGroups, fGroupsUF = fGroupsUF, fListRG = fListRG,
     #              fGroupsRG = fGroupsRG, mslists = mslists, formulas = formulas, compsMF = compsMF,
-    #              compsSIR = compsSIR, componCAM = componCAM, componInt = componInt, compsClust = compsClust,
+    #              compsSIR = compsSIR, componCAM = componCAM, componInt = componInt, componNT = componNT,
+    #              compsClust = compsClust,
     #              ftOpt = ftOpt),
     #         "~/handbook-obj.Rds")
 }

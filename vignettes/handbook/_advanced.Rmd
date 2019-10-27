@@ -240,6 +240,42 @@ compsClust <- treeCutDynamic(compsClust, minModuleSize = 3, groupName = "M109_R1
 
 For a complete overview see the reference manual (`?compoundsCluster`).
 
+## Basic quantitative and regression analysis
+
+
+While `patRoon` is currently primarily focused on qualitative analyses, some _basic_ quantitative analysis can also be performed, for instance, to estimate concentrations of features. In fact, other types of data that may be useful for regression analysis can be set such as sample dilution factor or sampling time. The latter may, for instance, be used to isolate features with increasing or decreasing intensity. Regardless of what kind of regression analysis is performed, here we simply refer the values to be calculated as _concentrations_. In order to use this functionality, an extra column (`conc`) should be added to the [analysis information](#anaInfo), for instance:
+
+```{r quantAnaInfo,eval=FALSE}
+# obtain analysis information as usual, but add some concentrations.
+# The blanks are set to NA, whereas the standards are set to increasing levels.
+anaInfo <- generateAnalysisInfo(paths = patRoonData::exampleDataPath(),
+                                groups = c(rep("solvent", 3), rep("standard", 3)),
+                                blanks = "solvent",
+                                concs = c(NA, NA, NA, 1, 2, 3))
+```
+
+For analyses with known concentrations (e.g. standards) the `conc` column should be set; for all others the value should be set to `NA`.
+
+The `as.data.table()` function (or `as.data.frame()`) can then be used to calculate regression data and estimate concentrations:
+
+```{r quantDT,eval=FALSE}
+# use areas for quantitation and make sure that feature data is reported
+# (otherwise no concentrations are calculated)
+as.data.table(fGroups, areas = TRUE, features = TRUE, regression = TRUE)
+```
+
+```{r quantDTDo,echo=FALSE,eval=runData}
+as.data.table(fGroupsConc, areas = TRUE, features = TRUE, regression = TRUE)
+```
+
+Calculated concentrations are stored in the `conc_reg` column, alongside while other regression data (i.e. `RSQ`, `intercept`, `slope` columns). To perform basic trend analysis the `RSQ` (i.e. R squared) can be used:
+
+```{r quantRSQ,eval=FALSE}
+fGroupsTab <- as.data.table(fGroups, areas = TRUE, features = FALSE, regression = TRUE)
+# subset fGroups with reasonable correlation
+increasingFGroups <- fGroups[, fGroupsTab[RSQ >= 0.8, group]]
+```
+
 ## Caching
 
 In `patRoon` lengthy processing operations such as finding features and generating annotation data is _cached_. This means that when you run such a calculation again (without changing any parameters), the data is simply loaded from the cache data instead of re-generating it. This in turn is very useful, for instance, if you have closed your R session and want to continue with data processing at a later stage.

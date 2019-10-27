@@ -453,7 +453,7 @@ In addition, several plotting functions are [discussed in the next section](#vis
 
 ## Visualization
 
-### Features and annatation data
+### Features and annatation data {#vis_feat_ann}
 
 Several generic functions are available to visualize feature and annotation data:
 
@@ -465,6 +465,7 @@ Generic           | Classes                                              | Remar
 `plotSpec()`      | `MSPeakLists`, `formulas`, `compounds`, `components` | Plots (annotated) spectra
 `plotStructure()` | `compounds`                                          | Draws candidate structures
 `plotScores()`    | `formulas`, `compounds`                              | Barplot for candidate scoring
+`plotGraph()`     | `componentsNT`                                       | Draws interactive graphs of linked homologous series
 
 The most common plotting functions are `plotEIC()`, which plots chromatographic data for features, and `plotSpec()`, which will plot (annotated) spectra. An overview of their most important function arguments are shown below.
 
@@ -531,6 +532,9 @@ plotSpec(compounds, index = 1, groupName = "M120_R328_81", MSPeakLists = mslists
 plotSpec(compounds, index = 1, groupName = "M120_R328_81", MSPeakLists = mslists,
          ylim = c(0, 5000), plotStruct = FALSE)
 plotSpec(components, index = 7) # component spectrum
+
+# Inspect homologous series
+plotGraph(componNT)
 ```
 
 ### Comparing data {#visComp}

@@ -488,8 +488,6 @@ componRC <- generateComponents(fGroups, "ramclustr", ionization = "positive", hm
 
 ### Homologues series
 
-<!-- UNDONE: view links? -->
-
 Homologues series can be automatically detected by interfacing with the [nontarget] R package. Components are made from feature groups that show increasing _m/z_ and retention time values. Series are first detected within each replicate group. Afterwards, series from all replicates are linked in case (partial) overlap occurs and this overlap consists of the _same_ feature groups (see figure below). Linked series are then finally merged if this will not cause any conflicts with other series: such a conflict typically occurs when two series are not only linked to each other.
 
 ```{r HS,echo=FALSE,fig.cap="**Linking of homologues series** top: partial overlap and will be linked; bottom: no linkage due to different feature in overlapping series."}
@@ -535,6 +533,8 @@ digraph Homologs {
   D -> _D [constraint=false, style=dashed, arrowhead=none]
 }", height = 250, width = 600)
 ```
+
+The series that are linked can be interactively explored with the `plotGraph()` function (discussed [here](#vis_feat_ann)).
 
 Common function arguments to `generateComponents()` are listed below.
 

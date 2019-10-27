@@ -10,10 +10,6 @@
 
 ## docs
 - improve instructions for MF and SIRIUS installation?
-- handbook
-    - semi-quant advanced section
-    - NT components graph plotting
-    - xcms3
 
 
 ## features
@@ -31,6 +27,7 @@
     - remove zero values for maxReplicateIntRSD?
 - importFeaturesXCMS/importFeaturesXCMS3/importFeatureGroupsXCMS: get rid of anaInfo arg requirement? (or make import func?)
 - comparison(): support xcms3? (needs missing support for missing raw data)
+- conc to generateAnalysisInformation?
 
 
 ## MSPeakLists
@@ -55,6 +52,7 @@
 
 ## components
 - RC: check spearmans correlation
+- NT: minimum size argument, combine rows for multiple rGroups?
 
 
 ## reporting
@@ -78,6 +76,7 @@
 - newProject(): fix multi line delete (when possible)
 - more withr wrapping? (dev, par)
 - improve default plotting for plotInt and cluster plot functions
+- newProject(): concentration column for anaInfo
 
 
 ## Features

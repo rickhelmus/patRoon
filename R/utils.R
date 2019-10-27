@@ -196,31 +196,37 @@ line2user <- function(line, side)
            stop("Side must be 1, 2, 3, or 4", call.=FALSE))
 }
 
-#' @details \code{generateAnalysisInfo} is an utility function that automatically
-#'   generates an analysis information object. It will collect all datafiles
-#'   from given file paths and convert the filenames into valid analysis names
-#'   (\emph{i.e.} without extensions such as \file{.d} and \file{.mzML}).
-#'   Duplicate analyses, which may appear when datafiles with different file
-#'   extension (\file{.d}, \file{.mzXML} and/or \file{.mzML}) are present, will
-#'   be automatically removed.
+#' @details \code{generateAnalysisInfo} is an utility function that
+#'   automatically generates an analysis information object. It will collect all
+#'   datafiles from given file paths and convert the filenames into valid
+#'   analysis names (\emph{i.e.} without extensions such as \file{.d} and
+#'   \file{.mzML}). Duplicate analyses, which may appear when datafiles with
+#'   different file extension (\file{.d}, \file{.mzXML} and/or \file{.mzML}) are
+#'   present, will be automatically removed.
 #'
 #' @param paths A character vector containing one or more file paths that should
 #'   be used for finding the analyses.
-#' @param groups,blanks An (optional) character vector containing replicate groups
-#'   and references, respectively (will be recycled). If \code{groups} is an
-#'   empty character string (\code{""}) the analysis name will be set as
+#' @param groups,blanks An (optional) character vector containing replicate
+#'   groups and references, respectively (will be recycled). If \code{groups} is
+#'   an empty character string (\code{""}) the analysis name will be set as
 #'   replicate group.
+#' @param concs An optional numeric vector containing concentration values for
+#'   each analysis. Can be \code{NA} if unknown. If the length of \code{concs}
+#'   is less than the number of analyses the remainders will be set to
+#'   \code{NA}. Set to \code{NULL} to not include concentration data.
 #' @param formats A character vector of analyses file types. Valid values are:
 #'   \code{Bruker}, \code{mzXML} and \code{mzML}.
 #'
 #' @rdname analysis-information
 #' @export
-generateAnalysisInfo <- function(paths, groups = "", blanks = "", formats = MSFileFormats())
+generateAnalysisInfo <- function(paths, groups = "", blanks = "", concs = NULL,
+                                 formats = MSFileFormats())
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertDirectoryExists(paths, access = "r", add = ac)
     checkmate::assertCharacter(groups, min.len = 1, add = ac)
     checkmate::assertCharacter(blanks, min.len = 1, add = ac)
+    checkmate::assertNumeric(concs, finite = TRUE, null.ok = TRUE, add = ac)
     checkmate::assertSubset(formats, MSFileFormats(), empty.ok = FALSE, add = ac)
     checkmate::reportAssertions(ac)
 
@@ -239,6 +245,17 @@ generateAnalysisInfo <- function(paths, groups = "", blanks = "", formats = MSFi
     groups <- rep(groups, length.out = nrow(ret))
     ret$group <- ifelse(!nzchar(groups), ret$analysis, groups)
     ret$blank <- blanks
+    
+    if (!is.null(concs))
+    {
+        if (length(concs) >= nrow(ret))
+            ret$conc <- concs[seq_len(nrow(ret))]
+        else
+        {
+            ret$conc <- NA
+            ret$conc[seq_along(concs)] <- concs
+        }
+    }
 
     return(ret)
 }

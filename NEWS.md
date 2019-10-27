@@ -12,6 +12,7 @@
     * Series are now properly unlinked when merging (was too greedy)
     * Better algorithm to detect conflicting series
     * Fixed bug when updating removed links
+* `concs` option for `generateAnalysisInfo()` to set concentration data
 
 ## September 2019
 

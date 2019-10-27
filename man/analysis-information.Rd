@@ -6,7 +6,7 @@
 \alias{generateAnalysisInfoFromEnviMass}
 \title{Analysis information}
 \usage{
-generateAnalysisInfo(paths, groups = "", blanks = "",
+generateAnalysisInfo(paths, groups = "", blanks = "", concs = NULL,
   formats = MSFileFormats())
 
 generateAnalysisInfoFromEnviMass(path)
@@ -15,10 +15,15 @@ generateAnalysisInfoFromEnviMass(path)
 \item{paths}{A character vector containing one or more file paths that should
 be used for finding the analyses.}
 
-\item{groups, blanks}{An (optional) character vector containing replicate groups
-and references, respectively (will be recycled). If \code{groups} is an
-empty character string (\code{""}) the analysis name will be set as
+\item{groups, blanks}{An (optional) character vector containing replicate
+groups and references, respectively (will be recycled). If \code{groups} is
+an empty character string (\code{""}) the analysis name will be set as
 replicate group.}
+
+\item{concs}{An optional numeric vector containing concentration values for
+each analysis. Can be \code{NA} if unknown. If the length of \code{concs}
+is less than the number of analyses the remainders will be set to
+\code{NA}. Set to \code{NULL} to not include concentration data.}
 
 \item{formats}{A character vector of analyses file types. Valid values are:
 \code{Bruker}, \code{mzXML} and \code{mzML}.}
@@ -76,13 +81,13 @@ Most functionality requires the data files to be in either the
   obtaining regression information is desired with the
   \code{\link[=as.data.table,featureGroups-method]{as.data.table}} method.
 
-\code{generateAnalysisInfo} is an utility function that automatically
-  generates an analysis information object. It will collect all datafiles
-  from given file paths and convert the filenames into valid analysis names
-  (\emph{i.e.} without extensions such as \file{.d} and \file{.mzML}).
-  Duplicate analyses, which may appear when datafiles with different file
-  extension (\file{.d}, \file{.mzXML} and/or \file{.mzML}) are present, will
-  be automatically removed.
+\code{generateAnalysisInfo} is an utility function that
+  automatically generates an analysis information object. It will collect all
+  datafiles from given file paths and convert the filenames into valid
+  analysis names (\emph{i.e.} without extensions such as \file{.d} and
+  \file{.mzML}). Duplicate analyses, which may appear when datafiles with
+  different file extension (\file{.d}, \file{.mzXML} and/or \file{.mzML}) are
+  present, will be automatically removed.
 
 \code{generateAnalysisInfoFromEnviMass} loads analysis information
   from an \pkg{enviMass} project. Note: this funtionality has only been

@@ -260,6 +260,7 @@ generateComponentsNontarget <- function(fGroups, ionization, rtRange = c(-120, 1
         for (other in links)
         {
             otherLinks <- compTab[["links"]][[other]]
+            # linkage is equal?
             if (length(links) == length(otherLinks) && all(otherLinks == r | otherLinks %in% links))
             {
                 # merge groups

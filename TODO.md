@@ -6,10 +6,12 @@
     - Agilent .d is also a directory?
 - consistent src file names, split utils?
 - get RAMClustR from CRAN?
+- vecortorize segments for makeMSPlot()?
 
 
 ## docs
 - improve instructions for MF and SIRIUS installation?
+- handbook: update GenForm isotope detection & MSMode
 
 
 ## features
@@ -42,12 +44,12 @@
 - SIRIUS: use --auto-charge instead of manually fixing charge of fragments (or not? conflicting docs on what it does)
 - test score normalization?
 - timeouts for SIRIUS?
-- improve formula scoring
 - do something about negative H explained fragments by MF?
 
 
 ## formulas
 - customize/document ranking column order? (only do rank for sirius?)
+- *FIX*: make sure that also precursor formula scoring is averaged and fix ranking/grouping formulas with different fragments from different analyses  (see eg m/z 235 with CHNOPSClBr elements)
 
 
 ## components

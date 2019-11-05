@@ -330,10 +330,11 @@ setMethod("filter", "compounds", function(obj, minExplainedPeaks = NULL, minScor
     return(obj)
 })
 
-#' @describeIn compounds Provides compound scoring data that is based on the
-#'   presence of candidate formulae being present in a given
-#'   \code{\link{formulas}} object. Matched precursor formulae yield one
-#'   point, whereas matched MS/MS fragments yield 0.5 point each.
+#' @describeIn compounds Adds formula ranking data from a \code{\link{formulas}}
+#'   object as an extra compound candidate scoring (\code{formulaScore} column).
+#'   The formula score for each compound candidate is between \samp{0-1}, where
+#'   \emph{zero} means no match with any formula candidates, and \emph{one}
+#'   means that the compound candidate's formula is the highest ranked.
 #'
 #' @param updateScore If set to \code{TRUE} then the \code{score} column is
 #'   updated by adding the normalized \option{formulaScore} (weighted by
@@ -362,21 +363,15 @@ setMethod("addFormulaScoring", "compounds", function(compounds, formulas, update
     cTable <- compoundTable(compounds)
     cGNames <- names(cTable)
 
-    # one point for formula presence, half a point for each fragment
     calculateScores <- function(cr, forms)
     {
-        formScores <- as.integer(cr$formula %in% forms$neutral_formula)
-
-        fragScores <- sapply(seq_len(nrow(cr)), function(i)
-        {
-            sforms <- forms[neutral_formula == cr[i, formula] & byMSMS == TRUE]
-            if (nrow(sforms) == 0)
-                return(0)
-
-            return(sum(cr$fragInfo[[i]]$formula %in% sforms$frag_formula) * 0.5)
-        })
-
-        return(formScores + fragScores)
+        forms <- unique(forms, by = "neutral_formula") # ensure we have only one row per precursor (ranking remains)
+        
+        fCount <- nrow(forms)
+        fRanks <- match(cr$formula, forms$neutral_formula, nomatch = fCount + 1) # add one to no-match results to make it the worst score
+        fRanks <- (fCount - (fRanks - 1)) / fCount # convert to 0-1 where one is best ranked and zero a no match
+        
+        return(fRanks)
     }
 
     printf("Adding formula scoring...\n")

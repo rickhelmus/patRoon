@@ -1,5 +1,10 @@
 # patRoon 0.1.0.9000
 
+## November 2019
+
+* **IMPORTANT** The `addFormulaScoring()` function now uses a different algorithm to calculate formula scores for compound candidates. The score is now based on the actual formula ranking in the provided `formulas` object, and is fixed between _zero_ (no match) and _one_ (best match).
+
+
 ## October 2019
 
 * Fixed: `convertMSFiles` correctly checks if input exists

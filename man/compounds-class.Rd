@@ -326,10 +326,11 @@ list is named by feature group names, and is typically used with the
 \item \code{filter}: Provides rule based filtering for generated compounds.
 Useful to eliminate unlikely candidates and speed up further processing.
 
-\item \code{addFormulaScoring}: Provides compound scoring data that is based on the
-presence of candidate formulae being present in a given
-\code{\link{formulas}} object. Matched precursor formulae yield one
-point, whereas matched MS/MS fragments yield 0.5 point each.
+\item \code{addFormulaScoring}: Adds formula ranking data from a \code{\link{formulas}}
+object as an extra compound candidate scoring (\code{formulaScore} column).
+The formula score for each compound candidate is between \samp{0-1}, where
+\emph{zero} means no match with any formula candidates, and \emph{one}
+means that the compound candidate's formula is the highest ranked.
 
 \item \code{getMCS}: Calculates the maximum common substructure (MCS)
 for two or more candidate structures for a feature group. This method uses

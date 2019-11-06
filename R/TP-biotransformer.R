@@ -3,6 +3,7 @@
 NULL
 
 # UNDONE: precursor --> parent?
+# UNDONE: finalize new patRoon path options for BT and obabel (docs, verifyDependencies())
 
 #' @export
 TPPredictionsBT <- setClass("TPPredictionsBT", contains = "TPPredictions")
@@ -10,6 +11,58 @@ TPPredictionsBT <- setClass("TPPredictionsBT", contains = "TPPredictions")
 setMethod("initialize", "TPPredictionsBT",
           function(.Object, ...) callNextMethod(.Object, algorithm = "biotransformer", ...))
 
+
+babelConvert <- function(input, inFormat, outFormat, mustWork = TRUE)
+{
+    # Use batch conversion with a single input/output file. Note that obabel
+    # will stop after an error. This can be overidden, however, then it is
+    # unclear which entries failed. Hence, this option is not used, and when an
+    # error occurs the batch conversion is simply restarted with the subsequent
+    # entry.
+
+    inputFile <- tempfile("obabel_inp", fileext = ".txt")
+    outputFile <- tempfile("obabel_out", fileext = ".txt")
+    doConversion <- function(inp)
+    {
+        cat(inp, file = inputFile, sep = "\n")
+        executeCommand(getCommandWithOptPath("obabel", "obabel"),
+                       c(paste0("-i", inFormat), inputFile,
+                         paste0("-o", outFormat), "-O", outputFile, "-xw"),
+                       stderr = FALSE)
+        # each conversion is followed by a tab (why??) and newline. Read line
+        # by line and remove tab afterwards.
+        ret <- readLines(outputFile)
+        return(trimws(ret, which = "right", whitespace = "\t"))
+    }
+    
+    inputLen <- length(input)
+    ret <- character(inputLen)
+    curIndex <- 1
+    while(TRUE)
+    {
+        curRange <- seq(curIndex, inputLen)
+        out <- doConversion(input[curRange])
+        outl <- length(out)
+        
+        if (outl > 0)
+            ret[seq(curIndex, curIndex + outl - 1)] <- out
+        
+        curIndex <- curIndex + outl + 1
+        
+        if (curIndex <= inputLen)
+        {
+            msg <- sprintf("Failed to convert %d ('%s')", curIndex - 1, input[curIndex - 1])
+            if (mustWork)
+                stop(msg)
+            else
+                warning(msg)
+        }
+        else
+            break
+    }
+    
+    return(ret)
+}
 
 getBTBin <- function()
 {
@@ -57,8 +110,12 @@ processBTResults <- function(cmd)
     ret[, c("Synonyms", "PUBCHEM_CID", "cdk:Title") := NULL]
     
     # BUG: BT somestimes doesn't fill in the formula. Calculate them manually
-    ret[!nzchar(formula),
-        formula := sapply(InChI, function(i) rcdk::get.mol2formula(rinchi::parse.inchi(i)[[1]])@string)]
+    ret[!nzchar(formula), formula := 
+    {
+        SMI <- babelConvert(InChI, "inchi", "smi")
+        mols <- getMoleculesFromSMILES(SMI)
+        return(sapply(mols, function(m) rcdk::get.mol2formula(m)@string))
+    }]
     
     # Assign some unique identifier
     ret[, name := paste0(cmd$precursor, "-TP", seq_len(nrow(ret)))]
@@ -110,9 +167,6 @@ predictTPsBioTransformer <- function(suspects = NULL, compounds = NULL, type = "
                                      logPath = file.path("log", "biotransformer"),
                                      maxProcAmount = getOption("patRoon.maxProcAmount"))
 {
-    # UNDONE: as long as BT may return empty formulas we need this
-    checkPackage("rinchi", "CDK-R/rinchi")
-    
     if (is.null(suspects) && is.null(compounds))
         stop("Specify at least either the suspects or compounds argument.")
     
@@ -211,9 +265,6 @@ setMethod("convertToMFDB", "TPPredictionsBT", function(pred, out, includePrec)
 {
     # UNDONE: cache?
     
-    # rinchi: remotes::install_github("CDK-R/rinchi", INSTALL_opts = "--no-multiarch")
-    checkPackage("rinchi", "CDK-R/rinchi")
-    
     ac <- checkmate::makeAssertCollection()
     checkmate::assertPathForOutput(out, overwrite = TRUE, add = ac) # NOTE: assert doesn't work on Windows...
     checkmate::assertFlag(includePrec, add = ac)
@@ -230,18 +281,7 @@ setMethod("convertToMFDB", "TPPredictionsBT", function(pred, out, includePrec)
 
     
     cat("Calculating SMILES... ")
-    mols <- suppressWarnings(rinchi::parse.inchi(predAll$InChI))
-    nullMols <- which(sapply(mols, is.null))
-    if (length(nullMols) > 0)
-    {
-        warning(paste("Failed to convert some InChI strings:\n",
-                      paste0(sprintf("%s (%s)\n", predAll$InChI[nullMols], predAll$Identifier[nullMols]),
-                             collapse = "\n")))
-        predAll <- predAll[-nullMols]
-        mols <- mols[-nullMols]
-    }
-    
-    predAll[, SMILES := sapply(mols, rcdk::get.smiles)]
+    predAll[, SMILES := babelConvert(InChI, "inchi", "smi")]
     cat("Done!\n")
         
     if (includePrec)
@@ -256,8 +296,8 @@ setMethod("convertToMFDB", "TPPredictionsBT", function(pred, out, includePrec)
         precs[, MolecularFormula := sapply(mols, function(m) rcdk::get.mol2formula(m)@string)]
         precs[, MonoisotopicMass := sapply(mols, rcdk::get.exact.mass)]
         
-        precs[, InChI := sapply(SMILES, rinchi::get.inchi)]
-        precs[, InChIKey := sapply(SMILES, rinchi::get.inchi.key)]
+        precs[, InChI := babelConvert(SMILES, "smi", "inchi")]
+        precs[, InChIKey := babelConvert(SMILES, "smi", "inchikey", )]
         
         predAll <- rbind(precs, predAll, fill = TRUE)
         
@@ -271,7 +311,7 @@ setMethod("convertToMFDB", "TPPredictionsBT", function(pred, out, includePrec)
     predAll[, CompoundName := Identifier]
     
     keepCols <- c("Identifier", "MolecularFormula", "MonoisotopicMass", "Precursor MonoisotopicMass",
-                  "InChI", "InChIKey", "InChIKey1", "ALogP") # UNDONE: more?
+                  "SMILES", "InChI", "InChIKey", "InChIKey1", "ALogP") # UNDONE: more?
     
     fwrite(predAll[, keepCols, with = FALSE], out)
 })

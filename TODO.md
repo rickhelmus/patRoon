@@ -49,7 +49,6 @@
 
 ## formulas
 - customize/document ranking column order? (only do rank for sirius?)
-- *FIX*: make sure that also precursor formula scoring is averaged and fix ranking/grouping formulas with different fragments from different analyses  (see eg m/z 235 with CHNOPSClBr elements)
 
 
 ## components

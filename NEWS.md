@@ -3,6 +3,9 @@
 ## November 2019
 
 * **IMPORTANT** The `addFormulaScoring()` function now uses a different algorithm to calculate formula scores for compound candidates. The score is now based on the actual formula ranking in the provided `formulas` object, and is fixed between _zero_ (no match) and _one_ (best match).
+* Formula feature consensus:
+    * All scorings are now averaged, including those that are not fragment specific (e.g. precursor m/z error)
+    * This also improves ranking in certain specific cases
 
 
 ## October 2019

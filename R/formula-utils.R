@@ -323,10 +323,6 @@ generateFormConsensusForGroup <- function(formAnaList, formThreshold)
         # number of analyses searched for formulas per group
         anaCount <- length(formAnaList)
 
-        byCols <- "formula"
-        if (haveMSMS)
-            byCols <- c(byCols, "frag_formula")
-
         # unique precursor formulas per analysis
         uniqueAnaForms <- unique(formAnaList, by = c("formula", "analysis"))
 
@@ -341,15 +337,20 @@ generateFormConsensusForGroup <- function(formAnaList, formThreshold)
         MSMSForms <- unique(formTable[byMSMS == TRUE, formula])
         formTable <- formTable[byMSMS == TRUE | !formula %in% MSMSForms]
 
-        # rank before duplicate removal and score averaging: make sure to retain best scored candidate
-        formTable <- rankFormulaTable(formTable)
-        
         # average scorings
-        avCols <- intersect(c(formulaScorings()$name, "error", "frag_error"), names(formTable))
-        formTable[, (avCols) := lapply(.SD, mean), by = byCols, .SDcols = avCols]
+        
+        # for each analysis, frag_error is unique per fragment, while others are per precursor candidate
+        if (haveMSMS && "frag_error" %in% names(formTable))
+            formTable[, frag_error := mean(frag_error), by = c("formula", "frag_formula")]
+        
+        avCols <- intersect(c(formulaScorings()$name, "error"), names(formTable))
+        formTable[, (avCols) := lapply(unique(.SD, by = "analysis")[, -"analysis"], mean),
+                  by = "formula", .SDcols = c(avCols, "analysis")]
         
         # Remove duplicate entries (do this after coverage!)
-        formTable <- unique(formTable, by = byCols)
+        formTable <- unique(formTable, by = intersect(c("formula", "frag_formula"), names(formTable)))
+        
+        formTable <- rankFormulaTable(formTable)
     }
 
     return(formTable)

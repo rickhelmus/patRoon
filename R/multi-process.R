@@ -279,8 +279,9 @@ executeMultiProcess <- function(commandQueue, finishHandler,
         if (doLog)
             return(txt)
     }
-    processOutput <- function() doProcessOut(rp[[pi]]$read_output(), printOutput)
-    processError <- function() doProcessOut(rp[[pi]]$read_error(), printError)
+    
+    # reading process output might fail sometimes(?)
+    emptyStrOnErr <- function(expr) tryCatch(expr, error = function(e) "")
 
     while (nextCommand <= totCmdCount || any(sapply(runningProcInfo, function(rp) !is.null(rp) && rp$running)))
     {
@@ -296,8 +297,10 @@ executeMultiProcess <- function(commandQueue, finishHandler,
                 if (printOutput || printError || doLog)
                 {
                     cind <- runningProcInfo[[pi]]$cmdIndRange[1]
-                    commandQueue[[cind]]$stdoutLog <- paste0(commandQueue[[cind]]$stdoutLog, processOutput())
-                    commandQueue[[cind]]$stderrLog <- paste0(commandQueue[[cind]]$stderrLog, processError())
+                    commandQueue[[cind]]$stdoutLog <- paste0(commandQueue[[cind]]$stdoutLog,
+                                                             emptyStrOnErr(doProcessOut(rp[[pi]]$read_output(), printOutput)))
+                    commandQueue[[cind]]$stderrLog <- paste0(commandQueue[[cind]]$stderrLog,
+                                                             emptyStrOnErr(doProcessOut(rp[[pi]]$read_error(), printError)))
                 }
             }
 

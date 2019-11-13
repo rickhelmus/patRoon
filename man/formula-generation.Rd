@@ -176,19 +176,18 @@ When DataAnalysis is used for formula generation or
 The results are then combined for final assignment of candidate formulae for
 each feature group. If a formula was found in multiple features within the
 group, the reported scorings and mass errors are averaged and other numeric
-values are those from the best ranked feature (the analysis of this feature
-is stored in the \code{"analysis"} column). The calculation of formulae on
-'feature level' might result in a more thorough formula search and better
-removal of outliers (controlled by \code{featThreshold} argument). In
-contrast, when calculations occur on 'feature group level' (\emph{i.e.}
-\code{calculateFeatures=FALSE}), formulae are directly assigned to each
-feature group (by using group averaged peak MS lists), which significantly
-reduces processing time is, especially with many analyses. Note that in both
-situations subsequent algorithms that use formula data (\emph{e.g.}
-\code{\link{addFormulaScoring}} and \link{reporting} functions) only use
-formula data that was eventually assigned to feature groups. Furthermore,
-please note that calculation of formulae with DataAnalysis always occurs on
-'feature level'.
+values are those from the feature in the analysis of the \code{"analysis"}
+column. The calculation of formulae on 'feature level' might result in a
+more thorough formula search and better removal of outliers (controlled by
+\code{featThreshold} argument). In contrast, when calculations occur on
+'feature group level' (\emph{i.e.} \code{calculateFeatures=FALSE}), formulae
+are directly assigned to each feature group (by using group averaged peak MS
+lists), which significantly reduces processing time is, especially with many
+analyses. Note that in both situations subsequent algorithms that use formula
+data (\emph{e.g.} \code{\link{addFormulaScoring}} and \link{reporting}
+functions) only use formula data that was eventually assigned to feature
+groups. Furthermore, please note that calculation of formulae with
+DataAnalysis always occurs on 'feature level'.
 
 \code{generateFormulas} is a generic function that will generate formulae
   using one of the supported algorithms. The actual functionality is provided

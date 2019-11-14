@@ -6,7 +6,6 @@
     - Agilent .d is also a directory?
 - consistent src file names, split utils?
 - get RAMClustR from CRAN?
-- vecortorize segments for makeMSPlot()?
 
 
 ## docs
@@ -29,7 +28,6 @@
     - remove zero values for maxReplicateIntRSD?
 - importFeaturesXCMS/importFeaturesXCMS3/importFeatureGroupsXCMS: get rid of anaInfo arg requirement? (or make import func?)
 - comparison(): support xcms3? (needs missing support for missing raw data)
-- conc to generateAnalysisInformation?
 
 
 ## MSPeakLists

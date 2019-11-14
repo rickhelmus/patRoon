@@ -701,14 +701,15 @@ makeMSPlot <- function(spec, xlim, ylim, ..., extraHeightInch = 0)
     plot(0, xlab = "m/z", ylab = "Intensity", xlim = xlim, ylim = ylim,
          type = "n", bty = "l", ...)
 
-    for (i in seq_len(nrow(plotData)))
+    segments(plotData[["mz"]], 0, plotData[["mz"]], plotData[["intensity"]],
+             col = plotData[["colour"]], lwd = plotData[["lwd"]])
+        
+    if (!is.null(plotData[["formula"]]))
     {
-        segments(plotData[[i, "mz"]], 0, plotData[[i, "mz"]], plotData[[i, "intensity"]],
-                 col = plotData[[i, "colour"]], lwd = plotData[[i, "lwd"]])
-
-        if (!is.null(plotData[["formula"]]) && !is.na(plotData[[i, "formula"]]))
-            text(plotData[[i, "mz"]], plotData[[i, "intensity"]] + (ylim[2] * 0.02),
-                 subscriptFormula(plotData[[i, "formula"]]), srt = 90, adj = 0)
+        pdf <- plotData[!is.na(formula)]
+        if (nrow(pdf) > 0)
+            text(pdf[["mz"]], pdf[["intensity"]] + (ylim[2] * 0.02),
+                 subscriptFormula(pdf[["formula"]]), srt = 90, adj = 0)
     }
 
     if (doLegend)

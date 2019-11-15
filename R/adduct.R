@@ -14,12 +14,12 @@ NULL
 #'
 #' @slot add,sub A \code{character} with one or more formulas to add/subtract.
 #' @slot molMult How many times the original molecule is present in this
-#'   molecule (\emph{e.g.} for a dimer this would be \samp{2}).
-#' @slot charge The final charge of the adduct.
+#'   molecule (\emph{e.g.} for a dimer this would be \samp{2}). Default is \samp{1}.
+#' @slot charge The final charge of the adduct (default \samp{1}).
 #'
-#' @usage adduct(add = character(), sub = character(), molMult = 1, charge = 1)
+#' @usage adduct(...)
 #'
-#' @param add,sub,molMult,charge See \verb{Slots}.
+#' @param \dots Any of \code{add}, \code{sub}, \code{molMult} and/or \code{charge}. See \verb{Slots}.
 #' @param x,object An \code{adduct} object.
 #'
 #' @examples adduct("H") # [M+H]+

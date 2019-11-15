@@ -74,7 +74,6 @@ setGeneric("settings", function(compoundsMF) standardGeneric("settings"))
 setGeneric("makeHCluster", function(obj, method = "complete", ...) standardGeneric("makeHCluster"))
 
 setGeneric("plotHeatMap", function(obj, ...) standardGeneric("plotHeatMap"))
-setGeneric("plotSilhouettes", function(obj, kSeq, ...) standardGeneric("plotSilhouettes"))
 
 ### suspect screening
 
@@ -234,6 +233,13 @@ setGeneric("plotInt", function(obj, ...) standardGeneric("plotInt"))
 #' @templateVar desc plots candidate scorings.
 #' @template generics
 setGeneric("plotScores", function(obj, ...) standardGeneric("plotScores"))
+
+#' @templateVar func plotSilhouettes
+#' @templateVar desc plots silhouette widths to evaluate the desired cluster size.
+#' @template generics
+#' @param kSeq An integer vector containing the sequence that should be used for
+#'   average silhouette width calculation.
+setGeneric("plotSilhouettes", function(obj, kSeq, ...) standardGeneric("plotSilhouettes"))
 
 #' @templateVar func plotSpec
 #' @templateVar desc plots a (annotated) spectrum.

@@ -19,6 +19,7 @@
 \alias{plotEIC}
 \alias{plotInt}
 \alias{plotScores}
+\alias{plotSilhouettes}
 \alias{plotSpec}
 \alias{plotStructure}
 \alias{plotVenn}
@@ -72,6 +73,8 @@ plotInt(obj, ...)
 
 plotScores(obj, ...)
 
+plotSilhouettes(obj, kSeq, ...)
+
 plotSpec(obj, ...)
 
 plotStructure(obj, ...)
@@ -98,6 +101,9 @@ represent non-shared data.}
 
 \item{addRetMzPlots}{Set to \code{TRUE} to enable \emph{m/z} \emph{vs}
 retention time scatter plots.}
+
+\item{kSeq}{An integer vector containing the sequence that should be used for
+average silhouette width calculation.}
 
 \item{k, h}{Desired numbers of clusters. See \code{\link{cutree}}.}
 
@@ -211,6 +217,12 @@ please refer to the linked method documentation for each generic.
 
 \itemize{
     \item Methods are defined for: \code{\link[=plotScores,compounds-method]{compounds}}; \code{\link[=plotScores,formulas-method]{formulas}}.
+}
+
+\code{plotSilhouettes} plots silhouette widths to evaluate the desired cluster size.
+
+\itemize{
+    \item Methods are defined for: \code{\link[=plotSilhouettes,componentsIntClust-method]{componentsIntClust}}; \code{\link[=plotSilhouettes,compoundsCluster-method]{compoundsCluster}}.
 }
 
 \code{plotSpec} plots a (annotated) spectrum.

@@ -24,7 +24,7 @@ defaultPkgOpts <- function(pkgname)
 
 .onAttach <- function(libname, pkgname)
 {
-    packageStartupMessage(sprintf("Welcome to %s %s!", pkgname, packageVersion(pkgname)))
+    packageStartupMessage(sprintf("Welcome to %s %s!", pkgname, utils::packageVersion(pkgname)))
     packageStartupMessage("Configuration:")
     for (opt in names(defaultPkgOpts(pkgname)))
         packageStartupMessage(sprintf("- %s: \"%s\"", opt, getOption(opt)))

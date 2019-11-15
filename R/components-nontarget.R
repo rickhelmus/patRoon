@@ -135,7 +135,7 @@ generateComponentsNontarget <- function(fGroups, ionization, rtRange = c(-120, 1
     gInfo <- groupInfo(fGroups)
     anaInfo <- analysisInfo(fGroups)
 
-    data(isotopes, package = "enviPat")
+    utils::data(isotopes, package = "enviPat")
 
     # adduct.search() and homol.search() call stop() when nothing is found (arg!) --> use tryCatch
 

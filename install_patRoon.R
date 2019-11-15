@@ -511,7 +511,7 @@ utils <- setRefClass("utilsInst", methods = list(
                                     "Do you want to open the webpage so that you can download and install ProteoWizard manually?",
                                     sep = "\n")))
             {
-                browseURL("http://proteowizard.sourceforge.net/download.html")
+                utils::browseURL("http://proteowizard.sourceforge.net/download.html")
                 while(!yesNo(title = "Did you install ProteoWizard and are ready to continue the patRoon installation?")) {}
                 
                 pwiz <- findPWizPath()

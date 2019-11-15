@@ -1,26 +1,27 @@
 Package: patRoon
 Type: Package
-Title: Workflow Solutions for Mass-Spectrometry Based Non-Target Analysis
-Version: 0.1.0
+Title: Workflows for Mass-Spectrometry Based Non-Target Analysis
+Version: 0.9.0.9000
 Authors@R: c(
     person("Rick", "Helmus", email = "r.helmus@uva.nl", role = c("aut", "cre")),
     person("Olaf", "Brock", role = "ctb"),
     person("Vittorio", "Albergamo", role = "ctb"),
     person("Andrea", "Brunner", role = "ctb"),
     person("Emma", "Schymanski", role = "ctb"))
-Description: Provides a common interface to the various workflow steps that are
-    typically part of a mass spectrometry based non-target analysis. Various
-    (open-source) tools are combined which provide algorithms for extraction
-    and grouping of features, extraction of MS and MS/MS data, automatic
-    determination of formula and compound candidates and grouping related
-    features to components. In addition, various tools are provided for e.g.
-    data preparation and cleanup, plotting results and automatic reporting.
+Description: Provides an easy-to-use interface to a mass spectrometry based
+    non-target analysis workflow. Various (open-source) tools are combined
+    which provide algorithms for extraction and grouping of features,
+    extraction of MS and MS/MS data, automatic formula and compound annotation
+    and grouping related features to components. In addition, various tools are
+    provided for e.g. data preparation and cleanup, plotting results and
+    automatic reporting.
 License: GPL-3
 LazyData: TRUE
 RoxygenNote: 6.1.1
 URL: https://github.com/rickhelmus/patRoon
 BugReports: https://github.com/rickhelmus/patRoon/issues
 Encoding: UTF-8
+SystemRequirements: GNU make
 Imports:
     methods,
     checkmate (>= 1.8.5),
@@ -88,6 +89,7 @@ Suggests:
     metfRag,
     RAMClustR,
     testthat,
+    rlang,
     vdiffr,
     patRoonData,
     devtools,

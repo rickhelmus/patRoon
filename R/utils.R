@@ -432,7 +432,7 @@ showAnaInfo <- function(anaInfo)
     printf("Replicate groups used as blank: %s (%d total)\n", getStrListWithMax(blGroups, 8, ", "), length(blGroups))
 }
 
-showObjectSize <- function(object) printf("Object size (indication): %s\n", format(object.size(object), "auto", "SI"))
+showObjectSize <- function(object) printf("Object size (indication): %s\n", format(utils::object.size(object), "auto", "SI"))
 
 allSame <- function(l)
 {

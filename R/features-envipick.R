@@ -40,7 +40,7 @@ findFeaturesEnviPick <- function(analysisInfo, ..., verbose = TRUE)
 
         if (is.null(f))
         {
-            invisible(capture.output(ep <- enviPick::enviPickwrap(fp, ...)))
+            invisible(utils::capture.output(ep <- enviPick::enviPickwrap(fp, ...)))
             f <- importEnviPickPeakList(ep$Peaklist)
             saveCacheData("featuresEnviPick", f, hash)
         }

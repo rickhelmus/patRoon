@@ -3,8 +3,9 @@
 ^doc$
 ^.*\.Rproj$
 ^\.Rproj\.user$
-^docs/$
-^man-roxygen/$
+^docs$
+^docs/.nojekyll$
+^man-roxygen$
 ^src/GenForm$
 ^src/GenForm\.exe$
 ^src/GenForm-svn/*\.o$
@@ -20,3 +21,10 @@
 ^codecov\.yml$
 ^TODO.md
 ^gen_site.R
+^vignettes/handbook.log$
+^LICENSE$
+^_pkgdown.yaml$
+^cache.sqlite$
+^docker^
+^install_patRoon.R$
+^vignettes/$

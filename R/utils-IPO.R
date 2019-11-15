@@ -282,7 +282,7 @@ findIsotopes.CAMERA = function(xset, ...) {
             #an <- CAMERA::xsAnnotate(xset, sample=sample)
             an <- CAMERA::xsAnnotate(xset[, sample])
             # CHANGED: suppress output
-            invisible(capture.output(isos <- CAMERA::findIsotopes(an, ...)@isoID[,c("mpeak", "isopeak"), drop=FALSE]))
+            invisible(utils::capture.output(isos <- CAMERA::findIsotopes(an, ...)@isoID[,c("mpeak", "isopeak"), drop=FALSE]))
             #start_id <- ids[ids[,2]==sample,,drop=FALSE][1,1] - 1
             iso_mat <- rbind(iso_mat, matrix(ids[ids[,2]==sample,1][isos], ncol=2))
         }

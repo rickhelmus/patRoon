@@ -493,6 +493,7 @@ setMethod("plot", "optimizationResult", function(x, paramSet, DoEIteration, para
 #' @describeIn optimizationResult Returns parameter set yielding optimal
 #'   results. The \code{paramSet} and \code{DoEIteration} arguments can be
 #'   \code{NULL}.
+#' @aliases optimizedParameters
 #' @export
 setMethod("optimizedParameters", "optimizationResult", function(object, paramSet, DoEIteration)
 {
@@ -515,6 +516,7 @@ setMethod("optimizedParameters", "optimizationResult", function(object, paramSet
 #'   \code{\link{features}} or \code{\link{featureGroups}} object) that was
 #'   generated with optimized parameters. The \code{paramSet} argument can be
 #'   \code{NULL}.
+#' @aliases optimizedObject
 #' @export
 setMethod("optimizedObject", "optimizationResult", function(object, paramSet)
 {
@@ -529,6 +531,7 @@ setMethod("optimizedObject", "optimizationResult", function(object, paramSet)
 
 #' @describeIn optimizationResult Returns optimization scores. The
 #'   \code{paramSet} and \code{DoEIteration} arguments can be \code{NULL}.
+#' @aliases scores
 #' @export
 setMethod("scores", "optimizationResult", function(object, paramSet, DoEIteration)
 {
@@ -549,6 +552,7 @@ setMethod("scores", "optimizationResult", function(object, paramSet, DoEIteratio
 
 #' @describeIn optimizationResult Returns a \code{list} with optimization
 #'   information from an DoE iteration.
+#' @aliases experimentInfo
 #' @export
 setMethod("experimentInfo", "optimizationResult", function(object, paramSet, DoEIteration)
 {

@@ -7,6 +7,7 @@
 \alias{peakLists,MSPeakLists-method}
 \alias{peakLists}
 \alias{averagedPeakLists,MSPeakLists-method}
+\alias{averagedPeakLists}
 \alias{analyses,MSPeakLists-method}
 \alias{groupNames,MSPeakLists-method}
 \alias{length,MSPeakLists-method}

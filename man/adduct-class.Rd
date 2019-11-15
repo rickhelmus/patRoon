@@ -8,7 +8,7 @@
 \alias{as.character,adduct-method}
 \title{Generic adduct class}
 \usage{
-adduct(add = character(), sub = character(), molMult = 1, charge = 1)
+adduct(...)
 
 \S4method{show}{adduct}(object)
 
@@ -31,7 +31,7 @@ adduct(add = character(), sub = character(), molMult = 1, charge = 1)
   which can be obtained with the \code{GenFormAdducts} and
   \code{MetFragAdducts} functions, respectively.}
 
-\item{add, sub, molMult, charge}{See \verb{Slots}.}
+\item{\dots}{Any of \code{add}, \code{sub}, \code{molMult} and/or \code{charge}. See \verb{Slots}.}
 }
 \description{
 Objects from this class are used to specify adduct information in an
@@ -51,9 +51,9 @@ algorithm independent way.
 \item{\code{add,sub}}{A \code{character} with one or more formulas to add/subtract.}
 
 \item{\code{molMult}}{How many times the original molecule is present in this
-molecule (\emph{e.g.} for a dimer this would be \samp{2}).}
+molecule (\emph{e.g.} for a dimer this would be \samp{2}). Default is \samp{1}.}
 
-\item{\code{charge}}{The final charge of the adduct.}
+\item{\code{charge}}{The final charge of the adduct (default \samp{1}).}
 }}
 
 \examples{

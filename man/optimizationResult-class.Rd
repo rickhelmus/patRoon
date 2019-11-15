@@ -10,9 +10,13 @@
 \alias{show,optimizationResult-method}
 \alias{plot,optimizationResult,ANY-method}
 \alias{optimizedParameters,optimizationResult-method}
+\alias{optimizedParameters}
 \alias{optimizedObject,optimizationResult-method}
+\alias{optimizedObject}
 \alias{scores,optimizationResult-method}
+\alias{scores}
 \alias{experimentInfo,optimizationResult-method}
+\alias{experimentInfo}
 \title{Class containing optimization results.}
 \usage{
 \S4method{algorithm}{optimizationResult}(obj)

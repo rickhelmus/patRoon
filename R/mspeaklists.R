@@ -118,7 +118,7 @@ setMethod("peakLists", "MSPeakLists", function(obj) obj@peakLists)
 #'   MS peak lists.
 #' @return \code{averagedPeakLists} returns a nested list of feature group
 #'   averaged peak lists in a similar format as \code{peakLists}.
-#' @aliases peakLists
+#' @aliases averagedPeakLists
 #' @export
 setMethod("averagedPeakLists", "MSPeakLists", function(obj) obj@averagedPeakLists)
 

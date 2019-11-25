@@ -1219,6 +1219,7 @@ setMethod("plotChroms", "featureGroups", function(obj, rtWindow = 30, mzExpWindo
         plot.new()
         leg <- makeLegend(0, 0, plot = FALSE)
         lw <- (grconvertX(leg$rect$w, to = "ndc") - grconvertX(0, to = "ndc"))
+        lw <- min(lw, 0.5) # don't make it too wide
         par(omd = c(0, 1 - lw, 0, 1), new = TRUE)
     }
 

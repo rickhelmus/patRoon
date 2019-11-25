@@ -10,7 +10,7 @@ vignette: |
 ---
 
 ```{r include=FALSE}
-vignDir <- normalizePath(".")
+vignDir <- normalizePath(".", winslash = "/")
 ```
 
 ```{r child="handbook/_setup.Rmd"}

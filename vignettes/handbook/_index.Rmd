@@ -8,7 +8,7 @@ date: "`r Sys.Date()`"
 ```
 
 ```{r include=FALSE}
-vignDir <- normalizePath("..")
+vignDir <- normalizePath("..", winslash = "/")
 ```
 
 ```{r child="_setup.Rmd"}

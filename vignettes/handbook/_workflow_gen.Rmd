@@ -87,12 +87,15 @@ Alternatively, the `newProject()` function discussed in the next section can be 
 
 ### Automatic project generation with newProject()
 
-The previous sections already highlighted some steps that have to be performed prior to starting a new non-target analysis workflow: data pre-treatment and gathering information on the analysis. Most of the times you will put this and other `R` code a script file so you can re-call what you have done before (i.e. reproducbile research).
+The previous sections already highlighted some steps that have to be performed prior to starting a new non-target analysis workflow: data pre-treatment and gathering information on the analysis. Most of the times you will put this and other `R` code a script file so you can re-call what you have done before (i.e. reproducible research).
 
 The `newProject()` function can be used to setup a new project. When you run this function it will launch a small tool (see screenshot below) where you can select your analyses and configure the various workflow steps which you want to execute (e.g. data pre-treatment, finding features, annotation etc). After setting everything up the function will generate a template script which can easily be edited afterwards. In addition, you have the option to create a new RStudio project, which is advantegeous as it neatly seperates your data processing work from the rest.
 
 ```{r newp,echo=FALSE,out.width="450px"}
-knitr::include_graphics(file.path(vignDir, "newp.png"))
+if (knitr::is_html_output()) {
+    knitr::include_graphics(knitr::image_uri(file.path(vignDir, "newp.png")))
+} else
+    knitr::include_graphics(file.path(vignDir, "newp.png"))
 ```
 
 > **_NOTE_** At the moment `newProject()` _only_ works with (recent) versions of RStudio.

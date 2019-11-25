@@ -532,10 +532,13 @@ plotSpec(compounds, index = 1, groupName = "M120_R328_81", MSPeakLists = mslists
 plotSpec(compounds, index = 1, groupName = "M120_R328_81", MSPeakLists = mslists,
          ylim = c(0, 5000), plotStruct = FALSE)
 plotSpec(components, index = 7) # component spectrum
+```
 
+```{r plotHomol,eval=runData && knitr::is_html_output()}
 # Inspect homologous series
 plotGraph(componNT)
 ```
+
 
 ### Comparing data {#visComp}
 

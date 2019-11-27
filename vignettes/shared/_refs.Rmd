@@ -14,6 +14,7 @@
 [XCMS3]: https://www.bioconductor.org/packages/release/bioc/html/xcms.html
 [enviPick]: https://cran.r-project.org/web/packages/enviPick/index.html
 [CompTox-dl]: https://epa.figshare.com/articles/CompTox_Chemicals_Dashboard_Metadata_Files_for_Integration_with_MetFrag/7525199
+[PCLite-dl]: https://zenodo.org/record/3548654
 [csvDB-ex]: https://raw.githubusercontent.com/rickhelmus/patRoon/master/tests/testthat/test_data/test-mf-db-isomers.csv
 [SIRIUS]: https://bio.informatik.uni-jena.de/software/sirius/
 [CSI:FingerID]: https://www.csi-fingerid.uni-jena.de/

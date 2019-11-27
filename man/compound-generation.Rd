@@ -280,9 +280,11 @@ before feature groups have been prioritized.
   metFusionScore       \tab OfflineMetFusionScore                            \tab                   \cr
   individualMoNAScore  \tab OfflineIndividualMoNAScore                       \tab                   \cr
   numberPatents        \tab PubChemNumberPatents                             \tab pubchem           \cr
+  numberPatents        \tab Patent_Count                                     \tab pubchemlite       \cr
   pubMedReferences     \tab PubChemNumberPubMedReferences                    \tab pubchem           \cr
   pubMedReferences     \tab ChemSpiderNumberPubMedReferences                 \tab chemspider        \cr
   pubMedReferences     \tab NUMBER_OF_PUBMED_ARTICLES                        \tab comptox           \cr
+  pubMedReferences     \tab PubMed_Count                                     \tab pubchemlite       \cr
   extReferenceCount    \tab ChemSpiderNumberExternalReferences               \tab chemspider        \cr
   dataSourceCount      \tab ChemSpiderDataSourceCount                        \tab chemspider        \cr
   referenceCount       \tab ChemSpiderReferenceCount                         \tab chemspider        \cr
@@ -302,7 +304,16 @@ before feature groups have been prioritized.
   TOX21SL              \tab TOX21SL                                          \tab comptox           \cr
   TOXCAST              \tab TOXCAST                                          \tab comptox           \cr
   peakFingerprintScore \tab AutomatedPeakFingerprintAnnotationScore          \tab                   \cr
-  lossFingerprintScore \tab AutomatedLossFingerprintAnnotationScore          \tab                   
+  lossFingerprintScore \tab AutomatedLossFingerprintAnnotationScore          \tab                   \cr
+  agroChemInfo         \tab AgroChemInfo                                     \tab pubchemlite       \cr
+  bioPathway           \tab BioPathway                                       \tab pubchemlite       \cr
+  drugMedicInfo        \tab DrugMedicInfo                                    \tab pubchemlite       \cr
+  foodRelated          \tab FoodRelated                                      \tab pubchemlite       \cr
+  pharmacoInfo         \tab PharmacoInfo                                     \tab pubchemlite       \cr
+  safetyInfo           \tab SafetyInfo                                       \tab pubchemlite       \cr
+  toxicityInfo         \tab ToxicityInfo                                     \tab pubchemlite       \cr
+  knownUse             \tab KnownUse                                         \tab pubchemlite       \cr
+  FPSum                \tab FPSum                                            \tab pubchemlite       
 }
 
  In addition, the \code{compoundScorings} function is also
@@ -322,10 +333,12 @@ before feature groups have been prioritized.
   setting the \code{chemSpiderToken} argument is mandatory.
 
   When a local database is set (\emph{i.e.} \code{sdf}, \code{psv},
-  \code{csv}, \code{comptox}) the file location of the database should be set
-  in the \code{LocalDatabasePath} value via the \code{extraOpts} argument or
-  using the \code{patRoon.path.MetFragCompTox} option (only when
-  \code{database="comptox"}).
+  \code{csv}, \code{comptox}, \code{pubchemlite}) the file location of the
+  database should be set in the \code{LocalDatabasePath} value via the
+  \code{extraOpts} argument or using the
+  \code{patRoon.path.MetFragCompTox}/\code{patRoon.path.MetFragPubChemLite}
+  option (only when \code{database="comptox"} or
+  \code{database="pubchemlite"}).
 
   Examples:
   \verb{options(patRoon.path.MetFragCompTox = "C:/DSSTox_01May18_Full_SelectMetaDataPlus.csv")}

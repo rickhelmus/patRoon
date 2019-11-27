@@ -7,6 +7,7 @@ defaultPkgOpts <- function(pkgname)
                 path.GenForm = "",
                 path.MetFragCL = getOption("patRoon.path.metFragCL", ""), # backwards compat
                 path.MetFragCompTox = "",
+                path.MetFragPubChemLite = "",
                 path.SIRIUS = "",
                 path.OpenMS = "",
                 path.pngquant = "")

@@ -92,6 +92,10 @@ NULL
 #'   \item \code{patRoon.path.MetFragCompTox}: The complete file path to the
 #'   CompTox database \file{csv} file. See \code{\link{generateCompounds}} for
 #'   more details.
+#'   
+#'   \item \code{patRoon.path.MetFragPubChemLite}: The complete file path to the
+#'   PubChem database \file{csv} file. See \code{\link{generateCompounds}} for
+#'   more details.
 #'
 #'   \item \code{patRoon.path.SIRIUS}: The directory in which SIRIUS is
 #'   installed. Unless the binaries can be located via the \option{PATH}

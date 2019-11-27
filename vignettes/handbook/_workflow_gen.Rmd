@@ -345,6 +345,7 @@ Database            | Algorithm(s)            | Remarks
 `pubchem`           | `"metfrag"`, `"sirius"` | [PubChem] is currently the largest compound database and is used by default.
 `chemspider`        | `"metfrag"`             | [ChemSpider] is another large database. Requires security token from [here](http://www.chemspider.com/AboutServices.aspx) (see next section).
 `comptox`           | `"metfrag"`             | The EPA [CompTox] contains many compounds and scorings relevant to environmental studies. Needs manual download (see next section).
+`pubchemlite`       | `"metfrag"`             | A specialized subset of the PubChem database. Needs manual download (see next section).
 `for-ident`         | `"metfrag"`             | The [FOR-IDENT] (STOFF-IDENT) database for water related substances.
 `kegg`              | `"metfrag"`, `"sirius"` | The [KEGG] database for biological compounds
 `hmdb`              | `"metfrag"`, `"sirius"` | The [HMDB] contains many human metabolites.
@@ -353,7 +354,7 @@ Database            | Algorithm(s)            | Remarks
 
 #### Configuring MetFrag databases and scoring
 
-Some extra configuration may be necessary when using certain databases with MetFrag. In order to use the ChemSpider database a [security token](http://www.chemspider.com/AboutServices.aspx) should be requested and set with the `chemSpiderToken` argument to `generateCompounds()`. The CompTox database needs to be manually downloaded from [here][CompTox-dl] (currently only the _SelectMetaData_ and _SelectMetaDataPlus_ databases are supported). The file location of this and other local databases (`csv`, `psv`, `sdf`) needs to be manually configured, see the examples below and/or `?generateCompounds` for more information on how to do this.
+Some extra configuration may be necessary when using certain databases with MetFrag. In order to use the ChemSpider database a [security token](http://www.chemspider.com/AboutServices.aspx) should be requested and set with the `chemSpiderToken` argument to `generateCompounds()`. The CompTox and PubChemLite databases need to be manually downloaded from [CompTox][CompTox-dl] (currently only the _SelectMetaData_ and _SelectMetaDataPlus_ databases are supported) and [PUbChemLite][PCLite-dl]. The file location of this and other local databases (`csv`, `psv`, `sdf`) needs to be manually configured, see the examples below and/or `?generateCompounds` for more information on how to do this.
 
 ```{r compDB,eval=FALSE}
 # PubChem: the default

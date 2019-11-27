@@ -62,6 +62,22 @@ unifyMFNames <- function(mfr)
                  XlogP3 = "XlogP",
                  PubChemNumberPubMedReferences = "pubMedReferences",
                  ChemSpiderNumberPubMedReferences = "pubMedReferences",
+                 
+                 # PubChemLite
+                 FP = "FP",
+                 PubMed_Count = "pubMedReferences",
+                 Patent_Count = "numberPatents",
+                 # Related_CIDs # UNDONE: do something with this?
+                 Name2 = "compoundNames2",
+                 AgroChemInfo = "agroChemInfo",
+                 BioPathway = "bioPathway",
+                 DrugMedicInfo = "drugMedicInfo",
+                 FoodRelated = "foodRelated",
+                 PharmacoInfo = "pharmacoInfo",
+                 SafetyInfo = "safetyInfo",
+                 ToxicityInfo = "toxicityInfo",
+                 KnownUse = "knownUse",
+                 FPSum = "FPSum",
 
                  # ChemSpider
                  CHEMSPIDER_XLOGP = "XlogP",
@@ -350,10 +366,12 @@ processMFResults <- function(comptab, spec, adduct, db, topMost, lfile = "")
 #'   setting the \code{chemSpiderToken} argument is mandatory.
 #'
 #'   When a local database is set (\emph{i.e.} \code{sdf}, \code{psv},
-#'   \code{csv}, \code{comptox}) the file location of the database should be set
-#'   in the \code{LocalDatabasePath} value via the \code{extraOpts} argument or
-#'   using the \code{patRoon.path.MetFragCompTox} option (only when
-#'   \code{database="comptox"}).
+#'   \code{csv}, \code{comptox}, \code{pubchemlite}) the file location of the
+#'   database should be set in the \code{LocalDatabasePath} value via the
+#'   \code{extraOpts} argument or using the
+#'   \code{patRoon.path.MetFragCompTox}/\code{patRoon.path.MetFragPubChemLite}
+#'   option (only when \code{database="comptox"} or
+#'   \code{database="pubchemlite"}).
 #'
 #'   Examples:
 #'   \verb{options(patRoon.path.MetFragCompTox = "C:/DSSTox_01May18_Full_SelectMetaDataPlus.csv")}
@@ -398,7 +416,8 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
     aapply(checkmate::assertCount, . ~ topMost + maxCandidatesToStop, positive = TRUE, fixed = list(add = ac))
     aapply(checkmate::assertFlag, . ~ addTrivialNames, fixed = list(add = ac))
     checkmate::assertString(chemSpiderToken, add = ac)
-    checkmate::assertChoice(database, c("pubchem", "chemspider", "kegg", "for-ident", "sdf", "psv", "csv", "comptox"), add = ac)
+    checkmate::assertChoice(database, c("pubchem", "chemspider", "kegg", "for-ident", "sdf", "psv", "csv",
+                                        "comptox", "pubchemlite"), add = ac)
     checkmate::assert(checkmate::checkFlag(extendedPubChem),
                       checkmate::checkChoice(extendedPubChem, "auto"),
                       .var.name = "extendedPubChem")
@@ -409,7 +428,7 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
            names = "unique", null.ok = TRUE, fixed = list(add = ac))
 
     compsScores <- compoundScorings("metfrag", database)
-    isLocalDB <- database %in% c("sdf", "psv", "csv", "comptox")
+    isLocalDB <- database %in% c("sdf", "psv", "csv", "comptox", "pubchemlite")
     allScoringNames <- union(compsScores$name, compsScores$metfrag)
     # allow freely definable scorings from local databases
     if (!isLocalDB)
@@ -420,9 +439,9 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
     adduct <- checkAndToAdduct(adduct)
 
     extDB <- if (!is.null(extraOpts)) extraOpts[["LocalDatabasePath"]] else NULL
-    if (database == "comptox" && is.null(extDB))
+    if ((database == "comptox" || database == "pubchemlite") && is.null(extDB))
     {
-        extDB <- getOption("patRoon.path.MetFragCompTox", NULL)
+        extDB <- getOption(if (database == "comptox") "patRoon.path.MetFragCompTox" else "patRoon.path.MetFragPubChemLite", NULL)
         if (!is.null(extDB))
             extraOpts <- modifyList(if (!is.null(extraOpts)) extraOpts else list(), list(LocalDatabasePath = extDB))
     }
@@ -430,7 +449,7 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
     if (isLocalDB && (is.null(extDB) || !file.exists(extDB)))
     {
         ex <- "as part of the extraOpts argument, e.g. extraOpts = list(LocalDatabasePath = \"C:/DSSTox_01May18_Full_SelectMetaDataPlus.csv\")"
-        if (database == "comptox")
+        if (database == "comptox" || database == "pubchemlite")
             stop(paste("No (valid) external database file set. This should be either set as an option, e.g.",
                        "options(patRoon.path.MetFragCompTox = \"C:/DSSTox_01May18_Full_SelectMetaDataPlus.csv\") or", ex))
 
@@ -460,7 +479,8 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
                        sdf = "LocalSDF",
                        psv = "LocalPSV",
                        csv = "LocalCSV",
-                       comptox = "LocalCSV")
+                       comptox = "LocalCSV",
+                       pubchemlite = "LocalCSV")
     if (database == "PubChem" && extendedPubChem) # can't seem to combine this conditional in above switch...
         database <- "ExtendedPubChem"
 

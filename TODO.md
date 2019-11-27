@@ -43,6 +43,9 @@
 - test score normalization?
 - timeouts for SIRIUS?
 - do something about negative H explained fragments by MF?
+- PubChemLite
+    - Do something with related CIDs? (e.g. link in getCompInfoList())
+    - Install from Win inst script
 
 
 ## formulas

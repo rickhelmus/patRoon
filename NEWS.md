@@ -7,6 +7,7 @@
     * All scorings are now averaged, including those that are not fragment specific (e.g. precursor m/z error)
     * This also improves ranking in certain specific cases
 * Vectorized plotting of MS spectra to make it potentially faster
+* Added PubChemLite support for MetFrag
 
 
 ## October 2019

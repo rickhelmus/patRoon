@@ -147,6 +147,7 @@ getCompInfoList <- function(compResults, compIndex, addHTMLURL, mCompNames)
             # CSI:FingerID might return multiple identifiers
             idlist <- unlist(strsplit(ident, ";"))
 
+            # UNDONE: could use related CIDs here with PubChemLite?
             if (grepl("pubchem", tolower(db)))
                 fmt <- "<a target=\"_blank\" href=\"https://pubchem.ncbi.nlm.nih.gov/compound/%s\">%s</a>"
             else if (tolower(db) == "chemspider")
@@ -187,6 +188,9 @@ getCompInfoList <- function(compResults, compIndex, addHTMLURL, mCompNames)
 
     ctext <- addValText(ctext, "%.2f", c("XlogP", "AlogP"))
 
+    # PubChemLite
+    ctext <- addValText(ctext, "%s", c("FP", "compoundName2"))
+    
     # Dashboard
     ctext <- addValText(ctext, "%s", c("CASRN", "QCLevel"))
 

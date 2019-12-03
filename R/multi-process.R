@@ -259,9 +259,11 @@ executeMultiProcess <- function(commandQueue, finishHandler,
             {
                 if (!is.null(cmd$logFile))
                 {
-                    fprintf(cmd$logFile, "command: %s\nargs: %s\n", cmd$command, paste0(cmd$args, collapse = " "))
-                    fprintf(cmd$logFile, "\n---\n\noutput:\n%s\n\nstandard error output:\n%s\n",
-                            cmd$stdoutLog, cmd$stderrLog, append = TRUE)
+                    tryCatch({
+                        fprintf(cmd$logFile, "command: %s\nargs: %s\n", cmd$command, paste0(cmd$args, collapse = " "))
+                        fprintf(cmd$logFile, "\n---\n\noutput:\n%s\n\nstandard error output:\n%s\n",
+                                cmd$stdoutLog, cmd$stderrLog, append = TRUE)
+                    }, error = function(e) "")
                 }
             }
         }

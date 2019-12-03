@@ -10,7 +10,6 @@
 
 ## docs
 - improve instructions for MF and SIRIUS installation?
-- handbook: update GenForm isotope detection & MSMode
 
 
 ## features

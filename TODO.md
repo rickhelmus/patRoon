@@ -44,7 +44,7 @@
 - do something about negative H explained fragments by MF?
 - PubChemLite
     - Do something with related CIDs? (e.g. link in getCompInfoList())
-    - Install from Win inst script
+    - Install from Win inst script --> now only tier1, OK?
 
 
 ## formulas

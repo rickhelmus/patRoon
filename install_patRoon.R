@@ -444,6 +444,8 @@ utils <- setRefClass("utilsInst", methods = list(
                                        path = getOption("patRoon.path.MetFragCL", "")))
         extDeps <- rbind(extDeps, list(name = "MetFrag CompTox DB", command = "", copt = "",
                                        path = getOption("patRoon.path.MetFragCompTox", "")))
+        extDeps <- rbind(extDeps, list(name = "MetFrag PubChemLite DB", command = "", copt = "",
+                                       path = getOption("patRoon.path.MetFragPubChemLite", "")))
         
         present <- nzchar(extDeps$path) & file.exists(extDeps$path)
         instChoices <- paste(extDeps$name, ifelse(present, "(seems installed)", "(doesn't seem to be installed)"))
@@ -489,6 +491,14 @@ utils <- setRefClass("utilsInst", methods = list(
                     setOpts <- c(setOpts,
                                  list(patRoon.path.MetFragCompTox = fixPath(file.path(down, "DSSTox_01May18_Full_SelectMetaDataPlus.csv"))))
                 }
+            }
+
+            if ("MetFrag PubChemLite DB" %in% instWhat)
+            {
+                down <- downloadFile(instPath, "MetFrag PubChemLite database", "https://zenodo.org/record/3548654/files/PubChemLite_18Nov2019_tier1.csv",
+                                     FALSE)
+                if (!is.null(down))
+                    setOpts <- c(setOpts, list(patRoon.path.MetFragPubChemLite = down))
             }
             
             if ("SIRIUS" %in% instWhat)

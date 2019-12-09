@@ -111,6 +111,8 @@ unifyMFNames <- function(mfr)
                  TOX21SL = "TOX21SL",
                  "EXPOCAST_MEDIAN_EXPOSURE_PREDICTION_MG/KG-BW/DAY" = "EXPOCASTPredExpo",
                  TOXCAST = "TOXCAST",
+                 KEMIMARKET = "KEMIMARKET",
+                 MZCLOUD = "MZCLOUD",
 
                  # FOR-IDENT
                  ForIdentTonnage = "tonnage",

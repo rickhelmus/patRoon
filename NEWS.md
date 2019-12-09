@@ -1,5 +1,10 @@
 # patRoon 0.1.0.9000
 
+## December 2019
+
+* Added missing score terms for latest CompTox MetFrag database
+
+
 ## November 2019
 
 * **IMPORTANT** The `addFormulaScoring()` function now uses a different algorithm to calculate formula scores for compound candidates. The score is now based on the actual formula ranking in the provided `formulas` object, and is fixed between _zero_ (no match) and _one_ (best match).

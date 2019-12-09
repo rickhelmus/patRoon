@@ -918,7 +918,7 @@ setMethod("consensus", "compounds", function(obj, ..., absMinAbundance = NULL,
     ac <- checkmate::makeAssertCollection()
     checkmate::assertList(allCompounds, types = "compounds", min.len = 2, any.missing = FALSE,
                           unique = TRUE, .var.name = "...", add = ac)
-    checkmate::assertNumber(rankWeights, lower = 0, finite = TRUE, add = ac)
+    checkmate::assertNumeric(rankWeights, lower = 0, finite = TRUE, add = ac)
     checkmate::reportAssertions(ac)
 
     rankWeights <- rep(rankWeights, length.out = length(allCompounds))

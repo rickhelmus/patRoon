@@ -173,6 +173,8 @@ setMethod("$", "components", function(x, name)
 #' @export
 setMethod("as.data.table", "components", function(x)
 {
+    if (length(x) == 0)
+        return(data.table())
     ret <- rbindlist(componentTable(x), idcol = "name")
     ret <- merge(componentInfo(x), ret, by = "name")
     ret <- ret[orderComponentsNames(name)]

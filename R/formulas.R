@@ -619,6 +619,7 @@ setMethod("plotVenn", "formulas", function(obj, ..., labels = NULL, vennArgs = N
     ac <- checkmate::makeAssertCollection()
     checkmate::assertList(allForms, types = "formulas", min.len = 2, any.missing = FALSE,
                           unique = TRUE, .var.name = "...", add = ac)
+    checkmate::assertCharacter(labels, min.chars = 1, len = length(allForms), null.ok = TRUE, add = ac)
     checkmate::assertList(vennArgs, names = "unique", null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
 
@@ -656,6 +657,7 @@ setMethod("plotUpSet", "formulas", function(obj, ..., labels = NULL, nsets = len
     ac <- checkmate::makeAssertCollection()
     checkmate::assertList(allForms, types = "formulas", min.len = 2, any.missing = FALSE,
                           unique = TRUE, .var.name = "...", add = ac)
+    checkmate::assertCharacter(labels, min.chars = 1, len = length(allForms), null.ok = TRUE, add = ac)
     checkmate::assertList(upsetArgs, names = "unique", null.ok = TRUE, add = ac)
     checkmate::assertCount(nsets, positive = TRUE)
     checkmate::assertCount(nintersects, positive = TRUE, na.ok = TRUE)
@@ -700,7 +702,7 @@ setMethod("plotUpSet", "formulas", function(obj, ..., labels = NULL, nsets = len
 setMethod("consensus", "formulas", function(obj, ..., absMinAbundance = NULL,
                                             relMinAbundance = NULL,
                                             uniqueFrom = NULL, uniqueOuter = FALSE,
-                                            rankWeights = 1)
+                                            rankWeights = 1, labels = NULL)
 {
     allFormulas <- c(list(obj), list(...))
 
@@ -708,9 +710,10 @@ setMethod("consensus", "formulas", function(obj, ..., absMinAbundance = NULL,
     checkmate::assertList(allFormulas, types = "formulas", min.len = 2, any.missing = FALSE,
                           unique = TRUE, .var.name = "...", add = ac)
     checkmate::assertNumber(rankWeights, lower = 0, finite = TRUE, add = ac)
+    checkmate::assertCharacter(labels, min.chars = 1, len = length(allForms), null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
 
-    allFormNames <- make.unique(sapply(allFormulas, algorithm))
+    allFormNames <- if (!is.null(labels)) labels else make.unique(sapply(allFormulas, algorithm))
     assertConsCommonArgs(absMinAbundance, relMinAbundance, uniqueFrom, uniqueOuter, allFormNames)
 
     relMinAbundance <- max(NULLToZero(absMinAbundance) / length(allFormulas), NULLToZero(relMinAbundance))

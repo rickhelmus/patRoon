@@ -46,6 +46,7 @@
     - Do something with related CIDs? (e.g. link in getCompInfoList())
     - Install from Win inst script --> now only tier1, OK?
 - Update to latest CompTox: update installer and default scorings
+- BUG: addFormulaScoring doesn't work with consensus results (missing score column)
 
 
 ## formulas

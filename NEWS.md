@@ -3,6 +3,7 @@
 ## December 2019
 
 * Added missing score terms for latest CompTox MetFrag database
+* labels parameter for formulas/compounds methods of `consensus()`
 
 
 ## November 2019

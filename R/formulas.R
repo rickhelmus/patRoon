@@ -710,14 +710,14 @@ setMethod("consensus", "formulas", function(obj, ..., absMinAbundance = NULL,
     checkmate::assertList(allFormulas, types = "formulas", min.len = 2, any.missing = FALSE,
                           unique = TRUE, .var.name = "...", add = ac)
     checkmate::assertNumber(rankWeights, lower = 0, finite = TRUE, add = ac)
-    checkmate::assertCharacter(labels, min.chars = 1, len = length(allForms), null.ok = TRUE, add = ac)
+    checkmate::assertCharacter(labels, min.chars = 1, len = length(allFormulas), null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
 
     allFormNames <- if (!is.null(labels)) labels else make.unique(sapply(allFormulas, algorithm))
     assertConsCommonArgs(absMinAbundance, relMinAbundance, uniqueFrom, uniqueOuter, allFormNames)
 
     relMinAbundance <- max(NULLToZero(absMinAbundance) / length(allFormulas), NULLToZero(relMinAbundance))
-    
+
     rankWeights <- rep(rankWeights, length.out = length(allFormulas))
 
     allFormulasLists <- sapply(seq_along(allFormulas), function(fi)

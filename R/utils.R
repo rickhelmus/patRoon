@@ -583,7 +583,7 @@ makeScoresPlot <- function(scoreTable, mcn, useGGPlot2)
         par(mai = c(maxStrW, 0.5, omai[3], 0))
 
         if (length(mcn) > 1)
-            cols <- getBrewerPal(length(mcn), "Paired")
+            cols <- getBrewerPal(length(unique(scores$merged)), "Paired")
         else
             cols <- getBrewerPal(nrow(scores), "Paired")
 
@@ -598,10 +598,10 @@ makeScoresPlot <- function(scoreTable, mcn, useGGPlot2)
             {
                 merge(left, right, by = "merged", all = TRUE)
             }, scSplit)
-
+            
             plot.new()
 
-            makeLegend <- function(x, y, ...) legend(x, y, plotTab$merged, col = cols, lwd = 1, xpd = NA, ncol = 1,
+            makeLegend <- function(x, y, ...) legend(x, y, unique(scores$merged), col = cols, lwd = 1, xpd = NA, ncol = 1,
                                                      cex = 0.75, bty = "n", ...)
 
             # auto legend positioning: https://stackoverflow.com/a/34624632/9264518

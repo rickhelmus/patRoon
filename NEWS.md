@@ -4,6 +4,7 @@
 
 * Added missing score terms for latest CompTox MetFrag database
 * labels parameter for formulas/compounds methods of `consensus()`
+* Fixed: colour assignment for scores plotting of merged formulae/compound results might be incorrect (reported by Emma Schymanski)
 
 
 ## November 2019

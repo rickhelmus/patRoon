@@ -384,13 +384,14 @@ newProject <- function(destPath = NULL)
 
     # NOTE: disable column sorting so we don't have to worry about getting correct row index
     # (https://github.com/jrowen/rhandsontable/issues/257)
+    # NOTE: preventOverflow should not be set when columnSorting = FALSE
+    # https://github.com/handsontable/handsontable/issues/4303
     # NOTE: set selectionMode to range as only row series can currently be queried
     # (https://github.com/jrowen/rhandsontable/issues/313)
     hotOpts <- list(rowHeaderWidth = 40, readOnly = TRUE,
                     columnSorting = FALSE, sortIndicator = TRUE, selectCallback = TRUE,
                     currentRowClassName = "currentRow", stretchH = "all",
-                    preventOverflow = "horizontal", selectionMode = "range",
-                    outsideClickDeselects = FALSE,
+                    selectionMode = "range", outsideClickDeselects = FALSE,
                     contextMenu = FALSE, manualColumnResize = TRUE)
 
     server <- function(input, output, session)
@@ -542,10 +543,10 @@ newProject <- function(destPath = NULL)
 
         output$analysesHot <- rhandsontable::renderRHandsontable({
             hot <- do.call(rhandsontable::rhandsontable,
-                           c(list(rValues$analyses, height = 350, maxRows = nrow(rValues$analyses)),
+                           c(list(rValues$analyses, height = 250, maxRows = nrow(rValues$analyses)),
                              hotOpts)) %>%
                 rhandsontable::hot_col(c("group", "blank"), readOnly = FALSE, type = "text")
-
+            
             return(hot)
         })
     }

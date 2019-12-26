@@ -6,6 +6,7 @@
 * labels parameter for formulas/compounds methods of `consensus()`
 * Fixed: colour assignment for scores plotting of merged formulae/compound results might be incorrect (reported by Emma Schymanski)
 * Fixed: analysis table in `newProject()` UI only showed partial amount of rows.
+* Fixed: don't print normalized instead of absolute design parameters when only one parameter is optimized in DoEs (fixes issue #10)
 
 
 ## November 2019

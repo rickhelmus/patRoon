@@ -66,12 +66,12 @@ DoEOptimizer$methods(
                                     diff(typParams$to_optimize[[1]]) / 8)
         }
 
+        printf("---\nDesign:\n")
+        print(designParams)
+        printf("---\n")
+
         designParams <- combineParams(designParams, typParams$no_optimization)
         tasks <- seq_len(nrow(design))
-
-        printf("---\nDesign:\n")
-        print(rsm::decode.data(design))
-        printf("---\n")
 
         prog <- openProgBar(0, length(tasks))
 

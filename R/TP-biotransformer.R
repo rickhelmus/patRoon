@@ -12,58 +12,6 @@ setMethod("initialize", "TPPredictionsBT",
           function(.Object, ...) callNextMethod(.Object, algorithm = "biotransformer", ...))
 
 
-babelConvert <- function(input, inFormat, outFormat, mustWork = TRUE)
-{
-    # Use batch conversion with a single input/output file. Note that obabel
-    # will stop after an error. This can be overidden, however, then it is
-    # unclear which entries failed. Hence, this option is not used, and when an
-    # error occurs the batch conversion is simply restarted with the subsequent
-    # entry.
-
-    inputFile <- tempfile("obabel_inp", fileext = ".txt")
-    outputFile <- tempfile("obabel_out", fileext = ".txt")
-    doConversion <- function(inp)
-    {
-        cat(inp, file = inputFile, sep = "\n")
-        executeCommand(getCommandWithOptPath("obabel", "obabel"),
-                       c(paste0("-i", inFormat), inputFile,
-                         paste0("-o", outFormat), "-O", outputFile, "-xw"),
-                       stderr = FALSE)
-        # each conversion is followed by a tab (why??) and newline. Read line
-        # by line and remove tab afterwards.
-        ret <- readLines(outputFile)
-        return(trimws(ret, which = "right", whitespace = "\t"))
-    }
-    
-    inputLen <- length(input)
-    ret <- character(inputLen)
-    curIndex <- 1
-    while(TRUE)
-    {
-        curRange <- seq(curIndex, inputLen)
-        out <- doConversion(input[curRange])
-        outl <- length(out)
-        
-        if (outl > 0)
-            ret[seq(curIndex, curIndex + outl - 1)] <- out
-        
-        curIndex <- curIndex + outl + 1
-        
-        if (curIndex <= inputLen)
-        {
-            msg <- sprintf("Failed to convert %d ('%s')", curIndex - 1, input[curIndex - 1])
-            if (mustWork)
-                stop(msg)
-            else
-                warning(msg)
-        }
-        else
-            break
-    }
-    
-    return(ret)
-}
-
 getBTBin <- function()
 {
     ret <- path.expand(getOption("patRoon.path.BioTransformer", ""))
@@ -104,24 +52,24 @@ processBTResults <- function(cmd)
     setnames(ret,
              c("Molecular formula", "Major Isotope Mass"),
              c("formula", "mass"))
-    
+
     # No need for these...
     # NOTE: cdk:Title seems the same as "Metabolite ID" column(?)
     ret[, c("Synonyms", "PUBCHEM_CID", "cdk:Title") := NULL]
-    
+
     # BUG: BT somestimes doesn't fill in the formula. Calculate them manually
-    ret[!nzchar(formula), formula := 
+    ret[!nzchar(formula), formula :=
     {
         SMI <- babelConvert(InChI, "inchi", "smi")
         mols <- getMoleculesFromSMILES(SMI)
         return(sapply(mols, function(m) rcdk::get.mol2formula(m)@string))
     }]
-    
+
     # Assign some unique identifier
     ret[, name := paste0(cmd$precursor, "-TP", seq_len(nrow(ret)))]
-    
+
     ret[, RTDir := ifelse(ALogP < `Precursor ALogP`, -1, 1)]
-    
+
     return(ret)
 }
 
@@ -137,7 +85,7 @@ collapseBTResults <- function(pred)
         p[, (col) := paste0(get(col), collapse = "/"), by = "InChIKey"]
         p <- unique(p, by = "InChIKey")
     })
-    
+
     predAll <- rbindlist(pred, idcol = "precursor")
 
     # merge precursor and sub-precursor (ie from consecutive reactions)
@@ -147,11 +95,11 @@ collapseBTResults <- function(pred)
     predAll[, c("name", "precursor") := .(paste0(name, collapse = ","),
                                           paste0(precursor, collapse = ",")),
             by = "InChIKey"]
-    
+
     # ... and remove now duplicates
     predAll <- unique(predAll, by = "InChIKey")
 
-    return(predAll)    
+    return(predAll)
 }
 
 getPrecursorSuspList <- function(pred, adduct)
@@ -169,7 +117,7 @@ predictTPsBioTransformer <- function(suspects = NULL, compounds = NULL, type = "
 {
     if (is.null(suspects) && is.null(compounds))
         stop("Specify at least either the suspects or compounds argument.")
-    
+
     ac <- checkmate::makeAssertCollection()
     checkmate::assertDataFrame(suspects, any.missing = FALSE, min.rows = 1, null.ok = TRUE, add = ac)
     if (!is.null(suspects))
@@ -182,7 +130,7 @@ predictTPsBioTransformer <- function(suspects = NULL, compounds = NULL, type = "
     checkmate::reportAssertions(ac)
 
     suspects <- if (!is.null(suspects)) as.data.table(suspects) else data.table()
-    
+
     if (!is.null(compounds))
     {
         compTab <- as.data.table(compounds)
@@ -197,7 +145,7 @@ predictTPsBioTransformer <- function(suspects = NULL, compounds = NULL, type = "
         stop("'name' column contains one ore more empty values")
     if (any(!nzchar(suspects$SMILES)))
         stop("'SMILES' column contains one ore more empty values")
-    
+
     cacheDB <- openCacheDBScope()
     baseHash <- makeHash(type, steps, extraOpts)
     setHash <- makeHash(suspects, baseHash)
@@ -256,7 +204,7 @@ predictTPsBioTransformer <- function(suspects = NULL, compounds = NULL, type = "
 
     results <- pruneList(results, checkZeroRows = TRUE)
     suspects <- suspects[name %in% names(results)]
-    
+
     return(TPPredictionsBT(suspects = suspects, predictions = results))
 }
 
@@ -264,12 +212,12 @@ predictTPsBioTransformer <- function(suspects = NULL, compounds = NULL, type = "
 setMethod("convertToMFDB", "TPPredictionsBT", function(pred, out, includePrec)
 {
     # UNDONE: cache?
-    
+
     ac <- checkmate::makeAssertCollection()
     checkmate::assertPathForOutput(out, overwrite = TRUE, add = ac) # NOTE: assert doesn't work on Windows...
     checkmate::assertFlag(includePrec, add = ac)
     checkmate::reportAssertions(ac)
-    
+
     cat("Collapsing results... ")
     predAll <- collapseBTResults(pred@predictions)
     cat("Done!\n")
@@ -279,40 +227,40 @@ setMethod("convertToMFDB", "TPPredictionsBT", function(pred, out, includePrec)
              c("name", "formula", "mass", "Precursor Major Isotope Mass"),
              c("Identifier", "MolecularFormula", "MonoisotopicMass", "Precursor MonoisotopicMass"))
 
-    
+
     cat("Calculating SMILES... ")
     predAll[, SMILES := babelConvert(InChI, "inchi", "smi")]
     cat("Done!\n")
-        
+
     if (includePrec)
     {
         cat("Adding and calculating precursor information... ")
-        
+
         precs <- copy(suspects(pred))
         setnames(precs, "name", "Identifier")
         precs[, CompoundName := Identifier]
-        
+
         mols <- getMoleculesFromSMILES(precs$SMILES, doTyping = TRUE, doIsotopes = TRUE)
         precs[, MolecularFormula := sapply(mols, function(m) rcdk::get.mol2formula(m)@string)]
         precs[, MonoisotopicMass := sapply(mols, rcdk::get.exact.mass)]
-        
+
         precs[, InChI := babelConvert(SMILES, "smi", "inchi")]
         precs[, InChIKey := babelConvert(SMILES, "smi", "inchikey", )]
-        
+
         predAll <- rbind(precs, predAll, fill = TRUE)
-        
+
         cat("Done!\n")
     }
-    
+
     # Add required InChIKey1 column
     predAll[, InChIKey1 := sub("\\-.*", "", InChIKey)]
 
     # equalize identifiers and names
     predAll[, CompoundName := Identifier]
-    
+
     keepCols <- c("Identifier", "MolecularFormula", "MonoisotopicMass", "Precursor MonoisotopicMass",
                   "SMILES", "InChI", "InChIKey", "InChIKey1", "ALogP") # UNDONE: more?
-    
+
     fwrite(predAll[, keepCols, with = FALSE], out)
 })
 
@@ -328,17 +276,17 @@ setMethod("linkPrecursorsToFGroups", "TPPredictionsBT", function(pred, fGroups, 
 setMethod("filter", "TPPredictionsBT", function(obj, removeEqualFormulas = FALSE, negate = FALSE)
 {
     # UNDONE: move to base class?
-    
+
     ac <- checkmate::makeAssertCollection()
     checkmate::assertFlag(removeEqualFormulas, add = ac)
     checkmate::assertFlag(negate, add = ac)
     checkmate::reportAssertions(ac)
-    
+
     if (length(obj) == 0)
         return(obj)
-    
+
     oldn <- length(obj)
-    
+
     hash <- makeHash(obj, removeEqualFormulas, negate)
     cache <- loadCacheData("filterTPs", hash)
     if (!is.null(cache))
@@ -356,14 +304,14 @@ setMethod("filter", "TPPredictionsBT", function(obj, removeEqualFormulas = FALSE
                 return(pred[formula != pform])
             })
         }
-        
+
         obj@predictions <- pruneList(obj@predictions, checkZeroRows = TRUE)
-        
+
         saveCacheData("filterTPs", obj, hash)
     }
-    
+
     newn <- length(obj)
     printf("Done! Filtered %d (%.2f%%) TPs. Remaining: %d\n", oldn - newn, if (oldn == 0) 0 else (1-(newn/oldn))*100, newn)
-    
+
     return(obj)
 })

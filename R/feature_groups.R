@@ -497,11 +497,11 @@ setMethod("plot", "featureGroups", function(x, colourBy = "fGroups",
     rGroups <- replicateGroups(x)
     if (is.null(which))
         which <- rGroups
-    
+
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertFlag, . ~ onlyUnique + retMin + showLegend, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
-    
+
     if (length(x) == 0)
         plot(0, type = "n", ...)
     else
@@ -512,13 +512,13 @@ setMethod("plot", "featureGroups", function(x, colourBy = "fGroups",
                 col <- if (colourBy == "fGroups") colorRampPalette(RColorBrewer::brewer.pal(12, "Paired"))(length(x)) else "black"
             if (is.null(pch))
                 pch <- 16
-            
+
             showLegend <- FALSE # UNDONE: also for fGroups (ie as with plotEIC() ?)
         }
         else if (colourBy == "rGroups")
         {
             labels <- c(replicateGroups(x), "overlap")
-            
+
             if (is.null(col))
                 labCol <- colorRampPalette(RColorBrewer::brewer.pal(12, "Paired"))(length(labels))
             else
@@ -539,10 +539,10 @@ setMethod("plot", "featureGroups", function(x, colourBy = "fGroups",
             else
                 labPch <- rep(pch, length.out = length(labels))
             names(labPch) <- labels
-            
+
             # get averaged intensities for each rGroup and omit initial name/rt/mz columns
             gTable <- as.data.table(x, average = TRUE)[, -(seq_len(3))]
-            
+
             for (r in seq_len(nrow(gTable)))
             {
                 present <- which(gTable[r] != 0)
@@ -557,7 +557,7 @@ setMethod("plot", "featureGroups", function(x, colourBy = "fGroups",
 
             # remove unassigned (e.g. rGroups without unique feature groups)
             labels <- labels[labels %in% gTable$label]
-            
+
             col <- labCol[gTable$label]; pch <- labPch[gTable$label]
         }
 
@@ -567,23 +567,23 @@ setMethod("plot", "featureGroups", function(x, colourBy = "fGroups",
             makeLegend <- function(x, y, ...)
             {
                 return(legend(x, y, labels, col = labCol[labels], pch = labPch[labels],
-                              text.col = labCol[labels], 
+                              text.col = labCol[labels],
                               xpd = NA, ncol = 1, cex = 0.75, bty = "n", ...))
             }
-            
+
             plot.new()
             leg <- makeLegend(0, 0, plot = FALSE)
             lw <- (grconvertX(leg$rect$w, to = "ndc") - grconvertX(0, to = "ndc"))
             par(omd = c(0, 1 - lw, 0, 1), new = TRUE)
         }
-        
+
         plot(if (retMin) x@groupInfo$rts / 60 else x@groupInfo$rts, x@groupInfo$mzs,
              xlab = if (retMin) "Retention time (min)" else "Retention time (sec.)",
              ylab = "m/z", col = col, pch = pch, ...)
-        
+
         if (showLegend)
             makeLegend(par("usr")[2], par("usr")[4])
-        
+
         par(oldp)
     }
 })
@@ -1224,11 +1224,13 @@ setMethod("overlap", "featureGroups", function(fGroups, which, exclusive)
 
 #' @rdname suspect-screening
 #' @export
-setMethod("screenSuspects", "featureGroups", function(obj, suspects, rtWindow, mzWindow)
+setMethod("screenSuspects", "featureGroups", function(obj, suspects, rtWindow, mzWindow, adduct = NULL)
 {
+    if (!is.null(adduct))
+        adduct <- checkAndToAdduct(adduct)
+
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertDataFrame(suspects, any.missing = FALSE, min.rows = 1, add = ac)
-    assertHasNames(suspects, c("name", "mz"), add = ac)
+    assertSuspectList(suspects, adduct, add = ac)
     aapply(checkmate::assertNumber, . ~ rtWindow + mzWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
 
@@ -1236,15 +1238,17 @@ setMethod("screenSuspects", "featureGroups", function(obj, suspects, rtWindow, m
     cd <- loadCacheData("screenSuspectsFG", hash)
     if (!is.null(cd))
         return(cd)
-    
+
     gTable <- groups(obj)
     gInfo <- groupInfo(obj)
     anaInfo <- analysisInfo(obj)
 
+    suspects <- prepareSuspectList(suspects, adduct)
+
     suspects$name <- as.character(suspects$name) # in case factors are given
 
     prog <- openProgBar(0, nrow(suspects))
-    
+
     retlist <- lapply(seq_len(nrow(suspects)), function(ti)
     {
         hasRT <- !is.null(suspects$rt) && !is.na(suspects$rt[ti])
@@ -1271,21 +1275,21 @@ setMethod("screenSuspects", "featureGroups", function(obj, suspects, rtWindow, m
 
             return(ret)
         }), fill = TRUE)
-        
+
         setTxtProgressBar(prog, ti)
         return(hits)
     })
     ret <- rbindlist(retlist, fill = TRUE)
-    
+
     setTxtProgressBar(prog, nrow(suspects))
     close(prog)
-    
+
     suspectsn <- nrow(suspects)
     foundn <- suspectsn - sum(is.na(ret$group))
     printf("Found %d/%d suspects (%.2f%%)\n", foundn, suspectsn, foundn * 100 / suspectsn)
 
     saveCacheData("screenSuspectsFG", ret, hash)
-    
+
     return(ret)
 })
 

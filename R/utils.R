@@ -245,7 +245,7 @@ generateAnalysisInfo <- function(paths, groups = "", blanks = "", concs = NULL,
     groups <- rep(groups, length.out = nrow(ret))
     ret$group <- ifelse(!nzchar(groups), ret$analysis, groups)
     ret$blank <- blanks
-    
+
     if (!is.null(concs))
     {
         if (length(concs) >= nrow(ret))
@@ -1107,4 +1107,83 @@ setListNamesIfPresent <- function(l, o, n)
     o <- o[pr]; n <- n[pr]
     names(l)[match(o, names(l))] <- n
     return(l)
+}
+
+babelConvert <- function(input, inFormat, outFormat, mustWork = TRUE)
+{
+    # Use batch conversion with a single input/output file. Note that obabel
+    # will stop after an error. This can be overidden, however, then it is
+    # unclear which entries failed. Hence, this option is not used, and when an
+    # error occurs the batch conversion is simply restarted with the subsequent
+    # entry.
+
+    inputFile <- tempfile("obabel_inp", fileext = ".txt")
+    outputFile <- tempfile("obabel_out", fileext = ".txt")
+    doConversion <- function(inp)
+    {
+        cat(inp, file = inputFile, sep = "\n")
+        executeCommand(getCommandWithOptPath("obabel", "obabel"),
+                       c(paste0("-i", inFormat), inputFile,
+                         paste0("-o", outFormat), "-O", outputFile, "-xw"),
+                       stderr = FALSE)
+        # each conversion is followed by a tab (why??) and newline. Read line
+        # by line and remove tab afterwards.
+        ret <- readLines(outputFile)
+        return(trimws(ret, which = "right", whitespace = "\t"))
+    }
+
+    inputLen <- length(input)
+    ret <- character(inputLen)
+    curIndex <- 1
+    while(TRUE)
+    {
+        curRange <- seq(curIndex, inputLen)
+        out <- doConversion(input[curRange])
+        outl <- length(out)
+
+        if (outl > 0)
+            ret[seq(curIndex, curIndex + outl - 1)] <- out
+
+        curIndex <- curIndex + outl + 1
+
+        if (curIndex <= inputLen)
+        {
+            msg <- sprintf("Failed to convert %d ('%s')", curIndex - 1, input[curIndex - 1])
+            if (mustWork)
+                stop(msg)
+            else
+                warning(msg)
+        }
+        else
+            break
+    }
+
+    return(ret)
+}
+
+prepareSuspectList <- function(suspects, adducts)
+{
+    # UNDONE: check if/make name column is file safe
+
+    suspects <- as.data.table(suspects)
+    suspects[, name := as.character(name)] # in case factors are given
+
+    if (!is.null(suspects[["mz"]]))
+        return(suspects) # no further need for calculation of ion masses
+
+    # neutral mass given?
+    if (!is.null(suspects[["neutralMass"]]))
+        neutralMasses <- suspects[["neutralMass"]]
+    else if (!is.null(suspects[["SMILES"]]) || !is.null(suspects[["InChI"]]))
+    {
+        # otherwise calculate
+        SMI <- if (!is.null(suspects[["SMILES"]])) suspects$SMILES else babelConvert(suspects$InChI, "inchi", "smi")
+        mols <- getMoleculesFromSMILES(SMI, doTyping = TRUE, doIsotopes = TRUE)
+        neutralMasses <- sapply(mols, rcdk::get.exact.mass)
+    }
+
+    addMZs <- sapply(adducts, adductMZDelta)
+    suspects[, mz := neutralMasses + addMZs][]
+
+    return(suspects)
 }

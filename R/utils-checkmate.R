@@ -1,4 +1,9 @@
-checkHasNames <- function(x, n, type = "unique") checkmate::checkNames(names(x), must.include = n, type = type)
+checkHasNames <- function(x, n, subset = FALSE, type = "unique")
+{
+    if (subset)
+        return(checkmate::checkNames(names(x), subset.of = n, type = type))
+    return(checkmate::checkNames(names(x), must.include = n, type = type))
+}
 assertHasNames <- checkmate::makeAssertionFunction(checkHasNames)
 
 checkRange <- function(x, null.ok = FALSE)
@@ -117,6 +122,25 @@ assertAndPrepareAnaInfo <- function(x, ..., add = NULL)
         x[["conc"]] <- as.numeric(x[["conc"]])
 
     return(x)
+}
+
+assertSuspectList <- function(x, adduct, .var.name = checkmate::vname(x), add = NULL)
+{
+    checkmate::assertDataFrame(x, any.missing = FALSE, min.rows = 1, .var.name = .var.name, add = ac)
+    assertHasNames(x, "name", .var.name = .var.name, add = ac)
+    assertHasNames(x, c("mz", "neutralMass", "SMILES", "InChI"), subset = TRUE, .var.name = .var.name, add = ac)
+
+    assertCharField <- function(f, null.ok = TRUE) checkmate::assertCharacter(x[[f]], .var.name = sprintf("%s[\"%s\"]", .var.name, f),
+                                                                              any.missing = FALSE, min.chars = 1,
+                                                                              null.ok = null.ok, add = add)
+    assertCharField("SMILES"); assertCharField("InChI"); assertCharField("adduct", null.ok = !is.null(adduct))
+
+    assertNumField <- function(f) checkmate::assertNumeric(x[[f]], .var.name = sprintf("%s[\"%s\"]", .var.name, f),
+                                                           any.missing = FALSE, lower = 0, finite = TRUE,
+                                                           null.ok = TRUE, add = add)
+    assertNumField("mz"); assertNumField("neutralMass")
+
+    invisible(NULL)
 }
 
 assertCanCreateDir <- function(x, .var.name = checkmate::vname(x), add = NULL)

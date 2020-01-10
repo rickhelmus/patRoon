@@ -15,7 +15,8 @@ defaultPkgOpts <- function(pkgname)
                 path.SIRIUS = "",
                 path.OpenMS = "",
                 path.pngquant = "",
-                path.obabel = "")
+                path.obabel = "",
+                path.BioTransformer = "")
     return(setNames(ret, paste0(pkgname, ".", names(ret))))
 }
 

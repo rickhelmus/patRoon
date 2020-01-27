@@ -24,8 +24,7 @@
 
 \S4method{show}{TPPredictions}(object)
 
-\S4method{[}{TPPredictions,ANY,missing,missing}(x, i, j, ...,
-  drop = TRUE)
+\S4method{[}{TPPredictions,ANY,missing,missing}(x, i, j, ..., drop = TRUE)
 
 \S4method{[[}{TPPredictions,ANY,missing}(x, i, j)
 

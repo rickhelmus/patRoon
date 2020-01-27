@@ -90,7 +90,7 @@
 
 \S4method{plot}{featureGroups,ANY}(
   x,
-  colourBy = c("none", "rGroups", "fGroups"),
+  colourBy = "fGroups",
   onlyUnique = FALSE,
   retMin = FALSE,
   showLegend = TRUE,

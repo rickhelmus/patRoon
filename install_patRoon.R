@@ -484,12 +484,12 @@ utils <- setRefClass("utilsInst", methods = list(
             
             if ("MetFrag CompTox DB" %in% instWhat)
             {
-                down <- downloadFile(instPath, "MetFrag CompTox database", "ftp://newftp.epa.gov/COMPTOX/Sustainable_Chemistry_Data/Chemistry_Dashboard/MetFrag_metadata_files/DSSTox_01May18_Full_SelectMetaDataPlus.zip",
-                                     TRUE)
+                down <- downloadFile(instPath, "MetFrag CompTox database", "ftp://newftp.epa.gov/COMPTOX/Sustainable_Chemistry_Data/Chemistry_Dashboard/MetFrag_metadata_files/CompTox_17March2019_SelectMetaData.csv",
+                                     FALSE)
                 if (!is.null(down))
                 {
                     setOpts <- c(setOpts,
-                                 list(patRoon.path.MetFragCompTox = fixPath(file.path(down, "DSSTox_01May18_Full_SelectMetaDataPlus.csv"))))
+                                 list(patRoon.path.MetFragCompTox = down))
                 }
             }
 

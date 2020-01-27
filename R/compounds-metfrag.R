@@ -492,12 +492,26 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
     if (any(isSimplScore))
         scoreTypesMF[isSimplScore] <- compsScores[scoreTypesMF[isSimplScore], "metfrag"]
 
+    scoreWeights <- rep(scoreWeights, length.out = length(scoreTypesMF))
+    
+    if (isLocalDB)
+    {
+        # only keep scorings that are present in the DB
+        # BUG: nrows=0 gives internal data.table error, so read 1 line
+        scInDB <- names(fread(extraOpts[["LocalDatabasePath"]], nrows = 1))
+        
+        isDBType <- scoreTypesMF %in% compsScores[nzchar(compsScores$database), "metfrag"]
+        keep <- !isDBType | scoreTypesMF %in% scInDB
+
+        scoreTypesMF <- scoreTypesMF[keep]; scoreWeights <- scoreWeights[keep]
+    }
+    
     mfSettings <- list(DatabaseSearchRelativeMassDeviation = dbRelMzDev,
                        FragmentPeakMatchRelativeMassDeviation = fragRelMzDev,
                        FragmentPeakMatchAbsoluteMassDeviation = fragAbsMzDev,
                        PrecursorIonType = as.character(adduct, format = "metfrag"),
                        MetFragDatabaseType = database, MetFragScoreTypes = scoreTypesMF,
-                       MetFragScoreWeights = rep(scoreWeights, length.out = length(scoreTypesMF)),
+                       MetFragScoreWeights = scoreWeights,
                        MetFragPreProcessingCandidateFilter = preProcessingFilters,
                        MetFragPostProcessingCandidateFilter = postProcessingFilters,
                        MaxCandidateLimitToStop = maxCandidatesToStop)

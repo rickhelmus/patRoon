@@ -1,5 +1,9 @@
 # patRoon 0.1.0.9000
 
+## January 2020
+
+* Ignore user specified scorings for local databases such as CompTox that are not actually present in the DB. This makes it easier to use e.g. different DB versions with differing scorings.
+
 ## December 2019
 
 * Added missing score terms for latest CompTox MetFrag database

@@ -143,8 +143,7 @@
   uniqueFrom = NULL,
   uniqueOuter = FALSE,
   minMaxNormalization = FALSE,
-  rankWeights = 1,
-  labels = NULL
+  rankWeights = 1
 )
 }
 \arguments{

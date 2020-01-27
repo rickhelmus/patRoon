@@ -839,6 +839,9 @@ getMoleculesFromSMILES <- function(SMILES, doTyping = FALSE, emptyIfFails = FALS
     return(mols)
 }
 
+getNeutralMassFromSMILES <- function(SMILES) sapply(getMoleculesFromSMILES(SMILES, doTyping = TRUE, doIsotopes = TRUE),
+                                                    rcdk::get.exact.mass)
+
 getMostIntenseAnaWithMSMS <- function(fGroups, MSPeakLists, groupName)
 {
     gTable <- groups(fGroups)
@@ -1161,7 +1164,7 @@ babelConvert <- function(input, inFormat, outFormat, mustWork = TRUE)
     return(ret)
 }
 
-prepareSuspectList <- function(suspects, adducts)
+prepareSuspectList <- function(suspects, adduct)
 {
     # UNDONE: check if/make name column is file safe
 
@@ -1178,11 +1181,14 @@ prepareSuspectList <- function(suspects, adducts)
     {
         # otherwise calculate
         SMI <- if (!is.null(suspects[["SMILES"]])) suspects$SMILES else babelConvert(suspects$InChI, "inchi", "smi")
-        mols <- getMoleculesFromSMILES(SMI, doTyping = TRUE, doIsotopes = TRUE)
-        neutralMasses <- sapply(mols, rcdk::get.exact.mass)
+        neutralMasses <- getNeutralMassFromSMILES(SMI)
     }
-
-    addMZs <- sapply(adducts, adductMZDelta)
+    
+    if (!is.null(adduct))
+        addMZs <- adductMZDelta(adduct)
+    else
+        addMZs <- sapply(suspects[["adduct"]], function(a) adductMZDelta(as.adduct(a)))
+    
     suspects[, mz := neutralMasses + addMZs][]
 
     return(suspects)

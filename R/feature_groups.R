@@ -1224,7 +1224,7 @@ setMethod("overlap", "featureGroups", function(fGroups, which, exclusive)
 
 #' @rdname suspect-screening
 #' @export
-setMethod("screenSuspects", "featureGroups", function(obj, suspects, rtWindow, mzWindow, adduct = NULL)
+setMethod("screenSuspects", "featureGroups", function(obj, suspects, rtWindow, mzWindow, adduct)
 {
     if (!is.null(adduct))
         adduct <- checkAndToAdduct(adduct)
@@ -1244,8 +1244,6 @@ setMethod("screenSuspects", "featureGroups", function(obj, suspects, rtWindow, m
     anaInfo <- analysisInfo(obj)
 
     suspects <- prepareSuspectList(suspects, adduct)
-
-    suspects$name <- as.character(suspects$name) # in case factors are given
 
     prog <- openProgBar(0, nrow(suspects))
 

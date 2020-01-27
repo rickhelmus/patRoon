@@ -27,6 +27,23 @@ checkAndToAdduct <- function(adduct, na.ok = FALSE)
     as.adduct(adduct)
 }
 
+adductMZDelta <- function(adduct)
+{
+    # NOTE: rcdk::get.formula makes elemental counts absolute
+    ret <- 0
+    getMZ <- function(form, charge) rcdk::get.formula(form, charge)@mass
+    if (length(adduct@add) > 0 && length(adduct@sub) > 0) # NOTE: add charge once
+        ret <- sum(sapply(adduct@add, getMZ, charge = adduct@charge)) - sum(sapply(adduct@sub, getMZ, charge = 0))
+    else if (length(adduct@add) > 0)
+        ret <- sum(sapply(adduct@add, getMZ, charge = adduct@charge))
+    else if (length(adduct@sub) > 0)
+        ret <- -(sum(sapply(adduct@sub, getMZ, charge = adduct@charge)))
+    else # [M]
+        ret <- getMZ("H", adduct@charge) - getMZ("H", 0) # electron mass
+    
+    return(ret)
+}
+
 #' @details \code{GenFormAdducts} returns a table with information on adducts
 #'   supported by \command{GenForm}.
 #' @rdname adduct-utils

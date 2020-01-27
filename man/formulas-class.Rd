@@ -117,8 +117,7 @@
   relMinAbundance = NULL,
   uniqueFrom = NULL,
   uniqueOuter = FALSE,
-  rankWeights = 1,
-  labels = NULL
+  rankWeights = 1
 )
 }
 \arguments{

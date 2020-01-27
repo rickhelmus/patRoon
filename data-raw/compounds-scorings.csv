@@ -30,6 +30,22 @@ TOX21SL,TOX21SL,,comptox,TRUE,TRUE,
 TOXCAST,TOXCAST,,comptox,TRUE,TRUE,
 KEMIMARKET,KEMIMARKET,,comptox,TRUE,TRUE,
 MZCLOUD,MZCLOUD,,comptox,TRUE,TRUE,
+pubMedNeuro,PubMedNeuro,,comptox,FALSE,TRUE,Smoking metadata
+CIGARETTES,CIGARETTES,,comptox,TRUE,TRUE,Smoking metadata
+INDOORCT16,INDOORCT16,,comptox,TRUE,TRUE,Smoking metadata
+SRM2585DUST,SRM2585DUST,,comptox,TRUE,TRUE,Smoking metadata
+SLTCHEMDB,SLTCHEMDB,,comptox,TRUE,TRUE,Smoking metadata
+THSMOKE,THSMOKE,,comptox,TRUE,TRUE,Smoking metadata
+ITNANTIBIOTIC,ITNANTIBIOTIC,,comptox,TRUE,TRUE,Wastewater metadata
+STOFFIDENT,STOFFIDENT,,comptox,TRUE,TRUE,Wastewater metadata
+KEMIMARKET_EXPO,KEMIMARKET_EXPO,,comptox,TRUE,TRUE,Wastewater metadata
+KEMIMARKET_HAZ,KEMIMARKET_HAZ,,comptox,TRUE,TRUE,Wastewater metadata
+REACH2017,REACH2017,,comptox,TRUE,TRUE,Wastewater metadata
+KEMIWW_WDUIndex,KEMIWW_WDUIndex,,comptox,TRUE,TRUE,Wastewater metadata
+KEMIWW_StpSE,KEMIWW_StpSE,,comptox,TRUE,TRUE,Wastewater metadata
+KEMIWW_SEHitsOverDL,KEMIWW_SEHitsOverDL,,comptox,TRUE,TRUE,Wastewater metadata
+ZINC15PHARMA,ZINC15PHARMA,,comptox,TRUE,TRUE,Wastewater metadata
+PFASMASTER,PFASMASTER,,comptox,TRUE,TRUE,Wastewater metadata
 peakFingerprintScore,AutomatedPeakFingerprintAnnotationScore,,,FALSE,FALSE,
 lossFingerprintScore,AutomatedLossFingerprintAnnotationScore,,,FALSE,FALSE,
 agroChemInfo,AgroChemInfo,,pubchemlite,FALSE,FALSE,

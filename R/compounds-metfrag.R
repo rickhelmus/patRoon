@@ -96,7 +96,7 @@ unifyMFNames <- function(mfr)
                  AutomatedPeakFingerprintAnnotationScore = "peakFingerprintScore",
                  AutomatedLossFingerprintAnnotationScore = "lossFingerprintScore",
 
-                 # Dashboard variables
+                 # CompTox variables
                  CASRN_DTXSID = "CASRN",
                  CPDAT_COUNT = "CPDATCount",
                  ECOTOX = "ECOTOX",
@@ -113,6 +113,26 @@ unifyMFNames <- function(mfr)
                  TOXCAST = "TOXCAST",
                  KEMIMARKET = "KEMIMARKET",
                  MZCLOUD = "MZCLOUD",
+                 
+                 # CompTox - smoke metadata
+                 PubMedNeuro = "pubMedNeuro",
+                 CIGARETTES = "CIGARETTES",
+                 INDOORCT16 = "INDOORCT16",
+                 SRM2585DUST = "SRM2585DUST",
+                 SLTCHEMDB = "SLTCHEMDB",
+                 THSMOKE = "THSMOKE",
+                 
+                 # CompTox - wastewater metadata
+                 ITNANTIBIOTIC = "ITNANTIBIOTIC",
+                 STOFFIDENT = "STOFFIDENT",
+                 KEMIMARKET_EXPO = "KEMIMARKET_EXPO",
+                 KEMIMARKET_HAZ = "KEMIMARKET_HAZ",
+                 REACH2017 = "REACH2017",
+                 KEMIWW_WDUIndex = "KEMIWW_WDUIndex",
+                 KEMIWW_StpSE = "KEMIWW_StpSE",
+                 KEMIWW_SEHitsOverDL = "KEMIWW_SEHitsOverDL",
+                 ZINC15PHARMA = "ZINC15PHARMA",
+                 PFASMASTER = "PFASMASTER",
 
                  # FOR-IDENT
                  ForIdentTonnage = "tonnage",

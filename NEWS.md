@@ -3,6 +3,7 @@
 ## January 2020
 
 * Ignore user specified scorings for local databases such as CompTox that are not actually present in the DB. This makes it easier to use e.g. different DB versions with differing scorings.
+* Add scorings from wastewater and smoking metadata comptox MetFrag databases
 
 ## December 2019
 

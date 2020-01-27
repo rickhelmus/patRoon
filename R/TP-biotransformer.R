@@ -106,7 +106,7 @@ getPrecursorSuspList <- function(pred, adduct)
 {
     addMZ <- adductMZDelta(adduct)
     ret <- copy(suspects(pred))
-    ret[, mz := sapply(getMoleculesFromSMILES(SMILES, doTyping = TRUE, doIsotopes = TRUE), rcdk::get.exact.mass) + addMZ]
+    ret[, mz := getNeutralMassFromSMILES(SMILES) + addMZ]
 }
 
 #' @export

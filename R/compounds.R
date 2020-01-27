@@ -363,6 +363,10 @@ setMethod("addFormulaScoring", "compounds", function(compounds, formulas, update
     cTable <- compoundTable(compounds)
     cGNames <- names(cTable)
 
+    # UNDONE?
+    if (length(mergedCompoundNames(compounds)) > 0)
+        stop("Currently formula scoring cannot be calculated for consensus results. Please add the scorings before calling consensus()")
+    
     calculateScores <- function(cr, forms)
     {
         forms <- unique(forms, by = "neutral_formula") # ensure we have only one row per precursor (ranking remains)

@@ -45,7 +45,6 @@
 - PubChemLite
     - Do something with related CIDs? (e.g. link in getCompInfoList())
     - Install from Win inst script --> now only tier1, OK?
-- BUG: addFormulaScoring doesn't work with consensus results (missing score column)
 
 
 ## formulas

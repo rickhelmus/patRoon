@@ -56,4 +56,5 @@ pharmacoInfo,PharmacoInfo,,pubchemlite,FALSE,FALSE,
 safetyInfo,SafetyInfo,,pubchemlite,FALSE,FALSE,
 toxicityInfo,ToxicityInfo,,pubchemlite,FALSE,FALSE,
 knownUse,KnownUse,,pubchemlite,FALSE,FALSE,
-FPSum,FPSum,,pubchemlite,FALSE,TRUE,
+annoTypeCount,FPSum,,pubchemlite,FALSE,TRUE,FPSum was renamed
+annoTypeCount,AnnoTypeCount,,pubchemlite,FALSE,TRUE,

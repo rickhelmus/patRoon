@@ -68,7 +68,8 @@ unifyMFNames <- function(mfr)
                  PubMed_Count = "pubMedReferences",
                  Patent_Count = "numberPatents",
                  # Related_CIDs # UNDONE: do something with this?
-                 Name2 = "compoundNames2",
+                 Name2 = "compoundName2", # Nov2019 version
+                 Synonym = "compoundName2", # Jan2020 version
                  AgroChemInfo = "agroChemInfo",
                  BioPathway = "bioPathway",
                  DrugMedicInfo = "drugMedicInfo",
@@ -77,7 +78,8 @@ unifyMFNames <- function(mfr)
                  SafetyInfo = "safetyInfo",
                  ToxicityInfo = "toxicityInfo",
                  KnownUse = "knownUse",
-                 FPSum = "FPSum",
+                 FPSum = "annoTypeCount", # Nov2019 version (rename to Jan2020 version)
+                 AnnoTypeCount = "annoTypeCount", # Jan2020 version
 
                  # ChemSpider
                  CHEMSPIDER_XLOGP = "XlogP",
@@ -506,11 +508,10 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
     if (database == "PubChem" && extendedPubChem) # can't seem to combine this conditional in above switch...
         database <- "ExtendedPubChem"
 
-    rownames(compsScores) <- compsScores$name
     scoreTypesMF <- setdiff(scoreTypes, c("score", "Score")) # final score is to be determined
     isSimplScore <- scoreTypesMF %in% compsScores$name
     if (any(isSimplScore))
-        scoreTypesMF[isSimplScore] <- compsScores[scoreTypesMF[isSimplScore], "metfrag"]
+        scoreTypesMF[isSimplScore] <- compsScores[match(scoreTypesMF[isSimplScore], compsScores$name), "metfrag"]
 
     scoreWeights <- rep(scoreWeights, length.out = length(scoreTypesMF))
     

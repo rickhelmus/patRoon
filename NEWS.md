@@ -5,6 +5,7 @@
 * Ignore user specified scorings for local databases such as CompTox that are not actually present in the DB. This makes it easier to use e.g. different DB versions with differing scorings.
 * Add scorings from wastewater and smoking metadata comptox MetFrag databases
 * Windows install script now install latest (March2019) CompTox
+* Updates for latest PubChemLite relaease (Jan2020) 
 
 ## December 2019
 

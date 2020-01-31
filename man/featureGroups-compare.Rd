@@ -18,8 +18,7 @@
 \alias{consensus,featureGroupsComparison-method}
 \title{Comparing feature groups}
 \usage{
-\S4method{comparison}{featureGroups}(..., groupAlgo,
-  groupArgs = list(rtalign = FALSE))
+\S4method{comparison}{featureGroups}(..., groupAlgo, groupArgs = list(rtalign = FALSE))
 
 \S4method{plot}{featureGroupsComparison,ANY}(x, retMin = TRUE, ...)
 
@@ -27,12 +26,15 @@
 
 \S4method{plotUpSet}{featureGroupsComparison}(obj, which = NULL, ...)
 
-\S4method{plotChord}{featureGroupsComparison}(obj, addSelfLinks = FALSE,
-  addRetMzPlots = TRUE, ...)
+\S4method{plotChord}{featureGroupsComparison}(obj, addSelfLinks = FALSE, addRetMzPlots = TRUE, ...)
 
-\S4method{consensus}{featureGroupsComparison}(obj,
-  absMinAbundance = NULL, relMinAbundance = NULL, uniqueFrom = NULL,
-  uniqueOuter = FALSE)
+\S4method{consensus}{featureGroupsComparison}(
+  obj,
+  absMinAbundance = NULL,
+  relMinAbundance = NULL,
+  uniqueFrom = NULL,
+  uniqueOuter = FALSE
+)
 }
 \arguments{
 \item{\dots}{For \code{comparison}: \code{featureGroups} objects that should

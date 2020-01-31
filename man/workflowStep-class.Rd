@@ -14,8 +14,7 @@
 
 \S4method{as.data.table}{workflowStep}(x, keep.rownames = FALSE, ...)
 
-\S4method{as.data.frame}{workflowStep}(x, row.names = NULL,
-  optional = FALSE, ...)
+\S4method{as.data.frame}{workflowStep}(x, row.names = NULL, optional = FALSE, ...)
 
 \S4method{show}{workflowStep}(object)
 }

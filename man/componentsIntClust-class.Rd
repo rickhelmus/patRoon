@@ -24,21 +24,29 @@
 
 \S4method{treeCut}{componentsIntClust}(obj, k = NULL, h = NULL)
 
-\S4method{treeCutDynamic}{componentsIntClust}(obj, maxTreeHeight,
-  deepSplit, minModuleSize)
+\S4method{treeCutDynamic}{componentsIntClust}(obj, maxTreeHeight, deepSplit, minModuleSize)
 
-\S4method{plotHeatMap}{componentsIntClust}(obj, interactive = FALSE,
-  col = NULL, margins = c(6, 2), cexCol = 1, ...)
+\S4method{plotHeatMap}{componentsIntClust}(
+  obj,
+  interactive = FALSE,
+  col = NULL,
+  margins = c(6, 2),
+  cexCol = 1,
+  ...
+)
 
-\S4method{plotInt}{componentsIntClust}(obj, index, pch = 20,
-  type = "b", lty = 3, col = NULL, ...)
+\S4method{plotInt}{componentsIntClust}(obj, index, pch = 20, type = "b", lty = 3, col = NULL, ...)
 
-\S4method{plot}{componentsIntClust,ANY}(x, pal = "Paired",
-  numericLabels = TRUE, colourBranches = length(x) < 50,
-  showLegend = length(x) < 20, ...)
+\S4method{plot}{componentsIntClust,ANY}(
+  x,
+  pal = "Paired",
+  numericLabels = TRUE,
+  colourBranches = length(x) < 50,
+  showLegend = length(x) < 20,
+  ...
+)
 
-\S4method{plotSilhouettes}{componentsIntClust}(obj, kSeq, pch = 16,
-  type = "b", ...)
+\S4method{plotSilhouettes}{componentsIntClust}(obj, kSeq, pch = 16, type = "b", ...)
 }
 \arguments{
 \item{k, h}{Desired number of clusters or tree height to be used for cutting

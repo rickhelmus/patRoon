@@ -47,9 +47,16 @@
 
 \S4method{as.data.table}{features}(x)
 
-\S4method{filter}{features}(obj, absMinIntensity = NULL,
-  relMinIntensity = NULL, retentionRange = NULL, mzRange = NULL,
-  mzDefectRange = NULL, chromWidthRange = NULL, negate = FALSE)
+\S4method{filter}{features}(
+  obj,
+  absMinIntensity = NULL,
+  relMinIntensity = NULL,
+  retentionRange = NULL,
+  mzRange = NULL,
+  mzDefectRange = NULL,
+  chromWidthRange = NULL,
+  negate = FALSE
+)
 
 \S4method{[}{features,ANY,missing,missing}(x, i, j, ..., drop = TRUE)
 
@@ -61,8 +68,7 @@
 
 \S4method{filter}{featuresXCMS}(obj, ...)
 
-\S4method{[}{featuresXCMS3,ANY,missing,missing}(x, i, j, ...,
-  drop = TRUE)
+\S4method{[}{featuresXCMS3,ANY,missing,missing}(x, i, j, ..., drop = TRUE)
 
 \S4method{filter}{featuresXCMS3}(obj, ...)
 }

@@ -72,8 +72,7 @@
 
 \S4method{groupFeatIndex}{featureGroups}(fGroups)
 
-\S4method{[}{featureGroups,ANY,ANY,missing}(x, i, j, ..., rGroups,
-  drop = TRUE)
+\S4method{[}{featureGroups,ANY,ANY,missing}(x, i, j, ..., rGroups, drop = TRUE)
 
 \S4method{[[}{featureGroups,ANY,ANY}(x, i, j)
 
@@ -81,34 +80,62 @@
 
 \S4method{export}{featureGroups}(fGroups, type, out)
 
-\S4method{as.data.table}{featureGroups}(x, average = FALSE,
-  areas = FALSE, features = FALSE, regression = FALSE)
+\S4method{as.data.table}{featureGroups}(
+  x,
+  average = FALSE,
+  areas = FALSE,
+  features = FALSE,
+  regression = FALSE
+)
 
-\S4method{plot}{featureGroups,ANY}(x, colourBy = "fGroups",
-  onlyUnique = FALSE, retMin = FALSE, showLegend = TRUE,
-  col = NULL, pch = NULL, ...)
+\S4method{plot}{featureGroups,ANY}(
+  x,
+  colourBy = "fGroups",
+  onlyUnique = FALSE,
+  retMin = FALSE,
+  showLegend = TRUE,
+  col = NULL,
+  pch = NULL,
+  ...
+)
 
-\S4method{plotInt}{featureGroups}(obj, average = FALSE, pch = 20,
-  type = "b", lty = 3, col = NULL, ...)
+\S4method{plotInt}{featureGroups}(obj, average = FALSE, pch = 20, type = "b", lty = 3, col = NULL, ...)
 
-\S4method{plotChord}{featureGroups}(obj, addSelfLinks = FALSE,
-  addRetMzPlots = TRUE, average = FALSE, outerGroups = NULL,
-  addIntraOuterGroupLinks = FALSE, ...)
+\S4method{plotChord}{featureGroups}(
+  obj,
+  addSelfLinks = FALSE,
+  addRetMzPlots = TRUE,
+  average = FALSE,
+  outerGroups = NULL,
+  addIntraOuterGroupLinks = FALSE,
+  ...
+)
 
-\S4method{plotEIC}{featureGroups}(obj, rtWindow = 30, mzWindow = 0.005,
-  retMin = FALSE, topMost = NULL, EICs = NULL,
-  showPeakArea = FALSE, showFGroupRect = TRUE, title = NULL,
-  colourBy = c("none", "rGroups", "fGroups"), showLegend = TRUE,
-  onlyPresent = TRUE, annotate = c("none", "ret", "mz"),
-  showProgress = FALSE, xlim = NULL, ylim = NULL, ...)
+\S4method{plotEIC}{featureGroups}(
+  obj,
+  rtWindow = 30,
+  mzWindow = 0.005,
+  retMin = FALSE,
+  topMost = NULL,
+  EICs = NULL,
+  showPeakArea = FALSE,
+  showFGroupRect = TRUE,
+  title = NULL,
+  colourBy = c("none", "rGroups", "fGroups"),
+  showLegend = TRUE,
+  onlyPresent = TRUE,
+  annotate = c("none", "ret", "mz"),
+  showProgress = FALSE,
+  xlim = NULL,
+  ylim = NULL,
+  ...
+)
 
 \S4method{plotVenn}{featureGroups}(obj, which = NULL, ...)
 
-\S4method{plotUpSet}{featureGroups}(obj, which = NULL,
-  nsets = length(which), nintersects = NA, ...)
+\S4method{plotUpSet}{featureGroups}(obj, which = NULL, nsets = length(which), nintersects = NA, ...)
 
-\S4method{unique}{featureGroups}(x, which, relativeTo = NULL,
-  outer = FALSE)
+\S4method{unique}{featureGroups}(x, which, relativeTo = NULL, outer = FALSE)
 
 \S4method{overlap}{featureGroups}(fGroups, which, exclusive = FALSE)
 }

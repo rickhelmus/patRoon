@@ -47,45 +47,103 @@
 
 \S4method{$}{compounds}(x, name)
 
-\S4method{as.data.table}{compounds}(x, fGroups = NULL,
-  fragments = FALSE, normalizeScores = "none",
-  excludeNormScores = c("score", "individualMoNAScore"))
+\S4method{as.data.table}{compounds}(
+  x,
+  fGroups = NULL,
+  fragments = FALSE,
+  normalizeScores = "none",
+  excludeNormScores = c("score", "individualMoNAScore")
+)
 
 \S4method{identifiers}{compounds}(compounds)
 
-\S4method{filter}{compounds}(obj, minExplainedPeaks = NULL,
-  minScore = NULL, minFragScore = NULL, minFormulaScore = NULL,
-  scoreLimits = NULL, elements = NULL, fragElements = NULL,
-  lossElements = NULL, topMost = NULL, negate = FALSE)
+\S4method{filter}{compounds}(
+  obj,
+  minExplainedPeaks = NULL,
+  minScore = NULL,
+  minFragScore = NULL,
+  minFormulaScore = NULL,
+  scoreLimits = NULL,
+  elements = NULL,
+  fragElements = NULL,
+  lossElements = NULL,
+  topMost = NULL,
+  negate = FALSE
+)
 
-\S4method{addFormulaScoring}{compounds}(compounds, formulas,
-  updateScore = FALSE, formulaScoreWeight = 1)
+\S4method{addFormulaScoring}{compounds}(
+  compounds,
+  formulas,
+  updateScore = FALSE,
+  formulaScoreWeight = 1
+)
 
 \S4method{getMCS}{compounds}(obj, index, groupName)
 
-\S4method{plotStructure}{compounds}(obj, index, groupName, width = 500,
-  height = 500, useGGPlot2 = FALSE)
+\S4method{plotStructure}{compounds}(
+  obj,
+  index,
+  groupName,
+  width = 500,
+  height = 500,
+  useGGPlot2 = FALSE
+)
 
-\S4method{plotScores}{compounds}(obj, index, groupName,
-  normalizeScores = "max", excludeNormScores = c("score",
-  "individualMoNAScore"), onlyUsed = TRUE, useGGPlot2 = FALSE)
+\S4method{plotScores}{compounds}(
+  obj,
+  index,
+  groupName,
+  normalizeScores = "max",
+  excludeNormScores = c("score", "individualMoNAScore"),
+  onlyUsed = TRUE,
+  useGGPlot2 = FALSE
+)
 
-\S4method{annotatedPeakList}{compounds}(obj, index, groupName, MSPeakLists,
-  formulas = NULL, onlyAnnotated = FALSE)
+\S4method{annotatedPeakList}{compounds}(
+  obj,
+  index,
+  groupName,
+  MSPeakLists,
+  formulas = NULL,
+  onlyAnnotated = FALSE
+)
 
-\S4method{plotSpec}{compounds}(obj, index, groupName, MSPeakLists,
-  formulas = NULL, plotStruct = TRUE, title = NULL,
-  useGGPlot2 = FALSE, xlim = NULL, ylim = NULL, ...)
+\S4method{plotSpec}{compounds}(
+  obj,
+  index,
+  groupName,
+  MSPeakLists,
+  formulas = NULL,
+  plotStruct = TRUE,
+  title = NULL,
+  useGGPlot2 = FALSE,
+  xlim = NULL,
+  ylim = NULL,
+  ...
+)
 
-\S4method{plotVenn}{compounds}(obj, ..., labels = NULL,
-  vennArgs = NULL)
+\S4method{plotVenn}{compounds}(obj, ..., labels = NULL, vennArgs = NULL)
 
-\S4method{plotUpSet}{compounds}(obj, ..., labels = NULL,
-  nsets = length(list(...)) + 1, nintersects = NA, upsetArgs = NULL)
+\S4method{plotUpSet}{compounds}(
+  obj,
+  ...,
+  labels = NULL,
+  nsets = length(list(...)) + 1,
+  nintersects = NA,
+  upsetArgs = NULL
+)
 
-\S4method{consensus}{compounds}(obj, ..., absMinAbundance = NULL,
-  relMinAbundance = NULL, uniqueFrom = NULL, uniqueOuter = FALSE,
-  minMaxNormalization = FALSE, rankWeights = 1)
+\S4method{consensus}{compounds}(
+  obj,
+  ...,
+  absMinAbundance = NULL,
+  relMinAbundance = NULL,
+  uniqueFrom = NULL,
+  uniqueOuter = FALSE,
+  minMaxNormalization = FALSE,
+  rankWeights = 1,
+  labels = NULL
+)
 }
 \arguments{
 \item{obj, object, x, compounds}{The \code{compound} object.}

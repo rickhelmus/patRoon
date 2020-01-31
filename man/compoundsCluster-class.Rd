@@ -34,26 +34,33 @@
 
 \S4method{show}{compoundsCluster}(object)
 
-\S4method{[}{compoundsCluster,ANY,missing,missing}(x, i, j, ...,
-  drop = TRUE)
+\S4method{[}{compoundsCluster,ANY,missing,missing}(x, i, j, ..., drop = TRUE)
 
-\S4method{treeCut}{compoundsCluster}(obj, k = NULL, h = NULL,
-  groupName)
+\S4method{treeCut}{compoundsCluster}(obj, k = NULL, h = NULL, groupName)
 
-\S4method{treeCutDynamic}{compoundsCluster}(obj, maxTreeHeight, deepSplit,
-  minModuleSize, groupName)
+\S4method{treeCutDynamic}{compoundsCluster}(obj, maxTreeHeight, deepSplit, minModuleSize, groupName)
 
-\S4method{plot}{compoundsCluster,ANY}(x, groupName, pal = "Paired",
+\S4method{plot}{compoundsCluster,ANY}(
+  x,
+  groupName,
+  pal = "Paired",
   colourBranches = lengths(x)[groupName] < 50,
-  showLegend = lengths(x)[groupName] < 20, ...)
+  showLegend = lengths(x)[groupName] < 20,
+  ...
+)
 
 \S4method{getMCS}{compoundsCluster}(obj, groupName, cluster)
 
-\S4method{plotStructure}{compoundsCluster}(obj, groupName, cluster,
-  width = 500, height = 500, withTitle = TRUE)
+\S4method{plotStructure}{compoundsCluster}(
+  obj,
+  groupName,
+  cluster,
+  width = 500,
+  height = 500,
+  withTitle = TRUE
+)
 
-\S4method{plotSilhouettes}{compoundsCluster}(obj, kSeq, groupName,
-  pch = 16, type = "b", ...)
+\S4method{plotSilhouettes}{compoundsCluster}(obj, kSeq, groupName, pch = 16, type = "b", ...)
 }
 \arguments{
 \item{obj, x, object}{A \code{compoundsCluster} object.}

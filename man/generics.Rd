@@ -87,8 +87,13 @@ replicateGroups(obj)
 
 treeCut(obj, k = NULL, h = NULL, ...)
 
-treeCutDynamic(obj, maxTreeHeight = 1, deepSplit = TRUE,
-  minModuleSize = 1, ...)
+treeCutDynamic(
+  obj,
+  maxTreeHeight = 1,
+  deepSplit = TRUE,
+  minModuleSize = 1,
+  ...
+)
 }
 \arguments{
 \item{obj}{The object the generic should be applied to.}
@@ -120,7 +125,7 @@ please refer to the linked method documentation for each generic.
 \code{algorithm} returns the algorithm that was used to generate the object.
 
 \itemize{
-    \item Methods are defined for: \code{\link[=algorithm,components-method]{components}}; \code{\link[=algorithm,compounds-method]{compounds}}; \code{\link[=algorithm,formulas-method]{formulas}}; \code{\link[=algorithm,optimizationResult-method]{optimizationResult}}; \code{\link[=algorithm,workflowStep-method]{workflowStep}}.
+    \item Methods are defined for: \code{\link[=algorithm,compounds-method]{compounds}}; \code{\link[=algorithm,formulas-method]{formulas}}; \code{\link[=algorithm,optimizationResult-method]{optimizationResult}}; \code{\link[=algorithm,workflowStep-method]{workflowStep}}.
 }
 
 \code{analysisInfo} returns the \link[=analysis-information]{analysis information} from an object.

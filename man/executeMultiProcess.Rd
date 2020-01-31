@@ -4,12 +4,20 @@
 \alias{executeMultiProcess}
 \title{Simultaneous execution of system commands.}
 \usage{
-executeMultiProcess(commandQueue, finishHandler,
+executeMultiProcess(
+  commandQueue,
+  finishHandler,
   timeoutHandler = function(...) TRUE,
-  errorHandler = defMultiProcErrorHandler, procTimeout = NULL,
-  printOutput = FALSE, printError = FALSE, showProgress = TRUE,
-  waitTimeout = 50, maxProcAmount = getOption("patRoon.maxProcAmount"),
-  batchSize = 1, delayBetweenProc = 0)
+  errorHandler = defMultiProcErrorHandler,
+  procTimeout = NULL,
+  printOutput = FALSE,
+  printError = FALSE,
+  showProgress = TRUE,
+  waitTimeout = 50,
+  maxProcAmount = getOption("patRoon.maxProcAmount"),
+  batchSize = 1,
+  delayBetweenProc = 0
+)
 }
 \arguments{
 \item{commandQueue}{A list with commands. Should contain \code{command}

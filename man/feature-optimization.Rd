@@ -11,18 +11,32 @@
 \alias{getDefFeaturesOptParamRanges}
 \title{Optimization of feature finding and grouping parameters}
 \usage{
-optimizeFeatureGrouping(features, algorithm, ...,
-  templateParams = list(), paramRanges = list(), maxIterations = 50,
-  maxModelDeviation = 0.1)
+optimizeFeatureGrouping(
+  features,
+  algorithm,
+  ...,
+  templateParams = list(),
+  paramRanges = list(),
+  maxIterations = 50,
+  maxModelDeviation = 0.1
+)
 
 generateFGroupsOptPSet(algorithm, ...)
 
 getDefFGroupsOptParamRanges(algorithm)
 
-optimizeFeatureFinding(anaInfo, algorithm, ..., templateParams = list(),
-  paramRanges = list(), isoIdent = if (algorithm == "openms") "OpenMS"
-  else "IPO", checkPeakShape = "none", CAMERAOpts = list(),
-  maxIterations = 50, maxModelDeviation = 0.1)
+optimizeFeatureFinding(
+  anaInfo,
+  algorithm,
+  ...,
+  templateParams = list(),
+  paramRanges = list(),
+  isoIdent = if (algorithm == "openms") "OpenMS" else "IPO",
+  checkPeakShape = "none",
+  CAMERAOpts = list(),
+  maxIterations = 50,
+  maxModelDeviation = 0.1
+)
 
 generateFeatureOptPSet(algorithm, ...)
 

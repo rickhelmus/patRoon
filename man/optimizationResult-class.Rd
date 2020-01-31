@@ -27,20 +27,25 @@
 
 \S4method{show}{optimizationResult}(object)
 
-\S4method{plot}{optimizationResult,ANY}(x, paramSet, DoEIteration,
-  paramsToPlot = NULL, maxCols = NULL, type = "contour",
-  image = TRUE, contours = "colors", ...)
+\S4method{plot}{optimizationResult,ANY}(
+  x,
+  paramSet,
+  DoEIteration,
+  paramsToPlot = NULL,
+  maxCols = NULL,
+  type = "contour",
+  image = TRUE,
+  contours = "colors",
+  ...
+)
 
-\S4method{optimizedParameters}{optimizationResult}(object,
-  paramSet = NULL, DoEIteration = NULL)
+\S4method{optimizedParameters}{optimizationResult}(object, paramSet = NULL, DoEIteration = NULL)
 
 \S4method{optimizedObject}{optimizationResult}(object, paramSet = NULL)
 
-\S4method{scores}{optimizationResult}(object, paramSet = NULL,
-  DoEIteration = NULL)
+\S4method{scores}{optimizationResult}(object, paramSet = NULL, DoEIteration = NULL)
 
-\S4method{experimentInfo}{optimizationResult}(object, paramSet,
-  DoEIteration)
+\S4method{experimentInfo}{optimizationResult}(object, paramSet, DoEIteration)
 }
 \arguments{
 \item{obj, x, object}{An \code{optimizationResult} object.}

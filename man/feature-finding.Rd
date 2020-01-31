@@ -20,31 +20,53 @@ findFeatures(analysisInfo, algorithm, ..., verbose = TRUE)
 
 importFeatures(analysisInfo, type, ...)
 
-findFeaturesBruker(analysisInfo, doFMF = "auto", startRange = 0,
-  endRange = 0, save = TRUE, close = save, verbose = TRUE)
+findFeaturesBruker(
+  analysisInfo,
+  doFMF = "auto",
+  startRange = 0,
+  endRange = 0,
+  save = TRUE,
+  close = save,
+  verbose = TRUE
+)
 
 findFeaturesEnviPick(analysisInfo, ..., verbose = TRUE)
 
 importFeaturesEnviMass(analysisInfo, enviProjPath)
 
-findFeaturesOpenMS(analysisInfo, noiseThrInt = 1000, chromSNR = 3,
-  chromFWHM = 5, mzPPM = 10, reEstimateMTSD = TRUE,
-  traceTermCriterion = "sample_rate", traceTermOutliers = 5,
-  minSampleRate = 0.5, minTraceLength = 3, maxTraceLength = -1,
-  widthFiltering = "fixed", minFWHM = 3, maxFWHM = 60,
-  traceSNRFiltering = FALSE, localRTRange = 10, localMZRange = 6.5,
+findFeaturesOpenMS(
+  analysisInfo,
+  noiseThrInt = 1000,
+  chromSNR = 3,
+  chromFWHM = 5,
+  mzPPM = 10,
+  reEstimateMTSD = TRUE,
+  traceTermCriterion = "sample_rate",
+  traceTermOutliers = 5,
+  minSampleRate = 0.5,
+  minTraceLength = 3,
+  maxTraceLength = -1,
+  widthFiltering = "fixed",
+  minFWHM = 3,
+  maxFWHM = 60,
+  traceSNRFiltering = FALSE,
+  localRTRange = 10,
+  localMZRange = 6.5,
   isotopeFilteringModel = "metabolites (5\% RMS)",
-  MZScoring13C = FALSE, useSmoothedInts = TRUE, extraOpts = NULL,
-  intSearchRTWindow = 3, logPath = file.path("log", "openms"),
-  maxProcAmount = getOption("patRoon.maxProcAmount"), verbose = TRUE)
+  MZScoring13C = FALSE,
+  useSmoothedInts = TRUE,
+  extraOpts = NULL,
+  intSearchRTWindow = 3,
+  logPath = file.path("log", "openms"),
+  maxProcAmount = getOption("patRoon.maxProcAmount"),
+  verbose = TRUE
+)
 
-findFeaturesXCMS(analysisInfo, method = "centWave", ...,
-  verbose = TRUE)
+findFeaturesXCMS(analysisInfo, method = "centWave", ..., verbose = TRUE)
 
 importFeaturesXCMS(xs, analysisInfo)
 
-findFeaturesXCMS3(analysisInfo, param = xcms::CentWaveParam(),
-  verbose = TRUE)
+findFeaturesXCMS3(analysisInfo, param = xcms::CentWaveParam(), verbose = TRUE)
 
 importFeaturesXCMS3(xdata, analysisInfo)
 }

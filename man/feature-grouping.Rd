@@ -2,7 +2,6 @@
 % Please edit documentation in R/main.R, R/feature_groups.R,
 %   R/feature_groups-bruker.R, R/feature_groups-envimass.R,
 %   R/feature_groups-openms.R, R/feature_groups-xcms.R, R/feature_groups-xcms3.R
-\docType{methods}
 \name{feature-grouping}
 \alias{feature-grouping}
 \alias{groupFeatures,features-method}
@@ -21,25 +20,46 @@
 
 importFeatureGroups(path, type, ...)
 
-importFeatureGroupsBrukerPA(path, feat, rtWindow = 12,
-  mzWindow = 0.005, intWindow = 5, warn = TRUE)
+importFeatureGroupsBrukerPA(
+  path,
+  feat,
+  rtWindow = 12,
+  mzWindow = 0.005,
+  intWindow = 5,
+  warn = TRUE
+)
 
 importFeatureGroupsEnviMass(path, feat, positive)
 
-groupFeaturesOpenMS(feat, rtalign = TRUE, QT = FALSE,
-  maxAlignRT = 30, maxAlignMZ = 0.005, maxGroupRT = 12,
-  maxGroupMZ = 0.005, verbose = TRUE)
+groupFeaturesOpenMS(
+  feat,
+  rtalign = TRUE,
+  QT = FALSE,
+  maxAlignRT = 30,
+  maxAlignMZ = 0.005,
+  maxGroupRT = 12,
+  maxGroupMZ = 0.005,
+  verbose = TRUE
+)
 
-groupFeaturesXCMS(feat, rtalign = TRUE, exportedData = TRUE,
-  groupArgs = list(mzwid = 0.015), retcorArgs = list(method =
-  "obiwarp"), verbose = TRUE)
+groupFeaturesXCMS(
+  feat,
+  rtalign = TRUE,
+  exportedData = TRUE,
+  groupArgs = list(mzwid = 0.015),
+  retcorArgs = list(method = "obiwarp"),
+  verbose = TRUE
+)
 
 importFeatureGroupsXCMS(xs, analysisInfo)
 
-groupFeaturesXCMS3(feat, rtalign = TRUE,
-  groupParam = xcms::PeakDensityParam(sampleGroups =
-  analysisInfo(feat)$group), retAlignParam = xcms::ObiwarpParam(),
-  verbose = TRUE)
+groupFeaturesXCMS3(
+  feat,
+  rtalign = TRUE,
+  groupParam = xcms::PeakDensityParam(sampleGroups = analysisInfo(feat)$group),
+  retAlignParam = xcms::ObiwarpParam(),
+  verbose = TRUE
+)
 
 importFeatureGroupsXCMS3(xdata, analysisInfo)
 }

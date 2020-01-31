@@ -7,12 +7,21 @@
 \usage{
 MSFileFormats(algorithm = "pwiz", vendor = FALSE)
 
-convertMSFiles(files = NULL, outPath = NULL, dirs = TRUE,
-  anaInfo = NULL, from = MSFileFormats(algorithm, vendor = algorithm !=
-  "openms"), to = "mzML", overWrite = FALSE, algorithm = "pwiz",
-  centroid = algorithm != "openms", filters = NULL, extraOpts = NULL,
+convertMSFiles(
+  files = NULL,
+  outPath = NULL,
+  dirs = TRUE,
+  anaInfo = NULL,
+  from = MSFileFormats(algorithm, vendor = algorithm != "openms"),
+  to = "mzML",
+  overWrite = FALSE,
+  algorithm = "pwiz",
+  centroid = algorithm != "openms",
+  filters = NULL,
+  extraOpts = NULL,
   logPath = file.path("log", "convert"),
-  maxProcAmount = getOption("patRoon.maxProcAmount"))
+  maxProcAmount = getOption("patRoon.maxProcAmount")
+)
 }
 \arguments{
 \item{algorithm}{Either \code{"pwiz"} (implemented by \command{msConvert} of

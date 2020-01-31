@@ -17,7 +17,7 @@ Description: Provides an easy-to-use interface to a mass spectrometry based
     automatic reporting.
 License: GPL-3
 LazyData: TRUE
-RoxygenNote: 6.1.1
+RoxygenNote: 7.0.2
 URL: https://github.com/rickhelmus/patRoon
 BugReports: https://github.com/rickhelmus/patRoon/issues
 Encoding: UTF-8

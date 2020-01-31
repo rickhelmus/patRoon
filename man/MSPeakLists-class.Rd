@@ -33,25 +33,41 @@
 
 \S4method{show}{MSPeakLists}(object)
 
-\S4method{[}{MSPeakLists,ANY,ANY,missing}(x, i, j, ..., reAverage = TRUE,
-  drop = TRUE)
+\S4method{[}{MSPeakLists,ANY,ANY,missing}(x, i, j, ..., reAverage = TRUE, drop = TRUE)
 
 \S4method{[[}{MSPeakLists,ANY,ANY}(x, i, j)
 
 \S4method{$}{MSPeakLists}(x, name)
 
-\S4method{as.data.table}{MSPeakLists}(x, fGroups = NULL,
-  averaged = TRUE)
+\S4method{as.data.table}{MSPeakLists}(x, fGroups = NULL, averaged = TRUE)
 
-\S4method{filter}{MSPeakLists}(obj, absMSIntThr = NULL,
-  absMSMSIntThr = NULL, relMSIntThr = NULL, relMSMSIntThr = NULL,
-  topMSPeaks = NULL, topMSMSPeaks = NULL, isolatePrec = NULL,
-  deIsotopeMS = FALSE, deIsotopeMSMS = FALSE, withMSMS = FALSE,
-  retainPrecursorMSMS = TRUE, negate = FALSE)
+\S4method{filter}{MSPeakLists}(
+  obj,
+  absMSIntThr = NULL,
+  absMSMSIntThr = NULL,
+  relMSIntThr = NULL,
+  relMSMSIntThr = NULL,
+  topMSPeaks = NULL,
+  topMSMSPeaks = NULL,
+  isolatePrec = NULL,
+  deIsotopeMS = FALSE,
+  deIsotopeMSMS = FALSE,
+  withMSMS = FALSE,
+  retainPrecursorMSMS = TRUE,
+  negate = FALSE
+)
 
-\S4method{plotSpec}{MSPeakLists}(obj, groupName, analysis = NULL,
-  MSLevel = 1, title = NULL, useGGPlot2 = FALSE, xlim = NULL,
-  ylim = NULL, ...)
+\S4method{plotSpec}{MSPeakLists}(
+  obj,
+  groupName,
+  analysis = NULL,
+  MSLevel = 1,
+  title = NULL,
+  useGGPlot2 = FALSE,
+  xlim = NULL,
+  ylim = NULL,
+  ...
+)
 
 getDefIsolatePrecParams(...)
 }

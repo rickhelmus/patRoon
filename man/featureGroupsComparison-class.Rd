@@ -15,8 +15,7 @@
 
 \S4method{length}{featureGroupsComparison}(x)
 
-\S4method{[}{featureGroupsComparison,ANY,missing,missing}(x, i, j, ...,
-  drop = TRUE)
+\S4method{[}{featureGroupsComparison,ANY,missing,missing}(x, i, j, ..., drop = TRUE)
 
 \S4method{[[}{featureGroupsComparison,ANY,missing}(x, i, j)
 

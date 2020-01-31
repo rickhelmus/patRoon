@@ -21,13 +21,33 @@ recalibrarateDAFiles(anaInfo, close = TRUE, save = close)
 
 getDACalibrationError(anaInfo)
 
-addDAEIC(analysis, path, mz, mzWindow = 0.005, ctype = "EIC",
-  mtype = "MS", polarity = "both", bgsubtr = FALSE, fragpath = "",
-  name = NULL, hideDA = TRUE, close = FALSE, save = close)
+addDAEIC(
+  analysis,
+  path,
+  mz,
+  mzWindow = 0.005,
+  ctype = "EIC",
+  mtype = "MS",
+  polarity = "both",
+  bgsubtr = FALSE,
+  fragpath = "",
+  name = NULL,
+  hideDA = TRUE,
+  close = FALSE,
+  save = close
+)
 
-addAllDAEICs(fGroups, mzWindow = 0.005, ctype = "EIC",
-  bgsubtr = FALSE, name = TRUE, onlyPresent = TRUE, hideDA = TRUE,
-  close = FALSE, save = close)
+addAllDAEICs(
+  fGroups,
+  mzWindow = 0.005,
+  ctype = "EIC",
+  bgsubtr = FALSE,
+  name = TRUE,
+  onlyPresent = TRUE,
+  hideDA = TRUE,
+  close = FALSE,
+  save = close
+)
 }
 \arguments{
 \item{anaInfo}{\link[=analysis-information]{Analysis info table}}

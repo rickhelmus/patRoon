@@ -6,8 +6,13 @@
 \alias{generateAnalysisInfoFromEnviMass}
 \title{Analysis information}
 \usage{
-generateAnalysisInfo(paths, groups = "", blanks = "", concs = NULL,
-  formats = MSFileFormats())
+generateAnalysisInfo(
+  paths,
+  groups = "",
+  blanks = "",
+  concs = NULL,
+  formats = MSFileFormats()
+)
 
 generateAnalysisInfoFromEnviMass(path)
 }

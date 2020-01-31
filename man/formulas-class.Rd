@@ -42,34 +42,84 @@
 
 \S4method{$}{formulas}(x, name)
 
-\S4method{as.data.table}{formulas}(x, fGroups = NULL, average = FALSE,
-  countElements = NULL, countFragElements = NULL, OM = FALSE,
-  maxFormulas = NULL, maxFragFormulas = NULL,
-  normalizeScores = "none", excludeNormScores = NULL)
+\S4method{as.data.table}{formulas}(
+  x,
+  fGroups = NULL,
+  average = FALSE,
+  countElements = NULL,
+  countFragElements = NULL,
+  OM = FALSE,
+  maxFormulas = NULL,
+  maxFragFormulas = NULL,
+  normalizeScores = "none",
+  excludeNormScores = NULL
+)
 
-\S4method{filter}{formulas}(obj, minExplainedPeaks = NULL,
-  elements = NULL, fragElements = NULL, lossElements = NULL,
-  topMost = NULL, scoreLimits = NULL, OM = FALSE, negate = FALSE)
+\S4method{filter}{formulas}(
+  obj,
+  minExplainedPeaks = NULL,
+  elements = NULL,
+  fragElements = NULL,
+  lossElements = NULL,
+  topMost = NULL,
+  scoreLimits = NULL,
+  OM = FALSE,
+  negate = FALSE
+)
 
-\S4method{annotatedPeakList}{formulas}(obj, precursor, groupName,
-  analysis = NULL, MSPeakLists, onlyAnnotated = FALSE)
+\S4method{annotatedPeakList}{formulas}(
+  obj,
+  precursor,
+  groupName,
+  analysis = NULL,
+  MSPeakLists,
+  onlyAnnotated = FALSE
+)
 
-\S4method{plotScores}{formulas}(obj, precursor, groupName,
-  analysis = NULL, normalizeScores = "max", excludeNormScores = NULL,
-  useGGPlot2 = FALSE)
+\S4method{plotScores}{formulas}(
+  obj,
+  precursor,
+  groupName,
+  analysis = NULL,
+  normalizeScores = "max",
+  excludeNormScores = NULL,
+  useGGPlot2 = FALSE
+)
 
-\S4method{plotSpec}{formulas}(obj, precursor, groupName, analysis = NULL,
-  MSPeakLists, title = NULL, useGGPlot2 = FALSE, xlim = NULL,
-  ylim = NULL, ...)
+\S4method{plotSpec}{formulas}(
+  obj,
+  precursor,
+  groupName,
+  analysis = NULL,
+  MSPeakLists,
+  title = NULL,
+  useGGPlot2 = FALSE,
+  xlim = NULL,
+  ylim = NULL,
+  ...
+)
 
 \S4method{plotVenn}{formulas}(obj, ..., labels = NULL, vennArgs = NULL)
 
-\S4method{plotUpSet}{formulas}(obj, ..., labels = NULL,
-  nsets = length(list(...)) + 1, nintersects = NA, upsetArgs = NULL)
+\S4method{plotUpSet}{formulas}(
+  obj,
+  ...,
+  labels = NULL,
+  nsets = length(list(...)) + 1,
+  nintersects = NA,
+  upsetArgs = NULL
+)
 
-\S4method{consensus}{formulas}(obj, ..., absMinAbundance = NULL,
-  relMinAbundance = NULL, uniqueFrom = NULL, uniqueOuter = FALSE,
-  rankWeights = 1)
+\S4method{consensus}{formulas}(
+  obj,
+  ...,
+  absMinAbundance = NULL,
+  relMinAbundance = NULL,
+  uniqueFrom = NULL,
+  uniqueOuter = FALSE,
+  rankWeights = 1,
+  labels = NULL
+)
 }
 \arguments{
 \item{obj, x, object, formulas}{The \code{formulas} object.}

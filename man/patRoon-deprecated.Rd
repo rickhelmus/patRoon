@@ -9,8 +9,13 @@
 \usage{
 reportMD(...)
 
-exportDAFiles(anaInfo, format = "mzML", exportLine = TRUE,
-  outPath = anaInfo$path, overWrite = FALSE)
+exportDAFiles(
+  anaInfo,
+  format = "mzML",
+  exportLine = TRUE,
+  outPath = anaInfo$path,
+  overWrite = FALSE
+)
 
 screenTargets(obj, targets, rtWindow, mzWindow)
 }

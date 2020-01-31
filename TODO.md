@@ -87,6 +87,7 @@
 - OpenMS MetaboliteAdductDecharger support?
 - OpenMS: Support KD grouper?
 - suspect screening: tag fGroups with suspect instead of converting fGroups object (and add filter to remove non-hits)
+- Integration of mzMine features (package pending...), MS-DIAL and KPIC2?
 
 
 ## MSPeakLists
@@ -108,13 +109,16 @@
 
 ## Compounds
 
-- do something with sirius fingerprints?
+- do something with sirius fingerprints? --> comparison?
 - fix compoundViewer
 - add new MF HD scorings and make sure default normalization equals that of MF web
+- CFM-ID and MS-FINDER integration
 
 
 ## components
 - mass defect components
+- CliqueMS
+- split peak correlation and adduct etc annotation? would allow better non-target integration
 
 
 ## Reporting

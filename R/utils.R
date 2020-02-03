@@ -817,7 +817,7 @@ isValidMol <- function(mol) !is.null(mol) # && !is.na(mol)
 emptyMol <- function() rcdk::parse.smiles("")[[1]]
 isEmptyMol <- function(mol) rcdk::get.atom.count(mol) == 0
 
-getMoleculesFromSMILES <- function(SMILES, doTyping = FALSE, emptyIfFails = FALSE)
+getMoleculesFromSMILES <- function(SMILES, doTyping = FALSE, doIsotopes = FALSE, emptyIfFails = FALSE)
 {
     # vectorization doesn't work if any of the SMILES are not OK
     # mols <- rcdk::parse.smiles(SMILES)
@@ -826,16 +826,24 @@ getMoleculesFromSMILES <- function(SMILES, doTyping = FALSE, emptyIfFails = FALS
         ret <- rcdk::parse.smiles(sm)[[1]]
         if (!isValidMol(ret))
             ret <- rcdk::parse.smiles(sm, kekulise = FALSE)[[1]] # might work w/out kekulization
-        if (emptyIfFails && !isValidMol(ret))
-            ret <- emptyMol()
-        else if (doTyping && isValidMol(ret))
+        if (!isValidMol(ret))
         {
-            rcdk::do.typing(ret)
-            rcdk::do.aromaticity(ret)
+            if (emptyIfFails)
+                ret <- emptyMol()
+        }
+        else
+        {
+            if (doTyping)
+            {
+                rcdk::do.typing(ret)
+                rcdk::do.aromaticity(ret)
+            }
+            if (doIsotopes)
+                rcdk::do.isotopes(ret)
         }
         return(ret)
     })
-
+    
     return(mols)
 }
 
@@ -1053,6 +1061,7 @@ verifyDependencies <- function()
     check("MetFrag CL", getOption("patRoon.path.MetFragCL"), "patRoon.path.MetFragCL")
     check("MetFrag CompTox Database", getOption("patRoon.path.MetFragCompTox"), "patRoon.path.MetFragCompTox")
     check("MetFrag PubChemLite Database", getOption("patRoon.path.MetFragPubChemLite"), "patRoon.path.MetFragPubChemLite")
+    check("OpenBabel", getCommandWithOptPath("obabel", "obabel", verify = FALSE), "patRoon.path.obabel")
 
     if (!OK)
         cat("\nSome dependencies were not found. Please make sure that their file locations are configured properly.",

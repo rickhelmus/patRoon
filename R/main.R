@@ -118,6 +118,11 @@ NULL
 #'   environment variable, hence, it is recommended to set up \option{PATH}
 #'   instead.
 #'
+#'   \item \code{patRoon.path.obabel}: The path in which the \command{OpenBabel}
+#'   binaries are installed. Usually the location is added to the \option{PATH}
+#'   environment variable when OpenBabel is installed, in which case this option
+#'   can be left empty.
+#'   
 #'   }
 #'
 "_PACKAGE"

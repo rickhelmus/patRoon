@@ -18,11 +18,11 @@
 \alias{featuresBrukerTASQ}
 \title{Target and suspect screening}
 \usage{
-screenSuspects(obj, suspects, rtWindow = 12, mzWindow = 0.005)
+screenSuspects(obj, suspects, rtWindow = 12, mzWindow = 0.005, adduct = NULL)
 
-\S4method{screenSuspects}{features}(obj, suspects, rtWindow = 12, mzWindow = 0.005)
+\S4method{screenSuspects}{features}(obj, suspects, rtWindow = 12, mzWindow = 0.005, adduct = NULL)
 
-\S4method{screenSuspects}{featureGroups}(obj, suspects, rtWindow = 12, mzWindow = 0.005)
+\S4method{screenSuspects}{featureGroups}(obj, suspects, rtWindow = 12, mzWindow = 0.005, adduct = NULL)
 
 \S4method{groupFeaturesScreening}{featureGroups}(fGroups, scr)
 
@@ -32,14 +32,25 @@ importFeatureGroupsBrukerTASQ(path, analysisInfo)
 \item{obj}{The object that should be screened (\emph{i.e.}
 \code{\link{features}} or \code{\link{featureGroups}}).}
 
-\item{suspects}{A \code{data.frame} consisting of mandatory columns
-\code{"name"} (the analyte name) and \code{"mz"} (the \emph{m/z}
-value of the suspect). In addition, a column \code{"rt"} can be used to
-specify the retention time (if unspecified no retention times are checked).}
+\item{suspects}{A \code{data.frame} that must consist a \code{"name"} column
+(the analyte name) and \emph{either} a \code{"mz"}, \code{"neutralMass"},
+\code{"SMILES"} or \code{"InChI"} column (with the ionized m/z value, the
+neutral monoisotopic mass or the SMILES/InChI character string for the
+molecule, respectively). When no \code{"mz"} is specified the adduct must
+be specified either with the \code{adduct} function argument or by an
+\code{"adduct"} column containing a \code{character} that can be converted
+with \code{as.adduct} (\emph{e.g.} \code{"[M+H]+"}).  In addition, a column
+\code{"rt"} can be included to specify the retention time (if unspecified
+no retention times are checked).}
 
 \item{rtWindow, mzWindow}{The retention time window (in seconds) and
 \emph{m/z} window that will be used for matching a suspect (+/- feature
 data).}
+
+\item{adduct}{An \code{\link{adduct}} object (or something that can be
+converted to it with \code{\link{as.adduct}}). Examples: \code{"[M-H]-"},
+\code{"[M+Na]+"}. Can be \code{NULL} if either a \code{"mz"} or
+\code{"adduct"} column is present in the \code{suspects} argument.}
 
 \item{fGroups}{The \code{\link{featureGroups}} object that should be
 transformed (and was used to obtain the screening results).}
@@ -53,10 +64,10 @@ TASQ, converted to \file{.csv} format.}
 information}.}
 }
 \value{
-\code{screenSuspects} will return a table (a \code{\link{data.table}})
-  with detected suspects and details such as retention and \emph{m/z} values.
-  If a suspect is matched on multiple features/feature groups then each hit is
-  reported as a separate row.
+\code{screenSuspects} will return a table (a
+  \code{\link{data.table}}) with detected suspects and details such as
+  retention and \emph{m/z} values. If a suspect is matched on multiple
+  features/feature groups then each hit is reported as a separate row.
 
 \code{groupFeaturesScreening} returns a modified \code{featureGroups}
   object in which those feature groups that were not matched by any suspects

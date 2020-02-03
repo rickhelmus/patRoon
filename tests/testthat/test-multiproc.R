@@ -21,7 +21,7 @@ performMPTest <- function(len, fail = numeric(), timeout = numeric(), failFirst 
         shFile <- tempfile("makefile", fileext = ".bat")
         cat("if not exist %1 (SET ret=1) else (SET ret=0)",
             "echo y > %1",
-            if (delay) paste(px, "sleep 2") else "",
+            if (delay) paste(paste0("\"", px, "\""), "sleep 2") else "",
             if (failFirst) "exit /b %ret%" else "", # will fail if file didn't exist yet (i.e. first time it's executed)
             sep = "\n", file = shFile)
     }
@@ -32,7 +32,7 @@ performMPTest <- function(len, fail = numeric(), timeout = numeric(), failFirst 
             "test -f $1",
             "ret=$?",
             "echo y > $1",
-            if (delay) paste(px, "sleep 2") else "",
+            if (delay) paste(paste0("\"", px, "\""), "sleep 2") else "",
             if (failFirst) "exit $ret" else "", # will fail if file didn't exist yet (i.e. first time it's executed)
             sep = "\n", file = shFile)
         Sys.chmod(shFile)

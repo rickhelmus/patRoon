@@ -6,7 +6,7 @@
 * Add scorings from wastewater and smoking metadata comptox MetFrag databases
 * Windows install script now install latest (March2019) CompTox
 * Updates for latest PubChemLite relaease (Jan2020)
-* Suspect screening now doesn't require pre-calculated ion `m/z` values. Instead, suspect lists can contain SMILES, InChI or neutral mass values which are used for automatic ion `m/z` calculation. See `?screenSuspects` for moe details.
+* Suspect screening now doesn't require pre-calculated ion `m/z` values. Instead, suspect lists can contain SMILES, InChI or neutral mass values which are used for automatic ion `m/z` calculation. See `?screenSuspects` for more details.
 
 
 ## December 2019

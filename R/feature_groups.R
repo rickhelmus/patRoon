@@ -1234,7 +1234,7 @@ setMethod("screenSuspects", "featureGroups", function(obj, suspects, rtWindow, m
     aapply(checkmate::assertNumber, . ~ rtWindow + mzWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
 
-    hash <- makeHash(obj, suspects, rtWindow, mzWindow)
+    hash <- makeHash(obj, suspects, rtWindow, mzWindow, adduct)
     cd <- loadCacheData("screenSuspectsFG", hash)
     if (!is.null(cd))
         return(cd)

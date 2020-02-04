@@ -24,6 +24,12 @@ install:
             Invoke-WebRequest https://bio.informatik.uni-jena.de/repository/dist-release-local/de/unijena/bioinf/ms/sirius/4.0.1/sirius-4.0.1-win64-headless.zip -OutFile "C:\deps\sirius-win.zip"
             7z x -oC:\deps\ C:\deps\sirius-win.zip
         }
+    - ps: >-
+        if (-Not (Test-Path C:\deps\openbabel.exe)) {
+            Invoke-WebRequest https://github.com/openbabel/openbabel/releases/download/openbabel-3-0-0/OpenBabel-3.0.0-x86.exe -OutFile "C:\deps\openbabel.exe"
+        }
+        C:\deps\openbabel.exe /S
+
 
     #- ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 

@@ -11,7 +11,7 @@ LABEL maintainer="Rick Helmus <r.helmus@uva.nl>" \
 ENV SETUPDIR=/usr/local/setup
 
 RUN apt-get update -y && \
-    apt-get install -y --no-install-recommends libssl-dev libssh2-1-dev wget \
+    apt-get install -y --no-install-recommends libssl-dev libssh2-1-dev wget openbabel \
         libxml2-dev libnetcdf-dev netcdf-bin pngquant openjdk-8-jdk libmagick++-dev pandoc \
         r-cran-checkmate r-cran-data.table r-cran-withr r-cran-digest r-cran-xml r-cran-xml2 r-cran-dbi \
         r-cran-rsqlite r-cran-rjava r-cran-dplyr r-cran-rcolorbrewer \

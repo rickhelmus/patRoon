@@ -33,6 +33,8 @@ WORKDIR /home/patRoon
 
 COPY ./docker/install_deps.R ./DESCRIPTION ./
 
+ENV R_REMOTES_NO_ERRORS_FROM_WARNINGS=true
+
 RUN wget http://msbi.ipb-halle.de/~cruttkie/metfrag/MetFrag2.4.5-CL.jar && \
     wget https://bio.informatik.uni-jena.de/repository/dist-release-local/de/unijena/bioinf/ms/sirius/4.0.1/sirius-4.0.1-linux64-headless.zip && \
     unzip sirius-4.0.1-linux64-headless.zip && rm sirius-4.0.1-linux64-headless.zip && \
@@ -43,7 +45,6 @@ RUN wget http://msbi.ipb-halle.de/~cruttkie/metfrag/MetFrag2.4.5-CL.jar && \
 
 ADD --chown=patRoon . patRoon
 
-ENV R_REMOTES_NO_ERRORS_FROM_WARNINGS=true
 RUN Rscript -e 'devtools::install(pkg = "patRoon", upgrade = FALSE)'
 
 ENV OPENMS_DATA_PATH=/usr/share/OpenMS _R_CHECK_FORCE_SUGGESTS_=0 R_MAX_NUM_DLLS=150

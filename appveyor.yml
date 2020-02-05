@@ -26,12 +26,12 @@ install:
         }
     - ps: >-
         if (-Not (Test-Path C:\deps\openbabel.exe)) {
-            Invoke-WebRequest https://github.com/openbabel/openbabel/releases/download/openbabel-3-0-0/OpenBabel-3.0.0-x86.exe -OutFile "C:\deps\openbabel.exe"
+            Invoke-WebRequest https://github.com/openbabel/openbabel/releases/download/openbabel-3-0-0/OpenBabel-3.0.0.exe -OutFile "C:\deps\openbabel.exe"
         }
         C:\deps\openbabel.exe /S
 
 
-    - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+    #- ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
 cache:
   - C:\RLibrary

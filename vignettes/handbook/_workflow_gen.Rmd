@@ -207,6 +207,17 @@ This will perform the following steps:
 2. Screen a feature groups object for the suspects. The return value will be a `data.frame` with results.
 3. Use the screening results to filter the original feature groups and store the results in `fGroupsSusp`.
 
+Alternatively, the `mz` column of the input suspect list can also be substituted by a `neutralMass`, `SMILES` or `InChI` column, so that ion masses don't need to be calculated in advance. This is especially advantageous for e.g. NORMAN suspect lists where such information is readily available. A requirement is that the adduct species should be specified for automatic ion mass calculation. This can either be done with an extra `adduct` column in the suspect list, or by using the `adduct` function argument to `screenSuspects`, e.g.:
+
+```{r susp2,eval=FALSE}
+suspects <- data.frame(name = c("susp1", "susp2", "susp3"),
+                       SMILES = c("C1=CC=C(C=C1)C(=O)O", "C1=CC=C2C(=C1)C=CC3=CC=CC=C3N2C(=O)N", "C1=CC2=NNN=C2C=C1"),
+                       stringsAsFactors = FALSE)
+scr <- screenSuspects(fGroups, suspects, adduct = "[M+H]+")
+fGroupsSusp <- groupFeaturesScreening(fGroups, scr)
+```
+
+
 ## Annotation
 
 The annotation consists of collecting MS peak lists and then formula and/or compound annotation:

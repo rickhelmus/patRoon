@@ -7,7 +7,7 @@
 - consistent src file names, split utils?
 - get RAMClustR from CRAN?
 - installer: get OpenBabel?
-- suspects: update handbook
+- Update SIRIUS interface for 4.4
 
 
 ## docs
@@ -89,7 +89,7 @@
 - OpenMS MetaboliteAdductDecharger support?
 - OpenMS: Support KD grouper?
 - suspect screening: tag fGroups with suspect instead of converting fGroups object (and add filter to remove non-hits)
-- Integration of mzMine features (package pending...), MS-DIAL and KPIC2?
+- Integration of mzMine features (package pending...), MS-DIAL and KPIC2, peakonly, SIRIUS?
 
 
 ## MSPeakLists

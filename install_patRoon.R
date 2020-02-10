@@ -430,9 +430,9 @@ utils <- setRefClass("utilsInst", methods = list(
         
         setOpts <- list()
         
-        extDeps <- data.frame(name = c("ProteoWizard", "OpenMS", "SIRIUS", "pngquant"),
-                              command = c("msconvert", "FeatureFinderMetabo", "sirius-console-64", "pngquant"),
-                              copt = c("pwiz", "OpenMS", "SIRIUS", "pngquant"),
+        extDeps <- data.frame(name = c("ProteoWizard", "OpenMS", "SIRIUS", "OpenBabel", "pngquant"),
+                              command = c("msconvert", "FeatureFinderMetabo", "sirius-console-64", "obabel", "pngquant"),
+                              copt = c("pwiz", "OpenMS", "SIRIUS", "obabel", "pngquant"),
                               stringsAsFactors = FALSE)
         extDeps$path <- mapply(extDeps$command, extDeps$copt, FUN = utils$getCommandWithOptPath)
         
@@ -507,6 +507,12 @@ utils <- setRefClass("utilsInst", methods = list(
                                      TRUE)
                 if (!is.null(down))
                     setOpts <- c(setOpts, list(patRoon.path.SIRIUS = fixPath(file.path(down, "sirius-win64-headless-4.0.1"))))
+            }
+            
+            if ("OpenBabel" %in% instWhat)
+            {
+                installr::install.URL("https://github.com/openbabel/openbabel/releases/download/openbabel-3-0-0/OpenBabel-3.0.0.exe",
+                                      message = FALSE)
             }
             
             if ("pngquant" %in% instWhat)

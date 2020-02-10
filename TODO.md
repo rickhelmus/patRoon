@@ -6,7 +6,6 @@
     - Agilent .d is also a directory?
 - consistent src file names, split utils?
 - get RAMClustR from CRAN?
-- installer: get OpenBabel?
 - Update SIRIUS interface for 4.4
 
 

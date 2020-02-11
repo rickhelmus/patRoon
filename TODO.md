@@ -70,7 +70,7 @@
 ## General
 
 - msPurity integration
-- suspect screening: add MS/MS qualifiers, calculate ion masses
+- suspect screening: add MS/MS qualifiers
 - newProject(): generate Rmd?
 - fillPeaks for CAMERA (and RAMClustR?)
 - support fastcluster for compounds clustering/int component clusters?

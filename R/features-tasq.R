@@ -12,9 +12,9 @@ importFeaturesBrukerTASQ <- function(analysisInfo, TASQExportFile)
 {
     cat("Importing features from TASQ...")
 
-    selCols <- c("Row", "Sample", "RT [min] exp.", "m/z exp.", "Height", "Area")
+    selCols <- c("Row", "Data Set", "RT [min]", "m/z meas.", "Height", "Area", "FWHM [s]")
     tExport <- fread(TASQExportFile, select = selCols)
-    setnames(tExport, selCols, c("ID", "analysis", "ret", "mz", "intensity", "area"))
+    setnames(tExport, selCols, c("ID", "analysis", "ret", "mz", "intensity", "area", "FWHM"))
 
     tExport <- tExport[!is.na(ret)] # skip empty results
     tExport[, ret := ret * 60] # min --> s
@@ -29,13 +29,16 @@ importFeaturesBrukerTASQ <- function(analysisInfo, TASQExportFile)
         ft <- tExport[analysis == ana]
         ft[, analysis := NULL]
 
+        # estimate min/max ret from fwhm (https://en.wikipedia.org/wiki/Full_width_at_half_maximum)
+        ft[, s := FWHM / 2.355]
+        ft[, retmin := ret - 2*s]
+        ft[, retmax := ret + 2*s]
+        
         # dummy ranges
-        ft[, retmin := ret - 3]
-        ft[, retmax := ret + 3]
         ft[, mzmin := mz - 0.0025]
         ft[, mzmax := mz + 0.0025]
 
-        return(ft)
+        return(ft[, -c("FWHM", "s")])
     }, simplify = FALSE)
 
     cat("Done!\n")

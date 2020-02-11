@@ -122,9 +122,10 @@ Please note that \code{groupFeaturesScreening} method can only
   transform the \code{featureGroups} object that was used to obtain the given
   screening results.
 
-\code{importFeatureGroupsBrukerTASQ} will use dummy values for
-  retention time and \emph{m/z} values for conversion to features, since this
-  information is not available. Hence, when plotting, for instance, extracted
-  ion chromatograms (with \code{\link{plotEIC}}) the integrated
-  chromatographic peak range shown is incorrect.
+\code{importFeatureGroupsBrukerTASQ} will use estimated min/max values
+  for retention times and dummy min/max \emph{m/z} values for conversion to
+  features, since this information is not (readily) available. Hence, when
+  plotting, for instance, extracted ion chromatograms (with
+  \code{\link{plotEIC}}) the integrated chromatographic peak range shown is
+  incorrect.
 }

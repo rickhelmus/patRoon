@@ -26,25 +26,26 @@ setMethod("initialize", "featureGroupsBrukerTASQ",
 #'   \code{featureGroups} object containing converted screening results from
 #'   Bruker TASQ.
 #'
-#' @note \code{importFeatureGroupsBrukerTASQ} will use dummy values for
-#'   retention time and \emph{m/z} values for conversion to features, since this
-#'   information is not available. Hence, when plotting, for instance, extracted
-#'   ion chromatograms (with \code{\link{plotEIC}}) the integrated
-#'   chromatographic peak range shown is incorrect.
+#' @note \code{importFeatureGroupsBrukerTASQ} will use estimated min/max values
+#'   for retention times and dummy min/max \emph{m/z} values for conversion to
+#'   features, since this information is not (readily) available. Hence, when
+#'   plotting, for instance, extracted ion chromatograms (with
+#'   \code{\link{plotEIC}}) the integrated chromatographic peak range shown is
+#'   incorrect.
 #'
 #' @rdname suspect-screening
 #' @export
 importFeatureGroupsBrukerTASQ <- function(path, analysisInfo)
 {
-    selCols <- c("Row", "Sample", "Analyte", "RT [min]", "m/z meas.", "Height")
+    selCols <- c("Row", "Data Set", "Analyte", "RT [min]", "m/z meas.", "Height")
 
     ac <- checkmate::makeAssertCollection()
     assertCSVFile(path, selCols, add = ac)
-    analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, "bruker", add = ac)
+    analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, add = ac)
     checkmate::reportAssertions(ac)
 
     tExport <- fread(path, select = selCols)
-    tExport <- tExport[!is.na(`RT [min]`) & Sample %in% analysisInfo$analysis] # skip empty/other results
+    tExport <- tExport[!is.na(`RT [min]`) & `Data Set` %in% analysisInfo$analysis] # skip empty/other results
     setnames(tExport, selCols, c("ID", "analysis", "group", "rts", "mzs", "intensity"))
 
     fts <- importFeaturesBrukerTASQ(analysisInfo, path)

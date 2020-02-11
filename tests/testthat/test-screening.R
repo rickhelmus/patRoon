@@ -21,7 +21,7 @@ scr <- screenSuspects(fGroups, susps)
 scrF <- screenSuspects(getFeatures(fGroups), susps)
 scrSMI <- screenSuspects(fGroups, susps[, c("name", "rt", "adduct", "SMILES")])
 
-test_that("target screening is OK", {
+test_that("suspect screening is OK", {
     expect_equal(nrow(scr), nrow(susps))
     expect_length(unique(scrF$name), nrow(susps))
     expect_known_value(scr, testFile("screening"))
@@ -40,4 +40,15 @@ test_that("target screening is OK", {
     # adduct argument
     expect_equal(screenSuspects(fGroups, susps[name %in% c("TBA", "TPA")]),
                  screenSuspects(fGroups, susps[name %in% c("TBA", "TPA"), -"adduct"], adduct = "[M]+"))
+})
+
+TQFile <- file.path(getTestDataPath(), "GlobalResults-TASQ.csv")
+TQRes <- fread(TQFile)
+fGroupsTQ <- importFeatureGroupsBrukerTASQ(TQFile, anaInfo)
+fGroupsTQ <- filter(fGroupsTQ, blankThreshold = 5, removeBlanks = TRUE)
+
+test_that("TASQ import works", {
+    expect_equal(unique(TQRes$Analyte), names(fGroupsTQ))
+    expect_known_value(groups(fGroupsTQ), testFile("susp-tasq"))
+    expect_known_show(fGroupsTQ, testFile("susp-tasq", text = TRUE))
 })

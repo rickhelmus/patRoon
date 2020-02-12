@@ -7,7 +7,6 @@
 - consistent src file names, split utils?
 - get RAMClustR from CRAN?
 - Update SIRIUS interface for 4.4
-- Update patRoonData for SMILES and name
 
 
 ## docs
@@ -22,7 +21,7 @@
     - get rid of getXCMSSet() calls?
 - tests to verify getXCMSSet
 - suspect screening
-    - rename patRoonData::targets
+    - rename patRoonData::targets?
     - rename groupFeaturesScreening?
 - filter()
     - document which filters work on feature level (e.g. chromWidth)

@@ -2,15 +2,6 @@ context("screening")
 
 susps <- as.data.table(patRoonData::targets)
 
-# UNDONE: update patRoonData at some point
-susps[, SMILES := c("[nH]1nnc2ccccc12", "CNc1ccccn1", "Oc1ccc2ccccc2n1", "Oc1ccnc2ccccc12",
-                    "Oc1ccc2ncccc2c1", "Oc1cccc2cccnc12", "Cc1ccc2[nH]nnc2c1", "CN1N(C(=O)C=C1C)c2ccccc2",
-                    "CCNc1nc(Cl)nc(NC(C)C)n1","C1=CC(=C(C(=C1)Cl)C(=O)N)Cl", "Cn1cnc2N(C)C(=O)N(C)C(=O)c12", "NC(=O)N1c2ccccc2C=Cc3ccccc13",
-                    "NC1=C(Cl)C(=O)N(N=C1)c2ccccc2", "CCN(CC)C(=O)c1cccc(C)c1",
-                    "COCCOCCOC", "CN(C)C(=O)Nc1ccc(Cl)c(Cl)c1", "CC(=O)Nc1ccc(O)cc1",
-                    "NC(=O)Nc1ccccc1", "Cc1cc(C)nc(N[S](=O)(=O)c2ccc(N)cc2)n1",
-                    "Cc1onc(N[S](=O)(=O)c2ccc(N)cc2)c1", "CCCC[N+](CCCC)(CCCC)CCCC", "CCO[P](=O)(OCC)OCC",
-                    "CCCC[NH+](CCCC)CCCC")]
 susps[, InChI := babelConvert(SMILES, "smi", "inchi")]
 susps[, neutralMass := getNeutralMassFromSMILES(SMILES)]
 susps[, formula := sapply(getMoleculesFromSMILES(SMILES), function(m) rcdk::get.mol2formula(m)@string)]

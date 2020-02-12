@@ -44,7 +44,7 @@ test_that("suspect screening is OK", {
 
 TQFile <- file.path(getTestDataPath(), "GlobalResults-TASQ.csv")
 TQRes <- fread(TQFile)
-fGroupsTQ <- importFeatureGroupsBrukerTASQ(TQFile, anaInfo)
+fGroupsTQ <- importFeatureGroupsBrukerTASQ(TQFile, getTestAnaInfo())
 fGroupsTQ <- filter(fGroupsTQ, blankThreshold = 5, removeBlanks = TRUE)
 
 test_that("TASQ import works", {

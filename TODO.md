@@ -7,6 +7,7 @@
 - consistent src file names, split utils?
 - get RAMClustR from CRAN?
 - Update SIRIUS interface for 4.4
+- Update patRoonData for SMILES and name
 
 
 ## docs

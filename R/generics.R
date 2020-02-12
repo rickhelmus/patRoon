@@ -102,10 +102,11 @@ NULL
 #'   \code{\link{features}} or \code{\link{featureGroups}}).
 #' @param suspects A \code{data.frame} that must consist a \code{"name"} column
 #'   (the analyte name) and \emph{either} a \code{"mz"}, \code{"neutralMass"},
-#'   \code{"SMILES"} or \code{"InChI"} column (with the ionized m/z value, the
-#'   neutral monoisotopic mass or the SMILES/InChI character string for the
-#'   molecule, respectively). When no \code{"mz"} is specified the adduct must
-#'   be specified either with the \code{adduct} function argument or by an
+#'   \code{"SMILES"}, \code{"InChI"} or \code{"formula"} column (with the
+#'   ionized m/z value, the neutral monoisotopic mass or the
+#'   SMILES/InChI/chemical formula character string for the molecule,
+#'   respectively). When no \code{"mz"} is specified the adduct must be
+#'   specified either with the \code{adduct} function argument or by an
 #'   \code{"adduct"} column containing a \code{character} that can be converted
 #'   with \code{as.adduct} (\emph{e.g.} \code{"[M+H]+"}).  In addition, a column
 #'   \code{"rt"} can be included to specify the retention time (if unspecified

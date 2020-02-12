@@ -1,5 +1,10 @@
 # patRoon 0.1.0.9000
 
+## February 2020
+
+* Several small improvements and fixes for TASQ import
+* Suspect screening: now also support chemical formula for automatic m/z calculation
+
 ## January 2020
 
 * Ignore user specified scorings for local databases such as CompTox that are not actually present in the DB. This makes it easier to use e.g. different DB versions with differing scorings.
@@ -7,7 +12,6 @@
 * Windows install script now install latest (March2019) CompTox
 * Updates for latest PubChemLite relaease (Jan2020)
 * Suspect screening now doesn't require pre-calculated ion `m/z` values. Instead, suspect lists can contain SMILES, InChI or neutral mass values which are used for automatic ion `m/z` calculation. See `?screenSuspects` for more details.
-* Several small improvements and fixes for TASQ import
 
 
 ## December 2019

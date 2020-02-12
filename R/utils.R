@@ -1186,11 +1186,17 @@ prepareSuspectList <- function(suspects, adduct)
     # neutral mass given?
     if (!is.null(suspects[["neutralMass"]]))
         neutralMasses <- suspects[["neutralMass"]]
-    else if (!is.null(suspects[["SMILES"]]) || !is.null(suspects[["InChI"]]))
+    else
     {
         # otherwise calculate
-        SMI <- if (!is.null(suspects[["SMILES"]])) suspects$SMILES else babelConvert(suspects$InChI, "inchi", "smi")
-        neutralMasses <- getNeutralMassFromSMILES(SMI)
+        
+        if (!is.null(suspects[["formula"]]))
+            neutralMasses <- sapply(suspects$formula, function(f) rcdk::get.formula(f)@mass)
+        else
+        {
+            SMI <- if (!is.null(suspects[["SMILES"]])) suspects$SMILES else babelConvert(suspects$InChI, "inchi", "smi")
+            neutralMasses <- getNeutralMassFromSMILES(SMI)
+        }
     }
     
     if (!is.null(adduct))

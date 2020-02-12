@@ -13,6 +13,7 @@ susps[, SMILES := c("[nH]1nnc2ccccc12", "CNc1ccccn1", "Oc1ccc2ccccc2n1", "Oc1ccn
                     "CCCC[NH+](CCCC)CCCC")]
 susps[, InChI := babelConvert(SMILES, "smi", "inchi")]
 susps[, neutralMass := getNeutralMassFromSMILES(SMILES)]
+susps[, formula := sapply(getMoleculesFromSMILES(SMILES), function(m) rcdk::get.mol2formula(m)@string)]
 susps[, adduct := "[M+H]+"]
 susps[name %in% c("TBA", "TPA"), adduct := "[M]+"]
 
@@ -36,6 +37,7 @@ test_that("suspect screening is OK", {
     expect_equal(scr, scrSMI, tolerance = 1E-3) # higher tolerance due to inaccurate mz column in patRoonData::targets
     expect_equal(scrSMI, screenSuspects(fGroups, susps[, c("name", "rt", "adduct", "InChI")]))
     expect_equal(scrSMI, screenSuspects(fGroups, susps[, c("name", "rt", "adduct", "neutralMass")]))
+    expect_equal(scrSMI, screenSuspects(fGroups, susps[, c("name", "rt", "adduct", "formula")]))
     
     # adduct argument
     expect_equal(screenSuspects(fGroups, susps[name %in% c("TBA", "TPA")]),

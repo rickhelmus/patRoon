@@ -129,14 +129,15 @@ assertSuspectList <- function(x, adduct, .var.name = checkmate::vname(x), add = 
     checkmate::assertDataFrame(x, any.missing = FALSE, min.rows = 1, .var.name = .var.name, add = add)
     assertHasNames(x, "name", .var.name = .var.name, add = add)
     
-    mzCols <- c("mz", "neutralMass", "SMILES", "InChI")
+    mzCols <- c("mz", "neutralMass", "SMILES", "InChI", "formula")
     checkmate::assertNames(intersect(names(x), mzCols), subset.of = mzCols,
                            .var.name = paste0("names(", .var.name, ")"), add = add)
 
     assertCharField <- function(f, null.ok = TRUE) checkmate::assertCharacter(x[[f]], .var.name = sprintf("%s[\"%s\"]", .var.name, f),
                                                                               any.missing = FALSE, min.chars = 1,
                                                                               null.ok = null.ok, add = add)
-    assertCharField("SMILES"); assertCharField("InChI"); assertCharField("adduct", null.ok = !is.null(adduct) || !is.null(x[["mz"]]))
+    assertCharField("SMILES"); assertCharField("InChI"); assertCharField("formula");
+    assertCharField("adduct", null.ok = !is.null(adduct) || !is.null(x[["mz"]]))
 
     assertNumField <- function(f) checkmate::assertNumeric(x[[f]], .var.name = sprintf("%s[\"%s\"]", .var.name, f),
                                                            any.missing = FALSE, lower = 0, finite = TRUE,

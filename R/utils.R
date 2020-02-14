@@ -1190,13 +1190,32 @@ prepareSuspectList <- function(suspects, adduct)
     {
         # otherwise calculate
         
+        printf("Calculating ion masses for each suspect...\n")
+        prog <- openProgBar(0, nrow(suspects))
+        
         if (!is.null(suspects[["formula"]]))
-            neutralMasses <- sapply(suspects$formula, function(f) rcdk::get.formula(f)@mass)
+        {
+            neutralMasses <- sapply(seq_len(nrow(suspects)), function(i)
+            {
+                ret <- rcdk::get.formula(suspects$formula[i])@mass
+                setTxtProgressBar(prog, i)
+                return(ret)
+            })
+        }
         else
         {
             SMI <- if (!is.null(suspects[["SMILES"]])) suspects$SMILES else babelConvert(suspects$InChI, "inchi", "smi")
-            neutralMasses <- getNeutralMassFromSMILES(SMI)
+            
+            neutralMasses <- sapply(seq_along(SMI), function(i)
+            {
+                ret <- getNeutralMassFromSMILES(SMI[i])[[1]]
+                setTxtProgressBar(prog, i)
+                return(ret)
+                
+            })
         }
+        
+        close(prog)
     }
     
     if (!is.null(adduct))

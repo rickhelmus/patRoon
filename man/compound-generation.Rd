@@ -117,9 +117,10 @@ converted to it with \code{\link{as.adduct}}). Examples: \code{"[M-H]-"},
 \code{"[M+Na]+"}.}
 
 \item{database}{Compound database to use. Valid values are: \code{"pubchem"},
-\code{"chemspider"}, \code{"for-ident"}, \code{"toxcast"}, \code{"kegg"},
-\code{"sdf"}, \code{"psv"} and \code{"csv"}. See section below for more
-information. Sets the \code{MetFragDatabaseType} option.}
+\code{"chemspider"}, \code{"for-ident"}, \code{"comptox"},
+\code{"pubchemlite"}, \code{"kegg"}, \code{"sdf"}, \code{"psv"} and
+\code{"csv"}. See section below for more information. Sets the
+\code{MetFragDatabaseType} option.}
 
 \item{extendedPubChem}{If \code{database="pubchem"}: whether to use the
 \emph{extended} database that includes information for compound scoring

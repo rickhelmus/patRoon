@@ -126,10 +126,17 @@ assertAndPrepareAnaInfo <- function(x, ..., add = NULL)
 
 assertSuspectList <- function(x, adduct, .var.name = checkmate::vname(x), add = NULL)
 {
+    mzCols <- c("mz", "neutralMass", "SMILES", "InChI", "formula")
+    allCols <- c("name", "adduct", "rt", mzCols)
+    
+    # subset with relevant columns: avoid checking others in subsequent assetDataFrame call
+    if (checkmate::testDataFrame(x))
+        x <- x[, intersect(names(x), allCols), with = FALSE]
+    
     checkmate::assertDataFrame(x, any.missing = FALSE, min.rows = 1, .var.name = .var.name, add = add)
     assertHasNames(x, "name", .var.name = .var.name, add = add)
     
-    mzCols <- c("mz", "neutralMass", "SMILES", "InChI", "formula")
+
     checkmate::assertNames(intersect(names(x), mzCols), subset.of = mzCols,
                            .var.name = paste0("names(", .var.name, ")"), add = add)
 

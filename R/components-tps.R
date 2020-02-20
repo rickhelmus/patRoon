@@ -72,7 +72,7 @@ generateComponentsTPs <- function(fGroups, pred, MSPeakLists, adduct, mzWindow =
     if (length(fGroups) == 0)
         return(componentsTPs(componentInfo = data.table(), components = list()))
     
-    hash <- makeHash(fGroups, pred, adduct, mzWindow, fGroupsPrec, fGroupsTPs)
+    hash <- makeHash(fGroups, pred, adduct, mzWindow, fGroupsPrec, fGroupsTPs, minRTDiff)
     cd <- loadCacheData("componentsTPs", hash)
     if (!is.null(cd))
         return(cd)

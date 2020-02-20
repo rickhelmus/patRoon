@@ -102,13 +102,6 @@ collapseBTResults <- function(pred)
     return(predAll)
 }
 
-getPrecursorSuspList <- function(pred, adduct)
-{
-    addMZ <- adductMZDelta(adduct)
-    ret <- copy(suspects(pred))
-    ret[, mz := getNeutralMassFromSMILES(SMILES) + addMZ]
-}
-
 #' @export
 predictTPsBioTransformer <- function(suspects = NULL, compounds = NULL, type = "env", steps = 2,
                                      extraOpts = NULL,
@@ -266,8 +259,8 @@ setMethod("convertToMFDB", "TPPredictionsBT", function(pred, out, includePrec)
 
 setMethod("linkPrecursorsToFGroups", "TPPredictionsBT", function(pred, fGroups, adduct, mzWindow)
 {
-    suspList <- getPrecursorSuspList(pred, adduct)
-    scr <- screenSuspects(fGroups, suspList, mzWindow = mzWindow)
+    suspList <- suspects(pred)
+    scr <- screenSuspects(fGroups, suspList, mzWindow = mzWindow, adduct = adduct)
     scr <- scr[!is.na(group)] # remove non-hits
     return(scr[, c("name", "group")])
 })

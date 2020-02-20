@@ -100,10 +100,8 @@ setMethod("$", "TPPredictions", function(x, name)
 setMethod("as.data.table", "TPPredictions", function(x) rbindlist(predictions(x), idcol = "suspect"))
 
 #' @export
-setMethod("convertToSuspects", "TPPredictions", function(pred, adduct, includePrec, tidy)
+setMethod("convertToSuspects", "TPPredictions", function(pred, includePrec, tidy)
 {
-    adduct <- checkAndToAdduct(adduct)
-    
     ac <- checkmate::makeAssertCollection()
     checkmate::assertFlag(includePrec, add = ac)
     checkmate::assertFlag(tidy, add = ac)
@@ -112,12 +110,8 @@ setMethod("convertToSuspects", "TPPredictions", function(pred, adduct, includePr
     predAll <- rbindlist(predictions(pred))
     predAll <- predAll[, c("name", "mass")]
     
-    # calculate adduct m/z to make subsequent ion calculations faster
-    addMZ <- adductMZDelta(adduct)
-    predAll[, mz := mass + addMZ]
-    
     if (includePrec)
-        predAll <- rbind(getPrecursorSuspList(pred, adduct), predAll, fill = TRUE)
+        predAll <- rbind(suspects(pred), predAll, fill = TRUE)
     
     if (tidy)
         predAll <- predAll[, c("name", "mz"), with = FALSE]

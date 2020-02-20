@@ -86,11 +86,11 @@ generateComponentsTPs <- function(fGroups, pred, MSPeakLists, adduct, mzWindow =
     #       - filter TPs (retention, intensity, ...)
     
     
-    suspList <- convertToSuspects(pred, adduct, includePrec = FALSE)
+    suspList <- convertToSuspects(pred, includePrec = FALSE)
 
     printf("Screening TPs...\n")
     
-    screeningTPs <- screenSuspects(fGroupsTPs, suspList, mzWindow = mzWindow)
+    screeningTPs <- screenSuspects(fGroupsTPs, suspList, mzWindow = mzWindow, adduct = adduct)
     screeningTPs <- screeningTPs[!is.na(group)] # remove non-hits
     susps <- suspects(pred)
     precGroups <- linkPrecursorsToFGroups(pred, fGroupsPrec, adduct, mzWindow)

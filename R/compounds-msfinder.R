@@ -79,10 +79,16 @@ generateCompoundsMSFINDER <- function(fGroups, MSPeakLists, adduct = "[M+H]+", e
     # withr::with_dir(normalizePath("~/Rproj/MSFINDER ver 3.30"),
     #                 executeCommand("MsfinderConsoleApp.exe",
     #                c("predict", "-i", outDir, "-o", file.path(outDir, "results"), "-m", file.path(outDir, "MSFINDER.INI"))))
-    executeMultiProcess(list(list(command = normalizePath("~/Rproj/MSFINDER ver 3.30/MsfinderConsoleApp.exe"),
-                                  args = c("predict", "-i", outDir, "-o", file.path(outDir, "results"), "-m", file.path(outDir, "MSFINDER.INI")),
-                                  logFile = "msf-log.txt")),
-                        function(cmd) NULL)
+    
+    # work-around from https://stackoverflow.com/a/50512416
+    withr::with_dir(normalizePath("~/Rproj/MSFINDER-ver-3_30"),
+                    shell(sprintf("start cmd /C MsfinderConsoleApp.exe predict -i %s -o %s -m %s",
+                                  outDir, file.path(outDir, "results"), file.path(outDir, "MSFINDER.INI"))))
+    
+    # executeMultiProcess(list(list(command = normalizePath("~/Rproj/MSFINDER ver 3.30/MsfinderConsoleApp.exe"),
+    #                               args = c("predict", "-i", outDir, "-o", file.path(outDir, "results"), "-m", file.path(outDir, "MSFINDER.INI")),
+    #                               logFile = "msf-log.txt")),
+    #                     function(cmd) NULL)
     
     browser()
     # Read in results

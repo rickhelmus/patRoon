@@ -110,11 +110,15 @@ simplifyFormula <- function(formula) sortFormula(formula)
 
 # Based on chemistry2expression() from ReSOLUTION package
 # (authors: Emma Schymanski / Steffen Neumann). See https://github.com/schymane/ReSOLUTION/
-subscriptFormula <- function(formulas, prefix = "", postfix = "", parse = TRUE)
+subscriptFormula <- function(formulas, over = NULL, parse = TRUE)
 {
     exprs <- sub("\\*$", "", gsub("([[:digit:]-]+)", "[\\1]*", formulas))
     if (parse)
-        return(parse(text = sprintf('"%s" * %s * "%s"', prefix, exprs, postfix)))
+    {
+        if (!is.null(over))
+            return(parse(text = sprintf('atop("%s", %s)', over, exprs)))
+        return(parse(text = exprs))
+    }
     return(exprs)
 }
 

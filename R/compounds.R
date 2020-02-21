@@ -679,7 +679,7 @@ setMethod("plotSpec", "compounds", function(obj, index, groupName, MSPeakLists, 
     if (is.null(title))
     {
         if (!is.null(compr$compoundName) && !is.na(compr$compoundName) && nzchar(compr$compoundName))
-            title <- subscriptFormula(compr$formula, prefix = paste(compr$compoundName, "("), postfix = ")")
+            title <- subscriptFormula(compr$formula, over = compr$compoundName) #subscriptFormula(compr$formula, prefix = paste0(compr$compoundName, "\n("), postfix = ")")
         else
             title <- subscriptFormula(compr$formula)
     }

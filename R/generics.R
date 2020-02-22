@@ -118,6 +118,11 @@ NULL
 #'   converted to it with \code{\link{as.adduct}}). Examples: \code{"[M-H]-"},
 #'   \code{"[M+Na]+"}. Can be \code{NULL} if either a \code{"mz"} or
 #'   \code{"adduct"} column is present in the \code{suspects} argument.
+#' @param skipInvalid If set to \code{TRUE} then suspects with invalid data
+#'   (\emph{e.g.} missing names or other missing data) will be ignored with a
+#'   warning. Similarly, any suspects for which mass calculation failed (when no
+#'   \code{mz} column is present in the suspect list), for instance, due to
+#'   invalid \code{SMILES}, will be ignored with a warning.
 #'
 #' @return \code{screenSuspects} will return a table (a
 #'   \code{\link{data.table}}) with detected suspects and details such as
@@ -125,7 +130,8 @@ NULL
 #'   features/feature groups then each hit is reported as a separate row.
 #'
 #' @rdname suspect-screening
-setGeneric("screenSuspects", function(obj, suspects, rtWindow = 12, mzWindow = 0.005, adduct = NULL) standardGeneric("screenSuspects"))
+setGeneric("screenSuspects", function(obj, suspects, rtWindow = 12, mzWindow = 0.005, adduct = NULL,
+                                      skipInvalid = TRUE) standardGeneric("screenSuspects"))
 
 
 ### Optimization

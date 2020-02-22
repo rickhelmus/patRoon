@@ -124,16 +124,19 @@ assertAndPrepareAnaInfo <- function(x, ..., add = NULL)
     return(x)
 }
 
-assertSuspectList <- function(x, adduct, .var.name = checkmate::vname(x), add = NULL)
+assertSuspectList <- function(x, adduct, skipInvalid, .var.name = checkmate::vname(x), add = NULL)
 {
     mzCols <- c("mz", "neutralMass", "SMILES", "InChI", "formula")
     allCols <- c("name", "adduct", "rt", mzCols)
+    
+    # this seems necessary for proper naming in subsequent assertions (why??)
+    .var.name <- force(.var.name)
     
     # subset with relevant columns: avoid checking others in subsequent assetDataFrame call
     if (checkmate::testDataFrame(x))
         x <- x[, intersect(names(x), allCols), with = FALSE]
     
-    checkmate::assertDataFrame(x, any.missing = FALSE, min.rows = 1, .var.name = .var.name, add = add)
+    checkmate::assertDataFrame(x, any.missing = skipInvalid, min.rows = 1, .var.name = .var.name, add = add)
     assertHasNames(x, "name", .var.name = .var.name, add = add)
     
 
@@ -141,13 +144,13 @@ assertSuspectList <- function(x, adduct, .var.name = checkmate::vname(x), add = 
                            .var.name = paste0("names(", .var.name, ")"), add = add)
 
     assertCharField <- function(f, null.ok = TRUE) checkmate::assertCharacter(x[[f]], .var.name = sprintf("%s[\"%s\"]", .var.name, f),
-                                                                              any.missing = FALSE, min.chars = 1,
+                                                                              min.chars = if (skipInvalid) 0 else 1,
                                                                               null.ok = null.ok, add = add)
     assertCharField("SMILES"); assertCharField("InChI"); assertCharField("formula");
     assertCharField("adduct", null.ok = !is.null(adduct) || !is.null(x[["mz"]]))
 
     assertNumField <- function(f) checkmate::assertNumeric(x[[f]], .var.name = sprintf("%s[\"%s\"]", .var.name, f),
-                                                           any.missing = FALSE, lower = 0, finite = TRUE,
+                                                           lower = 0, finite = TRUE,
                                                            null.ok = TRUE, add = add)
     assertNumField("mz"); assertNumField("neutralMass"); assertNumField("rt")
 

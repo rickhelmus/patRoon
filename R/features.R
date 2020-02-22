@@ -196,13 +196,13 @@ setMethod("$", "features", function(x, name)
 
 #' @rdname suspect-screening
 #' @export
-setMethod("screenSuspects", "features", function(obj, suspects, rtWindow, mzWindow, adduct)
+setMethod("screenSuspects", "features", function(obj, suspects, rtWindow, mzWindow, adduct, skipInvalid)
 {
     if (!is.null(adduct))
         adduct <- checkAndToAdduct(adduct)
     
     ac <- checkmate::makeAssertCollection()
-    assertSuspectList(suspects, adduct, add = ac)
+    assertSuspectList(suspects, adduct, skipInvalid, add = ac)
     aapply(checkmate::assertNumber, . ~ rtWindow + mzWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
 
@@ -214,7 +214,7 @@ setMethod("screenSuspects", "features", function(obj, suspects, rtWindow, mzWind
     fTable <- featureTable(obj)
     anaInfo <- analysisInfo(obj)
     
-    suspects <- prepareSuspectList(suspects, adduct)
+    suspects <- prepareSuspectList(suspects, adduct, skipInvalid)
     
     prog <- openProgBar(0, nrow(suspects))
 

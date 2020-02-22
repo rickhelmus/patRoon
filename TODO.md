@@ -24,7 +24,7 @@
 - suspect screening
     - rename patRoonData::targets?
     - rename groupFeaturesScreening?
-    - cache results for mass calculation. Test with big suspect lists
+    - cache results for mass calculation.
 - filter()
     - document which filters work on feature level (e.g. chromWidth)
     - remove zero values for maxReplicateIntRSD?
@@ -48,6 +48,7 @@
 - PubChemLite
     - Do something with related CIDs? (e.g. link in getCompInfoList())
     - Install from Win inst script --> now only tier1, OK?
+- SusDat MF support
 
 
 ## formulas

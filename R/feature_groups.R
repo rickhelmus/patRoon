@@ -1225,13 +1225,13 @@ setMethod("overlap", "featureGroups", function(fGroups, which, exclusive)
 
 #' @rdname suspect-screening
 #' @export
-setMethod("screenSuspects", "featureGroups", function(obj, suspects, rtWindow, mzWindow, adduct)
+setMethod("screenSuspects", "featureGroups", function(obj, suspects, rtWindow, mzWindow, adduct, skipInvalid)
 {
     if (!is.null(adduct))
         adduct <- checkAndToAdduct(adduct)
 
     ac <- checkmate::makeAssertCollection()
-    assertSuspectList(suspects, adduct, add = ac)
+    assertSuspectList(suspects, adduct, skipInvalid, add = ac)
     aapply(checkmate::assertNumber, . ~ rtWindow + mzWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
 
@@ -1244,7 +1244,7 @@ setMethod("screenSuspects", "featureGroups", function(obj, suspects, rtWindow, m
     gInfo <- groupInfo(obj)
     anaInfo <- analysisInfo(obj)
 
-    suspects <- prepareSuspectList(suspects, adduct)
+    suspects <- prepareSuspectList(suspects, adduct, skipInvalid)
 
     prog <- openProgBar(0, nrow(suspects))
 

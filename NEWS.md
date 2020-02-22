@@ -3,7 +3,10 @@
 ## February 2020
 
 * Several small improvements and fixes for TASQ import
-* Suspect screening: now also support chemical formula for automatic m/z calculation
+* Suspect screening:
+    * now also support chemical formula for automatic m/z calculation
+    * more robust loading of suspect lists (e.g. skip suspects with missing/invalid data)
+
 
 ## January 2020
 

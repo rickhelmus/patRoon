@@ -828,6 +828,7 @@ getMoleculesFromSMILES <- function(SMILES, doTyping = FALSE, doIsotopes = FALSE,
             ret <- rcdk::parse.smiles(sm, kekulise = FALSE)[[1]] # might work w/out kekulization
         if (!isValidMol(ret))
         {
+            warning(paste("Failed to parse SMILES:", sm))
             if (emptyIfFails)
                 ret <- emptyMol()
         }
@@ -847,8 +848,21 @@ getMoleculesFromSMILES <- function(SMILES, doTyping = FALSE, doIsotopes = FALSE,
     return(mols)
 }
 
-getNeutralMassFromSMILES <- function(SMILES) sapply(getMoleculesFromSMILES(SMILES, doTyping = TRUE, doIsotopes = TRUE),
-                                                    rcdk::get.exact.mass)
+getNeutralMassFromSMILES <- function(SMILES, mustWork = TRUE)
+{
+    sapply(getMoleculesFromSMILES(SMILES, doTyping = TRUE, doIsotopes = TRUE), function(m)
+    {
+        if (!mustWork)
+        {
+            if(!isValidMol(m))
+                return(NA)
+            
+            # this could fail for some edge cases
+            return(tryCatch(rcdk::get.exact.mass(m), error = function(e) NA))
+        }
+        return(rcdk::get.exact.mass(m))
+    })
+}
 
 getMostIntenseAnaWithMSMS <- function(fGroups, MSPeakLists, groupName)
 {
@@ -1173,19 +1187,51 @@ babelConvert <- function(input, inFormat, outFormat, mustWork = TRUE)
     return(ret)
 }
 
-prepareSuspectList <- function(suspects, adduct)
+prepareSuspectList <- function(suspects, adduct, skipInvalid)
 {
-    # UNDONE: check if/make name column is file safe
+    # UNDONE: check if/make name column is file safe/unique
 
-    suspects <- as.data.table(suspects)
+    if (is.data.table(suspects))
+        suspects <- copy(suspects)
+    else
+        suspects <- as.data.table(suspects)
+    
     suspects[, name := as.character(name)] # in case factors are given
-
+    
+    checkValidColumn <- function(column, check, printLine = FALSE)
+    {
+        if (!skipInvalid)
+            return(suspects) # checks should've been done by prior assert
+        
+        valid <- check(suspects[[column]])
+        if (any(!valid))
+        {
+            warning(paste0("Ignored following suspects with invalid data for column '", column, "': ",
+                           if (printLine) sprintf("%s (line %d)", suspects$name[!valid], which(!valid)) else suspects$name[!valid]),
+                    call. = FALSE)
+            suspects <- suspects[valid]
+        }
+        return(suspects)
+    }
+    checkValidNumColumn <- function(column, ...) checkValidColumn(column, function(x) !is.na(x), ...)
+    checkValidStrColumn <- function(column, ...) checkValidColumn(column, function(x) !is.na(x) & nzchar(x), ...)
+    
+    # only print line here, next ones might be invalid as the table may have
+    # been subset by subsequent calls to this function
+    suspects <- checkValidStrColumn("name", printLine = TRUE)
+    
     if (!is.null(suspects[["mz"]]))
+    {
+        suspects <- checkValidNumColumn("mz")
         return(suspects) # no further need for calculation of ion masses
+    }
 
     # neutral mass given?
     if (!is.null(suspects[["neutralMass"]]))
+    {
+        suspects <- checkValidNumColumn("neutralMass")
         neutralMasses <- suspects[["neutralMass"]]
+    }
     else
     {
         # otherwise calculate
@@ -1195,6 +1241,7 @@ prepareSuspectList <- function(suspects, adduct)
         
         if (!is.null(suspects[["formula"]]))
         {
+            suspects <- checkValidStrColumn("formula")
             neutralMasses <- sapply(seq_len(nrow(suspects)), function(i)
             {
                 ret <- rcdk::get.formula(suspects$formula[i])@mass
@@ -1204,14 +1251,22 @@ prepareSuspectList <- function(suspects, adduct)
         }
         else
         {
-            SMI <- if (!is.null(suspects[["SMILES"]])) suspects$SMILES else babelConvert(suspects$InChI, "inchi", "smi")
+            if (!is.null(suspects[["SMILES"]]))
+            {
+                suspects <- checkValidStrColumn("SMILES")
+                SMI <- suspects$SMILES
+            }
+            else
+            {
+                suspects <- checkValidStrColumn("InChI")
+                SMI <- babelConvert(suspects$InChI, "inchi", "smi")
+            }
             
             neutralMasses <- sapply(seq_along(SMI), function(i)
             {
-                ret <- getNeutralMassFromSMILES(SMI[i])[[1]]
+                ret <- getNeutralMassFromSMILES(SMI[i], mustWork = !skipInvalid)[[1]]
                 setTxtProgressBar(prog, i)
                 return(ret)
-                
             })
         }
         
@@ -1222,6 +1277,18 @@ prepareSuspectList <- function(suspects, adduct)
         addMZs <- adductMZDelta(adduct)
     else
         addMZs <- sapply(suspects[["adduct"]], function(a) adductMZDelta(as.adduct(a)))
+    
+    if (skipInvalid)
+    {
+        # skip any suspects without proper mass info
+        isNA <- is.na(neutralMasses)
+        if (any(isNA))
+        {
+            warning(paste("Ignored following suspects for which no mass could be calculated:",
+                          paste0(suspects[["name"]][isNA], collapse = ", ")))
+            suspects <- suspects[!isNA]; neutralMasses <- neutralMasses[!isNA]
+        }
+    }
     
     suspects[, mz := neutralMasses + addMZs][]
 

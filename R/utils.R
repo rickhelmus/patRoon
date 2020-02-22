@@ -1189,6 +1189,11 @@ babelConvert <- function(input, inFormat, outFormat, mustWork = TRUE)
 
 prepareSuspectList <- function(suspects, adduct, skipInvalid)
 {
+    hash <- makeHash(suspects, adduct, skipInvalid)
+    cd <- loadCacheData("screenSuspectsPrepList", hash)
+    if (!is.null(cd))
+        return(cd)
+    
     # UNDONE: check if/make name column is file safe/unique
 
     if (is.data.table(suspects))
@@ -1292,5 +1297,7 @@ prepareSuspectList <- function(suspects, adduct, skipInvalid)
     
     suspects[, mz := neutralMasses + addMZs][]
 
+    saveCacheData("screenSuspectsPrepList", suspects, hash)
+    
     return(suspects)
 }

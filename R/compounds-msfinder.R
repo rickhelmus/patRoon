@@ -27,6 +27,53 @@ generateMATFile <- function(gName, precMz, adduct, plistsFG, out)
     return(fileName) # UNDONE: needed?
 }
 
+readSFD <- function(file)
+{
+    lines <- readLines(file)
+    lines <- lines[nzchar(lines)]
+    
+    # split in result chunks, where it's assumed each result starts with NAME field
+    linesResults <- split(lines, cumsum(grepl("^NAME:", lines)))
+    
+    results <- lapply(linesResults, function(lr)
+    {
+        # split by variable/value by colon, see https://stackoverflow.com/a/26247455
+        parsed <- regmatches(lr, regexpr(":", lr), invert = TRUE)
+        # omit non-key/value pairs (these are usually the annotated fragments)
+        parsed <- parsed[lengths(parsed) == 2]
+        parsed <- lapply(parsed, function(p) trimws(p))
+        
+        keys <- sapply(parsed, "[", 1)
+        vals <- lapply(parsed, "[", 2) # lapply: keep it as a list
+        
+        ret <- data.table()
+        ret[, (keys) := vals]
+        
+        annColName <- grep("^Num Fragment", keys, value = TRUE)
+        annRows <- as.integer(ret[[annColName]])
+        
+        if (annRows > 0)
+        {
+            annStartRow <- which(grepl(annColName, lr, fixed = TRUE)) + 1
+            # parse raw text from annotated fragment as a table
+            fragInfo <- fread(text = paste0(lr[seq(annStartRow, annStartRow + (annRows-1))], collapse = "\n"))
+            # figure out column names from key value (white space separated between parenthesis)
+            cols <- sub(".+\\((.+)\\)", "\\1", annColName)
+            cols <- unlist(strsplit(cols, " ", fixed = TRUE))
+            setnames(fragInfo, cols)
+        }
+        
+        
+        # figure out annotated mass peaks for fragInfo
+        
+        
+        browser()
+        
+    })
+    
+    
+}
+
 #' @rdname compound-generation
 #' @export
 generateCompoundsMSFINDER <- function(fGroups, MSPeakLists, adduct = "[M+H]+", elements = "CHNOP",

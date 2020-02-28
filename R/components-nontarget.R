@@ -42,10 +42,11 @@ setMethod("plotGraph", "componentsNT", function(obj, onlyLinked)
     
     cInfo <- copy(obj@componentInfo)
     cInfo[, id := .I]
-    allLinks <- unique(unlist(cInfo$links))
+    cInfo[, linksIDs := lapply(links, match, table = names(obj))]
+    allLinks <- unique(unlist(cInfo$linksIDs))
     cInfo <- cInfo[lengths(links) > 0 | id %in% allLinks]
     
-    edges <- rbindlist(mapply(cInfo$name, cInfo$links, FUN = function(n, l)
+    edges <- rbindlist(mapply(cInfo$name, cInfo$linksIDs, FUN = function(n, l)
     {
         data.table::data.table(from = n, to = cInfo$name[match(unlist(l), cInfo$id)])
     }, SIMPLIFY = FALSE))

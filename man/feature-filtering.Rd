@@ -138,7 +138,7 @@ Basic rule based filtering of feature groups.
   necessary to ensure minimum replicate abundance again as the intensity and
   blank filters may have removed some features within a replicate group.
 
-  With this in mind, filters (if specified) occurs in the following order:
+  With this in mind, filters (if specified) occur in the following order:
 
   \enumerate{
 

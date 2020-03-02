@@ -24,7 +24,37 @@ generateMATFile <- function(gName, precMz, adduct, plistsFG, out)
     writeParam("Num Peaks", nrow(plistsFG[["MSMS"]]))
     cat(paste(plistsFG[["MSMS"]]$mz, plistsFG[["MSMS"]]$intensity, sep = "\t"), sep = "\n", file = fileCon)
     
-    return(fileName) # UNDONE: needed?
+    return(fileName)
+}
+
+unifyMSFNames <- function(resTab)
+{
+    unNames <- c(NAME = "compoundName",
+                 ID = "identifier",
+                 INCHIKEY = "InChIKey",
+                 SMILES = "SMILES",
+                 RESOURCES = "resources",
+                 SubstructureInChIKeys = "substructureInChIKeys",
+                 SubstructureOntologies = "substructureOntologies",
+                 Ontology = "ontology",
+                 OntologyID = "ontologyID",
+                 TotalBondEnergy = "totalBondEnergy",
+                 TotalScore = "score",
+                 TotalHrRulesScore = "totalHrRulesScore",
+                 TotalBondCleavageScore = "totalBondCleavageScore",
+                 TotalMassAccuracyScore = "totalMassAccuracyScore",
+                 TotalFragmentLinkageScore = "totalFragmentLinkageScore",
+                 TotalBondDissociationEnergyScore = "totalBondDissociationEnergyScore",
+                 DatabaseScore = "databaseScore",
+                 SubstructureAssignmentScore = "substructureAssignmentScore",
+                 
+                 fragInfo = "fragInfo" # keep
+    )
+    
+    unNames <- unNames[names(unNames) %in% names(resTab)] # filter out missing
+    setnames(resTab, names(unNames), unNames)
+    
+    return(resTab[, unNames, with = FALSE]) # filter out any other columns
 }
 
 readSFD <- function(file)
@@ -34,6 +64,9 @@ readSFD <- function(file)
     
     # split in result chunks, where it's assumed each result starts with NAME field
     linesResults <- split(lines, cumsum(grepl("^NAME:", lines)))
+    
+    # assume file names are named by their candidate formula
+    candidateFormula <- tools::file_path_sans_ext(basename(file))
     
     results <- lapply(linesResults, function(lr)
     {
@@ -61,17 +94,43 @@ readSFD <- function(file)
             cols <- sub(".+\\((.+)\\)", "\\1", annColName)
             cols <- unlist(strsplit(cols, " ", fixed = TRUE))
             setnames(fragInfo, cols)
+            
+            # unify names
+            setnames(fragInfo,
+                     c("M/Z", "Intensity", "Formula", "TotalScore"),
+                     c("mz", "intensity", "formula", "score"))
+            
+            # UNDONE: keep more info? There's plenty...
+            fragInfo <- fragInfo[, c("mz", "intensity", "formula", "score", "SMILES"), with = FALSE]
+            fragInfo[, neutral_loss := sapply(formula, subtractFormula, formula1 = candidateFormula)]
+            
+            ret[, fragInfo := list(list(fragInfo))]
         }
         
         
-        # figure out annotated mass peaks for fragInfo
-        
+        ret <- unifyMSFNames(ret)
+        ret[, formula := candidateFormula]
         
         browser()
-        
     })
     
     
+}
+
+readMSFResults <- function(outDir, MATFiles)
+{
+    # resDirs <- list.dirs(outDir, recursive = FALSE)
+    # resDirs <- resDirs[grepl(tools::file_path_sans_ext(basename(MATFiles)), resDirs, fixed = TRUE)]
+    resDirs <- tools::file_path_sans_ext(MATFiles)
+    resDirs <- resDirs[dir.exists(resDirs)]
+    
+    for (rd in resDirs)
+    {
+        # find *.sfd files
+        # process with readSFD and merge
+    }
+    
+    ret <- rbindlist
 }
 
 #' @rdname compound-generation
@@ -112,15 +171,15 @@ generateCompoundsMSFINDER <- function(fGroups, MSPeakLists, adduct = "[M+H]+", e
     # Modify INI
     
     
-    for (gName in gNames)
+    MATFiles <- sapply(gNames, function(gName)
     {
         # Prepare input files
         
         if (is.null(MSPeakLists[[gName]][["MS"]]) || is.null(MSPeakLists[[gName]][["MSMS"]]))
-            next
+            return(character())
 
-        generateMATFile(gName, gInfo[gName, "mzs"], adduct, MSPeakLists[[gName]], outDir)
-    }
+        return(generateMATFile(gName, gInfo[gName, "mzs"], adduct, MSPeakLists[[gName]], outDir))
+    })
     
     # Run command (or split in multiproc batches?)
     # withr::with_dir(normalizePath("~/Rproj/MSFINDER ver 3.30"),
@@ -137,9 +196,11 @@ generateCompoundsMSFINDER <- function(fGroups, MSPeakLists, adduct = "[M+H]+", e
     #                               logFile = "msf-log.txt")),
     #                     function(cmd) NULL)
     
-    browser()
     # Read in results
+
     
+        
+    browser()
     
     ngrp <- length(ret)
     printf("Loaded %d compounds from %d features (%.2f%%).\n", sum(unlist(lapply(ret, function(r) nrow(r$comptab)))),

@@ -351,3 +351,6 @@
     - optionally take areas instead of intensities
     - cache results
 
+## TPs
+- Suspects --> BT --> MF DB/suspect list (opt combine with precursors)
+- Make sure hash takes into account parent names

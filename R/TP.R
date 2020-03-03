@@ -108,10 +108,12 @@ setMethod("convertToSuspects", "TPPredictions", function(pred, includePrec, tidy
     checkmate::reportAssertions(ac)
     
     predAll <- rbindlist(predictions(pred))
-    predAll <- predAll[, c("name", "mass")]
+    predAll <- predAll[, c("name", "InChI")]
     
     if (includePrec)
         predAll <- rbind(suspects(pred), predAll, fill = TRUE)
+    
+    # UNDONE: handle differences in mz, SMILES, InChI etc columns between TPs and parents
     
     if (tidy)
         predAll <- predAll[, c("name", "mz"), with = FALSE]

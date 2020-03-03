@@ -134,7 +134,12 @@ assertSuspectList <- function(x, adduct, skipInvalid, .var.name = checkmate::vna
     
     # subset with relevant columns: avoid checking others in subsequent assetDataFrame call
     if (checkmate::testDataFrame(x))
-        x <- x[, intersect(names(x), allCols), with = FALSE]
+    {
+        if (is.data.table(x))
+            x <- x[, intersect(names(x), allCols), with = FALSE]
+        else
+            x <- x[, intersect(names(x), allCols)]
+    }
     
     checkmate::assertDataFrame(x, any.missing = skipInvalid, min.rows = 1, .var.name = .var.name, add = add)
     assertHasNames(x, "name", .var.name = .var.name, add = add)

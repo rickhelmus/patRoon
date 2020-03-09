@@ -1201,7 +1201,12 @@ prepareSuspectList <- function(suspects, adduct, skipInvalid)
     else
         suspects <- as.data.table(suspects)
     
-    suspects[, name := as.character(name)] # in case factors are given
+    # convert to character in case factors are given...
+    for (col in c("name", "formula", "SMILES", "InChI", "adduct"))
+    {
+        if (!is.null(suspects[[col]]))
+            suspects[, (col) := as.character(get(col))]
+    }
     
     checkValidColumn <- function(column, check, printLine = FALSE)
     {

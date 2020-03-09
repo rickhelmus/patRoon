@@ -148,9 +148,17 @@ assertSuspectList <- function(x, adduct, skipInvalid, .var.name = checkmate::vna
     checkmate::assertNames(intersect(names(x), mzCols), subset.of = mzCols,
                            .var.name = paste0("names(", .var.name, ")"), add = add)
 
-    assertCharField <- function(f, null.ok = TRUE) checkmate::assertCharacter(x[[f]], .var.name = sprintf("%s[\"%s\"]", .var.name, f),
-                                                                              min.chars = if (skipInvalid) 0 else 1,
-                                                                              null.ok = null.ok, add = add)
+    assertCharField <- function(f, null.ok = TRUE)
+    {
+        checkmate::assert(
+            checkmate::checkFactor(x[[f]], empty.levels.ok = skipInvalid,
+                                   any.missing = skipInvalid, null.ok = null.ok),
+            checkmate::checkCharacter(x[[f]], min.chars = if (skipInvalid) 0 else 1,
+                                      null.ok = null.ok),
+            .var.name = sprintf("%s[\"%s\"]", .var.name, f)    
+        )
+        
+    }
     assertCharField("SMILES"); assertCharField("InChI"); assertCharField("formula");
     assertCharField("adduct", null.ok = !is.null(adduct) || !is.null(x[["mz"]]))
 

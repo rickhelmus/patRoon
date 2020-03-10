@@ -100,17 +100,19 @@ NULL
 #'
 #' @param obj The object that should be screened (\emph{i.e.}
 #'   \code{\link{features}} or \code{\link{featureGroups}}).
-#' @param suspects A \code{data.frame} that must consist a \code{"name"} column
-#'   (the analyte name) and \emph{either} a \code{"mz"}, \code{"neutralMass"},
-#'   \code{"SMILES"}, \code{"InChI"} or \code{"formula"} column (with the
-#'   ionized m/z value, the neutral monoisotopic mass or the
-#'   SMILES/InChI/chemical formula character string for the molecule,
-#'   respectively). When no \code{"mz"} is specified the adduct must be
-#'   specified either with the \code{adduct} function argument or by an
-#'   \code{"adduct"} column containing a \code{character} that can be converted
-#'   with \code{as.adduct} (\emph{e.g.} \code{"[M+H]+"}).  In addition, a column
-#'   \code{"rt"} can be included to specify the retention time (if unspecified
-#'   no retention times are checked).
+#' @param suspects A \code{data.frame} that must contain a \code{"name"} column
+#'   (the analyte name) and \emph{at least} a \code{"mz"}, \code{"neutralMass"},
+#'   \code{"formula"}, \code{"SMILES"}, \code{"InChI"} column (with the ionized
+#'   m/z value, the neutral monoisotopic mass or the chemical
+#'   formula/SMILES/InChI character string for the molecule, respectively). If
+#'   an ion mass needs to be calculated (\emph{i.e.} no valid data is available
+#'   in the \code{mz} column) then data is tried to be used from the columns in
+#'   the aforementioned order. Furthermore, if ion masses need to be calculated
+#'   then the adduct must be specified either with the \code{adduct} function
+#'   argument or by an \code{"adduct"} column containing a \code{character} that
+#'   can be converted with \code{as.adduct} (\emph{e.g.} \code{"[M+H]+"}). In
+#'   addition, a column \code{"rt"} can be included to specify the retention
+#'   time (if unspecified no retention times are checked).
 #' @param rtWindow,mzWindow The retention time window (in seconds) and
 #'   \emph{m/z} window that will be used for matching a suspect (+/- feature
 #'   data).

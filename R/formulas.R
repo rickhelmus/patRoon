@@ -139,7 +139,8 @@ setMethod("[", c("formulas", "ANY", "missing", "missing"), function(x, i, j, ...
                                     simplify = FALSE)
         x@featureFormulas <- pruneList(x@featureFormulas, TRUE)
 
-        x@formulas <- pruneList(x@formulas[i], TRUE)
+        x@formulas <- x@formulas[i]
+        x@scoreRanges <- x@scoreRanges[i]
     }
 
     return(x)
@@ -229,11 +230,8 @@ setMethod("as.data.table", "formulas", function(x, fGroups = NULL, average = FAL
     fTable <- formulaTable(x)
     if (normalizeScores != "none")
     {
-        fTable <- mapply(fTable, groupNames(x), SIMPLIFY = FALSE, FUN = function(ft, grp)
-        {
-            return(normalizeFormScores(ft, x@scoreRanges[[grp]],
-                                       normalizeScores == "minmax", excludeNormScores))
-        })
+        fTable <- mapply(fTable, x@scoreRanges, SIMPLIFY = FALSE, FUN = normalizeFormScores,
+                         MoreArgs = list(normalizeScores == "minmax", excludeNormScores))
     }
 
     ret <- rbindlist(fTable, fill = TRUE, idcol = "group")
@@ -429,6 +427,8 @@ setMethod("filter", "formulas", function(obj, minExplainedPeaks = NULL, elements
         return(formTable)
     }, simplify = FALSE), checkZeroRows = TRUE)
 
+    obj@scoreRanges <- obj@scoreRanges[names(obj@formulas)]
+    
     newn <- length(obj)
     printf("Done! Filtered %d (%.2f%%) formulas. Remaining: %d\n", oldn - newn, if (oldn == 0) 0 else (1-(newn/oldn))*100, newn)
     return(obj)

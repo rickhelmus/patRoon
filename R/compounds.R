@@ -109,6 +109,7 @@ setMethod("[", c("compounds", "ANY", "missing", "missing"), function(x, i, ...)
     {
         i <- assertSubsetArgAndToChr(i, groupNames(x))
         x@compounds <- x@compounds[i]
+        x@scoreRanges <- x@scoreRanges[i]
     }
 
     return(x)
@@ -151,11 +152,8 @@ setMethod("as.data.table", "compounds", function(x, fGroups = NULL, fragments = 
     cTable <- compoundTable(x)
     if (normalizeScores != "none")
     {
-        cTable <- mapply(cTable, groupNames(x), SIMPLIFY = FALSE, FUN = function(ct, grp)
-        {
-            return(normalizeCompScores(ct, x@scoreRanges[[grp]], mcn,
-                                       normalizeScores == "minmax", excludeNormScores))
-        })
+        cTable <- mapply(cTable, x@scoreRanges, SIMPLIFY = FALSE, FUN = normalizeCompScores,
+                         MoreArgs = list(mcn, normalizeScores == "minmax", excludeNormScores))
     }
 
     if (fragments)
@@ -325,6 +323,8 @@ setMethod("filter", "compounds", function(obj, minExplainedPeaks = NULL, minScor
     if (length(obj) > 0)
         obj@compounds <- obj@compounds[sapply(obj@compounds, function(cm) !is.null(cm) && nrow(cm) > 0)]
 
+    obj@scoreRanges <- obj@scoreRanges[names(obj@compounds)]
+    
     newn <- length(obj)
     printf("Done! Filtered %d (%.2f%%) compounds. Remaining: %d\n", oldn - newn, if (oldn == 0) 0 else (1-(newn/oldn))*100, newn)
     return(obj)

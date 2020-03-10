@@ -1,5 +1,9 @@
 # patRoon 0.1.0.9000
 
+## March 2020
+
+* Fixed: Normalization of scorings for formulae/compounds potentially uses wrong data after subsetting/filtering of `formulas`/`compounds` objects 
+
 ## February 2020
 
 * Several small improvements and fixes for TASQ import

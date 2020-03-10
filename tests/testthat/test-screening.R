@@ -13,6 +13,15 @@ scr <- screenSuspects(fGroups, susps)
 scrF <- screenSuspects(getFeatures(fGroups), susps)
 scrSMI <- screenSuspects(fGroups, susps[, c("name", "rt", "adduct", "SMILES")])
 
+suspsMissing <- copy(susps)
+suspsMissing[1, mz := NA]
+suspsMissing[2, neutralMass := NA]
+suspsMissing[3, formula := NA_character_]
+suspsMissing[4, SMILES := ""]
+suspsMissing[5, InChI := ""]
+suspsMissingRow <- copy(susps)
+suspsMissingRow[2, c("mz", "neutralMass", "formula", "SMILES", "InChI") := NA]
+
 test_that("suspect screening is OK", {
     expect_equal(nrow(scr), nrow(susps))
     expect_length(unique(scrF$name), nrow(susps))
@@ -29,6 +38,16 @@ test_that("suspect screening is OK", {
     expect_equal(scrSMI, screenSuspects(fGroups, susps[, c("name", "rt", "adduct", "InChI")]))
     expect_equal(scrSMI, screenSuspects(fGroups, susps[, c("name", "rt", "adduct", "neutralMass")]))
     expect_equal(scrSMI, screenSuspects(fGroups, susps[, c("name", "rt", "adduct", "formula")]))
+
+    # same, with missing data (having 2 options for ion mass calculation should be sufficient)
+    expect_equal(scrSMI, screenSuspects(fGroups, suspsMissing[, c("name", "rt", "adduct", "mz", "neutralMass")]),
+                 tolerance = 1E-3)
+    expect_equal(scrSMI, screenSuspects(fGroups, suspsMissing[, c("name", "rt", "adduct", "neutralMass", "formula")]))
+    expect_equal(scrSMI, screenSuspects(fGroups, suspsMissing[, c("name", "rt", "adduct", "formula", "SMILES")]))
+    expect_equal(scrSMI, screenSuspects(fGroups, suspsMissing[, c("name", "rt", "adduct", "SMILES", "InChI")]))
+    
+    expect_warning(screenSuspects(fGroups, suspsMissingRow, skipInvalid = TRUE))
+    expect_error(screenSuspects(fGroups, suspsMissingRow, skipInvalid = FALSE))
     
     # adduct argument
     expect_equal(screenSuspects(fGroups, susps[name %in% c("TBA", "TPA")]),

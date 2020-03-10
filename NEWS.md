@@ -2,7 +2,10 @@
 
 ## March 2020
 
-* Fixed: Normalization of scorings for formulae/compounds potentially uses wrong data after subsetting/filtering of `formulas`/`compounds` objects 
+* Fixed: Normalization of scorings for formulae/compounds potentially uses wrong data after subsetting/filtering of `formulas`/`compounds` objects
+* Suspect screening
+    * Fixed: Errors/Warnings of missing data in suspect list were not shown if using cached data
+    * If a value is missing in any of the columns from the suspect list used for automatic ion mass calculation (e.g. SMILES, formula, ...) then data from another suitable column is tried.
 
 ## February 2020
 

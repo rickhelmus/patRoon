@@ -206,6 +206,9 @@ setMethod("screenSuspects", "features", function(obj, suspects, rtWindow, mzWind
     aapply(checkmate::assertNumber, . ~ rtWindow + mzWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
 
+    # do this before checking cache to ensure proper errors/warnings are thrown!
+    suspects <- prepareSuspectList(suspects, adduct, skipInvalid)
+    
     hash <- makeHash(obj, suspects, rtWindow, mzWindow, adduct)
     cd <- loadCacheData("screenSuspectsFT", hash)
     if (!is.null(cd))
@@ -213,8 +216,6 @@ setMethod("screenSuspects", "features", function(obj, suspects, rtWindow, mzWind
     
     fTable <- featureTable(obj)
     anaInfo <- analysisInfo(obj)
-    
-    suspects <- prepareSuspectList(suspects, adduct, skipInvalid)
     
     prog <- openProgBar(0, nrow(suspects))
 

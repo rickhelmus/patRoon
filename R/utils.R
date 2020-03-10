@@ -1192,117 +1192,96 @@ prepareSuspectList <- function(suspects, adduct, skipInvalid)
     hash <- makeHash(suspects, adduct, skipInvalid)
     cd <- loadCacheData("screenSuspectsPrepList", hash)
     if (!is.null(cd))
-        return(cd)
-    
-    # UNDONE: check if/make name column is file safe/unique
-
-    if (is.data.table(suspects))
-        suspects <- copy(suspects)
-    else
-        suspects <- as.data.table(suspects)
-    
-    # convert to character in case factors are given...
-    for (col in c("name", "formula", "SMILES", "InChI", "adduct"))
-    {
-        if (!is.null(suspects[[col]]))
-            suspects[, (col) := as.character(get(col))]
-    }
-    
-    checkValidColumn <- function(column, check, printLine = FALSE)
-    {
-        if (!skipInvalid)
-            return(suspects) # checks should've been done by prior assert
-        
-        valid <- check(suspects[[column]])
-        if (any(!valid))
-        {
-            warning(paste0("Ignored following suspects with invalid data for column '", column, "': ",
-                           if (printLine) sprintf("%s (line %d)", suspects$name[!valid], which(!valid)) else suspects$name[!valid]),
-                    call. = FALSE)
-            suspects <- suspects[valid]
-        }
-        return(suspects)
-    }
-    checkValidNumColumn <- function(column, ...) checkValidColumn(column, function(x) !is.na(x), ...)
-    checkValidStrColumn <- function(column, ...) checkValidColumn(column, function(x) !is.na(x) & nzchar(x), ...)
-    
-    # only print line here, next ones might be invalid as the table may have
-    # been subset by subsequent calls to this function
-    suspects <- checkValidStrColumn("name", printLine = TRUE)
-    
-    if (!is.null(suspects[["mz"]]))
-    {
-        suspects <- checkValidNumColumn("mz")
-        return(suspects) # no further need for calculation of ion masses
-    }
-
-    # neutral mass given?
-    if (!is.null(suspects[["neutralMass"]]))
-    {
-        suspects <- checkValidNumColumn("neutralMass")
-        neutralMasses <- suspects[["neutralMass"]]
-    }
+        suspects <- cd
     else
     {
-        # otherwise calculate
+        # UNDONE: check if/make name column is file safe/unique
         
-        printf("Calculating ion masses for each suspect...\n")
-        prog <- openProgBar(0, nrow(suspects))
+        if (is.data.table(suspects))
+            suspects <- copy(suspects)
+        else
+            suspects <- as.data.table(suspects)
         
-        if (!is.null(suspects[["formula"]]))
+        # convert to character in case factors are given...
+        for (col in c("name", "formula", "SMILES", "InChI", "adduct"))
         {
-            suspects <- checkValidStrColumn("formula")
-            neutralMasses <- sapply(seq_len(nrow(suspects)), function(i)
-            {
-                ret <- rcdk::get.formula(suspects$formula[i])@mass
-                setTxtProgressBar(prog, i)
-                return(ret)
-            })
+            if (!is.null(suspects[[col]]))
+                suspects[, (col) := as.character(get(col))]
         }
+        
+        if (!is.null(suspects[["mz"]]) && !any(is.na(suspects[["mz"]])))
+        {
+            saveCacheData("screenSuspectsPrepList", suspects, hash)
+            return(suspects) # no further need for calculation of ion masses
+        }
+        
+        # neutral masses given for all?
+        if (!is.null(suspects[["neutralMass"]]) && !any(is.na(suspects[["neutralMass"]])))
+            neutralMasses <- suspects[["neutralMass"]]
         else
         {
-            if (!is.null(suspects[["SMILES"]]))
-            {
-                suspects <- checkValidStrColumn("SMILES")
-                SMI <- suspects$SMILES
-            }
-            else
-            {
-                suspects <- checkValidStrColumn("InChI")
-                SMI <- babelConvert(suspects$InChI, "inchi", "smi")
-            }
+            InChISMILES <- NULL
             
-            neutralMasses <- sapply(seq_along(SMI), function(i)
+            printf("Calculating ion masses for each suspect...\n")
+            prog <- openProgBar(0, nrow(suspects))
+            
+            canUse <- function(v) !is.null(v) && !is.na(v) && (!is.character(v) || nzchar(v))
+            neutralMasses <- sapply(seq_len(nrow(suspects)), function(i)
             {
-                ret <- getNeutralMassFromSMILES(SMI[i], mustWork = !skipInvalid)[[1]]
+                if (canUse(suspects[["neutralMass"]][i]))
+                    ret <- suspects$neutralMass[i]
+                else if (canUse(suspects[["formula"]][i]))
+                    ret <- rcdk::get.formula(suspects$formula[i])@mass
+                else if (canUse(suspects[["SMILES"]][i]))
+                    ret <- getNeutralMassFromSMILES(suspects$SMILES[i], mustWork = FALSE)[[1]]
+                else if (canUse(suspects[["InChI"]][i]))
+                {
+                    # it's more efficient to calculate all at once with obabel --> cache result
+                    if (is.null(InChISMILES))
+                    {
+                        doInChI <- suspects$InChI[!is.na(suspects$InChI) & nzchar(suspects$InChI)]
+                        InChISMILES <<- babelConvert(doInChI, "inchi", "smi", mustWork = FALSE)
+                        names(InChISMILES) <<- doInChI
+                    }
+                    ret <- getNeutralMassFromSMILES(InChISMILES[[suspects$InChI[i]]], mustWork = FALSE)[[1]]
+                }
+                else
+                    ret <- NA
+                
                 setTxtProgressBar(prog, i)
                 return(ret)
             })
+            
+            close(prog)
         }
         
-        close(prog)
-    }
+        if (!is.null(adduct))
+            addMZs <- adductMZDelta(adduct)
+        else
+            addMZs <- sapply(suspects[["adduct"]], function(a) adductMZDelta(as.adduct(a)))
+        
+        if (!is.null(suspects[["mz"]]))
+            suspects[, mz := ifelse(!is.na(suspects$mz), suspects$mz, neutralMasses + addMZs)]
+        else
+            suspects[, mz := neutralMasses + addMZs]
+        
+        saveCacheData("screenSuspectsPrepList", suspects, hash)
+    }        
     
-    if (!is.null(adduct))
-        addMZs <- adductMZDelta(adduct)
-    else
-        addMZs <- sapply(suspects[["adduct"]], function(a) adductMZDelta(as.adduct(a)))
-    
-    if (skipInvalid)
+    # check for any suspects without proper mass info
+    isNA <- is.na(suspects$mz)
+    if (any(isNA))
     {
-        # skip any suspects without proper mass info
-        isNA <- is.na(neutralMasses)
-        if (any(isNA))
+        wrong <- paste0(sprintf("%s (line %d)", suspects$name[isNA], which(isNA)), collapse = "\n")
+        if (skipInvalid)
         {
             warning(paste("Ignored following suspects for which no mass could be calculated:",
-                          paste0(suspects[["name"]][isNA], collapse = ", ")))
-            suspects <- suspects[!isNA]; neutralMasses <- neutralMasses[!isNA]
+                          wrong))
+            suspects <- suspects[!isNA]
         }
+        else
+            stop(paste("Could not calculate ion masses for the following suspects: "), wrong)
     }
-    
-    suspects[, mz := neutralMasses + addMZs][]
-
-    saveCacheData("screenSuspectsPrepList", suspects, hash)
     
     return(suspects)
 }

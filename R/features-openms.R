@@ -185,7 +185,6 @@ getOpenMSFFCommand <- function(datafile, out, noiseThrInt, chromSNR, chromFWHM, 
                   "-algorithm:epd:width_filtering" = widthFiltering,
                   "-algorithm:epd:min_fwhm" = minFWHM,
                   "-algorithm:epd:max_fwhm" = maxFWHM,
-                  "-algorithm:epd:masstrace_snr_filtering" = boolToChr(traceSNRFiltering),
                   "-algorithm:ffm:local_rt_range" = localRTRange,
                   "-algorithm:ffm:local_mz_range" = localMZRange,
                   "-algorithm:ffm:isotope_filtering_model" = isotopeFilteringModel,
@@ -193,6 +192,21 @@ getOpenMSFFCommand <- function(datafile, out, noiseThrInt, chromSNR, chromFWHM, 
                   "-algorithm:ffm:use_smoothed_intensities" = boolToChr(useSmoothedInts),
                   "-algorithm:ffm:report_convex_hulls" = "true")
 
+    # figure out if we're running OpenMS version >= 2.5
+    oldFFM <- TRUE
+    FFMHelp <- suppressWarnings(executeCommand(getCommandWithOptPath("FeatureFinderMetabo", "OpenMS"), stdout = TRUE))
+    FFMHelp <- FFMHelp[grepl("Version:", FFMHelp, fixed = TRUE)]
+    if (length(FFMHelp) == 1) # should be fine, but fallback to old version just in case...
+    {
+        FFMVer <- unlist(regmatches(FFMHelp, regexec("[0-9\\.]+", FFMHelp)))
+        oldFFM <- utils::compareVersion(FFMVer, "2.5") == -1
+    }
+    
+    if (oldFFM)
+        settings <- c(settings, "-algorithm:epd:masstrace_snr_filtering" = boolToChr(traceSNRFiltering))
+    else if (traceSNRFiltering) # changed from boolean value to just be there or not...
+        settings <- c(settings, "-algorithm:epd:masstrace_snr_filtering" = "")
+    
     if (!is.null(extraOpts))
         settings <- c(extraOpts, settings)
 

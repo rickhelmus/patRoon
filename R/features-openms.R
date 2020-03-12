@@ -194,7 +194,7 @@ getOpenMSFFCommand <- function(datafile, out, noiseThrInt, chromSNR, chromFWHM, 
 
     # figure out if we're running OpenMS version >= 2.5
     oldFFM <- TRUE
-    FFMHelp <- suppressWarnings(executeCommand(getCommandWithOptPath("FeatureFinderMetabo", "OpenMS"), stdout = TRUE))
+    FFMHelp <- suppressWarnings(executeCommand(getCommandWithOptPath("FeatureFinderMetabo", "OpenMS"), stdout = TRUE, stderr = TRUE))
     FFMHelp <- FFMHelp[grepl("Version:", FFMHelp, fixed = TRUE)]
     if (length(FFMHelp) == 1) # should be fine, but fallback to old version just in case...
     {

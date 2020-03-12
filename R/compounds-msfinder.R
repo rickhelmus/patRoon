@@ -110,27 +110,26 @@ readSFD <- function(file)
         
         ret <- unifyMSFNames(ret)
         ret[, formula := candidateFormula]
-        
-        browser()
     })
-    
-    
+
+    return(results)    
 }
 
 readMSFResults <- function(outDir, MATFiles)
 {
     # resDirs <- list.dirs(outDir, recursive = FALSE)
     # resDirs <- resDirs[grepl(tools::file_path_sans_ext(basename(MATFiles)), resDirs, fixed = TRUE)]
-    resDirs <- tools::file_path_sans_ext(MATFiles)
+    resDirs <- setNames(tools::file_path_sans_ext(MATFiles), names(MATFiles))
     resDirs <- resDirs[dir.exists(resDirs)]
     
-    for (rd in resDirs)
+    ret <- sapply(resDirs, function(rd)
     {
-        # find *.sfd files
-        # process with readSFD and merge
-    }
+        sfds <- list.files(rd, pattern = "\\.sfd", full.names = TRUE)
+        rbindlist(lapply(sfds, readSFD))
+    }, simplify = FALSE)
     
-    ret <- rbindlist
+
+    return(ret)    
 }
 
 #' @rdname compound-generation
@@ -187,7 +186,7 @@ generateCompoundsMSFINDER <- function(fGroups, MSPeakLists, adduct = "[M+H]+", e
     #                c("predict", "-i", outDir, "-o", file.path(outDir, "results"), "-m", file.path(outDir, "MSFINDER.INI"))))
     
     # work-around from https://stackoverflow.com/a/50512416
-    withr::with_dir(normalizePath("~/Rproj/MSFINDER-ver-3_30"),
+    withr::with_dir(normalizePath("~/werk/MSFINDER ver 3.30"),
                     shell(sprintf("start cmd /C MsfinderConsoleApp.exe predict -i %s -o %s -m %s",
                                   outDir, file.path(outDir, "results"), file.path(outDir, "MSFINDER.INI"))))
     

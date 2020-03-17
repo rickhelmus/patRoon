@@ -5,13 +5,13 @@
 - convertMSFiles()
     - Agilent .d is also a directory?
 - consistent src file names, split utils?
-- get RAMClustR from CRAN?
 - Update SIRIUS interface for 4.4
 
 
 ## docs
 - improve instructions for MF and SIRIUS installation?
 - update handbook for installation of PCLite & obabel
+- Update handbook/installation instructions for RAMClustR
 
 
 ## features

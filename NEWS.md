@@ -8,6 +8,7 @@
     * If a value is missing in any of the columns from the suspect list used for automatic ion mass calculation (e.g. SMILES, formula, ...) then data from another suitable column is tried.
     * Fixed: invalid neutral mass calculation for suspects with charged SMILES/InChIs 
 * Small compatibility fix for feature finding with OpenMS 2.5 (reported by Thanh Wang)
+* RAMClustR is now supported from CRAN and no need to install girhub package anymore
 
 ## February 2020
 

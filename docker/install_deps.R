@@ -5,7 +5,6 @@ install.packages("devtools")
 BiocManager::install(c("mzR", "xcms", "CAMERA"))
 BiocManager::install(c("Rdisop", "InterpretMSSpectrum")) # need to install these deps manually (why??)
 
-devtools::install_github("cbroeckl/RAMClustR", upgrade_dependencies = FALSE)
 devtools::install_github("rickhelmus/patRoonData", upgrade_dependencies = FALSE)
 install.packages("vdiffr")
 

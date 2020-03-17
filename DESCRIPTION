@@ -67,6 +67,7 @@ Imports:
     shiny,
     templates,
     CAMERA,
+    RAMClustR,
     enviPat,
     nontarget,
     knitr,
@@ -87,7 +88,6 @@ Imports:
 Suggests: 
     RDCOMClient,
     metfRag,
-    RAMClustR,
     testthat,
     rlang,
     vdiffr,

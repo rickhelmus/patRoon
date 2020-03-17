@@ -850,6 +850,10 @@ getMoleculesFromSMILES <- function(SMILES, doTyping = FALSE, doIsotopes = FALSE,
 
 getNeutralMassFromSMILES <- function(SMILES, mustWork = TRUE)
 {
+    # NOTE: molecules are converted to formula to get the mass instead of using
+    # rcdk::get.exact.mass() so that the neutral mass can be obtained
+    getMass <- function(m) rcdk::get.mol2formula(m)@mass
+    
     sapply(getMoleculesFromSMILES(SMILES, doTyping = TRUE, doIsotopes = TRUE), function(m)
     {
         if (!mustWork)
@@ -858,9 +862,9 @@ getNeutralMassFromSMILES <- function(SMILES, mustWork = TRUE)
                 return(NA)
             
             # this could fail for some edge cases
-            return(tryCatch(rcdk::get.exact.mass(m), error = function(e) NA))
+            return(tryCatch(getMass(m), error = function(e) NA))
         }
-        return(rcdk::get.exact.mass(m))
+        return(getMass(m))
     })
 }
 

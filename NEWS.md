@@ -6,6 +6,7 @@
 * Suspect screening
     * Fixed: Errors/Warnings of missing data in suspect list were not shown if using cached data
     * If a value is missing in any of the columns from the suspect list used for automatic ion mass calculation (e.g. SMILES, formula, ...) then data from another suitable column is tried.
+    * Fixed: invalid neutral mass calculation for suspects with charged SMILES/InChIs 
 * Small compatibility fix for feature finding with OpenMS 2.5 (reported by Thanh Wang)
 
 ## February 2020

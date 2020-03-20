@@ -644,12 +644,16 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
                         # fetching trivial names may sometimes fail with connection error, just ignore this for now
                         tryCatch(comptab <<- metfRag::add.trivialname.pubchem(comptab), error = function(e) comptab$TrivialName <<- NA)
                     }
-
+                    
                     comptab <- unFactorDF(comptab)
-                    comptab <- as.data.table(comptab)
+                }
 
-                    procres <- processMFResults(comptab, rd$spec, adduct, database, topMost)
-
+                comptab <- as.data.table(comptab)
+                
+                procres <- processMFResults(comptab, rd$spec, adduct, database, topMost)
+                
+                if (nrow(procres$comptab) > 0)
+                {
                     # BUG: metfRag seems to give second duplicate results where only NoExplPeaks may differ and have an incorrect value.
                     # for now, just remove all duplicates and re-assign NoExplPeaks
                     procres$comptab <- procres$comptab[!duplicated(identifier)]

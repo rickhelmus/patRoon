@@ -23,7 +23,7 @@ void ParseCommandLine(int argc, char *argv[],map<string,string>& mapParamValue)
 	while(--argc>0)
 	{
 		string strArg=*++argv;
-		unsigned int iPos=strArg.find('=');
+	    string::size_type iPos=strArg.find('=');
 		mapParamValue[strArg.substr(0,iPos)]=iPos==string::npos?"":strArg.substr(iPos+1);
 	}
 }

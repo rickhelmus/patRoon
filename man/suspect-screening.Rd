@@ -148,6 +148,10 @@ Both \code{groupFeaturesScreening} and
   feature group names, therefore, it is important that these are
   file-compatible names when \link[=reporting]{reporting data}.
 
+For \code{screenSuspects} in some cases you may need to install
+  \href{http://openbabel.org/wiki/Main_Page}{OpenBabel} (\emph{e.g.} when
+  only InChI data is available for mass calculation).
+
 Please note that \code{groupFeaturesScreening} method can only
   transform the \code{featureGroups} object that was used to obtain the given
   screening results.

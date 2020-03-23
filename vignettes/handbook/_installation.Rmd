@@ -47,18 +47,20 @@ Note that the latter three commands concern installation of _optional_ packages.
 
 ### Other dependencies
 
-Depending on which functionality is used, the following external dependencies may be installed:
+Depending on which functionality is used, the following external dependencies may need to be installed:
 
-Software                         | Remarks
--------------------------------- | -----------------------------------------------------
-[Java JDK][JavaJDK]              | **Mandatory** for e.g. plotting structures and using MetFrag.
-[Rtools]                         | Necessary on Window and when `patRoon` is _not_ installed from `patRoonDeps`.
-[ProteoWizard]                   | Needed for automatic data-pretreatment (e.g. data file conversion and centroiding, Bruker users may use DataAnalysis integration instead).
-[OpenMS]                         | Recommended. Used for e.g. finding and grouping features.
-[MetFrag CL][MetFragCL]          | Recommended. Used for annotation with MetFrag.
-[MetFrag CompTox DB][CompTox-dl] | Database files necessary for usage of the [CompTox] database with MetFrag. Note that a recent version  of MetFrag (>=2.4.5) is required. Note that the lists with additions for [smoking metadata][CompTox-smoke] and [wastewater metadata][CompTox-WW] are also supported.
-[SIRIUS]                         | For formula and/or compound annotation.
-[pngquant]                       | Used to reduce size of HTML reports, definitely optional.
+Software                            | Remarks
+----------------------------------- | -----------------------------------------------------
+[Java JDK][JavaJDK]                 | **Mandatory** for e.g. plotting structures and using MetFrag.
+[Rtools]                            | Necessary on Window and when `patRoon` is _not_ installed from `patRoonDeps`.
+[ProteoWizard]                      | Needed for automatic data-pretreatment (e.g. data file conversion and centroiding, Bruker users may use DataAnalysis integration instead).
+[OpenMS]                            | Recommended. Used for e.g. finding and grouping features.
+[MetFrag CL][MetFragCL]             | Recommended. Used for annotation with MetFrag.
+[MetFrag CompTox DB][CompTox-dl]    | Database files necessary for usage of the [CompTox] database with MetFrag. Note that a recent version  of MetFrag (>=2.4.5) is required. Note that the lists with additions for [smoking metadata][CompTox-smoke] and [wastewater metadata][CompTox-WW] are also supported.
+[MetFrag PubChemLite DB][PCLite-dl] | Database files needed to use PubChemLite with MetFrag (currently tested with tier0 and tier1 November 2019 versions).
+[SIRIUS]                            | For formula and/or compound annotation.
+[OpenBabel]                         | Used in some cases for suspect screening (e.g. to calculate molecular masses for suspects with only InChI information). Otherwise optional.
+[pngquant]                          | Used to reduce size of HTML reports, definitely optional.
 
 After installation you may need to configure the file path to ProteoWizard, OpenMS, SIRIUS, MetFrag, the MetFrag CompTox DB and/or pngquant (normally ProteoWizard and OpenMS should be automatically found). To configure their file locations you should set some global package options with the `options()` R function, for instance:
 
@@ -69,6 +71,8 @@ options(patRoon.path.OpenMS = "/usr/local/bin") # directory with the OpenMS bina
 options(patRoon.path.pngquant = "~/pngquant") # directory containing pngquant binary
 options(patRoon.path.MetFragCL = "~/MetFrag2.4.5-CL.jar") # full location to the jar file
 options(patRoon.path.MetFragCompTox = "C:/CompTox_17March2019_SelectMetaData.csv") # full location to desired CompTox CSV file
+options(patRoon.path.MetFragPubChemLite = "~/PubChemLite_14Jan2020_tier0.csv") # full location to desired PubChemLite CSV file
+options(patRoon.path.obabel = "C:/Program Files/OpenBabel-3.0.0") # directory with OpenBabel binaries
 ```
 
 These commands have to be executed everytime you start a new R session (e.g. as part of your script). However, it is probably easier to add them to your `~/.Rprofile` file so that they are executed automatically when you start R. If you don't have this file yet you can simply create it yourself (for more information see e.g. [this SO answer](https://stackoverflow.com/a/46819910)).

@@ -217,6 +217,7 @@ scr <- screenSuspects(fGroups, suspects, adduct = "[M+H]+")
 fGroupsSusp <- groupFeaturesScreening(fGroups, scr)
 ```
 
+Note that in some cases you may need to install [OpenBabel] (e.g. when only InChI data is available for mass calculation).
 
 ## Annotation
 

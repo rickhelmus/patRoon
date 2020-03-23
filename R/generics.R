@@ -130,6 +130,10 @@ NULL
 #'   \code{\link{data.table}}) with detected suspects and details such as
 #'   retention and \emph{m/z} values. If a suspect is matched on multiple
 #'   features/feature groups then each hit is reported as a separate row.
+#'   
+#' @note For \code{screenSuspects} in some cases you may need to install
+#'   \href{http://openbabel.org/wiki/Main_Page}{OpenBabel} (\emph{e.g.} when
+#'   only InChI data is available for mass calculation).
 #'
 #' @rdname suspect-screening
 setGeneric("screenSuspects", function(obj, suspects, rtWindow = 12, mzWindow = 0.005, adduct = NULL,

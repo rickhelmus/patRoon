@@ -4,8 +4,7 @@
 - test negative subset indices
 - convertMSFiles()
     - Agilent .d is also a directory?
-- consistent src file names, split utils?
-- Update SIRIUS interface for 4.4
+- split exported utils
 
 
 ## docs
@@ -121,6 +120,7 @@
 - fix compoundViewer
 - add new MF HD scorings and make sure default normalization equals that of MF web
 - CFM-ID and MS-FINDER integration
+- Update SIRIUS interface for 4.4
 
 
 ## components

@@ -365,7 +365,7 @@ Database            | Algorithm(s)            | Remarks
 
 #### Configuring MetFrag databases and scoring
 
-Some extra configuration may be necessary when using certain databases with MetFrag. In order to use the ChemSpider database a [security token](http://www.chemspider.com/AboutServices.aspx) should be requested and set with the `chemSpiderToken` argument to `generateCompounds()`. The CompTox and PubChemLite databases need to be manually downloaded from [CompTox][CompTox-dl] (currently only the _SelectMetaData_ and _SelectMetaDataPlus_ databases are supported) and [PUbChemLite][PCLite-dl]. The file location of this and other local databases (`csv`, `psv`, `sdf`) needs to be manually configured, see the examples below and/or `?generateCompounds` for more information on how to do this.
+Some extra configuration may be necessary when using certain databases with MetFrag. In order to use the ChemSpider database a [security token](http://www.chemspider.com/AboutServices.aspx) should be requested and set with the `chemSpiderToken` argument to `generateCompounds()`. The CompTox and PubChemLite databases need to be manually downloaded from [CompTox][CompTox-dl] (or variations with [smoking][CompTox-smoke] or [wastewater][CompTox-WW] metadata) and [PUbChemLite][PCLite-dl]. The file location of this and other local databases (`csv`, `psv`, `sdf`) needs to be manually configured, see the examples below and/or `?generateCompounds` for more information on how to do this.
 
 ```{r compDB,eval=FALSE}
 # PubChem: the default
@@ -376,12 +376,12 @@ compsMF2 <- generateCompounds(fGroups, mslists, "metfrag", database = "chemspide
                               chemSpiderToken = "MY_TOKEN_HERE", adduct = "[M+H]+")
 
 # CompTox: set global option to database path
-options(patRoon.path.MetFragCompTox = "~/DSSTox_01May18_Full_SelectMetaDataPlus.csv")
+options(patRoon.path.MetFragCompTox = "~/CompTox_17March2019_SelectMetaData.csv")
 compsMF3 <- generateCompounds(fGroups, mslists, "metfrag", database = "comptox", adduct = "[M+H]+")
 
 # CompTox: set database location without global option
 compsMF4 <- generateCompounds(fGroups, mslists, "metfrag", database = "comptox", adduct = "[M+H]+",
-                              extraOpts = list(LocalDatabasePath = "~/DSSTox_01May18_Full_SelectMetaDataPlus.csv"))
+                              extraOpts = list(LocalDatabasePath = "~/CompTox_17March2019_SelectMetaData.csv"))
 
 # Same, but for custom database
 compsMF5 <- generateCompounds(fGroups, mslists, "metfrag", database = "csv", adduct = "[M+H]+",

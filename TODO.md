@@ -10,6 +10,7 @@
 - improve instructions for MF and SIRIUS installation?
 - update handbook for installation of PCLite & obabel
 - Update handbook/installation instructions for RAMClustR
+- (Auto) update handbook/tutorial
 
 
 ## features

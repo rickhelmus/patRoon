@@ -387,16 +387,17 @@ before feature groups have been prioritized.
   option (only when \code{database="comptox"} or
   \code{database="pubchemlite"}).
 
-  Examples:
-  \verb{options(patRoon.path.MetFragCompTox = "C:/DSSTox_01May18_Full_SelectMetaDataPlus.csv")}
-  \verb{extraOpts = list(LocalDatabasePath = "C:/myDB.csv")}.
+  Examples: \verb{options(patRoon.path.MetFragCompTox =
+  "C:/CompTox_17March2019_SelectMetaData.csv")} \verb{extraOpts =
+  list(LocalDatabasePath = "C:/myDB.csv")}.
 
-  Note that for \code{database="comptox"} currently only scorings from the
-  \file{SelectMetaData} and \file{SelectMetaDataPlus} files are supported.
-  These files can be obtained from
-  \url{https://epa.figshare.com/articles/CompTox_Chemicals_Dashboard_Metadata_Files_for_Integration_with_MetFrag/7525199}.
-   Note that only recent \command{MetFrag} versions (>= \samp{2.4.5}) support
-  these libraries.
+  For \code{database="comptox"} the files can be obtained from
+  \href{ftp://newftp.epa.gov/COMPTOX/Sustainable_Chemistry_Data/Chemistry_Dashboard/MetFrag_metadata_files}{here}.
+   Furthermore, the files with additions for
+  \href{smoking}{https://zenodo.org/record/3364464#.XnjM-XLvKUk} and
+  \href{wastewater}{https://zenodo.org/record/3472781#.XnjMAHLvKUk} metadata
+  are also supported. Note that only recent \command{MetFrag} versions (>=
+  \samp{2.4.5}) support these libraries.
 }
 
 \references{

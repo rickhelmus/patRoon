@@ -56,7 +56,7 @@ Software                         | Remarks
 [ProteoWizard]                   | Needed for automatic data-pretreatment (e.g. data file conversion and centroiding, Bruker users may use DataAnalysis integration instead).
 [OpenMS]                         | Recommended. Used for e.g. finding and grouping features.
 [MetFrag CL][MetFragCL]          | Recommended. Used for annotation with MetFrag.
-[MetFrag CompTox DB][CompTox-dl] | Database files necessary for usage of the [CompTox] database with MetFrag. Note that currently only scorings from the `SelectMetaData` and `SelectMetaDataPlus` files are supported and a recent version (>=2.4.5) of MetFrag is required.
+[MetFrag CompTox DB][CompTox-dl] | Database files necessary for usage of the [CompTox] database with MetFrag. Note that a recent version  of MetFrag (>=2.4.5) is required. Note that the lists with additions for [smoking metadata][CompTox-smoke] and [wastewater metadata][CompTox-WW] are also supported.
 [SIRIUS]                         | For formula and/or compound annotation.
 [pngquant]                       | Used to reduce size of HTML reports, definitely optional.
 
@@ -68,7 +68,7 @@ options(patRoon.path.SIRIUS = "C:/sirius-win64-3.5.1") # location where SIRIUS w
 options(patRoon.path.OpenMS = "/usr/local/bin") # directory with the OpenMS binaries
 options(patRoon.path.pngquant = "~/pngquant") # directory containing pngquant binary
 options(patRoon.path.MetFragCL = "~/MetFrag2.4.5-CL.jar") # full location to the jar file
-options(patRoon.path.MetFragCompTox = "C:/DSSTox_01May18_Full_SelectMetaDataPlus.csv") # full location to desired CompTox CSV file
+options(patRoon.path.MetFragCompTox = "C:/CompTox_17March2019_SelectMetaData.csv") # full location to desired CompTox CSV file
 ```
 
 These commands have to be executed everytime you start a new R session (e.g. as part of your script). However, it is probably easier to add them to your `~/.Rprofile` file so that they are executed automatically when you start R. If you don't have this file yet you can simply create it yourself (for more information see e.g. [this SO answer](https://stackoverflow.com/a/46819910)).

@@ -40,22 +40,6 @@ mkdirp <- function(path)
     }
 }
 
-insertDFColumn <- function(df, col, d, before)
-{
-    if (before < ncol(df))
-    {
-        ind <- c()
-
-        if (before > 1)
-            ind <- append(ind, 1:(before-1))
-
-        ind <- append(ind, c(ncol(df), before:(ncol(df)-1)))
-        df <- df[, ind]
-    }
-
-    return(df)
-}
-
 insertDTColumn <- function(dt, col, d, before)
 {
     dt <- copy(dt)
@@ -74,25 +58,6 @@ insertDTColumn <- function(dt, col, d, before)
     }
 
     return(dt)
-}
-
-# Fix from R DescTools
-#' Internal fix for \pkg{RDCOMClient}, ignore.
-#' @param ref,className ignore
-#' @keywords internal
-#' @export
-createCOMReference <- function(ref, className)
-{
-    RDCOMClient::createCOMReference(ref, className)
-}
-
-#' Internal fix for \pkg{RDCOMClient}, ignore.
-#' @param ... ignore
-#' @keywords internal
-#' @export
-COMStop <- function(...)
-{
-    RDCOMClient::COMStop(...)
 }
 
 checkPackage <- function(pkg, gh = NULL)
@@ -182,127 +147,6 @@ findPWizPath <- function()
     return(NULL)
 }
 
-# From http://stackoverflow.com/a/30835971
-line2user <- function(line, side)
-{
-    lh <- par('cin')[2] * par('cex') * par('lheight')
-    x_off <- diff(grconvertX(c(0, lh), 'inches', 'npc'))
-    y_off <- diff(grconvertY(c(0, lh), 'inches', 'npc'))
-    switch(side,
-           `1` = grconvertY(-line * y_off, 'npc', 'user'),
-           `2` = grconvertX(-line * x_off, 'npc', 'user'),
-           `3` = grconvertY(1 + line * y_off, 'npc', 'user'),
-           `4` = grconvertX(1 + line * x_off, 'npc', 'user'),
-           stop("Side must be 1, 2, 3, or 4", call.=FALSE))
-}
-
-#' @details \code{generateAnalysisInfo} is an utility function that
-#'   automatically generates an analysis information object. It will collect all
-#'   datafiles from given file paths and convert the filenames into valid
-#'   analysis names (\emph{i.e.} without extensions such as \file{.d} and
-#'   \file{.mzML}). Duplicate analyses, which may appear when datafiles with
-#'   different file extension (\file{.d}, \file{.mzXML} and/or \file{.mzML}) are
-#'   present, will be automatically removed.
-#'
-#' @param paths A character vector containing one or more file paths that should
-#'   be used for finding the analyses.
-#' @param groups,blanks An (optional) character vector containing replicate
-#'   groups and references, respectively (will be recycled). If \code{groups} is
-#'   an empty character string (\code{""}) the analysis name will be set as
-#'   replicate group.
-#' @param concs An optional numeric vector containing concentration values for
-#'   each analysis. Can be \code{NA} if unknown. If the length of \code{concs}
-#'   is less than the number of analyses the remainders will be set to
-#'   \code{NA}. Set to \code{NULL} to not include concentration data.
-#' @param formats A character vector of analyses file types. Valid values are:
-#'   \code{Bruker}, \code{mzXML} and \code{mzML}.
-#'
-#' @rdname analysis-information
-#' @export
-generateAnalysisInfo <- function(paths, groups = "", blanks = "", concs = NULL,
-                                 formats = MSFileFormats())
-{
-    ac <- checkmate::makeAssertCollection()
-    checkmate::assertDirectoryExists(paths, access = "r", add = ac)
-    checkmate::assertCharacter(groups, min.len = 1, add = ac)
-    checkmate::assertCharacter(blanks, min.len = 1, add = ac)
-    checkmate::assertNumeric(concs, finite = TRUE, null.ok = TRUE, add = ac)
-    checkmate::assertSubset(formats, MSFileFormats(), empty.ok = FALSE, add = ac)
-    checkmate::reportAssertions(ac)
-
-    files <- listMSFiles(paths, formats)
-
-    if (length(files) == 0)
-    {
-        warning(sprintf("No analyses found in %s!", paste(paths, collapse = ", ")))
-        return(NULL)
-    }
-
-    ret <- data.frame(path = dirname(files), analysis = simplifyAnalysisNames(files), stringsAsFactors = FALSE)
-    ret <- ret[!duplicated(ret[, c("path", "analysis")]), ]
-
-    # set after duplicate removal
-    groups <- rep(groups, length.out = nrow(ret))
-    ret$group <- ifelse(!nzchar(groups), ret$analysis, groups)
-    ret$blank <- blanks
-
-    if (!is.null(concs))
-    {
-        if (length(concs) >= nrow(ret))
-            ret$conc <- concs[seq_len(nrow(ret))]
-        else
-        {
-            ret$conc <- NA
-            ret$conc[seq_along(concs)] <- concs
-        }
-    }
-
-    return(ret)
-}
-
-#' @details \code{generateAnalysisInfoFromEnviMass} loads analysis information
-#'   from an \pkg{enviMass} project. Note: this funtionality has only been
-#'   tested with older versions of \pkg{enviMass}.
-#'
-#' @param path The path of the enviMass project.
-#'
-#' @rdname analysis-information
-#' @export
-generateAnalysisInfoFromEnviMass <- function(path)
-{
-    checkmate::assertDirectoryExists(path, access = "r")
-
-    enviSInfo <- fread(file.path(path, "dataframes", "measurements"))[Type %in% c("sample", "blank")]
-
-    enviSInfo[, DT := as.POSIXct(paste(Date, Time, sep = " "))]
-    enviSInfo[, group := tag3]
-
-    blanks <- enviSInfo[enviSInfo$Type == "blank", ]
-    if (nrow(blanks) > 0)
-    {
-        blanks[, blank := paste0("blank", match(DT, unique(DT)))] # add unique date+time identifier
-        enviSInfo[, blank := sapply(DT, function(dt)
-        {
-            bls <- blanks[DT <= dt]
-            if (nrow(bls) > 0)
-                return(bls[which.max(bls$DT), blank])
-            else
-                return("")
-        })]
-
-        enviSInfo[Type == "blank", group := blank]
-    }
-    else
-        enviSInfo[, blank := ""]
-
-    enviSInfo[group == "FALSE", group := ""]
-
-    ret <- data.frame(path = file.path(path, "files"), analysis = enviSInfo$ID, group = enviSInfo$group,
-                      blank = enviSInfo$blank, stringsAsFactors = FALSE)
-
-    return(ret)
-}
-
 # based on http://www.cureffi.org/2013/09/23/a-quick-intro-to-chemical-informatics-in-r/
 getRCDKStructurePlot <- function(molecule, width = 500, height = 500, trim = TRUE, transparent = TRUE)
 {
@@ -370,23 +214,7 @@ prepareDTForComparison <- function(dt)
     setindex(dt, NULL)
 }
 
-getCSVStr <- function(df, ...)
-{
-    tcon <- textConnection("ret", "w", TRUE)
-    write.csv(df, tcon, ...)
-    close(tcon)
-    return(paste0(ret, collapse = "\n"))
-}
-
 readAllFile <- function(f) readChar(f, file.size(f))
-
-# NOTE: args converted to list, so sep argument to paste doesn't make sense
-pasteNonEmpty <- function(..., collapse = NULL)
-{
-    strl <- list(...)
-    strl <- as.character(strl[!sapply(strl, is.null)])
-    paste0(strl[nzchar(strl) > 0], collapse = collapse)
-}
 
 getBrewerPal <- function(n, name)
 {
@@ -868,25 +696,6 @@ getNeutralMassFromSMILES <- function(SMILES, mustWork = TRUE)
     })
 }
 
-getMostIntenseAnaWithMSMS <- function(fGroups, MSPeakLists, groupName)
-{
-    gTable <- groups(fGroups)
-    anaInfo <- analysisInfo(fGroups)
-    pLists <- peakLists(MSPeakLists)
-
-    ogind <- order(-gTable[[groupName]])
-    oanalyses <- anaInfo$analysis[ogind] # analyses ordered from highest to lowest intensity
-
-    # filter out analyses without MS/MS
-    oanalyses <- sapply(oanalyses, function(a) if (!is.null(pLists[[a]][[groupName]][["MSMS"]])) a else "", USE.NAMES = FALSE)
-    oanalyses <- oanalyses[oanalyses != ""]
-
-    if (length(oanalyses) < 1)
-        return(NULL)
-
-    return(oanalyses[[1]])
-}
-
 # don't use all.equal here so functions are vectorized
 # NOTE: actually all.equal seems to also take relative
 # tolerances into account and thus may give different results.
@@ -1027,70 +836,6 @@ getAllMethods <- function(gen)
 NULLToZero <- function(x) if (is.null(x)) 0 else x
 zeroToNULL <- function(x) if (is.numeric(x) && x == 0) NULL else x
 
-#' Verifies if all dependencies are installed properly and instructs the user if
-#' this is not the case.
-#' @export
-verifyDependencies <- function()
-{
-    # UNDONE: for now just check one command-line tool of a software package
-    # UNDONE: skip GenForm for now? Should be present as embedded binary.
-
-    OK <- TRUE
-    check <- function(name, path, opt, isDir = FALSE)
-    {
-        pleaseSet <- sprintf("Please set the '%s' option.", opt)
-        printf("Checking %s... ", name)
-        if (is.null(path) || !nzchar(path))
-        {
-            cat("not found or configured.", pleaseSet, "\n")
-            OK <<- FALSE
-        }
-        else if (isDir)
-        {
-            if (!dir.exists(path))
-            {
-                cat("configured directory path does not exist!", pleaseSet, "\n")
-                OK <<- FALSE
-            }
-            else
-                printf("found! (directory '%s')\n", path)
-        }
-        else
-        {
-            # NOTE: dirname point to current path if getCommandWithOptPath() found it in PATH
-            dn <- dirname(path)
-            # if ((nzchar(dn) && dn != "." && !file.exists(path)) || !nzchar(Sys.which(path)))
-            if (nzchar(dn) && dn != "." && !file.exists(path))
-            {
-                cat("configured path does not exist!", pleaseSet, "\n")
-                OK <<- FALSE
-            }
-            else if (nzchar(dn) && dn != ".")
-                printf("found! (in '%s')\n", dn)
-            else
-                cat("found!\n")
-        }
-    }
-
-    check("ProteoWizard", findPWizPath(), "patRoon.path.pwiz", isDir = TRUE)
-    check("OpenMS", getCommandWithOptPath("FeatureFinderMetabo", "OpenMS", verify = FALSE), "patRoon.path.OpenMS")
-    check("pngquant", getCommandWithOptPath("pngquant", "pngquant", verify = FALSE), "patRoon.path.pngquant")
-    check("SIRIUS", getCommandWithOptPath(getSiriusBin(), "SIRIUS", verify = FALSE), "patRoon.path.SIRIUS")
-    check("MetFrag CL", getOption("patRoon.path.MetFragCL"), "patRoon.path.MetFragCL")
-    check("MetFrag CompTox Database", getOption("patRoon.path.MetFragCompTox"), "patRoon.path.MetFragCompTox")
-    check("MetFrag PubChemLite Database", getOption("patRoon.path.MetFragPubChemLite"), "patRoon.path.MetFragPubChemLite")
-    check("OpenBabel", getCommandWithOptPath("obabel", "obabel", verify = FALSE), "patRoon.path.obabel")
-
-    if (!OK)
-        cat("\nSome dependencies were not found. Please make sure that their file locations are configured properly.",
-            "For instance, run the following to set the location of MetFragCL:",
-            sprintf("options(patRoon.path.MetFragCL = \"C:/MetFrag2.4.5-CL.jar\")"),
-            "\nPlease see ?patRoon for more information on how to configure patRoon options.",
-            sep = "\n")
-
-    invisible(NULL)
-}
-
 # From https://stackoverflow.com/a/47955845
 allArgs <- function(origValues = FALSE)
 {
@@ -1130,14 +875,6 @@ openProgBar <- function(min = 0, max, style = 3, ...)
 }
 
 verboseCall <- function(f, a, v) if (v) do.call(f, a) else suppressMessages(invisible(do.call(f, a)))
-
-setListNamesIfPresent <- function(l, o, n)
-{
-    pr <- o %in% names(l)
-    o <- o[pr]; n <- n[pr]
-    names(l)[match(o, names(l))] <- n
-    return(l)
-}
 
 babelConvert <- function(input, inFormat, outFormat, mustWork = TRUE)
 {

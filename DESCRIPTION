@@ -162,6 +162,7 @@ Collate:
     'report.R'
     'utils-checkmate.R'
     'utils-compounds.R'
+    'utils-exported.R'
     'utils-formulas.R'
     'utils-mspeaklists.R'
     'utils-optimize.R'

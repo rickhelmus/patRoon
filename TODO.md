@@ -4,7 +4,7 @@
 - test negative subset indices
 - convertMSFiles()
     - Agilent .d is also a directory?
-- split exported utils
+- split utils.R
 
 
 ## docs

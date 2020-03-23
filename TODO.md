@@ -8,7 +8,6 @@
 
 ## docs
 - improve instructions for MF and SIRIUS installation?
-- Update handbook/installation instructions for RAMClustR
 - (Auto) update handbook/tutorial
 
 

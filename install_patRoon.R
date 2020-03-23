@@ -339,7 +339,7 @@ utils <- setRefClass("utilsInst", methods = list(
         
         packagesCRAN <- packagesNotInstalled(c("installr", "BiocManager", "rJava", "remotes", "pkgbuild"))
         packagesBioC <- packagesNotInstalled(c("mzR", "xcms", "CAMERA"))
-        optPackages <- packagesNotInstalled(c("RDCOMClient", "RAMClustR"))
+        optPackages <- packagesNotInstalled("RDCOMClient")
         mandatoryPackages <- c(packagesCRAN, packagesBioC)
         
         choices <- character()
@@ -347,8 +347,6 @@ utils <- setRefClass("utilsInst", methods = list(
             choices <- c(choices, mandatory = "Only mandatory packages")
         if ("RDCOMClient" %in% optPackages)
             choices <- c(choices, RDCOMClient = "RDCOMClient (required for Bruker DataAnalysis integration)")
-        if ("RAMClustR" %in% optPackages)
-            choices <- c(choices, RAMClustR = "RAMClustR (for componentization and e.g. adduct/isotope annotation)")
         if (length(choices) > 1)
             choices <- c(choices, all = "All")
         else if (length(choices) == 0)
@@ -379,9 +377,6 @@ utils <- setRefClass("utilsInst", methods = list(
         {
             if (any(c("all", "RDCOMClient") %in% instWhat))
                 checkPackages("RDCOMClient", pkgWhere, ask = FALSE, repos = "http://www.omegahat.net/R")
-            
-            if (any(c("all", "RAMClustR") %in% instWhat))
-                checkPackages("RAMClustR", pkgWhere, ask = FALSE, type = "gh", repos = "cbroeckl", build_vignettes = TRUE, dependencies = TRUE)            
         }
     },
     

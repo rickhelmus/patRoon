@@ -36,14 +36,11 @@ BiocManager::install("CAMERA")
 # only needed for Bruker DataAnalysis integration
 install.packages("RDCOMClient", repos = "http://www.omegahat.net/R")
 
-# only needed for RAMClustR integration
-remotes::install_github("cbroeckl/RAMClustR")
-
 # only when using the R interface (not recommended by default)
 remotes::install_github("c-ruttkies/MetFragR/metfRag")
 ```
 
-Note that the latter three commands concern installation of _optional_ packages. If you are unsure, you probably want to install RAMClustR but not any of the others.
+Note that the latter two commands concern installation of _optional_ packages. If you are unsure then you probably don't need them.
 
 ### Other dependencies
 

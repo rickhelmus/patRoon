@@ -69,7 +69,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.9.0.9000</span>
       </span>
     </div>
 
@@ -140,25 +140,46 @@
 
 <span class='fu'>importFeatureGroups</span>(<span class='no'>path</span>, <span class='no'>type</span>, <span class='no'>...</span>)
 
-<span class='fu'>importFeatureGroupsBrukerPA</span>(<span class='no'>path</span>, <span class='no'>feat</span>, <span class='kw'>rtWindow</span> <span class='kw'>=</span> <span class='fl'>12</span>,
-  <span class='kw'>mzWindow</span> <span class='kw'>=</span> <span class='fl'>0.005</span>, <span class='kw'>intWindow</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>warn</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+<span class='fu'>importFeatureGroupsBrukerPA</span>(
+  <span class='no'>path</span>,
+  <span class='no'>feat</span>,
+  <span class='kw'>rtWindow</span> <span class='kw'>=</span> <span class='fl'>12</span>,
+  <span class='kw'>mzWindow</span> <span class='kw'>=</span> <span class='fl'>0.005</span>,
+  <span class='kw'>intWindow</span> <span class='kw'>=</span> <span class='fl'>5</span>,
+  <span class='kw'>warn</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
+)
 
 <span class='fu'>importFeatureGroupsEnviMass</span>(<span class='no'>path</span>, <span class='no'>feat</span>, <span class='no'>positive</span>)
 
-<span class='fu'>groupFeaturesOpenMS</span>(<span class='no'>feat</span>, <span class='kw'>rtalign</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>QT</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>maxAlignRT</span> <span class='kw'>=</span> <span class='fl'>30</span>, <span class='kw'>maxAlignMZ</span> <span class='kw'>=</span> <span class='fl'>0.005</span>, <span class='kw'>maxGroupRT</span> <span class='kw'>=</span> <span class='fl'>12</span>,
-  <span class='kw'>maxGroupMZ</span> <span class='kw'>=</span> <span class='fl'>0.005</span>, <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+<span class='fu'>groupFeaturesOpenMS</span>(
+  <span class='no'>feat</span>,
+  <span class='kw'>rtalign</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>QT</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>maxAlignRT</span> <span class='kw'>=</span> <span class='fl'>30</span>,
+  <span class='kw'>maxAlignMZ</span> <span class='kw'>=</span> <span class='fl'>0.005</span>,
+  <span class='kw'>maxGroupRT</span> <span class='kw'>=</span> <span class='fl'>12</span>,
+  <span class='kw'>maxGroupMZ</span> <span class='kw'>=</span> <span class='fl'>0.005</span>,
+  <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
+)
 
-<span class='fu'>groupFeaturesXCMS</span>(<span class='no'>feat</span>, <span class='kw'>rtalign</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>exportedData</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>groupArgs</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>mzwid</span> <span class='kw'>=</span> <span class='fl'>0.015</span>), <span class='kw'>retcorArgs</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>method</span> <span class='kw'>=</span>
-  <span class='st'>"obiwarp"</span>), <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+<span class='fu'>groupFeaturesXCMS</span>(
+  <span class='no'>feat</span>,
+  <span class='kw'>rtalign</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>exportedData</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>groupArgs</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>mzwid</span> <span class='kw'>=</span> <span class='fl'>0.015</span>),
+  <span class='kw'>retcorArgs</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"obiwarp"</span>),
+  <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
+)
 
 <span class='fu'>importFeatureGroupsXCMS</span>(<span class='no'>xs</span>, <span class='no'>analysisInfo</span>)
 
-<span class='fu'>groupFeaturesXCMS3</span>(<span class='no'>feat</span>, <span class='kw'>rtalign</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>groupParam</span> <span class='kw'>=</span> <span class='kw pkg'>xcms</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/xcms/man/groupChromPeaks-density.html'>PeakDensityParam</a></span>(<span class='kw'>sampleGroups</span> <span class='kw'>=</span>
-  <span class='fu'><a href='generics.html'>analysisInfo</a></span>(<span class='no'>feat</span>)$<span class='no'>group</span>), <span class='kw'>retAlignParam</span> <span class='kw'>=</span> <span class='kw pkg'>xcms</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/xcms/man/adjustRtime-obiwarp.html'>ObiwarpParam</a></span>(),
-  <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+<span class='fu'>groupFeaturesXCMS3</span>(
+  <span class='no'>feat</span>,
+  <span class='kw'>rtalign</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>groupParam</span> <span class='kw'>=</span> <span class='kw pkg'>xcms</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/xcms/man/groupChromPeaks-density.html'>PeakDensityParam</a></span>(<span class='kw'>sampleGroups</span> <span class='kw'>=</span> <span class='fu'><a href='generics.html'>analysisInfo</a></span>(<span class='no'>feat</span>)$<span class='no'>group</span>),
+  <span class='kw'>retAlignParam</span> <span class='kw'>=</span> <span class='kw pkg'>xcms</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/xcms/man/adjustRtime-obiwarp.html'>ObiwarpParam</a></span>(),
+  <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
+)
 
 <span class='fu'>importFeatureGroupsXCMS3</span>(<span class='no'>xdata</span>, <span class='no'>analysisInfo</span>)</pre>
 
@@ -196,9 +217,10 @@ an exported global result table (converted to <code class="file">.csv</code>) an
     </tr>
     <tr>
       <th>type</th>
-      <td><p>The type of data to be imported: <code>brukerpa</code> for Bruker
-ProfileAnalysis, <code>brukertasq</code> for Bruker TASQ or <code>envimass</code> for
-<span class="pkg">enviMass</span>.</p></td>
+      <td><p>Which file type should be imported or exported: <code>"brukerpa"</code>
+(Bruker ProfileAnalysis), <code>"brukertasq"</code> (Bruker TASQ),
+<code>envimass</code> (<span class="pkg">enviMass</span>, only import) or <code>"mzmine"</code> (MZMine,
+only export).</p></td>
     </tr>
     <tr>
       <th>rtWindow, mzWindow, intWindow</th>
@@ -268,10 +290,6 @@ extra parameters to be used by <code><a href='https://rdrr.io/pkg/xcms/man/group
     <tr>
       <th>xdata</th>
       <td><p>An <code>XCMSnExp</code> object.</p></td>
-    </tr>
-    <tr>
-      <th>analysisInfo</th>
-      <td><p>A <code>data.frame</code> with <a href='analysis-information.html'>analysis info</a>.</p></td>
     </tr>
     </table>
 

@@ -69,7 +69,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.9.0.9000</span>
       </span>
     </div>
 
@@ -136,8 +136,7 @@
     </div>
 
     <pre class="usage"><span class='co'># S4 method for featureGroups</span>
-<span class='fu'>comparison</span>(<span class='no'>...</span>, <span class='no'>groupAlgo</span>,
-  <span class='kw'>groupArgs</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>rtalign</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>))
+<span class='fu'>comparison</span>(<span class='no'>...</span>, <span class='no'>groupAlgo</span>, <span class='kw'>groupArgs</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>rtalign</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>))
 
 <span class='co'># S4 method for featureGroupsComparison,ANY</span>
 <span class='fu'><a href='generics.html'>plot</a></span>(<span class='no'>x</span>, <span class='kw'>retMin</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='no'>...</span>)
@@ -149,13 +148,16 @@
 <span class='fu'><a href='generics.html'>plotUpSet</a></span>(<span class='no'>obj</span>, <span class='kw'>which</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)
 
 <span class='co'># S4 method for featureGroupsComparison</span>
-<span class='fu'><a href='generics.html'>plotChord</a></span>(<span class='no'>obj</span>, <span class='kw'>addSelfLinks</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>addRetMzPlots</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='no'>...</span>)
+<span class='fu'><a href='generics.html'>plotChord</a></span>(<span class='no'>obj</span>, <span class='kw'>addSelfLinks</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>addRetMzPlots</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='no'>...</span>)
 
 <span class='co'># S4 method for featureGroupsComparison</span>
-<span class='fu'><a href='generics.html'>consensus</a></span>(<span class='no'>obj</span>,
-  <span class='kw'>absMinAbundance</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>relMinAbundance</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>uniqueFrom</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>uniqueOuter</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
+<span class='fu'><a href='generics.html'>consensus</a></span>(
+  <span class='no'>obj</span>,
+  <span class='kw'>absMinAbundance</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>relMinAbundance</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>uniqueFrom</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>uniqueOuter</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">

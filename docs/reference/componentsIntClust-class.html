@@ -71,7 +71,7 @@ groups." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.9.0.9000</span>
       </span>
     </div>
 
@@ -152,25 +152,33 @@ groups.</p>
 <span class='fu'><a href='generics.html'>treeCut</a></span>(<span class='no'>obj</span>, <span class='kw'>k</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>h</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
 
 <span class='co'># S4 method for componentsIntClust</span>
-<span class='fu'><a href='generics.html'>treeCutDynamic</a></span>(<span class='no'>obj</span>, <span class='no'>maxTreeHeight</span>,
-  <span class='no'>deepSplit</span>, <span class='no'>minModuleSize</span>)
+<span class='fu'><a href='generics.html'>treeCutDynamic</a></span>(<span class='no'>obj</span>, <span class='no'>maxTreeHeight</span>, <span class='no'>deepSplit</span>, <span class='no'>minModuleSize</span>)
 
 <span class='co'># S4 method for componentsIntClust</span>
-<span class='fu'>plotHeatMap</span>(<span class='no'>obj</span>, <span class='kw'>interactive</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>col</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>margins</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>6</span>, <span class='fl'>2</span>), <span class='kw'>cexCol</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='no'>...</span>)
+<span class='fu'>plotHeatMap</span>(
+  <span class='no'>obj</span>,
+  <span class='kw'>interactive</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>col</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>margins</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>6</span>, <span class='fl'>2</span>),
+  <span class='kw'>cexCol</span> <span class='kw'>=</span> <span class='fl'>1</span>,
+  <span class='no'>...</span>
+)
 
 <span class='co'># S4 method for componentsIntClust</span>
-<span class='fu'><a href='generics.html'>plotInt</a></span>(<span class='no'>obj</span>, <span class='no'>index</span>, <span class='kw'>pch</span> <span class='kw'>=</span> <span class='fl'>20</span>,
-  <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"b"</span>, <span class='kw'>lty</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>col</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)
+<span class='fu'><a href='generics.html'>plotInt</a></span>(<span class='no'>obj</span>, <span class='no'>index</span>, <span class='kw'>pch</span> <span class='kw'>=</span> <span class='fl'>20</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"b"</span>, <span class='kw'>lty</span> <span class='kw'>=</span> <span class='fl'>3</span>, <span class='kw'>col</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)
 
 <span class='co'># S4 method for componentsIntClust,ANY</span>
-<span class='fu'><a href='generics.html'>plot</a></span>(<span class='no'>x</span>, <span class='kw'>pal</span> <span class='kw'>=</span> <span class='st'>"Paired"</span>,
-  <span class='kw'>numericLabels</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>colourBranches</span> <span class='kw'>=</span> <span class='fu'><a href='generics.html'>length</a></span>(<span class='no'>x</span>) <span class='kw'>&lt;</span> <span class='fl'>50</span>,
-  <span class='kw'>showLegend</span> <span class='kw'>=</span> <span class='fu'><a href='generics.html'>length</a></span>(<span class='no'>x</span>) <span class='kw'>&lt;</span> <span class='fl'>20</span>, <span class='no'>...</span>)
+<span class='fu'><a href='generics.html'>plot</a></span>(
+  <span class='no'>x</span>,
+  <span class='kw'>pal</span> <span class='kw'>=</span> <span class='st'>"Paired"</span>,
+  <span class='kw'>numericLabels</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>colourBranches</span> <span class='kw'>=</span> <span class='fu'><a href='generics.html'>length</a></span>(<span class='no'>x</span>) <span class='kw'>&lt;</span> <span class='fl'>50</span>,
+  <span class='kw'>showLegend</span> <span class='kw'>=</span> <span class='fu'><a href='generics.html'>length</a></span>(<span class='no'>x</span>) <span class='kw'>&lt;</span> <span class='fl'>20</span>,
+  <span class='no'>...</span>
+)
 
 <span class='co'># S4 method for componentsIntClust</span>
-<span class='fu'>plotSilhouettes</span>(<span class='no'>obj</span>, <span class='no'>kSeq</span>, <span class='kw'>pch</span> <span class='kw'>=</span> <span class='fl'>16</span>,
-  <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"b"</span>, <span class='no'>...</span>)</pre>
+<span class='fu'><a href='generics.html'>plotSilhouettes</a></span>(<span class='no'>obj</span>, <span class='no'>kSeq</span>, <span class='kw'>pch</span> <span class='kw'>=</span> <span class='fl'>16</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"b"</span>, <span class='no'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -192,6 +200,11 @@ Analogous to <code><a href='https://rdrr.io/r/stats/cutree.html'>cutree</a></cod
 <code>d3heatmap</code>).</p></td>
     </tr>
     <tr>
+      <th>col</th>
+      <td><p>The colour used for plotting. Set to <code>NULL</code> for automatic
+colours.</p></td>
+    </tr>
+    <tr>
       <th>margins, cexCol</th>
       <td><p>Passed to <code>heatmap.2</code></p></td>
     </tr>
@@ -208,6 +221,10 @@ Analogous to <code><a href='https://rdrr.io/r/stats/cutree.html'>cutree</a></cod
     <tr>
       <th>pch, type</th>
       <td><p>Passed to <code><a href='https://rdrr.io/r/graphics/plot.html'>plot</a></code>.</p></td>
+    </tr>
+    <tr>
+      <th>lty</th>
+      <td><p>Passed to <code><a href='https://rdrr.io/r/graphics/lines.html'>lines</a></code>.</p></td>
     </tr>
     <tr>
       <th>x, obj</th>

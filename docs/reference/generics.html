@@ -72,7 +72,7 @@ please refer to the linked method documentation for each generic." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.9.0.9000</span>
       </span>
     </div>
 
@@ -175,6 +175,8 @@ please refer to the linked method documentation for each generic.</p>
 
 <span class='fu'>plotScores</span>(<span class='no'>obj</span>, <span class='no'>...</span>)
 
+<span class='fu'>plotSilhouettes</span>(<span class='no'>obj</span>, <span class='no'>kSeq</span>, <span class='no'>...</span>)
+
 <span class='fu'>plotSpec</span>(<span class='no'>obj</span>, <span class='no'>...</span>)
 
 <span class='fu'>plotStructure</span>(<span class='no'>obj</span>, <span class='no'>...</span>)
@@ -187,8 +189,13 @@ please refer to the linked method documentation for each generic.</p>
 
 <span class='fu'>treeCut</span>(<span class='no'>obj</span>, <span class='kw'>k</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>h</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)
 
-<span class='fu'>treeCutDynamic</span>(<span class='no'>obj</span>, <span class='kw'>maxTreeHeight</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>deepSplit</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>minModuleSize</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='no'>...</span>)</pre>
+<span class='fu'>treeCutDynamic</span>(
+  <span class='no'>obj</span>,
+  <span class='kw'>maxTreeHeight</span> <span class='kw'>=</span> <span class='fl'>1</span>,
+  <span class='kw'>deepSplit</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>minModuleSize</span> <span class='kw'>=</span> <span class='fl'>1</span>,
+  <span class='no'>...</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -213,6 +220,11 @@ represent non-shared data.</p></td>
 retention time scatter plots.</p></td>
     </tr>
     <tr>
+      <th>kSeq</th>
+      <td><p>An integer vector containing the sequence that should be used for
+average silhouette width calculation.</p></td>
+    </tr>
+    <tr>
       <th>k, h</th>
       <td><p>Desired numbers of clusters. See <code><a href='https://rdrr.io/r/stats/cutree.html'>cutree</a></code>.</p></td>
     </tr>
@@ -227,7 +239,7 @@ retention time scatter plots.</p></td>
 
     <p><code>algorithm</code> returns the algorithm that was used to generate the object.</p>
 <ul>
-<li><p>Methods are defined for: <code><a href='components-class.html'>components</a></code>; <code><a href='compounds-class.html'>compounds</a></code>; <code><a href='formulas-class.html'>formulas</a></code>; <code><a href='optimizationResult-class.html'>optimizationResult</a></code>; <code><a href='workflowStep-class.html'>workflowStep</a></code>.</p></li>
+<li><p>Methods are defined for: <code><a href='compounds-class.html'>compounds</a></code>; <code><a href='formulas-class.html'>formulas</a></code>; <code><a href='optimizationResult-class.html'>optimizationResult</a></code>; <code><a href='workflowStep-class.html'>workflowStep</a></code>.</p></li>
 </ul>
 
 <p><code>analysisInfo</code> returns the <a href='analysis-information.html'>analysis information</a> from an object.</p>
@@ -308,6 +320,11 @@ retention time scatter plots.</p></td>
 <p><code>plotScores</code> plots candidate scorings.</p>
 <ul>
 <li><p>Methods are defined for: <code><a href='compounds-class.html'>compounds</a></code>; <code><a href='formulas-class.html'>formulas</a></code>.</p></li>
+</ul>
+
+<p><code>plotSilhouettes</code> plots silhouette widths to evaluate the desired cluster size.</p>
+<ul>
+<li><p>Methods are defined for: <code><a href='componentsIntClust-class.html'>componentsIntClust</a></code>; <code><a href='compoundsCluster-class.html'>compoundsCluster</a></code>.</p></li>
 </ul>
 
 <p><code>plotSpec</code> plots a (annotated) spectrum.</p>

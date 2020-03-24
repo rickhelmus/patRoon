@@ -69,7 +69,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.9.0.9000</span>
       </span>
     </div>
 
@@ -135,12 +135,20 @@
     <p>Execute a queue of system commands in parallel.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>executeMultiProcess</span>(<span class='no'>commandQueue</span>, <span class='no'>finishHandler</span>,
+    <pre class="usage"><span class='fu'>executeMultiProcess</span>(
+  <span class='no'>commandQueue</span>,
+  <span class='no'>finishHandler</span>,
   <span class='kw'>timeoutHandler</span> <span class='kw'>=</span> <span class='kw'>function</span>(<span class='no'>...</span>) <span class='fl'>TRUE</span>,
-  <span class='kw'>errorHandler</span> <span class='kw'>=</span> <span class='no'>defMultiProcErrorHandler</span>, <span class='kw'>procTimeout</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>printOutput</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>printError</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>showProgress</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>waitTimeout</span> <span class='kw'>=</span> <span class='fl'>50</span>, <span class='kw'>maxProcAmount</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"patRoon.maxProcAmount"</span>),
-  <span class='kw'>batchSize</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>delayBetweenProc</span> <span class='kw'>=</span> <span class='fl'>0</span>)</pre>
+  <span class='kw'>errorHandler</span> <span class='kw'>=</span> <span class='no'>defMultiProcErrorHandler</span>,
+  <span class='kw'>procTimeout</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>printOutput</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>printError</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>showProgress</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>waitTimeout</span> <span class='kw'>=</span> <span class='fl'>50</span>,
+  <span class='kw'>maxProcAmount</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"patRoon.maxProcAmount"</span>),
+  <span class='kw'>batchSize</span> <span class='kw'>=</span> <span class='fl'>1</span>,
+  <span class='kw'>delayBetweenProc</span> <span class='kw'>=</span> <span class='fl'>0</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">

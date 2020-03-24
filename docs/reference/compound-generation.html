@@ -70,7 +70,7 @@ groups." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.9.0.9000</span>
       </span>
     </div>
 
@@ -138,32 +138,60 @@ groups.</p>
     </div>
 
     <pre class="usage"><span class='co'># S4 method for featureGroups</span>
-<span class='fu'>generateCompounds</span>(<span class='no'>fGroups</span>, <span class='no'>MSPeakLists</span>,
-  <span class='no'>algorithm</span>, <span class='no'>...</span>)
+<span class='fu'>generateCompounds</span>(<span class='no'>fGroups</span>, <span class='no'>MSPeakLists</span>, <span class='no'>algorithm</span>, <span class='no'>...</span>)
 
-<span class='fu'>generateCompoundsMetfrag</span>(<span class='no'>fGroups</span>, <span class='no'>MSPeakLists</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"CL"</span>,
-  <span class='kw'>logPath</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='st'>"log"</span>, <span class='st'>"metfrag"</span>), <span class='kw'>timeout</span> <span class='kw'>=</span> <span class='fl'>300</span>,
-  <span class='kw'>timeoutRetries</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>errorRetries</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>topMost</span> <span class='kw'>=</span> <span class='fl'>100</span>,
-  <span class='kw'>dbRelMzDev</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>fragRelMzDev</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>fragAbsMzDev</span> <span class='kw'>=</span> <span class='fl'>0.002</span>, <span class='no'>adduct</span>,
-  <span class='kw'>database</span> <span class='kw'>=</span> <span class='st'>"pubchem"</span>, <span class='kw'>extendedPubChem</span> <span class='kw'>=</span> <span class='st'>"auto"</span>,
-  <span class='kw'>chemSpiderToken</span> <span class='kw'>=</span> <span class='st'>""</span>, <span class='kw'>scoreTypes</span> <span class='kw'>=</span> <span class='fu'>compoundScorings</span>(<span class='st'>"metfrag"</span>,
-  <span class='no'>database</span>, <span class='kw'>onlyDefault</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)$<span class='no'>name</span>, <span class='kw'>scoreWeights</span> <span class='kw'>=</span> <span class='fl'>1</span>,
+<span class='fu'>generateCompoundsMetfrag</span>(
+  <span class='no'>fGroups</span>,
+  <span class='no'>MSPeakLists</span>,
+  <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"CL"</span>,
+  <span class='kw'>logPath</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='st'>"log"</span>, <span class='st'>"metfrag"</span>),
+  <span class='kw'>timeout</span> <span class='kw'>=</span> <span class='fl'>300</span>,
+  <span class='kw'>timeoutRetries</span> <span class='kw'>=</span> <span class='fl'>2</span>,
+  <span class='kw'>errorRetries</span> <span class='kw'>=</span> <span class='fl'>2</span>,
+  <span class='kw'>topMost</span> <span class='kw'>=</span> <span class='fl'>100</span>,
+  <span class='kw'>dbRelMzDev</span> <span class='kw'>=</span> <span class='fl'>5</span>,
+  <span class='kw'>fragRelMzDev</span> <span class='kw'>=</span> <span class='fl'>5</span>,
+  <span class='kw'>fragAbsMzDev</span> <span class='kw'>=</span> <span class='fl'>0.002</span>,
+  <span class='no'>adduct</span>,
+  <span class='kw'>database</span> <span class='kw'>=</span> <span class='st'>"pubchem"</span>,
+  <span class='kw'>extendedPubChem</span> <span class='kw'>=</span> <span class='st'>"auto"</span>,
+  <span class='kw'>chemSpiderToken</span> <span class='kw'>=</span> <span class='st'>""</span>,
+  <span class='kw'>scoreTypes</span> <span class='kw'>=</span> <span class='fu'>compoundScorings</span>(<span class='st'>"metfrag"</span>, <span class='no'>database</span>, <span class='kw'>onlyDefault</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)$<span class='no'>name</span>,
+  <span class='kw'>scoreWeights</span> <span class='kw'>=</span> <span class='fl'>1</span>,
   <span class='kw'>preProcessingFilters</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"UnconnectedCompoundFilter"</span>, <span class='st'>"IsotopeFilter"</span>),
   <span class='kw'>postProcessingFilters</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"InChIKeyFilter"</span>),
-  <span class='kw'>maxCandidatesToStop</span> <span class='kw'>=</span> <span class='fl'>2500</span>, <span class='kw'>addTrivialNames</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>identifiers</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>extraOpts</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>maxProcAmount</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"patRoon.maxProcAmount"</span>))
+  <span class='kw'>maxCandidatesToStop</span> <span class='kw'>=</span> <span class='fl'>2500</span>,
+  <span class='kw'>addTrivialNames</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>identifiers</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>extraOpts</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>maxProcAmount</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"patRoon.maxProcAmount"</span>)
+)
 
-<span class='fu'>generateCompoundsSirius</span>(<span class='no'>fGroups</span>, <span class='no'>MSPeakLists</span>, <span class='kw'>relMzDev</span> <span class='kw'>=</span> <span class='fl'>5</span>,
-  <span class='kw'>adduct</span> <span class='kw'>=</span> <span class='st'>"[M+H]+"</span>, <span class='kw'>elements</span> <span class='kw'>=</span> <span class='st'>"CHNOP"</span>, <span class='kw'>profile</span> <span class='kw'>=</span> <span class='st'>"qtof"</span>,
-  <span class='kw'>formulaDatabase</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>fingerIDDatabase</span> <span class='kw'>=</span> <span class='st'>"pubchem"</span>, <span class='kw'>noise</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>errorRetries</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>topMost</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='kw'>topMostFormulas</span> <span class='kw'>=</span> <span class='fl'>5</span>,
-  <span class='kw'>extraOpts</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>logPath</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='st'>"log"</span>, <span class='st'>"sirius"</span>),
-  <span class='kw'>maxProcAmount</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"patRoon.maxProcAmount"</span>))
+<span class='fu'>generateCompoundsSirius</span>(
+  <span class='no'>fGroups</span>,
+  <span class='no'>MSPeakLists</span>,
+  <span class='kw'>relMzDev</span> <span class='kw'>=</span> <span class='fl'>5</span>,
+  <span class='kw'>adduct</span> <span class='kw'>=</span> <span class='st'>"[M+H]+"</span>,
+  <span class='kw'>elements</span> <span class='kw'>=</span> <span class='st'>"CHNOP"</span>,
+  <span class='kw'>profile</span> <span class='kw'>=</span> <span class='st'>"qtof"</span>,
+  <span class='kw'>formulaDatabase</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>fingerIDDatabase</span> <span class='kw'>=</span> <span class='st'>"pubchem"</span>,
+  <span class='kw'>noise</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>errorRetries</span> <span class='kw'>=</span> <span class='fl'>2</span>,
+  <span class='kw'>topMost</span> <span class='kw'>=</span> <span class='fl'>100</span>,
+  <span class='kw'>topMostFormulas</span> <span class='kw'>=</span> <span class='fl'>5</span>,
+  <span class='kw'>extraOpts</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>logPath</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='st'>"log"</span>, <span class='st'>"sirius"</span>),
+  <span class='kw'>maxProcAmount</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"patRoon.maxProcAmount"</span>)
+)
 
-<span class='fu'>compoundScorings</span>(<span class='kw'>algorithm</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>database</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>includeSuspectLists</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>onlyDefault</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>includeNoDB</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
+<span class='fu'>compoundScorings</span>(
+  <span class='kw'>algorithm</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>database</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>includeSuspectLists</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>onlyDefault</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>includeNoDB</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -249,9 +277,10 @@ converted to it with <code><a href='adduct-utils.html'>as.adduct</a></code>). Ex
     <tr>
       <th>database</th>
       <td><p>Compound database to use. Valid values are: <code>"pubchem"</code>,
-<code>"chemspider"</code>, <code>"for-ident"</code>, <code>"toxcast"</code>, <code>"kegg"</code>,
-<code>"sdf"</code>, <code>"psv"</code> and <code>"csv"</code>. See section below for more
-information. Sets the <code>MetFragDatabaseType</code> option.</p></td>
+<code>"chemspider"</code>, <code>"for-ident"</code>, <code>"comptox"</code>,
+<code>"pubchemlite"</code>, <code>"kegg"</code>, <code>"sdf"</code>, <code>"psv"</code> and
+<code>"csv"</code>. See section below for more information. Sets the
+<code>MetFragDatabaseType</code> option.</p></td>
     </tr>
     <tr>
       <th>extendedPubChem</th>
@@ -465,9 +494,11 @@ before feature groups have been prioritized.</p>
 <tr><td>metFusionScore</td><td>OfflineMetFusionScore</td><td></td></tr>
 <tr><td>individualMoNAScore</td><td>OfflineIndividualMoNAScore</td><td></td></tr>
 <tr><td>numberPatents</td><td>PubChemNumberPatents</td><td>pubchem</td></tr>
+<tr><td>numberPatents</td><td>Patent_Count</td><td>pubchemlite</td></tr>
 <tr><td>pubMedReferences</td><td>PubChemNumberPubMedReferences</td><td>pubchem</td></tr>
 <tr><td>pubMedReferences</td><td>ChemSpiderNumberPubMedReferences</td><td>chemspider</td></tr>
 <tr><td>pubMedReferences</td><td>NUMBER_OF_PUBMED_ARTICLES</td><td>comptox</td></tr>
+<tr><td>pubMedReferences</td><td>PubMed_Count</td><td>pubchemlite</td></tr>
 <tr><td>extReferenceCount</td><td>ChemSpiderNumberExternalReferences</td><td>chemspider</td></tr>
 <tr><td>dataSourceCount</td><td>ChemSpiderDataSourceCount</td><td>chemspider</td></tr>
 <tr><td>referenceCount</td><td>ChemSpiderReferenceCount</td><td>chemspider</td></tr>
@@ -486,8 +517,36 @@ before feature groups have been prioritized.</p>
 <tr><td>MASSBANKEU</td><td>MASSBANKEU</td><td>comptox</td></tr>
 <tr><td>TOX21SL</td><td>TOX21SL</td><td>comptox</td></tr>
 <tr><td>TOXCAST</td><td>TOXCAST</td><td>comptox</td></tr>
+<tr><td>KEMIMARKET</td><td>KEMIMARKET</td><td>comptox</td></tr>
+<tr><td>MZCLOUD</td><td>MZCLOUD</td><td>comptox</td></tr>
+<tr><td>pubMedNeuro</td><td>PubMedNeuro</td><td>comptox</td></tr>
+<tr><td>CIGARETTES</td><td>CIGARETTES</td><td>comptox</td></tr>
+<tr><td>INDOORCT16</td><td>INDOORCT16</td><td>comptox</td></tr>
+<tr><td>SRM2585DUST</td><td>SRM2585DUST</td><td>comptox</td></tr>
+<tr><td>SLTCHEMDB</td><td>SLTCHEMDB</td><td>comptox</td></tr>
+<tr><td>THSMOKE</td><td>THSMOKE</td><td>comptox</td></tr>
+<tr><td>ITNANTIBIOTIC</td><td>ITNANTIBIOTIC</td><td>comptox</td></tr>
+<tr><td>STOFFIDENT</td><td>STOFFIDENT</td><td>comptox</td></tr>
+<tr><td>KEMIMARKET_EXPO</td><td>KEMIMARKET_EXPO</td><td>comptox</td></tr>
+<tr><td>KEMIMARKET_HAZ</td><td>KEMIMARKET_HAZ</td><td>comptox</td></tr>
+<tr><td>REACH2017</td><td>REACH2017</td><td>comptox</td></tr>
+<tr><td>KEMIWW_WDUIndex</td><td>KEMIWW_WDUIndex</td><td>comptox</td></tr>
+<tr><td>KEMIWW_StpSE</td><td>KEMIWW_StpSE</td><td>comptox</td></tr>
+<tr><td>KEMIWW_SEHitsOverDL</td><td>KEMIWW_SEHitsOverDL</td><td>comptox</td></tr>
+<tr><td>ZINC15PHARMA</td><td>ZINC15PHARMA</td><td>comptox</td></tr>
+<tr><td>PFASMASTER</td><td>PFASMASTER</td><td>comptox</td></tr>
 <tr><td>peakFingerprintScore</td><td>AutomatedPeakFingerprintAnnotationScore</td><td></td></tr>
 <tr><td>lossFingerprintScore</td><td>AutomatedLossFingerprintAnnotationScore</td><td></td></tr>
+<tr><td>agroChemInfo</td><td>AgroChemInfo</td><td>pubchemlite</td></tr>
+<tr><td>bioPathway</td><td>BioPathway</td><td>pubchemlite</td></tr>
+<tr><td>drugMedicInfo</td><td>DrugMedicInfo</td><td>pubchemlite</td></tr>
+<tr><td>foodRelated</td><td>FoodRelated</td><td>pubchemlite</td></tr>
+<tr><td>pharmacoInfo</td><td>PharmacoInfo</td><td>pubchemlite</td></tr>
+<tr><td>safetyInfo</td><td>SafetyInfo</td><td>pubchemlite</td></tr>
+<tr><td>toxicityInfo</td><td>ToxicityInfo</td><td>pubchemlite</td></tr>
+<tr><td>knownUse</td><td>KnownUse</td><td>pubchemlite</td></tr>
+<tr><td>annoTypeCount</td><td>FPSum</td><td>pubchemlite</td></tr>
+<tr><td>annoTypeCount</td><td>AnnoTypeCount</td><td>pubchemlite</td></tr>
 </table>
 
 
@@ -505,19 +564,22 @@ before feature groups have been prioritized.</p>
     <p>When <code>database="chemspider"</code>
   setting the <code>chemSpiderToken</code> argument is mandatory.</p>
 <p>When a local database is set (<em>i.e.</em> <code>sdf</code>, <code>psv</code>,
-  <code>csv</code>, <code>comptox</code>) the file location of the database should be set
-  in the <code>LocalDatabasePath</code> value via the <code>extraOpts</code> argument or
-  using the <code>patRoon.path.MetFragCompTox</code> option (only when
-  <code>database="comptox"</code>).</p>
-<p>Examples:
-  <code>options(patRoon.path.MetFragCompTox = "C:/DSSTox_01May18_Full_SelectMetaDataPlus.csv")</code>
-  <code>extraOpts = list(LocalDatabasePath = "C:/myDB.csv")</code>.</p>
-<p>Note that for <code>database="comptox"</code> currently only scorings from the
-  <code class="file">SelectMetaData</code> and <code class="file">SelectMetaDataPlus</code> files are supported.
-  These files can be obtained from
-  <a href='https://epa.figshare.com/articles/CompTox_Chemicals_Dashboard_Metadata_Files_for_Integration_with_MetFrag/7525199'>https://epa.figshare.com/articles/CompTox_Chemicals_Dashboard_Metadata_Files_for_Integration_with_MetFrag/7525199</a>.
-   Note that only recent <code class='command'>MetFrag</code> versions (&gt;= <samp>2.4.5</samp>) support
-  these libraries.</p>
+  <code>csv</code>, <code>comptox</code>, <code>pubchemlite</code>) the file location of the
+  database should be set in the <code>LocalDatabasePath</code> value via the
+  <code>extraOpts</code> argument or using the
+  <code>patRoon.path.MetFragCompTox</code>/<code>patRoon.path.MetFragPubChemLite</code>
+  option (only when <code>database="comptox"</code> or
+  <code>database="pubchemlite"</code>).</p>
+<p>Examples: <code>options(patRoon.path.MetFragCompTox =
+  "C:/CompTox_17March2019_SelectMetaData.csv")</code> <code>extraOpts =
+  list(LocalDatabasePath = "C:/myDB.csv")</code>.</p>
+<p>For <code>database="comptox"</code> the files can be obtained from
+  <a href='ftp://newftp.epa.gov/COMPTOX/Sustainable_Chemistry_Data/Chemistry_Dashboard/MetFrag_metadata_files'>here</a>.
+   Furthermore, the files with additions for
+  <a href='smoking'>https://zenodo.org/record/3364464#.XnjM-XLvKUk</a> and
+  <a href='wastewater'>https://zenodo.org/record/3472781#.XnjMAHLvKUk</a> metadata
+  are also supported. Note that only recent <code class='command'>MetFrag</code> versions (&gt;=
+  <samp>2.4.5</samp>) support these libraries.</p>
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
     <p>Ruttkies C, Schymanski EL, Wolf S, Hollender J, Neumann S (2016).

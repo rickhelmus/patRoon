@@ -69,7 +69,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.9.0.9000</span>
       </span>
     </div>
 
@@ -137,12 +137,21 @@
 
     <pre class="usage"><span class='fu'>MSFileFormats</span>(<span class='kw'>algorithm</span> <span class='kw'>=</span> <span class='st'>"pwiz"</span>, <span class='kw'>vendor</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
 
-<span class='fu'>convertMSFiles</span>(<span class='kw'>files</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>outPath</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>dirs</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>anaInfo</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>from</span> <span class='kw'>=</span> <span class='fu'>MSFileFormats</span>(<span class='no'>algorithm</span>, <span class='kw'>vendor</span> <span class='kw'>=</span> <span class='no'>algorithm</span> <span class='kw'>!=</span>
-  <span class='st'>"openms"</span>), <span class='kw'>to</span> <span class='kw'>=</span> <span class='st'>"mzML"</span>, <span class='kw'>overWrite</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>algorithm</span> <span class='kw'>=</span> <span class='st'>"pwiz"</span>,
-  <span class='kw'>centroid</span> <span class='kw'>=</span> <span class='no'>algorithm</span> <span class='kw'>!=</span> <span class='st'>"openms"</span>, <span class='kw'>filters</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>extraOpts</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+<span class='fu'>convertMSFiles</span>(
+  <span class='kw'>files</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>outPath</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>dirs</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>anaInfo</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>from</span> <span class='kw'>=</span> <span class='fu'>MSFileFormats</span>(<span class='no'>algorithm</span>, <span class='kw'>vendor</span> <span class='kw'>=</span> <span class='no'>algorithm</span> <span class='kw'>!=</span> <span class='st'>"openms"</span>),
+  <span class='kw'>to</span> <span class='kw'>=</span> <span class='st'>"mzML"</span>,
+  <span class='kw'>overWrite</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>algorithm</span> <span class='kw'>=</span> <span class='st'>"pwiz"</span>,
+  <span class='kw'>centroid</span> <span class='kw'>=</span> <span class='no'>algorithm</span> <span class='kw'>!=</span> <span class='st'>"openms"</span>,
+  <span class='kw'>filters</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>extraOpts</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>logPath</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='st'>"log"</span>, <span class='st'>"convert"</span>),
-  <span class='kw'>maxProcAmount</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"patRoon.maxProcAmount"</span>))</pre>
+  <span class='kw'>maxProcAmount</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"patRoon.maxProcAmount"</span>)
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -280,7 +289,7 @@ doi: <a href='https://doi.org/10.1038/nbt.2377'>10.1038/nbt.2377</a>
 , <a href='https://doi.org/10.1038/nbt.2377'>https://doi.org/10.1038/nbt.2377</a>.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
+    <pre class="examples"><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
 <span class='co'># Use FileConverter of OpenMS to convert between open mzXML/mzML format</span>
 <span class='fu'>convertMSFiles</span>(<span class='st'>"standard-1.mzXML"</span>, <span class='kw'>to</span> <span class='kw'>=</span> <span class='st'>"mzML"</span>, <span class='kw'>algorithm</span> <span class='kw'>=</span> <span class='st'>"openms"</span>)
 
@@ -289,7 +298,7 @@ doi: <a href='https://doi.org/10.1038/nbt.2377'>10.1038/nbt.2377</a>
 <span class='co'># the peakPicking filter and only MS 1 data is kept.</span>
 <span class='fu'>convertMSFiles</span>(<span class='st'>"analyses/raw"</span>, <span class='st'>"analyses/mzml"</span>, <span class='kw'>dirs</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>from</span> <span class='kw'>=</span> <span class='st'>"thermo"</span>,
                <span class='kw'>centroid</span> <span class='kw'>=</span> <span class='st'>"vendor"</span>, <span class='kw'>filters</span> <span class='kw'>=</span> <span class='st'>"msLevel 1"</span>)
-}</div></pre>
+}</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<html lang="" xml:lang="">
 <head>
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>4.2 Features | patRoon handbook</title>
   <meta name="description" content="4.2 Features | patRoon handbook" />
-  <meta name="generator" content="bookdown 0.13 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.18 and GitBook 2.6.7" />
 
   <meta property="og:title" content="4.2 Features | patRoon handbook" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2019-10-12" />
+<meta name="date" content="2020-03-24" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -40,6 +40,7 @@
 <link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
 
 
 
@@ -47,11 +48,16 @@
 
 
 
-<script src="libs/htmlwidgets-1.3/htmlwidgets.js"></script>
-<script src="libs/viz-0.3/viz.js"></script>
+
+
+<script src="libs/htmlwidgets-1.5.1/htmlwidgets.js"></script>
+<script src="libs/viz-1.8.2/viz.js"></script>
 <link href="libs/DiagrammeR-styles-0.2/styles.css" rel="stylesheet" />
-<script src="libs/grViz-binding-1.0.1/grViz.js"></script>
+<script src="libs/grViz-binding-1.0.5/grViz.js"></script>
 <script src="libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="libs/vis-4.20.1/vis.css" rel="stylesheet" />
+<script src="libs/vis-4.20.1/vis.min.js"></script>
+<script src="libs/visNetwork-binding-2.0.9/visNetwork.js"></script>
 <script src="libs/d3-3.5.3/./d3.min.js"></script>
 <link href="libs/d3heatmapcore-0.0.0/heatmapcore.css" rel="stylesheet" />
 <script src="libs/d3heatmapcore-0.0.0/heatmapcore.js"></script>
@@ -178,7 +184,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="chapter" data-level="5.4" data-path="unOv.html"><a href="unOv.html"><i class="fa fa-check"></i><b>5.4</b> Unique and overlapping features</a></li>
 <li class="chapter" data-level="5.5" data-path="visualization.html"><a href="visualization.html"><i class="fa fa-check"></i><b>5.5</b> Visualization</a><ul>
-<li class="chapter" data-level="5.5.1" data-path="visualization.html"><a href="visualization.html#features-and-annatation-data"><i class="fa fa-check"></i><b>5.5.1</b> Features and annatation data</a></li>
+<li class="chapter" data-level="5.5.1" data-path="visualization.html"><a href="visualization.html#vis_feat_ann"><i class="fa fa-check"></i><b>5.5.1</b> Features and annatation data</a></li>
 <li class="chapter" data-level="5.5.2" data-path="visualization.html"><a href="visualization.html#visComp"><i class="fa fa-check"></i><b>5.5.2</b> Comparing data</a></li>
 <li class="chapter" data-level="5.5.3" data-path="visualization.html"><a href="visualization.html#plotClust"><i class="fa fa-check"></i><b>5.5.3</b> Hierarchical clustering results</a></li>
 <li class="chapter" data-level="5.5.4" data-path="visualization.html"><a href="visualization.html#interactive-plotting-of-chromatography-data"><i class="fa fa-check"></i><b>5.5.4</b> Interactive plotting of chromatography data</a></li>
@@ -195,8 +201,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="6.3" data-path="exporting-and-converting-feature-data.html"><a href="exporting-and-converting-feature-data.html"><i class="fa fa-check"></i><b>6.3</b> Exporting and converting feature data</a></li>
 <li class="chapter" data-level="6.4" data-path="consensus.html"><a href="consensus.html"><i class="fa fa-check"></i><b>6.4</b> Algorithm consensus</a></li>
 <li class="chapter" data-level="6.5" data-path="compclust.html"><a href="compclust.html"><i class="fa fa-check"></i><b>6.5</b> Compound clustering</a></li>
-<li class="chapter" data-level="6.6" data-path="caching.html"><a href="caching.html"><i class="fa fa-check"></i><b>6.6</b> Caching</a></li>
-<li class="chapter" data-level="6.7" data-path="parallelization.html"><a href="parallelization.html"><i class="fa fa-check"></i><b>6.7</b> Parallelization</a></li>
+<li class="chapter" data-level="6.6" data-path="basic-quantitative-and-regression-analysis.html"><a href="basic-quantitative-and-regression-analysis.html"><i class="fa fa-check"></i><b>6.6</b> Basic quantitative and regression analysis</a></li>
+<li class="chapter" data-level="6.7" data-path="caching.html"><a href="caching.html"><i class="fa fa-check"></i><b>6.7</b> Caching</a></li>
+<li class="chapter" data-level="6.8" data-path="parallelization.html"><a href="parallelization.html"><i class="fa fa-check"></i><b>6.8</b> Parallelization</a></li>
 </ul></li>
 </ul>
 
@@ -218,8 +225,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="features" class="section level2">
 <h2><span class="header-section-number">4.2</span> Features</h2>
 <p>Collecting features from the analyses consists of finding all features, grouping them across analyses (optionally after retention time alignment) and finally, if desired suspect screening:</p>
-<div id="htmlwidget-5596f067be975c98f435" style="width:500px;height:70px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-5596f067be975c98f435">{"x":{"diagram":"\ndigraph Features {\n  graph [ rankdir = LR, compound = true ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.2,\n         height = 1,\n         fontsize = 18,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"Find features\" -> \"Group features\"\n    \"Suspect screening\"\n    \"Group features\" -> \"Suspect screening\" [dir=both, style=dashed]\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-6312039a50f5f414c6ef" style="width:500px;height:70px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-6312039a50f5f414c6ef">{"x":{"diagram":"\ndigraph Features {\n  graph [ rankdir = LR, compound = true ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.2,\n         height = 1,\n         fontsize = 18,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"Find features\" -> \"Group features\"\n    \"Suspect screening\"\n    \"Group features\" -> \"Suspect screening\" [dir=both, style=dashed]\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 <div id="finding-and-grouping-features" class="section level3">
 <h3><span class="header-section-number">4.2.1</span> Finding and grouping features</h3>
 <p>Several algorithms are available for finding features. These are listed in the table below alongside their usage and general remarks.</p>
@@ -397,6 +404,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li>Screen a feature groups object for the suspects. The return value will be a <code>data.frame</code> with results.</li>
 <li>Use the screening results to filter the original feature groups and store the results in <code>fGroupsSusp</code>.</li>
 </ol>
+<p>Alternatively, the <code>mz</code> column of the input suspect list can also be substituted by a <code>neutralMass</code>, <code>SMILES</code>, <code>InChI</code> or <code>formula</code> column, so that ion masses don’t need to be calculated in advance. This is especially advantageous for e.g. NORMAN suspect lists where such information is readily available. A requirement is that the adduct species should be specified for automatic ion mass calculation. This can either be done with an extra <code>adduct</code> column in the suspect list, or by using the <code>adduct</code> function argument to <code>screenSuspects</code>, e.g.:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1">suspects &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">name =</span> <span class="kw">c</span>(<span class="st">&quot;susp1&quot;</span>, <span class="st">&quot;susp2&quot;</span>, <span class="st">&quot;susp3&quot;</span>),</a>
+<a class="sourceLine" id="cb14-2" data-line-number="2">                       <span class="dt">SMILES =</span> <span class="kw">c</span>(<span class="st">&quot;C1=CC=C(C=C1)C(=O)O&quot;</span>, <span class="st">&quot;C1=CC=C2C(=C1)C=CC3=CC=CC=C3N2C(=O)N&quot;</span>, <span class="st">&quot;C1=CC2=NNN=C2C=C1&quot;</span>),</a>
+<a class="sourceLine" id="cb14-3" data-line-number="3">                       <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb14-4" data-line-number="4">scr &lt;-<span class="st"> </span><span class="kw">screenSuspects</span>(fGroups, suspects, <span class="dt">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>)</a>
+<a class="sourceLine" id="cb14-5" data-line-number="5">fGroupsSusp &lt;-<span class="st"> </span><span class="kw">groupFeaturesScreening</span>(fGroups, scr)</a></code></pre></div>
+<p>Note that in some cases you may need to install <a href="http://openbabel.org/wiki/Main_Page">OpenBabel</a> (e.g. when only InChI data is available for mass calculation).</p>
 </div>
 </div>
             </section>
@@ -410,11 +424,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
 <script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
 <script>
 gitbook.require(["gitbook"], function(gitbook) {
 gitbook.start({
@@ -429,6 +445,10 @@ gitbook.start({
 "text": null
 },
 "history": {
+"link": null,
+"text": null
+},
+"view": {
 "link": null,
 "text": null
 },

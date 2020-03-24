@@ -69,7 +69,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.9.0.9000</span>
       </span>
     </div>
 
@@ -200,45 +200,15 @@ converted to it with <code>as.adduct</code>). Examples: <code>"[M-H]-"</code>,
   neutral formulae.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'>as.adduct</span>(<span class='st'>"[M+H]+"</span>)</div><div class='output co'>#&gt; An adduct object ('adduct')
-#&gt; Addition: H
-#&gt; Subtraction: 
-#&gt; Molecule multiplier: 1
-#&gt; Charge: +1
-#&gt; Generic textual representation: [M+H]+
-#&gt; Object size (indication): 1.2 kB</div><div class='input'><span class='fu'>as.adduct</span>(<span class='st'>"[M+H2]2+"</span>)</div><div class='output co'>#&gt; An adduct object ('adduct')
-#&gt; Addition: H2
-#&gt; Subtraction: 
-#&gt; Molecule multiplier: 1
-#&gt; Charge: +2
-#&gt; Generic textual representation: [M+H2]2+
-#&gt; Object size (indication): 1.2 kB</div><div class='input'><span class='fu'>as.adduct</span>(<span class='st'>"[2M+H]+"</span>)</div><div class='output co'>#&gt; An adduct object ('adduct')
-#&gt; Addition: H
-#&gt; Subtraction: 
-#&gt; Molecule multiplier: 2
-#&gt; Charge: +1
-#&gt; Generic textual representation: [2M+H]+
-#&gt; Object size (indication): 1.2 kB</div><div class='input'><span class='fu'>as.adduct</span>(<span class='st'>"[M-H]-"</span>)</div><div class='output co'>#&gt; An adduct object ('adduct')
-#&gt; Addition: 
-#&gt; Subtraction: H
-#&gt; Molecule multiplier: 1
-#&gt; Charge: -1
-#&gt; Generic textual representation: [M-H]-
-#&gt; Object size (indication): 1.2 kB</div><div class='input'><span class='fu'>as.adduct</span>(<span class='st'>"+H"</span>, <span class='kw'>format</span> <span class='kw'>=</span> <span class='st'>"genform"</span>)</div><div class='output co'>#&gt; An adduct object ('adduct')
-#&gt; Addition: H
-#&gt; Subtraction: 
-#&gt; Molecule multiplier: 1
-#&gt; Charge: +1
-#&gt; Generic textual representation: [M+H]+
-#&gt; Object size (indication): 1.2 kB</div><div class='input'><span class='fu'>as.adduct</span>(<span class='fl'>1</span>, <span class='kw'>isPositive</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>format</span> <span class='kw'>=</span> <span class='st'>"metfrag"</span>) <span class='co'># MetFrag adduct ID 1 --&gt; returns [M+H]+</span></div><div class='output co'>#&gt; An adduct object ('adduct')
-#&gt; Addition: H
-#&gt; Subtraction: 
-#&gt; Molecule multiplier: 1
-#&gt; Charge: +1
-#&gt; Generic textual representation: [M+H]+
-#&gt; Object size (indication): 1.2 kB</div><div class='input'>
-<span class='fu'>calculateIonFormula</span>(<span class='st'>"C2H4O"</span>, <span class='st'>"[M+H]+"</span>) <span class='co'># C2H5O</span></div><div class='output co'>#&gt; [1] "C2H5O"</div><div class='input'><span class='fu'>calculateNeutralFormula</span>(<span class='st'>"C2H5O"</span>, <span class='st'>"[M+H]+"</span>) <span class='co'># C2H4O</span></div><div class='output co'>#&gt; [1] "C2H4O"</div><div class='input'>
-</div></pre>
+    <pre class="examples"><span class='fu'>as.adduct</span>(<span class='st'>"[M+H]+"</span>)
+<span class='fu'>as.adduct</span>(<span class='st'>"[M+H2]2+"</span>)
+<span class='fu'>as.adduct</span>(<span class='st'>"[2M+H]+"</span>)
+<span class='fu'>as.adduct</span>(<span class='st'>"[M-H]-"</span>)
+<span class='fu'>as.adduct</span>(<span class='st'>"+H"</span>, <span class='kw'>format</span> <span class='kw'>=</span> <span class='st'>"genform"</span>)
+<span class='fu'>as.adduct</span>(<span class='fl'>1</span>, <span class='kw'>isPositive</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>format</span> <span class='kw'>=</span> <span class='st'>"metfrag"</span>) <span class='co'># MetFrag adduct ID 1 --&gt; returns [M+H]+</span>
+
+<span class='fu'>calculateIonFormula</span>(<span class='st'>"C2H4O"</span>, <span class='st'>"[M+H]+"</span>) <span class='co'># C2H5O</span>
+<span class='fu'>calculateNeutralFormula</span>(<span class='st'>"C2H5O"</span>, <span class='st'>"[M+H]+"</span>) <span class='co'># C2H4O</span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

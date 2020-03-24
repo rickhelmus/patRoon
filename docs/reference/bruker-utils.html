@@ -69,7 +69,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.9.0.9000</span>
       </span>
     </div>
 
@@ -145,13 +145,33 @@
 
 <span class='fu'>getDACalibrationError</span>(<span class='no'>anaInfo</span>)
 
-<span class='fu'>addDAEIC</span>(<span class='no'>analysis</span>, <span class='no'>path</span>, <span class='no'>mz</span>, <span class='kw'>mzWindow</span> <span class='kw'>=</span> <span class='fl'>0.005</span>, <span class='kw'>ctype</span> <span class='kw'>=</span> <span class='st'>"EIC"</span>,
-  <span class='kw'>mtype</span> <span class='kw'>=</span> <span class='st'>"MS"</span>, <span class='kw'>polarity</span> <span class='kw'>=</span> <span class='st'>"both"</span>, <span class='kw'>bgsubtr</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>fragpath</span> <span class='kw'>=</span> <span class='st'>""</span>,
-  <span class='kw'>name</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>hideDA</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>close</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>save</span> <span class='kw'>=</span> <span class='no'>close</span>)
+<span class='fu'>addDAEIC</span>(
+  <span class='no'>analysis</span>,
+  <span class='no'>path</span>,
+  <span class='no'>mz</span>,
+  <span class='kw'>mzWindow</span> <span class='kw'>=</span> <span class='fl'>0.005</span>,
+  <span class='kw'>ctype</span> <span class='kw'>=</span> <span class='st'>"EIC"</span>,
+  <span class='kw'>mtype</span> <span class='kw'>=</span> <span class='st'>"MS"</span>,
+  <span class='kw'>polarity</span> <span class='kw'>=</span> <span class='st'>"both"</span>,
+  <span class='kw'>bgsubtr</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>fragpath</span> <span class='kw'>=</span> <span class='st'>""</span>,
+  <span class='kw'>name</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>hideDA</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>close</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>save</span> <span class='kw'>=</span> <span class='no'>close</span>
+)
 
-<span class='fu'>addAllDAEICs</span>(<span class='no'>fGroups</span>, <span class='kw'>mzWindow</span> <span class='kw'>=</span> <span class='fl'>0.005</span>, <span class='kw'>ctype</span> <span class='kw'>=</span> <span class='st'>"EIC"</span>,
-  <span class='kw'>bgsubtr</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>name</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>onlyPresent</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>hideDA</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>close</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>save</span> <span class='kw'>=</span> <span class='no'>close</span>)</pre>
+<span class='fu'>addAllDAEICs</span>(
+  <span class='no'>fGroups</span>,
+  <span class='kw'>mzWindow</span> <span class='kw'>=</span> <span class='fl'>0.005</span>,
+  <span class='kw'>ctype</span> <span class='kw'>=</span> <span class='st'>"EIC"</span>,
+  <span class='kw'>bgsubtr</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>name</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>onlyPresent</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>hideDA</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>close</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>save</span> <span class='kw'>=</span> <span class='no'>close</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">

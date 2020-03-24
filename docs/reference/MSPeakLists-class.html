@@ -70,7 +70,7 @@ featureGroups object." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.9.0.9000</span>
       </span>
     </div>
 
@@ -156,8 +156,7 @@ length(x)
 show(object)
 
 # S4 method for MSPeakLists,ANY,ANY,missing
-[(x, i, j, ..., reAverage = TRUE,
-  drop = TRUE)
+[(x, i, j, ..., reAverage = TRUE, drop = TRUE)
 
 # S4 method for MSPeakLists,ANY,ANY
 [[(x, i, j)
@@ -166,20 +165,37 @@ show(object)
 $(x, name)
 
 # S4 method for MSPeakLists
-as.data.table(x, fGroups = NULL,
-  averaged = TRUE)
+as.data.table(x, fGroups = NULL, averaged = TRUE)
 
 # S4 method for MSPeakLists
-filter(obj, absMSIntThr = NULL,
-  absMSMSIntThr = NULL, relMSIntThr = NULL, relMSMSIntThr = NULL,
-  topMSPeaks = NULL, topMSMSPeaks = NULL, isolatePrec = NULL,
-  deIsotopeMS = FALSE, deIsotopeMSMS = FALSE, withMSMS = FALSE,
-  retainPrecursorMSMS = TRUE, negate = FALSE)
+filter(
+  obj,
+  absMSIntThr = NULL,
+  absMSMSIntThr = NULL,
+  relMSIntThr = NULL,
+  relMSMSIntThr = NULL,
+  topMSPeaks = NULL,
+  topMSMSPeaks = NULL,
+  isolatePrec = NULL,
+  deIsotopeMS = FALSE,
+  deIsotopeMSMS = FALSE,
+  withMSMS = FALSE,
+  retainPrecursorMSMS = TRUE,
+  negate = FALSE
+)
 
 # S4 method for MSPeakLists
-plotSpec(obj, groupName, analysis = NULL,
-  MSLevel = 1, title = NULL, useGGPlot2 = FALSE, xlim = NULL,
-  ylim = NULL, ...)
+plotSpec(
+  obj,
+  groupName,
+  analysis = NULL,
+  MSLevel = 1,
+  title = NULL,
+  useGGPlot2 = FALSE,
+  xlim = NULL,
+  ylim = NULL,
+  ...
+)
 
 getDefIsolatePrecParams(...)</pre>
 

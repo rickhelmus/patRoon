@@ -69,7 +69,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.9.0.9000</span>
       </span>
     </div>
 
@@ -160,56 +160,114 @@ show(object)
 $(x, name)
 
 # S4 method for compounds
-as.data.table(x, fGroups = NULL,
-  fragments = FALSE, normalizeScores = "none",
-  excludeNormScores = c("score", "individualMoNAScore"))
+as.data.table(
+  x,
+  fGroups = NULL,
+  fragments = FALSE,
+  normalizeScores = "none",
+  excludeNormScores = c("score", "individualMoNAScore")
+)
 
 # S4 method for compounds
 identifiers(compounds)
 
 # S4 method for compounds
-filter(obj, minExplainedPeaks = NULL,
-  minScore = NULL, minFragScore = NULL, minFormulaScore = NULL,
-  scoreLimits = NULL, elements = NULL, fragElements = NULL,
-  lossElements = NULL, topMost = NULL, negate = FALSE)
+filter(
+  obj,
+  minExplainedPeaks = NULL,
+  minScore = NULL,
+  minFragScore = NULL,
+  minFormulaScore = NULL,
+  scoreLimits = NULL,
+  elements = NULL,
+  fragElements = NULL,
+  lossElements = NULL,
+  topMost = NULL,
+  negate = FALSE
+)
 
 # S4 method for compounds
-addFormulaScoring(compounds, formulas,
-  updateScore = FALSE, formulaScoreWeight = 1)
+addFormulaScoring(
+  compounds,
+  formulas,
+  updateScore = FALSE,
+  formulaScoreWeight = 1
+)
 
 # S4 method for compounds
 getMCS(obj, index, groupName)
 
 # S4 method for compounds
-plotStructure(obj, index, groupName, width = 500,
-  height = 500, useGGPlot2 = FALSE)
+plotStructure(
+  obj,
+  index,
+  groupName,
+  width = 500,
+  height = 500,
+  useGGPlot2 = FALSE
+)
 
 # S4 method for compounds
-plotScores(obj, index, groupName,
-  normalizeScores = "max", excludeNormScores = c("score",
-  "individualMoNAScore"), onlyUsed = TRUE, useGGPlot2 = FALSE)
+plotScores(
+  obj,
+  index,
+  groupName,
+  normalizeScores = "max",
+  excludeNormScores = c("score", "individualMoNAScore"),
+  onlyUsed = TRUE,
+  useGGPlot2 = FALSE
+)
 
 # S4 method for compounds
-annotatedPeakList(obj, index, groupName, MSPeakLists,
-  formulas = NULL, onlyAnnotated = FALSE)
+annotatedPeakList(
+  obj,
+  index,
+  groupName,
+  MSPeakLists,
+  formulas = NULL,
+  onlyAnnotated = FALSE
+)
 
 # S4 method for compounds
-plotSpec(obj, index, groupName, MSPeakLists,
-  formulas = NULL, plotStruct = TRUE, title = NULL,
-  useGGPlot2 = FALSE, xlim = NULL, ylim = NULL, ...)
+plotSpec(
+  obj,
+  index,
+  groupName,
+  MSPeakLists,
+  formulas = NULL,
+  plotStruct = TRUE,
+  title = NULL,
+  useGGPlot2 = FALSE,
+  xlim = NULL,
+  ylim = NULL,
+  ...
+)
 
 # S4 method for compounds
-plotVenn(obj, ..., labels = NULL,
-  vennArgs = NULL)
+plotVenn(obj, ..., labels = NULL, vennArgs = NULL)
 
 # S4 method for compounds
-plotUpSet(obj, ..., labels = NULL,
-  nsets = length(list(...)) + 1, nintersects = NA, upsetArgs = NULL)
+plotUpSet(
+  obj,
+  ...,
+  labels = NULL,
+  nsets = length(list(...)) + 1,
+  nintersects = NA,
+  upsetArgs = NULL
+)
 
 # S4 method for compounds
-consensus(obj, ..., absMinAbundance = NULL,
-  relMinAbundance = NULL, uniqueFrom = NULL, uniqueOuter = FALSE,
-  minMaxNormalization = FALSE, rankWeights = 1)</pre>
+consensus(
+  obj,
+  ...,
+  absMinAbundance = NULL,
+  relMinAbundance = NULL,
+  uniqueFrom = NULL,
+  uniqueOuter = FALSE,
+  minMaxNormalization = FALSE,
+  rankWeights = 1,
+  labels = NULL
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -458,11 +516,6 @@ ranking score for each candidate. The value will be re-cycled if necessary,
 hence, the default value of <samp>1</samp> means equal weights for all considered
 objects.</p></td>
     </tr>
-    <tr>
-      <th>mergeScoresFunc</th>
-      <td><p>Function used to calculate the total score for all
-(merged) score columns.</p></td>
-    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
@@ -515,10 +568,11 @@ list is named by feature group names, and is typically used with the
 <code>identifiers</code> option of <code><a href='compound-generation.html'>generateCompoundsMetfrag</a></code>.</p></li>
 <li><p><code>filter</code>: Provides rule based filtering for generated compounds.
 Useful to eliminate unlikely candidates and speed up further processing.</p></li>
-<li><p><code>addFormulaScoring</code>: Provides compound scoring data that is based on the
-presence of candidate formulae being present in a given
-<code><a href='formulas-class.html'>formulas</a></code> object. Matched precursor formulae yield one
-point, whereas matched MS/MS fragments yield 0.5 point each.</p></li>
+<li><p><code>addFormulaScoring</code>: Adds formula ranking data from a <code><a href='formulas-class.html'>formulas</a></code>
+object as an extra compound candidate scoring (<code>formulaScore</code> column).
+The formula score for each compound candidate is between <samp>0-1</samp>, where
+<em>zero</em> means no match with any formula candidates, and <em>one</em>
+means that the compound candidate's formula is the highest ranked.</p></li>
 <li><p><code>getMCS</code>: Calculates the maximum common substructure (MCS)
 for two or more candidate structures for a feature group. This method uses
 the <code>get.mcs</code> function from <a href='https://CRAN.R-project.org/package=rcdk'><span class="pkg">rcdk</span></a>.</p></li>

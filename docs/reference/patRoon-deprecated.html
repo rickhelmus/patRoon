@@ -70,7 +70,7 @@ future." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.9.0.9000</span>
       </span>
     </div>
 
@@ -139,8 +139,13 @@ future.</p>
 
     <pre class="usage"><span class='fu'>reportMD</span>(<span class='no'>...</span>)
 
-<span class='fu'>exportDAFiles</span>(<span class='no'>anaInfo</span>, <span class='kw'>format</span> <span class='kw'>=</span> <span class='st'>"mzML"</span>, <span class='kw'>exportLine</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>outPath</span> <span class='kw'>=</span> <span class='no'>anaInfo</span>$<span class='no'>path</span>, <span class='kw'>overWrite</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+<span class='fu'>exportDAFiles</span>(
+  <span class='no'>anaInfo</span>,
+  <span class='kw'>format</span> <span class='kw'>=</span> <span class='st'>"mzML"</span>,
+  <span class='kw'>exportLine</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>outPath</span> <span class='kw'>=</span> <span class='no'>anaInfo</span>$<span class='no'>path</span>,
+  <span class='kw'>overWrite</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
+)
 
 <span class='fu'>screenTargets</span>(<span class='no'>obj</span>, <span class='no'>targets</span>, <span class='no'>rtWindow</span>, <span class='no'>mzWindow</span>)</pre>
 

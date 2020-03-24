@@ -69,7 +69,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.9.0.9000</span>
       </span>
     </div>
 
@@ -163,41 +163,91 @@ show(object)
 $(x, name)
 
 # S4 method for formulas
-as.data.table(x, fGroups = NULL, average = FALSE,
-  countElements = NULL, countFragElements = NULL, OM = FALSE,
-  maxFormulas = NULL, maxFragFormulas = NULL,
-  normalizeScores = "none", excludeNormScores = NULL)
+as.data.table(
+  x,
+  fGroups = NULL,
+  average = FALSE,
+  countElements = NULL,
+  countFragElements = NULL,
+  OM = FALSE,
+  maxFormulas = NULL,
+  maxFragFormulas = NULL,
+  normalizeScores = "none",
+  excludeNormScores = NULL
+)
 
 # S4 method for formulas
-filter(obj, minExplainedPeaks = NULL,
-  elements = NULL, fragElements = NULL, lossElements = NULL,
-  topMost = NULL, scoreLimits = NULL, OM = FALSE, negate = FALSE)
+filter(
+  obj,
+  minExplainedPeaks = NULL,
+  elements = NULL,
+  fragElements = NULL,
+  lossElements = NULL,
+  topMost = NULL,
+  scoreLimits = NULL,
+  OM = FALSE,
+  negate = FALSE
+)
 
 # S4 method for formulas
-annotatedPeakList(obj, precursor, groupName,
-  analysis = NULL, MSPeakLists, onlyAnnotated = FALSE)
+annotatedPeakList(
+  obj,
+  precursor,
+  groupName,
+  analysis = NULL,
+  MSPeakLists,
+  onlyAnnotated = FALSE
+)
 
 # S4 method for formulas
-plotScores(obj, precursor, groupName,
-  analysis = NULL, normalizeScores = "max", excludeNormScores = NULL,
-  useGGPlot2 = FALSE)
+plotScores(
+  obj,
+  precursor,
+  groupName,
+  analysis = NULL,
+  normalizeScores = "max",
+  excludeNormScores = NULL,
+  useGGPlot2 = FALSE
+)
 
 # S4 method for formulas
-plotSpec(obj, precursor, groupName, analysis = NULL,
-  MSPeakLists, title = NULL, useGGPlot2 = FALSE, xlim = NULL,
-  ylim = NULL, ...)
+plotSpec(
+  obj,
+  precursor,
+  groupName,
+  analysis = NULL,
+  MSPeakLists,
+  title = NULL,
+  useGGPlot2 = FALSE,
+  xlim = NULL,
+  ylim = NULL,
+  ...
+)
 
 # S4 method for formulas
 plotVenn(obj, ..., labels = NULL, vennArgs = NULL)
 
 # S4 method for formulas
-plotUpSet(obj, ..., labels = NULL,
-  nsets = length(list(...)) + 1, nintersects = NA, upsetArgs = NULL)
+plotUpSet(
+  obj,
+  ...,
+  labels = NULL,
+  nsets = length(list(...)) + 1,
+  nintersects = NA,
+  upsetArgs = NULL
+)
 
 # S4 method for formulas
-consensus(obj, ..., absMinAbundance = NULL,
-  relMinAbundance = NULL, uniqueFrom = NULL, uniqueOuter = FALSE,
-  rankWeights = 1)</pre>
+consensus(
+  obj,
+  ...,
+  absMinAbundance = NULL,
+  relMinAbundance = NULL,
+  uniqueFrom = NULL,
+  uniqueOuter = FALSE,
+  rankWeights = 1,
+  labels = NULL
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">

@@ -69,7 +69,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.9.0.9000</span>
       </span>
     </div>
 
@@ -135,15 +135,34 @@
     <p>Utilities to screen for analytes with known or suspected identity.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>screenSuspects</span>(<span class='no'>obj</span>, <span class='no'>suspects</span>, <span class='kw'>rtWindow</span> <span class='kw'>=</span> <span class='fl'>12</span>, <span class='kw'>mzWindow</span> <span class='kw'>=</span> <span class='fl'>0.005</span>)
+    <pre class="usage"><span class='fu'>screenSuspects</span>(
+  <span class='no'>obj</span>,
+  <span class='no'>suspects</span>,
+  <span class='kw'>rtWindow</span> <span class='kw'>=</span> <span class='fl'>12</span>,
+  <span class='kw'>mzWindow</span> <span class='kw'>=</span> <span class='fl'>0.005</span>,
+  <span class='kw'>adduct</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>skipInvalid</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
+)
 
 <span class='co'># S4 method for features</span>
-<span class='fu'>screenSuspects</span>(<span class='no'>obj</span>, <span class='no'>suspects</span>, <span class='kw'>rtWindow</span> <span class='kw'>=</span> <span class='fl'>12</span>,
-  <span class='kw'>mzWindow</span> <span class='kw'>=</span> <span class='fl'>0.005</span>)
+<span class='fu'>screenSuspects</span>(
+  <span class='no'>obj</span>,
+  <span class='no'>suspects</span>,
+  <span class='kw'>rtWindow</span> <span class='kw'>=</span> <span class='fl'>12</span>,
+  <span class='kw'>mzWindow</span> <span class='kw'>=</span> <span class='fl'>0.005</span>,
+  <span class='kw'>adduct</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>skipInvalid</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
+)
 
 <span class='co'># S4 method for featureGroups</span>
-<span class='fu'>screenSuspects</span>(<span class='no'>obj</span>, <span class='no'>suspects</span>, <span class='kw'>rtWindow</span> <span class='kw'>=</span> <span class='fl'>12</span>,
-  <span class='kw'>mzWindow</span> <span class='kw'>=</span> <span class='fl'>0.005</span>)
+<span class='fu'>screenSuspects</span>(
+  <span class='no'>obj</span>,
+  <span class='no'>suspects</span>,
+  <span class='kw'>rtWindow</span> <span class='kw'>=</span> <span class='fl'>12</span>,
+  <span class='kw'>mzWindow</span> <span class='kw'>=</span> <span class='fl'>0.005</span>,
+  <span class='kw'>adduct</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>skipInvalid</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
+)
 
 <span class='co'># S4 method for featureGroups</span>
 <span class='fu'>groupFeaturesScreening</span>(<span class='no'>fGroups</span>, <span class='no'>scr</span>)
@@ -160,16 +179,40 @@
     </tr>
     <tr>
       <th>suspects</th>
-      <td><p>A <code>data.frame</code> consisting of mandatory columns
-<code>"name"</code> (the analyte name) and <code>"mz"</code> (the <em>m/z</em>
-value of the suspect). In addition, a column <code>"rt"</code> can be used to
-specify the retention time (if unspecified no retention times are checked).</p></td>
+      <td><p>A <code>data.frame</code> that must contain a <code>"name"</code> column
+(the analyte name) and <em>at least</em> a <code>"mz"</code>, <code>"neutralMass"</code>,
+<code>"formula"</code>, <code>"SMILES"</code>, <code>"InChI"</code> column (with the ionized
+m/z value, the neutral monoisotopic mass or the chemical
+formula/SMILES/InChI character string for the molecule, respectively). If
+an ion mass needs to be calculated (<em>i.e.</em> no valid data is available
+in the <code>mz</code> column) then data is tried to be used from the columns in
+the aforementioned order. Furthermore, if ion masses need to be calculated
+then the adduct must be specified either with the <code>adduct</code> function
+argument or by an <code>"adduct"</code> column containing a <code>character</code> that
+can be converted with <code>as.adduct</code> (<em>e.g.</em> <code>"[M+H]+"</code>). In
+addition, a column <code>"rt"</code> can be included to specify the retention
+time (if unspecified no retention times are checked).</p></td>
     </tr>
     <tr>
       <th>rtWindow, mzWindow</th>
       <td><p>The retention time window (in seconds) and
 <em>m/z</em> window that will be used for matching a suspect (+/- feature
 data).</p></td>
+    </tr>
+    <tr>
+      <th>adduct</th>
+      <td><p>An <code><a href='adduct-class.html'>adduct</a></code> object (or something that can be
+converted to it with <code><a href='adduct-utils.html'>as.adduct</a></code>). Examples: <code>"[M-H]-"</code>,
+<code>"[M+Na]+"</code>. Can be <code>NULL</code> if either a <code>"mz"</code> or
+<code>"adduct"</code> column is present in the <code>suspects</code> argument.</p></td>
+    </tr>
+    <tr>
+      <th>skipInvalid</th>
+      <td><p>If set to <code>TRUE</code> then suspects with invalid data
+(<em>e.g.</em> missing names or other missing data) will be ignored with a
+warning. Similarly, any suspects for which mass calculation failed (when no
+<code>mz</code> column is present in the suspect list), for instance, due to
+invalid <code>SMILES</code>, will be ignored with a warning.</p></td>
     </tr>
     <tr>
       <th>fGroups</th>
@@ -194,10 +237,10 @@ information</a>.</p></td>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p><code>screenSuspects</code> will return a table (a <code>data.table</code>)
-  with detected suspects and details such as retention and <em>m/z</em> values.
-  If a suspect is matched on multiple features/feature groups then each hit is
-  reported as a separate row.</p>
+    <p><code>screenSuspects</code> will return a table (a
+  <code>data.table</code>) with detected suspects and details such as
+  retention and <em>m/z</em> values. If a suspect is matched on multiple
+  features/feature groups then each hit is reported as a separate row.</p>
 <p><code>groupFeaturesScreening</code> returns a modified <code>featureGroups</code>
   object in which those feature groups that were not matched by any suspects
   are removed and others renamed by the respective suspect name. In case of
@@ -239,14 +282,18 @@ if possible, as it can significantly reduce the load on data interpretation.</p>
   <code>importFeatureGroupsBrukerTASQ</code> use names from targets/suspects as
   feature group names, therefore, it is important that these are
   file-compatible names when <a href='reporting.html'>reporting data</a>.</p>
+<p>For <code>screenSuspects</code> in some cases you may need to install
+  <a href='http://openbabel.org/wiki/Main_Page'>OpenBabel</a> (<em>e.g.</em> when
+  only InChI data is available for mass calculation).</p>
 <p>Please note that <code>groupFeaturesScreening</code> method can only
   transform the <code>featureGroups</code> object that was used to obtain the given
   screening results.</p>
-<p><code>importFeatureGroupsBrukerTASQ</code> will use dummy values for
-  retention time and <em>m/z</em> values for conversion to features, since this
-  information is not available. Hence, when plotting, for instance, extracted
-  ion chromatograms (with <code><a href='generics.html'>plotEIC</a></code>) the integrated
-  chromatographic peak range shown is incorrect.</p>
+<p><code>importFeatureGroupsBrukerTASQ</code> will use estimated min/max values
+  for retention times and dummy min/max <em>m/z</em> values for conversion to
+  features, since this information is not (readily) available. Hence, when
+  plotting, for instance, extracted ion chromatograms (with
+  <code><a href='generics.html'>plotEIC</a></code>) the integrated chromatographic peak range shown is
+  incorrect.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

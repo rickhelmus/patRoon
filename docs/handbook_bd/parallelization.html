@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<html lang="" xml:lang="">
 <head>
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>6.7 Parallelization | patRoon handbook</title>
-  <meta name="description" content="6.7 Parallelization | patRoon handbook" />
-  <meta name="generator" content="bookdown 0.13 and GitBook 2.6.7" />
+  <title>6.8 Parallelization | patRoon handbook</title>
+  <meta name="description" content="6.8 Parallelization | patRoon handbook" />
+  <meta name="generator" content="bookdown 0.18 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="6.7 Parallelization | patRoon handbook" />
+  <meta property="og:title" content="6.8 Parallelization | patRoon handbook" />
   <meta property="og:type" content="book" />
   
   
@@ -16,7 +16,7 @@
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="6.7 Parallelization | patRoon handbook" />
+  <meta name="twitter:title" content="6.8 Parallelization | patRoon handbook" />
   
   
   
@@ -24,7 +24,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2019-10-12" />
+<meta name="date" content="2020-03-24" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -40,6 +40,7 @@
 <link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
 
 
 
@@ -47,11 +48,16 @@
 
 
 
-<script src="libs/htmlwidgets-1.3/htmlwidgets.js"></script>
-<script src="libs/viz-0.3/viz.js"></script>
+
+
+<script src="libs/htmlwidgets-1.5.1/htmlwidgets.js"></script>
+<script src="libs/viz-1.8.2/viz.js"></script>
 <link href="libs/DiagrammeR-styles-0.2/styles.css" rel="stylesheet" />
-<script src="libs/grViz-binding-1.0.1/grViz.js"></script>
+<script src="libs/grViz-binding-1.0.5/grViz.js"></script>
 <script src="libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="libs/vis-4.20.1/vis.css" rel="stylesheet" />
+<script src="libs/vis-4.20.1/vis.min.js"></script>
+<script src="libs/visNetwork-binding-2.0.9/visNetwork.js"></script>
 <script src="libs/d3-3.5.3/./d3.min.js"></script>
 <link href="libs/d3heatmapcore-0.0.0/heatmapcore.css" rel="stylesheet" />
 <script src="libs/d3heatmapcore-0.0.0/heatmapcore.js"></script>
@@ -178,7 +184,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="chapter" data-level="5.4" data-path="unOv.html"><a href="unOv.html"><i class="fa fa-check"></i><b>5.4</b> Unique and overlapping features</a></li>
 <li class="chapter" data-level="5.5" data-path="visualization.html"><a href="visualization.html"><i class="fa fa-check"></i><b>5.5</b> Visualization</a><ul>
-<li class="chapter" data-level="5.5.1" data-path="visualization.html"><a href="visualization.html#features-and-annatation-data"><i class="fa fa-check"></i><b>5.5.1</b> Features and annatation data</a></li>
+<li class="chapter" data-level="5.5.1" data-path="visualization.html"><a href="visualization.html#vis_feat_ann"><i class="fa fa-check"></i><b>5.5.1</b> Features and annatation data</a></li>
 <li class="chapter" data-level="5.5.2" data-path="visualization.html"><a href="visualization.html#visComp"><i class="fa fa-check"></i><b>5.5.2</b> Comparing data</a></li>
 <li class="chapter" data-level="5.5.3" data-path="visualization.html"><a href="visualization.html#plotClust"><i class="fa fa-check"></i><b>5.5.3</b> Hierarchical clustering results</a></li>
 <li class="chapter" data-level="5.5.4" data-path="visualization.html"><a href="visualization.html#interactive-plotting-of-chromatography-data"><i class="fa fa-check"></i><b>5.5.4</b> Interactive plotting of chromatography data</a></li>
@@ -195,8 +201,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="6.3" data-path="exporting-and-converting-feature-data.html"><a href="exporting-and-converting-feature-data.html"><i class="fa fa-check"></i><b>6.3</b> Exporting and converting feature data</a></li>
 <li class="chapter" data-level="6.4" data-path="consensus.html"><a href="consensus.html"><i class="fa fa-check"></i><b>6.4</b> Algorithm consensus</a></li>
 <li class="chapter" data-level="6.5" data-path="compclust.html"><a href="compclust.html"><i class="fa fa-check"></i><b>6.5</b> Compound clustering</a></li>
-<li class="chapter" data-level="6.6" data-path="caching.html"><a href="caching.html"><i class="fa fa-check"></i><b>6.6</b> Caching</a></li>
-<li class="chapter" data-level="6.7" data-path="parallelization.html"><a href="parallelization.html"><i class="fa fa-check"></i><b>6.7</b> Parallelization</a></li>
+<li class="chapter" data-level="6.6" data-path="basic-quantitative-and-regression-analysis.html"><a href="basic-quantitative-and-regression-analysis.html"><i class="fa fa-check"></i><b>6.6</b> Basic quantitative and regression analysis</a></li>
+<li class="chapter" data-level="6.7" data-path="caching.html"><a href="caching.html"><i class="fa fa-check"></i><b>6.7</b> Caching</a></li>
+<li class="chapter" data-level="6.8" data-path="parallelization.html"><a href="parallelization.html"><i class="fa fa-check"></i><b>6.8</b> Parallelization</a></li>
 </ul></li>
 </ul>
 
@@ -216,12 +223,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
             <section class="normal" id="section-">
 <div id="parallelization" class="section level2">
-<h2><span class="header-section-number">6.7</span> Parallelization</h2>
+<h2><span class="header-section-number">6.8</span> Parallelization</h2>
 <p><code>patRoon</code> relies on several external (command-line) utilities to generate workflow data such as <code>MetFrag CL</code>, <code>OpenMS</code> and <code>SIRIUS</code>. When these tools are used for obtaining results for a large number of features it may take a long time before processing is finished. In order to speed this up these commands are executed in <em>parallel</em>. Running several commands simultenously is especially advantageous on multi core CPUs.</p>
-<p>The number of commands to run in parallel is by default equal to the number of available cores/threads.
+<p>The number of commands to run in parallel is by default equal to the number of physical cores.
 You may want to change this amount, for instance, when you don’t want to dedicate all of your computers resources to <code>patRoon</code>. This can either be done by changing a global package option, which affects all operations, or when executing a single workflow step.</p>
-<div class="sourceCode" id="cb122"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb122-1" data-line-number="1"><span class="kw">options</span>(<span class="dt">patRoon.maxProcAmount =</span> <span class="dv">3</span>) <span class="co"># execute max 3 commands in parallel</span></a>
-<a class="sourceLine" id="cb122-2" data-line-number="2">formulas &lt;-<span class="st"> </span><span class="kw">generateFormulas</span>(..., <span class="dt">maxProcAmount =</span> <span class="dv">3</span>) <span class="co"># ditto, but only for this function</span></a></code></pre></div>
+<div class="sourceCode" id="cb128"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb128-1" data-line-number="1"><span class="kw">options</span>(<span class="dt">patRoon.maxProcAmount =</span> <span class="dv">3</span>) <span class="co"># execute max 3 commands in parallel</span></a>
+<a class="sourceLine" id="cb128-2" data-line-number="2">formulas &lt;-<span class="st"> </span><span class="kw">generateFormulas</span>(..., <span class="dt">maxProcAmount =</span> <span class="dv">3</span>) <span class="co"># ditto, but only for this function</span></a></code></pre></div>
 
 </div>
 <!-- </div> -->
@@ -236,11 +243,13 @@ You may want to change this amount, for instance, when you don’t want to dedic
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
 <script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
 <script>
 gitbook.require(["gitbook"], function(gitbook) {
 gitbook.start({
@@ -255,6 +264,10 @@ gitbook.start({
 "text": null
 },
 "history": {
+"link": null,
+"text": null
+},
+"view": {
 "link": null,
 "text": null
 },

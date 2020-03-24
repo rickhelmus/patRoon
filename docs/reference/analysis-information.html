@@ -70,7 +70,7 @@ automatically generate this information." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.9.0.9000</span>
       </span>
     </div>
 
@@ -128,7 +128,7 @@ automatically generate this information." />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Analysis information</h1>
-    <small class="dont-index">Source: <a href='https://github.com/rickhelmus/patRoon/blob/master/R/main.R'><code>R/main.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/utils.R'><code>R/utils.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/rickhelmus/patRoon/blob/master/R/main.R'><code>R/main.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/utils-exported.R'><code>R/utils-exported.R</code></a></small>
     <div class="hidden name"><code>analysis-information.Rd</code></div>
     </div>
 
@@ -137,8 +137,13 @@ automatically generate this information." />
 automatically generate this information.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>generateAnalysisInfo</span>(<span class='no'>paths</span>, <span class='kw'>groups</span> <span class='kw'>=</span> <span class='st'>""</span>, <span class='kw'>blanks</span> <span class='kw'>=</span> <span class='st'>""</span>,
-  <span class='kw'>formats</span> <span class='kw'>=</span> <span class='fu'><a href='convertMSFiles.html'>MSFileFormats</a></span>())
+    <pre class="usage"><span class='fu'>generateAnalysisInfo</span>(
+  <span class='no'>paths</span>,
+  <span class='kw'>groups</span> <span class='kw'>=</span> <span class='st'>""</span>,
+  <span class='kw'>blanks</span> <span class='kw'>=</span> <span class='st'>""</span>,
+  <span class='kw'>concs</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>formats</span> <span class='kw'>=</span> <span class='fu'><a href='convertMSFiles.html'>MSFileFormats</a></span>()
+)
 
 <span class='fu'>generateAnalysisInfoFromEnviMass</span>(<span class='no'>path</span>)</pre>
 
@@ -152,10 +157,17 @@ be used for finding the analyses.</p></td>
     </tr>
     <tr>
       <th>groups, blanks</th>
-      <td><p>An (optional) character vector containing replicate groups
-and references, respectively (will be recycled). If <code>groups</code> is an
-empty character string (<code>""</code>) the analysis name will be set as
+      <td><p>An (optional) character vector containing replicate
+groups and references, respectively (will be recycled). If <code>groups</code> is
+an empty character string (<code>""</code>) the analysis name will be set as
 replicate group.</p></td>
+    </tr>
+    <tr>
+      <th>concs</th>
+      <td><p>An optional numeric vector containing concentration values for
+each analysis. Can be <code>NA</code> if unknown. If the length of <code>concs</code>
+is less than the number of analyses the remainders will be set to
+<code>NA</code>. Set to <code>NULL</code> to not include concentration data.</p></td>
     </tr>
     <tr>
       <th>formats</th>
@@ -212,13 +224,13 @@ replicate group.</p></td>
   subtraction should occur. The <code>conc</code> column is only required when
   obtaining regression information is desired with the
   <code><a href='featureGroups-class.html'>as.data.table</a></code> method.</p>
-<p><code>generateAnalysisInfo</code> is an utility function that automatically
-  generates an analysis information object. It will collect all datafiles
-  from given file paths and convert the filenames into valid analysis names
-  (<em>i.e.</em> without extensions such as <code class="file">.d</code> and <code class="file">.mzML</code>).
-  Duplicate analyses, which may appear when datafiles with different file
-  extension (<code class="file">.d</code>, <code class="file">.mzXML</code> and/or <code class="file">.mzML</code>) are present, will
-  be automatically removed.</p>
+<p><code>generateAnalysisInfo</code> is an utility function that
+  automatically generates an analysis information object. It will collect all
+  datafiles from given file paths and convert the filenames into valid
+  analysis names (<em>i.e.</em> without extensions such as <code class="file">.d</code> and
+  <code class="file">.mzML</code>). Duplicate analyses, which may appear when datafiles with
+  different file extension (<code class="file">.d</code>, <code class="file">.mzXML</code> and/or <code class="file">.mzML</code>) are
+  present, will be automatically removed.</p>
 <p><code>generateAnalysisInfoFromEnviMass</code> loads analysis information
   from an <span class="pkg">enviMass</span> project. Note: this funtionality has only been
   tested with older versions of <span class="pkg">enviMass</span>.</p>

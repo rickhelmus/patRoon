@@ -69,7 +69,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.9.0.9000</span>
       </span>
     </div>
 
@@ -172,8 +172,7 @@ getFeatures(obj)
 groupFeatIndex(fGroups)
 
 # S4 method for featureGroups,ANY,ANY,missing
-[(x, i, j, ..., rGroups,
-  drop = TRUE)
+[(x, i, j, ..., rGroups, drop = TRUE)
 
 # S4 method for featureGroups,ANY,ANY
 [[(x, i, j)
@@ -185,41 +184,69 @@ $(x, name)
 export(fGroups, type, out)
 
 # S4 method for featureGroups
-as.data.table(x, average = FALSE,
-  areas = FALSE, features = FALSE, regression = FALSE)
+as.data.table(
+  x,
+  average = FALSE,
+  areas = FALSE,
+  features = FALSE,
+  regression = FALSE
+)
 
 # S4 method for featureGroups,ANY
-plot(x, colourBy = "fGroups",
-  onlyUnique = FALSE, retMin = FALSE, showLegend = TRUE,
-  col = NULL, pch = NULL, ...)
+plot(
+  x,
+  colourBy = "fGroups",
+  onlyUnique = FALSE,
+  retMin = FALSE,
+  showLegend = TRUE,
+  col = NULL,
+  pch = NULL,
+  ...
+)
 
 # S4 method for featureGroups
-plotInt(obj, average = FALSE, pch = 20,
-  type = "b", lty = 3, col = NULL, ...)
+plotInt(obj, average = FALSE, pch = 20, type = "b", lty = 3, col = NULL, ...)
 
 # S4 method for featureGroups
-plotChord(obj, addSelfLinks = FALSE,
-  addRetMzPlots = TRUE, average = FALSE, outerGroups = NULL,
-  addIntraOuterGroupLinks = FALSE, ...)
+plotChord(
+  obj,
+  addSelfLinks = FALSE,
+  addRetMzPlots = TRUE,
+  average = FALSE,
+  outerGroups = NULL,
+  addIntraOuterGroupLinks = FALSE,
+  ...
+)
 
 # S4 method for featureGroups
-plotEIC(obj, rtWindow = 30, mzWindow = 0.005,
-  retMin = FALSE, topMost = NULL, EICs = NULL,
-  showPeakArea = FALSE, showFGroupRect = TRUE, title = NULL,
-  colourBy = c("none", "rGroups", "fGroups"), showLegend = TRUE,
-  onlyPresent = TRUE, annotate = c("none", "ret", "mz"),
-  showProgress = FALSE, xlim = NULL, ylim = NULL, ...)
+plotEIC(
+  obj,
+  rtWindow = 30,
+  mzWindow = 0.005,
+  retMin = FALSE,
+  topMost = NULL,
+  EICs = NULL,
+  showPeakArea = FALSE,
+  showFGroupRect = TRUE,
+  title = NULL,
+  colourBy = c("none", "rGroups", "fGroups"),
+  showLegend = TRUE,
+  onlyPresent = TRUE,
+  annotate = c("none", "ret", "mz"),
+  showProgress = FALSE,
+  xlim = NULL,
+  ylim = NULL,
+  ...
+)
 
 # S4 method for featureGroups
 plotVenn(obj, which = NULL, ...)
 
 # S4 method for featureGroups
-plotUpSet(obj, which = NULL,
-  nsets = length(which), nintersects = NA, ...)
+plotUpSet(obj, which = NULL, nsets = length(which), nintersects = NA, ...)
 
 # S4 method for featureGroups
-unique(x, which, relativeTo = NULL,
-  outer = FALSE)
+unique(x, which, relativeTo = NULL, outer = FALSE)
 
 # S4 method for featureGroups
 overlap(fGroups, which, exclusive = FALSE)</pre>
@@ -265,12 +292,6 @@ argument to <code><a href='feature-filtering.html'>filter</a></code>).</p></td>
       <td><p>The feature group name (partially matched).</p></td>
     </tr>
     <tr>
-      <th>type</th>
-      <td><p>Which file type should be exported: <code>"brukerpa"</code> (Bruker
-ProfileAnalysis), <code>"brukertasq"</code> (Bruker TASQ) or <code>"mzmine"</code>
-(MZMine).</p></td>
-    </tr>
-    <tr>
       <th>out</th>
       <td><p>The destination file for the exported data.</p></td>
     </tr>
@@ -286,7 +307,7 @@ ProfileAnalysis), <code>"brukertasq"</code> (Bruker TASQ) or <code>"mzmine"</cod
     <tr>
       <th>regression</th>
       <td><p>Set to <code>TRUE</code> to add regression data for each feature
-group. For this a linear model is created (intensity/area [dependning on
+group. For this a linear model is created (intensity/area [depending on
 <code>areas</code> argument] <em>vs</em> concentration). The model concentrations
 (e.g. of a set of standards) is derived from the <code>conc</code> column of the
 <a href='analysis-information.html'>analysis information</a>. From this model the

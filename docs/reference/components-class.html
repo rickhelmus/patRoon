@@ -70,7 +70,7 @@ components commonly include adducts, isotopes and homologues." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.9.0.9000</span>
       </span>
     </div>
 
@@ -144,9 +144,6 @@ componentTable(obj)
 componentInfo(obj)
 
 # S4 method for components
-algorithm(obj)
-
-# S4 method for components
 groupNames(obj)
 
 # S4 method for components
@@ -171,16 +168,29 @@ $(x, name)
 as.data.table(x)
 
 # S4 method for components
-filter(obj, size = NULL, adducts = NULL,
-  isotopes = NULL, rtIncrement = NULL, mzIncrement = NULL,
-  negate = FALSE)
+filter(
+  obj,
+  size = NULL,
+  adducts = NULL,
+  isotopes = NULL,
+  rtIncrement = NULL,
+  mzIncrement = NULL,
+  negate = FALSE
+)
 
 # S4 method for components
 findFGroup(obj, fGroup)
 
 # S4 method for components
-plotSpec(obj, index, markFGroup = NULL,
-  useGGPlot2 = FALSE, xlim = NULL, ylim = NULL, ...)
+plotSpec(
+  obj,
+  index,
+  markFGroup = NULL,
+  useGGPlot2 = FALSE,
+  xlim = NULL,
+  ylim = NULL,
+  ...
+)
 
 # S4 method for components
 plotEIC(obj, index, fGroups, rtWindow = 5, ...)
@@ -319,8 +329,6 @@ generate the components.</p></td>
 <code>data.table</code>.</p></li>
 <li><p><code>componentInfo</code>: Accessor method for the <code>componentInfo</code> slot of a
 <code>components</code> class.</p></li>
-<li><p><code>algorithm</code>: Retrieve the algorithm (a character string) used to
-generate components.</p></li>
 <li><p><code>groupNames</code>: returns a <code>character</code> vector with the names of the
 feature groups for which data is present in this object.</p></li>
 <li><p><code>length</code>: Obtain total number of components.</p></li>

@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<html lang="" xml:lang="">
 <head>
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>5.3 Subsetting | patRoon handbook</title>
   <meta name="description" content="5.3 Subsetting | patRoon handbook" />
-  <meta name="generator" content="bookdown 0.13 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.18 and GitBook 2.6.7" />
 
   <meta property="og:title" content="5.3 Subsetting | patRoon handbook" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2019-10-12" />
+<meta name="date" content="2020-03-24" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -40,6 +40,7 @@
 <link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
 
 
 
@@ -47,11 +48,16 @@
 
 
 
-<script src="libs/htmlwidgets-1.3/htmlwidgets.js"></script>
-<script src="libs/viz-0.3/viz.js"></script>
+
+
+<script src="libs/htmlwidgets-1.5.1/htmlwidgets.js"></script>
+<script src="libs/viz-1.8.2/viz.js"></script>
 <link href="libs/DiagrammeR-styles-0.2/styles.css" rel="stylesheet" />
-<script src="libs/grViz-binding-1.0.1/grViz.js"></script>
+<script src="libs/grViz-binding-1.0.5/grViz.js"></script>
 <script src="libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="libs/vis-4.20.1/vis.css" rel="stylesheet" />
+<script src="libs/vis-4.20.1/vis.min.js"></script>
+<script src="libs/visNetwork-binding-2.0.9/visNetwork.js"></script>
 <script src="libs/d3-3.5.3/./d3.min.js"></script>
 <link href="libs/d3heatmapcore-0.0.0/heatmapcore.css" rel="stylesheet" />
 <script src="libs/d3heatmapcore-0.0.0/heatmapcore.js"></script>
@@ -178,7 +184,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="chapter" data-level="5.4" data-path="unOv.html"><a href="unOv.html"><i class="fa fa-check"></i><b>5.4</b> Unique and overlapping features</a></li>
 <li class="chapter" data-level="5.5" data-path="visualization.html"><a href="visualization.html"><i class="fa fa-check"></i><b>5.5</b> Visualization</a><ul>
-<li class="chapter" data-level="5.5.1" data-path="visualization.html"><a href="visualization.html#features-and-annatation-data"><i class="fa fa-check"></i><b>5.5.1</b> Features and annatation data</a></li>
+<li class="chapter" data-level="5.5.1" data-path="visualization.html"><a href="visualization.html#vis_feat_ann"><i class="fa fa-check"></i><b>5.5.1</b> Features and annatation data</a></li>
 <li class="chapter" data-level="5.5.2" data-path="visualization.html"><a href="visualization.html#visComp"><i class="fa fa-check"></i><b>5.5.2</b> Comparing data</a></li>
 <li class="chapter" data-level="5.5.3" data-path="visualization.html"><a href="visualization.html#plotClust"><i class="fa fa-check"></i><b>5.5.3</b> Hierarchical clustering results</a></li>
 <li class="chapter" data-level="5.5.4" data-path="visualization.html"><a href="visualization.html#interactive-plotting-of-chromatography-data"><i class="fa fa-check"></i><b>5.5.4</b> Interactive plotting of chromatography data</a></li>
@@ -195,8 +201,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="6.3" data-path="exporting-and-converting-feature-data.html"><a href="exporting-and-converting-feature-data.html"><i class="fa fa-check"></i><b>6.3</b> Exporting and converting feature data</a></li>
 <li class="chapter" data-level="6.4" data-path="consensus.html"><a href="consensus.html"><i class="fa fa-check"></i><b>6.4</b> Algorithm consensus</a></li>
 <li class="chapter" data-level="6.5" data-path="compclust.html"><a href="compclust.html"><i class="fa fa-check"></i><b>6.5</b> Compound clustering</a></li>
-<li class="chapter" data-level="6.6" data-path="caching.html"><a href="caching.html"><i class="fa fa-check"></i><b>6.6</b> Caching</a></li>
-<li class="chapter" data-level="6.7" data-path="parallelization.html"><a href="parallelization.html"><i class="fa fa-check"></i><b>6.7</b> Parallelization</a></li>
+<li class="chapter" data-level="6.6" data-path="basic-quantitative-and-regression-analysis.html"><a href="basic-quantitative-and-regression-analysis.html"><i class="fa fa-check"></i><b>6.6</b> Basic quantitative and regression analysis</a></li>
+<li class="chapter" data-level="6.7" data-path="caching.html"><a href="caching.html"><i class="fa fa-check"></i><b>6.7</b> Caching</a></li>
+<li class="chapter" data-level="6.8" data-path="parallelization.html"><a href="parallelization.html"><i class="fa fa-check"></i><b>6.8</b> Parallelization</a></li>
 </ul></li>
 </ul>
 
@@ -273,13 +280,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </tbody>
 </table>
 <p>For objects that support two-dimensional subsetting (e.g. <code>featureGroups</code>, <code>MSPeakLists</code>), either the <code>i</code> or <code>j</code> argument is optional. Furthermore, unlike subsetting a <code>data.frame</code>, the position of <code>i</code> and <code>j</code> does not change when only one argument is specified:</p>
-<div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb60-1" data-line-number="1">df[<span class="dv">1</span>, <span class="dv">1</span>] <span class="co"># subset data.frame by first row/column</span></a>
-<a class="sourceLine" id="cb60-2" data-line-number="2">df[<span class="dv">1</span>] <span class="co"># subset by first column</span></a>
-<a class="sourceLine" id="cb60-3" data-line-number="3">df[<span class="dv">1</span>, ] <span class="co"># subset by first row</span></a>
-<a class="sourceLine" id="cb60-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb60-5" data-line-number="5">fGroups[<span class="dv">1</span>, <span class="dv">1</span>] <span class="co"># subset by first analysis/feature group</span></a>
-<a class="sourceLine" id="cb60-6" data-line-number="6">fGroups[, <span class="dv">1</span>] <span class="co"># subset by first feature group (i.e. column)</span></a>
-<a class="sourceLine" id="cb60-7" data-line-number="7">fGroups[<span class="dv">1</span>] <span class="co"># subset by first analysis (i.e. row)</span></a></code></pre></div>
+<div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb61-1" data-line-number="1">df[<span class="dv">1</span>, <span class="dv">1</span>] <span class="co"># subset data.frame by first row/column</span></a>
+<a class="sourceLine" id="cb61-2" data-line-number="2">df[<span class="dv">1</span>] <span class="co"># subset by first column</span></a>
+<a class="sourceLine" id="cb61-3" data-line-number="3">df[<span class="dv">1</span>, ] <span class="co"># subset by first row</span></a>
+<a class="sourceLine" id="cb61-4" data-line-number="4"></a>
+<a class="sourceLine" id="cb61-5" data-line-number="5">fGroups[<span class="dv">1</span>, <span class="dv">1</span>] <span class="co"># subset by first analysis/feature group</span></a>
+<a class="sourceLine" id="cb61-6" data-line-number="6">fGroups[, <span class="dv">1</span>] <span class="co"># subset by first feature group (i.e. column)</span></a>
+<a class="sourceLine" id="cb61-7" data-line-number="7">fGroups[<span class="dv">1</span>] <span class="co"># subset by first analysis (i.e. row)</span></a></code></pre></div>
 <p>The subset operator allows three types of input:</p>
 <ul>
 <li>A logical vector: elements are selected if corresponding values are <code>TRUE</code>.</li>
@@ -287,52 +294,52 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li>A character vector: select elements by their name.</li>
 </ul>
 <p>When a logical vector is used as input it will be re-cycled if necessary. For instance, the following will select by the first, third, fifth, etc. analysis.</p>
-<div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb61-1" data-line-number="1">fGroups[<span class="kw">c</span>(<span class="ot">TRUE</span>, <span class="ot">FALSE</span>)]</a></code></pre></div>
+<div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb62-1" data-line-number="1">fGroups[<span class="kw">c</span>(<span class="ot">TRUE</span>, <span class="ot">FALSE</span>)]</a></code></pre></div>
 <p>In order to select by a <code>character</code> you will need to know the names for each element. These can, for instance, be obtained by the <code>groupNames()</code> (feature group names), <code>analyses()</code> (analysis names) and <code>names()</code> (names for components or feature groups for <code>featureGroups</code> objects) generic functions.</p>
 <p>Some more examples of common subsetting operations are shown below.</p>
-<div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb62-1" data-line-number="1"><span class="co"># select first three analyses</span></a>
-<a class="sourceLine" id="cb62-2" data-line-number="2">fList[<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>]</a>
-<a class="sourceLine" id="cb62-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb62-4" data-line-number="4"><span class="co"># select first three analyses and first 500 feature groups</span></a>
-<a class="sourceLine" id="cb62-5" data-line-number="5">fGroups[<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">500</span>]</a>
-<a class="sourceLine" id="cb62-6" data-line-number="6"></a>
-<a class="sourceLine" id="cb62-7" data-line-number="7"><span class="co"># select all feature groups from first component</span></a>
-<a class="sourceLine" id="cb62-8" data-line-number="8">fGroupsNT &lt;-<span class="st"> </span>fGroups[, componNT[[<span class="dv">1</span>]]<span class="op">$</span>group]</a>
-<a class="sourceLine" id="cb62-9" data-line-number="9"></a>
-<a class="sourceLine" id="cb62-10" data-line-number="10"><span class="co"># only keep feature groups with formula annotation results</span></a>
-<a class="sourceLine" id="cb62-11" data-line-number="11">fGroupsForms &lt;-<span class="st"> </span>fGroups[, <span class="kw">groupNames</span>(formulas)]</a>
-<a class="sourceLine" id="cb62-12" data-line-number="12"></a>
-<a class="sourceLine" id="cb62-13" data-line-number="13"><span class="co"># only keep feature groups with either formula or compound annotation results</span></a>
-<a class="sourceLine" id="cb62-14" data-line-number="14">fGroupsAnn &lt;-<span class="st"> </span>fGroups[, <span class="kw">union</span>(<span class="kw">groupNames</span>(formulas), <span class="kw">groupNames</span>(compounds))]</a>
-<a class="sourceLine" id="cb62-15" data-line-number="15"></a>
-<a class="sourceLine" id="cb62-16" data-line-number="16"><span class="co"># select first 15 components</span></a>
-<a class="sourceLine" id="cb62-17" data-line-number="17">components[<span class="dv">1</span><span class="op">:</span><span class="dv">15</span>]</a>
-<a class="sourceLine" id="cb62-18" data-line-number="18"></a>
-<a class="sourceLine" id="cb62-19" data-line-number="19"><span class="co"># select by name</span></a>
-<a class="sourceLine" id="cb62-20" data-line-number="20">components[<span class="kw">c</span>(<span class="st">&quot;CMP1&quot;</span>, <span class="st">&quot;CMP5&quot;</span>)]</a>
-<a class="sourceLine" id="cb62-21" data-line-number="21"></a>
-<a class="sourceLine" id="cb62-22" data-line-number="22"><span class="co"># only retain feature groups in components for which compound annotations are</span></a>
-<a class="sourceLine" id="cb62-23" data-line-number="23"><span class="co"># available</span></a>
-<a class="sourceLine" id="cb62-24" data-line-number="24">components[, <span class="kw">groupNames</span>(compounds)]</a></code></pre></div>
+<div class="sourceCode" id="cb63"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb63-1" data-line-number="1"><span class="co"># select first three analyses</span></a>
+<a class="sourceLine" id="cb63-2" data-line-number="2">fList[<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>]</a>
+<a class="sourceLine" id="cb63-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb63-4" data-line-number="4"><span class="co"># select first three analyses and first 500 feature groups</span></a>
+<a class="sourceLine" id="cb63-5" data-line-number="5">fGroups[<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">500</span>]</a>
+<a class="sourceLine" id="cb63-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb63-7" data-line-number="7"><span class="co"># select all feature groups from first component</span></a>
+<a class="sourceLine" id="cb63-8" data-line-number="8">fGroupsNT &lt;-<span class="st"> </span>fGroups[, componNT[[<span class="dv">1</span>]]<span class="op">$</span>group]</a>
+<a class="sourceLine" id="cb63-9" data-line-number="9"></a>
+<a class="sourceLine" id="cb63-10" data-line-number="10"><span class="co"># only keep feature groups with formula annotation results</span></a>
+<a class="sourceLine" id="cb63-11" data-line-number="11">fGroupsForms &lt;-<span class="st"> </span>fGroups[, <span class="kw">groupNames</span>(formulas)]</a>
+<a class="sourceLine" id="cb63-12" data-line-number="12"></a>
+<a class="sourceLine" id="cb63-13" data-line-number="13"><span class="co"># only keep feature groups with either formula or compound annotation results</span></a>
+<a class="sourceLine" id="cb63-14" data-line-number="14">fGroupsAnn &lt;-<span class="st"> </span>fGroups[, <span class="kw">union</span>(<span class="kw">groupNames</span>(formulas), <span class="kw">groupNames</span>(compounds))]</a>
+<a class="sourceLine" id="cb63-15" data-line-number="15"></a>
+<a class="sourceLine" id="cb63-16" data-line-number="16"><span class="co"># select first 15 components</span></a>
+<a class="sourceLine" id="cb63-17" data-line-number="17">components[<span class="dv">1</span><span class="op">:</span><span class="dv">15</span>]</a>
+<a class="sourceLine" id="cb63-18" data-line-number="18"></a>
+<a class="sourceLine" id="cb63-19" data-line-number="19"><span class="co"># select by name</span></a>
+<a class="sourceLine" id="cb63-20" data-line-number="20">components[<span class="kw">c</span>(<span class="st">&quot;CMP1&quot;</span>, <span class="st">&quot;CMP5&quot;</span>)]</a>
+<a class="sourceLine" id="cb63-21" data-line-number="21"></a>
+<a class="sourceLine" id="cb63-22" data-line-number="22"><span class="co"># only retain feature groups in components for which compound annotations are</span></a>
+<a class="sourceLine" id="cb63-23" data-line-number="23"><span class="co"># available</span></a>
+<a class="sourceLine" id="cb63-24" data-line-number="24">components[, <span class="kw">groupNames</span>(compounds)]</a></code></pre></div>
 <div id="prioritization-workflow" class="section level3">
 <h3><span class="header-section-number">5.3.1</span> Prioritization workflow</h3>
 <p>An important use case of subsetting is prioritization of data. For instance, after statistical analysis only certain feature groups are deemed relevant for the rest of the workflow. A common prioritization workflow is illustrated below:</p>
-<div id="htmlwidget-8234dbee982a3ed2a5ff" style="width:500px;height:120px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-8234dbee982a3ed2a5ff">{"x":{"diagram":"\ndigraph Prioritization {\n  graph [ rankdir = LR ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.3,\n         height = 1,\n         fontsize = 18,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"Object conversion\" -> \"Prioritization\" -> Subsetting\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-2355e2f95122b980b060" style="width:500px;height:120px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-2355e2f95122b980b060">{"x":{"diagram":"\ndigraph Prioritization {\n  graph [ rankdir = LR ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.3,\n         height = 1,\n         fontsize = 18,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"Object conversion\" -> \"Prioritization\" -> Subsetting\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 <p>During the first step the workflow object is converted to a suitable format, most often using the <code>as.data.frame()</code> function. The converted data is then used as input for the prioritization strategy. Finally, these results are then used to select the data of interest in the original object.</p>
 <p>A very simplified example of such a process is shown below.</p>
-<div class="sourceCode" id="cb63"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb63-1" data-line-number="1">featTab &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(fGroups, <span class="dt">average =</span> <span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb63-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb63-3" data-line-number="3"><span class="co"># prioritization: sort by (averaged) intensity of the &quot;sample&quot; replicate group</span></a>
-<a class="sourceLine" id="cb63-4" data-line-number="4"><span class="co"># (from high to low) and then obtain the feature group identifiers of the top 5.</span></a>
-<a class="sourceLine" id="cb63-5" data-line-number="5">featTab &lt;-<span class="st"> </span>featTab[<span class="kw">order</span>(featTab<span class="op">$</span>standard, <span class="dt">decreasing =</span> <span class="ot">TRUE</span>), ]</a>
-<a class="sourceLine" id="cb63-6" data-line-number="6">groupsOfInterest &lt;-<span class="st"> </span>featTab<span class="op">$</span>group[<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>]</a>
-<a class="sourceLine" id="cb63-7" data-line-number="7"></a>
-<a class="sourceLine" id="cb63-8" data-line-number="8"><span class="co"># subset the original data</span></a>
-<a class="sourceLine" id="cb63-9" data-line-number="9">fGroups &lt;-<span class="st"> </span>fGroups[, groupsOfInterest]</a>
-<a class="sourceLine" id="cb63-10" data-line-number="10"></a>
-<a class="sourceLine" id="cb63-11" data-line-number="11"><span class="co"># fGroups now only contains the feature groups for which intensity values in the</span></a>
-<a class="sourceLine" id="cb63-12" data-line-number="12"><span class="co"># &quot;sample&quot; replicate group were in the top 5</span></a></code></pre></div>
+<div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb64-1" data-line-number="1">featTab &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(fGroups, <span class="dt">average =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb64-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb64-3" data-line-number="3"><span class="co"># prioritization: sort by (averaged) intensity of the &quot;sample&quot; replicate group</span></a>
+<a class="sourceLine" id="cb64-4" data-line-number="4"><span class="co"># (from high to low) and then obtain the feature group identifiers of the top 5.</span></a>
+<a class="sourceLine" id="cb64-5" data-line-number="5">featTab &lt;-<span class="st"> </span>featTab[<span class="kw">order</span>(featTab<span class="op">$</span>standard, <span class="dt">decreasing =</span> <span class="ot">TRUE</span>), ]</a>
+<a class="sourceLine" id="cb64-6" data-line-number="6">groupsOfInterest &lt;-<span class="st"> </span>featTab<span class="op">$</span>group[<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>]</a>
+<a class="sourceLine" id="cb64-7" data-line-number="7"></a>
+<a class="sourceLine" id="cb64-8" data-line-number="8"><span class="co"># subset the original data</span></a>
+<a class="sourceLine" id="cb64-9" data-line-number="9">fGroups &lt;-<span class="st"> </span>fGroups[, groupsOfInterest]</a>
+<a class="sourceLine" id="cb64-10" data-line-number="10"></a>
+<a class="sourceLine" id="cb64-11" data-line-number="11"><span class="co"># fGroups now only contains the feature groups for which intensity values in the</span></a>
+<a class="sourceLine" id="cb64-12" data-line-number="12"><span class="co"># &quot;sample&quot; replicate group were in the top 5</span></a></code></pre></div>
 </div>
 </div>
             </section>
@@ -346,11 +353,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
 <script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
 <script>
 gitbook.require(["gitbook"], function(gitbook) {
 gitbook.start({
@@ -365,6 +374,10 @@ gitbook.start({
 "text": null
 },
 "history": {
+"link": null,
+"text": null
+},
+"view": {
 "link": null,
 "text": null
 },

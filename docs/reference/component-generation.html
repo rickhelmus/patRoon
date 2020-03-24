@@ -70,7 +70,7 @@ isotopes, adducts and homologues) to assist and simplify compound annotation." /
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.9.0.9000</span>
       </span>
     </div>
 
@@ -140,24 +140,55 @@ isotopes, adducts and homologues) to assist and simplify compound annotation.</p
     <pre class="usage"><span class='co'># S4 method for featureGroups</span>
 <span class='fu'>generateComponents</span>(<span class='no'>fGroups</span>, <span class='no'>algorithm</span>, <span class='no'>...</span>)
 
-<span class='fu'>generateComponentsCAMERA</span>(<span class='no'>fGroups</span>, <span class='no'>ionization</span>, <span class='kw'>onlyIsotopes</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>minSize</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>relMinReplicates</span> <span class='kw'>=</span> <span class='fl'>0.5</span>, <span class='kw'>extraOpts</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
+<span class='fu'>generateComponentsCAMERA</span>(
+  <span class='no'>fGroups</span>,
+  <span class='no'>ionization</span>,
+  <span class='kw'>onlyIsotopes</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>minSize</span> <span class='kw'>=</span> <span class='fl'>2</span>,
+  <span class='kw'>relMinReplicates</span> <span class='kw'>=</span> <span class='fl'>0.5</span>,
+  <span class='kw'>extraOpts</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
+)
 
-<span class='fu'>generateComponentsIntClust</span>(<span class='no'>fGroups</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"complete"</span>,
-  <span class='kw'>metric</span> <span class='kw'>=</span> <span class='st'>"euclidean"</span>, <span class='kw'>normFunc</span> <span class='kw'>=</span> <span class='no'>max</span>, <span class='kw'>average</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>maxTreeHeight</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>deepSplit</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>minModuleSize</span> <span class='kw'>=</span> <span class='fl'>1</span>)
+<span class='fu'>generateComponentsIntClust</span>(
+  <span class='no'>fGroups</span>,
+  <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"complete"</span>,
+  <span class='kw'>metric</span> <span class='kw'>=</span> <span class='st'>"euclidean"</span>,
+  <span class='kw'>normFunc</span> <span class='kw'>=</span> <span class='no'>max</span>,
+  <span class='kw'>average</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>maxTreeHeight</span> <span class='kw'>=</span> <span class='fl'>1</span>,
+  <span class='kw'>deepSplit</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>minModuleSize</span> <span class='kw'>=</span> <span class='fl'>1</span>
+)
 
-<span class='fu'>generateComponentsNontarget</span>(<span class='no'>fGroups</span>, <span class='no'>ionization</span>, <span class='kw'>rtRange</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(-<span class='fl'>120</span>, <span class='fl'>120</span>),
-  <span class='kw'>mzRange</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>5</span>, <span class='fl'>120</span>), <span class='kw'>elements</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"C"</span>, <span class='st'>"H"</span>, <span class='st'>"O"</span>), <span class='kw'>rtDev</span> <span class='kw'>=</span> <span class='fl'>30</span>,
-  <span class='kw'>absMzDev</span> <span class='kw'>=</span> <span class='fl'>0.002</span>, <span class='kw'>extraOpts</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>traceHack</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/all.html'>all</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/Version.html'>R.Version</a></span>()[<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"major"</span>, <span class='st'>"minor"</span>)] <span class='kw'>&gt;=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>3</span>, <span class='fl'>4</span>)))
+<span class='fu'>generateComponentsNontarget</span>(
+  <span class='no'>fGroups</span>,
+  <span class='no'>ionization</span>,
+  <span class='kw'>rtRange</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(-<span class='fl'>120</span>, <span class='fl'>120</span>),
+  <span class='kw'>mzRange</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>5</span>, <span class='fl'>120</span>),
+  <span class='kw'>elements</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"C"</span>, <span class='st'>"H"</span>, <span class='st'>"O"</span>),
+  <span class='kw'>rtDev</span> <span class='kw'>=</span> <span class='fl'>30</span>,
+  <span class='kw'>absMzDev</span> <span class='kw'>=</span> <span class='fl'>0.002</span>,
+  <span class='kw'>extraOpts</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>traceHack</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/all.html'>all</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/Version.html'>R.Version</a></span>()[<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"major"</span>, <span class='st'>"minor"</span>)] <span class='kw'>&gt;=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>3</span>, <span class='fl'>4</span>))
+)
 
-<span class='fu'>generateComponentsRAMClustR</span>(<span class='no'>fGroups</span>, <span class='kw'>st</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>sr</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>maxt</span> <span class='kw'>=</span> <span class='fl'>12</span>,
-  <span class='kw'>hmax</span> <span class='kw'>=</span> <span class='fl'>0.3</span>, <span class='kw'>normalize</span> <span class='kw'>=</span> <span class='st'>"TIC"</span>, <span class='no'>ionization</span>, <span class='kw'>absMzDev</span> <span class='kw'>=</span> <span class='fl'>0.002</span>,
-  <span class='kw'>relMzDev</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>minSize</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>relMinReplicates</span> <span class='kw'>=</span> <span class='fl'>0.5</span>,
+<span class='fu'>generateComponentsRAMClustR</span>(
+  <span class='no'>fGroups</span>,
+  <span class='kw'>st</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>sr</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>maxt</span> <span class='kw'>=</span> <span class='fl'>12</span>,
+  <span class='kw'>hmax</span> <span class='kw'>=</span> <span class='fl'>0.3</span>,
+  <span class='kw'>normalize</span> <span class='kw'>=</span> <span class='st'>"TIC"</span>,
+  <span class='no'>ionization</span>,
+  <span class='kw'>absMzDev</span> <span class='kw'>=</span> <span class='fl'>0.002</span>,
+  <span class='kw'>relMzDev</span> <span class='kw'>=</span> <span class='fl'>5</span>,
+  <span class='kw'>minSize</span> <span class='kw'>=</span> <span class='fl'>2</span>,
+  <span class='kw'>relMinReplicates</span> <span class='kw'>=</span> <span class='fl'>0.5</span>,
   <span class='kw'>RCExperimentVals</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>design</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>platform</span> <span class='kw'>=</span> <span class='st'>"LC-MS"</span>), <span class='kw'>instrument</span> <span class='kw'>=</span>
-  <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>ionization</span> <span class='kw'>=</span> <span class='no'>ionization</span>, <span class='kw'>MSlevs</span> <span class='kw'>=</span> <span class='fl'>1</span>)), <span class='kw'>extraOptsRC</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>extraOptsFM</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
+    <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>ionization</span> <span class='kw'>=</span> <span class='no'>ionization</span>, <span class='kw'>MSlevs</span> <span class='kw'>=</span> <span class='fl'>1</span>)),
+  <span class='kw'>extraOptsRC</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>extraOptsFM</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -260,16 +291,13 @@ detection of repeating units. Sets the <code>elements</code> argument of
 <code>homol.search</code> function.</p></td>
     </tr>
     <tr>
-      <th>rtDev, absMzDev</th>
-      <td><p>Maximum retention and (absolute) <em>m/z</em>
-deviation for detection of homologues within series. These arguments set
-the <code>rttol</code> and <code>mztol</code> arguments of <code>homol.search</code>.</p></td>
-    </tr>
-    <tr>
-      <th>absMzDev, relMzDev</th>
-      <td><p>Maximum absolute/relative <em>m/z</em> deviation for
-annotation. Passed as the <code>mzabs.error</code> and <code>ppm.error</code> arguments
-to <code><a href='https://rdrr.io/pkg/RAMClustR/man/do.findmain.html'>do.findmain</a></code>.</p></td>
+      <th>rtDev, absMzDev, relMzDev</th>
+      <td><p>Maximum deviation for retention time or
+  absolute/relative <em>m/z</em>.</p>
+<p>For <code>generateComponentsRAMClustR</code>: Sets the <code>mzabs.error</code> and
+  <code>ppm.error</code> arguments to <code><a href='https://rdrr.io/pkg/RAMClustR/man/do.findmain.html'>do.findmain</a></code>.</p>
+<p>For <code>generateComponentsNontarget</code>: Sets the <code>rttol</code> and
+  <code>mztol</code> arguments of <code>homol.search</code>.</p></td>
     </tr>
     <tr>
       <th>traceHack</th>
@@ -352,14 +380,12 @@ and reduce the data size and thus complexity.</p>
   <code>relMinReplicates</code> arguments provide additional filtering
   functionality not provided by <span class="pkg">CAMERA</span> or <span class="pkg">RAMClustR</span> (except
   <code>minSize</code>). Note that these filters are enabled by default, hence,
-  final results may be different than what CAMERA/RAMClustR normally
-  would return.</p>
+  final results may be different than what CAMERA/RAMClustR normally would
+  return.</p>
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
     <p>Kuhl, C., Tautenhahn, R., Boettcher, C., Larson, T. R. and Neumann, S. CAMERA: an integrated strategy for compound spectra extraction and annotation of liquid chromatography/mass spectrometry data sets. Analytical Chemistry, 84:283-289 (2012)</p>
-<p>Loos, M., Singer, H. (2017). 
-			Nontargeted homologue series extraction from hyphenated high resolution mass spectrometry, 
-			Journal of Cheminformatics 9(12), . <br /><br /> Loos, M., Gerber, C., Corona, F., Hollender, J., Singer, H. (2015). 
+<p>Martin Loos (2016). nontarget: Detecting Isotope, Adduct and Homologue Relations in LC-MS Data. R package version 1.9. https://CRAN.R-project.org/package=nontarget <br /><br /> Loos, M., Gerber, C., Corona, F., Hollender, J., Singer, H. (2015). 
 			Accelerated isotope fine structure calculation using pruned transition trees, 
 			Analytical Chemistry 87(11), 5738-5744.</p>
 <p>Broeckling, Heuberger CD, Prince AL, Ingelsson JA, Prenni E, E. J (2013).

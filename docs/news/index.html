@@ -67,7 +67,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.9.0.9000</span>
       </span>
     </div>
 
@@ -131,12 +131,100 @@
     <div id="patroon-0-1-0-9000" class="section level1">
 <h1 class="page-header">
 <a href="#patroon-0-1-0-9000" class="anchor"></a>patRoon 0.1.0.9000</h1>
+<div id="march-2020" class="section level2">
+<h2 class="hasAnchor">
+<a href="#march-2020" class="anchor"></a>March 2020</h2>
+<ul>
+<li>Fixed: Normalization of scorings for formulae/compounds potentially uses wrong data after subsetting/filtering of <code>formulas</code>/<code>compounds</code> objects</li>
+<li>Suspect screening
+<ul>
+<li>Fixed: Errors/Warnings of missing data in suspect list were not shown if using cached data</li>
+<li>If a value is missing in any of the columns from the suspect list used for automatic ion mass calculation (e.g. SMILES, formula, …) then data from another suitable column is tried.</li>
+<li>Fixed: invalid neutral mass calculation for suspects with charged SMILES/InChIs</li>
+</ul>
+</li>
+<li>Small compatibility fix for feature finding with OpenMS 2.5 (reported by Thanh Wang)</li>
+<li>RAMClustR is now supported from CRAN and no need to install girhub package anymore</li>
+</ul>
+</div>
+<div id="february-2020" class="section level2">
+<h2 class="hasAnchor">
+<a href="#february-2020" class="anchor"></a>February 2020</h2>
+<ul>
+<li>Several small improvements and fixes for TASQ import</li>
+<li>Suspect screening:
+<ul>
+<li>now also support chemical formula for automatic m/z calculation</li>
+<li>more robust loading of suspect lists (e.g. skip suspects with missing/invalid data)</li>
+</ul>
+</li>
+</ul>
+</div>
+<div id="january-2020" class="section level2">
+<h2 class="hasAnchor">
+<a href="#january-2020" class="anchor"></a>January 2020</h2>
+<ul>
+<li>Ignore user specified scorings for local databases such as CompTox that are not actually present in the DB. This makes it easier to use e.g. different DB versions with differing scorings.</li>
+<li>Add scorings from wastewater and smoking metadata comptox MetFrag databases</li>
+<li>Windows install script now install latest (March2019) CompTox</li>
+<li>Updates for latest PubChemLite relaease (Jan2020)</li>
+<li>Suspect screening now doesn’t require pre-calculated ion <code>m/z</code> values. Instead, suspect lists can contain SMILES, InChI or neutral mass values which are used for automatic ion <code>m/z</code> calculation. See <code><a href="../reference/suspect-screening.html">?screenSuspects</a></code> for more details.</li>
+</ul>
+</div>
+<div id="december-2019" class="section level2">
+<h2 class="hasAnchor">
+<a href="#december-2019" class="anchor"></a>December 2019</h2>
+<ul>
+<li>Added missing score terms for latest CompTox MetFrag database</li>
+<li>labels parameter for formulas/compounds methods of <code><a href="../reference/generics.html">consensus()</a></code>
+</li>
+<li>Fixed: colour assignment for scores plotting of merged formulae/compound results might be incorrect (reported by Emma Schymanski)</li>
+<li>Fixed: analysis table in <code><a href="../reference/GUI-utils.html">newProject()</a></code> UI only showed partial amount of rows.</li>
+<li>Fixed: don’t print normalized instead of absolute design parameters when only one parameter is optimized in DoEs (fixes issue <a href='https://github.com/rickhelmus/patRoon/issues/10'>#10</a>)</li>
+</ul>
+</div>
+<div id="november-2019" class="section level2">
+<h2 class="hasAnchor">
+<a href="#november-2019" class="anchor"></a>November 2019</h2>
+<ul>
+<li>
+<strong>IMPORTANT</strong> The <code><a href="../reference/compounds-class.html">addFormulaScoring()</a></code> function now uses a different algorithm to calculate formula scores for compound candidates. The score is now based on the actual formula ranking in the provided <code>formulas</code> object, and is fixed between <em>zero</em> (no match) and <em>one</em> (best match).</li>
+<li>Formula feature consensus:
+<ul>
+<li>All scorings are now averaged, including those that are not fragment specific (e.g. precursor m/z error)</li>
+<li>This also improves ranking in certain specific cases</li>
+</ul>
+</li>
+<li>Vectorized plotting of MS spectra to make it potentially faster</li>
+<li>Added PubChemLite support for MetFrag</li>
+</ul>
+</div>
 <div id="october-2019" class="section level2">
 <h2 class="hasAnchor">
 <a href="#october-2019" class="anchor"></a>October 2019</h2>
 <ul>
+<li>Fixed: <code>convertMSFiles</code> correctly checks if input exists</li>
+<li>Specific optimizations after benchmarking results:
+<ul>
+<li>
+<code>maxProcAmount</code> (i.e. number of parallel processes) now defaults to amount of physical cores instead of total number of CPU threads.</li>
+<li>Decreased <code>batchSize</code> to <code>8</code> for GenForm formula calculation.</li>
+</ul>
+</li>
 <li>
 <code><a href="../reference/generics.html">plot()</a></code> for <code>featureGroups</code> can now highlight unique/shared features across replicates (suggested by V Albergamo)</li>
+<li>Linking of homologous series:
+<ul>
+<li>Improved info descriptions for <code><a href="../reference/componentsNT-class.html">plotGraph()</a></code>
+</li>
+<li>Series are now properly unlinked when merging (was too greedy)</li>
+<li>Better algorithm to detect conflicting series</li>
+<li>Fixed bug when updating removed links</li>
+</ul>
+</li>
+<li>
+<code>concs</code> option for <code><a href="../reference/analysis-information.html">generateAnalysisInfo()</a></code> to set concentration data</li>
+<li>Components for homologous series new report links as character string indices instead of numeric indices.</li>
 </ul>
 </div>
 <div id="september-2019" class="section level2">
@@ -156,6 +244,7 @@
 <li>
 <code>topMost</code> argument for GenForm formula calculation.</li>
 <li>Added XCMS3 support for finding and grouping features, importing/exisiting data and parameter optimization (i.e. mostly on-par with classic XCMS support).</li>
+<li>Changed compound result column name from InChi to InChI</li>
 </ul>
 </div>
 <div id="june-2019" class="section level2">
@@ -181,7 +270,7 @@
 <li>
 <code><a href="../reference/featureGroups-class.html">groups()</a></code> and <code><a href="../reference/generics.html">as.data.table()</a></code> methods for <code>featureGroups</code>: optionally consider feature areas instead of peak intensities.</li>
 <li>
-<code>plotSilhouettes()</code> method for <code>compoundsCluster</code>
+<code><a href="../reference/generics.html">plotSilhouettes()</a></code> method for <code>compoundsCluster</code>
 </li>
 <li>Added <code>rGroups</code> argument to subset operator for <code>featureGroups</code> to subset by replicate groups (equivalent to <code>rGroups</code> argument to <code><a href="../reference/generics.html">filter()</a></code>).</li>
 <li>Improved logging of output from CLI tools (e.g. OpenMS, MetFrag, SIRUS, …)</li>

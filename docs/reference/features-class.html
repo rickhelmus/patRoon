@@ -69,7 +69,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.9.0.9000</span>
       </span>
     </div>
 
@@ -157,9 +157,16 @@ replicateGroups(obj)
 as.data.table(x)
 
 # S4 method for features
-filter(obj, absMinIntensity = NULL,
-  relMinIntensity = NULL, retentionRange = NULL, mzRange = NULL,
-  mzDefectRange = NULL, chromWidthRange = NULL, negate = FALSE)
+filter(
+  obj,
+  absMinIntensity = NULL,
+  relMinIntensity = NULL,
+  retentionRange = NULL,
+  mzRange = NULL,
+  mzDefectRange = NULL,
+  chromWidthRange = NULL,
+  negate = FALSE
+)
 
 # S4 method for features,ANY,missing,missing
 [(x, i, j, ..., drop = TRUE)
@@ -177,8 +184,7 @@ $(x, name)
 filter(obj, ...)
 
 # S4 method for featuresXCMS3,ANY,missing,missing
-[(x, i, j, ...,
-  drop = TRUE)
+[(x, i, j, ..., drop = TRUE)
 
 # S4 method for featuresXCMS3
 filter(obj, ...)</pre>

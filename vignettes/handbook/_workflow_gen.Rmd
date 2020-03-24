@@ -93,7 +93,7 @@ The `newProject()` function can be used to setup a new project. When you run thi
 
 ```{r newp,echo=FALSE,out.width="450px"}
 if (knitr::is_html_output()) {
-    knitr::include_graphics(knitr::image_uri(file.path(vignDir, "newp.png")))
+    knitr::include_graphics(knitr::image_uri(file.path(vignDir, "newp.png")), error = FALSE)
 } else
     knitr::include_graphics(file.path(vignDir, "newp.png"))
 ```

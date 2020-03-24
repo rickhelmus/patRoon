@@ -36,13 +36,13 @@
 
 
 <meta property="og:title" content="Workflow solutions for mass-spectrometry based non-target analysis. — patRoon-package" />
-<meta property="og:description" content="Provides a common interface to the various workflow steps that are
-    typically part of a mass spectrometry based non-target analysis. Various
-    (open-source) tools are combined which provide algorithms for extraction
-    and grouping of features, extraction of MS and MS/MS data, automatic
-    determination of formula and compound candidates and grouping related
-    features to components. In addition, various tools are provided for e.g.
-    data preparation and cleanup, plotting results and automatic reporting." />
+<meta property="og:description" content="Provides an easy-to-use interface to a mass spectrometry based
+    non-target analysis workflow. Various (open-source) tools are combined
+    which provide algorithms for extraction and grouping of features,
+    extraction of MS and MS/MS data, automatic formula and compound annotation
+    and grouping related features to components. In addition, various tools are
+    provided for e.g. data preparation and cleanup, plotting results and
+    automatic reporting." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -75,7 +75,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.9.0.9000</span>
       </span>
     </div>
 
@@ -138,13 +138,13 @@
     </div>
 
     <div class="ref-description">
-    <p>Provides a common interface to the various workflow steps that are
-    typically part of a mass spectrometry based non-target analysis. Various
-    (open-source) tools are combined which provide algorithms for extraction
-    and grouping of features, extraction of MS and MS/MS data, automatic
-    determination of formula and compound candidates and grouping related
-    features to components. In addition, various tools are provided for e.g.
-    data preparation and cleanup, plotting results and automatic reporting.</p>
+    <p>Provides an easy-to-use interface to a mass spectrometry based
+    non-target analysis workflow. Various (open-source) tools are combined
+    which provide algorithms for extraction and grouping of features,
+    extraction of MS and MS/MS data, automatic formula and compound annotation
+    and grouping related features to components. In addition, various tools are
+    provided for e.g. data preparation and cleanup, plotting results and
+    automatic reporting.</p>
     </div>
 
 
@@ -166,7 +166,8 @@
   of the cache file (default is <code class="file">cache.sqlite</code>).</p></li>
 <li><p><code>patRoon.maxProcAmount</code>: The maximum number of processes that
   should be initiated in parallel. A good starting point is the number of
-  cores available. Default is set by <code><a href='https://rdrr.io/r/parallel/detectCores.html'>detectCores</a></code>.</p></li>
+  physical cores, which is the default as detected by
+  <code><a href='https://rdrr.io/r/parallel/detectCores.html'>detectCores</a></code>.</p></li>
 <li><p><code>patRoon.path.pwiz</code>: The path in which the
   <code class='command'>ProteoWizard</code> binaries are installed. If unset an attempt is made
   to find this directory from the Windows registry and <span class="option">PATH</span>
@@ -180,6 +181,9 @@
   <code>"C:/MetFrag2.4.2-CL.jar"</code>.</p></li>
 <li><p><code>patRoon.path.MetFragCompTox</code>: The complete file path to the
   CompTox database <code class="file">csv</code> file. See <code><a href='compound-generation.html'>generateCompounds</a></code> for
+  more details.</p></li>
+<li><p><code>patRoon.path.MetFragPubChemLite</code>: The complete file path to the
+  PubChem database <code class="file">csv</code> file. See <code><a href='compound-generation.html'>generateCompounds</a></code> for
   more details.</p></li>
 <li><p><code>patRoon.path.SIRIUS</code>: The directory in which SIRIUS is
   installed. Unless the binaries can be located via the <span class="option">PATH</span>
@@ -199,6 +203,10 @@
   <code>reportHTML</code> only locates the binary through the <span class="option">PATH</span>
   environment variable, hence, it is recommended to set up <span class="option">PATH</span>
   instead.</p></li>
+<li><p><code>patRoon.path.obabel</code>: The path in which the <code class='command'>OpenBabel</code>
+  binaries are installed. Usually the location is added to the <span class="option">PATH</span>
+  environment variable when OpenBabel is installed, in which case this option
+  can be left empty.</p></li>
 </ul>
 
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>

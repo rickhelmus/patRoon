@@ -69,7 +69,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.9.0.9000</span>
       </span>
     </div>
 
@@ -138,19 +138,36 @@
     <pre class="usage"><span class='co'># S4 method for featureGroups</span>
 <span class='fu'>generateMSPeakLists</span>(<span class='no'>fGroups</span>, <span class='no'>algorithm</span>, <span class='no'>...</span>)
 
-<span class='fu'>generateMSPeakListsDA</span>(<span class='no'>fGroups</span>, <span class='kw'>bgsubtr</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>maxMSRtWindow</span> <span class='kw'>=</span> <span class='fl'>5</span>,
-  <span class='kw'>minMSIntensity</span> <span class='kw'>=</span> <span class='fl'>500</span>, <span class='kw'>minMSMSIntensity</span> <span class='kw'>=</span> <span class='fl'>500</span>, <span class='kw'>clear</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>close</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>save</span> <span class='kw'>=</span> <span class='no'>close</span>, <span class='kw'>MSMSType</span> <span class='kw'>=</span> <span class='st'>"MSMS"</span>,
-  <span class='kw'>avgFGroupParams</span> <span class='kw'>=</span> <span class='fu'>getDefAvgPListParams</span>())
+<span class='fu'>generateMSPeakListsDA</span>(
+  <span class='no'>fGroups</span>,
+  <span class='kw'>bgsubtr</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>maxMSRtWindow</span> <span class='kw'>=</span> <span class='fl'>5</span>,
+  <span class='kw'>minMSIntensity</span> <span class='kw'>=</span> <span class='fl'>500</span>,
+  <span class='kw'>minMSMSIntensity</span> <span class='kw'>=</span> <span class='fl'>500</span>,
+  <span class='kw'>clear</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>close</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>save</span> <span class='kw'>=</span> <span class='no'>close</span>,
+  <span class='kw'>MSMSType</span> <span class='kw'>=</span> <span class='st'>"MSMS"</span>,
+  <span class='kw'>avgFGroupParams</span> <span class='kw'>=</span> <span class='fu'>getDefAvgPListParams</span>()
+)
 
-<span class='fu'>generateMSPeakListsDAFMF</span>(<span class='no'>fGroups</span>, <span class='kw'>minMSIntensity</span> <span class='kw'>=</span> <span class='fl'>500</span>,
-  <span class='kw'>minMSMSIntensity</span> <span class='kw'>=</span> <span class='fl'>500</span>, <span class='kw'>close</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>save</span> <span class='kw'>=</span> <span class='no'>close</span>,
-  <span class='kw'>avgFGroupParams</span> <span class='kw'>=</span> <span class='fu'>getDefAvgPListParams</span>())
+<span class='fu'>generateMSPeakListsDAFMF</span>(
+  <span class='no'>fGroups</span>,
+  <span class='kw'>minMSIntensity</span> <span class='kw'>=</span> <span class='fl'>500</span>,
+  <span class='kw'>minMSMSIntensity</span> <span class='kw'>=</span> <span class='fl'>500</span>,
+  <span class='kw'>close</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>save</span> <span class='kw'>=</span> <span class='no'>close</span>,
+  <span class='kw'>avgFGroupParams</span> <span class='kw'>=</span> <span class='fu'>getDefAvgPListParams</span>()
+)
 
-<span class='fu'>generateMSPeakListsMzR</span>(<span class='no'>fGroups</span>, <span class='kw'>maxMSRtWindow</span> <span class='kw'>=</span> <span class='fl'>5</span>,
-  <span class='kw'>precursorMzWindow</span> <span class='kw'>=</span> <span class='fl'>4</span>, <span class='kw'>topMost</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+<span class='fu'>generateMSPeakListsMzR</span>(
+  <span class='no'>fGroups</span>,
+  <span class='kw'>maxMSRtWindow</span> <span class='kw'>=</span> <span class='fl'>5</span>,
+  <span class='kw'>precursorMzWindow</span> <span class='kw'>=</span> <span class='fl'>4</span>,
+  <span class='kw'>topMost</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>avgFeatParams</span> <span class='kw'>=</span> <span class='fu'>getDefAvgPListParams</span>(),
-  <span class='kw'>avgFGroupParams</span> <span class='kw'>=</span> <span class='fu'>getDefAvgPListParams</span>())
+  <span class='kw'>avgFGroupParams</span> <span class='kw'>=</span> <span class='fu'>getDefAvgPListParams</span>()
+)
 
 <span class='fu'>getDefAvgPListParams</span>(<span class='no'>...</span>)</pre>
 

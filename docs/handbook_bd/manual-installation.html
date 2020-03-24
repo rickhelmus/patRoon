@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<html lang="" xml:lang="">
 <head>
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>2.2 Manual installation | patRoon handbook</title>
   <meta name="description" content="2.2 Manual installation | patRoon handbook" />
-  <meta name="generator" content="bookdown 0.13 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.18 and GitBook 2.6.7" />
 
   <meta property="og:title" content="2.2 Manual installation | patRoon handbook" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2019-10-12" />
+<meta name="date" content="2020-03-24" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -40,6 +40,7 @@
 <link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
 
 
 
@@ -47,11 +48,16 @@
 
 
 
-<script src="libs/htmlwidgets-1.3/htmlwidgets.js"></script>
-<script src="libs/viz-0.3/viz.js"></script>
+
+
+<script src="libs/htmlwidgets-1.5.1/htmlwidgets.js"></script>
+<script src="libs/viz-1.8.2/viz.js"></script>
 <link href="libs/DiagrammeR-styles-0.2/styles.css" rel="stylesheet" />
-<script src="libs/grViz-binding-1.0.1/grViz.js"></script>
+<script src="libs/grViz-binding-1.0.5/grViz.js"></script>
 <script src="libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="libs/vis-4.20.1/vis.css" rel="stylesheet" />
+<script src="libs/vis-4.20.1/vis.min.js"></script>
+<script src="libs/visNetwork-binding-2.0.9/visNetwork.js"></script>
 <script src="libs/d3-3.5.3/./d3.min.js"></script>
 <link href="libs/d3heatmapcore-0.0.0/heatmapcore.css" rel="stylesheet" />
 <script src="libs/d3heatmapcore-0.0.0/heatmapcore.js"></script>
@@ -178,7 +184,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="chapter" data-level="5.4" data-path="unOv.html"><a href="unOv.html"><i class="fa fa-check"></i><b>5.4</b> Unique and overlapping features</a></li>
 <li class="chapter" data-level="5.5" data-path="visualization.html"><a href="visualization.html"><i class="fa fa-check"></i><b>5.5</b> Visualization</a><ul>
-<li class="chapter" data-level="5.5.1" data-path="visualization.html"><a href="visualization.html#features-and-annatation-data"><i class="fa fa-check"></i><b>5.5.1</b> Features and annatation data</a></li>
+<li class="chapter" data-level="5.5.1" data-path="visualization.html"><a href="visualization.html#vis_feat_ann"><i class="fa fa-check"></i><b>5.5.1</b> Features and annatation data</a></li>
 <li class="chapter" data-level="5.5.2" data-path="visualization.html"><a href="visualization.html#visComp"><i class="fa fa-check"></i><b>5.5.2</b> Comparing data</a></li>
 <li class="chapter" data-level="5.5.3" data-path="visualization.html"><a href="visualization.html#plotClust"><i class="fa fa-check"></i><b>5.5.3</b> Hierarchical clustering results</a></li>
 <li class="chapter" data-level="5.5.4" data-path="visualization.html"><a href="visualization.html#interactive-plotting-of-chromatography-data"><i class="fa fa-check"></i><b>5.5.4</b> Interactive plotting of chromatography data</a></li>
@@ -195,8 +201,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="6.3" data-path="exporting-and-converting-feature-data.html"><a href="exporting-and-converting-feature-data.html"><i class="fa fa-check"></i><b>6.3</b> Exporting and converting feature data</a></li>
 <li class="chapter" data-level="6.4" data-path="consensus.html"><a href="consensus.html"><i class="fa fa-check"></i><b>6.4</b> Algorithm consensus</a></li>
 <li class="chapter" data-level="6.5" data-path="compclust.html"><a href="compclust.html"><i class="fa fa-check"></i><b>6.5</b> Compound clustering</a></li>
-<li class="chapter" data-level="6.6" data-path="caching.html"><a href="caching.html"><i class="fa fa-check"></i><b>6.6</b> Caching</a></li>
-<li class="chapter" data-level="6.7" data-path="parallelization.html"><a href="parallelization.html"><i class="fa fa-check"></i><b>6.7</b> Parallelization</a></li>
+<li class="chapter" data-level="6.6" data-path="basic-quantitative-and-regression-analysis.html"><a href="basic-quantitative-and-regression-analysis.html"><i class="fa fa-check"></i><b>6.6</b> Basic quantitative and regression analysis</a></li>
+<li class="chapter" data-level="6.7" data-path="caching.html"><a href="caching.html"><i class="fa fa-check"></i><b>6.7</b> Caching</a></li>
+<li class="chapter" data-level="6.8" data-path="parallelization.html"><a href="parallelization.html"><i class="fa fa-check"></i><b>6.8</b> Parallelization</a></li>
 </ul></li>
 </ul>
 
@@ -233,20 +240,17 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb2-4" data-line-number="4"><span class="co"># only needed for Bruker DataAnalysis integration</span></a>
 <a class="sourceLine" id="cb2-5" data-line-number="5"><span class="kw">install.packages</span>(<span class="st">&quot;RDCOMClient&quot;</span>, <span class="dt">repos =</span> <span class="st">&quot;http://www.omegahat.net/R&quot;</span>)</a>
 <a class="sourceLine" id="cb2-6" data-line-number="6"></a>
-<a class="sourceLine" id="cb2-7" data-line-number="7"><span class="co"># only needed for RAMClustR integration</span></a>
-<a class="sourceLine" id="cb2-8" data-line-number="8">remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;cbroeckl/RAMClustR&quot;</span>)</a>
-<a class="sourceLine" id="cb2-9" data-line-number="9"></a>
-<a class="sourceLine" id="cb2-10" data-line-number="10"><span class="co"># only when using the R interface (not recommended by default)</span></a>
-<a class="sourceLine" id="cb2-11" data-line-number="11">remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;c-ruttkies/MetFragR/metfRag&quot;</span>)</a></code></pre></div>
-<p>Note that the latter three commands concern installation of <em>optional</em> packages. If you are unsure, you probably want to install RAMClustR but not any of the others.</p>
+<a class="sourceLine" id="cb2-7" data-line-number="7"><span class="co"># only when using the R interface (not recommended by default)</span></a>
+<a class="sourceLine" id="cb2-8" data-line-number="8">remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;c-ruttkies/MetFragR/metfRag&quot;</span>)</a></code></pre></div>
+<p>Note that the latter two commands concern installation of <em>optional</em> packages. If you are unsure then you probably don’t need them.</p>
 </div>
 <div id="other-dependencies" class="section level3">
 <h3><span class="header-section-number">2.2.2</span> Other dependencies</h3>
-<p>Depending on which functionality is used, the following external dependencies may be installed:</p>
+<p>Depending on which functionality is used, the following external dependencies may need to be installed:</p>
 <table>
 <colgroup>
-<col width="37%" />
-<col width="62%" />
+<col width="39%" />
+<col width="60%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -276,12 +280,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <td>Recommended. Used for annotation with MetFrag.</td>
 </tr>
 <tr class="even">
-<td><a href="https://epa.figshare.com/articles/CompTox_Chemicals_Dashboard_Metadata_Files_for_Integration_with_MetFrag/7525199">MetFrag CompTox DB</a></td>
-<td>Database files necessary for usage of the <a href="https://comptox.epa.gov/dashboard">CompTox</a> database with MetFrag. Note that currently only scorings from the <code>SelectMetaData</code> and <code>SelectMetaDataPlus</code> files are supported and a recent version (&gt;=2.4.5) of MetFrag is required.</td>
+<td><a href="ftp://newftp.epa.gov/COMPTOX/Sustainable_Chemistry_Data/Chemistry_Dashboard/MetFrag_metadata_files">MetFrag CompTox DB</a></td>
+<td>Database files necessary for usage of the <a href="https://comptox.epa.gov/dashboard">CompTox</a> database with MetFrag. Note that a recent version of MetFrag (&gt;=2.4.5) is required. Note that the lists with additions for <a href="https://zenodo.org/record/3364464#.XnjM-XLvKUk">smoking metadata</a> and <a href="https://zenodo.org/record/3472781#.XnjMAHLvKUk">wastewater metadata</a> are also supported.</td>
 </tr>
 <tr class="odd">
+<td><a href="https://zenodo.org/record/3548654">MetFrag PubChemLite DB</a></td>
+<td>Database files needed to use PubChemLite with MetFrag (currently tested with tier0 and tier1 November 2019 versions).</td>
+</tr>
+<tr class="even">
 <td><a href="https://bio.informatik.uni-jena.de/software/sirius/">SIRIUS</a></td>
 <td>For formula and/or compound annotation.</td>
+</tr>
+<tr class="odd">
+<td><a href="http://openbabel.org/wiki/Main_Page">OpenBabel</a></td>
+<td>Used in some cases for suspect screening (e.g. to calculate molecular masses for suspects with only InChI information). Otherwise optional.</td>
 </tr>
 <tr class="even">
 <td><a href="https://pngquant.org/">pngquant</a></td>
@@ -289,13 +301,15 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </tr>
 </tbody>
 </table>
-<p>After installation you may need to configure the file path to ProteoWizard, OpenMS, SIRIUS, MetFrag, the MetFrag CompTox DB and/or pngquant (normally ProteoWizard and OpenMS should be automatically found). To configure their file locations you should set some global package options with the <code>option()</code> R function, for instance:</p>
+<p>After installation you may need to configure the file path to ProteoWizard, OpenMS, SIRIUS, MetFrag, the MetFrag CompTox DB and/or pngquant (normally ProteoWizard and OpenMS should be automatically found). To configure their file locations you should set some global package options with the <code>options()</code> R function, for instance:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="kw">options</span>(<span class="dt">patRoon.path.pwiz =</span> <span class="st">&quot;C:/ProteoWizard&quot;</span>) <span class="co"># location of ProteoWizard installation folder</span></a>
 <a class="sourceLine" id="cb3-2" data-line-number="2"><span class="kw">options</span>(<span class="dt">patRoon.path.SIRIUS =</span> <span class="st">&quot;C:/sirius-win64-3.5.1&quot;</span>) <span class="co"># location where SIRIUS was extracted</span></a>
 <a class="sourceLine" id="cb3-3" data-line-number="3"><span class="kw">options</span>(<span class="dt">patRoon.path.OpenMS =</span> <span class="st">&quot;/usr/local/bin&quot;</span>) <span class="co"># directory with the OpenMS binaries</span></a>
 <a class="sourceLine" id="cb3-4" data-line-number="4"><span class="kw">options</span>(<span class="dt">patRoon.path.pngquant =</span> <span class="st">&quot;~/pngquant&quot;</span>) <span class="co"># directory containing pngquant binary</span></a>
 <a class="sourceLine" id="cb3-5" data-line-number="5"><span class="kw">options</span>(<span class="dt">patRoon.path.MetFragCL =</span> <span class="st">&quot;~/MetFrag2.4.5-CL.jar&quot;</span>) <span class="co"># full location to the jar file</span></a>
-<a class="sourceLine" id="cb3-6" data-line-number="6"><span class="kw">options</span>(<span class="dt">patRoon.path.MetFragCompTox =</span> <span class="st">&quot;C:/DSSTox_01May18_Full_SelectMetaDataPlus.csv&quot;</span>) <span class="co"># full location to desired CompTox CSV file</span></a></code></pre></div>
+<a class="sourceLine" id="cb3-6" data-line-number="6"><span class="kw">options</span>(<span class="dt">patRoon.path.MetFragCompTox =</span> <span class="st">&quot;C:/CompTox_17March2019_SelectMetaData.csv&quot;</span>) <span class="co"># full location to desired CompTox CSV file</span></a>
+<a class="sourceLine" id="cb3-7" data-line-number="7"><span class="kw">options</span>(<span class="dt">patRoon.path.MetFragPubChemLite =</span> <span class="st">&quot;~/PubChemLite_14Jan2020_tier0.csv&quot;</span>) <span class="co"># full location to desired PubChemLite CSV file</span></a>
+<a class="sourceLine" id="cb3-8" data-line-number="8"><span class="kw">options</span>(<span class="dt">patRoon.path.obabel =</span> <span class="st">&quot;C:/Program Files/OpenBabel-3.0.0&quot;</span>) <span class="co"># directory with OpenBabel binaries</span></a></code></pre></div>
 <p>These commands have to be executed everytime you start a new R session (e.g. as part of your script). However, it is probably easier to add them to your <code>~/.Rprofile</code> file so that they are executed automatically when you start R. If you don’t have this file yet you can simply create it yourself (for more information see e.g. <a href="https://stackoverflow.com/a/46819910">this SO answer</a>).</p>
 </div>
 <div id="patroon-installation" class="section level3">
@@ -328,11 +342,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
 <script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
 <script>
 gitbook.require(["gitbook"], function(gitbook) {
 gitbook.start({
@@ -347,6 +363,10 @@ gitbook.start({
 "text": null
 },
 "history": {
+"link": null,
+"text": null
+},
+"view": {
 "link": null,
 "text": null
 },

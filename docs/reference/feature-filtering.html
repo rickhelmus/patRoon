@@ -69,7 +69,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.9.0.9000</span>
       </span>
     </div>
 
@@ -136,20 +136,33 @@
     </div>
 
     <pre class="usage"><span class='co'># S4 method for featureGroups</span>
-<span class='fu'><a href='generics.html'>filter</a></span>(<span class='no'>obj</span>, <span class='kw'>absMinIntensity</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>relMinIntensity</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>preAbsMinIntensity</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>preRelMinIntensity</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>absMinAnalyses</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>relMinAnalyses</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>absMinReplicates</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>relMinReplicates</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>absMinFeatures</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>relMinFeatures</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>absMinReplicateAbundance</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>relMinReplicateAbundance</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>maxReplicateIntRSD</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>blankThreshold</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>retentionRange</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>mzRange</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>mzDefectRange</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>chromWidthRange</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>rGroups</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>removeBlanks</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>negate</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+<span class='fu'><a href='generics.html'>filter</a></span>(
+  <span class='no'>obj</span>,
+  <span class='kw'>absMinIntensity</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>relMinIntensity</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>preAbsMinIntensity</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>preRelMinIntensity</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>absMinAnalyses</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>relMinAnalyses</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>absMinReplicates</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>relMinReplicates</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>absMinFeatures</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>relMinFeatures</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>absMinReplicateAbundance</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>relMinReplicateAbundance</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>maxReplicateIntRSD</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>blankThreshold</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>retentionRange</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>mzRange</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>mzDefectRange</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>chromWidthRange</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>rGroups</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>removeBlanks</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>negate</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
+)
 
 <span class='co'># S4 method for featureGroups</span>
-<span class='fu'>replicateGroupSubtract</span>(<span class='no'>fGroups</span>, <span class='no'>rGroups</span>,
-  <span class='kw'>threshold</span> <span class='kw'>=</span> <span class='fl'>0</span>)</pre>
+<span class='fu'>replicateGroupSubtract</span>(<span class='no'>fGroups</span>, <span class='no'>rGroups</span>, <span class='kw'>threshold</span> <span class='kw'>=</span> <span class='fl'>0</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -283,7 +296,7 @@ the given replicate groups.</p></td>
   blank filters are executed after the replicate abundance filter it may be
   necessary to ensure minimum replicate abundance again as the intensity and
   blank filters may have removed some features within a replicate group.</p>
-<p>With this in mind, filters (if specified) occurs in the following order:</p>
+<p>With this in mind, filters (if specified) occur in the following order:</p>
 <p></p><ol>
 <li><p>Pre-Intensity filters (<em>i.e.</em> <code>preAbsMinIntensity</code> and
   <code>preRelMinIntensity</code>).</p></li>

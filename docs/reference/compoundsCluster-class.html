@@ -70,7 +70,7 @@ candidate structures within compounds objects." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.9.0.9000</span>
       </span>
     </div>
 
@@ -159,32 +159,39 @@ lengths(x, use.names = TRUE)
 show(object)
 
 # S4 method for compoundsCluster,ANY,missing,missing
-[(x, i, j, ...,
-  drop = TRUE)
+[(x, i, j, ..., drop = TRUE)
 
 # S4 method for compoundsCluster
-treeCut(obj, k = NULL, h = NULL,
-  groupName)
+treeCut(obj, k = NULL, h = NULL, groupName)
 
 # S4 method for compoundsCluster
-treeCutDynamic(obj, maxTreeHeight, deepSplit,
-  minModuleSize, groupName)
+treeCutDynamic(obj, maxTreeHeight, deepSplit, minModuleSize, groupName)
 
 # S4 method for compoundsCluster,ANY
-plot(x, groupName, pal = "Paired",
+plot(
+  x,
+  groupName,
+  pal = "Paired",
   colourBranches = lengths(x)[groupName] < 50,
-  showLegend = lengths(x)[groupName] < 20, ...)
+  showLegend = lengths(x)[groupName] < 20,
+  ...
+)
 
 # S4 method for compoundsCluster
 getMCS(obj, groupName, cluster)
 
 # S4 method for compoundsCluster
-plotStructure(obj, groupName, cluster,
-  width = 500, height = 500, withTitle = TRUE)
+plotStructure(
+  obj,
+  groupName,
+  cluster,
+  width = 500,
+  height = 500,
+  withTitle = TRUE
+)
 
 # S4 method for compoundsCluster
-plotSilhouettes(obj, kSeq, groupName,
-  pch = 16, type = "b", ...)</pre>
+plotSilhouettes(obj, kSeq, groupName, pch = 16, type = "b", ...)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">

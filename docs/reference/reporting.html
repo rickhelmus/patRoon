@@ -71,7 +71,7 @@ identified compounds." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.9.0.9000</span>
       </span>
     </div>
 
@@ -140,43 +140,83 @@ identified compounds.</p>
     </div>
 
     <pre class="usage"><span class='co'># S4 method for featureGroups</span>
-<span class='fu'>reportCSV</span>(<span class='no'>fGroups</span>, <span class='kw'>path</span> <span class='kw'>=</span> <span class='st'>"report"</span>,
-  <span class='kw'>reportFGroupsAsRows</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>reportFGroupsAnalysisInfo</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>reportFGroupsRetMz</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>reportFeatures</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>formulas</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>formulasNormalizeScores</span> <span class='kw'>=</span> <span class='st'>"max"</span>, <span class='kw'>formulasExclNormScores</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>compounds</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>compoundsNormalizeScores</span> <span class='kw'>=</span> <span class='st'>"max"</span>,
-  <span class='kw'>compoundsExclNormScores</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"score"</span>, <span class='st'>"individualMoNAScore"</span>),
-  <span class='kw'>compsCluster</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>components</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>retMin</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>clearPath</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
-
-<span class='co'># S4 method for featureGroups</span>
-<span class='fu'>reportPDF</span>(<span class='no'>fGroups</span>, <span class='kw'>path</span> <span class='kw'>=</span> <span class='st'>"report"</span>,
-  <span class='kw'>reportFGroups</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>formulas</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>formulasTopMost</span> <span class='kw'>=</span> <span class='fl'>5</span>,
-  <span class='kw'>formulasNormalizeScores</span> <span class='kw'>=</span> <span class='st'>"max"</span>, <span class='kw'>formulasExclNormScores</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>reportFormulaSpectra</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>compounds</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+<span class='fu'>reportCSV</span>(
+  <span class='no'>fGroups</span>,
+  <span class='kw'>path</span> <span class='kw'>=</span> <span class='st'>"report"</span>,
+  <span class='kw'>reportFGroupsAsRows</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>reportFGroupsAnalysisInfo</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>reportFGroupsRetMz</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>reportFeatures</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>formulas</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>formulasNormalizeScores</span> <span class='kw'>=</span> <span class='st'>"max"</span>,
+  <span class='kw'>formulasExclNormScores</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>compounds</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>compoundsNormalizeScores</span> <span class='kw'>=</span> <span class='st'>"max"</span>,
   <span class='kw'>compoundsExclNormScores</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"score"</span>, <span class='st'>"individualMoNAScore"</span>),
-  <span class='kw'>compoundsOnlyUsedScorings</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>compoundsTopMost</span> <span class='kw'>=</span> <span class='fl'>5</span>,
-  <span class='kw'>compsCluster</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>components</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>MSPeakLists</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>retMin</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>EICGrid</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>2</span>, <span class='fl'>1</span>), <span class='kw'>EICRtWindow</span> <span class='kw'>=</span> <span class='fl'>20</span>,
-  <span class='kw'>EICMzWindow</span> <span class='kw'>=</span> <span class='fl'>0.005</span>, <span class='kw'>EICTopMost</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>EICOnlyPresent</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>clearPath</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+  <span class='kw'>compsCluster</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>components</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>retMin</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>clearPath</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
+)
 
 <span class='co'># S4 method for featureGroups</span>
-<span class='fu'>reportHTML</span>(<span class='no'>fGroups</span>, <span class='kw'>path</span> <span class='kw'>=</span> <span class='st'>"report"</span>,
-  <span class='kw'>reportPlots</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"chord"</span>, <span class='st'>"venn"</span>, <span class='st'>"upset"</span>, <span class='st'>"eics"</span>, <span class='st'>"formulas"</span>),
-  <span class='kw'>formulas</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>formulasTopMost</span> <span class='kw'>=</span> <span class='fl'>5</span>,
-  <span class='kw'>formulasNormalizeScores</span> <span class='kw'>=</span> <span class='st'>"max"</span>, <span class='kw'>formulasExclNormScores</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>compounds</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>compoundsNormalizeScores</span> <span class='kw'>=</span> <span class='st'>"max"</span>,
+<span class='fu'>reportPDF</span>(
+  <span class='no'>fGroups</span>,
+  <span class='kw'>path</span> <span class='kw'>=</span> <span class='st'>"report"</span>,
+  <span class='kw'>reportFGroups</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>formulas</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>formulasTopMost</span> <span class='kw'>=</span> <span class='fl'>5</span>,
+  <span class='kw'>formulasNormalizeScores</span> <span class='kw'>=</span> <span class='st'>"max"</span>,
+  <span class='kw'>formulasExclNormScores</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>reportFormulaSpectra</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>compounds</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>compoundsNormalizeScores</span> <span class='kw'>=</span> <span class='st'>"max"</span>,
   <span class='kw'>compoundsExclNormScores</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"score"</span>, <span class='st'>"individualMoNAScore"</span>),
-  <span class='kw'>compoundsOnlyUsedScorings</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>compoundsTopMost</span> <span class='kw'>=</span> <span class='fl'>5</span>,
-  <span class='kw'>compsCluster</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>includeMFWebLinks</span> <span class='kw'>=</span> <span class='st'>"compounds"</span>,
-  <span class='kw'>components</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>interactiveHeat</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>MSPeakLists</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>retMin</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>EICRtWindow</span> <span class='kw'>=</span> <span class='fl'>20</span>, <span class='kw'>EICMzWindow</span> <span class='kw'>=</span> <span class='fl'>0.005</span>,
-  <span class='kw'>EICTopMost</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>EICOnlyPresent</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>selfContained</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>compoundsOnlyUsedScorings</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>compoundsTopMost</span> <span class='kw'>=</span> <span class='fl'>5</span>,
+  <span class='kw'>compsCluster</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>components</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>MSPeakLists</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>retMin</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>EICGrid</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>2</span>, <span class='fl'>1</span>),
+  <span class='kw'>EICRtWindow</span> <span class='kw'>=</span> <span class='fl'>20</span>,
+  <span class='kw'>EICMzWindow</span> <span class='kw'>=</span> <span class='fl'>0.005</span>,
+  <span class='kw'>EICTopMost</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>EICOnlyPresent</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>clearPath</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
+)
+
+<span class='co'># S4 method for featureGroups</span>
+<span class='fu'>reportHTML</span>(
+  <span class='no'>fGroups</span>,
+  <span class='kw'>path</span> <span class='kw'>=</span> <span class='st'>"report"</span>,
+  <span class='kw'>reportPlots</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"chord"</span>, <span class='st'>"venn"</span>, <span class='st'>"upset"</span>, <span class='st'>"eics"</span>, <span class='st'>"formulas"</span>),
+  <span class='kw'>formulas</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>formulasTopMost</span> <span class='kw'>=</span> <span class='fl'>5</span>,
+  <span class='kw'>formulasNormalizeScores</span> <span class='kw'>=</span> <span class='st'>"max"</span>,
+  <span class='kw'>formulasExclNormScores</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>compounds</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>compoundsNormalizeScores</span> <span class='kw'>=</span> <span class='st'>"max"</span>,
+  <span class='kw'>compoundsExclNormScores</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"score"</span>, <span class='st'>"individualMoNAScore"</span>),
+  <span class='kw'>compoundsOnlyUsedScorings</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>compoundsTopMost</span> <span class='kw'>=</span> <span class='fl'>5</span>,
+  <span class='kw'>compsCluster</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>includeMFWebLinks</span> <span class='kw'>=</span> <span class='st'>"compounds"</span>,
+  <span class='kw'>components</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>interactiveHeat</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>MSPeakLists</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>retMin</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>EICRtWindow</span> <span class='kw'>=</span> <span class='fl'>20</span>,
+  <span class='kw'>EICMzWindow</span> <span class='kw'>=</span> <span class='fl'>0.005</span>,
+  <span class='kw'>EICTopMost</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>EICOnlyPresent</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>selfContained</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>optimizePng</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>maxProcAmount</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"patRoon.maxProcAmount"</span>),
-  <span class='kw'>clearPath</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>openReport</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>noDate</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
+  <span class='kw'>clearPath</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>openReport</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>noDate</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">

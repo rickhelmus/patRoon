@@ -55,7 +55,7 @@ getScriptCode <- function(input, analyses)
 
     template <- templates::tmpl(readAllFile(system.file("templates", "main_script.R", package = "patRoon")),
                                 destination = sldest, generateAnaInfo = input$generateAnaInfo, analysisTableFile = input$analysisTableFile,
-                                analyses = analyses, suspectList = input$suspectList,
+                                analyses = analyses, suspectList = input$suspectList, suspectAdduct = input$suspectAdduct,
                                 doMSPeakFind = (input$formulaGen != "" && input$formulaGen != "Bruker") || input$compIdent != "",
                                 precursorMzWindow = input$precursorMzWindow,
                                 polarity = input$polarity, reportFormats = input$report)
@@ -271,11 +271,21 @@ getNewProjectUI <- function(destPath)
                         selectInput("featGrouper", "Feature grouper", c("OpenMS", "XCMS"),
                                     "OpenMS", FALSE, width = "100%")
                     ),
-                    fillCol(
-                        flex = c(1, NA),
-                        height = 90,
-                        fileSelect("suspectList", "suspectListButton", "Suspect list"),
-                        textNote("Leave blank for no suspect screening (i.e. perform full non-target analysis)")
+                    fillRow(
+                        height = 130,
+                        fillCol(
+                            flex = c(1, NA),
+                            height = 110,
+                            width = "95%",
+                            fileSelect("suspectList", "suspectListButton", "Suspect list"),
+                            textNote("Leave blank for no suspect screening (i.e. perform full non-target analysis)")
+                        ),
+                        fillCol(
+                            flex = c(1, NA),
+                            height = 130,
+                            textInput("suspectAdduct", "Adduct", placeholder = "e.g. [M+H]+ or [M-H]-"),
+                            textNote("Used for mass calculation. Can be left empty if ionized mass or adduct data information is available in the suspect list (\"mz\"/\"adduct\" columns).")
+                        )
                     ),
                     hr(),
                     fillCol(

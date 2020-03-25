@@ -55,7 +55,7 @@ getScriptCode <- function(input, analyses)
 
     template <- templates::tmpl(readAllFile(system.file("templates", "main_script.R", package = "patRoon")),
                                 destination = sldest, generateAnaInfo = input$generateAnaInfo, analysisTableFile = input$analysisTableFile,
-                                analyses = analyses, suspectList = input$suspectList,
+                                analyses = analyses, suspectList = input$suspectList, suspectAdduct = input$suspectAdduct,
                                 doMSPeakFind = (input$formulaGen != "" && input$formulaGen != "Bruker") || input$compIdent != "",
                                 precursorMzWindow = input$precursorMzWindow,
                                 polarity = input$polarity, reportFormats = input$report)
@@ -271,11 +271,21 @@ getNewProjectUI <- function(destPath)
                         selectInput("featGrouper", "Feature grouper", c("OpenMS", "XCMS"),
                                     "OpenMS", FALSE, width = "100%")
                     ),
-                    fillCol(
-                        flex = c(1, NA),
-                        height = 90,
-                        fileSelect("suspectList", "suspectListButton", "Suspect list"),
-                        textNote("Leave blank for no suspect screening (i.e. perform full non-target analysis)")
+                    fillRow(
+                        height = 130,
+                        fillCol(
+                            flex = c(1, NA),
+                            height = 110,
+                            width = "95%",
+                            fileSelect("suspectList", "suspectListButton", "Suspect list"),
+                            textNote("Leave blank for no suspect screening (i.e. perform full non-target analysis)")
+                        ),
+                        fillCol(
+                            flex = c(1, NA),
+                            height = 130,
+                            textInput("suspectAdduct", "Adduct", placeholder = "e.g. [M+H]+ or [M-H]-"),
+                            textNote("Used for mass calculation. Can be left empty if ionized mass or adduct data information is available in the suspect list (\"mz\"/\"adduct\" columns).")
+                        )
                     ),
                     hr(),
                     fillCol(
@@ -528,14 +538,23 @@ newProject <- function(destPath = NULL)
             sl <- rstudioapi::selectFile("Select suspect list", filter = "csv files (*.csv)")
             if (!is.null(sl))
             {
-                csvTab <- tryCatch(fread(sl, select = c("name", "mz"),
-                                         colClasses = c(name = "character", mz = "numeric")),
-                                   error = function(e) FALSE, warning = function(w) FALSE)
-
+                csvTab <- tryCatch(fread(sl), error = function(e) FALSE, warning = function(w) FALSE)
+                cols <- names(csvTab)
+                massCols <- c("mz", "neutralMass", "formula", "SMILES", "InChI")
+                
+                err <- NULL
                 if (is.logical(csvTab))
-                    rstudioapi::showDialog("Error", "Failed to open/parse selected csv file! The CSV file should have the following columns: name, mz and (optionally) rt.", "")
+                    err <- "Failed to open/parse selected csv file!"
                 else if (nrow(csvTab) == 0)
-                    rstudioapi::showDialog("Error", "The selected files seems to be empty.", "")
+                    err <- "The selected files seems to be empty."
+                else if (!"name" %in% cols)
+                    err <- "The selected file does not have a name column"
+                else if (!any(massCols %in% cols))
+                    err <- paste("The selected file should have either one of the columns:",
+                                 paste(massCols, collapse = ", "))
+                
+                if (!is.null(err))                
+                    rstudioapi::showDialog("Error", err, "")
                 else
                     updateTextInput(session, "suspectList", value = sl)
             }

@@ -63,7 +63,7 @@ jobs:
             - run:
                 name: Perform tests
                 command: |
-                    docker run --name patroon -t patroon /bin/bash -c "cd patRoon; Rscript docker/run_tests.R"
+                    docker run --name patroon -t "${IMAGE_NAME}" /bin/bash -c "cd patRoon; Rscript docker/run_tests.R"
                     # tag if tests were OK
                     docker tag "${TMP_IMAGE_NAME}" "${IMAGE_NAME}"
             - run:

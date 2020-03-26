@@ -4,24 +4,28 @@ dockerimg: &dockerimg
 get_ws: &get_ws
     attach_workspace:
         at: /root
-restore_docker_from_cache: &restore_docker_from_cache
+set_dock_env: &set_dock_env
     environment:
         IMAGE_NAME: "patroonorg/patroon"
         TMP_IMAGE_NAME: "patroon"
-    steps:
-        - setup_remote_docker
-        - restore_cache:
-            keys:
-                - v2-{{ .Branch }}
-            paths:
-                - /caches/dock.tar
-        - run:
-            name: Load Docker image layer cache
-            command: |
-                set +o pipefail
-                docker load -i /caches/dock.tar | true
 
-version: 2
+version: 2.1
+commands:
+    restore_docker_from_cache:
+        description: "Restore patRoon docker image from cache"
+        steps:
+            - setup_remote_docker
+            - restore_cache:
+                keys:
+                    - v2-{{ .Branch }}
+                paths:
+                    - /caches/dock.tar
+            - run:
+                name: Load Docker image layer cache
+                command: |
+                    set +o pipefail
+                    docker load -i /caches/dock.tar | true
+
 jobs:
     do_checkout:
         <<: *dockerimg
@@ -32,9 +36,10 @@ jobs:
                 paths: project
     build:
         <<: *dockerimg
-        <<: *restore_docker_from_cache
+        <<: *set_dock_env
         steps:
             - *get_ws
+            - restore_docker_from_cache
             - run:
                 name: Build Docker image
                 no_output_timeout: 30m
@@ -51,9 +56,10 @@ jobs:
                     - /caches/dock.tar
     test:
         <<: *dockerimg
-        <<: *restore_docker_from_cache
+        <<: *set_dock_env
         steps:
             - *get_ws
+            - restore_docker_from_cache
             - run:
                 name: Perform tests
                 command: |
@@ -91,7 +97,6 @@ jobs:
                     fi
 
 workflows:
-    version: 2
     btd:
         jobs:
             - do_checkout

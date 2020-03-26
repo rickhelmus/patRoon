@@ -1,37 +1,45 @@
+dockerimg: &dockerimg
+    docker:
+        - image: docker:18.04.0-ce-git
+get_ws: &get_ws
+    attach_workspace:
+        at: /root
+restore_docker_from_cache: &restore_docker_from_cache
+    environment:
+        IMAGE_NAME: "patroonorg/patroon"
+        TMP_IMAGE_NAME: "patroon"
+    steps:
+        - setup_remote_docker
+        - restore_cache:
+            keys:
+                - v2-{{ .Branch }}
+            paths:
+                - /caches/dock.tar
+        - run:
+            name: Load Docker image layer cache
+            command: |
+                set +o pipefail
+                docker load -i /caches/dock.tar | true
+
 version: 2
 jobs:
-    build:
-        working_directory: /app
-        docker:
-            - image: docker:18.04.0-ce-git
-        environment:
-            IMAGE_NAME: "patroonorg/patroon"
-            TMP_IMAGE_NAME: "patroon"
+    do_checkout:
+        <<: *dockerimg
         steps:
             - checkout
-            - setup_remote_docker
-            - restore_cache:
-                keys:
-                    - v2-{{ .Branch }}
-                paths:
-                    - /caches/dock.tar
-            - run:
-                name: Load Docker image layer cache
-                command: |
-                    set +o pipefail
-                    docker load -i /caches/dock.tar | true
+            - persist_to_workspace:
+                root: /root
+                paths: project
+    build:
+        <<: *dockerimg
+        <<: *restore_docker_from_cache
+        steps:
+            - *get_ws
             - run:
                 name: Build Docker image
                 no_output_timeout: 30m
                 command: |
                     docker build --pull --cache-from "${IMAGE_NAME}" --tag "${TMP_IMAGE_NAME}" .
-            - run:
-                name: Perform tests
-                command: |
-                    docker run --name patroon -t patroon /bin/bash -c "cd patRoon; Rscript docker/run_tests.R"
-                    # tag if tests were OK
-                    docker tag "${TMP_IMAGE_NAME}" "${IMAGE_NAME}"
-
             - run:
                 name: Save Docker image layer cache
                 command: |
@@ -41,6 +49,17 @@ jobs:
                 key: v2-{{ .Branch }}-{{ epoch }}
                 paths:
                     - /caches/dock.tar
+    test:
+        <<: *dockerimg
+        <<: *restore_docker_from_cache
+        steps:
+            - *get_ws
+            - run:
+                name: Perform tests
+                command: |
+                    docker run --name patroon -t patroon /bin/bash -c "cd patRoon; Rscript docker/run_tests.R"
+                    # tag if tests were OK
+                    docker tag "${TMP_IMAGE_NAME}" "${IMAGE_NAME}"
             - run:
                 name: Copy test results
                 when: always
@@ -70,3 +89,15 @@ jobs:
                         docker tag "${TMP_IMAGE_NAME}" "${IMAGE_NAME}:${git_sha}-master-failed"
                         docker push "${IMAGE_NAME}:${git_sha}-master-failed"
                     fi
+
+workflows:
+    version: 2
+    btd:
+        jobs:
+            - do_checkout
+            - build:
+                requires:
+                    - do_checkout
+            - test:
+                requires:
+                    - build

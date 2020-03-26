@@ -75,7 +75,12 @@ optimizePngPlots <- function(plotFiles, maxProcAmount)
     plotsPerBlock <- 50
     blocks <- ceiling(length(plotFiles) / plotsPerBlock)
     pqcmd <- getCommandWithOptPath("pngquant", "pngquant")
-    mainArgs <- c("--skip-if-larger", "--strip", "--force")
+    mainArgs <- c("--skip-if-larger", "--force")
+    
+    # older pngquant versions may not support the --strip argument yet
+    if (any(grepl("--strip", suppressWarnings(executeCommand(pqcmd, stderr = TRUE)), fixed = TRUE)))
+        mainArgs <- c(mainArgs, "--strip")
+    
     cmdQueue <- lapply(seq_len(blocks), function(bl)
     {
         startpl <- (bl - 1) * plotsPerBlock + 1

@@ -67,7 +67,7 @@ unifyMFNames <- function(mfr)
                  FP = "FP",
                  PubMed_Count = "pubMedReferences",
                  Patent_Count = "numberPatents",
-                 # Related_CIDs # UNDONE: do something with this?
+                 Related_CIDs = "relatedCIDs",
                  Name2 = "compoundName2", # Nov2019 version
                  Synonym = "compoundName2", # Jan2020 version
                  AgroChemInfo = "agroChemInfo",

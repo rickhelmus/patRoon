@@ -497,18 +497,18 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
     }
 
     # convert to metfrag naming scheme
-    database <- switch(database,
-                       pubchem = "PubChem",
-                       chemspider = "ChemSpider",
-                       kegg = "KEGG",
-                       "for-ident" = "FOR-IDENT",
-                       sdf = "LocalSDF",
-                       psv = "LocalPSV",
-                       csv = "LocalCSV",
-                       comptox = "LocalCSV",
-                       pubchemlite = "LocalCSV")
-    if (database == "PubChem" && extendedPubChem) # can't seem to combine this conditional in above switch...
-        database <- "ExtendedPubChem"
+    databaseMF <- switch(database,
+                         pubchem = "PubChem",
+                         chemspider = "ChemSpider",
+                         kegg = "KEGG",
+                         "for-ident" = "FOR-IDENT",
+                         sdf = "LocalSDF",
+                         psv = "LocalPSV",
+                         csv = "LocalCSV",
+                         comptox = "LocalCSV",
+                         pubchemlite = "LocalCSV")
+    if (databaseMF == "PubChem" && extendedPubChem) # can't seem to combine this conditional in above switch...
+        databaseMF <- "ExtendedPubChem"
 
     scoreTypesMF <- setdiff(scoreTypes, c("score", "Score")) # final score is to be determined
     isSimplScore <- scoreTypesMF %in% compsScores$name
@@ -533,7 +533,7 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
                        FragmentPeakMatchRelativeMassDeviation = fragRelMzDev,
                        FragmentPeakMatchAbsoluteMassDeviation = fragAbsMzDev,
                        PrecursorIonType = as.character(adduct, format = "metfrag"),
-                       MetFragDatabaseType = database, MetFragScoreTypes = scoreTypesMF,
+                       MetFragDatabaseType = databaseMF, MetFragScoreTypes = scoreTypesMF,
                        MetFragScoreWeights = scoreWeights,
                        MetFragPreProcessingCandidateFilter = preProcessingFilters,
                        MetFragPostProcessingCandidateFilter = postProcessingFilters,

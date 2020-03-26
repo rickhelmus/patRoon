@@ -10,6 +10,8 @@
     * Default adduct can be specified in `newProject()` dialog
 * Small compatibility fix for feature finding with OpenMS 2.5 (reported by Thanh Wang)
 * RAMClustR is now supported from CRAN and no need to install github package anymore
+* pubchemlite identifiers are now URL linked in HTML reports
+
 
 ## February 2020
 

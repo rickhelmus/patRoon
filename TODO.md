@@ -44,7 +44,6 @@
 - PubChemLite
     - Do something with related CIDs? (e.g. link in getCompInfoList())
     - Install from Win inst script --> now only tier1, OK?
-    - Identifier web links
 - SusDat MF support
 
 

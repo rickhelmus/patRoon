@@ -53,8 +53,6 @@
 ## components
 - RC: check spearmans correlation
 - NT: minimum size argument, combine rows for multiple rGroups?
-- reporting: don't include components that have only feature groups not in fGroups
-    - Subsetting doesn't work because it yields a reduced object
 
 
 ## reporting

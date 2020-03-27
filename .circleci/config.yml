@@ -1,9 +1,6 @@
 dockerimg: &dockerimg
     docker:
         - image: docker:18.04.0-ce-git
-get_ws: &get_ws
-    attach_workspace:
-        at: /root
 set_dock_env: &set_dock_env
     environment:
         IMAGE_NAME: "patroonorg/patroon"
@@ -27,18 +24,11 @@ commands:
                     docker load -i /caches/dock.tar | true
 
 jobs:
-    do_checkout:
-        <<: *dockerimg
-        steps:
-            - checkout
-            - persist_to_workspace:
-                root: /root
-                paths: project
     build:
         <<: *dockerimg
         <<: *set_dock_env
         steps:
-            - *get_ws
+            - checkout
             - restore_docker_from_cache
             - run:
                 name: Build Docker image
@@ -78,7 +68,7 @@ jobs:
                 command: |
                     if [ "${CIRCLE_BRANCH}" == "master" ]; then
                         echo "$DH_PASS" | docker login -u "$DH_USER" --password-stdin
-                        git_sha="$(git rev-parse --short HEAD)"
+                        git_sha=`echo $CIRCLE_SHA1 | cut -c1:7`
                         docker tag "$IMAGE_NAME" "${IMAGE_NAME}:${git_sha}-master"
                         docker push "${IMAGE_NAME}:latest" && docker push "${IMAGE_NAME}:${git_sha}-master"
                     fi
@@ -96,10 +86,7 @@ jobs:
 workflows:
     btd:
         jobs:
-            - do_checkout
-            - build:
-                requires:
-                    - do_checkout
+            - build
             - test:
                 requires:
                     - build

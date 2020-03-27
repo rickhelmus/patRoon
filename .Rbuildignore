@@ -25,6 +25,6 @@
 ^LICENSE$
 ^_pkgdown.yaml$
 ^cache.sqlite$
-^docker^
+^docker$
 ^install_patRoon.R$
-^vignettes/$
+^vignettes$

@@ -226,7 +226,7 @@ initMetFragCLCommand <- function(mfSettings, spec, mfBin, logFile)
     return(list(command = "java", args = c("-jar", mfBin, paramFile), logFile = logFile, outFile = outFile))
 }
 
-generateMetFragRunData <- function(fGroups, MSPeakLists, mfSettings, topMost, identifiers, method, addTrivialNames)
+generateMetFragRunData <- function(fGroups, MSPeakLists, mfSettings, topMost, identifiers, method)
 {
     gNames <- names(fGroups)
     gTable <- groups(fGroups)
@@ -248,7 +248,7 @@ generateMetFragRunData <- function(fGroups, MSPeakLists, mfSettings, topMost, id
         if (!is.null(identifiers))
             mfSettings$PrecursorCompoundIDs <- identifiers[[grp]]
 
-        hash <- makeHash(method, mfSettings, spec, topMost, if (method == "R") addTrivialNames else FALSE)
+        hash <- makeHash(method, mfSettings, spec, topMost)
 
         return(list(hash = hash, gName = grp, spec = spec, mfSettings = mfSettings))
     }, simplify = FALSE)
@@ -371,8 +371,6 @@ processMFResults <- function(comptab, spec, adduct, db, topMost, lfile = "")
 #'   will be reported. Low values increase the chance of missing data, whereas
 #'   too high values will use too much computer resources and signficantly
 #'   slowdown the process. Sets the \option{MaxCandidateLimitToStop} option.
-#' @param addTrivialNames If \code{TRUE} and the PubChem database is used then
-#'   trivial names will be added after compound search.
 #' @param identifiers A \code{list} containing for each feature group a
 #'   character vector with database identifiers that should be used to find
 #'   candidates for a feature group (the list should be named by feature group
@@ -422,12 +420,9 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
                                      scoreWeights = 1.0,
                                      preProcessingFilters = c("UnconnectedCompoundFilter", "IsotopeFilter"),
                                      postProcessingFilters = c("InChIKeyFilter"),
-                                     maxCandidatesToStop = 2500, addTrivialNames = TRUE,
-                                     identifiers = NULL, extraOpts = NULL,
+                                     maxCandidatesToStop = 2500, identifiers = NULL, extraOpts = NULL,
                                      maxProcAmount = getOption("patRoon.maxProcAmount"))
 {
-    # UNDONE: does addTrivialNames actually work?
-
     if (method == "R")
         checkPackage("metfRag", "c-ruttkies/MetFragR")
 
@@ -440,7 +435,6 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
            lower = 0, finite = TRUE, fixed = list(add = ac))
     aapply(checkmate::assertCount, . ~ timeoutRetries + errorRetries, fixed = list(add = ac))
     aapply(checkmate::assertCount, . ~ topMost + maxCandidatesToStop, positive = TRUE, fixed = list(add = ac))
-    aapply(checkmate::assertFlag, . ~ addTrivialNames, fixed = list(add = ac))
     checkmate::assertString(chemSpiderToken, add = ac)
     checkmate::assertChoice(database, c("pubchem", "chemspider", "kegg", "for-ident", "sdf", "psv", "csv",
                                         "comptox", "pubchemlite"), add = ac)
@@ -549,14 +543,14 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
     }
 
     cacheDB <- openCacheDBScope()
-    setHash <- makeHash(fGroups, pLists, method, mfSettings, topMost, identifiers, addTrivialNames)
+    setHash <- makeHash(fGroups, pLists, method, mfSettings, topMost, identifiers)
     cachedSet <- loadCacheSet("compoundsMetFrag", setHash, cacheDB)
     resultHashes <- vector("character", length(gNames))
     names(resultHashes) <- gNames
 
     printf("Identifying %d feature groups with MetFrag...\n", gCount)
 
-    runData <- generateMetFragRunData(fGroups, MSPeakLists, mfSettings, topMost, identifiers, method, addTrivialNames)
+    runData <- generateMetFragRunData(fGroups, MSPeakLists, mfSettings, topMost, identifiers, method)
 
     cachedResults <- sapply(runData, function(rd)
     {
@@ -639,15 +633,7 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
                 jgc() # hopefully reduce some memory usage
 
                 if (nrow(comptab) > 0)
-                {
-                    if (addTrivialNames && rd$mfSettings$MetFragDatabaseType %in% c("PubChem", "ExtendedPubChem"))
-                    {
-                        # fetching trivial names may sometimes fail with connection error, just ignore this for now
-                        tryCatch(comptab <<- metfRag::add.trivialname.pubchem(comptab), error = function(e) comptab$TrivialName <<- NA)
-                    }
-                    
                     comptab <- unFactorDF(comptab)
-                }
 
                 comptab <- as.data.table(comptab)
                 

@@ -33,7 +33,6 @@ generateCompoundsMetfrag(
   preProcessingFilters = c("UnconnectedCompoundFilter", "IsotopeFilter"),
   postProcessingFilters = c("InChIKeyFilter"),
   maxCandidatesToStop = 2500,
-  addTrivialNames = TRUE,
   identifiers = NULL,
   extraOpts = NULL,
   maxProcAmount = getOption("patRoon.maxProcAmount")
@@ -162,9 +161,6 @@ are found then processing will be aborted and no results this feature group
 will be reported. Low values increase the chance of missing data, whereas
 too high values will use too much computer resources and signficantly
 slowdown the process. Sets the \option{MaxCandidateLimitToStop} option.}
-
-\item{addTrivialNames}{If \code{TRUE} and the PubChem database is used then
-trivial names will be added after compound search.}
 
 \item{identifiers}{A \code{list} containing for each feature group a
 character vector with database identifiers that should be used to find

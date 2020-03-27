@@ -12,6 +12,7 @@
 * RAMClustR is now supported from CRAN and no need to install github package anymore
 * pubchemlite identifiers are now URL linked in HTML reports
 * related CIDs are now reported for PubChemLite results.
+* MetFrag compound generation: removed `addTrivialNames` option as it never worked very well.
 
 
 ## February 2020

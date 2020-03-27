@@ -36,7 +36,6 @@
 
 
 ## compounds
-- MetFrag: (buggy) trivial name fetching not needed anymore?
 - SIRIUS: use --auto-charge instead of manually fixing charge of fragments (or not? conflicting docs on what it does)
 - test score normalization?
 - timeouts for SIRIUS?

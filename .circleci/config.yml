@@ -68,7 +68,7 @@ jobs:
                 command: |
                     if [ "${CIRCLE_BRANCH}" == "master" ]; then
                         echo "$DH_PASS" | docker login -u "$DH_USER" --password-stdin
-                        git_sha=`echo $CIRCLE_SHA1 | cut -c1:7`
+                        git_sha=`echo $CIRCLE_SHA1 | cut -c1-7`
                         docker tag "$IMAGE_NAME" "${IMAGE_NAME}:${git_sha}-master"
                         docker push "${IMAGE_NAME}:latest" && docker push "${IMAGE_NAME}:${git_sha}-master"
                     fi
@@ -78,7 +78,7 @@ jobs:
                 command: |
                     if [ "${CIRCLE_BRANCH}" == "master" ]; then
                         echo "$DH_PASS" | docker login -u "$DH_USER" --password-stdin
-                        git_sha="$(git rev-parse --short HEAD)"
+                        git_sha=`echo $CIRCLE_SHA1 | cut -c1-7`
                         docker tag "${IMAGE_NAME}" "${IMAGE_NAME}:${git_sha}-master-failed"
                         docker push "${IMAGE_NAME}:${git_sha}-master-failed"
                     fi

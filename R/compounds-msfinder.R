@@ -68,7 +68,7 @@ readSFD <- function(file)
     # assume file names are named by their candidate formula
     candidateFormula <- tools::file_path_sans_ext(basename(file))
     
-    results <- lapply(linesResults, function(lr)
+    results <- rbindlist(lapply(linesResults, function(lr)
     {
         # split by variable/value by colon, see https://stackoverflow.com/a/26247455
         parsed <- regmatches(lr, regexpr(":", lr), invert = TRUE)
@@ -89,7 +89,9 @@ readSFD <- function(file)
         {
             annStartRow <- which(grepl(annColName, lr, fixed = TRUE)) + 1
             # parse raw text from annotated fragment as a table
-            fragInfo <- fread(text = paste0(lr[seq(annStartRow, annStartRow + (annRows-1))], collapse = "\n"))
+            # NOTE: add a newline to ensure trailing newline needed for fread()
+            fragInfo <- fread(text = paste0(lr[seq(annStartRow, annStartRow + (annRows-1))], "\n", collapse = "\n"))
+            
             # figure out column names from key value (white space separated between parenthesis)
             cols <- sub(".+\\((.+)\\)", "\\1", annColName)
             cols <- unlist(strsplit(cols, " ", fixed = TRUE))
@@ -106,19 +108,18 @@ readSFD <- function(file)
             
             ret[, fragInfo := list(list(fragInfo))]
         }
-        
+        else
+            ret[, fragInfo := list(list(data.table()))]
         
         ret <- unifyMSFNames(ret)
         ret[, formula := candidateFormula]
-    })
+    }))
 
     return(results)    
 }
 
 readMSFResults <- function(outDir, MATFiles)
 {
-    # resDirs <- list.dirs(outDir, recursive = FALSE)
-    # resDirs <- resDirs[grepl(tools::file_path_sans_ext(basename(MATFiles)), resDirs, fixed = TRUE)]
     resDirs <- setNames(tools::file_path_sans_ext(MATFiles), names(MATFiles))
     resDirs <- resDirs[dir.exists(resDirs)]
     
@@ -181,14 +182,14 @@ generateCompoundsMSFINDER <- function(fGroups, MSPeakLists, adduct = "[M+H]+", e
     })
     
     # Run command (or split in multiproc batches?)
-    # withr::with_dir(normalizePath("~/Rproj/MSFINDER ver 3.30"),
-    #                 executeCommand("MsfinderConsoleApp.exe",
-    #                c("predict", "-i", outDir, "-o", file.path(outDir, "results"), "-m", file.path(outDir, "MSFINDER.INI"))))
+    withr::with_dir(normalizePath("~/werk/MSFINDER ver 3.32"),
+                    executeCommand("MsfinderConsoleApp.exe",
+                   c("predict", "-i", outDir, "-o", file.path(outDir, "results"), "-m", file.path(outDir, "MSFINDER.INI"))))
     
     # work-around from https://stackoverflow.com/a/50512416
-    withr::with_dir(normalizePath("~/werk/MSFINDER ver 3.30"),
-                    shell(sprintf("start cmd /C MsfinderConsoleApp.exe predict -i %s -o %s -m %s",
-                                  outDir, file.path(outDir, "results"), file.path(outDir, "MSFINDER.INI"))))
+    # withr::with_dir(normalizePath("~/werk/MSFINDER ver 3.30"),
+    #                 shell(sprintf("start cmd /C MsfinderConsoleApp.exe predict -i %s -o %s -m %s",
+    #                               outDir, file.path(outDir, "results"), file.path(outDir, "MSFINDER.INI"))))
     
     # executeMultiProcess(list(list(command = normalizePath("~/Rproj/MSFINDER ver 3.30/MsfinderConsoleApp.exe"),
     #                               args = c("predict", "-i", outDir, "-o", file.path(outDir, "results"), "-m", file.path(outDir, "MSFINDER.INI")),

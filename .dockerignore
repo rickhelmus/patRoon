@@ -21,3 +21,4 @@
 !docker/*.R
 !NEWS.md
 !LICSENSE
+!README.md

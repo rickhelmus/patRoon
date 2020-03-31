@@ -24,7 +24,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2020-03-24" />
+<meta name="date" content="2020-03-31" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -66,66 +66,41 @@
 
 
 <style type="text/css">
-a.sourceLine { display: inline-block; line-height: 1.25; }
-a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
-a.sourceLine:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode { white-space: pre; position: relative; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-code.sourceCode { white-space: pre-wrap; }
-a.sourceLine { text-indent: -1em; padding-left: 1em; }
-}
-pre.numberSource a.sourceLine
-  { position: relative; left: -4em; }
-pre.numberSource a.sourceLine::before
-  { content: attr(data-line-number);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; pointer-events: all; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-    color: #aaaaaa;
-  }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
-div.sourceCode
-  {  }
-@media screen {
-a.sourceLine::before { text-decoration: underline; }
-}
-code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code span.at { color: #7d9029; } /* Attribute */
-code span.bn { color: #40a070; } /* BaseN */
-code span.bu { } /* BuiltIn */
-code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code span.ch { color: #4070a0; } /* Char */
-code span.cn { color: #880000; } /* Constant */
-code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code span.dt { color: #902000; } /* DataType */
-code span.dv { color: #40a070; } /* DecVal */
-code span.er { color: #ff0000; font-weight: bold; } /* Error */
-code span.ex { } /* Extension */
-code span.fl { color: #40a070; } /* Float */
-code span.fu { color: #06287e; } /* Function */
-code span.im { } /* Import */
-code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code span.op { color: #666666; } /* Operator */
-code span.ot { color: #007020; } /* Other */
-code span.pp { color: #bc7a00; } /* Preprocessor */
-code span.sc { color: #4070a0; } /* SpecialChar */
-code span.ss { color: #bb6688; } /* SpecialString */
-code span.st { color: #4070a0; } /* String */
-code span.va { color: #19177c; } /* Variable */
-code span.vs { color: #4070a0; } /* VerbatimString */
-code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
 </style>
 
 </head>
@@ -225,15 +200,15 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="features" class="section level2">
 <h2><span class="header-section-number">4.2</span> Features</h2>
 <p>Collecting features from the analyses consists of finding all features, grouping them across analyses (optionally after retention time alignment) and finally, if desired suspect screening:</p>
-<div id="htmlwidget-6312039a50f5f414c6ef" style="width:500px;height:70px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-6312039a50f5f414c6ef">{"x":{"diagram":"\ndigraph Features {\n  graph [ rankdir = LR, compound = true ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.2,\n         height = 1,\n         fontsize = 18,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"Find features\" -> \"Group features\"\n    \"Suspect screening\"\n    \"Group features\" -> \"Suspect screening\" [dir=both, style=dashed]\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-69e5308c6a43d8e558bd" style="width:500px;height:70px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-69e5308c6a43d8e558bd">{"x":{"diagram":"\ndigraph Features {\n  graph [ rankdir = LR, compound = true ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.2,\n         height = 1,\n         fontsize = 18,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"Find features\" -> \"Group features\"\n    \"Suspect screening\"\n    \"Group features\" -> \"Suspect screening\" [dir=both, style=dashed]\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 <div id="finding-and-grouping-features" class="section level3">
 <h3><span class="header-section-number">4.2.1</span> Finding and grouping features</h3>
 <p>Several algorithms are available for finding features. These are listed in the table below alongside their usage and general remarks.</p>
 <table>
 <colgroup>
-<col width="21%" />
-<col width="58%" />
+<col width="22%" />
+<col width="57%" />
 <col width="19%" />
 </colgroup>
 <thead>
@@ -284,8 +259,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>Most often the performance of these algorithms heavily depend on the data and parameter settings that are used. Since obtaining a good feature dataset is crucial for the rest of the workflow, it is highly recommended to experiment with different settings (this process can also be automated, see <a href="fOpt.html#fOpt">the feature optimization section</a> for more details). Some common parameters to look at are listed in the table below. However, there are many more (advanced) parameters that can be set, please see the reference documentation for these (e.g. <code>?findFeatures</code>).</p>
 <table>
 <colgroup>
-<col width="16%" />
-<col width="83%" />
+<col width="17%" />
+<col width="82%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -316,10 +291,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p><strong><em>NOTE</em></strong> DataAnalysis feature settings have to be configured in DataAnalysis prior to calling <code>findFeatures()</code>.</p>
 </blockquote>
 <p>Similarly, for grouping features across analyses several algorithms are supported.</p>
-<table>
+<table style="width:100%;">
 <colgroup>
-<col width="14%" />
-<col width="51%" />
+<col width="15%" />
+<col width="50%" />
 <col width="33%" />
 </colgroup>
 <thead>
@@ -370,33 +345,33 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>Just like finding features, each algorithm has their own set of parameters. Often the defaults are a good start but it is recommended to have look at them. See <code>?groupFeatures</code> for more details.</p>
 <p>When using the <a href="https://www.bioconductor.org/packages/release/bioc/html/xcms.html">XCMS</a> algorithms both the ‘classical’ interface and latest <code>XCMS3</code> interfaces are supported. Currently, both interfaces are mostly the same regarding functionalities and implementation. However, since future developments of XCMS are primarily focused the latter this interface is recommended.</p>
 <p>Some examples of finding and grouping features are shown below.</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1"><span class="co"># The anaInfo variable contains analysis information, see the previous section</span></a>
-<a class="sourceLine" id="cb12-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb12-3" data-line-number="3"><span class="co"># Finding features</span></a>
-<a class="sourceLine" id="cb12-4" data-line-number="4">fListOMS &lt;-<span class="st"> </span><span class="kw">findFeatures</span>(anaInfo, <span class="st">&quot;openms&quot;</span>) <span class="co"># OpenMS, with default settings</span></a>
-<a class="sourceLine" id="cb12-5" data-line-number="5">fListOMS2 &lt;-<span class="st"> </span><span class="kw">findFeatures</span>(anaInfo, <span class="st">&quot;openms&quot;</span>, <span class="dt">noiseThrInt =</span> <span class="dv">500</span>, <span class="dt">chromSNR =</span> <span class="dv">10</span>) <span class="co"># OpenMS, adjusted minimum intensity and S/N</span></a>
-<a class="sourceLine" id="cb12-6" data-line-number="6">fListXCMS &lt;-<span class="st"> </span><span class="kw">findFeatures</span>(anaInfo, <span class="st">&quot;xcms&quot;</span>, <span class="dt">ppm =</span> <span class="dv">10</span>) <span class="co"># XCMS</span></a>
-<a class="sourceLine" id="cb12-7" data-line-number="7">fListXCMSImp &lt;-<span class="st"> </span><span class="kw">importFeatures</span>(anaInfo, <span class="st">&quot;xcms&quot;</span>, xset) <span class="co"># import XCMS xcmsSet object</span></a>
-<a class="sourceLine" id="cb12-8" data-line-number="8">fListXCMS3 &lt;-<span class="st"> </span><span class="kw">findFeatures</span>(anaInfo, <span class="st">&quot;xcms3&quot;</span>, <span class="kw">CentWaveParam</span>(<span class="dt">peakwidth =</span> <span class="kw">c</span>(<span class="dv">5</span>, <span class="dv">15</span>))) <span class="co"># XCMS3</span></a>
-<a class="sourceLine" id="cb12-9" data-line-number="9">fListEP &lt;-<span class="st"> </span><span class="kw">findFeatures</span>(anaInfo, <span class="st">&quot;envipick&quot;</span>, <span class="dt">minint =</span> <span class="fl">1E3</span>) <span class="co"># enviPick</span></a>
-<a class="sourceLine" id="cb12-10" data-line-number="10"></a>
-<a class="sourceLine" id="cb12-11" data-line-number="11"><span class="co"># Grouping features</span></a>
-<a class="sourceLine" id="cb12-12" data-line-number="12">fGroupsOMS &lt;-<span class="st"> </span><span class="kw">groupFeatures</span>(fListOMS, <span class="st">&quot;openms&quot;</span>) <span class="co"># OpenMS grouping, default settings</span></a>
-<a class="sourceLine" id="cb12-13" data-line-number="13">fGroupsOMS2 &lt;-<span class="st"> </span><span class="kw">groupFeatures</span>(fListOMS2, <span class="st">&quot;openms&quot;</span>, <span class="dt">rtalign =</span> <span class="ot">FALSE</span>) <span class="co"># OpenMS grouping, no RT alignment</span></a>
-<a class="sourceLine" id="cb12-14" data-line-number="14">fGroupsOMS3 &lt;-<span class="st"> </span><span class="kw">groupFeatures</span>(fListXCMS, <span class="st">&quot;openms&quot;</span>, <span class="dt">maxGroupRT =</span> <span class="dv">6</span>) <span class="co"># group XCMS features with OpenMS, adjusted grouping parameter</span></a>
-<a class="sourceLine" id="cb12-15" data-line-number="15"><span class="co"># group enviPick features with XCMS3, disable minFraction</span></a>
-<a class="sourceLine" id="cb12-16" data-line-number="16">fGroupsXCMS &lt;-<span class="st"> </span><span class="kw">groupFeatures</span>(fListEP, <span class="st">&quot;xcms3&quot;</span>,</a>
-<a class="sourceLine" id="cb12-17" data-line-number="17">                             xcms<span class="op">::</span><span class="kw">PeakDensityParam</span>(<span class="dt">sampleGroups =</span> analInfo<span class="op">$</span>group,</a>
-<a class="sourceLine" id="cb12-18" data-line-number="18">                                                    <span class="dt">minFraction =</span> <span class="dv">0</span>))</a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># The anaInfo variable contains analysis information, see the previous section</span>
+
+<span class="co"># Finding features</span>
+fListOMS &lt;-<span class="st"> </span><span class="kw">findFeatures</span>(anaInfo, <span class="st">&quot;openms&quot;</span>) <span class="co"># OpenMS, with default settings</span>
+fListOMS2 &lt;-<span class="st"> </span><span class="kw">findFeatures</span>(anaInfo, <span class="st">&quot;openms&quot;</span>, <span class="dt">noiseThrInt =</span> <span class="dv">500</span>, <span class="dt">chromSNR =</span> <span class="dv">10</span>) <span class="co"># OpenMS, adjusted minimum intensity and S/N</span>
+fListXCMS &lt;-<span class="st"> </span><span class="kw">findFeatures</span>(anaInfo, <span class="st">&quot;xcms&quot;</span>, <span class="dt">ppm =</span> <span class="dv">10</span>) <span class="co"># XCMS</span>
+fListXCMSImp &lt;-<span class="st"> </span><span class="kw">importFeatures</span>(anaInfo, <span class="st">&quot;xcms&quot;</span>, xset) <span class="co"># import XCMS xcmsSet object</span>
+fListXCMS3 &lt;-<span class="st"> </span><span class="kw">findFeatures</span>(anaInfo, <span class="st">&quot;xcms3&quot;</span>, <span class="kw">CentWaveParam</span>(<span class="dt">peakwidth =</span> <span class="kw">c</span>(<span class="dv">5</span>, <span class="dv">15</span>))) <span class="co"># XCMS3</span>
+fListEP &lt;-<span class="st"> </span><span class="kw">findFeatures</span>(anaInfo, <span class="st">&quot;envipick&quot;</span>, <span class="dt">minint =</span> <span class="fl">1E3</span>) <span class="co"># enviPick</span>
+
+<span class="co"># Grouping features</span>
+fGroupsOMS &lt;-<span class="st"> </span><span class="kw">groupFeatures</span>(fListOMS, <span class="st">&quot;openms&quot;</span>) <span class="co"># OpenMS grouping, default settings</span>
+fGroupsOMS2 &lt;-<span class="st"> </span><span class="kw">groupFeatures</span>(fListOMS2, <span class="st">&quot;openms&quot;</span>, <span class="dt">rtalign =</span> <span class="ot">FALSE</span>) <span class="co"># OpenMS grouping, no RT alignment</span>
+fGroupsOMS3 &lt;-<span class="st"> </span><span class="kw">groupFeatures</span>(fListXCMS, <span class="st">&quot;openms&quot;</span>, <span class="dt">maxGroupRT =</span> <span class="dv">6</span>) <span class="co"># group XCMS features with OpenMS, adjusted grouping parameter</span>
+<span class="co"># group enviPick features with XCMS3, disable minFraction</span>
+fGroupsXCMS &lt;-<span class="st"> </span><span class="kw">groupFeatures</span>(fListEP, <span class="st">&quot;xcms3&quot;</span>,
+                             xcms<span class="op">::</span><span class="kw">PeakDensityParam</span>(<span class="dt">sampleGroups =</span> analInfo<span class="op">$</span>group,
+                                                    <span class="dt">minFraction =</span> <span class="dv">0</span>))</code></pre></div>
 </div>
 <div id="suspect-screening" class="section level3">
 <h3><span class="header-section-number">4.2.2</span> Suspect screening</h3>
 <p>After features have been grouped suspect screening may be performed to eliminate any feature groups with <em>m/z</em> and (optionally) retention properties not present in a given suspect list. A typical workflow looks like this:</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1">suspects &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">name =</span> <span class="kw">c</span>(<span class="st">&quot;susp1&quot;</span>, <span class="st">&quot;susp2&quot;</span>, <span class="st">&quot;susp3&quot;</span>),</a>
-<a class="sourceLine" id="cb13-2" data-line-number="2">                       <span class="dt">mz =</span> <span class="kw">c</span>(<span class="fl">100.1034</span>, <span class="fl">250.0456</span>, <span class="fl">300.1234</span>),</a>
-<a class="sourceLine" id="cb13-3" data-line-number="3">                       <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb13-4" data-line-number="4">scr &lt;-<span class="st"> </span><span class="kw">screenSuspects</span>(fGroups, suspects)</a>
-<a class="sourceLine" id="cb13-5" data-line-number="5">fGroupsSusp &lt;-<span class="st"> </span><span class="kw">groupFeaturesScreening</span>(fGroups, scr)</a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">suspects &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">name =</span> <span class="kw">c</span>(<span class="st">&quot;susp1&quot;</span>, <span class="st">&quot;susp2&quot;</span>, <span class="st">&quot;susp3&quot;</span>),
+                       <span class="dt">mz =</span> <span class="kw">c</span>(<span class="fl">100.1034</span>, <span class="fl">250.0456</span>, <span class="fl">300.1234</span>),
+                       <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>)
+scr &lt;-<span class="st"> </span><span class="kw">screenSuspects</span>(fGroups, suspects)
+fGroupsSusp &lt;-<span class="st"> </span><span class="kw">groupFeaturesScreening</span>(fGroups, scr)</code></pre></div>
 <!-- UNDONE: make this interactive -->
 <p>This will perform the following steps:</p>
 <ol style="list-style-type: decimal">
@@ -405,11 +380,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li>Use the screening results to filter the original feature groups and store the results in <code>fGroupsSusp</code>.</li>
 </ol>
 <p>Alternatively, the <code>mz</code> column of the input suspect list can also be substituted by a <code>neutralMass</code>, <code>SMILES</code>, <code>InChI</code> or <code>formula</code> column, so that ion masses don’t need to be calculated in advance. This is especially advantageous for e.g. NORMAN suspect lists where such information is readily available. A requirement is that the adduct species should be specified for automatic ion mass calculation. This can either be done with an extra <code>adduct</code> column in the suspect list, or by using the <code>adduct</code> function argument to <code>screenSuspects</code>, e.g.:</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1">suspects &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">name =</span> <span class="kw">c</span>(<span class="st">&quot;susp1&quot;</span>, <span class="st">&quot;susp2&quot;</span>, <span class="st">&quot;susp3&quot;</span>),</a>
-<a class="sourceLine" id="cb14-2" data-line-number="2">                       <span class="dt">SMILES =</span> <span class="kw">c</span>(<span class="st">&quot;C1=CC=C(C=C1)C(=O)O&quot;</span>, <span class="st">&quot;C1=CC=C2C(=C1)C=CC3=CC=CC=C3N2C(=O)N&quot;</span>, <span class="st">&quot;C1=CC2=NNN=C2C=C1&quot;</span>),</a>
-<a class="sourceLine" id="cb14-3" data-line-number="3">                       <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb14-4" data-line-number="4">scr &lt;-<span class="st"> </span><span class="kw">screenSuspects</span>(fGroups, suspects, <span class="dt">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>)</a>
-<a class="sourceLine" id="cb14-5" data-line-number="5">fGroupsSusp &lt;-<span class="st"> </span><span class="kw">groupFeaturesScreening</span>(fGroups, scr)</a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">suspects &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">name =</span> <span class="kw">c</span>(<span class="st">&quot;susp1&quot;</span>, <span class="st">&quot;susp2&quot;</span>, <span class="st">&quot;susp3&quot;</span>),
+                       <span class="dt">SMILES =</span> <span class="kw">c</span>(<span class="st">&quot;C1=CC=C(C=C1)C(=O)O&quot;</span>, <span class="st">&quot;C1=CC=C2C(=C1)C=CC3=CC=CC=C3N2C(=O)N&quot;</span>, <span class="st">&quot;C1=CC2=NNN=C2C=C1&quot;</span>),
+                       <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>)
+scr &lt;-<span class="st"> </span><span class="kw">screenSuspects</span>(fGroups, suspects, <span class="dt">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>)
+fGroupsSusp &lt;-<span class="st"> </span><span class="kw">groupFeaturesScreening</span>(fGroups, scr)</code></pre></div>
 <p>Note that in some cases you may need to install <a href="http://openbabel.org/wiki/Main_Page">OpenBabel</a> (e.g. when only InChI data is available for mass calculation).</p>
 </div>
 </div>

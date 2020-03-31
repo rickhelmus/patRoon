@@ -24,7 +24,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2020-03-24" />
+<meta name="date" content="2020-03-31" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -66,66 +66,41 @@
 
 
 <style type="text/css">
-a.sourceLine { display: inline-block; line-height: 1.25; }
-a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
-a.sourceLine:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode { white-space: pre; position: relative; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-code.sourceCode { white-space: pre-wrap; }
-a.sourceLine { text-indent: -1em; padding-left: 1em; }
-}
-pre.numberSource a.sourceLine
-  { position: relative; left: -4em; }
-pre.numberSource a.sourceLine::before
-  { content: attr(data-line-number);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; pointer-events: all; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-    color: #aaaaaa;
-  }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
-div.sourceCode
-  {  }
-@media screen {
-a.sourceLine::before { text-decoration: underline; }
-}
-code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code span.at { color: #7d9029; } /* Attribute */
-code span.bn { color: #40a070; } /* BaseN */
-code span.bu { } /* BuiltIn */
-code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code span.ch { color: #4070a0; } /* Char */
-code span.cn { color: #880000; } /* Constant */
-code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code span.dt { color: #902000; } /* DataType */
-code span.dv { color: #40a070; } /* DecVal */
-code span.er { color: #ff0000; font-weight: bold; } /* Error */
-code span.ex { } /* Extension */
-code span.fl { color: #40a070; } /* Float */
-code span.fu { color: #06287e; } /* Function */
-code span.im { } /* Import */
-code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code span.op { color: #666666; } /* Operator */
-code span.ot { color: #007020; } /* Other */
-code span.pp { color: #bc7a00; } /* Preprocessor */
-code span.sc { color: #4070a0; } /* SpecialChar */
-code span.ss { color: #bb6688; } /* SpecialString */
-code span.st { color: #4070a0; } /* String */
-code span.va { color: #19177c; } /* Variable */
-code span.vs { color: #4070a0; } /* VerbatimString */
-code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
 </style>
 
 </head>
@@ -230,7 +205,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <colgroup>
 <col width="12%" />
 <col width="23%" />
-<col width="64%" />
+<col width="63%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -263,21 +238,21 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </tbody>
 </table>
 <p>Some examples:</p>
-<div class="sourceCode" id="cb65"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb65-1" data-line-number="1"><span class="co"># only keep features uniquely present in replicate group &quot;repl1&quot;</span></a>
-<a class="sourceLine" id="cb65-2" data-line-number="2">fGroupsUn1 &lt;-<span class="st"> </span><span class="kw">unique</span>(fGroups, <span class="dt">which =</span> <span class="st">&quot;repl1&quot;</span>)</a>
-<a class="sourceLine" id="cb65-3" data-line-number="3"><span class="co"># only keep features in repl1/repl2 which are not in repl3</span></a>
-<a class="sourceLine" id="cb65-4" data-line-number="4">fGroupsUn2 &lt;-<span class="st"> </span><span class="kw">unique</span>(fGroups, <span class="dt">which =</span> <span class="kw">c</span>(<span class="st">&quot;repl1&quot;</span>, <span class="st">&quot;repl2&quot;</span>),</a>
-<a class="sourceLine" id="cb65-5" data-line-number="5">                     <span class="dt">relativeTo =</span> <span class="st">&quot;repl3&quot;</span>)</a>
-<a class="sourceLine" id="cb65-6" data-line-number="6"><span class="co"># only keep features that are only present in repl1 OR repl2</span></a>
-<a class="sourceLine" id="cb65-7" data-line-number="7">fGroupsUn3 &lt;-<span class="st"> </span><span class="kw">unique</span>(fGroups, <span class="dt">which =</span> <span class="kw">c</span>(<span class="st">&quot;repl1&quot;</span>, <span class="st">&quot;repl2&quot;</span>),</a>
-<a class="sourceLine" id="cb65-8" data-line-number="8">                     <span class="dt">outer =</span> <span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb65-9" data-line-number="9"></a>
-<a class="sourceLine" id="cb65-10" data-line-number="10"><span class="co"># only keep features overlapping in repl1/repl2</span></a>
-<a class="sourceLine" id="cb65-11" data-line-number="11">fGroupsOv1 &lt;-<span class="st"> </span><span class="kw">overlap</span>(fGroups, <span class="dt">which =</span> <span class="kw">c</span>(<span class="st">&quot;repl1&quot;</span>, <span class="st">&quot;repl2&quot;</span>))</a>
-<a class="sourceLine" id="cb65-12" data-line-number="12"><span class="co"># only keep features overlapping in repl1/repl2 AND are not present in any other</span></a>
-<a class="sourceLine" id="cb65-13" data-line-number="13"><span class="co"># replicate group</span></a>
-<a class="sourceLine" id="cb65-14" data-line-number="14">fGroupsOv2 &lt;-<span class="st"> </span><span class="kw">overlap</span>(fGroups, <span class="dt">which =</span> <span class="kw">c</span>(<span class="st">&quot;repl1&quot;</span>, <span class="st">&quot;repl2&quot;</span>),</a>
-<a class="sourceLine" id="cb65-15" data-line-number="15">                      <span class="dt">exclusive =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># only keep features uniquely present in replicate group &quot;repl1&quot;</span>
+fGroupsUn1 &lt;-<span class="st"> </span><span class="kw">unique</span>(fGroups, <span class="dt">which =</span> <span class="st">&quot;repl1&quot;</span>)
+<span class="co"># only keep features in repl1/repl2 which are not in repl3</span>
+fGroupsUn2 &lt;-<span class="st"> </span><span class="kw">unique</span>(fGroups, <span class="dt">which =</span> <span class="kw">c</span>(<span class="st">&quot;repl1&quot;</span>, <span class="st">&quot;repl2&quot;</span>),
+                     <span class="dt">relativeTo =</span> <span class="st">&quot;repl3&quot;</span>)
+<span class="co"># only keep features that are only present in repl1 OR repl2</span>
+fGroupsUn3 &lt;-<span class="st"> </span><span class="kw">unique</span>(fGroups, <span class="dt">which =</span> <span class="kw">c</span>(<span class="st">&quot;repl1&quot;</span>, <span class="st">&quot;repl2&quot;</span>),
+                     <span class="dt">outer =</span> <span class="ot">TRUE</span>)
+
+<span class="co"># only keep features overlapping in repl1/repl2</span>
+fGroupsOv1 &lt;-<span class="st"> </span><span class="kw">overlap</span>(fGroups, <span class="dt">which =</span> <span class="kw">c</span>(<span class="st">&quot;repl1&quot;</span>, <span class="st">&quot;repl2&quot;</span>))
+<span class="co"># only keep features overlapping in repl1/repl2 AND are not present in any other</span>
+<span class="co"># replicate group</span>
+fGroupsOv2 &lt;-<span class="st"> </span><span class="kw">overlap</span>(fGroups, <span class="dt">which =</span> <span class="kw">c</span>(<span class="st">&quot;repl1&quot;</span>, <span class="st">&quot;repl2&quot;</span>),
+                      <span class="dt">exclusive =</span> <span class="ot">TRUE</span>)</code></pre></div>
 <p>In addition, several plotting functions are <a href="visualization.html#visComp">discussed in the next section</a> that visualize overlap and uniqueness of features.</p>
 </div>
             </section>

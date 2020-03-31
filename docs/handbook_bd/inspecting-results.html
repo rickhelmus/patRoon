@@ -24,7 +24,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2020-03-24" />
+<meta name="date" content="2020-03-31" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -66,66 +66,41 @@
 
 
 <style type="text/css">
-a.sourceLine { display: inline-block; line-height: 1.25; }
-a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
-a.sourceLine:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode { white-space: pre; position: relative; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-code.sourceCode { white-space: pre-wrap; }
-a.sourceLine { text-indent: -1em; padding-left: 1em; }
-}
-pre.numberSource a.sourceLine
-  { position: relative; left: -4em; }
-pre.numberSource a.sourceLine::before
-  { content: attr(data-line-number);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; pointer-events: all; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-    color: #aaaaaa;
-  }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
-div.sourceCode
-  {  }
-@media screen {
-a.sourceLine::before { text-decoration: underline; }
-}
-code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code span.at { color: #7d9029; } /* Attribute */
-code span.bn { color: #40a070; } /* BaseN */
-code span.bu { } /* BuiltIn */
-code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code span.ch { color: #4070a0; } /* Char */
-code span.cn { color: #880000; } /* Constant */
-code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code span.dt { color: #902000; } /* DataType */
-code span.dv { color: #40a070; } /* DecVal */
-code span.er { color: #ff0000; font-weight: bold; } /* Error */
-code span.ex { } /* Extension */
-code span.fl { color: #40a070; } /* Float */
-code span.fu { color: #06287e; } /* Function */
-code span.im { } /* Import */
-code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code span.op { color: #666666; } /* Operator */
-code span.ot { color: #007020; } /* Other */
-code span.pp { color: #bc7a00; } /* Preprocessor */
-code span.sc { color: #4070a0; } /* SpecialChar */
-code span.ss { color: #bb6688; } /* SpecialString */
-code span.st { color: #4070a0; } /* String */
-code span.va { color: #19177c; } /* Variable */
-code span.vs { color: #4070a0; } /* VerbatimString */
-code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
 </style>
 
 </head>
@@ -225,10 +200,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="inspecting-results" class="section level2">
 <h2><span class="header-section-number">5.1</span> Inspecting results</h2>
 <p>Several generic functions exist that can be used to inspect data that is stored in a particular object (e.g. features, compounds etc):</p>
-<table>
+<table style="width:100%;">
 <colgroup>
 <col width="41%" />
-<col width="23%" />
+<col width="24%" />
 <col width="34%" />
 </colgroup>
 <thead>
@@ -297,39 +272,39 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </tbody>
 </table>
 <p>The common <code>R</code> extraction operators <code>&quot;[[&quot;</code>, <code>&quot;$&quot;</code> can be used to obtain data for a particular feature groups, analysis etc:</p>
-<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb24-1" data-line-number="1"><span class="co"># Feature table (only first columns for readability)</span></a>
-<a class="sourceLine" id="cb24-2" data-line-number="2">fList[[<span class="st">&quot;standard-1&quot;</span>]][, <span class="dv">1</span><span class="op">:</span><span class="dv">6</span>]</a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Feature table (only first columns for readability)</span>
+fList[[<span class="st">&quot;standard-1&quot;</span>]][, <span class="dv">1</span><span class="op">:</span><span class="dv">6</span>]</code></pre></div>
 <pre><code>#&gt;                          ID       ret        mz       area    retmin    retmax
-#&gt;   1: f_14725992727853481898  19.00698  78.99684  65793.391  13.01202  29.99700
-#&gt;   2:  f_2160366339221378685  20.00598  79.02098 125354.100  13.01202  29.99700
-#&gt;   3:  f_8776383793478240607   8.01600  79.02101 188045.900   3.03000  12.01302
-#&gt;   4:  f_3114575892487940460 112.34220  79.02103  71168.984 106.55400 147.51600
-#&gt;   5:  f_9569267575827982645 111.64380  84.95950  54875.129 105.15180 599.87400
+#&gt;   1: f_11329730552087355907  19.00698  78.99684  65793.391  13.01202  29.99700
+#&gt;   2: f_13285270494729286580  20.00598  79.02098 125354.100  13.01202  29.99700
+#&gt;   3:    f_58916114743160065   8.01600  79.02101 188045.900   3.03000  12.01302
+#&gt;   4: f_14296721878219155518 112.34220  79.02103  71168.984 106.55400 147.51600
+#&gt;   5: f_15742211275246261909 111.64380  84.95950  54875.129 105.15180 599.87400
 #&gt;  ---                                                                          
-#&gt; 433:   f_715393229297425918  11.01402 295.22387   9514.476   9.01602  13.01202
-#&gt; 434: f_12859688662236331925  13.01202 296.92038  37753.414  10.01502  15.01098
-#&gt; 435:   f_329587951831392807  12.01302 297.16751  17366.125   9.01602  15.01098
-#&gt; 436: f_15328485197249407763  11.01402 297.20368  13995.990   9.01602  14.01102
-#&gt; 437: f_14600639929467999375  12.01302 299.12581  13630.378   9.01602  15.01098</code></pre>
-<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb26-1" data-line-number="1"><span class="co"># Feature group intensities</span></a>
-<a class="sourceLine" id="cb26-2" data-line-number="2">fGroups<span class="op">$</span>M120_R328_<span class="dv">81</span></a></code></pre></div>
+#&gt; 433:  f_2551637455485774695  11.01402 295.22387   9514.476   9.01602  13.01202
+#&gt; 434: f_12460667962844723287  13.01202 296.92038  37753.414  10.01502  15.01098
+#&gt; 435: f_11932197148570625835  12.01302 297.16751  17366.125   9.01602  15.01098
+#&gt; 436: f_13954261240425820654  11.01402 297.20368  13995.990   9.01602  14.01102
+#&gt; 437: f_14789081759697133865  12.01302 299.12581  13630.378   9.01602  15.01098</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Feature group intensities</span>
+fGroups<span class="op">$</span>M120_R328_<span class="dv">81</span></code></pre></div>
 <pre><code>#&gt; [1] 55936 61668 59624</code></pre>
-<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb28-1" data-line-number="1">fGroups[[<span class="dv">1</span>, <span class="st">&quot;M120_R328_81&quot;</span>]] <span class="co"># only first analysis</span></a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fGroups[[<span class="dv">1</span>, <span class="st">&quot;M120_R328_81&quot;</span>]] <span class="co"># only first analysis</span></code></pre></div>
 <pre><code>#&gt; [1] 55936</code></pre>
-<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb30-1" data-line-number="1"><span class="co"># obtains list MS/MS peak list  (feature group averaged datas)</span></a>
-<a class="sourceLine" id="cb30-2" data-line-number="2">mslists[[<span class="st">&quot;M120_R328_81&quot;</span>]]<span class="op">$</span>MSMS</a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># obtains list MS/MS peak list  (feature group averaged datas)</span>
+mslists[[<span class="st">&quot;M120_R328_81&quot;</span>]]<span class="op">$</span>MSMS</code></pre></div>
 <pre><code>#&gt;           mz intensity precursor
 #&gt; 1:  92.04936  9426.556     FALSE
 #&gt; 2: 118.08606  2167.444     FALSE
 #&gt; 3: 120.05549 43949.222      TRUE
 #&gt; 4: 121.05850  3397.556     FALSE</code></pre>
-<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb32-1" data-line-number="1"><span class="co"># get all formula candidates for a feature group</span></a>
-<a class="sourceLine" id="cb32-2" data-line-number="2">formulas[[<span class="st">&quot;M120_R328_81&quot;</span>]][, <span class="dv">1</span><span class="op">:</span><span class="dv">7</span>]</a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># get all formula candidates for a feature group</span>
+formulas[[<span class="st">&quot;M120_R328_81&quot;</span>]][, <span class="dv">1</span><span class="op">:</span><span class="dv">7</span>]</code></pre></div>
 <pre><code>#&gt;      analysis neutral_formula formula formula_mz    error dbe  isoScore
 #&gt; 1: standard-1          C6H5N3  C6H6N3   120.0556 1.266667   6 0.9905167
 #&gt; 2: standard-1          C6H5N3  C6H6N3   120.0556 1.266667   6 0.9905167</code></pre>
-<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb34-1" data-line-number="1"><span class="co"># get all compound candidates for a feature group</span></a>
-<a class="sourceLine" id="cb34-2" data-line-number="2">compounds[[<span class="st">&quot;M120_R328_81&quot;</span>]][, <span class="dv">1</span><span class="op">:</span><span class="dv">4</span>]</a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># get all compound candidates for a feature group</span>
+compounds[[<span class="st">&quot;M120_R328_81&quot;</span>]][, <span class="dv">1</span><span class="op">:</span><span class="dv">4</span>]</code></pre></div>
 <pre><code>#&gt;      explainedPeaks    score neutralMass                     SMILES
 #&gt;   1:              1 3.322371    119.0483          C1=CC2=NNN=C2C=C1
 #&gt;   2:              1 1.644565    119.0483        C1=CC=C2C(=C1)N2N=N
@@ -342,8 +317,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 #&gt;  98:              1 1.017414    119.0483        C1=C(NC=N1)/C=C/C#N
 #&gt;  99:              1 1.016333    119.0483          C=CN1C=C(N=N1)C#C
 #&gt; 100:              1 1.016333    119.0483          C=CN1C(=CN=N1)C#C</code></pre>
-<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb36-1" data-line-number="1"><span class="co"># get a table with information of a component</span></a>
-<a class="sourceLine" id="cb36-2" data-line-number="2">components[[<span class="st">&quot;CMP7&quot;</span>]][, <span class="dv">1</span><span class="op">:</span><span class="dv">6</span>]</a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># get a table with information of a component</span>
+components[[<span class="st">&quot;CMP7&quot;</span>]][, <span class="dv">1</span><span class="op">:</span><span class="dv">6</span>]</code></pre></div>
 <pre><code>#&gt;            group       rt       mz isotopes adnr adduct_rule
 #&gt; 1: M254_R321_484 320.2038 254.0596             1           1
 #&gt; 2: M276_R321_550 320.6412 276.0415             1           6</code></pre>
@@ -355,22 +330,22 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p><strong><em>NOTE</em></strong> The <code>as.data.frame()</code> methods defined in <code>patRoon</code> simply convert the results from <code>as.data.table()</code>, hence, both functions are equal in their usage and are defined for the same object classes.</p>
 </blockquote>
 <p>Some typical examples are shown below.</p>
-<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb38-1" data-line-number="1"><span class="co"># obtain table with all features (only first columns for readability)</span></a>
-<a class="sourceLine" id="cb38-2" data-line-number="2"><span class="kw">as.data.table</span>(fList)[, <span class="dv">1</span><span class="op">:</span><span class="dv">6</span>]</a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># obtain table with all features (only first columns for readability)</span>
+<span class="kw">as.data.table</span>(fList)[, <span class="dv">1</span><span class="op">:</span><span class="dv">6</span>]</code></pre></div>
 <pre><code>#&gt;         analysis                     ID       ret        mz      area     retmin
-#&gt;    1:  solvent-1 f_12528456164079122906  19.10298  78.99678  73929.27  13.108980
-#&gt;    2:  solvent-1  f_2900588911177472437  14.10798  84.95948 941557.00   3.922998
-#&gt;    3:  solvent-1 f_14137611587310595254 112.97220  84.95949  47558.80 105.301800
-#&gt;    4:  solvent-1  f_6220388842879228751  13.10898  88.95255  34552.67   7.114020
-#&gt;    5:  solvent-1 f_14449051427326583029   2.52900  88.96823  14710.10   1.732002
+#&gt;    1:  solvent-1  f_1439950324738930567  19.10298  78.99678  73929.27  13.108980
+#&gt;    2:  solvent-1  f_4723432532018662211  14.10798  84.95948 941557.00   3.922998
+#&gt;    3:  solvent-1 f_17957959581330325949 112.97220  84.95949  47558.80 105.301800
+#&gt;    4:  solvent-1 f_12794612830313876089  13.10898  88.95255  34552.67   7.114020
+#&gt;    5:  solvent-1  f_2626237537596032389   2.52900  88.96823  14710.10   1.732002
 #&gt;   ---                                                                           
-#&gt; 2440: standard-3  f_4729861527861304943  12.14898 294.93888 350965.20   9.151020
-#&gt; 2441: standard-3  f_3998598167423081195  11.14998 295.18863  10705.59   9.151020
-#&gt; 2442: standard-3  f_4238936567216093638  13.14798 296.92039  42195.86  10.150980
-#&gt; 2443: standard-3   f_644240323524805309  11.14998 297.16737  15177.58   9.151020
-#&gt; 2444: standard-3 f_15603754028750016993  11.14998 297.20377  16678.13   9.151020</code></pre>
-<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb40-1" data-line-number="1"><span class="co"># Returns group info and intensity values for each feature group</span></a>
-<a class="sourceLine" id="cb40-2" data-line-number="2"><span class="kw">as.data.table</span>(fGroups, <span class="dt">average =</span> <span class="ot">TRUE</span>) <span class="co"># average intensities for replicates</span></a></code></pre></div>
+#&gt; 2440: standard-3 f_14157176504633736808  12.14898 294.93888 350965.20   9.151020
+#&gt; 2441: standard-3 f_17182318984831705374  11.14998 295.18863  10705.59   9.151020
+#&gt; 2442: standard-3 f_11078520112152057907  13.14798 296.92039  42195.86  10.150980
+#&gt; 2443: standard-3  f_6300408645316430515  11.14998 297.16737  15177.58   9.151020
+#&gt; 2444: standard-3  f_6054274671841613279  11.14998 297.20377  16678.13   9.151020</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Returns group info and intensity values for each feature group</span>
+<span class="kw">as.data.table</span>(fGroups, <span class="dt">average =</span> <span class="ot">TRUE</span>) <span class="co"># average intensities for replicates</span></code></pre></div>
 <pre><code>#&gt;             group      ret       mz standard
 #&gt;  1:  M120_R328_81 327.9955 120.0555 59076.00
 #&gt;  2: M134_R399_118 398.6365 134.0712 78472.00
@@ -383,8 +358,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 #&gt; 25: M254_R321_484 320.7174 254.0598 33440.00
 #&gt; 26: M276_R321_550 320.9508 276.0416 10876.00
 #&gt; 27: M279_R284_557 283.9626 279.0915 42941.33</code></pre>
-<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb42-1" data-line-number="1"><span class="co"># Returns all peak lists for each feature group</span></a>
-<a class="sourceLine" id="cb42-2" data-line-number="2"><span class="kw">as.data.table</span>(mslists)</a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Returns all peak lists for each feature group</span>
+<span class="kw">as.data.table</span>(mslists)</code></pre></div>
 <pre><code>#&gt;               group type        mz intensity precursor
 #&gt;    1:  M120_R328_81   MS  84.95945  2526.560     FALSE
 #&gt;    2:  M120_R328_81   MS  87.08025  1148.153     FALSE
@@ -397,9 +372,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 #&gt; 1308: M279_R284_557 MSMS 204.04394  7115.156     FALSE
 #&gt; 1309: M279_R284_557 MSMS 213.11359  3676.444     FALSE
 #&gt; 1310: M279_R284_557 MSMS 279.09140  2027.244      TRUE</code></pre>
-<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb44-1" data-line-number="1"><span class="co"># Returns all formula candidates for each feature group with scoring</span></a>
-<a class="sourceLine" id="cb44-2" data-line-number="2"><span class="co"># information, neutral loss etc</span></a>
-<a class="sourceLine" id="cb44-3" data-line-number="3"><span class="kw">as.data.table</span>(formulas)[, <span class="dv">1</span><span class="op">:</span><span class="dv">6</span>]</a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Returns all formula candidates for each feature group with scoring</span>
+<span class="co"># information, neutral loss etc</span>
+<span class="kw">as.data.table</span>(formulas)[, <span class="dv">1</span><span class="op">:</span><span class="dv">6</span>]</code></pre></div>
 <pre><code>#&gt;              group   analysis neutral_formula     formula formula_mz      error
 #&gt;   1:  M120_R328_81 standard-1          C6H5N3      C6H6N3   120.0556  1.2666667
 #&gt;   2:  M120_R328_81 standard-1          C6H5N3      C6H6N3   120.0556  1.2666667
@@ -412,8 +387,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 #&gt; 250: M279_R284_557 standard-2       C12H22OS3   C12H23OS3   279.0906 -2.8500000
 #&gt; 251: M279_R284_557 standard-1      C4H10N10O5  C4H11N10O5   279.0908 -2.4000000
 #&gt; 252: M279_R284_557 standard-1     C13H20Cl2O2 C13H21Cl2O2   279.0913 -0.7000000</code></pre>
-<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb46-1" data-line-number="1"><span class="co"># Returns all compound candidates for each feature group with scoring and other metadata</span></a>
-<a class="sourceLine" id="cb46-2" data-line-number="2"><span class="kw">as.data.table</span>(compounds)[, <span class="dv">1</span><span class="op">:</span><span class="dv">4</span>]</a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Returns all compound candidates for each feature group with scoring and other metadata</span>
+<span class="kw">as.data.table</span>(compounds)[, <span class="dv">1</span><span class="op">:</span><span class="dv">4</span>]</code></pre></div>
 <pre><code>#&gt;               group explainedPeaks    score neutralMass
 #&gt;    1:  M120_R328_81              1 3.322371    119.0483
 #&gt;    2:  M120_R328_81              1 1.644565    119.0483
@@ -426,8 +401,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 #&gt; 2098: M254_R321_484              5 1.478817    253.0521
 #&gt; 2099: M254_R321_484              4 1.468703    253.0521
 #&gt; 2100: M254_R321_484              4 1.468703    253.0521</code></pre>
-<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb48-1" data-line-number="1"><span class="co"># Returns table with all components (including feature group info, annotations etc)</span></a>
-<a class="sourceLine" id="cb48-2" data-line-number="2"><span class="kw">as.data.table</span>(components)[, <span class="dv">1</span><span class="op">:</span><span class="dv">6</span>]</a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Returns table with all components (including feature group info, annotations etc)</span>
+<span class="kw">as.data.table</span>(components)[, <span class="dv">1</span><span class="op">:</span><span class="dv">6</span>]</code></pre></div>
 <pre><code>#&gt;     name  cmp_ret cmp_retsd neutral_mass   analysis size
 #&gt;  1: CMP1 560.3138 0.3277624         &lt;NA&gt; standard-2    2
 #&gt;  2: CMP1 560.3138 0.3277624         &lt;NA&gt; standard-2    2
@@ -445,49 +420,49 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 #&gt; 14: CMP7 320.8341 0.1649877    253.05231 standard-2    2
 #&gt; 15: CMP7 320.8341 0.1649877    253.05231 standard-2    2</code></pre>
 <p>Finally, the <code>annotatedPeakList()</code> function is useful to inspect annotation results for a formula or compound candidate:</p>
-<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb50-1" data-line-number="1"><span class="co"># formula annotations for for a formula candidate of feature group M120_R328_81</span></a>
-<a class="sourceLine" id="cb50-2" data-line-number="2"><span class="kw">annotatedPeakList</span>(formulas, <span class="dt">precursor =</span> <span class="st">&quot;C6H6N3&quot;</span>, <span class="dt">groupName =</span> <span class="st">&quot;M120_R328_81&quot;</span>,</a>
-<a class="sourceLine" id="cb50-3" data-line-number="3">                  <span class="dt">MSPeakLists =</span> mslists)</a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># formula annotations for for a formula candidate of feature group M120_R328_81</span>
+<span class="kw">annotatedPeakList</span>(formulas, <span class="dt">precursor =</span> <span class="st">&quot;C6H6N3&quot;</span>, <span class="dt">groupName =</span> <span class="st">&quot;M120_R328_81&quot;</span>,
+                  <span class="dt">MSPeakLists =</span> mslists)</code></pre></div>
 <pre><code>#&gt;           mz intensity precursor formula neutral_loss
 #&gt; 1:  92.04936  9426.556     FALSE   C6H6N           N2
 #&gt; 2: 118.08606  2167.444     FALSE    &lt;NA&gt;         &lt;NA&gt;
 #&gt; 3: 120.05549 43949.222      TRUE  C6H6N3             
 #&gt; 4: 121.05850  3397.556     FALSE    &lt;NA&gt;         &lt;NA&gt;</code></pre>
-<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb52-1" data-line-number="1"><span class="co"># compound annotation for first candidate of feature group M120_R328_81</span></a>
-<a class="sourceLine" id="cb52-2" data-line-number="2"><span class="kw">annotatedPeakList</span>(compounds, <span class="dt">index =</span> <span class="dv">1</span>, <span class="dt">groupName =</span> <span class="st">&quot;M120_R328_81&quot;</span>,</a>
-<a class="sourceLine" id="cb52-3" data-line-number="3">                  <span class="dt">MSPeakLists =</span> mslists)</a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># compound annotation for first candidate of feature group M120_R328_81</span>
+<span class="kw">annotatedPeakList</span>(compounds, <span class="dt">index =</span> <span class="dv">1</span>, <span class="dt">groupName =</span> <span class="st">&quot;M120_R328_81&quot;</span>,
+                  <span class="dt">MSPeakLists =</span> mslists)</code></pre></div>
 <pre><code>#&gt;           mz intensity precursor formula neutral_loss score
 #&gt; 1:  92.04936  9426.556     FALSE   C6H6N           N2  1022
 #&gt; 2: 118.08606  2167.444     FALSE    &lt;NA&gt;         &lt;NA&gt;    NA
 #&gt; 3: 120.05549 43949.222      TRUE    &lt;NA&gt;         &lt;NA&gt;    NA
 #&gt; 4: 121.05850  3397.556     FALSE    &lt;NA&gt;         &lt;NA&gt;    NA</code></pre>
 <p>More advanced examples for these functions are shown below.</p>
-<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb54-1" data-line-number="1"><span class="co"># Feature table, can also be accessed by numeric index</span></a>
-<a class="sourceLine" id="cb54-2" data-line-number="2">fList[[<span class="dv">1</span>]]</a>
-<a class="sourceLine" id="cb54-3" data-line-number="3">mslists[[<span class="st">&quot;standard-1&quot;</span>, <span class="st">&quot;M120_R328_81&quot;</span>]] <span class="co"># feature data (instead of feature group averaged)</span></a>
-<a class="sourceLine" id="cb54-4" data-line-number="4">formulas[[<span class="dv">1</span>, <span class="st">&quot;M120_R328_81&quot;</span>]] <span class="co"># feature data (if available, i.e. calculateFeatures=TRUE)</span></a>
-<a class="sourceLine" id="cb54-5" data-line-number="5">components[[<span class="st">&quot;CMP1&quot;</span>, <span class="dv">1</span>]] <span class="co"># only for first feature group in component</span></a>
-<a class="sourceLine" id="cb54-6" data-line-number="6"></a>
-<a class="sourceLine" id="cb54-7" data-line-number="7"><span class="kw">as.data.frame</span>(fList) <span class="co"># classic data.frame format, works for all objects</span></a>
-<a class="sourceLine" id="cb54-8" data-line-number="8"><span class="kw">as.data.table</span>(fGroups) <span class="co"># return non-averaged intensities (default)</span></a>
-<a class="sourceLine" id="cb54-9" data-line-number="9"><span class="kw">as.data.table</span>(fGroups, <span class="dt">features =</span> <span class="ot">TRUE</span>) <span class="co"># include feature information</span></a>
-<a class="sourceLine" id="cb54-10" data-line-number="10"><span class="kw">as.data.table</span>(mslists, <span class="dt">averaged =</span> <span class="ot">FALSE</span>) <span class="co"># peak lists each feature</span></a>
-<a class="sourceLine" id="cb54-11" data-line-number="11"><span class="kw">as.data.table</span>(mslists, <span class="dt">fGroups =</span> fGroups) <span class="co"># add feature group information</span></a>
-<a class="sourceLine" id="cb54-12" data-line-number="12"></a>
-<a class="sourceLine" id="cb54-13" data-line-number="13"><span class="kw">as.data.table</span>(formulas, <span class="dt">countElements =</span> <span class="kw">c</span>(<span class="st">&quot;C&quot;</span>, <span class="st">&quot;H&quot;</span>)) <span class="co"># include C/H counts (e.g. for van Krevelen plots)</span></a>
-<a class="sourceLine" id="cb54-14" data-line-number="14"><span class="co"># report only top precursor and fragment formula. This yields in one row per feature group.</span></a>
-<a class="sourceLine" id="cb54-15" data-line-number="15"><span class="kw">as.data.table</span>(formulas, <span class="dt">maxFormulas =</span> <span class="dv">1</span>, <span class="dt">maxFragFormulas =</span> <span class="dv">1</span>)</a>
-<a class="sourceLine" id="cb54-16" data-line-number="16"><span class="co"># add various information for organic matter characterization (common elemental</span></a>
-<a class="sourceLine" id="cb54-17" data-line-number="17"><span class="co"># counts/ratios, classifications etc)</span></a>
-<a class="sourceLine" id="cb54-18" data-line-number="18"><span class="kw">as.data.table</span>(formulas, <span class="dt">OM =</span> <span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb54-19" data-line-number="19"></a>
-<a class="sourceLine" id="cb54-20" data-line-number="20"><span class="kw">as.data.table</span>(compounds, <span class="dt">fGroups =</span> fGroups) <span class="co"># add feature group informaion</span></a>
-<a class="sourceLine" id="cb54-21" data-line-number="21"><span class="kw">as.data.table</span>(compounds, <span class="dt">fragments =</span> <span class="ot">TRUE</span>) <span class="co"># include information of all annotated fragments</span></a>
-<a class="sourceLine" id="cb54-22" data-line-number="22"></a>
-<a class="sourceLine" id="cb54-23" data-line-number="23"><span class="kw">annotatedPeakList</span>(formulas, <span class="dt">precursor =</span> <span class="st">&quot;C6H6N3&quot;</span>, <span class="dt">groupName =</span> <span class="st">&quot;M120_R328_81&quot;</span>,</a>
-<a class="sourceLine" id="cb54-24" data-line-number="24">                  <span class="dt">MSPeakLists =</span> mslists, <span class="dt">onlyAnnotated =</span> <span class="ot">TRUE</span>) <span class="co"># only include annotated peaks</span></a>
-<a class="sourceLine" id="cb54-25" data-line-number="25"><span class="kw">annotatedPeakList</span>(compounds, <span class="dt">index =</span> <span class="dv">1</span>, <span class="dt">groupName =</span> <span class="st">&quot;M120_R328_81&quot;</span>,</a>
-<a class="sourceLine" id="cb54-26" data-line-number="26">                  <span class="dt">MSPeakLists =</span> mslists, <span class="dt">formulas =</span> formulas) <span class="co"># include formula annotations</span></a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Feature table, can also be accessed by numeric index</span>
+fList[[<span class="dv">1</span>]]
+mslists[[<span class="st">&quot;standard-1&quot;</span>, <span class="st">&quot;M120_R328_81&quot;</span>]] <span class="co"># feature data (instead of feature group averaged)</span>
+formulas[[<span class="dv">1</span>, <span class="st">&quot;M120_R328_81&quot;</span>]] <span class="co"># feature data (if available, i.e. calculateFeatures=TRUE)</span>
+components[[<span class="st">&quot;CMP1&quot;</span>, <span class="dv">1</span>]] <span class="co"># only for first feature group in component</span>
+
+<span class="kw">as.data.frame</span>(fList) <span class="co"># classic data.frame format, works for all objects</span>
+<span class="kw">as.data.table</span>(fGroups) <span class="co"># return non-averaged intensities (default)</span>
+<span class="kw">as.data.table</span>(fGroups, <span class="dt">features =</span> <span class="ot">TRUE</span>) <span class="co"># include feature information</span>
+<span class="kw">as.data.table</span>(mslists, <span class="dt">averaged =</span> <span class="ot">FALSE</span>) <span class="co"># peak lists each feature</span>
+<span class="kw">as.data.table</span>(mslists, <span class="dt">fGroups =</span> fGroups) <span class="co"># add feature group information</span>
+
+<span class="kw">as.data.table</span>(formulas, <span class="dt">countElements =</span> <span class="kw">c</span>(<span class="st">&quot;C&quot;</span>, <span class="st">&quot;H&quot;</span>)) <span class="co"># include C/H counts (e.g. for van Krevelen plots)</span>
+<span class="co"># report only top precursor and fragment formula. This yields in one row per feature group.</span>
+<span class="kw">as.data.table</span>(formulas, <span class="dt">maxFormulas =</span> <span class="dv">1</span>, <span class="dt">maxFragFormulas =</span> <span class="dv">1</span>)
+<span class="co"># add various information for organic matter characterization (common elemental</span>
+<span class="co"># counts/ratios, classifications etc)</span>
+<span class="kw">as.data.table</span>(formulas, <span class="dt">OM =</span> <span class="ot">TRUE</span>)
+
+<span class="kw">as.data.table</span>(compounds, <span class="dt">fGroups =</span> fGroups) <span class="co"># add feature group informaion</span>
+<span class="kw">as.data.table</span>(compounds, <span class="dt">fragments =</span> <span class="ot">TRUE</span>) <span class="co"># include information of all annotated fragments</span>
+
+<span class="kw">annotatedPeakList</span>(formulas, <span class="dt">precursor =</span> <span class="st">&quot;C6H6N3&quot;</span>, <span class="dt">groupName =</span> <span class="st">&quot;M120_R328_81&quot;</span>,
+                  <span class="dt">MSPeakLists =</span> mslists, <span class="dt">onlyAnnotated =</span> <span class="ot">TRUE</span>) <span class="co"># only include annotated peaks</span>
+<span class="kw">annotatedPeakList</span>(compounds, <span class="dt">index =</span> <span class="dv">1</span>, <span class="dt">groupName =</span> <span class="st">&quot;M120_R328_81&quot;</span>,
+                  <span class="dt">MSPeakLists =</span> mslists, <span class="dt">formulas =</span> formulas) <span class="co"># include formula annotations</span></code></pre></div>
 </div>
             </section>
 

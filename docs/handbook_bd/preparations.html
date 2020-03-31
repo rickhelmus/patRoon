@@ -24,7 +24,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2020-03-24" />
+<meta name="date" content="2020-03-31" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -66,66 +66,41 @@
 
 
 <style type="text/css">
-a.sourceLine { display: inline-block; line-height: 1.25; }
-a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
-a.sourceLine:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode { white-space: pre; position: relative; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-code.sourceCode { white-space: pre-wrap; }
-a.sourceLine { text-indent: -1em; padding-left: 1em; }
-}
-pre.numberSource a.sourceLine
-  { position: relative; left: -4em; }
-pre.numberSource a.sourceLine::before
-  { content: attr(data-line-number);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; pointer-events: all; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-    color: #aaaaaa;
-  }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
-div.sourceCode
-  {  }
-@media screen {
-a.sourceLine::before { text-decoration: underline; }
-}
-code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code span.at { color: #7d9029; } /* Attribute */
-code span.bn { color: #40a070; } /* BaseN */
-code span.bu { } /* BuiltIn */
-code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code span.ch { color: #4070a0; } /* Char */
-code span.cn { color: #880000; } /* Constant */
-code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code span.dt { color: #902000; } /* DataType */
-code span.dv { color: #40a070; } /* DecVal */
-code span.er { color: #ff0000; font-weight: bold; } /* Error */
-code span.ex { } /* Extension */
-code span.fl { color: #40a070; } /* Float */
-code span.fu { color: #06287e; } /* Function */
-code span.im { } /* Import */
-code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code span.op { color: #666666; } /* Operator */
-code span.ot { color: #007020; } /* Other */
-code span.pp { color: #bc7a00; } /* Preprocessor */
-code span.sc { color: #4070a0; } /* SpecialChar */
-code span.ss { color: #bb6688; } /* SpecialString */
-code span.st { color: #4070a0; } /* String */
-code span.va { color: #19177c; } /* Variable */
-code span.vs { color: #4070a0; } /* VerbatimString */
-code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
 </style>
 
 </head>
@@ -227,12 +202,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="data-pre-treatment" class="section level3">
 <h3><span class="header-section-number">4.1.1</span> Data pre-treatment</h3>
 <p>Prior to performing the actual non-target data processing workflow some preparations often need to be made. Often data has to be pre-treated, for instance, by converting it to an open format that is usable for subsequent workflow steps or to perform mass re-calibration. Some common functions are listed below.</p>
-<table>
+<table style="width:100%;">
 <colgroup>
-<col width="34%" />
+<col width="33%" />
 <col width="22%" />
-<col width="36%" />
-<col width="6%" />
+<col width="35%" />
+<col width="7%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -264,22 +239,22 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </tbody>
 </table>
 <p>The <code>convertMSFiles()</code> function supports conversion between many different file formats typically used in non-target analysis. Furthermore, other pre-treatment steps are available (e.g. centroiding, filtering) when the <a href="http://proteowizard.sourceforge.net/">ProteoWizard</a> algorithm is used. For an overview of these functionalities see the <a href="http://proteowizard.sourceforge.net/tools/msconvert.html">MsConvert documentation</a>. Some examples:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1"><span class="co"># Converts a single mzXML file to mzML format</span></a>
-<a class="sourceLine" id="cb8-2" data-line-number="2"><span class="kw">convertMSFiles</span>(<span class="st">&quot;standard-1.mzXML&quot;</span>, <span class="dt">to =</span> <span class="st">&quot;mzML&quot;</span>, <span class="dt">algorithm =</span> <span class="st">&quot;openms&quot;</span>)</a>
-<a class="sourceLine" id="cb8-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb8-4" data-line-number="4"><span class="co"># Converts all Thermo files with ProteoWizard (the default) in the analyses/raw</span></a>
-<a class="sourceLine" id="cb8-5" data-line-number="5"><span class="co"># directory and stores the mzML files in analyses/raw. Afterwards, only MS1</span></a>
-<a class="sourceLine" id="cb8-6" data-line-number="6"><span class="co"># spectra are retained.</span></a>
-<a class="sourceLine" id="cb8-7" data-line-number="7"><span class="kw">convertMSFiles</span>(<span class="st">&quot;analyses/raw&quot;</span>, <span class="st">&quot;analyses/mzml&quot;</span>, <span class="dt">from =</span> <span class="st">&quot;thermo&quot;</span>,</a>
-<a class="sourceLine" id="cb8-8" data-line-number="8">               <span class="dt">centroid =</span> <span class="st">&quot;vendor&quot;</span>, <span class="dt">filters =</span> <span class="st">&quot;msLevel 1&quot;</span>)</a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Converts a single mzXML file to mzML format</span>
+<span class="kw">convertMSFiles</span>(<span class="st">&quot;standard-1.mzXML&quot;</span>, <span class="dt">to =</span> <span class="st">&quot;mzML&quot;</span>, <span class="dt">algorithm =</span> <span class="st">&quot;openms&quot;</span>)
+
+<span class="co"># Converts all Thermo files with ProteoWizard (the default) in the analyses/raw</span>
+<span class="co"># directory and stores the mzML files in analyses/raw. Afterwards, only MS1</span>
+<span class="co"># spectra are retained.</span>
+<span class="kw">convertMSFiles</span>(<span class="st">&quot;analyses/raw&quot;</span>, <span class="st">&quot;analyses/mzml&quot;</span>, <span class="dt">from =</span> <span class="st">&quot;thermo&quot;</span>,
+               <span class="dt">centroid =</span> <span class="st">&quot;vendor&quot;</span>, <span class="dt">filters =</span> <span class="st">&quot;msLevel 1&quot;</span>)</code></pre></div>
 <blockquote>
 <p><strong><em>NOTE</em></strong> Most algorithms further down the workflow require the <em>mzML</em> or <em>mzXML</em> file format and additionally require that mass peaks have been centroided. When using the ProteoWizard algorithm (the default), centroiding by vendor algorithms is generally recommended (i.e. by setting <code>centroid=&quot;vendor&quot;</code> as shown in the above example).</p>
 </blockquote>
 <p>When Bruker MS data is used it can be automatically re-calibrated to improve its mass accuracy. Often this is preceeded by calling the <code>setDAMethod()</code> function to set a DataAnalysis method to all files in order to configure automatic re-calibration. The <code>recalibrarateDAFiles()</code> function performs the actual re-calibration. The <code>getDACalibrationError()</code> function can be used at anytime to request the current calibration error of each analysis. An example of these functions is shown below.</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="co"># anaInfo is a data.frame with information on analyses (see next section)</span></a>
-<a class="sourceLine" id="cb9-2" data-line-number="2"><span class="kw">setDAMethod</span>(anaInfo, <span class="st">&quot;path/to/DAMethod.m&quot;</span>) <span class="co"># configure Bruker files with given method that has automatic calibration setup</span></a>
-<a class="sourceLine" id="cb9-3" data-line-number="3"><span class="kw">recalibrarateDAFiles</span>(anaInfo) <span class="co"># trigger re-calibration for each analysis</span></a>
-<a class="sourceLine" id="cb9-4" data-line-number="4"><span class="kw">getDACalibrationError</span>(anaInfo) <span class="co"># get calibration error for each analysis (</span><span class="al">NOTE</span><span class="co">: also shown when previous function is finished)</span></a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># anaInfo is a data.frame with information on analyses (see next section)</span>
+<span class="kw">setDAMethod</span>(anaInfo, <span class="st">&quot;path/to/DAMethod.m&quot;</span>) <span class="co"># configure Bruker files with given method that has automatic calibration setup</span>
+<span class="kw">recalibrarateDAFiles</span>(anaInfo) <span class="co"># trigger re-calibration for each analysis</span>
+<span class="kw">getDACalibrationError</span>(anaInfo) <span class="co"># get calibration error for each analysis (</span><span class="al">NOTE</span><span class="co">: also shown when previous function is finished)</span></code></pre></div>
 </div>
 <div id="anaInfo" class="section level3">
 <h3><span class="header-section-number">4.1.2</span> Analysis information</h3>
@@ -292,17 +267,17 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><strong>conc</strong> (optional, advanced) A numeric value describing the concentration or any other value for which the intensity in this sample may correlate, for instance, dilution factor, sampling time etc. This column is only required when you want to obtain quantitative information (e.g. concentrations) using the <code>as.data.table()</code> method function (see <code>?featureGroups</code> for more information).</li>
 </ul>
 <p>The <code>generateAnalysisInfo()</code> function can be used to (semi-)automatically generate a suitable <code>data.frame</code> that contains all the required information for a set of analysis. For, instance, the following line was used in the tutorial:</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1"><span class="co"># Take example data from patRoonData package (triplicate solvent blank + triplicate standard)</span></a>
-<a class="sourceLine" id="cb10-2" data-line-number="2"><span class="kw">generateAnalysisInfo</span>(<span class="dt">paths =</span> patRoonData<span class="op">::</span><span class="kw">exampleDataPath</span>(),</a>
-<a class="sourceLine" id="cb10-3" data-line-number="3">                     <span class="dt">groups =</span> <span class="kw">c</span>(<span class="kw">rep</span>(<span class="st">&quot;solvent&quot;</span>, <span class="dv">3</span>), <span class="kw">rep</span>(<span class="st">&quot;standard&quot;</span>, <span class="dv">3</span>)),</a>
-<a class="sourceLine" id="cb10-4" data-line-number="4">                     <span class="dt">blanks =</span> <span class="st">&quot;solvent&quot;</span>)</a></code></pre></div>
-<pre><code>#&gt;                                                               path   analysis    group   blank
-#&gt; 1 /home/rick/R/x86_64-pc-linux-gnu-library/3.6/patRoonData/extdata  solvent-1  solvent solvent
-#&gt; 2 /home/rick/R/x86_64-pc-linux-gnu-library/3.6/patRoonData/extdata  solvent-2  solvent solvent
-#&gt; 3 /home/rick/R/x86_64-pc-linux-gnu-library/3.6/patRoonData/extdata  solvent-3  solvent solvent
-#&gt; 4 /home/rick/R/x86_64-pc-linux-gnu-library/3.6/patRoonData/extdata standard-1 standard solvent
-#&gt; 5 /home/rick/R/x86_64-pc-linux-gnu-library/3.6/patRoonData/extdata standard-2 standard solvent
-#&gt; 6 /home/rick/R/x86_64-pc-linux-gnu-library/3.6/patRoonData/extdata standard-3 standard solvent</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Take example data from patRoonData package (triplicate solvent blank + triplicate standard)</span>
+<span class="kw">generateAnalysisInfo</span>(<span class="dt">paths =</span> patRoonData<span class="op">::</span><span class="kw">exampleDataPath</span>(),
+                     <span class="dt">groups =</span> <span class="kw">c</span>(<span class="kw">rep</span>(<span class="st">&quot;solvent&quot;</span>, <span class="dv">3</span>), <span class="kw">rep</span>(<span class="st">&quot;standard&quot;</span>, <span class="dv">3</span>)),
+                     <span class="dt">blanks =</span> <span class="st">&quot;solvent&quot;</span>)</code></pre></div>
+<pre><code>#&gt;                                                path   analysis    group   blank
+#&gt; 1 /usr/local/lib/R/site-library/patRoonData/extdata  solvent-1  solvent solvent
+#&gt; 2 /usr/local/lib/R/site-library/patRoonData/extdata  solvent-2  solvent solvent
+#&gt; 3 /usr/local/lib/R/site-library/patRoonData/extdata  solvent-3  solvent solvent
+#&gt; 4 /usr/local/lib/R/site-library/patRoonData/extdata standard-1 standard solvent
+#&gt; 5 /usr/local/lib/R/site-library/patRoonData/extdata standard-2 standard solvent
+#&gt; 6 /usr/local/lib/R/site-library/patRoonData/extdata standard-3 standard solvent</code></pre>
 <p>Alternatively, the <code>newProject()</code> function discussed in the next section can be used to interactively construct this information.</p>
 </div>
 <div id="automatic-project-generation-with-newproject" class="section level3">

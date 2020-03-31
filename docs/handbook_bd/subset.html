@@ -24,7 +24,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2020-03-24" />
+<meta name="date" content="2020-03-31" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -66,66 +66,41 @@
 
 
 <style type="text/css">
-a.sourceLine { display: inline-block; line-height: 1.25; }
-a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
-a.sourceLine:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode { white-space: pre; position: relative; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-code.sourceCode { white-space: pre-wrap; }
-a.sourceLine { text-indent: -1em; padding-left: 1em; }
-}
-pre.numberSource a.sourceLine
-  { position: relative; left: -4em; }
-pre.numberSource a.sourceLine::before
-  { content: attr(data-line-number);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; pointer-events: all; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-    color: #aaaaaa;
-  }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
-div.sourceCode
-  {  }
-@media screen {
-a.sourceLine::before { text-decoration: underline; }
-}
-code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code span.at { color: #7d9029; } /* Attribute */
-code span.bn { color: #40a070; } /* BaseN */
-code span.bu { } /* BuiltIn */
-code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code span.ch { color: #4070a0; } /* Char */
-code span.cn { color: #880000; } /* Constant */
-code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code span.dt { color: #902000; } /* DataType */
-code span.dv { color: #40a070; } /* DecVal */
-code span.er { color: #ff0000; font-weight: bold; } /* Error */
-code span.ex { } /* Extension */
-code span.fl { color: #40a070; } /* Float */
-code span.fu { color: #06287e; } /* Function */
-code span.im { } /* Import */
-code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code span.op { color: #666666; } /* Operator */
-code span.ot { color: #007020; } /* Other */
-code span.pp { color: #bc7a00; } /* Preprocessor */
-code span.sc { color: #4070a0; } /* SpecialChar */
-code span.ss { color: #bb6688; } /* SpecialString */
-code span.st { color: #4070a0; } /* String */
-code span.va { color: #19177c; } /* Variable */
-code span.vs { color: #4070a0; } /* VerbatimString */
-code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
 </style>
 
 </head>
@@ -225,12 +200,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="subset" class="section level2">
 <h2><span class="header-section-number">5.3</span> Subsetting</h2>
 <p>The previous section discussed the <code>filter()</code> generic function to perform various data cleaning operations. A more generic way to select data is by <em>subsetting</em>: here you can manually specify which parts of an object should be retained. Subsetting is supported for all workflow objects and is performed by the R subset operator (<code>&quot;[&quot;</code>). This operator either subsets by one or two arguments, which are referred to as the <code>i</code> and <code>j</code> arguments.</p>
-<table>
+<table style="width:100%;">
 <colgroup>
 <col width="16%" />
 <col width="15%" />
 <col width="15%" />
-<col width="52%" />
+<col width="51%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -280,13 +255,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </tbody>
 </table>
 <p>For objects that support two-dimensional subsetting (e.g. <code>featureGroups</code>, <code>MSPeakLists</code>), either the <code>i</code> or <code>j</code> argument is optional. Furthermore, unlike subsetting a <code>data.frame</code>, the position of <code>i</code> and <code>j</code> does not change when only one argument is specified:</p>
-<div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb61-1" data-line-number="1">df[<span class="dv">1</span>, <span class="dv">1</span>] <span class="co"># subset data.frame by first row/column</span></a>
-<a class="sourceLine" id="cb61-2" data-line-number="2">df[<span class="dv">1</span>] <span class="co"># subset by first column</span></a>
-<a class="sourceLine" id="cb61-3" data-line-number="3">df[<span class="dv">1</span>, ] <span class="co"># subset by first row</span></a>
-<a class="sourceLine" id="cb61-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb61-5" data-line-number="5">fGroups[<span class="dv">1</span>, <span class="dv">1</span>] <span class="co"># subset by first analysis/feature group</span></a>
-<a class="sourceLine" id="cb61-6" data-line-number="6">fGroups[, <span class="dv">1</span>] <span class="co"># subset by first feature group (i.e. column)</span></a>
-<a class="sourceLine" id="cb61-7" data-line-number="7">fGroups[<span class="dv">1</span>] <span class="co"># subset by first analysis (i.e. row)</span></a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">df[<span class="dv">1</span>, <span class="dv">1</span>] <span class="co"># subset data.frame by first row/column</span>
+df[<span class="dv">1</span>] <span class="co"># subset by first column</span>
+df[<span class="dv">1</span>, ] <span class="co"># subset by first row</span>
+
+fGroups[<span class="dv">1</span>, <span class="dv">1</span>] <span class="co"># subset by first analysis/feature group</span>
+fGroups[, <span class="dv">1</span>] <span class="co"># subset by first feature group (i.e. column)</span>
+fGroups[<span class="dv">1</span>] <span class="co"># subset by first analysis (i.e. row)</span></code></pre></div>
 <p>The subset operator allows three types of input:</p>
 <ul>
 <li>A logical vector: elements are selected if corresponding values are <code>TRUE</code>.</li>
@@ -294,52 +269,52 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li>A character vector: select elements by their name.</li>
 </ul>
 <p>When a logical vector is used as input it will be re-cycled if necessary. For instance, the following will select by the first, third, fifth, etc. analysis.</p>
-<div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb62-1" data-line-number="1">fGroups[<span class="kw">c</span>(<span class="ot">TRUE</span>, <span class="ot">FALSE</span>)]</a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fGroups[<span class="kw">c</span>(<span class="ot">TRUE</span>, <span class="ot">FALSE</span>)]</code></pre></div>
 <p>In order to select by a <code>character</code> you will need to know the names for each element. These can, for instance, be obtained by the <code>groupNames()</code> (feature group names), <code>analyses()</code> (analysis names) and <code>names()</code> (names for components or feature groups for <code>featureGroups</code> objects) generic functions.</p>
 <p>Some more examples of common subsetting operations are shown below.</p>
-<div class="sourceCode" id="cb63"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb63-1" data-line-number="1"><span class="co"># select first three analyses</span></a>
-<a class="sourceLine" id="cb63-2" data-line-number="2">fList[<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>]</a>
-<a class="sourceLine" id="cb63-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb63-4" data-line-number="4"><span class="co"># select first three analyses and first 500 feature groups</span></a>
-<a class="sourceLine" id="cb63-5" data-line-number="5">fGroups[<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">500</span>]</a>
-<a class="sourceLine" id="cb63-6" data-line-number="6"></a>
-<a class="sourceLine" id="cb63-7" data-line-number="7"><span class="co"># select all feature groups from first component</span></a>
-<a class="sourceLine" id="cb63-8" data-line-number="8">fGroupsNT &lt;-<span class="st"> </span>fGroups[, componNT[[<span class="dv">1</span>]]<span class="op">$</span>group]</a>
-<a class="sourceLine" id="cb63-9" data-line-number="9"></a>
-<a class="sourceLine" id="cb63-10" data-line-number="10"><span class="co"># only keep feature groups with formula annotation results</span></a>
-<a class="sourceLine" id="cb63-11" data-line-number="11">fGroupsForms &lt;-<span class="st"> </span>fGroups[, <span class="kw">groupNames</span>(formulas)]</a>
-<a class="sourceLine" id="cb63-12" data-line-number="12"></a>
-<a class="sourceLine" id="cb63-13" data-line-number="13"><span class="co"># only keep feature groups with either formula or compound annotation results</span></a>
-<a class="sourceLine" id="cb63-14" data-line-number="14">fGroupsAnn &lt;-<span class="st"> </span>fGroups[, <span class="kw">union</span>(<span class="kw">groupNames</span>(formulas), <span class="kw">groupNames</span>(compounds))]</a>
-<a class="sourceLine" id="cb63-15" data-line-number="15"></a>
-<a class="sourceLine" id="cb63-16" data-line-number="16"><span class="co"># select first 15 components</span></a>
-<a class="sourceLine" id="cb63-17" data-line-number="17">components[<span class="dv">1</span><span class="op">:</span><span class="dv">15</span>]</a>
-<a class="sourceLine" id="cb63-18" data-line-number="18"></a>
-<a class="sourceLine" id="cb63-19" data-line-number="19"><span class="co"># select by name</span></a>
-<a class="sourceLine" id="cb63-20" data-line-number="20">components[<span class="kw">c</span>(<span class="st">&quot;CMP1&quot;</span>, <span class="st">&quot;CMP5&quot;</span>)]</a>
-<a class="sourceLine" id="cb63-21" data-line-number="21"></a>
-<a class="sourceLine" id="cb63-22" data-line-number="22"><span class="co"># only retain feature groups in components for which compound annotations are</span></a>
-<a class="sourceLine" id="cb63-23" data-line-number="23"><span class="co"># available</span></a>
-<a class="sourceLine" id="cb63-24" data-line-number="24">components[, <span class="kw">groupNames</span>(compounds)]</a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># select first three analyses</span>
+fList[<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>]
+
+<span class="co"># select first three analyses and first 500 feature groups</span>
+fGroups[<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">500</span>]
+
+<span class="co"># select all feature groups from first component</span>
+fGroupsNT &lt;-<span class="st"> </span>fGroups[, componNT[[<span class="dv">1</span>]]<span class="op">$</span>group]
+
+<span class="co"># only keep feature groups with formula annotation results</span>
+fGroupsForms &lt;-<span class="st"> </span>fGroups[, <span class="kw">groupNames</span>(formulas)]
+
+<span class="co"># only keep feature groups with either formula or compound annotation results</span>
+fGroupsAnn &lt;-<span class="st"> </span>fGroups[, <span class="kw">union</span>(<span class="kw">groupNames</span>(formulas), <span class="kw">groupNames</span>(compounds))]
+
+<span class="co"># select first 15 components</span>
+components[<span class="dv">1</span><span class="op">:</span><span class="dv">15</span>]
+
+<span class="co"># select by name</span>
+components[<span class="kw">c</span>(<span class="st">&quot;CMP1&quot;</span>, <span class="st">&quot;CMP5&quot;</span>)]
+
+<span class="co"># only retain feature groups in components for which compound annotations are</span>
+<span class="co"># available</span>
+components[, <span class="kw">groupNames</span>(compounds)]</code></pre></div>
 <div id="prioritization-workflow" class="section level3">
 <h3><span class="header-section-number">5.3.1</span> Prioritization workflow</h3>
 <p>An important use case of subsetting is prioritization of data. For instance, after statistical analysis only certain feature groups are deemed relevant for the rest of the workflow. A common prioritization workflow is illustrated below:</p>
-<div id="htmlwidget-2355e2f95122b980b060" style="width:500px;height:120px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-2355e2f95122b980b060">{"x":{"diagram":"\ndigraph Prioritization {\n  graph [ rankdir = LR ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.3,\n         height = 1,\n         fontsize = 18,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"Object conversion\" -> \"Prioritization\" -> Subsetting\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-d0f9d66e32e80303d5db" style="width:500px;height:120px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-d0f9d66e32e80303d5db">{"x":{"diagram":"\ndigraph Prioritization {\n  graph [ rankdir = LR ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.3,\n         height = 1,\n         fontsize = 18,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"Object conversion\" -> \"Prioritization\" -> Subsetting\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 <p>During the first step the workflow object is converted to a suitable format, most often using the <code>as.data.frame()</code> function. The converted data is then used as input for the prioritization strategy. Finally, these results are then used to select the data of interest in the original object.</p>
 <p>A very simplified example of such a process is shown below.</p>
-<div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb64-1" data-line-number="1">featTab &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(fGroups, <span class="dt">average =</span> <span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb64-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb64-3" data-line-number="3"><span class="co"># prioritization: sort by (averaged) intensity of the &quot;sample&quot; replicate group</span></a>
-<a class="sourceLine" id="cb64-4" data-line-number="4"><span class="co"># (from high to low) and then obtain the feature group identifiers of the top 5.</span></a>
-<a class="sourceLine" id="cb64-5" data-line-number="5">featTab &lt;-<span class="st"> </span>featTab[<span class="kw">order</span>(featTab<span class="op">$</span>standard, <span class="dt">decreasing =</span> <span class="ot">TRUE</span>), ]</a>
-<a class="sourceLine" id="cb64-6" data-line-number="6">groupsOfInterest &lt;-<span class="st"> </span>featTab<span class="op">$</span>group[<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>]</a>
-<a class="sourceLine" id="cb64-7" data-line-number="7"></a>
-<a class="sourceLine" id="cb64-8" data-line-number="8"><span class="co"># subset the original data</span></a>
-<a class="sourceLine" id="cb64-9" data-line-number="9">fGroups &lt;-<span class="st"> </span>fGroups[, groupsOfInterest]</a>
-<a class="sourceLine" id="cb64-10" data-line-number="10"></a>
-<a class="sourceLine" id="cb64-11" data-line-number="11"><span class="co"># fGroups now only contains the feature groups for which intensity values in the</span></a>
-<a class="sourceLine" id="cb64-12" data-line-number="12"><span class="co"># &quot;sample&quot; replicate group were in the top 5</span></a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">featTab &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(fGroups, <span class="dt">average =</span> <span class="ot">TRUE</span>)
+
+<span class="co"># prioritization: sort by (averaged) intensity of the &quot;sample&quot; replicate group</span>
+<span class="co"># (from high to low) and then obtain the feature group identifiers of the top 5.</span>
+featTab &lt;-<span class="st"> </span>featTab[<span class="kw">order</span>(featTab<span class="op">$</span>standard, <span class="dt">decreasing =</span> <span class="ot">TRUE</span>), ]
+groupsOfInterest &lt;-<span class="st"> </span>featTab<span class="op">$</span>group[<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>]
+
+<span class="co"># subset the original data</span>
+fGroups &lt;-<span class="st"> </span>fGroups[, groupsOfInterest]
+
+<span class="co"># fGroups now only contains the feature groups for which intensity values in the</span>
+<span class="co"># &quot;sample&quot; replicate group were in the top 5</span></code></pre></div>
 </div>
 </div>
             </section>

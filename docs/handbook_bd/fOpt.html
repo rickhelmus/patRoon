@@ -24,7 +24,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2020-03-24" />
+<meta name="date" content="2020-03-31" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -66,66 +66,41 @@
 
 
 <style type="text/css">
-a.sourceLine { display: inline-block; line-height: 1.25; }
-a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
-a.sourceLine:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode { white-space: pre; position: relative; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-code.sourceCode { white-space: pre-wrap; }
-a.sourceLine { text-indent: -1em; padding-left: 1em; }
-}
-pre.numberSource a.sourceLine
-  { position: relative; left: -4em; }
-pre.numberSource a.sourceLine::before
-  { content: attr(data-line-number);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; pointer-events: all; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-    color: #aaaaaa;
-  }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
-div.sourceCode
-  {  }
-@media screen {
-a.sourceLine::before { text-decoration: underline; }
-}
-code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code span.at { color: #7d9029; } /* Attribute */
-code span.bn { color: #40a070; } /* BaseN */
-code span.bu { } /* BuiltIn */
-code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code span.ch { color: #4070a0; } /* Char */
-code span.cn { color: #880000; } /* Constant */
-code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code span.dt { color: #902000; } /* DataType */
-code span.dv { color: #40a070; } /* DecVal */
-code span.er { color: #ff0000; font-weight: bold; } /* Error */
-code span.ex { } /* Extension */
-code span.fl { color: #40a070; } /* Float */
-code span.fu { color: #06287e; } /* Function */
-code span.im { } /* Import */
-code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code span.op { color: #666666; } /* Operator */
-code span.ot { color: #007020; } /* Other */
-code span.pp { color: #bc7a00; } /* Preprocessor */
-code span.sc { color: #4070a0; } /* SpecialChar */
-code span.ss { color: #bb6688; } /* SpecialString */
-code span.st { color: #4070a0; } /* String */
-code span.va { color: #19177c; } /* Variable */
-code span.vs { color: #4070a0; } /* VerbatimString */
-code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
 </style>
 
 </head>
@@ -229,47 +204,47 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="parameter-sets" class="section level3">
 <h3><span class="header-section-number">6.2.1</span> Parameter sets</h3>
 <p>Before starting an optimization experiment we have to define <em>parameter sets</em>. These sets contain the parameters and (initial) numeric ranges that should be tested. A parameter set is defined as a regular <code>list</code>, and can be easily constructed with the <code>generateFeatureOptPSet()</code> and <code>generateFGroupsOptPSet()</code> functions (for feature finding and feature grouping, respectively).</p>
-<div class="sourceCode" id="cb101"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb101-1" data-line-number="1">pSet &lt;-<span class="st"> </span><span class="kw">generateFeatureOptPSet</span>(<span class="st">&quot;openms&quot;</span>) <span class="co"># default test set for OpenMS</span></a>
-<a class="sourceLine" id="cb101-2" data-line-number="2">pSet &lt;-<span class="st"> </span><span class="kw">generateFeatureOptPSet</span>(<span class="st">&quot;openms&quot;</span>, <span class="dt">chromSNR =</span> <span class="kw">c</span>(<span class="dv">5</span>, <span class="dv">10</span>)) <span class="co"># add parameter</span></a>
-<a class="sourceLine" id="cb101-3" data-line-number="3"><span class="co"># of course manually making a list is also possible (e.g. if you don&#39;t want to test the default parameters)</span></a>
-<a class="sourceLine" id="cb101-4" data-line-number="4">pSet &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">noiseThrInt =</span> <span class="kw">c</span>(<span class="dv">1000</span>, <span class="dv">5000</span>))</a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pSet &lt;-<span class="st"> </span><span class="kw">generateFeatureOptPSet</span>(<span class="st">&quot;openms&quot;</span>) <span class="co"># default test set for OpenMS</span>
+pSet &lt;-<span class="st"> </span><span class="kw">generateFeatureOptPSet</span>(<span class="st">&quot;openms&quot;</span>, <span class="dt">chromSNR =</span> <span class="kw">c</span>(<span class="dv">5</span>, <span class="dv">10</span>)) <span class="co"># add parameter</span>
+<span class="co"># of course manually making a list is also possible (e.g. if you don&#39;t want to test the default parameters)</span>
+pSet &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">noiseThrInt =</span> <span class="kw">c</span>(<span class="dv">1000</span>, <span class="dv">5000</span>))</code></pre></div>
 <p>When optimizing with <a href="https://www.bioconductor.org/packages/release/bioc/html/xcms.html">XCMS</a> a few things have to be considered. First of all, when using the XCMS3 interface (i.e. <code>algorithm=&quot;xcms3&quot;</code>) the underlying method that should be used for finding and grouping features and retention alignment should be set. In case these are not set default methods will be used.</p>
-<div class="sourceCode" id="cb102"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb102-1" data-line-number="1">pSet &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">method =</span> <span class="st">&quot;centWave&quot;</span>, <span class="dt">ppm =</span> <span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">8</span>))</a>
-<a class="sourceLine" id="cb102-2" data-line-number="2">pSet &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">ppm =</span> <span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">8</span>)) <span class="co"># same: centWave is default</span></a>
-<a class="sourceLine" id="cb102-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb102-4" data-line-number="4"><span class="co"># get defaults, but for different grouping/alignment methods</span></a>
-<a class="sourceLine" id="cb102-5" data-line-number="5">pSetFG &lt;-<span class="st"> </span><span class="kw">generateFGroupsOptPSet</span>(<span class="st">&quot;xcms3&quot;</span>, <span class="dt">groupMethod =</span> <span class="st">&quot;nearest&quot;</span>, <span class="dt">retAlignMethod =</span> <span class="st">&quot;peakgroups&quot;</span>)</a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pSet &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">method =</span> <span class="st">&quot;centWave&quot;</span>, <span class="dt">ppm =</span> <span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">8</span>))
+pSet &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">ppm =</span> <span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">8</span>)) <span class="co"># same: centWave is default</span>
+
+<span class="co"># get defaults, but for different grouping/alignment methods</span>
+pSetFG &lt;-<span class="st"> </span><span class="kw">generateFGroupsOptPSet</span>(<span class="st">&quot;xcms3&quot;</span>, <span class="dt">groupMethod =</span> <span class="st">&quot;nearest&quot;</span>, <span class="dt">retAlignMethod =</span> <span class="st">&quot;peakgroups&quot;</span>)</code></pre></div>
 <p>In addition, when optimizing feature grouping (both XCMS interfaces) we need to set the grouping and retention alignment parameters in two different nested lists: these are <code>groupArgs</code>/<code>retcorArgs</code> (<code>algorithm=&quot;xcms&quot;</code>) and <code>groupParams</code>/<code>retAlignParams</code> (<code>algorithm=&quot;xcms3&quot;</code>).</p>
-<div class="sourceCode" id="cb103"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb103-1" data-line-number="1">pSetFG &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">groupParams =</span> <span class="kw">list</span>(<span class="dt">bw =</span> <span class="kw">c</span>(<span class="dv">20</span>, <span class="dv">30</span>))) <span class="co"># xcms3</span></a>
-<a class="sourceLine" id="cb103-2" data-line-number="2">pSetFG &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">retcorArgs =</span> <span class="kw">list</span>(<span class="dt">gapInit =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">7</span>))) <span class="co"># xcms</span></a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pSetFG &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">groupParams =</span> <span class="kw">list</span>(<span class="dt">bw =</span> <span class="kw">c</span>(<span class="dv">20</span>, <span class="dv">30</span>))) <span class="co"># xcms3</span>
+pSetFG &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">retcorArgs =</span> <span class="kw">list</span>(<span class="dt">gapInit =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">7</span>))) <span class="co"># xcms</span></code></pre></div>
 <p>When a parameter set has been defined it should be used as input for the <code>optimizeFeatureFinding()</code> or <code>optimizeFeatureGrouping()</code> functions.</p>
-<div class="sourceCode" id="cb104"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb104-1" data-line-number="1">ftOpt &lt;-<span class="st"> </span><span class="kw">optimizeFeatureFinding</span>(anaInfo, <span class="st">&quot;openms&quot;</span>, pSet)</a>
-<a class="sourceLine" id="cb104-2" data-line-number="2">fgOpt &lt;-<span class="st"> </span><span class="kw">optimizeFeatureGrouping</span>(fList, <span class="st">&quot;openms&quot;</span>, pSetFG) <span class="co"># fList is an existing features object</span></a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ftOpt &lt;-<span class="st"> </span><span class="kw">optimizeFeatureFinding</span>(anaInfo, <span class="st">&quot;openms&quot;</span>, pSet)
+fgOpt &lt;-<span class="st"> </span><span class="kw">optimizeFeatureGrouping</span>(fList, <span class="st">&quot;openms&quot;</span>, pSetFG) <span class="co"># fList is an existing features object</span></code></pre></div>
 <p>Similar to <code>findFeatures()</code>, the first argument to <code>optimizeFeatureFinding()</code> should be the <a href="preparations.html#anaInfo">analysis information</a>. Note that it is not uncommon to perform the optimization with only a subset of (representative) analyses (i.e. to reduce processing time).</p>
-<div class="sourceCode" id="cb105"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb105-1" data-line-number="1">ftOpt &lt;-<span class="st"> </span><span class="kw">optimizeFeatureFinding</span>(anaInfo[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>, ], <span class="st">&quot;openms&quot;</span>, pSet) <span class="co"># only use first two analyses</span></a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ftOpt &lt;-<span class="st"> </span><span class="kw">optimizeFeatureFinding</span>(anaInfo[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>, ], <span class="st">&quot;openms&quot;</span>, pSet) <span class="co"># only use first two analyses</span></code></pre></div>
 <p>From the parameter set a design of experiment will be automatically created. Obviously, the more parameters are specified, the longer such an experiment will take. After an experiment has finished, the optimization algorithm will start a new experiment where numeric ranges for each parameter are increased or decreased in order to more accurately find optimum values. Hence, the numeric ranges specified in the parameter set are only <em>initial</em> ranges, and will be changed in subsequent experiments. After each experiment iteration the results will be evaluated and a new experiment will be started as long as better results were obtained during the last experiment (although there is a hard limit defined by the <code>maxIterations</code> argument).</p>
 <p>For some parameters it is recommended or even necessary to set hard limits on the numeric ranges that are allowed to be tested. For instance, setting a minimum feature intensity threshold is highly recommended to avoid excessive processing time and potentially suboptimal results due to excessive amounts of resulting features. Configuring absolute parameter ranges is done by setting the <code>paramRanges</code> argument.</p>
-<div class="sourceCode" id="cb106"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb106-1" data-line-number="1"><span class="co"># set minimum intensity threshold (but no max)</span></a>
-<a class="sourceLine" id="cb106-2" data-line-number="2">ftOpt &lt;-<span class="st"> </span><span class="kw">optimizeFeatureFinding</span>(anaInfo, <span class="st">&quot;openms&quot;</span>,</a>
-<a class="sourceLine" id="cb106-3" data-line-number="3">                                <span class="kw">list</span>(<span class="dt">noiseThrInt =</span> <span class="kw">c</span>(<span class="dv">1000</span>, <span class="dv">5000</span>), <span class="co"># initial testing range</span></a>
-<a class="sourceLine" id="cb106-4" data-line-number="4">                                <span class="dt">paramRanges =</span> <span class="kw">list</span>(<span class="dt">noiseThrInt =</span> <span class="kw">c</span>(<span class="dv">500</span>, <span class="ot">Inf</span>))) <span class="co"># never test below 500</span></a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># set minimum intensity threshold (but no max)</span>
+ftOpt &lt;-<span class="st"> </span><span class="kw">optimizeFeatureFinding</span>(anaInfo, <span class="st">&quot;openms&quot;</span>,
+                                <span class="kw">list</span>(<span class="dt">noiseThrInt =</span> <span class="kw">c</span>(<span class="dv">1000</span>, <span class="dv">5000</span>), <span class="co"># initial testing range</span>
+                                <span class="dt">paramRanges =</span> <span class="kw">list</span>(<span class="dt">noiseThrInt =</span> <span class="kw">c</span>(<span class="dv">500</span>, <span class="ot">Inf</span>))) <span class="co"># never test below 500</span></code></pre></div>
 <p>Depending on the used algorithm, several default absolute limits are imposed. These may be obtained with the <code>getDefFeaturesOptParamRanges()</code> and <code>getDefFGroupsOptParamRanges()</code> functions.</p>
 <p>The common operation is to optimize numeric parameters. However, parameters that are not numeric (i.e. <em>qualitative</em>) need a different approach. In this case you will need to define multiple parameter sets, where each set defines a different qualitative value.</p>
-<div class="sourceCode" id="cb107"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb107-1" data-line-number="1">ftOpt &lt;-<span class="st"> </span><span class="kw">optimizeFeatureFinding</span>(anaInfo, <span class="st">&quot;openms&quot;</span>,</a>
-<a class="sourceLine" id="cb107-2" data-line-number="2">                                <span class="kw">list</span>(<span class="dt">chromFWHM =</span> <span class="kw">c</span>(<span class="dv">4</span>, <span class="dv">8</span>), <span class="dt">isotopeFilteringModel =</span> <span class="st">&quot;metabolites (5% RMS)&quot;</span>),</a>
-<a class="sourceLine" id="cb107-3" data-line-number="3">                                <span class="kw">list</span>(<span class="dt">chromFWHM =</span> <span class="kw">c</span>(<span class="dv">4</span>, <span class="dv">8</span>), <span class="dt">isotopeFilteringModel =</span> <span class="st">&quot;metabolites (2% RMS)&quot;</span>))</a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ftOpt &lt;-<span class="st"> </span><span class="kw">optimizeFeatureFinding</span>(anaInfo, <span class="st">&quot;openms&quot;</span>,
+                                <span class="kw">list</span>(<span class="dt">chromFWHM =</span> <span class="kw">c</span>(<span class="dv">4</span>, <span class="dv">8</span>), <span class="dt">isotopeFilteringModel =</span> <span class="st">&quot;metabolites (5% RMS)&quot;</span>),
+                                <span class="kw">list</span>(<span class="dt">chromFWHM =</span> <span class="kw">c</span>(<span class="dv">4</span>, <span class="dv">8</span>), <span class="dt">isotopeFilteringModel =</span> <span class="st">&quot;metabolites (2% RMS)&quot;</span>))</code></pre></div>
 <p>In the above example there are two parameter sets: both define the numeric <code>chromFWHM</code> parameter, whereas the qualitative <code>isotopeFilteringModel</code> parameter has a different value for each. Note that we had to specify the <code>chromFWHM</code> twice, this can be remediated by using the <code>templateParams</code> argument:</p>
-<div class="sourceCode" id="cb108"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb108-1" data-line-number="1">ftOpt &lt;-<span class="st"> </span><span class="kw">optimizeFeatureFinding</span>(anaInfo, <span class="st">&quot;openms&quot;</span>,</a>
-<a class="sourceLine" id="cb108-2" data-line-number="2">                                <span class="kw">list</span>(<span class="dt">isotopeFilteringModel =</span> <span class="st">&quot;metabolites (5% RMS)&quot;</span>),</a>
-<a class="sourceLine" id="cb108-3" data-line-number="3">                                <span class="kw">list</span>(<span class="dt">isotopeFilteringModel =</span> <span class="st">&quot;metabolites (2% RMS)&quot;</span>),</a>
-<a class="sourceLine" id="cb108-4" data-line-number="4">                                <span class="dt">templateParams =</span> <span class="kw">list</span>(<span class="dt">chromFWHM =</span> <span class="kw">c</span>(<span class="dv">4</span>, <span class="dv">8</span>)))</a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ftOpt &lt;-<span class="st"> </span><span class="kw">optimizeFeatureFinding</span>(anaInfo, <span class="st">&quot;openms&quot;</span>,
+                                <span class="kw">list</span>(<span class="dt">isotopeFilteringModel =</span> <span class="st">&quot;metabolites (5% RMS)&quot;</span>),
+                                <span class="kw">list</span>(<span class="dt">isotopeFilteringModel =</span> <span class="st">&quot;metabolites (2% RMS)&quot;</span>),
+                                <span class="dt">templateParams =</span> <span class="kw">list</span>(<span class="dt">chromFWHM =</span> <span class="kw">c</span>(<span class="dv">4</span>, <span class="dv">8</span>)))</code></pre></div>
 <p>As its name suggests, the <code>templateParams</code> argument serves as a template parameter set, and its values are essentially combined with each given parameter set. Note that current support for optimizing qualitative parameters is relatively basic and time consuming. This is because tests are essentially repeated for each parameter set (e.g. in the above example the <code>chromFWHM</code> parameter is optimized twice, each time with a different value for <code>isotopeFilteringModel</code>).</p>
 </div>
 <div id="processing-optmization-results" class="section level3">
 <h3><span class="header-section-number">6.2.2</span> Processing optmization results</h3>
 <p>The results of an optimization process are stored in objects from the S4 <code>optimizationResult</code> class. Several methods are defined to inspect and visualize these results.</p>
 <p>The <code>optimizedParameters()</code> function is used to inspect the best parameter settings. Similarly, the <code>optimizedObject()</code> function can be used to obtain the object that was created with these settings (i.e. a <code>features</code> or <code>featureGroups</code> object).</p>
-<div class="sourceCode" id="cb109"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb109-1" data-line-number="1"><span class="kw">optimizedParameters</span>(ftOpt) <span class="co"># best settings for whole experiment</span></a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">optimizedParameters</span>(ftOpt) <span class="co"># best settings for whole experiment</span></code></pre></div>
 <pre><code>#&gt; $chromFWHM
 #&gt; [1] 3
 #&gt; 
@@ -284,9 +259,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 #&gt; 
 #&gt; $logPath
 #&gt; NULL</code></pre>
-<div class="sourceCode" id="cb111"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb111-1" data-line-number="1"><span class="kw">optimizedObject</span>(ftOpt) <span class="co"># features object with best settings for whole experiment</span></a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">optimizedObject</span>(ftOpt) <span class="co"># features object with best settings for whole experiment</span></code></pre></div>
 <pre><code>#&gt; A featuresOpenMS object (derived from features -&gt; workflowStep)
-#&gt; Object size (indication): 134.5 kB
+#&gt; Object size (indication): 134.4 kB
 #&gt; Algorithm: openms
 #&gt; Total feature count: 781
 #&gt; Average feature count/analysis: 390
@@ -294,13 +269,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 #&gt; Replicate groups: solvent (1 total)
 #&gt; Replicate groups used as blank: solvent (1 total)</code></pre>
 <p>Results can also be obtained for specific parameter sets/iterations.</p>
-<div class="sourceCode" id="cb113"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb113-1" data-line-number="1"><span class="kw">optimizedParameters</span>(ftOpt, <span class="dv">1</span>) <span class="co"># best settings for first parameter set</span></a>
-<a class="sourceLine" id="cb113-2" data-line-number="2"><span class="kw">optimizedParameters</span>(ftOpt, <span class="dv">1</span>, <span class="dv">1</span>) <span class="co"># best settings for first parameter set and experiment iteration</span></a>
-<a class="sourceLine" id="cb113-3" data-line-number="3"><span class="kw">optimizedObject</span>(ftOpt, <span class="dv">1</span>) <span class="co"># features object with best settings for first parameter set</span></a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">optimizedParameters</span>(ftOpt, <span class="dv">1</span>) <span class="co"># best settings for first parameter set</span>
+<span class="kw">optimizedParameters</span>(ftOpt, <span class="dv">1</span>, <span class="dv">1</span>) <span class="co"># best settings for first parameter set and experiment iteration</span>
+<span class="kw">optimizedObject</span>(ftOpt, <span class="dv">1</span>) <span class="co"># features object with best settings for first parameter set</span></code></pre></div>
 <p>The <code>plot()</code> function can be used to visualize optimization results. This function will plot graphs for results of all tested parameter pairs. The graphs can be contour, image or perspective plots (as specified by the <code>type</code> argument).</p>
-<div class="sourceCode" id="cb114"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb114-1" data-line-number="1"><span class="kw">plot</span>(ftOpt, <span class="dt">paramSet =</span> <span class="dv">1</span>, <span class="dt">DoEIteration =</span> <span class="dv">1</span>) <span class="co"># contour plots for first param set/experiment</span></a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(ftOpt, <span class="dt">paramSet =</span> <span class="dv">1</span>, <span class="dt">DoEIteration =</span> <span class="dv">1</span>) <span class="co"># contour plots for first param set/experiment</span></code></pre></div>
 <p><img src="handbook_files/figure-html/fOptPlot-1.png" width="70%" /></p>
-<div class="sourceCode" id="cb115"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb115-1" data-line-number="1"><span class="kw">plot</span>(ftOpt, <span class="dt">paramSet =</span> <span class="dv">1</span>, <span class="dt">DoEIteration =</span> <span class="dv">1</span>, <span class="dt">type =</span> <span class="st">&quot;persp&quot;</span>) <span class="co"># pretty perspective plots</span></a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(ftOpt, <span class="dt">paramSet =</span> <span class="dv">1</span>, <span class="dt">DoEIteration =</span> <span class="dv">1</span>, <span class="dt">type =</span> <span class="st">&quot;persp&quot;</span>) <span class="co"># pretty perspective plots</span></code></pre></div>
 <p><img src="handbook_files/figure-html/fOptPlot-2.png" width="70%" /></p>
 <p>Please refer to the reference manual for more methods to inspect optimization results (e.g. <code>?optimizationResult</code>).</p>
 </div>

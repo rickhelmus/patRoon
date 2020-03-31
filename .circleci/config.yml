@@ -34,7 +34,7 @@ jobs:
                 name: Build Docker image
                 no_output_timeout: 30m
                 command: |
-                    docker build --pull --cache-from "${IMAGE_NAME}" --tag "${TMP_IMAGE_NAME}" .
+                    docker build --pull --cache-from "${TMP_IMAGE_NAME}" --tag "${TMP_IMAGE_NAME}" .
             - run:
                 name: Save Docker image layer cache
                 command: |
@@ -105,6 +105,8 @@ jobs:
                     git config user.name "CircleCI updater"
                     git add docs
                     git status
+                    git commit -m "automatic site/doc update [skip ci]"
+                    gith push origin master
 
 workflows:
     btd:

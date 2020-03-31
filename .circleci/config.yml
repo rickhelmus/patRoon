@@ -101,8 +101,8 @@ jobs:
                     rm -rf docs
                     docker cp $CONTAINER_ID:/home/patRoon/patRoon/docs docs
                     touch docs/.nojekyll
-                    git config user.email "something@somewhere.com"
-                    git config user.name "CircleCI updater"
+                    git config --global user.email "something@email.com"
+                    git config --global user.name "CircleCI updater"
                     git add docs
                     git status
                     git commit -m "automatic site/doc update [skip ci]"

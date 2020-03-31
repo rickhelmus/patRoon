@@ -106,7 +106,7 @@ jobs:
                     git add docs
                     git status
                     git commit -m "automatic site/doc update [skip ci]"
-                    gith push origin master
+                    git push origin master
 
 workflows:
     btd:

@@ -1,6 +1,8 @@
 context("adducts")
 
 test_that("adduct class and utilities", {
+    expect_known_show(adduct("H"), testFile("adduct-show", text = TRUE))
+    
     expect_equal(adduct("H"), as.adduct("[M+H]+"))
     expect_equal(adduct("H"), as.adduct("[M+H]+"))
     expect_equal(adduct(sub = "H", charge = -1), as.adduct("[M-H]-"))

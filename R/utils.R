@@ -308,6 +308,7 @@ pruneList <- function(l, checkEmptyElements = FALSE, checkZeroRows = FALSE)
 }
 
 # based on tabular() from formatting vignette of roxygen
+# nocov start
 tabularRD <- function(df, ...)
 {
     align <- function(x) if (is.numeric(x)) "r" else "l"
@@ -424,6 +425,7 @@ getAllMethods <- function(gen)
 
     return(cl[order(tolower(cl))])
 }
+# nocov end
 
 NULLToZero <- function(x) if (is.null(x)) 0 else x
 zeroToNULL <- function(x) if (is.numeric(x) && x == 0) NULL else x

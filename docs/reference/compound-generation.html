@@ -164,7 +164,6 @@ groups.</p>
   <span class='kw'>preProcessingFilters</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"UnconnectedCompoundFilter"</span>, <span class='st'>"IsotopeFilter"</span>),
   <span class='kw'>postProcessingFilters</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"InChIKeyFilter"</span>),
   <span class='kw'>maxCandidatesToStop</span> <span class='kw'>=</span> <span class='fl'>2500</span>,
-  <span class='kw'>addTrivialNames</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>identifiers</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>extraOpts</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>maxProcAmount</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"patRoon.maxProcAmount"</span>)
@@ -337,11 +336,6 @@ are found then processing will be aborted and no results this feature group
 will be reported. Low values increase the chance of missing data, whereas
 too high values will use too much computer resources and signficantly
 slowdown the process. Sets the <span class="option">MaxCandidateLimitToStop</span> option.</p></td>
-    </tr>
-    <tr>
-      <th>addTrivialNames</th>
-      <td><p>If <code>TRUE</code> and the PubChem database is used then
-trivial names will be added after compound search.</p></td>
     </tr>
     <tr>
       <th>identifiers</th>

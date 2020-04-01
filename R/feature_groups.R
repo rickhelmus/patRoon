@@ -500,6 +500,7 @@ setMethod("plot", "featureGroups", function(x, colourBy = "fGroups",
 
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertFlag, . ~ onlyUnique + retMin + showLegend, fixed = list(add = ac))
+    checkmate::assertChoice(colourBy, c("none", "rGroups", "fGroups"), add = ac)
     checkmate::reportAssertions(ac)
 
     if (length(x) == 0)

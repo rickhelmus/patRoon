@@ -12,12 +12,10 @@ getGenFormBin <- function()
     else
     {
         ret <- system.file("bin", Sys.getenv("R_ARCH"), gbin, package = "patRoon")
-
-        if (!nzchar(ret) &&
-            ((requireNamespace("pkgload", quietly = TRUE) && !is.null(pkgload::dev_meta("patRoon"))) ||
-             (requireNamespace("devtools", quietly = TRUE) && !is.null(devtools::dev_meta("patRoon")))))
-            ret <- normalizePath(file.path(system.file(".", package = "patRoon"), "..", "src", gbin))
-    }
+        
+        # HACK: try GenForm binary from local src folder if devtools::load_all() was used
+        if (!nzchar(ret) && requireNamespace("pkgload", quietly = TRUE) && !is.null(pkgload::dev_meta("patRoon")))
+            ret <- normalizePath(file.path(system.file(".", package = "patRoon"), "..", "src", gbin))    }
 
     if (!file.exists(ret))
         stop(sprintf("GenForm binary does not exist: %s", ret))

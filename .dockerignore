@@ -19,3 +19,7 @@
 !DESCRIPTION
 !NAMESPACE
 !docker/*.R
+!NEWS.md
+!LICSENSE
+!README.md
+!_pkgdown.yaml

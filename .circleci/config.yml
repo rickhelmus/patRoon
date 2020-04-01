@@ -1,14 +1,16 @@
-version: 2
-jobs:
-    build:
-        working_directory: /app
-        docker:
-            - image: docker:18.04.0-ce-git
-        environment:
-            IMAGE_NAME: "patroonorg/patroon"
-            TMP_IMAGE_NAME: "patroon"
+dockerimg: &dockerimg
+    docker:
+        - image: docker:18.04.0-ce-git
+set_dock_env: &set_dock_env
+    environment:
+        IMAGE_NAME: "patroonorg/patroon"
+        TMP_IMAGE_NAME: "patroon"
+
+version: 2.1
+commands:
+    restore_docker_from_cache:
+        description: "Restore patRoon docker image from cache"
         steps:
-            - checkout
             - setup_remote_docker
             - restore_cache:
                 keys:
@@ -20,27 +22,38 @@ jobs:
                 command: |
                     set +o pipefail
                     docker load -i /caches/dock.tar | true
+
+jobs:
+    build:
+        <<: *dockerimg
+        <<: *set_dock_env
+        steps:
+            - checkout
+            - restore_docker_from_cache
             - run:
                 name: Build Docker image
                 no_output_timeout: 30m
                 command: |
-                    docker build --pull --cache-from "${IMAGE_NAME}" --tag "${TMP_IMAGE_NAME}" .
-            - run:
-                name: Perform tests
-                command: |
-                    docker run --name patroon -t patroon /bin/bash -c "cd patRoon; Rscript docker/run_tests.R"
-                    # tag if tests were OK
-                    docker tag "${TMP_IMAGE_NAME}" "${IMAGE_NAME}"
-
+                    docker build --pull --cache-from "${TMP_IMAGE_NAME}" --tag "${TMP_IMAGE_NAME}" .
             - run:
                 name: Save Docker image layer cache
                 command: |
                     mkdir -p /caches
-                    docker save -o /caches/dock.tar "${IMAGE_NAME}"
+                    docker save -o /caches/dock.tar "${TMP_IMAGE_NAME}"
             - save_cache:
                 key: v2-{{ .Branch }}-{{ epoch }}
                 paths:
                     - /caches/dock.tar
+    test:
+        <<: *dockerimg
+        <<: *set_dock_env
+        steps:
+            - restore_docker_from_cache
+            - run:
+                name: Perform tests
+                command: |
+                    docker run --name patroon -t "${TMP_IMAGE_NAME}" /bin/bash -c "cd patRoon; Rscript docker/run_tests.R"
+                    docker tag "${TMP_IMAGE_NAME}" "${IMAGE_NAME}"
             - run:
                 name: Copy test results
                 when: always
@@ -56,7 +69,7 @@ jobs:
                 command: |
                     if [ "${CIRCLE_BRANCH}" == "master" ]; then
                         echo "$DH_PASS" | docker login -u "$DH_USER" --password-stdin
-                        git_sha="$(git rev-parse --short HEAD)"
+                        git_sha=`echo $CIRCLE_SHA1 | cut -c1-7`
                         docker tag "$IMAGE_NAME" "${IMAGE_NAME}:${git_sha}-master"
                         docker push "${IMAGE_NAME}:latest" && docker push "${IMAGE_NAME}:${git_sha}-master"
                     fi
@@ -66,7 +79,42 @@ jobs:
                 command: |
                     if [ "${CIRCLE_BRANCH}" == "master" ]; then
                         echo "$DH_PASS" | docker login -u "$DH_USER" --password-stdin
-                        git_sha="$(git rev-parse --short HEAD)"
-                        docker tag "${TMP_IMAGE_NAME}" "${IMAGE_NAME}:${git_sha}-master-failed"
+                        git_sha=`echo $CIRCLE_SHA1 | cut -c1-7`
+                        docker tag "${IMAGE_NAME}" "${IMAGE_NAME}:${git_sha}-master-failed"
                         docker push "${IMAGE_NAME}:${git_sha}-master-failed"
                     fi
+    docs:
+        <<: *dockerimg
+        <<: *set_dock_env
+        steps:
+            - checkout
+            - restore_docker_from_cache
+            - add_ssh_keys:
+                fingerprints:
+                    - "9a:18:88:f8:04:fe:25:3b:8f:6e:23:d7:fd:d4:46:b8"
+            - run:
+                name: Generate docs & site
+                no_output_timeout: 30m
+                command: |
+                    docker run --name patroon -t "${TMP_IMAGE_NAME}" /bin/bash -c "cd patRoon; Rscript docker/make_docs.R"
+                    CONTAINER_ID=`docker ps -aqf "name=patroon"`
+                    rm -rf docs
+                    docker cp $CONTAINER_ID:/home/patRoon/patRoon/docs docs
+                    touch docs/.nojekyll
+                    git config --global user.email "something@email.com"
+                    git config --global user.name "CircleCI updater"
+                    git add docs
+                    git status
+                    git commit -m "automatic site/doc update [skip ci]"
+                    git push origin master
+
+workflows:
+    btd:
+        jobs:
+            - build
+            - test:
+                requires:
+                    - build
+            - docs:
+                requires:
+                    - build

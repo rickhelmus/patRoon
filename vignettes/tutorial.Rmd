@@ -22,7 +22,7 @@ knitr::opts_chunk$set(
 options(patRoon.cache.fileName = "~/tutorial.sqlite")
 options(patRoon.progress.opts = list(style = 1, width = 80))
 
-if (pkgdown::in_pkgdown() && file.exists("~/.Rprofile"))
+if (file.exists("~/.Rprofile"))
   source("~/.Rprofile")
 
 options(width=1500) # big nr to avoid wrapping text in code chunks

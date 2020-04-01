@@ -16,8 +16,8 @@ options(width=1500) # big nr to avoid wrapping text in code chunks
 options(datatable.print.nrows = 15)
 
 # pkgdown doesn't seem to load RProfile, which may become annoying when MetFrag
-# path's and other patRoon settings are set there...
-if (pkgdown::in_pkgdown() && file.exists("~/.Rprofile"))
+# paths and other patRoon settings are set there...
+if (file.exists("~/.Rprofile"))
   source("~/.Rprofile")
 
 library(patRoon)

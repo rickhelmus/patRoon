@@ -36,15 +36,12 @@
 
 
 ## compounds
-- MetFrag: (buggy) trivial name fetching not needed anymore?
 - SIRIUS: use --auto-charge instead of manually fixing charge of fragments (or not? conflicting docs on what it does)
 - test score normalization?
 - timeouts for SIRIUS?
 - do something about negative H explained fragments by MF?
 - PubChemLite
-    - Do something with related CIDs? (e.g. link in getCompInfoList())
     - Install from Win inst script --> now only tier1, OK?
-    - Identifier web links
 - SusDat MF support
 
 
@@ -56,8 +53,6 @@
 ## components
 - RC: check spearmans correlation
 - NT: minimum size argument, combine rows for multiple rGroups?
-- reporting: don't include components that have only feature groups not in fGroups
-    - Subsetting doesn't work because it yields a reduced object
 
 
 ## reporting

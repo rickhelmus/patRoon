@@ -2,7 +2,13 @@
 cTable <- componentTable(rmdVars$components)
 cInfo <- componentInfo(rmdVars$components)
 cNames <- names(rmdVars$components)
-cCount <- length(rmdVars$components)
+
+# the given fGroups may be a subset: make sure to only report components with
+# given fGroups.
+# NOTE: we cannot report a subset of the components object as it removes
+# necessary metadata.
+subComps <- rmdVars$components[, names(rmdVars$fGroups)]
+indsWithFGroups <- which(names(rmdVars$components) %in% names(subComps))
 
 message("Plotting components...")
 prog <- openProgBar(0, length(rmdVars$components))
@@ -18,7 +24,7 @@ isHomol <- inherits(rmdVars$components, "componentsNT")
 if (isHClust)
     clProps <- clusterProperties(rmdVars$components)
 
-for (ci in seq_len(cCount))
+for (ci in indsWithFGroups)
 {
     curPlotInd <- curPlotInd + 1
     allPlots[curPlotInd] <- file.path(plotPathFull, sprintf("component_spec_%d.png", ci))
@@ -100,12 +106,13 @@ plotGraph(rmdVars$components, onlyLinked = TRUE)
 
 ### Components { .components }
 
+NOTE: only components with feature group data are shown here.
+
 <style> .components { overflow-x: auto; } </style>
 
 ```{r echo=FALSE}
-compSeq <- seq_len(cCount)
-sppaths <- file.path(plotPathLink, sprintf("component_spec_%d.png", compSeq))
-eicpaths <- file.path(plotPathLink, sprintf("component_eic_%d.png", compSeq))
+sppaths <- file.path(plotPathLink, sprintf("component_spec_%d.png", indsWithFGroups))
+eicpaths <- file.path(plotPathLink, sprintf("component_eic_%d.png", indsWithFGroups))
 
 if (rmdVars$selfContained)
 {
@@ -118,18 +125,18 @@ cTable <- sapply(cTable, function(ct)
 {
     ct[, sapply(ct, function(x) !all(is.na(x))), with = FALSE]
 }, simplify = FALSE)
-infoTables <- sapply(compSeq, function(compi) knitr::kable(cTable[[compi]], "html") %>%
+infoTables <- sapply(indsWithFGroups, function(compi) knitr::kable(cTable[[compi]], "html") %>%
                          kableExtra::kable_styling(font_size = 11) %>%
                          kableExtra::scroll_box(extra_css = "overflow: auto; width: 350px; height: 300px;"))
 
-compTable <- data.table(component = names(rmdVars$components),
+compTable <- data.table(component = names(rmdVars$components)[indsWithFGroups],
                         info = infoTables,
                         EIC = imgTags(eicpaths))
                              
 if (isHClust)
 {
-    intnpaths <- file.path(plotPathLink, sprintf("component_int_norm_%d.png", compSeq))
-    intapaths <- file.path(plotPathLink, sprintf("component_int_abs_%d.png", compSeq))
+    intnpaths <- file.path(plotPathLink, sprintf("component_int_norm_%d.png", indsWithFGroups))
+    intapaths <- file.path(plotPathLink, sprintf("component_int_abs_%d.png", indsWithFGroups))
     
     if (rmdVars$selfContained)
     {

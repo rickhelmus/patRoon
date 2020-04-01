@@ -12,8 +12,8 @@
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous" />
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
 
@@ -81,25 +81,28 @@ groups." />
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fa fa-home fa-lg"></span>
      
   </a>
 </li>
 <li>
   <a href="../reference/index.html">Reference</a>
 </li>
+<li>
+  <a href="../articles/tutorial.html">Tutorial</a>
+</li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    Articles
+    Handbook
      
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/handbook.html">patRoon handbook</a>
+      <a href="../handbook_bd/introduction.html">Book format</a>
     </li>
     <li>
-      <a href="../articles/tutorial.html">patRoon tutorial</a>
+      <a href="../articles/handbook.html">Single page</a>
     </li>
   </ul>
 </li>
@@ -109,8 +112,8 @@ groups." />
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/rickhelmus/patRoon/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+  <a href="https://github.com/rickhelmus/patRoon">
+    <span class="fa fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -161,7 +164,6 @@ groups.</p>
   <span class='kw'>preProcessingFilters</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"UnconnectedCompoundFilter"</span>, <span class='st'>"IsotopeFilter"</span>),
   <span class='kw'>postProcessingFilters</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"InChIKeyFilter"</span>),
   <span class='kw'>maxCandidatesToStop</span> <span class='kw'>=</span> <span class='fl'>2500</span>,
-  <span class='kw'>addTrivialNames</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>identifiers</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>extraOpts</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>maxProcAmount</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"patRoon.maxProcAmount"</span>)
@@ -334,11 +336,6 @@ are found then processing will be aborted and no results this feature group
 will be reported. Low values increase the chance of missing data, whereas
 too high values will use too much computer resources and signficantly
 slowdown the process. Sets the <span class="option">MaxCandidateLimitToStop</span> option.</p></td>
-    </tr>
-    <tr>
-      <th>addTrivialNames</th>
-      <td><p>If <code>TRUE</code> and the PubChem database is used then
-trivial names will be added after compound search.</p></td>
     </tr>
     <tr>
       <th>identifiers</th>

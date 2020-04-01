@@ -147,6 +147,9 @@ getCompInfoList <- function(compResults, compIndex, addHTMLURL, mCompNames)
             # CSI:FingerID might return multiple identifiers
             idlist <- unlist(strsplit(ident, ";"))
 
+            # Same for PubChemLite with MetFrag, but space spearated
+            idlist <- unlist(strsplit(ident, " "))
+            
             # UNDONE: could use related CIDs here with PubChemLite?
             if (grepl("pubchem", tolower(db)))
                 fmt <- "<a target=\"_blank\" href=\"https://pubchem.ncbi.nlm.nih.gov/compound/%s\">%s</a>"
@@ -160,12 +163,13 @@ getCompInfoList <- function(compResults, compIndex, addHTMLURL, mCompNames)
             return(sprintf("%s: %s", param, paste0(sprintf(fmt, idlist, idlist), collapse = "; ")))
         }
 
+        dbcols <- getAllCompCols("database", columns, mCompNames)
+        
         if (!is.null(resultRow$identifier)) # compounds were not merged, can use 'regular' column
             ctext <- c(ctext, addIdURL("identifier", resultRow$identifier, resultRow$database))
         else
         {
             idcols <- getAllCompCols("identifier", columns, mCompNames)
-            dbcols <- getAllCompCols("database", columns, mCompNames)
 
             if (allSame(resultRow[, idcols, with = FALSE])) # no need to show double ids
                 ctext <- c(ctext, addIdURL("identifier", resultRow[[idcols[1]]], resultRow[[dbcols[1]]]))
@@ -175,9 +179,16 @@ getCompInfoList <- function(compResults, compIndex, addHTMLURL, mCompNames)
                     ctext <- c(ctext, addIdURL(idcols[i], resultRow[[idcols[i]]], resultRow[[dbcols[i]]]))
             }
         }
+        
+        relatedIDCols <- getAllCompCols("relatedCIDs", columns, mCompNames)
+        for (i in seq_along(relatedIDCols))
+            ctext <- c(ctext, addIdURL(relatedIDCols[i], resultRow[[relatedIDCols[i]]], resultRow[[dbcols[i]]]))
     }
     else
+    {
         ctext <- addValText(ctext, "%s", "identifier")
+        ctext <- addValText(ctext, "%s", "relatedCIDs")
+    }
 
     ctext <- addValText(ctext, "%s", c("compoundName", "formula", "SMILES"))
 

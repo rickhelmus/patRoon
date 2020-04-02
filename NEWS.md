@@ -3,7 +3,9 @@
 ## April 2020
 
 * `extraOptsRT`/`extraOptsGroup` arguments for OpenMS feature grouping to allow custom command line options.
-* `importFeatureGroupsBrukerTASQ`: now correctly groups suspects across analyses if they were found >1 in the same analyses.
+* `importFeatureGroupsBrukerTASQ`
+    * now correctly groups suspects across analyses if they were found >1 in the same analyses.
+    * retention times / _m/z_ values are now averaged over grouped suspects.
 
 
 ## March 2020

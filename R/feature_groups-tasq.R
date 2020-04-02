@@ -83,7 +83,9 @@ importFeatureGroupsBrukerTASQ <- function(path, analysisInfo, clusterRTWindow = 
     
     tExport[cl > 1, group := paste0(group, "-", cl)]
 
-    gInfoDT <- tExport[!duplicated(group), c("group", "rts", "mzs")]
+    # calculate group averages
+    gInfoDT <- tExport[, .(rts = mean(rts), mzs = mean(mzs)), by = "group"]
+    
     gInfo <- as.data.frame(gInfoDT[, c("rts", "mzs")])
     rownames(gInfo) <- gInfoDT$group
 

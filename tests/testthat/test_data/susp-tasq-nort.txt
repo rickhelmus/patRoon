@@ -1,0 +1,1 @@
+A featureGroupsBrukerTASQ object (derived from featureGroups -> workflowStep)Algorithm: bruker_tasqFeature groups: 4-quinolol, 6-quinolol, 4-quinolol-2, TBA, 8-quinolol, 5-methyl-1H-benzotriazole, ... (36 total)Analyses: standard-1, standard-2, standard-3 (3 total)Replicate groups: standard (1 total)Replicate groups used as blank: solvent (1 total)

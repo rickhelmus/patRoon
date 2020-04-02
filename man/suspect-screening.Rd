@@ -47,7 +47,7 @@ screenSuspects(
 
 \S4method{groupFeaturesScreening}{featureGroups}(fGroups, scr)
 
-importFeatureGroupsBrukerTASQ(path, analysisInfo)
+importFeatureGroupsBrukerTASQ(path, analysisInfo, clusterRTWindow = 12)
 }
 \arguments{
 \item{obj}{The object that should be screened (\emph{i.e.}
@@ -92,6 +92,9 @@ TASQ, converted to \file{.csv} format.}
 
 \item{analysisInfo}{A table with \link[=analysis-information]{analysis
 information}.}
+
+\item{clusterRTWindow}{This retention time window (in seconds) is used to
+group hits across analyses together. See also the details section.}
 }
 \value{
 \code{screenSuspects} will return a table (a
@@ -134,9 +137,13 @@ if possible, as it can significantly reduce the load on data interpretation.
   \code{featureGroups}.
 
 \code{importFeatureGroupsBrukerTASQ} will convert screening results
-  from Bruker TASQ to a \code{\link{featureGroups}} object. Groups are made
-  based on target analyte names and individual results per analysis are used
-  to generate the features. The input for this function is obtained by
+  from Bruker TASQ to a \code{\link{featureGroups}} object. The groups across
+  analyses are formed by the name of suspects. However, for suspects that
+  were found >1 in the same analysis ambiguity exists as the same name occurs
+  multiple times for these analyses. For this situation, grouping is
+  performed by clustering on closeness of retention times (using
+  \pkg{\link{fastcluster}}). The cut-off value for this is specified by the
+  \code{clusterRTWindow} argument. The input for this function is obtained by
   generating an Excel export of the 'global' results and subsequently
   converting the file to \file{.csv} format. Similar to
   \code{groupFeaturesScreening}, this method will return an object that is
@@ -146,7 +153,8 @@ if possible, as it can significantly reduce the load on data interpretation.
 Both \code{groupFeaturesScreening} and
   \code{importFeatureGroupsBrukerTASQ} use names from targets/suspects as
   feature group names, therefore, it is important that these are
-  file-compatible names when \link[=reporting]{reporting data}.
+  file-compatible names when \link[=reporting]{reporting data} \file{csv} or
+  \file{pdf} data.
 
 For \code{screenSuspects} in some cases you may need to install
   \href{http://openbabel.org/wiki/Main_Page}{OpenBabel} (\emph{e.g.} when
@@ -162,4 +170,7 @@ Please note that \code{groupFeaturesScreening} method can only
   plotting, for instance, extracted ion chromatograms (with
   \code{\link{plotEIC}}) the integrated chromatographic peak range shown is
   incorrect.
+}
+\references{
+\addCitations{fastcluster}{1}
 }

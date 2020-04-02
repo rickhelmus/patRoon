@@ -58,9 +58,18 @@ TQFile <- file.path(getTestDataPath(), "GlobalResults-TASQ.csv")
 TQRes <- fread(TQFile)
 fGroupsTQ <- importFeatureGroupsBrukerTASQ(TQFile, getTestAnaInfo())
 fGroupsTQ <- filter(fGroupsTQ, blankThreshold = 5, removeBlanks = TRUE)
+TQFileNoRT <- file.path(getTestDataPath(), "GlobalResults_noRT-TASQ.csv")
+TQResNoRT <- fread(TQFileNoRT)
+fGroupsTQNoRT <- importFeatureGroupsBrukerTASQ(TQFileNoRT, getTestAnaInfo())
+fGroupsTQNoRT <- filter(fGroupsTQNoRT, blankThreshold = 5, removeBlanks = TRUE)
 
 test_that("TASQ import works", {
     expect_equal(unique(TQRes$Analyte), names(fGroupsTQ))
     expect_known_value(groups(fGroupsTQ), testFile("susp-tasq"))
     expect_known_show(fGroupsTQ, testFile("susp-tasq", text = TRUE))
+    
+    expect_lt(length(unique(TQResNoRT$Analyte)), length(fGroupsTQNoRT))
+    expect_known_value(groups(fGroupsTQNoRT), testFile("susp-tasq-nort"))
+    expect_known_show(fGroupsTQNoRT, testFile("susp-tasq-nort", text = TRUE))
+    
 })

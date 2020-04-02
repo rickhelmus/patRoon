@@ -9,9 +9,13 @@ setMethod("initialize", "featureGroupsBrukerTASQ",
 # UNDONE: does this work with analytes that are matched more than once in an analysis?
 
 #' @details \code{importFeatureGroupsBrukerTASQ} will convert screening results
-#'   from Bruker TASQ to a \code{\link{featureGroups}} object. Groups are made
-#'   based on target analyte names and individual results per analysis are used
-#'   to generate the features. The input for this function is obtained by
+#'   from Bruker TASQ to a \code{\link{featureGroups}} object. The groups across
+#'   analyses are formed by the name of suspects. However, for suspects that
+#'   were found >1 in the same analysis ambiguity exists as the same name occurs
+#'   multiple times for these analyses. For this situation, grouping is
+#'   performed by clustering on closeness of retention times (using
+#'   \pkg{\link{fastcluster}}). The cut-off value for this is specified by the
+#'   \code{clusterRTWindow} argument. The input for this function is obtained by
 #'   generating an Excel export of the 'global' results and subsequently
 #'   converting the file to \file{.csv} format. Similar to
 #'   \code{groupFeaturesScreening}, this method will return an object that is
@@ -21,6 +25,8 @@ setMethod("initialize", "featureGroupsBrukerTASQ",
 #'   TASQ, converted to \file{.csv} format.
 #' @param analysisInfo A table with \link[=analysis-information]{analysis
 #'   information}.
+#' @param clusterRTWindow This retention time window (in seconds) is used to
+#'   group hits across analyses together. See also the details section.
 #'
 #' @return \code{importFeatureGroupsBrukerTASQ} returns a new
 #'   \code{featureGroups} object containing converted screening results from
@@ -33,26 +39,51 @@ setMethod("initialize", "featureGroupsBrukerTASQ",
 #'   \code{\link{plotEIC}}) the integrated chromatographic peak range shown is
 #'   incorrect.
 #'
+#'   
+#' @references \addCitations{fastcluster}{1}
+#'
 #' @rdname suspect-screening
 #' @export
-importFeatureGroupsBrukerTASQ <- function(path, analysisInfo)
+importFeatureGroupsBrukerTASQ <- function(path, analysisInfo, clusterRTWindow = 12)
 {
     selCols <- c("Row", "Data Set", "Analyte", "RT [min]", "m/z meas.", "Height")
 
     ac <- checkmate::makeAssertCollection()
     assertCSVFile(path, selCols, add = ac)
     analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, add = ac)
+    checkmate::assertNumber(clusterRTWindow, finite = TRUE, add = ac)
     checkmate::reportAssertions(ac)
 
+    fts <- importFeaturesBrukerTASQ(analysisInfo, path)
+    fTable <- featureTable(fts)
+    
     tExport <- fread(path, select = selCols)
     tExport <- tExport[!is.na(`RT [min]`) & `Data Set` %in% analysisInfo$analysis] # skip empty/other results
     setnames(tExport, selCols, c("ID", "analysis", "group", "rts", "mzs", "intensity"))
 
-    fts <- importFeaturesBrukerTASQ(analysisInfo, path)
-    fTable <- featureTable(fts)
+    tExport[, rts := rts * 60] # min --> s
+    
+    # if TASQ detects >1 of the same suspect in a single analysis it will return
+    # each result as a row. Since they all have the same name we cannot easily
+    # group therm across analyses. Thus,
+    # - the duplicate hits must have unique names
+    # - the duplicates should be grouped by similar retention time
+    # --> perform HCA for each suspect to group them by close retention time and then re-assign names based on cluster number
+    
+    tExport[, cl := {
+        if (anyDuplicated(.SD))
+        {
+            distm <- dist(rts)
+            hc <- fastcluster::hclust(distm)
+            cutree(hc, h = 12) # UNDONE: make h configurable
+        }
+        else
+            1
+    }, by = "group", .SDcols = c("analysis", "group")]
+    
+    tExport[cl > 1, group := paste0(group, "-", cl)]
 
     gInfoDT <- tExport[!duplicated(group), c("group", "rts", "mzs")]
-    gInfoDT[, rts := rts * 60] # min --> s
     gInfo <- as.data.frame(gInfoDT[, c("rts", "mzs")])
     rownames(gInfo) <- gInfoDT$group
 

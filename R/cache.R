@@ -1,4 +1,11 @@
-getCacheMode <- function() getOption("patRoon.cache.mode")
+getCacheMode <- function()
+{
+    ret <- getOption("patRoon.cache.mode", default = "both")
+    if (!ret %in% c("both", "save", "load", "none"))
+        stop(sprintf("Invalid cache mode (patRoon.cache.mode = \"%s\"), should be \"both\", \"save\", \"load\" or \"none\".", ret))
+    return(ret)
+}
+
 getCacheFile <- function() getOption("patRoon.cache.fileName")
 getMaxCacheEntries <- function() 100000 # UNDONE
 

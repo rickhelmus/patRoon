@@ -1,5 +1,10 @@
 # patRoon 0.1.0.9000
 
+## April 2020
+
+* `extraOptsRT`/`extraOptsGroup` arguments for OpenMS feature grouping to allow custom command line options.
+
+
 ## March 2020
 
 * Fixed: Normalization of scorings for formulae/compounds potentially uses wrong data after subsetting/filtering of `formulas`/`compounds` objects

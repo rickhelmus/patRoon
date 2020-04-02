@@ -19,7 +19,6 @@ setGeneric("overlap", function(fGroups, which, exclusive = FALSE) standardGeneri
 setGeneric("comparison", function(..., groupAlgo,
                                   groupArgs = list(rtalign = FALSE)) standardGeneric("comparison"), signature = "...")
 setGeneric("groupFeatures", function(feat, algorithm, ...) standardGeneric("groupFeatures"))
-setGeneric("generateConsensusXML", function(feat, out, rtalign, QT, maxAlignRT, maxAlignMZ, maxGroupRT, maxGroupMZ, verbose) standardGeneric("generateConsensusXML"))
 setGeneric("groupFeaturesScreening", function(fGroups, scr) standardGeneric("groupFeaturesScreening"))
 setGeneric("replicateGroupSubtract", function(fGroups, rGroups, threshold = 0) standardGeneric("replicateGroupSubtract"))
 

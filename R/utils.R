@@ -109,6 +109,9 @@ getCommandWithOptPath <- function(cmd, opt, verify = TRUE)
     return(cmd)
 }
 
+# convert to unnamed character vector where previous names are followed by set values
+OpenMSArgListToOpts <- function(args) as.vector(mapply(names(args), args, FUN = c, USE.NAMES = FALSE))
+
 # NOTE: keep in sync with install-patRoon version
 findPWizPath <- function()
 {

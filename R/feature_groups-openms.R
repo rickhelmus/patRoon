@@ -20,8 +20,8 @@ setMethod("initialize", "featureGroupsOpenMS",
 #'   \href{https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/TOPP_FeatureLinkerUnlabeledQT.html}{FeatureLinkerUnlabeledQT}
 #'    TOPP tools.
 #'
-#' @param QT If enabled, use \code{FeatureLinkerUnlabeledQT} instead of
-#'   \code{FeatureLinkerUnlabeled} for feature grouping.
+#' @param QT If enabled, use \command{FeatureLinkerUnlabeledQT} instead of
+#'   \command{FeatureLinkerUnlabeled} for feature grouping.
 #' @param maxAlignRT,maxAlignMZ Used for retention alignment. Maximum retention
 #'   time or m/z difference (seconds/Dalton) for feature pairing. Sets
 #'   \code{-algorithm:pairfinder:distance_RT:max_difference} and
@@ -30,27 +30,34 @@ setMethod("initialize", "featureGroupsOpenMS",
 #' @param maxGroupRT,maxGroupMZ as \code{maxAlignRT} and \code{maxAlignMZ}, but
 #'   for grouping of features. Sets \code{-algorithm:distance_RT:max_difference}
 #'   and \code{-algorithm:distance_MZ:max_difference} options, respectively.
+#' @param extraOptsRT,extraOptsGroup Named \code{list} containing extra options
+#'   that will be passed to \command{MapAlignerPoseClustering} or
+#'   \command{FeatureLinkerUnlabeledQT/FeatureLinkerUnlabeled}, respectively.
+#'   Any options specified here will override any of the above. Example:
+#'   \code{extraOptsGroup=list("-algorithm:distance_RT:max_difference"=12)}
+#'   (corresponds to setting \code{maxGroupRT=12}). Set to \code{NULL} to
+#'   ignore.
 #'
 #' @template refs-openms
 #'
 #' @rdname feature-grouping
 #' @export
 groupFeaturesOpenMS <- function(feat, rtalign = TRUE, QT = FALSE, maxAlignRT = 30, maxAlignMZ = 0.005, maxGroupRT = 12,
-                                maxGroupMZ = 0.005, verbose = TRUE)
+                                maxGroupMZ = 0.005, extraOptsRT = NULL, extraOptsGroup = NULL, verbose = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(feat, "features", add = ac)
-    aapply(checkmate::assertFlag, . ~ rtalign + QT, fixed = list(add = ac))
+    aapply(checkmate::assertFlag, . ~ rtalign + QT + verbose, fixed = list(add = ac))
     aapply(checkmate::assertNumber, . ~ maxAlignRT + maxAlignMZ + maxGroupRT + maxGroupMZ,
            finite = TRUE, lower = 0, fixed = list(add = ac))
+    aapply(checkmate::assertList, . ~ extraOptsRT + extraOptsGroup, any.missing = FALSE,
+           names = "unique", null.ok = TRUE, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
-
-    # UNDONE: allow extra options for aligning/grouping?
 
     if (length(feat) == 0)
         return(featureGroupsOpenMS(analysisInfo = analysisInfo(feat), features = feat))
 
-    hash <- makeHash(feat, rtalign, QT, maxAlignRT, maxAlignMZ, maxGroupRT, maxGroupMZ)
+    hash <- makeHash(feat, rtalign, QT, maxAlignRT, maxAlignMZ, maxGroupRT, maxGroupMZ, extraOptsRT, extraOptsGroup)
     cachefg <- loadCacheData("featureGroupsOpenMS", hash)
     if (!is.null(cachefg))
         return(cachefg)
@@ -59,7 +66,8 @@ groupFeaturesOpenMS <- function(feat, rtalign = TRUE, QT = FALSE, maxAlignRT = 3
         cat("Grouping features with OpenMS...\n===========\n")
 
     cfile <- tempfile("cons", fileext = ".consensusXML")
-    generateConsensusXML(feat, cfile, rtalign, QT, maxAlignRT, maxAlignMZ, maxGroupRT, maxGroupMZ, verbose)
+    generateConsensusXML(feat, cfile, rtalign, QT, maxAlignRT, maxAlignMZ, maxGroupRT, maxGroupMZ,
+                         extraOptsRT, extraOptsGroup, verbose)
     fgimp <- importConsensusXML(feat, cfile, verbose)
 
     ret <- featureGroupsOpenMS(groups = fgimp$groups, groupInfo = fgimp$gInfo, analysisInfo = analysisInfo(feat),
@@ -73,8 +81,8 @@ groupFeaturesOpenMS <- function(feat, rtalign = TRUE, QT = FALSE, maxAlignRT = 3
     return(ret)
 }
 
-setMethod("generateConsensusXML", "features", function(feat, out, rtalign, QT, maxAlignRT, maxAlignMZ, maxGroupRT,
-                                                       maxGroupMZ, verbose)
+generateConsensusXML <- function(feat, out, rtalign, QT, maxAlignRT, maxAlignMZ, maxGroupRT,
+                                                       maxGroupMZ, extraOptsRT, extraOptsGroup, verbose)
 {
     sGroup <- analysisInfo(feat)
     fts <- featureTable(feat)
@@ -89,26 +97,32 @@ setMethod("generateConsensusXML", "features", function(feat, out, rtalign, QT, m
 
     if (rtalign)
     {
-        settings <- c("-algorithm:max_num_peaks_considered", -1,
-                      "-algorithm:superimposer:mz_pair_max_distance", maxAlignMZ,
-                      "-algorithm:superimposer:num_used_points", 10000,
-                      "-algorithm:pairfinder:distance_RT:max_difference", maxAlignRT,
-                      "-algorithm:pairfinder:distance_MZ:max_difference", maxAlignMZ,
-                      "-algorithm:pairfinder:distance_MZ:unit", "Da")
+        settings <- list("-algorithm:max_num_peaks_considered" = -1,
+                         "-algorithm:superimposer:mz_pair_max_distance" = maxAlignMZ,
+                         "-algorithm:superimposer:num_used_points" = 10000,
+                         "-algorithm:pairfinder:distance_RT:max_difference" = maxAlignRT,
+                         "-algorithm:pairfinder:distance_MZ:max_difference" = maxAlignMZ,
+                         "-algorithm:pairfinder:distance_MZ:unit" = "Da")
+        if (!is.null(extraOptsRT))
+            settings <- modifyList(settings, extraOptsRT)
+        
         executeCommand(getCommandWithOptPath("MapAlignerPoseClustering", "OpenMS"),
-                       c(settings, "-in", featFiles, "-out", featFiles),
+                       c(OpenMSArgListToOpts(settings), "-in", featFiles, "-out", featFiles),
                        stdout = if (verbose) "" else FALSE,
                        stderr = if (verbose) "" else FALSE)
     }
 
-    settings <- c("-algorithm:distance_RT:max_difference", maxGroupRT,
-                  "-algorithm:distance_MZ:max_difference", maxGroupMZ,
-                  "-algorithm:distance_MZ:unit", "Da")
+    settings <- list("-algorithm:distance_RT:max_difference" = maxGroupRT,
+                     "-algorithm:distance_MZ:max_difference" = maxGroupMZ,
+                     "-algorithm:distance_MZ:unit" = "Da")
+    if (!is.null(extraOptsGroup))
+        settings <- modifyList(settings, extraOptsGroup)
+    
     executeCommand(getCommandWithOptPath(if (QT) "FeatureLinkerUnlabeledQT" else "FeatureLinkerUnlabeled", "OpenMS"),
-                   c(settings, "-in", featFiles, "-out", out),
+                   c(OpenMSArgListToOpts(settings), "-in", featFiles, "-out", out),
                    stdout = if (verbose) "" else FALSE,
                    stderr = if (verbose) "" else FALSE)
-})
+}
 
 importConsensusXML <- function(feat, cfile, verbose)
 {

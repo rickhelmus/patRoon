@@ -21,6 +21,12 @@ test_that("verify feature grouping output", {
     expect_known_value(groups(fgOpenMS), testFile("fg-openms"))
     expect_known_value(groups(fgXCMS), testFile("fg-xcms"))
     expect_known_value(groups(fgXCMS3), testFile("fg-xcms3"))
+    
+    # extraOpts
+    expect_equal(fgOpenMS, groupFeatures(fList, "openms",
+                                         extraOptsRT = list("-algorithm:pairfinder:distance_RT:max_difference" = 30)))
+    expect_equal(fgOpenMS, groupFeatures(fList, "openms",
+                                         extraOptsGroup = list("-algorithm:distance_RT:max_difference" = 12)))
 })
 
 test_that("verify show output", {

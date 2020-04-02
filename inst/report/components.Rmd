@@ -11,8 +11,8 @@ subComps <- rmdVars$components[, names(rmdVars$fGroups)]
 indsWithFGroups <- which(names(rmdVars$components) %in% names(subComps))
 
 message("Plotting components...")
-prog <- openProgBar(0, length(rmdVars$components))
-allPlots <- vector("character", length(rmdVars$components) * 2)
+prog <- openProgBar(0, length(indsWithFGroups))
+allPlots <- vector("character", length(rmdVars$components) * 4)
 curPlotInd <- 0
 plotPathFull <- getPlotPath(FALSE)
 plotPathLink <- getPlotPath(TRUE)
@@ -61,7 +61,7 @@ for (ci in indsWithFGroups)
 close(prog)
 
 if (rmdVars$optimizePng && curPlotInd > 0)
-    optimizePngPlots(allPlots, rmdVars$maxProcAmount)
+    optimizePngPlots(allPlots[seq_len(curPlotInd)], rmdVars$maxProcAmount)
 ```
 
 

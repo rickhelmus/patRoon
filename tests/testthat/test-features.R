@@ -26,13 +26,19 @@ if (doDATests())
     ffDAEmpty <- findFeatures(getDAAnaInfo()[2, ], "bruker", endRange = 0.01, doFMF = "force")
 }
 
+# Remove ID column: not reproducible
+OpenMSFTable <- function(ff) sapply(featureTable(ff), function(fts) fts[, -"ID"], simplify = FALSE)
+
 test_that("verify feature finder output", {
-    # Don't store ID column: not reproducible
-    expect_known_value(sapply(featureTable(ffOpenMS), function(fts) fts[, -"ID"], simplify = FALSE),
-                       testFile("ff-openms"), tolerance = 1E-5) # increased tolerance value for win/lin deviations
+    expect_known_value(OpenMSFTable(ffOpenMS), testFile("ff-openms"), tolerance = 1E-5) # increased tolerance value for win/lin deviations
     expect_known_value(featureTable(ffXCMS), testFile("ff-xcms"))
     expect_known_value(featureTable(ffXCMS3), testFile("ff-xcms3"))
     expect_known_value(featureTable(ffEP), testFile("ff-envipick"))
+    
+    # extraOpts
+    expect_equal(OpenMSFTable(ffOpenMS),
+                 OpenMSFTable(findFeatures(anaInfo, "openms", logPath = NULL,
+                                           extraOpts = list("-algorithm:common:noise_threshold_int" = 1000))))
 
     skip_if_not(doDATests())
     expect_known_value(featureTable(ffDA), testFile("ff-DA"))

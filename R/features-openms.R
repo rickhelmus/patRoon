@@ -63,9 +63,12 @@ setMethod("initialize", "featuresOpenMS",
 #' @param useSmoothedInts If \code{TRUE} then use LOWESS intensities instead of
 #'   raw intensities. Sets the \code{algorithm:ffm:use_smoothed_intensities}
 #'   option.
-#' @param extraOpts Named character \code{vector} containing extra options that
-#'   will be passed to \code{FeatureFinderMetabo}. Any options specified here
-#'   will override any of the above.
+#' @param extraOpts Named \code{list} containing extra options that will be
+#'   passed to \command{FeatureFinderMetabo}. Any options specified here will
+#'   override any of the above. Example:
+#'   \code{extraOpts=list("-algorithm:common:noise_threshold_int"=1000)}
+#'   (corresponds to setting \code{noiseThrInt=1000}). Set to \code{NULL} to
+#'   ignore.
 #' @param intSearchRTWindow Retention time window (in seconds, +/- feature
 #'   retention time) that is used to find the closest data point to the
 #'   retention time to obtain the intensity of a feature (this is needed since
@@ -172,25 +175,25 @@ getOpenMSFFCommand <- function(datafile, out, noiseThrInt, chromSNR, chromFWHM, 
 {
     boolToChr <- function(b) if (b) "true" else "false"
 
-    settings <- c("-algorithm:common:noise_threshold_int" = noiseThrInt,
-                  "-algorithm:common:chrom_peak_snr" = chromSNR,
-                  "-algorithm:common:chrom_fwhm" = chromFWHM,
-                  "-algorithm:mtd:mass_error_ppm" = mzPPM,
-                  "-algorithm:mtd:reestimate_mt_sd" = boolToChr(reEstimateMTSD),
-                  "-algorithm:mtd:trace_termination_criterion" = traceTermCriterion,
-                  "-algorithm:mtd:trace_termination_outliers" = traceTermOutliers,
-                  "-algorithm:mtd:min_sample_rate" = minSampleRate,
-                  "-algorithm:mtd:min_trace_length" = minTraceLength,
-                  "-algorithm:mtd:max_trace_length" = maxTraceLength,
-                  "-algorithm:epd:width_filtering" = widthFiltering,
-                  "-algorithm:epd:min_fwhm" = minFWHM,
-                  "-algorithm:epd:max_fwhm" = maxFWHM,
-                  "-algorithm:ffm:local_rt_range" = localRTRange,
-                  "-algorithm:ffm:local_mz_range" = localMZRange,
-                  "-algorithm:ffm:isotope_filtering_model" = isotopeFilteringModel,
-                  "-algorithm:ffm:mz_scoring_13C" = boolToChr(MZScoring13C),
-                  "-algorithm:ffm:use_smoothed_intensities" = boolToChr(useSmoothedInts),
-                  "-algorithm:ffm:report_convex_hulls" = "true")
+    settings <- list("-algorithm:common:noise_threshold_int" = noiseThrInt,
+                     "-algorithm:common:chrom_peak_snr" = chromSNR,
+                     "-algorithm:common:chrom_fwhm" = chromFWHM,
+                     "-algorithm:mtd:mass_error_ppm" = mzPPM,
+                     "-algorithm:mtd:reestimate_mt_sd" = boolToChr(reEstimateMTSD),
+                     "-algorithm:mtd:trace_termination_criterion" = traceTermCriterion,
+                     "-algorithm:mtd:trace_termination_outliers" = traceTermOutliers,
+                     "-algorithm:mtd:min_sample_rate" = minSampleRate,
+                     "-algorithm:mtd:min_trace_length" = minTraceLength,
+                     "-algorithm:mtd:max_trace_length" = maxTraceLength,
+                     "-algorithm:epd:width_filtering" = widthFiltering,
+                     "-algorithm:epd:min_fwhm" = minFWHM,
+                     "-algorithm:epd:max_fwhm" = maxFWHM,
+                     "-algorithm:ffm:local_rt_range" = localRTRange,
+                     "-algorithm:ffm:local_mz_range" = localMZRange,
+                     "-algorithm:ffm:isotope_filtering_model" = isotopeFilteringModel,
+                     "-algorithm:ffm:mz_scoring_13C" = boolToChr(MZScoring13C),
+                     "-algorithm:ffm:use_smoothed_intensities" = boolToChr(useSmoothedInts),
+                     "-algorithm:ffm:report_convex_hulls" = "true")
 
     # figure out if we're running OpenMS version >= 2.5
     oldFFM <- TRUE
@@ -208,13 +211,10 @@ getOpenMSFFCommand <- function(datafile, out, noiseThrInt, chromSNR, chromFWHM, 
         settings <- c(settings, "-algorithm:epd:masstrace_snr_filtering" = "")
     
     if (!is.null(extraOpts))
-        settings <- c(extraOpts, settings)
-
-    # convert to unnamed character vector where previous names are followed by set values
-    settings <- as.vector(sapply(names(settings), function(s) c(s, settings[[s]])))
+        settings <- modifyList(settings, extraOpts)
 
     return(list(command = getCommandWithOptPath("FeatureFinderMetabo", "OpenMS"),
-                args = c(settings, "-in", datafile, "-out", out)))
+                args = c(OpenMSArgListToOpts(settings), "-in", datafile, "-out", out)))
 }
 
 importFeatureXML <- function(ffile)

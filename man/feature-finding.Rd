@@ -163,9 +163,12 @@ mass traces. See
 raw intensities. Sets the \code{algorithm:ffm:use_smoothed_intensities}
 option.}
 
-\item{extraOpts}{Named character \code{vector} containing extra options that
-will be passed to \code{FeatureFinderMetabo}. Any options specified here
-will override any of the above.}
+\item{extraOpts}{Named \code{list} containing extra options that will be
+passed to \command{FeatureFinderMetabo}. Any options specified here will
+override any of the above. Example:
+\code{extraOpts=list("-algorithm:common:noise_threshold_int"=1000)}
+(corresponds to setting \code{noiseThrInt=1000}). Set to \code{NULL} to
+ignore.}
 
 \item{intSearchRTWindow}{Retention time window (in seconds, +/- feature
 retention time) that is used to find the closest data point to the

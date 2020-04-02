@@ -170,7 +170,7 @@
 <span class='co'># S4 method for featureGroups</span>
 <span class='fu'>groupFeaturesScreening</span>(<span class='no'>fGroups</span>, <span class='no'>scr</span>)
 
-<span class='fu'>importFeatureGroupsBrukerTASQ</span>(<span class='no'>path</span>, <span class='no'>analysisInfo</span>)</pre>
+<span class='fu'>importFeatureGroupsBrukerTASQ</span>(<span class='no'>path</span>, <span class='no'>analysisInfo</span>, <span class='kw'>clusterRTWindow</span> <span class='kw'>=</span> <span class='fl'>12</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -236,6 +236,11 @@ TASQ, converted to <code class="file">.csv</code> format.</p></td>
       <td><p>A table with <a href='analysis-information.html'>analysis
 information</a>.</p></td>
     </tr>
+    <tr>
+      <th>clusterRTWindow</th>
+      <td><p>This retention time window (in seconds) is used to
+group hits across analyses together. See also the details section.</p></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
@@ -272,9 +277,13 @@ if possible, as it can significantly reduce the load on data interpretation.</p>
   workflow steps such as compound identification as with 'regular'
   <code>featureGroups</code>.</p>
 <p><code>importFeatureGroupsBrukerTASQ</code> will convert screening results
-  from Bruker TASQ to a <code><a href='featureGroups-class.html'>featureGroups</a></code> object. Groups are made
-  based on target analyte names and individual results per analysis are used
-  to generate the features. The input for this function is obtained by
+  from Bruker TASQ to a <code><a href='featureGroups-class.html'>featureGroups</a></code> object. The groups across
+  analyses are formed by the name of suspects. However, for suspects that
+  were found &gt;1 in the same analysis ambiguity exists as the same name occurs
+  multiple times for these analyses. For this situation, grouping is
+  performed by clustering on closeness of retention times (using
+  <span class="pkg">fastcluster</span>). The cut-off value for this is specified by the
+  <code>clusterRTWindow</code> argument. The input for this function is obtained by
   generating an Excel export of the 'global' results and subsequently
   converting the file to <code class="file">.csv</code> format. Similar to
   <code>groupFeaturesScreening</code>, this method will return an object that is
@@ -284,7 +293,8 @@ if possible, as it can significantly reduce the load on data interpretation.</p>
     <p>Both <code>groupFeaturesScreening</code> and
   <code>importFeatureGroupsBrukerTASQ</code> use names from targets/suspects as
   feature group names, therefore, it is important that these are
-  file-compatible names when <a href='reporting.html'>reporting data</a>.</p>
+  file-compatible names when <a href='reporting.html'>reporting data</a> <code class="file">csv</code> or
+  <code class="file">pdf</code> data.</p>
 <p>For <code>screenSuspects</code> in some cases you may need to install
   <a href='http://openbabel.org/wiki/Main_Page'>OpenBabel</a> (<em>e.g.</em> when
   only InChI data is available for mass calculation).</p>
@@ -297,6 +307,9 @@ if possible, as it can significantly reduce the load on data interpretation.</p>
   plotting, for instance, extracted ion chromatograms (with
   <code><a href='generics.html'>plotEIC</a></code>) the integrated chromatographic peak range shown is
   incorrect.</p>
+    <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
+
+    <p>Daniel Müllner (2013). fastcluster: Fast Hierarchical, Agglomerative Clustering Routines for R and Python. Journal of Statistical Software, 53(9), 1-18. URL http://www.jstatsoft.org/v53/i09/.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

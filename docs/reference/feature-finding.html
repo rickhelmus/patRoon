@@ -333,9 +333,12 @@ option.</p></td>
     </tr>
     <tr>
       <th>extraOpts</th>
-      <td><p>Named character <code>vector</code> containing extra options that
-will be passed to <code>FeatureFinderMetabo</code>. Any options specified here
-will override any of the above.</p></td>
+      <td><p>Named <code>list</code> containing extra options that will be
+passed to <code class='command'>FeatureFinderMetabo</code>. Any options specified here will
+override any of the above. Example:
+<code>extraOpts=list("-algorithm:common:noise_threshold_int"=1000)</code>
+(corresponds to setting <code>noiseThrInt=1000</code>). Set to <code>NULL</code> to
+ignore.</p></td>
     </tr>
     <tr>
       <th>intSearchRTWindow</th>

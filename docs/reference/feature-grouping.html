@@ -162,6 +162,8 @@
   <span class='kw'>maxAlignMZ</span> <span class='kw'>=</span> <span class='fl'>0.005</span>,
   <span class='kw'>maxGroupRT</span> <span class='kw'>=</span> <span class='fl'>12</span>,
   <span class='kw'>maxGroupMZ</span> <span class='kw'>=</span> <span class='fl'>0.005</span>,
+  <span class='kw'>extraOptsRT</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>extraOptsGroup</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
 )
 
@@ -248,8 +250,8 @@ from grouped features.</p></td>
     </tr>
     <tr>
       <th>QT</th>
-      <td><p>If enabled, use <code>FeatureLinkerUnlabeledQT</code> instead of
-<code>FeatureLinkerUnlabeled</code> for feature grouping.</p></td>
+      <td><p>If enabled, use <code class='command'>FeatureLinkerUnlabeledQT</code> instead of
+<code class='command'>FeatureLinkerUnlabeled</code> for feature grouping.</p></td>
     </tr>
     <tr>
       <th>maxAlignRT, maxAlignMZ</th>
@@ -264,6 +266,16 @@ respectively.</p></td>
       <td><p>as <code>maxAlignRT</code> and <code>maxAlignMZ</code>, but
 for grouping of features. Sets <code>-algorithm:distance_RT:max_difference</code>
 and <code>-algorithm:distance_MZ:max_difference</code> options, respectively.</p></td>
+    </tr>
+    <tr>
+      <th>extraOptsRT, extraOptsGroup</th>
+      <td><p>Named <code>list</code> containing extra options
+that will be passed to <code class='command'>MapAlignerPoseClustering</code> or
+<code class='command'>FeatureLinkerUnlabeledQT/FeatureLinkerUnlabeled</code>, respectively.
+Any options specified here will override any of the above. Example:
+<code>extraOptsGroup=list("-algorithm:distance_RT:max_difference"=12)</code>
+(corresponds to setting <code>maxGroupRT=12</code>). Set to <code>NULL</code> to
+ignore.</p></td>
     </tr>
     <tr>
       <th>exportedData</th>

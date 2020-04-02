@@ -88,7 +88,8 @@ setGeneric("plotHeatMap", function(obj, ...) standardGeneric("plotHeatMap"))
 #' @note Both \code{groupFeaturesScreening} and
 #'   \code{importFeatureGroupsBrukerTASQ} use names from targets/suspects as
 #'   feature group names, therefore, it is important that these are
-#'   file-compatible names when \link[=reporting]{reporting data}.
+#'   file-compatible names when \link[=reporting]{reporting data} \file{csv} or
+#'   \file{pdf} data.
 #'
 #' @name suspect-screening
 NULL

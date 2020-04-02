@@ -14,8 +14,6 @@ featureGroupsOptimizer$methods(
 
     calculateResponse = function(params, task, keepObject)
     {
-        # UNDONE: do we want to keep caching this?
-
         # UNDONE: error handling necessary as is done in IPO?
         # retCorFailed <- if (!is.null(params[["rtalign"]]) && params$rtalign) 1.1 else 1
         retCorFailed <- 1

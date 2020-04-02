@@ -8,9 +8,6 @@ featureGroupsScreening <- setClass("featureGroupsScreening", contains = "feature
 setMethod("initialize", "featureGroupsScreening",
           function(.Object, ...) callNextMethod(.Object, algorithm = "screening", ...))
 
-
-# UNDONE: make sure (document) that analyte names should be file compatible names
-
 #' @details \code{groupFeaturesScreening} uses results from \code{screenSuspects}
 #'   to transform an existing \code{\link{featureGroups}} object by (1) renaming
 #'   any matched feature groups by the respective name of the suspect and (2)

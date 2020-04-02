@@ -598,7 +598,7 @@ installPatRoon <- function(what = c("packages", "tools", "deps", "patRoon"),
             "On the other hand, using the patRoonDeps repository minimizes the risk on installation errors.",
             "Furthermore, when using the patRoonDeps repository you can choose to use a local R library which is only used",
             "if specified explicitly and will therefore not interfere with your current installed packages.",
-            "NOTE: patRoon deps currently only works with R 3.5.\n")
+            "NOTE: patRoonDeps only work with recent versions of R.\n")
         
         choices <- c(pDepsIso = "Install from patRoonDeps repository (inside an isolated R library)",
                      pDeps = "Install from patRoonDeps repository (inside your default R library)",

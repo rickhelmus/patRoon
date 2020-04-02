@@ -102,8 +102,6 @@ featuresOptimizer$methods(
 
     calculateResponse = function(params, task, keepObject)
     {
-        # UNDONE: do we want to keep caching this?
-
         feat <- do.call(findFeatures, c(list(anaInfo, algorithm, verbose = FALSE), params))
         ret <- calcPPS(feat)
 

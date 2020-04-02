@@ -1012,7 +1012,6 @@ setMethod("consensus", "compounds", function(obj, ..., absMinAbundance = NULL,
             }
             else
             {
-                # UNDONE: (merely) InChIKey1 is a sensible choice?
                 mCompounds <- merge(mCompList[[grp]], rightTable[[grp]],
                                     by.x = paste0("InChIKey1-", leftName),
                                     by.y = paste0("InChIKey1-", rightName),

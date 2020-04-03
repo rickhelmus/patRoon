@@ -4,23 +4,10 @@
 knitr::knit_meta("latex_dependency", clean = TRUE)
 
 knitr::opts_chunk$set(
-  collapse = FALSE,
-  comment = "#>",
-  fig.width = 6, fig.height = 4, out.width = "50%",
-  warning = FALSE, message = FALSE
+    fig.width = 6, fig.height = 4, out.width = "50%"
 )
 
-options(patRoon.cache.fileName = "~/tutorial.sqlite")
-options(patRoon.progress.opts = list(style = 1, width = 80))
-options(width=1500) # big nr to avoid wrapping text in code chunks
-options(datatable.print.nrows = 15)
-
-# pkgdown doesn't seem to load RProfile, which may become annoying when MetFrag
-# paths and other patRoon settings are set there...
-if (file.exists("~/.Rprofile"))
-  source("~/.Rprofile")
-
-library(patRoon)
+source(file.path(vignDir, "shared", "init.R"))
 
 runData <- TRUE
 if (runData)

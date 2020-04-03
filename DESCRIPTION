@@ -96,6 +96,8 @@ Suggests:
     devtools,
     covr,
     DiagrammeR,
+    DiagrammeRsvg,
+    rsvg,
     pkgload
 LinkingTo:
     Rcpp

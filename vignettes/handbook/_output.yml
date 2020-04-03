@@ -5,3 +5,7 @@ bookdown::gitbook:
         sharing: no
         toc:
             collapse: no
+bookdown::pdfbook:
+    number_sections: yes
+    toc: yes
+

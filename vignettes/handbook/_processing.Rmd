@@ -381,8 +381,8 @@ components[, groupNames(compounds)]
 
 An important use case of subsetting is prioritization of data. For instance, after statistical analysis only certain feature groups are deemed relevant for the rest of the workflow. A common prioritization workflow is illustrated below:
 
-```{r prioriWorkflow,echo=FALSE}
-DiagrammeR::grViz("
+```{r prioriWorkflow,echo=FALSE,out.width="75%"}
+plotGV("
 digraph Prioritization {
   graph [ rankdir = LR ]
   node [ shape = box,
@@ -534,7 +534,7 @@ plotSpec(compounds, index = 1, groupName = "M120_R328_81", MSPeakLists = mslists
 plotSpec(components, index = 7) # component spectrum
 ```
 
-```{r plotHomol,eval=runData && knitr::is_html_output()}
+```{r plotHomol,eval=runData}
 # Inspect homologous series
 plotGraph(componNT)
 ```

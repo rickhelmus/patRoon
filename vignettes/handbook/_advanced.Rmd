@@ -242,7 +242,6 @@ For a complete overview see the reference manual (`?compoundsCluster`).
 
 ## Basic quantitative and regression analysis
 
-
 While `patRoon` is currently primarily focused on qualitative analyses, some _basic_ quantitative analysis can also be performed, for instance, to estimate concentrations of features. In fact, other types of data that may be useful for regression analysis can be set such as sample dilution factor or sampling time. The latter may, for instance, be used to isolate features with increasing or decreasing intensity. Regardless of what kind of regression analysis is performed, here we simply refer the values to be calculated as _concentrations_. In order to use this functionality, an extra column (`conc`) should be added to the [analysis information](#anaInfo), for instance:
 
 ```{r quantAnaInfo,eval=FALSE}
@@ -261,11 +260,12 @@ The `as.data.table()` function (or `as.data.frame()`) can then be used to calcul
 ```{r quantDT,eval=FALSE}
 # use areas for quantitation and make sure that feature data is reported
 # (otherwise no concentrations are calculated)
+# (only relevant columns are shown for clarity)
 as.data.table(fGroups, areas = TRUE, features = TRUE, regression = TRUE)
 ```
 
 ```{r quantDTDo,echo=FALSE,eval=runData}
-as.data.table(fGroupsConc, areas = TRUE, features = TRUE, regression = TRUE)
+as.data.table(fGroupsConc, areas = TRUE, features = TRUE, regression = TRUE)[, c("group", "conc", "RSQ", "intercept", "slope", "conc_reg")]
 ```
 
 Calculated concentrations are stored in the `conc_reg` column, alongside while other regression data (i.e. `RSQ`, `intercept`, `slope` columns). To perform basic trend analysis the `RSQ` (i.e. R squared) can be used:

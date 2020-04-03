@@ -2,6 +2,9 @@
 title: "patRoon handbook"
 author: "Rick Helmus"
 date: "`r Sys.Date()`"
+header-includes:
+    - \usepackage{fvextra}
+    - \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
 ---
 
 ```{r child="_intro.Rmd"}

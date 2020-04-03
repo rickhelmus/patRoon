@@ -105,8 +105,8 @@ if (knitr::is_html_output()) {
 
 Collecting features from the analyses consists of finding all features, grouping them across analyses (optionally after retention time alignment) and finally, if desired suspect screening: 
 
-```{r featWorkflow,echo=FALSE}
-DiagrammeR::grViz("
+```{r featWorkflow,echo=FALSE,out.width="75%"}
+plotGV("
 digraph Features {
   graph [ rankdir = LR, compound = true ]
   node [ shape = box,
@@ -223,8 +223,8 @@ Note that in some cases you may need to install [OpenBabel] (e.g. when only InCh
 
 The annotation consists of collecting MS peak lists and then formula and/or compound annotation:
 
-```{r annWorkflow,echo=FALSE}
-DiagrammeR::grViz("
+```{r annWorkflow,echo=FALSE,out.width="50%"}
+plotGV("
 digraph Annotation {
   graph [ rankdir = LR ]
   node [ shape = box,
@@ -394,13 +394,18 @@ An example of a custom _.csv_ database can be found [here][csvDB-ex].
 With MetFrag compound databases are not only used to retrieve candidate structures but are also used to obtain metadata for further ranking. Each database has its own scorings, a table with currently supported scorings can be obtained with the `compoundScorings()` function (some columns omitted):
 
 ```{r compSc,echo=FALSE}
-k <- knitr::kable(compoundScorings()[, c("name", "metfrag", "database", "default")],
-                  if (knitr::is_html_output()) "html" else "latex")
+dt <- compoundScorings()[, c("name", "metfrag", "database", "default")]
 if (knitr::is_html_output())
 {
+    k <- knitr::kable(dt, format = "html")
     k <- kableExtra::kable_styling(k, font_size = 11)
     k <- kableExtra::scroll_box(k, extra_css = "overflow-y: auto; height: 350px;")
+} else
+{
+    k <- knitr::kable(dt, format = "latex", longtable = TRUE, booktabs = TRUE)
+    k <- kableExtra::kable_styling(k, latex_options = "repeat_header", font_size = 7)
 }
+
 k
 ```
 
@@ -506,8 +511,8 @@ componRC <- generateComponents(fGroups, "ramclustr", ionization = "positive", hm
 
 Homologues series can be automatically detected by interfacing with the [nontarget] R package. Components are made from feature groups that show increasing _m/z_ and retention time values. Series are first detected within each replicate group. Afterwards, series from all replicates are linked in case (partial) overlap occurs and this overlap consists of the _same_ feature groups (see figure below). Linked series are then finally merged if this will not cause any conflicts with other series: such a conflict typically occurs when two series are not only linked to each other.
 
-```{r HS,echo=FALSE,fig.cap="**Linking of homologues series** top: partial overlap and will be linked; bottom: no linkage due to different feature in overlapping series."}
-DiagrammeR::grViz("
+```{r HS,echo=FALSE,fig.cap="**Linking of homologues series** top: partial overlap and will be linked; bottom: no linkage due to different feature in overlapping series.",out.width="100%"}
+plotGV("
 digraph Homologs {
   graph [ rankdir = LR, compound = true, style = invis ]
   node [ shape = oval,

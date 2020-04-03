@@ -9,8 +9,8 @@ In a non-target workflow both chromatographic and mass spectral data is automati
     
 <!-- UNDONE: include other data processing steps here? -->
     
-```{r workflow,echo=FALSE}
-DiagrammeR::grViz("
+```{r workflow,echo=FALSE,out.width="100%"}
+plotGV("
 digraph workflow {
   graph [ rankdir = LR, compound = true, style = invis ]
   node [ shape = box,

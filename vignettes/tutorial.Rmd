@@ -13,20 +13,10 @@ vignette: >
 
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
-  comment = "#>",
-  warning = FALSE,
-  error = FALSE,
-  message = FALSE
+    error = FALSE
 )
 
-options(patRoon.cache.fileName = "~/tutorial.sqlite")
-options(patRoon.progress.opts = list(style = 1, width = 80))
-
-if (file.exists("~/.Rprofile"))
-  source("~/.Rprofile")
-
-options(width=1500) # big nr to avoid wrapping text in code chunks
-
+source(file.path("shared", "init.R"))
 doCompounds <- TRUE # curl::has_internet()
 ```
 
@@ -42,8 +32,8 @@ In this tutorial you will learn how to perform a simple non-target analysis with
 
 The workflow in this tutorial consists of the following steps:
 
-```{r workflow,echo=FALSE}
-DiagrammeR::grViz("
+```{r workflow,echo=FALSE,out.width="75%"}
+plotGV("
 digraph rmarkdown {
 graph [ rankdir = LR ]
 node [ shape = box,
@@ -340,8 +330,8 @@ formulas
 compounds
 
 as.data.table(mslists)
-as.data.table(formulas)
-as.data.table(compounds)
+as.data.table(formulas)[, 1:7] # only show first columns for clarity
+as.data.table(compounds)[, 1:5] # only show first columns for clarity
 ```
 
 ```{r plotSpec,fig.width=6,fig.height=3.5,eval=doCompounds}

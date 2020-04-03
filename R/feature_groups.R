@@ -489,7 +489,7 @@ setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas =
 #' @param onlyUnique If \code{TRUE} and \code{colourBy="rGroups"} then only
 #'   feature groups that are unique to a replicate group are plotted.
 #' @export
-setMethod("plot", "featureGroups", function(x, colourBy = "fGroups",
+setMethod("plot", "featureGroups", function(x, colourBy = c("none", "rGroups", "fGroups"),
                                             onlyUnique = FALSE, retMin = FALSE,
                                             showLegend = TRUE, col = NULL,
                                             pch = NULL, ...)
@@ -500,7 +500,7 @@ setMethod("plot", "featureGroups", function(x, colourBy = "fGroups",
 
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertFlag, . ~ onlyUnique + retMin + showLegend, fixed = list(add = ac))
-    checkmate::assertChoice(colourBy, c("none", "rGroups", "fGroups"), add = ac)
+    colourBy <- checkmate::matchArg(colourBy, c("none", "rGroups", "fGroups"), add = ac)
     checkmate::reportAssertions(ac)
 
     if (length(x) == 0)
@@ -514,7 +514,15 @@ setMethod("plot", "featureGroups", function(x, colourBy = "fGroups",
             if (is.null(pch))
                 pch <- 16
 
-            showLegend <- FALSE # UNDONE: also for fGroups (ie as with plotEIC() ?)
+            if (colourBy == "fGroups" && showLegend)
+            {
+                labels <- names(x)
+                labCol <- rep(col, length.out = length(labels))
+                labPch <- rep(pch, length.out = length(labels))
+                names(labCol) <- labels; names(labPch) <- labels
+            }
+            else
+                showLegend <- FALSE
         }
         else if (colourBy == "rGroups")
         {

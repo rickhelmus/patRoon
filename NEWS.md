@@ -6,6 +6,7 @@
 * `importFeatureGroupsBrukerTASQ`
     * now correctly takes retention times of suspects into account when creating feature groups.
     * retention times / _m/z_ values are now averaged over grouped suspects.
+* The `plot()` method for `featureGroups` now allows drawing legends when `colourBy="fGroups"` and sets `colourBy="none"` by default, both for consistency with `plotEIC()`.
 
 
 ## March 2020

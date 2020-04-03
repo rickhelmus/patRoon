@@ -6,15 +6,15 @@ featureGroupsBrukerTASQ <- setClass("featureGroupsBrukerTASQ", contains = "featu
 setMethod("initialize", "featureGroupsBrukerTASQ",
           function(.Object, ...) callNextMethod(.Object, algorithm = "bruker_tasq", ...))
 
-# UNDONE: does this work with analytes that are matched more than once in an analysis?
-
 #' @details \code{importFeatureGroupsBrukerTASQ} will convert screening results
-#'   from Bruker TASQ to a \code{\link{featureGroups}} object. The groups across
-#'   analyses are formed by the name of suspects. However, for suspects that
-#'   were found >1 in the same analysis ambiguity exists as the same name occurs
-#'   multiple times for these analyses. For this situation, grouping is
-#'   performed by clustering on closeness of retention times (using
-#'   \pkg{\link{fastcluster}}). The cut-off value for this is specified by the
+#'   from Bruker TASQ to a \code{\link{featureGroups}} object. The feature
+#'   groups across analyses are formed based on the name of suspects and their
+#'   closeness in retention time. The latter is necessary because TASQ does not
+#'   necessarily perform checks on retention times and may therefore assign a
+#'   suspect to peaks with different retention times across analyses (or within
+#'   a single analysis). Hence, suspects with equal names are hierarchically
+#'   clustered on their retention times (using \pkg{\link{fastcluster}}) to form
+#'   the feature groups. The cut-off value for this is specified by the
 #'   \code{clusterRTWindow} argument. The input for this function is obtained by
 #'   generating an Excel export of the 'global' results and subsequently
 #'   converting the file to \file{.csv} format. Similar to
@@ -39,7 +39,7 @@ setMethod("initialize", "featureGroupsBrukerTASQ",
 #'   \code{\link{plotEIC}}) the integrated chromatographic peak range shown is
 #'   incorrect.
 #'
-#'   
+#'
 #' @references \addCitations{fastcluster}{1}
 #'
 #' @rdname suspect-screening
@@ -63,23 +63,18 @@ importFeatureGroupsBrukerTASQ <- function(path, analysisInfo, clusterRTWindow = 
 
     tExport[, rts := rts * 60] # min --> s
     
-    # if TASQ detects >1 of the same suspect in a single analysis it will return
-    # each result as a row. Since they all have the same name we cannot easily
-    # group therm across analyses. Thus,
-    # - the duplicate hits must have unique names
+    # If no retention times were specified in TASQ for a suspect then we cannot
+    # assume that suspect hits across analyses are from the same peak. Hence, to
+    # group the suspects across analyses, we need to
+    # - make sure unique names are assigned to each suspect hit at different retention times
     # - the duplicates should be grouped by similar retention time
     # --> perform HCA for each suspect to group them by close retention time and then re-assign names based on cluster number
     
     tExport[, cl := {
-        if (anyDuplicated(.SD))
-        {
-            distm <- dist(rts)
-            hc <- fastcluster::hclust(distm)
-            cutree(hc, h = 12) # UNDONE: make h configurable
-        }
-        else
-            1
-    }, by = "group", .SDcols = c("analysis", "group")]
+        distm <- dist(rts)
+        hc <- fastcluster::hclust(distm)
+        cutree(hc, h = clusterRTWindow)
+    }, by = "group"]
     
     tExport[cl > 1, group := paste0(group, "-", cl)]
 

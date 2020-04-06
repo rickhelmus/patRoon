@@ -150,7 +150,6 @@ getCompInfoList <- function(compResults, compIndex, addHTMLURL, mCompNames)
             # Same for PubChemLite with MetFrag, but space spearated
             idlist <- unlist(strsplit(ident, " "))
             
-            # UNDONE: could use related CIDs here with PubChemLite?
             if (grepl("pubchem", tolower(db)))
                 fmt <- "<a target=\"_blank\" href=\"https://pubchem.ncbi.nlm.nih.gov/compound/%s\">%s</a>"
             else if (tolower(db) == "chemspider")

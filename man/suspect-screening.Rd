@@ -137,12 +137,14 @@ if possible, as it can significantly reduce the load on data interpretation.
   \code{featureGroups}.
 
 \code{importFeatureGroupsBrukerTASQ} will convert screening results
-  from Bruker TASQ to a \code{\link{featureGroups}} object. The groups across
-  analyses are formed by the name of suspects. However, for suspects that
-  were found >1 in the same analysis ambiguity exists as the same name occurs
-  multiple times for these analyses. For this situation, grouping is
-  performed by clustering on closeness of retention times (using
-  \pkg{\link{fastcluster}}). The cut-off value for this is specified by the
+  from Bruker TASQ to a \code{\link{featureGroups}} object. The feature
+  groups across analyses are formed based on the name of suspects and their
+  closeness in retention time. The latter is necessary because TASQ does not
+  necessarily perform checks on retention times and may therefore assign a
+  suspect to peaks with different retention times across analyses (or within
+  a single analysis). Hence, suspects with equal names are hierarchically
+  clustered on their retention times (using \pkg{\link{fastcluster}}) to form
+  the feature groups. The cut-off value for this is specified by the
   \code{clusterRTWindow} argument. The input for this function is obtained by
   generating an Excel export of the 'global' results and subsequently
   converting the file to \file{.csv} format. Similar to

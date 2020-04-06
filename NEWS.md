@@ -6,6 +6,7 @@
 * `importFeatureGroupsBrukerTASQ`
     * now correctly groups suspects across analyses if they were found >1 in the same analyses.
     * retention times / _m/z_ values are now averaged over grouped suspects.
+* All documentation is now available as PDF files on the website (https://rickhelmus.github.io/patRoon/)
 
 
 ## March 2020

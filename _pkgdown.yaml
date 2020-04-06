@@ -19,10 +19,18 @@ navbar:
       href: index.html
     reference:
       text: Reference
-      href: reference/index.html
+      menu:
+      - text: Online
+        href: reference/index.html
+      - text: PDF
+        href: reference/patRoon.pdf
     tutorial:
       text: Tutorial
-      href: articles/tutorial.html
+      menu:
+      - text: Online HTML page
+        href: articles/tutorial.html
+      - text: PDF
+        href: articles/tutorial.pdf
     handbook:
       text: Handbook
       menu:
@@ -30,6 +38,8 @@ navbar:
         href: handbook_bd/introduction.html
       - text: Single page
         href: articles/handbook.html
+      - text: PDF
+        href: handbook_bd/handbook.pdf
     news:
       text: Changelog
       href: news/index.html

@@ -24,7 +24,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2020-04-02" />
+<meta name="date" content="2020-04-07" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -210,19 +210,20 @@ anaInfo &lt;-<span class="st"> </span><span class="kw">generateAnalysisInfo</spa
 <p>The <code>as.data.table()</code> function (or <code>as.data.frame()</code>) can then be used to calculate regression data and estimate concentrations:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># use areas for quantitation and make sure that feature data is reported</span>
 <span class="co"># (otherwise no concentrations are calculated)</span>
+<span class="co"># (only relevant columns are shown for clarity)</span>
 <span class="kw">as.data.table</span>(fGroups, <span class="dt">areas =</span> <span class="ot">TRUE</span>, <span class="dt">features =</span> <span class="ot">TRUE</span>, <span class="dt">regression =</span> <span class="ot">TRUE</span>)</code></pre></div>
-<pre><code>#&gt;             group group_ret group_mz   analysis                     ID      ret       mz      area   retmin   retmax    mzmin    mzmax isocount intensity conc       RSQ intercept slope  conc_reg
-#&gt;  1:  M120_R328_81  327.9955 120.0555 standard-1   f_294152501404774557 327.3768 120.0557 316237.50 321.6000 339.9420 120.0551 120.0562        2     55936    1 0.4029224  55388.00  1844 0.2971800
-#&gt;  2:  M120_R328_81  327.9955 120.0555 standard-2  f_5152583482223220822 328.4562 120.0554 309761.80 322.1808 339.7152 120.0546 120.0560        2     61668    2 0.4029224  55388.00  1844 3.4056399
-#&gt;  3:  M120_R328_81  327.9955 120.0555 standard-3  f_1568837368456339615 326.9130 120.0554 340405.30 321.3378 339.8430 120.0545 120.0562        2     59624    3 0.4029224  55388.00  1844 2.2971800
-#&gt;  4: M134_R399_118  398.6365 134.0712 standard-1  f_6452692034856542288 398.1000 134.0712 448873.10 391.4970 411.3258 134.0705 134.0723        2     84880    1 0.7969603  88396.00 -4962 0.7085852
-#&gt;  5: M134_R399_118  398.6365 134.0712 standard-2 f_15725135163421783544 398.6988 134.0711 422063.40 391.8888 413.3238 134.0705 134.0715        2     75580    2 0.7969603  88396.00 -4962 2.5828295
-#&gt; ---                                                                                                                                                                                               
-#&gt; 77: M276_R321_550  320.9508 276.0416 standard-2  f_8479943841030380305 320.7840 276.0414  68398.90 315.9678 327.0810 276.0409 276.0418        1     10772    2 0.9695239   9860.00   508 1.7952756
-#&gt; 78: M276_R321_550  320.9508 276.0416 standard-3 f_11440930563702814165 320.6412 276.0415  59881.61 314.6370 326.2182 276.0408 276.0421        1     11436    3 0.9695239   9860.00   508 3.1023622
-#&gt; 79: M279_R284_557  283.9626 279.0915 standard-1  f_3369795019155478053 283.4748 279.0919 272206.80 277.8900 293.6490 279.0904 279.0927        2     44256    1 0.6417469  47565.33 -2312 1.4313725
-#&gt; 80: M279_R284_557  283.9626 279.0915 standard-2 f_11704012115709050761 284.3130 279.0915 261789.00 278.7150 295.1202 279.0900 279.0928        2     44936    2 0.6417469  47565.33 -2312 1.1372549
-#&gt; 81: M279_R284_557  283.9626 279.0915 standard-3  f_1321406669141459744 282.9768 279.0912 241428.00 277.3932 293.7942 279.0904 279.0924        2     39632    3 0.6417469  47565.33 -2312 3.4313725</code></pre>
+<pre><code>#&gt;             group conc       RSQ intercept slope  conc_reg
+#&gt;  1:  M120_R328_81    1 0.4029224  55388.00  1844 0.2971800
+#&gt;  2:  M120_R328_81    2 0.4029224  55388.00  1844 3.4056399
+#&gt;  3:  M120_R328_81    3 0.4029224  55388.00  1844 2.2971800
+#&gt;  4: M134_R399_118    1 0.7969603  88396.00 -4962 0.7085852
+#&gt;  5: M134_R399_118    2 0.7969603  88396.00 -4962 2.5828295
+#&gt; ---                                                       
+#&gt; 77: M276_R321_550    2 0.9695239   9860.00   508 1.7952756
+#&gt; 78: M276_R321_550    3 0.9695239   9860.00   508 3.1023622
+#&gt; 79: M279_R284_557    1 0.6417469  47565.33 -2312 1.4313725
+#&gt; 80: M279_R284_557    2 0.6417469  47565.33 -2312 1.1372549
+#&gt; 81: M279_R284_557    3 0.6417469  47565.33 -2312 3.4313725</code></pre>
 <p>Calculated concentrations are stored in the <code>conc_reg</code> column, alongside while other regression data (i.e. <code>RSQ</code>, <code>intercept</code>, <code>slope</code> columns). To perform basic trend analysis the <code>RSQ</code> (i.e. R squared) can be used:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fGroupsTab &lt;-<span class="st"> </span><span class="kw">as.data.table</span>(fGroups, <span class="dt">areas =</span> <span class="ot">TRUE</span>, <span class="dt">features =</span> <span class="ot">FALSE</span>, <span class="dt">regression =</span> <span class="ot">TRUE</span>)
 <span class="co"># subset fGroups with reasonable correlation</span>

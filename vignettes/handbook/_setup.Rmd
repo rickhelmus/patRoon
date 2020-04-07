@@ -22,14 +22,15 @@ if (runData)
                                                  rep("repl3", 1),
                                                  rep("repl4", 1)))
     
-    fList <- findFeatures(anaInfo, "openms")
+    # set maxProcAmount = 1 to limit FFM memory usage a bit on CI
+    fList <- findFeatures(anaInfo, "openms", maxProcAmount = 1)
     fGroups <- fGroupsUF <- groupFeatures(fList, "openms")
     fGroups <- filter(fGroups, preAbsMinIntensity = 100, absMinIntensity = 10000,
                       relMinReplicateAbundance = 1, maxReplicateIntRSD = 0.75,
                       blankThreshold = 5, removeBlanks = TRUE,
                       retentionRange = c(120, Inf), mzRange = NULL)
 
-    fListRG <- findFeatures(anaInfoRG, "openms")
+    fListRG <- findFeatures(anaInfoRG, "openms", maxProcAmount = 1)
     fGroupsRG <- groupFeatures(fListRG, "openms")
     fGroupsRG <- filter(fGroupsRG, preAbsMinIntensity = 100, absMinIntensity = 10000)
     
@@ -37,7 +38,7 @@ if (runData)
                                         groups = c(rep("solvent", 3), rep("standard", 3)),
                                         blanks = "solvent",
                                         concs = c(NA, NA, NA, 1, 2, 3))
-    fListConc <- findFeatures(anaInfoConc, "openms")
+    fListConc <- findFeatures(anaInfoConc, "openms", maxProcAmount = 1)
     fGroupsConc <- groupFeatures(fListConc, "openms")
     fGroupsConc <- filter(fGroupsConc, preAbsMinIntensity = 100, absMinIntensity = 10000,
                           relMinReplicateAbundance = 1, maxReplicateIntRSD = 0.75,

@@ -94,7 +94,7 @@ jobs:
                     - "9a:18:88:f8:04:fe:25:3b:8f:6e:23:d7:fd:d4:46:b8"
             - run:
                 name: Generate docs & site
-                no_output_timeout: 30m
+                no_output_timeout: 60m
                 command: |
                     docker run --name patroon -t "${TMP_IMAGE_NAME}" /bin/bash -c "cd patRoon; Rscript docker/make_docs.R"
                     CONTAINER_ID=`docker ps -aqf "name=patroon"`

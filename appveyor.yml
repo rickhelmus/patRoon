@@ -31,22 +31,22 @@ install:
         C:\deps\openbabel.exe /S
 
 
-    - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+    #- ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
 cache:
-  - C:\RLibrary
-  - C:\Program Files (x86)\Pandoc\
-  - C:\deps
+  #- C:\RLibrary
+  - C:\Program Files\Pandoc\
+  #- C:\deps
 
 # Adapt as necessary starting from here
 
 # Install Pandoc: https://github.com/krlmlr/r-appveyor/issues/82#issuecomment-261695154
 before_test:
   - ps: >-
-      if (-Not (Test-Path "C:\Program Files (x86)\Pandoc\")) {
+      if (-Not (Test-Path "C:\Program Files\Pandoc\")) {
         cinst pandoc
       }
-  - ps: $env:Path += ";C:\Program Files (x86)\Pandoc\"
+  - ps: $env:Path += ";C:\Program Files\Pandoc\"
   - pandoc -v
   - ps: >-
       if (-Not (Test-Path "C:\ProgramData\chocolatey\bin\pngquant.exe")) {

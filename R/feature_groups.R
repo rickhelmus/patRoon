@@ -1190,11 +1190,19 @@ setMethod("unique", "featureGroups", function(x, which, relativeTo = NULL, outer
 
     # Split by selected and other replicate groups
     selFGroups <- replicateGroupFilter(x, which, verbose = FALSE)
-    otherFGroups <- replicateGroupFilter(x, setdiff(relativeTo, which), verbose = FALSE)
-
-    # pick out all feature groups NOT present in others
-    ret <- selFGroups[, setdiff(names(selFGroups), names(otherFGroups))]
-
+    
+    otherFGNames <- setdiff(relativeTo, which)
+    # NOTE: check length here to avoid ending up with an empty 'otherFGroups'
+    # below, which yields warnings with XCMS.
+    if (length(otherFGNames) > 0)
+    {
+        # pick out all feature groups NOT present in others
+        otherFGroups <- replicateGroupFilter(x, otherFGNames, verbose = FALSE)
+        ret <- selFGroups[, setdiff(names(selFGroups), names(otherFGroups))]
+    }
+    else
+        ret <- selFGroups
+    
     # remove all that is in at least 2 replicate groups
     if (outer && length(which) > 1)
         ret <- minReplicatesFilter(ret, absThreshold = 2, negate = TRUE, verbose = FALSE)

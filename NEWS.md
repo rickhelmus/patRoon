@@ -8,6 +8,7 @@
     * retention times / _m/z_ values are now averaged over grouped suspects.
 * The `plot()` method for `featureGroups` now allows drawing legends when `colourBy="fGroups"` and sets `colourBy="none"` by default, both for consistency with `plotEIC()`.
 * All documentation is now available as PDF files on the website (https://rickhelmus.github.io/patRoon/)
+* `newProject()` now uses XCMS3 algorithms instead of the older XCMS interface.
 
 
 ## March 2020

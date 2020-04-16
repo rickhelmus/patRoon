@@ -61,7 +61,7 @@ fList <- findFeatures(anaInfo, "openms")
 {{ endCodeBlock() }}
 {{ optionalCodeBlock(featFinderOpts$algo == "XCMS") }}
 # NOTE: see XCMS manual for many more options
-fList <- findFeatures(anaInfo, "xcms", method = "centWave")
+fList <- findFeatures(anaInfo, "xcms3", param = xcms::CentWaveParam())
 {{ endCodeBlock() }}
 {{ optionalCodeBlock(featFinderOpts$algo == "enviPick") }}
 # NOTE: see enviPickWrap manual for many more options
@@ -76,7 +76,9 @@ fList <- findFeatures(anaInfo, "bruker", doFMF = "auto")
 fGroups <- groupFeatures(fList, "openms")
 {{ endCodeBlock() }}
 {{ optionalCodeBlock(featGrouperOpts$algo == "XCMS") }}
-fGroups <- groupFeatures(fList, "xcms", rtalign = TRUE, retcorArgs = list(method = "obiwarp"))
+fGroups <- groupFeatures(fList, "xcms3", rtalign = TRUE,
+                         groupParam = xcms::PeakDensityParam(sampleGroups = analysisInfo(fList)$group),
+                         retAlignParam = xcms::ObiwarpParam())
 {{ endCodeBlock() }}
 
 # Basic rule based filtering

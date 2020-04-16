@@ -20,9 +20,6 @@ NULL # need this for doc generation
 #' @importFrom withr defer
 NULL
 
-# workaround to make sure XCMS3 can find these functions (UNDONE: report this!)
-#' @importFrom MSnbase selectFeatureData centroided
-
 # UNDONE: rstudioapi optional?
 
 # For Rcpp

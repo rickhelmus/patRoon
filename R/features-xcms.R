@@ -13,10 +13,7 @@ setMethod("initialize", "featuresXCMS",
 setMethod("[", c("featuresXCMS", "ANY", "missing", "missing"), function(x, i, j, ..., drop = TRUE)
 {
     x <- callNextMethod(x, i, j, ..., drop)
-    if (length(analyses(x)) > 0)
-        x@xs <- x@xs[, analyses(x)]
-    else
-        warning("XCMS currently does not allow removing data from all analyses by subsetting.")
+    x@xs <- x@xs[, analyses(x)]
     return(x)
 })
 

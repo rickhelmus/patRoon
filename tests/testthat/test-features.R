@@ -1,5 +1,7 @@
 context("features")
 
+initXCMS()
+
 anaInfo <- getTestAnaInfo()[1:3, ]
 anaInfoOne <- getTestAnaInfo()[4, ]
 

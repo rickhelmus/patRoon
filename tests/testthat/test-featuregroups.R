@@ -1,5 +1,7 @@
 context("feature groups")
 
+initXCMS()
+
 fList <- findFeatures(getTestAnaInfo(), "openms", logPath = NULL)
 fgOpenMS <- groupFeatures(fList, "openms")
 fgXCMS <- groupFeatures(fList, "xcms")

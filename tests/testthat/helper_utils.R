@@ -159,3 +159,11 @@ expect_csv_file <- checkmate::makeExpectationFunction(patRoon:::checkCSVFile)
 
 # call dollar operator with string
 callDollar <- function(x, name) eval(substitute(x$NAME_ARG, list(NAME_ARG = name)))
+
+initXCMS <- function()
+{
+    # temporary workaround, fixed in https://github.com/sneumann/xcms/pull/462
+    if (utils::packageVersion("xcms") < 3.10)
+        library(xcms)
+}
+

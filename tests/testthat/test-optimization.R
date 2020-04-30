@@ -1,5 +1,7 @@
 context("optimization")
 
+initXCMS()
+
 anaInfo <- getTestAnaInfo()[1:2, ]
 anaInfoOne <- getTestAnaInfo()[4, ]
 epAnaInfo <- makeMZXMLs(anaInfoOne)
@@ -37,13 +39,14 @@ test_that("verify feature optimization output", {
     # expect_known_value(expInfoNoObject(ffOptXCMS, 1, 1), testFile("ff-opt-xcms"))
     # expect_known_show(ffOptXCMS, testFile("ff-opt-xcms-show", text = TRUE))
 
-    expect_known_value(expInfoNoObject(ffOptXCMS3, 1, 1), testFile("ff-opt-xcms3"))
-    expect_known_show(ffOptXCMS3, testFile("ff-opt-xcms3-show", text = TRUE))
-    
     expect_known_value(expInfoNoObject(ffOptEnviPick, 1, 1), testFile("ff-opt-ep"))
     expect_known_show(ffOptEnviPick, testFile("ff-opt-ep-show", text = TRUE))
 
     expect_length(ffOptEmpty, 1)
+
+    skip_if(utils::packageVersion("xcms") < 3.10) # output changed a little with 3.10
+    expect_known_value(expInfoNoObject(ffOptXCMS3, 1, 1), testFile("ff-opt-xcms3"))
+    expect_known_show(ffOptXCMS3, testFile("ff-opt-xcms3-show", text = TRUE))
 })
 
 test_that("verify feature group optimization output", {

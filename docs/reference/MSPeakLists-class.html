@@ -427,7 +427,7 @@ group averaged MS(/MS) peak lists.</p></dd>
 <p></p><ul>
 <li><p><code>maxIsotopes</code> The maximum number of isotopes to consider. For
   instance, a value of <samp>5</samp> means that <code>M+0</code> (<em>i.e.</em> the
-  monoisoptic peak) till <code>M+5</code> is considered. All mass peaks outside
+  monoisotopic peak) till <code>M+5</code> is considered. All mass peaks outside
   this range are removed.</p></li>
 <li><p><code>mzDefectRange</code> A two-sized <code>vector</code> specifying the minimum
   (can be negative) and maximum <em>m/z</em> defect deviation compared to the
@@ -439,7 +439,7 @@ group averaged MS(/MS) peak lists.</p></dd>
   search range is doubled for <code>M+2</code>, tripled for <code>M+3</code> etc.</p></li>
 <li><p><code>intRange</code> A two-sized <code>vector</code> specifying the minimum and
   maximum relative intensity range compared to the precursor. For instance,
-  <code><a href='https://rdrr.io/r/base/c.html'>c(0.001, 2)</a></code> removes all peaks that have an intensity below 0.1% are
+  <code><a href='https://rdrr.io/r/base/c.html'>c(0.001, 2)</a></code> removes all peaks that have an intensity below 0.1% or
   above 200% of that of the precursor.</p></li>
 <li><p><code>z</code> The <code>z</code> value (<em>i.e.</em> absolute charge) to be
   considerd. For instance, a value of <code>2</code> would look for <code>M+0.5</code>,

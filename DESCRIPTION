@@ -1,13 +1,29 @@
 Package: patRoon
 Type: Package
 Title: Workflows for Mass-Spectrometry Based Non-Target Analysis
-Version: 0.9.0.9000
+Version: 1.0.0
 Authors@R: c(
-    person("Rick", "Helmus", email = "r.helmus@uva.nl", role = c("aut", "cre")),
-    person("Olaf", "Brock", role = "ctb"),
-    person("Vittorio", "Albergamo", role = "ctb"),
-    person("Andrea", "Brunner", role = "ctb"),
-    person("Emma", "Schymanski", role = "ctb"))
+    person("Rick", "Helmus",
+           email = "r.helmus@uva.nl",
+           role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0001-9401-3133")
+    ),
+    person("Olaf", "Brock",
+           role = "ctb",
+           comment = c(ORCID = "0000-0003-4727-8459")
+    ),
+    person("Vittorio", "Albergamo",
+           role = "ctb",
+           comment = c(ORCID = "0000-0002-5347-1362")
+    ),
+    person("Andrea", "Brunner",
+           role = "ctb",
+           comment = c(ORCID = "0000-0002-2801-1751")
+    ),
+    person("Emma", "Schymanski",
+           role = "ctb",
+           comment = c(ORCID = "0000-0001-6868-8145")
+    ))
 Description: Provides an easy-to-use interface to a mass spectrometry based
     non-target analysis workflow. Various (open-source) tools are combined
     which provide algorithms for extraction and grouping of features,

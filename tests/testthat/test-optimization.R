@@ -44,7 +44,7 @@ test_that("verify feature optimization output", {
 
     expect_length(ffOptEmpty, 1)
 
-    skip_if(utils::packageVersion("xcms") < 3.10) # output changed a little with 3.10
+    skip_if(utils::packageVersion("xcms") < "3.10") # output changed a little with 3.10
     expect_known_value(expInfoNoObject(ffOptXCMS3, 1, 1), testFile("ff-opt-xcms3"))
     expect_known_show(ffOptXCMS3, testFile("ff-opt-xcms3-show", text = TRUE))
 })

@@ -8,7 +8,6 @@
 
 ## docs
 - improve instructions for MF and SIRIUS installation?
-- (Auto) update handbook/tutorial
 
 
 ## features

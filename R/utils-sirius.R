@@ -14,16 +14,38 @@ getSiriusBin <- function()
     return("sirius-console-32")
 }
 
-getSiriusFragFiles <- function(resultPath)
+isSIRIUSPre44 <- function()
 {
-    pat <- "[:0-9:]+_([A-Za-z0-9]+).*\\.ms"
+    # SIRIUS 4.4 returns a version string when running with --version, older
+    # versions don't actually report version info...
+    return(!any(grepl("^SIRIUS 4\\.", executeCommand(getCommandWithOptPath(getSiriusBin(), "SIRIUS"),
+                                                     "--version", stdout = TRUE, stderr = FALSE))))
+}
+
+getSiriusResultPath <- function(outPath, msFName, cmpName, isPre44)
+{
+    # format is resultno_specname_compoundname, older versions start with 1, newer with 0
+    return(file.path(outPath, sprintf("%d_%s_%s", as.integer(isPre44),
+                                      basename(tools::file_path_sans_ext(msFName)),
+                                      cmpName)))
+}
+
+getSiriusFragFiles <- function(resultPath, isPre44)
+{
+    if (isPre44)
+        pat <- "[:0-9:]+_([A-Za-z0-9]+).*\\.ms"
+    else
+        pat <- "([A-Za-z0-9]+).*\\.csv"
     return(list.files(file.path(resultPath, "spectra"), full.names = TRUE, pattern = pat))
 }
 
-getFormulaFromSiriusFragFile <- function(ffile)
+getFormulaFromSiriusFragFile <- function(ffile, isPre44)
 {
-    pat <- "[:0-9:]+_([A-Za-z0-9]+).*\\.ms"
-    gsub(pat, "\\1", basename(ffile))
+    if (isPre44)
+        pat <- "[:0-9:]+_([A-Za-z0-9]+).*\\.ms"
+    else
+        pat <- "([A-Za-z0-9]+).*\\.csv"
+    return(gsub(pat, "\\1", basename(ffile)))
 }
 
 makeSirMSFile <- function(plistMS, plistMSMS, parentMZ, compound, ionization, out)
@@ -57,7 +79,16 @@ unifySirNames <- function(sir)
                  molecularFormula = "formula",
                  xlogp = "XlogP",
                  name = "compoundName",
-                 links = "libraryLinks")
+                 links = "libraryLinks",
+                 
+                 # some names were changed in 4.4 and new columns were added
+                 # UNDONE: there is also a compound_dentifications.csv file with slightly different columns, use that?
+                 formulaRank = "formulaRank",
+                 InChI = "InChI",
+                 InChIkey2D = "InChIKey1",
+                 "CSI:FingerID_Score" = "score",
+                 TreeIsotope_Score = "SIR_formulaScore" # UNDONE: better name?
+                 )
 
     unNames <- unNames[names(unNames) %in% names(sir)] # filter out missing
     setnames(sir, names(unNames), unNames)
@@ -67,36 +98,45 @@ unifySirNames <- function(sir)
 
 # get a command queue list that can be used with executeMultiProcess()
 getSiriusCommand <- function(precursorMZ, MSPList, MSMSPList, profile, adduct, ppmMax, elements,
-                             database, noise, withFingerID, fingerIDDatabase, topMost, extraOpts)
+                             database, noise, withFingerID, fingerIDDatabase, topMost, extraOpts,
+                             isPre44)
 {
     outPath <- tempfile("sirius")
     # unlink(outPath, TRUE) # start with fresh output directory (otherwise previous results are combined)
 
     stopifnot(!file.exists(outPath))
 
+    msFName <- tempfile("spec", fileext = ".ms")    
     ionization <- as.character(adduct, format = "sirius")
     mainArgs <- c("-p", profile,
                   "-i", ionization,
                   "-e", elements,
                   "--ppm-max", ppmMax,
-                  "-c", topMost,
-                  "-o", outPath)
+                  "-c", topMost)
 
     if (!is.null(database))
         mainArgs <- c(mainArgs, "-d", database)
     if (!is.null(noise))
         mainArgs <- c(mainArgs, "-n", noise)
-    if (withFingerID)
-        mainArgs <- c(mainArgs, "--fingerid")
-    if (!is.null(fingerIDDatabase))
-        mainArgs <- c(mainArgs, "--fingerid-db", fingerIDDatabase)
     if (!is.null(extraOpts))
         mainArgs <- c(mainArgs, extraOpts)
 
-    msFName <- tempfile("spec", fileext = ".ms")
+    if (isPre44)
+    {
+        if (withFingerID)
+            mainArgs <- c(mainArgs, "--fingerid", "--fingerid-db", fingerIDDatabase)
+        args <- c(mainArgs, "-o", outPath, msFName)
+    }
+    else
+    {
+        args <- c("-o", outPath, "-i", msFName, "formula", mainArgs)
+        if (withFingerID)
+            args <- c(args, "structure", "--database", fingerIDDatabase)
+    }
+
     cmpName <- "unknownCompound"
     makeSirMSFile(MSPList, MSMSPList, precursorMZ, cmpName, ionization, msFName)
 
-    return(list(command = getCommandWithOptPath(getSiriusBin(), "SIRIUS"), args = c(mainArgs, msFName),
-                outPath = outPath, msFName = msFName, cmpName = cmpName))
+    return(list(command = getCommandWithOptPath(getSiriusBin(), "SIRIUS"), args = args,
+                outPath = outPath, msFName = msFName, cmpName = cmpName, isPre44 = isPre44))
 }

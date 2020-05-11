@@ -14,32 +14,42 @@ processSiriusFormulas <- function(cmd, exitStatus, retries)
                                     frag_mz = numeric(0), frag_formula_mz = numeric(0), frag_intensity = numeric(0),
                                     neutral_loss = character(0), explainedPeaks = integer(0), explainedIntensity = numeric(0))
 
-    # format is resultno_specname_compoundname
-    resultPath <- file.path(cmd$outPath, sprintf("1_%s_%s", basename(tools::file_path_sans_ext(cmd$msFName)), cmd$cmpName))
+    # format is resultno_specname_compoundname, older versions start with 1, newer with 0
+    resultPath <- getSiriusResultPath(cmd$outPath, cmd$msFName, cmd$cmpName, cmd$isPre44)
 
-    summary <- file.path(resultPath, "summary_sirius.csv")
+    summary <- file.path(resultPath, if (cmd$isPre44) "summary_sirius.csv" else "formula_candidates.csv")
     if (!file.exists(summary))
         forms <- noResult
     else
     {
         forms <- fread(summary)
-        fragFiles <- getSiriusFragFiles(resultPath)
+        fragFiles <- getSiriusFragFiles(resultPath, cmd$isPre44)
 
         if (nrow(forms) == 0 || length(fragFiles) == 0)
             forms <- noResult
         else
         {
-            setnames(forms, c("formula", "treeScore"), c("neutral_formula", "MSMSScore"))
+            if (cmd$isPre44)
+                setnames(forms, c("formula", "treeScore"), c("neutral_formula", "MSMSScore"))
+            else
+            {
+                setnames(forms, c("molecularFormula", "TreeIsotope_Score", "Tree_Score", "Isotope_Score"),
+                         c("neutral_formula", "score", "MSMSScore", "isoScore"))
+                forms[, precursorFormula := NULL] # seems same as molecularFormula
+            }
+            
             setkey(forms, neutral_formula)
 
             frags <- rbindlist(lapply(fragFiles, function(ff)
             {
                 fragInfo <- fread(ff)
                 setnames(fragInfo,
-                         c("mz", "intensity", "exactmass", "explanation"),
+                         c("mz", "intensity", "exactmass", if (cmd$isPre44) "explanation" else "formula"),
                          c("frag_mz", "frag_intensity", "frag_formula_mz", "frag_neutral_formula"))
                 fragInfo[, rel.intensity := NULL]
-                fragInfo[, neutral_formula := getFormulaFromSiriusFragFile(ff)]
+                if (!cmd$isPre44)
+                    fragInfo[, ionization := NULL]
+                fragInfo[, neutral_formula := getFormulaFromSiriusFragFile(ff, cmd$isPre44)]
                 return(fragInfo)
             }))
             setkey(frags, neutral_formula)
@@ -120,6 +130,8 @@ generateFormulasSirius <- function(fGroups, MSPeakLists, relMzDev = 5, adduct = 
     setHash <- makeHash(fGroups, MSPeakLists, baseHash)
     cachedSet <- loadCacheSet("formulasSirius", setHash, cacheDB)
     formHashes <- character(0)
+    
+    isPre44 <- isSIRIUSPre44()
 
     doSIRIUS <- function(featMZs, groupPeakLists)
     {
@@ -151,7 +163,8 @@ generateFormulasSirius <- function(fGroups, MSPeakLists, relMzDev = 5, adduct = 
             plmz <- groupPeakLists[[grp]][["MS"]][precursor == TRUE, mz]
 
             cmd <- getSiriusCommand(plmz, groupPeakLists[[grp]][["MS"]], groupPeakLists[[grp]][["MSMS"]], profile,
-                                    adduct, relMzDev, elements, database, noise, FALSE, NULL, topMost, extraOpts)
+                                    adduct, relMzDev, elements, database, noise, FALSE, NULL, topMost, extraOpts,
+                                    isPre44)
             logf <- if (!is.null(logPath)) file.path(logPath, paste0("sirius-form-", grp, ".txt")) else NULL
 
             return(c(list(hash = hashes[grp], adduct = adduct, cacheDB = cacheDB, logFile = logf,

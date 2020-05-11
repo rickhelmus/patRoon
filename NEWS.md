@@ -1,5 +1,9 @@
 # patRoon 0.1.0.9000
 
+## May 2020
+
+* Support for SIRIUS 4.4.
+
 ## April 2020
 
 * `extraOptsRT`/`extraOptsGroup` arguments for OpenMS feature grouping to allow custom command line options.

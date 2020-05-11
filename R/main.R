@@ -647,7 +647,7 @@ NULL
 #'   CL} homepages for all available options.
 #'
 #'   For \command{SIRIUS}: a \code{character} vector with any extra commandline
-#'   parameters. See the SIRIUS manual for more details.
+#'   parameters for formula prediction. See the SIRIUS manual for more details.
 #'
 #'   Set to \code{NULL} to ignore.
 #'

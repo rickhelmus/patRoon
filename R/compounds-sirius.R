@@ -5,17 +5,17 @@ NULL
 
 processSiriusCompounds <- function(cmd, exitStatus, retries)
 {
-    # format is resultno_specname_compoundname
-    resultPath <- file.path(cmd$outPath, sprintf("1_%s_%s", basename(tools::file_path_sans_ext(cmd$msFName)), cmd$cmpName))
+    resultPath <- getSiriusResultPath(cmd$outPath, cmd$msFName, cmd$cmpName, cmd$isPre44)
 
     results <- data.table()
     scRanges <- list()
 
-    summary <- file.path(resultPath, "summary_csi_fingerid.csv")
+    summary <- file.path(resultPath, if (cmd$isPre44) "summary_csi_fingerid.csv" else "structure_candidates.csv")
     if (file.exists(summary)) # csi:fingerid got any results?
     {
         results <- fread(summary)
-
+        results <- unifySirNames(results)
+        
         # NOTE: so far SIRIUS only has one score
         if (nrow(results) > 0)
             scRanges <- list(score = range(results$score))
@@ -26,20 +26,19 @@ processSiriusCompounds <- function(cmd, exitStatus, retries)
                 results <- results[seq_len(cmd$topMost)] # results should already be sorted on score
         }
 
-        results <- unifySirNames(results)
-
-        # NOTE: fragment info is based on SIRIUS results, ie from formula prediction and not by compounds!
-        pat <- "[:0-9:]+_([A-Za-z0-9]+).*\\.ms"
-        fragFiles <- list.files(file.path(resultPath, "spectra"), full.names = TRUE, pattern = pat)
+        # NOTE: fragment info is based on SIRIUS results, ie from formula
+        # prediction and not by compounds! Hence, results are the same for all
+        # isomers.
+        fragFiles <- getSiriusFragFiles(resultPath, cmd$isPre44)
         for (ff in fragFiles)
         {
-            precursor <- gsub(pat, "\\1", basename(ff))
-
+            precursor <- getFormulaFromSiriusFragFile(ff, cmd$isPre44)
             if (precursor %in% results$formula) # may not be there if filtered out or no compound was found
             {
                 fragInfo <- fread(ff)
                 fragInfo[, c("rel.intensity", "exactmass") := NULL]
-                setnames(fragInfo, "explanation", "formula")
+                if (cmd$isPre44)
+                    setnames(fragInfo, "explanation", "formula")
                 fragInfo[, PLIndex := sapply(mz, function(omz) which.min(abs(omz - cmd$MSMSSpec$mz)))]
 
                 # sirius neutralizes fragments, make them ion again
@@ -59,7 +58,7 @@ processSiriusCompounds <- function(cmd, exitStatus, retries)
             results[, explainedPeaks := 0]
         }
 
-        results[, database := cmd$database]
+        results[, database := cmd$database][]
     }
 
     ret <- list(comptab = results, scRanges = scRanges)
@@ -110,7 +109,7 @@ generateCompoundsSirius <- function(fGroups, MSPeakLists, relMzDev = 5, adduct =
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
     checkmate::assertNumber(relMzDev, lower = 0, finite = TRUE, add = ac)
     aapply(checkmate::assertString, . ~ elements + profile + fingerIDDatabase, fixed = list(add = ac))
-    checkmate::assertString(formulaDatabase, null.ok = TRUE, add = ac)
+    aapply(checkmate::assertString, . ~ formulaDatabase + fingerIDDatabase, null.ok = TRUE, fixed = list(add = ac))
     checkmate::assertNumber(noise, lower = 0, finite = TRUE, null.ok = TRUE, add = ac)
     checkmate::assertCount(errorRetries, add = ac)
     checkmate::assertCount(topMost, positive = TRUE, add = ac)
@@ -120,6 +119,8 @@ generateCompoundsSirius <- function(fGroups, MSPeakLists, relMzDev = 5, adduct =
     checkmate::reportAssertions(ac)
 
     adduct <- checkAndToAdduct(adduct)
+    if (is.null(fingerIDDatabase))
+        fingerIDDatabase <- if (!is.null(formulaDatabase)) formulaDatabase else "pubchem"
 
     anaInfo <- analysisInfo(fGroups)
     fTable <- featureTable(fGroups)
@@ -138,6 +139,7 @@ generateCompoundsSirius <- function(fGroups, MSPeakLists, relMzDev = 5, adduct =
 
     printf("Processing %d feature groups with SIRIUS-CSI:FingerID...\n", gCount)
 
+    isPre44 <- isSIRIUSPre44()
     cmdQueue <- sapply(gNames, function(grp)
     {
         plist <- MSPeakLists[[grp]]
@@ -155,11 +157,10 @@ generateCompoundsSirius <- function(fGroups, MSPeakLists, relMzDev = 5, adduct =
 
         cmd <- getSiriusCommand(plmz, plist$MS, plist$MSMS, profile,
                                 adduct, relMzDev, elements, formulaDatabase, noise, TRUE,
-                                fingerIDDatabase, topMostFormulas, extraOpts)
-        db <- if (!is.null(fingerIDDatabase)) fingerIDDatabase else if (!is.null(formulaDatabase)) formulaDatabase else "pubchem"
+                                fingerIDDatabase, topMostFormulas, extraOpts, isPre44)
         logf <- if (!is.null(logPath)) file.path(logPath, paste0("sirius-comp-", grp, ".txt")) else NULL
         return(c(list(hash = hash, adduct = adduct, cacheDB = cacheDB, MSMSSpec = plist$MSMS,
-                      database = db, topMost = topMost, logFile = logf, gName = grp), cmd))
+                      database = fingerIDDatabase, topMost = topMost, logFile = logf, gName = grp), cmd))
     }, simplify = FALSE)
     cmdQueue <- cmdQueue[!sapply(cmdQueue, is.null)]
 

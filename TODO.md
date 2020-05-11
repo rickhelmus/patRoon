@@ -4,11 +4,12 @@
 - test negative subset indices
 - convertMSFiles()
     - Agilent .d is also a directory?
+- checkmate checks for generic workflow functions
+- newProject(): show polarity selection if compound algo is selected (now only work with formula)
 
 
 ## docs
 - improve instructions for MF and SIRIUS installation?
-- (Auto) update handbook/tutorial
 
 
 ## features

@@ -59,10 +59,10 @@ makeSirMSFile <- function(plistMS, plistMSMS, parentMZ, compound, ionization, ou
     writeMeta("ionization", ionization)
 
     cat(">ms1peaks\n", file = msFile)
-    write.table(plistMS, msFile, row.names = FALSE, col.names = FALSE)
+    write.table(plistMS[, c("mz", "intensity")], msFile, row.names = FALSE, col.names = FALSE)
 
     cat("\n>ms2peaks\n", file = msFile)
-    write.table(plistMSMS, msFile, row.names = FALSE, col.names = FALSE)
+    write.table(plistMSMS[, c("mz", "intensity")], msFile, row.names = FALSE, col.names = FALSE)
 
     close(msFile)
 }
@@ -109,7 +109,6 @@ getSiriusCommand <- function(precursorMZ, MSPList, MSMSPList, profile, adduct, p
     msFName <- tempfile("spec", fileext = ".ms")    
     ionization <- as.character(adduct, format = "sirius")
     mainArgs <- c("-p", profile,
-                  "-i", ionization,
                   "-e", elements,
                   "--ppm-max", ppmMax,
                   "-c", topMost)

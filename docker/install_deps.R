@@ -5,7 +5,7 @@ install.packages("devtools")
 BiocManager::install(c("mzR", "xcms", "CAMERA"))
 BiocManager::install(c("Rdisop", "InterpretMSSpectrum")) # need to install these deps manually (why??)
 
-devtools::install_github("rickhelmus/patRoonData", upgrade_dependencies = FALSE)
+remotes::install_github("rickhelmus/patRoonData", upgrade = "never")
 install.packages("vdiffr")
 
 install.packages("desc")

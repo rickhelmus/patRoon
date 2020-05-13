@@ -12,7 +12,7 @@ ENV SETUPDIR=/usr/local/setup
 
 RUN apt-get update -y && \
     apt-get install -y --no-install-recommends libssl-dev libssh2-1-dev wget openbabel libv8-3.14-dev \
-        libxml2-dev libnetcdf-dev netcdf-bin pngquant openjdk-8-jdk libmagick++-dev pandoc git pngquant texinfo \
+        libxml2-dev libnetcdf-dev netcdf-bin pngquant openjdk-11-jdk libmagick++-dev pandoc git pngquant texinfo \
         r-cran-checkmate r-cran-data.table r-cran-withr r-cran-digest r-cran-xml r-cran-xml2 r-cran-dbi \
         r-cran-rsqlite r-cran-rjava r-cran-dplyr r-cran-rcolorbrewer \
         r-cran-htmlwidgets r-cran-shiny r-cran-knitr r-cran-r.utils \
@@ -26,7 +26,8 @@ RUN apt-get update -y && \
     rm -rf $SETUPDIR && \
     useradd -ms /bin/bash patRoon && \
     addgroup patRoon staff && \
-    apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+    apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
+    R CMD javareconf
 
 USER patRoon
 WORKDIR /home/patRoon
@@ -36,10 +37,10 @@ COPY ./docker/install_deps.R ./DESCRIPTION ./
 ENV R_REMOTES_NO_ERRORS_FROM_WARNINGS=true
 
 RUN wget http://msbi.ipb-halle.de/~cruttkie/metfrag/MetFrag2.4.5-CL.jar && \
-    wget https://bio.informatik.uni-jena.de/repository/dist-release-local/de/unijena/bioinf/ms/sirius/4.0.1/sirius-4.0.1-linux64-headless.zip && \
-    unzip sirius-4.0.1-linux64-headless.zip && rm sirius-4.0.1-linux64-headless.zip && \
+    wget https://bio.informatik.uni-jena.de/repository/dist-release-local/de/unijena/bioinf/ms/sirius/4.4.17/sirius-4.4.17-linux64-headless.zip && \
+    unzip sirius-4.4.17-linux64-headless.zip && rm sirius-4.4.17-linux64-headless.zip && \
     echo 'options(patRoon.path.metFragCL = "~/MetFrag2.4.5-CL.jar")' >> .Rprofile && \
-    echo 'options(patRoon.path.SIRIUS = "~/sirius-linux64-headless-4.0.1/bin")' >> .Rprofile && \
+    echo 'options(patRoon.path.SIRIUS = "~/sirius-linux64-headless-4.4.17/bin")' >> .Rprofile && \
     echo 'options(patRoon.progress.opts = list(style = 1))' >> .Rprofile && \
     Rscript install_deps.R && rm -f ~/install_deps.R ~/DESCRIPTION
 
@@ -47,6 +48,6 @@ ADD --chown=patRoon . patRoon
 
 RUN Rscript -e 'devtools::install(pkg = "patRoon", upgrade = FALSE)'
 
-ENV OPENMS_DATA_PATH=/usr/share/OpenMS _R_CHECK_FORCE_SUGGESTS_=0 R_MAX_NUM_DLLS=150
+ENV OPENMS_DATA_PATH=/usr/share/OpenMS _R_CHECK_FORCE_SUGGESTS_=0 R_MAX_NUM_DLLS=150 JAVA_HOME=zulu11.39.15-ca-jre11.0.7-linux_x64
 
 CMD ["R"]

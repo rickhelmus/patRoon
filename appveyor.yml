@@ -31,10 +31,10 @@ install:
         C:\deps\openbabel.exe /S
 
 
-    #- ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+    - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
 cache:
-  - C:\RLibrary
+  #- C:\RLibrary
   - C:\Program Files\Pandoc\
   #- C:\deps
 

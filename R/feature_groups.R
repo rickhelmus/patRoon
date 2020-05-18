@@ -759,7 +759,7 @@ setMethod("plotChord", "featureGroups", function(obj, addSelfLinks = FALSE, addR
     if (hasOuter)
         tracks <- list(list(track.height = 0.1, track.margin = c(if (addRetMzPlots) 0.05 else 0.06, 0)))
     if (addRetMzPlots)
-        tracks = c(tracks, list(list(track.height = 0.1, track.margin = c(0.08, 0))))
+        tracks <- c(tracks, list(list(track.height = 0.1, track.margin = c(0.08, 0))))
 
     maxv <- max(if (hasOuter) chordTable[groupFrom != groupTo, value] else chordTable$value)
     colFunc <- circlize::colorRamp2(maxv * seq(0, 1, 0.25),

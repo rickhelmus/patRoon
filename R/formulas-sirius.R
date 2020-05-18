@@ -14,7 +14,6 @@ processSiriusFormulas <- function(cmd, exitStatus, retries)
                                     frag_mz = numeric(0), frag_formula_mz = numeric(0), frag_intensity = numeric(0),
                                     neutral_loss = character(0), explainedPeaks = integer(0), explainedIntensity = numeric(0))
 
-    # format is resultno_specname_compoundname, older versions start with 1, newer with 0
     resultPath <- getSiriusResultPath(cmd$outPath, cmd$msFName, cmd$cmpName, cmd$isPre44)
 
     summary <- file.path(resultPath, if (cmd$isPre44) "summary_sirius.csv" else "formula_candidates.csv")

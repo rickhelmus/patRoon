@@ -11,7 +11,7 @@ processSiriusCompounds <- function(cmd, exitStatus, retries)
     scRanges <- list()
 
     summary <- file.path(resultPath, if (cmd$isPre44) "summary_csi_fingerid.csv" else "structure_candidates.csv")
-    if (file.exists(summary)) # csi:fingerid got any results?
+    if (length(summary) != 0 || file.exists(summary)) # csi:fingerid got any results?
     {
         results <- fread(summary)
         results <- unifySirNames(results)

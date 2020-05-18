@@ -25,9 +25,8 @@ isSIRIUSPre44 <- function()
 getSiriusResultPath <- function(outPath, msFName, cmpName, isPre44)
 {
     # format is resultno_specname_compoundname, older versions start with 1, newer with 0
-    return(file.path(outPath, sprintf("%d_%s_%s", as.integer(isPre44),
-                                      basename(tools::file_path_sans_ext(msFName)),
-                                      cmpName)))
+    msFName <- basename(tools::file_path_sans_ext(msFName))
+    return(list.files(outPath, pattern = sprintf("[0-9]+_%s_%s", msFName, cmpName), full.names = TRUE))
 }
 
 getSiriusFragFiles <- function(resultPath, isPre44)
@@ -138,4 +137,58 @@ getSiriusCommand <- function(precursorMZ, MSPList, MSMSPList, profile, adduct, p
 
     return(list(command = getCommandWithOptPath(getSiriusBin(), "SIRIUS"), args = args,
                 outPath = outPath, msFName = msFName, cmpName = cmpName, isPre44 = isPre44))
+}
+
+# get a command queue list that can be used with executeMultiProcess()
+getSiriusCommandBatch <- function(precursorMZs, MSPLists, MSMSPLists, profile, adduct, ppmMax, elements,
+                                  database, noise, cores, withFingerID, fingerIDDatabase, topMost, extraOpts,
+                                  isPre44)
+{
+    inPath <- tempfile("sirius_in")
+    outPath <- tempfile("sirius_out")
+    # unlink(outPath, TRUE) # start with fresh output directory (otherwise previous results are combined)
+    stopifnot(!file.exists(outPath) && !file.exists(outPath))
+    dir.create(inPath)
+    
+    ionization <- as.character(adduct, format = "sirius")
+    cmpName <- "unknownCompound"
+    
+    msFNames <- mapply(precursorMZs, MSPLists, MSMSPLists, FUN = function(pmz, mspl, msmspl)
+    {
+        ret <- tempfile("spec", fileext = ".ms", tmpdir = inPath)
+        makeSirMSFile(mspl, msmspl, pmz, cmpName, ionization, ret)
+        return(ret)
+    })
+
+    mainArgs <- character()
+    if (!is.null(cores))
+        mainArgs <- c("--cores", cores)
+    
+    formArgs <- c("-p", profile,
+                  "-e", elements,
+                  "--ppm-max", ppmMax,
+                  "-c", topMost)
+    
+    if (!is.null(database))
+        formArgs <- c(formArgs, "-d", database)
+    if (!is.null(noise))
+        formArgs <- c(formArgs, "-n", noise)
+    if (!is.null(extraOpts))
+        formArgs <- c(formArgs, extraOpts)
+    
+    if (isPre44)
+    {
+        if (withFingerID)
+            formArgs <- c(formArgs, "--fingerid", "--fingerid-db", fingerIDDatabase)
+        args <- c(mainArgs, formArgs, "-o", outPath, inPath)
+    }
+    else
+    {
+        args <- c(mainArgs, "-o", outPath, "-i", inPath, "formula", formArgs)
+        if (withFingerID)
+            args <- c(args, "structure", "--database", fingerIDDatabase)
+    }
+    
+    return(list(command = getCommandWithOptPath(getSiriusBin(), "SIRIUS"), args = args,
+                outPath = outPath, msFNames = msFNames, cmpName = cmpName, isPre44 = isPre44))
 }

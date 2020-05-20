@@ -59,9 +59,9 @@ initCommand <- function(commandQueue, cmdInds, sucDir, printOutput, printError)
     procArgs <- c(procArgs, list(cleanup_tree = TRUE, supervise = TRUE))
 
     if (printOutput)
-        procArgs <- c(procArgs, stdout = "|")
+        procArgs[["stdout"]] <- "|"
     if (printError)
-        procArgs <- c(procArgs, stderr = "|")
+        procArgs[["stderr"]] <- "|"
 
     ncmd <- length(commandQueue)
 
@@ -243,7 +243,7 @@ executeMultiProcess <- function(commandQueue, finishHandler,
     lastCommandTime <- 0 # at which time (in ms) the last command was started
 
     doLog <- any(sapply(commandQueue, function(q) !is.null(q$logFile)))
-    stopifnot(batchSize == 1 || (!doLog && !printOutput || !printError))
+    stopifnot(batchSize == 1 || (!doLog && !printOutput && !printError))
 
     # clear up stale processes: see https://github.com/r-lib/processx/issues/171
     on.exit({

@@ -141,24 +141,19 @@ getSiriusCommand <- function(precursorMZ, MSPList, MSMSPList, profile, adduct, p
 
 runSIRIUS <- function(precursorMZs, MSPLists, MSMSPLists, profile, adduct, ppmMax, elements,
                       database, noise, cores, withFingerID, fingerIDDatabase, topMost,
-                      extraOptsGeneral, extraOptsFormula, verbose, isPre44)
+                      extraOptsGeneral, extraOptsFormula, verbose, isPre44,
+                      batchSize, logPath, maxProcAmount)
 {
-    inPath <- tempfile("sirius_in")
     outPath <- tempfile("sirius_out")
     # unlink(outPath, TRUE) # start with fresh output directory (otherwise previous results are combined)
-    stopifnot(!file.exists(outPath) && !file.exists(outPath))
-    dir.create(inPath)
+    stopifnot(!file.exists(outPath))
+    
+    if (!is.null(logPath))
+        mkdirp(logPath)
     
     ionization <- as.character(adduct, format = "sirius")
     cmpName <- "unknownCompound"
     
-    msFNames <- mapply(precursorMZs, MSPLists, MSMSPLists, FUN = function(pmz, mspl, msmspl)
-    {
-        ret <- tempfile("spec", fileext = ".ms", tmpdir = inPath)
-        makeSirMSFile(mspl, msmspl, pmz, cmpName, ionization, ret)
-        return(ret)
-    })
-
     mainArgs <- character()
     if (!is.null(cores))
         mainArgs <- c("--cores", cores)
@@ -181,18 +176,53 @@ runSIRIUS <- function(precursorMZs, MSPLists, MSMSPLists, profile, adduct, ppmMa
     {
         if (withFingerID)
             formArgs <- c(formArgs, "--fingerid", "--fingerid-db", fingerIDDatabase)
-        args <- c(mainArgs, formArgs, "-o", outPath, inPath)
+        args <- c(mainArgs, formArgs, "-o", outPath)
     }
     else
     {
-        args <- c(mainArgs, "-o", outPath, "-i", inPath, "formula", formArgs)
+        args <- c(mainArgs, "-o", outPath, "formula", formArgs)
         if (withFingerID)
             args <- c(args, "structure", "--database", fingerIDDatabase)
     }
     
-    verbose <- if (verbose) "" else FALSE
-    executeCommand(getCommandWithOptPath(getSiriusBin(), "SIRIUS"), args, stdout = verbose, stderr = verbose)
-    return(list(outPath = outPath, msFNames = msFNames, cmpName = cmpName))
+    # verbose <- if (verbose) "" else FALSE
+    # executeCommand(getCommandWithOptPath(getSiriusBin(), "SIRIUS"), args, stdout = verbose, stderr = verbose)
+    
+    if (batchSize == 0)
+        batches <- list(seq_along(precursorMZs))
+    else
+    {
+        # splitting a vector in chunks: https://stackoverflow.com/a/3321659
+        batches <- split(seq_along(precursorMZs), ceiling(seq_along(precursorMZs) / batchSize))
+    }
+    command <- getCommandWithOptPath(getSiriusBin(), "SIRIUS")
+    cmdQueue <- lapply(seq_along(batches), function(bi)
+    {
+        inPath <- tempfile("sirius_in")
+        stopifnot(!file.exists(inPath))
+        dir.create(inPath)
+        
+        batch <- batches[[bi]]
+        msFNames <- mapply(precursorMZs[batch], MSPLists[batch], MSMSPLists[batch], FUN = function(pmz, mspl, msmspl)
+        {
+            ret <- tempfile("spec", fileext = ".ms", tmpdir = inPath)
+            makeSirMSFile(mspl, msmspl, pmz, cmpName, ionization, ret)
+            return(ret)
+        })
+        
+        bArgs <- if (isPre44) c(args, inPath) else c("-i", inPath, args)
+        logf <- if (!is.null(logPath)) file.path(logPath, paste0("sirius-batch_", bi, ".txt")) else NULL
+        
+        return(list(command = command, args = bArgs, logFile = logf, msFNames = msFNames))
+    })
+    
+    singular <- length(cmdQueue) == 1
+    executeMultiProcess(cmdQueue, printOutput = verbose && singular, printError = verbose && singular,
+                        maxProcAmount = maxProcAmount, showProgress = !singular,
+                        finishHandler = function(...) NULL)
+    
+    return(list(outPath = outPath, cmpName = cmpName,
+                msFNames = unlist(lapply(cmdQueue, "[[", "msFNames"), use.names = FALSE)))
 }
 
 doSIRIUS <- function(allGNames, featMZs, groupPeakLists, profile, adduct, relMzDev, elements,
@@ -262,7 +292,8 @@ doSIRIUS <- function(allGNames, featMZs, groupPeakLists, profile, adduct, relMzD
 
 doSIRIUS2 <- function(allGNames, MSPeakLists, doFeatures, profile, adduct, relMzDev, elements,
                       database, noise, cores, withFingerID, fingerIDDatabase, topMost,
-                      extraOptsGeneral, extraOptsFormula, verbose, cacheName, processFunc, processArgs)
+                      extraOptsGeneral, extraOptsFormula, verbose, cacheName, processFunc, processArgs,
+                      batchSize, logPath, maxProcAmount)
 {
     isPre44 <- isSIRIUSPre44()
     
@@ -311,19 +342,21 @@ doSIRIUS2 <- function(allGNames, MSPeakLists, doFeatures, profile, adduct, relMz
                 res <- loadCacheData(cacheName, h, cacheDB)
             return(res)
         }, simplify = FALSE))
+        
         flPLMeta[, cached := hash %in% names(cachedResults)]
+        flPLMeta[, msFName := character()]
         doPLists <- flattenedPLists[!flPLMeta$cached]
         
-        plmzs <- lapply(doPLists, function(pl) pl[["MS"]][precursor == TRUE, mz])
-        mspls <- lapply(doPLists, "[[", "MS")
-        msmspls <- lapply(doPLists, "[[", "MSMS")
-        
-        flPLMeta[, msFName := character()]
         if (length(doPLists) > 0)
         {
+            plmzs <- lapply(doPLists, function(pl) pl[["MS"]][precursor == TRUE, mz])
+            mspls <- lapply(doPLists, "[[", "MS")
+            msmspls <- lapply(doPLists, "[[", "MSMS")
+            
             runData <- runSIRIUS(plmzs, mspls, msmspls, profile, adduct, relMzDev, elements,
                                  database, noise, cores, withFingerID, fingerIDDatabase, topMost,
-                                 extraOptsGeneral, extraOptsFormula, verbose, isPre44)
+                                 extraOptsGeneral, extraOptsFormula, verbose, isPre44,
+                                 batchSize, logPath, maxProcAmount)
             flPLMeta[cached == FALSE, msFName := runData$msFNames]
         }
         else

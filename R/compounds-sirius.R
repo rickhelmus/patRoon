@@ -20,15 +20,16 @@ processSiriusCompounds <- function(cmd, exitStatus, retries)
         if (nrow(results) > 0)
             scRanges <- list(score = range(results$score))
 
+        # manually sort results: SIRIUS seems to sometimes randomly order results with equal scores
+        # NOTE: do this before topMost filter step below to ensure proper filtering
+        setorderv(results, c("score", "identifier"), order = c(-1, 1))
+        
         if (!is.null(cmd$topMost))
         {
             if (nrow(results) > cmd$topMost)
                 results <- results[seq_len(cmd$topMost)] # results should already be sorted on score
         }
         
-        # manually sort results: SIRIUS seems to sometimes randomly order results with equal scores
-        setorderv(results, c("score", "identifier"), order = c(-1, 1))
-
         # NOTE: fragment info is based on SIRIUS results, ie from formula
         # prediction and not by compounds! Hence, results are the same for all
         # isomers.
@@ -86,6 +87,7 @@ processSIRIUSCompounds <- function(msFName, outPath, cmpName, MSMS, database, ad
             scRanges <- list(score = range(results$score))
         
         # manually sort results: SIRIUS seems to sometimes randomly order results with equal scores
+        # NOTE: do this before topMost filter step below to ensure proper filtering
         setorderv(results, c("score", "identifier"), order = c(-1, 1))
         
         if (!is.null(topMost))

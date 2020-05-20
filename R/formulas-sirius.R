@@ -543,7 +543,7 @@ generateFormulasSIRIUS2 <- function(fGroups, MSPeakLists, relMzDev = 5, adduct =
         }
         ngrp <- length(groupFormulas)
         gCount <- length(fGroups)
-        printf("Assigned %d unique formulas for %d feature groups (%.2f%% coverage).\n", countUniqueFormulas(groupFormulas),
+        printf("Assigned %d unique formulas to %d feature groups (%.2f%% coverage).\n", countUniqueFormulas(groupFormulas),
                ngrp, if (gCount == 0) 0 else ngrp * 100 / gCount)
     }
     

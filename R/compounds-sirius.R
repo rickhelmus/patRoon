@@ -11,7 +11,7 @@ processSiriusCompounds <- function(cmd, exitStatus, retries)
     scRanges <- list()
 
     summary <- file.path(resultPath, if (cmd$isPre44) "summary_csi_fingerid.csv" else "structure_candidates.csv")
-    if (length(summary) != 0 || file.exists(summary)) # csi:fingerid got any results?
+    if (length(summary) != 0 && file.exists(summary)) # csi:fingerid got any results?
     {
         results <- fread(summary)
         results <- unifySirNames(results)
@@ -25,6 +25,9 @@ processSiriusCompounds <- function(cmd, exitStatus, retries)
             if (nrow(results) > cmd$topMost)
                 results <- results[seq_len(cmd$topMost)] # results should already be sorted on score
         }
+        
+        # manually sort results: SIRIUS seems to sometimes randomly order results with equal scores
+        setorderv(results, c("score", "identifier"), order = c(-1, 1))
 
         # NOTE: fragment info is based on SIRIUS results, ie from formula
         # prediction and not by compounds! Hence, results are the same for all

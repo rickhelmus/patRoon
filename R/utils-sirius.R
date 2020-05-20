@@ -262,7 +262,7 @@ doSIRIUS <- function(allGNames, featMZs, groupPeakLists, profile, adduct, relMzD
 
 doSIRIUS2 <- function(allGNames, MSPeakLists, doFeatures, profile, adduct, relMzDev, elements,
                       database, noise, cores, withFingerID, fingerIDDatabase, topMost,
-                      extraOptsGeneral, extraOptsFormula, verbose, cacheName, processFunc)
+                      extraOptsGeneral, extraOptsFormula, verbose, cacheName, processFunc, processArgs)
 {
     isPre44 <- isSIRIUSPre44()
     
@@ -272,7 +272,7 @@ doSIRIUS2 <- function(allGNames, MSPeakLists, doFeatures, profile, adduct, relMz
     cacheDB <- openCacheDBScope() # open manually so caching code doesn't need to on each R/W access
     baseHash <- makeHash(profile, adduct, relMzDev, elements, database, noise,
                          withFingerID, fingerIDDatabase, topMost, extraOptsGeneral,
-                         extraOptsFormula, isPre44)
+                         extraOptsFormula, isPre44, processArgs)
     setHash <- makeHash(MSPeakLists, baseHash, doFeatures)
     cachedSet <- loadCacheSet(cacheName, setHash, cacheDB)
 
@@ -333,13 +333,15 @@ doSIRIUS2 <- function(allGNames, MSPeakLists, doFeatures, profile, adduct, relMz
         {
             if (any(!meta$cached))
             {
-                procArgs <- list(outPath = runData$outPath, cmpName = runData$cmpName, adduct = adduct,
-                                 isPre44 = isPre44, cacheDB = cacheDB)
+                pArgs <- list(outPath = runData$outPath, cmpName = runData$cmpName, adduct = adduct,
+                              isPre44 = isPre44, cacheDB = cacheDB)
+                if (!is.null(processArgs))
+                    pArgs <- c(pArgs, processArgs)
                 
                 metaNew <- meta[cached == FALSE]
-                res <- mapply(metaNew$msFName, metaNew$hash, SIMPLIFY = FALSE,
-                              FUN = function(n, h) do.call(processFunc, c(list(msFName = n, hash = h),
-                                                                          procArgs)))
+                MSMS <- lapply(doPLists[metaNew$name], "[[", "MSMS")
+                res <- mapply(metaNew$msFName, metaNew$hash, MSMS, SIMPLIFY = FALSE,
+                              FUN = function(n, h, m) do.call(processFunc, c(list(msFName = n, hash = h, MSMS = m), pArgs)))
                 names(res) <- metaNew$group
             }
             else
@@ -351,9 +353,7 @@ doSIRIUS2 <- function(allGNames, MSPeakLists, doFeatures, profile, adduct, relMz
                 res <- c(res, setNames(cachedResults[metaCached$hash], metaCached$group))
             }
             
-            res <- pruneList(res, checkZeroRows = TRUE)
             res <- res[intersect(allGNames, names(res))] # ensure correct order
-            
             return(res)
         }
 

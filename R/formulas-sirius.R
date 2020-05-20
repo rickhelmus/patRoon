@@ -164,7 +164,7 @@ processSIRIUSFormulas <- function(gNames, adduct, hashes, runData, isPre44, cach
     return(ret)
 }
 
-processSIRIUSFormulas2 <- function(msFName, outPath, cmpName, adduct, hash, isPre44, cacheDB)
+processSIRIUSFormulas2 <- function(msFName, outPath, cmpName, adduct, hash, isPre44, cacheDB, ...)
 {
     noResult <- forms <- data.table(neutral_formula = character(0), formula = character(0),
                                     adduct = character(0), score = numeric(0), MSMSScore = numeric(0),
@@ -515,18 +515,21 @@ generateFormulasSIRIUS2 <- function(fGroups, MSPeakLists, relMzDev = 5, adduct =
     
     formTable <- doSIRIUS2(gNames, MSPeakLists, calculateFeatures, profile, adduct, relMzDev, elements,
                            database, noise, cores, FALSE, NULL, topMost, extraOptsGeneral, extraOptsFormula,
-                           verbose, "formulasSIRIUS", processSIRIUSFormulas2)
+                           verbose, "formulasSIRIUS", processSIRIUSFormulas2, NULL)
         
     if (calculateFeatures)
     {
         if (length(formTable) > 0)
+        {
+            formTable <- lapply(formTable, pruneList, checkZeroRows = TRUE)
             groupFormulas <- generateGroupFormulasByConsensus(formTable, featThreshold, gNames)
+        }
         else
             groupFormulas <- list()
     }
     else
     {
-        groupFormulas <- formTable
+        groupFormulas <- pruneList(formTable, checkZeroRows = TRUE)
         formTable <- list()
     }
     

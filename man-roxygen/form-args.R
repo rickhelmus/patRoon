@@ -6,7 +6,7 @@
 #' @param elements Elements to be considered for formulae calculation. This will
 #'   heavily affects the number of candidates! Always try to work with a minimal
 #'   set by excluding elements you don't expect. <%=if (genForm) "For
-#'   \\code{generateFormulasSirius}, the" else "The" %> minimum/maximum number
+#'   \\code{generateFormulasSIRIUS}, the" else "The" %> minimum/maximum number
 #'   of elements can also be specified, for example: a value of
 #'   \code{"C[5]H[10-15]O"} will only consider formulae with up to five carbon
 #'   atoms, between ten and fifteen hydrogen atoms and any amount of oxygen

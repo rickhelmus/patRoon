@@ -35,6 +35,7 @@
 - collapse averagedPeakLists
 - test avg params
 - metadata() generic?
+- ensure correct group name order?
 
 
 ## compounds

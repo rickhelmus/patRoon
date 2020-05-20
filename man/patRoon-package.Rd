@@ -56,8 +56,8 @@
   \item \code{patRoon.path.SIRIUS}: The directory in which SIRIUS is
   installed. Unless the binaries can be located via the \option{PATH}
   environment variable, this \emph{must} be set when using
-  \code{\link{generateFormulasSirius}} or
-  \code{\link{generateCompoundsSirius}}. Example:
+  \code{\link{generateFormulasSIRIUS}} or
+  \code{\link{generateCompoundsSIRIUS}}. Example:
   \code{"C:/sirius-win64-3.5.1"}.
 
   \item \code{patRoon.path.OpenMS}: The path in which the \command{OpenMS}
@@ -91,14 +91,14 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Rick Helmus \email{r.helmus@uva.nl}
+\strong{Maintainer}: Rick Helmus \email{r.helmus@uva.nl} (\href{https://orcid.org/0000-0001-9401-3133}{ORCID})
 
 Other contributors:
 \itemize{
-  \item Olaf Brock [contributor]
-  \item Vittorio Albergamo [contributor]
-  \item Andrea Brunner [contributor]
-  \item Emma Schymanski [contributor]
+  \item Olaf Brock (\href{https://orcid.org/0000-0003-4727-8459}{ORCID}) [contributor]
+  \item Vittorio Albergamo (\href{https://orcid.org/0000-0002-5347-1362}{ORCID}) [contributor]
+  \item Andrea Brunner (\href{https://orcid.org/0000-0002-2801-1751}{ORCID}) [contributor]
+  \item Emma Schymanski (\href{https://orcid.org/0000-0001-6868-8145}{ORCID}) [contributor]
 }
 
 }

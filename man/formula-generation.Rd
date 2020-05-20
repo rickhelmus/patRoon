@@ -7,7 +7,7 @@
 \alias{generateFormulas}
 \alias{generateFormulasDA}
 \alias{generateFormulasGenForm}
-\alias{generateFormulasSirius}
+\alias{generateFormulasSIRIUS}
 \alias{formulaScorings}
 \title{Automatic chemical formula generation}
 \usage{
@@ -42,7 +42,7 @@ generateFormulasGenForm(
   batchSize = 8
 )
 
-generateFormulasSirius(
+generateFormulasSIRIUS(
   fGroups,
   MSPeakLists,
   relMzDev = 5,
@@ -51,11 +51,15 @@ generateFormulasSirius(
   profile = "qtof",
   database = NULL,
   noise = NULL,
+  cores = NULL,
   topMost = 100,
-  extraOpts = NULL,
+  extraOptsGeneral = NULL,
+  extraOptsFormula = NULL,
   calculateFeatures = TRUE,
   featThreshold = 0.75,
-  logPath = file.path("log", "sirius"),
+  verbose = TRUE,
+  batchSize = 0,
+  logPath = file.path("log", "sirius_formulas"),
   maxProcAmount = getOption("patRoon.maxProcAmount")
 )
 
@@ -118,7 +122,7 @@ and \option{--ppm-max} commandline options for \command{GenForm} and
 \item{elements}{Elements to be considered for formulae calculation. This will
 heavily affects the number of candidates! Always try to work with a minimal
 set by excluding elements you don't expect. For
-\code{generateFormulasSirius}, the minimum/maximum number
+\code{generateFormulasSIRIUS}, the minimum/maximum number
 of elements can also be specified, for example: a value of
 \code{"C[5]H[10-15]O"} will only consider formulae with up to five carbon
 atoms, between ten and fifteen hydrogen atoms and any amount of oxygen
@@ -242,7 +246,7 @@ DataAnalysis always occurs on 'feature level'.
   chemical formulae. When MS/MS data is available it will be used to score
   candidate formulae by presence of 'fitting' fragments.
 
-\code{generateFormulasSirius} uses
+\code{generateFormulasSIRIUS} uses
   \href{https://bio.informatik.uni-jena.de/software/sirius/}{SIRIUS} to
   generate chemical formulae. Similarity of measured and theoretical isotopic
   patterns will be used for scoring candidates. Note that \command{SIRIUS}

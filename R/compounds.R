@@ -1137,7 +1137,7 @@ setMethod("consensus", "compounds", function(obj, ..., absMinAbundance = NULL,
 #' @templateVar func generateCompounds
 #' @templateVar what generate compounds
 #' @templateVar ex1 generateCompoundsMetfrag
-#' @templateVar ex2 generateCompoundsSirius
+#' @templateVar ex2 generateCompoundsSIRIUS
 #' @templateVar algos metfrag,sirius
 #' @template generic-algo
 #'
@@ -1151,7 +1151,7 @@ setMethod("generateCompounds", "featureGroups", function(fGroups, MSPeakLists, a
 {
     f <- switch(algorithm,
                 metfrag = generateCompoundsMetfrag,
-                sirius = generateCompoundsSirius,
+                sirius = generateCompoundsSIRIUS,
                 stop("Invalid algorithm! Should be: metfrag or sirius"))
 
     f(fGroups, MSPeakLists, ...)

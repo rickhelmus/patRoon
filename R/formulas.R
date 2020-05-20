@@ -875,7 +875,7 @@ setMethod("generateFormulas", "featureGroups", function(fGroups, algorithm, ...)
     f <- switch(algorithm,
                 bruker = generateFormulasDA,
                 genform = generateFormulasGenForm,
-                sirius = generateFormulasSirius,
+                sirius = generateFormulasSIRIUS,
                 stop("Invalid algorithm! Should be: bruker, genform or sirius"))
 
     f(fGroups, ...)

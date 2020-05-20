@@ -97,8 +97,8 @@ NULL
 #'   \item \code{patRoon.path.SIRIUS}: The directory in which SIRIUS is
 #'   installed. Unless the binaries can be located via the \option{PATH}
 #'   environment variable, this \emph{must} be set when using
-#'   \code{\link{generateFormulasSirius}} or
-#'   \code{\link{generateCompoundsSirius}}. Example:
+#'   \code{\link{generateFormulasSIRIUS}} or
+#'   \code{\link{generateCompoundsSIRIUS}}. Example:
 #'   \code{"C:/sirius-win64-3.5.1"}.
 #'
 #'   \item \code{patRoon.path.OpenMS}: The path in which the \command{OpenMS}

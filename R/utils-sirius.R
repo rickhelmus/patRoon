@@ -139,10 +139,9 @@ getSiriusCommand <- function(precursorMZ, MSPList, MSMSPList, profile, adduct, p
                 outPath = outPath, msFName = msFName, cmpName = cmpName, isPre44 = isPre44))
 }
 
-# get a command queue list that can be used with executeMultiProcess()
-getSiriusCommandBatch <- function(precursorMZs, MSPLists, MSMSPLists, profile, adduct, ppmMax, elements,
-                                  database, noise, cores, withFingerID, fingerIDDatabase, topMost, extraOpts,
-                                  isPre44)
+runSIRIUS <- function(precursorMZs, MSPLists, MSMSPLists, profile, adduct, ppmMax, elements,
+                      database, noise, cores, withFingerID, fingerIDDatabase, topMost,
+                      extraOptsGeneral, extraOptsFormula, verbose, isPre44)
 {
     inPath <- tempfile("sirius_in")
     outPath <- tempfile("sirius_out")
@@ -163,6 +162,8 @@ getSiriusCommandBatch <- function(precursorMZs, MSPLists, MSMSPLists, profile, a
     mainArgs <- character()
     if (!is.null(cores))
         mainArgs <- c("--cores", cores)
+    if (!is.null(extraOptsGeneral))
+        mainArgs <- c(mainArgs, extraOptsGeneral)
     
     formArgs <- c("-p", profile,
                   "-e", elements,
@@ -173,8 +174,8 @@ getSiriusCommandBatch <- function(precursorMZs, MSPLists, MSMSPLists, profile, a
         formArgs <- c(formArgs, "-d", database)
     if (!is.null(noise))
         formArgs <- c(formArgs, "-n", noise)
-    if (!is.null(extraOpts))
-        formArgs <- c(formArgs, extraOpts)
+    if (!is.null(extraOptsFormula))
+        formArgs <- c(formArgs, extraOptsFormula)
     
     if (isPre44)
     {
@@ -189,6 +190,181 @@ getSiriusCommandBatch <- function(precursorMZs, MSPLists, MSMSPLists, profile, a
             args <- c(args, "structure", "--database", fingerIDDatabase)
     }
     
-    return(list(command = getCommandWithOptPath(getSiriusBin(), "SIRIUS"), args = args,
-                outPath = outPath, msFNames = msFNames, cmpName = cmpName, isPre44 = isPre44))
+    verbose <- if (verbose) "" else FALSE
+    executeCommand(getCommandWithOptPath(getSiriusBin(), "SIRIUS"), args, stdout = verbose, stderr = verbose)
+    return(list(outPath = outPath, msFNames = msFNames, cmpName = cmpName))
+}
+
+doSIRIUS <- function(allGNames, featMZs, groupPeakLists, profile, adduct, relMzDev, elements,
+                     database, noise, cores, withFingerID, fingerIDDatabase, topMost,
+                     extraOptsGeneral, extraOptsFormula, verbose, isPre44, cacheName, cacheDB, processFunc)
+{
+    doFGroups <- names(featMZs)
+    
+    # skip fgroups without proper ms peak lists
+    if (length(doFGroups) > 0)
+        doFGroups <- doFGroups[sapply(doFGroups,
+                                      function(grp) !is.null(groupPeakLists[[grp]][["MS"]]) &&
+                                          any(groupPeakLists[[grp]][["MS"]]$precursor) &&
+                                          !is.null(groupPeakLists[[grp]][["MSMS"]]))]
+    
+    featMZs <- featMZs[doFGroups]; groupPeakLists <- groupPeakLists[doFGroups]
+    
+    baseHash <- makeHash(profile, adduct, relMzDev, elements, database, noise, topMost, extraOptsGeneral, extraOptsFormula)
+    setHash <- makeHash(featMZs, groupPeakLists, baseHash)
+    cachedSet <- loadCacheSet(cacheName, setHash, cacheDB)
+    
+    hashes <- sapply(doFGroups, function(grp) makeHash(featMZs[grp], groupPeakLists[[grp]], baseHash))
+    
+    if (is.null(cachedSet))
+        saveCacheSet(cacheName, hashes, setHash, cacheDB)
+    
+    cachedResults <- pruneList(sapply(hashes, function(h)
+    {
+        res <- NULL
+        if (!is.null(cachedSet))
+            res <- cachedSet[[h]]
+        if (is.null(res))
+            res <- loadCacheData(cacheName, h, cacheDB)
+        return(res)
+    }, simplify = FALSE))
+    doFGroups <- setdiff(doFGroups, names(cachedResults))
+    
+    if (length(doFGroups) > 0)        
+    {        
+        plmzs <- lapply(doFGroups, function(g) groupPeakLists[[g]][["MS"]][precursor == TRUE, mz])
+        mspls <- lapply(groupPeakLists[doFGroups], "[[", "MS")
+        msmspls <- lapply(groupPeakLists[doFGroups], "[[", "MSMS")
+        runData <- runSIRIUS(plmzs, mspls, msmspls, profile, adduct, relMzDev, elements,
+                             database, noise, cores, withFingerID, fingerIDDatabase, topMost,
+                             extraOptsGeneral, extraOptsFormula, verbose, isPre44)
+        ret <- processFunc(doFGroups, adduct, hashes, runData, isPre44, cacheDB)
+        ngrp <- length(ret)
+    }
+    else
+    {
+        ret <- list()
+        ngrp <- 0
+    }
+    
+    if (length(cachedResults) > 0)
+    {
+        ngrp <- ngrp + length(cachedResults)
+        ret <- c(ret, cachedResults)
+        ret <- ret[intersect(allGNames, names(ret))] # re-order
+    }
+    
+    # prune after combining with cached results: these may also contain zero row results
+    ret <- pruneList(ret, checkZeroRows = TRUE)
+    
+    return(ret)
+}
+
+doSIRIUS2 <- function(allGNames, MSPeakLists, doFeatures, profile, adduct, relMzDev, elements,
+                      database, noise, cores, withFingerID, fingerIDDatabase, topMost,
+                      extraOptsGeneral, extraOptsFormula, verbose, cacheName, processFunc)
+{
+    isPre44 <- isSIRIUSPre44()
+    
+    # only do relevant feature groups
+    MSPeakLists <- MSPeakLists[, intersect(allGNames, groupNames(MSPeakLists))]
+    
+    cacheDB <- openCacheDBScope() # open manually so caching code doesn't need to on each R/W access
+    baseHash <- makeHash(profile, adduct, relMzDev, elements, database, noise,
+                         withFingerID, fingerIDDatabase, topMost, extraOptsGeneral,
+                         extraOptsFormula, isPre44)
+    setHash <- makeHash(MSPeakLists, baseHash, doFeatures)
+    cachedSet <- loadCacheSet(cacheName, setHash, cacheDB)
+
+    if (doFeatures)
+    {
+        pLists <- peakLists(MSPeakLists)
+        flattenedPLists <- unlist(pLists, recursive = FALSE)
+        
+        # important: assign before subset step below
+        flPLMeta <- data.table(name = names(flattenedPLists),
+                               group = unlist(lapply(pLists, names), use.names = FALSE),
+                               analysis = rep(names(pLists), times = lengths(pLists)))
+    }
+    else
+    {
+        flattenedPLists <- averagedPeakLists(MSPeakLists)
+        flPLMeta <- data.table(name = names(flattenedPLists), group = names(flattenedPLists))
+    }
+
+    validPL <- function(pl) !is.null(pl[["MS"]]) && !is.null(pl[["MSMS"]]) && any(pl[["MS"]]$precursor)
+    flattenedPLists <- flattenedPLists[sapply(flattenedPLists, validPL)]
+    flPLMeta <- flPLMeta[name %in% names(flattenedPLists)]
+    
+    flPLMeta[, hash := sapply(flattenedPLists, makeHash, baseHash)]
+    if (is.null(cachedSet))
+        saveCacheSet(cacheName, flPLMeta$hash, setHash, cacheDB)
+
+    if (length(flattenedPLists) > 0)        
+    {
+        cachedResults <- pruneList(sapply(flPLMeta$hash, function(h)
+        {
+            res <- NULL
+            if (!is.null(cachedSet))
+                res <- cachedSet[[h]]
+            if (is.null(res))
+                res <- loadCacheData(cacheName, h, cacheDB)
+            return(res)
+        }, simplify = FALSE))
+        flPLMeta[, cached := hash %in% names(cachedResults)]
+        doPLists <- flattenedPLists[!flPLMeta$cached]
+        
+        plmzs <- lapply(doPLists, function(pl) pl[["MS"]][precursor == TRUE, mz])
+        mspls <- lapply(doPLists, "[[", "MS")
+        msmspls <- lapply(doPLists, "[[", "MSMS")
+        
+        flPLMeta[, msFName := character()]
+        if (length(doPLists) > 0)
+        {
+            runData <- runSIRIUS(plmzs, mspls, msmspls, profile, adduct, relMzDev, elements,
+                                 database, noise, cores, withFingerID, fingerIDDatabase, topMost,
+                                 extraOptsGeneral, extraOptsFormula, verbose, isPre44)
+            flPLMeta[cached == FALSE, msFName := runData$msFNames]
+        }
+        else
+            runData <- list()
+
+        processResultSet <- function(meta)
+        {
+            if (any(!meta$cached))
+            {
+                procArgs <- list(outPath = runData$outPath, cmpName = runData$cmpName, adduct = adduct,
+                                 isPre44 = isPre44, cacheDB = cacheDB)
+                
+                metaNew <- meta[cached == FALSE]
+                res <- mapply(metaNew$msFName, metaNew$hash, SIMPLIFY = FALSE,
+                              FUN = function(n, h) do.call(processFunc, c(list(msFName = n, hash = h),
+                                                                          procArgs)))
+                names(res) <- metaNew$group
+            }
+            else
+                res <- list()
+            
+            if (length(cachedResults) > 0)
+            {
+                metaCached <- meta[cached == TRUE]
+                res <- c(res, setNames(cachedResults[metaCached$hash], metaCached$group))
+            }
+            
+            res <- pruneList(res, checkZeroRows = TRUE)
+            res <- res[intersect(allGNames, names(res))] # ensure correct order
+            
+            return(res)
+        }
+
+        if (doFeatures)
+            ret <- sapply(unique(flPLMeta$analysis), function(ana) processResultSet(flPLMeta[analysis == ana]),
+                          simplify = FALSE)
+        else
+            ret <- processResultSet(flPLMeta)
+    }
+    else
+        ret <- list()
+    
+    return(ret)
 }

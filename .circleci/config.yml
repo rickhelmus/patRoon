@@ -116,5 +116,9 @@ workflows:
                 requires:
                     - build
             - docs:
+                filters:
+                    branches:
+                        only:
+                            - master
                 requires:
                     - build

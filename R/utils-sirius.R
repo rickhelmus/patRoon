@@ -234,6 +234,9 @@ doSIRIUS <- function(allGNames, MSPeakLists, doFeatures, profile, adduct, relMzD
     # only do relevant feature groups
     MSPeakLists <- MSPeakLists[, intersect(allGNames, groupNames(MSPeakLists))]
     
+    if (length(MSPeakLists) == 0)
+        return(list())
+    
     cacheDB <- openCacheDBScope() # open manually so caching code doesn't need to on each R/W access
     baseHash <- makeHash(profile, adduct, relMzDev, elements, database, noise,
                          withFingerID, fingerIDDatabase, topMost, extraOptsGeneral,

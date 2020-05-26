@@ -119,10 +119,9 @@ generateFormulasSIRIUS <- function(fGroups, MSPeakLists, relMzDev = 5, adduct = 
     
     adduct <- checkAndToAdduct(adduct)
     gNames <- names(fGroups)
-    
     gCount <- length(fGroups)
-    printf("Processing %d feature groups with SIRIUS...\n---\n", gCount)
     
+    printf("Processing %d feature groups with SIRIUS...\n---\n", gCount)
     formTable <- doSIRIUS(gNames, MSPeakLists, calculateFeatures, profile, adduct, relMzDev, elements,
                           database, noise, cores, FALSE, NULL, topMost, extraOptsGeneral, extraOptsFormula,
                           verbose, "formulasSIRIUS", processSIRIUSFormulas, NULL,
@@ -147,7 +146,7 @@ generateFormulasSIRIUS <- function(fGroups, MSPeakLists, relMzDev = 5, adduct = 
     if (verbose)
     {
         printf("-------\n")
-        if (calculateFeatures)
+        if (calculateFeatures && length(formTable) > 0)
         {
             fCounts <- sapply(formTable, countUniqueFormulas)
             fTotCount <- sum(fCounts)

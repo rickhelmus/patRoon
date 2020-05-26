@@ -1,8 +1,15 @@
-# patRoon 0.1.0.9000
+# patRoon 1.0
 
 ## May 2020
 
-* Support for SIRIUS 4.4.
+* **IMPORTANT** Major changes were made related to `SIRIUS` support 
+    * Multiple features can now be annotated at once by `SIRIUS` (configurable with new `SIRBatchSize` function argument). This dramatically improves overal calculation times (thanks to Markus Fleischauer for pointing out this possibility!).
+    * `generateFormulasSirius()` and `generateCompoundsSirius()` are now properly capitalized to `generateFormulasSIRIUS()` and `generateCompoundsSIRIUS()`
+    * Support for `SIRIUS` 4.4.
+    * If all features are annotated at once then `SIRIUS` output is directly shown on the console.
+    * The amount of cores used by `SIRIUS` can be specified with the `cores` function arguments.
+    * More extra commandline options can be given to `SIRIUS`
+* Fixed: `groupNames()`, `analyses()` and similar methods sometimes returned `NULL` instead of an empty `character` vector for empty objects.
 
 ## April 2020
 

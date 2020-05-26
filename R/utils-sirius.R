@@ -34,7 +34,7 @@ getSiriusFragFiles <- function(resultPath, isPre44)
     if (isPre44)
         pat <- "[:0-9:]+_([A-Za-z0-9]+).*\\.ms"
     else
-        pat <- "([A-Za-z0-9]+).*\\.csv"
+        pat <- "([A-Za-z0-9]+).*\\.tsv"
     return(list.files(file.path(resultPath, "spectra"), full.names = TRUE, pattern = pat))
 }
 
@@ -43,7 +43,7 @@ getFormulaFromSiriusFragFile <- function(ffile, isPre44)
     if (isPre44)
         pat <- "[:0-9:]+_([A-Za-z0-9]+).*\\.ms"
     else
-        pat <- "([A-Za-z0-9]+).*\\.csv"
+        pat <- "([A-Za-z0-9]+).*\\.tsv"
     return(gsub(pat, "\\1", basename(ffile)))
 }
 

@@ -15,8 +15,7 @@ processSIRIUSFormulas <- function(msFName, outPath, cmpName, adduct, hash, isPre
                                     neutral_loss = character(0), explainedPeaks = integer(0), explainedIntensity = numeric(0))
     
     
-    resFile <- if (isPre44) "summary_sirius.csv" else "formula_candidates.csv"
-    
+    resFile <- if (isPre44) "summary_sirius.csv" else "formula_candidates.tsv"
     resultPath <- getSiriusResultPath(outPath, msFName, cmpName, isPre44)
     summary <- file.path(resultPath, resFile)
     if (length(summary) == 0 || length(summary) == 0 || !file.exists(summary))

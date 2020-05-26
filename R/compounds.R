@@ -54,6 +54,13 @@ compounds <- setClass("compounds",
                       slots = c(compounds = "list", scoreTypes = "character", scoreRanges = "list"),
                       contains = "workflowStep")
 
+setMethod("initialize", "compounds", function(.Object, ...)
+{
+    .Object <- callNextMethod(.Object, ...)
+    .Object@compounds <- makeEmptyListNamed(.Object@compounds)
+    return(.Object)
+})
+
 #' @rdname compounds-class
 compoundsConsensus <- setClass("compoundsConsensus",
                                slots = c(mergedCompNames = "character"),

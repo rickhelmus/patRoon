@@ -58,6 +58,13 @@ components <- setClass("components",
                        slots = c(components = "list", componentInfo = "data.table"),
                        contains = "workflowStep")
 
+setMethod("initialize", "components", function(.Object, ...)
+{
+    .Object <- callNextMethod(.Object, ...)
+    .Object@components <- makeEmptyListNamed(.Object@components)
+    return(.Object)
+})
+
 #' @rdname components-class
 componentsReduced <- setClass("componentsReduced",
                               contains = "components")

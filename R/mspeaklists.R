@@ -95,6 +95,10 @@ setMethod("initialize", "MSPeakLists", function(.Object, ...)
     if (length(.Object@avgPeakListArgs) > 0)
         .Object@averagedPeakLists <- do.call(averageMSPeakLists, c(list(.Object@peakLists),
                                                                    .Object@avgPeakListArgs))
+    
+    .Object@peakLists <- makeEmptyListNamed(.Object@peakLists)
+    .Object@averagedPeakLists <- makeEmptyListNamed(.Object@averagedPeakLists)
+    
     return(.Object)
 })
 

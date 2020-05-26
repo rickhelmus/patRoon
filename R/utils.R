@@ -310,6 +310,13 @@ pruneList <- function(l, checkEmptyElements = FALSE, checkZeroRows = FALSE)
     return(ret)
 }
 
+makeEmptyListNamed <- function(li)
+{
+    if (length(li) == 0)
+        names(li) <- character()
+    return(li)
+}
+
 # based on tabular() from formatting vignette of roxygen
 # nocov start
 tabularRD <- function(df, ...)

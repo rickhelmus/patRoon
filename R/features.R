@@ -43,6 +43,13 @@ features <- setClass("features",
                      slots = c(features = "list", analysisInfo = "data.frame"),
                      contains = c("VIRTUAL", "workflowStep"))
 
+setMethod("initialize", "features", function(.Object, ...)
+{
+    .Object <- callNextMethod(.Object, ...)
+    .Object@features <- makeEmptyListNamed(.Object@features)
+    return(.Object)
+})
+
 #' @describeIn features Obtain total number of features.
 #' @export
 setMethod("length", "features", function(x) if (length(x@features) > 0) sum(sapply(x@features, nrow)) else 0)

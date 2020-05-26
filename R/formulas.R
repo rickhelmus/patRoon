@@ -65,8 +65,12 @@ setMethod("initialize", "formulas", function(.Object, ...)
     .Object <- callNextMethod(.Object, ...)
 
     # NOTE: change this if topMost filter for formulas is ever implemented
+    # (since it can change the actual range?)
     .Object@scoreRanges <- sapply(.Object@formulas, calculateFormScoreRanges, simplify = FALSE)
 
+    .Object@formulas <- makeEmptyListNamed(.Object@formulas)
+    .Object@featureFormulas <- makeEmptyListNamed(.Object@featureFormulas)
+    
     return(.Object)
 })
 

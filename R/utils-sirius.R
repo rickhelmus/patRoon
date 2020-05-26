@@ -219,7 +219,7 @@ runSIRIUS <- function(precursorMZs, MSPLists, MSMSPLists, profile, adduct, ppmMa
                         maxProcAmount = maxProcAmount, showProgress = !singular,
                         finishHandler = function(...) NULL)
     
-    return(list(outPaths = unlist(sapply(cmdQueue, function(cmd) rep(cmd$outPath, length(cmd$msFNames))), use.names = FALSE),
+    return(list(outPaths = unlist(lapply(cmdQueue, function(cmd) rep(cmd$outPath, length(cmd$msFNames))), use.names = FALSE),
                 msFNames = unlist(lapply(cmdQueue, "[[", "msFNames"), use.names = FALSE),
                 cmpName = cmpName))
 }

@@ -88,9 +88,8 @@ processSIRIUSFormulas <- function(msFName, outPath, cmpName, adduct, hash, isPre
 #'
 #' @templateVar ident FALSE
 #' @template sirius-args
-#'
-#' @references \insertRef{Duhrkop2015}{patRoon} \cr\cr
-#'   \insertRef{Bcker2008}{patRoon}
+#' 
+#' @param verbose If \code{TRUE} then more output is shown in the terminal.
 #'
 #' @rdname formula-generation
 #' @export
@@ -98,7 +97,7 @@ generateFormulasSIRIUS <- function(fGroups, MSPeakLists, relMzDev = 5, adduct = 
                                    profile = "qtof", database = NULL, noise = NULL, cores = NULL, topMost = 100,
                                    extraOptsGeneral = NULL, extraOptsFormula = NULL, calculateFeatures = TRUE,
                                    featThreshold = 0.75, verbose = TRUE,
-                                   batchSize = 0, logPath = file.path("log", "sirius_formulas"),
+                                   SIRBatchSize = 0, logPath = file.path("log", "sirius_formulas"),
                                    maxProcAmount = getOption("patRoon.maxProcAmount"))
 {
     ac <- checkmate::makeAssertCollection()
@@ -114,18 +113,20 @@ generateFormulasSIRIUS <- function(fGroups, MSPeakLists, relMzDev = 5, adduct = 
     checkmate::assertFlag(calculateFeatures, add = ac)
     checkmate::assertNumber(featThreshold, lower = 0, finite = TRUE, null.ok = TRUE, add = ac)
     checkmate::assertFlag(verbose, add = ac)
-    checkmate::assertCount(batchSize, add = ac)
+    checkmate::assertCount(SIRBatchSize, add = ac)
     assertMultiProcArgs(logPath, maxProcAmount, add = ac)
     checkmate::reportAssertions(ac)
     
     adduct <- checkAndToAdduct(adduct)
-    
     gNames <- names(fGroups)
+    
+    gCount <- length(fGroups)
+    printf("Processing %d feature groups with SIRIUS...\n---\n", gCount)
     
     formTable <- doSIRIUS(gNames, MSPeakLists, calculateFeatures, profile, adduct, relMzDev, elements,
                           database, noise, cores, FALSE, NULL, topMost, extraOptsGeneral, extraOptsFormula,
                           verbose, "formulasSIRIUS", processSIRIUSFormulas, NULL,
-                          batchSize, logPath, maxProcAmount)
+                          SIRBatchSize, logPath, maxProcAmount)
         
     if (calculateFeatures)
     {
@@ -155,7 +156,6 @@ generateFormulasSIRIUS <- function(fGroups, MSPeakLists, relMzDev = 5, adduct = 
             printf("Total: %d\n", fTotCount)
         }
         ngrp <- length(groupFormulas)
-        gCount <- length(fGroups)
         printf("Assigned %d unique formulas to %d feature groups (%.2f%% coverage).\n", countUniqueFormulas(groupFormulas),
                ngrp, if (gCount == 0) 0 else ngrp * 100 / gCount)
     }

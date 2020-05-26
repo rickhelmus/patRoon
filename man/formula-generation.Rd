@@ -58,7 +58,7 @@ generateFormulasSIRIUS(
   calculateFeatures = TRUE,
   featThreshold = 0.75,
   verbose = TRUE,
-  batchSize = 0,
+  SIRBatchSize = 0,
   logPath = file.path("log", "sirius_formulas"),
   maxProcAmount = getOption("patRoon.maxProcAmount")
 )
@@ -177,13 +177,34 @@ performance. For more information see \code{\link{executeMultiProcess}}.}
 \option{"qtof"}, \option{"orbitrap"}, \option{"fticr"}. Sets the
 \option{--profile} commandline option.}
 
-\item{database}{If not \code{NULL}, use a database for retrieval of formula
-candidates. Possible values are: \option{"pubchem"}, \option{"bio"},
-\option{"kegg"}, \option{"hmdb"}. Sets the \option{--database} commandline
-option.}
+\item{database}{If not \code{NULL},
+use a database for retrieval of formula candidates. Possible values are:
+\option{"pubchem"}, \option{"bio"}, \option{"kegg"}, \option{"hmdb"}. Sets
+the \option{--database} commandline option.}
 
 \item{noise}{Median intensity of the noise (\code{NULL} ignores this
 parameter). Sets the \option{--noise} commandline option.}
+
+\item{cores}{The number of cores \command{SIRIUS} will use. If \code{NULL}
+then the default of all cores will be used.}
+
+\item{extraOptsGeneral, extraOptsFormula}{a \code{character} vector with any
+extra commandline parameters for \command{SIRIUS}. For \command{SIRIUS}
+versions \code{<4.4} there is no distinction between general and formula
+options. Otherwise commandline options specified in \code{extraOptsGeneral}
+are added prior to the \code{formula} command, while options specified in
+\code{extraOptsFormula} are added in afterwards. See the \command{SIRIUS}
+manual for more details. Set to \code{NULL} to ignore.}
+
+\item{verbose}{If \code{TRUE} then more output is shown in the terminal.}
+
+\item{SIRBatchSize}{The maximum number of calculations done by
+\command{SIRIUS}. If this number is less than the amount of features to be
+calculated then calculations will be evenly split over multiple
+\command{SIRIUS} calls (which may be run in parallel if
+\command{maxProcAmount>1}). If \code{SIRBatchSize=0} then all feature
+calculations are performed from a single \command{SIRIUS} exection, which
+is often the fastest.}
 
 \item{logPath}{Destination directory for log files with output from executed
 commands. Will be created if non-existant. Set to \code{NULL} to disable
@@ -270,6 +291,11 @@ If any errors related to \command{DCOM} appear it might be necessary to
   formula calculation may need a very long time. Timeouts are used to avoid
   excessive computational times by terminating long running commands (set by
   the \code{timeout} argument).
+
+For annotations performed with \command{SIRIUS} it is often the fastest
+  to keep the default \code{SIRBatchSize=0}. In this case, the
+  \code{maxProcAmount} argument will be ignored and all \command{SIRIUS}
+  output will be printed to the terminal (unless \code{verbose=FALSE}).
 }
 \section{Scorings}{
  Each algorithm implements their own scoring system. Their
@@ -353,8 +379,8 @@ Explanation:
 \references{
 \insertRef{Meringer2011}{patRoon}
 
-\insertRef{Duhrkop2015}{patRoon} \cr\cr
-  \insertRef{Bcker2008}{patRoon}
+\insertRef{Dhrkop2019}{patRoon} \cr\cr \insertRef{Duhrkop2015}{patRoon} \cr\cr
+  \insertRef{Duhrkop2015-2}{patRoon} \cr\cr \insertRef{Bcker2008}{patRoon}
 }
 \seealso{
 \code{\link{formulas-class}}. The

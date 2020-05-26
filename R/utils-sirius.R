@@ -142,7 +142,7 @@ getSiriusCommand <- function(precursorMZ, MSPList, MSMSPList, profile, adduct, p
 runSIRIUS <- function(precursorMZs, MSPLists, MSMSPLists, profile, adduct, ppmMax, elements,
                       database, noise, cores, withFingerID, fingerIDDatabase, topMost,
                       extraOptsGeneral, extraOptsFormula, verbose, isPre44,
-                      batchSize, logPath, maxProcAmount)
+                      SIRBatchSize, logPath, maxProcAmount)
 {
     if (!is.null(logPath))
         mkdirp(logPath)
@@ -184,12 +184,12 @@ runSIRIUS <- function(precursorMZs, MSPLists, MSMSPLists, profile, adduct, ppmMa
     # verbose <- if (verbose) "" else FALSE
     # executeCommand(getCommandWithOptPath(getSiriusBin(), "SIRIUS"), args, stdout = verbose, stderr = verbose)
     
-    if (batchSize == 0)
+    if (SIRBatchSize == 0)
         batches <- list(seq_along(precursorMZs))
     else
     {
         # splitting a vector in chunks: https://stackoverflow.com/a/3321659
-        batches <- split(seq_along(precursorMZs), ceiling(seq_along(precursorMZs) / batchSize))
+        batches <- split(seq_along(precursorMZs), ceiling(seq_along(precursorMZs) / SIRBatchSize))
     }
     command <- getCommandWithOptPath(getSiriusBin(), "SIRIUS")
     cmdQueue <- lapply(seq_along(batches), function(bi)
@@ -227,7 +227,7 @@ runSIRIUS <- function(precursorMZs, MSPLists, MSMSPLists, profile, adduct, ppmMa
 doSIRIUS <- function(allGNames, MSPeakLists, doFeatures, profile, adduct, relMzDev, elements,
                      database, noise, cores, withFingerID, fingerIDDatabase, topMost,
                      extraOptsGeneral, extraOptsFormula, verbose, cacheName, processFunc, processArgs,
-                     batchSize, logPath, maxProcAmount)
+                     SIRBatchSize, logPath, maxProcAmount)
 {
     isPre44 <- isSIRIUSPre44()
     
@@ -290,7 +290,7 @@ doSIRIUS <- function(allGNames, MSPeakLists, doFeatures, profile, adduct, relMzD
             runData <- runSIRIUS(plmzs, mspls, msmspls, profile, adduct, relMzDev, elements,
                                  database, noise, cores, withFingerID, fingerIDDatabase, topMost,
                                  extraOptsGeneral, extraOptsFormula, verbose, isPre44,
-                                 batchSize, logPath, maxProcAmount)
+                                 SIRBatchSize, logPath, maxProcAmount)
             flPLMeta[cached == FALSE, outPath := runData$outPaths]
             flPLMeta[cached == FALSE, msFName := runData$msFNames]
         }

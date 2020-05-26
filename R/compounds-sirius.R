@@ -75,9 +75,7 @@ processSIRIUSCompounds <- function(msFName, outPath, cmpName, MSMS, database, ad
 #'   for compound identification. Similar to
 #'   \code{\link{generateFormulasSIRIUS}}, candidate formulae are generated with
 #'   SIRIUS. These results are then feed to CSI:FingerID to acquire candidate
-#'   structures. Candidates are then scored on similarity of measured and
-#'   in-silico predicted MS/MS fragments and if the PubChem database is used, on
-#'   the number of references in patents. This method requires the availability
+#'   structures. This method requires the availability
 #'   of MS/MS data, and feature groups without it will be ignored.
 #'
 #' @templateVar ident TRUE
@@ -95,9 +93,7 @@ processSIRIUSCompounds <- function(msFName, outPath, cmpName, MSMS, database, ad
 #' @param topMostFormulas Do not return more than this number of candidate
 #'   formulae. Note that only compounds for these formulae will be searched.
 #'   Sets the \option{--candidates} commandline option.
-#'
-#' @references \insertRef{Duhrkop2015}{patRoon} \cr\cr
-#'   \insertRef{Duhrkop2015-2}{patRoon} \cr\cr \insertRef{Bcker2008}{patRoon}
+#' @param verbose If \code{TRUE} then more output is shown in the terminal.
 #'
 #' @rdname compound-generation
 #' @export
@@ -105,7 +101,7 @@ generateCompoundsSIRIUS <- function(fGroups, MSPeakLists, relMzDev = 5, adduct =
                                     profile = "qtof", formulaDatabase = NULL, fingerIDDatabase = "pubchem",
                                     noise = NULL, errorRetries = 2, cores = NULL, topMost = 100, topMostFormulas = 5,
                                     extraOptsGeneral = NULL, extraOptsFormula = NULL, verbose = TRUE,
-                                    batchSize = 0, logPath = file.path("log", "sirius_compounds"),
+                                    SIRBatchSize = 0, logPath = file.path("log", "sirius_compounds"),
                                     maxProcAmount = getOption("patRoon.maxProcAmount"))
 {
     ac <- checkmate::makeAssertCollection()
@@ -120,7 +116,7 @@ generateCompoundsSIRIUS <- function(fGroups, MSPeakLists, relMzDev = 5, adduct =
     aapply(checkmate::assertCount, . ~ topMost + topMostFormulas, positive = TRUE, fixed = list(add = ac))
     aapply(checkmate::assertCharacter, . ~ extraOptsGeneral + extraOptsFormula, null.ok = TRUE, fixed = list(add = ac))
     checkmate::assertFlag(verbose, add = ac)
-    checkmate::assertCount(batchSize, add = ac)
+    checkmate::assertCount(SIRBatchSize, add = ac)
     assertMultiProcArgs(logPath, maxProcAmount, add = ac)
     checkmate::reportAssertions(ac)
 
@@ -136,7 +132,7 @@ generateCompoundsSIRIUS <- function(fGroups, MSPeakLists, relMzDev = 5, adduct =
                         formulaDatabase, noise, cores, TRUE, fingerIDDatabase, topMost, extraOptsGeneral, extraOptsFormula,
                         verbose, "compoundsSIRIUS", processSIRIUSCompounds,
                         list(database = fingerIDDatabase, topMost = topMost),
-                        batchSize, logPath, maxProcAmount)
+                        SIRBatchSize, logPath, maxProcAmount)
     
     # prune empty/NULL results
     if (length(results) > 0)

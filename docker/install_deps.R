@@ -6,6 +6,7 @@ BiocManager::install(c("mzR", "xcms", "CAMERA"))
 BiocManager::install(c("Rdisop", "InterpretMSSpectrum")) # need to install these deps manually (why??)
 
 remotes::install_github("rickhelmus/patRoonData", upgrade = "never")
+remotes::install_github("jokergoo/circlize", upgrade = "never")
 install.packages("vdiffr")
 
 install.packages("desc")

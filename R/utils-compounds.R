@@ -144,12 +144,9 @@ getCompInfoList <- function(compResults, compIndex, addHTMLURL, mCompNames)
             if (is.na(ident) || !nzchar(ident))
                 return(character())
 
-            # CSI:FingerID might return multiple identifiers
-            idlist <- unlist(strsplit(ident, ";"))
+            # CSI:FingerID/PubChemLite might return multiple identifiers, separated by ; or a space
+            idlist <- unlist(strsplit(ident, ";| "))
 
-            # Same for PubChemLite with MetFrag, but space spearated
-            idlist <- unlist(strsplit(ident, " "))
-            
             if (grepl("pubchem", tolower(db)))
                 fmt <- "<a target=\"_blank\" href=\"https://pubchem.ncbi.nlm.nih.gov/compound/%s\">%s</a>"
             else if (tolower(db) == "chemspider")

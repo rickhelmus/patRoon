@@ -10,6 +10,7 @@
     * The amount of cores used by `SIRIUS` can be specified with the `cores` function arguments.
     * More extra commandline options can be given to `SIRIUS`
 * Fixed: `groupNames()`, `analyses()` and similar methods sometimes returned `NULL` instead of an empty `character` vector for empty objects.
+* `plotHeatMap()` with `interactive=TRUE`: switch from now removed `d3heatmap` package to `heatmaply`
 
 ## April 2020
 

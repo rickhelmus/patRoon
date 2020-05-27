@@ -47,7 +47,7 @@ genIntComponentInfo <- function(cutClusters)
 #' @param col The colour used for plotting. Set to \code{NULL} for automatic
 #'   colours.
 #' @param \dots Further options passed to \code{\link{heatmap.2}} /
-#'   \code{\link{d3heatmap}} (\code{plotHeatMap}), \code{\link{plot.dendrogram}}
+#'   \code{\link{heatmaply}} (\code{plotHeatMap}), \code{\link{plot.dendrogram}}
 #'   (\code{plot}) or \code{\link[graphics]{plot}} (\code{plotInt}).
 #'
 #' @references \insertRef{Scholle2018}{patRoon}
@@ -131,12 +131,12 @@ setMethod("treeCutDynamic", "componentsIntClust", function(obj, maxTreeHeight, d
 })
 
 #' @describeIn componentsIntClust draws a heatmap using the
-#'   \code{\link{heatmap.2}} or \code{\link{d3heatmap}} function.
+#'   \code{\link{heatmap.2}} or \code{\link{heatmaply}} function.
 #' @param interactive If \code{TRUE} an interactive heatmap will be drawn (with
-#'   \code{\link{d3heatmap}}).
+#'   \code{\link{heatmaply}}).
 #' @param margins,cexCol Passed to \code{\link{heatmap.2}}
 #' @return \code{plotHeatMap} returns the same as \code{\link{heatmap.2}} or
-#'   \code{\link{d3heatmap}}.
+#'   \code{\link{heatmaply}}.
 #' @aliases plotHeatMap
 #' @export
 setMethod("plotHeatMap", "componentsIntClust", function(obj, interactive = FALSE, col = NULL,
@@ -150,9 +150,9 @@ setMethod("plotHeatMap", "componentsIntClust", function(obj, interactive = FALSE
         col <- colorRampPalette(c("blue", "yellow", "red"))(300)
     
     if (interactive)
-        d3heatmap::d3heatmap(obj@clusterm, Colv = NA, distfun = function(d) dist(d, obj@properties$metric),
+        heatmaply::heatmaply(obj@clusterm, Colv = NA, distfun = function(d) dist(d, obj@properties$metric),
                              hclustfun = function(h) hclust(h, obj@properties$method),
-                             scale = "none", colors = col, ...)
+                             scale = "none", colors = col, showticklabels = c(FALSE, FALSE), ...)
     else
         gplots::heatmap.2(obj@clusterm, Colv = NA, distfun = function(d) dist(d, obj@properties$metric),
                           hclustfun = function(h) hclust(h, obj@properties$method),

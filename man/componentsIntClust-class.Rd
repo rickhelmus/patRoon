@@ -57,7 +57,7 @@ Analogous to \code{\link{cutree}}.}
 \code{\link{cutreeDynamicTree}}.}
 
 \item{interactive}{If \code{TRUE} an interactive heatmap will be drawn (with
-\code{\link{d3heatmap}}).}
+\code{\link{heatmaply}}).}
 
 \item{col}{The colour used for plotting. Set to \code{NULL} for automatic
 colours.}
@@ -65,7 +65,7 @@ colours.}
 \item{margins, cexCol}{Passed to \code{\link{heatmap.2}}}
 
 \item{\dots}{Further options passed to \code{\link{heatmap.2}} /
-\code{\link{d3heatmap}} (\code{plotHeatMap}), \code{\link{plot.dendrogram}}
+\code{\link{heatmaply}} (\code{plotHeatMap}), \code{\link{plot.dendrogram}}
 (\code{plot}) or \code{\link[graphics]{plot}} (\code{plotInt}).}
 
 \item{index}{Numeric component/cluster index.}
@@ -95,7 +95,7 @@ average silhouette width calculation.}
 }
 \value{
 \code{plotHeatMap} returns the same as \code{\link{heatmap.2}} or
-  \code{\link{d3heatmap}}.
+  \code{\link{heatmaply}}.
 }
 \description{
 This class is derived from \code{\link{components}} and is used to store
@@ -125,7 +125,7 @@ the \code{\link{cutreeDynamicTree}} function from
 \pkg{\link{dynamicTreeCut}}.
 
 \item \code{plotHeatMap}: draws a heatmap using the
-\code{\link{heatmap.2}} or \code{\link{d3heatmap}} function.
+\code{\link{heatmap.2}} or \code{\link{heatmaply}} function.
 
 \item \code{plotInt}: makes a plot for all (normalized) intensity
 profiles of the feature groups within a given cluster.

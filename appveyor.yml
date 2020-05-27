@@ -20,8 +20,8 @@ install:
             Invoke-WebRequest http://msbi.ipb-halle.de/~cruttkie/metfrag/MetFrag2.4.5-CL.jar -OutFile "C:\deps\MetFrag2.4.5-CL.jar"
         }
     - ps: >-
-        if (-Not (Test-Path C:\deps\sirius-win64-headless-4.4.17)) {
-            Invoke-WebRequest https://bio.informatik.uni-jena.de/repository/dist-release-local/de/unijena/bioinf/ms/sirius/4.4.17/sirius-4.4.17-win64-headless.zip -OutFile "C:\deps\sirius-win.zip"
+        if (-Not (Test-Path C:\deps\sirius-win64-headless-4.4.23)) {
+            Invoke-WebRequest https://bio.informatik.uni-jena.de/repository/dist-release-local/de/unijena/bioinf/ms/sirius/4.4.23/sirius-4.4.23-win64-headless.zip -OutFile "C:\deps\sirius-win.zip"
             7z x -oC:\deps\ C:\deps\sirius-win.zip
         }
     - ps: >-
@@ -72,11 +72,11 @@ build_script:
     - travis-tool.sh install_deps
 
 test_script:
-    - set JAVA_HOME=C:\Program Files\Java\jdk11
-    - set PATH=C:\Program Files\OpenMS-2.5.0\bin;C:\Program Files\OpenBabel-3.0.0;%PATH%
+    - set JAVA_HOME=C:\PROGRA~1\Java\jdk11
+    - set PATH=%JAVA_HOME%\bin;C:\Program Files\OpenMS-2.5.0\bin;C:\Program Files\OpenBabel-3.0.0;%PATH%
     - set OPENMS_DATA_PATH=C:\Program Files\OpenMS-2.5.0\share\OpenMS
     - set PATROON_METFRAG=C:\deps\MetFrag2.4.5-CL.jar
-    - set PATROON_SIRIUS=C:\deps\sirius-win64-headless-4.4.17
+    - set PATROON_SIRIUS=C:\deps\sirius-win64-headless-4.4.23
     - set PATROON_JUNIT=%APPVEYOR_BUILD_FOLDER%\junit.xml
     # HACK for SIRIUS
     - del C:\tools\Coverity\bin\jnidispatch.dll

@@ -48,6 +48,6 @@ ADD --chown=patRoon . patRoon
 
 RUN Rscript -e 'devtools::install(pkg = "patRoon", upgrade = FALSE)'
 
-ENV OPENMS_DATA_PATH=/usr/share/OpenMS _R_CHECK_FORCE_SUGGESTS_=0 R_MAX_NUM_DLLS=150 JAVA_HOME=zulu11.39.15-ca-jre11.0.7-linux_x64
+ENV OPENMS_DATA_PATH=/usr/share/OpenMS _R_CHECK_FORCE_SUGGESTS_=0 R_MAX_NUM_DLLS=150
 
 CMD ["R"]

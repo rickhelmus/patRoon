@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>5.1 Inspecting results | patRoon handbook</title>
   <meta name="description" content="5.1 Inspecting results | patRoon handbook" />
-  <meta name="generator" content="bookdown 0.18 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.19 and GitBook 2.6.7" />
 
   <meta property="og:title" content="5.1 Inspecting results | patRoon handbook" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2020-04-30" />
+<meta name="date" content="2020-05-28" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -53,16 +53,17 @@
 <script src="libs/htmlwidgets-1.5.1/htmlwidgets.js"></script>
 <script src="libs/viz-1.8.2/viz.js"></script>
 <link href="libs/DiagrammeR-styles-0.2/styles.css" rel="stylesheet" />
-<script src="libs/grViz-binding-1.0.5/grViz.js"></script>
+<script src="libs/grViz-binding-1.0.6.1/grViz.js"></script>
 <script src="libs/kePrint-0.0.1/kePrint.js"></script>
 <link href="libs/vis-4.20.1/vis.css" rel="stylesheet" />
 <script src="libs/vis-4.20.1/vis.min.js"></script>
 <script src="libs/visNetwork-binding-2.0.9/visNetwork.js"></script>
-<script src="libs/d3-3.5.3/./d3.min.js"></script>
-<link href="libs/d3heatmapcore-0.0.0/heatmapcore.css" rel="stylesheet" />
-<script src="libs/d3heatmapcore-0.0.0/heatmapcore.js"></script>
-<script src="libs/d3-tip-0.6.6/index.js"></script>
-<script src="libs/d3heatmap-binding-0.6.1.2/d3heatmap.js"></script>
+<script src="libs/plotly-binding-4.9.2.1/plotly.js"></script>
+<script src="libs/typedarray-0.1/typedarray.min.js"></script>
+<link href="libs/crosstalk-1.1.0.1/css/crosstalk.css" rel="stylesheet" />
+<script src="libs/crosstalk-1.1.0.1/js/crosstalk.min.js"></script>
+<link href="libs/plotly-htmlwidgets-css-1.52.2/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="libs/plotly-main-1.52.2/plotly-latest.min.js"></script>
 
 
 <style type="text/css">
@@ -115,7 +116,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
       <nav role="navigation">
 
 <ul class="summary">
-<li class="chapter" data-level="1" data-path="introduction.html"><a href="introduction.html"><i class="fa fa-check"></i><b>1</b> Introduction</a></li>
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Introduction</a></li>
 <li class="chapter" data-level="2" data-path="installation.html"><a href="installation.html"><i class="fa fa-check"></i><b>2</b> Installation</a><ul>
 <li class="chapter" data-level="2.1" data-path="automatic-installation-windows-only.html"><a href="automatic-installation-windows-only.html"><i class="fa fa-check"></i><b>2.1</b> Automatic installation (Windows only)</a></li>
 <li class="chapter" data-level="2.2" data-path="manual-installation.html"><a href="manual-installation.html"><i class="fa fa-check"></i><b>2.2</b> Manual installation</a><ul>
@@ -275,17 +276,17 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Feature table (only first columns for readability)</span>
 fList[[<span class="st">&quot;standard-1&quot;</span>]][, <span class="dv">1</span><span class="op">:</span><span class="dv">6</span>]</code></pre></div>
 <pre><code>#&gt;                          ID       ret        mz       area    retmin    retmax
-#&gt;   1:  f_4747104396802167723  19.00698  78.99684  65793.391  13.01202  29.99700
-#&gt;   2: f_17384754037374534007  20.00598  79.02098 125354.100  13.01202  29.99700
-#&gt;   3:  f_1652305254647623283   8.01600  79.02101 188045.900   3.03000  12.01302
-#&gt;   4: f_15257119497287231370 112.34220  79.02103  71168.984 106.55400 147.51600
-#&gt;   5: f_15107035460879109089 111.64380  84.95950  54875.129 105.15180 599.87400
+#&gt;   1: f_17348634386323200834  19.00698  78.99684  65793.391  13.01202  29.99700
+#&gt;   2:  f_9478463872729308223  20.00598  79.02098 125354.100  13.01202  29.99700
+#&gt;   3: f_11213087985470022693   8.01600  79.02101 188045.900   3.03000  12.01302
+#&gt;   4:  f_2983767143169403772 112.34220  79.02103  71168.984 106.55400 147.51600
+#&gt;   5:   f_658379536046154540 111.64380  84.95950  54875.129 105.15180 599.87400
 #&gt;  ---                                                                          
-#&gt; 433:  f_2921274992715396736  11.01402 295.22387   9514.476   9.01602  13.01202
-#&gt; 434:  f_5421345065893959336  13.01202 296.92038  37753.414  10.01502  15.01098
-#&gt; 435:  f_1050733208842461705  12.01302 297.16751  17366.125   9.01602  15.01098
-#&gt; 436:  f_5831544031753809525  11.01402 297.20368  13995.990   9.01602  14.01102
-#&gt; 437:  f_3312875377324196662  12.01302 299.12581  13630.378   9.01602  15.01098</code></pre>
+#&gt; 433: f_16291767111896044416  11.01402 295.22387   9514.476   9.01602  13.01202
+#&gt; 434: f_13895674551703412940  13.01202 296.92038  37753.414  10.01502  15.01098
+#&gt; 435:  f_1204316825321995902  12.01302 297.16751  17366.125   9.01602  15.01098
+#&gt; 436:  f_3603889052733439052  11.01402 297.20368  13995.990   9.01602  14.01102
+#&gt; 437: f_10135882577183508712  12.01302 299.12581  13630.378   9.01602  15.01098</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Feature group intensities</span>
 fGroups<span class="op">$</span>M120_R328_<span class="dv">81</span></code></pre></div>
 <pre><code>#&gt; [1] 55936 61668 59624</code></pre>
@@ -333,17 +334,17 @@ components[[<span class="st">&quot;CMP7&quot;</span>]][, <span class="dv">1</spa
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># obtain table with all features (only first columns for readability)</span>
 <span class="kw">as.data.table</span>(fList)[, <span class="dv">1</span><span class="op">:</span><span class="dv">6</span>]</code></pre></div>
 <pre><code>#&gt;         analysis                     ID       ret        mz      area     retmin
-#&gt;    1:  solvent-1 f_14814478536674459276  19.10298  78.99678  73929.27  13.108980
-#&gt;    2:  solvent-1  f_5025748252013532365  14.10798  84.95948 941557.00   3.922998
-#&gt;    3:  solvent-1 f_16256825004667847820 112.97220  84.95949  47558.80 105.301800
-#&gt;    4:  solvent-1  f_6897838843815220160  13.10898  88.95255  34552.67   7.114020
-#&gt;    5:  solvent-1  f_1162855837791687207   2.52900  88.96823  14710.10   1.732002
+#&gt;    1:  solvent-1   f_440125947438726465  19.10298  78.99678  73929.27  13.108980
+#&gt;    2:  solvent-1 f_16541488847134842739  14.10798  84.95948 941557.00   3.922998
+#&gt;    3:  solvent-1  f_2769303508531980211 112.97220  84.95949  47558.80 105.301800
+#&gt;    4:  solvent-1 f_16890328857712363791  13.10898  88.95255  34552.67   7.114020
+#&gt;    5:  solvent-1 f_14158948151893286118   2.52900  88.96823  14710.10   1.732002
 #&gt;   ---                                                                           
-#&gt; 2440: standard-3 f_15879805560241107006  12.14898 294.93888 350965.20   9.151020
-#&gt; 2441: standard-3 f_10445490037749584456  11.14998 295.18863  10705.59   9.151020
-#&gt; 2442: standard-3 f_14636456056030483551  13.14798 296.92039  42195.86  10.150980
-#&gt; 2443: standard-3  f_8948583827308950996  11.14998 297.16737  15177.58   9.151020
-#&gt; 2444: standard-3 f_16629024450970070833  11.14998 297.20377  16678.13   9.151020</code></pre>
+#&gt; 2440: standard-3  f_5923910199959285150  12.14898 294.93888 350965.20   9.151020
+#&gt; 2441: standard-3  f_7318691086950121616  11.14998 295.18863  10705.59   9.151020
+#&gt; 2442: standard-3 f_13614151431879219540  13.14798 296.92039  42195.86  10.150980
+#&gt; 2443: standard-3 f_10244147797962263830  11.14998 297.16737  15177.58   9.151020
+#&gt; 2444: standard-3  f_7421892603903417220  11.14998 297.20377  16678.13   9.151020</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Returns group info and intensity values for each feature group</span>
 <span class="kw">as.data.table</span>(fGroups, <span class="dt">average =</span> <span class="ot">TRUE</span>) <span class="co"># average intensities for replicates</span></code></pre></div>
 <pre><code>#&gt;             group      ret       mz standard

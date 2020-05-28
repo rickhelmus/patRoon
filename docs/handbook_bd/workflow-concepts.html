@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>3 Workflow concepts | patRoon handbook</title>
   <meta name="description" content="3 Workflow concepts | patRoon handbook" />
-  <meta name="generator" content="bookdown 0.18 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.19 and GitBook 2.6.7" />
 
   <meta property="og:title" content="3 Workflow concepts | patRoon handbook" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2020-04-30" />
+<meta name="date" content="2020-05-28" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -53,16 +53,17 @@
 <script src="libs/htmlwidgets-1.5.1/htmlwidgets.js"></script>
 <script src="libs/viz-1.8.2/viz.js"></script>
 <link href="libs/DiagrammeR-styles-0.2/styles.css" rel="stylesheet" />
-<script src="libs/grViz-binding-1.0.5/grViz.js"></script>
+<script src="libs/grViz-binding-1.0.6.1/grViz.js"></script>
 <script src="libs/kePrint-0.0.1/kePrint.js"></script>
 <link href="libs/vis-4.20.1/vis.css" rel="stylesheet" />
 <script src="libs/vis-4.20.1/vis.min.js"></script>
 <script src="libs/visNetwork-binding-2.0.9/visNetwork.js"></script>
-<script src="libs/d3-3.5.3/./d3.min.js"></script>
-<link href="libs/d3heatmapcore-0.0.0/heatmapcore.css" rel="stylesheet" />
-<script src="libs/d3heatmapcore-0.0.0/heatmapcore.js"></script>
-<script src="libs/d3-tip-0.6.6/index.js"></script>
-<script src="libs/d3heatmap-binding-0.6.1.2/d3heatmap.js"></script>
+<script src="libs/plotly-binding-4.9.2.1/plotly.js"></script>
+<script src="libs/typedarray-0.1/typedarray.min.js"></script>
+<link href="libs/crosstalk-1.1.0.1/css/crosstalk.css" rel="stylesheet" />
+<script src="libs/crosstalk-1.1.0.1/js/crosstalk.min.js"></script>
+<link href="libs/plotly-htmlwidgets-css-1.52.2/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="libs/plotly-main-1.52.2/plotly-latest.min.js"></script>
 
 
 <style type="text/css">
@@ -115,7 +116,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
       <nav role="navigation">
 
 <ul class="summary">
-<li class="chapter" data-level="1" data-path="introduction.html"><a href="introduction.html"><i class="fa fa-check"></i><b>1</b> Introduction</a></li>
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Introduction</a></li>
 <li class="chapter" data-level="2" data-path="installation.html"><a href="installation.html"><i class="fa fa-check"></i><b>2</b> Installation</a><ul>
 <li class="chapter" data-level="2.1" data-path="automatic-installation-windows-only.html"><a href="automatic-installation-windows-only.html"><i class="fa fa-check"></i><b>2.1</b> Automatic installation (Windows only)</a></li>
 <li class="chapter" data-level="2.2" data-path="manual-installation.html"><a href="manual-installation.html"><i class="fa fa-check"></i><b>2.2</b> Manual installation</a><ul>
@@ -205,8 +206,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <!-- - show images of feature definition etc? -->
 <p>In a non-target workflow both chromatographic and mass spectral data is automatically processed in order to provide a comprehensive chemical characterization of your samples. While the exact workflow is typically dependent on the type of study, it generally involves of the following steps:</p>
 <!-- UNDONE: include other data processing steps here? -->
-<div id="htmlwidget-c55cb1f0113a9aacca83" style="width:750px;height:250px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-c55cb1f0113a9aacca83">{"x":{"diagram":"\ndigraph workflow {\n  graph [ rankdir = LR, compound = true, style = invis ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.8,\n         height = 1,\n         fontsize = 20,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n  subgraph cluster1 {\n    \"Data pre-treatment\" -> \"Find features\"\n    \"Find features\" -> \"Group features\"\n  }\n  \n  subgraph cluster2 {\n    \"Suspect screening\" -> \"Group features\" [minlen=3, style=dashed]\n    \"Find features\" -> \"Suspect screening\" [style=invis]\n    \"Group features\" -> \"Suspect screening\" [style=dashed]\n  }\n  \n  subgraph cluster3 {\n    graph [style = dashed ]\n    color=blue\n    \"MS peak lists\" \"Formula annotation\"  \"Compound Annotation\"\n  }\n\n  subgraph cluster4 {\n    Componentization\n  }\n  \n  \"Group features\" -> \"Formula annotation\" [ltail=cluster1, lhead=cluster3, style=dashed]\n  \"Group features\" -> \"Componentization\" [ltail=cluster1, lhead=cluster4, style=dashed]\n  \n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-74729fce22005c5d97f1" style="width:750px;height:250px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-74729fce22005c5d97f1">{"x":{"diagram":"\ndigraph workflow {\n  graph [ rankdir = LR, compound = true, style = invis ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.8,\n         height = 1,\n         fontsize = 20,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n  subgraph cluster1 {\n    \"Data pre-treatment\" -> \"Find features\"\n    \"Find features\" -> \"Group features\"\n  }\n  \n  subgraph cluster2 {\n    \"Suspect screening\" -> \"Group features\" [minlen=3, style=dashed]\n    \"Find features\" -> \"Suspect screening\" [style=invis]\n    \"Group features\" -> \"Suspect screening\" [style=dashed]\n  }\n  \n  subgraph cluster3 {\n    graph [style = dashed ]\n    color=blue\n    \"MS peak lists\" \"Formula annotation\"  \"Compound Annotation\"\n  }\n\n  subgraph cluster4 {\n    Componentization\n  }\n  \n  \"Group features\" -> \"Formula annotation\" [ltail=cluster1, lhead=cluster3, style=dashed]\n  \"Group features\" -> \"Componentization\" [ltail=cluster1, lhead=cluster4, style=dashed]\n  \n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 <p>Note that <code>patRoon</code> supports flexible composition of workflows. In the scheme above you can recognize optional steps by a <em>dashed line</em>. The inclusion of each step is only necessary if a further steps depends on its data. For instance, annotation and componentization do not depend on each other and can therefore be executed in any order or simply be omitted. A brief descripton of all steps is given below.</p>
 <p>During <strong>data pre-treatment</strong> raw MS data is prepared for further analysis. A common need for this step is to convert the data to an open format so that other tools are able to process it. Other pre-treatment steps may involve re-calibration of <em>m/z</em> data or performing advanced filtering operations.</p>
 <p>The next step is to extract <strong>features</strong> from the data. While different terminologies are used, a feature in <code>patRoon</code> refers to a single chromatographic peak in an extracted ion chromatogram for a single <em>m/z</em> value (within a defined tolerance). Hence, a feature contains both chromatographic data (e.g. retention time and peak height) and mass spectral data (e.g. the accurate <em>m/z</em>). Note that with mass spectrometry multiple <em>m/z</em> values may be detected for a single compound as a result of adduct formation, natural isotopes and/or in-source fragments. Some algorithms may try to combine these different masses in a single feature. However, in <code>patRoon</code> we generally assume this is not the case (and may optionally be done afterwards during the componentization step described below). Features are sometimes simply referred to as ‘peaks’.</p>

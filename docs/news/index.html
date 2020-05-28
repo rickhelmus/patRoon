@@ -159,9 +159,34 @@
       <small>Source: <a href='https://github.com/rickhelmus/patRoon/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
-    <div id="patroon-0-1-0-9000" class="section level1">
-<h1 class="page-header" data-toc-text="0.1.0.9000">
-<a href="#patroon-0-1-0-9000" class="anchor"></a>patRoon 0.1.0.9000</h1>
+    <div id="patroon-1-0" class="section level1">
+<h1 class="page-header" data-toc-text="1.0">
+<a href="#patroon-1-0" class="anchor"></a>patRoon 1.0</h1>
+<div id="may-2020" class="section level2">
+<h2 class="hasAnchor">
+<a href="#may-2020" class="anchor"></a>May 2020</h2>
+<ul>
+<li>
+<strong>IMPORTANT</strong> Major changes were made related to <code>SIRIUS</code> support
+<ul>
+<li>Multiple features can now be annotated at once by <code>SIRIUS</code> (configurable with new <code>SIRBatchSize</code> function argument). This dramatically improves overal calculation times (thanks to Markus Fleischauer for pointing out this possibility!).</li>
+<li>
+<code>generateFormulasSirius()</code> and <code>generateCompoundsSirius()</code> are now properly capitalized to <code><a href="../reference/formula-generation.html">generateFormulasSIRIUS()</a></code> and <code><a href="../reference/compound-generation.html">generateCompoundsSIRIUS()</a></code>
+</li>
+<li>Support for <code>SIRIUS</code> 4.4.</li>
+<li>If all features are annotated at once then <code>SIRIUS</code> output is directly shown on the console.</li>
+<li>The amount of cores used by <code>SIRIUS</code> can be specified with the <code>cores</code> function arguments.</li>
+<li>More extra commandline options can be given to <code>SIRIUS</code>
+</li>
+</ul>
+</li>
+<li>Fixed: <code><a href="../reference/generics.html">groupNames()</a></code>, <code><a href="../reference/generics.html">analyses()</a></code> and similar methods sometimes returned <code>NULL</code> instead of an empty <code>character</code> vector for empty objects.</li>
+<li>
+<code><a href="../reference/componentsIntClust-class.html">plotHeatMap()</a></code> with <code>interactive=TRUE</code>: switch from now removed <code>d3heatmap</code> package to <code>heatmaply</code>
+</li>
+<li>Fixed: <code><a href="../reference/reporting.html">reportHTML()</a></code> didn’t split PubChem URLs when multiple identifiers were reported.</li>
+</ul>
+</div>
 <div id="april-2020" class="section level2">
 <h2 class="hasAnchor">
 <a href="#april-2020" class="anchor"></a>April 2020</h2>

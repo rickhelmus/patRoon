@@ -7,6 +7,7 @@ BiocManager::install(c("Rdisop", "InterpretMSSpectrum")) # need to install these
 
 remotes::install_github("rickhelmus/patRoonData", upgrade = "never")
 remotes::install_github("jokergoo/circlize", upgrade = "never")
+remotes::install_github("thomasp85/farver", upgrade = "never")
 install.packages("vdiffr")
 
 install.packages("desc")

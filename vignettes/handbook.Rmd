@@ -13,26 +13,34 @@ vignette: >
 
 ```{r include=FALSE}
 vignDir <- normalizePath(".", winslash = "/")
+hbDir <- function(f)
+{
+    # HACK HACK HACK: currently we temporary re-name the markdown files to be
+    # underscore prefixed (see make_docs.R)
+    if (pkgdown::in_pkgdown())
+        f <- paste0("_", f)
+    return(file.path("handbook", f))
+}
 ```
 
-```{r child="handbook/_setup.Rmd"}
+```{r child=hbDir("setup.Rmd")}
 ```
 
-```{r child="handbook/_intro.Rmd"}
+```{r child=hbDir("intro.Rmd")}
 ```
 
-```{r child="handbook/_installation.Rmd"}
+```{r child=hbDir("installation.Rmd")}
 ```
 
-```{r child="handbook/_concepts.Rmd"}
+```{r child=hbDir("concepts.Rmd")}
 ```
 
-```{r child="handbook/_workflow_gen.Rmd"}
+```{r child=hbDir("workflow_gen.Rmd")}
 ```
 
-```{r child="handbook/_processing.Rmd"}
+```{r child=hbDir("processing.Rmd")}
 ```
 
-```{r child="handbook/_advanced.Rmd"}
+```{r child=hbDir("advanced.Rmd")}
 ```
 

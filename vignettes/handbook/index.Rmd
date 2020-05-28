@@ -7,12 +7,12 @@ header-includes:
     - \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
 ---
 
-```{r child="_intro.Rmd"}
+```{r child="intro.Rmd"}
 ```
 
 ```{r include=FALSE}
 vignDir <- normalizePath("..", winslash = "/")
 ```
 
-```{r child="_setup.Rmd"}
+```{r child="setup.Rmd"}
 ```

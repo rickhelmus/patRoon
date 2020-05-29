@@ -16,7 +16,7 @@ The workflow of non-target analysis is typically highly dependent on several fac
 
 Below is an overview of the most common non-target workflow steps supported along with various software tools that were used to implement them:
 
-* **Data preparation**: conversion between and export to common open MS data formats (e.g. mzXML and mzML) ([OpenMS], [DataAnalysis]).
+* **Data preparation**: conversion between and export to common open MS data formats (e.g. mzXML and mzML) ([pwiz], [OpenMS], [DataAnalysis]).
 * **Extraction and grouping of features** (e.g. [XCMS], [OpenMS], [enviPick], [ProfileAnalysis]).
 * **Data cleanup**: post filtering of data to improve its quality and aid prioritization.
 * **Automatic extraction of MS and MS/MS** data ([mzR], [DataAnalysis]).
@@ -87,5 +87,5 @@ However, for a better guide to get started it is recommended to read the [tutori
 [RDCOMClient]: http://www.omegahat.net/RDCOMClient/
 [Shiny]: https://shiny.rstudio.com/
 [example]: https://rickhelmus.github.io/patRoon/examples/report.html
-
+[pwiz]: http://proteowizard.sourceforge.net/
 

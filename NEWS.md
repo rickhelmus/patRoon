@@ -12,6 +12,7 @@
 * Fixed: `groupNames()`, `analyses()` and similar methods sometimes returned `NULL` instead of an empty `character` vector for empty objects.
 * `plotHeatMap()` with `interactive=TRUE`: switch from now removed `d3heatmap` package to `heatmaply`
 * Fixed: `reportHTML()` didn't split PubChem URLs when multiple identifiers were reported.
+* `PWizBatchSize` argument for `convertMSFiles()`
 
 
 ## April 2020

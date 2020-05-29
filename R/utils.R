@@ -196,7 +196,6 @@ prepareDTForComparison <- function(dt)
 
 readAllFile <- function(f) readChar(f, file.size(f))
 
-
 getArgNames <- function(..., def = NULL)
 {
     args <- sapply(substitute(list(...))[-1], deparse)
@@ -245,6 +244,9 @@ allSame <- function(l)
 
     return(TRUE)
 }
+
+# splitting a vector in chunks: https://stackoverflow.com/a/3321659
+splitInBatches <- function(x, size) split(x, ceiling(seq_along(x) / size))
 
 normalize <- function(x, minMax, xrange = range(x, na.rm = TRUE))
 {

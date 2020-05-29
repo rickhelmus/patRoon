@@ -181,16 +181,11 @@ runSIRIUS <- function(precursorMZs, MSPLists, MSMSPLists, profile, adduct, ppmMa
             args <- c(args, "structure", "--database", fingerIDDatabase)
     }
     
-    # verbose <- if (verbose) "" else FALSE
-    # executeCommand(getCommandWithOptPath(getSiriusBin(), "SIRIUS"), args, stdout = verbose, stderr = verbose)
-    
     if (SIRBatchSize == 0)
         batches <- list(seq_along(precursorMZs))
     else
-    {
-        # splitting a vector in chunks: https://stackoverflow.com/a/3321659
-        batches <- split(seq_along(precursorMZs), ceiling(seq_along(precursorMZs) / SIRBatchSize))
-    }
+        batches <- splitInBatches(seq_along(precursorMZs), SIRBatchSize)
+    
     command <- getCommandWithOptPath(getSiriusBin(), "SIRIUS")
     cmdQueue <- lapply(seq_along(batches), function(bi)
     {

@@ -19,6 +19,7 @@ convertMSFiles(
   centroid = algorithm != "openms",
   filters = NULL,
   extraOpts = NULL,
+  PWizBatchSize = 1,
   logPath = file.path("log", "convert"),
   maxProcAmount = getOption("patRoon.maxProcAmount")
 )
@@ -68,6 +69,11 @@ parameters passed to \command{msConvert} or \command{FileConverter}. Set to
 \href{https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/TOPP_FileConverter.html}{FileConverter}
  and
 \href{http://proteowizard.sourceforge.net/tools/msconvert.html}{msConvert}.}
+
+\item{PWizBatchSize}{When \code{algorithm="pwiz"}: the number of analyses to
+process by a single call to \command{msConvert}. Usually a value of one is
+most efficient. Set to zero to run all analyses all at once from a single
+call.}
 
 \item{logPath}{Destination directory for log files with output from executed
 commands. Will be created if non-existant. Set to \code{NULL} to disable

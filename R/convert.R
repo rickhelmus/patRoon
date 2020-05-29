@@ -70,7 +70,7 @@ listMSFiles <- function(dirs, from)
     return(filterMSFileDirs(files, from))
 }
 
-convertMSFilesPWiz <- function(inFiles, outFiles, to, centroid, filters, extraOpts,
+convertMSFilesPWiz <- function(inFiles, outFiles, to, centroid, filters, extraOpts, PWizBatchSize,
                                logPath, maxProcAmount)
 {
     if (centroid != FALSE)
@@ -91,14 +91,38 @@ convertMSFilesPWiz <- function(inFiles, outFiles, to, centroid, filters, extraOp
         stop("Could not find ProteoWizard. You may set its location in the patRoon.path.pwiz option. See ?patRoon for more details.")
     msc <- file.path(pwpath, "msconvert")
 
-    cmdQueue <- lapply(seq_along(inFiles), function(fi)
+    if (PWizBatchSize != 1 && length(inFiles) > 1)
     {
-        basef <- basename(tools::file_path_sans_ext(inFiles[fi]))
-        logf <- if (!is.null(logPath)) file.path(logPath, paste0("pwiz-", basef, ".txt")) else NULL
-        return(list(logFile = logf, command = msc,
-                    args = c(inFiles[fi], "--outfile", outFiles[fi],
-                             "-o", dirname(outFiles[fi]), mainArgs)))
-    })
+        outDir <- dirname(outFiles)
+        if (!allSame(outDir)) # UNDONE?
+            stop("If PWizBatchSize>1 then all output files must go to the same directory.")
+        outDir <- outDir[1]
+        
+        if (PWizBatchSize == 0)
+            batches <- list(seq_along(inFiles))
+        else
+            batches <- splitInBatches(seq_along(inFiles), PWizBatchSize)
+    
+        cmdQueue <- lapply(seq_along(batches), function(bi)
+        {
+            input <- tempfile("msconvert")
+            cat(inFiles[batches[[bi]]], sep = "\n", file = input)
+            logf <- if (!is.null(logPath)) file.path(logPath, paste0("pwiz-batch_", bi, ".txt")) else NULL
+            # UNDONE: unlike PWizBatchSize==1 we don't (can't) set output file names here, is this a problem?
+            return(list(logFile = logf, command = msc, args = c("-f", input,  "-o", outDir, mainArgs)))
+        })
+    }
+    else
+    {
+        cmdQueue <- lapply(seq_along(inFiles), function(fi)
+        {
+            basef <- basename(tools::file_path_sans_ext(inFiles[fi]))
+            logf <- if (!is.null(logPath)) file.path(logPath, paste0("pwiz-", basef, ".txt")) else NULL
+            return(list(logFile = logf, command = msc,
+                        args = c(inFiles[fi], "--outfile", outFiles[fi],
+                                 "-o", dirname(outFiles[fi]), mainArgs)))
+        })
+    }
 
     executeMultiProcess(cmdQueue, function(cmd) {}, maxProcAmount = maxProcAmount)
 
@@ -192,6 +216,10 @@ convertMSFilesBruker <- function(inFiles, outFiles, to, centroid)
 #'   \href{https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/TOPP_FileConverter.html}{FileConverter}
 #'    and
 #'   \href{http://proteowizard.sourceforge.net/tools/msconvert.html}{msConvert}.
+#' @param PWizBatchSize When \code{algorithm="pwiz"}: the number of analyses to
+#'   process by a single call to \command{msConvert}. Usually a value of one is
+#'   most efficient. Set to zero to run all analyses all at once from a single
+#'   call.
 #'
 #' @template multiProc-args
 #'
@@ -248,7 +276,7 @@ convertMSFiles <- function(files = NULL, outPath = NULL, dirs = TRUE,
                            anaInfo = NULL, from = MSFileFormats(algorithm, vendor = algorithm != "openms"), to = "mzML",
                            overWrite = FALSE, algorithm = "pwiz",
                            centroid = algorithm != "openms",
-                           filters = NULL, extraOpts = NULL,
+                           filters = NULL, extraOpts = NULL, PWizBatchSize = 1,
                            logPath = file.path("log", "convert"),
                            maxProcAmount = getOption("patRoon.maxProcAmount"))
 {
@@ -265,6 +293,7 @@ convertMSFiles <- function(files = NULL, outPath = NULL, dirs = TRUE,
                       .var.name = centroid)
     checkmate::assertCharacter(filters, min.chars = 1, null.ok = TRUE, add = ac)
     checkmate::assertCharacter(extraOpts, null.ok = TRUE, add = ac)
+    checkmate::assertCount(PWizBatchSize, add = ac)
     assertMultiProcArgs(logPath, maxProcAmount, add = ac)
     checkmate::reportAssertions(ac)
 
@@ -329,7 +358,7 @@ convertMSFiles <- function(files = NULL, outPath = NULL, dirs = TRUE,
 
     # NOTE: use normalizePath() here to convert to backslashes on Windows: needed by msconvert
     outPath <- normalizePath(rep(outPath, length.out = length(files)), mustWork = TRUE)
-    files <- normalizePath(files, mustWork = FALSE) # no mustWork, file existance will be checked later
+    files <- normalizePath(files, mustWork = FALSE) # no mustWork, file existence will be checked later
 
     basef <- basename(tools::file_path_sans_ext(files))
     output <- normalizePath(file.path(outPath, paste0(basef, ".", to)),
@@ -352,7 +381,7 @@ convertMSFiles <- function(files = NULL, outPath = NULL, dirs = TRUE,
     if (length(files) > 0)
     {
         if (algorithm == "pwiz")
-            convertMSFilesPWiz(files, output, to, centroid, filters, extraOpts, logPath, maxProcAmount)
+            convertMSFilesPWiz(files, output, to, centroid, filters, extraOpts, PWizBatchSize, logPath, maxProcAmount)
         else if (algorithm == "openms")
             convertMSFilesOpenMS(files, output, to, extraOpts, logPath, maxProcAmount)
         else # bruker

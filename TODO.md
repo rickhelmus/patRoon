@@ -47,6 +47,7 @@
 - PubChemLite
     - Install from Win inst script --> now only tier1, OK?
 - SusDat MF support
+- Update SIRIUS version in install script
 
 
 ## formulas

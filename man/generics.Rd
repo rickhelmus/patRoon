@@ -110,6 +110,8 @@ represent non-shared data.}
 \item{addRetMzPlots}{Set to \code{TRUE} to enable \emph{m/z} \emph{vs}
 retention time scatter plots.}
 
+\item{onlyLinked}{Only plots linked objects if \code{TRUE}.}
+
 \item{kSeq}{An integer vector containing the sequence that should be used for
 average silhouette width calculation.}
 

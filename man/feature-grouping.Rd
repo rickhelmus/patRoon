@@ -39,6 +39,8 @@ groupFeaturesOpenMS(
   maxAlignMZ = 0.005,
   maxGroupRT = 12,
   maxGroupMZ = 0.005,
+  extraOptsRT = NULL,
+  extraOptsGroup = NULL,
   verbose = TRUE
 )
 
@@ -101,8 +103,8 @@ from grouped features.}
 
 \item{rtalign}{Enable retention time alignment.}
 
-\item{QT}{If enabled, use \code{FeatureLinkerUnlabeledQT} instead of
-\code{FeatureLinkerUnlabeled} for feature grouping.}
+\item{QT}{If enabled, use \command{FeatureLinkerUnlabeledQT} instead of
+\command{FeatureLinkerUnlabeled} for feature grouping.}
 
 \item{maxAlignRT, maxAlignMZ}{Used for retention alignment. Maximum retention
 time or m/z difference (seconds/Dalton) for feature pairing. Sets
@@ -113,6 +115,14 @@ respectively.}
 \item{maxGroupRT, maxGroupMZ}{as \code{maxAlignRT} and \code{maxAlignMZ}, but
 for grouping of features. Sets \code{-algorithm:distance_RT:max_difference}
 and \code{-algorithm:distance_MZ:max_difference} options, respectively.}
+
+\item{extraOptsRT, extraOptsGroup}{Named \code{list} containing extra options
+that will be passed to \command{MapAlignerPoseClustering} or
+\command{FeatureLinkerUnlabeledQT/FeatureLinkerUnlabeled}, respectively.
+Any options specified here will override any of the above. Example:
+\code{extraOptsGroup=list("-algorithm:distance_RT:max_difference"=12)}
+(corresponds to setting \code{maxGroupRT=12}). Set to \code{NULL} to
+ignore.}
 
 \item{exportedData}{Set to \code{TRUE} if analyses were exported as
 \code{mzXML} or \code{mzML} files.}

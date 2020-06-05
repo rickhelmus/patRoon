@@ -350,7 +350,7 @@ getNewProjectUI <- function(destPath)
                             )
                         ),
                         conditionalPanel(
-                            condition = "input.formulaGen != \"\" || input.compIdent == \"\" || input.components != \"\"",
+                            condition = "input.formulaGen != \"\" || input.compIdent != \"\" || input.components != \"\"",
                             selectInput("polarity", "Polarity", c("positive", "negative"), "positive",
                                         multiple = FALSE, width = "100%")
                         )

@@ -5,8 +5,7 @@
 - convertMSFiles()
     - Agilent .d is also a directory?
 - checkmate checks for generic workflow functions
-- newProject(): show polarity selection if compound algo is selected (now only work with formula)
-- remove old brtanches
+- remove old branches
 
 
 ## docs

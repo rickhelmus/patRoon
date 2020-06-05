@@ -1,5 +1,10 @@
 # patRoon 1.0
 
+## June 2020
+
+* Fixed: `newProject()` didn't show polarity selection if only a compound identification algorithm was selected.
+
+
 ## May 2020
 
 * **IMPORTANT** Major changes were made related to `SIRIUS` support 

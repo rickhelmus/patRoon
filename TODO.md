@@ -7,7 +7,6 @@
 - checkmate checks for generic workflow functions
 - newProject(): show polarity selection if compound algo is selected (now only work with formula)
 - remove old brtanches
-- run DA tests
 
 
 ## docs

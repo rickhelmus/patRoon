@@ -1,1 +1,1 @@
-A MSPeakLists object (derived from workflowStep)Algorithm: Bruker_DataAnalysisTotal peak count: 64250 (MS: 63480 - MS/MS: 770)Average peak count/analysis: 64250 (MS: 63480 - MS/MS: 770)Total peak lists: 414 (MS: 345 - MS/MS: 69)Average peak lists/analysis: 414 (MS: 345 - MS/MS: 69)
+A MSPeakLists object (derived from workflowStep)Algorithm: brukerTotal peak count: 60391 (MS: 59630 - MS/MS: 761)Average peak count/analysis: 60391 (MS: 59630 - MS/MS: 761)Total peak lists: 411 (MS: 345 - MS/MS: 66)Average peak lists/analysis: 411 (MS: 345 - MS/MS: 66)

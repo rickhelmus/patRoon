@@ -179,6 +179,7 @@
   <span class='kw'>centroid</span> <span class='kw'>=</span> <span class='no'>algorithm</span> <span class='kw'>!=</span> <span class='st'>"openms"</span>,
   <span class='kw'>filters</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>extraOpts</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>PWizBatchSize</span> <span class='kw'>=</span> <span class='fl'>1</span>,
   <span class='kw'>logPath</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='st'>"log"</span>, <span class='st'>"convert"</span>),
   <span class='kw'>maxProcAmount</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"patRoon.maxProcAmount"</span>)
 )</pre>
@@ -252,6 +253,13 @@ parameters passed to <code class='command'>msConvert</code> or <code class='comm
 <a href='https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/TOPP_FileConverter.html'>FileConverter</a>
  and
 <a href='http://proteowizard.sourceforge.net/tools/msconvert.html'>msConvert</a>.</p></td>
+    </tr>
+    <tr>
+      <th>PWizBatchSize</th>
+      <td><p>When <code>algorithm="pwiz"</code>: the number of analyses to
+process by a single call to <code class='command'>msConvert</code>. Usually a value of one is
+most efficient. Set to zero to run all analyses all at once from a single
+call.</p></td>
     </tr>
     <tr>
       <th>logPath</th>

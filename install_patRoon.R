@@ -466,7 +466,7 @@ utils <- setRefClass("utilsInst", methods = list(
             if ("OpenMS" %in% instWhat)
             {
                 # NOTE: set keep_install_file to avoid long delays after installation
-                installr::install.URL("https://github.com/OpenMS/OpenMS/releases/download/Release2.4.0/OpenMS-2.4.0-Win64.exe",
+                installr::install.URL("https://github.com/OpenMS/OpenMS/releases/download/Release2.5.0/OpenMS-2.5.0-Win64.exe",
                                       message = FALSE, keep_install_file = TRUE)
             }
             
@@ -498,10 +498,10 @@ utils <- setRefClass("utilsInst", methods = list(
             
             if ("SIRIUS" %in% instWhat)
             {
-                down <- downloadFile(instPath, "SIRIUS", "https://bio.informatik.uni-jena.de/repository/dist-release-local/de/unijena/bioinf/ms/sirius/4.0.1/sirius-4.0.1-win64-headless.zip",
+                down <- downloadFile(instPath, "SIRIUS", "https://bio.informatik.uni-jena.de/repository/dist-release-local/de/unijena/bioinf/ms/sirius/4.4.25/sirius-4.4.25-win64.zip",
                                      TRUE)
                 if (!is.null(down))
-                    setOpts <- c(setOpts, list(patRoon.path.SIRIUS = fixPath(file.path(down, "sirius-win64-headless-4.0.1"))))
+                    setOpts <- c(setOpts, list(patRoon.path.SIRIUS = fixPath(file.path(down, "sirius-win64-4.4.25"))))
             }
             
             if ("OpenBabel" %in% instWhat)

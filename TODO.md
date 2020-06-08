@@ -47,7 +47,6 @@
 
 ## formulas
 - customize/document ranking column order? (only do rank for sirius?)
-- figure out topMost comment in initialize...
 
 
 ## components

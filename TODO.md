@@ -4,7 +4,6 @@
 - test negative subset indices
 - convertMSFiles()
     - Agilent .d is also a directory?
-- checkmate checks for generic workflow functions
 - remove old branches
 
 

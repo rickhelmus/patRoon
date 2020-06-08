@@ -1156,10 +1156,14 @@ setMethod("consensus", "compounds", function(obj, ..., absMinAbundance = NULL,
 #' @export
 setMethod("generateCompounds", "featureGroups", function(fGroups, MSPeakLists, algorithm, ...)
 {
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
+    checkmate::assertChoice(algorithm, c("metfrag", "sirius"), add = ac)
+    checkmate::reportAssertions(ac)
+    
     f <- switch(algorithm,
                 metfrag = generateCompoundsMetfrag,
-                sirius = generateCompoundsSIRIUS,
-                stop("Invalid algorithm! Should be: metfrag or sirius"))
+                sirius = generateCompoundsSIRIUS)
 
     f(fGroups, MSPeakLists, ...)
 })

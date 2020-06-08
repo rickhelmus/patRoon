@@ -1322,11 +1322,15 @@ setMethod("screenSuspects", "featureGroups", function(obj, suspects, rtWindow, m
 #' @export
 setMethod("groupFeatures", "features", function(feat, algorithm, ..., verbose = TRUE)
 {
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertChoice(algorithm, c("openms", "xcms", "xcms3"), add = ac)
+    checkmate::assertFlag(verbose, add = ac)
+    checkmate::reportAssertions(ac)
+    
     f <- switch(algorithm,
                 openms = groupFeaturesOpenMS,
                 xcms = groupFeaturesXCMS,
-                xcms3 = groupFeaturesXCMS3,
-                stop("Invalid algorithm! Should be: openms, xcms or xcms3"))
+                xcms3 = groupFeaturesXCMS3)
 
     f(feat, ..., verbose = verbose)
 })

@@ -876,11 +876,12 @@ setMethod("consensus", "formulas", function(obj, ..., absMinAbundance = NULL,
 #' @export
 setMethod("generateFormulas", "featureGroups", function(fGroups, algorithm, ...)
 {
+    checkmate::assertChoice(algorithm, c("bruker", "genform", "sirius"))
+    
     f <- switch(algorithm,
                 bruker = generateFormulasDA,
                 genform = generateFormulasGenForm,
-                sirius = generateFormulasSIRIUS,
-                stop("Invalid algorithm! Should be: bruker, genform or sirius"))
+                sirius = generateFormulasSIRIUS)
 
     f(fGroups, ...)
 })

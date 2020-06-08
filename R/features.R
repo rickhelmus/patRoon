@@ -276,15 +276,18 @@ setMethod("screenSuspects", "features", function(obj, suspects, rtWindow, mzWind
 #' @export
 findFeatures <- function(analysisInfo, algorithm, ..., verbose = TRUE)
 {
-    analysisInfo <- assertAndPrepareAnaInfo(analysisInfo)
+    ac <- checkmate::makeAssertCollection()
+    analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, add = ac)
+    checkmate::assertChoice(algorithm, c("bruker", "openms", "xcms", "xcms3", "envipick"), add = ac)
+    checkmate::assertFlag(verbose, add = ac)
+    checkmate::reportAssertions(ac)
 
     f <- switch(algorithm,
                 bruker = findFeaturesBruker,
                 openms = findFeaturesOpenMS,
                 xcms = findFeaturesXCMS,
                 xcms3 = findFeaturesXCMS3,
-                envipick = findFeaturesEnviPick,
-                stop("Invalid algorithm! Should be: bruker, openms, xcms or envipick"))
+                envipick = findFeaturesEnviPick)
 
     f(analysisInfo, ..., verbose = verbose)
 }

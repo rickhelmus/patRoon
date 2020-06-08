@@ -481,11 +481,12 @@ setMethod("plotSpec", "MSPeakLists", function(obj, groupName, analysis = NULL, M
 #' @export
 setMethod("generateMSPeakLists", "featureGroups", function(fGroups, algorithm, ...)
 {
+    checkmate::assertChoice(algorithm, c("bruker", "brukerfmf", "mzr"))
+    
     f <- switch(algorithm,
                 bruker = generateMSPeakListsDA,
                 brukerfmf = generateMSPeakListsDAFMF,
-                mzr = generateMSPeakListsMzR,
-                stop("Invalid algorithm! Should be: bruker, brukerfmf or mzr"))
+                mzr = generateMSPeakListsMzR)
 
     f(fGroups, ...)
 })

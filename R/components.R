@@ -564,12 +564,13 @@ setMethod("consensus", "components", function(obj, ...)
 #' @export
 setMethod("generateComponents", "featureGroups", function(fGroups, algorithm, ...)
 {
+    checkmate::assertChoice(algorithm, c("ramclustr", "camera", "nontarget", "intclust"))
+    
     f <- switch(algorithm,
                 ramclustr = generateComponentsRAMClustR,
                 camera = generateComponentsCAMERA,
                 nontarget = generateComponentsNontarget,
-                intclust = generateComponentsIntClust,
-                stop("Invalid algorithm! Should be: ramclustr, camera, nontarget or intclust"))
+                intclust = generateComponentsIntClust)
 
     f(fGroups, ...)
 })

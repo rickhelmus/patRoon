@@ -221,6 +221,9 @@ for each feature group.}
 
 \item{\code{avgPeakListArgs}}{A \code{list} with arguments used to generate feature
 group averaged MS(/MS) peak lists.}
+
+\item{\code{origFGNames}}{A \code{character} with the original input feature group
+names.}
 }}
 
 \section{Isolating precursor data}{

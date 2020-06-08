@@ -142,5 +142,6 @@ generateMSPeakListsMzR <- function(fGroups, maxMSRtWindow = 5, precursorMzWindow
     if (is.null(cachedSet))
         saveCacheSet("MSPeakListsMzR", resultHashes[seq_len(resultHashCount)], setHash, cacheDB)
 
-    return(MSPeakLists(peakLists = plists, metadata = metadata, avgPeakListArgs = avgFGroupParams, algorithm = "mzr"))
+    return(MSPeakLists(peakLists = plists, metadata = metadata, avgPeakListArgs = avgFGroupParams,
+                       origFGNames = gNames, algorithm = "mzr"))
 }

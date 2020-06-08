@@ -26,7 +26,7 @@ plistsNoIM <- plists
 plistsNoIM@metadata <- lapply(plistsNoIM@metadata, function(mda) lapply(mda, function(mdf) lapply(mdf, function(mds) mds[, setdiff(names(mds), "ionMobilityDriftTime"), with = FALSE])))
 
 test_that("verify generation of MS peak lists", {
-    expect_known_value(plistsNoIM, testFile("plists-mzr"), check.attributes = FALSE) # attributes seem irreproducible
+    expect_known_value(plistsNoIM, testFile("plists-mzr"))
 
     skip_if_not(doDATests())
     expect_known_value(plistsDA, testFile("plists-DA"))

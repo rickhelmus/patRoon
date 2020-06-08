@@ -18,6 +18,8 @@ NULL
 #'   for each feature group.
 #' @slot avgPeakListArgs A \code{list} with arguments used to generate feature
 #'   group averaged MS(/MS) peak lists.
+#' @slot origFGNames A \code{character} with the original input feature group
+#'   names.
 #'
 #' @templateVar seli analyses
 #' @templateVar selOrderi analyses()
@@ -84,7 +86,8 @@ NULL
 #' @param obj,x,object The \code{\link{MSPeakLists}} object to access.
 #' @export
 MSPeakLists <- setClass("MSPeakLists",
-                        slots = c(peakLists = "list", metadata = "list", averagedPeakLists = "list", avgPeakListArgs = "list"),
+                        slots = c(peakLists = "list", metadata = "list", averagedPeakLists = "list",
+                                  avgPeakListArgs = "list", origFGNames = "character"),
                         contains = "workflowStep")
 
 
@@ -93,7 +96,7 @@ setMethod("initialize", "MSPeakLists", function(.Object, ...)
     .Object <- callNextMethod(.Object, ...)
 
     if (length(.Object@avgPeakListArgs) > 0)
-        .Object@averagedPeakLists <- do.call(averageMSPeakLists, c(list(.Object@peakLists),
+        .Object@averagedPeakLists <- do.call(averageMSPeakLists, c(list(.Object@peakLists, .Object@origFGNames),
                                                                    .Object@avgPeakListArgs))
     
     .Object@peakLists <- makeEmptyListNamed(.Object@peakLists)
@@ -196,7 +199,7 @@ setMethod("[", c("MSPeakLists", "ANY", "ANY", "missing"), function(x, i, j, ...,
 
         # update group averaged peak lists
         if (reAverage)
-            x@averagedPeakLists <- do.call(averageMSPeakLists, c(list(peakLists(x)), x@avgPeakListArgs))
+            x@averagedPeakLists <- do.call(averageMSPeakLists, c(list(peakLists(x), x@origFGNames), x@avgPeakListArgs))
     }
 
     if (!missing(j))
@@ -396,7 +399,7 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
     }
 
     # update group averaged peak lists
-    obj@averagedPeakLists <- do.call(averageMSPeakLists, c(list(pLists), obj@avgPeakListArgs))
+    obj@averagedPeakLists <- do.call(averageMSPeakLists, c(list(pLists, obj@origFGNames), obj@avgPeakListArgs))
 
     # and filter it as well...
     printf("Filtering averaged MS peak lists for %d feature groups...\n", length(obj@averagedPeakLists))

@@ -5,6 +5,7 @@
 * Fixed: `newProject()` didn't show polarity selection if only a compound identification algorithm was selected.
 * Updated external dependency versions in installer script. 
 * Fixed: `groupFeaturesXCMS3()` didn't properly cache results.
+* `MSPeakLists`: results for averaged peak lists are now the same order as the input feature groups
 
 
 ## May 2020

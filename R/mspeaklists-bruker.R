@@ -139,7 +139,8 @@ generateMSPeakListsDA <- function(fGroups, bgsubtr = TRUE, maxMSRtWindow = 5, mi
 
     peakLists <- pruneList(setNames(peakLists, anaInfo$analysis))
 
-    return(MSPeakLists(peakLists = peakLists, metadata = list(), avgPeakListArgs = avgFGroupParams, algorithm = "bruker"))
+    return(MSPeakLists(peakLists = peakLists, metadata = list(), avgPeakListArgs = avgFGroupParams,
+                       origFGNames = gNames, algorithm = "bruker"))
 }
 
 #' @details \code{generateMSPeakListsDAFMF} is similar to \code{generateMSPeakListsDA},
@@ -170,6 +171,7 @@ generateMSPeakListsDAFMF <- function(fGroups, minMSIntensity = 500, minMSMSInten
 
     ftindex <- groupFeatIndex(fGroups)
     gcount <- ncol(ftindex)
+    gNames <- names(fGroups)
     fTable <- featureTable(fGroups)
     anaInfo <- analysisInfo(fGroups)
     DA <- getDAApplication()
@@ -208,9 +210,7 @@ generateMSPeakListsDAFMF <- function(fGroups, minMSIntensity = 500, minMSMSInten
             if (fti == 0)
                 next
 
-            gname <- colnames(ftindex)[grpi]
-
-            hash <- makeHash(setHash, gname)
+            hash <- makeHash(setHash, gNames[grpi])
             resultHashes[grpi] <- hash
 
             results <- NULL
@@ -235,7 +235,7 @@ generateMSPeakListsDAFMF <- function(fGroups, minMSIntensity = 500, minMSMSInten
                 saveCacheData("MSPeakListsDAFMF", results, hash, cacheDB)
             }
 
-            ret[[ana]][[gname]] <- results
+            ret[[ana]][[gNames[grpi]]] <- results
 
             setTxtProgressBar(prog, grpi)
         }
@@ -249,5 +249,6 @@ generateMSPeakListsDAFMF <- function(fGroups, minMSIntensity = 500, minMSMSInten
         closeSaveDAFile(DA, findDA, close, save)
     }
 
-    return(MSPeakLists(peakLists = ret, metadata = list(), avgPeakListArgs = avgFGroupParams, algorithm = "Bruker_DataAnalysis_FMF"))
+    return(MSPeakLists(peakLists = ret, metadata = list(), avgPeakListArgs = avgFGroupParams,
+                       origFGNames = gNames, algorithm = "Bruker_DataAnalysis_FMF"))
 }

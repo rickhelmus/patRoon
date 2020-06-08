@@ -113,7 +113,7 @@ averageSpectra <- function(spectra, clusterMzWindow, topMost, minIntensityPre, m
     return(ret)
 }
 
-averageMSPeakLists <- function(peakLists, clusterMzWindow, topMost, minIntensityPre, minIntensityPost,
+averageMSPeakLists <- function(peakLists, origFGNames, clusterMzWindow, topMost, minIntensityPre, minIntensityPost,
                                avgFun, method, pruneMissingPrecursorMS, retainPrecursorMSMS)
 {
     # UNDONE: use cache sets?
@@ -125,6 +125,7 @@ averageMSPeakLists <- function(peakLists, clusterMzWindow, topMost, minIntensity
 
     # figure out feature groups from (non-averaged) peak lists
     gNames <- unique(unlist(sapply(peakLists, names, simplify = FALSE), use.names = FALSE))
+    gNames <- intersect(origFGNames, gNames) # sort to original order
     gCount <- length(gNames)
 
     if (gCount == 0)

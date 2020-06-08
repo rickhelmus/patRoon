@@ -3,6 +3,8 @@
 ## June 2020
 
 * Fixed: `newProject()` didn't show polarity selection if only a compound identification algorithm was selected.
+* Updated external dependency versions in installer script. 
+* Fixed: `groupFeaturesXCMS3()` didn't properly cache results.
 
 
 ## May 2020

@@ -75,7 +75,7 @@ groupFeaturesXCMS3 <- function(feat, rtalign = TRUE,
     xdata <- verboseCall(xcms::groupChromPeaks, list(xdata, groupParam), verbose)
 
     ret <- importFeatureGroupsXCMS3FromFeat(xdata, anaInfo, feat)
-    saveCacheData("featureGroupsXCMS", ret, hash)
+    saveCacheData("featureGroupsXCMS3", ret, hash)
 
     if (verbose)
         cat("\n===========\nDone!\n")

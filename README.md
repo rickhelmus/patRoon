@@ -27,7 +27,7 @@ Below is an overview of the most common non-target workflow steps supported alon
 
 An example HTML report which gives an overview of what data can be produced can viewed [here][example].
 
-Some implementation notes:
+## Implementation notes
 
 * Developed on both Windows and Linux
 * `data.table` is used internally as a generally much more efficient alternative to `data.frame`.
@@ -38,7 +38,6 @@ Some implementation notes:
 * The [Shiny] R package was used to implement several GUI tools.
 * S4 classes and generics are used to implement a consistent interface to the many different supported software algorithms for each workflow step.
 
-Currently most functionalities have been implemented. On the short term the main focus is to improve and extend documentation, improve robustness when dealing with user input and find & remove bugs by (implementing automated) testing.
 
 ## Installation
 
@@ -57,6 +56,7 @@ newProject()
 The `newProject()` function will pop-up a dialog screen (requires [R Studio][RStudio]!) which will allow you to quickly select the analyses and common workflow options to subsequently generate a template `R` processing script.
 
 However, for a better guide to get started it is recommended to read the [tutorial]. Afterwards the [handbook] is a recommended read if you want to know more about advanced usage of `patRoon`. Finally, the [reference] outlines all the details of the `patRoon` package.
+
 
 [R]: https://www.r-project.org/
 [XCMS]: https://github.com/sneumann/xcms

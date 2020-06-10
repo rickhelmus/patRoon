@@ -6,7 +6,7 @@
 * Updated external dependency versions in installer script. 
 * Fixed: `groupFeaturesXCMS3()` didn't properly cache results.
 * `MSPeakLists`: results for averaged peak lists are now the same order as the input feature groups
-
+* Fixed: XCMS(3) feature group import used wrong variable name internally (reported by Ricardo Cunha)
 
 ## May 2020
 

@@ -135,7 +135,7 @@ importFeatureGroupsXCMS <- function(xs, analysisInfo)
         stop("Provided xcmsSet does not contain any grouped features!")
 
     feat <- importFeaturesXCMS(xs, analysisInfo)
-    return(importFeatureGroupsXCMSFromFeat(xs, anaInfo, feat))
+    return(importFeatureGroupsXCMSFromFeat(xs, analysisInfo, feat))
 }
 
 setMethod("removeGroups", "featureGroupsXCMS", function(fGroups, indices)

@@ -100,11 +100,10 @@ setMethod("$", "TPPredictions", function(x, name)
 setMethod("as.data.table", "TPPredictions", function(x) rbindlist(predictions(x), idcol = "suspect"))
 
 #' @export
-setMethod("convertToSuspects", "TPPredictions", function(pred, includePrec, tidy)
+setMethod("convertToSuspects", "TPPredictions", function(pred, includePrec)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertFlag(includePrec, add = ac)
-    checkmate::assertFlag(tidy, add = ac)
     checkmate::reportAssertions(ac)
     
     predAll <- rbindlist(predictions(pred))
@@ -112,11 +111,6 @@ setMethod("convertToSuspects", "TPPredictions", function(pred, includePrec, tidy
     
     if (includePrec)
         predAll <- rbind(suspects(pred), predAll, fill = TRUE)
-    
-    # UNDONE: handle differences in mz, SMILES, InChI etc columns between TPs and parents
-    
-    if (tidy)
-        predAll <- predAll[, c("name", "mz"), with = FALSE]
     
     return(predAll)
 })

@@ -108,6 +108,8 @@ predictTPsBioTransformer <- function(suspects = NULL, compounds = NULL, type = "
                                      logPath = file.path("log", "biotransformer"),
                                      maxProcAmount = getOption("patRoon.maxProcAmount"))
 {
+    # UNDONE: citations, also EnviPath
+    
     if (is.null(suspects) && is.null(compounds))
         stop("Specify at least either the suspects or compounds argument.")
 
@@ -135,9 +137,9 @@ predictTPsBioTransformer <- function(suspects = NULL, compounds = NULL, type = "
     }
 
     if (any(!nzchar(suspects$name)))
-        stop("'name' column contains one ore more empty values")
+        stop("'name' column contains one or more empty values")
     if (any(!nzchar(suspects$SMILES)))
-        stop("'SMILES' column contains one ore more empty values")
+        stop("'SMILES' column contains one or more empty values")
 
     cacheDB <- openCacheDBScope()
     baseHash <- makeHash(type, steps, extraOpts)

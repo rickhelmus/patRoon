@@ -130,7 +130,7 @@ assertSuspectList <- function(x, hasAdduct, skipInvalid, .var.name = checkmate::
     # this seems necessary for proper naming in subsequent assertions (why??)
     .var.name <- force(.var.name)
     
-    # subset with relevant columns: avoid checking others in subsequent assetDataFrame call
+    # subset with relevant columns: avoid checking others in subsequent assertDataFrame call
     if (checkmate::testDataFrame(x))
     {
         if (is.data.table(x))

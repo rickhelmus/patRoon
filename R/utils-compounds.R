@@ -4,6 +4,8 @@
 #' @include formulas.R
 NULL
 
+getIKBlock1 <- function(IK) strtrim(IK, 14)
+
 # get a vector of all (merged) columns
 getAllCompCols <- function(targetCols, allCols, mCompNames)
 {

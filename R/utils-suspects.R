@@ -1,5 +1,6 @@
 #' @include utils.R
 #' @include utils-compounds.R
+NULL
 
 prepareSuspectList <- function(suspects, adduct, skipInvalid)
 {
@@ -102,7 +103,7 @@ prepareSuspectList <- function(suspects, adduct, skipInvalid)
 
 annotatedMSMSSimilarity <- function(fragInfo, MSMSList, absMzDev, relMinIntensity)
 {
-    if (nrow(MSMSList) == 0 || is.null(fragInfo) || nrow(fragInfo) == 0)
+    if (nrow(MSMSList) == 0 || nrow(fragInfo) == 0)
         return(0)
     
     MSMSList <- MSMSList[, c("mz", "intensity")]
@@ -111,9 +112,9 @@ annotatedMSMSSimilarity <- function(fragInfo, MSMSList, absMzDev, relMinIntensit
                                             b = relMinIntensity, print.graphic = FALSE))
 }
 
-estimateIdentificationLevel <- function(suspectInChIKey, suspectFormula, suspectAnnSim,
-                                        suspectFragments, compTable, formTable, formScoreRanges,
-                                        minFormScores, minFormScoresToNext, MSMSList, absMzDev)
+estimateIdentificationLevel <- function(suspectInChIKey1, suspectFormula, suspectAnnSim,
+                                        suspectFragments, MSMSList, formTable, formScoreRanges,
+                                        minFormScores, minFormScoresToNext, compTable, absMzDev)
 {
     # Level 2a: suspect is the only candidate with >= 0.9 MoNa score
     # Level 3a: suspect is with (multiple candidates of) MoNa >= 0.4
@@ -124,15 +125,16 @@ estimateIdentificationLevel <- function(suspectInChIKey, suspectFormula, suspect
     #   - score >= minScore && minScoreNext higher than next candidate (if multiple)
     # Level 5: Anything else
     
-    suspectIK1 <- getIKBlock1(suspectInChIKey)
+    suspectFragments <- as.numeric(unlist(strsplit(suspectFragments, ";")))
     
     # compound info for suspect
-    cRow <- if (!is.null(compTable)) compTable[suspectIK1 == InChIKey1] else data.table::data.table()
+    cRow <- if (!is.null(compTable) && !is.null(suspectInChIKey1)) compTable[suspectInChIKey1 == InChIKey1] else
+        data.table::data.table()
     
     if (nrow(cRow) != 0 && !is.null(cRow[["individualMoNAScore"]]))
     {
         goodMoNas <- compTable[individualMoNAScore >= 0.9]
-        if (nrow(goodMoNas) == 1 && suspectIK1 %in% goodMoNas$InChIKey1)
+        if (nrow(goodMoNas) == 1 && suspectInChIKey1 %in% goodMoNas$InChIKey1)
             return("2a")
         
         if (cRow$individualMoNAScore >= 0.4)
@@ -153,7 +155,7 @@ estimateIdentificationLevel <- function(suspectInChIKey, suspectFormula, suspect
         return("3c")
     
     # no (good) hit --> level 4/5
-    if (!is.null(formTable))
+    if (!is.null(formTable) && !is.null(suspectFormula))
     {
         formTable <- normalizeFormScores(formTable, formScoreRanges, FALSE)
         unFTable <- unique(formTable, by = "formula")
@@ -193,4 +195,73 @@ estimateIdentificationLevel <- function(suspectInChIKey, suspectFormula, suspect
     }
     
     return("5") # no (good) formula match
+}
+
+annotateSuspectList <- function(scr, MSPeakLists = NULL, formulas = NULL, compounds = NULL,
+                                absMzDev = 0.005, relMinMSMSIntensity = 0.05,
+                                minFormScores, minFormScoresToNext)
+{
+    # add to scr: MFSim, identification level, InChIKey, formula, suspRank
+
+    scr <- copy(scr)
+    
+    # get InChIKeys/Formulas if necessary and possible
+    # UNDONE: cache
+    
+    hasData <- function(x) !is.na(x) & nzchar(x)
+    missingInScr <- function(what) if (is.null(scr[[what]])) rep(TRUE, nrow(scr)) else !hasData(scr[[what]])
+    
+    if (is.null(scr[["InChIKey"]]) || any(!hasData(scr$InChIKey)))
+    {
+        printf("Trying to calculate missing InChIKeys...")
+        
+        scr[missingInScr("InChIKey") & !missingInScr("SMILES"), InChIKey := babelConvert(SMILES, "smi", "inchikey", mustWork = FALSE)]
+        
+        # re-try from InChI for the results not yet available
+        scr[missingInScr("InChIKey") & !missingInScr("InChI"), InChIKey := babelConvert(InChI, "inchi", "inchikey", mustWork = FALSE)]
+    }
+    if (is.null(scr[["formula"]]) || any(!hasData(scr$formula)))
+    {
+        printf("Trying to calculate missing formulas...")
+        missingSMILES <- missingInScr("SMILES")
+        if (any(missingSMILES))
+        {
+            doConv <- missingInScr("SMILES") & !missingInScr("InChI")
+            SMI <- rep(NA_character_, nrow(scr))
+            SMI[doConv] <- babelConvert(scr$InChI[doConv], "inchi", "smi", mustWork = FALSE)
+        }
+        else
+            SMI <- scr$SMILES
+        
+        scr[missingInScr("formula") & !is.na(SMI), formula := {
+            mols <- getMoleculesFromSMILES(SMI, emptyIfFails = TRUE)
+            sapply(mols, function(m) if (isEmptyMol(m)) NA_character_ else rcdk::get.mol2formula(m))
+        }]
+    }
+    browser()
+    for (i in seq_len(nrow(scr)))
+    {
+        gName <- scr$name[i]
+        MSMSList <- if (!is.null(MSPeakLists)) MSPeakLists[[gName]][["MSMS"]] else NULL
+        fTable <- if (!is.null(formulas)) formulas[[gName]] else NULL
+        cTable <- if (!is.null(compounds)) compounds[[gName]] else NULL
+        
+        suspIK <- if(!is.null(scr[["InChIKey"]])) getIKBlock1(scr$InChIKey[i]) else NULL
+        annSim <- 0; suspRank <- NA
+        if (!is.null(MSMSList) && !is.null(cTable) && suspIK)
+        {
+            suspRank <- which(suspIK == cTable$InChIKey1)
+            suspRank <- if (length(suspRank) > 0) suspRank[1] else NA
+            
+            if (!is.na(suspRank) && !is.null(cTable[["fragInfo"]][[suspRank]]))
+                annSim <- annotatedMSMSSimilarity(cTable[["fragInfo"]][[suspRank]],
+                                                  MSPeakLists[[gName]][["MSMS"]],
+                                                  absMzDev, relMinMSMSIntensity)
+        }
+        
+        set(scr, i, c("suspCompAnnRank", "annotatedMSMSSimilarity"), list(suspRank, annSim))
+        set(scr, i, "estIDLevel", estimateIdentificationLevel(suspIK, scr$formula[i], annSim,
+                                                              scr$fragments[i], MSMSList, minFormScores,
+                                                              minFormScoresToNext, fTable, cTable, absMzDev))
+    }
 }

@@ -1,4 +1,4 @@
-FROM rocker/r-apt:bionic
+FROM r-base
 
 LABEL maintainer="Rick Helmus <r.helmus@uva.nl>" \
     org.label-schema.name="patRoon" \
@@ -11,13 +11,13 @@ LABEL maintainer="Rick Helmus <r.helmus@uva.nl>" \
 ENV SETUPDIR=/usr/local/setup
 
 RUN apt-get update -y && \
-    apt-get install -y --no-install-recommends libssl-dev libssh2-1-dev wget openbabel libv8-3.14-dev \
+    apt-get install -y --no-install-recommends libssl-dev libssh2-1-dev wget openbabel \
         libxml2-dev libnetcdf-dev netcdf-bin pngquant openjdk-11-jdk libmagick++-dev pandoc git pngquant texinfo \
         r-cran-checkmate r-cran-data.table r-cran-withr r-cran-digest r-cran-xml r-cran-xml2 r-cran-dbi \
-        r-cran-rsqlite r-cran-rjava r-cran-dplyr r-cran-rcolorbrewer \
+        r-cran-rsqlite r-cran-dplyr r-cran-rcolorbrewer \
         r-cran-htmlwidgets r-cran-shiny r-cran-knitr r-cran-r.utils \
         r-cran-ggplot2 r-cran-jsonlite r-cran-igraph r-cran-hmisc \
-        r-cran-robustbase r-cran-testthat r-cran-biocmanager \
+        r-cran-robustbase r-cran-testthat r-cran-v8 r-cran-biocmanager \
         r-bioc-biocparallel r-bioc-affy r-bioc-biocgenerics r-bioc-biobase \
         r-bioc-rbgl r-bioc-s4vectors r-bioc-biocparallel r-bioc-multtest && \
     mkdir -p $SETUPDIR && \

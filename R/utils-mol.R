@@ -17,7 +17,7 @@ getMoleculesFromSMILES <- function(SMILES, doTyping = FALSE, doIsotopes = FALSE,
             if (emptyIfFails)
                 ret <- emptyMol()
         }
-        else
+        else if (!isEmptyMol(ret))
         {
             if (doTyping)
             {
@@ -35,25 +35,16 @@ getMoleculesFromSMILES <- function(SMILES, doTyping = FALSE, doIsotopes = FALSE,
 
 getNeutralMassFromSMILES <- function(SMILES, mustWork = TRUE)
 {
-    # NOTE: molecules are converted to formula to get the mass instead of using
-    # rcdk::get.exact.mass() so that the neutral mass can be obtained
-    getMass <- function(m) rcdk::get.mol2formula(m)@mass
-    
-    sapply(getMoleculesFromSMILES(SMILES, doTyping = TRUE, doIsotopes = TRUE), function(m)
-    {
-        if (!mustWork)
-        {
-            if(!isValidMol(m))
-                return(NA)
-            
-            # this could fail for some edge cases
-            return(tryCatch(getMass(m), error = function(e) NA))
-        }
-        return(getMass(m))
-    })
-}
+    # Use OpenBabel to convert to (neutral) formulas and get mass from there,
+    # which seems less buggy compared to parsing the SMILES with RCDK and then
+    # using rcdk::get.mol2formula() to get the mass. The latter could give
+    # troubles in tryCatch() calls on Linux with certain JVMs.
+    forms <- convertToFormulaBabel(SMILES, "smi", mustWork = mustWork)
+    return(sapply(forms, function(f) if (length(f) > 0) rcdk::get.formula(f)@mass else NA_character_,
+                  USE.NAMES = FALSE))
+}    
 
-babelConvert <- function(input, inFormat, outFormat, mustWork = TRUE)
+babelConvert <- function(input, inFormat, outFormat, mustWork = TRUE, extraOpts = NULL)
 {
     # Use batch conversion with a single input/output file. Note that obabel
     # will stop after an error. This can be overidden, however, then it is
@@ -66,10 +57,13 @@ babelConvert <- function(input, inFormat, outFormat, mustWork = TRUE)
     doConversion <- function(inp)
     {
         cat(inp, file = inputFile, sep = "\n")
-        executeCommand(getCommandWithOptPath("obabel", "obabel"),
-                       c(paste0("-i", inFormat), inputFile,
-                         paste0("-o", outFormat), "-O", outputFile, "-xw"),
-                       stderr = FALSE)
+        
+        args <- c(paste0("-i", inFormat), inputFile,
+                  paste0("-o", outFormat), "-O", outputFile, "-xw")
+        if (!is.null(extraOpts))
+            args <- c(args, extraOpts)
+        
+        executeCommand(getCommandWithOptPath("obabel", "obabel"), args, stderr = FALSE)
         # each conversion is followed by a tab (why??) and newline. Read line
         # by line and remove tab afterwards.
         ret <- readLines(outputFile)
@@ -103,4 +97,11 @@ babelConvert <- function(input, inFormat, outFormat, mustWork = TRUE)
     }
     
     return(ret)
+}
+
+convertToFormulaBabel <- function(input, inFormat, mustWork)
+{
+    ret <- babelConvert(input = input, inFormat = inFormat, outFormat = "txt", mustWork = mustWork,
+                        extraOpts = c("--append", "formula"))
+    ret <- sub("[\\+\\-]+$", "", ret) # remove trailing positive/negative charge is present
 }

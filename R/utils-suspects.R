@@ -190,6 +190,8 @@ estimateIdentificationLevel <- function(suspectInChIKey1, suspectFormula, suspec
 }
 
 # NOTE: no-result rows are removed
+# UNDONE: proper defaults for minFormScores/minFormScoresToNext
+# UNDONE: allow compound scoring thresholds for ID level estimation
 annotateSuspectList <- function(scr, MSPeakLists = NULL, formulas = NULL, compounds = NULL,
                                 absMzDev = 0.005, relMinMSMSIntensity = 0.05,
                                 minFormScores, minFormScoresToNext)

@@ -1269,7 +1269,7 @@ setMethod("screenSuspects", "featureGroups", function(obj, suspects, rtWindow, m
 
     retlist <- lapply(seq_len(nrow(suspects)), function(ti)
     {
-        hasRT <- !is.null(suspects$rt) && !is.na(suspects$rt[ti])
+        hasRT <- !is.null(suspects[["rt"]]) && !is.na(suspects$rt[ti])
 
         # find related feature group(s)
         gi <- gInfo
@@ -1284,10 +1284,15 @@ setMethod("screenSuspects", "featureGroups", function(obj, suspects, rtWindow, m
 
         hits <- rbindlist(lapply(rownames(gi), function(g)
         {
-            ret <- data.table(name = suspects$name[ti], rt = if (hasRT) suspects$rt[ti] else NA, mz = suspects$mz[ti],
-                              group = g, exp_rt = gi[g, "rts"], exp_mz = gi[g, "mzs"],
-                              d_rt = if (hasRT) gi[g, "rts"] - suspects$rt[ti] else NA, d_mz = gi[g, "mzs"] - suspects$mz[ti])
-
+            ret <- data.table()
+            for (col in c("name", "mz", "SMILES", "InChI", "formula", "neutralMass", "adduct", "rt"))
+            {
+                if (!is.null(suspects[[col]]))
+                    set(ret, 1L, col, suspects[[col]][ti])
+            }
+            ret[, c("group", "exp_rt", "exp_mz", "d_rt", "d_mz") :=
+                    .(g, gi[g, "rts"], gi[g, "mzs"], d_rt = if (hasRT) gi[g, "rts"] - rt else NA, gi[g, "mzs"] - mz)]
+            
             for (anai in seq_len(nrow(anaInfo)))
                 set(ret, 1L, anaInfo$analysis[anai], gTable[[g]][anai])
 

@@ -170,6 +170,7 @@ Collate:
     'utils-screening.R'
     'feature_groups-screening.R'
     'feature_groups-sirius.R'
+    'feature_groups-set.R'
     'feature_groups-tasq.R'
     'feature_groups-xcms.R'
     'feature_groups-xcms3.R'

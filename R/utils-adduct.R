@@ -19,11 +19,11 @@
 #' @name adduct-utils
 NULL
 
-checkAndToAdduct <- function(adduct, na.ok = FALSE)
+checkAndToAdduct <- function(adduct, na.ok = FALSE, .var.name = "adduct")
 {
     checkmate::assert(checkmate::checkString(adduct, min.chars = 1, na.ok = na.ok),
                       checkmate::checkClass(adduct, "adduct"),
-                      .var.name = "adduct")
+                      .var.name = .var.name)
     as.adduct(adduct)
 }
 

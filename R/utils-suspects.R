@@ -193,12 +193,21 @@ annotateSuspectList <- function(scr, MSPeakLists = NULL, formulas = NULL, compou
                                 absMzDev = 0.005, relMinMSMSIntensity = 0.05,
                                 minFormScores, minFormScoresToNext)
 {
+    ac <- checkmate::makeAssertCollection()
+    assertScreeningResults(scr, fromFGroups = TRUE, add = ac)
+    aapply(checkmate::assertClass, . ~ MSPeakLists + formulas + compounds,
+           c("MSPeakLists", "formulas", "compounds"), null.ok = TRUE, fixed = list(add = ac))
+    aapply(checkmate::assertNumber, . ~ absMzDev + relMinMSMSIntensity, lower = 0,
+           finite = TRUE, fixed = list(add = ac))
+    aapply(checkmate::assertNumeric, . ~ minFormScores + minFormScoresToNext, finite = TRUE,
+           any.missing = FALSE, names = "unique", fixed = list(add = ac))
+    checkmate::reportAssertions(ac)
+    
     scr <- copy(scr)
     
     # get InChIKeys/Formulas if necessary and possible
     # UNDONE: cache
-    # UNDONE: also support screening results from features object?
-    
+
     hasData <- function(x) !is.na(x) & nzchar(x)
     missingInScr <- function(what) if (is.null(scr[[what]])) rep(TRUE, nrow(scr)) else !hasData(scr[[what]])
     

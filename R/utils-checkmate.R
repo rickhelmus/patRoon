@@ -141,7 +141,6 @@ assertSuspectList <- function(x, adduct, skipInvalid, .var.name = checkmate::vna
     
     checkmate::assertDataFrame(x, any.missing = skipInvalid, min.rows = 1, .var.name = .var.name, add = add)
     assertHasNames(x, "name", .var.name = .var.name, add = add)
-    
 
     checkmate::assertNames(intersect(names(x), mzCols), subset.of = mzCols,
                            .var.name = paste0("names(", .var.name, ")"), add = add)
@@ -165,6 +164,15 @@ assertSuspectList <- function(x, adduct, skipInvalid, .var.name = checkmate::vna
                                                            null.ok = TRUE, add = add)
     assertNumField("mz"); assertNumField("neutralMass"); assertNumField("rt")
 
+    invisible(NULL)
+}
+
+assertScreeningResults <- function(x, fromFGroups, .var.name = checkmate::vname(x), add = NULL)
+{
+    checkmate::assertDataFrame(x, min.rows = 1, .var.name = .var.name, add = add)
+    assertHasNames(x, c("name", "mz"), .var.name = .var.name, add = add)
+    if (fromFGroups && is.null(x[["group"]]))
+        stop("The screening results should be obtained from feature groups (thus not from features objects)")
     invisible(NULL)
 }
 

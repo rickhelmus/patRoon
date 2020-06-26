@@ -203,10 +203,15 @@ annotateSuspectList <- function(scr, MSPeakLists = NULL, formulas = NULL, compou
            any.missing = FALSE, names = "unique", fixed = list(add = ac))
     checkmate::reportAssertions(ac)
     
+    hash <- makeHash(scr, MSPeakLists, formulas, compounds, absMzDev, relMinMSMSIntensity, minFormScores,
+                     minFormScoresToNext)
+    cd <- loadCacheData("annotateSuspects", hash)
+    if (!is.null(cd))
+        return(cd)
+    
     scr <- copy(scr)
     
     # get InChIKeys/Formulas if necessary and possible
-    # UNDONE: cache
 
     hasData <- function(x) !is.na(x) & nzchar(x)
     missingInScr <- function(what) if (is.null(scr[[what]])) rep(TRUE, nrow(scr)) else !hasData(scr[[what]])
@@ -261,6 +266,8 @@ annotateSuspectList <- function(scr, MSPeakLists = NULL, formulas = NULL, compou
                                                               MSMSList, fTable, fScRanges, minFormScores,
                                                               minFormScoresToNext, cTable, absMzDev))
     }
+    
+    saveCacheData("annotateSuspects", scr, hash)
     
     return(scr[])
 }

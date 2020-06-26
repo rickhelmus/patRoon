@@ -189,6 +189,7 @@ estimateIdentificationLevel <- function(suspectInChIKey1, suspectFormula, suspec
     return("5") # no (good) formula match
 }
 
+# NOTE: no-result rows are removed
 annotateSuspectList <- function(scr, MSPeakLists = NULL, formulas = NULL, compounds = NULL,
                                 absMzDev = 0.005, relMinMSMSIntensity = 0.05,
                                 minFormScores, minFormScoresToNext)
@@ -210,6 +211,7 @@ annotateSuspectList <- function(scr, MSPeakLists = NULL, formulas = NULL, compou
         return(cd)
     
     scr <- copy(scr)
+    scr <- scr[!is.na(group)]
     
     # get InChIKeys/Formulas if necessary and possible
 

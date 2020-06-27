@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>6.6 Basic quantitative and regression analysis | patRoon handbook</title>
   <meta name="description" content="6.6 Basic quantitative and regression analysis | patRoon handbook" />
-  <meta name="generator" content="bookdown 0.19 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.20 and GitBook 2.6.7" />
 
   <meta property="og:title" content="6.6 Basic quantitative and regression analysis | patRoon handbook" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2020-06-10" />
+<meta name="date" content="2020-06-27" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -150,8 +150,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="5" data-path="processing-workflow-data.html"><a href="processing-workflow-data.html"><i class="fa fa-check"></i><b>5</b> Processing workflow data</a><ul>
 <li class="chapter" data-level="5.1" data-path="inspecting-results.html"><a href="inspecting-results.html"><i class="fa fa-check"></i><b>5.1</b> Inspecting results</a></li>
 <li class="chapter" data-level="5.2" data-path="filtering.html"><a href="filtering.html"><i class="fa fa-check"></i><b>5.2</b> Filtering</a><ul>
-<li class="chapter" data-level="5.2.1" data-path="filtering.html"><a href="filtering.html#features-1"><i class="fa fa-check"></i><b>5.2.1</b> Features</a></li>
-<li class="chapter" data-level="5.2.2" data-path="filtering.html"><a href="filtering.html#annotation-1"><i class="fa fa-check"></i><b>5.2.2</b> Annotation</a></li>
+<li class="chapter" data-level="5.2.1" data-path="features.html"><a href="features.html#features"><i class="fa fa-check"></i><b>5.2.1</b> Features</a></li>
+<li class="chapter" data-level="5.2.2" data-path="annotation.html"><a href="annotation.html#annotation"><i class="fa fa-check"></i><b>5.2.2</b> Annotation</a></li>
 <li class="chapter" data-level="5.2.3" data-path="filtering.html"><a href="filtering.html#components"><i class="fa fa-check"></i><b>5.2.3</b> Components</a></li>
 <li class="chapter" data-level="5.2.4" data-path="filtering.html"><a href="filtering.html#negation"><i class="fa fa-check"></i><b>5.2.4</b> Negation</a></li>
 </ul></li>
@@ -207,7 +207,7 @@ anaInfo &lt;-<span class="st"> </span><span class="kw">generateAnalysisInfo</spa
                                 <span class="dt">groups =</span> <span class="kw">c</span>(<span class="kw">rep</span>(<span class="st">&quot;solvent&quot;</span>, <span class="dv">3</span>), <span class="kw">rep</span>(<span class="st">&quot;standard&quot;</span>, <span class="dv">3</span>)),
                                 <span class="dt">blanks =</span> <span class="st">&quot;solvent&quot;</span>,
                                 <span class="dt">concs =</span> <span class="kw">c</span>(<span class="ot">NA</span>, <span class="ot">NA</span>, <span class="ot">NA</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>))</code></pre></div>
-<p>For analyses with known concentrations (e.g. standards) the <code>conc</code> column should be set; for all others the value should be set to <code>NA</code>.</p>
+<p>For analyses with known concentrations (e.g. standards) the <code>conc</code> column should be set; for all others the value should be set to <code>NA</code>.</p>
 <p>The <code>as.data.table()</code> function (or <code>as.data.frame()</code>) can then be used to calculate regression data and estimate concentrations:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># use areas for quantitation and make sure that feature data is reported</span>
 <span class="co"># (otherwise no concentrations are calculated)</span>
@@ -225,7 +225,7 @@ anaInfo &lt;-<span class="st"> </span><span class="kw">generateAnalysisInfo</spa
 #&gt; 79: M279_R284_557    1 0.6417469  47565.33 -2312 1.4313725
 #&gt; 80: M279_R284_557    2 0.6417469  47565.33 -2312 1.1372549
 #&gt; 81: M279_R284_557    3 0.6417469  47565.33 -2312 3.4313725</code></pre>
-<p>Calculated concentrations are stored in the <code>conc_reg</code> column, alongside while other regression data (i.e. <code>RSQ</code>, <code>intercept</code>, <code>slope</code> columns). To perform basic trend analysis the <code>RSQ</code> (i.e. R squared) can be used:</p>
+<p>Calculated concentrations are stored in the <code>conc_reg</code> column, alongside while other regression data (i.e. <code>RSQ</code>, <code>intercept</code>, <code>slope</code> columns). To perform basic trend analysis the <code>RSQ</code> (i.e. R squared) can be used:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fGroupsTab &lt;-<span class="st"> </span><span class="kw">as.data.table</span>(fGroups, <span class="dt">areas =</span> <span class="ot">TRUE</span>, <span class="dt">features =</span> <span class="ot">FALSE</span>, <span class="dt">regression =</span> <span class="ot">TRUE</span>)
 <span class="co"># subset fGroups with reasonable correlation</span>
 increasingFGroups &lt;-<span class="st"> </span>fGroups[, fGroupsTab[RSQ <span class="op">&gt;=</span><span class="st"> </span><span class="fl">0.8</span>, group]]</code></pre></div>

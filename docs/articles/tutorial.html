@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.1</span>
       </span>
     </div>
 
@@ -119,7 +119,7 @@
       <h1 data-toc-skip>patRoon tutorial</h1>
                         <h4 class="author">Rick Helmus</h4>
             
-            <h4 class="date">2020-06-10</h4>
+            <h4 class="date">2020-06-27</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/rickhelmus/patRoon/blob/master/vignettes/tutorial.Rmd"><code>vignettes/tutorial.Rmd</code></a></small>
       <div class="hidden name"><code>tutorial.Rmd</code></div>
@@ -151,13 +151,13 @@ p.caption {
 <!-- UNDONE: link to advanced vignette -->
 <p>In this tutorial you will learn how to perform a simple non-target analysis with <code>patRoon</code>. This tutorial is not meant to give a detailed overview of <code>patRoon</code>. Instead, it serves as a quick introduction on how to use <code>patRoon</code> to setup and perform a full non-target analysis workflow.</p>
 <p>The workflow in this tutorial consists of the following steps:</p>
-<div id="htmlwidget-5d427090ad63f262939e" style="width:750px;height:100px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-5d427090ad63f262939e">{"x":{"diagram":"\ndigraph rmarkdown {\ngraph [ rankdir = LR ]\nnode [ shape = box,\n       fixedsize = true,\n       width = 2.2,\n       height = 1,\n       fontsize = 18,\n       fillcolor = darkseagreen1,\n       style = filled ]\n\"New project\" -> Features -> Annotation -> Reporting [ arrowhead = vee ]\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-f4413d70e1f0a4dd2470" style="width:750px;height:100px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-f4413d70e1f0a4dd2470">{"x":{"diagram":"\ndigraph rmarkdown {\ngraph [ rankdir = LR ]\nnode [ shape = box,\n       fixedsize = true,\n       width = 2.2,\n       height = 1,\n       fontsize = 18,\n       fillcolor = darkseagreen1,\n       style = filled ]\n\"New project\" -> Features -> Annotation -> Reporting [ arrowhead = vee ]\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 </div>
 <div id="data" class="section level1">
 <h1 class="hasAnchor">
 <a href="#data" class="anchor"></a>Data</h1>
-<p>In this tutorial we will use example data provided within the <a href="https://github.com/rickhelmus/patRoonData">patRoonData</a> package. Please make sure this package is installed (see the <a href="https://rickhelmus.github.io/patRoon/">readme</a> for brief installation instructions). The example dataset contains LC-MS data for a standard mixture with known composition (‘standard-X’) and a blank solvent (‘solvent-X’), both in triplicate. While this may not seem like the most exciting data, it does allow to demonstrate the most important functionalities of <code>patRoon</code>.</p>
+<p>In this tutorial we will use example data provided within the <a href="https://github.com/rickhelmus/patRoonData">patRoonData</a> package. Please make sure this package is installed (see the <a href="https://rickhelmus.github.io/patRoon/">readme</a> for brief installation instructions). The example dataset contains LC-MS data for a standard mixture with known composition ('standard-X') and a blank solvent ('solvent-X'), both in triplicate. While this may not seem like the most exciting data, it does allow to demonstrate the most important functionalities of <code>patRoon</code>.</p>
 <!-- UNDONE: Move/Refer below to other vignette -->
 <p>The provided analyses already have been exported to an open format (<em>.mzML</em>) and are ready to use. For your own data it may be necessary to first export your data to <em>mzXML</em> or <em>mzML</em> and perform other data pre-treatment steps such as mass re-calibration. This can be done using the tools from <a href="http://proteowizard.sourceforge.net/">ProteoWizard</a> or software from your mass spectrometer vendor. Alternatively, <code>patRoon</code> can do this automatically for your analyses with the <code><a href="../reference/convertMSFiles.html">convertMSFiles()</a></code> function. Please see the reference manual or other vignettes for its usage.</p>
 </div>
@@ -168,10 +168,10 @@ p.caption {
 <p>Starting a new project typically consists of</p>
 <ol style="list-style-type: decimal">
 <li>Creating a new directory (unsurprisingly!)</li>
-<li>Changing the active working directory to the project directory (e.g. with <code><a href="https://rdrr.io/r/base/getwd.html">setwd()</a></code>).</li>
+<li>Changing the active working directory to the project directory (e.g. with <code><a href="https://rdrr.io/r/base/getwd.html">setwd()</a></code>).</li>
 <li>Create (or copy) an <code>R</code> processing script.</li>
 </ol>
-<p>Note that step 2 is important as any output files (e.g. reports and cached results) are stored to the current working directory by default. Consequently, always take care to ensure that this directory is active, for instance, after restarting <code>R</code>.</p>
+<p>Note that step 2 is important as any output files (e.g. reports and cached results) are stored to the current working directory by default. Consequently, always take care to ensure that this directory is active, for instance, after restarting <code>R</code>.</p>
 <p>Steps 1-3 can be easily performed with the <code><a href="../reference/GUI-utils.html">newProject()</a></code> function. Alternatively, you can of course also perform these steps yourself. Both approaches will be discussed in the next sections.</p>
 <div id="automatic-project-creation" class="section level2">
 <h2 class="hasAnchor">
@@ -204,7 +204,7 @@ p.caption {
 <div id="manual-project-creation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#manual-project-creation" class="anchor"></a>Manual project creation</h2>
-<p>For RStudio users it is easiest to simply create a new RStudio project (e.g. <em>File</em> –&gt; <em>New Project</em>). This will create a new directory and ensure that the working directory is set whenever you re-open it. Alternatively, you can do this manually, for instance:</p>
+<p>For RStudio users it is easiest to simply create a new RStudio project (e.g. <em>File</em> --&gt; <em>New Project</em>). This will create a new directory and ensure that the working directory is set whenever you re-open it. Alternatively, you can do this manually, for instance:</p>
 <div class="sourceCode"><html><body><pre class="r"><span class="no">projDir</span> <span class="kw">&lt;-</span> <span class="st">"~/myProjectDir"</span>
 <span class="fu"><a href="https://rdrr.io/r/base/files2.html">dir.create</a></span>(<span class="no">projDir</span>)
 <span class="fu"><a href="https://rdrr.io/r/base/getwd.html">setwd</a></span>(<span class="no">projDir</span>)</pre></body></html></div>
@@ -341,7 +341,7 @@ p.caption {
 <p>The latter two columns are especially important for <a href="#data-cleanup">data cleanup</a>, which will be discussed later. For now keep in mind that the analyses for the solvents and standards each belong to a different replicate group (<code>"solvent"</code> and <code>"standard"</code>) and that the solvents should be used for blank subtraction.</p>
 <p>In this tutorial the analysis information was generated by the <code><a href="../reference/analysis-information.html">generateAnalysisInfo()</a></code> function. This function will scan a given directory for MS data files and automatically fill in the <code>path</code> and <code>analysis</code> columns from this information. In addition, you can pass replicate group and blank information to this function as was done in the code above.</p>
 <blockquote>
-<p><strong><em>NOTE</em></strong> Of course nothing stops you from creating a <code>data.frame</code> with analysis information manually within <code>R</code> or load the information from a <em>csv</em> file. In fact, when you create a new project with <code><a href="../reference/GUI-utils.html">newProject()</a></code> you can select to generate a separate <em>csv</em> file with analysis information (i.e. by filling in the right information in the analysis tab).</p>
+<p><strong><em>NOTE</em></strong> Of course nothing stops you from creating a <code>data.frame</code> with analysis information manually within <code>R</code> or load the information from a <em>csv</em> file. In fact, when you create a new project with <code><a href="../reference/GUI-utils.html">newProject()</a></code> you can select to generate a separate <em>csv</em> file with analysis information (i.e. by filling in the right information in the analysis tab).</p>
 </blockquote>
 <blockquote>
 <p><strong><em>NOTE</em></strong> The blanks for the solvent analyses are set to themselves. This will remove any features from the solvents later in the workflow, which is generally fine as we are usually not interested in the blanks anyway.</p>
@@ -351,7 +351,7 @@ p.caption {
 <div id="find-and-group-features" class="section level1">
 <h1 class="hasAnchor">
 <a href="#find-and-group-features" class="anchor"></a>Find and group features</h1>
-<p>The first step of a LC-MS non-target analysis workflow is typically the extraction of so called ‘features’. While sometimes slightly different definitions are used, a feature can be seen as a single peak within an extracted ion chromatogram. For a complex sample it is not uncommon that hundreds to thousands of features can extracted. Because these large numbers this process is typically automatized nowadays.</p>
+<p>The first step of a LC-MS non-target analysis workflow is typically the extraction of so called 'features'. While sometimes slightly different definitions are used, a feature can be seen as a single peak within an extracted ion chromatogram. For a complex sample it is not uncommon that hundreds to thousands of features can extracted. Because these large numbers this process is typically automatized nowadays.</p>
 <p>To obtain all the features within your dataset the <code>findFeatures</code> function is used. This function requires data on the analysis information (<code>anaInfo</code> variable created earlier) and the desired algorithm that should be used. On top of that there are many more options that can significantly influence the feature finding process, hence, it is important to evaluate results afterwards.</p>
 <p>In this tutorial we will use the <a href="http://openms.de/">OpenMS</a> software to find features and stick with default parameters:</p>
 <div class="sourceCode"><html><body><pre class="r"><span class="no">fList</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/feature-finding.html">findFeatures</a></span>(<span class="no">anaInfo</span>, <span class="st">"openms"</span>)</pre></body></html></div>
@@ -384,8 +384,8 @@ p.caption {
 #&gt; Applying replicate group filter... Done! Filtered 0 (0.00%) groups. Remaining: 34.</code></pre>
 <p>The following filterings steps will be performed:</p>
 <ul>
-<li>Features are removed if their intensity is below a defined intensity threshold (set by <code>absMinIntensity</code>). This filter is an effective way to not only remove ‘noisy’ data, but, for instance, can also be used to remove any low intensity features which likely miss MS/MS data.</li>
-<li>If a feature is not ubiquitously present in (part of) replicate analyses it will be filtered out from that replicate group. This is controlled by setting <code>relMinReplicateAbundance</code>. The value is relative, for instance, a value of <code>0.5</code> would mean that a feature needs to be present in half of the replicates. In this tutorial we use a value of <code>1</code> which means that a feature should be present in all replicate samples. This is a <em>very</em> effective filter in removing any outliers, for instance, caused by features which don’t actually represent a well defined chromatographic peak.</li>
+<li>Features are removed if their intensity is below a defined intensity threshold (set by <code>absMinIntensity</code>). This filter is an effective way to not only remove 'noisy' data, but, for instance, can also be used to remove any low intensity features which likely miss MS/MS data.</li>
+<li>If a feature is not ubiquitously present in (part of) replicate analyses it will be filtered out from that replicate group. This is controlled by setting <code>relMinReplicateAbundance</code>. The value is relative, for instance, a value of <code>0.5</code> would mean that a feature needs to be present in half of the replicates. In this tutorial we use a value of <code>1</code> which means that a feature should be present in all replicate samples. This is a <em>very</em> effective filter in removing any outliers, for instance, caused by features which don't actually represent a well defined chromatographic peak.</li>
 <li>Similarly, features with within a replicate group are removed if the relative standard deviation (RSD) of their intensities exceeds that of the value set by the <code>maxReplicateIntRSD</code> argument.</li>
 <li>Features are filtered out that do not have a significantly higher intensity than the blank intensity. This is controlled by <code>blankThreshold</code>: the given value of <code>5</code> means that the intensity of a feature needs to be at least five times higher compared to the (average) blank signal.</li>
 </ul>
@@ -504,12 +504,12 @@ p.caption {
 #&gt; ============================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================
 #&gt; Loaded 2209 compounds from 23 features (67.65%).</code></pre>
 <p>While <code><a href="../reference/compound-generation.html">generateCompounds()</a></code> is running a list of candidate compound structures will be downloaded for every feature group and ranked according to various scoring parameters.</p>
-<p>In this case we are using the <a href="https://pubchem.ncbi.nlm.nih.gov/">PubChem</a> database to retrieve candidates. Other commonly databases are <a href="http://www.chemspider.com/">ChemSpider</a> and EPA’s <a href="https://comptox.epa.gov/dashboard">CompTox</a>. See <code>?generateCompounds()</code> for more information on possible databases and many other parameters that can be set.</p>
+<p>In this case we are using the <a href="https://pubchem.ncbi.nlm.nih.gov/">PubChem</a> database to retrieve candidates. Other commonly databases are <a href="http://www.chemspider.com/">ChemSpider</a> and EPA's <a href="https://comptox.epa.gov/dashboard">CompTox</a>. See <code>?generateCompounds()</code> for more information on possible databases and many other parameters that can be set.</p>
 <blockquote>
 <p><strong><em>NOTE</em></strong> You may get several warnings for feature groups for which no compounds could be searched. Usually this is because we set a hard limit with the <code>maxCandidatesToStop</code> argument. Increasing this value is tempting, however, the compounds are searched through an online database and processing thousands of candidates takes too much time (and is not nice towards the servers running MetFrag!). An obvious drawback is that you will not get any results for feature groups with many candidates (however, these are generally difficult to sort out anyway!).</p>
 </blockquote>
 <blockquote>
-<p><strong><em>NOTE</em></strong> This is often one of the most time consuming steps during the workflow. For this reason, and in order to not ‘abuse’ the servers used by MetFrag, you should always take care to prioritize your data before running this function!</p>
+<p><strong><em>NOTE</em></strong> This is often one of the most time consuming steps during the workflow. For this reason, and in order to not 'abuse' the servers used by MetFrag, you should always take care to prioritize your data before running this function!</p>
 </blockquote>
 <p>Finally we use the <code><a href="../reference/compounds-class.html">addFormulaScoring()</a></code> function to improve ranking of candidates by incorporating the formula calculation data from the previous step.</p>
 <div class="sourceCode"><html><body><pre class="r"><span class="no">compounds</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/compounds-class.html">addFormulaScoring</a></span>(<span class="no">compounds</span>, <span class="no">formulas</span>, <span class="kw">updateScore</span> <span class="kw">=</span> <span class="fl">TRUE</span>)</pre></body></html></div>
@@ -623,7 +623,7 @@ p.caption {
 <div class="sourceCode"><html><body><pre class="r"><span class="fu"><a href="../reference/generics.html">plotEIC</a></span>(<span class="no">components</span>, <span class="st">"CMP6"</span>, <span class="no">fGroups</span>)</pre></body></html></div>
 <p><img src="tutorial_files/figure-html/unnamed-chunk-4-2.png" width="480"></p>
 <blockquote>
-<p><strong><em>NOTE</em></strong> The componentization process must currently be seen as a tool to provide hints on how different features <em>may</em> be related to each other. Hence, results should always be checked manually, for instance, by the above commands or with the reports generated in the next step. For this reason, features that were annotated as e.g. adducts or fragments should not be blindly removed.</p>
+<p><strong><em>NOTE</em></strong> The componentization process must currently be seen as a tool to provide hints on how different features <em>may</em> be related to each other. Hence, results should always be checked manually, for instance, by the above commands or with the reports generated in the next step. For this reason, features that were annotated as e.g. adducts or fragments should not be blindly removed.</p>
 </blockquote>
 </div>
 <div id="reporting" class="section level1">

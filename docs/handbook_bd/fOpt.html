@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>6.2 Feature parameter optimization | patRoon handbook</title>
   <meta name="description" content="6.2 Feature parameter optimization | patRoon handbook" />
-  <meta name="generator" content="bookdown 0.19 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.20 and GitBook 2.6.7" />
 
   <meta property="og:title" content="6.2 Feature parameter optimization | patRoon handbook" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2020-06-10" />
+<meta name="date" content="2020-06-27" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -150,8 +150,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="5" data-path="processing-workflow-data.html"><a href="processing-workflow-data.html"><i class="fa fa-check"></i><b>5</b> Processing workflow data</a><ul>
 <li class="chapter" data-level="5.1" data-path="inspecting-results.html"><a href="inspecting-results.html"><i class="fa fa-check"></i><b>5.1</b> Inspecting results</a></li>
 <li class="chapter" data-level="5.2" data-path="filtering.html"><a href="filtering.html"><i class="fa fa-check"></i><b>5.2</b> Filtering</a><ul>
-<li class="chapter" data-level="5.2.1" data-path="filtering.html"><a href="filtering.html#features-1"><i class="fa fa-check"></i><b>5.2.1</b> Features</a></li>
-<li class="chapter" data-level="5.2.2" data-path="filtering.html"><a href="filtering.html#annotation-1"><i class="fa fa-check"></i><b>5.2.2</b> Annotation</a></li>
+<li class="chapter" data-level="5.2.1" data-path="features.html"><a href="features.html#features"><i class="fa fa-check"></i><b>5.2.1</b> Features</a></li>
+<li class="chapter" data-level="5.2.2" data-path="annotation.html"><a href="annotation.html#annotation"><i class="fa fa-check"></i><b>5.2.2</b> Annotation</a></li>
 <li class="chapter" data-level="5.2.3" data-path="filtering.html"><a href="filtering.html#components"><i class="fa fa-check"></i><b>5.2.3</b> Components</a></li>
 <li class="chapter" data-level="5.2.4" data-path="filtering.html"><a href="filtering.html#negation"><i class="fa fa-check"></i><b>5.2.4</b> Negation</a></li>
 </ul></li>
@@ -200,7 +200,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
             <section class="normal" id="section-">
 <div id="fOpt" class="section level2">
 <h2><span class="header-section-number">6.2</span> Feature parameter optimization</h2>
-<p>Many different parameters exist that may affect the output quality of feature finding and grouping. To avoid time consuming manual experimentation, functionality is provided to largely automate the optimization process. The methodology, which uses design of experiments (DoE), is based on the excellent <a href="IPO">Isotopologue Parameter Optimization (IPO)</a> R package. The functionality of this package is directly integrated in patRoon. Some functionality was added or changed, the most important being support for other feature finding and grouping algorithms besides <a href="https://www.bioconductor.org/packages/release/bioc/html/xcms.html">XCMS</a> and basic optimization support for qualitative parameters. Nevertheless, the core optimization algorithms are largely untouched.</p>
+<p>Many different parameters exist that may affect the output quality of feature finding and grouping. To avoid time consuming manual experimentation, functionality is provided to largely automate the optimization process. The methodology, which uses design of experiments (DoE), is based on the excellent <a href="IPO">Isotopologue Parameter Optimization (IPO)</a> R package. The functionality of this package is directly integrated in patRoon. Some functionality was added or changed, the most important being support for other feature finding and grouping algorithms besides [XCMS] and basic optimization support for qualitative parameters. Nevertheless, the core optimization algorithms are largely untouched.</p>
 <p>This section will introduce the most important concepts and functionalities. Please see the reference manual for more information (e.g. <code>?`feature-optimization`</code>).</p>
 <div id="parameter-sets" class="section level3">
 <h3><span class="header-section-number">6.2.1</span> Parameter sets</h3>
@@ -209,7 +209,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 pSet &lt;-<span class="st"> </span><span class="kw">generateFeatureOptPSet</span>(<span class="st">&quot;openms&quot;</span>, <span class="dt">chromSNR =</span> <span class="kw">c</span>(<span class="dv">5</span>, <span class="dv">10</span>)) <span class="co"># add parameter</span>
 <span class="co"># of course manually making a list is also possible (e.g. if you don&#39;t want to test the default parameters)</span>
 pSet &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">noiseThrInt =</span> <span class="kw">c</span>(<span class="dv">1000</span>, <span class="dv">5000</span>))</code></pre></div>
-<p>When optimizing with <a href="https://www.bioconductor.org/packages/release/bioc/html/xcms.html">XCMS</a> a few things have to be considered. First of all, when using the XCMS3 interface (i.e. <code>algorithm=&quot;xcms3&quot;</code>) the underlying method that should be used for finding and grouping features and retention alignment should be set. In case these are not set default methods will be used.</p>
+<p>When optimizing with [XCMS] a few things have to be considered. First of all, when using the XCMS3 interface (i.e. <code>algorithm=&quot;xcms3&quot;</code>) the underlying method that should be used for finding and grouping features and retention alignment should be set. In case these are not set default methods will be used.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pSet &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">method =</span> <span class="st">&quot;centWave&quot;</span>, <span class="dt">ppm =</span> <span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">8</span>))
 pSet &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">ppm =</span> <span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">8</span>)) <span class="co"># same: centWave is default</span>
 
@@ -221,7 +221,7 @@ pSetFG &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="d
 <p>When a parameter set has been defined it should be used as input for the <code>optimizeFeatureFinding()</code> or <code>optimizeFeatureGrouping()</code> functions.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ftOpt &lt;-<span class="st"> </span><span class="kw">optimizeFeatureFinding</span>(anaInfo, <span class="st">&quot;openms&quot;</span>, pSet)
 fgOpt &lt;-<span class="st"> </span><span class="kw">optimizeFeatureGrouping</span>(fList, <span class="st">&quot;openms&quot;</span>, pSetFG) <span class="co"># fList is an existing features object</span></code></pre></div>
-<p>Similar to <code>findFeatures()</code>, the first argument to <code>optimizeFeatureFinding()</code> should be the <a href="preparations.html#anaInfo">analysis information</a>. Note that it is not uncommon to perform the optimization with only a subset of (representative) analyses (i.e. to reduce processing time).</p>
+<p>Similar to <code>findFeatures()</code>, the first argument to <code>optimizeFeatureFinding()</code> should be the <a href="preparations.html#anaInfo">analysis information</a>. Note that it is not uncommon to perform the optimization with only a subset of (representative) analyses (i.e. to reduce processing time).</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ftOpt &lt;-<span class="st"> </span><span class="kw">optimizeFeatureFinding</span>(anaInfo[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>, ], <span class="st">&quot;openms&quot;</span>, pSet) <span class="co"># only use first two analyses</span></code></pre></div>
 <p>From the parameter set a design of experiment will be automatically created. Obviously, the more parameters are specified, the longer such an experiment will take. After an experiment has finished, the optimization algorithm will start a new experiment where numeric ranges for each parameter are increased or decreased in order to more accurately find optimum values. Hence, the numeric ranges specified in the parameter set are only <em>initial</em> ranges, and will be changed in subsequent experiments. After each experiment iteration the results will be evaluated and a new experiment will be started as long as better results were obtained during the last experiment (although there is a hard limit defined by the <code>maxIterations</code> argument).</p>
 <p>For some parameters it is recommended or even necessary to set hard limits on the numeric ranges that are allowed to be tested. For instance, setting a minimum feature intensity threshold is highly recommended to avoid excessive processing time and potentially suboptimal results due to excessive amounts of resulting features. Configuring absolute parameter ranges is done by setting the <code>paramRanges</code> argument.</p>
@@ -239,12 +239,12 @@ ftOpt &lt;-<span class="st"> </span><span class="kw">optimizeFeatureFinding</spa
                                 <span class="kw">list</span>(<span class="dt">isotopeFilteringModel =</span> <span class="st">&quot;metabolites (5% RMS)&quot;</span>),
                                 <span class="kw">list</span>(<span class="dt">isotopeFilteringModel =</span> <span class="st">&quot;metabolites (2% RMS)&quot;</span>),
                                 <span class="dt">templateParams =</span> <span class="kw">list</span>(<span class="dt">chromFWHM =</span> <span class="kw">c</span>(<span class="dv">4</span>, <span class="dv">8</span>)))</code></pre></div>
-<p>As its name suggests, the <code>templateParams</code> argument serves as a template parameter set, and its values are essentially combined with each given parameter set. Note that current support for optimizing qualitative parameters is relatively basic and time consuming. This is because tests are essentially repeated for each parameter set (e.g. in the above example the <code>chromFWHM</code> parameter is optimized twice, each time with a different value for <code>isotopeFilteringModel</code>).</p>
+<p>As its name suggests, the <code>templateParams</code> argument serves as a template parameter set, and its values are essentially combined with each given parameter set. Note that current support for optimizing qualitative parameters is relatively basic and time consuming. This is because tests are essentially repeated for each parameter set (e.g. in the above example the <code>chromFWHM</code> parameter is optimized twice, each time with a different value for <code>isotopeFilteringModel</code>).</p>
 </div>
 <div id="processing-optmization-results" class="section level3">
 <h3><span class="header-section-number">6.2.2</span> Processing optmization results</h3>
 <p>The results of an optimization process are stored in objects from the S4 <code>optimizationResult</code> class. Several methods are defined to inspect and visualize these results.</p>
-<p>The <code>optimizedParameters()</code> function is used to inspect the best parameter settings. Similarly, the <code>optimizedObject()</code> function can be used to obtain the object that was created with these settings (i.e. a <code>features</code> or <code>featureGroups</code> object).</p>
+<p>The <code>optimizedParameters()</code> function is used to inspect the best parameter settings. Similarly, the <code>optimizedObject()</code> function can be used to obtain the object that was created with these settings (i.e. a <code>features</code> or <code>featureGroups</code> object).</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">optimizedParameters</span>(ftOpt) <span class="co"># best settings for whole experiment</span></code></pre></div>
 <pre><code>#&gt; $chromFWHM
 #&gt; [1] 3

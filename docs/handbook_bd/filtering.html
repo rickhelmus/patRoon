@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>5.2 Filtering | patRoon handbook</title>
   <meta name="description" content="5.2 Filtering | patRoon handbook" />
-  <meta name="generator" content="bookdown 0.19 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.20 and GitBook 2.6.7" />
 
   <meta property="og:title" content="5.2 Filtering | patRoon handbook" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2020-06-10" />
+<meta name="date" content="2020-06-27" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -150,8 +150,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="5" data-path="processing-workflow-data.html"><a href="processing-workflow-data.html"><i class="fa fa-check"></i><b>5</b> Processing workflow data</a><ul>
 <li class="chapter" data-level="5.1" data-path="inspecting-results.html"><a href="inspecting-results.html"><i class="fa fa-check"></i><b>5.1</b> Inspecting results</a></li>
 <li class="chapter" data-level="5.2" data-path="filtering.html"><a href="filtering.html"><i class="fa fa-check"></i><b>5.2</b> Filtering</a><ul>
-<li class="chapter" data-level="5.2.1" data-path="filtering.html"><a href="filtering.html#features-1"><i class="fa fa-check"></i><b>5.2.1</b> Features</a></li>
-<li class="chapter" data-level="5.2.2" data-path="filtering.html"><a href="filtering.html#annotation-1"><i class="fa fa-check"></i><b>5.2.2</b> Annotation</a></li>
+<li class="chapter" data-level="5.2.1" data-path="features.html"><a href="features.html#features"><i class="fa fa-check"></i><b>5.2.1</b> Features</a></li>
+<li class="chapter" data-level="5.2.2" data-path="annotation.html"><a href="annotation.html#annotation"><i class="fa fa-check"></i><b>5.2.2</b> Annotation</a></li>
 <li class="chapter" data-level="5.2.3" data-path="filtering.html"><a href="filtering.html#components"><i class="fa fa-check"></i><b>5.2.3</b> Components</a></li>
 <li class="chapter" data-level="5.2.4" data-path="filtering.html"><a href="filtering.html#negation"><i class="fa fa-check"></i><b>5.2.4</b> Negation</a></li>
 </ul></li>
@@ -200,7 +200,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
             <section class="normal" id="section-">
 <div id="filtering" class="section level2">
 <h2><span class="header-section-number">5.2</span> Filtering</h2>
-<p>During a non-target workflow it is not uncommon that some kind of data-cleanup is necessary. Datasets are often highly complex, which makes separating data of interest from the rest highly important. Furthermore, general cleanup typically improves the quality of the dataset, for instance by removing low scoring annotation results or features that are unlikely to be ‘correct’ (e.g. noise or present in blanks). For this reason <code>patRoon</code> supports <em>many</em> different filters that easily clean data produced during the workflow in a highly customizable way.</p>
+<p>During a non-target workflow it is not uncommon that some kind of data-cleanup is necessary. Datasets are often highly complex, which makes separating data of interest from the rest highly important. Furthermore, general cleanup typically improves the quality of the dataset, for instance by removing low scoring annotation results or features that are unlikely to be 'correct' (e.g. noise or present in blanks). For this reason <code>patRoon</code> supports <em>many</em> different filters that easily clean data produced during the workflow in a highly customizable way.</p>
 <p>All major workflow objects (e.g. <code>featureGroups</code>, <code>compounds</code>, <code>components</code> etc.) support filtering operations by the <code>filter()</code> generic. This function takes the object to be filtered as first argument and any remaining arguments describe the desired filter options. The <code>filter()</code> generic function then returns the modified object back. Some examples are shown below.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># remove low intensity (&lt;500) features</span>
 features &lt;-<span class="st"> </span><span class="kw">filter</span>(features, <span class="dt">absMinIntensity =</span> <span class="dv">500</span>)
@@ -211,7 +211,7 @@ fGroups &lt;-<span class="st"> </span><span class="kw">filter</span>(fGroups, <s
 <span class="co"># only retain compounds with &gt;1 explained MS/MS peaks</span>
 compounds &lt;-<span class="st"> </span><span class="kw">filter</span>(compounds, <span class="dt">minExplainedPeaks =</span> <span class="dv">1</span>)</code></pre></div>
 <p>The following sections will provide a more detailed overview of available data filters.</p>
-<div id="features-1" class="section level3">
+<div id="features" class="section level3">
 <h3><span class="header-section-number">5.2.1</span> Features</h3>
 <p>There are many filters available for feature data:</p>
 <table>
@@ -282,7 +282,7 @@ compounds &lt;-<span class="st"> </span><span class="kw">filter</span>(compounds
 </table>
 <p>Application of filters to feature data is important for (environmental) non-target analysis. Especially blank and replicate filters (i.e. <code>blankThreshold</code> and <code>absMinReplicateAbundance</code>/<code>relMinReplicateAbundance</code>) are important filters and are highly recommended to always apply for cleaning up your dataset.</p>
 <p>All filters are available for feature group data, whereas only a subset is available for feature objects. The main reason is that other filters need grouping of features between analyses. Regardless, in <code>patRoon</code> filtering feature data is less important, and typically only needed when the number of features are extremely large and direct grouping is undesired.</p>
-<p>From the table above you can notice that many filters concern both <em>absolute</em> and <em>relative</em> data (i.e. as prefixed with <code>abs</code> and <code>rel</code>). When a relative filter is used the value is scaled between <em>0</em> and <em>1</em>. For instance:</p>
+<p>From the table above you can notice that many filters concern both <em>absolute</em> and <em>relative</em> data (i.e. as prefixed with <code>abs</code> and <code>rel</code>). When a relative filter is used the value is scaled between <em>0</em> and <em>1</em>. For instance:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># remove features not present in at least half of the analyses within a replicate group</span>
 fGroups &lt;-<span class="st"> </span><span class="kw">filter</span>(fGroups, <span class="dt">relMinReplicateAbundance =</span> <span class="fl">0.5</span>)</code></pre></div>
 <p>An advantage of relative filters is that you will not have to worry about the data size involved. For instance, in the above example the filter always takes half of the number of analyses within a replicate group, even when replicate groups have different number of analyses.</p>
@@ -313,7 +313,7 @@ fGroups &lt;-<span class="st"> </span><span class="kw">filter</span>(fGroups, <s
 <span class="co"># all other features and analyses will be removed</span>
 fGroups &lt;-<span class="st"> </span><span class="kw">filter</span>(fGroups, <span class="dt">rGroups =</span> <span class="kw">c</span>(<span class="st">&quot;repl1&quot;</span>, <span class="st">&quot;repl2&quot;</span>))</code></pre></div>
 </div>
-<div id="annotation-1" class="section level3">
+<div id="annotation" class="section level3">
 <h3><span class="header-section-number">5.2.2</span> Annotation</h3>
 <p>There are various filters available for handling annotation data:</p>
 <table>
@@ -378,7 +378,7 @@ fGroups &lt;-<span class="st"> </span><span class="kw">filter</span>(fGroups, <s
 </tbody>
 </table>
 <p>Several intensity related filters are available to clean-up MS peak list data. For instance, the <code>topMSPeaks</code>/<code>topMSMSPeaks</code> filters provide a simple way to remove noisy data by only retaining a defined number of most intense mass peaks. Note that none of these filters will remove the mass peak of the feature from its MS peak list.</p>
-<p>The filters applicable to formula and compound annotation generally concern minimal scoring or chemical properties. The former is useful to remove unlikely candidates, whereas the second is useful to focus on certain study specific chemical properties (e.g. known neutral losses).</p>
+<p>The filters applicable to formula and compound annotation generally concern minimal scoring or chemical properties. The former is useful to remove unlikely candidates, whereas the second is useful to focus on certain study specific chemical properties (e.g. known neutral losses).</p>
 <p>Common examples are shown below.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># intensity filtering</span>
 mslists &lt;-<span class="st"> </span><span class="kw">filter</span>(mslists,

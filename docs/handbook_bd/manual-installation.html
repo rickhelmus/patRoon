@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>2.2 Manual installation | patRoon handbook</title>
   <meta name="description" content="2.2 Manual installation | patRoon handbook" />
-  <meta name="generator" content="bookdown 0.19 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.20 and GitBook 2.6.7" />
 
   <meta property="og:title" content="2.2 Manual installation | patRoon handbook" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2020-06-10" />
+<meta name="date" content="2020-06-27" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -150,8 +150,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="5" data-path="processing-workflow-data.html"><a href="processing-workflow-data.html"><i class="fa fa-check"></i><b>5</b> Processing workflow data</a><ul>
 <li class="chapter" data-level="5.1" data-path="inspecting-results.html"><a href="inspecting-results.html"><i class="fa fa-check"></i><b>5.1</b> Inspecting results</a></li>
 <li class="chapter" data-level="5.2" data-path="filtering.html"><a href="filtering.html"><i class="fa fa-check"></i><b>5.2</b> Filtering</a><ul>
-<li class="chapter" data-level="5.2.1" data-path="filtering.html"><a href="filtering.html#features-1"><i class="fa fa-check"></i><b>5.2.1</b> Features</a></li>
-<li class="chapter" data-level="5.2.2" data-path="filtering.html"><a href="filtering.html#annotation-1"><i class="fa fa-check"></i><b>5.2.2</b> Annotation</a></li>
+<li class="chapter" data-level="5.2.1" data-path="features.html"><a href="features.html#features"><i class="fa fa-check"></i><b>5.2.1</b> Features</a></li>
+<li class="chapter" data-level="5.2.2" data-path="annotation.html"><a href="annotation.html#annotation"><i class="fa fa-check"></i><b>5.2.2</b> Annotation</a></li>
 <li class="chapter" data-level="5.2.3" data-path="filtering.html"><a href="filtering.html#components"><i class="fa fa-check"></i><b>5.2.3</b> Components</a></li>
 <li class="chapter" data-level="5.2.4" data-path="filtering.html"><a href="filtering.html#negation"><i class="fa fa-check"></i><b>5.2.4</b> Negation</a></li>
 </ul></li>
@@ -200,7 +200,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
             <section class="normal" id="section-">
 <div id="manual-installation" class="section level2">
 <h2><span class="header-section-number">2.2</span> Manual installation</h2>
-<p>Alternatively, the manual installation is for users who don’t use Windows, prefer to do a manual installation or simply want to know what happens behind the scenes. The manual installation consists of three phases:</p>
+<p>Alternatively, the manual installation is for users who don't use Windows, prefer to do a manual installation or simply want to know what happens behind the scenes. The manual installation consists of three phases:</p>
 <ol style="list-style-type: decimal">
 <li>Installing some prerequisite <code>R</code> packages</li>
 <li>Install and configure (non-<code>R</code>) dependencies</li>
@@ -208,8 +208,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </ol>
 <div id="r-prerequisites" class="section level3">
 <h3><span class="header-section-number">2.2.1</span> R prerequisites</h3>
-<p>When installing <code>patRoon</code> Windows users have the option to install from a customized (<a href="https://github.com/andrie/miniCRAN">miniCRAN</a>) repository (<code>patRoonDeps</code>). This repository provides a central repository for <code>patRoon</code> and all its R packages. An advantage is that installation will be faster and you will not need to install <a href="https://cran.r-project.org/bin/windows/Rtools/">Rtools</a>. Note that you will need to have the latest <code>R</code> version installed in order to use this repository.</p>
-<p>When you decide to use the <code>patRoonDeps</code> repository you can simply <em>skip</em> this step. <strong>Otherwise</strong> (i.e. you will use regular repositories instead), execute the following:</p>
+<p>When installing <code>patRoon</code> Windows users have the option to install from a customized ([miniCRAN]) repository (<code>patRoonDeps</code>). This repository provides a central repository for <code>patRoon</code> and all its R packages. An advantage is that installation will be faster and you will not need to install [Rtools]. Note that you will need to have the latest <code>R</code> version installed in order to use this repository.</p>
+<p>When you decide to use the <code>patRoonDeps</code> repository you can simply <em>skip</em> this step. <strong>Otherwise</strong> (i.e. you will use regular repositories instead), execute the following:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">install.packages</span>(<span class="kw">c</span>(<span class="st">&quot;BiocManager&quot;</span>, <span class="st">&quot;remotes&quot;</span>))
 BiocManager<span class="op">::</span><span class="kw">install</span>(<span class="st">&quot;CAMERA&quot;</span>)
 
@@ -218,7 +218,7 @@ BiocManager<span class="op">::</span><span class="kw">install</span>(<span class
 
 <span class="co"># only when using the R interface (not recommended by default)</span>
 remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;c-ruttkies/MetFragR/metfRag&quot;</span>)</code></pre></div>
-<p>Note that the latter two commands concern installation of <em>optional</em> packages. If you are unsure then you probably don’t need them.</p>
+<p>Note that the latter two commands concern installation of <em>optional</em> packages. If you are unsure then you probably don't need them.</p>
 </div>
 <div id="other-dependencies" class="section level3">
 <h3><span class="header-section-number">2.2.2</span> Other dependencies</h3>
@@ -236,43 +236,43 @@ remotes<span class="op">::</span><span class="kw">install_github</span>(<span cl
 </thead>
 <tbody>
 <tr class="odd">
-<td><a href="https://www.oracle.com/technetwork/java/javase/downloads/index.html">Java JDK</a></td>
-<td><strong>Mandatory</strong> for e.g. plotting structures and using MetFrag.</td>
+<td>[Java JDK][JavaJDK]</td>
+<td><strong>Mandatory</strong> for e.g. plotting structures and using MetFrag.</td>
 </tr>
 <tr class="even">
-<td><a href="https://cran.r-project.org/bin/windows/Rtools/">Rtools</a></td>
+<td>[Rtools]</td>
 <td>Necessary on Window and when <code>patRoon</code> is <em>not</em> installed from <code>patRoonDeps</code>.</td>
 </tr>
 <tr class="odd">
-<td><a href="http://proteowizard.sourceforge.net/">ProteoWizard</a></td>
-<td>Needed for automatic data-pretreatment (e.g. data file conversion and centroiding, Bruker users may use DataAnalysis integration instead).</td>
+<td>[ProteoWizard]</td>
+<td>Needed for automatic data-pretreatment (e.g. data file conversion and centroiding, Bruker users may use DataAnalysis integration instead).</td>
 </tr>
 <tr class="even">
-<td><a href="http://openms.de/">OpenMS</a></td>
-<td>Recommended. Used for e.g. finding and grouping features.</td>
+<td>[OpenMS]</td>
+<td>Recommended. Used for e.g. finding and grouping features.</td>
 </tr>
 <tr class="odd">
-<td><a href="http://ipb-halle.github.io/MetFrag/projects/metfragcl/">MetFrag CL</a></td>
+<td>[MetFrag CL][MetFragCL]</td>
 <td>Recommended. Used for annotation with MetFrag.</td>
 </tr>
 <tr class="even">
-<td><a href="ftp://newftp.epa.gov/COMPTOX/Sustainable_Chemistry_Data/Chemistry_Dashboard/MetFrag_metadata_files">MetFrag CompTox DB</a></td>
-<td>Database files necessary for usage of the <a href="https://comptox.epa.gov/dashboard">CompTox</a> database with MetFrag. Note that a recent version of MetFrag (&gt;=2.4.5) is required. Note that the lists with additions for <a href="https://zenodo.org/record/3364464#.XnjM-XLvKUk">smoking metadata</a> and <a href="https://zenodo.org/record/3472781#.XnjMAHLvKUk">wastewater metadata</a> are also supported.</td>
+<td>[MetFrag CompTox DB][CompTox-dl]</td>
+<td>Database files necessary for usage of the [CompTox] database with MetFrag. Note that a recent version of MetFrag (&gt;=2.4.5) is required. Note that the lists with additions for [smoking metadata][CompTox-smoke] and [wastewater metadata][CompTox-WW] are also supported.</td>
 </tr>
 <tr class="odd">
-<td><a href="https://zenodo.org/record/3548654">MetFrag PubChemLite DB</a></td>
+<td>[MetFrag PubChemLite DB][PCLite-dl]</td>
 <td>Database files needed to use PubChemLite with MetFrag (currently tested with tier0 and tier1 November 2019 versions).</td>
 </tr>
 <tr class="even">
-<td><a href="https://bio.informatik.uni-jena.de/software/sirius/">SIRIUS</a></td>
+<td>[SIRIUS]</td>
 <td>For formula and/or compound annotation.</td>
 </tr>
 <tr class="odd">
-<td><a href="http://openbabel.org/wiki/Main_Page">OpenBabel</a></td>
-<td>Used in some cases for suspect screening (e.g. to calculate molecular masses for suspects with only InChI information). Otherwise optional.</td>
+<td>[OpenBabel]</td>
+<td>Used in some cases for suspect screening (e.g. to calculate molecular masses for suspects with only InChI information). Otherwise optional.</td>
 </tr>
 <tr class="even">
-<td><a href="https://pngquant.org/">pngquant</a></td>
+<td>[pngquant]</td>
 <td>Used to reduce size of HTML reports, definitely optional.</td>
 </tr>
 </tbody>
@@ -286,7 +286,7 @@ remotes<span class="op">::</span><span class="kw">install_github</span>(<span cl
 <span class="kw">options</span>(<span class="dt">patRoon.path.MetFragCompTox =</span> <span class="st">&quot;C:/CompTox_17March2019_SelectMetaData.csv&quot;</span>) <span class="co"># full location to desired CompTox CSV file</span>
 <span class="kw">options</span>(<span class="dt">patRoon.path.MetFragPubChemLite =</span> <span class="st">&quot;~/PubChemLite_14Jan2020_tier0.csv&quot;</span>) <span class="co"># full location to desired PubChemLite CSV file</span>
 <span class="kw">options</span>(<span class="dt">patRoon.path.obabel =</span> <span class="st">&quot;C:/Program Files/OpenBabel-3.0.0&quot;</span>) <span class="co"># directory with OpenBabel binaries</span></code></pre></div>
-<p>These commands have to be executed everytime you start a new R session (e.g. as part of your script). However, it is probably easier to add them to your <code>~/.Rprofile</code> file so that they are executed automatically when you start R. If you don’t have this file yet you can simply create it yourself (for more information see e.g. <a href="https://stackoverflow.com/a/46819910">this SO answer</a>).</p>
+<p>These commands have to be executed everytime you start a new R session (e.g. as part of your script). However, it is probably easier to add them to your <code>~/.Rprofile</code> file so that they are executed automatically when you start R. If you don't have this file yet you can simply create it yourself (for more information see e.g. <a href="https://stackoverflow.com/a/46819910">this SO answer</a>).</p>
 </div>
 <div id="patroon-installation" class="section level3">
 <h3><span class="header-section-number">2.2.3</span> patRoon installation</h3>

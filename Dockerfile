@@ -20,7 +20,7 @@ RUN apt-get update -y && \
         #r-cran-robustbase r-cran-testthat r-cran-v8 r-cran-biocmanager \
         #r-bioc-biocparallel r-bioc-affy r-bioc-biocgenerics r-bioc-biobase \
         #r-bioc-rbgl r-bioc-s4vectors r-bioc-biocparallel r-bioc-multtest && \
-        zlib1g-dev libxml2-dev libnetcdf-dev libglpk-dev && \
+        zlib1g-dev libxml2-dev libnetcdf-dev libglpk-dev tzdata && \
     mkdir -p $SETUPDIR && \
     wget -P $SETUPDIR https://abibuilder.informatik.uni-tuebingen.de/archive/openms/OpenMSInstaller/release/2.5.0/OpenMS-2.5.0-Debian-Linux-x86_64.deb && \
     apt-get install -y --no-install-recommends $SETUPDIR/OpenMS-2.5.0-Debian-Linux-x86_64.deb && \

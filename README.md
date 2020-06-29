@@ -76,7 +76,7 @@ However, for a better guide to get started it is recommended to read the [tutori
 [Bioconductor]: https://www.bioconductor.org
 [rJava]: http://www.rforge.net/rJava/
 [tutorial]: https://rickhelmus.github.io/patRoon/articles/tutorial.html
-[handbook]: https://rickhelmus.github.io/patRoon/handbook_bd/introduction.html
+[handbook]: https://rickhelmus.github.io/patRoon/handbook_bd/index.html
 [handbook-inst]: https://rickhelmus.github.io/patRoon/articles/handbook.html#installation
 [reference]: https://rickhelmus.github.io/patRoon/reference/index.html
 [remotes]: https://github.com/r-lib/remotes#readme

@@ -8,7 +8,7 @@ processSIRIUSCompounds <- function(msFName, outPath, cmpName, MSMS, database, ad
     resFile <- if (isPre44) "summary_csi_fingerid.csv" else "structure_candidates.tsv"
     resultPath <- getSiriusResultPath(outPath, msFName, cmpName, isPre44)
     summary <- file.path(resultPath, resFile)
-    results <- scRanges <- list()
+    results <- scRanges <- data.table()
     
     if (length(summary) != 0 && file.exists(summary))
     {

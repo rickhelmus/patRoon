@@ -1,3 +1,8 @@
+# patRoon 1.0.2
+
+* Fixed: avoid errors when SIRIUS returns zero results (reported by Vittorio Albergamo)
+
+
 # patRoon 1.0.1
 
 * Perform neutral mass calculation for suspect screening with OpenBabel to avoid some possible Java/RCDK bugs on Linux.

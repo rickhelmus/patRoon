@@ -126,14 +126,18 @@ setMethod("getXCMSSet", "features", function(obj, exportedData, verbose)
         ft <- fts[[anaInfo$analysis[i]]]
 
         if (nrow(ft) > 0)
+        {
             plist[[i]] <- data.frame(mz = ft$mz, mzmin = ft$mzmin, mzmax = ft$mzmax, rt = ft$ret,
                                      rtmin = ft$retmin, rtmax = ft$retmax, maxo = ft$intensity, into = ft$area,
                                      sample = i, stringsAsFactors = F)
+            if (!is.null(ft[["sn"]]))
+                plist[[i]]$sn <- ft$sn
+        }
         else
             plist[[i]] <- data.frame(mz = numeric(), mzmin = numeric(), mzmax = numeric(), rt = numeric(),
                                      rtmin = numeric(), rtmax = numeric(), maxo = numeric(), into = numeric(),
                                      sample = numeric())
-
+        
         if (exportedData)
         {
             xr <- loadXCMSRaw(anaInfo$analysis[i], anaInfo$path[i], verbose = verbose)[[1]]
@@ -218,12 +222,17 @@ setMethod("getXCMSnExp", "features", function(obj, verbose)
         allFeats <- rbindlist(lapply(unname(fTable), function(ft)
         {
             if (nrow(ft) > 0)
-                data.table(mz = ft$mz, mzmin = ft$mzmin, mzmax = ft$mzmax, rt = ft$ret,
+            {
+                ret <- data.table(mz = ft$mz, mzmin = ft$mzmin, mzmax = ft$mzmax, rt = ft$ret,
                            rtmin = ft$retmin, rtmax = ft$retmax, maxo = ft$intensity, into = ft$area)
+                if (!is.null(ft[["sn"]]))
+                    ret$sn <- ft$sn
+            }
             else
-                data.table(mz = numeric(), mzmin = numeric(), mzmax = numeric(), rt = numeric(),
-                           rtmin = numeric(), rtmax = numeric(), maxo = numeric(), into = numeric(),
-                           sample = numeric())
+                ret <- data.table(mz = numeric(), mzmin = numeric(), mzmax = numeric(), rt = numeric(),
+                                  rtmin = numeric(), rtmax = numeric(), maxo = numeric(), into = numeric(),
+                                  sample = numeric())
+            return(ret)
         }), idcol = "sample")
         setcolorder(allFeats, setdiff(names(allFeats), "sample")) # move sample col to end
 
@@ -316,7 +325,8 @@ importXCMSPeaks <- function(peaks, analysisInfo)
         ret <- plist[sample == sind]
         ret[, ID := seq_len(nrow(ret))]
         setnames(ret, c("rt", "rtmin", "rtmax", "maxo", "into"), c("ret", "retmin", "retmax", "intensity", "area"))
-        return(ret[, c("mz", "mzmin", "mzmax", "ret", "retmin", "retmax", "intensity", "area", "ID")])
+        keepCols <- c("mz", "mzmin", "mzmax", "ret", "retmin", "retmax", "intensity", "area", "sn", "ID")
+        return(ret[, intersect(keepCols, names(ret)), with = FALSE])
     })
     names(feat) <- analysisInfo$analysis
 

@@ -2,7 +2,7 @@
 
 * Fixed: avoid errors when SIRIUS returns zero results (reported by Vittorio Albergamo)
 * Fixed: `plotGraph()` didn't properly handle components without linked series (reported by Vittorio Albergamo)
-
+* Keep signal to noise data when importing/exporting XCMS data (`sn` column) (suggested by Ricardo Cunha)
 
 # patRoon 1.0.1
 

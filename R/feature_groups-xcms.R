@@ -51,7 +51,7 @@ groupFeaturesXCMS <- function(feat, rtalign = TRUE, exportedData = TRUE, groupAr
     if (verbose)
         cat("Grouping features with XCMS...\n===========\n")
 
-    xs <- getXCMSSet(feat, exportedData, verbose = verbose)
+    xs <- getXCMSSet(feat, verbose = verbose, exportedData = exportedData)
     if (verbose)
         xs <- do.call(group, c(list(xs), groupArgs))
     else

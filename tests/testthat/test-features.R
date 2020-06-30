@@ -104,3 +104,46 @@ test_that("basic filtering", {
 test_that("basic usage", {
     expect_equal(nrow(as.data.table(ffOpenMS)), length(ffOpenMS))
 })
+
+XCMSImpXCMS <- getXCMSSet(ffXCMS)
+XCMSImpXCMS3 <- getXCMSSet(ffXCMS3, exportedData = FALSE)
+XCMSImpOpenMS <- getXCMSSet(ffOpenMS, exportedData = FALSE)
+XCMSImpEP <- getXCMSSet(ffEP, exportedData = FALSE)
+featMZs <- function(f) lapply(featureTable(f), "[[", "mz")
+test_that("XCMS conversion", {
+    expect_equal(nrow(xcms::peaks(XCMSImpXCMS)), length(ffXCMS))
+    expect_equal(nrow(xcms::peaks(XCMSImpXCMS3)), length(ffXCMS3))
+    expect_equal(nrow(xcms::peaks(XCMSImpOpenMS)), length(ffOpenMS))
+    expect_equal(nrow(xcms::peaks(XCMSImpEP)), length(ffEP))
+    
+    expect_known_value(xcms::peaks(XCMSImpXCMS), testFile("ff-xcms_import_xcms"))
+    expect_known_value(xcms::peaks(XCMSImpXCMS3), testFile("ff-xcms_import_xcms3"))
+    expect_known_value(xcms::peaks(XCMSImpOpenMS), testFile("ff-xcms_import_openms"))
+    expect_known_value(xcms::peaks(XCMSImpEP), testFile("ff-xcms_import_ep"))
+    
+    expect_equal(featMZs(importFeatures(anaInfoOne, "xcms", XCMSImpXCMS)), featMZs(ffXCMS))
+    expect_equal(featMZs(importFeatures(anaInfoOne, "xcms", XCMSImpXCMS3)), featMZs(ffXCMS3))
+    expect_equal(featMZs(importFeatures(anaInfo, "xcms", XCMSImpOpenMS)), featMZs(ffOpenMS))
+    expect_equal(featMZs(importFeatures(epAnaInfo, "xcms", XCMSImpEP)), featMZs(ffEP))
+})
+
+XCMS3ImpXCMS <- getXCMSnExp(ffXCMS)
+XCMS3ImpXCMS3 <- getXCMSnExp(ffXCMS3)
+XCMS3ImpOpenMS <- getXCMSnExp(ffOpenMS)
+# XCMS3ImpEP <- getXCMSnExp(ffEP) XCMS3/MSnbase doesn't like mzXMLs generated for EnviPick
+test_that("XCMS3 conversion", {
+    expect_equal(nrow(xcms::chromPeaks(XCMS3ImpXCMS)), length(ffXCMS))
+    expect_equal(nrow(xcms::chromPeaks(XCMS3ImpXCMS3)), length(ffXCMS3))
+    expect_equal(nrow(xcms::chromPeaks(XCMS3ImpOpenMS)), length(ffOpenMS))
+    # expect_equal(nrow(xcms::chromPeaks(XCMS3ImpEP)), length(ffEP))
+    
+    expect_known_value(xcms::chromPeaks(XCMS3ImpXCMS), testFile("ff-xcms3_import_xcms"))
+    expect_known_value(xcms::chromPeaks(XCMS3ImpXCMS3), testFile("ff-xcms3_import_xcms3"))
+    expect_known_value(xcms::chromPeaks(XCMS3ImpOpenMS), testFile("ff-xcms3_import_openms"))
+    # expect_known_value(xcms::chromPeaks(XCMS3ImpEP), testFile("ff-xcms3_import_ep"))
+    
+    expect_equal(featMZs(importFeatures(anaInfoOne, "xcms3", XCMS3ImpXCMS)), featMZs(ffXCMS))
+    expect_equal(featMZs(importFeatures(anaInfoOne, "xcms3", XCMS3ImpXCMS3)), featMZs(ffXCMS3))
+    expect_equal(featMZs(importFeatures(anaInfo, "xcms3", XCMS3ImpOpenMS)), featMZs(ffOpenMS))
+    # expect_equal(featMZs(importFeatures(epAnaInfo, "xcms3", XCMSImpEP)), featMZs(ffEP))
+})

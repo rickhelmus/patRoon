@@ -3,6 +3,8 @@
 * Fixed: avoid errors when SIRIUS returns zero results (reported by Vittorio Albergamo)
 * Fixed: `plotGraph()` didn't properly handle components without linked series (reported by Vittorio Albergamo)
 * Keep signal to noise data when importing/exporting XCMS data (`sn` column) (suggested by Ricardo Cunha)
+* Reversed argument order of `exportedData`/`verbose` to `getXCMSSet()` functions to avoid ambiguities
+* Automated tests for importing/exporting XCMS(3) data + small fixes for surfaced bugs
 
 # patRoon 1.0.1
 

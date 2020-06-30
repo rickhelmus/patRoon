@@ -101,7 +101,7 @@ makeXCMSGroups <- function(fGroups, verbose = TRUE)
 
 #' @rdname getXCMSSet
 #' @export
-setMethod("getXCMSSet", "features", function(obj, exportedData, verbose)
+setMethod("getXCMSSet", "features", function(obj, verbose, exportedData)
 {
     # generate dummy XCMS set, based on https://groups.google.com/forum/m/#!topic/xcms/CGC0SKMVhAQ
 
@@ -155,28 +155,28 @@ setMethod("getXCMSSet", "features", function(obj, exportedData, verbose)
 
 #' @rdname getXCMSSet
 #' @export
-setMethod("getXCMSSet", "featuresOpenMS", function(obj, exportedData, verbose = FALSE)
+setMethod("getXCMSSet", "featuresOpenMS", function(obj, verbose, ...)
 {
-    return(callNextMethod(obj, TRUE, verbose = verbose))
+    return(callNextMethod(obj, verbose = verbose, exportedData = TRUE))
 })
 
 #' @rdname getXCMSSet
 #' @export
-setMethod("getXCMSSet", "featuresXCMS", function(obj, exportedData, verbose)
+setMethod("getXCMSSet", "featuresXCMS", function(obj, ...)
 {
     return(obj@xs)
 })
 
 #' @rdname getXCMSSet
 #' @export
-setMethod("getXCMSSet", "featureGroups", function(obj, exportedData, verbose = TRUE)
+setMethod("getXCMSSet", "featureGroups", function(obj, verbose, exportedData)
 {
     checkmate::assertFlag(exportedData)
     checkmate::assertFlag(verbose)
 
     if (verbose)
         cat("Getting ungrouped xcmsSet...\n")
-    xs <- getXCMSSet(getFeatures(obj), exportedData, verbose = verbose)
+    xs <- getXCMSSet(getFeatures(obj), verbose = verbose, exportedData = exportedData)
 
     xsgrps <- makeXCMSGroups(obj, verbose)
     xcms::groupidx(xs) <- xsgrps$idx
@@ -187,7 +187,7 @@ setMethod("getXCMSSet", "featureGroups", function(obj, exportedData, verbose = T
 
 #' @rdname getXCMSSet
 #' @export
-setMethod("getXCMSSet", "featureGroupsXCMS", function(obj, exportedData, verbose)
+setMethod("getXCMSSet", "featureGroupsXCMS", function(obj, verbose, exportedData)
 {
     # first see if we can just return the xcmsSet used during grouping
 
@@ -195,7 +195,10 @@ setMethod("getXCMSSet", "featureGroupsXCMS", function(obj, exportedData, verbose
 
     if (length(filepaths(obj@xs)) != length(anaInfo$analysis) ||
         !all(simplifyAnalysisNames(filepaths(obj@xs)) == anaInfo$analysis))
-        return(callNextMethod(obj, exportedData, verbose = verbose)) # files changed, need to update group statistics which is rather complex so just fallback
+    {
+        # files changed, need to update group statistics which is rather complex so just fallback
+        return(callNextMethod(obj, verbose = verbose, exportedData = exportedData))
+    }
 
     return(obj@xs)
 })
@@ -289,8 +292,8 @@ setMethod("getXCMSnExp", "featureGroupsXCMS3", function(obj, verbose)
 
     anaInfo <- analysisInfo(obj)
 
-    if (length(filepaths(obj@xs)) != length(anaInfo$analysis) ||
-        !all(simplifyAnalysisNames(filepaths(obj@xs)) == anaInfo$analysis))
+    if (nrow(pData(obj@xdata)) != length(anaInfo$analysis) ||
+        !all(simplifyAnalysisNames(pData(obj@xdata)$sample_name) == anaInfo$analysis))
         return(callNextMethod(obj, verbose = verbose))
 
     return(obj@xdata)

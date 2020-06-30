@@ -28,7 +28,7 @@ setMethod("filter", "featuresXCMS", function(obj, ...)
     {
         cat("Updating xcmsSet...\n")
         # NOTE: use base method to force update as overloaded method simply returns @xs slot
-        obj@xs <- selectMethod(getXCMSSet, "features")(obj, TRUE)
+        obj@xs <- selectMethod(getXCMSSet, "features")(obj, exportedData = TRUE)
     }
 
     return(obj)

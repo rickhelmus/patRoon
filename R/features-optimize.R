@@ -25,7 +25,7 @@ featuresOptimizer$methods(
         doOpenMS <- isoIdent == "OpenMS"
         if (!doOpenMS) # no need to find isotopes with OpenMS algo
         {
-            xset <- getXCMSSet(feat, TRUE, verbose = FALSE)
+            xset <- getXCMSSet(feat, verbose = FALSE, exportedData = TRUE)
             peak_source <- utilsIPO$peaks_IPO(xset)[, c("mz", "rt", "sample", "into", "mzmin",
                                                         "mzmax", "rtmin", "rtmax"), drop = FALSE]
             if(isoIdent == "IPO")

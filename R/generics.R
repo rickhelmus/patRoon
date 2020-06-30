@@ -35,7 +35,7 @@ setGeneric("replicateGroupSubtract", function(fGroups, rGroups, threshold = 0) s
 #'   \code{featuresXCMS} methods).
 #' @param verbose If \code{FALSE} then no text output is shown.
 #'
-setGeneric("getXCMSSet", function(obj, ..., verbose = TRUE) standardGeneric("getXCMSSet"))
+setGeneric("getXCMSSet", function(obj, verbose = TRUE, ...) standardGeneric("getXCMSSet"))
 
 setGeneric("getXCMSnExp", function(obj, verbose = TRUE) standardGeneric("getXCMSnExp"))
 

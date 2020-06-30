@@ -51,7 +51,7 @@ generateComponentsCAMERA <- function(fGroups, ionization, onlyIsotopes = FALSE,
     gInfo <- groupInfo(fGroups)
     anaInfo <- analysisInfo(fGroups)
 
-    xs <- getXCMSSet(fGroups, TRUE) # UNDONE: handle exportedData: check if all files are present? Is it necessary?
+    xs <- getXCMSSet(fGroups, exportedData = TRUE) # UNDONE: handle exportedData: check if all files are present? Is it necessary?
 
     # UNDONE: do fillpeaks? What about RC?
 

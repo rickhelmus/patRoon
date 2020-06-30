@@ -16,7 +16,6 @@
         - mention parameters default unless specified
     - keep retcor_done?
     - get rid of getXCMSSet() calls?
-- tests to verify getXCMSSet
 - suspect screening
     - rename patRoonData::targets?
     - rename groupFeaturesScreening?

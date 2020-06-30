@@ -70,6 +70,40 @@ test_that("exporting works", {
     expect_error(export(fgOpenMSEmpty, "brukerpa", expfile))
 })
 
+XCMSImpXCMS <- getXCMSSet(fgXCMS)
+XCMSImpXCMS3 <- getXCMSSet(fgXCMS3, exportedData = FALSE)
+XCMSImpOpenMS <- getXCMSSet(fgOpenMS, exportedData = FALSE)
+test_that("XCMS conversion", {
+    expect_equal(nrow(xcms::groups(XCMSImpXCMS)), length(fgXCMS))
+    expect_equal(nrow(xcms::groups(XCMSImpXCMS3)), length(fgXCMS3))
+    expect_equal(nrow(xcms::groups(XCMSImpOpenMS)), length(fgOpenMS))
+    
+    expect_known_value(xcms::groups(XCMSImpXCMS), testFile("fg-xcms_import_xcms"))
+    expect_known_value(xcms::groups(XCMSImpXCMS3), testFile("fg-xcms_import_xcms3"))
+    expect_known_value(xcms::groups(XCMSImpOpenMS), testFile("fg-xcms_import_openms"))
+    
+    expect_equal(unname(groups(importFeatureGroupsXCMS(XCMSImpXCMS, anaInfo))), unname(groups(fgXCMS)))
+    expect_equal(unname(groups(importFeatureGroupsXCMS(XCMSImpXCMS3, anaInfo))), unname(groups(fgXCMS3)))
+    expect_equal(unname(groups(importFeatureGroupsXCMS(XCMSImpOpenMS, anaInfo))), unname(groups(fgOpenMS)))
+})
+
+XCMS3ImpXCMS <- getXCMSnExp(fgXCMS)
+XCMS3ImpXCMS3 <- getXCMSnExp(fgXCMS3)
+XCMS3ImpOpenMS <- getXCMSnExp(fgOpenMS)
+test_that("XCMS3 conversion", {
+    expect_equal(nrow(xcms::featureDefinitions(XCMS3ImpXCMS)), length(fgXCMS))
+    expect_equal(nrow(xcms::featureDefinitions(XCMS3ImpXCMS3)), length(fgXCMS3))
+    expect_equal(nrow(xcms::featureDefinitions(XCMS3ImpOpenMS)), length(fgOpenMS))
+    
+    expect_known_value(xcms::featureDefinitions(XCMS3ImpXCMS), testFile("fg-xcms3_import_xcms"))
+    expect_known_value(xcms::featureDefinitions(XCMS3ImpXCMS3), testFile("fg-xcms3_import_xcms3"))
+    expect_known_value(xcms::featureDefinitions(XCMS3ImpOpenMS), testFile("fg-xcms3_import_openms"))
+    
+    expect_equal(unname(groups(importFeatureGroupsXCMS3(XCMS3ImpXCMS, anaInfo))), unname(groups(fgXCMS)))
+    expect_equal(unname(groups(importFeatureGroupsXCMS3(XCMS3ImpXCMS3, anaInfo))), unname(groups(fgXCMS3)))
+    expect_equal(unname(groups(importFeatureGroupsXCMS3(XCMS3ImpOpenMS, anaInfo))), unname(groups(fgOpenMS)))
+})
+
 regr <- as.data.table(fgOpenMSConc, features = TRUE, regression = TRUE)
 test_that("as.data.table works", {
     expect_equal(nrow(as.data.table(fgOpenMS)), length(fgOpenMS))

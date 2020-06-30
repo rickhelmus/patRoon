@@ -1,6 +1,7 @@
 # patRoon 1.0.2
 
 * Fixed: avoid errors when SIRIUS returns zero results (reported by Vittorio Albergamo)
+* Fixed: `plotGraph()` didn't properly handle components without linked series (reported by Vittorio Albergamo)
 
 
 # patRoon 1.0.1

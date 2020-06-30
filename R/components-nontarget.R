@@ -46,18 +46,29 @@ setMethod("plotGraph", "componentsNT", function(obj, onlyLinked)
     allLinks <- unique(unlist(cInfo$linksIDs))
     cInfo <- cInfo[lengths(links) > 0 | id %in% allLinks]
     
-    edges <- rbindlist(mapply(cInfo$name, cInfo$linksIDs, FUN = function(n, l)
+    if (nrow(cInfo) == 0)
     {
-        data.table::data.table(from = n, to = cInfo$name[match(unlist(l), cInfo$id)])
-    }, SIMPLIFY = FALSE))
+        if (onlyLinked)
+            stop("No component links in your data and onlyLinked = TRUE, so nothing to show.")
+        nodes <- data.table(id = character(), label = character(), group = numeric())
+        edges <- data.table(from = character(), to = character())
+    }
+    else
+    {
+        edges <- rbindlist(mapply(cInfo$name, cInfo$linksIDs, FUN = function(n, l)
+        {
+            data.table::data.table(from = n, to = cInfo$name[match(unlist(l), cInfo$id)])
+        }, SIMPLIFY = FALSE))
+        
+        graph <- igraph::simplify(igraph::graph_from_data_frame(edges, directed = FALSE))
+        fc <- igraph::fastgreedy.community(graph)
+        
+        data <- visNetwork::toVisNetworkData(graph)
+        nodes <- as.data.table(data$nodes)
+        nodes[, group := fc$membership]
+        edges <- data$edges
+    }
 
-    graph <- igraph::simplify(igraph::graph_from_data_frame(edges, directed = FALSE))
-    fc <- igraph::fastgreedy.community(graph)
-
-    data <- visNetwork::toVisNetworkData(graph)
-    nodes <- as.data.table(data$nodes)
-    nodes[, group := fc$membership]
-    
     if (!onlyLinked)
     {
         unNodes <- data.table(id = setdiff(names(obj), cInfo$name), group = 0)
@@ -73,7 +84,7 @@ setMethod("plotGraph", "componentsNT", function(obj, onlyLinked)
     nodes[, title := sprintf("<b>%s</b> (RT: %.2f; m/z: %.4f; #%d)<br>fGroups: <i>%s</i><br>rGroups: <i>%s</i>",
                              nodes$label, infos$rt_increment, infos$mz_increment, infos$size, hsFGroups, hsRGroups)]
     
-    visNetwork::visNetwork(nodes = nodes, edges = data$edges)
+    visNetwork::visNetwork(nodes = nodes, edges = edges)
 })
 
 

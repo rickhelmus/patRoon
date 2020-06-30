@@ -82,9 +82,9 @@ test_that("XCMS conversion", {
     expect_known_value(xcms::groups(XCMSImpXCMS3), testFile("fg-xcms_import_xcms3"))
     expect_known_value(xcms::groups(XCMSImpOpenMS), testFile("fg-xcms_import_openms"))
     
-    expect_equal(unname(groups(importFeatureGroupsXCMS(XCMSImpXCMS, anaInfo))), unname(groups(fgXCMS)))
-    expect_equal(unname(groups(importFeatureGroupsXCMS(XCMSImpXCMS3, anaInfo))), unname(groups(fgXCMS3)))
-    expect_equal(unname(groups(importFeatureGroupsXCMS(XCMSImpOpenMS, anaInfo))), unname(groups(fgOpenMS)))
+    expect_equal(unname(groups(importFeatureGroupsXCMS(XCMSImpXCMS, getTestAnaInfo()))), unname(groups(fgXCMS)))
+    expect_equal(unname(groups(importFeatureGroupsXCMS(XCMSImpXCMS3, getTestAnaInfo()))), unname(groups(fgXCMS3)))
+    expect_equal(unname(groups(importFeatureGroupsXCMS(XCMSImpOpenMS, getTestAnaInfo()))), unname(groups(fgOpenMS)))
 })
 
 XCMS3ImpXCMS <- getXCMSnExp(fgXCMS)
@@ -99,9 +99,9 @@ test_that("XCMS3 conversion", {
     expect_known_value(xcms::featureDefinitions(XCMS3ImpXCMS3), testFile("fg-xcms3_import_xcms3"))
     expect_known_value(xcms::featureDefinitions(XCMS3ImpOpenMS), testFile("fg-xcms3_import_openms"))
     
-    expect_equal(unname(groups(importFeatureGroupsXCMS3(XCMS3ImpXCMS, anaInfo))), unname(groups(fgXCMS)))
-    expect_equal(unname(groups(importFeatureGroupsXCMS3(XCMS3ImpXCMS3, anaInfo))), unname(groups(fgXCMS3)))
-    expect_equal(unname(groups(importFeatureGroupsXCMS3(XCMS3ImpOpenMS, anaInfo))), unname(groups(fgOpenMS)))
+    expect_equal(unname(groups(importFeatureGroupsXCMS3(XCMS3ImpXCMS, getTestAnaInfo()))), unname(groups(fgXCMS)))
+    expect_equal(unname(groups(importFeatureGroupsXCMS3(XCMS3ImpXCMS3, getTestAnaInfo()))), unname(groups(fgXCMS3)))
+    expect_equal(unname(groups(importFeatureGroupsXCMS3(XCMS3ImpOpenMS, getTestAnaInfo()))), unname(groups(fgOpenMS)))
 })
 
 regr <- as.data.table(fgOpenMSConc, features = TRUE, regression = TRUE)

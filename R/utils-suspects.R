@@ -189,7 +189,6 @@ estimateIdentificationLevel <- function(suspectInChIKey1, suspectFormula, suspec
     return("5") # no (good) formula match
 }
 
-# NOTE: no-result rows are removed
 # UNDONE: proper defaults for minFormScores/minFormScoresToNext
 # UNDONE: allow compound scoring thresholds for ID level estimation
 annotateSuspectList <- function(scr, MSPeakLists = NULL, formulas = NULL, compounds = NULL,
@@ -213,7 +212,6 @@ annotateSuspectList <- function(scr, MSPeakLists = NULL, formulas = NULL, compou
         return(cd)
     
     scr <- copy(scr)
-    scr <- scr[!is.na(group)]
     
     # get InChIKeys/Formulas if necessary and possible
 
@@ -245,30 +243,35 @@ annotateSuspectList <- function(scr, MSPeakLists = NULL, formulas = NULL, compou
     
     for (i in seq_len(nrow(scr)))
     {
-        gName <- scr$name[i]
-        MSMSList <- if (!is.null(MSPeakLists)) MSPeakLists[[gName]][["MSMS"]] else NULL
-        fTable <- if (!is.null(formulas)) formulas[[gName]] else NULL
-        fScRanges <- if (!is.null(formulas)) formulas@scoreRanges[[gName]] else NULL
-        cTable <- if (!is.null(compounds)) compounds[[gName]] else NULL
-        
-        suspIK1 <- if (!is.null(scr[["InChIKey"]])) getIKBlock1(scr$InChIKey[i]) else NULL
-        annSim <- 0; suspRank <- NA
-        if (!is.null(MSMSList) && !is.null(cTable) && !is.null(suspIK1))
+        if (is.na(scr$group[i]))
+            set(scr, i, c("suspCompAnnRank", "annotatedMSMSSimilarity", "estIDLevel"), NA)
+        else
         {
-            suspRank <- which(suspIK1 == cTable$InChIKey1)
-            suspRank <- if (length(suspRank) > 0) suspRank[1] else NA
+            gName <- scr$name[i]
+            MSMSList <- if (!is.null(MSPeakLists)) MSPeakLists[[gName]][["MSMS"]] else NULL
+            fTable <- if (!is.null(formulas)) formulas[[gName]] else NULL
+            fScRanges <- if (!is.null(formulas)) formulas@scoreRanges[[gName]] else NULL
+            cTable <- if (!is.null(compounds)) compounds[[gName]] else NULL
             
-            if (!is.na(suspRank) && !is.null(cTable[["fragInfo"]][[suspRank]]))
-                annSim <- annotatedMSMSSimilarity(cTable[["fragInfo"]][[suspRank]],
-                                                  MSPeakLists[[gName]][["MSMS"]],
-                                                  absMzDev, relMinMSMSIntensity)
+            suspIK1 <- if (!is.null(scr[["InChIKey"]])) getIKBlock1(scr$InChIKey[i]) else NULL
+            annSim <- 0; suspRank <- NA
+            if (!is.null(MSMSList) && !is.null(cTable) && !is.null(suspIK1))
+            {
+                suspRank <- which(suspIK1 == cTable$InChIKey1)
+                suspRank <- if (length(suspRank) > 0) suspRank[1] else NA
+                
+                if (!is.na(suspRank) && !is.null(cTable[["fragInfo"]][[suspRank]]))
+                    annSim <- annotatedMSMSSimilarity(cTable[["fragInfo"]][[suspRank]],
+                                                      MSPeakLists[[gName]][["MSMS"]],
+                                                      absMzDev, relMinMSMSIntensity)
+            }
+            
+            set(scr, i, c("suspCompAnnRank", "annotatedMSMSSimilarity"), list(suspRank, annSim))
+            set(scr, i, "estIDLevel", estimateIdentificationLevel(suspIK1, scr$formula[i], annSim,
+                                                                  if (!is.null(scr[["fragments"]])) scr$fragments[i] else NULL,
+                                                                  MSMSList, fTable, fScRanges, minFormScores,
+                                                                  minFormScoresToNext, cTable, absMzDev))
         }
-        
-        set(scr, i, c("suspCompAnnRank", "annotatedMSMSSimilarity"), list(suspRank, annSim))
-        set(scr, i, "estIDLevel", estimateIdentificationLevel(suspIK1, scr$formula[i], annSim,
-                                                              if (!is.null(scr[["fragments"]])) scr$fragments[i] else NULL,
-                                                              MSMSList, fTable, fScRanges, minFormScores,
-                                                              minFormScoresToNext, cTable, absMzDev))
     }
     
     saveCacheData("annotateSuspects", scr, hash)

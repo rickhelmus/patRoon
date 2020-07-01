@@ -187,6 +187,7 @@ Collate:
     'features-optimize-xcms3.R'
     'features-safd.R'
     'features-sirius.R'
+    'features-set.R'
     'features-tasq.R'
     'features-xcms.R'
     'features-xcms3.R'

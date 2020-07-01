@@ -1,0 +1,10 @@
+level,subLevel,type,score,min,minToOtherHighest,mustExist
+2,a,compound,individualMoNAScore,0.9,Inf,TRUE
+2,a,compound,rank,1,,TRUE
+3,a,compound,individualMoNAScore,0.4,,TRUE
+3,b,suspectFragments,,3,,TRUE
+3,c,annotatedMSMSSimilarity,,0.7,,TRUE
+4,,formula,combScore,0.5,0.2,FALSE
+4,,formula,isoScore,0.9,0.2,TRUE
+4,,formula,rank,1,,TRUE
+5,,none,,,,

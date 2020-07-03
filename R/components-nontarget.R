@@ -109,6 +109,9 @@ setMethod("plotGraph", "componentsNT", function(obj, onlyLinked)
 #' @param elements A character vector with elements to be considered for
 #'   detection of repeating units. Sets the \code{elements} argument of
 #'   \code{\link{homol.search}} function.
+#' @param absMzDevLink Maximum absolute \emph{m/z} deviation when linking
+#'   series. This should usually be a bit higher than \code{absMzDev} to ensure
+#'   proper linkage.
 #' @param traceHack Currently \code{\link{homol.search}} does not work with \R
 #'   \samp{>3.3.3}. This flag, which is enabled by default on these R versions,
 #'   implements a (messy) workaround
@@ -120,7 +123,7 @@ setMethod("plotGraph", "componentsNT", function(obj, onlyLinked)
 #' @export
 generateComponentsNontarget <- function(fGroups, ionization, rtRange = c(-120, 120), mzRange = c(5, 120),
                                         elements = c("C", "H", "O"), rtDev = 30, absMzDev = 0.002,
-                                        extraOpts = NULL,
+                                        absMzDevLink = absMzDev * 2, extraOpts = NULL,
                                         traceHack = all(R.Version()[c("major", "minor")] >= c(3, 4)))
 {
     ac <- checkmate::makeAssertCollection()
@@ -129,8 +132,7 @@ generateComponentsNontarget <- function(fGroups, ionization, rtRange = c(-120, 1
     checkmate::assertNumeric(rtRange, finite = TRUE, any.missing = FALSE, len = 2, add = ac)
     checkmate::assertNumeric(mzRange, lower = 0, finite = TRUE, any.missing = FALSE, len = 2, add = ac)
     checkmate::assertCharacter(elements, min.chars = 1, any.missing = FALSE, min.len = 1, add = ac)
-    checkmate::assertNumber(rtDev, lower = 0, finite = TRUE, add = ac)
-    checkmate::assertNumber(absMzDev, lower = 0, finite = TRUE, add = ac)
+    aapply(checkmate::assertNumber, . ~ rtDev + absMzDev + absMzDevLink, lower = 0, finite = TRUE, fixed = list(add = ac))
     checkmate::assertList(extraOpts, any.missing = FALSE, names = "unique", null.ok = TRUE, add = ac)
     checkmate::assertFlag(traceHack, add = ac)
     checkmate::reportAssertions(ac)
@@ -138,7 +140,7 @@ generateComponentsNontarget <- function(fGroups, ionization, rtRange = c(-120, 1
     if (length(fGroups) == 0)
         return(componentsNT(componentInfo = data.table(), components = list()))
 
-    hash <- makeHash(fGroups, ionization, rtRange, mzRange, elements, rtDev, absMzDev, extraOpts)
+    hash <- makeHash(fGroups, ionization, rtRange, mzRange, elements, rtDev, absMzDev, absMzDevLink, extraOpts)
     cd <- loadCacheData("componentsNontarget", hash)
     if (!is.null(cd))
         return(cd)
@@ -219,8 +221,6 @@ generateComponentsNontarget <- function(fGroups, ionization, rtRange = c(-120, 1
     for (r in seq_len(nrow(compTab)))
     {
         series <- compTab[["groups"]][[r]][[1]]
-        nseries <- length(series)
-        mzRange <- range(gInfo[series, "mzs"])
         links <- integer(0)
         for (ro in seq_len(nrow(compTab)))
         {
@@ -236,14 +236,12 @@ generateComponentsNontarget <- function(fGroups, ionization, rtRange = c(-120, 1
             if (sum(series %in% otherSeries) < 1) # UNDONE: minimum overlap?
                 next
 
-            otherMzRange <- range(gInfo[otherSeries, "mzs"])
-
             # check for conflicts: groups that are not present in both but with
             # m/z values close or equal to those groups that are present
             missingG <- setdiff(series, otherSeries)
             missingOtherG <- setdiff(otherSeries, series)
 
-            mzSame <- function(mz1, mz2) numLTE(abs(mz1 - mz2), absMzDev)
+            mzSame <- function(mz1, mz2) numLTE(abs(mz1 - mz2), absMzDevLink)
             
             if (any(sapply(missingG, function(mg) any(mzSame(gInfo[mg, "mzs"], gInfo[otherSeries, "mzs"])))) ||
                 any(sapply(missingOtherG, function(mg) any(mzSame(gInfo[mg, "mzs"], gInfo[series, "mzs"])))))

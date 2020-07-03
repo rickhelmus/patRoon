@@ -41,6 +41,7 @@ generateComponentsNontarget(
   elements = c("C", "H", "O"),
   rtDev = 30,
   absMzDev = 0.002,
+  absMzDevLink = absMzDev * 2,
   extraOpts = NULL,
   traceHack = all(R.Version()[c("major", "minor")] >= c(3, 4))
 )
@@ -137,6 +138,10 @@ detection of repeating units. Sets the \code{elements} argument of
 
   For \code{generateComponentsNontarget}: Sets the \code{rttol} and
   \code{mztol} arguments of \code{\link{homol.search}}.}
+
+\item{absMzDevLink}{Maximum absolute \emph{m/z} deviation when linking
+series. This should usually be a bit higher than \code{absMzDev} to ensure
+proper linkage.}
 
 \item{traceHack}{Currently \code{\link{homol.search}} does not work with \R
 \samp{>3.3.3}. This flag, which is enabled by default on these R versions,

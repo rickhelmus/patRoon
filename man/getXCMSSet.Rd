@@ -9,17 +9,17 @@
 \alias{getXCMSSet,featureGroupsXCMS-method}
 \title{Conversion to xcmsSet objects}
 \usage{
-getXCMSSet(obj, ..., verbose = TRUE)
+getXCMSSet(obj, verbose = TRUE, ...)
 
-\S4method{getXCMSSet}{features}(obj, exportedData, verbose)
+\S4method{getXCMSSet}{features}(obj, verbose, exportedData)
 
-\S4method{getXCMSSet}{featuresOpenMS}(obj, exportedData, verbose = FALSE)
+\S4method{getXCMSSet}{featuresOpenMS}(obj, verbose = TRUE, ...)
 
-\S4method{getXCMSSet}{featuresXCMS}(obj, exportedData, verbose)
+\S4method{getXCMSSet}{featuresXCMS}(obj, verbose = TRUE, ...)
 
-\S4method{getXCMSSet}{featureGroups}(obj, exportedData, verbose = TRUE)
+\S4method{getXCMSSet}{featureGroups}(obj, verbose, exportedData)
 
-\S4method{getXCMSSet}{featureGroupsXCMS}(obj, exportedData, verbose)
+\S4method{getXCMSSet}{featureGroupsXCMS}(obj, verbose, exportedData)
 }
 \arguments{
 \item{obj}{The object that should be converted.}

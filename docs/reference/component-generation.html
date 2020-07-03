@@ -198,6 +198,7 @@ isotopes, adducts and homologues) to assist and simplify compound annotation.</p
   <span class='kw'>elements</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"C"</span>, <span class='st'>"H"</span>, <span class='st'>"O"</span>),
   <span class='kw'>rtDev</span> <span class='kw'>=</span> <span class='fl'>30</span>,
   <span class='kw'>absMzDev</span> <span class='kw'>=</span> <span class='fl'>0.002</span>,
+  <span class='kw'>absMzDevLink</span> <span class='kw'>=</span> <span class='no'>absMzDev</span> * <span class='fl'>2</span>,
   <span class='kw'>extraOpts</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>traceHack</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/all.html'>all</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/Version.html'>R.Version</a></span>()[<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"major"</span>, <span class='st'>"minor"</span>)] <span class='kw'>&gt;=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>3</span>, <span class='fl'>4</span>))
 )
@@ -328,6 +329,12 @@ detection of repeating units. Sets the <code>elements</code> argument of
   <code>ppm.error</code> arguments to <code><a href='https://rdrr.io/pkg/RAMClustR/man/do.findmain.html'>do.findmain</a></code>.</p>
 <p>For <code>generateComponentsNontarget</code>: Sets the <code>rttol</code> and
   <code>mztol</code> arguments of <code>homol.search</code>.</p></td>
+    </tr>
+    <tr>
+      <th>absMzDevLink</th>
+      <td><p>Maximum absolute <em>m/z</em> deviation when linking
+series. This should usually be a bit higher than <code>absMzDev</code> to ensure
+proper linkage.</p></td>
     </tr>
     <tr>
       <th>traceHack</th>

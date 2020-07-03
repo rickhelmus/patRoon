@@ -24,7 +24,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2020-06-30" />
+<meta name="date" content="2020-07-03" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -276,17 +276,17 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Feature table (only first columns for readability)</span>
 fList[[<span class="st">&quot;standard-1&quot;</span>]][, <span class="dv">1</span><span class="op">:</span><span class="dv">6</span>]</code></pre></div>
 <pre><code>#&gt;                          ID       ret        mz       area    retmin    retmax
-#&gt;   1:  f_2540623637027511073  19.00698  78.99684  65793.391  13.01202  29.99700
-#&gt;   2: f_10400787677006989369  20.00598  79.02098 125354.100  13.01202  29.99700
-#&gt;   3: f_15146149851977565998   8.01600  79.02101 188045.900   3.03000  12.01302
-#&gt;   4:  f_3071607977437389214 112.34220  79.02103  71168.984 106.55400 147.51600
-#&gt;   5:  f_1102206878908603608 111.64380  84.95950  54875.129 105.15180 599.87400
+#&gt;   1: f_12198123004280964078  19.00698  78.99684  65793.391  13.01202  29.99700
+#&gt;   2: f_14116662334685951522  20.00598  79.02098 125354.100  13.01202  29.99700
+#&gt;   3: f_16623264975991309209   8.01600  79.02101 188045.900   3.03000  12.01302
+#&gt;   4:  f_3942930422657434859 112.34220  79.02103  71168.984 106.55400 147.51600
+#&gt;   5: f_10475523409052309097 111.64380  84.95950  54875.129 105.15180 599.87400
 #&gt;  ---                                                                          
-#&gt; 433:  f_2771386799713810990  11.01402 295.22387   9514.476   9.01602  13.01202
-#&gt; 434:  f_7096433801699369684  13.01202 296.92038  37753.414  10.01502  15.01098
-#&gt; 435: f_13580434521210186590  12.01302 297.16751  17366.125   9.01602  15.01098
-#&gt; 436: f_11606505077301825376  11.01402 297.20368  13995.990   9.01602  14.01102
-#&gt; 437:  f_2353809924609938587  12.01302 299.12581  13630.378   9.01602  15.01098</code></pre>
+#&gt; 433: f_16833125942862999222  11.01402 295.22387   9514.476   9.01602  13.01202
+#&gt; 434: f_16569108464623263639  13.01202 296.92038  37753.414  10.01502  15.01098
+#&gt; 435:  f_4374923640831909397  12.01302 297.16751  17366.125   9.01602  15.01098
+#&gt; 436: f_13489335848141138924  11.01402 297.20368  13995.990   9.01602  14.01102
+#&gt; 437: f_14187874534141918169  12.01302 299.12581  13630.378   9.01602  15.01098</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Feature group intensities</span>
 fGroups<span class="op">$</span>M120_R328_<span class="dv">81</span></code></pre></div>
 <pre><code>#&gt; [1] 55936 61668 59624</code></pre>
@@ -334,17 +334,17 @@ components[[<span class="st">&quot;CMP7&quot;</span>]][, <span class="dv">1</spa
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># obtain table with all features (only first columns for readability)</span>
 <span class="kw">as.data.table</span>(fList)[, <span class="dv">1</span><span class="op">:</span><span class="dv">6</span>]</code></pre></div>
 <pre><code>#&gt;         analysis                     ID       ret        mz      area     retmin
-#&gt;    1:  solvent-1  f_9638880420100393987  19.10298  78.99678  73929.27  13.108980
-#&gt;    2:  solvent-1 f_14369798597078502453  14.10798  84.95948 941557.00   3.922998
-#&gt;    3:  solvent-1 f_12001999604954707302 112.97220  84.95949  47558.80 105.301800
-#&gt;    4:  solvent-1  f_7134098699824217839  13.10898  88.95255  34552.67   7.114020
-#&gt;    5:  solvent-1 f_13710068432321228905   2.52900  88.96823  14710.10   1.732002
+#&gt;    1:  solvent-1 f_16105329662462653228  19.10298  78.99678  73929.27  13.108980
+#&gt;    2:  solvent-1   f_686062333713420287  14.10798  84.95948 941557.00   3.922998
+#&gt;    3:  solvent-1  f_4442657700814412961 112.97220  84.95949  47558.80 105.301800
+#&gt;    4:  solvent-1 f_17622948131486385632  13.10898  88.95255  34552.67   7.114020
+#&gt;    5:  solvent-1  f_6603644900063960782   2.52900  88.96823  14710.10   1.732002
 #&gt;   ---                                                                           
-#&gt; 2440: standard-3  f_1805692154142994424  12.14898 294.93888 350965.20   9.151020
-#&gt; 2441: standard-3   f_140934049452192290  11.14998 295.18863  10705.59   9.151020
-#&gt; 2442: standard-3  f_9156505004269054112  13.14798 296.92039  42195.86  10.150980
-#&gt; 2443: standard-3 f_14558479237145846060  11.14998 297.16737  15177.58   9.151020
-#&gt; 2444: standard-3 f_16244712996325281455  11.14998 297.20377  16678.13   9.151020</code></pre>
+#&gt; 2440: standard-3 f_12576030326548600052  12.14898 294.93888 350965.20   9.151020
+#&gt; 2441: standard-3  f_3569339503241913608  11.14998 295.18863  10705.59   9.151020
+#&gt; 2442: standard-3  f_4355220367125346346  13.14798 296.92039  42195.86  10.150980
+#&gt; 2443: standard-3 f_16545228989070575523  11.14998 297.16737  15177.58   9.151020
+#&gt; 2444: standard-3 f_11495868189668544060  11.14998 297.20377  16678.13   9.151020</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Returns group info and intensity values for each feature group</span>
 <span class="kw">as.data.table</span>(fGroups, <span class="dt">average =</span> <span class="ot">TRUE</span>) <span class="co"># average intensities for replicates</span></code></pre></div>
 <pre><code>#&gt;             group      ret       mz standard

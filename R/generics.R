@@ -78,7 +78,8 @@ setGeneric("plotHeatMap", function(obj, ...) standardGeneric("plotHeatMap"))
 
 setGeneric("sets", function(obj) standardGeneric("sets"))
 setGeneric("adducts", function(obj) standardGeneric("adducts"))
-
+setGeneric("ionize", function(obj, sets = NULL) standardGeneric("ionize"))
+setGeneric("groupAlgorithm", function(obj) standardGeneric("groupAlgorithm"))
 
 ### suspect screening
 
@@ -163,6 +164,11 @@ setGeneric("cutClusters", function(obj) standardGeneric("cutClusters"))
 #' @templateVar desc combines and merges data from various algorithms to generate a consensus.
 #' @template generics
 setGeneric("consensus", function(obj, ...) standardGeneric("consensus"))
+
+#' @templateVar func export
+#' @templateVar desc exports workflow data to a given format.
+#' @template generics
+setGeneric("export", function(obj, type, out, ...) standardGeneric("export"))
 
 #' @templateVar func featureTable
 #' @templateVar desc returns feature information.

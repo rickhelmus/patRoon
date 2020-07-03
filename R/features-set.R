@@ -10,8 +10,8 @@ neutralizeFeatures <- function(feat, adduct)
     {
         fTab <- copy(fTab)
         fTab[, mz := mz - adductMZ]
-        fTab[, mzmin := mz - adductMZ]
-        fTab[, mzmax := mz - adductMZ]
+        fTab[, mzmin := mzmin - adductMZ]
+        fTab[, mzmax := mzmax - adductMZ]
         return(fTab)
     })
     return(feat)
@@ -35,7 +35,7 @@ setMethod("show", "featuresSet", function(object)
     printf("adducts: %s\n", paste0(sapply(object@adducts, as.character), collapse = ", "))
 })
 
-# UNDONE: export/move
+# UNDONE: export/move/docs
 setMethod("sets", "featuresSet", function(obj) names(obj@adducts))
 setMethod("adducts", "featuresSet", function(obj) obj@adducts)
 
@@ -49,11 +49,11 @@ setMethod("featureTable", "featuresSet", function(obj, neutralized = TRUE, sets 
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertFlag(neutralized, add = ac)
-    checkmate::assertChoice(sets, obj@sets, null.ok = TRUE, add = ac)
+    checkmate::assertSubset(sets, obj@sets, empty.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
 
-    if (!is.null(set))
-        obj <- obj[, sets = set]
+    if (!is.null(sets) && length(sets) > 0)
+        obj <- obj[, sets = sets]
     
     if (neutralized)
         return(callNextMethod(obj))
@@ -68,10 +68,10 @@ setMethod("as.data.table", "featuresSet", function(x, neutralized = TRUE, sets =
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertFlag(neutralized, add = ac)
-    checkmate::assertChoice(sets, obj@sets, null.ok = TRUE, add = ac)
+    checkmate::assertSubset(sets, x@sets, empty.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
-    if (!is.null(sets))
+    if (!is.null(sets) && length(sets) > 0)
         x <- x[, sets = sets]
     
     if (neutralized)
@@ -79,7 +79,7 @@ setMethod("as.data.table", "featuresSet", function(x, neutralized = TRUE, sets =
         ret <- callNextMethod(x)
         ret[, set := rep.int(sets(x), times = sapply(x@setObjects, length))]
         setcolorder(ret, "set")
-        return(ret)
+        return(ret[])
     }
     
     # return original ionized features
@@ -92,13 +92,11 @@ setMethod("as.data.table", "featuresSet", function(x, neutralized = TRUE, sets =
 #' @export
 setMethod("[", c("featuresSet", "ANY", "missing", "missing"), function(x, i, ..., sets = NULL, drop = TRUE)
 {
-    checkmate::assertChoice(sets, obj@sets, null.ok = TRUE)
-    if (!is.null(sets))
-    {
-        setAna <- x@analysisInfo$analysis[x@analysisInfo$set %in% sets]
-        i <- if (missing(i)) setAna else union(i, setAna)
-    }
+    checkmate::assertSubset(sets, x@sets, empty.ok = TRUE)
     
+    if (!is.null(sets) && length(sets) > 0)
+        i <- mergeAnaSubsetArgWithSets(i, sets, analysisInfo(x))
+        
     x <- callNextMethod(x, i, ...)
     if (!missing(i))
     {
@@ -134,9 +132,9 @@ setMethod("[[", c("featuresSet", "ANY", "missing"), function(x, i, neutralized)
 #' @export
 setMethod("filter", "featuresSet", function(obj, ..., sets = NULL)
 {
-    checkmate::assertChoice(sets, obj@sets, null.ok = TRUE)
+    checkmate::assertSubset(sets, obj@sets, empty.ok = TRUE)
     
-    if (!is.null(sets))
+    if (!is.null(sets) && length(sets) > 0)
         obj <- obj[, sets = sets]
     
     obj <- callNextMethod(obj, ...)
@@ -210,3 +208,19 @@ setMethod("screenSuspects", "featuresSet", function(obj, suspects, rtWindow, mzW
                                                     skipInvalid) fSetNotYetImplemented())
 setMethod("getXCMSSet", "featuresSet", function(obj, verbose) fSetNotYetImplemented())
 setMethod("getXCMSnExp", "featuresSet", function(obj, verbose) fSetNotYetImplemented())
+
+featuresSetIonized <- setClass("featuresSetIonized", contains = "features")
+setMethod("initialize", "featuresSetIonized",
+          function(.Object, ...) callNextMethod(.Object, algorithm = "set_ionized", ...))
+setMethod("ionize", "featuresSet", function(obj, sets)
+{
+    checkmate::assertSubset(sets, obj@sets, empty.ok = TRUE)
+    
+    if (!is.null(sets) && length(sets) > 0)
+        obj <- obj[, sets = sets]
+
+    if (!allSame(adducts(obj)))
+        stop("Selected sets for conversion must have have equal adducts")
+    
+    return(featuresSetIonized(features = obj@ionizedFeatures, analysisInfo = analysisInfo(obj)))
+})

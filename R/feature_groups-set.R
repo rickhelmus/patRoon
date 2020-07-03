@@ -1,81 +1,143 @@
-# UNDONE: combine featureGroupsComparison interface (perhaps this could replace it?)
-# UNDONE: design common set base class for this, compounds etc?
-
 #' @include main.R
-#' @include feature_groups-comparison.R
+#' @include feature_groups.R
+#' @include features-set.R
 NULL
 
-neutralizeFGroups <- function(fGroups, adduct)
-{
-    adductMZ <- adductMZDelta(adduct)
-    fGroups@groupInfo$mzs <- fGroups@groupInfo$mzs - adductMZ
-    fGroups@features@features <- lapply(fGroups@features@features, function(fTab)
-    {
-        fTab <- copy(fTab)
-        fTab[, mz := mz - adductMZ]
-        fTab[, mzmin := mz - adductMZ]
-        fTab[, mzmax := mz - adductMZ]
-        return(fTab)
-    })
-    return(fGroups)
-}
+assertFGroupSets <- function(obj, s, add = NULL) checkmate::assertSubset(s, sets(obj), empty.ok = TRUE, add = add)
 
 featureGroupsSet <- setClass("featureGroupsSet",
-                             slots = c(adducts = "list", setObjects = "list",
-                                       neutralizedFGroups = "list"),
+                             slots = c(groupAlgorithm = "character"),
                              contains = "featureGroups")
 
 setMethod("initialize", "featureGroupsSet",
           function(.Object, ...) callNextMethod(.Object, algorithm = "set", ...))
 
-setMethod("c", "featureGroups", function(x, ..., adducts, groupAlgo, groupArgs = list(rtalign = FALSE))
+setMethod("sets", "featureGroupsSet", function(obj) sets(getFeatures(obj)))
+setMethod("adducts", "featureGroupsSet", function(obj) adducts(getFeatures(obj)))
+setMethod("groupAlgorithm", "featureGroupsSet", function(obj) obj@groupAlgorithm)
+
+#' @describeIn featureGroupsSet Shows summary information for this object.
+#' @export
+setMethod("show", "featureGroupsSet", function(object)
 {
-    fGroupsList <- list(x, ...)
+    callNextMethod(object)
+    printf("sets: %s\n", paste0(sets(object), collapse = ", "))
+    printf("adducts: %s\n", paste0(sapply(adducts(getFeatures(object)), as.character), collapse = ", "))
+    printf("grouping algorithm: %s\n", groupAlgorithm(object))
+})
+
+#' @describeIn featureGroupsSet Obtain feature information (see \code{\link{features}}).
+#' @export
+setMethod("featureTable", "featureGroupsSet", function(obj, neutralized = TRUE, set = NULL) featureTable(obj@features, neutralized, set))
+
+#' @describeIn featureGroupsSet Subset on analyses/feature groups.
+#' @param rGroups An optional \code{character} vector: if specified only keep
+#'   results for the given replicate groups (equivalent to the \code{rGroups}
+#'   argument to \code{\link[=filter,featureGroups-method]{filter}}).
+#' @export
+setMethod("[", c("featureGroupsSet", "ANY", "ANY", "missing"), function(x, i, j, ..., sets = NULL, drop = TRUE)
+{
+    assertFGroupSets(x, sets)
     
+    if (!is.null(sets) && length(sets) > 0)
+        i <- mergeAnaSubsetArgWithSets(i, sets, analysisInfo(x))
+
+    return(callNextMethod(x, i, j, ...))
+})
+
+#' @describeIn featureGroupsSet Extract intensity values.
+#' @export
+setMethod("[[", c("featureGroupsSet", "ANY", "ANY"), function(x, i, j, sets = NULL)
+{
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertList(fGroupsList, types = "featureGroups", any.missing = FALSE,
-                          unique = TRUE, .var.name = "...", add = ac)
-    checkmate::assert(checkmate::checkCharacter(adducts, any.missing = FALSE, min.len = 1,
-                                                max.len = length(fGroupsList)),
-                      checkmate::checkList(adducts, types = c("adduct", "character"), any.missing = FALSE,
-                                           min.len = 1, max.len = length(fGroupsList)),
-                      .var.name = "adducts")
-    checkmate::assertChoice(groupAlgo, c("xcms", "openms"), add = ac)
-    checkmate::assertList(groupArgs, any.missing = FALSE, names = "unique", add = ac)
+    assertExtractArg(i, add = ac)
+    assertFGroupSets(x, sets, add = ac)
     checkmate::reportAssertions(ac)
+
+    if (!is.null(sets) && length(sets) > 0)
+        i <- mergeAnaSubsetArgWithSets(i, sets, analysisInfo(x))
     
-    n <- getArgNames(..., def = sapply(fGroupsList, algorithm))
-    names(fGroupsList) <- make.unique(n)
+    return(callNextMethod(x, i, j))
+})
+
+# UNDONE: mention that object will be ionized
+#' @describeIn featureGroupsSet Exports feature groups to a \file{.csv} file that
+#'   is readable to Bruker ProfileAnalysis (a 'bucket table'), Bruker TASQ (an
+#'   analyte database) or that is suitable as input for the \verb{Targeted peak
+#'   detection} functionality of \href{http://mzmine.github.io/}{MZmine}.
+#' @param out The destination file for the exported data.
+#' @export
+setMethod("export", "featureGroupsSet", function(obj, type, out, sets = NULL) callNextMethod(ionize(obj, sets), type, out))
+
+#' @describeIn featureGroupsSet Obtain a summary table (a \code{\link{data.table}})
+#'   with retention, \emph{m/z}, intensity and optionally other feature data.
+#' @param features If \code{TRUE} then feature specific data will be added. If
+#'   \code{average=TRUE} this data will be averaged for each feature group.
+#' @param regression Set to \code{TRUE} to add regression data for each feature
+#'   group. For this a linear model is created (intensity/area [depending on
+#'   \code{areas} argument] \emph{vs} concentration). The model concentrations
+#'   (e.g. of a set of standards) is derived from the \code{conc} column of the
+#'   \link[=analysis-information]{analysis information}. From this model the
+#'   intercept, slope and R2 is added to the output. In addition, when
+#'   \code{features=TRUE}, concentrations for each feature are added. Note that
+#'   no regression information is added when no \code{conc} column is present in
+#'   the analysis information or when less than two concentrations are specified
+#'   (\emph{i.e.} the minimum amount).
+#' @export
+setMethod("as.data.table", "featureGroupsSet", function(x, neutralized = TRUE, sets = NULL, features = FALSE, ...)
+{
+    assertFGroupSets(x, sets)
     
-    adductNamed <- checkmate::testNames(names(adducts))
-    if (adductNamed)
-        checkmate::assertNames(names(adducts), type = "unique", must.include = names(fGroupsList))
-    adducts <- lapply(adducts, checkAndToAdduct, .var.name = "adducts")
-    adducts <- rep(adducts, length.out = length(fGroupsList))
+    if (!is.null(sets) && length(sets) > 0)
+        x <- x[, sets = sets]
+
+    anaInfo <- analysisInfo(x) # get before ionizing    
+    if (!neutralized)
+        x <- ionize(x)
     
-    if (!adductNamed)
-        names(adducts) <- names(fGroupsList)
-    else
-        adducts <- adducts[names(fGroupsList)] # synchronize order
+    ret <- callNextMethod(x, features = features, ...)
     
-    # neutralize featureGroups
-    neutralizedFGroups <- mapply(fGroupsList, adducts, FUN = neutralizeFGroups,
-                                 SIMPLIFY = FALSE, USE.NAMES = TRUE)
-    
-    # convert feature groups to features
-    featsFromGroups <- convertFeatureGroupsToFeatures(neutralizedFGroups)
-    
-    if (groupAlgo == "xcms")
-        groupArgs <- c(list(exportedData = FALSE), groupArgs)
-    compGroups <- do.call(groupFeatures, c(list(featsFromGroups, groupAlgo), groupArgs))
-    
-    anaInfo <- do.call(rbind, c(mapply(fGroupsList, names(fGroupsList), FUN = function(fG, n)
+    if (features) # add set column
     {
-        fG@analysisInfo$set <- n
-        return(fG@analysisInfo)
-    }, SIMPLIFY = FALSE), list(stringsAsFactors = FALSE, make.row.names = FALSE)))
+        ret[, set := anaInfo[match(analysis, anaInfo$analysis), "set"]]
+        setcolorder(ret, c("group", "group_ret", "group_mz", "set", "analysis"))
+    }
     
-    return(featureGroupsSet(adducts = adducts, setObjects = fGroupsList, neutralizedFGroups = neutralizedFGroups,
-                            groups = groups(compGroups), analysisInfo = anaInfo, groupInfo = groupInfo(compGroups),
-                            features = getFeatures(compGroups), ftindex = groupFeatIndex(compGroups)))
+    return(ret[])
+})
+
+setMethod("groupFeatures", "featuresSet", function(feat, algorithm, ..., verbose = TRUE)
+{
+    # UNDONE: xcms3 not yet supported
+    checkmate::assertChoice(algorithm, c("openms", "xcms"))
+    
+    otherArgs <- list(...)
+    if (algorithm == "xcms")
+        otherArgs <- modifyList(otherArgs, list(exportedData = FALSE))
+    
+    fGroups <- do.call(callNextMethod, c(list(feat = feat, algorithm = algorithm, verbose = verbose), otherArgs))
+    
+    return(featureGroupsSet(groupAlgorithm = algorithm, groups = groups(fGroups), groupInfo = groupInfo(fGroups),
+                            analysisInfo = analysisInfo(fGroups), features = feat, ftindex = groupFeatIndex(fGroups)))
+})
+
+featureGroupsSetIonized <- setClass("featureGroupsSetIonized", contains = "featureGroups")
+setMethod("initialize", "featureGroupsSetIonized",
+          function(.Object, ...) callNextMethod(.Object, algorithm = "set_ionized", ...))
+setMethod("ionize", "featureGroupsSet", function(obj, sets)
+{
+    # UNDONE: mention that group names remain the same and thus represent neutral masses
+    
+    if (!is.null(sets) && length(sets) > 0)
+        obj <- obj[, sets = sets]
+    
+    if (!allSame(adducts(obj)))
+        stop("Selected sets for conversion must have have equal adducts")
+    
+    addMZ <- adductMZDelta(adducts(obj)[[1]])
+    gInfo <- groupInfo(obj)
+    gInfo$mzs <- gInfo$mzs + addMZ
+    
+    featureGroupsSetIonized(groups = groups(obj), groupInfo = gInfo, analysisInfo = analysisInfo(obj),
+                            features = ionize(getFeatures(obj)), ftindex = groupFeatIndex(obj))
 })

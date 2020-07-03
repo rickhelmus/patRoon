@@ -440,26 +440,25 @@ setMethod("averageGroups", "featureGroups", function(fGroups, areas)
 #'   analyte database) or that is suitable as input for the \verb{Targeted peak
 #'   detection} functionality of \href{http://mzmine.github.io/}{MZmine}.
 #' @param out The destination file for the exported data.
-#' @aliases export
 #' @export
-setMethod("export", "featureGroups", function(fGroups, type, out)
+setMethod("export", "featureGroups", function(obj, type, out)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertChoice(type, c("brukerpa", "brukertasq", "mzmine"), add = ac)
     checkmate::assertPathForOutput(out, overwrite = TRUE, add = ac) # NOTE: assert doesn't work on Windows...
     checkmate::reportAssertions(ac)
 
-    if (length(fGroups) == 0)
+    if (length(obj) == 0)
         stop("Cannot export empty feature groups object")
 
     if (type == "brukerpa")
     {
         # UNDONE: do we need this?
         #files <- sapply(bucketInfo$fInfo$analysis, function(f) file.path(bucketInfo$dataPath, paste0(f, ".d")), USE.NAMES = F)
-        files <- fGroups@analysisInfo$analysis
+        files <- obj@analysisInfo$analysis
 
         # col.names: if NA an empty initial column is added
-        write.table(fGroups@groups, out, na = "", sep = "\t", quote = FALSE, row.names = files, col.names = NA)
+        write.table(obj@groups, out, na = "", sep = "\t", quote = FALSE, row.names = files, col.names = NA)
     }
     else if (type == "brukertasq")
     {
@@ -471,18 +470,18 @@ setMethod("export", "featureGroups", function(fGroups, type, out)
                  "precursor ion MS3", "precursor ion MS3 formula", "precursor ion MS4",
                  "precursor ion MS4 formula")
 
-        df <- data.frame(matrix(ncol=length(hdr), nrow=ncol(fGroups@groups)))
+        df <- data.frame(matrix(ncol=length(hdr), nrow=ncol(obj@groups)))
         colnames(df) <- hdr
 
-        df["name"] <- colnames(fGroups@groups)
-        df["m/z"] <- fGroups@groupInfo$mzs
-        df["rt"] <- fGroups@groupInfo$rts / 60
+        df["name"] <- colnames(obj@groups)
+        df["m/z"] <- obj@groupInfo$mzs
+        df["rt"] <- obj@groupInfo$rts / 60
 
         write.csv(df, out, row.names = FALSE, na = "")
     }
     else if (type == "mzmine")
     {
-        df <- fGroups@groupInfo
+        df <- obj@groupInfo
         df$name <- rownames(df)
         df <- df[, c("mzs", "rts", "name")]
         df$rts <- df$rts / 60

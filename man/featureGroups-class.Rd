@@ -25,7 +25,6 @@
 \alias{[[,featureGroups,ANY,ANY-method}
 \alias{$,featureGroups-method}
 \alias{export,featureGroups-method}
-\alias{export}
 \alias{as.data.table,featureGroups-method}
 \alias{plot,featureGroups,ANY-method}
 \alias{plotInt,featureGroups-method}
@@ -78,7 +77,7 @@
 
 \S4method{$}{featureGroups}(x, name)
 
-\S4method{export}{featureGroups}(fGroups, type, out)
+\S4method{export}{featureGroups}(obj, type, out)
 
 \S4method{as.data.table}{featureGroups}(
   x,
@@ -401,7 +400,7 @@ row within the feature table of the analysis (see
 }}
 
 \section{S4 class hierarchy}{
- \itemize{   \item{\code{\link{workflowStep}}}   \itemize{     \item{\strong{\code{\link{featureGroups}}}}     \itemize{       \item{\code{\link{featureGroupsBruker}}}       \item{\code{\link{featureGroupsConsensus}}}       \item{\code{\link{featureGroupsEnviMass}}}       \item{\code{\link{featureGroupsOpenMS}}}       \item{\code{\link{featureGroupsScreening}}}       \item{\code{\link{featureGroupsSet}}}       \item{\code{\link{featureGroupsBrukerTASQ}}}       \item{\code{\link{featureGroupsXCMS}}}       \item{\code{\link{featureGroupsXCMS3}}}     }   } }
+ \itemize{   \item{\code{\link{workflowStep}}}   \itemize{     \item{\strong{\code{\link{featureGroups}}}}     \itemize{       \item{\code{\link{featureGroupsBruker}}}       \item{\code{\link{featureGroupsConsensus}}}       \item{\code{\link{featureGroupsEnviMass}}}       \item{\code{\link{featureGroupsOpenMS}}}       \item{\code{\link{featureGroupsScreening}}}       \item{\code{\link{featureGroupsSet}}}       \item{\code{\link{featureGroupsSetIonized}}}       \item{\code{\link{featureGroupsBrukerTASQ}}}       \item{\code{\link{featureGroupsXCMS}}}       \item{\code{\link{featureGroupsXCMS3}}}     }   } }
 }
 
 \references{

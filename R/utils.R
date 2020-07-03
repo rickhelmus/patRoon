@@ -29,6 +29,13 @@ getMzMLOrMzXMLAnalysisPath <- function(file, path)
     return(ret)
 }
 
+mergeAnaSubsetArgWithSets <- function(i, sets, anaInfo)
+{
+    if (!missing(i))
+        assertSubsetArgAndToChr(i, analyses(x))
+    return(union(i, anaInfo$analysis[anaInfo$set %in% sets]))
+}
+
 mkdirp <- function(path)
 {
     for (p in path)
@@ -238,7 +245,7 @@ allSame <- function(l)
         if (any(is.na(l)))
             return(FALSE)
 
-        return(all(l[[1]] == l))
+        return(all(sapply(l[-1], identical, l[[1]])))
     }
 
     return(TRUE)

@@ -25,7 +25,6 @@ featuresSet <- setClass("featuresSet",
 setMethod("initialize", "featuresSet",
           function(.Object, ...) callNextMethod(.Object, algorithm = "set", ...))
 
-
 # UNDONE: move (partially)
 #' @describeIn featuresSet Shows summary information for this object.
 #' @export
@@ -38,6 +37,7 @@ setMethod("show", "featuresSet", function(object)
 
 # UNDONE: export/move
 setMethod("sets", "featuresSet", function(obj) names(obj@adducts))
+setMethod("adducts", "featuresSet", function(obj) obj@adducts)
 
 #' @describeIn featuresSet Get table with feature information
 #'
@@ -45,15 +45,15 @@ setMethod("sets", "featuresSet", function(obj) names(obj@adducts))
 #'   \code{\link{data.table}} for each analysis with feature data
 #'
 #' @export
-setMethod("featureTable", "featuresSet", function(obj, neutralized = TRUE, set = NULL)
+setMethod("featureTable", "featuresSet", function(obj, neutralized = TRUE, sets = NULL)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertFlag(neutralized, add = ac)
-    checkmate::assertChoice(set, sets(obj), null.ok = TRUE, add = ac)
+    checkmate::assertChoice(sets, obj@sets, null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
 
     if (!is.null(set))
-        obj <- obj[, set = set]
+        obj <- obj[, sets = set]
     
     if (neutralized)
         return(callNextMethod(obj))
@@ -64,15 +64,15 @@ setMethod("featureTable", "featuresSet", function(obj, neutralized = TRUE, set =
 
 #' @describeIn featuresSet Returns all feature data in a table.
 #' @export
-setMethod("as.data.table", "featuresSet", function(x, neutralized = TRUE, set = NULL)
+setMethod("as.data.table", "featuresSet", function(x, neutralized = TRUE, sets = NULL)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertFlag(neutralized, add = ac)
-    checkmate::assertChoice(set, sets(obj), null.ok = TRUE, add = ac)
+    checkmate::assertChoice(sets, obj@sets, null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
-    if (!is.null(set))
-        x <- x[, set = set]
+    if (!is.null(sets))
+        x <- x[, sets = sets]
     
     if (neutralized)
     {
@@ -90,12 +90,12 @@ setMethod("as.data.table", "featuresSet", function(x, neutralized = TRUE, set = 
 #' @describeIn featuresSet Subset on analyses.
 #' @param \dots Ignored.
 #' @export
-setMethod("[", c("featuresSet", "ANY", "missing", "missing"), function(x, i, ..., set = NULL, drop = TRUE)
+setMethod("[", c("featuresSet", "ANY", "missing", "missing"), function(x, i, ..., sets = NULL, drop = TRUE)
 {
-    checkmate::assertChoice(set, sets(obj), null.ok = TRUE)
-    if (!is.null(set))
+    checkmate::assertChoice(sets, obj@sets, null.ok = TRUE)
+    if (!is.null(sets))
     {
-        setAna <- x@analysisInfo$analysis[x@analysisInfo$set == set]
+        setAna <- x@analysisInfo$analysis[x@analysisInfo$set %in% sets]
         i <- if (missing(i)) setAna else union(i, setAna)
     }
     
@@ -132,9 +132,9 @@ setMethod("[[", c("featuresSet", "ANY", "missing"), function(x, i, neutralized)
 #' @templateVar feat TRUE
 #' @template feat-filter-args
 #' @export
-setMethod("filter", "featuresSet", function(obj, ..., set = NULL)
+setMethod("filter", "featuresSet", function(obj, ..., sets = NULL)
 {
-    checkmate::assertChoice(set, sets(obj), null.ok = TRUE)
+    checkmate::assertChoice(sets, obj@sets, null.ok = TRUE)
     
     if (!is.null(sets))
         obj <- obj[, sets = sets]

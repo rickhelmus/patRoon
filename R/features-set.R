@@ -208,5 +208,5 @@ fSetNotYetImplemented <- function() stop("This function is not yet implemented f
 
 setMethod("screenSuspects", "featuresSet", function(obj, suspects, rtWindow, mzWindow, adduct,
                                                     skipInvalid) fSetNotYetImplemented())
-setMethod("getXCMSSet", "featuresSet", function(obj, ..., verbose) fSetNotYetImplemented())
+setMethod("getXCMSSet", "featuresSet", function(obj, verbose) fSetNotYetImplemented())
 setMethod("getXCMSnExp", "featuresSet", function(obj, verbose) fSetNotYetImplemented())

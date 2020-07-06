@@ -2,6 +2,7 @@
 
 ## general
 - test negative subset indices
+- refs to OpenBabel?
 - convertMSFiles()
     - Agilent .d is also a directory?
     - Remove necessity to have different input/output formats? (at least OK for pwiz)
@@ -10,15 +11,11 @@
 
 - update version number
 - credits to ES
-- Refs for OrgMassSpecR?
 - tests
 - screenSuspects()
     - include MS/MS fragments in suspect list (; separated?), both by m/z and formula
         - for formula: also check fragInfo of forms/compounds?
     - allow filtering by occurrence of MS/MS fragments
-    - automatically add formula in prepareSuspectList()
-    - warn for missing info if ID level cannot be calculated
-    - workflow: run screenSuspects() twice: first just with feature info, then with annotation
 
 
 ## docs
@@ -97,6 +94,7 @@
     - concentration column for anaInfo
     - generate more detailed script with e.g. commented examples of subsetting, extraction etc
 - support more of the new SIRIUS functionality
+	- newProject(): import Bruker seq file?
 
 
 ## Features

@@ -113,6 +113,7 @@ annotatedMSMSSimilarity <- function(fragInfo, MSMSList, absMzDev, relMinIntensit
 }
 
 # UNDONE: GenForm scoring: somehow exclude non MS/MS candidates if MS/MS candidates are present?
+# UNDONE: add scorings for SIRIUS
 defaultIDLevelRules <- function() defIDLevelRules # stored inside R/sysdata.rda
 
 # UNDONE/NOTE: mustExist field only used for compound/formula types
@@ -120,15 +121,6 @@ estimateIdentificationLevel <- function(suspectInChIKey1, suspectFormula, suspec
                                         suspectFragments, MSMSList, formTable, formScoreRanges,
                                         compTable, absMzDev, IDLevelRules, mCompNames)
 {
-    # Level 2a: suspect is the only candidate with >= 0.9 MoNa score
-    # Level 3a: suspect is with (multiple candidates of) MoNa >= 0.4
-    # Level 3b: suspect matches >= 3 fragments (or all available) in suspect list
-    # Level 3c: suspect has sufficient in-silico score --> MFSim >= 0.7
-    #   - MFSim: similarity between reconstructed spectrum from annotated peaks and actual MS/MS spectrum
-    # Level 4: Clear single formula result
-    #   - score >= minScore && minScoreNext higher than next candidate (if multiple)
-    # Level 5: Anything else
-    
     if (!is.null(suspectFragments))
         suspectFragments <- as.numeric(unlist(strsplit(suspectFragments, ";")))
 

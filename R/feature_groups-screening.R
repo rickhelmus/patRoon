@@ -55,8 +55,7 @@ setMethod("groupFeaturesScreening", "featureGroups", function(fGroups, scr)
 
     gInfo <- data.frame(rts = scr$exp_rt, mzs = scr$exp_mz, row.names = gNames)
 
-    rmcols <- c("name", "rt", "mz", "group", "d_rt", "d_mz", "exp_rt", "exp_mz")
-    groups <- transpose(as.data.table(scr)[, -rmcols, with = FALSE])
+    groups <- transpose(as.data.table(scr)[, analyses(fGroups), with = FALSE])
     setnames(groups, gNames)
 
     ftind <- copy(groupFeatIndex(fGroups))

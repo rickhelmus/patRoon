@@ -169,7 +169,8 @@ information (retention and \emph{m/z} values).}
 be included.}
 
 \item{normalizeScores}{A \code{character} that specifies how normalization of
-compound scorings occurs. Either \code{"none"} (no normalization),
+annotation scorings occurs. Either
+\code{"none"} (no normalization),
 \code{"max"} (normalize to max value) or \code{"minmax"} (perform min-max
 normalization). Note that normalization of negative scores (e.g. output by
 \command{SIRIUS}) is always performed as min-max. Furthermore, currently
@@ -179,10 +180,11 @@ values into account when candidates were generated. Thus, for
 results were removed after they were generated (\emph{e.g.} by use of
 \code{filter}).}
 
-\item{excludeNormScores}{A \code{character} vector specifying any compound
-  scoring names that should \emph{not} be normalized. Set to \code{NULL} to
-  normalize all scorings. Note that whether any normalization occurs is set
-  by the \code{excludeNormScores} argument.
+\item{excludeNormScores}{A
+  \code{character} vector specifying any compound scoring names that
+  should \emph{not} be normalized. Set to \code{NULL} to normalize all
+  scorings. Note that whether any normalization occurs is set by the
+  \code{excludeNormScores} argument.
 
   For \code{compounds}: By default \code{score} and
   \code{individualMoNAScore} are set to mimic the behavior of the

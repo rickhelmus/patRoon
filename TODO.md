@@ -12,6 +12,13 @@
 - update version number
 - credits to ES
 - tests
+- ID level rules
+    - GenForm scoring: somehow exclude non MS/MS candidates if MS/MS candidates are present?
+    - add scorings for SIRIUS
+    - append/override custom rules via ... argument of defaultIDLevelRules()?
+- annotation
+    - also add formula rank in results
+    - docs
 - screenSuspects()
     - include MS/MS fragments in suspect list (; separated?), both by m/z and formula
         - for formula: also check fragInfo of forms/compounds?
@@ -37,6 +44,7 @@
     - remove zero values for maxReplicateIntRSD?
 - importFeaturesXCMS/importFeaturesXCMS3/importFeatureGroupsXCMS: get rid of anaInfo arg requirement? (or make import func?)
 - comparison(): support xcms3? (needs missing support for missing raw data)
+- Fix: blank filter with multiple replicate groups (and maybe others?)
 
 
 ## MSPeakLists

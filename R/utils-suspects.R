@@ -112,38 +112,38 @@ annotatedMSMSSimilarity <- function(fragInfo, MSMSList, absMzDev, relMinIntensit
                                             b = relMinIntensity, print.graphic = FALSE))
 }
 
-# UNDONE: GenForm scoring: somehow exclude non MS/MS candidates if MS/MS candidates are present?
-# UNDONE: add scorings for SIRIUS
 defaultIDLevelRules <- function() defIDLevelRules # stored inside R/sysdata.rda
 
-# UNDONE/NOTE: mustExist field only used for compound/formula types
+# UNDONE/NOTE: mustExist/relative fields only used for scorings of compound/formulas
 estimateIdentificationLevel <- function(suspectInChIKey1, suspectFormula, suspectAnnSim,
                                         suspectFragments, MSMSList, formTable, formScoreRanges,
-                                        compTable, absMzDev, IDLevelRules, mCompNames)
+                                        formulasNormalizeScores, compTable, mCompNames,
+                                        compScoreRanges, compoundsNormalizeScores,
+                                        absMzDev, IDLevelRules)
 {
     if (!is.null(suspectFragments))
         suspectFragments <- as.numeric(unlist(strsplit(suspectFragments, ";")))
 
     if (!is.null(formTable) && !is.null(suspectFormula))
     {
-        formTable <- normalizeFormScores(formTable, formScoreRanges, FALSE)
-        unFTable <- unique(formTable, by = "formula")
+        formTableNorm <- normalizeFormScores(formTable, formScoreRanges, formulasNormalizeScores == "minmax")
+        unFTable <- unique(formTable, by = "formula"); unFTableNorm <- unique(formTableNorm, by = "formula")
         formRank <- which(suspectFormula == unFTable$neutral_formula)
         if (length(formRank) != 0)
         {
             formRank <- formRank[1]
-            fRow <- unFTable[formRank]
+            fRow <- unFTable[formRank]; fRowNorm <- unFTableNorm[formRank]
         }
     }
     
     if (!is.null(compTable) && !is.null(suspectInChIKey1))
     {
-        # UNDONE: also normalize compound scores? or optional for both?
+        compTableNorm <- normalizeCompScores(compTable, compScoreRanges, mCompNames, compoundsNormalizeScores == "minmax")
         compRank <- which(suspectInChIKey1 == compTable$InChIKey1)
         if (length(compRank) != 0)
         {
             compRank <- compRank[1]
-            cRow <- compTable[compRank]
+            cRow <- compTable[compRank]; cRowNorm <- compTableNorm[compRank]
         }
     }
     
@@ -156,7 +156,7 @@ estimateIdentificationLevel <- function(suspectInChIKey1, suspectFormula, suspec
 
     mzWithin <- function(mz1, mz2) abs(mz1 - mz2) <= absMzDev
     
-    checkAnnotationScore <- function(ID, rank, annRow, annTable, scCols)
+    checkAnnotationScore <- function(ID, rank, annRow, annTable, annRowNorm, annTableNorm, scCols)
     {
         # special case: rank
         if (ID$score == "rank")
@@ -166,6 +166,12 @@ estimateIdentificationLevel <- function(suspectInChIKey1, suspectFormula, suspec
         if (length(scCols) == 0)
             return(!ID$mustExist)
         
+        if (ID$relative)
+        {
+            annRow <- annRowNorm
+            annTable <- annTableNorm
+        }
+
         scoreVal <- rowMeans(annRow[, scCols, with = FALSE])
         if (scoreVal < ID$min)
             return(FALSE)
@@ -173,7 +179,6 @@ estimateIdentificationLevel <- function(suspectInChIKey1, suspectFormula, suspec
         if (!is.na(ID$minToOtherHighest) && ID$minToOtherHighest > 0 && nrow(annTable) > 1)
         {
             otherHighest <- max(rowMeans(annTable[-rank, scCols, with = FALSE]))
-            # if (compTable$compoundName[1] == "Dimethomorph") browser()
             if (is.infinite(ID$minToOtherHighest)) # special case: should be highest
             {
                 if (otherHighest > 0)
@@ -188,9 +193,11 @@ estimateIdentificationLevel <- function(suspectInChIKey1, suspectFormula, suspec
     checkScore <- function(ID)
     {
         if (ID$type == "formula")
-            return(checkAnnotationScore(ID, formRank, fRow, unFTable, getAllFormulasCols(ID$score, names(formTable))))
+            return(checkAnnotationScore(ID, formRank, fRow, unFTable, fRowNorm, unFTableNorm,
+                                        getAllFormulasCols(ID$score, names(formTable))))
         if (ID$type == "compound")
-            return(checkAnnotationScore(ID, compRank, cRow, compTable, getAllCompCols(ID$score, names(compTable), mCompNames)))
+            return(checkAnnotationScore(ID, compRank, cRow, compTable, cRowNorm, compTableNorm,
+                                        getAllCompCols(ID$score, names(compTable), mCompNames)))
         if (ID$type == "suspectFragments")
         {
             suspMSMSMatches <- sapply(MSMSList$mz, function(mz1) any(sapply(suspectFragments, mzWithin, mz1 = mz1)))
@@ -228,8 +235,14 @@ estimateIdentificationLevel <- function(suspectInChIKey1, suspectFormula, suspec
     return(NA_character_)
 }
 
+#' @templateVar normParam compoundsNormalizeScores,formulasNormalizeScores
+#' @templateVar noNone TRUE
+#' @template norm-args
 annotateSuspectList <- function(scr, MSPeakLists = NULL, formulas = NULL, compounds = NULL,
-                                absMzDev = 0.005, relMinMSMSIntensity = 0.05, IDLevelRules = defaultIDLevelRules())
+                                absMzDev = 0.005, relMinMSMSIntensity = 0.05,
+                                formulasNormalizeScores = "max",
+                                compoundsNormalizeScores = "max",
+                                IDLevelRules = defaultIDLevelRules())
 {
     ac <- checkmate::makeAssertCollection()
     assertScreeningResults(scr, fromFGroups = TRUE, add = ac)
@@ -237,6 +250,13 @@ annotateSuspectList <- function(scr, MSPeakLists = NULL, formulas = NULL, compou
            c("MSPeakLists", "formulas", "compounds"), null.ok = TRUE, fixed = list(add = ac))
     aapply(checkmate::assertNumber, . ~ absMzDev + relMinMSMSIntensity, lower = 0,
            finite = TRUE, fixed = list(add = ac))
+    aapply(assertNormalizationMethod, . ~ formulasNormalizeScores + compoundsNormalizeScores, withNone = FALSE,
+           fixed = list(add = ac))
+    checkmate::assertDataFrame(IDLevelRules, types = c("numeric", "character", "logical"),
+                               all.missing = FALSE, min.rows = 1, add = ac)
+    assertHasNames(IDLevelRules,
+                   c("level", "subLevel", "type", "score", "relative", "min", "minToOtherHighest", "mustExist"),
+                   add = ac)
     checkmate::reportAssertions(ac)
     
     hash <- makeHash(scr, MSPeakLists, formulas, compounds, absMzDev, relMinMSMSIntensity, IDLevelRules)
@@ -285,6 +305,7 @@ annotateSuspectList <- function(scr, MSPeakLists = NULL, formulas = NULL, compou
             fTable <- if (!is.null(formulas)) formulas[[gName]] else NULL
             fScRanges <- if (!is.null(formulas)) formulas@scoreRanges[[gName]] else NULL
             cTable <- if (!is.null(compounds)) compounds[[gName]] else NULL
+            cScRanges <- if (!is.null(compounds)) compounds@scoreRanges[[gName]] else NULL
             
             suspIK1 <- if (!is.null(scr[["InChIKey"]])) getIKBlock1(scr$InChIKey[i]) else NULL
             annSim <- 0; suspRank <- NA
@@ -302,9 +323,9 @@ annotateSuspectList <- function(scr, MSPeakLists = NULL, formulas = NULL, compou
             set(scr, i, c("suspCompAnnRank", "annotatedMSMSSimilarity"), list(suspRank, annSim))
             set(scr, i, "estIDLevel", estimateIdentificationLevel(suspIK1, scr$formula[i], annSim,
                                                                   if (!is.null(scr[["fragments"]])) scr$fragments[i] else NULL,
-                                                                  MSMSList, fTable, fScRanges, cTable, absMzDev,
-                                                                  IDLevelRules,
-                                                                  mCompNames = if (!is.null(compounds)) mergedCompoundNames(compounds) else NULL))
+                                                                  MSMSList, fTable, fScRanges, formulasNormalizeScores, cTable,
+                                                                  mCompNames = if (!is.null(compounds)) mergedCompoundNames(compounds) else NULL,
+                                                                  cScRanges, compoundsNormalizeScores, absMzDev, IDLevelRules))
         }
     }
     

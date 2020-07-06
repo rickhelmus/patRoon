@@ -283,9 +283,12 @@ checkExtractArg <- function(x)
 }
 assertExtractArg <- checkmate::makeAssertionFunction(checkExtractArg)
 
-assertNormalizationMethod <- function(x, .var.name = checkmate::vname(x), add = NULL)
+assertNormalizationMethod <- function(x, withNone = TRUE, .var.name = checkmate::vname(x), add = NULL)
 {
-    checkmate::assertChoice(x, c("none", "max", "minmax"), .var.name = .var.name, add = add)
+    ch <- c("max", "minmax")
+    if (withNone)
+        ch <- c(ch, "none")
+    checkmate::assertChoice(x, ch, .var.name = .var.name, add = add)
 }
 
 assertAvgPListParams <- function(x, .var.name = checkmate::vname(x), add = NULL)

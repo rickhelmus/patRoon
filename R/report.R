@@ -38,7 +38,7 @@ NULL
 #'   \emph{mandatory} when spectra for formulae and/or compounds will be
 #'   reported.
 #' @param retMin If \code{TRUE} then report retention times in minutes
-#'   (otehrwise seconds).
+#'   (otherwise seconds).
 #' @param EICRtWindow,EICMzWindow,EICTopMost,EICOnlyPresent Plotting parameters
 #'   passed to \code{\link{plotChroms}} (\emph{i.e.} \code{rtWindow},
 #'   \code{mzWindow}, \code{topMost} and \code{onlyPresent} arguments).

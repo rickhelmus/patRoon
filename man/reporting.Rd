@@ -111,7 +111,8 @@ features.}
 reported. Specify \code{NULL} to skip reporting a particular object.}
 
 \item{compoundsNormalizeScores, formulasNormalizeScores}{A \code{character} that specifies how normalization of
-compound scorings occurs. Either \code{"none"} (no normalization),
+annotation scorings occurs. Either
+\code{"none"} (no normalization),
 \code{"max"} (normalize to max value) or \code{"minmax"} (perform min-max
 normalization). Note that normalization of negative scores (e.g. output by
 \command{SIRIUS}) is always performed as min-max. Furthermore, currently
@@ -121,17 +122,18 @@ values into account when candidates were generated. Thus, for
 results were removed after they were generated (\emph{e.g.} by use of
 \code{filter}).}
 
-\item{compoundsExclNormScores, formulasExclNormScores}{A \code{character} vector specifying any compound
-  scoring names that should \emph{not} be normalized. Set to \code{NULL} to
-  normalize all scorings. Note that whether any normalization occurs is set
-  by the \code{compoundsExclNormScores,formulasExclNormScores} argument.
+\item{compoundsExclNormScores, formulasExclNormScores}{A
+  \code{character} vector specifying any compound scoring names that
+  should \emph{not} be normalized. Set to \code{NULL} to normalize all
+  scorings. Note that whether any normalization occurs is set by the
+  \code{compoundsExclNormScores,formulasExclNormScores} argument.
 
   For \code{compounds}: By default \code{score} and
   \code{individualMoNAScore} are set to mimic the behavior of the
   \command{MetFrag} web interface.}
 
 \item{retMin}{If \code{TRUE} then report retention times in minutes
-(otehrwise seconds).}
+(otherwise seconds).}
 
 \item{clearPath}{If \code{TRUE} then the destination path will be
 (recursively) removed prior to reporting.}

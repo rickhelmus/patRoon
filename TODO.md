@@ -19,9 +19,9 @@
 - annotation
     - docs
 - screenSuspects()
-    - include MS/MS fragments in suspect list (; separated?), both by m/z and formula
-        - for formula: also check fragInfo of forms/compounds?
-    - allow filtering by occurrence of MS/MS fragments
+    - allow filtering by occurrence of MS/MS fragments --> new filter() method?
+        - maybe later, could deprecate features method and simply directly convert to fGroups?
+    - check new columns with checkmate (e.g. suspect fragments)
 
 
 ## docs

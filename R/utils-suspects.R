@@ -116,14 +116,17 @@ defaultIDLevelRules <- function() defIDLevelRules # stored inside R/sysdata.rda
 
 # UNDONE/NOTE: mustExist/relative fields only used for scorings of compound/formulas
 estimateIdentificationLevel <- function(suspectInChIKey1, suspectFormula, suspectAnnSim,
-                                        suspectFragments, MSMSList, formTable, formScoreRanges,
-                                        formulasNormalizeScores, compTable, mCompNames,
-                                        compScoreRanges, compoundsNormalizeScores,
+                                        suspectFragmentsMZ, suspectFragmentsForms,
+                                        checkSuspectFragments, MSMSList,
+                                        formTable, formScoreRanges, formulasNormalizeScores,
+                                        compTable, mCompNames, compScoreRanges, compoundsNormalizeScores,
                                         absMzDev, IDLevelRules)
 {
-    if (!is.null(suspectFragments))
-        suspectFragments <- as.numeric(unlist(strsplit(suspectFragments, ";")))
-
+    if (!is.null(suspectFragmentsMZ))
+        suspectFragmentsMZ <- as.numeric(unlist(strsplit(suspectFragmentsMZ, ";")))
+    if (!is.null(suspectFragmentsForms))
+        suspectFragmentsForms <- unlist(strsplit(suspectFragmentsForms, ";"))
+    
     if (!is.null(formTable) && !is.null(suspectFormula))
     {
         formTableNorm <- normalizeFormScores(formTable, formScoreRanges, formulasNormalizeScores == "minmax")
@@ -200,9 +203,25 @@ estimateIdentificationLevel <- function(suspectInChIKey1, suspectFormula, suspec
                                         getAllCompCols(ID$score, names(compTable), mCompNames)))
         if (ID$type == "suspectFragments")
         {
-            suspMSMSMatches <- sapply(MSMSList$mz, function(mz1) any(sapply(suspectFragments, mzWithin, mz1 = mz1)))
+            suspMSMSMatchesMZ <- suspMSMSMatchesFormF <- suspMSMSMatchesFormC <- 0
+            if (!is.null(suspectFragmentsMZ))
+                suspMSMSMatchesMZ <- sum(sapply(MSMSList$mz, function(mz1) any(sapply(suspectFragmentsMZ, mzWithin, mz1 = mz1))))
+            if (!is.null(suspectFragmentsForms))
+            {
+                if (!is.null(fRow) && "formula" %in% checkSuspectFragments)
+                {
+                    frTable <- formTable[byMSMS == TRUE & suspectFormula == neutral_formula]
+                    if (nrow(frTable) > 0)
+                    {
+                        fi <- getFragmentInfoFromForms(MSMSList, frTable)
+                        suspMSMSMatchesFormF <- sum(suspectFragmentsForms %in% fi$formula)
+                    }
+                }
+                if (!is.null(cRow) && "compound" %in% checkSuspectFragments && !is.null(cRow[["fragInfo"]]))
+                    suspMSMSMatchesFormC <- sum(suspectFragmentsForms %in% cRow$fragInfo$formula)
+            }
             # UNDONE: make min(length...) configurable?
-            return(sum(suspMSMSMatches) >= min(ID$min, length(suspectFragments)))
+            return(max(suspMSMSMatchesMZ, suspMSMSMatchesFormF, suspMSMSMatchesFormC) >= min(ID$min, length(suspectFragmentsMZ)))
         }
         if (ID$type == "annotatedMSMSSimilarity")
             return(suspectAnnSim >= ID$min)
@@ -215,10 +234,19 @@ estimateIdentificationLevel <- function(suspectInChIKey1, suspectFormula, suspec
             levelOK <- TRUE
         else
         {
-            if ("suspectFragments" %in% IDL$type &&
-                (is.null(suspectFragments) || length(suspectFragments) == 0 ||
-                 is.null(MSMSList) || nrow(MSMSList) == 0))
-                next
+            if ("suspectFragments" %in% IDL$type)
+            {
+                if (is.null(MSMSList) || nrow(MSMSList) == 0)
+                    next
+                hasFRMZ <- "mz" %in% checkSuspectFragments && !is.null(suspectFragmentsMZ) && length(suspectFragmentsMZ) > 0
+                hasFRForms <- !is.null(suspectFragmentsForms) && length(suspectFragmentsForms) > 0
+                if (!hasFRMZ && !hasFRForms)
+                    next
+                if (!hasFRMZ &&
+                    (is.null(formTable) || !"formula" %in% checkSuspectFragments) &&
+                    (is.null(compTable) || !"compound" %in% checkSuspectFragments))
+                    next
+            }
             if ("formula" %in% IDL$type && (is.null(formTable) || nrow(formTable) == 0 ||
                                             is.null(suspectFormula) || nrow(fRow) == 0))
                 next
@@ -240,6 +268,7 @@ estimateIdentificationLevel <- function(suspectInChIKey1, suspectFormula, suspec
 #' @template norm-args
 annotateSuspectList <- function(scr, MSPeakLists = NULL, formulas = NULL, compounds = NULL,
                                 absMzDev = 0.005, relMinMSMSIntensity = 0.05,
+                                checkSuspectFragments = c("mz", "formula", "compound"),
                                 formulasNormalizeScores = "max",
                                 compoundsNormalizeScores = "max",
                                 IDLevelRules = defaultIDLevelRules())
@@ -250,10 +279,11 @@ annotateSuspectList <- function(scr, MSPeakLists = NULL, formulas = NULL, compou
            c("MSPeakLists", "formulas", "compounds"), null.ok = TRUE, fixed = list(add = ac))
     aapply(checkmate::assertNumber, . ~ absMzDev + relMinMSMSIntensity, lower = 0,
            finite = TRUE, fixed = list(add = ac))
+    checkmate::assertSubset(checkSuspectFragments, c("mz", "formula", "compound"), add = ac)
     aapply(assertNormalizationMethod, . ~ formulasNormalizeScores + compoundsNormalizeScores, withNone = FALSE,
            fixed = list(add = ac))
     checkmate::assertDataFrame(IDLevelRules, types = c("numeric", "character", "logical"),
-                               all.missing = FALSE, min.rows = 1, add = ac)
+                               all.missing = TRUE, min.rows = 1, add = ac)
     assertHasNames(IDLevelRules,
                    c("level", "subLevel", "type", "score", "relative", "min", "minToOtherHighest", "mustExist"),
                    add = ac)
@@ -329,8 +359,10 @@ annotateSuspectList <- function(scr, MSPeakLists = NULL, formulas = NULL, compou
             
             set(scr, i, c("suspFormRank", "suspCompRank", "annotatedMSMSSimilarity"), list(suspFormRank, suspCompRank, annSim))
             set(scr, i, "estIDLevel", estimateIdentificationLevel(suspIK1, scr$formula[i], annSim,
-                                                                  if (!is.null(scr[["fragments"]])) scr$fragments[i] else NULL,
-                                                                  MSMSList, fTable, fScRanges, formulasNormalizeScores, cTable,
+                                                                  if (!is.null(scr[["fragments_mz"]])) scr$fragments_mz[i] else NULL,
+                                                                  if (!is.null(scr[["fragments_formula"]])) scr$fragments_formula[i] else NULL,
+                                                                  checkSuspectFragments, MSMSList, fTable, fScRanges,
+                                                                  formulasNormalizeScores, cTable,
                                                                   mCompNames = if (!is.null(compounds)) mergedCompoundNames(compounds) else NULL,
                                                                   cScRanges, compoundsNormalizeScores, absMzDev, IDLevelRules))
         }

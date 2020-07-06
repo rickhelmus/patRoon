@@ -112,18 +112,13 @@ annotatedMSMSSimilarity <- function(fragInfo, MSMSList, absMzDev, relMinIntensit
                                             b = relMinIntensity, print.graphic = FALSE))
 }
 
-defaultIDLevels <- function()
-{
-    # UNDONE: make rda
-    # UNDONE: GenForm scoring: somehow exclude non MS/MS candidates if MS/MS candidates are present?
-    fread(system.file("data-raw", "IDLevels.csv", package = "patRoon"))
-}
+# UNDONE: GenForm scoring: somehow exclude non MS/MS candidates if MS/MS candidates are present?
+defaultIDLevelRules <- function() defIDLevelRules # stored inside R/sysdata.rda
 
 # UNDONE/NOTE: mustExist field only used for compound/formula types
 estimateIdentificationLevel <- function(suspectInChIKey1, suspectFormula, suspectAnnSim,
                                         suspectFragments, MSMSList, formTable, formScoreRanges,
-                                        minFormScores, minFormScoresToNext, compTable, absMzDev,
-                                        IDLevels = defaultIDLevels(), mCompNames)
+                                        compTable, absMzDev, IDLevelRules, mCompNames)
 {
     # Level 2a: suspect is the only candidate with >= 0.9 MoNa score
     # Level 3a: suspect is with (multiple candidates of) MoNa >= 0.4
@@ -163,12 +158,9 @@ estimateIdentificationLevel <- function(suspectInChIKey1, suspectFormula, suspec
     if (!is.null(MSMSList))
         MSMSList <- MSMSList[precursor == FALSE]
 
-    if (TRUE)
-    {
-        
-    IDLevels <- copy(IDLevels)
-    setorderv(IDLevels, c("level", "subLevel"))
-    IDLevelList <- split(IDLevels, by = c("level", "subLevel"))
+    IDLevelRules <- if (is.data.table(IDLevelRules)) copy(IDLevelRules) else as.data.table(IDLevelRules)
+    setorderv(IDLevelRules, c("level", "subLevel"))
+    IDLevelList <- split(IDLevelRules, by = c("level", "subLevel"))
 
     mzWithin <- function(mz1, mz2) abs(mz1 - mz2) <= absMzDev
     
@@ -242,68 +234,10 @@ estimateIdentificationLevel <- function(suspectInChIKey1, suspectFormula, suspec
     }
     
     return(NA_character_)
-    }
-    
-    if (nrow(cRow) != 0 && !is.null(cRow[["individualMoNAScore"]]))
-    {
-        goodMoNas <- compTable[individualMoNAScore >= 0.9]
-        if (nrow(goodMoNas) == 1 && suspectInChIKey1 %in% goodMoNas$InChIKey1)
-            return("2a")
-        
-        if (cRow$individualMoNAScore >= 0.4)
-            return("3a")
-    }
-    
-    if (!is.null(MSMSList) && nrow(MSMSList) > 0 && length(suspectFragments) > 0)
-    {
-        suspMSMSMatches <- sapply(MSMSList$mz, function(mz1) any(sapply(suspectFragments, mzWithin, mz1 = mz1,
-                                                                        absMzDev = absMzDev)))
-        if (length(suspectFragments) > 0 && sum(suspMSMSMatches) >= min(3, length(suspectFragments)))
-            return("3b")
-    }
-    
-    if (suspectAnnSim >= 0.7)
-        return("3c")
-    
-    # no (good) hit --> level 4/5
-    if (!is.null(formTable) && !is.null(suspectFormula))
-    {
-        formTable <- normalizeFormScores(formTable, formScoreRanges, FALSE)
-        unFTable <- unique(formTable, by = "formula")
-        fRow <- unFTable[suspectFormula == neutral_formula]
-        
-        # suspect formula present and top ranked?
-        if (suspectFormula %in% fRow$neutral_formula && suspectFormula == unFTable$neutral_formula[1])
-        {
-            if (nrow(unFTable) > 1) # multiple hits
-            {
-                avgScoreVals <- function(sc, fr)
-                {
-                    scCols <- getAllFormulasCols(sc, names(formTable))
-                    if (length(scCols) == 0)
-                        return(NA)
-                    return(rowMeans(fr[, scCols, with = FALSE]))
-                }
-                    
-                scoreVals <- sapply(names(minFormScores), avgScoreVals, fRow)
-                nextScoreVals <- sapply(names(minFormScores), avgScoreVals, unFTable[2])
-                
-                if (all(is.na(scoreVals) | (scoreVals >= minFormScores & (scoreVals - nextScoreVals) >= minFormScoresToNext)))
-                    return(4)
-            }
-            else
-                return("4") # only hit
-        }
-    }
-    
-    return("5") # no (good) formula match
 }
 
-# UNDONE: proper defaults for minFormScores/minFormScoresToNext
-# UNDONE: allow compound scoring thresholds for ID level estimation
 annotateSuspectList <- function(scr, MSPeakLists = NULL, formulas = NULL, compounds = NULL,
-                                absMzDev = 0.005, relMinMSMSIntensity = 0.05,
-                                minFormScores, minFormScoresToNext)
+                                absMzDev = 0.005, relMinMSMSIntensity = 0.05, IDLevelRules = defaultIDLevelRules())
 {
     ac <- checkmate::makeAssertCollection()
     assertScreeningResults(scr, fromFGroups = TRUE, add = ac)
@@ -311,12 +245,9 @@ annotateSuspectList <- function(scr, MSPeakLists = NULL, formulas = NULL, compou
            c("MSPeakLists", "formulas", "compounds"), null.ok = TRUE, fixed = list(add = ac))
     aapply(checkmate::assertNumber, . ~ absMzDev + relMinMSMSIntensity, lower = 0,
            finite = TRUE, fixed = list(add = ac))
-    aapply(checkmate::assertNumeric, . ~ minFormScores + minFormScoresToNext, finite = TRUE,
-           any.missing = FALSE, names = "unique", fixed = list(add = ac))
     checkmate::reportAssertions(ac)
     
-    hash <- makeHash(scr, MSPeakLists, formulas, compounds, absMzDev, relMinMSMSIntensity, minFormScores,
-                     minFormScoresToNext)
+    hash <- makeHash(scr, MSPeakLists, formulas, compounds, absMzDev, relMinMSMSIntensity, IDLevelRules)
     cd <- loadCacheData("annotateSuspects", hash)
     if (!is.null(cd))
         return(cd)
@@ -379,8 +310,8 @@ annotateSuspectList <- function(scr, MSPeakLists = NULL, formulas = NULL, compou
             set(scr, i, c("suspCompAnnRank", "annotatedMSMSSimilarity"), list(suspRank, annSim))
             set(scr, i, "estIDLevel", estimateIdentificationLevel(suspIK1, scr$formula[i], annSim,
                                                                   if (!is.null(scr[["fragments"]])) scr$fragments[i] else NULL,
-                                                                  MSMSList, fTable, fScRanges, minFormScores,
-                                                                  minFormScoresToNext, cTable, absMzDev,
+                                                                  MSMSList, fTable, fScRanges, cTable, absMzDev,
+                                                                  IDLevelRules,
                                                                   mCompNames = if (!is.null(compounds)) mergedCompoundNames(compounds) else NULL))
         }
     }

@@ -297,7 +297,7 @@ annotateSuspectList <- function(scr, MSPeakLists = NULL, formulas = NULL, compou
     for (i in seq_len(nrow(scr)))
     {
         if (is.na(scr$group[i]))
-            set(scr, i, c("suspCompAnnRank", "annotatedMSMSSimilarity", "estIDLevel"), NA)
+            set(scr, i, c("suspFormRank", "suspCompRank", "annotatedMSMSSimilarity", "estIDLevel"), NA)
         else
         {
             gName <- scr$name[i]
@@ -307,20 +307,27 @@ annotateSuspectList <- function(scr, MSPeakLists = NULL, formulas = NULL, compou
             cTable <- if (!is.null(compounds)) compounds[[gName]] else NULL
             cScRanges <- if (!is.null(compounds)) compounds@scoreRanges[[gName]] else NULL
             
-            suspIK1 <- if (!is.null(scr[["InChIKey"]])) getIKBlock1(scr$InChIKey[i]) else NULL
-            annSim <- 0; suspRank <- NA
-            if (!is.null(MSMSList) && !is.null(cTable) && !is.null(suspIK1))
+            suspFormRank <- NA
+            if (!is.null(fTable) && !is.null(scr[["formula"]]) && !is.na(scr$formula[i]))
             {
-                suspRank <- which(suspIK1 == cTable$InChIKey1)
-                suspRank <- if (length(suspRank) > 0) suspRank[1] else NA
-                
-                if (!is.na(suspRank) && !is.null(cTable[["fragInfo"]][[suspRank]]))
-                    annSim <- annotatedMSMSSimilarity(cTable[["fragInfo"]][[suspRank]],
-                                                      MSPeakLists[[gName]][["MSMS"]],
-                                                      absMzDev, relMinMSMSIntensity)
+                unFTable <- unique(fTable, by = "formula")
+                suspFormRank <- which(scr$formula[i] == unFTable$neutral_formula)
+                suspFormRank <- if (length(suspFormRank) > 0) suspFormRank[1] else NA
             }
             
-            set(scr, i, c("suspCompAnnRank", "annotatedMSMSSimilarity"), list(suspRank, annSim))
+            suspIK1 <- if (!is.null(scr[["InChIKey"]]) && !is.na(scr$InChIKey[i])) getIKBlock1(scr$InChIKey[i]) else NULL
+            annSim <- 0; suspCompRank <- NA
+            if (!is.null(MSMSList) && !is.null(cTable) && !is.null(suspIK1))
+            {
+                suspCompRank <- which(suspIK1 == cTable$InChIKey1)
+                suspCompRank <- if (length(suspCompRank) > 0) suspCompRank[1] else NA
+                
+                if (!is.na(suspCompRank) && !is.null(cTable[["fragInfo"]][[suspCompRank]]))
+                    annSim <- annotatedMSMSSimilarity(cTable[["fragInfo"]][[suspCompRank]],
+                                                      MSMSList, absMzDev, relMinMSMSIntensity)
+            }
+            
+            set(scr, i, c("suspFormRank", "suspCompRank", "annotatedMSMSSimilarity"), list(suspFormRank, suspCompRank, annSim))
             set(scr, i, "estIDLevel", estimateIdentificationLevel(suspIK1, scr$formula[i], annSim,
                                                                   if (!is.null(scr[["fragments"]])) scr$fragments[i] else NULL,
                                                                   MSMSList, fTable, fScRanges, formulasNormalizeScores, cTable,

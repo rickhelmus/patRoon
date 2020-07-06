@@ -17,7 +17,6 @@
     - add scorings for SIRIUS
     - append/override custom rules via ... argument of defaultIDLevelRules()?
 - annotation
-    - also add formula rank in results
     - docs
 - screenSuspects()
     - include MS/MS fragments in suspect list (; separated?), both by m/z and formula

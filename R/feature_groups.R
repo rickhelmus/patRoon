@@ -1271,6 +1271,8 @@ setMethod("screenSuspects", "featureGroups", function(obj, suspects, rtWindow, m
         {
             if (!is.null(suspects[[col]]))
                 set(t, 1L, col, suspRow[[col]])
+            else if (col == "rt")
+                set(t, 1L, col, NA_real_) # exception: always want this column
         }
         return(t)
     }        

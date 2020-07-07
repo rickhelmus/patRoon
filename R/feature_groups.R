@@ -1247,7 +1247,9 @@ setMethod("screenSuspects", "featureGroups", function(obj, suspects, rtWindow, m
 {
     if (!is.null(adduct))
         adduct <- checkAndToAdduct(adduct)
-
+    
+    checkmate::assertFlag(skipInvalid) # not in assert collection, should fail before assertSuspectList
+    
     ac <- checkmate::makeAssertCollection()
     assertSuspectList(suspects, adduct, skipInvalid, add = ac)
     aapply(checkmate::assertNumber, . ~ rtWindow + mzWindow, lower = 0, finite = TRUE, fixed = list(add = ac))

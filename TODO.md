@@ -23,6 +23,7 @@
         - maybe later, could deprecate features method and simply directly convert to fGroups?
     - check new columns with checkmate (e.g. suspect fragments)
     - update/deprecate features method
+- newProject(): create template auto ID rule csv?
 
 
 ## docs

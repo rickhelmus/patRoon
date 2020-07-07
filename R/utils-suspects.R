@@ -115,7 +115,7 @@ annotatedMSMSSimilarity <- function(fragInfo, MSMSList, absMzDev, relMinIntensit
 defaultIDLevelRules <- function() defIDLevelRules # stored inside R/sysdata.rda
 
 # UNDONE/NOTE: mustExist/relative fields only used for scorings of compound/formulas
-estimateIdentificationLevel <- function(suspectInChIKey1, suspectFormula, suspectAnnSim,
+estimateIdentificationLevel <- function(suspectRTDev, suspectInChIKey1, suspectFormula, suspectAnnSim,
                                         suspectFragmentsMZ, suspectFragmentsForms,
                                         checkSuspectFragments, MSMSList,
                                         formTable, formScoreRanges, formulasNormalizeScores,
@@ -163,7 +163,7 @@ estimateIdentificationLevel <- function(suspectInChIKey1, suspectFormula, suspec
     {
         # special case: rank
         if (ID$score == "rank")
-            return(rank >= ID$min)
+            return(rank >= ID$value)
         
         scCols <- scCols[!is.na(unlist(annRow[, scCols, with = FALSE]))]
         if (length(scCols) == 0)
@@ -176,18 +176,18 @@ estimateIdentificationLevel <- function(suspectInChIKey1, suspectFormula, suspec
         }
 
         scoreVal <- rowMeans(annRow[, scCols, with = FALSE])
-        if (scoreVal < ID$min)
+        if (scoreVal < ID$value)
             return(FALSE)
         
-        if (!is.na(ID$minToOtherHighest) && ID$minToOtherHighest > 0 && nrow(annTable) > 1)
+        if (!is.na(ID$higherThanNext) && ID$higherThanNext > 0 && nrow(annTable) > 1)
         {
             otherHighest <- max(rowMeans(annTable[-rank, scCols, with = FALSE]))
-            if (is.infinite(ID$minToOtherHighest)) # special case: should be highest
+            if (is.infinite(ID$higherThanNext)) # special case: should be highest
             {
                 if (otherHighest > 0)
                     return(FALSE)
             }
-            else if ((scoreVal - otherHighest) < ID$minToOtherHighest)
+            else if ((scoreVal - otherHighest) < ID$higherThanNext)
                 return(FALSE)
         }
         
@@ -195,6 +195,8 @@ estimateIdentificationLevel <- function(suspectInChIKey1, suspectFormula, suspec
     }
     checkScore <- function(ID)
     {
+        if (ID$type == "retention" && ID$score == "maxDeviation")
+            return(!is.na(suspectRTDev) && numLTE(abs(suspectRTDev), ID$value))
         if (ID$type == "formula")
             return(checkAnnotationScore(ID, formRank, fRow, unFTable, fRowNorm, unFTableNorm,
                                         getAllFormulasCols(ID$score, names(formTable))))
@@ -221,10 +223,10 @@ estimateIdentificationLevel <- function(suspectInChIKey1, suspectFormula, suspec
                     suspMSMSMatchesFormC <- sum(suspectFragmentsForms %in% cRow$fragInfo$formula)
             }
             # UNDONE: make min(length...) configurable?
-            return(max(suspMSMSMatchesMZ, suspMSMSMatchesFormF, suspMSMSMatchesFormC) >= min(ID$min, length(suspectFragmentsMZ)))
+            return(max(suspMSMSMatchesMZ, suspMSMSMatchesFormF, suspMSMSMatchesFormC) >= min(ID$value, length(suspectFragmentsMZ)))
         }
         if (ID$type == "annotatedMSMSSimilarity")
-            return(suspectAnnSim >= ID$min)
+            return(suspectAnnSim >= ID$value)
         stop(paste("Unknown ID level type:", ID$type))
     }
 
@@ -247,6 +249,8 @@ estimateIdentificationLevel <- function(suspectInChIKey1, suspectFormula, suspec
                     (is.null(compTable) || !"compound" %in% checkSuspectFragments))
                     next
             }
+            if ("retention" %in% IDL$type && is.null(suspectRTDev))
+                next
             if ("formula" %in% IDL$type && (is.null(formTable) || nrow(formTable) == 0 ||
                                             is.null(suspectFormula) || nrow(fRow) == 0))
                 next
@@ -288,7 +292,7 @@ annotateSuspectList <- function(scr, fGroups, MSPeakLists = NULL, formulas = NUL
     checkmate::assertDataFrame(IDLevelRules, types = c("numeric", "character", "logical"),
                                all.missing = TRUE, min.rows = 1, add = ac)
     assertHasNames(IDLevelRules,
-                   c("level", "subLevel", "type", "score", "relative", "min", "minToOtherHighest", "mustExist"),
+                   c("level", "subLevel", "type", "score", "relative", "value", "higherThanNext", "mustExist"),
                    add = ac)
     checkmate::reportAssertions(ac)
     
@@ -361,7 +365,7 @@ annotateSuspectList <- function(scr, fGroups, MSPeakLists = NULL, formulas = NUL
             }
             
             set(scr, i, c("suspFormRank", "suspCompRank", "annotatedMSMSSimilarity"), list(suspFormRank, suspCompRank, annSim))
-            set(scr, i, "estIDLevel", estimateIdentificationLevel(suspIK1, scr$formula[i], annSim,
+            set(scr, i, "estIDLevel", estimateIdentificationLevel(scr$d_rt[i], suspIK1, scr$formula[i], annSim,
                                                                   if (!is.null(scr[["fragments_mz"]])) scr$fragments_mz[i] else NULL,
                                                                   if (!is.null(scr[["fragments_formula"]])) scr$fragments_formula[i] else NULL,
                                                                   checkSuspectFragments, MSMSList, fTable, fScRanges,

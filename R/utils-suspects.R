@@ -266,8 +266,8 @@ estimateIdentificationLevel <- function(suspectInChIKey1, suspectFormula, suspec
 #' @templateVar normParam compoundsNormalizeScores,formulasNormalizeScores
 #' @templateVar noNone TRUE
 #' @template norm-args
-annotateSuspectList <- function(scr, MSPeakLists = NULL, formulas = NULL, compounds = NULL,
-                                absMzDev = 0.005, relMinMSMSIntensity = 0.05,
+annotateSuspectList <- function(scr, fGroups, MSPeakLists = NULL, formulas = NULL, compounds = NULL,
+                                collapseBy = NULL, absMzDev = 0.005, relMinMSMSIntensity = 0.05,
                                 checkSuspectFragments = c("mz", "formula", "compound"),
                                 formulasNormalizeScores = "max",
                                 compoundsNormalizeScores = "max",
@@ -275,10 +275,13 @@ annotateSuspectList <- function(scr, MSPeakLists = NULL, formulas = NULL, compou
 {
     ac <- checkmate::makeAssertCollection()
     assertScreeningResults(scr, fromFGroups = TRUE, add = ac)
+    checkmate::assertClass(fGroups, "featureGroups", add = ac)
     aapply(checkmate::assertClass, . ~ MSPeakLists + formulas + compounds,
            c("MSPeakLists", "formulas", "compounds"), null.ok = TRUE, fixed = list(add = ac))
     aapply(checkmate::assertNumber, . ~ absMzDev + relMinMSMSIntensity, lower = 0,
            finite = TRUE, fixed = list(add = ac))
+    checkmate::assertChoice(collapseBy, c("lowestInt", "highestInt", "lowestLevel", "highestLevel"),
+                            null.ok = TRUE, add = ac)
     checkmate::assertSubset(checkSuspectFragments, c("mz", "formula", "compound"), add = ac)
     aapply(assertNormalizationMethod, . ~ formulasNormalizeScores + compoundsNormalizeScores, withNone = FALSE,
            fixed = list(add = ac))
@@ -367,6 +370,20 @@ annotateSuspectList <- function(scr, MSPeakLists = NULL, formulas = NULL, compou
                                                                   cScRanges, compoundsNormalizeScores, absMzDev, IDLevelRules))
         }
     }
+    
+    if (!is.null(collapseBy))
+    {
+        doKeep <- function(v) is.na(v) | order(v, decreasing = grepl("^highest", collapseBy)) == 1
+        if (collapseBy == "lowestInt" || collapseBy == "highestInt")
+        {
+            scr[, avgInts := rowMeans(.SD), .SDcol = analyses(fGroups)]
+            scr <- scr[scr[, doKeep(avgInts), by = "name"][[2]], -"avgInts"]
+        }
+        else # collapse by ID level
+            scr <- scr[scr[, doKeep(estIDLevel), by = "name"][[2]]]
+    }
+    
+    # UNDONE: make suspect names unique again if rows were removed?
     
     saveCacheData("annotateSuspects", scr, hash)
     

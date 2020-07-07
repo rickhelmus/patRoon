@@ -22,6 +22,7 @@
     - allow filtering by occurrence of MS/MS fragments --> new filter() method?
         - maybe later, could deprecate features method and simply directly convert to fGroups?
     - check new columns with checkmate (e.g. suspect fragments)
+    - update/deprecate features method
 
 
 ## docs
@@ -44,6 +45,7 @@
 - importFeaturesXCMS/importFeaturesXCMS3/importFeatureGroupsXCMS: get rid of anaInfo arg requirement? (or make import func?)
 - comparison(): support xcms3? (needs missing support for missing raw data)
 - Fix: blank filter with multiple replicate groups (and maybe others?)
+- Check: units of plotChord() rt/mz graphs seems off
 
 
 ## MSPeakLists

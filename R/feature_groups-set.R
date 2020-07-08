@@ -86,6 +86,8 @@ setMethod("export", "featureGroupsSet", function(obj, type, out, sets = NULL) ca
 #' @export
 setMethod("as.data.table", "featureGroupsSet", function(x, neutralized = TRUE, sets = NULL, features = FALSE, ...)
 {
+    # UNDONE: also support reporting ionized features with different adducts?
+    
     assertFGroupSets(x, sets)
     
     if (!is.null(sets) && length(sets) > 0)
@@ -104,6 +106,25 @@ setMethod("as.data.table", "featureGroupsSet", function(x, neutralized = TRUE, s
     }
     
     return(ret[])
+})
+
+setMethod("filter", "featureGroupsSet", function(obj, ..., sets = NULL, negate = FALSE)
+{
+    ac <- checkmate::makeAssertCollection()
+    assertFGroupSets(obj, sets, add = ac)
+    checkmate::assertFlag(negate, add = ac)
+    checkmate::reportAssertions(ac)
+
+    if (!is.null(sets) && length(sets) > 0)
+    {
+        if (negate)
+            sets <- setdiff(get("sets", pos = 2)(obj), sets)
+        obj <- obj[, sets = sets]
+    }
+
+    if (length(list(...)) > 0)
+        return(callNextMethod(obj, ..., negate = negate))
+    return(obj)
 })
 
 setMethod("groupFeatures", "featuresSet", function(feat, algorithm, ..., verbose = TRUE)

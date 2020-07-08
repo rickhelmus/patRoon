@@ -120,8 +120,6 @@ setMethod("[[", c("featuresSet", "ANY", "missing"), function(x, i, neutralized)
     return(if (neutralized) x@features[[i]] else x@ionizedFeatures[[i]])
 })
 
-# UNDONE: re-use docs from this and other methods somehow?
-# UNDONE: support ionized masses for mass filters? or just clarify it doesn't.
 #' @describeIn features Performs common rule based filtering of features. Note
 #'   that this (and much more) functionality is also provided by the
 #'   \code{filter} method defined for \code{\link{featureGroups}}. However,
@@ -130,22 +128,29 @@ setMethod("[[", c("featuresSet", "ANY", "missing"), function(x, i, neutralized)
 #' @templateVar feat TRUE
 #' @template feat-filter-args
 #' @export
-setMethod("filter", "featuresSet", function(obj, ..., sets = NULL)
+setMethod("filter", "featuresSet", function(obj, ..., sets = NULL, negate = FALSE)
 {
     checkmate::assertSubset(sets, obj@sets, empty.ok = TRUE)
     
     if (!is.null(sets) && length(sets) > 0)
+    {
+        if (negate)
+            sets <- setdiff(obj@sets, sets)
         obj <- obj[, sets = sets]
+    }
     
-    obj <- callNextMethod(obj, ...)
-    
-    # synchronize other features objects by remaining IDs
-    cat("Synchronizing feature set objects...")
-    remainingIDsPerAna <- sapply(obj@features, "[[", "ID", simplify = FALSE)
-    obj@ionizedFeatures <- lapply(analyses(obj), function(ana) obj@ionizedFeatures[[ana]][ID %in% remainingIDsPerAna[[ana]]])
-    obj@setObjects <- lapply(obj@setObjects, function(so) lapply(names(so),
-                                                                 function(ana) featureTable(so)[[ana]][ID %in% remainingIDsPerAna]))
-    cat("Done!\n")
+    if (length(list(...)) > 0)
+    {
+        obj <- callNextMethod(obj, ..., negate = negate)
+        
+        # synchronize other features objects by remaining IDs
+        cat("Synchronizing feature set objects...")
+        remainingIDsPerAna <- sapply(obj@features, "[[", "ID", simplify = FALSE)
+        obj@ionizedFeatures <- lapply(analyses(obj), function(ana) obj@ionizedFeatures[[ana]][ID %in% remainingIDsPerAna[[ana]]])
+        obj@setObjects <- lapply(obj@setObjects, function(so) lapply(names(so),
+                                                                     function(ana) featureTable(so)[[ana]][ID %in% remainingIDsPerAna]))
+        cat("Done!\n")
+    }
     
     return(obj)
 })

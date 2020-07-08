@@ -21,12 +21,12 @@ NULL
 #'
 #' @rdname MSPeakLists-generation
 #' @export
-generateMSPeakListsMzR <- function(fGroups, maxMSRtWindow = 5, precursorMzWindow = 4, topMost = NULL,
-                                   avgFeatParams = getDefAvgPListParams(),
-                                   avgFGroupParams = getDefAvgPListParams())
+setMethod("generateMSPeakListsMzR", "featureGroups", function(fGroups, maxMSRtWindow = 5,
+                                                              precursorMzWindow = 4, topMost = NULL,
+                                                              avgFeatParams = getDefAvgPListParams(),
+                                                              avgFGroupParams = getDefAvgPListParams())
 {
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertClass(fGroups, "featureGroups", add = ac)
     checkmate::assertNumber(maxMSRtWindow, lower = 1, finite = TRUE, null.ok = TRUE, add = ac)
     checkmate::assertNumber(precursorMzWindow, lower = 0, finite = TRUE, null.ok = TRUE, add = ac)
     checkmate::assertCount(topMost, positive = TRUE, null.ok = TRUE, add = ac)
@@ -115,7 +115,7 @@ generateMSPeakListsMzR <- function(fGroups, maxMSRtWindow = 5, precursorMzWindow
                 # no spectra selection is made.
                 results$metadata$MS <- getSpectraHeader(spectra, rtRange, 1, NULL, NULL)
                 results$plists$MS <- do.call(averageSpectraMZR,
-                                      c(list(spectra = spectra, hd = results$metadata$MS, precursor = ft$mz), avgFeatParamsMS))
+                                             c(list(spectra = spectra, hd = results$metadata$MS, precursor = ft$mz), avgFeatParamsMS))
 
                 hdMSMS <- getSpectraHeader(spectra, rtRange, 2, ft$mz, precursorMzWindow)
                 MSMS <- do.call(averageSpectraMZR, c(list(spectra = spectra, hd = hdMSMS, precursor = ft$mz),
@@ -144,4 +144,10 @@ generateMSPeakListsMzR <- function(fGroups, maxMSRtWindow = 5, precursorMzWindow
 
     return(MSPeakLists(peakLists = plists, metadata = metadata, avgPeakListArgs = avgFGroupParams,
                        origFGNames = gNames, algorithm = "mzr"))
-}
+})
+
+setMethod("generateMSPeakListsMzR", "featureGroupsSet", function(fGroups, ...,
+                                                                 avgSetParams = getDefAvgPListParams())
+{
+    generateMSPeakListsSet(fGroups, generateMSPeakListsMzR, ..., avgSetParams = avgSetParams)
+})

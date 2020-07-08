@@ -127,6 +127,7 @@ estimateIdentificationLevel <- function(suspectRTDev, suspectInChIKey1, suspectF
     if (!is.null(suspectFragmentsForms))
         suspectFragmentsForms <- unlist(strsplit(suspectFragmentsForms, ";"))
     
+    fRow <- cRow <- NULL
     if (!is.null(formTable) && !is.null(suspectFormula))
     {
         formTableNorm <- normalizeFormScores(formTable, formScoreRanges, formulasNormalizeScores == "minmax")
@@ -252,10 +253,11 @@ estimateIdentificationLevel <- function(suspectRTDev, suspectInChIKey1, suspectF
             if ("retention" %in% IDL$type && is.null(suspectRTDev))
                 next
             if ("formula" %in% IDL$type && (is.null(formTable) || nrow(formTable) == 0 ||
-                                            is.null(suspectFormula) || nrow(fRow) == 0))
+                                            is.null(suspectFormula) || is.null(fRow) ||
+                                            nrow(fRow) == 0))
                 next
             if (any(c("compound", "annotatedMSMSSimilarity") %in% IDL$type) &&
-                (is.null(compTable) || nrow(compTable) == 0 || nrow(cRow) == 0))
+                (is.null(compTable) || nrow(compTable) == 0 || is.null(cRow) || nrow(cRow) == 0))
                 next
             
             levelOK <- all(sapply(split(IDL, seq_len(nrow(IDL))), checkScore))

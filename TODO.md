@@ -12,17 +12,27 @@
 - update version number
 - credits to ES
 - tests
+    - annotation tests
+    - ref
+    - increase in max(IDLevel) with more annotation data
+    - m/z fragments in suspect list
+    - automatic InChIKey/formula calculation from InChIs/SMILES
 - ID level rules
     - GenForm scoring: somehow exclude non MS/MS candidates if MS/MS candidates are present?
     - add scorings for SIRIUS
     - append/override custom rules via ... argument of defaultIDLevelRules()?
 - annotation
     - docs
+    - only add sim, ranking etc columns if data is available
 - screenSuspects()
-    - allow filtering by occurrence of MS/MS fragments --> new filter() method?
-        - maybe later, could deprecate features method and simply directly convert to fGroups?
+    - combine screenSuspects() and groupFeaturesScreening()
+        - screenSuspects() does both the screening and making new fGroups
+        - as.data.table() for fGroupsScreening which adds suspect metadata and ID levels
+        - filter() method for minimal rankings, matched MS/MS fragments etc
+        - deprecate features method
+        - tag hits, but keep all fGroups?
+            - fGroups[, hits = TRUE] ?
     - check new columns with checkmate (e.g. suspect fragments)
-    - update/deprecate features method
 - newProject(): create template auto ID rule csv?
 
 

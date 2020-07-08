@@ -127,6 +127,25 @@ setMethod("filter", "featureGroupsSet", function(obj, ..., sets = NULL, negate =
     return(obj)
 })
 
+#' @export
+setMethod("plotEIC", "featureGroupsSet", function(obj, ..., retMin = FALSE, title = NULL)
+{
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertFlag(retMin, add = ac)
+    checkmate::assertString(title, null.ok = TRUE, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    if (is.null(title) && length(obj) == 1)
+    {
+        # override default title
+        gInfo <- groupInfo(obj)
+        title <- sprintf("Group '%s'\nrt: %.1f - neutralized mass: %.4f", names(obj)[1],
+                         if (retMin) gInfo[1, "rts"] / 60 else gInfo[1, "rts"],
+                         gInfo[1, "mzs"])
+    }
+    callNextMethod(obj, ..., retMin = retMin, title = title)
+})
+
 setMethod("groupFeatures", "featuresSet", function(feat, algorithm, ..., verbose = TRUE)
 {
     # UNDONE: xcms3 not yet supported

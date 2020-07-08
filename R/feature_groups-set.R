@@ -138,6 +138,6 @@ setMethod("ionize", "featureGroupsSet", function(obj, sets)
     gInfo <- groupInfo(obj)
     gInfo$mzs <- gInfo$mzs + addMZ
     
-    featureGroupsSetIonized(groups = groups(obj), groupInfo = gInfo, analysisInfo = analysisInfo(obj),
-                            features = ionize(getFeatures(obj)), ftindex = groupFeatIndex(obj))
+    return(featureGroupsSetIonized(groups = groups(obj), groupInfo = gInfo, analysisInfo = analysisInfo(obj),
+                                   features = ionize(getFeatures(obj)), ftindex = groupFeatIndex(obj)))
 })

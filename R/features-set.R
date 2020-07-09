@@ -31,8 +31,8 @@ setMethod("initialize", "featuresSet",
 setMethod("show", "featuresSet", function(object)
 {
     callNextMethod(object)
-    printf("sets: %s\n", paste0(sets(object), collapse = ", "))
-    printf("adducts: %s\n", paste0(sapply(object@adducts, as.character), collapse = ", "))
+    printf("Sets: %s\n", paste0(sets(object), collapse = ", "))
+    printf("Adducts: %s\n", paste0(sapply(object@adducts, as.character), collapse = ", "))
 })
 
 # UNDONE: export/move/docs

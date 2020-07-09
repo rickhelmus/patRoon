@@ -44,6 +44,17 @@ setMethod("adducts", "MSPeakListsSet", function(obj) obj@adducts)
 #' @export
 setMethod("analysisInfo", "MSPeakListsSet", function(obj) obj@analysisInfo)
 
+#' @describeIn MSPeakListsSet Shows summary information for this object.
+#' @export
+setMethod("show", "MSPeakListsSet", function(object)
+{
+    callNextMethod(object)
+    printf("Sets: %s\n", paste0(sets(object), collapse = ", "))
+    printf("Adducts: %s\n", paste0(sapply(adducts(object), as.character), collapse = ", "))
+    if (length(object@setObjects[[1]]) > 0)
+        printf("Original algorithm: %s\n", algorithm(object@setObjects[[1]]))
+})
+
 #' @describeIn MSPeakListsSet Accessor method to obtain the MS peak lists.
 #' @return \code{peakLists} returns a nested list containing MS (and MS/MS where
 #'   available) peak lists per feature group and per analysis. The format is:

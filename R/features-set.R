@@ -225,8 +225,7 @@ setMethod("ionize", "featuresSet", function(obj, sets)
     if (!is.null(sets) && length(sets) > 0)
         obj <- obj[, sets = sets]
 
-    if (!allSame(adducts(obj)))
-        stop("Selected sets for conversion must have have equal adducts")
+    assertEqualAdducts(adducts(obj))
     
     return(featuresSetIonized(features = obj@ionizedFeatures, analysisInfo = analysisInfo(obj)))
 })

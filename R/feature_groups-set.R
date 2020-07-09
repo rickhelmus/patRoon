@@ -169,8 +169,7 @@ setMethod("ionize", "featureGroupsSet", function(obj, sets)
     if (!is.null(sets) && length(sets) > 0)
         obj <- obj[, sets = sets]
     
-    if (!allSame(adducts(obj)))
-        stop("Selected sets for conversion must have have equal adducts")
+    assertEqualAdducts(adducts(obj))
     
     addMZ <- adductMZDelta(adducts(obj)[[1]])
     gInfo <- groupInfo(obj)

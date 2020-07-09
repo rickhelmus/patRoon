@@ -102,7 +102,8 @@ setMethod("[", c("featuresSet", "ANY", "missing", "missing"), function(x, i, ...
     {
         subSets <- unique(x@analysisInfo$set)
         x@adducts <- x@adducts[subSets]
-        x@setObjects <- x@setObjects[subSets]
+        # NOTE: assume that subsetting with non-existing analyses will not result in errors
+        x@setObjects <- lapply(x@setObjects[subSets], "[", i = analyses(x))
         x@ionizedFeatures <- x@ionizedFeatures[x@analysisInfo$analysis]
     }
     return(x)

@@ -390,6 +390,12 @@ assertCheckFeaturesSession <- function(x, fGroups, mustExist, canClearSession, d
 
 assertSets <- function(obj, s, empty.ok = TRUE, add = NULL) checkmate::assertSubset(s, sets(obj), empty.ok = empty.ok, add = add)
 
+assertEqualAdducts <- function(adducts)
+{
+    if (!allSame(adducts))
+        stop("Selected sets must have have equal adducts")
+}
+
 # from https://github.com/mllg/checkmate/issues/115
 aapply = function(fun, formula, ..., fixed = list())
 {

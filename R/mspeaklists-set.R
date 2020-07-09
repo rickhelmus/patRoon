@@ -255,6 +255,30 @@ setMethod("filter", "MSPeakListsSet", function(obj, ..., sets = NULL, negate = F
     return(obj)
 })
 
+#' @export
+setMethod("plotSpec", "MSPeakListsSet", function(obj, groupName, analysis = NULL, MSLevel = 1, title = NULL,
+                                                 useGGPlot2 = FALSE, xlim = NULL, ylim = NULL, ...,
+                                                 neutralized = TRUE, sets = NULL, perSet = FALSE)
+{
+    ac <- checkmate::makeAssertCollection()
+    aapply(checkmate::assertFlag, . ~ neutralized + perSet, fixed = list(add = ac))
+    assertSets(obj, sets, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    if (!is.null(sets) && length(sets) > 0)
+        obj <- obj[, sets = sets]
+    
+    if (!perSet)
+    {
+        if (!neutralized)
+            obj <- ionize(obj)
+        return(plotSpec(obj, ...)) # UNDONE
+    }
+    
+    # - normalize intensities
+    # - plot either top/bottom or overlaid, with colours per set
+})
+
 generateMSPeakListsSet <- function(fGroupsSet, generator, ..., avgSetParams)
 {
     assertAvgPListParams(avgSetParams) # UNDONE: move?

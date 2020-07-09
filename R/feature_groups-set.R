@@ -3,8 +3,6 @@
 #' @include features-set.R
 NULL
 
-assertFGroupSets <- function(obj, s, add = NULL) checkmate::assertSubset(s, sets(obj), empty.ok = TRUE, add = add)
-
 featureGroupsSet <- setClass("featureGroupsSet",
                              slots = c(groupAlgorithm = "character"),
                              contains = "featureGroups")
@@ -37,7 +35,7 @@ setMethod("featureTable", "featureGroupsSet", function(obj, neutralized = TRUE, 
 #' @export
 setMethod("[", c("featureGroupsSet", "ANY", "ANY", "missing"), function(x, i, j, ..., sets = NULL, drop = TRUE)
 {
-    assertFGroupSets(x, sets)
+    assertSets(x, sets)
     
     if (!is.null(sets) && length(sets) > 0)
         i <- mergeAnaSubsetArgWithSets(i, sets, analysisInfo(x))
@@ -51,7 +49,7 @@ setMethod("[[", c("featureGroupsSet", "ANY", "ANY"), function(x, i, j, sets = NU
 {
     ac <- checkmate::makeAssertCollection()
     assertExtractArg(i, add = ac)
-    assertFGroupSets(x, sets, add = ac)
+    assertSets(x, sets, add = ac)
     checkmate::reportAssertions(ac)
 
     if (!is.null(sets) && length(sets) > 0)
@@ -88,7 +86,7 @@ setMethod("as.data.table", "featureGroupsSet", function(x, neutralized = TRUE, s
 {
     # UNDONE: also support reporting ionized features with different adducts?
     
-    assertFGroupSets(x, sets)
+    assertSets(x, sets)
     
     if (!is.null(sets) && length(sets) > 0)
         x <- x[, sets = sets]
@@ -111,7 +109,7 @@ setMethod("as.data.table", "featureGroupsSet", function(x, neutralized = TRUE, s
 setMethod("filter", "featureGroupsSet", function(obj, ..., sets = NULL, negate = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
-    assertFGroupSets(obj, sets, add = ac)
+    assertSets(obj, sets, add = ac)
     checkmate::assertFlag(negate, add = ac)
     checkmate::reportAssertions(ac)
 

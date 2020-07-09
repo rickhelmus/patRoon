@@ -49,7 +49,7 @@ setMethod("featureTable", "featuresSet", function(obj, neutralized = TRUE, sets 
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertFlag(neutralized, add = ac)
-    checkmate::assertSubset(sets, obj@sets, empty.ok = TRUE, add = ac)
+    assertSets(obj, sets, add = ac)
     checkmate::reportAssertions(ac)
 
     if (!is.null(sets) && length(sets) > 0)
@@ -68,7 +68,7 @@ setMethod("as.data.table", "featuresSet", function(x, neutralized = TRUE, sets =
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertFlag(neutralized, add = ac)
-    checkmate::assertSubset(sets, x@sets, empty.ok = TRUE, add = ac)
+    assertSets(x, sets, add = ac)
     checkmate::reportAssertions(ac)
     
     if (!is.null(sets) && length(sets) > 0)
@@ -92,7 +92,7 @@ setMethod("as.data.table", "featuresSet", function(x, neutralized = TRUE, sets =
 #' @export
 setMethod("[", c("featuresSet", "ANY", "missing", "missing"), function(x, i, ..., sets = NULL, drop = TRUE)
 {
-    checkmate::assertSubset(sets, x@sets, empty.ok = TRUE)
+    assertSets(x, sets)
     
     if (!is.null(sets) && length(sets) > 0)
         i <- mergeAnaSubsetArgWithSets(i, sets, analysisInfo(x))
@@ -110,7 +110,7 @@ setMethod("[", c("featuresSet", "ANY", "missing", "missing"), function(x, i, ...
 
 #' @describeIn features Extract a feature table for an analysis.
 #' @export
-setMethod("[[", c("featuresSet", "ANY", "missing"), function(x, i, neutralized)
+setMethod("[[", c("featuresSet", "ANY", "missing"), function(x, i, neutralized = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
     assertExtractArg(i, add = ac)
@@ -130,7 +130,7 @@ setMethod("[[", c("featuresSet", "ANY", "missing"), function(x, i, neutralized)
 #' @export
 setMethod("filter", "featuresSet", function(obj, ..., sets = NULL, negate = FALSE)
 {
-    checkmate::assertSubset(sets, obj@sets, empty.ok = TRUE)
+    assertSets(obj, sets)
     
     if (!is.null(sets) && length(sets) > 0)
     {
@@ -219,7 +219,7 @@ setMethod("initialize", "featuresSetIonized",
           function(.Object, ...) callNextMethod(.Object, algorithm = "set_ionized", ...))
 setMethod("ionize", "featuresSet", function(obj, sets)
 {
-    checkmate::assertSubset(sets, obj@sets, empty.ok = TRUE)
+    assertSets(obj, sets)
     
     if (!is.null(sets) && length(sets) > 0)
         obj <- obj[, sets = sets]

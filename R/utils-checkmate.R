@@ -388,6 +388,8 @@ assertCheckFeaturesSession <- function(x, fGroups, mustExist, canClearSession, d
     }
 }
 
+assertSets <- function(obj, s, empty.ok = TRUE, add = NULL) checkmate::assertSubset(s, sets(obj), empty.ok = empty.ok, add = add)
+
 # from https://github.com/mllg/checkmate/issues/115
 aapply = function(fun, formula, ..., fixed = list())
 {

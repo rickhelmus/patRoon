@@ -24,6 +24,33 @@ ionizeMSPeakList <- function(pl, adduct, ionize)
     return(pl)
 }
 
+syncMSPeakListsSetObjects <- function(MSPeakListsSet, analyses, gNames, reAverage)
+{
+    args <- list(reAverage = reAverage)
+    if (!is.null(analyses))
+        args <- c(args, list(i = analyses))
+    if (!is.null(gNames))
+        args <- c(args, list(j = gNames))
+    
+    # NOTE: assume that subsetting with non-existing i/j will not result in errors
+    MSPeakListsSet@setObjects <- lapply(MSPeakListsSet@setObjects, function(o) do.call("[", args = c(list(x = o), args)))
+    MSPeakListsSet@setObjects <- pruneList(MSPeakListsSet@setObjects, checkEmptyElements = TRUE)
+    
+    # re-generate
+    MSPeakListsSet@ionizedPeakLists <- Reduce(modifyList, lapply(MSPeakListsSet@setObjects, peakLists))
+    
+    MSPeakListsSet@adducts <- MSPeakListsSet@adducts[names(MSPeakListsSet@setObjects)] # in case sets were removed
+    
+    # average ionized if (now) possible
+    if (allSame(adducts(MSPeakListsSet)))
+        MSPeakListsSet@ionizedAveragedPeakLists <- do.call(averageMSPeakLists,
+                                                           c(list(MSPeakListsSet@ionizedPeakLists,
+                                                                  MSPeakListsSet@origFGNames),
+                                                             MSPeakListsSet@avgPeakListArgs))
+    
+    return(MSPeakListsSet)
+}
+
 #' @export
 MSPeakListsSet <- setClass("MSPeakListsSet",
                            slots = c(adducts = "list", setObjects = "list", ionizedPeakLists = "list",
@@ -130,27 +157,7 @@ setMethod("[", c("MSPeakListsSet", "ANY", "ANY", "missing"), function(x, i, j, .
         x@analysisInfo <- x@analysisInfo[x@analysisInfo$analysis %in% names(peakLists(x)), ]
     
     if (!missing(i) || !missing(j))
-    {
-        args <- list(reAverage = reAverage)
-        if (!missing(i))
-            args <- c(args, list(i = analyses(x)))
-        if (!missing(j))
-            args <- c(args, list(j = groupNames(x)))
-        
-        # NOTE: assume that subsetting with non-existing i/j will not result in errors
-        x@setObjects <- lapply(x@setObjects, function(o) do.call("[", args = c(list(x = o), args)))
-        x@setObjects <- pruneList(x@setObjects, checkEmptyElements = TRUE)
-        
-        # re-generate
-        x@ionizedPeakLists <- Reduce(modifyList, lapply(x@setObjects, peakLists))
-
-        x@adducts <- x@adducts[names(x@setObjects)] # in case sets were removed
-        
-        # average ionized if (now) possible
-        if (allSame(adducts(x)))
-            x@ionizedAveragedPeakLists <- do.call(averageMSPeakLists,
-                                                  c(list(x@ionizedPeakLists, x@origFGNames), x@avgPeakListArgs))
-    }
+        x <- syncMSPeakListsSetObjects(x, if (missing(i)) NULL else i, if (missing(j)) NULL else j, reAverage)
     
     return(x)
 })
@@ -218,6 +225,34 @@ setMethod("as.data.table", "MSPeakListsSet", function(x, fGroups = NULL, average
     }
     
     return(ret[])
+})
+
+#' @export
+setMethod("filter", "MSPeakListsSet", function(obj, ..., sets = NULL, negate = FALSE)
+{
+    ac <- checkmate::makeAssertCollection()
+    assertSets(obj, sets, add = ac)
+    checkmate::assertFlag(negate, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    if (!is.null(sets) && length(sets) > 0)
+    {
+        if (negate)
+            sets <- setdiff(obj@sets, sets)
+        obj <- obj[, sets = sets]
+    }
+    
+    if (length(list(...)) > 0)
+    {
+        obj <- callNextMethod(obj, ..., negate = negate)
+        
+        # synchronize other objects
+        cat("Synchronizing set objects...\n")
+        obj <- syncMSPeakListsSetObjects(obj, analyses(obj), groupNames(obj), reAverage = TRUE)
+        cat("Done!\n")
+    }
+    
+    return(obj)
 })
 
 generateMSPeakListsSet <- function(fGroupsSet, generator, ..., avgSetParams)

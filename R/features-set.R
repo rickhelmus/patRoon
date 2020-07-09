@@ -131,7 +131,10 @@ setMethod("[[", c("featuresSet", "ANY", "missing"), function(x, i, neutralized =
 #' @export
 setMethod("filter", "featuresSet", function(obj, ..., sets = NULL, negate = FALSE)
 {
-    assertSets(obj, sets)
+    ac <- checkmate::makeAssertCollection()
+    assertSets(obj, sets, add = ac)
+    checkmate::assertFlag(negate, add = ac)
+    checkmate::reportAssertions(ac)
     
     if (!is.null(sets) && length(sets) > 0)
     {

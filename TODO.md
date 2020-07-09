@@ -42,10 +42,13 @@
 - ref docs and exports for getXCMSnSet
 - ffOpenMS etc: analyses also needs to be available for hashing
 
+
 ## sets
 - fGroups: provide methods for non-implemented functionality
 - find nice way to re-use docs
 - filter() for features/fGroups: support ionized masses for mass filters? or just clarify it doesn't.
+- handle/test empty objects
+
 
 ## features
 - feature optim:

@@ -19,9 +19,9 @@ setMethod("groupAlgorithm", "featureGroupsSet", function(obj) obj@groupAlgorithm
 setMethod("show", "featureGroupsSet", function(object)
 {
     callNextMethod(object)
-    printf("sets: %s\n", paste0(sets(object), collapse = ", "))
-    printf("adducts: %s\n", paste0(sapply(adducts(getFeatures(object)), as.character), collapse = ", "))
-    printf("grouping algorithm: %s\n", groupAlgorithm(object))
+    printf("Sets: %s\n", paste0(sets(object), collapse = ", "))
+    printf("Adducts: %s\n", paste0(sapply(adducts(getFeatures(object)), as.character), collapse = ", "))
+    printf("Grouping algorithm: %s\n", groupAlgorithm(object))
 })
 
 #' @describeIn featureGroupsSet Obtain feature information (see \code{\link{features}}).

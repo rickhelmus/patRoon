@@ -115,7 +115,45 @@ setMethod("[[", c("MSPeakListsSet", "ANY", "ANY"), function(x, i, j, neutralized
     return(ionize(x)[[i]])
 })
 
-
+#' @describeIn MSPeakListsSet Returns all MS peak list data in a table.
+#'
+#' @param averaged If \code{TRUE} then feature group averaged peak list data is
+#'   used.
+#'
+#' @template as_data_table-args
+#'
+#' @export
+setMethod("as.data.table", "MSPeakListsSet", function(x, fGroups = NULL, averaged = TRUE,
+                                                      neutralized = TRUE, sets = NULL)
+{
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertClass(fGroups, "featureGroupsSet", null.ok = TRUE, add = ac)
+    checkmate::assertFlag(averaged, add = ac)
+    checkmate::assertFlag(neutralized, add = ac)
+    assertSets(x, sets, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    if (!is.null(sets) && length(sets) > 0)
+        x <- x[, sets = sets]
+    
+    anaInfo <- analysisInfo(x) # get before ionizing    
+    if (!neutralized)
+    {
+        x <- ionize(x)
+        if (!is.null(fGroups))
+            fGroups <- ionize(fGroups)
+    }
+    
+    ret <- callNextMethod(x, fGroups = fGroups, averaged = averaged)
+    
+    if (!averaged) # add set column
+    {
+        ret[, set := anaInfo[match(analysis, anaInfo$analysis), "set"]]
+        setcolorder(ret, "set")
+    }
+    
+    return(ret[])
+})
 
 generateMSPeakListsSet <- function(fGroupsSet, generator, ..., avgSetParams)
 {

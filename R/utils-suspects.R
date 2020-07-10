@@ -288,7 +288,7 @@ annotateSuspectList <- function(scr, fGroups, MSPeakLists = NULL, formulas = NUL
            c("MSPeakLists", "formulas", "compounds"), null.ok = TRUE, fixed = list(add = ac))
     aapply(checkmate::assertNumber, . ~ absMzDev + relMinMSMSIntensity, lower = 0,
            finite = TRUE, fixed = list(add = ac))
-    checkmate::assertChoice(collapseBy, c("lowestInt", "highestInt", "lowestLevel", "highestLevel"),
+    checkmate::assertChoice(collapseBy, c("minInt", "maxInt", "minLevel", "maxLevel"),
                             null.ok = TRUE, add = ac)
     checkmate::assertSubset(checkSuspectFragments, c("mz", "formula", "compound"), add = ac)
     aapply(assertNormalizationMethod, . ~ formulasNormalizeScores + compoundsNormalizeScores, withNone = FALSE,
@@ -385,7 +385,7 @@ annotateSuspectList <- function(scr, fGroups, MSPeakLists = NULL, formulas = NUL
     if (!is.null(collapseBy))
     {
         doKeep <- function(v) is.na(v) | order(v, decreasing = grepl("^highest", collapseBy)) == 1
-        if (collapseBy == "lowestInt" || collapseBy == "highestInt")
+        if (collapseBy == "minInt" || collapseBy == "maxInt")
         {
             scr[, avgInts := rowMeans(.SD), .SDcol = analyses(fGroups)]
             scr <- scr[scr[, doKeep(avgInts), by = "name"][[2]], -"avgInts"]

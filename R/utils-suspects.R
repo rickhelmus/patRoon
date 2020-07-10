@@ -241,8 +241,10 @@ estimateIdentificationLevel <- function(suspectRTDev, suspectInChIKey1, suspectF
             {
                 if (is.null(MSMSList) || nrow(MSMSList) == 0)
                     next
-                hasFRMZ <- "mz" %in% checkSuspectFragments && !is.null(suspectFragmentsMZ) && length(suspectFragmentsMZ) > 0
-                hasFRForms <- !is.null(suspectFragmentsForms) && length(suspectFragmentsForms) > 0
+                hasFRMZ <- "mz" %in% checkSuspectFragments && !is.null(suspectFragmentsMZ) &&
+                    !is.na(suspectFragmentsMZ) && length(suspectFragmentsMZ) > 0
+                hasFRForms <- !is.null(suspectFragmentsForms) && !is.na(suspectFragmentsForms) &&
+                    length(suspectFragmentsForms) > 0
                 if (!hasFRMZ && !hasFRForms)
                     next
                 if (!hasFRMZ &&
@@ -336,7 +338,8 @@ annotateSuspectList <- function(scr, fGroups, MSPeakLists = NULL, formulas = NUL
     for (i in seq_len(nrow(scr)))
     {
         if (is.na(scr$group[i]))
-            set(scr, i, c("suspFormRank", "suspCompRank", "annotatedMSMSSimilarity", "estIDLevel"), NA)
+            set(scr, i, c("suspFormRank", "suspCompRank", "annotatedMSMSSimilarity", "estIDLevel"),
+                list(NA_integer_, NA_integer_, NA_real_, NA_character_))
         else
         {
             gName <- scr$name[i]
@@ -367,13 +370,15 @@ annotateSuspectList <- function(scr, fGroups, MSPeakLists = NULL, formulas = NUL
             }
             
             set(scr, i, c("suspFormRank", "suspCompRank", "annotatedMSMSSimilarity"), list(suspFormRank, suspCompRank, annSim))
-            set(scr, i, "estIDLevel", estimateIdentificationLevel(scr$d_rt[i], suspIK1, scr$formula[i], annSim,
-                                                                  if (!is.null(scr[["fragments_mz"]])) scr$fragments_mz[i] else NULL,
-                                                                  if (!is.null(scr[["fragments_formula"]])) scr$fragments_formula[i] else NULL,
-                                                                  checkSuspectFragments, MSMSList, fTable, fScRanges,
-                                                                  formulasNormalizeScores, cTable,
-                                                                  mCompNames = if (!is.null(compounds)) mergedCompoundNames(compounds) else NULL,
-                                                                  cScRanges, compoundsNormalizeScores, absMzDev, IDLevelRules))
+            set(scr, i, "estIDLevel",
+                estimateIdentificationLevel(scr$d_rt[i], suspIK1, scr$formula[i], annSim,
+                                            if (!is.null(scr[["fragments_mz"]])) scr$fragments_mz[i] else NULL,
+                                            if (!is.null(scr[["fragments_formula"]])) scr$fragments_formula[i] else NULL,
+                                            checkSuspectFragments, MSMSList, fTable, fScRanges,
+                                            formulasNormalizeScores, cTable,
+                                            mCompNames = if (!is.null(compounds)) mergedCompoundNames(compounds) else NULL,
+                                            cScRanges, compoundsNormalizeScores, absMzDev, IDLevelRules))
+            if (is.na(scr$estIDLevel[i])) browser()
         }
     }
     

@@ -342,7 +342,7 @@ annotateSuspectList <- function(scr, fGroups, MSPeakLists = NULL, formulas = NUL
                 list(NA_integer_, NA_integer_, NA_real_, NA_character_))
         else
         {
-            gName <- scr$name[i]
+            gName <- scr$name_unique[i]
             MSMSList <- if (!is.null(MSPeakLists)) MSPeakLists[[gName]][["MSMS"]] else NULL
             fTable <- if (!is.null(formulas)) formulas[[gName]] else NULL
             fScRanges <- if (!is.null(formulas)) formulas@scoreRanges[[gName]] else NULL
@@ -378,20 +378,20 @@ annotateSuspectList <- function(scr, fGroups, MSPeakLists = NULL, formulas = NUL
                                             formulasNormalizeScores, cTable,
                                             mCompNames = if (!is.null(compounds)) mergedCompoundNames(compounds) else NULL,
                                             cScRanges, compoundsNormalizeScores, absMzDev, IDLevelRules))
-            if (is.na(scr$estIDLevel[i])) browser()
         }
     }
     
     if (!is.null(collapseBy))
     {
-        doKeep <- function(v) is.na(v) | order(v, decreasing = grepl("^highest", collapseBy)) == 1
+        doKeep <- function(v) is.na(v) | length(v) == 1 | order(v, decreasing = grepl("^max", collapseBy)) == 1
         if (collapseBy == "minInt" || collapseBy == "maxInt")
         {
             scr[, avgInts := rowMeans(.SD), .SDcol = analyses(fGroups)]
-            scr <- scr[scr[, doKeep(avgInts), by = "name"][[2]], -"avgInts"]
+            scr <- scr[, keep := doKeep(avgInts), by = "name"][, -"avgInts"]
         }
         else # collapse by ID level
-            scr <- scr[scr[, doKeep(estIDLevel), by = "name"][[2]]]
+            scr <- scr[, keep := doKeep(estIDLevel), by = "name"]
+        scr <- scr[keep == TRUE, -"keep"]
     }
     
     # UNDONE: make suspect names unique again if rows were removed?

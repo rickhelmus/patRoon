@@ -413,8 +413,9 @@ addAllDAEICs <- function(fGroups, mzWindow = 0.005, ctype = "EIC", bgsubtr = FAL
                         warning("Failed to add some EICs, cannot set names.")
                     else
                     {
+                        gn <- gNames[grpsInAna]
                         for (eici in seq(oldEICCount+1, newEICCount))
-                            chroms[[eici]][["Name_"]] <- gNames[eici - oldEICCount]
+                            chroms[[eici]][["Name_"]] <- gn[eici - oldEICCount]
                     }
                 }
                 

@@ -6,7 +6,7 @@
 * Reversed argument order of `exportedData`/`verbose` to `getXCMSSet()` functions to avoid ambiguities
 * Automated tests for importing/exporting XCMS(3) data + small fixes for surfaced bugs
 * `generateComponentsNontarget()`: allow wider _m/z_ deviation for proper linkage of different series (controlled by `absMzDevLink` argument).
-
+* Fixed: `addAllDAEICs()` sometimes used wrong names for EICs
 
 # patRoon 1.0.1
 

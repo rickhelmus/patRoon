@@ -8,6 +8,25 @@ getTestFGroups <- function(anaInfo = getTestAnaInfo(), ...) groupFeatures(findFe
 getEmptyTestFGroups <- function() getTestFGroups()[, "none"]
 getEmptyPLists <- function() MSPeakLists(algorithm = "none")
 
+getMFTestDBPath <- function() file.path(getTestDataPath(), "test-mf-db.csv")
+getCompScr <- function() screenSuspects(getTestFGroups(getTestAnaInfo()[4, ]), patRoonData::targets)
+getCompFGroups <- function()
+{
+    fGroups <- getTestFGroups(getTestAnaInfo()[4, ])
+    # convert to screening results to simplify things a bit
+    fGroups <- groupFeaturesScreening(fGroups, getCompScr())
+    # just focus on 5 targets, these are named exactly the same as in the MetFrag test DB
+    return(fGroups[, fread(getMFTestDBPath())$Name])
+}
+
+callMF <- function(fGroups, plists, scoreTypes = "fragScore", db = getMFTestDBPath(), to = 300)
+{
+    generateCompounds(fGroups, plists, "metfrag",
+                      adduct = "[M+H]+", timeout = to,
+                      database = "csv", scoreTypes = scoreTypes,
+                      extraOpts = list(LocalDatabasePath = db))
+}
+
 # to make testing a bit easier: precursors don't have to follow filter rules
 removePrecursors <- function(plists)
 {
@@ -151,6 +170,15 @@ expect_reportHTML <- function(object)
         expect(rpHash == makeFileHash(rpFile), "cached report differs")
     }
 
+    invisible(act$val)
+}
+
+expect_equal_scr <- function(object, expected, ...)
+{
+    act <- quasi_label(rlang::enquo(object))
+    rmCols <- c("InChI", "SMILES", "neutralMass", "formula", "adduct")
+    expect(isTRUE(all.equal(object[, setdiff(names(object), rmCols)], expected[, setdiff(names(expected), rmCols)], ...)),
+           "screening results differ")
     invisible(act$val)
 }
 

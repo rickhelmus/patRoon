@@ -12,14 +12,12 @@
 - update version number
 - credits to ES
 - tests
-    - annotation tests
-    - ref
-    - increase in max(IDLevel) with more annotation data
-    - m/z fragments in suspect list
     - automatic InChIKey/formula calculation from InChIs/SMILES
+    - more?
 - ID level rules
     - GenForm scoring: somehow exclude non MS/MS candidates if MS/MS candidates are present?
-    - add scorings for SIRIUS
+        - already fine now with minimum rank?
+    - add scorings for SIRIUS/DA
     - append/override custom rules via ... argument of defaultIDLevelRules()?
 - annotation
     - docs

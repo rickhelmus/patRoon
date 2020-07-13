@@ -1,17 +1,8 @@
 context("compounds")
 
-fGroups <- getTestFGroups(getTestAnaInfo()[4, ])
+fGroups <- getCompFGroups()
 
-# convert to screening results to simplify things a bit
-fGroups <- groupFeaturesScreening(fGroups, screenSuspects(fGroups, patRoonData::targets))
-
-mfTestDBPath <- file.path(getTestDataPath(), "test-mf-db.csv")
-mfTestDB <- fread(mfTestDBPath)
-
-# just focus on 5 targets, these are named exactly the same as in the MetFrag test DB
-fGroupsSub <- fGroups[, mfTestDB$Name]
-
-plists <- generateMSPeakLists(fGroupsSub, "mzr")
+plists <- generateMSPeakLists(fGroups, "mzr")
 plistsEmpty <- getEmptyPLists()
 plistsEmptyMS <- removeMSPlists(plists, "MS")
 fGroupsEmpty <- getEmptyTestFGroups()
@@ -19,27 +10,19 @@ fGroupsEmpty <- getEmptyTestFGroups()
 doMetFrag <- !is.null(getOption("patRoon.path.MetFragCL")) && nzchar(getOption("patRoon.path.MetFragCL"))
 doSIRIUS <- !is.null(getOption("patRoon.path.SIRIUS")) && nzchar(getOption("patRoon.path.SIRIUS"))
 
-callMF <- function(fGroups, plists, db = mfTestDBPath, to = 300)
-{
-    generateCompounds(fGroups, plists, "metfrag",
-                      adduct = "[M+H]+", timeout = to,
-                      database = "csv", scoreTypes = "fragScore",
-                      extraOpts = list(LocalDatabasePath = db))
-}
-
 if (doMetFrag)
 {
-    compsMF <- callMF(fGroupsSub, plists)
+    compsMF <- callMF(fGroups, plists)
     ct <- compoundTable(compsMF)
     compsMFEmpty <- callMF(fGroupsEmpty, plists = plistsEmpty)
-    compsMFEmptyPL <- callMF(fGroupsSub, plists = plistsEmpty)
+    compsMFEmptyPL <- callMF(fGroups, plists = plistsEmpty)
 }
 
 if (doSIRIUS)
 {
-    compsSIR <- generateCompounds(fGroupsSub, plists, "sirius")
+    compsSIR <- generateCompounds(fGroups, plists, "sirius")
     compsSIREmpty <- generateCompounds(fGroupsEmpty, plistsEmpty, "sirius")
-    compsSIREmptyPL <- generateCompounds(fGroupsSub, plistsEmpty, "sirius")
+    compsSIREmptyPL <- generateCompounds(fGroups, plistsEmpty, "sirius")
 }
 
 test_that("verify MetFragCL compound generation", {
@@ -59,7 +42,7 @@ test_that("verify SIRIUS compound generation", {
     expect_known_show(compsSIR, testFile("compounds-sir", text = TRUE))
     expect_length(compsSIREmpty, 0)
     expect_length(compsSIREmptyPL, 0)
-    expect_length(generateCompounds(fGroupsSub, plistsEmptyMS, "sirius"), 0)
+    expect_length(generateCompounds(fGroups, plistsEmptyMS, "sirius"), 0)
 })
 
 hasCompounds <- doMetFrag || doSIRIUS
@@ -67,7 +50,7 @@ hasCompounds <- doMetFrag || doSIRIUS
 if (doMetFrag)
 {
     # include some isomers to test filtering... (sirius should already have multiple compounds for feature groups)
-    compsMFIso <- callMF(fGroupsSub, plists, db = file.path(getTestDataPath(), "test-mf-db-isomers.csv"))
+    compsMFIso <- callMF(fGroups, plists, db = file.path(getTestDataPath(), "test-mf-db-isomers.csv"))
 }
 
 # continue with one or another...
@@ -78,10 +61,10 @@ compsExplained <- filter(comps, minExplainedPeaks = 1)
 test_that("filtering works", {
     skip_if_not(hasCompounds)
 
-    expect_lte(length(filter(comps, topMost = 1)), length(fGroupsSub))
-    expect_lte(length(filter(comps, topMost = 5)), 5 * length(fGroupsSub))
-    expect_lte(length(filter(comps, topMost = 1, negate = TRUE)), length(fGroupsSub))
-    expect_lte(length(filter(comps, topMost = 5, negate = TRUE)), 5 * length(fGroupsSub))
+    expect_lte(length(filter(comps, topMost = 1)), length(fGroups))
+    expect_lte(length(filter(comps, topMost = 5)), 5 * length(fGroups))
+    expect_lte(length(filter(comps, topMost = 1, negate = TRUE)), length(fGroups))
+    expect_lte(length(filter(comps, topMost = 5, negate = TRUE)), 5 * length(fGroups))
     expect_true(all(as.data.table(filter(comps, topMost = 1))$score >
                         as.data.table(filter(comps, topMost = 1, negate = TRUE))$score))
 
@@ -166,7 +149,7 @@ test_that("basic usage", {
 
 if (doMetFrag)
 {
-    forms <- generateFormulas(fGroupsSub, "genform", plists)
+    forms <- generateFormulas(fGroups, "genform", plists)
     compsMFIsoF <- addFormulaScoring(compsMFIso, forms)
 }
 
@@ -190,7 +173,7 @@ test_that("MetFrag uninitialized jniinchi workaround", {
             {
                 info = sprintf("iter: %d", n)
                 unlink(jnatiTestDir, recursive = TRUE)
-                expect_warning(compsJNI <- callMF(fGroupsSub, plists), NA, info = info)
+                expect_warning(compsJNI <- callMF(fGroups, plists), NA, info = info)
                 expect_equal(compsJNI, compsMF, info = info)
             }
         })
@@ -201,7 +184,7 @@ test_that("MetFrag can timeout", {
     skip_if_not(doMetFrag)
     withr::with_options(c(patRoon.cache.mode = "none"), {
         # call with unreasonably short timeout...
-        expect_warning(compsTO <- callMF(fGroupsSub, plists, to = 1))
+        expect_warning(compsTO <- callMF(fGroups, plists, to = 1))
         expect_lt(length(compsTO), length(compsMF))
     })
 })

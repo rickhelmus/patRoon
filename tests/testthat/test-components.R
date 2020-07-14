@@ -160,6 +160,7 @@ test_that("reporting empty object works", {
     expect_error(reportCSV(fGroupsSimple, getWorkPath(), components = compsEmpty), NA)
     expect_error(reportPDF(fGroupsSimple, getWorkPath(), reportFGroups = FALSE, components = compsEmpty), NA)
     expect_reportHTML(makeReportHTML(fGroupsSimple, reportPlots = "none", components = compsEmpty))
+    expect_error(makeReportHTML(fGroupsEmpty, reportPlots = "eics", components = compsRC), NA)
 })
 
 test_that("plotting works", {

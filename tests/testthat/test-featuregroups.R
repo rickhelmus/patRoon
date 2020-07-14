@@ -278,7 +278,7 @@ test_that("reporting works", {
 test_that("reporting with empty object works", {
     expect_error(reportCSV(fgOpenMSEmpty, getWorkPath(), reportFeatures = TRUE), NA)
     expect_error(reportPDF(fgOpenMSEmpty, getWorkPath()), NA)
-    expect_reportHTML(makeReportHTML(fgOpenMSEmpty))
+    expect_error(makeReportHTML(fgOpenMSEmpty), NA)
 })
 
 test_that("plotting works", {

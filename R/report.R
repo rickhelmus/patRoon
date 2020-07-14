@@ -278,16 +278,17 @@ reportFormulaSpectra <- function(fGroups, path, formulas, topMost, normalizeScor
         invisible(return(NULL))
     }
 
-    gNames <- names(fGroups)
-
     if (length(formulas) == 0)
         invisible(return(NULL))
 
     if (!is.null(topMost))
         formulas <- filter(formulas, topMost = topMost)
 
-    formGroups <- groupNames(formulas)
+    formGroups <- intersect(groupNames(formulas), names(fGroups))
     fcount <- length(formGroups)
+    if (fcount == 0)
+        invisible(return(NULL))
+    
     prog <- openProgBar(0, fcount)
 
     for (grp in formGroups)
@@ -296,8 +297,6 @@ reportFormulaSpectra <- function(fGroups, path, formulas, topMost, normalizeScor
 
         if (nrow(ft) > 0)
         {
-            grpi <- match(grp, gNames)
-
             out <- file.path(path, sprintf("%s-%s.pdf", class(fGroups), grp))
             # a4r: width=11.69, height=8.27
             pdf(out, paper = "a4r", pointsize = 10, width = 11, height = 8)

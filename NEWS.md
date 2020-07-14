@@ -8,6 +8,7 @@
 * `generateComponentsNontarget()`: allow wider _m/z_ deviation for proper linkage of different series (controlled by `absMzDevLink` argument).
 * Fixed: `addAllDAEICs()` sometimes used wrong names for EICs
 * Improved handling of empty feature groups objects when reporting
+* Fixed: `reportPDF()` may report formula annotated spectra of results not present in input `featureGroups`
 
 
 # patRoon 1.0.1

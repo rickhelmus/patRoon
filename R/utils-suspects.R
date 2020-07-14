@@ -2,6 +2,32 @@
 #' @include utils-compounds.R
 NULL
 
+convertSuspDataIfNeeded <- function(scr, destFormat, destCol, fromFormats, fromCols)
+{
+    hasData <- function(x) !is.na(x) & nzchar(x)
+    missingInScr <- function(x) if (is.null(scr[[x]])) rep(TRUE, nrow(scr)) else !hasData(scr[[x]])
+
+    countEntries <- function() if (is.null(scr[[destCol]])) 0 else sum(hasData(scr[[destCol]]))
+    curEntryCount <- countEntries()
+    if (curEntryCount < nrow(scr))
+    {
+        printf("Trying to calculate missing %s data in suspect list... ", destCol)
+        
+        if (destFormat == "formula")
+            doConv <- function(inp, f) convertToFormulaBabel(inp, f, mustWork = FALSE)
+        else
+            doConv <- function(inp, f) babelConvert(inp, f, destFormat, mustWork = FALSE)
+        
+        for (i in seq_along(fromFormats))
+            scr[missingInScr(destCol) & !missingInScr(fromCols[i]), (destCol) := doConv(get(fromCols[i]), fromFormats[i])]
+     
+        newEntryCount <- countEntries() - curEntryCount
+        printf("Done! Filled in %d (%.1f) entries.\n", newEntryCount,
+               if (newEntryCount > 0) newEntryCount * 100 / nrow(scr) else 0)
+    }
+    return(scr)
+}
+
 prepareSuspectList <- function(suspects, adduct, skipInvalid)
 {
     hash <- makeHash(suspects, adduct, skipInvalid)
@@ -24,6 +50,16 @@ prepareSuspectList <- function(suspects, adduct, skipInvalid)
                 suspects[, (col) := as.character(get(col))]
         }
         
+        # get missing identifiers & formulae if necessary and possible
+        suspects <- convertSuspDataIfNeeded(suspects, destFormat = "smi", destCol = "SMILES",
+                                            fromFormats = "inchi", fromCols = "InChI")
+        suspects <- convertSuspDataIfNeeded(suspects, destFormat = "inchi", destCol = "InChI",
+                                            fromFormats = "smi", fromCols = "SMILES")
+        suspects <- convertSuspDataIfNeeded(suspects, destFormat = "inchikey", destCol = "InChIKey",
+                                            fromFormats = c("smi", "inchi"), fromCols = c("SMILES", "InChI"))
+        suspects <- convertSuspDataIfNeeded(suspects, destFormat = "formula", destCol = "formula",
+                                            fromFormats = c("smi", "inchi"), fromCols = c("SMILES", "InChI"))
+        
         if (!is.null(suspects[["mz"]]) && !any(is.na(suspects[["mz"]])))
         {
             saveCacheData("screenSuspectsPrepList", suspects, hash)
@@ -35,8 +71,6 @@ prepareSuspectList <- function(suspects, adduct, skipInvalid)
             neutralMasses <- suspects[["neutralMass"]]
         else
         {
-            InChISMILES <- NULL
-            
             printf("Calculating ion masses for each suspect...\n")
             prog <- openProgBar(0, nrow(suspects))
             
@@ -49,17 +83,6 @@ prepareSuspectList <- function(suspects, adduct, skipInvalid)
                     ret <- rcdk::get.formula(suspects$formula[i])@mass
                 else if (canUse(suspects[["SMILES"]][i]))
                     ret <- getNeutralMassFromSMILES(suspects$SMILES[i], mustWork = FALSE)[[1]]
-                else if (canUse(suspects[["InChI"]][i]))
-                {
-                    # it's more efficient to calculate all at once with obabel --> cache result
-                    if (is.null(InChISMILES))
-                    {
-                        doInChI <- suspects$InChI[!is.na(suspects$InChI) & nzchar(suspects$InChI)]
-                        InChISMILES <<- babelConvert(doInChI, "inchi", "smi", mustWork = FALSE)
-                        names(InChISMILES) <<- doInChI
-                    }
-                    ret <- getNeutralMassFromSMILES(InChISMILES[[suspects$InChI[i]]], mustWork = FALSE)[[1]]
-                }
                 else
                     ret <- NA
                 
@@ -308,34 +331,6 @@ annotateSuspectList <- function(scr, fGroups, MSPeakLists = NULL, formulas = NUL
         return(cd)
     
     scr <- copy(scr)
-    
-    # get InChIKeys/Formulas if necessary and possible
-
-    hasData <- function(x) !is.na(x) & nzchar(x)
-    missingInScr <- function(what) if (is.null(scr[[what]])) rep(TRUE, nrow(scr)) else !hasData(scr[[what]])
-    
-    if (is.null(scr[["InChIKey"]]) || any(!hasData(scr$InChIKey)))
-    {
-        printf("Trying to calculate missing InChIKeys...\n")
-        
-        if (!is.null(scr[["SMILES"]]))
-            scr[missingInScr("InChIKey") & !missingInScr("SMILES"), InChIKey := babelConvert(SMILES, "smi", "inchikey", mustWork = FALSE)]
-        
-        # re-try from InChI for the results not yet available
-        if (!is.null(scr[["InChI"]]))
-            scr[missingInScr("InChIKey") & !missingInScr("InChI"), InChIKey := babelConvert(InChI, "inchi", "inchikey", mustWork = FALSE)]
-    }
-    if (is.null(scr[["formula"]]) || any(!hasData(scr$formula)))
-    {
-        printf("Trying to calculate missing formulas...\n")
-        missingSMILES <- missingInScr("SMILES")
-        missingInChIs <- missingInScr("InChI")
-        
-        if (!is.null(scr[["SMILES"]]))
-            scr[!missingSMILES & missingInScr("formula"), formula := convertToFormulaBabel(SMILES, "smi", mustWork = FALSE)]
-        if (!is.null(scr[["InChI"]]))
-            scr[!missingInChIs & missingInScr("formula"), formula := convertToFormulaBabel(SMILES, "inchi", mustWork = FALSE)]
-    }
     
     for (i in seq_len(nrow(scr)))
     {

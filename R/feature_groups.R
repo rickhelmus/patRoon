@@ -1269,7 +1269,7 @@ setMethod("screenSuspects", "featureGroups", function(obj, suspects, rtWindow, m
     
     setMetaData <- function(t, suspRow)
     {
-        for (col in c("name", "mz", "SMILES", "InChI", "formula", "neutralMass", "adduct", "rt",
+        for (col in c("name", "mz", "SMILES", "InChI", "InChIKey", "formula", "neutralMass", "adduct", "rt",
                       "fragments_mz", "fragments_formula"))
         {
             if (!is.null(suspects[[col]]))

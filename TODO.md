@@ -30,6 +30,7 @@
         - deprecate features method
         - tag hits, but keep all fGroups?
             - fGroups[, hits = TRUE] ?
+            - collapse suspects matched to same fGroups? nice for speeding up annotation
     - check new columns with checkmate (e.g. suspect fragments)
 - newProject(): create template auto ID rule csv?
 

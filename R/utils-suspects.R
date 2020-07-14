@@ -135,7 +135,19 @@ annotatedMSMSSimilarity <- function(fragInfo, MSMSList, absMzDev, relMinIntensit
                                             b = relMinIntensity, print.graphic = FALSE))
 }
 
-defaultIDLevelRules <- function() defIDLevelRules # stored inside R/sysdata.rda
+defaultIDLevelRules <- function(inLevels = NULL, exLevels = NULL)
+{
+    aapply(checkmate::assertCharacter, . ~ inLevels + exLevels, null.ok = TRUE)
+    
+    ret <- defIDLevelRules # stored inside R/sysdata.rda
+    
+    pred <- function(p, l) grepl(p, l)
+    if (!is.null(inLevels))
+        ret <- ret[grepl(inLevels, paste0(ret$level, ret$subLevel)), ]
+    if (!is.null(exLevels))
+        ret <- ret[!grepl(exLevels, paste0(ret$level, ret$subLevel)), ]
+    return(ret)
+}
 
 # UNDONE/NOTE: mustExist/relative fields only used for scorings of compound/formulas
 estimateIdentificationLevel <- function(suspectRTDev, suspectInChIKey1, suspectFormula, suspectAnnSim,

@@ -18,10 +18,9 @@
     - GenForm scoring: somehow exclude non MS/MS candidates if MS/MS candidates are present?
         - already fine now with minimum rank?
     - add scorings for SIRIUS/DA
-    - append/override custom rules via ... argument of defaultIDLevelRules()?
 - annotation
     - docs
-    - only add sim, ranking etc columns if data is available
+    - only add sim, ranking etc columns if data is available?
 - screenSuspects()
     - combine screenSuspects() and groupFeaturesScreening()
         - screenSuspects() does both the screening and making new fGroups

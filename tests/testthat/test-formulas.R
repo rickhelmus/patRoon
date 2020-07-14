@@ -244,6 +244,20 @@ test_that("reporting works", {
                                      formulas = formsGFWithMSMS, MSPeakLists = plists))
 })
 
+test_that("reporting empty objects works", {
+    expect_error(reportCSV(fGroups, getWorkPath(), formulas = formsGFEmpty), NA)
+    expect_error(reportCSV(fGroupsEmpty, getWorkPath(), formulas = formsGF), NA)
+    expect_error(reportPDF(fGroups, getWorkPath(), reportFGroups = FALSE, formulas = formsGFEmpty,
+                           MSPeakLists = plistsEmpty), NA)
+    expect_error(reportPDF(fGroupsEmpty, getWorkPath(), reportFGroups = FALSE, formulas = formsGF,
+                           MSPeakLists = plists), NA)
+    expect_reportHTML(makeReportHTML(fGroups, reportPlots = "none",
+                                     formulas = formsGFEmpty, MSPeakLists = plistsEmpty))
+    expect_error(makeReportHTML(fGroupsEmpty, reportPlots = "none",
+                                formulas = formsGF, MSPeakLists = plists), NA)
+})
+
+
 plotPrec <- formsGFWithMSMS[[1]][["formula"]][1]
 test_that("plotting works", {
     expect_doppel("form-spec", function() plotSpec(formsGFWithMSMS, plotPrec, groupNames(formsGFWithMSMS)[1],

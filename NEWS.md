@@ -7,6 +7,8 @@
 * Automated tests for importing/exporting XCMS(3) data + small fixes for surfaced bugs
 * `generateComponentsNontarget()`: allow wider _m/z_ deviation for proper linkage of different series (controlled by `absMzDevLink` argument).
 * Fixed: `addAllDAEICs()` sometimes used wrong names for EICs
+* Improved handling of empty feature groups objects when reporting
+
 
 # patRoon 1.0.1
 

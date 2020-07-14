@@ -269,10 +269,15 @@ test_that("reporting works", {
 test_that("reporting empty objects works", {
     skip_if_not(hasCompounds)
     expect_error(reportCSV(fGroups, getWorkPath(), compounds = compsEmpty), NA)
+    expect_error(reportCSV(fGroupsEmpty, getWorkPath(), compounds = comps), NA)
     expect_error(reportPDF(fGroups, getWorkPath(), reportFGroups = FALSE, compounds = compsEmpty,
                            MSPeakLists = plistsEmpty), NA)
+    expect_error(reportPDF(fGroupsEmpty, getWorkPath(), reportFGroups = FALSE, compounds = comps,
+                           MSPeakLists = plists), NA)
     expect_reportHTML(makeReportHTML(fGroups, reportPlots = "none",
                                      compounds = compsEmpty, MSPeakLists = plistsEmpty))
+    expect_error(makeReportHTML(fGroupsEmpty, reportPlots = "none",
+                                compounds = comps, MSPeakLists = plists), NA)
 })
 
 test_that("plotting works", {

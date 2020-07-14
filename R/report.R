@@ -612,6 +612,12 @@ setMethod("reportCSV", "featureGroups", function(fGroups, path, reportFGroupsAsR
            min.chars = 1, null.ok = TRUE, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
 
+    if (length(fGroups) == 0)
+    {
+        cat("No feature groups, nothing to report...\n")
+        invisible(return(NULL))
+    }
+    
     prepareReportPath(path, clearPath)
 
     reportFGroupTable(fGroups, path, reportFGroupsAsRows, reportFGroupsAnalysisInfo, reportFGroupsRetMz, retMin)
@@ -678,10 +684,10 @@ setMethod("reportPDF", "featureGroups", function(fGroups, path, reportFGroups,
     aapply(checkmate::assertNumber, . ~ EICRtWindow + EICMzWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
 
-    if (!reportFGroups && is.null(formulas) && is.null(compounds) && is.null(components))
+    if ((!reportFGroups && is.null(formulas) && is.null(compounds) && is.null(components)) || length(fGroups) == 0)
     {
-        cat("Nothing to report...\n")
-        return(NULL)
+        cat("No feature groups, nothing to report...\n")
+        invisible(return(NULL))
     }
 
     if (is.null(MSPeakLists) &&
@@ -806,6 +812,12 @@ setMethod("reportHTML", "featureGroups", function(fGroups, path, reportPlots, fo
     checkmate::assertCount(maxProcAmount, positive = TRUE, add = ac)
     checkmate::reportAssertions(ac)
 
+    if (length(fGroups) == 0)
+    {
+        cat("No feature groups, nothing to report...\n")
+        invisible(return(NULL))
+    }
+    
     if ("none" %in% reportPlots)
         reportPlots <- ""
 

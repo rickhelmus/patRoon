@@ -300,7 +300,9 @@ annotateSuspectList <- function(scr, fGroups, MSPeakLists = NULL, formulas = NUL
                    add = ac)
     checkmate::reportAssertions(ac)
     
-    hash <- makeHash(scr, MSPeakLists, formulas, compounds, absMzDev, relMinMSMSIntensity, IDLevelRules)
+    hash <- makeHash(scr, fGroups, MSPeakLists, formulas, compounds, collapseBy, absMzDev,
+                     relMinMSMSIntensity, checkSuspectFragments, formulasNormalizeScores,
+                     compoundsNormalizeScores, IDLevelRules)
     cd <- loadCacheData("annotateSuspects", hash)
     if (!is.null(cd))
         return(cd)

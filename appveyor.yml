@@ -31,12 +31,12 @@ install:
         C:\deps\openbabel.exe /S
 
 
-    - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+    #- ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
 cache:
-  #- C:\RLibrary
+  - C:\RLibrary
   - C:\Program Files\Pandoc\
-  #- C:\deps
+  - C:\deps
 
 # Adapt as necessary starting from here
 
@@ -63,6 +63,7 @@ environment:
       secure: JJT6ZdxNWo6wf+xPRwfOXAXW1M65jtdzRXCKFGarzzQ=
 
 build_script:
+    - travis-tool.sh install_r tibble # workaround for MSnbase
     - travis-tool.sh install_bioc mzR xcms CAMERA Rdisop
     - travis-tool.sh install_github rickhelmus/patRoonData
     - travis-tool.sh install_github blosloos/nontarget

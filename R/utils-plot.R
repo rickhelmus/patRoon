@@ -84,7 +84,7 @@ makeVennPlot <- function(plotObjects, categories, areas, intersectFunc,
     invisible(list(gList = gRet, areas = areas, intersectionCounts = icounts))
 }
 
-getMSPlotData <- function(spec)
+getMSPlotData <- function(spec, marklwd)
 {
     hasFragInfo <- !is.null(spec[["formula"]])
     plotData <- copy(spec)
@@ -92,26 +92,24 @@ getMSPlotData <- function(spec)
     # default colour/line width
     plotData[, c("colour", "lwd", "legend") := .("grey", 1, "unassigned")]
     
-    if (hasFragInfo)
+    markWhich <- if (hasFragInfo) plotData[!is.na(formula), which = TRUE] else seq_len(nrow(plotData))
+    
+    if (!is.null(spec[["mergedBy"]]))
     {
-        isAnnotated <- plotData[!is.na(formula), which = TRUE]
-        if (!is.null(spec[["mergedBy"]]))
-        {
-            plotData[isAnnotated, legend := sapply(mergedBy, wrapStr, width = 10)]
-            
-            mbsUnique <- unique(plotData$legend)
-            # order from small to big based on number of commas
-            mbsUnique <- mbsUnique[order(sapply(mbsUnique, countCharInStr, ch = ",", USE.NAMES = FALSE))]
-            mbCombCols <- setNames(getBrewerPal(length(mbsUnique), "Paired"), mbsUnique)
-            
-            plotData[isAnnotated, c("colour", "lwd") := .(mbCombCols[match(legend, mbsUnique)], 2)]
-        }
-        else
-            plotData[isAnnotated, c("colour", "lwd", "legend") := .("blue", 2, "assigned")] # nothing merged, just mark all annotated blue
+        plotData[markWhich, legend := sapply(mergedBy, wrapStr, width = 10)]
+        
+        mbsUnique <- unique(plotData$legend)
+        # order from small to big based on number of commas
+        mbsUnique <- mbsUnique[order(sapply(mbsUnique, countCharInStr, ch = ",", USE.NAMES = FALSE))]
+        mbCombCols <- setNames(getBrewerPal(length(mbsUnique), "Paired"), mbsUnique)
+        
+        plotData[markWhich, c("colour", "lwd") := .(mbCombCols[match(legend, mbsUnique)], marklwd)]
     }
+    else if (hasFragInfo)
+        plotData[markWhich, c("colour", "lwd", "legend") := .("blue", marklwd, "assigned")] # nothing merged, just mark all annotated blue
     
     # mark precursor
-    plotData[precursor == TRUE, c("colour", "lwd", "legend") := .("red", 2, "precursor")]
+    plotData[precursor == TRUE, c("colour", "lwd", "legend") := .("red", marklwd, "precursor")]
     
     return(plotData)
 }
@@ -205,16 +203,15 @@ makeScoresPlot <- function(scoreTable, mcn, useGGPlot2)
 }
 
 # spec may be annotated
-makeMSPlot <- function(spec, xlim, ylim, ..., extraHeightInch = 0)
+makeMSPlot <- function(plotData, xlim, ylim, ylab = "Intensity", ..., extraHeightInch = 0)
 {
-    plotData <- getMSPlotData(spec)
     if (!is.null(plotData[["formula"]]))
         plotData[!is.na(formula), formWidth := strwidth(formula, units = "inches")]
     
     if (is.null(xlim))
         xlim <- range(plotData$mz) * c(0.9, 1.1)
     else
-        plotData <- plotData[numGTE(mz, xlim[1]) & numLTE(mz, xlim[2])] # remove any peaks outisde plotting range
+        plotData <- plotData[numGTE(mz, xlim[1]) & numLTE(mz, xlim[2])] # remove any peaks outside plotting range
     
     doLegend <- !is.null(plotData[["legend"]]) && any(!is.na(plotData[["legend"]]) & nzchar(plotData[["legend"]]))
     if (doLegend)
@@ -256,7 +253,7 @@ makeMSPlot <- function(spec, xlim, ylim, ..., extraHeightInch = 0)
         ylim <- c(0, ym)
     }
     
-    plot(0, xlab = "m/z", ylab = "Intensity", xlim = xlim, ylim = ylim,
+    plot(0, xlab = "m/z", ylab = ylab, xlim = xlim, ylim = ylim,
          type = "n", bty = "l", ...)
     
     segments(plotData[["mz"]], 0, plotData[["mz"]], plotData[["intensity"]],
@@ -277,10 +274,8 @@ makeMSPlot <- function(spec, xlim, ylim, ..., extraHeightInch = 0)
     }
 }
 
-makeMSPlotGG <- function(spec, ...)
+makeMSPlotGG <- function(plotData, ...)
 {
-    plotData <- getMSPlotData(spec)
-    
     # BUG: throws errors when parse=TRUE and all labels are empty
     if (!is.null(plotData$formula) && any(!is.na(plotData$formula)))
     {
@@ -293,7 +288,7 @@ makeMSPlotGG <- function(spec, ...)
     else
         ret <- ggplot(plotData, aes_string(x = "mz", y = 0))
     
-    ret <- ret + xlim(range(spec$mz) * c(0.9, 1.1)) +
+    ret <- ret + xlim(range(plotData$mz) * c(0.9, 1.1)) +
         geom_segment(aes_string(xend = "mz", yend = "intensity", colour = "legend", size = "lwd")) +
         scale_size(range = c(0.5, 2), guide = FALSE) + xlab("m/z") + ylab("Intensity") +
         cowplot::theme_cowplot(font_size = 12) + theme(legend.position = "bottom", legend.title = element_blank())

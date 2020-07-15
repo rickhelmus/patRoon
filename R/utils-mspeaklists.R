@@ -295,3 +295,21 @@ isolatePrecInMSPeakList <- function(plist, isolatePrec, negate)
 
     return(plist)
 }
+
+getSpec <- function(MSPeakLists, groupName, MSLevel, analysis)
+{
+    MSInd <- if (MSLevel == 1) "MS" else "MSMS"
+    if (!is.null(analysis))
+        spec <- MSPeakLists[[analysis, groupName]][[MSInd]]
+    else
+        spec <- MSPeakLists[[groupName]][[MSInd]]
+    return(spec)
+}
+
+getMSPeakListPlotTitle <- function(MSLevel, analysis, groupName)
+{
+    MSInd <- if (MSLevel == 1) "MS" else "MSMS"
+    if (!is.null(analysis))
+        return(sprintf("%s (%s) %s", groupName, analysis, MSInd))
+    return(paste(groupName, MSInd))
+}

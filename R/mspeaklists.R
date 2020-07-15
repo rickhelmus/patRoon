@@ -448,27 +448,17 @@ setMethod("plotSpectrum", "MSPeakLists", function(obj, groupName, analysis = NUL
     if (length(obj) == 0)
         return(NULL)
 
-    MSInd <- if (MSLevel == 1) "MS" else "MSMS"
-    if (!is.null(analysis))
-        spec <- obj[[analysis, groupName]][[MSInd]]
-    else
-        spec <- obj[[groupName]][[MSInd]]
-
+    spec <- getSpec(obj, groupName, MSLevel, analysis)
     if (is.null(spec))
         return(NULL)
 
     if (is.null(title))
-    {
-        if (!is.null(analysis))
-            title <- sprintf("%s (%s) %s", groupName, analysis, MSInd)
-        else
-            title <- paste(groupName, MSInd)
-    }
-
+        title <- getMSPeakListPlotTitle(MSLevel, analysis, groupName)
+    
     if (useGGPlot2)
-        return(makeMSPlotGG(spec) + ggtitle(title))
+        return(makeMSPlotGG(getMSPlotData(spec, 2)) + ggtitle(title))
 
-    makeMSPlot(spec, xlim, ylim, main = title, ...)
+    makeMSPlot(getMSPlotData(spec, 2), xlim, ylim, main = title, ...)
 })
 
 

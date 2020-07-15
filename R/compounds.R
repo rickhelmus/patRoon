@@ -696,10 +696,10 @@ setMethod("plotSpectrum", "compounds", function(obj, index, groupName, MSPeakLis
         if (plotStruct && isValidMol(mol))
         {
             molHInch <- 1.5
-            makeMSPlot(spec, xlim, ylim, main = title, ..., extraHeightInch = molHInch)
+            makeMSPlot(getMSPlotData(spec, 2), xlim, ylim, main = title, ..., extraHeightInch = molHInch)
         }
         else
-            makeMSPlot(spec, xlim, ylim, main = title, ...)
+            makeMSPlot(getMSPlotData(spec, 2), xlim, ylim, main = title, ...)
 
         # draw structure
         if (plotStruct && isValidMol(mol))
@@ -743,7 +743,7 @@ setMethod("plotSpectrum", "compounds", function(obj, index, groupName, MSPeakLis
     }
     else
     {
-        MSPlot <- makeMSPlotGG(spec) + ggtitle(title)
+        MSPlot <- makeMSPlotGG(getMSPlotData(spec, 2)) + ggtitle(title)
 
         if (plotStruct && isValidMol(mol))
         {

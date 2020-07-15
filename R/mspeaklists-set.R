@@ -257,26 +257,62 @@ setMethod("filter", "MSPeakListsSet", function(obj, ..., sets = NULL, negate = F
 
 #' @export
 setMethod("plotSpec", "MSPeakListsSet", function(obj, groupName, analysis = NULL, MSLevel = 1, title = NULL,
-                                                 useGGPlot2 = FALSE, xlim = NULL, ylim = NULL, ...,
-                                                 neutralized = TRUE, sets = NULL, perSet = FALSE)
+                                                 useGGPlot2 = FALSE, xlim = NULL, ylim = NULL,
+                                                 neutralized = TRUE, sets = NULL, perSet = TRUE,
+                                                 mirror = TRUE, ...)
 {
     ac <- checkmate::makeAssertCollection()
-    aapply(checkmate::assertFlag, . ~ neutralized + perSet, fixed = list(add = ac))
+    checkmate::assertString(groupName, min.chars = 1, add = ac)
+    checkmate::assertString(analysis, min.chars = 1, null.ok = TRUE, add = ac)
+    checkmate::assertChoice(MSLevel, 1:2, add = ac)
+    assertXYLim(xlim, ylim, add = ac)
+    aapply(checkmate::assertFlag, . ~ useGGPlot2 + neutralized + perSet, fixed = list(add = ac))
     assertSets(obj, sets, add = ac)
     checkmate::reportAssertions(ac)
     
     if (!is.null(sets) && length(sets) > 0)
         obj <- obj[, sets = sets]
     
-    if (!perSet)
+    mySets <- get("sets", pos = 2)(obj)
+    
+    if (!perSet || length(mySets) == 1 || !is.null(analysis))
     {
         if (!neutralized)
             obj <- ionize(obj)
-        return(plotSpec(obj, ...)) # UNDONE
+        return(callNextMethod(obj, groupName, analysis, MSLevel, title, useGGPlot2, xlim, ylim, ...))
     }
     
-    # - normalize intensities
-    # - plot either top/bottom or overlaid, with colours per set
+    specs <- lapply(obj@setObjects, getSpec, groupName = groupName, MSLevel = MSLevel, analysis = NULL)
+    names(specs) <- mySets
+    specs <- pruneList(specs)
+    if (length(specs) == 0)
+        return(NULL)
+    
+    specs <- lapply(specs, function(sp) { sp <- copy(sp); sp[, intensity := normalize(intensity, FALSE)]; return(sp) })
+    specComb <- rbindlist(specs, idcol = "mergedBy")
+    setorderv(specComb, "mz")
+
+    if (is.null(title))
+        title <- getMSPeakListPlotTitle(MSLevel, analysis, groupName)
+    
+    if (mirror && length(mySets) == 2)    
+    {
+        specComb[mergedBy == mySets[2], intensity := -intensity]
+        if (is.null(ylim))
+            ylim <- c(-1, 1)
+    }
+    
+    plotData <- getMSPlotData(specComb, 1)
+    ticks <- pretty(c(-specComb$intensity, specComb$intensity))
+    if (useGGPlot2)
+    {
+        return(makeMSPlotGG(plotData) + ggtitle(title) +
+                   ggplot2::scale_y_continuous(labels = abs(ticks)))
+    }
+    
+    makeMSPlot(plotData, xlim, ylim, ylab = "Normalized intensity",
+               main = title, yaxt = "n", ...)
+    axis(2, at = ticks, labels = abs(ticks))
 })
 
 generateMSPeakListsSet <- function(fGroupsSet, generator, ..., avgSetParams)

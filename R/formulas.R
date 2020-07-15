@@ -592,9 +592,9 @@ setMethod("plotSpectrum", "formulas", function(obj, precursor, groupName, analys
         return(NULL)
 
     if (useGGPlot2)
-        return(makeMSPlotGG(spec) + ggtitle(title))
+        return(makeMSPlotGG(getMSPlotData(spec, 2)) + ggtitle(title))
 
-    makeMSPlot(spec, xlim, ylim, ..., main = title)
+    makeMSPlot(getMSPlotData(spec, 2), xlim, ylim, ..., main = title)
 })
 
 setMethod("plotSpectrumHash", "formulas", function(obj, precursor, groupName, analysis = NULL, MSPeakLists,

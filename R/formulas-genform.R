@@ -390,7 +390,7 @@ generateFormulasGenForm <- function(fGroups, MSPeakLists, relMzDev = 5, adduct =
         formTable <- pruneList(formTable, TRUE)
 
         if (length(formTable) > 0)
-            groupFormulas <- generateGroupFormulasByConsensus(formTable, featThreshold, gNames)
+            groupFormulas <- generateGroupFormulasByConsensus(formTable, featThreshold, gNames, "analysis", "anaCoverage")
         else
             groupFormulas <- list()
     }

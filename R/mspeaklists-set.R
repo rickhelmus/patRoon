@@ -24,13 +24,13 @@ ionizeMSPeakList <- function(pl, adduct, ionize)
     return(pl)
 }
 
-syncMSPeakListsSetObjects <- function(MSPeakListsSet, analyses, gNames, reAverage)
+syncMSPeakListsSetObjects <- function(MSPeakListsSet, i, j, reAverage)
 {
     args <- list(reAverage = reAverage)
-    if (!is.null(analyses))
-        args <- c(args, list(i = analyses))
-    if (!is.null(gNames))
-        args <- c(args, list(j = gNames))
+    if (!is.null(i))
+        args <- c(args, list(i = i))
+    if (!is.null(j))
+        args <- c(args, list(j = j))
     
     # NOTE: assume that subsetting with non-existing i/j will not result in errors
     MSPeakListsSet@setObjects <- lapply(MSPeakListsSet@setObjects, function(o) do.call("[", args = c(list(x = o), args)))
@@ -63,7 +63,7 @@ setMethod("initialize", "MSPeakListsSet",
 setMethod("sets", "MSPeakListsSet", function(obj) names(obj@setObjects))
 setMethod("adducts", "MSPeakListsSet", function(obj) obj@adducts)
 
-#' @describeIn features Get analysis information
+#' @describeIn MSPeakListsSet Get analysis information
 #' @return \code{analysisInfo}: A \code{data.frame} containing a column with
 #'   analysis name (\code{analysis}), its path (\code{path}), and other columns
 #'   such as replicate group name (\code{group}) and blank reference

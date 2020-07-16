@@ -49,6 +49,10 @@
 - filter() for features/fGroups: support ionized masses for mass filters? or just clarify it doesn't.
 - handle/test empty objects
 - more descriptive messages what's going on with all the avaraging of MSPeakLists
+- --> does it make sense to keep neutralized MS(/MS) peaklists? radicals are a problem here. Perhaps just force sets specifier when accessing peaklists (unless all adducts are equal)?
+- annotatedPeakList: force sets specifier and always use ionized peaklists?
+- don't neutralize fragInfo for formulas/compounds?
+- maybe keep neutralization for annotation objects but clearly document they may not always make sense and should be used with care. In any case, it shouldn't be used with e.g. reporting in patRoon
 
 
 ## features

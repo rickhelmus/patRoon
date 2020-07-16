@@ -82,11 +82,14 @@ setMethod("export", "featureGroupsSet", function(obj, type, out, sets = NULL) ca
 #'   the analysis information or when less than two concentrations are specified
 #'   (\emph{i.e.} the minimum amount).
 #' @export
-setMethod("as.data.table", "featureGroupsSet", function(x, neutralized = TRUE, sets = NULL, features = FALSE, ...)
+setMethod("as.data.table", "featureGroupsSet", function(x, ..., neutralized = TRUE, sets = NULL)
 {
     # UNDONE: also support reporting ionized features with different adducts?
     
-    assertSets(x, sets)
+    ac <- checkmate::makeAssertCollection()
+    aapply(checkmate::assertFlag, . ~ neutralized, fixed = list(add = ac))
+    assertSets(x, sets, add = ac)
+    checkmate::reportAssertions(ac)
     
     if (!is.null(sets) && length(sets) > 0)
         x <- x[, sets = sets]
@@ -95,9 +98,9 @@ setMethod("as.data.table", "featureGroupsSet", function(x, neutralized = TRUE, s
     if (!neutralized)
         x <- ionize(x)
     
-    ret <- callNextMethod(x, features = features, ...)
+    ret <- callNextMethod(x, ...)
     
-    if (features) # add set column
+    if (!is.null(ret[["analysis"]])) # add set column if feature data is present
     {
         ret[, set := anaInfo[match(analysis, anaInfo$analysis), "set"]]
         setcolorder(ret, c("group", "group_ret", "group_mz", "set", "analysis"))
@@ -106,11 +109,11 @@ setMethod("as.data.table", "featureGroupsSet", function(x, neutralized = TRUE, s
     return(ret[])
 })
 
-setMethod("filter", "featureGroupsSet", function(obj, ..., sets = NULL, negate = FALSE)
+setMethod("filter", "featureGroupsSet", function(obj, ..., negate = FALSE, sets = NULL)
 {
     ac <- checkmate::makeAssertCollection()
-    assertSets(obj, sets, add = ac)
     checkmate::assertFlag(negate, add = ac)
+    assertSets(obj, sets, add = ac)
     checkmate::reportAssertions(ac)
 
     if (!is.null(sets) && length(sets) > 0)
@@ -120,28 +123,31 @@ setMethod("filter", "featureGroupsSet", function(obj, ..., sets = NULL, negate =
         obj <- obj[, sets = sets]
     }
 
-    if (length(list(...)) > 0)
+    if (...length() > 0)
         return(callNextMethod(obj, ..., negate = negate))
     return(obj)
 })
 
 #' @export
-setMethod("plotEIC", "featureGroupsSet", function(obj, ..., retMin = FALSE, title = NULL)
+setMethod("plotEIC", "featureGroupsSet", function(obj, ...)
 {
-    ac <- checkmate::makeAssertCollection()
-    checkmate::assertFlag(retMin, add = ac)
-    checkmate::assertString(title, null.ok = TRUE, add = ac)
-    checkmate::reportAssertions(ac)
+    # UNDONE: find a neat way to keep both argument order and also override title if not specified
     
-    if (is.null(title) && length(obj) == 1)
-    {
-        # override default title
-        gInfo <- groupInfo(obj)
-        title <- sprintf("Group '%s'\nrt: %.1f - neutralized mass: %.4f", names(obj)[1],
-                         if (retMin) gInfo[1, "rts"] / 60 else gInfo[1, "rts"],
-                         gInfo[1, "mzs"])
-    }
-    callNextMethod(obj, ..., retMin = retMin, title = title)
+    # ac <- checkmate::makeAssertCollection()
+    # checkmate::assertFlag(retMin, add = ac)
+    # checkmate::assertString(title, null.ok = TRUE, add = ac)
+    # checkmate::reportAssertions(ac)
+    # 
+    # if (is.null(title) && length(obj) == 1)
+    # {
+    #     # override default title
+    #     gInfo <- groupInfo(obj)
+    #     title <- sprintf("Group '%s'\nrt: %.1f - neutralized mass: %.4f", names(obj)[1],
+    #                      if (retMin) gInfo[1, "rts"] / 60 else gInfo[1, "rts"],
+    #                      gInfo[1, "mzs"])
+    # }
+    
+    callNextMethod(obj, ...)
 })
 
 setMethod("groupFeatures", "featuresSet", function(feat, algorithm, ..., verbose = TRUE)

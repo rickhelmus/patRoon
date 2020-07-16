@@ -228,11 +228,11 @@ setMethod("as.data.table", "MSPeakListsSet", function(x, fGroups = NULL, average
 })
 
 #' @export
-setMethod("filter", "MSPeakListsSet", function(obj, ..., sets = NULL, negate = FALSE)
+setMethod("filter", "MSPeakListsSet", function(obj, ..., negate = FALSE, sets = NULL)
 {
     ac <- checkmate::makeAssertCollection()
-    assertSets(obj, sets, add = ac)
     checkmate::assertFlag(negate, add = ac)
+    assertSets(obj, sets, add = ac)
     checkmate::reportAssertions(ac)
     
     if (!is.null(sets) && length(sets) > 0)

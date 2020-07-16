@@ -48,6 +48,7 @@
 - find nice way to re-use docs
 - filter() for features/fGroups: support ionized masses for mass filters? or just clarify it doesn't.
 - handle/test empty objects
+- more descriptive messages what's going on with all the avaraging of MSPeakLists
 
 
 ## features

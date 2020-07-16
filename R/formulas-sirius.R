@@ -123,7 +123,8 @@ generateFormulasSIRIUS <- function(fGroups, MSPeakLists, relMzDev = 5, adduct = 
         if (length(formTable) > 0)
         {
             formTable <- lapply(formTable, pruneList, checkZeroRows = TRUE)
-            groupFormulas <- generateGroupFormulasByConsensus(formTable, featThreshold, gNames)
+            groupFormulas <- generateGroupFormulasByConsensus(formTable, featThreshold, gNames,
+                                                              "analysis", "anaCoverage")
         }
         else
             groupFormulas <- list()

@@ -248,7 +248,7 @@ generateFormulasDA <- function(fGroups, precursorMzSearchWindow = 0.002, MSMode 
     fTable <- pruneList(sapply(fTable, function(ft) ft[sapply(ft, nrow) > 0], simplify = FALSE), TRUE)
 
     if (length(fTable) > 0)
-        groupFormulas <- generateGroupFormulasByConsensus(fTable, featThreshold, gNames)
+        groupFormulas <- generateGroupFormulasByConsensus(fTable, featThreshold, gNames, "analysis", "anaCoverage")
     else
         groupFormulas <- list()
 

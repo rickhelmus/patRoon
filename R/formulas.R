@@ -473,15 +473,11 @@ setMethod("annotatedPeakList", "formulas", function(obj, precursor, groupName, a
     formTable <- formTable[byMSMS == TRUE & formula == precursor]
     if (nrow(formTable) > 0)
     {
-        formTable <- formTable[formula == precursor]
-        if (nrow(formTable) > 0)
-        {
-            fragInfo <- getFragmentInfoFromForms(spec, formTable)
-            spec <- copy(spec)
-            spec[, PLIndex := seq_len(nrow(spec))] # for merging
-            spec <- merge(spec, fragInfo[, -c("intensity", "mz")], all.x = TRUE, by = "PLIndex")
-            spec <- spec[, PLIndex := NULL]
-        }
+        fragInfo <- getFragmentInfoFromForms(spec, formTable)
+        spec <- copy(spec)
+        spec[, PLIndex := seq_len(nrow(spec))] # for merging
+        spec <- merge(spec, fragInfo[, -c("intensity", "mz")], all.x = TRUE, by = "PLIndex")
+        spec <- spec[, PLIndex := NULL]
     }
 
     if (onlyAnnotated)

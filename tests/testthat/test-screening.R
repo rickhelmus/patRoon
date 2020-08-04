@@ -74,8 +74,12 @@ if (hasMF)
     
     scrAnnFrag <- copy(scrAnn)
     scrAnnFrag[name == "1H-benzotriazole", fragments_mz := "92.0495"] # UNDONE: add qualifiers to patRoonData?
+    scrAnnFragForm <- copy(scrAnn)
+    scrAnnFragForm[name == "1H-benzotriazole", fragments_formula := "C6H5N"] # UNDONE: add qualifiers to patRoonData?
     annFrag <- annotateSuspectList(scrAnnFrag[, -"d_rt"], fGroupsAnn, MSPeakLists = plists)
     annFragRT <- annotateSuspectList(scrAnnFrag, fGroupsAnn, MSPeakLists = plists)
+    annFragForm <- annotateSuspectList(scrAnnFragForm[, -"d_rt"], fGroupsAnn, MSPeakLists = plists, compounds = compsMF,
+                                       IDLevelRules = defaultIDLevelRules(exLevels = "3a|c"))
 }
 
 minIDLevel <- function(l) min(as.integer(gsub("[[:alpha:]]*", "", l)))
@@ -86,6 +90,7 @@ test_that("Suspect annotation works", {
     expect_equal(minIDLevel(annOnlyForms$estIDLevel), 4)
     expect_equal(minIDLevel(annMF$estIDLevel), 3)
     expect_equal(minIDLevel(annFrag$estIDLevel), 3)
+    expect_equal(minIDLevel(annFragForm$estIDLevel), 3)
     expect_equal(minIDLevel(annMoNa$estIDLevel), 2)
     expect_equal(minIDLevel(annFragRT$estIDLevel), 1)
 })

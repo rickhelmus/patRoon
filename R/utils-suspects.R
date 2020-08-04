@@ -19,7 +19,10 @@ convertSuspDataIfNeeded <- function(scr, destFormat, destCol, fromFormats, fromC
             doConv <- function(inp, f) babelConvert(inp, f, destFormat, mustWork = FALSE)
         
         for (i in seq_along(fromFormats))
-            scr[missingInScr(destCol) & !missingInScr(fromCols[i]), (destCol) := doConv(get(fromCols[i]), fromFormats[i])]
+        {
+            if (!is.null(scr[[fromCols[i]]]))
+                scr[missingInScr(destCol) & !missingInScr(fromCols[i]), (destCol) := doConv(get(fromCols[i]), fromFormats[i])]
+        }
      
         newEntryCount <- countEntries() - curEntryCount
         printf("Done! Filled in %d (%.1f) entries.\n", newEntryCount,

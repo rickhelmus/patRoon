@@ -176,8 +176,8 @@ expect_reportHTML <- function(object)
 expect_equal_scr <- function(object, expected, ...)
 {
     act <- quasi_label(rlang::enquo(object))
-    rmCols <- c("InChI", "SMILES", "neutralMass", "formula", "adduct")
-    expect(isTRUE(all.equal(object[, setdiff(names(object), rmCols)], expected[, setdiff(names(expected), rmCols)], ...)),
+    rmCols <- c("InChI", "InChIKey", "SMILES", "neutralMass", "formula", "adduct")
+    expect(isTRUE(all.equal(object[, setdiff(names(object), rmCols), with = FALSE], expected[, setdiff(names(expected), rmCols), with = FALSE], ...)),
            "screening results differ")
     invisible(act$val)
 }

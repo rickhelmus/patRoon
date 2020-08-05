@@ -2,17 +2,15 @@
 #' @include mspeaklists.R
 NULL
 
-ionizeMSPeakList <- function(pl, adduct, ionize)
+neutralizeMSPeakList <- function(pl, adduct)
 {
     adductMZ <- adductMZDelta(adduct)
 
     adjPL <- function(x)
     {
         x <- copy(x)
-        if (ionize)
-            x[, mz := mz + adductMZ]
-        else
-            x[, mz := mz - adductMZ]
+        x[, mz := mz - adductMZ]
+        x[, intensity := normalize(intensity, FALSE)]
         return(x)
     }
     
@@ -315,9 +313,12 @@ setMethod("plotSpec", "MSPeakListsSet", function(obj, groupName, analysis = NULL
     axis(2, at = ticks, labels = abs(ticks))
 })
 
-generateMSPeakListsSet <- function(fGroupsSet, generator, ..., avgSetParams)
+generateMSPeakListsSet <- function(fGroupsSet, generator, ..., avgSetParams,
+                                   neutralizeByCharge)
 {
-    assertAvgPListParams(avgSetParams) # UNDONE: move?
+    # UNDONE: move?
+    assertAvgPListParams(avgSetParams)
+    checkmate::assertChoice(neutralizeByCharge, c("none", "ms", "msms", "both"))
     
     # ionize all sets
     # calculate MS peak lists for each set
@@ -330,8 +331,8 @@ generateMSPeakListsSet <- function(fGroupsSet, generator, ..., avgSetParams)
     
     neutralizedMSPL <- mapply(ionizedMSPeakLists, adducts(fGroupsSet), FUN = function(pl, add)
     {
-        pl@peakLists <- lapply(pl@peakLists, lapply, ionizeMSPeakList, adduct = add, ionize = FALSE)
-        pl@averagedPeakLists <- lapply(pl@averagedPeakLists, ionizeMSPeakList, adduct = add, ionize = FALSE)
+        pl@peakLists <- lapply(pl@peakLists, lapply, neutralizeMSPeakList, adduct = add)
+        pl@averagedPeakLists <- lapply(pl@averagedPeakLists, neutralizeMSPeakList, adduct = add)
         return(pl)
     }, SIMPLIFY = FALSE, USE.NAMES = TRUE)
     
@@ -347,10 +348,8 @@ generateMSPeakListsSet <- function(fGroupsSet, generator, ..., avgSetParams)
     
     if (allSame(adducts(ret)))
     {
-        # ionize averaged combined spectra if all adducts are the same
-        ret@ionizedAveragedPeakLists <- sapply(ret@averagedPeakLists, ionizeMSPeakList,
-                                               adduct = adducts(fGroupsSet)[[1]], ionize = TRUE,
-                                               simplify = FALSE)
+        # average ionized spectra if all adducts are the same
+        ret@ionizedAveragedPeakLists <- do.call(averageMSPeakLists, c(list(combPLIon, ret@origFGNames), avgSetParams))
     }
     
     return(ret)

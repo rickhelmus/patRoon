@@ -2,24 +2,6 @@
 #' @include mspeaklists.R
 NULL
 
-neutralizeMSPeakList <- function(pl, adductMS, adductMSMS)
-{
-    adjPL <- function(x, a)
-    {
-        x <- copy(x)
-        x[, mz := mz - adductMZDelta(a)]
-        x[, intensity := normalize(intensity, FALSE)]
-        return(x)
-    }
-    
-    if (!is.null(pl[["MS"]]))
-        pl$MS <- adjPL(pl$MS, adductMS)
-    if (!is.null(pl[["MSMS"]]))
-        pl$MSMS <- adjPL(pl$MSMS, adductMSMS)
-    
-    return(pl)
-}
-
 syncMSPeakListsSetObjects <- function(MSPeakListsSet, i, j, reAverage)
 {
     args <- list(reAverage = reAverage)
@@ -31,30 +13,49 @@ syncMSPeakListsSetObjects <- function(MSPeakListsSet, i, j, reAverage)
     # NOTE: assume that subsetting with non-existing i/j will not result in errors
     MSPeakListsSet@setObjects <- lapply(MSPeakListsSet@setObjects, function(o) do.call("[", args = c(list(x = o), args)))
     MSPeakListsSet@setObjects <- pruneList(MSPeakListsSet@setObjects, checkEmptyElements = TRUE)
-    
-    # re-generate
-    MSPeakListsSet@ionizedPeakLists <- Reduce(modifyList, lapply(MSPeakListsSet@setObjects, peakLists))
-    
     MSPeakListsSet@adducts <- MSPeakListsSet@adducts[names(MSPeakListsSet@setObjects)] # in case sets were removed
-    
-    # average ionized if (now) possible
-    if (allSame(adducts(MSPeakListsSet)))
-        MSPeakListsSet@ionizedAveragedPeakLists <- do.call(averageMSPeakLists,
-                                                           c(list(MSPeakListsSet@ionizedPeakLists,
-                                                                  MSPeakListsSet@origFGNames),
-                                                             MSPeakListsSet@avgPeakListArgs))
     
     return(MSPeakListsSet)
 }
 
 #' @export
 MSPeakListsSet <- setClass("MSPeakListsSet",
-                           slots = c(adducts = "list", setObjects = "list", ionizedPeakLists = "list",
-                                     ionizedAveragedPeakLists = "list", analysisInfo = "data.frame"),
+                           slots = c(adducts = "list", setObjects = "list", analysisInfo = "data.frame"),
                            contains = "MSPeakLists")
 
 setMethod("initialize", "MSPeakListsSet",
           function(.Object, ...) callNextMethod(.Object, algorithm = "set", ...))
+
+setMethod("averageMSPeakLists", "MSPeakListsSet", function(obj)
+{
+    # create 'averaged' peak lists by simply merging the averaged lists from the setObjects
+    
+    cat("Merging set-averaged peak lists...\n")
+
+    hash <- makeHash(lapply(obj@setObjects, averagedPeakLists))
+    avgPLists <- loadCacheData("MSPeakListsSetAvg", hash)
+    
+    gNames <- unique(unlist(sapply(obj@setObjects, groupNames, simplify = FALSE), use.names = FALSE))
+    gNames <- intersect(obj@origFGNames, gNames) # sort to original order
+    
+    if (length(gNames) == 0)
+        avgPLists <- list()
+    else if (is.null(avgPLists))
+    {
+        avgPLists <- sapply(gNames, function(gName)
+        {
+            PLMS <- rbindlist(pruneList(lapply(obj@setObjects, function(mspl) mspl[[gName]][["MS"]])), idcol = "set")
+            PLMSMS <- rbindlist(pruneList(lapply(obj@setObjects, function(mspl) mspl[[gName]][["MSMS"]])), idcol = "set")
+            return(list(MS = PLMS, MSMS = PLMSMS))
+        }, simplify = FALSE)
+        saveCacheData("MSPeakListsSetAvg", avgPLists, hash)
+    }
+
+    cat("Done!\n")
+    
+    return(avgPLists)
+})
+
 
 setMethod("sets", "MSPeakListsSet", function(obj) names(obj@setObjects))
 setMethod("adducts", "MSPeakListsSet", function(obj) obj@adducts)
@@ -92,20 +93,12 @@ setMethod("show", "MSPeakListsSet", function(object)
 #'
 #' @aliases peakLists
 #' @export
-setMethod("peakLists", "MSPeakListsSet", function(obj, neutralized = TRUE, sets = NULL)
+setMethod("peakLists", "MSPeakListsSet", function(obj, sets = NULL)
 {
-    ac <- checkmate::makeAssertCollection()
-    checkmate::assertFlag(neutralized, add = ac)
-    assertSets(obj, sets, add = ac)
-    checkmate::reportAssertions(ac)
-    
+    assertSets(obj, sets)
     if (!is.null(sets) && length(sets) > 0)
         obj <- obj[, sets = sets]
-    
-    if (neutralized)
-        return(callNextMethod(obj))
-    
-    return(obj@ionizedPeakLists)
+    return(callNextMethod(obj))
 })
 
 #' @describeIn MSPeakListsSet Accessor method to obtain the feature group averaged
@@ -114,22 +107,12 @@ setMethod("peakLists", "MSPeakListsSet", function(obj, neutralized = TRUE, sets 
 #'   averaged peak lists in a similar format as \code{peakLists}.
 #' @aliases averagedPeakLists
 #' @export
-setMethod("averagedPeakLists", "MSPeakListsSet", function(obj, neutralized = TRUE, sets = NULL)
+setMethod("averagedPeakLists", "MSPeakListsSet", function(obj, sets = NULL)
 {
-    ac <- checkmate::makeAssertCollection()
-    checkmate::assertFlag(neutralized, add = ac)
-    assertSets(obj, sets, add = ac)
-    checkmate::reportAssertions(ac)
-    
+    assertSets(obj, sets)
     if (!is.null(sets) && length(sets) > 0)
         obj <- obj[, sets = sets]
-    
-    if (neutralized)
-        return(callNextMethod(obj))
-    
-    assertEqualAdducts(adducts(obj))
-    
-    return(obj@ionizedAveragedPeakLists)
+    return(callNextMethod(obj))
 })
 
 #' @describeIn MSPeakListsSet Subset on analyses/feature groups.
@@ -158,31 +141,6 @@ setMethod("[", c("MSPeakListsSet", "ANY", "ANY", "missing"), function(x, i, j, .
     return(x)
 })
 
-#' @describeIn MSPeakListsSet Extract a list with MS and MS/MS (if available) peak
-#'   lists. If the second argument (\code{j}) is not specified the averaged peak
-#'   lists for the group specified by the first argument (\code{i}) will be
-#'   returned.
-#' @export
-setMethod("[[", c("MSPeakListsSet", "ANY", "ANY"), function(x, i, j, neutralized = TRUE)
-{
-    ac <- checkmate::makeAssertCollection()
-    assertExtractArg(i, add = ac)
-    if (!missing(j))
-        assertExtractArg(j, add = ac)
-    checkmate::assertFlag(neutralized, add = ac)
-    checkmate::reportAssertions(ac)
-    
-    if (!neutralized && missing(j))
-        assertEqualAdducts(adducts(x))
-    
-    if (neutralized)
-        return(callNextMethod(x, i, j))
-    
-    if (!missing(j))
-        return(ionize(x)[[i, j]])
-    return(ionize(x)[[i]])
-})
-
 #' @describeIn MSPeakListsSet Returns all MS peak list data in a table.
 #'
 #' @param averaged If \code{TRUE} then feature group averaged peak list data is
@@ -191,31 +149,22 @@ setMethod("[[", c("MSPeakListsSet", "ANY", "ANY"), function(x, i, j, neutralized
 #' @template as_data_table-args
 #'
 #' @export
-setMethod("as.data.table", "MSPeakListsSet", function(x, fGroups = NULL, averaged = TRUE,
-                                                      neutralized = TRUE, sets = NULL)
+setMethod("as.data.table", "MSPeakListsSet", function(x, fGroups = NULL, averaged = TRUE, sets = NULL)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroupsSet", null.ok = TRUE, add = ac)
     checkmate::assertFlag(averaged, add = ac)
-    checkmate::assertFlag(neutralized, add = ac)
     assertSets(x, sets, add = ac)
     checkmate::reportAssertions(ac)
     
     if (!is.null(sets) && length(sets) > 0)
         x <- x[, sets = sets]
     
-    anaInfo <- analysisInfo(x) # get before ionizing    
-    if (!neutralized)
-    {
-        x <- ionize(x)
-        if (!is.null(fGroups))
-            fGroups <- ionize(fGroups)
-    }
-    
     ret <- callNextMethod(x, fGroups = fGroups, averaged = averaged)
     
     if (!averaged) # add set column
     {
+        anaInfo <- analysisInfo(x)
         ret[, set := anaInfo[match(analysis, anaInfo$analysis), "set"]]
         setcolorder(ret, "set")
     }
@@ -254,7 +203,7 @@ setMethod("filter", "MSPeakListsSet", function(obj, ..., negate = FALSE, sets = 
 #' @export
 setMethod("plotSpec", "MSPeakListsSet", function(obj, groupName, analysis = NULL, MSLevel = 1, title = NULL,
                                                  useGGPlot2 = FALSE, xlim = NULL, ylim = NULL,
-                                                 neutralized = TRUE, sets = NULL, perSet = FALSE,
+                                                 sets = NULL, perSet = FALSE,
                                                  mirror = TRUE, ...)
 {
     ac <- checkmate::makeAssertCollection()
@@ -262,12 +211,9 @@ setMethod("plotSpec", "MSPeakListsSet", function(obj, groupName, analysis = NULL
     checkmate::assertString(analysis, min.chars = 1, null.ok = TRUE, add = ac)
     checkmate::assertChoice(MSLevel, 1:2, add = ac)
     assertXYLim(xlim, ylim, add = ac)
-    aapply(checkmate::assertFlag, . ~ useGGPlot2 + neutralized + perSet, fixed = list(add = ac))
+    aapply(checkmate::assertFlag, . ~ useGGPlot2 + perSet, fixed = list(add = ac))
     assertSets(obj, sets, add = ac)
     checkmate::reportAssertions(ac)
-    
-    if (neutralized && perSet)
-        stop("perSet cannot be TRUE for neutralized spectra")
     
     if (!is.null(sets) && length(sets) > 0)
         obj <- obj[, sets = sets]
@@ -275,11 +221,7 @@ setMethod("plotSpec", "MSPeakListsSet", function(obj, groupName, analysis = NULL
     mySets <- get("sets", pos = 2)(obj)
     
     if (!perSet || length(mySets) == 1 || !is.null(analysis))
-    {
-        if (!neutralized)
-            obj <- ionize(obj)
         return(callNextMethod(obj, groupName, analysis, MSLevel, title, useGGPlot2, xlim, ylim, ...))
-    }
     
     specs <- lapply(obj@setObjects, getSpec, groupName = groupName, MSLevel = MSLevel, analysis = NULL)
     names(specs) <- mySets
@@ -287,22 +229,27 @@ setMethod("plotSpec", "MSPeakListsSet", function(obj, groupName, analysis = NULL
     if (length(specs) == 0)
         return(NULL)
     
-    specs <- lapply(specs, function(sp) { sp <- copy(sp); sp[, intensity := normalize(intensity, FALSE)]; return(sp) })
-    specComb <- rbindlist(specs, idcol = "mergedBy")
-    setorderv(specComb, "mz")
+    spec <- getSpec(obj, groupName, MSLevel, NULL)
+    if (is.null(spec))
+        return(NULL)
+    spec <- copy(spec)
+    # UNDONE: provide normalize functionality elsewhere?
+    spec[, intensity := normalize(intensity, minMax = FALSE), by = "set"]
+    setnames(spec, "set", "mergedBy") # to get labelling
+    setorderv(spec, "mz")
 
     if (is.null(title))
         title <- getMSPeakListPlotTitle(MSLevel, analysis, groupName)
     
     if (mirror && length(mySets) == 2)    
     {
-        specComb[mergedBy == mySets[2], intensity := -intensity]
+        spec[mergedBy == mySets[2], intensity := -intensity]
         if (is.null(ylim))
             ylim <- c(-1, 1)
     }
     
-    plotData <- getMSPlotData(specComb, 1)
-    ticks <- pretty(c(-specComb$intensity, specComb$intensity))
+    plotData <- getMSPlotData(spec, 1)
+    ticks <- pretty(c(-spec$intensity, spec$intensity))
     if (useGGPlot2)
     {
         return(makeMSPlotGG(plotData) + ggtitle(title) +
@@ -314,50 +261,23 @@ setMethod("plotSpec", "MSPeakListsSet", function(obj, groupName, analysis = NULL
     axis(2, at = ticks, labels = abs(ticks))
 })
 
-generateMSPeakListsSet <- function(fGroupsSet, generator, ..., avgSetParams,
-                                   neutralizeByCharge)
+generateMSPeakListsSet <- function(fGroupsSet, generator, ...)
 {
-    # UNDONE: move?
-    assertAvgPListParams(avgSetParams)
-    checkmate::assertChoice(neutralizeByCharge, c("none", "ms", "msms", "both"))
-    
-    # ionize all sets
-    # calculate MS peak lists for each set
-    # store set results in setObjects
-    # store combined ionized results in ionizedPeakLists/ionizedAveragedPeakLists
-    # store combined neutralized results in peakLists/averagedPeakLists
+    # ionize all fGroups sets, calculate MS peak lists for each set and store in setObjects
+    # store combined ionized results in peakLists
+    # store merged averaged peak lists in averagedPeakLists
     
     ionizedFGroupsList <- sapply(sets(fGroupsSet), ionize, obj = fGroupsSet, simplify = FALSE)
     ionizedMSPeakLists <- sapply(ionizedFGroupsList, generator, ..., simplify = FALSE)
     
-    adductsMS <- adductsMSMS <- adducts(fGroupsSet)
-    if (neutralizeByCharge == "ms" || neutralizeByCharge == "both")
-        adductsMS <- lapply(adductsMS, function(a) adduct(charge = a@charge))
-    if (neutralizeByCharge == "msms" || neutralizeByCharge == "both")
-        adductsMSMS <- lapply(adductsMSMS, function(a) adduct(charge = a@charge))
-    
-    neutralizedMSPL <- mapply(ionizedMSPeakLists, adductsMS, adductsMSMS, FUN = function(pl, addMS, addMSMS)
-    {
-        pl@peakLists <- lapply(pl@peakLists, lapply, neutralizeMSPeakList, adductMS = addMS, adductMSMS = addMSMS)
-        pl@averagedPeakLists <- lapply(pl@averagedPeakLists, neutralizeMSPeakList, adductMS = addMS, adductMSMS = addMSMS)
-        return(pl)
-    }, SIMPLIFY = FALSE, USE.NAMES = TRUE)
-    
-    # combine (neutralized) MSPeakLists
-    combPL <- Reduce(modifyList, lapply(neutralizedMSPL, peakLists))
-    combPLIon <- Reduce(modifyList, lapply(ionizedMSPeakLists, peakLists))
-    
+    # combine non averaged (per analysis) MSPeakLists
+    combPL <- Reduce(modifyList, lapply(ionizedMSPeakLists, peakLists))
+
     # UNDONE: set metadata?
     ret <- MSPeakListsSet(adducts = adducts(fGroupsSet), setObjects = ionizedMSPeakLists,
-                          ionizedPeakLists = combPLIon, analysisInfo = analysisInfo(fGroupsSet),
-                          peakLists = combPL, metadata = list(), avgPeakListArgs = avgSetParams,
+                          analysisInfo = analysisInfo(fGroupsSet),
+                          peakLists = combPL, metadata = list(),
                           origFGNames = names(fGroupsSet))
-    
-    if (allSame(adducts(ret)))
-    {
-        # average ionized spectra if all adducts are the same
-        ret@ionizedAveragedPeakLists <- do.call(averageMSPeakLists, c(list(combPLIon, ret@origFGNames), avgSetParams))
-    }
     
     return(ret)
 }
@@ -372,9 +292,8 @@ setMethod("ionize", "MSPeakListsSet", function(obj, sets)
     
     assertEqualAdducts(adducts(obj))
     
-    return(MSPeakListsSetIonized(peakLists = obj@ionizedPeakLists,
-                                 averagedPeakLists = obj@ionizedAveragedPeakLists,
-                                 metadata = list(), avgPeakListArgs = obj@avgPeakListArgs,
+    avArgs <- if (length(obj@setObjects) > 0) obj@setObjects[[1]]@avgPeakListArgs else list()
+    return(MSPeakListsSetIonized(peakLists = obj@peakLists, metadata = list(), avgPeakListArgs = avArgs,
                                  origFGNames = obj@origFGNames))
 })
 

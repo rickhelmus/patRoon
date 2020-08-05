@@ -2,22 +2,20 @@
 #' @include mspeaklists.R
 NULL
 
-neutralizeMSPeakList <- function(pl, adduct)
+neutralizeMSPeakList <- function(pl, adductMS, adductMSMS)
 {
-    adductMZ <- adductMZDelta(adduct)
-
-    adjPL <- function(x)
+    adjPL <- function(x, a)
     {
         x <- copy(x)
-        x[, mz := mz - adductMZ]
+        x[, mz := mz - adductMZDelta(a)]
         x[, intensity := normalize(intensity, FALSE)]
         return(x)
     }
     
     if (!is.null(pl[["MS"]]))
-        pl$MS <- adjPL(pl$MS)
+        pl$MS <- adjPL(pl$MS, adductMS)
     if (!is.null(pl[["MSMS"]]))
-        pl$MSMS <- adjPL(pl$MSMS)
+        pl$MSMS <- adjPL(pl$MSMS, adductMSMS)
     
     return(pl)
 }
@@ -332,10 +330,16 @@ generateMSPeakListsSet <- function(fGroupsSet, generator, ..., avgSetParams,
     ionizedFGroupsList <- sapply(sets(fGroupsSet), ionize, obj = fGroupsSet, simplify = FALSE)
     ionizedMSPeakLists <- sapply(ionizedFGroupsList, generator, ..., simplify = FALSE)
     
-    neutralizedMSPL <- mapply(ionizedMSPeakLists, adducts(fGroupsSet), FUN = function(pl, add)
+    adductsMS <- adductsMSMS <- adducts(fGroupsSet)
+    if (neutralizeByCharge == "ms" || neutralizeByCharge == "both")
+        adductsMS <- lapply(adductsMS, function(a) adduct(charge = a@charge))
+    if (neutralizeByCharge == "msms" || neutralizeByCharge == "both")
+        adductsMSMS <- lapply(adductsMSMS, function(a) adduct(charge = a@charge))
+    
+    neutralizedMSPL <- mapply(ionizedMSPeakLists, adductsMS, adductsMSMS, FUN = function(pl, addMS, addMSMS)
     {
-        pl@peakLists <- lapply(pl@peakLists, lapply, neutralizeMSPeakList, adduct = add)
-        pl@averagedPeakLists <- lapply(pl@averagedPeakLists, neutralizeMSPeakList, adduct = add)
+        pl@peakLists <- lapply(pl@peakLists, lapply, neutralizeMSPeakList, adductMS = addMS, adductMSMS = addMSMS)
+        pl@averagedPeakLists <- lapply(pl@averagedPeakLists, neutralizeMSPeakList, adductMS = addMS, adductMSMS = addMSMS)
         return(pl)
     }, SIMPLIFY = FALSE, USE.NAMES = TRUE)
     

@@ -147,7 +147,9 @@ setMethod("generateMSPeakListsMzR", "featureGroups", function(fGroups, maxMSRtWi
 })
 
 setMethod("generateMSPeakListsMzR", "featureGroupsSet", function(fGroups, ...,
-                                                                 avgSetParams = getDefAvgPListParams())
+                                                                 avgSetParams = getDefAvgPListParams(),
+                                                                 neutralizeByCharge = "msms")
 {
-    generateMSPeakListsSet(fGroups, generateMSPeakListsMzR, ..., avgSetParams = avgSetParams)
+    generateMSPeakListsSet(fGroups, generateMSPeakListsMzR, ..., avgSetParams = avgSetParams,
+                           neutralizeByCharge = neutralizeByCharge)
 })

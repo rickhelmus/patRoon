@@ -256,7 +256,7 @@ setMethod("filter", "MSPeakListsSet", function(obj, ..., negate = FALSE, sets = 
 #' @export
 setMethod("plotSpec", "MSPeakListsSet", function(obj, groupName, analysis = NULL, MSLevel = 1, title = NULL,
                                                  useGGPlot2 = FALSE, xlim = NULL, ylim = NULL,
-                                                 neutralized = TRUE, sets = NULL, perSet = TRUE,
+                                                 neutralized = TRUE, sets = NULL, perSet = FALSE,
                                                  mirror = TRUE, ...)
 {
     ac <- checkmate::makeAssertCollection()
@@ -267,6 +267,9 @@ setMethod("plotSpec", "MSPeakListsSet", function(obj, groupName, analysis = NULL
     aapply(checkmate::assertFlag, . ~ useGGPlot2 + neutralized + perSet, fixed = list(add = ac))
     assertSets(obj, sets, add = ac)
     checkmate::reportAssertions(ac)
+    
+    if (neutralized && perSet)
+        stop("perSet cannot be TRUE for neutralized spectra")
     
     if (!is.null(sets) && length(sets) > 0)
         obj <- obj[, sets = sets]

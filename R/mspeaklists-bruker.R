@@ -144,9 +144,11 @@ setMethod("generateMSPeakListsDA", "featureGroups", function(fGroups, bgsubtr = 
 })
 
 setMethod("generateMSPeakListsDA", "featureGroupsSet", function(fGroups, ...,
-                                                                 avgSetParams = getDefAvgPListParams())
+                                                                 avgSetParams = getDefAvgPListParams(),
+                                                                neutralizeByCharge = "msms")
 {
-    generateMSPeakListsSet(fGroups, generateMSPeakListsDA, ..., avgSetParams = avgSetParams)
+    generateMSPeakListsSet(fGroups, generateMSPeakListsDA, ..., avgSetParams = avgSetParams,
+                           neutralizeByCharge = neutralizeByCharge)
 })
 
 #' @details \code{generateMSPeakListsDAFMF} is similar to \code{generateMSPeakListsDA},
@@ -261,7 +263,9 @@ setMethod("generateMSPeakListsDAFMF", "featureGroups", function(fGroups, minMSIn
 })
 
 setMethod("generateMSPeakListsDAFMF", "featureGroupsSet", function(fGroups, ...,
-                                                                   avgSetParams = getDefAvgPListParams())
+                                                                   avgSetParams = getDefAvgPListParams(),
+                                                                   neutralizeByCharge = "msms")
 {
-    generateMSPeakListsSet(fGroups, generateMSPeakListsDAFMF, ..., avgSetParams = avgSetParams)
+    generateMSPeakListsSet(fGroups, generateMSPeakListsDAFMF, ..., avgSetParams = avgSetParams,
+                           neutralizeByCharge = neutralizeByCharge)
 })

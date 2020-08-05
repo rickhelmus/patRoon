@@ -113,62 +113,6 @@ averageSpectra <- function(spectra, clusterMzWindow, topMost, minIntensityPre, m
     return(ret)
 }
 
-averageMSPeakLists <- function(peakLists, origFGNames, clusterMzWindow, topMost, minIntensityPre, minIntensityPost,
-                               avgFun, method, pruneMissingPrecursorMS, retainPrecursorMSMS)
-{
-    # UNDONE: use cache sets?
-
-    cat("Generating averaged peak lists for all feature groups...\n")
-
-    hash <- makeHash(peakLists, clusterMzWindow, topMost, minIntensityPre, avgFun, method)
-    avgPLists <- loadCacheData("MSPeakListsAvg", hash)
-
-    # figure out feature groups from (non-averaged) peak lists
-    gNames <- unique(unlist(sapply(peakLists, names, simplify = FALSE), use.names = FALSE))
-    gNames <- intersect(origFGNames, gNames) # sort to original order
-    gCount <- length(gNames)
-
-    if (gCount == 0)
-        avgPLists <- list()
-    else if (is.null(avgPLists))
-    {
-        prog <- openProgBar(0, gCount)
-
-        avgPLists <- lapply(seq_len(gCount), function(grpi)
-        {
-            plistsMS <- lapply(peakLists, function(pl) pl[[gNames[grpi]]][["MS"]])
-            plistsMS <- pruneList(plistsMS, checkZeroRows = TRUE)
-            avgPLMS <- averageSpectra(plistsMS, clusterMzWindow, topMost, minIntensityPre, minIntensityPost,
-                                      avgFun, method, pruneMissingPrecursorMS, TRUE)
-
-            plistsMSMS <- lapply(peakLists, function(pl) pl[[gNames[grpi]]][["MSMS"]])
-            plistsMSMS <- pruneList(plistsMSMS, checkZeroRows = TRUE)
-            avgPLMSMS <- averageSpectra(plistsMSMS, clusterMzWindow, topMost, minIntensityPre, minIntensityPost,
-                                        avgFun, method, FALSE, retainPrecursorMSMS)
-
-            results <- pruneList(list(MS = if (nrow(avgPLMS) > 0) avgPLMS else NULL,
-                                      MSMS = if (nrow(avgPLMSMS) > 0) avgPLMSMS else NULL))
-
-            if (!any(avgPLMS$precursor))
-                warning(sprintf("Couldn't find back any precursor m/z from (averaged) MS peak list of group %s!", gNames[grpi]))
-
-            setTxtProgressBar(prog, grpi)
-            return(results)
-        })
-        names(avgPLists) <- gNames
-        avgPLists <- pruneList(avgPLists, checkEmptyElements = TRUE)
-        
-        setTxtProgressBar(prog, gCount)
-        close(prog)
-
-        saveCacheData("MSPeakListsAvg", avgPLists, hash)
-    }
-    else
-        cat("Done!\n")
-
-    return(avgPLists)
-}
-
 # get corresponding mz of feature from MS peaklist
 getMZIndexFromMSPeakList <- function(featMZ, plist)
 {

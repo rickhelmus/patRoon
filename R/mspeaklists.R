@@ -95,14 +95,74 @@ setMethod("initialize", "MSPeakLists", function(.Object, ...)
 {
     .Object <- callNextMethod(.Object, ...)
 
-    if (length(.Object@avgPeakListArgs) > 0)
-        .Object@averagedPeakLists <- do.call(averageMSPeakLists, c(list(.Object@peakLists, .Object@origFGNames),
-                                                                   .Object@avgPeakListArgs))
-    
+    .Object@averagedPeakLists <- averageMSPeakLists(.Object)
     .Object@peakLists <- makeEmptyListNamed(.Object@peakLists)
     .Object@averagedPeakLists <- makeEmptyListNamed(.Object@averagedPeakLists)
     
     return(.Object)
+})
+
+setMethod("averageMSPeakLists", "MSPeakLists", function(obj)
+{
+    # UNDONE: use cache sets?
+    
+    cat("Generating averaged peak lists for all feature groups...\n")
+    
+    pLists <- peakLists(obj)
+    hash <- makeHash(pLists, obj@avgPeakListArgs)
+    avgPLists <- loadCacheData("MSPeakListsAvg", hash)
+    
+    # figure out feature groups from (non-averaged) peak lists
+    gNames <- unique(unlist(sapply(pLists, names, simplify = FALSE), use.names = FALSE))
+    gNames <- intersect(obj@origFGNames, gNames) # sort to original order
+    gCount <- length(gNames)
+    
+    if (gCount == 0 || length(obj@avgPeakListArgs) == 0)
+        avgPLists <- list()
+    else if (is.null(avgPLists))
+    {
+        prog <- openProgBar(0, gCount)
+        
+        avgPLists <- lapply(seq_len(gCount), function(grpi)
+        {
+            plistsMS <- lapply(pLists, function(pl) pl[[gNames[grpi]]][["MS"]])
+            plistsMS <- pruneList(plistsMS, checkZeroRows = TRUE)
+            avgPLMS <- averageSpectra(plistsMS, obj@avgPeakListArgs$clusterMzWindow, obj@avgPeakListArgs$topMost,
+                                      obj@avgPeakListArgs$minIntensityPre,
+                                      obj@avgPeakListArgs$minIntensityPost,
+                                      obj@avgPeakListArgs$avgFun, obj@avgPeakListArgs$method,
+                                      obj@avgPeakListArgs$pruneMissingPrecursorMS, TRUE)
+            
+            plistsMSMS <- lapply(pLists, function(pl) pl[[gNames[grpi]]][["MSMS"]])
+            plistsMSMS <- pruneList(plistsMSMS, checkZeroRows = TRUE)
+            avgPLMSMS <- averageSpectra(plistsMSMS, obj@avgPeakListArgs$clusterMzWindow, obj@avgPeakListArgs$topMost,
+                                        obj@avgPeakListArgs$minIntensityPre,
+                                        obj@avgPeakListArgs$minIntensityPost,
+                                        obj@avgPeakListArgs$avgFun, obj@avgPeakListArgs$method,
+                                        FALSE, obj@avgPeakListArgs$retainPrecursorMSMS)
+            
+            results <- pruneList(list(MS = if (nrow(avgPLMS) > 0) avgPLMS else NULL,
+                                      MSMS = if (nrow(avgPLMSMS) > 0) avgPLMSMS else NULL))
+            
+            if (!any(avgPLMS$precursor))
+                warning(sprintf("Couldn't find back any precursor m/z from (averaged) MS peak list of group %s!", gNames[grpi]))
+            
+            setTxtProgressBar(prog, grpi)
+            return(results)
+        })
+        names(avgPLists) <- gNames
+        
+		avgPLists <- pruneList(avgPLists, checkEmptyElements = TRUE)
+		
+        setTxtProgressBar(prog, gCount)
+        close(prog)
+        
+        saveCacheData("MSPeakListsAvg", avgPLists, hash)
+    }
+    else
+        cat("Done!\n")
+    
+    return(avgPLists)
 })
 
 #' @describeIn MSPeakLists Accessor method to obtain the MS peak lists.
@@ -199,7 +259,7 @@ setMethod("[", c("MSPeakLists", "ANY", "ANY", "missing"), function(x, i, j, ...,
 
         # update group averaged peak lists
         if (reAverage)
-            x@averagedPeakLists <- do.call(averageMSPeakLists, c(list(peakLists(x), x@origFGNames), x@avgPeakListArgs))
+            x@averagedPeakLists <- averageMSPeakLists(x)
     }
 
     if (!missing(j))
@@ -398,14 +458,15 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
         pLists[[anai]] <- doFilterGroups(pLists[[anai]])
     }
 
+    obj@peakLists <- pLists
+    
     # update group averaged peak lists
-    obj@averagedPeakLists <- do.call(averageMSPeakLists, c(list(pLists, obj@origFGNames), obj@avgPeakListArgs))
+    obj@averagedPeakLists <- averageMSPeakLists(obj)
 
     # and filter it as well...
     printf("Filtering averaged MS peak lists for %d feature groups...\n", length(obj@averagedPeakLists))
     obj@averagedPeakLists <- doFilterGroups(obj@averagedPeakLists)
 
-    obj@peakLists <- pLists
     saveCacheData("filterMSPeakLists", obj, hash)
 
     newn <- length(obj)

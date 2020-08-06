@@ -164,13 +164,13 @@ test_that("as.data.table() works", {
     expect_range(as.data.table(formsGF, normalizeScores = "max")$isoScore, c(0, 1))
 
     expect_equal(uniqueN(as.data.table(formsGF, maxFormulas = 1),
-                         by = c("group", "formula")),
+                         by = c("group", "neutral_formula")),
                  length(groupNames(formsGF)))
     # maxFragFormulas = 1: amount of unique (MS/MS) formulas should be same as
     # amount of unique fragments
     expect_equal(uniqueN(as.data.table(formsGFWithMSMS, maxFragFormulas = 1),
-                         by = c("group", "formula", "byMSMS", "frag_formula")),
-                 uniqueN(as.data.table(formsGFWithMSMS), by = c("group", "formula")))
+                         by = c("group", "neutral_formula", "byMSMS", "frag_formula")),
+                 uniqueN(as.data.table(formsGFWithMSMS), by = c("group", "neutral_formula")))
     expect_equal(uniqueN(as.data.table(formsGF, maxFormulas = 1, maxFragFormulas = 1), by = "group"),
                  length(groupNames(formsGF)))
     expect_equal(uniqueN(as.data.table(formsGF, average = TRUE), by = "group"),
@@ -214,8 +214,8 @@ test_that("consensus works", {
 
 if (doSIRIUS)
 {
-    anPL <- annotatedPeakList(fCons, precursor = "C9H8NO", groupName = groupNames(fCons)[6], MSPeakLists = plists)
-    anPLOnly <- annotatedPeakList(fCons, precursor = "C9H8NO", groupName = groupNames(fCons)[6],
+    anPL <- annotatedPeakList(fCons, precursor = "C9H7NO", groupName = groupNames(fCons)[6], MSPeakLists = plists)
+    anPLOnly <- annotatedPeakList(fCons, precursor = "C9H7NO", groupName = groupNames(fCons)[6],
                                   MSPeakLists = plists, onlyAnnotated = TRUE)
 }
 
@@ -258,7 +258,7 @@ test_that("reporting empty objects works", {
 })
 
 
-plotPrec <- formsGFWithMSMS[[2]][["formula"]][1]
+plotPrec <- formsGFWithMSMS[[2]][["neutral_formula"]][1]
 test_that("plotting works", {
     expect_doppel("form-spec", function() plotSpectrum(formsGFWithMSMS, plotPrec, groupNames(formsGFWithMSMS)[2],
                                                        MSPeakLists = plists))

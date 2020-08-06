@@ -573,7 +573,7 @@ plotChroms(components, index = 7, fGroups = fGroups) # EICs from a component
 plotSpectrum(mslists, "M120_R328_81") # non-annotated MS spectrum
 plotSpectrum(mslists, "M120_R328_81", MSLevel = 2) # non-annotated MS/MS spectrum
 # formula annotated spectrum
-plotSpectrum(formulas, precursor = "C6H9N2", groupName = "M120_R328_81",
+plotSpectrum(formulas, precursor = "C6H8N2", groupName = "M120_R328_81",
              MSPeakLists = mslists)
 # compound annotated spectrum, with added formula annotations
 plotSpectrum(compounds, index = 1, groupName = "M120_R328_81", MSPeakLists = mslists,

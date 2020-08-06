@@ -42,7 +42,8 @@ setMethod("[", c("formulasSet", "ANY", "missing", "missing"), function(x, i, j, 
     return(x)
 })
 
-
+# UNDONE: test formula averaging of as.data.table()
+# UNDONE: don't average all frag errors across sets, check if averaging and normalization of scorings are OK
 
 generateFormulasSet <- function(fGroupsSet, MSPeakListsSet, generator, ..., setThreshold)
 {

@@ -1,3 +1,8 @@
+# patRoon next major
+
+* **IMPORTANT**: the `precursor` argument to the `plotSpec()`, `annotatedSpectrum()` and `plotScores()` methods for `formulas` now expects the neutral formula instead of the ionized formula. This change was necessary to select precursors for sets with different polarities. This is also in general more consistent with compound annotations.
+
+
 # patRoon 1.3.0
 
 * Future multiprocessing: make sure that logs are created even when an error occurs.
@@ -76,7 +81,6 @@ Other changes
 * Fix: plotting structures resulted in a Java error on the RStudio Docker image (https://github.com/rickhelmus/patRoon/issues/18)
 
             
-
 # patRoon 1.1
 
 * **IMPORTANT**: The `plotEIC()`, `groups()` and `plotSpec()` methods were renamed to `plotChroms()`, `groupTable()` and `plotSpectrum()`. This was done to avoid name clashes with `XCMS` and `CAMERA`. The old functions still work (with a warning), but please update your scripts as these will be removed in the future.
@@ -103,7 +107,6 @@ Other changes
 * `checkChromatograms()`: fix error when `fGroups` has only one replicate group
 * `convertMSFiles()`: If `algorithm="pwiz"` and vendor centroiding is used then any extra filters are now correctly put after the `peakPicking` filter.
 * `getXCMSnExp()` is now properly exported and documented.
-
 
 # patRoon 1.0.4
 * Small compatibility fixes for macOS

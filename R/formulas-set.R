@@ -7,24 +7,12 @@ syncFormulasSetObjects <- function(formulasSet, j)
     # NOTE: assume that subsetting with non-existing j will not result in errors
     formulasSet@setObjects <- lapply(formulasSet@setObjects, "[", j = j)
     formulasSet@setObjects <- pruneList(formulasSet@setObjects, checkEmptyElements = TRUE)
-    
-    # re-generate
-    formulasSet@ionizedFeatureFormulas <- Reduce(modifyList, lapply(formulasSet@setObjects, formulaTable, features = TRUE))
-    
     formulasSet@adducts <- formulasSet@adducts[names(formulasSet@setObjects)] # in case sets were removed
-    
-    # average ionized if (now) possible
-    # if (allSame(adducts(formulasSet)))
-    #     formulasSet@ionizedAveragedPeakLists <- do.call(averageMSPeakLists,
-    #                                                        c(list(formulasSet@ionizedPeakLists,
-    #                                                               formulasSet@origFGNames),
-    #                                                          formulasSet@avgPeakListArgs))
     
     return(formulasSet)
 }
 
-formulasSet <- setClass("formulasSet", slots = c(adducts = "list", setObjects = "list",
-                                                 ionizedFeatureFormulas = "list"),
+formulasSet <- setClass("formulasSet", slots = c(adducts = "list", setObjects = "list"),
                         contains = "formulas")
 
 setMethod("initialize", "formulasSet",
@@ -59,24 +47,28 @@ setMethod("[", c("formulasSet", "ANY", "missing", "missing"), function(x, i, j, 
 generateFormulasSet <- function(fGroupsSet, MSPeakListsSet, generator, ..., setThreshold)
 {
     ionizedFGroupsList <- sapply(sets(fGroupsSet), ionize, obj = fGroupsSet, simplify = FALSE)
-    ionizedMSPeaksList <- sapply(sets(fGroupsSet), ionize, obj = MSPeakListsSet, simplify = FALSE)
+    ionizedMSPeaksList <- sapply(sets(MSPeakListsSet), ionize, obj = MSPeakListsSet, simplify = FALSE)
+    # UNDONE: sync sets
     ionizedFormulasList <- mapply(ionizedFGroupsList, ionizedMSPeaksList, adducts(fGroupsSet),
                                   FUN = function(fg, mspl, a) generator(fGroups = fg, MSPeakLists = mspl, adduct = a, ...),
                                   SIMPLIFY = FALSE)
     
-    neutralizeFTable <- function(ft)
+    neutralizeFTable <- function(ft, add)
     {
         ft <- copy(ft)
         ft[, formula := neutral_formula]
-        # UNDONE: more? (check SIRIUS/DA)
+        ft[, formula_mz := formula_mz - adductMZDelta(add)]
+        # UNDONE: take multiple M into account?
+        ft[, frag_formula_mz := frag_formula_mz - adductMZDelta(adduct(charge = add@charge))]
+        # UNDONE: more? check SIRIUS/DA. neutral_loss?
         return(ft)
     }
-    neutralFormulasList <- sapply(ionizedFormulasList, function(forms)
+    neutralFormulasList <- mapply(ionizedFormulasList, adducts(fGroupsSet), FUN = function(forms, add)
     {
-        forms@featureFormulas <- lapply(forms@featureFormulas, lapply, neutralizeFTable)
-        forms@formulas <- lapply(forms@formulas, neutralizeFTable)
+        forms@featureFormulas <- lapply(forms@featureFormulas, lapply, neutralizeFTable, add = add)
+        forms@formulas <- lapply(forms@formulas, neutralizeFTable, add = add)
         return(forms)
-    }, simplify = FALSE)
+    }, SIMPLIFY = FALSE)
     
     combFormulas <- Reduce(modifyList, lapply(neutralFormulasList, formulaTable, features = TRUE))
     combIonFormulas <- Reduce(modifyList, lapply(ionizedFormulasList, formulaTable, features = TRUE))
@@ -86,16 +78,7 @@ generateFormulasSet <- function(fGroupsSet, MSPeakListsSet, generator, ..., setT
                                                    "set", "setCoverage")
     
     ret <- formulasSet(adducts = adducts(fGroupsSet), setObjects = ionizedFormulasList,
-                       ionizedFeatureFormulas = combIonFormulas, formulas = groupForms,
-                       featureFormulas = combFormulas)
-    
-    # if (allSame(adducts(ret)))
-    # {
-    #     # ionize averaged combined spectra if all adducts are the same
-    #     ret@ionizedAveragedPeakLists <- sapply(ret@averagedPeakLists, ionizeMSPeakList,
-    #                                            adduct = adducts(fGroupsSet)[[1]], ionize = TRUE,
-    #                                            simplify = FALSE)
-    # }
+                       formulas = groupForms, featureFormulas = combFormulas)
     
     return(ret)
 }

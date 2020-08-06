@@ -43,7 +43,6 @@ setMethod("[", c("formulasSet", "ANY", "missing", "missing"), function(x, i, j, 
 })
 
 # UNDONE: test formula averaging of as.data.table()
-# UNDONE: don't average all frag errors across sets, check if averaging and normalization of scorings are OK
 
 generateFormulasSet <- function(fGroupsSet, MSPeakListsSet, generator, ..., setThreshold)
 {
@@ -54,27 +53,9 @@ generateFormulasSet <- function(fGroupsSet, MSPeakListsSet, generator, ..., setT
                                   FUN = function(fg, mspl, a) generator(fGroups = fg, MSPeakLists = mspl, adduct = a, ...),
                                   SIMPLIFY = FALSE)
     
-    neutralizeFTable <- function(ft, add)
-    {
-        ft <- copy(ft)
-        ft[, formula := neutral_formula]
-        ft[, formula_mz := formula_mz - adductMZDelta(add)]
-        # UNDONE: take multiple M into account?
-        ft[, frag_formula_mz := frag_formula_mz - adductMZDelta(adduct(charge = add@charge))]
-        # UNDONE: more? check SIRIUS/DA. neutral_loss?
-        return(ft)
-    }
-    neutralFormulasList <- mapply(ionizedFormulasList, adducts(fGroupsSet), FUN = function(forms, add)
-    {
-        forms@featureFormulas <- lapply(forms@featureFormulas, lapply, neutralizeFTable, add = add)
-        forms@formulas <- lapply(forms@formulas, neutralizeFTable, add = add)
-        return(forms)
-    }, SIMPLIFY = FALSE)
+    combFormulas <- Reduce(modifyList, lapply(ionizedFormulasList, formulaTable, features = TRUE))
     
-    combFormulas <- Reduce(modifyList, lapply(neutralFormulasList, formulaTable, features = TRUE))
-    combIonFormulas <- Reduce(modifyList, lapply(ionizedFormulasList, formulaTable, features = TRUE))
-    
-    groupFormsList <- sapply(neutralFormulasList, formulaTable, features = FALSE, simplify = FALSE)
+    groupFormsList <- sapply(ionizedFormulasList, formulaTable, features = FALSE, simplify = FALSE)
     groupForms <- generateGroupFormulasByConsensus(groupFormsList, setThreshold, names(fGroupsSet),
                                                    "set", "setCoverage")
     

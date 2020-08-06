@@ -339,7 +339,7 @@ generateFormConsensusForGroup <- function(formList, formThreshold, mergeCol, mer
         
         # frag_error is unique per fragment, while other scorings are per precursor candidate
         if (haveMSMS && "frag_error" %in% names(formTable))
-            formTable[, frag_error := mean(frag_error), by = c("formula", "frag_formula")]
+            formTable[, frag_error := mean(frag_error), by = c("neutral_formula", "frag_formula")]
         
         avCols <- intersect(c(formulaScorings()$name, "error", "error_median"), names(formTable))
         formTable[, (avCols) := lapply(unique(.SD, by = mergeCol)[, avCols, with = FALSE], mean),

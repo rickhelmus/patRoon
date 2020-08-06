@@ -117,7 +117,7 @@ setMethod("show", "formulas", function(object)
 
     ft <- formulaTable(object, TRUE)
     hasFeatForms <- length(ft) > 0
-    ftcounts <- if (hasFeatForms) recursiveApplyDT(ft, function(x) length(unique(x$formula)), sapply) else 0
+    ftcounts <- if (hasFeatForms) recursiveApplyDT(ft, function(x) length(unique(x$neutral_formula)), sapply) else 0
     ma <- mean(sapply(ftcounts, sum))
     mft <- mean(sapply(ftcounts, mean))
     printf("Formulas assigned to features:\n")
@@ -126,7 +126,7 @@ setMethod("show", "formulas", function(object)
     printf("  - Average formulas per feature: %.1f\n", mft)
 
     gft <- formulaTable(object)
-    mfg <- if (length(gft) > 0) sapply(gft, function(ft) length(unique(ft$formula))) else 0
+    mfg <- if (length(gft) > 0) sapply(gft, function(ft) length(unique(ft$neutral_formula))) else 0
     printf("Formulas assigned to feature groups:\n")
     printf("  - Total formula count: %d\n", sum(mfg))
     printf("  - Average formulas per feature group: %.1f\n", mean(mfg))
@@ -253,7 +253,7 @@ setMethod("as.data.table", "formulas", function(x, fGroups = NULL, average = FAL
         # collapse byMSMS: will be TRUE if at least an MS/MS formula candidate was there
         ret[, byMSMS := any(byMSMS), by = "group"]
 
-        ret[, formula_avg_count := length(unique(formula)), by = "group"]
+        ret[, formula_avg_count := length(unique(neutral_formula)), by = "group"]
 
         avgCols <- c("formula", "neutral_formula")
         ret[, (avgCols) := lapply(.SD, function(f) averageFormulas(unique(f))), .SDcols = avgCols, by = "group"]
@@ -269,20 +269,20 @@ setMethod("as.data.table", "formulas", function(x, fGroups = NULL, average = FAL
         if (length(rmCols) > 0)
             ret[, (rmCols) := NULL]
 
-        ret <- unique(ret, by = c("group", "formula"))
+        ret <- unique(ret, by = c("group", "neutral_formula"))
     }
     else
     {
         if (!is.null(maxFormulas))
         {
-            ret[, unFormNr := match(formula, unique(.SD$formula)), by = "group"]
+            ret[, unFormNr := match(neutral_formula, unique(.SD$neutral_formula)), by = "group"]
             ret <- ret[unFormNr <= maxFormulas][, unFormNr := NULL]
         }
 
         if (!is.null(maxFragFormulas) && any(ret$byMSMS))
         {
             ret[, unFormNr := match(frag_formula, unique(.SD$frag_formula)),
-                by = c("group", "byMSMS", "formula")]
+                by = c("group", "byMSMS", "neutral_formula")]
             ret <- ret[unFormNr <= maxFragFormulas][, unFormNr := NULL]
         }
     }
@@ -351,7 +351,7 @@ setMethod("filter", "formulas", function(obj, minExplainedPeaks = NULL, elements
             if (nrow(ft) == 0)
                 return(if (negate) formTable else ft)
             formTable <- ft
-            fragCounts <- formTable[, ifelse(byMSMS, length(frag_formula), 0L), by = "formula"][[2]]
+            fragCounts <- formTable[, ifelse(byMSMS, length(frag_formula), 0L), by = "neutral_formula"][[2]]
             if (negate)
                 formTable <- formTable[fragCounts < minExplainedPeaks]
             else
@@ -372,14 +372,14 @@ setMethod("filter", "formulas", function(obj, minExplainedPeaks = NULL, elements
             if (!is.null(fragElements))
             {
                 keep <- formTable[, rep(any(sapply(frag_formula, checkFormula, fragElements, negate = negate)), .N),
-                                  by = "formula"][[2]]
+                                  by = "neutral_formula"][[2]]
                 formTable <- formTable[keep]
             }
 
             if (!is.null(lossElements))
             {
                 keep <- formTable[, rep(any(sapply(neutral_loss, checkFormula, lossElements, negate = negate)), .N),
-                                  by = "formula"][[2]]
+                                  by = "neutral_formula"][[2]]
                 formTable <- formTable[keep]
             }
         }
@@ -421,8 +421,8 @@ setMethod("filter", "formulas", function(obj, minExplainedPeaks = NULL, elements
 
         if (!is.null(topMost))
         {
-            unForms <- unique(formTable$formula)
-            unFormNrs <- formTable[, match(formula, unForms)]
+            unForms <- unique(formTable$neutral_formula)
+            unFormNrs <- formTable[, match(neutral_formula, unForms)]
             if (negate)
                 unFormNrs <- length(unForms) - (unFormNrs - 1)
             formTable <- formTable[unFormNrs <= topMost]
@@ -470,7 +470,7 @@ setMethod("annotatedPeakList", "formulas", function(obj, precursor, groupName, a
     if (is.null(spec))
         return(NULL)
 
-    formTable <- formTable[byMSMS == TRUE & formula == precursor]
+    formTable <- formTable[byMSMS == TRUE & neutral_formula == precursor]
     if (nrow(formTable) > 0)
     {
         fragInfo <- getFragmentInfoFromForms(spec, formTable)
@@ -512,7 +512,7 @@ setMethod("plotScores", "formulas", function(obj, precursor, groupName, analysis
     else
         formTable <- obj[[groupName]]
 
-    if (is.null(formTable) || nrow(formTable) == 0 || !precursor %in% formTable$formula)
+    if (is.null(formTable) || nrow(formTable) == 0 || !precursor %in% formTable$neutral_formula)
         return(NULL)
 
     mcn <- character()
@@ -524,7 +524,7 @@ setMethod("plotScores", "formulas", function(obj, precursor, groupName, analysis
                                          normalizeScores == "minmax", excludeNormScores)
 
     scoreCols <- getAllFormulasCols(formulaScorings()$name, names(formTable))
-    scoreTable <- getPrecursorFormScores(formTable[formula == precursor], scoreCols)[, scoreCols, with = FALSE]
+    scoreTable <- getPrecursorFormScores(formTable[neutral_formula == precursor], scoreCols)[, scoreCols, with = FALSE]
     makeScoresPlot(scoreTable, mcn, useGGPlot2)
 })
 
@@ -536,10 +536,11 @@ setMethod("plotScoresHash", "formulas", function(obj, precursor, groupName, anal
         formTable <- obj[[analysis, groupName]]
     else
         formTable <- obj[[groupName]]
+    
     if (is.null(formTable) || nrow(formTable) == 0 || !precursor %in% formTable$formula)
         formTable <- NULL
     else if (normalizeScores == "none")
-        formTable <- formTable[formula == precursor]
+        formTable <- formTable[neutral_formula == precursor]
 
     return(makeHash(precursor, formTable, normalizeScores, excludeNormScores, useGGPlot2))
 })
@@ -547,8 +548,7 @@ setMethod("plotScoresHash", "formulas", function(obj, precursor, groupName, anal
 #' @describeIn formulas Plots an annotated spectrum for a given candidate
 #'   formula of a feature or feature group.
 #'
-#' @param precursor The formula of the precursor (in ionic form, \emph{i.e.} as
-#'   detected by the MS).
+#' @param precursor The formula of the precursor (in neutral form).
 #' @param analysis A \code{character} specifying the analysis for which the
 #'   annotated spectrum should be plotted. If \code{NULL} then annotation
 #'   results for the complete feature group will be plotted.
@@ -631,7 +631,7 @@ setMethod("plotVenn", "formulas", function(obj, ..., labels = NULL, vennArgs = N
     {
         if (length(obj1) == 0 || length(obj2) == 0)
             return(data.table())
-        fintersect(obj1[, c("group", "formula")], obj2[, c("group", "formula")])
+        fintersect(obj1[, c("group", "neutral_formula")], obj2[, c("group", "neutral_formula")])
     }, nrow), vennArgs))
 })
 
@@ -668,13 +668,13 @@ setMethod("plotUpSet", "formulas", function(obj, ..., labels = NULL, nsets = len
     {
         ret <- as.data.table(f)
         if (length(ret) == 0)
-            ret <- data.table(group = character(), formula = character())
-        ret <- unique(ret[, c("group", "formula")])[, (l) := 1]
+            return(data.table(group = character(), formula = character()))
+        return(unique(ret[, c("group", "neutral_formula")])[, (l) := 1])
     })
 
     formTab <- Reduce(function(f1, f2)
     {
-        merge(f1, f2, by = c("group", "formula"), all = TRUE)
+        merge(f1, f2, by = c("group", "neutral_formula"), all = TRUE)
     }, allFormTabs)
 
     formTab <- formTab[, labels, with = FALSE]
@@ -724,8 +724,8 @@ setMethod("consensus", "formulas", function(obj, ..., absMinAbundance = NULL,
         {
             ret <- copy(ft)
             ret[, mergedBy := allFormNames[fi]]
-            ranks <- seq_len(length(unique(ret$formula)))
-            ret[, rank := ranks[.GRP], by = "formula"]
+            ranks <- seq_len(length(unique(ret$neutral_formula)))
+            ret[, rank := ranks[.GRP], by = "neutral_formula"]
             ret[, rankscore := (.N - (rank - 1)) / .N * rankWeights[fi]]
             setnames(ret, paste0(names(ret), "-", allFormNames[fi]))
             return(ret)
@@ -757,7 +757,7 @@ setMethod("consensus", "formulas", function(obj, ..., absMinAbundance = NULL,
                 mTable <- rightFList[[grp]]
 
                 # rename columns that should be unique from right to left
-                unCols <- c(uniqueCols, c("formula", "byMSMS", "frag_formula", "mergedBy"))
+                unCols <- c(uniqueCols, c("neutral_formula", "byMSMS", "frag_formula", "mergedBy"))
                 unCols <- unCols[sapply(unCols, function(uc) !is.null(mTable[[paste0(uc, "-", rightName)]]))]
                 setnames(mTable, paste0(unCols, "-", rightName), paste0(unCols, "-", leftName))
             }
@@ -766,7 +766,7 @@ setMethod("consensus", "formulas", function(obj, ..., absMinAbundance = NULL,
                 haveLeftMSMS <- paste0("frag_formula-", leftName) %in% names(consFormulaList[[grp]])
                 haveRightMSMS <- paste0("frag_formula-", rightName) %in% names(rightFList[[grp]])
 
-                mergeCols <- c("formula", "byMSMS") # put byMSMS in there anyway in case only left/right has MSMS
+                mergeCols <- c("neutral_formula", "byMSMS") # put byMSMS in there anyway in case only left/right has MSMS
                 if (haveLeftMSMS && haveRightMSMS)
                     mergeCols <- c(mergeCols, "frag_formula")
 
@@ -812,14 +812,15 @@ setMethod("consensus", "formulas", function(obj, ..., absMinAbundance = NULL,
     for (grpi in seq_along(consFormulaList))
     {
         # fix up de-duplicated column names
-        deDupCols <- c(uniqueCols, "formula", "byMSMS", "frag_formula", "mergedBy")
+        deDupCols <- c(uniqueCols, "neutral_formula", "byMSMS", "frag_formula", "mergedBy")
         leftCols <- paste0(deDupCols, "-", leftName)
         deDupCols <- deDupCols[leftCols %in% names(consFormulaList[[grpi]])]
         leftCols <- leftCols[leftCols %in% names(consFormulaList[[grpi]])]
         if (length(leftCols) > 0)
             setnames(consFormulaList[[grpi]], leftCols, deDupCols)
 
-        consFormulaList[[grpi]][, coverage := length(unique(unlist(strsplit(mergedBy, ",")))) / length(allFormulas), by = "formula"]
+        consFormulaList[[grpi]][, coverage := length(unique(unlist(strsplit(mergedBy, ",")))) / length(allFormulas),
+                                by = "neutral_formula"]
 
         if (relMinAbundance > 0)
             consFormulaList[[grpi]] <- consFormulaList[[grpi]][coverage >= relMinAbundance]
@@ -835,7 +836,7 @@ setMethod("consensus", "formulas", function(obj, ..., absMinAbundance = NULL,
                 return(rep(ret, length(mergedBy)))
             }
 
-            consFormulaList[[grpi]] <- consFormulaList[[grpi]][consFormulaList[[grpi]][, keep(mergedBy), by = "formula"][[2]]]
+            consFormulaList[[grpi]] <- consFormulaList[[grpi]][consFormulaList[[grpi]][, keep(mergedBy), by = "neutral_formula"][[2]]]
         }
 
         rnames <- getAllFormulasCols("rankscore", names(consFormulaList[[grpi]]))

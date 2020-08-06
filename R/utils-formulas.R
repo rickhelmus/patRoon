@@ -134,7 +134,7 @@ averageFormulas <- function(formulas)
     return(formulaListToString(fl))
 }
 
-countUniqueFormulas <- function(fList) sum(unlist(lapply(fList, function(ft) length(unique(ft$formula)))))
+countUniqueFormulas <- function(fList) sum(unlist(lapply(fList, function(ft) length(unique(ft$neutral_formula)))))
 
 addElementInfoToFormTable <- function(formTable, elements, fragElements, OM)
 {
@@ -283,7 +283,7 @@ getPrecursorFormScores <- function(formTable, scoreCols)
     # algorithms. For this reason try to find the first non-NA value from all
     # rows.
     return(formTable[, lapply(.SD, function(x) { xn <- x[!is.na(x)]; if (length(xn) > 0) xn[1] else x[1] }),
-                     by = "formula", .SDcols = scoreCols])
+                     by = "neutral_formula", .SDcols = scoreCols])
 }
 
 normalizeFormScores <- function(formResults, scoreRanges, minMaxNormalization, exclude = NULL)
@@ -302,7 +302,7 @@ normalizeFormScores <- function(formResults, scoreRanges, minMaxNormalization, e
                                    FUN = function(sc, scr) normalize(sc, minMaxNormalization, scr)),
            .SDcols = scoreCols]
         # add/merge normalized columns and restore original column order
-        formResults <- formResults[, setdiff(columns, scoreCols), with = FALSE][sc, on = "formula"][, columns, with = FALSE]
+        formResults <- formResults[, setdiff(columns, scoreCols), with = FALSE][sc, on = "neutral_formula"][, columns, with = FALSE]
     }
     
     return(formResults)
@@ -325,15 +325,15 @@ generateFormConsensusForGroup <- function(formList, formThreshold, mergeCol, mer
     if (nrow(formTable) > 0)
     {
         # Determine coverage of precursor formulas.
-        formTable[, (mergeCovCol) := uniqueN(get(mergeCol)) / length(formList), by = "formula"]
+        formTable[, (mergeCovCol) := uniqueN(get(mergeCol)) / length(formList), by = "neutral_formula"]
 
         if (formThreshold > 0)
-            formTable <- formTable[(mergeCovCol) >= formThreshold] # Apply coverage filter
+            formTable <- formTable[get(mergeCovCol) >= formThreshold] # Apply coverage filter
 
         # remove MS only formulas if MS/MS candidate is also present (do after
         # coverage filter).
-        MSMSForms <- unique(formTable[byMSMS == TRUE, formula])
-        formTable <- formTable[byMSMS == TRUE | !formula %in% MSMSForms]
+        MSMSForms <- unique(formTable[byMSMS == TRUE, neutral_formula])
+        formTable <- formTable[byMSMS == TRUE | !neutral_formula %in% MSMSForms]
 
         # average scorings
         
@@ -343,10 +343,10 @@ generateFormConsensusForGroup <- function(formList, formThreshold, mergeCol, mer
         
         avCols <- intersect(c(formulaScorings()$name, "error", "error_median"), names(formTable))
         formTable[, (avCols) := lapply(unique(.SD, by = mergeCol)[, avCols, with = FALSE], mean),
-                  by = "formula", .SDcols = c(avCols, mergeCol)]
+                  by = "neutral_formula", .SDcols = c(avCols, mergeCol)]
         
         # Remove duplicate entries (do this after coverage!)
-        formTable <- unique(formTable, by = intersect(c("formula", "frag_formula"), names(formTable)))
+        formTable <- unique(formTable, by = intersect(c("neutral_formula", "frag_formula"), names(formTable)))
         
         formTable <- rankFormulaTable(formTable)
     }
@@ -440,7 +440,7 @@ getAllMergedFormulasCols <- function(allCols)
 
 getFormInfoList <- function(formTable, precursor, useHTML = FALSE)
 {
-    formTable <- formTable[formula == precursor]
+    formTable <- formTable[neutral_formula == precursor]
 
     if (nrow(formTable) == 0)
         return(NULL)

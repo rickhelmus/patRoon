@@ -336,7 +336,7 @@ as.data.table(compounds)[, 1:5] # only show first columns for clarity
 
 ```{r plotSpectrum,fig.width=6,fig.height=3.5,eval=doCompounds}
 plotSpectrum(mslists, "M186_R265_296", MSLevel = 2)
-plotSpectrum(formulas, "C6H9N2", "M109_R116_56", MSPeakLists = mslists)
+plotSpectrum(formulas, "C6H8N2", "M109_R116_56", MSPeakLists = mslists)
 plotSpectrum(compounds, 1, "M120_R328_81", mslists)
 ```
 

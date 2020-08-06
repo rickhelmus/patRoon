@@ -2,17 +2,22 @@
 #' @include formulas.R
 NULL
 
-syncFormulasSetObjects <- function(formulasSet, j)
+syncFormulasSetObjects <- function(formulasSet)
 {
-    # NOTE: assume that subsetting with non-existing j will not result in errors
-    formulasSet@setObjects <- lapply(formulasSet@setObjects, "[", j = j)
-    formulasSet@setObjects <- pruneList(formulasSet@setObjects, checkEmptyElements = TRUE)
     formulasSet@adducts <- formulasSet@adducts[names(formulasSet@setObjects)] # in case sets were removed
+    
+    # re-generate
+    formulasSet@featureFormulas <- Reduce(modifyList, lapply(formulasSet@setObjects, formulaTable, features = TRUE))
+    groupFormsList <- sapply(formulasSet@setObjects, formulaTable, features = FALSE, simplify = FALSE)
+    formulasSet@formulas <- generateGroupFormulasByConsensus(groupFormsList, formulasSet@setThreshold,
+                                                             formulasSet@origFGNames, "set", "setCoverage")
     
     return(formulasSet)
 }
 
-formulasSet <- setClass("formulasSet", slots = c(adducts = "list", setObjects = "list"),
+formulasSet <- setClass("formulasSet", slots = c(adducts = "list", setObjects = "list",
+                                                 setThreshold = "numeric",
+                                                 origFGNames = "character"),
                         contains = "formulas")
 
 setMethod("initialize", "formulasSet",
@@ -32,12 +37,30 @@ setMethod("show", "formulasSet", function(object)
         printf("Original algorithm: %s\n", algorithm(object@setObjects[[1]]))
 })
 
-setMethod("[", c("formulasSet", "ANY", "missing", "missing"), function(x, i, j, ...)
+setMethod("[", c("formulasSet", "ANY", "missing", "missing"), function(x, i, j, ..., sets = NULL, drop = TRUE)
 {
-    x <- callNextMethod(x, i, j, ...)
+    assertSets(x, sets)
+    
+    # parent method is not so useful currently, as we need to re-generate
+    # formulas/featureFormulas slot data
+    # x <- callNextMethod(x, i, j, ...)
+
+    if (!is.null(sets))
+        x@setObjects <- x@setObjects[sets]
     
     if (!missing(i))
-        x <- syncFormulasSetObjects(x, i)
+    {
+        # from parent method
+        i <- assertSubsetArgAndToChr(i, groupNames(x))
+        x@scoreRanges <- x@scoreRanges[i]
+        
+        # NOTE: assume that subsetting with non-existing i will not result in errors
+        x@setObjects <- lapply(x@setObjects, "[", i = i)
+        x@setObjects <- pruneList(x@setObjects, checkEmptyElements = TRUE)
+    }
+    
+    if (!is.null(sets) || !missing(i))
+        x <- syncFormulasSetObjects(x)
     
     return(x)
 })
@@ -60,6 +83,7 @@ generateFormulasSet <- function(fGroupsSet, MSPeakListsSet, generator, ..., setT
                                                    "set", "setCoverage")
     
     ret <- formulasSet(adducts = adducts(fGroupsSet), setObjects = ionizedFormulasList,
+                       origFGNames = names(fGroupsSet), setThreshold = setThreshold,
                        formulas = groupForms, featureFormulas = combFormulas)
     
     return(ret)

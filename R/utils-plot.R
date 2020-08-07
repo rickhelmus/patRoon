@@ -296,6 +296,35 @@ makeMSPlotGG <- function(plotData, ...)
     return(ret)
 }
 
+makeMSPlotSets <- function(spec, title, mirror, sets, xlim, ylim, useGGPlot2, ...)
+{
+    spec <- copy(spec)
+    
+    # UNDONE: provide normalize functionality elsewhere?
+    spec[, intensity := normalize(intensity, minMax = FALSE), by = "set"]
+    setnames(spec, "set", "mergedBy") # to get labelling
+    setorderv(spec, "mz")
+    
+    if (mirror && length(sets) == 2)
+    {
+        spec[mergedBy == sets[2], intensity := -intensity]
+        if (is.null(ylim))
+            ylim <- c(-1, 1)
+    }
+    
+    plotData <- getMSPlotData(spec, 1)
+    ticks <- pretty(c(-spec$intensity, spec$intensity))
+    if (useGGPlot2)
+    {
+        return(makeMSPlotGG(plotData) + ggtitle(title) +
+                   ggplot2::scale_y_continuous(labels = abs(ticks)))
+    }
+    
+    makeMSPlot(plotData, xlim, ylim, ylab = "Normalized intensity",
+               main = title, yaxt = "n", ...)
+    axis(2, at = ticks, labels = abs(ticks))
+}
+
 plotDendroWithClusters <- function(dendro, ct, pal, colourBranches, showLegend, ...)
 {
     if (colourBranches)

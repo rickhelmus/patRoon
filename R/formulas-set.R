@@ -96,6 +96,36 @@ setMethod("filter", "formulasSet", function(obj, ..., negate = FALSE, sets = NUL
     return(obj)
 })
 
+#' @export
+setMethod("plotSpec", "formulasSet", function(obj, precursor, groupName, analysis = NULL, MSPeakLists,
+                                              title = NULL, useGGPlot2 = FALSE, xlim = NULL, ylim = NULL,
+                                              perSet = FALSE, mirror = TRUE, ...)
+{
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertString(precursor, min.chars = 1, add = ac)
+    checkmate::assertString(groupName, min.chars = 1, add = ac)
+    checkmate::assertString(analysis, min.chars = 1, null.ok = TRUE, add = ac)
+    checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
+    checkmate::assertString(title, null.ok = TRUE, add = ac)
+    assertXYLim(xlim, ylim, add = ac)
+    aapply(checkmate::assertFlag, . ~ useGGPlot2 + perSet, fixed = list(add = ac))
+    checkmate::reportAssertions(ac)
+    
+    if (!perSet || length(sets(obj)) == 1 || !is.null(analysis))
+        return(callNextMethod(obj, precursor, groupName, analysis, MSPeakLists, title,
+                              useGGPlot2, xlim, ylim, ...))
+    
+    spec <- annotatedPeakList(obj, precursor, groupName, analysis, MSPeakLists)
+    if (is.null(spec))
+        return(NULL)
+
+    if (is.null(title))
+        title <- subscriptFormula(precursor)
+    
+    return(makeMSPlotSets(spec, title, mirror, sets(obj), xlim, ylim, useGGPlot2, ...))
+})
+
+
 generateFormulasSet <- function(fGroupsSet, MSPeakListsSet, generator, ..., setThreshold)
 {
     ionizedFGroupsList <- sapply(sets(fGroupsSet), ionize, obj = fGroupsSet, simplify = FALSE)

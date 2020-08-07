@@ -232,12 +232,6 @@ setMethod("plotSpec", "MSPeakListsSet", function(obj, groupName, analysis = NULL
     if (!perSet || length(mySets) == 1 || !is.null(analysis))
         return(callNextMethod(obj, groupName, analysis, MSLevel, title, useGGPlot2, xlim, ylim, ...))
     
-    specs <- lapply(obj@setObjects, getSpec, groupName = groupName, MSLevel = MSLevel, analysis = NULL)
-    names(specs) <- mySets
-    specs <- pruneList(specs)
-    if (length(specs) == 0)
-        return(NULL)
-    
     spec <- getSpec(obj, groupName, MSLevel, NULL)
     if (is.null(spec))
         return(NULL)

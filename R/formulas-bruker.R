@@ -43,7 +43,7 @@ setMethod("generateFormulasDA", "featureGroups", function(fGroups, precursorMzSe
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
     checkmate::assertNumber(precursorMzSearchWindow, lower = 0, finite = TRUE, add = ac)
     checkmate::assertChoice(MSMode, c("ms", "msms", "both"), add = ac)
-    checkmate::assertNumber(featThreshold, lower = 0, finite = TRUE, null.ok = TRUE, add = ac)
+    checkmate::assertNumber(featThreshold, lower = 0, finite = TRUE, add = ac)
     assertDACloseSaveArgs(close, save, add = ac)
     checkmate::reportAssertions(ac)
 

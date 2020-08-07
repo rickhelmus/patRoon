@@ -61,6 +61,9 @@ setGeneric("generateComponents", function(fGroups, algorithm, ...) standardGener
 
 setGeneric("formulaTable", function(obj, features = FALSE) standardGeneric("formulaTable"))
 setGeneric("generateFormulas", function(fGroups, algorithm, ...) standardGeneric("generateFormulas"))
+setGeneric("generateFormulasGenForm", function(fGroups, ...) standardGeneric("generateFormulasGenForm"))
+setGeneric("generateFormulasSIRIUS", function(fGroups, ...) standardGeneric("generateFormulasSIRIUS"))
+setGeneric("generateFormulasDA", function(fGroups, ...) standardGeneric("generateFormulasDA"))
 
 ### Compounds
 

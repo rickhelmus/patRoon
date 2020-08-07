@@ -296,11 +296,11 @@ processGenFormResultFile <- function(file, isMSMS, adduct, topMost)
 #'
 #' @rdname formula-generation
 #' @export
-generateFormulasGenForm <- function(fGroups, MSPeakLists, relMzDev = 5, adduct = "[M+H]+",
-                                    elements = "CHNOP", hetero = TRUE, oc = FALSE, extraOpts = NULL,
-                                    calculateFeatures = TRUE, featThreshold = 0.75, MSMode = "both",
-                                    isolatePrec = TRUE, timeout = 120, topMost = 50,
-                                    batchSize = 8)
+setMethod("generateFormulasGenForm", "featureGroups", function(fGroups, MSPeakLists, relMzDev = 5, adduct = "[M+H]+",
+                                                               elements = "CHNOP", hetero = TRUE, oc = FALSE, extraOpts = NULL,
+                                                               calculateFeatures = TRUE, featThreshold = 0.75, MSMode = "both",
+                                                               isolatePrec = TRUE, timeout = 120, topMost = 50,
+                                                               batchSize = 8)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
@@ -401,4 +401,10 @@ generateFormulasGenForm <- function(fGroups, MSPeakLists, relMzDev = 5, adduct =
     }
 
     return(formulas(formulas = groupFormulas, featureFormulas = formTable, algorithm = "genform"))
-}
+})
+
+setMethod("generateFormulasGenForm", "featureGroupsSet", function(fGroups, MSPeakLists, ..., setThreshold = 0.75)
+{
+    setArgs <- assertAndGetMSPLSetsArgs(fGroups, MSPeakLists)
+    generateFormulasSet(fGroups, generateFormulasGenForm, ..., setArgs = setArgs, setThreshold = setThreshold)
+})

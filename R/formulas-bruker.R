@@ -35,8 +35,9 @@ simplifyDAFormula <- function(formula)
 #'
 #' @rdname formula-generation
 #' @export
-generateFormulasDA <- function(fGroups, precursorMzSearchWindow = 0.002, MSMode = "both",
-                               adduct, featThreshold = 0.75, save = TRUE, close = save)
+setMethod("generateFormulasDA", "featureGroups", function(fGroups, precursorMzSearchWindow = 0.002,
+                                                          MSMode = "both", adduct, featThreshold = 0.75,
+                                                          save = TRUE, close = save)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
@@ -253,4 +254,9 @@ generateFormulasDA <- function(fGroups, precursorMzSearchWindow = 0.002, MSMode 
         groupFormulas <- list()
 
     return(formulas(formulas = groupFormulas, featureFormulas = fTable, algorithm = "bruker"))
-}
+})
+
+setMethod("generateFormulasDA", "featureGroupsSet", function(fGroups, ..., setThreshold = 0.75)
+{
+    generateFormulasSet(fGroups, generateFormulasDA, ..., setThreshold = setThreshold)
+})

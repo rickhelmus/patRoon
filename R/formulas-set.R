@@ -126,13 +126,13 @@ setMethod("plotSpec", "formulasSet", function(obj, precursor, groupName, analysi
 })
 
 
-generateFormulasSet <- function(fGroupsSet, MSPeakListsSet, generator, ..., setThreshold)
+generateFormulasSet <- function(fGroupsSet, generator, ..., setArgs, setThreshold)
 {
+    # UNDONE: mention that adduct argument is automatically set
+
     ionizedFGroupsList <- sapply(sets(fGroupsSet), ionize, obj = fGroupsSet, simplify = FALSE)
-    ionizedMSPeaksList <- sapply(sets(MSPeakListsSet), ionize, obj = MSPeakListsSet, simplify = FALSE)
-    # UNDONE: sync sets
-    ionizedFormulasList <- mapply(ionizedFGroupsList, ionizedMSPeaksList, adducts(fGroupsSet),
-                                  FUN = function(fg, mspl, a) generator(fGroups = fg, MSPeakLists = mspl, adduct = a, ...),
+    ionizedFormulasList <- mapply(ionizedFGroupsList, adducts(fGroupsSet), setArgs,
+                                  FUN = function(fg, a, sa) do.call(generator, c(list(fGroups = fg, adduct = a, ...), sa)),
                                   SIMPLIFY = FALSE)
     
     combFormulas <- Reduce(modifyList, lapply(ionizedFormulasList, formulaTable, features = TRUE))

@@ -183,11 +183,11 @@ setMethod("filter", "MSPeakListsSet", function(obj, ..., negate = FALSE, sets = 
     if (!is.null(sets) && length(sets) > 0)
     {
         if (negate)
-            sets <- setdiff(obj@sets, sets)
+            sets <- setdiff(get("sets", pos = 2)(obj), sets)
         obj <- obj[, sets = sets]
     }
     
-    if (length(list(...)) > 0)
+    if (...length() > 0)
     {
         obj <- callNextMethod(obj, ..., negate = negate)
         

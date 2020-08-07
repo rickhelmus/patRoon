@@ -128,6 +128,8 @@ setMethod("plotSpec", "formulasSet", function(obj, precursor, groupName, analysi
 
 generateFormulasSet <- function(fGroupsSet, generator, ..., setArgs, setThreshold)
 {
+    checkmate::assertNumber(setThreshold, lower = 0, finite = TRUE)
+    
     # UNDONE: mention that adduct argument is automatically set
 
     ionizedFGroupsList <- sapply(sets(fGroupsSet), ionize, obj = fGroupsSet, simplify = FALSE)

@@ -147,6 +147,7 @@ Collate:
     'formulas.R'
     'mspeaklists.R'
     'compounds-metfrag.R'
+    'compounds-set.R'
     'utils-sirius.R'
     'compounds-sirius.R'
     'convert.R'

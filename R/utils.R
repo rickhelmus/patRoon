@@ -505,3 +505,14 @@ RUserDir <- function(...)
         return(tools::R_user_dir(...))
     return(backports:::R_user_dir(...))
 }
+
+assertAndGetMSPLSetsArgs <- function(fGroupsSet, MSPeakListsSet)
+{
+    checkmate::assertClass(MSPeakListsSet, "MSPeakListsSet")
+    sd <- setdiff(sets(fGroupsSet), sets(MSPeakListsSet))
+    if (length(sd) > 0)
+        stop(paste("The following sets in fGroups are missing in MSPeakLists:"), paste0(sd, collapse = ", "))
+    
+    ionizedMSPeaksList <- lapply(sets(MSPeakListsSet), ionize, obj = MSPeakListsSet)
+    return(lapply(ionizedMSPeaksList, function(x) list(MSPeakLists = x)))
+}

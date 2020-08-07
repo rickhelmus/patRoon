@@ -4,13 +4,14 @@ NULL
 
 syncFormulasSetObjects <- function(formulasSet)
 {
-    formulasSet@adducts <- formulasSet@adducts[names(formulasSet@setObjects)] # in case sets were removed
-    
     # re-generate
     formulasSet@featureFormulas <- Reduce(modifyList, lapply(formulasSet@setObjects, formulaTable, features = TRUE))
     groupFormsList <- sapply(formulasSet@setObjects, formulaTable, features = FALSE, simplify = FALSE)
     formulasSet@formulas <- generateGroupFormulasByConsensus(groupFormsList, formulasSet@setThreshold,
                                                              formulasSet@origFGNames, "set", "setCoverage")
+
+    formulasSet@scoreRanges <- formulasSet@scoreRanges[groupNames(formulasSet)]
+    formulasSet@adducts <- formulasSet@adducts[names(formulasSet@setObjects)]
     
     return(formulasSet)
 }
@@ -41,31 +42,59 @@ setMethod("[", c("formulasSet", "ANY", "missing", "missing"), function(x, i, j, 
 {
     assertSets(x, sets)
     
-    # parent method is not so useful currently, as we need to re-generate
-    # formulas/featureFormulas slot data
-    # x <- callNextMethod(x, i, j, ...)
-
     if (!is.null(sets))
         x@setObjects <- x@setObjects[sets]
     
     if (!missing(i))
     {
-        # from parent method
-        i <- assertSubsetArgAndToChr(i, groupNames(x))
-        x@scoreRanges <- x@scoreRanges[i]
-        
         # NOTE: assume that subsetting with non-existing i will not result in errors
         x@setObjects <- lapply(x@setObjects, "[", i = i)
         x@setObjects <- pruneList(x@setObjects, checkEmptyElements = TRUE)
-    }
-    
-    if (!is.null(sets) || !missing(i))
+        
         x <- syncFormulasSetObjects(x)
+    }
     
     return(x)
 })
 
-# UNDONE: test formula averaging of as.data.table()
+setMethod("as.data.table", "formulasSet", function(x, fGroups = NULL, average = FALSE, ...)
+{
+    ret <- callNextMethod(x, fGroups = fGroups, average = average, ...)
+    if (average)
+        ret[, formula := NULL] # doesn't make a lot of sense anymore with different adducts
+    return(ret[])
+})
+
+#' @export
+setMethod("filter", "formulasSet", function(obj, ..., negate = FALSE, sets = NULL)
+{
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertFlag(negate, add = ac)
+    assertSets(obj, sets, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    if (!is.null(sets) && length(sets) > 0)
+    {
+        if (negate)
+            sets <- setdiff(get("sets", pos = 2)(obj), sets)
+        obj <- obj[, sets = sets]
+    }
+    
+    if (...length() > 0)
+    {
+        # filter set objects and re-generate annotation consensus
+        
+        obj@setObjects <- lapply(obj@setObjects, filter, ..., negate = negate)
+        obj@setObjects <- pruneList(obj@setObjects, checkEmptyElements = TRUE)
+        
+        # synchronize other objects
+        cat("Synchronizing set objects...\n")
+        obj <- syncFormulasSetObjects(obj)
+        cat("Done!\n")
+    }
+    
+    return(obj)
+})
 
 generateFormulasSet <- function(fGroupsSet, MSPeakListsSet, generator, ..., setThreshold)
 {

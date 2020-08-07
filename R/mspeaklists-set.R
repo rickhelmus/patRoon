@@ -140,8 +140,8 @@ setMethod("[", c("MSPeakListsSet", "ANY", "ANY", "missing"), function(x, i, j, .
             args <- c(args, list(j = j))
         
         # NOTE: assume that subsetting with non-existing i/j will not result in errors
-        x@setObjects <- lapply(MSPeakListsSet@setObjects, function(o) do.call("[", args = c(list(x = o), args)))
-        x@setObjects <- pruneList(MSPeakListsSet@setObjects, checkEmptyElements = TRUE)
+        x@setObjects <- lapply(x@setObjects, function(o) do.call("[", args = c(list(x = o), args)))
+        x@setObjects <- pruneList(x@setObjects, checkEmptyElements = TRUE)
         
         x <- syncMSPeakListsSetObjects(x)
     }

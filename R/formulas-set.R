@@ -147,3 +147,19 @@ generateFormulasSet <- function(fGroupsSet, MSPeakListsSet, generator, ..., setT
     
     return(ret)
 }
+
+formulasSetIonized <- setClass("formulasSetIonized", contains = "formulas")
+setMethod("initialize", "formulasSetIonized",
+          function(.Object, ...) callNextMethod(.Object, algorithm = "set_ionized", ...))
+setMethod("ionize", "formulasSetIonized", function(obj, sets)
+{
+    if (!is.null(sets) && length(sets) > 0)
+        obj <- obj[, sets = sets]
+    
+    assertEqualAdducts(adducts(obj))
+    
+    groupForms <- copy(formulaTable(obj))
+    groupForms <- lapply(groupForms, set, j = c("set", "setCoverage"), value = NULL)
+    
+    return(formulasSetIonized(formulas = groupForms, featureFormulas = formulaTable(obj, features = TRUE)))
+})

@@ -2,18 +2,15 @@
 #' @include mspeaklists.R
 NULL
 
-syncMSPeakListsSetObjects <- function(MSPeakListsSet, i, j, reAverage)
+syncMSPeakListsSetObjects <- function(MSPeakListsSet)
 {
-    args <- list(reAverage = reAverage)
-    if (!is.null(i))
-        args <- c(args, list(i = i))
-    if (!is.null(j))
-        args <- c(args, list(j = j))
+    # update/initialize from setObjects
+    MSPeakListsSet@peakLists <- Reduce(modifyList, lapply(MSPeakListsSet@setObjects, peakLists))
+    MSPeakListsSet@averagedPeakLists <- averageMSPeakLists(MSPeakListsSet)
     
-    # NOTE: assume that subsetting with non-existing i/j will not result in errors
-    MSPeakListsSet@setObjects <- lapply(MSPeakListsSet@setObjects, function(o) do.call("[", args = c(list(x = o), args)))
-    MSPeakListsSet@setObjects <- pruneList(MSPeakListsSet@setObjects, checkEmptyElements = TRUE)
-    MSPeakListsSet@adducts <- MSPeakListsSet@adducts[names(MSPeakListsSet@setObjects)] # in case sets were removed
+    MSPeakListsSet@analysisInfo <-
+        MSPeakListsSet@analysisInfo[MSPeakListsSet@analysisInfo$analysis %in% names(peakLists(MSPeakListsSet)), ]
+    MSPeakListsSet@adducts <- MSPeakListsSet@adducts[names(MSPeakListsSet@setObjects)]
     
     return(MSPeakListsSet)
 }
@@ -127,16 +124,27 @@ setMethod("[", c("MSPeakListsSet", "ANY", "ANY", "missing"), function(x, i, j, .
     checkmate::assertFlag(reAverage, add = ac)
     checkmate::reportAssertions(ac)
     
+    # UNDONE: drop reAverage=FALSE support?
+    if (!reAverage)
+        stop("reAverage must be TRUE for sets for now...")
+    
     if (!is.null(sets) && length(sets) > 0)
         i <- mergeAnaSubsetArgWithSets(i, sets, analysisInfo(x))
     
-    x <- callNextMethod(x, i, j, ..., reAverage = TRUE)
-
-    if (!missing(i))
-        x@analysisInfo <- x@analysisInfo[x@analysisInfo$analysis %in% names(peakLists(x)), ]
-    
     if (!missing(i) || !missing(j))
-        x <- syncMSPeakListsSetObjects(x, if (missing(i)) NULL else i, if (missing(j)) NULL else j, reAverage)
+    {
+        args <- list(reAverage = reAverage)
+        if (!missing(i))
+            args <- c(args, list(i = i))
+        if (!missing(j))
+            args <- c(args, list(j = j))
+        
+        # NOTE: assume that subsetting with non-existing i/j will not result in errors
+        x@setObjects <- lapply(MSPeakListsSet@setObjects, function(o) do.call("[", args = c(list(x = o), args)))
+        x@setObjects <- pruneList(MSPeakListsSet@setObjects, checkEmptyElements = TRUE)
+        
+        x <- syncMSPeakListsSetObjects(x)
+    }
     
     return(x)
 })
@@ -189,11 +197,12 @@ setMethod("filter", "MSPeakListsSet", function(obj, ..., negate = FALSE, sets = 
     
     if (...length() > 0)
     {
-        obj <- callNextMethod(obj, ..., negate = negate)
+        obj@setObjects <- lapply(obj@setObjects, filter, ..., negate = negate)
+        obj@setObjects <- pruneList(obj@setObjects, checkEmptyElements = TRUE)
         
         # synchronize other objects
         cat("Synchronizing set objects...\n")
-        obj <- syncMSPeakListsSetObjects(obj, analyses(obj), groupNames(obj), reAverage = TRUE)
+        obj <- syncMSPeakListsSetObjects(obj)
         cat("Done!\n")
     }
     

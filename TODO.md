@@ -52,6 +52,7 @@
 - remove sets argument for some methods (as.data.table, accessors etc)?
     - if keep, be consistent with all classes
 - as.data.table() for formulas: average=T will now produce strange averaged ionized formula, for now simply remove this column.. also give a note in docs? or maybe only remove is not all adducts are equal?
+- different name/generic for ionize()? makes less sense for annotation classes
 
 
 ## features

@@ -13,6 +13,7 @@
 - credits to ES
 - tests
     - automatic InChIKey/formula calculation from InChIs/SMILES
+        - already done implicitly?
     - more?
 - ID level rules
     - GenForm scoring: somehow exclude non MS/MS candidates if MS/MS candidates are present?
@@ -25,12 +26,12 @@
     - combine screenSuspects() and groupFeaturesScreening()
         - screenSuspects() does both the screening and making new fGroups
         - as.data.table() for fGroupsScreening which adds suspect metadata and ID levels
+            - optionally un-collapses suspects per row
         - filter() method for minimal rankings, matched MS/MS fragments etc
         - deprecate features method
         - tag hits, but keep all fGroups?
             - fGroups[, hits = TRUE] ?
             - collapse suspects matched to same fGroups? nice for speeding up annotation
-    - check new columns with checkmate (e.g. suspect fragments)
 - newProject(): create template auto ID rule csv?
 
 

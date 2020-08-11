@@ -194,7 +194,7 @@ Collate:
     'utils-optimize.R'
     'utils-plot.R'
     'utils.R'
-    'utils-suspects.R'
+    'utils-screening.R'
     'utils-xcms.R'
     'zzz.R'
 VignetteBuilder: knitr

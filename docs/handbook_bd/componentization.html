@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>4.4 Componentization | patRoon handbook</title>
   <meta name="description" content="4.4 Componentization | patRoon handbook" />
-  <meta name="generator" content="bookdown 0.20 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.19 and GitBook 2.6.7" />
 
   <meta property="og:title" content="4.4 Componentization | patRoon handbook" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2020-07-03" />
+<meta name="date" content="2020-08-14" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -150,8 +150,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="5" data-path="processing-workflow-data.html"><a href="processing-workflow-data.html"><i class="fa fa-check"></i><b>5</b> Processing workflow data</a><ul>
 <li class="chapter" data-level="5.1" data-path="inspecting-results.html"><a href="inspecting-results.html"><i class="fa fa-check"></i><b>5.1</b> Inspecting results</a></li>
 <li class="chapter" data-level="5.2" data-path="filtering.html"><a href="filtering.html"><i class="fa fa-check"></i><b>5.2</b> Filtering</a><ul>
-<li class="chapter" data-level="5.2.1" data-path="features.html"><a href="features.html#features"><i class="fa fa-check"></i><b>5.2.1</b> Features</a></li>
-<li class="chapter" data-level="5.2.2" data-path="annotation.html"><a href="annotation.html#annotation"><i class="fa fa-check"></i><b>5.2.2</b> Annotation</a></li>
+<li class="chapter" data-level="5.2.1" data-path="filtering.html"><a href="filtering.html#features-1"><i class="fa fa-check"></i><b>5.2.1</b> Features</a></li>
+<li class="chapter" data-level="5.2.2" data-path="filtering.html"><a href="filtering.html#annotation-1"><i class="fa fa-check"></i><b>5.2.2</b> Annotation</a></li>
 <li class="chapter" data-level="5.2.3" data-path="filtering.html"><a href="filtering.html#components"><i class="fa fa-check"></i><b>5.2.3</b> Components</a></li>
 <li class="chapter" data-level="5.2.4" data-path="filtering.html"><a href="filtering.html#negation"><i class="fa fa-check"></i><b>5.2.4</b> Negation</a></li>
 </ul></li>
@@ -222,19 +222,19 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </thead>
 <tbody>
 <tr class="odd">
-<td>[CAMERA]</td>
+<td><a href="http://msbi.ipb-halle.de/msbi/CAMERA/">CAMERA</a></td>
 <td><code>generateComponents(algorithm = &quot;camera&quot;, ...)</code></td>
 <td>Clusters feature groups with similar chromatographic elution profiles and annotate by known chemical rules (adducts, isotopologues, in-source fragments).</td>
 </tr>
 <tr class="even">
-<td>[RAMClustR]</td>
+<td><a href="https://github.com/sneumann/RAMClustR">RAMClustR</a></td>
 <td><code>generateComponents(algorithm = &quot;ramclustr&quot;, ...)</code></td>
 <td>As above.</td>
 </tr>
 <tr class="odd">
-<td>[nontarget]</td>
+<td><a href="https://cran.r-project.org/web/packages/nontarget/index.html">nontarget</a></td>
 <td><code>generateComponents(algorithm = &quot;nontarget&quot;, ...)</code></td>
-<td>Uses the [nontarget] R package to perform unsupervised homologous series detection.</td>
+<td>Uses the <a href="https://cran.r-project.org/web/packages/nontarget/index.html">nontarget</a> R package to perform unsupervised homologous series detection.</td>
 </tr>
 <tr class="even">
 <td>Intensity clustering</td>
@@ -248,7 +248,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </blockquote>
 <div id="features-with-similar-chromatographic-behaviour" class="section level3">
 <h3><span class="header-section-number">4.4.1</span> Features with similar chromatographic behaviour</h3>
-<p>Isotopes, adducts and in-source fragments typically result in detection of multiple mass peaks by the mass spectrometer for a single chemical compound. While some feature finding algorithms already try to collapse (some of) these in to a single feature, this process is often incomplete (if performed at all) and it is not uncommon that multiple features will describe the same compound. To overcome this complexity the algorithms from [CAMERA] and [RAMClustR] can be used to group features that undergo highly similar chromatographic behaviour but have different <em>m/z</em> values. Basic chemical rules are then applied to the resulting components to annotate adducts, in-source fragments and isotopologues, which may be highly useful for general identification purposes.</p>
+<p>Isotopes, adducts and in-source fragments typically result in detection of multiple mass peaks by the mass spectrometer for a single chemical compound. While some feature finding algorithms already try to collapse (some of) these in to a single feature, this process is often incomplete (if performed at all) and it is not uncommon that multiple features will describe the same compound. To overcome this complexity the algorithms from <a href="http://msbi.ipb-halle.de/msbi/CAMERA/">CAMERA</a> and <a href="https://github.com/sneumann/RAMClustR">RAMClustR</a> can be used to group features that undergo highly similar chromatographic behaviour but have different <em>m/z</em> values. Basic chemical rules are then applied to the resulting components to annotate adducts, in-source fragments and isotopologues, which may be highly useful for general identification purposes.</p>
 <p>Some common function arguments to <code>generateComponents()</code> are listed below. Note that careful tuning for some of these is required to obtain useful results. In our experience the current default settings may significantly 'over-cluster' features that (clearly visibly) do not belong to each other. For this reason, you are advised to optimize and verify the various parameters supported by both algorithms. For a complete listing all arguments see the reference manual (e.g. <code>?generateComponents</code>).</p>
 <table style="width:100%;">
 <colgroup>
@@ -282,17 +282,17 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <tr class="even">
 <td><code>st</code>, <code>sr</code>, <code>maxt</code>, <code>hmax</code></td>
 <td><code>&quot;ramclustr&quot;</code></td>
-<td>Common parameters to influence clustering of [RAMClustR]. See <code>?ramclustR</code> for details.</td>
+<td>Common parameters to influence clustering of <a href="https://github.com/sneumann/RAMClustR">RAMClustR</a>. See <code>?ramclustR</code> for details.</td>
 </tr>
 <tr class="odd">
 <td><code>extraOpts</code></td>
 <td><code>&quot;camera&quot;</code></td>
-<td>A list with extra argument passed to the <code>annotate()</code> function from [CAMERA].</td>
+<td>A list with extra argument passed to the <code>annotate()</code> function from <a href="http://msbi.ipb-halle.de/msbi/CAMERA/">CAMERA</a>.</td>
 </tr>
 <tr class="even">
 <td><code>extraOptsRC</code>, <code>extraOptsFM</code></td>
 <td><code>&quot;ramclustr&quot;</code></td>
-<td>A list with extra arguments passed to the <code>ramclustR()</code> and <code>do.findmain()</code> functions from [RAMClustR].</td>
+<td>A list with extra arguments passed to the <code>ramclustR()</code> and <code>do.findmain()</code> functions from <a href="https://github.com/sneumann/RAMClustR">RAMClustR</a>.</td>
 </tr>
 </tbody>
 </table>
@@ -312,10 +312,10 @@ componRC &lt;-<span class="st"> </span><span class="kw">generateComponents</span
 </div>
 <div id="homologues-series" class="section level3">
 <h3><span class="header-section-number">4.4.2</span> Homologues series</h3>
-<p>Homologues series can be automatically detected by interfacing with the [nontarget] R package. Components are made from feature groups that show increasing <em>m/z</em> and retention time values. Series are first detected within each replicate group. Afterwards, series from all replicates are linked in case (partial) overlap occurs and this overlap consists of the <em>same</em> feature groups (see figure below). Linked series are then finally merged if this will not cause any conflicts with other series: such a conflict typically occurs when two series are not only linked to each other.</p>
+<p>Homologues series can be automatically detected by interfacing with the <a href="https://cran.r-project.org/web/packages/nontarget/index.html">nontarget</a> R package. Components are made from feature groups that show increasing <em>m/z</em> and retention time values. Series are first detected within each replicate group. Afterwards, series from all replicates are linked in case (partial) overlap occurs and this overlap consists of the <em>same</em> feature groups (see figure below). Linked series are then finally merged if this will not cause any conflicts with other series: such a conflict typically occurs when two series are not only linked to each other.</p>
 <div class="figure"><span id="fig:HS"></span>
-<div id="htmlwidget-925986faff662a525f2a" style="width:600px;height:250px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-925986faff662a525f2a">{"x":{"diagram":"\ndigraph Homologs {\n  graph [ rankdir = LR, compound = true, style = invis ]\n  node [ shape = oval,\n         fixedsize = true,\n         width = 2.3,\n         height = 0.8,\n         fontsize = 25,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n  subgraph cluster3 {\n    I [fillcolor=skyblue]; J [fillcolor=skyblue]; K [fillcolor=skyblue]\n    G -> H -> I -> J -> K [style=invis]\n  }\n\n  subgraph cluster4 {\n    _I [label=I, fillcolor=skyblue]; X [fillcolor=indianred1]; _K [label=K, fillcolor=skyblue]\n    _I -> X -> _K -> L [style=invis]\n  }\n\n  H -> _I [ltail=cluster3, lhead=cluster4, style=invis]\n  \n  I -> _I [constraint=false, style=dashed, arrowhead=none]\n  K -> _K [constraint=false, style=dashed, arrowhead=none]\n  \n  subgraph cluster1 {\n    C [fillcolor=skyblue]; D [fillcolor=skyblue]\n    A -> B -> C -> D [style=invis]\n  }\n\n  subgraph cluster2 {\n    _C [label=C, fillcolor=skyblue]; _D [label=D, fillcolor=skyblue]\n    _C -> _D -> E -> F [style=invis]\n  }\n  \n  B -> _C [ltail=cluster1, lhead=cluster2, style=invis]\n\n  C -> _C [constraint=false, style=dashed, arrowhead=none]\n  D -> _D [constraint=false, style=dashed, arrowhead=none]\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-96000eb6d1af564d438a" style="width:600px;height:250px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-96000eb6d1af564d438a">{"x":{"diagram":"\ndigraph Homologs {\n  graph [ rankdir = LR, compound = true, style = invis ]\n  node [ shape = oval,\n         fixedsize = true,\n         width = 2.3,\n         height = 0.8,\n         fontsize = 25,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n  subgraph cluster3 {\n    I [fillcolor=skyblue]; J [fillcolor=skyblue]; K [fillcolor=skyblue]\n    G -> H -> I -> J -> K [style=invis]\n  }\n\n  subgraph cluster4 {\n    _I [label=I, fillcolor=skyblue]; X [fillcolor=indianred1]; _K [label=K, fillcolor=skyblue]\n    _I -> X -> _K -> L [style=invis]\n  }\n\n  H -> _I [ltail=cluster3, lhead=cluster4, style=invis]\n  \n  I -> _I [constraint=false, style=dashed, arrowhead=none]\n  K -> _K [constraint=false, style=dashed, arrowhead=none]\n  \n  subgraph cluster1 {\n    C [fillcolor=skyblue]; D [fillcolor=skyblue]\n    A -> B -> C -> D [style=invis]\n  }\n\n  subgraph cluster2 {\n    _C [label=C, fillcolor=skyblue]; _D [label=D, fillcolor=skyblue]\n    _C -> _D -> E -> F [style=invis]\n  }\n  \n  B -> _C [ltail=cluster1, lhead=cluster2, style=invis]\n\n  C -> _C [constraint=false, style=dashed, arrowhead=none]\n  D -> _D [constraint=false, style=dashed, arrowhead=none]\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 <p class="caption">
 Figure 4.1: <strong>Linking of homologues series</strong> top: partial overlap and will be linked; bottom: no linkage due to different feature in overlapping series.
 </p>
@@ -366,7 +366,7 @@ componNT2 &lt;-<span class="st"> </span><span class="kw">generateComponents</spa
 <div id="intclust" class="section level3">
 <h3><span class="header-section-number">4.4.3</span> Intensity clustering</h3>
 <!-- UNDONE: refs? -->
-<p>Whereas previous componentization methods utilized chemical properties to relate features, intensity clustering uses a statistical approach. This methodology is especially useful to find features that show similar trends in the analysed samples. Intensities for all features are first normalized and thereafter hierarchical clustering is performed to find features that show similar intensity profiles across analyses. Components are then formed from automatically assigned clusters (using the [dynamicTreeCut] R package, however, assignment can be changed afterwards).</p>
+<p>Whereas previous componentization methods utilized chemical properties to relate features, intensity clustering uses a statistical approach. This methodology is especially useful to find features that show similar trends in the analysed samples. Intensities for all features are first normalized and thereafter hierarchical clustering is performed to find features that show similar intensity profiles across analyses. Components are then formed from automatically assigned clusters (using the <a href="https://cran.r-project.org/package=dynamicTreeCut">dynamicTreeCut</a> R package, however, assignment can be changed afterwards).</p>
 <p>Some common arguments to <code>generateComponents()</code> are listed below. It is recommended to test various settings (especially for <code>method</code>) to optimize the clustering results.</p>
 <table>
 <colgroup>

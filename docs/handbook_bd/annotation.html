@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>4.3 Annotation | patRoon handbook</title>
   <meta name="description" content="4.3 Annotation | patRoon handbook" />
-  <meta name="generator" content="bookdown 0.20 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.19 and GitBook 2.6.7" />
 
   <meta property="og:title" content="4.3 Annotation | patRoon handbook" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2020-07-03" />
+<meta name="date" content="2020-08-14" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -150,8 +150,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="5" data-path="processing-workflow-data.html"><a href="processing-workflow-data.html"><i class="fa fa-check"></i><b>5</b> Processing workflow data</a><ul>
 <li class="chapter" data-level="5.1" data-path="inspecting-results.html"><a href="inspecting-results.html"><i class="fa fa-check"></i><b>5.1</b> Inspecting results</a></li>
 <li class="chapter" data-level="5.2" data-path="filtering.html"><a href="filtering.html"><i class="fa fa-check"></i><b>5.2</b> Filtering</a><ul>
-<li class="chapter" data-level="5.2.1" data-path="features.html"><a href="features.html#features"><i class="fa fa-check"></i><b>5.2.1</b> Features</a></li>
-<li class="chapter" data-level="5.2.2" data-path="annotation.html"><a href="annotation.html#annotation"><i class="fa fa-check"></i><b>5.2.2</b> Annotation</a></li>
+<li class="chapter" data-level="5.2.1" data-path="filtering.html"><a href="filtering.html#features-1"><i class="fa fa-check"></i><b>5.2.1</b> Features</a></li>
+<li class="chapter" data-level="5.2.2" data-path="filtering.html"><a href="filtering.html#annotation-1"><i class="fa fa-check"></i><b>5.2.2</b> Annotation</a></li>
 <li class="chapter" data-level="5.2.3" data-path="filtering.html"><a href="filtering.html#components"><i class="fa fa-check"></i><b>5.2.3</b> Components</a></li>
 <li class="chapter" data-level="5.2.4" data-path="filtering.html"><a href="filtering.html#negation"><i class="fa fa-check"></i><b>5.2.4</b> Negation</a></li>
 </ul></li>
@@ -201,8 +201,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="annotation" class="section level2">
 <h2><span class="header-section-number">4.3</span> Annotation</h2>
 <p>The annotation consists of collecting MS peak lists and then formula and/or compound annotation:</p>
-<div id="htmlwidget-0c2faf6373d89f6bf001" style="width:500px;height:120px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-0c2faf6373d89f6bf001">{"x":{"diagram":"\ndigraph Annotation {\n  graph [ rankdir = LR ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.3,\n         height = 1,\n         fontsize = 18,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"MS peak lists\" -> \"Formula annotation\"\n    \"MS peak lists\" -> \"Compound annotation\"\n    \"Formula annotation\":e -> \"Compound annotation\":e [style = dotted, constraint = false]\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-b87c89a1797347b80769" style="width:500px;height:120px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-b87c89a1797347b80769">{"x":{"diagram":"\ndigraph Annotation {\n  graph [ rankdir = LR ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.3,\n         height = 1,\n         fontsize = 18,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"MS peak lists\" -> \"Formula annotation\"\n    \"MS peak lists\" -> \"Compound annotation\"\n    \"Formula annotation\":e -> \"Compound annotation\":e [style = dotted, constraint = false]\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 <p>Note that compound annotation is normally not dependent upon formula annotation. However, formula data can be used to improve ranking of candidates afterwards by the <code>addFormulaScoring()</code> function, which will be discussed later in this section.</p>
 <div id="ms-peak-lists" class="section level3">
 <h3><span class="header-section-number">4.3.1</span> MS peak lists</h3>
@@ -221,9 +221,9 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </thead>
 <tbody>
 <tr class="odd">
-<td>[mzR]</td>
+<td><a href="https://bioconductor.org/packages/release/bioc/html/mzR.html">mzR</a></td>
 <td><code>generateMSPeakLists(algorithm = &quot;mzr&quot;, ...)</code></td>
-<td>Uses [mzR] for spectra retrieval. Recommended default.</td>
+<td>Uses <a href="https://bioconductor.org/packages/release/bioc/html/mzR.html">mzR</a> for spectra retrieval. Recommended default.</td>
 </tr>
 <tr class="even">
 <td>DataAnalysis</td>
@@ -325,12 +325,12 @@ plists &lt;-<span class="st"> </span><span class="kw">generateMSPeakLists</span>
 </thead>
 <tbody>
 <tr class="odd">
-<td>[GenForm]</td>
+<td><a href="https://sourceforge.net/projects/genform/">GenForm</a></td>
 <td><code>generateFormulas(algorithm = &quot;genform&quot;, ...)</code></td>
 <td>Bundled with <code>patRoon</code>. Reasonable default.</td>
 </tr>
 <tr class="even">
-<td>[SIRIUS]</td>
+<td><a href="https://bio.informatik.uni-jena.de/software/sirius/">SIRIUS</a></td>
 <td><code>generateFormulas(algorithm = &quot;sirius&quot;, ...)</code></td>
 <td>Requires MS/MS data.</td>
 </tr>
@@ -341,7 +341,7 @@ plists &lt;-<span class="st"> </span><span class="kw">generateMSPeakLists</span>
 </tr>
 </tbody>
 </table>
-<p>Calculation with [GenForm] is often a good default. It is fast and basic rules can be applied to filter out obvious non-existing formulae. A possible drawback of GenForm, however, is that may become slow when many candidates are calculated, for instance, due to a relative high feature <em>m/z</em> (e.g. &gt;600) or loose elemental restricitions. More thorough calculation is performed with [SIRIUS]: this algorithm often yields fewer and often more plausible results. However, [SIRIUS] requires MS/MS data (hence features without will not have results) and formula prediction may not work well for compounds that structurally deviate from the training sets used by [SIRIUS]. Calculation with DataAnalysis is only possible when features are obtained with DataAnalysis as well. An advantage is that analysis files do not have to be converted and no MS peak generation is necessary, however, compared to other algorithms calculation is often relative slow.</p>
+<p>Calculation with <a href="https://sourceforge.net/projects/genform/">GenForm</a> is often a good default. It is fast and basic rules can be applied to filter out obvious non-existing formulae. A possible drawback of GenForm, however, is that may become slow when many candidates are calculated, for instance, due to a relative high feature <em>m/z</em> (e.g. &gt;600) or loose elemental restricitions. More thorough calculation is performed with <a href="https://bio.informatik.uni-jena.de/software/sirius/">SIRIUS</a>: this algorithm often yields fewer and often more plausible results. However, <a href="https://bio.informatik.uni-jena.de/software/sirius/">SIRIUS</a> requires MS/MS data (hence features without will not have results) and formula prediction may not work well for compounds that structurally deviate from the training sets used by <a href="https://bio.informatik.uni-jena.de/software/sirius/">SIRIUS</a>. Calculation with DataAnalysis is only possible when features are obtained with DataAnalysis as well. An advantage is that analysis files do not have to be converted and no MS peak generation is necessary, however, compared to other algorithms calculation is often relative slow.</p>
 <p>There are two methods for formula assignment:</p>
 <ol style="list-style-type: decimal">
 <li>Formulae are first calculated for each individual feature within a feature group. These results are then pooled, outliers are removed and remaining formulae are assigned to the feature group (i.e. <code>calculateFeatures = TRUE</code>).</li>
@@ -427,19 +427,19 @@ formulasBr &lt;-<span class="st"> </span><span class="kw">generateFormulas</span
 </thead>
 <tbody>
 <tr class="odd">
-<td>[MetFrag]</td>
+<td><a href="http://ipb-halle.github.io/MetFrag/">MetFrag</a></td>
 <td><code>generateCompounds(algorithm = &quot;metfrag&quot;, ...)</code></td>
 <td>Supports many databases (including custom) and scorings for candidate ranking.</td>
 </tr>
 <tr class="even">
-<td>[SIRIUS] with [CSI:FingerID]</td>
+<td><a href="https://bio.informatik.uni-jena.de/software/sirius/">SIRIUS</a> with <a href="https://www.csi-fingerid.uni-jena.de/">CSI:FingerID</a></td>
 <td><code>generateCompounds(algorithm = &quot;sirius&quot;, ...)</code></td>
 <td>Incorporates prior comprohensive formula calculations.</td>
 </tr>
 </tbody>
 </table>
 <p>Compound annotation is often a relative time and resource intensive procedure. For this reason, features are not annotated individually, but instead a feature group as a whole is annotated, which generally saves significant amounts of computational requirements. Nevertheless, it is not uncommon that this is the most time consuming step in the workflow. For this reason, prioritization of features is highly important, even more so to avoid 'abusing' servers when an online database is used for compound retrieval.</p>
-<p>Selecting the right database is important for proper candidate assignment. Afterall, if the 'right' chemical compound is not present in the used database, it is impossible to assign the correct structure. Luckily, however, several large databases such as [PubChem] and [ChemSpider] are openly available which contain tens of millions of compounds. On the other hand, these databases may also lead to many unlikely candidates and therefore more specialized (or custom databases) may be preferred. Which database will be used is dictated by the <code>database</code> argument to <code>generateCompounds()</code>, currently the following options exist:</p>
+<p>Selecting the right database is important for proper candidate assignment. Afterall, if the 'right' chemical compound is not present in the used database, it is impossible to assign the correct structure. Luckily, however, several large databases such as <a href="https://pubchem.ncbi.nlm.nih.gov/">PubChem</a> and <a href="http://www.chemspider.com/">ChemSpider</a> are openly available which contain tens of millions of compounds. On the other hand, these databases may also lead to many unlikely candidates and therefore more specialized (or custom databases) may be preferred. Which database will be used is dictated by the <code>database</code> argument to <code>generateCompounds()</code>, currently the following options exist:</p>
 <!-- UNDONE: add missing databases when support is added -->
 <table style="width:94%;">
 <colgroup>
@@ -458,17 +458,17 @@ formulasBr &lt;-<span class="st"> </span><span class="kw">generateFormulas</span
 <tr class="odd">
 <td><code>pubchem</code></td>
 <td><code>&quot;metfrag&quot;</code>, <code>&quot;sirius&quot;</code></td>
-<td>[PubChem] is currently the largest compound database and is used by default.</td>
+<td><a href="https://pubchem.ncbi.nlm.nih.gov/">PubChem</a> is currently the largest compound database and is used by default.</td>
 </tr>
 <tr class="even">
 <td><code>chemspider</code></td>
 <td><code>&quot;metfrag&quot;</code></td>
-<td>[ChemSpider] is another large database. Requires security token from <a href="http://www.chemspider.com/AboutServices.aspx">here</a> (see next section).</td>
+<td><a href="http://www.chemspider.com/">ChemSpider</a> is another large database. Requires security token from <a href="http://www.chemspider.com/AboutServices.aspx">here</a> (see next section).</td>
 </tr>
 <tr class="odd">
 <td><code>comptox</code></td>
 <td><code>&quot;metfrag&quot;</code></td>
-<td>The EPA [CompTox] contains many compounds and scorings relevant to environmental studies. Needs manual download (see next section).</td>
+<td>The EPA <a href="https://comptox.epa.gov/dashboard">CompTox</a> contains many compounds and scorings relevant to environmental studies. Needs manual download (see next section).</td>
 </tr>
 <tr class="even">
 <td><code>pubchemlite</code></td>
@@ -478,17 +478,17 @@ formulasBr &lt;-<span class="st"> </span><span class="kw">generateFormulas</span
 <tr class="odd">
 <td><code>for-ident</code></td>
 <td><code>&quot;metfrag&quot;</code></td>
-<td>The [FOR-IDENT] (STOFF-IDENT) database for water related substances.</td>
+<td>The <a href="https://water.for-ident.org">FOR-IDENT</a> (STOFF-IDENT) database for water related substances.</td>
 </tr>
 <tr class="even">
 <td><code>kegg</code></td>
 <td><code>&quot;metfrag&quot;</code>, <code>&quot;sirius&quot;</code></td>
-<td>The [KEGG] database for biological compounds</td>
+<td>The <a href="https://www.genome.jp/kegg/">KEGG</a> database for biological compounds</td>
 </tr>
 <tr class="odd">
 <td><code>hmdb</code></td>
 <td><code>&quot;metfrag&quot;</code>, <code>&quot;sirius&quot;</code></td>
-<td>The [HMDB] contains many human metabolites.</td>
+<td>The <a href="http://www.hmdb.ca/">HMDB</a> contains many human metabolites.</td>
 </tr>
 <tr class="even">
 <td><code>bio</code></td>
@@ -498,13 +498,13 @@ formulasBr &lt;-<span class="st"> </span><span class="kw">generateFormulas</span
 <tr class="odd">
 <td><code>csv</code>, <code>psv</code>, <code>sdf</code></td>
 <td><code>&quot;metfrag&quot;</code></td>
-<td>Custom database (see next section). [CSV example][csvDB-ex].</td>
+<td>Custom database (see next section). <a href="https://raw.githubusercontent.com/rickhelmus/patRoon/master/tests/testthat/test_data/test-mf-db-isomers.csv">CSV example</a>.</td>
 </tr>
 </tbody>
 </table>
 <div id="configuring-metfrag-databases-and-scoring" class="section level4">
 <h4><span class="header-section-number">4.3.3.1</span> Configuring MetFrag databases and scoring</h4>
-<p>Some extra configuration may be necessary when using certain databases with MetFrag. In order to use the ChemSpider database a <a href="http://www.chemspider.com/AboutServices.aspx">security token</a> should be requested and set with the <code>chemSpiderToken</code> argument to <code>generateCompounds()</code>. The CompTox and PubChemLite databases need to be manually downloaded from [CompTox][CompTox-dl] (or variations with [smoking][CompTox-smoke] or [wastewater][CompTox-WW] metadata) and [PUbChemLite][PCLite-dl]. The file location of this and other local databases (<code>csv</code>, <code>psv</code>, <code>sdf</code>) needs to be manually configured, see the examples below and/or <code>?generateCompounds</code> for more information on how to do this.</p>
+<p>Some extra configuration may be necessary when using certain databases with MetFrag. In order to use the ChemSpider database a <a href="http://www.chemspider.com/AboutServices.aspx">security token</a> should be requested and set with the <code>chemSpiderToken</code> argument to <code>generateCompounds()</code>. The CompTox and PubChemLite databases need to be manually downloaded from <a href="ftp://newftp.epa.gov/COMPTOX/Sustainable_Chemistry_Data/Chemistry_Dashboard/MetFrag_metadata_files">CompTox</a> (or variations with <a href="https://zenodo.org/record/3364464#.XnjM-XLvKUk">smoking</a> or <a href="https://zenodo.org/record/3472781#.XnjMAHLvKUk">wastewater</a> metadata) and <a href="https://zenodo.org/record/3548654">PUbChemLite</a>. The file location of this and other local databases (<code>csv</code>, <code>psv</code>, <code>sdf</code>) needs to be manually configured, see the examples below and/or <code>?generateCompounds</code> for more information on how to do this.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># PubChem: the default</span>
 compsMF &lt;-<span class="st"> </span><span class="kw">generateCompounds</span>(fGroups, mslists, <span class="st">&quot;metfrag&quot;</span>, <span class="dt">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>)
 
@@ -523,7 +523,7 @@ compsMF4 &lt;-<span class="st"> </span><span class="kw">generateCompounds</span>
 <span class="co"># Same, but for custom database</span>
 compsMF5 &lt;-<span class="st"> </span><span class="kw">generateCompounds</span>(fGroups, mslists, <span class="st">&quot;metfrag&quot;</span>, <span class="dt">database =</span> <span class="st">&quot;csv&quot;</span>, <span class="dt">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>,
                               <span class="dt">extraOpts =</span> <span class="kw">list</span>(<span class="dt">LocalDatabasePath =</span> <span class="st">&quot;~/mydb.csv&quot;</span>))</code></pre></div>
-<p>An example of a custom <em>.csv</em> database can be found [here][csvDB-ex].</p>
+<p>An example of a custom <em>.csv</em> database can be found <a href="https://raw.githubusercontent.com/rickhelmus/patRoon/master/tests/testthat/test_data/test-mf-db-isomers.csv">here</a>.</p>
 <p>With MetFrag compound databases are not only used to retrieve candidate structures but are also used to obtain metadata for further ranking. Each database has its own scorings, a table with currently supported scorings can be obtained with the <code>compoundScorings()</code> function (some columns omitted):</p>
 <div style="border: 1px solid #ddd; padding: 5px; overflow-y: auto; height: 350px;">
 <table class="table" style="font-size: 11px; margin-left: auto; margin-right: auto;">

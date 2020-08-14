@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>6.7 Caching | patRoon handbook</title>
   <meta name="description" content="6.7 Caching | patRoon handbook" />
-  <meta name="generator" content="bookdown 0.20 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.19 and GitBook 2.6.7" />
 
   <meta property="og:title" content="6.7 Caching | patRoon handbook" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2020-07-03" />
+<meta name="date" content="2020-08-14" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -150,8 +150,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="5" data-path="processing-workflow-data.html"><a href="processing-workflow-data.html"><i class="fa fa-check"></i><b>5</b> Processing workflow data</a><ul>
 <li class="chapter" data-level="5.1" data-path="inspecting-results.html"><a href="inspecting-results.html"><i class="fa fa-check"></i><b>5.1</b> Inspecting results</a></li>
 <li class="chapter" data-level="5.2" data-path="filtering.html"><a href="filtering.html"><i class="fa fa-check"></i><b>5.2</b> Filtering</a><ul>
-<li class="chapter" data-level="5.2.1" data-path="features.html"><a href="features.html#features"><i class="fa fa-check"></i><b>5.2.1</b> Features</a></li>
-<li class="chapter" data-level="5.2.2" data-path="annotation.html"><a href="annotation.html#annotation"><i class="fa fa-check"></i><b>5.2.2</b> Annotation</a></li>
+<li class="chapter" data-level="5.2.1" data-path="filtering.html"><a href="filtering.html#features-1"><i class="fa fa-check"></i><b>5.2.1</b> Features</a></li>
+<li class="chapter" data-level="5.2.2" data-path="filtering.html"><a href="filtering.html#annotation-1"><i class="fa fa-check"></i><b>5.2.2</b> Annotation</a></li>
 <li class="chapter" data-level="5.2.3" data-path="filtering.html"><a href="filtering.html#components"><i class="fa fa-check"></i><b>5.2.3</b> Components</a></li>
 <li class="chapter" data-level="5.2.4" data-path="filtering.html"><a href="filtering.html#negation"><i class="fa fa-check"></i><b>5.2.4</b> Negation</a></li>
 </ul></li>
@@ -201,7 +201,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="caching" class="section level2">
 <h2><span class="header-section-number">6.7</span> Caching</h2>
 <p>In <code>patRoon</code> lengthy processing operations such as finding features and generating annotation data is <em>cached</em>. This means that when you run such a calculation again (without changing any parameters), the data is simply loaded from the cache data instead of re-generating it. This in turn is very useful, for instance, if you have closed your R session and want to continue with data processing at a later stage.</p>
-<p>The cache data is stored in a [sqlite] database file. This file is stored by default under the name <code>cache.sqlite</code> in the current working directory (for this reason it is very important to always restore your working directory!). However, the name and location can be changed by setting a global package option:</p>
+<p>The cache data is stored in a <a href="https://www.sqlite.org/index.html">sqlite</a> database file. This file is stored by default under the name <code>cache.sqlite</code> in the current working directory (for this reason it is very important to always restore your working directory!). However, the name and location can be changed by setting a global package option:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">options</span>(<span class="dt">patRoon.cache.fileName =</span> <span class="st">&quot;~/myCacheFile.sqlite&quot;</span>)</code></pre></div>
 <p>For instance, this might be useful if you want to use a shared cache file between projects.</p>
 <p>After a while you may see that your cache file can get quite large. This is especially true when testing different parameters to optimize your workflow. Furthermore, you may want to clear the cache after you have updated <code>patRoon</code> and want to make sure that the latest code is used to generate the data. At any point you can simply remove the cache file. A more fine tuned approach which doesn't wipe all your cached data is by using the <code>clearCache()</code> function. With this function you can selectively remove parts of the cache file. The function has two arguments: <code>what</code>, which specifies what should be removed, and <code>file</code> which specifies the path to the cache file. The latter only needs to be specified if you want to manage a different cache file.</p>

@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>4 Generating workflow data | patRoon handbook</title>
   <meta name="description" content="4 Generating workflow data | patRoon handbook" />
-  <meta name="generator" content="bookdown 0.20 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.19 and GitBook 2.6.7" />
 
   <meta property="og:title" content="4 Generating workflow data | patRoon handbook" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2020-07-03" />
+<meta name="date" content="2020-08-14" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -150,8 +150,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="5" data-path="processing-workflow-data.html"><a href="processing-workflow-data.html"><i class="fa fa-check"></i><b>5</b> Processing workflow data</a><ul>
 <li class="chapter" data-level="5.1" data-path="inspecting-results.html"><a href="inspecting-results.html"><i class="fa fa-check"></i><b>5.1</b> Inspecting results</a></li>
 <li class="chapter" data-level="5.2" data-path="filtering.html"><a href="filtering.html"><i class="fa fa-check"></i><b>5.2</b> Filtering</a><ul>
-<li class="chapter" data-level="5.2.1" data-path="features.html"><a href="features.html#features"><i class="fa fa-check"></i><b>5.2.1</b> Features</a></li>
-<li class="chapter" data-level="5.2.2" data-path="annotation.html"><a href="annotation.html#annotation"><i class="fa fa-check"></i><b>5.2.2</b> Annotation</a></li>
+<li class="chapter" data-level="5.2.1" data-path="filtering.html"><a href="filtering.html#features-1"><i class="fa fa-check"></i><b>5.2.1</b> Features</a></li>
+<li class="chapter" data-level="5.2.2" data-path="filtering.html"><a href="filtering.html#annotation-1"><i class="fa fa-check"></i><b>5.2.2</b> Annotation</a></li>
 <li class="chapter" data-level="5.2.3" data-path="filtering.html"><a href="filtering.html#components"><i class="fa fa-check"></i><b>5.2.3</b> Components</a></li>
 <li class="chapter" data-level="5.2.4" data-path="filtering.html"><a href="filtering.html#negation"><i class="fa fa-check"></i><b>5.2.4</b> Negation</a></li>
 </ul></li>
@@ -257,7 +257,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </tr>
 </tbody>
 </table>
-<p>All of these functions store their output in objects derived from so called S4 classes. Knowing the details about the S4 class system of <code>R</code> is generally not important when using <code>patRoon</code> (and well written resources are available if you want to know more). In brief, usage of this class system allows a general data format that is used irrespective of the algorithm that was used to generate the data. For instance, when features have been found by [OpenMS] or [XCMS] they both return the same data format.</p>
+<p>All of these functions store their output in objects derived from so called S4 classes. Knowing the details about the S4 class system of <code>R</code> is generally not important when using <code>patRoon</code> (and well written resources are available if you want to know more). In brief, usage of this class system allows a general data format that is used irrespective of the algorithm that was used to generate the data. For instance, when features have been found by <a href="http://openms.de/">OpenMS</a> or <a href="https://www.bioconductor.org/packages/release/bioc/html/xcms.html">XCMS</a> they both return the same data format.</p>
 <p>Another advantage of the S4 class system is the usage of so called <em>generic functions</em>. To put simply: a generic function performs a certain task for different types of data objects. A good example is the <code>plotSpec()</code> function which plots an (annotated) spectrum from data of MS peak lists or from formula or compound annotation:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># mslists, formulas, compounds contain results for MS peak lists and</span>
 <span class="co"># formula/compound annotations, respectively.</span>

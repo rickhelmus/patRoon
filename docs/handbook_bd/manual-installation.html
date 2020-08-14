@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>2.2 Manual installation | patRoon handbook</title>
   <meta name="description" content="2.2 Manual installation | patRoon handbook" />
-  <meta name="generator" content="bookdown 0.20 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.19 and GitBook 2.6.7" />
 
   <meta property="og:title" content="2.2 Manual installation | patRoon handbook" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2020-07-03" />
+<meta name="date" content="2020-08-14" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -150,8 +150,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="5" data-path="processing-workflow-data.html"><a href="processing-workflow-data.html"><i class="fa fa-check"></i><b>5</b> Processing workflow data</a><ul>
 <li class="chapter" data-level="5.1" data-path="inspecting-results.html"><a href="inspecting-results.html"><i class="fa fa-check"></i><b>5.1</b> Inspecting results</a></li>
 <li class="chapter" data-level="5.2" data-path="filtering.html"><a href="filtering.html"><i class="fa fa-check"></i><b>5.2</b> Filtering</a><ul>
-<li class="chapter" data-level="5.2.1" data-path="features.html"><a href="features.html#features"><i class="fa fa-check"></i><b>5.2.1</b> Features</a></li>
-<li class="chapter" data-level="5.2.2" data-path="annotation.html"><a href="annotation.html#annotation"><i class="fa fa-check"></i><b>5.2.2</b> Annotation</a></li>
+<li class="chapter" data-level="5.2.1" data-path="filtering.html"><a href="filtering.html#features-1"><i class="fa fa-check"></i><b>5.2.1</b> Features</a></li>
+<li class="chapter" data-level="5.2.2" data-path="filtering.html"><a href="filtering.html#annotation-1"><i class="fa fa-check"></i><b>5.2.2</b> Annotation</a></li>
 <li class="chapter" data-level="5.2.3" data-path="filtering.html"><a href="filtering.html#components"><i class="fa fa-check"></i><b>5.2.3</b> Components</a></li>
 <li class="chapter" data-level="5.2.4" data-path="filtering.html"><a href="filtering.html#negation"><i class="fa fa-check"></i><b>5.2.4</b> Negation</a></li>
 </ul></li>
@@ -208,7 +208,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </ol>
 <div id="r-prerequisites" class="section level3">
 <h3><span class="header-section-number">2.2.1</span> R prerequisites</h3>
-<p>When installing <code>patRoon</code> Windows users have the option to install from a customized ([miniCRAN]) repository (<code>patRoonDeps</code>). This repository provides a central repository for <code>patRoon</code> and all its R packages. An advantage is that installation will be faster and you will not need to install [Rtools]. Note that you will need to have the latest <code>R</code> version installed in order to use this repository.</p>
+<p>When installing <code>patRoon</code> Windows users have the option to install from a customized (<a href="https://github.com/andrie/miniCRAN">miniCRAN</a>) repository (<code>patRoonDeps</code>). This repository provides a central repository for <code>patRoon</code> and all its R packages. An advantage is that installation will be faster and you will not need to install <a href="https://cran.r-project.org/bin/windows/Rtools/">Rtools</a>. Note that you will need to have the latest <code>R</code> version installed in order to use this repository.</p>
 <p>When you decide to use the <code>patRoonDeps</code> repository you can simply <em>skip</em> this step. <strong>Otherwise</strong> (i.e. you will use regular repositories instead), execute the following:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">install.packages</span>(<span class="kw">c</span>(<span class="st">&quot;BiocManager&quot;</span>, <span class="st">&quot;remotes&quot;</span>))
 BiocManager<span class="op">::</span><span class="kw">install</span>(<span class="st">&quot;CAMERA&quot;</span>)
@@ -236,43 +236,43 @@ remotes<span class="op">::</span><span class="kw">install_github</span>(<span cl
 </thead>
 <tbody>
 <tr class="odd">
-<td>[Java JDK][JavaJDK]</td>
+<td><a href="https://www.oracle.com/technetwork/java/javase/downloads/index.html">Java JDK</a></td>
 <td><strong>Mandatory</strong> for e.g. plotting structures and using MetFrag.</td>
 </tr>
 <tr class="even">
-<td>[Rtools]</td>
+<td><a href="https://cran.r-project.org/bin/windows/Rtools/">Rtools</a></td>
 <td>Necessary on Window and when <code>patRoon</code> is <em>not</em> installed from <code>patRoonDeps</code>.</td>
 </tr>
 <tr class="odd">
-<td>[ProteoWizard]</td>
+<td><a href="http://proteowizard.sourceforge.net/">ProteoWizard</a></td>
 <td>Needed for automatic data-pretreatment (e.g. data file conversion and centroiding, Bruker users may use DataAnalysis integration instead).</td>
 </tr>
 <tr class="even">
-<td>[OpenMS]</td>
+<td><a href="http://openms.de/">OpenMS</a></td>
 <td>Recommended. Used for e.g. finding and grouping features.</td>
 </tr>
 <tr class="odd">
-<td>[MetFrag CL][MetFragCL]</td>
+<td><a href="http://ipb-halle.github.io/MetFrag/projects/metfragcl/">MetFrag CL</a></td>
 <td>Recommended. Used for annotation with MetFrag.</td>
 </tr>
 <tr class="even">
-<td>[MetFrag CompTox DB][CompTox-dl]</td>
-<td>Database files necessary for usage of the [CompTox] database with MetFrag. Note that a recent version of MetFrag (&gt;=2.4.5) is required. Note that the lists with additions for [smoking metadata][CompTox-smoke] and [wastewater metadata][CompTox-WW] are also supported.</td>
+<td><a href="ftp://newftp.epa.gov/COMPTOX/Sustainable_Chemistry_Data/Chemistry_Dashboard/MetFrag_metadata_files">MetFrag CompTox DB</a></td>
+<td>Database files necessary for usage of the <a href="https://comptox.epa.gov/dashboard">CompTox</a> database with MetFrag. Note that a recent version of MetFrag (&gt;=2.4.5) is required. Note that the lists with additions for <a href="https://zenodo.org/record/3364464#.XnjM-XLvKUk">smoking metadata</a> and <a href="https://zenodo.org/record/3472781#.XnjMAHLvKUk">wastewater metadata</a> are also supported.</td>
 </tr>
 <tr class="odd">
-<td>[MetFrag PubChemLite DB][PCLite-dl]</td>
+<td><a href="https://zenodo.org/record/3548654">MetFrag PubChemLite DB</a></td>
 <td>Database files needed to use PubChemLite with MetFrag (currently tested with tier0 and tier1 November 2019 versions).</td>
 </tr>
 <tr class="even">
-<td>[SIRIUS]</td>
+<td><a href="https://bio.informatik.uni-jena.de/software/sirius/">SIRIUS</a></td>
 <td>For formula and/or compound annotation.</td>
 </tr>
 <tr class="odd">
-<td>[OpenBabel]</td>
+<td><a href="http://openbabel.org/wiki/Main_Page">OpenBabel</a></td>
 <td>Used in some cases for suspect screening (e.g. to calculate molecular masses for suspects with only InChI information). Otherwise optional.</td>
 </tr>
 <tr class="even">
-<td>[pngquant]</td>
+<td><a href="https://pngquant.org/">pngquant</a></td>
 <td>Used to reduce size of HTML reports, definitely optional.</td>
 </tr>
 </tbody>

@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>3 Workflow concepts | patRoon handbook</title>
   <meta name="description" content="3 Workflow concepts | patRoon handbook" />
-  <meta name="generator" content="bookdown 0.20 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.19 and GitBook 2.6.7" />
 
   <meta property="og:title" content="3 Workflow concepts | patRoon handbook" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2020-07-03" />
+<meta name="date" content="2020-08-14" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -150,8 +150,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="5" data-path="processing-workflow-data.html"><a href="processing-workflow-data.html"><i class="fa fa-check"></i><b>5</b> Processing workflow data</a><ul>
 <li class="chapter" data-level="5.1" data-path="inspecting-results.html"><a href="inspecting-results.html"><i class="fa fa-check"></i><b>5.1</b> Inspecting results</a></li>
 <li class="chapter" data-level="5.2" data-path="filtering.html"><a href="filtering.html"><i class="fa fa-check"></i><b>5.2</b> Filtering</a><ul>
-<li class="chapter" data-level="5.2.1" data-path="features.html"><a href="features.html#features"><i class="fa fa-check"></i><b>5.2.1</b> Features</a></li>
-<li class="chapter" data-level="5.2.2" data-path="annotation.html"><a href="annotation.html#annotation"><i class="fa fa-check"></i><b>5.2.2</b> Annotation</a></li>
+<li class="chapter" data-level="5.2.1" data-path="filtering.html"><a href="filtering.html#features-1"><i class="fa fa-check"></i><b>5.2.1</b> Features</a></li>
+<li class="chapter" data-level="5.2.2" data-path="filtering.html"><a href="filtering.html#annotation-1"><i class="fa fa-check"></i><b>5.2.2</b> Annotation</a></li>
 <li class="chapter" data-level="5.2.3" data-path="filtering.html"><a href="filtering.html#components"><i class="fa fa-check"></i><b>5.2.3</b> Components</a></li>
 <li class="chapter" data-level="5.2.4" data-path="filtering.html"><a href="filtering.html#negation"><i class="fa fa-check"></i><b>5.2.4</b> Negation</a></li>
 </ul></li>
@@ -206,8 +206,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <!-- - show images of feature definition etc? -->
 <p>In a non-target workflow both chromatographic and mass spectral data is automatically processed in order to provide a comprehensive chemical characterization of your samples. While the exact workflow is typically dependent on the type of study, it generally involves of the following steps:</p>
 <!-- UNDONE: include other data processing steps here? -->
-<div id="htmlwidget-356de8e30fb148485782" style="width:750px;height:250px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-356de8e30fb148485782">{"x":{"diagram":"\ndigraph workflow {\n  graph [ rankdir = LR, compound = true, style = invis ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.8,\n         height = 1,\n         fontsize = 20,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n  subgraph cluster1 {\n    \"Data pre-treatment\" -> \"Find features\"\n    \"Find features\" -> \"Group features\"\n  }\n  \n  subgraph cluster2 {\n    \"Suspect screening\" -> \"Group features\" [minlen=3, style=dashed]\n    \"Find features\" -> \"Suspect screening\" [style=invis]\n    \"Group features\" -> \"Suspect screening\" [style=dashed]\n  }\n  \n  subgraph cluster3 {\n    graph [style = dashed ]\n    color=blue\n    \"MS peak lists\" \"Formula annotation\"  \"Compound Annotation\"\n  }\n\n  subgraph cluster4 {\n    Componentization\n  }\n  \n  \"Group features\" -> \"Formula annotation\" [ltail=cluster1, lhead=cluster3, style=dashed]\n  \"Group features\" -> \"Componentization\" [ltail=cluster1, lhead=cluster4, style=dashed]\n  \n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-5a608e45c816e71d384b" style="width:750px;height:250px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-5a608e45c816e71d384b">{"x":{"diagram":"\ndigraph workflow {\n  graph [ rankdir = LR, compound = true, style = invis ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.8,\n         height = 1,\n         fontsize = 20,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n  subgraph cluster1 {\n    \"Data pre-treatment\" -> \"Find features\"\n    \"Find features\" -> \"Group features\"\n  }\n  \n  subgraph cluster2 {\n    \"Suspect screening\" -> \"Group features\" [minlen=3, style=dashed]\n    \"Find features\" -> \"Suspect screening\" [style=invis]\n    \"Group features\" -> \"Suspect screening\" [style=dashed]\n  }\n  \n  subgraph cluster3 {\n    graph [style = dashed ]\n    color=blue\n    \"MS peak lists\" \"Formula annotation\"  \"Compound Annotation\"\n  }\n\n  subgraph cluster4 {\n    Componentization\n  }\n  \n  \"Group features\" -> \"Formula annotation\" [ltail=cluster1, lhead=cluster3, style=dashed]\n  \"Group features\" -> \"Componentization\" [ltail=cluster1, lhead=cluster4, style=dashed]\n  \n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 <p>Note that <code>patRoon</code> supports flexible composition of workflows. In the scheme above you can recognize optional steps by a <em>dashed line</em>. The inclusion of each step is only necessary if a further steps depends on its data. For instance, annotation and componentization do not depend on each other and can therefore be executed in any order or simply be omitted. A brief descripton of all steps is given below.</p>
 <p>During <strong>data pre-treatment</strong> raw MS data is prepared for further analysis. A common need for this step is to convert the data to an open format so that other tools are able to process it. Other pre-treatment steps may involve re-calibration of <em>m/z</em> data or performing advanced filtering operations.</p>
 <p>The next step is to extract <strong>features</strong> from the data. While different terminologies are used, a feature in <code>patRoon</code> refers to a single chromatographic peak in an extracted ion chromatogram for a single <em>m/z</em> value (within a defined tolerance). Hence, a feature contains both chromatographic data (e.g. retention time and peak height) and mass spectral data (e.g. the accurate <em>m/z</em>). Note that with mass spectrometry multiple <em>m/z</em> values may be detected for a single compound as a result of adduct formation, natural isotopes and/or in-source fragments. Some algorithms may try to combine these different masses in a single feature. However, in <code>patRoon</code> we generally assume this is not the case (and may optionally be done afterwards during the componentization step described below). Features are sometimes simply referred to as 'peaks'.</p>

@@ -119,7 +119,7 @@
       <h1 data-toc-skip>patRoon tutorial</h1>
                         <h4 class="author">Rick Helmus</h4>
             
-            <h4 class="date">2020-07-03</h4>
+            <h4 class="date">2020-08-14</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/rickhelmus/patRoon/blob/master/vignettes/tutorial.Rmd"><code>vignettes/tutorial.Rmd</code></a></small>
       <div class="hidden name"><code>tutorial.Rmd</code></div>
@@ -151,8 +151,8 @@ p.caption {
 <!-- UNDONE: link to advanced vignette -->
 <p>In this tutorial you will learn how to perform a simple non-target analysis with <code>patRoon</code>. This tutorial is not meant to give a detailed overview of <code>patRoon</code>. Instead, it serves as a quick introduction on how to use <code>patRoon</code> to setup and perform a full non-target analysis workflow.</p>
 <p>The workflow in this tutorial consists of the following steps:</p>
-<div id="htmlwidget-c5f03e631a7c82c266ea" style="width:750px;height:100px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-c5f03e631a7c82c266ea">{"x":{"diagram":"\ndigraph rmarkdown {\ngraph [ rankdir = LR ]\nnode [ shape = box,\n       fixedsize = true,\n       width = 2.2,\n       height = 1,\n       fontsize = 18,\n       fillcolor = darkseagreen1,\n       style = filled ]\n\"New project\" -> Features -> Annotation -> Reporting [ arrowhead = vee ]\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-31c1f887cde7097cbbcd" style="width:750px;height:100px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-31c1f887cde7097cbbcd">{"x":{"diagram":"\ndigraph rmarkdown {\ngraph [ rankdir = LR ]\nnode [ shape = box,\n       fixedsize = true,\n       width = 2.2,\n       height = 1,\n       fontsize = 18,\n       fillcolor = darkseagreen1,\n       style = filled ]\n\"New project\" -> Features -> Annotation -> Reporting [ arrowhead = vee ]\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 </div>
 <div id="data" class="section level1">
 <h1 class="hasAnchor">
@@ -574,16 +574,16 @@ p.caption {
 <div class="sourceCode"><html><body><pre class="r"><span class="fu"><a href="../reference/generics.html">as.data.table</a></span>(<span class="no">compounds</span>)[, <span class="fl">1</span>:<span class="fl">5</span>] <span class="co"># only show first columns for clarity</span></pre></body></html></div>
 <pre><code>#&gt;               group explainedPeaks    score neutralMass                               SMILES
 #&gt;    1:  M109_R116_56              3 4.521840    108.0687                    C1=CC=C(C(=C1)N)N
-#&gt;    2:  M109_R116_56              3 4.014284    108.0687                      C1=CC(=CC=C1N)N
-#&gt;    3:  M109_R116_56              3 3.491462    108.0687                      C1=CC=C(C=C1)NN
-#&gt;    4:  M109_R116_56              3 3.313121    108.0687                    C1=CC(=CC(=C1)N)N
-#&gt;    5:  M109_R116_56              3 3.028436    108.0687                      CC1=NC(=CC=C1)N
+#&gt;    2:  M109_R116_56              3 4.019102    108.0687                      C1=CC(=CC=C1N)N
+#&gt;    3:  M109_R116_56              3 3.491141    108.0687                      C1=CC=C(C=C1)NN
+#&gt;    4:  M109_R116_56              3 3.313966    108.0687                    C1=CC(=CC(=C1)N)N
+#&gt;    5:  M109_R116_56              3 3.028255    108.0687                      CC1=NC(=CC=C1)N
 #&gt;   ---                                                                                       
-#&gt; 2205: M254_R321_484              2 2.480706    253.0521 CC1=C(C(=NO1)NS(=O)(=O)C2=CC=CC=C2)N
-#&gt; 2206: M254_R321_484              5 2.478817    253.0521 CC1=NN=C(O1)C2=CC(=CC=C2)NS(=O)(=O)C
-#&gt; 2207: M254_R321_484              5 2.478817    253.0521 CC1=NN=C(O1)C2=CC=C(C=C2)NS(=O)(=O)C
-#&gt; 2208: M254_R321_484              4 2.468703    253.0521   COC1=CC=C(C=C1)NS(=O)(=O)C2=CC=NN2
-#&gt; 2209: M254_R321_484              4 2.468703    253.0521   COC1=CC=CC(=C1)NS(=O)(=O)C2=CC=NN2</code></pre>
+#&gt; 2205: M254_R321_484              6 2.482113    253.0521   CCC1=NN=C(O1)C2=CC=CC=C2S(=O)(=O)N
+#&gt; 2206: M254_R321_484              2 2.480706    253.0521 CC1=C(C(=NO1)NS(=O)(=O)C2=CC=CC=C2)N
+#&gt; 2207: M254_R321_484              5 2.478817    253.0521 CC1=NN=C(O1)C2=CC(=CC=C2)NS(=O)(=O)C
+#&gt; 2208: M254_R321_484              5 2.478817    253.0521 CC1=NN=C(O1)C2=CC=C(C=C2)NS(=O)(=O)C
+#&gt; 2209: M254_R321_484              4 2.468703    253.0521   COC1=CC=C(C=C1)NS(=O)(=O)C2=CC=NN2</code></pre>
 <div class="sourceCode"><html><body><pre class="r"><span class="fu"><a href="../reference/generics.html">plotSpec</a></span>(<span class="no">mslists</span>, <span class="st">"M186_R265_296"</span>, <span class="kw">MSLevel</span> <span class="kw">=</span> <span class="fl">2</span>)</pre></body></html></div>
 <p><img src="tutorial_files/figure-html/plotSpec-1.png" width="576"></p>
 <div class="sourceCode"><html><body><pre class="r"><span class="fu"><a href="../reference/generics.html">plotSpec</a></span>(<span class="no">formulas</span>, <span class="st">"C6H9N2"</span>, <span class="st">"M109_R116_56"</span>, <span class="kw">MSPeakLists</span> <span class="kw">=</span> <span class="no">mslists</span>)</pre></body></html></div>

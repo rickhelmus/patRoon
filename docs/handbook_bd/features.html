@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>4.2 Features | patRoon handbook</title>
   <meta name="description" content="4.2 Features | patRoon handbook" />
-  <meta name="generator" content="bookdown 0.20 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.19 and GitBook 2.6.7" />
 
   <meta property="og:title" content="4.2 Features | patRoon handbook" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2020-07-03" />
+<meta name="date" content="2020-08-14" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -150,8 +150,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="5" data-path="processing-workflow-data.html"><a href="processing-workflow-data.html"><i class="fa fa-check"></i><b>5</b> Processing workflow data</a><ul>
 <li class="chapter" data-level="5.1" data-path="inspecting-results.html"><a href="inspecting-results.html"><i class="fa fa-check"></i><b>5.1</b> Inspecting results</a></li>
 <li class="chapter" data-level="5.2" data-path="filtering.html"><a href="filtering.html"><i class="fa fa-check"></i><b>5.2</b> Filtering</a><ul>
-<li class="chapter" data-level="5.2.1" data-path="features.html"><a href="features.html#features"><i class="fa fa-check"></i><b>5.2.1</b> Features</a></li>
-<li class="chapter" data-level="5.2.2" data-path="annotation.html"><a href="annotation.html#annotation"><i class="fa fa-check"></i><b>5.2.2</b> Annotation</a></li>
+<li class="chapter" data-level="5.2.1" data-path="filtering.html"><a href="filtering.html#features-1"><i class="fa fa-check"></i><b>5.2.1</b> Features</a></li>
+<li class="chapter" data-level="5.2.2" data-path="filtering.html"><a href="filtering.html#annotation-1"><i class="fa fa-check"></i><b>5.2.2</b> Annotation</a></li>
 <li class="chapter" data-level="5.2.3" data-path="filtering.html"><a href="filtering.html#components"><i class="fa fa-check"></i><b>5.2.3</b> Components</a></li>
 <li class="chapter" data-level="5.2.4" data-path="filtering.html"><a href="filtering.html#negation"><i class="fa fa-check"></i><b>5.2.4</b> Negation</a></li>
 </ul></li>
@@ -201,8 +201,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="features" class="section level2">
 <h2><span class="header-section-number">4.2</span> Features</h2>
 <p>Collecting features from the analyses consists of finding all features, grouping them across analyses (optionally after retention time alignment) and finally, if desired suspect screening:</p>
-<div id="htmlwidget-a7f40931b598a7624c4d" style="width:500px;height:70px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-a7f40931b598a7624c4d">{"x":{"diagram":"\ndigraph Features {\n  graph [ rankdir = LR, compound = true ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.2,\n         height = 1,\n         fontsize = 18,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"Find features\" -> \"Group features\"\n    \"Suspect screening\"\n    \"Group features\" -> \"Suspect screening\" [dir=both, style=dashed]\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-9c2fb8e6d308adc60e0a" style="width:500px;height:70px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-9c2fb8e6d308adc60e0a">{"x":{"diagram":"\ndigraph Features {\n  graph [ rankdir = LR, compound = true ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.2,\n         height = 1,\n         fontsize = 18,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"Find features\" -> \"Group features\"\n    \"Suspect screening\"\n    \"Group features\" -> \"Suspect screening\" [dir=both, style=dashed]\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 <div id="finding-and-grouping-features" class="section level3">
 <h3><span class="header-section-number">4.2.1</span> Finding and grouping features</h3>
 <p>Several algorithms are available for finding features. These are listed in the table below alongside their usage and general remarks.</p>
@@ -221,32 +221,32 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </thead>
 <tbody>
 <tr class="odd">
-<td>[OpenMS]</td>
+<td><a href="http://openms.de/">OpenMS</a></td>
 <td><code>findFeatures(algorithm = &quot;openms&quot;, ...)</code></td>
-<td>Uses the [FeatureFinderMetabo] algorithm</td>
+<td>Uses the <a href="https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/TOPP_FeatureFinderMetabo.html">FeatureFinderMetabo</a> algorithm</td>
 </tr>
 <tr class="even">
-<td>[XCMS]</td>
+<td><a href="https://www.bioconductor.org/packages/release/bioc/html/xcms.html">XCMS</a></td>
 <td><code>findFeatures(algorithm = &quot;xcms&quot;, ...)</code></td>
 <td>Uses <code>xcms::xcmsSet()</code> function</td>
 </tr>
 <tr class="odd">
-<td>[XCMS] (import)</td>
+<td><a href="https://www.bioconductor.org/packages/release/bioc/html/xcms.html">XCMS</a> (import)</td>
 <td><code>importFeatures(algorithm = &quot;xcms&quot;, ...)</code></td>
 <td>Imports an existing <code>xcmsSet</code> object.</td>
 </tr>
 <tr class="even">
-<td>[XCMS3]</td>
+<td><a href="https://www.bioconductor.org/packages/release/bioc/html/xcms.html">XCMS3</a></td>
 <td><code>findFeatures(algorithm = &quot;xcms3&quot;, ...)</code></td>
 <td>Uses <code>xcms::findChromPeaks()</code> from the new XCMS3 interface</td>
 </tr>
 <tr class="odd">
-<td>[XCMS3] (import)</td>
+<td><a href="https://www.bioconductor.org/packages/release/bioc/html/xcms.html">XCMS3</a> (import)</td>
 <td><code>importFeatures(algorithm = &quot;xcms3&quot;, ...)</code></td>
 <td>Imports an existing <code>XCMSnExp</code> object.</td>
 </tr>
 <tr class="even">
-<td>[enviPick]</td>
+<td><a href="https://cran.r-project.org/web/packages/enviPick/index.html">enviPick</a></td>
 <td><code>findFeatures(algorithm = &quot;envipick&quot;, ...)</code></td>
 <td>Uses <code>enviPick::enviPickwrap()</code></td>
 </tr>
@@ -271,15 +271,15 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </thead>
 <tbody>
 <tr class="odd">
-<td>[OpenMS]</td>
+<td><a href="http://openms.de/">OpenMS</a></td>
 <td><code>noiseThrInt</code>, <code>chromSNR</code>, <code>chromFWHM</code>, <code>mzPPM</code>, <code>minFWHM</code>, <code>maxFWHM</code> (see <code>?findFeatures</code>)</td>
 </tr>
 <tr class="even">
-<td>[XCMS] / [XCMS3]</td>
+<td><a href="https://www.bioconductor.org/packages/release/bioc/html/xcms.html">XCMS</a> / <a href="https://www.bioconductor.org/packages/release/bioc/html/xcms.html">XCMS3</a></td>
 <td><code>peakwidth</code>, <code>mzdiff</code>, <code>prefilter</code>, <code>noise</code> (assuming default <code>centWave</code> algorithm, see <code>?findPeaks.centWave</code> / <code>?CentWaveParam</code>)</td>
 </tr>
 <tr class="odd">
-<td>[enviPick]</td>
+<td><a href="https://cran.r-project.org/web/packages/enviPick/index.html">enviPick</a></td>
 <td><code>dmzgap</code>, <code>dmzdens</code>, <code>drtgap</code>, <code>drtsmall</code>, <code>drtdens</code>, <code>drtfill</code>, <code>drttotal</code>, <code>minpeak</code>, <code>minint</code>, <code>maxint</code> (see <code>?enviPickwrap</code>)</td>
 </tr>
 <tr class="even">
@@ -307,27 +307,27 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </thead>
 <tbody>
 <tr class="odd">
-<td>[OpenMS]</td>
+<td><a href="http://openms.de/">OpenMS</a></td>
 <td><code>groupFeatures(algorithm = &quot;openms&quot;, ...)</code></td>
-<td>Uses the [FeatureLinkerUnlabeled] algorithm (and [MapAlignerPoseClustering] for retention alignment)</td>
+<td>Uses the <a href="https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/TOPP_FeatureLinkerUnlabeled.html">FeatureLinkerUnlabeled</a> algorithm (and <a href="https://abibuilder.informatik.uni-tuebingen.de/archive/openms/Documentation/release/latest/html/TOPP_MapAlignerPoseClustering.html">MapAlignerPoseClustering</a> for retention alignment)</td>
 </tr>
 <tr class="even">
-<td>[XCMS]</td>
+<td><a href="https://www.bioconductor.org/packages/release/bioc/html/xcms.html">XCMS</a></td>
 <td><code>groupFeatures(algorithm = &quot;xcms&quot;, ...)</code></td>
 <td>Uses <code>xcms::group()</code> <code>xcms::retcor()</code> functions</td>
 </tr>
 <tr class="odd">
-<td>[XCMS] (import)</td>
+<td><a href="https://www.bioconductor.org/packages/release/bioc/html/xcms.html">XCMS</a> (import)</td>
 <td><code>importFeatureGroupsXCMS(...)</code></td>
 <td>Imports an existing <code>xcmsSet</code> object.</td>
 </tr>
 <tr class="even">
-<td>[XCMS3]</td>
+<td><a href="https://www.bioconductor.org/packages/release/bioc/html/xcms.html">XCMS3</a></td>
 <td><code>groupFeatures(algorithm = &quot;xcms3&quot;, ...)</code></td>
 <td>Uses <code>xcms::groupChromPeaks()</code> and <code>xcms::adjustRtime()</code> functions</td>
 </tr>
 <tr class="odd">
-<td>[XCMS3] (import)</td>
+<td><a href="https://www.bioconductor.org/packages/release/bioc/html/xcms.html">XCMS3</a> (import)</td>
 <td><code>importFeatureGroupsXCMS3(...)</code></td>
 <td>Imports an existing <code>XCMSnExp</code> object.</td>
 </tr>
@@ -344,7 +344,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </tbody>
 </table>
 <p>Just like finding features, each algorithm has their own set of parameters. Often the defaults are a good start but it is recommended to have look at them. See <code>?groupFeatures</code> for more details.</p>
-<p>When using the [XCMS] algorithms both the 'classical' interface and latest <code>XCMS3</code> interfaces are supported. Currently, both interfaces are mostly the same regarding functionalities and implementation. However, since future developments of XCMS are primarily focused the latter this interface is recommended.</p>
+<p>When using the <a href="https://www.bioconductor.org/packages/release/bioc/html/xcms.html">XCMS</a> algorithms both the 'classical' interface and latest <code>XCMS3</code> interfaces are supported. Currently, both interfaces are mostly the same regarding functionalities and implementation. However, since future developments of XCMS are primarily focused the latter this interface is recommended.</p>
 <p>Some examples of finding and grouping features are shown below.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># The anaInfo variable contains analysis information, see the previous section</span>
 
@@ -386,7 +386,7 @@ fGroupsSusp &lt;-<span class="st"> </span><span class="kw">groupFeaturesScreenin
                        <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>)
 scr &lt;-<span class="st"> </span><span class="kw">screenSuspects</span>(fGroups, suspects, <span class="dt">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>)
 fGroupsSusp &lt;-<span class="st"> </span><span class="kw">groupFeaturesScreening</span>(fGroups, scr)</code></pre></div>
-<p>Note that in some cases you may need to install [OpenBabel] (e.g. when only InChI data is available for mass calculation).</p>
+<p>Note that in some cases you may need to install <a href="http://openbabel.org/wiki/Main_Page">OpenBabel</a> (e.g. when only InChI data is available for mass calculation).</p>
 </div>
 </div>
             </section>

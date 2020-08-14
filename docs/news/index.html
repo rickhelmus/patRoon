@@ -170,6 +170,11 @@
 <li>Automated tests for importing/exporting XCMS(3) data + small fixes for surfaced bugs</li>
 <li>
 <code><a href="../reference/component-generation.html">generateComponentsNontarget()</a></code>: allow wider <em>m/z</em> deviation for proper linkage of different series (controlled by <code>absMzDevLink</code> argument).</li>
+<li>Fixed: <code><a href="../reference/bruker-utils.html">addAllDAEICs()</a></code> sometimes used wrong names for EICs</li>
+<li>Improved handling of empty feature groups objects when reporting</li>
+<li>Fixed: <code><a href="../reference/reporting.html">reportPDF()</a></code> may report formula annotated spectra of results not present in input <code>featureGroups</code>
+</li>
+<li>Fixed: Loading <code>data.table</code> data from cache now calls <code><a href="https://Rdatatable.gitlab.io/data.table/reference/truelength.html">data.table::setalloccol()</a></code> to ensure proper behavior if <code><a href="https://Rdatatable.gitlab.io/data.table/reference/assign.html">data.table::set()</a></code> is called on cached data.</li>
 </ul>
 </div>
     <div id="patroon-1-0-1" class="section level1">

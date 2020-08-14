@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>5.1 Inspecting results | patRoon handbook</title>
   <meta name="description" content="5.1 Inspecting results | patRoon handbook" />
-  <meta name="generator" content="bookdown 0.20 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.19 and GitBook 2.6.7" />
 
   <meta property="og:title" content="5.1 Inspecting results | patRoon handbook" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2020-07-03" />
+<meta name="date" content="2020-08-14" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -150,8 +150,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="5" data-path="processing-workflow-data.html"><a href="processing-workflow-data.html"><i class="fa fa-check"></i><b>5</b> Processing workflow data</a><ul>
 <li class="chapter" data-level="5.1" data-path="inspecting-results.html"><a href="inspecting-results.html"><i class="fa fa-check"></i><b>5.1</b> Inspecting results</a></li>
 <li class="chapter" data-level="5.2" data-path="filtering.html"><a href="filtering.html"><i class="fa fa-check"></i><b>5.2</b> Filtering</a><ul>
-<li class="chapter" data-level="5.2.1" data-path="features.html"><a href="features.html#features"><i class="fa fa-check"></i><b>5.2.1</b> Features</a></li>
-<li class="chapter" data-level="5.2.2" data-path="annotation.html"><a href="annotation.html#annotation"><i class="fa fa-check"></i><b>5.2.2</b> Annotation</a></li>
+<li class="chapter" data-level="5.2.1" data-path="filtering.html"><a href="filtering.html#features-1"><i class="fa fa-check"></i><b>5.2.1</b> Features</a></li>
+<li class="chapter" data-level="5.2.2" data-path="filtering.html"><a href="filtering.html#annotation-1"><i class="fa fa-check"></i><b>5.2.2</b> Annotation</a></li>
 <li class="chapter" data-level="5.2.3" data-path="filtering.html"><a href="filtering.html#components"><i class="fa fa-check"></i><b>5.2.3</b> Components</a></li>
 <li class="chapter" data-level="5.2.4" data-path="filtering.html"><a href="filtering.html#negation"><i class="fa fa-check"></i><b>5.2.4</b> Negation</a></li>
 </ul></li>
@@ -276,17 +276,17 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Feature table (only first columns for readability)</span>
 fList[[<span class="st">&quot;standard-1&quot;</span>]][, <span class="dv">1</span><span class="op">:</span><span class="dv">6</span>]</code></pre></div>
 <pre><code>#&gt;                          ID       ret        mz       area    retmin    retmax
-#&gt;   1: f_12198123004280964078  19.00698  78.99684  65793.391  13.01202  29.99700
-#&gt;   2: f_14116662334685951522  20.00598  79.02098 125354.100  13.01202  29.99700
-#&gt;   3: f_16623264975991309209   8.01600  79.02101 188045.900   3.03000  12.01302
-#&gt;   4:  f_3942930422657434859 112.34220  79.02103  71168.984 106.55400 147.51600
-#&gt;   5: f_10475523409052309097 111.64380  84.95950  54875.129 105.15180 599.87400
+#&gt;   1: f_15194826037905025322  19.00698  78.99684  65793.391  13.01202  29.99700
+#&gt;   2: f_17284723738930738658  20.00598  79.02098 125354.100  13.01202  29.99700
+#&gt;   3: f_10161848269763194404   8.01600  79.02101 188045.900   3.03000  12.01302
+#&gt;   4:  f_5087645546746315974 112.34220  79.02103  71168.984 106.55400 147.51600
+#&gt;   5:  f_4387676815345115746 111.64380  84.95950  54875.129 105.15180 599.87400
 #&gt;  ---                                                                          
-#&gt; 433: f_16833125942862999222  11.01402 295.22387   9514.476   9.01602  13.01202
-#&gt; 434: f_16569108464623263639  13.01202 296.92038  37753.414  10.01502  15.01098
-#&gt; 435:  f_4374923640831909397  12.01302 297.16751  17366.125   9.01602  15.01098
-#&gt; 436: f_13489335848141138924  11.01402 297.20368  13995.990   9.01602  14.01102
-#&gt; 437: f_14187874534141918169  12.01302 299.12581  13630.378   9.01602  15.01098</code></pre>
+#&gt; 433: f_10559238485815422565  11.01402 295.22387   9514.476   9.01602  13.01202
+#&gt; 434: f_13316607402748059327  13.01202 296.92038  37753.414  10.01502  15.01098
+#&gt; 435:  f_7534884339299326876  12.01302 297.16751  17366.125   9.01602  15.01098
+#&gt; 436: f_12600318035991575294  11.01402 297.20368  13995.990   9.01602  14.01102
+#&gt; 437: f_14603003333708809777  12.01302 299.12581  13630.378   9.01602  15.01098</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Feature group intensities</span>
 fGroups<span class="op">$</span>M120_R328_<span class="dv">81</span></code></pre></div>
 <pre><code>#&gt; [1] 55936 61668 59624</code></pre>
@@ -308,12 +308,12 @@ formulas[[<span class="st">&quot;M120_R328_81&quot;</span>]][, <span class="dv">
 compounds[[<span class="st">&quot;M120_R328_81&quot;</span>]][, <span class="dv">1</span><span class="op">:</span><span class="dv">4</span>]</code></pre></div>
 <pre><code>#&gt;      explainedPeaks    score neutralMass                     SMILES
 #&gt;   1:              1 3.322371    119.0483          C1=CC2=NNN=C2C=C1
-#&gt;   2:              1 1.644565    119.0483        C1=CC=C2C(=C1)N2N=N
+#&gt;   2:              1 1.644564    119.0483        C1=CC=C2C(=C1)N2N=N
 #&gt;   3:              1 1.522632    119.0483 C1=CC(=N)C(=[N+]=[N-])C=C1
 #&gt;   4:              1 1.490700    119.0483   C1=CC=C2C(=C1)[N-]N[N-]2
 #&gt;   5:              1 1.488898    119.0483        C1=CC=C(C=C1)N2N=N2
 #&gt;  ---                                                               
-#&gt;  96:              1 1.021884    119.0483          C1C=NC2=C1N=NC=C2
+#&gt;  96:              1 1.021883    119.0483          C1C=NC2=C1N=NC=C2
 #&gt;  97:              1 1.018037    119.0483     C1=CC2=CN=N[C@@H]2N=C1
 #&gt;  98:              1 1.017414    119.0483        C1=C(NC=N1)/C=C/C#N
 #&gt;  99:              1 1.016333    119.0483          C=CN1C=C(N=N1)C#C
@@ -325,7 +325,7 @@ components[[<span class="st">&quot;CMP7&quot;</span>]][, <span class="dv">1</spa
 #&gt; 2: M276_R321_550 320.6412 276.0415             1           6</code></pre>
 <p>A more sophisticated way to obtain data from a workflow object is to use <code>as.data.table()</code> or <code>as.data.frame()</code>. These functions will convert <em>all</em> information within the object to a table (<code>data.table</code> or <code>data.frame</code>) and allow various options to add extra information. An advantage is that this common data format can be used with many other functions within <code>R</code>. The output is in a <a href="https://r4ds.had.co.nz/tidy-data.html">tidy format</a>.</p>
 <blockquote>
-<p><strong><em>NOTE</em></strong> If you are not familiar with <code>data.table</code> and want to know more see [data.table]. Briefly, this is a more efficient and largely compatible alternative to the regular <code>data.frame</code>.</p>
+<p><strong><em>NOTE</em></strong> If you are not familiar with <code>data.table</code> and want to know more see <a href="https://github.com/Rdatatable/data.table/wiki">data.table</a>. Briefly, this is a more efficient and largely compatible alternative to the regular <code>data.frame</code>.</p>
 </blockquote>
 <blockquote>
 <p><strong><em>NOTE</em></strong> The <code>as.data.frame()</code> methods defined in <code>patRoon</code> simply convert the results from <code>as.data.table()</code>, hence, both functions are equal in their usage and are defined for the same object classes.</p>
@@ -334,17 +334,17 @@ components[[<span class="st">&quot;CMP7&quot;</span>]][, <span class="dv">1</spa
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># obtain table with all features (only first columns for readability)</span>
 <span class="kw">as.data.table</span>(fList)[, <span class="dv">1</span><span class="op">:</span><span class="dv">6</span>]</code></pre></div>
 <pre><code>#&gt;         analysis                     ID       ret        mz      area     retmin
-#&gt;    1:  solvent-1 f_16105329662462653228  19.10298  78.99678  73929.27  13.108980
-#&gt;    2:  solvent-1   f_686062333713420287  14.10798  84.95948 941557.00   3.922998
-#&gt;    3:  solvent-1  f_4442657700814412961 112.97220  84.95949  47558.80 105.301800
-#&gt;    4:  solvent-1 f_17622948131486385632  13.10898  88.95255  34552.67   7.114020
-#&gt;    5:  solvent-1  f_6603644900063960782   2.52900  88.96823  14710.10   1.732002
+#&gt;    1:  solvent-1  f_2519001741251112422  19.10298  78.99678  73929.27  13.108980
+#&gt;    2:  solvent-1  f_2315032086534116001  14.10798  84.95948 941557.00   3.922998
+#&gt;    3:  solvent-1   f_929079660921739770 112.97220  84.95949  47558.80 105.301800
+#&gt;    4:  solvent-1 f_15132089019627157447  13.10898  88.95255  34552.67   7.114020
+#&gt;    5:  solvent-1  f_6655599652678688513   2.52900  88.96823  14710.10   1.732002
 #&gt;   ---                                                                           
-#&gt; 2440: standard-3 f_12576030326548600052  12.14898 294.93888 350965.20   9.151020
-#&gt; 2441: standard-3  f_3569339503241913608  11.14998 295.18863  10705.59   9.151020
-#&gt; 2442: standard-3  f_4355220367125346346  13.14798 296.92039  42195.86  10.150980
-#&gt; 2443: standard-3 f_16545228989070575523  11.14998 297.16737  15177.58   9.151020
-#&gt; 2444: standard-3 f_11495868189668544060  11.14998 297.20377  16678.13   9.151020</code></pre>
+#&gt; 2440: standard-3  f_3167927305415242162  12.14898 294.93888 350965.20   9.151020
+#&gt; 2441: standard-3 f_13364107187623417404  11.14998 295.18863  10705.59   9.151020
+#&gt; 2442: standard-3  f_1715090820227702177  13.14798 296.92039  42195.86  10.150980
+#&gt; 2443: standard-3 f_12248299008018287417  11.14998 297.16737  15177.58   9.151020
+#&gt; 2444: standard-3  f_5123348378408377466  11.14998 297.20377  16678.13   9.151020</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Returns group info and intensity values for each feature group</span>
 <span class="kw">as.data.table</span>(fGroups, <span class="dt">average =</span> <span class="ot">TRUE</span>) <span class="co"># average intensities for replicates</span></code></pre></div>
 <pre><code>#&gt;             group      ret       mz standard
@@ -392,15 +392,15 @@ components[[<span class="st">&quot;CMP7&quot;</span>]][, <span class="dv">1</spa
 <span class="kw">as.data.table</span>(compounds)[, <span class="dv">1</span><span class="op">:</span><span class="dv">4</span>]</code></pre></div>
 <pre><code>#&gt;               group explainedPeaks    score neutralMass
 #&gt;    1:  M120_R328_81              1 3.322371    119.0483
-#&gt;    2:  M120_R328_81              1 1.644565    119.0483
+#&gt;    2:  M120_R328_81              1 1.644564    119.0483
 #&gt;    3:  M120_R328_81              1 1.522632    119.0483
 #&gt;    4:  M120_R328_81              1 1.490700    119.0483
 #&gt;    5:  M120_R328_81              1 1.488898    119.0483
 #&gt;   ---                                                  
-#&gt; 2096: M254_R321_484              2 1.480706    253.0521
-#&gt; 2097: M254_R321_484              5 1.478817    253.0521
+#&gt; 2096: M254_R321_484              6 1.482113    253.0521
+#&gt; 2097: M254_R321_484              2 1.480706    253.0521
 #&gt; 2098: M254_R321_484              5 1.478817    253.0521
-#&gt; 2099: M254_R321_484              4 1.468703    253.0521
+#&gt; 2099: M254_R321_484              5 1.478817    253.0521
 #&gt; 2100: M254_R321_484              4 1.468703    253.0521</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Returns table with all components (including feature group info, annotations etc)</span>
 <span class="kw">as.data.table</span>(components)[, <span class="dv">1</span><span class="op">:</span><span class="dv">6</span>]</code></pre></div>

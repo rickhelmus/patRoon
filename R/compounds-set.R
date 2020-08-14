@@ -138,7 +138,7 @@ generateCompoundsSet <- function(fGroupsSet, MSPeakListsSet, generator, ..., set
     
     # generate consensus by...
     # - checking setThreshold
-    # - merging by IK1 (or identifier?)
+    # - merging by identifier
     # - average scores
     # - merge fragInfos and update PLIndex
     
@@ -148,31 +148,48 @@ generateCompoundsSet <- function(fGroupsSet, MSPeakListsSet, generator, ..., set
     cons <- sapply(allAnnGNames, function(gName)
     {
         allResults <- pruneList(sapply(ionizedCompoundsList, "[[", gName, simplify = FALSE))
-        # allResults <- lapply(ionizedCompoundsList, function(cmp)
-        # {
-        #     ret <- compoundTable(cmp)
-        #     ret[setdiff(allAnnGNames, groupNames(cmp))] <- list(data.table()) # add empty table for missing results
-        #     return(ret[allAnnGNames]) # sync order
-        # })
+        if (length(allResults) == 1)
+            return(copy(allResults[[1]])[, c("mergedCount", "set") := .(1, names(allResults)[1])])
+
+        allResults <- lapply(allResults, copy)
+        
+        # init set names
+        allResults <- mapply(allResults, names(allResults), FUN = set, SIMPLIFY = FALSE,
+                             MoreArgs = list(i = NULL, j = "set"))
+        
+        # update fragInfos
+        allResults <- mapply(allResults, names(allResults), SIMPLIFY = FALSE, FUN = function(cmp, s)
+        {
+            pl <- copy(MSPeakListsSet[[gName]][["MSMS"]]); pl[, PLIndex := seq_len(.N)]; pl <- pl[set == s]
+            cmp[, fragInfo := lapply(fragInfo, function(fi)
+            {
+                fi[, PLIndex := sapply(mz, function(fimz) pl[which.min(abs(fimz - mz)), "PLIndex"])]
+                fi[, set := s]
+                return(fi)
+            })]
+        })
         
         Reduce(x = allResults, f = function(left, right)
         {
-            if (nrow(left) == 0)
-                return(right)
-            if (nrow(right) == 0)
-                return(left)
             merged <- copy(left)
+
+            if (is.null(merged[["mergedCount"]]))
+                merged[, mergedCount := 1]
             
             # UNDONE: assume score cols are same for left/right, should always be the case?
             
-            # average scores for overlapping candidates
+            # merge overlapping candidates: average scores, combine set names and merge fragInfos
             scoreCols <- getAllCompCols(getCompScoreColNames(), names(left), NULL)
-            merged[right, (scoreCols) := lapply(scoreCols,
-                                                function(sc) .rowMeans(unlist(mget(c(sc, paste0("i.", sc)), inherits = TRUE)), na.rm = TRUE, m = .N, n = 2)),
+            merged[right, (c(scoreCols, "set", "fragInfo")) :=
+                       c(lapply(scoreCols, function(sc) .rowMeans(unlist(mget(c(sc, paste0("i.", sc)), inherits = TRUE)), na.rm = TRUE, m = .N, n = 2)),
+                         list(paste0(set, ",", i.set),
+                              mapply(fragInfo, i.fragInfo, SIMPLIFY = FALSE, FUN = rbind))),
                    on = "identifier"]
             
             # add missing candidates from right
-            merged <- rbind(merged, right[!identifier %in% merged$identifier])
+            merged <- rbind(merged, right[!identifier %in% merged$identifier], fill = TRUE)
+
+            merged[identifier %in% right$identifier, mergedCount := mergedCount + 1]
             
             # re-sort
             setorderv(merged, "score")
@@ -181,12 +198,45 @@ generateCompoundsSet <- function(fGroupsSet, MSPeakListsSet, generator, ..., set
         })
     }, simplify = FALSE)
     
-    
-browser()    
+    scTypes <- if (length(ionizedCompoundsList) > 0) ionizedCompoundsList[[1]]@scoreTypes else character()
+    scRanges <- list()
+    if (length(ionizedCompoundsList) > 0)
+    {
+        scRanges <- Reduce(x = lapply(ionizedCompoundsList, slot, "scoreRanges"), f = function(left, right)
+        {
+            # changes ranges for overlap
+            groupsLR <- intersect(names(left), names(right))
+            ret <- mapply(left[groupsLR], right[groupsLR], SIMPLIFY = FALSE, FUN = function(rangesL, rangesR)
+            {
+                scLR <- names(rangesL) # should be same for left/right
+                mapply(rangesL[scLR], rangesR[scLR], FUN = range, SIMPLIFY = FALSE)
+            })
 
-    ret <- compoundsSet(adducts = adducts(fGroupsSet), setObjects = ionizedFormulasList,
-                        setThreshold = setThreshold,
-                        formulas = groupForms, featureFormulas = combFormulas)
+            # add unique from left
+            groupsOnlyL <- setdiff(names(left), names(right))
+            ret[groupsOnlyL] <- left[groupsOnlyL]
+            
+            # add unique from right
+            groupsOnlyR <- setdiff(names(right), names(left))
+            ret[groupsOnlyR] <- right[groupsOnlyR]
+            
+            return(ret[intersect(allAnnGNames, names(ret))]) # order
+        })
+    }
+
+    if (setThreshold > 0)
+    {
+        absSetThreshold <- setThreshold * length(ionizedCompoundsList)
+        cons <- pruneList(lapply(cons, function(ct) ct[mergedCount >= absSetThreshold]), checkZeroRows = TRUE)
+        scRanges <- scRanges[names(cons)]
+    }
+    cons <- lapply(cons, set, j = "mergedCount", value = NULL)
+    
+    ret <- compoundsSet(adducts = adducts(fGroupsSet), setObjects = ionizedCompoundsList,
+                        setThreshold = setThreshold, compounds = cons, scoreTypes = scTypes,
+                        scoreRanges = scRanges)
     
     return(ret)
 }
+
+# UNDONE: compoundsSetMF sub-class (for settings slot)

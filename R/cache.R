@@ -62,6 +62,8 @@ loadCacheData <- function(category, hashes, dbArg = NULL)
         }
     }
 
+    ret <- recursiveApplyDT(ret, setalloccol, sapply, simplify = FALSE)
+    
     return(ret)
 }
 

@@ -9,6 +9,7 @@
 * Fixed: `addAllDAEICs()` sometimes used wrong names for EICs
 * Improved handling of empty feature groups objects when reporting
 * Fixed: `reportPDF()` may report formula annotated spectra of results not present in input `featureGroups`
+* Fixed: Loading `data.table` data from cache now calls `data.table::setalloccol()` to ensure proper behavior if `data.table::set()` is called on cached data.
 
 
 # patRoon 1.0.1

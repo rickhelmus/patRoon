@@ -27,6 +27,8 @@
         - screenSuspects() does both the screening and making new fGroups
         - as.data.table() for fGroupsScreening which adds suspect metadata and ID levels
             - optionally un-collapses suspects per row
+        - annotate() method which does what annotateSuspects() now does
+            - can later also be defined for fGroups?
         - filter() method for minimal rankings, matched MS/MS fragments etc
         - deprecate features method
         - tag hits, but keep all fGroups?

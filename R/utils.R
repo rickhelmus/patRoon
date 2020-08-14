@@ -180,7 +180,15 @@ recursiveApplyDT <- function(l, f, appl = lapply, ...)
         if (inherits(x, "data.table"))
             f(x)
         else if (is.recursive(x))
+        {
+            if (is.data.frame(x))
+            {
+                # keep data.frame class
+                x[] <- appl(x, rec, ...)
+                return(x)
+            }
             appl(x, rec, ...)
+        }
         else
             x
     }

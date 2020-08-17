@@ -14,7 +14,7 @@ commands:
             - setup_remote_docker
             - restore_cache:
                 keys:
-                    - v2-{{ .Branch }}
+                    - v3-{{ .Branch }}
                 paths:
                     - /caches/dock.tar
             - run:

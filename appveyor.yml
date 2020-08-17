@@ -67,6 +67,7 @@ build_script:
     - travis-tool.sh install_bioc mzR xcms CAMERA Rdisop
     - travis-tool.sh install_github rickhelmus/patRoonData
     - travis-tool.sh install_github blosloos/nontarget
+    - travis-tool.sh install_github cbroeckl/RAMClustR
     - travis-tool.sh install_r vdiffr
     - travis-tool.sh install_r covr
     - travis-tool.sh install_deps

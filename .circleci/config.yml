@@ -41,7 +41,7 @@ jobs:
                     mkdir -p /caches
                     docker save -o /caches/dock.tar "${TMP_IMAGE_NAME}"
             - save_cache:
-                key: v2-{{ .Branch }}-{{ epoch }}
+                key: v3-{{ .Branch }}-{{ epoch }}
                 paths:
                     - /caches/dock.tar
     test:

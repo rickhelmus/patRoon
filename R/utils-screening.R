@@ -127,6 +127,72 @@ prepareSuspectList <- function(suspects, adduct, skipInvalid)
     return(suspects)
 }
 
+doScreenSuspects <- function(fGroups, suspects, rtWindow, mzWindow, adduct, skipInvalid)
+{
+    gInfo <- groupInfo(fGroups)
+    
+    setMetaData <- function(t, suspRow)
+    {
+        for (col in c("name", "rt", "mz", "SMILES", "InChI", "InChIKey", "formula", "neutralMass", "adduct",
+                      "fragments_mz", "fragments_formula"))
+        {
+            if (!is.null(suspects[[col]]))
+                set(t, 1L, col, suspRow[[col]])
+            else if (col == "rt")
+                set(t, 1L, col, NA_real_) # exception: always want this column
+        }
+        return(t)
+    }        
+    
+    prog <- openProgBar(0, nrow(suspects))
+    
+    retlist <- lapply(seq_len(nrow(suspects)), function(ti)
+    {
+        hasRT <- !is.null(suspects[["rt"]]) && !is.na(suspects$rt[ti])
+        
+        # find related feature group(s)
+        gi <- gInfo
+        if (hasRT)
+            gi <- gInfo[numLTE(abs(gInfo$rts - suspects$rt[ti]), rtWindow) & numLTE(abs(gInfo$mzs - suspects$mz[ti]), mzWindow), ]
+        else
+            gi <- gInfo[numLTE(abs(gInfo$mzs - suspects$mz[ti]), mzWindow), ]
+        
+        if (nrow(gi) == 0) # no results? --> add NA result
+        {
+            ret <- data.table()
+            setMetaData(ret, suspects[ti])
+            ret[, c("group", "d_rt", "d_mz") := NA]
+            return(ret)
+        }
+        
+        hits <- rbindlist(lapply(rownames(gi), function(g)
+        {
+            ret <- data.table()
+            setMetaData(ret, suspects[ti])
+            ret[, c("group", "d_rt", "d_mz") := .(g, d_rt = if (hasRT) gi[g, "rts"] - rt else NA, gi[g, "mzs"] - mz)]
+            return(ret)
+        }), fill = TRUE)
+        
+        setTxtProgressBar(prog, ti)
+        return(hits)
+    })
+    ret <- rbindlist(retlist, fill = TRUE)
+    
+    ret[, name_unique := make.unique(name)] # UNDONE: do we still need this?
+    setcolorder(ret, c("name", "name_unique"))
+    
+    setTxtProgressBar(prog, nrow(suspects))
+    close(prog)
+    
+    suspectsn <- nrow(suspects)
+    foundn <- suspectsn - sum(is.na(ret$group))
+    printf("Found %d/%d suspects (%.2f%%)\n", foundn, suspectsn, foundn * 100 / suspectsn)
+    
+    ret <- ret[!is.na(group), ]
+    
+    return(ret[])
+}
+
 annotatedMSMSSimilarity <- function(fragInfo, MSMSList, absMzDev, relMinIntensity)
 {
     if (nrow(MSMSList) == 0 || nrow(fragInfo) == 0)
@@ -155,7 +221,7 @@ defaultIDLevelRules <- function(inLevels = NULL, exLevels = NULL)
 # UNDONE/NOTE: mustExist/relative fields only used for scorings of compound/formulas
 estimateIdentificationLevel <- function(suspectRTDev, suspectInChIKey1, suspectFormula, suspectAnnSim,
                                         suspectFragmentsMZ, suspectFragmentsForms,
-                                        checkSuspectFragments, MSMSList,
+                                        checkFragments, MSMSList,
                                         formTable, formScoreRanges, formulasNormalizeScores,
                                         compTable, mCompNames, compScoreRanges, compoundsNormalizeScores,
                                         absMzDev, IDLevelRules)
@@ -249,7 +315,7 @@ estimateIdentificationLevel <- function(suspectRTDev, suspectInChIKey1, suspectF
                 suspMSMSMatchesMZ <- sum(sapply(MSMSList$mz, function(mz1) any(sapply(suspectFragmentsMZ, mzWithin, mz1 = mz1))))
             if (!is.null(suspectFragmentsForms))
             {
-                if (!is.null(fRow) && "formula" %in% checkSuspectFragments)
+                if (!is.null(fRow) && "formula" %in% checkFragments)
                 {
                     frTable <- formTable[byMSMS == TRUE & suspectFormula == neutral_formula]
                     if (nrow(frTable) > 0)
@@ -258,7 +324,7 @@ estimateIdentificationLevel <- function(suspectRTDev, suspectInChIKey1, suspectF
                         suspMSMSMatchesFormF <- sum(suspectFragmentsForms %in% fi$formula)
                     }
                 }
-                if (!is.null(cRow) && "compound" %in% checkSuspectFragments && !is.null(cRow[["fragInfo"]]))
+                if (!is.null(cRow) && "compound" %in% checkFragments && !is.null(cRow[["fragInfo"]]))
                     suspMSMSMatchesFormC <- sum(suspectFragmentsForms %in% cRow$fragInfo$formula)
             }
             # UNDONE: make min(length...) configurable?
@@ -279,15 +345,15 @@ estimateIdentificationLevel <- function(suspectRTDev, suspectInChIKey1, suspectF
             {
                 if (is.null(MSMSList) || nrow(MSMSList) == 0)
                     next
-                hasFRMZ <- "mz" %in% checkSuspectFragments && !is.null(suspectFragmentsMZ) &&
+                hasFRMZ <- "mz" %in% checkFragments && !is.null(suspectFragmentsMZ) &&
                     !is.na(suspectFragmentsMZ) && length(suspectFragmentsMZ) > 0
                 hasFRForms <- !is.null(suspectFragmentsForms) && !is.na(suspectFragmentsForms) &&
                     length(suspectFragmentsForms) > 0
                 if (!hasFRMZ && !hasFRForms)
                     next
                 if (!hasFRMZ &&
-                    (is.null(formTable) || !"formula" %in% checkSuspectFragments) &&
-                    (is.null(compTable) || !"compound" %in% checkSuspectFragments))
+                    (is.null(formTable) || !"formula" %in% checkFragments) &&
+                    (is.null(compTable) || !"compound" %in% checkFragments))
                     next
             }
             if ("retention" %in% IDL$type && is.null(suspectRTDev))
@@ -309,106 +375,3 @@ estimateIdentificationLevel <- function(suspectRTDev, suspectInChIKey1, suspectF
     return(NA_character_)
 }
 
-#' @templateVar normParam compoundsNormalizeScores,formulasNormalizeScores
-#' @templateVar noNone TRUE
-#' @template norm-args
-annotateSuspectList <- function(scr, fGroups, MSPeakLists = NULL, formulas = NULL, compounds = NULL,
-                                collapseBy = NULL, absMzDev = 0.005, relMinMSMSIntensity = 0.05,
-                                checkSuspectFragments = c("mz", "formula", "compound"),
-                                formulasNormalizeScores = "max",
-                                compoundsNormalizeScores = "max",
-                                IDLevelRules = defaultIDLevelRules())
-{
-    ac <- checkmate::makeAssertCollection()
-    assertScreeningResults(scr, fromFGroups = TRUE, add = ac)
-    checkmate::assertClass(fGroups, "featureGroups", add = ac)
-    aapply(checkmate::assertClass, . ~ MSPeakLists + formulas + compounds,
-           c("MSPeakLists", "formulas", "compounds"), null.ok = TRUE, fixed = list(add = ac))
-    aapply(checkmate::assertNumber, . ~ absMzDev + relMinMSMSIntensity, lower = 0,
-           finite = TRUE, fixed = list(add = ac))
-    checkmate::assertChoice(collapseBy, c("minInt", "maxInt", "minLevel", "maxLevel"),
-                            null.ok = TRUE, add = ac)
-    checkmate::assertSubset(checkSuspectFragments, c("mz", "formula", "compound"), add = ac)
-    aapply(assertNormalizationMethod, . ~ formulasNormalizeScores + compoundsNormalizeScores, withNone = FALSE,
-           fixed = list(add = ac))
-    checkmate::assertDataFrame(IDLevelRules, types = c("numeric", "character", "logical"),
-                               all.missing = TRUE, min.rows = 1, add = ac)
-    assertHasNames(IDLevelRules,
-                   c("level", "subLevel", "type", "score", "relative", "value", "higherThanNext", "mustExist"),
-                   add = ac)
-    checkmate::reportAssertions(ac)
-    
-    hash <- makeHash(scr, fGroups, MSPeakLists, formulas, compounds, collapseBy, absMzDev,
-                     relMinMSMSIntensity, checkSuspectFragments, formulasNormalizeScores,
-                     compoundsNormalizeScores, IDLevelRules)
-    cd <- loadCacheData("annotateSuspects", hash)
-    if (!is.null(cd))
-        return(cd)
-    
-    scr <- copy(scr)
-    
-    for (i in seq_len(nrow(scr)))
-    {
-        if (is.na(scr$group[i]))
-            set(scr, i, c("suspFormRank", "suspCompRank", "annotatedMSMSSimilarity", "estIDLevel"),
-                list(NA_integer_, NA_integer_, NA_real_, NA_character_))
-        else
-        {
-            gName <- scr$name_unique[i]
-            MSMSList <- if (!is.null(MSPeakLists)) MSPeakLists[[gName]][["MSMS"]] else NULL
-            fTable <- if (!is.null(formulas)) formulas[[gName]] else NULL
-            fScRanges <- if (!is.null(formulas)) formulas@scoreRanges[[gName]] else NULL
-            cTable <- if (!is.null(compounds)) compounds[[gName]] else NULL
-            cScRanges <- if (!is.null(compounds)) compounds@scoreRanges[[gName]] else NULL
-            
-            suspFormRank <- NA
-            if (!is.null(fTable) && !is.null(scr[["formula"]]) && !is.na(scr$formula[i]))
-            {
-                unFTable <- unique(fTable, by = "formula")
-                suspFormRank <- which(scr$formula[i] == unFTable$neutral_formula)
-                suspFormRank <- if (length(suspFormRank) > 0) suspFormRank[1] else NA
-            }
-            
-            suspIK1 <- if (!is.null(scr[["InChIKey"]]) && !is.na(scr$InChIKey[i])) getIKBlock1(scr$InChIKey[i]) else NULL
-            annSim <- 0; suspCompRank <- NA
-            if (!is.null(MSMSList) && !is.null(cTable) && !is.null(suspIK1))
-            {
-                suspCompRank <- which(suspIK1 == cTable$InChIKey1)
-                suspCompRank <- if (length(suspCompRank) > 0) suspCompRank[1] else NA
-                
-                if (!is.na(suspCompRank) && !is.null(cTable[["fragInfo"]][[suspCompRank]]))
-                    annSim <- annotatedMSMSSimilarity(cTable[["fragInfo"]][[suspCompRank]],
-                                                      MSMSList, absMzDev, relMinMSMSIntensity)
-            }
-            
-            set(scr, i, c("suspFormRank", "suspCompRank", "annotatedMSMSSimilarity"), list(suspFormRank, suspCompRank, annSim))
-            set(scr, i, "estIDLevel",
-                estimateIdentificationLevel(scr$d_rt[i], suspIK1, scr$formula[i], annSim,
-                                            if (!is.null(scr[["fragments_mz"]])) scr$fragments_mz[i] else NULL,
-                                            if (!is.null(scr[["fragments_formula"]])) scr$fragments_formula[i] else NULL,
-                                            checkSuspectFragments, MSMSList, fTable, fScRanges,
-                                            formulasNormalizeScores, cTable,
-                                            mCompNames = if (!is.null(compounds)) mergedCompoundNames(compounds) else NULL,
-                                            cScRanges, compoundsNormalizeScores, absMzDev, IDLevelRules))
-        }
-    }
-    
-    if (!is.null(collapseBy))
-    {
-        doKeep <- function(v) is.na(v) | length(v) == 1 | order(v, decreasing = grepl("^max", collapseBy)) == 1
-        if (collapseBy == "minInt" || collapseBy == "maxInt")
-        {
-            scr[, avgInts := rowMeans(.SD), .SDcol = analyses(fGroups)]
-            scr <- scr[, keep := doKeep(avgInts), by = "name"][, -"avgInts"]
-        }
-        else # collapse by ID level
-            scr <- scr[, keep := doKeep(estIDLevel), by = "name"]
-        scr <- scr[keep == TRUE, -"keep"]
-    }
-    
-    # UNDONE: make suspect names unique again if rows were removed?
-    
-    saveCacheData("annotateSuspects", scr, hash)
-    
-    return(scr[])
-}

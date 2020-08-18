@@ -10,6 +10,8 @@
 ## AutoID
 
 - update version number
+- update docs & handbook
+    - renamed rt/m columns
 - credits to ES
 - tests
     - automatic InChIKey/formula calculation from InChIs/SMILES
@@ -29,11 +31,14 @@
             - optionally un-collapses suspects per row
         - annotate() method which does what annotateSuspects() now does
             - can later also be defined for fGroups?
-        - filter() method for minimal rankings, matched MS/MS fragments etc
+            - adds data to screenInfo slot
+        - filter() method for minimal rankings, matched MS/MS fragments, no/one/multiple hits etc
         - deprecate features method
         - tag hits, but keep all fGroups?
             - fGroups[, hits = TRUE] ?
-            - collapse suspects matched to same fGroups? nice for speeding up annotation
+            - still keep re-naming functionality? not really possible, but put names in reporting functionality
+        - same format for TASQ screening import?
+        - throw informative error when screenSuspects()/screenTargets() is called
 - newProject(): create template auto ID rule csv?
 
 

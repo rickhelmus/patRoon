@@ -19,7 +19,6 @@ setGeneric("overlap", function(fGroups, which, exclusive = FALSE) standardGeneri
 setGeneric("comparison", function(..., groupAlgo,
                                   groupArgs = list(rtalign = FALSE)) standardGeneric("comparison"), signature = "...")
 setGeneric("groupFeatures", function(feat, algorithm, ...) standardGeneric("groupFeatures"))
-setGeneric("groupFeaturesScreening", function(fGroups, scr) standardGeneric("groupFeaturesScreening"))
 setGeneric("replicateGroupSubtract", function(fGroups, rGroups, threshold = 0) standardGeneric("replicateGroupSubtract"))
 
 ### utils (XCMS)
@@ -77,6 +76,14 @@ setGeneric("plotHeatMap", function(obj, ...) standardGeneric("plotHeatMap"))
 
 ### suspect screening
 
+setGeneric("groupFeaturesScreening", function(fGroups, suspects, rtWindow = 12, mzWindow = 0.005, adduct = NULL,
+                                              skipInvalid = TRUE, onlyHits = FALSE) standardGeneric("groupFeaturesScreening"))
+setGeneric("screenInfo", function(obj) standardGeneric("screenInfo"))
+setGeneric("annotateSuspects", function(fGroups, MSPeakLists = NULL, formulas = NULL, compounds = NULL,
+                                        absMzDev = 0.005, relMinMSMSIntensity = 0.05,
+                                        checkFragments = c("mz", "formula", "compound"), formulasNormalizeScores = "max",
+                                        compoundsNormalizeScores = "max",
+                                        IDLevelRules = defaultIDLevelRules()) standardGeneric("annotateSuspects"))
 #' Target and suspect screening
 #'
 #' Utilities to screen for analytes with known or suspected identity.

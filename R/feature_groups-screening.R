@@ -1,12 +1,141 @@
 #' @include main.R
 #' @include feature_groups.R
+#' @include utils-screening.R
 NULL
 
 #' @rdname suspect-screening
-featureGroupsScreening <- setClass("featureGroupsScreening", contains = "featureGroups")
+featureGroupsScreening <- setClass("featureGroupsScreening",
+                                   slots = c(screenInfo = "data.table"),
+                                   contains = "featureGroups")
 
 setMethod("initialize", "featureGroupsScreening",
           function(.Object, ...) callNextMethod(.Object, algorithm = "screening", ...))
+
+
+setMethod("screenInfo", "featureGroupsScreening", function(obj) obj@screenInfo)
+
+setMethod("as.data.table", "featureGroupsScreening",
+          function(x, ..., collapseSuspects = FALSE, onlyHits = FALSE)
+{
+    # UNDONE: re-name/combine collapseSuspects
+    
+    ac <- checkmate::makeAssertCollection()
+    aapply(checkmate::assertFlag, . ~ collapseSuspects + onlyHits, fixed = list(add = ac))
+    checkmate::assertChoice(collapseBy, c("minInt", "maxInt", "minLevel", "maxLevel"),
+                            null.ok = TRUE, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    
+    ret <- callNextMethod(x, ...)
+    if (nrow(ret) > 0)
+    {
+        si <- copy(screenInfo(x))
+        setnames(si, c("rt", "mz"), c("susp_rt", "susp_mz"))
+        
+        if (collapseSuspects)
+        {
+            si[, c("name", "name_unique") := .(paste0(name, collapse = ","),
+                                               paste0(name_unique, collapse = ",")), by = "group"]
+            si <- unique(si, by = "group")
+        }
+        
+        ret <- merge(ret, si, by = "group", all.x = !onlyHits)
+        
+        # UNDONE: move to filter()?
+        if (FALSE && !is.null(collapseBy))
+        {
+            doKeep <- function(v) is.na(v) | length(v) == 1 | order(v, decreasing = grepl("^max", collapseBy)) == 1
+            if (collapseBy == "minInt" || collapseBy == "maxInt")
+            {
+                scr[, avgInts := rowMeans(.SD), .SDcol = analyses(fGroups)]
+                scr <- scr[, keep := doKeep(avgInts), by = "name"][, -"avgInts"]
+            }
+            else # collapse by ID level
+                scr <- scr[, keep := doKeep(estIDLevel), by = "name"]
+            scr <- scr[keep == TRUE, -"keep"]
+        }
+    }
+    return(ret)
+})
+
+#' @templateVar normParam compoundsNormalizeScores,formulasNormalizeScores
+#' @templateVar noNone TRUE
+#' @template norm-args
+setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeakLists, formulas, compounds,
+                                                                 absMzDev, relMinMSMSIntensity, checkFragments,
+                                                                 formulasNormalizeScores, compoundsNormalizeScores,
+                                                                 IDLevelRules)
+{
+    ac <- checkmate::makeAssertCollection()
+    aapply(checkmate::assertClass, . ~ MSPeakLists + formulas + compounds,
+           c("MSPeakLists", "formulas", "compounds"), null.ok = TRUE, fixed = list(add = ac))
+    aapply(checkmate::assertNumber, . ~ absMzDev + relMinMSMSIntensity, lower = 0,
+           finite = TRUE, fixed = list(add = ac))
+    checkmate::assertSubset(checkFragments, c("mz", "formula", "compound"), add = ac)
+    aapply(assertNormalizationMethod, . ~ formulasNormalizeScores + compoundsNormalizeScores, withNone = FALSE,
+           fixed = list(add = ac))
+    checkmate::assertDataFrame(IDLevelRules, types = c("numeric", "character", "logical"),
+                               all.missing = TRUE, min.rows = 1, add = ac)
+    assertHasNames(IDLevelRules,
+                   c("level", "subLevel", "type", "score", "relative", "value", "higherThanNext", "mustExist"),
+                   add = ac)
+    checkmate::reportAssertions(ac)
+    
+    hash <- makeHash(fGroups, MSPeakLists, formulas, compounds, absMzDev,
+                     relMinMSMSIntensity, checkFragments, formulasNormalizeScores,
+                     compoundsNormalizeScores, IDLevelRules)
+    cd <- loadCacheData("annotateSuspects", hash)
+    if (!is.null(cd))
+        return(cd)
+    
+    si <- copy(screenInfo(fGroups))
+    
+    for (i in seq_len(nrow(si)))
+    {
+        gName <- si$group[i]
+        MSMSList <- if (!is.null(MSPeakLists)) MSPeakLists[[gName]][["MSMS"]] else NULL
+        fTable <- if (!is.null(formulas)) formulas[[gName]] else NULL
+        fScRanges <- if (!is.null(formulas)) formulas@scoreRanges[[gName]] else NULL
+        cTable <- if (!is.null(compounds)) compounds[[gName]] else NULL
+        cScRanges <- if (!is.null(compounds)) compounds@scoreRanges[[gName]] else NULL
+        
+        suspFormRank <- NA_integer_
+        if (!is.null(fTable) && !is.null(si[["formula"]]) && !is.na(si$formula[i]))
+        {
+            unFTable <- unique(fTable, by = "formula")
+            suspFormRank <- which(si$formula[i] == unFTable$neutral_formula)
+            suspFormRank <- if (length(suspFormRank) > 0) suspFormRank[1] else NA_integer_
+        }
+        
+        suspIK1 <- if (!is.null(si[["InChIKey"]]) && !is.na(si$InChIKey[i])) getIKBlock1(si$InChIKey[i]) else NULL
+        annSim <- 0; suspCompRank <- NA_integer_
+        if (!is.null(MSMSList) && !is.null(cTable) && !is.null(suspIK1))
+        {
+            suspCompRank <- which(suspIK1 == cTable$InChIKey1)
+            suspCompRank <- if (length(suspCompRank) > 0) suspCompRank[1] else NA_integer_
+            
+            if (!is.na(suspCompRank) && !is.null(cTable[["fragInfo"]][[suspCompRank]]))
+                annSim <- annotatedMSMSSimilarity(cTable[["fragInfo"]][[suspCompRank]],
+                                                  MSMSList, absMzDev, relMinMSMSIntensity)
+        }
+        
+        set(si, i, c("suspFormRank", "suspCompRank", "annotatedMSMSSimilarity"), list(suspFormRank, suspCompRank, annSim))
+        set(si, i, "estIDLevel",
+            estimateIdentificationLevel(si$d_rt[i], suspIK1, si$formula[i], annSim,
+                                        if (!is.null(si[["fragments_mz"]])) si$fragments_mz[i] else NULL,
+                                        if (!is.null(si[["fragments_formula"]])) si$fragments_formula[i] else NULL,
+                                        checkFragments, MSMSList, fTable, fScRanges,
+                                        formulasNormalizeScores, cTable,
+                                        mCompNames = if (!is.null(compounds)) mergedCompoundNames(compounds) else NULL,
+                                        cScRanges, compoundsNormalizeScores, absMzDev, IDLevelRules))
+    }
+    
+    fGroups@screenInfo <- si
+    
+    saveCacheData("annotateSuspects", fGroups, hash)
+    
+    return(fGroups)
+})
 
 #' @details \code{groupFeaturesScreening} uses results from \code{screenSuspects}
 #'   to transform an existing \code{\link{featureGroups}} object by (1) renaming
@@ -36,34 +165,38 @@ setMethod("initialize", "featureGroupsScreening",
 #' @rdname suspect-screening
 #' @aliases groupFeaturesScreening
 #' @export
-setMethod("groupFeaturesScreening", "featureGroups", function(fGroups, scr)
+setMethod("groupFeaturesScreening", "featureGroups", function(fGroups, suspects, rtWindow, mzWindow,
+                                                              adduct, skipInvalid, onlyHits)
 {
-    assertScreeningResults(scr, fromFGroups = TRUE)
+    if (!is.null(adduct))
+        adduct <- checkAndToAdduct(adduct)
+    
+    checkmate::assertFlag(skipInvalid) # not in assert collection, should fail before assertSuspectList
+    
+    ac <- checkmate::makeAssertCollection()
+    assertSuspectList(suspects, adduct, skipInvalid, add = ac)
+    checkmate::assertFlag(onlyHits, add = ac)
+    aapply(checkmate::assertNumber, . ~ rtWindow + mzWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
+    checkmate::reportAssertions(ac)
+    
+    # do this before checking cache to ensure proper errors/warnings are thrown!
+    suspects <- prepareSuspectList(suspects, adduct, skipInvalid)
+    
+    hash <- makeHash(fGroups, suspects, rtWindow, mzWindow, adduct, skipInvalid, onlyHits)
+    cd <- loadCacheData("screenSuspects", hash)
+    if (!is.null(cd))
+        return(cd)
 
-    cat("Converting screening results to feature groups... ")
-
-    if (any(is.na(scr$group)))
-    {
-        cat("\nRemoving empty screening results\n")
-        scr <- scr[!is.na(scr$group), ]
-    }
-
-    feat <- getFeatures(fGroups)
-    anaInfo <- analysisInfo(fGroups)
-    gNames <- make.unique(scr$name_unique)
-    fgNames <- colnames(groupTable(fGroups))
-
-    gInfo <- data.frame(rts = scr$exp_rt, mzs = scr$exp_mz, row.names = gNames)
-
-    groups <- transpose(as.data.table(scr)[, analyses(fGroups), with = FALSE])
-    setnames(groups, gNames)
-
-    ftind <- copy(groupFeatIndex(fGroups))
-    ftind <- ftind[, scr$group, with = FALSE] # re-order and isolate screened groups
-    setnames(ftind,  gNames)
-
-    ret <- featureGroupsScreening(groups = groups, analysisInfo = anaInfo, groupInfo = gInfo, features = feat, ftindex = ftind)
-
-    cat("Done!\n")
+    scr <- doScreenSuspects(fGroups, suspects, rtWindow, mzWindow, adduct, skipInvalid)    
+    
+    ret <- featureGroupsScreening(screenInfo = scr, groups = copy(groupTable(fGroups)),
+                                  analysisInfo = analysisInfo(fGroups), groupInfo = groupInfo(fGroups),
+                                  features = getFeatures(fGroups), ftindex = copy(groupFeatIndex(fGroups)))
+    
+    if (onlyHits)
+        ret <- ret[, scr$group]
+    
+    saveCacheData("screenSuspects", ret, hash)
+    
     return(ret)
 })

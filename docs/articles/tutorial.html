@@ -119,7 +119,7 @@
       <h1 data-toc-skip>patRoon tutorial</h1>
                         <h4 class="author">Rick Helmus</h4>
             
-            <h4 class="date">2020-08-14</h4>
+            <h4 class="date">2020-08-19</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/rickhelmus/patRoon/blob/master/vignettes/tutorial.Rmd"><code>vignettes/tutorial.Rmd</code></a></small>
       <div class="hidden name"><code>tutorial.Rmd</code></div>
@@ -151,8 +151,8 @@ p.caption {
 <!-- UNDONE: link to advanced vignette -->
 <p>In this tutorial you will learn how to perform a simple non-target analysis with <code>patRoon</code>. This tutorial is not meant to give a detailed overview of <code>patRoon</code>. Instead, it serves as a quick introduction on how to use <code>patRoon</code> to setup and perform a full non-target analysis workflow.</p>
 <p>The workflow in this tutorial consists of the following steps:</p>
-<div id="htmlwidget-31c1f887cde7097cbbcd" style="width:750px;height:100px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-31c1f887cde7097cbbcd">{"x":{"diagram":"\ndigraph rmarkdown {\ngraph [ rankdir = LR ]\nnode [ shape = box,\n       fixedsize = true,\n       width = 2.2,\n       height = 1,\n       fontsize = 18,\n       fillcolor = darkseagreen1,\n       style = filled ]\n\"New project\" -> Features -> Annotation -> Reporting [ arrowhead = vee ]\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-b30430f4efc9944a27e0" style="width:750px;height:100px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-b30430f4efc9944a27e0">{"x":{"diagram":"\ndigraph rmarkdown {\ngraph [ rankdir = LR ]\nnode [ shape = box,\n       fixedsize = true,\n       width = 2.2,\n       height = 1,\n       fontsize = 18,\n       fillcolor = darkseagreen1,\n       style = filled ]\n\"New project\" -> Features -> Annotation -> Reporting [ arrowhead = vee ]\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 </div>
 <div id="data" class="section level1">
 <h1 class="hasAnchor">
@@ -502,7 +502,7 @@ p.caption {
                                <span class="kw">adduct</span> <span class="kw">=</span> <span class="st">"[M+H]+"</span>, <span class="kw">database</span> <span class="kw">=</span> <span class="st">"pubchem"</span>, <span class="kw">maxCandidatesToStop</span> <span class="kw">=</span> <span class="fl">5000</span>)</pre></body></html></div>
 <pre><code>#&gt; Identifying 34 feature groups with MetFrag...
 #&gt; ============================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================
-#&gt; Loaded 2209 compounds from 23 features (67.65%).</code></pre>
+#&gt; Loaded 2214 compounds from 23 features (67.65%).</code></pre>
 <p>While <code><a href="../reference/compound-generation.html">generateCompounds()</a></code> is running a list of candidate compound structures will be downloaded for every feature group and ranked according to various scoring parameters.</p>
 <p>In this case we are using the <a href="https://pubchem.ncbi.nlm.nih.gov/">PubChem</a> database to retrieve candidates. Other commonly databases are <a href="http://www.chemspider.com/">ChemSpider</a> and EPA's <a href="https://comptox.epa.gov/dashboard">CompTox</a>. See <code>?generateCompounds()</code> for more information on possible databases and many other parameters that can be set.</p>
 <blockquote>
@@ -541,10 +541,10 @@ p.caption {
 #&gt;   - Average formulas per feature group: 4.1</code></pre>
 <div class="sourceCode"><html><body><pre class="r"><span class="no">compounds</span></pre></body></html></div>
 <pre><code>#&gt; A compoundsMF object (derived from compounds -&gt; workflowStep)
-#&gt; Object size (indication): 7.1 MB
+#&gt; Object size (indication): 7.2 MB
 #&gt; Algorithm: metfrag
 #&gt; Number of feature groups with compounds in this object: 23
-#&gt; Number of compounds: 2209 (total), 96.0 (mean), 9 - 100 (min - max)</code></pre>
+#&gt; Number of compounds: 2214 (total), 96.3 (mean), 14 - 100 (min - max)</code></pre>
 <div class="sourceCode"><html><body><pre class="r"><span class="fu"><a href="../reference/generics.html">as.data.table</a></span>(<span class="no">mslists</span>)</pre></body></html></div>
 <pre><code>#&gt;              group type        mz  intensity precursor
 #&gt;    1: M109_R116_56   MS  79.02100  2390.4646     FALSE
@@ -573,17 +573,17 @@ p.caption {
 #&gt; 287:  M293_R11_583 standard-1      C14H32N2S2  C14H33N2S2   293.2080 -1.900000   0</code></pre>
 <div class="sourceCode"><html><body><pre class="r"><span class="fu"><a href="../reference/generics.html">as.data.table</a></span>(<span class="no">compounds</span>)[, <span class="fl">1</span>:<span class="fl">5</span>] <span class="co"># only show first columns for clarity</span></pre></body></html></div>
 <pre><code>#&gt;               group explainedPeaks    score neutralMass                               SMILES
-#&gt;    1:  M109_R116_56              3 4.521840    108.0687                    C1=CC=C(C(=C1)N)N
-#&gt;    2:  M109_R116_56              3 4.019102    108.0687                      C1=CC(=CC=C1N)N
-#&gt;    3:  M109_R116_56              3 3.491141    108.0687                      C1=CC=C(C=C1)NN
-#&gt;    4:  M109_R116_56              3 3.313966    108.0687                    C1=CC(=CC(=C1)N)N
-#&gt;    5:  M109_R116_56              3 3.028255    108.0687                      CC1=NC(=CC=C1)N
+#&gt;    1:  M109_R116_56              3 4.483028    108.0687                    C1=CC=C(C(=C1)N)N
+#&gt;    2:  M109_R116_56              3 3.980290    108.0687                      C1=CC(=CC=C1N)N
+#&gt;    3:  M109_R116_56              3 3.447238    108.0687                      C1=CC=C(C=C1)NN
+#&gt;    4:  M109_R116_56              3 3.275154    108.0687                    C1=CC(=CC(=C1)N)N
+#&gt;    5:  M109_R116_56              3 2.970339    108.0687                      CC1=NC(=CC=C1)N
 #&gt;   ---                                                                                       
-#&gt; 2205: M254_R321_484              6 2.482113    253.0521   CCC1=NN=C(O1)C2=CC=CC=C2S(=O)(=O)N
-#&gt; 2206: M254_R321_484              2 2.480706    253.0521 CC1=C(C(=NO1)NS(=O)(=O)C2=CC=CC=C2)N
-#&gt; 2207: M254_R321_484              5 2.478817    253.0521 CC1=NN=C(O1)C2=CC(=CC=C2)NS(=O)(=O)C
-#&gt; 2208: M254_R321_484              5 2.478817    253.0521 CC1=NN=C(O1)C2=CC=C(C=C2)NS(=O)(=O)C
-#&gt; 2209: M254_R321_484              4 2.468703    253.0521   COC1=CC=C(C=C1)NS(=O)(=O)C2=CC=NN2</code></pre>
+#&gt; 2210: M254_R321_484              4 2.489731    253.0521 CC(C#N)S(=O)(=O)NC1=CC=C(C=C1)C(=O)N
+#&gt; 2211: M254_R321_484              5 2.488391    253.0521   CC1=NOC(=N1)C2=CC=CC=C2NS(=O)(=O)C
+#&gt; 2212: M254_R321_484              3 2.486534    253.0521   CNC1=CC=C(C=C1)S(=O)(=O)NC2=NOC=C2
+#&gt; 2213: M254_R321_484              6 2.482113    253.0521   CCC1=NN=C(O1)C2=CC=CC=C2S(=O)(=O)N
+#&gt; 2214: M254_R321_484              2 2.480706    253.0521 CC1=C(C(=NO1)NS(=O)(=O)C2=CC=CC=C2)N</code></pre>
 <div class="sourceCode"><html><body><pre class="r"><span class="fu"><a href="../reference/generics.html">plotSpec</a></span>(<span class="no">mslists</span>, <span class="st">"M186_R265_296"</span>, <span class="kw">MSLevel</span> <span class="kw">=</span> <span class="fl">2</span>)</pre></body></html></div>
 <p><img src="tutorial_files/figure-html/plotSpec-1.png" width="576"></p>
 <div class="sourceCode"><html><body><pre class="r"><span class="fu"><a href="../reference/generics.html">plotSpec</a></span>(<span class="no">formulas</span>, <span class="st">"C6H9N2"</span>, <span class="st">"M109_R116_56"</span>, <span class="kw">MSPeakLists</span> <span class="kw">=</span> <span class="no">mslists</span>)</pre></body></html></div>

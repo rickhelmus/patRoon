@@ -244,3 +244,10 @@ buildMFLandingURL <- function(mfSettings, peakList, precursorMz)
 
     return(ret)
 }
+
+getCompoundsSpecPlotTitle <- function(compoundName, formula)
+{
+    if (!is.null(compoundName) && !is.na(compoundName) && nzchar(compoundName))
+        return(subscriptFormula(formula, over = compoundName))
+    return(subscriptFormula(formula))
+}

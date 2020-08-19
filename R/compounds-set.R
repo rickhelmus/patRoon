@@ -148,32 +148,40 @@ setMethod("filter", "compoundsSet", function(obj, ..., negate = FALSE, sets = NU
 })
 
 #' @export
-setMethod("plotSpec", "compoundsSet", function(obj, precursor, groupName, analysis = NULL, MSPeakLists,
-                                              title = NULL, useGGPlot2 = FALSE, xlim = NULL, ylim = NULL,
-                                              perSet = FALSE, mirror = TRUE, ...)
+setMethod("plotSpec", "compoundsSet", function(obj, index, groupName, MSPeakLists, formulas = NULL,
+                                               plotStruct = TRUE, title = NULL, useGGPlot2 = FALSE, xlim = NULL,
+                                               ylim = NULL, perSet = FALSE, mirror = TRUE, ...)
 {
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertString(precursor, min.chars = 1, add = ac)
+    checkmate::assertCount(index, positive = TRUE, add = ac)
     checkmate::assertString(groupName, min.chars = 1, add = ac)
-    checkmate::assertString(analysis, min.chars = 1, null.ok = TRUE, add = ac)
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
-    checkmate::assertString(title, null.ok = TRUE, add = ac)
+    checkmate::assertClass(formulas, "formulas", null.ok = TRUE, add = ac)
+    aapply(checkmate::assertFlag, . ~ plotStruct + useGGPlot2 + perSet + mirror, fixed = list(add = ac))
     assertXYLim(xlim, ylim, add = ac)
-    aapply(checkmate::assertFlag, . ~ useGGPlot2 + perSet, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
     
-    if (!perSet || length(sets(obj)) == 1 || !is.null(analysis))
-        return(callNextMethod(obj, precursor, groupName, analysis, MSPeakLists, title,
-                              useGGPlot2, xlim, ylim, ...))
+    if (!perSet || length(sets(obj)) == 1)
+        return(callNextMethod(obj, index, groupName, MSPeakLists, formulas,
+                              plotStruct, title, useGGPlot2, xlim, ylim, ...))
     
-    spec <- annotatedPeakList(obj, precursor, groupName, analysis, MSPeakLists)
+    spec <- annotatedPeakList(obj, index, groupName, MSPeakLists, formulas)
     if (is.null(spec))
         return(NULL)
+
+    compr <- obj[[groupName]][index, ]    
+    mol <- NULL
+    if (plotStruct)
+    {
+        mol <- getMoleculesFromSMILES(compr$SMILES)
+        if (!isValidMol(mol))
+            mol <- NULL
+    }
     
     if (is.null(title))
-        title <- subscriptFormula(precursor)
+        title <- getCompoundsSpecPlotTitle(compr$compoundName, compr$formula)
     
-    return(makeMSPlotSets(spec, title, mirror, sets(obj), xlim, ylim, useGGPlot2, ...))
+    return(makeMSPlotSets(spec, title, mirror, sets(obj), xlim, ylim, useGGPlot2, ..., mol = mol))
 })
 
 setMethod("annotatedPeakList", "compoundsSet", function(obj, ...)

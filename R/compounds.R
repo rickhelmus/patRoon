@@ -665,141 +665,26 @@ setMethod("plotSpectrum", "compounds", function(obj, index, groupName, MSPeakLis
     assertXYLim(xlim, ylim, add = ac)
     checkmate::reportAssertions(ac)
 
-    compTable <- compoundTable(obj)[[groupName]]
-
-    if (is.null(compTable) || nrow(compTable) == 0)
+    spec <- annotatedPeakList(obj, index, groupName, MSPeakLists, formulas)
+    if (is.null(spec))
         return(NULL)
 
-    if (!is.null(formulas) && groupName %in% groupNames(formulas))
-        fTable <- formulas[[groupName]][byMSMS == TRUE]
-    else
-        fTable <- NULL
-
-    compr <- compTable[index, ]
-    spec <- annotatedPeakList(obj, index, groupName, MSPeakLists, formulas)
-
+    compr <- obj[[groupName]][index, ]
+    mol <- NULL
     if (plotStruct)
+    {
         mol <- getMoleculesFromSMILES(compr$SMILES)
+        if (!isValidMol(mol))
+            mol <- NULL
+    }
 
     if (is.null(title))
-    {
-        if (!is.null(compr$compoundName) && !is.na(compr$compoundName) && nzchar(compr$compoundName))
-            title <- subscriptFormula(compr$formula, over = compr$compoundName) #subscriptFormula(compr$formula, prefix = paste0(compr$compoundName, "\n("), postfix = ")")
-        else
-            title <- subscriptFormula(compr$formula)
-    }
+        title <- getCompoundsSpecPlotTitle(compr$compoundName, compr$formula)
 
     if (!useGGPlot2)
-    {
-        # oldp <- par(mar = par("mar") * c(1, 1, 0, 0))
-
-        if (plotStruct && isValidMol(mol))
-        {
-            molHInch <- 1.5
-            makeMSPlot(getMSPlotData(spec, 2), xlim, ylim, main = title, ..., extraHeightInch = molHInch)
-        }
-        else
-            makeMSPlot(getMSPlotData(spec, 2), xlim, ylim, main = title, ...)
-
-        # draw structure
-        if (plotStruct && isValidMol(mol))
-        {
-            img <- getRCDKStructurePlot(mol[[1]], 100, 100)
-
-            dpi <- (par("cra")/par("cin"))[1]
-
-            startx <- par("usr")[1]
-            xlim <- par("usr")[2]
-            ylim <- par("usr")[4]
-            imgInfo <- magick::image_info(img)
-
-            imgPlotW <- xinch(imgInfo$width / dpi)
-            imgPlotH <- yinch(imgInfo$height / dpi)
-
-            maxW <- 0.2 * xlim
-            if (imgPlotW > maxW)
-            {
-                hresize <- imgPlotW / maxW
-                imgPlotH <- imgPlotH / hresize
-                imgPlotW <- maxW
-            }
-
-            maxH <- yinch(molHInch)
-            if (imgPlotH > maxH)
-            {
-                wresize <- imgPlotH / maxH
-                imgPlotW <- imgPlotW / wresize
-                imgPlotH <- maxH
-            }
-
-            # offset a little
-            startx <- startx + 0.01 * xlim
-            ylim <- ylim * 0.99
-
-            rasterImage(img, startx, ylim - imgPlotH, startx + imgPlotW, ylim)
-        }
-
-        # par(oldp)
-    }
+        makeMSPlot(getMSPlotData(spec, 2), xlim, ylim, main = title, ..., mol = mol)
     else
-    {
-        MSPlot <- makeMSPlotGG(getMSPlotData(spec, 2)) + ggtitle(title)
-
-        if (plotStruct && isValidMol(mol))
-        {
-            img <- getRCDKStructurePlot(mol[[1]], 100, 100, transparent = FALSE)
-
-            # positioning if legend is on top... doesn't work too well :(
-            # mar <- 7
-            # pos <- grid::convertUnit(grid::unit(0.8, "npc") - grid::unit(mar, "pt"), "npc", valueOnly = TRUE)
-            # MSPlot <- MSPlot + theme(plot.margin = margin(mar, mar, mar, mar)) +
-            #     ylim(0, max(fi$intensity) * (1.2 + (0.8 - pos)))
-
-            pos <- 0.8; size <- 1 - pos
-            MSPlot <- MSPlot +
-                ylim(0, max(spec$intensity) * (1 + size + 0.1)) # add a bit of space between most intense point+label
-            MSPlot <- cowplot::ggdraw(MSPlot) +
-                cowplot::draw_image(img, pos, pos, size, size)
-        }
-
-        return(MSPlot)
-        # mcn <- mergedCompoundNames(obj)
-        # scoreCols <- getAllCompCols(getCompScoreColNames(), names(compTable), mcn)
-        # scores <- setnames(transpose(compr[, scoreCols, with = FALSE]), "score")
-        # scores[, type := scoreCols]
-        # scores <- scores[!is.na(score)]
-        #
-        # if (length(mcn) > 1)
-        # {
-        #     scores[, merged := "both"]
-        #     for (n in mcn)
-        #     {
-        #         withM <- which(grepl(paste0("-", n), scores[["type"]], fixed = TRUE))
-        #         set(scores, withM, "merged", n)
-        #         set(scores, withM, "type", gsub(paste0("-", n), "", scores[["type"]][withM]))
-        #     }
-        # }
-
-        # scorePlot <- ggplot(scores, aes_string(x = "type", y = "score")) +
-        #     theme_cowplot(font_size = 12) +
-        #     theme(axis.title.y = element_blank(), axis.title.x = element_blank(), # axis.text.y = element_blank(), axis.ticks.y = element_blank(),
-        #           legend.position = "top", legend.title = element_blank()) +
-        #     guides(colour = guide_legend(nrow = 3, ncol = 2, byrow = TRUE))
-        #
-        #
-        # if (length(mcn) > 1)
-        #     scorePlot <- scorePlot + geom_bar(stat = "identity", position = "dodge",
-        #                                       aes_string(colour = "merged", fill = "merged"))
-        # else
-        #     scorePlot <- scorePlot + geom_bar(stat = "identity", aes_string(colour = "type", fill = "type"))
-        #
-        # scorePlot <- scorePlot + coord_flip()
-
-        # ap <- align_plots(MSPlot, scorePlot, align = "h")
-        # plot_grid(ap[[1]], plot_grid(structPlot, ap[[2]], nrow = 2, rel_heights = c(1, 2)), rel_widths = c(2, 1))
-        # gridExtra::grid.arrange(MSPlot, structPlot, scorePlot, layout_matrix = matrix(c(1, 2, 1, 3, 1, 3), ncol = 2, byrow = TRUE), widths = c(2, 1))
-
-    }
+        return(makeMSPlotGG(getMSPlotData(spec, 2), mol = mol) + ggtitle(title))
 })
 
 setMethod("plotSpectrumHash", "compounds", function(obj, index, groupName, MSPeakLists, formulas = NULL,

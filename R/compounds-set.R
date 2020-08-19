@@ -206,6 +206,7 @@ generateCompoundsSet <- function(fGroupsSet, MSPeakListsSet, generator, ..., set
             ct <- ionizedCompoundsList[[s]]@compounds[[fg]]
             ct[, fragInfo := lapply(fragInfo, function(fi)
             {
+                fi <- copy(fi) # BUG: avoid warning that somehow was incorrectly copied (invalid .internal.selfref) 
                 fi[, PLIndexSet := sapply(mz, function(fimz) pl[which.min(abs(fimz - mz)), "PLIndex"])]
                 fi[, set := s]
                 return(fi)

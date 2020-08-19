@@ -661,7 +661,7 @@ setMethod("plotSpectrum", "compounds", function(obj, index, groupName, MSPeakLis
     checkmate::assertString(groupName, min.chars = 1, add = ac)
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
     checkmate::assertClass(formulas, "formulas", null.ok = TRUE, add = ac)
-    aapply(checkmate::assertFlag, . ~plotStruct + useGGPlot2, fixed = list(add = ac))
+    aapply(checkmate::assertFlag, . ~ plotStruct + useGGPlot2, fixed = list(add = ac))
     assertXYLim(xlim, ylim, add = ac)
     checkmate::reportAssertions(ac)
 

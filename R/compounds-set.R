@@ -116,14 +116,6 @@ setMethod("[", c("compoundsSet", "ANY", "missing", "missing"), function(x, i, j,
     return(x)
 })
 
-setMethod("as.data.table", "compoundsSet", function(x, fGroups = NULL, average = FALSE, ...)
-{
-    ret <- callNextMethod(x, fGroups = fGroups, average = average, ...)
-    if (average)
-        ret[, formula := NULL] # doesn't make a lot of sense anymore with different adducts
-    return(ret[])
-})
-
 #' @export
 setMethod("filter", "compoundsSet", function(obj, ..., negate = FALSE, sets = NULL)
 {

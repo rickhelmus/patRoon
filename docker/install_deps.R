@@ -8,7 +8,9 @@ BiocManager::install(c("Rdisop", "InterpretMSSpectrum")) # need to install these
 
 remotes::install_github("rickhelmus/patRoonData", upgrade = "never")
 remotes::install_github("thomasp85/farver", upgrade = "never")
+remotes::install_github("cbroeckl/RAMClustR", upgrade = "never")
 install.packages("vdiffr")
+install.packages("circlize", repos="http://cran.r-project.org") # get most recent version (rpm is too old)
 
 install.packages("desc")
 dp <- desc::desc_get_deps()

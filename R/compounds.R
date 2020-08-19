@@ -608,7 +608,7 @@ setMethod("annotatedPeakList", "compounds", function(obj, index, groupName, MSPe
         fragInfo <- compr$fragInfo[[1]]
     }
 
-    formTable <- formulas[[groupName]]
+    formTable <- if (!is.null(formulas)) formulas[[groupName]] else NULL
     if (!is.null(formTable))
     {
         formTable <- formTable[byMSMS == TRUE & neutral_formula == compr$formula]

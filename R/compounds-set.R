@@ -140,7 +140,7 @@ setMethod("filter", "compoundsSet", function(obj, ..., negate = FALSE, sets = NU
         
         # synchronize other objects
         cat("Synchronizing set objects...\n")
-        obj <- synccompoundsSetObjects(obj)
+        obj <- syncCompoundsSetObjects(obj)
         cat("Done!\n")
     }
     

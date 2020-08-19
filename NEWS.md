@@ -10,7 +10,7 @@
 * Improved handling of empty feature groups objects when reporting
 * Fixed: `reportPDF()` may report formula annotated spectra of results not present in input `featureGroups`
 * Fixed: Loading `data.table` data from cache now calls `data.table::setalloccol()` to ensure proper behavior if `data.table::set()` is called on cached data.
-
+* Fixed: plotSpec() for `compounds` with `useGGPlot2=TRUE` would try to plot formulas for non-annotated peaks (resulting in many extra diagonal lines)  
 
 # patRoon 1.0.1
 

@@ -284,15 +284,11 @@ makeMSPlotGG <- function(spec, ...)
     # BUG: throws errors when parse=TRUE and all labels are empty
     if (!is.null(plotData$formula) && any(!is.na(plotData$formula)))
     {
-        # convert NAs to empty strings to avoid warnings with ggrepel
         plotData[!is.na(formula), formula := subscriptFormula(formula, parse = FALSE)]
-        # BUG: ggrepel warns about NAs, but when replacing this with empty
-        # characters or space the text entries are simply removed. for now just
-        # use a dummy expression...
-        plotData[is.na(formula), formula := "plain()"]
         ret <- ggplot(plotData, aes_string(x = "mz", y = 0, label = "formula")) +
             ggrepel::geom_text_repel(aes_string(y = "intensity", angle = 0), min.segment.length = 0.1, parse = TRUE,
-                                     nudge_y = grid::convertUnit(grid::unit(5, "mm"), "npc", valueOnly = TRUE), size = 3.2)
+                                     nudge_y = grid::convertUnit(grid::unit(5, "mm"), "npc", valueOnly = TRUE), size = 3.2,
+                                     na.rm = TRUE)
     }
     else
         ret <- ggplot(plotData, aes_string(x = "mz", y = 0))

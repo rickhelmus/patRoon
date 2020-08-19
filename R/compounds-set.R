@@ -188,6 +188,15 @@ setMethod("annotatedPeakList", "compoundsSet", function(obj, ...)
     return(ret[])
 })
 
+setMethod("addFormulaScoring", "compoundsSet", function(compounds, formulas, updateScore,
+                                                        formulaScoreWeight)
+{
+    compounds@setObjects <- lapply(compounds@setObjects, addFormulaScoring,
+                                   formulas = formulas, updateScore = updateScore,
+                                   formulaScoreWeight = formulaScoreWeight)
+    compounds <- syncCompoundsSetObjects(compounds)
+    return(compounds)
+})
 
 generateCompoundsSet <- function(fGroupsSet, MSPeakListsSet, generator, ..., setThreshold)
 {

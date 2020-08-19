@@ -108,7 +108,7 @@ setMethod("plotSpec", "formulasSet", function(obj, precursor, groupName, analysi
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
     checkmate::assertString(title, null.ok = TRUE, add = ac)
     assertXYLim(xlim, ylim, add = ac)
-    aapply(checkmate::assertFlag, . ~ useGGPlot2 + perSet, fixed = list(add = ac))
+    aapply(checkmate::assertFlag, . ~ useGGPlot2 + perSet + mirror, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
     
     if (!perSet || length(sets(obj)) == 1 || !is.null(analysis))

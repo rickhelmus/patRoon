@@ -203,8 +203,10 @@ makeScoresPlot <- function(scoreTable, mcn, useGGPlot2)
 }
 
 # spec may be annotated
-makeMSPlot <- function(plotData, xlim, ylim, ylab = "Intensity", ..., extraHeightInch = 0)
+makeMSPlot <- function(plotData, xlim, ylim, ylab = "Intensity", ..., mol = NULL)
 {
+    molHInch <- 1.5
+    
     if (!is.null(plotData[["formula"]]))
         plotData[!is.na(formula), formWidth := strwidth(formula, units = "inches")]
     
@@ -247,8 +249,8 @@ makeMSPlot <- function(plotData, xlim, ylim, ylab = "Intensity", ..., extraHeigh
         
         ym <- ym * maxRelH * 1.05 # enlarge y limit and add some extra spacing
         
-        if (extraHeightInch > 0)
-            ym <- ym * (1 + (extraHeightInch / pheight))
+        if (!is.null(mol))
+            ym <- ym * (1 + (molHInch / pheight)) # add space for molecule
         
         ylim <- c(0, ym)
     }
@@ -272,9 +274,47 @@ makeMSPlot <- function(plotData, xlim, ylim, ylab = "Intensity", ..., extraHeigh
         makeLegend(par("usr")[2], par("usr")[4])
         par(oldp)
     }
+    
+    # draw structure
+    if (!is.null(mol))
+    {
+        img <- getRCDKStructurePlot(mol[[1]], 100, 100)
+        
+        dpi <- (par("cra")/par("cin"))[1]
+        
+        startx <- par("usr")[1]
+        xl <- par("usr")[2]
+        yl <- par("usr")[4]
+        imgInfo <- magick::image_info(img)
+        
+        imgPlotW <- xinch(imgInfo$width / dpi)
+        imgPlotH <- yinch(imgInfo$height / dpi)
+        
+        maxW <- 0.2 * xl
+        if (imgPlotW > maxW)
+        {
+            hresize <- imgPlotW / maxW
+            imgPlotH <- imgPlotH / hresize
+            imgPlotW <- maxW
+        }
+        
+        maxH <- yinch(molHInch)
+        if (imgPlotH > maxH)
+        {
+            wresize <- imgPlotH / maxH
+            imgPlotW <- imgPlotW / wresize
+            imgPlotH <- maxH
+        }
+        
+        # offset a little
+        startx <- startx + 0.01 * xl
+        yl <- yl * 0.99
+        
+        rasterImage(img, startx, yl - imgPlotH, startx + imgPlotW, yl)
+    }
 }
 
-makeMSPlotGG <- function(plotData, ...)
+makeMSPlotGG <- function(plotData, ..., mol = NULL)
 {
     # BUG: throws errors when parse=TRUE and all labels are empty
     if (!is.null(plotData$formula) && any(!is.na(plotData$formula)))
@@ -293,10 +333,21 @@ makeMSPlotGG <- function(plotData, ...)
         scale_size(range = c(0.5, 2), guide = FALSE) + xlab("m/z") + ylab("Intensity") +
         cowplot::theme_cowplot(font_size = 12) + theme(legend.position = "bottom", legend.title = element_blank())
     
+    if (!is.null(mol))
+    {
+        img <- getRCDKStructurePlot(mol[[1]], 100, 100, transparent = FALSE)
+        
+        pos <- 0.8; size <- 1 - pos
+        ret <- ret +
+            ylim(0, max(plotData$intensity) * (1 + size + 0.1)) # add a bit of space between most intense point+label
+        ret <- cowplot::ggdraw(ret) +
+            cowplot::draw_image(img, pos, pos, size, size)
+    }
+    
     return(ret)
 }
 
-makeMSPlotSets <- function(spec, title, mirror, sets, xlim, ylim, useGGPlot2, ...)
+makeMSPlotSets <- function(spec, title, mirror, sets, xlim, ylim, useGGPlot2, ..., mol = NULL)
 {
     spec <- copy(spec)
     
@@ -316,12 +367,12 @@ makeMSPlotSets <- function(spec, title, mirror, sets, xlim, ylim, useGGPlot2, ..
     ticks <- pretty(c(-spec$intensity, spec$intensity))
     if (useGGPlot2)
     {
-        return(makeMSPlotGG(plotData) + ggtitle(title) +
+        return(makeMSPlotGG(plotData, mol = mol) + ggtitle(title) +
                    ggplot2::scale_y_continuous(labels = abs(ticks)))
     }
     
     makeMSPlot(plotData, xlim, ylim, ylab = "Normalized intensity",
-               main = title, yaxt = "n", ...)
+               main = title, yaxt = "n", ..., mol = mol)
     axis(2, at = ticks, labels = abs(ticks))
 }
 

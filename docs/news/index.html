@@ -175,6 +175,7 @@
 <li>Fixed: <code><a href="../reference/reporting.html">reportPDF()</a></code> may report formula annotated spectra of results not present in input <code>featureGroups</code>
 </li>
 <li>Fixed: Loading <code>data.table</code> data from cache now calls <code><a href="https://Rdatatable.gitlab.io/data.table/reference/truelength.html">data.table::setalloccol()</a></code> to ensure proper behavior if <code><a href="https://Rdatatable.gitlab.io/data.table/reference/assign.html">data.table::set()</a></code> is called on cached data.</li>
+<li>Fixed: plotSpec() for <code>compounds</code> with <code>useGGPlot2=TRUE</code> would try to plot formulas for non-annotated peaks (resulting in many extra diagonal lines)</li>
 </ul>
 </div>
     <div id="patroon-1-0-1" class="section level1">

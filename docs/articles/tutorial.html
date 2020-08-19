@@ -151,8 +151,8 @@ p.caption {
 <!-- UNDONE: link to advanced vignette -->
 <p>In this tutorial you will learn how to perform a simple non-target analysis with <code>patRoon</code>. This tutorial is not meant to give a detailed overview of <code>patRoon</code>. Instead, it serves as a quick introduction on how to use <code>patRoon</code> to setup and perform a full non-target analysis workflow.</p>
 <p>The workflow in this tutorial consists of the following steps:</p>
-<div id="htmlwidget-b30430f4efc9944a27e0" style="width:750px;height:100px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-b30430f4efc9944a27e0">{"x":{"diagram":"\ndigraph rmarkdown {\ngraph [ rankdir = LR ]\nnode [ shape = box,\n       fixedsize = true,\n       width = 2.2,\n       height = 1,\n       fontsize = 18,\n       fillcolor = darkseagreen1,\n       style = filled ]\n\"New project\" -> Features -> Annotation -> Reporting [ arrowhead = vee ]\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-8bf07dd8957a39a1def5" style="width:750px;height:100px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-8bf07dd8957a39a1def5">{"x":{"diagram":"\ndigraph rmarkdown {\ngraph [ rankdir = LR ]\nnode [ shape = box,\n       fixedsize = true,\n       width = 2.2,\n       height = 1,\n       fontsize = 18,\n       fillcolor = darkseagreen1,\n       style = filled ]\n\"New project\" -> Features -> Annotation -> Reporting [ arrowhead = vee ]\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 </div>
 <div id="data" class="section level1">
 <h1 class="hasAnchor">
@@ -579,11 +579,11 @@ p.caption {
 #&gt;    4:  M109_R116_56              3 3.275154    108.0687                    C1=CC(=CC(=C1)N)N
 #&gt;    5:  M109_R116_56              3 2.970339    108.0687                      CC1=NC(=CC=C1)N
 #&gt;   ---                                                                                       
-#&gt; 2210: M254_R321_484              4 2.489731    253.0521 CC(C#N)S(=O)(=O)NC1=CC=C(C=C1)C(=O)N
-#&gt; 2211: M254_R321_484              5 2.488391    253.0521   CC1=NOC(=N1)C2=CC=CC=C2NS(=O)(=O)C
-#&gt; 2212: M254_R321_484              3 2.486534    253.0521   CNC1=CC=C(C=C1)S(=O)(=O)NC2=NOC=C2
-#&gt; 2213: M254_R321_484              6 2.482113    253.0521   CCC1=NN=C(O1)C2=CC=CC=C2S(=O)(=O)N
-#&gt; 2214: M254_R321_484              2 2.480706    253.0521 CC1=C(C(=NO1)NS(=O)(=O)C2=CC=CC=C2)N</code></pre>
+#&gt; 2210: M254_R321_484              3 2.492776    253.0521 CC1=C(C=C(C=C1)N)S(=O)(=O)NC2=NOC=C2
+#&gt; 2211: M254_R321_484              5 2.492690    253.0521   CC1=NN=C(O1)C2=CC=CC=C2NS(=O)(=O)C
+#&gt; 2212: M254_R321_484              4 2.489731    253.0521 CC(C#N)S(=O)(=O)NC1=CC=C(C=C1)C(=O)N
+#&gt; 2213: M254_R321_484              5 2.488391    253.0521   CC1=NOC(=N1)C2=CC=CC=C2NS(=O)(=O)C
+#&gt; 2214: M254_R321_484              3 2.486534    253.0521   CNC1=CC=C(C=C1)S(=O)(=O)NC2=NOC=C2</code></pre>
 <div class="sourceCode"><html><body><pre class="r"><span class="fu"><a href="../reference/generics.html">plotSpec</a></span>(<span class="no">mslists</span>, <span class="st">"M186_R265_296"</span>, <span class="kw">MSLevel</span> <span class="kw">=</span> <span class="fl">2</span>)</pre></body></html></div>
 <p><img src="tutorial_files/figure-html/plotSpec-1.png" width="576"></p>
 <div class="sourceCode"><html><body><pre class="r"><span class="fu"><a href="../reference/generics.html">plotSpec</a></span>(<span class="no">formulas</span>, <span class="st">"C6H9N2"</span>, <span class="st">"M109_R116_56"</span>, <span class="kw">MSPeakLists</span> <span class="kw">=</span> <span class="no">mslists</span>)</pre></body></html></div>
@@ -602,7 +602,8 @@ p.caption {
 #&gt;   organizing dataset 
 #&gt;   normalizing dataset 
 #&gt; calculating ramclustR similarity: nblocks =  1 
-#&gt; 1  RAMClust feature similarity matrix calculated and stored: 
+#&gt; 1  
+#&gt;  RAMClust feature similarity matrix calculated and stored: 
 #&gt; RAMClust distances converted to distance object 
 #&gt; fastcluster based clustering complete 
 #&gt; dynamicTreeCut based pruning complete 
@@ -614,7 +615,7 @@ p.caption {
 <p>The results can be inspected similarly as seen before:</p>
 <div class="sourceCode"><html><body><pre class="r"><span class="no">components</span></pre></body></html></div>
 <pre><code>#&gt; A componentsRC object (derived from components -&gt; workflowStep)
-#&gt; Object size (indication): 213.1 kB
+#&gt; Object size (indication): 214.5 kB
 #&gt; Algorithm: ramclustr
 #&gt; Components: CMP1, CMP2, CMP3, CMP4, CMP5, CMP6, ... (11 total)
 #&gt; Number of feature groups in components: 28 (total), 2.5 (mean), 2 - 5 (min - max)</code></pre>

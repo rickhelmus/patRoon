@@ -276,17 +276,17 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Feature table (only first columns for readability)</span>
 fList[[<span class="st">&quot;standard-1&quot;</span>]][, <span class="dv">1</span><span class="op">:</span><span class="dv">6</span>]</code></pre></div>
 <pre><code>#&gt;                          ID       ret        mz       area    retmin    retmax
-#&gt;   1:  f_3230856962162103326  19.00698  78.99684  65793.391  13.01202  29.99700
-#&gt;   2: f_11761933036472264185  20.00598  79.02098 125354.100  13.01202  29.99700
-#&gt;   3:  f_2524059078783588777   8.01600  79.02101 188045.900   3.03000  12.01302
-#&gt;   4:  f_5864408260222461962 112.34220  79.02103  71168.984 106.55400 147.51600
-#&gt;   5:  f_1622642148327897938 111.64380  84.95950  54875.129 105.15180 599.87400
+#&gt;   1: f_15382642093057293070  19.00698  78.99684  65793.391  13.01202  29.99700
+#&gt;   2: f_11024303891665717758  20.00598  79.02098 125354.100  13.01202  29.99700
+#&gt;   3: f_13516717263239957711   8.01600  79.02101 188045.900   3.03000  12.01302
+#&gt;   4:  f_7806781230628571232 112.34220  79.02103  71168.984 106.55400 147.51600
+#&gt;   5: f_11190488180330977465 111.64380  84.95950  54875.129 105.15180 599.87400
 #&gt;  ---                                                                          
-#&gt; 433:  f_3283523776591117342  11.01402 295.22387   9514.476   9.01602  13.01202
-#&gt; 434: f_14296615514214200899  13.01202 296.92038  37753.414  10.01502  15.01098
-#&gt; 435:  f_2625442165690324880  12.01302 297.16751  17366.125   9.01602  15.01098
-#&gt; 436: f_16061703898803214329  11.01402 297.20368  13995.990   9.01602  14.01102
-#&gt; 437:  f_6256886896499202217  12.01302 299.12581  13630.378   9.01602  15.01098</code></pre>
+#&gt; 433:  f_3450208252573417965  11.01402 295.22387   9514.476   9.01602  13.01202
+#&gt; 434: f_15081486223164456388  13.01202 296.92038  37753.414  10.01502  15.01098
+#&gt; 435:  f_4502841840372481873  12.01302 297.16751  17366.125   9.01602  15.01098
+#&gt; 436: f_12814731812853556811  11.01402 297.20368  13995.990   9.01602  14.01102
+#&gt; 437:  f_9838920494576067165  12.01302 299.12581  13630.378   9.01602  15.01098</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Feature group intensities</span>
 fGroups<span class="op">$</span>M120_R328_<span class="dv">81</span></code></pre></div>
 <pre><code>#&gt; [1] 55936 61668 59624</code></pre>
@@ -334,17 +334,17 @@ components[[<span class="st">&quot;CMP7&quot;</span>]][, <span class="dv">1</spa
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># obtain table with all features (only first columns for readability)</span>
 <span class="kw">as.data.table</span>(fList)[, <span class="dv">1</span><span class="op">:</span><span class="dv">6</span>]</code></pre></div>
 <pre><code>#&gt;         analysis                     ID       ret        mz      area     retmin
-#&gt;    1:  solvent-1 f_11154317979287121736  19.10298  78.99678  73929.27  13.108980
-#&gt;    2:  solvent-1  f_8087179661593565352  14.10798  84.95948 941557.00   3.922998
-#&gt;    3:  solvent-1 f_17231954621526394237 112.97220  84.95949  47558.80 105.301800
-#&gt;    4:  solvent-1  f_7867492785266121417  13.10898  88.95255  34552.67   7.114020
-#&gt;    5:  solvent-1   f_870091562492806786   2.52900  88.96823  14710.10   1.732002
+#&gt;    1:  solvent-1 f_11322423131707764887  19.10298  78.99678  73929.27  13.108980
+#&gt;    2:  solvent-1  f_3802148767485934890  14.10798  84.95948 941557.00   3.922998
+#&gt;    3:  solvent-1   f_145344778168995104 112.97220  84.95949  47558.80 105.301800
+#&gt;    4:  solvent-1 f_11701763359052110720  13.10898  88.95255  34552.67   7.114020
+#&gt;    5:  solvent-1 f_12307708836586287386   2.52900  88.96823  14710.10   1.732002
 #&gt;   ---                                                                           
-#&gt; 2440: standard-3  f_9491350416506690844  12.14898 294.93888 350965.20   9.151020
-#&gt; 2441: standard-3 f_13697199126392479724  11.14998 295.18863  10705.59   9.151020
-#&gt; 2442: standard-3 f_10904223361591741882  13.14798 296.92039  42195.86  10.150980
-#&gt; 2443: standard-3  f_2244132926736218367  11.14998 297.16737  15177.58   9.151020
-#&gt; 2444: standard-3  f_8116069500944622060  11.14998 297.20377  16678.13   9.151020</code></pre>
+#&gt; 2440: standard-3 f_16324740948173400798  12.14898 294.93888 350965.20   9.151020
+#&gt; 2441: standard-3  f_2084920014740779138  11.14998 295.18863  10705.59   9.151020
+#&gt; 2442: standard-3   f_111372755872611543  13.14798 296.92039  42195.86  10.150980
+#&gt; 2443: standard-3 f_15520419863401197161  11.14998 297.16737  15177.58   9.151020
+#&gt; 2444: standard-3  f_9464216473436806357  11.14998 297.20377  16678.13   9.151020</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Returns group info and intensity values for each feature group</span>
 <span class="kw">as.data.table</span>(fGroups, <span class="dt">average =</span> <span class="ot">TRUE</span>) <span class="co"># average intensities for replicates</span></code></pre></div>
 <pre><code>#&gt;             group      ret       mz standard
@@ -397,11 +397,11 @@ components[[<span class="st">&quot;CMP7&quot;</span>]][, <span class="dv">1</spa
 #&gt;    4:  M120_R328_81              1 1.490700    119.0483
 #&gt;    5:  M120_R328_81              1 1.488898    119.0483
 #&gt;   ---                                                  
-#&gt; 2096: M254_R321_484              4 1.489731    253.0521
-#&gt; 2097: M254_R321_484              5 1.488391    253.0521
-#&gt; 2098: M254_R321_484              3 1.486534    253.0521
-#&gt; 2099: M254_R321_484              6 1.482113    253.0521
-#&gt; 2100: M254_R321_484              2 1.480706    253.0521</code></pre>
+#&gt; 2096: M254_R321_484              3 1.492776    253.0521
+#&gt; 2097: M254_R321_484              5 1.492690    253.0521
+#&gt; 2098: M254_R321_484              4 1.489731    253.0521
+#&gt; 2099: M254_R321_484              5 1.488391    253.0521
+#&gt; 2100: M254_R321_484              3 1.486534    253.0521</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Returns table with all components (including feature group info, annotations etc)</span>
 <span class="kw">as.data.table</span>(components)[, <span class="dv">1</span><span class="op">:</span><span class="dv">6</span>]</code></pre></div>
 <pre><code>#&gt;     name  cmp_ret cmp_retsd neutral_mass   analysis size

@@ -201,8 +201,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="annotation" class="section level2">
 <h2><span class="header-section-number">4.3</span> Annotation</h2>
 <p>The annotation consists of collecting MS peak lists and then formula and/or compound annotation:</p>
-<div id="htmlwidget-ba51123c12518b4579ec" style="width:500px;height:120px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-ba51123c12518b4579ec">{"x":{"diagram":"\ndigraph Annotation {\n  graph [ rankdir = LR ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.3,\n         height = 1,\n         fontsize = 18,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"MS peak lists\" -> \"Formula annotation\"\n    \"MS peak lists\" -> \"Compound annotation\"\n    \"Formula annotation\":e -> \"Compound annotation\":e [style = dotted, constraint = false]\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-3c2340bf5b4a0ac81c9b" style="width:500px;height:120px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-3c2340bf5b4a0ac81c9b">{"x":{"diagram":"\ndigraph Annotation {\n  graph [ rankdir = LR ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.3,\n         height = 1,\n         fontsize = 18,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"MS peak lists\" -> \"Formula annotation\"\n    \"MS peak lists\" -> \"Compound annotation\"\n    \"Formula annotation\":e -> \"Compound annotation\":e [style = dotted, constraint = false]\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 <p>Note that compound annotation is normally not dependent upon formula annotation. However, formula data can be used to improve ranking of candidates afterwards by the <code>addFormulaScoring()</code> function, which will be discussed later in this section.</p>
 <div id="ms-peak-lists" class="section level3">
 <h3><span class="header-section-number">4.3.1</span> MS peak lists</h3>

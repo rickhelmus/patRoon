@@ -47,10 +47,10 @@ setMethod("[", c("formulasSet", "ANY", "missing", "missing"), function(x, i, j, 
     
     if (!missing(i))
     {
+        i <- assertSubsetArgAndToChr(i, groupNames(x))
         # NOTE: assume that subsetting with non-existing i will not result in errors
         x@setObjects <- lapply(x@setObjects, "[", i = i)
         x@setObjects <- pruneList(x@setObjects, checkEmptyElements = TRUE)
-        
         x <- syncFormulasSetObjects(x)
     }
     

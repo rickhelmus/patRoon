@@ -135,9 +135,9 @@ setMethod("[", c("MSPeakListsSet", "ANY", "ANY", "missing"), function(x, i, j, .
     {
         args <- list(reAverage = reAverage)
         if (!missing(i))
-            args <- c(args, list(i = i))
+            args <- c(args, list(i = assertSubsetArgAndToChr(i, analyses(x))))
         if (!missing(j))
-            args <- c(args, list(j = j))
+            args <- c(args, list(j = assertSubsetArgAndToChr(j, groupNames(x))))
         
         # NOTE: assume that subsetting with non-existing i/j will not result in errors
         x@setObjects <- lapply(x@setObjects, function(o) do.call("[", args = c(list(x = o), args)))

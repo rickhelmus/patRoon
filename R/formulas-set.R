@@ -125,6 +125,15 @@ setMethod("plotSpec", "formulasSet", function(obj, precursor, groupName, analysi
     return(makeMSPlotSets(spec, title, mirror, sets(obj), xlim, ylim, useGGPlot2, ...))
 })
 
+setMethod("plotSpecHash", "formulasSet", function(obj, precursor, groupName, analysis = NULL, MSPeakLists,
+                                                  title = NULL, useGGPlot2 = FALSE, xlim = NULL, ylim = NULL,
+                                                  perSet = FALSE, mirror = TRUE, ...)
+{
+    return(makeHash(callNextMethod(obj, precursor, groupName, analysis, MSPeakLists,
+                                   title, useGGPlot2, xlim, ylim),
+                    perSet, mirror))
+})
+
 
 generateFormulasSet <- function(fGroupsSet, generator, ..., setArgs, setThreshold)
 {

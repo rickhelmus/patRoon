@@ -184,6 +184,16 @@ setMethod("plotSpec", "compoundsSet", function(obj, index, groupName, MSPeakList
     return(makeMSPlotSets(spec, title, mirror, sets(obj), xlim, ylim, useGGPlot2, ..., mol = mol))
 })
 
+setMethod("plotSpecHash", "compoundsSet", function(obj, index, groupName, MSPeakLists, formulas = NULL,
+                                                   plotStruct = TRUE, title = NULL, useGGPlot2 = FALSE, xlim = NULL,
+                                                   ylim = NULL, perSet = FALSE, mirror = TRUE, ...)
+{
+    return(makeHash(callNextMethod(obj, index, groupName, MSPeakLists, formulas,
+                                   plotStruct, title, useGGPlot2, xlim,
+                                   ylim, ...),
+                    perSet, mirror))
+})
+
 setMethod("annotatedPeakList", "compoundsSet", function(obj, ...)
 {
     ret <- callNextMethod()

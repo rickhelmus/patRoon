@@ -17,7 +17,7 @@ makeCompoundsSetConsensus <- function(setObjects, origFGNames, setThreshold)
     {
         allResults <- pruneList(sapply(setObjects, "[[", gName, simplify = FALSE))
         if (length(allResults) == 1)
-            return(copy(allResults[[1]])[, c("mergedCount", "set") := .(1, names(allResults)[1])])
+            return(copy(allResults[[1]])[, c("setCoverage", "set") := .(1, names(allResults)[1])])
         
         allResults <- lapply(allResults, copy)
         
@@ -29,23 +29,23 @@ makeCompoundsSetConsensus <- function(setObjects, origFGNames, setThreshold)
         {
             merged <- copy(left)
             
-            if (is.null(merged[["mergedCount"]]))
-                merged[, mergedCount := 1]
+            if (is.null(merged[["setCoverage"]]))
+                merged[, setCoverage := 1]
             
             # UNDONE: assume score cols are same for left/right, should always be the case?
-            
+
             # merge overlapping candidates: average scores, combine set names and merge fragInfos
             scoreCols <- getAllCompCols(getCompScoreColNames(), names(left), NULL)
             merged[right, (c(scoreCols, "set", "fragInfo")) :=
                        c(lapply(scoreCols, function(sc) .rowMeans(unlist(mget(c(sc, paste0("i.", sc)), inherits = TRUE)), na.rm = TRUE, m = .N, n = 2)),
                          list(paste0(set, ",", i.set),
-                              mapply(fragInfo, i.fragInfo, SIMPLIFY = FALSE, FUN = rbind))),
+                              mapply(fragInfo, i.fragInfo, SIMPLIFY = FALSE, FUN = rbind, MoreArgs = list(fill = TRUE)))),
                    on = "identifier"]
             
             # add missing candidates from right
             merged <- rbind(merged, right[!identifier %in% merged$identifier], fill = TRUE)
             
-            merged[identifier %in% right$identifier, mergedCount := mergedCount + 1]
+            merged[identifier %in% right$identifier, setCoverage := setCoverage + 1]
             
             # re-sort
             setorderv(merged, "score")
@@ -56,12 +56,11 @@ makeCompoundsSetConsensus <- function(setObjects, origFGNames, setThreshold)
         })
     }, simplify = FALSE)
     
+    # convert absolute merge counts to coverage
+    cons <- lapply(cons, function(ct) ct[, setCoverage := setCoverage / length(setObjects)])
+    
     if (setThreshold > 0)
-    {
-        absSetThreshold <- setThreshold * length(setObjects)
-        cons <- pruneList(lapply(cons, function(ct) ct[mergedCount >= absSetThreshold]), checkZeroRows = TRUE)
-    }
-    cons <- lapply(cons, set, j = "mergedCount", value = NULL)
+        cons <- pruneList(lapply(cons, function(ct) ct[setCoverage >= setThreshold]), checkZeroRows = TRUE)
  
     return(cons)   
 }

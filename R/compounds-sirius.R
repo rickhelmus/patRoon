@@ -1,6 +1,7 @@
 #' @include main.R
 #' @include compounds.R
 #' @include utils-sirius.R
+#' @include feature_groups-set.R
 NULL
 
 processSIRIUSCompounds <- function(msFName, outPath, MSMS, database, adduct, topMost)
@@ -114,11 +115,13 @@ processSIRIUSCompounds <- function(msFName, outPath, MSMS, database, adduct, top
 #'
 #' @rdname compound-generation
 #' @export
-generateCompoundsSIRIUS <- function(fGroups, MSPeakLists, relMzDev = 5, adduct = "[M+H]+", elements = "CHNOP",
-                                    profile = "qtof", formulaDatabase = NULL, fingerIDDatabase = "pubchem",
-                                    noise = NULL, errorRetries = 2, cores = NULL, topMost = 100, topMostFormulas = 5,
-                                    extraOptsGeneral = NULL, extraOptsFormula = NULL, verbose = TRUE,
-                                    splitBatches = FALSE)
+setMethod("generateCompoundsSIRIUS", "featureGroups", function(fGroups, MSPeakLists, relMzDev = 5, adduct = "[M+H]+",
+                                                               elements = "CHNOP",
+                                                               profile = "qtof", formulaDatabase = NULL,
+                                                               fingerIDDatabase = "pubchem", noise = NULL, errorRetries = 2,
+                                                               cores = NULL, topMost = 100, topMostFormulas = 5,
+                                                               extraOptsGeneral = NULL, extraOptsFormula = NULL, verbose = TRUE,
+                                                               splitBatches = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
@@ -163,4 +166,9 @@ generateCompoundsSIRIUS <- function(fGroups, MSPeakLists, relMzDev = 5, adduct =
     return(compounds(compounds = lapply(results, "[[", "comptab"), scoreTypes = "score",
                      scoreRanges = lapply(results, "[[", "scRanges"),
                      algorithm = "sirius"))
-}
+})
+
+setMethod("generateCompoundsSIRIUS", "featureGroupsSet", function(fGroups, MSPeakLists, ..., setThreshold = 0.75)
+{
+    generateCompoundsSet(fGroups, MSPeakLists, generateCompoundsSIRIUS, ..., setThreshold = setThreshold)
+})

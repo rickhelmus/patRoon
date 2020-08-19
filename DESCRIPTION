@@ -144,6 +144,8 @@ Collate:
     'components-ramclustr.R'
     'compounds.R'
     'compounds-cluster.R'
+    'features-set.R'
+    'feature_groups-set.R'
     'formulas.R'
     'mspeaklists.R'
     'compounds-metfrag.R'

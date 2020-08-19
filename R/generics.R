@@ -69,6 +69,8 @@ setGeneric("generateFormulasDA", function(fGroups, ...) standardGeneric("generat
 
 setGeneric("compoundTable", function(obj) standardGeneric("compoundTable"))
 setGeneric("generateCompounds", function(fGroups, MSPeakLists, algorithm, ...) standardGeneric("generateCompounds"))
+setGeneric("generateCompoundsMetfrag", function(fGroups, ...) standardGeneric("generateCompoundsMetfrag"))
+setGeneric("generateCompoundsSIRIUS", function(fGroups, ...) standardGeneric("generateCompoundsSIRIUS"))
 setGeneric("mergedCompoundNames", function(compounds) standardGeneric("mergedCompoundNames"))
 setGeneric("identifiers", function(compounds) standardGeneric("identifiers"))
 setGeneric("addFormulaScoring", function(compounds, formulas, updateScore = FALSE,

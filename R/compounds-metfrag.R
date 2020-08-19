@@ -186,7 +186,8 @@ cleanFragFormulas <- function(forms)
 getMFFragmentInfo <- function(spec, mfResult, adduct)
 {
     if (mfResult$NoExplPeaks == 0 || mfResult$FormulasOfExplPeaks == "NA")
-        return(data.table(mz = numeric(0), formula = character(0), score = numeric(0), PLIndex = numeric(0)))
+        return(data.table(mz = numeric(0), formula = character(0), neutral_loss = character(0),
+                          intensity = numeric(0), score = numeric(0), PLIndex = numeric(0)))
 
     # format of FormulasOfExplPeaks: list of strings with mz1:formula1;mz2:formula2;...
     fi <- unlist(strsplit(mfResult$FormulasOfExplPeaks, "[;:]")) # split into list with subsequent m/z / formula pairs

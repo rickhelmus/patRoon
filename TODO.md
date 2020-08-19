@@ -55,6 +55,7 @@
 - different name/generic for ionize()? makes less sense for annotation classes
 - test DA algorithms
 - check if more has to be cached (eg merged results from sets)
+- more descriptive algorithm(): include setObjects algorithm in name if possible. Necessary for eg mergedBy fields.
 
 
 ## features

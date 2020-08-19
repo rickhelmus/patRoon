@@ -176,6 +176,18 @@ setMethod("plotSpec", "compoundsSet", function(obj, precursor, groupName, analys
     return(makeMSPlotSets(spec, title, mirror, sets(obj), xlim, ylim, useGGPlot2, ...))
 })
 
+setMethod("annotatedPeakList", "compoundsSet", function(obj, ...)
+{
+    ret <- callNextMethod()
+    if (!is.null(ret[["set.x"]]))
+    {
+        # remove duplicate set column resulting from merging peak lists and fragInfo
+        setnames(ret, "set.x", "set")
+        ret[, set.y := NULL]
+    }
+    return(ret[])
+})
+
 
 generateCompoundsSet <- function(fGroupsSet, MSPeakListsSet, generator, ..., setThreshold)
 {

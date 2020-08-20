@@ -1,5 +1,6 @@
 #' @include main.R
 #' @include components.R
+#' @include feature_groups-set.R
 NULL
 
 #' @rdname components-class
@@ -33,12 +34,12 @@ setMethod("initialize", "componentsRC",
 #'
 #' @rdname component-generation
 #' @export
-generateComponentsRAMClustR <- function(fGroups, st = NULL, sr = NULL, maxt = 12, hmax = 0.3,
-                                        normalize = "TIC", ionization, absMzDev = 0.002, relMzDev = 5,
-                                        minSize = 2, relMinReplicates = 0.5,
-                                        RCExperimentVals = list(design = list(platform = "LC-MS"),
-                                                                instrument = list(ionization = ionization, MSlevs = 1)),
-                                        extraOptsRC = NULL, extraOptsFM = NULL)
+setMethod("generateComponentsRAMClustR", "featureGroups", function(fGroups, st = NULL, sr = NULL, maxt = 12, hmax = 0.3,
+                                                                   normalize = "TIC", ionization, absMzDev = 0.002, relMzDev = 5,
+                                                                   minSize = 2, relMinReplicates = 0.5,
+                                                                   RCExperimentVals = list(design = list(platform = "LC-MS"),
+                                                                                           instrument = list(ionization = ionization, MSlevs = 1)),
+                                                                   extraOptsRC = NULL, extraOptsFM = NULL)
 {
     checkPackage("RAMClustR", "https://github.com/cbroeckl/RAMClustR")
     
@@ -171,4 +172,11 @@ generateComponentsRAMClustR <- function(fGroups, st = NULL, sr = NULL, maxt = 12
     ret <- componentsRC(RC = RC, components = comps, componentInfo = cInfo)
     saveCacheData("componentsRC", ret, hash)
     return(ret)
-}
+})
+
+setMethod("generateComponentsRAMClustR", "featureGroupsSet", function(fGroups, ...)
+{
+    ionization <- ifelse(sapply(adducts(fGroups), "slot", "charge") < 0, "negative", "positive")
+    setArgs <- lapply(ionization, function(i) list(ionization = i))
+    generateComponentsSet(fGroups, generateComponentsRAMClustR, ..., setArgs = setArgs)
+})

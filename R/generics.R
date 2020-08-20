@@ -56,6 +56,10 @@ setGeneric("componentInfo", function(obj) standardGeneric("componentInfo"))
 setGeneric("findFGroup", function(obj, fGroup) standardGeneric("findFGroup"))
 setGeneric("plotGraph", function(obj, onlyLinked = TRUE) standardGeneric("plotGraph"))
 setGeneric("generateComponents", function(fGroups, algorithm, ...) standardGeneric("generateComponents"))
+setGeneric("generateComponentsRAMClustR", function(fGroups, ...) standardGeneric("generateComponentsRAMClustR"))
+setGeneric("generateComponentsCAMERA", function(fGroups, ...) standardGeneric("generateComponentsCAMERA"))
+setGeneric("generateComponentsNontarget", function(fGroups, ...) standardGeneric("generateComponentsNontarget"))
+setGeneric("generateComponentsIntClust", function(fGroups, ...) standardGeneric("generateComponentsIntClust"))
 
 ### Formulas
 

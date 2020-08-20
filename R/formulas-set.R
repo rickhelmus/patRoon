@@ -51,8 +51,10 @@ setMethod("[", c("formulasSet", "ANY", "missing", "missing"), function(x, i, j, 
         # NOTE: assume that subsetting with non-existing i will not result in errors
         x@setObjects <- lapply(x@setObjects, "[", i = i)
         x@setObjects <- pruneList(x@setObjects, checkEmptyElements = TRUE)
-        x <- syncFormulasSetObjects(x)
     }
+
+    if (!is.null(sets) || !missing(i))
+        x <- syncFormulasSetObjects(x)
     
     return(x)
 })

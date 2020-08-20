@@ -110,8 +110,10 @@ setMethod("[", c("compoundsSet", "ANY", "missing", "missing"), function(x, i, j,
         i <- assertSubsetArgAndToChr(i, groupNames(x))
         x@setObjects <- lapply(x@setObjects, "[", i = i)
         x@setObjects <- pruneList(x@setObjects, checkEmptyElements = TRUE)
-        x <- syncCompoundsSetObjects(x)
     }
+    
+    if (!is.null(sets) || !missing(i))
+        x <- syncCompoundsSetObjects(x)
     
     return(x)
 })
@@ -282,4 +284,3 @@ generateCompoundsSet <- function(fGroupsSet, MSPeakListsSet, generator, ..., set
     return(ret)
 }
 
-# UNDONE: compoundsSetMF sub-class (for settings slot)

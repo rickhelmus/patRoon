@@ -32,7 +32,7 @@ setMethod("show", "componentsSet", function(object)
         printf("Original algorithm: %s\n", algorithm(object@setObjects[[1]]))
 })
 
-setMethod("[", c("componentsSet", "ANY", "ANY", "missing"), function(x, i, j, ..., sets = NULL)
+setMethod("[", c("componentsSet", "ANY", "ANY", "missing"), function(x, i, j, ..., sets = NULL, drop = TRUE)
 {
     assertSets(x, sets)
     if (!is.null(sets))
@@ -86,52 +86,6 @@ setMethod("filter", "componentsSet", function(obj, ..., negate = FALSE, sets = N
     return(obj)
 })
 
-#' @export
-setMethod("plotSpec", "componentsSet", function(obj, index, groupName, MSPeakLists, formulas = NULL,
-                                               plotStruct = TRUE, title = NULL, useGGPlot2 = FALSE, xlim = NULL,
-                                               ylim = NULL, perSet = FALSE, mirror = TRUE, ...)
-{
-    ac <- checkmate::makeAssertCollection()
-    checkmate::assertCount(index, positive = TRUE, add = ac)
-    checkmate::assertString(groupName, min.chars = 1, add = ac)
-    checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
-    checkmate::assertClass(formulas, "formulas", null.ok = TRUE, add = ac)
-    aapply(checkmate::assertFlag, . ~ plotStruct + useGGPlot2 + perSet + mirror, fixed = list(add = ac))
-    assertXYLim(xlim, ylim, add = ac)
-    checkmate::reportAssertions(ac)
-    
-    if (!perSet || length(sets(obj)) == 1)
-        return(callNextMethod(obj, index, groupName, MSPeakLists, formulas,
-                              plotStruct, title, useGGPlot2, xlim, ylim, ...))
-    
-    spec <- annotatedPeakList(obj, index, groupName, MSPeakLists, formulas)
-    if (is.null(spec))
-        return(NULL)
-    
-    compr <- obj[[groupName]][index, ]    
-    mol <- NULL
-    if (plotStruct)
-    {
-        mol <- getMoleculesFromSMILES(compr$SMILES)
-        if (!isValidMol(mol))
-            mol <- NULL
-    }
-    
-    if (is.null(title))
-        title <- getComponentsSpecPlotTitle(compr$compoundName, compr$formula)
-    
-    return(makeMSPlotSets(spec, title, mirror, sets(obj), xlim, ylim, useGGPlot2, ..., mol = mol))
-})
-
-setMethod("plotSpecHash", "componentsSet", function(obj, index, groupName, MSPeakLists, formulas = NULL,
-                                                   plotStruct = TRUE, title = NULL, useGGPlot2 = FALSE, xlim = NULL,
-                                                   ylim = NULL, perSet = FALSE, mirror = TRUE, ...)
-{
-    return(makeHash(callNextMethod(obj, index, groupName, MSPeakLists, formulas,
-                                   plotStruct, title, useGGPlot2, xlim,
-                                   ylim, ...),
-                    perSet, mirror))
-})
 
 generateComponentsSet <- function(fGroupsSet, generator, ..., setArgs)
 {

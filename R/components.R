@@ -1,9 +1,7 @@
 #' @include main.R
 #' @include workflow-step.R
+#' @include utils-components.R
 NULL
-
-# from https://stackoverflow.com/a/17531678
-orderComponentsNames <- function(n) order(nchar(n), n)
 
 #' Component class
 #'
@@ -529,24 +527,10 @@ setMethod("consensus", "components", function(obj, ...)
         stop("Need at least two non-empty components objects")
 
     compNames <- make.unique(sapply(allComponents, algorithm))
-    retCInfo <- copy(componentInfo(allComponents[[1]]))
-    retCInfo[, algorithm := compNames[[1]]]
-    retCTable <- componentTable(allComponents[[1]])
-
-    for (mi in seq(2, length(allComponents)))
-    {
-        if (length(allComponents[[mi]]) == 0)
-            next
-        rci <- copy(componentInfo(allComponents[[mi]]))
-        rci[, algorithm := compNames[[mi]]]
-        retCInfo <- rbind(retCInfo, rci, fill = TRUE)
-        retCTable <- c(retCTable, componentTable(allComponents[[mi]]))
-    }
-
-    retCInfo[, name := paste0(name, "-", algorithm)]
-    names(retCTable) <- retCInfo[["name"]]
-
-    return(components(components = retCTable, componentInfo = retCInfo, algorithm = paste0(compNames, collapse = ",")))
+    mcmp <- mergeComponents(allComponents, compNames, "algorithm")
+    
+    return(components(components = mcmp$components, componentInfo = mcmp$componentInfo,
+                      algorithm = paste0(compNames, collapse = ",")))
 })
 
 #' @templateVar func generateComponents

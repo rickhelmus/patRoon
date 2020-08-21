@@ -235,13 +235,9 @@ setMethod("plotSilhouettes", "componentsIntClust", function(obj, kSeq, pch = 16,
 #'   \code{\link{hclust}}).
 #' @param metric Distance metric used to calculate the distance matrix (passed
 #'   to \code{\link{daisy}}).
-#' @param normFunc Function that should be used for normalization of data.
-#'   Intensitity values of a feature group will be divided by the result of this
-#'   function when it is called with all intensity values of that feature group.
-#'   For example, when \code{\link{max}} is used normalized intensities will be
-#'   between zero and one.
-#' @param average If \code{TRUE} then all intensitity data will be averaged for
-#'   each replicate group.
+#' @param normFunc,average Passed to
+#'   \code{\link[=as.data.table,featureGroups-method]{as.data.table}} to perform
+#'   normalization and averaging of data.
 #'
 #' @template dynamictreecut
 #'
@@ -266,31 +262,15 @@ generateComponentsIntClust <- function(fGroups, method = "complete", metric = "e
                                   clust = structure(list(), class = "hclust"), cutClusters = numeric(),
                                   gInfo = data.frame(), properties = list()))
 
-    if (average)
-    {
-        gTable <- averageGroups(fGroups)
-        analysis <- unique(analysisInfo(fGroups)$group)
-    }
-    else
-    {
-        gTable <- groupTable(fGroups)
-        analysis <- analysisInfo(fGroups)$analysis
-    }
-
-    if (length(analysis) < 2)
+    anas <- if (average) replicateGroups(fGroups) else analyses(fGroups)
+    if (length(anas) < 2)
         stop(paste("Need at least >= 2", if (average) "replicate groups" else "analyses"))
 
-    clusterdt <- copy(gTable)
-
-    cat("Normalizing data... ")
-    normv <- clusterdt[, lapply(.SD, normFunc)]
-    for (g in seq_along(clusterdt))
-        set(clusterdt, j = g, value = clusterdt[[g]] / normv[[g]])
+    cat("Obtaining feature quantities... ")
+    gTable <- as.data.table(fGroups, average = average, normFunc = normFunc)
+    clusterm <- as.matrix(gTable[, anas, with = FALSE])
+    rownames(clusterm) <- names(fGroups)
     cat("Done!\n")
-
-    clusterm <- as.matrix(transpose(clusterdt))
-    rownames(clusterm) <- colnames(gTable)
-    colnames(clusterm) <- analysis
 
     cat("Calculating distance matrix... ")
     distm <- daisy(clusterm, metric)

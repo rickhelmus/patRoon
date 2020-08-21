@@ -369,7 +369,7 @@ makeClassHierarchy <- function(class, showParents)
     {
         pars <- selectSuperClasses(class)
         if (length(pars) > 0)
-            ret <- c(list(name = paste0(pars, collapse = ", ")), list(ret))
+            ret <- c(list(name = paste0(pars, collapse = ",")), list(ret))
     }
 
     return(ret)
@@ -421,7 +421,7 @@ printClassHierarchy <- function(class, showParents = TRUE, RD = FALSE)
 
     if (RD)
     {
-        hier <- rapply(hier, function(h) sprintf("\\code{\\link{%s}}", h),
+        hier <- rapply(hier, function(h) paste0(sprintf("\\code{\\link{%s}}", unlist(strsplit(h, ","))), collapse = ","),
                        classes = "character", how = "replace")
 
         # if parents are shown make the second line (ie this class) bold

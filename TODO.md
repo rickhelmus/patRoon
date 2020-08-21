@@ -56,7 +56,6 @@
 - different name/generic for ionize()? makes less sense for annotation classes
 - test DA algorithms
 - check if more has to be cached (eg merged results from sets)
-- annotatedSpectrum(): fix mergedBy column --> set name.
 - compoundsSetMF sub-class (for settings slot)? or is access via setObjects sufficient? may need to explain anyway for other cases like intclust components
 - base set class
     - show method

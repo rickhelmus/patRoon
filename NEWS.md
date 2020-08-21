@@ -1,6 +1,7 @@
 # patRoon next major
 
 * **IMPORTANT**: the `precursor` argument to the `plotSpec()`, `annotatedSpectrum()` and `plotScores()` methods for `formulas` now expects the neutral formula instead of the ionized formula. This change was necessary to select precursors for sets with different polarities. This is also in general more consistent with compound annotations.
+* The `as.data.table()` method for `featureGroups` now supports normalization of intensities through the `normFunc` argument.
 
 
 # patRoon 1.3.0

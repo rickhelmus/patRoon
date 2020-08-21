@@ -503,15 +503,24 @@ setMethod("export", "featureGroups", function(obj, type, out)
 #'   no regression information is added when no \code{conc} column is present in
 #'   the analysis information or when less than two concentrations are specified
 #'   (\emph{i.e.} the minimum amount).
+#' @param normFunc Function that should be used for normalization of data. The
+#'   function is called for all intensities/areas of a feature group and these
+#'   quantities are divided by the result of the function call. For example,
+#'   when \code{\link{max}} is used normalized intensities will be between zero
+#'   and one. If all quantities are zero then the function will not be called.
+#'   Set to \code{NULL} to perform no normalization.
 #' @export
 setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas = FALSE, features = FALSE,
-                                                     qualities = FALSE, regression = FALSE)
+                                                     qualities = FALSE, regression = FALSE, normFunc = NULL)
 {
+    # NOTE: keep args in sync with as.data.table() method for featureGroupsSet
+    
     ac <- checkmate::makeAssertCollection()
     checkmate::assertFlag(average, add = ac)
     checkmate::assertFlag(areas, add = ac)
     checkmate::assertFlag(features, add = ac)
     checkmate::assertFlag(regression, add = ac)
+    checkmate::assertFunction(normFunc, null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
 
     checkmate::assert(checkmate::checkFALSE(qualities),
@@ -523,7 +532,9 @@ setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas =
 
     if (features && average && regression)
         stop("Cannot add regression data for averaged features.")
-
+    if (features && average && !is.null(normFunc))
+        stop("Cannot normalize data for averaged features.")
+    
     anaInfo <- analysisInfo(x)
     gNames <- names(x)
     gInfo <- groupInfo(x)
@@ -568,6 +579,13 @@ setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas =
         }
         else
         {
+            if (!is.null(normFunc))
+            {
+                ret[, c("area", "intensity") := .(if (all(area == 0)) area else area / normFunc(area),
+                                                  if (all(intensity == 0)) intensity else intensity / normFunc(intensity)),
+                    by = "group"]
+            }
+            
             doConc <- doConc && nrow(anaInfo) > 1
             if (doConc)
             {
@@ -604,6 +622,17 @@ setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas =
             snames <- anaInfo$analysis
             if (doConc)
                 concs <- anaInfo$conc
+        }
+        
+        if (!is.null(normFunc))
+        {
+            normv <- gTable[, lapply(.SD, normFunc)]
+            gTable <- copy(gTable)
+            for (g in seq_along(gTable))
+            {
+                if (!all(gTable[[g]] == 0))
+                    set(gTable, j = g, value = gTable[[g]] / normv[[g]])
+            }
         }
 
         ret <- transpose(gTable)

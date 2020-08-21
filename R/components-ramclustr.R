@@ -176,7 +176,5 @@ setMethod("generateComponentsRAMClustR", "featureGroups", function(fGroups, st =
 
 setMethod("generateComponentsRAMClustR", "featureGroupsSet", function(fGroups, ...)
 {
-    ionization <- ifelse(sapply(adducts(fGroups), "slot", "charge") < 0, "negative", "positive")
-    setArgs <- lapply(ionization, function(i) list(ionization = i))
-    generateComponentsSet(fGroups, generateComponentsRAMClustR, ..., setArgs = setArgs)
+    generateComponentsSet(fGroups, generateComponentsRAMClustR, ...)
 })

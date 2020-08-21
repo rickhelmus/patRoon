@@ -1,5 +1,6 @@
 #' @include main.R
 #' @include components.R
+#' @include feature_groups-set.R
 NULL
 
 #' Components class for homologous series.
@@ -124,10 +125,10 @@ setMethod("plotGraph", "componentsNT", function(obj, onlyLinked)
 #'
 #' @rdname component-generation
 #' @export
-generateComponentsNontarget <- function(fGroups, ionization, rtRange = c(-120, 120), mzRange = c(5, 120),
-                                        elements = c("C", "H", "O"), rtDev = 30, absMzDev = 0.002,
-                                        absMzDevLink = absMzDev * 2, extraOpts = NULL,
-                                        traceHack = all(R.Version()[c("major", "minor")] >= c(3, 4)))
+setMethod("generateComponentsNontarget", "featureGroups", function(fGroups, ionization, rtRange = c(-120, 120), mzRange = c(5, 120),
+                                                                   elements = c("C", "H", "O"), rtDev = 30, absMzDev = 0.002,
+                                                                   absMzDevLink = absMzDev * 2, extraOpts = NULL,
+                                                                   traceHack = all(R.Version()[c("major", "minor")] >= c(3, 4)))
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
@@ -367,4 +368,10 @@ generateComponentsNontarget <- function(fGroups, ionization, rtRange = c(-120, 1
     saveCacheData("componentsNontarget", ret, hash)
 
     return(ret)
-}
+})
+
+setMethod("generateComponentsNontarget", "featureGroupsSet", function(fGroups, ...)
+{
+    generateComponentsSet(fGroups, generateComponentsNontarget, ...)
+})
+

@@ -1,5 +1,6 @@
 #' @include main.R
 #' @include components.R
+#' @include feature_groups-set.R
 NULL
 
 #' @rdname components-class
@@ -25,8 +26,8 @@ setMethod("initialize", "componentsCamera",
 #'
 #' @rdname component-generation
 #' @export
-generateComponentsCAMERA <- function(fGroups, ionization, onlyIsotopes = FALSE,
-                                     minSize = 2, relMinReplicates = 0.5, extraOpts = NULL)
+setMethod("generateComponentsCAMERA", "featureGroups", function(fGroups, ionization, onlyIsotopes = FALSE,
+                                                                minSize = 2, relMinReplicates = 0.5, extraOpts = NULL)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
@@ -154,4 +155,10 @@ generateComponentsCAMERA <- function(fGroups, ionization, onlyIsotopes = FALSE,
     ret <- componentsCamera(xsa = an, components = comps, componentInfo = cInfo)
     saveCacheData("componentsCAMERA", ret, hash)
     return(ret)
-}
+})
+
+setMethod("generateComponentsCAMERA", "featureGroupsSet", function(fGroups, ...)
+{
+    generateComponentsSet(fGroups, generateComponentsCAMERA, ...)
+})
+

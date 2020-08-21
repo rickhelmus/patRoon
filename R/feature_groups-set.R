@@ -82,7 +82,9 @@ setMethod("export", "featureGroupsSet", function(obj, type, out, sets = NULL) ca
 #'   the analysis information or when less than two concentrations are specified
 #'   (\emph{i.e.} the minimum amount).
 #' @export
-setMethod("as.data.table", "featureGroupsSet", function(x, ..., neutralized = TRUE, sets = NULL)
+setMethod("as.data.table", "featureGroupsSet", function(x, average = FALSE, areas = FALSE, features = FALSE,
+                                                        regression = FALSE, normFunc = NULL,
+                                                        neutralized = TRUE, sets = NULL)
 {
     # UNDONE: also support reporting ionized features with different adducts?
     
@@ -98,12 +100,38 @@ setMethod("as.data.table", "featureGroupsSet", function(x, ..., neutralized = TR
     if (!neutralized)
         x <- ionize(x)
     
-    ret <- callNextMethod(x, ...)
+    # NOTE: we normalize hereafter per set afterwards
+    ret <- callNextMethod(x, average = average, areas = areas, features = features,
+                          regression = regression, normFunc = NULL)
     
     if (!is.null(ret[["analysis"]])) # add set column if feature data is present
     {
         ret[, set := anaInfo[match(analysis, anaInfo$analysis), "set"]]
         setcolorder(ret, c("group", "group_ret", "group_mz", "set", "analysis"))
+    }
+    
+    if (!is.null(normFunc))
+    {
+        # do normalization here to do so per set
+        
+        if (features)
+            ret[, c("area", "intensity") := .(if (all(area == 0)) area else area / normFunc(area),
+                                              if (all(intensity == 0)) intensity else intensity / normFunc(intensity)),
+                by = c("set", "group")]
+        else
+        {
+            rowSeq <- seq_len(nrow(ret)) # BUG? can't put in expression below directly...
+            for (s in sets(x))
+            {
+                anaInfo <- analysisInfo(x)
+                anaInfo <- anaInfo[anaInfo$set == s, ]
+                intCols <- if (average) unique(anaInfo$group) else anaInfo$analysis
+                ret[, (intCols) := {
+                    v <- unlist(.SD)
+                    if (all(v == 0)) .SD else as.list(v / normFunc(v))
+                }, by = rowSeq, .SDcols = intCols]
+            }
+        }
     }
     
     return(ret[])

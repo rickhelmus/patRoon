@@ -21,9 +21,6 @@ formulasSet <- setClass("formulasSet", slots = c(setThreshold = "numeric",
                                                  origFGNames = "character"),
                         contains = c("formulas", "workflowStepSet"))
 
-setMethod("initialize", "formulasSet",
-          function(.Object, ...) callNextMethod(.Object, algorithm = "set", ...))
-
 #' @describeIn formulasSet Shows summary information for this object.
 #' @export
 setMethod("show", "formulasSet", function(object)
@@ -149,15 +146,14 @@ generateFormulasSet <- function(fGroupsSet, generator, ..., setArgs, setThreshol
     
     ret <- formulasSet(adducts = adducts(fGroupsSet), setObjects = ionizedFormulasList,
                        origFGNames = names(fGroupsSet), setThreshold = setThreshold,
-                       formulas = groupForms, featureFormulas = combFormulas)
+                       formulas = groupForms, featureFormulas = combFormulas,
+                       algorithm = makeSetAlgorithm(ionizedFormulasList))
     
     return(ret)
 }
 
 formulasSetIonized <- setClass("formulasSetIonized", contains = "formulas")
-setMethod("initialize", "formulasSetIonized",
-          function(.Object, ...) callNextMethod(.Object, algorithm = "set_ionized", ...))
-setMethod("ionize", "formulasSetIonized", function(obj, sets)
+setMethod("ionize", "formulasSet", function(obj, sets)
 {
     if (!is.null(sets) && length(sets) > 0)
         obj <- obj[, sets = sets]
@@ -167,5 +163,6 @@ setMethod("ionize", "formulasSetIonized", function(obj, sets)
     groupForms <- copy(formulaTable(obj))
     groupForms <- lapply(groupForms, set, j = c("set", "setCoverage"), value = NULL)
     
-    return(formulasSetIonized(formulas = groupForms, featureFormulas = formulaTable(obj, features = TRUE)))
+    return(formulasSetIonized(formulas = groupForms, featureFormulas = formulaTable(obj, features = TRUE),
+                              algorithm = paste0(algorithm(obj), "_ionized")))
 })

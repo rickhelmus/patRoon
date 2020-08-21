@@ -56,7 +56,7 @@
 - different name/generic for ionize()? makes less sense for annotation classes
 - test DA algorithms
 - check if more has to be cached (eg merged results from sets)
-- more descriptive algorithm(): include setObjects algorithm in name if possible. Necessary for eg mergedBy fields.
+- annotatedSpectrum(): fix mergedBy column --> set name.
 - compoundsSetMF sub-class (for settings slot)? or is access via setObjects sufficient? may need to explain anyway for other cases like intclust components
 - base set class
     - show method
@@ -70,6 +70,7 @@
     - clearly mention that nontarget is done per set now
     - nontarget-set: plotGraph method?
 - implement XCMS conversion functions? maybe with given set. Could just ionize() it.
+- ionize() for compounds/components? if not remove formulas?
 
 
 ## features

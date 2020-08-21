@@ -18,9 +18,6 @@ syncComponentsSetObjects <- function(componentsSet)
 componentsSet <- setClass("componentsSet", slots = c(setObjects = "list"),
                           contains = c("components", "workflowStepSet"))
 
-setMethod("initialize", "componentsSet",
-          function(.Object, ...) callNextMethod(.Object, algorithm = "set", ...))
-
 #' @describeIn componentsSet Shows summary information for this object.
 #' @export
 setMethod("show", "componentsSet", function(object)
@@ -95,6 +92,7 @@ generateComponentsSet <- function(fGroupsSet, generator, ...)
     mcmp <- mergeComponents(ionizedComponentsList, sets(fGroupsSet), "set")
     
     return(componentsSet(adducts = adducts(fGroupsSet), setObjects = ionizedComponentsList,
-                         components = mcmp$components, componentInfo = mcmp$componentInfo))
+                         components = mcmp$components, componentInfo = mcmp$componentInfo,
+                         algorithm = makeSetAlgorithm(ionizedComponentsList)))
 }
 

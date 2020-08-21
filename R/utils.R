@@ -518,6 +518,15 @@ RUserDir <- function(...)
     return(backports:::R_user_dir(...))
 }
 
+makeSetAlgorithm <- function(setObjects)
+{
+    if (length(setObjects) == 0)
+        setAlgo <- "empty"
+    else
+        setAlgo <- paste0(unique(sapply(setObjects, algorithm)), collapse = ",")
+    return(paste(setAlgo, "set", sep = "-"))
+}
+
 assertAndGetMSPLSetsArgs <- function(fGroupsSet, MSPeakListsSet)
 {
     checkmate::assertClass(MSPeakListsSet, "MSPeakListsSet")

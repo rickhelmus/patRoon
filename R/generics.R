@@ -89,6 +89,7 @@ setGeneric("plotHeatMap", function(obj, ...) standardGeneric("plotHeatMap"))
 
 ### Sets
 
+setGeneric("setObjects", function(obj) standardGeneric("setObjects"))
 setGeneric("sets", function(obj) standardGeneric("sets"))
 setGeneric("adducts", function(obj) standardGeneric("adducts"))
 setGeneric("ionize", function(obj, sets = NULL) standardGeneric("ionize"))

@@ -45,7 +45,7 @@
 
 
 ## sets
-- fGroups: provide methods for non-implemented functionality
+- provide methods for non-implemented functionality (eg consensus)
 - find nice way to re-use docs
 - filter() for features/fGroups: support ionized masses for mass filters? or just clarify it doesn't.
 - handle/test empty objects
@@ -58,17 +58,19 @@
 - check if more has to be cached (eg merged results from sets)
 - more descriptive algorithm(): include setObjects algorithm in name if possible. Necessary for eg mergedBy fields.
 - compoundsSetMF sub-class (for settings slot)? or is access via setObjects sufficient? may need to explain anyway for other cases like intclust components
-- compoundsSet: remove adducts() slot? not really needed, although gives some metadata... If keep: add to components too.
 - have default set name based on something else than algorithm (polarity?)
 - base set class
-    - setObjects method
-    - adducts method?
+    - show method
+        - print setObject algo? maybe not necessary if algo names are clarified
+    - don't use for fGroupsSet?
 - components
     - neutralize masses? otherwise document
         - yay: consistent with other set classes
         - nay: might be a bit strange when looking for adducts etc and components are per set anyway
     - intclust: return componentsSet? if not document somewhere...
     - clearly mention that nontarget is done per set now
+    - nontarget-set: plotGraph method?
+- implement XCMS conversion functions? maybe with given set. Could just ionize() it.
 
 
 ## features

@@ -1,6 +1,5 @@
-# UNDONE: design common set base class for this, compounds etc?
-
 #' @include main.R
+#' @include workflow-step-set.R
 NULL
 
 neutralizeFeatures <- function(feat, adduct)
@@ -18,26 +17,18 @@ neutralizeFeatures <- function(feat, adduct)
 }
 
 featuresSet <- setClass("featuresSet",
-                        slots = c(adducts = "list", setObjects = "list",
-                                  ionizedFeatures = "list"),
-                        contains = "features")
+                        slots = c(ionizedFeatures = "list"),
+                        contains = c("features", "workflowStepSet"))
 
 setMethod("initialize", "featuresSet",
           function(.Object, ...) callNextMethod(.Object, algorithm = "set", ...))
 
-# UNDONE: move (partially)
 #' @describeIn featuresSet Shows summary information for this object.
 #' @export
 setMethod("show", "featuresSet", function(object)
 {
-    callNextMethod(object)
-    printf("Sets: %s\n", paste0(sets(object), collapse = ", "))
-    printf("Adducts: %s\n", paste0(sapply(object@adducts, as.character), collapse = ", "))
+    callAllNextMethods(object, show, firstClass = "features")
 })
-
-# UNDONE: export/move/docs
-setMethod("sets", "featuresSet", function(obj) names(obj@adducts))
-setMethod("adducts", "featuresSet", function(obj) obj@adducts)
 
 #' @describeIn featuresSet Get table with feature information
 #'

@@ -1,5 +1,6 @@
 #' @include main.R
 #' @include compounds.R
+#' @include workflow-step-set.R
 NULL
 
 makeCompoundsSetConsensus <- function(setObjects, origFGNames, setThreshold)
@@ -76,25 +77,17 @@ syncCompoundsSetObjects <- function(compoundsSet)
     return(compoundsSet)
 }
 
-compoundsSet <- setClass("compoundsSet", slots = c(adducts = "list", setObjects = "list",
-                                                   setThreshold = "numeric", origFGNames = "character"),
-                        contains = "compounds")
+compoundsSet <- setClass("compoundsSet", slots = c(setThreshold = "numeric", origFGNames = "character"),
+                        contains = c("compounds", "workflowStepSet"))
 
 setMethod("initialize", "compoundsSet",
           function(.Object, ...) callNextMethod(.Object, algorithm = "set", ...))
-
-setMethod("sets", "compoundsSet", function(obj) names(obj@setObjects))
-setMethod("adducts", "compoundsSet", function(obj) obj@adducts)
 
 #' @describeIn compoundsSet Shows summary information for this object.
 #' @export
 setMethod("show", "compoundsSet", function(object)
 {
-    callNextMethod(object)
-    printf("Sets: %s\n", paste0(sets(object), collapse = ", "))
-    printf("Adducts: %s\n", paste0(sapply(adducts(object), as.character), collapse = ", "))
-    if (length(object@setObjects[[1]]) > 0)
-        printf("Original algorithm: %s\n", algorithm(object@setObjects[[1]]))
+    callAllNextMethods(object, show, firstClass = "compounds")
 })
 
 setMethod("[", c("compoundsSet", "ANY", "missing", "missing"), function(x, i, j, ..., sets = NULL, drop = TRUE)

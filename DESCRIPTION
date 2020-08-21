@@ -141,6 +141,7 @@ Collate:
     'RcppExports.R'
     'utils-adduct.R'
     'adduct.R'
+    'workflow-step-set.R'
     'features-set.R'
     'feature_groups-set.R'
     'utils-components.R'

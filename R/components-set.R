@@ -1,5 +1,6 @@
 #' @include main.R
 #' @include components.R
+#' @include workflow-step-set.R
 NULL
 
 syncComponentsSetObjects <- function(componentsSet)
@@ -15,21 +16,16 @@ syncComponentsSetObjects <- function(componentsSet)
 }
 
 componentsSet <- setClass("componentsSet", slots = c(setObjects = "list"),
-                          contains = "components")
+                          contains = c("components", "workflowStepSet"))
 
 setMethod("initialize", "componentsSet",
           function(.Object, ...) callNextMethod(.Object, algorithm = "set", ...))
-
-setMethod("sets", "componentsSet", function(obj) names(obj@setObjects))
 
 #' @describeIn componentsSet Shows summary information for this object.
 #' @export
 setMethod("show", "componentsSet", function(object)
 {
-    callNextMethod(object)
-    printf("Sets: %s\n", paste0(sets(object), collapse = ", "))
-    if (length(object@setObjects[[1]]) > 0)
-        printf("Original algorithm: %s\n", algorithm(object@setObjects[[1]]))
+    callAllNextMethods(object, show, firstClass = "components")
 })
 
 setMethod("[", c("componentsSet", "ANY", "ANY", "missing"), function(x, i, j, ..., sets = NULL, drop = TRUE)
@@ -98,6 +94,7 @@ generateComponentsSet <- function(fGroupsSet, generator, ...)
     
     mcmp <- mergeComponents(ionizedComponentsList, sets(fGroupsSet), "set")
     
-    return(componentsSet(setObjects = ionizedComponentsList, components = mcmp$components, componentInfo = mcmp$componentInfo))
+    return(componentsSet(adducts = adducts(fGroupsSet), setObjects = ionizedComponentsList,
+                         components = mcmp$components, componentInfo = mcmp$componentInfo))
 }
 

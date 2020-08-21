@@ -80,9 +80,6 @@ syncCompoundsSetObjects <- function(compoundsSet)
 compoundsSet <- setClass("compoundsSet", slots = c(setThreshold = "numeric", origFGNames = "character"),
                         contains = c("compounds", "workflowStepSet"))
 
-setMethod("initialize", "compoundsSet",
-          function(.Object, ...) callNextMethod(.Object, algorithm = "set", ...))
-
 #' @describeIn compoundsSet Shows summary information for this object.
 #' @export
 setMethod("show", "compoundsSet", function(object)
@@ -272,7 +269,8 @@ generateCompoundsSet <- function(fGroupsSet, MSPeakListsSet, generator, ..., set
     
     ret <- compoundsSet(adducts = adducts(fGroupsSet), setObjects = ionizedCompoundsList,
                         setThreshold = setThreshold, origFGNames = names(fGroupsSet),
-                        compounds = cons, scoreTypes = scTypes, scoreRanges = scRanges)
+                        compounds = cons, scoreTypes = scTypes, scoreRanges = scRanges,
+                        algorithm = makeSetAlgorithm(ionizedCompoundsList))
     
     return(ret)
 }

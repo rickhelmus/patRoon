@@ -20,9 +20,6 @@ MSPeakListsSet <- setClass("MSPeakListsSet",
                            slots = c(analysisInfo = "data.frame"),
                            contains = c("MSPeakLists", "workflowStepSet"))
 
-setMethod("initialize", "MSPeakListsSet",
-          function(.Object, ...) callNextMethod(.Object, algorithm = "set", ...))
-
 setMethod("averageMSPeakLists", "MSPeakListsSet", function(obj)
 {
     # create 'averaged' peak lists by simply merging the averaged lists from the setObjects
@@ -251,14 +248,13 @@ generateMSPeakListsSet <- function(fGroupsSet, generator, ...)
     ret <- MSPeakListsSet(adducts = adducts(fGroupsSet), setObjects = ionizedMSPeakLists,
                           analysisInfo = analysisInfo(fGroupsSet),
                           peakLists = combPL, metadata = list(),
-                          origFGNames = names(fGroupsSet))
+                          origFGNames = names(fGroupsSet),
+                          algorithm = makeSetAlgorithm(ionizedMSPeakLists))
     
     return(ret)
 }
 
 MSPeakListsSetIonized <- setClass("MSPeakListsSetIonized", contains = "MSPeakLists")
-setMethod("initialize", "MSPeakListsSetIonized",
-          function(.Object, ...) callNextMethod(.Object, algorithm = "set_ionized", ...))
 setMethod("ionize", "MSPeakListsSet", function(obj, sets)
 {
     if (!is.null(sets) && length(sets) > 0)
@@ -268,6 +264,6 @@ setMethod("ionize", "MSPeakListsSet", function(obj, sets)
     
     avArgs <- if (length(obj@setObjects) > 0) obj@setObjects[[1]]@avgPeakListArgs else list()
     return(MSPeakListsSetIonized(peakLists = obj@peakLists, metadata = list(), avgPeakListArgs = avArgs,
-                                 origFGNames = obj@origFGNames))
+                                 origFGNames = obj@origFGNames, algorithm = paste0(algorithm(obj), "_ionized")))
 })
 

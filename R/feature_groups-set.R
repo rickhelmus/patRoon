@@ -4,15 +4,10 @@
 NULL
 
 featureGroupsSet <- setClass("featureGroupsSet",
-                             slots = c(groupAlgorithm = "character"),
                              contains = "featureGroups")
-
-setMethod("initialize", "featureGroupsSet",
-          function(.Object, ...) callNextMethod(.Object, algorithm = "set", ...))
 
 setMethod("sets", "featureGroupsSet", function(obj) sets(getFeatures(obj)))
 setMethod("adducts", "featureGroupsSet", function(obj) adducts(getFeatures(obj)))
-setMethod("groupAlgorithm", "featureGroupsSet", function(obj) obj@groupAlgorithm)
 
 #' @describeIn featureGroupsSet Shows summary information for this object.
 #' @export
@@ -21,7 +16,6 @@ setMethod("show", "featureGroupsSet", function(object)
     callNextMethod(object)
     printf("Sets: %s\n", paste0(sets(object), collapse = ", "))
     printf("Adducts: %s\n", paste0(sapply(adducts(getFeatures(object)), as.character), collapse = ", "))
-    printf("Grouping algorithm: %s\n", groupAlgorithm(object))
 })
 
 #' @describeIn featureGroupsSet Obtain feature information (see \code{\link{features}}).
@@ -189,13 +183,12 @@ setMethod("groupFeatures", "featuresSet", function(feat, algorithm, ..., verbose
     
     fGroups <- do.call(callNextMethod, c(list(feat = feat, algorithm = algorithm, verbose = verbose), otherArgs))
     
-    return(featureGroupsSet(groupAlgorithm = algorithm, groups = groups(fGroups), groupInfo = groupInfo(fGroups),
-                            analysisInfo = analysisInfo(fGroups), features = feat, ftindex = groupFeatIndex(fGroups)))
+    return(featureGroupsSet(groups = groups(fGroups), groupInfo = groupInfo(fGroups),
+                            analysisInfo = analysisInfo(fGroups), features = feat, ftindex = groupFeatIndex(fGroups),
+                            algorithm = makeSetAlgorithm(list(fGroups))))
 })
 
 featureGroupsSetIonized <- setClass("featureGroupsSetIonized", contains = "featureGroups")
-setMethod("initialize", "featureGroupsSetIonized",
-          function(.Object, ...) callNextMethod(.Object, algorithm = "set_ionized", ...))
 setMethod("ionize", "featureGroupsSet", function(obj, sets)
 {
     # UNDONE: mention that group names remain the same and thus represent neutral masses
@@ -210,5 +203,6 @@ setMethod("ionize", "featureGroupsSet", function(obj, sets)
     gInfo$mzs <- gInfo$mzs + addMZ
     
     return(featureGroupsSetIonized(groups = groups(obj), groupInfo = gInfo, analysisInfo = analysisInfo(obj),
-                                   features = ionize(getFeatures(obj)), ftindex = groupFeatIndex(obj)))
+                                   features = ionize(getFeatures(obj)), ftindex = groupFeatIndex(obj),
+                                   algorithm = paste0(algorithm(obj), "_ionized")))
 })

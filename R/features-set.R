@@ -20,9 +20,6 @@ featuresSet <- setClass("featuresSet",
                         slots = c(ionizedFeatures = "list"),
                         contains = c("features", "workflowStepSet"))
 
-setMethod("initialize", "featuresSet",
-          function(.Object, ...) callNextMethod(.Object, algorithm = "set", ...))
-
 #' @describeIn featuresSet Shows summary information for this object.
 #' @export
 setMethod("show", "featuresSet", function(object)
@@ -198,7 +195,7 @@ setMethod("c", "features", function(x, ..., adducts)
     combFeaturesIon <- Reduce(modifyList, lapply(featuresList, featureTable))
 
     return(featuresSet(adducts = adducts, setObjects = featuresList, ionizedFeatures = combFeaturesIon,
-                       features = combFeatures, analysisInfo = combAnaInfo))
+                       features = combFeatures, analysisInfo = combAnaInfo, algorithm = makeSetAlgorithm(featuresList)))
 })
 
 # UNDONE: implement someday?
@@ -210,8 +207,6 @@ setMethod("getXCMSSet", "featuresSet", function(obj, verbose) fSetNotYetImplemen
 setMethod("getXCMSnExp", "featuresSet", function(obj, verbose) fSetNotYetImplemented())
 
 featuresSetIonized <- setClass("featuresSetIonized", contains = "features")
-setMethod("initialize", "featuresSetIonized",
-          function(.Object, ...) callNextMethod(.Object, algorithm = "set_ionized", ...))
 setMethod("ionize", "featuresSet", function(obj, sets)
 {
     assertSets(obj, sets)
@@ -221,5 +216,6 @@ setMethod("ionize", "featuresSet", function(obj, sets)
 
     assertEqualAdducts(adducts(obj))
     
-    return(featuresSetIonized(features = obj@ionizedFeatures, analysisInfo = analysisInfo(obj)))
+    return(featuresSetIonized(features = obj@ionizedFeatures, analysisInfo = analysisInfo(obj),
+                              algorithm = paste0(algorithm(obj), "_ionized")))
 })

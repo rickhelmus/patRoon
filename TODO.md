@@ -41,6 +41,7 @@
 - improve instructions for MF and SIRIUS installation?
 - ref docs and exports for getXCMSnSet
 - ffOpenMS etc: analyses also needs to be available for hashing
+- improve docs for areas (only affects when features=FALSE) and average (different behavior when features=TRUE/FALSE) for as.data.table() of featureGroups
 
 
 ## sets
@@ -59,6 +60,7 @@
 - compoundsSetMF sub-class (for settings slot)? or is access via setObjects sufficient? may need to explain anyway for other cases like intclust components
 - compoundsSet: remove adducts() slot? not really needed, although gives some metadata... If keep: add to components too.
 - have default set name based on something else than algorithm (polarity?)
+- components: neutralize masses? otherwise document
 
 
 ## features
@@ -224,4 +226,7 @@
 - mass defect components
 - CliqueMS
 - split peak correlation and adduct etc annotation? would allow better non-target integration
+- intclust
+    - optionally take areas instead of intensities
+    - cache results
 

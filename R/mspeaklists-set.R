@@ -17,8 +17,8 @@ syncMSPeakListsSetObjects <- function(MSPeakListsSet)
 
 #' @export
 MSPeakListsSet <- setClass("MSPeakListsSet",
-                           slots = c(adducts = "list", setObjects = "list", analysisInfo = "data.frame"),
-                           contains = "MSPeakLists")
+                           slots = c(analysisInfo = "data.frame"),
+                           contains = c("MSPeakLists", "workflowStepSet"))
 
 setMethod("initialize", "MSPeakListsSet",
           function(.Object, ...) callNextMethod(.Object, algorithm = "set", ...))
@@ -54,9 +54,6 @@ setMethod("averageMSPeakLists", "MSPeakListsSet", function(obj)
 })
 
 
-setMethod("sets", "MSPeakListsSet", function(obj) names(obj@setObjects))
-setMethod("adducts", "MSPeakListsSet", function(obj) obj@adducts)
-
 #' @describeIn MSPeakListsSet Get analysis information
 #' @return \code{analysisInfo}: A \code{data.frame} containing a column with
 #'   analysis name (\code{analysis}), its path (\code{path}), and other columns
@@ -69,11 +66,7 @@ setMethod("analysisInfo", "MSPeakListsSet", function(obj) obj@analysisInfo)
 #' @export
 setMethod("show", "MSPeakListsSet", function(object)
 {
-    callNextMethod(object)
-    printf("Sets: %s\n", paste0(sets(object), collapse = ", "))
-    printf("Adducts: %s\n", paste0(sapply(adducts(object), as.character), collapse = ", "))
-    if (length(object@setObjects[[1]]) > 0)
-        printf("Original algorithm: %s\n", algorithm(object@setObjects[[1]]))
+    callAllNextMethods(object, show, firstClass = "MSPeakLists")
 })
 
 #' @describeIn MSPeakListsSet Accessor method to obtain the MS peak lists.

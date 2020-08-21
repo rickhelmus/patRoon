@@ -455,6 +455,18 @@ getAllMethods <- function(gen)
 }
 # nocov end
 
+callAllNextMethods <- function(obj, f, ..., firstClass = NULL)
+{
+    supers <- selectSuperClasses(class(obj), directOnly = TRUE)
+    if (!is.null(firstClass))
+    {
+        selectMethod(f, firstClass)(obj, ...)
+        supers <- supers[supers != firstClass]
+    }
+    for (sc in supers)
+        selectMethod(f, sc)(obj, ...)
+}
+
 NULLToZero <- function(x) if (is.null(x)) 0 else x
 zeroToNULL <- function(x) if (is.numeric(x) && x == 0) NULL else x
 NAToZero <- function(x) if (is.na(x)) 0 else x

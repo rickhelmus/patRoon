@@ -1,5 +1,6 @@
 #' @include main.R
 #' @include formulas.R
+#' @include workflow-step-set.R
 NULL
 
 syncFormulasSetObjects <- function(formulasSet)
@@ -16,26 +17,18 @@ syncFormulasSetObjects <- function(formulasSet)
     return(formulasSet)
 }
 
-formulasSet <- setClass("formulasSet", slots = c(adducts = "list", setObjects = "list",
-                                                 setThreshold = "numeric",
+formulasSet <- setClass("formulasSet", slots = c(setThreshold = "numeric",
                                                  origFGNames = "character"),
-                        contains = "formulas")
+                        contains = c("formulas", "workflowStepSet"))
 
 setMethod("initialize", "formulasSet",
           function(.Object, ...) callNextMethod(.Object, algorithm = "set", ...))
-
-setMethod("sets", "formulasSet", function(obj) names(obj@setObjects))
-setMethod("adducts", "formulasSet", function(obj) obj@adducts)
 
 #' @describeIn formulasSet Shows summary information for this object.
 #' @export
 setMethod("show", "formulasSet", function(object)
 {
-    callNextMethod(object)
-    printf("Sets: %s\n", paste0(sets(object), collapse = ", "))
-    printf("Adducts: %s\n", paste0(sapply(adducts(object), as.character), collapse = ", "))
-    if (length(object@setObjects[[1]]) > 0)
-        printf("Original algorithm: %s\n", algorithm(object@setObjects[[1]]))
+    callAllNextMethods(object, show, firstClass = "formulas")
 })
 
 setMethod("[", c("formulasSet", "ANY", "missing", "missing"), function(x, i, j, ..., sets = NULL, drop = TRUE)

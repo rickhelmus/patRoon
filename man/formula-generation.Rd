@@ -5,15 +5,15 @@
 \alias{formula-generation}
 \alias{generateFormulas,featureGroups-method}
 \alias{generateFormulas}
-\alias{generateFormulasDA}
-\alias{generateFormulasGenForm}
-\alias{generateFormulasSIRIUS}
+\alias{generateFormulasDA,featureGroups-method}
+\alias{generateFormulasGenForm,featureGroups-method}
+\alias{generateFormulasSIRIUS,featureGroups-method}
 \alias{formulaScorings}
 \title{Automatic chemical formula generation}
 \usage{
 \S4method{generateFormulas}{featureGroups}(fGroups, algorithm, ...)
 
-generateFormulasDA(
+\S4method{generateFormulasDA}{featureGroups}(
   fGroups,
   precursorMzSearchWindow = 0.002,
   MSMode = "both",
@@ -23,7 +23,7 @@ generateFormulasDA(
   close = save
 )
 
-generateFormulasGenForm(
+\S4method{generateFormulasGenForm}{featureGroups}(
   fGroups,
   MSPeakLists,
   relMzDev = 5,
@@ -41,7 +41,7 @@ generateFormulasGenForm(
   batchSize = 8
 )
 
-generateFormulasSIRIUS(
+\S4method{generateFormulasSIRIUS}{featureGroups}(
   fGroups,
   MSPeakLists,
   relMzDev = 5,

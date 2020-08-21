@@ -443,7 +443,7 @@ results were generated. This is used for normalization.}
 }}
 
 \section{S4 class hierarchy}{
- \itemize{   \item{\code{\link{workflowStep}}}   \itemize{     \item{\strong{\code{\link{compounds}}}}     \itemize{       \item{\code{\link{compoundsConsensus}}}       \item{\code{\link{compoundsMF}}}     }   } }
+ \itemize{   \item{\code{\link{workflowStep}}}   \itemize{     \item{\strong{\code{\link{compounds}}}}     \itemize{       \item{\code{\link{compoundsConsensus}}}       \item{\code{\link{compoundsMF}}}       \item{\code{\link{compoundsSet}}}     }   } }
 }
 
 \section{Source}{

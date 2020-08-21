@@ -60,8 +60,9 @@ setMethod("as.data.frame", "workflowStep", function(x, row.names = NULL,
 #' @export
 setMethod("show", "workflowStep", function(object)
 {
-    printf("A %s object (derived from %s)\n", class(object),
-           paste0(getAllSuperClasses(getClassDef(class(object))), collapse = " -> "))
+    printf("A %s object\nHierarchy:\n", class(object))
+    printClassHierarchy(class(object))
+    printf("---\n")
     showObjectSize(object)
     printf("Algorithm: %s\n", algorithm(object))
     invisible(NULL)

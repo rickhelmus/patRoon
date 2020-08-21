@@ -232,8 +232,7 @@ specified scoring is never removed. Set to \code{NULL} to skip this filter.}
 
 \item{negate}{If \code{TRUE} then filters are applied in opposite manner.}
 
-\item{precursor}{The formula of the precursor (in ionic form, \emph{i.e.} as
-detected by the MS).}
+\item{precursor}{The formula of the precursor (in neutral form).}
 
 \item{groupName}{The name of the feature group to which the candidate
 belongs.}
@@ -412,7 +411,7 @@ results were generated. This is used for normalization.}
 }
 
 \section{S4 class hierarchy}{
- \itemize{   \item{\code{\link{workflowStep}}}   \itemize{     \item{\strong{\code{\link{formulas}}}}   } }
+ \itemize{   \item{\code{\link{workflowStep}}}   \itemize{     \item{\strong{\code{\link{formulas}}}}     \itemize{       \item{\code{\link{formulasSet}}}       \item{\code{\link{formulasSetIonized}}}     }   } }
 }
 
 \references{

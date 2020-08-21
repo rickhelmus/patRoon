@@ -279,6 +279,6 @@ names.}
 }
 
 \section{S4 class hierarchy}{
- \itemize{   \item{\code{\link{workflowStep}}}   \itemize{     \item{\strong{\code{\link{MSPeakLists}}}}   } }
+ \itemize{   \item{\code{\link{workflowStep}}}   \itemize{     \item{\strong{\code{\link{MSPeakLists}}}}     \itemize{       \item{\code{\link{MSPeakListsSet}}}       \item{\code{\link{MSPeakListsSetIonized}}}     }   } }
 }
 

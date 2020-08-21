@@ -5,15 +5,15 @@
 \alias{component-generation}
 \alias{generateComponents,featureGroups-method}
 \alias{generateComponents}
-\alias{generateComponentsCAMERA}
-\alias{generateComponentsIntClust}
-\alias{generateComponentsNontarget}
-\alias{generateComponentsRAMClustR}
+\alias{generateComponentsCAMERA,featureGroups-method}
+\alias{generateComponentsIntClust,featureGroups-method}
+\alias{generateComponentsNontarget,featureGroups-method}
+\alias{generateComponentsRAMClustR,featureGroups-method}
 \title{Grouping feature groups in components}
 \usage{
 \S4method{generateComponents}{featureGroups}(fGroups, algorithm, ...)
 
-generateComponentsCAMERA(
+\S4method{generateComponentsCAMERA}{featureGroups}(
   fGroups,
   ionization,
   onlyIsotopes = FALSE,
@@ -22,7 +22,7 @@ generateComponentsCAMERA(
   extraOpts = NULL
 )
 
-generateComponentsIntClust(
+\S4method{generateComponentsIntClust}{featureGroups}(
   fGroups,
   method = "complete",
   metric = "euclidean",
@@ -33,7 +33,7 @@ generateComponentsIntClust(
   minModuleSize = 1
 )
 
-generateComponentsNontarget(
+\S4method{generateComponentsNontarget}{featureGroups}(
   fGroups,
   ionization,
   rtRange = c(-120, 120),
@@ -46,7 +46,7 @@ generateComponentsNontarget(
   traceHack = all(R.Version()[c("major", "minor")] >= c(3, 4))
 )
 
-generateComponentsRAMClustR(
+\S4method{generateComponentsRAMClustR}{featureGroups}(
   fGroups,
   st = NULL,
   sr = NULL,
@@ -103,14 +103,9 @@ to \code{\link{homol.search}} (\code{generateComponentsNontarget}) or
 \item{metric}{Distance metric used to calculate the distance matrix (passed
 to \code{\link{daisy}}).}
 
-\item{normFunc}{Function that should be used for normalization of data.
-Intensitity values of a feature group will be divided by the result of this
-function when it is called with all intensity values of that feature group.
-For example, when \code{\link{max}} is used normalized intensities will be
-between zero and one.}
-
-\item{average}{If \code{TRUE} then all intensitity data will be averaged for
-each replicate group.}
+\item{normFunc, average}{Passed to
+\code{\link[=as.data.table,featureGroups-method]{as.data.table}} to perform
+normalization and averaging of data.}
 
 \item{maxTreeHeight, deepSplit, minModuleSize}{Arguments used by
 \code{\link{cutreeDynamicTree}}.}

@@ -84,7 +84,8 @@
   average = FALSE,
   areas = FALSE,
   features = FALSE,
-  regression = FALSE
+  regression = FALSE,
+  normFunc = NULL
 )
 
 \S4method{plot}{featureGroups,ANY}(
@@ -179,6 +180,13 @@ intercept, slope and R2 is added to the output. In addition, when
 no regression information is added when no \code{conc} column is present in
 the analysis information or when less than two concentrations are specified
 (\emph{i.e.} the minimum amount).}
+
+\item{normFunc}{Function that should be used for normalization of data. The
+function is called for all intensities/areas of a feature group and these
+quantities are divided by the result of the function call. For example,
+when \code{\link{max}} is used normalized intensities will be between zero
+and one. If all quantities are zero then the function will not be called.
+Set to \code{NULL} to perform no normalization.}
 
 \item{colourBy}{Sets the automatic colour selection: \code{"none"} for a
 single colour or \code{"rGroups"}/\code{"fGroups"} for a distinct colour
@@ -400,7 +408,7 @@ row within the feature table of the analysis (see
 }}
 
 \section{S4 class hierarchy}{
- \itemize{   \item{\code{\link{workflowStep}}}   \itemize{     \item{\strong{\code{\link{featureGroups}}}}     \itemize{       \item{\code{\link{featureGroupsBruker}}}       \item{\code{\link{featureGroupsConsensus}}}       \item{\code{\link{featureGroupsEnviMass}}}       \item{\code{\link{featureGroupsOpenMS}}}       \item{\code{\link{featureGroupsScreening}}}       \item{\code{\link{featureGroupsSet}}}       \item{\code{\link{featureGroupsSetIonized}}}       \item{\code{\link{featureGroupsBrukerTASQ}}}       \item{\code{\link{featureGroupsXCMS}}}       \item{\code{\link{featureGroupsXCMS3}}}     }   } }
+ \itemize{   \item{\code{\link{workflowStep}}}   \itemize{     \item{\strong{\code{\link{featureGroups}}}}     \itemize{       \item{\code{\link{featureGroupsSet}}}       \item{\code{\link{featureGroupsSetIonized}}}       \item{\code{\link{featureGroupsBruker}}}       \item{\code{\link{featureGroupsConsensus}}}       \item{\code{\link{featureGroupsEnviMass}}}       \item{\code{\link{featureGroupsOpenMS}}}       \item{\code{\link{featureGroupsScreening}}}       \item{\code{\link{featureGroupsBrukerTASQ}}}       \item{\code{\link{featureGroupsXCMS}}}       \item{\code{\link{featureGroupsXCMS3}}}     }   } }
 }
 
 \references{

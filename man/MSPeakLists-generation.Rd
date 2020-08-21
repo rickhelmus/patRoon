@@ -5,15 +5,15 @@
 \alias{MSPeakLists-generation}
 \alias{generateMSPeakLists,featureGroups-method}
 \alias{generateMSPeakLists}
-\alias{generateMSPeakListsDA}
-\alias{generateMSPeakListsDAFMF}
-\alias{generateMSPeakListsMzR}
+\alias{generateMSPeakListsDA,featureGroups-method}
+\alias{generateMSPeakListsDAFMF,featureGroups-method}
+\alias{generateMSPeakListsMzR,featureGroups-method}
 \alias{getDefAvgPListParams}
 \title{Generation of MS Peak Lists}
 \usage{
 \S4method{generateMSPeakLists}{featureGroups}(fGroups, algorithm, ...)
 
-generateMSPeakListsDA(
+\S4method{generateMSPeakListsDA}{featureGroups}(
   fGroups,
   bgsubtr = TRUE,
   maxMSRtWindow = 5,
@@ -26,7 +26,7 @@ generateMSPeakListsDA(
   avgFGroupParams = getDefAvgPListParams()
 )
 
-generateMSPeakListsDAFMF(
+\S4method{generateMSPeakListsDAFMF}{featureGroups}(
   fGroups,
   minMSIntensity = 500,
   minMSMSIntensity = 500,
@@ -35,7 +35,7 @@ generateMSPeakListsDAFMF(
   avgFGroupParams = getDefAvgPListParams()
 )
 
-generateMSPeakListsMzR(
+\S4method{generateMSPeakListsMzR}{featureGroups}(
   fGroups,
   maxMSRtWindow = 5,
   precursorMzWindow = 4,

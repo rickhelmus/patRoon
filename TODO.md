@@ -60,7 +60,15 @@
 - compoundsSetMF sub-class (for settings slot)? or is access via setObjects sufficient? may need to explain anyway for other cases like intclust components
 - compoundsSet: remove adducts() slot? not really needed, although gives some metadata... If keep: add to components too.
 - have default set name based on something else than algorithm (polarity?)
-- components: neutralize masses? otherwise document
+- base set class
+    - setObjects method
+    - adducts method?
+- components
+    - neutralize masses? otherwise document
+        - yay: consistent with other set classes
+        - nay: might be a bit strange when looking for adducts etc and components are per set anyway
+    - intclust: return componentsSet? if not document somewhere...
+    - clearly mention that nontarget is done per set now
 
 
 ## features

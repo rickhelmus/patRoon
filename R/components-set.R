@@ -87,11 +87,13 @@ setMethod("filter", "componentsSet", function(obj, ..., negate = FALSE, sets = N
 })
 
 
-generateComponentsSet <- function(fGroupsSet, generator, ..., setArgs)
+generateComponentsSet <- function(fGroupsSet, generator, ...)
 {
+    posneg <- function(add) if (add@charge < 0) "negative" else "positive"
+    
     ionizedFGroupsList <- sapply(sets(fGroupsSet), ionize, obj = fGroupsSet, simplify = FALSE)
-    ionizedComponentsList <- mapply(ionizedFGroupsList, setArgs,
-                                    FUN = function(fg, sa) do.call(generator, c(list(fGroups = fg, ...), sa)),
+    ionizedComponentsList <- mapply(ionizedFGroupsList, adducts(fGroupsSet),
+                                    FUN = function(fg, a) do.call(generator, list(fGroups = fg, ionization = posneg(a), ...)),
                                     SIMPLIFY = FALSE)
     
     mcmp <- mergeComponents(ionizedComponentsList, sets(fGroupsSet), "set")

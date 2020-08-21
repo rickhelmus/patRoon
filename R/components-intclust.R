@@ -243,10 +243,10 @@ setMethod("plotSilhouettes", "componentsIntClust", function(obj, kSeq, pch = 16,
 #'
 #' @rdname component-generation
 #' @export
-generateComponentsIntClust <- function(fGroups, method = "complete", metric = "euclidean",
-                                       normFunc = max, average = TRUE,
-                                       maxTreeHeight = 1, deepSplit = TRUE,
-                                       minModuleSize = 1)
+setMethod("generateComponentsIntClust", "featureGroups", function(fGroups, method = "complete", metric = "euclidean",
+                                                                  normFunc = max, average = TRUE,
+                                                                  maxTreeHeight = 1, deepSplit = TRUE,
+                                                                  minModuleSize = 1)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
@@ -289,4 +289,4 @@ generateComponentsIntClust <- function(fGroups, method = "complete", metric = "e
     return(componentsIntClust(components = comps, componentInfo = cInfo, clusterm = clusterm, distm = distm,
                               clust = clust, cutClusters = cutClusters, gInfo = gInfo,
                               properties = list(metric = metric, method = method, average = average)))
-}
+})

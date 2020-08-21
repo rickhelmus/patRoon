@@ -58,7 +58,6 @@
 - check if more has to be cached (eg merged results from sets)
 - more descriptive algorithm(): include setObjects algorithm in name if possible. Necessary for eg mergedBy fields.
 - compoundsSetMF sub-class (for settings slot)? or is access via setObjects sufficient? may need to explain anyway for other cases like intclust components
-- have default set name based on something else than algorithm (polarity?)
 - base set class
     - show method
         - print setObject algo? maybe not necessary if algo names are clarified

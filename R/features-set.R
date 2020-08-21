@@ -167,14 +167,14 @@ setMethod("c", "features", function(x, ..., adducts)
                       .var.name = "adducts")
     checkmate::reportAssertions(ac)
     
-    n <- getArgNames(..., def = sapply(featuresList, algorithm))
-    names(featuresList) <- make.unique(n)
-    
     adductNamed <- checkmate::testNames(names(adducts))
     if (adductNamed)
         checkmate::assertNames(names(adducts), type = "unique", must.include = names(featuresList))
     adducts <- lapply(adducts, checkAndToAdduct, .var.name = "adducts")
     adducts <- rep(adducts, length.out = length(featuresList))
+
+    n <- getArgNames(..., def = ifelse(sapply(adducts, "slot", "charge") < 0, "negative", "positive"))
+    names(featuresList) <- make.unique(n)
     
     if (!adductNamed)
         names(adducts) <- names(featuresList)

@@ -514,9 +514,8 @@ setMethod("plotStructureHash", "compounds", function(obj, index, groupName, widt
                                                      height = 500, useGGPlot2 = FALSE)
 {
     compTable <- compoundTable(obj)[[groupName]]
-    if (is.null(compTable) || nrow(compTable) == 0)
-        return(NULL)
-    return(makeHash(compTable$SMILES[index], width, height, useGGPlot2))
+    SMI <- if (is.null(compTable) || nrow(compTable) == 0) NULL else compTable$SMILES[index]
+    return(makeHash(SMI, width, height, useGGPlot2))
 })
 
 #' @describeIn compounds Plots a barplot with scoring of a candidate compound.
@@ -562,11 +561,10 @@ setMethod("plotScoresHash", "compounds", function(obj, index, groupName, normali
 {
     compTable <- compoundTable(obj)[[groupName]]
     if (is.null(compTable) || nrow(compTable) == 0 || index > nrow(compTable))
-        return(NULL)
-
-    if (normalizeScores == "none")
+        compTable <- NULL
+    else if (normalizeScores == "none")
         compTable <- compTable[index]
-
+    
     return(makeHash(index, compTable, normalizeScores, excludeNormScores, onlyUsed, useGGPlot2))
 })
 
@@ -809,10 +807,8 @@ setMethod("plotSpecHash", "compounds", function(obj, index, groupName, MSPeakLis
                                                 ylim = NULL, ...)
 {
     compTable <- compoundTable(obj)[[groupName]]
-    if (is.null(compTable) || nrow(compTable) == 0)
-        return(NULL)
-
-    return(makeHash(compTable[index, ], annotatedPeakList(obj, index, groupName, MSPeakLists, formulas),
+    cRow <- if (is.null(compTable) || nrow(compTable) == 0) NULL else compTable[index, ]
+    return(makeHash(cRow, annotatedPeakList(obj, index, groupName, MSPeakLists, formulas),
                     plotStruct, title, useGGPlot2, xlim, ylim, ...))
 })
 

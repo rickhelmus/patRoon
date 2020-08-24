@@ -11,6 +11,7 @@
 * Fixed: `reportPDF()` may report formula annotated spectra of results not present in input `featureGroups`
 * Fixed: Loading `data.table` data from cache now calls `data.table::setalloccol()` to ensure proper behavior if `data.table::set()` is called on cached data.
 * Fixed: plotSpec() for `compounds` with `useGGPlot2=TRUE` would try to plot formulas for non-annotated peaks (resulting in many extra diagonal lines)  
+* Fixed: some functions involved in caching plot data for HTML reports sometimes returned invalid data.
 
 # patRoon 1.0.1
 

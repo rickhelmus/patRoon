@@ -541,13 +541,11 @@ setMethod("plotScoresHash", "formulas", function(obj, precursor, groupName, anal
     else
         formTable <- obj[[groupName]]
     if (is.null(formTable) || nrow(formTable) == 0 || !precursor %in% formTable$formula)
-        return(NULL)
-
-    mb <- formTable[["mergedBy"]]
-    if (normalizeScores == "none")
+        formTable <- NULL
+    else if (normalizeScores == "none")
         formTable <- formTable[formula == precursor]
 
-    return(makeHash(precursor, formTable, formTable$mb, normalizeScores, excludeNormScores, useGGPlot2))
+    return(makeHash(precursor, formTable, normalizeScores, excludeNormScores, useGGPlot2))
 })
 
 #' @describeIn formulas Plots an annotated spectrum for a given candidate

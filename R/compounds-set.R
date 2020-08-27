@@ -142,7 +142,7 @@ setMethod("filter", "compoundsSet", function(obj, ..., negate = FALSE, sets = NU
 #' @export
 setMethod("plotSpec", "compoundsSet", function(obj, index, groupName, MSPeakLists, formulas = NULL,
                                                plotStruct = TRUE, title = NULL, useGGPlot2 = FALSE, xlim = NULL,
-                                               ylim = NULL, perSet = FALSE, mirror = TRUE, ...)
+                                               ylim = NULL, perSet = TRUE, mirror = TRUE, ...)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertCount(index, positive = TRUE, add = ac)
@@ -178,7 +178,7 @@ setMethod("plotSpec", "compoundsSet", function(obj, index, groupName, MSPeakList
 
 setMethod("plotSpecHash", "compoundsSet", function(obj, index, groupName, MSPeakLists, formulas = NULL,
                                                    plotStruct = TRUE, title = NULL, useGGPlot2 = FALSE, xlim = NULL,
-                                                   ylim = NULL, perSet = FALSE, mirror = TRUE, ...)
+                                                   ylim = NULL, perSet = TRUE, mirror = TRUE, ...)
 {
     return(makeHash(callNextMethod(obj, index, groupName, MSPeakLists, formulas,
                                    plotStruct, title, useGGPlot2, xlim,

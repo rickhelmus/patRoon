@@ -58,8 +58,6 @@
 - check if more has to be cached (eg merged results from sets)
 - compoundsSetMF sub-class (for settings slot)? or is access via setObjects sufficient? may need to explain anyway for other cases like intclust components
 - base set class
-    - show method
-        - print setObject algo? maybe not necessary if algo names are clarified
     - don't use for fGroupsSet?
 - components
     - neutralize masses? otherwise document

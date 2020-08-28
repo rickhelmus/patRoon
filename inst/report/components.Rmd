@@ -20,6 +20,7 @@ plotPathLink <- getPlotPath(TRUE)
 # HACK: this should be replaced some proper inheritance/methods at some point
 isHClust <- inherits(rmdVars$components, "componentsIntClust")
 isHomol <- inherits(rmdVars$components, "componentsNT")
+isSet <- inherits(rmdVars$components, "componentsSet")
 
 if (isHClust)
     clProps <- clusterProperties(rmdVars$components)
@@ -71,7 +72,7 @@ Components {data-orientation=rows}
 
 ```{r echo=FALSE,eval=isHClust}
 rmdText <- knitr::knit(text = glue::glue("
-##
+## {{data-height=350}}
 
 ### heatmap
 
@@ -103,59 +104,90 @@ plotGraph(rmdVars$components, onlyLinked = TRUE)
 
 `r if (isHClust || isHomol) rmdText`
 
-## { .components }
-
-### Components { .components }
-
-NOTE: only components with feature group data are shown here.
-
 <style> .components { overflow-x: auto; } </style>
 
 ```{r echo=FALSE}
-sppaths <- file.path(plotPathLink, sprintf("component_spec_%d.png", indsWithFGroups))
-eicpaths <- file.path(plotPathLink, sprintf("component_eic_%d.png", indsWithFGroups))
-
-if (rmdVars$selfContained)
+makeCompDT <- function(s)
 {
-    sppaths <- sapply(sppaths, knitr::image_uri)
-    eicpaths <- sapply(eicpaths, knitr::image_uri)
-}
-
-# clearout useless columns with only NA in them
-cTable <- sapply(cTable, function(ct)
-{
-    ct[, sapply(ct, function(x) !all(is.na(x))), with = FALSE]
-}, simplify = FALSE)
-infoTables <- sapply(indsWithFGroups, function(compi) knitr::kable(cTable[[compi]], "html") %>%
-                         kableExtra::kable_styling(font_size = 11) %>%
-                         kableExtra::scroll_box(extra_css = "overflow: auto; width: 350px; height: 300px;"))
-
-compTable <- data.table(component = names(rmdVars$components)[indsWithFGroups],
-                        info = infoTables,
-                        EIC = imgTags(eicpaths))
-                             
-if (isHClust)
-{
-    intnpaths <- file.path(plotPathLink, sprintf("component_int_norm_%d.png", indsWithFGroups))
-    intapaths <- file.path(plotPathLink, sprintf("component_int_abs_%d.png", indsWithFGroups))
+    if (is.null(s))
+        compInds <- indsWithFGroups
+    else
+        compInds <- intersect(cInfo[set == s, which = TRUE], indsWithFGroups)
+    
+    sppaths <- file.path(plotPathLink, sprintf("component_spec_%d.png", compInds))
+    eicpaths <- file.path(plotPathLink, sprintf("component_eic_%d.png", compInds))
     
     if (rmdVars$selfContained)
     {
-        intnpaths <- sapply(intnpaths, knitr::image_uri)
-        intapaths <- sapply(intapaths, knitr::image_uri)
+        sppaths <- sapply(sppaths, knitr::image_uri)
+        eicpaths <- sapply(eicpaths, knitr::image_uri)
     }
     
-    compTable[, intensities := paste0(imgTags(intnpaths), "<br>", imgTags(intapaths))]
-} else
-    compTable[, spectrum := imgTags(sppaths)]
+    # clearout useless columns with only NA in them
+    cTable <- sapply(cTable, function(ct)
+    {
+        ct[, sapply(ct, function(x) !all(is.na(x))), with = FALSE]
+    }, simplify = FALSE)
+    infoTables <- sapply(compInds, function(compi) knitr::kable(cTable[[compi]], "html") %>%
+                             kableExtra::kable_styling(font_size = 11) %>%
+                             kableExtra::scroll_box(extra_css = "overflow: auto; width: 350px; height: 300px;"))
+    
+    compTable <- data.table(component = names(rmdVars$components)[compInds],
+                            info = infoTables,
+                            EIC = imgTags(eicpaths))
+    
+    if (isHClust)
+    {
+        intnpaths <- file.path(plotPathLink, sprintf("component_int_norm_%d.png", compInds))
+        intapaths <- file.path(plotPathLink, sprintf("component_int_abs_%d.png", compInds))
+        
+        if (rmdVars$selfContained)
+        {
+            intnpaths <- sapply(intnpaths, knitr::image_uri)
+            intapaths <- sapply(intapaths, knitr::image_uri)
+        }
+        
+        compTable[, intensities := paste0(imgTags(intnpaths), "<br>", imgTags(intapaths))]
+    } else
+        compTable[, spectrum := imgTags(sppaths)]
+    
+    initDT <- DT::JS("function(settings, json) {",
+                     "setTimeout(function() {",
+                     sprintf("$(\"#componentsTable_%s .dataTable\").DataTable().columns.adjust().draw(); }", s),
+                     ", 25); }")
+    DT::datatable(compTable, options = list(scrollX = TRUE, scrollY = "600px", deferRender = TRUE,
+                                            dom = "lrtip", pageLength = 25, autoWidth = FALSE,
+                                            initComplete = initDT, ordering = FALSE),
+                  class = "striped row-border", elementId = paste0("componentsTable_", s),
+                  fillContainer = TRUE, rownames = FALSE, escape = FALSE)
+}
 
-initDT <- DT::JS("function(settings, json) {",
-                 "setTimeout(function() {",
-                 "$(\"#componentsTable .dataTable\").DataTable().columns.adjust().draw(); }",
-                 ", 25); }")
-DT::datatable(compTable, options = list(scrollX = TRUE, scrollY = "800px", deferRender = TRUE,
-                                        dom = "lrtip", pageLength = 25, autoWidth = FALSE,
-                                        initComplete = initDT, ordering = FALSE),
-              class = "striped row-border", elementId = "componentsTable",
-              rownames = FALSE, escape = FALSE)
+hd <- paste0("### %s { .components }\n\n",
+             "NOTE: only components with feature group data are shown here.\n\n")
+
+if (isSet)
+{
+    rmdText <- "## { data-height=800 .components .tabset }\n\n"
+    for (s in sets(rmdVars$components))
+    {
+        rmdText <- c(rmdText, paste0(sprintf(hd, s),
+                                     glue::glue("
+{ ticks } {{r}}
+makeCompDT('{ s }')
+{ ticks }\n\n", ticks = "```", s = s)))
+    }
+    
+} else
+{
+    rmdText <- paste0("## { data-height=800 .components }\n\n",
+                      sprintf(hd, "Components"),
+                      glue::glue("
+{ ticks } {{r}}
+makeCompDT(NULL)
+{ ticks }", ticks = "```"))
+}
+
+rmdText <- if (length(rmdText) > 0) paste0(knitr::knit(text = rmdText), collapse = "\n")
 ```
+
+`r if (nzchar(rmdText)) rmdText`

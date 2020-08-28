@@ -58,6 +58,7 @@ for (ci in indsWithFGroups)
     setTxtProgressBar(prog, ci)
 }
 
+setTxtProgressBar(prog, length(indsWithFGroups))
 close(prog)
 
 if (rmdVars$optimizePng && curPlotInd > 0)

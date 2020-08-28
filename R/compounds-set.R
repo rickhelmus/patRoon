@@ -228,7 +228,13 @@ generateCompoundsSet <- function(fGroupsSet, MSPeakListsSet, generator, ..., set
             ct[, fragInfo := lapply(fragInfo, function(fi)
             {
                 fi <- copy(fi) # BUG: avoid warning that somehow was incorrectly copied (invalid .internal.selfref)
-                fi[, PLIndexSet := sapply(mz, function(fimz) pl[which.min(abs(fimz - mz))][["PLIndex"]])]
+                if (nrow(fi) == 0)
+                {
+                    # otherwise it will be assigned as empty list, which messes up merging elsewhere
+                    fi[, PLIndexSet := numeric()]
+                }
+                else
+                    fi[, PLIndexSet := sapply(mz, function(fimz) pl[which.min(abs(fimz - mz))][["PLIndex"]])]
                 fi[, set := s]
                 return(fi)
             })]

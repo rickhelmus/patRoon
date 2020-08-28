@@ -229,7 +229,7 @@ makeMSPlot <- function(plotData, xlim, ylim, ylab = "Intensity", ..., mol = NULL
     }
     
     if (is.null(ylim))
-        ylim <- range(plotData$intensity) * 1.5
+        ylim <- range(plotData$intensity) * 1.75
     
     plot(0, xlab = "m/z", ylab = ylab, xlim = xlim, ylim = ylim,
          type = "n", bty = "l", ...)

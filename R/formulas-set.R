@@ -122,7 +122,7 @@ setMethod("plotSpecHash", "formulasSet", function(obj, precursor, groupName, ana
                                                   perSet = TRUE, mirror = TRUE, ...)
 {
     return(makeHash(callNextMethod(obj, precursor, groupName, analysis, MSPeakLists,
-                                   title, useGGPlot2, xlim, ylim),
+                                   title, useGGPlot2, xlim, ylim, ...),
                     perSet, mirror))
 })
 

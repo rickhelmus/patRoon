@@ -207,9 +207,6 @@ makeMSPlot <- function(plotData, xlim, ylim, ylab = "Intensity", ..., mol = NULL
 {
     molHInch <- 1.5
     
-    if (!is.null(plotData[["formula"]]))
-        plotData[!is.na(formula), formWidth := strwidth(formula, units = "inches")]
-    
     if (is.null(xlim))
         xlim <- range(plotData$mz) * c(0.9, 1.1)
     else
@@ -235,24 +232,73 @@ makeMSPlot <- function(plotData, xlim, ylim, ylab = "Intensity", ..., mol = NULL
     
     if (is.null(ylim))
     {
+        ylim <- range(plotData$intensity) * 1.5
+        if (F)
+        {
+        plot.new()
+        
+        if (!is.null(plotData[["formula"]]))
+        {
+            # plotData[!is.na(formula), formWidth := strwidth(formula, units = "user", cex = par("cex"))]
+            plotData[!is.na(formula), formWidth := sapply(formula, function(f) string.dim(f, cex = par("cex"), srt = 90)[[2]])]
+        }
+        
         formWidths <- if (!is.null(plotData[["formWidth"]])) plotData$formWidth else rep(0, nrow(plotData))
         formWidths[is.na(formWidths)] <- 0
         
+        pwidth <- par("pin")[1]
+        pheight <- par("pin")[2]
+        
+        mfw <- max(formWidths)
+        # mfw <- mfw * (pwidth / pheight) # scale to height
+        mfw <- grconvertY(mfw, "user", "npc") - grconvertY(0, "user", "npc")
+        # browser()
+        # oldp <- par(omd = c(0, 1, mfw, 1 - mfw), new = TRUE)
+        par(new = TRUE)
+        ylim <- range(plotData$intensity) * (1 + mfw)
+        print("ylim"); print(ylim); print(mfw); print(xinch(mfw))
+        browser()
+        }
+        if (FALSE)
+        {
+        if (!is.null(plotData[["formula"]]))
+            plotData[!is.na(formula), formWidth := strwidth(formula, units = "inches", cex = par("cex"))]
+        
+        formWidths <- if (!is.null(plotData[["formWidth"]])) plotData$formWidth else rep(0, nrow(plotData))
+        formWidths[is.na(formWidths)] <- 0
+        
+        # plot dev dimensions in inches
+        pwidth <- par("din")[1]
+        pheight <- par("din")[2]
+        
         # see how much extra vertical space is needed by formula labels
         # get character widths (assuming that height of vertically plotted text is the same)
-        pheight <- par("din")[2] # plot dev height in inches
-        relFormHeights <- formWidths / pheight
+        # relFormHeights <- formWidths / pheight
+        relFormWidths <- formWidths / pwidth
+        relFormHeights <- relFormWidths * (pwidth / pheight)
         
-        ym <- max(plotData$intensity) # 'regular' plot height in user coordinates, not considering any labels etc
-        relIntHeights <- plotData$intensity / ym
+        ymax <- max(plotData$intensity) # 'regular' plot height in user coordinates, not considering any labels etc
+        relIntHeights <- plotData$intensity / ymax
         maxRelH <- max(relFormHeights + relIntHeights)
-        
-        ym <- ym * maxRelH * 1.05 # enlarge y limit and add some extra spacing
+         
+        ymax <- ymax * maxRelH * 1.05 # enlarge y limit and add some extra spacing
+
+        # ymax <- max(plotData$intensity + formWidths)
         
         if (!is.null(mol))
-            ym <- ym * (1 + (molHInch / pheight)) # add space for molecule
-        
-        ylim <- c(0, ym)
+            ymax <- ymax * (1 + (molHInch / pheight)) # add space for molecule
+
+        ymin <- 0
+        if (min(plotData$intensity) < 0)
+        {
+            ymin <- min(plotData$intensity) # 'regular' plot height in user coordinates, not considering any labels etc
+            relIntHeights <- plotData$intensity / -ymin # minus: keep sign after division
+            minRelH <- min(relIntHeights - relFormHeights)
+            ymin <- ymin * abs(minRelH) * 1.05 # enlarge y limit and add some extra spacing
+        }
+                
+        ylim <- c(ymin, ymax)
+        }
     }
     
     plot(0, xlab = "m/z", ylab = ylab, xlim = xlim, ylim = ylim,
@@ -265,8 +311,18 @@ makeMSPlot <- function(plotData, xlim, ylim, ylab = "Intensity", ..., mol = NULL
     {
         pdf <- plotData[!is.na(formula)]
         if (nrow(pdf) > 0)
-            text(pdf[["mz"]], pdf[["intensity"]] + (ylim[2] * 0.02),
-                 subscriptFormula(pdf[["formula"]]), srt = 90, adj = 0)
+        {
+            formWidths <- sapply(pdf$formula, function(f) strwidth(f, cex = par("cex"), units = "inch"))
+            formHeights <- yinch(formWidths)
+            maxFormHeight <- max(formHeights)
+            maxHeight <- (ylim[2] - max(abs(pdf$intensity))) * 0.98
+            cex <- par("cex")
+            cex <- min(cex, cex * (maxHeight / maxFormHeight))
+            formHeights <- sapply(pdf$formula, function(f) string.dim(f, cex = cex, srt = 90)[[2]])
+            yoffsets <- ylim[2] * 0.02
+            yoffsets <- ifelse(pdf[["intensity"]] < 0, -(yoffsets + formHeights), yoffsets)
+            text(pdf[["mz"]], pdf[["intensity"]] + yoffsets, subscriptFormula(pdf[["formula"]]), srt = 90, adj = 0, cex = cex)
+        }
     }
     
     if (doLegend)
@@ -357,11 +413,7 @@ makeMSPlotSets <- function(spec, title, mirror, sets, xlim, ylim, useGGPlot2, ..
     setorderv(spec, "mz")
     
     if (mirror && length(sets) == 2)
-    {
         spec[mergedBy == sets[2], intensity := -intensity]
-        if (is.null(ylim))
-            ylim <- c(-1, 1)
-    }
     
     plotData <- getMSPlotData(spec, 1)
     ticks <- pretty(c(-spec$intensity, spec$intensity))
@@ -374,6 +426,7 @@ makeMSPlotSets <- function(spec, title, mirror, sets, xlim, ylim, useGGPlot2, ..
     makeMSPlot(plotData, xlim, ylim, ylab = "Normalized intensity",
                main = title, yaxt = "n", ..., mol = mol)
     axis(2, at = ticks, labels = abs(ticks))
+    # axis(1, pos = 0)
 }
 
 plotDendroWithClusters <- function(dendro, ct, pal, colourBranches, showLegend, ...)

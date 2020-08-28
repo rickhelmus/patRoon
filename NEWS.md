@@ -3,6 +3,8 @@
 * **IMPORTANT**: the `precursor` argument to the `plotSpec()`, `annotatedSpectrum()` and `plotScores()` methods for `formulas` now expects the neutral formula instead of the ionized formula. This change was necessary to select precursors for sets with different polarities. This is also in general more consistent with compound annotations.
 * The `as.data.table()` method for `featureGroups` now supports normalization of intensities through the `normFunc` argument.
 * `show()` methods now print class inheritance tree
+* **IMPORTANT** The behavior of the `filter()` method for `MSPeakLists` was slightly changed. Prior to this change, the analysis specific peak lists were first filtered, these lists were then averaged to regenerate feature group peak lists and finally the updated group peak lists were also filtered. The latter filter step was removed, since this may result in subtle bugs after e.g. subsetting.
+
 
 
 # patRoon 1.3.0

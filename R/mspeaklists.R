@@ -353,8 +353,11 @@ setMethod("as.data.table", "MSPeakLists", function(x, fGroups = NULL, averaged =
 #' @describeIn MSPeakLists provides post filtering of generated MS peak lists,
 #'   which may further enhance quality of subsequent workflow steps (\emph{e.g.}
 #'   formulae calculation and compounds identification) and/or speed up these
-#'   processes.
-#'
+#'   processes. The filters are applied to all peak lists for each analysis.
+#'   These peak lists are subsequently averaged to update group averaged peak
+#'   lists. However, since version \samp{1.1}, the resulting feature group lists are
+#'   \emph{not} filtered afterwards.
+#'   
 #' @param absMSIntThr,absMSMSIntThr,relMSIntThr,relMSMSIntThr Absolute/relative
 #'   intensity threshold for MS or MS/MS peak lists. \code{NULL} for none.
 #' @param topMSPeaks,topMSMSPeaks Only consider this amount of MS or MS/MS peaks
@@ -462,10 +465,6 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
     
     # update group averaged peak lists
     obj@averagedPeakLists <- averageMSPeakLists(obj)
-
-    # and filter it as well...
-    printf("Filtering averaged MS peak lists for %d feature groups...\n", length(obj@averagedPeakLists))
-    obj@averagedPeakLists <- doFilterGroups(obj@averagedPeakLists)
 
     saveCacheData("filterMSPeakLists", obj, hash)
 

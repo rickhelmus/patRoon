@@ -42,6 +42,7 @@
 - ref docs and exports for getXCMSnSet
 - ffOpenMS etc: analyses also needs to be available for hashing
 - improve docs for areas (only affects when features=FALSE) and average (different behavior when features=TRUE/FALSE) for as.data.table() of featureGroups
+- update/check version nr mentioned in filter() for MSPeakLists
 
 
 ## sets

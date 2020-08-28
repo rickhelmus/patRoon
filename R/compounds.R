@@ -646,6 +646,10 @@ setMethod("annotatedPeakList", "compounds", function(obj, index, groupName, MSPe
 #'   spectrum.
 #' @param title The title of the plot. If \code{NULL} a title will be
 #'   automatically made.
+#' @param maxMolSize Numeric vector of size two with the maximum width/height of
+#'   the candidate structure (relative to the plot size).
+#' @param molRes Numeric vector of size two with the resolution of the candidate
+#'   structure (in pixels).
 #'
 #' @template fsubscript_source
 #'
@@ -654,7 +658,7 @@ setMethod("annotatedPeakList", "compounds", function(obj, index, groupName, MSPe
 #' @export
 setMethod("plotSpectrum", "compounds", function(obj, index, groupName, MSPeakLists, formulas = NULL,
                                             plotStruct = TRUE, title = NULL, useGGPlot2 = FALSE, xlim = NULL,
-                                            ylim = NULL, ...)
+                                            ylim = NULL, maxMolSize = c(0.2, 0.4), molRes = c(100, 100), ...)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertCount(index, positive = TRUE, add = ac)
@@ -663,6 +667,7 @@ setMethod("plotSpectrum", "compounds", function(obj, index, groupName, MSPeakLis
     checkmate::assertClass(formulas, "formulas", null.ok = TRUE, add = ac)
     aapply(checkmate::assertFlag, . ~ plotStruct + useGGPlot2, fixed = list(add = ac))
     assertXYLim(xlim, ylim, add = ac)
+    aapply(checkmate::assertNumeric, . ~ maxMolSize + molRes, finite = TRUE, len = 2, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
 
     spec <- annotatedPeakList(obj, index, groupName, MSPeakLists, formulas)
@@ -682,14 +687,15 @@ setMethod("plotSpectrum", "compounds", function(obj, index, groupName, MSPeakLis
         title <- getCompoundsSpecPlotTitle(compr$compoundName, compr$formula)
 
     if (!useGGPlot2)
-        makeMSPlot(getMSPlotData(spec, 2), xlim, ylim, main = title, ..., mol = mol)
+        makeMSPlot(getMSPlotData(spec, 2), xlim, ylim, main = title, ..., mol = mol,
+                   maxMolSize = maxMolSize, molRes = molRes)
     else
         return(makeMSPlotGG(getMSPlotData(spec, 2), mol = mol) + ggtitle(title))
 })
 
 setMethod("plotSpectrumHash", "compounds", function(obj, index, groupName, MSPeakLists, formulas = NULL,
                                                 plotStruct = TRUE, title = NULL, useGGPlot2 = FALSE, xlim = NULL,
-                                                ylim = NULL, ...)
+                                                ylim = NULL, maxMolSize = c(0.2, 0.4), molRes = c(100, 100), ...)
 {
     compTable <- compoundTable(obj)[[groupName]]
     cRow <- if (is.null(compTable) || nrow(compTable) == 0) NULL else compTable[index, ]

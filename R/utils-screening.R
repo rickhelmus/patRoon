@@ -178,8 +178,7 @@ doScreenSuspects <- function(fGroups, suspects, rtWindow, mzWindow, adduct, skip
     })
     ret <- rbindlist(retlist, fill = TRUE)
     
-    ret[, name_unique := make.unique(name)] # UNDONE: do we still need this?
-    setcolorder(ret, c("name", "name_unique"))
+    setcolorder(ret, "name")
     
     setTxtProgressBar(prog, nrow(suspects))
     close(prog)

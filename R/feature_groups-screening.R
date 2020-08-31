@@ -36,8 +36,7 @@ setMethod("as.data.table", "featureGroupsScreening",
         
         if (collapseSuspects)
         {
-            si[, c("name", "name_unique") := .(paste0(name, collapse = ","),
-                                               paste0(name_unique, collapse = ",")), by = "group"]
+            si[, name := paste0(name, collapse = ","), by = "group"]
             si <- unique(si, by = "group")
         }
         

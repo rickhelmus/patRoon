@@ -107,7 +107,7 @@ plotGraph(rmdVars$components, onlyLinked = TRUE)
 <style> .components { overflow-x: auto; } </style>
 
 ```{r echo=FALSE}
-makeCompDT <- function(s)
+makeCompDT <- function(s, scrollY)
 {
     if (is.null(s))
         compInds <- indsWithFGroups
@@ -151,41 +151,33 @@ makeCompDT <- function(s)
     } else
         compTable[, spectrum := imgTags(sppaths)]
     
+    eId <- if (!is.null(s)) paste0("componentsTable_", s) else "componentsTable"
     initDT <- DT::JS("function(settings, json) {",
                      "setTimeout(function() {",
-                     sprintf("$(\"#componentsTable_%s .dataTable\").DataTable().columns.adjust().draw(); }", s),
+                     sprintf("$(\"#%s .dataTable\").DataTable().columns.adjust().draw(); }", eId),
                      ", 25); }")
-    DT::datatable(compTable, options = list(scrollX = TRUE, scrollY = "600px", deferRender = TRUE,
+    DT::datatable(compTable, options = list(scrollX = TRUE, scrollY = paste0(scrollY, "px"), deferRender = TRUE,
                                             dom = "lrtip", pageLength = 25, autoWidth = FALSE,
                                             initComplete = initDT, ordering = FALSE),
-                  class = "striped row-border", elementId = paste0("componentsTable_", s),
+                  class = "striped row-border", elementId = eId,
                   fillContainer = TRUE, rownames = FALSE, escape = FALSE)
 }
 
-hd <- paste0("### %s { .components }\n\n",
-             "NOTE: only components with feature group data are shown here.\n\n")
+compTableHeight <- if (isHClust || isHomol) 800 else 1200
+hd <- function(cl) sprintf("## { data-height=%d .components %s }\n\n", compTableHeight, cl)
+subhd <- function(t) paste0(sprintf("### %s { .components }\n\n", t),
+                            "NOTE: only components with feature group data are shown here.\n\n")
+body <- function(s) glue::glue("\n{ ticks } {{r}}\nmakeCompDT({ s }, { h })\n{ ticks }\n\n",
+                               ticks = "```", s = s, h = compTableHeight - 200)
 
 if (isSet)
 {
-    rmdText <- "## { data-height=800 .components .tabset }\n\n"
+    rmdText <- hd(".tabset")
     for (s in sets(rmdVars$components))
-    {
-        rmdText <- c(rmdText, paste0(sprintf(hd, s),
-                                     glue::glue("
-{ ticks } {{r}}
-makeCompDT('{ s }')
-{ ticks }\n\n", ticks = "```", s = s)))
-    }
+        rmdText <- c(rmdText, paste0(subhd(s), body(paste0("\"", s, "\""))))
     
 } else
-{
-    rmdText <- paste0("## { data-height=800 .components }\n\n",
-                      sprintf(hd, "Components"),
-                      glue::glue("
-{ ticks } {{r}}
-makeCompDT(NULL)
-{ ticks }", ticks = "```"))
-}
+    rmdText <- paste0(hd(""), subhd("Components"), body("NULL"))
 
 rmdText <- if (length(rmdText) > 0) paste0(knitr::knit(text = rmdText), collapse = "\n")
 ```

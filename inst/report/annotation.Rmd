@@ -58,11 +58,26 @@ if (!is.null(rmdVars$components))
 plotGroups <- unique(c(compFGroups, compsClustFGroups, formFGroups))
 allGroups <- unique(c(plotGroups, componentFGroups, mfWebFGroups))
 
-rts <- rmdVars$gInfo[allGroups, "rts"]
+# UNDONE: replace by proper inheritance
+isSusp <- inherits(rmdVars$fGroups, "featureGroupsScreening")
+fGroupsSpecDT <- as.data.table(rmdVars$fGroups)
+fGroupsSpecDT <- fGroupsSpecDT[group %in% allGroups]
+
+if (isSusp)
+{
+    setnames(fGroupsSpecDT, "name", "suspect")
+    
+    fGroupsSpecDT[, c("d_rt", "d_mz", "annotatedMSMSSimilarity") :=
+                      .(round(d_rt, 2), round(d_mz, 5), round(annotatedMSMSSimilarity, 2))]
+}
 if (rmdVars$retMin)
-    rts <- rts / 60
-fGroupsSpecDT <- data.table(group = allGroups, rt = round(rts, 2),
-                            mz = round(rmdVars$gInfo[allGroups, "mzs"], 5))
+    fGroupsSpecDT[, ret := ret / 60]
+
+fGroupsSpecDT[, c("ret", "mz") := .(round(ret, 2), round(mz, 5))]
+fGroupsSpecDT <- fGroupsSpecDT[, intersect(c("group", "ret", "mz", "suspect", "d_rt", "d_mz",
+                                             "suspFormRank", "suspCompRank",
+                                             "annotatedMSMSSimilarity", "estIDLevel"), names(fGroupsSpecDT)),
+                               with = FALSE]
 
 showButton <- function(title, jsFunc, ...)
 {

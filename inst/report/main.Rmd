@@ -148,5 +148,5 @@ close(prog)
 ```
 
 
-```{r child="annotation.Rmd", eval=!is.null(rmdVars$compounds) || !is.null(rmdVars$compsCluster) || !is.null(rmdVars$formulas) || !is.null(rmdVars$components)}
+```{r child="annotation.Rmd", eval=!is.null(rmdVars$compounds) || !is.null(rmdVars$compsCluster) || !is.null(rmdVars$formulas) || !is.null(rmdVars$components) || inherits(rmdVars$fGroups, "featureGroupsScreening") }
 ```

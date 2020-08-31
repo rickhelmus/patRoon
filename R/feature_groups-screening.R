@@ -22,7 +22,7 @@ setMethod("[", c("featureGroupsScreening", "ANY", "ANY", "missing"), function(x,
 })
 
 setMethod("as.data.table", "featureGroupsScreening",
-          function(x, ..., collapseSuspects = FALSE, onlyHits = FALSE)
+          function(x, ..., collapseSuspects = TRUE, onlyHits = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertFlag, . ~ collapseSuspects + onlyHits, fixed = list(add = ac))

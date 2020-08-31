@@ -14,6 +14,13 @@ setMethod("initialize", "featureGroupsScreening",
 
 setMethod("screenInfo", "featureGroupsScreening", function(obj) obj@screenInfo)
 
+setMethod("[", c("featureGroupsScreening", "ANY", "ANY", "missing"), function(x, i, j, ..., drop = TRUE)
+{
+    x <- callNextMethod()
+    x@screenInfo <- x@screenInfo[group %in% names(x)]
+    return(x)
+})
+
 setMethod("as.data.table", "featureGroupsScreening",
           function(x, ..., collapseSuspects = FALSE, onlyHits = FALSE)
 {
@@ -21,8 +28,6 @@ setMethod("as.data.table", "featureGroupsScreening",
     
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertFlag, . ~ collapseSuspects + onlyHits, fixed = list(add = ac))
-    checkmate::assertChoice(collapseBy, c("minInt", "maxInt", "minLevel", "maxLevel"),
-                            null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
     
@@ -40,20 +45,6 @@ setMethod("as.data.table", "featureGroupsScreening",
         }
         
         ret <- merge(ret, si, by = "group", all.x = !onlyHits)
-        
-        # UNDONE: move to filter()?
-        if (FALSE && !is.null(collapseBy))
-        {
-            doKeep <- function(v) is.na(v) | length(v) == 1 | order(v, decreasing = grepl("^max", collapseBy)) == 1
-            if (collapseBy == "minInt" || collapseBy == "maxInt")
-            {
-                scr[, avgInts := rowMeans(.SD), .SDcol = analyses(fGroups)]
-                scr <- scr[, keep := doKeep(avgInts), by = "name"][, -"avgInts"]
-            }
-            else # collapse by ID level
-                scr <- scr[, keep := doKeep(estIDLevel), by = "name"]
-            scr <- scr[keep == TRUE, -"keep"]
-        }
     }
     return(ret)
 })
@@ -135,6 +126,57 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
     saveCacheData("annotateSuspects", fGroups, hash)
     
     return(fGroups)
+})
+
+setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = FALSE,
+                                                       selectBy = NULL, negate = FALSE)
+{
+    # UNDONE: doc that selectBy only applies to hits, in case of ties: first hit
+    
+    ac <- checkmate::makeAssertCollection()
+    aapply(checkmate::assertFlag, . ~ onlyHits + negate, fixed = list(add = ac))
+    checkmate::assertChoice(selectBy, c("intensity", "level"), null.ok = TRUE, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    if (onlyHits)
+    {
+        sGroups <- unique(screenInfo(obj)$group)
+        if (negate)
+            obj <- obj[, setdiff(names(obj), sGroups)]
+        else
+            obj <- obj[, sGroups]
+    }
+    
+    if (!is.null(selectBy))
+    {
+        gTab <- as.data.table(obj, onlyHits = TRUE)
+        doKeep <- function(v, d) is.na(v) | length(v) == 1 | order(v, decreasing = d) == 1
+        if (selectBy == "intensity")
+        {
+            gTab[, avgInts := rowMeans(.SD), .SDcol = analyses(fGroups)]
+            gTab <- gTab[, keep := doKeep(avgInts, !negate), by = "name"]
+        }
+        else # keep best ID level
+        {
+            if (is.null(gTab[["estIDLevel"]]))
+                stop("Cannot select by identification level: no annotation data available (did you run annotate annotateSuspects()?). ")
+            gTab <- gTab[, keep := doKeep(estIDLevel, negate), by = "name"]
+        }
+        
+        if (any(!gTab$keep))
+        {
+            # merge-in keep column so we can subset screenInfo
+            si <- screenInfo(obj)[gTab, keep := i.keep, on = c("group", "name")]
+            setorderv(si, "name")
+            obj@screenInfo <- si[keep == TRUE, -"keep"]
+            obj <- obj[, unique(obj@screenInfo$group)]
+        }
+    }
+    
+    if (...length() > 0)
+        obj <- callNextMethod(obj, ..., negate)
+    
+    return(obj)
 })
 
 #' @details \code{groupFeaturesScreening} uses results from \code{screenSuspects}

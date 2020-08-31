@@ -190,25 +190,32 @@ as.adduct <- function(x, format = "generic", isPositive = NULL)
 
     if (format == "generic" || format == "sirius")
     {
-        if (!grepl("^\\[.+\\].*[\\+\\-]{1}", x))
-            stop("Wrong format! (forgot brackets or charge?)")
-
-        if (format == "sirius")
-            mult <- charge <- 1
+        if (format == "generic" && x == "[M]") # special case
+        {
+            mult <- 1; charge <- 0; adds <- subs <- character()
+        }
         else
         {
-            mult <- as.numeric(sub("^\\[([0-9]*)M.*", "\\1", x))
-            if (is.na(mult))
-                mult <- 1
-            charge <- as.numeric(sub(".*\\]([0-9]*)[\\+\\-]{1}$", "\\1", x))
-            if (is.na(charge))
-                charge <- 1
+            if (!grepl("^\\[.+\\].*[\\+\\-]{1}", x))
+                stop("Wrong format! (forgot brackets or charge?)")
+            
+            if (format == "sirius")
+                mult <- charge <- 1
+            else
+            {
+                mult <- as.numeric(sub("^\\[([0-9]*)M.*", "\\1", x))
+                if (is.na(mult))
+                    mult <- 1
+                charge <- as.numeric(sub(".*\\]([0-9]*)[\\+\\-]{1}$", "\\1", x))
+                if (is.na(charge))
+                    charge <- 1
+            }
+            
+            adds <- sub("\\+", "", unlist(regmatches(x, gregexpr("[\\+]{1}[[:alnum:]]+", x))))
+            subs <- sub("\\-", "", unlist(regmatches(x, gregexpr("[\\-]{1}[[:alnum:]]+", x))))
+            if (endsWith(x, "-"))
+                charge <- -charge
         }
-
-        adds <- sub("\\+", "", unlist(regmatches(x, gregexpr("[\\+]{1}[[:alnum:]]+", x))))
-        subs <- sub("\\-", "", unlist(regmatches(x, gregexpr("[\\-]{1}[[:alnum:]]+", x))))
-        if (endsWith(x, "-"))
-            charge <- -charge
     }
     else if (format == "genform")
     {

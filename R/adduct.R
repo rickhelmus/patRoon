@@ -45,9 +45,6 @@ setMethod("initialize", "adduct", function(.Object, add = character(), sub = cha
     checkmate::assertCount(.Object@molMult, positive = TRUE)
     checkmate::assertInt(.Object@charge)
 
-    if (.Object@charge == 0)
-        stop("Adduct charge cannot be zero.")
-
     if (length(.Object@add) > 0)
         .Object@add <- sapply(.Object@add, simplifyFormula, USE.NAMES = FALSE)
     if (length(.Object@sub) > 0)
@@ -84,7 +81,7 @@ setMethod("as.character", "adduct", function(x, format = "generic")
     {
         if (format == "sirius")
         {
-            if (abs(x@charge) > 1)
+            if (abs(x@charge) != 1)
                 stop("SIRIUS only supports a charge of +/- 1")
             if (x@molMult > 1)
                 stop("SIRIUS only supports a molecular multiplier of 1")
@@ -93,7 +90,7 @@ setMethod("as.character", "adduct", function(x, format = "generic")
         adds <- if (length(x@add)) paste0("+", x@add, collapse = "") else ""
         subs <- if (length(x@sub)) paste0("-", x@sub, collapse = "") else ""
 
-        charge <- if (x@charge > 0) "+" else "-"
+        charge <- if (x@charge > 0) "+" else if (x@charge < 0) "-"
         if (abs(x@charge) > 1)
             charge <- paste0(abs(x@charge), charge)
         mult <- if (x@molMult > 1) x@molMult else ""
@@ -113,7 +110,7 @@ setMethod("as.character", "adduct", function(x, format = "generic")
     }
     else if (format == "metfrag")
     {
-        if (abs(x@charge) > 1)
+        if (abs(x@charge) != 1)
             stop("MetFrag only supports a charge of +/- 1")
         if (x@molMult > 1)
             stop("MetFrag only supports a molecular multiplier of 1")

@@ -24,12 +24,9 @@ setMethod("[", c("featureGroupsScreening", "ANY", "ANY", "missing"), function(x,
 setMethod("as.data.table", "featureGroupsScreening",
           function(x, ..., collapseSuspects = FALSE, onlyHits = FALSE)
 {
-    # UNDONE: re-name/combine collapseSuspects
-    
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertFlag, . ~ collapseSuspects + onlyHits, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
-    
     
     ret <- callNextMethod(x, ...)
     if (nrow(ret) > 0)
@@ -166,7 +163,8 @@ setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = FALS
         if (any(!gTab$keep))
         {
             # merge-in keep column so we can subset screenInfo
-            si <- screenInfo(obj)[gTab, keep := i.keep, on = c("group", "name")]
+            si <- copy(screenInfo(obj))
+            si[gTab, keep := i.keep, on = c("group", "name")]
             setorderv(si, "name")
             obj@screenInfo <- si[keep == TRUE, -"keep"]
             obj <- obj[, unique(obj@screenInfo$group)]

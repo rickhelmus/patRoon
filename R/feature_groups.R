@@ -551,7 +551,7 @@ setMethod("plot", "featureGroups", function(x, colourBy = c("none", "rGroups", "
             names(labPch) <- labels
 
             # get averaged intensities for each rGroup and omit initial name/rt/mz columns
-            gTable <- as.data.table(x, average = TRUE)[, -(seq_len(3))]
+            gTable <- as.data.table(x, average = TRUE)[, replicateGroups(x), with = FALSE]
 
             for (r in seq_len(nrow(gTable)))
             {
@@ -1147,7 +1147,8 @@ setMethod("plotUpSet", "featureGroups", function(obj, which = NULL, nsets = leng
     obj <- replicateGroupFilter(obj, which, verbose = FALSE)
 
     gt <- as.data.table(obj, average = TRUE)
-    gt[, (which) := lapply(.SD, function(x) as.integer(x > 0)), .SDcols = which]
+    gt <- gt[, which, with = FALSE] # isolate relevant columns
+    gt[, (which) := lapply(.SD, function(x) as.integer(x > 0))]
 
     if (sum(sapply(gt[, which, with = FALSE], function(x) any(x>0))) < 2)
         stop("Need at least two replicate groups with non-zero intensities")

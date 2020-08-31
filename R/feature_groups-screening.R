@@ -40,7 +40,7 @@ setMethod("as.data.table", "featureGroupsScreening",
             si <- unique(si, by = "group")
         }
         
-        ret <- merge(ret, si, by = "group", all.x = !onlyHits)
+        ret <- merge(ret, si, by = "group", all.x = !onlyHits, sort = FALSE)
     }
     return(ret)
 })

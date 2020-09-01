@@ -201,7 +201,10 @@ returned.
 \item \code{filter}: provides post filtering of generated MS peak lists,
 which may further enhance quality of subsequent workflow steps (\emph{e.g.}
 formulae calculation and compounds identification) and/or speed up these
-processes.
+processes. The filters are applied to all peak lists for each analysis.
+These peak lists are subsequently averaged to update group averaged peak
+lists. However, since version \samp{1.1}, the resulting feature group lists are
+\emph{not} filtered afterwards.
 
 \item \code{plotSpectrum}: Plots a spectrum using MS or MS/MS peak lists for a
 given feature group.

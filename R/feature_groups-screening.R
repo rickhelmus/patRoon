@@ -1,7 +1,10 @@
 #' @include main.R
 #' @include feature_groups.R
+#' @include feature_groups-set.R
 #' @include utils-screening.R
 NULL
+
+screeningSlots <- c(screenInfo = "data.table")
 
 #' Class for suspect screened feature groups.
 #'
@@ -129,17 +132,25 @@ NULL
 #'
 #' @export
 featureGroupsScreening <- setClass("featureGroupsScreening",
-                                   slots = c(screenInfo = "data.table"),
+                                   slots = screeningSlots,
                                    contains = "featureGroups")
+
+featureGroupsScreeningSet <- setClass("featureGroupsScreeningSet",
+                                      slots = screeningSlots,
+                                      contains = "featureGroupsSet")
+
+setClassUnion("screeningUnion", c("featureGroupsScreening", "featureGroupsScreeningSet"))
 
 setMethod("initialize", "featureGroupsScreening",
           function(.Object, ...) callNextMethod(.Object, algorithm = "screening", ...))
 
+setMethod("initialize", "featureGroupsScreeningSet",
+          function(.Object, ...) callNextMethod(.Object, algorithm = "screening-set", ...))
 
 #' @describeIn featureGroupsScreening Returns a table with screening information
 #'   (see \code{screenInfo} slot).
 #' @export
-setMethod("screenInfo", "featureGroupsScreening", function(obj) obj@screenInfo)
+setMethod("screenInfo", "screeningUnion", function(obj) obj@screenInfo)
 
 #' @describeIn featureGroupsScreening Shows summary information for this object.
 #' @export
@@ -686,6 +697,22 @@ setMethod("screenSuspects", "featureGroups", function(fGroups, suspects, rtWindo
                                   features = getFeatures(fGroups), ftindex = copy(groupFeatIndex(fGroups)))
     
     saveCacheData("screenSuspects", ret, hash)
+    
+    return(ret)
+})
+
+setMethod("groupFeaturesScreening", "featureGroupsSet", function(fGroups, suspects, rtWindow, mzWindow,
+                                                                 adduct, skipInvalid)
+{
+    # UNDONE: remove argument (and from generic?)
+    if (!is.null(adduct))
+        stop("adduct argument not supported for sets!")
+    
+    noset <- callNextMethod(fGroups, suspects, rtWindow, mzWindow, "[M]", skipInvalid)
+    
+    ret <- featureGroupsScreeningSet(screenInfo = screenInfo(noset), groups = copy(groups(fGroups)),
+                                     analysisInfo = analysisInfo(fGroups), groupInfo = groupInfo(fGroups),
+                                     features = getFeatures(fGroups), ftindex = copy(groupFeatIndex(fGroups)))
     
     return(ret)
 })

@@ -119,6 +119,8 @@
   useGGPlot2 = FALSE,
   xlim = NULL,
   ylim = NULL,
+  maxMolSize = c(0.2, 0.4),
+  molRes = c(100, 100),
   ...
 )
 
@@ -276,6 +278,12 @@ automatically made.}
 
 \item{xlim, ylim}{Sets the plot size limits used by
 \code{\link[graphics]{plot}}. Set to \code{NULL} for automatic plot sizing.}
+
+\item{maxMolSize}{Numeric vector of size two with the maximum width/height of
+the candidate structure (relative to the plot size).}
+
+\item{molRes}{Numeric vector of size two with the resolution of the candidate
+structure (in pixels).}
 
 \item{labels}{A \code{character} with names to use for labelling. If
 \code{NULL} labels are automatically generated.}

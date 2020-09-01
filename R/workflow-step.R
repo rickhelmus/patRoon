@@ -19,16 +19,19 @@ NULL
 workflowStep <- setClass("workflowStep", slots = c(algorithm = "character"),
                          contains = "VIRTUAL")
 
-setValidity("workflowStep", function(object)
-{
-    if (length(object@algorithm) > 0 && nzchar(object@algorithm))
-        return(TRUE)
-    return("Algorithm not set!")
-})
+# setValidity doesn't seem to work properly in some cases, just check in initialize instead...
+# setValidity("workflowStep", function(object)
+# {
+#     # if (length(object@algorithm) > 0 && nzchar(object@algorithm))
+#         return(TRUE)
+#     return("Algorithm not set!")
+# })
 
 setMethod("initialize", "workflowStep", function(.Object, ...)
 {
     .Object <- callNextMethod()
+    if (length(.Object@algorithm) == 0 || !nzchar(.Object@algorithm))
+        stop("Algorithm not set!")
     # have to do this manually: default initialize method doesn't call validObject() if no arguments were given ...
     # ugh ... doesn't work, this function seems to be called without any other arguments when constructing base classes
     # if (length(list(...)) == 0)

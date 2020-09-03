@@ -50,9 +50,11 @@ setMethod("as.data.table", "featureGroupsScreening",
 #' @templateVar noNone TRUE
 #' @template norm-args
 setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeakLists, formulas, compounds,
-                                                                 absMzDev, relMinMSMSIntensity, checkFragments,
-                                                                 formulasNormalizeScores, compoundsNormalizeScores,
-                                                                 IDLevelRules)
+                                                                 absMzDev = 0.005, relMinMSMSIntensity = 0.05,
+                                                                 checkFragments = c("mz", "formula", "compound"),
+                                                                 formulasNormalizeScores = "max",
+                                                                 compoundsNormalizeScores = "max",
+                                                                 IDLevelRules = defaultIDLevelRules())
 {
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertClass, . ~ MSPeakLists + formulas + compounds,

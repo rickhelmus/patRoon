@@ -79,11 +79,9 @@ setGeneric("plotHeatMap", function(obj, ...) standardGeneric("plotHeatMap"))
 setGeneric("groupFeaturesScreening", function(fGroups, suspects, rtWindow = 12, mzWindow = 0.005, adduct = NULL,
                                               skipInvalid = TRUE, onlyHits = FALSE) standardGeneric("groupFeaturesScreening"))
 setGeneric("screenInfo", function(obj) standardGeneric("screenInfo"))
-setGeneric("annotateSuspects", function(fGroups, MSPeakLists = NULL, formulas = NULL, compounds = NULL,
-                                        absMzDev = 0.005, relMinMSMSIntensity = 0.05,
-                                        checkFragments = c("mz", "formula", "compound"), formulasNormalizeScores = "max",
-                                        compoundsNormalizeScores = "max",
-                                        IDLevelRules = defaultIDLevelRules()) standardGeneric("annotateSuspects"))
+setGeneric("annotateSuspects", function(fGroups, MSPeakLists = NULL, formulas = NULL,
+                                        compounds = NULL, ...) standardGeneric("annotateSuspects"))
+
 #' Target and suspect screening
 #'
 #' Utilities to screen for analytes with known or suspected identity.

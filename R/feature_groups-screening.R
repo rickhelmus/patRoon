@@ -169,7 +169,6 @@ setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = FALS
             si[gTab, keep := i.keep, on = c("group", "name")]
             setorderv(si, "name")
             obj@screenInfo <- si[keep == TRUE, -"keep"]
-            obj <- obj[, unique(obj@screenInfo$group)]
         }
     }
     

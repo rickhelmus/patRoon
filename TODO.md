@@ -71,6 +71,12 @@
 - implement XCMS conversion functions? maybe with given set. Could just ionize() it.
 - ionize() for compounds/components? if not remove formulas?
 - setThreshold filter() argument, and remove argument from generators?
+- handle errors when object has <=1 set
+    - groupFeaturesScreening()
+- suspect screening
+    - handle suspect and fragment mz values somehow
+    - implement TASQ?
+    - consensus?
 
 
 ## features

@@ -81,6 +81,7 @@ setMethod("as.data.table", "featureGroupsSet", function(x, average = FALSE, area
                                                         neutralized = TRUE, sets = NULL)
 {
     # UNDONE: also support reporting ionized features with different adducts?
+    # NOTE keep args in sync with featureGroupsScreeningSet
     
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertFlag, . ~ neutralized, fixed = list(add = ac))

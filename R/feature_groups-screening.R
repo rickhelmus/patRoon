@@ -152,13 +152,13 @@ setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = FALS
         doKeep <- function(v, d) is.na(v) | length(v) == 1 | order(v, decreasing = d) == 1
         if (selectBy == "intensity")
         {
-            gTab[, avgInts := rowMeans(.SD), .SDcol = analyses(fGroups)]
+            gTab[, avgInts := rowMeans(.SD), .SDcol = analyses(obj)]
             gTab <- gTab[, keep := doKeep(avgInts, !negate), by = "name"]
         }
         else # keep best ID level
         {
             if (is.null(gTab[["estIDLevel"]]))
-                stop("Cannot select by identification level: no annotation data available (did you run annotate annotateSuspects()?). ")
+                stop("Cannot select by identification level: no annotation data available (did you run annotateSuspects()?). ")
             gTab <- gTab[, keep := doKeep(estIDLevel, negate), by = "name"]
         }
         

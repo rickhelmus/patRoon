@@ -285,3 +285,18 @@ generateCompoundsSet <- function(fGroupsSet, MSPeakListsSet, generator, ..., set
     return(ret)
 }
 
+
+compoundsSetIonized <- setClass("compoundsSetIonized", contains = "compounds")
+setMethod("ionize", "compoundsSet", function(obj, sets)
+{
+    if (!is.null(sets) && length(sets) > 0)
+        obj <- obj[, sets = sets]
+    
+    assertEqualAdducts(adducts(obj))
+    
+    cList <- lapply(compoundTable(obj), copy)
+    cList <- lapply(cList, set, j = c("set", "setCoverage"), value = NULL)
+    
+    return(compoundsSetIonized(compounds = cList, scoreTypes = obj@scoreTypes, scoreRanges = obj@scoreRanges,
+                               algorithm = paste0(algorithm(obj), "_ionized")))
+})

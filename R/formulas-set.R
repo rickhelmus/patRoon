@@ -160,7 +160,7 @@ setMethod("ionize", "formulasSet", function(obj, sets)
     
     assertEqualAdducts(adducts(obj))
     
-    groupForms <- copy(formulaTable(obj))
+    groupForms <- lapply(formulaTable(obj), copy)
     groupForms <- lapply(groupForms, set, j = c("set", "setCoverage"), value = NULL)
     
     return(formulasSetIonized(formulas = groupForms, featureFormulas = formulaTable(obj, features = TRUE),

@@ -22,10 +22,11 @@ setMethod("[", c("featureGroupsScreening", "ANY", "ANY", "missing"), function(x,
 })
 
 setMethod("as.data.table", "featureGroupsScreening",
-          function(x, ..., collapseSuspects = TRUE, onlyHits = FALSE)
+          function(x, ..., collapseSuspects = ",", onlyHits = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
-    aapply(checkmate::assertFlag, . ~ collapseSuspects + onlyHits, fixed = list(add = ac))
+    checkmate::assertString(collapseSuspects, null.ok = TRUE, add = ac)
+    checkmate::assertFlag(onlyHits, add = ac)
     checkmate::reportAssertions(ac)
     
     ret <- callNextMethod(x, ...)
@@ -34,9 +35,9 @@ setMethod("as.data.table", "featureGroupsScreening",
         si <- copy(screenInfo(x))
         setnames(si, c("rt", "mz"), c("susp_rt", "susp_mz"))
         
-        if (collapseSuspects)
+        if (!is.null(collapseSuspects))
         {
-            si[, name := paste0(name, collapse = ","), by = "group"]
+            si[, name := paste0(name, collapse = collapseSuspects), by = "group"]
             si <- unique(si, by = "group")
         }
         

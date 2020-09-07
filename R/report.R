@@ -201,16 +201,30 @@ reportFGroupPlots <- function(fGroups, path, plotGrid, rtWindow, mzWindow, retMi
     # all feature groups
     plotEIC(fGroups, rtWindow, mzWindow, retMin, 1, EICs, TRUE, FALSE)
 
-    par(mfrow = plotGrid)
+    plotsPerPage <- plotGrid[1] * plotGrid[2]
     prog <- openProgBar(0, gCount)
+    scr <- NULL
     for (grpi in seq_len(gCount))
     {
-        plotEIC(fGroups[, grpi], rtWindow, mzWindow, retMin, topMost, EICs, onlyPresent = onlyPresent, colourBy = "rGroups")
+        scrInd <- grpi %% plotsPerPage
+        if (scrInd == 0)
+            scrInd <- plotsPerPage
+        else if (scrInd == 1)
+        {
+            if (!is.null(scr))
+                close.screen(scr)
+            scr <- split.screen(plotGrid)
+        }
+        
+        screen(scr[scrInd])
+        plotEIC(fGroups[, grpi], rtWindow, mzWindow, retMin, topMost, EICs, onlyPresent = onlyPresent, colourBy = "rGroups", showLegend=FALSE)
         setTxtProgressBar(prog, grpi)
     }
 
     setTxtProgressBar(prog, gCount)
     close(prog)
+    if (!is.null(scr))
+        close.screen(scr)
     dev.off()
 
     # UNDONE: may fail sometimes (on AppVeyor)

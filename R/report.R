@@ -217,7 +217,7 @@ reportFGroupPlots <- function(fGroups, path, plotGrid, rtWindow, mzWindow, retMi
         }
         
         screen(scr[scrInd])
-        plotEIC(fGroups[, grpi], rtWindow, mzWindow, retMin, topMost, EICs, onlyPresent = onlyPresent, colourBy = "rGroups", showLegend=FALSE)
+        plotEIC(fGroups[, grpi], rtWindow, mzWindow, retMin, topMost, EICs, onlyPresent = onlyPresent, colourBy = "rGroups")
         setTxtProgressBar(prog, grpi)
     }
 

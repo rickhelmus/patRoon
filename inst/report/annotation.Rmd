@@ -327,7 +327,7 @@ formulasDT <- rbindlist(lapply(formFGroups, function(grp)
     precursors <- unique(rmdVars$formulas[[grp]][["formula"]])
     
     infoTexts <- sapply(precursors,
-                        function(prec) paste0(getFormInfoList(rmdVars$formulas[[grp]], prec),
+                        function(prec) paste0(getFormInfoList(rmdVars$formulas[[grp]], prec, useHTML = TRUE),
                                                               collapse = "<br>"))
     infoTexts <- sprintf("<div style='max-width: 300px; max-height: 432px; border: 1px solid black; border-style: dotted; margin: 1px; padding: 1px; overflow: auto; white-space: nowrap; }'>%s</div>", infoTexts)
     

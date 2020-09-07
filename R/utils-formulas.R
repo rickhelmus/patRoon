@@ -446,7 +446,7 @@ getAllMergedFormulasCols <- function(allCols)
     return(grep("^.+\\-.+", allCols, value = TRUE))
 }
 
-getFormInfoList <- function(formTable, precursor)
+getFormInfoList <- function(formTable, precursor, useHTML = FALSE)
 {
     formTable <- formTable[formula == precursor]
 
@@ -454,6 +454,9 @@ getFormInfoList <- function(formTable, precursor)
         return(NULL)
 
     precInfo <- formTable[1] # precursor info is duplicated over all fragment rows
+    
+    if (useHTML)
+        precInfo[, neutral_formula := subscriptFormulaHTML(neutral_formula)]
 
     addValText <- function(curText, fmt, col)
     {

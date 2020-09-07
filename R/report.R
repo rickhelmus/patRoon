@@ -102,7 +102,7 @@ optimizePngPlots <- function(plotFiles, maxProcAmount)
     invisible(NULL)
 }
 
-makeCachedPlot <- function(out, plotFunc, plotArgs, w, h, bg = "white", cacheDB)
+makeCachedPlot <- function(out, plotFunc, plotArgs, w, h, bg = "white", parSettings = NULL, cacheDB)
 {
     hash <- do.call(paste0(plotFunc, "Hash"), plotArgs)
     cache <- loadCacheData("reportPlots", hash, cacheDB)
@@ -111,8 +111,12 @@ makeCachedPlot <- function(out, plotFunc, plotArgs, w, h, bg = "white", cacheDB)
         writeBin(cache, out)
     else
     {
-        withr::with_png(out, width = w, height = h, units = "in", res = 72, bg = bg,
-                        code = do.call(plotFunc, plotArgs))
+        withr::with_png(out, width = w, height = h, units = "in", res = 72, bg = bg, code = {
+            if (!is.null(parSettings))
+                withr::with_par(parSettings, do.call(plotFunc, plotArgs))
+            else
+                do.call(plotFunc, plotArgs)
+        })
         saveCacheData("reportPlots", readBin(out, "raw", file.info(out)$size), hash, cacheDB)
     }
 }

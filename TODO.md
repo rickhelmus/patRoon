@@ -56,7 +56,6 @@
 ## reporting
 - add more options to reportPlots argument of reportHTML()?
 
-
 ## Cleanup
 - Reduce non-exported class only methods
 
@@ -67,14 +66,15 @@
 
 - msPurity integration
 - suspect screening: add MS/MS qualifiers
-- newProject(): generate Rmd?
 - fillPeaks for CAMERA (and RAMClustR?)
 - support fastcluster for compounds clustering/int component clusters?
 - algorithmObject() generic: for xset, xsa, rc, ...
 - newProject(): fix multi line delete (when possible)
 - more withr wrapping? (dev, par)
 - improve default plotting for plotInt and cluster plot functions
-- newProject(): concentration column for anaInfo
+- newProject()
+    - concentration column for anaInfo
+    - generate more detailed script with e.g. commented examples of subsetting, extraction etc
 
 
 ## Features
@@ -110,7 +110,6 @@
 - fix compoundViewer
 - add new MF HD scorings and make sure default normalization equals that of MF web
 - CFM-ID and MS-FINDER integration
-- Update SIRIUS interface for 4.4
 
 
 ## components
@@ -118,9 +117,3 @@
 - CliqueMS
 - split peak correlation and adduct etc annotation? would allow better non-target integration
 
-
-## Reporting
-- report spectra/tables?
-
-## TPs
-- Suspects --> BT --> MF DB/suspect list (opt combine with precursors)

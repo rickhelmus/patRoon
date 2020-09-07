@@ -14,6 +14,7 @@
 * Fixed: some functions involved in caching plot data for HTML reports sometimes returned invalid data.
 * Fixed: EICs plotted by `reportPDF()` where not properly placed in a grid (as specified by `EICGrid` argument)
 * `reportHTML()` now displays subscripted neutral formulae
+* Fixed: `reportHTML()`: x axis title of EICs in annotation tab was cut-off 
 
 
 # patRoon 1.0.1

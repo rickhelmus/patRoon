@@ -13,8 +13,10 @@
 * Fixed: plotSpec() for `compounds` with `useGGPlot2=TRUE` would try to plot formulas for non-annotated peaks (resulting in many extra diagonal lines)  
 * Fixed: some functions involved in caching plot data for HTML reports sometimes returned invalid data.
 * Fixed: EICs plotted by `reportPDF()` where not properly placed in a grid (as specified by `EICGrid` argument)
-* `reportHTML()` now displays subscripted neutral formulae
-* Fixed: `reportHTML()`: x axis title of EICs in annotation tab was cut-off 
+* Small tweaks/fixes for `reportHTML()`
+    * now displays subscripted neutral formulae
+    * Fixed: x axis title of EICs in annotation tab was cut-off
+    * Fixed: The rt vs mz plot in the summary page now uses minutes for retention times if `retMin=TRUE`
 
 
 # patRoon 1.0.1

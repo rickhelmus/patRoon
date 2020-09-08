@@ -20,8 +20,8 @@ install:
             Invoke-WebRequest http://msbi.ipb-halle.de/~cruttkie/metfrag/MetFrag2.4.5-CL.jar -OutFile "C:\deps\MetFrag2.4.5-CL.jar"
         }
     - ps: >-
-        if (-Not (Test-Path C:\deps\sirius-win64-headless-4.4.23)) {
-            Invoke-WebRequest https://bio.informatik.uni-jena.de/repository/dist-release-local/de/unijena/bioinf/ms/sirius/4.4.23/sirius-4.4.23-win64-headless.zip -OutFile "C:\deps\sirius-win.zip"
+        if (-Not (Test-Path C:\deps\sirius-win64-headless-4.4.29)) {
+            Invoke-WebRequest https://bio.informatik.uni-jena.de/repository/dist-release-local/de/unijena/bioinf/ms/sirius/4.4.29/sirius-4.4.29-win64-headless.zip -OutFile "C:\deps\sirius-win.zip"
             7z x -oC:\deps\ C:\deps\sirius-win.zip
         }
     - ps: >-

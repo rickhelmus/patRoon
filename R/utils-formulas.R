@@ -347,7 +347,7 @@ generateFormConsensusForGroup <- function(formAnaList, formThreshold)
         if (haveMSMS && "frag_error" %in% names(formTable))
             formTable[, frag_error := mean(frag_error), by = c("formula", "frag_formula")]
         
-        avCols <- intersect(c(formulaScorings()$name, "error"), names(formTable))
+        avCols <- intersect(c(formulaScorings()$name, "error", "error_median"), names(formTable))
         formTable[, (avCols) := lapply(unique(.SD, by = "analysis")[, -"analysis"], mean),
                   by = "formula", .SDcols = c(avCols, "analysis")]
         
@@ -481,6 +481,7 @@ getFormInfoList <- function(formTable, precursor, useHTML = FALSE)
     ret <- addValText(ret, "%s", "formula_mz")
     ret <- addValText(ret, "%s", "neutral_formula")
     ret <- addValText(ret, "%.2f ppm", "error")
+    ret <- addValText(ret, "%.2f ppm", "error_median")
     ret <- addValText(ret, "%.1f", "mSigma")
     ret <- addValText(ret, "%f", "rank")
     ret <- addValText(ret, "%.2f", "score")

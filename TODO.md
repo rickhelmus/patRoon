@@ -110,6 +110,7 @@
 - fix compoundViewer
 - add new MF HD scorings and make sure default normalization equals that of MF web
 - CFM-ID and MS-FINDER integration
+- utility functions to make custom DBs for MetFrag and SIRIUS and support to use them with the latter
 
 
 ## components

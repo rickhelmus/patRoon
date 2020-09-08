@@ -17,6 +17,7 @@
     * now displays subscripted neutral formulae
     * Fixed: x axis title of EICs in annotation tab was cut-off
     * Fixed: The rt vs mz plot in the summary page now uses minutes for retention times if `retMin=TRUE`
+* Updates for SIRIUS 4.4.29
 
 
 # patRoon 1.0.1

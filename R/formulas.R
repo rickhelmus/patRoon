@@ -259,7 +259,7 @@ setMethod("as.data.table", "formulas", function(x, fGroups = NULL, average = FAL
         ret[, (avgCols) := lapply(.SD, function(f) averageFormulas(unique(f))), .SDcols = avgCols, by = "group"]
 
         # remove columns which don't really make sense anymore
-        rmCols <- c("neutral_loss", "error", "formula_mz", "dbe", "anaCoverage",
+        rmCols <- c("neutral_loss", "error", "error_median", "formula_mz", "dbe", "anaCoverage",
                     "adduct", "rank", "explainedPeaks", "explainedIntensity",
                     # add any fragment columns
                     grep("^frag_", names(ret), value = TRUE),
@@ -738,7 +738,7 @@ setMethod("consensus", "formulas", function(obj, ..., absMinAbundance = NULL,
     }, simplify = FALSE)
 
     # UNDONE: remove old style columns?
-    uniqueCols <- c("neutral_formula", "formula_mz", "error", "dbe", "frag_mz", "frag_neutral_formula",
+    uniqueCols <- c("neutral_formula", "formula_mz", "error", "error_median", "dbe", "frag_mz", "frag_neutral_formula",
                     "frag_formula_mz", "frag_error", "neutral_loss", "frag_dbe", "min_intensity", "max_intensity",
                     "ana_min_intensity", "ana_max_intensity")
 

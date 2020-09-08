@@ -498,10 +498,10 @@ utils <- setRefClass("utilsInst", methods = list(
             
             if ("SIRIUS" %in% instWhat)
             {
-                down <- downloadFile(instPath, "SIRIUS", "https://bio.informatik.uni-jena.de/repository/dist-release-local/de/unijena/bioinf/ms/sirius/4.4.25/sirius-4.4.25-win64.zip",
+                down <- downloadFile(instPath, "SIRIUS", "https://bio.informatik.uni-jena.de/repository/dist-release-local/de/unijena/bioinf/ms/sirius/4.4.29/sirius-4.4.29-win64.zip",
                                      TRUE)
                 if (!is.null(down))
-                    setOpts <- c(setOpts, list(patRoon.path.SIRIUS = fixPath(file.path(down, "sirius-win64-4.4.25"))))
+                    setOpts <- c(setOpts, list(patRoon.path.SIRIUS = fixPath(file.path(down, "sirius-win64-4.4.29"))))
             }
             
             if ("OpenBabel" %in% instWhat)

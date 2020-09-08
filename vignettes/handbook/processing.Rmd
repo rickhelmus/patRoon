@@ -136,6 +136,9 @@ compounds <- filter(compounds, minExplainedPeaks = 1)
 
 The following sections will provide a more detailed overview of available data filters.
 
+> **_NOTE_**  Some other `R` packages (notably `dplyr`) also provide a `filter()` generic function. To use the `filter()` function from different packages you need explicitly specify which one to use in your script. This can be done by prefixing it with the package name, e.g. `patRoon::filter(...)`, `dplyr::filter(...)` etc.
+
+
 ### Features
 
 There are many filters available for feature data:

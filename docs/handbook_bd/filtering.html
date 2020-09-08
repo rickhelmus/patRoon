@@ -24,7 +24,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2020-08-19" />
+<meta name="date" content="2020-09-08" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -211,6 +211,9 @@ fGroups &lt;-<span class="st"> </span><span class="kw">filter</span>(fGroups, <s
 <span class="co"># only retain compounds with &gt;1 explained MS/MS peaks</span>
 compounds &lt;-<span class="st"> </span><span class="kw">filter</span>(compounds, <span class="dt">minExplainedPeaks =</span> <span class="dv">1</span>)</code></pre></div>
 <p>The following sections will provide a more detailed overview of available data filters.</p>
+<blockquote>
+<p><strong><em>NOTE</em></strong> Some other <code>R</code> packages (notably <code>dplyr</code>) also provide a <code>filter()</code> generic function. To use the <code>filter()</code> function from different packages you need explicitly specify which one to use in your script. This can be done by prefixing it with the package name, e.g. <code>patRoon::filter(...)</code>, <code>dplyr::filter(...)</code> etc.</p>
+</blockquote>
 <div id="features-1" class="section level3">
 <h3><span class="header-section-number">5.2.1</span> Features</h3>
 <p>There are many filters available for feature data:</p>

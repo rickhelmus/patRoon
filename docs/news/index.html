@@ -175,7 +175,19 @@
 <li>Fixed: <code><a href="../reference/reporting.html">reportPDF()</a></code> may report formula annotated spectra of results not present in input <code>featureGroups</code>
 </li>
 <li>Fixed: Loading <code>data.table</code> data from cache now calls <code><a href="https://Rdatatable.gitlab.io/data.table/reference/truelength.html">data.table::setalloccol()</a></code> to ensure proper behavior if <code><a href="https://Rdatatable.gitlab.io/data.table/reference/assign.html">data.table::set()</a></code> is called on cached data.</li>
-<li>Fixed: plotSpec() for <code>compounds</code> with <code>useGGPlot2=TRUE</code> would try to plot formulas for non-annotated peaks (resulting in many extra diagonal lines)</li>
+<li>Fixed: plotSpec() for <code>compounds</code> with <code>useGGPlot2=TRUE</code> would try to plot formulas for non-annotated peaks (resulting in many extra diagonal lines)<br>
+</li>
+<li>Fixed: some functions involved in caching plot data for HTML reports sometimes returned invalid data.</li>
+<li>Fixed: EICs plotted by <code><a href="../reference/reporting.html">reportPDF()</a></code> where not properly placed in a grid (as specified by <code>EICGrid</code> argument)</li>
+<li>Small tweaks/fixes for <code><a href="../reference/reporting.html">reportHTML()</a></code>
+<ul>
+<li>now displays subscripted neutral formulae</li>
+<li>Fixed: x axis title of EICs in annotation tab was cut-off</li>
+<li>Fixed: The rt vs mz plot in the summary page now uses minutes for retention times if <code>retMin=TRUE</code>
+</li>
+</ul>
+</li>
+<li>Updates for SIRIUS 4.4.29</li>
 </ul>
 </div>
     <div id="patroon-1-0-1" class="section level1">

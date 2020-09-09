@@ -31,7 +31,7 @@ install:
         C:\deps\openbabel.exe /S
 
 
-    - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+    #- ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
 cache:
   - C:\RLibrary
@@ -77,7 +77,7 @@ test_script:
     - set PATH=%JAVA_HOME%\bin;C:\Program Files\OpenMS-2.5.0\bin;C:\Program Files\OpenBabel-3.0.0;%PATH%
     - set OPENMS_DATA_PATH=C:\Program Files\OpenMS-2.5.0\share\OpenMS
     - set PATROON_METFRAG=C:\deps\MetFrag2.4.5-CL.jar
-    - set PATROON_SIRIUS=C:\deps\sirius-win64-headless-4.4.23
+    - set PATROON_SIRIUS=C:\deps\sirius-win64-headless-4.4.29
     - set PATROON_JUNIT=%APPVEYOR_BUILD_FOLDER%\junit.xml
     # HACK for SIRIUS
     - del C:\tools\Coverity\bin\jnidispatch.dll

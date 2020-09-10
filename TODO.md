@@ -182,6 +182,38 @@
     
 
 
+## TPs
+- Suspects --> BT --> MF DB/suspect list (opt combine with precursors)
+- Make sure hash takes into account parent names
+- Update...
+    - suspect lists for TPs: use new assert/prepare functions
+        - allows usage of lists w/out SMILES?
+        - require lists with InChI/SMILES
+        - remove mz column and warn about it
+    - linkPrecursorsToFGroups(): is this really necessary? update for new interface
+        - dictate fGroupsScreening class in BT method?
+            - workflow: predictTPsBT() --> groupFeaturesScreening(<both parents and TPs>) --> componentsTPs()
+- componentsTP
+    - allow usage of sets
+    - allow input of new spectral similarity clustered components/predictions class
+- predictTPsBioTransformer()
+    - allow usage of compoundsSet (if not already working)
+    - allow fGroupsScreening for input
+- predictTPsMSMS()
+    - hcluster all input fGroups on their MS/MS similarity
+    - somehow cluster parents/TPs (eg by selecting fGroups subsets?)
+    - use components base class?
+        - might be useful for other applications
+        - needs conversion for current TP componentization code
+    - use predictions base class?
+        - opposite of above
+        - but no parent/TP distinction yet, so perhaps not possible?
+    - alternatively
+        - componentsMSMS --> predictTPsMSMS(fGroupsParent, fGroupsTP) --> TPPredictionsMSMS --> componentsTPs
+- extend spectrumSimilarity() with code from Bas
+- subsetting/componentization based on log2fc
+
+
 ## features
 - feature optim:
     - docs
@@ -350,7 +382,3 @@
 - intclust
     - optionally take areas instead of intensities
     - cache results
-
-## TPs
-- Suspects --> BT --> MF DB/suspect list (opt combine with precursors)
-- Make sure hash takes into account parent names

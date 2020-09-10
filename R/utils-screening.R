@@ -25,7 +25,7 @@ convertSuspDataIfNeeded <- function(scr, destFormat, destCol, fromFormats, fromC
         }
      
         newEntryCount <- countEntries() - curEntryCount
-        printf("Done! Filled in %d (%.1f) entries.\n", newEntryCount,
+        printf("Done! Filled in %d (%.1f%%) entries.\n", newEntryCount,
                if (newEntryCount > 0) newEntryCount * 100 / nrow(scr) else 0)
     }
     return(scr)

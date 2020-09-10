@@ -39,9 +39,11 @@
             - still keep re-naming functionality? not really possible, but put names in reporting functionality
         - same format for TASQ screening import?
         - throw informative error when screenSuspects()/screenTargets() is called
+        - subset/select by suspect name
 - newProject(): create template auto ID rule csv?
 - util to check if there are suspect results? (ie to replace inherits(...))
 - expand reporting, eg marking which candidate corresponds to suspect and include suspect name in EICs
+- check for empty names in assertion/preparation functions
 
 
 ## docs

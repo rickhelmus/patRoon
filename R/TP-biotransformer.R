@@ -104,7 +104,7 @@ collapseBTResults <- function(pred)
 
 #' @export
 predictTPsBioTransformer <- function(suspects = NULL, compounds = NULL, type = "env", steps = 2,
-                                     extraOpts = NULL,
+                                     extraOpts = NULL, skipInvalid = TRUE,
                                      logPath = file.path("log", "biotransformer"),
                                      maxProcAmount = getOption("patRoon.maxProcAmount"))
 {
@@ -112,11 +112,11 @@ predictTPsBioTransformer <- function(suspects = NULL, compounds = NULL, type = "
     
     if (is.null(suspects) && is.null(compounds))
         stop("Specify at least either the suspects or compounds argument.")
+    
+    checkmate::assertFlag(skipInvalid)
 
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertDataFrame(suspects, any.missing = FALSE, min.rows = 1, null.ok = TRUE, add = ac)
-    if (!is.null(suspects))
-        assertHasNames(suspects, c("name", "SMILES"), add = ac)
+    assertSuspectList(suspects, adduct = NULL, skipInvalid = TRUE, checkAdduct = FALSE, add = ac)
     checkmate::assertClass(compounds, "compounds", null.ok = TRUE, add = ac)
     checkmate::assertChoice(type, c("ecbased", "cyp450", "phaseII", "hgut", "superbio", "allHuman", "env"), add = ac)
     checkmate::assertCount(steps, positive = TRUE, add = ac)
@@ -124,8 +124,15 @@ predictTPsBioTransformer <- function(suspects = NULL, compounds = NULL, type = "
     assertMultiProcArgs(logPath, maxProcAmount, add = ac)
     checkmate::reportAssertions(ac)
 
-    suspects <- if (!is.null(suspects)) as.data.table(suspects) else data.table()
-
+    if (!is.null(suspects))
+    {
+        suspects <- prepareSuspectList(suspects, adduct, skipInvalid, calcMZs = FALSE)
+        if (is.null(suspects[["SMILES"]]))
+            stop("No SMILES information available for suspects. Please include either SMILES or InChI columns.")
+    }
+    else
+        suspects <- data.table()
+    
     if (!is.null(compounds))
     {
         compTab <- as.data.table(compounds)
@@ -136,10 +143,9 @@ predictTPsBioTransformer <- function(suspects = NULL, compounds = NULL, type = "
         suspects <- rbind(suspects, compTab[, c("name", "SMILES"), with = FALSE])
     }
 
+    # UNDONE: move to suspect lists checks
     if (any(!nzchar(suspects$name)))
         stop("'name' column contains one or more empty values")
-    if (any(!nzchar(suspects$SMILES)))
-        stop("'SMILES' column contains one or more empty values")
 
     cacheDB <- openCacheDBScope()
     baseHash <- makeHash(type, steps, extraOpts)

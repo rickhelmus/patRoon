@@ -40,9 +40,9 @@ convertSuspDataIfNeeded <- function(scr, destFormat, destCol, fromFormats, fromC
     return(scr)
 }
 
-prepareSuspectList <- function(suspects, adduct, skipInvalid)
+prepareSuspectList <- function(suspects, adduct, skipInvalid, calcMZs = TRUE)
 {
-    hash <- makeHash(suspects, adduct, skipInvalid)
+    hash <- makeHash(suspects, adduct, skipInvalid, calcMZs)
     cd <- loadCacheData("screenSuspectsPrepList", hash)
     if (!is.null(cd))
         suspects <- cd
@@ -82,7 +82,7 @@ prepareSuspectList <- function(suspects, adduct, skipInvalid)
         suspects <- convertSuspDataIfNeeded(suspects, destFormat = "formula", destCol = "formula",
                                             fromFormats = c("smi", "inchi"), fromCols = c("SMILES", "InChI"))
         
-        if (!is.null(suspects[["mz"]]) && !any(is.na(suspects[["mz"]])))
+        if (!calcMZs || !is.null(suspects[["mz"]]) && !any(is.na(suspects[["mz"]])))
         {
             saveCacheData("screenSuspectsPrepList", suspects, hash)
             return(suspects) # no further need for calculation of ion masses

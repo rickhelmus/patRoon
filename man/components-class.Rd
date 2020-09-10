@@ -231,7 +231,7 @@ for each component. Use the \code{componentInfo} method for access.}
   within a component if that component contains adduct information.
 }
 \section{S4 class hierarchy}{
- \itemize{   \item{\code{\link{workflowStep}}}   \itemize{     \item{\strong{\code{\link{components}}}}     \itemize{       \item{\code{\link{componentsReduced}}}       \item{\code{\link{componentsCamera}}}       \item{\code{\link{componentsIntClust}}}       \item{\code{\link{componentsNT}}}       \item{\code{\link{componentsRC}}}       \item{\code{\link{componentsSet}}}     }   } }
+ \itemize{   \item{\code{\link{workflowStep}}}   \itemize{     \item{\strong{\code{\link{components}}}}     \itemize{       \item{\code{\link{componentsReduced}}}       \item{\code{\link{componentsCamera}}}       \item{\code{\link{componentsIntClust}}}       \item{\code{\link{componentsNT}}}       \item{\code{\link{componentsRC}}}       \item{\code{\link{componentsSet}}}       \item{\code{\link{componentsTPs}}}     }   } }
 }
 
 \seealso{

@@ -408,7 +408,7 @@ row within the feature table of the analysis (see
 }}
 
 \section{S4 class hierarchy}{
- \itemize{   \item{\code{\link{workflowStep}}}   \itemize{     \item{\strong{\code{\link{featureGroups}}}}     \itemize{       \item{\code{\link{featureGroupsSet}}}       \itemize{         \item{\code{\link{featureGroupsScreeningSet}}}       }       \item{\code{\link{featureGroupsSetIonized}}}       \item{\code{\link{featureGroupsBruker}}}       \item{\code{\link{featureGroupsConsensus}}}       \item{\code{\link{featureGroupsEnviMass}}}       \item{\code{\link{featureGroupsOpenMS}}}       \item{\code{\link{featureGroupsScreening}}}       \item{\code{\link{featureGroupsBrukerTASQ}}}       \item{\code{\link{featureGroupsXCMS}}}       \item{\code{\link{featureGroupsXCMS3}}}     }   } }
+ \itemize{   \item{\code{\link{workflowStep}}}   \itemize{     \item{\strong{\code{\link{featureGroups}}}}     \itemize{       \item{\code{\link{featureGroupsSet}}}       \itemize{         \item{\code{\link{featureGroupsScreeningSet}}}       }       \item{\code{\link{featureGroupsSetIonized}}}       \item{\code{\link{featureGroupsBruker}}}       \item{\code{\link{featureGroupsConsensus}}}       \item{\code{\link{featureGroupsEnviMass}}}       \item{\code{\link{featureGroupsOpenMS}}}       \item{\code{\link{featureGroupsScreening}}}       \itemize{         \item{\code{\link{featureGroupsSetScreeningIonized}}}       }       \item{\code{\link{featureGroupsBrukerTASQ}}}       \item{\code{\link{featureGroupsXCMS}}}       \item{\code{\link{featureGroupsXCMS3}}}     }   } }
 }
 
 \references{

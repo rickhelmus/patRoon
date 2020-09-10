@@ -187,9 +187,7 @@
 - Make sure hash takes into account parent names
 - Update...
     - suspect lists for TPs: use new assert/prepare functions
-        - allows usage of lists w/out SMILES?
-        - require lists with InChI/SMILES
-        - remove mz column and warn about it
+        - remove mz column and warn about it?
     - linkPrecursorsToFGroups(): is this really necessary? update for new interface
         - dictate fGroupsScreening class in BT method?
             - workflow: predictTPsBT() --> groupFeaturesScreening(<both parents and TPs>) --> componentsTPs()

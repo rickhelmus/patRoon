@@ -556,9 +556,11 @@ setMethod("export", "featureGroups", function(obj, type, out)
 #'   Set to \code{NULL} to perform no normalization.
 #' @export
 setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas = FALSE, features = FALSE,
-                                                     qualities = FALSE, regression = FALSE, normFunc = NULL)
+                                                     qualities = FALSE, regression = FALSE, normFunc = NULL, FC = NULL)
 {
     # NOTE: keep args in sync with as.data.table() method for featureGroupsSet
+    
+    # UNDONE: document FC and put in assertions
     
     ac <- checkmate::makeAssertCollection()
     checkmate::assertFlag(average, add = ac)
@@ -579,6 +581,8 @@ setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas =
         stop("Cannot add regression data for averaged features.")
     if (features && average && !is.null(normFunc))
         stop("Cannot normalize data for averaged features.")
+    if (features && !is.null(FC))
+        stop("Cannot calculate fold-changes with features=TRUE")
     
     anaInfo <- analysisInfo(x)
     gNames <- names(x)
@@ -657,32 +661,40 @@ setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas =
     }
     else
     {
+        gTableAvg <- averageGroups(x, areas)
+        gTableNonAvg <- groupTable(x, areas)
+
+        if (!is.null(normFunc))
+        {
+            doNorm <- function(gt)
+            {
+                normv <- gt[, lapply(.SD, normFunc)]
+                gt <- copy(gt)
+                for (g in seq_along(gt))
+                {
+                    if (!all(gt[[g]] == 0))
+                        set(gt, j = g, value = gt[[g]] / normv[[g]])
+                }
+                return(gt)
+            }
+            gTableAvg <- doNorm(gTableAvg); gTableNonAvg <- doNorm(gTableNonAvg)
+        }
+        
         if (average)
         {
-            gTable <- averageGroups(x, areas)
+            gTable <- gTableAvg
             snames <- unique(anaInfo$group)
             if (doConc)
                 concs <- anaInfo[!duplicated(anaInfo$group), "conc"] # conc should be same for all replicates
         }
         else
         {
-            gTable <- groupTable(x, areas)
+            gTable <- gTableNonAvg
             snames <- anaInfo$analysis
             if (doConc)
                 concs <- anaInfo$conc
         }
         
-        if (!is.null(normFunc))
-        {
-            normv <- gTable[, lapply(.SD, normFunc)]
-            gTable <- copy(gTable)
-            for (g in seq_along(gTable))
-            {
-                if (!all(gTable[[g]] == 0))
-                    set(gTable, j = g, value = gTable[[g]] / normv[[g]])
-            }
-        }
-
         ret <- transpose(gTable)
         setnames(ret, snames)
 
@@ -699,6 +711,23 @@ setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas =
                       sapply(regr, function(r) r$coefficients[2, 1]))]
         }
 
+        if (!is.null(FC))
+        {
+            calcFC <- function(x, y)
+            {
+                # UNDONE: make configurable (omit, dummy value)
+                if (x == 0)
+                    x <- 1
+                if (y == 0)
+                    y <- 1
+                return(y / x)
+            }
+            
+            repInds <- match(FC, replicateGroups(x))
+            for (i in seq_along(gTableAvg))
+                set(ret, i, "FC", do.call(calcFC, as.list(gTableAvg[[i]][repInds])))
+        }
+        
         ret[, c("group", "ret", "mz") := .(gNames, gInfo$rts, gInfo$mzs)]
         setcolorder(ret, c("group", "ret", "mz"))
         

@@ -51,7 +51,7 @@ processBTResults <- function(cmd)
     # Simplify/harmonize columns a bit
     setnames(ret,
              c("Molecular formula", "Major Isotope Mass"),
-             c("formula", "mass"))
+             c("formula", "neutralMass"))
 
     # No need for these...
     # NOTE: cdk:Title seems the same as "Metabolite ID" column(?)

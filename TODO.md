@@ -206,6 +206,26 @@
     - alternatively
         - componentsMSMS --> predictTPsMSMS(fGroupsParent, fGroupsTP) --> TPPredictionsMSMS --> componentsTPs
 - subsetting/componentization based on log2fc
+    - componentization approach
+        - specify 'categories' (better name?): pairs of before/after rGroups
+        - two components are made for each category: before and after
+        - components store PC/FC values
+        - plotVolcano() method
+        - subset/filter on before/after
+        - workflow: generateComponentsFC() --> fGroupsTPs = groupNames(comps[, categ = "after"]) --> ...
+        - pros: may fit more in generic workflows, multiple rGroups simultaneously
+        - cons: more work, bit clunky for just one category
+    - as.data.table() approach
+        - specify single before/after rep: FC = c(before = "influent", after = "effluent")
+        - calculate FC and PV
+        - classifyFC = c(pValue, FC)
+        - output only contains analyses for specified rGroups and their averages (ie overrides average argument)
+        - plotVolcano() method for fGroups, which uses as.data.table()
+        - fetch PC/TP gNames from resulting table and subsetting
+        - pros: easier to implement, more flexibility as classification is done by user with subsetting
+        - cons: only one category per time, perhaps less generic way if other classification methods are done with components
+    - for go with as.data.table()...
+    - as.data.table() fGroupsScreening: can't combine normalizing and FC at the moment --> notify user
 - convertToSuspects(): fill in missing info (eg neutralMass)?
 - spectrumSimilarity
     - sets

@@ -42,12 +42,10 @@ TPPredictionsLogic <- setClass("TPPredictionsLogic", contains = "TPPredictions")
 setMethod("initialize", "TPPredictionsLogic",
           function(.Object, ...) callNextMethod(.Object, algorithm = "logic", ...))
 
-setMethod("linkPrecursorsToFGroups", "TPPredictionsLogic", function(pred, fGroups, adduct, mzWindow)
+setMethod("linkPrecursorsToFGroups", "TPPredictionsLogic", function(pred, fGroupsScr)
 {
-    susp <- suspects(pred)[name %in% names(fGroups)]
-    # here we can just link directly (ie suspects are the groups)
-    return(data.table(name = susp$name,
-                      group = susp$name))
+    fg <- intersect(names(pred), names(fGroupsScr))
+    return(data.table(name = fg, group = fg))
 })
 
 #' @export

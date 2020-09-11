@@ -265,12 +265,9 @@ setMethod("convertToMFDB", "TPPredictionsBT", function(pred, out, includePrec)
     fwrite(predAll[, keepCols, with = FALSE], out)
 })
 
-setMethod("linkPrecursorsToFGroups", "TPPredictionsBT", function(pred, fGroups, adduct, mzWindow)
+setMethod("linkPrecursorsToFGroups", "TPPredictionsBT", function(pred, fGroupsScr)
 {
-    suspList <- suspects(pred)
-    scr <- screenSuspects(fGroups, suspList, mzWindow = mzWindow, adduct = adduct)
-    scr <- scr[!is.na(group)] # remove non-hits
-    return(scr[, c("name", "group")])
+    return(screenInfo(fGroupsScr)[name %in% names(pred), c("name", "group"), with = FALSE])
 })
 
 #' @export

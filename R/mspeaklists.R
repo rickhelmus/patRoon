@@ -604,8 +604,9 @@ setMethod("spectrumSimilarity", "MSPeakLists", function(obj, groupName1, groupNa
     if (is.null(xlim))
         xlim <- c(min(spec1$mz, spec2$mz), max(spec1$mz, spec2$mz)) + 10
     
-    return(OrgMassSpecR::SpectrumSimilarity(spec1, spec2, t = absMzDev, b = relMinIntensity,
-                                            print.graphic = doPlot, xlim = xlim, ylim, ...))
+    ret <- OrgMassSpecR::SpectrumSimilarity(spec1, spec2, t = absMzDev, b = relMinIntensity,
+                                            print.graphic = doPlot, xlim = xlim, ylim, ...)
+    return(if (is.nan(ret)) 0 else ret)
 })
 
 

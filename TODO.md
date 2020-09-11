@@ -73,10 +73,12 @@
 - setThreshold filter() argument, and remove argument from generators?
 - handle errors when object has <=1 set
     - groupFeaturesScreening()
+    - mergeScreeningSetInfos()
 - suspect screening
     - handle suspect and fragment mz values somehow
     - implement TASQ?
     - consensus?
+    - support recursive screening? or throw error otherwise
 
 
 ## features

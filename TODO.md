@@ -188,9 +188,6 @@
 - Update...
     - suspect lists for TPs: use new assert/prepare functions
         - remove mz column and warn about it?
-    - linkPrecursorsToFGroups(): is this really necessary? update for new interface
-        - dictate fGroupsScreening class in BT method?
-            - workflow: predictTPsBT() --> groupFeaturesScreening(<both parents and TPs>) --> componentsTPs()
 - componentsTP
     - allow usage of sets
     - allow input of new spectral similarity clustered components/predictions class

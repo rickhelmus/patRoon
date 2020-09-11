@@ -4,6 +4,8 @@
 - test negative subset indices
 - convertMSFiles()
     - Agilent .d is also a directory?
+- runWithoutCache? rinWithCacheMode()? shortcut to withr::with_options(patRoon.cache.mode=...)
+- backport latest recursiveApplyDT() from TPs
 
 
 ## docs

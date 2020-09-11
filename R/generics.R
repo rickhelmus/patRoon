@@ -60,9 +60,7 @@ setGeneric("generateMSPeakListsDA", function(fGroups, ...) standardGeneric("gene
 setGeneric("generateMSPeakListsDAFMF", function(fGroups, ...) standardGeneric("generateMSPeakListsDAFMF"))
 setGeneric("spectrumSimilarity", function(obj, groupName1, groupName2,
                                           analysis1 = NULL, analysis2 = NULL,
-                                          MSLevel = 1, doPlot = TRUE, absMzDev = 0.002,
-                                          relMinIntensity = 10, omitPrecursor = FALSE,
-                                          mzShift = 0, xlim = NULL, ylim = c(0, 100), ...) standardGeneric("spectrumSimilarity"))
+                                          MSLevel = 1, ...) standardGeneric("spectrumSimilarity"))
 
 ### Components
 

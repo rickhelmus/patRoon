@@ -189,11 +189,11 @@
     - suspect lists for TPs: use new assert/prepare functions
         - remove mz column and warn about it?
 - componentsTP
-    - allow usage of sets
     - allow input of new spectral similarity clustered components/predictions class
 - predictTPsBioTransformer()
     - allow usage of compoundsSet (if not already working)
     - allow fGroupsScreening for input
+    - logging: don't use precursor names? or somehow sanitize invalid file names
 - predictTPsMSMS()
     - hcluster all input fGroups on their MS/MS similarity
     - somehow cluster parents/TPs (eg by selecting fGroups subsets?)
@@ -205,9 +205,13 @@
         - but no parent/TP distinction yet, so perhaps not possible?
     - alternatively
         - componentsMSMS --> predictTPsMSMS(fGroupsParent, fGroupsTP) --> TPPredictionsMSMS --> componentsTPs
-- extend spectrumSimilarity() with code from Bas
 - subsetting/componentization based on log2fc
-
+- convertToSuspects(): fill in missing info (eg neutralMass)?
+- spectrumSimilarity
+    - sets
+        - custom weights per set? specify methods/parameters for averaging?
+        - missing values? somehow compare between spectra from sets? or just use merged?
+    - extend with code from Bas
 
 ## features
 - feature optim:

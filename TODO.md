@@ -226,12 +226,15 @@
         - cons: only one category per time, perhaps less generic way if other classification methods are done with components
     - for go with as.data.table()...
     - as.data.table() fGroupsScreening: can't combine normalizing and FC at the moment --> notify user
+    - as.data.table/plotVolcano: docs and assertions
 - convertToSuspects(): fill in missing info (eg neutralMass)?
 - spectrumSimilarity
     - sets
         - custom weights per set? specify methods/parameters for averaging?
         - missing values? somehow compare between spectra from sets? or just use merged?
     - extend with code from Bas
+- Include BT in installation script and verifyDependencies()
+
 
 ## features
 - feature optim:

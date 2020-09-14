@@ -534,6 +534,23 @@ setMethod("export", "featureGroups", function(obj, type, out)
     }
 })
 
+#' @export
+getFCParams <- function(rGroups, ...)
+{
+    # FC params: rGroups, testFunc, method to handle zeros for FC (zeroMethod?), p.adjust function,
+    #    FC/PV significance limits
+    
+    def <- list(rGroups = rGroups,
+                thresholdFC = 0.25,
+                thresholdPV = 0.05,
+                zeroMethod = "add",
+                zeroValue = 0.01,
+                PVTestFunc = function(x, y) t.test(x, y, paired = TRUE)$p.value,
+                PVAdjFunc = function(pv) p.adjust(pv, "BH"))
+    return(modifyList(def, list(...)))
+}
+
+
 #' @describeIn featureGroups Obtain a summary table (a \code{\link{data.table}})
 #'   with retention, \emph{m/z}, intensity and optionally other feature data.
 #' @param features If \code{TRUE} then feature specific data will be added. If
@@ -556,7 +573,8 @@ setMethod("export", "featureGroups", function(obj, type, out)
 #'   Set to \code{NULL} to perform no normalization.
 #' @export
 setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas = FALSE, features = FALSE,
-                                                     qualities = FALSE, regression = FALSE, normFunc = NULL, FC = NULL)
+                                                     qualities = FALSE, regression = FALSE, normFunc = NULL,
+                                                     FCParams = NULL)
 {
     # NOTE: keep args in sync with as.data.table() method for featureGroupsSet
     
@@ -711,21 +729,41 @@ setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas =
                       sapply(regr, function(r) r$coefficients[2, 1]))]
         }
 
-        if (!is.null(FC))
+        if (!is.null(FCParams))
         {
             calcFC <- function(x, y)
             {
-                # UNDONE: make configurable (omit, dummy value)
-                if (x == 0)
-                    x <- 1
-                if (y == 0)
-                    y <- 1
-                return(y / x)
+                fixZeros <- function(x)
+                {
+                    zx <- which(x == 0)
+                    if (FCParams$zeroMethod == "add")
+                        x[zx] <- x[zx] + FCParams$zeroValue
+                    else if (FCParams$zeroMethod == "fixed")
+                        x[zx] <- FCParams$zeroValue
+                    else # "omit"
+                        x <- x[!zx]
+                    return(x)                    
+                }
+                return(fixZeros(y) / fixZeros(x))
             }
             
-            repInds <- match(FC, replicateGroups(x))
+            repInds <- match(FCParams$rGroups, replicateGroups(x))
             for (i in seq_along(gTableAvg))
                 set(ret, i, "FC", do.call(calcFC, as.list(gTableAvg[[i]][repInds])))
+            ret[, FC_log := log2(FC)]
+            
+            anaInds1 <- which(anaInfo$group %in% FCParams$rGroups[1])
+            anaInds2 <- which(anaInfo$group %in% FCParams$rGroups[2])
+            ret[, PV := mapply(gTableNonAvg[anaInds1, ], gTableNonAvg[anaInds2, ], FUN = FCParams$PVTestFunc)]
+            ret[, PV := FCParams$PVAdjFunc(PV)]
+            ret[, PV_log := -log10(PV)]
+            
+            isSignificant <- ret$PV < FCParams$thresholdPV
+            ret[, classification := "insignificant"] # by default
+            ret[isSignificant & numGTE(FC_log, FCParams$thresholdFC), classification := "increase"]
+            ret[isSignificant & numLTE(FC_log, FCParams$thresholdFC), classification := "decrease"]
+            ret[!isSignificant & numGTE(abs(FC_log), FCParams$thresholdFC), classification := "FC"]
+            ret[isSignificant & numLTE(abs(FC_log), FCParams$thresholdFC), classification := "significant"]
         }
         
         ret[, c("group", "ret", "mz") := .(gNames, gInfo$rts, gInfo$mzs)]
@@ -1435,6 +1473,32 @@ setMethod("plotUpSet", "featureGroups", function(obj, which = NULL, nsets = leng
         stop("Need at least two replicate groups with non-zero intensities")
 
     UpSetR::upset(gt, nsets = nsets, nintersects = nintersects, ...)
+})
+
+#' @export
+setMethod("plotVolcano", "featureGroups", function(obj, FCParams, col = NULL, pch = 19, ...)
+{
+    # UNDONE: docs, assertions, more plot parameters?
+    
+    ac <- checkmate::makeAssertCollection()
+    checkmate::reportAssertions(ac)
+    
+    if (length(obj) == 0)
+        stop("Can't plot empty feature groups object")
+
+    if (is.null(col))
+        col <- getBrewerPal(5, "Paired")
+    names(col) <- c("increase", "decrease", "FC", "significant", "insignificant")
+    
+    gt <- as.data.table(obj, FCParams = FCParams)
+    gt[, colour := col[classification]]
+    
+    plot(gt$FC_log, gt$PV_log, xlab = "log2 fold change", ylab = "-log10 p-value", 
+         col = gt$colour, pch = pch, ...)
+    abline(v = c(-0.25, 0.25), col = "red", lty = 2, lwd = 1, h = -log10(0.05))
+    legend("topright", legend = names(col), col = col, cex = 0.8, pch = pch)
+    
+    invisible(NULL)
 })
 
 #' @describeIn featureGroups Obtain a subset with unique feature groups

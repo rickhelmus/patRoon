@@ -144,7 +144,7 @@ setMethod("export", "featureGroupsSet", function(obj, type, out, set) export(uns
 #' @export
 setMethod("as.data.table", "featureGroupsSet", function(x, average = FALSE, areas = FALSE, features = FALSE,
                                                         qualities = FALSE, regression = FALSE, normFunc = NULL,
-                                                        FC = NULL)
+                                                        FCParams = NULL)
 {
     # NOTE keep args in sync with featureGroupsScreeningSet
     
@@ -157,7 +157,7 @@ setMethod("as.data.table", "featureGroupsSet", function(x, average = FALSE, area
     
     # NOTE: we normalize hereafter per set afterwards
     ret <- callNextMethod(x, average = average, areas = areas, features = features, qualities = qualities,
-                          regression = regression, normFunc = NULL, FC = FC)
+                          regression = regression, normFunc = NULL, FCParams = FCParams)
     
     if (!is.null(ret[["analysis"]])) # add set column if feature data is present
     {

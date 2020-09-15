@@ -128,23 +128,16 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
 })
 
 setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = FALSE,
-                                                       selectBy = NULL, negate = FALSE)
+                                                       selectBy = NULL, maxLevel = NULL, negate = FALSE)
 {
     # UNDONE: doc that selectBy only applies to hits, in case of ties: first hit
+    # UNDONE: mention that filter with onlyHits may need to be repeated
     
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertFlag, . ~ onlyHits + negate, fixed = list(add = ac))
     checkmate::assertChoice(selectBy, c("intensity", "level"), null.ok = TRUE, add = ac)
+    checkmate::assertInt(maxLevel, null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
-    
-    if (onlyHits)
-    {
-        sGroups <- unique(screenInfo(obj)$group)
-        if (negate)
-            obj <- obj[, setdiff(names(obj), sGroups)]
-        else
-            obj <- obj[, sGroups]
-    }
     
     if (!is.null(selectBy))
     {
@@ -170,6 +163,22 @@ setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = FALS
             setorderv(si, "name")
             obj@screenInfo <- si[keep == TRUE, -"keep"]
         }
+    }
+    
+    if (!is.null(maxLevel) && !is.null(screenInfo(obj)[["estIDLevel"]]))
+    {
+        pred <- if (negate) function(x) x > maxLevel else function(x) x <= maxLevel
+        obj@screenInfo <- screenInfo(obj)[nzchar(estIDLevel) & pred(numericIDLevel(estIDLevel))]
+    }
+
+    # NOTE: do last in case previous steps removed hits 
+    if (onlyHits)
+    {
+        sGroups <- unique(screenInfo(obj)$group)
+        if (negate)
+            obj <- obj[, setdiff(names(obj), sGroups)]
+        else
+            obj <- obj[, sGroups]
     }
     
     if (...length() > 0)

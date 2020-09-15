@@ -20,6 +20,7 @@
 - ID level rules
     - GenForm scoring: somehow exclude non MS/MS candidates if MS/MS candidates are present?
         - already fine now with minimum rank?
+        - absolute thresholds for iso/comb scores?
     - add scorings for SIRIUS/DA
 - annotation
     - docs

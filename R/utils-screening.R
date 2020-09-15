@@ -203,6 +203,9 @@ annotatedMSMSSimilarity <- function(fragInfo, MSMSList, absMzDev, relMinIntensit
                                             b = relMinIntensity, print.graphic = FALSE))
 }
 
+# UNDONE: export?
+numericIDLevel <- function(l) as.integer(gsub("[[:alpha:]]*", "", l))
+
 defaultIDLevelRules <- function(inLevels = NULL, exLevels = NULL)
 {
     aapply(checkmate::assertCharacter, . ~ inLevels + exLevels, null.ok = TRUE)

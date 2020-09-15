@@ -128,10 +128,13 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
 })
 
 setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = FALSE,
-                                                       selectBy = NULL, maxLevel = NULL, negate = FALSE)
+                                                       selectBy = NULL, maxLevel = NULL,
+                                                       maxFormRank = NULL, maxCompRank = NULL,
+                                                       minAnnMSMSSim = NULL, negate = FALSE)
 {
     # UNDONE: doc that selectBy only applies to hits, in case of ties: first hit
     # UNDONE: mention that filter with onlyHits may need to be repeated
+    # UNDONE: cache?
     
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertFlag, . ~ onlyHits + negate, fixed = list(add = ac))
@@ -165,12 +168,25 @@ setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = FALS
         }
     }
     
-    if (!is.null(maxLevel) && !is.null(screenInfo(obj)[["estIDLevel"]]))
+    colFilter <- function(pred, col, val)
     {
-        pred <- if (negate) function(x) x > maxLevel else function(x) x <= maxLevel
-        obj@screenInfo <- screenInfo(obj)[nzchar(estIDLevel) & pred(numericIDLevel(estIDLevel))]
+        if (!is.null(val) && !is.null(screenInfo(obj)[[col]]))
+        {
+            if (negate)
+                pred <- Negate(pred)
+            obj@screenInfo <- screenInfo(obj)[!is.na(get(col)) & nzchar(get(col)) & pred(get(col), val)]
+        }
+        return(obj)
     }
+    minPred <- function(x, v) x >= v
+    maxPred <- function(x, v) x <= v
+    levPred <- function(x, v) maxPred(numericIDLevel(x), v)
 
+    obj <- colFilter(levPred, "estIDLevel", maxLevel)
+    obj <- colFilter(maxPred, "suspFormRank", maxFormRank)
+    obj <- colFilter(maxPred, "suspCompRank", maxCompRank)
+    obj <- colFilter(minPred, "annotatedMSMSSimilarity", minAnnMSMSSim)
+        
     # NOTE: do last in case previous steps removed hits 
     if (onlyHits)
     {

@@ -37,6 +37,13 @@ with the \pkg{\link{igraph}} package and rendered with
 \pkg{\link{visNetwork}}.
 }}
 
+\section{Slots}{
+
+\describe{
+\item{\code{homol}}{A \code{list} with \code{homol} objects for each replicate group
+as returned by \code{\link{homol.search}}}
+}}
+
 \references{
 \addCitations{nontarget}{1} \cr\cr \addCitations{enviPat}{1}
 

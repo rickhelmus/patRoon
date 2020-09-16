@@ -1,3 +1,7 @@
+# patRoon 1.0.3
+* `componentsNT`: include algorithm data returned by `nontarget::homol.search` in `homol` slot (suggested by Vittorio Albergamo)
+
+
 # patRoon 1.0.2
 
 * Fixed: avoid errors when SIRIUS returns zero results (reported by Vittorio Albergamo)

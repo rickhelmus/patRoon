@@ -25,6 +25,7 @@
 - annotation
     - docs
     - only add sim, ranking etc columns if data is available?
+    - cache
 - screenSuspects()
     - combine screenSuspects() and groupFeaturesScreening()
         - screenSuspects() does both the screening and making new fGroups
@@ -34,6 +35,7 @@
             - can later also be defined for fGroups?
             - adds data to screenInfo slot
         - filter() method for minimal rankings, matched MS/MS fragments, no/one/multiple hits etc
+            - onlyHits = TRUE by default? or by default if any of the others are given?
         - deprecate features method
         - tag hits, but keep all fGroups?
             - fGroups[, hits = TRUE] ?
@@ -43,8 +45,11 @@
         - subset/select by suspect name
 - newProject(): create template auto ID rule csv?
 - util to check if there are suspect results? (ie to replace inherits(...))
-- expand reporting, eg marking which candidate corresponds to suspect and include suspect name in EICs
+- expand reporting
+    - eg marking which candidate corresponds to suspect and include suspect name in EICs
+    - mention suspect similarities/ranks etc for candidates (or somehow in compounds?)
 - check for empty names in assertion/preparation functions
+- prepareSuspectList(): export? and always calculate neutralMass?
 
 
 ## docs

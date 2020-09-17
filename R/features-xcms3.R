@@ -12,7 +12,7 @@ setMethod("initialize", "featuresXCMS3",
 #' @export
 setMethod("[", c("featuresXCMS3", "ANY", "missing", "missing"), function(x, i, j, ..., drop = TRUE)
 {
-    x <- callNextMethod(x, i, j, ..., drop)
+    x <- callNextMethod(x, i, j, ..., drop = drop)
     x@xdata <- xcms::filterFile(x@xdata, analyses(x))
     return(x)
 })

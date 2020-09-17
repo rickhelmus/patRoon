@@ -27,14 +27,14 @@ setMethod("featureTable", "featureGroupsSet", function(obj, neutralized = TRUE, 
 #'   results for the given replicate groups (equivalent to the \code{rGroups}
 #'   argument to \code{\link[=filter,featureGroups-method]{filter}}).
 #' @export
-setMethod("[", c("featureGroupsSet", "ANY", "ANY", "missing"), function(x, i, j, ..., sets = NULL, drop = TRUE)
+setMethod("[", c("featureGroupsSet", "ANY", "ANY", "missing"), function(x, i, j, ..., rGroups, sets = NULL, drop = TRUE)
 {
     assertSets(x, sets)
     
     if (!is.null(sets) && length(sets) > 0)
         i <- mergeAnaSubsetArgWithSets(i, sets, analysisInfo(x))
 
-    return(callNextMethod(x, i, j, ...))
+    return(callNextMethod(x, i, j, ..., rGroups = rGroups))
 })
 
 #' @describeIn featureGroupsSet Extract intensity values.

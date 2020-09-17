@@ -66,9 +66,9 @@ setMethod("initialize", "featureGroupsScreeningSet",
 
 setMethod("screenInfo", "featureGroupsScreeningSet", function(obj) obj@screenInfo)
 
-setMethod("[", c("featureGroupsScreeningSet", "ANY", "ANY", "missing"), function(x, i, j, ..., sets = NULL, drop = TRUE)
+setMethod("[", c("featureGroupsScreeningSet", "ANY", "ANY", "missing"), function(x, i, j, ..., rGroups, sets = NULL, drop = TRUE)
 {
-    x <- callNextMethod(x, i, j, ..., sets = sets, drop = drop)
+    x <- callNextMethod(x, i, j, ..., rGroups = rGroups, sets = sets, drop = drop)
     return(syncScreeningSetObjects(x))
 })
 

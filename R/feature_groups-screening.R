@@ -14,9 +14,9 @@ setMethod("initialize", "featureGroupsScreening",
 
 setMethod("screenInfo", "featureGroupsScreening", function(obj) obj@screenInfo)
 
-setMethod("[", c("featureGroupsScreening", "ANY", "ANY", "missing"), function(x, i, j, ..., drop = TRUE)
+setMethod("[", c("featureGroupsScreening", "ANY", "ANY", "missing"), function(x, i, j, ..., rGroups, drop = TRUE)
 {
-    x <- callNextMethod()
+    x <- callNextMethod(x, i, j, ..., rGroups = rGroups, drop = drop)
     x@screenInfo <- x@screenInfo[group %in% names(x)]
     return(x)
 })
@@ -198,7 +198,7 @@ setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = FALS
     }
     
     if (...length() > 0)
-        obj <- callNextMethod(obj, ..., negate)
+        obj <- callNextMethod(obj, ..., negate = negate)
     
     return(obj)
 })

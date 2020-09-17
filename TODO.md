@@ -48,6 +48,7 @@
 - expand reporting
     - eg marking which candidate corresponds to suspect and include suspect name in EICs
     - mention suspect similarities/ranks etc for candidates (or somehow in compounds?)
+    - somehow re-introduce ID levels etc in annotation table?
 - check for empty names in assertion/preparation functions
 - prepareSuspectList(): export? and always calculate neutralMass?
 

@@ -38,7 +38,9 @@ setMethod("as.data.table", "featureGroupsScreening",
         if (!is.null(collapseSuspects))
         {
             si[, name := paste0(name, collapse = collapseSuspects), by = "group"]
-            si <- unique(si, by = "group")
+            # only keep unique and remove suspect specific columns
+            # UNDONE: keep specific columns if only one suspect?
+            si <- unique(si[, c("group", "name"), with = FALSE], by = "group")
         }
         
         ret <- merge(ret, si, by = "group", all.x = !onlyHits, sort = FALSE)
@@ -142,9 +144,29 @@ setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = FALS
     checkmate::assertInt(maxLevel, null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
+    colFilter <- function(pred, col, val)
+    {
+        if (!is.null(val) && !is.null(screenInfo(obj)[[col]]))
+        {
+            if (negate)
+                pred <- Negate(pred)
+            obj@screenInfo <- screenInfo(obj)[!is.na(get(col)) & nzchar(get(col)) & pred(get(col), val)]
+        }
+        return(obj)
+    }
+    minPred <- function(x, v) x >= v
+    maxPred <- function(x, v) x <= v
+    levPred <- function(x, v) maxPred(numericIDLevel(x), v)
+
+    obj <- colFilter(levPred, "estIDLevel", maxLevel)
+    obj <- colFilter(maxPred, "suspFormRank", maxFormRank)
+    obj <- colFilter(maxPred, "suspCompRank", maxCompRank)
+    obj <- colFilter(minPred, "annotatedMSMSSimilarity", minAnnMSMSSim)
+    
+    # do here so that only duplicates not yet filtered out in previous steps are considered
     if (!is.null(selectBy))
     {
-        gTab <- as.data.table(obj, onlyHits = TRUE)
+        gTab <- as.data.table(obj, collapseSuspects = NULL, onlyHits = TRUE)
         doKeep <- function(v, d) is.na(v) | length(v) == 1 | order(v, decreasing = d) == 1
         if (selectBy == "intensity")
         {
@@ -168,25 +190,6 @@ setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = FALS
         }
     }
     
-    colFilter <- function(pred, col, val)
-    {
-        if (!is.null(val) && !is.null(screenInfo(obj)[[col]]))
-        {
-            if (negate)
-                pred <- Negate(pred)
-            obj@screenInfo <- screenInfo(obj)[!is.na(get(col)) & nzchar(get(col)) & pred(get(col), val)]
-        }
-        return(obj)
-    }
-    minPred <- function(x, v) x >= v
-    maxPred <- function(x, v) x <= v
-    levPred <- function(x, v) maxPred(numericIDLevel(x), v)
-
-    obj <- colFilter(levPred, "estIDLevel", maxLevel)
-    obj <- colFilter(maxPred, "suspFormRank", maxFormRank)
-    obj <- colFilter(maxPred, "suspCompRank", maxCompRank)
-    obj <- colFilter(minPred, "annotatedMSMSSimilarity", minAnnMSMSSim)
-        
     # NOTE: do last in case previous steps removed hits 
     if (onlyHits)
     {

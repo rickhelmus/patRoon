@@ -264,3 +264,84 @@ getMSPeakListPlotTitle <- function(MSLevel, analysis, groupName)
         return(sprintf("%s (%s) %s", groupName, analysis, MSInd))
     return(paste(groupName, MSInd))
 }
+
+binPeakLists <- function(pl1, pl2, shift, absMzDev)
+{
+    prep <- function(pl)
+    {
+        pl <- copy(pl)
+        pl[, c("index", "low", "high") := .(seq_len(nrow(pl)), mz - absMzDev, mz + absMzDev)]
+        setkeyv(pl, c("low", "high"))
+        return(pl)
+    }
+    pl1 <- prep(pl1); pl2 <- prep(pl2)
+    
+    if (shift != "none")
+    {
+        if (!any(pl1$precursor) || !any(pl2$precursor))
+            stop("Cannot shift spectra: one or both lack precursor ion!")
+        precDiff <- pl2[precursor == TRUE]$mz - pl1[precursor == TRUE]$mz
+        if (shift == "precursor")
+            pl2[, mz := mz - precDiff]
+        else # both
+        {
+            # first bin as normal (recursive call)
+            binNone <- binPeakLists(pl1, pl2, "none", absMzDev)
+            pl1Unique <- setnames(binNone[intensity_2 == 0, -"intensity_2"], "intensity_1", "intensity")
+            pl2Unique <- setnames(binNone[intensity_1 == 0, -"intensity_1"], "intensity_2", "intensity")
+            
+            # bin missing with shift
+            pl2Unique[, mz := mz - precDiff]
+            binShift <- binPeakLists(pl1Unique, pl2Unique, "none", absMzDev)
+            
+            # merge both: add missing from binNone
+            ret <- rbind(binNone[intensity_1 != 0 & intensity_2 != 0], binShift)
+            setorderv(ret, "mz")
+            return(ret)
+        }
+    }
+    
+    ov <- foverlaps(prep(pl1), prep(pl2))
+    # NOTE: i.xx cols are from left
+    
+    ret <- ov[, c("i.mz", "intensity", "i.intensity"), with = FALSE]
+    setnames(ret, c("i.mz", "intensity", "i.intensity"), c("mz", "intensity_2", "intensity_1"))
+
+    # all left entries should be in there, right can miss and should be added manually
+    stopifnot(all(pl1$index %in% ov$i.index))
+    ret <- rbind(ret, setnames(pl2[!index %in% ov$index, c("mz", "intensity")], "intensity", "intensity_2"), fill = TRUE)
+    
+    setnafill(ret, fill = 0)
+    setorderv(ret, "mz")
+    setcolorder(ret, c("mz", "intensity_1", "intensity_2"))
+    
+    return(ret)
+}
+
+specSimilarity <- function(pl1, pl2, method, shift = "none", removePrecursor = FALSE, mzWeight = 1, intWeight = 1, absMzDev = 0.005)
+{
+    # UNDONE: refs, cov() for pearson?
+    
+    # code contributed by Bas van de Velde
+    # cosine similarity from OrgMassSpecR
+    
+    binnedPL <- binPeakLists(pl1, pl2, shift, absMzDev)
+    
+    # remove precursor
+    if (removePrecursor)
+        binnedPL <- binnedPL[precursor == FALSE]
+    
+    # normalize
+    binnedPL[, c("intensity_1", "intensity_2") :=
+                 .(normalize(intensity_1, FALSE), normalize(intensity_2, FALSE))]
+    
+    u <- binnedPL$mz^mzWeight * binnedPL$intensity_1^intWeight
+    v <- binnedPL$mz^mzWeight * binnedPL$intensity_2^intWeight
+
+    return(switch(method,
+                  cosine = as.vector((u %*% v) / (sqrt(sum(u^2)) * sqrt(sum(v^2)))),
+                  pearson = cov(u, v, "pearson"),
+                  spearman = cov(u, v, "spearman"),
+                  jaccard = length(intersect(binnedPL[intensity_1 != 0]$mz,
+                                             binnedPL[intensity_2 != 0]$mz)) / nrow(binnedPL)))
+}

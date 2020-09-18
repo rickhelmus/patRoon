@@ -85,7 +85,8 @@
   areas = FALSE,
   features = FALSE,
   regression = FALSE,
-  normFunc = NULL
+  normFunc = NULL,
+  FCParams = NULL
 )
 
 \S4method{plot}{featureGroups,ANY}(

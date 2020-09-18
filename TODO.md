@@ -205,6 +205,8 @@
         - but no parent/TP distinction yet, so perhaps not possible?
     - alternatively
         - componentsMSMS --> predictTPsMSMS(fGroupsParent, fGroupsTP) --> TPPredictionsMSMS --> componentsTPs
+    - convert componentsInt
+    - sets for componentsSpec
 - subsetting/componentization based on log2fc
     - componentization approach
         - specify 'categories' (better name?): pairs of before/after rGroups

@@ -318,9 +318,10 @@ binPeakLists <- function(pl1, pl2, shift, absMzDev)
     return(ret)
 }
 
-specSimilarity <- function(pl1, pl2, method, shift = "none", removePrecursor = FALSE, mzWeight = 1, intWeight = 1, absMzDev = 0.005)
+specSimilarity <- function(pl1, pl2, method, shift = "none", removePrecursor = FALSE, mzWeight = 1, intWeight = 1,
+                           absMzDev = 0.005, relMinIntensity = 0.1)
 {
-    # UNDONE: refs, cov() for pearson?
+    # UNDONE: refs
     
     # code contributed by Bas van de Velde
     # cosine similarity from OrgMassSpecR
@@ -335,13 +336,17 @@ specSimilarity <- function(pl1, pl2, method, shift = "none", removePrecursor = F
     binnedPL[, c("intensity_1", "intensity_2") :=
                  .(normalize(intensity_1, FALSE), normalize(intensity_2, FALSE))]
     
+    # intensity filter
+    binnedPL[intensity_1 < relMinIntensity, intensity_1 := 0]
+    binnedPL[intensity_2 < relMinIntensity, intensity_2 := 0]
+    binnedPL <- binnedPL[intensity_1 != 0 | intensity_2 != 0]
+    
     u <- binnedPL$mz^mzWeight * binnedPL$intensity_1^intWeight
     v <- binnedPL$mz^mzWeight * binnedPL$intensity_2^intWeight
 
     return(switch(method,
                   cosine = as.vector((u %*% v) / (sqrt(sum(u^2)) * sqrt(sum(v^2)))),
-                  pearson = cov(u, v, "pearson"),
-                  spearman = cov(u, v, "spearman"),
-                  jaccard = length(intersect(binnedPL[intensity_1 != 0]$mz,
-                                             binnedPL[intensity_2 != 0]$mz)) / nrow(binnedPL)))
+                  pearson = cor(u, v, method = "pearson"),
+                  spearman = cor(u, v, method = "spearman"),
+                  jaccard = binnedPL[intensity_1 != 0 & intensity_2 != 0, .N] / nrow(binnedPL)))
 }

@@ -74,6 +74,7 @@ setGeneric("generateComponentsNontarget", function(fGroups, ...) standardGeneric
 setGeneric("generateComponentsIntClust", function(fGroups, ...) standardGeneric("generateComponentsIntClust"))
 setGeneric("generateComponentsOpenMS", function(fGroups, ...) standardGeneric("generateComponentsOpenMS"))
 setGeneric("generateComponentsCliqueMS", function(fGroups, ...) standardGeneric("generateComponentsCliqueMS"))
+setGeneric("generateComponentsSpecClust", function(fGroups, ...) standardGeneric("generateComponentsSpecClust"))
 setGeneric("generateComponentsTPs", function(fGroups, ...) standardGeneric("generateComponentsTPs"))
 
 ### Formulas

@@ -427,6 +427,13 @@ assertMakeSetArgs <- function(objects, class, adducts, adductNullOK, labels, add
                                null.ok = !is.null(adducts), add = add)
 }
 
+assertDynamicTreeCutArgs <- function(maxTreeHeight, deepSplit, minModuleSize, add = NULL)
+{
+    checkmate::assertNumber(maxTreeHeight, 0, finite = TRUE, add = add)
+    checkmate::assertFlag(deepSplit, add = add)
+    checkmate::assertCount(minModuleSize, positive = TRUE, add = add)
+}
+
 # from https://github.com/mllg/checkmate/issues/115
 aapply = function(fun, formula, ..., fixed = list())
 {

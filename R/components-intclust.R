@@ -115,9 +115,7 @@ setMethod("treeCutDynamic", "componentsIntClust", function(obj, maxTreeHeight, d
                                                            minModuleSize)
 {
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertNumber(maxTreeHeight, 0, finite = TRUE, add = ac)
-    checkmate::assertFlag(deepSplit, add = ac)
-    checkmate::assertCount(minModuleSize, positive = TRUE, add = ac)
+    assertDynamicTreeCutArgs(maxTreeHeight, deepSplit, minModuleSize, ac)
     checkmate::reportAssertions(ac)
 
     obj@cutClusters <- doDynamicTreeCut(obj@clust, maxTreeHeight,
@@ -253,6 +251,7 @@ setMethod("generateComponentsIntClust", "featureGroups", function(fGroups, metho
     checkmate::assertString(metric, add = ac)
     checkmate::assertString(method, add = ac)
     checkmate::assertFlag(average, add = ac)
+    assertDynamicTreeCutArgs(maxTreeHeight, deepSplit, minModuleSize, ac)
     checkmate::reportAssertions(ac)
 
     if (length(fGroups) == 0)

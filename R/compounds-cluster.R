@@ -167,9 +167,8 @@ setMethod("treeCutDynamic", "compoundsCluster", function(obj, maxTreeHeight, dee
                                                          minModuleSize, groupName)
 {
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertNumber(maxTreeHeight, 0, finite = TRUE, add = ac)
-    checkmate::assertFlag(deepSplit, add = ac)
-    checkmate::assertCount(minModuleSize, positive = TRUE, add = ac)
+    assertChoiceSilent(groupName, names(obj@clusters), add = ac)
+    assertDynamicTreeCutArgs(maxTreeHeight, deepSplit, minModuleSize, ac)
     checkmate::reportAssertions(ac)
     
     obj@cutClusters[[groupName]] <- doDynamicTreeCut(obj@clusters[[groupName]], maxTreeHeight,
@@ -318,9 +317,7 @@ setMethod("makeHCluster", "compounds", function(obj, method, fpType = "extended"
 {
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertString, . ~ method + fpType + fpSimMethod, min.chars = 1, fixed = list(add = ac))
-    checkmate::assertNumber(maxTreeHeight, 0, finite = TRUE, add = ac)
-    checkmate::assertFlag(deepSplit, add = ac)
-    checkmate::assertCount(minModuleSize, positive = TRUE, add = ac)
+    assertDynamicTreeCutArgs(maxTreeHeight, deepSplit, minModuleSize, ac)
     checkmate::reportAssertions(ac)
 
     hash <- makeHash(obj, method, fpType, fpSimMethod, maxTreeHeight, deepSplit, minModuleSize)

@@ -60,16 +60,17 @@ allGroups <- unique(c(plotGroups, componentFGroups, mfWebFGroups))
 
 # UNDONE: replace by proper inheritance
 isSusp <- inherits(rmdVars$fGroups, "featureGroupsScreening")
-fGroupsSpecDT <- as.data.table(rmdVars$fGroups)
-fGroupsSpecDT <- fGroupsSpecDT[group %in% allGroups]
 
 if (isSusp)
 {
+    fGroupsSpecDT <- as.data.table(rmdVars$fGroups, collapseSuspects = NULL)
     setnames(fGroupsSpecDT, "name", "suspect")
-    
     fGroupsSpecDT[, c("d_rt", "d_mz", "annotatedMSMSSimilarity") :=
                       .(round(d_rt, 2), round(d_mz, 5), round(annotatedMSMSSimilarity, 2))]
-}
+} else
+    fGroupsSpecDT <- as.data.table(rmdVars$fGroups)
+
+fGroupsSpecDT <- fGroupsSpecDT[group %in% allGroups]
 if (rmdVars$retMin)
     fGroupsSpecDT[, ret := ret / 60]
 
@@ -84,15 +85,20 @@ showButton <- function(title, jsFunc, ...)
     args <- paste0("'", unlist(list(...)), "'", collapse = ", ")
     sprintf("<button onclick=\"%s(%s);\" style=\"padding: 0px 3px 0px 3px\">%s</button>", jsFunc, args, title)
 }
-maybeAddButton <- function(grpi, subGroups, ...) if (allGroups[grpi] %in% subGroups) showButton(...) else "^"
+maybeAddButton <- function(g, subGroups, ...) if (g %in% subGroups) showButton(...) else "^"
 
-compButtons <- sapply(seq_along(allGroups), function(gi) maybeAddButton(gi, compFGroups, "compounds", "showAnnotation", gi, "compounds"))
-compCLButtons <- sapply(seq_along(allGroups), function(gi) maybeAddButton(gi, compsClustFGroups,
-                                                                          "compounds clust", "showCompoundsCluster", gi))
-formButtons <- sapply(seq_along(allGroups), function(gi) maybeAddButton(gi, formFGroups, "formulas",
-                                                                        "showAnnotation", gi, "formulas"))
-mfWebButtons <- sapply(seq_along(allGroups), function(gi) maybeAddButton(gi, mfWebFGroups, "MetFrag web",
-                                                                         "window.open", mfWebLinks[allGroups[gi]], "_blank"))
+compButtons <- sapply(fGroupsSpecDT$group, function(g) maybeAddButton(g, compFGroups, "compounds", "showAnnotation",
+                                                                      match(g, allGroups), "compounds"))
+compCLButtons <- sapply(fGroupsSpecDT$group, function(g) maybeAddButton(g, compsClustFGroups,
+                                                                        "compounds clust", "showCompoundsCluster",
+                                                                        match(g, allGroups)))
+formButtons <- sapply(fGroupsSpecDT$group, function(g) maybeAddButton(g, formFGroups, "formulas",
+                                                                      "showAnnotation", match(g, allGroups),
+                                                                      "formulas"))
+mfWebButtons <- sapply(fGroupsSpecDT$group, function(g) maybeAddButton(g, mfWebFGroups, "MetFrag web",
+                                                                       "window.open",
+                                                                       mfWebLinks[allGroups[match(g, allGroups)]],
+                                                                       "_blank"))
 
 sp <- paste0(rep("&nbsp;", 4), collapse = "")
 buttons <- paste(compButtons, compCLButtons, formButtons, mfWebButtons, sep = sp)

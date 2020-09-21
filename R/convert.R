@@ -375,11 +375,11 @@ convertMSFiles <- function(files = NULL, outPath = NULL, dirs = TRUE,
         return(FALSE)
     }, USE.NAMES = FALSE)
 
-    files <- files[keepFiles]
-    output <- output[keepFiles]
-
-    if (length(files) > 0)
+    if (is.logical(keepFiles) && any(keepFiles))
     {
+        files <- files[keepFiles]
+        output <- output[keepFiles]
+
         if (algorithm == "pwiz")
             convertMSFilesPWiz(files, output, to, centroid, filters, extraOpts, PWizBatchSize, logPath, maxProcAmount)
         else if (algorithm == "openms")

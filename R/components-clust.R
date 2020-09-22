@@ -31,14 +31,18 @@ setMethod("initialize", "componentsClust", function(.Object, distm, method, gInf
                                                     maxTreeHeight, deepSplit, minModuleSize, ...)
 {
     properties <- c(properties, list(method = method))
-    
-    # amend properties
-    # perform clustering
-    # perform cutting
-    # create components
-    
+
+    if (is.null(distm))
+    {
+        # empty object
+        return(callNextMethod(.Object, components = list(), componentInfo = data.table(),
+                              clust = structure(list(), class = "hclust"), cutClusters = numeric(),
+                              distm = structure(list(), class = "dist"), gInfo = gInfo,
+                              properties = c(properties, list(method = method)), ...))
+    }
+
     cat("Hierarchical clustering... ")
-    clust <- hclust(distm, method)
+    clust <- fastcluster::hclust(distm, method)
     cat("Done!\n")
     
     cutClusters <- doDynamicTreeCut(clust, maxTreeHeight, deepSplit, minModuleSize)
@@ -48,7 +52,7 @@ setMethod("initialize", "componentsClust", function(.Object, distm, method, gInf
     
     return(callNextMethod(.Object, components = comps, componentInfo = cInfo,
                           clust = clust, cutClusters = cutClusters, distm = distm, gInfo = gInfo,
-                          properties = c(properties, list(method = method)), ...))
+                          properties = properties, ...))
 })
 
 

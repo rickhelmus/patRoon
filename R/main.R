@@ -30,7 +30,7 @@ NULL
 
 # So it can be used as a S4 slot
 setOldClass("hclust")
-setOldClass("dissimilarity")
+setOldClass(c("dissimilarity", "dist"))
 
 # for method signatures
 # doesn't work with devtools::load_all(): confuses xcmsRaw "[" operator (!?!?)

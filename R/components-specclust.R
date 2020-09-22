@@ -16,13 +16,11 @@ setMethod("generateComponentsSpecClust", "featureGroups", function(fGroups, MSPe
     assertDynamicTreeCutArgs(maxTreeHeight, deepSplit, minModuleSize, ac)
     checkmate::reportAssertions(ac)
     
-    # UNDONE: handle empty objects here or in componentsClust
-    # if (length(fGroups) == 0)
-    #     return(componentsSpecClust(components = list(), componentInfo = data.table(), clusterm = matrix(),
-    #                               distm = structure(list(), class = "dissimilarity"),
-    #                               clust = structure(list(), class = "hclust"), cutClusters = numeric(),
-    #                               gInfo = data.frame(), properties = list()))
-    
+    if (length(fGroups) == 0)
+        return(componentsSpecClust(distm = NULL, method = method, gInfo = groupInfo(fGroups),
+                                   properties = list(), maxTreeHeight = maxTreeHeight, deepSplit = deepSplit,
+                                   minModuleSize = minModuleSize, algorithm = "specclust"))
+
     cat("Calculating distance matrix... ")
     
     MSPeakLists <- MSPeakLists[, intersect(groupNames(MSPeakLists), groupNames(fGroups))]

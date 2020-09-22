@@ -205,8 +205,9 @@
         - but no parent/TP distinction yet, so perhaps not possible?
     - alternatively
         - componentsMSMS --> predictTPsMSMS(fGroupsParent, fGroupsTP) --> TPPredictionsMSMS --> componentsTPs
-    - convert componentsInt
-    - sets for componentsSpec
+    - componentsSpecClust
+        - sets
+        - more properties?
 - subsetting/componentization based on log2fc
     - componentization approach
         - specify 'categories' (better name?): pairs of before/after rGroups
@@ -238,6 +239,7 @@
     - plotting? could extend plotSpec() by allowing selection of two spectra and using sets code for mirroring
     - update MSPeakLists method and/or export new functions?
     - auto select pearson/spearman?
+    - remove OrgMassSpecR dependency
 - Include BT in installation script and verifyDependencies()
 
 

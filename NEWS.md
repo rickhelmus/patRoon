@@ -9,6 +9,7 @@
 * Minor changes
     - `show()` methods now print class inheritance tree
     - `calculateIonFormula()` and `calculateNeutralFormula()` now Hill sort their result
+    - Intensity clusters now use `fastcluster` for hierarchical clustering
 
 
 

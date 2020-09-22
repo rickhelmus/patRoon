@@ -157,19 +157,19 @@ please refer to the linked method documentation for each generic.
 \code{clusterProperties} Obtain a list with properties of the generated cluster(s).
 
 \itemize{
-    \item Methods are defined for: \code{\link[=clusterProperties,componentsClust-method]{componentsClust}}; \code{\link[=clusterProperties,componentsIntClust-method]{componentsIntClust}}; \code{\link[=clusterProperties,compoundsCluster-method]{compoundsCluster}}.
+    \item Methods are defined for: \code{\link[=clusterProperties,componentsClust-method]{componentsClust}}; \code{\link[=clusterProperties,compoundsCluster-method]{compoundsCluster}}.
 }
 
 \code{clusters} Obtain clustering object(s).
 
 \itemize{
-    \item Methods are defined for: \code{\link[=clusters,componentsClust-method]{componentsClust}}; \code{\link[=clusters,componentsIntClust-method]{componentsIntClust}}; \code{\link[=clusters,compoundsCluster-method]{compoundsCluster}}.
+    \item Methods are defined for: \code{\link[=clusters,componentsClust-method]{componentsClust}}; \code{\link[=clusters,compoundsCluster-method]{compoundsCluster}}.
 }
 
 \code{cutClusters} Returns assigned cluster indices of a cut cluster.
 
 \itemize{
-    \item Methods are defined for: \code{\link[=cutClusters,componentsClust-method]{componentsClust}}; \code{\link[=cutClusters,componentsIntClust-method]{componentsIntClust}}; \code{\link[=cutClusters,compoundsCluster-method]{compoundsCluster}}.
+    \item Methods are defined for: \code{\link[=cutClusters,componentsClust-method]{componentsClust}}; \code{\link[=cutClusters,compoundsCluster-method]{compoundsCluster}}.
 }
 
 \code{consensus} combines and merges data from various algorithms to generate a consensus.
@@ -283,13 +283,13 @@ please refer to the linked method documentation for each generic.
 \code{treeCut} Manually cut a cluster.
 
 \itemize{
-    \item Methods are defined for: \code{\link[=treeCut,componentsClust-method]{componentsClust}}; \code{\link[=treeCut,componentsIntClust-method]{componentsIntClust}}; \code{\link[=treeCut,compoundsCluster-method]{compoundsCluster}}.
+    \item Methods are defined for: \code{\link[=treeCut,componentsClust-method]{componentsClust}}; \code{\link[=treeCut,compoundsCluster-method]{compoundsCluster}}.
 }
 
 \code{treeCutDynamic} Automatically cut a cluster.
 
 \itemize{
-    \item Methods are defined for: \code{\link[=treeCutDynamic,componentsClust-method]{componentsClust}}; \code{\link[=treeCutDynamic,componentsIntClust-method]{componentsIntClust}}; \code{\link[=treeCutDynamic,compoundsCluster-method]{compoundsCluster}}.
+    \item Methods are defined for: \code{\link[=treeCutDynamic,componentsClust-method]{componentsClust}}; \code{\link[=treeCutDynamic,compoundsCluster-method]{compoundsCluster}}.
 }
 }
 \section{Other generics}{

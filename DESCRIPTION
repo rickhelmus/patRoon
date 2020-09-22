@@ -108,7 +108,8 @@ Imports:
     keys,
     backports,
     shinyjs,
-    OrgMassSpecR
+    OrgMassSpecR,
+    proxy
 Suggests: 
     RDCOMClient,
     metfRag,

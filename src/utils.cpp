@@ -55,3 +55,12 @@ bool numberGTE(double x, double y, double tol)
 {
     return x > y || compareTol(x, y, tol);
 }
+
+void normalizeNums(std::vector<double> &v)
+{
+    double m = 0;
+    for (double d : v)
+        m = std::max(m, d);
+    for (double &d : v)
+        d /= m;
+}

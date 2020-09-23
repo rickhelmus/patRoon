@@ -267,6 +267,41 @@ getMSPeakListPlotTitle <- function(MSLevel, analysis, groupName)
 
 binPeakLists <- function(pl1, pl2, shift, absMzDev)
 {
+    if (shift != "none")
+    {
+        if (!any(pl1$precursor) || !any(pl2$precursor))
+            stop("Cannot shift spectra: one or both lack precursor ion!")
+        precDiff <- pl2[precursor == TRUE]$mz - pl1[precursor == TRUE]$mz
+        if (shift == "precursor")
+            pl2[, mz := mz - precDiff]
+        else # both
+        {
+            # first bin as normal (recursive call)
+            binNone <- binPeakLists(pl1, pl2, "none", absMzDev)
+            pl1Unique <- setnames(binNone[intensity_2 == 0, -"intensity_2"], "intensity_1", "intensity")
+            pl2Unique <- setnames(binNone[intensity_1 == 0, -"intensity_1"], "intensity_2", "intensity")
+            
+            # bin missing with shift
+            pl2Unique[, mz := mz - precDiff]
+            binShift <- binPeakLists(pl1Unique, pl2Unique, "none", absMzDev)
+            
+            # merge both: add missing from binNone
+            ret <- rbind(binNone[intensity_1 != 0 & intensity_2 != 0], binShift)
+            setorderv(ret, "mz")
+            return(ret)
+        }
+    }
+
+    pl1 <- as.matrix(pl1[, c("mz", "intensity"), with = FALSE])
+    pl2 <- as.matrix(pl2[, c("mz", "intensity"), with = FALSE])
+    ret <- as.data.table(binSpectra(pl1, pl2, absMzDev))
+    setorderv(ret, "mz")
+        
+    return(ret)
+}
+
+binPeakListsOld <- function(pl1, pl2, shift, absMzDev)
+{
     prep <- function(pl)
     {
         pl <- copy(pl)
@@ -301,7 +336,7 @@ binPeakLists <- function(pl1, pl2, shift, absMzDev)
         }
     }
     
-    ov <- foverlaps(prep(pl1), prep(pl2))
+    ov <- foverlaps(pl1, pl2)
     # NOTE: i.xx cols are from left
     
     ret <- ov[, c("i.mz", "intensity", "i.intensity"), with = FALSE]
@@ -318,7 +353,7 @@ binPeakLists <- function(pl1, pl2, shift, absMzDev)
     return(ret)
 }
 
-specSimilarity <- function(pl1, pl2, method, shift = "none", removePrecursor = FALSE, mzWeight = 1, intWeight = 1,
+specSimilarity2 <- function(pl1, pl2, method, shift = "none", removePrecursor = FALSE, mzWeight = 1, intWeight = 1,
                            absMzDev = 0.005, relMinIntensity = 0.1)
 {
     # UNDONE: refs
@@ -326,7 +361,8 @@ specSimilarity <- function(pl1, pl2, method, shift = "none", removePrecursor = F
     # code contributed by Bas van de Velde
     # cosine similarity from OrgMassSpecR
     
-    binnedPL <- binPeakLists(pl1, pl2, shift, absMzDev)
+    binnedPL <- as.data.table(binSpecCPP(pl1, pl2, absMzDev))
+    # binnedPL <- (binPeakListsOld(pl1, pl2, shift, absMzDev))
     
     # remove precursor
     if (removePrecursor)

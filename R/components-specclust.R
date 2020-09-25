@@ -48,6 +48,10 @@ setMethod("generateComponentsSpecClust", "featureGroups", function(fGroups, MSPe
         })
     }
     
+    gInfo <- groupInfo(fGroups)[names(allMSMS), ] # make sure to subset!
+    
+    precMZs <- sapply(names(allMSMS), function(g) gInfo[g, "mzs"])
+    
     cat("Calculating distance matrix... ")
     
     if (F)
@@ -58,10 +62,8 @@ setMethod("generateComponentsSpecClust", "featureGroups", function(fGroups, MSPe
         class(distm) <- "dist" # has both simul and dist, which confuses S4 validity checks
     }
     else
-        distm <- 1 - as.dist(specDistMatrix(allMSMS, simMethod, shift, mzWeight, intWeight, absMzDev))
+        distm <- 1 - as.dist(specDistMatrix(allMSMS, simMethod, shift, precMZs, mzWeight, intWeight, absMzDev))
     cat("Done!\n")
-    
-    gInfo <- groupInfo(fGroups)[names(allMSMS), ] # make sure to subset!
     
     return(componentsSpecClust(distm = distm, method = method, gInfo = gInfo,
                                properties = list(simMethod = simMethod, shift = shift,

@@ -245,7 +245,6 @@
     - consistent naming: spec vs peaklist
     - show method for new components classes
 - Include BT in installation script and verifyDependencies()
-- fix: reportHTML: susp table, components, 
 
 
 ## features

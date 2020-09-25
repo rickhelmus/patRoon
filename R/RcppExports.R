@@ -17,8 +17,8 @@ writeFeatureXML <- function(featList, out, hulls) {
     invisible(.Call(`_patRoon_writeFeatureXML`, featList, out, hulls))
 }
 
-specDistMatrix <- function(specList, cb) {
-    .Call(`_patRoon_specDistMatrix`, specList, cb)
+specDistMatrix <- function(specList, method, shift, mzWeight, intWeight, mzWindow) {
+    .Call(`_patRoon_specDistMatrix`, specList, method, shift, mzWeight, intWeight, mzWindow)
 }
 
 loadEICIntensities <- function(spectra, featList, rtWindow) {
@@ -37,7 +37,7 @@ binSpecCPP <- function(sp1, sp2, shift, mzWindow) {
     .Call(`_patRoon_binSpecCPP`, sp1, sp2, shift, mzWindow)
 }
 
-calcSpecSimularity <- function(sp1, sp2, method, shift, mzWindow, mzWeight, intWeight) {
-    .Call(`_patRoon_calcSpecSimularity`, sp1, sp2, method, shift, mzWindow, mzWeight, intWeight)
+calcSpecSimularity <- function(sp1, sp2, method, shift, precDiff, mzWeight, intWeight, mzWindow) {
+    .Call(`_patRoon_calcSpecSimularity`, sp1, sp2, method, shift, precDiff, mzWeight, intWeight, mzWindow)
 }
 

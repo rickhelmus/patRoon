@@ -190,6 +190,8 @@
         - remove mz column and warn about it?
 - componentsTP
     - allow input of new spectral similarity clustered components/predictions class
+    - include precursor_formula in compInfo
+    - include diff formula and reaction in components
 - predictTPsBioTransformer()
     - allow usage of compoundsSet (if not already working)
     - allow fGroupsScreening for input

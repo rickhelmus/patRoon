@@ -225,7 +225,7 @@ setMethod("convertToMFDB", "TPPredictionsBT", function(pred, out, includePrec)
 
     # set to MetFrag style names
     setnames(predAll,
-             c("name", "formula", "mass", "Precursor Major Isotope Mass"),
+             c("neutralMass", "formula", "mass", "Precursor Major Isotope Mass"),
              c("Identifier", "MolecularFormula", "MonoisotopicMass", "Precursor MonoisotopicMass"))
 
 

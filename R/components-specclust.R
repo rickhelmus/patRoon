@@ -26,14 +26,14 @@ setMethod("generateComponentsSpecClust", "featureGroups", function(fGroups, MSPe
     MSPeakLists <- MSPeakLists[, intersect(groupNames(MSPeakLists), groupNames(fGroups))]
     allMSMS <- pruneList(sapply(averagedPeakLists(MSPeakLists), "[[", "MSMS", simplify = FALSE))
     
-    if (FALSE)
+    if (F)
     {
         # UNDONE: parameters for spec similarity
-        distm <- 1 - proxy::simil(allMSMS, method = function(x, y) specSimilarity(x, y, "cosine"))
+        distm <- 1 - proxy::simil(allMSMS, method = function(x, y) specSimilarityR(x, y, "cosine"))
         class(distm) <- "dist" # has both simul and dist, which confuses S4 validity checks
     }
     else
-        distm <- 1 - as.dist(specDistMatrix(allMSMS, function(pl1, pl2) specSimilarity(pl1, pl2, "cosine")))
+        distm <- 1 - as.dist(specDistMatrix(allMSMS, "cosine", "none", 0, 1, 0.002))
     cat("Done!\n")
     
     gInfo <- groupInfo(fGroups)[names(allMSMS), ] # make sure to subset!

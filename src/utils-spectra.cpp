@@ -7,6 +7,7 @@
 #include <Rcpp.h>
 
 #include "utils.h"
+#include "utils-spectra.h"
 
 namespace {
 
@@ -61,11 +62,6 @@ double getTotMZIntFromSpec(const Rcpp::NumericVector &peakMZs, const Rcpp::Numer
     return totInt;
 }
 
-struct Spectrum
-{
-    std::vector<double> mzs, intensities;
-};
-    
 struct BinnedSpectrum
 {
     std::vector<double> mzs, intsLeft, intsRight;
@@ -271,6 +267,10 @@ BinnedSpectrum binSpectra(const Spectrum &specLeft, Spectrum specRight,
         while (lastRightInd < specRight.mzs.size())
         {
             const double rmz = specRight.mzs[lastRightInd], rmzmin = rmz - mzWindow, rmzmax = rmz + mzWindow;
+            
+            if (leftMZ < rmzmin)
+                break; // surpassed range for left
+            
             if (leftMZ >= rmzmin && leftMZ <= rmzmax)
             {
                 // overlap
@@ -281,7 +281,7 @@ BinnedSpectrum binSpectra(const Spectrum &specLeft, Spectrum specRight,
             
             ++lastRightInd;
             
-            if (foundRight || leftMZ < rmzmin)
+            if (foundRight)
                 break; // done or surpassed range
         }
         
@@ -346,46 +346,23 @@ Rcpp::DataFrame binSpecCPP(Rcpp::DataFrame sp1, Rcpp::DataFrame sp2, Rcpp::Chara
                                    Rcpp::Named("intensity_2") = binnedSpec.intsRight);
 }
 
-// [[Rcpp::export]]
-Rcpp::NumericVector calcSpecSimularity(Rcpp::DataFrame sp1, Rcpp::DataFrame sp2, Rcpp::CharacterVector method,
-                                       Rcpp::CharacterVector shift, Rcpp::NumericVector mzWindow,
-                                       Rcpp::NumericVector mzWeight, Rcpp::NumericVector intWeight)
+double doCalcSpecSimularity(Spectrum sp1, Spectrum sp2, const std::string &method,
+                            const std::string &shift, double precDiff,
+                            double mzWeight, double intWeight, double mzWindow)
 {
-    // UNDONE: intensity filters? shift, arg naming
+    normalizeNums(sp1.intensities); normalizeNums(sp2.intensities);
     
-    Spectrum specLeft{ sp1["mz"], sp1["intensity"] };
-    Spectrum specRight{ sp2["mz"], sp2["intensity"] };
+    BinnedSpectrum binnedSpec = binSpectra(sp1, sp2, shift, precDiff, mzWindow);
     
-    const std::string meth = Rcpp::as<std::string>(method), sh = Rcpp::as<std::string>(shift);
-    const double mzw = Rcpp::as<double>(mzWeight), intw = Rcpp::as<double>(intWeight);
-    
-    normalizeNums(specLeft.intensities); normalizeNums(specRight.intensities);
-
-    double precDiff = 0.0;
-    if (sh != "none")
-    {
-        // figure out precursor masses
-        const std::vector<int> isPrecLeft = sp1["precursor"];
-        const std::vector<int> isPrecRight = sp2["precursor"];
-
-        auto itl = std::find(isPrecLeft.begin(), isPrecLeft.end(), TRUE);
-        auto itr = std::find(isPrecRight.begin(), isPrecRight.end(), TRUE);
-        if (itl == isPrecLeft.end() || itr == isPrecRight.end())
-            Rcpp::stop("Cannot shift spectra: one or both lack precursor ion!");
-        precDiff = specRight.mzs[itr - isPrecRight.begin()] - specLeft.mzs[itl - isPrecLeft.begin()];
-    }
-    
-    BinnedSpectrum binnedSpec = binSpectra(specLeft, specRight, sh, precDiff, Rcpp::as<double>(mzWindow));
-    
-    // UNDONE: pearsons/spearman?
-    if (meth == "cosine")
+    // UNDONE: pearsons/spearman? needs sorting?
+    if (method == "cosine")
     {
         std::vector<double> u, v;
         for (size_t i=0; i<binnedSpec.mzs.size(); ++i)
         {
-            const double m = pow(binnedSpec.mzs[i], mzw);
-            u.push_back(m * pow(binnedSpec.intsLeft[i], intw));
-            v.push_back(m * pow(binnedSpec.intsRight[i], intw));
+            const double m = pow(binnedSpec.mzs[i], mzWeight);
+            u.push_back(m * pow(binnedSpec.intsLeft[i], intWeight));
+            v.push_back(m * pow(binnedSpec.intsRight[i], intWeight));
         }
         
         const double dp = std::inner_product(u.begin(), u.end(), v.begin(), 0.0);
@@ -398,9 +375,9 @@ Rcpp::NumericVector calcSpecSimularity(Rcpp::DataFrame sp1, Rcpp::DataFrame sp2,
         }
         const double div = sqrt(divu) * sqrt(divv);
         
-        return Rcpp::NumericVector::create(dp / div);
+        return dp / div;
     }
-    else if (meth == "jaccard")
+    else if (method == "jaccard")
     {
         // binnedPL[intensity_1 != 0 & intensity_2 != 0, .N] / nrow(binnedPL)
         int both = 0;
@@ -409,8 +386,21 @@ Rcpp::NumericVector calcSpecSimularity(Rcpp::DataFrame sp1, Rcpp::DataFrame sp2,
             if (binnedSpec.intsLeft[i] != 0 && binnedSpec.intsRight[i] != 0)
                 ++both;
         }
-        return Rcpp::NumericVector::create(static_cast<double>(both) / static_cast<double>(binnedSpec.mzs.size()));
+        return static_cast<double>(both) / static_cast<double>(binnedSpec.mzs.size());
     }
     
     return NA_REAL; // shouldn't be here
+}
+
+// [[Rcpp::export]]
+Rcpp::NumericVector calcSpecSimularity(Rcpp::DataFrame sp1, Rcpp::DataFrame sp2, Rcpp::CharacterVector method,
+                                       Rcpp::CharacterVector shift, Rcpp::NumericVector precDiff,
+                                       Rcpp::NumericVector mzWeight, Rcpp::NumericVector intWeight, Rcpp::NumericVector mzWindow)
+{
+    Spectrum specLeft{ sp1["mz"], sp1["intensity"] };
+    Spectrum specRight{ sp2["mz"], sp2["intensity"] };
+    
+    return Rcpp::NumericVector::create(doCalcSpecSimularity(Spectrum{ sp1["mz"], sp1["intensity"] }, Spectrum{ sp2["mz"], sp2["intensity"] },
+                                                            Rcpp::as<std::string>(method), Rcpp::as<std::string>(shift), Rcpp::as<double>(precDiff),
+                                                            Rcpp::as<double>(mzWeight), Rcpp::as<double>(intWeight), Rcpp::as<double>(mzWindow)));
 }

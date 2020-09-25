@@ -5,12 +5,14 @@
 #' @include feature_groups-screening-set.R
 NULL
 
-doGenComponentsTPs <- function(fGroups, fGroupsTPs, pred, MSPeakLists, mzWindow, minRTDiff)
+doGenComponentsTPs <- function(fGroups, fGroupsTPs, pred, MSPeakLists, minRTDiff,
+                               simMethod, removePrecursor, mzWeight, intWeight, absMzDev, relMinIntensity)
 {
     if (length(fGroups) == 0)
         return(componentsTPs(componentInfo = data.table(), components = list()))
     
-    hash <- makeHash(fGroups, fGroupsTPs, pred, MSPeakLists, mzWindow, minRTDiff)
+    hash <- makeHash(fGroups, fGroupsTPs, pred, MSPeakLists, minRTDiff, simMethod, removePrecursor,
+                     mzWeight, intWeight, absMzDev, relMinIntensity)
     cd <- loadCacheData("componentsTPs", hash)
     if (!is.null(cd))
         return(cd)
@@ -75,20 +77,18 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, pred, MSPeakLists, mzWindow,
                     TPMSMS <- MSPeakLists[[g]][["MSMS"]]
                     if (!is.null(TPMSMS))
                     {
-                        # UNDONE: make some arguments configurable (eg omit precursor)
-                        
-                        if (shift)
-                            shift <- diff(gInfoPrec[c(precFG, g), "mzs"])
-                        else
-                            shift <- 0
-                        return(spectrumSimilarity(MSPeakLists, precFG, g, MSLevel = 2, doPlot = FALSE, mzShift = shift))
+                        return(specSimilarity(precMSMS, TPMSMS, method = simMethod, shift = shift,
+                                              precDiff = gInfoTPs[g, "mzs"] - gInfoPrec[precFG, "mzs"],
+                                              removePrecursor = removePrecursor, mzWeight = mzWeight,
+                                              intWeight = intWeight, absMzDev = absMzDev,
+                                              relMinIntensity = relMinIntensity))
                     }
-                    
                     return(NA)
                 }
                 
-                ret[, specSimilarity := sapply(group, getSim, shift = FALSE)]
-                ret[, specSimilarityShift := sapply(group, getSim, shift = TRUE)]
+                ret[, specSimilarity := sapply(group, getSim, shift = "none")]
+                ret[, specSimilarityPrec := sapply(group, getSim, shift = "precursor")]
+                ret[, specSimilarityBoth := sapply(group, getSim, shift = "both")]
             }
             else
                 ret[, c("specSimilarity", "specSimilarityShift") := NA]
@@ -178,7 +178,10 @@ setMethod("plotGraph", "componentsTPs", function(obj, onlyLinked)
 
 #' @export
 setMethod("generateComponentsTPs", "featureGroupsScreening", function(fGroups, fGroupsTPs = fGroups, pred,
-                                                                      MSPeakLists, mzWindow = 0.005, minRTDiff = 20)
+                                                                      MSPeakLists, minRTDiff = 20, simMethod,
+                                                                      removePrecursor = FALSE, mzWeight = 0,
+                                                                      intWeight = 1, absMzDev = 0.005,
+                                                                      relMinIntensity = 0.1)
 {
     # UNDONE: optionally remove TPs with equal formula as parent (how likely are these?)
     # UNDONE: optional MSPeakLists? and MSPeakListsTPs?
@@ -188,11 +191,14 @@ setMethod("generateComponentsTPs", "featureGroupsScreening", function(fGroups, f
     aapply(checkmate::assertClass, . ~ fGroupsTPs + pred + MSPeakLists,
            c("featureGroupsScreening", "TPPredictions", "MSPeakLists"),
            null.ok = c(TRUE, FALSE, FALSE), fixed = list(add = ac))
-    aapply(checkmate::assertNumber, . ~ mzWindow + minRTDiff,
+    aapply(checkmate::assertNumber, . ~ minRTDiff + mzWeight + intWeight + absMzDev + relMinIntensity,
            lower = 0, finite = TRUE, fixed = list(add = ac))
+    checkmate::assertChoice(simMethod, c("cosine", "jaccard"), add = ac)
+    checkmate::assertFlag(removePrecursor, add = ac)
     checkmate::reportAssertions(ac)
 
-    return(doGenComponentsTPs(fGroups, fGroupsTPs, pred, MSPeakLists, mzWindow, minRTDiff))
+    return(doGenComponentsTPs(fGroups, fGroupsTPs, pred, MSPeakLists, minRTDiff, simMethod, removePrecursor,
+                              mzWeight, intWeight, absMzDev, relMinIntensity))
     
     if (length(fGroups) == 0)
         return(componentsTPs(componentInfo = data.table(), components = list()))
@@ -200,7 +206,7 @@ setMethod("generateComponentsTPs", "featureGroupsScreening", function(fGroups, f
     if (is.null(fGroupsTPs))
         fGroupsTPs <- fGroups
     
-    hash <- makeHash(fGroups, fGroupsTPs, pred, MSPeakLists, mzWindow, minRTDiff)
+    hash <- makeHash(fGroups, fGroupsTPs, pred, MSPeakLists, absMzDev, minRTDiff)
     cd <- loadCacheData("componentsTPs", hash)
     if (!is.null(cd))
         return(cd)
@@ -312,17 +318,22 @@ setMethod("generateComponentsTPs", "featureGroupsScreening", function(fGroups, f
 
 #' @export
 setMethod("generateComponentsTPs", "featureGroupsScreeningSet", function(fGroups, fGroupsTPs = fGroups, pred,
-                                                                         MSPeakLists, mzWindow = 0.005, minRTDiff = 20)
+                                                                         MSPeakLists, minRTDiff = 20,
+                                                                         simMethod, removePrecursor = FALSE, mzWeight = 0,
+                                                                         intWeight = 1, absMzDev = 0.005,
+                                                                         relMinIntensity = 0.1)
 {
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertClass, . ~ fGroupsTPs + pred + MSPeakLists,
            c("featureGroupsScreeningSet", "TPPredictions", "MSPeakListsSet"),
            null.ok = c(TRUE, FALSE, FALSE), fixed = list(add = ac))
-    aapply(checkmate::assertNumber, . ~ mzWindow + minRTDiff,
+    aapply(checkmate::assertNumber, . ~ minRTDiff + mzWeight + intWeight + absMzDev + relMinIntensity,
            lower = 0, finite = TRUE, fixed = list(add = ac))
+    checkmate::assertChoice(simMethod, c("cosine", "jaccard"), add = ac)
+    checkmate::assertFlag(removePrecursor, add = ac)
     checkmate::reportAssertions(ac)
     
-    ret <- doGenComponentsTPs(fGroups, fGroupsTPs, pred, MSPeakLists, mzWindow, minRTDiff)
+    ret <- doGenComponentsTPs(fGroups, fGroupsTPs, pred, MSPeakLists, absMzDev, minRTDiff)
     
     # mark set presence
     gNamesTPsSets <- sapply(setObjects(fGroupsTPs), names, simplify = FALSE)

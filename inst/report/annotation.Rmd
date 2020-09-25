@@ -65,8 +65,9 @@ if (isSusp)
 {
     fGroupsSpecDT <- as.data.table(rmdVars$fGroups, collapseSuspects = NULL)
     setnames(fGroupsSpecDT, "name", "suspect")
-    fGroupsSpecDT[, c("d_rt", "d_mz", "annotatedMSMSSimilarity") :=
-                      .(round(d_rt, 2), round(d_mz, 5), round(annotatedMSMSSimilarity, 2))]
+    fGroupsSpecDT[, c("d_rt", "d_mz") := .(round(d_rt, 2), round(d_mz, 5))]
+    if (!is.null(fGroupsSpecDT[["annotatedMSMSSimilarity"]]))
+        fGroupsSpecDT[, annotatedMSMSSimilarity := round(annotatedMSMSSimilarity, 2)]
 } else
     fGroupsSpecDT <- as.data.table(rmdVars$fGroups)
 

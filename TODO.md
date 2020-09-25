@@ -227,7 +227,7 @@
         - fetch PC/TP gNames from resulting table and subsetting
         - pros: easier to implement, more flexibility as classification is done by user with subsetting
         - cons: only one category per time, perhaps less generic way if other classification methods are done with components
-    - for go with as.data.table()...
+    - for now go with as.data.table()...
     - as.data.table() fGroupsScreening: can't combine normalizing and FC at the moment --> notify user
     - as.data.table/plotVolcano: docs and assertions; mention Bas
     - plotVolcano(): move legend outside graph
@@ -239,8 +239,9 @@
     - plotting? could extend plotSpec() by allowing selection of two spectra and using sets code for mirroring
     - update MSPeakLists method and/or export new functions?
     - auto select pearson/spearman?
-    - remove OrgMassSpecR dependency
+    - remove OrgMassSpecR and proxy dependency
     - consistent naming: spec vs peaklist
+    - show method for new components classes
 - Include BT in installation script and verifyDependencies()
 
 

@@ -59,6 +59,8 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, pred, MSPeakLists, mzWindow,
             # dummy intensity value so e.g. plotSpec works            
             ret[, intensity := 1]
             
+            ret[, c("ret", "mz") := gInfoTPs[group, c("rts", "mzs")]]
+            
             if (minRTDiff > 0)
             {
                 rtDiffs <- gInfoTPs[ret$group, "rts"] - gInfoPrec[precFG, "rts"]

@@ -52,6 +52,7 @@
     - optionally report with collapsed suspects
 - check for empty names in assertion/preparation functions
 - prepareSuspectList(): export? and always calculate neutralMass?
+- fix: reporting non-annotated suspects (port from TP branch)
 
 
 ## docs

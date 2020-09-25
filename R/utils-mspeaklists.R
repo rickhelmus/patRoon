@@ -372,7 +372,7 @@ specSimilarity <- function(pl1, pl2, method, shift = "none", precDiff = 0, remov
         filterPL <- function(pl)
         {
             minInt <- relMinIntensity * max(pl$intensity)
-            return(pl1[intensity >= minInt])
+            return(pl[intensity >= minInt])
         }
         pl1 <- filterPL(pl1); pl2 <- filterPL(pl2)
     }

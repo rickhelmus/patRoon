@@ -360,9 +360,9 @@ double doCalcSpecSimularity(Spectrum sp1, Spectrum sp2, const std::string &metho
         std::vector<double> u, v;
         for (size_t i=0; i<binnedSpec.mzs.size(); ++i)
         {
-            const double m = pow(binnedSpec.mzs[i], mzWeight);
-            u.push_back(m * pow(binnedSpec.intsLeft[i], intWeight));
-            v.push_back(m * pow(binnedSpec.intsRight[i], intWeight));
+            const double m = std::pow(binnedSpec.mzs[i], mzWeight);
+            u.push_back(m * std::pow(binnedSpec.intsLeft[i], intWeight));
+            v.push_back(m * std::pow(binnedSpec.intsRight[i], intWeight));
         }
         
         const double dp = std::inner_product(u.begin(), u.end(), v.begin(), 0.0);
@@ -373,7 +373,7 @@ double doCalcSpecSimularity(Spectrum sp1, Spectrum sp2, const std::string &metho
             divu += (u[i] * u[i]);
             divv += (v[i] * v[i]);
         }
-        const double div = sqrt(divu) * sqrt(divv);
+        const double div = std::sqrt(divu) * std::sqrt(divv);
         
         return dp / div;
     }

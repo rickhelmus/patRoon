@@ -7,12 +7,21 @@ componentsSpecClust <- setClass("componentsSpecClust", contains = "componentsClu
 
 #' @export
 setMethod("generateComponentsSpecClust", "featureGroups", function(fGroups, MSPeakLists, method = "complete",
-                                                                   maxTreeHeight = 1, deepSplit = TRUE,
+                                                                   simMethod, shift = "none", removePrecursor = FALSE,
+                                                                   mzWeight = 0, intWeight = 1, absMzDev = 0.005,
+                                                                   relMinIntensity = 0.1, maxTreeHeight = 1, deepSplit = TRUE,
                                                                    minModuleSize = 1)
 {
+    # UNDONE: document that relative intensity filter is applied after removing precursors
+    
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
     checkmate::assertString(method, add = ac)
+    checkmate::assertChoice(simMethod, c("cosine", "jaccard"), add = ac)
+    checkmate::assertChoice(shift, c("none", "precursor", "both"), add = ac)
+    checkmate::assertFlag(removePrecursor, add = ac)
+    aapply(checkmate::assertNumber, . ~ mzWeight + intWeight + absMzDev + relMinIntensity,
+           finite = TRUE, fixed = list(add = ac))
     assertDynamicTreeCutArgs(maxTreeHeight, deepSplit, minModuleSize, ac)
     checkmate::reportAssertions(ac)
     
@@ -21,25 +30,44 @@ setMethod("generateComponentsSpecClust", "featureGroups", function(fGroups, MSPe
                                    properties = list(), maxTreeHeight = maxTreeHeight, deepSplit = deepSplit,
                                    minModuleSize = minModuleSize, algorithm = "specclust"))
 
-    cat("Calculating distance matrix... ")
-    
     MSPeakLists <- MSPeakLists[, intersect(groupNames(MSPeakLists), groupNames(fGroups))]
     allMSMS <- pruneList(sapply(averagedPeakLists(MSPeakLists), "[[", "MSMS", simplify = FALSE))
+    
+    if (removePrecursor || relMinIntensity > 0)
+    {
+        allMSMS <- lapply(allMSMS, function(pl)
+        {
+            if (removePrecursor)
+                pl <- pl[precursor == FALSE]
+            if (relMinIntensity > 0)
+            {
+                thr <- relMinIntensity * max(pl$intensity)
+                pl <- pl[intensity >= thr]
+            }
+            return(pl)
+        })
+    }
+    
+    cat("Calculating distance matrix... ")
     
     if (F)
     {
         # UNDONE: parameters for spec similarity
-        distm <- 1 - proxy::simil(allMSMS, method = function(x, y) specSimilarityR(x, y, "cosine"))
+        distm <- 1 - proxy::simil(allMSMS, method = function(x, y) specSimilarityR(x, y, simMethod, shift, FALSE, mzWeight,
+                                                                                   intWeight, absMzDev, 0))
         class(distm) <- "dist" # has both simul and dist, which confuses S4 validity checks
     }
     else
-        distm <- 1 - as.dist(specDistMatrix(allMSMS, "cosine", "none", 0, 1, 0.002))
+        distm <- 1 - as.dist(specDistMatrix(allMSMS, simMethod, shift, mzWeight, intWeight, absMzDev))
     cat("Done!\n")
     
     gInfo <- groupInfo(fGroups)[names(allMSMS), ] # make sure to subset!
     
-    # UNDONE: properties: spec similarity properties
-    return(componentsSpecClust(distm = distm, method = method, gInfo = gInfo, properties = list(),
+    return(componentsSpecClust(distm = distm, method = method, gInfo = gInfo,
+                               properties = list(simMethod = simMethod, shift = shift,
+                                                 removePrecursor = removePrecursor,
+                                                 mzWeight = mzWeight, intWeight = intWeight,
+                                                 absMzDev = absMzDev),
                                maxTreeHeight = maxTreeHeight, deepSplit = deepSplit,
                                minModuleSize = minModuleSize, algorithm = "specclust"))
 })

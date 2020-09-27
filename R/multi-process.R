@@ -159,6 +159,155 @@ defMultiProcErrorHandler <- function(cmd, exitStatus, ...)
                  cmd$command, paste0(cmd$args, collapse = " "), exitStatus))
 }
 
+doProcFuture <- function(commandQueue, finishHandler, timeoutHandler, errorHandler,
+                         procTimeout, printOutput, printError, waitTimeout, delayBetweenProc)
+{
+    # UNDONE: printOutput/printError not here?
+    
+    {
+        withr::local_tempfile("sucDir")
+        dir.create(sucDir)
+        
+        lastCommandTime <- 0 # at which time (in ms) the last command was started
+        ret <- vector("list", length(commandQueue))
+
+        # UNDONE: or just always wait here? since lastCommandTime is only available in this future
+        # if (delayBetweenProc > 0)
+        # {
+        #     diffTime <- curTimeMS() - lastCommandTime
+        #     if (diffTime < delayBetweenProc)
+        #         Sys.sleep((delayBetweenProc - diffTime) / 1000)
+        # }
+            
+        ncmd <- length(commandQueue)
+        procInfo <- patRoon:::initCommand(commandQueue, seq_along(commandQueue), sucDir, printOutput, printError)
+        proc <- do.call(processx::process$new, procInfo$procArgs)
+        # lastCommandTime <- curTimeMS()
+        
+        while (TRUE)
+        {
+            if (!is.null(proc) && !proc$is_alive() && procInfo$running)
+            {
+                # NOTE: as per docs get_exit_status() might return NA, in this
+                # case check if a command failed (by checking for missing
+                # success marker files)
+                # UNDONE: when batchSize=1 we don't create/check success
+                # markers. Fix this? So far never had NA exit statuses in that
+                # situation.
+                exitStatus <- proc$get_exit_status()
+                
+                if (is.na(exitStatus) || exitStatus != 0) # something (may have) failed?
+                {
+                    maybe <- maybeRestartCommand(commandQueue, procInfo, sucDir, exitStatus,
+                                                 timeoutHandler, errorHandler)
+                    procInfo <- maybe$procInfo # might have been updated
+                    
+                    if (maybe$restart)
+                        proc <- do.call(processx::process$new, procInfo$procArgs)
+                    else
+                        break
+                }
+                else
+                    break
+            }
+            else if (!is.null(procTimeout))
+            {
+                # check for timeouts
+                kill <- FALSE
+                
+                if (length(commandQueue) > 1)
+                {
+                    # for batch execution: update start time if a new command was started
+                    for (i in seq_along(commandQueue))
+                    {
+                        if (procInfo$failed[i] || procInfo$finished[i])
+                            next
+                        
+                        if (file.exists(file.path(sucDir, i)))
+                        {
+                            procInfo$finished[i] <- TRUE # now finished
+                            procInfo$startTime <- Sys.time()
+                        }
+                        else if (difftime(Sys.time(), procInfo$startTime, units = "secs")[[1]] > procTimeout)
+                            procInfo$timedOut[i] <- kill <- TRUE
+                        
+                        break
+                    }
+                }
+                else
+                    procInfo$timedOut[1] <- kill <- difftime(Sys.time(), procInfo$startTime, units = "secs") > procTimeout
+                
+                if (kill)
+                {
+                    proc$kill()
+                    proc$wait()
+                }
+            }
+            else
+                proc$wait(waitTimeout)
+        }
+        
+        inds <- which(!procInfo$failed)
+        if (length(inds) > 0)
+            ret[inds] <- lapply(inds, function(ci) finishHandler(cmd = commandQueue[[ci]]))
+        
+        ret
+    }
+}
+
+createProcFuture <- function(expr, globals)
+{
+    expr <- createProcFutureExpr(commandQueue, finishHandler, timeoutHandler, errorHandler,
+                                 procTimeout, printOutput, printError, waitTimeout, delayBetweenProc)
+    future::future(eval(expr), globals = globals)
+}
+
+executeMultiProcessF <- function(commandQueue, finishHandler,
+                                 timeoutHandler = function(...) TRUE,
+                                 errorHandler = defMultiProcErrorHandler,
+                                 prepareHandler = NULL,
+                                 procTimeout = NULL, printOutput = FALSE, printError = FALSE,
+                                 showProgress = TRUE, waitTimeout = 50,
+                                 maxProcAmount = getOption("patRoon.maxProcAmount"),
+                                 batchSize = 1, delayBetweenProc = 0)
+{
+    if (FALSE)
+    {
+        expr <- quote(patRoon:::doProcFuture(commandQueue, finishHandler, timeoutHandler, errorHandler,
+                                             procTimeout, printOutput, printError, waitTimeout, delayBetweenProc))
+        
+        globals <- future::getGlobalsAndPackages(expr)$globals
+        futures <- lapply(commandQueue, function(cmd)
+        {
+            g <- modifyList(globals, list(commandQueue = list(cmd)))
+            future::future({ patRoon:::doProcFuture(list(cmd), finishHandler, timeoutHandler, errorHandler,
+                                                    procTimeout, printOutput, printError, waitTimeout, delayBetweenProc) }, globals = g)
+        })
+        # future::resolve(futures, result = TRUE)
+        return(unlist(future::values(futures), recursive = FALSE))
+    }
+    else
+    {
+        # executeMultiProcessNP(commandQueue = commandQueue,
+        #                       finishHandler = finishHandler, timeoutHandler = timeoutHandler,
+        #                       errorHandler = errorHandler, prepareHandler = prepareHandler, procTimeout = procTimeout,
+        #                       printOutput = printOutput, printError = printError, showProgress = showProgress,
+        #                       waitTimeout = waitTimeout, maxProcAmount = maxProcAmount, batchSize = batchSize,
+        #                       delayBetweenProc = delayBetweenProc)
+        
+        n <- 2 # UNDONE
+        chunks <- split(commandQueue, cut(seq_along(commandQueue), n, labels = FALSE))
+        ret <- future.apply::future_lapply(chunks,
+                                           function(ch) executeMultiProcess(commandQueue = ch,
+                                                                            finishHandler = finishHandler, timeoutHandler = timeoutHandler,
+                                                                            errorHandler = errorHandler, prepareHandler = prepareHandler, procTimeout = procTimeout,
+                                                                            printOutput = printOutput, printError = printError, showProgress = showProgress,
+                                                                            waitTimeout = waitTimeout, maxProcAmount = maxProcAmount, batchSize = batchSize,
+                                                                            delayBetweenProc = delayBetweenProc))
+        return(unlist(unname(ret), recursive = FALSE))
+    }
+}
+
 #' Simultaneous execution of system commands.
 #'
 #' Execute a queue of system commands in parallel.
@@ -220,6 +369,7 @@ defMultiProcErrorHandler <- function(cmd, exitStatus, ...)
 executeMultiProcess <- function(commandQueue, finishHandler,
                                 timeoutHandler = function(...) TRUE,
                                 errorHandler = defMultiProcErrorHandler,
+                                prepareHandler = NULL,
                                 procTimeout = NULL, printOutput = FALSE, printError = FALSE,
                                 showProgress = TRUE, waitTimeout = 50,
                                 maxProcAmount = getOption("patRoon.maxProcAmount"),
@@ -284,6 +434,9 @@ executeMultiProcess <- function(commandQueue, finishHandler,
     
     # reading process output might fail sometimes(?)
     emptyStrOnErr <- function(expr) tryCatch(expr, error = function(e) "")
+    
+    if (!is.null(prepareHandler))
+        commandQueue <- prepareHandler(commandQueue)
 
     while (nextCommand <= totCmdCount || any(sapply(runningProcInfo, function(rp) !is.null(rp) && rp$running)))
     {

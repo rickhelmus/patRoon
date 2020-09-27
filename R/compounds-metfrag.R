@@ -551,7 +551,7 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
         mfSettings <- modifyList(mfSettings, extraOpts)
     }
 
-    cacheDB <- openCacheDBScope()
+    cacheDB <- NULL #openCacheDBScope() UNDONE! see https://github.com/HenrikBengtsson/globals/issues/66
     setHash <- makeHash(fGroups, pLists, method, mfSettings, topMost, identifiers)
     cachedSet <- loadCacheSet("compoundsMetFrag", setHash, cacheDB)
     resultHashes <- vector("character", length(gNames))
@@ -579,23 +579,7 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
     {
         if (method == "CL")
         {
-            if (!is.null(logPath))
-                mkdirp(logPath)
-            mfBin <- path.expand(getOption("patRoon.path.MetFragCL"))
-            if (is.null(mfBin) || !nzchar(mfBin) || !file.exists(mfBin))
-                stop("Please set the 'MetFragCL' option with a (correct) path to the MetFrag CL jar file. Example: options(patRoon.path.MetFragCL = \"C:/MetFrag2.4.5-CL.jar\")")
-
-            if (!nzchar(Sys.which("java")))
-                stop("Please make sure that java is installed and its location is correctly set in PATH.")
-
-            cmdQueue <- lapply(runData, function(rd)
-            {
-                logf <- if (!is.null(logPath)) file.path(logPath, paste0("mfcl-", rd$gName, ".txt")) else NULL
-                return(c(rd[c("hash", "gName", "spec")],
-                         initMetFragCLCommand(rd$mfSettings, rd$spec, mfBin, logf)))
-            })
-
-            results <- executeMultiProcess(cmdQueue, finishHandler = function(cmd)
+            results <- executeMultiProcessF(runData, finishHandler = function(cmd)
             {
                 comptab <- fread(cmd$outFile, colClasses = c(Identifier = "character"))
                 procres <- processMFResults(comptab, cmd$spec, adduct, database, topMost, cmd$stderrFile)
@@ -629,6 +613,22 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
                 # some other error (e.g. java not present)
                 stop(sprintf("Fatal: Failed to execute MetFragCL for %s - exit code: %d - Log: %s",
                              cmd$gName, exitStatus, cmd$logFile))
+            }, prepareHandler = function(cmdQueue)
+            {
+                if (!is.null(logPath))
+                    mkdirp(logPath)
+                mfBin <- path.expand(getOption("patRoon.path.MetFragCL"))
+                if (is.null(mfBin) || !nzchar(mfBin) || !file.exists(mfBin))
+                    stop("Please set the 'MetFragCL' option with a (correct) path to the MetFrag CL jar file. Example: options(patRoon.path.MetFragCL = \"C:/MetFrag2.4.5-CL.jar\")")
+                
+                if (!nzchar(Sys.which("java")))
+                    stop("Please make sure that java is installed and its location is correctly set in PATH.")
+                
+                return(lapply(cmdQueue, function(cmd)
+                {
+                    logf <- if (!is.null(logPath)) file.path(logPath, paste0("mfcl-", cmd$gName, ".txt")) else NULL
+                    return(c(cmd, initMetFragCLCommand(cmd$mfSettings, cmd$spec, mfBin, logf)))
+                }))
             }, maxProcAmount = maxProcAmount, procTimeout = timeout, delayBetweenProc = 1000)
         }
         else

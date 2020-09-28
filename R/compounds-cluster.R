@@ -317,7 +317,7 @@ setMethod("makeHCluster", "compounds", function(obj, method, fpType = "extended"
                                                 minModuleSize = 1)
 {
     ac <- checkmate::makeAssertCollection()
-    aapply(checkmate::assertString, . ~ method + fpType, min.chars = 1, fixed = list(add = ac))
+    aapply(checkmate::assertString, . ~ method + fpType + fpSimMethod, min.chars = 1, fixed = list(add = ac))
     checkmate::assertNumber(maxTreeHeight, 0, finite = TRUE, add = ac)
     checkmate::assertFlag(deepSplit, add = ac)
     checkmate::assertCount(minModuleSize, positive = TRUE, add = ac)

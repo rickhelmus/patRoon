@@ -265,9 +265,9 @@ setMethod("convertToMFDB", "TPPredictionsBT", function(pred, out, includePrec)
     fwrite(predAll[, keepCols, with = FALSE], out)
 })
 
-setMethod("linkPrecursorsToFGroups", "TPPredictionsBT", function(pred, fGroupsScr)
+setMethod("linkPrecursorsToFGroups", "TPPredictionsBT", function(pred, fGroups)
 {
-    return(screenInfo(fGroupsScr)[name %in% names(pred), c("name", "group"), with = FALSE])
+    return(screenInfo(fGroups)[name %in% names(pred), c("name", "group"), with = FALSE])
 })
 
 #' @export

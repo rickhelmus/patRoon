@@ -115,7 +115,9 @@ setGeneric("suspects", function(pred) standardGeneric("suspects"))
 setGeneric("predictions", function(pred) standardGeneric("predictions"))
 setGeneric("convertToMFDB", function(pred, out, includePrec = TRUE) standardGeneric("convertToMFDB"))
 setGeneric("convertToSuspects", function(pred, includePrec = TRUE) standardGeneric("convertToSuspects"))
-setGeneric("linkPrecursorsToFGroups", function(pred, fGroupsScr) standardGeneric("linkPrecursorsToFGroups"))
+setGeneric("needsScreening", function(pred) standardGeneric("needsScreening"))
+setGeneric("linkPrecursorsToFGroups", function(pred, fGroups) standardGeneric("linkPrecursorsToFGroups"))
+setGeneric("linkTPsToFGroups", function(pred, fGroups) standardGeneric("linkTPsToFGroups"))
 
 ### suspect screening
 

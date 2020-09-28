@@ -25,8 +25,8 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, pred, MSPeakLists, minRTDiff
     #       - filter TPs (retention, intensity, ...)
     
     precFGMapping <- linkPrecursorsToFGroups(pred, fGroups)
+    TPFGMapping <- linkTPsToFGroups(pred, fGroupsTPs)
     gInfoPrec <- groupInfo(fGroups); gInfoTPs <- groupInfo(fGroupsTPs)
-    screeningTPs <- screenInfo(fGroupsTPs)
     
     cat("Linking precursors and TPs ...\n")
     precCount <- length(names(pred))
@@ -35,13 +35,10 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, pred, MSPeakLists, minRTDiff
     compTab <- rbindlist(mapply(names(pred), predictions(pred), seq_len(precCount), FUN = function(pname, preds, i)
     {
         precFGs <- precFGMapping[name == pname][["group"]]
-        scrTP <- screeningTPs[name %in% preds$name]
+        TPs <- TPFGMapping[TP_name %in% preds$name]
         
-        if (length(precFGs) == 0 || nrow(scrTP) == 0)
+        if (length(precFGs) == 0 || nrow(TPs) == 0)
             return(NULL)
-        
-        scrTP <- scrTP[, c("group", "name"), with = FALSE]
-        setnames(scrTP, "name", "TP_name")
         
         # limit columns a bit to not bloat components too much
         # UNDONE: column selection OK?
@@ -52,7 +49,7 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, pred, MSPeakLists, minRTDiff
         {
             # UNDONE: do more checks etc
             
-            ret <- merge(scrTP, preds, by.x = "TP_name", by.y = "name")
+            ret <- merge(TPs, preds, by.x = "TP_name", by.y = "name")
             
             # merge rows with duplicate fGroups, for instance, caused by different TPs with equal mass
             ret[, TP_name := paste0(TP_name, collapse = ","), by = "group"]
@@ -165,7 +162,7 @@ setMethod("as.data.table", "componentsTPs", function(x)
 setMethod("plotGraph", "componentsTPs", function(obj, onlyLinked)
 {
     checkmate::assertFlag(onlyLinked)
-    
+
     cInfo <- componentInfo(obj)
     cTable <- componentTable(obj)
     
@@ -177,46 +174,52 @@ setMethod("plotGraph", "componentsTPs", function(obj, onlyLinked)
 })
 
 #' @export
-setMethod("generateComponentsTPs", "featureGroupsScreening", function(fGroups, fGroupsTPs = fGroups, pred,
-                                                                      MSPeakLists, minRTDiff = 20, simMethod,
-                                                                      removePrecursor = FALSE, mzWeight = 0,
-                                                                      intWeight = 1, absMzDev = 0.005,
-                                                                      relMinIntensity = 0.1)
+setMethod("generateComponentsTPs", "featureGroups", function(fGroups, fGroupsTPs = fGroups, pred,
+                                                             MSPeakLists, minRTDiff = 20, simMethod,
+                                                             removePrecursor = FALSE, mzWeight = 0,
+                                                             intWeight = 1, absMzDev = 0.005,
+                                                             relMinIntensity = 0.1)
 {
     # UNDONE: optionally remove TPs with equal formula as parent (how likely are these?)
     # UNDONE: optional MSPeakLists? and MSPeakListsTPs?
-    
+    # UNDONE: doc when fGroups/fGroupsTPs needs to be fGroupsScreening
     
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertClass, . ~ fGroupsTPs + pred + MSPeakLists,
-           c("featureGroupsScreening", "TPPredictions", "MSPeakLists"),
-           null.ok = c(TRUE, FALSE, FALSE), fixed = list(add = ac))
+           c("featureGroups", "TPPredictions", "MSPeakLists"), fixed = list(add = ac))
     aapply(checkmate::assertNumber, . ~ minRTDiff + mzWeight + intWeight + absMzDev + relMinIntensity,
            lower = 0, finite = TRUE, fixed = list(add = ac))
     checkmate::assertChoice(simMethod, c("cosine", "jaccard"), add = ac)
     checkmate::assertFlag(removePrecursor, add = ac)
     checkmate::reportAssertions(ac)
+    
+    if (needsScreening(pred) &&
+        (!inherits(fGroups, "featureGroupsScreening") || !inherits(fGroupsTPs, "featureGroupsScreening")))
+        stop("Input feature groups need to be screened for (TP) suspects!")
 
     return(doGenComponentsTPs(fGroups, fGroupsTPs, pred, MSPeakLists, minRTDiff, simMethod, removePrecursor,
                               mzWeight, intWeight, absMzDev, relMinIntensity))
 })
 
 #' @export
-setMethod("generateComponentsTPs", "featureGroupsScreeningSet", function(fGroups, fGroupsTPs = fGroups, pred,
-                                                                         MSPeakLists, minRTDiff = 20,
-                                                                         simMethod, removePrecursor = FALSE, mzWeight = 0,
-                                                                         intWeight = 1, absMzDev = 0.005,
-                                                                         relMinIntensity = 0.1)
+setMethod("generateComponentsTPs", "featureGroupsSet", function(fGroups, fGroupsTPs = fGroups, pred,
+                                                                MSPeakLists, minRTDiff = 20,
+                                                                simMethod, removePrecursor = FALSE, mzWeight = 0,
+                                                                intWeight = 1, absMzDev = 0.005,
+                                                                relMinIntensity = 0.1)
 {
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertClass, . ~ fGroupsTPs + pred + MSPeakLists,
-           c("featureGroupsScreeningSet", "TPPredictions", "MSPeakListsSet"),
-           null.ok = c(TRUE, FALSE, FALSE), fixed = list(add = ac))
+           c("featureGroupsSet", "TPPredictions", "MSPeakListsSet"), fixed = list(add = ac))
     aapply(checkmate::assertNumber, . ~ minRTDiff + mzWeight + intWeight + absMzDev + relMinIntensity,
            lower = 0, finite = TRUE, fixed = list(add = ac))
     checkmate::assertChoice(simMethod, c("cosine", "jaccard"), add = ac)
     checkmate::assertFlag(removePrecursor, add = ac)
     checkmate::reportAssertions(ac)
+
+    if (needsScreening(pred) &&
+        !inherits(fGroups, "featureGroupsScreeningSet") || !inherits(fGroupsTPs, "featureGroupsScreeningSet"))
+        stop("Input feature groups need to be screened for (TP) suspects!")
     
     ret <- doGenComponentsTPs(fGroups, fGroupsTPs, pred, MSPeakLists, absMzDev, minRTDiff)
     

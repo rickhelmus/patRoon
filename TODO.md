@@ -244,6 +244,9 @@
     - consistent naming: spec vs peaklist
     - show method for new components classes
 - Include BT in installation script and verifyDependencies()
+- Naming
+    - More generic naming for predict etc to accommodate other sources for TPs
+    - consistentency for precursor/parent/suspect
 
 
 ## features
@@ -338,6 +341,7 @@
 
 ## reporting
 - add more options to reportPlots argument of reportHTML()?
+- onlyAnnotated argument
 
 
 ## Cleanup

@@ -115,3 +115,13 @@ setMethod("convertToSuspects", "TPPredictions", function(pred, includePrec)
     
     return(predAll)
 })
+
+setMethod("needsScreening", "TPPredictions", function(pred) TRUE)
+
+setMethod("linkTPsToFGroups", "TPPredictions", function(pred, fGroups)
+{
+    TPNames <- as.data.table(pred)$name
+    ret <- screenInfo(fGroups)[name %in% TPNames, c("group", "name"), with = FALSE]
+    setnames(ret, "name", "TP_name")
+    return(ret)
+})

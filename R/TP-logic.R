@@ -1,5 +1,6 @@
 #' @include main.R
 #' @include TP.R
+#' @include feature_groups-screening-set.R
 NULL
 
 # UNDONE: precursor --> parent?
@@ -36,6 +37,39 @@ getTPLogicTransformations <- function()
     return(ret[])
 }
 
+doPredictTPsLogic <- function(fGroups, minMass, adduct)
+{
+    if (!is.null(adduct))
+        adductMZ <- adductMZDelta(adduct)
+    
+    gInfo <- groupInfo(fGroups)
+    neutralMasses <- if (!is.null(adduct)) gInfo$mzs - adductMZ else gInfo$mzs
+    suspects <- data.table(name = rownames(gInfo), rt = gInfo$rts, neutralMass = neutralMasses)
+    transformations <- getTPLogicTransformations()
+    
+    prog <- openProgBar(0, nrow(suspects))
+    
+    predictions <- lapply(seq_len(nrow(suspects)), function(si)
+    {
+        ret <- data.table(name = paste0(suspects$name[si], "-",
+                                        transformations$reaction),
+                          neutralMass = neutralMasses[si] + transformations$deltaMZ,
+                          RTDir = transformations$RTDir)
+        ret <- ret[neutralMass >= minMass]
+        
+        # UNDONE: more checks (e.g. formulas)
+        
+        setTxtProgressBar(prog, si)
+        
+        return(ret)
+    })
+    
+    setTxtProgressBar(prog, nrow(suspects))
+    close(prog)
+    
+    return(list(suspects = suspects, predictions = predictions))
+}
+
 #' @export
 TPPredictionsLogic <- setClass("TPPredictionsLogic", contains = "TPPredictions")
 
@@ -49,43 +83,27 @@ setMethod("linkPrecursorsToFGroups", "TPPredictionsLogic", function(pred, fGroup
 })
 
 #' @export
-predictTPsLogic <- function(fGroups, adduct, minMass = 40)
+setMethod("predictTPsLogic", "featureGroups", function(fGroups, minMass = 40, adduct)
 {
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertClass(fGroups, "featureGroups", add = ac)
     checkmate::assertNumber(minMass, finite = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
     adduct <- checkAndToAdduct(adduct)
-    adductMZ <- adductMZDelta(adduct)
     
-    gInfo <- groupInfo(fGroups)
-    suspects <- data.table(name = rownames(gInfo), rt = gInfo$rts, mz = gInfo$mzs)
-    transformations <- getTPLogicTransformations()
+    res <- doPredictTPsLogic(fGroups, minMass, adduct)
+    
+    return(TPPredictionsLogic(suspects = res$suspects, predictions = res$predictions))
+})
 
-    prog <- openProgBar(0, nrow(suspects))
+#' @export
+setMethod("predictTPsLogic", "featureGroupsSet", function(fGroups, minMass = 40)
+{
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertNumber(minMass, finite = TRUE, add = ac)
+    checkmate::reportAssertions(ac)
     
-    predictions <- lapply(seq_len(nrow(suspects)), function(si)
-    {
-        mass <- suspects$mz[si] - adductMZ
-        
-        ret <- data.table(name = paste0(suspects$name[si], "-",
-                                              transformations$reaction),
-                          mass = mass + transformations$deltaMZ,
-                          mz = suspects$mz[si] + transformations$deltaMZ,
-                          RTDir = transformations$RTDir)
-        ret <- ret[mass >= minMass]
-        
-        # UNDONE: more checks (e.g. formulas)
-
-        setTxtProgressBar(prog, si)
-
-        return(ret)
-    })
+    res <- doPredictTPsLogic(fGroups, minMass, NULL)
     
-    setTxtProgressBar(prog, nrow(suspects))
-    close(prog)
-    
-    
-    return(TPPredictionsLogic(suspects = suspects, predictions = predictions))
-}
+    return(TPPredictionsLogic(suspects = res$suspects, predictions = res$predictions))
+})

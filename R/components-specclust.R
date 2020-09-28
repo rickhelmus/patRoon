@@ -35,17 +35,17 @@ setMethod("generateComponentsSpecClust", "featureGroups", function(fGroups, MSPe
     
     if (removePrecursor || relMinIntensity > 0)
     {
-        allMSMS <- lapply(allMSMS, function(pl)
+        allMSMS <- pruneList(lapply(allMSMS, function(pl)
         {
             if (removePrecursor)
                 pl <- pl[precursor == FALSE]
-            if (relMinIntensity > 0)
+            if (relMinIntensity > 0 && nrow(pl) > 0)
             {
                 thr <- relMinIntensity * max(pl$intensity)
                 pl <- pl[intensity >= thr]
             }
             return(pl)
-        })
+        }), checkZeroRows = TRUE)
     }
     
     gInfo <- groupInfo(fGroups)[names(allMSMS), ] # make sure to subset!

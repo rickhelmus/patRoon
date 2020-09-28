@@ -79,6 +79,7 @@
     - implement TASQ?
     - consensus?
     - support recursive screening? or throw error otherwise
+- fix empty MS(MS) peaklists if unavailable during merging sets
 
 
 ## features

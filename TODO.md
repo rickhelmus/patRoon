@@ -209,6 +209,7 @@
         - componentsMSMS --> predictTPsMSMS(fGroupsParent, fGroupsTP) --> TPPredictionsMSMS --> componentsTPs
     - componentsSpecClust
         - sets
+    - fix if empty cTab for MSMS components
 - subsetting/componentization based on log2fc
     - componentization approach
         - specify 'categories' (better name?): pairs of before/after rGroups
@@ -337,6 +338,8 @@
 - RC: check spearmans correlation
 - NT: minimum size argument, combine rows for multiple rGroups?
 - int: also use calculateComponentIntensities() for intensities?
+- plot doesnt work for componentsReduced that originates from cluster components
+    - maybe drop reduced mechanism?
 
 
 ## reporting

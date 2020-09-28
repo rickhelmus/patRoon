@@ -57,7 +57,7 @@ processBTResults <- function(cmd)
     # NOTE: cdk:Title seems the same as "Metabolite ID" column(?)
     ret[, c("Synonyms", "PUBCHEM_CID", "cdk:Title") := NULL]
 
-    # BUG: BT somestimes doesn't fill in the formula. Calculate them manually
+    # BUG: BT sometimes doesn't fill in the formula. Calculate them manually
     ret[!nzchar(formula), formula :=
     {
         SMI <- babelConvert(InChI, "inchi", "smi")
@@ -105,6 +105,7 @@ collapseBTResults <- function(pred)
 #' @export
 predictTPsBioTransformer <- function(suspects = NULL, compounds = NULL, type = "env", steps = 2,
                                      extraOpts = NULL, skipInvalid = TRUE,
+                                     fpType = "extended", fpSimMethod = "tanimoto",
                                      logPath = file.path("log", "biotransformer"),
                                      maxProcAmount = getOption("patRoon.maxProcAmount"))
 {
@@ -121,6 +122,7 @@ predictTPsBioTransformer <- function(suspects = NULL, compounds = NULL, type = "
     checkmate::assertChoice(type, c("ecbased", "cyp450", "phaseII", "hgut", "superbio", "allHuman", "env"), add = ac)
     checkmate::assertCount(steps, positive = TRUE, add = ac)
     checkmate::assertCharacter(extraOpts, null.ok = TRUE, add = ac)
+    aapply(checkmate::assertString, . ~ fpType + fpSimMethod, min.chars = 1, fixed = list(add = ac))
     assertMultiProcArgs(logPath, maxProcAmount, add = ac)
     checkmate::reportAssertions(ac)
 
@@ -193,6 +195,16 @@ predictTPsBioTransformer <- function(suspects = NULL, compounds = NULL, type = "
             return(res)
         }, workDir = btPath, maxProcAmount = maxProcAmount)
 
+        cat("Calculating compound similarities... ")
+        results <- lapply(results, function(res)
+        {
+            if (nrow(res) > 0)
+                res[, similarity := mapply(`Precursor SMILES`, SMILES, SIMPLIFY = TRUE, FUN = distSMILES,
+                                           MoreArgs = list(fpType = fpType, fpSimMethod = fpSimMethod))][]
+            return(res)
+        })
+        cat("Done!\n")
+        
         if (is.null(cachedSet))
             saveCacheSet("predictTPsBT", hashes, setHash, cacheDB)
     }

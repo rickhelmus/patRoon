@@ -42,7 +42,14 @@ getNeutralMassFromSMILES <- function(SMILES, mustWork = TRUE)
     forms <- convertToFormulaBabel(SMILES, "smi", mustWork = mustWork)
     return(sapply(forms, function(f) if (length(f) > 0) getFormulaMass(f) else NA_character_,
                   USE.NAMES = FALSE))
-}    
+}
+
+distSMILES <- function(SMI1, SMI2, fpType, fpSimMethod)
+{
+    mols <- getMoleculesFromSMILES(list(SMI1, SMI2), doTyping = TRUE, emptyIfFails = TRUE)
+    fps <- lapply(mols, rcdk::get.fingerprint, type = fpType)
+    return(fingerprint::distance(fps[[1]], fps[[2]], fpSimMethod))
+}
 
 babelConvert <- function(input, inFormat, outFormat, mustWork = TRUE, extraOpts = NULL)
 {

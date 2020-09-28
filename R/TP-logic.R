@@ -42,9 +42,9 @@ TPPredictionsLogic <- setClass("TPPredictionsLogic", contains = "TPPredictions")
 setMethod("initialize", "TPPredictionsLogic",
           function(.Object, ...) callNextMethod(.Object, algorithm = "logic", ...))
 
-setMethod("linkPrecursorsToFGroups", "TPPredictionsLogic", function(pred, fGroupsScr)
+setMethod("linkPrecursorsToFGroups", "TPPredictionsLogic", function(pred, fGroups)
 {
-    fg <- intersect(names(pred), names(fGroupsScr))
+    fg <- intersect(names(pred), names(fGroups))
     return(data.table(name = fg, group = fg))
 })
 

@@ -86,7 +86,7 @@ TPs.
 }}
 
 \section{S4 class hierarchy}{
- \itemize{   \item{\code{\link{workflowStep}}}   \itemize{     \item{\strong{\code{\link{TPPredictions}}}}     \itemize{       \item{\code{\link{TPPredictionsBT}}}       \item{\code{\link{TPPredictionsLogic}}}     }   } }
+ \itemize{   \item{\code{\link{workflowStep}}}   \itemize{     \item{\strong{\code{\link{TPPredictions}}}}     \itemize{       \item{\code{\link{TPPredictionsBT}}}       \item{\code{\link{TPPredictionsComponents}}}       \item{\code{\link{TPPredictionsLogic}}}     }   } }
 }
 
 \seealso{

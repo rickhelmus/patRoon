@@ -221,7 +221,8 @@ setMethod("generateComponentsTPs", "featureGroupsSet", function(fGroups, fGroups
         !inherits(fGroups, "featureGroupsScreeningSet") || !inherits(fGroupsTPs, "featureGroupsScreeningSet"))
         stop("Input feature groups need to be screened for (TP) suspects!")
     
-    ret <- doGenComponentsTPs(fGroups, fGroupsTPs, pred, MSPeakLists, absMzDev, minRTDiff)
+    ret <- doGenComponentsTPs(fGroups, fGroupsTPs, pred, MSPeakLists, minRTDiff, simMethod, removePrecursor,
+                              mzWeight, intWeight, absMzDev, relMinIntensity)
     
     # mark set presence
     gNamesTPsSets <- sapply(setObjects(fGroupsTPs), names, simplify = FALSE)

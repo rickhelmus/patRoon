@@ -283,12 +283,14 @@ setMethod("linkPrecursorsToFGroups", "TPPredictionsBT", function(pred, fGroups)
 })
 
 #' @export
-setMethod("filter", "TPPredictionsBT", function(obj, removeEqualFormulas = FALSE, negate = FALSE)
+setMethod("filter", "TPPredictionsBT", function(obj, removeEqualFormulas = FALSE, minSimilarity = NULL,
+                                                negate = FALSE)
 {
     # UNDONE: move to base class?
 
     ac <- checkmate::makeAssertCollection()
     checkmate::assertFlag(removeEqualFormulas, add = ac)
+    checkmate::assertNumber(minSimilarity, lower = 0, finite = TRUE, null.ok = TRUE, add = ac)
     checkmate::assertFlag(negate, add = ac)
     checkmate::reportAssertions(ac)
 
@@ -297,7 +299,7 @@ setMethod("filter", "TPPredictionsBT", function(obj, removeEqualFormulas = FALSE
 
     oldn <- length(obj)
 
-    hash <- makeHash(obj, removeEqualFormulas, negate)
+    hash <- makeHash(obj, removeEqualFormulas, minSimilarity, negate)
     cache <- loadCacheData("filterTPs", hash)
     if (!is.null(cache))
         obj <- cache
@@ -305,14 +307,18 @@ setMethod("filter", "TPPredictionsBT", function(obj, removeEqualFormulas = FALSE
     {
         if (removeEqualFormulas)
         {
-            mols <- getMoleculesFromSMILES(obj@suspects$SMILES, doTyping = TRUE, doIsotopes = TRUE)
-            pforms <- sapply(mols, function(m) rcdk::get.mol2formula(m)@string)
-            obj@predictions <- mapply(pforms, obj@predictions, SIMPLIFY = FALSE, FUN = function(pform, pred)
+            obj@predictions <- mapply(suspects(obj)$formula, obj@predictions, SIMPLIFY = FALSE, FUN = function(pform, pred)
             {
                 if (negate)
                     return(pred[formula == pform])
                 return(pred[formula != pform])
             })
+        }
+        
+        if (!is.null(minSimilarity))
+        {
+            pred <- if (negate) function(x) x < minSimilarity else function(x) numGTE(x, minSimilarity)
+            obj@predictions <- lapply(obj@predictions, function(p) p[pred(similarity)])
         }
 
         obj@predictions <- pruneList(obj@predictions, checkZeroRows = TRUE)

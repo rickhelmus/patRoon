@@ -20,6 +20,12 @@ MSFileExtensions <- function()
          mzML = "mzML")
 }
 
+MSFileFormatIsDir <- function(format, ext)
+{
+    # UNDONE: is agilent .d also a directory?
+    return((format == "bruker" && ext == "d") || (format == "waters" && ext == "raw"))
+}
+
 #' @details \code{MSFileFormats} returns a \code{character} with all supported
 #'   input formats (see below).
 #' @param vendor If \code{TRUE} only vendor formats are returned.
@@ -45,18 +51,32 @@ MSFileFormats <- function(algorithm = "pwiz", vendor = FALSE)
 
 filterMSFileDirs <- function(files, from)
 {
-    isDir <- file.info(files, extra_cols = FALSE)$isdir
-    if ("bruker" %in% from)
+    if (length(files) == 0)
+        return(files)
+    
+    allFromExts <- MSFileExtensions()[from]
+    keep <- sapply(files, function(file)
     {
-        isD <- grepl("(\\.d)$", files)
-        # filter out directories unless they end with .d
-        files <- files[isD | !isDir]
+        fExt <- tools::file_ext(file)
+        
+        fromExts <- pruneList(lapply(allFromExts, function(f) f[f %in% fExt]), checkEmptyElements = TRUE)
+        if (length(fromExts) == 0)
+            return(FALSE)
+        
+        fromCheck <- names(fromExts)
+        shouldBeDir <- mapply(fromCheck, fromExts, SIMPLIFY = TRUE,
+                              FUN = function(format, exts) sapply(exts, MSFileFormatIsDir, format = format))
+        
+        if (!allSame(shouldBeDir))
+            return(TRUE) # can be either
+        
+        isDir <- file.info(file, extra_cols = FALSE)$isdir
+        if (all(shouldBeDir))
+            return(isDir)
+        return(!isDir)
+    })
 
-        # filter out any non directory files that end with .d
-        files <- files[!isD | isDir]
-    }
-    else
-        files <- files[!isDir]
+    return(files[keep])    
 }
 
 listMSFiles <- function(dirs, from)
@@ -197,8 +217,8 @@ convertMSFilesBruker <- function(inFiles, outFiles, to, centroid)
 #' @param anaInfo An \link[=analysis-information]{analysis info table} used to
 #'   retrieve input files. Either this argument or \code{files} (or both) should
 #'   be set (\emph{i.e.} not \code{NULL}).
-#' @param from One or more input formats (see below). These are used to find
-#'   analyses when \code{dirs=TRUE} or \code{anaInfo} is set.
+#' @param from Input format (see below). These are used to find analyses when
+#'   \code{dirs=TRUE} or \code{anaInfo} is set.
 #' @param to Output format: \code{"mzXML"} or \code{"mzML"}.
 #' @param overWrite Should existing destination file be overwritten
 #'   (\code{TRUE}) or not (\code{FALSE})?
@@ -273,7 +293,7 @@ convertMSFilesBruker <- function(inFiles, outFiles, to, centroid)
 #' @rdname convertMSFiles
 #' @export
 convertMSFiles <- function(files = NULL, outPath = NULL, dirs = TRUE,
-                           anaInfo = NULL, from = MSFileFormats(algorithm, vendor = algorithm != "openms"), to = "mzML",
+                           anaInfo = NULL, from = NULL, to = "mzML",
                            overWrite = FALSE, algorithm = "pwiz",
                            centroid = algorithm != "openms",
                            filters = NULL, extraOpts = NULL, PWizBatchSize = 1,
@@ -306,19 +326,14 @@ convertMSFiles <- function(files = NULL, outPath = NULL, dirs = TRUE,
     {
         if (algorithm == "pwiz")
             from <- checkmate::matchArg(from, c("thermo", "bruker", "agilent", "ab", "waters", "mzXML", "mzML"),
-                                        several.ok = TRUE, add = ac)
+                                        several.ok = FALSE, add = ac)
         else if (algorithm == "openms")
-            from <- checkmate::matchArg(from, c("mzXML", "mzML"), several.ok = TRUE, add = ac)
+            from <- checkmate::matchArg(from, c("mzXML", "mzML"), several.ok = FALSE, add = ac)
         else # bruker
             from <- checkmate::matchArg(from, "bruker", add = ac)
 
-        ofrom <- from
-        from <- setdiff(from, to)
-        if (length(from) < length(ofrom))
-            warning(paste("Skipping input formats that are also specified as output: ",
-                          paste0(setdiff(ofrom, from), collapse = ", ")))
-        if (length(from) == 0)
-            stop("No (valid) input formats specified.")
+        if (from == to)
+            stop("Input and output formats are the same")
     }
 
     anaInfo <- assertAndPrepareAnaInfo(anaInfo, from, null.ok = !is.null(files), add = ac)
@@ -329,9 +344,8 @@ convertMSFiles <- function(files = NULL, outPath = NULL, dirs = TRUE,
         {
             dirs <- files[file.info(files, extra_cols = FALSE)$isdir]
 
-            # UNDONE: is agilent .d also a directory?
-            if ("bruker" %in% from)
-                dirs <- dirs[!grepl("(\\.d)$", files)] # filter out .d analyses "files" (are actually directories)
+            if (MSFileFormatIsDir(from))
+                dirs <- dirs[!grepl(sprintf("(\\.%s)$", MSFileExtensions()[[from]]), files)] # filter out analyses "files" (are actually directories)
 
             dirFiles <- listMSFiles(dirs, from)
             files <- union(dirFiles, setdiff(files, dirs))
@@ -342,8 +356,8 @@ convertMSFiles <- function(files = NULL, outPath = NULL, dirs = TRUE,
 
     if (!is.null(anaInfo))
     {
-        fExts <- unique(unlist(MSFileExtensions()[from]))
-        afiles <- unlist(Map(anaInfo$path, anaInfo$analysis, f = function(p, a) paste0(file.path(p, a), ".", fExts)))
+        ext <- MSFileExtensions()[[from]]
+        afiles <- unlist(Map(anaInfo$path, anaInfo$analysis, f = function(p, a) paste0(file.path(p, a), ".", ext)))
         afiles <- afiles[file.exists(afiles)]
         afiles <- filterMSFileDirs(afiles, from)
         files <- c(files, afiles)

@@ -17,13 +17,9 @@ getScriptCode <- function(input, analyses)
     else
         centroid <- FALSE
 
-    convFrom <- ""
-    if (nzchar(input$convAlgo))
-        convFrom <- if (length(input$convFrom) > 0) input$convFrom else MSFileFormats(input$convAlgo)
-
     # Can't set lists in template() call (bug?)
     preTreatOpts = list(convAlgo = input$convAlgo,
-                        convFrom = convFrom,
+                        convFrom = input$convFrom,
                         convTo = input$convTo, centroid = centroid,
                         DAMethod = input$DAMethod, doDACalib = input$doDACalib,
                         do = nzchar(input$convAlgo) || nzchar(input$DAMethod) || input$doDACalib)
@@ -214,15 +210,11 @@ getNewProjectUI <- function(destPath)
                             "input.convAlgo != \"\"",
                             fillRow(
                                 height = 90,
+                                selectInput("convFrom", "Input format", MSFileFormats(), multiple = FALSE,
+                                            width = "95%"),
                                 fillCol(
                                     flex = c(1, NA),
-                                    selectInput("convFrom", "Input format(s)", MSFileFormats(), multiple = TRUE,
-                                                width = "95%"),
-                                    textNote("Leave blank to select all supported formats")
-                                ),
-                                fillCol(
-                                    flex = c(1, NA),
-                                    selectInput("convTo", "Output format(s)", c("mzML", "mzXML"), multiple = TRUE,
+                                    selectInput("convTo", "Output format", "mzML", multiple = FALSE,
                                                 selected = "mzML", width = "100%"),
                                     textNote("enviPick/XCMS support mzXML, XCMS/OpenMS support mzML")
                                 )
@@ -518,7 +510,7 @@ newProject <- function(destPath = NULL)
                    )
             sel <- ""
             if (nzchar(input$convAlgo))
-                sel <- MSFileFormats(input$convAlgo, input$convAlgo != "openms")
+                sel <- MSFileFormats(input$convAlgo, input$convAlgo != "openms")[1]
 
             updateSelectInput(session, "convFrom", choices = from, selected = sel)
         })

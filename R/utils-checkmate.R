@@ -74,24 +74,22 @@ assertAnalysisInfo <- function(x, allowedFormats = NULL, null.ok = FALSE, .var.n
 
         exts <- unique(unlist(MSFileExtensions()[allowedFormats]))
 
-        existFiles <- rep(FALSE, length(x$analysis))
-        for (e in exts)
+        existFiles <- mapply(x$path, x$analysis, FUN = function(path, ana)
         {
-            for (i in seq_along(x$analysis))
+            for (f in allowedFormats)
             {
-                if (existFiles[i])
-                    next
-                p <- file.path(x$path[i], paste0(x$analysis[i], ".", e))
-                if (e == "d") # UNDONE: also OK for Agilent?
-                    existFiles[i] <- checkmate::testDirectoryExists(p)
-                else
-                    existFiles[i] <- checkmate::testFileExists(p)
+                exts <- MSFileExtensions()[[f]]
+                for (e in exts)
+                {
+                    p <- file.path(path, paste0(ana, ".", e))
+                    if (file.exists(p) && file.info(p, extra_cols = FALSE)$isdir == MSFileFormatIsDir(f, e))
+                        return(TRUE)
+                }
             }
-
-            if (all(existFiles))
-                break
-        }
-
+            message(sprintf("Analysis does not exist: %s (in %s)", ana, path))
+            return(FALSE)
+        })
+        
         if (any(!existFiles))
             checkmate::makeAssertion(x, sprintf("No analyses found with correct data format (valid: %s)",
                                                 paste0(allowedFormats, collapse = ", ")),

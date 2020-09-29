@@ -12,7 +12,7 @@ convertMSFiles(
   outPath = NULL,
   dirs = TRUE,
   anaInfo = NULL,
-  from = MSFileFormats(algorithm, vendor = algorithm != "openms"),
+  from = NULL,
   to = "mzML",
   overWrite = FALSE,
   algorithm = "pwiz",
@@ -45,8 +45,8 @@ directories will be kept the same as the input directories.}
 retrieve input files. Either this argument or \code{files} (or both) should
 be set (\emph{i.e.} not \code{NULL}).}
 
-\item{from}{One or more input formats (see below). These are used to find
-analyses when \code{dirs=TRUE} or \code{anaInfo} is set.}
+\item{from}{Input format (see below). These are used to find analyses when
+\code{dirs=TRUE} or \code{anaInfo} is set.}
 
 \item{to}{Output format: \code{"mzXML"} or \code{"mzML"}.}
 

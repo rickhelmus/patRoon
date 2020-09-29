@@ -1,6 +1,9 @@
 # patRoon 1.0.3
 * `componentsNT`: include algorithm data returned by `nontarget::homol.search` in `homol` slot (suggested by Vittorio Albergamo)
-* `convertMSFiles()`: prevent error when no input files are found (issue #14).
+* several `convertMSFiles()` fixes (issue #14)
+    * prevent error when no input files are found
+    * only allow one input/output format (didn't properly work before)
+    * recognize that Waters files are directories
 * minor fixes for subsetting XCMS `features` objects
 
 

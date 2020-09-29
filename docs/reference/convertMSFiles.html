@@ -172,7 +172,7 @@
   <span class='kw'>outPath</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>dirs</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>anaInfo</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>from</span> <span class='kw'>=</span> <span class='fu'>MSFileFormats</span>(<span class='no'>algorithm</span>, <span class='kw'>vendor</span> <span class='kw'>=</span> <span class='no'>algorithm</span> <span class='kw'>!=</span> <span class='st'>"openms"</span>),
+  <span class='kw'>from</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>to</span> <span class='kw'>=</span> <span class='st'>"mzML"</span>,
   <span class='kw'>overWrite</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>algorithm</span> <span class='kw'>=</span> <span class='st'>"pwiz"</span>,
@@ -219,8 +219,8 @@ be set (<em>i.e.</em> not <code>NULL</code>).</p></td>
     </tr>
     <tr>
       <th>from</th>
-      <td><p>One or more input formats (see below). These are used to find
-analyses when <code>dirs=TRUE</code> or <code>anaInfo</code> is set.</p></td>
+      <td><p>Input format (see below). These are used to find analyses when
+<code>dirs=TRUE</code> or <code>anaInfo</code> is set.</p></td>
     </tr>
     <tr>
       <th>to</th>

@@ -165,9 +165,15 @@
 <ul>
 <li>
 <code>componentsNT</code>: include algorithm data returned by <code><a href="https://rdrr.io/pkg/nontarget/man/homol.search.html">nontarget::homol.search</a></code> in <code>homol</code> slot (suggested by Vittorio Albergamo)</li>
-<li>
-<code><a href="../reference/convertMSFiles.html">convertMSFiles()</a></code>: prevent error when no input files are found (issue <a href='https://github.com/rickhelmus/patRoon/issues/14'>#14</a>).</li>
+<li>several <code><a href="../reference/convertMSFiles.html">convertMSFiles()</a></code> fixes (issue <a href='https://github.com/rickhelmus/patRoon/issues/14'>#14</a>)
+<ul>
+<li>prevent error when no input files are found</li>
+<li>only allow one input/output format (didn’t properly work before)</li>
+<li>recognize that Waters files are directories</li>
+</ul>
+</li>
 <li>minor fixes for subsetting XCMS <code>features</code> objects</li>
+<li>Fixed: <code>generateCompoundsMetFrag()</code>: compound names could be sometimes be interpreted as dates (reported by Corey Griffith)</li>
 </ul>
 </div>
     <div id="patroon-1-0-2" class="section level1">

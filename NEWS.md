@@ -5,6 +5,7 @@
     * only allow one input/output format (didn't properly work before)
     * recognize that Waters files are directories
 * minor fixes for subsetting XCMS `features` objects
+* Fixed: `generateCompoundsMetFrag()`: compound names could be sometimes be interpreted as dates (reported by Corey Griffith)
 
 
 # patRoon 1.0.2

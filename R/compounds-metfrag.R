@@ -298,6 +298,13 @@ processMFResults <- function(comptab, spec, adduct, db, topMost, lfile = "")
 
         if (!is.null(comptab[["CASRN"]]))
             comptab[, CASRN := sub("CASRN:", "", CASRN, fixed = TRUE)] # remove "CASRN" prefix
+        
+        # sometimes these can be interpreted as dates!
+        for (col in c("compoundName", "compoundName2", "CASRN"))
+        {
+            if (!is.null(comptab[[col]]))
+                comptab[, (col) := as.character(get(col))]
+        }
 
         comptab[, database := db]
     }

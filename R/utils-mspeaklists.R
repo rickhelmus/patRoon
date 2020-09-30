@@ -393,9 +393,9 @@ specSimilarity <- function(pl1, pl2, method, shift = "none", precDiff = 0, remov
             spl1 <- pl1[set == s]; spl2 <- pl2[set == s]
             if (nrow(spl1) == 0 || nrow(spl2) == 0)
                 return(NA)
-            return(calcSpecSimularity(spl1, spl2, method, shift, precDiff, mzWeight, intWeight, absMzDev))
+            return(calcSpecSimilarity(spl1, spl2, method, shift, precDiff, mzWeight, intWeight, absMzDev))
         }), na.rm = TRUE))
     }
 
-    return(calcSpecSimularity(pl1, pl2, method, shift, precDiff, mzWeight, intWeight, absMzDev))
+    return(calcSpecSimilarity(pl1, pl2, method, shift, precDiff, mzWeight, intWeight, absMzDev))
 }

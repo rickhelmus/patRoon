@@ -27,7 +27,7 @@ Rcpp::NumericMatrix specDistMatrix(Rcpp::List specList, Rcpp::CharacterVector me
         for (size_t j=i+1; j<=len; ++j)
         {
             // write to output matrix
-            const double d = doCalcSpecSimularity(spectra[i], spectra[j-1], meth, sh,
+            const double d = doCalcSpecSimilarity(spectra[i], spectra[j-1], meth, sh,
                                                   pmzs[j-1] - pmzs[i], mzw, intw, mzwin);
             ret(i, j-1) = d;
             ret(j-1, i) = d;

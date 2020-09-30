@@ -40,8 +40,11 @@ setMethod("averageMSPeakLists", "MSPeakListsSet", function(obj)
         {
             PLMS <- rbindlist(pruneList(lapply(obj@setObjects, function(mspl) mspl[[gName]][["MS"]])), idcol = "set")
             PLMSMS <- rbindlist(pruneList(lapply(obj@setObjects, function(mspl) mspl[[gName]][["MSMS"]])), idcol = "set")
-            return(list(MS = PLMS, MSMS = PLMSMS))
+            
+            return(pruneList(list(MS = if (nrow(PLMS) > 0) PLMS else NULL,
+                                  MSMS = if (nrow(PLMSMS) > 0) PLMSMS else NULL)))
         }, simplify = FALSE)
+        avgPLists <- pruneList(avgPLists, checkEmptyElements = TRUE)
         saveCacheData("MSPeakListsSetAvg", avgPLists, hash)
     }
 

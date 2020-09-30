@@ -17,7 +17,7 @@ mergeScreeningSetInfos <- function(setObjects, sInfos = lapply(setObjects, scree
                                   f = function(l, r, sl, sr) merge(l, r, suffixes = c(sl, sr),
                                                                    by = c("name", "group"), all = TRUE))
         
-        unCols <- c("rt", "formula", "d_rt", "d_mz", "fragments_formula")
+        unCols <- c("rt", "formula", "SMILES", "InChI", "InChIKey", "neutralMass", "d_rt", "d_mz", "fragments_formula")
         
         getAllCols <- function(cols)
         {

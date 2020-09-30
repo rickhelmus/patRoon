@@ -156,7 +156,8 @@ averageMSPeakLists <- function(peakLists, origFGNames, clusterMzWindow, topMost,
             return(results)
         })
         names(avgPLists) <- gNames
-
+        avgPLists <- pruneList(avgPLists, checkEmptyElements = TRUE)
+        
         setTxtProgressBar(prog, gCount)
         close(prog)
 

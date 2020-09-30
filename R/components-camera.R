@@ -160,6 +160,6 @@ setMethod("generateComponentsCAMERA", "featureGroups", function(fGroups, ionizat
 
 setMethod("generateComponentsCAMERA", "featureGroupsSet", function(fGroups, ...)
 {
-    generateComponentsSet(fGroups, generateComponentsCAMERA, ...)
+    generateComponentsSet(fGroups, generateComponentsCAMERA, setIonization = TRUE, ...)
 })
 

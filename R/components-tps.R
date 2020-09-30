@@ -5,6 +5,25 @@
 #' @include feature_groups-screening-set.R
 NULL
 
+genTPSpecSimilarities <- function(pl1, pl2, method, precDiff, removePrecursor,
+                                  mzWeight, intWeight, absMzDev, relMinIntensity)
+{
+    getSim <- function(shift)
+    {
+        if (!is.null(pl2))
+        {
+            return(specSimilarity(pl1, pl2, method = method, shift = shift,
+                                  precDiff = precDiff, removePrecursor = removePrecursor, mzWeight = mzWeight,
+                                  intWeight = intWeight, absMzDev = absMzDev,
+                                  relMinIntensity = relMinIntensity))
+        }
+        return(NA)
+    }
+    
+    return(list(specSimilarity = getSim("none"), specSimilarityPrec = getSim("precursor"),
+                specSimilarityBoth = getSim("both")))
+}
+
 doGenComponentsTPs <- function(fGroups, fGroupsTPs, pred, MSPeakLists, minRTDiff,
                                simMethod, removePrecursor, mzWeight, intWeight, absMzDev, relMinIntensity)
 {
@@ -32,7 +51,7 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, pred, MSPeakLists, minRTDiff
     precCount <- length(names(pred))
     prog <- openProgBar(0, precCount)
     
-    compTab <- rbindlist(mapply(names(pred), predictions(pred), seq_len(precCount), FUN = function(pname, preds, i)
+    compTab <- rbindlist(Map(names(pred), predictions(pred), seq_len(precCount), f = function(pname, preds, i)
     {
         precFGs <- precFGMapping[name == pname][["group"]]
         TPs <- TPFGMapping[TP_name %in% preds$name]
@@ -59,6 +78,7 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, pred, MSPeakLists, minRTDiff
             ret[, intensity := 1]
             
             ret[, c("ret", "mz") := gInfoTPs[group, c("rts", "mzs")]]
+            ret[, mzDiff := gInfoPrec[precFG, "mzs"] - mz]
             
             if (minRTDiff > 0)
             {
@@ -67,28 +87,19 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, pred, MSPeakLists, minRTDiff
             }
             
             precMSMS <- MSPeakLists[[precFG]][["MSMS"]]
-            if (!is.null(precMSMS))
+            if (nrow(ret) > 0 && !is.null(precMSMS))
             {
-                getSim <- function(g, shift)
+                sims <- rbindlist(Map(ret$group, ret$mzDiff, f = function(g, mzd)
                 {
-                    TPMSMS <- MSPeakLists[[g]][["MSMS"]]
-                    if (!is.null(TPMSMS))
-                    {
-                        return(specSimilarity(precMSMS, TPMSMS, method = simMethod, shift = shift,
-                                              precDiff = gInfoTPs[g, "mzs"] - gInfoPrec[precFG, "mzs"],
-                                              removePrecursor = removePrecursor, mzWeight = mzWeight,
-                                              intWeight = intWeight, absMzDev = absMzDev,
-                                              relMinIntensity = relMinIntensity))
-                    }
-                    return(NA)
-                }
-                
-                ret[, specSimilarity := sapply(group, getSim, shift = "none")]
-                ret[, specSimilarityPrec := sapply(group, getSim, shift = "precursor")]
-                ret[, specSimilarityBoth := sapply(group, getSim, shift = "both")]
+                    genTPSpecSimilarities(precMSMS, MSPeakLists[[g]][["MSMS"]], method = simMethod,
+                                          precDiff = -mzd, removePrecursor = removePrecursor,
+                                          mzWeight = mzWeight, intWeight = intWeight, absMzDev = absMzDev,
+                                          relMinIntensity = relMinIntensity)
+                }))
+                ret <- cbind(ret, sims)
             }
             else
-                ret[, c("specSimilarity", "specSimilarityShift") := NA]
+                ret[, c("specSimilarity", "specSimilarityPrec", "specSimilarityBoth") := NA]
             
             return(ret)
         }, simplify = FALSE), idcol = "precursor_group")
@@ -96,7 +107,7 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, pred, MSPeakLists, minRTDiff
         setTxtProgressBar(prog, i)
         
         return(comps)
-    }, SIMPLIFY = FALSE), idcol = "precursor_name")
+    }), idcol = "precursor_name")
     
     setTxtProgressBar(prog, precCount)
     close(prog)
@@ -224,12 +235,37 @@ setMethod("generateComponentsTPs", "featureGroupsSet", function(fGroups, fGroups
     ret <- doGenComponentsTPs(fGroups, fGroupsTPs, pred, MSPeakLists, minRTDiff, simMethod, removePrecursor,
                               mzWeight, intWeight, absMzDev, relMinIntensity)
     
-    # mark set presence
     gNamesTPsSets <- sapply(setObjects(fGroupsTPs), names, simplify = FALSE)
-    ret@components <- lapply(ret@components, function(cmp)
+    ionizedMSPeaksLists <- sapply(sets(MSPeakLists), ionize, obj = MSPeakLists, simplify = FALSE)
+    ret@components <- Map(ret@components, ret@componentInfo$precursor_group, f = function(cmp, precFG)
     {
         for (s in sets(fGroupsTPs))
+        {
+            # mark set presence
             set(cmp, j = s, value = cmp$group %in% gNamesTPsSets[[s]])
+            
+            # calculate per set spectrum similarities
+            simColNames <- paste0(c("specSimilarity", "specSimilarityPrec", "specSimilarityBoth"), "-", s)
+            # if (any(!is.na(cmp$specSimilarity))) browser()
+            precMSMS <- ionizedMSPeaksLists[[s]][[precFG]][["MSMS"]]
+            if (!is.null(precMSMS))
+            {
+                sims <- rbindlist(Map(cmp$group, cmp$mzDiff, f = function(g, mzd)
+                {
+                    genTPSpecSimilarities(precMSMS, ionizedMSPeaksLists[[s]][[g]][["MSMS"]], method = simMethod,
+                                          precDiff = -mzd, removePrecursor = removePrecursor,
+                                          mzWeight = mzWeight, intWeight = intWeight, absMzDev = absMzDev,
+                                          relMinIntensity = relMinIntensity)
+                }))
+                cmp <- cbind(cmp, setnames(sims, simColNames))
+            }
+            else
+                cmp[, (simColNames) := NA]
+        }
+        
+        # move spec similarity columns to end
+        setcolorder(cmp, setdiff(names(cmp), grep("^specSimilarity", names(cmp), value = TRUE)))
+        
         return(cmp)
     })
     

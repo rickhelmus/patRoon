@@ -66,7 +66,7 @@ setMethod("analysisInfo", "MSPeakListsSet", function(obj) obj@analysisInfo)
 #' @export
 setMethod("show", "MSPeakListsSet", function(object)
 {
-    callAllNextMethods(object, show, firstClass = "MSPeakLists")
+    callAllNextMethods(object, show, firstClass = "MSPeakLists", startFrom = "MSPeakListsSet")
 })
 
 #' @describeIn MSPeakListsSet Accessor method to obtain the MS peak lists.

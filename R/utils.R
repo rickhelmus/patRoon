@@ -455,9 +455,9 @@ getAllMethods <- function(gen)
 }
 # nocov end
 
-callAllNextMethods <- function(obj, f, ..., firstClass = NULL)
+callAllNextMethods <- function(obj, f, ..., firstClass = NULL, startFrom = class(obj))
 {
-    supers <- selectSuperClasses(class(obj), directOnly = TRUE)
+    supers <- selectSuperClasses(startFrom, directOnly = TRUE)
     if (!is.null(firstClass))
     {
         selectMethod(f, firstClass)(obj, ...)

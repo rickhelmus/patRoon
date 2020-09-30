@@ -24,7 +24,7 @@ featuresSet <- setClass("featuresSet",
 #' @export
 setMethod("show", "featuresSet", function(object)
 {
-    callAllNextMethods(object, show, firstClass = "features")
+    callAllNextMethods(object, show, firstClass = "features", startFrom = "featuresSet")
 })
 
 #' @describeIn featuresSet Get table with feature information

@@ -37,7 +37,7 @@ binSpecCPP <- function(sp1, sp2, shift, mzWindow) {
     .Call(`_patRoon_binSpecCPP`, sp1, sp2, shift, mzWindow)
 }
 
-calcSpecSimularity <- function(sp1, sp2, method, shift, precDiff, mzWeight, intWeight, mzWindow) {
-    .Call(`_patRoon_calcSpecSimularity`, sp1, sp2, method, shift, precDiff, mzWeight, intWeight, mzWindow)
+calcSpecSimilarity <- function(sp1, sp2, method, shift, precDiff, mzWeight, intWeight, mzWindow) {
+    .Call(`_patRoon_calcSpecSimilarity`, sp1, sp2, method, shift, precDiff, mzWeight, intWeight, mzWindow)
 }
 

@@ -346,7 +346,7 @@ Rcpp::DataFrame binSpecCPP(Rcpp::DataFrame sp1, Rcpp::DataFrame sp2, Rcpp::Chara
                                    Rcpp::Named("intensity_2") = binnedSpec.intsRight);
 }
 
-double doCalcSpecSimularity(Spectrum sp1, Spectrum sp2, const std::string &method,
+double doCalcSpecSimilarity(Spectrum sp1, Spectrum sp2, const std::string &method,
                             const std::string &shift, double precDiff,
                             double mzWeight, double intWeight, double mzWindow)
 {
@@ -393,14 +393,14 @@ double doCalcSpecSimularity(Spectrum sp1, Spectrum sp2, const std::string &metho
 }
 
 // [[Rcpp::export]]
-Rcpp::NumericVector calcSpecSimularity(Rcpp::DataFrame sp1, Rcpp::DataFrame sp2, Rcpp::CharacterVector method,
+Rcpp::NumericVector calcSpecSimilarity(Rcpp::DataFrame sp1, Rcpp::DataFrame sp2, Rcpp::CharacterVector method,
                                        Rcpp::CharacterVector shift, Rcpp::NumericVector precDiff,
                                        Rcpp::NumericVector mzWeight, Rcpp::NumericVector intWeight, Rcpp::NumericVector mzWindow)
 {
     Spectrum specLeft{ sp1["mz"], sp1["intensity"] };
     Spectrum specRight{ sp2["mz"], sp2["intensity"] };
     
-    return Rcpp::NumericVector::create(doCalcSpecSimularity(Spectrum{ sp1["mz"], sp1["intensity"] }, Spectrum{ sp2["mz"], sp2["intensity"] },
+    return Rcpp::NumericVector::create(doCalcSpecSimilarity(Spectrum{ sp1["mz"], sp1["intensity"] }, Spectrum{ sp2["mz"], sp2["intensity"] },
                                                             Rcpp::as<std::string>(method), Rcpp::as<std::string>(shift), Rcpp::as<double>(precDiff),
                                                             Rcpp::as<double>(mzWeight), Rcpp::as<double>(intWeight), Rcpp::as<double>(mzWindow)));
 }

@@ -84,7 +84,7 @@ compoundsSet <- setClass("compoundsSet", slots = c(setThreshold = "numeric", ori
 #' @export
 setMethod("show", "compoundsSet", function(object)
 {
-    callAllNextMethods(object, show, firstClass = "compounds")
+    callAllNextMethods(object, show, firstClass = "compounds", startFrom = "compoundsSet")
 })
 
 setMethod("[", c("compoundsSet", "ANY", "missing", "missing"), function(x, i, j, ..., sets = NULL, drop = TRUE)

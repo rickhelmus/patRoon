@@ -25,7 +25,7 @@ formulasSet <- setClass("formulasSet", slots = c(setThreshold = "numeric",
 #' @export
 setMethod("show", "formulasSet", function(object)
 {
-    callAllNextMethods(object, show, firstClass = "formulas")
+    callAllNextMethods(object, show, firstClass = "formulas", startFrom = "formulasSet")
 })
 
 setMethod("[", c("formulasSet", "ANY", "missing", "missing"), function(x, i, j, ..., sets = NULL, drop = TRUE)

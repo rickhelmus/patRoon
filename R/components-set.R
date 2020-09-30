@@ -22,7 +22,7 @@ componentsSet <- setClass("componentsSet", slots = c(setObjects = "list"),
 #' @export
 setMethod("show", "componentsSet", function(object)
 {
-    callAllNextMethods(object, show, firstClass = "components")
+    callAllNextMethods(object, show, firstClass = "components", startFrom = "componentsSet")
 })
 
 setMethod("[", c("componentsSet", "ANY", "ANY", "missing"), function(x, i, j, ..., sets = NULL, drop = TRUE)

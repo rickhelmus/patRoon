@@ -127,8 +127,8 @@ setMethod("treeCutDynamic", "componentsClust", function(obj, maxTreeHeight, deep
 #' @template plot_clust
 #' @export
 setMethod("plot", "componentsClust", function(x, pal = "Paired", numericLabels = TRUE,
-                                                 colourBranches = length(x) < 50,
-                                                 showLegend = length(x) < 20, ...)
+                                              colourBranches = length(x) < 50,
+                                              showLegend = length(x) < 20, ...)
 {
     checkmate::assertString(pal, min.chars = 1)
     dendro <- as.dendrogram(x@clust)

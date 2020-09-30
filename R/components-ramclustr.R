@@ -183,5 +183,5 @@ setMethod("generateComponentsRAMClustR", "featureGroups", function(fGroups, st =
 
 setMethod("generateComponentsRAMClustR", "featureGroupsSet", function(fGroups, ...)
 {
-    generateComponentsSet(fGroups, generateComponentsRAMClustR, ...)
+    generateComponentsSet(fGroups, generateComponentsRAMClustR, setIonization = TRUE, ...)
 })

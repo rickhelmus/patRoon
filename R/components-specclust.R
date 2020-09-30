@@ -4,7 +4,6 @@ NULL
 
 componentsSpecClust <- setClass("componentsSpecClust", contains = "componentsClust")
 
-
 #' @export
 setMethod("generateComponentsSpecClust", "featureGroups", function(fGroups, MSPeakLists, method = "complete",
                                                                    simMethod, shift = "none", removePrecursor = FALSE,
@@ -72,4 +71,16 @@ setMethod("generateComponentsSpecClust", "featureGroups", function(fGroups, MSPe
                                                  absMzDev = absMzDev),
                                maxTreeHeight = maxTreeHeight, deepSplit = deepSplit,
                                minModuleSize = minModuleSize, algorithm = "specclust"))
+})
+
+componentsSpecClustSet <- setClass("componentsSpecClustSet", contains = "componentsClustSet")
+
+#' @export
+setMethod("generateComponentsSpecClust", "featureGroupsSet", function(fGroups, ...)
+{
+    cset <- generateComponentsSet(fGroups, generateComponentsSpecClust, setIonization = FALSE, ...)
+    browser()
+    return(componentsSpecClustSet(adducts = adducts(cset), setObjects = setObjects(cset),
+                                  components = componentTable(cset), componentInfo = componentInfo(cset),
+                                  algorithm = "specclust-set"))
 })

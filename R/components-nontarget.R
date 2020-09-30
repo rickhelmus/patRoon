@@ -336,7 +336,7 @@ setMethod("generateComponentsNontarget", "featureGroups", function(fGroups, ioni
 
 setMethod("generateComponentsNontarget", "featureGroupsSet", function(fGroups, ...)
 {
-    return(generateComponentsSet(fGroups, generateComponentsNontarget, ...,
+    return(generateComponentsSet(fGroups, generateComponentsNontarget, setIonization = TRUE, ...,
                                  classGenerator = componentsNTSet))
 })
 

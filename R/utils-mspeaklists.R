@@ -376,6 +376,26 @@ specSimilarity <- function(pl1, pl2, method, shift = "none", precDiff = 0, remov
         }
         pl1 <- filterPL(pl1); pl2 <- filterPL(pl2)
     }
+    
+    if (nrow(pl1) == 0 || nrow(pl2) == 0)
+        return(0)
+    
+    # UNDONE: use inheritance instead?
+    # UNDONE: parameters for weighing? other approaches, eg if peaklists are missing in a set?
+    if (!is.null(pl1[["set"]]) || !is.null(pl2[["set"]]))
+    {
+        if (is.null(pl1[["set"]]) != is.null(pl2[["set"]]))
+            stop("Either none or both peaklists need to contain set data")
+        
+        allSets <- unique(c(pl1$set, pl2$set))
+        return(mean(sapply(allSets, function(s)
+        {
+            spl1 <- pl1[set == s]; spl2 <- pl2[set == s]
+            if (nrow(spl1) == 0 || nrow(spl2) == 0)
+                return(NA)
+            return(calcSpecSimularity(spl1, spl2, method, shift, precDiff, mzWeight, intWeight, absMzDev))
+        }), na.rm = TRUE))
+    }
 
     return(calcSpecSimularity(pl1, pl2, method, shift, precDiff, mzWeight, intWeight, absMzDev))
 }

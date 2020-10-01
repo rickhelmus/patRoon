@@ -88,6 +88,7 @@
         - ??
 - suspect screening
     - implement TASQ?
+    - support recursive screening? or throw error otherwise
 - neutralizing / ionization
     - selectIons()
 	    - prefer adducts based on MS/MS? eg handy for Na/K adducts
@@ -180,8 +181,7 @@
     - OpenMS adducts?
     - fGroups/components: disable comparison/consensus?
     
-
-
+    
 ## TPs
 - Suspects --> BT --> MF DB/suspect list (opt combine with precursors)
 - Make sure hash takes into account parent names
@@ -244,10 +244,16 @@
     - remove OrgMassSpecR and proxy dependency
     - consistent naming: spec vs peaklist
     - show method for new components classes
+    - use neutral_formula for annotated similarity calculation for formulas
+        - still relevant?
 - Include BT in installation script and verifyDependencies()
 - Naming
     - More generic naming for predict etc to accommodate other sources for TPs
     - consistentency for precursor/parent/suspect
+- misc
+    - finish new minMSMSPeaks filter (apply always after averaging?)
+    - log2fc: median also possible?
+    - plotVolcano: also take thresholds into account for plotting, move legend outside graph
 
 
 ## features

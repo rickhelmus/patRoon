@@ -229,13 +229,14 @@ setMethod("generateComponentsTPs", "featureGroupsSet", function(fGroups, fGroups
     checkmate::reportAssertions(ac)
 
     if (needsScreening(pred) &&
-        !inherits(fGroups, "featureGroupsScreeningSet") || !inherits(fGroupsTPs, "featureGroupsScreeningSet"))
+        (!inherits(fGroups, "featureGroupsScreeningSet") || !inherits(fGroupsTPs, "featureGroupsScreeningSet")))
         stop("Input feature groups need to be screened for (TP) suspects!")
     
     ret <- doGenComponentsTPs(fGroups, fGroupsTPs, pred, MSPeakLists, minRTDiff, simMethod, removePrecursor,
                               mzWeight, intWeight, absMzDev, relMinIntensity)
     
-    gNamesTPsSets <- sapply(setObjects(fGroupsTPs), names, simplify = FALSE)
+    # UNDONE: more efficient method to get set specific fGroups?
+    gNamesTPsSets <- sapply(sets(fGroupsTPs), function(s) names(fGroupsTPs[, sets = s]), simplify = FALSE)
     ionizedMSPeaksLists <- sapply(sets(MSPeakLists), ionize, obj = MSPeakLists, simplify = FALSE)
     ret@components <- Map(ret@components, ret@componentInfo$precursor_group, f = function(cmp, precFG)
     {

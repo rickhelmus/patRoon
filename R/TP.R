@@ -49,7 +49,7 @@ setMethod("predictions", "TPPredictions", function(pred) pred@predictions)
 
 #' @describeIn components Obtain total number of predictions.
 #' @export
-setMethod("length", "TPPredictions", function(x) sum(sapply(predictions(x), nrow)))
+setMethod("length", "TPPredictions", function(x) if (length(predictions(x)) == 0) 0 else sum(sapply(predictions(x), nrow)))
 
 #' @describeIn TPPredictions Obtain the names of all suspects with predicted
 #'   TPs.

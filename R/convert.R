@@ -97,7 +97,7 @@ convertMSFilesPWiz <- function(inFiles, outFiles, to, centroid, filters, extraOp
     {
         if (is.null(filters))
             filters <- character()
-        filters <- c(filters, if (centroid == "vendor") "peakPicking vendor" else "peakPicking")
+        filters <- c(filters, paste("peakPicking", if (is.character(centroid)) centroid else ""))
     }
 
     mainArgs <- paste0("--", to)
@@ -225,7 +225,7 @@ convertMSFilesBruker <- function(inFiles, outFiles, to, centroid)
 #' @param centroid Set to \code{TRUE} to enable centroiding (not supported if
 #'   \code{algorithm="openms"}). In addition, when \code{algorithm="pwiz"} the
 #'   value may be \code{"vendor"} to perform centroiding with the vendor
-#'   algorithm.
+#'   algorithm or \code{"cwt"} to use ProteoWizard's wavelet algorithm.
 #' @param filters When \code{algorithm="pwiz"}: a \code{character} vector
 #'   specifying one or more filters. The elements of the specified vector are
 #'   directly passed to the \code{--filter} option (see
@@ -309,7 +309,7 @@ convertMSFiles <- function(files = NULL, outPath = NULL, dirs = TRUE,
     checkmate::assertFlag(overWrite, add = ac)
     checkmate::assertChoice(algorithm, c("pwiz", "openms", "bruker"), add = ac)
     checkmate::assert(checkmate::checkFlag(centroid),
-                      checkmate::checkSetEqual(centroid, "vendor"),
+                      checkmate::checkChoice(centroid, c("vendor", "cwt")),
                       .var.name = centroid)
     checkmate::assertCharacter(filters, min.chars = 1, null.ok = TRUE, add = ac)
     checkmate::assertCharacter(extraOpts, null.ok = TRUE, add = ac)
@@ -319,8 +319,8 @@ convertMSFiles <- function(files = NULL, outPath = NULL, dirs = TRUE,
 
     if (centroid != FALSE && algorithm == "openms")
         stop("Centroiding with OpenMS is currently not supported.")
-    else if (centroid == "vendor" && algorithm != "pwiz")
-        stop("Vendor centroiding is only supported when algorithm=\"pwiz\"")
+    else if ((centroid == "vendor" || centroid == "cwt") && algorithm != "pwiz")
+        stop("Vendor/cwt centroiding is only supported when algorithm=\"pwiz\"")
 
     if (dirs || !is.null(anaInfo)) # from arg needs to be used?
     {

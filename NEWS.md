@@ -4,6 +4,7 @@
     * prevent error when no input files are found
     * only allow one input/output format (didn't properly work before)
     * recognize that Waters files are directories
+    * `cwt` option is now available for conversion with ProteoWizard
 * minor fixes for subsetting XCMS `features` objects
 * Fixed: `generateCompoundsMetFrag()`: compound names could be sometimes be interpreted as dates (reported by Corey Griffith)
 * Fixed: on very rare cases empty peaklists could be present after averaging.

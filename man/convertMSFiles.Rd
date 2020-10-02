@@ -56,7 +56,7 @@ be set (\emph{i.e.} not \code{NULL}).}
 \item{centroid}{Set to \code{TRUE} to enable centroiding (not supported if
 \code{algorithm="openms"}). In addition, when \code{algorithm="pwiz"} the
 value may be \code{"vendor"} to perform centroiding with the vendor
-algorithm.}
+algorithm or \code{"cwt"} to use ProteoWizard's wavelet algorithm.}
 
 \item{filters}{When \code{algorithm="pwiz"}: a \code{character} vector
 specifying one or more filters. The elements of the specified vector are

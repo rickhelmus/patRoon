@@ -254,7 +254,7 @@
 - misc
     - finish new minMSMSPeaks filter (apply always after averaging?)
     - log2fc: median also possible?
-    - plotVolcano: move legend outside graph
+    - more logic reactions?
 
 
 ## features

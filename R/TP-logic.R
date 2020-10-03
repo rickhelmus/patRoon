@@ -54,6 +54,9 @@ doPredictTPsLogic <- function(fGroups, minMass, adduct)
         ret <- data.table(name = paste0(suspects$name[si], "-",
                                         transformations$reaction),
                           neutralMass = neutralMasses[si] + transformations$deltaMZ,
+                          deltaMZ = transformations$deltaMZ,
+                          reaction_add = transformations$add,
+                          reaction_sub = transformations$sub,
                           RTDir = transformations$RTDir)
         ret <- ret[neutralMass >= minMass]
         
@@ -63,6 +66,7 @@ doPredictTPsLogic <- function(fGroups, minMass, adduct)
         
         return(ret)
     })
+    names(predictions) <- suspects$name
     
     setTxtProgressBar(prog, nrow(suspects))
     close(prog)

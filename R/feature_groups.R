@@ -1479,7 +1479,7 @@ setMethod("plotUpSet", "featureGroups", function(obj, which = NULL, nsets = leng
 })
 
 #' @export
-setMethod("plotVolcano", "featureGroups", function(obj, FCParams, col = NULL, pch = 19, ...)
+setMethod("plotVolcano", "featureGroups", function(obj, FCParams, averageFunc = mean, col = NULL, pch = 19, ...)
 {
     # UNDONE: docs, assertions, more plot parameters?
     
@@ -1493,12 +1493,12 @@ setMethod("plotVolcano", "featureGroups", function(obj, FCParams, col = NULL, pc
         col <- getBrewerPal(5, "Paired")
     names(col) <- c("increase", "decrease", "FC", "significant", "insignificant")
     
-    gt <- as.data.table(obj, FCParams = FCParams)
+    gt <- as.data.table(obj, FCParams = FCParams, averageFunc = averageFunc)
     gt[, colour := col[classification]]
     
     plot(gt$FC_log, gt$PV_log, xlab = "log2 fold change", ylab = "-log10 p-value", 
          col = gt$colour, pch = pch, ...)
-    abline(v = c(-0.25, 0.25), col = "red", lty = 2, lwd = 1, h = -log10(0.05))
+    abline(v = c(-FCParams$thresholdFC, FCParams$thresholdFC), col = "red", lty = 2, lwd = 1, h = -log10(FCParams$thresholdPV))
     legend("topright", legend = names(col), col = col, cex = 0.8, pch = pch)
     
     invisible(NULL)

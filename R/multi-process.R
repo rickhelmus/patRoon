@@ -268,7 +268,7 @@ executeMultiProcessF <- function(commandQueue, finishHandler,
                                  prepareHandler = NULL,
                                  procTimeout = NULL, printOutput = FALSE, printError = FALSE,
                                  showProgress = TRUE, waitTimeout = 50,
-                                 maxProcAmount = getOption("patRoon.maxProcAmount"),
+                                 maxProcAmount = NULL,
                                  batchSize = 1, delayBetweenProc = 0)
 {
     if (FALSE)
@@ -295,15 +295,16 @@ executeMultiProcessF <- function(commandQueue, finishHandler,
         #                       waitTimeout = waitTimeout, maxProcAmount = maxProcAmount, batchSize = batchSize,
         #                       delayBetweenProc = delayBetweenProc)
         
-        n <- 2 # UNDONE
+        n <- future::nbrOfWorkers() # UNDONE: configurable? check for Inf (docs state it may be, then default to 1?)
         chunks <- split(commandQueue, cut(seq_along(commandQueue), n, labels = FALSE))
-        ret <- future.apply::future_lapply(chunks,
-                                           function(ch) executeMultiProcess(commandQueue = ch,
-                                                                            finishHandler = finishHandler, timeoutHandler = timeoutHandler,
-                                                                            errorHandler = errorHandler, prepareHandler = prepareHandler, procTimeout = procTimeout,
-                                                                            printOutput = printOutput, printError = printError, showProgress = showProgress,
-                                                                            waitTimeout = waitTimeout, maxProcAmount = maxProcAmount, batchSize = batchSize,
-                                                                            delayBetweenProc = delayBetweenProc))
+        args <- list(finishHandler = finishHandler, timeoutHandler = timeoutHandler,
+                     errorHandler = errorHandler, prepareHandler = prepareHandler, procTimeout = procTimeout,
+                     printOutput = printOutput, printError = printError, showProgress = showProgress,
+                     waitTimeout = waitTimeout, batchSize = batchSize,
+                     delayBetweenProc = delayBetweenProc)
+        if (!is.null(maxProcAmount))
+            args <- c(args, maxProcAmount = maxProcAmount) # UNDONE?
+        ret <- do.call(future.apply::future_lapply, chunks, executeMultiProcess, args)
         return(unlist(unname(ret), recursive = FALSE))
     }
 }

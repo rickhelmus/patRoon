@@ -22,7 +22,7 @@ NULL
 #'   \code{\link[graphics]{lines}} (\code{plotInt}), \pkg{\link{VennDiagram}}
 #'   plotting functions (\code{plotVenn}), \code{\link{chordDiagram}}
 #'   (\code{plotChord}) or \code{\link[UpSetR]{upset}} (\code{plotUpSet}).
-#' @param average Average data within replicate groups.
+#' @param average If \code{TRUE} then data within replicate groups are averaged.
 #' @param areas If set to \code{TRUE} then areas are considered instead of peak
 #'   intensities.
 #' @param pch,type,lty Common plotting parameters passed to \emph{e.g.}
@@ -462,7 +462,7 @@ setMethod("removeEmptyAnalyses", "featureGroups", function(fGroups)
     return(fGroups)
 })
 
-setMethod("averageGroups", "featureGroups", function(fGroups, areas)
+setMethod("averageGroups", "featureGroups", function(fGroups, areas, func)
 {
     gTable <- copy(groupTable(fGroups, areas))
     if (nrow(gTable) == 0)
@@ -473,7 +473,7 @@ setMethod("averageGroups", "featureGroups", function(fGroups, areas)
 
     gTable[, sgroup := anaInfo$group]
 
-    gTable[, (gNames) := lapply(.SD, function(v) { if (any(v > 0)) mean(v[v>0]) else 0 }), by = sgroup, .SDcols = gNames]
+    gTable[, (gNames) := lapply(.SD, function(v) { if (any(v > 0)) func(v[v>0]) else 0 }), by = sgroup, .SDcols = gNames]
     gTable <- unique(gTable, by = "sgroup")
     gTable[, sgroup := NULL]
 
@@ -565,6 +565,8 @@ getFCParams <- function(rGroups, ...)
 #'   no regression information is added when no \code{conc} column is present in
 #'   the analysis information or when less than two concentrations are specified
 #'   (\emph{i.e.} the minimum amount).
+#' @param averageFunc Function used for averaging. Used when \code{average=TRUE}
+#'   or \code{FCParams != NULL}
 #' @param normFunc Function that should be used for normalization of data. The
 #'   function is called for all intensities/areas of a feature group and these
 #'   quantities are divided by the result of the function call. For example,
@@ -573,8 +575,8 @@ getFCParams <- function(rGroups, ...)
 #'   Set to \code{NULL} to perform no normalization.
 #' @export
 setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas = FALSE, features = FALSE,
-                                                     qualities = FALSE, regression = FALSE, normFunc = NULL,
-                                                     FCParams = NULL)
+                                                     qualities = FALSE, regression = FALSE, averageFunc = mean,
+                                                     normFunc = NULL, FCParams = NULL)
 {
     # NOTE: keep args in sync with as.data.table() method for featureGroupsSet
     
@@ -585,6 +587,7 @@ setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas =
     checkmate::assertFlag(areas, add = ac)
     checkmate::assertFlag(features, add = ac)
     checkmate::assertFlag(regression, add = ac)
+    checkmate::assertFunction(averageFunc, add = ac)
     checkmate::assertFunction(normFunc, null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
 
@@ -644,7 +647,7 @@ setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas =
         {
             ret <- ret[, -c("isocount", "analysis", "ID")]
             numCols <- setdiff(names(ret), c("group"))
-            ret[, (numCols) := lapply(.SD, mean), .SDcols = numCols, by = "group"]
+            ret[, (numCols) := lapply(.SD, averageFunc), .SDcols = numCols, by = "group"]
             ret <- unique(ret, by = "group")
         }
         else
@@ -679,8 +682,8 @@ setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas =
     }
     else
     {
-        gTableAvg <- averageGroups(x, areas)
-        gTableNonAvg <- groupTable(x, areas)
+        gTableAvg <- averageGroups(x, areas, func = averageFunc)
+        gTableNonAvg <- groups(x, areas)
 
         if (!is.null(normFunc))
         {

@@ -171,61 +171,61 @@ arguments are often specific for the implemented methods, for this reason,
 please refer to the linked method documentation for each generic.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>algorithm</span>(<span class='no'>obj</span>)
+    <pre class="usage"><span class='fu'>algorithm</span><span class='op'>(</span><span class='va'>obj</span><span class='op'>)</span>
 
-<span class='fu'>analysisInfo</span>(<span class='no'>obj</span>)
+<span class='fu'>analysisInfo</span><span class='op'>(</span><span class='va'>obj</span><span class='op'>)</span>
 
-<span class='fu'>analyses</span>(<span class='no'>obj</span>)
+<span class='fu'>analyses</span><span class='op'>(</span><span class='va'>obj</span><span class='op'>)</span>
 
-<span class='fu'>annotatedPeakList</span>(<span class='no'>obj</span>, <span class='no'>...</span>)
+<span class='fu'>annotatedPeakList</span><span class='op'>(</span><span class='va'>obj</span>, <span class='va'>...</span><span class='op'>)</span>
 
-<span class='fu'>clusterProperties</span>(<span class='no'>obj</span>)
+<span class='fu'>clusterProperties</span><span class='op'>(</span><span class='va'>obj</span><span class='op'>)</span>
 
-<span class='fu'>clusters</span>(<span class='no'>obj</span>)
+<span class='fu'>clusters</span><span class='op'>(</span><span class='va'>obj</span><span class='op'>)</span>
 
-<span class='fu'>cutClusters</span>(<span class='no'>obj</span>)
+<span class='fu'>cutClusters</span><span class='op'>(</span><span class='va'>obj</span><span class='op'>)</span>
 
-<span class='fu'>consensus</span>(<span class='no'>obj</span>, <span class='no'>...</span>)
+<span class='fu'>consensus</span><span class='op'>(</span><span class='va'>obj</span>, <span class='va'>...</span><span class='op'>)</span>
 
-<span class='fu'>featureTable</span>(<span class='no'>obj</span>)
+<span class='fu'>featureTable</span><span class='op'>(</span><span class='va'>obj</span><span class='op'>)</span>
 
-<span class='fu'>filter</span>(<span class='no'>obj</span>, <span class='no'>...</span>)
+<span class='fu'>filter</span><span class='op'>(</span><span class='va'>obj</span>, <span class='va'>...</span><span class='op'>)</span>
 
-<span class='fu'>getFeatures</span>(<span class='no'>obj</span>)
+<span class='fu'>getFeatures</span><span class='op'>(</span><span class='va'>obj</span><span class='op'>)</span>
 
-<span class='fu'>getMCS</span>(<span class='no'>obj</span>, <span class='no'>...</span>)
+<span class='fu'>getMCS</span><span class='op'>(</span><span class='va'>obj</span>, <span class='va'>...</span><span class='op'>)</span>
 
-<span class='fu'>groupNames</span>(<span class='no'>obj</span>)
+<span class='fu'>groupNames</span><span class='op'>(</span><span class='va'>obj</span><span class='op'>)</span>
 
-<span class='fu'>plotChord</span>(<span class='no'>obj</span>, <span class='kw'>addSelfLinks</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>addRetMzPlots</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='no'>...</span>)
+<span class='fu'>plotChord</span><span class='op'>(</span><span class='va'>obj</span>, addSelfLinks <span class='op'>=</span> <span class='cn'>FALSE</span>, addRetMzPlots <span class='op'>=</span> <span class='cn'>TRUE</span>, <span class='va'>...</span><span class='op'>)</span>
 
-<span class='fu'>plotEIC</span>(<span class='no'>obj</span>, <span class='no'>...</span>)
+<span class='fu'>plotEIC</span><span class='op'>(</span><span class='va'>obj</span>, <span class='va'>...</span><span class='op'>)</span>
 
-<span class='fu'>plotInt</span>(<span class='no'>obj</span>, <span class='no'>...</span>)
+<span class='fu'>plotInt</span><span class='op'>(</span><span class='va'>obj</span>, <span class='va'>...</span><span class='op'>)</span>
 
-<span class='fu'>plotScores</span>(<span class='no'>obj</span>, <span class='no'>...</span>)
+<span class='fu'>plotScores</span><span class='op'>(</span><span class='va'>obj</span>, <span class='va'>...</span><span class='op'>)</span>
 
-<span class='fu'>plotSilhouettes</span>(<span class='no'>obj</span>, <span class='no'>kSeq</span>, <span class='no'>...</span>)
+<span class='fu'>plotSilhouettes</span><span class='op'>(</span><span class='va'>obj</span>, <span class='va'>kSeq</span>, <span class='va'>...</span><span class='op'>)</span>
 
-<span class='fu'>plotSpec</span>(<span class='no'>obj</span>, <span class='no'>...</span>)
+<span class='fu'>plotSpec</span><span class='op'>(</span><span class='va'>obj</span>, <span class='va'>...</span><span class='op'>)</span>
 
-<span class='fu'>plotStructure</span>(<span class='no'>obj</span>, <span class='no'>...</span>)
+<span class='fu'>plotStructure</span><span class='op'>(</span><span class='va'>obj</span>, <span class='va'>...</span><span class='op'>)</span>
 
-<span class='fu'>plotVenn</span>(<span class='no'>obj</span>, <span class='no'>...</span>)
+<span class='fu'>plotVenn</span><span class='op'>(</span><span class='va'>obj</span>, <span class='va'>...</span><span class='op'>)</span>
 
-<span class='fu'>plotUpSet</span>(<span class='no'>obj</span>, <span class='no'>...</span>)
+<span class='fu'>plotUpSet</span><span class='op'>(</span><span class='va'>obj</span>, <span class='va'>...</span><span class='op'>)</span>
 
-<span class='fu'>replicateGroups</span>(<span class='no'>obj</span>)
+<span class='fu'>replicateGroups</span><span class='op'>(</span><span class='va'>obj</span><span class='op'>)</span>
 
-<span class='fu'>treeCut</span>(<span class='no'>obj</span>, <span class='kw'>k</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>h</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)
+<span class='fu'>treeCut</span><span class='op'>(</span><span class='va'>obj</span>, k <span class='op'>=</span> <span class='cn'>NULL</span>, h <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>...</span><span class='op'>)</span>
 
-<span class='fu'>treeCutDynamic</span>(
-  <span class='no'>obj</span>,
-  <span class='kw'>maxTreeHeight</span> <span class='kw'>=</span> <span class='fl'>1</span>,
-  <span class='kw'>deepSplit</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>minModuleSize</span> <span class='kw'>=</span> <span class='fl'>1</span>,
-  <span class='no'>...</span>
-)</pre>
+<span class='fu'>treeCutDynamic</span><span class='op'>(</span>
+  <span class='va'>obj</span>,
+  maxTreeHeight <span class='op'>=</span> <span class='fl'>1</span>,
+  deepSplit <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  minModuleSize <span class='op'>=</span> <span class='fl'>1</span>,
+  <span class='va'>...</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -463,7 +463,7 @@ average silhouette width calculation.</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

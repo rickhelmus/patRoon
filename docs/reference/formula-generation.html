@@ -168,59 +168,59 @@ groups.</p>
     </div>
 
     <pre class="usage"><span class='co'># S4 method for featureGroups</span>
-<span class='fu'>generateFormulas</span>(<span class='no'>fGroups</span>, <span class='no'>algorithm</span>, <span class='no'>...</span>)
+<span class='fu'>generateFormulas</span><span class='op'>(</span><span class='va'>fGroups</span>, <span class='va'>algorithm</span>, <span class='va'>...</span><span class='op'>)</span>
 
-<span class='fu'>generateFormulasDA</span>(
-  <span class='no'>fGroups</span>,
-  <span class='kw'>precursorMzSearchWindow</span> <span class='kw'>=</span> <span class='fl'>0.002</span>,
-  <span class='kw'>MSMode</span> <span class='kw'>=</span> <span class='st'>"both"</span>,
-  <span class='no'>adduct</span>,
-  <span class='kw'>featThreshold</span> <span class='kw'>=</span> <span class='fl'>0.75</span>,
-  <span class='kw'>save</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>close</span> <span class='kw'>=</span> <span class='no'>save</span>
-)
+<span class='fu'>generateFormulasDA</span><span class='op'>(</span>
+  <span class='va'>fGroups</span>,
+  precursorMzSearchWindow <span class='op'>=</span> <span class='fl'>0.002</span>,
+  MSMode <span class='op'>=</span> <span class='st'>"both"</span>,
+  <span class='va'>adduct</span>,
+  featThreshold <span class='op'>=</span> <span class='fl'>0.75</span>,
+  save <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  close <span class='op'>=</span> <span class='va'>save</span>
+<span class='op'>)</span>
 
-<span class='fu'>generateFormulasGenForm</span>(
-  <span class='no'>fGroups</span>,
-  <span class='no'>MSPeakLists</span>,
-  <span class='kw'>relMzDev</span> <span class='kw'>=</span> <span class='fl'>5</span>,
-  <span class='kw'>adduct</span> <span class='kw'>=</span> <span class='st'>"[M+H]+"</span>,
-  <span class='kw'>elements</span> <span class='kw'>=</span> <span class='st'>"CHNOP"</span>,
-  <span class='kw'>hetero</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>oc</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>extraOpts</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>calculateFeatures</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>featThreshold</span> <span class='kw'>=</span> <span class='fl'>0.75</span>,
-  <span class='kw'>MSMode</span> <span class='kw'>=</span> <span class='st'>"both"</span>,
-  <span class='kw'>isolatePrec</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>timeout</span> <span class='kw'>=</span> <span class='fl'>120</span>,
-  <span class='kw'>topMost</span> <span class='kw'>=</span> <span class='fl'>50</span>,
-  <span class='kw'>maxProcAmount</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"patRoon.maxProcAmount"</span>),
-  <span class='kw'>batchSize</span> <span class='kw'>=</span> <span class='fl'>8</span>
-)
+<span class='fu'>generateFormulasGenForm</span><span class='op'>(</span>
+  <span class='va'>fGroups</span>,
+  <span class='va'>MSPeakLists</span>,
+  relMzDev <span class='op'>=</span> <span class='fl'>5</span>,
+  adduct <span class='op'>=</span> <span class='st'>"[M+H]+"</span>,
+  elements <span class='op'>=</span> <span class='st'>"CHNOP"</span>,
+  hetero <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  oc <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  extraOpts <span class='op'>=</span> <span class='cn'>NULL</span>,
+  calculateFeatures <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  featThreshold <span class='op'>=</span> <span class='fl'>0.75</span>,
+  MSMode <span class='op'>=</span> <span class='st'>"both"</span>,
+  isolatePrec <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  timeout <span class='op'>=</span> <span class='fl'>120</span>,
+  topMost <span class='op'>=</span> <span class='fl'>50</span>,
+  maxProcAmount <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span><span class='op'>(</span><span class='st'>"patRoon.maxProcAmount"</span><span class='op'>)</span>,
+  batchSize <span class='op'>=</span> <span class='fl'>8</span>
+<span class='op'>)</span>
 
-<span class='fu'>generateFormulasSIRIUS</span>(
-  <span class='no'>fGroups</span>,
-  <span class='no'>MSPeakLists</span>,
-  <span class='kw'>relMzDev</span> <span class='kw'>=</span> <span class='fl'>5</span>,
-  <span class='kw'>adduct</span> <span class='kw'>=</span> <span class='st'>"[M+H]+"</span>,
-  <span class='kw'>elements</span> <span class='kw'>=</span> <span class='st'>"CHNOP"</span>,
-  <span class='kw'>profile</span> <span class='kw'>=</span> <span class='st'>"qtof"</span>,
-  <span class='kw'>database</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>noise</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>cores</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>topMost</span> <span class='kw'>=</span> <span class='fl'>100</span>,
-  <span class='kw'>extraOptsGeneral</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>extraOptsFormula</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>calculateFeatures</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>featThreshold</span> <span class='kw'>=</span> <span class='fl'>0.75</span>,
-  <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>SIRBatchSize</span> <span class='kw'>=</span> <span class='fl'>0</span>,
-  <span class='kw'>logPath</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='st'>"log"</span>, <span class='st'>"sirius_formulas"</span>),
-  <span class='kw'>maxProcAmount</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"patRoon.maxProcAmount"</span>)
-)
+<span class='fu'>generateFormulasSIRIUS</span><span class='op'>(</span>
+  <span class='va'>fGroups</span>,
+  <span class='va'>MSPeakLists</span>,
+  relMzDev <span class='op'>=</span> <span class='fl'>5</span>,
+  adduct <span class='op'>=</span> <span class='st'>"[M+H]+"</span>,
+  elements <span class='op'>=</span> <span class='st'>"CHNOP"</span>,
+  profile <span class='op'>=</span> <span class='st'>"qtof"</span>,
+  database <span class='op'>=</span> <span class='cn'>NULL</span>,
+  noise <span class='op'>=</span> <span class='cn'>NULL</span>,
+  cores <span class='op'>=</span> <span class='cn'>NULL</span>,
+  topMost <span class='op'>=</span> <span class='fl'>100</span>,
+  extraOptsGeneral <span class='op'>=</span> <span class='cn'>NULL</span>,
+  extraOptsFormula <span class='op'>=</span> <span class='cn'>NULL</span>,
+  calculateFeatures <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  featThreshold <span class='op'>=</span> <span class='fl'>0.75</span>,
+  verbose <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  SIRBatchSize <span class='op'>=</span> <span class='fl'>0</span>,
+  logPath <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='st'>"log"</span>, <span class='st'>"sirius_formulas"</span><span class='op'>)</span>,
+  maxProcAmount <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span><span class='op'>(</span><span class='st'>"patRoon.maxProcAmount"</span><span class='op'>)</span>
+<span class='op'>)</span>
 
-<span class='fu'>formulaScorings</span>()</pre>
+<span class='fu'>formulaScorings</span><span class='op'>(</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -521,15 +521,15 @@ DataAnalysis always occurs on 'feature level'.</p>
   <code>extraOpts</code> parameter.</p>
 <p></p><pre>Formula calculation from MS and MS/MS data as described in
 Meringer et al (2011) MATCH Commun Math Comput Chem 65: 259-290
-Usage: GenForm ms=&amp;lt;filename&amp;gt; [msms=&amp;lt;filename&amp;gt;] [out=&amp;lt;filename&amp;gt;]
-        [exist[=mv]] [m=&amp;lt;number&amp;gt;] [ion=-e|+e|-H|+H|+Na] [cha=&amp;lt;number&amp;gt;]
-        [ppm=&amp;lt;number&amp;gt;] [msmv=ndp|nsse|nsae] [acc=&amp;lt;number&amp;gt;] [rej=&amp;lt;number&amp;gt;]
-        [thms=&amp;lt;number&amp;gt;] [thmsms=&amp;lt;number&amp;gt;] [thcomb=&amp;lt;number&amp;gt;]
-        [sort[=ppm|msmv|msmsmv|combmv]] [el=&amp;lt;elements&amp;gt; [oc]] [ff=&amp;lt;fuzzy formula&amp;gt;]
-        [vsp[=&amp;lt;even|odd&amp;gt;]] [vsm2mv[=&amp;lt;value&amp;gt;]] [vsm2ap2[=&amp;lt;value&amp;gt;]] [hcf]
-        [wm[=lin|sqrt|log]] [wi[=lin|sqrt|log]] [exp=&amp;lt;number&amp;gt;] [oei]
-        [dbeexc=&amp;lt;number&amp;gt;] [ivsm2mv=&amp;lt;number&amp;gt;] [vsm2ap2=&amp;lt;number&amp;gt;]
-        [oms[=&amp;lt;filename&amp;gt;]] [omsms[=&amp;lt;filename&amp;gt;]] [oclean[=&amp;lt;filename&amp;gt;]]
+Usage: GenForm ms=&lt;filename&gt; [msms=&lt;filename&gt;] [out=&lt;filename&gt;]
+        [exist[=mv]] [m=&lt;number&gt;] [ion=-e|+e|-H|+H|+Na] [cha=&lt;number&gt;]
+        [ppm=&lt;number&gt;] [msmv=ndp|nsse|nsae] [acc=&lt;number&gt;] [rej=&lt;number&gt;]
+        [thms=&lt;number&gt;] [thmsms=&lt;number&gt;] [thcomb=&lt;number&gt;]
+        [sort[=ppm|msmv|msmsmv|combmv]] [el=&lt;elements&gt; [oc]] [ff=&lt;fuzzy formula&gt;]
+        [vsp[=&lt;even|odd&gt;]] [vsm2mv[=&lt;value&gt;]] [vsm2ap2[=&lt;value&gt;]] [hcf]
+        [wm[=lin|sqrt|log]] [wi[=lin|sqrt|log]] [exp=&lt;number&gt;] [oei]
+        [dbeexc=&lt;number&gt;] [ivsm2mv=&lt;number&gt;] [vsm2ap2=&lt;number&gt;]
+        [oms[=&lt;filename&gt;]] [omsms[=&lt;filename&gt;]] [oclean[=&lt;filename&gt;]]
         [analyze [loss] [intens]] [dbe] [cm] [pc] [sc]
 Explanation:
         ms      : filename of MS data (*.txt)
@@ -559,9 +559,9 @@ Explanation:
         het     : formulas must have at least one hetero atom
         vsp     : valency sum parity (even for graphical formulas)
         vsm2mv  : lower bound for valency sum - 2 * maximum valency
-                  (&amp;gt;=0 for graphical formulas)
+                  (&gt;=0 for graphical formulas)
         vsm2ap2 : lower bound for valency sum - 2 * number of atoms + 2
-                  (&amp;gt;=0 for graphical connected formulas)
+                  (&gt;=0 for graphical connected formulas)
         hcf     : apply Heuerding-Clerc filter
         wm      : m/z weighting for MS/MS match value
         wi      : intensity weighting for MS/MS match value
@@ -631,7 +631,7 @@ doi: <a href='https://doi.org/10.1093/bioinformatics/btn603'>10.1093/bioinformat
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

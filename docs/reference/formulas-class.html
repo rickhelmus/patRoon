@@ -294,8 +294,8 @@ for feature groups.</p></td>
     <tr>
       <th>i, j</th>
       <td><p>A numeric or character value which is used to select analyses/feature groups by
-their index or name, respectively (for the order/names see <code>analyses()/groupNames()</code>).<br /><br /> For <code>[</code>: Can also be logical to perform logical selection
-(similar to regular vectors). If missing all analyses/feature groups are selected.<br /><br /> For <code>[[</code>: should be a scalar value. If <code>j</code> is not specified, <code>i</code> selects by feature groups instead.</p></td>
+their index or name, respectively (for the order/names see <code>analyses()/groupNames()</code>).<br /><br /> For <code><a href='generics.html'>[</a></code>: Can also be logical to perform logical selection
+(similar to regular vectors). If missing all analyses/feature groups are selected.<br /><br /> For <code><a href='generics.html'>[[</a></code>: should be a scalar value. If <code>j</code> is not specified, <code>i</code> selects by feature groups instead.</p></td>
     </tr>
     <tr>
       <th>...</th>
@@ -560,12 +560,12 @@ analyses for which data is present in this object.</p></li>
 feature groups for which data is present in this object.</p></li>
 <li><p><code>length</code>: Obtain total number of formulae entries.</p></li>
 <li><p><code>show</code>: Show summary information for this object.</p></li>
-<li><p><code>[</code>: Subset on feature groups.</p></li>
-<li><p><code>[[</code>: Extract a formula table. If both arguments (<code>i</code> and
+<li><p><code><a href='generics.html'>[</a></code>: Subset on feature groups.</p></li>
+<li><p><code><a href='generics.html'>[[</a></code>: Extract a formula table. If both arguments (<code>i</code> and
 <code>j</code>) are specified, the feature specific formula table belonging to
 the analysis (<code>i</code>)/feature group (<code>j</code>) is returned. Otherwise the
 formula table for the feature group specified by <code>j</code> is returned.</p></li>
-<li><p><code>$</code>: Extract a formula table for a feature group.</p></li>
+<li><p><code><a href='generics.html'>$</a></code>: Extract a formula table for a feature group.</p></li>
 <li><p><code>as.data.table</code>: Generates a table with all candidate formulae for each
 feature group and other information such as element counts.</p></li>
 <li><p><code>filter</code>: Performs rule based filtering on formula results.</p></li>
@@ -593,7 +593,7 @@ the <code>rank</code> columns.</p></li>
 
     
 
-<dl'>
+<dl>
 <dt><code>formulas,featureFormulas</code></dt><dd><p>Lists of all generated formulae. Use the
 <code>formulaTable</code> method for access.</p></dd>
 
@@ -675,7 +675,7 @@ doi: <a href='https://doi.org/10.1109/tvcg.2014.2346248'>10.1109/tvcg.2014.23462
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

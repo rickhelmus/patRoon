@@ -165,39 +165,39 @@
     <p>Utilities to screen for analytes with known or suspected identity.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>screenSuspects</span>(
-  <span class='no'>obj</span>,
-  <span class='no'>suspects</span>,
-  <span class='kw'>rtWindow</span> <span class='kw'>=</span> <span class='fl'>12</span>,
-  <span class='kw'>mzWindow</span> <span class='kw'>=</span> <span class='fl'>0.005</span>,
-  <span class='kw'>adduct</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>skipInvalid</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
-)
+    <pre class="usage"><span class='fu'>screenSuspects</span><span class='op'>(</span>
+  <span class='va'>obj</span>,
+  <span class='va'>suspects</span>,
+  rtWindow <span class='op'>=</span> <span class='fl'>12</span>,
+  mzWindow <span class='op'>=</span> <span class='fl'>0.005</span>,
+  adduct <span class='op'>=</span> <span class='cn'>NULL</span>,
+  skipInvalid <span class='op'>=</span> <span class='cn'>TRUE</span>
+<span class='op'>)</span>
 
 <span class='co'># S4 method for features</span>
-<span class='fu'>screenSuspects</span>(
-  <span class='no'>obj</span>,
-  <span class='no'>suspects</span>,
-  <span class='kw'>rtWindow</span> <span class='kw'>=</span> <span class='fl'>12</span>,
-  <span class='kw'>mzWindow</span> <span class='kw'>=</span> <span class='fl'>0.005</span>,
-  <span class='kw'>adduct</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>skipInvalid</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
-)
+<span class='fu'>screenSuspects</span><span class='op'>(</span>
+  <span class='va'>obj</span>,
+  <span class='va'>suspects</span>,
+  rtWindow <span class='op'>=</span> <span class='fl'>12</span>,
+  mzWindow <span class='op'>=</span> <span class='fl'>0.005</span>,
+  adduct <span class='op'>=</span> <span class='cn'>NULL</span>,
+  skipInvalid <span class='op'>=</span> <span class='cn'>TRUE</span>
+<span class='op'>)</span>
 
 <span class='co'># S4 method for featureGroups</span>
-<span class='fu'>screenSuspects</span>(
-  <span class='no'>obj</span>,
-  <span class='no'>suspects</span>,
-  <span class='kw'>rtWindow</span> <span class='kw'>=</span> <span class='fl'>12</span>,
-  <span class='kw'>mzWindow</span> <span class='kw'>=</span> <span class='fl'>0.005</span>,
-  <span class='kw'>adduct</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>skipInvalid</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
-)
+<span class='fu'>screenSuspects</span><span class='op'>(</span>
+  <span class='va'>obj</span>,
+  <span class='va'>suspects</span>,
+  rtWindow <span class='op'>=</span> <span class='fl'>12</span>,
+  mzWindow <span class='op'>=</span> <span class='fl'>0.005</span>,
+  adduct <span class='op'>=</span> <span class='cn'>NULL</span>,
+  skipInvalid <span class='op'>=</span> <span class='cn'>TRUE</span>
+<span class='op'>)</span>
 
 <span class='co'># S4 method for featureGroups</span>
-<span class='fu'>groupFeaturesScreening</span>(<span class='no'>fGroups</span>, <span class='no'>scr</span>)
+<span class='fu'>groupFeaturesScreening</span><span class='op'>(</span><span class='va'>fGroups</span>, <span class='va'>scr</span><span class='op'>)</span>
 
-<span class='fu'>importFeatureGroupsBrukerTASQ</span>(<span class='no'>path</span>, <span class='no'>analysisInfo</span>, <span class='kw'>clusterRTWindow</span> <span class='kw'>=</span> <span class='fl'>12</span>)</pre>
+<span class='fu'>importFeatureGroupsBrukerTASQ</span><span class='op'>(</span><span class='va'>path</span>, <span class='va'>analysisInfo</span>, clusterRTWindow <span class='op'>=</span> <span class='fl'>12</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -355,7 +355,7 @@ if possible, as it can significantly reduce the load on data interpretation.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

@@ -166,54 +166,54 @@
     </div>
 
     <pre class="usage"><span class='co'># S4 method for features</span>
-<span class='fu'>groupFeatures</span>(<span class='no'>feat</span>, <span class='no'>algorithm</span>, <span class='no'>...</span>, <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+<span class='fu'>groupFeatures</span><span class='op'>(</span><span class='va'>feat</span>, <span class='va'>algorithm</span>, <span class='va'>...</span>, verbose <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
 
-<span class='fu'>importFeatureGroups</span>(<span class='no'>path</span>, <span class='no'>type</span>, <span class='no'>...</span>)
+<span class='fu'>importFeatureGroups</span><span class='op'>(</span><span class='va'>path</span>, <span class='va'>type</span>, <span class='va'>...</span><span class='op'>)</span>
 
-<span class='fu'>importFeatureGroupsBrukerPA</span>(
-  <span class='no'>path</span>,
-  <span class='no'>feat</span>,
-  <span class='kw'>rtWindow</span> <span class='kw'>=</span> <span class='fl'>12</span>,
-  <span class='kw'>mzWindow</span> <span class='kw'>=</span> <span class='fl'>0.005</span>,
-  <span class='kw'>intWindow</span> <span class='kw'>=</span> <span class='fl'>5</span>,
-  <span class='kw'>warn</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
-)
+<span class='fu'>importFeatureGroupsBrukerPA</span><span class='op'>(</span>
+  <span class='va'>path</span>,
+  <span class='va'>feat</span>,
+  rtWindow <span class='op'>=</span> <span class='fl'>12</span>,
+  mzWindow <span class='op'>=</span> <span class='fl'>0.005</span>,
+  intWindow <span class='op'>=</span> <span class='fl'>5</span>,
+  warn <span class='op'>=</span> <span class='cn'>TRUE</span>
+<span class='op'>)</span>
 
-<span class='fu'>importFeatureGroupsEnviMass</span>(<span class='no'>path</span>, <span class='no'>feat</span>, <span class='no'>positive</span>)
+<span class='fu'>importFeatureGroupsEnviMass</span><span class='op'>(</span><span class='va'>path</span>, <span class='va'>feat</span>, <span class='va'>positive</span><span class='op'>)</span>
 
-<span class='fu'>groupFeaturesOpenMS</span>(
-  <span class='no'>feat</span>,
-  <span class='kw'>rtalign</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>QT</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>maxAlignRT</span> <span class='kw'>=</span> <span class='fl'>30</span>,
-  <span class='kw'>maxAlignMZ</span> <span class='kw'>=</span> <span class='fl'>0.005</span>,
-  <span class='kw'>maxGroupRT</span> <span class='kw'>=</span> <span class='fl'>12</span>,
-  <span class='kw'>maxGroupMZ</span> <span class='kw'>=</span> <span class='fl'>0.005</span>,
-  <span class='kw'>extraOptsRT</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>extraOptsGroup</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
-)
+<span class='fu'>groupFeaturesOpenMS</span><span class='op'>(</span>
+  <span class='va'>feat</span>,
+  rtalign <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  QT <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  maxAlignRT <span class='op'>=</span> <span class='fl'>30</span>,
+  maxAlignMZ <span class='op'>=</span> <span class='fl'>0.005</span>,
+  maxGroupRT <span class='op'>=</span> <span class='fl'>12</span>,
+  maxGroupMZ <span class='op'>=</span> <span class='fl'>0.005</span>,
+  extraOptsRT <span class='op'>=</span> <span class='cn'>NULL</span>,
+  extraOptsGroup <span class='op'>=</span> <span class='cn'>NULL</span>,
+  verbose <span class='op'>=</span> <span class='cn'>TRUE</span>
+<span class='op'>)</span>
 
-<span class='fu'>groupFeaturesXCMS</span>(
-  <span class='no'>feat</span>,
-  <span class='kw'>rtalign</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>exportedData</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>groupArgs</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>mzwid</span> <span class='kw'>=</span> <span class='fl'>0.015</span>),
-  <span class='kw'>retcorArgs</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"obiwarp"</span>),
-  <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
-)
+<span class='fu'>groupFeaturesXCMS</span><span class='op'>(</span>
+  <span class='va'>feat</span>,
+  rtalign <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  exportedData <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  groupArgs <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>mzwid <span class='op'>=</span> <span class='fl'>0.015</span><span class='op'>)</span>,
+  retcorArgs <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>method <span class='op'>=</span> <span class='st'>"obiwarp"</span><span class='op'>)</span>,
+  verbose <span class='op'>=</span> <span class='cn'>TRUE</span>
+<span class='op'>)</span>
 
-<span class='fu'>importFeatureGroupsXCMS</span>(<span class='no'>xs</span>, <span class='no'>analysisInfo</span>)
+<span class='fu'>importFeatureGroupsXCMS</span><span class='op'>(</span><span class='va'>xs</span>, <span class='va'>analysisInfo</span><span class='op'>)</span>
 
-<span class='fu'>groupFeaturesXCMS3</span>(
-  <span class='no'>feat</span>,
-  <span class='kw'>rtalign</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>groupParam</span> <span class='kw'>=</span> <span class='kw pkg'>xcms</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/xcms/man/groupChromPeaks-density.html'>PeakDensityParam</a></span>(<span class='kw'>sampleGroups</span> <span class='kw'>=</span> <span class='fu'><a href='generics.html'>analysisInfo</a></span>(<span class='no'>feat</span>)$<span class='no'>group</span>),
-  <span class='kw'>retAlignParam</span> <span class='kw'>=</span> <span class='kw pkg'>xcms</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/xcms/man/adjustRtime-obiwarp.html'>ObiwarpParam</a></span>(),
-  <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
-)
+<span class='fu'>groupFeaturesXCMS3</span><span class='op'>(</span>
+  <span class='va'>feat</span>,
+  rtalign <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  groupParam <span class='op'>=</span> <span class='fu'>xcms</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/xcms/man/groupChromPeaks-density.html'>PeakDensityParam</a></span><span class='op'>(</span>sampleGroups <span class='op'>=</span> <span class='fu'><a href='generics.html'>analysisInfo</a></span><span class='op'>(</span><span class='va'>feat</span><span class='op'>)</span><span class='op'>$</span><span class='va'>group</span><span class='op'>)</span>,
+  retAlignParam <span class='op'>=</span> <span class='fu'>xcms</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/xcms/man/adjustRtime-obiwarp.html'>ObiwarpParam</a></span><span class='op'>(</span><span class='op'>)</span>,
+  verbose <span class='op'>=</span> <span class='cn'>TRUE</span>
+<span class='op'>)</span>
 
-<span class='fu'>importFeatureGroupsXCMS3</span>(<span class='no'>xdata</span>, <span class='no'>analysisInfo</span>)</pre>
+<span class='fu'>importFeatureGroupsXCMS3</span><span class='op'>(</span><span class='va'>xdata</span>, <span class='va'>analysisInfo</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -444,7 +444,7 @@ doi: <a href='https://doi.org/10.1038/nmeth.3959'>10.1038/nmeth.3959</a>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

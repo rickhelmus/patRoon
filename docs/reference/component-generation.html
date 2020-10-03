@@ -168,58 +168,58 @@ isotopes, adducts and homologues) to assist and simplify compound annotation.</p
     </div>
 
     <pre class="usage"><span class='co'># S4 method for featureGroups</span>
-<span class='fu'>generateComponents</span>(<span class='no'>fGroups</span>, <span class='no'>algorithm</span>, <span class='no'>...</span>)
+<span class='fu'>generateComponents</span><span class='op'>(</span><span class='va'>fGroups</span>, <span class='va'>algorithm</span>, <span class='va'>...</span><span class='op'>)</span>
 
-<span class='fu'>generateComponentsCAMERA</span>(
-  <span class='no'>fGroups</span>,
-  <span class='no'>ionization</span>,
-  <span class='kw'>onlyIsotopes</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>minSize</span> <span class='kw'>=</span> <span class='fl'>2</span>,
-  <span class='kw'>relMinReplicates</span> <span class='kw'>=</span> <span class='fl'>0.5</span>,
-  <span class='kw'>extraOpts</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
-)
+<span class='fu'>generateComponentsCAMERA</span><span class='op'>(</span>
+  <span class='va'>fGroups</span>,
+  <span class='va'>ionization</span>,
+  onlyIsotopes <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  minSize <span class='op'>=</span> <span class='fl'>2</span>,
+  relMinReplicates <span class='op'>=</span> <span class='fl'>0.5</span>,
+  extraOpts <span class='op'>=</span> <span class='cn'>NULL</span>
+<span class='op'>)</span>
 
-<span class='fu'>generateComponentsIntClust</span>(
-  <span class='no'>fGroups</span>,
-  <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"complete"</span>,
-  <span class='kw'>metric</span> <span class='kw'>=</span> <span class='st'>"euclidean"</span>,
-  <span class='kw'>normFunc</span> <span class='kw'>=</span> <span class='no'>max</span>,
-  <span class='kw'>average</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>maxTreeHeight</span> <span class='kw'>=</span> <span class='fl'>1</span>,
-  <span class='kw'>deepSplit</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>minModuleSize</span> <span class='kw'>=</span> <span class='fl'>1</span>
-)
+<span class='fu'>generateComponentsIntClust</span><span class='op'>(</span>
+  <span class='va'>fGroups</span>,
+  method <span class='op'>=</span> <span class='st'>"complete"</span>,
+  metric <span class='op'>=</span> <span class='st'>"euclidean"</span>,
+  normFunc <span class='op'>=</span> <span class='va'>max</span>,
+  average <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  maxTreeHeight <span class='op'>=</span> <span class='fl'>1</span>,
+  deepSplit <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  minModuleSize <span class='op'>=</span> <span class='fl'>1</span>
+<span class='op'>)</span>
 
-<span class='fu'>generateComponentsNontarget</span>(
-  <span class='no'>fGroups</span>,
-  <span class='no'>ionization</span>,
-  <span class='kw'>rtRange</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(-<span class='fl'>120</span>, <span class='fl'>120</span>),
-  <span class='kw'>mzRange</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>5</span>, <span class='fl'>120</span>),
-  <span class='kw'>elements</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"C"</span>, <span class='st'>"H"</span>, <span class='st'>"O"</span>),
-  <span class='kw'>rtDev</span> <span class='kw'>=</span> <span class='fl'>30</span>,
-  <span class='kw'>absMzDev</span> <span class='kw'>=</span> <span class='fl'>0.002</span>,
-  <span class='kw'>absMzDevLink</span> <span class='kw'>=</span> <span class='no'>absMzDev</span> * <span class='fl'>2</span>,
-  <span class='kw'>extraOpts</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>traceHack</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/all.html'>all</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/Version.html'>R.Version</a></span>()[<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"major"</span>, <span class='st'>"minor"</span>)] <span class='kw'>&gt;=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>3</span>, <span class='fl'>4</span>))
-)
+<span class='fu'>generateComponentsNontarget</span><span class='op'>(</span>
+  <span class='va'>fGroups</span>,
+  <span class='va'>ionization</span>,
+  rtRange <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='op'>-</span><span class='fl'>120</span>, <span class='fl'>120</span><span class='op'>)</span>,
+  mzRange <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>5</span>, <span class='fl'>120</span><span class='op'>)</span>,
+  elements <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"C"</span>, <span class='st'>"H"</span>, <span class='st'>"O"</span><span class='op'>)</span>,
+  rtDev <span class='op'>=</span> <span class='fl'>30</span>,
+  absMzDev <span class='op'>=</span> <span class='fl'>0.002</span>,
+  absMzDevLink <span class='op'>=</span> <span class='va'>absMzDev</span> <span class='op'>*</span> <span class='fl'>2</span>,
+  extraOpts <span class='op'>=</span> <span class='cn'>NULL</span>,
+  traceHack <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/all.html'>all</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/Version.html'>R.Version</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>[</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"major"</span>, <span class='st'>"minor"</span><span class='op'>)</span><span class='op'>]</span> <span class='op'>&gt;=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>3</span>, <span class='fl'>4</span><span class='op'>)</span><span class='op'>)</span>
+<span class='op'>)</span>
 
-<span class='fu'>generateComponentsRAMClustR</span>(
-  <span class='no'>fGroups</span>,
-  <span class='kw'>st</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>sr</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>maxt</span> <span class='kw'>=</span> <span class='fl'>12</span>,
-  <span class='kw'>hmax</span> <span class='kw'>=</span> <span class='fl'>0.3</span>,
-  <span class='kw'>normalize</span> <span class='kw'>=</span> <span class='st'>"TIC"</span>,
-  <span class='no'>ionization</span>,
-  <span class='kw'>absMzDev</span> <span class='kw'>=</span> <span class='fl'>0.002</span>,
-  <span class='kw'>relMzDev</span> <span class='kw'>=</span> <span class='fl'>5</span>,
-  <span class='kw'>minSize</span> <span class='kw'>=</span> <span class='fl'>2</span>,
-  <span class='kw'>relMinReplicates</span> <span class='kw'>=</span> <span class='fl'>0.5</span>,
-  <span class='kw'>RCExperimentVals</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>design</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>platform</span> <span class='kw'>=</span> <span class='st'>"LC-MS"</span>), <span class='kw'>instrument</span> <span class='kw'>=</span>
-    <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>ionization</span> <span class='kw'>=</span> <span class='no'>ionization</span>, <span class='kw'>MSlevs</span> <span class='kw'>=</span> <span class='fl'>1</span>)),
-  <span class='kw'>extraOptsRC</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>extraOptsFM</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
-)</pre>
+<span class='fu'>generateComponentsRAMClustR</span><span class='op'>(</span>
+  <span class='va'>fGroups</span>,
+  st <span class='op'>=</span> <span class='cn'>NULL</span>,
+  sr <span class='op'>=</span> <span class='cn'>NULL</span>,
+  maxt <span class='op'>=</span> <span class='fl'>12</span>,
+  hmax <span class='op'>=</span> <span class='fl'>0.3</span>,
+  normalize <span class='op'>=</span> <span class='st'>"TIC"</span>,
+  <span class='va'>ionization</span>,
+  absMzDev <span class='op'>=</span> <span class='fl'>0.002</span>,
+  relMzDev <span class='op'>=</span> <span class='fl'>5</span>,
+  minSize <span class='op'>=</span> <span class='fl'>2</span>,
+  relMinReplicates <span class='op'>=</span> <span class='fl'>0.5</span>,
+  RCExperimentVals <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>design <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>platform <span class='op'>=</span> <span class='st'>"LC-MS"</span><span class='op'>)</span>, instrument <span class='op'>=</span>
+    <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>ionization <span class='op'>=</span> <span class='va'>ionization</span>, MSlevs <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span><span class='op'>)</span>,
+  extraOptsRC <span class='op'>=</span> <span class='cn'>NULL</span>,
+  extraOptsFM <span class='op'>=</span> <span class='cn'>NULL</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -448,7 +448,7 @@ and reduce the data size and thus complexity.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

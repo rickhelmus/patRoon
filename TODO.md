@@ -8,6 +8,7 @@
     - Remove necessity to have different input/output formats? (at least OK for pwiz)
     - Support OpenMS vendor conversion? (eg thermo)
 - somehow handle different fragment formula annotations when making a consensus between formula/compounds objects
+- allow specifying average function in other places where as.data.table() is used (eg clustering, plotting etc)
 
 
 ## AutoID

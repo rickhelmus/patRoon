@@ -85,6 +85,7 @@
   areas = FALSE,
   features = FALSE,
   regression = FALSE,
+  averageFunc = mean,
   normFunc = NULL,
   FCParams = NULL
 )
@@ -166,7 +167,7 @@ argument to \code{\link[=filter,featureGroups-method]{filter}}).}
 
 \item{out}{The destination file for the exported data.}
 
-\item{average}{Average data within replicate groups.}
+\item{average}{If \code{TRUE} then data within replicate groups are averaged.}
 
 \item{features}{If \code{TRUE} then feature specific data will be added. If
 \code{average=TRUE} this data will be averaged for each feature group.}
@@ -181,6 +182,9 @@ intercept, slope and R2 is added to the output. In addition, when
 no regression information is added when no \code{conc} column is present in
 the analysis information or when less than two concentrations are specified
 (\emph{i.e.} the minimum amount).}
+
+\item{averageFunc}{Function used for averaging. Used when \code{average=TRUE}
+or \code{FCParams != NULL}}
 
 \item{normFunc}{Function that should be used for normalization of data. The
 function is called for all intensities/areas of a feature group and these

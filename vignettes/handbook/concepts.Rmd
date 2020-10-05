@@ -73,3 +73,6 @@ To summarize:
 * **Componentization** involves consolidating different feature groups that have a relationship to each other in to a single component.
 
 The next chapters will discuss how to generate this data and process it.
+
+```{r child=file.path(vignDir, "shared", "_refs.Rmd")}
+```

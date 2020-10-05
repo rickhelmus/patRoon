@@ -12,3 +12,5 @@ New users are highly recommended to start with the tutorial: this document provi
 
 
 
+```{r child=file.path(vignDir, "shared", "_refs.Rmd")}
+```

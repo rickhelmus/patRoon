@@ -317,3 +317,6 @@ options(patRoon.maxProcAmount = 3) # execute max 3 commands in parallel
 formulas <- generateFormulas(..., maxProcAmount = 3) # ditto, but only for this function
 ```
 
+
+```{r child=file.path(vignDir, "shared", "_refs.Rmd")}
+```

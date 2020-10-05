@@ -100,3 +100,6 @@ Afterwards, you can run the `verifyDependencies()` function to see if `patRoon` 
 ```{r eval=FALSE}
 patRoon::verifyDependencies()
 ```
+
+```{r child=file.path(vignDir, "shared", "_refs.Rmd")}
+```

@@ -79,6 +79,3 @@ if (runData)
 
 ```{css code=readLines(file.path(vignDir, "styles.css")),echo=FALSE,eval=knitr::is_html_output()}
 ```
-
-```{r child=file.path(vignDir, "shared", "_refs.Rmd")}
-```

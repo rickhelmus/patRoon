@@ -604,3 +604,6 @@ componInt <- treeCut(componInt, k = 10)
 # automatic re-assignment of clusters (adjusted max tree height)
 componInt <- treeCutDynamic(componInt, maxTreeHeight = 0.7)
 ```
+
+```{r child=file.path(vignDir, "shared", "_refs.Rmd")}
+```

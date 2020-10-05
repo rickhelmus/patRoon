@@ -700,3 +700,6 @@ reportHTML(fGroups, formulas = formulas, compounds = compounds,
            compsCluster = compsClust,
            compoundsTopMost = 10)
 ```
+
+```{r child=file.path(vignDir, "shared", "_refs.Rmd")}
+```

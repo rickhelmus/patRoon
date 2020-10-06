@@ -24,7 +24,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2020-10-03" />
+<meta name="date" content="2020-10-06" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -201,8 +201,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
             <section class="normal" id="section-">
 <div id="compclust" class="section level2">
 <h2><span class="header-section-number">6.5</span> Compound clustering</h2>
-<p>When large databases such as [PubChem] or [ChemSpider] are used for compound annotation, it is common to find <em>many</em> candidate structures for even a single feature. While choosing the right scoring settings can significantly improve their ranking, it is still very much possible that many candidates of potential interest remain. In this situation it might help to perform <em>compound clustering</em>. During this process, all candidates for a feature are clustered hierarchically on basis of similar chemical structure. From the resulting cluster the <em>maximum common substructure</em> (MCS) can be derived, which represents the largest possible substructure that 'fit' in all candidates. By visual inspection of the MCS it may be possible to identify likely common structural properties of a feature.</p>
-<p>In order to perform compound clustering the <code>makeHCluster()</code> generic function should be used. This function heavily relies on chemical fingerprinting functionality provided by [rcdk].</p>
+<p>When large databases such as <a href="https://pubchem.ncbi.nlm.nih.gov/">PubChem</a> or <a href="http://www.chemspider.com/">ChemSpider</a> are used for compound annotation, it is common to find <em>many</em> candidate structures for even a single feature. While choosing the right scoring settings can significantly improve their ranking, it is still very much possible that many candidates of potential interest remain. In this situation it might help to perform <em>compound clustering</em>. During this process, all candidates for a feature are clustered hierarchically on basis of similar chemical structure. From the resulting cluster the <em>maximum common substructure</em> (MCS) can be derived, which represents the largest possible substructure that 'fit' in all candidates. By visual inspection of the MCS it may be possible to identify likely common structural properties of a feature.</p>
+<p>In order to perform compound clustering the <code>makeHCluster()</code> generic function should be used. This function heavily relies on chemical fingerprinting functionality provided by <a href="https://github.com/CDK-R/cdkr">rcdk</a>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">compounds &lt;-<span class="st"> </span><span class="kw">generateCompounds</span>(...) <span class="co"># get our compounds</span>
 compsClust &lt;-<span class="st"> </span><span class="kw">makeHCluster</span>(compounds)</code></pre></div>
 <p>This function accepts several arguments to fine tune the clustering process:</p>

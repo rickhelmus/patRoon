@@ -24,7 +24,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2020-10-03" />
+<meta name="date" content="2020-10-06" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -202,7 +202,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="exporting-and-converting-feature-data" class="section level2">
 <h2><span class="header-section-number">6.3</span> Exporting and converting feature data</h2>
 <p>The feature group data obtained during the workflow can be exported to various formats with the <code>export()</code> generic function. There are currently three formats supported: <code>&quot;brukerpa&quot;</code> (Bruker ProfileAnalysis), <code>&quot;brukertasq&quot;</code> (Bruker TASQ) and <code>&quot;mzmine&quot;</code> (mzMine). The former exports a 'bucket table' which can be loaded in ProfileAnalysis, the second and third export a target list that can be processed with TASQ and mzMine, respectively.</p>
-<p>The <code>getXCMSSet()</code> function converts a <code>features</code> or <code>featureGroups</code> object to an <code>xcmsSet</code> object which can be used for further processing with [xcms]. Similarly, the <code>getXCMSnExp()</code> function can be used for conversion to an XCMS3 style <code>XCMSnExp</code> object.</p>
+<p>The <code>getXCMSSet()</code> function converts a <code>features</code> or <code>featureGroups</code> object to an <code>xcmsSet</code> object which can be used for further processing with <a href="https://www.bioconductor.org/packages/release/bioc/html/xcms.html">xcms</a>. Similarly, the <code>getXCMSnExp()</code> function can be used for conversion to an XCMS3 style <code>XCMSnExp</code> object.</p>
 <p>Some examples for these functions are shown below.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">export</span>(fGroups, <span class="st">&quot;brukertasq&quot;</span>, <span class="dt">out =</span> <span class="st">&quot;my_targets.csv&quot;</span>)
 

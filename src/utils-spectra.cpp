@@ -213,6 +213,7 @@ BinnedSpectrum binSpectra(const Spectrum &specLeft, Spectrum specRight,
     {
         for (double &m : specRight.mzs)
             m -= precDiff;
+        // NOTE: negative m/z values will be skipped below
     }
     else if (shift == "both") // UNDONE: other name for "both"?
     {
@@ -268,6 +269,12 @@ BinnedSpectrum binSpectra(const Spectrum &specLeft, Spectrum specRight,
         {
             const double rmz = specRight.mzs[lastRightInd], rmzmin = rmz - mzWindow, rmzmax = rmz + mzWindow;
             
+            if (rmz <= 0) // may be (below) zero due to precursor shift
+            {
+                ++lastRightInd;
+                continue;
+            }
+            
             if (leftMZ < rmzmin)
                 break; // surpassed range for left
             
@@ -301,7 +308,8 @@ BinnedSpectrum binSpectra(const Spectrum &specLeft, Spectrum specRight,
     // add missing from right
     for (size_t j=0; j<specRight.mzs.size(); ++j)
     {
-        if (std::find(usedRightInds.begin(), usedRightInds.end(), j) == usedRightInds.end())
+        if (std::find(usedRightInds.begin(), usedRightInds.end(), j) == usedRightInds.end() &&
+            specRight.mzs[j] > 0)
         {
             ret.mzs.push_back(specRight.mzs[j]);
             ret.intsLeft.push_back(0);
@@ -373,6 +381,10 @@ double doCalcSpecSimilarity(Spectrum sp1, Spectrum sp2, const std::string &metho
             divu += (u[i] * u[i]);
             divv += (v[i] * v[i]);
         }
+        
+        if (divu == 0.0 || divv == 0.0) // lack of any overlap
+            return 0.0;
+        
         const double div = std::sqrt(divu) * std::sqrt(divv);
         
         return dp / div;

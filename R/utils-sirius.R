@@ -159,7 +159,8 @@ runSIRIUS <- function(precursorMZs, MSPLists, MSMSPLists, profile, adduct, ppmMa
     formArgs <- c("-p", profile,
                   "-e", elements,
                   "--ppm-max", ppmMax,
-                  "-c", topMost)
+                  "-c", topMost,
+                  "-i", ionization)
     
     if (!is.null(database))
         formArgs <- c(formArgs, "-d", database)

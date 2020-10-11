@@ -8,6 +8,7 @@
 * minor fixes for subsetting XCMS `features` objects
 * Fixed: `generateCompoundsMetFrag()`: compound names could be sometimes be interpreted as dates (reported by Corey Griffith)
 * Fixed: on very rare cases empty peaklists could be present after averaging.
+* Fixed: `SIRIUS` annotation didn't use set adduct but used default instead
 
 
 # patRoon 1.0.2

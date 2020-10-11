@@ -44,6 +44,7 @@
 - PubChemLite
     - Install from Win inst script --> now only tier1, OK?
 - SusDat MF support
+- Fix SIRIUS with other adducts: https://github.com/boecker-lab/sirius/issues/10
 
 
 ## formulas

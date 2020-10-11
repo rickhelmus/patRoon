@@ -388,13 +388,16 @@ specSimilarity <- function(pl1, pl2, method, shift = "none", precDiff = 0, remov
             stop("Either none or both peaklists need to contain set data")
         
         allSets <- unique(c(pl1$set, pl2$set))
-        return(mean(sapply(allSets, function(s)
+        sims <- sapply(allSets, function(s)
         {
             spl1 <- pl1[set == s]; spl2 <- pl2[set == s]
             if (nrow(spl1) == 0 || nrow(spl2) == 0)
                 return(NA)
             return(calcSpecSimilarity(spl1, spl2, method, shift, precDiff, mzWeight, intWeight, absMzDev))
-        }), na.rm = TRUE))
+        })
+        if (all(is.na(sims)))
+            return(NA)
+        return(mean(sims, na.rm = TRUE))
     }
 
     return(calcSpecSimilarity(pl1, pl2, method, shift, precDiff, mzWeight, intWeight, absMzDev))

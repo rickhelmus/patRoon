@@ -80,63 +80,6 @@ TPPredictionsLogic <- setClass("TPPredictionsLogic", contains = "TPPredictions")
 setMethod("initialize", "TPPredictionsLogic",
           function(.Object, ...) callNextMethod(.Object, algorithm = "logic", ...))
 
-#' @export
-setMethod("filter", "TPPredictionsLogic", function(obj, formulas = NULL, negate = FALSE)
-{
-    # UNDONE: move to base class?
-    
-    ac <- checkmate::makeAssertCollection()
-    checkmate::assertClass(formulas, "formulas", null.ok = TRUE, add = ac)
-    checkmate::assertFlag(negate, add = ac)
-    checkmate::reportAssertions(ac)
-    
-    if (length(obj) == 0)
-        return(obj)
-    
-    oldn <- length(obj)
-    
-    hash <- makeHash(obj, formulas, negate)
-    cache <- loadCacheData("filterTPs", hash)
-    if (!is.null(cache))
-        obj <- cache
-    else if (!is.null(formulas))
-    {
-        obj@predictions <- Map(obj@predictions, names(obj), f = function(pred, gName)
-        {
-            if (!is.null(formulas[[gName]]))
-            {
-                # check if subtracting is possible, ie by checking if
-                # subtraction doesn't lead to negative element counts
-                candidateForms <- unique(formulas[[gName]]$neutral_formula)
-                
-                canSub <- function(f)
-                {
-                    for (cf in candidateForms)
-                    {
-                        fl <- splitFormulaToList(subtractFormula(cf, f))
-                        if (all(fl >= 0))
-                            return(TRUE)
-                    }
-                    return(FALSE)
-                }
-                if (negate)
-                    canSub <- Negate(canSub)
-                pred <- pred[sapply(reaction_sub, canSub)]
-            }
-            return(pred)
-        })
-        
-        obj@predictions <- pruneList(obj@predictions, checkZeroRows = TRUE)
-        
-        saveCacheData("filterTPs", obj, hash)
-    }
-    
-    newn <- length(obj)
-    printf("Done! Filtered %d (%.2f%%) TPs. Remaining: %d\n", oldn - newn, if (oldn == 0) 0 else (1-(newn/oldn))*100, newn)
-    
-    return(obj)
-})
-
 setMethod("linkPrecursorsToFGroups", "TPPredictionsLogic", function(pred, fGroups)
 {
     fg <- intersect(names(pred), names(fGroups))

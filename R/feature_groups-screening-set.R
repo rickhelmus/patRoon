@@ -42,7 +42,11 @@ mergeScreeningSetInfos <- function(setObjects, sInfos = lapply(setObjects, scree
     {
         scrInfo <- copy(sInfos[[1]])
         if (rmSetCols)
-            scrInfo[, (rmCols) := NULL]
+        {
+            rmCols <- intersect(rmCols, names(scrInfo))
+            if (length(rmCols) > 0)
+                scrInfo[, (intersect(rmCols, names(scrInfo))) := NULL]
+        }
     }
     return(scrInfo[])
 }

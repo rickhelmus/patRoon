@@ -61,7 +61,8 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, pred, MSPeakLists, minRTDiff
         
         # limit columns a bit to not bloat components too much
         # UNDONE: column selection OK?
-        predCols <- c("name", "InChIKey", "formula", "mass", "RTDir")
+        predCols <- c("name", "InChIKey", "formula", "mass", "RTDir",
+                      "reaction_add", "reaction_sub", "deltaMZ")
         preds <- preds[, intersect(names(preds), predCols), with = FALSE]
         
         comps <- rbindlist(sapply(precFGs, function(precFG)
@@ -160,6 +161,68 @@ setMethod("as.data.table", "componentsTPs", function(x)
     return(ret)
 })
 
+#' @export
+setMethod("filter", "componentsTPs", function(obj, ..., formulas = NULL, negate = FALSE)
+{
+    # UNDONE: if formulas is set, also remove fGroups without assignment? Otherwise document!
+    
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertClass(formulas, "formulas", null.ok = TRUE, add = ac)
+    checkmate::assertFlag(negate, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    if (length(obj) == 0)
+        return(obj)
+    
+    if (!is.null(formulas))
+    {
+        if (is.null(obj[[1]][["reaction_add"]]))
+            stop("formula filter is only available for logic TP predictions")
+        
+        oldn <- length(obj)
+        
+        obj@components <- Map(componentTable(obj), componentInfo(obj)$precursor_group, f = function(cmp, gName)
+        {
+            # check if subtracting is possible, ie by checking if
+            # subtraction doesn't lead to negative element counts
+            canSub <- function(f, fg)
+            {
+                if (is.null(formulas[[fg]]) || length(f) == 0 || !nzchar(f))
+                    return(TRUE) # UNDONE?
+                candidateForms <- unique(formulas[[fg]]$neutral_formula)
+                for (cf in candidateForms)
+                {
+                    fl <- splitFormulaToList(subtractFormula(cf, f))
+                    if (all(fl >= 0))
+                        return(TRUE)
+                }
+                return(FALSE)
+            }
+            if (negate)
+                canSub <- Negate(canSub)
+            
+            # filter results where subtraction of any of the precursor formulas is impossible
+            cmp <- cmp[!nzchar(reaction_sub) | sapply(reaction_sub, canSub, gName)]
+            
+            # filter results where addition is not part of TP candidate formulas
+            if (nrow(cmp) > 0)
+                cmp <- cmp[!nzchar(reaction_add) | mapply(reaction_add, group, FUN = canSub)]
+
+            return(cmp)
+        })
+        
+        obj@components <- pruneList(obj@components, checkZeroRows = TRUE)
+        
+        newn <- length(obj)
+        printf("Done! Filtered %d (%.2f%%) components. Remaining: %d\n", oldn - newn, if (oldn == 0) 0 else (1-(newn/oldn))*100, newn)
+    }
+    
+    if (...length() > 0)
+        return(callNextMethod(obj, ..., negate = negate))
+    
+    return(obj)
+})
+
 #' @describeIn componentsTPs Plots an interactive network graph for linked
 #'   components. Components are linked when (partial) overlap occurs of their
 #'   containing transformation products. The graph is constructed with the
@@ -231,7 +294,6 @@ setMethod("generateComponentsTPs", "featureGroupsSet", function(fGroups, fGroups
     if (needsScreening(pred) &&
         (!inherits(fGroups, "featureGroupsScreeningSet") || !inherits(fGroupsTPs, "featureGroupsScreeningSet")))
         stop("Input feature groups need to be screened for (TP) suspects!")
-    
     ret <- doGenComponentsTPs(fGroups, fGroupsTPs, pred, MSPeakLists, minRTDiff, simMethod, removePrecursor,
                               mzWeight, intWeight, absMzDev, relMinIntensity)
     

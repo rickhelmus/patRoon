@@ -41,3 +41,7 @@
 [JavaJDK]: https://www.oracle.com/technetwork/java/javase/downloads/index.html
 [pngquant]: https://pngquant.org/
 [OpenBabel]: http://openbabel.org/wiki/Main_Page
+[Docker]: https://www.docker.com/
+[RStudio]: https://rstudio.com/
+[issues]: https://github.com/rickhelmus/patRoon/issues
+[RStudio image]: https://hub.docker.com/r/rocker/rstudio

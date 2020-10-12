@@ -30,11 +30,16 @@ COPY ./docker/install_deps.R ./DESCRIPTION ./
 
 ENV R_REMOTES_NO_ERRORS_FROM_WARNINGS=true
 
-RUN wget http://msbi.ipb-halle.de/~cruttkie/metfrag/MetFrag2.4.5-CL.jar && \
+RUN mkdir deps && cd deps && \
+    wget http://msbi.ipb-halle.de/~cruttkie/metfrag/MetFrag2.4.5-CL.jar && \
     wget https://bio.informatik.uni-jena.de/repository/dist-release-local/de/unijena/bioinf/ms/sirius/4.4.29/sirius-4.4.29-linux64-headless.zip && \
+    wget https://zenodo.org/record/3611238/files/PubChemLite_14Jan2020_tier1.csv && \
+    wget ftp://newftp.epa.gov/COMPTOX/Sustainable_Chemistry_Data/Chemistry_Dashboard/MetFrag_metadata_files/CompTox_17March2019_SelectMetaData.csv && \
     unzip sirius-4.4.29-linux64-headless.zip && rm sirius-4.4.29-linux64-headless.zip && \
-    echo 'options(patRoon.path.metFragCL = "~/MetFrag2.4.5-CL.jar")' >> .Rprofile && \
-    echo 'options(patRoon.path.SIRIUS = "~/sirius-linux64-headless-4.4.29/bin")' >> .Rprofile && \
+    echo 'options(patRoon.path.MetFragCL = "/home/patRoon/deps/MetFrag2.4.5-CL.jar")' >> .Rprofile && \
+    echo 'options(patRoon.path.SIRIUS = "/home/patRoon/deps/sirius-linux64-headless-4.4.29/bin")' >> .Rprofile && \
+    echo 'options(patRoon.path.MetFragCompTox = "/home/patRoon/deps/CompTox_17March2019_SelectMetaData.csv")' >> .Rprofile && \
+    echo 'options(patRoon.path.patRoon.path.MetFragPubChemLite = "/home/patRoon/deps/PubChemLite_14Jan2020_tier1.csv")' >> .Rprofile && \
     echo 'options(patRoon.progress.opts = list(style = 1))' >> .Rprofile && \
     Rscript install_deps.R && rm -f ~/install_deps.R ~/DESCRIPTION
 
@@ -43,5 +48,9 @@ ADD --chown=patRoon . patRoon
 RUN Rscript -e 'devtools::install(pkg = "patRoon", upgrade = FALSE)'
 
 ENV OPENMS_DATA_PATH=/usr/share/OpenMS _R_CHECK_FORCE_SUGGESTS_=0 R_MAX_NUM_DLLS=150
+
+USER root
+RUN cp /home/patRoon/.Rprofile /home/rstudio/.Rprofile
+USER patRoon
 
 CMD ["R"]

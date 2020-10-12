@@ -6,6 +6,7 @@
     - Agilent .d is also a directory?
 - runWithoutCache? rinWithCacheMode()? shortcut to withr::with_options(patRoon.cache.mode=...)
 - backport latest recursiveApplyDT() from TPs
+- Docker: only apply progress opt when testing
 
 
 ## docs

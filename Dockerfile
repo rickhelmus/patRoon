@@ -1,4 +1,4 @@
-FROM rocker/r-rspm:18.04
+FROM rocker/rstudio:4.0.2
 
 LABEL maintainer="Rick Helmus <r.helmus@uva.nl>" \
     org.label-schema.name="patRoon" \
@@ -11,22 +11,15 @@ LABEL maintainer="Rick Helmus <r.helmus@uva.nl>" \
 ENV SETUPDIR=/usr/local/setup
 
 RUN apt-get update -y && \
-    apt-get install -y --no-install-recommends libssl-dev libssh2-1-dev wget libv8-3.14-dev openbabel \
+    apt-get install -y --no-install-recommends libssl-dev libssh2-1-dev wget libnode-dev openbabel \
         libxml2-dev libnetcdf-dev netcdf-bin pngquant openjdk-11-jdk libmagick++-dev pandoc git pngquant texinfo libfribidi0 \
-        #r-cran-checkmate r-cran-data.table r-cran-withr r-cran-digest r-cran-xml r-cran-xml2 r-cran-dbi \
-        #r-cran-rsqlite r-cran-dplyr r-cran-rcolorbrewer \
-        #r-cran-htmlwidgets r-cran-shiny r-cran-knitr r-cran-r.utils \
-        #r-cran-ggplot2 r-cran-jsonlite r-cran-igraph r-cran-hmisc \
-        #r-cran-robustbase r-cran-testthat r-cran-v8 r-cran-biocmanager \
-        #r-bioc-biocparallel r-bioc-affy r-bioc-biocgenerics r-bioc-biobase \
-        #r-bioc-rbgl r-bioc-s4vectors r-bioc-biocparallel r-bioc-multtest && \
         zlib1g-dev libxml2-dev libnetcdf-dev libglpk-dev tzdata && \
     mkdir -p $SETUPDIR && \
     wget -P $SETUPDIR https://abibuilder.informatik.uni-tuebingen.de/archive/openms/OpenMSInstaller/release/2.5.0/OpenMS-2.5.0-Debian-Linux-x86_64.deb && \
     apt-get install -y --no-install-recommends $SETUPDIR/OpenMS-2.5.0-Debian-Linux-x86_64.deb && \
     rm -rf $SETUPDIR && \
     useradd -ms /bin/bash patRoon && \
-    addgroup patRoon docker && \
+    addgroup patRoon staff && \
     apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
     R CMD javareconf
 

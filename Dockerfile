@@ -35,7 +35,7 @@ RUN mkdir deps && cd deps && \
     wget https://bio.informatik.uni-jena.de/repository/dist-release-local/de/unijena/bioinf/ms/sirius/4.4.29/sirius-4.4.29-linux64-headless.zip && \
     wget https://zenodo.org/record/3611238/files/PubChemLite_14Jan2020_tier1.csv && \
     wget ftp://newftp.epa.gov/COMPTOX/Sustainable_Chemistry_Data/Chemistry_Dashboard/MetFrag_metadata_files/CompTox_17March2019_SelectMetaData.csv && \
-    unzip sirius-4.4.29-linux64-headless.zip && rm sirius-4.4.29-linux64-headless.zip && \
+    unzip sirius-4.4.29-linux64-headless.zip && rm sirius-4.4.29-linux64-headless.zip && cd ~ && \
     echo 'options(patRoon.path.MetFragCL = "/home/patRoon/deps/MetFrag2.4.5-CL.jar")' >> .Rprofile && \
     echo 'options(patRoon.path.SIRIUS = "/home/patRoon/deps/sirius-linux64-headless-4.4.29/bin")' >> .Rprofile && \
     echo 'options(patRoon.path.MetFragCompTox = "/home/patRoon/deps/CompTox_17March2019_SelectMetaData.csv")' >> .Rprofile && \

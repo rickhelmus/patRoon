@@ -5,24 +5,21 @@
 [![codecov](https://codecov.io/gh/rickhelmus/patRoon/branch/master/graph/badge.svg)](https://codecov.io/gh/rickhelmus/patRoon)
 [![](https://images.microbadger.com/badges/image/patroonorg/patroon.svg)](https://microbadger.com/images/patroonorg/patroon)
 
-`patRoon` aims to provide a common interface to various (primarily
-open-source) software solutions for mass spectrometry based non-target analysis.
-The name is derived from a Dutch word that means _pattern_ and may also be an acronym for _hyPhenated
-mAss specTROmetry nOn-target aNalysis_.
+`patRoon` aims to provide a solution for comprehensive mass spectrometry based non-target analysis (NTA) workflows for environmental analysis. The name is derived from a Dutch word that means _pattern_ and may also be an acronym for _hyPhenated mAss specTROmetry nOn-target aNalysis_.
 
-Mass spectrometry based non-target analysis is used to screen large numbers of chemicals simultaneously. For this purpose, high resolution mass spectrometry instruments are used which are typically coupled (or _hyphenated_) with chromatography (_e.g._ LC or GC) to provide additional separation of analytes prior to mass detection. The size and complexity of resulting data makes manual processing impractical, however, many dedicated software tools were developed (and are generally still in active development) to facilitate a more automated approach. The aim of `patRoon` is to harmonize the many tools available to provide a consistent user interface without the need to know all the details of each individual software tool and remove the need for tedious conversion of data when multiple tools are used. Many of the available tools were developed using the [R language][R] or otherwise easily interface with `R`, hence, it was a straightforward decision to develop `patRoon` as an `R` package.
+Mass spectrometry based non-target analysis is used to screen large numbers of chemicals simultaneously. For this purpose, high resolution mass spectrometry instruments are used which are typically coupled (or _hyphenated_) with chromatography (_e.g._ LC or GC) to provide additional separation of analytes prior to mass detection. The size and complexity of resulting data makes manual processing impractical. Many dedicated software tools were developed and are still being developed to facilitate a more automated approach. However, these tools are generally not optimized for environmental workflows and/or only implement parts of the functionality required for a complete NTA workflow. An important aim of `patRoon` is to harmonize the many tools available in a consistent user interface, which removes the need to know all the details of each individual software tool and performing tedious conversion of data when combining tools in a workflow. In addition, key functionality is implemented in `patRoon` to provide complete NTA workflows, such as fully automated annotation, evaluating and combining of results from different algorithms, automatic reporting, several user friendly graphical tools, extensive documentation, several important optimization strategies and more. Many of the available tools nowadays were developed using the [R language][R] or are otherwise easily interface with `R`, hence, it was a straightforward decision to develop `patRoon` as an `R` package.
 
 The workflow of non-target analysis is typically highly dependent on several factors such as the analytical instrumentation used and requirements of the study. For this reason, `patRoon` does not enforce a certain workflow. Instead, most workflow steps are optional, are highly configurable and algorithms can easily be mixed or even combined.
 
 Below is an overview of the most common non-target workflow steps supported along with various software tools that were used to implement them:
 
-* **Data preparation**: conversion between and export to common open MS data formats (e.g. mzXML and mzML) ([pwiz], [OpenMS], [DataAnalysis]).
+* **Data preparation**: conversion between and export to common open MS data formats (e.g. mzXML and mzML) ([ProteoWizard], [OpenMS], [DataAnalysis]).
 * **Extraction and grouping of features** (e.g. [XCMS], [OpenMS], [enviPick], [ProfileAnalysis]).
-* **Data cleanup**: post filtering of data to improve its quality and aid prioritization.
+* **Data cleanup**: post filtering of data to improve its quality and several tools to aid prioritization.
 * **Automatic extraction of MS and MS/MS** data ([mzR], [DataAnalysis]).
 * **Formula calculation**: automatic calculation of candidate formulae for detected features ([GenForm], [SIRIUS], [DataAnalysis]).
 * **Compound identification**: automatic annotation of MS/MS spectra and retrieval of candidate structures ([MetFrag], [SIRIUS with CSI:FingerID][SIRIUS]).
-* **Generation of components**: grouping of (chemically) related features such as isotopes, adducts and homologs ([RAMClustR], [CAMERA], [nontarget R package][nontarget]).
+* **Generation of components**: grouping of (chemically) related features such as isotopes, adducts and homologs ([RAMClustR], [CAMERA], [nontarget R package][nontarget]) and with related intensity profiles.
 * **reporting** of all workflow steps in various formats: _CSV_, _PDF_ and _HTML_.
 
 An example HTML report which gives an overview of what data can be produced can viewed [here][example].
@@ -33,15 +30,16 @@ An example HTML report which gives an overview of what data can be produced can 
 * `data.table` is used internally as a generally much more efficient alternative to `data.frame`.
 * The [processx] R package is used to execute command line processes in parallel to reduce computation times.
 * Results from workflow steps are cached within a [SQLite] database to avoid repeated computations.
-* The [RDCOMClient] is used to provide several functionalities from DataAnalysis (Bruker).
-* Depending on which software algorithms, the following MS data formats are supported: `mzXML`, `mzML` and `.d` (Bruker).
+* The [RDCOMClient] is used to provide functionality from DataAnalysis (Bruker).
+* Supports all major instrument vendor input formats (through usage of [ProteoWizard] and [DataAnalysis]).
 * The [Shiny] R package was used to implement several GUI tools.
 * S4 classes and generics are used to implement a consistent interface to the many different supported software algorithms for each workflow step.
+* Continuous integration is used for automated unit testing, automatically updating the [Website][ghweb] and documentation and maintaining a [miniCRAN] [repository][patRoonDeps] and [Docker image][DockerImg] to simplify installation (see [the handbook][handbook-inst] for more details).
 
 
 ## Installation
 
-`patRoon` itself can be installed as any other R package, however, since it is dependent on several other software tools some extra steps are required for the installation. Please see the [installation section in the handbook][handbook-inst] for more information.
+`patRoon` itself can be installed as any other R package, however, depending on which algorithms you want to use in your workflow, some extra steps may be required to install all the necessary tools. Please see the [installation section in the handbook][handbook-inst] for more information.
 
 
 ## Getting started
@@ -87,5 +85,8 @@ However, for a better guide to get started it is recommended to read the [tutori
 [RDCOMClient]: http://www.omegahat.net/RDCOMClient/
 [Shiny]: https://shiny.rstudio.com/
 [example]: https://rickhelmus.github.io/patRoon/examples/report.html
-[pwiz]: http://proteowizard.sourceforge.net/
-
+[ProteoWizard]: http://proteowizard.sourceforge.net/
+[ghweb]: https://rickhelmus.github.io/patRoon/
+[patRoonDeps]: https://github.com/rickhelmus/patRoonDeps
+[miniCRAN]: https://cran.r-project.org/web/packages/miniCRAN/index.html
+[DockerImg]: https://hub.docker.com/r/patroonorg/patroon

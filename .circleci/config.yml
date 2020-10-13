@@ -16,12 +16,12 @@ commands:
                 keys:
                     - v4-{{ .Branch }}
                 paths:
-                    - /caches/dock.tar
+                    - caches/dock.tar
             - run:
                 name: Load Docker image layer cache
                 command: |
                     set +o pipefail
-                    docker load -i /caches/dock.tar | true
+                    docker load -i caches/dock.tar | true
 
 jobs:
     build:
@@ -38,12 +38,12 @@ jobs:
             - run:
                 name: Save Docker image layer cache
                 command: |
-                    mkdir -p /caches
-                    docker save -o /caches/dock.tar "${TMP_IMAGE_NAME}"
+                    mkdir -p caches
+                    docker save -o caches/dock.tar "${TMP_IMAGE_NAME}"
             - save_cache:
                 key: v4-{{ .Branch }}-{{ epoch }}
                 paths:
-                    - /caches/dock.tar
+                    - caches/dock.tar
     test:
         <<: *dockerimg
         <<: *set_dock_env

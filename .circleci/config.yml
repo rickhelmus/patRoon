@@ -1,6 +1,6 @@
 dockerimg: &dockerimg
     docker:
-        - image: docker:18.04.0-ce-git
+        - image: ubuntu-2004:202008-01
 set_dock_env: &set_dock_env
     environment:
         IMAGE_NAME: "patroonorg/patroon"
@@ -14,7 +14,7 @@ commands:
             - setup_remote_docker
             - restore_cache:
                 keys:
-                    - v3-{{ .Branch }}
+                    - v4-{{ .Branch }}
                 paths:
                     - /caches/dock.tar
             - run:
@@ -41,7 +41,7 @@ jobs:
                     mkdir -p /caches
                     docker save -o /caches/dock.tar "${TMP_IMAGE_NAME}"
             - save_cache:
-                key: v3-{{ .Branch }}-{{ epoch }}
+                key: v4-{{ .Branch }}-{{ epoch }}
                 paths:
                     - /caches/dock.tar
     test:

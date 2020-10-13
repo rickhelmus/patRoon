@@ -8,16 +8,12 @@ LABEL maintainer="Rick Helmus <r.helmus@uva.nl>" \
     org.label-schema.vendor="patRoon" \
     docker.cmd.test="docker run -t patroonorg/patroon /bin/bash -c 'cd patRoon; Rscript docker/run_tests.R'"
 
-ENV SETUPDIR=/usr/local/setup
-
 RUN apt-get update -y && \
     apt-get install -y --no-install-recommends libssl-dev libssh2-1-dev wget libnode-dev openbabel \
         libxml2-dev libnetcdf-dev netcdf-bin pngquant openjdk-11-jdk libmagick++-dev pandoc git pngquant texinfo libfribidi0 \
         zlib1g-dev libxml2-dev libnetcdf-dev libglpk-dev tzdata && \
-    mkdir -p $SETUPDIR && \
-    wget -P $SETUPDIR https://github.com/OpenMS/OpenMS/releases/download/Release2.6.0/OpenMS-2.6.0-Debian-Linux-x86_64.deb && \
-    apt-get install -y --no-install-recommends $SETUPDIR/OpenMS-2.6.0-Debian-Linux-x86_64.deb && \
-    rm -rf $SETUPDIR && \
+    echo "deb http://archive.ubuntu.com/ubuntu/ groovy main universe" > /etc/apt/sources.list.d/groovy.list && \
+    apt-get update && apt-get install openms && rm /etc/apt/sources.list.d/groovy.list && \
     useradd -ms /bin/bash patRoon && \
     addgroup patRoon staff && \
     apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \

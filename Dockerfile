@@ -1,4 +1,4 @@
-FROM rocker/rstudio:4.0.2
+FROM rocker/rstudio:4.0.0-ubuntu18.04
 
 LABEL maintainer="Rick Helmus <r.helmus@uva.nl>" \
     org.label-schema.name="patRoon" \
@@ -8,12 +8,16 @@ LABEL maintainer="Rick Helmus <r.helmus@uva.nl>" \
     org.label-schema.vendor="patRoon" \
     docker.cmd.test="docker run -t patroonorg/patroon /bin/bash -c 'cd patRoon; Rscript docker/run_tests.R'"
 
+ENV SETUPDIR=/usr/local/setup
+
 RUN apt-get update -y && \
-    apt-get install -y --no-install-recommends libssl-dev libssh2-1-dev wget libnode-dev openbabel \
+    apt-get install -y --no-install-recommends libssl-dev libssh2-1-dev wget libv8-3.14-dev openbabel \
         libxml2-dev pngquant openjdk-11-jdk libmagick++-dev pandoc git pngquant texinfo libfribidi0 \
-        zlib1g-dev libxml2-dev libnetcdf-dev libglpk-dev tzdata && \
-    echo "deb http://archive.ubuntu.com/ubuntu/ groovy main universe" > /etc/apt/sources.list.d/groovy.list && \
-    apt-get update && apt-get -y --no-install-recommends install openms libnetcdf-dev netcdf-bin libnetcdf15 && rm /etc/apt/sources.list.d/groovy.list && \
+        zlib1g-dev libxml2-dev libnetcdf-dev libglpk-dev tzdata libnetcdf-dev netcdf-bin && \
+    mkdir -p $SETUPDIR && \
+    wget -P $SETUPDIR https://abibuilder.informatik.uni-tuebingen.de/archive/openms/OpenMSInstaller/release/2.5.0/OpenMS-2.5.0-Debian-Linux-x86_64.deb && \
+    apt-get install -y --no-install-recommends $SETUPDIR/OpenMS-2.5.0-Debian-Linux-x86_64.deb && \
+    rm -rf $SETUPDIR && \
     useradd -ms /bin/bash patRoon && \
     addgroup patRoon staff && \
     apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \

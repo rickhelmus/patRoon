@@ -10,10 +10,10 @@ LABEL maintainer="Rick Helmus <r.helmus@uva.nl>" \
 
 RUN apt-get update -y && \
     apt-get install -y --no-install-recommends libssl-dev libssh2-1-dev wget libnode-dev openbabel \
-        libxml2-dev libnetcdf-dev netcdf-bin pngquant openjdk-11-jdk libmagick++-dev pandoc git pngquant texinfo libfribidi0 \
+        libxml2-dev pngquant openjdk-11-jdk libmagick++-dev pandoc git pngquant texinfo libfribidi0 \
         zlib1g-dev libxml2-dev libnetcdf-dev libglpk-dev tzdata && \
     echo "deb http://archive.ubuntu.com/ubuntu/ groovy main universe" > /etc/apt/sources.list.d/groovy.list && \
-    apt-get update && apt-get -y --no-install-recommends install openms && rm /etc/apt/sources.list.d/groovy.list && \
+    apt-get update && apt-get -y --no-install-recommends install openms libnetcdf-dev netcdf-bin && rm /etc/apt/sources.list.d/groovy.list && \
     useradd -ms /bin/bash patRoon && \
     addgroup patRoon staff && \
     apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
@@ -27,10 +27,10 @@ COPY ./docker/install_deps.R ./DESCRIPTION ./
 ENV R_REMOTES_NO_ERRORS_FROM_WARNINGS=true
 
 RUN mkdir deps && cd deps && \
-    wget http://msbi.ipb-halle.de/~cruttkie/metfrag/MetFrag2.4.5-CL.jar && \
-    wget https://bio.informatik.uni-jena.de/repository/dist-release-local/de/unijena/bioinf/ms/sirius/4.4.29/sirius-4.4.29-linux64-headless.zip && \
-    wget https://zenodo.org/record/3611238/files/PubChemLite_14Jan2020_tier1.csv && \
-    wget ftp://newftp.epa.gov/COMPTOX/Sustainable_Chemistry_Data/Chemistry_Dashboard/MetFrag_metadata_files/CompTox_17March2019_SelectMetaData.csv && \
+    wget -q http://msbi.ipb-halle.de/~cruttkie/metfrag/MetFrag2.4.5-CL.jar && \
+    wget -q https://bio.informatik.uni-jena.de/repository/dist-release-local/de/unijena/bioinf/ms/sirius/4.4.29/sirius-4.4.29-linux64-headless.zip && \
+    wget -q https://zenodo.org/record/3611238/files/PubChemLite_14Jan2020_tier1.csv && \
+    wget -q ftp://newftp.epa.gov/COMPTOX/Sustainable_Chemistry_Data/Chemistry_Dashboard/MetFrag_metadata_files/CompTox_17March2019_SelectMetaData.csv && \
     unzip sirius-4.4.29-linux64-headless.zip && rm sirius-4.4.29-linux64-headless.zip && cd ~ && \
     echo 'options(patRoon.path.MetFragCL = "/home/patRoon/deps/MetFrag2.4.5-CL.jar")' >> .Rprofile && \
     echo 'options(patRoon.path.SIRIUS = "/home/patRoon/deps/sirius-linux64-headless-4.4.29/bin")' >> .Rprofile && \

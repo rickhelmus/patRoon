@@ -13,7 +13,7 @@ RUN apt-get update -y && \
         libxml2-dev pngquant openjdk-11-jdk libmagick++-dev pandoc git pngquant texinfo libfribidi0 \
         zlib1g-dev libxml2-dev libnetcdf-dev libglpk-dev tzdata && \
     echo "deb http://archive.ubuntu.com/ubuntu/ groovy main universe" > /etc/apt/sources.list.d/groovy.list && \
-    apt-get update && apt-get -y --no-install-recommends install openms libnetcdf-dev netcdf-bin && rm /etc/apt/sources.list.d/groovy.list && \
+    apt-get update && apt-get -y --no-install-recommends install openms libnetcdf-dev netcdf-bin libnetcdf15 && rm /etc/apt/sources.list.d/groovy.list && \
     useradd -ms /bin/bash patRoon && \
     addgroup patRoon staff && \
     apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \

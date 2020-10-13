@@ -1,6 +1,6 @@
 dockerimg: &dockerimg
     docker:
-        - image: cimg/base
+        - image: cimg/base:2020.01
 set_dock_env: &set_dock_env
     environment:
         IMAGE_NAME: "patroonorg/patroon"

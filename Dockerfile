@@ -15,8 +15,8 @@ RUN apt-get update -y && \
         libxml2-dev libnetcdf-dev netcdf-bin pngquant openjdk-11-jdk libmagick++-dev pandoc git pngquant texinfo libfribidi0 \
         zlib1g-dev libxml2-dev libnetcdf-dev libglpk-dev tzdata && \
     mkdir -p $SETUPDIR && \
-    wget -P $SETUPDIR https://abibuilder.informatik.uni-tuebingen.de/archive/openms/OpenMSInstaller/release/2.5.0/OpenMS-2.5.0-Debian-Linux-x86_64.deb && \
-    apt-get install -y --no-install-recommends $SETUPDIR/OpenMS-2.5.0-Debian-Linux-x86_64.deb && \
+    wget -P $SETUPDIR https://github.com/OpenMS/OpenMS/releases/download/Release2.6.0/OpenMS-2.6.0-Debian-Linux-x86_64.deb && \
+    apt-get install -y --no-install-recommends $SETUPDIR/OpenMS-2.6.0-Debian-Linux-x86_64.deb && \
     rm -rf $SETUPDIR && \
     useradd -ms /bin/bash patRoon && \
     addgroup patRoon staff && \

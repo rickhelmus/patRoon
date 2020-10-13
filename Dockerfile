@@ -39,7 +39,7 @@ RUN mkdir deps && cd deps && \
     echo 'options(patRoon.path.MetFragCL = "/home/patRoon/deps/MetFrag2.4.5-CL.jar")' >> .Rprofile && \
     echo 'options(patRoon.path.SIRIUS = "/home/patRoon/deps/sirius-linux64-headless-4.4.29/bin")' >> .Rprofile && \
     echo 'options(patRoon.path.MetFragCompTox = "/home/patRoon/deps/CompTox_17March2019_SelectMetaData.csv")' >> .Rprofile && \
-    echo 'options(patRoon.path.patRoon.path.MetFragPubChemLite = "/home/patRoon/deps/PubChemLite_14Jan2020_tier1.csv")' >> .Rprofile && \
+    echo 'options(patRoon.path.MetFragPubChemLite = "/home/patRoon/deps/PubChemLite_14Jan2020_tier1.csv")' >> .Rprofile && \
     echo 'options(patRoon.progress.opts = list(style = 1))' >> .Rprofile && \
     Rscript install_deps.R && rm -f ~/install_deps.R ~/DESCRIPTION
 

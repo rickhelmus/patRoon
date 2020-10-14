@@ -10,12 +10,10 @@ origRmds <- file.path(handbookSubRmdPath, origRmds)
 disabledRmds <- file.path(handbookSubRmdPath, disabledRmds)
 file.rename(origRmds, disabledRmds)
 
-install.packages(c("pkgdown", "bookdown", "DiagrammeR", "rsvg", "tinytex", "webshot"))
+install.packages(c("pkgdown", "bookdown", "DiagrammeR", "rsvg", "webshot"))
 remotes::install_github("rich-iannone/DiagrammeRsvg")
 
-tinytex::install_tinytex()
 webshot::install_phantomjs()
-Sys.setenv(PATH = paste0(Sys.getenv("PATH"), ":", "/home/patRoon/bin"))
 
 pkgdown::clean_site()
 pkgdown::build_site(examples = FALSE)

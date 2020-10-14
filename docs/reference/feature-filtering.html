@@ -166,33 +166,33 @@
     </div>
 
     <pre class="usage"><span class='co'># S4 method for featureGroups</span>
-<span class='fu'><a href='generics.html'>filter</a></span><span class='op'>(</span>
-  <span class='va'>obj</span>,
-  absMinIntensity <span class='op'>=</span> <span class='cn'>NULL</span>,
-  relMinIntensity <span class='op'>=</span> <span class='cn'>NULL</span>,
-  preAbsMinIntensity <span class='op'>=</span> <span class='cn'>NULL</span>,
-  preRelMinIntensity <span class='op'>=</span> <span class='cn'>NULL</span>,
-  absMinAnalyses <span class='op'>=</span> <span class='cn'>NULL</span>,
-  relMinAnalyses <span class='op'>=</span> <span class='cn'>NULL</span>,
-  absMinReplicates <span class='op'>=</span> <span class='cn'>NULL</span>,
-  relMinReplicates <span class='op'>=</span> <span class='cn'>NULL</span>,
-  absMinFeatures <span class='op'>=</span> <span class='cn'>NULL</span>,
-  relMinFeatures <span class='op'>=</span> <span class='cn'>NULL</span>,
-  absMinReplicateAbundance <span class='op'>=</span> <span class='cn'>NULL</span>,
-  relMinReplicateAbundance <span class='op'>=</span> <span class='cn'>NULL</span>,
-  maxReplicateIntRSD <span class='op'>=</span> <span class='cn'>NULL</span>,
-  blankThreshold <span class='op'>=</span> <span class='cn'>NULL</span>,
-  retentionRange <span class='op'>=</span> <span class='cn'>NULL</span>,
-  mzRange <span class='op'>=</span> <span class='cn'>NULL</span>,
-  mzDefectRange <span class='op'>=</span> <span class='cn'>NULL</span>,
-  chromWidthRange <span class='op'>=</span> <span class='cn'>NULL</span>,
-  rGroups <span class='op'>=</span> <span class='cn'>NULL</span>,
-  removeBlanks <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  negate <span class='op'>=</span> <span class='cn'>FALSE</span>
-<span class='op'>)</span>
+<span class='fu'><a href='generics.html'>filter</a></span>(
+  <span class='no'>obj</span>,
+  <span class='kw'>absMinIntensity</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>relMinIntensity</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>preAbsMinIntensity</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>preRelMinIntensity</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>absMinAnalyses</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>relMinAnalyses</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>absMinReplicates</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>relMinReplicates</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>absMinFeatures</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>relMinFeatures</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>absMinReplicateAbundance</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>relMinReplicateAbundance</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>maxReplicateIntRSD</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>blankThreshold</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>retentionRange</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>mzRange</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>mzDefectRange</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>chromWidthRange</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>rGroups</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>removeBlanks</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>negate</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
+)
 
 <span class='co'># S4 method for featureGroups</span>
-<span class='fu'>replicateGroupSubtract</span><span class='op'>(</span><span class='va'>fGroups</span>, <span class='va'>rGroups</span>, threshold <span class='op'>=</span> <span class='fl'>0</span><span class='op'>)</span></pre>
+<span class='fu'>replicateGroupSubtract</span>(<span class='no'>fGroups</span>, <span class='no'>rGroups</span>, <span class='kw'>threshold</span> <span class='kw'>=</span> <span class='fl'>0</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -369,7 +369,7 @@ the given replicate groups.</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
 </div>
 
       </footer>

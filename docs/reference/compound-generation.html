@@ -168,63 +168,63 @@ groups.</p>
     </div>
 
     <pre class="usage"><span class='co'># S4 method for featureGroups</span>
-<span class='fu'>generateCompounds</span><span class='op'>(</span><span class='va'>fGroups</span>, <span class='va'>MSPeakLists</span>, <span class='va'>algorithm</span>, <span class='va'>...</span><span class='op'>)</span>
+<span class='fu'>generateCompounds</span>(<span class='no'>fGroups</span>, <span class='no'>MSPeakLists</span>, <span class='no'>algorithm</span>, <span class='no'>...</span>)
 
-<span class='fu'>generateCompoundsMetfrag</span><span class='op'>(</span>
-  <span class='va'>fGroups</span>,
-  <span class='va'>MSPeakLists</span>,
-  method <span class='op'>=</span> <span class='st'>"CL"</span>,
-  logPath <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='st'>"log"</span>, <span class='st'>"metfrag"</span><span class='op'>)</span>,
-  timeout <span class='op'>=</span> <span class='fl'>300</span>,
-  timeoutRetries <span class='op'>=</span> <span class='fl'>2</span>,
-  errorRetries <span class='op'>=</span> <span class='fl'>2</span>,
-  topMost <span class='op'>=</span> <span class='fl'>100</span>,
-  dbRelMzDev <span class='op'>=</span> <span class='fl'>5</span>,
-  fragRelMzDev <span class='op'>=</span> <span class='fl'>5</span>,
-  fragAbsMzDev <span class='op'>=</span> <span class='fl'>0.002</span>,
-  <span class='va'>adduct</span>,
-  database <span class='op'>=</span> <span class='st'>"pubchem"</span>,
-  extendedPubChem <span class='op'>=</span> <span class='st'>"auto"</span>,
-  chemSpiderToken <span class='op'>=</span> <span class='st'>""</span>,
-  scoreTypes <span class='op'>=</span> <span class='fu'>compoundScorings</span><span class='op'>(</span><span class='st'>"metfrag"</span>, <span class='va'>database</span>, onlyDefault <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span><span class='op'>$</span><span class='va'>name</span>,
-  scoreWeights <span class='op'>=</span> <span class='fl'>1</span>,
-  preProcessingFilters <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"UnconnectedCompoundFilter"</span>, <span class='st'>"IsotopeFilter"</span><span class='op'>)</span>,
-  postProcessingFilters <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"InChIKeyFilter"</span><span class='op'>)</span>,
-  maxCandidatesToStop <span class='op'>=</span> <span class='fl'>2500</span>,
-  identifiers <span class='op'>=</span> <span class='cn'>NULL</span>,
-  extraOpts <span class='op'>=</span> <span class='cn'>NULL</span>,
-  maxProcAmount <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span><span class='op'>(</span><span class='st'>"patRoon.maxProcAmount"</span><span class='op'>)</span>
-<span class='op'>)</span>
+<span class='fu'>generateCompoundsMetfrag</span>(
+  <span class='no'>fGroups</span>,
+  <span class='no'>MSPeakLists</span>,
+  <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"CL"</span>,
+  <span class='kw'>logPath</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='st'>"log"</span>, <span class='st'>"metfrag"</span>),
+  <span class='kw'>timeout</span> <span class='kw'>=</span> <span class='fl'>300</span>,
+  <span class='kw'>timeoutRetries</span> <span class='kw'>=</span> <span class='fl'>2</span>,
+  <span class='kw'>errorRetries</span> <span class='kw'>=</span> <span class='fl'>2</span>,
+  <span class='kw'>topMost</span> <span class='kw'>=</span> <span class='fl'>100</span>,
+  <span class='kw'>dbRelMzDev</span> <span class='kw'>=</span> <span class='fl'>5</span>,
+  <span class='kw'>fragRelMzDev</span> <span class='kw'>=</span> <span class='fl'>5</span>,
+  <span class='kw'>fragAbsMzDev</span> <span class='kw'>=</span> <span class='fl'>0.002</span>,
+  <span class='no'>adduct</span>,
+  <span class='kw'>database</span> <span class='kw'>=</span> <span class='st'>"pubchem"</span>,
+  <span class='kw'>extendedPubChem</span> <span class='kw'>=</span> <span class='st'>"auto"</span>,
+  <span class='kw'>chemSpiderToken</span> <span class='kw'>=</span> <span class='st'>""</span>,
+  <span class='kw'>scoreTypes</span> <span class='kw'>=</span> <span class='fu'>compoundScorings</span>(<span class='st'>"metfrag"</span>, <span class='no'>database</span>, <span class='kw'>onlyDefault</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)$<span class='no'>name</span>,
+  <span class='kw'>scoreWeights</span> <span class='kw'>=</span> <span class='fl'>1</span>,
+  <span class='kw'>preProcessingFilters</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"UnconnectedCompoundFilter"</span>, <span class='st'>"IsotopeFilter"</span>),
+  <span class='kw'>postProcessingFilters</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"InChIKeyFilter"</span>),
+  <span class='kw'>maxCandidatesToStop</span> <span class='kw'>=</span> <span class='fl'>2500</span>,
+  <span class='kw'>identifiers</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>extraOpts</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>maxProcAmount</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"patRoon.maxProcAmount"</span>)
+)
 
-<span class='fu'>generateCompoundsSIRIUS</span><span class='op'>(</span>
-  <span class='va'>fGroups</span>,
-  <span class='va'>MSPeakLists</span>,
-  relMzDev <span class='op'>=</span> <span class='fl'>5</span>,
-  adduct <span class='op'>=</span> <span class='st'>"[M+H]+"</span>,
-  elements <span class='op'>=</span> <span class='st'>"CHNOP"</span>,
-  profile <span class='op'>=</span> <span class='st'>"qtof"</span>,
-  formulaDatabase <span class='op'>=</span> <span class='cn'>NULL</span>,
-  fingerIDDatabase <span class='op'>=</span> <span class='st'>"pubchem"</span>,
-  noise <span class='op'>=</span> <span class='cn'>NULL</span>,
-  errorRetries <span class='op'>=</span> <span class='fl'>2</span>,
-  cores <span class='op'>=</span> <span class='cn'>NULL</span>,
-  topMost <span class='op'>=</span> <span class='fl'>100</span>,
-  topMostFormulas <span class='op'>=</span> <span class='fl'>5</span>,
-  extraOptsGeneral <span class='op'>=</span> <span class='cn'>NULL</span>,
-  extraOptsFormula <span class='op'>=</span> <span class='cn'>NULL</span>,
-  verbose <span class='op'>=</span> <span class='cn'>TRUE</span>,
-  SIRBatchSize <span class='op'>=</span> <span class='fl'>0</span>,
-  logPath <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='st'>"log"</span>, <span class='st'>"sirius_compounds"</span><span class='op'>)</span>,
-  maxProcAmount <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span><span class='op'>(</span><span class='st'>"patRoon.maxProcAmount"</span><span class='op'>)</span>
-<span class='op'>)</span>
+<span class='fu'>generateCompoundsSIRIUS</span>(
+  <span class='no'>fGroups</span>,
+  <span class='no'>MSPeakLists</span>,
+  <span class='kw'>relMzDev</span> <span class='kw'>=</span> <span class='fl'>5</span>,
+  <span class='kw'>adduct</span> <span class='kw'>=</span> <span class='st'>"[M+H]+"</span>,
+  <span class='kw'>elements</span> <span class='kw'>=</span> <span class='st'>"CHNOP"</span>,
+  <span class='kw'>profile</span> <span class='kw'>=</span> <span class='st'>"qtof"</span>,
+  <span class='kw'>formulaDatabase</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>fingerIDDatabase</span> <span class='kw'>=</span> <span class='st'>"pubchem"</span>,
+  <span class='kw'>noise</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>errorRetries</span> <span class='kw'>=</span> <span class='fl'>2</span>,
+  <span class='kw'>cores</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>topMost</span> <span class='kw'>=</span> <span class='fl'>100</span>,
+  <span class='kw'>topMostFormulas</span> <span class='kw'>=</span> <span class='fl'>5</span>,
+  <span class='kw'>extraOptsGeneral</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>extraOptsFormula</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>SIRBatchSize</span> <span class='kw'>=</span> <span class='fl'>0</span>,
+  <span class='kw'>logPath</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span>(<span class='st'>"log"</span>, <span class='st'>"sirius_compounds"</span>),
+  <span class='kw'>maxProcAmount</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"patRoon.maxProcAmount"</span>)
+)
 
-<span class='fu'>compoundScorings</span><span class='op'>(</span>
-  algorithm <span class='op'>=</span> <span class='cn'>NULL</span>,
-  database <span class='op'>=</span> <span class='cn'>NULL</span>,
-  includeSuspectLists <span class='op'>=</span> <span class='cn'>TRUE</span>,
-  onlyDefault <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  includeNoDB <span class='op'>=</span> <span class='cn'>TRUE</span>
-<span class='op'>)</span></pre>
+<span class='fu'>compoundScorings</span>(
+  <span class='kw'>algorithm</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>database</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>includeSuspectLists</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>onlyDefault</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>includeNoDB</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -643,29 +643,29 @@ before feature groups have been prioritized.</p>
   <samp>2.4.5</samp>) support these libraries.</p>
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
-    <p>Ruttkies C, Schymanski EL, Wolf S, Hollender J, Neumann S (2016-jan).
+    <p>Ruttkies C, Schymanski EL, Wolf S, Hollender J, Neumann S (2016).
 &#8220;MetFrag relaunched: incorporating strategies beyond in silico fragmentation.&#8221;
-<em>Journal of Cheminformatics</em>, <b>8</b>.
+<em>Journal of Cheminformatics</em>, <b>8</b>(1).
 doi: <a href='https://doi.org/10.1186/s13321-016-0115-9'>10.1186/s13321-016-0115-9</a>
 .</p>
-<p>Duhrkop K, Fleischauer M, Ludwig M, Aksenov AA, Melnik AV, Meusel M, Dorrestein PC, Rousu J, Bocker S (2019-mar).
+<p>Duhrkop K, Fleischauer M, Ludwig M, Aksenov AA, Melnik AV, Meusel M, Dorrestein PC, Rousu J, Bocker S (2019).
 &#8220;SIRIUS 4: a rapid tool for turning tandem mass spectra into metabolite structure information.&#8221;
-<em>Nature Methods</em>, <b>16</b>, 299--302.
+<em>Nature Methods</em>, <b>16</b>(4), 299--302.
 doi: <a href='https://doi.org/10.1038/s41592-019-0344-8'>10.1038/s41592-019-0344-8</a>
-.
+, <a href='https://doi.org/10.1038/s41592-019-0344-8'>https://doi.org/10.1038/s41592-019-0344-8</a>.
  <br /><br /> Duhrkop K, Bocker S (2015).
 &#8220;Fragmentation Trees Reloaded.&#8221;
-In <em>Research in Computational Molecular Biology</em>, 65--79.
+In Przytycka TM (ed.), <em>Research in Computational Molecular Biology</em>, 65--79.
 ISBN 978-3-319-16706-0.
  <br /><br />
-  Duhrkop K, Shen H, Meusel M, Rousu J, Bocker S (2015-sep).
+  Duhrkop K, Shen H, Meusel M, Rousu J, Bocker S (2015).
 &#8220;Searching molecular structure databases with tandem mass spectra using CSI:FingerID.&#8221;
-<em>Proceedings of the National Academy of Sciences</em>, <b>112</b>, 12580--12585.
+<em>Proceedings of the National Academy of Sciences</em>, <b>112</b>(41), 12580--12585.
 doi: <a href='https://doi.org/10.1073/pnas.1509788112'>10.1073/pnas.1509788112</a>
 .
- <br /><br /> Bocker S, Letzel MC, Liptak Z, Pervukhin A (2008-nov).
+ <br /><br /> Bocker S, Letzel MC, Liptak Z, Pervukhin A (2008).
 &#8220;SIRIUS: decomposing isotope patterns for metabolite identification.&#8221;
-<em>Bioinformatics</em>, <b>25</b>, 218--224.
+<em>Bioinformatics</em>, <b>25</b>(2), 218--224.
 doi: <a href='https://doi.org/10.1093/bioinformatics/btn603'>10.1093/bioinformatics/btn603</a>
 .</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
@@ -687,7 +687,7 @@ doi: <a href='https://doi.org/10.1093/bioinformatics/btn603'>10.1093/bioinformat
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
 </div>
 
       </footer>

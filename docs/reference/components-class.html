@@ -238,8 +238,8 @@ consensus(obj, ...)</pre>
     <tr>
       <th>i, j</th>
       <td><p>A numeric or character value which is used to select components/feature groups by
-their index or name, respectively (for the order/names see <code>names()/groupNames()</code>).<br /><br /> For <code><a href='generics.html'>[</a></code>: Can also be logical to perform logical selection
-(similar to regular vectors). If missing all components/feature groups are selected.<br /><br /> For <code><a href='generics.html'>[[</a></code>: should be a scalar value. <code>j</code> is optional.</p></td>
+their index or name, respectively (for the order/names see <code>names()/groupNames()</code>).<br /><br /> For <code>[</code>: Can also be logical to perform logical selection
+(similar to regular vectors). If missing all components/feature groups are selected.<br /><br /> For <code>[[</code>: should be a scalar value. <code>j</code> is optional.</p></td>
     </tr>
     <tr>
       <th>...</th>
@@ -338,7 +338,7 @@ generate the components.</p></td>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>The subset operator (<code>"["</code>) and <code>filter</code> method return the
+    <p>The subset operator (<code><a href='generics.html'>"["</a></code>) and <code>filter</code> method return the
   data subset in an object from the <code>componentsReduced</code> class. This
   object does not contain any algorithm specific data and as such, algorithm
   specific methods (<em>e.g.</em> <code>treeCut</code>) will not work on this object.
@@ -364,9 +364,9 @@ feature groups for which data is present in this object.</p></li>
 <li><p><code>length</code>: Obtain total number of components.</p></li>
 <li><p><code>names</code>: Obtain the names of all components.</p></li>
 <li><p><code>show</code>: Show summary information for this object.</p></li>
-<li><p><code><a href='generics.html'>[</a></code>: Subset on components/feature groups.</p></li>
-<li><p><code><a href='generics.html'>[[</a></code>: Extracts a component table, optionally filtered by a feature group.</p></li>
-<li><p><code><a href='generics.html'>$</a></code>: Extracts a component table by component name.</p></li>
+<li><p><code>[</code>: Subset on components/feature groups.</p></li>
+<li><p><code>[[</code>: Extracts a component table, optionally filtered by a feature group.</p></li>
+<li><p><code>$</code>: Extracts a component table by component name.</p></li>
 <li><p><code>as.data.table</code>: Returns all component data in a table.</p></li>
 <li><p><code>filter</code>: Provides rule based filtering for components.</p></li>
 <li><p><code>findFGroup</code>: Returns the component id(s) to which a feature group
@@ -383,7 +383,7 @@ merge similar components.</p></li>
 
     
 
-<dl>
+<dl'>
 <dt><code>components</code></dt><dd><p>List of all components in this object. Use the
 <code>componentTable</code> method for access.</p></dd>
 
@@ -430,7 +430,7 @@ for each component. Use the <code>componentInfo</code> method for access.</p></d
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
 </div>
 
       </footer>

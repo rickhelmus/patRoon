@@ -239,8 +239,8 @@ getDefIsolatePrecParams(...)</pre>
     <tr>
       <th>i, j</th>
       <td><p>A numeric or character value which is used to select analyses/feature groups by
-their index or name, respectively (for the order/names see <code>analyses()/groupNames()</code>).<br /><br /> For <code><a href='generics.html'>[</a></code>: Can also be logical to perform logical selection
-(similar to regular vectors). If missing all analyses/feature groups are selected.<br /><br /> For <code><a href='generics.html'>[[</a></code>: should be a scalar value. If <code>j</code> is not specified, <code>i</code> selects by feature groups instead.</p></td>
+their index or name, respectively (for the order/names see <code>analyses()/groupNames()</code>).<br /><br /> For <code>[</code>: Can also be logical to perform logical selection
+(similar to regular vectors). If missing all analyses/feature groups are selected.<br /><br /> For <code>[[</code>: should be a scalar value. If <code>j</code> is not specified, <code>i</code> selects by feature groups instead.</p></td>
     </tr>
     <tr>
       <th>...</th>
@@ -380,12 +380,12 @@ analyses for which data is present in this object.</p></li>
 feature groups for which data is present in this object.</p></li>
 <li><p><code>length</code>: Obtain total number of <em>m/z</em> values.</p></li>
 <li><p><code>show</code>: Shows summary information for this object.</p></li>
-<li><p><code><a href='generics.html'>[</a></code>: Subset on analyses/feature groups.</p></li>
-<li><p><code><a href='generics.html'>[[</a></code>: Extract a list with MS and MS/MS (if available) peak
+<li><p><code>[</code>: Subset on analyses/feature groups.</p></li>
+<li><p><code>[[</code>: Extract a list with MS and MS/MS (if available) peak
 lists. If the second argument (<code>j</code>) is not specified the averaged peak
 lists for the group specified by the first argument (<code>i</code>) will be
 returned.</p></li>
-<li><p><code><a href='generics.html'>$</a></code>: Extract group averaged MS peaklists for a feature group.</p></li>
+<li><p><code>$</code>: Extract group averaged MS peaklists for a feature group.</p></li>
 <li><p><code>as.data.table</code>: Returns all MS peak list data in a table.</p></li>
 <li><p><code>filter</code>: provides post filtering of generated MS peak lists,
 which may further enhance quality of subsequent workflow steps (<em>e.g.</em>
@@ -398,7 +398,7 @@ given feature group.</p></li>
 
     
 
-<dl>
+<dl'>
 <dt><code>peakLists</code></dt><dd><p>Contains a list of all MS (and MS/MS) peak lists. Use the
 <code>peakLists</code> method for access.</p></dd>
 
@@ -482,7 +482,7 @@ names.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
 </div>
 
       </footer>

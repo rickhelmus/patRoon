@@ -296,12 +296,12 @@ intensities.</p></td>
     <tr>
       <th>i, j</th>
       <td><p>A numeric or character value which is used to select analyses/feature groups by
-their index or name, respectively (for the order/names see <code>analyses()/names()</code>).<br /><br /> For <code>[</code>: Can also be logical to perform logical selection
-(similar to regular vectors). If missing all analyses/feature groups are selected.<br /><br /> For <code>[[</code>: should be a scalar value. If <code>j</code> is not specified, <code>i</code> selects by feature groups instead.</p></td>
+their index or name, respectively (for the order/names see <code>analyses()/names()</code>).<br /><br /> For <code><a href='generics.html'>[</a></code>: Can also be logical to perform logical selection
+(similar to regular vectors). If missing all analyses/feature groups are selected.<br /><br /> For <code><a href='generics.html'>[[</a></code>: should be a scalar value. If <code>j</code> is not specified, <code>i</code> selects by feature groups instead.</p></td>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>Ignored for <code><a href='generics.html'>"["</a></code> operator or passed to
+      <td><p>Ignored for <code>"["</code> operator or passed to
 <code><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></code> (<code>plot</code> and <code>plotEIC</code>),
 <code><a href='https://rdrr.io/r/graphics/lines.html'>lines</a></code> (<code>plotInt</code>), <span class="pkg">VennDiagram</span>
 plotting functions (<code>plotVenn</code>), <code>chordDiagram</code>
@@ -532,9 +532,9 @@ replicate groups for which data is present in this object.</p></li>
 <li><p><code>featureTable</code>: Obtain feature information (see <code><a href='features-class.html'>features</a></code>).</p></li>
 <li><p><code>getFeatures</code>: Accessor for <code>features</code> slot.</p></li>
 <li><p><code>groupFeatIndex</code>: Accessor for <code>ftindex</code> slot.</p></li>
-<li><p><code>[</code>: Subset on analyses/feature groups.</p></li>
-<li><p><code>[[</code>: Extract intensity values.</p></li>
-<li><p><code>$</code>: Extract intensity values for a feature group.</p></li>
+<li><p><code><a href='generics.html'>[</a></code>: Subset on analyses/feature groups.</p></li>
+<li><p><code><a href='generics.html'>[[</a></code>: Extract intensity values.</p></li>
+<li><p><code><a href='generics.html'>$</a></code>: Extract intensity values for a feature group.</p></li>
 <li><p><code>export</code>: Exports feature groups to a <code class="file">.csv</code> file that
 is readable to Bruker ProfileAnalysis (a 'bucket table'), Bruker TASQ (an
 analyte database) or that is suitable as input for the <code>Targeted peak
@@ -568,7 +568,7 @@ between a set of specified replicate group(s).</p></li>
 
     
 
-<dl'>
+<dl>
 <dt><code>groups</code></dt><dd><p>Matrix (<code>data.table</code>) with intensities for each
 feature group (columns) per analysis (rows). Access with <code>groups</code>
 method.</p></dd>
@@ -634,7 +634,7 @@ doi: <a href='https://doi.org/10.1109/tvcg.2014.2346248'>10.1109/tvcg.2014.23462
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

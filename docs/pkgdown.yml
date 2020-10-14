@@ -1,19 +1,10 @@
 pandoc: 2.7.3
-pkgdown: 1.5.1
+pkgdown: 1.6.1
 pkgdown_sha: ~
 articles:
-  _advanced: handbook/_advanced.html
-  _concepts: handbook/_concepts.html
-  _index: handbook/_index.html
-  _installation: handbook/_installation.html
-  _intro: handbook/_intro.html
-  _processing: handbook/_processing.html
-  _setup: handbook/_setup.html
-  _workflow_gen: handbook/_workflow_gen.html
   handbook: handbook.html
-  _refs: shared/_refs.html
   tutorial: tutorial.html
-last_built: 2020-10-14T11:45Z
+last_built: 2020-10-14T14:00Z
 urls:
   reference: https://rickhelmus.github.io/patRoon/reference
   article: https://rickhelmus.github.io/patRoon/articles

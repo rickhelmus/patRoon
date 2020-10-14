@@ -10,7 +10,9 @@ origRmds <- file.path(handbookSubRmdPath, origRmds)
 disabledRmds <- file.path(handbookSubRmdPath, disabledRmds)
 file.rename(origRmds, disabledRmds)
 
-install.packages(c("pkgdown", "bookdown", "DiagrammeR", "rsvg", "webshot"))
+# NOTE: use CRAN mirror to get latest (RSPM versions are old)
+install.packages(c("pkgdown", "bookdown", "DiagrammeR", "rsvg", "webshot"),
+                 repos = "http://cran.us.r-project.org")
 remotes::install_github("rich-iannone/DiagrammeRsvg")
 
 webshot::install_phantomjs()

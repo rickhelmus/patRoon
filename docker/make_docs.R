@@ -11,11 +11,12 @@ disabledRmds <- file.path(handbookSubRmdPath, disabledRmds)
 file.rename(origRmds, disabledRmds)
 
 # NOTE: use CRAN mirror to get latest (RSPM versions are old)
-install.packages(c("pkgdown", "bookdown", "DiagrammeR", "rsvg", "webshot"),
+install.packages(c("pkgdown", "bookdown", "DiagrammeR", "rsvg", "webshot", "knitr"),
                  repos = "http://cran.us.r-project.org")
 remotes::install_github("rich-iannone/DiagrammeRsvg")
 
 webshot::install_phantomjs()
+Sys.setenv(PATH = paste0(Sys.getenv("PATH"), ":", "/home/patRoon/bin"))
 
 pkgdown::clean_site()
 pkgdown::build_site(examples = FALSE)

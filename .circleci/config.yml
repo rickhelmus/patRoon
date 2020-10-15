@@ -100,7 +100,7 @@ jobs:
                 name: Generate docs & site
                 no_output_timeout: 60m
                 command: |
-                    docker run --name patroon -u 0 -t "${TMP_IMAGE_NAME}" /bin/bash -c 'apt-get update && apt-get install -y texlive-fonts-recommended texlive-fonts-extra --no-install-recommends && su patRoon -c "cd patRoon; Rscript docker/make_docs.R"'
+                    docker run --name patroon -t "${TMP_IMAGE_NAME}" /bin/bash -c "cd patRoon; Rscript docker/make_docs.R"
                     CONTAINER_ID=`docker ps -aqf "name=patroon"`
                     rm -rf docs
                     docker cp $CONTAINER_ID:/home/patRoon/patRoon/docs docs

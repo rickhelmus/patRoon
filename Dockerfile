@@ -1,4 +1,4 @@
-FROM rocker/rstudio:4.0.0-ubuntu18.04
+FROM rocker/r-rspm:18.04
 
 LABEL maintainer="Rick Helmus <r.helmus@uva.nl>" \
     org.label-schema.name="patRoon" \
@@ -19,7 +19,7 @@ RUN apt-get update -y && \
     apt-get install -y --no-install-recommends $SETUPDIR/OpenMS-2.5.0-Debian-Linux-x86_64.deb && \
     rm -rf $SETUPDIR && \
     useradd -ms /bin/bash patRoon && \
-    addgroup patRoon staff && \
+    addgroup patRoon docker && \
     apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
     R CMD javareconf
 

@@ -249,26 +249,26 @@ ftOpt &lt;-<span class="st"> </span><span class="kw">optimizeFeatureFinding</spa
 <p>The <code>optimizedParameters()</code> function is used to inspect the best parameter settings. Similarly, the <code>optimizedObject()</code> function can be used to obtain the object that was created with these settings (i.e. a <code>features</code> or <code>featureGroups</code> object).</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">optimizedParameters</span>(ftOpt) <span class="co"># best settings for whole experiment</span></code></pre></div>
 <pre><code>#&gt; $chromFWHM
-#&gt; [1] 3
+#&gt; [1] 3.5
 #&gt; 
 #&gt; $mzPPM
-#&gt; [1] 17
+#&gt; [1] 13.5
 #&gt; 
 #&gt; $minFWHM
-#&gt; [1] 2.5
+#&gt; [1] 1.5
 #&gt; 
 #&gt; $maxFWHM
-#&gt; [1] 24.5
+#&gt; [1] 20
 #&gt; 
 #&gt; $logPath
 #&gt; NULL</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">optimizedObject</span>(ftOpt) <span class="co"># features object with best settings for whole experiment</span></code></pre></div>
 <pre><code>#&gt; A featuresOpenMS object (derived from features -&gt; workflowStep)
-#&gt; Object size (indication): 134.4 kB
+#&gt; Object size (indication): 71.4 kB
 #&gt; Algorithm: openms
-#&gt; Total feature count: 781
-#&gt; Average feature count/analysis: 390
-#&gt; Analyses: solvent-1, solvent-2 (2 total)
+#&gt; Total feature count: 409
+#&gt; Average feature count/analysis: 409
+#&gt; Analyses: solvent-1 (1 total)
 #&gt; Replicate groups: solvent (1 total)
 #&gt; Replicate groups used as blank: solvent (1 total)</code></pre>
 <p>Results can also be obtained for specific parameter sets/iterations.</p>

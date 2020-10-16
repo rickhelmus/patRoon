@@ -58,10 +58,11 @@ jobs:
                 command: |
                     docker run --name patroon -t "${TMP_IMAGE_NAME}" /bin/bash -c "cd patRoon; Rscript docker/run_tests.R"
             - run:
-                name: Tag image
+                name: Tag images
                 when: always
                 command: |
-                    docker tag "${TMP_IMAGE_NAME}" "${IMAGE_NAME}"                    
+                    docker tag "${TMP_IMAGE_NAME}" "${IMAGE_NAME}"
+                    docker tag "${TMP_IMAGE_NAME_RS}" "${IMAGE_NAME_RS}"
             - run:
                 name: Copy test results
                 when: always

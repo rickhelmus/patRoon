@@ -5,6 +5,8 @@ set_dock_env: &set_dock_env
     environment:
         IMAGE_NAME: "patroonorg/patroon"
         TMP_IMAGE_NAME: "patroon"
+        IMAGE_NAME_RS: "patroonorg/patroonrs"
+        TMP_IMAGE_NAME_RS: "patroonrs"
 
 version: 2.1
 commands:
@@ -31,10 +33,12 @@ jobs:
             - checkout
             - restore_docker_from_cache
             - run:
-                name: Build Docker image
-                no_output_timeout: 30m
+                name: Build Docker images
+                no_output_timeout: 50m
                 command: |
+                    echo "$DH_PASS" | docker login -u "$DH_USER" --password-stdin
                     docker build --pull --cache-from "${TMP_IMAGE_NAME}" --tag "${TMP_IMAGE_NAME}" .
+                    docker build --pull --cache-from "${TMP_IMAGE_NAME_RS}" --tag "${TMP_IMAGE_NAME_RS}" ./docker/rstudio
             - run:
                 name: Save Docker image layer cache
                 command: |
@@ -69,13 +73,15 @@ jobs:
             - store_test_results:
                 path: /tmp/tests
             - deploy:
-                name: Push tested Docker image
+                name: Push Docker images
                 command: |
                     if [ "${CIRCLE_BRANCH}" == "master" ]; then
                         echo "$DH_PASS" | docker login -u "$DH_USER" --password-stdin
                         git_sha=`echo $CIRCLE_SHA1 | cut -c1-7`
                         docker tag "$IMAGE_NAME" "${IMAGE_NAME}:${git_sha}-master"
                         docker push "${IMAGE_NAME}:latest" && docker push "${IMAGE_NAME}:${git_sha}-master"
+                        docker tag "$IMAGE_NAME_RS" "${IMAGE_NAME_RS}:${git_sha}-master"
+                        docker push "${IMAGE_NAME_RS}:latest" && docker push "${IMAGE_NAME_RS}:${git_sha}-master"
                     fi
             - deploy:
                 name: Push failed Docker image

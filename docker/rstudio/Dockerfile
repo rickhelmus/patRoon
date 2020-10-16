@@ -1,3 +1,5 @@
+FROM patroon:latest AS patroon
+
 FROM rocker/rstudio:4.0.0-ubuntu18.04
 
 ENV SETUPDIR=/usr/local/setup
@@ -15,8 +17,8 @@ RUN apt-get update -y && \
 
 USER rstudio
 
-COPY --from=patroon:latest --chown=rstudio:rstudio /home/patRoon/deps /home/rstudio/deps
-COPY --from=patroon:latest --chown=rstudio:rstudio /home/patRoon/.Rprofile /home/rstudio
+COPY --from=patroon --chown=rstudio:rstudio /home/patRoon/deps /home/rstudio/deps
+COPY --from=patroon --chown=rstudio:rstudio /home/patRoon/.Rprofile /home/rstudio
 
 RUN sed -i -e 's/\/home\/patRoon/\/home\/rstudio/g' ~/.Rprofile
 
@@ -24,4 +26,4 @@ ENV OPENMS_DATA_PATH=/usr/share/OpenMS _R_CHECK_FORCE_SUGGESTS_=0 R_MAX_NUM_DLLS
 
 USER root
 
-COPY --from=patroon:latest /usr/local/lib/R/site-library/. /usr/local/lib/R/site-library/
+COPY --from=patroon /usr/local/lib/R/site-library/. /usr/local/lib/R/site-library/

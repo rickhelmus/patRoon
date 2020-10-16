@@ -572,9 +572,9 @@ plotChord(fGroups, average = TRUE) # overlap between replicate groups
 plotChord(fGroups, average = TRUE,
           outer = c(repl1 = "grp1", repl2 = "grp1", repl3 = "grp2", repl4 = "grp3"))
 
-# compare MetFrag and SIRIUS results
-plotVenn(compsMF, compsSIR,
-         labels = c("MF", "SIR")) # manual labeling
+# compare GenForm and SIRIUS results
+plotVenn(formsGF, formsSIR,
+         labels = c("GF", "SIR")) # manual labeling
 ```
 
 ```{r postPlotComp,include=FALSE,eval=runData}

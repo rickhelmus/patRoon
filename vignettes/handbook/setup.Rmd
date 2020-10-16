@@ -44,19 +44,22 @@ if (runData)
                           relMinReplicateAbundance = 1, maxReplicateIntRSD = 0.75,
                           blankThreshold = 5, removeBlanks = TRUE,
                           retentionRange = c(120, Inf), mzRange = NULL)
-        
+    
+    fGroupsAnn <- fGroups[, 1:5]    
     avgPListParams <- getDefAvgPListParams(clusterMzWindow = 0.002)
-    mslists <- generateMSPeakLists(fGroups, "mzr", maxMSRtWindow = 5, precursorMzWindow = 4,
+    mslists <- generateMSPeakLists(fGroupsAnn, "mzr", maxMSRtWindow = 5, precursorMzWindow = 4,
                                    avgFeatParams = avgPListParams, avgFGroupParams = avgPListParams)
     mslists <- filter(mslists, relMSMSIntThr = 0.02, topMSMSPeaks = 10)
-    formulas <- generateFormulas(fGroups, "genform", mslists, relMzDev = 5,
-                                 adduct = "[M+H]+", elements = "CHNOPSCl",
-                                 calculateFeatures = TRUE, featThreshold = 0.75)
+    formulas <- formsGF <- generateFormulas(fGroupsAnn, "genform", mslists, relMzDev = 5,
+                                            adduct = "[M+H]+", elements = "CHNOPSCl",
+                                            calculateFeatures = TRUE, featThreshold = 0.75)
+    formsSIR <- generateFormulas(fGroupsAnn, "sirius", mslists, elements = "CHNOPSCl",
+                                 calculateFeatures = FALSE)
+
     compsMF <- compounds <-
-        generateCompounds(fGroups, mslists, "metfrag", method = "CL",
+        generateCompounds(fGroupsAnn, mslists, "metfrag", method = "CL",
                           dbRelMzDev = 5, fragRelMzDev = 5, fragAbsMzDev = 0.002,
                           adduct = "[M+H]+", database = "pubchem", maxCandidatesToStop = 5000)
-    compsSIR <- generateCompounds(fGroups, mslists, "sirius")
     
     componCAM <- components <- generateComponents(fGroups, "camera", ionization = "positive")
     componInt <- generateComponents(fGroupsRG, "intclust")
@@ -65,7 +68,7 @@ if (runData)
     compsClust <- makeHCluster(compsMF)
     
     pSet <- generateFeatureOptPSet("openms")
-    ftOpt <- optimizeFeatureFinding(anaInfo[1:2,], "openms", pSet,
+    ftOpt <- optimizeFeatureFinding(anaInfo[1, ], "openms", pSet, maxIterations = 2,
                                     paramRanges = list(noiseThrInt = c(500, Inf)))
     
     # saveRDS(list(fList = fList, fGroups = fGroups, fGroupsUF = fGroupsUF, fListRG = fListRG,

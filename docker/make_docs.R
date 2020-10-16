@@ -27,12 +27,12 @@ file.rename(disabledRmds, origRmds)
 # make book after pkgdown, otherwise it complains
 # NOTE: set clean_envir to FALSE so that 'out' variable below is recognized
 out <- file.path(normalizePath("docs", mustWork = FALSE), "handbook_bd")
-withr::with_dir("vignettes/handbook/", bookdown::render_book("_index.Rmd",
+withr::with_dir("vignettes/handbook/", bookdown::render_book("index.Rmd",
                                                              output_dir = out,
                                                              clean_envir = FALSE))
 
 # PDF versions
-withr::with_dir("vignettes/handbook/", bookdown::render_book("_index.Rmd",
+withr::with_dir("vignettes/handbook/", bookdown::render_book("index.Rmd",
                                                              "bookdown::pdf_book",
                                                              output_dir = out,
                                                              clean_envir = FALSE))

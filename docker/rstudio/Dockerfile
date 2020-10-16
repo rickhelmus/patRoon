@@ -1,5 +1,3 @@
-FROM patroon:latest AS patroon
-
 FROM rocker/rstudio:4.0.0-ubuntu18.04
 
 ENV SETUPDIR=/usr/local/setup

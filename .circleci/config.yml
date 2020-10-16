@@ -38,7 +38,7 @@ jobs:
                 command: |
                     echo "$DH_PASS" | docker login -u "$DH_USER" --password-stdin
                     docker build --pull --cache-from "${TMP_IMAGE_NAME}" --tag "${TMP_IMAGE_NAME}" .
-                    docker build --pull --cache-from "${TMP_IMAGE_NAME_RS}" --tag "${TMP_IMAGE_NAME_RS}" ./docker/rstudio
+                    docker build --cache-from "${TMP_IMAGE_NAME_RS}" --tag "${TMP_IMAGE_NAME_RS}" ./docker/rstudio
             - run:
                 name: Save Docker image layer cache
                 command: |

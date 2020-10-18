@@ -147,6 +147,4 @@ workflows:
                             - master
                 requires:
                     - build
-            - buildrs:
-                requires:
-                    - test
+            - buildrs

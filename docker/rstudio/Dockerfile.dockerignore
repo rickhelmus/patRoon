@@ -15,11 +15,10 @@
 !tests/figs/*
 !tests/testthat/*.R
 !tests/testthat/test_data/*
-!vignettes/*
 !DESCRIPTION
 !NAMESPACE
 !docker/*.R
-!NEWS.md
 !LICENSE
-!README.md
-!_pkgdown.yaml
+!docker/rstudio/ccache.conf
+!docker/rstudio/Makevars
+

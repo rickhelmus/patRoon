@@ -5,8 +5,6 @@ set_dock_env: &set_dock_env
     environment:
         IMAGE_NAME: "patroonorg/patroon"
         TMP_IMAGE_NAME: "patroon"
-        IMAGE_NAME_RS: "patroonorg/patroonrs"
-        TMP_IMAGE_NAME_RS: "patroonrs"
 
 version: 2.1
 commands:
@@ -33,17 +31,16 @@ jobs:
             - checkout
             - restore_docker_from_cache
             - run:
-                name: Build Docker images
+                name: Build Docker image
                 no_output_timeout: 50m
                 command: |
                     echo "$DH_PASS" | docker login -u "$DH_USER" --password-stdin
                     docker build --pull --cache-from "${TMP_IMAGE_NAME}" --tag "${TMP_IMAGE_NAME}" .
-                    docker build --cache-from "${TMP_IMAGE_NAME_RS}" --tag "${TMP_IMAGE_NAME_RS}" ./docker/rstudio
             - run:
                 name: Save Docker image layer cache
                 command: |
                     mkdir -p caches
-                    docker save -o caches/dock.tar "${TMP_IMAGE_NAME}" "${TMP_IMAGE_NAME_RS}"
+                    docker save -o caches/dock.tar "${TMP_IMAGE_NAME}"
             - save_cache:
                 key: v4-{{ .Branch }}-{{ epoch }}
                 paths:
@@ -58,11 +55,10 @@ jobs:
                 command: |
                     docker run --name patroon -t "${TMP_IMAGE_NAME}" /bin/bash -c "cd patRoon; Rscript docker/run_tests.R"
             - run:
-                name: Tag images
+                name: Tag image
                 when: always
                 command: |
                     docker tag "${TMP_IMAGE_NAME}" "${IMAGE_NAME}"
-                    docker tag "${TMP_IMAGE_NAME_RS}" "${IMAGE_NAME_RS}"
             - run:
                 name: Copy test results
                 when: always
@@ -74,15 +70,13 @@ jobs:
             - store_test_results:
                 path: /tmp/tests
             - deploy:
-                name: Push Docker images
+                name: Push Docker image
                 command: |
                     if [ "${CIRCLE_BRANCH}" == "master" ]; then
                         echo "$DH_PASS" | docker login -u "$DH_USER" --password-stdin
                         git_sha=`echo $CIRCLE_SHA1 | cut -c1-7`
                         docker tag "$IMAGE_NAME" "${IMAGE_NAME}:${git_sha}-master"
                         docker push "${IMAGE_NAME}:latest" && docker push "${IMAGE_NAME}:${git_sha}-master"
-                        docker tag "$IMAGE_NAME_RS" "${IMAGE_NAME_RS}:${git_sha}-master"
-                        docker push "${IMAGE_NAME_RS}:latest" && docker push "${IMAGE_NAME_RS}:${git_sha}-master"
                     fi
             - deploy:
                 name: Push failed Docker image
@@ -118,7 +112,25 @@ jobs:
                     git status
                     git commit -m "automatic site/doc update [skip ci]"
                     git push origin master
-
+    buildrs:
+        <<: *dockerimg
+        environment:
+            IMAGE_NAME_RS: "patroonorg/patroonrs"
+            DOCKER_BUILDKIT: 1
+        steps:
+            - checkout
+            - run:
+                name: Build Docker RS image
+                no_output_timeout: 50m
+                command: |
+                    echo "$DH_PASS" | docker login -u "$DH_USER" --password-stdin
+                    docker build --cache-from "${IMAGE_NAME_RS}" --tag "${IMAGE_NAME_RS}" --build-arg BUILDKIT_INLINE_CACHE=1 ./docker/rstudio
+            - run
+                name: Push RS image
+                command: |
+                    git_sha=`echo $CIRCLE_SHA1 | cut -c1-7`
+                    docker tag "$IMAGE_NAME_RS" "${IMAGE_NAME_RS}:${git_sha}-master"
+                    docker push "${IMAGE_NAME_RS}:latest" && docker push "${IMAGE_NAME_RS}:${git_sha}-master"
 workflows:
     btd:
         jobs:
@@ -133,3 +145,6 @@ workflows:
                             - master
                 requires:
                     - build
+            - buildrs:
+                requires:
+                    - test

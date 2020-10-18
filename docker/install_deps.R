@@ -3,6 +3,8 @@ options(Ncpus = 3)
 install.packages("devtools")
 install.packages("BiocManager")
 
+install.packages("dplyr") # missing dep(?)
+
 BiocManager::install(c("mzR", "xcms", "CAMERA"))
 BiocManager::install(c("Rdisop", "InterpretMSSpectrum")) # need to install these deps manually (why??)
 

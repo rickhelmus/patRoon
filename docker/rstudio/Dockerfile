@@ -1,11 +1,13 @@
-FROM rocker/rstudio:4.0.0-ubuntu18.04
+# syntax=docker/dockerfile:experimental
+
+FROM rocker/rstudio:4.0.3
 
 ENV SETUPDIR=/usr/local/setup
 
-RUN apt-get update -y && \
-    apt-get install -y --no-install-recommends libssl-dev libssh2-1-dev wget libv8-3.14-dev openbabel \
+RUN --mount=type=cache,id=cache_apt,target=/var/cache/apt --mount=type=cache,id=lib_apt,target=/var/lib/apt apt-get update -y && \
+    apt-get install -y --no-install-recommends libssl-dev libssh2-1-dev wget libnode-dev openbabel \
         libxml2-dev pngquant openjdk-11-jdk libmagick++-dev pandoc git pngquant texinfo libfribidi-dev \
-        zlib1g-dev libxml2-dev libnetcdf-dev libglpk-dev tzdata libnetcdf-dev netcdf-bin && \
+        zlib1g-dev libxml2-dev libnetcdf-dev libglpk-dev tzdata libnetcdf-dev netcdf-bin ccache && \
     mkdir -p $SETUPDIR && \
     wget -P $SETUPDIR https://abibuilder.informatik.uni-tuebingen.de/archive/openms/OpenMSInstaller/release/2.5.0/OpenMS-2.5.0-Debian-Linux-x86_64.deb && \
     apt-get install -y --no-install-recommends $SETUPDIR/OpenMS-2.5.0-Debian-Linux-x86_64.deb && \
@@ -14,14 +16,30 @@ RUN apt-get update -y && \
     R CMD javareconf
 
 USER rstudio
+WORKDIR /home/rstudio
 
-COPY --from=patroon --chown=rstudio:rstudio /home/patRoon/deps /home/rstudio/deps
-COPY --from=patroon --chown=rstudio:rstudio /home/patRoon/.Rprofile /home/rstudio
+COPY ./docker/install_deps.R ./DESCRIPTION .
 
-RUN sed -i -e 's/\/home\/patRoon/\/home\/rstudio/g' ~/.Rprofile
+ENV R_REMOTES_NO_ERRORS_FROM_WARNINGS=true
 
-ENV OPENMS_DATA_PATH=/usr/share/OpenMS _R_CHECK_FORCE_SUGGESTS_=0 R_MAX_NUM_DLLS=150 R_REMOTES_NO_ERRORS_FROM_WARNINGS=true
+RUN  mkdir deps && cd deps && \
+    wget -q http://msbi.ipb-halle.de/~cruttkie/metfrag/MetFrag2.4.5-CL.jar && \
+    wget -q https://bio.informatik.uni-jena.de/repository/dist-release-local/de/unijena/bioinf/ms/sirius/4.4.29/sirius-4.4.29-linux64-headless.zip && \
+    wget -q https://zenodo.org/record/3611238/files/PubChemLite_14Jan2020_tier1.csv && \
+    wget -q ftp://newftp.epa.gov/COMPTOX/Sustainable_Chemistry_Data/Chemistry_Dashboard/MetFrag_metadata_files/CompTox_17March2019_SelectMetaData.csv && \
+    unzip sirius-4.4.29-linux64-headless.zip && rm sirius-4.4.29-linux64-headless.zip && cd ~ && \
+    echo 'options(patRoon.path.MetFragCL = "/home/rstudio/deps/MetFrag2.4.5-CL.jar")' >> .Rprofile && \
+    echo 'options(patRoon.path.SIRIUS = "/home/rstudio/deps/sirius-linux64-headless-4.4.29/bin")' >> .Rprofile && \
+    echo 'options(patRoon.path.MetFragCompTox = "/home/rstudio/deps/CompTox_17March2019_SelectMetaData.csv")' >> .Rprofile && \
+    echo 'options(patRoon.path.MetFragPubChemLite = "/home/rstudio/deps/PubChemLite_14Jan2020_tier1.csv")' >> .Rprofile && \
+    echo 'options(patRoon.progress.opts = list(style = 1))' >> /home/rstudio/.Rprofile
+
+RUN --mount=type=cache,id=ccache,target=/home/rstudio/.ccache Rscript install_deps.R && rm -f install_deps.R DESCRIPTION
+
+ADD --chown=rstudio . patRoon
+
+RUN Rscript -e 'devtools::install(pkg = "patRoon", upgrade = FALSE)'
 
 USER root
 
-COPY --from=patroon /usr/local/lib/R/site-library/. /usr/local/lib/R/site-library/
+ENV OPENMS_DATA_PATH=/usr/share/OpenMS _R_CHECK_FORCE_SUGGESTS_=0 R_MAX_NUM_DLLS=150

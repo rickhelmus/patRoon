@@ -18,9 +18,9 @@ RUN --mount=type=cache,id=cache_apt,target=/var/cache/apt --mount=type=cache,id=
 USER rstudio
 WORKDIR /home/rstudio
 
-COPY docker/install_deps.R DESCRIPTION .
-COPY docker/rstudio/ccache.conf /home/rstudio/.ccache/
-COPY docker/rstudio/Makevars /home/rstudio/.R/
+COPY --chown=rstudio docker/install_deps.R DESCRIPTION .
+COPY --chown=rstudio docker/rstudio/ccache.conf /home/rstudio/.ccache/
+COPY --chown=rstudio docker/rstudio/Makevars /home/rstudio/.R/
 
 ENV R_REMOTES_NO_ERRORS_FROM_WARNINGS=true
 

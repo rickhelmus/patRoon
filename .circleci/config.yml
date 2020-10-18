@@ -125,7 +125,7 @@ jobs:
                 command: |
                     echo "$DH_PASS" | docker login -u "$DH_USER" --password-stdin
                     docker build --cache-from "${IMAGE_NAME_RS}" --tag "${IMAGE_NAME_RS}" --build-arg BUILDKIT_INLINE_CACHE=1 ./docker/rstudio
-            - run
+            - run:
                 name: Push RS image
                 command: |
                     git_sha=`echo $CIRCLE_SHA1 | cut -c1-7`

@@ -126,7 +126,7 @@ jobs:
                 no_output_timeout: 30m
                 command: |
                     echo "$DH_PASS" | docker login -u "$DH_USER" --password-stdin
-                    docker build --cache-from "${IMAGE_NAME_RS}" --tag "${IMAGE_NAME_RS}" --build-arg BUILDKIT_INLINE_CACHE=1 ./docker/rstudio
+                    docker build --cache-from "${IMAGE_NAME_RS}" --tag "${IMAGE_NAME_RS}" --build-arg BUILDKIT_INLINE_CACHE=1 ./docker/rstudio .
             - run:
                 name: Push RS image
                 command: |

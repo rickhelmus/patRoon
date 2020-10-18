@@ -119,6 +119,7 @@ jobs:
             DOCKER_BUILDKIT: 1
         steps:
             - checkout
+            - setup_remote_docker
             - run:
                 name: Build Docker RS image
                 no_output_timeout: 50m

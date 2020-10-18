@@ -32,7 +32,7 @@ jobs:
             - restore_docker_from_cache
             - run:
                 name: Build Docker image
-                no_output_timeout: 50m
+                no_output_timeout: 30m
                 command: |
                     echo "$DH_PASS" | docker login -u "$DH_USER" --password-stdin
                     docker build --pull --cache-from "${TMP_IMAGE_NAME}" --tag "${TMP_IMAGE_NAME}" .
@@ -123,7 +123,7 @@ jobs:
                 version: 19.03.13
             - run:
                 name: Build Docker RS image
-                no_output_timeout: 50m
+                no_output_timeout: 30m
                 command: |
                     echo "$DH_PASS" | docker login -u "$DH_USER" --password-stdin
                     docker build --cache-from "${IMAGE_NAME_RS}" --tag "${IMAGE_NAME_RS}" --build-arg BUILDKIT_INLINE_CACHE=1 ./docker/rstudio

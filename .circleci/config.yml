@@ -11,7 +11,6 @@ commands:
     restore_docker_from_cache:
         description: "Restore patRoon docker image from cache"
         steps:
-            - setup_remote_docker
             - restore_cache:
                 keys:
                     - v4-{{ .Branch }}
@@ -28,6 +27,7 @@ jobs:
         <<: *dockerimg
         <<: *set_dock_env
         steps:
+            - setup_remote_docker
             - checkout
             - restore_docker_from_cache
             - run:
@@ -93,6 +93,7 @@ jobs:
         <<: *dockerimg
         <<: *set_dock_env
         steps:
+            - setup_remote_docker
             - checkout
             - restore_docker_from_cache
             - add_ssh_keys:
@@ -120,6 +121,7 @@ jobs:
             DOCKER_BUILDKIT: 1
             BUILDKIT_PROGRESS: plain
         steps:
+            - setup_remote_docker
             - checkout
             - setup_remote_docker:
                 version: 19.03.13

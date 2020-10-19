@@ -39,8 +39,9 @@ ENV CCACHE_DIR=/home/rstudio/ccache
 RUN --mount=type=cache,id=ccache,target=/home/rstudio/ccache,uid=1000,gid=1000 Rscript install_deps.R && rm -f install_deps.R DESCRIPTION
 
 ADD --chown=rstudio . patRoon
-
 RUN --mount=type=cache,id=ccache,target=/home/rstudio/ccache,uid=1000,gid=1000 Rscript -e 'devtools::install(pkg = "patRoon", upgrade = FALSE)'
 
 ENV OPENMS_DATA_PATH=/usr/share/OpenMS _R_CHECK_FORCE_SUGGESTS_=0 R_MAX_NUM_DLLS=150 CCACHE_DIR=
-RUN rm /home/rstudio/.R/Makevars
+RUN rm -rf /home/rstudio/.R/Makevars /home/rstudio/patRoon
+
+CMD ["R"]

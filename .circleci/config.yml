@@ -46,7 +46,8 @@ jobs:
                 paths:
                     - caches/dock.tar
     test:
-        <<: *dockerimg
+        machine:
+            image: ubuntu-2004:202010-01
         <<: *set_dock_env
         steps:
             - restore_docker_from_cache
@@ -148,4 +149,6 @@ workflows:
                             - master
                 requires:
                     - build
-            - buildrs
+            - buildrs:
+                requires:
+                    - test

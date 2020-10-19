@@ -25,10 +25,10 @@ COPY --chown=rstudio docker/rstudio/Makevars /home/rstudio/.R/
 ENV R_REMOTES_NO_ERRORS_FROM_WARNINGS=true
 
 RUN  mkdir deps && cd deps && \
-    wget -q http://msbi.ipb-halle.de/~cruttkie/metfrag/MetFrag2.4.5-CL.jar && \
-    wget -q https://bio.informatik.uni-jena.de/repository/dist-release-local/de/unijena/bioinf/ms/sirius/4.4.29/sirius-4.4.29-linux64-headless.zip && \
-    wget -q https://zenodo.org/record/3611238/files/PubChemLite_14Jan2020_tier1.csv && \
-    wget -q ftp://newftp.epa.gov/COMPTOX/Sustainable_Chemistry_Data/Chemistry_Dashboard/MetFrag_metadata_files/CompTox_17March2019_SelectMetaData.csv && \
+    wget --progress=dot:mega http://msbi.ipb-halle.de/~cruttkie/metfrag/MetFrag2.4.5-CL.jar && \
+    wget --progress=dot:mega https://bio.informatik.uni-jena.de/repository/dist-release-local/de/unijena/bioinf/ms/sirius/4.4.29/sirius-4.4.29-linux64-headless.zip && \
+    wget --progress=dot:mega https://zenodo.org/record/3611238/files/PubChemLite_14Jan2020_tier1.csv && \
+    wget --progress=dot:mega ftp://newftp.epa.gov/COMPTOX/Sustainable_Chemistry_Data/Chemistry_Dashboard/MetFrag_metadata_files/CompTox_17March2019_SelectMetaData.csv && \
     unzip sirius-4.4.29-linux64-headless.zip && rm sirius-4.4.29-linux64-headless.zip && cd ~ && \
     echo 'options(patRoon.path.MetFragCL = "/home/rstudio/deps/MetFrag2.4.5-CL.jar")' >> .Rprofile && \
     echo 'options(patRoon.path.SIRIUS = "/home/rstudio/deps/sirius-linux64-headless-4.4.29/bin")' >> .Rprofile && \
@@ -36,12 +36,12 @@ RUN  mkdir deps && cd deps && \
     echo 'options(patRoon.path.MetFragPubChemLite = "/home/rstudio/deps/PubChemLite_14Jan2020_tier1.csv")' >> .Rprofile && \
     echo 'options(patRoon.progress.opts = list(style = 1))' >> /home/rstudio/.Rprofile
 
-RUN --mount=type=cache,id=ccache,target=/home/rstudio/.ccache Rscript install_deps.R && rm -f install_deps.R DESCRIPTION
+ENV CCACHE_DIR=/home/rstudio/ccache
+RUN --mount=type=cache,id=ccache,target=/home/rstudio/ccache,uid=1000,gid=1000 Rscript install_deps.R && rm -f install_deps.R DESCRIPTION
 
 ADD --chown=rstudio . patRoon
 
-RUN Rscript -e 'devtools::install(pkg = "patRoon", upgrade = FALSE)'
+RUN --mount=type=cache,id=ccache,target=/home/rstudio/ccache,uid=1000,gid=1000 Rscript -e 'devtools::install(pkg = "patRoon", upgrade = FALSE)'
 
-USER root
-
-ENV OPENMS_DATA_PATH=/usr/share/OpenMS _R_CHECK_FORCE_SUGGESTS_=0 R_MAX_NUM_DLLS=150
+ENV OPENMS_DATA_PATH=/usr/share/OpenMS _R_CHECK_FORCE_SUGGESTS_=0 R_MAX_NUM_DLLS=150 CCACHE_DIR=
+RUN rm /home/rstudio/.R/Makevars

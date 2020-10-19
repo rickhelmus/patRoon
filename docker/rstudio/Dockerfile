@@ -33,8 +33,7 @@ RUN  mkdir deps && cd deps && \
     echo 'options(patRoon.path.MetFragCL = "/home/rstudio/deps/MetFrag2.4.5-CL.jar")' >> .Rprofile && \
     echo 'options(patRoon.path.SIRIUS = "/home/rstudio/deps/sirius-linux64-headless-4.4.29/bin")' >> .Rprofile && \
     echo 'options(patRoon.path.MetFragCompTox = "/home/rstudio/deps/CompTox_17March2019_SelectMetaData.csv")' >> .Rprofile && \
-    echo 'options(patRoon.path.MetFragPubChemLite = "/home/rstudio/deps/PubChemLite_14Jan2020_tier1.csv")' >> .Rprofile && \
-    echo 'options(patRoon.progress.opts = list(style = 1))' >> /home/rstudio/.Rprofile
+    echo 'options(patRoon.path.MetFragPubChemLite = "/home/rstudio/deps/PubChemLite_14Jan2020_tier1.csv")' >> .Rprofile
 
 ENV CCACHE_DIR=/home/rstudio/ccache
 RUN --mount=type=cache,id=ccache,target=/home/rstudio/ccache,uid=1000,gid=1000 Rscript install_deps.R && rm -f install_deps.R DESCRIPTION

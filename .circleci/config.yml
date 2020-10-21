@@ -1,65 +1,40 @@
-dockerimg: &dockerimg
-    docker:
-        - image: cimg/base:2020.01
 set_dock_env: &set_dock_env
     environment:
-        IMAGE_NAME: "patroonorg/patroon"
-        TMP_IMAGE_NAME: "patroon"
+        IMAGE_NAME: "patroonorg/patroonrs"
+        DOCKER_BUILDKIT: 1
+        BUILDKIT_PROGRESS: plain
 
 version: 2.1
-commands:
-    restore_docker_from_cache:
-        description: "Restore patRoon docker image from cache"
-        steps:
-            - restore_cache:
-                keys:
-                    - v4-{{ .Branch }}
-                paths:
-                    - caches/dock.tar
-            - run:
-                name: Load Docker image layer cache
-                command: |
-                    set +o pipefail
-                    docker load -i caches/dock.tar | true
 
 jobs:
     build:
-        <<: *dockerimg
+        machine:
+            image: ubuntu-2004:202010-01
         <<: *set_dock_env
         steps:
-            - setup_remote_docker
             - checkout
-            - restore_docker_from_cache
             - run:
                 name: Build Docker image
                 no_output_timeout: 30m
                 command: |
                     echo "$DH_PASS" | docker login -u "$DH_USER" --password-stdin
-                    docker build --pull --cache-from "${TMP_IMAGE_NAME}" --tag "${TMP_IMAGE_NAME}" .
+                    docker build --cache-from "${IMAGE_NAME}" --tag "${IMAGE_NAME}" --build-arg BUILDKIT_INLINE_CACHE=1 --file ./docker/rstudio/Dockerfile .
             - run:
-                name: Save Docker image layer cache
+                name: Push Docker image
                 command: |
-                    mkdir -p caches
-                    docker save -o caches/dock.tar "${TMP_IMAGE_NAME}"
-            - save_cache:
-                key: v4-{{ .Branch }}-{{ epoch }}
-                paths:
-                    - caches/dock.tar
+                    git_sha=`echo $CIRCLE_SHA1 | cut -c1-7`
+                    docker tag "IMAGE_NAME" "${IMAGE_NAME}:${git_sha}-master"
+                    docker push "${IMAGE_NAME}:${git_sha}-master"
     test:
         machine:
             image: ubuntu-2004:202010-01
         <<: *set_dock_env
         steps:
-            - restore_docker_from_cache
             - run:
                 name: Perform tests
                 command: |
-                    docker run --name patroon -t "${TMP_IMAGE_NAME}" /bin/bash -c "cd patRoon; Rscript docker/run_tests.R"
-            - run:
-                name: Tag image
-                when: always
-                command: |
-                    docker tag "${TMP_IMAGE_NAME}" "${IMAGE_NAME}"
+                    git_sha=`echo $CIRCLE_SHA1 | cut -c1-7`
+                    docker run --name patroon -t "${IMAGE_NAME}:${git_sha}-master" /bin/bash -c "cd patRoon; Rscript docker/run_tests.R"
             - run:
                 name: Copy test results
                 when: always
@@ -71,31 +46,18 @@ jobs:
             - store_test_results:
                 path: /tmp/tests
             - deploy:
-                name: Push Docker image
+                name: Push Docker image as latest
                 command: |
                     if [ "${CIRCLE_BRANCH}" == "master" ]; then
                         echo "$DH_PASS" | docker login -u "$DH_USER" --password-stdin
                         git_sha=`echo $CIRCLE_SHA1 | cut -c1-7`
-                        docker tag "$IMAGE_NAME" "${IMAGE_NAME}:${git_sha}-master"
-                        docker push "${IMAGE_NAME}:latest" && docker push "${IMAGE_NAME}:${git_sha}-master"
-                    fi
-            - deploy:
-                name: Push failed Docker image
-                when: on_fail
-                command: |
-                    if [ "${CIRCLE_BRANCH}" == "master" ]; then
-                        echo "$DH_PASS" | docker login -u "$DH_USER" --password-stdin
-                        git_sha=`echo $CIRCLE_SHA1 | cut -c1-7`
-                        docker tag "${IMAGE_NAME}" "${IMAGE_NAME}:${git_sha}-master-failed"
-                        docker push "${IMAGE_NAME}:${git_sha}-master-failed"
+                        docker tag "${IMAGE_NAME}:${git_sha}-master" "${IMAGE_NAME}:latest"
+                        docker push "${IMAGE_NAME}:latest"
                     fi
     docs:
-        <<: *dockerimg
         <<: *set_dock_env
         steps:
-            - setup_remote_docker
             - checkout
-            - restore_docker_from_cache
             - add_ssh_keys:
                 fingerprints:
                     - "9a:18:88:f8:04:fe:25:3b:8f:6e:23:d7:fd:d4:46:b8"
@@ -103,7 +65,8 @@ jobs:
                 name: Generate docs & site
                 no_output_timeout: 60m
                 command: |
-                    docker run --name patroon -t "${TMP_IMAGE_NAME}" /bin/bash -c "cd patRoon; Rscript docker/make_docs.R"
+                    git_sha=`echo $CIRCLE_SHA1 | cut -c1-7`
+                    docker run --name patroon -t "${IMAGE_NAME}:${git_sha}-master" /bin/bash -c "cd patRoon; Rscript docker/make_docs.R"
                     CONTAINER_ID=`docker ps -aqf "name=patroon"`
                     rm -rf docs
                     docker cp $CONTAINER_ID:/home/patRoon/patRoon/docs docs
@@ -113,7 +76,7 @@ jobs:
                     git add docs
                     git status
                     git commit -m "automatic site/doc update [skip ci]"
-                    git push origin master
+                    #git push origin master
     buildrs:
         machine:
             image: ubuntu-2004:202010-01
@@ -143,11 +106,7 @@ jobs:
 workflows:
     btd:
         jobs:
-            - build:
-                filters:
-                    branches:
-                        only:
-                            - disabled
+            - build
             - test:
                 requires:
                     - build
@@ -158,4 +117,8 @@ workflows:
                             - master
                 requires:
                     - build
-            - buildrs
+            - buildrs:
+                filters:
+                    branches:
+                        only:
+                            - disabled

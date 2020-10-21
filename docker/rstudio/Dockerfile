@@ -9,7 +9,7 @@ RUN --mount=type=cache,id=cache_apt,target=/var/cache/apt --mount=type=cache,id=
         libxml2-dev pngquant openjdk-11-jdk libmagick++-dev pandoc git pngquant texinfo libfribidi-dev \
         zlib1g-dev libxml2-dev libnetcdf-dev libglpk-dev tzdata libnetcdf-dev netcdf-bin ccache && \
     mkdir -p $SETUPDIR && \
-    wget -P $SETUPDIR https://abibuilder.informatik.uni-tuebingen.de/archive/openms/OpenMSInstaller/release/2.5.0/OpenMS-2.5.0-Debian-Linux-x86_64.deb && \
+    wget -P $SETUPDIR https://github.com/OpenMS/OpenMS/releases/download/Release2.5.0/OpenMS-2.5.0-Debian-Linux-x86_64.deb && \
     apt-get install -y --no-install-recommends $SETUPDIR/OpenMS-2.5.0-Debian-Linux-x86_64.deb && \
     rm -rf $SETUPDIR && \
     apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \

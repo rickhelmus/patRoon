@@ -55,6 +55,8 @@ jobs:
                         docker push "${IMAGE_NAME}:latest"
                     fi
     docs:
+        machine:
+            image: ubuntu-2004:202010-01
         <<: *set_dock_env
         steps:
             - checkout

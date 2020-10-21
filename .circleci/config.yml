@@ -23,7 +23,7 @@ jobs:
                 name: Push Docker image
                 command: |
                     git_sha=`echo $CIRCLE_SHA1 | cut -c1-7`
-                    docker tag "IMAGE_NAME" "${IMAGE_NAME}:${git_sha}-master"
+                    docker tag "${IMAGE_NAME}" "${IMAGE_NAME}:${git_sha}-master"
                     docker push "${IMAGE_NAME}:${git_sha}-master"
     test:
         machine:

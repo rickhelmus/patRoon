@@ -11,18 +11,21 @@ epAnaInfo <- makeMZXMLs(anaInfoOne)
 # alongside with it for now...
 file.copy(patRoon:::getMzMLAnalysisPath(anaInfoOne$analysis[1], anaInfoOne$path[1]), epAnaInfo$path[1])
 
-ffOptOpenMS <- optimizeFeatureFinding(anaInfo, "openms", list(chromFWHM = c(5, 10), mzPPM = c(5, 15)))
+ffOptOpenMS <- optimizeFeatureFinding(anaInfo, "openms", list(chromFWHM = c(5, 10), mzPPM = c(5, 15)),
+                                      maxIterations = 2)
 # disable 'old' xcms for now to save testing time (both interfaces are fairly similar anyway)
 # ffOptXCMS <- optimizeFeatureFinding(anaInfo, "xcms", list(mzdiff = c(0.002, 0.006)))
-ffOptXCMS3 <- optimizeFeatureFinding(anaInfo, "xcms3", list(mzdiff = c(0.002, 0.006)))
-ffOptEnviPick <- optimizeFeatureFinding(epAnaInfo, "envipick", list(drtsmall = c(10, 30)))
+ffOptXCMS3 <- optimizeFeatureFinding(anaInfo, "xcms3", list(mzdiff = c(0.002, 0.006)), maxIterations = 2)
+ffOptEnviPick <- optimizeFeatureFinding(epAnaInfo, "envipick", list(drtsmall = c(10, 30)), maxIterations = 2)
 
 suppressWarnings(ffOptEmpty <- optimizeFeatureFinding(anaInfo, "openms", list(chromFWHM = c(5, 10), noiseThrInt = 1E9)))
 
-fgOptOpenMS <- optimizeFeatureGrouping(optimizedObject(ffOptOpenMS), "openms", list(maxGroupMZ = c(0.002, 0.007)))
+fgOptOpenMS <- optimizeFeatureGrouping(optimizedObject(ffOptOpenMS), "openms", list(maxGroupMZ = c(0.002, 0.007)),
+                                                                                    maxIterations = 2)
 # fgOptXCMS <- optimizeFeatureGrouping(optimizedObject(ffOptXCMS), "xcms", list(groupArgs = list(bw = c(22, 28)),
 #                                                                               retcorArgs = list(method = "obiwarp")))
-fgOptXCMS3 <- optimizeFeatureGrouping(optimizedObject(ffOptXCMS3), "xcms3", list(groupParams = list(bw = c(22, 28))))
+fgOptXCMS3 <- optimizeFeatureGrouping(optimizedObject(ffOptXCMS3), "xcms3", list(groupParams = list(bw = c(22, 28))),
+                                      maxIterations = 2)
 
 # don't want to compare resulting object as it may be irreproducible due to file paths etc
 expInfoNoObject <- function(...)

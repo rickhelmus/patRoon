@@ -115,13 +115,13 @@ jobs:
                     git commit -m "automatic site/doc update [skip ci]"
                     git push origin master
     buildrs:
-        <<: *dockerimg
+        machine:
+            image: ubuntu-2004:202010-01
         environment:
             IMAGE_NAME_RS: "patroonorg/patroonrs"
             DOCKER_BUILDKIT: 1
             BUILDKIT_PROGRESS: plain
         steps:
-            - setup_remote_docker
             - checkout
             - setup_remote_docker:
                 version: 19.03.13
@@ -132,6 +132,11 @@ jobs:
                     echo "$DH_PASS" | docker login -u "$DH_USER" --password-stdin
                     docker build --cache-from "${IMAGE_NAME_RS}" --tag "${IMAGE_NAME_RS}" --build-arg BUILDKIT_INLINE_CACHE=1 --file ./docker/rstudio/Dockerfile .
             - run:
+                name: Test RS image
+                no_output_timeout: 30m
+                command: |
+                    docker run -u rstudio -t "${IMAGE_NAME_RS}" /bin/bash -c "cd patRoon; Rscript docker/run_tests.R"
+            - run:
                 name: Push RS image
                 command: |
                     git_sha=`echo $CIRCLE_SHA1 | cut -c1-7`
@@ -140,7 +145,11 @@ jobs:
 workflows:
     btd:
         jobs:
-            - build
+            - build:
+                filters:
+                    branches:
+                        only:
+                            - disabled
             - test:
                 requires:
                     - build
@@ -151,6 +160,4 @@ workflows:
                             - master
                 requires:
                     - build
-            - buildrs:
-                requires:
-                    - test
+            - buildrs

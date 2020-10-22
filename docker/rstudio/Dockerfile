@@ -13,7 +13,7 @@ RUN --mount=type=cache,id=cache_apt,target=/var/cache/apt --mount=type=cache,id=
     apt-get install -y --no-install-recommends $SETUPDIR/OpenMS-2.5.0-Debian-Linux-x86_64.deb && \
     rm -rf $SETUPDIR && \
     apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
-    R CMD javareconf
+    echo 'PATH=/home/rstudio/bin:${PATH}' >> /usr/local/lib/R/etc/Renviron && R CMD javareconf
 
 USER rstudio
 WORKDIR /home/rstudio

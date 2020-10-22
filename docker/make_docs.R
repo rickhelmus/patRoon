@@ -10,7 +10,6 @@ origRmds <- file.path(handbookSubRmdPath, origRmds)
 disabledRmds <- file.path(handbookSubRmdPath, disabledRmds)
 file.rename(origRmds, disabledRmds)
 
-# NOTE: use CRAN mirror to get latest (RSPM versions are old)
 install.packages(c("pkgdown", "bookdown", "DiagrammeR", "rsvg", "webshot", "tinytex"))
 remotes::install_github("rich-iannone/DiagrammeRsvg")
 
@@ -38,6 +37,8 @@ withr::with_dir("vignettes/handbook/", bookdown::render_book("index.Rmd",
                                                              clean_envir = FALSE))
 rmarkdown::render("vignettes/tutorial.Rmd", "rmarkdown::pdf_document",
                   output_dir = file.path("docs", "articles"))
+
+tinytex::tlmgr_install("makeindex")
 refp <- file.path("docs/reference")
 devtools::build_manual(path = refp)
 file.rename(file.path(refp, paste0(desc::desc_get_field("Package"), "_", desc::desc_get_version(), ".pdf")),

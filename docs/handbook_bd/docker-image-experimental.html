@@ -24,7 +24,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2020-10-19" />
+<meta name="date" content="2020-10-22" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -50,6 +50,7 @@
 
 
 
+<script src="libs/accessible-code-block-0.0.1/empty-anchor.js"></script>
 <script src="libs/htmlwidgets-1.5.2/htmlwidgets.js"></script>
 <script src="libs/viz-1.8.2/viz.js"></script>
 <link href="libs/DiagrammeR-styles-0.2/styles.css" rel="stylesheet" />
@@ -68,41 +69,68 @@
 
 
 <style type="text/css">
-div.sourceCode { overflow-x: auto; }
-table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
-  margin: 0; padding: 0; vertical-align: baseline; border: none; }
-table.sourceCode { width: 100%; line-height: 100%; }
-td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
-td.sourceCode { padding-left: 5px; }
-code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code > span.dt { color: #902000; } /* DataType */
-code > span.dv { color: #40a070; } /* DecVal */
-code > span.bn { color: #40a070; } /* BaseN */
-code > span.fl { color: #40a070; } /* Float */
-code > span.ch { color: #4070a0; } /* Char */
-code > span.st { color: #4070a0; } /* String */
-code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code > span.ot { color: #007020; } /* Other */
-code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code > span.fu { color: #06287e; } /* Function */
-code > span.er { color: #ff0000; font-weight: bold; } /* Error */
-code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-code > span.cn { color: #880000; } /* Constant */
-code > span.sc { color: #4070a0; } /* SpecialChar */
-code > span.vs { color: #4070a0; } /* VerbatimString */
-code > span.ss { color: #bb6688; } /* SpecialString */
-code > span.im { } /* Import */
-code > span.va { color: #19177c; } /* Variable */
-code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code > span.op { color: #666666; } /* Operator */
-code > span.bu { } /* BuiltIn */
-code > span.ex { } /* Extension */
-code > span.pp { color: #bc7a00; } /* Preprocessor */
-code > span.at { color: #7d9029; } /* Attribute */
-code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code.sourceCode > span { display: inline-block; line-height: 1.25; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
 </style>
 
 </head>
@@ -204,16 +232,16 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <h2><span class="header-section-number">2.2</span> Docker image (experimental)</h2>
 <p>Docker images are provided to easily install a reproducible environment with <code>R</code>, <code>patRoon</code> and nearly all of its dependencies. This section assumes you have a basic understanding of <a href="https://www.docker.com/">Docker</a> and have it installed. If not, please refer to the many guides available on the Internet. The Docker images of <code>patRoon</code> were originally only used for automated testing, however, since these contain a complete working environment of <code>patRoon</code> they are also suitable for using the software. They come with all external dependencies (except ProteoWizard), R dependencies and MetFrag libraries. Furthermore, as of recently the Docker image now also contains <a href="https://rstudio.com/">RStudio</a> server, which makes using <code>patRoon</code> even easier. This feature is still experimental and may change over time. If you find bugs or suggestion please <a href="https://github.com/rickhelmus/patRoon/issues">file a bug report</a>!</p>
 <p>Below are some example shell commands on how to run the image.</p>
-<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="co"># run an interactive R console session</span>
-<span class="ex">docker</span> run --rm -it patroonorg/patroon
-
-<span class="co"># run a linux shell, from which R can be launched</span>
-<span class="ex">docker</span> run --rm -it patroonorg/patroon bash
-
-<span class="co"># run rstudio server, acessible from localhost:8787</span>
-<span class="co"># login with rstudio/yourpasswordhere</span>
-<span class="ex">docker</span> run --rm -p 8787:8787 -u 0 -e PASSWORD=yourpasswordhere -v ~/myvolume:/home/rstudio patroonorg/patroon /init</code></pre></div>
-<p>Note that the first two commands run as the default user <code>patRoon</code>, while the last as <code>root</code>. The last command launches <a href="https://rstudio.com/">RStudio</a> server. You can access it by browsing to <code>localhost:8787</code> and logging with user <code>rstudio</code> and the password defined by the <code>PASSWORD</code> variable from the command (<code>yourpasswordhere</code> in the above example). This command also links a local volume to the <code>rstudio</code> user in order to obtain persistence of files in the container's home directory. The Docker image is based on the excellent <a href="https://hub.docker.com/r/rocker/rstudio">RStudio image</a> from the <a href="https://www.rocker-project.org/">rocker project</a>. For more information on RStudio related options see the documentation for the <a href="https://hub.docker.com/r/rocker/rstudio">RStudio image</a>.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="docker-image-experimental.html#cb2-1"></a><span class="co"># run an interactive R console session</span></span>
+<span id="cb2-2"><a href="docker-image-experimental.html#cb2-2"></a><span class="ex">docker</span> run --rm -it patroonorg/patroon</span>
+<span id="cb2-3"><a href="docker-image-experimental.html#cb2-3"></a></span>
+<span id="cb2-4"><a href="docker-image-experimental.html#cb2-4"></a><span class="co"># run a linux shell, from which R can be launched</span></span>
+<span id="cb2-5"><a href="docker-image-experimental.html#cb2-5"></a><span class="ex">docker</span> run --rm -it patroonorg/patroon bash</span>
+<span id="cb2-6"><a href="docker-image-experimental.html#cb2-6"></a></span>
+<span id="cb2-7"><a href="docker-image-experimental.html#cb2-7"></a><span class="co"># run rstudio server, acessible from localhost:8787</span></span>
+<span id="cb2-8"><a href="docker-image-experimental.html#cb2-8"></a><span class="co"># login with rstudio/yourpasswordhere</span></span>
+<span id="cb2-9"><a href="docker-image-experimental.html#cb2-9"></a><span class="ex">docker</span> run --rm -p 8787:8787 -u 0 -e PASSWORD=yourpasswordhere -v ~/myvolume:/home/rstudio patroonorg/patroon /init</span></code></pre></div>
+<p>Note that the first two commands run as the default user <code>patRoon</code>, while the last as <code>root</code>. The last command launches <a href="https://rstudio.com/">RStudio</a> server. You can access it by browsing to <code>localhost:8787</code> and logging with user <code>rstudio</code> and the password defined by the <code>PASSWORD</code> variable from the command (<code>yourpasswordhere</code> in the above example). This command also links a local volume to the <code>rstudio</code> user in order to obtain persistence of files in the container’s home directory. The Docker image is based on the excellent <a href="https://hub.docker.com/r/rocker/rstudio">RStudio image</a> from the <a href="https://www.rocker-project.org/">rocker project</a>. For more information on RStudio related options see the documentation for the <a href="https://hub.docker.com/r/rocker/rstudio">RStudio image</a>.</p>
 </div>
             </section>
 

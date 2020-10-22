@@ -24,7 +24,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2020-10-19" />
+<meta name="date" content="2020-10-22" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -50,6 +50,7 @@
 
 
 
+<script src="libs/accessible-code-block-0.0.1/empty-anchor.js"></script>
 <script src="libs/htmlwidgets-1.5.2/htmlwidgets.js"></script>
 <script src="libs/viz-1.8.2/viz.js"></script>
 <link href="libs/DiagrammeR-styles-0.2/styles.css" rel="stylesheet" />
@@ -68,41 +69,68 @@
 
 
 <style type="text/css">
-div.sourceCode { overflow-x: auto; }
-table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
-  margin: 0; padding: 0; vertical-align: baseline; border: none; }
-table.sourceCode { width: 100%; line-height: 100%; }
-td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
-td.sourceCode { padding-left: 5px; }
-code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code > span.dt { color: #902000; } /* DataType */
-code > span.dv { color: #40a070; } /* DecVal */
-code > span.bn { color: #40a070; } /* BaseN */
-code > span.fl { color: #40a070; } /* Float */
-code > span.ch { color: #4070a0; } /* Char */
-code > span.st { color: #4070a0; } /* String */
-code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code > span.ot { color: #007020; } /* Other */
-code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code > span.fu { color: #06287e; } /* Function */
-code > span.er { color: #ff0000; font-weight: bold; } /* Error */
-code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-code > span.cn { color: #880000; } /* Constant */
-code > span.sc { color: #4070a0; } /* SpecialChar */
-code > span.vs { color: #4070a0; } /* VerbatimString */
-code > span.ss { color: #bb6688; } /* SpecialString */
-code > span.im { } /* Import */
-code > span.va { color: #19177c; } /* Variable */
-code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code > span.op { color: #666666; } /* Operator */
-code > span.bu { } /* BuiltIn */
-code > span.ex { } /* Extension */
-code > span.pp { color: #bc7a00; } /* Preprocessor */
-code > span.at { color: #7d9029; } /* Attribute */
-code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code.sourceCode > span { display: inline-block; line-height: 1.25; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
 </style>
 
 </head>
@@ -203,16 +231,16 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="annotation" class="section level2">
 <h2><span class="header-section-number">4.3</span> Annotation</h2>
 <p>The annotation consists of collecting MS peak lists and then formula and/or compound annotation:</p>
-<div id="htmlwidget-7807070642930080178a" style="width:500px;height:120px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-7807070642930080178a">{"x":{"diagram":"\ndigraph Annotation {\n  graph [ rankdir = LR ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.3,\n         height = 1,\n         fontsize = 18,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"MS peak lists\" -> \"Formula annotation\"\n    \"MS peak lists\" -> \"Compound annotation\"\n    \"Formula annotation\":e -> \"Compound annotation\":e [style = dotted, constraint = false]\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-c6bf8135c3ec15a728b7" style="width:500px;height:120px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-c6bf8135c3ec15a728b7">{"x":{"diagram":"\ndigraph Annotation {\n  graph [ rankdir = LR ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.3,\n         height = 1,\n         fontsize = 18,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"MS peak lists\" -> \"Formula annotation\"\n    \"MS peak lists\" -> \"Compound annotation\"\n    \"Formula annotation\":e -> \"Compound annotation\":e [style = dotted, constraint = false]\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 <p>Note that compound annotation is normally not dependent upon formula annotation. However, formula data can be used to improve ranking of candidates afterwards by the <code>addFormulaScoring()</code> function, which will be discussed later in this section.</p>
 <div id="ms-peak-lists" class="section level3">
 <h3><span class="header-section-number">4.3.1</span> MS peak lists</h3>
-<table style="width:100%;">
+<table>
 <colgroup>
 <col width="10%" />
 <col width="45%" />
-<col width="43%" />
+<col width="44%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -224,17 +252,17 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <tbody>
 <tr class="odd">
 <td><a href="https://bioconductor.org/packages/release/bioc/html/mzR.html">mzR</a></td>
-<td><code>generateMSPeakLists(algorithm = &quot;mzr&quot;, ...)</code></td>
+<td><code>generateMSPeakLists(algorithm = "mzr", ...)</code></td>
 <td>Uses <a href="https://bioconductor.org/packages/release/bioc/html/mzR.html">mzR</a> for spectra retrieval. Recommended default.</td>
 </tr>
 <tr class="even">
 <td>DataAnalysis</td>
-<td><code>generateMSPeakLists(algorithm = &quot;bruker&quot;, ...)</code></td>
+<td><code>generateMSPeakLists(algorithm = "bruker", ...)</code></td>
 <td>Loads data after automatically generating MS and MS/MS spectra in DataAnalysis</td>
 </tr>
 <tr class="odd">
 <td>DataAnalysis FMF</td>
-<td><code>generateMSPeakLists(algorithm = &quot;brukerfmf&quot;, ...)</code></td>
+<td><code>generateMSPeakLists(algorithm = "brukerfmf", ...)</code></td>
 <td>Uses spectra from the <em>find molecular features</em> algorithm.</td>
 </tr>
 </tbody>
@@ -242,7 +270,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>The recommended default algorithm is <code>mzr</code>: this algorithm is generally faster and is not limited to a vendor data format as it will read the open <code>mzML</code> and <code>mzXML</code> file formats. On the other hand, when DataAnalysis is used with Bruker data the spectra can be automatically background subtracted and there is no need for file conversion. Note that the <code>brukerfmf</code> algorithm only works when <code>findFeatures()</code> was called with the <code>bruker</code> algorithm.</p>
 <p>When <code>generateMSPeakists()</code> is called it will</p>
 <ol style="list-style-type: decimal">
-<li>Find all MS and MS/MS spectra that 'belong' to a feature. For MS spectra this means that all spectra close to the retention time of a feature will be collected. In addition, for MS/MS normally only spectra will be considered that have a precursor mass close to that of the feature (however, this can be disabled for data that was recorded with data independent acquisition (DIA, MS^E, bbCID, ...)).</li>
+<li>Find all MS and MS/MS spectra that ‘belong’ to a feature. For MS spectra this means that all spectra close to the retention time of a feature will be collected. In addition, for MS/MS normally only spectra will be considered that have a precursor mass close to that of the feature (however, this can be disabled for data that was recorded with data independent acquisition (DIA, MS^E, bbCID, …)).</li>
 <li>Average all MS and MS/MS spectra to produce peak lists for each feature.</li>
 <li>Average all peak lists for features within the same group.</li>
 </ol>
@@ -253,7 +281,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <colgroup>
 <col width="28%" />
 <col width="16%" />
-<col width="54%" />
+<col width="55%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -271,7 +299,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <tr class="even">
 <td><code>precursorMzWindow</code></td>
 <td><code>mzr</code></td>
-<td>Maximum precursor <em>m/z</em> search window to find MS/MS spectra. Set to <code>NULL</code> to disable (i.e. for DIA experiments).</td>
+<td>Maximum precursor <em>m/z</em> search window to find MS/MS spectra. Set to <code>NULL</code> to disable (i.e. for DIA experiments).</td>
 </tr>
 <tr class="odd">
 <td><code>topMost</code></td>
@@ -281,7 +309,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <tr class="even">
 <td><code>bgsubtr</code></td>
 <td><code>bruker</code></td>
-<td>Perform background subtraction (if the spectra type supports this, e.g. MS and bbCID)</td>
+<td>Perform background subtraction (if the spectra type supports this, e.g. MS and bbCID)</td>
 </tr>
 <tr class="odd">
 <td><code>minMSIntensity</code>, <code>minMSMSIntensity</code></td>
@@ -291,23 +319,23 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <tr class="even">
 <td><code>MSMSType</code></td>
 <td><code>bruker</code></td>
-<td>The type of spectra that should be used for MSMS: <code>&quot;BBCID&quot;</code> for bbCID experiments, otherwise <code>&quot;MSMS&quot;</code> (the default).</td>
+<td>The type of spectra that should be used for MSMS: <code>"BBCID"</code> for bbCID experiments, otherwise <code>"MSMS"</code> (the default).</td>
 </tr>
 </tbody>
 </table>
 <p>In addition, several parameters can be set that affect spectral averaging. These parameters are passed as a <code>list</code> to the <code>avgFeatParams</code> (<code>mzr</code> algorithm only) and <code>avgFGroupParams</code> arguments, which affect averaging of feature and feature group data, respectively. Some typical parameters include:</p>
 <ul>
 <li><code>clusterMzWindow</code>: Maximum <em>m/z</em> window used to cluster mass peaks when averaging. The better the MS resolution, the lower this value should be.</li>
-<li><code>topMost</code>: Retain no more than this amount of most intense mass peaks. Useful to filter out 'noisy' peaks.</li>
+<li><code>topMost</code>: Retain no more than this amount of most intense mass peaks. Useful to filter out ‘noisy’ peaks.</li>
 <li><code>minIntensityPre</code> / <code>minIntensityPost</code>: Mass peaks below this intensity will be removed before/after averaging.</li>
 </ul>
 <p>See <code>?generateMSPeakLists</code> for all possible parameters.</p>
 <p>A suitable list object to set averaging parameters can be obtained with the <code>getDefAvgPListParams()</code> function.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># lower default clustering window, other settings remain default</span>
-avgPListParams &lt;-<span class="st"> </span><span class="kw">getDefAvgPListParams</span>(<span class="dt">clusterMzWindow =</span> <span class="fl">0.001</span>)
-
-<span class="co"># Apply to both feature and feature group averaging</span>
-plists &lt;-<span class="st"> </span><span class="kw">generateMSPeakLists</span>(fGroups, <span class="st">&quot;mzr&quot;</span>, <span class="dt">avgFeatParams =</span> avgPListParams, <span class="dt">avgFGroupParams =</span> avgPListParams)</code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="annotation.html#cb16-1"></a><span class="co"># lower default clustering window, other settings remain default</span></span>
+<span id="cb16-2"><a href="annotation.html#cb16-2"></a>avgPListParams &lt;-<span class="st"> </span><span class="kw">getDefAvgPListParams</span>(<span class="dt">clusterMzWindow =</span> <span class="fl">0.001</span>)</span>
+<span id="cb16-3"><a href="annotation.html#cb16-3"></a></span>
+<span id="cb16-4"><a href="annotation.html#cb16-4"></a><span class="co"># Apply to both feature and feature group averaging</span></span>
+<span id="cb16-5"><a href="annotation.html#cb16-5"></a>plists &lt;-<span class="st"> </span><span class="kw">generateMSPeakLists</span>(fGroups, <span class="st">&quot;mzr&quot;</span>, <span class="dt">avgFeatParams =</span> avgPListParams, <span class="dt">avgFGroupParams =</span> avgPListParams)</span></code></pre></div>
 </div>
 <div id="formulae" class="section level3">
 <h3><span class="header-section-number">4.3.2</span> Formulae</h3>
@@ -316,7 +344,7 @@ plists &lt;-<span class="st"> </span><span class="kw">generateMSPeakLists</span>
 <colgroup>
 <col width="11%" />
 <col width="43%" />
-<col width="44%" />
+<col width="45%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -328,35 +356,35 @@ plists &lt;-<span class="st"> </span><span class="kw">generateMSPeakLists</span>
 <tbody>
 <tr class="odd">
 <td><a href="https://sourceforge.net/projects/genform/">GenForm</a></td>
-<td><code>generateFormulas(algorithm = &quot;genform&quot;, ...)</code></td>
+<td><code>generateFormulas(algorithm = "genform", ...)</code></td>
 <td>Bundled with <code>patRoon</code>. Reasonable default.</td>
 </tr>
 <tr class="even">
 <td><a href="https://bio.informatik.uni-jena.de/software/sirius/">SIRIUS</a></td>
-<td><code>generateFormulas(algorithm = &quot;sirius&quot;, ...)</code></td>
+<td><code>generateFormulas(algorithm = "sirius", ...)</code></td>
 <td>Requires MS/MS data.</td>
 </tr>
 <tr class="odd">
 <td>DataAnalysis</td>
-<td><code>generateFormulas(algorithm = &quot;bruker&quot;, ...)</code></td>
-<td>Requires FMF features (i.e. <code>findFeatures(algorithm = &quot;bruker&quot;, ...)</code>). MS peak lists are not needed. Uses <em>SmartFormula</em> algorithms.</td>
+<td><code>generateFormulas(algorithm = "bruker", ...)</code></td>
+<td>Requires FMF features (i.e. <code>findFeatures(algorithm = "bruker", ...)</code>). MS peak lists are not needed. Uses <em>SmartFormula</em> algorithms.</td>
 </tr>
 </tbody>
 </table>
-<p>Calculation with <a href="https://sourceforge.net/projects/genform/">GenForm</a> is often a good default. It is fast and basic rules can be applied to filter out obvious non-existing formulae. A possible drawback of GenForm, however, is that may become slow when many candidates are calculated, for instance, due to a relative high feature <em>m/z</em> (e.g. &gt;600) or loose elemental restricitions. More thorough calculation is performed with <a href="https://bio.informatik.uni-jena.de/software/sirius/">SIRIUS</a>: this algorithm often yields fewer and often more plausible results. However, <a href="https://bio.informatik.uni-jena.de/software/sirius/">SIRIUS</a> requires MS/MS data (hence features without will not have results) and formula prediction may not work well for compounds that structurally deviate from the training sets used by <a href="https://bio.informatik.uni-jena.de/software/sirius/">SIRIUS</a>. Calculation with DataAnalysis is only possible when features are obtained with DataAnalysis as well. An advantage is that analysis files do not have to be converted and no MS peak generation is necessary, however, compared to other algorithms calculation is often relative slow.</p>
+<p>Calculation with <a href="https://sourceforge.net/projects/genform/">GenForm</a> is often a good default. It is fast and basic rules can be applied to filter out obvious non-existing formulae. A possible drawback of GenForm, however, is that may become slow when many candidates are calculated, for instance, due to a relative high feature <em>m/z</em> (e.g. &gt;600) or loose elemental restricitions. More thorough calculation is performed with <a href="https://bio.informatik.uni-jena.de/software/sirius/">SIRIUS</a>: this algorithm often yields fewer and often more plausible results. However, <a href="https://bio.informatik.uni-jena.de/software/sirius/">SIRIUS</a> requires MS/MS data (hence features without will not have results) and formula prediction may not work well for compounds that structurally deviate from the training sets used by <a href="https://bio.informatik.uni-jena.de/software/sirius/">SIRIUS</a>. Calculation with DataAnalysis is only possible when features are obtained with DataAnalysis as well. An advantage is that analysis files do not have to be converted and no MS peak generation is necessary, however, compared to other algorithms calculation is often relative slow.</p>
 <p>There are two methods for formula assignment:</p>
 <ol style="list-style-type: decimal">
-<li>Formulae are first calculated for each individual feature within a feature group. These results are then pooled, outliers are removed and remaining formulae are assigned to the feature group (i.e. <code>calculateFeatures = TRUE</code>).</li>
-<li>Formulae are directly calculated for each feature group by using group averaged peak lists (see previous section) (i.e. <code>calculateFeatures = FALSE</code>).</li>
+<li>Formulae are first calculated for each individual feature within a feature group. These results are then pooled, outliers are removed and remaining formulae are assigned to the feature group (i.e. <code>calculateFeatures = TRUE</code>).</li>
+<li>Formulae are directly calculated for each feature group by using group averaged peak lists (see previous section) (i.e. <code>calculateFeatures = FALSE</code>).</li>
 </ol>
 <p>The first method is more thorough and the possibility to remove outliers may sometimes result in better formula assignment. However, the second method is much faster and generally recommended for large number of analyses.</p>
-<p>By default, formulae are either calculated by <em>only</em> MS/MS data (SIRIUS) or with both MS <em>and</em> MS/MS data (GenForm/Bruker). The latter also allows formula calculation when no MS/MS data is present. Furthermore, with Bruker algorithms, data from both MS and MS/MS formula data can be combined to allow inclusion of candidates that would otherwise be excluded by e.g. poor MS/MS data. However, a disadvantage is that formulae needs to be calculated twice. The <code>MSMode</code> argument (listed below) can be used to customize this behaviour.</p>
+<p>By default, formulae are either calculated by <em>only</em> MS/MS data (SIRIUS) or with both MS <em>and</em> MS/MS data (GenForm/Bruker). The latter also allows formula calculation when no MS/MS data is present. Furthermore, with Bruker algorithms, data from both MS and MS/MS formula data can be combined to allow inclusion of candidates that would otherwise be excluded by e.g. poor MS/MS data. However, a disadvantage is that formulae needs to be calculated twice. The <code>MSMode</code> argument (listed below) can be used to customize this behaviour.</p>
 <p>An overview of common parameters that are typically set to customize formula calculation is listed below.</p>
 <table>
 <colgroup>
-<col width="15%" />
+<col width="14%" />
 <col width="16%" />
-<col width="67%" />
+<col width="68%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -374,7 +402,7 @@ plists &lt;-<span class="st"> </span><span class="kw">generateMSPeakLists</span>
 <tr class="even">
 <td>elements</td>
 <td><code>genform</code>, <code>sirius</code></td>
-<td>Which elements to consider. By default <code>&quot;CHNOP&quot;</code>. Try to limit possible elements as much as possible.</td>
+<td>Which elements to consider. By default <code>"CHNOP"</code>. Try to limit possible elements as much as possible.</td>
 </tr>
 <tr class="odd">
 <td>calculateFeatures</td>
@@ -384,41 +412,41 @@ plists &lt;-<span class="st"> </span><span class="kw">generateMSPeakLists</span>
 <tr class="even">
 <td>featThreshold</td>
 <td>All</td>
-<td>Minimum relative amount (<em>0-1</em>) amongst all features within a feature group that a formula candidate should be present (e.g. <em>1</em> means that a candidate is only considered if it was assigned to all features).</td>
+<td>Minimum relative amount (<em>0-1</em>) amongst all features within a feature group that a formula candidate should be present (e.g. <em>1</em> means that a candidate is only considered if it was assigned to all features).</td>
 </tr>
 <tr class="odd">
 <td>adduct</td>
 <td><code>genform</code>, <code>sirius</code></td>
-<td>The adduct to consider for calculation (e.g. <code>&quot;[M+H]+&quot;</code>, <code>&quot;[M-H]-&quot;</code>, more details in the <a href="adducts.html#adducts">adduct section</a>).</td>
+<td>The adduct to consider for calculation (e.g. <code>"[M+H]+"</code>, <code>"[M-H]-"</code>, more details in the <a href="adducts.html#adducts">adduct section</a>).</td>
 </tr>
 <tr class="even">
 <td>MSMode</td>
 <td><code>genform</code>, <code>bruker</code></td>
-<td>Whether formulae should be generated only from MS data (<code>&quot;ms&quot;</code>), MS/MS data (<code>&quot;msms&quot;</code>) or both (<code>&quot;both&quot;</code>). The latter is default, see discussion above.</td>
+<td>Whether formulae should be generated only from MS data (<code>"ms"</code>), MS/MS data (<code>"msms"</code>) or both (<code>"both"</code>). The latter is default, see discussion above.</td>
 </tr>
 <tr class="odd">
 <td>profile</td>
 <td><code>sirius</code></td>
-<td>Instrument profile, e.g. <code>&quot;qtof&quot;</code>, <code>&quot;orbitrap&quot;</code>, <code>&quot;fticr&quot;</code>.</td>
+<td>Instrument profile, e.g. <code>"qtof"</code>, <code>"orbitrap"</code>, <code>"fticr"</code>.</td>
 </tr>
 </tbody>
 </table>
 <p>Some typical examples:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">formulasGF &lt;-<span class="st"> </span><span class="kw">generateFormulas</span>(fGroups, <span class="st">&quot;genform&quot;</span>, mslists) <span class="co"># GenForm, default settings</span>
-formulasGF2 &lt;-<span class="st"> </span><span class="kw">generateFormulas</span>(fGroups, <span class="st">&quot;genform&quot;</span>, mslists, <span class="dt">calculateFeatures =</span> <span class="ot">FALSE</span>) <span class="co"># direct feature group assignment (faster)</span>
-formulasSIR &lt;-<span class="st"> </span><span class="kw">generateFormulas</span>(fGroups, <span class="st">&quot;sirius&quot;</span>, mslists, <span class="dt">elements =</span> <span class="st">&quot;CHNOPSClBr&quot;</span>) <span class="co"># SIRIUS, common elements for pollutant</span>
-formulasSIR2 &lt;-<span class="st"> </span><span class="kw">generateFormulas</span>(fGroups, <span class="st">&quot;sirius&quot;</span>, <span class="dt">adduct =</span> <span class="st">&quot;[M-H]-&quot;</span>) <span class="co"># SIRIUS, negative ionization</span>
-formulasBr &lt;-<span class="st"> </span><span class="kw">generateFormulas</span>(fGroups, <span class="st">&quot;bruker&quot;</span>, <span class="dt">MSMode =</span> <span class="st">&quot;MSMS&quot;</span>) <span class="co"># Only consider MSMS data (SmartFormula3D)</span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="annotation.html#cb17-1"></a>formulasGF &lt;-<span class="st"> </span><span class="kw">generateFormulas</span>(fGroups, <span class="st">&quot;genform&quot;</span>, mslists) <span class="co"># GenForm, default settings</span></span>
+<span id="cb17-2"><a href="annotation.html#cb17-2"></a>formulasGF2 &lt;-<span class="st"> </span><span class="kw">generateFormulas</span>(fGroups, <span class="st">&quot;genform&quot;</span>, mslists, <span class="dt">calculateFeatures =</span> <span class="ot">FALSE</span>) <span class="co"># direct feature group assignment (faster)</span></span>
+<span id="cb17-3"><a href="annotation.html#cb17-3"></a>formulasSIR &lt;-<span class="st"> </span><span class="kw">generateFormulas</span>(fGroups, <span class="st">&quot;sirius&quot;</span>, mslists, <span class="dt">elements =</span> <span class="st">&quot;CHNOPSClBr&quot;</span>) <span class="co"># SIRIUS, common elements for pollutant</span></span>
+<span id="cb17-4"><a href="annotation.html#cb17-4"></a>formulasSIR2 &lt;-<span class="st"> </span><span class="kw">generateFormulas</span>(fGroups, <span class="st">&quot;sirius&quot;</span>, <span class="dt">adduct =</span> <span class="st">&quot;[M-H]-&quot;</span>) <span class="co"># SIRIUS, negative ionization</span></span>
+<span id="cb17-5"><a href="annotation.html#cb17-5"></a>formulasBr &lt;-<span class="st"> </span><span class="kw">generateFormulas</span>(fGroups, <span class="st">&quot;bruker&quot;</span>, <span class="dt">MSMode =</span> <span class="st">&quot;MSMS&quot;</span>) <span class="co"># Only consider MSMS data (SmartFormula3D)</span></span></code></pre></div>
 </div>
 <div id="compounds" class="section level3">
 <h3><span class="header-section-number">4.3.3</span> Compounds</h3>
-<p>An important step in a typical non-target workflow is structural identification for features of interest. Afterall, this information may finally reveal <em>what</em> a feature is. The first step is to find all possible structures in a database that may be assigned to the feature (based on e.g. monoisotopic mass or formula). These candidates are then scored to rank likely candidates, for instance, on correspondence with in-silico or library MS/MS spectra and environmental relevance.</p>
+<p>An important step in a typical non-target workflow is structural identification for features of interest. Afterall, this information may finally reveal <em>what</em> a feature is. The first step is to find all possible structures in a database that may be assigned to the feature (based on e.g. monoisotopic mass or formula). These candidates are then scored to rank likely candidates, for instance, on correspondence with in-silico or library MS/MS spectra and environmental relevance.</p>
 <p>Structure assignment in <code>patRoon</code> is performed automatically for all feature groups with the <code>generateCompounds()</code> function. Currently, this function supports two algorithms:</p>
 <table>
 <colgroup>
-<col width="23%" />
+<col width="22%" />
 <col width="38%" />
-<col width="38%" />
+<col width="39%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -430,24 +458,24 @@ formulasBr &lt;-<span class="st"> </span><span class="kw">generateFormulas</span
 <tbody>
 <tr class="odd">
 <td><a href="http://ipb-halle.github.io/MetFrag/">MetFrag</a></td>
-<td><code>generateCompounds(algorithm = &quot;metfrag&quot;, ...)</code></td>
+<td><code>generateCompounds(algorithm = "metfrag", ...)</code></td>
 <td>Supports many databases (including custom) and scorings for candidate ranking.</td>
 </tr>
 <tr class="even">
 <td><a href="https://bio.informatik.uni-jena.de/software/sirius/">SIRIUS</a> with <a href="https://www.csi-fingerid.uni-jena.de/">CSI:FingerID</a></td>
-<td><code>generateCompounds(algorithm = &quot;sirius&quot;, ...)</code></td>
+<td><code>generateCompounds(algorithm = "sirius", ...)</code></td>
 <td>Incorporates prior comprohensive formula calculations.</td>
 </tr>
 </tbody>
 </table>
-<p>Compound annotation is often a relative time and resource intensive procedure. For this reason, features are not annotated individually, but instead a feature group as a whole is annotated, which generally saves significant amounts of computational requirements. Nevertheless, it is not uncommon that this is the most time consuming step in the workflow. For this reason, prioritization of features is highly important, even more so to avoid 'abusing' servers when an online database is used for compound retrieval.</p>
-<p>Selecting the right database is important for proper candidate assignment. Afterall, if the 'right' chemical compound is not present in the used database, it is impossible to assign the correct structure. Luckily, however, several large databases such as <a href="https://pubchem.ncbi.nlm.nih.gov/">PubChem</a> and <a href="http://www.chemspider.com/">ChemSpider</a> are openly available which contain tens of millions of compounds. On the other hand, these databases may also lead to many unlikely candidates and therefore more specialized (or custom databases) may be preferred. Which database will be used is dictated by the <code>database</code> argument to <code>generateCompounds()</code>, currently the following options exist:</p>
+<p>Compound annotation is often a relative time and resource intensive procedure. For this reason, features are not annotated individually, but instead a feature group as a whole is annotated, which generally saves significant amounts of computational requirements. Nevertheless, it is not uncommon that this is the most time consuming step in the workflow. For this reason, prioritization of features is highly important, even more so to avoid ‘abusing’ servers when an online database is used for compound retrieval.</p>
+<p>Selecting the right database is important for proper candidate assignment. Afterall, if the ‘right’ chemical compound is not present in the used database, it is impossible to assign the correct structure. Luckily, however, several large databases such as <a href="https://pubchem.ncbi.nlm.nih.gov/">PubChem</a> and <a href="http://www.chemspider.com/">ChemSpider</a> are openly available which contain tens of millions of compounds. On the other hand, these databases may also lead to many unlikely candidates and therefore more specialized (or custom databases) may be preferred. Which database will be used is dictated by the <code>database</code> argument to <code>generateCompounds()</code>, currently the following options exist:</p>
 <!-- UNDONE: add missing databases when support is added -->
-<table style="width:94%;">
+<table>
 <colgroup>
-<col width="27%" />
-<col width="33%" />
-<col width="33%" />
+<col width="29%" />
+<col width="35%" />
+<col width="35%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -459,47 +487,47 @@ formulasBr &lt;-<span class="st"> </span><span class="kw">generateFormulas</span
 <tbody>
 <tr class="odd">
 <td><code>pubchem</code></td>
-<td><code>&quot;metfrag&quot;</code>, <code>&quot;sirius&quot;</code></td>
+<td><code>"metfrag"</code>, <code>"sirius"</code></td>
 <td><a href="https://pubchem.ncbi.nlm.nih.gov/">PubChem</a> is currently the largest compound database and is used by default.</td>
 </tr>
 <tr class="even">
 <td><code>chemspider</code></td>
-<td><code>&quot;metfrag&quot;</code></td>
+<td><code>"metfrag"</code></td>
 <td><a href="http://www.chemspider.com/">ChemSpider</a> is another large database. Requires security token from <a href="http://www.chemspider.com/AboutServices.aspx">here</a> (see next section).</td>
 </tr>
 <tr class="odd">
 <td><code>comptox</code></td>
-<td><code>&quot;metfrag&quot;</code></td>
+<td><code>"metfrag"</code></td>
 <td>The EPA <a href="https://comptox.epa.gov/dashboard">CompTox</a> contains many compounds and scorings relevant to environmental studies. Needs manual download (see next section).</td>
 </tr>
 <tr class="even">
 <td><code>pubchemlite</code></td>
-<td><code>&quot;metfrag&quot;</code></td>
+<td><code>"metfrag"</code></td>
 <td>A specialized subset of the PubChem database. Needs manual download (see next section).</td>
 </tr>
 <tr class="odd">
 <td><code>for-ident</code></td>
-<td><code>&quot;metfrag&quot;</code></td>
+<td><code>"metfrag"</code></td>
 <td>The <a href="https://water.for-ident.org">FOR-IDENT</a> (STOFF-IDENT) database for water related substances.</td>
 </tr>
 <tr class="even">
 <td><code>kegg</code></td>
-<td><code>&quot;metfrag&quot;</code>, <code>&quot;sirius&quot;</code></td>
+<td><code>"metfrag"</code>, <code>"sirius"</code></td>
 <td>The <a href="https://www.genome.jp/kegg/">KEGG</a> database for biological compounds</td>
 </tr>
 <tr class="odd">
 <td><code>hmdb</code></td>
-<td><code>&quot;metfrag&quot;</code>, <code>&quot;sirius&quot;</code></td>
+<td><code>"metfrag"</code>, <code>"sirius"</code></td>
 <td>The <a href="http://www.hmdb.ca/">HMDB</a> contains many human metabolites.</td>
 </tr>
 <tr class="even">
 <td><code>bio</code></td>
-<td><code>&quot;sirius&quot;</code></td>
+<td><code>"sirius"</code></td>
 <td>Selects all supports biological databases.</td>
 </tr>
 <tr class="odd">
 <td><code>csv</code>, <code>psv</code>, <code>sdf</code></td>
-<td><code>&quot;metfrag&quot;</code></td>
+<td><code>"metfrag"</code></td>
 <td>Custom database (see next section). <a href="https://raw.githubusercontent.com/rickhelmus/patRoon/master/tests/testthat/test_data/test-mf-db-isomers.csv">CSV example</a>.</td>
 </tr>
 </tbody>
@@ -507,24 +535,24 @@ formulasBr &lt;-<span class="st"> </span><span class="kw">generateFormulas</span
 <div id="configuring-metfrag-databases-and-scoring" class="section level4">
 <h4><span class="header-section-number">4.3.3.1</span> Configuring MetFrag databases and scoring</h4>
 <p>Some extra configuration may be necessary when using certain databases with MetFrag. In order to use the ChemSpider database a <a href="http://www.chemspider.com/AboutServices.aspx">security token</a> should be requested and set with the <code>chemSpiderToken</code> argument to <code>generateCompounds()</code>. The CompTox and PubChemLite databases need to be manually downloaded from <a href="ftp://newftp.epa.gov/COMPTOX/Sustainable_Chemistry_Data/Chemistry_Dashboard/MetFrag_metadata_files">CompTox</a> (or variations with <a href="https://zenodo.org/record/3364464#.XnjM-XLvKUk">smoking</a> or <a href="https://zenodo.org/record/3472781#.XnjMAHLvKUk">wastewater</a> metadata) and <a href="https://zenodo.org/record/3548654">PUbChemLite</a>. The file location of this and other local databases (<code>csv</code>, <code>psv</code>, <code>sdf</code>) needs to be manually configured, see the examples below and/or <code>?generateCompounds</code> for more information on how to do this.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># PubChem: the default</span>
-compsMF &lt;-<span class="st"> </span><span class="kw">generateCompounds</span>(fGroups, mslists, <span class="st">&quot;metfrag&quot;</span>, <span class="dt">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>)
-
-<span class="co"># ChemSpider: needs security token</span>
-compsMF2 &lt;-<span class="st"> </span><span class="kw">generateCompounds</span>(fGroups, mslists, <span class="st">&quot;metfrag&quot;</span>, <span class="dt">database =</span> <span class="st">&quot;chemspider&quot;</span>,
-                              <span class="dt">chemSpiderToken =</span> <span class="st">&quot;MY_TOKEN_HERE&quot;</span>, <span class="dt">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>)
-
-<span class="co"># CompTox: set global option to database path</span>
-<span class="kw">options</span>(<span class="dt">patRoon.path.MetFragCompTox =</span> <span class="st">&quot;~/CompTox_17March2019_SelectMetaData.csv&quot;</span>)
-compsMF3 &lt;-<span class="st"> </span><span class="kw">generateCompounds</span>(fGroups, mslists, <span class="st">&quot;metfrag&quot;</span>, <span class="dt">database =</span> <span class="st">&quot;comptox&quot;</span>, <span class="dt">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>)
-
-<span class="co"># CompTox: set database location without global option</span>
-compsMF4 &lt;-<span class="st"> </span><span class="kw">generateCompounds</span>(fGroups, mslists, <span class="st">&quot;metfrag&quot;</span>, <span class="dt">database =</span> <span class="st">&quot;comptox&quot;</span>, <span class="dt">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>,
-                              <span class="dt">extraOpts =</span> <span class="kw">list</span>(<span class="dt">LocalDatabasePath =</span> <span class="st">&quot;~/CompTox_17March2019_SelectMetaData.csv&quot;</span>))
-
-<span class="co"># Same, but for custom database</span>
-compsMF5 &lt;-<span class="st"> </span><span class="kw">generateCompounds</span>(fGroups, mslists, <span class="st">&quot;metfrag&quot;</span>, <span class="dt">database =</span> <span class="st">&quot;csv&quot;</span>, <span class="dt">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>,
-                              <span class="dt">extraOpts =</span> <span class="kw">list</span>(<span class="dt">LocalDatabasePath =</span> <span class="st">&quot;~/mydb.csv&quot;</span>))</code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="annotation.html#cb18-1"></a><span class="co"># PubChem: the default</span></span>
+<span id="cb18-2"><a href="annotation.html#cb18-2"></a>compsMF &lt;-<span class="st"> </span><span class="kw">generateCompounds</span>(fGroups, mslists, <span class="st">&quot;metfrag&quot;</span>, <span class="dt">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>)</span>
+<span id="cb18-3"><a href="annotation.html#cb18-3"></a></span>
+<span id="cb18-4"><a href="annotation.html#cb18-4"></a><span class="co"># ChemSpider: needs security token</span></span>
+<span id="cb18-5"><a href="annotation.html#cb18-5"></a>compsMF2 &lt;-<span class="st"> </span><span class="kw">generateCompounds</span>(fGroups, mslists, <span class="st">&quot;metfrag&quot;</span>, <span class="dt">database =</span> <span class="st">&quot;chemspider&quot;</span>,</span>
+<span id="cb18-6"><a href="annotation.html#cb18-6"></a>                              <span class="dt">chemSpiderToken =</span> <span class="st">&quot;MY_TOKEN_HERE&quot;</span>, <span class="dt">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>)</span>
+<span id="cb18-7"><a href="annotation.html#cb18-7"></a></span>
+<span id="cb18-8"><a href="annotation.html#cb18-8"></a><span class="co"># CompTox: set global option to database path</span></span>
+<span id="cb18-9"><a href="annotation.html#cb18-9"></a><span class="kw">options</span>(<span class="dt">patRoon.path.MetFragCompTox =</span> <span class="st">&quot;~/CompTox_17March2019_SelectMetaData.csv&quot;</span>)</span>
+<span id="cb18-10"><a href="annotation.html#cb18-10"></a>compsMF3 &lt;-<span class="st"> </span><span class="kw">generateCompounds</span>(fGroups, mslists, <span class="st">&quot;metfrag&quot;</span>, <span class="dt">database =</span> <span class="st">&quot;comptox&quot;</span>, <span class="dt">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>)</span>
+<span id="cb18-11"><a href="annotation.html#cb18-11"></a></span>
+<span id="cb18-12"><a href="annotation.html#cb18-12"></a><span class="co"># CompTox: set database location without global option</span></span>
+<span id="cb18-13"><a href="annotation.html#cb18-13"></a>compsMF4 &lt;-<span class="st"> </span><span class="kw">generateCompounds</span>(fGroups, mslists, <span class="st">&quot;metfrag&quot;</span>, <span class="dt">database =</span> <span class="st">&quot;comptox&quot;</span>, <span class="dt">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>,</span>
+<span id="cb18-14"><a href="annotation.html#cb18-14"></a>                              <span class="dt">extraOpts =</span> <span class="kw">list</span>(<span class="dt">LocalDatabasePath =</span> <span class="st">&quot;~/CompTox_17March2019_SelectMetaData.csv&quot;</span>))</span>
+<span id="cb18-15"><a href="annotation.html#cb18-15"></a></span>
+<span id="cb18-16"><a href="annotation.html#cb18-16"></a><span class="co"># Same, but for custom database</span></span>
+<span id="cb18-17"><a href="annotation.html#cb18-17"></a>compsMF5 &lt;-<span class="st"> </span><span class="kw">generateCompounds</span>(fGroups, mslists, <span class="st">&quot;metfrag&quot;</span>, <span class="dt">database =</span> <span class="st">&quot;csv&quot;</span>, <span class="dt">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>,</span>
+<span id="cb18-18"><a href="annotation.html#cb18-18"></a>                              <span class="dt">extraOpts =</span> <span class="kw">list</span>(<span class="dt">LocalDatabasePath =</span> <span class="st">&quot;~/mydb.csv&quot;</span>))</span></code></pre></div>
 <p>An example of a custom <em>.csv</em> database can be found <a href="https://raw.githubusercontent.com/rickhelmus/patRoon/master/tests/testthat/test_data/test-mf-db-isomers.csv">here</a>.</p>
 <p>With MetFrag compound databases are not only used to retrieve candidate structures but are also used to obtain metadata for further ranking. Each database has its own scorings, a table with currently supported scorings can be obtained with the <code>compoundScorings()</code> function (some columns omitted):</p>
 <div style="border: 1px solid #ddd; padding: 5px; overflow-y: auto; height: 350px;">
@@ -1363,36 +1391,36 @@ TRUE
 </tbody>
 </table>
 </div>
-<p>The first two columns contain the generic and original MetFrag naming schemes for each scoring type. While both naming schemes can be used, the generic is often shorter and harmonized with other algorithms (e.g. SIRIUS). The <em>database</em> column specifies for which databases a particular scoring is available (empty if not database specific). Most scorings are selected by default (as specified by the <em>default</em> column), however, this behaviour can be customized by using the <code>scoreTypes</code> argument:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Only in-silico and PubChem number of patents scorings</span>
-compsMF1 &lt;-<span class="st"> </span><span class="kw">generateCompounds</span>(fGroups, mslists, <span class="st">&quot;metfrag&quot;</span>, <span class="dt">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>,
-                              <span class="dt">scoreTypes =</span> <span class="kw">c</span>(<span class="st">&quot;fragScore&quot;</span> <span class="st">&quot;numberPatents&quot;</span>))
-
-<span class="co"># Custom scoring in custom database</span>
-compsMF2 &lt;-<span class="st"> </span><span class="kw">generateCompounds</span>(fGroups, mslists, <span class="st">&quot;metfrag&quot;</span>, <span class="dt">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>,
-                              <span class="dt">database =</span> <span class="st">&quot;csv&quot;</span>, <span class="dt">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>,
-                              <span class="dt">extraOpts =</span> <span class="kw">list</span>(<span class="dt">LocalDatabasePath =</span> <span class="st">&quot;~/mydb.csv&quot;</span>),
-                              <span class="dt">scoreTypes =</span> <span class="kw">c</span>(<span class="st">&quot;fragScore&quot;</span>, <span class="st">&quot;myScore&quot;</span>, <span class="st">&quot;myScore2&quot;</span>))</code></pre></div>
-<p>By default ranking is performed with equal weight (i.e. <em>1</em>) for all scorings. This can be changed by the <code>scoreWeights</code> argument, which should be a <code>vector</code> containing the weights for all scorings following the order of <code>scoreTypes</code>, for instance:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">compsMF &lt;-<span class="st"> </span><span class="kw">generateCompounds</span>(fGroups, mslists, <span class="st">&quot;metfrag&quot;</span>, <span class="dt">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>,
-                             <span class="dt">scoreTypes =</span> <span class="kw">c</span>(<span class="st">&quot;fragScore&quot;</span> <span class="st">&quot;numberPatents&quot;</span>),
-                             <span class="dt">scoreWeights =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))</code></pre></div>
+<p>The first two columns contain the generic and original MetFrag naming schemes for each scoring type. While both naming schemes can be used, the generic is often shorter and harmonized with other algorithms (e.g. SIRIUS). The <em>database</em> column specifies for which databases a particular scoring is available (empty if not database specific). Most scorings are selected by default (as specified by the <em>default</em> column), however, this behaviour can be customized by using the <code>scoreTypes</code> argument:</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="annotation.html#cb19-1"></a><span class="co"># Only in-silico and PubChem number of patents scorings</span></span>
+<span id="cb19-2"><a href="annotation.html#cb19-2"></a>compsMF1 &lt;-<span class="st"> </span><span class="kw">generateCompounds</span>(fGroups, mslists, <span class="st">&quot;metfrag&quot;</span>, <span class="dt">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>,</span>
+<span id="cb19-3"><a href="annotation.html#cb19-3"></a>                              <span class="dt">scoreTypes =</span> <span class="kw">c</span>(<span class="st">&quot;fragScore&quot;</span> <span class="st">&quot;numberPatents&quot;</span>))</span>
+<span id="cb19-4"><a href="annotation.html#cb19-4"></a></span>
+<span id="cb19-5"><a href="annotation.html#cb19-5"></a><span class="co"># Custom scoring in custom database</span></span>
+<span id="cb19-6"><a href="annotation.html#cb19-6"></a>compsMF2 &lt;-<span class="st"> </span><span class="kw">generateCompounds</span>(fGroups, mslists, <span class="st">&quot;metfrag&quot;</span>, <span class="dt">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>,</span>
+<span id="cb19-7"><a href="annotation.html#cb19-7"></a>                              <span class="dt">database =</span> <span class="st">&quot;csv&quot;</span>, <span class="dt">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>,</span>
+<span id="cb19-8"><a href="annotation.html#cb19-8"></a>                              <span class="dt">extraOpts =</span> <span class="kw">list</span>(<span class="dt">LocalDatabasePath =</span> <span class="st">&quot;~/mydb.csv&quot;</span>),</span>
+<span id="cb19-9"><a href="annotation.html#cb19-9"></a>                              <span class="dt">scoreTypes =</span> <span class="kw">c</span>(<span class="st">&quot;fragScore&quot;</span>, <span class="st">&quot;myScore&quot;</span>, <span class="st">&quot;myScore2&quot;</span>))</span></code></pre></div>
+<p>By default ranking is performed with equal weight (i.e. <em>1</em>) for all scorings. This can be changed by the <code>scoreWeights</code> argument, which should be a <code>vector</code> containing the weights for all scorings following the order of <code>scoreTypes</code>, for instance:</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="annotation.html#cb20-1"></a>compsMF &lt;-<span class="st"> </span><span class="kw">generateCompounds</span>(fGroups, mslists, <span class="st">&quot;metfrag&quot;</span>, <span class="dt">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>,</span>
+<span id="cb20-2"><a href="annotation.html#cb20-2"></a>                             <span class="dt">scoreTypes =</span> <span class="kw">c</span>(<span class="st">&quot;fragScore&quot;</span> <span class="st">&quot;numberPatents&quot;</span>),</span>
+<span id="cb20-3"><a href="annotation.html#cb20-3"></a>                             <span class="dt">scoreWeights =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))</span></code></pre></div>
 <p>Sometimes thousands or more structural candidates are found when annotating a feature group. In this situation processing all these candidates will too involving (especially when external databases are used). To avoid this a default cut-off is set: when the number of candidates exceed a certain amount the search will be aborted and no results will be reported for that feature group. The maximum number of candidates can be set with the <code>maxCandidatesToStop</code> argument. The default value is relative conservative, especially for local databases it may be useful to increase this number.</p>
 </div>
 <div id="timeout-and-error-handling" class="section level4">
 <h4><span class="header-section-number">4.3.3.2</span> Timeout and error handling</h4>
-<p>The use of online databases has the drawback that an error may occur, for instance, as a result of a connection error. Furthermore, MetFrag typically returns an error when too many candidates are found (as set by the <code>maxCandidatesToStop</code> argument). By default processing is restarted if an error has occurred (configured by the <code>errorRetries</code> argument). Similarly, the <code>timeoutRetries</code> and <code>timeout</code> arguments can be used to avoid being 'stuck' on obtaining results, for instance, due to an unstable internet connection.</p>
+<p>The use of online databases has the drawback that an error may occur, for instance, as a result of a connection error. Furthermore, MetFrag typically returns an error when too many candidates are found (as set by the <code>maxCandidatesToStop</code> argument). By default processing is restarted if an error has occurred (configured by the <code>errorRetries</code> argument). Similarly, the <code>timeoutRetries</code> and <code>timeout</code> arguments can be used to avoid being ‘stuck’ on obtaining results, for instance, due to an unstable internet connection.</p>
 <p>If no compounds could be assigned due to an error a warning will be issued. In this case it is best to see what went wrong by manually checking the log files, which by default are stored in the <em>log/metfrag</em> folder.</p>
 </div>
 <div id="formula-scoring" class="section level4">
 <h4><span class="header-section-number">4.3.3.3</span> Formula scoring</h4>
 <p>Ranking of candidate structures may further be improved by incorporating formula information by using the <code>addFormulaScoring()</code> function:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">comps &lt;-<span class="st"> </span><span class="kw">addFormulaScoring</span>(coms, formulas, <span class="dt">updateScore =</span> <span class="ot">TRUE</span>)</code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="annotation.html#cb21-1"></a>comps &lt;-<span class="st"> </span><span class="kw">addFormulaScoring</span>(coms, formulas, <span class="dt">updateScore =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
 <p>Here, corresponding formula and explained fragments will be used to calculate a <em>formulaScore</em> for each candidate. Note that SIRIUS candidates are already based on calculated formulae, hence, running this function on SIRIUS results is less sensable unless scoring from another formula calculation algorithm is desired.</p>
 </div>
 <div id="further-options-and-parameters" class="section level4">
 <h4><span class="header-section-number">4.3.3.4</span> Further options and parameters</h4>
-<p>There are <em>many</em> more options and parameters that affect compound annotation. For a full overview please have a look at the reference manual (e.g. by running <code>?generateCompounds</code>).</p>
+<p>There are <em>many</em> more options and parameters that affect compound annotation. For a full overview please have a look at the reference manual (e.g. by running <code>?generateCompounds</code>).</p>
 </div>
 </div>
 </div>

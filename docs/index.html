@@ -132,7 +132,7 @@
 <li>
 <strong>Data preparation</strong>: conversion between and export to common open MS data formats (e.g. mzXML and mzML) (<a href="http://proteowizard.sourceforge.net/">ProteoWizard</a>, <a href="http://openms.de/">OpenMS</a>, <a href="https://www.bruker.com/">DataAnalysis</a>).</li>
 <li>
-<strong>Extraction and grouping of features</strong> (e.g. <a href="https://github.com/sneumann/xcms">XCMS</a>, <a href="http://openms.de/">OpenMS</a>, <a href="https://cran.r-project.org/web/packages/enviPick/index.html">enviPick</a>, <a href="https://www.bruker.com/">ProfileAnalysis</a>).</li>
+<strong>Extraction and grouping of features</strong> (e.g. <a href="https://github.com/sneumann/xcms">XCMS</a>, <a href="http://openms.de/">OpenMS</a>, <a href="https://cran.r-project.org/web/packages/enviPick/index.html">enviPick</a>, <a href="https://www.bruker.com/">ProfileAnalysis</a>).</li>
 <li>
 <strong>Data cleanup</strong>: post filtering of data to improve its quality and several tools to aid prioritization.</li>
 <li>
@@ -160,7 +160,7 @@
 <li>Supports all major instrument vendor input formats (through usage of <a href="http://proteowizard.sourceforge.net/">ProteoWizard</a> and <a href="https://www.bruker.com/">DataAnalysis</a>).</li>
 <li>The <a href="https://shiny.rstudio.com/">Shiny</a> R package was used to implement several GUI tools.</li>
 <li>S4 classes and generics are used to implement a consistent interface to the many different supported software algorithms for each workflow step.</li>
-<li>Continuous integration is used for automated unit testing, automatically updating the <a href="https://rickhelmus.github.io/patRoon/">Website</a> and documentation and maintaining a [miniCRAN] [repository]<a href="https://github.com/rickhelmus/patRoonDeps">patRoonDeps</a> and <a href="https://hub.docker.com/r/patroonorg/patroon">Docker image</a> to simplify installation (see <a href="https://rickhelmus.github.io/patRoon/articles/handbook.html#installation">the handbook</a> for more details).</li>
+<li>Continuous integration is used for automated unit testing, automatically updating the <a href="https://rickhelmus.github.io/patRoon/">Website</a> and documentation and maintaining a <a href="https://cran.r-project.org/web/packages/miniCRAN/index.html">miniCRAN</a> <a href="https://github.com/rickhelmus/patRoonDeps">repository</a> and <a href="https://hub.docker.com/r/patroonorg/patroon">Docker image</a> to simplify installation (see <a href="https://rickhelmus.github.io/patRoon/articles/handbook.html#installation">the handbook</a> for more details).</li>
 </ul>
 </div>
 <div id="installation" class="section level2">
@@ -172,7 +172,7 @@
 <h2 class="hasAnchor">
 <a href="#getting-started" class="anchor"></a>Getting started</h2>
 <p>For a very quick start:</p>
-<div class="sourceCode"><pre class="downlit">
+<div class="sourceCode" id="cb1"><pre class="downlit">
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/rickhelmus/patRoon">patRoon</a></span><span class="op">)</span>
 <span class="fu"><a href="reference/GUI-utils.html">newProject</a></span><span class="op">(</span><span class="op">)</span></pre></div>
 <p>The <code><a href="reference/GUI-utils.html">newProject()</a></code> function will pop-up a dialog screen (requires <a href="https://www.rstudio.com/">R Studio</a>!) which will allow you to quickly select the analyses and common workflow options to subsequently generate a template <code>R</code> processing script.</p>

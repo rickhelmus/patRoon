@@ -24,7 +24,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2020-10-19" />
+<meta name="date" content="2020-10-22" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -50,6 +50,7 @@
 
 
 
+<script src="libs/accessible-code-block-0.0.1/empty-anchor.js"></script>
 <script src="libs/htmlwidgets-1.5.2/htmlwidgets.js"></script>
 <script src="libs/viz-1.8.2/viz.js"></script>
 <link href="libs/DiagrammeR-styles-0.2/styles.css" rel="stylesheet" />
@@ -68,41 +69,68 @@
 
 
 <style type="text/css">
-div.sourceCode { overflow-x: auto; }
-table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
-  margin: 0; padding: 0; vertical-align: baseline; border: none; }
-table.sourceCode { width: 100%; line-height: 100%; }
-td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
-td.sourceCode { padding-left: 5px; }
-code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code > span.dt { color: #902000; } /* DataType */
-code > span.dv { color: #40a070; } /* DecVal */
-code > span.bn { color: #40a070; } /* BaseN */
-code > span.fl { color: #40a070; } /* Float */
-code > span.ch { color: #4070a0; } /* Char */
-code > span.st { color: #4070a0; } /* String */
-code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code > span.ot { color: #007020; } /* Other */
-code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code > span.fu { color: #06287e; } /* Function */
-code > span.er { color: #ff0000; font-weight: bold; } /* Error */
-code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-code > span.cn { color: #880000; } /* Constant */
-code > span.sc { color: #4070a0; } /* SpecialChar */
-code > span.vs { color: #4070a0; } /* VerbatimString */
-code > span.ss { color: #bb6688; } /* SpecialString */
-code > span.im { } /* Import */
-code > span.va { color: #19177c; } /* Variable */
-code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code > span.op { color: #666666; } /* Operator */
-code > span.bu { } /* BuiltIn */
-code > span.ex { } /* Extension */
-code > span.pp { color: #bc7a00; } /* Preprocessor */
-code > span.at { color: #7d9029; } /* Attribute */
-code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code.sourceCode > span { display: inline-block; line-height: 1.25; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
 </style>
 
 </head>
@@ -203,18 +231,18 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="basic-quantitative-and-regression-analysis" class="section level2">
 <h2><span class="header-section-number">6.6</span> Basic quantitative and regression analysis</h2>
 <p>While <code>patRoon</code> is currently primarily focused on qualitative analyses, some <em>basic</em> quantitative analysis can also be performed, for instance, to estimate concentrations of features. In fact, other types of data that may be useful for regression analysis can be set such as sample dilution factor or sampling time. The latter may, for instance, be used to isolate features with increasing or decreasing intensity. Regardless of what kind of regression analysis is performed, here we simply refer the values to be calculated as <em>concentrations</em>. In order to use this functionality, an extra column (<code>conc</code>) should be added to the <a href="preparations.html#anaInfo">analysis information</a>, for instance:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># obtain analysis information as usual, but add some concentrations.</span>
-<span class="co"># The blanks are set to NA, whereas the standards are set to increasing levels.</span>
-anaInfo &lt;-<span class="st"> </span><span class="kw">generateAnalysisInfo</span>(<span class="dt">paths =</span> patRoonData<span class="op">::</span><span class="kw">exampleDataPath</span>(),
-                                <span class="dt">groups =</span> <span class="kw">c</span>(<span class="kw">rep</span>(<span class="st">&quot;solvent&quot;</span>, <span class="dv">3</span>), <span class="kw">rep</span>(<span class="st">&quot;standard&quot;</span>, <span class="dv">3</span>)),
-                                <span class="dt">blanks =</span> <span class="st">&quot;solvent&quot;</span>,
-                                <span class="dt">concs =</span> <span class="kw">c</span>(<span class="ot">NA</span>, <span class="ot">NA</span>, <span class="ot">NA</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>))</code></pre></div>
-<p>For analyses with known concentrations (e.g. standards) the <code>conc</code> column should be set; for all others the value should be set to <code>NA</code>.</p>
+<div class="sourceCode" id="cb121"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb121-1"><a href="basic-quantitative-and-regression-analysis.html#cb121-1"></a><span class="co"># obtain analysis information as usual, but add some concentrations.</span></span>
+<span id="cb121-2"><a href="basic-quantitative-and-regression-analysis.html#cb121-2"></a><span class="co"># The blanks are set to NA, whereas the standards are set to increasing levels.</span></span>
+<span id="cb121-3"><a href="basic-quantitative-and-regression-analysis.html#cb121-3"></a>anaInfo &lt;-<span class="st"> </span><span class="kw">generateAnalysisInfo</span>(<span class="dt">paths =</span> patRoonData<span class="op">::</span><span class="kw">exampleDataPath</span>(),</span>
+<span id="cb121-4"><a href="basic-quantitative-and-regression-analysis.html#cb121-4"></a>                                <span class="dt">groups =</span> <span class="kw">c</span>(<span class="kw">rep</span>(<span class="st">&quot;solvent&quot;</span>, <span class="dv">3</span>), <span class="kw">rep</span>(<span class="st">&quot;standard&quot;</span>, <span class="dv">3</span>)),</span>
+<span id="cb121-5"><a href="basic-quantitative-and-regression-analysis.html#cb121-5"></a>                                <span class="dt">blanks =</span> <span class="st">&quot;solvent&quot;</span>,</span>
+<span id="cb121-6"><a href="basic-quantitative-and-regression-analysis.html#cb121-6"></a>                                <span class="dt">concs =</span> <span class="kw">c</span>(<span class="ot">NA</span>, <span class="ot">NA</span>, <span class="ot">NA</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>))</span></code></pre></div>
+<p>For analyses with known concentrations (e.g. standards) the <code>conc</code> column should be set; for all others the value should be set to <code>NA</code>.</p>
 <p>The <code>as.data.table()</code> function (or <code>as.data.frame()</code>) can then be used to calculate regression data and estimate concentrations:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># use areas for quantitation and make sure that feature data is reported</span>
-<span class="co"># (otherwise no concentrations are calculated)</span>
-<span class="co"># (only relevant columns are shown for clarity)</span>
-<span class="kw">as.data.table</span>(fGroups, <span class="dt">areas =</span> <span class="ot">TRUE</span>, <span class="dt">features =</span> <span class="ot">TRUE</span>, <span class="dt">regression =</span> <span class="ot">TRUE</span>)</code></pre></div>
+<div class="sourceCode" id="cb122"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb122-1"><a href="basic-quantitative-and-regression-analysis.html#cb122-1"></a><span class="co"># use areas for quantitation and make sure that feature data is reported</span></span>
+<span id="cb122-2"><a href="basic-quantitative-and-regression-analysis.html#cb122-2"></a><span class="co"># (otherwise no concentrations are calculated)</span></span>
+<span id="cb122-3"><a href="basic-quantitative-and-regression-analysis.html#cb122-3"></a><span class="co"># (only relevant columns are shown for clarity)</span></span>
+<span id="cb122-4"><a href="basic-quantitative-and-regression-analysis.html#cb122-4"></a><span class="kw">as.data.table</span>(fGroups, <span class="dt">areas =</span> <span class="ot">TRUE</span>, <span class="dt">features =</span> <span class="ot">TRUE</span>, <span class="dt">regression =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
 <pre><code>#&gt;             group conc       RSQ intercept slope  conc_reg
 #&gt;  1:  M120_R328_81    1 0.4029224  55388.00  1844 0.2971800
 #&gt;  2:  M120_R328_81    2 0.4029224  55388.00  1844 3.4056399
@@ -227,10 +255,10 @@ anaInfo &lt;-<span class="st"> </span><span class="kw">generateAnalysisInfo</spa
 #&gt; 79: M279_R284_557    1 0.6417469  47565.33 -2312 1.4313725
 #&gt; 80: M279_R284_557    2 0.6417469  47565.33 -2312 1.1372549
 #&gt; 81: M279_R284_557    3 0.6417469  47565.33 -2312 3.4313725</code></pre>
-<p>Calculated concentrations are stored in the <code>conc_reg</code> column, alongside while other regression data (i.e. <code>RSQ</code>, <code>intercept</code>, <code>slope</code> columns). To perform basic trend analysis the <code>RSQ</code> (i.e. R squared) can be used:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fGroupsTab &lt;-<span class="st"> </span><span class="kw">as.data.table</span>(fGroups, <span class="dt">areas =</span> <span class="ot">TRUE</span>, <span class="dt">features =</span> <span class="ot">FALSE</span>, <span class="dt">regression =</span> <span class="ot">TRUE</span>)
-<span class="co"># subset fGroups with reasonable correlation</span>
-increasingFGroups &lt;-<span class="st"> </span>fGroups[, fGroupsTab[RSQ <span class="op">&gt;=</span><span class="st"> </span><span class="fl">0.8</span>, group]]</code></pre></div>
+<p>Calculated concentrations are stored in the <code>conc_reg</code> column, alongside while other regression data (i.e. <code>RSQ</code>, <code>intercept</code>, <code>slope</code> columns). To perform basic trend analysis the <code>RSQ</code> (i.e. R squared) can be used:</p>
+<div class="sourceCode" id="cb124"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb124-1"><a href="basic-quantitative-and-regression-analysis.html#cb124-1"></a>fGroupsTab &lt;-<span class="st"> </span><span class="kw">as.data.table</span>(fGroups, <span class="dt">areas =</span> <span class="ot">TRUE</span>, <span class="dt">features =</span> <span class="ot">FALSE</span>, <span class="dt">regression =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb124-2"><a href="basic-quantitative-and-regression-analysis.html#cb124-2"></a><span class="co"># subset fGroups with reasonable correlation</span></span>
+<span id="cb124-3"><a href="basic-quantitative-and-regression-analysis.html#cb124-3"></a>increasingFGroups &lt;-<span class="st"> </span>fGroups[, fGroupsTab[RSQ <span class="op">&gt;=</span><span class="st"> </span><span class="fl">0.8</span>, group]]</span></code></pre></div>
 </div>
             </section>
 

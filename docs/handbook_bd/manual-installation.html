@@ -24,7 +24,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2020-10-19" />
+<meta name="date" content="2020-10-22" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -50,6 +50,7 @@
 
 
 
+<script src="libs/accessible-code-block-0.0.1/empty-anchor.js"></script>
 <script src="libs/htmlwidgets-1.5.2/htmlwidgets.js"></script>
 <script src="libs/viz-1.8.2/viz.js"></script>
 <link href="libs/DiagrammeR-styles-0.2/styles.css" rel="stylesheet" />
@@ -68,41 +69,68 @@
 
 
 <style type="text/css">
-div.sourceCode { overflow-x: auto; }
-table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
-  margin: 0; padding: 0; vertical-align: baseline; border: none; }
-table.sourceCode { width: 100%; line-height: 100%; }
-td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
-td.sourceCode { padding-left: 5px; }
-code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code > span.dt { color: #902000; } /* DataType */
-code > span.dv { color: #40a070; } /* DecVal */
-code > span.bn { color: #40a070; } /* BaseN */
-code > span.fl { color: #40a070; } /* Float */
-code > span.ch { color: #4070a0; } /* Char */
-code > span.st { color: #4070a0; } /* String */
-code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code > span.ot { color: #007020; } /* Other */
-code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code > span.fu { color: #06287e; } /* Function */
-code > span.er { color: #ff0000; font-weight: bold; } /* Error */
-code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-code > span.cn { color: #880000; } /* Constant */
-code > span.sc { color: #4070a0; } /* SpecialChar */
-code > span.vs { color: #4070a0; } /* VerbatimString */
-code > span.ss { color: #bb6688; } /* SpecialString */
-code > span.im { } /* Import */
-code > span.va { color: #19177c; } /* Variable */
-code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code > span.op { color: #666666; } /* Operator */
-code > span.bu { } /* BuiltIn */
-code > span.ex { } /* Extension */
-code > span.pp { color: #bc7a00; } /* Preprocessor */
-code > span.at { color: #7d9029; } /* Attribute */
-code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code.sourceCode > span { display: inline-block; line-height: 1.25; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
 </style>
 
 </head>
@@ -202,7 +230,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
             <section class="normal" id="section-">
 <div id="manual-installation" class="section level2">
 <h2><span class="header-section-number">2.3</span> Manual installation</h2>
-<p>The manual installation is for users who don't use Windows or Docker, prefer to do a manual installation or simply want to know what happens behind the scenes. The manual installation consists of three phases:</p>
+<p>The manual installation is for users who don’t use Windows or Docker, prefer to do a manual installation or simply want to know what happens behind the scenes. The manual installation consists of three phases:</p>
 <ol style="list-style-type: decimal">
 <li>Installing some prerequisite <code>R</code> packages</li>
 <li>Install and configure (non-<code>R</code>) dependencies</li>
@@ -211,23 +239,23 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="r-prerequisites" class="section level3">
 <h3><span class="header-section-number">2.3.1</span> R prerequisites</h3>
 <p>When installing <code>patRoon</code> Windows users have the option to install from a customized (<a href="https://github.com/andrie/miniCRAN">miniCRAN</a>) repository (<code>patRoonDeps</code>). This repository provides a central repository for <code>patRoon</code> and all its R packages. An advantage is that installation will be faster and you will not need to install <a href="https://cran.r-project.org/bin/windows/Rtools/">Rtools</a>. Note that you will need to have the latest <code>R</code> version installed in order to use this repository.</p>
-<p>When you decide to use the <code>patRoonDeps</code> repository you can simply <em>skip</em> this step. <strong>Otherwise</strong> (i.e. you will use regular repositories instead), execute the following:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">install.packages</span>(<span class="kw">c</span>(<span class="st">&quot;BiocManager&quot;</span>, <span class="st">&quot;remotes&quot;</span>))
-BiocManager<span class="op">::</span><span class="kw">install</span>(<span class="st">&quot;CAMERA&quot;</span>)
-
-<span class="co"># only needed for Bruker DataAnalysis integration</span>
-<span class="kw">install.packages</span>(<span class="st">&quot;RDCOMClient&quot;</span>, <span class="dt">repos =</span> <span class="st">&quot;http://www.omegahat.net/R&quot;</span>)
-
-<span class="co"># only when using the R interface (not recommended by default)</span>
-remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;c-ruttkies/MetFragR/metfRag&quot;</span>)</code></pre></div>
-<p>Note that the latter two commands concern installation of <em>optional</em> packages. If you are unsure then you probably don't need them.</p>
+<p>When you decide to use the <code>patRoonDeps</code> repository you can simply <em>skip</em> this step. <strong>Otherwise</strong> (i.e. you will use regular repositories instead), execute the following:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="manual-installation.html#cb3-1"></a><span class="kw">install.packages</span>(<span class="kw">c</span>(<span class="st">&quot;BiocManager&quot;</span>, <span class="st">&quot;remotes&quot;</span>))</span>
+<span id="cb3-2"><a href="manual-installation.html#cb3-2"></a>BiocManager<span class="op">::</span><span class="kw">install</span>(<span class="st">&quot;CAMERA&quot;</span>)</span>
+<span id="cb3-3"><a href="manual-installation.html#cb3-3"></a></span>
+<span id="cb3-4"><a href="manual-installation.html#cb3-4"></a><span class="co"># only needed for Bruker DataAnalysis integration</span></span>
+<span id="cb3-5"><a href="manual-installation.html#cb3-5"></a><span class="kw">install.packages</span>(<span class="st">&quot;RDCOMClient&quot;</span>, <span class="dt">repos =</span> <span class="st">&quot;http://www.omegahat.net/R&quot;</span>)</span>
+<span id="cb3-6"><a href="manual-installation.html#cb3-6"></a></span>
+<span id="cb3-7"><a href="manual-installation.html#cb3-7"></a><span class="co"># only when using the R interface (not recommended by default)</span></span>
+<span id="cb3-8"><a href="manual-installation.html#cb3-8"></a>remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;c-ruttkies/MetFragR/metfRag&quot;</span>)</span></code></pre></div>
+<p>Note that the latter two commands concern installation of <em>optional</em> packages. If you are unsure then you probably don’t need them.</p>
 </div>
 <div id="other-dependencies" class="section level3">
 <h3><span class="header-section-number">2.3.2</span> Other dependencies</h3>
 <p>Depending on which functionality is used, the following external dependencies may need to be installed:</p>
 <table>
 <colgroup>
-<col width="40%" />
+<col width="39%" />
 <col width="60%" />
 </colgroup>
 <thead>
@@ -239,7 +267,7 @@ remotes<span class="op">::</span><span class="kw">install_github</span>(<span cl
 <tbody>
 <tr class="odd">
 <td><a href="https://www.oracle.com/technetwork/java/javase/downloads/index.html">Java JDK</a></td>
-<td><strong>Mandatory</strong> for e.g. plotting structures and using MetFrag.</td>
+<td><strong>Mandatory</strong> for e.g. plotting structures and using MetFrag.</td>
 </tr>
 <tr class="even">
 <td><a href="https://cran.r-project.org/bin/windows/Rtools/">Rtools</a></td>
@@ -247,11 +275,11 @@ remotes<span class="op">::</span><span class="kw">install_github</span>(<span cl
 </tr>
 <tr class="odd">
 <td><a href="http://proteowizard.sourceforge.net/">ProteoWizard</a></td>
-<td>Needed for automatic data-pretreatment (e.g. data file conversion and centroiding, Bruker users may use DataAnalysis integration instead).</td>
+<td>Needed for automatic data-pretreatment (e.g. data file conversion and centroiding, Bruker users may use DataAnalysis integration instead).</td>
 </tr>
 <tr class="even">
 <td><a href="http://openms.de/">OpenMS</a></td>
-<td>Recommended. Used for e.g. finding and grouping features.</td>
+<td>Recommended. Used for e.g. finding and grouping features.</td>
 </tr>
 <tr class="odd">
 <td><a href="http://ipb-halle.github.io/MetFrag/projects/metfragcl/">MetFrag CL</a></td>
@@ -271,7 +299,7 @@ remotes<span class="op">::</span><span class="kw">install_github</span>(<span cl
 </tr>
 <tr class="odd">
 <td><a href="http://openbabel.org/wiki/Main_Page">OpenBabel</a></td>
-<td>Used in some cases for suspect screening (e.g. to calculate molecular masses for suspects with only InChI information). Otherwise optional.</td>
+<td>Used in some cases for suspect screening (e.g. to calculate molecular masses for suspects with only InChI information). Otherwise optional.</td>
 </tr>
 <tr class="even">
 <td><a href="https://pngquant.org/">pngquant</a></td>
@@ -280,31 +308,31 @@ remotes<span class="op">::</span><span class="kw">install_github</span>(<span cl
 </tbody>
 </table>
 <p>After installation you may need to configure the file path to ProteoWizard, OpenMS, SIRIUS, MetFrag, the MetFrag CompTox DB and/or pngquant (normally ProteoWizard and OpenMS should be automatically found). To configure their file locations you should set some global package options with the <code>options()</code> R function, for instance:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">options</span>(<span class="dt">patRoon.path.pwiz =</span> <span class="st">&quot;C:/ProteoWizard&quot;</span>) <span class="co"># location of ProteoWizard installation folder</span>
-<span class="kw">options</span>(<span class="dt">patRoon.path.SIRIUS =</span> <span class="st">&quot;C:/sirius-win64-3.5.1&quot;</span>) <span class="co"># location where SIRIUS was extracted</span>
-<span class="kw">options</span>(<span class="dt">patRoon.path.OpenMS =</span> <span class="st">&quot;/usr/local/bin&quot;</span>) <span class="co"># directory with the OpenMS binaries</span>
-<span class="kw">options</span>(<span class="dt">patRoon.path.pngquant =</span> <span class="st">&quot;~/pngquant&quot;</span>) <span class="co"># directory containing pngquant binary</span>
-<span class="kw">options</span>(<span class="dt">patRoon.path.MetFragCL =</span> <span class="st">&quot;~/MetFrag2.4.5-CL.jar&quot;</span>) <span class="co"># full location to the jar file</span>
-<span class="kw">options</span>(<span class="dt">patRoon.path.MetFragCompTox =</span> <span class="st">&quot;C:/CompTox_17March2019_SelectMetaData.csv&quot;</span>) <span class="co"># full location to desired CompTox CSV file</span>
-<span class="kw">options</span>(<span class="dt">patRoon.path.MetFragPubChemLite =</span> <span class="st">&quot;~/PubChemLite_14Jan2020_tier0.csv&quot;</span>) <span class="co"># full location to desired PubChemLite CSV file</span>
-<span class="kw">options</span>(<span class="dt">patRoon.path.obabel =</span> <span class="st">&quot;C:/Program Files/OpenBabel-3.0.0&quot;</span>) <span class="co"># directory with OpenBabel binaries</span></code></pre></div>
-<p>These commands have to be executed everytime you start a new R session (e.g. as part of your script). However, it is probably easier to add them to your <code>~/.Rprofile</code> file so that they are executed automatically when you start R. If you don't have this file yet you can simply create it yourself (for more information see e.g. <a href="https://stackoverflow.com/a/46819910">this SO answer</a>).</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="manual-installation.html#cb4-1"></a><span class="kw">options</span>(<span class="dt">patRoon.path.pwiz =</span> <span class="st">&quot;C:/ProteoWizard&quot;</span>) <span class="co"># location of ProteoWizard installation folder</span></span>
+<span id="cb4-2"><a href="manual-installation.html#cb4-2"></a><span class="kw">options</span>(<span class="dt">patRoon.path.SIRIUS =</span> <span class="st">&quot;C:/sirius-win64-3.5.1&quot;</span>) <span class="co"># location where SIRIUS was extracted</span></span>
+<span id="cb4-3"><a href="manual-installation.html#cb4-3"></a><span class="kw">options</span>(<span class="dt">patRoon.path.OpenMS =</span> <span class="st">&quot;/usr/local/bin&quot;</span>) <span class="co"># directory with the OpenMS binaries</span></span>
+<span id="cb4-4"><a href="manual-installation.html#cb4-4"></a><span class="kw">options</span>(<span class="dt">patRoon.path.pngquant =</span> <span class="st">&quot;~/pngquant&quot;</span>) <span class="co"># directory containing pngquant binary</span></span>
+<span id="cb4-5"><a href="manual-installation.html#cb4-5"></a><span class="kw">options</span>(<span class="dt">patRoon.path.MetFragCL =</span> <span class="st">&quot;~/MetFrag2.4.5-CL.jar&quot;</span>) <span class="co"># full location to the jar file</span></span>
+<span id="cb4-6"><a href="manual-installation.html#cb4-6"></a><span class="kw">options</span>(<span class="dt">patRoon.path.MetFragCompTox =</span> <span class="st">&quot;C:/CompTox_17March2019_SelectMetaData.csv&quot;</span>) <span class="co"># full location to desired CompTox CSV file</span></span>
+<span id="cb4-7"><a href="manual-installation.html#cb4-7"></a><span class="kw">options</span>(<span class="dt">patRoon.path.MetFragPubChemLite =</span> <span class="st">&quot;~/PubChemLite_14Jan2020_tier0.csv&quot;</span>) <span class="co"># full location to desired PubChemLite CSV file</span></span>
+<span id="cb4-8"><a href="manual-installation.html#cb4-8"></a><span class="kw">options</span>(<span class="dt">patRoon.path.obabel =</span> <span class="st">&quot;C:/Program Files/OpenBabel-3.0.0&quot;</span>) <span class="co"># directory with OpenBabel binaries</span></span></code></pre></div>
+<p>These commands have to be executed everytime you start a new R session (e.g. as part of your script). However, it is probably easier to add them to your <code>~/.Rprofile</code> file so that they are executed automatically when you start R. If you don’t have this file yet you can simply create it yourself (for more information see e.g. <a href="https://stackoverflow.com/a/46819910">this SO answer</a>).</p>
 </div>
 <div id="patroon-installation" class="section level3">
 <h3><span class="header-section-number">2.3.3</span> patRoon installation</h3>
 <p>Finally, it is time to install <code>patRoon</code> itself. As mentioned before, Windows users (who have the latest <code>R</code> version) can install <code>patRoon</code> and all its package dependencies from the <code>patRoonDeps</code> repository:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># install from patRoonDeps (only Windows with latest R version)</span>
-<span class="kw">install.packages</span>(<span class="st">&quot;patRoon&quot;</span>, <span class="dt">repos =</span> <span class="st">&quot;https://rickhelmus.github.io/patRoonDeps/&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;binary&quot;</span>)
-
-<span class="co"># optional, data for tutorial</span>
-<span class="kw">install.packages</span>(<span class="st">&quot;patRoonData&quot;</span>, <span class="dt">repos =</span> <span class="st">&quot;https://rickhelmus.github.io/patRoonDeps/&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;binary&quot;</span>)</code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="manual-installation.html#cb5-1"></a><span class="co"># install from patRoonDeps (only Windows with latest R version)</span></span>
+<span id="cb5-2"><a href="manual-installation.html#cb5-2"></a><span class="kw">install.packages</span>(<span class="st">&quot;patRoon&quot;</span>, <span class="dt">repos =</span> <span class="st">&quot;https://rickhelmus.github.io/patRoonDeps/&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;binary&quot;</span>)</span>
+<span id="cb5-3"><a href="manual-installation.html#cb5-3"></a></span>
+<span id="cb5-4"><a href="manual-installation.html#cb5-4"></a><span class="co"># optional, data for tutorial</span></span>
+<span id="cb5-5"><a href="manual-installation.html#cb5-5"></a><span class="kw">install.packages</span>(<span class="st">&quot;patRoonData&quot;</span>, <span class="dt">repos =</span> <span class="st">&quot;https://rickhelmus.github.io/patRoonDeps/&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;binary&quot;</span>)</span></code></pre></div>
 <p><strong>Otherwise</strong>, installation occurs directly from GitHub:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;rickhelmus/patRoon&quot;</span>)
-
-<span class="co"># optional, data for tutorial</span>
-remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;rickhelmus/patRoonData&quot;</span>) <span class="co"># example data used by tutorial</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="manual-installation.html#cb6-1"></a>remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;rickhelmus/patRoon&quot;</span>)</span>
+<span id="cb6-2"><a href="manual-installation.html#cb6-2"></a></span>
+<span id="cb6-3"><a href="manual-installation.html#cb6-3"></a><span class="co"># optional, data for tutorial</span></span>
+<span id="cb6-4"><a href="manual-installation.html#cb6-4"></a>remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;rickhelmus/patRoonData&quot;</span>) <span class="co"># example data used by tutorial</span></span></code></pre></div>
 <p>Afterwards, you can run the <code>verifyDependencies()</code> function to see if <code>patRoon</code> can find all its dependencies (you may need to restart R beforehand)</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">patRoon<span class="op">::</span><span class="kw">verifyDependencies</span>()</code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="manual-installation.html#cb7-1"></a>patRoon<span class="op">::</span><span class="kw">verifyDependencies</span>()</span></code></pre></div>
 
 </div>
 </div>

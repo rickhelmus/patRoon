@@ -33,13 +33,10 @@ processSIRIUSFormulas <- function(msFName, outPath, cmpName, adduct, hash, isPre
                 setnames(forms, c("formula", "treeScore"), c("neutral_formula", "MSMSScore"))
             else
             {
-                setnames(forms, c("molecularFormula", "TreeIsotope_Score", "Tree_Score", "Isotope_Score",
-                                  "medianMassError(ppm)", "massError(ppm)"),
-                         c("neutral_formula", "score", "MSMSScore", "isoScore", "error_median", "error"))
-                forms[, precursorFormula := NULL] # seems same as molecularFormula
+                setnames(forms, c("molecularFormula", "precursorFormula", "TreeIsotope_Score",
+                                  "Tree_Score", "Isotope_Score", "medianMassError(ppm)", "massError(ppm)"),
+                         c("neutral_formula", "neutral_adduct_formula", "score", "MSMSScore", "isoScore", "error_median", "error"))
             }
-            
-            setkey(forms, neutral_formula)
             
             frags <- rbindlist(lapply(fragFiles, function(ff)
             {
@@ -50,12 +47,12 @@ processSIRIUSFormulas <- function(msFName, outPath, cmpName, adduct, hash, isPre
                 fragInfo[, rel.intensity := NULL]
                 if (!isPre44)
                     fragInfo[, ionization := NULL]
-                fragInfo[, neutral_formula := getFormulaFromSiriusFragFile(ff, isPre44)]
+                fragInfo[, neutral_adduct_formula := getFormulaFromSiriusFragFile(ff, isPre44)]
                 return(fragInfo)
             }))
-            setkey(frags, neutral_formula)
             
-            forms <- forms[frags] # merge fragment info
+            # merge fragment info
+            forms <- merge(forms, frags, by = "neutral_adduct_formula")
             
             forms[, formula := calculateIonFormula(neutral_formula, ..adduct)]
             forms[, frag_formula := calculateIonFormula(frag_neutral_formula, ..adduct)]
@@ -70,8 +67,8 @@ processSIRIUSFormulas <- function(msFName, outPath, cmpName, adduct, hash, isPre
             forms <- forms[frag_intensity != 0 | formula != frag_formula]
             
             # set nice column order
-            setcolorder(forms, c("neutral_formula", "formula", "error", "error_median", "adduct", "score",
-                                 "MSMSScore", "isoScore", "byMSMS", "frag_neutral_formula", "frag_formula",
+            setcolorder(forms, c("neutral_formula", "formula", "neutral_adduct_formula", "formula_mz", "error", "error_median",
+                                 "adduct", "score", "MSMSScore", "isoScore", "byMSMS", "frag_neutral_formula", "frag_formula",
                                  "frag_mz", "frag_formula_mz", "frag_intensity", "neutral_loss",
                                  "explainedPeaks", "explainedIntensity"))
             

@@ -9,6 +9,7 @@
 * Fixed: `generateCompoundsMetFrag()`: compound names could be sometimes be interpreted as dates (reported by Corey Griffith)
 * Fixed: on very rare cases empty peaklists could be present after averaging.
 * Fixed: `SIRIUS` annotation didn't use set adduct but used default instead
+* `SIRIUS` results are better handled if choosen adduct is not `[M+H]+` or `[M+H]+`
 
 
 # patRoon 1.0.2

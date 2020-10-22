@@ -10,6 +10,12 @@ processSIRIUSCompounds <- function(msFName, outPath, cmpName, MSMS, database, ad
     summary <- file.path(resultPath, resFile)
     results <- scRanges <- data.table()
     
+    # NOTE: SIRIUS frag results are identified by 'neutral adducts', which is
+    # the (de)protonated form of a formula with adduct, eg [M+NH4]+ yields M+NH3
+    addChr <- as.character(adduct)
+    neutralFormIsAdductForm <- addChr == "[M+H]+" || addChr == "[M-H]-" || addChr == "[M]"
+    fragAdduct <- as.adduct(if (adduct@charge > 0) "[M+H]+" else "[M-H]-")
+    
     if (length(summary) != 0 && file.exists(summary))
     {
         results <- fread(summary)
@@ -29,28 +35,43 @@ processSIRIUSCompounds <- function(msFName, outPath, cmpName, MSMS, database, ad
                 results <- results[seq_len(topMost)] # results should already be sorted on score
         }
         
+        if (neutralFormIsAdductForm)
+            neutralAdductForms <- results$formula
+        else
+        {
+            # get neutral formula and (de)protonate to get neutral adduct formula
+            neutralAdductForms <- calculateNeutralFormula(calculateIonFormula(results$formula, adduct),
+                                                          fragAdduct)
+        }
+        
         # NOTE: fragment info is based on SIRIUS results, ie from formula
         # prediction and not by compounds! Hence, results are the same for
         # candidates with the same formula.
         fragFiles <- getSiriusFragFiles(resultPath, isPre44)
         for (ff in fragFiles)
         {
-            precursor <- getFormulaFromSiriusFragFile(ff, isPre44)
-            if (precursor %in% results$formula) # may not be there if filtered out or no compound was found
+            neutralAdductFormFrag <- getFormulaFromSiriusFragFile(ff, isPre44)
+            
+            if (neutralAdductFormFrag %in% neutralAdductForms) # may not be there if filtered out or no compound was found
             {
                 fragInfo <- fread(ff)
-                fragInfo[, c("rel.intensity", "exactmass") := NULL]
+                fragInfo[, c("rel.intensity", "exactmass", "ionization") := NULL]
                 if (isPre44)
                     setnames(fragInfo, "explanation", "formula")
                 fragInfo[, PLIndex := sapply(mz, function(omz) which.min(abs(omz - MSMS$mz)))]
                 
-                # sirius neutralizes fragments, make them ion again
-                fragInfo[, formula := calculateIonFormula(formula, ..adduct)]
-                fragInfo[, neutral_loss := sapply(formula, subtractFormula,
-                                                  formula1 = calculateIonFormula(precursor, ..adduct))]
-                
-                set(results, which(results$formula == precursor), "fragInfo", list(list(fragInfo)))
-                set(results, which(results$formula == precursor), "explainedPeaks", nrow(fragInfo))
+                wh <- which(neutralAdductForms == neutralAdductFormFrag)
+                if (length(wh) > 0)
+                {
+                    fragInfo[, neutral_loss := sapply(formula, subtractFormula,
+                                                      formula1 = results$formula[wh[1]])]
+                    
+                    # sirius neutralizes fragments, make them ion again
+                    fragInfo[, formula := calculateIonFormula(formula, ..adduct)]
+                    
+                    set(results, wh, "fragInfo", list(list(fragInfo)))
+                    set(results, wh, "explainedPeaks", nrow(fragInfo))
+                }
             }
         }
         

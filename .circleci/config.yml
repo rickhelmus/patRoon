@@ -71,7 +71,7 @@ jobs:
                     docker run --name patroon -t "${IMAGE_NAME}:${git_sha}-master" /bin/bash -c "cd patRoon; Rscript docker/make_docs.R"
                     CONTAINER_ID=`docker ps -aqf "name=patroon"`
                     rm -rf docs
-                    docker cp $CONTAINER_ID:/home/patRoon/patRoon/docs docs
+                    docker cp $CONTAINER_ID:/home/rstudio/patRoon/docs docs
                     touch docs/.nojekyll
                     git config --global user.email "something@email.com"
                     git config --global user.name "CircleCI updater"

@@ -6,12 +6,10 @@
     - Agilent .d is also a directory?
 - runWithoutCache? rinWithCacheMode()? shortcut to withr::with_options(patRoon.cache.mode=...)
 - backport latest recursiveApplyDT() from TPs
-- Docker: only apply progress opt when testing
 
 
 ## docs
 - improve instructions for MF and SIRIUS installation?
-- mention potential conflicts with dplyr::filter()
 
 
 ## features
@@ -45,7 +43,6 @@
 - PubChemLite
     - Install from Win inst script --> now only tier1, OK?
 - SusDat MF support
-- Fix SIRIUS with other adducts: https://github.com/boecker-lab/sirius/issues/10
 
 
 ## formulas

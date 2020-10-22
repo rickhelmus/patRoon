@@ -78,33 +78,7 @@ jobs:
                     git add docs
                     git status
                     git commit -m "automatic site/doc update [skip ci]"
-                    #git push origin master
-    buildrs:
-        machine:
-            image: ubuntu-2004:202010-01
-        environment:
-            IMAGE_NAME_RS: "patroonorg/patroonrs"
-            DOCKER_BUILDKIT: 1
-            BUILDKIT_PROGRESS: plain
-        steps:
-            - checkout
-            - run:
-                name: Build Docker RS image
-                no_output_timeout: 30m
-                command: |
-                    echo "$DH_PASS" | docker login -u "$DH_USER" --password-stdin
-                    docker build --cache-from "${IMAGE_NAME_RS}" --tag "${IMAGE_NAME_RS}" --build-arg BUILDKIT_INLINE_CACHE=1 --file ./docker/rstudio/Dockerfile .
-            - run:
-                name: Test RS image
-                no_output_timeout: 30m
-                command: |
-                    docker run -u rstudio -t "${IMAGE_NAME_RS}" /bin/bash -c "cd patRoon; Rscript docker/run_tests.R"
-            - run:
-                name: Push RS image
-                command: |
-                    git_sha=`echo $CIRCLE_SHA1 | cut -c1-7`
-                    docker tag "$IMAGE_NAME_RS" "${IMAGE_NAME_RS}:${git_sha}-master"
-                    docker push "${IMAGE_NAME_RS}:latest" && docker push "${IMAGE_NAME_RS}:${git_sha}-master"
+                    git push origin master
 workflows:
     btd:
         jobs:
@@ -119,8 +93,3 @@ workflows:
                             - master
                 requires:
                     - build
-            - buildrs:
-                filters:
-                    branches:
-                        only:
-                            - disabled

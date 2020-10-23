@@ -71,7 +71,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.3</span>
       </span>
     </div>
 
@@ -178,6 +178,10 @@
 <li>Fixed: <code>generateCompoundsMetFrag()</code>: compound names could be sometimes be interpreted as dates (reported by Corey Griffith)</li>
 <li>Fixed: on very rare cases empty peaklists could be present after averaging.</li>
 <li>Fixed: <code>SIRIUS</code> annotation didn’t use set adduct but used default instead</li>
+<li>
+<code>SIRIUS</code> results are better handled if choosen adduct is not <code>[M+H]+</code> or <code>[M+H]+</code>
+</li>
+<li>More fixes for loading <code>data.table</code> objects properly from cache.</li>
 </ul>
 </div>
     <div id="patroon-102" class="section level1">

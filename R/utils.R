@@ -179,6 +179,11 @@ recursiveApplyDT <- function(l, f, appl = lapply, ...)
     {
         if (inherits(x, "data.table"))
             x <- f(x)
+        else if (isS4(x))
+        {
+            for (sn in slotNames(x))
+                slot(x, sn) <- rec(slot(x, sn))
+        }
         else if (is.recursive(x))
         {
             if (is.data.frame(x))
@@ -188,11 +193,6 @@ recursiveApplyDT <- function(l, f, appl = lapply, ...)
                 return(x)
             }
             x <- appl(x, rec, ...)
-        }
-        else if (isS4(x))
-        {
-            for (sn in slotNames(x))
-                slot(x, sn) <- rec(slot(x, sn))
         }
         return(x)
     }

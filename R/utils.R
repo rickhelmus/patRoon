@@ -187,7 +187,7 @@ recursiveApplyDT <- function(l, f, appl = lapply, ...)
         else if (is.list(x))
         {
             # retain attributes: https://stackoverflow.com/a/48905113
-            "attributes<-"(appl(x, rec, ...), attributes(x))
+            x <- "attributes<-"(appl(x, rec, ...), attributes(x))
         }
         return(x)
     }

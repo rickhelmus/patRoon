@@ -184,7 +184,7 @@ recursiveApplyDT <- function(l, f, appl = lapply, ...)
             for (sn in slotNames(x))
                 slot(x, sn) <- rec(slot(x, sn))
         }
-        else if (is.recursive(x))
+        else if (is.list(x))
         {
             if (is.data.frame(x))
             {

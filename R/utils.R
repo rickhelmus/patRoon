@@ -186,13 +186,8 @@ recursiveApplyDT <- function(l, f, appl = lapply, ...)
         }
         else if (is.list(x))
         {
-            if (is.data.frame(x))
-            {
-                # keep data.frame class
-                x[] <- appl(x, rec, ...)
-                return(x)
-            }
-            x <- appl(x, rec, ...)
+            # retain attributes: https://stackoverflow.com/a/48905113
+            "attributes<-"(appl(x, rec, ...), attributes(x))
         }
         return(x)
     }

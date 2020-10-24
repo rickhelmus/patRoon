@@ -47,9 +47,15 @@ function disableAllAnnotations()
 
 function selectFGroupRow(group)
 {
-    qu = "#fGroupsTable .dataTable";
-    $(qu).DataTable().$('tr.selected').removeClass('selected'); // remove any current selections
-    $(qu).DataTable().row(group-1).node().classList.add("selected");
+    var table = $("#fGroupsTable .dataTable").DataTable();
+    
+    table.$('tr.selected').removeClass('selected'); // remove any current selections
+    
+    var indexes = table.rows().eq(0).filter(function(ind)
+    {
+        return table.cell(ind, 0).data() == group ? true : false;
+    });
+    table.rows(indexes).nodes().to$().addClass("selected");
 }
 
 function initAnnotation()

@@ -79,6 +79,8 @@ fGroupsSpecDT <- fGroupsSpecDT[, intersect(c("group", "ret", "mz", "suspect", "d
                                              "suspFormRank", "suspCompRank",
                                              "annotatedMSMSSimilarity", "estIDLevel"), names(fGroupsSpecDT)),
                                with = FALSE]
+fGroupsSpecDT[, groupInd := match(group, allGroups)]
+setcolorder(fGroupsSpecDT, "groupInd")
 
 showButton <- function(title, jsFunc, ...)
 {
@@ -151,7 +153,8 @@ DT::datatable(fGroupsSpecDT,
               options = list(paging = FALSE, scrollY = "200px", autoWidth = TRUE,
                              initComplete = DT::JS("function(settings, json)",
                                                    "{ setTimeout(initAnnotation, 25); }"),
-                             order = list(list(0, "asc"))),
+                             order = list(list(1, "asc")),
+                             columnDefs = list(list(visible = FALSE, targets = 0))),
               escape = FALSE, rownames = FALSE, elementId = "fGroupsTable")
 ```
 

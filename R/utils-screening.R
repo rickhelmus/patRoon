@@ -2,7 +2,7 @@
 #' @include utils-compounds.R
 NULL
 
-isScreening <- function(fGroups) inherits(fGroups, "featureGroupsScreening")
+isScreening <- function(fGroups) inherits(fGroups, c("featureGroupsScreening", "featureGroupsScreeningSet"))
 
 convertSuspDataIfNeeded <- function(scr, destFormat, destCol, fromFormats, fromCols)
 {

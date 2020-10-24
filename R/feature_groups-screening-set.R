@@ -38,7 +38,7 @@ mergeScreeningSetInfos <- function(setObjects, sInfos = lapply(setObjects, scree
         if (rmSetCols)
             scrInfo[, (getAllCols(rmCols)) := NULL]
     }
-    else
+    else if (length(sInfos) == 1)
     {
         scrInfo <- copy(sInfos[[1]])
         if (rmSetCols)
@@ -48,6 +48,9 @@ mergeScreeningSetInfos <- function(setObjects, sInfos = lapply(setObjects, scree
                 scrInfo[, (intersect(rmCols, names(scrInfo))) := NULL]
         }
     }
+    else
+        scrInfo <- data.table()
+    
     return(scrInfo[])
 }
 

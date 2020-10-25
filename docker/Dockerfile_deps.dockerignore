@@ -1,0 +1,5 @@
+*
+!DESCRIPTION
+!docker/install_deps.R
+!docker/rstudio/ccache.conf
+!docker/rstudio/Makevars

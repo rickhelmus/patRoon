@@ -33,6 +33,7 @@ jobs:
             - run:
                 name: Perform tests
                 command: |
+                    echo "$DH_PASS" | docker login -u "$DH_USER" --password-stdin
                     git_sha=`echo $CIRCLE_SHA1 | cut -c1-7`
                     docker run --name patroon -t "${IMAGE_NAME}:${git_sha}-master" /bin/bash -c "cd patRoon; Rscript docker/run_tests.R"
             - run:
@@ -49,7 +50,6 @@ jobs:
                 name: Push Docker image as latest
                 command: |
                     if [ "${CIRCLE_BRANCH}" == "master" ]; then
-                        echo "$DH_PASS" | docker login -u "$DH_USER" --password-stdin
                         git_sha=`echo $CIRCLE_SHA1 | cut -c1-7`
                         docker tag "${IMAGE_NAME}:${git_sha}-master" "${IMAGE_NAME}:latest"
                         docker push "${IMAGE_NAME}:latest"
@@ -67,6 +67,7 @@ jobs:
                 name: Generate docs & site
                 no_output_timeout: 60m
                 command: |
+                    echo "$DH_PASS" | docker login -u "$DH_USER" --password-stdin
                     git_sha=`echo $CIRCLE_SHA1 | cut -c1-7`
                     docker run --name patroon -t "${IMAGE_NAME}:${git_sha}-master" /bin/bash -c "cd patRoon; Rscript docker/make_docs.R"
                     CONTAINER_ID=`docker ps -aqf "name=patroon"`
@@ -79,7 +80,38 @@ jobs:
                     git status
                     git commit -m "automatic site/doc update [skip ci]"
                     git push origin master
+    deps:
+        machine:
+            image: ubuntu-2004:202010-01
+        <<: *set_dock_env
+        environment:
+            IMAGE_NAME_DEPS: "patroonorg/patroondeps"
+        steps:
+            - checkout
+            - run:
+                name: Build Docker image
+                no_output_timeout: 30m
+                command: |
+                    echo "$DH_PASS" | docker login -u "$DH_USER" --password-stdin
+                    docker build --cache-from "${IMAGE_NAME_DEPS}" --tag "${IMAGE_NAME_DEPS}" --build-arg BUILDKIT_INLINE_CACHE=1 --file ./docker/Dockerfile_deps .
+            - run:
+                name: Push Docker image
+                command: |
+                    git_sha=`echo $CIRCLE_SHA1 | cut -c1-7`
+                    docker tag "${IMAGE_NAME_DEPS}" "$IMAGE_NAME_DEPS}:${git_sha}-master"
+                    docker push "${IMAGE_NAME_DEPS}:latest" && docker push "${IMAGE_NAME_DEPS}:${git_sha}-master"
+
 workflows:
+    builddeps:
+        jobs:
+            - deps
+        triggers:
+            - schedule:
+                cron: "0 2 * * 0,2,4,6"
+                filters:
+                    branches:
+                        only:
+                            - master
     btd:
         jobs:
             - build

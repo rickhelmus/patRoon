@@ -18,10 +18,9 @@
 !vignettes/*
 !DESCRIPTION
 !NAMESPACE
-!docker/*.R
+!docker/make_docs.R
+!docker/run_tests.R
 !NEWS.md
 !LICENSE
 !README.md
 !_pkgdown.yaml
-!docker/rstudio/ccache.conf
-!docker/rstudio/Makevars

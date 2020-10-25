@@ -1,0 +1,42 @@
+# syntax=docker/dockerfile:experimental
+
+FROM rocker/rstudio:4.0.3
+
+ENV SETUPDIR=/usr/local/setup
+
+RUN --mount=type=cache,id=cache_apt,target=/var/cache/apt --mount=type=cache,id=lib_apt,target=/var/lib/apt apt-get update -y && \
+    apt-get install -y --no-install-recommends libssl-dev libssh2-1-dev wget libnode-dev openbabel \
+        libxml2-dev pngquant openjdk-11-jdk libmagick++-dev pandoc git pngquant texinfo libfribidi-dev \
+        zlib1g-dev libxml2-dev libnetcdf-dev libglpk-dev tzdata libnetcdf-dev netcdf-bin ccache && \
+    mkdir -p $SETUPDIR && \
+    wget -P $SETUPDIR https://github.com/OpenMS/OpenMS/releases/download/Release2.5.0/OpenMS-2.5.0-Debian-Linux-x86_64.deb && \
+    apt-get install -y --no-install-recommends $SETUPDIR/OpenMS-2.5.0-Debian-Linux-x86_64.deb && \
+    rm -rf $SETUPDIR && \
+    apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
+    echo 'PATH=/home/rstudio/bin:${PATH}' >> /usr/local/lib/R/etc/Renviron && R CMD javareconf
+
+USER rstudio
+WORKDIR /home/rstudio
+
+COPY --chown=rstudio docker/install_deps.R DESCRIPTION .
+COPY --chown=rstudio docker/rstudio/ccache.conf /home/rstudio/.ccache/
+COPY --chown=rstudio docker/rstudio/Makevars /home/rstudio/.R/
+
+ENV R_REMOTES_NO_ERRORS_FROM_WARNINGS=true OPENMS_DATA_PATH=/usr/share/OpenMS _R_CHECK_FORCE_SUGGESTS_=0 R_MAX_NUM_DLLS=150
+
+RUN  mkdir deps && cd deps && \
+    wget --progress=dot:mega http://msbi.ipb-halle.de/~cruttkie/metfrag/MetFrag2.4.5-CL.jar && \
+    wget --progress=dot:mega https://bio.informatik.uni-jena.de/repository/dist-release-local/de/unijena/bioinf/ms/sirius/4.4.29/sirius-4.4.29-linux64-headless.zip && \
+    wget --progress=dot:mega https://zenodo.org/record/3611238/files/PubChemLite_14Jan2020_tier1.csv && \
+    wget --progress=dot:mega ftp://newftp.epa.gov/COMPTOX/Sustainable_Chemistry_Data/Chemistry_Dashboard/MetFrag_metadata_files/CompTox_17March2019_SelectMetaData.csv && \
+    unzip sirius-4.4.29-linux64-headless.zip && rm sirius-4.4.29-linux64-headless.zip && cd ~ && \
+    echo 'options(patRoon.path.MetFragCL = "/home/rstudio/deps/MetFrag2.4.5-CL.jar")' >> .Rprofile && \
+    echo 'options(patRoon.path.SIRIUS = "/home/rstudio/deps/sirius-linux64-headless-4.4.29/bin")' >> .Rprofile && \
+    echo 'options(patRoon.path.MetFragCompTox = "/home/rstudio/deps/CompTox_17March2019_SelectMetaData.csv")' >> .Rprofile && \
+    echo 'options(patRoon.path.MetFragPubChemLite = "/home/rstudio/deps/PubChemLite_14Jan2020_tier1.csv")' >> .Rprofile
+
+RUN --mount=type=cache,id=ccache,target=/home/rstudio/ccache,uid=1000,gid=1000 Rscript install_deps.R && rm -f install_deps.R DESCRIPTION
+
+RUN rm -rf /home/rstudio/.R/Makevars
+
+CMD ["R"]

@@ -102,7 +102,7 @@ jobs:
                     docker push "${IMAGE_NAME_DEPS}:latest" && docker push "${IMAGE_NAME_DEPS}:${git_sha}-master"
 
 workflows:
-    version 2.1
+    version: 2.1
     builddeps:
         triggers:
             - schedule:

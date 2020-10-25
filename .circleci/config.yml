@@ -104,13 +104,6 @@ jobs:
 workflows:
     version: 2.1
     builddeps:
-        triggers:
-            - schedule:
-                cron: "0 2 * * 0,2,4,6"
-                filters:
-                    branches:
-                        only:
-                            - master
         jobs:
             - deps
     btd:

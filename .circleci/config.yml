@@ -109,7 +109,7 @@ workflows:
             - deps
         triggers:
             - schedule:
-                cron: "10 * * * *"
+                cron: "0 2 * * 2,4,6"
                 filters:
                     branches:
                         only:

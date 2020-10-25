@@ -629,7 +629,7 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
                     logf <- if (!is.null(logPath)) file.path(logPath, paste0("mfcl-", cmd$gName, ".txt")) else NULL
                     return(c(cmd, initMetFragCLCommand(cmd$mfSettings, cmd$spec, mfBin, logf)))
                 }))
-            }, maxProcAmount = maxProcAmount, procTimeout = timeout, delayBetweenProc = 1000)
+            }, maxProcAmount = NULL, procTimeout = timeout, delayBetweenProc = 1000) # UNDONE
         }
         else
         {

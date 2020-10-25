@@ -160,13 +160,16 @@ defMultiProcErrorHandler <- function(cmd, exitStatus, ...)
 }
 
 doProcFuture <- function(commandQueue, finishHandler, timeoutHandler, errorHandler,
-                         procTimeout, printOutput, printError, waitTimeout, delayBetweenProc)
+                         prepareHandler, procTimeout, printOutput, printError, waitTimeout, delayBetweenProc)
 {
     # UNDONE: printOutput/printError not here?
     
     {
         withr::local_tempfile("sucDir")
         dir.create(sucDir)
+        
+        if (!is.null(prepareHandler))
+            commandQueue <- prepareHandler(commandQueue)
         
         lastCommandTime <- 0 # at which time (in ms) the last command was started
         ret <- vector("list", length(commandQueue))
@@ -286,7 +289,7 @@ executeMultiProcessF <- function(commandQueue, finishHandler,
         # future::resolve(futures, result = TRUE)
         return(unlist(future::values(futures), recursive = FALSE))
     }
-    else
+    else if (F)
     {
         # executeMultiProcessNP(commandQueue = commandQueue,
         #                       finishHandler = finishHandler, timeoutHandler = timeoutHandler,
@@ -304,7 +307,18 @@ executeMultiProcessF <- function(commandQueue, finishHandler,
                      delayBetweenProc = delayBetweenProc)
         if (!is.null(maxProcAmount))
             args <- c(args, maxProcAmount = maxProcAmount) # UNDONE?
-        ret <- do.call(future.apply::future_lapply, chunks, executeMultiProcess, args)
+        ret <- do.call(future.apply::future_lapply, c(list(chunks, executeMultiProcess), args))
+        return(unlist(unname(ret), recursive = FALSE))
+    }
+    else
+    {
+        if (!is.null(maxProcAmount))
+            args <- c(args, maxProcAmount = maxProcAmount) # UNDONE?
+        ret <- future.apply::future_lapply(commandQueue, function(cmd)
+        {
+            doProcFuture(list(cmd), finishHandler, timeoutHandler, errorHandler, prepareHandler,
+                         procTimeout, printOutput, printError, waitTimeout, delayBetweenProc)
+        }, future.scheduling = 1.0)
         return(unlist(unname(ret), recursive = FALSE))
     }
 }

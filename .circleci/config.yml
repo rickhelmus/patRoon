@@ -99,7 +99,7 @@ jobs:
                 name: Push Docker image
                 command: |
                     git_sha=`echo $CIRCLE_SHA1 | cut -c1-7`
-                    docker tag "${IMAGE_NAME_DEPS}" "$IMAGE_NAME_DEPS}:${git_sha}-master"
+                    docker tag "${IMAGE_NAME_DEPS}" "${IMAGE_NAME_DEPS}:${git_sha}-master"
                     docker push "${IMAGE_NAME_DEPS}:latest" && docker push "${IMAGE_NAME_DEPS}:${git_sha}-master"
 
 workflows:
@@ -109,7 +109,7 @@ workflows:
             - deps
         triggers:
             - schedule:
-                cron: "0 2 * * 2,4,6"
+                cron: "0 2 * * 0,2,4,6"
                 filters:
                     branches:
                         only:

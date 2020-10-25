@@ -83,8 +83,9 @@ jobs:
     deps:
         machine:
             image: ubuntu-2004:202010-01
-        <<: *set_dock_env
         environment:
+            DOCKER_BUILDKIT: 1
+            BUILDKIT_PROGRESS: plain
             IMAGE_NAME_DEPS: "patroonorg/patroondeps"
         steps:
             - checkout
@@ -106,6 +107,9 @@ workflows:
     builddeps:
         jobs:
             - deps
+        triggers:
+            - schedule:
+                cron: "0 1 * * *"
     btd:
         jobs:
             - build

@@ -102,6 +102,12 @@ jobs:
                     docker tag "${IMAGE_NAME_DEPS}" "${IMAGE_NAME_DEPS}:${git_sha}-master"
                     docker push "${IMAGE_NAME_DEPS}:latest" && docker push "${IMAGE_NAME_DEPS}:${git_sha}-master"
 
+parameters:
+    do_trigger_deps:
+        type: boolean
+        default: false
+
+
 workflows:
     version: 2.1
     builddeps:
@@ -114,6 +120,10 @@ workflows:
                     branches:
                         only:
                             - master
+    builddeps_trigger:
+        when: << pipeline.parameters.do_trigger_deps >>
+        jobs:
+            - deps
     btd:
         jobs:
             - build

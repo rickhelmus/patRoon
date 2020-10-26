@@ -125,6 +125,7 @@ workflows:
         jobs:
             - deps
     btd:
+        unless: << pipeline.parameters.do_trigger_deps >>
         jobs:
             - build
             - test:

@@ -17,23 +17,23 @@ A simple text based wizard will start and asks you what to install and how to do
 
 ## Docker image (experimental)
 
-Docker images are provided to easily install a reproducible environment with `R`, `patRoon` and nearly all of its dependencies. This section assumes you have a basic understanding of [Docker] and have it installed. If not, please refer to the many guides available on the Internet. The Docker images of `patRoon` were originally only used for automated testing, however, since these contain a complete working environment of `patRoon` they are also suitable for using the software. They come with all external dependencies (except ProteoWizard), R dependencies and MetFrag libraries. Furthermore, as of recently the Docker image now also contains [RStudio] server, which makes using `patRoon` even easier. This feature is still experimental and may change over time. If you find bugs or suggestion please [file a bug report][issues]!
+Docker images are provided to easily install a reproducible environment with `R`, `patRoon` and nearly all of its dependencies. This section assumes you have a basic understanding of [Docker] and have it installed. If not, please refer to the many guides available on the Internet. The Docker images of `patRoon` were originally only used for automated testing, however, since these contain a complete working environment of `patRoon` they are also suitable for using the software. They come with all external dependencies (except ProteoWizard), `R` dependencies and `MetFrag` libraries. Furthermore, as of recently the Docker image now also contains [RStudio] server, which makes using `patRoon` even easier. This feature is still experimental and may change over time. If you find bugs or suggestion please [file a bug report][issues]!
 
 Below are some example shell commands on how to run the image.
 
 ```{bash, eval=FALSE}
 # run an interactive R console session
-docker run --rm -it patroonorg/patroon
+docker run --rm -it patroonorg/patroonrs
 
 # run a linux shell, from which R can be launched
-docker run --rm -it patroonorg/patroon bash
+docker run --rm -it patroonorg/patroonrs bash
 
 # run rstudio server, acessible from localhost:8787
 # login with rstudio/yourpasswordhere
-docker run --rm -p 8787:8787 -u 0 -e PASSWORD=yourpasswordhere -v ~/myvolume:/home/rstudio patroonorg/patroon /init
+docker run --rm -p 8787:8787 -u 0 -e PASSWORD=yourpasswordhere -v ~/myvolume:/home/rstudio patroonorg/patroonrs /init
 ```
 
-Note that the first two commands run as the default user `patRoon`, while the last as `root`. The last command launches [RStudio] server. You can access it by browsing to `localhost:8787` and logging with user `rstudio` and the password defined by the `PASSWORD` variable from the command (`yourpasswordhere` in the above example). This command also links a local volume to the `rstudio` user in order to obtain persistence of files in the container's home directory. The Docker image is based on the excellent [RStudio image] from the [rocker project](https://www.rocker-project.org/). For more information on RStudio related options see the documentation for the [RStudio image].
+Note that the first two commands run as the default user `rstudio`, while the last as `root`. The last command launches [RStudio] server. You can access it by browsing to `localhost:8787` and logging with user `rstudio` and the password defined by the `PASSWORD` variable from the command (`yourpasswordhere` in the above example). This command also links a local volume to the `rstudio` user in order to obtain persistence of files in the container's home directory. The Docker image is based on the excellent work from the [rocker project](https://www.rocker-project.org/). For more information on RStudio related options see their documentation for the [RStudio image].
 
 
 ## Manual installation

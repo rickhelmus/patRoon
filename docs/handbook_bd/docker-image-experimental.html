@@ -24,7 +24,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2020-10-23" />
+<meta name="date" content="2020-10-26" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -232,18 +232,18 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
             <section class="normal" id="section-">
 <div id="docker-image-experimental" class="section level2">
 <h2><span class="header-section-number">2.2</span> Docker image (experimental)</h2>
-<p>Docker images are provided to easily install a reproducible environment with <code>R</code>, <code>patRoon</code> and nearly all of its dependencies. This section assumes you have a basic understanding of <a href="https://www.docker.com/">Docker</a> and have it installed. If not, please refer to the many guides available on the Internet. The Docker images of <code>patRoon</code> were originally only used for automated testing, however, since these contain a complete working environment of <code>patRoon</code> they are also suitable for using the software. They come with all external dependencies (except ProteoWizard), R dependencies and MetFrag libraries. Furthermore, as of recently the Docker image now also contains <a href="https://rstudio.com/">RStudio</a> server, which makes using <code>patRoon</code> even easier. This feature is still experimental and may change over time. If you find bugs or suggestion please <a href="https://github.com/rickhelmus/patRoon/issues">file a bug report</a>!</p>
+<p>Docker images are provided to easily install a reproducible environment with <code>R</code>, <code>patRoon</code> and nearly all of its dependencies. This section assumes you have a basic understanding of <a href="https://www.docker.com/">Docker</a> and have it installed. If not, please refer to the many guides available on the Internet. The Docker images of <code>patRoon</code> were originally only used for automated testing, however, since these contain a complete working environment of <code>patRoon</code> they are also suitable for using the software. They come with all external dependencies (except ProteoWizard), <code>R</code> dependencies and <code>MetFrag</code> libraries. Furthermore, as of recently the Docker image now also contains <a href="https://rstudio.com/">RStudio</a> server, which makes using <code>patRoon</code> even easier. This feature is still experimental and may change over time. If you find bugs or suggestion please <a href="https://github.com/rickhelmus/patRoon/issues">file a bug report</a>!</p>
 <p>Below are some example shell commands on how to run the image.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="docker-image-experimental.html#cb2-1"></a><span class="co"># run an interactive R console session</span></span>
-<span id="cb2-2"><a href="docker-image-experimental.html#cb2-2"></a><span class="ex">docker</span> run --rm -it patroonorg/patroon</span>
+<span id="cb2-2"><a href="docker-image-experimental.html#cb2-2"></a><span class="ex">docker</span> run --rm -it patroonorg/patroonrs</span>
 <span id="cb2-3"><a href="docker-image-experimental.html#cb2-3"></a></span>
 <span id="cb2-4"><a href="docker-image-experimental.html#cb2-4"></a><span class="co"># run a linux shell, from which R can be launched</span></span>
-<span id="cb2-5"><a href="docker-image-experimental.html#cb2-5"></a><span class="ex">docker</span> run --rm -it patroonorg/patroon bash</span>
+<span id="cb2-5"><a href="docker-image-experimental.html#cb2-5"></a><span class="ex">docker</span> run --rm -it patroonorg/patroonrs bash</span>
 <span id="cb2-6"><a href="docker-image-experimental.html#cb2-6"></a></span>
 <span id="cb2-7"><a href="docker-image-experimental.html#cb2-7"></a><span class="co"># run rstudio server, acessible from localhost:8787</span></span>
 <span id="cb2-8"><a href="docker-image-experimental.html#cb2-8"></a><span class="co"># login with rstudio/yourpasswordhere</span></span>
-<span id="cb2-9"><a href="docker-image-experimental.html#cb2-9"></a><span class="ex">docker</span> run --rm -p 8787:8787 -u 0 -e PASSWORD=yourpasswordhere -v ~/myvolume:/home/rstudio patroonorg/patroon /init</span></code></pre></div>
-<p>Note that the first two commands run as the default user <code>patRoon</code>, while the last as <code>root</code>. The last command launches <a href="https://rstudio.com/">RStudio</a> server. You can access it by browsing to <code>localhost:8787</code> and logging with user <code>rstudio</code> and the password defined by the <code>PASSWORD</code> variable from the command (<code>yourpasswordhere</code> in the above example). This command also links a local volume to the <code>rstudio</code> user in order to obtain persistence of files in the container’s home directory. The Docker image is based on the excellent <a href="https://hub.docker.com/r/rocker/rstudio">RStudio image</a> from the <a href="https://www.rocker-project.org/">rocker project</a>. For more information on RStudio related options see the documentation for the <a href="https://hub.docker.com/r/rocker/rstudio">RStudio image</a>.</p>
+<span id="cb2-9"><a href="docker-image-experimental.html#cb2-9"></a><span class="ex">docker</span> run --rm -p 8787:8787 -u 0 -e PASSWORD=yourpasswordhere -v ~/myvolume:/home/rstudio patroonorg/patroonrs /init</span></code></pre></div>
+<p>Note that the first two commands run as the default user <code>rstudio</code>, while the last as <code>root</code>. The last command launches <a href="https://rstudio.com/">RStudio</a> server. You can access it by browsing to <code>localhost:8787</code> and logging with user <code>rstudio</code> and the password defined by the <code>PASSWORD</code> variable from the command (<code>yourpasswordhere</code> in the above example). This command also links a local volume to the <code>rstudio</code> user in order to obtain persistence of files in the container’s home directory. The Docker image is based on the excellent work from the <a href="https://www.rocker-project.org/">rocker project</a>. For more information on RStudio related options see their documentation for the <a href="https://hub.docker.com/r/rocker/rstudio">RStudio image</a>.</p>
 </div>
             </section>
 

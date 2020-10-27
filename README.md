@@ -89,4 +89,4 @@ However, for a better guide to get started it is recommended to read the [tutori
 [ghweb]: https://rickhelmus.github.io/patRoon/
 [patRoonDeps]: https://github.com/rickhelmus/patRoonDeps
 [miniCRAN]: https://cran.r-project.org/web/packages/miniCRAN/index.html
-[DockerImg]: https://hub.docker.com/r/patroonorg/patroon
+[DockerImg]: https://hub.docker.com/r/patroonorg/patroonrs

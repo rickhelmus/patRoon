@@ -308,17 +308,17 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="inspecting-results.html#cb25-1"></a><span class="co"># Feature table (only first columns for readability)</span></span>
 <span id="cb25-2"><a href="inspecting-results.html#cb25-2"></a>fList[[<span class="st">&quot;standard-1&quot;</span>]][, <span class="dv">1</span><span class="op">:</span><span class="dv">6</span>]</span></code></pre></div>
 <pre><code>#&gt;                          ID       ret        mz       area    retmin    retmax
-#&gt;   1:  f_4958598299774242101  19.00698  78.99684  65793.391  13.01202  29.99700
-#&gt;   2:  f_9712801401741162235  20.00598  79.02098 125354.100  13.01202  29.99700
-#&gt;   3:  f_9088526672850588381   8.01600  79.02101 188045.900   3.03000  12.01302
-#&gt;   4: f_10831112662272412891 112.34220  79.02103  71168.984 106.55400 147.51600
-#&gt;   5:  f_6543232487668163452 111.64380  84.95950  54875.129 105.15180 599.87400
+#&gt;   1: f_18179715632395607972  19.00698  78.99684  65793.391  13.01202  29.99700
+#&gt;   2:  f_1690740062063619144  20.00598  79.02098 125354.100  13.01202  29.99700
+#&gt;   3:  f_1073260696443316556   8.01600  79.02101 188045.900   3.03000  12.01302
+#&gt;   4:  f_8533796444973901186 112.34220  79.02103  71168.984 106.55400 147.51600
+#&gt;   5:   f_948748278324442951 111.64380  84.95950  54875.129 105.15180 599.87400
 #&gt;  ---                                                                          
-#&gt; 433:   f_596456267470586408  11.01402 295.22387   9514.476   9.01602  13.01202
-#&gt; 434:  f_9729650972334723872  13.01202 296.92038  37753.414  10.01502  15.01098
-#&gt; 435: f_10281150542637687067  12.01302 297.16751  17366.125   9.01602  15.01098
-#&gt; 436: f_18067383495359436124  11.01402 297.20368  13995.990   9.01602  14.01102
-#&gt; 437:  f_5745394672803455243  12.01302 299.12581  13630.378   9.01602  15.01098</code></pre>
+#&gt; 433:  f_1331674135964220335  11.01402 295.22387   9514.476   9.01602  13.01202
+#&gt; 434:  f_5945414659731891452  13.01202 296.92038  37753.414  10.01502  15.01098
+#&gt; 435: f_14650204468881113097  12.01302 297.16751  17366.125   9.01602  15.01098
+#&gt; 436: f_15234398883956976242  11.01402 297.20368  13995.990   9.01602  14.01102
+#&gt; 437: f_16144322573279262284  12.01302 299.12581  13630.378   9.01602  15.01098</code></pre>
 <div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="inspecting-results.html#cb27-1"></a><span class="co"># Feature group intensities</span></span>
 <span id="cb27-2"><a href="inspecting-results.html#cb27-2"></a>fGroups<span class="op">$</span>M120_R328_<span class="dv">81</span></span></code></pre></div>
 <pre><code>#&gt; [1] 55936 61668 59624</code></pre>
@@ -366,17 +366,17 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="inspecting-results.html#cb39-1"></a><span class="co"># obtain table with all features (only first columns for readability)</span></span>
 <span id="cb39-2"><a href="inspecting-results.html#cb39-2"></a><span class="kw">as.data.table</span>(fList)[, <span class="dv">1</span><span class="op">:</span><span class="dv">6</span>]</span></code></pre></div>
 <pre><code>#&gt;         analysis                     ID       ret        mz      area     retmin
-#&gt;    1:  solvent-1  f_6268159515671929880  19.10298  78.99678  73929.27  13.108980
-#&gt;    2:  solvent-1  f_5899392216413942234  14.10798  84.95948 941557.00   3.922998
-#&gt;    3:  solvent-1  f_5520515824970026779 112.97220  84.95949  47558.80 105.301800
-#&gt;    4:  solvent-1 f_16991445913304232988  13.10898  88.95255  34552.67   7.114020
-#&gt;    5:  solvent-1  f_1177855853080028237   2.52900  88.96823  14710.10   1.732002
+#&gt;    1:  solvent-1  f_3031756598025735782  19.10298  78.99678  73929.27  13.108980
+#&gt;    2:  solvent-1 f_16375275321139751015  14.10798  84.95948 941557.00   3.922998
+#&gt;    3:  solvent-1 f_10534906674626283715 112.97220  84.95949  47558.80 105.301800
+#&gt;    4:  solvent-1  f_3933702526933638228  13.10898  88.95255  34552.67   7.114020
+#&gt;    5:  solvent-1 f_18384935222989019846   2.52900  88.96823  14710.10   1.732002
 #&gt;   ---                                                                           
-#&gt; 2440: standard-3 f_14049673646745102171  12.14898 294.93888 350965.20   9.151020
-#&gt; 2441: standard-3 f_17707024843545452397  11.14998 295.18863  10705.59   9.151020
-#&gt; 2442: standard-3 f_12933080019506180580  13.14798 296.92039  42195.86  10.150980
-#&gt; 2443: standard-3  f_8058890024675811644  11.14998 297.16737  15177.58   9.151020
-#&gt; 2444: standard-3 f_13476654137170102284  11.14998 297.20377  16678.13   9.151020</code></pre>
+#&gt; 2440: standard-3   f_657091778834665912  12.14898 294.93888 350965.20   9.151020
+#&gt; 2441: standard-3 f_15623546788587190737  11.14998 295.18863  10705.59   9.151020
+#&gt; 2442: standard-3  f_4348413745961841799  13.14798 296.92039  42195.86  10.150980
+#&gt; 2443: standard-3 f_13803738005585047024  11.14998 297.16737  15177.58   9.151020
+#&gt; 2444: standard-3  f_6738348293740625588  11.14998 297.20377  16678.13   9.151020</code></pre>
 <div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="inspecting-results.html#cb41-1"></a><span class="co"># Returns group info and intensity values for each feature group</span></span>
 <span id="cb41-2"><a href="inspecting-results.html#cb41-2"></a><span class="kw">as.data.table</span>(fGroups, <span class="dt">average =</span> <span class="ot">TRUE</span>) <span class="co"># average intensities for replicates</span></span></code></pre></div>
 <pre><code>#&gt;             group      ret       mz standard
@@ -429,11 +429,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 #&gt;   4:  M120_R328_81              1 1.522632    119.0483
 #&gt;   5:  M120_R328_81              1 1.490700    119.0483
 #&gt;  ---                                                  
-#&gt; 496: M146_R185_153              2 1.557046    145.0528
-#&gt; 497: M146_R185_153              3 1.555828    145.0528
-#&gt; 498: M146_R185_153              3 1.554854    145.0528
-#&gt; 499: M146_R185_153              3 1.551151    145.0528
-#&gt; 500: M146_R185_153              3 1.549153    145.0528</code></pre>
+#&gt; 496: M146_R185_153              3 1.533663    145.0528
+#&gt; 497: M146_R185_153              3 1.532748    145.0528
+#&gt; 498: M146_R185_153              3 1.531075    145.0528
+#&gt; 499: M146_R185_153              3 1.524293    145.0528
+#&gt; 500: M146_R185_153              3 1.524285    145.0528</code></pre>
 <div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="inspecting-results.html#cb49-1"></a><span class="co"># Returns table with all components (including feature group info, annotations etc)</span></span>
 <span id="cb49-2"><a href="inspecting-results.html#cb49-2"></a><span class="kw">as.data.table</span>(components)[, <span class="dv">1</span><span class="op">:</span><span class="dv">6</span>]</span></code></pre></div>
 <pre><code>#&gt;     name  cmp_ret cmp_retsd neutral_mass   analysis size

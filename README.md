@@ -3,7 +3,7 @@
 [![CircleCI](https://circleci.com/gh/rickhelmus/patRoon.svg?style=svg)](https://circleci.com/gh/rickhelmus/patRoon)
 [![Build status](https://ci.appveyor.com/api/projects/status/52nnpq8kqpkjqc92/branch/master?svg=true)](https://ci.appveyor.com/project/rickhelmus/patroon/branch/master)
 [![codecov](https://codecov.io/gh/rickhelmus/patRoon/branch/master/graph/badge.svg)](https://codecov.io/gh/rickhelmus/patRoon)
-[![](https://images.microbadger.com/badges/image/patroonorg/patroon.svg)](https://microbadger.com/images/patroonorg/patroon)
+[![Docker image](https://img.shields.io/docker/image-size/patroonorg/patroonrs/latest)][DockerImg]
 
 `patRoon` aims to provide a solution for comprehensive mass spectrometry based non-target analysis (NTA) workflows for environmental analysis. The name is derived from a Dutch word that means _pattern_ and may also be an acronym for _hyPhenated mAss specTROmetry nOn-target aNalysis_.
 

@@ -24,7 +24,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2020-10-26" />
+<meta name="date" content="2020-10-27" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -240,10 +240,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb2-4"><a href="docker-image-experimental.html#cb2-4"></a><span class="co"># run a linux shell, from which R can be launched</span></span>
 <span id="cb2-5"><a href="docker-image-experimental.html#cb2-5"></a><span class="ex">docker</span> run --rm -it patroonorg/patroonrs bash</span>
 <span id="cb2-6"><a href="docker-image-experimental.html#cb2-6"></a></span>
-<span id="cb2-7"><a href="docker-image-experimental.html#cb2-7"></a><span class="co"># run rstudio server, acessible from localhost:8787</span></span>
+<span id="cb2-7"><a href="docker-image-experimental.html#cb2-7"></a><span class="co"># run rstudio server, accessible from localhost:8787</span></span>
 <span id="cb2-8"><a href="docker-image-experimental.html#cb2-8"></a><span class="co"># login with rstudio/yourpasswordhere</span></span>
-<span id="cb2-9"><a href="docker-image-experimental.html#cb2-9"></a><span class="ex">docker</span> run --rm -p 8787:8787 -u 0 -e PASSWORD=yourpasswordhere -v ~/myvolume:/home/rstudio patroonorg/patroonrs /init</span></code></pre></div>
-<p>Note that the first two commands run as the default user <code>rstudio</code>, while the last as <code>root</code>. The last command launches <a href="https://rstudio.com/">RStudio</a> server. You can access it by browsing to <code>localhost:8787</code> and logging with user <code>rstudio</code> and the password defined by the <code>PASSWORD</code> variable from the command (<code>yourpasswordhere</code> in the above example). This command also links a local volume to the <code>rstudio</code> user in order to obtain persistence of files in the container’s home directory. The Docker image is based on the excellent work from the <a href="https://www.rocker-project.org/">rocker project</a>. For more information on RStudio related options see their documentation for the <a href="https://hub.docker.com/r/rocker/rstudio">RStudio image</a>.</p>
+<span id="cb2-9"><a href="docker-image-experimental.html#cb2-9"></a><span class="ex">docker</span> run --rm -p 8787:8787 -u 0 -e PASSWORD=yourpasswordhere patroonorg/patroonrs /init</span>
+<span id="cb2-10"><a href="docker-image-experimental.html#cb2-10"></a></span>
+<span id="cb2-11"><a href="docker-image-experimental.html#cb2-11"></a><span class="co"># same as above, but mount a local directory (~/myvolume) as local volume so it can be used for persistent storage</span></span>
+<span id="cb2-12"><a href="docker-image-experimental.html#cb2-12"></a><span class="co"># please ensure that ~/myvolume exists!</span></span>
+<span id="cb2-13"><a href="docker-image-experimental.html#cb2-13"></a><span class="ex">docker</span> run --rm -p 8787:8787 -u 0 -e PASSWORD=yourpasswordhere -v ~/myvolume:/home/rstudio/myvolume patroonorg/patroonrs /init</span></code></pre></div>
+<p>Note that the first two commands run as the default user <code>rstudio</code>, while the last two as <code>root</code>. The last commands launch <a href="https://rstudio.com/">RStudio</a> server. You can access it by browsing to <code>localhost:8787</code> and logging with user <code>rstudio</code> and the password defined by the <code>PASSWORD</code> variable from the command (<code>yourpasswordhere</code> in the above example). The last command also links a local volume in order to obtain persistence of files in the container’s home directory. The Docker image is based on the excellent work from the <a href="https://www.rocker-project.org/">rocker project</a>. For more information on RStudio related options see their documentation for the <a href="https://hub.docker.com/r/rocker/rstudio">RStudio image</a>.</p>
 </div>
             </section>
 

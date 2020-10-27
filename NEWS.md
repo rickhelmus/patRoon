@@ -11,6 +11,7 @@
 * Fixed: `SIRIUS` annotation didn't use set adduct but used default instead
 * `SIRIUS` results are better handled if choosen adduct is not `[M+H]+` or `[M+H]+`
 * More fixes for loading `data.table` objects properly from cache.
+* RStudio Docker image: see the updated installation instructions in the handbook (thanks to Thanh Wang for some last minute fixes!)
 
 
 # patRoon 1.0.2

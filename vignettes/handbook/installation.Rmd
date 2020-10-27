@@ -28,12 +28,16 @@ docker run --rm -it patroonorg/patroonrs
 # run a linux shell, from which R can be launched
 docker run --rm -it patroonorg/patroonrs bash
 
-# run rstudio server, acessible from localhost:8787
+# run rstudio server, accessible from localhost:8787
 # login with rstudio/yourpasswordhere
-docker run --rm -p 8787:8787 -u 0 -e PASSWORD=yourpasswordhere -v ~/myvolume:/home/rstudio patroonorg/patroonrs /init
+docker run --rm -p 8787:8787 -u 0 -e PASSWORD=yourpasswordhere patroonorg/patroonrs /init
+
+# same as above, but mount a local directory (~/myvolume) as local volume so it can be used for persistent storage
+# please ensure that ~/myvolume exists!
+docker run --rm -p 8787:8787 -u 0 -e PASSWORD=yourpasswordhere -v ~/myvolume:/home/rstudio/myvolume patroonorg/patroonrs /init
 ```
 
-Note that the first two commands run as the default user `rstudio`, while the last as `root`. The last command launches [RStudio] server. You can access it by browsing to `localhost:8787` and logging with user `rstudio` and the password defined by the `PASSWORD` variable from the command (`yourpasswordhere` in the above example). This command also links a local volume to the `rstudio` user in order to obtain persistence of files in the container's home directory. The Docker image is based on the excellent work from the [rocker project](https://www.rocker-project.org/). For more information on RStudio related options see their documentation for the [RStudio image].
+Note that the first two commands run as the default user `rstudio`, while the last two as `root`. The last commands launch [RStudio] server. You can access it by browsing to `localhost:8787` and logging with user `rstudio` and the password defined by the `PASSWORD` variable from the command (`yourpasswordhere` in the above example). The last command also links a local volume in order to obtain persistence of files in the container's home directory. The Docker image is based on the excellent work from the [rocker project](https://www.rocker-project.org/). For more information on RStudio related options see their documentation for the [RStudio image].
 
 
 ## Manual installation

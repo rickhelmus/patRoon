@@ -14,9 +14,16 @@ setMethod("initialize", "featureGroupsScreening",
 
 setMethod("screenInfo", "featureGroupsScreening", function(obj) obj@screenInfo)
 
-setMethod("[", c("featureGroupsScreening", "ANY", "ANY", "missing"), function(x, i, j, ..., rGroups, drop = TRUE)
+setMethod("[", c("featureGroupsScreening", "ANY", "ANY", "missing"), function(x, i, j, ..., rGroups,
+                                                                              suspects = NULL, drop = TRUE)
 {
+    checkmate::assertChoice(suspects, x@screenInfo$name, null.ok = TRUE)
+    
     x <- callNextMethod(x, i, j, ..., rGroups = rGroups, drop = drop)
+    
+    if (!is.null(suspects))
+        x <- x[, x@screenInfo[name %in% suspects]$group]
+    
     x@screenInfo <- x@screenInfo[group %in% names(x)]
     return(x)
 })

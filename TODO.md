@@ -16,6 +16,7 @@
 - tests
     - automatic InChIKey/formula calculation from InChIs/SMILES
         - already done implicitly?
+    - handling empty results
     - more?
 - ID level rules
     - GenForm scoring: somehow exclude non MS/MS candidates if MS/MS candidates are present?
@@ -42,17 +43,17 @@
             - still keep re-naming functionality? not really possible, but put names in reporting functionality
         - same format for TASQ screening import?
         - throw informative error when screenSuspects()/screenTargets() is called
-        - subset/select by suspect name
         - also selectBy for fGroups with multiple hits
 - newProject(): create template auto ID rule csv?
 - util to check if there are suspect results? (ie to replace inherits(...))
 - expand reporting
     - eg marking which candidate corresponds to suspect and include suspect name in EICs
+        - mark with different row colour and label?
     - mention suspect similarities/ranks etc for candidates (or somehow in compounds?)
     - optionally report with collapsed suspects
 - check for empty names in assertion/preparation functions
 - prepareSuspectList(): export? and always calculate neutralMass?
-- fix: reporting non-annotated suspects (port from TP branch)
+- annotateSuspects() --> annotate() latter is a function (but not generic) from ggplot2 and RAMClustR and method from CAMERA, so probably no conflicts
 
 
 ## docs

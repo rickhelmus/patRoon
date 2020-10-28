@@ -137,17 +137,18 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
 })
 
 setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = FALSE,
-                                                       selectBy = NULL, maxLevel = NULL,
-                                                       maxFormRank = NULL, maxCompRank = NULL,
+                                                       selectHitsBy = NULL, selectFGroupsBy = NULL,
+                                                       maxLevel = NULL, maxFormRank = NULL, maxCompRank = NULL,
                                                        minAnnMSMSSim = NULL, negate = FALSE)
 {
-    # UNDONE: doc that selectBy only applies to hits, in case of ties: first hit
+    # UNDONE: doc that selectHitsBy/selectFGroupsBy only applies to hits, in case of ties: first hit
     # UNDONE: mention that filter with onlyHits may need to be repeated
     # UNDONE: cache?
     
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertFlag, . ~ onlyHits + negate, fixed = list(add = ac))
-    checkmate::assertChoice(selectBy, c("intensity", "level"), null.ok = TRUE, add = ac)
+    aapply(checkmate::assertChoice, . ~ selectHitsBy + selectFGroupsBy, null.ok = TRUE,
+           fixed = list(choices = c("intensity", "level"), add = ac))
     checkmate::assertInt(maxLevel, null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
@@ -171,30 +172,39 @@ setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = FALS
     obj <- colFilter(minPred, "annotatedMSMSSimilarity", minAnnMSMSSim)
     
     # do here so that only duplicates not yet filtered out in previous steps are considered
-    if (!is.null(selectBy))
+    if (!is.null(selectHitsBy) || !is.null(selectFGroupsBy))
     {
-        gTab <- as.data.table(obj, collapseSuspects = NULL, onlyHits = TRUE)
         doKeep <- function(v, d) is.na(v) | length(v) == 1 | order(v, decreasing = d) == 1
-        if (selectBy == "intensity")
+        doSelectFilter <- function(si, by, byCol)
         {
-            gTab[, avgInts := rowMeans(.SD), .SDcol = analyses(obj)]
-            gTab <- gTab[, keep := doKeep(avgInts, !negate), by = "name"]
-        }
-        else # keep best ID level
-        {
-            if (is.null(gTab[["estIDLevel"]]))
-                stop("Cannot select by identification level: no annotation data available (did you run annotateSuspects()?). ")
-            gTab <- gTab[, keep := doKeep(estIDLevel, negate), by = "name"]
+            gTab <- as.data.table(obj, collapseSuspects = NULL, onlyHits = TRUE)
+            
+            if (by == "intensity")
+            {
+                gTab[, avgInts := rowMeans(.SD), .SDcol = analyses(obj)]
+                gTab <- gTab[, keep := doKeep(avgInts, !negate), by = byCol]
+            }
+            else # select by best hit
+            {
+                if (is.null(gTab[["estIDLevel"]]))
+                    stop("Cannot select by identification level: no annotation data available (did you run annotateSuspects()?). ")
+                gTab <- gTab[, keep := doKeep(estIDLevel, negate), by = byCol]
+            }
+            
+            if (any(!gTab$keep))
+            {
+                # merge-in keep column so we can subset screenInfo
+                si <- copy(si)
+                si[gTab, keep := i.keep, on = c("group", "name")]
+                setorderv(si, "name")
+                obj@screenInfo <- si[keep == TRUE, -"keep"]
+            }
         }
         
-        if (any(!gTab$keep))
-        {
-            # merge-in keep column so we can subset screenInfo
-            si <- copy(screenInfo(obj))
-            si[gTab, keep := i.keep, on = c("group", "name")]
-            setorderv(si, "name")
-            obj@screenInfo <- si[keep == TRUE, -"keep"]
-        }
+        if (!is.null(selectHitsBy))
+            obj@screenInfo <- doSelectFilter(obj@screenInfo, selectHitsBy, "name")
+        if (!is.null(selectFGroupsBy))
+            obj@screenInfo <- doSelectFilter(obj@screenInfo, selectFGroupsBy, "group")
     }
     
     # NOTE: do last in case previous steps removed hits 

@@ -197,9 +197,18 @@ annotatedMSMSSimilarity <- function(fragInfo, MSMSList, absMzDev, relMinIntensit
     if (nrow(MSMSList) == 0 || nrow(fragInfo) == 0)
         return(0)
     
-    MSMSList <- MSMSList[, c("mz", "intensity")]
+    relMinIntensity <- relMinIntensity * 100 # NOTE: OrgMassSpecR normalizes to 0-100
+    
+    prepList <- function(pl)
+    {
+        # remove precursor, as eg MetFrag doesn't include this
+        pl <- pl[precursor == FALSE]
+        return(pl[, c("mz", "intensity"), with = FALSE])
+    }
+
     annMSMSList <- MSMSList[fragInfo$PLIndex]
-    return(OrgMassSpecR::SpectrumSimilarity(annMSMSList, MSMSList, t = absMzDev,
+    
+    return(OrgMassSpecR::SpectrumSimilarity(prepList(annMSMSList), prepList(MSMSList), t = absMzDev,
                                             b = relMinIntensity, print.graphic = FALSE))
 }
 

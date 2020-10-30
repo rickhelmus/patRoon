@@ -579,7 +579,7 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
     {
         if (method == "CL")
         {
-            results <- executeMultiProcessF(runData, finishHandler = function(cmd)
+            results <- executeMultiProcessFuture(runData, finishHandler = function(cmd)
             {
                 comptab <- data.table::fread(cmd$outFile, colClasses = c(Identifier = "character"))
                 procres <- processMFResults(comptab, cmd$spec, adduct, database, topMost, cmd$stderrFile)

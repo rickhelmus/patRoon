@@ -421,16 +421,15 @@ processMFResults <- function(comptab, spec, adduct, db, topMost, lfile = "")
 #'
 #' @rdname compound-generation
 #' @export
-generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPath = file.path("log", "metfrag"),
-                                     timeout = 300, timeoutRetries = 2, errorRetries = 2, topMost = 100,
+generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", timeout = 300,
+                                     timeoutRetries = 2, errorRetries = 2, topMost = 100,
                                      dbRelMzDev = 5, fragRelMzDev = 5, fragAbsMzDev = 0.002, adduct,
                                      database = "pubchem", extendedPubChem = "auto", chemSpiderToken = "",
                                      scoreTypes = compoundScorings("metfrag", database, onlyDefault = TRUE)$name,
                                      scoreWeights = 1.0,
                                      preProcessingFilters = c("UnconnectedCompoundFilter", "IsotopeFilter"),
                                      postProcessingFilters = c("InChIKeyFilter"),
-                                     maxCandidatesToStop = 2500, identifiers = NULL, extraOpts = NULL,
-                                     maxProcAmount = getOption("patRoon.maxProcAmount"))
+                                     maxCandidatesToStop = 2500, identifiers = NULL, extraOpts = NULL)
 {
     if (method == "R")
         checkPackage("metfRag", "c-ruttkies/MetFragR")
@@ -439,7 +438,6 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
     checkmate::assertChoice(method, c("CL", "R"), add = ac)
-    assertMultiProcArgs(logPath, maxProcAmount, add = ac)
     aapply(checkmate::assertNumber, . ~ timeout + dbRelMzDev + fragRelMzDev + fragAbsMzDev,
            lower = 0, finite = TRUE, fixed = list(add = ac))
     aapply(checkmate::assertCount, . ~ timeoutRetries + errorRetries, fixed = list(add = ac))
@@ -626,7 +624,7 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
                 
                 logf <- if (!is.null(logPath)) file.path(logPath, paste0("mfcl-", cmd$gName, ".txt")) else NULL
                 return(c(cmd, initMetFragCLCommand(cmd$mfSettings, cmd$spec, mfBin, logf)))
-            }, maxProcAmount = NULL, procTimeout = timeout, delayBetweenProc = 1000) # UNDONE
+            }, procTimeout = timeout, delayBetweenProc = 1000)
         }
         else
         {

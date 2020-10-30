@@ -55,7 +55,6 @@ defMultiProcErrorHandler <- function(cmd, exitStatus, ...)
 #' @param showProgress Set to \code{TRUE} to display a progress bar.
 #' @param waitTimeout Number of milliseconds to wait before checking if a new
 #'   process should be spawned.
-#' @param maxProcAmount Maximum number of processes to run simultaneously.
 #' @param batchSize Number of commands that should be executed in sequence per
 #'   processes. See details.
 #' @param delayBetweenProc Minimum number of milliseconds to wait before
@@ -68,7 +67,6 @@ executeMultiProcess <- function(commandQueue, finishHandler,
                                 prepareHandler = NULL,
                                 procTimeout = NULL, printOutput = FALSE, printError = FALSE,
                                 showProgress = TRUE, waitTimeout = 50,
-                                maxProcAmount = getOption("patRoon.maxProcAmount"),
                                 batchSize = 1, delayBetweenProc = 0)
 {
     # UNDONE
@@ -78,7 +76,6 @@ executeMultiProcess <- function(commandQueue, finishHandler,
                                       prepareHandler,
                                       procTimeout, printOutput, printError,
                                       showProgress, waitTimeout,
-                                      maxProcAmount,
                                       batchSize, delayBetweenProc))
     
     if (length(commandQueue) == 0)

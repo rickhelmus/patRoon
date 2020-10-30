@@ -200,14 +200,6 @@ assertCanCreateDirs <- function(x, .var.name = checkmate::vname(x), add = NULL)
         assertCanCreateDir(ana, .var.name, add)
 }
 
-assertMultiProcArgs <- function(x, maxProcAmount, .var.name = checkmate::vname(x), add = NULL)
-{
-    if (!is.null(x))
-        assertCanCreateDir(x, .var.name = .var.name, add = add)
-    # HACK: fix var name
-    checkmate::assertCount(maxProcAmount, positive = TRUE, .var.name = "maxProcAmount", add = add)
-}
-
 assertDACloseSaveArgs <- function(x, save, .var.name = checkmate::vname(x), add = NULL)
 {
     checkmate::assertFlag(x, .var.name = .var.name, add = add)

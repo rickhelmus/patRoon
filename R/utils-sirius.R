@@ -134,7 +134,7 @@ getSiriusCommand <- function(precursorMZ, MSPList, MSMSPList, profile, adduct, p
 runSIRIUS <- function(precursorMZs, MSPLists, MSMSPLists, profile, adduct, ppmMax, elements,
                       database, noise, cores, withFingerID, fingerIDDatabase, topMost,
                       extraOptsGeneral, extraOptsFormula, verbose, isPre44,
-                      SIRBatchSize, logPath, maxProcAmount)
+                      SIRBatchSize)
 {
     if (!is.null(logPath))
         mkdirp(logPath)
@@ -205,8 +205,7 @@ runSIRIUS <- function(precursorMZs, MSPLists, MSMSPLists, profile, adduct, ppmMa
     
     singular <- length(cmdQueue) == 1
     executeMultiProcess(cmdQueue, printOutput = verbose && singular, printError = verbose && singular,
-                        maxProcAmount = maxProcAmount, showProgress = !singular,
-                        finishHandler = function(...) NULL)
+                        showProgress = !singular, finishHandler = function(...) NULL)
     
     return(list(outPaths = unlist(lapply(cmdQueue, function(cmd) rep(cmd$outPath, length(cmd$msFNames))), use.names = FALSE),
                 msFNames = unlist(lapply(cmdQueue, "[[", "msFNames"), use.names = FALSE),
@@ -216,7 +215,7 @@ runSIRIUS <- function(precursorMZs, MSPLists, MSMSPLists, profile, adduct, ppmMa
 doSIRIUS <- function(fGroups, MSPeakLists, doFeatures, profile, adduct, relMzDev, elements,
                      database, noise, cores, withFingerID, fingerIDDatabase, topMost,
                      extraOptsGeneral, extraOptsFormula, verbose, cacheName, processFunc, processArgs,
-                     SIRBatchSize, logPath, maxProcAmount)
+                     SIRBatchSize)
 {
     isPre44 <- isSIRIUSPre44()
     gNames <- names(fGroups)
@@ -292,7 +291,7 @@ doSIRIUS <- function(fGroups, MSPeakLists, doFeatures, profile, adduct, relMzDev
             runData <- runSIRIUS(plmzs, mspls, msmspls, profile, adduct, relMzDev, elements,
                                  database, noise, cores, withFingerID, fingerIDDatabase, topMost,
                                  extraOptsGeneral, extraOptsFormula, verbose, isPre44,
-                                 SIRBatchSize, logPath, maxProcAmount)
+                                 SIRBatchSize)
             flPLMeta[cached == FALSE, outPath := runData$outPaths]
             flPLMeta[cached == FALSE, msFName := runData$msFNames]
         }

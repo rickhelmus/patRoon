@@ -84,9 +84,7 @@ findFeaturesOpenMS <- function(analysisInfo, noiseThrInt = 1000, chromSNR = 3, c
                                minTraceLength = 3, maxTraceLength = -1, widthFiltering = "fixed", minFWHM = 3,
                                maxFWHM = 60, traceSNRFiltering = FALSE, localRTRange = 10, localMZRange = 6.5,
                                isotopeFilteringModel = "metabolites (5% RMS)", MZScoring13C = FALSE, useSmoothedInts = TRUE,
-                               extraOpts = NULL, intSearchRTWindow = 3,
-                               logPath = file.path("log", "openms"), maxProcAmount = getOption("patRoon.maxProcAmount"),
-                               verbose = TRUE)
+                               extraOpts = NULL, intSearchRTWindow = 3, verbose = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
     analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, "mzML", add = ac)
@@ -101,7 +99,6 @@ findFeaturesOpenMS <- function(analysisInfo, noiseThrInt = 1000, chromSNR = 3, c
                                                      "peptides", "none"), add = ac)
     aapply(checkmate::assertFlag, . ~ reEstimateMTSD + traceSNRFiltering + MZScoring13C + useSmoothedInts, fixed = list(add = ac))
     checkmate::assertList(extraOpts, any.missing = FALSE, names = "unique", null.ok = TRUE, add = ac)
-    assertMultiProcArgs(logPath, maxProcAmount, add = ac)
     checkmate::reportAssertions(ac)
 
     if (verbose)
@@ -149,7 +146,7 @@ findFeaturesOpenMS <- function(analysisInfo, noiseThrInt = 1000, chromSNR = 3, c
             saveCacheData("featuresOpenMS", fts, cmd$hash)
 
             return(fts)
-        }, maxProcAmount = maxProcAmount, showProgress = verbose)
+        }, showProgress = verbose)
     }
 
     if (length(cachedResults) > 0)

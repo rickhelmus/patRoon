@@ -159,12 +159,12 @@ executeMultiProcessClassic <- function(commandQueue, finishHandler,
                                        prepareHandler = NULL,
                                        procTimeout = NULL, printOutput = FALSE, printError = FALSE,
                                        showProgress = TRUE, waitTimeout = 50,
-                                       maxProcAmount = getOption("patRoon.maxProcAmount"),
                                        batchSize = 1, delayBetweenProc = 0)
 {
     if (length(commandQueue) == 0)
         return(list())
     
+    maxProcAmount <- getOption("patRoon.maxProcAmount")
     runningProcs <- vector("list", maxProcAmount)
     runningProcInfo <- vector("list", maxProcAmount)
     

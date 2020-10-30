@@ -90,8 +90,7 @@ listMSFiles <- function(dirs, from)
     return(filterMSFileDirs(files, from))
 }
 
-convertMSFilesPWiz <- function(inFiles, outFiles, to, centroid, filters, extraOpts, PWizBatchSize,
-                               logPath, maxProcAmount)
+convertMSFilesPWiz <- function(inFiles, outFiles, to, centroid, filters, extraOpts, PWizBatchSize)
 {
     if (centroid != FALSE)
     {
@@ -144,12 +143,12 @@ convertMSFilesPWiz <- function(inFiles, outFiles, to, centroid, filters, extraOp
         })
     }
 
-    executeMultiProcess(cmdQueue, function(cmd) {}, maxProcAmount = maxProcAmount)
+    executeMultiProcess(cmdQueue, function(cmd) {})
 
     invisible(NULL)
 }
 
-convertMSFilesOpenMS <- function(inFiles, outFiles, to, extraOpts, logPath, maxProcAmount)
+convertMSFilesOpenMS <- function(inFiles, outFiles, to, extraOpts)
 {
     mainArgs <- c()
     if (!is.null(extraOpts))
@@ -164,7 +163,7 @@ convertMSFilesOpenMS <- function(inFiles, outFiles, to, extraOpts, logPath, maxP
                     args = c("-in", inFiles[fi], "-out", outFiles[fi], mainArgs)))
     })
 
-    executeMultiProcess(cmdQueue, function(cmd) {}, maxProcAmount = maxProcAmount)
+    executeMultiProcess(cmdQueue, function(cmd) {})
 
     invisible(NULL)
 }
@@ -296,9 +295,7 @@ convertMSFiles <- function(files = NULL, outPath = NULL, dirs = TRUE,
                            anaInfo = NULL, from = NULL, to = "mzML",
                            overWrite = FALSE, algorithm = "pwiz",
                            centroid = algorithm != "openms",
-                           filters = NULL, extraOpts = NULL, PWizBatchSize = 1,
-                           logPath = file.path("log", "convert"),
-                           maxProcAmount = getOption("patRoon.maxProcAmount"))
+                           filters = NULL, extraOpts = NULL, PWizBatchSize = 1)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertCharacter(files, min.len = 1, min.chars = 1, null.ok = !is.null(anaInfo), add = ac)
@@ -314,7 +311,6 @@ convertMSFiles <- function(files = NULL, outPath = NULL, dirs = TRUE,
     checkmate::assertCharacter(filters, min.chars = 1, null.ok = TRUE, add = ac)
     checkmate::assertCharacter(extraOpts, null.ok = TRUE, add = ac)
     checkmate::assertCount(PWizBatchSize, add = ac)
-    assertMultiProcArgs(logPath, maxProcAmount, add = ac)
     checkmate::reportAssertions(ac)
 
     if (centroid != FALSE && algorithm == "openms")
@@ -395,9 +391,9 @@ convertMSFiles <- function(files = NULL, outPath = NULL, dirs = TRUE,
         output <- output[keepFiles]
 
         if (algorithm == "pwiz")
-            convertMSFilesPWiz(files, output, to, centroid, filters, extraOpts, PWizBatchSize, logPath, maxProcAmount)
+            convertMSFilesPWiz(files, output, to, centroid, filters, extraOpts, PWizBatchSize)
         else if (algorithm == "openms")
-            convertMSFilesOpenMS(files, output, to, extraOpts, logPath, maxProcAmount)
+            convertMSFilesOpenMS(files, output, to, extraOpts)
         else # bruker
             convertMSFilesBruker(files, output, to, centroid)
     }

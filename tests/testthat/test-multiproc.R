@@ -14,8 +14,12 @@ px <- paste0(
 # further: different amount of maxprocs? check output/error (is this actually used?)
 
 performMPTest <- function(len, fail = numeric(), timeout = numeric(), failFirst = FALSE, delay = FALSE,
-                          errorHandler = function(...) FALSE, timeoutHandler = function(...) FALSE, ...)
+                          errorHandler = function(...) FALSE, timeoutHandler = function(...) FALSE,
+                          maxProcAmount = NULL, ...)
 {
+    if (!is.null(maxProcAmount))
+        withr::local_options(list(patRoon.maxProcAmount = maxProcAmount))
+    
     if (Sys.info()[["sysname"]] == "Windows")
     {
         shFile <- tempfile("makefile", fileext = ".bat")

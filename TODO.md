@@ -63,6 +63,7 @@
     - batch mode
     - logging --> return stdout/stderr from run()
     - printOutput, eg for SIRIUS
+    - showProgress
 - changes
     - logging done in executeMultiProc()
     - caching done in executeMultiProc()
@@ -70,7 +71,14 @@
     - configure "engine" through options() --> "classic" and "future"
         - let executeMultiProc() handle general things like caching and logging
     - somehow let user set future.apply scheduling and chunk.size options, probably through options()
-- write vignette or handbook chapter
+    - logging:
+        - enabled through an option
+        - check all uses of logPath and only pass fixed subdirs
+- default GenForm to classic?
+- docs
+    - write vignette or handbook chapter
+    - update sirius-args.R (mention maxProcAmount)
+    - update handbook etc for maxProcAmount
 - tests
 
 

@@ -70,7 +70,7 @@ prepareReportPath <- function(path, clear)
     mkdirp(path)
 }
 
-optimizePngPlots <- function(plotFiles, maxProcAmount)
+optimizePngPlots <- function(plotFiles)
 {
     plotsPerBlock <- 50
     blocks <- ceiling(length(plotFiles) / plotsPerBlock)
@@ -97,7 +97,7 @@ optimizePngPlots <- function(plotFiles, maxProcAmount)
         qplots <- paste0(tools::file_path_sans_ext(plots), "-fs8.png")
         qexist <- file.exists(qplots)
         file.rename(qplots[qexist], plots[qexist])
-    }, maxProcAmount = maxProcAmount)
+    })
 
     invisible(NULL)
 }
@@ -781,9 +781,6 @@ setMethod("reportPDF", "featureGroups", function(fGroups, path, reportFGroups,
 #' @param optimizePng If \code{TRUE} then \command{pngquant} is used to reduce
 #'   the size of generated graphics. A signficant reduction in disk space usage
 #'   may be seen, however, at the cost additional processing time.
-#' @param maxProcAmount Maximum amount of \command{pngquant} commands to run in
-#'   parallel. Higher numbers will decrease processing time, with an optimum
-#'   usually close to the amount of CPU cores.
 #' @param openReport If set to \code{TRUE} then the output report file will be
 #'   opened with the system browser.
 #' @param noDate If \code{TRUE} then the current date is not added to the
@@ -805,7 +802,7 @@ setMethod("reportHTML", "featureGroups", function(fGroups, path, reportPlots, fo
                                                   compsCluster, includeMFWebLinks, components, interactiveHeat,
                                                   MSPeakLists, retMin, EICRtWindow, EICMzWindow,
                                                   EICTopMost, EICOnlyPresent, selfContained,
-                                                  optimizePng, maxProcAmount, clearPath, openReport, noDate)
+                                                  optimizePng, clearPath, openReport, noDate)
 {
     # UNDONE: mention pandoc win limits
 
@@ -826,7 +823,6 @@ setMethod("reportHTML", "featureGroups", function(fGroups, path, reportPlots, fo
            positive = TRUE, null.ok = TRUE, fixed = list(add = ac))
     checkmate::assertChoice(includeMFWebLinks, c("compounds", "MSMS", "none"), add = ac)
     aapply(checkmate::assertNumber, . ~ EICRtWindow + EICMzWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
-    checkmate::assertCount(maxProcAmount, positive = TRUE, add = ac)
     checkmate::reportAssertions(ac)
 
     if (length(fGroups) == 0)
@@ -884,8 +880,7 @@ setMethod("reportHTML", "featureGroups", function(fGroups, path, reportPlots, fo
                     compoundsExclNormScores = compoundsExclNormScores,
                     compoundsOnlyUsedScorings = compoundsOnlyUsedScorings,
                     components = components, interactiveHeat = interactiveHeat, selfContained = selfContained,
-                    optimizePng = optimizePng, maxProcAmount = maxProcAmount,
-                    noDate = noDate)
+                    optimizePng = optimizePng, noDate = noDate)
 
     # HACK: not sure what exactly happens here, but... kableExtra adds latex
     # dependencies by default, which then may cause serious memory leakage when

@@ -69,7 +69,7 @@ makeGenFormCmdQueue <- function(gfBin, mainArgs, groupPeakLists, workFiles, hash
 }
 
 runGenForm <- function(gfBin, mainArgs, featMZs, groupPeakLists, MSMode, isolatePrec,
-                       hashes, cachedSet, workFiles, gNames, adduct, topMost, maxProcAmount,
+                       hashes, cachedSet, workFiles, gNames, adduct, topMost,
                        batchSize, timeout, ana)
 {
     cacheDB <- openCacheDBScope()
@@ -133,7 +133,7 @@ runGenForm <- function(gfBin, mainArgs, featMZs, groupPeakLists, MSMode, isolate
                           if (!is.null(ana)) sprintf("(analysis '%s')", ana) else ""),
                     call. = FALSE)
             return(FALSE)
-        }, maxProcAmount = maxProcAmount, waitTimeout = 10, batchSize = batchSize,
+        }, waitTimeout = 10, batchSize = batchSize,
         procTimeout = timeout)
     }
 
@@ -300,7 +300,7 @@ generateFormulasGenForm <- function(fGroups, MSPeakLists, relMzDev = 5, adduct =
                                     elements = "CHNOP", hetero = TRUE, oc = FALSE, extraOpts = NULL,
                                     calculateFeatures = TRUE, featThreshold = 0.75, MSMode = "both",
                                     isolatePrec = TRUE, timeout = 120, topMost = 50,
-                                    maxProcAmount = getOption("patRoon.maxProcAmount"), batchSize = 8)
+                                    batchSize = 8)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
@@ -312,7 +312,7 @@ generateFormulasGenForm <- function(fGroups, MSPeakLists, relMzDev = 5, adduct =
     checkmate::assertChoice(MSMode, c("ms", "msms", "both"), add = ac)
     checkmate::assertCharacter(extraOpts, null.ok = TRUE, add = ac)
     checkmate::assertCount(topMost, positive = TRUE, add = ac)
-    aapply(checkmate::assertCount, . ~ maxProcAmount + batchSize, positive = TRUE, fixed = list(add = ac))
+    checkmate::assertCount(batchSize, positive = TRUE, add = ac)
 
     if (!is.logical(isolatePrec))
          assertPListIsolatePrecParams(isolatePrec, add = ac)
@@ -368,8 +368,7 @@ generateFormulasGenForm <- function(fGroups, MSPeakLists, relMzDev = 5, adduct =
             printf("Loading all formulas...\n")
 
         forms <- runGenForm(gfBin, mainArgs, featMZs, groupPeakLists, MSMode, isolatePrec,
-                            hashes, cachedSet, workFiles, gNames, adduct, topMost,
-                            maxProcAmount, batchSize, timeout, ana)
+                            hashes, cachedSet, workFiles, gNames, adduct, topMost, batchSize, timeout, ana)
 
         printf("Loaded %d formulas for %d %s (%.2f%%).\n", countUniqueFormulas(forms), length(forms),
                if (!is.null(ana)) "features" else "feature groups",

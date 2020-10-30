@@ -122,8 +122,7 @@ generateCompoundsSIRIUS <- function(fGroups, MSPeakLists, relMzDev = 5, adduct =
                                     profile = "qtof", formulaDatabase = NULL, fingerIDDatabase = "pubchem",
                                     noise = NULL, errorRetries = 2, cores = NULL, topMost = 100, topMostFormulas = 5,
                                     extraOptsGeneral = NULL, extraOptsFormula = NULL, verbose = TRUE,
-                                    SIRBatchSize = 0, logPath = file.path("log", "sirius_compounds"),
-                                    maxProcAmount = getOption("patRoon.maxProcAmount"))
+                                    SIRBatchSize = 0)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
@@ -138,7 +137,6 @@ generateCompoundsSIRIUS <- function(fGroups, MSPeakLists, relMzDev = 5, adduct =
     aapply(checkmate::assertCharacter, . ~ extraOptsGeneral + extraOptsFormula, null.ok = TRUE, fixed = list(add = ac))
     checkmate::assertFlag(verbose, add = ac)
     checkmate::assertCount(SIRBatchSize, add = ac)
-    assertMultiProcArgs(logPath, maxProcAmount, add = ac)
     checkmate::reportAssertions(ac)
 
     adduct <- checkAndToAdduct(adduct)
@@ -152,7 +150,7 @@ generateCompoundsSIRIUS <- function(fGroups, MSPeakLists, relMzDev = 5, adduct =
                         formulaDatabase, noise, cores, TRUE, fingerIDDatabase, topMost, extraOptsGeneral, extraOptsFormula,
                         verbose, "compoundsSIRIUS", processSIRIUSCompounds,
                         list(database = fingerIDDatabase, topMost = topMost),
-                        SIRBatchSize, logPath, maxProcAmount)
+                        SIRBatchSize)
     
     # prune empty/NULL results
     if (length(results) > 0)

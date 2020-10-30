@@ -244,7 +244,7 @@ close(prog)
 
 ap <- unlist(allPlots); ap <- ap[nzchar(ap)]
 if (rmdVars$optimizePng && length(ap > 0))
-    optimizePngPlots(ap, rmdVars$maxProcAmount)
+    optimizePngPlots(ap)
 
 if (rmdVars$selfContained)
 {

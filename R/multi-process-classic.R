@@ -181,8 +181,18 @@ executeMultiProcessClassic <- function(commandQueue, finishHandler,
     nextCommand <- 1
     finishedCommands <- 0
     lastCommandTime <- 0 # at which time (in ms) the last command was started
+
+    logPath <- getOption("patRoon.logPath", FALSE)
+    if (!is.null(logSubDir) && !isFALSE(logPath))
+    {
+        logPath <- file.path(logPath, logSubDir)
+        mkdirp(logPath)
+        commandQueue <- lapply(commandQueue, function(cmd) { cmd$logFile <- file.path(logPath, logFile); return(cmd) })
+    }
+    else
+        logPath <- NULL
+    doLog <- !is.null(logPath)
     
-    doLog <- any(sapply(commandQueue, function(q) !is.null(q$logFile)))
     stopifnot(batchSize == 1 || (!doLog && !printOutput && !printError))
     
     # clear up stale processes: see https://github.com/r-lib/processx/issues/171

@@ -64,10 +64,10 @@
     - logging --> return stdout/stderr from run()
     - printOutput, eg for SIRIUS
     - showProgress
+    - waitTimeout/delayBetweenProc?
 - changes
     - logging done in executeMultiProc()
     - caching done in executeMultiProc()
-    - remove logPath and maxProcAmount arguments to specific functions
     - configure "engine" through options() --> "classic" and "future"
         - let executeMultiProc() handle general things like caching and logging
     - somehow let user set future.apply scheduling and chunk.size options, probably through options()

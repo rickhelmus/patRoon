@@ -551,7 +551,7 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
         mfSettings <- modifyList(mfSettings, extraOpts)
     }
 
-    cacheDB <- NULL #openCacheDBScope() UNDONE! see https://github.com/HenrikBengtsson/globals/issues/66
+    cacheDB <- openCacheDBScope()
     setHash <- makeHash(fGroups, pLists, method, mfSettings, topMost, identifiers)
     cachedSet <- loadCacheSet("compoundsMetFrag", setHash, cacheDB)
     resultHashes <- vector("character", length(gNames))
@@ -581,9 +581,9 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", logPat
         {
             results <- executeMultiProcessF(runData, finishHandler = function(cmd)
             {
-                comptab <- fread(cmd$outFile, colClasses = c(Identifier = "character"))
+                comptab <- data.table::fread(cmd$outFile, colClasses = c(Identifier = "character"))
                 procres <- processMFResults(comptab, cmd$spec, adduct, database, topMost, cmd$stderrFile)
-                saveCacheData("compoundsMetFrag", procres, cmd$hash, cacheDB)
+                # saveCacheData("compoundsMetFrag", procres, cmd$hash, cacheDB) # UNDONE
                 return(procres)
             }, timeoutHandler = function(cmd, retries)
             {

@@ -165,7 +165,7 @@ doProcFuture <- function(commandQueue, finishHandler, timeoutHandler, errorHandl
     # UNDONE: printOutput/printError not here?
     
     {
-        withr::local_tempfile("sucDir")
+        sucDir <- withr::local_tempfile()
         dir.create(sucDir)
         
         if (!is.null(prepareHandler))
@@ -291,15 +291,18 @@ executeMultiProcessF <- function(commandQueue, finishHandler,
     }
     else if (F)
     {
-        # executeMultiProcessNP(commandQueue = commandQueue,
+        # executeMultiProcess(commandQueue = commandQueue,
         #                       finishHandler = finishHandler, timeoutHandler = timeoutHandler,
         #                       errorHandler = errorHandler, prepareHandler = prepareHandler, procTimeout = procTimeout,
         #                       printOutput = printOutput, printError = printError, showProgress = showProgress,
-        #                       waitTimeout = waitTimeout, maxProcAmount = maxProcAmount, batchSize = batchSize,
+        #                       waitTimeout = waitTimeout, maxProcAmount = 4, batchSize = batchSize,
         #                       delayBetweenProc = delayBetweenProc)
         
         n <- future::nbrOfWorkers() # UNDONE: configurable? check for Inf (docs state it may be, then default to 1?)
-        chunks <- split(commandQueue, cut(seq_along(commandQueue), n, labels = FALSE))
+        if (n == 1)
+            chunks <- list(commandQueue)
+        else
+            chunks <- split(commandQueue, cut(seq_along(commandQueue), n, labels = FALSE))
         args <- list(finishHandler = finishHandler, timeoutHandler = timeoutHandler,
                      errorHandler = errorHandler, prepareHandler = prepareHandler, procTimeout = procTimeout,
                      printOutput = printOutput, printError = printError, showProgress = showProgress,
@@ -310,16 +313,54 @@ executeMultiProcessF <- function(commandQueue, finishHandler,
         ret <- do.call(future.apply::future_lapply, c(list(chunks, executeMultiProcess), args))
         return(unlist(unname(ret), recursive = FALSE))
     }
-    else
+    else if (FALSE)
     {
-        if (!is.null(maxProcAmount))
-            args <- c(args, maxProcAmount = maxProcAmount) # UNDONE?
         ret <- future.apply::future_lapply(commandQueue, function(cmd)
         {
             doProcFuture(list(cmd), finishHandler, timeoutHandler, errorHandler, prepareHandler,
                          procTimeout, printOutput, printError, waitTimeout, delayBetweenProc)
-        }, future.scheduling = 1.0)
+        }, future.scheduling = 4.0)
         return(unlist(unname(ret), recursive = FALSE))
+    }
+    else
+    {
+        ret <- future.apply::future_lapply(commandQueue, function(cmd)
+        {
+            if (!is.null(prepareHandler))
+                cmd <- prepareHandler(list(cmd))[[1]] # UNDONE
+            timeoutRetries <- errorRetries <- 0
+            while (TRUE)
+            {
+                stat <- processx::run(cmd$command, cmd$args, error_on_status = FALSE,
+                                      timeout = procTimeout, cleanup_tree = TRUE)
+                
+                if (!is.null(cmd$logFile))
+                {
+                    tryCatch({
+                        fprintf(cmd$logFile, "command: %s\nargs: %s\n", cmd$command, paste0(cmd$args, collapse = " "))
+                        fprintf(cmd$logFile, "\n---\n\noutput:\n%s\n\nstandard error output:\n%s\n",
+                                stat$stdout, stat$stderr, append = TRUE)
+                    }, error = function(e) "")
+                }
+                
+                if (stat$timeout)
+                {
+                    if (!timeoutHandler(cmd = cmd, retries = errorRetries))
+                        break
+                    timeoutRetries <- timeoutRetries + 1
+                }
+                else if (stat$status != 0)
+                {
+                    if (!errorHandler(cmd = cmd, exitStatus = stat$status, retries = errorRetries))
+                        break
+                    errorRetries <- errorRetries + 1
+                }
+                else # success
+                    return(finishHandler(cmd))
+                        
+            }
+        }, future.scheduling = 1.0)
+        return(ret)
     }
 }
 
@@ -395,6 +436,10 @@ executeMultiProcess <- function(commandQueue, finishHandler,
 
     runningProcs <- vector("list", maxProcAmount)
     runningProcInfo <- vector("list", maxProcAmount)
+    
+    if (!is.null(prepareHandler))
+        commandQueue <- prepareHandler(commandQueue)
+    
     totCmdCount <- length(commandQueue)
 
     ret <- vector("list", totCmdCount)
@@ -450,9 +495,6 @@ executeMultiProcess <- function(commandQueue, finishHandler,
     # reading process output might fail sometimes(?)
     emptyStrOnErr <- function(expr) tryCatch(expr, error = function(e) "")
     
-    if (!is.null(prepareHandler))
-        commandQueue <- prepareHandler(commandQueue)
-
     while (nextCommand <= totCmdCount || any(sapply(runningProcInfo, function(rp) !is.null(rp) && rp$running)))
     {
         for (pi in seq_along(runningProcs))

@@ -21,7 +21,7 @@ doSIRIUS <- !is.null(getOption("patRoon.path.SIRIUS")) && nzchar(getOption("patR
 
 callMF <- function(fGroups, plists, db = mfTestDBPath, to = 300)
 {
-    generateCompounds(fGroups, plists, "metfrag", logPath = NULL,
+    generateCompounds(fGroups, plists, "metfrag",
                       adduct = "[M+H]+", timeout = to,
                       database = "csv", scoreTypes = "fragScore",
                       extraOpts = list(LocalDatabasePath = db))
@@ -37,9 +37,9 @@ if (doMetFrag)
 
 if (doSIRIUS)
 {
-    compsSIR <- generateCompounds(fGroupsSub, plists, "sirius", logPath = NULL)
-    compsSIREmpty <- generateCompounds(fGroupsEmpty, plistsEmpty, "sirius", logPath = NULL)
-    compsSIREmptyPL <- generateCompounds(fGroupsSub, plistsEmpty, "sirius", logPath = NULL)
+    compsSIR <- generateCompounds(fGroupsSub, plists, "sirius")
+    compsSIREmpty <- generateCompounds(fGroupsEmpty, plistsEmpty, "sirius")
+    compsSIREmptyPL <- generateCompounds(fGroupsSub, plistsEmpty, "sirius")
 }
 
 test_that("verify MetFragCL compound generation", {
@@ -59,7 +59,7 @@ test_that("verify SIRIUS compound generation", {
     expect_known_show(compsSIR, testFile("compounds-sir", text = TRUE))
     expect_length(compsSIREmpty, 0)
     expect_length(compsSIREmptyPL, 0)
-    expect_length(generateCompounds(fGroupsSub, plistsEmptyMS, "sirius", logPath = NULL), 0)
+    expect_length(generateCompounds(fGroupsSub, plistsEmptyMS, "sirius"), 0)
 })
 
 hasCompounds <- doMetFrag || doSIRIUS

@@ -14,3 +14,4 @@ if (doDATests())
 }
 
 options(datatable.auto.index = FALSE) # should make tests more reproducible
+options(patRoon.logPath = FALSE)

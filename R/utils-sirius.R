@@ -136,9 +136,6 @@ runSIRIUS <- function(precursorMZs, MSPLists, MSMSPLists, profile, adduct, ppmMa
                       extraOptsGeneral, extraOptsFormula, verbose, isPre44,
                       SIRBatchSize)
 {
-    if (!is.null(logPath))
-        mkdirp(logPath)
-    
     ionization <- as.character(adduct, format = "sirius")
     cmpName <- "unknownCompound"
     
@@ -198,14 +195,15 @@ runSIRIUS <- function(precursorMZs, MSPLists, MSMSPLists, profile, adduct, ppmMa
         })
         
         bArgs <- if (isPre44) c(args, "-o", outPath, inPath) else c("-i", inPath, "-o", outPath, args)
-        logf <- if (!is.null(logPath)) file.path(logPath, paste0("sirius-batch_", bi, ".txt")) else NULL
+        logf <- paste0("sirius-batch_", bi, ".txt")
         
         return(list(command = command, args = bArgs, logFile = logf, outPath = outPath, msFNames = msFNames))
     })
     
     singular <- length(cmdQueue) == 1
     executeMultiProcess(cmdQueue, printOutput = verbose && singular, printError = verbose && singular,
-                        showProgress = !singular, finishHandler = function(...) NULL)
+                        showProgress = !singular, finishHandler = function(...) NULL,
+                        logSubDir = paste0("sirius_", if (withFingerID) "compounds" else "formulas"))
     
     return(list(outPaths = unlist(lapply(cmdQueue, function(cmd) rep(cmd$outPath, length(cmd$msFNames))), use.names = FALSE),
                 msFNames = unlist(lapply(cmdQueue, "[[", "msFNames"), use.names = FALSE),

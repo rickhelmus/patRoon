@@ -613,8 +613,6 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", timeou
                              cmd$gName, exitStatus, cmd$logFile))
             }, prepareHandler = function(cmd)
             {
-                if (!is.null(logPath))
-                    mkdirp(logPath)
                 mfBin <- path.expand(getOption("patRoon.path.MetFragCL"))
                 if (is.null(mfBin) || !nzchar(mfBin) || !file.exists(mfBin))
                     stop("Please set the 'MetFragCL' option with a (correct) path to the MetFrag CL jar file. Example: options(patRoon.path.MetFragCL = \"C:/MetFrag2.4.5-CL.jar\")")
@@ -622,9 +620,9 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", timeou
                 if (!nzchar(Sys.which("java")))
                     stop("Please make sure that java is installed and its location is correctly set in PATH.")
                 
-                logf <- if (!is.null(logPath)) file.path(logPath, paste0("mfcl-", cmd$gName, ".txt")) else NULL
+                logf <- paste0("mfcl-", cmd$gName, ".txt")
                 return(c(cmd, initMetFragCLCommand(cmd$mfSettings, cmd$spec, mfBin, logf)))
-            }, procTimeout = timeout, delayBetweenProc = 1000)
+            }, procTimeout = timeout, delayBetweenProc = 1000, logSubDir = "metfrag")
         }
         else
         {

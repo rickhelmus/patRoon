@@ -64,8 +64,9 @@ defMultiProcErrorHandler <- function(cmd, exitStatus, ...)
 executeMultiProcess <- function(commandQueue, finishHandler,
                                 timeoutHandler = function(...) TRUE,
                                 errorHandler = defMultiProcErrorHandler,
-                                prepareHandler = NULL,
-                                procTimeout = NULL, printOutput = FALSE, printError = FALSE,
+                                prepareHandler = NULL, procTimeout = NULL,
+                                printOutput = FALSE, printError = FALSE,
+                                logSubDir = NULL,
                                 showProgress = TRUE, waitTimeout = 50,
                                 batchSize = 1, delayBetweenProc = 0)
 {

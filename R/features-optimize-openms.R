@@ -28,15 +28,7 @@ featuresOptimizerOpenMS$methods(
     {
         return(fixOptParamRange(params, list(c("minFWHM", "maxFWHM"),
                                              c("minTraceLength", "maxTraceLength"))))
-    },
-
-    convertOptToCallParams = function(params)
-    {
-        # logging won't make a lot of sense (constantly overwritten during experiments)
-        params <- c(params, list(logPath = NULL)) # NOTE: wrap in list to be able to assign
-        return(params)
     }
-
 )
 
 generateFeatureOptPSetOpenMS <- function(...)

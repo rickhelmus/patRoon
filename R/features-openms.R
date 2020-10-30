@@ -118,7 +118,7 @@ findFeaturesOpenMS <- function(analysisInfo, noiseThrInt = 1000, chromSNR = 3, c
         hash <- makeHash(makeFileHash(dfile), paramsHash)
         cmd <- do.call(getOpenMSFFCommand, c(list(dfile, ffile), params))
 
-        logf <- if (!is.null(logPath)) file.path(logPath, paste0("ffm-", analysisInfo$analysis[anai], ".txt")) else NULL
+        logf <- paste0("ffm-", analysisInfo$analysis[anai], ".txt")
 
         return(c(list(hash = hash, dataFile = dfile, featFile = ffile, logFile = logf), cmd))
     })
@@ -131,9 +131,6 @@ findFeaturesOpenMS <- function(analysisInfo, noiseThrInt = 1000, chromSNR = 3, c
     fList <- list()
     if (length(cmdQueue) > 0)
     {
-        if (!is.null(logPath))
-            mkdirp(logPath)
-
         fList <- executeMultiProcess(cmdQueue, function(cmd, ...)
         {
             fts <- importFeatureXML(cmd$featFile)
@@ -146,7 +143,7 @@ findFeaturesOpenMS <- function(analysisInfo, noiseThrInt = 1000, chromSNR = 3, c
             saveCacheData("featuresOpenMS", fts, cmd$hash)
 
             return(fts)
-        }, showProgress = verbose)
+        }, showProgress = verbose, logSubDir = "openms")
     }
 
     if (length(cachedResults) > 0)

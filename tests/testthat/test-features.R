@@ -5,7 +5,7 @@ initXCMS()
 anaInfo <- getTestAnaInfo()[1:3, ]
 anaInfoOne <- getTestAnaInfo()[4, ]
 
-ffOpenMS <- findFeatures(anaInfo, "openms", logPath = NULL)
+ffOpenMS <- findFeatures(anaInfo, "openms")
 ffXCMS <- findFeatures(anaInfoOne, "xcms")
 ffXCMS3 <- findFeatures(anaInfoOne, "xcms3")
 
@@ -17,7 +17,7 @@ exDataFiles <- list.files(patRoonData::exampleDataPath(), "\\.mzML$", full.names
 epAnaInfo <- makeMZXMLs(anaInfoOne)
 ffEP <- findFeatures(epAnaInfo, "envipick")
 
-ffEmpty <- findFeatures(anaInfoOne, "openms", noiseThrInt = 1E9, logPath = NULL)
+ffEmpty <- findFeatures(anaInfoOne, "openms", noiseThrInt = 1E9)
 
 if (doDATests())
 {
@@ -39,7 +39,7 @@ test_that("verify feature finder output", {
     
     # extraOpts
     expect_equal(OpenMSFTable(ffOpenMS),
-                 OpenMSFTable(findFeatures(anaInfo, "openms", logPath = NULL,
+                 OpenMSFTable(findFeatures(anaInfo, "openms",
                                            extraOpts = list("-algorithm:common:noise_threshold_int" = 1000))))
 
     skip_if_not(doDATests())

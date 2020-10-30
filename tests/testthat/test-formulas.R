@@ -22,10 +22,10 @@ formsGFMS <- generateFormulas(fGroups, "genform", plists, MSMode = "ms")
 
 if (doSIRIUS)
 {
-    formsSIR <- generateFormulas(fGroups, "sirius", plists, logPath = NULL, calculateFeatures = FALSE)
-    formsSIREmpty <- generateFormulas(fGroupsEmpty, "sirius", plistsEmpty, logPath = NULL)
-    formsSIREmptyPL <- generateFormulas(fGroups, "sirius", plistsEmpty, logPath = NULL)
-    formsSIREmptyPLMS <- generateFormulas(fGroups, "sirius", plistsEmptyMS, logPath = NULL)
+    formsSIR <- generateFormulas(fGroups, "sirius", plists, calculateFeatures = FALSE)
+    formsSIREmpty <- generateFormulas(fGroupsEmpty, "sirius", plistsEmpty)
+    formsSIREmptyPL <- generateFormulas(fGroups, "sirius", plistsEmpty)
+    formsSIREmptyPLMS <- generateFormulas(fGroups, "sirius", plistsEmptyMS)
 }
 
 if (doDATests())

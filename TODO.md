@@ -73,12 +73,15 @@
     - somehow let user set future.apply scheduling and chunk.size options, probably through options()
     - logging:
         - enabled through an option
-        - check all uses of logPath and only pass fixed subdirs
+        - implement in engines
+        - somehow disable for featuresOptimizerOpenMS
 - default GenForm to classic?
 - docs
     - write vignette or handbook chapter
     - update sirius-args.R (mention maxProcAmount)
     - update handbook etc for maxProcAmount
+    - patRoon.logPath
+    - update ref docus for executeMultiProcess
 - tests
 
 

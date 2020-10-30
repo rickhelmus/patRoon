@@ -9,8 +9,7 @@ if (hasMetfrag)
     plists <- generateMSPeakLists(fGroups, "mzr")
     compounds <- generateCompounds(fGroups, plists, "metfrag", adduct = "[M+H]+",
                                    database = "csv", scoreTypes = "fragScore",
-                                   extraOpts = list(LocalDatabasePath = file.path(getTestDataPath(), "test-mf-db-isomers.csv")),
-                                   logPath = NULL)
+                                   extraOpts = list(LocalDatabasePath = file.path(getTestDataPath(), "test-mf-db-isomers.csv")))
     compsClust <- makeHCluster(compounds)
     firstGroup <- names(clusters(compsClust))[1]
 

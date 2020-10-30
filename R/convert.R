@@ -126,7 +126,7 @@ convertMSFilesPWiz <- function(inFiles, outFiles, to, centroid, filters, extraOp
         {
             input <- tempfile("msconvert")
             cat(inFiles[batches[[bi]]], sep = "\n", file = input)
-            logf <- if (!is.null(logPath)) file.path(logPath, paste0("pwiz-batch_", bi, ".txt")) else NULL
+            logf <- paste0("pwiz-batch_", bi, ".txt")
             # UNDONE: unlike PWizBatchSize==1 we don't (can't) set output file names here, is this a problem?
             return(list(logFile = logf, command = msc, args = c("-f", input,  "-o", outDir, mainArgs)))
         })
@@ -136,14 +136,14 @@ convertMSFilesPWiz <- function(inFiles, outFiles, to, centroid, filters, extraOp
         cmdQueue <- lapply(seq_along(inFiles), function(fi)
         {
             basef <- basename(tools::file_path_sans_ext(inFiles[fi]))
-            logf <- if (!is.null(logPath)) file.path(logPath, paste0("pwiz-", basef, ".txt")) else NULL
+            logf <- paste0("pwiz-", basef, ".txt")
             return(list(logFile = logf, command = msc,
                         args = c(inFiles[fi], "--outfile", outFiles[fi],
                                  "-o", dirname(outFiles[fi]), mainArgs)))
         })
     }
 
-    executeMultiProcess(cmdQueue, function(cmd) {})
+    executeMultiProcess(cmdQueue, function(cmd) {}, logSubDir = "convert")
 
     invisible(NULL)
 }
@@ -158,12 +158,12 @@ convertMSFilesOpenMS <- function(inFiles, outFiles, to, extraOpts)
     cmdQueue <- lapply(seq_along(inFiles), function(fi)
     {
         basef <- basename(tools::file_path_sans_ext(inFiles[fi]))
-        logf <- if (!is.null(logPath)) file.path(logPath, paste0("openms-", basef, ".txt")) else NULL
+        logf <- paste0("openms-", basef, ".txt")
         return(list(logFile = logf, command = msc,
                     args = c("-in", inFiles[fi], "-out", outFiles[fi], mainArgs)))
     })
 
-    executeMultiProcess(cmdQueue, function(cmd) {})
+    executeMultiProcess(cmdQueue, function(cmd) {}, logSubDir = "convert")
 
     invisible(NULL)
 }
@@ -363,8 +363,6 @@ convertMSFiles <- function(files = NULL, outPath = NULL, dirs = TRUE,
         outPath <- dirname(files)
 
     mkdirp(outPath)
-    if (!is.null(logPath))
-        mkdirp(logPath)
 
     # NOTE: use normalizePath() here to convert to backslashes on Windows: needed by msconvert
     outPath <- normalizePath(rep(outPath, length.out = length(files)), mustWork = TRUE)

@@ -2,7 +2,7 @@ context("feature groups")
 
 initXCMS()
 
-fList <- findFeatures(getTestAnaInfo(), "openms", logPath = NULL)
+fList <- findFeatures(getTestAnaInfo(), "openms")
 fgOpenMS <- groupFeatures(fList, "openms")
 fgXCMS <- groupFeatures(fList, "xcms")
 fgXCMS3 <- groupFeatures(fList, "xcms3")
@@ -11,10 +11,10 @@ fgXCMS3 <- groupFeatures(fList, "xcms3")
 anaInfoConc <- cbind(getTestAnaInfo(), list(conc = c(NA, NA, NA, 1, 2, 3)))
 # modify replicate groups so we can test averaging
 anaInfoConc$group[grepl("standard", anaInfoConc$group)] <- c("standard-1", "standard-2", "standard-2")
-fListConc <- findFeatures(anaInfoConc, "openms", logPath = NULL)
+fListConc <- findFeatures(anaInfoConc, "openms")
 fgOpenMSConc <- groupFeatures(fListConc, "openms")
 
-fListEmpty <- findFeatures(getTestAnaInfo(), "openms", noiseThrInt = 1E9, logPath = NULL)
+fListEmpty <- findFeatures(getTestAnaInfo(), "openms", noiseThrInt = 1E9)
 fgOpenMSEmpty <- groupFeatures(fListEmpty, "openms")
 fgXCMSEmpty <- groupFeatures(fListEmpty, "xcms")
 fgXCMS3Empty <- groupFeatures(fListEmpty, "xcms3")

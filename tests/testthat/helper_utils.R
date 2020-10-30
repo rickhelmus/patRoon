@@ -4,7 +4,7 @@ testFile <- function(f, ..., text = FALSE) file.path(getTestDataPath(), paste0(f
 getTestAnaInfo <- function(path = patRoonData::exampleDataPath()) generateAnalysisInfo(path,
                                                                                        groups = c(rep("solvent", 3), rep("standard", 3)),
                                                                                        blanks = "solvent")
-getTestFGroups <- function(anaInfo = getTestAnaInfo(), ...) groupFeatures(findFeatures(anaInfo, "openms", logPath = NULL, ...), "openms")
+getTestFGroups <- function(anaInfo = getTestAnaInfo(), ...) groupFeatures(findFeatures(anaInfo, "openms", ...), "openms")
 getEmptyTestFGroups <- function() getTestFGroups()[, "none"]
 getEmptyPLists <- function() MSPeakLists(algorithm = "none")
 
@@ -45,7 +45,7 @@ doDATests <- function() !is.null(getOption("patRoon.test.DAAnalyses"))
 makeMZXMLs <- function(anaInfo)
 {
     convertMSFiles(anaInfo = anaInfo, from = "mzML", outPath = getWorkPath(), to = "mzXML",
-                   algorithm = "openms", logPath = NULL)
+                   algorithm = "openms")
     anaInfo$path <- getWorkPath()
     return(anaInfo)
 }

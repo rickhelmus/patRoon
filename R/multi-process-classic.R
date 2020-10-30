@@ -154,12 +154,11 @@ maybeRestartCommand <- function(commandQueue, procInfo, sucDir, exitStatus, time
 }
 
 executeMultiProcessClassic <- function(commandQueue, finishHandler,
-                                       timeoutHandler = function(...) TRUE,
-                                       errorHandler = defMultiProcErrorHandler,
-                                       prepareHandler = NULL,
-                                       procTimeout = NULL, printOutput = FALSE, printError = FALSE,
-                                       showProgress = TRUE, waitTimeout = 50,
-                                       batchSize = 1, delayBetweenProc = 0)
+                                       timeoutHandler, errorHandler = defMultiProcErrorHandler,
+                                       prepareHandler, procTimeout,
+                                       printOutput, printError,
+                                       logSubDir, showProgress, waitTimeout,
+                                       batchSize, delayBetweenProc)
 {
     if (length(commandQueue) == 0)
         return(list())

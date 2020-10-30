@@ -64,18 +64,58 @@ defMultiProcErrorHandler <- function(cmd, exitStatus, ...)
 executeMultiProcess <- function(commandQueue, finishHandler,
                                 timeoutHandler = function(...) TRUE,
                                 errorHandler = defMultiProcErrorHandler,
-                                prepareHandler = NULL, procTimeout = NULL,
-                                printOutput = FALSE, printError = FALSE,
+                                prepareHandler = NULL, cacheName = NULL, setHash = NULL,
+                                procTimeout = NULL, printOutput = FALSE, printError = FALSE,
                                 logSubDir = NULL,
                                 showProgress = TRUE, waitTimeout = 50,
                                 batchSize = 1, delayBetweenProc = 0)
 {
+    cmdNames <- names(commandQueue)
+    
+    if (!is.null(cacheName))
+    {
+        cacheDB <- openCacheDBScope()
+        if (!is.null(setHash))
+            cachedSet <- loadCacheSet(cacheName, setHash, cacheDB)
+        
+        allHashes <- lapply(commandQueue, "[[", "hash")
+        cachedResults <- lapply(allHashes, function(hash)
+        {
+            res <- NULL
+            if (!is.null(cachedSet))
+                res <- cachedSet[[hash]]
+            if (is.null(res))
+                res <- loadCacheData(cacheName, hash, cacheDB)
+            return(res)
+        })
+        names(cachedResults) <- names(commandQueue)
+        cachedResults <- pruneList(cachedResults)
+        
+        # remove cached results
+        commandQueue <- commandQueue[setdiff(names(commandQueue), names(cachedResults))]
+    }
+    
     # UNDONE
-    return(executeMultiProcessClassic(commandQueue, finishHandler,
-                                      timeoutHandler,
-                                      errorHandler,
-                                      prepareHandler,
-                                      procTimeout, printOutput, printError,
-                                      showProgress, waitTimeout,
-                                      batchSize, delayBetweenProc))
+    results <- executeMultiProcessClassic(commandQueue, finishHandler,
+                                          timeoutHandler,
+                                          errorHandler,
+                                          prepareHandler,
+                                          procTimeout, printOutput, printError,
+                                          logSubDir, showProgress, waitTimeout,
+                                          batchSize, delayBetweenProc)
+    
+    if (!is.null(cacheName))
+    {
+        if (length(cachedResults) > 0)
+        {
+            # merge cached results
+            results <- c(results, cachedResults)
+            results <- results[intersect(cmdNames, names(results))] # re-order
+        }
+    
+        if (is.null(cachedSet) && !is.null(setHash))
+            saveCacheSet(cacheName, allHashes, setHash, cacheDB)
+    }
+    
+    return(results)
 }

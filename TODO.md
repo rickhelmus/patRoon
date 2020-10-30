@@ -80,7 +80,7 @@
     - write vignette or handbook chapter
     - update sirius-args.R (mention maxProcAmount)
     - update handbook etc for maxProcAmount
-    - patRoon.logPath
+    - patRoon.logPath, multiProcMethod
     - update ref docus for executeMultiProcess
 - tests
 

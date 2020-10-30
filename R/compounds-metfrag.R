@@ -549,94 +549,94 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", timeou
         mfSettings <- modifyList(mfSettings, extraOpts)
     }
 
-    cacheDB <- openCacheDBScope()
     setHash <- makeHash(fGroups, pLists, method, mfSettings, topMost, identifiers)
-    cachedSet <- loadCacheSet("compoundsMetFrag", setHash, cacheDB)
-    resultHashes <- vector("character", length(gNames))
-    names(resultHashes) <- gNames
 
     printf("Identifying %d feature groups with MetFrag...\n", gCount)
 
     runData <- generateMetFragRunData(fGroups, MSPeakLists, mfSettings, topMost, identifiers, method)
 
-    cachedResults <- sapply(runData, function(rd)
+    if (method == "CL")
     {
-        resultHashes[rd$gName] <<- rd$hash
-        comptab <- NULL
-        if (!is.null(cachedSet))
-            comptab <- cachedSet[[rd$hash]]
-        if (is.null(comptab))
-            comptab <- loadCacheData("compoundsMetFrag", rd$hash, cacheDB)
-        return(comptab)
-    }, simplify = FALSE)
-    cachedResults <- cachedResults[!sapply(cachedResults, is.null)]
-
-    runData <- runData[setdiff(names(runData), names(cachedResults))] # remove cached results
-
-    if (length(runData) > 0)
-    {
-        if (method == "CL")
+        results <- executeMultiProcess(runData, finishHandler = function(cmd)
         {
-            results <- executeMultiProcessFuture(runData, finishHandler = function(cmd)
+            comptab <- data.table::fread(cmd$outFile, colClasses = c(Identifier = "character"))
+            procres <- processMFResults(comptab, cmd$spec, adduct, database, topMost, cmd$stderrFile)
+            return(procres)
+        }, timeoutHandler = function(cmd, retries)
+        {
+            if (retries >= timeoutRetries)
             {
-                comptab <- data.table::fread(cmd$outFile, colClasses = c(Identifier = "character"))
-                procres <- processMFResults(comptab, cmd$spec, adduct, database, topMost, cmd$stderrFile)
-                # saveCacheData("compoundsMetFrag", procres, cmd$hash, cacheDB) # UNDONE
-                return(procres)
-            }, timeoutHandler = function(cmd, retries)
+                warning(sprintf("Could not run MetFrag for %s: timeout. Log: %s", cmd$gName, cmd$logFile))
+                return(FALSE)
+            }
+            warning(sprintf("Restarting timed out MetFrag command for %s (retry %d/%d)",
+                            cmd$gName, retries+1, errorRetries))
+            return(TRUE)
+        }, errorHandler = function(cmd, exitStatus, retries)
+        {
+            if (!is.na(exitStatus) && exitStatus <= 6) # some error thrown by MF
             {
-                if (retries >= timeoutRetries)
+                if (retries >= errorRetries)
                 {
-                    warning(sprintf("Could not run MetFrag for %s: timeout. Log: %s", cmd$gName, cmd$logFile))
+                    warning(sprintf("Could not run MetFrag for %s - exit code: %d - Log: %s",
+                                    cmd$gName, exitStatus, cmd$logFile))
                     return(FALSE)
                 }
-                warning(sprintf("Restarting timed out MetFrag command for %s (retry %d/%d)",
-                                cmd$gName, retries+1, errorRetries))
+                warning(sprintf("Restarting failed MetFrag command for %s - exit: %d (retry %d/%d)",
+                                cmd$gName, exitStatus, retries+1, errorRetries))
                 return(TRUE)
-            }, errorHandler = function(cmd, exitStatus, retries)
-            {
-                if (!is.na(exitStatus) && exitStatus <= 6) # some error thrown by MF
-                {
-                    if (retries >= errorRetries)
-                    {
-                        warning(sprintf("Could not run MetFrag for %s - exit code: %d - Log: %s",
-                                        cmd$gName, exitStatus, cmd$logFile))
-                        return(FALSE)
-                    }
-                    warning(sprintf("Restarting failed MetFrag command for %s - exit: %d (retry %d/%d)",
-                                    cmd$gName, exitStatus, retries+1, errorRetries))
-                    return(TRUE)
-                }
-
-                # some other error (e.g. java not present)
-                stop(sprintf("Fatal: Failed to execute MetFragCL for %s - exit code: %d - Log: %s",
-                             cmd$gName, exitStatus, cmd$logFile))
-            }, prepareHandler = function(cmd)
-            {
-                mfBin <- path.expand(getOption("patRoon.path.MetFragCL"))
-                if (is.null(mfBin) || !nzchar(mfBin) || !file.exists(mfBin))
-                    stop("Please set the 'MetFragCL' option with a (correct) path to the MetFrag CL jar file. Example: options(patRoon.path.MetFragCL = \"C:/MetFrag2.4.5-CL.jar\")")
-                
-                if (!nzchar(Sys.which("java")))
-                    stop("Please make sure that java is installed and its location is correctly set in PATH.")
-                
-                logf <- paste0("mfcl-", cmd$gName, ".txt")
-                return(c(cmd, initMetFragCLCommand(cmd$mfSettings, cmd$spec, mfBin, logf)))
-            }, procTimeout = timeout, delayBetweenProc = 1000, logSubDir = "metfrag")
-        }
-        else
+            }
+            
+            # some other error (e.g. java not present)
+            stop(sprintf("Fatal: Failed to execute MetFragCL for %s - exit code: %d - Log: %s",
+                         cmd$gName, exitStatus, cmd$logFile))
+        }, prepareHandler = function(cmd)
+        {
+            mfBin <- path.expand(getOption("patRoon.path.MetFragCL"))
+            if (is.null(mfBin) || !nzchar(mfBin) || !file.exists(mfBin))
+                stop("Please set the 'MetFragCL' option with a (correct) path to the MetFrag CL jar file. Example: options(patRoon.path.MetFragCL = \"C:/MetFrag2.4.5-CL.jar\")")
+            
+            if (!nzchar(Sys.which("java")))
+                stop("Please make sure that java is installed and its location is correctly set in PATH.")
+            
+            logf <- paste0("mfcl-", cmd$gName, ".txt")
+            return(c(cmd, initMetFragCLCommand(cmd$mfSettings, cmd$spec, mfBin, logf)))
+        }, cacheName = "metfrag", setHash = setHash, procTimeout = timeout, delayBetweenProc = 1000, logSubDir = "metfrag")
+    }
+    else
+    {
+        cacheDB <- openCacheDBScope()
+        cachedSet <- loadCacheSet("compoundsMetFrag", setHash, cacheDB)
+        resultHashes <- vector("character", length(gNames))
+        names(resultHashes) <- gNames
+        
+        cachedResults <- sapply(runData, function(rd)
+        {
+            resultHashes[rd$gName] <<- rd$hash
+            comptab <- NULL
+            if (!is.null(cachedSet))
+                comptab <- cachedSet[[rd$hash]]
+            if (is.null(comptab))
+                comptab <- loadCacheData("compoundsMetFrag", rd$hash, cacheDB)
+            return(comptab)
+        }, simplify = FALSE)
+        cachedResults <- cachedResults[!sapply(cachedResults, is.null)]
+        
+        runData <- runData[setdiff(names(runData), names(cachedResults))] # remove cached results
+        
+        if (length(runData) > 0)
         {
             prog <- openProgBar(0, gCount)
-
+            
             results <- lapply(runData, function(rd)
             {
                 rd$mfSettings$PeakList <- as.matrix(rd$spec[, c("mz", "intensity")])
                 comptab <- metfRag::run.metfrag(rd$mfSettings)
                 jgc() # hopefully reduce some memory usage
-
+                
                 if (nrow(comptab) > 0)
                     comptab <- unFactorDF(comptab)
-
+                
                 comptab <- as.data.table(comptab)
                 
                 procres <- processMFResults(comptab, rd$spec, adduct, database, topMost)
@@ -648,27 +648,30 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", timeou
                     procres$comptab <- procres$comptab[!duplicated(identifier)]
                     procres$comptab[, explainedPeaks := sapply(fragInfo, nrow)]
                 }
-
+                
                 saveCacheData("compoundsMetFrag", procres, rd$hash, cacheDB)
-
+                
                 setTxtProgressBar(prog, match(rd$gName, gNames))
-
+                
                 return(procres)
             })
-
+            
             setTxtProgressBar(prog, gCount)
             close(prog)
         }
+        else
+            results <- list()
+        
+        if (length(cachedResults) > 0)
+        {
+            results <- c(results, cachedResults)
+            results <- results[intersect(gNames, names(results))] # re-order
+        }
+        
+        if (is.null(cachedSet))
+            saveCacheSet("compoundsMetFrag", resultHashes[resultHashes != ""], setHash, cacheDB)
     }
-    else
-        results <- list()
-
-    if (length(cachedResults) > 0)
-    {
-        results <- c(results, cachedResults)
-        results <- results[intersect(gNames, names(results))] # re-order
-    }
-
+    
     # prune empty/NULL results
     if (length(results) > 0)
         results <- results[sapply(results, function(r) !is.null(r$comptab) && nrow(r$comptab) > 0, USE.NAMES = FALSE)]
@@ -676,9 +679,6 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", timeou
     ngrp <- length(results)
     printf("Loaded %d compounds from %d features (%.2f%%).\n", sum(unlist(lapply(results, function(r) nrow(r$comptab)))),
            ngrp, if (gCount == 0) 0 else ngrp * 100 / gCount)
-
-    if (is.null(cachedSet))
-        saveCacheSet("compoundsMetFrag", resultHashes[resultHashes != ""], setHash, cacheDB)
 
     # convert scoreTypes to generic names
     scoreTypes <- union(scoreTypes, "score") # ensure final score is in and remove duplicates

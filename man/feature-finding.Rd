@@ -57,8 +57,6 @@ findFeaturesOpenMS(
   useSmoothedInts = TRUE,
   extraOpts = NULL,
   intSearchRTWindow = 3,
-  logPath = file.path("log", "openms"),
-  maxProcAmount = getOption("patRoon.maxProcAmount"),
   verbose = TRUE
 )
 
@@ -174,14 +172,6 @@ ignore.}
 retention time) that is used to find the closest data point to the
 retention time to obtain the intensity of a feature (this is needed since
 OpenMS does not provide this data).}
-
-\item{logPath}{Destination directory for log files with output from executed
-commands. Will be created if non-existant. Set to \code{NULL} to disable
-logging.}
-
-\item{maxProcAmount}{Maximum number of processes to run for parallelization.
-Usually a number close to the amount of physical cores yields most
-efficient results.}
 
 \item{method}{The method setting used by XCMS peak finding, see
 \code{\link[xcms:findPeaks-methods]{xcms::findPeaks}}}

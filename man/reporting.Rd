@@ -80,7 +80,6 @@
   EICOnlyPresent = TRUE,
   selfContained = TRUE,
   optimizePng = FALSE,
-  maxProcAmount = getOption("patRoon.maxProcAmount"),
   clearPath = FALSE,
   openReport = TRUE,
   noDate = FALSE
@@ -190,10 +189,6 @@ memory.}
 \item{optimizePng}{If \code{TRUE} then \command{pngquant} is used to reduce
 the size of generated graphics. A signficant reduction in disk space usage
 may be seen, however, at the cost additional processing time.}
-
-\item{maxProcAmount}{Maximum amount of \command{pngquant} commands to run in
-parallel. Higher numbers will decrease processing time, with an optimum
-usually close to the amount of CPU cores.}
 
 \item{openReport}{If set to \code{TRUE} then the output report file will be
 opened with the system browser.}

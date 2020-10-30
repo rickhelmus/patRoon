@@ -38,7 +38,6 @@ generateFormulasGenForm(
   isolatePrec = TRUE,
   timeout = 120,
   topMost = 50,
-  maxProcAmount = getOption("patRoon.maxProcAmount"),
   batchSize = 8
 )
 
@@ -58,9 +57,7 @@ generateFormulasSIRIUS(
   calculateFeatures = TRUE,
   featThreshold = 0.75,
   verbose = TRUE,
-  SIRBatchSize = 0,
-  logPath = file.path("log", "sirius_formulas"),
-  maxProcAmount = getOption("patRoon.maxProcAmount")
+  SIRBatchSize = 0
 )
 
 formulaScorings()
@@ -164,10 +161,6 @@ need of timeouts.}
 highest score. For \command{SIRIUS}: Sets the \option{--candidates}
 commandline option.}
 
-\item{maxProcAmount}{Maximum number of processes to run for parallelization.
-Usually a number close to the amount of physical cores yields most
-efficient results.}
-
 \item{batchSize}{Maximum number of \command{GenForm} commands that should be
 run sequentially in each parallel process. Combining commands with short
 runtimes (such as \command{GenForm}) can significantly increase parallel
@@ -205,10 +198,6 @@ calculated then calculations will be evenly split over multiple
 \command{maxProcAmount>1}). If \code{SIRBatchSize=0} then all feature
 calculations are performed from a single \command{SIRIUS} exection, which
 is often the fastest.}
-
-\item{logPath}{Destination directory for log files with output from executed
-commands. Will be created if non-existant. Set to \code{NULL} to disable
-logging.}
 }
 \value{
 A \code{\link{formulas}} object containing all generated formulae.

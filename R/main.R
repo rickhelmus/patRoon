@@ -592,8 +592,6 @@ NULL
 #'
 #' @template adduct-arg
 #'
-#' @template multiProc-args
-#'
 #' @section Scorings: Each algorithm implements their own scoring system. Their
 #'   names have been harmonized where possible. An overview is obtained with the
 #'   \code{formulaScorings} function:
@@ -652,8 +650,6 @@ NULL
 #'   Set to \code{NULL} to ignore.
 #'
 #' @template adduct-arg
-#'
-#' @template multiProc-args
 #'
 #' @section Scorings: Each algorithm implements their own scoring system. Their
 #'   names have been simplified and harmonized where possible and are used for

@@ -19,9 +19,7 @@ convertMSFiles(
   centroid = algorithm != "openms",
   filters = NULL,
   extraOpts = NULL,
-  PWizBatchSize = 1,
-  logPath = file.path("log", "convert"),
-  maxProcAmount = getOption("patRoon.maxProcAmount")
+  PWizBatchSize = 1
 )
 }
 \arguments{
@@ -74,14 +72,6 @@ parameters passed to \command{msConvert} or \command{FileConverter}. Set to
 process by a single call to \command{msConvert}. Usually a value of one is
 most efficient. Set to zero to run all analyses all at once from a single
 call.}
-
-\item{logPath}{Destination directory for log files with output from executed
-commands. Will be created if non-existant. Set to \code{NULL} to disable
-logging.}
-
-\item{maxProcAmount}{Maximum number of processes to run for parallelization.
-Usually a number close to the amount of physical cores yields most
-efficient results.}
 }
 \description{
 Conversion of MS analysis files between several open and closed data formats.

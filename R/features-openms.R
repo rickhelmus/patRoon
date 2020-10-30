@@ -73,7 +73,6 @@ setMethod("initialize", "featuresOpenMS",
 #'   retention time) that is used to find the closest data point to the
 #'   retention time to obtain the intensity of a feature (this is needed since
 #'   OpenMS does not provide this data).
-#' @template multiProc-args
 #'
 #' @template refs-openms
 #'

@@ -240,8 +240,6 @@ convertMSFilesBruker <- function(inFiles, outFiles, to, centroid)
 #'   most efficient. Set to zero to run all analyses all at once from a single
 #'   call.
 #'
-#' @template multiProc-args
-#'
 #' @section Conversion formats: Possible output formats (\code{to} argument) are
 #'   \code{mzXML} and \code{mzML}.
 #'

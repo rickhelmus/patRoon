@@ -9,12 +9,13 @@ executeMultiProcess(
   finishHandler,
   timeoutHandler = function(...) TRUE,
   errorHandler = defMultiProcErrorHandler,
+  prepareHandler = NULL,
   procTimeout = NULL,
   printOutput = FALSE,
   printError = FALSE,
+  logSubDir = NULL,
   showProgress = TRUE,
   waitTimeout = 50,
-  maxProcAmount = getOption("patRoon.maxProcAmount"),
   batchSize = 1,
   delayBetweenProc = 0
 )
@@ -56,8 +57,6 @@ output to the console. Currently unused and untested.}
 
 \item{waitTimeout}{Number of milliseconds to wait before checking if a new
 process should be spawned.}
-
-\item{maxProcAmount}{Maximum number of processes to run simultaneously.}
 
 \item{batchSize}{Number of commands that should be executed in sequence per
 processes. See details.}

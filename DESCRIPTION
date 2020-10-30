@@ -177,6 +177,8 @@ Collate:
     'mspeaklists-bruker.R'
     'utils-mzr.R'
     'mspeaklists-mzr.R'
+    'multi-process-classic.R'
+    'multi-process-future.R'
     'multi-process.R'
     'project-tool.R'
     'report.R'

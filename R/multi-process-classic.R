@@ -187,7 +187,7 @@ executeMultiProcessClassic <- function(commandQueue, finishHandler,
     {
         logPath <- file.path(logPath, logSubDir)
         mkdirp(logPath)
-        commandQueue <- lapply(commandQueue, function(cmd) { cmd$logFile <- file.path(logPath, logFile); return(cmd) })
+        commandQueue <- lapply(commandQueue, function(cmd) { cmd$logFile <- file.path(logPath, cmd$logFile); return(cmd) })
     }
     else
         logPath <- NULL

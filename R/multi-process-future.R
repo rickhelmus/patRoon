@@ -1,10 +1,6 @@
-executeMultiProcessFuture <- function(commandQueue, finishHandler,
-                                      timeoutHandler = function(...) TRUE,
-                                      errorHandler = defMultiProcErrorHandler,
-                                      prepareHandler = NULL,
-                                      procTimeout = NULL, printOutput = FALSE, printError = FALSE,
-                                      showProgress = TRUE, waitTimeout = 50,
-                                      batchSize = 1, delayBetweenProc = 0)
+executeMultiProcessFuture <- function(commandQueue, finishHandler, timeoutHandler, errorHandler,
+                                      prepareHandler, procTimeout, printOutput, printError,
+                                      showProgress, batchSize = 1, ...)
 {
     ret <- future.apply::future_lapply(commandQueue, function(cmd)
     {

@@ -71,10 +71,10 @@ executeMultiProcess <- function(commandQueue, finishHandler,
                                 batchSize = 1, delayBetweenProc = 0)
 {
     cmdNames <- names(commandQueue)
+    cacheDB <- openCacheDBScope()
     
     if (!is.null(cacheName))
     {
-        cacheDB <- openCacheDBScope()
         if (!is.null(setHash))
             cachedSet <- loadCacheSet(cacheName, setHash, cacheDB)
         
@@ -95,14 +95,28 @@ executeMultiProcess <- function(commandQueue, finishHandler,
         commandQueue <- commandQueue[setdiff(names(commandQueue), names(cachedResults))]
     }
     
-    # UNDONE
-    results <- executeMultiProcessClassic(commandQueue, finishHandler,
-                                          timeoutHandler,
-                                          errorHandler,
-                                          prepareHandler,
-                                          procTimeout, printOutput, printError,
-                                          logSubDir, showProgress, waitTimeout,
-                                          batchSize, delayBetweenProc)
+    if (length(commandQueue) > 0)
+    {
+        f <- switch(getOption("patRoon.multiProcMethod", "classic"),
+                    classic = executeMultiProcessClassic,
+                    future = executeMultiProcessFuture)
+        if (is.null(f))
+            stop("Wrong value set for patRoon.multiProcMethod! Should be \"classic\" or \"future\"")
+        
+        results <- f(commandQueue = commandQueue, finishHandler = finishHandler, timeoutHandler = timeoutHandler,
+                     errorHandler = errorHandler, prepareHandler = prepareHandler, procTimeout = procTimeout,
+                     printOutput = printOutput, printError = printError, logSubDir = logSubDir,
+                     showProgress = showProgress, waitTimeout = waitTimeout, batchSize = batchSize,
+                     delayBetweenProc = delayBetweenProc)
+        
+        if (!is.null(cacheName))
+        {
+            for (n in names(results))
+                saveCacheData(cacheName, results[[n]], commandQueue[[n]]$hash, cacheDB)
+        }
+    }
+    else
+        results <- list()
     
     if (!is.null(cacheName))
     {

@@ -70,6 +70,9 @@ executeMultiProcess <- function(commandQueue, finishHandler,
                                 showProgress = TRUE, waitTimeout = 50,
                                 batchSize = 1, delayBetweenProc = 0)
 {
+    if (!checkmate::testNamed(commandQueue))
+        names(commandQueue) <- seq_along(commandQueue) # setting names makes it easier to split/merge cached results later
+    
     cmdNames <- names(commandQueue)
     cacheDB <- openCacheDBScope()
     
@@ -88,11 +91,11 @@ executeMultiProcess <- function(commandQueue, finishHandler,
                 res <- loadCacheData(cacheName, hash, cacheDB)
             return(res)
         })
-        names(cachedResults) <- names(commandQueue)
+        names(cachedResults) <- cmdNames
         cachedResults <- pruneList(cachedResults)
         
         # remove cached results
-        commandQueue <- commandQueue[setdiff(names(commandQueue), names(cachedResults))]
+        commandQueue <- commandQueue[setdiff(cmdNames, names(cachedResults))]
     }
     
     if (length(commandQueue) > 0)

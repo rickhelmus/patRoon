@@ -131,10 +131,10 @@ getSiriusCommand <- function(precursorMZ, MSPList, MSMSPList, profile, adduct, p
                 outPath = outPath, msFName = msFName, cmpName = cmpName, isPre44 = isPre44))
 }
 
-runSIRIUS <- function(precursorMZs, MSPLists, MSMSPLists, profile, adduct, ppmMax, elements,
+runSIRIUS <- function(precursorMZs, MSPLists, MSMSPLists, resNames, profile, adduct, ppmMax, elements,
                       database, noise, cores, withFingerID, fingerIDDatabase, topMost,
                       extraOptsGeneral, extraOptsFormula, verbose, isPre44,
-                      SIRBatchSize)
+                      processFunc, processArgs, SIRBatchSize)
 {
     ionization <- as.character(adduct, format = "sirius")
     cmpName <- "unknownCompound"
@@ -180,14 +180,30 @@ runSIRIUS <- function(precursorMZs, MSPLists, MSMSPLists, profile, adduct, ppmMa
     
     cmdQueue <- lapply(seq_along(batches), function(bi)
     {
+        batch <- batches[[bi]]
+        return(list(command = command, precMZs = precursorMZs[batch], MSPL = MSPLists[batch], MSMSPL = MSMSPLists[batch],
+                    logFile = paste0("sirius-batch_", bi, ".txt")))
+    })
+    
+    singular <- length(cmdQueue) == 1
+    ret <- executeMultiProcess(cmdQueue, finishHandler = function(cmd)
+    {
+        pArgs <- list(cmpName = cmpName, adduct = adduct, isPre44 = isPre44)
+        if (!is.null(processArgs))
+            pArgs <- c(pArgs, processArgs)
+        
+        res <- mapply(cmd$msFNames, cmd$MSMSPL, SIMPLIFY = FALSE,
+                      FUN = function(n, m) do.call(processFunc, c(list(outPath = cmd$outPath, msFName = n, MSMS = m), pArgs)))
+        return(res)
+    }, prepareHandler = function(cmd)
+    {
         inPath <- tempfile("sirius_in")
         outPath <- tempfile("sirius_out")
         # unlink(outPath, TRUE) # start with fresh output directory (otherwise previous results are combined)
         stopifnot(!file.exists(inPath) || !file.exists(outPath))
         dir.create(inPath)
         
-        batch <- batches[[bi]]
-        msFNames <- mapply(precursorMZs[batch], MSPLists[batch], MSMSPLists[batch], FUN = function(pmz, mspl, msmspl)
+        msFNames <- mapply(cmd$precMZs, cmd$MSPL, cmd$MSMSPL, FUN = function(pmz, mspl, msmspl)
         {
             ret <- tempfile("spec", fileext = ".ms", tmpdir = inPath)
             makeSirMSFile(mspl, msmspl, pmz, cmpName, ionization, ret)
@@ -195,19 +211,12 @@ runSIRIUS <- function(precursorMZs, MSPLists, MSMSPLists, profile, adduct, ppmMa
         })
         
         bArgs <- if (isPre44) c(args, "-o", outPath, inPath) else c("-i", inPath, "-o", outPath, args)
-        logf <- paste0("sirius-batch_", bi, ".txt")
         
-        return(list(command = command, args = bArgs, logFile = logf, outPath = outPath, msFNames = msFNames))
-    })
-    
-    singular <- length(cmdQueue) == 1
-    executeMultiProcess(cmdQueue, printOutput = verbose && singular, printError = verbose && singular,
-                        showProgress = !singular, finishHandler = function(...) NULL,
-                        logSubDir = paste0("sirius_", if (withFingerID) "compounds" else "formulas"))
-    
-    return(list(outPaths = unlist(lapply(cmdQueue, function(cmd) rep(cmd$outPath, length(cmd$msFNames))), use.names = FALSE),
-                msFNames = unlist(lapply(cmdQueue, "[[", "msFNames"), use.names = FALSE),
-                cmpName = cmpName))
+        return(c(cmd, list(args = bArgs, outPath = outPath, msFNames = msFNames)))
+    }, printOutput = verbose && singular, printError = verbose && singular,
+    showProgress = !singular, logSubDir = paste0("sirius_", if (withFingerID) "compounds" else "formulas"))
+
+    return(setNames(unlist(ret, recursive = FALSE, use.names = FALSE), resNames))
 }
 
 doSIRIUS <- function(fGroups, MSPeakLists, doFeatures, profile, adduct, relMzDev, elements,
@@ -230,7 +239,7 @@ doSIRIUS <- function(fGroups, MSPeakLists, doFeatures, profile, adduct, relMzDev
                          extraOptsFormula, isPre44, processArgs)
     setHash <- makeHash(MSPeakLists, baseHash, doFeatures)
     cachedSet <- loadCacheSet(cacheName, setHash, cacheDB)
-
+    
     if (doFeatures)
     {
         pLists <- peakLists(MSPeakLists)
@@ -255,7 +264,7 @@ doSIRIUS <- function(fGroups, MSPeakLists, doFeatures, profile, adduct, relMzDev
         flattenedPLists <- averagedPeakLists(MSPeakLists)
         flPLMeta <- data.table(name = names(flattenedPLists), group = names(flattenedPLists))
     }
-
+    
     validPL <- function(pl) !is.null(pl[["MS"]]) && !is.null(pl[["MSMS"]]) && any(pl[["MS"]]$precursor)
     flattenedPLists <- flattenedPLists[sapply(flattenedPLists, validPL)]
     flPLMeta <- flPLMeta[name %in% names(flattenedPLists)]
@@ -263,7 +272,7 @@ doSIRIUS <- function(fGroups, MSPeakLists, doFeatures, profile, adduct, relMzDev
     flPLMeta[, hash := sapply(flattenedPLists, makeHash, baseHash)]
     if (is.null(cachedSet))
         saveCacheSet(cacheName, flPLMeta$hash, setHash, cacheDB)
-
+    
     if (length(flattenedPLists) > 0)        
     {
         cachedResults <- pruneList(sapply(flPLMeta$hash, function(h)
@@ -277,7 +286,6 @@ doSIRIUS <- function(fGroups, MSPeakLists, doFeatures, profile, adduct, relMzDev
         }, simplify = FALSE))
         
         flPLMeta[, cached := hash %in% names(cachedResults)]
-        flPLMeta[, msFName := character()]
         doPLists <- flattenedPLists[!flPLMeta$cached]
         
         if (length(doPLists) > 0)
@@ -286,48 +294,41 @@ doSIRIUS <- function(fGroups, MSPeakLists, doFeatures, profile, adduct, relMzDev
             mspls <- lapply(doPLists, "[[", "MS")
             msmspls <- lapply(doPLists, "[[", "MSMS")
             
-            runData <- runSIRIUS(plmzs, mspls, msmspls, profile, adduct, relMzDev, elements,
-                                 database, noise, cores, withFingerID, fingerIDDatabase, topMost,
-                                 extraOptsGeneral, extraOptsFormula, verbose, isPre44,
-                                 SIRBatchSize)
-            flPLMeta[cached == FALSE, outPath := runData$outPaths]
-            flPLMeta[cached == FALSE, msFName := runData$msFNames]
+            allResults <- runSIRIUS(plmzs, mspls, msmspls, flPLMeta[cached == FALSE]$name, profile, adduct,
+                                    relMzDev, elements, database, noise, cores, withFingerID, fingerIDDatabase, topMost,
+                                    extraOptsGeneral, extraOptsFormula, verbose, isPre44, processFunc, processArgs, SIRBatchSize)
         }
         else
-            runData <- list()
-
-        processResultSet <- function(meta)
+            allResults <- list()
+        
+        mergeCachedGroupResults <- function(meta, res)
         {
-            if (any(!meta$cached))
-            {
-                pArgs <- list(cmpName = runData$cmpName, adduct = adduct, isPre44 = isPre44, cacheDB = cacheDB)
-                if (!is.null(processArgs))
-                    pArgs <- c(pArgs, processArgs)
-                
-                metaNew <- meta[cached == FALSE]
-                MSMS <- lapply(doPLists[metaNew$name], "[[", "MSMS")
-                res <- mapply(metaNew$outPath, metaNew$msFName, metaNew$hash, MSMS, SIMPLIFY = FALSE,
-                              FUN = function(o, n, h, m) do.call(processFunc, c(list(outPath = o, msFName = n, hash = h, MSMS = m), pArgs)))
-                names(res) <- metaNew$group
-            }
-            else
-                res <- list()
-            
             if (length(cachedResults) > 0)
             {
                 metaCached <- meta[cached == TRUE]
                 res <- c(res, setNames(cachedResults[metaCached$hash], metaCached$group))
+                res <- res[intersect(meta$group, names(res))] # ensure correct order
             }
-            
-            res <- res[intersect(gNames, names(res))] # ensure correct order
             return(res)
         }
-
+        
         if (doFeatures)
-            ret <- sapply(unique(flPLMeta$analysis), function(ana) processResultSet(flPLMeta[analysis == ana]),
-                          simplify = FALSE)
+        {
+            ret <- sapply(unique(flPLMeta$analysis), function(ana)
+            {
+                meta <- flPLMeta[analysis == ana]
+                metaNotCached <- meta[cached == FALSE]
+                res <- setNames(allResults[metaNotCached$name], metaNotCached$group)
+                res <- mergeCachedGroupResults(meta, res)
+                return(res)
+            }, simplify = FALSE)
+        }
         else
-            ret <- processResultSet(flPLMeta)
+            ret <- mergeCachedGroupResults(flPLMeta, allResults)
+        
+        metaNotCached <- flPLMeta[cached == FALSE]
+        for (i in seq_len(nrow(metaNotCached)))
+            saveCacheData(cacheName, allResults[[metaNotCached$name[i]]], metaNotCached$hash[i], cacheDB)
     }
     else
         ret <- list()

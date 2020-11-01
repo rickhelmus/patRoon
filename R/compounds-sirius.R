@@ -3,7 +3,7 @@
 #' @include utils-sirius.R
 NULL
 
-processSIRIUSCompounds <- function(msFName, outPath, cmpName, MSMS, database, adduct, topMost, hash, isPre44, cacheDB)
+processSIRIUSCompounds <- function(msFName, outPath, cmpName, MSMS, database, adduct, topMost, isPre44)
 {
     resFile <- if (isPre44) "summary_csi_fingerid.csv" else "structure_candidates.tsv"
     resultPath <- getSiriusResultPath(outPath, msFName, cmpName, isPre44)
@@ -86,7 +86,6 @@ processSIRIUSCompounds <- function(msFName, outPath, cmpName, MSMS, database, ad
     }
     
     ret <- list(comptab = results, scRanges = scRanges)
-    saveCacheData("compoundsSIRIUS", ret, hash, cacheDB)
     return(ret)
 }
 

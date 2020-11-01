@@ -5,7 +5,7 @@
 NULL
 
 # callback for executeMultiProcess()
-processSIRIUSFormulas <- function(msFName, outPath, cmpName, adduct, hash, isPre44, cacheDB, ...)
+processSIRIUSFormulas <- function(msFName, outPath, cmpName, adduct, isPre44, ...)
 {
     noResult <- forms <- data.table(neutral_formula = character(0), formula = character(0),
                                     adduct = character(0), score = numeric(0), MSMSScore = numeric(0),
@@ -77,7 +77,6 @@ processSIRIUSFormulas <- function(msFName, outPath, cmpName, adduct, hash, isPre
             forms <- rankFormulaTable(forms)
         }
     }
-    saveCacheData("formulasSIRIUS", forms, hash, cacheDB)
     return(forms)
 }
 

@@ -5,7 +5,7 @@ NULL
 
 getGenFormBin <- function()
 {
-    gbin <- if (Sys.info()[["sysname"]] == "Linux") "GenForm" else "GenForm.exe"
+    gbin <- if (Sys.info()[["sysname"]] == "Windows") "GenForm.exe" else "GenForm"
     pOpt <- getOption("patRoon.path.GenForm")
     if (!is.null(pOpt) && nzchar(pOpt))
         ret <- file.path(pOpt, gbin)

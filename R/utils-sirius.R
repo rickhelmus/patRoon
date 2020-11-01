@@ -4,7 +4,7 @@ getSiriusBin <- function()
 {
     si <- Sys.info()
 
-    if (si[["sysname"]] == "Linux")
+    if (si[["sysname"]] != "Windows")
         return("sirius")
 
     # windows

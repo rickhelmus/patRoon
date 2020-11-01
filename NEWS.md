@@ -1,3 +1,7 @@
+# patRoon 1.0.4
+* Small compatibility fixes for macOS
+
+
 # patRoon 1.0.3
 * `componentsNT`: include algorithm data returned by `nontarget::homol.search` in `homol` slot (suggested by Vittorio Albergamo)
 * several `convertMSFiles()` fixes (issue #14)

@@ -1,7 +1,8 @@
 # patRoon 1.0.4
 * Small compatibility fixes for macOS
 * Updated support for latest PubChemLite
-* The `annoTypeCount` score for annotated compounds with PubChemLite is now not normalized by default anymore.
+* The `annoTypeCount` score for annotated compounds with PubChemLite is now not normalized by default anymore when reporting results.
+* `reportHTML()` now correctly handles relative paths while opening the final report in a browser.
 
 
 # patRoon 1.0.3

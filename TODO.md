@@ -53,7 +53,6 @@
 
 ## reporting
 - add more options to reportPlots argument of reportHTML()?
-- fix: use normalizePath for auto opening report
 
 
 ## Cleanup

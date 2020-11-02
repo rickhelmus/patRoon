@@ -904,7 +904,7 @@ setMethod("reportHTML", "featureGroups", function(fGroups, path, reportPlots, fo
                                           quiet = TRUE))
 
     if (openReport)
-        utils::browseURL(paste0("file://", outputFile))
+        utils::browseURL(paste0("file://", normalizePath(outputFile)))
 
     invisible(NULL)
 })

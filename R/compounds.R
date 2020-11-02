@@ -146,7 +146,7 @@ setMethod("$", "compounds", function(x, name)
 #'
 #' @export
 setMethod("as.data.table", "compounds", function(x, fGroups = NULL, fragments = FALSE, normalizeScores = "none",
-                                                 excludeNormScores = c("score", "individualMoNAScore"))
+                                                 excludeNormScores = c("score", "individualMoNAScore", "annoTypeCount"))
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", null.ok = TRUE, add = ac)
@@ -526,7 +526,7 @@ setMethod("plotStructureHash", "compounds", function(obj, index, groupName, widt
 #'
 #' @export
 setMethod("plotScores", "compounds", function(obj, index, groupName, normalizeScores = "max",
-                                              excludeNormScores = c("score", "individualMoNAScore"),
+                                              excludeNormScores = c("score", "individualMoNAScore", "annoTypeCount"),
                                               onlyUsed = TRUE, useGGPlot2 = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
@@ -556,7 +556,7 @@ setMethod("plotScores", "compounds", function(obj, index, groupName, normalizeSc
 })
 
 setMethod("plotScoresHash", "compounds", function(obj, index, groupName, normalizeScores = "max",
-                                                  excludeNormScores = c("score", "individualMoNAScore"),
+                                                  excludeNormScores = c("score", "individualMoNAScore", "annoTypeCount"),
                                                   onlyUsed = TRUE, useGGPlot2 = FALSE)
 {
     compTable <- compoundTable(obj)[[groupName]]

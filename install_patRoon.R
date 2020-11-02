@@ -490,7 +490,7 @@ utils <- setRefClass("utilsInst", methods = list(
 
             if ("MetFrag PubChemLite DB" %in% instWhat)
             {
-                down <- downloadFile(instPath, "MetFrag PubChemLite database", "https://zenodo.org/record/3611238/files/PubChemLite_14Jan2020_tier1.csv",
+                down <- downloadFile(instPath, "MetFrag PubChemLite database", "https://zenodo.org/record/4183801/files/PubChemLite_31Oct2020_exposomics.csv",
                                      FALSE)
                 if (!is.null(down))
                     setOpts <- c(setOpts, list(patRoon.path.MetFragPubChemLite = down))

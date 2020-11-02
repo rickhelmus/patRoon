@@ -1,5 +1,7 @@
 # patRoon 1.0.4
 * Small compatibility fixes for macOS
+* Updated support for latest PubChemLite
+* The `annoTypeCount` score for annotated compounds with PubChemLite is now not normalized by default anymore.
 
 
 # patRoon 1.0.3

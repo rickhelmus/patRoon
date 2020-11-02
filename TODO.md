@@ -39,8 +39,6 @@
 - test score normalization?
 - timeouts for SIRIUS?
 - do something about negative H explained fragments by MF?
-- PubChemLite
-    - Install from Win inst script --> now only tier1, OK?
 - SusDat MF support
 
 

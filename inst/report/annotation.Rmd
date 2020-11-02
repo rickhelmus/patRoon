@@ -151,11 +151,15 @@ if (!is.null(rmdVars$components))
 }
 
 DT::datatable(fGroupsSpecDT,
+              extensions = "Buttons",
               options = list(paging = FALSE, scrollY = "200px", autoWidth = TRUE,
+                             dom = "Bfrtip",
                              initComplete = DT::JS("function(settings, json)",
                                                    "{ setTimeout(initAnnotation, 25); }"),
                              order = list(list(1, "asc")),
-                             columnDefs = list(list(visible = FALSE, targets = 0))),
+                             columnDefs = list(list(visible = FALSE, targets = 0)),
+                             buttons = list(list(extend = "colvis", background = FALSE,
+                                                 columns = seq(2, ncol(fGroupsSpecDT)-1) - 1))),
               escape = FALSE, rownames = FALSE, elementId = "fGroupsTable")
 ```
 

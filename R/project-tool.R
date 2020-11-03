@@ -53,8 +53,9 @@ getScriptCode <- function(input, analyses)
                                 destination = sldest, generateAnaInfo = input$generateAnaInfo, analysisTableFile = input$analysisTableFile,
                                 analyses = analyses, suspectList = input$suspectList, suspectAdduct = input$suspectAdduct,
                                 doMSPeakFind = (input$formulaGen != "" && input$formulaGen != "Bruker") || input$compIdent != "",
-                                precursorMzWindow = input$precursorMzWindow,
-                                polarity = input$polarity, reportFormats = input$report)
+                                precursorMzWindow = input$precursorMzWindow, polarity = input$polarity,
+                                annotateSus = input$annotateSus, genIDLevelFile = input$genIDLevelFile,
+                                reportFormats = input$report)
 
     ret <- template
 
@@ -85,6 +86,10 @@ doCreateProject <- function(input, analyses)
         write.csv(analyses[, c("path", "analysis", "group", "blank")],
                   file.path(input$destinationPath, input$analysisTableFile), row.names = FALSE)
 
+    if (input$genIDLevelFile)
+        write.csv(defaultIDLevelRules(),
+                  file.path(input$destinationPath, "idlevelrules.csv"), row.names = FALSE)
+    
     code <- getScriptCode(input, analyses)
     if (input$outputScriptTo == "curFile")
     {
@@ -345,6 +350,21 @@ getNewProjectUI <- function(destPath)
                             condition = "input.formulaGen != \"\" || input.compIdent != \"\" || input.components != \"\"",
                             selectInput("polarity", "Polarity", c("positive", "negative"), "positive",
                                         multiple = FALSE, width = "100%")
+                        ),
+                        conditionalPanel(
+                            condition = "input.suspectList != \"\" && (input.formulaGen != \"\" || input.compIdent != \"\")",
+                            fillRow(
+                                height = 65,
+                                fillCol(
+                                    strong("Suspect annotation"),
+                                    checkboxInput("annotateSus", "Annotate suspects", TRUE, width = "100%"),
+                                    conditionalPanel(
+                                        condition = "input.annotateSus",
+                                        checkboxInput("genIDLevelFile", "Generate template file with configurable identification levels",
+                                                      TRUE, width = "100%")
+                                    )
+                                )
+                            )
                         )
                     )
                 )

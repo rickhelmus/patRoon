@@ -46,7 +46,7 @@
             - still keep re-naming functionality? not really possible, but put names in reporting functionality
         - same format for TASQ screening import?
         - throw informative error when screenSuspects()/screenTargets() is called
-- newProject(): create template auto ID rule csv?
+- newProject(): update for new interface
 - util to check if there are suspect results? (ie to replace inherits(...))
 - expand reporting
     - eg marking which candidate corresponds to suspect and include suspect name in EICs
@@ -61,6 +61,7 @@
     - port from TPs someday
     - proper default for min intensity?
     - calculate from formulae too? and/or specify in rules from which?
+        - better column name(s)
 
 
 ## docs

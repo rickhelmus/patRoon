@@ -169,6 +169,19 @@ components <- generateComponents(fGroups, "nontarget", ionization = "{{ polarity
                                  mzRange = c(5, 120), elements = c("C", "H", "O"), rtDev = 30,
                                  absMzDev = 0.002)
 {{ endCodeBlock() }}
+{{ optionalCodeBlock(nzchar(suspectList) && annotateSus) }}
+
+# Annotate suspects
+{{ endCodeBlock() }}
+{{ optionalCodeBlock(nzchar(suspectList) && annotateSus && genIDLevelFile) }}
+IDLevelRules <- read.csv("idlevelrules.csv", stringsAsFactors = FALSE)
+fGroups <- annotateSuspects(fGroups, MSPeakLists = mslists, formulas = formulas,
+                            compounds = compounds, IDLevelRules = IDLevelRules)
+{{ endCodeBlock() }}
+{{ optionalCodeBlock(nzchar(suspectList) && annotateSus && !genIDLevelFile) }}
+fGroups <- annotateSuspects(fGroups, MSPeakLists = mslists, formulas = formulas,
+                            compounds = compounds)
+{{ endCodeBlock() }}
 {{ optionalCodeBlock(length(reportFormats) > 0) }}
 
 

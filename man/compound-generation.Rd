@@ -234,7 +234,7 @@ calculations are performed from a single \command{SIRIUS} execution, which
 is often the fastest if calculations are performed on a single computer.}
 
 \item{includeSuspectLists, onlyDefault, includeNoDB}{A logical specifying
-whether scoring terms releated to suspect lists, default scoring terms and
+whether scoring terms related to suspect lists, default scoring terms and
 non-database specific scoring terms should be included in the output,
 respectively.}
 }

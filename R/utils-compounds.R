@@ -49,7 +49,7 @@ mergeFragInfo <- function(fiLeft, fiRight, leftName, rightName)
 #'   applied to rank candidate compounds (see \verb{Scorings} section below).
 #'
 #' @param includeSuspectLists,onlyDefault,includeNoDB A logical specifying
-#'   whether scoring terms releated to suspect lists, default scoring terms and
+#'   whether scoring terms related to suspect lists, default scoring terms and
 #'   non-database specific scoring terms should be included in the output,
 #'   respectively.
 #'

@@ -45,7 +45,14 @@ screenSuspects(
   skipInvalid = TRUE
 )
 
-\S4method{groupFeaturesScreening}{featureGroups}(fGroups, scr)
+\S4method{groupFeaturesScreening}{featureGroups}(
+  fGroups,
+  suspects,
+  rtWindow,
+  mzWindow,
+  adduct,
+  skipInvalid
+)
 
 importFeatureGroupsBrukerTASQ(path, analysisInfo, clusterRTWindow = 12)
 }
@@ -85,8 +92,6 @@ invalid \code{SMILES}, will be ignored with a warning.}
 \item{fGroups}{The \code{\link{featureGroups}} object that should be
 transformed (and was used to obtain the screening results).}
 
-\item{scr}{The screening results table returned by \code{screenSuspects}.}
-
 \item{path}{The file path to an Excel export of the Global results table from
 TASQ, converted to \file{.csv} format.}
 
@@ -95,6 +100,8 @@ information}.}
 
 \item{clusterRTWindow}{This retention time window (in seconds) is used to
 group hits across analyses together. See also the details section.}
+
+\item{scr}{The screening results table returned by \code{screenSuspects}.}
 }
 \value{
 \code{screenSuspects} will return a table (a

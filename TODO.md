@@ -14,12 +14,13 @@
 - update docs & handbook
     - renamed rt/m columns
 - credits to ES
-- tests
+- tests/docs
     - automatic InChIKey/formula calculation from InChIs/SMILES
         - already done implicitly?
     - handling empty results
     - filters
     - more?
+    - new plotVenn list functionality
 - ID level rules
     - GenForm scoring: somehow exclude non MS/MS candidates if MS/MS candidates are present?
         - already fine now with minimum rank?

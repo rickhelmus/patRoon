@@ -31,7 +31,16 @@ NULL
 #' @param col Colour(s) used. If \code{col=NULL} then colours are automatically
 #'   generated.
 #' @param which A character vector with replicate groups used for comparison.
+#'   
 #'   For plotting functions: set to \code{NULL} for all replicate groups.
+#'   
+#'   For \code{plotVenn}: alternatively a named \code{list} containing elements
+#'   of \code{character} vectors with replicate groups to compare. For instance,
+#'   \code{which=list(infl = c("influent-A", "influent-B"), effl =
+#'   c("effluent-A", "effluent-B"))}, will compare the features in replicate
+#'   groups \samp{"influent-A/B"} against those in \samp{"effluent-A/B"}.
+#'   The names of the list are used for labeling in the plot, and will be made
+#'   automatically if not specified.
 #' @param colourBy Sets the automatic colour selection: \code{"none"} for a
 #'   single colour or \code{"rGroups"}/\code{"fGroups"} for a distinct colour
 #'   per replicate/feature group.
@@ -1110,10 +1119,22 @@ setMethod("plotVenn", "featureGroups", function(obj, which = NULL, ...)
     rGroups <- replicateGroups(obj)
     if (is.null(which))
         which <- rGroups
-    checkmate::assertSubset(which, rGroups, empty.ok = FALSE)
+    
+    checkmate::assert(checkmate::checkSubset(which, rGroups, empty.ok = FALSE),
+                      checkmate::checkList(which, "character", any.missing = FALSE),
+                      .var.name = "which")
 
     fGroupsList <- lapply(which, function(w) replicateGroupFilter(obj, w, verbose = FALSE))
-    makeVennPlot(lapply(fGroupsList, names), which, lengths(fGroupsList),
+    
+    if (is.list(which))
+    {
+        if (!checkmate::testNamed(which))
+            names(which) <- sapply(which, paste0, collapse = "+", USE.NAMES = FALSE)
+    }
+    else
+        names(which) <- which
+    
+    makeVennPlot(lapply(fGroupsList, names), names(which), lengths(fGroupsList),
                  function(obj1, obj2) intersect(obj1, obj2),
                  length, ...)
 })

@@ -257,7 +257,16 @@ annotation.}
 \code{\link[graphics]{plot}}. Set to \code{NULL} for automatic plot sizing.}
 
 \item{which}{A character vector with replicate groups used for comparison.
-For plotting functions: set to \code{NULL} for all replicate groups.}
+
+For plotting functions: set to \code{NULL} for all replicate groups.
+
+For \code{plotVenn}: alternatively a named \code{list} containing elements
+of \code{character} vectors with replicate groups to compare. For instance,
+\code{which=list(infl = c("influent-A", "influent-B"), effl =
+c("effluent-A", "effluent-B"))}, will compare the features in replicate
+groups \samp{"influent-A/B"} against those in \samp{"effluent-A/B"}.
+The names of the list are used for labeling in the plot, and will be made
+automatically if not specified.}
 
 \item{nsets, nintersects}{See \code{\link[UpSetR]{upset}}.}
 

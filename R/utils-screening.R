@@ -199,15 +199,26 @@ annotatedMSMSSimilarity <- function(annPL, absMzDev, relMinIntensity)
 
     # remove precursor, as eg MetFrag doesn't include this and it's not so interesting anyway
     annPL <- annPL[precursor == FALSE, c("mz", "intensity"), with = FALSE]
-    
+
     annPLWithAnn <- annPL[!is.na(formula)]
     if (nrow(annPL) == 0 || nrow(annPLWithAnn) == 0)
         return(0)
-    
+
     relMinIntensity <- relMinIntensity * 100 # NOTE: OrgMassSpecR normalizes to 0-100
     
-    return(OrgMassSpecR::SpectrumSimilarity(annPL, annPLWithAnn, t = absMzDev,
-                                            b = relMinIntensity, print.graphic = FALSE))
+    # UNDONE: OrgMassSpecR will normalize intensities, which is _not_ something
+    # we want. For now just use it to align spectra and calculate jaccard as
+    # alternative measure...
+    
+    # return(OrgMassSpecR::SpectrumSimilarity(annPL, annPLWithAnn, t = absMzDev,
+    #                                         b = relMinIntensity, print.graphic = FALSE))
+    
+    aligned <- OrgMassSpecR::SpectrumSimilarity(annPL, annPLWithAnn, t = absMzDev,
+                                                b = relMinIntensity, print.graphic = FALSE,
+                                                output.list = TRUE)$alignment
+    npresent <- sum(aligned$intensity.top != 0 & aligned$intensity.bottom != 0)
+    return(npresent / nrow(aligned))
+    
 }
 
 # UNDONE: export?

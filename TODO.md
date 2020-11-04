@@ -10,58 +10,46 @@
 
 ## AutoID
 
-- update version number
+- ID level rules
+    - GenForm scoring: somehow exclude non MS/MS candidates if MS/MS candidates are present?
+        - already fine now with minimum rank?
+        - absolute thresholds for iso/comb scores?
+    - add scorings for SIRIUS/DA
+- interface
+    - groupFeaturesScreening() --> screenSuspects()?
+    - deprecate old screen functions
+    - filters: by matched fragments of suspect list, ann similarity
+    - also convert TASQ?
+    - newProject(): update for new interface
+    - annotateSuspects() --> annotate() latter is a function (but not generic) from ggplot2 and RAMClustR and method from CAMERA, so probably no
+    conflicts
+    - don't assign level <1 if suspect is a target? or give the choice (or make filter?)
+    - only add sim, ranking etc columns if data is available?
+    - spec similarity:
+        - port from TPs someday
+        - calculate from formulae too? and/or specify in rules from which?
+            - better column name(s)
+- misc
+    - util to check if there are suspect results? (ie to replace inherits(...))
+    - check for empty names in assertion/preparation functions
+    - credits to ES
+    - update version number
+    - prepareSuspectList(): export? and always calculate neutralMass?
+- expand reporting
+    - eg marking which candidate corresponds to suspect and include suspect name in EICs
+        - mark with different row colour and label?
+    - mention suspect similarities/ranks etc for candidates (or somehow in compounds?)
+    - optionally report with collapsed suspects
 - update docs & handbook
-    - renamed rt/m columns
-- credits to ES
-- tests/docs
+    - renamed rt/mz columns
+    - new plotVenn list functionality
+- tests
     - automatic InChIKey/formula calculation from InChIs/SMILES
         - already done implicitly?
     - handling empty results
     - filters
     - more?
     - new plotVenn list functionality
-- ID level rules
-    - GenForm scoring: somehow exclude non MS/MS candidates if MS/MS candidates are present?
-        - already fine now with minimum rank?
-        - absolute thresholds for iso/comb scores?
-    - add scorings for SIRIUS/DA
-- annotation
-    - docs
-    - only add sim, ranking etc columns if data is available?
-    - cache
-- screenSuspects()
-    - combine screenSuspects() and groupFeaturesScreening()
-        - screenSuspects() does both the screening and making new fGroups
-        - as.data.table() for fGroupsScreening which adds suspect metadata and ID levels
-            - optionally un-collapses suspects per row
-        - annotate() method which does what annotateSuspects() now does
-            - can later also be defined for fGroups?
-            - adds data to screenInfo slot
-        - filter() method for minimal rankings, matched MS/MS fragments, no/one/multiple hits etc
-            - onlyHits = TRUE by default? or by default if any of the others are given?
-        - deprecate features method
-        - tag hits, but keep all fGroups?
-            - fGroups[, hits = TRUE] ?
-            - still keep re-naming functionality? not really possible, but put names in reporting functionality
-        - same format for TASQ screening import?
-        - throw informative error when screenSuspects()/screenTargets() is called
-- newProject(): update for new interface
-- util to check if there are suspect results? (ie to replace inherits(...))
-- expand reporting
-    - eg marking which candidate corresponds to suspect and include suspect name in EICs
-        - mark with different row colour and label?
-    - mention suspect similarities/ranks etc for candidates (or somehow in compounds?)
-    - optionally report with collapsed suspects
-- check for empty names in assertion/preparation functions
-- prepareSuspectList(): export? and always calculate neutralMass?
-- annotateSuspects() --> annotate() latter is a function (but not generic) from ggplot2 and RAMClustR and method from CAMERA, so probably no conflicts
-- don't assign level <1 if suspect is a target? or give the choice (or make filter?)
-- spec similarity:
-    - port from TPs someday
-    - proper default for min intensity?
-    - calculate from formulae too? and/or specify in rules from which?
-        - better column name(s)
 
 
 ## docs

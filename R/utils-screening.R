@@ -192,23 +192,21 @@ doScreenSuspects <- function(fGroups, suspects, rtWindow, mzWindow, adduct, skip
     return(ret[])
 }
 
-annotatedMSMSSimilarity <- function(fragInfo, MSMSList, absMzDev, relMinIntensity)
+annotatedMSMSSimilarity <- function(annPL, absMzDev, relMinIntensity)
 {
-    if (nrow(MSMSList) == 0 || nrow(fragInfo) == 0)
+    if (is.null(annPL[["formula"]]))
+        return(0)
+
+    # remove precursor, as eg MetFrag doesn't include this and it's not so interesting anyway
+    annPL <- annPL[precursor == FALSE, c("mz", "intensity"), with = FALSE]
+    
+    annPLWithAnn <- annPL[!is.na(formula)]
+    if (nrow(annPL) == 0 || nrow(annPLWithAnn) == 0)
         return(0)
     
     relMinIntensity <- relMinIntensity * 100 # NOTE: OrgMassSpecR normalizes to 0-100
     
-    prepList <- function(pl)
-    {
-        # remove precursor, as eg MetFrag doesn't include this
-        pl <- pl[precursor == FALSE]
-        return(pl[, c("mz", "intensity"), with = FALSE])
-    }
-
-    annMSMSList <- MSMSList[fragInfo$PLIndex]
-    
-    return(OrgMassSpecR::SpectrumSimilarity(prepList(annMSMSList), prepList(MSMSList), t = absMzDev,
+    return(OrgMassSpecR::SpectrumSimilarity(annPL, annPLWithAnn, t = absMzDev,
                                             b = relMinIntensity, print.graphic = FALSE))
 }
 

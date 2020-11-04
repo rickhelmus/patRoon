@@ -118,8 +118,9 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
             suspCompRank <- if (length(suspCompRank) > 0) suspCompRank[1] else NA_integer_
             
             if (!is.na(suspCompRank) && !is.null(cTable[["fragInfo"]][[suspCompRank]]))
-                annSim <- annotatedMSMSSimilarity(cTable[["fragInfo"]][[suspCompRank]],
-                                                  MSMSList, absMzDev, relMinMSMSIntensity)
+                annSim <- annotatedMSMSSimilarity(annotatedPeakList(compounds, index = suspCompRank,
+                                                                    groupName = gName, MSPeakLists = MSPeakLists),
+                                                  absMzDev, relMinMSMSIntensity)
         }
         
         fragMZMatches <- fragFormMatches <- fragFormCompMatches <- NA_integer_

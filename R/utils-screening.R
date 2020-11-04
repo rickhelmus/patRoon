@@ -228,7 +228,8 @@ defaultIDLevelRules <- function(inLevels = NULL, exLevels = NULL)
 }
 
 # UNDONE/NOTE: mustExist/relative fields only used for scorings of compound/formulas
-estimateIdentificationLevel <- function(suspectRTDev, suspectInChIKey1, suspectFormula, suspectAnnSim,
+estimateIdentificationLevel <- function(suspectRTDev, suspectInChIKey1, suspectFormula,
+                                        suspectAnnSimForm, suspectAnnSimComp, suspectAnnSimBoth,
                                         maxSuspFrags, maxFragMatches, MSMSList,
                                         formTable, formScoreRanges, formulasNormalizeScores,
                                         compTable, mCompNames, compScoreRanges, compoundsNormalizeScores,
@@ -269,9 +270,13 @@ estimateIdentificationLevel <- function(suspectRTDev, suspectInChIKey1, suspectF
     
     checkAnnotationScore <- function(ID, rank, annRow, annTable, annRowNorm, annTableNorm, scCols)
     {
-        # special case: rank
+        # special cases first
         if (ID$score == "rank")
             return(rank >= ID$value)
+        else if (ID$score == "annMSMSSim")
+            return((if (ID$type == "formula") suspectAnnSimForm else suspectAnnSimComp) >= ID$value)
+        else if (ID$score == "annMSMSSimBoth")
+            return(suspectAnnSimBoth >= ID$value)
         
         scCols <- scCols[!is.na(unlist(annRow[, scCols, with = FALSE]))]
         if (length(scCols) == 0)
@@ -317,8 +322,6 @@ estimateIdentificationLevel <- function(suspectRTDev, suspectInChIKey1, suspectF
             # former is used as minimum, make this configurable?
             return(maxFragMatches >= min(ID$value, maxSuspFrags, na.rm = TRUE))
         }
-        if (ID$type == "annotatedMSMSSimilarity")
-            return(suspectAnnSim >= ID$value)
         stop(paste("Unknown ID level type:", ID$type))
     }
 
@@ -339,8 +342,6 @@ estimateIdentificationLevel <- function(suspectRTDev, suspectInChIKey1, suspectF
                 next
             if ("compound" %in% IDL$type &&
                 (is.null(compTable) || nrow(compTable) == 0 || is.null(cRow) || nrow(cRow) == 0))
-                next
-            if ("annotatedMSMSSimilarity" %in% IDL$type && is.na(suspectAnnSim))
                 next
             
             levelOK <- all(sapply(split(IDL, seq_len(nrow(IDL))), checkScore))

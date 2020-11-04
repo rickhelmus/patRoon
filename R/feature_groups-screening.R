@@ -165,6 +165,11 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
             list(suspFormRank, suspCompRank, annSim, maxSuspFrags, maxFragMatches, estIDLevel))
     }
     
+    rmCols <- c("suspFormRank", "suspCompRank", "annotatedMSMSSimilarity", "maxFrags", "maxFragMatches")
+    rmCols <- rmCols[sapply(rmCols, function(col) !is.null(si[[col]]) && all(is.na(si[[col]])))]
+    if (length(rmCols) > 0)
+        si <- si[, setdiff(names(si), rmCols), with = FALSE]
+    
     fGroups@screenInfo <- si
     
     saveCacheData("annotateSuspects", fGroups, hash)

@@ -23,7 +23,6 @@
     - annotateSuspects() --> annotate() latter is a function (but not generic) from ggplot2 and RAMClustR and method from CAMERA, so probably no
     conflicts
     - don't assign level <1 if suspect is a target? or give the choice (or make filter?)
-    - only add sim, ranking etc columns if data is available?
     - spec similarity:
         - port from TPs someday
         - calculate from formulae too? and/or specify in rules from which?

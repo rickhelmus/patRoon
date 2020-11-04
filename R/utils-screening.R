@@ -231,8 +231,7 @@ defaultIDLevelRules <- function(inLevels = NULL, exLevels = NULL)
 
 # UNDONE/NOTE: mustExist/relative fields only used for scorings of compound/formulas
 estimateIdentificationLevel <- function(suspectRTDev, suspectInChIKey1, suspectFormula, suspectAnnSim,
-                                        suspectFragmentsMZ, suspectFragmentsForms, fragMZMatches, fragFormMatches,
-                                        fragFormCompMatches, checkFragments, MSMSList,
+                                        maxSuspFrags, maxFragMatches, MSMSList,
                                         formTable, formScoreRanges, formulasNormalizeScores,
                                         compTable, mCompNames, compScoreRanges, compoundsNormalizeScores,
                                         absMzDev, IDLevelRules)
@@ -316,10 +315,9 @@ estimateIdentificationLevel <- function(suspectRTDev, suspectInChIKey1, suspectF
                                         getAllCompCols(ID$score, names(compTable), mCompNames)))
         if (ID$type == "suspectFragments")
         {
-            # UNDONE: if suspect fragments are less than rule value then the
+            # UNDONE: if suspect fragments are less than the rule value then the
             # former is used as minimum, make this configurable?
-            return((fragMZMatches >= min(ID$value, length(suspectFragmentsMZ))) || 
-                       (max(fragFormMatches, fragFormCompMatches) >= min(ID$value, length(suspectFragmentsForms))))
+            return(maxFragMatches >= min(ID$value, maxSuspFrags, na.rm = TRUE))
         }
         if (ID$type == "annotatedMSMSSimilarity")
             return(suspectAnnSim >= ID$value)
@@ -328,25 +326,13 @@ estimateIdentificationLevel <- function(suspectRTDev, suspectInChIKey1, suspectF
 
     for (IDL in IDLevelList)
     {
+        levelOK <- FALSE
         if ("none" %in% IDL$type) # special case: always valid
             levelOK <- TRUE
         else
         {
-            if ("suspectFragments" %in% IDL$type)
-            {
-                if (is.null(MSMSList) || nrow(MSMSList) == 0)
-                    next
-                hasFRMZ <- "mz" %in% checkFragments && !is.null(suspectFragmentsMZ) &&
-                    !is.na(suspectFragmentsMZ) && length(suspectFragmentsMZ) > 0
-                hasFRForms <- !is.null(suspectFragmentsForms) && !is.na(suspectFragmentsForms) &&
-                    length(suspectFragmentsForms) > 0
-                if (!hasFRMZ && !hasFRForms)
-                    next
-                if (!hasFRMZ &&
-                    (is.null(formTable) || !"formula" %in% checkFragments) &&
-                    (is.null(compTable) || !"compound" %in% checkFragments))
-                    next
-            }
+            if ("suspectFragments" %in% IDL$type && is.na(maxFragMatches))
+                next
             if ("retention" %in% IDL$type && is.null(suspectRTDev))
                 next
             if ("formula" %in% IDL$type && (is.null(formTable) || nrow(formTable) == 0 ||

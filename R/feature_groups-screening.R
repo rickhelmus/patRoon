@@ -65,6 +65,8 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
                                                                  compoundsNormalizeScores = "max",
                                                                  IDLevelRules = defaultIDLevelRules())
 {
+    # UNDONE: prog bar
+    
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertClass, . ~ MSPeakLists + formulas + compounds,
            c("MSPeakLists", "formulas", "compounds"), null.ok = TRUE, fixed = list(add = ac))
@@ -109,7 +111,7 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
         }
         
         suspIK1 <- if (!is.null(si[["InChIKey"]]) && !is.na(si$InChIKey[i])) getIKBlock1(si$InChIKey[i]) else NULL
-        annSim <- 0; suspCompRank <- NA_integer_
+        annSim <- NA_real_; suspCompRank <- NA_integer_
         if (!is.null(MSMSList) && !is.null(cTable) && !is.null(suspIK1))
         {
             suspCompRank <- which(suspIK1 == cTable$InChIKey1)
@@ -120,16 +122,21 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
                                                   MSMSList, absMzDev, relMinMSMSIntensity)
         }
         
-        fragMZMatches <- fragFormMatches <- fragFormCompMatches <- 0
+        fragMZMatches <- fragFormMatches <- fragFormCompMatches <- NA_integer_
         fragMZs <- fragForms <- NULL
-        if (!is.null(si[["fragments_mz"]]))
+        maxSuspFrags <- maxFragMatches <- NA_integer_
+        if (!is.null(si[["fragments_mz"]]) && !is.na(si[["fragments_mz"]][i]) &&
+            nzchar(si[["fragments_mz"]][i]) && "mz" %in% checkFragments)
         {
             fragMZs <- as.numeric(unlist(strsplit(si[["fragments_mz"]][i], ";")))
-            fragMZMatches <- sum(sapply(MSMSList$mz, function(mz1) any(sapply(fragMZs, mzWithin, mz1 = mz1))))
+            maxSuspFrags <- length(fragMZs)
+            maxFragMatches <- sum(sapply(MSMSList$mz, function(mz1) any(sapply(fragMZs, mzWithin, mz1 = mz1))))
         }
-        if (!is.null(si[["fragments_formula"]]))
+        if (!is.null(si[["fragments_formula"]]) && !is.na(si[["fragments_formula"]][si]) &&
+            nzchar(si[["fragments_formula"]][si]))
         {
             fragForms <- unlist(strsplit(si[["fragments_formula"]][i], ";"))
+            maxSuspFrags <- max(NAToZero(maxSuspFrags), length(fragForms))
             
             if (!is.null(fTable) && "formula" %in% checkFragments)
             {
@@ -137,25 +144,24 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
                 if (nrow(frTable) > 0)
                 {
                     fi <- getFragmentInfoFromForms(MSMSList, frTable)
-                    fragFormMatches <- sum(fragForms %in% fi$formula)
+                    maxFragMatches <- max(NAToZero(maxFragMatches), sum(fragForms %in% fi$formula))
                 }
             }
             
             if (!is.null(cTable) && "compound" %in% checkFragments && !is.na(suspCompRank) &&
                 !is.null(cTable[["fragInfo"]][[suspCompRank]]))
-                fragFormCompMatches <- sum(fragForms %in% cTable[["fragInfo"]][[suspCompRank]]$formula)
+                maxFragMatches <- max(NAToZero(maxFragMatches), sum(fragForms %in% cTable[["fragInfo"]][[suspCompRank]]$formula))
         }
 
         estIDLevel <- estimateIdentificationLevel(si$d_rt[i], suspIK1, si$formula[i], annSim,
-                                                  fragMZs, fragForms, fragMZMatches, fragFormMatches, fragFormCompMatches,
-                                                  checkFragments, MSMSList, fTable, fScRanges, formulasNormalizeScores, cTable,
+                                                  maxSuspFrags, maxFragMatches, MSMSList, fTable, fScRanges,
+                                                  formulasNormalizeScores, cTable,
                                                   mCompNames = if (!is.null(compounds)) mergedCompoundNames(compounds) else NULL,
                                                   cScRanges, compoundsNormalizeScores, absMzDev, IDLevelRules)
 
         set(si, i,
-            c("suspFormRank", "suspCompRank", "annotatedMSMSSimilarity", "fragMZMatches", "fragFormMatches",
-              "fragFormCompMatches", "estIDLevel"),
-            list(suspFormRank, suspCompRank, annSim, fragMZMatches, fragFormMatches, fragFormCompMatches, estIDLevel))
+            c("suspFormRank", "suspCompRank", "annotatedMSMSSimilarity", "maxFrags", "maxFragMatches", "estIDLevel"),
+            list(suspFormRank, suspCompRank, annSim, maxSuspFrags, maxFragMatches, estIDLevel))
     }
     
     fGroups@screenInfo <- si

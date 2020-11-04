@@ -78,8 +78,8 @@ if (rmdVars$retMin)
 fGroupsSpecDT[, c("ret", "mz") := .(round(ret, 2), round(mz, 5))]
 fGroupsSpecDT <- fGroupsSpecDT[, intersect(c("group", "ret", "mz", "suspect", "d_rt", "d_mz",
                                              "suspFormRank", "suspCompRank",
-                                             "annotatedMSMSSimilarity", "estIDLevel",
-                                             "fragMZMatches", "fragFormMatches", "fragFormCompMatches"),
+                                             "annotatedMSMSSimilarity", "maxFrags", "maxFragMatches",
+                                             "estIDLevel"),
                                            names(fGroupsSpecDT)),
                                with = FALSE]
 fGroupsSpecDT[, groupInd := match(group, allGroups)]

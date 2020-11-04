@@ -454,6 +454,7 @@ getAllMethods <- function(gen)
 
 NULLToZero <- function(x) if (is.null(x)) 0 else x
 zeroToNULL <- function(x) if (is.numeric(x) && x == 0) NULL else x
+NAToZero <- function(x) if (is.na(x)) 0 else x
 
 # From https://stackoverflow.com/a/47955845
 allArgs <- function(origValues = FALSE)

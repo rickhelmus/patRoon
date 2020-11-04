@@ -18,7 +18,6 @@
 - interface
     - groupFeaturesScreening() --> screenSuspects()?
     - deprecate old screen functions
-    - filters: by matched fragments of suspect list, ann similarity
     - also convert TASQ?
     - newProject(): update for new interface
     - annotateSuspects() --> annotate() latter is a function (but not generic) from ggplot2 and RAMClustR and method from CAMERA, so probably no

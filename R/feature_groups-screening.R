@@ -174,11 +174,13 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
 setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = FALSE,
                                                        selectHitsBy = NULL, selectFGroupsBy = NULL,
                                                        maxLevel = NULL, maxFormRank = NULL, maxCompRank = NULL,
-                                                       minAnnMSMSSim = NULL, negate = FALSE)
+                                                       minAnnMSMSSim = NULL, minFragMatches = NULL, negate = FALSE)
 {
     # UNDONE: doc that selectHitsBy/selectFGroupsBy only applies to hits, in case of ties: first hit
     # UNDONE: mention that filter with onlyHits may need to be repeated
     # UNDONE: cache?
+    # UNDONE: minFragMatches --> split in abs/rel thresholds?
+    # UNDONE: keep or remove NA values with colFilter()? document what happens
     
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertFlag, . ~ onlyHits + negate, fixed = list(add = ac))
@@ -187,13 +189,21 @@ setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = FALS
     checkmate::assertInt(maxLevel, null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
-    colFilter <- function(pred, col, val)
+    colFilter <- function(pred, what, col)
     {
-        if (!is.null(val) && !is.null(screenInfo(obj)[[col]]))
+        val <- get(what)
+        if (!is.null(val))
         {
-            if (negate)
-                pred <- Negate(pred)
-            obj@screenInfo <- screenInfo(obj)[!is.na(get(col)) & nzchar(get(col)) & pred(get(col), val)]
+            if (is.null(screenInfo(obj)[[col]]))
+                warning(sprintf("Cannot apply %s filter: no annotation data available (did you run annotateSuspects()?).", what))
+            else
+            {
+                if (negate)
+                    doPred <- function(x, v) is.na(x) | !nzchar(x) | !pred(x, v)
+                else
+                    doPred <- function(x, v) !is.na(x) & nzchar(x) & pred(x, v)
+                obj@screenInfo <- screenInfo(obj)[doPred(get(col), val)]
+            }
         }
         return(obj)
     }
@@ -201,10 +211,11 @@ setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = FALS
     maxPred <- function(x, v) x <= v
     levPred <- function(x, v) maxPred(numericIDLevel(x), v)
 
-    obj <- colFilter(levPred, "estIDLevel", maxLevel)
-    obj <- colFilter(maxPred, "suspFormRank", maxFormRank)
-    obj <- colFilter(maxPred, "suspCompRank", maxCompRank)
-    obj <- colFilter(minPred, "annotatedMSMSSimilarity", minAnnMSMSSim)
+    obj <- colFilter(levPred, "maxLevel", "estIDLevel")
+    obj <- colFilter(maxPred, "maxFormRank", "suspFormRank")
+    obj <- colFilter(maxPred, "maxCompRank", "suspCompRank")
+    obj <- colFilter(minPred, "minAnnMSMSSim", "annotatedMSMSSimilarity")
+    obj <- colFilter(minPred, "minFragMatches", "maxFragMatches")
     
     # do here so that only duplicates not yet filtered out in previous steps are considered
     if (!is.null(selectHitsBy) || !is.null(selectFGroupsBy))
@@ -212,28 +223,30 @@ setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = FALS
         doKeep <- function(v, d) is.na(v) | length(v) == 1 | order(v, decreasing = d) == 1
         doSelectFilter <- function(si, by, byCol)
         {
-            gTab <- as.data.table(obj, collapseSuspects = NULL, onlyHits = TRUE)
-            
-            if (by == "intensity")
+            if (by == "level" && is.null(gTab[["estIDLevel"]]))
+                warning("Cannot select by identification level: no annotation data available (did you run annotateSuspects()?).")
+            else
             {
-                gTab[, avgInts := rowMeans(.SD), .SDcol = analyses(obj)]
-                gTab <- gTab[, keep := doKeep(avgInts, !negate), by = byCol]
+                gTab <- as.data.table(obj, collapseSuspects = NULL, onlyHits = TRUE)
+                
+                if (by == "intensity")
+                {
+                    gTab[, avgInts := rowMeans(.SD), .SDcol = analyses(obj)]
+                    gTab <- gTab[, keep := doKeep(avgInts, !negate), by = byCol]
+                }
+                else # select by best hit
+                    gTab <- gTab[, keep := doKeep(estIDLevel, negate), by = byCol]
+                
+                if (any(!gTab$keep))
+                {
+                    # merge-in keep column so we can subset screenInfo
+                    si <- copy(si)
+                    si[gTab, keep := i.keep, on = c("group", "name")]
+                    setorderv(si, "name")
+                    obj@screenInfo <- si[keep == TRUE, -"keep"]
+                }
             }
-            else # select by best hit
-            {
-                if (is.null(gTab[["estIDLevel"]]))
-                    stop("Cannot select by identification level: no annotation data available (did you run annotateSuspects()?). ")
-                gTab <- gTab[, keep := doKeep(estIDLevel, negate), by = byCol]
-            }
-            
-            if (any(!gTab$keep))
-            {
-                # merge-in keep column so we can subset screenInfo
-                si <- copy(si)
-                si[gTab, keep := i.keep, on = c("group", "name")]
-                setorderv(si, "name")
-                obj@screenInfo <- si[keep == TRUE, -"keep"]
-            }
+            return(obj@screenInfo)
         }
         
         if (!is.null(selectHitsBy))

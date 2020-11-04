@@ -339,8 +339,10 @@ estimateIdentificationLevel <- function(suspectRTDev, suspectInChIKey1, suspectF
                                             is.null(suspectFormula) || is.null(fRow) ||
                                             nrow(fRow) == 0))
                 next
-            if (any(c("compound", "annotatedMSMSSimilarity") %in% IDL$type) &&
+            if ("compound" %in% IDL$type &&
                 (is.null(compTable) || nrow(compTable) == 0 || is.null(cRow) || nrow(cRow) == 0))
+                next
+            if ("annotatedMSMSSimilarity" %in% IDL$type && is.na(suspectAnnSim))
                 next
             
             levelOK <- all(sapply(split(IDL, seq_len(nrow(IDL))), checkScore))

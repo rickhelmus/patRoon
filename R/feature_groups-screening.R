@@ -125,8 +125,9 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
         fragMZMatches <- fragFormMatches <- fragFormCompMatches <- NA_integer_
         fragMZs <- fragForms <- NULL
         maxSuspFrags <- maxFragMatches <- NA_integer_
-        if (!is.null(si[["fragments_mz"]]) && !is.na(si[["fragments_mz"]][i]) &&
-            nzchar(si[["fragments_mz"]][i]) && "mz" %in% checkFragments)
+        if (!is.null(MSPeakLists) && !is.null(si[["fragments_mz"]]) &&
+            !is.na(si[["fragments_mz"]][i]) && nzchar(si[["fragments_mz"]][i]) &&
+            "mz" %in% checkFragments)
         {
             fragMZs <- as.numeric(unlist(strsplit(si[["fragments_mz"]][i], ";")))
             maxSuspFrags <- length(fragMZs)
@@ -223,7 +224,7 @@ setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = FALS
         doKeep <- function(v, d) is.na(v) | length(v) == 1 | order(v, decreasing = d) == 1
         doSelectFilter <- function(si, by, byCol)
         {
-            if (by == "level" && is.null(gTab[["estIDLevel"]]))
+            if (by == "level" && is.null(si[["estIDLevel"]]))
                 warning("Cannot select by identification level: no annotation data available (did you run annotateSuspects()?).")
             else
             {

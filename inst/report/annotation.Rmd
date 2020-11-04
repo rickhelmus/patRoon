@@ -78,7 +78,9 @@ if (rmdVars$retMin)
 fGroupsSpecDT[, c("ret", "mz") := .(round(ret, 2), round(mz, 5))]
 fGroupsSpecDT <- fGroupsSpecDT[, intersect(c("group", "ret", "mz", "suspect", "d_rt", "d_mz",
                                              "suspFormRank", "suspCompRank",
-                                             "annotatedMSMSSimilarity", "estIDLevel"), names(fGroupsSpecDT)),
+                                             "annotatedMSMSSimilarity", "estIDLevel",
+                                             "fragMZMatches", "fragFormMatches", "fragFormCompMatches"),
+                                           names(fGroupsSpecDT)),
                                with = FALSE]
 fGroupsSpecDT[, groupInd := match(group, allGroups)]
 setcolorder(fGroupsSpecDT, "groupInd")

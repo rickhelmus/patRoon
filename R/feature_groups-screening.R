@@ -87,6 +87,8 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
     if (!is.null(cd))
         return(cd)
     
+    mzWithin <- function(mz1, mz2) abs(mz1 - mz2) <= absMzDev
+    
     si <- copy(screenInfo(fGroups))
     
     for (i in seq_len(nrow(si)))
@@ -118,15 +120,42 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
                                                   MSMSList, absMzDev, relMinMSMSIntensity)
         }
         
-        set(si, i, c("suspFormRank", "suspCompRank", "annotatedMSMSSimilarity"), list(suspFormRank, suspCompRank, annSim))
-        set(si, i, "estIDLevel",
-            estimateIdentificationLevel(si$d_rt[i], suspIK1, si$formula[i], annSim,
-                                        if (!is.null(si[["fragments_mz"]])) si$fragments_mz[i] else NULL,
-                                        if (!is.null(si[["fragments_formula"]])) si$fragments_formula[i] else NULL,
-                                        checkFragments, MSMSList, fTable, fScRanges,
-                                        formulasNormalizeScores, cTable,
-                                        mCompNames = if (!is.null(compounds)) mergedCompoundNames(compounds) else NULL,
-                                        cScRanges, compoundsNormalizeScores, absMzDev, IDLevelRules))
+        fragMZMatches <- fragFormMatches <- fragFormCompMatches <- 0
+        fragMZs <- fragForms <- NULL
+        if (!is.null(si[["fragments_mz"]]))
+        {
+            fragMZs <- as.numeric(unlist(strsplit(si[["fragments_mz"]][i], ";")))
+            fragMZMatches <- sum(sapply(MSMSList$mz, function(mz1) any(sapply(fragMZs, mzWithin, mz1 = mz1))))
+        }
+        if (!is.null(si[["fragments_formula"]]))
+        {
+            fragForms <- unlist(strsplit(si[["fragments_formula"]][i], ";"))
+            
+            if (!is.null(fTable) && "formula" %in% checkFragments)
+            {
+                frTable <- fTable[byMSMS == TRUE & si$formula[i] == neutral_formula]
+                if (nrow(frTable) > 0)
+                {
+                    fi <- getFragmentInfoFromForms(MSMSList, frTable)
+                    fragFormMatches <- sum(fragForms %in% fi$formula)
+                }
+            }
+            
+            if (!is.null(cTable) && "compound" %in% checkFragments && !is.na(suspCompRank) &&
+                !is.null(cTable[["fragInfo"]][[suspCompRank]]))
+                fragFormCompMatches <- sum(fragForms %in% cTable[["fragInfo"]][[suspCompRank]]$formula)
+        }
+
+        estIDLevel <- estimateIdentificationLevel(si$d_rt[i], suspIK1, si$formula[i], annSim,
+                                                  fragMZs, fragForms, fragMZMatches, fragFormMatches, fragFormCompMatches,
+                                                  checkFragments, MSMSList, fTable, fScRanges, formulasNormalizeScores, cTable,
+                                                  mCompNames = if (!is.null(compounds)) mergedCompoundNames(compounds) else NULL,
+                                                  cScRanges, compoundsNormalizeScores, absMzDev, IDLevelRules)
+
+        set(si, i,
+            c("suspFormRank", "suspCompRank", "annotatedMSMSSimilarity", "fragMZMatches", "fragFormMatches",
+              "fragFormCompMatches", "estIDLevel"),
+            list(suspFormRank, suspCompRank, annSim, fragMZMatches, fragFormMatches, fragFormCompMatches, estIDLevel))
     }
     
     fGroups@screenInfo <- si

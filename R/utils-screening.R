@@ -231,17 +231,12 @@ defaultIDLevelRules <- function(inLevels = NULL, exLevels = NULL)
 
 # UNDONE/NOTE: mustExist/relative fields only used for scorings of compound/formulas
 estimateIdentificationLevel <- function(suspectRTDev, suspectInChIKey1, suspectFormula, suspectAnnSim,
-                                        suspectFragmentsMZ, suspectFragmentsForms,
-                                        checkFragments, MSMSList,
+                                        suspectFragmentsMZ, suspectFragmentsForms, fragMZMatches, fragFormMatches,
+                                        fragFormCompMatches, checkFragments, MSMSList,
                                         formTable, formScoreRanges, formulasNormalizeScores,
                                         compTable, mCompNames, compScoreRanges, compoundsNormalizeScores,
                                         absMzDev, IDLevelRules)
 {
-    if (!is.null(suspectFragmentsMZ))
-        suspectFragmentsMZ <- as.numeric(unlist(strsplit(suspectFragmentsMZ, ";")))
-    if (!is.null(suspectFragmentsForms))
-        suspectFragmentsForms <- unlist(strsplit(suspectFragmentsForms, ";"))
-    
     fRow <- cRow <- NULL
     if (!is.null(formTable) && !is.null(suspectFormula))
     {
@@ -321,25 +316,10 @@ estimateIdentificationLevel <- function(suspectRTDev, suspectInChIKey1, suspectF
                                         getAllCompCols(ID$score, names(compTable), mCompNames)))
         if (ID$type == "suspectFragments")
         {
-            suspMSMSMatchesMZ <- suspMSMSMatchesFormF <- suspMSMSMatchesFormC <- 0
-            if (!is.null(suspectFragmentsMZ))
-                suspMSMSMatchesMZ <- sum(sapply(MSMSList$mz, function(mz1) any(sapply(suspectFragmentsMZ, mzWithin, mz1 = mz1))))
-            if (!is.null(suspectFragmentsForms))
-            {
-                if (!is.null(fRow) && "formula" %in% checkFragments)
-                {
-                    frTable <- formTable[byMSMS == TRUE & suspectFormula == neutral_formula]
-                    if (nrow(frTable) > 0)
-                    {
-                        fi <- getFragmentInfoFromForms(MSMSList, frTable)
-                        suspMSMSMatchesFormF <- sum(suspectFragmentsForms %in% fi$formula)
-                    }
-                }
-                if (!is.null(cRow) && "compound" %in% checkFragments && !is.null(cRow[["fragInfo"]]))
-                    suspMSMSMatchesFormC <- sum(suspectFragmentsForms %in% cRow$fragInfo$formula)
-            }
-            # UNDONE: make min(length...) configurable?
-            return(max(suspMSMSMatchesMZ, suspMSMSMatchesFormF, suspMSMSMatchesFormC) >= min(ID$value, length(suspectFragmentsMZ)))
+            # UNDONE: if suspect fragments are less than rule value then the
+            # former is used as minimum, make this configurable?
+            return((fragMZMatches >= min(ID$value, length(suspectFragmentsMZ))) || 
+                       (max(fragFormMatches, fragFormCompMatches) >= min(ID$value, length(suspectFragmentsForms))))
         }
         if (ID$type == "annotatedMSMSSimilarity")
             return(suspectAnnSim >= ID$value)

@@ -26,8 +26,6 @@
     - spec similarity:
         - port from TPs someday
         - don't use jaccard? perhaps it makes sense to use it, as intensities are irrelevant anyway
-        - calculate from formulae too? and/or specify in rules from which?
-            - better column name(s)
 - misc
     - util to check if there are suspect results? (ie to replace inherits(...))
     - check for empty names in assertion/preparation functions

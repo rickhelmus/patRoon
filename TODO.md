@@ -31,7 +31,7 @@
     - check for empty names in assertion/preparation functions
     - credits to ES
     - update version number
-    - prepareSuspectList(): export? and always calculate neutralMass?
+    - prepareSuspectList(): export?
 - expand reporting
     - eg marking which candidate corresponds to suspect and include suspect name in EICs
         - mark with different row colour and label?

@@ -106,6 +106,8 @@ prepareSuspectList <- function(suspects, adduct, skipInvalid)
         else
             suspects[, mz := neutralMasses + addMZs]
         
+        suspects[, neutralMass := neutralMasses]
+        
         saveCacheData("screenSuspectsPrepList", suspects, hash)
     }        
     

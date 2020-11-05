@@ -49,6 +49,7 @@
   relMSMSIntThr = NULL,
   topMSPeaks = NULL,
   topMSMSPeaks = NULL,
+  minMSMSPeaks = NULL,
   isolatePrec = NULL,
   deIsotopeMS = FALSE,
   deIsotopeMSMS = FALSE,
@@ -99,6 +100,10 @@ intensity threshold for MS or MS/MS peak lists. \code{NULL} for none.}
 
 \item{topMSPeaks, topMSMSPeaks}{Only consider this amount of MS or MS/MS peaks
 with highest intensity. \code{NULL} to consider all.}
+
+\item{minMSMSPeaks}{If the number of peaks in an MS/MS peak list
+(\strong{excluding} the precursor peak) is lower than this it will be removed.
+Set to \code{NULL} to ignore.}
 
 \item{isolatePrec}{If not \code{NULL} then value should be a \code{list} with
 parameters used for isolating the precursor and its isotopes in MS peak

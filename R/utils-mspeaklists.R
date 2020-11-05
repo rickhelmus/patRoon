@@ -173,7 +173,7 @@ deIsotopeMSPeakList <- function(MSPeakList, negate)
     return(MSPeakList[unique_iso])
 }
 
-doMSPeakListFilter <- function(pList, absIntThr, relIntThr, topMost, deIsotope, retainPrecursor, negate)
+doMSPeakListFilter <- function(pList, absIntThr, relIntThr, topMost, minPeaks, deIsotope, retainPrecursor, negate)
 {
     ret <- pList
 
@@ -208,6 +208,10 @@ doMSPeakListFilter <- function(pList, absIntThr, relIntThr, topMost, deIsotope, 
         }
     }
 
+    # -1: don't count precursor peaks
+    if (!is.null(minPeaks) && (nrow(ret)-1) < minPeaks)
+        ret <- ret[0, ]
+    
     return(ret)
 }
 

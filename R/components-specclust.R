@@ -8,7 +8,8 @@ componentsSpecClust <- setClass("componentsSpecClust", contains = "componentsClu
 setMethod("generateComponentsSpecClust", "featureGroups", function(fGroups, MSPeakLists, method = "complete",
                                                                    simMethod, shift = "none", removePrecursor = FALSE,
                                                                    mzWeight = 0, intWeight = 1, absMzDev = 0.005,
-                                                                   relMinIntensity = 0.1, maxTreeHeight = 1, deepSplit = TRUE,
+                                                                   relMinIntensity = 0.05, minSimMSMSPeaks = 0,
+                                                                   maxTreeHeight = 1, deepSplit = TRUE,
                                                                    minModuleSize = 1)
 {
     # UNDONE: document that relative intensity filter is applied after removing precursors
@@ -21,6 +22,7 @@ setMethod("generateComponentsSpecClust", "featureGroups", function(fGroups, MSPe
     checkmate::assertFlag(removePrecursor, add = ac)
     aapply(checkmate::assertNumber, . ~ mzWeight + intWeight + absMzDev + relMinIntensity,
            finite = TRUE, fixed = list(add = ac))
+    checkmate::assertCount(minSimMSMSPeaks, add = ac)
     assertDynamicTreeCutArgs(maxTreeHeight, deepSplit, minModuleSize, ac)
     checkmate::reportAssertions(ac)
     
@@ -46,6 +48,9 @@ setMethod("generateComponentsSpecClust", "featureGroups", function(fGroups, MSPe
             return(pl)
         }), checkZeroRows = TRUE)
     }
+    
+    if (minSimMSMSPeaks > 0)
+        allMSMS <- allMSMS[sapply(allMSMS, nrow) >= minSimMSMSPeaks]
     
     gInfo <- groupInfo(fGroups)[names(allMSMS), ] # make sure to subset!
     

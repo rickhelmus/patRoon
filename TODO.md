@@ -234,6 +234,8 @@
     - as.data.table() fGroupsScreening: can't combine normalizing and FC at the moment --> notify user
     - as.data.table/plotVolcano: docs and assertions; mention Bas
     - plotVolcano(): move legend outside graph
+    - workflow: first do log2fc subsetting, then clustering
+        - somehow ensure that parents always end up in clusters??
 - convertToSuspects(): fill in missing info (eg neutralMass)?
 - spectrumSimilarity
     - sets

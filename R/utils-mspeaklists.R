@@ -353,7 +353,8 @@ specSimilarityR <- function(pl1, pl2, method, shift = "none", removePrecursor = 
 }
 
 specSimilarity <- function(pl1, pl2, method, shift = "none", precDiff = 0, removePrecursor = FALSE,
-                           mzWeight = 0, intWeight = 1, absMzDev = 0.005, relMinIntensity = 0.1)
+                           mzWeight = 0, intWeight = 1, absMzDev = 0.005, relMinIntensity = 0.1,
+                           minPeaks = 0)
 {
     # UNDONE: refs
     # UNDONE: export? add asserts if yes
@@ -378,6 +379,9 @@ specSimilarity <- function(pl1, pl2, method, shift = "none", precDiff = 0, remov
     }
     
     if (nrow(pl1) == 0 || nrow(pl2) == 0)
+        return(0)
+    
+    if (nrow(pl1) < minPeaks || nrow(pl2) < minPeaks)
         return(0)
     
     # UNDONE: use inheritance instead?

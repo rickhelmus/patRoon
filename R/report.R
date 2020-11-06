@@ -97,7 +97,7 @@ optimizePngPlots <- function(plotFiles)
         qplots <- paste0(tools::file_path_sans_ext(plots), "-fs8.png")
         qexist <- file.exists(qplots)
         file.rename(qplots[qexist], plots[qexist])
-    })
+    }, method = "classic")
 
     invisible(NULL)
 }

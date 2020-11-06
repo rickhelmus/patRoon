@@ -68,7 +68,7 @@ executeMultiProcess <- function(commandQueue, finishHandler,
                                 procTimeout = NULL, printOutput = FALSE, printError = FALSE,
                                 logSubDir = NULL,
                                 showProgress = TRUE, waitTimeout = 50,
-                                batchSize = 1, delayBetweenProc = 0)
+                                batchSize = 1, delayBetweenProc = 0, method = NULL)
 {
     if (!checkmate::testNamed(commandQueue))
         names(commandQueue) <- seq_along(commandQueue) # setting names makes it easier to split/merge cached results later
@@ -102,7 +102,9 @@ executeMultiProcess <- function(commandQueue, finishHandler,
     
     if (length(commandQueue) > 0)
     {
-        f <- switch(getOption("patRoon.multiProcMethod", "classic"),
+        if (is.null(method))
+            method <- getOption("patRoon.multiProcMethod", "classic")
+        f <- switch(method,
                     classic = executeMultiProcessClassic,
                     future = executeMultiProcessFuture)
         if (is.null(f))

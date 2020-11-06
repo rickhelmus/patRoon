@@ -113,19 +113,11 @@ findFeaturesOpenMS <- function(analysisInfo, noiseThrInt = 1000, chromSNR = 3, c
     cmdQueue <- lapply(seq_len(nrow(analysisInfo)), function(anai)
     {
         dfile <- getMzMLAnalysisPath(analysisInfo$analysis[anai], analysisInfo$path[anai])
-        ffile <- tempfile(analysisInfo$analysis[anai], fileext = ".featureXML")
         hash <- makeHash(makeFileHash(dfile), paramsHash)
-        cmd <- do.call(getOpenMSFFCommand, c(list(dfile, ffile), params))
-
         logf <- paste0("ffm-", analysisInfo$analysis[anai], ".txt")
-
-        return(c(list(hash = hash, dataFile = dfile, featFile = ffile, logFile = logf), cmd))
+        return(list(hash = hash, dataFile = dfile, logFile = logf))
     })
     names(cmdQueue) <- analysisInfo$analysis
-
-    cachedResults <- sapply(cmdQueue, function(cmd) loadCacheData("featuresOpenMS", cmd$hash), simplify = FALSE)
-    cachedResults <- cachedResults[!sapply(cachedResults, is.null)]
-    cmdQueue <- cmdQueue[setdiff(names(cmdQueue), names(cachedResults))] # remove cached results
 
     fList <- list()
     if (length(cmdQueue) > 0)
@@ -133,22 +125,28 @@ findFeaturesOpenMS <- function(analysisInfo, noiseThrInt = 1000, chromSNR = 3, c
         fList <- executeMultiProcess(cmdQueue, function(cmd, ...)
         {
             fts <- importFeatureXML(cmd$featFile)
-            fts <- loadIntensities(cmd$dataFile, fts, intSearchRTWindow)
-
+            return(fts)
+        }, prepareHandler = function(cmd)
+        {
+            ffile <- tempfile(fileext = ".featureXML")
+            cmd <- do.call(getOpenMSFFCommand, c(list(cmd$dataFile, ffile), params))
+            return(c(list(featFile = ffile), cmd))
+        }, showProgress = verbose, logSubDir = "openms", cacheName = "featuresOpenMS")
+        
+        # load intensities afterwards: we want to use the cache if possible,
+        # which wouldn't be possible if future MP is used.
+        if (verbose)
+            cat("Loading peak intensities...\n")
+        fList <- lapply(names(fList), function(ana)
+        {
+            fts <- loadIntensities(cmdQueue[[ana]]$dataFile, fList[[ana]], intSearchRTWindow)
+            
             # BUG: OpenMS sporadically reports features with 0 intensity
             # (noticed this with a feature of only two datapoints in hull).
             fts <- fts[intensity > 0]
-
-            saveCacheData("featuresOpenMS", fts, cmd$hash)
-
+            
             return(fts)
-        }, showProgress = verbose, logSubDir = "openms")
-    }
-
-    if (length(cachedResults) > 0)
-    {
-        fList <- c(fList, cachedResults)
-        fList <- fList[intersect(analysisInfo$analysis, names(fList))] # re-order
+        })
     }
 
     if (verbose)

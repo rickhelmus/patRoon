@@ -87,50 +87,6 @@ unifySirNames <- function(sir)
     return(sir[, unNames, with = FALSE]) # filter out any other columns
 }
 
-# get a command queue list that can be used with executeMultiProcess()
-getSiriusCommand <- function(precursorMZ, MSPList, MSMSPList, profile, adduct, ppmMax, elements,
-                             database, noise, withFingerID, fingerIDDatabase, topMost, extraOpts,
-                             isPre44)
-{
-    outPath <- tempfile("sirius")
-    # unlink(outPath, TRUE) # start with fresh output directory (otherwise previous results are combined)
-
-    stopifnot(!file.exists(outPath))
-
-    msFName <- tempfile("spec", fileext = ".ms")    
-    ionization <- as.character(adduct, format = "sirius")
-    mainArgs <- c("-p", profile,
-                  "-e", elements,
-                  "--ppm-max", ppmMax,
-                  "-c", topMost)
-
-    if (!is.null(database))
-        mainArgs <- c(mainArgs, "-d", database)
-    if (!is.null(noise))
-        mainArgs <- c(mainArgs, "-n", noise)
-    if (!is.null(extraOpts))
-        mainArgs <- c(mainArgs, extraOpts)
-
-    if (isPre44)
-    {
-        if (withFingerID)
-            mainArgs <- c(mainArgs, "--fingerid", "--fingerid-db", fingerIDDatabase)
-        args <- c(mainArgs, "-o", outPath, msFName)
-    }
-    else
-    {
-        args <- c("-o", outPath, "-i", msFName, "formula", mainArgs)
-        if (withFingerID)
-            args <- c(args, "structure", "--database", fingerIDDatabase)
-    }
-
-    cmpName <- "unknownCompound"
-    makeSirMSFile(MSPList, MSMSPList, precursorMZ, cmpName, ionization, msFName)
-
-    return(list(command = getCommandWithOptPath(getSiriusBin(), "SIRIUS"), args = args,
-                outPath = outPath, msFName = msFName, cmpName = cmpName, isPre44 = isPre44))
-}
-
 runSIRIUS <- function(precursorMZs, MSPLists, MSMSPLists, resNames, profile, adduct, ppmMax, elements,
                       database, noise, cores, withFingerID, fingerIDDatabase, topMost,
                       extraOptsGeneral, extraOptsFormula, verbose, isPre44,

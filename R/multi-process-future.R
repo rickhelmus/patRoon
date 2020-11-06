@@ -2,10 +2,13 @@ executeMultiProcessFuture <- function(commandQueue, finishHandler, timeoutHandle
                                       prepareHandler, procTimeout, printOutput, printError, logSubDir,
                                       showProgress, batchSize = 1, ...)
 {
+    if (is.null(procTimeout))
+        procTimeout <- Inf
+    
     results <- future.apply::future_lapply(commandQueue, function(cmd)
     {
         if (!is.null(prepareHandler))
-            cmd <- prepareHandler(cmd) # UNDONE
+            cmd <- prepareHandler(cmd)
         timeoutRetries <- errorRetries <- 0
         while (TRUE)
         {
@@ -61,6 +64,6 @@ executeMultiProcessFuture <- function(commandQueue, finishHandler, timeoutHandle
         }
     }
     
-    ret <- sapply(results, "[[", "result")
+    ret <- sapply(results, "[[", "result", simplify = FALSE)
     return(ret)
 }

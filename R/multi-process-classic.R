@@ -16,7 +16,7 @@ makeCommandList <- function(commandQueue, cmdInds, sucDir)
             # on Windows we easily reach the commandline text limit --> execute as batch file
             
             # fail with last exit code if a command failed: see https://stackoverflow.com/questions/734598/how-do-i-make-a-batch-file-terminate-upon-encountering-an-error
-            # NOTE: need to enable delayed expension and use exclamation marks for current errorlevel expansion.
+            # NOTE: need to enable delayed expansion and use exclamation marks for current errorlevel expansion.
             ORDoExit <- "|| exit /b !errorlevel!"
             
             # mark success of a command by creating an empty file named after the command index

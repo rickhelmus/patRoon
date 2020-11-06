@@ -83,6 +83,7 @@
     - patRoon.logPath, multiProcMethod
     - update ref docus for executeMultiProcess
 - tests
+- limitation: local databases need to be available for MF on the localhost and nodes, both for caching and checking score types. Any workarounds? Otherwise document that location for them should be fixed.
 
 
 # Future

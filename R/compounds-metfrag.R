@@ -204,7 +204,7 @@ getMFFragmentInfo <- function(spec, mfResult, adduct)
     return(ret)
 }
 
-initMetFragCLCommand <- function(mfSettings, spec, mfBin, logFile)
+initMetFragCLCommand <- function(mfSettings, spec, mfBin)
 {
     paramFile <- tempfile("parameters", fileext = ".txt")
     paramCon <- file(paramFile, "w")
@@ -225,7 +225,7 @@ initMetFragCLCommand <- function(mfSettings, spec, mfBin, logFile)
 
     close(paramCon)
 
-    return(list(command = "java", args = c("-jar", mfBin, paramFile), logFile = logFile, outFile = outFile))
+    return(list(command = "java", args = c("-jar", mfBin, paramFile), outFile = outFile))
 }
 
 generateMetFragRunData <- function(fGroups, MSPeakLists, mfSettings, topMost, identifiers, method)
@@ -252,7 +252,9 @@ generateMetFragRunData <- function(fGroups, MSPeakLists, mfSettings, topMost, id
 
         hash <- makeHash(method, mfSettings, spec, topMost)
 
-        return(list(hash = hash, gName = grp, spec = spec, mfSettings = mfSettings))
+        logf <- paste0("mfcl-", grp, ".txt")
+        
+        return(list(hash = hash, gName = grp, spec = spec, mfSettings = mfSettings, logFile = logf))
     }, simplify = FALSE)
 
     return(ret[!sapply(ret, is.null)])
@@ -599,8 +601,7 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", timeou
             if (!nzchar(Sys.which("java")))
                 stop("Please make sure that java is installed and its location is correctly set in PATH.")
             
-            logf <- paste0("mfcl-", cmd$gName, ".txt")
-            return(c(cmd, initMetFragCLCommand(cmd$mfSettings, cmd$spec, mfBin, logf)))
+            return(c(cmd, initMetFragCLCommand(cmd$mfSettings, cmd$spec, mfBin)))
         }, cacheName = "metfrag", setHash = setHash, procTimeout = timeout, delayBetweenProc = 1000, logSubDir = "metfrag")
     }
     else

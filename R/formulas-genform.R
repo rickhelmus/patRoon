@@ -31,84 +31,48 @@ makeGenFormFilesNames <- function()
     return(list(MSFile = MSFile, MSMSFile = MSMSFile, outFile = outFile))
 }
 
-writeGenFormFiles <- function(MSPList, MSMSPList, workFiles)
+writeGenFormFiles <- function(MSPList, MSMSPList, MSFile, MSMSFile)
 {
     writePList <- function(f, pl) fwrite(pl[, c("mz", "intensity")], f, quote = FALSE,
                                          sep = "\t", row.names = FALSE, col.names = FALSE)
 
-    writePList(workFiles$MSFile, MSPList)
+    writePList(MSFile, MSPList)
 
     if (!is.null(MSMSPList))
-        writePList(workFiles$MSMSFile, MSMSPList)
+        writePList(MSMSFile, MSMSPList)
 }
 
-makeGenFormCmdQueue <- function(gfBin, mainArgs, groupPeakLists, workFiles, hashes, MSMode)
+makeGenFormCmdQueue <- function(groupPeakLists, baseHash, MSMode, isolatePrec)
 {
     pruneList(sapply(names(groupPeakLists), function(grp)
     {
         if (is.null(groupPeakLists[[grp]]) || is.null(groupPeakLists[[grp]][["MS"]]))
             return(NULL) # MS or MSMS spectrum probably filtered away
-
+        
         hasMSMS <- !is.null(groupPeakLists[[grp]][["MSMS"]]) && MSMode != "ms"
         if (MSMode == "msms" && !hasMSMS)
             return(NULL)
-
-        plmz <- groupPeakLists[[grp]][["MS"]][precursor == TRUE, mz]
+        
+        plms <- groupPeakLists[[grp]][["MS"]]
+        plmz <- plms[precursor == TRUE, mz]
         if (length(plmz) == 0)
             return(NULL) # no precursor
-
-        args <- c(mainArgs, sprintf("ms=%s", workFiles[[grp]]$MSFile), sprintf("m=%f", plmz),
-                  sprintf("out=%s", workFiles[[grp]]$outFile))
-
-        if (MSMode != "ms" && hasMSMS)
-            args <- c(args, sprintf("msms=%s", workFiles[[grp]]$MSMSFile), "analyze")
-
-        return(list(command = gfBin, args = args, outFile = workFiles[[grp]]$outFile,
-                    hash = hashes[grp], group = grp, isMSMS = hasMSMS))
+        
+        if (!is.logical(isolatePrec))
+            plms <- isolatePrecInMSPeakList(plms, isolatePrec, negate = FALSE)
+ 
+        hash <- makeHash(groupPeakLists[[grp]], baseHash)
+               
+        return(list(PLMZ = plmz, MSPL = plms, MSMSPL = groupPeakLists[[grp]][["MSMS"]],
+                    hash = hash, group = grp, isMSMS = hasMSMS))
     }, simplify = FALSE))
 }
 
-runGenForm <- function(gfBin, mainArgs, featMZs, groupPeakLists, MSMode, isolatePrec,
-                       hashes, cachedSet, workFiles, gNames, adduct, topMost,
+runGenForm <- function(mainArgs, groupPeakLists, MSMode, isolatePrec,
+                       baseHash, setHash, gNames, adduct, topMost,
                        batchSize, timeout, ana)
 {
-    cacheDB <- openCacheDBScope()
-
-    cachedResults <- pruneList(sapply(hashes, function(h)
-    {
-        forms <- NULL
-        if (!is.null(cachedSet))
-            forms <- cachedSet[[h]]
-        if (is.null(forms))
-            forms <- loadCacheData("formulasGenForm", h, cacheDB)
-        return(forms)
-    }, simplify = FALSE))
-
-    # skip cached results
-    doGNames <- setdiff(names(featMZs), names(cachedResults))
-    if (length(doGNames) > 0)
-    {
-        # filter out fgroups which shouldn't be done:
-        # - those without MS peak lists (mandatory, at least for now, maybe not for GF)
-        # - when doing MSMS only: if an MS/MS peak lists does not exist
-        doGNames <- doGNames[sapply(groupPeakLists[doGNames],
-                                    function(pl) !is.null(pl[["MS"]]) && (MSMode != "msms" || !is.null(pl[["MSMS"]])))]
-    }
-
-    for (grp in doGNames)
-    {
-
-        plms <- groupPeakLists[[grp]][["MS"]]
-        if (is.logical(isolatePrec) && isolatePrec)
-            isolatePrec <- getDefIsolatePrecParams(z = abs(adduct@charge))
-        if (!is.logical(isolatePrec)) # i.e. not FALSE
-            plms <- isolatePrecInMSPeakList(plms, isolatePrec, negate = FALSE)
-        writeGenFormFiles(plms, if (MSMode != "ms") groupPeakLists[[grp]][["MSMS"]] else NULL,
-                          workFiles[[grp]])
-    }
-
-    cmdQueue <- makeGenFormCmdQueue(gfBin, mainArgs, groupPeakLists[doGNames],
-                                    workFiles[doGNames], hashes, MSMode)
+    cmdQueue <- makeGenFormCmdQueue(groupPeakLists, baseHash, MSMode, isolatePrec)
 
     ret <- list()
     if (length(cmdQueue) > 0)
@@ -124,8 +88,6 @@ runGenForm <- function(gfBin, mainArgs, featMZs, groupPeakLists, MSMode, isolate
                 # formula in case no peaks could be explained
                 f <- f[byMSMS == TRUE]
             }
-
-            saveCacheData("formulasGenForm", f, cmd$hash, cacheDB)
             return(f)
         }, timeoutHandler = function(cmd, retries)
         {
@@ -133,14 +95,33 @@ runGenForm <- function(gfBin, mainArgs, featMZs, groupPeakLists, MSMode, isolate
                           if (!is.null(ana)) sprintf("(analysis '%s')", ana) else ""),
                     call. = FALSE)
             return(FALSE)
-        }, waitTimeout = 10, batchSize = batchSize,
-        procTimeout = timeout)
-    }
-
-    if (length(cachedResults) > 0)
-    {
-        ret <- c(ret, cachedResults)
-        ret <- ret[intersect(gNames, names(ret))] # re-order
+        }, prepareHandler = function(cmd)
+        {
+            gfBin <- getGenFormBin()
+            
+            MSFile <- tempfile("MSPList", fileext = ".txt")
+            outFile <- tempfile("formulas", fileext = ".txt")
+            
+            writePList <- function(f, pl) fwrite(pl[, c("mz", "intensity")], f, quote = FALSE,
+                                                 sep = "\t", row.names = FALSE, col.names = FALSE)
+            writePList(MSFile, cmd$MSPL)
+            
+            MSMSFile <- NULL
+            if (!is.null(cmd[["MSMSPL"]]))
+            {
+                MSMSFile <- tempfile("MSMSPList", fileext = ".txt")
+                writePList(MSMSFile, cmd$MSMSPL)
+            }
+            
+            args <- c(mainArgs, sprintf("ms=%s", MSFile), sprintf("m=%f", cmd$PLMZ),
+                      sprintf("out=%s", outFile))
+            if (MSMode != "ms" && cmd$isMSMS)
+                args <- c(args, sprintf("msms=%s", MSMSFile), "analyze")
+            
+            return(c(cmd, list(command = gfBin, args = c(mainArgs, args), MSFile = MSFile,
+                               MSMSFile = MSMSFile, outFile = outFile)))
+        }, waitTimeout = 10, batchSize = batchSize, procTimeout = timeout,
+        cacheName = "formulasGenForm", setHash = setHash)
     }
 
     return(pruneList(ret, checkZeroRows = TRUE))
@@ -321,14 +302,18 @@ generateFormulasGenForm <- function(fGroups, MSPeakLists, relMzDev = 5, adduct =
 
     adduct <- checkAndToAdduct(adduct)
 
+    if (is.logical(isolatePrec) && isolatePrec)
+        isolatePrec <- getDefIsolatePrecParams(z = abs(adduct@charge))
+    
     gInfo <- groupInfo(fGroups)
     anaInfo <- analysisInfo(fGroups)
     featIndex <- groupFeatIndex(fGroups)
     fTable <- featureTable(fGroups)
     gCount <- length(fGroups)
     gNames <- names(fGroups)
-    pLists <- peakLists(MSPeakLists)
 
+    MSPeakLists <- MSPeakLists[, gNames] # only do relevant
+    
     mainArgs <- c("exist",
                   "oei",
                   "noref",
@@ -345,30 +330,19 @@ generateFormulasGenForm <- function(fGroups, MSPeakLists, relMzDev = 5, adduct =
         mainArgs <- c(mainArgs, "oc")
 
     formTable <- list()
-    cacheDB <- openCacheDBScope() # open manually so caching code doesn't need to on each R/W access
     baseHash <- makeHash(mainArgs, MSMode, isolatePrec)
     setHash <- makeHash(fGroups, MSPeakLists, baseHash)
-    cachedSet <- loadCacheSet("formulasGenForm", setHash, cacheDB)
-    formHashes <- character(0)
-    gfBin <- getGenFormBin()
 
     # ana is optional and not used when only calculating group average formulas
-    doGenForm <- function(featMZs, groupPeakLists, ana)
+    doGenForm <- function(groupPeakLists, ana)
     {
-        doGNames <- names(featMZs)
-
-        hashes <- sapply(doGNames, function(grp) makeHash(featMZs[grp], groupPeakLists[[grp]], baseHash))
-        formHashes <<- c(formHashes, hashes)
-
-        workFiles <- sapply(doGNames, function(g) makeGenFormFilesNames(), simplify = FALSE)
-
         if (!is.null(ana))
             printf("Loading all formulas for analysis '%s'...\n", ana)
         else
             printf("Loading all formulas...\n")
 
-        forms <- runGenForm(gfBin, mainArgs, featMZs, groupPeakLists, MSMode, isolatePrec,
-                            hashes, cachedSet, workFiles, gNames, adduct, topMost, batchSize, timeout, ana)
+        forms <- runGenForm(mainArgs, groupPeakLists, MSMode, isolatePrec,
+                            baseHash, setHash, gNames, adduct, topMost, batchSize, timeout, ana)
 
         printf("Loaded %d formulas for %d %s (%.2f%%).\n", countUniqueFormulas(forms), length(forms),
                if (!is.null(ana)) "features" else "feature groups",
@@ -384,22 +358,17 @@ generateFormulasGenForm <- function(fGroups, MSPeakLists, relMzDev = 5, adduct =
         formTable <- sapply(seq_along(anaInfo$analysis), function(anai)
         {
             ana <- anaInfo$analysis[anai]
-
             if (is.null(pLists[[ana]]))
                 return(NULL)
-
+            
             ftinds <- sapply(gNames, function(grp) featIndex[[grp]][anai])
-            ftinds <- ftinds[ftinds != 0] # prune missing
-            featMZs <- sapply(ftinds, function(fti) fTable[[ana]][["mz"]][fti])
-
-            return(doGenForm(featMZs, pLists[[ana]], ana))
+            doFGroups <- gNames[ftinds != 0] # prune missing
+            
+            return(doGenForm(pLists[[ana]][doFGroups], ana))
         }, simplify = FALSE)
-
+        
         names(formTable) <- anaInfo$analysis
         formTable <- pruneList(formTable, TRUE)
-
-        if (is.null(cachedSet))
-            saveCacheSet("formulasGenForm", formHashes, setHash, cacheDB)
 
         if (length(formTable) > 0)
             groupFormulas <- generateGroupFormulasByConsensus(formTable, featThreshold, gNames)
@@ -408,8 +377,7 @@ generateFormulasGenForm <- function(fGroups, MSPeakLists, relMzDev = 5, adduct =
     }
     else
     {
-        featMZs <- setNames(gInfo[, "mzs"], gNames)
-        groupFormulas <- doGenForm(featMZs, averagedPeakLists(MSPeakLists), NULL)
+        groupFormulas <- doGenForm(averagedPeakLists(MSPeakLists), NULL)
         formTable <- list()
     }
 

@@ -82,9 +82,10 @@
     - update handbook etc for maxProcAmount
     - patRoon.logPath, multiProcMethod
     - update ref docus for executeMultiProcess
+    - update docs and NEWS for SIRBatchSize --> splitBatches
 - tests
 - limitation: local databases need to be available for MF on the localhost and nodes, both for caching and checking score types. Any workarounds? Otherwise document that location for them should be fixed.
-
+- remove pre44 SIRIUS support: doesn't work with future procs at the moment, and doesn't seem useful to keep
 
 # Future
 

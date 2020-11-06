@@ -97,7 +97,7 @@ generateFormulasSIRIUS <- function(fGroups, MSPeakLists, relMzDev = 5, adduct = 
                                    profile = "qtof", database = NULL, noise = NULL, cores = NULL, topMost = 100,
                                    extraOptsGeneral = NULL, extraOptsFormula = NULL, calculateFeatures = TRUE,
                                    featThreshold = 0.75, verbose = TRUE,
-                                   SIRBatchSize = 0)
+                                   splitBatches = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
@@ -112,7 +112,7 @@ generateFormulasSIRIUS <- function(fGroups, MSPeakLists, relMzDev = 5, adduct = 
     checkmate::assertFlag(calculateFeatures, add = ac)
     checkmate::assertNumber(featThreshold, lower = 0, finite = TRUE, null.ok = TRUE, add = ac)
     checkmate::assertFlag(verbose, add = ac)
-    checkmate::assertCount(SIRBatchSize, add = ac)
+    checkmate::assertFlag(splitBatches, add = ac)
     checkmate::reportAssertions(ac)
     
     adduct <- checkAndToAdduct(adduct)
@@ -123,7 +123,7 @@ generateFormulasSIRIUS <- function(fGroups, MSPeakLists, relMzDev = 5, adduct = 
     formTable <- doSIRIUS(fGroups, MSPeakLists, calculateFeatures, profile, adduct, relMzDev, elements,
                           database, noise, cores, FALSE, NULL, topMost, extraOptsGeneral, extraOptsFormula,
                           verbose, "formulasSIRIUS", processSIRIUSFormulas, NULL,
-                          SIRBatchSize)
+                          splitBatches)
         
     if (calculateFeatures)
     {

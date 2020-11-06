@@ -254,6 +254,12 @@ allSame <- function(l)
 
 # splitting a vector in chunks: https://stackoverflow.com/a/3321659
 splitInBatches <- function(x, size) split(x, ceiling(seq_along(x) / size))
+splitInNBatches <- function(x, n)
+{
+    if (n == 1)
+        return(list(x))
+    return(split(x, cut(seq_along(x), n, labels = FALSE)))
+}
 
 normalize <- function(x, minMax, xrange = range(x, na.rm = TRUE))
 {

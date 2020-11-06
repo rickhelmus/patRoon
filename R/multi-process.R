@@ -80,6 +80,8 @@ executeMultiProcess <- function(commandQueue, finishHandler,
     {
         if (!is.null(setHash))
             cachedSet <- loadCacheSet(cacheName, setHash, cacheDB)
+        else
+            cachedSet <- NULL
         
         allHashes <- lapply(commandQueue, "[[", "hash")
         cachedResults <- lapply(allHashes, function(hash)
@@ -130,7 +132,7 @@ executeMultiProcess <- function(commandQueue, finishHandler,
             results <- results[intersect(cmdNames, names(results))] # re-order
         }
     
-        if (is.null(cachedSet) && !is.null(setHash))
+        if (!is.null(setHash) && is.null(cachedSet))
             saveCacheSet(cacheName, allHashes, setHash, cacheDB)
     }
     

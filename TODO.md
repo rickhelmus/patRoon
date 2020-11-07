@@ -62,7 +62,7 @@
 - new interface
     - batch mode
     - logging --> return stdout/stderr from run()
-    - printOutput, eg for SIRIUS
+    - printOutput, eg for SIRIUS... or not?
     - showProgress
     - waitTimeout/delayBetweenProc?
 - changes
@@ -81,7 +81,7 @@
     - update sirius-args.R (mention maxProcAmount)
     - update handbook etc for maxProcAmount
     - patRoon.logPath, multiProcMethod
-    - update ref docus for executeMultiProcess
+    - update ref docs for executeMultiProcess
     - update docs and NEWS for SIRBatchSize --> splitBatches
     - mention that reportHTML never uses future method
 - tests

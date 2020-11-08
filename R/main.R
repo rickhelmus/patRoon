@@ -4,11 +4,8 @@
 #' @importFrom graphics plot axis barplot close.screen grconvertX grconvertY grid layout legend lines par plot.new points polygon rasterImage rect screen segments split.screen strwidth text title xinch yinch abline contour persp
 #' @importFrom grDevices adjustcolor colorRampPalette dev.off pdf png
 #' @importFrom stats cutree dist hclust heatmap lm median rect.hclust sd setNames as.dendrogram order.dendrogram as.dist as.formula
-#' @importFrom xcms phenoData phenoData<- filepaths filepaths<- xcmsRaw peaks peaks<- profinfo profinfo<- groupidx xcmsSet group retcor groupval groupnames rawEIC sampnames groupidx<-
 #' @importFrom Rdpack reprompt
 #' @importFrom magrittr %>%
-#' @importClassesFrom xcms XProcessHistory
-#' @importClassesFrom CAMERA xsAnnotate
 #' @import data.table
 #' @import shiny
 #' @import cluster

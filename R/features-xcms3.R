@@ -3,7 +3,7 @@ NULL
 
 #' @rdname features-class
 #' @export
-featuresXCMS3 <- setClass("featuresXCMS3", slots = list(xdata = "XCMSnExp"), contains = "features")
+featuresXCMS3 <- setClass("featuresXCMS3", slots = list(xdata = "ANY"), contains = "features")
 
 setMethod("initialize", "featuresXCMS3",
           function(.Object, ...) callNextMethod(.Object, algorithm = "xcms3", ...))
@@ -48,6 +48,8 @@ setMethod("filter", "featuresXCMS3", function(obj, ...)
 #' @export
 findFeaturesXCMS3 <- function(analysisInfo, param = xcms::CentWaveParam(), verbose = TRUE)
 {
+    checkPackage("xcms")
+    
     ac <- checkmate::makeAssertCollection()
     analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, c("mzXML", "mzML"), add = ac)
     assertS4(param, add = ac)

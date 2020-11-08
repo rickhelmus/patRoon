@@ -31,7 +31,10 @@ featuresOptimizer$methods(
             if(isoIdent == "IPO")
                 iso_mat <- utilsIPO$findIsotopes.IPO(xset, checkPeakShape)
             else
+            {
+                checkPackage("CAMERA")
                 iso_mat <- do.call(utilsIPO$findIsotopes.CAMERA, c(list(xset), CAMERAOpts))
+            }
         }
 
         isotope_abundance = 0.01108

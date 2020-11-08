@@ -4,7 +4,7 @@ NULL
 
 #' @rdname featureGroups-class
 #' @export
-featureGroupsXCMS3 <- setClass("featureGroupsXCMS3", slots = c(xdata = "XCMSnExp"), contains = "featureGroups")
+featureGroupsXCMS3 <- setClass("featureGroupsXCMS3", slots = c(xdata = "ANY"), contains = "featureGroups")
 
 setMethod("initialize", "featureGroupsXCMS3",
           function(.Object, ...) callNextMethod(.Object, algorithm = "xcms3", ...))
@@ -31,6 +31,8 @@ groupFeaturesXCMS3 <- function(feat, rtalign = TRUE,
                                groupParam = xcms::PeakDensityParam(sampleGroups = analysisInfo(feat)$group),
                                retAlignParam = xcms::ObiwarpParam(), verbose = TRUE)
 {
+    checkPackage("xcms")
+    
     # UNDONE: aligning gives XCMS errors when multithreading
 
     ac <- checkmate::makeAssertCollection()

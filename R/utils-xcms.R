@@ -103,6 +103,8 @@ makeXCMSGroups <- function(fGroups, verbose = TRUE)
 #' @export
 setMethod("getXCMSSet", "features", function(obj, verbose, exportedData)
 {
+    checkPackage("xcms")
+    
     # generate dummy XCMS set, based on https://groups.google.com/forum/m/#!topic/xcms/CGC0SKMVhAQ
 
     checkmate::assertFlag(exportedData)
@@ -110,12 +112,12 @@ setMethod("getXCMSSet", "features", function(obj, verbose, exportedData)
 
     xs <- new(getClassDef("xcmsSet", package = "xcms"))
     anaInfo <- analysisInfo(obj)
-    phenoData(xs) <- data.frame(class = anaInfo$group, row.names = anaInfo$analysis)
+    xcms::phenoData(xs) <- data.frame(class = anaInfo$group, row.names = anaInfo$analysis)
 
     if (exportedData)
-        filepaths(xs) <- sapply(seq_len(nrow(anaInfo)), function(i) getMzMLOrMzXMLAnalysisPath(anaInfo$analysis[i], anaInfo$path[i]), USE.NAMES = F)
+        xcms::filepaths(xs) <- sapply(seq_len(nrow(anaInfo)), function(i) getMzMLOrMzXMLAnalysisPath(anaInfo$analysis[i], anaInfo$path[i]), USE.NAMES = F)
     else
-        filepaths(xs) <- anaInfo$analysis # dummy paths
+        xcms::filepaths(xs) <- anaInfo$analysis # dummy paths
 
     fts <- featureTable(obj)
     plist <- list()
@@ -146,9 +148,9 @@ setMethod("getXCMSSet", "features", function(obj, verbose, exportedData)
         }
     }
 
-    peaks(xs) <- as.matrix(do.call(function(...) rbind(..., make.row.names=F), plist))
+    xcms::peaks(xs) <- as.matrix(do.call(function(...) rbind(..., make.row.names=F), plist))
     xs@rt <- rlist
-    profinfo(xs) <- list(method = "bin", step = 0.1)
+    xcms::profinfo(xs) <- list(method = "bin", step = 0.1)
 
     return(xs)
 })
@@ -171,6 +173,8 @@ setMethod("getXCMSSet", "featuresXCMS", function(obj, ...)
 #' @export
 setMethod("getXCMSSet", "featureGroups", function(obj, verbose, exportedData)
 {
+    checkPackage("xcms")
+    
     checkmate::assertFlag(exportedData)
     checkmate::assertFlag(verbose)
 
@@ -189,12 +193,14 @@ setMethod("getXCMSSet", "featureGroups", function(obj, verbose, exportedData)
 #' @export
 setMethod("getXCMSSet", "featureGroupsXCMS", function(obj, verbose, exportedData)
 {
+    checkPackage("xcms")
+    
     # first see if we can just return the xcmsSet used during grouping
 
     anaInfo <- analysisInfo(obj)
 
-    if (length(filepaths(obj@xs)) != length(anaInfo$analysis) ||
-        !all(simplifyAnalysisNames(filepaths(obj@xs)) == anaInfo$analysis))
+    if (length(xcms::filepaths(obj@xs)) != length(anaInfo$analysis) ||
+        !all(simplifyAnalysisNames(xcms::filepaths(obj@xs)) == anaInfo$analysis))
     {
         # files changed, need to update group statistics which is rather complex so just fallback
         return(callNextMethod(obj, verbose = verbose, exportedData = exportedData))
@@ -310,7 +316,7 @@ loadXCMSRaw <- function(analyses, paths, cacheDB = NULL, verbose = TRUE)
         {
             if (verbose)
                 printf("Loading raw data from '%s'...\n", analyses[anai])
-            xr <- xcmsRaw(p, profstep = 0)
+            xr <- xcms::xcmsRaw(p, profstep = 0)
             saveCacheData("EICData", xr, hash, cacheDB)
         }
         return(xr)

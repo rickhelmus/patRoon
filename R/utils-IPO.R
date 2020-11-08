@@ -44,7 +44,7 @@ findIsotopes.IPO = function(xset, checkPeakShape=c("none", "borderIntensity", "s
             speaks <- peak_source[peak_source[,"sample"]==sample,,drop=FALSE]
             split <- 250
             if(!(checkPeakShape=="none"))
-                rawdata <- xcms::loadRaw(xcms::xcmsSource(filepaths(xset)[sample]))
+                rawdata <- xcms::loadRaw(xcms::xcmsSource(xcms::filepaths(xset)[sample]))
 
             if(nrow(speaks)>1) {
                 #speaks <- speaks[,-c("sample")]
@@ -580,14 +580,14 @@ getRGTVValues = function(xset, exp_index=1, retcor_penalty=1) {
             relative_rt_diff <-
                 c(relative_rt_diff,
                   mean(abs(feature_rtmed -
-                               peaks_IPO(xset)[groupidx(xset)[[i]], "rt"]) / feature_rtmed))
+                               peaks_IPO(xset)[xcms::groupidx(xset)[[i]], "rt"]) / feature_rtmed))
         }
         good_groups <-
-            sum(unlist(lapply(X=groupidx(xset), FUN = function(x, xset) {
+            sum(unlist(lapply(X=xcms::groupidx(xset), FUN = function(x, xset) {
                 ifelse(length(unique(peaks_IPO(xset)[x,"sample"])) ==
-                           length(filepaths(xset)) &
+                           length(xcms::filepaths(xset)) &
                            length(peaks_IPO(xset)[x,"sample"]) ==
-                           length(filepaths(xset)), 1, 0)
+                           length(xcms::filepaths(xset)), 1, 0)
             }, xset)))
         bad_groups <- nrow(xcms::groups(xset)) - good_groups
     } else {

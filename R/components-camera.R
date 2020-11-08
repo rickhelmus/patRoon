@@ -4,7 +4,7 @@ NULL
 
 #' @rdname components-class
 #' @export
-componentsCamera <- setClass("componentsCamera", slots = c(xsa = "xsAnnotate"),
+componentsCamera <- setClass("componentsCamera", slots = c(xsa = "ANY"),
                              contains = "components")
 setMethod("initialize", "componentsCamera",
           function(.Object, ...) callNextMethod(.Object, algorithm = "camera", ...))
@@ -28,6 +28,8 @@ setMethod("initialize", "componentsCamera",
 generateComponentsCAMERA <- function(fGroups, ionization, onlyIsotopes = FALSE,
                                      minSize = 2, relMinReplicates = 0.5, extraOpts = NULL)
 {
+    checkPackage("CAMERA")
+    
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
     checkmate::assertChoice(ionization, c("positive", "negative"), add = ac)

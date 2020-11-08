@@ -3,7 +3,7 @@ NULL
 
 #' @rdname features-class
 #' @export
-featuresXCMS <- setClass("featuresXCMS", slots = list(xs = "xcmsSet"), contains = "features")
+featuresXCMS <- setClass("featuresXCMS", slots = list(xs = "ANY"), contains = "features")
 
 setMethod("initialize", "featuresXCMS",
           function(.Object, ...) callNextMethod(.Object, algorithm = "xcms", ...))
@@ -24,7 +24,7 @@ setMethod("filter", "featuresXCMS", function(obj, ...)
     obj <- callNextMethod(obj, ...)
 
     # check if amount of features (peaks) changed (e.g. due to filtering), if so update
-    if (length(obj) != nrow(peaks(obj@xs)))
+    if (length(obj) != nrow(xcms::peaks(obj@xs)))
     {
         cat("Updating xcmsSet...\n")
         # NOTE: use base method to force update as overloaded method simply returns @xs slot
@@ -49,6 +49,8 @@ setMethod("filter", "featuresXCMS", function(obj, ...)
 #' @export
 findFeaturesXCMS <- function(analysisInfo, method = "centWave", ..., verbose = TRUE)
 {
+    checkPackage("xcms")
+    
     ac <- checkmate::makeAssertCollection()
     analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, c("mzXML", "mzML"), add = ac)
     checkmate::assertString(method, min.chars = 1, add = ac)
@@ -68,9 +70,9 @@ findFeaturesXCMS <- function(analysisInfo, method = "centWave", ..., verbose = T
         printf("Finding features with XCMS for %d analyses ...\n", nrow(analysisInfo))
 
     if (verbose)
-        xs <- xcmsSet(files, analysisInfo$analysis, analysisInfo$group, method = method, ...)
+        xs <- xcms::xcmsSet(files, analysisInfo$analysis, analysisInfo$group, method = method, ...)
     else
-        suppressMessages(xs <- xcmsSet(files, analysisInfo$analysis, analysisInfo$group, method = method, ...))
+        suppressMessages(xs <- xcms::xcmsSet(files, analysisInfo$analysis, analysisInfo$group, method = method, ...))
 
     ret <- importFeaturesXCMS(xs, analysisInfo)
 

@@ -4,7 +4,7 @@ NULL
 
 #' @rdname featureGroups-class
 #' @export
-featureGroupsXCMS <- setClass("featureGroupsXCMS", slots = c(xs = "xcmsSet"), contains = "featureGroups")
+featureGroupsXCMS <- setClass("featureGroupsXCMS", slots = c(xs = "ANY"), contains = "featureGroups")
 
 setMethod("initialize", "featureGroupsXCMS",
           function(.Object, ...) callNextMethod(.Object, algorithm = "xcms", ...))
@@ -32,6 +32,8 @@ setMethod("initialize", "featureGroupsXCMS",
 groupFeaturesXCMS <- function(feat, rtalign = TRUE, exportedData = TRUE, groupArgs = list(mzwid = 0.015),
                               retcorArgs = list(method = "obiwarp"), verbose = TRUE)
 {
+    checkPackage("xcms")
+    
     # UNDONE: keep exportedData things? Or just require that it's exported? If keep document also for OpenMS and implications.
 
     ac <- checkmate::makeAssertCollection()
@@ -66,13 +68,13 @@ groupFeaturesXCMS <- function(feat, rtalign = TRUE, exportedData = TRUE, groupAr
     {
         if (verbose)
         {
-            xs <- do.call(retcor, c(list(xs), retcorArgs))
-            xs <- do.call(group, c(list(xs), groupArgs))
+            xs <- do.call(xcms::retcor, c(list(xs), retcorArgs))
+            xs <- do.call(xcms::group, c(list(xs), groupArgs))
         }
         else
         {
-            suppressMessages(invisible(utils::capture.output(xs <- do.call(retcor, c(list(xs), retcorArgs)))))
-            suppressMessages(invisible(utils::capture.output(xs <- do.call(group, c(list(xs), groupArgs)))))
+            suppressMessages(invisible(utils::capture.output(xs <- do.call(xcms::retcor, c(list(xs), retcorArgs)))))
+            suppressMessages(invisible(utils::capture.output(xs <- do.call(xcms::group, c(list(xs), groupArgs)))))
         }
     }
 
@@ -86,10 +88,10 @@ groupFeaturesXCMS <- function(feat, rtalign = TRUE, exportedData = TRUE, groupAr
 
 getFeatIndicesFromXS <- function(xs)
 {
-    plist <- as.data.table(peaks(xs))
+    plist <- as.data.table(xcms::peaks(xs))
     plist[, subind := seq_len(.N), by = "sample"]
 
-    xsftidx <- groupval(xs)
+    xsftidx <- xcms::groupval(xs)
     ret <- as.data.table(t(xsftidx))
 
     for (grp in seq_along(ret))
@@ -109,7 +111,7 @@ importFeatureGroupsXCMSFromFeat <- function(xs, analysisInfo, feat)
     gNames <- makeFGroupName(seq_len(nrow(xcginfo)), xcginfo[, "rtmed"], xcginfo[, "mzmed"])
     gInfo <- data.frame(rts = xcginfo[, "rtmed"], mzs = xcginfo[, "mzmed"], row.names = gNames, stringsAsFactors = FALSE)
 
-    groups <- data.table(t(groupval(xs, value = "maxo")))
+    groups <- data.table(t(xcms::groupval(xs, value = "maxo")))
     setnames(groups, gNames)
     groups[is.na(groups)] <- 0
 
@@ -146,7 +148,7 @@ setMethod("removeGroups", "featureGroupsXCMS", function(fGroups, indices)
     if (length(indices) > 0)
     {
         xcms::groups(fGroups@xs) <- xcms::groups(fGroups@xs)[-indices, , drop = FALSE]
-        groupidx(fGroups@xs) <- groupidx(fGroups@xs)[-indices]
+        xcms::groupidx(fGroups@xs) <- xcms::groupidx(fGroups@xs)[-indices]
     }
 
     return(fGroups)

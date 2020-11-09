@@ -6,7 +6,7 @@ level,subLevel,type,score,relative,value,higherThanNext,mustExist
 3,a,compound,individualMoNAScore,FALSE,0.4,,TRUE
 3,b,suspectFragments,,,3,,
 3,c,compound,annMSMSSim,,0.7,,TRUE
-4,,formula,annMSMSSim,TRUE,0.7,0.2,FALSE
-4,,formula,isoScore,TRUE,0.9,0.2,TRUE
+4,,formula,annMSMSSim,FALSE,0.7,0.2,FALSE
+4,,formula,isoScore,FALSE,0.9,0.2,TRUE
 4,,formula,rank,,1,,TRUE
 5,,none,,,,,

@@ -13,8 +13,9 @@
 - ID level rules
     - GenForm scoring: somehow exclude non MS/MS candidates if MS/MS candidates are present?
         - already fine now with minimum rank?
-        - absolute thresholds for iso/comb scores?
+        - make OR'ing possible?
     - add scorings for SIRIUS/DA
+    - remove mustExist?
 - interface
     - groupFeaturesScreening() --> screenSuspects()?
     - deprecate old screen functions

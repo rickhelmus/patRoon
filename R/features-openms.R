@@ -137,7 +137,7 @@ findFeaturesOpenMS <- function(analysisInfo, noiseThrInt = 1000, chromSNR = 3, c
         # which wouldn't be possible if future MP is used.
         if (verbose)
             cat("Loading peak intensities...\n")
-        fList <- lapply(names(fList), function(ana)
+        fList <- sapply(names(fList), function(ana)
         {
             fts <- loadIntensities(cmdQueue[[ana]]$dataFile, fList[[ana]], intSearchRTWindow)
             
@@ -146,7 +146,7 @@ findFeaturesOpenMS <- function(analysisInfo, noiseThrInt = 1000, chromSNR = 3, c
             fts <- fts[intensity > 0]
             
             return(fts)
-        })
+        }, simplify = FALSE)
     }
 
     if (verbose)

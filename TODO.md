@@ -25,13 +25,15 @@
     - don't assign level <1 if suspect is a target? or give the choice (or make filter?)
     - spec similarity:
         - port from TPs someday
-        - don't use jaccard? perhaps it makes sense to use it, as intensities are irrelevant anyway
+        - clarify that intensity filter happens after filtering precursor (make this optional?)
+        - add proper refs
 - misc
     - util to check if there are suspect results? (ie to replace inherits(...))
     - check for empty names in assertion/preparation functions
     - credits to ES
     - update version number
     - prepareSuspectList(): export?
+        - mainly to allow merging of lists, perhaps make util for that instead? Would also be handy for MF databases
 - expand reporting
     - eg marking which candidate corresponds to suspect and include suspect name in EICs
         - mark with different row colour and label?

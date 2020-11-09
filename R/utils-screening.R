@@ -194,33 +194,31 @@ doScreenSuspects <- function(fGroups, suspects, rtWindow, mzWindow, adduct, skip
     return(ret[])
 }
 
-annotatedMSMSSimilarity <- function(annPL, absMzDev, relMinIntensity)
+annotatedMSMSSimilarity <- function(annPL, absMzDev, relMinIntensity, method)
 {
     if (is.null(annPL[["formula"]]))
         return(0)
 
     # remove precursor, as eg MetFrag doesn't include this and it's not so interesting anyway
-    annPL <- annPL[precursor == FALSE, c("mz", "intensity"), with = FALSE]
-
-    annPLWithAnn <- annPL[!is.na(formula)]
-    if (nrow(annPL) == 0 || nrow(annPLWithAnn) == 0)
+    annPL <- annPL[precursor == FALSE]
+    
+    if (nrow(annPL) > 0)
+    {
+        maxInt <- max(annPL$intensity)
+        annPL <- annPL[(intensity / maxInt) >= relMinIntensity]
+    }
+    
+    if (nrow(annPL) == 0 || sum(!is.na(annPL$formula)) == 0)
         return(0)
-
-    relMinIntensity <- relMinIntensity * 100 # NOTE: OrgMassSpecR normalizes to 0-100
     
-    # UNDONE: OrgMassSpecR will normalize intensities, which is _not_ something
-    # we want. For now just use it to align spectra and calculate jaccard as
-    # alternative measure...
-    
-    # return(OrgMassSpecR::SpectrumSimilarity(annPL, annPLWithAnn, t = absMzDev,
-    #                                         b = relMinIntensity, print.graphic = FALSE))
-    
-    aligned <- OrgMassSpecR::SpectrumSimilarity(annPL, annPLWithAnn, t = absMzDev,
-                                                b = relMinIntensity, print.graphic = FALSE,
-                                                output.list = TRUE)$alignment
-    npresent <- sum(aligned$intensity.top != 0 & aligned$intensity.bottom != 0)
-    return(npresent / nrow(aligned))
-    
+    if (method == "cosine")
+    {
+        annPL[, intensityAnn := ifelse(is.na(formula), 0, intensity)]
+        return(as.vector((annPL$intensityAnn %*% annPL$intensity) /
+                             (sqrt(sum(annPL$intensityAnn^2)) * sqrt(sum(annPL$intensity^2)))))
+    }
+    else # jaccard
+        return(sum(!is.na(annPL$formula)) / nrow(annPL))
 }
 
 # UNDONE: export?

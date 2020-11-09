@@ -60,6 +60,7 @@ setMethod("as.data.table", "featureGroupsScreening",
 #' @template norm-args
 setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeakLists, formulas, compounds,
                                                                  absMzDev = 0.005, relMinMSMSIntensity = 0.05,
+                                                                 simMSMSMethod = "cosine",
                                                                  checkFragments = c("mz", "formula", "compound"),
                                                                  formulasNormalizeScores = "max",
                                                                  compoundsNormalizeScores = "max",
@@ -73,6 +74,7 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
            c("MSPeakLists", "formulas", "compounds"), null.ok = TRUE, fixed = list(add = ac))
     aapply(checkmate::assertNumber, . ~ absMzDev + relMinMSMSIntensity, lower = 0,
            finite = TRUE, fixed = list(add = ac))
+    checkmate::assertChoice(simMSMSMethod, c("cosine", "jaccard"))
     checkmate::assertSubset(checkFragments, c("mz", "formula", "compound"), add = ac)
     aapply(assertNormalizationMethod, . ~ formulasNormalizeScores + compoundsNormalizeScores, withNone = FALSE,
            fixed = list(add = ac))
@@ -84,7 +86,7 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
     checkmate::reportAssertions(ac)
     
     hash <- makeHash(fGroups, MSPeakLists, formulas, compounds, absMzDev,
-                     relMinMSMSIntensity, checkFragments, formulasNormalizeScores,
+                     relMinMSMSIntensity, simMSMSMethod, checkFragments, formulasNormalizeScores,
                      compoundsNormalizeScores, IDLevelRules)
     cd <- loadCacheData("annotateSuspects", hash)
     if (!is.null(cd))
@@ -113,7 +115,7 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
                 annSimForm <- annotatedMSMSSimilarity(annotatedPeakList(formulas,
                                                                         precursor = unFTable$formula[suspFormRank],
                                                                         groupName = gName, MSPeakLists = MSPeakLists),
-                                                      absMzDev, relMinMSMSIntensity)
+                                                      absMzDev, relMinMSMSIntensity, simMSMSMethod)
         }
         
         suspIK1 <- if (!is.null(si[["InChIKey"]]) && !is.na(si$InChIKey[i])) getIKBlock1(si$InChIKey[i]) else NULL
@@ -127,12 +129,13 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
             {
                 annSimComp <- annotatedMSMSSimilarity(annotatedPeakList(compounds, index = suspCompRank,
                                                                         groupName = gName, MSPeakLists = MSPeakLists),
-                                                      absMzDev, relMinMSMSIntensity)
+                                                      absMzDev, relMinMSMSIntensity, simMSMSMethod)
+                
                 if (!is.na(suspFormRank))
                     annSimBoth <- annotatedMSMSSimilarity(annotatedPeakList(compounds, index = suspCompRank,
                                                                             groupName = gName, MSPeakLists = MSPeakLists,
                                                                             formulas = formulas),
-                                                      absMzDev, relMinMSMSIntensity)
+                                                          absMzDev, relMinMSMSIntensity, simMSMSMethod)
                 else
                     annSimBoth <- annSimComp
             }

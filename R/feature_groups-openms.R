@@ -82,7 +82,7 @@ groupFeaturesOpenMS <- function(feat, rtalign = TRUE, QT = FALSE, maxAlignRT = 3
 }
 
 generateConsensusXML <- function(feat, out, rtalign, QT, maxAlignRT, maxAlignMZ, maxGroupRT,
-                                                       maxGroupMZ, extraOptsRT, extraOptsGroup, verbose)
+                                 maxGroupMZ, extraOptsRT, extraOptsGroup, verbose)
 {
     sGroup <- analysisInfo(feat)
     fts <- featureTable(feat)

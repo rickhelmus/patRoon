@@ -87,8 +87,7 @@ doCreateProject <- function(input, analyses)
                   file.path(input$destinationPath, input$analysisTableFile), row.names = FALSE)
 
     if (input$genIDLevelFile)
-        write.csv(defaultIDLevelRules(),
-                  file.path(input$destinationPath, "idlevelrules.csv"), row.names = FALSE)
+        genIDLevelRulesFile(file.path(input$destinationPath, "idlevelrules.yml"))
     
     code <- getScriptCode(input, analyses)
     if (input$outputScriptTo == "curFile")

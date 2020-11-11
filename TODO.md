@@ -17,10 +17,8 @@
     - add scorings for SIRIUS/DA
     - remove mustExist?
     - convert to YAML
-        - no numeric level handling? makes file easier.
-        - Filters could take perhaps order of file, eg if bestHit="4a" then ignore all rules below 4a
-            - but this needs the rules...
-            - maybe force a format? could be done while loading file, eg "[0-9]+[a-z]?"
+        - remove/replace defaultIDLevelRules() --> update tests
+        - refs?
 - interface
     - groupFeaturesScreening() --> screenSuspects()?
     - deprecate old screen functions
@@ -33,7 +31,7 @@
         - port from TPs someday
         - clarify that intensity filter happens after filtering precursor (make this optional?)
         - add proper refs
-    - update filter() for new annMSMS cols
+    - update filter() and reportHTML() for new annMSMS cols
 - misc
     - util to check if there are suspect results? (ie to replace inherits(...))
     - check for empty names in assertion/preparation functions
@@ -47,6 +45,7 @@
     - mention suspect similarities/ranks etc for candidates (or somehow in compounds?)
     - optionally report with collapsed suspects
     - adducts from components?
+    - update reportCSV() / reportPDF()?
 - update docs & handbook
     - renamed rt/mz columns
     - new plotVenn list functionality

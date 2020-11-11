@@ -64,7 +64,8 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
                                                                  checkFragments = c("mz", "formula", "compound"),
                                                                  formulasNormalizeScores = "max",
                                                                  compoundsNormalizeScores = "max",
-                                                                 IDLevelRules = defaultIDLevelRules())
+                                                                 IDFile = system.file("inst", "misc", "IDLevelRules.yml",
+                                                                                      package = "patRoon"))
 {
     # UNDONE: prog bar
     # UNDONE/document: annSimBoth falls back to annSimComp if no formals available
@@ -152,8 +153,8 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
             maxSuspFrags <- length(fragMZs)
             maxFragMatches <- sum(sapply(MSMSList$mz, function(mz1) any(sapply(fragMZs, mzWithin, mz1 = mz1))))
         }
-        if (!is.null(si[["fragments_formula"]]) && !is.na(si[["fragments_formula"]][si]) &&
-            nzchar(si[["fragments_formula"]][si]))
+        if (!is.null(si[["fragments_formula"]]) && !is.na(si[["fragments_formula"]][i]) &&
+            nzchar(si[["fragments_formula"]][i]))
         {
             fragForms <- unlist(strsplit(si[["fragments_formula"]][i], ";"))
             maxSuspFrags <- max(NAToZero(maxSuspFrags), length(fragForms))
@@ -174,11 +175,11 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
         }
 
         estIDLevel <- estimateIdentificationLevel(si$d_rt[i], suspIK1, si$formula[i], annSimForm, annSimComp, annSimBoth,
-                                                  maxSuspFrags, maxFragMatches, MSMSList, fTable, fScRanges,
-                                                  formulasNormalizeScores, cTable,
+                                                  maxSuspFrags, maxFragMatches, fTable, suspFormRank, fScRanges,
+                                                  formulasNormalizeScores, cTable, suspCompRank,
                                                   mCompNames = if (!is.null(compounds)) mergedCompoundNames(compounds) else NULL,
-                                                  cScRanges, compoundsNormalizeScores, absMzDev, IDLevelRules)
-
+                                                  cScRanges, compoundsNormalizeScores, absMzDev, IDFile)
+        
         set(si, i,
             c("suspFormRank", "suspCompRank", "annotatedMSMSSimForm", "annotatedMSMSSimComp", "annotatedMSMSSimBoth",
               "maxFrags", "maxFragMatches", "estIDLevel"),

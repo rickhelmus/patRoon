@@ -1,0 +1,38 @@
+1:
+    suspectFragments: 3
+    retention: 12
+2a:
+    individualMoNAScore:
+        min: 0.9
+        higherThanNext: .inf
+    rank:
+        max: 1
+        type: compound
+3a:
+    individualMoNAScore: 0.4
+3b:
+    suspectFragments: 3
+3c:
+    annMSMSSim:
+        type: compound
+        min: 0.7
+4a:
+    annMSMSSim:
+        type: formula
+        min: 0.7
+        higherThanNext: 0.2
+    isoScore:
+        min: 0.5
+        higherThanNext: 0.2
+    rank:
+        max: 1
+        type: formula
+4b:
+    isoScore:
+        min: 0.9
+        higherThanNext: 0.2
+    rank:
+        max: 1
+        type: formula
+5:
+    all: yes

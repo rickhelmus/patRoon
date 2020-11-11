@@ -224,143 +224,185 @@ annotatedMSMSSimilarity <- function(annPL, absMzDev, relMinIntensity, method)
 # UNDONE: export?
 numericIDLevel <- function(l) as.integer(gsub("[[:alpha:]]*", "", l))
 
-defaultIDLevelRules <- function(inLevels = NULL, exLevels = NULL)
+genIDLevelRulesFile <- function(out, inLevels = NULL, exLevels = NULL)
 {
     aapply(checkmate::assertCharacter, . ~ inLevels + exLevels, null.ok = TRUE)
+    checkmate::assertPathForOutput(basename(out), overwrite = TRUE)
     
-    ret <- defIDLevelRules # stored inside R/sysdata.rda
+    defFile <- system.file("inst", "misc", "IDLevelRules.yml", package = "patRoon")
     
-    pred <- function(p, l) grepl(p, l)
-    if (!is.null(inLevels))
-        ret <- ret[grepl(inLevels, paste0(ret$level, ret$subLevel)), ]
-    if (!is.null(exLevels))
-        ret <- ret[!grepl(exLevels, paste0(ret$level, ret$subLevel)), ]
-    return(ret)
+    if (is.null(inLevels) && is.null(exLevels))
+        file.copy(defFile, out, overwrite = TRUE)
+    else
+    {
+        rules <- yaml::yaml.load_file(defFile)
+        if (!is.null(inLevels))
+            rules <- rules[grepl(inLevels, names(rules))]
+        if (!is.null(exLevels))
+            rules <- rules[!grepl(exLevels, names(rules))]
+        # UNDONE: this quotes ID levels without sub-level, fix?
+        yaml::write_yaml(rules, out, indent = 4,
+                         handlers = list(int = function(x) { class(x) <- "verbatim"; x }))
+    }
+    invisible(NULL)
 }
 
 # UNDONE/NOTE: mustExist/relative fields only used for scorings of compound/formulas
 estimateIdentificationLevel <- function(suspectRTDev, suspectInChIKey1, suspectFormula,
-                                        suspectAnnSimForm, suspectAnnSimComp, suspectAnnSimBoth,
-                                        maxSuspFrags, maxFragMatches, MSMSList,
-                                        formTable, formScoreRanges, formulasNormalizeScores,
-                                        compTable, mCompNames, compScoreRanges, compoundsNormalizeScores,
-                                        absMzDev, IDLevelRules)
+                                           suspectAnnSimForm, suspectAnnSimComp, suspectAnnSimBoth,
+                                           maxSuspFrags, maxFragMatches, formTable, formRank,
+                                           formScoreRanges, formulasNormalizeScores, compTable,
+                                           compRank, mCompNames, compScoreRanges, compoundsNormalizeScores,
+                                           absMzDev, IDFile)
 {
     fRow <- cRow <- NULL
     if (!is.null(formTable) && !is.null(suspectFormula))
     {
         formTableNorm <- normalizeFormScores(formTable, formScoreRanges, formulasNormalizeScores == "minmax")
         unFTable <- unique(formTable, by = "formula"); unFTableNorm <- unique(formTableNorm, by = "formula")
-        formRank <- which(suspectFormula == unFTable$neutral_formula)
-        if (length(formRank) != 0)
+        if (!is.na(formRank))
         {
-            formRank <- formRank[1]
-            fRow <- unFTable[formRank]; fRowNorm <- unFTableNorm[formRank]
+            fRow <- unFTable[formRank]
+            fRowNorm <- unFTableNorm[formRank]
         }
     }
     
     if (!is.null(compTable) && !is.null(suspectInChIKey1))
     {
         compTableNorm <- normalizeCompScores(compTable, compScoreRanges, mCompNames, compoundsNormalizeScores == "minmax")
-        compRank <- which(suspectInChIKey1 == compTable$InChIKey1)
-        if (length(compRank) != 0)
+        if (!is.na(compRank))
         {
-            compRank <- compRank[1]
-            cRow <- compTable[compRank]; cRowNorm <- compTableNorm[compRank]
+            cRow <- compTable[compRank]
+            cRowNorm <- compTableNorm[compRank]
         }
     }
     
-    if (!is.null(MSMSList))
-        MSMSList <- MSMSList[precursor == FALSE]
-
-    IDLevelRules <- if (is.data.table(IDLevelRules)) copy(IDLevelRules) else as.data.table(IDLevelRules)
-    setorderv(IDLevelRules, c("level", "subLevel"))
-    IDLevelList <- split(IDLevelRules, by = c("level", "subLevel"))
-
-    mzWithin <- function(mz1, mz2) abs(mz1 - mz2) <= absMzDev
+    IDLevelRules <- yaml::yaml.load_file(IDFile, eval.expr = FALSE)
     
-    checkAnnotationScore <- function(ID, rank, annRow, annTable, annRowNorm, annTableNorm, scCols)
+    if (!checkmate::test_named(IDLevelRules))
+        stop("No valid rules could be loaded")
+    if (!all(grepl("^[[:digit:]]+[[:alpha:]]?$", names(IDLevelRules))))
+        stop("Levels should be defined as a number and may optionally followed by one character (e.g. 3, 2b etc)")
+    
+    IDLevelRules <- IDLevelRules[order(names(IDLevelRules))] # sort to ensure lowest levels will be tested first
+    
+    getValType <- function(val, IDType)
     {
-        # special cases first
-        if (ID$score == "rank")
-            return(rank >= ID$value)
-        else if (ID$score == "annMSMSSim")
-            return((if (ID$type == "formula") suspectAnnSimForm else suspectAnnSimComp) >= ID$value)
-        else if (ID$score == "annMSMSSimBoth")
-            return(suspectAnnSimBoth >= ID$value)
-        
+        if (!is.list(val) || is.null(val[["type"]]) || !val[["type"]] %in% c("formula", "compound"))
+            stop(sprintf("Need to specify the type (formula/compound) for %s!", IDType))
+        return(val[["type"]])
+    }
+    
+    getVal <- function(val, IDType, valType)
+    {
+        if (is.list(val))
+        {
+            if (is.null(val[[valType]]))
+                stop(sprintf("Need to specify %s for %s!", valType, IDType))
+            return(val[[valType]])
+        }
+        return(val)
+    }
+    
+    getOptVal <- function(val, valType, default)
+    {
+        if (is.list(val) && !is.null(val[[valType]]))
+            return(val[[valType]])
+        return(default)
+    }
+    
+    checkAnnotationScore <- function(val, scType, rank, annRow, annTable, annRowNorm, annTableNorm, scCols)
+    {
         scCols <- scCols[!is.na(unlist(annRow[, scCols, with = FALSE]))]
         if (length(scCols) == 0)
-            return(!ID$mustExist)
+            return(FALSE)
         
-        if (ID$relative)
+        minValue <- getVal(val, scType, "min")
+        
+        if (getOptVal(val, "relative", FALSE))
         {
             annRow <- annRowNorm
             annTable <- annTableNorm
         }
-
+        
         scoreVal <- rowMeans(annRow[, scCols, with = FALSE])
-        if (scoreVal < ID$value)
+        if (scoreVal < minValue)
             return(FALSE)
         
-        if (!is.na(ID$higherThanNext) && ID$higherThanNext > 0 && nrow(annTable) > 1)
+        htn <- getOptVal(val, "higherThanNext", 0)
+        if (htn > 0 && nrow(annTable) > 1)
         {
             otherHighest <- max(rowMeans(annTable[-rank, scCols, with = FALSE]))
-            if (is.infinite(ID$higherThanNext)) # special case: should be highest
+            # UNDONE: handler for Inf? or check "Inf" here?
+            if (is.infinite(htn)) # special case: should be highest
             {
                 if (otherHighest > 0)
                     return(FALSE)
             }
-            else if ((scoreVal - otherHighest) < ID$higherThanNext)
+            else if ((scoreVal - otherHighest) < htn)
                 return(FALSE)
         }
         
         return(TRUE)            
     }
-    checkScore <- function(ID)
-    {
-        if (ID$type == "retention" && ID$score == "maxDeviation")
-            return(!is.na(suspectRTDev) && numLTE(abs(suspectRTDev), ID$value))
-        if (ID$type == "formula")
-            return(checkAnnotationScore(ID, formRank, fRow, unFTable, fRowNorm, unFTableNorm,
-                                        getAllFormulasCols(ID$score, names(formTable))))
-        if (ID$type == "compound")
-            return(checkAnnotationScore(ID, compRank, cRow, compTable, cRowNorm, compTableNorm,
-                                        getAllCompCols(ID$score, names(compTable), mCompNames)))
-        if (ID$type == "suspectFragments")
-        {
-            # UNDONE: if suspect fragments are less than the rule value then the
-            # former is used as minimum, make this configurable?
-            return(maxFragMatches >= min(ID$value, maxSuspFrags, na.rm = TRUE))
-        }
-        stop(paste("Unknown ID level type:", ID$type))
-    }
 
-    for (IDL in IDLevelList)
+    formScores <- formulaScorings()$name
+    compScores <- compoundScorings()$name
+    formCompScores <- intersect(formScores, compScores)
+    allScores <- union(formScores, compScores)
+    for (lvl in names(IDLevelRules))
     {
-        levelOK <- FALSE
-        if ("none" %in% IDL$type) # special case: always valid
-            levelOK <- TRUE
-        else
+        levelOK <- TRUE
+        IDL <- IDLevelRules[[lvl]]
+        for (type in names(IDL))
         {
-            if ("suspectFragments" %in% IDL$type && is.na(maxFragMatches))
-                next
-            if ("retention" %in% IDL$type && is.null(suspectRTDev))
-                next
-            if ("formula" %in% IDL$type && (is.null(formTable) || nrow(formTable) == 0 ||
-                                            is.null(suspectFormula) || is.null(fRow) ||
-                                            nrow(fRow) == 0))
-                next
-            if ("compound" %in% IDL$type &&
-                (is.null(compTable) || nrow(compTable) == 0 || is.null(cRow) || nrow(cRow) == 0))
-                next
+            val <- IDL[[type]]
+            if (type == "all" && val == TRUE)
+                levelOK <- TRUE # special case: this level is always valid
+            else if (type == "suspectFragments")
+            {
+                # UNDONE: if suspect fragments are less than the rule value then the
+                # former is used as minimum, make this configurable?
+                levelOK <- !is.na(maxFragMatches) && maxFragMatches >= min(val, maxSuspFrags, na.rm = TRUE)
+            }
+            else if (type == "retention")
+                levelOK <- !is.null(suspectRTDev) && !is.na(suspectRTDev) && numLTE(abs(suspectRTDev), val)
+            else if (type == "rank")
+            {
+                r <- if (getValType(val, type) == "formula") formRank else compRank
+                levelOK <- !is.na(r) && r <= getVal(val, type, "max")
+            }
+            else if (type == "annMSMSSim")
+            {
+                sim <- if (getValType(val, type) == "formula") suspectAnnSimForm else suspectAnnSimComp
+                levelOK <- !is.na(sim) && numGTE(sim, getVal(val, type, "min"))
+            }
+            else if (type == "annMSMSSimBoth")
+                levelOK <- !is.na(suspectAnnSimBoth) && numGTE(suspectAnnSimBoth, getVal(val, type, "min"))
+            else if (type %in% allScores)
+            {
+                if (type %in% formCompScores)
+                    isForm <- getValType(val, type) == "formula"
+                else
+                    isForm <- type %in% formScores
+                
+                if (isForm)
+                    levelOK <- checkAnnotationScore(val, type, formRank, fRow, unFTable, fRowNorm, unFTableNorm,
+                                                    getAllFormulasCols(type, names(formTable)))
+                else
+                    levelOK <- checkAnnotationScore(val, type, compRank, cRow, compTable, cRowNorm, compTableNorm,
+                                                    getAllCompCols(type, names(compTable), mCompNames))
+            }
+            else
+                stop(paste("Unknown ID level type:", type))
             
-            levelOK <- all(sapply(split(IDL, seq_len(nrow(IDL))), checkScore))
+            if (!levelOK)
+                break
         }
+        
         if (levelOK)
-            return(paste0(IDL$level[1], IDL$subLevel[1]))
+            return(lvl)
     }
     
     return(NA_character_)
 }
-

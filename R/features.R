@@ -201,69 +201,6 @@ setMethod("$", "features", function(x, name)
     eval(substitute(x@features$NAME_ARG, list(NAME_ARG = name)))
 })
 
-#' @rdname suspect-screening
-#' @export
-setMethod("screenSuspects", "features", function(obj, suspects, rtWindow, mzWindow, adduct, skipInvalid)
-{
-    if (!is.null(adduct))
-        adduct <- checkAndToAdduct(adduct)
-    
-    ac <- checkmate::makeAssertCollection()
-    assertSuspectList(suspects, adduct, skipInvalid, add = ac)
-    aapply(checkmate::assertNumber, . ~ rtWindow + mzWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
-    checkmate::reportAssertions(ac)
-
-    # do this before checking cache to ensure proper errors/warnings are thrown!
-    suspects <- prepareSuspectList(suspects, adduct, skipInvalid)
-    
-    hash <- makeHash(obj, suspects, rtWindow, mzWindow, adduct)
-    cd <- loadCacheData("screenSuspectsFT", hash)
-    if (!is.null(cd))
-        return(cd)
-    
-    fTable <- featureTable(obj)
-    anaInfo <- analysisInfo(obj)
-    
-    prog <- openProgBar(0, nrow(suspects))
-
-    retlist <- lapply(seq_len(nrow(suspects)), function(ti)
-    {
-        hasRT <- !is.null(suspects$rt) && !is.na(suspects$rt[ti])
-
-        rbindlist(lapply(names(fTable), function(ana)
-        {
-            if (hasRT)
-                fts <- fTable[[ana]][numLTE(abs(ret - suspects$rt[ti]), rtWindow) & numLTE(abs(mz - suspects$mz[ti]), mzWindow), ]
-            else
-                fts <- fTable[[ana]][numLTE(abs(mz - suspects$mz[ti]), mzWindow), ]
-
-            if (nrow(fts) == 0) # no results? --> add NA result
-                return(data.table(name = suspects$name[ti], rt = if (hasRT) suspects$rt[ti] else NA,
-                                  mz = suspects$mz[ti], analysis = ana,
-                                  feature = NA, d_rt = NA, d_mz = NA, intensity = NA, area = NA))
-
-            hits <- rbindlist(lapply(seq_len(nrow(fts)), function(i)
-            {
-                data.table(name = suspects$name[ti], rt = if (hasRT) suspects$rt[ti] else NA, mz = suspects$mz[ti], analysis = ana,
-                           feature = fts[["ID"]][i], d_rt = if (hasRT) fts[["ret"]][i] - suspects$rt[ti] else NA,
-                           d_mz = fts[["mz"]][i] - suspects$mz[ti], intensity = fts[["intensity"]][i],
-                           area = if (is.null(fts[["area"]][i])) 0 else fts[["area"]][i])
-            }))
-
-            setTxtProgressBar(prog, ti)
-            return(hits)
-        }))
-    })
-
-    setTxtProgressBar(prog, nrow(suspects))
-    close(prog)
-    
-    ret <- rbindlist(retlist, fill = TRUE)
-    saveCacheData("screenSuspectsFT", ret, hash)
-    
-    return(ret)
-})
-
 #' @templateVar func findFeatures
 #' @templateVar what find features
 #' @templateVar ex1 findFeaturesOpenMS

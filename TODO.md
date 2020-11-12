@@ -19,7 +19,6 @@
         - refs?
 - interface
     - groupFeaturesScreening() --> screenSuspects()?
-    - deprecate old screen functions
     - also convert TASQ?
     - newProject(): update for new interface
     - annotateSuspects() --> annotate() latter is a function (but not generic) from ggplot2 and RAMClustR and method from CAMERA, so probably no
@@ -43,10 +42,11 @@
     - optionally report with collapsed suspects
     - adducts from components?
     - update reportCSV() / reportPDF()?
-- update docs & handbook
+- update docs, handbook & NEWS
     - renamed rt/mz columns
     - new plotVenn list functionality
     - logging for ID level estimation
+    - removal of screening for features
 - tests
     - automatic InChIKey/formula calculation from InChIs/SMILES
         - already done implicitly?

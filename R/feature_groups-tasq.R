@@ -17,9 +17,7 @@ setMethod("initialize", "featureGroupsBrukerTASQ",
 #'   the feature groups. The cut-off value for this is specified by the
 #'   \code{clusterRTWindow} argument. The input for this function is obtained by
 #'   generating an Excel export of the 'global' results and subsequently
-#'   converting the file to \file{.csv} format. Similar to
-#'   \code{groupFeaturesScreening}, this method will return an object that is
-#'   suitable for any further workflow processes.
+#'   converting the file to \file{.csv} format.
 #'
 #' @param path The file path to an Excel export of the Global results table from
 #'   TASQ, converted to \file{.csv} format.

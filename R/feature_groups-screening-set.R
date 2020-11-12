@@ -73,10 +73,24 @@ setMethod("initialize", "featureGroupsScreeningSet",
 
 setMethod("screenInfo", "featureGroupsScreeningSet", function(obj) obj@screenInfo)
 
-setMethod("[", c("featureGroupsScreeningSet", "ANY", "ANY", "missing"), function(x, i, j, ..., rGroups, sets = NULL, drop = TRUE)
+setMethod("[", c("featureGroupsScreeningSet", "ANY", "ANY", "missing"), function(x, i, j, ..., rGroups,
+                                                                                 suspects = NULL, sets = NULL,
+                                                                                 drop = TRUE)
 {
+    checkmate::assertCharacter(suspects, null.ok = TRUE)
+    
     x <- callNextMethod(x, i, j, ..., rGroups = rGroups, sets = sets, drop = drop)
-    return(syncScreeningSetObjects(x))
+    x <- syncScreeningSetObjects(x)
+    
+    if (!is.null(suspects))
+    {
+        x@setObjects <- lapply(x@setObjects, "[", suspects = suspects)
+        # --> groups may have been removed
+        x <- x[, unique(unlist(sapply(x@setObjects, groupNames)))]
+        x <- syncScreeningSetObjects(x)
+    }    
+    
+    return(x)
 })
 
 setMethod("as.data.table", "featureGroupsScreeningSet", function(x, ..., collapseSuspects = ",",

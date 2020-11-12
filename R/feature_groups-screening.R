@@ -484,6 +484,8 @@ setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = NULL
                                                        minAnnSimForm = NULL, minAnnSimComp = NULL, minAnnSimBoth = NULL,
                                                        absMinFragMatches = NULL, relMinFragMatches = NULL, negate = FALSE)
 {
+    # NOTE: keep args in sync with featureGroupsScreeningSet method
+    
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertFlag, . ~ onlyHits + selectBestFGroups + negate, null.ok = c(TRUE, FALSE, FALSE), fixed = list(add = ac))
     checkmate::assertChoice(selectHitsBy, choices = c("intensity", "level"), null.ok = TRUE, add = ac)

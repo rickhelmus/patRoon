@@ -119,14 +119,18 @@ setMethod("annotateSuspects", "featureGroupsScreeningSet", function(fGroups, MSP
 })
 
 setMethod("filter", "featureGroupsScreeningSet", function(obj, ..., onlyHits = FALSE,
-                                                          selectBy = NULL, negate = FALSE)
+                                                          selectHitsBy = NULL, selectFGroupsBy = NULL,
+                                                          maxLevel = NULL, maxFormRank = NULL, maxCompRank = NULL,
+                                                          minAnnMSMSSim = NULL, minFragMatches = NULL, negate = FALSE)
 {
     # filter functionality from fGroupsSet
     obj <- callNextMethod(obj, ..., negate = negate)
     obj <- syncScreeningSetObjects(obj)
     
     # filter functionality from screening (no need to pass ...)
-    obj@setObjects <- lapply(obj@setObjects, filter, onlyHits = onlyHits, selectBy = selectBy,
+    obj@setObjects <- lapply(obj@setObjects, filter, onlyHits = onlyHits, selectHitsBy = selectHitsBy,
+                             selectFGroupsBy = selectFGroupsBy, maxLevel = maxLevel, maxFormRank = maxFormRank,
+                             maxCompRank = maxCompRank, minAnnMSMSSim = minAnnMSMSSim, minFragMatches = minFragMatches,
                              negate = negate)
     # --> groups may have been removed
     obj <- obj[, unique(unlist(sapply(obj@setObjects, groupNames)))]

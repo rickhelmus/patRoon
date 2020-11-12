@@ -182,6 +182,7 @@ Collate:
     'feature_groups-sirius.R'
     'features-set.R'
     'feature_groups-set.R'
+    'feature_groups-screening-set.R'
     'feature_groups-tasq.R'
     'feature_groups-xcms.R'
     'feature_groups-xcms3.R'

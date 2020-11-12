@@ -170,7 +170,8 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
                 maxFragMatches <- max(NAToZero(maxFragMatches), sum(fragForms %in% cTable[["fragInfo"]][[suspCompRank]]$formula))
         }
 
-        estIDLevel <- estimateIdentificationLevel(si$d_rt[i], suspIK1, si$formula[i], annSimForm, annSimComp, annSimBoth,
+        estIDLevel <- estimateIdentificationLevel(si$name[i], si$group[i], si$d_rt[i], suspIK1, si$formula[i],
+                                                  annSimForm, annSimComp, annSimBoth,
                                                   maxSuspFrags, maxFragMatches, fTable, suspFormRank, fScRanges,
                                                   formulasNormalizeScores, cTable, suspCompRank,
                                                   mCompNames = if (!is.null(compounds)) mergedCompoundNames(compounds) else NULL,

@@ -48,6 +48,7 @@
 - update docs & handbook
     - renamed rt/mz columns
     - new plotVenn list functionality
+    - logging for ID level estimation
 - tests
     - automatic InChIKey/formula calculation from InChIs/SMILES
         - already done implicitly?

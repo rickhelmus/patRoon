@@ -248,7 +248,7 @@ genIDLevelRulesFile <- function(out, inLevels = NULL, exLevels = NULL)
 }
 
 # UNDONE/NOTE: mustExist/relative fields only used for scorings of compound/formulas
-estimateIdentificationLevel <- function(suspectRTDev, suspectInChIKey1, suspectFormula,
+estimateIdentificationLevel <- function(suspectName, suspectFGroup, suspectRTDev, suspectInChIKey1, suspectFormula,
                                         suspectAnnSimForm, suspectAnnSimComp, suspectAnnSimBoth,
                                         maxSuspFrags, maxFragMatches, formTable, formRank,
                                         formScoreRanges, formulasNormalizeScores, compTable,
@@ -315,7 +315,7 @@ estimateIdentificationLevel <- function(suspectRTDev, suspectInChIKey1, suspectF
     {
         scCols <- scCols[!is.na(unlist(annRow[, scCols, with = FALSE]))]
         if (length(scCols) == 0)
-            return(FALSE)
+            return("score not available")
         
         minValue <- getVal(val, scType, "min")
         
@@ -327,7 +327,7 @@ estimateIdentificationLevel <- function(suspectRTDev, suspectInChIKey1, suspectF
         
         scoreVal <- rowMeans(annRow[, scCols, with = FALSE])
         if (scoreVal < minValue)
-            return(FALSE)
+            return(sprintf("(average) score too low: %f/%f", scoreVal, minValue))
         
         htn <- getOptVal(val, "higherThanNext", 0)
         if (htn > 0 && nrow(annTable) > 1)
@@ -336,32 +336,49 @@ estimateIdentificationLevel <- function(suspectRTDev, suspectInChIKey1, suspectF
             if (is.infinite(htn)) # special case: should be highest
             {
                 if (otherHighest > 0)
-                    return(FALSE)
+                    return("not the highest score")
             }
             else if ((scoreVal - otherHighest) < htn)
-                return(FALSE)
+                return(sprintf("difference with highest score from other candidates too low: %f/%f", scoreVal - otherHighest, htn))
         }
         
         return(TRUE)            
     }
 
+    logOut <- file.path("log", "ident", paste0(suspectName, "-", suspectFGroup, ".txt"))
+    mkdirp(dirname(logOut))
+    unlink(logOut)
+    doLog <- function(indent, s, ...) fprintf(logOut, paste0(strrep(" ", indent * 4), s), ..., append = TRUE)
+    
     formScores <- formulaScorings()$name
     compScores <- compoundScorings()$name
     formCompScores <- intersect(formScores, compScores)
     allScores <- union(formScores, compScores)
     
-    checkLevelOK <- function(IDL)
+    checkLevelOK <- function(IDL, indent = 0)
     {
+        indent <- indent + 1
         for (type in names(IDL))
         {
             levelOK <- NULL
-            
+            levelFailed <- NULL
             val <- IDL[[type]]
+            
+            if (type %in% c("rank", "annMSMSSim", formCompScores))
+                doLog(indent, "Checking ID level type '%s' (for %s)\n", type,
+                      getValType(val, type))
+            else
+                doLog(indent, "Checking ID level type '%s'\n", type)
+            
             if (type == "or")
             {
                 if (!is.list(val) || checkmate::testNamed(val))
                     stop("Specify a list with 'or'")
-                levelOK <- any(sapply(val, checkLevelOK))
+                levelOK <- any(mapply(val, seq_along(val), FUN = function(IDL, i)
+                {
+                    doLog(indent + 1, "check OR condition %d/%d\n", i, length(val))
+                    return(checkLevelOK(IDL, indent + 2))
+                }))
             }
             else if (type == "all" && val == TRUE)
                 levelOK <- TRUE # special case: this level is always valid
@@ -369,22 +386,53 @@ estimateIdentificationLevel <- function(suspectRTDev, suspectInChIKey1, suspectF
             {
                 # UNDONE: if suspect fragments are less than the rule value then the
                 # former is used as minimum, make this configurable?
-                levelOK <- !is.na(maxFragMatches) && maxFragMatches >= min(val, maxSuspFrags, na.rm = TRUE)
+                minFrags <- min(val, maxSuspFrags, na.rm = TRUE)
+                levelOK <- !is.na(maxFragMatches) && maxFragMatches >= minFrags
+                if (!levelOK)
+                {
+                    if (is.na(maxFragMatches))
+                        levelFailed <- "no fragments to match"
+                    else
+                        levelFailed <- sprintf("not enough fragments: %d/%d", maxFragMatches, minFrags)
+                }
             }
             else if (type == "retention")
-                levelOK <- !is.null(suspectRTDev) && !is.na(suspectRTDev) && numLTE(abs(suspectRTDev), val)
+            {
+                rtm <- getVal(val, type, "max")
+                levelOK <- !is.null(suspectRTDev) && !is.na(suspectRTDev) && numLTE(abs(suspectRTDev), rtm)
+                if (!levelOK)
+                {
+                    if (is.null(suspectRTDev) && is.na(suspectRTDev))
+                        levelFailed <- "no retention time information available"
+                    else
+                        levelFailed <- sprintf("too high retention time deviation: %f/%f",
+                                               abs(suspectRTDev), rtm)
+                }
+            }
             else if (type == "rank")
             {
                 r <- if (getValType(val, type) == "formula") formRank else compRank
-                levelOK <- !is.na(r) && r <= getVal(val, type, "max")
+                maxR <- getVal(val, type, "max")
+                levelOK <- !is.na(r) && r <= maxR
+                if (!levelOK)
+                    levelFailed <- if (is.na(r)) "candidate not ranked" else sprintf("ranked too low: %d/%d", r, maxR)
             }
             else if (type == "annMSMSSim")
             {
                 sim <- if (getValType(val, type) == "formula") suspectAnnSimForm else suspectAnnSimComp
-                levelOK <- !is.na(sim) && numGTE(sim, getVal(val, type, "min"))
+                minSim <- getVal(val, type, "min")
+                levelOK <- !is.na(sim) && numGTE(sim, minSim)
+                if (!levelOK)
+                    levelFailed <- if (is.na(sim)) "no calculated similarity" else sprintf("similarity too low: %f/%f", sim, minSim)
             }
             else if (type == "annMSMSSimBoth")
-                levelOK <- !is.na(suspectAnnSimBoth) && numGTE(suspectAnnSimBoth, getVal(val, type, "min"))
+            {
+                minSim <- getVal(val, type, "min")
+                levelOK <- !is.na(suspectAnnSimBoth) && numGTE(suspectAnnSimBoth, minSim)
+                if (!levelOK)
+                    levelFailed <- if (is.na(suspectAnnSimBoth)) "no calculated similarity" else
+                        sprintf("similarity too low: %f/%f", suspectAnnSimBoth, minSim)
+            }
             else if (type %in% allScores)
             {
                 if (type %in% formCompScores)
@@ -398,21 +446,36 @@ estimateIdentificationLevel <- function(suspectRTDev, suspectInChIKey1, suspectF
                 else
                     levelOK <- checkAnnotationScore(val, type, compRank, cRow, compTable, cRowNorm, compTableNorm,
                                                     getAllCompCols(type, names(compTable), mCompNames))
+                
+                if (!isTRUE(levelOK))
+                {
+                    levelFailed <- levelOK
+                    levelOK <- FALSE
+                }
             }
             else
                 stop(paste("Unknown ID level type:", type))
             
             if (!levelOK)
+            {
+                doLog(indent, "ID level failed: %s\n", levelFailed)
                 return(FALSE)
+            }
+            doLog(indent, "ID level type passed!\n")
         }
         
         return(TRUE)
     }
     
+    doLog(0, "Estimating identification level for '%s' to feature group '%s'\n---\n", suspectName, suspectFGroup)
     for (lvl in names(IDLevelRules))
     {
+        doLog(0, "Checking level '%s'\n", lvl)
         if (checkLevelOK(IDLevelRules[[lvl]]))
+        {
+            doLog(0, "assigned level '%s'!\n", lvl)
             return(lvl)
+        }
     }
     
     return(NA_character_)

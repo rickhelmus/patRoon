@@ -30,7 +30,6 @@
         - port from TPs someday
         - clarify that intensity filter happens after filtering precursor (make this optional?)
         - add proper refs
-    - update filter() and reportHTML() for new annMSMS cols
 - misc
     - util to check if there are suspect results? (ie to replace inherits(...))
     - check for empty names in assertion/preparation functions

@@ -178,7 +178,7 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
                                                   cScRanges, compoundsNormalizeScores, absMzDev, IDFile)
         
         set(si, i,
-            c("suspFormRank", "suspCompRank", "annotatedMSMSSimForm", "annotatedMSMSSimComp", "annotatedMSMSSimBoth",
+            c("suspFormRank", "suspCompRank", "annSimForm", "annSimComp", "annSimBoth",
               "maxFrags", "maxFragMatches", "estIDLevel"),
             list(suspFormRank, suspCompRank, annSimForm, annSimComp, annSimBoth, maxSuspFrags, maxFragMatches, estIDLevel))
     }
@@ -198,7 +198,8 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
 setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = FALSE,
                                                        selectHitsBy = NULL, selectFGroupsBy = NULL,
                                                        maxLevel = NULL, maxFormRank = NULL, maxCompRank = NULL,
-                                                       minAnnMSMSSim = NULL, minFragMatches = NULL, negate = FALSE)
+                                                       minAnnSimForm = NULL, minAnnSimComp = NULL, minAnnSimBoth = NULL,
+                                                       minFragMatches = NULL, negate = FALSE)
 {
     # UNDONE: doc that selectHitsBy/selectFGroupsBy only applies to hits, in case of ties: first hit
     # UNDONE: mention that filter with onlyHits may need to be repeated
@@ -210,7 +211,8 @@ setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = FALS
     aapply(checkmate::assertFlag, . ~ onlyHits + negate, fixed = list(add = ac))
     aapply(checkmate::assertChoice, . ~ selectHitsBy + selectFGroupsBy, null.ok = TRUE,
            fixed = list(choices = c("intensity", "level"), add = ac))
-    checkmate::assertInt(maxLevel, null.ok = TRUE, add = ac)
+    aapply(checkmate::assertCount, . ~ maxLevel + maxFormRank + maxCompRank + minAnnSimForm + minAnnSimComp +
+               minAnnSimBoth + minFragMatches, null.ok = TRUE, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
     
     colFilter <- function(pred, what, col)
@@ -238,7 +240,9 @@ setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = FALS
     obj <- colFilter(levPred, "maxLevel", "estIDLevel")
     obj <- colFilter(maxPred, "maxFormRank", "suspFormRank")
     obj <- colFilter(maxPred, "maxCompRank", "suspCompRank")
-    obj <- colFilter(minPred, "minAnnMSMSSim", "annotatedMSMSSimilarity")
+    obj <- colFilter(minPred, "minAnnSimForm", "annSimForm")
+    obj <- colFilter(minPred, "minAnnSimComp", "annSimComp")
+    obj <- colFilter(minPred, "minAnnSimBoth", "annSimBoth")
     obj <- colFilter(minPred, "minFragMatches", "maxFragMatches")
     
     # do here so that only duplicates not yet filtered out in previous steps are considered

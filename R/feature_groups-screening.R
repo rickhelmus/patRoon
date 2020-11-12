@@ -79,16 +79,12 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
     checkmate::assertSubset(checkFragments, c("mz", "formula", "compound"), add = ac)
     aapply(assertNormalizationMethod, . ~ formulasNormalizeScores + compoundsNormalizeScores, withNone = FALSE,
            fixed = list(add = ac))
-    checkmate::assertDataFrame(IDLevelRules, types = c("numeric", "character", "logical"),
-                               all.missing = TRUE, min.rows = 1, add = ac)
-    assertHasNames(IDLevelRules,
-                   c("level", "subLevel", "type", "score", "relative", "value", "higherThanNext", "mustExist"),
-                   add = ac)
+    checkmate::assertFileExists(IDFile, "r", add = ac)
     checkmate::reportAssertions(ac)
     
     hash <- makeHash(fGroups, MSPeakLists, formulas, compounds, absMzDev,
                      relMinMSMSIntensity, simMSMSMethod, checkFragments, formulasNormalizeScores,
-                     compoundsNormalizeScores, IDLevelRules)
+                     compoundsNormalizeScores, makeFileHash(IDFile))
     cd <- loadCacheData("annotateSuspects", hash)
     if (!is.null(cd))
         return(cd)

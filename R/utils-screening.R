@@ -249,11 +249,11 @@ genIDLevelRulesFile <- function(out, inLevels = NULL, exLevels = NULL)
 
 # UNDONE/NOTE: mustExist/relative fields only used for scorings of compound/formulas
 estimateIdentificationLevel <- function(suspectRTDev, suspectInChIKey1, suspectFormula,
-                                           suspectAnnSimForm, suspectAnnSimComp, suspectAnnSimBoth,
-                                           maxSuspFrags, maxFragMatches, formTable, formRank,
-                                           formScoreRanges, formulasNormalizeScores, compTable,
-                                           compRank, mCompNames, compScoreRanges, compoundsNormalizeScores,
-                                           absMzDev, IDFile)
+                                        suspectAnnSimForm, suspectAnnSimComp, suspectAnnSimBoth,
+                                        maxSuspFrags, maxFragMatches, formTable, formRank,
+                                        formScoreRanges, formulasNormalizeScores, compTable,
+                                        compRank, mCompNames, compScoreRanges, compoundsNormalizeScores,
+                                        absMzDev, IDFile)
 {
     fRow <- cRow <- NULL
     if (!is.null(formTable) && !is.null(suspectFormula))
@@ -333,7 +333,6 @@ estimateIdentificationLevel <- function(suspectRTDev, suspectInChIKey1, suspectF
         if (htn > 0 && nrow(annTable) > 1)
         {
             otherHighest <- max(rowMeans(annTable[-rank, scCols, with = FALSE]))
-            # UNDONE: handler for Inf? or check "Inf" here?
             if (is.infinite(htn)) # special case: should be highest
             {
                 if (otherHighest > 0)

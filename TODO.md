@@ -13,7 +13,6 @@
 - ID level rules
     - GenForm scoring: somehow exclude non MS/MS candidates if MS/MS candidates are present?
         - already fine now with minimum rank?
-        - make OR'ing possible?
     - add scorings for SIRIUS/DA
     - remove mustExist?
     - convert to YAML

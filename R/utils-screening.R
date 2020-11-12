@@ -350,14 +350,21 @@ estimateIdentificationLevel <- function(suspectRTDev, suspectInChIKey1, suspectF
     compScores <- compoundScorings()$name
     formCompScores <- intersect(formScores, compScores)
     allScores <- union(formScores, compScores)
-    for (lvl in names(IDLevelRules))
+    
+    checkLevelOK <- function(IDL)
     {
-        levelOK <- TRUE
-        IDL <- IDLevelRules[[lvl]]
         for (type in names(IDL))
         {
+            levelOK <- NULL
+            
             val <- IDL[[type]]
-            if (type == "all" && val == TRUE)
+            if (type == "or")
+            {
+                if (!is.list(val) || checkmate::testNamed(val))
+                    stop("Specify a list with 'or'")
+                levelOK <- any(sapply(val, checkLevelOK))
+            }
+            else if (type == "all" && val == TRUE)
                 levelOK <- TRUE # special case: this level is always valid
             else if (type == "suspectFragments")
             {
@@ -397,10 +404,15 @@ estimateIdentificationLevel <- function(suspectRTDev, suspectInChIKey1, suspectF
                 stop(paste("Unknown ID level type:", type))
             
             if (!levelOK)
-                break
+                return(FALSE)
         }
         
-        if (levelOK)
+        return(TRUE)
+    }
+    
+    for (lvl in names(IDLevelRules))
+    {
+        if (checkLevelOK(IDLevelRules[[lvl]]))
             return(lvl)
     }
     

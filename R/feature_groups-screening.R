@@ -328,7 +328,7 @@ setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = FALS
 #' @aliases groupFeaturesScreening
 #' @export
 setMethod("groupFeaturesScreening", "featureGroups", function(fGroups, suspects, rtWindow, mzWindow,
-                                                              adduct, skipInvalid)
+                                                              adduct, skipInvalid, onlyHits)
 {
     if (!is.null(adduct))
         adduct <- checkAndToAdduct(adduct)
@@ -338,6 +338,7 @@ setMethod("groupFeaturesScreening", "featureGroups", function(fGroups, suspects,
     ac <- checkmate::makeAssertCollection()
     assertSuspectList(suspects, adduct, skipInvalid, add = ac)
     aapply(checkmate::assertNumber, . ~ rtWindow + mzWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
+    checkmate::assertFlag(onlyHits, add = ac)
     checkmate::reportAssertions(ac)
     
     # do this before checking cache to ensure proper errors/warnings are thrown!
@@ -348,7 +349,10 @@ setMethod("groupFeaturesScreening", "featureGroups", function(fGroups, suspects,
     if (!is.null(cd))
         return(cd)
 
-    scr <- doScreenSuspects(fGroups, suspects, rtWindow, mzWindow, adduct, skipInvalid)    
+    scr <- doScreenSuspects(fGroups, suspects, rtWindow, mzWindow, adduct, skipInvalid)
+
+    if (onlyHits)
+        fGroups <- fGroups[, scr$group]
     
     ret <- featureGroupsScreening(screenInfo = scr, groups = copy(groupTable(fGroups)),
                                   analysisInfo = analysisInfo(fGroups), groupInfo = groupInfo(fGroups),

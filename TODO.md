@@ -14,7 +14,6 @@
     - GenForm scoring: somehow exclude non MS/MS candidates if MS/MS candidates are present?
         - already fine now with minimum rank?
     - add scorings for SIRIUS/DA
-    - remove mustExist?
     - convert to YAML
         - update tests
         - refs?

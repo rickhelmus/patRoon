@@ -299,7 +299,7 @@ setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = FALS
     return(obj)
 })
 
-#' @details \code{groupFeaturesScreening} uses results from \code{screenSuspects}
+#' @details \code{screenSuspects} uses results from \code{screenSuspects}
 #'   to transform an existing \code{\link{featureGroups}} object by (1) renaming
 #'   any matched feature groups by the respective name of the suspect and (2)
 #'   filtering out any feature groups that were not matched. A common workflow
@@ -314,20 +314,20 @@ setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = FALS
 #'   transformed (and was used to obtain the screening results).
 #' @param scr The screening results table returned by \code{screenSuspects}.
 #'
-#' @return \code{groupFeaturesScreening} returns a modified \code{featureGroups}
+#' @return \code{screenSuspects} returns a modified \code{featureGroups}
 #'   object in which those feature groups that were not matched by any suspects
 #'   are removed and others renamed by the respective suspect name. In case of
 #'   duplicate suspect results, feature group names are made unique with
 #'   \code{\link{make.unique}}.
 #'
-#' @note Please note that \code{groupFeaturesScreening} method can only
+#' @note Please note that \code{screenSuspects} method can only
 #'   transform the \code{featureGroups} object that was used to obtain the given
 #'   screening results.
 #'
 #' @rdname suspect-screening
-#' @aliases groupFeaturesScreening
+#' @aliases screenSuspects
 #' @export
-setMethod("groupFeaturesScreening", "featureGroups", function(fGroups, suspects, rtWindow, mzWindow,
+setMethod("screenSuspects", "featureGroups", function(fGroups, suspects, rtWindow, mzWindow,
                                                               adduct, skipInvalid, onlyHits)
 {
     if (!is.null(adduct))

@@ -92,7 +92,7 @@ fGroups <- filter(fGroups, preAbsMinIntensity = {{ filterFGroupsOpts$preIntThr }
 suspFile <- read.csv("{{ suspectList }}", stringsAsFactors = FALSE)
 scr <- screenSuspects(fGroups, suspFile, rtWindow = 12, mzWindow = 0.005,
                       adduct = {{ if (!nzchar(suspectAdduct)) "NULL" else paste0("\"", suspectAdduct, "\"") }})
-fGroups <- groupFeaturesScreening(fGroups, scr)
+fGroups <- screenSuspects(fGroups, scr)
 {{ endCodeBlock() }}
 {{ optionalCodeBlock(doMSPeakFind || formulaOpts$algo != "" || identOpts$algo != "" || componentOpts$algo != "") }}
 

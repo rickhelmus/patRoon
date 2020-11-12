@@ -89,7 +89,7 @@ setGeneric("annotateSuspects", function(fGroups, MSPeakLists = NULL, formulas = 
 #' with known or suspected identity. This may be a generally favourable approach
 #' if possible, as it can significantly reduce the load on data interpretation.
 #'
-#' @note Both \code{groupFeaturesScreening} and
+#' @note Both \code{screenSuspects} and
 #'   \code{importFeatureGroupsBrukerTASQ} use names from targets/suspects as
 #'   feature group names, therefore, it is important that these are
 #'   file-compatible names when \link[=reporting]{reporting data} \file{csv} or
@@ -140,8 +140,8 @@ NULL
 #'   only InChI data is available for mass calculation).
 #'
 #' @rdname suspect-screening
-setGeneric("groupFeaturesScreening", function(fGroups, suspects, rtWindow = 12, mzWindow = 0.005, adduct = NULL,
-                                              skipInvalid = TRUE, onlyHits = FALSE) standardGeneric("groupFeaturesScreening"))
+setGeneric("screenSuspects", function(fGroups, suspects, rtWindow = 12, mzWindow = 0.005, adduct = NULL,
+                                              skipInvalid = TRUE, onlyHits = FALSE) standardGeneric("screenSuspects"))
 
 
 ### Optimization

@@ -7,7 +7,7 @@ Workflow step         | Function                                          | Outp
 Data pre-treatment    | `convertMSFiles()`, `recalibrarateDAFiles()`      | -
 Finding features      | `findFeatures()`                                  | `features`
 Grouping features     | `groupFeatures()`                                 | `featureGroups`
-Suspect screening     | `screenSuspects()` + `groupFeaturesScreening()`   | `featureGroups` 
+Suspect screening     | `screenSuspects()` + `screenSuspects()`   | `featureGroups` 
 MS peak lists         | `generateMSPeakLists()`                           | `MSPeakLists`
 Formula annotation    | `generateFormulas()`                              | `formulas`
 Compound annotation   | `generateCompounds()`                             | `compounds`
@@ -196,7 +196,7 @@ suspects <- data.frame(name = c("susp1", "susp2", "susp3"),
                        mz = c(100.1034, 250.0456, 300.1234),
                        stringsAsFactors = FALSE)
 scr <- screenSuspects(fGroups, suspects)
-fGroupsSusp <- groupFeaturesScreening(fGroups, scr)
+fGroupsSusp <- screenSuspects(fGroups, scr)
 ```
 
 <!-- UNDONE: make this interactive -->
@@ -214,7 +214,7 @@ suspects <- data.frame(name = c("susp1", "susp2", "susp3"),
                        SMILES = c("C1=CC=C(C=C1)C(=O)O", "C1=CC=C2C(=C1)C=CC3=CC=CC=C3N2C(=O)N", "C1=CC2=NNN=C2C=C1"),
                        stringsAsFactors = FALSE)
 scr <- screenSuspects(fGroups, suspects, adduct = "[M+H]+")
-fGroupsSusp <- groupFeaturesScreening(fGroups, scr)
+fGroupsSusp <- screenSuspects(fGroups, scr)
 ```
 
 Note that in some cases you may need to install [OpenBabel] (e.g. when only InChI data is available for mass calculation).

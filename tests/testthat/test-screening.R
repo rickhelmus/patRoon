@@ -27,7 +27,7 @@ test_that("suspect screening is OK", {
     expect_length(unique(scrF$name), nrow(susps))
     expect_known_value(scr, testFile("screening"))
     expect_known_value(scrF[, -"feature"], testFile("screening-feat"))
-    expect_length(groupFeaturesScreening(fGroups, scr), nrow(susps))
+    expect_equal(nrow(screenInfo(groupFeaturesScreening(fGroups, scr))), nrow(susps))
 
     # check suspects without retention
     expect_gte(nrow(screenSuspects(fGroups, susps[, -3])), nrow(scr))
@@ -67,19 +67,22 @@ if (hasMF)
     compsMFMoNa <- callMF(fGroupsAnn, plists, scoreTypes = c("fragScore", "individualMoNAScore"))
     forms <- generateFormulas(fGroupsAnn, "genform", plists)
     
-    ann <- annotateSuspectList(scrAnn, fGroupsAnn)
-    annMF <- annotateSuspectList(scrAnn, fGroupsAnn, MSPeakLists = plists, formulas = forms, compounds = compsMF)
-    annMoNa <- annotateSuspectList(scrAnn, fGroupsAnn, MSPeakLists = plists, formulas = forms, compounds = compsMFMoNa)
-    annOnlyForms <- annotateSuspectList(scrAnn, fGroupsAnn, MSPeakLists = plists, formulas = forms)
+    ann <- annotateSuspects(scrAnn, fGroupsAnn)
+    annMF <- annotateSuspects(scrAnn, fGroupsAnn, MSPeakLists = plists, formulas = forms, compounds = compsMF)
+    annMoNa <- annotateSuspects(scrAnn, fGroupsAnn, MSPeakLists = plists, formulas = forms, compounds = compsMFMoNa)
+    annOnlyForms <- annotateSuspects(scrAnn, fGroupsAnn, MSPeakLists = plists, formulas = forms)
     
     scrAnnFrag <- copy(scrAnn)
     scrAnnFrag[name == "1H-benzotriazole", fragments_mz := "92.0495"] # UNDONE: add qualifiers to patRoonData?
     scrAnnFragForm <- copy(scrAnn)
     scrAnnFragForm[name == "1H-benzotriazole", fragments_formula := "C6H5N"] # UNDONE: add qualifiers to patRoonData?
-    annFrag <- annotateSuspectList(scrAnnFrag[, -"d_rt"], fGroupsAnn, MSPeakLists = plists)
-    annFragRT <- annotateSuspectList(scrAnnFrag, fGroupsAnn, MSPeakLists = plists)
-    annFragForm <- annotateSuspectList(scrAnnFragForm[, -"d_rt"], fGroupsAnn, MSPeakLists = plists, compounds = compsMF,
-                                       IDLevelRules = defaultIDLevelRules(exLevels = "3a|c"))
+    annFrag <- annotateSuspects(scrAnnFrag[, -"d_rt"], fGroupsAnn, MSPeakLists = plists)
+    annFragRT <- annotateSuspects(scrAnnFrag, fGroupsAnn, MSPeakLists = plists)
+    
+    idlFrag <- getWorkPath("fragtest.yml")
+    genIDLevelRulesFile(idlFrag, exLevels = "3a|c")
+    annFragForm <- annotateSuspects(scrAnnFragForm[, -"d_rt"], fGroupsAnn, MSPeakLists = plists, compounds = compsMF,
+                                    IDLevelRulesFile = idlFrag)
 }
 
 minIDLevel <- function(l) min(as.integer(gsub("[[:alpha:]]*", "", l)))

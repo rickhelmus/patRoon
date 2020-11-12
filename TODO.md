@@ -17,7 +17,7 @@
     - add scorings for SIRIUS/DA
     - remove mustExist?
     - convert to YAML
-        - remove/replace defaultIDLevelRules() --> update tests
+        - update tests
         - refs?
 - interface
     - groupFeaturesScreening() --> screenSuspects()?

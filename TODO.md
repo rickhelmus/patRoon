@@ -34,6 +34,10 @@
     - update version number
     - prepareSuspectList(): export?
         - mainly to allow merging of lists, perhaps make util for that instead? Would also be handy for MF databases
+    - check why annotateSuspects() is sometimes slow
+    - check UNDONEs
+    - remove old annotation results in annotateSuspects()
+    - better name for selectBestFGroups filter?
 - expand reporting
     - eg marking which candidate corresponds to suspect and include suspect name in EICs
         - mark with different row colour and label?
@@ -46,13 +50,17 @@
     - new plotVenn list functionality
     - logging for ID level estimation
     - removal of screening for features
+    - update TASQ docs and other mentions to old suspect screening interface
+    - update examples where suspect name is used for subsetting
 - tests
     - automatic InChIKey/formula calculation from InChIs/SMILES
         - already done implicitly?
     - handling empty results
     - filters
-    - more?
+        - selectXBy: better tests?
+        - negation
     - new plotVenn list functionality
+    - update stored results for DA tests
 
 
 ## docs
@@ -76,6 +84,7 @@
 - comparison(): support xcms3? (needs missing support for missing raw data)
 - Fix: blank filter with multiple replicate groups (and maybe others?)
 - Check: units of plotChord() rt/mz graphs seems off
+- plotEIC(): get mzWindow from features if possible to show more representative results (eg when OpenMS mz window is very small)
 
 
 ## MSPeakLists

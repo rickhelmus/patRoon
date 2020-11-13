@@ -9,7 +9,8 @@ susps[, adduct := "[M+H]+"]
 susps[name %in% c("TBA", "TPA"), adduct := "[M]+"]
 
 fGroups <- getTestFGroups(getTestAnaInfo())
-
+fGroupsScr <- screenSuspects(fGroups, susps, onlyHits = TRUE)
+fGroupsScrNoRT <- screenSuspects(fGroups, susps[, -"rt"], onlyHits = TRUE)
 getScrInfo <- function(susps, ...) screenInfo(screenSuspects(fGroups, susps, onlyHits = TRUE, ...))
 
 scr <- getScrInfo(susps)
@@ -56,38 +57,50 @@ test_that("suspect screening is OK", {
 
     expect_warning(screenSuspects(fGroups, suspsMissingRow, skipInvalid = TRUE))
     expect_error(screenSuspects(fGroups, suspsMissingRow, skipInvalid = FALSE))
+    
+    # subsetting
+    expect_length(fGroupsScr[, suspects = susps$name], nrow(susps))
+    expect_length(fGroupsScr[, suspects = susps$name[1:2]], 2)
+    expect_length(fGroupsScr[, suspects = "doesnotexist"], 0)
+    
+    expect_equal(nrow(as.data.table(fGroupsScr, collapseSuspects = ",")), nrow(susps))
+    expect_gt(nrow(as.data.table(fGroupsScrNoRT, collapseSuspects = ",")), nrow(susps))
 })
 
 # NOTE: try keep this in sync with MF tests for caching purposes
 hasMF <- !is.null(getOption("patRoon.path.MetFragCL")) && nzchar(getOption("patRoon.path.MetFragCL"))
 if (hasMF)
 {
-    fGroupsForAnn <- getCompFGroups()
-    plists <- generateMSPeakLists(fGroupsForAnn, "mzr")
-    compsMF <- callMF(fGroupsForAnn, plists)
-    compsMFMoNa <- callMF(fGroupsForAnn, plists, scoreTypes = c("fragScore", "individualMoNAScore"))
-    forms <- generateFormulas(fGroupsForAnn, "genform", plists)
+    plists <- generateMSPeakLists(fGroupsScr, "mzr")
+    compsMF <- callMF(fGroupsScr, plists)
+    compsMFMoNa <- callMF(fGroupsScr, plists, scoreTypes = c("fragScore", "individualMoNAScore"))
+    forms <- generateFormulas(fGroupsScr, "genform", plists, calculateFeatures = FALSE)
     
-    fGroupsAnn <- annotateSuspects(fGroupsForAnn)
-    fGroupsAnnMF <- annotateSuspects(fGroupsForAnn, MSPeakLists = plists, formulas = forms, compounds = compsMF)
+    fGroupsAnn <- annotateSuspects(fGroupsScr)
+    fGroupsAnnMF <- annotateSuspects(fGroupsScr, MSPeakLists = plists, formulas = forms, compounds = compsMF)
+    fGroupsAnnMFJ <- annotateSuspects(fGroupsScr, MSPeakLists = plists, formulas = forms, compounds = compsMF,
+                                      simMSMSMethod = "jaccard")
     fGroupsAnnMoNA <- annotateSuspects(fGroupsAnn, MSPeakLists = plists, formulas = forms, compounds = compsMFMoNa)
     fGroupsOnlyForms <- annotateSuspects(fGroupsAnn, MSPeakLists = plists, formulas = forms)
     
-    fGroupsAnnFragNoRT <- screenSuspects(fGroupsForAnn, suspsFrag[, -"rt"])
+    fGroupsAnnFragNoRT <- screenSuspects(fGroupsScr, suspsFrag[, -"rt"])
     fGroupsAnnFragNoRT <- annotateSuspects(fGroupsAnnFragNoRT, MSPeakLists = plists)
-    fGroupsAnnFrag <- screenSuspects(fGroupsForAnn, suspsFrag)
+    fGroupsAnnFrag <- screenSuspects(fGroupsScr, suspsFrag)
     fGroupsAnnFrag <- annotateSuspects(fGroupsAnnFrag, MSPeakLists = plists)
     
     idlFrag <- getWorkPath("fragtest.yml")
     genIDLevelRulesFile(idlFrag, exLevels = "3a|c")
-    fGroupsAnnFragForm <- screenSuspects(fGroupsForAnn, suspsFragForm[, -"rt"])
-    fGroupsAnnFragForm <- annotateSuspects(fGroupsAnnFragForm, MSPeakLists = plists, compounds = compsMF,
-                                           IDFile = idlFrag)
+    fGroupsAnnFragFormNoRT <- screenSuspects(fGroups, suspsFragForm[, -"rt"], onlyHits = TRUE)
+    fGroupsAnnFragForm <- annotateSuspects(fGroupsAnnFragFormNoRT, MSPeakLists = plists, formulas = forms,
+                                           compounds = compsMF, IDFile = idlFrag)
 }
 
 minIDLevel <- function(ann) min(numericIDLevel(screenInfo(ann)$estIDLevel))
 test_that("Suspect annotation works", {
     skip_if_not(hasMF)
+    
+    expect_known_value(screenInfo(fGroupsAnnMF), testFile("screen-ann-MF"))
+    expect_known_value(screenInfo(fGroupsAnnMFJ), testFile("screen-ann-MF-J"))
     
     expect_equal(minIDLevel(fGroupsAnn), 5)
     expect_equal(minIDLevel(fGroupsOnlyForms), 4)
@@ -96,6 +109,27 @@ test_that("Suspect annotation works", {
     expect_equal(minIDLevel(fGroupsAnnFragForm), 3)
     expect_equal(minIDLevel(fGroupsAnnMoNA), 2)
     expect_equal(minIDLevel(fGroupsAnnFrag), 1)
+    
+    expect_equal(fGroupsAnnFrag, annotateSuspects(fGroupsAnnFrag, MSPeakLists = plists, checkFragments = "mz"))
+    expect_false(isTRUE(all.equal(fGroupsAnnFrag, annotateSuspects(fGroupsAnnFrag, MSPeakLists = plists, checkFragments = "formula"))))
+    expect_true(all(is.na(screenInfo(fGroupsAnnMF)$annSimBoth) |
+                        screenInfo(fGroupsAnnMF)$annSimBoth >= pmax(screenInfo(fGroupsAnnMF)$annSimForm, screenInfo(fGroupsAnnMF)$annSimComp, na.rm = TRUE)))
+})
+
+# take fGroupsAnnFragForm: doesn't have rt in susp list, so has double hits
+selectedHitsInt <- filter(fGroupsAnnFragForm, selectHitsBy = "intensity", onlyHits = TRUE)
+selectedHitsLev <- filter(fGroupsAnnFragForm, selectHitsBy = "level", onlyHits = TRUE)
+# UNDONE: these are not really good examples as the ID level is the same for all duplicates...
+selectedFGroupsLev <- filter(fGroupsAnnFragForm, selectBestFGroups = TRUE, onlyHits = TRUE)
+
+test_that("Screen filters", {
+    expect_known_value(as.data.table(selectedHitsInt, collapseSuspects = NULL), testFile("screen-ann-sel-hits_int"))
+    expect_known_value(as.data.table(selectedHitsLev, collapseSuspects = NULL), testFile("screen-ann-sel-hits_lev"))
+    expect_known_value(as.data.table(selectedFGroupsLev, collapseSuspects = NULL), testFile("screen-ann-sel-groups"))
+    
+    expect_lt(length(selectedHitsInt), length(fGroupsAnnFragForm))
+    expect_lt(length(selectedHitsLev), length(fGroupsAnnFragForm))
+    expect_lt(length(selectedFGroupsLev), nrow(screenInfo(fGroupsAnnFragForm)))
 })
 
 TQFile <- file.path(getTestDataPath(), "GlobalResults-TASQ.csv")

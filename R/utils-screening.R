@@ -337,8 +337,8 @@ estimateIdentificationLevel <- function(suspectName, suspectFGroup, suspectRTDev
 
     logOut <- file.path("log", "ident", paste0(suspectName, "-", suspectFGroup, ".txt"))
     mkdirp(dirname(logOut))
-    unlink(logOut)
-    doLog <- function(indent, s, ...) fprintf(logOut, paste0(strrep(" ", indent * 4), s), ..., append = TRUE)
+    logFile <- withr::local_connection(file(logOut, "w"))
+    doLog <- function(indent, s, ...) fprintf(logFile, paste0(strrep(" ", indent * 4), s), ...)
     
     formScores <- formulaScorings()$name
     compScores <- compoundScorings()$name

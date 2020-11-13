@@ -2,7 +2,7 @@ context("formulas")
 
 fGroups <- getTestFGroups(getTestAnaInfo()[4:5, ])
 # convert to screening results to simplify things a bit
-fGroups <- groupFeaturesScreening(fGroups, screenSuspects(fGroups, patRoonData::targets))
+fGroups <- screenSuspects(fGroups, patRoonData::targets, onlyHits = TRUE)
 
 fGroupsEmpty <- getEmptyTestFGroups()
 plists <- generateMSPeakLists(fGroups, "mzr")
@@ -214,8 +214,8 @@ test_that("consensus works", {
 
 if (doSIRIUS)
 {
-    anPL <- annotatedPeakList(fCons, precursor = "C9H8NO", groupName = groupNames(fCons)[4], MSPeakLists = plists)
-    anPLOnly <- annotatedPeakList(fCons, precursor = "C9H8NO", groupName = groupNames(fCons)[4],
+    anPL <- annotatedPeakList(fCons, precursor = "C9H8NO", groupName = groupNames(fCons)[6], MSPeakLists = plists)
+    anPLOnly <- annotatedPeakList(fCons, precursor = "C9H8NO", groupName = groupNames(fCons)[6],
                                   MSPeakLists = plists, onlyAnnotated = TRUE)
 }
 
@@ -258,9 +258,9 @@ test_that("reporting empty objects works", {
 })
 
 
-plotPrec <- formsGFWithMSMS[[1]][["formula"]][1]
+plotPrec <- formsGFWithMSMS[[2]][["formula"]][1]
 test_that("plotting works", {
-    expect_doppel("form-spec", function() plotSpectrum(formsGFWithMSMS, plotPrec, groupNames(formsGFWithMSMS)[1],
+    expect_doppel("form-spec", function() plotSpectrum(formsGFWithMSMS, plotPrec, groupNames(formsGFWithMSMS)[2],
                                                        MSPeakLists = plists))
 
     # ggplot2 versions don't really work with vdiffr at the moment :(
@@ -270,7 +270,7 @@ test_that("plotting works", {
     expect_ggplot(plotSpectrum(formsGFWithMSMS, plotPrec, groupNames(formsGFWithMSMS)[1], MSPeakLists = plists,
                                useGGPlot2 = TRUE))
 
-    expect_doppel("form-scores", function() plotScores(formsGFWithMSMS, plotPrec, groupNames(formsGFWithMSMS)[1]))
+    expect_doppel("form-scores", function() plotScores(formsGFWithMSMS, plotPrec, groupNames(formsGFWithMSMS)[2]))
 
     skip_if_not(doSIRIUS)
     expect_doppel("venn", function() plotVenn(formsGF, formsSIR))

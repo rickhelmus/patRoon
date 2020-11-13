@@ -9,14 +9,11 @@ getEmptyTestFGroups <- function() getTestFGroups()[, "none"]
 getEmptyPLists <- function() MSPeakLists(algorithm = "none")
 
 getMFTestDBPath <- function() file.path(getTestDataPath(), "test-mf-db.csv")
-getCompScr <- function() screenSuspects(getTestFGroups(getTestAnaInfo()[4, ]), patRoonData::targets)
 getCompFGroups <- function()
 {
-    fGroups <- getTestFGroups(getTestAnaInfo()[4, ])
-    # convert to screening results to simplify things a bit
-    fGroups <- groupFeaturesScreening(fGroups, getCompScr())
+    fGroups <- screenSuspects(getTestFGroups(getTestAnaInfo()[4, ]), patRoonData::targets, onlyHits = TRUE)
     # just focus on 5 targets, these are named exactly the same as in the MetFrag test DB
-    return(fGroups[, fread(getMFTestDBPath())$Name])
+    return(fGroups[, suspects = fread(getMFTestDBPath())$Name])
 }
 
 callMF <- function(fGroups, plists, scoreTypes = "fragScore", db = getMFTestDBPath(), to = 300)

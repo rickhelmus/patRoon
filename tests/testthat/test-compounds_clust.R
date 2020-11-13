@@ -5,7 +5,7 @@ hasMetfrag <- !is.null(getOption("patRoon.path.MetFragCL")) && nzchar(getOption(
 if (hasMetfrag)
 {
     fGroups <- getTestFGroups(getTestAnaInfo()[4, ])
-    fGroups <- groupFeaturesScreening(fGroups, screenSuspects(fGroups, patRoonData::targets))[1:5]
+    fGroups <- screenSuspects(fGroups, patRoonData::targets, onlyHits = TRUE)[1:5]
     plists <- generateMSPeakLists(fGroups, "mzr")
     compounds <- generateCompounds(fGroups, plists, "metfrag", adduct = "[M+H]+",
                                    database = "csv", scoreTypes = "fragScore",

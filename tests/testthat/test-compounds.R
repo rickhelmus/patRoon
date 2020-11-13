@@ -30,8 +30,8 @@ test_that("verify MetFragCL compound generation", {
     expect_known_value(compsMF, testFile("compounds-mf"))
     expect_known_show(compsMF, testFile("compounds-mf", text = TRUE))
     expect_length(compsMF, 5) # should be one compound per feature group
-    # make sure that all feature group names (=targets) correspond to identified compounds
-    expect_true(all(sapply(names(ct), function(grp) nrow(ct[[grp]]) == 1 && ct[[grp]]$identifier == grp)))
+    # make sure that all suspect names correspond to identified compounds
+    expect_true(all(sapply(names(ct), function(grp) nrow(ct[[grp]]) == 1 && ct[[grp]]$identifier == screenInfo(fGroups)[group == grp]$name)))
     expect_length(compsMFEmpty, 0)
     expect_length(compsMFEmptyPL, 0)
 })
@@ -215,9 +215,9 @@ test_that("consensus works", {
 
 if (doMetFrag && doSIRIUS)
 {
-    anPL <- annotatedPeakList(compsCons, index = 1, groupName = groupNames(compsCons)[2],
+    anPL <- annotatedPeakList(compsCons, index = 1, groupName = groupNames(compsCons)[1],
                               MSPeakLists = plists, formulas = forms)
-    anPLOnly <- annotatedPeakList(compsCons, index = 1, groupName = groupNames(compsCons)[2],
+    anPLOnly <- annotatedPeakList(compsCons, index = 1, groupName = groupNames(compsCons)[1],
                                   MSPeakLists = plists, formulas = forms, onlyAnnotated = TRUE)
 }
 
@@ -227,7 +227,7 @@ test_that("annotation works", {
     expect_lt(nrow(anPLOnly), nrow(anPL))
     expect_true(any(is.na(anPL$formula)))
     expect_false(any(is.na(anPLOnly$formula)))
-    expect_true(all(compsCons[[2]]$fragInfo[[1]]$formula %in% anPLOnly$formula))
+    expect_true(all(compsCons[[1]]$fragInfo[[1]]$formula %in% anPLOnly$formula))
     expect_true(any(grepl("metfrag", anPLOnly$mergedBy)))
     expect_true(any(grepl("sirius", anPLOnly$mergedBy)))
     expect_true(any(grepl("genform", anPLOnly$mergedBy)))
@@ -267,16 +267,15 @@ test_that("plotting works", {
     skip_if_not(doMetFrag)
 
     # plotting structure seems to be difficult to do reproducible between systems, so disable for vdiffr now...
-    expect_doppel("compound-spec", function() plotSpectrum(compsMFIso, 1, names(compoundTable(compsMFIso))[1],
-                                                           plists, plotStruct = FALSE))
-    expect_plot(plotSpectrum(compsMFIso, 1, names(compoundTable(compsMFIso))[1], plists, plotStruct = TRUE))
+    expect_doppel("compound-spec", function() plotSpectrum(compsMFIso, 1, names(compoundTable(compsMFIso))[2], plists, plotStruct = FALSE))
+    expect_plot(plotSpectrum(compsMFIso, 1, names(compoundTable(compsMFIso))[2], plists, plotStruct = TRUE))
     # expect_doppel("spec-gg", plotSpectrum(compsMFIso, 1, names(compoundTable(compsMFIso))[1], plists, useGGPlot2 = TRUE))
-    expect_ggplot(plotSpectrum(compsMFIso, 1, names(compoundTable(compsMFIso))[1], plists, useGGPlot2 = TRUE))
+    expect_ggplot(plotSpectrum(compsMFIso, 1, names(compoundTable(compsMFIso))[2], plists, useGGPlot2 = TRUE))
 
     # plotStructure gives an empty plot??
     # expect_doppel("struct", function() plotStructure(compsMFIso, 1, names(compoundTable(compsMFIso))[1]))
-    expect_plot(plotStructure(compsMFIso, 1, names(compoundTable(compsMFIso))[1]))
-    expect_doppel("scores", function() plotScores(compsMFIso, 1, names(compoundTable(compsMFIso))[1]))
+    expect_plot(plotStructure(compsMFIso, 1, names(compoundTable(compsMFIso))[2]))
+    expect_doppel("scores", function() plotScores(compsMFIso, 1, names(compoundTable(compsMFIso))[2]))
 
     skip_if_not(doSIRIUS)
     expect_doppel("venn", function() plotVenn(compsMF, compsSIR))

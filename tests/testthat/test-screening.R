@@ -9,9 +9,11 @@ susps[, adduct := "[M+H]+"]
 susps[name %in% c("TBA", "TPA"), adduct := "[M]+"]
 
 fGroups <- getTestFGroups(getTestAnaInfo())
-scr <- screenSuspects(fGroups, susps)
-scrF <- screenSuspects(getFeatures(fGroups), susps)
-scrSMI <- screenSuspects(fGroups, susps[, c("name", "rt", "adduct", "SMILES")])
+
+getScrInfo <- function(susps, ...) screenInfo(screenSuspects(fGroups, susps, onlyHits = TRUE, ...))
+
+scr <- getScrInfo(susps)
+scrSMI <- getScrInfo(susps[, c("name", "rt", "adduct", "SMILES")])
 
 suspsMissing <- copy(susps)
 suspsMissing[1, mz := NA]
@@ -22,36 +24,36 @@ suspsMissing[5, InChI := ""]
 suspsMissingRow <- copy(susps)
 suspsMissingRow[2, c("mz", "neutralMass", "formula", "SMILES", "InChI") := NA]
 
+suspsFrag <- copy(susps)
+suspsFrag[name == "1H-benzotriazole", fragments_mz := "92.0495"] # UNDONE: add qualifiers to patRoonData?
+suspsFragForm <- copy(susps)
+suspsFragForm[name == "1H-benzotriazole", fragments_formula := "C6H6N"] # UNDONE: add qualifiers to patRoonData?
+
 test_that("suspect screening is OK", {
     expect_equal(nrow(scr), nrow(susps))
-    expect_length(unique(scrF$name), nrow(susps))
     expect_known_value(scr, testFile("screening"))
-    expect_known_value(scrF[, -"feature"], testFile("screening-feat"))
-    expect_equal(nrow(screenInfo(groupFeaturesScreening(fGroups, scr))), nrow(susps))
+    expect_length(screenSuspects(fGroups, susps, onlyHits = TRUE), nrow(susps))
 
     # check suspects without retention
-    expect_gte(nrow(screenSuspects(fGroups, susps[, -3])), nrow(scr))
-    expect_gte(nrow(screenSuspects(getFeatures(fGroups), susps[, -3])), nrow(scrF))
+    expect_gte(nrow(getScrInfo(susps[, -3])), nrow(scr))
     
     # alternative ion mass calculations
     expect_equal_scr(scr, scrSMI, tolerance = 1E-3) # higher tolerance due to inaccurate mz column in patRoonData::targets
-    expect_equal_scr(scrSMI, screenSuspects(fGroups, susps[, c("name", "rt", "adduct", "InChI")]))
-    expect_equal_scr(scrSMI, screenSuspects(fGroups, susps[, c("name", "rt", "adduct", "neutralMass")]))
-    expect_equal_scr(scrSMI, screenSuspects(fGroups, susps[, c("name", "rt", "adduct", "formula")]))
+    expect_equal_scr(scrSMI, getScrInfo(susps[, c("name", "rt", "adduct", "InChI")]))
+    expect_equal_scr(scrSMI, getScrInfo(susps[, c("name", "rt", "adduct", "neutralMass")]))
+    expect_equal_scr(scrSMI, getScrInfo(susps[, c("name", "rt", "adduct", "formula")]))
 
     # same, with missing data (having 2 options for ion mass calculation should be sufficient)
-    expect_equal_scr(scrSMI, screenSuspects(fGroups, suspsMissing[, c("name", "rt", "adduct", "mz", "neutralMass")]),
+    expect_equal_scr(scrSMI, getScrInfo(suspsMissing[, c("name", "rt", "adduct", "mz", "neutralMass")]),
                  tolerance = 1E-3)
-    expect_equal_scr(scrSMI, screenSuspects(fGroups, suspsMissing[, c("name", "rt", "adduct", "neutralMass", "formula")]))
-    expect_equal_scr(scrSMI, screenSuspects(fGroups, suspsMissing[, c("name", "rt", "adduct", "formula", "SMILES")]))
-    expect_equal_scr(scrSMI, screenSuspects(fGroups, suspsMissing[, c("name", "rt", "adduct", "SMILES", "InChI")]))
+    expect_equal_scr(scrSMI, getScrInfo(suspsMissing[, c("name", "rt", "adduct", "neutralMass", "formula")]))
+    expect_equal_scr(scrSMI, getScrInfo(suspsMissing[, c("name", "rt", "adduct", "formula", "SMILES")]))
+    expect_equal_scr(scrSMI, getScrInfo(suspsMissing[, c("name", "rt", "adduct", "SMILES", "InChI")]))
     
     # adduct argument
-    expect_equal_scr(screenSuspects(fGroups, susps[name %in% c("TBA", "TPA")]),
-                     screenSuspects(fGroups, susps[name %in% c("TBA", "TPA"), -"adduct"], adduct = "[M]+"))
+    expect_equal_scr(getScrInfo(susps[name %in% c("TBA", "TPA")]),
+                     getScrInfo(susps[name %in% c("TBA", "TPA"), -"adduct"], adduct = "[M]+"))
 
-    # certain Linux/JVM combinations (e.g. current CI Docker image) give Java StackOverflows...
-    testthat::skip_on_os("linux")
     expect_warning(screenSuspects(fGroups, suspsMissingRow, skipInvalid = TRUE))
     expect_error(screenSuspects(fGroups, suspsMissingRow, skipInvalid = FALSE))
 })
@@ -60,42 +62,40 @@ test_that("suspect screening is OK", {
 hasMF <- !is.null(getOption("patRoon.path.MetFragCL")) && nzchar(getOption("patRoon.path.MetFragCL"))
 if (hasMF)
 {
-    scrAnn <- getCompScr()
-    fGroupsAnn <- getCompFGroups()
-    plists <- generateMSPeakLists(fGroupsAnn, "mzr")
-    compsMF <- callMF(fGroupsAnn, plists)
-    compsMFMoNa <- callMF(fGroupsAnn, plists, scoreTypes = c("fragScore", "individualMoNAScore"))
-    forms <- generateFormulas(fGroupsAnn, "genform", plists)
+    fGroupsForAnn <- getCompFGroups()
+    plists <- generateMSPeakLists(fGroupsForAnn, "mzr")
+    compsMF <- callMF(fGroupsForAnn, plists)
+    compsMFMoNa <- callMF(fGroupsForAnn, plists, scoreTypes = c("fragScore", "individualMoNAScore"))
+    forms <- generateFormulas(fGroupsForAnn, "genform", plists)
     
-    ann <- annotateSuspects(scrAnn, fGroupsAnn)
-    annMF <- annotateSuspects(scrAnn, fGroupsAnn, MSPeakLists = plists, formulas = forms, compounds = compsMF)
-    annMoNa <- annotateSuspects(scrAnn, fGroupsAnn, MSPeakLists = plists, formulas = forms, compounds = compsMFMoNa)
-    annOnlyForms <- annotateSuspects(scrAnn, fGroupsAnn, MSPeakLists = plists, formulas = forms)
+    fGroupsAnn <- annotateSuspects(fGroupsForAnn)
+    fGroupsAnnMF <- annotateSuspects(fGroupsForAnn, MSPeakLists = plists, formulas = forms, compounds = compsMF)
+    fGroupsAnnMoNA <- annotateSuspects(fGroupsAnn, MSPeakLists = plists, formulas = forms, compounds = compsMFMoNa)
+    fGroupsOnlyForms <- annotateSuspects(fGroupsAnn, MSPeakLists = plists, formulas = forms)
     
-    scrAnnFrag <- copy(scrAnn)
-    scrAnnFrag[name == "1H-benzotriazole", fragments_mz := "92.0495"] # UNDONE: add qualifiers to patRoonData?
-    scrAnnFragForm <- copy(scrAnn)
-    scrAnnFragForm[name == "1H-benzotriazole", fragments_formula := "C6H5N"] # UNDONE: add qualifiers to patRoonData?
-    annFrag <- annotateSuspects(scrAnnFrag[, -"d_rt"], fGroupsAnn, MSPeakLists = plists)
-    annFragRT <- annotateSuspects(scrAnnFrag, fGroupsAnn, MSPeakLists = plists)
+    fGroupsAnnFragNoRT <- screenSuspects(fGroupsForAnn, suspsFrag[, -"rt"])
+    fGroupsAnnFragNoRT <- annotateSuspects(fGroupsAnnFragNoRT, MSPeakLists = plists)
+    fGroupsAnnFrag <- screenSuspects(fGroupsForAnn, suspsFrag)
+    fGroupsAnnFrag <- annotateSuspects(fGroupsAnnFrag, MSPeakLists = plists)
     
     idlFrag <- getWorkPath("fragtest.yml")
     genIDLevelRulesFile(idlFrag, exLevels = "3a|c")
-    annFragForm <- annotateSuspects(scrAnnFragForm[, -"d_rt"], fGroupsAnn, MSPeakLists = plists, compounds = compsMF,
-                                    IDLevelRulesFile = idlFrag)
+    fGroupsAnnFragForm <- screenSuspects(fGroupsForAnn, suspsFragForm[, -"rt"])
+    fGroupsAnnFragForm <- annotateSuspects(fGroupsAnnFragForm, MSPeakLists = plists, compounds = compsMF,
+                                           IDFile = idlFrag)
 }
 
-minIDLevel <- function(l) min(as.integer(gsub("[[:alpha:]]*", "", l)))
+minIDLevel <- function(ann) min(numericIDLevel(screenInfo(ann)$estIDLevel))
 test_that("Suspect annotation works", {
     skip_if_not(hasMF)
     
-    expect_equal(minIDLevel(ann$estIDLevel), 5)
-    expect_equal(minIDLevel(annOnlyForms$estIDLevel), 4)
-    expect_equal(minIDLevel(annMF$estIDLevel), 3)
-    expect_equal(minIDLevel(annFrag$estIDLevel), 3)
-    expect_equal(minIDLevel(annFragForm$estIDLevel), 3)
-    expect_equal(minIDLevel(annMoNa$estIDLevel), 2)
-    expect_equal(minIDLevel(annFragRT$estIDLevel), 1)
+    expect_equal(minIDLevel(fGroupsAnn), 5)
+    expect_equal(minIDLevel(fGroupsOnlyForms), 4)
+    expect_equal(minIDLevel(fGroupsAnnMF), 3)
+    expect_equal(minIDLevel(fGroupsAnnFragNoRT), 3)
+    expect_equal(minIDLevel(fGroupsAnnFragForm), 3)
+    expect_equal(minIDLevel(fGroupsAnnMoNA), 2)
+    expect_equal(minIDLevel(fGroupsAnnFrag), 1)
 })
 
 TQFile <- file.path(getTestDataPath(), "GlobalResults-TASQ.csv")

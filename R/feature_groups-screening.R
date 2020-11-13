@@ -89,6 +89,16 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
     if (!is.null(cd))
         return(cd)
     
+    IDLevelRules <- yaml::yaml.load_file(IDFile, eval.expr = FALSE)
+    
+    if (!checkmate::test_named(IDLevelRules))
+        stop("No valid rules could be loaded")
+    if (!all(grepl("^[[:digit:]]+[[:alpha:]]?$", names(IDLevelRules))))
+        stop("Levels should be defined as a number and may optionally followed by one character (e.g. 3, 2b etc)")
+    
+    IDLevelRules <- IDLevelRules[order(names(IDLevelRules))] # sort to ensure lowest levels will be tested first
+    
+    
     mzWithin <- function(mz1, mz2) abs(mz1 - mz2) <= absMzDev
     
     si <- copy(screenInfo(fGroups))
@@ -175,7 +185,7 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
                                                   maxSuspFrags, maxFragMatches, fTable, suspFormRank, fScRanges,
                                                   formulasNormalizeScores, cTable, suspCompRank,
                                                   mCompNames = if (!is.null(compounds)) mergedCompoundNames(compounds) else NULL,
-                                                  cScRanges, compoundsNormalizeScores, absMzDev, IDFile)
+                                                  cScRanges, compoundsNormalizeScores, absMzDev, IDLevelRules)
         
         set(si, i,
             c("suspFormRank", "suspCompRank", "annSimForm", "annSimComp", "annSimBoth",

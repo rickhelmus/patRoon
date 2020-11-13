@@ -253,7 +253,7 @@ estimateIdentificationLevel <- function(suspectName, suspectFGroup, suspectRTDev
                                         maxSuspFrags, maxFragMatches, formTable, formRank,
                                         formScoreRanges, formulasNormalizeScores, compTable,
                                         compRank, mCompNames, compScoreRanges, compoundsNormalizeScores,
-                                        absMzDev, IDFile)
+                                        absMzDev, IDLevelRules)
 {
     fRow <- cRow <- NULL
     if (!is.null(formTable) && !is.null(suspectFormula))
@@ -276,15 +276,6 @@ estimateIdentificationLevel <- function(suspectName, suspectFGroup, suspectRTDev
             cRowNorm <- compTableNorm[compRank]
         }
     }
-    
-    IDLevelRules <- yaml::yaml.load_file(IDFile, eval.expr = FALSE)
-    
-    if (!checkmate::test_named(IDLevelRules))
-        stop("No valid rules could be loaded")
-    if (!all(grepl("^[[:digit:]]+[[:alpha:]]?$", names(IDLevelRules))))
-        stop("Levels should be defined as a number and may optionally followed by one character (e.g. 3, 2b etc)")
-    
-    IDLevelRules <- IDLevelRules[order(names(IDLevelRules))] # sort to ensure lowest levels will be tested first
     
     getValType <- function(val, IDType)
     {

@@ -241,8 +241,7 @@ genIDLevelRulesFile <- function(out, inLevels = NULL, exLevels = NULL)
         if (!is.null(exLevels))
             rules <- rules[!grepl(exLevels, names(rules))]
         # UNDONE: this quotes ID levels without sub-level, fix?
-        yaml::write_yaml(rules, out, indent = 4,
-                         handlers = list(int = function(x) { class(x) <- "verbatim"; x }))
+        yaml::write_yaml(rules, out, indent = 4)
     }
     invisible(NULL)
 }

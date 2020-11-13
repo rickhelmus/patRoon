@@ -68,7 +68,7 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
                                                                                       package = "patRoon"))
 {
     # UNDONE: prog bar
-    # UNDONE/document: annSimBoth falls back to annSimComp if no formulas available
+    # UNDONE/document: annSimBoth falls back to annSimForm/annSimComp if no formulas available
     
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertClass, . ~ MSPeakLists + formulas + compounds,
@@ -112,21 +112,21 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
         cTable <- if (!is.null(compounds)) compounds[[gName]] else NULL
         cScRanges <- if (!is.null(compounds)) compounds@scoreRanges[[gName]] else NULL
         
-        suspFormRank <- NA_integer_; annSimForm <- NA_real_
+        suspFormRank <- NA_integer_; annSimForm <- annSimBoth <- NA_real_
         if (!is.null(fTable) && !is.null(si[["formula"]]) && !is.na(si$formula[i]))
         {
             unFTable <- unique(fTable, by = "formula")
             suspFormRank <- which(si$formula[i] == unFTable$neutral_formula)
             suspFormRank <- if (length(suspFormRank) > 0) suspFormRank[1] else NA_integer_
             if (!is.na(suspFormRank))
-                annSimForm <- annotatedMSMSSimilarity(annotatedPeakList(formulas,
-                                                                        precursor = unFTable$formula[suspFormRank],
-                                                                        groupName = gName, MSPeakLists = MSPeakLists),
-                                                      absMzDev, relMinMSMSIntensity, simMSMSMethod)
+                annSimForm <- annSimBoth <- annotatedMSMSSimilarity(annotatedPeakList(formulas,
+                                                                                      precursor = unFTable$formula[suspFormRank],
+                                                                                      groupName = gName, MSPeakLists = MSPeakLists),
+                                                                    absMzDev, relMinMSMSIntensity, simMSMSMethod)
         }
         
         suspIK1 <- if (!is.null(si[["InChIKey"]]) && !is.na(si$InChIKey[i])) getIKBlock1(si$InChIKey[i]) else NULL
-        annSimComp <- annSimBoth <- NA_real_; suspCompRank <- NA_integer_
+        annSimComp <- NA_real_; suspCompRank <- NA_integer_
         if (!is.null(MSMSList) && !is.null(cTable) && !is.null(suspIK1))
         {
             suspCompRank <- which(suspIK1 == cTable$InChIKey1)

@@ -17,7 +17,7 @@ setMethod("screenInfo", "featureGroupsScreening", function(obj) obj@screenInfo)
 setMethod("[", c("featureGroupsScreening", "ANY", "ANY", "missing"), function(x, i, j, ..., rGroups,
                                                                               suspects = NULL, drop = TRUE)
 {
-    checkmate::assertChoice(suspects, x@screenInfo$name, null.ok = TRUE)
+    checkmate::assertCharacter(suspects, null.ok = TRUE)
     
     x <- callNextMethod(x, i, j, ..., rGroups = rGroups, drop = drop)
     
@@ -68,7 +68,7 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
                                                                                       package = "patRoon"))
 {
     # UNDONE: prog bar
-    # UNDONE/document: annSimBoth falls back to annSimComp if no formals available
+    # UNDONE/document: annSimBoth falls back to annSimComp if no formulas available
     
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertClass, . ~ MSPeakLists + formulas + compounds,
@@ -151,7 +151,7 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
         fragMZMatches <- fragFormMatches <- fragFormCompMatches <- NA_integer_
         fragMZs <- fragForms <- NULL
         maxSuspFrags <- maxFragMatches <- NA_integer_
-        if (!is.null(MSPeakLists) && !is.null(si[["fragments_mz"]]) &&
+        if (!is.null(MSMSList) && !is.null(si[["fragments_mz"]]) &&
             !is.na(si[["fragments_mz"]][i]) && nzchar(si[["fragments_mz"]][i]) &&
             "mz" %in% checkFragments)
         {
@@ -335,10 +335,9 @@ setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = FALS
 #'   screening results.
 #'
 #' @rdname suspect-screening
-#' @aliases screenSuspects
 #' @export
 setMethod("screenSuspects", "featureGroups", function(fGroups, suspects, rtWindow, mzWindow,
-                                                              adduct, skipInvalid, onlyHits)
+                                                      adduct, skipInvalid, onlyHits)
 {
     if (!is.null(adduct))
         adduct <- checkAndToAdduct(adduct)

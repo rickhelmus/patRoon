@@ -42,7 +42,8 @@ writeGenFormFiles <- function(MSPList, MSMSPList, MSFile, MSMSFile)
         writePList(MSMSFile, MSMSPList)
 }
 
-makeGenFormCmdQueue <- function(groupPeakLists, baseHash, MSMode, isolatePrec)
+makeGenFormCmdQueue <- function(groupPeakLists, baseHash, MSMode, isolatePrec, adduct, topMost,
+                                mainArgs)
 {
     pruneList(sapply(names(groupPeakLists), function(grp)
     {
@@ -63,65 +64,77 @@ makeGenFormCmdQueue <- function(groupPeakLists, baseHash, MSMode, isolatePrec)
  
         hash <- makeHash(groupPeakLists[[grp]], baseHash)
                
-        return(list(PLMZ = plmz, MSPL = plms, MSMSPL = groupPeakLists[[grp]][["MSMS"]],
-                    hash = hash, group = grp, isMSMS = hasMSMS))
+        return(list(args = mainArgs, PLMZ = plmz, MSPL = plms, MSMSPL = groupPeakLists[[grp]][["MSMS"]],
+                    hash = hash, group = grp, isMSMS = hasMSMS, adduct = adduct,
+                    topMost = topMost, MSMode = MSMode))
     }, simplify = FALSE))
+}
+
+GenFormMPFinishHandler <- function(cmd)
+{
+    f <- patRoon:::processGenFormResultFile(cmd$outFile, cmd$isMSMS, cmd$adduct, cmd$topMost)
+    if (is.null(f))
+        f <- data.table::data.table()
+    else if (cmd$MSMode == "msms")
+    {
+        # note that even if MSMS data is available we may get MS only
+        # formula in case no peaks could be explained
+        f <- f[byMSMS == TRUE]
+    }
+    return(f)
+}
+
+GenFormMPTimeoutHandler <- function(cmd, retries)
+{
+    warning(paste("Formula calculation timed out for", cmd$group,
+                  if (!is.null(ana)) sprintf("(analysis '%s')", ana) else ""),
+            call. = FALSE)
+    return(FALSE)
+}
+
+GenFormMPPrepareHandler <- function(cmd)
+{
+    gfBin <- patRoon:::getGenFormBin()
+    
+    MSFile <- tempfile("MSPList", fileext = ".txt")
+    outFile <- tempfile("formulas", fileext = ".txt")
+    
+    writePList <- function(f, pl) data.table::fwrite(pl[, c("mz", "intensity")], f, quote = FALSE,
+                                                     sep = "\t", row.names = FALSE, col.names = FALSE)
+    writePList(MSFile, cmd$MSPL)
+    
+    MSMSFile <- NULL
+    if (!is.null(cmd[["MSMSPL"]]))
+    {
+        MSMSFile <- tempfile("MSMSPList", fileext = ".txt")
+        writePList(MSMSFile, cmd$MSMSPL)
+    }
+    
+    args <- c(sprintf("ms=%s", MSFile), sprintf("m=%f", cmd$PLMZ),
+              sprintf("out=%s", outFile))
+    if (cmd$MSMode != "ms" && cmd$isMSMS)
+        args <- c(args, sprintf("msms=%s", MSMSFile), "analyze")
+    
+    cmd$args <- c(cmd$args, args)
+    return(c(cmd, list(command = gfBin, MSFile = MSFile,
+                       MSMSFile = MSMSFile, outFile = outFile)))
 }
 
 runGenForm <- function(mainArgs, groupPeakLists, MSMode, isolatePrec,
                        baseHash, setHash, gNames, adduct, topMost,
                        batchSize, timeout, ana)
 {
-    cmdQueue <- makeGenFormCmdQueue(groupPeakLists, baseHash, MSMode, isolatePrec)
+    cmdQueue <- makeGenFormCmdQueue(groupPeakLists, baseHash, MSMode, isolatePrec, adduct, topMost,
+                                    mainArgs)
 
     ret <- list()
     if (length(cmdQueue) > 0)
     {
-        ret <- executeMultiProcess(cmdQueue, function(cmd)
-        {
-            f <- processGenFormResultFile(cmd$outFile, cmd$isMSMS, adduct, topMost)
-            if (is.null(f))
-                f <- data.table()
-            else if (MSMode == "msms")
-            {
-                # note that even if MSMS data is available we may get MS only
-                # formula in case no peaks could be explained
-                f <- f[byMSMS == TRUE]
-            }
-            return(f)
-        }, timeoutHandler = function(cmd, retries)
-        {
-            warning(paste("Formula calculation timed out for", cmd$group,
-                          if (!is.null(ana)) sprintf("(analysis '%s')", ana) else ""),
-                    call. = FALSE)
-            return(FALSE)
-        }, prepareHandler = function(cmd)
-        {
-            gfBin <- getGenFormBin()
-            
-            MSFile <- tempfile("MSPList", fileext = ".txt")
-            outFile <- tempfile("formulas", fileext = ".txt")
-            
-            writePList <- function(f, pl) fwrite(pl[, c("mz", "intensity")], f, quote = FALSE,
-                                                 sep = "\t", row.names = FALSE, col.names = FALSE)
-            writePList(MSFile, cmd$MSPL)
-            
-            MSMSFile <- NULL
-            if (!is.null(cmd[["MSMSPL"]]))
-            {
-                MSMSFile <- tempfile("MSMSPList", fileext = ".txt")
-                writePList(MSMSFile, cmd$MSMSPL)
-            }
-            
-            args <- c(mainArgs, sprintf("ms=%s", MSFile), sprintf("m=%f", cmd$PLMZ),
-                      sprintf("out=%s", outFile))
-            if (MSMode != "ms" && cmd$isMSMS)
-                args <- c(args, sprintf("msms=%s", MSMSFile), "analyze")
-            
-            return(c(cmd, list(command = gfBin, args = c(mainArgs, args), MSFile = MSFile,
-                               MSMSFile = MSMSFile, outFile = outFile)))
-        }, waitTimeout = 10, batchSize = batchSize, procTimeout = timeout,
-        cacheName = "formulasGenForm", setHash = setHash)
+        ret <- executeMultiProcess(cmdQueue, finishHandler = patRoon:::GenFormMPFinishHandler,
+                                   timeoutHandler = patRoon:::GenFormMPTimeoutHandler,
+                                   prepareHandler = patRoon:::GenFormMPPrepareHandler,
+                                   waitTimeout = 10, batchSize = batchSize, procTimeout = timeout,
+                                   cacheName = "formulasGenForm", setHash = setHash)
     }
 
     return(pruneList(ret, checkZeroRows = TRUE))
@@ -129,7 +142,7 @@ runGenForm <- function(mainArgs, groupPeakLists, MSMode, isolatePrec,
 
 processGenFormMSMSResultFile <- function(file)
 {
-    formsMSMS <- fread(file, sep = "\t", fill = TRUE, header = FALSE) # fill should be set with strange formatting of file
+    formsMSMS <- data.table::fread(file, sep = "\t", fill = TRUE, header = FALSE) # fill should be set with strange formatting of file
 
     # first column: either formula precursor or fragment mass
     # second column: either dbe or formula fragment/neutral loss
@@ -144,9 +157,9 @@ processGenFormMSMSResultFile <- function(file)
     formsMSMS[, precursorGroup := cumsum(isPrecursor)] # assign unique ID for all precursors+their fragments
 
     fMS <- formsMSMS[isPrecursor == TRUE, ]
-    setnames(fMS, 1:7, c("neutral_formula", "dbe", "formula_mz", "error", "isoScore", "MSMSScore", "combMatch"))
+    data.table::setnames(fMS, 1:7, c("neutral_formula", "dbe", "formula_mz", "error", "isoScore", "MSMSScore", "combMatch"))
     fMS[, isPrecursor := NULL]
-    setkey(fMS, "precursorGroup")
+    data.table::setkey(fMS, "precursorGroup")
 
     fMSMS <- formsMSMS[isPrecursor == FALSE, ]
 
@@ -161,7 +174,7 @@ processGenFormMSMSResultFile <- function(file)
     }
 
     fMSMS[, c("V6", "V7", "isPrecursor") := NULL]
-    setkey(fMSMS, "precursorGroup")
+    data.table::setkey(fMSMS, "precursorGroup")
 
     formsMSMS <- merge(fMS, fMSMS, all.x = TRUE) # re-join (but ensure that MS only formulae in fMS are kept)
     formsMSMS[, byMSMS := !is.na(frag_formula)]
@@ -181,20 +194,20 @@ processGenFormResultFile <- function(file, isMSMS, adduct, topMost)
 
     if (!isMSMS)
     {
-        forms <- fread(file, header = FALSE)
-        setnames(forms, c("neutral_formula", "dbe", "formula_mz", "error", "isoScore"))
+        forms <- data.table::fread(file, header = FALSE)
+        data.table::setnames(forms, c("neutral_formula", "dbe", "formula_mz", "error", "isoScore"))
         forms[, byMSMS := FALSE]
     }
     else
-        forms <- processGenFormMSMSResultFile(file)
+        forms <- patRoon:::processGenFormMSMSResultFile(file)
 
     if (is.null(forms) || nrow(forms) == 0)
         return(NULL)
 
-    forms <- rankFormulaTable(forms)
+    forms <- patRoon:::rankFormulaTable(forms)
     
     # select topMost after ranking
-    if (!is.null(topMost) && uniqueN(forms, by = "neutral_formula") > topMost)
+    if (!is.null(topMost) && data.table::uniqueN(forms, by = "neutral_formula") > topMost)
     {
         forms[, unFormID := .GRP, by = "neutral_formula"]
         forms <- forms[unFormID <= topMost][, unFormID := NULL]
@@ -207,11 +220,11 @@ processGenFormResultFile <- function(file, isMSMS, adduct, topMost)
     numCols <- intersect(c("error", "dbe", "isoScore", "frag_mz", "frag_error",
                            "frag_dbe", "MSMSScore", "combMatch"), names(forms))
     for (col in numCols)
-        set(forms, j = col, value = as.numeric(forms[[col]]))
+        data.table::set(forms, j = col, value = as.numeric(forms[[col]]))
     
     chrCols <- intersect(c("formula", "frag_formula", "neutral_formula"), names(forms))
     for (col in chrCols)
-        set(forms, j = col, value = as.character(forms[[col]]))
+        data.table::set(forms, j = col, value = as.character(forms[[col]]))
     
     if (!is.null(forms[["frag_formula"]]))
     {
@@ -220,7 +233,7 @@ processGenFormResultFile <- function(file, isMSMS, adduct, topMost)
     }
 
     # set nice column order
-    setcolorder(forms, c("neutral_formula", "formula", "formula_mz", "error", "dbe", "isoScore", "byMSMS"))
+    data.table::setcolorder(forms, c("neutral_formula", "formula", "formula_mz", "error", "dbe", "isoScore", "byMSMS"))
 
     return(forms)
 }

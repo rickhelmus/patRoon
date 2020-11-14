@@ -228,7 +228,8 @@ initMetFragCLCommand <- function(mfSettings, spec, mfBin)
     return(list(command = "java", args = c("-jar", mfBin, paramFile), outFile = outFile))
 }
 
-generateMetFragRunData <- function(fGroups, MSPeakLists, mfSettings, topMost, identifiers, method)
+generateMetFragRunData <- function(fGroups, MSPeakLists, mfSettings, topMost, identifiers, method,
+                                   adduct, database)
 {
     gNames <- names(fGroups)
     gTable <- groups(fGroups)
@@ -254,13 +255,14 @@ generateMetFragRunData <- function(fGroups, MSPeakLists, mfSettings, topMost, id
 
         logf <- paste0("mfcl-", grp, ".txt")
         
-        return(list(hash = hash, gName = grp, spec = spec, mfSettings = mfSettings, logFile = logf))
+        return(list(hash = hash, gName = grp, spec = spec, mfSettings = mfSettings,
+                    adduct = adduct, database = database, topMost = topMost, logFile = logf))
     }, simplify = FALSE)
 
     return(ret[!sapply(ret, is.null)])
 }
 
-processMFResults <- function(comptab, spec, adduct, db, topMost, lfile = "")
+processMFResults <- function(comptab, runData, lfile = "")
 {
     scRanges <- list()
 
@@ -280,8 +282,8 @@ processMFResults <- function(comptab, spec, adduct, db, topMost, lfile = "")
                                  compsc$name)
         }
 
-        if (!is.null(topMost) && nrow(comptab) > topMost)
-            comptab <- comptab[seq_len(topMost)]
+        if (!is.null(runData$topMost) && nrow(comptab) > runData$topMost)
+            comptab <- comptab[seq_len(runData$topMost)]
 
         # make character: needed for getMFFragmentInfo()
         # note: this column is not present in empty tables so can't do this with colClasses
@@ -293,7 +295,7 @@ processMFResults <- function(comptab, spec, adduct, db, topMost, lfile = "")
         if (!is.null(lfile))
             cat(sprintf("\n%s - Done! Processing frags...\n", date()), file = lfile, append = TRUE)
         for (r in seq_len(nrow(comptab)))
-            set(comptab, r, "fragInfo", list(list(getMFFragmentInfo(spec, comptab[r], adduct))))
+            set(comptab, r, "fragInfo", list(list(getMFFragmentInfo(runData$spec, comptab[r], runData$adduct))))
         if (!is.null(lfile))
             cat(sprintf("\n%s - Done!\n", date()), file = lfile, append = TRUE)
 
@@ -310,10 +312,61 @@ processMFResults <- function(comptab, spec, adduct, db, topMost, lfile = "")
                 comptab[, (col) := as.character(get(col))]
         }
 
-        comptab[, database := db]
+        comptab[, database := runData$database]
     }
 
     return(list(comptab = comptab, scRanges = scRanges))
+}
+
+MFMPFinishHandler <- function(cmd)
+{
+    comptab <- data.table::fread(cmd$outFile, colClasses = c(Identifier = "character"))
+    procres <- patRoon:::processMFResults(comptab, cmd, cmd$stderrFile)
+    return(procres)
+}
+
+MFMPPrepareHandler <- function(cmd)
+{
+    mfBin <- path.expand(getOption("patRoon.path.MetFragCL"))
+    if (is.null(mfBin) || !nzchar(mfBin) || !file.exists(mfBin))
+        stop("Please set the 'MetFragCL' option with a (correct) path to the MetFrag CL jar file. Example: options(patRoon.path.MetFragCL = \"C:/MetFrag2.4.5-CL.jar\")")
+    
+    if (!nzchar(Sys.which("java")))
+        stop("Please make sure that java is installed and its location is correctly set in PATH.")
+    
+    return(c(cmd, patRoon:::initMetFragCLCommand(cmd$mfSettings, cmd$spec, mfBin)))
+}
+
+MFMPTimeoutHandler <- function(cmd, retries)
+{
+    if (retries >= timeoutRetries)
+    {
+        warning(sprintf("Could not run MetFrag for %s: timeout. Log: %s", cmd$gName, cmd$logFile))
+        return(FALSE)
+    }
+    warning(sprintf("Restarting timed out MetFrag command for %s (retry %d/%d)",
+                    cmd$gName, retries+1, errorRetries))
+    return(TRUE)
+}
+
+MFMPErrorHandler <- function(cmd, exitStatus, retries)
+{
+    if (!is.na(exitStatus) && exitStatus <= 6) # some error thrown by MF
+    {
+        if (retries >= errorRetries)
+        {
+            warning(sprintf("Could not run MetFrag for %s - exit code: %d - Log: %s",
+                            cmd$gName, exitStatus, cmd$logFile))
+            return(FALSE)
+        }
+        warning(sprintf("Restarting failed MetFrag command for %s - exit: %d (retry %d/%d)",
+                        cmd$gName, exitStatus, retries+1, errorRetries))
+        return(TRUE)
+    }
+    
+    # some other error (e.g. java not present)
+    stop(sprintf("Fatal: Failed to execute MetFragCL for %s - exit code: %d - Log: %s",
+                 cmd$gName, exitStatus, cmd$logFile))
 }
 
 #' @details \code{generateCompoundsMetfrag} uses the \pkg{metfRag} package or
@@ -555,54 +608,18 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", timeou
 
     printf("Identifying %d feature groups with MetFrag...\n", gCount)
 
-    runData <- generateMetFragRunData(fGroups, MSPeakLists, mfSettings, topMost, identifiers, method)
+    runData <- generateMetFragRunData(fGroups, MSPeakLists, mfSettings, topMost, identifiers, method,
+                                      adduct, database)
 
     if (method == "CL")
     {
-        results <- executeMultiProcess(runData, finishHandler = function(cmd)
-        {
-            comptab <- data.table::fread(cmd$outFile, colClasses = c(Identifier = "character"))
-            procres <- processMFResults(comptab, cmd$spec, adduct, database, topMost, cmd$stderrFile)
-            return(procres)
-        }, timeoutHandler = function(cmd, retries)
-        {
-            if (retries >= timeoutRetries)
-            {
-                warning(sprintf("Could not run MetFrag for %s: timeout. Log: %s", cmd$gName, cmd$logFile))
-                return(FALSE)
-            }
-            warning(sprintf("Restarting timed out MetFrag command for %s (retry %d/%d)",
-                            cmd$gName, retries+1, errorRetries))
-            return(TRUE)
-        }, errorHandler = function(cmd, exitStatus, retries)
-        {
-            if (!is.na(exitStatus) && exitStatus <= 6) # some error thrown by MF
-            {
-                if (retries >= errorRetries)
-                {
-                    warning(sprintf("Could not run MetFrag for %s - exit code: %d - Log: %s",
-                                    cmd$gName, exitStatus, cmd$logFile))
-                    return(FALSE)
-                }
-                warning(sprintf("Restarting failed MetFrag command for %s - exit: %d (retry %d/%d)",
-                                cmd$gName, exitStatus, retries+1, errorRetries))
-                return(TRUE)
-            }
-            
-            # some other error (e.g. java not present)
-            stop(sprintf("Fatal: Failed to execute MetFragCL for %s - exit code: %d - Log: %s",
-                         cmd$gName, exitStatus, cmd$logFile))
-        }, prepareHandler = function(cmd)
-        {
-            mfBin <- path.expand(getOption("patRoon.path.MetFragCL"))
-            if (is.null(mfBin) || !nzchar(mfBin) || !file.exists(mfBin))
-                stop("Please set the 'MetFragCL' option with a (correct) path to the MetFrag CL jar file. Example: options(patRoon.path.MetFragCL = \"C:/MetFrag2.4.5-CL.jar\")")
-            
-            if (!nzchar(Sys.which("java")))
-                stop("Please make sure that java is installed and its location is correctly set in PATH.")
-            
-            return(c(cmd, initMetFragCLCommand(cmd$mfSettings, cmd$spec, mfBin)))
-        }, cacheName = "metfrag", setHash = setHash, procTimeout = timeout, delayBetweenProc = 1000, logSubDir = "metfrag")
+        results <- executeMultiProcess(runData, finishHandler = patRoon:::MFMPFinishHandler,
+                                       timeoutHandler = patRoon:::MFMPTimeoutHandler,
+                                       errorHandler = patRoon:::MFMPErrorHandler,
+                                       prepareHandler = patRoon:::MFMPPrepareHandler,
+                                       cacheName = "metfrag", setHash = setHash,
+                                       procTimeout = timeout, delayBetweenProc = 1000,
+                                       logSubDir = "metfrag")
     }
     else
     {
@@ -640,7 +657,7 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", timeou
                 
                 comptab <- as.data.table(comptab)
                 
-                procres <- processMFResults(comptab, rd$spec, adduct, database, topMost)
+                procres <- processMFResults(comptab, rd)
                 
                 if (nrow(procres$comptab) > 0)
                 {

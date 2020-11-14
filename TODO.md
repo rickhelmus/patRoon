@@ -89,6 +89,8 @@
     - force that file should be available locally so it can be used for hashing (with makeFileHash?)/scoring
 - remove pre44 SIRIUS support: doesn't work with future procs at the moment, and doesn't seem useful to keep
 - remove/update PWizBatches?
+- logging from eg error/timeouthandlers from R
+
 
 # Future
 

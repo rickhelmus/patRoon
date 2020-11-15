@@ -70,6 +70,7 @@
     - caching done in executeMultiProc()
     - configure "engine" through options() --> "classic" and "future"
         - let executeMultiProc() handle general things like caching and logging
+        - rename "classic"?
     - somehow let user set future.apply scheduling and chunk.size options, probably through options()
     - logging:
         - enabled through an option
@@ -87,9 +88,11 @@
 - tests
 - limitation: local databases need to be available for MF on the localhost and nodes, both for caching and checking score types. Any workarounds? Otherwise document that location for them should be fixed.
     - force that file should be available locally so it can be used for hashing (with makeFileHash?)/scoring
+        --> implement hashing
 - remove pre44 SIRIUS support: doesn't work with future procs at the moment, and doesn't seem useful to keep
 - remove/update PWizBatches?
-- logging from eg error/timeouthandlers from R
+- move main future handler to separate function?
+- update FFM for local functions
 
 
 # Future

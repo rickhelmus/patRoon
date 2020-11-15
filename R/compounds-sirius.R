@@ -3,10 +3,10 @@
 #' @include utils-sirius.R
 NULL
 
-processSIRIUSCompounds <- function(msFName, outPath, cmpName, MSMS, database, adduct, topMost, isPre44)
+processSIRIUSCompounds <- function(msFName, outPath, MSMS, database, adduct, topMost, isPre44)
 {
     resFile <- if (isPre44) "summary_csi_fingerid.csv" else "structure_candidates.tsv"
-    resultPath <- getSiriusResultPath(outPath, msFName, cmpName, isPre44)
+    resultPath <- getSiriusResultPath(outPath, msFName, isPre44)
     summary <- file.path(resultPath, resFile)
     results <- scRanges <- data.table()
     
@@ -147,7 +147,7 @@ generateCompoundsSIRIUS <- function(fGroups, MSPeakLists, relMzDev = 5, adduct =
     
     results <- doSIRIUS(fGroups, MSPeakLists, FALSE, profile, adduct, relMzDev, elements,
                         formulaDatabase, noise, cores, TRUE, fingerIDDatabase, topMost, extraOptsGeneral, extraOptsFormula,
-                        verbose, "compoundsSIRIUS", processSIRIUSCompounds,
+                        verbose, "compoundsSIRIUS", patRoon:::processSIRIUSCompounds,
                         list(database = fingerIDDatabase, topMost = topMost),
                         splitBatches)
     

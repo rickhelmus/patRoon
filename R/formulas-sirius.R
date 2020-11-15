@@ -5,7 +5,7 @@
 NULL
 
 # callback for executeMultiProcess()
-processSIRIUSFormulas <- function(msFName, outPath, cmpName, adduct, isPre44, ...)
+processSIRIUSFormulas <- function(msFName, outPath, adduct, isPre44, ...)
 {
     noResult <- forms <- data.table(neutral_formula = character(0), formula = character(0),
                                     adduct = character(0), score = numeric(0), MSMSScore = numeric(0),
@@ -16,7 +16,7 @@ processSIRIUSFormulas <- function(msFName, outPath, cmpName, adduct, isPre44, ..
     
     
     resFile <- if (isPre44) "summary_sirius.csv" else "formula_candidates.tsv"
-    resultPath <- getSiriusResultPath(outPath, msFName, cmpName, isPre44)
+    resultPath <- getSiriusResultPath(outPath, msFName, isPre44)
     summary <- file.path(resultPath, resFile)
     if (length(summary) == 0 || length(summary) == 0 || !file.exists(summary))
         forms <- noResult
@@ -122,7 +122,7 @@ generateFormulasSIRIUS <- function(fGroups, MSPeakLists, relMzDev = 5, adduct = 
     printf("Processing %d feature groups with SIRIUS...\n---\n", gCount)
     formTable <- doSIRIUS(fGroups, MSPeakLists, calculateFeatures, profile, adduct, relMzDev, elements,
                           database, noise, cores, FALSE, NULL, topMost, extraOptsGeneral, extraOptsFormula,
-                          verbose, "formulasSIRIUS", processSIRIUSFormulas, NULL,
+                          verbose, "formulasSIRIUS", patRoon:::processSIRIUSFormulas, NULL,
                           splitBatches)
         
     if (calculateFeatures)

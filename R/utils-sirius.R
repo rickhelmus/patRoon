@@ -14,11 +14,13 @@ isSIRIUSPre44 <- function()
                                                      "--version", stdout = TRUE, stderr = FALSE))))
 }
 
-getSiriusResultPath <- function(outPath, msFName, cmpName, isPre44)
+getSIRIUSCmpName <- function() "unknownCompound"
+
+getSiriusResultPath <- function(outPath, msFName, isPre44)
 {
     # format is resultno_specname_compoundname, older versions start with 1, newer with 0
     msFName <- basename(tools::file_path_sans_ext(msFName))
-    return(list.files(outPath, pattern = sprintf("[0-9]+_%s_%s", msFName, cmpName), full.names = TRUE))
+    return(list.files(outPath, pattern = sprintf("[0-9]+_%s_%s", msFName, getSIRIUSCmpName()), full.names = TRUE))
 }
 
 getSiriusFragFiles <- function(resultPath, isPre44)
@@ -39,15 +41,15 @@ getFormulaFromSiriusFragFile <- function(ffile, isPre44)
     return(gsub(pat, "\\1", basename(ffile)))
 }
 
-makeSirMSFile <- function(plistMS, plistMSMS, parentMZ, compound, ionization, out)
+makeSirMSFile <- function(plistMS, plistMSMS, parentMZ, adduct, out)
 {
     msFile <- file(out, "w")
 
     writeMeta <- function(var, data) cat(sprintf(">%s %s\n", var, data), file = msFile)
 
-    writeMeta("compound", compound)
+    writeMeta("compound", getSIRIUSCmpName())
     writeMeta("parentmass", parentMZ)
-    writeMeta("ionization", ionization)
+    writeMeta("ionization", as.character(adduct, format = "sirius"))
 
     cat(">ms1peaks\n", file = msFile)
     write.table(plistMS[, c("mz", "intensity")], msFile, row.names = FALSE, col.names = FALSE)
@@ -87,13 +89,44 @@ unifySirNames <- function(sir)
     return(sir[, unNames, with = FALSE]) # filter out any other columns
 }
 
+SIRMPFinishHandler <- function(cmd)
+{
+    pArgs <- list(adduct = cmd$adduct, isPre44 = patRoon:::isSIRIUSPre44())
+    if (!is.null(cmd[["processArgs"]]))
+        pArgs <- c(pArgs, cmd$processArgs)
+    res <- mapply(cmd$msFNames, cmd$MSMSPL, SIMPLIFY = FALSE,
+                  FUN = function(n, m) do.call(cmd$processFunc, c(list(outPath = cmd$outPath, msFName = n, MSMS = m), pArgs)))
+    return(res)
+}
+
+SIRMPPrepareHandler <- function(cmd)
+{
+    command <- patRoon:::getCommandWithOptPath(patRoon:::getSiriusBin(), "SIRIUS")
+    
+    inPath <- tempfile("sirius_in")
+    outPath <- tempfile("sirius_out")
+    # unlink(outPath, TRUE) # start with fresh output directory (otherwise previous results are combined)
+    stopifnot(!file.exists(inPath) || !file.exists(outPath))
+    dir.create(inPath)
+    
+    msFNames <- mapply(cmd$precMZs, cmd$MSPL, cmd$MSMSPL, FUN = function(pmz, mspl, msmspl)
+    {
+        ret <- tempfile("spec", fileext = ".ms", tmpdir = inPath)
+        patRoon:::makeSirMSFile(mspl, msmspl, pmz, cmd$adduct, ret)
+        return(ret)
+    })
+    
+    bArgs <- if (patRoon:::isSIRIUSPre44()) c(cmd$args, "-o", outPath, inPath) else c("-i", inPath, "-o", outPath, cmd$args)
+    
+    return(utils::modifyList(cmd, list(command = command, args = bArgs, outPath = outPath, msFNames = msFNames)))
+}
+
 runSIRIUS <- function(precursorMZs, MSPLists, MSMSPLists, resNames, profile, adduct, ppmMax, elements,
                       database, noise, cores, withFingerID, fingerIDDatabase, topMost,
                       extraOptsGeneral, extraOptsFormula, verbose, isPre44,
                       processFunc, processArgs, splitBatches)
 {
     ionization <- as.character(adduct, format = "sirius")
-    cmpName <- "unknownCompound"
     
     mainArgs <- character()
     if (!is.null(cores))
@@ -138,42 +171,16 @@ runSIRIUS <- function(precursorMZs, MSPLists, MSMSPLists, resNames, profile, add
     cmdQueue <- lapply(seq_along(batches), function(bi)
     {
         batch <- batches[[bi]]
-        return(list(precMZs = precursorMZs[batch], MSPL = MSPLists[batch], MSMSPL = MSMSPLists[batch],
+        return(list(args = args, precMZs = precursorMZs[batch], MSPL = MSPLists[batch], MSMSPL = MSMSPLists[batch],
+                    adduct = adduct, processFunc = processFunc, processArgs = processArgs,
                     logFile = paste0("sirius-batch_", bi, ".txt")))
     })
     
     singular <- length(cmdQueue) == 1
-    ret <- executeMultiProcess(cmdQueue, finishHandler = function(cmd)
-    {
-        pArgs <- list(cmpName = cmpName, adduct = adduct, isPre44 = isPre44)
-        if (!is.null(processArgs))
-            pArgs <- c(pArgs, processArgs)
-        
-        res <- mapply(cmd$msFNames, cmd$MSMSPL, SIMPLIFY = FALSE,
-                      FUN = function(n, m) do.call(processFunc, c(list(outPath = cmd$outPath, msFName = n, MSMS = m), pArgs)))
-        return(res)
-    }, prepareHandler = function(cmd)
-    {
-        command <- getCommandWithOptPath(getSiriusBin(), "SIRIUS")
-        
-        inPath <- tempfile("sirius_in")
-        outPath <- tempfile("sirius_out")
-        # unlink(outPath, TRUE) # start with fresh output directory (otherwise previous results are combined)
-        stopifnot(!file.exists(inPath) || !file.exists(outPath))
-        dir.create(inPath)
-        
-        msFNames <- mapply(cmd$precMZs, cmd$MSPL, cmd$MSMSPL, FUN = function(pmz, mspl, msmspl)
-        {
-            ret <- tempfile("spec", fileext = ".ms", tmpdir = inPath)
-            makeSirMSFile(mspl, msmspl, pmz, cmpName, ionization, ret)
-            return(ret)
-        })
-        
-        bArgs <- if (isPre44) c(args, "-o", outPath, inPath) else c("-i", inPath, "-o", outPath, args)
-        
-        return(c(cmd, list(command = command, args = bArgs, outPath = outPath, msFNames = msFNames)))
-    }, printOutput = verbose && singular, printError = verbose && singular,
-    showProgress = !singular, logSubDir = paste0("sirius_", if (withFingerID) "compounds" else "formulas"))
+    ret <- executeMultiProcess(cmdQueue, finishHandler = SIRMPFinishHandler,
+                               prepareHandler = SIRMPPrepareHandler, printOutput = verbose && singular,
+                               printError = verbose && singular, showProgress = !singular,
+                               logSubDir = paste0("sirius_", if (withFingerID) "compounds" else "formulas"))
 
     return(setNames(unlist(ret, recursive = FALSE, use.names = FALSE), resNames))
 }

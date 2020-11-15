@@ -204,6 +204,30 @@ getMFFragmentInfo <- function(spec, mfResult, adduct)
     return(ret)
 }
 
+isLocalMetFragDB <- function(database) database %in% c("sdf", "psv", "csv", "comptox", "pubchemlite")
+
+getMetFragExtDB <- function(localDB, database)
+{
+    extDB <- if (!is.null(localDB)) localDB else NULL
+    if ((database == "comptox" || database == "pubchemlite") && is.null(extDB))
+        extDB <- getOption(if (database == "comptox") "patRoon.path.MetFragCompTox" else "patRoon.path.MetFragPubChemLite", NULL)
+    
+    if (!is.null(extDB))
+        extDB <- normalizePath(extDB)
+    
+    if (is.null(extDB) || !file.exists(extDB))
+    {
+        ex <- "as part of the extraOpts argument, e.g. extraOpts = list(LocalDatabasePath = \"C:/CompTox_17March2019_SelectMetaData.csv\")"
+        if (database == "comptox" || database == "pubchemlite")
+            stop(paste("No (valid) external database file set. This should be either set as an option, e.g.",
+                       "options(patRoon.path.MetFragCompTox = \"C:/CompTox_17March2019_SelectMetaData.csv\") or", ex))
+        
+        stop(paste("No external database file set. This should be set", ex))
+    }
+    
+    return(extDB)
+}
+
 initMetFragCLCommand <- function(mfSettings, spec, mfBin)
 {
     paramFile <- tempfile("parameters", fileext = ".txt")
@@ -335,6 +359,13 @@ MFMPPrepareHandler <- function(cmd)
     
     if (!nzchar(Sys.which("java")))
         stop("Please make sure that java is installed and its location is correctly set in PATH.")
+    
+    if (isLocalMetFragDB(cmd$database))
+    {
+        extDB <- patRoon:::getMetFragExtDB(cmd$mfSettings[["LocalDatabasePath"]], cmd$database)
+        # NOTE: this will set LocalDatabasePath in case only options() were set or update it with normalizePath()
+        cmd$mfSettings$LocalDatabasePath <- normalizePath(extDB)
+    }
     
     return(c(cmd, patRoon:::initMetFragCLCommand(cmd$mfSettings, cmd$spec, mfBin)))
 }
@@ -512,7 +543,7 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", timeou
            names = "unique", null.ok = TRUE, fixed = list(add = ac))
 
     compsScores <- compoundScorings("metfrag", database)
-    isLocalDB <- database %in% c("sdf", "psv", "csv", "comptox", "pubchemlite")
+    isLocalDB <- isLocalMetFragDB(database)
     allScoringNames <- union(compsScores$name, compsScores$metfrag)
     # allow freely definable scorings from local databases
     if (!isLocalDB)
@@ -521,24 +552,6 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", timeou
     checkmate::reportAssertions(ac)
 
     adduct <- checkAndToAdduct(adduct)
-
-    extDB <- if (!is.null(extraOpts)) extraOpts[["LocalDatabasePath"]] else NULL
-    if ((database == "comptox" || database == "pubchemlite") && is.null(extDB))
-    {
-        extDB <- getOption(if (database == "comptox") "patRoon.path.MetFragCompTox" else "patRoon.path.MetFragPubChemLite", NULL)
-        if (!is.null(extDB))
-            extraOpts <- modifyList(if (!is.null(extraOpts)) extraOpts else list(), list(LocalDatabasePath = extDB))
-    }
-
-    if (isLocalDB && (is.null(extDB) || !file.exists(extDB)))
-    {
-        ex <- "as part of the extraOpts argument, e.g. extraOpts = list(LocalDatabasePath = \"C:/CompTox_17March2019_SelectMetaData.csv\")"
-        if (database == "comptox" || database == "pubchemlite")
-            stop(paste("No (valid) external database file set. This should be either set as an option, e.g.",
-                       "options(patRoon.path.MetFragCompTox = \"C:/CompTox_17March2019_SelectMetaData.csv\") or", ex))
-
-        stop(paste("No external database file set. This should be set", ex))
-    }
 
     anaInfo <- analysisInfo(fGroups)
     ftind <- groupFeatIndex(fGroups)
@@ -577,9 +590,11 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", timeou
     
     if (isLocalDB)
     {
+        extDB <- getMetFragExtDB(extraOpts[["LocalDatabasePath"]], database)
+        
         # only keep scorings that are present in the DB
         # BUG: nrows=0 gives internal data.table error, so read 1 line
-        scInDB <- names(fread(extraOpts[["LocalDatabasePath"]], nrows = 1))
+        scInDB <- names(fread(extDB, nrows = 1))
         
         isDBType <- scoreTypesMF %in% compsScores[nzchar(compsScores$database), "metfrag"]
         keep <- !isDBType | scoreTypesMF %in% scInDB
@@ -611,7 +626,7 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", timeou
     printf("Identifying %d feature groups with MetFrag...\n", gCount)
 
     runData <- generateMetFragRunData(fGroups, MSPeakLists, mfSettings, topMost, identifiers, method,
-                                      adduct, database)
+                                      adduct, database, errorRetries, timeoutRetries)
 
     if (method == "CL")
     {

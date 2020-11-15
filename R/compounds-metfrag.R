@@ -229,7 +229,7 @@ initMetFragCLCommand <- function(mfSettings, spec, mfBin)
 }
 
 generateMetFragRunData <- function(fGroups, MSPeakLists, mfSettings, topMost, identifiers, method,
-                                   adduct, database)
+                                   adduct, database, errorRetries, timeoutRetries)
 {
     gNames <- names(fGroups)
     gTable <- groups(fGroups)
@@ -256,7 +256,9 @@ generateMetFragRunData <- function(fGroups, MSPeakLists, mfSettings, topMost, id
         logf <- paste0("mfcl-", grp, ".txt")
         
         return(list(hash = hash, gName = grp, spec = spec, mfSettings = mfSettings,
-                    adduct = adduct, database = database, topMost = topMost, logFile = logf))
+                    adduct = adduct, database = database, topMost = topMost,
+                    errorRetries = errorRetries, timeoutRetries = timeoutRetries,
+                    logFile = logf))
     }, simplify = FALSE)
 
     return(ret[!sapply(ret, is.null)])
@@ -339,13 +341,13 @@ MFMPPrepareHandler <- function(cmd)
 
 MFMPTimeoutHandler <- function(cmd, retries)
 {
-    if (retries >= timeoutRetries)
+    if (retries >= cmd$timeoutRetries)
     {
         warning(sprintf("Could not run MetFrag for %s: timeout. Log: %s", cmd$gName, cmd$logFile))
         return(FALSE)
     }
     warning(sprintf("Restarting timed out MetFrag command for %s (retry %d/%d)",
-                    cmd$gName, retries+1, errorRetries))
+                    cmd$gName, retries+1, cmd$timeoutRetries))
     return(TRUE)
 }
 
@@ -353,14 +355,14 @@ MFMPErrorHandler <- function(cmd, exitStatus, retries)
 {
     if (!is.na(exitStatus) && exitStatus <= 6) # some error thrown by MF
     {
-        if (retries >= errorRetries)
+        if (retries >= cmd$errorRetries)
         {
             warning(sprintf("Could not run MetFrag for %s - exit code: %d - Log: %s",
                             cmd$gName, exitStatus, cmd$logFile))
             return(FALSE)
         }
         warning(sprintf("Restarting failed MetFrag command for %s - exit: %d (retry %d/%d)",
-                        cmd$gName, exitStatus, retries+1, errorRetries))
+                        cmd$gName, exitStatus, retries+1, cmd$errorRetries))
         return(TRUE)
     }
     

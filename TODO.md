@@ -30,21 +30,19 @@
     - show() method
 - misc
     - util to check if there are suspect results? (ie to replace inherits(...))
-    - check for empty names in assertion/preparation functions
     - credits to ES
     - update version number
     - prepareSuspectList(): export?
         - mainly to allow merging of lists, perhaps make util for that instead? Would also be handy for MF databases
     - check why annotateSuspects() is sometimes slow
     - check UNDONEs
-    - remove old annotation results in annotateSuspects()
+    - remove old annotation results in annotateSuspects()?
     - better name for selectBestFGroups filter?
 - expand reporting
     - eg marking which candidate corresponds to suspect and include suspect name in EICs
         - mark with different row colour and label?
     - mention suspect similarities/ranks etc for candidates (or somehow in compounds?)
     - optionally report with collapsed suspects
-    - adducts from components?
     - update reportCSV() / reportPDF()?
 - update docs, handbook & NEWS
     - renamed rt/mz columns
@@ -53,6 +51,7 @@
     - removal of screening for features
     - update TASQ docs and other mentions to old suspect screening interface
     - update examples where suspect name is used for subsetting
+    - mention that components should be done prior to onlyHits=T?
 - tests
     - automatic InChIKey/formula calculation from InChIs/SMILES
         - already done implicitly?

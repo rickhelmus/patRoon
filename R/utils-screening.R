@@ -39,8 +39,6 @@ prepareSuspectList <- function(suspects, adduct, skipInvalid)
         suspects <- cd
     else
     {
-        # UNDONE: check if/make name column is file safe/unique
-        
         if (is.data.table(suspects))
             suspects <- copy(suspects)
         else
@@ -51,6 +49,17 @@ prepareSuspectList <- function(suspects, adduct, skipInvalid)
         {
             if (!is.null(suspects[[col]]))
                 suspects[, (col) := as.character(get(col))]
+        }
+
+        # make name column file safe and unique
+        sanNames <- fs::path_sanitize(suspects$name, replacement = "_")
+        sanNames <- make.unique(sanNames, sep = "-")
+        changedNames <- which(sanNames != suspects$name)
+        if (length(changedNames) > 0)
+        {
+            warning(paste0("The following suspect names were changed to make them file compatible and/or unique:\n",
+                           paste0(suspects$name[changedNames], " --> ", sanNames[changedNames], collapse = "\n")))
+            suspects[, name := sanNames]
         }
         
         # get missing identifiers & formulae if necessary and possible

@@ -38,6 +38,12 @@ test_that("suspect screening is OK", {
     # check suspects without retention
     expect_gte(nrow(getScrInfo(susps[, -3])), nrow(scr))
     
+    # valid suspect names
+    withr::with_options(list(patRoon.cache.mode = "none"), {
+        expect_warning(screenSuspects(fGroups, data.table(name = "test.", mz = 100)))
+        expect_error(screenSuspects(fGroups, data.table(name = "", mz = 100)))
+    })
+    
     # alternative ion mass calculations
     expect_equal_scr(scr, scrSMI, tolerance = 1E-3) # higher tolerance due to inaccurate mz column in patRoonData::targets
     expect_equal_scr(scrSMI, getScrInfo(susps[, c("name", "rt", "adduct", "InChI")]))

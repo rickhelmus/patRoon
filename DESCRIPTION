@@ -103,6 +103,7 @@ Imports:
     rsm,
     future.apply,
     progressr,
+    fs,
     yaml
 Suggests: 
     RDCOMClient,

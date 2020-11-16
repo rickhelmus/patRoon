@@ -56,7 +56,6 @@
 - tests
     - automatic InChIKey/formula calculation from InChIs/SMILES
         - already done implicitly?
-    - new plotVenn list functionality
     - update stored results for DA tests
 
 

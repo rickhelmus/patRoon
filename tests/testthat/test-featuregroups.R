@@ -321,6 +321,8 @@ test_that("plotting works", {
     expect_doppel("eic-ann", function() plotChroms(subFGroups, annotate = "mz"))
 
     expect_doppel("venn", function() plotVenn(fgOpenMS))
+    # use conc fGroups as it has >2 rGroups
+    expect_doppel("venn-multiple", function() plotVenn(fgOpenMSConc, which = list(standards = paste0("standard-", 1:3), solvents = "solvent")))
     expect_doppel("venn-comp", function() plotVenn(fGCompOpenMS))
     expect_equal(expect_plot(plotVenn(fgOpenMS, which = c("solvent", "standard")))$areas[2],
                  length(filter(fgOpenMS, rGroups = "standard")))

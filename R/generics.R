@@ -310,8 +310,7 @@ setGeneric("treeCutDynamic", function(obj, maxTreeHeight = 1, deepSplit = TRUE,
 
 setGeneric("checkChromatograms", function(fGroups, mzWindow = 0.005, enabledFGroups = NULL) standardGeneric("checkChromatograms"))
 setGeneric("compoundViewer", function(fGroups, MSPeakLists, compounds) standardGeneric("compoundViewer"))
-setGeneric("reportCSV", function(fGroups, path = "report", reportFGroupsAsRows = TRUE, reportFGroupsAnalysisInfo = TRUE,
-                                 reportFGroupsRetMz = TRUE, reportFeatures = FALSE, formulas = NULL,
+setGeneric("reportCSV", function(fGroups, path = "report", reportFeatures = FALSE, formulas = NULL,
                                  formulasNormalizeScores = "max", formulasExclNormScores = NULL,
                                  compounds = NULL, compoundsNormalizeScores = "max",
                                  compoundsExclNormScores = c("score", "individualMoNAScore", "annoTypeCount"),

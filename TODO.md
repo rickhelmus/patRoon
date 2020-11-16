@@ -14,9 +14,6 @@
     - GenForm scoring: somehow exclude non MS/MS candidates if MS/MS candidates are present?
         - already fine now with minimum rank?
     - add scorings for SIRIUS/DA
-    - convert to YAML
-        - update tests
-        - refs?
 - interface
     - also convert TASQ?
     - newProject(): update for new interface
@@ -42,7 +39,6 @@
         - mark with different row colour and label?
     - mention suspect similarities/ranks etc for candidates (or somehow in compounds?)
     - optionally report with collapsed suspects
-    - update reportCSV() / reportPDF()?
 - update docs, handbook & NEWS
     - renamed rt/mz columns
     - new plotVenn list functionality
@@ -51,10 +47,10 @@
     - update TASQ docs and other mentions to old suspect screening interface
     - update examples where suspect name is used for subsetting
     - mention that components should be done prior to onlyHits=T?
+    - simplified reportCSV() for fGroups
 - tests
     - automatic InChIKey/formula calculation from InChIs/SMILES
         - already done implicitly?
-    - update stored results for DA tests
 
 
 ## docs

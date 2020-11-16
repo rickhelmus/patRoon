@@ -129,9 +129,9 @@ textPlot <- function(txt)
     })
 }
 
-reportFGroupTable <- function(fGroups, path, fGroupsAsRows, reportAnalysisInfo, reportRetMz, retMin)
+reportFGroupTable <- function(fGroups, path, retMin)
 {
-    printf("Exporting feature group table...")
+    printf("Exporting feature group tables...")
 
     if (length(fGroups) == 0)
     {
@@ -139,47 +139,12 @@ reportFGroupTable <- function(fGroups, path, fGroupsAsRows, reportAnalysisInfo, 
         invisible(return(NULL))
     }
 
-    gTable <- copy(groupTable(fGroups))
-    gInfo <- groupInfo(fGroups)
-    anaInfo <- analysisInfo(fGroups)
-
-    if (reportAnalysisInfo)
-    {
-        gTable <- insertDTColumn(gTable, "blank", anaInfo$blank, 1)
-        gTable <- insertDTColumn(gTable, "replicate_group", anaInfo$group, 1)
-    }
-
-    if (fGroupsAsRows)
-    {
-        gTable <- transpose(gTable)
-        setnames(gTable, anaInfo$analysis)
-        initbl <- if (reportAnalysisInfo) rep("", 2) else c()
-
-        rnames <- rownames(gInfo)
-        if (reportAnalysisInfo)
-            rnames <- c("replicate_group", "blank", rnames)
-
-        if (reportRetMz)
-        {
-            gTable <- insertDTColumn(gTable, "m/z", c(initbl, gInfo$mzs), 1)
-            rts <- if (retMin) gInfo$rts / 60 else gInfo$rts
-            gTable <- insertDTColumn(gTable, "retention", c(initbl, rts), 1)
-        }
-    }
-    else
-    {
-        if (reportRetMz)
-        {
-            gi <- setnames(transpose(gInfo[, c("rts", "mzs")]), rownames(gInfo))
-            if (reportAnalysisInfo) # add two dummy columns
-                gi <- cbind(replicate_group = "", blank = "", gi)
-
-            gTable <- rbind(gi, gTable)
-            rnames <- c("retention", "mz", anaInfo$analysis)
-        }
-    }
-
-    write.csv(gTable, file.path(path, sprintf("%s.csv", class(fGroups))), row.names = rnames)
+    # UNDONE: inheritance...
+    tbl <- if (isScreening(fGroups)) as.data.table(fGroups, collapseSuspects = NULL) else as.data.table(fGroups)
+    if (retMin)
+        tbl[, ret := ret / 60]
+    
+    fwrite(tbl, file.path(path, sprintf("%s.csv", class(fGroups))))
 
     printf("Done!\n")
 }
@@ -598,12 +563,6 @@ reportComponentPlots <- function(fGroups, path, components, EICRtWindow, EICMzWi
 #'   files) for given data to be reported. This may also be useful to allow
 #'   import by other tools for post processing.
 #'
-#' @param reportFGroupsAsRows Report feature groups as rows (instead of columns)
-#'   within the resulting \file{.csv} file.
-#' @param reportFGroupsAnalysisInfo Include analyses information (reference and
-#'   replicate groups) in the reported feature groups table \file{.csv} file.
-#' @param reportFGroupsRetMz Include feature group information (retention time
-#'   and \emph{m/z}) within the reported feature groups table \file{.csv} file.
 #' @param reportFeatures If set to \code{TRUE} then for each analysis a
 #'   \file{.csv} file will be generated with information about its detected
 #'   features.
@@ -611,17 +570,14 @@ reportComponentPlots <- function(fGroups, path, components, EICRtWindow, EICMzWi
 #' @rdname reporting
 #' @aliases reportCSV
 #' @export
-setMethod("reportCSV", "featureGroups", function(fGroups, path, reportFGroupsAsRows, reportFGroupsAnalysisInfo,
-                                                 reportFGroupsRetMz, reportFeatures,
-                                                 formulas, formulasNormalizeScores, formulasExclNormScores,
+setMethod("reportCSV", "featureGroups", function(fGroups, path, reportFeatures, formulas,
+                                                 formulasNormalizeScores, formulasExclNormScores,
                                                  compounds, compoundsNormalizeScores, compoundsExclNormScores,
                                                  compsCluster, components, retMin, clearPath)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertPathForOutput(path, overwrite = TRUE, add = ac)
-    aapply(checkmate::assertFlag, . ~ reportFGroupsAsRows + reportFGroupsAnalysisInfo + reportFGroupsRetMz +
-               reportFeatures + retMin + clearPath,
-           fixed = list(add = ac))
+    aapply(checkmate::assertFlag, . ~ reportFeatures + retMin + clearPath, fixed = list(add = ac))
     aapply(checkmate::assertClass, . ~ formulas + compounds + compsCluster + components,
            c("formulas", "compounds", "compoundsCluster", "components"),
            null.ok = TRUE, fixed = list(add = ac))
@@ -638,7 +594,7 @@ setMethod("reportCSV", "featureGroups", function(fGroups, path, reportFGroupsAsR
     
     prepareReportPath(path, clearPath)
 
-    reportFGroupTable(fGroups, path, reportFGroupsAsRows, reportFGroupsAnalysisInfo, reportFGroupsRetMz, retMin)
+    reportFGroupTable(fGroups, path, retMin)
 
     if (reportFeatures)
     {

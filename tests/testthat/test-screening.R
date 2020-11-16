@@ -8,7 +8,7 @@ susps[, formula := convertToFormulaBabel(SMILES, "smi")]
 susps[, adduct := "[M+H]+"]
 susps[name %in% c("TBA", "TPA"), adduct := "[M]+"]
 
-fGroups <- getTestFGroups(getTestAnaInfo())
+fGroups <- getTestFGroups()
 fGroupsScr <- screenSuspects(fGroups, susps, onlyHits = TRUE)
 fGroupsScrNoRT <- screenSuspects(fGroups, susps[, -"rt"], onlyHits = TRUE)
 getScrInfo <- function(susps, ...) screenInfo(screenSuspects(fGroups, susps, onlyHits = TRUE, ...))
@@ -162,7 +162,6 @@ selectedNegHitsInt <- filter(fGroupsAnnNoRT, selectHitsBy = "intensity", onlyHit
 selectedNegHitsLev <- filter(fGroupsAnnNoRT, selectHitsBy = "level", onlyHits = FALSE, negate = TRUE)
 selectedNegFGroupsLev <- filter(fGroupsAnnNoRT, selectBestFGroups = TRUE, onlyHits = FALSE, negate = TRUE)
 
-
 test_that("Negated screen filters", {
     expect_known_value(as.data.table(selectedNegHitsInt, collapseSuspects = NULL), testFile("screen-ann-sel-neg-hits_int"))
     expect_known_value(as.data.table(selectedNegHitsLev, collapseSuspects = NULL), testFile("screen-ann-sel-neg-hits_lev"))
@@ -193,6 +192,28 @@ test_that("Negated screen filters", {
     expect_lt(getMinScrCol(filter(fGroupsAnnNoRT, minAnnSimBoth = 0.9, negate = TRUE), "annSimBoth"), 0.9)
     expect_true(all(is.na(screenInfo(filter(fGroupsAnnFrag, minFragMatches = 1, negate = TRUE))$maxFragMatches)))
     expect_true(all(is.na(screenInfo(filter(fGroupsAnnFragForm, minFragMatches = 1, negate = TRUE))$maxFragMatches)))
+})
+
+fGroupsEmpty <- groupFeatures(findFeatures(getTestAnaInfo(), "openms", noiseThrInt = 1E9, logPath = NULL), "openms")
+suspsEmpty <- data.table(name = "doesnotexist", mz = 1E5)
+fGroupsScrEmpty <- screenSuspects(fGroups, suspsEmpty, adduct = "[M+H]+")
+
+if (hasMF)
+    fGroupsScrAnnEmpty <- annotateSuspects(fGroupsScrEmpty, MSPeakLists = plists, formulas = forms, compounds = compsMF)
+
+test_that("Empty objects", {
+    expect_length(screenSuspects(fGroupsEmpty, suspsEmpty, adduct = "[M+H]+"), 0)
+    expect_length(fGroupsScrEmpty, length(fGroups))
+    
+    expect_length(filter(fGroupsScrEmpty, onlyHits = TRUE), 0)
+    expect_length(filter(fGroupsScrEmpty, onlyHits = TRUE, negate = TRUE), length(fGroups))
+
+    skip_if_not(hasMF)
+    expect_length(fGroupsScrAnnEmpty, length(fGroups))
+    expect_length(filter(fGroupsScrAnnEmpty, selectHitsBy = "intensity", onlyHits = TRUE), 0)
+    expect_length(filter(fGroupsScrAnnEmpty, selectHitsBy = "level", onlyHits = TRUE), 0)
+    expect_length(filter(fGroupsScrAnnEmpty, selectBestFGroups = TRUE, onlyHits = TRUE), 0)
+    expect_length(filter(fGroupsScrAnnEmpty, minAnnSimForm = 0.0, onlyHits = TRUE), 0)
 })
 
 

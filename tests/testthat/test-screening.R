@@ -76,12 +76,13 @@ if (hasMF)
     compsMFMoNa <- callMF(fGroupsScr, plists, scoreTypes = c("fragScore", "individualMoNAScore"))
     forms <- generateFormulas(fGroupsScr, "genform", plists, calculateFeatures = FALSE)
     
-    fGroupsAnn <- annotateSuspects(fGroupsScr)
+    fGroupsAnnNothing <- annotateSuspects(fGroupsScr)
     fGroupsAnnMF <- annotateSuspects(fGroupsScr, MSPeakLists = plists, formulas = forms, compounds = compsMF)
     fGroupsAnnMFJ <- annotateSuspects(fGroupsScr, MSPeakLists = plists, formulas = forms, compounds = compsMF,
                                       simMSMSMethod = "jaccard")
-    fGroupsAnnMoNA <- annotateSuspects(fGroupsAnn, MSPeakLists = plists, formulas = forms, compounds = compsMFMoNa)
-    fGroupsOnlyForms <- annotateSuspects(fGroupsAnn, MSPeakLists = plists, formulas = forms)
+    fGroupsAnnMoNA <- annotateSuspects(fGroupsScr, MSPeakLists = plists, formulas = forms, compounds = compsMFMoNa)
+    fGroupsOnlyForms <- annotateSuspects(fGroupsScr, MSPeakLists = plists, formulas = forms)
+    fGroupsAnnNoRT <- annotateSuspects(fGroupsScrNoRT, MSPeakLists = plists, formulas = forms, compounds = compsMFMoNa)
     
     fGroupsAnnFragNoRT <- screenSuspects(fGroupsScr, suspsFrag[, -"rt"])
     fGroupsAnnFragNoRT <- annotateSuspects(fGroupsAnnFragNoRT, MSPeakLists = plists)
@@ -102,7 +103,7 @@ test_that("Suspect annotation works", {
     expect_known_value(screenInfo(fGroupsAnnMF), testFile("screen-ann-MF"))
     expect_known_value(screenInfo(fGroupsAnnMFJ), testFile("screen-ann-MF-J"))
     
-    expect_equal(minIDLevel(fGroupsAnn), 5)
+    expect_equal(minIDLevel(fGroupsAnnNothing), 5)
     expect_equal(minIDLevel(fGroupsOnlyForms), 4)
     expect_equal(minIDLevel(fGroupsAnnMF), 3)
     expect_equal(minIDLevel(fGroupsAnnFragNoRT), 3)
@@ -116,20 +117,20 @@ test_that("Suspect annotation works", {
                         screenInfo(fGroupsAnnMF)$annSimBoth >= pmax(screenInfo(fGroupsAnnMF)$annSimForm, screenInfo(fGroupsAnnMF)$annSimComp, na.rm = TRUE)))
 })
 
-# take fGroupsAnnFragForm: doesn't have rt in susp list, so has double hits
-selectedHitsInt <- filter(fGroupsAnnFragForm, selectHitsBy = "intensity", onlyHits = TRUE)
-selectedHitsLev <- filter(fGroupsAnnFragForm, selectHitsBy = "level", onlyHits = TRUE)
+# take fGroupsAnnNoRT: doesn't have rt in susp list, so has double hits
+selectedHitsInt <- filter(fGroupsAnnNoRT, selectHitsBy = "intensity", onlyHits = TRUE)
+selectedHitsLev <- filter(fGroupsAnnNoRT, selectHitsBy = "level", onlyHits = TRUE)
 # UNDONE: these are not really good examples as the ID level is the same for all duplicates...
-selectedFGroupsLev <- filter(fGroupsAnnFragForm, selectBestFGroups = TRUE, onlyHits = TRUE)
+selectedFGroupsLev <- filter(fGroupsAnnNoRT, selectBestFGroups = TRUE, onlyHits = TRUE)
 
 test_that("Screen filters", {
     expect_known_value(as.data.table(selectedHitsInt, collapseSuspects = NULL), testFile("screen-ann-sel-hits_int"))
     expect_known_value(as.data.table(selectedHitsLev, collapseSuspects = NULL), testFile("screen-ann-sel-hits_lev"))
     expect_known_value(as.data.table(selectedFGroupsLev, collapseSuspects = NULL), testFile("screen-ann-sel-groups"))
     
-    expect_lt(length(selectedHitsInt), length(fGroupsAnnFragForm))
-    expect_lt(length(selectedHitsLev), length(fGroupsAnnFragForm))
-    expect_lt(length(selectedFGroupsLev), nrow(screenInfo(fGroupsAnnFragForm)))
+    expect_lt(length(selectedHitsInt), length(fGroupsAnnNoRT))
+    expect_lt(length(selectedHitsLev), length(fGroupsAnnNoRT))
+    expect_lt(length(selectedFGroupsLev), nrow(screenInfo(fGroupsAnnNoRT)))
 })
 
 TQFile <- file.path(getTestDataPath(), "GlobalResults-TASQ.csv")

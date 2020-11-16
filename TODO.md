@@ -27,6 +27,7 @@
         - port from TPs someday
         - clarify that intensity filter happens after filtering precursor (make this optional?)
         - add proper refs
+    - show() method
 - misc
     - util to check if there are suspect results? (ie to replace inherits(...))
     - check for empty names in assertion/preparation functions
@@ -56,9 +57,6 @@
     - automatic InChIKey/formula calculation from InChIs/SMILES
         - already done implicitly?
     - handling empty results
-    - filters
-        - selectXBy: better tests?
-        - negation
     - new plotVenn list functionality
     - update stored results for DA tests
 

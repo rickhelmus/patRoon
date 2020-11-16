@@ -72,8 +72,9 @@ hasMF <- !is.null(getOption("patRoon.path.MetFragCL")) && nzchar(getOption("patR
 if (hasMF)
 {
     plists <- generateMSPeakLists(fGroupsScr, "mzr")
-    compsMF <- callMF(fGroupsScr, plists)
-    compsMFMoNa <- callMF(fGroupsScr, plists, scoreTypes = c("fragScore", "individualMoNAScore"))
+    compsMF <- callMF(fGroupsScr, plists, db = file.path(getTestDataPath(), "test-mf-db-isomers.csv"))
+    compsMFMoNa <- callMF(fGroupsScr, plists, scoreTypes = c("fragScore", "individualMoNAScore"),
+                          db = file.path(getTestDataPath(), "test-mf-db-isomers.csv"))
     forms <- generateFormulas(fGroupsScr, "genform", plists, calculateFeatures = FALSE)
     
     fGroupsAnnNothing <- annotateSuspects(fGroupsScr)
@@ -120,18 +121,80 @@ test_that("Suspect annotation works", {
 # take fGroupsAnnNoRT: doesn't have rt in susp list, so has double hits
 selectedHitsInt <- filter(fGroupsAnnNoRT, selectHitsBy = "intensity", onlyHits = TRUE)
 selectedHitsLev <- filter(fGroupsAnnNoRT, selectHitsBy = "level", onlyHits = TRUE)
-# UNDONE: these are not really good examples as the ID level is the same for all duplicates...
 selectedFGroupsLev <- filter(fGroupsAnnNoRT, selectBestFGroups = TRUE, onlyHits = TRUE)
 
+maxIDLevel <- function(ann) max(numericIDLevel(screenInfo(ann)$estIDLevel))
+getMinScrCol <- function(fgAnn, col) min(screenInfo(fgAnn)[[col]], na.rm = TRUE)
+getMaxScrCol <- function(fgAnn, col) max(screenInfo(fgAnn)[[col]], na.rm = TRUE)
 test_that("Screen filters", {
     expect_known_value(as.data.table(selectedHitsInt, collapseSuspects = NULL), testFile("screen-ann-sel-hits_int"))
     expect_known_value(as.data.table(selectedHitsLev, collapseSuspects = NULL), testFile("screen-ann-sel-hits_lev"))
     expect_known_value(as.data.table(selectedFGroupsLev, collapseSuspects = NULL), testFile("screen-ann-sel-groups"))
     
+    # mean intensities should be increased when selecting a group for this suspect
+    expect_lt(mean(as.matrix(as.data.table(fGroupsAnnNoRT, collapseSuspects = NULL)[name == "2-quinolol",
+                                                                                    analyses(fGroupsAnnNoRT),
+                                                                                    with = FALSE])),
+              mean(as.matrix(as.data.table(selectedHitsInt, collapseSuspects = NULL)[name == "2-quinolol",
+                                                                                     analyses(selectedHitsInt),
+                                                                                     with = FALSE])))
+    expect_gt(max(numericIDLevel(screenInfo(fGroupsAnnNoRT)[name == "2-quinolol"]$estIDLevel)),
+              max(numericIDLevel(screenInfo(selectedHitsLev)[name == "2-quinolol"]$estIDLevel)))
+    # UNDONE: these are not really good examples as the ID level is the same for all duplicates...
+    # for now just verify that all groups are assigned to first quinolol (2-quinolol)
+    expect_true(all(screenInfo(selectedFGroupsLev)[grepl("quinolol", name)]$name == "2-quinolol"))
+    
     expect_lt(length(selectedHitsInt), length(fGroupsAnnNoRT))
     expect_lt(length(selectedHitsLev), length(fGroupsAnnNoRT))
     expect_lt(length(selectedFGroupsLev), nrow(screenInfo(fGroupsAnnNoRT)))
+    
+    expect_equal(maxIDLevel(filter(fGroupsAnnNoRT, maxLevel = 3)), 3)
+    expect_equal(getMaxScrCol(filter(fGroupsAnnNoRT, maxFormRank = 3), "suspFormRank"), 1) # UNDONE: all are one or NA
+    expect_lte(getMaxScrCol(filter(fGroupsAnnNoRT, maxCompRank = 3), "suspCompRank"), 3)
+    expect_gte(getMinScrCol(filter(fGroupsAnnNoRT, minAnnSimForm = 0.9), "annSimForm"), 0.9)
+    expect_gte(getMinScrCol(filter(fGroupsAnnNoRT, minAnnSimComp = 0.9), "annSimComp"), 0.9)
+    expect_gte(getMinScrCol(filter(fGroupsAnnNoRT, minAnnSimBoth = 0.9), "annSimBoth"), 0.9)
+    expect_equal(getMinScrCol(filter(fGroupsAnnFrag, minFragMatches = 1), "maxFragMatches"), 1)
+    expect_equal(getMinScrCol(filter(fGroupsAnnFragForm, minFragMatches = 1), "maxFragMatches"), 1)
 })
+
+selectedNegHitsInt <- filter(fGroupsAnnNoRT, selectHitsBy = "intensity", onlyHits = FALSE, negate = TRUE)
+selectedNegHitsLev <- filter(fGroupsAnnNoRT, selectHitsBy = "level", onlyHits = FALSE, negate = TRUE)
+selectedNegFGroupsLev <- filter(fGroupsAnnNoRT, selectBestFGroups = TRUE, onlyHits = FALSE, negate = TRUE)
+
+
+test_that("Negated screen filters", {
+    expect_known_value(as.data.table(selectedNegHitsInt, collapseSuspects = NULL), testFile("screen-ann-sel-neg-hits_int"))
+    expect_known_value(as.data.table(selectedNegHitsLev, collapseSuspects = NULL), testFile("screen-ann-sel-neg-hits_lev"))
+    expect_known_value(as.data.table(selectedNegFGroupsLev, collapseSuspects = NULL), testFile("screen-ann-sel-neg-groups"))
+    
+    # as above, but opposite
+    expect_gt(mean(as.matrix(as.data.table(fGroupsAnnNoRT, collapseSuspects = NULL)[name == "2-quinolol",
+                                                                                    analyses(fGroupsAnnNoRT),
+                                                                                    with = FALSE])),
+              mean(as.matrix(as.data.table(selectedNegHitsInt, collapseSuspects = NULL)[name == "2-quinolol",
+                                                                                     analyses(selectedNegHitsInt),
+                                                                                     with = FALSE])))
+    expect_lt(min(numericIDLevel(screenInfo(fGroupsAnnNoRT)[name == "2-quinolol"]$estIDLevel)),
+              min(numericIDLevel(screenInfo(selectedNegHitsLev)[name == "2-quinolol"]$estIDLevel)))
+    # UNDONE: these are not really good examples as the ID level is the same for all duplicates...
+    # for now just verify that all groups are assigned to first quinolol (2-quinolol)
+    expect_true(all(screenInfo(selectedFGroupsLev)[grepl("quinolol", name)]$name == "2-quinolol"))
+    
+    expect_length(selectedNegHitsInt, length(selectedHitsInt))
+    expect_length(selectedNegHitsLev, length(selectedHitsLev))
+    expect_equal(nrow(screenInfo(selectedNegFGroupsLev)), nrow(screenInfo(selectedFGroupsLev)))
+    
+    expect_gt(maxIDLevel(filter(fGroupsAnnNoRT, maxLevel = 3, negate = TRUE)), 3)
+    expect_true(all(is.na(screenInfo(filter(fGroupsAnnNoRT, maxFormRank = 3, negate = TRUE))$suspFormRank)))
+    expect_gt(getMaxScrCol(filter(fGroupsAnnNoRT, maxCompRank = 3, negate = TRUE), "suspCompRank"), 3)
+    expect_lt(getMinScrCol(filter(fGroupsAnnNoRT, minAnnSimForm = 0.9, negate = TRUE), "annSimForm"), 0.9)
+    expect_lt(getMinScrCol(filter(fGroupsAnnNoRT, minAnnSimComp = 0.9, negate = TRUE), "annSimComp"), 0.9)
+    expect_lt(getMinScrCol(filter(fGroupsAnnNoRT, minAnnSimBoth = 0.9, negate = TRUE), "annSimBoth"), 0.9)
+    expect_true(all(is.na(screenInfo(filter(fGroupsAnnFrag, minFragMatches = 1, negate = TRUE))$maxFragMatches)))
+    expect_true(all(is.na(screenInfo(filter(fGroupsAnnFragForm, minFragMatches = 1, negate = TRUE))$maxFragMatches)))
+})
+
 
 TQFile <- file.path(getTestDataPath(), "GlobalResults-TASQ.csv")
 TQRes <- fread(TQFile)

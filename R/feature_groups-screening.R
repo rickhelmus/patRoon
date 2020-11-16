@@ -205,7 +205,7 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
     return(fGroups)
 })
 
-setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = FALSE,
+setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = NULL,
                                                        selectHitsBy = NULL, selectBestFGroups = FALSE,
                                                        maxLevel = NULL, maxFormRank = NULL, maxCompRank = NULL,
                                                        minAnnSimForm = NULL, minAnnSimComp = NULL, minAnnSimBoth = NULL,
@@ -216,12 +216,15 @@ setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = FALS
     # UNDONE: cache?
     # UNDONE: minFragMatches --> split in abs/rel thresholds?
     # UNDONE: keep or remove NA values with colFilter()? document what happens
+    # UNDONE: properly document negate:
+    #   - selectHitsBy: select worst hit
+    #   - onlyHits: if TRUE only select non-hits, if FALSE select hits, if NULL nothing
     
     ac <- checkmate::makeAssertCollection()
-    aapply(checkmate::assertFlag, . ~ selectBestFGroups + onlyHits + negate, fixed = list(add = ac))
+    aapply(checkmate::assertFlag, . ~ onlyHits + selectBestFGroups + negate, null.ok = c(TRUE, FALSE, FALSE), fixed = list(add = ac))
     checkmate::assertChoice(selectHitsBy, choices = c("intensity", "level"), null.ok = TRUE, add = ac)
-    aapply(checkmate::assertCount, . ~ maxLevel + maxFormRank + maxCompRank + minAnnSimForm + minAnnSimComp +
-               minAnnSimBoth + minFragMatches, null.ok = TRUE, fixed = list(add = ac))
+    aapply(checkmate::assertCount, . ~ maxLevel + maxFormRank + maxCompRank + minFragMatches, null.ok = TRUE, fixed = list(add = ac))
+    aapply(checkmate::assertNumber, . ~ minAnnSimForm + minAnnSimComp + minAnnSimBoth, null.ok = TRUE, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
     
     colFilter <- function(pred, what, col)
@@ -257,7 +260,7 @@ setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = FALS
     # do here so that only duplicates not yet filtered out in previous steps are considered
     if (!is.null(selectHitsBy) || selectBestFGroups)
     {
-        doKeep <- function(v, d) is.na(v) | length(v) == 1 | order(v, decreasing = d) == 1
+        doKeep <- function(v, d) is.na(v) | length(v) == 1 | seq_along(v) == order(v, decreasing = d)[1]
         doSelectFilter <- function(si, by, byCol)
         {
             if (by == "level" && is.null(si[["estIDLevel"]]))
@@ -293,10 +296,10 @@ setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = FALS
     }
     
     # NOTE: do last in case previous steps removed hits 
-    if (onlyHits)
+    if (!is.null(onlyHits))
     {
         sGroups <- unique(screenInfo(obj)$group)
-        if (negate)
+        if (negate && onlyHits)
             obj <- obj[, setdiff(names(obj), sGroups)]
         else
             obj <- obj[, sGroups]

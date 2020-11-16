@@ -29,7 +29,6 @@
         - add proper refs
     - show() method
 - misc
-    - util to check if there are suspect results? (ie to replace inherits(...))
     - credits to ES
     - update version number
     - prepareSuspectList(): export?

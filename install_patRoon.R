@@ -426,7 +426,7 @@ utils <- setRefClass("utilsInst", methods = list(
         setOpts <- list()
         
         extDeps <- data.frame(name = c("ProteoWizard", "OpenMS", "SIRIUS", "OpenBabel", "pngquant"),
-                              command = c("msconvert", "FeatureFinderMetabo", "sirius-console-64", "obabel", "pngquant"),
+                              command = c("msconvert", "FeatureFinderMetabo", "sirius", "obabel", "pngquant"),
                               copt = c("pwiz", "OpenMS", "SIRIUS", "obabel", "pngquant"),
                               stringsAsFactors = FALSE)
         extDeps$path <- mapply(extDeps$command, extDeps$copt, FUN = utils$getCommandWithOptPath)
@@ -498,10 +498,10 @@ utils <- setRefClass("utilsInst", methods = list(
             
             if ("SIRIUS" %in% instWhat)
             {
-                down <- downloadFile(instPath, "SIRIUS", "https://bio.informatik.uni-jena.de/repository/dist-release-local/de/unijena/bioinf/ms/sirius/4.4.29/sirius-4.4.29-win64.zip",
+                down <- downloadFile(instPath, "SIRIUS", "https://bio.informatik.uni-jena.de/repository/dist-release-local/de/unijena/bioinf/ms/sirius/4.5.0/sirius-4.5.0-win64.zip",
                                      TRUE)
                 if (!is.null(down))
-                    setOpts <- c(setOpts, list(patRoon.path.SIRIUS = fixPath(file.path(down, "sirius-win64-4.4.29"))))
+                    setOpts <- c(setOpts, list(patRoon.path.SIRIUS = fixPath(file.path(down, "sirius-gui"))))
             }
             
             if ("OpenBabel" %in% instWhat)

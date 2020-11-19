@@ -2,16 +2,8 @@
 
 getSiriusBin <- function()
 {
-    si <- Sys.info()
-
-    if (si[["sysname"]] != "Windows")
-        return("sirius")
-
-    # windows
-    if (si[["machine"]] == "x86-64")
-        return("sirius-console-64")
-
-    return("sirius-console-32")
+    # UNDONE: check bin/ subdir?
+    return("sirius")
 }
 
 isSIRIUSPre44 <- function()
@@ -81,12 +73,12 @@ unifySirNames <- function(sir)
                  links = "libraryLinks",
                  
                  # some names were changed in 4.4 and new columns were added
-                 # UNDONE: there is also a compound_dentifications.csv file with slightly different columns, use that?
+                 # UNDONE: there is also a compound_identifications.csv file with slightly different columns, use that?
                  formulaRank = "formulaRank",
                  InChI = "InChI",
                  InChIkey2D = "InChIKey1",
-                 "CSI:FingerID_Score" = "score",
-                 TreeIsotope_Score = "SIR_formulaScore" # UNDONE: better name?
+                 "CSI:FingerIDScore" = "score",
+                 TreeIsotopeScore = "SIR_formulaScore" # UNDONE: better name?
                  )
 
     unNames <- unNames[names(unNames) %in% names(sir)] # filter out missing

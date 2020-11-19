@@ -1,3 +1,8 @@
+# patRoon 1.0.5
+
+* *IMPORTANT:* Support for SIRIUS 4.5.0. Please update to this version since these changes break support for older versions.
+
+
 # patRoon 1.0.4
 * Small compatibility fixes for macOS
 * Updated support for latest PubChemLite

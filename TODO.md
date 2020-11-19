@@ -75,6 +75,7 @@
 - newProject()
     - concentration column for anaInfo
     - generate more detailed script with e.g. commented examples of subsetting, extraction etc
+- support more of the new SIRIUS functionality
 
 
 ## Features

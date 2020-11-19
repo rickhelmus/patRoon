@@ -33,9 +33,11 @@ processSIRIUSFormulas <- function(msFName, outPath, cmpName, adduct, hash, isPre
                 setnames(forms, c("formula", "treeScore"), c("neutral_formula", "MSMSScore"))
             else
             {
-                setnames(forms, c("molecularFormula", "precursorFormula", "TreeIsotope_Score",
-                                  "Tree_Score", "Isotope_Score", "medianMassError(ppm)", "massError(ppm)"),
-                         c("neutral_formula", "neutral_adduct_formula", "score", "MSMSScore", "isoScore", "error_median", "error"))
+                setnames(forms, c("molecularFormula", "precursorFormula", "SiriusScore",
+                                  "TreeScore", "IsotopeScore", "numExplainedPeaks", "medianMassErrorFragmentPeaks(ppm)",
+                                  "medianAbsoluteMassErrorFragmentPeaks(ppm)", "massErrorPrecursor(ppm)"),
+                         c("neutral_formula", "neutral_adduct_formula", "score", "MSMSScore", "isoScore",
+                           "explainedPeaks", "error_frag_median", "error_frag_median_abs", "error"))
             }
             
             frags <- rbindlist(lapply(fragFiles, function(ff)
@@ -67,9 +69,9 @@ processSIRIUSFormulas <- function(msFName, outPath, cmpName, adduct, hash, isPre
             forms <- forms[frag_intensity != 0 | formula != frag_formula]
             
             # set nice column order
-            setcolorder(forms, c("neutral_formula", "formula", "neutral_adduct_formula", "formula_mz", "error", "error_median",
-                                 "adduct", "score", "MSMSScore", "isoScore", "byMSMS", "frag_neutral_formula", "frag_formula",
-                                 "frag_mz", "frag_formula_mz", "frag_intensity", "neutral_loss",
+            setcolorder(forms, c("neutral_formula", "formula", "neutral_adduct_formula", "formula_mz", "error", "error_frag_median",
+                                 "error_frag_median_abs", "adduct", "score", "MSMSScore", "isoScore", "byMSMS",
+                                 "frag_neutral_formula", "frag_formula", "frag_mz", "frag_formula_mz", "frag_intensity", "neutral_loss",
                                  "explainedPeaks", "explainedIntensity"))
             
             forms <- rankFormulaTable(forms)

@@ -212,15 +212,16 @@ runSIRIUS <- function(precursorMZs, MSPLists, MSMSPLists, profile, adduct, ppmMa
                 cmpName = cmpName))
 }
 
-doSIRIUS <- function(allGNames, MSPeakLists, doFeatures, profile, adduct, relMzDev, elements,
+doSIRIUS <- function(fGroups, MSPeakLists, doFeatures, profile, adduct, relMzDev, elements,
                      database, noise, cores, withFingerID, fingerIDDatabase, topMost,
                      extraOptsGeneral, extraOptsFormula, verbose, cacheName, processFunc, processArgs,
                      SIRBatchSize, logPath, maxProcAmount)
 {
     isPre44 <- isSIRIUSPre44()
+    gNames <- names(fGroups)
     
     # only do relevant feature groups
-    MSPeakLists <- MSPeakLists[, intersect(allGNames, groupNames(MSPeakLists))]
+    MSPeakLists <- MSPeakLists[, intersect(gNames, groupNames(MSPeakLists))]
     
     if (length(MSPeakLists) == 0)
         return(list())
@@ -237,10 +238,19 @@ doSIRIUS <- function(allGNames, MSPeakLists, doFeatures, profile, adduct, relMzD
         pLists <- peakLists(MSPeakLists)
         flattenedPLists <- unlist(pLists, recursive = FALSE)
         
-        # important: assign before subset step below
+        # important: assign before flattenedPLists subset steps below
         flPLMeta <- data.table(name = names(flattenedPLists),
                                group = unlist(lapply(pLists, names), use.names = FALSE),
                                analysis = rep(names(pLists), times = lengths(pLists)))
+        
+        # ensure only present features are done
+        ftind <- groupFeatIndex(fGroups)
+        flPLMeta <- flPLMeta[mapply(group, analysis, FUN = function(grp, ana)
+        {
+            anai <- match(ana, analyses(fGroups))
+            return(!is.na(anai) && ftind[[group]][anai] != 0)
+        })]
+        flattenedPLists <- flattenedPLists[flPLMeta$name]
     }
     else
     {
@@ -311,7 +321,7 @@ doSIRIUS <- function(allGNames, MSPeakLists, doFeatures, profile, adduct, relMzD
                 res <- c(res, setNames(cachedResults[metaCached$hash], metaCached$group))
             }
             
-            res <- res[intersect(allGNames, names(res))] # ensure correct order
+            res <- res[intersect(gNames, names(res))] # ensure correct order
             return(res)
         }
 

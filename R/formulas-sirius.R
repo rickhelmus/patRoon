@@ -123,7 +123,7 @@ generateFormulasSIRIUS <- function(fGroups, MSPeakLists, relMzDev = 5, adduct = 
     gCount <- length(fGroups)
     
     printf("Processing %d feature groups with SIRIUS...\n---\n", gCount)
-    formTable <- doSIRIUS(gNames, MSPeakLists, calculateFeatures, profile, adduct, relMzDev, elements,
+    formTable <- doSIRIUS(fGroups, MSPeakLists, calculateFeatures, profile, adduct, relMzDev, elements,
                           database, noise, cores, FALSE, NULL, topMost, extraOptsGeneral, extraOptsFormula,
                           verbose, "formulasSIRIUS", processSIRIUSFormulas, NULL,
                           SIRBatchSize, logPath, maxProcAmount)

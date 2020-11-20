@@ -40,7 +40,6 @@
 - timeouts for SIRIUS?
 - do something about negative H explained fragments by MF?
 - SusDat MF support
-- FIX: formula calculation with SIRIUS currently always calculate all formulae for the given MSPeakLists if calculateFeatures=TRUE 
 
 
 ## formulas

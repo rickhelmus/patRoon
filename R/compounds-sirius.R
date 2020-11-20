@@ -141,7 +141,6 @@ generateCompoundsSIRIUS <- function(fGroups, MSPeakLists, relMzDev = 5, adduct =
     assertMultiProcArgs(logPath, maxProcAmount, add = ac)
     checkmate::reportAssertions(ac)
 
-    gNames <- names(fGroups)
     adduct <- checkAndToAdduct(adduct)
     if (is.null(fingerIDDatabase))
         fingerIDDatabase <- if (!is.null(formulaDatabase)) formulaDatabase else "pubchem"
@@ -149,7 +148,7 @@ generateCompoundsSIRIUS <- function(fGroups, MSPeakLists, relMzDev = 5, adduct =
     gCount <- length(fGroups)
     printf("Processing %d feature groups with SIRIUS-CSI:FingerID...\n", gCount)
     
-    results <- doSIRIUS(gNames, MSPeakLists, FALSE, profile, adduct, relMzDev, elements,
+    results <- doSIRIUS(fGroups, MSPeakLists, FALSE, profile, adduct, relMzDev, elements,
                         formulaDatabase, noise, cores, TRUE, fingerIDDatabase, topMost, extraOptsGeneral, extraOptsFormula,
                         verbose, "compoundsSIRIUS", processSIRIUSCompounds,
                         list(database = fingerIDDatabase, topMost = topMost),

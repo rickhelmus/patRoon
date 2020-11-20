@@ -1,6 +1,7 @@
 # patRoon 1.0.5
 
 * *IMPORTANT:* Support for SIRIUS 4.5.0. Please update to this version since these changes break support for older versions.
+* Fix: SIRIUS formula calculation with `calculateFeatures=TRUE` would try to calculate formulas for features even if not present (eg after being removed by subsetting or filtering steps) 
 
 
 # patRoon 1.0.4

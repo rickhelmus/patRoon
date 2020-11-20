@@ -384,6 +384,8 @@ For annotations performed with \command{SIRIUS} it is often the fastest
   safetyInfo           \tab SafetyInfo                                       \tab pubchemlite       \cr
   toxicityInfo         \tab ToxicityInfo                                     \tab pubchemlite       \cr
   knownUse             \tab KnownUse                                         \tab pubchemlite       \cr
+  disorderDisease      \tab DisorderDisease                                  \tab pubchemlite       \cr
+  identification       \tab Identification                                   \tab pubchemlite       \cr
   annoTypeCount        \tab FPSum                                            \tab pubchemlite       \cr
   annoTypeCount        \tab AnnoTypeCount                                    \tab pubchemlite       
 }

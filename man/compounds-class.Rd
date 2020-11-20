@@ -52,7 +52,7 @@
   fGroups = NULL,
   fragments = FALSE,
   normalizeScores = "none",
-  excludeNormScores = c("score", "individualMoNAScore")
+  excludeNormScores = c("score", "individualMoNAScore", "annoTypeCount")
 )
 
 \S4method{identifiers}{compounds}(compounds)
@@ -94,7 +94,7 @@
   index,
   groupName,
   normalizeScores = "max",
-  excludeNormScores = c("score", "individualMoNAScore"),
+  excludeNormScores = c("score", "individualMoNAScore", "annoTypeCount"),
   onlyUsed = TRUE,
   useGGPlot2 = FALSE
 )

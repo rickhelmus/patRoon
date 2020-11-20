@@ -22,7 +22,7 @@ install:
     - ps: >-
         if (-Not (Test-Path C:\deps\sirius-4.5.0-win64-headless.zip)) {
             Invoke-WebRequest https://bio.informatik.uni-jena.de/repository/dist-release-local/de/unijena/bioinf/ms/sirius/4.5.0/sirius-4.5.0-win64-headless.zip -OutFile "C:\deps\sirius-win.zip"
-            7z x -oC:\deps\ C:\deps\sirius-win.zip
+            7z x -aoa -oC:\deps\ C:\deps\sirius-win.zip
         }
     - ps: >-
         if (-Not (Test-Path C:\deps\openbabel.exe)) {

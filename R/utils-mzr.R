@@ -17,8 +17,7 @@ loadSpectra <- function(path, rtRange = NULL, verbose = TRUE, cacheDB = NULL)
         else
             ps <- mzR::peaks(msf, hd[numGTE(retentionTime, rtRange[1]) & numLTE(retentionTime, rtRange[2]), seqNum])
 
-        spectra <- lapply(ps, function(spec) setnames(as.data.table(spec), c("mz", "intensity")))
-        ret <- list(header = hd, spectra = spectra)
+        ret <- list(header = hd, spectra = ps)
         mzR::close(msf)
         saveCacheData("specData", ret, hash, cacheDB)
     }
@@ -156,6 +155,8 @@ averageSpectraMZR <- function(spectra, hd, clusterMzWindow, topMost, minIntensit
         return(emptyMSPeakList())
 
     sp <- spectra$spectra[hd$seqNum]
+    # convert to peaklist format
+    sp <- lapply(sp, function(spec) setnames(as.data.table(spec), c("mz", "intensity")))
     sp <- lapply(sp, assignPrecursorToMSPeakList, precursor)
 
     return(averageSpectra(sp, clusterMzWindow, topMost, minIntensityPre, minIntensityPost,

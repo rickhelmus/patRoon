@@ -16,17 +16,46 @@ void specApply(Rcpp::List spectra, double rtMin, double rtMax, double mzMin, dou
     const Rcpp::NumericVector hdSeqNums = specHeader["seqNum"];
     const Rcpp::List specList = spectra["spectra"];
     const int specCount = hdRetTimes.size();
-        
+    const double rttol = 1E-4;
+    
+    // NOTE: assume header is RT ordered (low to high)
     for (int spi=0; spi<specCount; ++spi)
     {
         const double specRt = hdRetTimes[spi];
-        
-        if (!numberWithin(specRt, rtMin, rtMax, 1E-4) || hdMSLevels[spi] != 1)
-            continue;
-        
-        const Rcpp::DataFrame peaklist = Rcpp::as<Rcpp::DataFrame>(specList[hdSeqNums[spi] - 1]); // -1: R 1 based index
-        func(specRt, peaklist["mz"], peaklist["intensity"]);
+
+        if (hdMSLevels[spi] == 1 && numberGTE(specRt, rtMin, rttol))
+        {
+            if (numberLTE(specRt, rtMax, rttol))
+            {
+                const Rcpp::NumericMatrix peaklist = Rcpp::as<Rcpp::NumericMatrix>(specList[hdSeqNums[spi] - 1]); // -1: R 1 based index
+                func(specRt, peaklist(Rcpp::_, 0), peaklist(Rcpp::_, 1));
+            }
+            else // surpassed RT range, abort
+                return;
+        }
     }
+}
+    
+double getTotMZIntFromSpec(const Rcpp::NumericVector &peakMZs, const Rcpp::NumericVector &peakInts,
+                           double mzMin, double mzMax)
+{
+    // NOTE: assume spectrum is mz ordered (low to high)
+    
+    const double mztol = 1E-8;
+    const int pCount = peakMZs.length();
+    double totInt = 0;
+    for (int pi=0; pi<pCount; ++pi)
+    {
+        if (numberGTE(peakMZs[pi], mzMin, mztol))
+        {
+            if (numberLTE(peakMZs[pi], mzMax, mztol))
+                totInt += peakInts[pi];
+            else
+                break; // surpassed mz range, abort
+        }
+    }
+    
+    return totInt;
 }
 
 }
@@ -58,17 +87,8 @@ Rcpp::NumericVector loadEICIntensities(Rcpp::List spectra, Rcpp::DataFrame featL
                       else if (closestRTDiff < rtdiff)
                           return;
                       
-                      const int pCount = peakMZs.length();
-                      
-                      double totInt = 0;
-                      for (int pi=0; pi<pCount; ++pi)
-                      {
-                          if (numberWithin(peakMZs[pi], mzMin, mzMax, 1E-8))
-                              totInt += peakInts[pi];
-                      }
-                      
                       closestRTDiff = rtdiff;
-                      closestInt = totInt;
+                      closestInt = getTotMZIntFromSpec(peakMZs, peakInts, mzMin, mzMax);
                   });
         
         intensities[fti] = closestInt;
@@ -92,16 +112,8 @@ Rcpp::List loadEICs(Rcpp::List spectra, Rcpp::List rtRanges, Rcpp::List mzRanges
         specApply(spectra, rtr[0], rtr[1], mzMin, mzMax,
                   [&](double specRt, const Rcpp::NumericVector &peakMZs, const Rcpp::NumericVector &peakInts)
                   {
-                      const int pCount = peakMZs.length();
-                      double totInt = 0;
-                      for (int pi=0; pi<pCount; ++pi)
-                      {
-                          if (numberWithin(peakMZs[pi], mzMin, mzMax, 1E-8))
-                              totInt += peakInts[pi];
-                      }
-                      
                       EICTimes.push_back(specRt);
-                      EICIntensities.push_back(totInt);
+                      EICIntensities.push_back(getTotMZIntFromSpec(peakMZs, peakInts, mzMin, mzMax));
                   });
 
         // compress data by removing any zero intensity datapoints that are inbetween two other zero intensitiy points.

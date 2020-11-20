@@ -46,8 +46,12 @@ bool compareTol(double x, double y, double tol)
     return std::fabs(x - y) <= tol;
 }
 
-bool numberWithin(double x, double minVal, double maxVal, double tol)
+bool numberLTE(double x, double y, double tol)
 {
-    return((x > minVal || compareTol(x, minVal, tol)) &&
-           (x < maxVal || compareTol(x, maxVal, tol)));
+    return x < y || compareTol(x, y, tol);
+}
+
+bool numberGTE(double x, double y, double tol)
+{
+    return x > y || compareTol(x, y, tol);
 }

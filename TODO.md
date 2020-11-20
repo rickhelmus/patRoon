@@ -91,6 +91,8 @@
     - mention that reportHTML never uses future method
     - table in handbook with which functions work and remarks (eg GenForm no batchmode)
     - mention SIRIUS output is always logged (maybe also do for classic?)
+    - NEWS
+        - optimized loading of spectra and EICs a bit
 - tests
 - limitation: local databases need to be available for MF on the localhost and nodes, both for caching and checking score types. Any workarounds? Otherwise document that location for them should be fixed.
     - force that file should be available locally so it can be used for hashing (with makeFileHash?)/scoring

@@ -252,13 +252,17 @@ initMetFragCLCommand <- function(mfSettings, spec, mfBin)
     return(list(command = "java", args = c("-jar", mfBin, paramFile), outFile = outFile))
 }
 
-generateMetFragRunData <- function(fGroups, MSPeakLists, mfSettings, topMost, identifiers, method,
+generateMetFragRunData <- function(fGroups, MSPeakLists, mfSettings, extDB, topMost, identifiers, method,
                                    adduct, database, errorRetries, timeoutRetries)
 {
     gNames <- names(fGroups)
     gTable <- groups(fGroups)
     gInfo <- groupInfo(fGroups)
     anaInfo <- analysisInfo(fGroups)
+    
+    baseHash <- makeHash(method, topMost)
+    if (!is.null(extDB))
+        baseHash <- makeHash(baseHash, extDB)
 
     ret <- sapply(gNames, function(grp)
     {
@@ -275,7 +279,7 @@ generateMetFragRunData <- function(fGroups, MSPeakLists, mfSettings, topMost, id
         if (!is.null(identifiers))
             mfSettings$PrecursorCompoundIDs <- identifiers[[grp]]
 
-        hash <- makeHash(method, mfSettings, spec, topMost)
+        hash <- makeHash(baseHash, mfSettings, spec)
 
         logf <- paste0("mfcl-", grp, ".txt")
         
@@ -588,6 +592,7 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", timeou
 
     scoreWeights <- rep(scoreWeights, length.out = length(scoreTypesMF))
     
+    extDB <- NULL
     if (isLocalDB)
     {
         extDB <- getMetFragExtDB(extraOpts[["LocalDatabasePath"]], database)
@@ -622,10 +627,12 @@ generateCompoundsMetfrag <- function(fGroups, MSPeakLists, method = "CL", timeou
     }
 
     setHash <- makeHash(fGroups, pLists, method, mfSettings, topMost, identifiers)
-
+    if (!is.null(extDB))
+        setHash <- makeHash(setHash, makeFileHash(extDB))
+    
     printf("Identifying %d feature groups with MetFrag...\n", gCount)
 
-    runData <- generateMetFragRunData(fGroups, MSPeakLists, mfSettings, topMost, identifiers, method,
+    runData <- generateMetFragRunData(fGroups, MSPeakLists, mfSettings, extDB, topMost, identifiers, method,
                                       adduct, database, errorRetries, timeoutRetries)
 
     if (method == "CL")

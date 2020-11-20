@@ -59,28 +59,16 @@
 - Reduce non-exported class only methods
 
 ## MP
-- new interface
-    - batch mode
-        - or not? It's only for GenForm, could also extend GenForm with
-            - reading multiple inputs from txt
-            - implement a timeout
-    - logging --> return stdout/stderr from run()
+
+- default GenForm to classic?
+- rename "classic"?
+- future MP
     - printOutput, eg for SIRIUS... or not?
     - showProgress
-    - waitTimeout/delayBetweenProc?
-- changes
-    - logging done in executeMultiProc()
-    - caching done in executeMultiProc()
-    - configure "engine" through options() --> "classic" and "future"
-        - let executeMultiProc() handle general things like caching and logging
-        - rename "classic"?
+    - delayBetweenProc?
     - somehow let user set future.apply scheduling and chunk.size options, probably through options()
-    - logging:
-        - enabled through an option
-        - implement in engines
-        - somehow disable for featuresOptimizerOpenMS
-            - disable through withr::with_options()?
-- default GenForm to classic?
+    - somehow disable logging for featuresOptimizerOpenMS
+        - disable through withr::with_options()?
 - docs
     - write vignette or handbook chapter
     - update sirius-args.R (mention maxProcAmount)
@@ -91,14 +79,13 @@
     - mention that reportHTML never uses future method
     - table in handbook with which functions work and remarks (eg GenForm no batchmode)
     - mention SIRIUS output is always logged (maybe also do for classic?)
+    - limitation: MF local databases need to be available on the localhost and nodes, both for caching and checking score types.
+        - location configurable through options
     - NEWS
         - optimized loading of spectra and EICs a bit
         - removed SIRIUS pre44
+        - normalizePath and hashing for MF db files
 - tests
-- limitation: local databases need to be available for MF on the localhost and nodes, both for caching and checking score types. Any workarounds? Otherwise document that location for them should be fixed.
-    - force that file should be available locally so it can be used for hashing (with makeFileHash?)/scoring
-        --> implement hashing
-- remove/update PWizBatches?
 
 
 # Future

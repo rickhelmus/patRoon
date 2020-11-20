@@ -62,9 +62,9 @@
 
 - default GenForm to classic?
 - rename "classic"?
+- remove XCMS, CAMERA and others from imports in DESCRIPTION?
 - future MP
     - printOutput, eg for SIRIUS... or not?
-    - showProgress
     - delayBetweenProc?
     - somehow let user set future.apply scheduling and chunk.size options, probably through options()
     - somehow disable logging for featuresOptimizerOpenMS
@@ -75,6 +75,7 @@
     - update handbook etc for maxProcAmount
     - patRoon.logPath, multiProcMethod
     - update ref docs for executeMultiProcess
+        - mention which args are ignored by futures
     - update docs and NEWS for SIRBatchSize --> splitBatches
     - mention that reportHTML never uses future method
     - table in handbook with which functions work and remarks (eg GenForm no batchmode)

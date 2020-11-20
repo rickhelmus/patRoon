@@ -1,5 +1,5 @@
 executeFutureCmd <- function(cmd, finishHandler, timeoutHandler, errorHandler,
-                             prepareHandler, procTimeout, logSubDir, showProgress)
+                             prepareHandler, procTimeout, logSubDir, progress)
 {
     if (!is.null(prepareHandler))
         cmd <- prepareHandler(cmd)
@@ -27,6 +27,7 @@ executeFutureCmd <- function(cmd, finishHandler, timeoutHandler, errorHandler,
         }
         else # success
         {
+            progress()
             res <- finishHandler(cmd)
             return(list(stdout = stat$stdout, stderr = stat$stderr, result = res))
         }
@@ -38,16 +39,17 @@ executeFutureCmd <- function(cmd, finishHandler, timeoutHandler, errorHandler,
 
 executeMultiProcessFuture <- function(commandQueue, finishHandler, timeoutHandler, errorHandler,
                                       prepareHandler, procTimeout, printOutput, printError, logSubDir,
-                                      showProgress, batchSize = 1, ...)
+                                      ...)
 {
     if (is.null(procTimeout))
         procTimeout <- Inf
     
+    prog <- progressr::progressor(along = commandQueue)
     results <- future.apply::future_lapply(commandQueue, patRoon:::executeFutureCmd,
                                            finishHandler = finishHandler, timeoutHandler = timeoutHandler,
                                            errorHandler = errorHandler, prepareHandler = prepareHandler,
                                            procTimeout = procTimeout, logSubDir = logSubDir,
-                                           showProgress = showProgress, future.scheduling = 1.0)
+                                           progress = prog, future.scheduling = 1.0)
 
     logPath <- getOption("patRoon.logPath", FALSE)
     if (!is.null(logSubDir) && !isFALSE(logPath))

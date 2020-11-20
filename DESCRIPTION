@@ -101,7 +101,9 @@ Imports:
     cowplot,
     jsonlite,
     Rdpack,
-    rsm
+    rsm,
+    future.apply,
+    progressr
 Suggests: 
     RDCOMClient,
     metfRag,

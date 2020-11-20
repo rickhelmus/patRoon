@@ -6,38 +6,24 @@ getSiriusBin <- function()
     return(if (checkmate::testOS("windows")) "sirius" else "sirius.sh")
 }
 
-isSIRIUSPre44 <- function()
-{
-    # SIRIUS 4.4 returns a version string when running with --version, older
-    # versions don't actually report version info...
-    return(!any(grepl("^SIRIUS 4\\.", executeCommand(getCommandWithOptPath(getSiriusBin(), "SIRIUS"),
-                                                     "--version", stdout = TRUE, stderr = FALSE))))
-}
-
 getSIRIUSCmpName <- function() "unknownCompound"
 
-getSiriusResultPath <- function(outPath, msFName, isPre44)
+getSiriusResultPath <- function(outPath, msFName)
 {
     # format is resultno_specname_compoundname, older versions start with 1, newer with 0
     msFName <- basename(tools::file_path_sans_ext(msFName))
     return(list.files(outPath, pattern = sprintf("[0-9]+_%s_%s", msFName, getSIRIUSCmpName()), full.names = TRUE))
 }
 
-getSiriusFragFiles <- function(resultPath, isPre44)
+getSiriusFragFiles <- function(resultPath)
 {
-    if (isPre44)
-        pat <- "[:0-9:]+_([A-Za-z0-9]+).*\\.ms"
-    else
-        pat <- "([A-Za-z0-9]+).*\\.tsv"
+    pat <- "([A-Za-z0-9]+).*\\.tsv"
     return(list.files(file.path(resultPath, "spectra"), full.names = TRUE, pattern = pat))
 }
 
-getFormulaFromSiriusFragFile <- function(ffile, isPre44)
+getFormulaFromSiriusFragFile <- function(ffile)
 {
-    if (isPre44)
-        pat <- "[:0-9:]+_([A-Za-z0-9]+).*\\.ms"
-    else
-        pat <- "([A-Za-z0-9]+).*\\.tsv"
+    pat <- "([A-Za-z0-9]+).*\\.tsv"
     return(gsub(pat, "\\1", basename(ffile)))
 }
 
@@ -91,7 +77,7 @@ unifySirNames <- function(sir)
 
 SIRMPFinishHandler <- function(cmd)
 {
-    pArgs <- list(adduct = cmd$adduct, isPre44 = patRoon:::isSIRIUSPre44())
+    pArgs <- list(adduct = cmd$adduct)
     if (!is.null(cmd[["processArgs"]]))
         pArgs <- c(pArgs, cmd$processArgs)
     res <- mapply(cmd$msFNames, cmd$MSMSPL, SIMPLIFY = FALSE,
@@ -116,14 +102,13 @@ SIRMPPrepareHandler <- function(cmd)
         return(ret)
     })
     
-    bArgs <- if (patRoon:::isSIRIUSPre44()) c(cmd$args, "-o", outPath, inPath) else c("-i", inPath, "-o", outPath, cmd$args)
-    
+    bArgs <- c("-i", inPath, "-o", outPath, cmd$args)
     return(utils::modifyList(cmd, list(command = command, args = bArgs, outPath = outPath, msFNames = msFNames)))
 }
 
 runSIRIUS <- function(precursorMZs, MSPLists, MSMSPLists, resNames, profile, adduct, ppmMax, elements,
                       database, noise, cores, withFingerID, fingerIDDatabase, topMost,
-                      extraOptsGeneral, extraOptsFormula, verbose, isPre44,
+                      extraOptsGeneral, extraOptsFormula, verbose,
                       processFunc, processArgs, splitBatches)
 {
     ionization <- as.character(adduct, format = "sirius")
@@ -147,18 +132,9 @@ runSIRIUS <- function(precursorMZs, MSPLists, MSMSPLists, resNames, profile, add
     if (!is.null(extraOptsFormula))
         formArgs <- c(formArgs, extraOptsFormula)
     
-    if (isPre44)
-    {
-        if (withFingerID)
-            formArgs <- c(formArgs, "--fingerid", "--fingerid-db", fingerIDDatabase)
-        args <- c(mainArgs, formArgs)
-    }
-    else
-    {
-        args <- c(mainArgs, "formula", formArgs)
-        if (withFingerID)
-            args <- c(args, "structure", "--database", fingerIDDatabase)
-    }
+    args <- c(mainArgs, "formula", formArgs)
+    if (withFingerID)
+        args <- c(args, "structure", "--database", fingerIDDatabase)
 
     batchn <- 1
     if (splitBatches) 
@@ -190,9 +166,6 @@ doSIRIUS <- function(fGroups, MSPeakLists, doFeatures, profile, adduct, relMzDev
                      extraOptsGeneral, extraOptsFormula, verbose, cacheName, processFunc, processArgs,
                      splitBatches)
 {
-    isPre44 <- isSIRIUSPre44()
-    gNames <- names(fGroups)
-    
     # only do relevant feature groups
     MSPeakLists <- MSPeakLists[, intersect(gNames, groupNames(MSPeakLists))]
     
@@ -202,7 +175,7 @@ doSIRIUS <- function(fGroups, MSPeakLists, doFeatures, profile, adduct, relMzDev
     cacheDB <- openCacheDBScope() # open manually so caching code doesn't need to on each R/W access
     baseHash <- makeHash(profile, adduct, relMzDev, elements, database, noise,
                          withFingerID, fingerIDDatabase, topMost, extraOptsGeneral,
-                         extraOptsFormula, isPre44, processArgs)
+                         extraOptsFormula, processArgs)
     setHash <- makeHash(MSPeakLists, baseHash, doFeatures)
     cachedSet <- loadCacheSet(cacheName, setHash, cacheDB)
     
@@ -262,7 +235,7 @@ doSIRIUS <- function(fGroups, MSPeakLists, doFeatures, profile, adduct, relMzDev
             
             allResults <- runSIRIUS(plmzs, mspls, msmspls, flPLMeta[cached == FALSE]$name, profile, adduct,
                                     relMzDev, elements, database, noise, cores, withFingerID, fingerIDDatabase, topMost,
-                                    extraOptsGeneral, extraOptsFormula, verbose, isPre44, processFunc, processArgs, splitBatches)
+                                    extraOptsGeneral, extraOptsFormula, verbose, processFunc, processArgs, splitBatches)
         }
         else
             allResults <- list()

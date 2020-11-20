@@ -3,11 +3,10 @@
 #' @include utils-sirius.R
 NULL
 
-processSIRIUSCompounds <- function(msFName, outPath, MSMS, database, adduct, topMost, isPre44)
+processSIRIUSCompounds <- function(msFName, outPath, cmpName, MSMS, database, adduct, topMost, hash, cacheDB)
 {
-    resFile <- if (isPre44) "summary_csi_fingerid.csv" else "structure_candidates.tsv"
-    resultPath <- getSiriusResultPath(outPath, msFName, isPre44)
-    summary <- file.path(resultPath, resFile)
+    resultPath <- getSiriusResultPath(outPath, msFName, cmpName)
+    summary <- file.path(resultPath, "structure_candidates.tsv")
     results <- scRanges <- data.table()
     
     # NOTE: SIRIUS frag results are identified by 'neutral adducts', which is
@@ -47,17 +46,15 @@ processSIRIUSCompounds <- function(msFName, outPath, MSMS, database, adduct, top
         # NOTE: fragment info is based on SIRIUS results, ie from formula
         # prediction and not by compounds! Hence, results are the same for
         # candidates with the same formula.
-        fragFiles <- getSiriusFragFiles(resultPath, isPre44)
+        fragFiles <- getSiriusFragFiles(resultPath)
         for (ff in fragFiles)
         {
-            neutralAdductFormFrag <- getFormulaFromSiriusFragFile(ff, isPre44)
+            neutralAdductFormFrag <- getFormulaFromSiriusFragFile(ff)
             
             if (neutralAdductFormFrag %in% neutralAdductForms) # may not be there if filtered out or no compound was found
             {
                 fragInfo <- fread(ff)
                 fragInfo[, c("rel.intensity", "exactmass", "ionization") := NULL]
-                if (isPre44)
-                    setnames(fragInfo, "explanation", "formula")
                 fragInfo[, PLIndex := sapply(mz, function(omz) which.min(abs(omz - MSMS$mz)))]
                 
                 wh <- which(neutralAdductForms == neutralAdductFormFrag)
@@ -121,7 +118,8 @@ generateCompoundsSIRIUS <- function(fGroups, MSPeakLists, relMzDev = 5, adduct =
                                     profile = "qtof", formulaDatabase = NULL, fingerIDDatabase = "pubchem",
                                     noise = NULL, errorRetries = 2, cores = NULL, topMost = 100, topMostFormulas = 5,
                                     extraOptsGeneral = NULL, extraOptsFormula = NULL, verbose = TRUE,
-                                    splitBatches = FALSE)
+                                    SIRBatchSize = 0, logPath = file.path("log", "sirius_compounds"),
+                                    maxProcAmount = getOption("patRoon.maxProcAmount"))
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
@@ -135,7 +133,8 @@ generateCompoundsSIRIUS <- function(fGroups, MSPeakLists, relMzDev = 5, adduct =
     aapply(checkmate::assertCount, . ~ topMost + topMostFormulas, positive = TRUE, fixed = list(add = ac))
     aapply(checkmate::assertCharacter, . ~ extraOptsGeneral + extraOptsFormula, null.ok = TRUE, fixed = list(add = ac))
     checkmate::assertFlag(verbose, add = ac)
-    checkmate::assertFlag(splitBatches, add = ac)
+    checkmate::assertCount(SIRBatchSize, add = ac)
+    assertMultiProcArgs(logPath, maxProcAmount, add = ac)
     checkmate::reportAssertions(ac)
 
     adduct <- checkAndToAdduct(adduct)
@@ -147,9 +146,9 @@ generateCompoundsSIRIUS <- function(fGroups, MSPeakLists, relMzDev = 5, adduct =
     
     results <- doSIRIUS(fGroups, MSPeakLists, FALSE, profile, adduct, relMzDev, elements,
                         formulaDatabase, noise, cores, TRUE, fingerIDDatabase, topMost, extraOptsGeneral, extraOptsFormula,
-                        verbose, "compoundsSIRIUS", patRoon:::processSIRIUSCompounds,
+                        verbose, "compoundsSIRIUS", processSIRIUSCompounds,
                         list(database = fingerIDDatabase, topMost = topMost),
-                        splitBatches)
+                        SIRBatchSize, logPath, maxProcAmount)
     
     # prune empty/NULL results
     if (length(results) > 0)

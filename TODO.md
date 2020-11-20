@@ -93,11 +93,11 @@
     - mention SIRIUS output is always logged (maybe also do for classic?)
     - NEWS
         - optimized loading of spectra and EICs a bit
+        - removed SIRIUS pre44
 - tests
 - limitation: local databases need to be available for MF on the localhost and nodes, both for caching and checking score types. Any workarounds? Otherwise document that location for them should be fixed.
     - force that file should be available locally so it can be used for hashing (with makeFileHash?)/scoring
         --> implement hashing
-- remove pre44 SIRIUS support: doesn't work with future procs at the moment, and doesn't seem useful to keep
 - remove/update PWizBatches?
 
 

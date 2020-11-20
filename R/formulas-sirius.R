@@ -5,7 +5,7 @@
 NULL
 
 # callback for executeMultiProcess()
-processSIRIUSFormulas <- function(msFName, outPath, adduct, isPre44, ...)
+processSIRIUSFormulas <- function(msFName, outPath, adduct, ...)
 {
     noResult <- forms <- data.table(neutral_formula = character(0), formula = character(0),
                                     adduct = character(0), score = numeric(0), MSMSScore = numeric(0),
@@ -15,41 +15,34 @@ processSIRIUSFormulas <- function(msFName, outPath, adduct, isPre44, ...)
                                     neutral_loss = character(0), explainedPeaks = integer(0), explainedIntensity = numeric(0))
     
     
-    resFile <- if (isPre44) "summary_sirius.csv" else "formula_candidates.tsv"
-    resultPath <- getSiriusResultPath(outPath, msFName, isPre44)
-    summary <- file.path(resultPath, resFile)
+    resultPath <- getSiriusResultPath(outPath, msFName)
+    summary <- file.path(resultPath, "formula_candidates.tsv")
     if (length(summary) == 0 || length(summary) == 0 || !file.exists(summary))
         forms <- noResult
     else
     {
         forms <- fread(summary)
-        fragFiles <- getSiriusFragFiles(resultPath, isPre44)
+        fragFiles <- getSiriusFragFiles(resultPath)
         
         if (nrow(forms) == 0 || length(fragFiles) == 0)
             forms <- noResult
         else
         {
-            if (isPre44)
-                setnames(forms, c("formula", "treeScore"), c("neutral_formula", "MSMSScore"))
-            else
-            {
-                setnames(forms, c("molecularFormula", "precursorFormula", "SiriusScore",
-                                  "TreeScore", "IsotopeScore", "numExplainedPeaks", "medianMassErrorFragmentPeaks(ppm)",
-                                  "medianAbsoluteMassErrorFragmentPeaks(ppm)", "massErrorPrecursor(ppm)"),
-                         c("neutral_formula", "neutral_adduct_formula", "score", "MSMSScore", "isoScore",
-                           "explainedPeaks", "error_frag_median", "error_frag_median_abs", "error"))
-            }
+            setnames(forms, c("molecularFormula", "precursorFormula", "SiriusScore",
+                              "TreeScore", "IsotopeScore", "numExplainedPeaks", "medianMassErrorFragmentPeaks(ppm)",
+                              "medianAbsoluteMassErrorFragmentPeaks(ppm)", "massErrorPrecursor(ppm)"),
+                     c("neutral_formula", "neutral_adduct_formula", "score", "MSMSScore", "isoScore",
+                       "explainedPeaks", "error_frag_median", "error_frag_median_abs", "error"))
             
             frags <- rbindlist(lapply(fragFiles, function(ff)
             {
                 fragInfo <- fread(ff)
                 setnames(fragInfo,
-                         c("mz", "intensity", "exactmass", if (isPre44) "explanation" else "formula"),
+                         c("mz", "intensity", "exactmass", "formula"),
                          c("frag_mz", "frag_intensity", "frag_formula_mz", "frag_neutral_formula"))
                 fragInfo[, rel.intensity := NULL]
-                if (!isPre44)
-                    fragInfo[, ionization := NULL]
-                fragInfo[, neutral_adduct_formula := getFormulaFromSiriusFragFile(ff, isPre44)]
+                fragInfo[, ionization := NULL]
+                fragInfo[, neutral_adduct_formula := getFormulaFromSiriusFragFile(ff)]
                 return(fragInfo)
             }))
             

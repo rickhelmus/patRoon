@@ -124,12 +124,12 @@ findFeaturesOpenMS <- function(analysisInfo, noiseThrInt = 1000, chromSNR = 3, c
     {
         fList <- executeMultiProcess(cmdQueue, function(cmd, ...)
         {
-            fts <- importFeatureXML(cmd$featFile)
+            fts <- patRoon:::importFeatureXML(cmd$featFile)
             return(fts)
         }, prepareHandler = function(cmd)
         {
             ffile <- tempfile(fileext = ".featureXML")
-            cmd <- do.call(getOpenMSFFCommand, c(list(cmd$dataFile, ffile), params))
+            cmd <- do.call(patRoon:::getOpenMSFFCommand, c(list(cmd$dataFile, ffile), params))
             return(c(list(featFile = ffile), cmd))
         }, showProgress = verbose, logSubDir = "openms", cacheName = "featuresOpenMS")
         

@@ -92,7 +92,6 @@
 - remove pre44 SIRIUS support: doesn't work with future procs at the moment, and doesn't seem useful to keep
 - remove/update PWizBatches?
 - move main future handler to separate function?
-- update FFM for local functions
 
 
 # Future

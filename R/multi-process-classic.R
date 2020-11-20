@@ -163,7 +163,7 @@ executeMultiProcessClassic <- function(commandQueue, finishHandler,
     if (length(commandQueue) == 0)
         return(list())
     
-    maxProcAmount <- getOption("patRoon.maxProcAmount")
+    maxProcAmount <- getOption("patRoon.MP.maxProcs")
     runningProcs <- vector("list", maxProcAmount)
     runningProcInfo <- vector("list", maxProcAmount)
     
@@ -182,7 +182,7 @@ executeMultiProcessClassic <- function(commandQueue, finishHandler,
     finishedCommands <- 0
     lastCommandTime <- 0 # at which time (in ms) the last command was started
 
-    logPath <- getOption("patRoon.logPath", FALSE)
+    logPath <- getOption("patRoon.MP.logPath", FALSE)
     if (!is.null(logSubDir) && !isFALSE(logPath))
     {
         logPath <- file.path(logPath, logSubDir)

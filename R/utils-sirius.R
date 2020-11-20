@@ -139,8 +139,8 @@ runSIRIUS <- function(precursorMZs, MSPLists, MSMSPLists, resNames, profile, add
     batchn <- 1
     if (splitBatches) 
     {
-        mpm <- getOption("patRoon.multiProcMethod", "classic")
-        batchn <- if (mpm == "classic") getOption("patRoon.maxProcAmount") else future::nbrOfWorkers()
+        mpm <- getOption("patRoon.MP.method", "classic")
+        batchn <- if (mpm == "classic") getOption("patRoon.MP.maxProcs") else future::nbrOfWorkers()
     }
     batches <- splitInNBatches(seq_along(precursorMZs), batchn)
     

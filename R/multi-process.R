@@ -103,12 +103,12 @@ executeMultiProcess <- function(commandQueue, finishHandler,
     if (length(commandQueue) > 0)
     {
         if (is.null(method))
-            method <- getOption("patRoon.multiProcMethod", "classic")
+            method <- getOption("patRoon.MP.method", "classic")
         f <- switch(method,
                     classic = executeMultiProcessClassic,
                     future = executeMultiProcessFuture)
         if (is.null(f))
-            stop("Wrong value set for patRoon.multiProcMethod! Should be \"classic\" or \"future\"")
+            stop("Wrong value set for patRoon.MP.method! Should be \"classic\" or \"future\"")
         
         results <- f(commandQueue = commandQueue, finishHandler = finishHandler, timeoutHandler = timeoutHandler,
                      errorHandler = errorHandler, prepareHandler = prepareHandler, procTimeout = procTimeout,

@@ -18,7 +18,7 @@ performMPTest <- function(len, fail = numeric(), timeout = numeric(), failFirst 
                           maxProcAmount = NULL, ...)
 {
     if (!is.null(maxProcAmount))
-        withr::local_options(list(patRoon.maxProcAmount = maxProcAmount))
+        withr::local_options(list(patRoon.MP.maxProcs = maxProcAmount))
     
     if (Sys.info()[["sysname"]] == "Windows")
     {
@@ -106,7 +106,7 @@ test_that("multi-process functionality", {
 })
 
 test_that("multi-process future functionality", {
-    withr::local_options(list(patRoon.multiProcMethod = "future"))
+    withr::local_options(list(patRoon.MP.method = "future"))
     future::plan("multisession", workers = 2)
     withr::defer(future::plan("sequential"))
                         

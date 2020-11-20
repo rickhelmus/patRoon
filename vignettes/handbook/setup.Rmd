@@ -23,14 +23,16 @@ if (runData)
                                                  rep("repl4", 1)))
     
     # set maxProcAmount = 1 to limit FFM memory usage a bit on CI
-    fList <- findFeatures(anaInfo, "openms", maxProcAmount = 1)
+    getFeats <- function(ai) withr::with_options(list(patRoon.multiproc.max = 1), findFeatures(ai, "openms"))
+    
+    fList <- getFeats(anaInfo)
     fGroups <- fGroupsUF <- groupFeatures(fList, "openms")
     fGroups <- filter(fGroups, preAbsMinIntensity = 100, absMinIntensity = 10000,
                       relMinReplicateAbundance = 1, maxReplicateIntRSD = 0.75,
                       blankThreshold = 5, removeBlanks = TRUE,
                       retentionRange = c(120, Inf), mzRange = NULL)
 
-    fListRG <- findFeatures(anaInfoRG, "openms", maxProcAmount = 1)
+    fListRG <- getFeats(anaInfoRG)
     fGroupsRG <- groupFeatures(fListRG, "openms")
     fGroupsRG <- filter(fGroupsRG, preAbsMinIntensity = 100, absMinIntensity = 10000)
     
@@ -38,7 +40,7 @@ if (runData)
                                         groups = c(rep("solvent", 3), rep("standard", 3)),
                                         blanks = "solvent",
                                         concs = c(NA, NA, NA, 1, 2, 3))
-    fListConc <- findFeatures(anaInfoConc, "openms", maxProcAmount = 1)
+    fListConc <- getFeats(anaInfoConc)
     fGroupsConc <- groupFeatures(fListConc, "openms")
     fGroupsConc <- filter(fGroupsConc, preAbsMinIntensity = 100, absMinIntensity = 10000,
                           relMinReplicateAbundance = 1, maxReplicateIntRSD = 0.75,

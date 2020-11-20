@@ -66,14 +66,13 @@
 - future MP
     - printOutput, eg for SIRIUS... or not?
     - delayBetweenProc?
-    - somehow let user set future.apply scheduling and chunk.size options, probably through options()
     - somehow disable logging for featuresOptimizerOpenMS
         - disable through withr::with_options()?
 - docs
     - write vignette or handbook chapter
     - update sirius-args.R (mention maxProcAmount)
     - update handbook etc for maxProcAmount
-    - patRoon.logPath, multiProcMethod
+    - new/changed MP options
     - update ref docs for executeMultiProcess
         - mention which args are ignored by futures
     - update docs and NEWS for SIRBatchSize --> splitBatches

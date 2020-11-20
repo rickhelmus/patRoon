@@ -64,7 +64,7 @@ NULL
 #'   \item \code{patRoon.cache.fileName}: a \code{character} specifying the name
 #'   of the cache file (default is \file{cache.sqlite}).
 #'
-#'   \item \code{patRoon.maxProcAmount}: The maximum number of processes that
+#'   \item \code{patRoon.MP.maxProcs}: The maximum number of processes that
 #'   should be initiated in parallel. A good starting point is the number of
 #'   physical cores, which is the default as detected by
 #'   \code{\link[parallel]{detectCores}}.

@@ -402,7 +402,6 @@ reportCompoundSpectra <- function(fGroups, path, MSPeakLists, compounds, compsCl
     gNames <- names(fGroups)
     gInfo <- groupInfo(fGroups)
     anaInfo <- analysisInfo(fGroups)
-    # specs <- loadAllSpectra(anaInfo$analysis, anaInfo$path)
     pLists <- peakLists(MSPeakLists)
 
     if (length(compounds) == 0)

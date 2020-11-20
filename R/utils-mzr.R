@@ -26,13 +26,6 @@ loadSpectra <- function(path, rtRange = NULL, verbose = TRUE, cacheDB = NULL)
     return(ret)
 }
 
-loadAllSpectra <- function(analyses, paths)
-{
-    ret <- lapply(seq_along(analyses), function(i) loadSpectra(getMzMLOrMzXMLAnalysisPath(analyses[i], paths[i])))
-    names(ret) <- analyses
-    return(ret)
-}
-
 getSpectraHeader <- function(spectra, rtRange, MSLevel, precursor, precursorMzWindow)
 {
     hd <- spectra$header[numGTE(retentionTime, rtRange[1]) & numLTE(retentionTime, rtRange[2]) & msLevel == MSLevel]

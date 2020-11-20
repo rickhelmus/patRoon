@@ -61,6 +61,9 @@
 ## MP
 - new interface
     - batch mode
+        - or not? It's only for GenForm, could also extend GenForm with
+            - reading multiple inputs from txt
+            - implement a timeout
     - logging --> return stdout/stderr from run()
     - printOutput, eg for SIRIUS... or not?
     - showProgress
@@ -76,6 +79,7 @@
         - enabled through an option
         - implement in engines
         - somehow disable for featuresOptimizerOpenMS
+            - disable through withr::with_options()?
 - default GenForm to classic?
 - docs
     - write vignette or handbook chapter
@@ -85,13 +89,14 @@
     - update ref docs for executeMultiProcess
     - update docs and NEWS for SIRBatchSize --> splitBatches
     - mention that reportHTML never uses future method
+    - table in handbook with which functions work and remarks (eg GenForm no batchmode)
+    - mention SIRIUS output is always logged (maybe also do for classic?)
 - tests
 - limitation: local databases need to be available for MF on the localhost and nodes, both for caching and checking score types. Any workarounds? Otherwise document that location for them should be fixed.
     - force that file should be available locally so it can be used for hashing (with makeFileHash?)/scoring
         --> implement hashing
 - remove pre44 SIRIUS support: doesn't work with future procs at the moment, and doesn't seem useful to keep
 - remove/update PWizBatches?
-- move main future handler to separate function?
 
 
 # Future

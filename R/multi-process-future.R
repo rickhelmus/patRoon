@@ -1,3 +1,41 @@
+executeFutureCmd <- function(cmd, finishHandler, timeoutHandler, errorHandler,
+                             prepareHandler, procTimeout, logSubDir, showProgress)
+{
+    if (!is.null(prepareHandler))
+        cmd <- prepareHandler(cmd)
+    timeoutRetries <- errorRetries <- 0
+    while (TRUE)
+    {
+        stat <- processx::run(cmd$command, cmd$args, error_on_status = FALSE,
+                              timeout = procTimeout, cleanup_tree = TRUE)
+        
+        if (stat$timeout)
+        {
+            if (timeoutHandler(cmd = cmd, retries = errorRetries))
+            {
+                timeoutRetries <- timeoutRetries + 1
+                next
+            }
+        }
+        else if (stat$status != 0)
+        {
+            if (errorHandler(cmd = cmd, exitStatus = stat$status, retries = errorRetries))
+            {
+                errorRetries <- errorRetries + 1
+                next
+            }
+        }
+        else # success
+        {
+            res <- finishHandler(cmd)
+            return(list(stdout = stat$stdout, stderr = stat$stderr, result = res))
+        }
+        
+        # failure
+        return(list(stdout = stat$stdout, stderr = stat$stderr, result = NULL))
+    }
+}
+
 executeMultiProcessFuture <- function(commandQueue, finishHandler, timeoutHandler, errorHandler,
                                       prepareHandler, procTimeout, printOutput, printError, logSubDir,
                                       showProgress, batchSize = 1, ...)
@@ -5,42 +43,11 @@ executeMultiProcessFuture <- function(commandQueue, finishHandler, timeoutHandle
     if (is.null(procTimeout))
         procTimeout <- Inf
     
-    results <- future.apply::future_lapply(commandQueue, function(cmd)
-    {
-        if (!is.null(prepareHandler))
-            cmd <- prepareHandler(cmd)
-        timeoutRetries <- errorRetries <- 0
-        while (TRUE)
-        {
-            stat <- processx::run(cmd$command, cmd$args, error_on_status = FALSE,
-                                  timeout = procTimeout, cleanup_tree = TRUE)
-            
-            if (stat$timeout)
-            {
-                if (timeoutHandler(cmd = cmd, retries = errorRetries))
-                {
-                    timeoutRetries <- timeoutRetries + 1
-                    next
-                }
-            }
-            else if (stat$status != 0)
-            {
-                if (errorHandler(cmd = cmd, exitStatus = stat$status, retries = errorRetries))
-                {
-                    errorRetries <- errorRetries + 1
-                    next
-                }
-            }
-            else # success
-            {
-                res <- finishHandler(cmd)
-                return(list(stdout = stat$stdout, stderr = stat$stderr, result = res))
-            }
-            
-            # failure
-            return(list(stdout = stat$stdout, stderr = stat$stderr, result = NULL))
-        }
-    }, future.scheduling = 1.0)
+    results <- future.apply::future_lapply(commandQueue, patRoon:::executeFutureCmd,
+                                           finishHandler = finishHandler, timeoutHandler = timeoutHandler,
+                                           errorHandler = errorHandler, prepareHandler = prepareHandler,
+                                           procTimeout = procTimeout, logSubDir = logSubDir,
+                                           showProgress = showProgress, future.scheduling = 1.0)
 
     logPath <- getOption("patRoon.logPath", FALSE)
     if (!is.null(logSubDir) && !isFALSE(logPath))

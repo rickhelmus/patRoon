@@ -248,7 +248,7 @@ doSIRIUS <- function(fGroups, MSPeakLists, doFeatures, profile, adduct, relMzDev
         flPLMeta <- flPLMeta[mapply(group, analysis, FUN = function(grp, ana)
         {
             anai <- match(ana, analyses(fGroups))
-            return(!is.na(anai) && ftind[[group]][anai] != 0)
+            return(!is.na(anai) && ftind[[grp]][anai] != 0)
         })]
         flattenedPLists <- flattenedPLists[flPLMeta$name]
     }

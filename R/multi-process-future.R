@@ -11,7 +11,7 @@ executeFutureCmd <- function(cmd, finishHandler, timeoutHandler, errorHandler,
         
         if (stat$timeout)
         {
-            if (timeoutHandler(cmd = cmd, retries = errorRetries))
+            if (timeoutHandler(cmd = cmd, retries = timeoutRetries))
             {
                 timeoutRetries <- timeoutRetries + 1
                 next

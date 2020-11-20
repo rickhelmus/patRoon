@@ -85,7 +85,6 @@
         - optimized loading of spectra and EICs a bit
         - removed SIRIUS pre44
         - normalizePath and hashing for MF db files
-- tests
 
 
 # Future

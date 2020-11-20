@@ -104,3 +104,23 @@ test_that("multi-process functionality", {
     performMPTest(4, delay = TRUE) # delay is below timeout, shouldn't fail
     performMPTest(4, delay = TRUE, batchSize = 4, maxProcAmount = 1) # batch process will take longer
 })
+
+test_that("multi-process future functionality", {
+    withr::local_options(list(patRoon.multiProcMethod = "future"))
+    future::plan("multisession", workers = 2)
+    withr::defer(future::plan("sequential"))
+                        
+    performMPTest(10)
+    performMPTest(3, failFirst = TRUE, errorHandler = ehandler)
+    
+    performMPTest(10, fail = c(2, 8))
+    performMPTest(10, fail = c(2, 8), errorHandler = ehandler)
+    performMPTest(10, fail = c(1, 10))
+    performMPTest(2, fail = c(1, 2))
+    
+    performMPTest(10, timeout = c(2, 8))
+    performMPTest(10, timeout = c(2, 8), timeoutHandler = thandler)
+    performMPTest(10, timeout = c(1, 10))
+    performMPTest(2, timeout = c(1, 2))
+    performMPTest(4, delay = TRUE) # delay is below timeout, shouldn't fail
+})

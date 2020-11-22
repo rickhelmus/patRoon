@@ -508,6 +508,17 @@ MFMPErrorHandler <- function(cmd, exitStatus, retries)
 #'   \href{wastewater}{https://zenodo.org/record/3472781#.XnjMAHLvKUk} metadata
 #'   are also supported. Note that only recent \command{MetFrag} versions (>=
 #'   \samp{2.4.5}) support these libraries.
+#'   
+#' @section Parallelization: When local database files are used with
+#'   \code{generateCompoundsMetFrag} (\emph{e.g.} when \code{database} is set to
+#'   \code{"pubchemlite"}, \code{"csv"} etc.) and
+#'   \option{patRoon.MP.method="future"}, then the database file must be present
+#'   on all the nodes. When \code{pubchemlite} or \code{comptox} is used, the
+#'   location for these databases can be configured on the host with the
+#'   respective package options (\option{patRoon.path.MetFragPubChemLite} and
+#'   \option{patRoon.path.MetFragCompTox}). Note that these files must
+#'   \emph{also} be present on the local host computer, even if it is not
+#'   participating in computations.
 #'
 #' @references \insertRef{Ruttkies2016}{patRoon}
 #'

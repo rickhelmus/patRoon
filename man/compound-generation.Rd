@@ -5,14 +5,14 @@
 \alias{compound-generation}
 \alias{generateCompounds,featureGroups-method}
 \alias{generateCompounds}
-\alias{generateCompoundsMetfrag}
+\alias{generateCompoundsMetFrag}
 \alias{generateCompoundsSIRIUS}
 \alias{compoundScorings}
 \title{Automatic compound identification}
 \usage{
 \S4method{generateCompounds}{featureGroups}(fGroups, MSPeakLists, algorithm, ...)
 
-generateCompoundsMetfrag(
+generateCompoundsMetFrag(
   fGroups,
   MSPeakLists,
   method = "CL",
@@ -269,12 +269,12 @@ before feature groups have been prioritized.
 
 \code{generateCompounds} is a generic function that will generate compounds
   using one of the supported algorithms. The actual functionality is provided
-  by algorithm specific functions such as \code{generateCompoundsMetfrag} and
+  by algorithm specific functions such as \code{generateCompoundsMetFrag} and
   \code{generateCompoundsSIRIUS}. While these functions may be called directly,
   \code{generateCompounds} provides a generic interface and is therefore usually
   preferred.
 
-\code{generateCompoundsMetfrag} uses the \pkg{metfRag} package or
+\code{generateCompoundsMetFrag} uses the \pkg{metfRag} package or
   \command{MetFrag CL} for compound identification (see
   \url{http://ipb-halle.github.io/MetFrag/}). Several online compound
   databases such as \href{https://pubchem.ncbi.nlm.nih.gov/}{PubChem} and
@@ -300,9 +300,9 @@ before feature groups have been prioritized.
 }
 \note{
 For annotations performed with \command{SIRIUS} it is often the fastest
-  to keep the default \code{SIRBatchSize=0}. In this case, the
-  \code{maxProcAmount} argument will be ignored and all \command{SIRIUS}
-  output will be printed to the terminal (unless \code{verbose=FALSE}).
+  to keep the default \code{splitBatches=FALSE}. In this case, all
+  \command{SIRIUS} output will be printed to the terminal (unless
+  \code{verbose=FALSE} or \option{patRoon.MP.method="future"}).
 }
 \section{Scorings}{
  Each algorithm implements their own scoring system. Their
@@ -393,6 +393,17 @@ For annotations performed with \command{SIRIUS} it is often the fastest
  \code{generateCompoundsMetFrag} and \code{generateCompoundsSIRIUS} uses multiprocessing to parallelize
   computations. Please see the handbook for more details and
   \link[=patRoon-package]{patRoon options} for configuration options.
+
+ When local database files are used with
+  \code{generateCompoundsMetFrag} (\emph{e.g.} when \code{database} is set to
+  \code{"pubchemlite"}, \code{"csv"} etc.) and
+  \option{patRoon.MP.method="future"}, then the database file must be present
+  on all the nodes. When \code{pubchemlite} or \code{comptox} is used, the
+  location for these databases can be configured on the host with the
+  respective package options (\option{patRoon.path.MetFragPubChemLite} and
+  \option{patRoon.path.MetFragCompTox}). Note that these files must
+  \emph{also} be present on the local host computer, even if it is not
+  participating in computations.
 }
 
 \section{Usage of MetFrag databases}{

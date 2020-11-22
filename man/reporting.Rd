@@ -149,7 +149,7 @@ further annotation of compound MS/MS spectra.}
 
 \item{compoundsOnlyUsedScorings}{If \code{TRUE} then only scorings are plotted
 that actually have been used to rank data (see the \code{scoreTypes}
-argument to \code{\link{generateCompoundsMetfrag}} for more details).}
+argument to \code{\link{generateCompoundsMetFrag}} for more details).}
 
 \item{MSPeakLists}{A \code{\link{MSPeakLists}} object that is
 \emph{mandatory} when spectra for formulae and/or compounds will be
@@ -242,6 +242,16 @@ Any formulae and compounds for feature groups which are not present
   within \code{fGroups} (\emph{i.e.} because it has been subset afterwards)
   will not be reported.
 }
+\section{Parallelization}{
+ reportHTML uses multiprocessing to parallelize
+  computations. Please see the handbook for more details and
+  \link[=patRoon-package]{patRoon options} for configuration options.
+
+ Currently, \code{reportHTML} only uses
+  \code{"classic"} multiprocessing, regardless of the
+  \option{patRoon.MP.method} option.
+}
+
 \references{
 Creating MetFrag landing page URLs based on code from
   \href{https://github.com/Treutler/MetFamily}{MetFamily} R package. \cr\cr

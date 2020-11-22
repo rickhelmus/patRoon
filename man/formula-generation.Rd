@@ -282,9 +282,9 @@ If any errors related to \command{DCOM} appear it might be necessary to
   the \code{timeout} argument).
 
 For annotations performed with \command{SIRIUS} it is often the fastest
-  to keep the default \code{SIRBatchSize=0}. In this case, the
-  \code{maxProcAmount} argument will be ignored and all \command{SIRIUS}
-  output will be printed to the terminal (unless \code{verbose=FALSE}).
+  to keep the default \code{splitBatches=FALSE}. In this case, all
+  \command{SIRIUS} output will be printed to the terminal (unless
+  \code{verbose=FALSE} or \option{patRoon.MP.method="future"}).
 }
 \section{Scorings}{
  Each algorithm implements their own scoring system. Their

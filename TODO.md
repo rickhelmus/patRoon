@@ -60,7 +60,6 @@
 
 ## MP
 
-- default GenForm to classic?
 - rename "classic"?
 - remove XCMS, CAMERA and others from imports in DESCRIPTION?
 - future MP
@@ -74,8 +73,6 @@
         - table in handbook with which functions work and remarks (eg GenForm no batchmode, reportHTML no futures)
     - ref
         - update uses-multiProc.R with handbook link/section name?
-        - limitation: MF local databases need to be available on the localhost and nodes, both for caching and checking score types.
-            - location configurable through options
     - NEWS
         - optimized loading of spectra and EICs a bit
         - removed SIRIUS pre44

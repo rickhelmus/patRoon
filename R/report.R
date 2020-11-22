@@ -791,6 +791,13 @@ setMethod("reportPDF", "featureGroups", function(fGroups, path, reportFGroups,
 #'   guarentees equal report files when `reportHTML()` is called multiple times
 #'   with equal arguments.
 #'
+#' @templateVar what reportHTML
+#' @template uses-multiProc
+#' 
+#' @section Parallelization: Currently, \code{reportHTML} only uses
+#'   \code{"classic"} multiprocessing, regardless of the
+#'   \option{patRoon.MP.method} option.
+#'
 #' @references Creating MetFrag landing page URLs based on code from
 #'   \href{https://github.com/Treutler/MetFamily}{MetFamily} R package. \cr\cr
 #'   \addCitations{knitr}{2} \cr\cr \addCitations{knitr}{3}

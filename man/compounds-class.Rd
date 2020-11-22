@@ -258,7 +258,7 @@ faster.}
 
 \item{onlyUsed}{If \code{TRUE} then only scorings are plotted that actually
 have been used to rank data (see the \code{scoreTypes} argument to
-\code{\link{generateCompoundsMetfrag}} for more details).}
+\code{\link{generateCompoundsMetFrag}} for more details).}
 
 \item{MSPeakLists}{The \code{\link{MSPeakLists}} object that was used to
 generate the candidate}
@@ -380,7 +380,7 @@ feature groups for which data is present in this object.
 \item \code{identifiers}: Returns a list containing for each feature group a
 character vector with database identifiers for all candidate compounds. The
 list is named by feature group names, and is typically used with the
-\code{identifiers} option of \code{\link{generateCompoundsMetfrag}}.
+\code{identifiers} option of \code{\link{generateCompoundsMetFrag}}.
 
 \item \code{filter}: Provides rule based filtering for generated compounds.
 Useful to eliminate unlikely candidates and speed up further processing.

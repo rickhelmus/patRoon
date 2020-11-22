@@ -791,7 +791,7 @@ setMethod("reportPDF", "featureGroups", function(fGroups, path, reportFGroups,
 #'   guarentees equal report files when `reportHTML()` is called multiple times
 #'   with equal arguments.
 #'
-#' @templateVar what reportHTML
+#' @templateVar what \code{reportHTML}
 #' @template uses-multiProc
 #' 
 #' @section Parallelization: Currently, \code{reportHTML} only uses

@@ -243,7 +243,7 @@ Any formulae and compounds for feature groups which are not present
   will not be reported.
 }
 \section{Parallelization}{
- reportHTML uses multiprocessing to parallelize
+ \code{reportHTML} uses multiprocessing to parallelize
   computations. Please see the handbook for more details and
   \link[=patRoon-package]{patRoon options} for configuration options.
 

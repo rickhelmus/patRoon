@@ -64,18 +64,19 @@
 - rename "classic"?
 - remove XCMS, CAMERA and others from imports in DESCRIPTION?
 - future MP
-    - printOutput, eg for SIRIUS... or not?
     - delayBetweenProc?
     - somehow disable logging for featuresOptimizerOpenMS
         - disable through withr::with_options()?
 - docs
-    - write vignette or handbook chapter
-    - update handbook etc for maxProcAmount
-    - new/changed MP options
-    - table in handbook with which functions work and remarks (eg GenForm no batchmode, reportHTML no futures)
-    - mention SIRIUS output is always logged (maybe also do for classic?)
-    - limitation: MF local databases need to be available on the localhost and nodes, both for caching and checking score types.
-        - location configurable through options
+    - handbook/tutorial
+        - update parallelization section
+        - update handbook etc for maxProcAmount
+        - table in handbook with which functions work and remarks (eg GenForm no batchmode, reportHTML no futures)
+    - ref
+        - new/changed MP options
+        - mention SIRIUS output is always logged (maybe also do for classic?)
+        - limitation: MF local databases need to be available on the localhost and nodes, both for caching and checking score types.
+            - location configurable through options
     - NEWS
         - optimized loading of spectra and EICs a bit
         - removed SIRIUS pre44

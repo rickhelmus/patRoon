@@ -275,6 +275,7 @@ processGenFormResultFile <- function(file, isMSMS, adduct, topMost)
 #'   run sequentially in each parallel process. Combining commands with short
 #'   runtimes (such as \command{GenForm}) can significantly increase parallel
 #'   performance. For more information see \code{\link{executeMultiProcess}}.
+#'   Note that this is ignored if \options{patRoon.MP.method="future"}.
 #'
 #' @note \code{generateFormulasGenForm} always sets the \option{exist} and
 #'   \option{oei} \command{GenForm} commandline options.
@@ -285,6 +286,11 @@ processGenFormResultFile <- function(file, isMSMS, adduct, topMost)
 #'   formula calculation may need a very long time. Timeouts are used to avoid
 #'   excessive computational times by terminating long running commands (set by
 #'   the \code{timeout} argument).
+#'
+#'   When \code{futures} are used for parallel processing
+#'   (\code{patRoon.MP.method="future"}), calculations with \command{GenForm}
+#'   are done with batch mode is disabled (see \code{batchSize} argument), which
+#'   generally limit overall performance.
 #'
 #' @references \insertRef{Meringer2011}{patRoon}
 #'

@@ -57,7 +57,7 @@ generateFormulasSIRIUS(
   calculateFeatures = TRUE,
   featThreshold = 0.75,
   verbose = TRUE,
-  SIRBatchSize = 0
+  splitBatches = FALSE
 )
 
 formulaScorings()
@@ -164,7 +164,8 @@ commandline option.}
 \item{batchSize}{Maximum number of \command{GenForm} commands that should be
 run sequentially in each parallel process. Combining commands with short
 runtimes (such as \command{GenForm}) can significantly increase parallel
-performance. For more information see \code{\link{executeMultiProcess}}.}
+performance. For more information see \code{\link{executeMultiProcess}}.
+Note that this is ignored if \options{patRoon.MP.method="future"}.}
 
 \item{profile}{Name of the configuration profile, for example:
 \option{"qtof"}, \option{"orbitrap"}, \option{"fticr"}. Sets the
@@ -191,13 +192,12 @@ manual for more details. Set to \code{NULL} to ignore.}
 
 \item{verbose}{If \code{TRUE} then more output is shown in the terminal.}
 
-\item{SIRBatchSize}{The maximum number of calculations done by
-\command{SIRIUS}. If this number is less than the amount of features to be
-calculated then calculations will be evenly split over multiple
-\command{SIRIUS} calls (which may be run in parallel if
-\command{maxProcAmount>1}). If \code{SIRBatchSize=0} then all feature
-calculations are performed from a single \command{SIRIUS} exection, which
-is often the fastest.}
+\item{splitBatches}{If \code{TRUE} then the calculations done by
+\command{SIRIUS} will be evenly split over multiple \command{SIRIUS} calls
+(which may be run in parallel depending on the \link[=patRoon-package]{set
+package options}). If \code{splitBatches=FALSE} then all feature
+calculations are performed from a single \command{SIRIUS} execution, which
+is often the fastest if calculations are performed on a single computer.}
 }
 \value{
 A \code{\link{formulas}} object containing all generated formulae.
@@ -280,6 +280,11 @@ If any errors related to \command{DCOM} appear it might be necessary to
   formula calculation may need a very long time. Timeouts are used to avoid
   excessive computational times by terminating long running commands (set by
   the \code{timeout} argument).
+
+  When \code{futures} are used for parallel processing
+  (\code{patRoon.MP.method="future"}), calculations with \command{GenForm}
+  are done with batch mode is disabled (see \code{batchSize} argument), which
+  generally limit overall performance.
 
 For annotations performed with \command{SIRIUS} it is often the fastest
   to keep the default \code{SIRBatchSize=0}. In this case, the
@@ -368,8 +373,9 @@ Explanation:
 \references{
 \insertRef{Meringer2011}{patRoon}
 
-\insertRef{Dhrkop2019}{patRoon} \cr\cr \insertRef{Duhrkop2015}{patRoon} \cr\cr
-  \insertRef{Duhrkop2015-2}{patRoon} \cr\cr \insertRef{Bcker2008}{patRoon}
+\insertRef{Dhrkop2019}{patRoon} \cr\cr
+  \insertRef{Duhrkop2015}{patRoon} \cr\cr \insertRef{Duhrkop2015-2}{patRoon}
+  \cr\cr \insertRef{Bcker2008}{patRoon}
 }
 \seealso{
 \code{\link{formulas-class}}. The

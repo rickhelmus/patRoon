@@ -778,8 +778,12 @@ setMethod("reportPDF", "featureGroups", function(fGroups, path, reportFGroups,
 #'   large amounts of data to prevent \command{pandoc} from running out of
 #'   memory.
 #' @param optimizePng If \code{TRUE} then \command{pngquant} is used to reduce
-#'   the size of generated graphics. A signficant reduction in disk space usage
-#'   may be seen, however, at the cost additional processing time.
+#'   the size of generated graphics. A significant reduction in disk space usage
+#'   may be seen, however, at the cost additional processing time. Multiple
+#'   \command{pngquant} processes will be executed in parallel, which can be
+#'   configured with \option{patRoon.MP.maxProcs} (parallelization will always
+#'   happen with the \code{"classic"} method, see
+#'   \link[=patRoon-package]{patRoon options}).
 #' @param openReport If set to \code{TRUE} then the output report file will be
 #'   opened with the system browser.
 #' @param noDate If \code{TRUE} then the current date is not added to the

@@ -53,7 +53,7 @@ generateCompoundsSIRIUS(
   extraOptsGeneral = NULL,
   extraOptsFormula = NULL,
   verbose = TRUE,
-  SIRBatchSize = 0
+  splitBatches = FALSE
 )
 
 compoundScorings(
@@ -226,13 +226,12 @@ manual for more details. Set to \code{NULL} to ignore.}
 
 \item{verbose}{If \code{TRUE} then more output is shown in the terminal.}
 
-\item{SIRBatchSize}{The maximum number of calculations done by
-\command{SIRIUS}. If this number is less than the amount of features to be
-calculated then calculations will be evenly split over multiple
-\command{SIRIUS} calls (which may be run in parallel if
-\command{maxProcAmount>1}). If \code{SIRBatchSize=0} then all feature
-calculations are performed from a single \command{SIRIUS} exection, which
-is often the fastest.}
+\item{splitBatches}{If \code{TRUE} then the calculations done by
+\command{SIRIUS} will be evenly split over multiple \command{SIRIUS} calls
+(which may be run in parallel depending on the \link[=patRoon-package]{set
+package options}). If \code{splitBatches=FALSE} then all feature
+calculations are performed from a single \command{SIRIUS} execution, which
+is often the fastest if calculations are performed on a single computer.}
 
 \item{includeSuspectLists, onlyDefault, includeNoDB}{A logical specifying
 whether scoring terms releated to suspect lists, default scoring terms and
@@ -418,8 +417,9 @@ For annotations performed with \command{SIRIUS} it is often the fastest
 \references{
 \insertRef{Ruttkies2016}{patRoon}
 
-\insertRef{Dhrkop2019}{patRoon} \cr\cr \insertRef{Duhrkop2015}{patRoon} \cr\cr
-  \insertRef{Duhrkop2015-2}{patRoon} \cr\cr \insertRef{Bcker2008}{patRoon}
+\insertRef{Dhrkop2019}{patRoon} \cr\cr
+  \insertRef{Duhrkop2015}{patRoon} \cr\cr \insertRef{Duhrkop2015-2}{patRoon}
+  \cr\cr \insertRef{Bcker2008}{patRoon}
 }
 \seealso{
 \code{\link{compounds-class}}

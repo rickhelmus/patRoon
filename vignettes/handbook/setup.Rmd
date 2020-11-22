@@ -22,7 +22,7 @@ if (runData)
                                                  rep("repl3", 1),
                                                  rep("repl4", 1)))
     
-    # set maxProcAmount = 1 to limit FFM memory usage a bit on CI
+    # set max proc to 1 to limit FFM memory usage a bit on CI
     getFeats <- function(ai) withr::with_options(list(patRoon.multiproc.max = 1), findFeatures(ai, "openms"))
     
     fList <- getFeats(anaInfo)

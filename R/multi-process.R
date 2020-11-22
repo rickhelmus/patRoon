@@ -47,18 +47,30 @@ defMultiProcErrorHandler <- function(cmd, exitStatus, ...)
 #'   retries)}. The \code{exitStatus} argument is the exit code of the command
 #'   (may be \code{NA} in rare cases this is unknown). Other arguments are as
 #'   \code{timeoutHandler}.
+#' @param prepareHandler A function that is called prior to execution of the
+#'   command. The function signature should be \code{function(cmd)} where
+#'   \code{cmd} is the queue data (from \code{commandQueue}) of the command to
+#'   be started. The return value must be (an updated) \code{cmd}.
+#' @param cacheName,setHash Used for caching results. Set to \code{NULL} to
+#'   disable caching.
 #' @param procTimeout The maximum time a process may consume before a timeout
-#'   occurs (in seconds). Set to \code{NULL} to disable
-#'   timeouts.
+#'   occurs (in seconds). Set to \code{NULL} to disable timeouts. Ignored if
+#'   \code{patRoon.MP.method="future"}.
 #' @param printOutput,printError Set to \code{TRUE} to print stdout/stderr
-#'   output to the console. Currently unused and untested.
-#' @param showProgress Set to \code{TRUE} to display a progress bar.
+#'   output to the console. Ignored if \option{patRoon.MP.method="future"}.
+#' @param logSubDir The sub-directory used for log files. The final log file
+#'   path is constructed from \option{patRoon.MP.logPath}, \code{logSubDir} and
+#'   \code{logFile} set in the \code{commandQueue}.
+#' @param showProgress Set to \code{TRUE} to display a progress bar. Ignored if
+#'   \option{patRoon.MP.method="future"}.
 #' @param waitTimeout Number of milliseconds to wait before checking if a new
-#'   process should be spawned.
+#'   process should be spawned. Ignored if \option{patRoon.MP.method="future"}.
 #' @param batchSize Number of commands that should be executed in sequence per
-#'   processes. See details.
+#'   processes. See details. Ignored if \option{patRoon.MP.method="future"}.
 #' @param delayBetweenProc Minimum number of milliseconds to wait before
-#'   spawning a new process. Might be needed to workaround errors.
+#'   spawning a new process. Might be needed to workaround errors. Ignored if
+#'   \option{patRoon.MP.method="future"}.
+#' @param method Overrides \option{patRoon.MP.method} if not \code{NULL}.
 #'
 #' @keywords internal
 executeMultiProcess <- function(commandQueue, finishHandler,
@@ -66,8 +78,7 @@ executeMultiProcess <- function(commandQueue, finishHandler,
                                 errorHandler = defMultiProcErrorHandler,
                                 prepareHandler = NULL, cacheName = NULL, setHash = NULL,
                                 procTimeout = NULL, printOutput = FALSE, printError = FALSE,
-                                logSubDir = NULL,
-                                showProgress = TRUE, waitTimeout = 50,
+                                logSubDir = NULL, showProgress = TRUE, waitTimeout = 50,
                                 batchSize = 1, delayBetweenProc = 0, method = NULL)
 {
     if (!checkmate::testNamed(commandQueue))

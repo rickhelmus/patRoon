@@ -70,14 +70,9 @@
         - disable through withr::with_options()?
 - docs
     - write vignette or handbook chapter
-    - update sirius-args.R (mention maxProcAmount)
     - update handbook etc for maxProcAmount
     - new/changed MP options
-    - update ref docs for executeMultiProcess
-        - mention which args are ignored by futures
-    - update docs and NEWS for SIRBatchSize --> splitBatches
-    - mention that reportHTML never uses future method
-    - table in handbook with which functions work and remarks (eg GenForm no batchmode)
+    - table in handbook with which functions work and remarks (eg GenForm no batchmode, reportHTML no futures)
     - mention SIRIUS output is always logged (maybe also do for classic?)
     - limitation: MF local databases need to be available on the localhost and nodes, both for caching and checking score types.
         - location configurable through options
@@ -85,6 +80,7 @@
         - optimized loading of spectra and EICs a bit
         - removed SIRIUS pre44
         - normalizePath and hashing for MF db files
+        - splitBatches
 
 
 # Future

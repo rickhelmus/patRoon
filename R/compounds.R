@@ -195,7 +195,7 @@ setMethod("as.data.table", "compounds", function(x, fGroups = NULL, fragments = 
 #' @describeIn compounds Returns a list containing for each feature group a
 #'   character vector with database identifiers for all candidate compounds. The
 #'   list is named by feature group names, and is typically used with the
-#'   \code{identifiers} option of \code{\link{generateCompoundsMetfrag}}.
+#'   \code{identifiers} option of \code{\link{generateCompoundsMetFrag}}.
 #' @aliases identifiers
 #' @export
 setMethod("identifiers", "compounds", function(compounds)
@@ -522,7 +522,7 @@ setMethod("plotStructureHash", "compounds", function(obj, index, groupName, widt
 #'
 #' @param onlyUsed If \code{TRUE} then only scorings are plotted that actually
 #'   have been used to rank data (see the \code{scoreTypes} argument to
-#'   \code{\link{generateCompoundsMetfrag}} for more details).
+#'   \code{\link{generateCompoundsMetFrag}} for more details).
 #'
 #' @export
 setMethod("plotScores", "compounds", function(obj, index, groupName, normalizeScores = "max",
@@ -1139,7 +1139,7 @@ setMethod("consensus", "compounds", function(obj, ..., absMinAbundance = NULL,
 
 #' @templateVar func generateCompounds
 #' @templateVar what generate compounds
-#' @templateVar ex1 generateCompoundsMetfrag
+#' @templateVar ex1 generateCompoundsMetFrag
 #' @templateVar ex2 generateCompoundsSIRIUS
 #' @templateVar algos metfrag,sirius
 #' @template generic-algo
@@ -1158,7 +1158,7 @@ setMethod("generateCompounds", "featureGroups", function(fGroups, MSPeakLists, a
     checkmate::reportAssertions(ac)
     
     f <- switch(algorithm,
-                metfrag = generateCompoundsMetfrag,
+                metfrag = generateCompoundsMetFrag,
                 sirius = generateCompoundsSIRIUS)
 
     f(fGroups, MSPeakLists, ...)

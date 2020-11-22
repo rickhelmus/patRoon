@@ -94,7 +94,7 @@ NULL
 #'
 #'   \item \code{patRoon.path.MetFragCL}: The complete file path to the MetFrag
 #'   CL \file{jar} file that \emph{must} be set when using
-#'   \code{\link{generateCompoundsMetfrag}}. Example:
+#'   \code{\link{generateCompoundsMetFrag}}. Example:
 #'   \code{"C:/MetFrag2.4.2-CL.jar"}.
 #'
 #'   \item \code{patRoon.path.MetFragCompTox}: The complete file path to the

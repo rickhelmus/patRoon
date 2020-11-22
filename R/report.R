@@ -44,7 +44,7 @@ NULL
 #'   \code{mzWindow}, \code{topMost} and \code{onlyPresent} arguments).
 #' @param compoundsOnlyUsedScorings If \code{TRUE} then only scorings are plotted
 #'   that actually have been used to rank data (see the \code{scoreTypes}
-#'   argument to \code{\link{generateCompoundsMetfrag}} for more details).
+#'   argument to \code{\link{generateCompoundsMetFrag}} for more details).
 #' @param formulasTopMost,compoundsTopMost Only this amount of top ranked
 #'   candidate formulae/compounds are reported. Lower values may significantly
 #'   speed up reporting. Set to \code{NULL} to ignore.

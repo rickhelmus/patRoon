@@ -6,6 +6,10 @@
 #'   ProteoWizard), \code{"openms"} (implemented by \command{FileConverter} of
 #'   OpenMS) or \code{"bruker"} (implemented by DataAnalysis).
 #'
+#' @templateVar what \code{convertMSFiles} (except if \code{algorithm="bruker"})
+#' @template uses-multiProc
+#'
+#'
 #' @name convertMSFiles
 NULL
 

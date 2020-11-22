@@ -389,6 +389,12 @@ For annotations performed with \command{SIRIUS} it is often the fastest
   homepage}.
 }
 
+\section{Parallelization}{
+ \code{generateCompoundsMetFrag} and \code{generateCompoundsSIRIUS} uses multiprocessing to parallelize
+  computations. Please see the handbook for more details and
+  \link[=patRoon-package]{patRoon options} for configuration options.
+}
+
 \section{Usage of MetFrag databases}{
  When \code{database="chemspider"}
   setting the \code{chemSpiderToken} argument is mandatory.

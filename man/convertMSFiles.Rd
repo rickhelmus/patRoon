@@ -89,6 +89,12 @@ Conversion of MS analysis files between several open and closed data formats.
   \file{.mzML} and several vendor formats, depending on which algorithm is
   used.
 }
+\section{Parallelization}{
+ \code{convertMSFiles} (except if \code{algorithm="bruker"}) uses multiprocessing to parallelize
+  computations. Please see the handbook for more details and
+  \link[=patRoon-package]{patRoon options} for configuration options.
+}
+
 \section{Conversion formats}{
  Possible output formats (\code{to} argument) are
   \code{mzXML} and \code{mzML}.

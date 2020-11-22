@@ -268,6 +268,12 @@ The file format of analyses for \code{findFeaturesOpenMS} must be
   Please make sure it is installed and its binaries are added to the PATH
   environment variable or the \code{patRoon.path.OpenMS} option is set.
 }
+\section{Parallelization}{
+ \code{generateFeaturesOpenMS} uses multiprocessing to parallelize
+  computations. Please see the handbook for more details and
+  \link[=patRoon-package]{patRoon options} for configuration options.
+}
+
 \references{
 \insertRef{Rst2016}{patRoon} \cr\cr
   \href{https://pugixml.org/}{pugixml} (via \href{http://www.rcpp.org/}{Rcpp}) is used to process OpenMS XML output. \cr\cr

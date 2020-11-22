@@ -67,8 +67,22 @@ NULL
 #'   \item \code{patRoon.MP.maxProcs}: The maximum number of processes that
 #'   should be initiated in parallel. A good starting point is the number of
 #'   physical cores, which is the default as detected by
-#'   \code{\link[parallel]{detectCores}}.
-#'
+#'   \code{\link[parallel]{detectCores}}. This option is only used when
+#'   \option{patRoon.MP.method="classic"}.
+#'   
+#'   \item \code{patRoon.MP.method}: Either \code{"classic"} or \code{"future"}.
+#'   The former is the default and uses \code{\link{processx}} to execute
+#'   multiple commands in parallel. When \code{"future"} the
+#'   \code{\link{future.apply}} package is used for parallelization, which is
+#'   especially useful for \emph{e.g.} cluster computing.
+#'   
+#'   \item \code{MP.futureSched}: Sets the \code{future.scheduling} function
+#'   argument for \code{\link{future_lapply}}. Only used if
+#'   \option{patRoon.MP.method="future"}.
+#'   
+#'   \item \code{patRoon.MP.logPath}: The path used for logging of output from
+#'   commands executed by multiprocess.
+#'   
 #'   \item \code{patRoon.path.pwiz}: The path in which the
 #'   \command{ProteoWizard} binaries are installed. If unset an attempt is made
 #'   to find this directory from the Windows registry and \option{PATH}
@@ -181,6 +195,9 @@ NULL
 #'   (\code{featurefinderEnviPick}) or to selected feature finding or importing
 #'   algorithms (\code{findFeatures} and \code{importFeatures}).
 #' @param verbose If set to \code{FALSE} then no text output is shown.
+#'
+#' @templateVar what \code{generateFeaturesOpenMS}
+#' @template uses-multiProc
 #'
 #' @note The file format of analyses for \code{findFeaturesXCMS} and
 #'   \code{findFeaturesXCMS3} must be \code{mzML} or \code{mzXML}.
@@ -594,7 +611,8 @@ NULL
 #'   \code{formulaScorings} function:
 #'   \Sexpr[results=rd,echo=FALSE,stage=build]{patRoon:::tabularRD(patRoon::formulaScorings())}
 #'
-#'
+#' @templateVar what \code{generateFormulasGenForm} and \code{generateFormulasSIRIUS}
+#' @template uses-multiProc
 #'
 #' @return A \code{\link{formulas}} object containing all generated formulae.
 #'
@@ -669,6 +687,9 @@ NULL
 #'   Scores} section on the
 #'   \href{http://ipb-halle.github.io/MetFrag/projects/metfragr/}{MetFragR
 #'   homepage}.
+#'
+#' @templateVar what \code{generateCompoundsMetFrag} and \code{generateCompoundsSIRIUS}
+#' @template uses-multiProc
 #'
 #' @seealso \code{\link{compounds-class}}
 #' @name compound-generation

@@ -281,11 +281,6 @@ If any errors related to \command{DCOM} appear it might be necessary to
   excessive computational times by terminating long running commands (set by
   the \code{timeout} argument).
 
-  When \code{futures} are used for parallel processing
-  (\code{patRoon.MP.method="future"}), calculations with \command{GenForm}
-  are done with batch mode is disabled (see \code{batchSize} argument), which
-  generally limit overall performance.
-
 For annotations performed with \command{SIRIUS} it is often the fastest
   to keep the default \code{SIRBatchSize=0}. In this case, the
   \code{maxProcAmount} argument will be ignored and all \command{SIRIUS}
@@ -296,6 +291,17 @@ For annotations performed with \command{SIRIUS} it is often the fastest
   names have been harmonized where possible. An overview is obtained with the
   \code{formulaScorings} function:
   \Sexpr[results=rd,echo=FALSE,stage=build]{patRoon:::tabularRD(patRoon::formulaScorings())}
+}
+
+\section{Parallelization}{
+ \code{generateFormulasGenForm} and \code{generateFormulasSIRIUS} uses multiprocessing to parallelize
+  computations. Please see the handbook for more details and
+  \link[=patRoon-package]{patRoon options} for configuration options.
+
+ When \code{futures} are used for parallel processing
+  (\code{patRoon.MP.method="future"}), calculations with \command{GenForm}
+  are done with batch mode is disabled (see \code{batchSize} argument), which
+  generally limit overall performance.
 }
 
 \section{GenForm options}{

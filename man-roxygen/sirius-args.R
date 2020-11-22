@@ -24,9 +24,9 @@
 #'   is often the fastest if calculations are performed on a single computer.
 #'
 #' @note For annotations performed with \command{SIRIUS} it is often the fastest
-#'   to keep the default \code{SIRBatchSize=0}. In this case, the
-#'   \code{maxProcAmount} argument will be ignored and all \command{SIRIUS}
-#'   output will be printed to the terminal (unless \code{verbose=FALSE}).
+#'   to keep the default \code{splitBatches=FALSE}. In this case, all
+#'   \command{SIRIUS} output will be printed to the terminal (unless
+#'   \code{verbose=FALSE} or \option{patRoon.MP.method="future"}).
 #'
 #' @references \insertRef{Dhrkop2019}{patRoon} \cr\cr
 #'   \insertRef{Duhrkop2015}{patRoon} \cr\cr \insertRef{Duhrkop2015-2}{patRoon}

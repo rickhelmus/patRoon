@@ -73,8 +73,7 @@
         - update handbook etc for maxProcAmount
         - table in handbook with which functions work and remarks (eg GenForm no batchmode, reportHTML no futures)
     - ref
-        - new/changed MP options
-        - mention SIRIUS output is always logged (maybe also do for classic?)
+        - update uses-multiProc.R with handbook link/section name?
         - limitation: MF local databases need to be available on the localhost and nodes, both for caching and checking score types.
             - location configurable through options
     - NEWS
@@ -82,6 +81,7 @@
         - removed SIRIUS pre44
         - normalizePath and hashing for MF db files
         - splitBatches
+        - generateCompoundsMetfrag --> generateCompoundsMetFrag
 
 
 # Future

@@ -24,7 +24,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2020-11-16" />
+<meta name="date" content="2020-11-23" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -233,8 +233,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="annotation" class="section level2">
 <h2><span class="header-section-number">4.3</span> Annotation</h2>
 <p>The annotation consists of collecting MS peak lists and then formula and/or compound annotation:</p>
-<div id="htmlwidget-096054a976f54c3d9adb" style="width:500px;height:120px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-096054a976f54c3d9adb">{"x":{"diagram":"\ndigraph Annotation {\n  graph [ rankdir = LR ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.3,\n         height = 1,\n         fontsize = 18,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"MS peak lists\" -> \"Formula annotation\"\n    \"MS peak lists\" -> \"Compound annotation\"\n    \"Formula annotation\":e -> \"Compound annotation\":e [style = dotted, constraint = false]\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-c0f930146a3fb2c76a9b" style="width:500px;height:120px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-c0f930146a3fb2c76a9b">{"x":{"diagram":"\ndigraph Annotation {\n  graph [ rankdir = LR ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.3,\n         height = 1,\n         fontsize = 18,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"MS peak lists\" -> \"Formula annotation\"\n    \"MS peak lists\" -> \"Compound annotation\"\n    \"Formula annotation\":e -> \"Compound annotation\":e [style = dotted, constraint = false]\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 <p>Note that compound annotation is normally not dependent upon formula annotation. However, formula data can be used to improve ranking of candidates afterwards by the <code>addFormulaScoring()</code> function, which will be discussed later in this section.</p>
 <div id="ms-peak-lists" class="section level3">
 <h3><span class="header-section-number">4.3.1</span> MS peak lists</h3>
@@ -536,7 +536,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </table>
 <div id="configuring-metfrag-databases-and-scoring" class="section level4">
 <h4><span class="header-section-number">4.3.3.1</span> Configuring MetFrag databases and scoring</h4>
-<p>Some extra configuration may be necessary when using certain databases with MetFrag. In order to use the ChemSpider database a <a href="http://www.chemspider.com/AboutServices.aspx">security token</a> should be requested and set with the <code>chemSpiderToken</code> argument to <code>generateCompounds()</code>. The CompTox and PubChemLite databases need to be manually downloaded from <a href="ftp://newftp.epa.gov/COMPTOX/Sustainable_Chemistry_Data/Chemistry_Dashboard/MetFrag_metadata_files">CompTox</a> (or variations with <a href="https://zenodo.org/record/3364464#.XnjM-XLvKUk">smoking</a> or <a href="https://zenodo.org/record/3472781#.XnjMAHLvKUk">wastewater</a> metadata) and <a href="https://zenodo.org/record/3548654">PUbChemLite</a>. The file location of this and other local databases (<code>csv</code>, <code>psv</code>, <code>sdf</code>) needs to be manually configured, see the examples below and/or <code>?generateCompounds</code> for more information on how to do this.</p>
+<p>Some extra configuration may be necessary when using certain databases with MetFrag. In order to use the ChemSpider database a <a href="http://www.chemspider.com/AboutServices.aspx">security token</a> should be requested and set with the <code>chemSpiderToken</code> argument to <code>generateCompounds()</code>. The CompTox and PubChemLite databases need to be manually downloaded from <a href="ftp://newftp.epa.gov/COMPTOX/Sustainable_Chemistry_Data/Chemistry_Dashboard/MetFrag_metadata_files">CompTox</a> (or variations with <a href="https://zenodo.org/record/3364464#.XnjM-XLvKUk">smoking</a> or <a href="https://zenodo.org/record/3472781#.XnjMAHLvKUk">wastewater</a> metadata) and <a href="https://zenodo.org/record/4183801">PUbChemLite</a>. The file location of this and other local databases (<code>csv</code>, <code>psv</code>, <code>sdf</code>) needs to be manually configured, see the examples below and/or <code>?generateCompounds</code> for more information on how to do this.</p>
 <div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="annotation.html#cb18-1"></a><span class="co"># PubChem: the default</span></span>
 <span id="cb18-2"><a href="annotation.html#cb18-2"></a>compsMF &lt;-<span class="st"> </span><span class="kw">generateCompounds</span>(fGroups, mslists, <span class="st">&quot;metfrag&quot;</span>, <span class="dt">adduct =</span> <span class="st">&quot;[M+H]+&quot;</span>)</span>
 <span id="cb18-3"><a href="annotation.html#cb18-3"></a></span>

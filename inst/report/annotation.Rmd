@@ -5,7 +5,9 @@ Annotation {data-orientation=rows}
 
 ##
 
-### feature groups { data-width=300 }
+### feature groups { data-width=300 .fGroups }
+
+<style> .fGroups { overflow-x: auto; } </style>
 
 ```{r echo=FALSE}
 compFGroups <- compsClustFGroups <- formFGroups <- componentFGroups <- mfWebFGroups <- character()
@@ -81,7 +83,8 @@ if (rmdVars$retMin)
 fGroupsSpecDT[, c("ret", "mz") := .(round(ret, 2), round(mz, 5))]
 fGroupsSpecDT <- fGroupsSpecDT[, intersect(c("group", "ret", "mz", "suspect", "d_rt", "d_mz",
                                              "suspFormRank", "suspCompRank",
-                                             "annotatedMSMSSimilarity", "maxFrags", "maxFragMatches",
+                                             "annSimForm", "annSimComp", "annSimBoth",
+                                             "maxFrags", "maxFragMatches", "maxFragMatchesRel",
                                              "estIDLevel"),
                                            names(fGroupsSpecDT)),
                                with = FALSE]
@@ -157,14 +160,15 @@ if (!is.null(rmdVars$components))
 
 DT::datatable(fGroupsSpecDT,
               extensions = "Buttons",
-              options = list(paging = FALSE, scrollY = "200px", autoWidth = TRUE,
+              options = list(paging = FALSE, scrollX = TRUE, scrollY = "200px",
                              dom = "Bfrtip",
                              initComplete = DT::JS("function(settings, json)",
                                                    "{ setTimeout(initAnnotation, 25); }"),
                              order = list(list(1, "asc")),
                              columnDefs = list(list(visible = FALSE, targets = 0)),
                              buttons = list(list(extend = "colvis", background = FALSE,
-                                                 columns = seq(2, ncol(fGroupsSpecDT)-1) - 1))),
+                                                 columns = seq(2, ncol(fGroupsSpecDT)-1) - 1,
+                                                 collectionLayout = "three-column"))),
               escape = FALSE, rownames = FALSE, elementId = "fGroupsTable")
 ```
 

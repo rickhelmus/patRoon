@@ -43,6 +43,7 @@
         - mark with different row colour and label?
     - mention suspect similarities/ranks etc for candidates (or somehow in compounds?)
     - optionally report with collapsed suspects
+    - merge columns to avoid horizontal scrollbars
 - update docs, handbook & NEWS
     - renamed rt/mz columns
     - new plotVenn list functionality
@@ -67,6 +68,7 @@
 - tests
     - automatic InChIKey/formula calculation from InChIs/SMILES
         - already done implicitly?
+    - reporting
 
 
 ## docs

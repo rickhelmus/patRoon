@@ -78,7 +78,7 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
            fixed = list(add = ac))
     checkmate::assertFileExists(IDFile, "r", add = ac)
     checkmate::reportAssertions(ac)
-    
+
     hash <- makeHash(fGroups, MSPeakLists, formulas, compounds, absMzDev,
                      relMinMSMSIntensity, simMSMSMethod, checkFragments, formulasNormalizeScores,
                      compoundsNormalizeScores, makeFileHash(IDFile))
@@ -94,7 +94,14 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
         stop("Levels should be defined as a number and may optionally followed by one character (e.g. 3, 2b etc)")
     
     IDLevelRules <- IDLevelRules[order(names(IDLevelRules))] # sort to ensure lowest levels will be tested first
-    
+
+    if (nrow(screenInfo(fGroups)) == 0)
+    {
+        cat("No suspect hits, nothing to annotate")
+        return(fGroups)
+    }
+        
+        
     mzWithin <- function(mz1, mz2) abs(mz1 - mz2) <= absMzDev
 
     si <- copy(screenInfo(fGroups))
@@ -179,6 +186,10 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
                 maxFragMatches <- max(NAToZero(maxFragMatches), sum(fragForms %in% cTable[["fragInfo"]][[suspCompRank]]$formula))
         }
 
+        maxFragMatchesRel <- NA_real_
+        if (!is.na(maxFragMatches))
+            maxFragMatchesRel <- maxFragMatches / maxSuspFrags
+        
         estIDLevel <- estimateIdentificationLevel(si$name[i], si$group[i], si$d_rt[i], suspIK1, si$formula[i],
                                                   annSimForm, annSimComp, annSimBoth,
                                                   maxSuspFrags, maxFragMatches, fTable, suspFormRank, fScRanges,
@@ -188,13 +199,15 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
         
         set(si, i,
             c("suspFormRank", "suspCompRank", "annSimForm", "annSimComp", "annSimBoth",
-              "maxFrags", "maxFragMatches", "estIDLevel"),
-            list(suspFormRank, suspCompRank, annSimForm, annSimComp, annSimBoth, maxSuspFrags, maxFragMatches, estIDLevel))
+              "maxFrags", "maxFragMatches", "maxFragMatchesRel", "estIDLevel"),
+            list(suspFormRank, suspCompRank, annSimForm, annSimComp, annSimBoth, maxSuspFrags, maxFragMatches,
+                 maxFragMatchesRel, estIDLevel))
         
         setTxtProgressBar(prog, i)
     }
     
-    rmCols <- c("suspFormRank", "suspCompRank", "annSimForm", "annSimComp", "annSimBoth", "maxFrags", "maxFragMatches")
+    rmCols <- c("suspFormRank", "suspCompRank", "annSimForm", "annSimComp", "annSimBoth", "maxFrags", "maxFragMatches",
+                "maxFragMatchesRel")
     rmCols <- rmCols[sapply(rmCols, function(col) !is.null(si[[col]]) && all(is.na(si[[col]])))]
     if (length(rmCols) > 0)
         si <- si[, setdiff(names(si), rmCols), with = FALSE]
@@ -212,12 +225,13 @@ setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = NULL
                                                        selectHitsBy = NULL, selectBestFGroups = FALSE,
                                                        maxLevel = NULL, maxFormRank = NULL, maxCompRank = NULL,
                                                        minAnnSimForm = NULL, minAnnSimComp = NULL, minAnnSimBoth = NULL,
-                                                       minFragMatches = NULL, negate = FALSE)
+                                                       absMinFragMatches = NULL, relMinFragMatches = NULL, negate = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertFlag, . ~ onlyHits + selectBestFGroups + negate, null.ok = c(TRUE, FALSE, FALSE), fixed = list(add = ac))
     checkmate::assertChoice(selectHitsBy, choices = c("intensity", "level"), null.ok = TRUE, add = ac)
-    aapply(checkmate::assertCount, . ~ maxLevel + maxFormRank + maxCompRank + minFragMatches, null.ok = TRUE, fixed = list(add = ac))
+    aapply(checkmate::assertCount, . ~ maxLevel + maxFormRank + maxCompRank + absMinFragMatches + relMinFragMatches,
+           null.ok = TRUE, fixed = list(add = ac))
     aapply(checkmate::assertNumber, . ~ minAnnSimForm + minAnnSimComp + minAnnSimBoth, null.ok = TRUE, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
 
@@ -251,7 +265,8 @@ setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = NULL
         obj <- colFilter(minPred, "minAnnSimForm", "annSimForm")
         obj <- colFilter(minPred, "minAnnSimComp", "annSimComp")
         obj <- colFilter(minPred, "minAnnSimBoth", "annSimBoth")
-        obj <- colFilter(minPred, "minFragMatches", "maxFragMatches")
+        obj <- colFilter(minPred, "absMinFragMatches", "maxFragMatches")
+        obj <- colFilter(minPred, "relMinFragMatches", "maxFragMatchesRel")
         
         # do here so that only duplicates not yet filtered out in previous steps are considered
         if (!is.null(selectHitsBy) || selectBestFGroups)

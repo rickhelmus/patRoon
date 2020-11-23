@@ -160,8 +160,9 @@ test_that("Screen filters", {
     expect_gte(getMinScrCol(filter(fGroupsAnnNoRT, minAnnSimForm = 0.9), "annSimForm"), 0.9)
     expect_gte(getMinScrCol(filter(fGroupsAnnNoRT, minAnnSimComp = 0.9), "annSimComp"), 0.9)
     expect_gte(getMinScrCol(filter(fGroupsAnnNoRT, minAnnSimBoth = 0.9), "annSimBoth"), 0.9)
-    expect_equal(getMinScrCol(filter(fGroupsAnnFrag, minFragMatches = 1), "maxFragMatches"), 1)
-    expect_equal(getMinScrCol(filter(fGroupsAnnFragForm, minFragMatches = 1), "maxFragMatches"), 1)
+    expect_equal(getMinScrCol(filter(fGroupsAnnFrag, absMinFragMatches = 1), "maxFragMatches"), 1)
+    expect_equal(getMinScrCol(filter(fGroupsAnnFragForm, absMinFragMatches = 1), "maxFragMatches"), 1)
+    expect_equal(getMinScrCol(filter(fGroupsAnnFrag, relMinFragMatches = 1), "maxFragMatches"), 1)
 })
 
 selectedNegHitsInt <- filter(fGroupsAnnNoRT, selectHitsBy = "intensity", onlyHits = FALSE, negate = TRUE)
@@ -196,8 +197,9 @@ test_that("Negated screen filters", {
     expect_lt(getMinScrCol(filter(fGroupsAnnNoRT, minAnnSimForm = 0.9, negate = TRUE), "annSimForm"), 0.9)
     expect_lt(getMinScrCol(filter(fGroupsAnnNoRT, minAnnSimComp = 0.9, negate = TRUE), "annSimComp"), 0.9)
     expect_lt(getMinScrCol(filter(fGroupsAnnNoRT, minAnnSimBoth = 0.9, negate = TRUE), "annSimBoth"), 0.9)
-    expect_true(all(is.na(screenInfo(filter(fGroupsAnnFrag, minFragMatches = 1, negate = TRUE))$maxFragMatches)))
-    expect_true(all(is.na(screenInfo(filter(fGroupsAnnFragForm, minFragMatches = 1, negate = TRUE))$maxFragMatches)))
+    expect_true(all(is.na(screenInfo(filter(fGroupsAnnFrag, absMinFragMatches = 1, negate = TRUE))$maxFragMatches)))
+    expect_true(all(is.na(screenInfo(filter(fGroupsAnnFragForm, absMinFragMatches = 1, negate = TRUE))$maxFragMatches)))
+    expect_true(all(is.na(screenInfo(filter(fGroupsAnnFrag, relMinFragMatches = 1, negate = TRUE))$maxFragMatches)))
 })
 
 fGroupsEmpty <- groupFeatures(findFeatures(getTestAnaInfo(), "openms", noiseThrInt = 1E9, logPath = NULL), "openms")

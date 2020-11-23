@@ -25,7 +25,6 @@
     - filter():
         - keep or remove NA values with colFilter()? document what happens
         - cache?
-        - minFragMatches --> split in abs/rel thresholds?
     - don't assign level <1 if suspect is a target? or give the choice (or make filter?)
     - spec similarity:
         - port from TPs someday

@@ -20,7 +20,6 @@
     - annotateSuspects()
         - rename to annotate()? is a function (but not generic) from ggplot2 and RAMClustR and method from CAMERA, so probably no
     conflicts
-        - prog bar
         - check why it's is sometimes slow
             - seems to be logging, disable by default?
     - filter():

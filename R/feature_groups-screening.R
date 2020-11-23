@@ -95,10 +95,12 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
     
     IDLevelRules <- IDLevelRules[order(names(IDLevelRules))] # sort to ensure lowest levels will be tested first
     
-    
     mzWithin <- function(mz1, mz2) abs(mz1 - mz2) <= absMzDev
-    
+
     si <- copy(screenInfo(fGroups))
+    
+    printf("Annotating %d suspects...\n", nrow(si))
+    prog <- openProgBar(0, nrow(si))
     
     for (i in seq_len(nrow(si)))
     {
@@ -188,6 +190,8 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
             c("suspFormRank", "suspCompRank", "annSimForm", "annSimComp", "annSimBoth",
               "maxFrags", "maxFragMatches", "estIDLevel"),
             list(suspFormRank, suspCompRank, annSimForm, annSimComp, annSimBoth, maxSuspFrags, maxFragMatches, estIDLevel))
+        
+        setTxtProgressBar(prog, i)
     }
     
     rmCols <- c("suspFormRank", "suspCompRank", "annSimForm", "annSimComp", "annSimBoth", "maxFrags", "maxFragMatches")
@@ -196,6 +200,8 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
         si <- si[, setdiff(names(si), rmCols), with = FALSE]
     
     fGroups@screenInfo <- si
+    
+    close(prog)
     
     saveCacheData("annotateSuspects", fGroups, hash)
     

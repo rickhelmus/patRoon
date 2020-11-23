@@ -185,7 +185,7 @@ runSIRIUS <- function(precursorMZs, MSPLists, MSMSPLists, profile, adduct, ppmMa
     preArgs <- character()
     if (checkmate::testOS("linux"))
     {
-        preArgs <- c(system.file("inst", "misc", "runsir.sh", package = "patRoon"), dirname(command))
+        preArgs <- c(system.file("misc", "runsir.sh", package = "patRoon"), dirname(command))
         command <- "/bin/sh"
     }
     

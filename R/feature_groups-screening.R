@@ -64,12 +64,9 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
                                                                  checkFragments = c("mz", "formula", "compound"),
                                                                  formulasNormalizeScores = "max",
                                                                  compoundsNormalizeScores = "max",
-                                                                 IDFile = system.file("inst", "misc", "IDLevelRules.yml",
+                                                                 IDFile = system.file("misc", "IDLevelRules.yml",
                                                                                       package = "patRoon"))
 {
-    # UNDONE: prog bar
-    # UNDONE/document: annSimBoth falls back to annSimForm/annSimComp if no formulas available
-    
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertClass, . ~ MSPeakLists + formulas + compounds,
            c("MSPeakLists", "formulas", "compounds"), null.ok = TRUE, fixed = list(add = ac))
@@ -211,15 +208,6 @@ setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = NULL
                                                        minAnnSimForm = NULL, minAnnSimComp = NULL, minAnnSimBoth = NULL,
                                                        minFragMatches = NULL, negate = FALSE)
 {
-    # UNDONE: doc that selectHitsBy/selectFGroupsBy only applies to hits, in case of ties: first hit
-    # UNDONE: mention that filter with onlyHits may need to be repeated
-    # UNDONE: cache?
-    # UNDONE: minFragMatches --> split in abs/rel thresholds?
-    # UNDONE: keep or remove NA values with colFilter()? document what happens
-    # UNDONE: properly document negate:
-    #   - selectHitsBy: select worst hit
-    #   - onlyHits: if TRUE only select non-hits, if FALSE select hits, if NULL nothing
-    
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertFlag, . ~ onlyHits + selectBestFGroups + negate, null.ok = c(TRUE, FALSE, FALSE), fixed = list(add = ac))
     checkmate::assertChoice(selectHitsBy, choices = c("intensity", "level"), null.ok = TRUE, add = ac)

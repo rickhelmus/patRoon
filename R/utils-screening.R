@@ -257,7 +257,6 @@ genIDLevelRulesFile <- function(out, inLevels = NULL, exLevels = NULL)
     invisible(NULL)
 }
 
-# UNDONE/NOTE: mustExist/relative fields only used for scorings of compound/formulas
 estimateIdentificationLevel <- function(suspectName, suspectFGroup, suspectRTDev, suspectInChIKey1, suspectFormula,
                                         suspectAnnSimForm, suspectAnnSimComp, suspectAnnSimBoth,
                                         maxSuspFrags, maxFragMatches, formTable, formRank,
@@ -385,8 +384,6 @@ estimateIdentificationLevel <- function(suspectName, suspectFGroup, suspectRTDev
                 levelOK <- TRUE # special case: this level is always valid
             else if (type == "suspectFragments")
             {
-                # UNDONE: if suspect fragments are less than the rule value then the
-                # former is used as minimum, make this configurable?
                 minFrags <- min(val, maxSuspFrags, na.rm = TRUE)
                 levelOK <- !is.na(maxFragMatches) && maxFragMatches >= minFrags
                 if (!levelOK)

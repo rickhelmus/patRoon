@@ -17,8 +17,16 @@
 - interface
     - also convert TASQ?
     - newProject(): update for new interface
-    - annotateSuspects() --> annotate() latter is a function (but not generic) from ggplot2 and RAMClustR and method from CAMERA, so probably no
+    - annotateSuspects()
+        - rename to annotate()? is a function (but not generic) from ggplot2 and RAMClustR and method from CAMERA, so probably no
     conflicts
+        - prog bar
+        - check why it's is sometimes slow
+            - seems to be logging, disable by default?
+    - filter():
+        - keep or remove NA values with colFilter()? document what happens
+        - cache?
+        - minFragMatches --> split in abs/rel thresholds?
     - don't assign level <1 if suspect is a target? or give the choice (or make filter?)
     - spec similarity:
         - port from TPs someday
@@ -30,8 +38,6 @@
     - update version number
     - prepareSuspectList(): export?
         - mainly to allow merging of lists, perhaps make util for that instead? Would also be handy for MF databases
-    - check why annotateSuspects() is sometimes slow
-    - check UNDONEs
     - remove old annotation results in annotateSuspects()?
     - better name for selectBestFGroups filter?
 - expand reporting
@@ -42,12 +48,24 @@
 - update docs, handbook & NEWS
     - renamed rt/mz columns
     - new plotVenn list functionality
-    - logging for ID level estimation
     - removal of screening for features
     - update TASQ docs and other mentions to old suspect screening interface
     - update examples where suspect name is used for subsetting
     - mention that components should be done prior to onlyHits=T?
     - simplified reportCSV() for fGroups
+    - as.data.table: columns depend on collapseSuspects
+    - annotateSuspects:
+        - annSimBoth falls back to annSimForm/annSimComp if no formulas available
+        - logging for ID level estimation
+        - if suspect fragments are less than the rule value then the former is used as minimum
+        - yml
+            - relative fields only used for scorings of compound/formulas
+    - filter
+        - selectHitsBy/selectFGroupsBy only applies to hits, in case of ties: first hit
+        - mention that filter with onlyHits may need to be repeated
+        - properly document negate:
+            - selectHitsBy: select worst hit
+            - onlyHits: if TRUE only select non-hits, if FALSE select hits, if NULL nothing
 - tests
     - automatic InChIKey/formula calculation from InChIs/SMILES
         - already done implicitly?

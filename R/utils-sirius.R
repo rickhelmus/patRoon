@@ -180,6 +180,15 @@ runSIRIUS <- function(precursorMZs, MSPLists, MSMSPLists, profile, adduct, ppmMa
         batches <- splitInBatches(seq_along(precursorMZs), SIRBatchSize)
     
     command <- getCommandWithOptPath(getSiriusBin(), "SIRIUS")
+    
+    # work-around for Linux and SIRIUS 4.5.0, see https://github.com/boecker-lab/sirius/issues/15
+    preArgs <- character()
+    if (checkmate::testOS("linux"))
+    {
+        preArgs <- c(system.file("inst", "misc", "runsir.sh", package = "patRoon"), dirname(command))
+        command <- "/bin/sh"
+    }
+    
     cmdQueue <- lapply(seq_along(batches), function(bi)
     {
         inPath <- tempfile("sirius_in")
@@ -196,7 +205,7 @@ runSIRIUS <- function(precursorMZs, MSPLists, MSMSPLists, profile, adduct, ppmMa
             return(ret)
         })
         
-        bArgs <- if (isPre44) c(args, "-o", outPath, inPath) else c("-i", inPath, "-o", outPath, args)
+        bArgs <- if (isPre44) c(preArgs, args, "-o", outPath, inPath) else c(preArgs, "-i", inPath, "-o", outPath, args)
         logf <- if (!is.null(logPath)) file.path(logPath, paste0("sirius-batch_", bi, ".txt")) else NULL
         
         return(list(command = command, args = bArgs, logFile = logf, outPath = outPath, msFNames = msFNames))

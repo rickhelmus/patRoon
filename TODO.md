@@ -36,14 +36,13 @@
     - update version number
     - prepareSuspectList(): export?
         - mainly to allow merging of lists, perhaps make util for that instead? Would also be handy for MF databases
-    - remove old annotation results in annotateSuspects()?
+    - remove old annotation results in annotateSuspects()
     - better name for selectBestFGroups filter?
 - expand reporting
     - eg marking which candidate corresponds to suspect and include suspect name in EICs
         - mark with different row colour and label?
     - mention suspect similarities/ranks etc for candidates (or somehow in compounds?)
     - optionally report with collapsed suspects
-    - merge columns to avoid horizontal scrollbars
 - update docs, handbook & NEWS
     - renamed rt/mz columns
     - new plotVenn list functionality

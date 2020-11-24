@@ -62,7 +62,7 @@ allGroups <- unique(c(plotGroups, componentFGroups, mfWebFGroups))
 
 # UNDONE: replace by proper inheritance
 isSusp <- isScreening(rmdVars$fGroups)
-
+keepSuspCols <- c("suspect", "d_rt", "d_mz", "estIDLevel")
 if (isSusp)
 {
     fGroupsSpecDT <- as.data.table(rmdVars$fGroups, collapseSuspects = NULL)
@@ -73,6 +73,30 @@ if (isSusp)
         if (!is.null(fGroupsSpecDT[[col]]))
             fGroupsSpecDT[, (col) := round(get(col), 2)]
     }
+       
+    # NOTE: all cols must be same type
+    mergeCols <- function(fg, curColNames, parColNames, mergedName)
+    {
+        present <- which(curColNames %in% names(fg))
+        if (length(present) == 0)
+            return(fg)
+        
+        newColName <- paste(mergedName, paste0("(", paste0(parColNames[present], collapse = "/"), ")"))
+        keepSuspCols <<- c(keepSuspCols, newColName)
+        
+        fg[, (newColName) := do.call(paste, c(mget(curColNames[present]), list(sep = " / ")))]
+        return(fg)
+    }
+
+    fGroupsSpecDT <- mergeCols(fGroupsSpecDT, c("suspFormRank", "suspCompRank"), c("form", "comp"), "rank")
+    fGroupsSpecDT <- mergeCols(fGroupsSpecDT, c("annSimForm", "annSimComp", "annSimBoth"),
+                               c("form", "comp", "both"), "annotated sim")
+    fGroupsSpecDT <- mergeCols(fGroupsSpecDT, c("maxFrags", "maxFragMatches", "maxFragMatchesRel"),
+                               c("suspect", "max matches", "max matches rel"), "fragments")
+    
+    # keep ID level as last column
+    IDLevInd <- which(keepSuspCols == "estIDLevel")
+    keepSuspCols <- c(keepSuspCols[-IDLevInd], "estIDLevel")
 } else
     fGroupsSpecDT <- as.data.table(rmdVars$fGroups)
 
@@ -81,13 +105,7 @@ if (rmdVars$retMin)
     fGroupsSpecDT[, ret := ret / 60]
 
 fGroupsSpecDT[, c("ret", "mz") := .(round(ret, 2), round(mz, 5))]
-fGroupsSpecDT <- fGroupsSpecDT[, intersect(c("group", "ret", "mz", "suspect", "d_rt", "d_mz",
-                                             "suspFormRank", "suspCompRank",
-                                             "annSimForm", "annSimComp", "annSimBoth",
-                                             "maxFrags", "maxFragMatches", "maxFragMatchesRel",
-                                             "estIDLevel"),
-                                           names(fGroupsSpecDT)),
-                               with = FALSE]
+fGroupsSpecDT <- fGroupsSpecDT[, intersect(c("group", "ret", "mz", keepSuspCols), names(fGroupsSpecDT)), with = FALSE]
 fGroupsSpecDT[, groupInd := match(group, allGroups)]
 setcolorder(fGroupsSpecDT, "groupInd")
 

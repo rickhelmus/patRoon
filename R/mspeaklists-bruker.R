@@ -244,7 +244,7 @@ generateMSPeakListsDAFMF <- function(fGroups, minMSIntensity = 500, minMSMSInten
         close(prog)
 
         if (is.null(cachedSet))
-            saveCacheSet("MSPeakListsDAFMF", resultHashes[resultHashes != ""], setHash, cacheDB)
+            saveCacheSet("MSPeakListsDAFMF", resultHashes[nzchar(resultHashes)], setHash, cacheDB)
 
         closeSaveDAFile(DA, findDA, close, save)
     }

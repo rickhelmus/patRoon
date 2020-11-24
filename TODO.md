@@ -20,6 +20,7 @@
         - also allow suspect annotation with only peak lists? currently only selectable if formulas/compounds selected
     - annotateSuspects()
         - rename to annotate()? is a function (but not generic) from ggplot2 and RAMClustR and method from CAMERA, so probably no
+            - OTOH, it's pretty clear now it only concerns suspects
     conflicts
         - check why it's is sometimes slow
             - seems to be logging, disable by default? --> only slow with testthat?
@@ -38,7 +39,6 @@
     - prepareSuspectList(): export?
         - mainly to allow merging of lists, perhaps make util for that instead? Would also be handy for MF databases
     - better name for selectBestFGroups filter?
-    - != "" --> !nzchar()
 - expand reporting
     - eg marking which candidate corresponds to suspect and include suspect name in EICs
         - mark with different row colour and label?

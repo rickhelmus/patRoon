@@ -52,7 +52,7 @@ getScriptCode <- function(input, analyses)
     template <- templates::tmpl(readAllFile(system.file("templates", "main_script.R", package = "patRoon")),
                                 destination = sldest, generateAnaInfo = input$generateAnaInfo, analysisTableFile = input$analysisTableFile,
                                 analyses = analyses, suspectList = input$suspectList, suspectAdduct = input$suspectAdduct,
-                                doMSPeakFind = (input$formulaGen != "" && input$formulaGen != "Bruker") || input$compIdent != "",
+                                doMSPeakFind = (nzchar(input$formulaGen) && input$formulaGen != "Bruker") || nzchar(input$compIdent),
                                 precursorMzWindow = input$precursorMzWindow, polarity = input$polarity,
                                 annotateSus = input$annotateSus && (nzchar(input$formulaGen) || nzchar(input$compIdent)),
                                 genIDLevelFile = input$genIDLevelFile, reportFormats = input$report)
@@ -422,9 +422,9 @@ newProject <- function(destPath = NULL)
                                                         group = character(0), blank = character(0), path = character(0)))
 
         observeEvent(input$create, {
-            if (input$destinationPath == "")
+            if (!nzchar(input$destinationPath))
                 rstudioapi::showDialog("Invalid destination", "Please select a destination path!", "")
-            else if (input$outputScriptTo != "curFile" && input$scriptFile == "")
+            else if (input$outputScriptTo != "curFile" && !nzchar(input$scriptFile))
                 rstudioapi::showDialog("No script file", "Please select a destination script file!", "")
             else if (input$generateAnaInfo %in% c("table", "script") && nrow(rValues$analyses) == 0)
                 rstudioapi::showDialog("No analyses selected", "Please select some analyses!", "")

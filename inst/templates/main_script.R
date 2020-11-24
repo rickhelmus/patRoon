@@ -98,7 +98,7 @@ suspFile <- read.csv("{{ suspectList }}", stringsAsFactors = FALSE)
 fGroups <- screenSuspects(fGroups, suspFile, rtWindow = 12, mzWindow = 0.005,
                           adduct = {{ if (!nzchar(suspectAdduct)) "NULL" else paste0("\"", suspectAdduct, "\"") }}, onlyHits = TRUE)
 {{ endCodeBlock() }}
-{{ optionalCodeBlock(doMSPeakFind || formulaOpts$algo != "" || identOpts$algo != "" || componentOpts$algo != "") }}
+{{ optionalCodeBlock(doMSPeakFind || nzchar(formulaOpts$algo) || nzchar(identOpts$algo) || nzchar(componentOpts$algo)) }}
 
 
 {{ header("annotation") }}
@@ -125,7 +125,7 @@ mslists <- generateMSPeakLists(fGroups, "brukerfmf", avgFGroupParams = avgPListP
 #                  relMSMSIntThr = NULL, topMSPeaks = NULL, topMSMSPeaks = NULL,
 #                  deIsotopeMS = FALSE, deIsotopeMSMS = FALSE)
 {{ endCodeBlock() }}
-{{ optionalCodeBlock(formulaOpts$algo != "") }}
+{{ optionalCodeBlock(nzchar(formulaOpts$algo)) }}
 
 # Calculate formula candidates
 {{ endCodeBlock() }}
@@ -143,7 +143,7 @@ formulas <- generateFormulas(fGroups, "sirius", mslists, relMzDev = 5,
                              adduct = "{{ if (polarity == 'positive') '[M+H]+' else '[M-H]-' }}", elements = "CHNOP",
                              profile = "qtof", calculateFeatures = TRUE, featThreshold = 0.75)
 {{ endCodeBlock() }}
-{{ optionalCodeBlock(identOpts$algo != "") }}
+{{ optionalCodeBlock(nzchar(identOpts$algo)) }}
 
 # Find compound structure candidates
 {{ endCodeBlock() }}
@@ -151,14 +151,14 @@ formulas <- generateFormulas(fGroups, "sirius", mslists, relMzDev = 5,
 compounds <- generateCompounds(fGroups, mslists, "metfrag", method = "CL", dbRelMzDev = 5,
                                fragRelMzDev = 5, fragAbsMzDev = 0.002,
                                adduct = "{{ if (polarity == 'positive') '[M+H]+' else '[M-H]-' }}", database = "pubchem", maxCandidatesToStop = 2500)
-compounds <- addFormulaScoring(compounds, formulas, TRUE) {{ optionalLine(formulaOpts$algo != "") }}
+compounds <- addFormulaScoring(compounds, formulas, TRUE) {{ optionalLine(nzchar(formulaOpts$algo)) }}
 {{ endCodeBlock() }}
 {{ optionalCodeBlock(identOpts$algo == "SIRIUS") }}
 compounds <- generateCompounds(fGroups, mslists, "sirius", relMzDev = 5,
                                adduct = "{{ if (polarity == 'positive') '[M+H]+' else '[M-H]-' }}", elements = "CHNOP", profile = "qtof",
                                fingerIDDatabase = "pubchem")
 {{ endCodeBlock() }}
-{{ optionalCodeBlock(componentOpts$algo != "") }}
+{{ optionalCodeBlock(nzchar(componentOpts$algo)) }}
 
 # Perform automatic generation of components
 {{ endCodeBlock() }}
@@ -178,13 +178,13 @@ components <- generateComponents(fGroups, "nontarget", ionization = "{{ polarity
 # Annotate suspects
 {{ endCodeBlock() }}
 {{ optionalCodeBlock(nzchar(suspectList) && annotateSus && genIDLevelFile) }}
-fGroups <- annotateSuspects(fGroups, formulas = {{ if (formulaOpts$algo != "") "formulas" else "NULL" }},
-                            compounds = {{ if (identOpts$algo != "") "compounds" else "NULL" }}, MSPeakLists = {{ if (doMSPeakFind) "mslists" else "NULL" }},
+fGroups <- annotateSuspects(fGroups, formulas = {{ if (nzchar(formulaOpts$algo)) "formulas" else "NULL" }},
+                            compounds = {{ if (nzchar(identOpts$algo)) "compounds" else "NULL" }}, MSPeakLists = {{ if (doMSPeakFind) "mslists" else "NULL" }},
                             IDFile = "idlevelrules.yml")
 {{ endCodeBlock() }}
 {{ optionalCodeBlock(nzchar(suspectList) && annotateSus && !genIDLevelFile) }}
-fGroups <- annotateSuspects(fGroups, formulas = {{ if (formulaOpts$algo != "") "formulas" else "NULL" }},
-                            compounds = {{ if (identOpts$algo != "") "compounds" else "NULL" }}, MSPeakLists = {{ if (doMSPeakFind) "mslists" else "NULL" }})
+fGroups <- annotateSuspects(fGroups, formulas = {{ if (nzchar(formulaOpts$algo)) "formulas" else "NULL" }},
+                            compounds = {{ if (nzchar(identOpts$algo)) "compounds" else "NULL" }}, MSPeakLists = {{ if (doMSPeakFind) "mslists" else "NULL" }})
 {{ endCodeBlock() }}
 {{ optionalCodeBlock(length(reportFormats) > 0) }}
 
@@ -194,21 +194,21 @@ fGroups <- annotateSuspects(fGroups, formulas = {{ if (formulaOpts$algo != "") "
 
 {{ endCodeBlock() }}
 {{ optionalCodeBlock("CSV" %in% reportFormats) }}
-reportCSV(fGroups, path = "report", reportFeatures = FALSE, formulas = {{ if (formulaOpts$algo != "") "formulas" else "NULL" }},
-          compounds = {{ if (identOpts$algo != "") "compounds" else "NULL" }}, compoundsNormalizeScores = "max",
-          components = {{ if (componentOpts$algo != "") "components" else "NULL" }})
+reportCSV(fGroups, path = "report", reportFeatures = FALSE, formulas = {{ if (nzchar(formulaOpts$algo)) "formulas" else "NULL" }},
+          compounds = {{ if (nzchar(identOpts$algo)) "compounds" else "NULL" }}, compoundsNormalizeScores = "max",
+          components = {{ if (nzchar(componentOpts$algo)) "components" else "NULL" }})
 
 {{ endCodeBlock() }}
 {{ optionalCodeBlock("PDF" %in% reportFormats) }}
-reportPDF(fGroups, path = "report", reportFGroups = TRUE, formulas = {{ if (formulaOpts$algo != "") "formulas" else "NULL" }}, reportFormulaSpectra = TRUE,
-          compounds = {{ if (identOpts$algo != "") "compounds" else "NULL" }}, compoundsNormalizeScores = "max",
-          components = {{ if (componentOpts$algo != "") "components" else "NULL" }}, MSPeakLists = {{ if (doMSPeakFind) "mslists" else "NULL" }})
+reportPDF(fGroups, path = "report", reportFGroups = TRUE, formulas = {{ if (nzchar(formulaOpts$algo)) "formulas" else "NULL" }}, reportFormulaSpectra = TRUE,
+          compounds = {{ if (nzchar(identOpts$algo)) "compounds" else "NULL" }}, compoundsNormalizeScores = "max",
+          components = {{ if (nzchar(componentOpts$algo)) "components" else "NULL" }}, MSPeakLists = {{ if (doMSPeakFind) "mslists" else "NULL" }})
 
 {{ endCodeBlock() }}
 {{ optionalCodeBlock("HTML" %in% reportFormats) }}
 reportHTML(fGroups, path = "report", reportPlots = c("chord", "venn", "upset", "eics", "formulas"),
-           formulas = {{ if (formulaOpts$algo != "") "formulas" else "NULL" }}, compounds = {{ if (identOpts$algo != "") "compounds" else "NULL" }}, compoundsNormalizeScores = "max",
-           components = {{ if (componentOpts$algo != "") "components" else "NULL" }}, MSPeakLists = {{ if (doMSPeakFind) "mslists" else "NULL" }},
+           formulas = {{ if (nzchar(formulaOpts$algo)) "formulas" else "NULL" }}, compounds = {{ if (nzchar(identOpts$algo)) "compounds" else "NULL" }}, compoundsNormalizeScores = "max",
+           components = {{ if (nzchar(componentOpts$algo)) "components" else "NULL" }}, MSPeakLists = {{ if (doMSPeakFind) "mslists" else "NULL" }},
            selfContained = FALSE, openReport = TRUE)
 
 {{ endCodeBlock() }}

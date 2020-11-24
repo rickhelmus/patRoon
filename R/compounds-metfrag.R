@@ -722,7 +722,7 @@ generateCompoundsMetFrag <- function(fGroups, MSPeakLists, method = "CL", timeou
         }
         
         if (is.null(cachedSet))
-            saveCacheSet("compoundsMetFrag", resultHashes[resultHashes != ""], setHash, cacheDB)
+            saveCacheSet("compoundsMetFrag", resultHashes[nzchar(resultHashes)], setHash, cacheDB)
     }
     
     # prune empty/NULL results

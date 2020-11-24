@@ -206,14 +206,14 @@ deIsotopeMSPeakList <- function(MSPeakList, negate)
     unique_iso <- sapply(seq_along(MSPeakList$cmp), function(i)
     {
         # first and unassigned compounds are always unique
-        if (i == 1 || MSPeakList$cmp[i] == "")
+        if (i == 1 || !nzchar(MSPeakList$cmp[i]))
             return(TRUE)
 
         # peak may belong to multiple isotope compounds (separated by whitespace)
         cmp <- strsplit(MSPeakList$cmp[i], "\\s+")
 
         # isotope compound present before this entry?
-        othercmp <- MSPeakList[seq_len(i - 1)][cmp != ""]$cmp
+        othercmp <- MSPeakList[seq_len(i - 1)][nzchar(cmp)]$cmp
         for (ocmp in othercmp)
         {
             if (any(cmp %in% strsplit(ocmp, "\\s+")))

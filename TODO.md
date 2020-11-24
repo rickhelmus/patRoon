@@ -4,7 +4,6 @@
 - test negative subset indices
 - convertMSFiles()
     - Agilent .d is also a directory?
-- runWithoutCache? runWithCacheMode()? shortcut to withr::with_options(patRoon.cache.mode=...)
 
 
 ## docs
@@ -79,6 +78,7 @@
         - normalizePath and hashing for MF db files
         - splitBatches
         - generateCompoundsMetfrag --> generateCompoundsMetFrag
+        - wOpt/printPackageOpts
 
 
 # Future

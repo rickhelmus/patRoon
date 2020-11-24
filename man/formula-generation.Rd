@@ -165,7 +165,7 @@ commandline option.}
 run sequentially in each parallel process. Combining commands with short
 runtimes (such as \command{GenForm}) can significantly increase parallel
 performance. For more information see \code{\link{executeMultiProcess}}.
-Note that this is ignored if \options{patRoon.MP.method="future"}.}
+Note that this is ignored if \option{patRoon.MP.method="future"}.}
 
 \item{profile}{Name of the configuration profile, for example:
 \option{"qtof"}, \option{"orbitrap"}, \option{"fticr"}. Sets the

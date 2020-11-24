@@ -275,7 +275,7 @@ processGenFormResultFile <- function(file, isMSMS, adduct, topMost)
 #'   run sequentially in each parallel process. Combining commands with short
 #'   runtimes (such as \command{GenForm}) can significantly increase parallel
 #'   performance. For more information see \code{\link{executeMultiProcess}}.
-#'   Note that this is ignored if \options{patRoon.MP.method="future"}.
+#'   Note that this is ignored if \option{patRoon.MP.method="future"}.
 #' 
 #' @section Parallelization: When \code{futures} are used for parallel processing
 #'   (\code{patRoon.MP.method="future"}), calculations with \command{GenForm}

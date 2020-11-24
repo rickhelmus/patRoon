@@ -19,6 +19,12 @@ defaultPkgOpts <- function(pkgname)
     return(setNames(ret, paste0(pkgname, ".", names(ret))))
 }
 
+dumpPkgOpts <- function(printFunc)
+{
+    for (opt in names(defaultPkgOpts(utils::packageName())))
+        printFunc(sprintf("- %s: \"%s\"", opt, getOption(opt)))
+}
+
 .onLoad <- function(libname, pkgname)
 {
     # intialize any options that are unset
@@ -32,6 +38,5 @@ defaultPkgOpts <- function(pkgname)
 {
     packageStartupMessage(sprintf("Welcome to %s %s!", pkgname, utils::packageVersion(pkgname)))
     packageStartupMessage("Configuration:")
-    for (opt in names(defaultPkgOpts(pkgname)))
-        packageStartupMessage(sprintf("- %s: \"%s\"", opt, getOption(opt)))
+    dumpPkgOpts(packageStartupMessage)
 }

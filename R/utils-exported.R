@@ -127,6 +127,43 @@ generateAnalysisInfoFromEnviMass <- function(path)
     return(ret)
 }
 
+#' Temporarily changes package options
+#'
+#' This function is inspired by
+#' \code{\link[withr:with_options]{withr::with_options}}: it can be used to
+#' execute some code where package options are temporarily changed. This
+#' function uses a shortened syntax, especially when changing options for
+#' \code{patRoon}.
+#'
+#' @param \dots Named arguments with options to change.
+#' @param code The code to be executed.
+#' @param prefix A \code{character} that will be used to prefix given option
+#'   names.
+#'
+#' @examples \dontrun{
+#' # Set max parallel processes to five while performing formula calculations
+#' wOpt(MP.maxProcs = 5, {
+#'     formulas <- generateFormulas(fGroups, "genform", ...)
+#' })
+#' }
+#'
+#' @export
+wOpt <- withr::with_(function(..., prefix = "patRoon.")
+{
+    checkmate::assertString(prefix, null.ok = TRUE)
+    opts <- list(...)
+    checkmate::assertNamed(opts, "unique", .var.name = "...")
+    
+    if (!is.null(prefix))
+        names(opts) <- paste0(prefix, names(opts))
+    
+    options(opts)
+}, function(old) options(old), new = FALSE)
+
+#' Prints all the package options of \code{patRoon} and their currently set values.
+#' @export
+printPackageOpts <- function() dumpPkgOpts(function(s) cat(s, "\n", sep = ""))
+
 #' Verifies if all dependencies are installed properly and instructs the user if
 #' this is not the case.
 #' @export

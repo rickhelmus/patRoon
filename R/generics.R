@@ -76,72 +76,11 @@ setGeneric("plotHeatMap", function(obj, ...) standardGeneric("plotHeatMap"))
 
 ### suspect screening
 
+setGeneric("screenSuspects", function(fGroups, suspects, rtWindow = 12, mzWindow = 0.005, adduct = NULL,
+                                      skipInvalid = TRUE, onlyHits = FALSE) standardGeneric("screenSuspects"))
 setGeneric("screenInfo", function(obj) standardGeneric("screenInfo"))
 setGeneric("annotateSuspects", function(fGroups, MSPeakLists = NULL, formulas = NULL,
                                         compounds = NULL, ...) standardGeneric("annotateSuspects"))
-
-#' Target and suspect screening
-#'
-#' Utilities to screen for analytes with known or suspected identity.
-#'
-#' Besides 'full non-target analysis', where compounds may be identitified with
-#' little to no prior knowledge, a common strategy is to screen for compounds
-#' with known or suspected identity. This may be a generally favourable approach
-#' if possible, as it can significantly reduce the load on data interpretation.
-#'
-#' @note Both \code{screenSuspects} and
-#'   \code{importFeatureGroupsBrukerTASQ} use names from targets/suspects as
-#'   feature group names, therefore, it is important that these are
-#'   file-compatible names when \link[=reporting]{reporting data} \file{csv} or
-#'   \file{pdf} data.
-#'
-#' @name suspect-screening
-NULL
-
-#' @details \code{screenSuspects} will screen a set of suspects (provided as a
-#'   \code{data.frame}) within an \code{\link{features}} or
-#'   \code{\link{featureGroups}} object.
-#'
-#' @param obj The object that should be screened (\emph{i.e.}
-#'   \code{\link{features}} or \code{\link{featureGroups}}).
-#' @param suspects A \code{data.frame} that must contain a \code{"name"} column
-#'   (the analyte name) and \emph{at least} a \code{"mz"}, \code{"neutralMass"},
-#'   \code{"formula"}, \code{"SMILES"}, \code{"InChI"} column (with the ionized
-#'   m/z value, the neutral monoisotopic mass or the chemical
-#'   formula/SMILES/InChI character string for the molecule, respectively). If
-#'   an ion mass needs to be calculated (\emph{i.e.} no valid data is available
-#'   in the \code{mz} column) then data is tried to be used from the columns in
-#'   the aforementioned order. Furthermore, if ion masses need to be calculated
-#'   then the adduct must be specified either with the \code{adduct} function
-#'   argument or by an \code{"adduct"} column containing a \code{character} that
-#'   can be converted with \code{as.adduct} (\emph{e.g.} \code{"[M+H]+"}). In
-#'   addition, a column \code{"rt"} can be included to specify the retention
-#'   time (if unspecified no retention times are checked).
-#' @param rtWindow,mzWindow The retention time window (in seconds) and
-#'   \emph{m/z} window that will be used for matching a suspect (+/- feature
-#'   data).
-#' @param adduct An \code{\link{adduct}} object (or something that can be
-#'   converted to it with \code{\link{as.adduct}}). Examples: \code{"[M-H]-"},
-#'   \code{"[M+Na]+"}. Can be \code{NULL} if either a \code{"mz"} or
-#'   \code{"adduct"} column is present in the \code{suspects} argument.
-#' @param skipInvalid If set to \code{TRUE} then suspects with invalid data
-#'   (\emph{e.g.} missing names or other missing data) will be ignored with a
-#'   warning. Similarly, any suspects for which mass calculation failed (when no
-#'   \code{mz} column is present in the suspect list), for instance, due to
-#'   invalid \code{SMILES}, will be ignored with a warning.
-#'
-#' @return \code{screenSuspects} will return a table (a
-#'   \code{\link{data.table}}) with detected suspects and details such as
-#'   retention and \emph{m/z} values. If a suspect is matched on multiple
-#'   features/feature groups then each hit is reported as a separate row.
-#'   
-#' @note For \code{screenSuspects} in some cases you may need to install
-#'   \href{http://openbabel.org/wiki/Main_Page}{OpenBabel} (\emph{e.g.} when
-#'   only InChI data is available for mass calculation).
-#'
-#' @rdname suspect-screening
-setGeneric("screenSuspects", function(fGroups, suspects, rtWindow = 12, mzWindow = 0.005, adduct = NULL,
-                                              skipInvalid = TRUE, onlyHits = FALSE) standardGeneric("screenSuspects"))
 
 
 ### Optimization

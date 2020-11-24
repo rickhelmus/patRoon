@@ -3,7 +3,39 @@
 #' @include utils-screening.R
 NULL
 
-#' @rdname suspect-screening
+#' Class for suspect screened feature groups.
+#'
+#' This class derives from \code{\link{featureGroups}} and adds suspect
+#' screening information.
+#'
+#' @param obj,object,x,fGroups The \code{featureGroupsScreening} object.
+#' @param \dots Passed to the base \code{\link{featureGroups}} method.
+#' @param onlyHits For \code{as.data.table}: if \code{TRUE} then only feature
+#'   groups with suspect hits are reported.
+#'
+#'   For \code{filter} \itemize{
+#'
+#'   \item if \code{negate=FALSE} and \code{onlyHits=TRUE} then all feature
+#'   groups without suspect hits will be removed. Otherwise nothing will be
+#'   done.
+#'
+#'   \item if \code{negate=TRUE} then \code{onlyHits=TRUE} will select feature
+#'   groups without suspect hits, \code{onlyHits=FALSE} will only retain feature
+#'   groups with suspect matches and this filter is ignored if
+#'   \code{onlyHits=NULL}.
+#'
+#'   }
+#'
+#' @slot screenInfo A (\code{\link{data.table}}) with results from suspect
+#'   screening. This table will be amended with annotation data when
+#'   \code{annotateSuspects} is run.
+#'
+#' @templateVar class featureGroupsScreening
+#' @template class-hierarchy
+#'
+#' @seealso \code{\link{featureGroups}}
+#'
+#' @export
 featureGroupsScreening <- setClass("featureGroupsScreening",
                                    slots = c(screenInfo = "data.table"),
                                    contains = "featureGroups")
@@ -12,6 +44,9 @@ setMethod("initialize", "featureGroupsScreening",
           function(.Object, ...) callNextMethod(.Object, algorithm = "screening", ...))
 
 
+#' @describeIn featureGroupsScreening Returns a table with screening information
+#'   (see \code{screenInfo} slot).
+#' @export
 setMethod("screenInfo", "featureGroupsScreening", function(obj) obj@screenInfo)
 
 #' @describeIn featureGroupsScreening Shows summary information for this object.
@@ -24,6 +59,16 @@ setMethod("show", "featureGroupsScreening", function(object)
     printf("Annotated: %s\n", if (!is.null(screenInfo(object)[["estIDLevel"]])) "yes" else "no")
 })
 
+#' @describeIn featureGroupsScreening Subset on analyses, feature groups and/or
+#'   suspects.
+#'   
+#' @param i,j,rGroups Used for subsetting data analyses, feature groups and
+#'   replicate groups, see \code{\link{featureGroups}}.
+#' @param suspects An optional \code{character} vector with suspect names. If
+#'   specified, only \code{featureGroups} will be kept that are assigned to
+#'   these suspects.
+#'
+#' @export
 setMethod("[", c("featureGroupsScreening", "ANY", "ANY", "missing"), function(x, i, j, ..., rGroups,
                                                                               suspects = NULL, drop = TRUE)
 {
@@ -38,6 +83,19 @@ setMethod("[", c("featureGroupsScreening", "ANY", "ANY", "missing"), function(x,
     return(x)
 })
 
+#' @describeIn featureGroupsScreening Obtain a summary table (a
+#'   \code{\link{data.table}}) with retention, \emph{m/z}, intensity and
+#'   optionally other feature data. Furthermore, the output table will be merged
+#'   with information from \code{screenInfo}, such as suspect names and other
+#'   properties and annotation data.
+#'
+#' @param collapseSuspects If a \code{character} then any suspects that were
+#'   matched to the same feature group are collapsed to a single row and suspect
+#'   names are separated by the value of \code{collapseSuspects}. If \code{NULL}
+#'   then no collapsing occurs, and each suspect match is reported on a single
+#'   row.
+#'
+#' @export
 setMethod("as.data.table", "featureGroupsScreening",
           function(x, ..., collapseSuspects = ",", onlyHits = FALSE)
 {
@@ -65,9 +123,42 @@ setMethod("as.data.table", "featureGroupsScreening",
     return(ret)
 })
 
+#' @describeIn featureGroupsScreening Incorporates annotation data obtained
+#'   during the workflow to annotate suspects with matched known MS/MS
+#'   fragments, formula/candidate ranks and automatic estimation of
+#'   identification levels. See the \verb{Suspect annotation} section for more
+#'   details.
+#'
 #' @templateVar normParam compoundsNormalizeScores,formulasNormalizeScores
 #' @templateVar noNone TRUE
 #' @template norm-args
+#'
+#' @param MSPeakLists,formulas,compounds Annotation data
+#'   (\code{\link{MSPeakLists}}, \code{\link{formulas}} and
+#'   \code{\code{compounds}}) obtained for this \code{featureGroupsScreening}
+#'   object. All arguments can be \code{NULL} to exclude it from the annotation.
+#' @param absMzDev Maximum absolute \emph{m/z} deviation.
+#' @param relMinMSMSIntensity Minimum relative intensity (\samp{0-1}) threshold
+#'   applied when calculating annotation similarities.
+#' @param simMSMSMethod Either \code{"cosine"} or \code{"jaccard"}: used to
+#'   compare MS/MS peak lists for annotation similarity calculation.
+#' @param checkFragments Which type(s) of MS/MS fragments from workflow data
+#'   should be checked to evaluate the number of suspect fragment matches
+#'   (\emph{i.e.} from the \code{fragments_mz}/\code{fragments_formula} columns
+#'   in the suspect list). Valid values are: \code{"mz"}, \code{"formula"},
+#'   \code{"compounds"}. The former uses \emph{m/z} values in the specified
+#'   \code{MSPeakLists} object, whereas the others use the formulae that were
+#'   annotated to MS/MS peaks in the given \code{formulas} or \code{compounds}
+#'   objects. Multiple values are possible: in this case the maximum number of
+#'   fragment matches will be reported.
+#' @param IDFile A file path to a YAML file with rules used for estimation of
+#'   identification levels. See the \verb{Suspect annotation} section for more
+#'   details. If not specified then a default rules file will be used.
+#'
+#' @return \code{annotateSuspects} returns a \code{featureGroupsScreening}
+#'   object amended with annotation data.
+#'
+#' @export
 setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeakLists, formulas, compounds,
                                                                  absMzDev = 0.005, relMinMSMSIntensity = 0.05,
                                                                  simMSMSMethod = "cosine",
@@ -232,6 +323,45 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
     return(fGroups)
 })
 
+#' @describeIn featureGroupsScreening Performs rule based filtering. This method
+#'   builds on the comprehensive filter functionality from the base
+#'   \code{\link{filter,featureGroups-method}}. It adds several filters to
+#'   select \emph{e.g.} the best ranked suspects or those with a minimum
+#'   estimated identification level. \strong{NOTE}: most filters \emph{only}
+#'   affect suspect hits, not feature groups. Set \code{onlyHits=TRUE} to
+#'   subsequently remove any feature groups that lost any suspect matches due to
+#'   other filter steps.
+#'
+#' @param selectHitsBy Should be \code{"intensity"} or \code{"level"}. For cases
+#'   where the same suspect is matched to multiple feature groups, only the
+#'   suspect to the feature group with highest mean intensity
+#'   (\code{selectHitsBy="intensity"}) or best identification level
+#'   (\code{selectHitsBy="level"}) is kept. In case of ties only the first hit
+#'   is kept. Set to \code{NULL} to ignore this filter. If \code{negate=TRUE}
+#'   then only those hits with lowest mean intensity/poorest identification
+#'   level are kept.
+#' @param selectBestFGroups If \code{TRUE} then for any cases where a single
+#'   feature group is matched to several suspects only the suspect assigned to
+#'   the feature group with best identification score is kept. In case of ties
+#'   only the first is kept.
+#' @param
+#' maxLevel,maxFormRank,maxCompRank,minAnnSimForm,minAnnSimComp,minAnnSimBoth
+#' Filter suspects by maximum identification level (\emph{e.g.} \code{"3a"}),
+#' formula/compound rank or with minimum formula/compound/combined annotation
+#' similarity. Set to \code{NULL} to ignore.
+#' @param absMinFragMatches,relMinFragMatches Only retain suspects with this
+#'   minimum number MS/MS matches with the fragments specified in the suspect
+#'   list (\emph{i.e.} \code{fragments_mz}/\code{fragments_formula}).
+#'   \code{relMinFragMatches} sets the minimum that is relative (\samp{0-1}) to
+#'   the maximum number of MS/MS fragments specified in the \code{fragments_*}
+#'   columns of the suspect list. Set to \code{NULL} to ignore.
+#' @param negate If set to \code{TRUE} then filtering operations are performed
+#'   in opposite manner.
+#'
+#' @return \code{filter} returns a filtered \code{featureGroupsScreening}
+#'   object.
+#'
+#' @export
 setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = NULL,
                                                        selectHitsBy = NULL, selectBestFGroups = FALSE,
                                                        maxLevel = NULL, maxFormRank = NULL, maxCompRank = NULL,
@@ -334,32 +464,80 @@ setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = NULL
     return(obj)
 })
 
-#' @details \code{screenSuspects} uses results from \code{screenSuspects}
-#'   to transform an existing \code{\link{featureGroups}} object by (1) renaming
-#'   any matched feature groups by the respective name of the suspect and (2)
-#'   filtering out any feature groups that were not matched. A common workflow
-#'   is to first obtain and group features (with \emph{e.g.}
-#'   \code{\link{findFeatures}} and \code{\link{groupFeatures}}), screen them
-#'   with \code{screenSuspects}, convert the \code{featureGroups} object that was
-#'   used for screening with this method function and continue any further
-#'   workflow steps such as compound identification as with 'regular'
-#'   \code{featureGroups}.
-#'
+
+#' @details \code{screenSuspects} is used to perform suspect screening. The
+#'   input \code{\link{featureGroups}} object will be screened for suspects by
+#'   \emph{m/z} values and optionally retention times. Afterwards, any feature
+#'   groups not matched may be kept or removed, depending whether a full
+#'   non-target analysis is desired.
 #' @param fGroups The \code{\link{featureGroups}} object that should be
-#'   transformed (and was used to obtain the screening results).
-#' @param scr The screening results table returned by \code{screenSuspects}.
+#'   screened.
+#' @param suspects A \code{data.frame} with suspect information. See the
+#'   \verb{Suspect list format} section below.
+#' @param rtWindow,mzWindow The retention time window (in seconds) and
+#'   \emph{m/z} window that will be used for matching a suspect (+/- feature
+#'   data).
+#' @param adduct An \code{\link{adduct}} object (or something that can be
+#'   converted to it with \code{\link{as.adduct}}). Examples: \code{"[M-H]-"},
+#'   \code{"[M+Na]+"}. May be \code{NULL}, see \verb{Suspect list format}
+#'   section below.
+#' @param skipInvalid If set to \code{TRUE} then suspects with invalid data
+#'   (\emph{e.g.} missing names or other missing data) will be ignored with a
+#'   warning. Similarly, any suspects for which mass calculation failed (when no
+#'   \code{mz} column is present in the suspect list), for instance, due to
+#'   invalid \code{SMILES}, will be ignored with a warning.
+#' @param onlyHits If \code{TRUE} then all feature groups not matched by any of
+#'   the suspects will be removed.
 #'
-#' @return \code{screenSuspects} returns a modified \code{featureGroups}
-#'   object in which those feature groups that were not matched by any suspects
-#'   are removed and others renamed by the respective suspect name. In case of
-#'   duplicate suspect results, feature group names are made unique with
-#'   \code{\link{make.unique}}.
+#' @section Suspect list format: the \code{suspects} argument for
+#'   \code{screenSuspects} should be a \code{data.frame} with the following
+#'   mandatory and optional columns:
 #'
-#' @note Please note that \code{screenSuspects} method can only
-#'   transform the \code{featureGroups} object that was used to obtain the given
-#'   screening results.
+#'   \itemize{
+#'
+#'   \item \code{name} The suspect name. Must be file-compatible.
+#'   (\strong{mandatory})
+#'
+#'   \item \code{rt} The retention time (in seconds) for the suspect. If
+#'   specified the suspect will only be matched if its retention matches the
+#'   experimental value (tolerance defined by the \code{rtWindow} argument).
+#'   (\strong{optional})
+#'
+#'   \item \code{neutralMass},\code{formula},\code{SMILES},\code{InChI} The
+#'   neutral monoisotopic mass, chemical formula, SMILES or InChI for the
+#'   suspect. (data from one of these columns are \strong{mandatory} in case no
+#'   value from the \code{mz} column is available for a suspect)
+#'
+#'   \item \code{mz} The ionized \emph{m/z} of the suspect. (\strong{mandatory}
+#'   unless it can be calculated from one of the aforementioned columns)
+#'
+#'   \item \code{adduct} A \code{character} that can be converted with
+#'   \code{\link{as.adduct}}. (\strong{mandatory} unless data from the \code{mz}
+#'   column is available or the \code{adduct} argument is set)
+#'
+#'   \item \code{fragments_mz},\code{fragments_formula} One or more MS/MS
+#'   fragments (specified as \emph{m/z} or formulae, respectively). Multiple
+#'   values can be specified by separating them with a semicolon (\verb{;}).
+#'   This data is used by \code{\link{annotateSuspects}} to report detected
+#'   MS/MS fragments and calculate identification levels. (\strong{optional})
+#'
+#'   }
+#'
+#'
+#' @return \code{screenSuspects} returns a \code{\link{featureGroupsScreening}}
+#'   object, which is a copy of the input \code{fGroups} object amended with
+#'   additional screening information.
+#'
+#' @note For \code{screenSuspects} in some cases you may need to install
+#'   \href{http://openbabel.org/wiki/Main_Page}{OpenBabel} (\emph{e.g.} when
+#'   only InChI data is available for mass calculation).
+#'
+#' @seealso \code{featureGroupsScreening}
+#'
+#' @references \insertRef{OBoyle2011}{patRoon}
 #'
 #' @rdname suspect-screening
+#' @aliases screenSuspects
 #' @export
 setMethod("screenSuspects", "featureGroups", function(fGroups, suspects, rtWindow, mzWindow,
                                                       adduct, skipInvalid, onlyHits)

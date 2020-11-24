@@ -746,6 +746,22 @@ NULL
 #' @name component-generation
 NULL
 
+#' Target and suspect screening
+#'
+#' Utilities to screen for analytes with known or suspected identity.
+#'
+#' Besides 'full non-target analysis', where compounds may be identified with
+#' little to no prior knowledge, a common strategy is to screen for compounds
+#' with known or suspected identity. This may be a generally favorable approach
+#' if possible, as it can significantly reduce the load on data interpretation.
+#'
+#' @note Both \code{screenSuspects} and \code{importFeatureGroupsBrukerTASQ} may
+#'   use the suspect names to base file names used for reporting, logging etc.
+#'   Therefore, it is important that these are file-compatible names.
+#'
+#' @name suspect-screening
+NULL
+
 #' Bruker DataAnalysis utilities
 #'
 #' Miscellaneous utility functions which interface with Bruker DataAnalysis

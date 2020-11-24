@@ -13,9 +13,6 @@
 \S4method{reportCSV}{featureGroups}(
   fGroups,
   path = "report",
-  reportFGroupsAsRows = TRUE,
-  reportFGroupsAnalysisInfo = TRUE,
-  reportFGroupsRetMz = TRUE,
   reportFeatures = FALSE,
   formulas = NULL,
   formulasNormalizeScores = "max",
@@ -91,15 +88,6 @@ reporting data.}
 
 \item{path}{The destination file path for files generated during reporting.
 Will be generated if needed.}
-
-\item{reportFGroupsAsRows}{Report feature groups as rows (instead of columns)
-within the resulting \file{.csv} file.}
-
-\item{reportFGroupsAnalysisInfo}{Include analyses information (reference and
-replicate groups) in the reported feature groups table \file{.csv} file.}
-
-\item{reportFGroupsRetMz}{Include feature group information (retention time
-and \emph{m/z}) within the reported feature groups table \file{.csv} file.}
 
 \item{reportFeatures}{If set to \code{TRUE} then for each analysis a
 \file{.csv} file will be generated with information about its detected

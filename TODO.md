@@ -38,7 +38,9 @@
     - update version number
     - prepareSuspectList(): export?
         - mainly to allow merging of lists, perhaps make util for that instead? Would also be handy for MF databases
+        - if yes, mention in ref docs for screenSuspects()
     - better name for selectBestFGroups filter?
+    - deprecated groupFeaturesScreening function
 - expand reporting
     - eg marking which candidate corresponds to suspect and include suspect name in EICs
         - mark with different row colour and label?
@@ -58,14 +60,9 @@
         - logging for ID level estimation
         - if suspect fragments are less than the rule value then the former is used as minimum
         - Suspect annotation is currently only optimized for GenForm/MetFrag
+        - Mention case if both fragments_mz and fragments_formulas are available
         - yml
             - relative fields only used for scorings of compound/formulas
-    - filter
-        - selectHitsBy/selectFGroupsBy only applies to hits, in case of ties: first hit
-        - mention that filter with onlyHits may need to be repeated
-        - properly document negate:
-            - selectHitsBy: select worst hit
-            - onlyHits: if TRUE only select non-hits, if FALSE select hits, if NULL nothing
 - tests
     - automatic InChIKey/formula calculation from InChIs/SMILES
         - already done implicitly?

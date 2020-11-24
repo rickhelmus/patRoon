@@ -88,11 +88,15 @@ fGroups <- filter(fGroups, preAbsMinIntensity = {{ filterFGroupsOpts$preIntThr }
                   retentionRange = {{ if (is.null(filterFGroupsOpts$retRange)) "NULL" else paste0("c(", paste0(filterFGroupsOpts$retRange, collapse = ", "), ")") }}, mzRange = {{ if (is.null(filterFGroupsOpts$mzRange)) "NULL" else paste0("c(", paste0(filterFGroupsOpts$mzRange, collapse = ", "), ")") }})
 {{ optionalCodeBlock(nzchar(suspectList)) }}
 
-# Filter feature groups by suspects
+
+{{ header("suspect screening") }}
+
+
+# load suspect list
 suspFile <- read.csv("{{ suspectList }}", stringsAsFactors = FALSE)
-scr <- screenSuspects(fGroups, suspFile, rtWindow = 12, mzWindow = 0.005,
-                      adduct = {{ if (!nzchar(suspectAdduct)) "NULL" else paste0("\"", suspectAdduct, "\"") }})
-fGroups <- screenSuspects(fGroups, scr)
+# Set onlyHits to FALSE to retain features without suspects (eg for full NTA)
+fGroups <- screenSuspects(fGroups, suspFile, rtWindow = 12, mzWindow = 0.005,
+                          adduct = {{ if (!nzchar(suspectAdduct)) "NULL" else paste0("\"", suspectAdduct, "\"") }}, onlyHits = TRUE)
 {{ endCodeBlock() }}
 {{ optionalCodeBlock(doMSPeakFind || formulaOpts$algo != "" || identOpts$algo != "" || componentOpts$algo != "") }}
 
@@ -174,13 +178,13 @@ components <- generateComponents(fGroups, "nontarget", ionization = "{{ polarity
 # Annotate suspects
 {{ endCodeBlock() }}
 {{ optionalCodeBlock(nzchar(suspectList) && annotateSus && genIDLevelFile) }}
-IDLevelRules <- read.csv("idlevelrules.csv", stringsAsFactors = FALSE)
-fGroups <- annotateSuspects(fGroups, MSPeakLists = mslists, formulas = formulas,
-                            compounds = compounds, IDLevelRules = IDLevelRules)
+fGroups <- annotateSuspects(fGroups, formulas = {{ if (formulaOpts$algo != "") "formulas" else "NULL" }},
+                            compounds = {{ if (identOpts$algo != "") "compounds" else "NULL" }}, MSPeakLists = {{ if (doMSPeakFind) "mslists" else "NULL" }},
+                            IDFile = "idlevelrules.yml")
 {{ endCodeBlock() }}
 {{ optionalCodeBlock(nzchar(suspectList) && annotateSus && !genIDLevelFile) }}
-fGroups <- annotateSuspects(fGroups, MSPeakLists = mslists, formulas = formulas,
-                            compounds = compounds)
+fGroups <- annotateSuspects(fGroups, formulas = {{ if (formulaOpts$algo != "") "formulas" else "NULL" }},
+                            compounds = {{ if (identOpts$algo != "") "compounds" else "NULL" }}, MSPeakLists = {{ if (doMSPeakFind) "mslists" else "NULL" }})
 {{ endCodeBlock() }}
 {{ optionalCodeBlock(length(reportFormats) > 0) }}
 
@@ -198,13 +202,13 @@ reportCSV(fGroups, path = "report", reportFeatures = FALSE, formulas = {{ if (fo
 {{ optionalCodeBlock("PDF" %in% reportFormats) }}
 reportPDF(fGroups, path = "report", reportFGroups = TRUE, formulas = {{ if (formulaOpts$algo != "") "formulas" else "NULL" }}, reportFormulaSpectra = TRUE,
           compounds = {{ if (identOpts$algo != "") "compounds" else "NULL" }}, compoundsNormalizeScores = "max",
-          components = {{ if (componentOpts$algo != "") "components" else "NULL" }}, MSPeakLists = {{ if (formulaOpts$algo != "" || identOpts$algo != "") "mslists" else "NULL" }})
+          components = {{ if (componentOpts$algo != "") "components" else "NULL" }}, MSPeakLists = {{ if (doMSPeakFind) "mslists" else "NULL" }})
 
 {{ endCodeBlock() }}
 {{ optionalCodeBlock("HTML" %in% reportFormats) }}
 reportHTML(fGroups, path = "report", reportPlots = c("chord", "venn", "upset", "eics", "formulas"),
            formulas = {{ if (formulaOpts$algo != "") "formulas" else "NULL" }}, compounds = {{ if (identOpts$algo != "") "compounds" else "NULL" }}, compoundsNormalizeScores = "max",
-           components = {{ if (componentOpts$algo != "") "components" else "NULL" }}, MSPeakLists = {{ if (formulaOpts$algo != "" || identOpts$algo != "") "mslists" else "NULL" }},
+           components = {{ if (componentOpts$algo != "") "components" else "NULL" }}, MSPeakLists = {{ if (doMSPeakFind) "mslists" else "NULL" }},
            selfContained = FALSE, openReport = TRUE)
 
 {{ endCodeBlock() }}

@@ -54,8 +54,8 @@ getScriptCode <- function(input, analyses)
                                 analyses = analyses, suspectList = input$suspectList, suspectAdduct = input$suspectAdduct,
                                 doMSPeakFind = (input$formulaGen != "" && input$formulaGen != "Bruker") || input$compIdent != "",
                                 precursorMzWindow = input$precursorMzWindow, polarity = input$polarity,
-                                annotateSus = input$annotateSus, genIDLevelFile = input$genIDLevelFile,
-                                reportFormats = input$report)
+                                annotateSus = input$annotateSus && (nzchar(input$formulaGen) || nzchar(input$compIdent)),
+                                genIDLevelFile = input$genIDLevelFile, reportFormats = input$report)
 
     ret <- template
 
@@ -353,7 +353,7 @@ getNewProjectUI <- function(destPath)
                         conditionalPanel(
                             condition = "input.suspectList != \"\" && (input.formulaGen != \"\" || input.compIdent != \"\")",
                             fillRow(
-                                height = 65,
+                                height = 90,
                                 fillCol(
                                     strong("Suspect annotation"),
                                     checkboxInput("annotateSus", "Annotate suspects", TRUE, width = "100%"),
@@ -361,7 +361,8 @@ getNewProjectUI <- function(destPath)
                                         condition = "input.annotateSus",
                                         checkboxInput("genIDLevelFile", "Generate template file with configurable identification levels",
                                                       TRUE, width = "100%")
-                                    )
+                                    ),
+                                    textNote("Suspect annotation is currently only optimized for GenForm/MetFrag")
                                 )
                             )
                         )

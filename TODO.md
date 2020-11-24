@@ -16,12 +16,13 @@
     - add scorings for SIRIUS/DA
 - interface
     - also convert TASQ?
-    - newProject(): update for new interface
+    - newProject()
+        - also allow suspect annotation with only peak lists? currently only selectable if formulas/compounds selected
     - annotateSuspects()
         - rename to annotate()? is a function (but not generic) from ggplot2 and RAMClustR and method from CAMERA, so probably no
     conflicts
         - check why it's is sometimes slow
-            - seems to be logging, disable by default?
+            - seems to be logging, disable by default? --> only slow with testthat?
     - filter():
         - keep or remove NA values with colFilter()? document what happens
         - cache?
@@ -37,6 +38,7 @@
     - prepareSuspectList(): export?
         - mainly to allow merging of lists, perhaps make util for that instead? Would also be handy for MF databases
     - better name for selectBestFGroups filter?
+    - != "" --> !nzchar()
 - expand reporting
     - eg marking which candidate corresponds to suspect and include suspect name in EICs
         - mark with different row colour and label?
@@ -55,6 +57,7 @@
         - annSimBoth falls back to annSimForm/annSimComp if no formulas available
         - logging for ID level estimation
         - if suspect fragments are less than the rule value then the former is used as minimum
+        - Suspect annotation is currently only optimized for GenForm/MetFrag
         - yml
             - relative fields only used for scorings of compound/formulas
     - filter

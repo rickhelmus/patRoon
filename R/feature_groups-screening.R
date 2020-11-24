@@ -30,10 +30,101 @@ NULL
 #'   screening. This table will be amended with annotation data when
 #'   \code{annotateSuspects} is run.
 #'
+#' @section Suspect annotation: The \code{annotateSuspects} method is used to
+#'   annotate suspects after \code{\link{screenSuspects}} was used to collect
+#'   suspect screening results and other workflow steps such as formula and
+#'   compound annotation steps have been completed. The annotation results,
+#'   which can be acquired with the \code{as.data.table} and \code{screenInfo}
+#'   methods, amends the current screening data with the following columns:
+#'
+#'   \itemize{
+#'
+#'   \item \code{suspFormRank},\code{suspCompRank} The rank of the suspect
+#'   within the formula/compound annotation results.
+#'
+#'   \item \code{annSimForm},\code{annSimComp},\code{annSimBoth} A similarity
+#'   measure between measured and annotated MS/MS peaks from annotation of
+#'   formulae, compounds or both. The similarity is calculated as the spectral
+#'   similarity between a peaklist with (a) all MS/MS peaks and (b) only
+#'   annotated peaks. Thus, a value of one means that all MS/MS peaks were
+#'   annotated. If both formula and compound annotations are available then
+#'   \code{annSimBoth} is calculated after combining all the annotated peaks,
+#'   otherwise \code{annSimBoth} equals the available value for
+#'   \code{annSimForm} or \code{annSimComp}. The similarity calculation can be
+#'   configured with the \code{relMinMSMSIntensity} and \code{simMSMSMethod}
+#'   arguments to \code{annotateSuspects}.
+#'
+#'   \item \code{maxFrags} The maximum number of MS/MS fragments that can be
+#'   matched for this suspect (based on the \code{fragments_*} columns from the
+#'   suspect list).
+#'
+#'   \item \code{maxFragMatches},\code{maxFragMatchesRel} The absolute and
+#'   relative amount of experimental MS/MS peaks that were matched from the
+#'   fragments specified in the suspect list. The value for
+#'   \code{maxFragMatchesRel} is relative to the value for \code{maxFrags}. The
+#'   calculation of this column is influenced by the \code{checkFragments}
+#'   argument to \code{annotateSuspects}.
+#'
+#'   \item \code{estIDLevel} Provides an \emph{estimation} of the identification
+#'   level, roughly following that of \insertCite{Schymanski2014}{patRoon}.
+#'   However, please note that this value is only an estimation, and manual
+#'   interpretation is still necessary to assign final identification levels.
+#'   The estimation is done through a set of rules, see the
+#'   \verb{Identification level rules} section below.
+#'
+#'   }
+#'
+#' @section Identification level rules: The estimation of identification levels
+#'   is configured through a YAML file which specifies the rules for each level.
+#'   The default file is shown below.
+#'
+#' @eval paste0("@@section Identification level rules: \\preformatted{",
+#'   patRoon:::readAllFile(system.file("misc", "idlevelrules.yml", package =
+#'   "patRoon")), "}")
+#'
+#' @section Identification level rules: Most of the file should be
+#'   self-explanatory. Some notes:
+#'
+#'   \itemize{
+#'
+#'   \item Each rule is either a field of \code{suspectFragments} (minimum
+#'   number of MS/MS fragments matched from suspect list), \code{retention}
+#'   (maximum retention deviation from suspect list), \code{rank} (the maximum
+#'   annotation rank from formula or compound annotations), \code{all} (this
+#'   level is always matched) or any of the scorings available from the formula
+#'   or compound annotations.
+#'
+#'   \item In case any of the rules could be applied to either formula or
+#'   compound annotations, the annotation type must be specified with the
+#'   \code{type} field (\code{formula} or \code{compound}).
+#'
+#'   \item Identification levels should start with a number and may optionally
+#'   be followed by a alphabetic character. The lowest levels are checked first.
+#'
+#'   \item If \code{relative=yes} then the relative scoring will be used for
+#'   testing.
+#'
+#'   \item For \code{suspectFragments}: if the number of fragments from the
+#'   suspect list (\code{maxFrags} column) is less then the minimum rule value,
+#'   the minimum is adjusted to the number of available fragments.
+#'
+#'   }
+#'
+#'   A template rules file can be generated with the
+#'   \code{\link{genIDLevelRulesFile}} function, and this file can subsequently
+#'   passed to \code{annotateSuspects}. The file format is highly flexible and
+#'   (sub)levels can be added or removed if desired. Note that the default file
+#'   is currently only suitable when annotation is performed with GenForm and
+#'   MetFrag, for other algorithms it is crucial to modify the rules.
+#'
 #' @templateVar class featureGroupsScreening
 #' @template class-hierarchy
 #'
+#' @references \insertAllCited{}
+#'
 #' @seealso \code{\link{featureGroups}}
+#' 
+#' @author Rick Helmus \email{r.helmus@@uva.nl}, Emma Schymanski \email{emma.schymanski@@uni.lu}
 #'
 #' @export
 featureGroupsScreening <- setClass("featureGroupsScreening",
@@ -93,7 +184,8 @@ setMethod("[", c("featureGroupsScreening", "ANY", "ANY", "missing"), function(x,
 #'   matched to the same feature group are collapsed to a single row and suspect
 #'   names are separated by the value of \code{collapseSuspects}. If \code{NULL}
 #'   then no collapsing occurs, and each suspect match is reported on a single
-#'   row.
+#'   row. Note that some columns will not be reported when collapsing is
+#'   enabled.
 #'
 #' @export
 setMethod("as.data.table", "featureGroupsScreening",
@@ -127,7 +219,8 @@ setMethod("as.data.table", "featureGroupsScreening",
 #'   during the workflow to annotate suspects with matched known MS/MS
 #'   fragments, formula/candidate ranks and automatic estimation of
 #'   identification levels. See the \verb{Suspect annotation} section for more
-#'   details.
+#'   details. The estimation of identification levels for each suspect is logged
+#'   in the \code{log/ident} directory.
 #'
 #' @templateVar normParam compoundsNormalizeScores,formulasNormalizeScores
 #' @templateVar noNone TRUE
@@ -158,6 +251,7 @@ setMethod("as.data.table", "featureGroupsScreening",
 #' @return \code{annotateSuspects} returns a \code{featureGroupsScreening}
 #'   object amended with annotation data.
 #'
+#' @aliases annotateSuspects
 #' @export
 setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeakLists, formulas, compounds,
                                                                  absMzDev = 0.005, relMinMSMSIntensity = 0.05,
@@ -470,6 +564,7 @@ setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = NULL
 #'   \emph{m/z} values and optionally retention times. Afterwards, any feature
 #'   groups not matched may be kept or removed, depending whether a full
 #'   non-target analysis is desired.
+#'
 #' @param fGroups The \code{\link{featureGroups}} object that should be
 #'   screened.
 #' @param suspects A \code{data.frame} with suspect information. See the
@@ -574,3 +669,48 @@ setMethod("screenSuspects", "featureGroups", function(fGroups, suspects, rtWindo
     
     return(ret)
 })
+
+#' @details \code{numericIDLevel} Extracts the numeric part of a given
+#'   identification level (\emph{e.g.} \code{"3a"} becomes \samp{3}).
+#' @param level The identification level to be converted.
+#' @rdname suspect-screening
+#' @export
+numericIDLevel <- function(level)
+{
+    checkmate::assertCharacter(level, any.missing = FALSE, min.chars = 1)
+    return(as.integer(gsub("[[:alpha:]]*", "", l)))
+}
+
+#' @details \code{genIDLevelRulesFile} Generates a template YAML file that is
+#'   used to configure the rules for automatic estimation of identification
+#'   levels. This file can then be used as input for
+#'   \code{\link{annotateSuspects}}.
+#' @param out The file path to the target file.
+#' @param inLevels,exLevels A \link[=regex]{regular expression} for the
+#'   identification levels to include or exclude, respectively. For instance,
+#'   \code{exLevels="4|5"} would exclude level 4 and 5 from the output file. Set
+#'   to \code{NULL} to ignore.
+#' @rdname suspect-screening
+#' @export
+genIDLevelRulesFile <- function(out, inLevels = NULL, exLevels = NULL)
+{
+    aapply(checkmate::assertCharacter, . ~ inLevels + exLevels, null.ok = TRUE)
+    checkmate::assertPathForOutput(basename(out), overwrite = TRUE)
+    
+    defFile <- system.file("inst", "misc", "IDLevelRules.yml", package = "patRoon")
+    
+    if (is.null(inLevels) && is.null(exLevels))
+        file.copy(defFile, out, overwrite = TRUE)
+    else
+    {
+        rules <- yaml::yaml.load_file(defFile)
+        if (!is.null(inLevels))
+            rules <- rules[grepl(inLevels, names(rules))]
+        if (!is.null(exLevels))
+            rules <- rules[!grepl(exLevels, names(rules))]
+        # UNDONE: this quotes ID levels without sub-level, fix?
+        yaml::write_yaml(rules, out, indent = 4)
+    }
+    invisible(NULL)
+}
+

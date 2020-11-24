@@ -19,9 +19,8 @@
     - newProject()
         - also allow suspect annotation with only peak lists? currently only selectable if formulas/compounds selected
     - annotateSuspects()
-        - rename to annotate()? is a function (but not generic) from ggplot2 and RAMClustR and method from CAMERA, so probably no
+        - rename to annotate()? is a function (but not generic) from ggplot2 and RAMClustR and method from CAMERA, so probably no conflicts
             - OTOH, it's pretty clear now it only concerns suspects
-    conflicts
         - check why it's is sometimes slow
             - seems to be logging, disable by default? --> only slow with testthat?
     - filter():
@@ -34,7 +33,6 @@
         - add proper refs
     - remove NA annotation cols after subsetting?
 - misc
-    - credits to ES
     - update version number
     - prepareSuspectList(): export?
         - mainly to allow merging of lists, perhaps make util for that instead? Would also be handy for MF databases
@@ -54,15 +52,6 @@
     - update examples where suspect name is used for subsetting
     - mention that components should be done prior to onlyHits=T?
     - simplified reportCSV() for fGroups
-    - as.data.table: columns depend on collapseSuspects
-    - annotateSuspects:
-        - annSimBoth falls back to annSimForm/annSimComp if no formulas available
-        - logging for ID level estimation
-        - if suspect fragments are less than the rule value then the former is used as minimum
-        - Suspect annotation is currently only optimized for GenForm/MetFrag
-        - Mention case if both fragments_mz and fragments_formulas are available
-        - yml
-            - relative fields only used for scorings of compound/formulas
 - tests
     - automatic InChIKey/formula calculation from InChIs/SMILES
         - already done implicitly?

@@ -232,31 +232,6 @@ annotatedMSMSSimilarity <- function(annPL, absMzDev, relMinIntensity, method)
         return(sum(!is.na(annPL$formula)) / nrow(annPL))
 }
 
-# UNDONE: export?
-numericIDLevel <- function(l) as.integer(gsub("[[:alpha:]]*", "", l))
-
-genIDLevelRulesFile <- function(out, inLevels = NULL, exLevels = NULL)
-{
-    aapply(checkmate::assertCharacter, . ~ inLevels + exLevels, null.ok = TRUE)
-    checkmate::assertPathForOutput(basename(out), overwrite = TRUE)
-    
-    defFile <- system.file("inst", "misc", "IDLevelRules.yml", package = "patRoon")
-    
-    if (is.null(inLevels) && is.null(exLevels))
-        file.copy(defFile, out, overwrite = TRUE)
-    else
-    {
-        rules <- yaml::yaml.load_file(defFile)
-        if (!is.null(inLevels))
-            rules <- rules[grepl(inLevels, names(rules))]
-        if (!is.null(exLevels))
-            rules <- rules[!grepl(exLevels, names(rules))]
-        # UNDONE: this quotes ID levels without sub-level, fix?
-        yaml::write_yaml(rules, out, indent = 4)
-    }
-    invisible(NULL)
-}
-
 estimateIdentificationLevel <- function(suspectName, suspectFGroup, suspectRTDev, suspectInChIKey1, suspectFormula,
                                         suspectAnnSimForm, suspectAnnSimComp, suspectAnnSimBoth,
                                         maxSuspFrags, maxFragMatches, formTable, formRank,

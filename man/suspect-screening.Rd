@@ -6,6 +6,8 @@
 \alias{suspect-screening}
 \alias{screenSuspects,featureGroups-method}
 \alias{screenSuspects}
+\alias{numericIDLevel}
+\alias{genIDLevelRulesFile}
 \alias{featureGroupsBrukerTASQ-class}
 \alias{featureGroupsBrukerTASQ}
 \alias{importFeatureGroupsBrukerTASQ}
@@ -22,6 +24,10 @@
   skipInvalid = TRUE,
   onlyHits = FALSE
 )
+
+numericIDLevel(level)
+
+genIDLevelRulesFile(out, inLevels = NULL, exLevels = NULL)
 
 importFeatureGroupsBrukerTASQ(path, analysisInfo, clusterRTWindow = 12)
 }
@@ -49,6 +55,15 @@ invalid \code{SMILES}, will be ignored with a warning.}
 
 \item{onlyHits}{If \code{TRUE} then all feature groups not matched by any of
 the suspects will be removed.}
+
+\item{level}{The identification level to be converted.}
+
+\item{out}{The file path to the target file.}
+
+\item{inLevels, exLevels}{A \link[=regex]{regular expression} for the
+identification levels to include or exclude, respectively. For instance,
+\code{exLevels="4|5"} would exclude level 4 and 5 from the output file. Set
+to \code{NULL} to ignore.}
 
 \item{path}{The file path to an Excel export of the Global results table from
 TASQ, converted to \file{.csv} format.}
@@ -82,6 +97,14 @@ if possible, as it can significantly reduce the load on data interpretation.
   \emph{m/z} values and optionally retention times. Afterwards, any feature
   groups not matched may be kept or removed, depending whether a full
   non-target analysis is desired.
+
+\code{numericIDLevel} Extracts the numeric part of a given
+  identification level (\emph{e.g.} \code{"3a"} becomes \samp{3}).
+
+\code{genIDLevelRulesFile} Generates a template YAML file that is
+  used to configure the rules for automatic estimation of identification
+  levels. This file can then be used as input for
+  \code{\link{annotateSuspects}}.
 
 \code{importFeatureGroupsBrukerTASQ} will convert screening results
   from Bruker TASQ to a \code{\link{featureGroups}} object. The feature

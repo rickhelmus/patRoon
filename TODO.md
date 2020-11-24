@@ -30,7 +30,6 @@
         - port from TPs someday
         - clarify that intensity filter happens after filtering precursor (make this optional?)
         - add proper refs
-    - show() method
     - remove NA annotation cols after subsetting?
 - misc
     - credits to ES

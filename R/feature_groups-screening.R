@@ -14,6 +14,16 @@ setMethod("initialize", "featureGroupsScreening",
 
 setMethod("screenInfo", "featureGroupsScreening", function(obj) obj@screenInfo)
 
+#' @describeIn featureGroupsScreening Shows summary information for this object.
+#' @export
+setMethod("show", "featureGroupsScreening", function(object)
+{
+    callNextMethod(object)
+    printf("Suspects: %s (%d hits total)\n", getStrListWithMax(unique(screenInfo(object)$name), 6, ", "),
+           nrow(screenInfo(object)))
+    printf("Annotated: %s\n", if (!is.null(screenInfo(object)[["estIDLevel"]])) "yes" else "no")
+})
+
 setMethod("[", c("featureGroupsScreening", "ANY", "ANY", "missing"), function(x, i, j, ..., rGroups,
                                                                               suspects = NULL, drop = TRUE)
 {

@@ -31,12 +31,12 @@
         - clarify that intensity filter happens after filtering precursor (make this optional?)
         - add proper refs
     - show() method
+    - remove NA annotation cols after subsetting?
 - misc
     - credits to ES
     - update version number
     - prepareSuspectList(): export?
         - mainly to allow merging of lists, perhaps make util for that instead? Would also be handy for MF databases
-    - remove old annotation results in annotateSuspects()
     - better name for selectBestFGroups filter?
 - expand reporting
     - eg marking which candidate corresponds to suspect and include suspect name in EICs

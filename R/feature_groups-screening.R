@@ -105,6 +105,9 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
     mzWithin <- function(mz1, mz2) abs(mz1 - mz2) <= absMzDev
 
     si <- copy(screenInfo(fGroups))
+    annCols <- c("suspFormRank", "suspCompRank", "annSimForm", "annSimComp", "annSimBoth", "maxFrags", "maxFragMatches",
+                 "maxFragMatchesRel", "estIDLevel")
+    si <- si[, setdiff(names(si), annCols), with = FALSE] # remove any previous results
     
     printf("Annotating %d suspects...\n", nrow(si))
     prog <- openProgBar(0, nrow(si))
@@ -206,9 +209,7 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
         setTxtProgressBar(prog, i)
     }
     
-    rmCols <- c("suspFormRank", "suspCompRank", "annSimForm", "annSimComp", "annSimBoth", "maxFrags", "maxFragMatches",
-                "maxFragMatchesRel")
-    rmCols <- rmCols[sapply(rmCols, function(col) !is.null(si[[col]]) && all(is.na(si[[col]])))]
+    rmCols <- annCols[sapply(annCols, function(col) !is.null(si[[col]]) && all(is.na(si[[col]])))]
     if (length(rmCols) > 0)
         si <- si[, setdiff(names(si), rmCols), with = FALSE]
     

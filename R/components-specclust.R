@@ -84,7 +84,6 @@ componentsSpecClustSet <- setClass("componentsSpecClustSet", contains = "compone
 setMethod("generateComponentsSpecClust", "featureGroupsSet", function(fGroups, ...)
 {
     cset <- generateComponentsSet(fGroups, generateComponentsSpecClust, setIonization = FALSE, ...)
-    browser()
     return(componentsSpecClustSet(adducts = adducts(cset), setObjects = setObjects(cset),
                                   components = componentTable(cset), componentInfo = componentInfo(cset),
                                   algorithm = "specclust-set"))

@@ -193,44 +193,19 @@
     - allow input of new spectral similarity clustered components/predictions class
     - include precursor_formula in compInfo
     - include diff formula and reaction in components
+    - spec sim filter
 - predictTPsBioTransformer()
     - allow usage of compoundsSet (if not already working)
     - allow fGroupsScreening for input
-    - logging: don't use precursor names? or somehow sanitize invalid file names
+    - convertToMFDB: no need to calculate InChIs etc?
+- metabolic logic
+    - more logic reactions?
+    - make configurable?
 - predictTPsMSMS()
-    - hcluster all input fGroups on their MS/MS similarity
-    - somehow cluster parents/TPs (eg by selecting fGroups subsets?)
-    - use components base class?
-        - might be useful for other applications
-        - needs conversion for current TP componentization code
-    - use predictions base class?
-        - opposite of above
-        - but no parent/TP distinction yet, so perhaps not possible?
-    - alternatively
-        - componentsMSMS --> predictTPsMSMS(fGroupsParent, fGroupsTP) --> TPPredictionsMSMS --> componentsTPs
-    - componentsSpecClust
+    - componentsSpecClust --> works?
         - sets
     - fix if empty cTab for MSMS components
 - subsetting/componentization based on log2fc
-    - componentization approach
-        - specify 'categories' (better name?): pairs of before/after rGroups
-        - two components are made for each category: before and after
-        - components store PC/FC values
-        - plotVolcano() method
-        - subset/filter on before/after
-        - workflow: generateComponentsFC() --> fGroupsTPs = groupNames(comps[, categ = "after"]) --> ...
-        - pros: may fit more in generic workflows, multiple rGroups simultaneously
-        - cons: more work, bit clunky for just one category
-    - as.data.table() approach
-        - specify single before/after rep: FC = c(before = "influent", after = "effluent")
-        - calculate FC and PV
-        - classifyFC = c(pValue, FC)
-        - output only contains analyses for specified rGroups and their averages (ie overrides average argument)
-        - plotVolcano() method for fGroups, which uses as.data.table()
-        - fetch PC/TP gNames from resulting table and subsetting
-        - pros: easier to implement, more flexibility as classification is done by user with subsetting
-        - cons: only one category per time, perhaps less generic way if other classification methods are done with components
-    - for now go with as.data.table()...
     - as.data.table() fGroupsScreening: can't combine normalizing and FC at the moment --> notify user
     - as.data.table/plotVolcano: docs and assertions; mention Bas
     - plotVolcano(): move legend outside graph
@@ -243,20 +218,21 @@
         - missing values? somehow compare between spectra from sets? or just use merged?
     - plotting? could extend plotSpec() by allowing selection of two spectra and using sets code for mirroring
     - update MSPeakLists method and/or export new functions?
-    - auto select pearson/spearman?
     - remove OrgMassSpecR and proxy dependency
-    - consistent naming: spec vs peaklist
     - show method for new components classes
     - use neutral_formula for annotated similarity calculation for formulas
         - still relevant?
 - Include BT in installation script and verifyDependencies()
 - Naming
     - More generic naming for predict etc to accommodate other sources for TPs
-    - consistentency for precursor/parent/suspect
+    - consistency for precursor/parent/suspect
+    - consistency for spectrum/peaklist
 - misc
     - finish new minMSMSPeaks filter (apply always after averaging?)
     - log2fc: median also possible?
     - more logic reactions?
+- NEWS
+    - as.data.table(fGroups): normalization, FC, averageFunc
 
 
 ## features

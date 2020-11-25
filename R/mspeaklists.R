@@ -246,7 +246,7 @@ setMethod("show", "MSPeakLists", function(object)
 #' @param reAverage Set to \code{TRUE} to regenerate averaged MS peak lists
 #'   after subsetting analyses.
 #' @export
-setMethod("[", c("MSPeakLists", "ANY", "ANY", "missing"), function(x, i, j, ..., reAverage = TRUE, drop = TRUE)
+setMethod("[", c("MSPeakLists", "ANY", "ANY", "missing"), function(x, i, j, ..., reAverage = FALSE, drop = TRUE)
 {
     checkmate::assertFlag(reAverage)
 
@@ -471,6 +471,10 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
     # update group averaged peak lists
     obj@averagedPeakLists <- averageMSPeakLists(obj)
 
+    # and filter it as well...
+    printf("Filtering averaged MS peak lists for %d feature groups...\n", length(obj@averagedPeakLists))
+    obj@averagedPeakLists <- doFilterGroups(obj@averagedPeakLists)
+    
     saveCacheData("filterMSPeakLists", obj, hash)
 
     newn <- length(obj)

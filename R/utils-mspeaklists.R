@@ -208,9 +208,12 @@ doMSPeakListFilter <- function(pList, absIntThr, relIntThr, topMost, minPeaks, d
         }
     }
 
-    # -1: don't count precursor peaks
-    if (!is.null(minPeaks) && (nrow(ret)-1) < minPeaks)
-        ret <- ret[0, ]
+    if (!is.null(minPeaks))
+    {
+        notEnough <- (nrow(ret)-1) < minPeaks # -1: don't count precursor peaks
+        if (negate != notEnough)
+            ret <- ret[0, ]
+    }
     
     return(ret)
 }

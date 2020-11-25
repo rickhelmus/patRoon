@@ -24,7 +24,7 @@ setMethod("averageMSPeakLists", "MSPeakListsSet", function(obj)
 {
     # create 'averaged' peak lists by simply merging the averaged lists from the setObjects
     
-    cat("Merging set-averaged peak lists...\n")
+    cat("Merging set-averaged peak lists... ")
 
     hash <- makeHash(lapply(obj@setObjects, averagedPeakLists))
     avgPLists <- loadCacheData("MSPeakListsSetAvg", hash)
@@ -116,11 +116,11 @@ setMethod("[", c("MSPeakListsSet", "ANY", "ANY", "missing"), function(x, i, j, .
     assertSets(x, sets, add = ac)
     checkmate::assertFlag(reAverage, add = ac)
     checkmate::reportAssertions(ac)
-    
-    # UNDONE: drop reAverage=FALSE support?
-    if (!reAverage)
-        stop("reAverage must be TRUE for sets for now...")
-    
+
+    # NOTE: reAverage is ignored here, as syncMSPeakListsSetObjects() should
+    # always be called and averaging for MSPeaksList actually only concerns
+    # merging
+
     if (!is.null(sets) && length(sets) > 0)
         i <- mergeAnaSubsetArgWithSets(i, sets, analysisInfo(x))
     

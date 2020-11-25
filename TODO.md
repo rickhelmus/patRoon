@@ -81,8 +81,8 @@
     - support recursive screening? or throw error otherwise
 - fix empty MS(MS) peaklists if unavailable during merging sets
 - use neutral_formula for annotated similarity calculation for formulas
-- finish new minMSMSPeaks filter (apply always after averaging?)
-
+- NEWS
+    - [..., reAverage = FALSE] and implications of filtering when setting it to TRUE
 
 ## features
 - feature optim:
@@ -152,7 +152,6 @@
 - collapse averagedPeakLists
 - test avg params
 - metadata() generic?
-- drop support for reAverage of [ method? doesn't seem so useful, even less so with sets
 
 
 ## compounds

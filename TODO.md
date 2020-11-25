@@ -39,19 +39,27 @@
         - if yes, mention in ref docs for screenSuspects()
     - better name for selectBestFGroups filter?
     - deprecated groupFeaturesScreening function
+    - prepareSuspectList: handle empty names
 - expand reporting
     - eg marking which candidate corresponds to suspect and include suspect name in EICs
         - mark with different row colour and label?
     - mention suspect similarities/ranks etc for candidates (or somehow in compounds?)
     - optionally report with collapsed suspects
-- update docs, handbook & NEWS
+- NEWS
     - renamed rt/mz columns
     - new plotVenn list functionality
     - removal of screening for features
+    - simplified reportCSV() for fGroups
+    - suspect lists
+        - InChIKey, fragments_* columns
+        - name verification
+        
+    - reportHTML(): highlight multiple rows, select columns & scrollbar for annotation table
+- update docs, handbook & NEWS
+    - new plotVenn list functionality
     - update TASQ docs and other mentions to old suspect screening interface
     - update examples where suspect name is used for subsetting
     - mention that components should be done prior to onlyHits=T?
-    - simplified reportCSV() for fGroups
 - tests
     - automatic InChIKey/formula calculation from InChIs/SMILES
         - already done implicitly?

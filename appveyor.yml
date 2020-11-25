@@ -21,7 +21,7 @@ install:
         }
     - ps: >-
         if (-Not (Test-Path C:\deps\sirius-4.5.1.zip)) {
-            Invoke-WebRequest https://bio.informatik.uni-jena.de/repository/dist-release-local/de/unijena/bioinf/ms/sirius/4.5.1/sirius-4.5.1-win64-headless.msi -OutFile "C:\deps\sirius-win-4.5.1.zip"
+            Invoke-WebRequest https://bio.informatik.uni-jena.de/repository/dist-release-local/de/unijena/bioinf/ms/sirius/4.5.1/sirius-4.5.1-win64-headless.zip -OutFile "C:\deps\sirius-win-4.5.1.zip"
             7z x -aoa -oC:\deps\ C:\deps\sirius-win-4.5.1.zip
         }
     - ps: >-

@@ -132,10 +132,11 @@ setMethod("annotateSuspects", "featureGroupsScreeningSet", function(fGroups, MSP
     return(syncScreeningSetObjects(fGroups))
 })
 
-setMethod("filter", "featureGroupsScreeningSet", function(obj, ..., onlyHits = FALSE,
-                                                          selectHitsBy = NULL, selectFGroupsBy = NULL,
+setMethod("filter", "featureGroupsScreeningSet", function(obj, ..., onlyHits = NULL,
+                                                          selectHitsBy = NULL, selectBestFGroups = FALSE,
                                                           maxLevel = NULL, maxFormRank = NULL, maxCompRank = NULL,
-                                                          minAnnMSMSSim = NULL, minFragMatches = NULL, negate = FALSE)
+                                                          minAnnSimForm = NULL, minAnnSimComp = NULL, minAnnSimBoth = NULL,
+                                                          absMinFragMatches = NULL, relMinFragMatches = NULL, negate = FALSE)
 {
     # filter functionality from fGroupsSet
     obj <- callNextMethod(obj, ..., negate = negate)
@@ -143,9 +144,10 @@ setMethod("filter", "featureGroupsScreeningSet", function(obj, ..., onlyHits = F
     
     # filter functionality from screening (no need to pass ...)
     obj@setObjects <- lapply(obj@setObjects, filter, onlyHits = onlyHits, selectHitsBy = selectHitsBy,
-                             selectFGroupsBy = selectFGroupsBy, maxLevel = maxLevel, maxFormRank = maxFormRank,
-                             maxCompRank = maxCompRank, minAnnMSMSSim = minAnnMSMSSim, minFragMatches = minFragMatches,
-                             negate = negate)
+                             selectBestFGroups = selectBestFGroups, maxLevel = maxLevel, maxFormRank = maxFormRank,
+                             maxCompRank = maxCompRank, minAnnSimForm = minAnnSimForm, minAnnSimComp = minAnnSimComp,
+                             minAnnSimBoth = minAnnSimBoth, absMinFragMatches = absMinFragMatches,
+                             relMinFragMatches = relMinFragMatches, negate = negate)
     # --> groups may have been removed
     obj <- obj[, unique(unlist(sapply(obj@setObjects, groupNames)))]
     obj <- syncScreeningSetObjects(obj)
@@ -153,8 +155,8 @@ setMethod("filter", "featureGroupsScreeningSet", function(obj, ..., onlyHits = F
     return(obj)
 })
 
-setMethod("groupFeaturesScreening", "featureGroupsSet", function(fGroups, suspects, rtWindow, mzWindow,
-                                                                 adduct, skipInvalid)
+setMethod("screenSuspects", "featureGroupsSet", function(fGroups, suspects, rtWindow, mzWindow,
+                                                         adduct, skipInvalid, onlyHits)
 {
     # UNDONE: remove argument (and from generic?)
     if (!is.null(adduct))
@@ -177,8 +179,8 @@ setMethod("groupFeaturesScreening", "featureGroupsSet", function(fGroups, suspec
     
     ionizedFGroupsList <- sapply(sets(fGroups), ionize, obj = fGroups, simplify = FALSE)
     ionizedFGScr <- mapply(ionizedFGroupsList, suspects, adducts(fGroups), SIMPLIFY = FALSE,
-                           FUN = function(fg, s, a) groupFeaturesScreening(fg, s, rtWindow, mzWindow, a,
-                                                                           skipInvalid, onlyHits))
+                           FUN = function(fg, s, a) screenSuspects(fg, s, rtWindow, mzWindow, a,
+                                                                    skipInvalid, onlyHits))
     
     return(featureGroupsScreeningSet(screenInfo = mergeScreeningSetInfos(ionizedFGScr), setObjects = ionizedFGScr,
                                      groups = copy(groups(fGroups)), analysisInfo = analysisInfo(fGroups),

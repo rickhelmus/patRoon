@@ -52,6 +52,8 @@
 - filter() for features/fGroups: support ionized masses for mass filters? or just clarify it doesn't.
 - handle/test empty objects
 - more descriptive messages what's going on with all the avaraging of MSPeakLists
+    - this seems to be related to ionize(), which averages new objects and probably not something to be wanted
+    - is getting setObjects() sufficient? Might be good to look at when deciding what to do with ionize()
 - remove sets argument for some methods (as.data.table, accessors etc)?
     - if keep, be consistent with all classes
 - as.data.table() for formulas: average=T will now produce strange averaged ionized formula, for now simply remove this column.. also give a note in docs? or maybe only remove is not all adducts are equal?
@@ -81,6 +83,7 @@
     - support recursive screening? or throw error otherwise
 - fix empty MS(MS) peaklists if unavailable during merging sets
 - use neutral_formula for annotated similarity calculation for formulas
+    --> verify if OK
 - NEWS
     - [..., reAverage = FALSE] and implications of filtering when setting it to TRUE
 

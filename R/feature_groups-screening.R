@@ -342,7 +342,7 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
             suspFormRank <- if (length(suspFormRank) > 0) suspFormRank[1] else NA_integer_
             if (!is.na(suspFormRank))
                 annSimForm <- annSimBoth <- annotatedMSMSSimilarity(annotatedPeakList(formulas,
-                                                                                      precursor = unFTable$formula[suspFormRank],
+                                                                                      precursor = unFTable$neutral_formula[suspFormRank],
                                                                                       groupName = gName, MSPeakLists = MSPeakLists),
                                                                     absMzDev, relMinMSMSIntensity, simMSMSMethod)
         }

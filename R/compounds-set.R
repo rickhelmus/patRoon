@@ -274,7 +274,7 @@ generateCompoundsSet <- function(fGroupsSet, MSPeakListsSet, generator, ..., set
         })
         
         # some group results might have been filtered when making the set consensus
-        scRanges <- scRanges[names(cons)]
+        # --> scRanges may have more groups than the compound table!
     }    
     
     ret <- compoundsSet(adducts = adducts(fGroupsSet), setObjects = ionizedCompoundsList,

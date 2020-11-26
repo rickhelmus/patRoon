@@ -51,13 +51,18 @@
 - find nice way to re-use docs
 - filter() for features/fGroups: support ionized masses for mass filters? or just clarify it doesn't.
 - handle/test empty objects
-- more descriptive messages what's going on with all the avaraging of MSPeakLists
-    - this seems to be related to ionize(), which averages new objects and probably not something to be wanted
-    - is getting setObjects() sufficient? Might be good to look at when deciding what to do with ionize()
 - remove sets argument for some methods (as.data.table, accessors etc)?
     - if keep, be consistent with all classes
 - as.data.table() for formulas: average=T will now produce strange averaged ionized formula, for now simply remove this column.. also give a note in docs? or maybe only remove is not all adducts are equal?
-- different name/generic for ionize()? makes less sense for annotation classes
+- ionize()
+    - different name/generic? makes less sense for annotation classes
+        - split(), splice()?, unset()
+    - ionize() for components? or drop for most?
+    - more descriptive messages what's going on with all the avaraging of MSPeakLists
+        - this seems to be related to ionize(), which averages new objects and probably not something to be wanted (unless >1 sets requested)
+        - is getting setObjects() sufficient? Might be good to look at when deciding what to do with ionize()
+    - for setThreshold: number of annotated results may increase again, fix? OR is this maybe the reason to keep
+        - or just remove results in setObjects too, but can't apply lower threshold later if this functionality is implemented
 - test DA algorithms
 - check if more has to be cached (eg merged results from sets)
 - compoundsSetMF sub-class (for settings slot)? or is access via setObjects sufficient? may need to explain anyway for other cases like intclust components
@@ -71,13 +76,14 @@
     - clearly mention that nontarget is done per set now
     - nontarget-set: plotGraph method? and make sure it's used in reportHTML()
 - implement XCMS conversion functions? maybe with given set. Could just ionize() it.
-- ionize() for compounds/components? if not remove formulas?
 - setThreshold filter() argument, and remove argument from generators?
 - handle errors when object has <=1 set
     - groupFeaturesScreening()
     - mergeScreeningSetInfos()
 - suspect screening
     - handle suspect and fragment mz values somehow
+        - should it be an unique column in mergeScreeningSetInfos()
+        - dealt with with >1 suspect list? does this work?
     - implement TASQ?
     - consensus?
     - support recursive screening? or throw error otherwise

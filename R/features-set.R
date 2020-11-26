@@ -201,8 +201,6 @@ setMethod("c", "features", function(x, ..., adducts)
 # UNDONE: implement someday?
 fSetNotYetImplemented <- function() stop("This function is not yet implemented for featuresSet.", call. = FALSE)
 
-setMethod("screenSuspects", "featuresSet", function(obj, suspects, rtWindow, mzWindow, adduct,
-                                                    skipInvalid) fSetNotYetImplemented())
 setMethod("getXCMSSet", "featuresSet", function(obj, verbose) fSetNotYetImplemented())
 setMethod("getXCMSnExp", "featuresSet", function(obj, verbose) fSetNotYetImplemented())
 

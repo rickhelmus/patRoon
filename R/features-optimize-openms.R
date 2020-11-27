@@ -33,7 +33,7 @@ featuresOptimizerOpenMS$methods(
     calculateResponse = function(params, task, keepObject)
     {
         # disable (excessive) logging
-        wOpt(MP.logPath = FALSE, callSuper(params, task, keepObject))
+        withOpt(MP.logPath = FALSE, callSuper(params, task, keepObject))
     }
 )
 

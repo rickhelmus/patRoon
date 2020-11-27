@@ -61,7 +61,6 @@
 
 - rename "classic"?
 - remove XCMS, CAMERA and others from imports in DESCRIPTION?
-- wOpt --> withOpt? Also change handbook
 - future MP
     - delayBetweenProc?
 - docs

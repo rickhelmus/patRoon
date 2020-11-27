@@ -343,19 +343,19 @@ The number of parallel processes is configured through the `patRoon.MP.maxProcs`
 options(patRoon.MP.maxProcs = 2) # do not execute more than two tools in parallel. 
 ```
 
-This will change the parallelization for the complete workflow. However, it may be desirable to change this for only a part the workflow. This is easily achieved by using the `wOpt()` function.
+This will change the parallelization for the complete workflow. However, it may be desirable to change this for only a part the workflow. This is easily achieved by using the `withOpt()` function.
 
 ```{r eval=FALSE}
 # do not execute more than two tools in parallel.
 options(patRoon.MP.maxProcs = 2)
 
 # ... but execute up to four GenForm processes
-wOpt(MP.maxProcs = 4, {
+withOpt(MP.maxProcs = 4, {
     formulas <- generateFormulas(fGroups, "genform", ...)
 })
 ```
 
-The `wOpt` function will temporarily change the given option(s) while executing a given code block and restore it afterwards (it is very similar to the `with_options()` function from the [withr] `R` package). Furthermore, notice how `wOpt()` does not require you to prefix the option names with `patRoon.`. 
+The `withOpt` function will temporarily change the given option(s) while executing a given code block and restore it afterwards (it is very similar to the `with_options()` function from the [withr] `R` package). Furthermore, notice how `withOpt()` does not require you to prefix the option names with `patRoon.`. 
 
 ### Future parallelization method
 
@@ -375,7 +375,7 @@ future::plan("cluster", workers = rep("otherpc", 4))
 
 It is important to properly configure the right future plan. Please see the documentation of the respective packages (_e.g._ [future] and [future.batchtools]) for more details.
 
-The `wOpt()` function introduced in the previous section can also be used to temporarily switch between parallelization approaches, for instance:
+The `withOpt()` function introduced in the previous section can also be used to temporarily switch between parallelization approaches, for instance:
 
 ```{r eval=FALSE}
 # default to future parallelization
@@ -385,7 +385,7 @@ future::plan("cluster", workers = 4)
 # ... do workflow
 
 # do classic parallelization for GenForm
-wOpt(MP.method = "classic", {
+withOpt(MP.method = "classic", {
     formulas <- generateFormulas(fGroups, "genform", ...)
 })
 

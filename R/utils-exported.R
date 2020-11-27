@@ -142,13 +142,13 @@ generateAnalysisInfoFromEnviMass <- function(path)
 #'
 #' @examples \dontrun{
 #' # Set max parallel processes to five while performing formula calculations
-#' wOpt(MP.maxProcs = 5, {
+#' withOpt(MP.maxProcs = 5, {
 #'     formulas <- generateFormulas(fGroups, "genform", ...)
 #' })
 #' }
 #'
 #' @export
-wOpt <- withr::with_(function(..., prefix = "patRoon.")
+withOpt <- withr::with_(function(..., prefix = "patRoon.")
 {
     checkmate::assertString(prefix, null.ok = TRUE)
     opts <- list(...)

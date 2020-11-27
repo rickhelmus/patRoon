@@ -61,13 +61,10 @@
 
 - rename "classic"?
 - remove XCMS, CAMERA and others from imports in DESCRIPTION?
+- wOpt --> withOpt? Also change handbook
 - future MP
     - delayBetweenProc?
 - docs
-    - handbook/tutorial
-        - update parallelization section
-        - update handbook etc for maxProcAmount
-        - table in handbook with which functions work and remarks (eg GenForm no batchmode, reportHTML no futures)
     - ref
         - update uses-multiProc.R with handbook link/section name?
     - NEWS

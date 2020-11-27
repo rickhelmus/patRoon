@@ -45,3 +45,9 @@
 [RStudio]: https://rstudio.com/
 [issues]: https://github.com/rickhelmus/patRoon/issues
 [RStudio image]: https://hub.docker.com/r/rocker/rstudio
+[future]: https://github.com/HenrikBengtsson/future
+[future.apply]: https://github.com/HenrikBengtsson/future.batchtools
+[future.batchtools]: https://github.com/HenrikBengtsson/future.batchtools
+[withr]: https://cran.r-project.org/web/packages/withr/index.html
+[processx]: https://github.com/r-lib/processx
+[progressr]: https://github.com/HenrikBengtsson/progressr

@@ -15,7 +15,7 @@ remotes::install_github("rich-iannone/DiagrammeRsvg")
 
 tinytex::install_tinytex()
 webshot::install_phantomjs()
-Sys.setenv(PATH = paste0(Sys.getenv("PATH"), ":", "/home/patRoon/bin"))
+Sys.setenv(PATH = paste0(Sys.getenv("PATH"), ":", "/home/rstudio/bin"))
 
 pkgdown::clean_site()
 pkgdown::build_site(examples = FALSE)

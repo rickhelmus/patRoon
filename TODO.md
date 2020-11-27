@@ -63,8 +63,6 @@
 - remove XCMS, CAMERA and others from imports in DESCRIPTION?
 - future MP
     - delayBetweenProc?
-    - somehow disable logging for featuresOptimizerOpenMS
-        - disable through withr::with_options()?
 - docs
     - handbook/tutorial
         - update parallelization section

@@ -28,6 +28,12 @@ featuresOptimizerOpenMS$methods(
     {
         return(fixOptParamRange(params, list(c("minFWHM", "maxFWHM"),
                                              c("minTraceLength", "maxTraceLength"))))
+    },
+    
+    calculateResponse = function(params, task, keepObject)
+    {
+        # disable (excessive) logging
+        wOpt(MP.logPath = FALSE, callSuper(params, task, keepObject))
     }
 )
 

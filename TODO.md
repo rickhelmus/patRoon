@@ -79,6 +79,7 @@
         - splitBatches
         - generateCompoundsMetfrag --> generateCompoundsMetFrag
         - wOpt/printPackageOpts
+        - ffOpenMS: delete temporaries to avoid keeping around large temporaries
 
 
 # Future

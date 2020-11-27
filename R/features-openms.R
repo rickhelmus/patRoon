@@ -125,12 +125,13 @@ findFeaturesOpenMS <- function(analysisInfo, noiseThrInt = 1000, chromSNR = 3, c
         fList <- executeMultiProcess(cmdQueue, function(cmd, ...)
         {
             fts <- patRoon:::importFeatureXML(cmd$featFile)
+            unlink(cmd$featFile) # remove temporary result file, as its size may be considerable
             return(fts)
         }, prepareHandler = function(cmd)
         {
             ffile <- tempfile(fileext = ".featureXML")
-            cmd <- do.call(patRoon:::getOpenMSFFCommand, c(list(cmd$dataFile, ffile), params))
-            return(c(list(featFile = ffile), cmd))
+            cmdFF <- do.call(patRoon:::getOpenMSFFCommand, c(list(cmd$dataFile, ffile), params))
+            return(c(cmd, list(featFile = ffile), cmdFF))
         }, showProgress = verbose, logSubDir = "openms", cacheName = "featuresOpenMS")
         
         # load intensities afterwards: we want to use the cache if possible,

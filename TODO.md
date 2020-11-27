@@ -65,8 +65,6 @@
 - future MP
     - delayBetweenProc?
 - docs
-    - ref
-        - update uses-multiProc.R with handbook link/section name?
     - NEWS
         - optimized loading of spectra and EICs a bit
         - removed SIRIUS pre44

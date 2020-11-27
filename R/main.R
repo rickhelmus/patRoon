@@ -81,7 +81,7 @@ NULL
 #'   \option{patRoon.MP.method="future"}.
 #'   
 #'   \item \code{patRoon.MP.logPath}: The path used for logging of output from
-#'   commands executed by multiprocess.
+#'   commands executed by multiprocess. Set to \code{FALSE} to disable logging.
 #'   
 #'   \item \code{patRoon.path.pwiz}: The path in which the
 #'   \command{ProteoWizard} binaries are installed. If unset an attempt is made

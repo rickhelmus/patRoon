@@ -295,8 +295,9 @@ For annotations performed with \command{SIRIUS} it is often the fastest
 
 \section{Parallelization}{
  \code{generateFormulasGenForm} and \code{generateFormulasSIRIUS} uses multiprocessing to parallelize
-  computations. Please see the handbook for more details and
-  \link[=patRoon-package]{patRoon options} for configuration options.
+  computations. Please see the parallelization section in the handbook for
+  more details and \link[=patRoon-package]{patRoon options} for configuration
+  options.
 
  When \code{futures} are used for parallel processing
   (\code{patRoon.MP.method="future"}), calculations with \command{GenForm}

@@ -91,8 +91,9 @@ Conversion of MS analysis files between several open and closed data formats.
 }
 \section{Parallelization}{
  \code{convertMSFiles} (except if \code{algorithm="bruker"}) uses multiprocessing to parallelize
-  computations. Please see the handbook for more details and
-  \link[=patRoon-package]{patRoon options} for configuration options.
+  computations. Please see the parallelization section in the handbook for
+  more details and \link[=patRoon-package]{patRoon options} for configuration
+  options.
 }
 
 \section{Conversion formats}{

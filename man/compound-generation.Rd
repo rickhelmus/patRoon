@@ -391,8 +391,9 @@ For annotations performed with \command{SIRIUS} it is often the fastest
 
 \section{Parallelization}{
  \code{generateCompoundsMetFrag} and \code{generateCompoundsSIRIUS} uses multiprocessing to parallelize
-  computations. Please see the handbook for more details and
-  \link[=patRoon-package]{patRoon options} for configuration options.
+  computations. Please see the parallelization section in the handbook for
+  more details and \link[=patRoon-package]{patRoon options} for configuration
+  options.
 
  When local database files are used with
   \code{generateCompoundsMetFrag} (\emph{e.g.} when \code{database} is set to

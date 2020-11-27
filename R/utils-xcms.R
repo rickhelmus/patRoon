@@ -103,8 +103,6 @@ makeXCMSGroups <- function(fGroups, verbose = TRUE)
 #' @export
 setMethod("getXCMSSet", "features", function(obj, verbose, exportedData)
 {
-    checkPackage("xcms")
-    
     # generate dummy XCMS set, based on https://groups.google.com/forum/m/#!topic/xcms/CGC0SKMVhAQ
 
     checkmate::assertFlag(exportedData)
@@ -173,8 +171,6 @@ setMethod("getXCMSSet", "featuresXCMS", function(obj, ...)
 #' @export
 setMethod("getXCMSSet", "featureGroups", function(obj, verbose, exportedData)
 {
-    checkPackage("xcms")
-    
     checkmate::assertFlag(exportedData)
     checkmate::assertFlag(verbose)
 
@@ -193,8 +189,6 @@ setMethod("getXCMSSet", "featureGroups", function(obj, verbose, exportedData)
 #' @export
 setMethod("getXCMSSet", "featureGroupsXCMS", function(obj, verbose, exportedData)
 {
-    checkPackage("xcms")
-    
     # first see if we can just return the xcmsSet used during grouping
 
     anaInfo <- analysisInfo(obj)

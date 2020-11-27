@@ -48,8 +48,6 @@ setMethod("filter", "featuresXCMS3", function(obj, ...)
 #' @export
 findFeaturesXCMS3 <- function(analysisInfo, param = xcms::CentWaveParam(), verbose = TRUE)
 {
-    checkPackage("xcms")
-    
     ac <- checkmate::makeAssertCollection()
     analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, c("mzXML", "mzML"), add = ac)
     assertS4(param, add = ac)

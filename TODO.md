@@ -59,8 +59,6 @@
 
 ## MP
 
-- rename "classic"?
-- remove XCMS, CAMERA and others from imports in DESCRIPTION?
 - future MP
     - delayBetweenProc?
 

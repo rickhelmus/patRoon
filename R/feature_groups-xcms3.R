@@ -31,8 +31,6 @@ groupFeaturesXCMS3 <- function(feat, rtalign = TRUE,
                                groupParam = xcms::PeakDensityParam(sampleGroups = analysisInfo(feat)$group),
                                retAlignParam = xcms::ObiwarpParam(), verbose = TRUE)
 {
-    checkPackage("xcms")
-    
     # UNDONE: aligning gives XCMS errors when multithreading
 
     ac <- checkmate::makeAssertCollection()

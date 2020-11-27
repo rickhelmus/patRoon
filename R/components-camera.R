@@ -28,8 +28,6 @@ setMethod("initialize", "componentsCamera",
 generateComponentsCAMERA <- function(fGroups, ionization, onlyIsotopes = FALSE,
                                      minSize = 2, relMinReplicates = 0.5, extraOpts = NULL)
 {
-    checkPackage("CAMERA")
-    
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
     checkmate::assertChoice(ionization, c("positive", "negative"), add = ac)

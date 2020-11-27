@@ -58,6 +58,9 @@ When you decide to use the `patRoonDeps` repository you can simply _skip_ this s
 install.packages(c("BiocManager", "remotes"))
 BiocManager::install("CAMERA")
 
+# needed for RAMClustR for componentization
+remotes::install_github("cbroeckl/RAMClustR")
+
 # only needed for Bruker DataAnalysis integration
 install.packages("RDCOMClient", repos = "http://www.omegahat.net/R")
 
@@ -65,7 +68,7 @@ install.packages("RDCOMClient", repos = "http://www.omegahat.net/R")
 remotes::install_github("c-ruttkies/MetFragR/metfRag")
 ```
 
-Note that the latter two commands concern installation of _optional_ packages. If you are unsure then you probably don't need them.
+Note that the latter three commands concern installation of _optional_ packages. If you are unsure then you probably don't need them.
 
 ### Other dependencies
 

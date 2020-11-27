@@ -32,8 +32,6 @@ setMethod("initialize", "featureGroupsXCMS",
 groupFeaturesXCMS <- function(feat, rtalign = TRUE, exportedData = TRUE, groupArgs = list(mzwid = 0.015),
                               retcorArgs = list(method = "obiwarp"), verbose = TRUE)
 {
-    checkPackage("xcms")
-    
     # UNDONE: keep exportedData things? Or just require that it's exported? If keep document also for OpenMS and implications.
 
     ac <- checkmate::makeAssertCollection()

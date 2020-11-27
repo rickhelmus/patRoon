@@ -38,7 +38,7 @@
   \code{\link{future.apply}} package is used for parallelization, which is
   especially useful for \emph{e.g.} cluster computing.
   
-  \item \code{MP.futureSched}: Sets the \code{future.scheduling} function
+  \item \code{patRoon.MP.futureSched}: Sets the \code{future.scheduling} function
   argument for \code{\link{future_lapply}}. Only used if
   \option{patRoon.MP.method="future"}.
   

@@ -63,15 +63,6 @@
 - remove XCMS, CAMERA and others from imports in DESCRIPTION?
 - future MP
     - delayBetweenProc?
-- docs
-    - NEWS
-        - optimized loading of spectra and EICs a bit
-        - removed SIRIUS pre44
-        - normalizePath and hashing for MF db files
-        - splitBatches
-        - generateCompoundsMetfrag --> generateCompoundsMetFrag
-        - wOpt/printPackageOpts
-        - ffOpenMS: delete temporaries to avoid keeping around large temporaries
 
 
 # Future

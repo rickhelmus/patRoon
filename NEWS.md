@@ -1,7 +1,24 @@
-# patRoon 1.0.5
+# patRoon 1.1
 
-* *IMPORTANT:* Support for SIRIUS 4.5.0. Please update to this version since these changes break support for older versions.
-* Fix: SIRIUS formula calculation with `calculateFeatures=TRUE` would try to calculate formulas for features even if not present (eg after being removed by subsetting or filtering steps) 
+* **IMPORTANT**: Major changes to the parallelization functionality
+    * `patRoon` now supports an additional method to perform parallelization for tools such as `MetFrag`, `SIRIUS` etc. The main purpose of this method is to allow you to perform such calculations on external computer clusters. Please see the updated parallelization section in the handbook for more details.
+    * The `logPath` and `maxProcAmount` arguments to functions such `generateFormulas`, `generateCompounds` etc were removed. These should now solely be configured through package options (see `?patRoon`).
+    * The `patRoon.maxProcAmount` package option was renamed to `patRoon.MP.maxProcs`.
+* Changes related to `SIRIUS`
+    * **IMPORTANT:** Support for SIRIUS 4.5.0. Please update to this version since these changes break support for older versions.
+    * Fix: SIRIUS formula calculation with `calculateFeatures=TRUE` would try to calculate formulas for features even if not present (eg after being removed by subsetting or filtering steps).
+    * The `SIRBatchSize` argument to formula and compound generation functions was renamed to `splitBatches` and its meaning has slightly changed. Please see the reference manual (e.g. `?generateFormulas`) for more details.
+* Changes related to MetFrag
+    * Paths to local database files for MetFrag are now normalized, which makes handling of relative paths more reliable.
+    * Changes in the specified local MetFrag database files are now inspected to improve caching.
+    * Consistency: `generateCompoundsMetfrag` was renamed to `generateCompoundsMetFrag`.
+* Optimized loading of spectra and EIC data.
+* New utility functions
+    * `withOpt()` to temporarily change (`patRoon`) package options.
+    * `printPackageOpts()`: display current package options of `patRoon`.
+* Finding features with `OpenMS`: potentially large temporary files are removed when possible to avoid clogging up disk space (especially relevant on some Linux systems where `/tmp` is small).
+* Several packages such as `XCMS` are not attached by default, which significantly speeds up loading `patRoon` (e.g. with `library()`).
+
 
 
 # patRoon 1.0.4

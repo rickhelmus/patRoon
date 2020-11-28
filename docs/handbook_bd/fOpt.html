@@ -24,7 +24,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2020-11-25" />
+<meta name="date" content="2020-11-28" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -211,7 +211,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="6.5" data-path="compclust.html"><a href="compclust.html"><i class="fa fa-check"></i><b>6.5</b> Compound clustering</a></li>
 <li class="chapter" data-level="6.6" data-path="basic-quantitative-and-regression-analysis.html"><a href="basic-quantitative-and-regression-analysis.html"><i class="fa fa-check"></i><b>6.6</b> Basic quantitative and regression analysis</a></li>
 <li class="chapter" data-level="6.7" data-path="caching.html"><a href="caching.html"><i class="fa fa-check"></i><b>6.7</b> Caching</a></li>
-<li class="chapter" data-level="6.8" data-path="parallelization.html"><a href="parallelization.html"><i class="fa fa-check"></i><b>6.8</b> Parallelization</a></li>
+<li class="chapter" data-level="6.8" data-path="parallelization.html"><a href="parallelization.html"><i class="fa fa-check"></i><b>6.8</b> Parallelization</a><ul>
+<li class="chapter" data-level="6.8.1" data-path="parallelization.html"><a href="parallelization.html#classic-parallelization-method"><i class="fa fa-check"></i><b>6.8.1</b> Classic parallelization method</a></li>
+<li class="chapter" data-level="6.8.2" data-path="parallelization.html"><a href="parallelization.html#future-parallelization-method"><i class="fa fa-check"></i><b>6.8.2</b> Future parallelization method</a></li>
+<li class="chapter" data-level="6.8.3" data-path="parallelization.html"><a href="parallelization.html#logging"><i class="fa fa-check"></i><b>6.8.3</b> Logging</a></li>
+</ul></li>
 </ul></li>
 </ul>
 
@@ -232,7 +236,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
             <section class="normal" id="section-">
 <div id="fOpt" class="section level2">
 <h2><span class="header-section-number">6.2</span> Feature parameter optimization</h2>
-<p>Many different parameters exist that may affect the output quality of feature finding and grouping. To avoid time consuming manual experimentation, functionality is provided to largely automate the optimization process. The methodology, which uses design of experiments (DoE), is based on the excellent <a href="IPO">Isotopologue Parameter Optimization (IPO)</a> R package. The functionality of this package is directly integrated in patRoon. Some functionality was added or changed, the most important being support for other feature finding and grouping algorithms besides <a href="https://www.bioconductor.org/packages/release/bioc/html/xcms.html">XCMS</a> and basic optimization support for qualitative parameters. Nevertheless, the core optimization algorithms are largely untouched.</p>
+<p>Many different parameters exist that may affect the output quality of feature finding and grouping. To avoid time consuming manual experimentation, functionality is provided to largely automate the optimization process. The methodology, which uses design of experiments (DoE), is based on the excellent <a href="IPO">Isotopologue Parameter Optimization (IPO)</a> <code>R</code> package. The functionality of this package is directly integrated in patRoon. Some functionality was added or changed, the most important being support for other feature finding and grouping algorithms besides <a href="https://www.bioconductor.org/packages/release/bioc/html/xcms.html">XCMS</a> and basic optimization support for qualitative parameters. Nevertheless, the core optimization algorithms are largely untouched.</p>
 <p>This section will introduce the most important concepts and functionalities. Please see the reference manual for more information (e.g. <code>?`feature-optimization`</code>).</p>
 <div id="parameter-sets" class="section level3">
 <h3><span class="header-section-number">6.2.1</span> Parameter sets</h3>
@@ -288,10 +292,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 #&gt; [1] 1.5
 #&gt; 
 #&gt; $maxFWHM
-#&gt; [1] 20
-#&gt; 
-#&gt; $logPath
-#&gt; NULL</code></pre>
+#&gt; [1] 20</code></pre>
 <div class="sourceCode" id="cb112"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb112-1"><a href="fOpt.html#cb112-1"></a><span class="kw">optimizedObject</span>(ftOpt) <span class="co"># features object with best settings for whole experiment</span></span></code></pre></div>
 <pre><code>#&gt; A featuresOpenMS object (derived from features -&gt; workflowStep)
 #&gt; Object size (indication): 71.4 kB

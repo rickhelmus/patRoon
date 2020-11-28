@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1</span>
       </span>
     </div>
 
@@ -184,7 +184,7 @@ length(x)
 show(object)
 
 # S4 method for featureGroups
-groups(object, areas = FALSE)
+groupTable(object, areas = FALSE)
 
 # S4 method for featureGroups
 analysisInfo(obj)
@@ -249,7 +249,7 @@ plotChord(
 )
 
 # S4 method for featureGroups
-plotEIC(
+plotChroms(
   obj,
   rtWindow = 30,
   mzWindow = 0.005,
@@ -302,7 +302,7 @@ their index or name, respectively (for the order/names see <code>analyses()/name
     <tr>
       <th>...</th>
       <td><p>Ignored for <code>"["</code> operator or passed to
-<code><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></code> (<code>plot</code> and <code>plotEIC</code>),
+<code><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></code> (<code>plot</code> and <code>plotChroms</code>),
 <code><a href='https://rdrr.io/r/graphics/lines.html'>lines</a></code> (<code>plotInt</code>), <span class="pkg">VennDiagram</span>
 plotting functions (<code>plotVenn</code>), <code>chordDiagram</code>
 (<code>plotChord</code>) or <code><a href='https://rdrr.io/pkg/UpSetR/man/upset.html'>upset</a></code> (<code>plotUpSet</code>).</p></td>
@@ -366,7 +366,7 @@ feature groups that are unique to a replicate group are plotted.</p></td>
       <th>showLegend</th>
       <td><p>If <code>TRUE</code> a legend will be shown with either replicate
 groups (<code>colourBy == "rGroups"</code>) or feature groups (<code>colourBy ==
-"fGroups"</code>, only for <code>plotEIC</code>). If <code>colourBy</code> is <code>"none"</code>
+"fGroups"</code>, only for <code>plotChroms</code>). If <code>colourBy</code> is <code>"none"</code>
 no legend will be shown.</p></td>
     </tr>
     <tr>
@@ -526,7 +526,7 @@ replicate groups for which data is present in this object.</p></li>
 <li><p><code>groupNames</code>: Same as <code>names</code>. Provided for consistency to other classes.</p></li>
 <li><p><code>length</code>: Obtain number of feature groups.</p></li>
 <li><p><code>show</code>: Shows summary information for this object.</p></li>
-<li><p><code>groups</code>: Accessor for <code>groups</code> slot.</p></li>
+<li><p><code>groupTable</code>: Accessor for <code>groups</code> slot.</p></li>
 <li><p><code>analysisInfo</code>: Obtain analysisInfo (see analysisInfo slot in <code><a href='features-class.html'>features</a></code>).</p></li>
 <li><p><code>groupInfo</code>: Accessor for <code>groupInfo</code> slot.</p></li>
 <li><p><code>featureTable</code>: Obtain feature information (see <code><a href='features-class.html'>features</a></code>).</p></li>
@@ -551,7 +551,7 @@ visualize shared presence of feature groups between analyses or replicate
 groups. In addition, analyses/replicates sharing similar properties
 (<em>e.g.</em> location, age, type) may be grouped to enhance visualization
 between these 'outer groups'.</p></li>
-<li><p><code>plotEIC</code>: Plots extracted ion chromatograms (EICs) of feature
+<li><p><code>plotChroms</code>: Plots extracted ion chromatograms (EICs) of feature
 groups.</p></li>
 <li><p><code>plotVenn</code>: plots a Venn diagram (using
 <span class="pkg">VennDiagram</span>) outlining unique and shared feature groups

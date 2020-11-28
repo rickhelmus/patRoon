@@ -73,7 +73,7 @@ featureGroups object." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1</span>
       </span>
     </div>
 
@@ -215,7 +215,7 @@ filter(
 )
 
 # S4 method for MSPeakLists
-plotSpec(
+plotSpectrum(
   obj,
   groupName,
   analysis = NULL,
@@ -334,7 +334,7 @@ automatically made.</p></td>
     <tr>
       <th>useGGPlot2</th>
       <td><p>If <code>TRUE</code> then <span class="pkg">ggplot2</span> is used for
-plotting, otherwise base plot used. For <code>plotSpec</code>, <code>ggplot2</code>
+plotting, otherwise base plot used. For <code>plotSpectrum</code>, <code>ggplot2</code>
 allows nicely repelled text for annotation. However, base plot is generally
 faster.</p></td>
     </tr>
@@ -359,8 +359,8 @@ faster.</p></td>
   moment).</p>
 <p><code>averagedPeakLists</code> returns a nested list of feature group
   averaged peak lists in a similar format as <code>peakLists</code>.</p>
-<p><code>plotSpec</code> will return a <code>ggplot object</code>
-  if <code>useGGPlot2</code> is <code>TRUE</code>.</p>
+<p><code>plotSpectrum</code> will return a <code>ggplot
+  object</code> if <code>useGGPlot2</code> is <code>TRUE</code>.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>Objects for this class are returned by <a href='MSPeakLists-generation.html'>MS peak
@@ -391,7 +391,7 @@ returned.</p></li>
 which may further enhance quality of subsequent workflow steps (<em>e.g.</em>
 formulae calculation and compounds identification) and/or speed up these
 processes.</p></li>
-<li><p><code>plotSpec</code>: Plots a spectrum using MS or MS/MS peak lists for a
+<li><p><code>plotSpectrum</code>: Plots a spectrum using MS or MS/MS peak lists for a
 given feature group.</p></li>
 </ul>
     <h2 class="hasAnchor" id="slots"><a class="anchor" href="#slots"></a>Slots</h2>

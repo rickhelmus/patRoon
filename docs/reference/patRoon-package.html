@@ -78,7 +78,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1</span>
       </span>
     </div>
 
@@ -194,10 +194,21 @@
   running a function.</p></li>
 <li><p><code>patRoon.cache.fileName</code>: a <code>character</code> specifying the name
   of the cache file (default is <code class="file">cache.sqlite</code>).</p></li>
-<li><p><code>patRoon.maxProcAmount</code>: The maximum number of processes that
+<li><p><code>patRoon.MP.maxProcs</code>: The maximum number of processes that
   should be initiated in parallel. A good starting point is the number of
   physical cores, which is the default as detected by
-  <code><a href='https://rdrr.io/r/parallel/detectCores.html'>detectCores</a></code>.</p></li>
+  <code><a href='https://rdrr.io/r/parallel/detectCores.html'>detectCores</a></code>. This option is only used when
+  <span class="option">patRoon.MP.method="classic"</span>.</p></li>
+<li><p><code>patRoon.MP.method</code>: Either <code>"classic"</code> or <code>"future"</code>.
+  The former is the default and uses <code>processx</code> to execute
+  multiple commands in parallel. When <code>"future"</code> the
+  <code>future.apply</code> package is used for parallelization, which is
+  especially useful for <em>e.g.</em> cluster computing.</p></li>
+<li><p><code>patRoon.MP.futureSched</code>: Sets the <code>future.scheduling</code> function
+  argument for <code>future_lapply</code>. Only used if
+  <span class="option">patRoon.MP.method="future"</span>.</p></li>
+<li><p><code>patRoon.MP.logPath</code>: The path used for logging of output from
+  commands executed by multiprocess. Set to <code>FALSE</code> to disable logging.</p></li>
 <li><p><code>patRoon.path.pwiz</code>: The path in which the
   <code class='command'>ProteoWizard</code> binaries are installed. If unset an attempt is made
   to find this directory from the Windows registry and <span class="option">PATH</span>
@@ -207,7 +218,7 @@
   used. Only set if you want to override the executable.</p></li>
 <li><p><code>patRoon.path.MetFragCL</code>: The complete file path to the MetFrag
   CL <code class="file">jar</code> file that <em>must</em> be set when using
-  <code><a href='compound-generation.html'>generateCompoundsMetfrag</a></code>. Example:
+  <code><a href='compound-generation.html'>generateCompoundsMetFrag</a></code>. Example:
   <code>"C:/MetFrag2.4.2-CL.jar"</code>.</p></li>
 <li><p><code>patRoon.path.MetFragCompTox</code>: The complete file path to the
   CompTox database <code class="file">csv</code> file. See <code><a href='compound-generation.html'>generateCompounds</a></code> for

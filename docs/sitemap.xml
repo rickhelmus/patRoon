@@ -112,6 +112,9 @@
     <loc>https://rickhelmus.github.io/patRoon/reference/patRoon-package.html</loc>
   </url>
   <url>
+    <loc>https://rickhelmus.github.io/patRoon/reference/printPackageOpts.html</loc>
+  </url>
+  <url>
     <loc>https://rickhelmus.github.io/patRoon/reference/reporting.html</loc>
   </url>
   <url>
@@ -119,6 +122,9 @@
   </url>
   <url>
     <loc>https://rickhelmus.github.io/patRoon/reference/verifyDependencies.html</loc>
+  </url>
+  <url>
+    <loc>https://rickhelmus.github.io/patRoon/reference/withOpt.html</loc>
   </url>
   <url>
     <loc>https://rickhelmus.github.io/patRoon/reference/workflowStep-class.html</loc>

@@ -73,7 +73,7 @@ groups." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1</span>
       </span>
     </div>
 
@@ -195,7 +195,6 @@ groups.</p>
   isolatePrec <span class='op'>=</span> <span class='cn'>TRUE</span>,
   timeout <span class='op'>=</span> <span class='fl'>120</span>,
   topMost <span class='op'>=</span> <span class='fl'>50</span>,
-  maxProcAmount <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span><span class='op'>(</span><span class='st'>"patRoon.maxProcAmount"</span><span class='op'>)</span>,
   batchSize <span class='op'>=</span> <span class='fl'>8</span>
 <span class='op'>)</span>
 
@@ -215,9 +214,7 @@ groups.</p>
   calculateFeatures <span class='op'>=</span> <span class='cn'>TRUE</span>,
   featThreshold <span class='op'>=</span> <span class='fl'>0.75</span>,
   verbose <span class='op'>=</span> <span class='cn'>TRUE</span>,
-  SIRBatchSize <span class='op'>=</span> <span class='fl'>0</span>,
-  logPath <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='st'>"log"</span>, <span class='st'>"sirius_formulas"</span><span class='op'>)</span>,
-  maxProcAmount <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span><span class='op'>(</span><span class='st'>"patRoon.maxProcAmount"</span><span class='op'>)</span>
+  splitBatches <span class='op'>=</span> <span class='cn'>FALSE</span>
 <span class='op'>)</span>
 
 <span class='fu'>formulaScorings</span><span class='op'>(</span><span class='op'>)</span></pre>
@@ -358,17 +355,12 @@ highest score. For <code class='command'>SIRIUS</code>: Sets the <span class="op
 commandline option.</p></td>
     </tr>
     <tr>
-      <th>maxProcAmount</th>
-      <td><p>Maximum number of processes to run for parallelization.
-Usually a number close to the amount of physical cores yields most
-efficient results.</p></td>
-    </tr>
-    <tr>
       <th>batchSize</th>
       <td><p>Maximum number of <code class='command'>GenForm</code> commands that should be
 run sequentially in each parallel process. Combining commands with short
 runtimes (such as <code class='command'>GenForm</code>) can significantly increase parallel
-performance. For more information see <code><a href='executeMultiProcess.html'>executeMultiProcess</a></code>.</p></td>
+performance. For more information see <code><a href='executeMultiProcess.html'>executeMultiProcess</a></code>.
+Note that this is ignored if <span class="option">patRoon.MP.method="future"</span>.</p></td>
     </tr>
     <tr>
       <th>profile</th>
@@ -408,20 +400,13 @@ manual for more details. Set to <code>NULL</code> to ignore.</p></td>
       <td><p>If <code>TRUE</code> then more output is shown in the terminal.</p></td>
     </tr>
     <tr>
-      <th>SIRBatchSize</th>
-      <td><p>The maximum number of calculations done by
-<code class='command'>SIRIUS</code>. If this number is less than the amount of features to be
-calculated then calculations will be evenly split over multiple
-<code class='command'>SIRIUS</code> calls (which may be run in parallel if
-<code class='command'>maxProcAmount&gt;1</code>). If <code>SIRBatchSize=0</code> then all feature
-calculations are performed from a single <code class='command'>SIRIUS</code> exection, which
-is often the fastest.</p></td>
-    </tr>
-    <tr>
-      <th>logPath</th>
-      <td><p>Destination directory for log files with output from executed
-commands. Will be created if non-existant. Set to <code>NULL</code> to disable
-logging.</p></td>
+      <th>splitBatches</th>
+      <td><p>If <code>TRUE</code> then the calculations done by
+<code class='command'>SIRIUS</code> will be evenly split over multiple <code class='command'>SIRIUS</code> calls
+(which may be run in parallel depending on the <a href='patRoon-package.html'>set
+package options</a>). If <code>splitBatches=FALSE</code> then all feature
+calculations are performed from a single <code class='command'>SIRIUS</code> execution, which
+is often the fastest if calculations are performed on a single computer.</p></td>
     </tr>
     </table>
 
@@ -496,9 +481,9 @@ DataAnalysis always occurs on 'feature level'.</p>
   excessive computational times by terminating long running commands (set by
   the <code>timeout</code> argument).</p>
 <p>For annotations performed with <code class='command'>SIRIUS</code> it is often the fastest
-  to keep the default <code>SIRBatchSize=0</code>. In this case, the
-  <code>maxProcAmount</code> argument will be ignored and all <code class='command'>SIRIUS</code>
-  output will be printed to the terminal (unless <code>verbose=FALSE</code>).</p>
+  to keep the default <code>splitBatches=FALSE</code>. In this case, all
+  <code class='command'>SIRIUS</code> output will be printed to the terminal (unless
+  <code>verbose=FALSE</code> or <span class="option">patRoon.MP.method="future"</span>).</p>
     <h2 class="hasAnchor" id="scorings"><a class="anchor" href="#scorings"></a>Scorings</h2>
 
     <p>Each algorithm implements their own scoring system. Their
@@ -514,6 +499,16 @@ DataAnalysis always occurs on 'feature level'.</p>
 <tr><td>MSMSScore</td><td>MSMS_match</td><td>treeScore</td><td>-</td><td>How well MS/MS data matches</td></tr>
 <tr><td>score</td><td>-</td><td>score</td><td>Score</td><td>Overall MS formula score</td></tr>
 </table></p>
+    <h2 class="hasAnchor" id="parallelization"><a class="anchor" href="#parallelization"></a>Parallelization</h2>
+
+    <p><code>generateFormulasGenForm</code> and <code>generateFormulasSIRIUS</code> uses multiprocessing to parallelize
+  computations. Please see the parallelization section in the handbook for
+  more details and <a href='patRoon-package.html'>patRoon options</a> for configuration
+  options.</p>
+<p>When <code>futures</code> are used for parallel processing
+  (<code>patRoon.MP.method="future"</code>), calculations with <code class='command'>GenForm</code>
+  are done with batch mode is disabled (see <code>batchSize</code> argument), which
+  generally limit overall performance.</p>
     <h2 class="hasAnchor" id="genform-options"><a class="anchor" href="#genform-options"></a>GenForm options</h2>
 
     <p>Below is a list of options (generated by running
@@ -595,17 +590,18 @@ Explanation:
 <em>Nature Methods</em>, <b>16</b>(4), 299--302.
 doi: <a href='https://doi.org/10.1038/s41592-019-0344-8'>10.1038/s41592-019-0344-8</a>
 , <a href='https://doi.org/10.1038/s41592-019-0344-8'>https://doi.org/10.1038/s41592-019-0344-8</a>.
- <br /><br /> Duhrkop K, Bocker S (2015).
+ <br /><br />
+  Duhrkop K, Bocker S (2015).
 &#8220;Fragmentation Trees Reloaded.&#8221;
 In Przytycka TM (ed.), <em>Research in Computational Molecular Biology</em>, 65--79.
 ISBN 978-3-319-16706-0.
- <br /><br />
-  Duhrkop K, Shen H, Meusel M, Rousu J, Bocker S (2015).
+ <br /><br /> Duhrkop K, Shen H, Meusel M, Rousu J, Bocker S (2015).
 &#8220;Searching molecular structure databases with tandem mass spectra using CSI:FingerID.&#8221;
 <em>Proceedings of the National Academy of Sciences</em>, <b>112</b>(41), 12580--12585.
 doi: <a href='https://doi.org/10.1073/pnas.1509788112'>10.1073/pnas.1509788112</a>
 , <a href='https://doi.org/10.1073/pnas.1509788112'>https://doi.org/10.1073/pnas.1509788112</a>.
- <br /><br /> Bocker S, Letzel MC, Liptak Z, Pervukhin A (2008).
+
+  <br /><br /> Bocker S, Letzel MC, Liptak Z, Pervukhin A (2008).
 &#8220;SIRIUS: decomposing isotope patterns for metabolite identification.&#8221;
 <em>Bioinformatics</em>, <b>25</b>(2), 218--224.
 doi: <a href='https://doi.org/10.1093/bioinformatics/btn603'>10.1093/bioinformatics/btn603</a>

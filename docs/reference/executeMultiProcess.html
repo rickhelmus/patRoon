@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1</span>
       </span>
     </div>
 
@@ -170,14 +170,18 @@
   <span class='va'>finishHandler</span>,
   timeoutHandler <span class='op'>=</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>...</span><span class='op'>)</span> <span class='cn'>TRUE</span>,
   errorHandler <span class='op'>=</span> <span class='va'>defMultiProcErrorHandler</span>,
+  prepareHandler <span class='op'>=</span> <span class='cn'>NULL</span>,
+  cacheName <span class='op'>=</span> <span class='cn'>NULL</span>,
+  setHash <span class='op'>=</span> <span class='cn'>NULL</span>,
   procTimeout <span class='op'>=</span> <span class='cn'>NULL</span>,
   printOutput <span class='op'>=</span> <span class='cn'>FALSE</span>,
   printError <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  logSubDir <span class='op'>=</span> <span class='cn'>NULL</span>,
   showProgress <span class='op'>=</span> <span class='cn'>TRUE</span>,
   waitTimeout <span class='op'>=</span> <span class='fl'>50</span>,
-  maxProcAmount <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span><span class='op'>(</span><span class='st'>"patRoon.maxProcAmount"</span><span class='op'>)</span>,
   batchSize <span class='op'>=</span> <span class='fl'>1</span>,
-  delayBetweenProc <span class='op'>=</span> <span class='fl'>0</span>
+  delayBetweenProc <span class='op'>=</span> <span class='fl'>0</span>,
+  method <span class='op'>=</span> <span class='cn'>NULL</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -217,38 +221,58 @@ retries)</code>. The <code>exitStatus</code> argument is the exit code of the co
 <code>timeoutHandler</code>.</p></td>
     </tr>
     <tr>
+      <th>prepareHandler</th>
+      <td><p>A function that is called prior to execution of the
+command. The function signature should be <code>function(cmd)</code> where
+<code>cmd</code> is the queue data (from <code>commandQueue</code>) of the command to
+be started. The return value must be (an updated) <code>cmd</code>.</p></td>
+    </tr>
+    <tr>
+      <th>cacheName, setHash</th>
+      <td><p>Used for caching results. Set to <code>NULL</code> to
+disable caching.</p></td>
+    </tr>
+    <tr>
       <th>procTimeout</th>
       <td><p>The maximum time a process may consume before a timeout
-occurs (in seconds). Set to <code>NULL</code> to disable
-timeouts.</p></td>
+occurs (in seconds). Set to <code>NULL</code> to disable timeouts. Ignored if
+<code>patRoon.MP.method="future"</code>.</p></td>
     </tr>
     <tr>
       <th>printOutput, printError</th>
       <td><p>Set to <code>TRUE</code> to print stdout/stderr
-output to the console. Currently unused and untested.</p></td>
+output to the console. Ignored if <span class="option">patRoon.MP.method="future"</span>.</p></td>
+    </tr>
+    <tr>
+      <th>logSubDir</th>
+      <td><p>The sub-directory used for log files. The final log file
+path is constructed from <span class="option">patRoon.MP.logPath</span>, <code>logSubDir</code> and
+<code>logFile</code> set in the <code>commandQueue</code>.</p></td>
     </tr>
     <tr>
       <th>showProgress</th>
-      <td><p>Set to <code>TRUE</code> to display a progress bar.</p></td>
+      <td><p>Set to <code>TRUE</code> to display a progress bar. Ignored if
+<span class="option">patRoon.MP.method="future"</span>.</p></td>
     </tr>
     <tr>
       <th>waitTimeout</th>
       <td><p>Number of milliseconds to wait before checking if a new
-process should be spawned.</p></td>
-    </tr>
-    <tr>
-      <th>maxProcAmount</th>
-      <td><p>Maximum number of processes to run simultaneously.</p></td>
+process should be spawned. Ignored if <span class="option">patRoon.MP.method="future"</span>.</p></td>
     </tr>
     <tr>
       <th>batchSize</th>
       <td><p>Number of commands that should be executed in sequence per
-processes. See details.</p></td>
+processes. See details. Ignored if <span class="option">patRoon.MP.method="future"</span>.</p></td>
     </tr>
     <tr>
       <th>delayBetweenProc</th>
       <td><p>Minimum number of milliseconds to wait before
-spawning a new process. Might be needed to workaround errors.</p></td>
+spawning a new process. Might be needed to workaround errors. Ignored if
+<span class="option">patRoon.MP.method="future"</span>.</p></td>
+    </tr>
+    <tr>
+      <th>method</th>
+      <td><p>Overrides <span class="option">patRoon.MP.method</span> if not <code>NULL</code>.</p></td>
     </tr>
     </table>
 

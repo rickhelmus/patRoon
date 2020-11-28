@@ -24,7 +24,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2020-11-25" />
+<meta name="date" content="2020-11-28" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -211,7 +211,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="6.5" data-path="compclust.html"><a href="compclust.html"><i class="fa fa-check"></i><b>6.5</b> Compound clustering</a></li>
 <li class="chapter" data-level="6.6" data-path="basic-quantitative-and-regression-analysis.html"><a href="basic-quantitative-and-regression-analysis.html"><i class="fa fa-check"></i><b>6.6</b> Basic quantitative and regression analysis</a></li>
 <li class="chapter" data-level="6.7" data-path="caching.html"><a href="caching.html"><i class="fa fa-check"></i><b>6.7</b> Caching</a></li>
-<li class="chapter" data-level="6.8" data-path="parallelization.html"><a href="parallelization.html"><i class="fa fa-check"></i><b>6.8</b> Parallelization</a></li>
+<li class="chapter" data-level="6.8" data-path="parallelization.html"><a href="parallelization.html"><i class="fa fa-check"></i><b>6.8</b> Parallelization</a><ul>
+<li class="chapter" data-level="6.8.1" data-path="parallelization.html"><a href="parallelization.html#classic-parallelization-method"><i class="fa fa-check"></i><b>6.8.1</b> Classic parallelization method</a></li>
+<li class="chapter" data-level="6.8.2" data-path="parallelization.html"><a href="parallelization.html#future-parallelization-method"><i class="fa fa-check"></i><b>6.8.2</b> Future parallelization method</a></li>
+<li class="chapter" data-level="6.8.3" data-path="parallelization.html"><a href="parallelization.html#logging"><i class="fa fa-check"></i><b>6.8.3</b> Logging</a></li>
+</ul></li>
 </ul></li>
 </ul>
 
@@ -245,12 +249,15 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="manual-installation.html#cb3-1"></a><span class="kw">install.packages</span>(<span class="kw">c</span>(<span class="st">&quot;BiocManager&quot;</span>, <span class="st">&quot;remotes&quot;</span>))</span>
 <span id="cb3-2"><a href="manual-installation.html#cb3-2"></a>BiocManager<span class="op">::</span><span class="kw">install</span>(<span class="st">&quot;CAMERA&quot;</span>)</span>
 <span id="cb3-3"><a href="manual-installation.html#cb3-3"></a></span>
-<span id="cb3-4"><a href="manual-installation.html#cb3-4"></a><span class="co"># only needed for Bruker DataAnalysis integration</span></span>
-<span id="cb3-5"><a href="manual-installation.html#cb3-5"></a><span class="kw">install.packages</span>(<span class="st">&quot;RDCOMClient&quot;</span>, <span class="dt">repos =</span> <span class="st">&quot;http://www.omegahat.net/R&quot;</span>)</span>
+<span id="cb3-4"><a href="manual-installation.html#cb3-4"></a><span class="co"># needed for RAMClustR for componentization</span></span>
+<span id="cb3-5"><a href="manual-installation.html#cb3-5"></a>remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;cbroeckl/RAMClustR&quot;</span>)</span>
 <span id="cb3-6"><a href="manual-installation.html#cb3-6"></a></span>
-<span id="cb3-7"><a href="manual-installation.html#cb3-7"></a><span class="co"># only when using the R interface (not recommended by default)</span></span>
-<span id="cb3-8"><a href="manual-installation.html#cb3-8"></a>remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;c-ruttkies/MetFragR/metfRag&quot;</span>)</span></code></pre></div>
-<p>Note that the latter two commands concern installation of <em>optional</em> packages. If you are unsure then you probably don’t need them.</p>
+<span id="cb3-7"><a href="manual-installation.html#cb3-7"></a><span class="co"># only needed for Bruker DataAnalysis integration</span></span>
+<span id="cb3-8"><a href="manual-installation.html#cb3-8"></a><span class="kw">install.packages</span>(<span class="st">&quot;RDCOMClient&quot;</span>, <span class="dt">repos =</span> <span class="st">&quot;http://www.omegahat.net/R&quot;</span>)</span>
+<span id="cb3-9"><a href="manual-installation.html#cb3-9"></a></span>
+<span id="cb3-10"><a href="manual-installation.html#cb3-10"></a><span class="co"># only when using the R interface (not recommended by default)</span></span>
+<span id="cb3-11"><a href="manual-installation.html#cb3-11"></a>remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;c-ruttkies/MetFragR/metfRag&quot;</span>)</span></code></pre></div>
+<p>Note that the latter three commands concern installation of <em>optional</em> packages. If you are unsure then you probably don’t need them.</p>
 </div>
 <div id="other-dependencies" class="section level3">
 <h3><span class="header-section-number">2.3.2</span> Other dependencies</h3>

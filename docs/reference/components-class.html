@@ -73,7 +73,7 @@ components commonly include adducts, isotopes and homologues." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1</span>
       </span>
     </div>
 
@@ -212,7 +212,7 @@ filter(
 findFGroup(obj, fGroup)
 
 # S4 method for components
-plotSpec(
+plotSpectrum(
   obj,
   index,
   markFGroup = NULL,
@@ -223,7 +223,7 @@ plotSpec(
 )
 
 # S4 method for components
-plotEIC(obj, index, fGroups, rtWindow = 5, ...)
+plotChroms(obj, index, fGroups, rtWindow = 5, ...)
 
 # S4 method for components
 consensus(obj, ...)</pre>
@@ -243,11 +243,11 @@ their index or name, respectively (for the order/names see <code>names()/groupNa
     </tr>
     <tr>
       <th>...</th>
-      <td><p>For <code>plotEIC</code>: Further (optional) arguments passed to the
-  <code>plotEIC</code> method for the <code><a href='featureGroups-class.html'>featureGroups</a></code> class. Note that
+      <td><p>For <code>plotChroms</code>: Further (optional) arguments passed to the
+  <code>plotChroms</code> method for the <code><a href='featureGroups-class.html'>featureGroups</a></code> class. Note that
   the <code>colourBy</code>, <code>showPeakArea</code>, <code>showFGroupRect</code> and
   <code>topMost</code> arguments cannot be set as these are set by this method.</p>
-<p>For <code>plotSpec</code>: Further arguments passed to
+<p>For <code>plotSpectrum</code>: Further arguments passed to
   <code><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></code>.</p>
 <p>For <code>consensus</code>: <code>components</code> objects that should be used to
   generate the consensus.</p></td>
@@ -315,7 +315,7 @@ should be a character with the name of the feature group. Setting this to
     <tr>
       <th>useGGPlot2</th>
       <td><p>If <code>TRUE</code> then <span class="pkg">ggplot2</span> is used for
-plotting, otherwise base plot used. For <code>plotSpec</code>, <code>ggplot2</code>
+plotting, otherwise base plot used. For <code>plotSpectrum</code>, <code>ggplot2</code>
 allows nicely repelled text for annotation. However, base plot is generally
 faster.</p></td>
     </tr>
@@ -331,7 +331,7 @@ generate the components.</p></td>
     </tr>
     <tr>
       <th>rtWindow</th>
-      <td><p>Retention window: see the <code>plotEIC</code> method for the
+      <td><p>Retention window: see the <code>plotChroms</code> method for the
 <code><a href='featureGroups-class.html'>featureGroups</a></code> class.</p></td>
     </tr>
     </table>
@@ -371,9 +371,9 @@ feature groups for which data is present in this object.</p></li>
 <li><p><code>filter</code>: Provides rule based filtering for components.</p></li>
 <li><p><code>findFGroup</code>: Returns the component id(s) to which a feature group
 belongs.</p></li>
-<li><p><code>plotSpec</code>: Plot a <em>pseudo</em> mass spectrum for a single
+<li><p><code>plotSpectrum</code>: Plot a <em>pseudo</em> mass spectrum for a single
 component.</p></li>
-<li><p><code>plotEIC</code>: Plot an extracted ion chromatogram (EIC) for all
+<li><p><code>plotChroms</code>: Plot an extracted ion chromatogram (EIC) for all
 feature groups within a single component.</p></li>
 <li><p><code>consensus</code>: Generates a consensus from multiple <code>components</code>
 objects. At this point results are simply combined and no attempt is made to

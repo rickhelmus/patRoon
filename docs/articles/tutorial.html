@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1</span>
       </span>
     </div>
 
@@ -120,7 +120,7 @@
       <h1 data-toc-skip>patRoon tutorial</h1>
                         <h4 class="author">Rick Helmus</h4>
             
-            <h4 class="date">2020-11-25</h4>
+            <h4 class="date">2020-11-28</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/rickhelmus/patRoon/blob/master/vignettes/tutorial.Rmd"><code>vignettes/tutorial.Rmd</code></a></small>
       <div class="hidden name"><code>tutorial.Rmd</code></div>
@@ -152,8 +152,8 @@ p.caption {
 <!-- UNDONE: link to advanced vignette -->
 <p>In this tutorial you will learn how to perform a simple non-target analysis with <code>patRoon</code>. This tutorial is not meant to give a detailed overview of <code>patRoon</code>. Instead, it serves as a quick introduction on how to use <code>patRoon</code> to setup and perform a full non-target analysis workflow.</p>
 <p>The workflow in this tutorial consists of the following steps:</p>
-<div id="htmlwidget-4dfe44fa503ab51553c0" style="width:750px;height:100px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-4dfe44fa503ab51553c0">{"x":{"diagram":"\ndigraph rmarkdown {\ngraph [ rankdir = LR ]\nnode [ shape = box,\n       fixedsize = true,\n       width = 2.2,\n       height = 1,\n       fontsize = 18,\n       fillcolor = darkseagreen1,\n       style = filled ]\n\"New project\" -> Features -> Annotation -> Reporting [ arrowhead = vee ]\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-19f24d11364c12c417ab" style="width:750px;height:100px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-19f24d11364c12c417ab">{"x":{"diagram":"\ndigraph rmarkdown {\ngraph [ rankdir = LR ]\nnode [ shape = box,\n       fixedsize = true,\n       width = 2.2,\n       height = 1,\n       fontsize = 18,\n       fillcolor = darkseagreen1,\n       style = filled ]\n\"New project\" -> Features -> Annotation -> Reporting [ arrowhead = vee ]\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 </div>
 <div id="data" class="section level1">
 <h1 class="hasAnchor">
@@ -361,6 +361,12 @@ p.caption {
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fList</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/feature-finding.html">findFeatures</a></span><span class="op">(</span><span class="va">anaInfo</span>, <span class="st">"openms"</span><span class="op">)</span></code></pre></div>
 <pre><code>#&gt; Finding features with OpenMS for 6 analyses ...
+#&gt; Loading peak intensities for 'solvent-1'...
+#&gt; Loading peak intensities for 'solvent-2'...
+#&gt; Loading peak intensities for 'solvent-3'...
+#&gt; Loading peak intensities for 'standard-1'...
+#&gt; Loading peak intensities for 'standard-2'...
+#&gt; Loading peak intensities for 'standard-3'...
 #&gt; Done!
 #&gt; Feature statistics:
 #&gt; solvent-1: 385 (15.8%)
@@ -436,10 +442,10 @@ p.caption {
 #&gt; M142_R116_141 116.0809 141.9584</code></pre>
 <p>Finally, we can have a quick look at our data by plotting some nice extracted ion chromatograms (EICs) for all feature groups:</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/generics.html">plotEIC</a></span><span class="op">(</span><span class="va">fGroups</span>, colourBy <span class="op">=</span> <span class="st">"fGroups"</span>, showFGroupRect <span class="op">=</span> <span class="cn">FALSE</span>, showPeakArea <span class="op">=</span> <span class="cn">TRUE</span>,
-        topMost <span class="op">=</span> <span class="fl">1</span>, showLegend <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
-<p><img src="tutorial_files/figure-html/plotEIC-1.png" width="672"></p>
-<p>Note that here we only plot the most intense feature of a feature group here (as set by <code>topMost=1</code>). See the reference docs for many more parameters to these functions (e.g. <code><a href="../reference/generics.html">?plotEIC</a></code>).</p>
+<code class="sourceCode R"><span class="fu"><a href="../reference/generics.html">plotChroms</a></span><span class="op">(</span><span class="va">fGroups</span>, colourBy <span class="op">=</span> <span class="st">"fGroups"</span>, showFGroupRect <span class="op">=</span> <span class="cn">FALSE</span>, showPeakArea <span class="op">=</span> <span class="cn">TRUE</span>,
+           topMost <span class="op">=</span> <span class="fl">1</span>, showLegend <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
+<p><img src="tutorial_files/figure-html/plotChroms-1.png" width="672"></p>
+<p>Note that here we only plot the most intense feature of a feature group here (as set by <code>topMost=1</code>). See the reference docs for many more parameters to these functions (e.g. <code><a href="../reference/generics.html">?plotChroms</a></code>).</p>
 </div>
 </div>
 <div id="annotation" class="section level1">
@@ -596,11 +602,11 @@ p.caption {
 <div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/generics.html">as.data.table</a></span><span class="op">(</span><span class="va">compounds</span><span class="op">)</span><span class="op">[</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span> <span class="co"># only show first columns for clarity</span></code></pre></div>
 <pre><code>#&gt;               group explainedPeaks    score neutralMass                               SMILES
-#&gt;    1:  M109_R116_56              3 3.483028    108.0687                    C1=CC=C(C(=C1)N)N
-#&gt;    2:  M109_R116_56              2 3.474735    108.0687                        CCC1=NC=CC=N1
-#&gt;    3:  M109_R116_56              2 3.296937    108.0687                        C=CN1CN=CC=C1
-#&gt;    4:  M109_R116_56              3 3.280766    108.0687                      C1=CC(=CC=C1N)N
-#&gt;    5:  M109_R116_56              3 3.257105    108.0687                        C=CCC1=NC=CN1
+#&gt;    1:  M109_R116_56              3 4.483028    108.0687                    C1=CC=C(C(=C1)N)N
+#&gt;    2:  M109_R116_56              3 4.099968    108.0687                      C1=CC(=CC=C1N)N
+#&gt;    3:  M109_R116_56              3 3.796793    108.0687                      C1=CC=C(C=C1)NN
+#&gt;    4:  M109_R116_56              3 3.347722    108.0687                    C1=CC(=CC(=C1)N)N
+#&gt;    5:  M109_R116_56              3 3.018864    108.0687                      CC1=NC(=CC=C1)N
 #&gt;   ---                                                                                       
 #&gt; 2212: M254_R321_484              3 2.492790    253.0521 CC1=C(C=C(C=C1)S(=O)(=O)NC2=NOC=C2)N
 #&gt; 2213: M254_R321_484              3 2.492776    253.0521 CC1=C(C=CC(=C1)N)S(=O)(=O)NC2=NOC=C2
@@ -608,14 +614,14 @@ p.caption {
 #&gt; 2215: M254_R321_484              3 2.492776    253.0521 CC1=C(C=C(C=C1)N)S(=O)(=O)NC2=NOC=C2
 #&gt; 2216: M254_R321_484              5 2.492690    253.0521   CC1=NN=C(O1)C2=CC=CC=C2NS(=O)(=O)C</code></pre>
 <div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/generics.html">plotSpec</a></span><span class="op">(</span><span class="va">mslists</span>, <span class="st">"M186_R265_296"</span>, MSLevel <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></code></pre></div>
-<p><img src="tutorial_files/figure-html/plotSpec-1.png" width="576"></p>
+<code class="sourceCode R"><span class="fu"><a href="../reference/generics.html">plotSpectrum</a></span><span class="op">(</span><span class="va">mslists</span>, <span class="st">"M186_R265_296"</span>, MSLevel <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></code></pre></div>
+<p><img src="tutorial_files/figure-html/plotSpectrum-1.png" width="576"></p>
 <div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/generics.html">plotSpec</a></span><span class="op">(</span><span class="va">formulas</span>, <span class="st">"C6H9N2"</span>, <span class="st">"M109_R116_56"</span>, MSPeakLists <span class="op">=</span> <span class="va">mslists</span><span class="op">)</span></code></pre></div>
-<p><img src="tutorial_files/figure-html/plotSpec-2.png" width="576"></p>
+<code class="sourceCode R"><span class="fu"><a href="../reference/generics.html">plotSpectrum</a></span><span class="op">(</span><span class="va">formulas</span>, <span class="st">"C6H9N2"</span>, <span class="st">"M109_R116_56"</span>, MSPeakLists <span class="op">=</span> <span class="va">mslists</span><span class="op">)</span></code></pre></div>
+<p><img src="tutorial_files/figure-html/plotSpectrum-2.png" width="576"></p>
 <div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/generics.html">plotSpec</a></span><span class="op">(</span><span class="va">compounds</span>, <span class="fl">1</span>, <span class="st">"M120_R328_81"</span>, <span class="va">mslists</span><span class="op">)</span></code></pre></div>
-<p><img src="tutorial_files/figure-html/plotSpec-3.png" width="576"></p>
+<code class="sourceCode R"><span class="fu"><a href="../reference/generics.html">plotSpectrum</a></span><span class="op">(</span><span class="va">compounds</span>, <span class="fl">1</span>, <span class="st">"M120_R328_81"</span>, <span class="va">mslists</span><span class="op">)</span></code></pre></div>
+<p><img src="tutorial_files/figure-html/plotSpectrum-3.png" width="576"></p>
 </div>
 </div>
 <div id="components" class="section level1">
@@ -648,10 +654,10 @@ p.caption {
 #&gt; Components: CMP1, CMP2, CMP3, CMP4, CMP5, CMP6, ... (11 total)
 #&gt; Number of feature groups in components: 28 (total), 2.5 (mean), 2 - 5 (min - max)</code></pre>
 <div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/generics.html">plotSpec</a></span><span class="op">(</span><span class="va">components</span>, <span class="st">"CMP6"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="../reference/generics.html">plotSpectrum</a></span><span class="op">(</span><span class="va">components</span>, <span class="st">"CMP6"</span><span class="op">)</span></code></pre></div>
 <p><img src="tutorial_files/figure-html/unnamed-chunk-4-1.png" width="480"></p>
 <div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/generics.html">plotEIC</a></span><span class="op">(</span><span class="va">components</span>, <span class="st">"CMP6"</span>, <span class="va">fGroups</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="../reference/generics.html">plotChroms</a></span><span class="op">(</span><span class="va">components</span>, <span class="st">"CMP6"</span>, <span class="va">fGroups</span><span class="op">)</span></code></pre></div>
 <p><img src="tutorial_files/figure-html/unnamed-chunk-4-2.png" width="480"></p>
 <blockquote>
 <p><strong><em>NOTE</em></strong> The componentization process must currently be seen as a tool to provide hints on how different features <em>may</em> be related to each other. Hence, results should always be checked manually, for instance, by the above commands or with the reports generated in the next step. For this reason, features that were annotated as e.g. adducts or fragments should not be blindly removed.</p>

@@ -74,7 +74,7 @@ identified compounds." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1</span>
       </span>
     </div>
 
@@ -242,7 +242,6 @@ identified compounds.</p>
   EICOnlyPresent <span class='op'>=</span> <span class='cn'>TRUE</span>,
   selfContained <span class='op'>=</span> <span class='cn'>TRUE</span>,
   optimizePng <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  maxProcAmount <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span><span class='op'>(</span><span class='st'>"patRoon.maxProcAmount"</span><span class='op'>)</span>,
   clearPath <span class='op'>=</span> <span class='cn'>FALSE</span>,
   openReport <span class='op'>=</span> <span class='cn'>TRUE</span>,
   noDate <span class='op'>=</span> <span class='cn'>FALSE</span>
@@ -343,7 +342,7 @@ further annotation of compound MS/MS spectra.</p></td>
       <th>compoundsOnlyUsedScorings</th>
       <td><p>If <code>TRUE</code> then only scorings are plotted
 that actually have been used to rank data (see the <code>scoreTypes</code>
-argument to <code><a href='compound-generation.html'>generateCompoundsMetfrag</a></code> for more details).</p></td>
+argument to <code><a href='compound-generation.html'>generateCompoundsMetFrag</a></code> for more details).</p></td>
     </tr>
     <tr>
       <th>MSPeakLists</th>
@@ -359,7 +358,7 @@ used to determine the plotting grid when reporting EICs in PDF files.</p></td>
     <tr>
       <th>EICRtWindow, EICMzWindow, EICTopMost, EICOnlyPresent</th>
       <td><p>Plotting parameters
-passed to <code><a href='generics.html'>plotEIC</a></code> (<em>i.e.</em> <code>rtWindow</code>,
+passed to <code><a href='generics.html'>plotChroms</a></code> (<em>i.e.</em> <code>rtWindow</code>,
 <code>mzWindow</code>, <code>topMost</code> and <code>onlyPresent</code> arguments).</p></td>
     </tr>
     <tr>
@@ -397,14 +396,12 @@ memory.</p></td>
     <tr>
       <th>optimizePng</th>
       <td><p>If <code>TRUE</code> then <code class='command'>pngquant</code> is used to reduce
-the size of generated graphics. A signficant reduction in disk space usage
-may be seen, however, at the cost additional processing time.</p></td>
-    </tr>
-    <tr>
-      <th>maxProcAmount</th>
-      <td><p>Maximum amount of <code class='command'>pngquant</code> commands to run in
-parallel. Higher numbers will decrease processing time, with an optimum
-usually close to the amount of CPU cores.</p></td>
+the size of generated graphics. A significant reduction in disk space usage
+may be seen, however, at the cost additional processing time. Multiple
+<code class='command'>pngquant</code> processes will be executed in parallel, which can be
+configured with <span class="option">patRoon.MP.maxProcs</span> (parallelization will always
+happen with the <code>"classic"</code> method, see
+<a href='patRoon-package.html'>patRoon options</a>).</p></td>
     </tr>
     <tr>
       <th>openReport</th>
@@ -451,6 +448,15 @@ compounds, clustering) that are desired to be reported need to be specified.</p>
     <p>Any formulae and compounds for feature groups which are not present
   within <code>fGroups</code> (<em>i.e.</em> because it has been subset afterwards)
   will not be reported.</p>
+    <h2 class="hasAnchor" id="parallelization"><a class="anchor" href="#parallelization"></a>Parallelization</h2>
+
+    <p><code>reportHTML</code> uses multiprocessing to parallelize
+  computations. Please see the parallelization section in the handbook for
+  more details and <a href='patRoon-package.html'>patRoon options</a> for configuration
+  options.</p>
+<p>Currently, <code>reportHTML</code> only uses
+  <code>"classic"</code> multiprocessing, regardless of the
+  <span class="option">patRoon.MP.method</span> option.</p>
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
     <p>Creating MetFrag landing page URLs based on code from

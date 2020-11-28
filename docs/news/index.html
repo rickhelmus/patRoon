@@ -71,7 +71,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1</span>
       </span>
     </div>
 
@@ -159,13 +159,47 @@
       <small>Source: <a href='https://github.com/rickhelmus/patRoon/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
-    <div id="patroon-105" class="section level1">
-<h1 class="page-header" data-toc-text="1.0.5">
-<a href="#patroon-105" class="anchor"></a>patRoon 1.0.5</h1>
+    <div id="patroon-11" class="section level1">
+<h1 class="page-header" data-toc-text="1.1">
+<a href="#patroon-11" class="anchor"></a>patRoon 1.1</h1>
 <ul>
 <li>
-<em>IMPORTANT:</em> Support for SIRIUS 4.5.0. Please update to this version since these changes break support for older versions.</li>
-<li>Fix: SIRIUS formula calculation with <code>calculateFeatures=TRUE</code> would try to calculate formulas for features even if not present (eg after being removed by subsetting or filtering steps)</li>
+<strong>IMPORTANT</strong>: The <code><a href="../reference/patRoon-deprecated.html">plotEIC()</a></code>, <code><a href="../reference/patRoon-deprecated.html">groups()</a></code> and <code><a href="../reference/patRoon-deprecated.html">plotSpec()</a></code> methods were renamed to <code><a href="../reference/generics.html">plotChroms()</a></code>, <code><a href="../reference/featureGroups-class.html">groupTable()</a></code> and <code><a href="../reference/generics.html">plotSpectrum()</a></code>. This was done to avoid name clashes with <code>XCMS</code> and <code>CAMERA</code>. The old functions still work (with a warning), but please update your scripts as these will be removed in the future.</li>
+<li>
+<strong>IMPORTANT</strong>: Major changes to the parallelization functionality
+<ul>
+<li>
+<code>patRoon</code> now supports an additional method to perform parallelization for tools such as <code>MetFrag</code>, <code>SIRIUS</code> etc. The main purpose of this method is to allow you to perform such calculations on external computer clusters. Please see the updated parallelization section in the handbook for more details.</li>
+<li>The <code>logPath</code> and <code>maxProcAmount</code> arguments to functions such <code>generateFormulas</code>, <code>generateCompounds</code> etc were removed. These should now solely be configured through package options (see <code><a href="../reference/patRoon-package.html">?patRoon</a></code>).</li>
+<li>The <code>patRoon.maxProcAmount</code> package option was renamed to <code>patRoon.MP.maxProcs</code>.</li>
+</ul>
+</li>
+<li>Changes related to <code>SIRIUS</code>
+<ul>
+<li>
+<strong>IMPORTANT:</strong> Support for SIRIUS 4.5.0. Please update to this version since these changes break support for older versions.</li>
+<li>Fix: SIRIUS formula calculation with <code>calculateFeatures=TRUE</code> would try to calculate formulas for features even if not present (eg after being removed by subsetting or filtering steps).</li>
+<li>The <code>SIRBatchSize</code> argument to formula and compound generation functions was renamed to <code>splitBatches</code> and its meaning has slightly changed. Please see the reference manual (e.g. <code><a href="../reference/formula-generation.html">?generateFormulas</a></code>) for more details.</li>
+</ul>
+</li>
+<li>Changes related to MetFrag
+<ul>
+<li>Paths to local database files for MetFrag are now normalized, which makes handling of relative paths more reliable.</li>
+<li>Changes in the specified local MetFrag database files are now inspected to improve caching.</li>
+<li>Consistency: <code>generateCompoundsMetfrag</code> was renamed to <code>generateCompoundsMetFrag</code>.</li>
+</ul>
+</li>
+<li>Optimized loading of spectra and EIC data.</li>
+<li>New utility functions
+<ul>
+<li>
+<code><a href="../reference/withOpt.html">withOpt()</a></code> to temporarily change (<code>patRoon</code>) package options.</li>
+<li>
+<code><a href="../reference/printPackageOpts.html">printPackageOpts()</a></code>: display current package options of <code>patRoon</code>.</li>
+</ul>
+</li>
+<li>Finding features with <code>OpenMS</code>: potentially large temporary files are removed when possible to avoid clogging up disk space (especially relevant on some Linux systems where <code>/tmp</code> is small).</li>
+<li>Several packages such as <code>XCMS</code> are not attached by default, which significantly speeds up loading <code>patRoon</code> (e.g. with <code><a href="https://rdrr.io/r/base/library.html">library()</a></code>).</li>
 </ul>
 </div>
     <div id="patroon-104" class="section level1">
@@ -195,7 +229,7 @@
 </ul>
 </li>
 <li>minor fixes for subsetting XCMS <code>features</code> objects</li>
-<li>Fixed: <code>generateCompoundsMetFrag()</code>: compound names could be sometimes be interpreted as dates (reported by Corey Griffith)</li>
+<li>Fixed: <code><a href="../reference/compound-generation.html">generateCompoundsMetFrag()</a></code>: compound names could be sometimes be interpreted as dates (reported by Corey Griffith)</li>
 <li>Fixed: on very rare cases empty peaklists could be present after averaging.</li>
 <li>Fixed: <code>SIRIUS</code> annotation didn’t use set adduct but used default instead</li>
 <li>
@@ -299,7 +333,7 @@
 <li>retention times / <em>m/z</em> values are now averaged over grouped suspects.</li>
 </ul>
 </li>
-<li>The <code><a href="../reference/generics.html">plot()</a></code> method for <code>featureGroups</code> now allows drawing legends when <code>colourBy="fGroups"</code> and sets <code>colourBy="none"</code> by default, both for consistency with <code><a href="../reference/generics.html">plotEIC()</a></code>.</li>
+<li>The <code><a href="../reference/generics.html">plot()</a></code> method for <code>featureGroups</code> now allows drawing legends when <code>colourBy="fGroups"</code> and sets <code>colourBy="none"</code> by default, both for consistency with <code><a href="../reference/patRoon-deprecated.html">plotEIC()</a></code>.</li>
 <li>All documentation is now available as PDF files on the website (<a href="https://rickhelmus.github.io/patRoon/" class="uri">https://rickhelmus.github.io/patRoon/</a>)</li>
 <li>
 <code><a href="../reference/GUI-utils.html">newProject()</a></code> now uses XCMS3 algorithms instead of the older XCMS interface.</li>
@@ -449,7 +483,7 @@
 </li>
 <li>Fixed incorrect selection after feature table (or other interactive tables) have been manually re-ordered (reported by Thanh Wang)</li>
 <li>
-<code><a href="../reference/featureGroups-class.html">groups()</a></code> and <code><a href="../reference/generics.html">as.data.table()</a></code> methods for <code>featureGroups</code>: optionally consider feature areas instead of peak intensities.</li>
+<code><a href="../reference/patRoon-deprecated.html">groups()</a></code> and <code><a href="../reference/generics.html">as.data.table()</a></code> methods for <code>featureGroups</code>: optionally consider feature areas instead of peak intensities.</li>
 <li>
 <code><a href="../reference/generics.html">plotSilhouettes()</a></code> method for <code>compoundsCluster</code>
 </li>
@@ -538,7 +572,7 @@
 <code><a href="../reference/reporting.html">reportPDF()</a></code>/<code><a href="../reference/patRoon-deprecated.html">reportMD()</a></code> now report only 5 top most candidate compounds by default (controlled by <code>compoundsTopMost</code> argument).</li>
 <li>metadata for MS peak lists</li>
 <li>
-<code><a href="../reference/generics.html">plotSpec()</a></code> now displays subscripted formulae</li>
+<code><a href="../reference/patRoon-deprecated.html">plotSpec()</a></code> now displays subscripted formulae</li>
 <li>
 <strong>IMPORTANT</strong> Several major changes were made to the <code><a href="../reference/generics.html">filter()</a></code> methods for <code>features</code> and <code>featureGroups</code>. Please carefully read the updated documentation for these methods! (i.e. <code><a href="../reference/features-class.html">?`filter,features-method`</a></code> and <code><a href="../reference/feature-filtering.html">?`filter,featureGroups-method`</a></code>).
 <ul>
@@ -630,13 +664,13 @@
 <strong>IMPORTANT</strong> Several changes were made to the MetFrag compound generation interface in order to simplify it and make it more generic. See <code><a href="../reference/compound-generation.html">?generateCompounds</a></code> for more details (notably the Scorings section).</li>
 <li>More MS peak list updates
 <ul>
-<li>Precursor peaks are now flagged in MS peak list data and <code><a href="../reference/generics.html">plotSpec()</a></code>
+<li>Precursor peaks are now flagged in MS peak list data and <code><a href="../reference/patRoon-deprecated.html">plotSpec()</a></code>
 </li>
 <li>Prune MS peak lists (not MS/MS) if no precursor could be determined (enabled by default, see <code>pruneMissingPrecursorMS</code> option in <code><a href="../reference/MSPeakLists-generation.html">?generateMSPeakLists</a></code>).</li>
 <li>Better retain precursor peaks after filtering steps: only intensity thresholds may remove precursors (always for MS data, optional for MS/MS with <code>retainPrecursorMSMS</code> function arguments, see <code><a href="../reference/MSPeakLists-class.html">?MSPeakLists</a></code> and <code><a href="../reference/MSPeakLists-generation.html">?generateMSPeakLists</a></code>).</li>
 </ul>
 </li>
-<li>All major workflow classes now have <code><a href="../reference/generics.html">algorithm()</a></code> and <code>as.data.table()/as.data.frame()</code> methods. The latter replaces and enhances the <code>makeTable()</code> (<code>formulas</code> class) and <code>groupTable()</code> (<code>featureGroups</code> class) methods.</li>
+<li>All major workflow classes now have <code><a href="../reference/generics.html">algorithm()</a></code> and <code>as.data.table()/as.data.frame()</code> methods. The latter replaces and enhances the <code>makeTable()</code> (<code>formulas</code> class) and <code><a href="../reference/featureGroups-class.html">groupTable()</a></code> (<code>featureGroups</code> class) methods.</li>
 </ul>
 </div>
 <div id="december-2018" class="section level2">
@@ -683,7 +717,7 @@
 <li>
 <code><a href="../reference/compound-generation.html">generateCompounds()</a></code> and plotting functionality now uses averaged group peak lists instead of peak list of most intense analysis.</li>
 <li>
-<code><a href="../reference/generics.html">plotSpec()</a></code> method for MSPeakLists: plot (non-annotated) MS and MS/MS spectra.</li>
+<code><a href="../reference/patRoon-deprecated.html">plotSpec()</a></code> method for MSPeakLists: plot (non-annotated) MS and MS/MS spectra.</li>
 <li>Minimum intensity filter option that is applied after averaging.</li>
 <li>Now uses “hclust” method for averaging by default, which now uses the <a href="https://cran.r-project.org/web/packages/fastcluster/index.html">fastcluster</a> package.</li>
 </ul>

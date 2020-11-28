@@ -21,3 +21,7 @@ loadEICs <- function(spectra, rtRanges, mzRanges) {
     .Call(`_patRoon_loadEICs`, spectra, rtRanges, mzRanges)
 }
 
+makeSAFDInput <- function(spectra) {
+    .Call(`_patRoon_makeSAFDInput`, spectra)
+}
+

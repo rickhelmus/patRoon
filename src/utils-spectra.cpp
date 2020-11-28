@@ -138,3 +138,30 @@ Rcpp::List loadEICs(Rcpp::List spectra, Rcpp::List rtRanges, Rcpp::List mzRanges
     
     return ret;
 }
+
+// [[Rcpp::export]]
+Rcpp::List makeSAFDInput(Rcpp::List spectra)
+{
+    const Rcpp::List specList = spectra["spectra"];
+    const int rows = specList.size();
+    int cols = 0;
+    
+    for (int i=0; i<rows; ++i)
+        cols = std::max(cols, (Rcpp::as<Rcpp::NumericMatrix>(specList[i])).nrow());
+    
+    Rcpp::NumericMatrix mzs(rows, cols), ints(rows, cols);
+    for (int i=0; i<rows; ++i)
+    {
+        Rcpp::NumericMatrix::Row mzRow = mzs(i, Rcpp::_), intRow = ints(i, Rcpp::_);
+        Rcpp::NumericMatrix spec = Rcpp::as<Rcpp::NumericMatrix>(specList[i]);
+        mzs(i, Rcpp::_) = spec(Rcpp::_, 0);
+        ints(i, Rcpp::_) = spec(Rcpp::_, 1);
+        /*for (int j=0; j<spec.size(); ++j)
+        {
+            mzRow[i] = spec["mz"][i];
+            intRow[i] = spec["intensity"][i];
+        }*/
+    }
+    
+    return Rcpp::List::create(Rcpp::Named("mzM") = mzs, Rcpp::Named("intM") = ints);
+}

@@ -65,6 +65,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// makeSAFDInput
+Rcpp::List makeSAFDInput(Rcpp::List spectra);
+RcppExport SEXP _patRoon_makeSAFDInput(SEXP spectraSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::List >::type spectra(spectraSEXP);
+    rcpp_result_gen = Rcpp::wrap(makeSAFDInput(spectra));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_parseFeatureXMLFile", (DL_FUNC) &_patRoon_parseFeatureXMLFile, 1},
@@ -72,6 +83,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_writeFeatureXML", (DL_FUNC) &_patRoon_writeFeatureXML, 2},
     {"_patRoon_loadEICIntensities", (DL_FUNC) &_patRoon_loadEICIntensities, 3},
     {"_patRoon_loadEICs", (DL_FUNC) &_patRoon_loadEICs, 3},
+    {"_patRoon_makeSAFDInput", (DL_FUNC) &_patRoon_makeSAFDInput, 1},
     {NULL, NULL, 0}
 };
 

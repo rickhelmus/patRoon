@@ -242,10 +242,10 @@ setGeneric("groupNames", function(obj) standardGeneric("groupNames"))
 #'
 setGeneric("plotChord", function(obj, addSelfLinks = FALSE, addRetMzPlots = TRUE, ...) standardGeneric("plotChord"))
 
-#' @templateVar func plotEICs
+#' @templateVar func plotChroms
 #' @templateVar desc plots extracted ion chromatogram(s).
 #' @template generics
-setGeneric("plotEICs", function(obj, ...) standardGeneric("plotEICs"))
+setGeneric("plotChroms", function(obj, ...) standardGeneric("plotChroms"))
 
 #' @templateVar func plotInt
 #' @templateVar desc plots the intensity of all contained features.
@@ -339,7 +339,7 @@ setGeneric("plotHash", function(x, ...) standardGeneric("plotHash"))
 setGeneric("plotSpectrumHash", function(obj, ...) standardGeneric("plotSpectrumHash"))
 setGeneric("plotScoresHash", function(obj, ...) standardGeneric("plotScoresHash"))
 setGeneric("plotStructureHash", function(obj, ...) standardGeneric("plotStructureHash"))
-setGeneric("plotEICsHash", function(obj, ...) standardGeneric("plotEICsHash"))
+setGeneric("plotChromsHash", function(obj, ...) standardGeneric("plotChromsHash"))
 setGeneric("plotIntHash", function(obj, ...) standardGeneric("plotIntHash"))
 
 

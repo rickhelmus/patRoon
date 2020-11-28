@@ -40,7 +40,7 @@ NULL
 #' @param retMin If \code{TRUE} then report retention times in minutes
 #'   (otehrwise seconds).
 #' @param EICRtWindow,EICMzWindow,EICTopMost,EICOnlyPresent Plotting parameters
-#'   passed to \code{\link{plotEICs}} (\emph{i.e.} \code{rtWindow},
+#'   passed to \code{\link{plotChroms}} (\emph{i.e.} \code{rtWindow},
 #'   \code{mzWindow}, \code{topMost} and \code{onlyPresent} arguments).
 #' @param compoundsOnlyUsedScorings If \code{TRUE} then only scorings are plotted
 #'   that actually have been used to rank data (see the \code{scoreTypes}
@@ -203,7 +203,7 @@ reportFGroupPlots <- function(fGroups, path, plotGrid, rtWindow, mzWindow, retMi
     pdf(pdfFile, paper = "a4", pointsize = 10, width = 8, height = 11)
 
     # all feature groups
-    plotEICs(fGroups, rtWindow, mzWindow, retMin, 1, EICs, TRUE, FALSE)
+    plotChroms(fGroups, rtWindow, mzWindow, retMin, 1, EICs, TRUE, FALSE)
 
     plotsPerPage <- plotGrid[1] * plotGrid[2]
     prog <- openProgBar(0, gCount)
@@ -221,7 +221,8 @@ reportFGroupPlots <- function(fGroups, path, plotGrid, rtWindow, mzWindow, retMi
         }
         
         screen(scr[scrInd])
-        plotEICs(fGroups[, grpi], rtWindow, mzWindow, retMin, topMost, EICs, onlyPresent = onlyPresent, colourBy = "rGroups")
+        plotChroms(fGroups[, grpi], rtWindow, mzWindow, retMin, topMost, EICs,
+                   onlyPresent = onlyPresent, colourBy = "rGroups")
         setTxtProgressBar(prog, grpi)
     }
 
@@ -319,7 +320,7 @@ reportFormulaSpectra <- function(fGroups, path, formulas, topMost, normalizeScor
             # a4r: width=11.69, height=8.27
             pdf(out, paper = "a4r", pointsize = 10, width = 11, height = 8)
 
-            plotEICs(fGroups[, grp], EICRtWindow, EICMzWindow, retMin, EICTopMost, EICs)
+            plotChroms(fGroups[, grp], EICRtWindow, EICMzWindow, retMin, EICTopMost, EICs)
 
             for (precursor in unique(ft$formula))
             {
@@ -433,7 +434,7 @@ reportCompoundSpectra <- function(fGroups, path, MSPeakLists, compounds, compsCl
             # a4r: width=11.69, height=8.27
             pdf(out, paper = "a4r", pointsize = 10, width = 11, height = 8)
 
-            plotEICs(fGroups[, fgrpi], EICRtWindow, EICMzWindow, retMin, EICTopMost, EICs)
+            plotChroms(fGroups[, fgrpi], EICRtWindow, EICMzWindow, retMin, EICTopMost, EICs)
 
             for (idi in seq_len(nrow(compTable[[grp]])))
             {
@@ -566,8 +567,8 @@ reportComponentPlots <- function(fGroups, path, components, EICRtWindow, EICMzWi
             scr <- split.screen(c(2, 1))
 
         screen(scr[1])
-        plotEICs(components, cmpi, fGroups, title = sprintf("Component %d", cmpi), rtWindow = EICRtWindow,
-                 mzWindow = EICMzWindow, retMin = retMin, EICs = EICs)
+        plotChroms(components, cmpi, fGroups, title = sprintf("Component %d", cmpi), rtWindow = EICRtWindow,
+                   mzWindow = EICMzWindow, retMin = retMin, EICs = EICs)
 
         screen(scr[2])
         plotSpectrum(components, cmpi, main = sprintf("ret: %.1f; m/z: %.4f - %.4f",

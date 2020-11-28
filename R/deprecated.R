@@ -93,14 +93,14 @@ screenTargets <- function(obj, targets, rtWindow, mzWindow)
     screenSuspects(obj, targets, rtWindow, mzWindow)
 }
 
-#' @details Please use \code{\link{plotEICs}} instead.
+#' @details Please use \code{\link{plotChroms}} instead.
 #' @rdname patRoon-deprecated
 #' @export
 #' @keywords internal
 plotEIC <- function(obj, ...)
 {
-    .Deprecated("plotEICs")
-    plotEICs(obj, ...)
+    .Deprecated("plotChroms")
+    plotChroms(obj, ...)
 }
 
 #' @details Please use \code{\link{groupTable}} instead.

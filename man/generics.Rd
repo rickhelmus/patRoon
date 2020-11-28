@@ -16,7 +16,7 @@
 \alias{getMCS}
 \alias{groupNames}
 \alias{plotChord}
-\alias{plotEICs}
+\alias{plotChroms}
 \alias{plotInt}
 \alias{plotScores}
 \alias{plotSilhouettes}
@@ -67,7 +67,7 @@ groupNames(obj)
 
 plotChord(obj, addSelfLinks = FALSE, addRetMzPlots = TRUE, ...)
 
-plotEICs(obj, ...)
+plotChroms(obj, ...)
 
 plotInt(obj, ...)
 
@@ -206,10 +206,10 @@ please refer to the linked method documentation for each generic.
     \item Methods are defined for: \code{\link[=plotChord,featureGroups-method]{featureGroups}}; \code{\link[=plotChord,featureGroupsComparison-method]{featureGroupsComparison}}.
 }
 
-\code{plotEICs} plots extracted ion chromatogram(s).
+\code{plotChroms} plots extracted ion chromatogram(s).
 
 \itemize{
-    \item Methods are defined for: \code{\link[=plotEICs,components-method]{components}}; \code{\link[=plotEICs,featureGroups-method]{featureGroups}}.
+    \item Methods are defined for: \code{\link[=plotChroms,components-method]{components}}; \code{\link[=plotChroms,featureGroups-method]{featureGroups}}.
 }
 
 \code{plotInt} plots the intensity of all contained features.

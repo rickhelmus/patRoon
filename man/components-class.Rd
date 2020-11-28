@@ -23,7 +23,7 @@
 \alias{findFGroup,components-method}
 \alias{findFGroup}
 \alias{plotSpectrum,components-method}
-\alias{plotEICs,components-method}
+\alias{plotChroms,components-method}
 \alias{consensus,components-method}
 \alias{componentsCamera-class}
 \alias{componentsCamera}
@@ -73,7 +73,7 @@
   ...
 )
 
-\S4method{plotEICs}{components}(obj, index, fGroups, rtWindow = 5, ...)
+\S4method{plotChroms}{components}(obj, index, fGroups, rtWindow = 5, ...)
 
 \S4method{consensus}{components}(obj, ...)
 }
@@ -84,8 +84,8 @@
 their index or name, respectively (for the order/names see \code{names()/groupNames()}).\cr\cr For \code{[}: Can also be logical to perform logical selection
 (similar to regular vectors). If missing all components/feature groups are selected.\cr\cr For \code{[[}: should be a scalar value. \code{j} is optional.}
 
-\item{\dots}{For \code{plotEICs}: Further (optional) arguments passed to the
-  \code{plotEICs} method for the \code{\link{featureGroups}} class. Note that
+\item{\dots}{For \code{plotChroms}: Further (optional) arguments passed to the
+  \code{plotChroms} method for the \code{\link{featureGroups}} class. Note that
   the \code{colourBy}, \code{showPeakArea}, \code{showFGroupRect} and
   \code{topMost} arguments cannot be set as these are set by this method.
 
@@ -146,7 +146,7 @@ faster.}
 \item{fGroups}{The \code{\link{featureGroups}} object that was used to
 generate the components.}
 
-\item{rtWindow}{Retention window: see the \code{plotEICs} method for the
+\item{rtWindow}{Retention window: see the \code{plotChroms} method for the
 \code{\link{featureGroups}} class.}
 }
 \value{
@@ -202,7 +202,7 @@ belongs.
 \item \code{plotSpectrum}: Plot a \emph{pseudo} mass spectrum for a single
 component.
 
-\item \code{plotEICs}: Plot an extracted ion chromatogram (EIC) for all
+\item \code{plotChroms}: Plot an extracted ion chromatogram (EIC) for all
 feature groups within a single component.
 
 \item \code{consensus}: Generates a consensus from multiple \code{components}

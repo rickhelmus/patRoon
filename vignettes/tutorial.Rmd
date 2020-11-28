@@ -238,12 +238,12 @@ head(groupInfo(fGroups))
 
 Finally, we can have a quick look at our data by plotting some nice extracted ion chromatograms (EICs) for all feature groups:
 
-```{r plotEICs,fig.width=7}
-plotEICs(fGroups, colourBy = "fGroups", showFGroupRect = FALSE, showPeakArea = TRUE,
-         topMost = 1, showLegend = FALSE)
+```{r plotChroms,fig.width=7}
+plotChroms(fGroups, colourBy = "fGroups", showFGroupRect = FALSE, showPeakArea = TRUE,
+           topMost = 1, showLegend = FALSE)
 ```
 
-Note that here we only plot the most intense feature of a feature group here (as set by `topMost=1`). See the reference docs for many more parameters to these functions (e.g. `?plotEICs`).
+Note that here we only plot the most intense feature of a feature group here (as set by `topMost=1`). See the reference docs for many more parameters to these functions (e.g. `?plotChroms`).
 
 # Annotation
 
@@ -355,7 +355,7 @@ The results can be inspected similarly as seen before:
 ```{r fig.width=5,fig.height=4}
 components
 plotSpectrum(components, "CMP6")
-plotEICs(components, "CMP6", fGroups)
+plotChroms(components, "CMP6", fGroups)
 ```
 
 > **_NOTE_** The componentization process must currently be seen as a tool to provide hints on how different features _may_ be related to each other. Hence, results should always be checked manually, for instance, by the above commands or with the reports generated in the next step. For this reason, features that were annotated as e.g. adducts or fragments should not be blindly removed.

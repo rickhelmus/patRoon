@@ -312,13 +312,13 @@ test_that("plotting works", {
     expect_plot(plotChord(unique(fgOpenMS, which = replicateGroups(fgOpenMS), outer = TRUE),
                           average = TRUE, addSelfLinks = TRUE)) # unless there are self links
 
-    expect_doppel("eic-def", function() plotEICs(subFGroups))
-    expect_doppel("eic-rtmin", function() plotEICs(subFGroups, retMin = TRUE))
-    expect_doppel("eic-tm1", function() plotEICs(subFGroups, topMost = 1))
-    expect_doppel("eic-area", function() plotEICs(subFGroups, showPeakArea = TRUE))
-    expect_doppel("eic-cbr", function() plotEICs(subFGroups, colourBy = "rGroups"))
-    expect_doppel("eic-cbf", function() plotEICs(subFGroups, colourBy = "fGroups"))
-    expect_doppel("eic-ann", function() plotEICs(subFGroups, annotate = "mz"))
+    expect_doppel("eic-def", function() plotChroms(subFGroups))
+    expect_doppel("eic-rtmin", function() plotChroms(subFGroups, retMin = TRUE))
+    expect_doppel("eic-tm1", function() plotChroms(subFGroups, topMost = 1))
+    expect_doppel("eic-area", function() plotChroms(subFGroups, showPeakArea = TRUE))
+    expect_doppel("eic-cbr", function() plotChroms(subFGroups, colourBy = "rGroups"))
+    expect_doppel("eic-cbf", function() plotChroms(subFGroups, colourBy = "fGroups"))
+    expect_doppel("eic-ann", function() plotChroms(subFGroups, annotate = "mz"))
 
     expect_doppel("venn", function() plotVenn(fgOpenMS))
     expect_doppel("venn-comp", function() plotVenn(fGCompOpenMS))
@@ -346,7 +346,7 @@ test_that("plotting empty objects works", {
     expect_doppel("chord-def", function() plotChord(fGConsOneEmpty)) # should be same as fgOpenMS
     expect_error(plotChord(fgCompBothEmpty))
 
-    expect_doppel("eic-def-empty", function() plotEICs(fgOpenMSEmpty))
+    expect_doppel("eic-def-empty", function() plotChroms(fgOpenMSEmpty))
 
     expect_error(plotVenn(fgOpenMSEmpty))
     expect_doppel("venn", function() plotVenn(fGConsOneEmpty)) # should be same as fgOpenMS

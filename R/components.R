@@ -21,8 +21,8 @@ orderComponentsNames <- function(n) order(nchar(n), n)
 #' @param obj,object,x The \code{component} object.
 #' @param index The index of the component. Can be a numeric index or a
 #'   character with its name.
-#' @param \dots For \code{plotEICs}: Further (optional) arguments passed to the
-#'   \code{plotEICs} method for the \code{\link{featureGroups}} class. Note that
+#' @param \dots For \code{plotChroms}: Further (optional) arguments passed to the
+#'   \code{plotChroms} method for the \code{\link{featureGroups}} class. Note that
 #'   the \code{colourBy}, \code{showPeakArea}, \code{showFGroupRect} and
 #'   \code{topMost} arguments cannot be set as these are set by this method.
 #'
@@ -463,10 +463,10 @@ setMethod("plotSpectrumHash", "components", function(obj, index, markFGroup = NU
 #'   feature groups within a single component.
 #' @param fGroups The \code{\link{featureGroups}} object that was used to
 #'   generate the components.
-#' @param rtWindow Retention window: see the \code{plotEICs} method for the
+#' @param rtWindow Retention window: see the \code{plotChroms} method for the
 #'   \code{\link{featureGroups}} class.
 #' @export
-setMethod("plotEICs", "components", function(obj, index, fGroups, rtWindow = 5, ...)
+setMethod("plotChroms", "components", function(obj, index, fGroups, rtWindow = 5, ...)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assert(
@@ -495,11 +495,11 @@ setMethod("plotEICs", "components", function(obj, index, fGroups, rtWindow = 5, 
     fGroups <- fGroups[, unique(comp$group)]
 
     if (length(fGroups) > 0)
-        plotEICs(fGroups, rtWindow = rtWindow, colourBy = colourBy, showPeakArea = showPeakArea,
-                 showFGroupRect = showFGroupRect, topMost = topMost, ...)
+        plotChroms(fGroups, rtWindow = rtWindow, colourBy = colourBy, showPeakArea = showPeakArea,
+                   showFGroupRect = showFGroupRect, topMost = topMost, ...)
 })
 
-setMethod("plotEICsHash", "components", function(obj, index, fGroups, rtWindow = 5, ...)
+setMethod("plotChromsHash", "components", function(obj, index, fGroups, rtWindow = 5, ...)
 {
     comp <- componentTable(obj)[[index]]
     if (!is.null(comp[["hsnr"]])) # homologues?

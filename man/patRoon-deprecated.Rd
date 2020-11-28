@@ -57,7 +57,7 @@ future.
 
 Please use \code{\link{screenSuspects}} instead.
 
-Please use \code{\link{plotEICs}} instead.
+Please use \code{\link{plotChroms}} instead.
 
 Please use \code{\link{groupTable}} instead.
 

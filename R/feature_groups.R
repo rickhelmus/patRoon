@@ -18,7 +18,7 @@ NULL
 #' @param fGroups,obj,x,object \code{featureGroups} object to be accessed.
 #' @param retMin Plot retention time in minutes (instead of seconds).
 #' @param \dots Ignored for \code{"["} operator or passed to
-#'   \code{\link[graphics]{plot}} (\code{plot} and \code{plotEICs}),
+#'   \code{\link[graphics]{plot}} (\code{plot} and \code{plotChroms}),
 #'   \code{\link[graphics]{lines}} (\code{plotInt}), \pkg{\link{VennDiagram}}
 #'   plotting functions (\code{plotVenn}), \code{\link{chordDiagram}}
 #'   (\code{plotChord}) or \code{\link[UpSetR]{upset}} (\code{plotUpSet}).
@@ -37,7 +37,7 @@ NULL
 #'   per replicate/feature group.
 #' @param showLegend If \code{TRUE} a legend will be shown with either replicate
 #'   groups (\code{colourBy == "rGroups"}) or feature groups (\code{colourBy ==
-#'   "fGroups"}, only for \code{plotEICs}). If \code{colourBy} is \code{"none"}
+#'   "fGroups"}, only for \code{plotChroms}). If \code{colourBy} is \code{"none"}
 #'   no legend will be shown.
 #'
 #' @templateVar seli analyses
@@ -854,12 +854,12 @@ setMethod("plotChord", "featureGroups", function(obj, addSelfLinks = FALSE, addR
 #' @template plot-lim
 #'
 #' @export
-setMethod("plotEICs", "featureGroups", function(obj, rtWindow = 30, mzWindow = 0.005, retMin = FALSE, topMost = NULL,
-                                                EICs = NULL, showPeakArea = FALSE, showFGroupRect = TRUE,
-                                                title = NULL, colourBy = c("none", "rGroups", "fGroups"),
-                                                showLegend = TRUE, onlyPresent = TRUE,
-                                                annotate = c("none", "ret", "mz"), showProgress = FALSE,
-                                                xlim = NULL, ylim = NULL, ...)
+setMethod("plotChroms", "featureGroups", function(obj, rtWindow = 30, mzWindow = 0.005, retMin = FALSE, topMost = NULL,
+                                                  EICs = NULL, showPeakArea = FALSE, showFGroupRect = TRUE,
+                                                  title = NULL, colourBy = c("none", "rGroups", "fGroups"),
+                                                  showLegend = TRUE, onlyPresent = TRUE,
+                                                  annotate = c("none", "ret", "mz"), showProgress = FALSE,
+                                                  xlim = NULL, ylim = NULL, ...)
 {
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertNumber, . ~ rtWindow + mzWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
@@ -1086,12 +1086,12 @@ setMethod("plotEICs", "featureGroups", function(obj, rtWindow = 30, mzWindow = 0
     par(oldp)
 })
 
-setMethod("plotEICsHash", "featureGroups", function(obj, rtWindow = 30, mzWindow = 0.005, retMin = FALSE, topMost = NULL,
-                                                    EICs = NULL, showPeakArea = FALSE, showFGroupRect = TRUE,
-                                                    title = NULL, colourBy = c("none", "rGroups", "fGroups"),
-                                                    showLegend = TRUE, onlyPresent = TRUE,
-                                                    annotate = c("none", "ret", "mz"), showProgress = FALSE,
-                                                    xlim = NULL, ylim = NULL, ...)
+setMethod("plotChromsHash", "featureGroups", function(obj, rtWindow = 30, mzWindow = 0.005, retMin = FALSE, topMost = NULL,
+                                                      EICs = NULL, showPeakArea = FALSE, showFGroupRect = TRUE,
+                                                      title = NULL, colourBy = c("none", "rGroups", "fGroups"),
+                                                      showLegend = TRUE, onlyPresent = TRUE,
+                                                      annotate = c("none", "ret", "mz"), showProgress = FALSE,
+                                                      xlim = NULL, ylim = NULL, ...)
 {
     colourBy <- checkmate::matchArg(colourBy, c("none", "rGroups", "fGroups"))
     annotate <- checkmate::matchArg(annotate, c("none", "ret", "mz"), several.ok = TRUE)

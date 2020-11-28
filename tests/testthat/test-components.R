@@ -170,7 +170,7 @@ test_that("plotting works", {
     expect_plot(plotSpectrum(compsRC, 1))
     expect_plot(plotSpectrum(compsRC, 1, markFGroup = names(fGroupsSimple)[1]))
     expect_ggplot(plotSpectrum(compsRC, 1, useGGPlot2 = TRUE))
-    expect_doppel("eic-component", function() plotEICs(compsRC, 1, fGroupsSimple))
+    expect_doppel("eic-component", function() plotChroms(compsRC, 1, fGroupsSimple))
 
     expect_plot(plot(compsInt))
     expect_doppel("component-ic-int", function() plotInt(compsInt, index = 1))

@@ -430,12 +430,12 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
 #'
 #' @template plot-lim
 #'
-#' @return \code{plotSpec} will return a \code{\link[=ggplot2]{ggplot object}}
-#'   if \code{useGGPlot2} is \code{TRUE}.
+#' @return \code{plotSpectrum} will return a \code{\link[=ggplot2]{ggplot
+#'   object}} if \code{useGGPlot2} is \code{TRUE}.
 #'
 #' @export
-setMethod("plotSpec", "MSPeakLists", function(obj, groupName, analysis = NULL, MSLevel = 1, title = NULL,
-                                              useGGPlot2 = FALSE, xlim = NULL, ylim = NULL, ...)
+setMethod("plotSpectrum", "MSPeakLists", function(obj, groupName, analysis = NULL, MSLevel = 1, title = NULL,
+                                                  useGGPlot2 = FALSE, xlim = NULL, ylim = NULL, ...)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertString(groupName, min.chars = 1, add = ac)

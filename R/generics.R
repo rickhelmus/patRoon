@@ -4,7 +4,7 @@ if (!isGeneric("plot"))
 
 ### Feature groups
 
-setGeneric("groups", function(object, ...) standardGeneric("groups"))
+setGeneric("groupTable", function(object, ...) standardGeneric("groupTable"))
 setGeneric("groupFeatIndex", function(fGroups) standardGeneric("groupFeatIndex"))
 setGeneric("groupInfo", function(fGroups) standardGeneric("groupInfo"))
 setGeneric("removeAnalyses", function(fGroups, indices) standardGeneric("removeAnalyses"))
@@ -242,10 +242,10 @@ setGeneric("groupNames", function(obj) standardGeneric("groupNames"))
 #'
 setGeneric("plotChord", function(obj, addSelfLinks = FALSE, addRetMzPlots = TRUE, ...) standardGeneric("plotChord"))
 
-#' @templateVar func plotEIC
+#' @templateVar func plotEICs
 #' @templateVar desc plots extracted ion chromatogram(s).
 #' @template generics
-setGeneric("plotEIC", function(obj, ...) standardGeneric("plotEIC"))
+setGeneric("plotEICs", function(obj, ...) standardGeneric("plotEICs"))
 
 #' @templateVar func plotInt
 #' @templateVar desc plots the intensity of all contained features.
@@ -264,10 +264,10 @@ setGeneric("plotScores", function(obj, ...) standardGeneric("plotScores"))
 #'   average silhouette width calculation.
 setGeneric("plotSilhouettes", function(obj, kSeq, ...) standardGeneric("plotSilhouettes"))
 
-#' @templateVar func plotSpec
+#' @templateVar func plotSpectrum
 #' @templateVar desc plots a (annotated) spectrum.
 #' @template generics
-setGeneric("plotSpec", function(obj, ...) standardGeneric("plotSpec"))
+setGeneric("plotSpectrum", function(obj, ...) standardGeneric("plotSpectrum"))
 
 #' @templateVar func plotStructure
 #' @templateVar desc plots a chemical structure.
@@ -336,10 +336,10 @@ setGeneric("reportHTML", function(fGroups, path = "report", reportPlots = c("cho
 
 # Used for reporting
 setGeneric("plotHash", function(x, ...) standardGeneric("plotHash"))
-setGeneric("plotSpecHash", function(obj, ...) standardGeneric("plotSpecHash"))
+setGeneric("plotSpectrumHash", function(obj, ...) standardGeneric("plotSpectrumHash"))
 setGeneric("plotScoresHash", function(obj, ...) standardGeneric("plotScoresHash"))
 setGeneric("plotStructureHash", function(obj, ...) standardGeneric("plotStructureHash"))
-setGeneric("plotEICHash", function(obj, ...) standardGeneric("plotEICHash"))
+setGeneric("plotEICsHash", function(obj, ...) standardGeneric("plotEICsHash"))
 setGeneric("plotIntHash", function(obj, ...) standardGeneric("plotIntHash"))
 
 

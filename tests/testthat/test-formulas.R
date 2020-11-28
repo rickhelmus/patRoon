@@ -260,15 +260,15 @@ test_that("reporting empty objects works", {
 
 plotPrec <- formsGFWithMSMS[[1]][["formula"]][1]
 test_that("plotting works", {
-    expect_doppel("form-spec", function() plotSpec(formsGFWithMSMS, plotPrec, groupNames(formsGFWithMSMS)[1],
-                                                   MSPeakLists = plists))
+    expect_doppel("form-spec", function() plotSpectrum(formsGFWithMSMS, plotPrec, groupNames(formsGFWithMSMS)[1],
+                                                       MSPeakLists = plists))
 
     # ggplot2 versions don't really work with vdiffr at the moment :(
-    # expect_doppel("spec-gg", plotSpec(formsGFWithMSMS, fTable[byMSMS == TRUE, formula][1],
+    # expect_doppel("spec-gg", plotSpectrum(formsGFWithMSMS, fTable[byMSMS == TRUE, formula][1],
     #                                                 fTable[byMSMS == TRUE, group][1], plists,
     #                                                 useGGPlot2 = TRUE))
-    expect_ggplot(plotSpec(formsGFWithMSMS, plotPrec, groupNames(formsGFWithMSMS)[1], MSPeakLists = plists,
-                           useGGPlot2 = TRUE))
+    expect_ggplot(plotSpectrum(formsGFWithMSMS, plotPrec, groupNames(formsGFWithMSMS)[1], MSPeakLists = plists,
+                               useGGPlot2 = TRUE))
 
     expect_doppel("form-scores", function() plotScores(formsGFWithMSMS, plotPrec, groupNames(formsGFWithMSMS)[1]))
 

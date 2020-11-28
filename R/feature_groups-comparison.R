@@ -122,7 +122,7 @@ convertFeatureGroupsToFeatures <- function(fGroupsList)
             next
         }
 
-        gt <- groups(fGroupsList[[fgi]])
+        gt <- groupTable(fGroupsList[[fgi]])
         gi <- groupInfo(fGroupsList[[fgi]])
 
         # use group info as basis

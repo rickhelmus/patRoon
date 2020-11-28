@@ -47,7 +47,7 @@ generateComponentsCAMERA <- function(fGroups, ionization, onlyIsotopes = FALSE,
         return(cd)
 
     gNames <- names(fGroups)
-    gTable <- groups(fGroups)
+    gTable <- groupTable(fGroups)
     gInfo <- groupInfo(fGroups)
     anaInfo <- analysisInfo(fGroups)
 

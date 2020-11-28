@@ -91,7 +91,7 @@ extractPAGroupInfo <- function(groups)
 # PA doesn't export original feature IDs used for bucketing, try to find them back
 getFeatIndicesFromPA <- function(fGroups, rtWindow, mzWindow, intWindow, warn)
 {
-    gTable <- groups(fGroups)
+    gTable <- groupTable(fGroups)
     gCount <- ncol(gTable)
     gInfo <- groupInfo(fGroups)
     fTable <- featureTable(fGroups@features)

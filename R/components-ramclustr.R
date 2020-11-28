@@ -60,7 +60,7 @@ generateComponentsRAMClustR <- function(fGroups, st = NULL, sr = NULL, maxt = 12
         return(componentsRC(componentInfo = data.table(), components = list(),
                             RC = structure(list(), class = "hclust")))
 
-    gTable <- groups(fGroups)
+    gTable <- groupTable(fGroups)
     gInfo <- groupInfo(fGroups)
     gNames <- names(fGroups)
     ftinds <- groupFeatIndex(fGroups)

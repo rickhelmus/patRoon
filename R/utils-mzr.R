@@ -49,7 +49,7 @@ getEICsForFGroups <- function(fGroups, rtWindow, mzWindow, topMost, onlyPresent)
         return(list())
 
     gNames <- names(fGroups)
-    gTable <- groups(fGroups)
+    gTable <- groupTable(fGroups)
     gInfo <- groupInfo(fGroups)
     ftind <- groupFeatIndex(fGroups)
     fTable <- featureTable(fGroups)

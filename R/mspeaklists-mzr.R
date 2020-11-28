@@ -37,7 +37,7 @@ generateMSPeakListsMzR <- function(fGroups, maxMSRtWindow = 5, precursorMzWindow
     ftindex <- groupFeatIndex(fGroups)
     fTable <- featureTable(fGroups)
     anaInfo <- analysisInfo(fGroups)
-    gTable <- groups(fGroups)
+    gTable <- groupTable(fGroups)
     gCount <- length(fGroups)
     gNames <- names(fGroups)
     anaCount <- nrow(anaInfo)

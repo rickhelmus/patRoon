@@ -54,7 +54,7 @@ setMethod("groupFeaturesScreening", "featureGroups", function(fGroups, scr)
     feat <- getFeatures(fGroups)
     anaInfo <- analysisInfo(fGroups)
     gNames <- make.unique(scr$name)
-    fgNames <- colnames(groups(fGroups))
+    fgNames <- colnames(groupTable(fGroups))
 
     gInfo <- data.frame(rts = scr$exp_rt, mzs = scr$exp_mz, row.names = gNames)
 

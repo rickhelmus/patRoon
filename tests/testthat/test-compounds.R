@@ -284,10 +284,11 @@ test_that("plotting works", {
     skip_if_not(doMetFrag)
 
     # plotting structure seems to be difficult to do reproducible between systems, so disable for vdiffr now...
-    expect_doppel("compound-spec", function() plotSpec(compsMFIso, 1, names(compoundTable(compsMFIso))[1], plists, plotStruct = FALSE))
-    expect_plot(plotSpec(compsMFIso, 1, names(compoundTable(compsMFIso))[1], plists, plotStruct = TRUE))
-    # expect_doppel("spec-gg", plotSpec(compsMFIso, 1, names(compoundTable(compsMFIso))[1], plists, useGGPlot2 = TRUE))
-    expect_ggplot(plotSpec(compsMFIso, 1, names(compoundTable(compsMFIso))[1], plists, useGGPlot2 = TRUE))
+    expect_doppel("compound-spec", function() plotSpectrum(compsMFIso, 1, names(compoundTable(compsMFIso))[1],
+                                                           plists, plotStruct = FALSE))
+    expect_plot(plotSpectrum(compsMFIso, 1, names(compoundTable(compsMFIso))[1], plists, plotStruct = TRUE))
+    # expect_doppel("spec-gg", plotSpectrum(compsMFIso, 1, names(compoundTable(compsMFIso))[1], plists, useGGPlot2 = TRUE))
+    expect_ggplot(plotSpectrum(compsMFIso, 1, names(compoundTable(compsMFIso))[1], plists, useGGPlot2 = TRUE))
 
     # plotStructure gives an empty plot??
     # expect_doppel("struct", function() plotStructure(compsMFIso, 1, names(compoundTable(compsMFIso))[1]))

@@ -56,7 +56,7 @@ doFilter <- function(fGroups, what, hashParam, func, cacheCateg = what, verbose 
 
 intensityFilter <- function(fGroups, absThreshold, relThreshold, negate = FALSE)
 {
-    threshold <- getHighestAbsValue(absThreshold, relThreshold, max(groups(fGroups)))
+    threshold <- getHighestAbsValue(absThreshold, relThreshold, max(groupTable(fGroups)))
     if (threshold == 0)
         return(fGroups)
 
@@ -123,7 +123,7 @@ minAnalysesFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, negat
         pred <- function(x) sum(x > 0) >= threshold
         if (negate)
             pred <- Negate(pred)
-        return(fGroups[, sapply(groups(fGroups), pred, USE.NAMES = FALSE)])
+        return(fGroups[, sapply(groupTable(fGroups), pred, USE.NAMES = FALSE)])
     }, "minAnalyses"))
 }
 
@@ -141,7 +141,7 @@ minReplicatesFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, neg
         if (negate)
             pred <- Negate(pred)
 
-        return(fGroups[, sapply(groups(fGroups), pred, USE.NAMES = FALSE)])
+        return(fGroups[, sapply(groupTable(fGroups), pred, USE.NAMES = FALSE)])
     }, "minReplicates", verbose))
 }
 
@@ -157,7 +157,7 @@ minFeaturesFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, negat
         if (negate)
             pred <- Negate(pred)
 
-        return(fGroups[sapply(transpose(groups(fGroups)), pred, USE.NAMES = FALSE)])
+        return(fGroups[sapply(transpose(groupTable(fGroups)), pred, USE.NAMES = FALSE)])
     }, "minReplicates", verbose))
 }
 

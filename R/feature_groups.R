@@ -18,7 +18,7 @@ NULL
 #' @param fGroups,obj,x,object \code{featureGroups} object to be accessed.
 #' @param retMin Plot retention time in minutes (instead of seconds).
 #' @param \dots Ignored for \code{"["} operator or passed to
-#'   \code{\link[graphics]{plot}} (\code{plot} and \code{plotEIC}),
+#'   \code{\link[graphics]{plot}} (\code{plot} and \code{plotEICs}),
 #'   \code{\link[graphics]{lines}} (\code{plotInt}), \pkg{\link{VennDiagram}}
 #'   plotting functions (\code{plotVenn}), \code{\link{chordDiagram}}
 #'   (\code{plotChord}) or \code{\link[UpSetR]{upset}} (\code{plotUpSet}).
@@ -37,7 +37,7 @@ NULL
 #'   per replicate/feature group.
 #' @param showLegend If \code{TRUE} a legend will be shown with either replicate
 #'   groups (\code{colourBy == "rGroups"}) or feature groups (\code{colourBy ==
-#'   "fGroups"}, only for \code{plotEIC}). If \code{colourBy} is \code{"none"}
+#'   "fGroups"}, only for \code{plotEICs}). If \code{colourBy} is \code{"none"}
 #'   no legend will be shown.
 #'
 #' @templateVar seli analyses
@@ -114,14 +114,15 @@ setMethod("show", "featureGroups", function(object)
 {
     callNextMethod(object)
     anaInfo <- analysisInfo(object)
-    printf("Feature groups: %s (%d total)\n", getStrListWithMax(names(object), 6, ", "), ncol(groups(object)))
+    printf("Feature groups: %s (%d total)\n", getStrListWithMax(names(object), 6, ", "),
+           ncol(groupTable(object)))
     showAnaInfo(analysisInfo(object))
 })
 
 #' @describeIn featureGroups Accessor for \code{groups} slot.
-#' @aliases groups
+#' @aliases groupTable
 #' @export
-setMethod("groups", "featureGroups", function(object, areas = FALSE)
+setMethod("groupTable", "featureGroups", function(object, areas = FALSE)
 {
     checkmate::assertFlag(areas)
 
@@ -262,7 +263,7 @@ setMethod("removeEmptyAnalyses", "featureGroups", function(fGroups)
 {
     if (length(fGroups) > 0)
     {
-        trGT <- transpose(groups(fGroups))
+        trGT <- transpose(groupTable(fGroups))
 
         empty <- trGT[, sapply(.SD, sum) == 0]
         if (any(empty))
@@ -273,7 +274,7 @@ setMethod("removeEmptyAnalyses", "featureGroups", function(fGroups)
 
 setMethod("averageGroups", "featureGroups", function(fGroups, areas)
 {
-    gTable <- copy(groups(fGroups, areas))
+    gTable <- copy(groupTable(fGroups, areas))
     if (nrow(gTable) == 0)
         return()
 
@@ -293,7 +294,7 @@ setMethod("updateFeatIndex", "featureGroups", function(fGroups)
 {
     # remove feature indices from feature groups that were removed later (e.g. filtered out)
 
-    gTable <- groups(fGroups)
+    gTable <- groupTable(fGroups)
     fGroups@ftindex <- copy(groupFeatIndex(fGroups))
     for (i in seq_along(gTable))
         set(fGroups@ftindex, which(gTable[[i]] == 0), i, 0)
@@ -454,7 +455,7 @@ setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas =
         }
         else
         {
-            gTable <- groups(x, areas)
+            gTable <- groupTable(x, areas)
             snames <- anaInfo$analysis
             if (doConc)
                 concs <- anaInfo$conc
@@ -619,7 +620,7 @@ setMethod("plotInt", "featureGroups", function(obj, average = FALSE, pch = 20, t
     }
     else
     {
-        gTable <- groups(obj)
+        gTable <- groupTable(obj)
         snames <- anaInfo$analysis
     }
 
@@ -709,8 +710,8 @@ setMethod("plotChord", "featureGroups", function(obj, addSelfLinks = FALSE, addR
         else
         {
             if (length(snlist) > 0)
-                return(groups(obj[snlist]))
-            return(groups(obj))
+                return(groupTable(obj[snlist]))
+            return(groupTable(obj))
         }
     }
 
@@ -853,12 +854,12 @@ setMethod("plotChord", "featureGroups", function(obj, addSelfLinks = FALSE, addR
 #' @template plot-lim
 #'
 #' @export
-setMethod("plotEIC", "featureGroups", function(obj, rtWindow = 30, mzWindow = 0.005, retMin = FALSE, topMost = NULL,
-                                               EICs = NULL, showPeakArea = FALSE, showFGroupRect = TRUE,
-                                               title = NULL, colourBy = c("none", "rGroups", "fGroups"),
-                                               showLegend = TRUE, onlyPresent = TRUE,
-                                               annotate = c("none", "ret", "mz"), showProgress = FALSE,
-                                               xlim = NULL, ylim = NULL, ...)
+setMethod("plotEICs", "featureGroups", function(obj, rtWindow = 30, mzWindow = 0.005, retMin = FALSE, topMost = NULL,
+                                                EICs = NULL, showPeakArea = FALSE, showFGroupRect = TRUE,
+                                                title = NULL, colourBy = c("none", "rGroups", "fGroups"),
+                                                showLegend = TRUE, onlyPresent = TRUE,
+                                                annotate = c("none", "ret", "mz"), showProgress = FALSE,
+                                                xlim = NULL, ylim = NULL, ...)
 {
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertNumber, . ~ rtWindow + mzWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
@@ -885,7 +886,7 @@ setMethod("plotEIC", "featureGroups", function(obj, rtWindow = 30, mzWindow = 0.
         showLegend <- FALSE
 
     fTable <- featureTable(obj)
-    gTable <- groups(obj)
+    gTable <- groupTable(obj)
     gInfo <- groupInfo(obj)
     gCount <- nrow(gInfo)
     gNames <- names(obj)
@@ -1085,12 +1086,12 @@ setMethod("plotEIC", "featureGroups", function(obj, rtWindow = 30, mzWindow = 0.
     par(oldp)
 })
 
-setMethod("plotEICHash", "featureGroups", function(obj, rtWindow = 30, mzWindow = 0.005, retMin = FALSE, topMost = NULL,
-                                                   EICs = NULL, showPeakArea = FALSE, showFGroupRect = TRUE,
-                                                   title = NULL, colourBy = c("none", "rGroups", "fGroups"),
-                                                   showLegend = TRUE, onlyPresent = TRUE,
-                                                   annotate = c("none", "ret", "mz"), showProgress = FALSE,
-                                                   xlim = NULL, ylim = NULL, ...)
+setMethod("plotEICsHash", "featureGroups", function(obj, rtWindow = 30, mzWindow = 0.005, retMin = FALSE, topMost = NULL,
+                                                    EICs = NULL, showPeakArea = FALSE, showFGroupRect = TRUE,
+                                                    title = NULL, colourBy = c("none", "rGroups", "fGroups"),
+                                                    showLegend = TRUE, onlyPresent = TRUE,
+                                                    annotate = c("none", "ret", "mz"), showProgress = FALSE,
+                                                    xlim = NULL, ylim = NULL, ...)
 {
     colourBy <- checkmate::matchArg(colourBy, c("none", "rGroups", "fGroups"))
     annotate <- checkmate::matchArg(annotate, c("none", "ret", "mz"), several.ok = TRUE)
@@ -1260,7 +1261,7 @@ setMethod("screenSuspects", "featureGroups", function(obj, suspects, rtWindow, m
     if (!is.null(cd))
         return(cd)
 
-    gTable <- groups(obj)
+    gTable <- groupTable(obj)
     gInfo <- groupInfo(obj)
     anaInfo <- analysisInfo(obj)
 

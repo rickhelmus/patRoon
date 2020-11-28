@@ -148,7 +148,7 @@ generateComponentsNontarget <- function(fGroups, ionization, rtRange = c(-120, 1
     if (!is.null(cd))
         return(cd)
 
-    gTable <- groups(fGroups)
+    gTable <- groupTable(fGroups)
     gInfo <- groupInfo(fGroups)
     anaInfo <- analysisInfo(fGroups)
 

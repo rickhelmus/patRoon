@@ -92,3 +92,33 @@ screenTargets <- function(obj, targets, rtWindow, mzWindow)
     .Deprecated("screenSuspects")
     screenSuspects(obj, targets, rtWindow, mzWindow)
 }
+
+#' @details Please use \code{\link{plotEICs}} instead.
+#' @rdname patRoon-deprecated
+#' @export
+#' @keywords internal
+plotEIC <- function(obj, ...)
+{
+    .Deprecated("plotEICs")
+    plotEICs(obj, ...)
+}
+
+#' @details Please use \code{\link{groupTable}} instead.
+#' @rdname patRoon-deprecated
+#' @export
+#' @keywords internal
+groups <- function(object, ...)
+{
+    .Deprecated("groupTable")
+    groupTable(object, ...)
+}
+
+#' @details Please use \code{\link{plotSpectrum}} instead.
+#' @rdname patRoon-deprecated
+#' @export
+#' @keywords internal
+plotSpec <- function(obj, ...)
+{
+    .Deprecated("plotSpectrum")
+    plotSpectrum(obj, ...)
+}

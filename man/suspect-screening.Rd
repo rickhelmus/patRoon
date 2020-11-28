@@ -170,7 +170,7 @@ Please note that \code{groupFeaturesScreening} method can only
   for retention times and dummy min/max \emph{m/z} values for conversion to
   features, since this information is not (readily) available. Hence, when
   plotting, for instance, extracted ion chromatograms (with
-  \code{\link{plotEIC}}) the integrated chromatographic peak range shown is
+  \code{\link{plotEICs}}) the integrated chromatographic peak range shown is
   incorrect.
 }
 \references{

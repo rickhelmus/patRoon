@@ -256,7 +256,7 @@ generateMetFragRunData <- function(fGroups, MSPeakLists, mfSettings, extDB, topM
                                    adduct, database, errorRetries, timeoutRetries)
 {
     gNames <- names(fGroups)
-    gTable <- groups(fGroups)
+    gTable <- groupTable(fGroups)
     gInfo <- groupInfo(fGroups)
     anaInfo <- analysisInfo(fGroups)
     
@@ -570,7 +570,7 @@ generateCompoundsMetFrag <- function(fGroups, MSPeakLists, method = "CL", timeou
 
     anaInfo <- analysisInfo(fGroups)
     ftind <- groupFeatIndex(fGroups)
-    gTable <- groups(fGroups)
+    gTable <- groupTable(fGroups)
     gNames <- names(fGroups)
     gCount <- length(fGroups)
     gInfo <- groupInfo(fGroups)

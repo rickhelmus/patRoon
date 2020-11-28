@@ -15,7 +15,7 @@ NULL
 #'   results were generated. This is used for normalization.
 #'
 #' @param obj,x,object,formulas The \code{formulas} object.
-#' @param \dots For \code{plotSpec}: Further arguments passed to
+#' @param \dots For \code{plotSpectrum}: Further arguments passed to
 #'   \code{\link[graphics]{plot}}.
 #'
 #'   Others: Any further (and unique) \code{formulas} objects.
@@ -567,12 +567,12 @@ setMethod("plotScoresHash", "formulas", function(obj, precursor, groupName, anal
 #'
 #' @template fsubscript_source
 #'
-#' @return \code{plotSpec} will return a \code{\link[=ggplot2]{ggplot object}}
-#'   if \code{useGGPlot2} is \code{TRUE}.
+#' @return \code{plotSpectrum} will return a \code{\link[=ggplot2]{ggplot
+#'   object}} if \code{useGGPlot2} is \code{TRUE}.
 #'
 #' @export
-setMethod("plotSpec", "formulas", function(obj, precursor, groupName, analysis = NULL, MSPeakLists,
-                                           title = NULL, useGGPlot2 = FALSE, xlim = NULL, ylim = NULL, ...)
+setMethod("plotSpectrum", "formulas", function(obj, precursor, groupName, analysis = NULL, MSPeakLists,
+                                               title = NULL, useGGPlot2 = FALSE, xlim = NULL, ylim = NULL, ...)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertString(precursor, min.chars = 1, add = ac)
@@ -597,8 +597,8 @@ setMethod("plotSpec", "formulas", function(obj, precursor, groupName, analysis =
     makeMSPlot(spec, xlim, ylim, ..., main = title)
 })
 
-setMethod("plotSpecHash", "formulas", function(obj, precursor, groupName, analysis = NULL, MSPeakLists,
-                                               title = NULL, useGGPlot2 = FALSE, xlim = NULL, ylim = NULL, ...)
+setMethod("plotSpectrumHash", "formulas", function(obj, precursor, groupName, analysis = NULL, MSPeakLists,
+                                                   title = NULL, useGGPlot2 = FALSE, xlim = NULL, ylim = NULL, ...)
 {
     return(makeHash(precursor, annotatedPeakList(obj, precursor, groupName, analysis, MSPeakLists),
                     title, useGGPlot2, xlim, ylim, ...))

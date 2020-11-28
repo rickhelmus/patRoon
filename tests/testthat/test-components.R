@@ -165,12 +165,12 @@ test_that("reporting empty object works", {
 
 test_that("plotting works", {
     # specs don't work because of legend ... :(
-    # expect_doppel("compon-spec", function() plotSpec(compsNT, 1))
-    # expect_doppel("compon-spec-mark", function() plotSpec(compsNT, 1, markFGroup = names(fGroups)[1]))
-    expect_plot(plotSpec(compsRC, 1))
-    expect_plot(plotSpec(compsRC, 1, markFGroup = names(fGroupsSimple)[1]))
-    expect_ggplot(plotSpec(compsRC, 1, useGGPlot2 = TRUE))
-    expect_doppel("eic-component", function() plotEIC(compsRC, 1, fGroupsSimple))
+    # expect_doppel("compon-spec", function() plotSpectrum(compsNT, 1))
+    # expect_doppel("compon-spec-mark", function() plotSpectrum(compsNT, 1, markFGroup = names(fGroups)[1]))
+    expect_plot(plotSpectrum(compsRC, 1))
+    expect_plot(plotSpectrum(compsRC, 1, markFGroup = names(fGroupsSimple)[1]))
+    expect_ggplot(plotSpectrum(compsRC, 1, useGGPlot2 = TRUE))
+    expect_doppel("eic-component", function() plotEICs(compsRC, 1, fGroupsSimple))
 
     expect_plot(plot(compsInt))
     expect_doppel("component-ic-int", function() plotInt(compsInt, index = 1))

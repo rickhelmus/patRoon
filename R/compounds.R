@@ -17,7 +17,7 @@ NULL
 #'   results were generated. This is used for normalization.
 #'
 #' @param formulas The \code{\link{formulas}} object that should be used for
-#'   scoring/annotation. For \code{plotSpec}: set to \code{NULL} to ignore.
+#'   scoring/annotation. For \code{plotSpectrum}: set to \code{NULL} to ignore.
 #' @param obj,object,x,compounds The \code{compound} object.
 #' @param index The numeric index of the candidate structure. Multiple indices
 #'   (\emph{i.e.} vector with length >=2) may be specified for
@@ -25,7 +25,7 @@ NULL
 #'   \samp{-1} may be specified to these methods to select all candidates. When
 #'   multiple indices are specified for \code{plotStructure}, their maximum
 #'   common substructure will be drawn.
-#' @param \dots For \code{plotSpec}: Further arguments passed to
+#' @param \dots For \code{plotSpectrum}: Further arguments passed to
 #'   \code{\link[graphics]{plot}}.
 #'
 #'   Others: Any further (and unique) \code{compounds} objects.
@@ -35,7 +35,7 @@ NULL
 #' @templateVar dollarOpName feature group
 #' @template sub_op-args
 #'
-#' @return \code{plotSpec} and \code{plotStructure} will return a
+#' @return \code{plotSpectrum} and \code{plotStructure} will return a
 #'   \code{\link[=ggplot2]{ggplot object}} if \code{useGGPlot2} is \code{TRUE}.
 #'
 #' @template plotSpec-args
@@ -652,7 +652,7 @@ setMethod("annotatedPeakList", "compounds", function(obj, index, groupName, MSPe
 #' @template plot-lim
 #'
 #' @export
-setMethod("plotSpec", "compounds", function(obj, index, groupName, MSPeakLists, formulas = NULL,
+setMethod("plotSpectrum", "compounds", function(obj, index, groupName, MSPeakLists, formulas = NULL,
                                             plotStruct = TRUE, title = NULL, useGGPlot2 = FALSE, xlim = NULL,
                                             ylim = NULL, ...)
 {
@@ -802,7 +802,7 @@ setMethod("plotSpec", "compounds", function(obj, index, groupName, MSPeakLists, 
     }
 })
 
-setMethod("plotSpecHash", "compounds", function(obj, index, groupName, MSPeakLists, formulas = NULL,
+setMethod("plotSpectrumHash", "compounds", function(obj, index, groupName, MSPeakLists, formulas = NULL,
                                                 plotStruct = TRUE, title = NULL, useGGPlot2 = FALSE, xlim = NULL,
                                                 ylim = NULL, ...)
 {

@@ -20,9 +20,9 @@ fgXCMSEmpty <- groupFeatures(fListEmpty, "xcms")
 fgXCMS3Empty <- groupFeatures(fListEmpty, "xcms3")
 
 test_that("verify feature grouping output", {
-    expect_known_value(groups(fgOpenMS), testFile("fg-openms"))
-    expect_known_value(groups(fgXCMS), testFile("fg-xcms"))
-    expect_known_value(groups(fgXCMS3), testFile("fg-xcms3"))
+    expect_known_value(groupTable(fgOpenMS), testFile("fg-openms"))
+    expect_known_value(groupTable(fgXCMS), testFile("fg-xcms"))
+    expect_known_value(groupTable(fgXCMS3), testFile("fg-xcms3"))
     
     # extraOpts
     expect_equal(fgOpenMS, groupFeatures(fList, "openms",
@@ -56,9 +56,9 @@ test_that("basic subsetting", {
 
     expect_length(fgOpenMS[[1]], length(analyses(fgOpenMS)))
     expect_length(fgOpenMS[[1, 1]], 1)
-    expect_equivalent(fgOpenMS[[4, 50]], groups(fgOpenMS)[[4, 50]])
-    expect_equivalent(fgOpenMS[[analyses(fgOpenMS)[4], names(fgOpenMS)[50]]], groups(fgOpenMS)[[4, 50]])
-    expect_equivalent(fgOpenMS[[4]], groups(fgOpenMS)[[4]])
+    expect_equivalent(fgOpenMS[[4, 50]], groupTable(fgOpenMS)[[4, 50]])
+    expect_equivalent(fgOpenMS[[analyses(fgOpenMS)[4], names(fgOpenMS)[50]]], groupTable(fgOpenMS)[[4, 50]])
+    expect_equivalent(fgOpenMS[[4]], groupTable(fgOpenMS)[[4]])
     expect_equivalent(callDollar(fgOpenMS, names(fgOpenMS)[4]), fgOpenMS[[4]])
 })
 
@@ -82,9 +82,12 @@ test_that("XCMS conversion", {
     expect_known_value(xcms::groups(XCMSImpXCMS3), testFile("fg-xcms_import_xcms3"))
     expect_known_value(xcms::groups(XCMSImpOpenMS), testFile("fg-xcms_import_openms"))
     
-    expect_equal(unname(groups(importFeatureGroupsXCMS(XCMSImpXCMS, getTestAnaInfo()))), unname(groups(fgXCMS)))
-    expect_equal(unname(groups(importFeatureGroupsXCMS(XCMSImpXCMS3, getTestAnaInfo()))), unname(groups(fgXCMS3)))
-    expect_equal(unname(groups(importFeatureGroupsXCMS(XCMSImpOpenMS, getTestAnaInfo()))), unname(groups(fgOpenMS)))
+    expect_equal(unname(groupTable(importFeatureGroupsXCMS(XCMSImpXCMS, getTestAnaInfo()))),
+                 unname(groupTable(fgXCMS)))
+    expect_equal(unname(groupTable(importFeatureGroupsXCMS(XCMSImpXCMS3, getTestAnaInfo()))),
+                 unname(groupTable(fgXCMS3)))
+    expect_equal(unname(groupTable(importFeatureGroupsXCMS(XCMSImpOpenMS, getTestAnaInfo()))),
+                 unname(groupTable(fgOpenMS)))
 })
 
 XCMS3ImpXCMS <- getXCMSnExp(fgXCMS)
@@ -99,9 +102,12 @@ test_that("XCMS3 conversion", {
     expect_known_value(xcms::featureDefinitions(XCMS3ImpXCMS3), testFile("fg-xcms3_import_xcms3"))
     expect_known_value(xcms::featureDefinitions(XCMS3ImpOpenMS), testFile("fg-xcms3_import_openms"))
     
-    expect_equal(unname(groups(importFeatureGroupsXCMS3(XCMS3ImpXCMS, getTestAnaInfo()))), unname(groups(fgXCMS)))
-    expect_equal(unname(groups(importFeatureGroupsXCMS3(XCMS3ImpXCMS3, getTestAnaInfo()))), unname(groups(fgXCMS3)))
-    expect_equal(unname(groups(importFeatureGroupsXCMS3(XCMS3ImpOpenMS, getTestAnaInfo()))), unname(groups(fgOpenMS)))
+    expect_equal(unname(groupTable(importFeatureGroupsXCMS3(XCMS3ImpXCMS, getTestAnaInfo()))),
+                 unname(groupTable(fgXCMS)))
+    expect_equal(unname(groupTable(importFeatureGroupsXCMS3(XCMS3ImpXCMS3, getTestAnaInfo()))),
+                 unname(groupTable(fgXCMS3)))
+    expect_equal(unname(groupTable(importFeatureGroupsXCMS3(XCMS3ImpOpenMS, getTestAnaInfo()))),
+                 unname(groupTable(fgOpenMS)))
 })
 
 regr <- as.data.table(fgOpenMSConc, features = TRUE, regression = TRUE)
@@ -156,7 +162,7 @@ test_that("overlap works", {
 minInt <- function(fg, rel)
 {
     # collapse to vector with use.names = FALSE: https://stackoverflow.com/a/12796124/9264518
-    g <- unlist(groups(fg), use.names = FALSE)
+    g <- unlist(groupTable(fg), use.names = FALSE)
     if (rel)
         return(min(g[g != 0]) / max(g))
     return(min(g[g != 0]))
@@ -221,8 +227,8 @@ fgCompBothEmpty <- comparison(openms = fgOpenMSEmpty, xcms = fgXCMSEmpty, groupA
 fGConsBothEmpty <- consensus(fgCompBothEmpty)
 
 test_that("verify feature group comparison", {
-    expect_known_value(groups(fGCompOpenMS@comparedFGroups), testFile("fg-comp-openms"))
-    expect_known_value(groups(fGCompXCMS@comparedFGroups), testFile("fg-comp-xcms"))
+    expect_known_value(groupTable(fGCompOpenMS@comparedFGroups), testFile("fg-comp-openms"))
+    expect_known_value(groupTable(fGCompXCMS@comparedFGroups), testFile("fg-comp-xcms"))
 
     expect_named(fGCompOpenMS, c("openms", "xcms"))
     expect_named(fGCompXCMS, c("openms", "xcms"))
@@ -235,7 +241,7 @@ test_that("verify feature group comparison", {
     expect_equivalent(fGCompOpenMS[[names(fGCompOpenMS)[2]]], fgXCMS)
     expect_equivalent(callDollar(fGCompOpenMS, names(fGCompOpenMS)[1]), fgOpenMS)
 
-    expect_known_value(groups(fGCons), testFile("fg-comp-cons"))
+    expect_known_value(groupTable(fGCons), testFile("fg-comp-cons"))
 
     expect_lt(length(consensus(fGCompOpenMS, relMinAbundance = 1)), length(fGCons))
     expect_length(fgCompOneEmpty, 2)
@@ -306,13 +312,13 @@ test_that("plotting works", {
     expect_plot(plotChord(unique(fgOpenMS, which = replicateGroups(fgOpenMS), outer = TRUE),
                           average = TRUE, addSelfLinks = TRUE)) # unless there are self links
 
-    expect_doppel("eic-def", function() plotEIC(subFGroups))
-    expect_doppel("eic-rtmin", function() plotEIC(subFGroups, retMin = TRUE))
-    expect_doppel("eic-tm1", function() plotEIC(subFGroups, topMost = 1))
-    expect_doppel("eic-area", function() plotEIC(subFGroups, showPeakArea = TRUE))
-    expect_doppel("eic-cbr", function() plotEIC(subFGroups, colourBy = "rGroups"))
-    expect_doppel("eic-cbf", function() plotEIC(subFGroups, colourBy = "fGroups"))
-    expect_doppel("eic-ann", function() plotEIC(subFGroups, annotate = "mz"))
+    expect_doppel("eic-def", function() plotEICs(subFGroups))
+    expect_doppel("eic-rtmin", function() plotEICs(subFGroups, retMin = TRUE))
+    expect_doppel("eic-tm1", function() plotEICs(subFGroups, topMost = 1))
+    expect_doppel("eic-area", function() plotEICs(subFGroups, showPeakArea = TRUE))
+    expect_doppel("eic-cbr", function() plotEICs(subFGroups, colourBy = "rGroups"))
+    expect_doppel("eic-cbf", function() plotEICs(subFGroups, colourBy = "fGroups"))
+    expect_doppel("eic-ann", function() plotEICs(subFGroups, annotate = "mz"))
 
     expect_doppel("venn", function() plotVenn(fgOpenMS))
     expect_doppel("venn-comp", function() plotVenn(fGCompOpenMS))
@@ -340,7 +346,7 @@ test_that("plotting empty objects works", {
     expect_doppel("chord-def", function() plotChord(fGConsOneEmpty)) # should be same as fgOpenMS
     expect_error(plotChord(fgCompBothEmpty))
 
-    expect_doppel("eic-def-empty", function() plotEIC(fgOpenMSEmpty))
+    expect_doppel("eic-def-empty", function() plotEICs(fgOpenMSEmpty))
 
     expect_error(plotVenn(fgOpenMSEmpty))
     expect_doppel("venn", function() plotVenn(fGConsOneEmpty)) # should be same as fgOpenMS

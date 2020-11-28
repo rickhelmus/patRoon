@@ -443,7 +443,7 @@ setMethod("compoundViewer", c("featureGroups", "MSPeakLists", "compounds"), func
     fTable <- featureTable(fGroups)
     anaInfo <- analysisInfo(fGroups)
     gInfo <- groupInfo(fGroups)
-    gTable <- groups(fGroups)
+    gTable <- groupTable(fGroups)
     avgGTable <- averageGroups(fGroups)
     ftindex <- groupFeatIndex(fGroups)
     pLists <- peakLists(MSPeakLists)

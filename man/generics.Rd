@@ -16,11 +16,11 @@
 \alias{getMCS}
 \alias{groupNames}
 \alias{plotChord}
-\alias{plotEIC}
+\alias{plotEICs}
 \alias{plotInt}
 \alias{plotScores}
 \alias{plotSilhouettes}
-\alias{plotSpec}
+\alias{plotSpectrum}
 \alias{plotStructure}
 \alias{plotVenn}
 \alias{plotUpSet}
@@ -67,7 +67,7 @@ groupNames(obj)
 
 plotChord(obj, addSelfLinks = FALSE, addRetMzPlots = TRUE, ...)
 
-plotEIC(obj, ...)
+plotEICs(obj, ...)
 
 plotInt(obj, ...)
 
@@ -75,7 +75,7 @@ plotScores(obj, ...)
 
 plotSilhouettes(obj, kSeq, ...)
 
-plotSpec(obj, ...)
+plotSpectrum(obj, ...)
 
 plotStructure(obj, ...)
 
@@ -206,10 +206,10 @@ please refer to the linked method documentation for each generic.
     \item Methods are defined for: \code{\link[=plotChord,featureGroups-method]{featureGroups}}; \code{\link[=plotChord,featureGroupsComparison-method]{featureGroupsComparison}}.
 }
 
-\code{plotEIC} plots extracted ion chromatogram(s).
+\code{plotEICs} plots extracted ion chromatogram(s).
 
 \itemize{
-    \item Methods are defined for: \code{\link[=plotEIC,components-method]{components}}; \code{\link[=plotEIC,featureGroups-method]{featureGroups}}.
+    \item Methods are defined for: \code{\link[=plotEICs,components-method]{components}}; \code{\link[=plotEICs,featureGroups-method]{featureGroups}}.
 }
 
 \code{plotInt} plots the intensity of all contained features.
@@ -230,10 +230,10 @@ please refer to the linked method documentation for each generic.
     \item Methods are defined for: \code{\link[=plotSilhouettes,componentsIntClust-method]{componentsIntClust}}; \code{\link[=plotSilhouettes,compoundsCluster-method]{compoundsCluster}}.
 }
 
-\code{plotSpec} plots a (annotated) spectrum.
+\code{plotSpectrum} plots a (annotated) spectrum.
 
 \itemize{
-    \item Methods are defined for: \code{\link[=plotSpec,components-method]{components}}; \code{\link[=plotSpec,compounds-method]{compounds}}; \code{\link[=plotSpec,formulas-method]{formulas}}; \code{\link[=plotSpec,MSPeakLists-method]{MSPeakLists}}.
+    \item Methods are defined for: \code{\link[=plotSpectrum,components-method]{components}}; \code{\link[=plotSpectrum,compounds-method]{compounds}}; \code{\link[=plotSpectrum,formulas-method]{formulas}}; \code{\link[=plotSpectrum,MSPeakLists-method]{MSPeakLists}}.
 }
 
 \code{plotStructure} plots a chemical structure.

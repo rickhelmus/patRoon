@@ -5,6 +5,9 @@
 \alias{reportMD}
 \alias{exportDAFiles}
 \alias{screenTargets}
+\alias{plotEIC}
+\alias{groups}
+\alias{plotSpec}
 \title{Deprecated and renamed functions.}
 \usage{
 reportMD(...)
@@ -18,6 +21,12 @@ exportDAFiles(
 )
 
 screenTargets(obj, targets, rtWindow, mzWindow)
+
+plotEIC(obj, ...)
+
+groups(object, ...)
+
+plotSpec(obj, ...)
 }
 \arguments{
 \item{\dots}{Passed to successor function.}
@@ -47,5 +56,11 @@ future.
   \file{.mzXML} or \file{.mzML} formats.
 
 Please use \code{\link{screenSuspects}} instead.
+
+Please use \code{\link{plotEICs}} instead.
+
+Please use \code{\link{groupTable}} instead.
+
+Please use \code{\link{plotSpectrum}} instead.
 }
 \keyword{internal}

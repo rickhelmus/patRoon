@@ -464,36 +464,36 @@ Generic           | Classes                                              | Remar
 ----------------- | ---------------------------------------------------- | ---------------------------------------------------------------
 `plot()`          | `featureGroups`, `featureGroupsComparison`           | Scatter plot for retention and _m/z_ values
 `plotInt()`       | `featureGroups`                                      | Intensity profiles across analyses
-`plotEIC()`       | `featureGroups`, `components`                        | Plot extracted ion chromatograms (EICs)
-`plotSpec()`      | `MSPeakLists`, `formulas`, `compounds`, `components` | Plots (annotated) spectra
+`plotEICs()`      | `featureGroups`, `components`                        | Plot extracted ion chromatograms (EICs)
+`plotSpectrum()`  | `MSPeakLists`, `formulas`, `compounds`, `components` | Plots (annotated) spectra
 `plotStructure()` | `compounds`                                          | Draws candidate structures
 `plotScores()`    | `formulas`, `compounds`                              | Barplot for candidate scoring
 `plotGraph()`     | `componentsNT`                                       | Draws interactive graphs of linked homologous series
 
-The most common plotting functions are `plotEIC()`, which plots chromatographic data for features, and `plotSpec()`, which will plot (annotated) spectra. An overview of their most important function arguments are shown below.
+The most common plotting functions are `plotEICs()`, which plots chromatographic data for features, and `plotSpectrum()`, which will plot (annotated) spectra. An overview of their most important function arguments are shown below.
 
 Argument                                      | Generic                   | Remarks
 --------------------------------------------- | ------------------------- | -------------------------------------------------------------------
-`rtWindow`                                    | `plotEIC()`               | Extra time (in s) +/- retention limits of plotted features (useful to zoom out)
-`mzWindow`                                    | `plotEIC()`               | m/z width of EICs (in Da)
-`retMin`                                      | `plotEIC()`               | If `TRUE` plot retention times in minutes
-`topMost`                                     | `plotEIC()`               | Only draw this amount of highest intensity features in each group.
-`showPeakArea`, `showFGroupRect`              | `plotEIC()`               | Fill peak areas / draw rectangles around feature groups?
-`title`                                       | `plotEIC()`, `plotSpec()` | Override plot title
-`colourBy`                                    | `plotEIC()`               | Colour individual feature groups (`"fGroups"`) or replicate groups (`"rGroups"`). By default nothing is coloured (`"none"`)
-`showLegend`                                  | `plotEIC()`               | Display a legend? (only if `colourBy!="none"`)
-`onlyPresent`                                 | `plotEIC()`               | Only plot EICs for analyses where a feature was detected? Setting to `FALSE` is useful to inspect if a feature was 'missed'.
-`xlim`, `ylim`                                | `plotEIC()`, `plotSpec()` | Override x/y axis ranges, i.e. to manually set plotting range.
-`groupName`, `analysis`, `precursor`, `index` | `plotSpec()`              | What to plot. See examples below.
-`MSLevel`                                     | `plotSpec()`              | Whether to plot an MS or MS/MS spectrum (only `MSPeakLists`)
-`formulas`                                    | `plotSpec()`              | Whether `formula` annotation should be added (only `compounds`)
-`plotStruct`                                  | `plotSpec()`              | Whether the structure should be added to the plot (only `compounds`)
+`rtWindow`                                    | `plotEICs()`                   | Extra time (in s) +/- retention limits of plotted features (useful to zoom out)
+`mzWindow`                                    | `plotEICs()`                   | m/z width of EICs (in Da)
+`retMin`                                      | `plotEICs()`                   | If `TRUE` plot retention times in minutes
+`topMost`                                     | `plotEICs()`                   | Only draw this amount of highest intensity features in each group.
+`showPeakArea`, `showFGroupRect`              | `plotEICs()`                   | Fill peak areas / draw rectangles around feature groups?
+`title`                                       | `plotEICs()`, `plotSpectrum()` | Override plot title
+`colourBy`                                    | `plotEICs()`                   | Colour individual feature groups (`"fGroups"`) or replicate groups (`"rGroups"`). By default nothing is coloured (`"none"`)
+`showLegend`                                  | `plotEICs()`                   | Display a legend? (only if `colourBy!="none"`)
+`onlyPresent`                                 | `plotEICs()`                   | Only plot EICs for analyses where a feature was detected? Setting to `FALSE` is useful to inspect if a feature was 'missed'.
+`xlim`, `ylim`                                | `plotEICs()`, `plotSpectrum()` | Override x/y axis ranges, i.e. to manually set plotting range.
+`groupName`, `analysis`, `precursor`, `index` | `plotSpectrum()`               | What to plot. See examples below.
+`MSLevel`                                     | `plotSpectrum()`               | Whether to plot an MS or MS/MS spectrum (only `MSPeakLists`)
+`formulas`                                    | `plotSpectrum()`               | Whether `formula` annotation should be added (only `compounds`)
+`plotStruct`                                  | `plotSpectrum()`               | Whether the structure should be added to the plot (only `compounds`)
 
 Note that we can use [subsetting](#subset) to select which feature data we want to plot, e.g.
 
-```{r plotEICSub,eval=runData}
-plotEIC(fGroups[1:2]) # only plot EICs from first and second analyses.
-plotEIC(fGroups[, 1]) # only plot all features of first group
+```{r plotEICsSub,eval=runData}
+plotEICs(fGroups[1:2]) # only plot EICs from first and second analyses.
+plotEICs(fGroups[, 1]) # only plot all features of first group
 ```
 
 The `plotStructure()` function will draw a chemical structure for a compound candidate. In addition, this function can draw the maximum common substructure (MCS) of multiple candidates in order to assess common structural features.
@@ -510,31 +510,31 @@ Some other common and less common plotting operations are shown below.
 ```{r plotFeatAnn,eval=runData}
 plot(fGroups) # simple scatter plot of retention and m/z values
 
-plotEIC(fGroups) # plot EICs for all features
+plotEICs(fGroups) # plot EICs for all features
 # get overview of all feature groups
-plotEIC(fGroups,
-        colourBy = "fGroup", # unique colour for each group
-        topMost = 1, # only most intense feature in each group
-        showPeakArea = TRUE, # show integrated areas
-        showFGroupRect = FALSE,
-        showLegend = FALSE) # no legend (too busy for many feature groups)
-plotEIC(fGroups[, 1], # only plot all features of first group
-        colourBy = "rGroup") # and mark them individually per replicate group
-plotEIC(components, index = 7, fGroups = fGroups) # EICs from a component
+plotEICs(fGroups,
+         colourBy = "fGroup", # unique colour for each group
+         topMost = 1, # only most intense feature in each group
+         showPeakArea = TRUE, # show integrated areas
+         showFGroupRect = FALSE,
+         showLegend = FALSE) # no legend (too busy for many feature groups)
+plotEICs(fGroups[, 1], # only plot all features of first group
+         colourBy = "rGroup") # and mark them individually per replicate group
+plotEICs(components, index = 7, fGroups = fGroups) # EICs from a component
 
 
-plotSpec(mslists, "M120_R328_81") # non-annotated MS spectrum
-plotSpec(mslists, "M120_R328_81", MSLevel = 2) # non-annotated MS/MS spectrum
+plotSpectrum(mslists, "M120_R328_81") # non-annotated MS spectrum
+plotSpectrum(mslists, "M120_R328_81", MSLevel = 2) # non-annotated MS/MS spectrum
 # formula annotated spectrum
-plotSpec(formulas, precursor = "C6H9N2", groupName = "M120_R328_81",
-         MSPeakLists = mslists)
+plotSpectrum(formulas, precursor = "C6H9N2", groupName = "M120_R328_81",
+             MSPeakLists = mslists)
 # compound annotated spectrum, with added formula annotations
-plotSpec(compounds, index = 1, groupName = "M120_R328_81", MSPeakLists = mslists,
-         formulas = formulas)
+plotSpectrum(compounds, index = 1, groupName = "M120_R328_81", MSPeakLists = mslists,
+             formulas = formulas)
 # custom intensity range (e.g. to zoom in)
-plotSpec(compounds, index = 1, groupName = "M120_R328_81", MSPeakLists = mslists,
-         ylim = c(0, 5000), plotStruct = FALSE)
-plotSpec(components, index = 7) # component spectrum
+plotSpectrum(compounds, index = 1, groupName = "M120_R328_81", MSPeakLists = mslists,
+             ylim = c(0, 5000), plotStruct = FALSE)
+plotSpectrum(components, index = 7) # component spectrum
 ```
 
 ```{r plotHomol,eval=runData}
@@ -611,7 +611,7 @@ plotSilhouettes(componInt, 5:20) # plot silhouettes (e.g. to obtain ideal cluste
 
 ### Interactive plotting of chromatography data
 
-The `plotEIC()` function introduced before can be used to visualize chromatography data for one or more features. An interactive alternative is to call the `checkChromatograms()` function. This function will launch a GUI that allows you to browse through all features and inspect their EICs. Simply pass in the `featureGroups` object you want to inspect:
+The `plotEICs()` function introduced before can be used to visualize chromatography data for one or more features. An interactive alternative is to call the `checkChromatograms()` function. This function will launch a GUI that allows you to browse through all features and inspect their EICs. Simply pass in the `featureGroups` object you want to inspect:
 
 ```{r checkChrom1,eval=FALSE}
 checkChromatograms(fGroups)

@@ -1,5 +1,6 @@
 # patRoon 1.1
 
+* **IMPORTANT**: The `plotEIC()`, `groups()` and `plotSpec()` methods were renamed to `plotEICs()`, `groupTable()` and `plotSpectrum()`. This was done to avoid name clashes with `XCMS`. The old functions still work (with a warning), but please update your scripts as these will be removed in the future.
 * **IMPORTANT**: Major changes to the parallelization functionality
     * `patRoon` now supports an additional method to perform parallelization for tools such as `MetFrag`, `SIRIUS` etc. The main purpose of this method is to allow you to perform such calculations on external computer clusters. Please see the updated parallelization section in the handbook for more details.
     * The `logPath` and `maxProcAmount` arguments to functions such `generateFormulas`, `generateCompounds` etc were removed. These should now solely be configured through package options (see `?patRoon`).

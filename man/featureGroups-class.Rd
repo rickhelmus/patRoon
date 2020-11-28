@@ -12,8 +12,8 @@
 \alias{groupNames,featureGroups-method}
 \alias{length,featureGroups-method}
 \alias{show,featureGroups-method}
-\alias{groups,featureGroups-method}
-\alias{groups}
+\alias{groupTable,featureGroups-method}
+\alias{groupTable}
 \alias{analysisInfo,featureGroups-method}
 \alias{groupInfo,featureGroups-method}
 \alias{groupInfo}
@@ -30,7 +30,7 @@
 \alias{plot,featureGroups,ANY-method}
 \alias{plotInt,featureGroups-method}
 \alias{plotChord,featureGroups-method}
-\alias{plotEIC,featureGroups-method}
+\alias{plotEICs,featureGroups-method}
 \alias{plotVenn,featureGroups-method}
 \alias{plotUpSet,featureGroups-method}
 \alias{unique,featureGroups-method}
@@ -60,7 +60,7 @@
 
 \S4method{show}{featureGroups}(object)
 
-\S4method{groups}{featureGroups}(object, areas = FALSE)
+\S4method{groupTable}{featureGroups}(object, areas = FALSE)
 
 \S4method{analysisInfo}{featureGroups}(obj)
 
@@ -111,7 +111,7 @@
   ...
 )
 
-\S4method{plotEIC}{featureGroups}(
+\S4method{plotEICs}{featureGroups}(
   obj,
   rtWindow = 30,
   mzWindow = 0.005,
@@ -150,7 +150,7 @@ their index or name, respectively (for the order/names see \code{analyses()/name
 (similar to regular vectors). If missing all analyses/feature groups are selected.\cr\cr For \code{[[}: should be a scalar value. If \code{j} is not specified, \code{i} selects by feature groups instead.}
 
 \item{\dots}{Ignored for \code{"["} operator or passed to
-\code{\link[graphics]{plot}} (\code{plot} and \code{plotEIC}),
+\code{\link[graphics]{plot}} (\code{plot} and \code{plotEICs}),
 \code{\link[graphics]{lines}} (\code{plotInt}), \pkg{\link{VennDiagram}}
 plotting functions (\code{plotVenn}), \code{\link{chordDiagram}}
 (\code{plotChord}) or \code{\link[UpSetR]{upset}} (\code{plotUpSet}).}
@@ -192,7 +192,7 @@ feature groups that are unique to a replicate group are plotted.}
 
 \item{showLegend}{If \code{TRUE} a legend will be shown with either replicate
 groups (\code{colourBy == "rGroups"}) or feature groups (\code{colourBy ==
-"fGroups"}, only for \code{plotEIC}). If \code{colourBy} is \code{"none"}
+"fGroups"}, only for \code{plotEICs}). If \code{colourBy} is \code{"none"}
 no legend will be shown.}
 
 \item{col}{Colour(s) used. If \code{col=NULL} then colours are automatically
@@ -313,7 +313,7 @@ replicate groups for which data is present in this object.
 
 \item \code{show}: Shows summary information for this object.
 
-\item \code{groups}: Accessor for \code{groups} slot.
+\item \code{groupTable}: Accessor for \code{groups} slot.
 
 \item \code{analysisInfo}: Obtain analysisInfo (see analysisInfo slot in \code{\link{features}}).
 
@@ -352,7 +352,7 @@ groups. In addition, analyses/replicates sharing similar properties
 (\emph{e.g.} location, age, type) may be grouped to enhance visualization
 between these 'outer groups'.
 
-\item \code{plotEIC}: Plots extracted ion chromatograms (EICs) of feature
+\item \code{plotEICs}: Plots extracted ion chromatograms (EICs) of feature
 groups.
 
 \item \code{plotVenn}: plots a Venn diagram (using

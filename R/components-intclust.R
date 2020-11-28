@@ -54,7 +54,7 @@ genIntComponentInfo <- function(cutClusters)
 #'
 #' @seealso \code{\link{components}} and \link{component-generation}
 #'
-#' @note The intensity values for components (used by \code{plotSpec}) are set
+#' @note The intensity values for components (used by \code{plotSpectrum}) are set
 #'   to a dummy value (1) as no single intensity value exists for this kind of
 #'   components.
 #' @export
@@ -273,7 +273,7 @@ generateComponentsIntClust <- function(fGroups, method = "complete", metric = "e
     }
     else
     {
-        gTable <- groups(fGroups)
+        gTable <- groupTable(fGroups)
         analysis <- analysisInfo(fGroups)$analysis
     }
 

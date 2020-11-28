@@ -22,8 +22,8 @@
 \alias{filter,components-method}
 \alias{findFGroup,components-method}
 \alias{findFGroup}
-\alias{plotSpec,components-method}
-\alias{plotEIC,components-method}
+\alias{plotSpectrum,components-method}
+\alias{plotEICs,components-method}
 \alias{consensus,components-method}
 \alias{componentsCamera-class}
 \alias{componentsCamera}
@@ -63,7 +63,7 @@
 
 \S4method{findFGroup}{components}(obj, fGroup)
 
-\S4method{plotSpec}{components}(
+\S4method{plotSpectrum}{components}(
   obj,
   index,
   markFGroup = NULL,
@@ -73,7 +73,7 @@
   ...
 )
 
-\S4method{plotEIC}{components}(obj, index, fGroups, rtWindow = 5, ...)
+\S4method{plotEICs}{components}(obj, index, fGroups, rtWindow = 5, ...)
 
 \S4method{consensus}{components}(obj, ...)
 }
@@ -84,12 +84,12 @@
 their index or name, respectively (for the order/names see \code{names()/groupNames()}).\cr\cr For \code{[}: Can also be logical to perform logical selection
 (similar to regular vectors). If missing all components/feature groups are selected.\cr\cr For \code{[[}: should be a scalar value. \code{j} is optional.}
 
-\item{\dots}{For \code{plotEIC}: Further (optional) arguments passed to the
-  \code{plotEIC} method for the \code{\link{featureGroups}} class. Note that
+\item{\dots}{For \code{plotEICs}: Further (optional) arguments passed to the
+  \code{plotEICs} method for the \code{\link{featureGroups}} class. Note that
   the \code{colourBy}, \code{showPeakArea}, \code{showFGroupRect} and
   \code{topMost} arguments cannot be set as these are set by this method.
 
-  For \code{plotSpec}: Further arguments passed to
+  For \code{plotSpectrum}: Further arguments passed to
   \code{\link[graphics]{plot}}.
 
   For \code{consensus}: \code{components} objects that should be used to
@@ -136,7 +136,7 @@ should be a character with the name of the feature group. Setting this to
 \code{NULL} will not mark any peak.}
 
 \item{useGGPlot2}{If \code{TRUE} then \pkg{\link{ggplot2}} is used for
-plotting, otherwise base plot used. For \code{plotSpec}, \code{ggplot2}
+plotting, otherwise base plot used. For \code{plotSpectrum}, \code{ggplot2}
 allows nicely repelled text for annotation. However, base plot is generally
 faster.}
 
@@ -146,7 +146,7 @@ faster.}
 \item{fGroups}{The \code{\link{featureGroups}} object that was used to
 generate the components.}
 
-\item{rtWindow}{Retention window: see the \code{plotEIC} method for the
+\item{rtWindow}{Retention window: see the \code{plotEICs} method for the
 \code{\link{featureGroups}} class.}
 }
 \value{
@@ -199,10 +199,10 @@ feature groups for which data is present in this object.
 \item \code{findFGroup}: Returns the component id(s) to which a feature group
 belongs.
 
-\item \code{plotSpec}: Plot a \emph{pseudo} mass spectrum for a single
+\item \code{plotSpectrum}: Plot a \emph{pseudo} mass spectrum for a single
 component.
 
-\item \code{plotEIC}: Plot an extracted ion chromatogram (EIC) for all
+\item \code{plotEICs}: Plot an extracted ion chromatogram (EIC) for all
 feature groups within a single component.
 
 \item \code{consensus}: Generates a consensus from multiple \code{components}

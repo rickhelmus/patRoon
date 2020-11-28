@@ -159,7 +159,7 @@ reported.}
 used to determine the plotting grid when reporting EICs in PDF files.}
 
 \item{EICRtWindow, EICMzWindow, EICTopMost, EICOnlyPresent}{Plotting parameters
-passed to \code{\link{plotEIC}} (\emph{i.e.} \code{rtWindow},
+passed to \code{\link{plotEICs}} (\emph{i.e.} \code{rtWindow},
 \code{mzWindow}, \code{topMost} and \code{onlyPresent} arguments).}
 
 \item{reportPlots}{A character vector specifying what should be plotted.

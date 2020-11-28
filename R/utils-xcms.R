@@ -52,7 +52,7 @@ makeXCMSGroups <- function(fGroups, verbose = TRUE)
 
     combfts[, xsID := seq_len(.N)] # ID corresponding to XCMS peaks
 
-    gTable <- groups(fGroups)
+    gTable <- groupTable(fGroups)
     ftind <- copy(groupFeatIndex(fGroups))
     anaInfo <- analysisInfo(fGroups)
 

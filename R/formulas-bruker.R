@@ -51,7 +51,7 @@ generateFormulasDA <- function(fGroups, precursorMzSearchWindow = 0.002, MSMode 
     DA <- getDAApplication()
     anaInfo <- analysisInfo(fGroups)
     ftind <- groupFeatIndex(fGroups)
-    gTable <- groups(fGroups)
+    gTable <- groupTable(fGroups)
     gCount <- length(fGroups)
     gNames <- names(fGroups)
 

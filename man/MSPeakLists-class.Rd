@@ -17,7 +17,7 @@
 \alias{$,MSPeakLists-method}
 \alias{as.data.table,MSPeakLists-method}
 \alias{filter,MSPeakLists-method}
-\alias{plotSpec,MSPeakLists-method}
+\alias{plotSpectrum,MSPeakLists-method}
 \alias{getDefIsolatePrecParams}
 \title{Class containing MS Peak Lists}
 \usage{
@@ -57,7 +57,7 @@
   negate = FALSE
 )
 
-\S4method{plotSpec}{MSPeakLists}(
+\S4method{plotSpectrum}{MSPeakLists}(
   obj,
   groupName,
   analysis = NULL,
@@ -134,7 +134,7 @@ made.}
 automatically made.}
 
 \item{useGGPlot2}{If \code{TRUE} then \pkg{\link{ggplot2}} is used for
-plotting, otherwise base plot used. For \code{plotSpec}, \code{ggplot2}
+plotting, otherwise base plot used. For \code{plotSpectrum}, \code{ggplot2}
 allows nicely repelled text for annotation. However, base plot is generally
 faster.}
 
@@ -156,8 +156,8 @@ faster.}
 \code{averagedPeakLists} returns a nested list of feature group
   averaged peak lists in a similar format as \code{peakLists}.
 
-\code{plotSpec} will return a \code{\link[=ggplot2]{ggplot object}}
-  if \code{useGGPlot2} is \code{TRUE}.
+\code{plotSpectrum} will return a \code{\link[=ggplot2]{ggplot
+  object}} if \code{useGGPlot2} is \code{TRUE}.
 }
 \description{
 Contains all MS (and MS/MS where available) peak lists for a
@@ -203,7 +203,7 @@ which may further enhance quality of subsequent workflow steps (\emph{e.g.}
 formulae calculation and compounds identification) and/or speed up these
 processes.
 
-\item \code{plotSpec}: Plots a spectrum using MS or MS/MS peak lists for a
+\item \code{plotSpectrum}: Plots a spectrum using MS or MS/MS peak lists for a
 given feature group.
 }}
 

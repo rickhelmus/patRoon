@@ -40,7 +40,7 @@ NULL
 #' @param retMin If \code{TRUE} then report retention times in minutes
 #'   (otehrwise seconds).
 #' @param EICRtWindow,EICMzWindow,EICTopMost,EICOnlyPresent Plotting parameters
-#'   passed to \code{\link{plotEIC}} (\emph{i.e.} \code{rtWindow},
+#'   passed to \code{\link{plotEICs}} (\emph{i.e.} \code{rtWindow},
 #'   \code{mzWindow}, \code{topMost} and \code{onlyPresent} arguments).
 #' @param compoundsOnlyUsedScorings If \code{TRUE} then only scorings are plotted
 #'   that actually have been used to rank data (see the \code{scoreTypes}
@@ -139,7 +139,7 @@ reportFGroupTable <- function(fGroups, path, fGroupsAsRows, reportAnalysisInfo, 
         invisible(return(NULL))
     }
 
-    gTable <- copy(groups(fGroups))
+    gTable <- copy(groupTable(fGroups))
     gInfo <- groupInfo(fGroups)
     anaInfo <- analysisInfo(fGroups)
 
@@ -194,7 +194,7 @@ reportFGroupPlots <- function(fGroups, path, plotGrid, rtWindow, mzWindow, retMi
         invisible(return(NULL))
     }
 
-    gTable <- groups(fGroups)
+    gTable <- groupTable(fGroups)
     gCount <- length(fGroups)
     gInfo <- groupInfo(fGroups)
     anaInfo <- analysisInfo(fGroups)
@@ -203,7 +203,7 @@ reportFGroupPlots <- function(fGroups, path, plotGrid, rtWindow, mzWindow, retMi
     pdf(pdfFile, paper = "a4", pointsize = 10, width = 8, height = 11)
 
     # all feature groups
-    plotEIC(fGroups, rtWindow, mzWindow, retMin, 1, EICs, TRUE, FALSE)
+    plotEICs(fGroups, rtWindow, mzWindow, retMin, 1, EICs, TRUE, FALSE)
 
     plotsPerPage <- plotGrid[1] * plotGrid[2]
     prog <- openProgBar(0, gCount)
@@ -221,7 +221,7 @@ reportFGroupPlots <- function(fGroups, path, plotGrid, rtWindow, mzWindow, retMi
         }
         
         screen(scr[scrInd])
-        plotEIC(fGroups[, grpi], rtWindow, mzWindow, retMin, topMost, EICs, onlyPresent = onlyPresent, colourBy = "rGroups")
+        plotEICs(fGroups[, grpi], rtWindow, mzWindow, retMin, topMost, EICs, onlyPresent = onlyPresent, colourBy = "rGroups")
         setTxtProgressBar(prog, grpi)
     }
 
@@ -319,7 +319,7 @@ reportFormulaSpectra <- function(fGroups, path, formulas, topMost, normalizeScor
             # a4r: width=11.69, height=8.27
             pdf(out, paper = "a4r", pointsize = 10, width = 11, height = 8)
 
-            plotEIC(fGroups[, grp], EICRtWindow, EICMzWindow, retMin, EICTopMost, EICs)
+            plotEICs(fGroups[, grp], EICRtWindow, EICMzWindow, retMin, EICTopMost, EICs)
 
             for (precursor in unique(ft$formula))
             {
@@ -336,7 +336,7 @@ reportFormulaSpectra <- function(fGroups, path, formulas, topMost, normalizeScor
                     textPlot("No MS/MS data available.")
                 }
                 else
-                    plotSpec(formulas, precursor, grp, MSPeakLists = MSPeakLists)
+                    plotSpectrum(formulas, precursor, grp, MSPeakLists = MSPeakLists)
 
                 screen(scr[3])
                 plotScores(formulas, precursor, grp, normalizeScores = normalizeScores,
@@ -433,7 +433,7 @@ reportCompoundSpectra <- function(fGroups, path, MSPeakLists, compounds, compsCl
             # a4r: width=11.69, height=8.27
             pdf(out, paper = "a4r", pointsize = 10, width = 11, height = 8)
 
-            plotEIC(fGroups[, fgrpi], EICRtWindow, EICMzWindow, retMin, EICTopMost, EICs)
+            plotEICs(fGroups[, fgrpi], EICRtWindow, EICMzWindow, retMin, EICTopMost, EICs)
 
             for (idi in seq_len(nrow(compTable[[grp]])))
             {
@@ -443,7 +443,7 @@ reportCompoundSpectra <- function(fGroups, path, MSPeakLists, compounds, compsCl
                 scr <- c(scr, split.screen(c(1, 2), screen = scr[2]))
 
                 screen(scr[1])
-                plotSpec(compounds, idi, grp, MSPeakLists = MSPeakLists, formulas = formulas)
+                plotSpectrum(compounds, idi, grp, MSPeakLists = MSPeakLists, formulas = formulas)
 
                 screen(scr[3])
                 plotScores(compounds, idi, grp, normalizeScores, exclNormScores, onlyUsedScorings)
@@ -566,12 +566,13 @@ reportComponentPlots <- function(fGroups, path, components, EICRtWindow, EICMzWi
             scr <- split.screen(c(2, 1))
 
         screen(scr[1])
-        plotEIC(components, cmpi, fGroups, title = sprintf("Component %d", cmpi), rtWindow = EICRtWindow,
-                mzWindow = EICMzWindow, retMin = retMin, EICs = EICs)
+        plotEICs(components, cmpi, fGroups, title = sprintf("Component %d", cmpi), rtWindow = EICRtWindow,
+                 mzWindow = EICMzWindow, retMin = retMin, EICs = EICs)
 
         screen(scr[2])
-        plotSpec(components, cmpi, main = sprintf("ret: %.1f; m/z: %.4f - %.4f",
-                                                  cInfo$ret[cmpi], min(cTable[[cmpi]]$mz), max(cTable[[cmpi]]$mz)))
+        plotSpectrum(components, cmpi, main = sprintf("ret: %.1f; m/z: %.4f - %.4f",
+                                                      cInfo$ret[cmpi], min(cTable[[cmpi]]$mz),
+                                                      max(cTable[[cmpi]]$mz)))
 
         if (isHClust)
         {

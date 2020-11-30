@@ -2,6 +2,9 @@
 title: "patRoon handbook"
 author: "Rick Helmus"
 date: "`r Sys.Date()`"
+bibliography: ["refs.bib"]
+biblio-style: "springer-basic-brackets-no-et-al"
+link-citations: true
 header-includes:
     - \usepackage{fvextra}
     - \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}

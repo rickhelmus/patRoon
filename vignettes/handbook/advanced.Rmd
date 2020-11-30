@@ -125,14 +125,14 @@ The results of an optimization process are stored in objects from the S4 `optimi
 
 The `optimizedParameters()` function is used to inspect the best parameter settings. Similarly, the `optimizedObject()` function can be used to obtain the object that was created with these settings (i.e. a `features` or `featureGroups` object).
 
-```{r fOptProc1,eval=runData}
+```{r fOptProc1,eval=doOpt}
 optimizedParameters(ftOpt) # best settings for whole experiment
 optimizedObject(ftOpt) # features object with best settings for whole experiment
 ```
 
 Results can also be obtained for specific parameter sets/iterations.
 
-```{r fOptProc,eval=FALSE}
+```{r fOptProc,eval=doOpt}
 optimizedParameters(ftOpt, 1) # best settings for first parameter set
 optimizedParameters(ftOpt, 1, 1) # best settings for first parameter set and experiment iteration
 optimizedObject(ftOpt, 1) # features object with best settings for first parameter set
@@ -140,7 +140,7 @@ optimizedObject(ftOpt, 1) # features object with best settings for first paramet
 
 The `plot()` function can be used to visualize optimization results. This function will plot graphs for results of all tested parameter pairs. The graphs can be contour, image or perspective plots (as specified by the `type` argument).
 
-```{r fOptPlot,eval=runData,out.width="70%"}
+```{r fOptPlot,eval=doOpt,out.width="70%"}
 plot(ftOpt, paramSet = 1, DoEIteration = 1) # contour plots for first param set/experiment
 plot(ftOpt, paramSet = 1, DoEIteration = 1, type = "persp") # pretty perspective plots
 ```

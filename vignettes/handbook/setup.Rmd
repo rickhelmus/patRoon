@@ -10,6 +10,7 @@ knitr::opts_chunk$set(
 source(file.path(vignDir, "shared", "init.R"))
 
 runData <- TRUE
+doOpt <- runData
 if (runData)
 {
     # try to sync with tutorial so cache can be re-used
@@ -69,9 +70,12 @@ if (runData)
     
     compsClust <- makeHCluster(compsMF)
     
-    pSet <- generateFeatureOptPSet("openms")
-    ftOpt <- optimizeFeatureFinding(anaInfo[1, ], "openms", pSet, maxIterations = 2,
-                                    paramRanges = list(noiseThrInt = c(500, Inf)))
+    if (doOpt)
+    {
+        pSet <- generateFeatureOptPSet("openms")
+        ftOpt <- optimizeFeatureFinding(anaInfo[1, ], "openms", pSet, maxIterations = 2,
+                                        paramRanges = list(noiseThrInt = c(500, Inf)))
+    }
     
     # saveRDS(list(fList = fList, fGroups = fGroups, fGroupsUF = fGroupsUF, fListRG = fListRG,
     #              fGroupsRG = fGroupsRG, mslists = mslists, formulas = formulas, compsMF = compsMF,

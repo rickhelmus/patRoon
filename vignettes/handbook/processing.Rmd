@@ -17,6 +17,7 @@ Generic                                             | Classes                   
 `as.data.table()` / `as.data.frame()`               | All                           | Convert data to a `data.table` or `data.frame`, see below.
 `analysisInfo()`, `analyses()`, `replicateGroups()` | `features`, `featureGroups`   | Returns the [analysis information](#anaInfo), analyses or replicate groups for which this object contains data.
 `groupInfo()`                                       | `featureGroups`               | Returns feature group information (_m/z_ and retention time values).
+`screenInfo()`                                      | `featureGroupsScreening`      | Returns information on hits from [suspect screening](#suspscr).
 `componentInfo()`                                   | `components`                  | Returns information for all components.
 `annotatedPeakList()`                               | `formulas`, `compounds`       | Returns a table with annotated mass peaks (see below).
 
@@ -57,6 +58,11 @@ as.data.table(fList)[, 1:6]
 
 # Returns group info and intensity values for each feature group
 as.data.table(fGroups, average = TRUE) # average intensities for replicates
+
+# As above, but with extra suspect screening information
+# (select some columns to simplify the output below)
+as.data.table(fGroupsSusp, average = TRUE, collapseSuspects = NULL,
+              onlyHits = TRUE)[1:3, c("group", "name", "suspCompRank", "annSimBoth", "estIDLevel")]
 
 # Returns all peak lists for each feature group
 as.data.table(mslists)
@@ -117,7 +123,7 @@ annotatedPeakList(compounds, index = 1, groupName = "M120_R328_81",
                   MSPeakLists = mslists, formulas = formulas) # include formula annotations
 ```
 
-## Filtering
+## Filtering {#filtering}
 
 During a non-target workflow it is not uncommon that some kind of data-cleanup is necessary. Datasets are often highly complex, which makes separating data of interest from the rest highly important. Furthermore, general cleanup typically improves the quality of the dataset, for instance by removing low scoring annotation results or features that are unlikely to be 'correct' (e.g. noise or present in blanks). For this reason `patRoon` supports _many_ different filters that easily clean data produced during the workflow in a highly customizable way.
 
@@ -200,6 +206,35 @@ fGroups <- filter(fGroups, relMinReplicates = 0.2)
 fGroups <- filter(fGroups, rGroups = c("repl1", "repl2"))
 ```
 
+### Suspect screening
+
+Several additional filters are available for feature groups obtained with `screenSuspects()`:
+
+
+Filter                                    | Classes                  | Remarks
+----------------------------------------- | ------------------------ | ---------------------------------------------------------
+`onlyHits`                                | `featureGroupsScreening` | Only retain feature groups assigned to one or more suspects.
+`selectHitsBy`                            | `featureGroupsScreening` | Select the feature group that matches best with a suspect (in case there are multiple).
+`selectBestFGroups`                       | `featureGroupsScreening` | Select the suspect that matches best with a feature group (in case there are multiple).
+`maxLevel`, `maxFormRank`, `maxCompRank`  | `featureGroupsScreening` | Only retain suspect hits with identification/annotation ranks below a threshold.
+`minAnnSimForm`, `minAnnSimComp`, `minAnnSimBoth` | `featureGroupsScreening` | Remove suspect hits with annotation similarity scores below this value.
+`absMinFragMatches`, `relMinFragMatches`  | `featureGroupsScreening` | Only keep suspect hits with a minimum (relative) number of fragment matches from the suspect list.
+
+> **NOTE**: most filters only remove suspect hit results. Set `onlyHits=TRUE` to also remove any feature groups that end up without suspect hits.
+
+The `selectHitsBy` and `selectBestFGroups` filters are useful to remove duplicate hits (one suspect assigned to multiple feature groups or multiple feature groups assigned to the same suspect, respectively). The former selects based on either best identification level (`selectHitsBy="level"`) or highest mean intensity (`selectHitsBy="intensity"`). The `selectBestFGroups` can only be `TRUE`/`FALSE` and always selects by best identification level.
+
+Some examples are shown below.
+
+```{r filtSusp,eval=FALSE}
+# only keep feature groups assigned to at least one suspect
+fGroupsSusp <- filter(fGroupsSusp, onlyHits = TRUE)
+# remove duplicate suspect to feature group matches and keep the best
+fGroupsSusp <- filter(fGroupsSusp, selectHitsBy = "level")
+# remove suspect hits with ID levels >3 and make sure no feature groups
+# are present without suspect hits afterwards
+fGroupsSusp <- filter(fGroupsSusp, maxLevel = 3, onlyHits = TRUE)
+```
 
 ### Annotation
 
@@ -210,7 +245,7 @@ Filter                                        | Classes                        |
 `absMSIntThr`, `absMSMSIntThr`, `relMSIntThr`, `relMSMSIntThr` | `MSPeakLists` | Minimum intensity of mass peaks
 `topMSPeaks`, `topMSMSPeaks`                  | `MSPeakLists`                  | Only keep most intense mass peaks
 `withMSMS`                                    | `MSPeakLists`                  | Only keep results with MS/MS data
-`minExplainedPeaks`                           | `formulas` / `compounds`       | Minimum number of annotated mass peaks
+`minExplainedPeaks`                           | `formulas`, `compounds`        | Minimum number of annotated mass peaks
 `elements`, `fragElements`, `lossElements`    | `formulas`, `compounds`        | Restrain elemental composition
 `topMost`                                     | `formulas`, `compounds`        | Only keep highest ranked candidates 
 `minScore`, `minFragScore`, `minFormulaScore` | `compounds`                    | Minimum compound scorings
@@ -302,6 +337,9 @@ fGroups <- filter(fGroups, rGroups = c("repl1", "repl2"), negate = TRUE)
 # only retain features with a mass defect outside 0.8-0.9
 fGroups <- filter(mzDefectRange = c(0.8, 0.9), negate = TRUE)
 
+# remove duplicate suspect hits and only keep the _worst_ hit
+fGroupsSusp <- filter(fGroupsSusp, selectHitsBy = "level", negate = TRUE)
+
 # remove candidates with CO2 neutral loss
 formulas <- filter(formulas, lossElements = "CO2", negate = TRUE)
 
@@ -378,6 +416,15 @@ components[c("CMP1", "CMP5")]
 # only retain feature groups in components for which compound annotations are
 # available
 components[, groupNames(compounds)]
+```
+
+In addition, feature groups can also be subset by given replicate groups (similar to `filter()`). Similarly, suspect screening results can also be subset by given suspect names.
+
+```{r subsetRGSusp,eval=FALSE}
+# equal as filter(fGroups, rGroups = ...)
+fGroups[, rGroups = c("repl1", "repl2")]
+# only keep feature groups assigned to given suspects
+fGroupsSusp[, suspects = c("1H-benzotriazole", "2-quinolol")]
 ```
 
 ### Prioritization workflow
@@ -513,13 +560,13 @@ plot(fGroups) # simple scatter plot of retention and m/z values
 plotChroms(fGroups) # plot EICs for all features
 # get overview of all feature groups
 plotChroms(fGroups,
-         colourBy = "fGroup", # unique colour for each group
-         topMost = 1, # only most intense feature in each group
-         showPeakArea = TRUE, # show integrated areas
-         showFGroupRect = FALSE,
-         showLegend = FALSE) # no legend (too busy for many feature groups)
+           colourBy = "fGroup", # unique colour for each group
+           topMost = 1, # only most intense feature in each group
+           showPeakArea = TRUE, # show integrated areas
+           showFGroupRect = FALSE,
+           showLegend = FALSE) # no legend (too busy for many feature groups)
 plotChroms(fGroups[, 1], # only plot all features of first group
-         colourBy = "rGroup") # and mark them individually per replicate group
+           colourBy = "rGroup") # and mark them individually per replicate group
 plotChroms(components, index = 7, fGroups = fGroups) # EICs from a component
 
 

@@ -52,7 +52,6 @@
     - suspect lists
         - InChIKey, fragments_* columns
         - name verification
-        
     - reportHTML(): highlight multiple rows, select columns & scrollbar for annotation table
 - update docs, handbook & NEWS
     - new plotVenn list functionality

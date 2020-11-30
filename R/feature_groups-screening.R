@@ -678,7 +678,7 @@ setMethod("screenSuspects", "featureGroups", function(fGroups, suspects, rtWindo
 numericIDLevel <- function(level)
 {
     checkmate::assertCharacter(level, any.missing = FALSE, min.chars = 1)
-    return(as.integer(gsub("[[:alpha:]]*", "", l)))
+    return(as.integer(gsub("[[:alpha:]]*", "", level)))
 }
 
 #' @details \code{genIDLevelRulesFile} Generates a template YAML file that is

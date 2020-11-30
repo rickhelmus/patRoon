@@ -202,7 +202,7 @@ test_that("Negated screen filters", {
     expect_true(all(is.na(screenInfo(filter(fGroupsAnnFrag, relMinFragMatches = 1, negate = TRUE))$maxFragMatches)))
 })
 
-fGroupsEmpty <- groupFeatures(findFeatures(getTestAnaInfo(), "openms", noiseThrInt = 1E9, logPath = NULL), "openms")
+fGroupsEmpty <- groupFeatures(findFeatures(getTestAnaInfo(), "openms", noiseThrInt = 1E9), "openms")
 suspsEmpty <- data.table(name = "doesnotexist", mz = 1E5)
 fGroupsScrEmpty <- screenSuspects(fGroups, suspsEmpty, adduct = "[M+H]+")
 

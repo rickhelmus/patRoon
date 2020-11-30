@@ -19,8 +19,6 @@
     - newProject()
         - also allow suspect annotation with only peak lists? currently only selectable if formulas/compounds selected
     - annotateSuspects()
-        - rename to annotate()? is a function (but not generic) from ggplot2 and RAMClustR and method from CAMERA, so probably no conflicts
-            - OTOH, it's pretty clear now it only concerns suspects
         - check why it's is sometimes slow
             - seems to be logging, disable by default? --> only slow with testthat?
     - filter():
@@ -36,6 +34,7 @@
     - update version number
     - prepareSuspectList(): export?
         - mainly to allow merging of lists, perhaps make util for that instead? Would also be handy for MF databases
+            - could also fix column names, replace "-" with NAs etc
         - if yes, mention in ref docs for screenSuspects()
     - better name for selectBestFGroups filter?
     - deprecated groupFeaturesScreening function

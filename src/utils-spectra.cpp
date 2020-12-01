@@ -140,28 +140,53 @@ Rcpp::List loadEICs(Rcpp::List spectra, Rcpp::List rtRanges, Rcpp::List mzRanges
 }
 
 // [[Rcpp::export]]
-Rcpp::List makeSAFDInput(Rcpp::List spectra)
+Rcpp::List makeSAFDInput(Rcpp::List spectra, Rcpp::NumericVector mzRange)
 {
+    const Rcpp::DataFrame specHeader = Rcpp::as<Rcpp::DataFrame>(spectra["header"]);
+    const Rcpp::NumericVector hdMSLevels = specHeader["msLevel"];
+    const Rcpp::NumericVector hdSeqNums = specHeader["seqNum"];
     const Rcpp::List specList = spectra["spectra"];
-    const int rows = specList.size();
+    const double minMZ = mzRange[0], maxMZ = mzRange[1];
+    
     int cols = 0;
-    
-    for (int i=0; i<rows; ++i)
-        cols = std::max(cols, (Rcpp::as<Rcpp::NumericMatrix>(specList[i])).nrow());
-    
-    Rcpp::NumericMatrix mzs(rows, cols), ints(rows, cols);
-    for (int i=0; i<rows; ++i)
+    std::vector<int> specInds;
+    for (int i=0; i<hdMSLevels.size(); ++i)
     {
-        Rcpp::NumericMatrix::Row mzRow = mzs(i, Rcpp::_), intRow = ints(i, Rcpp::_);
-        Rcpp::NumericMatrix spec = Rcpp::as<Rcpp::NumericMatrix>(specList[i]);
-        mzs(i, Rcpp::_) = spec(Rcpp::_, 0);
-        ints(i, Rcpp::_) = spec(Rcpp::_, 1);
-        /*for (int j=0; j<spec.size(); ++j)
+        if (hdMSLevels[i] != 1)
+            continue;
+        
+        specInds.push_back(hdSeqNums[i]);
+        
+        int c = 0;
+        const Rcpp::NumericMatrix spec = Rcpp::as<Rcpp::NumericMatrix>(specList[i]);
+        for (int j=0; j<spec.nrow(); ++j)
         {
-            mzRow[i] = spec["mz"][i];
-            intRow[i] = spec["intensity"][i];
-        }*/
+            if (numberGTE(spec(j, 0), minMZ, 1E-8) && numberLTE(spec(j, 0), maxMZ, 1E-8) &&
+                spec(j, 1) != 0)
+                ++c;
+        }
+        cols = std::max(cols, c);
     }
     
-    return Rcpp::List::create(Rcpp::Named("mzM") = mzs, Rcpp::Named("intM") = ints);
+    Rcpp::NumericMatrix mzM(specInds.size(), cols), intM(specInds.size(), cols);
+    Rcpp::Rcout << "creating " << specInds.size() << "x" << cols << " matrix\n";
+    for (int i=0; i<specInds.size(); ++i)
+    {
+        Rcpp::NumericMatrix spec = Rcpp::as<Rcpp::NumericMatrix>(specList[specInds[i] - 1]);
+        Rcpp::NumericVector mzs = spec(Rcpp::_, 0), ints = spec(Rcpp::_, 1);
+        
+        int ind = 0;
+        for (int j=0; j<spec.nrow(); ++j)
+        {
+            if (numberGTE(mzs[j], minMZ, 1E-8) && numberLTE(mzs[j], maxMZ, 1E-8) &&
+                ints[j] != 0)
+            {
+                mzM(i, ind) = mzs[j];
+                intM(i, ind) = ints[j];
+                ++ind;
+            }
+        }
+    }
+    
+    return Rcpp::List::create(Rcpp::Named("mzM") = mzM, Rcpp::Named("intM") = intM);
 }

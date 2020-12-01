@@ -206,6 +206,11 @@ screening. This table will be amended with annotation data when
 \code{annotateSuspects} is run.}
 }}
 
+\note{
+\code{filter} removes suspect hits with \code{NA} values when any of
+  the filters related to minimum or maximum values are applied (unless
+  \code{negate=TRUE}).
+}
 \section{Suspect annotation}{
  The \code{annotateSuspects} method is used to
   annotate suspects after \code{\link{screenSuspects}} was used to collect

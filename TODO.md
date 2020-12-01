@@ -22,7 +22,6 @@
         - check why it's is sometimes slow
             - seems to be logging, disable by default? --> only slow with testthat?
     - filter():
-        - keep or remove NA values with colFilter()? document what happens
         - cache?
     - don't assign level <1 if suspect is a target? or give the choice (or make filter?)
     - spec similarity:

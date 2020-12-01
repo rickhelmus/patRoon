@@ -455,6 +455,10 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
 #' @return \code{filter} returns a filtered \code{featureGroupsScreening}
 #'   object.
 #'
+#' @note \code{filter} removes suspect hits with \code{NA} values when any of
+#'   the filters related to minimum or maximum values are applied (unless
+#'   \code{negate=TRUE}).
+#'
 #' @export
 setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = NULL,
                                                        selectHitsBy = NULL, selectBestFGroups = FALSE,

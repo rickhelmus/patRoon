@@ -95,7 +95,9 @@ setMethod("initialize", "MSPeakLists", function(.Object, ...)
 {
     .Object <- callNextMethod(.Object, ...)
 
-    .Object@averagedPeakLists <- averageMSPeakLists(.Object)
+    # average if not already done (eg unset objects may do themselves)
+    if (length(.Object@averagedPeakLists) == 0)
+        .Object@averagedPeakLists <- averageMSPeakLists(.Object)
     .Object@peakLists <- makeEmptyListNamed(.Object@peakLists)
     .Object@averagedPeakLists <- makeEmptyListNamed(.Object@averagedPeakLists)
     
@@ -471,7 +473,7 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
     # update group averaged peak lists
     obj@averagedPeakLists <- averageMSPeakLists(obj)
 
-    # and filter it as well...
+    # and filter them as well...
     printf("Filtering averaged MS peak lists for %d feature groups...\n", length(obj@averagedPeakLists))
     obj@averagedPeakLists <- doFilterGroups(obj@averagedPeakLists)
     

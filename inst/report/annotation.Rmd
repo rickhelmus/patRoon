@@ -334,8 +334,19 @@ compoundsDT <- rbindlist(lapply(compFGroups, function(grp)
 
     ct <- compTable[[grp]]
     
-    infoTexts <- sapply(seq_len(nrow(ct)),
-                        function(compi) paste0(getCompInfoList(ct, compi, TRUE, mn), collapse = "<br>"))
+    infoTexts <- sapply(seq_len(nrow(ct)), function(compi)
+    {
+        it <- paste0(getCompInfoList(ct, compi, TRUE, mn), collapse = "<br>")
+        if (isSusp)
+        {
+            # insert suspect names (if any)
+            tbl <- as.data.table(rmdVars$fGroups, collapseSuspects = NULL)[group == grp]
+            if (!is.null(tbl[["suspCompRank"]]) && any(tbl$suspCompRank == compi, na.rm = TRUE))
+                it <- paste(paste("<strong>Suspect(s):</strong>", paste0(tbl[suspCompRank == compi]$name, collapse = ", ")),
+                             it, sep = "<br>")
+        }
+        return(it)
+    })
     infoTexts <- sprintf("<div style='max-width: 300px; max-height: 432px; border: 1px solid black; border-style: dotted; margin: 1px; padding: 1px; overflow: auto; white-space: nowrap; }'>%s</div>", infoTexts)
     
     fiTables <- sapply(seq_len(nrow(ct)), function(compi)
@@ -382,9 +393,20 @@ formulasDT <- rbindlist(lapply(formFGroups, function(grp)
     grpi <- which(plotGroups == grp)
     precursors <- unique(rmdVars$formulas[[grp]][["formula"]])
     
-    infoTexts <- sapply(precursors,
-                        function(prec) paste0(getFormInfoList(rmdVars$formulas[[grp]], prec, useHTML = TRUE),
-                                                              collapse = "<br>"))
+    infoTexts <- sapply(seq_along(precursors), function(preci)
+    {
+        it <- paste0(getFormInfoList(rmdVars$formulas[[grp]], precursors[preci], useHTML = TRUE),
+                     collapse = "<br>")
+        if (isSusp)
+        {
+            # insert suspect names (if any)
+            tbl <- as.data.table(rmdVars$fGroups, collapseSuspects = NULL)[group == grp]
+            if (!is.null(tbl[["suspFormRank"]]) && any(tbl$suspFormRank == preci, na.rm = TRUE))
+                it <- paste(paste("<strong>Suspect(s):</strong>", paste0(tbl[suspFormRank == preci]$name, collapse = ", ")),
+                             it, sep = "<br>")
+        }
+        return(it)
+    })
     infoTexts <- sprintf("<div style='max-width: 300px; max-height: 432px; border: 1px solid black; border-style: dotted; margin: 1px; padding: 1px; overflow: auto; white-space: nowrap; }'>%s</div>", infoTexts)
     
     fiTables <- sapply(precursors, function(prec)

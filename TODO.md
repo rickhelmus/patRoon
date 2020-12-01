@@ -36,8 +36,7 @@
     - better name for selectBestFGroups filter?
     - prepareSuspectList: handle empty names
 - expand reporting
-    - eg marking which candidate corresponds to suspect and include suspect name in EICs
-        - mark with different row colour and label?
+    - eg marking include suspect name in EICs
     - mention suspect similarities/ranks etc for candidates (or somehow in compounds?)
     - optionally report with collapsed suspects
 - NEWS

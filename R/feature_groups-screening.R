@@ -69,8 +69,8 @@ NULL
 #'   level, roughly following that of \insertCite{Schymanski2014}{patRoon}.
 #'   However, please note that this value is only an estimation, and manual
 #'   interpretation is still necessary to assign final identification levels.
-#'   The estimation is done through a set of rules, see the
-#'   \verb{Identification level rules} section below.
+#'   The estimation is done through a set of rules, see the \verb{Identification
+#'   level rules} section below.
 #'
 #'   }
 #'
@@ -120,11 +120,10 @@ NULL
 #' @templateVar class featureGroupsScreening
 #' @template class-hierarchy
 #'
-#' @references \insertAllCited{}
+#' @references \insertAllCited{} \cr \cr
+#'   \insertRef{Stein1994}{patRoon}
 #'
 #' @seealso \code{\link{featureGroups}}
-#' 
-#' @author Rick Helmus \email{r.helmus@@uva.nl}, Emma Schymanski \email{emma.schymanski@@uni.lu}
 #'
 #' @export
 featureGroupsScreening <- setClass("featureGroupsScreening",
@@ -250,6 +249,14 @@ setMethod("as.data.table", "featureGroupsScreening",
 #'
 #' @return \code{annotateSuspects} returns a \code{featureGroupsScreening}
 #'   object amended with annotation data.
+#'
+#' @author Rick Helmus <\email{r.helmus@@uva.nl}>, Emma Schymanski
+#'   <\email{emma.schymanski@@uni.lu}> (contributions to identification level
+#'   rules), Bas van de Velde (contributions to spectral similarity
+#'   calculation).
+#'
+#' @section Source: Cosine spectral similarity calculation was based on the code
+#'   from \code{\link{OrgMassSpecR::SpectrumSimilarity()}}.
 #'
 #' @aliases annotateSuspects
 #' @export

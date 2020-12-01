@@ -251,8 +251,8 @@ screening. This table will be amended with annotation data when
   level, roughly following that of \insertCite{Schymanski2014}{patRoon}.
   However, please note that this value is only an estimation, and manual
   interpretation is still necessary to assign final identification levels.
-  The estimation is done through a set of rules, see the
-  \verb{Identification level rules} section below.
+  The estimation is done through a set of rules, see the \verb{Identification
+  level rules} section below.
 
   }
 }
@@ -342,12 +342,21 @@ screening. This table will be amended with annotation data when
  \itemize{   \item{\code{\link{featureGroups}}}   \itemize{     \item{\strong{\code{\link{featureGroupsScreening}}}}   } }
 }
 
+\section{Source}{
+ Cosine spectral similarity calculation was based on the code
+  from \code{\link{OrgMassSpecR::SpectrumSimilarity()}}.
+}
+
 \references{
-\insertAllCited{}
+\insertAllCited{} \cr \cr
+  \insertRef{Stein1994}{patRoon}
 }
 \seealso{
 \code{\link{featureGroups}}
 }
 \author{
-Rick Helmus \email{r.helmus@uva.nl}, Emma Schymanski \email{emma.schymanski@uni.lu}
+Rick Helmus <\email{r.helmus@uva.nl}>, Emma Schymanski
+  <\email{emma.schymanski@uni.lu}> (contributions to identification level
+  rules), Bas van de Velde (contributions to spectral similarity
+  calculation).
 }

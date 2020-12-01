@@ -155,8 +155,8 @@ setMethod("getEICsForFGroups", "featureGroups", function(fGroups, rtWindow, mzEx
 setMethod("getEICsForFGroups", "featureGroupsSet", function(fGroups, rtWindow, mzExpWindow, topMost, topMostByRGroup,
                                                             onlyPresent)
 {
-    ionizedFGroupsList <- sapply(sets(fGroups), ionize, obj = fGroups, simplify = FALSE)
-    EICList <- sapply(ionizedFGroupsList, getEICsForFGroups, rtWindow = rtWindow, mzExpWindow = mzExpWindow,
+    unsetFGroupsList <- sapply(sets(fGroups), unset, obj = fGroups, simplify = FALSE)
+    EICList <- sapply(unsetFGroupsList, getEICsForFGroups, rtWindow = rtWindow, mzExpWindow = mzExpWindow,
                       topMost = topMost, topMostByRGroup = topMostByRGroup, onlyPresent = onlyPresent, simplify = FALSE)
     EICs <- unlist(EICList, recursive = FALSE, use.names = FALSE) # use.names gives combined set/ana name, we just want ana
     names(EICs) <- unlist(lapply(EICList, names))

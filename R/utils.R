@@ -534,8 +534,8 @@ assertAndGetMSPLSetsArgs <- function(fGroupsSet, MSPeakListsSet)
     if (length(sd) > 0)
         stop(paste("The following sets in fGroups are missing in MSPeakLists:"), paste0(sd, collapse = ", "))
     
-    ionizedMSPeaksList <- lapply(sets(MSPeakListsSet), ionize, obj = MSPeakListsSet)
-    return(lapply(ionizedMSPeaksList, function(x) list(MSPeakLists = x)))
+    unsetMSPeaksList <- lapply(sets(MSPeakListsSet), unset, obj = MSPeakListsSet)
+    return(lapply(unsetMSPeaksList, function(x) list(MSPeakLists = x)))
 }
 
 ReduceWithArgs <- function(f, x, ..., fixedArgs = list())

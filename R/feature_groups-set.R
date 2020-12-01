@@ -52,14 +52,14 @@ setMethod("[[", c("featureGroupsSet", "ANY", "ANY"), function(x, i, j, sets = NU
     return(callNextMethod(x, i, j))
 })
 
-# UNDONE: mention that object will be ionized
+# UNDONE: mention that object will be unset
 #' @describeIn featureGroupsSet Exports feature groups to a \file{.csv} file that
 #'   is readable to Bruker ProfileAnalysis (a 'bucket table'), Bruker TASQ (an
 #'   analyte database) or that is suitable as input for the \verb{Targeted peak
 #'   detection} functionality of \href{http://mzmine.github.io/}{MZmine}.
 #' @param out The destination file for the exported data.
 #' @export
-setMethod("export", "featureGroupsSet", function(obj, type, out, sets = NULL) callNextMethod(ionize(obj, sets), type, out))
+setMethod("export", "featureGroupsSet", function(obj, type, out, sets = NULL) callNextMethod(unset(obj, sets), type, out))
 
 #' @describeIn featureGroupsSet Obtain a summary table (a \code{\link{data.table}})
 #'   with retention, \emph{m/z}, intensity and optionally other feature data.
@@ -93,7 +93,7 @@ setMethod("as.data.table", "featureGroupsSet", function(x, average = FALSE, area
 
     anaInfo <- analysisInfo(x) # get before ionizing    
     if (!neutralized)
-        x <- ionize(x)
+        x <- unset(x)
     
     # NOTE: we normalize hereafter per set afterwards
     ret <- callNextMethod(x, average = average, areas = areas, features = features,
@@ -189,8 +189,8 @@ setMethod("groupFeatures", "featuresSet", function(feat, algorithm, ..., verbose
                             algorithm = makeSetAlgorithm(list(fGroups))))
 })
 
-featureGroupsSetIonized <- setClass("featureGroupsSetIonized", contains = "featureGroups")
-setMethod("ionize", "featureGroupsSet", function(obj, sets)
+featureGroupsUnset <- setClass("featureGroupsUnset", contains = "featureGroups")
+setMethod("unset", "featureGroupsSet", function(obj, sets)
 {
     # UNDONE: mention that group names remain the same and thus represent neutral masses
     
@@ -203,7 +203,7 @@ setMethod("ionize", "featureGroupsSet", function(obj, sets)
     gInfo <- groupInfo(obj)
     gInfo$mzs <- gInfo$mzs + addMZ
     
-    return(featureGroupsSetIonized(groups = groups(obj), groupInfo = gInfo, analysisInfo = analysisInfo(obj),
-                                   features = ionize(getFeatures(obj)), ftindex = groupFeatIndex(obj),
-                                   algorithm = paste0(algorithm(obj), "_ionized")))
+    return(featureGroupsUnset(groups = groups(obj), groupInfo = gInfo, analysisInfo = analysisInfo(obj),
+                              features = unset(getFeatures(obj)), ftindex = groupFeatIndex(obj),
+                              algorithm = paste0(algorithm(obj), "_unset")))
 })

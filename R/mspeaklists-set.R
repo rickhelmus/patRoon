@@ -237,28 +237,28 @@ setMethod("plotSpec", "MSPeakListsSet", function(obj, groupName, analysis = NULL
 
 generateMSPeakListsSet <- function(fGroupsSet, generator, ...)
 {
-    # ionize all fGroups sets, calculate MS peak lists for each set and store in setObjects
-    # store combined ionized results in peakLists
+    # unset all fGroups sets, calculate MS peak lists for each set and store in setObjects
+    # store combined setObject results in peakLists
     # store merged averaged peak lists in averagedPeakLists
     
-    ionizedFGroupsList <- sapply(sets(fGroupsSet), ionize, obj = fGroupsSet, simplify = FALSE)
-    ionizedMSPeakLists <- sapply(ionizedFGroupsList, generator, ..., simplify = FALSE)
+    unsetFGroupsList <- sapply(sets(fGroupsSet), unset, obj = fGroupsSet, simplify = FALSE)
+    setObjects <- sapply(unsetFGroupsList, generator, ..., simplify = FALSE)
     
     # combine non averaged (per analysis) MSPeakLists
-    combPL <- Reduce(modifyList, lapply(ionizedMSPeakLists, peakLists))
+    combPL <- Reduce(modifyList, lapply(setObjects, peakLists))
 
     # UNDONE: set metadata?
-    ret <- MSPeakListsSet(adducts = adducts(fGroupsSet), setObjects = ionizedMSPeakLists,
+    ret <- MSPeakListsSet(adducts = adducts(fGroupsSet), setObjects = setObjects,
                           analysisInfo = analysisInfo(fGroupsSet),
                           peakLists = combPL, metadata = list(),
                           origFGNames = names(fGroupsSet),
-                          algorithm = makeSetAlgorithm(ionizedMSPeakLists))
+                          algorithm = makeSetAlgorithm(setObjects))
     
     return(ret)
 }
 
-MSPeakListsSetIonized <- setClass("MSPeakListsSetIonized", contains = "MSPeakLists")
-setMethod("ionize", "MSPeakListsSet", function(obj, sets)
+MSPeakListsUnset <- setClass("MSPeakListsUnset", contains = "MSPeakLists")
+setMethod("unset", "MSPeakListsSet", function(obj, sets)
 {
     if (!is.null(sets) && length(sets) > 0)
         obj <- obj[, sets = sets]
@@ -266,7 +266,7 @@ setMethod("ionize", "MSPeakListsSet", function(obj, sets)
     assertEqualAdducts(adducts(obj))
     
     avArgs <- if (length(obj@setObjects) > 0) obj@setObjects[[1]]@avgPeakListArgs else list()
-    return(MSPeakListsSetIonized(peakLists = obj@peakLists, metadata = list(), avgPeakListArgs = avArgs,
-                                 origFGNames = obj@origFGNames, algorithm = paste0(algorithm(obj), "_ionized")))
+    return(MSPeakListsUnset(peakLists = obj@peakLists, metadata = list(), avgPeakListArgs = avArgs,
+                            origFGNames = obj@origFGNames, algorithm = paste0(algorithm(obj), "_unset")))
 })
 

@@ -92,7 +92,7 @@ setGeneric("plotHeatMap", function(obj, ...) standardGeneric("plotHeatMap"))
 setGeneric("setObjects", function(obj) standardGeneric("setObjects"))
 setGeneric("sets", function(obj) standardGeneric("sets"))
 setGeneric("adducts", function(obj) standardGeneric("adducts"))
-setGeneric("ionize", function(obj, sets = NULL) standardGeneric("ionize"))
+setGeneric("unset", function(obj, sets = NULL) standardGeneric("unset"))
 
 ### suspect screening
 

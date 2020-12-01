@@ -133,27 +133,27 @@ generateFormulasSet <- function(fGroupsSet, generator, ..., setArgs, setThreshol
     
     # UNDONE: mention that adduct argument is automatically set
 
-    ionizedFGroupsList <- sapply(sets(fGroupsSet), ionize, obj = fGroupsSet, simplify = FALSE)
-    ionizedFormulasList <- mapply(ionizedFGroupsList, adducts(fGroupsSet), setArgs,
-                                  FUN = function(fg, a, sa) do.call(generator, c(list(fGroups = fg, adduct = a, ...), sa)),
-                                  SIMPLIFY = FALSE)
+    unsetFGroupsList <- sapply(sets(fGroupsSet), unset, obj = fGroupsSet, simplify = FALSE)
+    setObjects <- mapply(unsetFGroupsList, adducts(fGroupsSet), setArgs,
+                         FUN = function(fg, a, sa) do.call(generator, c(list(fGroups = fg, adduct = a, ...), sa)),
+                         SIMPLIFY = FALSE)
     
-    combFormulas <- Reduce(modifyList, lapply(ionizedFormulasList, formulaTable, features = TRUE))
+    combFormulas <- Reduce(modifyList, lapply(setObjects, formulaTable, features = TRUE))
     
-    groupFormsList <- sapply(ionizedFormulasList, formulaTable, features = FALSE, simplify = FALSE)
+    groupFormsList <- sapply(setObjects, formulaTable, features = FALSE, simplify = FALSE)
     groupForms <- generateGroupFormulasByConsensus(groupFormsList, setThreshold, names(fGroupsSet),
                                                    "set", "setCoverage")
     
-    ret <- formulasSet(adducts = adducts(fGroupsSet), setObjects = ionizedFormulasList,
+    ret <- formulasSet(adducts = adducts(fGroupsSet), setObjects = setObjects,
                        origFGNames = names(fGroupsSet), setThreshold = setThreshold,
                        formulas = groupForms, featureFormulas = combFormulas,
-                       algorithm = makeSetAlgorithm(ionizedFormulasList))
+                       algorithm = makeSetAlgorithm(setObjects))
     
     return(ret)
 }
 
-formulasSetIonized <- setClass("formulasSetIonized", contains = "formulas")
-setMethod("ionize", "formulasSet", function(obj, sets)
+formulasUnset <- setClass("formulasUnset", contains = "formulas")
+setMethod("unset", "formulasSet", function(obj, sets)
 {
     if (!is.null(sets) && length(sets) > 0)
         obj <- obj[, sets = sets]
@@ -163,6 +163,6 @@ setMethod("ionize", "formulasSet", function(obj, sets)
     groupForms <- lapply(formulaTable(obj), copy)
     groupForms <- lapply(groupForms, set, j = c("set", "setCoverage"), value = NULL)
     
-    return(formulasSetIonized(formulas = groupForms, featureFormulas = formulaTable(obj, features = TRUE),
-                              algorithm = paste0(algorithm(obj), "_ionized")))
+    return(formulasUnset(formulas = groupForms, featureFormulas = formulaTable(obj, features = TRUE),
+                         algorithm = paste0(algorithm(obj), "_unset")))
 })

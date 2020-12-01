@@ -96,3 +96,18 @@ generateComponentsSet <- function(fGroupsSet, generator, ...)
                          algorithm = makeSetAlgorithm(setObjects)))
 }
 
+
+componentsUnset <- setClass("componentsUnset", contains = "components")
+setMethod("unset", "componentsSet", function(obj, sets)
+{
+    # UNDONE: does this function always makes sense with >1 sets?
+    
+    if (!is.null(sets) && length(sets) > 0)
+        obj <- obj[, sets = sets]
+    
+    assertEqualAdducts(adducts(obj))
+    
+    return(componentsUnset(components = componentTable(obj), componentInfo = componentInfo(obj),
+                           algorithm = paste0(algorithm(obj), "_unset")))
+})
+

@@ -26,7 +26,6 @@
     - don't assign level <1 if suspect is a target? or give the choice (or make filter?)
     - spec similarity:
         - port from TPs someday
-        - clarify that intensity filter happens after filtering precursor (make this optional?)
 - misc
     - update version number
     - prepareSuspectList(): export?

@@ -250,6 +250,12 @@ setMethod("as.data.table", "featureGroupsScreening",
 #' @return \code{annotateSuspects} returns a \code{featureGroupsScreening}
 #'   object amended with annotation data.
 #'
+#' @note The \code{relMinMSMSIntensity} filter argument to
+#'   \code{annotateSuspects} is applied \emph{after} removing the precursor ion
+#'   from the peak lists (if present). Thus, intensity scales may be different
+#'   when this filter is applied when the most abundant peak resulted from the
+#'   precursor ion.
+#'
 #' @author Rick Helmus <\email{r.helmus@@uva.nl}>, Emma Schymanski
 #'   <\email{emma.schymanski@@uni.lu}> (contributions to identification level
 #'   rules), Bas van de Velde (contributions to spectral similarity

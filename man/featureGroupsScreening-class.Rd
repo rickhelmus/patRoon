@@ -207,6 +207,12 @@ screening. This table will be amended with annotation data when
 }}
 
 \note{
+The \code{relMinMSMSIntensity} filter argument to
+  \code{annotateSuspects} is applied \emph{after} removing the precursor ion
+  from the peak lists (if present). Thus, intensity scales may be different
+  when this filter is applied when the most abundant peak resulted from the
+  precursor ion.
+
 \code{filter} removes suspect hits with \code{NA} values when any of
   the filters related to minimum or maximum values are applied (unless
   \code{negate=TRUE}).

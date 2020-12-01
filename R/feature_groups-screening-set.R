@@ -120,13 +120,13 @@ setMethod("annotateSuspects", "featureGroupsScreeningSet", function(fGroups, MSP
            c("MSPeakListsSet", "formulasSet", "compoundsSet"), null.ok = TRUE, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
     
-    ionOrNULL <- function(o) if (is.null(o)) rep(list(NULL), length(sets(fGroups))) else lapply(sets(fGroups), ionize, obj = o)
+    unsetOrNULL <- function(o) if (is.null(o)) rep(list(NULL), length(sets(fGroups))) else lapply(sets(fGroups), unset, obj = o)
     
-    ionizedMSPeakLists <- ionOrNULL(MSPeakLists)
-    ionizedFormulas <- ionOrNULL(formulas)
-    ionizedCompounds <- ionOrNULL(compounds)
+    unsetMSPeakLists <- unsetOrNULL(MSPeakLists)
+    unsetFormulas <- unsetOrNULL(formulas)
+    unsetCompounds <- unsetOrNULL(compounds)
     
-    fGroups@setObjects <- mapply(setObjects(fGroups), ionizedMSPeakLists, ionizedFormulas, ionizedCompounds,
+    fGroups@setObjects <- mapply(setObjects(fGroups), unsetMSPeakLists, unsetFormulas, unsetCompounds,
                                  FUN = annotateSuspects, MoreArgs = list(...), SIMPLIFY = FALSE)
     
     return(syncScreeningSetObjects(fGroups))
@@ -177,12 +177,12 @@ setMethod("screenSuspects", "featureGroupsSet", function(fGroups, suspects, rtWi
     # sync order
     suspects <- suspects[sets(fGroups)]
     
-    ionizedFGroupsList <- sapply(sets(fGroups), ionize, obj = fGroups, simplify = FALSE)
-    ionizedFGScr <- mapply(ionizedFGroupsList, suspects, adducts(fGroups), SIMPLIFY = FALSE,
-                           FUN = function(fg, s, a) screenSuspects(fg, s, rtWindow, mzWindow, a,
-                                                                    skipInvalid, onlyHits))
+    unsetFGroupsList <- sapply(sets(fGroups), unset, obj = fGroups, simplify = FALSE)
+    setObjects <- mapply(unsetFGroupsList, suspects, adducts(fGroups), SIMPLIFY = FALSE,
+                         FUN = function(fg, s, a) screenSuspects(fg, s, rtWindow, mzWindow, a,
+                                                                 skipInvalid, onlyHits))
     
-    return(featureGroupsScreeningSet(screenInfo = mergeScreeningSetInfos(ionizedFGScr), setObjects = ionizedFGScr,
+    return(featureGroupsScreeningSet(screenInfo = mergeScreeningSetInfos(setObjects), setObjects = setObjects,
                                      groups = copy(groups(fGroups)), analysisInfo = analysisInfo(fGroups),
                                      groupInfo = groupInfo(fGroups), features = getFeatures(fGroups),
                                      ftindex = copy(groupFeatIndex(fGroups))))
@@ -191,7 +191,7 @@ setMethod("screenSuspects", "featureGroupsSet", function(fGroups, suspects, rtWi
 
 featureGroupsSetScreeningIonized <- setClass("featureGroupsSetScreeningIonized",
                                              contains = "featureGroupsScreening")
-setMethod("ionize", "featureGroupsScreeningSet", function(obj, sets)
+setMethod("unset", "featureGroupsScreeningSet", function(obj, sets)
 {
     iobj <- callNextMethod()
     
@@ -204,6 +204,6 @@ setMethod("ionize", "featureGroupsScreeningSet", function(obj, sets)
                                             features = getFeatures(iobj), ftindex = groupFeatIndex(iobj))
     # override after constructing: parent constructor already sets algorithm,
     # which results in error about double assignment
-    ret@algorithm <- paste0(algorithm(obj), "_ionized")
+    ret@algorithm <- paste0(algorithm(obj), "_unset")
     return(ret)
 })

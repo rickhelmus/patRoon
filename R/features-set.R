@@ -204,8 +204,8 @@ fSetNotYetImplemented <- function() stop("This function is not yet implemented f
 setMethod("getXCMSSet", "featuresSet", function(obj, verbose) fSetNotYetImplemented())
 setMethod("getXCMSnExp", "featuresSet", function(obj, verbose) fSetNotYetImplemented())
 
-featuresSetIonized <- setClass("featuresSetIonized", contains = "features")
-setMethod("ionize", "featuresSet", function(obj, sets)
+featuresUnset <- setClass("featuresUnset", contains = "features")
+setMethod("unset", "featuresSet", function(obj, sets)
 {
     assertSets(obj, sets)
     
@@ -214,6 +214,6 @@ setMethod("ionize", "featuresSet", function(obj, sets)
 
     assertEqualAdducts(adducts(obj))
     
-    return(featuresSetIonized(features = obj@ionizedFeatures, analysisInfo = analysisInfo(obj),
-                              algorithm = paste0(algorithm(obj), "_ionized")))
+    return(featuresUnset(features = obj@ionizedFeatures, analysisInfo = analysisInfo(obj),
+                         algorithm = paste0(algorithm(obj), "_unset")))
 })

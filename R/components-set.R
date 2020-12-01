@@ -84,15 +84,15 @@ generateComponentsSet <- function(fGroupsSet, generator, ...)
 {
     posneg <- function(add) if (add@charge < 0) "negative" else "positive"
     
-    ionizedFGroupsList <- sapply(sets(fGroupsSet), ionize, obj = fGroupsSet, simplify = FALSE)
-    ionizedComponentsList <- mapply(ionizedFGroupsList, adducts(fGroupsSet),
-                                    FUN = function(fg, a) do.call(generator, list(fGroups = fg, ionization = posneg(a), ...)),
-                                    SIMPLIFY = FALSE)
+    unsetFGroupsList <- sapply(sets(fGroupsSet), unset, obj = fGroupsSet, simplify = FALSE)
+    setObjects <- mapply(unsetFGroupsList, adducts(fGroupsSet),
+                         FUN = function(fg, a) do.call(generator, list(fGroups = fg, ionization = posneg(a), ...)),
+                         SIMPLIFY = FALSE)
     
-    mcmp <- mergeComponents(ionizedComponentsList, sets(fGroupsSet), "set")
+    mcmp <- mergeComponents(setObjects, sets(fGroupsSet), "set")
     
-    return(componentsSet(adducts = adducts(fGroupsSet), setObjects = ionizedComponentsList,
+    return(componentsSet(adducts = adducts(fGroupsSet), setObjects = setObjects,
                          components = mcmp$components, componentInfo = mcmp$componentInfo,
-                         algorithm = makeSetAlgorithm(ionizedComponentsList)))
+                         algorithm = makeSetAlgorithm(setObjects)))
 }
 

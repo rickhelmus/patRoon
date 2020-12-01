@@ -217,18 +217,18 @@ generateCompoundsSet <- function(fGroupsSet, MSPeakListsSet, generator, ..., set
     checkmate::assertNumber(setThreshold, lower = 0, finite = TRUE)
     msplArgs <- assertAndGetMSPLSetsArgs(fGroupsSet, MSPeakListsSet)
     
-    ionizedFGroupsList <- sapply(sets(fGroupsSet), ionize, obj = fGroupsSet, simplify = FALSE)
-    ionizedCompoundsList <- mapply(ionizedFGroupsList, msplArgs, adducts(fGroupsSet),
-                                   FUN = function(fg, mspl, a) generator(fGroups = fg, MSPeakLists = mspl[[1]], adduct = a, ...),
-                                   SIMPLIFY = FALSE)
+    unsetFGroupsList <- sapply(sets(fGroupsSet), unset, obj = fGroupsSet, simplify = FALSE)
+    setObjects <- mapply(unsetFGroupsList, msplArgs, adducts(fGroupsSet),
+                         FUN = function(fg, mspl, a) generator(fGroups = fg, MSPeakLists = mspl[[1]], adduct = a, ...),
+                         SIMPLIFY = FALSE)
     
     # update fragInfos
-    for (s in names(ionizedCompoundsList))
+    for (s in names(setObjects))
     {
-        for (fg in groupNames(ionizedCompoundsList[[s]]))
+        for (fg in groupNames(setObjects[[s]]))
         {
             pl <- copy(MSPeakListsSet[[fg]][["MSMS"]]); pl[, PLIndex := seq_len(.N)]; pl <- pl[set == s]
-            ct <- ionizedCompoundsList[[s]]@compounds[[fg]]
+            ct <- setObjects[[s]]@compounds[[fg]]
             ct[, fragInfo := lapply(fragInfo, function(fi)
             {
                 fi <- copy(fi) # BUG: avoid warning that somehow was incorrectly copied (invalid .internal.selfref)
@@ -242,17 +242,17 @@ generateCompoundsSet <- function(fGroupsSet, MSPeakListsSet, generator, ..., set
                 fi[, set := s]
                 return(fi)
             })]
-            ionizedCompoundsList[[s]]@compounds[[fg]] <- ct            
+            setObjects[[s]]@compounds[[fg]] <- ct            
         }
     }
     
-    cons <- makeCompoundsSetConsensus(ionizedCompoundsList, names(fGroupsSet), setThreshold)
+    cons <- makeCompoundsSetConsensus(setObjects, names(fGroupsSet), setThreshold)
 
-    scTypes <- if (length(ionizedCompoundsList) > 0) ionizedCompoundsList[[1]]@scoreTypes else character()
+    scTypes <- if (length(setObjects) > 0) setObjects[[1]]@scoreTypes else character()
     scRanges <- list()
-    if (length(ionizedCompoundsList) > 0)
+    if (length(setObjects) > 0)
     {
-        scRanges <- Reduce(x = lapply(ionizedCompoundsList, slot, "scoreRanges"), f = function(left, right)
+        scRanges <- Reduce(x = lapply(setObjects, slot, "scoreRanges"), f = function(left, right)
         {
             # change ranges for overlap
             groupsLR <- intersect(names(left), names(right))
@@ -277,17 +277,17 @@ generateCompoundsSet <- function(fGroupsSet, MSPeakListsSet, generator, ..., set
         # --> scRanges may have more groups than the compound table!
     }    
     
-    ret <- compoundsSet(adducts = adducts(fGroupsSet), setObjects = ionizedCompoundsList,
+    ret <- compoundsSet(adducts = adducts(fGroupsSet), setObjects = setObjects,
                         setThreshold = setThreshold, origFGNames = names(fGroupsSet),
                         compounds = cons, scoreTypes = scTypes, scoreRanges = scRanges,
-                        algorithm = makeSetAlgorithm(ionizedCompoundsList))
+                        algorithm = makeSetAlgorithm(setObjects))
     
     return(ret)
 }
 
 
-compoundsSetIonized <- setClass("compoundsSetIonized", contains = "compounds")
-setMethod("ionize", "compoundsSet", function(obj, sets)
+compoundsUnset <- setClass("compoundsUnset", contains = "compounds")
+setMethod("unset", "compoundsSet", function(obj, sets)
 {
     if (!is.null(sets) && length(sets) > 0)
         obj <- obj[, sets = sets]
@@ -297,6 +297,6 @@ setMethod("ionize", "compoundsSet", function(obj, sets)
     cList <- lapply(compoundTable(obj), copy)
     cList <- lapply(cList, set, j = c("set", "setCoverage"), value = NULL)
     
-    return(compoundsSetIonized(compounds = cList, scoreTypes = obj@scoreTypes, scoreRanges = obj@scoreRanges,
-                               algorithm = paste0(algorithm(obj), "_ionized")))
+    return(compoundsUnset(compounds = cList, scoreTypes = obj@scoreTypes, scoreRanges = obj@scoreRanges,
+                          algorithm = paste0(algorithm(obj), "_unset")))
 })

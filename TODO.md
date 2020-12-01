@@ -55,9 +55,7 @@
     - if keep, be consistent with all classes
     - currently: featureTable(), as.data.table() (features, fGroups, MSPL), filter() (all?), export(), ionize(), peakList(), averagedPeakLists(), [[ (fGroups, makes no sense?), plotSpec (MSPL), 
 - as.data.table() for formulas: average=T will now produce strange averaged ionized formula, for now simply remove this column.. also give a note in docs? or maybe only remove is not all adducts are equal?
-- ionize()
-    - more descriptive messages what's going on with all the avaraging of MSPeakLists
-        - this seems to be related to ionize(), which averages new objects and probably not something to be wanted (unless >1 sets requested)
+- unset()
     - for setThreshold: number of annotated results may increase again, fix? OR is this maybe the reason to keep
         - or just remove results in setObjects too, but can't apply lower threshold later if this functionality is implemented
 - test DA algorithms

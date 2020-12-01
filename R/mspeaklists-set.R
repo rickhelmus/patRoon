@@ -109,7 +109,7 @@ setMethod("averagedPeakLists", "MSPeakListsSet", function(obj, sets = NULL)
 #' @param reAverage Set to \code{TRUE} to regenerate averaged MS peak lists
 #'   after subsetting analyses.
 #' @export
-setMethod("[", c("MSPeakListsSet", "ANY", "ANY", "missing"), function(x, i, j, ..., reAverage = TRUE,
+setMethod("[", c("MSPeakListsSet", "ANY", "ANY", "missing"), function(x, i, j, ..., reAverage = FALSE,
                                                                       sets = NULL, drop = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
@@ -118,7 +118,7 @@ setMethod("[", c("MSPeakListsSet", "ANY", "ANY", "missing"), function(x, i, j, .
     checkmate::reportAssertions(ac)
 
     # NOTE: reAverage is ignored here, as syncMSPeakListsSetObjects() should
-    # always be called and averaging for MSPeaksList actually only concerns
+    # always be called and averaging for MSPeaksListSet actually only concerns
     # merging
 
     if (!is.null(sets) && length(sets) > 0)
@@ -266,7 +266,15 @@ setMethod("unset", "MSPeakListsSet", function(obj, sets)
     assertEqualAdducts(adducts(obj))
     
     avArgs <- if (length(obj@setObjects) > 0) obj@setObjects[[1]]@avgPeakListArgs else list()
-    return(MSPeakListsUnset(peakLists = obj@peakLists, metadata = list(), avgPeakListArgs = avArgs,
+    
+    # only re-average if >1 sets, otherwise just copy the setObject
+    if (length(obj@setObjects) > 1)
+        return(MSPeakListsUnset(peakLists = obj@peakLists, metadata = list(), avgPeakListArgs = avArgs,
+                                origFGNames = obj@origFGNames, algorithm = paste0(algorithm(obj), "_unset")))
+    
+    return(MSPeakListsUnset(peakLists = obj@setObjects[[1]]@peakLists,
+                            averagedPeakLists = averagedPeakLists(obj@setObjects[[1]]),
+                            metadata = list(), avgPeakListArgs = avArgs,
                             origFGNames = obj@origFGNames, algorithm = paste0(algorithm(obj), "_unset")))
 })
 

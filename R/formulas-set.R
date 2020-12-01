@@ -3,16 +3,29 @@
 #' @include workflow-step-set.R
 NULL
 
-syncFormulasSetObjects <- function(formulasSet)
+syncFormulasSetObjects <- function(formulasSet, makeCons)
 {
     # re-generate
     formulasSet@featureFormulas <- Reduce(modifyList, lapply(formulasSet@setObjects, formulaTable, features = TRUE))
-    groupFormsList <- sapply(formulasSet@setObjects, formulaTable, features = FALSE, simplify = FALSE)
-    formulasSet@formulas <- generateGroupFormulasByConsensus(groupFormsList, formulasSet@setThreshold,
-                                                             formulasSet@origFGNames, "set", "setCoverage")
-
+    
+    if (makeCons)
+    {
+        groupFormsList <- sapply(formulasSet@setObjects, formulaTable, features = FALSE, simplify = FALSE)
+        formulasSet@formulas <- generateGroupFormulasByConsensus(groupFormsList, formulasSet@setThreshold,
+                                                                 formulasSet@origFGNames, "set", "setCoverage")
+    }
+    else
+    {
+        # sync available feature groups
+        allFGroups <- unique(sapply(setObjects(formulasSet), groupNames))
+        formulasSet@formulas <- formulasSet@formulas[intersect(formulasSet@origFGNames, allFGroups)]
+        
+        # only keep results from sets still present
+        formulasSet@formulas <- lapply(formulasSet@formulas, function(ft) ft[set %in% sets(formulasSet)])
+    }
+    
     formulasSet@scoreRanges <- formulasSet@scoreRanges[groupNames(formulasSet)]
-    formulasSet@adducts <- formulasSet@adducts[names(formulasSet@setObjects)]
+    formulasSet@adducts <- formulasSet@adducts[sets(formulasSet)]
     
     return(formulasSet)
 }
@@ -44,7 +57,7 @@ setMethod("[", c("formulasSet", "ANY", "missing", "missing"), function(x, i, j, 
     }
 
     if (!is.null(sets) || !missing(i))
-        x <- syncFormulasSetObjects(x)
+        x <- syncFormulasSetObjects(x, FALSE)
     
     return(x)
 })
@@ -81,7 +94,7 @@ setMethod("filter", "formulasSet", function(obj, ..., negate = FALSE, sets = NUL
         
         # synchronize other objects
         cat("Synchronizing set objects...\n")
-        obj <- syncFormulasSetObjects(obj)
+        obj <- syncFormulasSetObjects(obj, TRUE)
         cat("Done!\n")
     }
     

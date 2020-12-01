@@ -55,9 +55,6 @@
     - if keep, be consistent with all classes
     - currently: featureTable(), as.data.table() (features, fGroups, MSPL), filter() (all?), export(), ionize(), peakList(), averagedPeakLists(), [[ (fGroups, makes no sense?), plotSpec (MSPL), 
 - as.data.table() for formulas: average=T will now produce strange averaged ionized formula, for now simply remove this column.. also give a note in docs? or maybe only remove is not all adducts are equal?
-- unset()
-    - for setThreshold: number of annotated results may increase again, fix? OR is this maybe the reason to keep
-        - or just remove results in setObjects too, but can't apply lower threshold later if this functionality is implemented
 - test DA algorithms
 - check if more has to be cached (eg merged results from sets)
 - compoundsSetMF sub-class (for settings slot)? or is access via setObjects sufficient? may need to explain anyway for other cases like intclust components
@@ -89,11 +86,15 @@
     - [..., reAverage = FALSE] and implications of filtering when setting it to TRUE
 - docs
     - mention that setObjects are _not_ filtered by setThreshold for formulas/compounds
-        - mention that new consensus for formulas/compounds is made after filtering() --> this could mean really different results if subsetting on sets is done prior to filtering
+    - mention that new consensus for formulas/compounds is made after filter() and addFormulaScoring() --> this could mean really different results if subsetting on sets is done prior to filtering
+        - put message() in sync function?
     - mention that set coverage/formula feature coverage do not consider sets/analyses without any results into account for their calculation
+        - put message() in sync function?
 - way to easily get results present in all of given sets
     - add new filter()?
 - fix addFormulaScoring(): properly add formulaScoring and don't remake consensus
+    - should work now, verify
+    
 
 
 ## features

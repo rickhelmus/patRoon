@@ -66,6 +66,40 @@ makeCompoundsSetConsensus <- function(setObjects, origFGNames, setThreshold)
     return(cons)   
 }
 
+makeCompoundsSetScorings <- function(setObjects, origFGNames)
+{
+    scTypes <- character()
+    if (length(setObjects) > 0)
+        scTypes <- unique(unlist(lapply(setObjects, slot, "scoreTypes")))
+    
+    scRanges <- list()
+    if (length(setObjects) > 0)
+    {
+        scRanges <- Reduce(x = lapply(setObjects, slot, "scoreRanges"), f = function(left, right)
+        {
+            # change ranges for overlap
+            groupsLR <- intersect(names(left), names(right))
+            ret <- mapply(left[groupsLR], right[groupsLR], SIMPLIFY = FALSE, FUN = function(rangesL, rangesR)
+            {
+                scLR <- names(rangesL) # should be same for left/right
+                mapply(rangesL[scLR], rangesR[scLR], FUN = range, SIMPLIFY = FALSE)
+            })
+            
+            # add unique from left
+            groupsOnlyL <- setdiff(names(left), names(right))
+            ret[groupsOnlyL] <- left[groupsOnlyL]
+            
+            # add unique from right
+            groupsOnlyR <- setdiff(names(right), names(left))
+            ret[groupsOnlyR] <- right[groupsOnlyR]
+            
+            return(ret[intersect(origFGNames, names(ret))]) # order
+        })
+    }
+    
+    return(list(scTypes = scTypes, scRanges = scRanges))
+}
+
 syncCompoundsSetObjects <- function(compoundsSet, makeCons)
 {
     if (makeCons)
@@ -83,6 +117,11 @@ syncCompoundsSetObjects <- function(compoundsSet, makeCons)
     
     compoundsSet@scoreRanges <- compoundsSet@scoreRanges[groupNames(compoundsSet)]
     compoundsSet@adducts <- compoundsSet@adducts[names(compoundsSet@setObjects)]
+    
+    # update scoreTypes/scoreRanges
+    sc <- makeCompoundsSetScorings(setObjects(compoundsSet), compoundsSet@origFGNames)
+    compoundsSet@scoreTypes <- sc$scTypes
+    compoundsSet@scoreRanges <- sc$scRanges
     
     return(compoundsSet)
 }
@@ -215,10 +254,21 @@ setMethod("annotatedPeakList", "compoundsSet", function(obj, ...)
 setMethod("addFormulaScoring", "compoundsSet", function(compounds, formulas, updateScore,
                                                         formulaScoreWeight)
 {
-    compounds@setObjects <- lapply(compounds@setObjects, addFormulaScoring,
-                                   formulas = formulas, updateScore = updateScore,
-                                   formulaScoreWeight = formulaScoreWeight)
+    checkmate::assertClass(formulas, "formulasSet")
+    
+    setsInBoth <- intersect(sets(compounds), sets(formulas))
+    setsInComps <- sets(compounds)
+    if (length(setsInBoth) < length(setsInComps))
+        warning(paste("Following sets not present in formulas:",
+                      paste0(setdiff(setsInComps, setsInBoth), collapse = ", ")))
+    
+    unsetFormulas <- sapply(setsInBoth, unset, obj = formulas, simplify = FALSE)
+    compounds@setObjects[setsInBoth] <- mapply(setObjects(compounds)[setsInBoth], unsetFormulas,
+                                               FUN = addFormulaScoring, SIMPLIFY = FALSE,
+                                               MoreArgs = list(updateScore = updateScore,
+                                                               formulaScoreWeight = formulaScoreWeight))
     compounds <- syncCompoundsSetObjects(compounds, TRUE)
+    
     return(compounds)
 })
 
@@ -257,39 +307,11 @@ generateCompoundsSet <- function(fGroupsSet, MSPeakListsSet, generator, ..., set
     }
     
     cons <- makeCompoundsSetConsensus(setObjects, names(fGroupsSet), setThreshold)
-
-    scTypes <- if (length(setObjects) > 0) setObjects[[1]]@scoreTypes else character()
-    scRanges <- list()
-    if (length(setObjects) > 0)
-    {
-        scRanges <- Reduce(x = lapply(setObjects, slot, "scoreRanges"), f = function(left, right)
-        {
-            # change ranges for overlap
-            groupsLR <- intersect(names(left), names(right))
-            ret <- mapply(left[groupsLR], right[groupsLR], SIMPLIFY = FALSE, FUN = function(rangesL, rangesR)
-            {
-                scLR <- names(rangesL) # should be same for left/right
-                mapply(rangesL[scLR], rangesR[scLR], FUN = range, SIMPLIFY = FALSE)
-            })
-            
-            # add unique from left
-            groupsOnlyL <- setdiff(names(left), names(right))
-            ret[groupsOnlyL] <- left[groupsOnlyL]
-            
-            # add unique from right
-            groupsOnlyR <- setdiff(names(right), names(left))
-            ret[groupsOnlyR] <- right[groupsOnlyR]
-            
-            return(ret[intersect(names(fGroupsSet), names(ret))]) # order
-        })
-        
-        # some group results might have been filtered when making the set consensus
-        # --> scRanges may have more groups than the compound table!
-    }    
+    sc <- makeCompoundsSetScorings(setObjects, names(fGroupsSet))
     
     ret <- compoundsSet(adducts = adducts(fGroupsSet), setObjects = setObjects,
                         setThreshold = setThreshold, origFGNames = names(fGroupsSet),
-                        compounds = cons, scoreTypes = scTypes, scoreRanges = scRanges,
+                        compounds = cons, scoreTypes = sc$scTypes, scoreRanges = sc$scRanges,
                         algorithm = makeSetAlgorithm(setObjects))
     
     return(ret)

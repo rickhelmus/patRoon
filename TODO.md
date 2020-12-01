@@ -29,7 +29,6 @@
         - port from TPs someday
         - clarify that intensity filter happens after filtering precursor (make this optional?)
         - add proper refs
-    - remove NA annotation cols after subsetting?
 - misc
     - update version number
     - prepareSuspectList(): export?
@@ -37,7 +36,6 @@
             - could also fix column names, replace "-" with NAs etc
         - if yes, mention in ref docs for screenSuspects()
     - better name for selectBestFGroups filter?
-    - deprecated groupFeaturesScreening function
     - prepareSuspectList: handle empty names
 - expand reporting
     - eg marking which candidate corresponds to suspect and include suspect name in EICs
@@ -56,8 +54,8 @@
 - update docs, handbook & NEWS
     - new plotVenn list functionality
     - update TASQ docs and other mentions to old suspect screening interface
-    - update examples where suspect name is used for subsetting
     - mention that components should be done prior to onlyHits=T?
+    - default ID level rules (ref and/or handbook)
 - tests
     - automatic InChIKey/formula calculation from InChIs/SMILES
         - already done implicitly?

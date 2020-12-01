@@ -87,6 +87,14 @@
     --> verify if OK
 - NEWS
     - [..., reAverage = FALSE] and implications of filtering when setting it to TRUE
+- docs
+    - mention that setObjects are _not_ filtered by setThreshold for formulas/compounds
+        - mention that new consensus for formulas/compounds is made after filtering() --> this could mean really different results if subsetting on sets is done prior to filtering
+    - mention that set coverage/formula feature coverage do not consider sets/analyses without any results into account for their calculation
+- way to easily get results present in all of given sets
+    - add new filter()?
+- fix addFormulaScoring(): properly add formulaScoring and don't remake consensus
+
 
 ## features
 - feature optim:

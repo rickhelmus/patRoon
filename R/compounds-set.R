@@ -66,11 +66,21 @@ makeCompoundsSetConsensus <- function(setObjects, origFGNames, setThreshold)
     return(cons)   
 }
 
-syncCompoundsSetObjects <- function(compoundsSet)
+syncCompoundsSetObjects <- function(compoundsSet, makeCons)
 {
-    # re-generate
-    compoundsSet@compounds <- makeCompoundsSetConsensus(compoundsSet@setObjects, compoundsSet@origFGNames,
-                                                        compoundsSet@setThreshold)
+    if (makeCons)
+        compoundsSet@compounds <- makeCompoundsSetConsensus(compoundsSet@setObjects, compoundsSet@origFGNames,
+                                                            compoundsSet@setThreshold)
+    else
+    {
+        # sync available feature groups
+        allFGroups <- unique(sapply(setObjects(compoundsSet), groupNames))
+        compoundsSet@compounds <- compoundsSet@compounds[intersect(compoundsSet@origFGNames, allFGroups)]
+        
+        # only keep results from sets still present
+        compoundsSet@compounds <- lapply(compoundsSet@compounds, function(ft) ft[set %in% sets(compoundsSet)])
+    }
+    
     compoundsSet@scoreRanges <- compoundsSet@scoreRanges[groupNames(compoundsSet)]
     compoundsSet@adducts <- compoundsSet@adducts[names(compoundsSet@setObjects)]
     
@@ -103,7 +113,7 @@ setMethod("[", c("compoundsSet", "ANY", "missing", "missing"), function(x, i, j,
     }
     
     if (!is.null(sets) || !missing(i))
-        x <- syncCompoundsSetObjects(x)
+        x <- syncCompoundsSetObjects(x, FALSE)
     
     return(x)
 })
@@ -132,7 +142,7 @@ setMethod("filter", "compoundsSet", function(obj, ..., negate = FALSE, sets = NU
         
         # synchronize other objects
         cat("Synchronizing set objects...\n")
-        obj <- syncCompoundsSetObjects(obj)
+        obj <- syncCompoundsSetObjects(obj, TRUE)
         cat("Done!\n")
     }
     
@@ -208,7 +218,7 @@ setMethod("addFormulaScoring", "compoundsSet", function(compounds, formulas, upd
     compounds@setObjects <- lapply(compounds@setObjects, addFormulaScoring,
                                    formulas = formulas, updateScore = updateScore,
                                    formulaScoreWeight = formulaScoreWeight)
-    compounds <- syncCompoundsSetObjects(compounds)
+    compounds <- syncCompoundsSetObjects(compounds, TRUE)
     return(compounds)
 })
 

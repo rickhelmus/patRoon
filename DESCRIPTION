@@ -178,6 +178,7 @@ Collate:
     'features-optimize-openms.R'
     'features-optimize-xcms.R'
     'features-optimize-xcms3.R'
+    'features-safd.R'
     'features-tasq.R'
     'features-xcms.R'
     'features-xcms3.R'

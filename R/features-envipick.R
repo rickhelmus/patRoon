@@ -20,7 +20,10 @@ setMethod("initialize", "featuresEnviPick",
 #' @export
 findFeaturesEnviPick <- function(analysisInfo, ..., verbose = TRUE)
 {
+    ac <- checkmate::makeAssertCollection()
     analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, "mzXML")
+    checkmate::assertFlag(verbose, add = ac)
+    checkmate::reportAssertions(ac)
 
     anaCount <- nrow(analysisInfo)
     ret <- featuresEnviPick(analysisInfo = analysisInfo)

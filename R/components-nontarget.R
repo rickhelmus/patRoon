@@ -1,5 +1,6 @@
 #' @include main.R
 #' @include components.R
+#' @include components-set.R
 #' @include feature_groups-set.R
 NULL
 
@@ -21,9 +22,6 @@ NULL
 #'
 #' @export
 componentsNT <- setClass("componentsNT", slots = c(homol = "list"), contains = "components")
-
-setMethod("initialize", "componentsNT",
-          function(.Object, ...) callNextMethod(.Object, ..., algorithm = "nontarget"))
 
 #' @describeIn componentsNT Plots an interactive network graph for linked
 #'   homologous series (\emph{i.e.} series with (partial) overlap which could
@@ -221,7 +219,7 @@ setMethod("generateComponentsNontarget", "featureGroups", function(fGroups, ioni
     }), fill = TRUE)
 
     if (nrow(compTab) == 0)
-        return(components(componentInfo = data.table(), components = list(), algorithm = "nontarget"))
+        return(componentsNT(componentInfo = data.table(), components = list(), algorithm = "nontarget"))
 
     # check which series should be linked
     compTab[, links := list(list(integer()))]
@@ -364,7 +362,8 @@ setMethod("generateComponentsNontarget", "featureGroups", function(fGroups, ioni
     # after subsetting
     cInfo[, links := lapply(links, function(l) cNames[l])]
 
-    ret <- componentsNT(homol = homList, componentInfo = cInfo, components = comps)
+    ret <- componentsNT(homol = homList, componentInfo = cInfo, components = comps,
+                        algorithm = "nontarget")
     saveCacheData("componentsNontarget", ret, hash)
 
     return(ret)
@@ -372,6 +371,7 @@ setMethod("generateComponentsNontarget", "featureGroups", function(fGroups, ioni
 
 setMethod("generateComponentsNontarget", "featureGroupsSet", function(fGroups, ...)
 {
-    generateComponentsSet(fGroups, generateComponentsNontarget, ...)
+    return(generateComponentsSet(fGroups, generateComponentsNontarget, ...,
+                                 classGenerator = componentsNTSet))
 })
 

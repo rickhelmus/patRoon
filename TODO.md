@@ -189,9 +189,7 @@
 
 ## components
 - RC: check spearmans correlation
-- NT
-    - minimum size argument, combine rows for multiple rGroups?
-    - update rt range reported after merging series
+- NT: minimum size argument, combine rows for multiple rGroups?
 
 
 ## reporting

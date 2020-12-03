@@ -319,6 +319,8 @@ generateCompoundsSet <- function(fGroupsSet, MSPeakListsSet, generator, ..., set
 compoundsUnset <- setClass("compoundsUnset", contains = "compounds")
 setMethod("unset", "compoundsSet", function(obj, sets)
 {
+    assertSets(obj, sets)
+    
     if (!is.null(sets) && length(sets) > 0)
         obj <- obj[, sets = sets]
     

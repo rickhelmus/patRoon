@@ -168,6 +168,8 @@ generateFormulasSet <- function(fGroupsSet, generator, ..., setArgs, setThreshol
 formulasUnset <- setClass("formulasUnset", contains = "formulas")
 setMethod("unset", "formulasSet", function(obj, sets)
 {
+    assertSets(obj, sets)
+    
     if (!is.null(sets) && length(sets) > 0)
         obj <- obj[, sets = sets]
     

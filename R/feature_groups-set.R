@@ -179,6 +179,8 @@ setMethod("groupFeatures", "featuresSet", function(feat, algorithm, ..., verbose
 featureGroupsUnset <- setClass("featureGroupsUnset", contains = "featureGroups")
 setMethod("unset", "featureGroupsSet", function(obj, sets)
 {
+    assertSets(obj, sets)
+    
     # UNDONE: mention that group names remain the same and thus represent neutral masses
     
     if (!is.null(sets) && length(sets) > 0)

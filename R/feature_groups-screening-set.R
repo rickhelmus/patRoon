@@ -206,6 +206,8 @@ featureGroupsSetScreeningIonized <- setClass("featureGroupsSetScreeningIonized",
                                              contains = "featureGroupsScreening")
 setMethod("unset", "featureGroupsScreeningSet", function(obj, sets)
 {
+    assertSets(obj, sets)
+    
     iobj <- callNextMethod()
     
     if (!is.null(sets))

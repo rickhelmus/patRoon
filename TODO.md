@@ -39,6 +39,7 @@
 - timeouts for SIRIUS?
 - do something about negative H explained fragments by MF?
 - SusDat MF support
+- defunct compoundViewer
 
 
 ## formulas

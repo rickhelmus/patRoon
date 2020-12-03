@@ -33,15 +33,9 @@ setMethod("show", "featuresSet", function(object)
 #'   \code{\link{data.table}} for each analysis with feature data
 #'
 #' @export
-setMethod("featureTable", "featuresSet", function(obj, neutralized = TRUE, sets = NULL)
+setMethod("featureTable", "featuresSet", function(obj, neutralized = TRUE)
 {
-    ac <- checkmate::makeAssertCollection()
-    checkmate::assertFlag(neutralized, add = ac)
-    assertSets(obj, sets, add = ac)
-    checkmate::reportAssertions(ac)
-
-    if (!is.null(sets) && length(sets) > 0)
-        obj <- obj[, sets = sets]
+    checkmate::assertFlag(neutralized)
     
     if (neutralized)
         return(callNextMethod(obj))
@@ -52,15 +46,9 @@ setMethod("featureTable", "featuresSet", function(obj, neutralized = TRUE, sets 
 
 #' @describeIn featuresSet Returns all feature data in a table.
 #' @export
-setMethod("as.data.table", "featuresSet", function(x, neutralized = TRUE, sets = NULL)
+setMethod("as.data.table", "featuresSet", function(x, neutralized = TRUE)
 {
-    ac <- checkmate::makeAssertCollection()
-    checkmate::assertFlag(neutralized, add = ac)
-    assertSets(x, sets, add = ac)
-    checkmate::reportAssertions(ac)
-    
-    if (!is.null(sets) && length(sets) > 0)
-        x <- x[, sets = sets]
+    checkmate::assertFlag(neutralized)
     
     if (neutralized)
     {

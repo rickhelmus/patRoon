@@ -3,8 +3,19 @@ NULL
 
 SAFDMPFinishHandler <- function(cmd)
 {
+    results <- fread(file.path(cmd$outPath, paste0(cmd$fileName, "_report.csv")))
+    setnames(results,
+             c("Nr", "Rt", "MeasMass", "MinMass", "MaxMass", "Area", "Int",
+               "FeatPurity", "MediRes"),
+             c("ID", "ret", "mz", "mzmin", "mzmax", "area", "intensity",
+               "purity", "mediRes"))
+    results[, ret := ret * 60] # min --> sec
     # UNDONE
-    fread(file.path(cmd$outPath, cmd$fileName))
+    results[, retmin := ret - (SecInPeak / 2)]
+    results[, retmax := ret + (SecInPeak / 2)]
+    results[, c("SecInPeak", "ScanNum", "ScanInPeak") := NULL]
+    
+    return(results[])
 }
 
 #' @rdname features-class
@@ -18,7 +29,8 @@ makeSAFDCommand <- function(inPath, outPath, fileName, mzRange, maxNumbIter, max
                             minMSW, RThreshold, minInt, sigIncThreshold, S2N, minPeakWS)
 {
     # UNDONE: check if julia exists? allow to configure path?
-    return(list(command = "julia", args = c(inPath, outPath, fileName, mzRange[1], mzRange[2],
+    return(list(command = "julia", args = c(system.file("misc", "runSAFD.jl", package = "patRoon"),
+                                            inPath, outPath, fileName, mzRange[1], mzRange[2],
                                             maxNumbIter, maxTPeakW, resolution,
                                             minMSW, RThreshold, minInt, sigIncThreshold, S2N,
                                             minPeakWS),

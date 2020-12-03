@@ -7,7 +7,7 @@
 #'   score will be \samp{0}). The original rankings for each object is stored in
 #'   the \code{rank} columns.
 #'
-#' @param rankWeights A numeric vector with weights of to calulcate the mean
+#' @param rankWeights A numeric vector with weights of to calculate the mean
 #'   ranking score for each candidate. The value will be re-cycled if necessary,
 #'   hence, the default value of \samp{1} means equal weights for all considered
 #'   objects.

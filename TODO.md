@@ -8,6 +8,7 @@
 
 ## docs
 - improve instructions for MF and SIRIUS installation?
+- ref docs and exports for getXCMSnSet
 
 
 ## features
@@ -48,7 +49,9 @@
 
 ## components
 - RC: check spearmans correlation
-- NT: minimum size argument, combine rows for multiple rGroups?
+- NT
+    - minimum size argument, combine rows for multiple rGroups?
+    - update rt range reported after merging series
 
 
 ## reporting

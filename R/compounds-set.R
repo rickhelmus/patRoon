@@ -309,12 +309,10 @@ generateCompoundsSet <- function(fGroupsSet, MSPeakListsSet, generator, ..., set
     cons <- makeCompoundsSetConsensus(setObjects, names(fGroupsSet), setThreshold)
     sc <- makeCompoundsSetScorings(setObjects, names(fGroupsSet))
     
-    ret <- compoundsSet(adducts = adducts(fGroupsSet), setObjects = setObjects,
+    return(compoundsSet(adducts = adducts(fGroupsSet), setObjects = setObjects,
                         setThreshold = setThreshold, origFGNames = names(fGroupsSet),
                         compounds = cons, scoreTypes = sc$scTypes, scoreRanges = sc$scRanges,
-                        algorithm = makeSetAlgorithm(setObjects))
-    
-    return(ret)
+                        algorithm = makeSetAlgorithm(setObjects)))
 }
 
 

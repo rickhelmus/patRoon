@@ -47,31 +47,38 @@
 
 
 ## sets
-- provide methods for non-implemented functionality (eg consensus)
-- find nice way to re-use docs
-- filter() for features/fGroups: support ionized masses for mass filters? or just clarify it doesn't.
-- handle/test empty objects
-- remove sets argument for some methods (as.data.table, accessors etc)?
-    - if keep, be consistent with all classes
-    - currently: featureTable(), as.data.table() (features, fGroups, MSPL), filter() (all?), export(), ionize(), peakList(), averagedPeakLists(), [[ (fGroups, makes no sense?), plotSpec (MSPL), 
-- as.data.table() for formulas: average=T will now produce strange averaged ionized formula, for now simply remove this column.. also give a note in docs? or maybe only remove is not all adducts are equal?
-- test DA algorithms
-- check if more has to be cached (eg merged results from sets)
-- compoundsSetMF sub-class (for settings slot)? or is access via setObjects sufficient? may need to explain anyway for other cases like intclust components
-- base set class
-    - don't use for fGroupsSet?
-- components
-    - neutralize masses? otherwise document
-        - yay: consistent with other set classes
-        - nay: might be a bit strange when looking for adducts etc and components are per set anyway
-    - intclust: return componentsSet? if not document somewhere...
-    - clearly mention that nontarget is done per set now
-    - nontarget-set: plotGraph method? and make sure it's used in reportHTML()
-- implement XCMS conversion functions? maybe with given set. Could just ionize() it.
-- setThreshold filter() argument, and remove argument from generators?
-- handle errors when object has <=1 set
-    - groupFeaturesScreening()
-    - mergeScreeningSetInfos()
+- methods to implement
+    - consensus / comparison()
+        - could first make consensus of setObjects and then make new set object from that
+        - for compounds (and formulas?) need proper way to average scorings
+        - or for later?
+    - implement XCMS conversion functions? maybe with given set. Could just ionize() it.
+    - more sub class specific methods
+        - nontarget-set: plotGraph method? and make sure it's used in reportHTML()
+        - compoundsSetMF sub-class (for settings slot)?
+    - provide methods for non-implemented functionality
+        - consensus()? (see above)
+        - compoundViewer?
+- misc
+    - filter() for features/fGroups: support ionized masses for mass filters? or just clarify it doesn't.
+    - as.data.table() for formulas: average=T will now produce strange averaged ionized formula, for now simply remove this column...
+        - also give a note in docs?
+        - or maybe only remove is not all adducts are equal?
+    - filter features, annotation results on minimum abundance amongst different setObjects
+        - (unlike setThreshold also take objects without results in to account)
+    - compound set consensus: scoreRanges should be re-determined from annotation results?
+    - handle errors when object has <=1 set
+        - groupFeaturesScreening()
+        - mergeScreeningSetInfos()
+    - fix empty MS(MS) peaklists if unavailable during merging sets
+        - already fixed?
+- merging setObjects: check if more has to be cached and may need status messages
+    - way to easily get results present in all of given sets
+    - add new filter()?
+- setThreshold
+    - filter() argument
+    - keep/change default setThreshold?
+        - or remove argument from generators?
 - suspect screening
     - handle suspect and fragment mz values somehow
         - should it be an unique column in mergeScreeningSetInfos()
@@ -79,22 +86,22 @@
     - implement TASQ?
     - consensus?
     - support recursive screening? or throw error otherwise
-- fix empty MS(MS) peaklists if unavailable during merging sets
 - use neutral_formula for annotated similarity calculation for formulas
     --> verify if OK
 - NEWS
     - [..., reAverage = FALSE] and implications of filtering when setting it to TRUE
 - docs
+    - CAMERA/RAMClustR/nontarget components: clearly mention it is simply a merge between sets
+    - intclust is not a componentsSet
+    - find nice way to re-use docs
     - mention that setObjects are _not_ filtered by setThreshold for formulas/compounds
     - mention that new consensus for formulas/compounds is made after filter() and addFormulaScoring() --> this could mean really different results if subsetting on sets is done prior to filtering
         - put message() in sync function?
     - mention that set coverage/formula feature coverage do not consider sets/analyses without any results into account for their calculation
         - put message() in sync function?
-- way to easily get results present in all of given sets
-    - add new filter()?
-- filter features, annotation results on minimum abundance amongst different setObjects (unlike setThreshold also take objects without results in to account)
-- compound set consensus: scoreRanges should be re-determined from annotation results?
-- keep/change default setThreshold?
+- tests
+    - handle/test empty objects
+    - test DA algorithms
     
 
 

@@ -213,6 +213,8 @@ generateMSPeakListsSet <- function(fGroupsSet, generator, ...)
 MSPeakListsUnset <- setClass("MSPeakListsUnset", contains = "MSPeakLists")
 setMethod("unset", "MSPeakListsSet", function(obj, sets)
 {
+    assertSets(obj, sets)
+    
     if (!is.null(sets) && length(sets) > 0)
         obj <- obj[, sets = sets]
     

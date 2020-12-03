@@ -161,7 +161,28 @@ setMethod("getEICsForFGroups", "featureGroupsSet", function(fGroups, rtWindow, m
     EICs <- unlist(EICList, recursive = FALSE, use.names = FALSE) # use.names gives combined set/ana name, we just want ana
     names(EICs) <- unlist(lapply(EICList, names))
     EICs <- EICs[intersect(analyses(fGroups), names(EICs))] # sync order
-    
+
+    if (!is.null(topMost))
+    {
+        # topMost is applied per set, make sure that the final result also
+        # doesn't contain >topMost results
+        
+        topMost <- min(topMost, nrow(analysisInfo(fGroups)))
+        gTable <- groups(fGroups)
+        gNames <- names(fGroups)
+        anas <- analyses(fGroups)
+        
+        for (fg in gNames)
+        {
+            oint <- order(-gTable[[fg]])
+            topAnalysesInd <- oint[seq_len(topMost)]
+            topAnalyses <- anas[topAnalysesInd]
+            # clearout any analysis results not being in topMost
+            otherAnas <- setdiff(anas, topAnalyses)
+            EICs[otherAnas] <- lapply(EICs[otherAnas], function(e) e[setdiff(names(e), fg)])
+        }
+    }
+
     return(EICs)
 })
 

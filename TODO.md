@@ -92,8 +92,9 @@
         - put message() in sync function?
 - way to easily get results present in all of given sets
     - add new filter()?
-- fix addFormulaScoring(): properly add formulaScoring and don't remake consensus
-    - should work now, verify
+- filter features, annotation results on minimum abundance amongst different setObjects (unlike setThreshold also take objects without results in to account)
+- compound set consensus: scoreRanges should be re-determined from annotation results?
+- keep/change default setThreshold?
     
 
 

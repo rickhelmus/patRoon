@@ -80,7 +80,7 @@ setMethod("filter", "componentsSet", function(obj, ..., negate = FALSE, sets = N
 })
 
 
-generateComponentsSet <- function(fGroupsSet, generator, ...)
+generateComponentsSet <- function(fGroupsSet, generator, ..., classGenerator = componentsSet)
 {
     posneg <- function(add) if (add@charge < 0) "negative" else "positive"
     
@@ -91,21 +91,24 @@ generateComponentsSet <- function(fGroupsSet, generator, ...)
     
     mcmp <- mergeComponents(setObjects, sets(fGroupsSet), "set")
     
-    return(componentsSet(adducts = adducts(fGroupsSet), setObjects = setObjects,
-                         components = mcmp$components, componentInfo = mcmp$componentInfo,
-                         algorithm = makeSetAlgorithm(setObjects)))
+    return(classGenerator(adducts = adducts(fGroupsSet), setObjects = setObjects,
+                          components = mcmp$components, componentInfo = mcmp$componentInfo,
+                          algorithm = makeSetAlgorithm(setObjects)))
 }
 
 
 componentsUnset <- setClass("componentsUnset", contains = "components")
 setMethod("unset", "componentsSet", function(obj, sets)
 {
-    # UNDONE: does this function always makes sense with >1 sets?
+    assertSets(obj, sets, FALSE)
     
-    if (!is.null(sets) && length(sets) > 0)
-        obj <- obj[, sets = sets]
+    # UNDONE: limitation?
+    if (length(sets) > 1)
+        stop("Please specify not more than one set")
     
-    assertEqualAdducts(adducts(obj))
+    obj <- obj[, sets = sets]
+    
+    # assertEqualAdducts(adducts(obj))
     
     return(componentsUnset(components = componentTable(obj), componentInfo = componentInfo(obj),
                            algorithm = paste0(algorithm(obj), "_unset")))

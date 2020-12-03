@@ -44,7 +44,7 @@ setMethod("[", c("featureGroupsSet", "ANY", "ANY", "missing"), function(x, i, j,
 #'   detection} functionality of \href{http://mzmine.github.io/}{MZmine}.
 #' @param out The destination file for the exported data.
 #' @export
-setMethod("export", "featureGroupsSet", function(obj, type, out, sets = NULL) callNextMethod(unset(obj, sets), type, out))
+setMethod("export", "featureGroupsSet", function(obj, type, out, sets = NULL) export(unset(obj, sets), type, out))
 
 #' @describeIn featureGroupsSet Obtain a summary table (a \code{\link{data.table}})
 #'   with retention, \emph{m/z}, intensity and optionally other feature data.

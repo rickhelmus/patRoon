@@ -20,7 +20,7 @@ setMethod("show", "featureGroupsSet", function(object)
 
 #' @describeIn featureGroupsSet Obtain feature information (see \code{\link{features}}).
 #' @export
-setMethod("featureTable", "featureGroupsSet", function(obj, neutralized = TRUE, set = NULL) featureTable(obj@features, neutralized, set))
+setMethod("featureTable", "featureGroupsSet", function(obj, neutralized = TRUE) featureTable(obj@features, neutralized = neutralized))
 
 #' @describeIn featureGroupsSet Subset on analyses/feature groups.
 #' @param rGroups An optional \code{character} vector: if specified only keep
@@ -35,21 +35,6 @@ setMethod("[", c("featureGroupsSet", "ANY", "ANY", "missing"), function(x, i, j,
         i <- mergeAnaSubsetArgWithSets(i, sets, analysisInfo(x))
 
     return(callNextMethod(x, i, j, ..., rGroups = rGroups))
-})
-
-#' @describeIn featureGroupsSet Extract intensity values.
-#' @export
-setMethod("[[", c("featureGroupsSet", "ANY", "ANY"), function(x, i, j, sets = NULL)
-{
-    ac <- checkmate::makeAssertCollection()
-    assertExtractArg(i, add = ac)
-    assertSets(x, sets, add = ac)
-    checkmate::reportAssertions(ac)
-
-    if (!is.null(sets) && length(sets) > 0)
-        i <- mergeAnaSubsetArgWithSets(i, sets, analysisInfo(x))
-    
-    return(callNextMethod(x, i, j))
 })
 
 # UNDONE: mention that object will be unset
@@ -78,19 +63,13 @@ setMethod("export", "featureGroupsSet", function(obj, type, out, sets = NULL) ca
 #' @export
 setMethod("as.data.table", "featureGroupsSet", function(x, average = FALSE, areas = FALSE, features = FALSE,
                                                         regression = FALSE, normFunc = NULL,
-                                                        neutralized = TRUE, sets = NULL)
+                                                        neutralized = TRUE)
 {
     # UNDONE: also support reporting ionized features with different adducts?
     # NOTE keep args in sync with featureGroupsScreeningSet
     
-    ac <- checkmate::makeAssertCollection()
-    aapply(checkmate::assertFlag, . ~ neutralized, fixed = list(add = ac))
-    assertSets(x, sets, add = ac)
-    checkmate::reportAssertions(ac)
+    checkmate::assertFlag(neutralized)
     
-    if (!is.null(sets) && length(sets) > 0)
-        x <- x[, sets = sets]
-
     anaInfo <- analysisInfo(x) # get before ionizing    
     if (!neutralized)
         x <- unset(x)

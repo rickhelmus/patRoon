@@ -136,8 +136,21 @@ setMethod("filter", "featureGroupsScreeningSet", function(obj, ..., onlyHits = N
                                                           selectHitsBy = NULL, selectBestFGroups = FALSE,
                                                           maxLevel = NULL, maxFormRank = NULL, maxCompRank = NULL,
                                                           minAnnSimForm = NULL, minAnnSimComp = NULL, minAnnSimBoth = NULL,
-                                                          absMinFragMatches = NULL, relMinFragMatches = NULL, negate = FALSE)
+                                                          absMinFragMatches = NULL, relMinFragMatches = NULL,
+                                                          sets = NULL, negate = FALSE)
 {
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertFlag(negate, add = ac)
+    assertSets(obj, sets, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    if (!is.null(sets) && length(sets) > 0)
+    {
+        if (negate)
+            sets <- setdiff(get("sets", pos = 2)(obj), sets)
+        obj <- obj[, sets = sets]
+    }
+    
     # filter functionality from fGroupsSet
     obj <- callNextMethod(obj, ..., negate = negate)
     obj <- syncScreeningSetObjects(obj)

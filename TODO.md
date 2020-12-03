@@ -52,7 +52,6 @@
         - could first make consensus of setObjects and then make new set object from that
         - for compounds (and formulas?) need proper way to average scorings
         - or for later?
-    - implement XCMS conversion functions? maybe with given set. Could just ionize() it.
     - more sub class specific methods
         - nontarget-set: plotGraph method? and make sure it's used in reportHTML()
         - compoundsSetMF sub-class (for settings slot)?

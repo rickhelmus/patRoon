@@ -46,6 +46,14 @@ setMethod("[", c("featureGroupsSet", "ANY", "ANY", "missing"), function(x, i, j,
 #' @export
 setMethod("export", "featureGroupsSet", function(obj, type, out, sets = NULL) export(unset(obj, sets), type, out))
 
+# UNDONE: mention that object will be unset
+#' @export
+setMethod("getXCMSSet", "featureGroupsSet", function(obj, ..., sets = NULL) getXCMSSet(unset(obj, sets), ...))
+
+# UNDONE: mention that object will be unset
+#' @export
+setMethod("getXCMSnExp", "featureGroupsSet", function(obj, ..., sets = NULL) getXCMSnExp(unset(obj, sets), ...))
+
 #' @describeIn featureGroupsSet Obtain a summary table (a \code{\link{data.table}})
 #'   with retention, \emph{m/z}, intensity and optionally other feature data.
 #' @param features If \code{TRUE} then feature specific data will be added. If

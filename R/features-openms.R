@@ -218,13 +218,23 @@ importFeatureXML <- function(ffile)
 # OpenMS doesn't support peak intensities. Estimate them from retention times
 loadIntensities <- function(dfile, features, rtWindow)
 {
-    spectra <- loadSpectra(dfile, verbose = FALSE)
-    features <- copy(features) # HACK: avoid sR crash caused by data.table
-
     if (nrow(features) == 0)
+    {
         features[, intensity := 0]
+        return(features)
+    }
+    
+    hash <- makeHash(features, rtWindow)
+    cd <- loadCacheData("loadIntensities", hash)
+    if (!is.null(cd))
+        features[, intensity := cd]
     else
+    {
+        spectra <- loadSpectra(dfile, verbose = FALSE)
+        features <- copy(features) # HACK: avoid sR crash caused by data.table
         features[, intensity := loadEICIntensities(spectra, features, rtWindow)]
+        saveCacheData("loadIntensities", features$intensity, hash)
+    }
 
     return(features)
 }

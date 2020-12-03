@@ -49,7 +49,7 @@ makeCompoundsSetConsensus <- function(setObjects, origFGNames, setThreshold)
             merged[identifier %in% right$identifier, setCoverage := setCoverage + 1]
             
             # re-sort
-            setorderv(merged, "score")
+            setorderv(merged, "score", order = -1)
             
             merged[, fragInfo := lapply(fragInfo, function(fi) fi[, c("PLIndex", "PLIndexSet") := .(PLIndexSet, NULL)])]
             

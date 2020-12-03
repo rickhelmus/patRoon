@@ -51,7 +51,6 @@ setMethod("export", "featureGroupsSet", function(obj, type, out, sets = NULL) ex
 setMethod("getXCMSSet", "featureGroupsSet", function(obj, ..., sets = NULL) getXCMSSet(unset(obj, sets), ...))
 
 # UNDONE: mention that object will be unset
-#' @export
 setMethod("getXCMSnExp", "featureGroupsSet", function(obj, ..., sets = NULL) getXCMSnExp(unset(obj, sets), ...))
 
 #' @describeIn featureGroupsSet Obtain a summary table (a \code{\link{data.table}})

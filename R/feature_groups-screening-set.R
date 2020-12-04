@@ -5,7 +5,7 @@ NULL
 
 # merges screening info from screenInfo slots or as.data.table() tables
 mergeScreeningSetInfos <- function(setObjects, sInfos = lapply(setObjects, screenInfo),
-                                   rmSetCols = TRUE)
+                                   rmSetCols = TRUE, markSets = TRUE)
 {
     rmCols <- c("mz", "fragments_mz")
 
@@ -50,6 +50,16 @@ mergeScreeningSetInfos <- function(setObjects, sInfos = lapply(setObjects, scree
     }
     else
         scrInfo <- data.table()
+    
+    if (nrow(scrInfo) > 0 && markSets)
+    {
+        # add set presence
+        scrInfo[, sets := mapply(name, group, FUN = function(n, g) {
+            ret <- names(setObjects)
+            return(paste0(ret[sapply(setObjects, function(so) screenInfo(so)[name == n & group == g, .N] > 0)],
+                          collapse = ","))
+        })]
+    }
     
     return(scrInfo[])
 }
@@ -106,7 +116,8 @@ setMethod("as.data.table", "featureGroupsScreeningSet", function(x, ..., collaps
     # ... can be ignored.
     dtSets <- mergeScreeningSetInfos(x@setObjects, lapply(x@setObjects, as.data.table,
                                                           collapseSuspects = collapseSuspects,
-                                                          onlyHits = onlyHits))
+                                                          onlyHits = onlyHits),
+                                     markSets = is.null(collapseSuspects))
     dtSets <- dtSets[, c("group", setdiff(names(dtSets), names(ret))), with = FALSE] # only keep unique columns (and group)
     
     return(merge(ret, dtSets, by = "group", all.x = !onlyHits))

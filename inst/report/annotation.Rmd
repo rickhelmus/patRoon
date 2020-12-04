@@ -62,7 +62,7 @@ allGroups <- unique(c(plotGroups, componentFGroups, mfWebFGroups))
 
 # UNDONE: replace by proper inheritance
 isSusp <- isScreening(rmdVars$fGroups)
-keepSuspCols <- c("suspect", "d_rt", "d_mz", "estIDLevel")
+keepSuspCols <- c("suspect", "d_rt", "d_mz", "sets", "estIDLevel")
 if (isSusp)
 {
     fGroupsSpecDT <- as.data.table(rmdVars$fGroups, collapseSuspects = NULL)

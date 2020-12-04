@@ -145,6 +145,7 @@ Collate:
     'utils-sirius.R'
     'compounds-sirius.R'
     'convert.R'
+    'defunct.R'
     'deprecated.R'
     'utils-IPO.R'
     'doe-optimizer.R'

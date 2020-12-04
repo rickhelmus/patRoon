@@ -19,6 +19,7 @@
     * `printPackageOpts()`: display current package options of `patRoon`.
 * Finding features with `OpenMS`: potentially large temporary files are removed when possible to avoid clogging up disk space (especially relevant on some Linux systems where `/tmp` is small).
 * Several packages such as `XCMS` are not attached by default, which significantly speeds up loading `patRoon` (e.g. with `library()`).
+* The `compoundViewer()` function was marked as defunct, as it hasn;t been working for some time and its functionality is largely replaced by `reportHTML()`.
 
 
 

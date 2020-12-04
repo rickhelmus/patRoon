@@ -5,6 +5,8 @@ loadSpectra <- function(path, rtRange = NULL, verbose = TRUE, cacheDB = NULL)
 {
     hash <- makeHash(makeFileHash(path), rtRange)
     ret <- loadCacheData("specData", hash, cacheDB)
+    if (!is.null(ret) && length(ret$spectra) > 1 && is.data.table(ret$spectra[[1]]))
+        ret <- NULL # old (pre v1.1) format, ignore cache to avoid crashes with Rcpp interface
     if (is.null(ret))
     {
         if (verbose)

@@ -158,7 +158,7 @@ interface (GUI)." />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Interactive GUI utilities</h1>
-    <small class="dont-index">Source: <a href='https://github.com/rickhelmus/patRoon/blob/master/R/main.R'><code>R/main.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/EIC-tool.R'><code>R/EIC-tool.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/project-tool.R'><code>R/project-tool.R</code></a>, and 1 more</small>
+    <small class="dont-index">Source: <a href='https://github.com/rickhelmus/patRoon/blob/master/R/main.R'><code>R/main.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/EIC-tool.R'><code>R/EIC-tool.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/project-tool.R'><code>R/project-tool.R</code></a></small>
     <div class="hidden name"><code>GUI-utils.Rd</code></div>
     </div>
 
@@ -170,10 +170,7 @@ interface (GUI).</p>
     <pre class="usage"><span class='co'># S4 method for featureGroups</span>
 <span class='fu'>checkChromatograms</span><span class='op'>(</span><span class='va'>fGroups</span>, mzWindow <span class='op'>=</span> <span class='fl'>0.005</span>, enabledFGroups <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span>
 
-<span class='fu'>newProject</span><span class='op'>(</span>destPath <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span>
-
-<span class='co'># S4 method for featureGroups,MSPeakLists,compounds</span>
-<span class='fu'>compoundViewer</span><span class='op'>(</span><span class='va'>fGroups</span>, <span class='va'>MSPeakLists</span>, <span class='va'>compounds</span><span class='op'>)</span></pre>
+<span class='fu'>newProject</span><span class='op'>(</span>destPath <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -198,14 +195,6 @@ groups are considered to be kept.</p></td>
       <th>destPath</th>
       <td><p>Set destination path value to this value (useful for
 debugging). Set to <code>NULL</code> for a default value.</p></td>
-    </tr>
-    <tr>
-      <th>MSPeakLists</th>
-      <td><p>A <code><a href='MSPeakLists-class.html'>MSPeakLists</a></code> object.</p></td>
-    </tr>
-    <tr>
-      <th>compounds</th>
-      <td><p>A <code><a href='compounds-class.html'>compounds</a></code> object.</p></td>
     </tr>
     </table>
 
@@ -237,10 +226,6 @@ debugging). Set to <code>NULL</code> for a default value.</p></td>
   either added to the current open file or to a new file. The
   <a href='analysis-information.html'>analysis information</a> will be written to a
   <code class="file">.csv</code> file so that it can easily be modified afterwards.</p>
-<p>The <code>compoundViewer</code> method is used to view compound
-  identification results. It will display available candidate information
-  such as scorings and identifiers, MS/MS spectra with explained peaks and
-  chemical structures.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

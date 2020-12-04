@@ -200,6 +200,9 @@
 </li>
 <li>Finding features with <code>OpenMS</code>: potentially large temporary files are removed when possible to avoid clogging up disk space (especially relevant on some Linux systems where <code>/tmp</code> is small).</li>
 <li>Several packages such as <code>XCMS</code> are not attached by default, which significantly speeds up loading <code>patRoon</code> (e.g. with <code><a href="https://rdrr.io/r/base/library.html">library()</a></code>).</li>
+<li>The <code>compoundViewer()</code> function was marked as defunct, as it hasn;t been working for some time and its functionality is largely replaced by <code><a href="../reference/reporting.html">reportHTML()</a></code>.</li>
+<li>
+<code><a href="../reference/component-generation.html">generateComponentsNontarget()</a></code>: update homolog statistics for merged series.</li>
 </ul>
 </div>
     <div id="patroon-104" class="section level1">

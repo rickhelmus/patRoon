@@ -4,7 +4,7 @@ pkgdown_sha: ~
 articles:
   handbook: handbook.html
   tutorial: tutorial.html
-last_built: 2020-12-03T08:51Z
+last_built: 2020-12-04T09:17Z
 urls:
   reference: https://rickhelmus.github.io/patRoon/reference
   article: https://rickhelmus.github.io/patRoon/articles

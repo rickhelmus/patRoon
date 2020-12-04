@@ -1,5 +1,6 @@
-#' @include main
-#' @include components-set
+#' @include main.R
+#' @include components-nontarget.R
+#' @include components-set.R
 NULL
 
 componentsNTSet <- setClass("componentsNTSet", contains = "componentsSet")

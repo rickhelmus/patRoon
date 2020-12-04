@@ -293,6 +293,14 @@ generateComponentsNontarget <- function(fGroups, ionization, rtRange = c(-120, 1
                         set(compTab, r, rg, list(list(lc[[rg]][[1]]))) # need to rewrap it in a list?
                 }
                 
+                # update statistics
+                indBoth <- c(r, other)
+                set(compTab, r, "m/z increment", mean(compTab[["m/z increment"]][indBoth]))
+                set(compTab, r, "RT increment", mean(compTab[["RT increment"]][indBoth]))
+                set(compTab, r, "min. RT in series", min(compTab[["min. RT in series"]][indBoth]))
+                set(compTab, r, "max. RT in series", max(compTab[["max. RT in series"]][indBoth]))
+                set(compTab, r, "max.-min. RT", compTab[["max. RT in series"]][r] - compTab[["min. RT in series"]][r])
+                
                 set(compTab, other, "keep", FALSE) # remove other
                 set(compTab, r, "links", list(list(setdiff(links, other)))) # unlink
             }

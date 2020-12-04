@@ -109,10 +109,10 @@ syncCompoundsSetObjects <- function(compoundsSet, makeCons)
     {
         # sync available feature groups
         allFGroups <- unique(sapply(setObjects(compoundsSet), groupNames))
-        compoundsSet@compounds <- compoundsSet@compounds[intersect(compoundsSet@origFGNames, allFGroups)]
+        compoundsSet@compounds <- compoundsSet@compounds[intersect(groupNames(compoundsSet), allFGroups)]
         
         # only keep results from sets still present
-        compoundsSet@compounds <- lapply(compoundsSet@compounds, function(ft) ft[set %in% sets(compoundsSet)])
+        compoundsSet@compounds <- lapply(compoundsSet@compounds, function(ct) ct[set %in% sets(compoundsSet)])
     }
     
     compoundsSet@scoreRanges <- compoundsSet@scoreRanges[groupNames(compoundsSet)]

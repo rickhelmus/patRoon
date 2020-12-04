@@ -18,7 +18,7 @@ syncFormulasSetObjects <- function(formulasSet, makeCons)
     {
         # sync available feature groups
         allFGroups <- unique(sapply(setObjects(formulasSet), groupNames))
-        formulasSet@formulas <- formulasSet@formulas[intersect(formulasSet@origFGNames, allFGroups)]
+        formulasSet@formulas <- formulasSet@formulas[intersect(groupNames(formulasSet), allFGroups)]
         
         # only keep results from sets still present
         formulasSet@formulas <- lapply(formulasSet@formulas, function(ft) ft[set %in% sets(formulasSet)])

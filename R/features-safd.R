@@ -37,28 +37,6 @@ makeSAFDCommand <- function(inPath, outPath, fileName, mzRange, maxNumbIter, max
                 outPath = outPath, fileName = fileName))
 }
 
-importSAFDPeakList <- function(peaklist)
-{
-    # peaklist is a single number (zero) when no results
-    if (length(peaklist) == 1 || nrow(peaklist) == 0)
-        return(data.table(ID = character(), ret = numeric(), mz = numeric(), intensity = numeric(),
-                          area = numeric(), retmin = numeric(), retmax = numeric(), mzmin = numeric(),
-                          mzmax = numeric()))
-
-    ft <- as.data.table(peaklist)
-
-    setnames(ft, c("m/z", "max_int", "sum_int", "RT", "minRT", "maxRT", "peak_ID"),
-             c("mz", "intensity", "area", "ret", "retmin", "retmax", "ID"))
-
-    # Estimate mzrange from variance
-    s <- sqrt(ft$`var_m/z`)
-    ft[, mzmin := mz - 2*s]
-    ft[, mzmax := mz + 2*s]
-
-    return(ft[, c("ID", "ret", "mz", "intensity", "area", "retmin", "retmax", "mzmin", "mzmax")])
-}
-
-
 #' @details \code{findFeaturesSAFD} uses the
 #'   \code{\link[enviPick]{enviPickwrap}}. function from the \pkg{enviPick} R
 #'   package to extract features.

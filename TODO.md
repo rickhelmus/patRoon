@@ -77,14 +77,12 @@
     - keep/change default setThreshold?
         - or remove argument from generators?
 - suspect screening
-    - handle suspect and fragment mz values somehow
-        - should it be an unique column in mergeScreeningSetInfos()
-        - dealt with with >1 suspect list? does this work?
     - implement TASQ?
     - consensus?
-    - support recursive screening? or throw error otherwise
-- use neutral_formula for annotated similarity calculation for formulas
-    --> verify if OK
+        - or just new set filter described above?
+    - annotation columns not in report, fine? (there are many) If yes document
+    - as.data.table(fGroupsScrSets, collapseSuspects=NULL): omits sets column
+        - still true? check
 - NEWS
     - [..., reAverage = FALSE] and implications of filtering when setting it to TRUE
 - docs

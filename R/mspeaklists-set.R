@@ -163,9 +163,9 @@ setMethod("filter", "MSPeakListsSet", function(obj, ..., negate = FALSE, sets = 
 })
 
 #' @export
-setMethod("plotSpec", "MSPeakListsSet", function(obj, groupName, analysis = NULL, MSLevel = 1, title = NULL,
-                                                 useGGPlot2 = FALSE, xlim = NULL, ylim = NULL, perSet = TRUE,
-                                                 mirror = TRUE, ...)
+setMethod("plotSpectrum", "MSPeakListsSet", function(obj, groupName, analysis = NULL, MSLevel = 1, title = NULL,
+                                                     useGGPlot2 = FALSE, xlim = NULL, ylim = NULL, perSet = TRUE,
+                                                     mirror = TRUE, ...)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertString(groupName, min.chars = 1, add = ac)

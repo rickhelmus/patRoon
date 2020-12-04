@@ -196,7 +196,7 @@ setMethod("screenSuspects", "featureGroupsSet", function(fGroups, suspects, rtWi
                                                                  skipInvalid, onlyHits))
     
     return(featureGroupsScreeningSet(screenInfo = mergeScreeningSetInfos(setObjects), setObjects = setObjects,
-                                     groups = copy(groups(fGroups)), analysisInfo = analysisInfo(fGroups),
+                                     groups = copy(groupTable(fGroups)), analysisInfo = analysisInfo(fGroups),
                                      groupInfo = groupInfo(fGroups), features = getFeatures(fGroups),
                                      ftindex = copy(groupFeatIndex(fGroups))))
 })
@@ -208,15 +208,15 @@ setMethod("unset", "featureGroupsScreeningSet", function(obj, sets)
 {
     assertSets(obj, sets)
     
-    iobj <- callNextMethod()
+    uobj <- callNextMethod()
     
     if (!is.null(sets))
         obj <- obj[, sets = sets]
     sInfo <- mergeScreeningSetInfos(setObjects(obj), rmSetCols = FALSE)
     
-    ret <- featureGroupsSetScreeningIonized(screenInfo = sInfo, groups = groups(iobj),
-                                            groupInfo = groupInfo(iobj), analysisInfo = analysisInfo(iobj),
-                                            features = getFeatures(iobj), ftindex = groupFeatIndex(iobj))
+    ret <- featureGroupsSetScreeningIonized(screenInfo = sInfo, groups = groupTable(uobj),
+                                            groupInfo = groupInfo(uobj), analysisInfo = analysisInfo(uobj),
+                                            features = getFeatures(uobj), ftindex = groupFeatIndex(uobj))
     # override after constructing: parent constructor already sets algorithm,
     # which results in error about double assignment
     ret@algorithm <- paste0(algorithm(obj), "_unset")

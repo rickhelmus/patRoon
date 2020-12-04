@@ -253,7 +253,11 @@ setMethod("checkChromatograms", "featureGroups", function(fGroups, mzWindow, ena
                                                                              xvalues = EICPreviews[[g]]$time,
                                                                              options = list(type = "line", height = 50)))),
                               keep = rValues$enabledHotFGroups, retention = gInfo$rts, mz = gInfo$mzs, stringsAsFactors = FALSE)
-            ret[, unique(anaInfo$group)] <- t(avgGTable)
+            tavg <- t(avgGTable)
+            if (ncol(tavg) == 1)
+                ret[[unique(anaInfo$group)]] <- tavg[, 1]
+            else
+                ret[, unique(anaInfo$group)] <- tavg
             ret[, "retention"] <- if (input$retUnit == "Minutes") gInfo$rts / 60 else gInfo$rts
 
             if (!"Keep" %in% input$showWhat)

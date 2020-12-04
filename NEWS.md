@@ -21,7 +21,7 @@
 * Several packages such as `XCMS` are not attached by default, which significantly speeds up loading `patRoon` (e.g. with `library()`).
 * The `compoundViewer()` function was marked as defunct, as it hasn;t been working for some time and its functionality is largely replaced by `reportHTML()`.
 * `generateComponentsNontarget()`: update homolog statistics for merged series.
-
+* `checkChromatograms()`: fix error when `fGroups` has only one replicate group
 
 
 # patRoon 1.0.4

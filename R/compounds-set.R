@@ -18,7 +18,7 @@ makeCompoundsSetConsensus <- function(setObjects, origFGNames, setThreshold)
     {
         allResults <- pruneList(sapply(setObjects, "[[", gName, simplify = FALSE))
         if (length(allResults) == 1)
-            return(copy(allResults[[1]])[, c("setCoverage", "set") := .(1, names(allResults)[1])])
+            return(copy(allResults[[1]])[, c("setCoverage", "set", "setCount") := .(1, names(allResults)[1], 1)])
         
         allResults <- lapply(allResults, copy)
         
@@ -31,7 +31,7 @@ makeCompoundsSetConsensus <- function(setObjects, origFGNames, setThreshold)
             merged <- copy(left)
             
             if (is.null(merged[["setCoverage"]]))
-                merged[, setCoverage := 1]
+                merged[, c("setCoverage", "setCount") := .(1, 1)]
             
             # UNDONE: assume score cols are same for left/right, should always be the case?
 
@@ -47,6 +47,7 @@ makeCompoundsSetConsensus <- function(setObjects, origFGNames, setThreshold)
             merged <- rbind(merged, right[!identifier %in% merged$identifier], fill = TRUE)
             
             merged[identifier %in% right$identifier, setCoverage := setCoverage + 1]
+            merged[, setCount := setCount + 1]
             
             # re-sort
             setorderv(merged, "score", order = -1)
@@ -58,7 +59,7 @@ makeCompoundsSetConsensus <- function(setObjects, origFGNames, setThreshold)
     }, simplify = FALSE)
     
     # convert absolute merge counts to coverage
-    cons <- lapply(cons, function(ct) ct[, setCoverage := setCoverage / length(setObjects)])
+    cons <- lapply(cons, function(ct) ct[, c("setCoverage", "setCount") := .(setCoverage / setCount, NULL)])
     
     if (setThreshold > 0)
         cons <- pruneList(lapply(cons, function(ct) ct[setCoverage >= setThreshold]), checkZeroRows = TRUE)

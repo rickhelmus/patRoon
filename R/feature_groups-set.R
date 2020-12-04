@@ -138,7 +138,7 @@ setMethod("filter", "featureGroupsSet", function(obj, ..., negate = FALSE, sets 
 })
 
 #' @export
-setMethod("plotEIC", "featureGroupsSet", function(obj, ...)
+setMethod("plotChroms", "featureGroupsSet", function(obj, ...)
 {
     # UNDONE: find a neat way to keep both argument order and also override title if not specified
     
@@ -170,7 +170,7 @@ setMethod("groupFeatures", "featuresSet", function(feat, algorithm, ..., verbose
     
     fGroups <- do.call(callNextMethod, c(list(feat = feat, algorithm = algorithm, verbose = verbose), otherArgs))
     
-    return(featureGroupsSet(groups = groups(fGroups), groupInfo = groupInfo(fGroups),
+    return(featureGroupsSet(groups = groupTable(fGroups), groupInfo = groupInfo(fGroups),
                             analysisInfo = analysisInfo(fGroups), features = feat, ftindex = groupFeatIndex(fGroups),
                             algorithm = makeSetAlgorithm(list(fGroups))))
 })
@@ -191,7 +191,7 @@ setMethod("unset", "featureGroupsSet", function(obj, sets)
     gInfo <- groupInfo(obj)
     gInfo$mzs <- gInfo$mzs + addMZ
     
-    return(featureGroupsUnset(groups = groups(obj), groupInfo = gInfo, analysisInfo = analysisInfo(obj),
+    return(featureGroupsUnset(groups = groupTable(obj), groupInfo = gInfo, analysisInfo = analysisInfo(obj),
                               features = unset(getFeatures(obj)), ftindex = groupFeatIndex(obj),
                               algorithm = paste0(algorithm(obj), "_unset")))
 })

@@ -1132,7 +1132,7 @@ setMethod("plotChroms", "featureGroups", function(obj, rtWindow = 30, mzExpWindo
 
     if (is.null(title))
     {
-        # NOTE: plotEIC() for sets override default
+        # NOTE: plotChroms() for sets override default
         if (gCount == 1)
             title <- sprintf("Group '%s'\nrt: %.1f - m/z: %.4f", names(gTable)[1],
                              if (retMin) gInfo[1, "rts"] / 60 else gInfo[1, "rts"],

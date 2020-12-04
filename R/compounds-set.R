@@ -189,10 +189,10 @@ setMethod("filter", "compoundsSet", function(obj, ..., negate = FALSE, sets = NU
 })
 
 #' @export
-setMethod("plotSpec", "compoundsSet", function(obj, index, groupName, MSPeakLists, formulas = NULL,
-                                               plotStruct = TRUE, title = NULL, useGGPlot2 = FALSE, xlim = NULL,
-                                               ylim = NULL, maxMolSize = c(0.2, 0.4), molRes = c(100, 100),
-                                               perSet = TRUE, mirror = TRUE, ...)
+setMethod("plotSpectrum", "compoundsSet", function(obj, index, groupName, MSPeakLists, formulas = NULL,
+                                                   plotStruct = TRUE, title = NULL, useGGPlot2 = FALSE, xlim = NULL,
+                                                   ylim = NULL, maxMolSize = c(0.2, 0.4), molRes = c(100, 100),
+                                                   perSet = TRUE, mirror = TRUE, ...)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertCount(index, positive = TRUE, add = ac)
@@ -228,10 +228,10 @@ setMethod("plotSpec", "compoundsSet", function(obj, index, groupName, MSPeakList
                           maxMolSize = maxMolSize, molRes = molRes))
 })
 
-setMethod("plotSpecHash", "compoundsSet", function(obj, index, groupName, MSPeakLists, formulas = NULL,
-                                                   plotStruct = TRUE, title = NULL, useGGPlot2 = FALSE, xlim = NULL,
-                                                   ylim = NULL, maxMolSize = c(0.2, 0.4), molRes = c(100, 100),
-                                                   perSet = TRUE, mirror = TRUE, ...)
+setMethod("plotSpectrumHash", "compoundsSet", function(obj, index, groupName, MSPeakLists, formulas = NULL,
+                                                       plotStruct = TRUE, title = NULL, useGGPlot2 = FALSE, xlim = NULL,
+                                                       ylim = NULL, maxMolSize = c(0.2, 0.4), molRes = c(100, 100),
+                                                       perSet = TRUE, mirror = TRUE, ...)
 {
     return(makeHash(callNextMethod(obj, index, groupName, MSPeakLists, formulas,
                                    plotStruct, title, useGGPlot2, xlim,

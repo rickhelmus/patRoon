@@ -168,7 +168,7 @@ setMethod("getEICsForFGroups", "featureGroupsSet", function(fGroups, rtWindow, m
         # doesn't contain >topMost results
         
         topMost <- min(topMost, nrow(analysisInfo(fGroups)))
-        gTable <- groups(fGroups)
+        gTable <- groupTable(fGroups)
         gNames <- names(fGroups)
         anas <- analyses(fGroups)
         

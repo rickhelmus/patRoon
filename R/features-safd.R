@@ -51,14 +51,21 @@ findFeaturesSAFD <- function(analysisInfo, profPath, mzRange = c(0, 400),
                              minMSW = 0.02, RThreshold = 0.75, minInt = 2000,
                              sigIncThreshold = 5, S2N = 2, minPeakWS = 3, verbose = TRUE)
 {
-    # UNDONE: more assertions
     # UNDONE: docs
     ac <- checkmate::makeAssertCollection()
     analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, add = ac)
     checkmate::assertCharacter(profPath, min.chars = 1, min.len = 1, null.ok = TRUE, add = ac)
     assertCanCreateDirs(profPath, add = ac)
+    checkmate::assertNumeric(mzRange, lower = 0, finite = TRUE, any.missing = FALSE, len = 2, add = ac)
+    aapply(checkmate::assertCount, . ~ maxNumbIter + maxTPeakW + resolution + sigIncThreshold +
+               S2N, positive = TRUE, fixed = list(add = ac))
+    aapply(checkmate::assertCount, . ~ minInt + minPeakWS, fixed = list(add = ac))
+    aapply(checkmate::assertNumber, . ~ minMSW + RThreshold, fixed = list(add = ac))
     checkmate::assertFlag(verbose, add = ac)
     checkmate::reportAssertions(ac)
+    
+    if (mzRange[1] > mzRange[2])
+        stop("First element of mzRange should be smaller than second.")
     
     anaCount <- nrow(analysisInfo)
     profPath <- rep(profPath, length.out = anaCount)

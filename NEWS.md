@@ -22,7 +22,7 @@
 * The `compoundViewer()` function was marked as defunct, as it hasn;t been working for some time and its functionality is largely replaced by `reportHTML()`.
 * `generateComponentsNontarget()`: update homolog statistics for merged series.
 * `checkChromatograms()`: fix error when `fGroups` has only one replicate group
-
+* `convertMSFiles()`: If `algorithm="pwiz"` and vendor centroiding is used then any extra filters are now correctly put after the `peakPicking` filter.
 
 # patRoon 1.0.4
 * Small compatibility fixes for macOS

@@ -100,7 +100,7 @@ convertMSFilesPWiz <- function(inFiles, outFiles, to, centroid, filters, extraOp
     {
         if (is.null(filters))
             filters <- character()
-        filters <- c(filters, paste("peakPicking", if (is.character(centroid)) centroid else ""))
+        filters <- c(paste("peakPicking", if (is.character(centroid)) centroid else ""), filters)
     }
 
     mainArgs <- paste0("--", to)

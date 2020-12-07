@@ -15,14 +15,28 @@ install.packages("vdiffr")
 install.packages("circlize", repos="http://cran.r-project.org") # get most recent version (rpm is too old)
 
 install.packages("desc")
-dp <- desc::desc_get_deps()
-dp <- dp[dp$type != "Suggests", "package"]
-dp <- dp[!sapply(dp, require, quietly = TRUE, character.only = TRUE)]
-if (length(dp) > 0)
+
+getMissingPkgs <- function()
 {
-    cat(sprintf("Missing packages: %s\n", paste0(dp, collapse = ", ")))
-    install.packages(dp)
+    dp <- desc::desc_get_deps()
+    dp <- dp[dp$type != "Suggests", "package"]
+    return(dp[!sapply(dp, require, quietly = TRUE, character.only = TRUE)])
+}
+
+mp <- getMissingPkgs()
+if (length(mp) > 0)
+{
+    cat(sprintf("Missing packages: %s\n", paste0(mp, collapse = ", ")))
+    install.packages(mp)
 }
 
 # workaround for sildist not found bug: https://github.com/hemberg-lab/SC3/issues/36
 install.packages("cluster")
+
+# check if antyhing failed (ie still not available)
+mp <- getMissingPkgs()
+if (length(mp) > 0)
+{
+    cat(sprintf("ERROR: couldn't install these packages: %s\n", paste0(mp, collapse = ", ")))
+    q(status = 1)
+}

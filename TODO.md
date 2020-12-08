@@ -27,15 +27,15 @@
     - spec similarity:
         - port from TPs someday
 - misc
-    - update version number
     - prepareSuspectList(): export?
         - mainly to allow merging of lists, perhaps make util for that instead? Would also be handy for MF databases
             - could also fix column names, replace "-" with NAs etc
         - if yes, mention in ref docs for screenSuspects()
     - better name for selectBestFGroups filter?
     - prepareSuspectList: handle empty names
+    - include MoNA exact by default
 - expand reporting
-    - eg marking include suspect name in EICs
+    - eg include suspect name in EICs
     - mention suspect similarities/ranks etc for candidates (or somehow in compounds?)
     - optionally report with collapsed suspects
 - NEWS
@@ -47,7 +47,7 @@
         - InChIKey, fragments_* columns
         - name verification
     - reportHTML(): highlight multiple rows, select columns & scrollbar for annotation table
-- update docs, handbook & NEWS
+- update docs and handbook
     - new plotVenn list functionality
     - update TASQ docs and other mentions to old suspect screening interface
     - mention that components should be done prior to onlyHits=T?

@@ -424,7 +424,7 @@ setMethod("compoundViewer", c("featureGroups", "MSPeakLists", "compounds"), func
 # nocov end
 
 #' @details \code{groupFeaturesScreening} was replaced by
-#'   \code{\links{screenSuspects}}. Please refer to this function and the
+#'   \code{\link{screenSuspects}}. Please refer to this function and the
 #'   handbook for the updated interface.
 #'
 #' @param ... Ignore.

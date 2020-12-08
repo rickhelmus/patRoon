@@ -53,15 +53,17 @@ BEGIN_RCPP
 END_RCPP
 }
 // loadEICs
-Rcpp::List loadEICs(Rcpp::List spectra, Rcpp::List rtRanges, Rcpp::List mzRanges);
-RcppExport SEXP _patRoon_loadEICs(SEXP spectraSEXP, SEXP rtRangesSEXP, SEXP mzRangesSEXP) {
+Rcpp::List loadEICs(Rcpp::List spectra, Rcpp::NumericVector rtMins, Rcpp::NumericVector rtMaxs, Rcpp::NumericVector mzMins, Rcpp::NumericVector mzMaxs);
+RcppExport SEXP _patRoon_loadEICs(SEXP spectraSEXP, SEXP rtMinsSEXP, SEXP rtMaxsSEXP, SEXP mzMinsSEXP, SEXP mzMaxsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::List >::type spectra(spectraSEXP);
-    Rcpp::traits::input_parameter< Rcpp::List >::type rtRanges(rtRangesSEXP);
-    Rcpp::traits::input_parameter< Rcpp::List >::type mzRanges(mzRangesSEXP);
-    rcpp_result_gen = Rcpp::wrap(loadEICs(spectra, rtRanges, mzRanges));
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type rtMins(rtMinsSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type rtMaxs(rtMaxsSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type mzMins(mzMinsSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type mzMaxs(mzMaxsSEXP);
+    rcpp_result_gen = Rcpp::wrap(loadEICs(spectra, rtMins, rtMaxs, mzMins, mzMaxs));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -83,7 +85,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_parseFeatConsXMLFile", (DL_FUNC) &_patRoon_parseFeatConsXMLFile, 2},
     {"_patRoon_writeFeatureXML", (DL_FUNC) &_patRoon_writeFeatureXML, 2},
     {"_patRoon_loadEICIntensities", (DL_FUNC) &_patRoon_loadEICIntensities, 3},
-    {"_patRoon_loadEICs", (DL_FUNC) &_patRoon_loadEICs, 3},
+    {"_patRoon_loadEICs", (DL_FUNC) &_patRoon_loadEICs, 5},
     {"_patRoon_makeSAFDInput", (DL_FUNC) &_patRoon_makeSAFDInput, 2},
     {NULL, NULL, 0}
 };

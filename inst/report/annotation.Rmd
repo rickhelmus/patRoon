@@ -213,7 +213,7 @@ allPlots <- lapply(seq_along(plotGroups), function(grpi)
     plotf <- file.path(plotPathFull, sprintf("eic_%i.png", grpi))
     grpPlots[["EIC"]] <- plotf
     makeCachedPlot(plotf, "plotChroms", list(rmdVars$fGroups[, plotGroups[grpi]], rmdVars$EICRtWindow,
-                                             rmdVars$EICMzWindow, rmdVars$retMin,
+                                             rmdVars$EICMzExpWindow, rmdVars$retMin,
                                              rmdVars$EICTopMost, rmdVars$EICs, colourBy = "rGroup", title = ""),
                    5, 4, parSettings = list(mar = c(4, 4, 0.1, 2)), cacheDB = rmdVars$cacheDB)
     

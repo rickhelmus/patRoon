@@ -98,25 +98,25 @@ Rcpp::NumericVector loadEICIntensities(Rcpp::List spectra, Rcpp::DataFrame featL
 }
 
 // [[Rcpp::export]]
-Rcpp::List loadEICs(Rcpp::List spectra, Rcpp::List rtRanges, Rcpp::List mzRanges)
+Rcpp::List loadEICs(Rcpp::List spectra, Rcpp::NumericVector rtMins, Rcpp::NumericVector rtMaxs,
+                    Rcpp::NumericVector mzMins, Rcpp::NumericVector mzMaxs)
 {
-    const int EICCount = rtRanges.length();
+    const int EICCount = rtMins.length();
     Rcpp::List ret(EICCount);
     for (int eici=0; eici<EICCount; ++eici)
     {
-        const Rcpp::NumericVector rtr = rtRanges[eici], mzr = mzRanges[eici];
-        const double mzMin = mzr[0], mzMax = mzr[1];
-        
+        const double mzMin = mzMins[eici], mzMax = mzMaxs[eici];
         std::vector<double> EICTimes;
         std::vector<double> EICIntensities;
-        specApply(spectra, rtr[0], rtr[1], mzMin, mzMax,
+        
+        specApply(spectra,  rtMins[eici], rtMaxs[eici], mzMin, mzMax,
                   [&](double specRt, const Rcpp::NumericVector &peakMZs, const Rcpp::NumericVector &peakInts)
                   {
                       EICTimes.push_back(specRt);
                       EICIntensities.push_back(getTotMZIntFromSpec(peakMZs, peakInts, mzMin, mzMax));
                   });
 
-        // compress data by removing any zero intensity datapoints that are inbetween two other zero intensitiy points.
+        // compress data by removing any zero intensity datapoints that are inbetween two other zero intensity points.
         for (size_t ind=0; ind<(EICTimes.size()-2); )
         {
             if (EICIntensities[ind+2] != 0)

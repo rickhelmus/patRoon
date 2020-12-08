@@ -247,7 +247,7 @@ setGeneric("treeCutDynamic", function(obj, maxTreeHeight = 1, deepSplit = TRUE,
                                       minModuleSize = 1, ...) standardGeneric("treeCutDynamic"))
 
 
-setGeneric("checkChromatograms", function(fGroups, mzWindow = 0.005, enabledFGroups = NULL) standardGeneric("checkChromatograms"))
+setGeneric("checkChromatograms", function(fGroups, mzExpWindow = 0.001, enabledFGroups = NULL) standardGeneric("checkChromatograms"))
 setGeneric("compoundViewer", function(fGroups, MSPeakLists, compounds) standardGeneric("compoundViewer"))
 setGeneric("reportCSV", function(fGroups, path = "report", reportFeatures = FALSE, formulas = NULL,
                                  formulasNormalizeScores = "max", formulasExclNormScores = NULL,
@@ -263,7 +263,7 @@ setGeneric("reportPDF", function(fGroups, path = "report", reportFGroups = TRUE,
                                  compoundsExclNormScores = c("score", "individualMoNAScore", "annoTypeCount"),
                                  compoundsOnlyUsedScorings = TRUE, compoundsTopMost = 5,
                                  compsCluster = NULL, components = NULL, MSPeakLists = NULL, retMin = TRUE,
-                                 EICGrid = c(2, 1), EICRtWindow = 20, EICMzWindow = 0.005, EICTopMost = NULL,
+                                 EICGrid = c(2, 1), EICRtWindow = 20, EICMzExpWindow = 0.001, EICTopMost = NULL,
                                  EICOnlyPresent = TRUE, clearPath = FALSE) standardGeneric("reportPDF"))
 setGeneric("reportHTML", function(fGroups, path = "report", reportPlots = c("chord", "venn", "upset", "eics", "formulas"),
                                   formulas = NULL, formulasTopMost = 5,
@@ -272,7 +272,7 @@ setGeneric("reportHTML", function(fGroups, path = "report", reportPlots = c("cho
                                   compoundsExclNormScores = c("score", "individualMoNAScore", "annoTypeCount"),
                                   compoundsOnlyUsedScorings = TRUE, compoundsTopMost = 5, compsCluster = NULL,
                                   includeMFWebLinks = "compounds", components = NULL, interactiveHeat = FALSE,
-                                  MSPeakLists = NULL, retMin = TRUE, EICRtWindow = 20, EICMzWindow = 0.005,
+                                  MSPeakLists = NULL, retMin = TRUE, EICRtWindow = 20, EICMzExpWindow = 0.001,
                                   EICTopMost = NULL, EICOnlyPresent = TRUE, selfContained = TRUE, optimizePng = FALSE,
                                   clearPath = FALSE, openReport = TRUE, noDate = FALSE) standardGeneric("reportHTML"))
 

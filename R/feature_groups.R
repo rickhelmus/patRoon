@@ -863,7 +863,7 @@ setMethod("plotChord", "featureGroups", function(obj, addSelfLinks = FALSE, addR
 #' @template plot-lim
 #'
 #' @export
-setMethod("plotChroms", "featureGroups", function(obj, rtWindow = 30, mzWindow = 0.005, retMin = FALSE, topMost = NULL,
+setMethod("plotChroms", "featureGroups", function(obj, rtWindow = 30, mzExpWindow = 0.001, retMin = FALSE, topMost = NULL,
                                                   EICs = NULL, showPeakArea = FALSE, showFGroupRect = TRUE,
                                                   title = NULL, colourBy = c("none", "rGroups", "fGroups"),
                                                   showLegend = TRUE, onlyPresent = TRUE,
@@ -871,7 +871,7 @@ setMethod("plotChroms", "featureGroups", function(obj, rtWindow = 30, mzWindow =
                                                   xlim = NULL, ylim = NULL, ...)
 {
     ac <- checkmate::makeAssertCollection()
-    aapply(checkmate::assertNumber, . ~ rtWindow + mzWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
+    aapply(checkmate::assertNumber, . ~ rtWindow + mzExpWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
     aapply(checkmate::assertFlag, . ~ retMin + showPeakArea + showFGroupRect + showLegend +
                onlyPresent + showProgress,
            fixed = list(add = ac))
@@ -905,7 +905,7 @@ setMethod("plotChroms", "featureGroups", function(obj, rtWindow = 30, mzWindow =
     rGroups <- unique(anaInfo$group)
 
     if (is.null(EICs))
-        EICs <- getEICsForFGroups(obj, rtWindow, mzWindow, topMost, onlyPresent)
+        EICs <- getEICsForFGroups(obj, rtWindow, mzExpWindow, topMost, onlyPresent)
     EICFGroups <- unique(unlist(sapply(EICs, names)))
 
     if (colourBy == "rGroups")
@@ -1095,7 +1095,7 @@ setMethod("plotChroms", "featureGroups", function(obj, rtWindow = 30, mzWindow =
     par(oldp)
 })
 
-setMethod("plotChromsHash", "featureGroups", function(obj, rtWindow = 30, mzWindow = 0.005, retMin = FALSE, topMost = NULL,
+setMethod("plotChromsHash", "featureGroups", function(obj, rtWindow = 30, mzExpWindow = 0.001, retMin = FALSE, topMost = NULL,
                                                       EICs = NULL, showPeakArea = FALSE, showFGroupRect = TRUE,
                                                       title = NULL, colourBy = c("none", "rGroups", "fGroups"),
                                                       showLegend = TRUE, onlyPresent = TRUE,

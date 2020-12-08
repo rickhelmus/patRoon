@@ -55,7 +55,6 @@
 - tests
     - automatic InChIKey/formula calculation from InChIs/SMILES
         - already done implicitly?
-    - reporting
 
 
 ## docs

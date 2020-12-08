@@ -91,9 +91,9 @@ if (hasMF)
     fGroupsOnlyForms <- annotateSuspects(fGroupsScr, MSPeakLists = plists, formulas = forms)
     fGroupsAnnNoRT <- annotateSuspects(fGroupsScrNoRT, MSPeakLists = plists, formulas = forms, compounds = compsMFMoNa)
     
-    fGroupsAnnFragNoRT <- screenSuspects(fGroupsScr, suspsFrag[, -"rt"])
+    fGroupsAnnFragNoRT <- screenSuspects(fGroupsScr, suspsFrag[, -"rt"], onlyHits = TRUE)
     fGroupsAnnFragNoRT <- annotateSuspects(fGroupsAnnFragNoRT, MSPeakLists = plists)
-    fGroupsAnnFrag <- screenSuspects(fGroupsScr, suspsFrag)
+    fGroupsAnnFrag <- screenSuspects(fGroupsScr, suspsFrag, onlyHits = TRUE)
     fGroupsAnnFrag <- annotateSuspects(fGroupsAnnFrag, MSPeakLists = plists)
     
     idlFrag <- getWorkPath("fragtest.yml")
@@ -212,16 +212,33 @@ if (hasMF)
 test_that("Empty objects", {
     expect_length(screenSuspects(fGroupsEmpty, suspsEmpty, adduct = "[M+H]+"), 0)
     expect_length(fGroupsScrEmpty, length(fGroups))
+    expect_equal(nrow(as.data.table(fGroupsScrEmpty, onlyHits = TRUE)), 0)
     
     expect_length(filter(fGroupsScrEmpty, onlyHits = TRUE), 0)
     expect_length(filter(fGroupsScrEmpty, onlyHits = TRUE, negate = TRUE), length(fGroups))
 
     skip_if_not(hasMF)
     expect_length(fGroupsScrAnnEmpty, length(fGroups))
+    expect_equal(nrow(as.data.table(fGroupsScrAnnEmpty, onlyHits = TRUE)), 0)
     expect_length(filter(fGroupsScrAnnEmpty, selectHitsBy = "intensity", onlyHits = TRUE), 0)
     expect_length(filter(fGroupsScrAnnEmpty, selectHitsBy = "level", onlyHits = TRUE), 0)
     expect_length(filter(fGroupsScrAnnEmpty, selectBestFGroups = TRUE, onlyHits = TRUE), 0)
     expect_length(filter(fGroupsScrAnnEmpty, minAnnSimForm = 0.0, onlyHits = TRUE), 0)
+})
+
+test_that("reporting works", {
+    skip_if_not(hasMF)
+    
+    expect_file(reportCSV(fGroupsAnnNoRT, getWorkPath()),
+                getWorkPath(paste0(class(fGroupsAnnNoRT), ".csv")))
+    checkmate::expect_names(names(fread(getWorkPath(paste0(class(fGroupsAnnNoRT), ".csv")))),
+                            must.include = c("name", "suspCompRank", "annSimBoth", "estIDLevel"))
+    expect_file(reportPDF(fGroupsAnnNoRT, getWorkPath()), getWorkPath(paste0(class(fGroupsAnnNoRT), ".pdf")))
+    expect_reportHTML(makeReportHTML(fGroupsAnnNoRT))
+
+    expect_error(reportCSV(fGroupsScrAnnEmpty[, 1:10], getWorkPath()), NA)
+    expect_error(reportPDF(fGroupsScrAnnEmpty[, 1:10], getWorkPath()), NA)
+    expect_error(makeReportHTML(fGroupsScrAnnEmpty[, 1:10]), NA)
 })
 
 

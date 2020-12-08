@@ -174,7 +174,7 @@ doScreenSuspects <- function(fGroups, suspects, rtWindow, mzWindow, adduct, skip
         {
             ret <- data.table()
             setMetaData(ret, suspects[ti])
-            ret[, c("group", "d_rt", "d_mz") := NA]
+            ret[, c("group", "d_rt", "d_mz") := list(NA_character_, NA_real_, NA_real_)]
             return(ret)
         }
         

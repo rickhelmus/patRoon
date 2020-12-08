@@ -38,10 +38,19 @@
     - new plotVenn list functionality
     - removal of screening for features
     - simplified reportCSV() for fGroups
+    - new suspect interface
+        - suspect annotation
+            - ranks, sim
+            - newProject() updated for suspect annotation
+            - id levels
+        - new fGroupsScreening format
+            - fGroups are kept by default to allow mixed workflows
+        - filters
     - suspect lists
         - InChIKey, fragments_* columns
         - name verification
-    - reportHTML(): highlight multiple rows, select columns & scrollbar for annotation table
+        - formulas, neutral masses etc are always calculated if possible (obtainable from screenInfo())
+    - reportHTML(): report susp annotation data, highlight multiple rows, select columns & scrollbar for annotation table, suspect formula/compound candidates highlighted
     - MoNA exact now included by default
 - update docs and handbook
     - mention that components should be done prior to onlyHits=T?

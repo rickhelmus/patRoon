@@ -507,6 +507,8 @@ Level | Description | Rules
 
 In general, the more data provided by the suspect list and to `annotateSuspects()`, the better identification level estimation works. For instance, when considering the default rules, either the `fragments_mz` or `fragments_formula` column is necessary to be able assign a `level 3b`. Similarly, the suspect list needs retention times (as well as fragment data) to be able to assign `level 1`. As you can imagine, providing the annotation workflow objects (i.e. `MSPeakLists`, `formulas`, `compounds`) to `annotateSuspects()` is necessary for calculation of most levels.
 
+The `annotateSuspects()` function will log decisions for identification level assignments to the `log/` sub-directory in the current working directory. This is useful to inspect level assignments and especially useful when you customized any rules.
+
 > **NOTE**: The current identification level rules are _only_ optimized for GenForm and MetFrag annotation algorithms.
 
 ## Componentization

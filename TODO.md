@@ -59,6 +59,7 @@
 - Fix: blank filter with multiple replicate groups (and maybe others?)
 - Check: units of plotChord() rt/mz graphs seems off
 - update docs and checkChromatograms() for mzWindow --> mzExpWindow
+- also subset features if fGroups are?
 
 
 ## MSPeakLists

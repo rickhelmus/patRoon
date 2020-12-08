@@ -48,7 +48,6 @@
     - MoNA exact now included by default
 - update docs and handbook
     - mention that components should be done prior to onlyHits=T?
-    - default ID level rules (ref and/or handbook)
 - tests
     - automatic InChIKey/formula calculation from InChIs/SMILES
         - already done implicitly?

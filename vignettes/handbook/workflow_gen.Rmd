@@ -492,7 +492,20 @@ fGroupsSusp <- annotateSuspects(fGroupsSusp, MSPeakLists = mslists,
                                 formulas = formulas, compounds = compounds)
 ```
 
-The calculation of identification levels is performed by a set of pre-defined rules. The `genIDLevelRulesFile()` can be used to inspect the default rules or to create your own rules file, which can subsequently passed to `annotateSuspects()` with the `IDFile` argument. See `?annotateSuspects` for more details on the file format and options. In general, the more data provided by the suspect list and to `annotateSuspects()`, the better identification level estimation works. For instance, when considering the default rules, either the `fragments_mz` or `fragments_formula` are necessary to be able assign a `level 3b` (all or at least three suspect fragments were matched). Similarly, the suspect list needs retention times (as well as fragment data) to be able to assign `level 1`. As you can imagine, providing the annotation workflow objects (i.e. `MSPeakLists`, `formulas`, `compounds`) to `annotateSuspects()` is necessary for calculation of most levels.
+The calculation of identification levels is performed by a set of pre-defined rules. The `genIDLevelRulesFile()` can be used to inspect the default rules or to create your own rules file, which can subsequently passed to `annotateSuspects()` with the `IDFile` argument. See `?annotateSuspects` for more details on the file format and options. The default identification levels can be summarized as follows:
+
+Level | Description | Rules
+----- | ----------- | --------------------------------
+1     | Target match               | Retention time deviates <12 seconds from suspect list. At least `3` (or all if the suspect list contains less) fragments from the suspect list must match.
+2a    | Good MS/MS library match   | Suspect is top ranked in the `compounds` results. The `individualMoNAScore` is at least `0.9` and all other candidates have no MoNA library score.
+3a    | Fair library match | The `individualMoNAScore` is at least 0.4.
+3b    | Known MS/MS match          | At least `3` (or all if the suspect list contains less) fragments from the suspect list must match.
+3c    | Good in-silico MS/MS match | The annotation MS/MS similarity (`annSimComp` column) is at least `0.7`.
+4a    | Good formula MS/MS match   | Suspect is top ranked formula candidate, annotation MS/MS similarity (`annSimForm` column) is at least `0.7` and isotopic match (`isoScore`) of at least 0.5. The latter two scores are at least `0.2` higher than next best ranked candidate.
+4b    | Good formula isotopic pattern match | Suspect is top ranked formula candidate and isotopic match (`isoScore`) of at least `0.9` and at least `0.2` higher than next best ranked candidate.
+5     | Unknown                    | All else.
+
+In general, the more data provided by the suspect list and to `annotateSuspects()`, the better identification level estimation works. For instance, when considering the default rules, either the `fragments_mz` or `fragments_formula` column is necessary to be able assign a `level 3b`. Similarly, the suspect list needs retention times (as well as fragment data) to be able to assign `level 1`. As you can imagine, providing the annotation workflow objects (i.e. `MSPeakLists`, `formulas`, `compounds`) to `annotateSuspects()` is necessary for calculation of most levels.
 
 > **NOTE**: The current identification level rules are _only_ optimized for GenForm and MetFrag annotation algorithms.
 

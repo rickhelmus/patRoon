@@ -11,8 +11,6 @@
 ## AutoID
 
 - ID level rules
-    - GenForm scoring: somehow exclude non MS/MS candidates if MS/MS candidates are present?
-        - already fine now with minimum rank?
     - add scorings for SIRIUS/DA
 - interface
     - also convert TASQ?
@@ -31,7 +29,6 @@
         - mainly to allow merging of lists, perhaps make util for that instead? Would also be handy for MF databases
             - could also fix column names, replace "-" with NAs etc
         - if yes, mention in ref docs for screenSuspects()
-    - better name for selectBestFGroups filter?
 - expand reporting
     - eg include suspect name in EICs
     - mention suspect similarities/ranks etc for candidates (or somehow in compounds?)
@@ -48,9 +45,6 @@
     - MoNA exact now included by default
 - update docs and handbook
     - mention that components should be done prior to onlyHits=T?
-- tests
-    - automatic InChIKey/formula calculation from InChIs/SMILES
-        - already done implicitly?
 
 
 ## docs

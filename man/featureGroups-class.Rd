@@ -265,7 +265,7 @@ of \code{character} vectors with replicate groups to compare. For instance,
 \code{which=list(infl = c("influent-A", "influent-B"), effl =
 c("effluent-A", "effluent-B"))}, will compare the features in replicate
 groups \samp{"influent-A/B"} against those in \samp{"effluent-A/B"}.
-The names of the list are used for labeling in the plot, and will be made
+The names of the list are used for labelling in the plot, and will be made
 automatically if not specified.}
 
 \item{nsets, nintersects}{See \code{\link[UpSetR]{upset}}.}

@@ -4,14 +4,19 @@
 \alias{patRoon-defunct}
 \alias{compoundViewer,featureGroups,MSPeakLists,compounds-method}
 \alias{compoundViewer}
+\alias{groupFeaturesScreening}
 \title{Defunct functions.}
 \usage{
 \S4method{compoundViewer}{featureGroups,MSPeakLists,compounds}(fGroups, MSPeakLists, compounds)
+
+groupFeaturesScreening(...)
 }
 \arguments{
 \item{MSPeakLists}{A \code{\link{MSPeakLists}} object.}
 
 \item{compounds}{A \code{\link{compounds}} object.}
+
+\item{...}{Ignore.}
 }
 \description{
 These functions do not work anymore and may be updated in the future.
@@ -22,5 +27,9 @@ The \code{compoundViewer} method is used to view compound
   identification results. It will display available candidate information
   such as scorings and identifiers, MS/MS spectra with explained peaks and
   chemical structures.
+
+\code{groupFeaturesScreening} was replaced by
+  \code{\link{screenSuspects}}. Please refer to this function and the
+  handbook for the updated interface.
 }
 \keyword{internal}

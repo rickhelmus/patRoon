@@ -4,7 +4,6 @@
 \alias{patRoon-deprecated}
 \alias{reportMD}
 \alias{exportDAFiles}
-\alias{screenTargets}
 \alias{plotEIC}
 \alias{groups}
 \alias{plotSpec}
@@ -19,8 +18,6 @@ exportDAFiles(
   outPath = anaInfo$path,
   overWrite = FALSE
 )
-
-screenTargets(obj, targets, rtWindow, mzWindow)
 
 plotEIC(obj, ...)
 
@@ -54,8 +51,6 @@ future.
 
 \code{exportDAFiles} will export a set of analyses either in
   \file{.mzXML} or \file{.mzML} formats.
-
-Please use \code{\link{screenSuspects}} instead.
 
 Please use \code{\link{plotChroms}} instead.
 

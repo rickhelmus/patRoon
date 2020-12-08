@@ -83,16 +83,6 @@ exportDAFiles <- function(anaInfo, format = "mzML", exportLine = TRUE, outPath =
     invisible(NULL)
 }
 
-#' @details Please use \code{\link{screenSuspects}} instead.
-#' @rdname patRoon-deprecated
-#' @export
-#' @keywords internal
-screenTargets <- function(obj, targets, rtWindow, mzWindow)
-{
-    .Deprecated("screenSuspects")
-    screenSuspects(obj, targets, rtWindow, mzWindow)
-}
-
 #' @details Please use \code{\link{plotChroms}} instead.
 #' @rdname patRoon-deprecated
 #' @export

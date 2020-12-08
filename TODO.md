@@ -32,8 +32,6 @@
             - could also fix column names, replace "-" with NAs etc
         - if yes, mention in ref docs for screenSuspects()
     - better name for selectBestFGroups filter?
-    - prepareSuspectList: handle empty names
-    - include MoNA exact by default
 - expand reporting
     - eg include suspect name in EICs
     - mention suspect similarities/ranks etc for candidates (or somehow in compounds?)
@@ -47,9 +45,8 @@
         - InChIKey, fragments_* columns
         - name verification
     - reportHTML(): highlight multiple rows, select columns & scrollbar for annotation table
+    - MoNA exact now included by default
 - update docs and handbook
-    - new plotVenn list functionality
-    - update TASQ docs and other mentions to old suspect screening interface
     - mention that components should be done prior to onlyHits=T?
     - default ID level rules (ref and/or handbook)
 - tests
@@ -94,6 +91,7 @@
 - timeouts for SIRIUS?
 - do something about negative H explained fragments by MF?
 - SusDat MF support
+- MetFrag: auto-include suspect results if suspectListScore is selected?
 
 
 ## formulas

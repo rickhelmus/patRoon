@@ -2,7 +2,7 @@ name,metfrag,sirius,database,suspect_list,default,description
 score,Score,score,,FALSE,TRUE,Overall score
 fragScore,FragmenterScore,,,FALSE,TRUE,In-silico MS/MS score
 metFusionScore,OfflineMetFusionScore,,,FALSE,TRUE,
-individualMoNAScore,OfflineIndividualMoNAScore,,,FALSE,FALSE,
+individualMoNAScore,OfflineIndividualMoNAScore,,,FALSE,TRUE,
 numberPatents,PubChemNumberPatents,PubChemNumberPatents,pubchem,FALSE,TRUE,Not reported anymore by SIRIUS?
 numberPatents,Patent_Count,,pubchemlite,FALSE,TRUE,
 pubMedReferences,PubChemNumberPubMedReferences,,pubchem,FALSE,TRUE,

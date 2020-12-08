@@ -20,6 +20,7 @@ getMissingPkgs <- function()
 {
     dp <- desc::desc_get_deps()
     dp <- dp[dp$type != "Suggests", "package"]
+    dp <- dp[dp != "R"]
     return(dp[!sapply(dp, require, quietly = TRUE, character.only = TRUE)])
 }
 

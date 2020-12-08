@@ -100,10 +100,10 @@
     <loc>https://rickhelmus.github.io/patRoon/reference/generics.html</loc>
   </url>
   <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/getXCMSSet.html</loc>
+    <loc>https://rickhelmus.github.io/patRoon/reference/optimizationResult-class.html</loc>
   </url>
   <url>
-    <loc>https://rickhelmus.github.io/patRoon/reference/optimizationResult-class.html</loc>
+    <loc>https://rickhelmus.github.io/patRoon/reference/patRoon-defunct.html</loc>
   </url>
   <url>
     <loc>https://rickhelmus.github.io/patRoon/reference/patRoon-deprecated.html</loc>
@@ -128,6 +128,9 @@
   </url>
   <url>
     <loc>https://rickhelmus.github.io/patRoon/reference/workflowStep-class.html</loc>
+  </url>
+  <url>
+    <loc>https://rickhelmus.github.io/patRoon/reference/xcms-conv.html</loc>
   </url>
   <url>
     <loc>https://rickhelmus.github.io/patRoon/articles/handbook.html</loc>

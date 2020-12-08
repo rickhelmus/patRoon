@@ -200,11 +200,15 @@
 </li>
 <li>Finding features with <code>OpenMS</code>: potentially large temporary files are removed when possible to avoid clogging up disk space (especially relevant on some Linux systems where <code>/tmp</code> is small).</li>
 <li>Several packages such as <code>XCMS</code> are not attached by default, which significantly speeds up loading <code>patRoon</code> (e.g. with <code><a href="https://rdrr.io/r/base/library.html">library()</a></code>).</li>
-<li>The <code>compoundViewer()</code> function was marked as defunct, as it hasn;t been working for some time and its functionality is largely replaced by <code><a href="../reference/reporting.html">reportHTML()</a></code>.</li>
+<li>The <code><a href="../reference/patRoon-defunct.html">compoundViewer()</a></code> function was marked as defunct, as it hasn;t been working for some time and its functionality is largely replaced by <code><a href="../reference/reporting.html">reportHTML()</a></code>.</li>
 <li>
 <code><a href="../reference/component-generation.html">generateComponentsNontarget()</a></code>: update homolog statistics for merged series.</li>
 <li>
 <code><a href="../reference/GUI-utils.html">checkChromatograms()</a></code>: fix error when <code>fGroups</code> has only one replicate group</li>
+<li>
+<code><a href="../reference/convertMSFiles.html">convertMSFiles()</a></code>: If <code>algorithm="pwiz"</code> and vendor centroiding is used then any extra filters are now correctly put after the <code>peakPicking</code> filter.</li>
+<li>
+<code><a href="../reference/getXCMSSet.html">getXCMSnExp()</a></code> is now properly exported and documented.</li>
 </ul>
 </div>
     <div id="patroon-104" class="section level1">

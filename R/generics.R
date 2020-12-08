@@ -24,19 +24,20 @@ setGeneric("replicateGroupSubtract", function(fGroups, rGroups, threshold = 0) s
 
 ### utils (XCMS)
 
-#' Conversion to xcmsSet objects
+#' Conversion to XCMS objects
 #'
 #' Converts a \code{\link{features}} or \code{\link{featureGroups}} object to an
-#' \code{\link{xcmsSet}} object.
+#' \code{\link{xcmsSet}} or \code{\link{XCMSnExp}} object.
 #'
 #' @param obj The object that should be converted.
 #' @param exportedData,\dots Set to \code{TRUE} if analyses were exported as
 #'   \code{mzXML} or \code{mzML} files (ignored for \code{featuresOpenMS} and
 #'   \code{featuresXCMS} methods).
 #' @param verbose If \code{FALSE} then no text output is shown.
-#'
+#' @rdname xcms-conv
 setGeneric("getXCMSSet", function(obj, verbose = TRUE, ...) standardGeneric("getXCMSSet"))
 
+#' @rdname xcms-conv
 setGeneric("getXCMSnExp", function(obj, verbose = TRUE) standardGeneric("getXCMSnExp"))
 
 ### MS Peak Lists

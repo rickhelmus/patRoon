@@ -2,14 +2,21 @@
 % Please edit documentation in R/generics.R, R/utils-xcms.R
 \name{getXCMSSet}
 \alias{getXCMSSet}
+\alias{getXCMSnExp}
 \alias{getXCMSSet,features-method}
 \alias{getXCMSSet,featuresOpenMS-method}
 \alias{getXCMSSet,featuresXCMS-method}
 \alias{getXCMSSet,featureGroups-method}
 \alias{getXCMSSet,featureGroupsXCMS-method}
-\title{Conversion to xcmsSet objects}
+\alias{getXCMSnExp,features-method}
+\alias{getXCMSnExp,featuresXCMS3-method}
+\alias{getXCMSnExp,featureGroups-method}
+\alias{getXCMSnExp,featureGroupsXCMS3-method}
+\title{Conversion to XCMS objects}
 \usage{
 getXCMSSet(obj, verbose = TRUE, ...)
+
+getXCMSnExp(obj, verbose = TRUE)
 
 \S4method{getXCMSSet}{features}(obj, verbose, exportedData)
 
@@ -20,6 +27,14 @@ getXCMSSet(obj, verbose = TRUE, ...)
 \S4method{getXCMSSet}{featureGroups}(obj, verbose, exportedData)
 
 \S4method{getXCMSSet}{featureGroupsXCMS}(obj, verbose, exportedData)
+
+\S4method{getXCMSnExp}{features}(obj, verbose = TRUE)
+
+\S4method{getXCMSnExp}{featuresXCMS3}(obj, verbose = TRUE)
+
+\S4method{getXCMSnExp}{featureGroups}(obj, verbose = TRUE)
+
+\S4method{getXCMSnExp}{featureGroupsXCMS3}(obj, verbose = TRUE)
 }
 \arguments{
 \item{obj}{The object that should be converted.}
@@ -32,5 +47,5 @@ getXCMSSet(obj, verbose = TRUE, ...)
 }
 \description{
 Converts a \code{\link{features}} or \code{\link{featureGroups}} object to an
-\code{\link{xcmsSet}} object.
+\code{\link{xcmsSet}} or \code{\link{XCMSnExp}} object.
 }

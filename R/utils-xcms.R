@@ -99,7 +99,7 @@ makeXCMSGroups <- function(fGroups, verbose = TRUE)
 }
 
 
-#' @rdname getXCMSSet
+#' @rdname xcms-conv
 #' @export
 setMethod("getXCMSSet", "features", function(obj, verbose, exportedData)
 {
@@ -153,21 +153,21 @@ setMethod("getXCMSSet", "features", function(obj, verbose, exportedData)
     return(xs)
 })
 
-#' @rdname getXCMSSet
+#' @rdname xcms-conv
 #' @export
 setMethod("getXCMSSet", "featuresOpenMS", function(obj, verbose, ...)
 {
     return(callNextMethod(obj, verbose = verbose, exportedData = TRUE))
 })
 
-#' @rdname getXCMSSet
+#' @rdname xcms-conv
 #' @export
 setMethod("getXCMSSet", "featuresXCMS", function(obj, ...)
 {
     return(obj@xs)
 })
 
-#' @rdname getXCMSSet
+#' @rdname xcms-conv
 #' @export
 setMethod("getXCMSSet", "featureGroups", function(obj, verbose, exportedData)
 {
@@ -185,7 +185,7 @@ setMethod("getXCMSSet", "featureGroups", function(obj, verbose, exportedData)
     return(xs)
 })
 
-#' @rdname getXCMSSet
+#' @rdname xcms-conv
 #' @export
 setMethod("getXCMSSet", "featureGroupsXCMS", function(obj, verbose, exportedData)
 {
@@ -203,6 +203,8 @@ setMethod("getXCMSSet", "featureGroupsXCMS", function(obj, verbose, exportedData
     return(obj@xs)
 })
 
+#' @rdname xcms-conv
+#' @export
 setMethod("getXCMSnExp", "features", function(obj, verbose)
 {
     rawData <- readMSDataForXCMS3(analysisInfo(obj))
@@ -250,11 +252,15 @@ setMethod("getXCMSnExp", "features", function(obj, verbose)
     return(ret)
 })
 
+#' @rdname xcms-conv
+#' @export
 setMethod("getXCMSnExp", "featuresXCMS3", function(obj, verbose)
 {
     return(obj@xdata)
 })
 
+#' @rdname xcms-conv
+#' @export
 setMethod("getXCMSnExp", "featureGroups", function(obj, verbose)
 {
     if (verbose)
@@ -285,6 +291,8 @@ setMethod("getXCMSnExp", "featureGroups", function(obj, verbose)
     return(xdata)
 })
 
+#' @rdname xcms-conv
+#' @export
 setMethod("getXCMSnExp", "featureGroupsXCMS3", function(obj, verbose)
 {
     # first see if we can just return the embedded xcms object

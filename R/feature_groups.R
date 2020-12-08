@@ -1263,6 +1263,35 @@ setMethod("overlap", "featureGroups", function(fGroups, which, exclusive)
     return(ret)
 })
 
+setMethod("calculatePeakQualities", "featureGroups", function(fGroups)
+{
+    EICs <- getEICsForFGroups(fGroups, 0, 0, NULL, TRUE)
+    ftind <- groupFeatIndex(fGroups)
+    anas <- analyses(fGroups)
+    gNames <- names(fGroups)
+    
+    qualities <- c("ABR", "F2B")
+    calcQualities <- function(retmin, retmax, EIC)
+    {
+        args <- list(c(rtmin = retmin, rtmax = retmax), as.matrix(EIC))
+        return(list(ABR = do.call(MetaClean::calculateApexMaxBoundaryRatio, args),
+                    "F2B" = do.call(MetaClean::calculateFWHM, args)))
+    }
+    
+    for (ana in names(EICs))
+    {
+        feat <- copy(featureTable(fGroups)[[ana]])
+        anai <- match(ana, anas)
+        featInds <- unlist(ftind[anai])
+        groups <- gNames[featInds != 0]
+        featInds <- featInds[featInds != 0]
+        feat[featInds, (qualities) := rbindlist(Map(calcQualities, retmin, retmax, EICs[[ana]][groups]))]
+        fGroups@features@features[[ana]] <- feat
+    }
+    
+    return(fGroups)
+})
+
 #' @templateVar func groupFeatures
 #' @templateVar what group features
 #' @templateVar ex1 groupFeaturesOpenMS

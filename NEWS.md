@@ -1,7 +1,50 @@
-# patRoon 1.1.1
+# patRoon 1.2.0
 
+This releases focuses on a significantly changed suspect screening interface, which brings several utilities to assist suspect annotation, prioritization, mixing of suspect and full NTA workflows and other general improvements.
+
+**IMPORTANT**: The suspect screening interface has changed slightly. Please read the documentation (`?screenSuspects` and the handbook) for more details. If you want to quickly update your code without using any new functionality:
+
+Change your existing code, e.g.
+
+```r
+scr <- screenSuspects(fGroups, suspectList, ...)
+fGroupsScr <- groupFeaturesScreening(fGroups, scr)
+```
+
+to
+
+```r
+fGroupsScr <- screenSuspects(fGroups, suspectList, ..., onlyHits = TRUE)
+```
+
+**Major changes**
+
+* New suspect screening interface
+    * By default, feature groups without suspect hit are _not_ removed (unless `onlyHits=TRUE`). This allows straightforward mixing of suspect and full non-target workflows.
+    * The feature groups are _not_ renamed tot the suspect name anymore. If you quickly want to assess which suspects were found, use the `screenInfo()` or `as.data.table()` methods.
+    * Subsetting of suspsect screening results can be done with the `suspects` argument to `[`, e.g. `fGroupsScr[, suspects = "carbamazepine"]`
+    * A new method, `annotateSuspects()`, allows combining the annotation workflow data (peak lists, formulas, compounds) to perform a detailed annotation for the suspects found during the workflow. This method calculates properties such as
+        * Rankings: where is the suspect formula/compound ranked in the candidates from the workflow data
+        * Annotation similarity: how well does the MS/MS spectrum of the suspect matches with formula/compound annotations.
+        * An _estimation_ of identification levels to assist in quickly evaluating how well the suspect was annotated. The rules for identification levels are fully configurable.
+    * A dedicated `filter()` method for suspect screening results, which allows you to easily prioritize data, for instance, by selecting minimum annotation ranks and similarities, identification levels and automatically choosing the best match in case multiple suspects are assigned to one feature (and vice versa).
+    * A dedicated `as.data.table()` method and reporting functionality for suspect screening results to quickly inspect their annotation data.
+    * Please refer to the updated suspect screening sections in the handbook and `?screenSuspects` and `?annotateSuspects` for  more information.
+* Changes to suspect lists
+    * Whenever possible, suspect information such as formulae, neutral masses, InChIKeys etc will be calculated for the input suspect list (obtainable afterwards with `screenInfo()`).
+    * The suspect names will be checked to be file compatible, and automatically adjusted if necessary.
+    * If MS/MS fragments are known for a suspect (formula or `m/z`), these can be included in the suspect list to improve suspect annotation.
+    * The old suspect screening support for `features` objects was removed. The same and much more functionality can be obtained by the workflow for feature groups.
+* The `reportCSV()` function was simplified and uses `as.data.table()` to generate the CSV data. This should give more consistent results.
+* The `individualMoNAScore` MetFrag scoring is now enabled by default.
+
+Other changes
+
+* `reportHTML()` now allows toggling visibility for the columns shown in the feature annotation table.
+* The `plotVenn()` method for `featureGroups` now allows to compare combinations of multiple replicate groups with each other. See `?plotVenn` for more information.
 * Fix: locating `SIRIUS` binary on `macOS` did not work properly
 * Fix: timeout warning for `GenForm` resulted in an error (https://github.com/rickhelmus/patRoon/issues/18)
+            
 
 # patRoon 1.1
 

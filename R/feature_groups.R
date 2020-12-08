@@ -1263,19 +1263,26 @@ setMethod("overlap", "featureGroups", function(fGroups, which, exclusive)
     return(ret)
 })
 
-setMethod("calculatePeakQualities", "featureGroups", function(fGroups)
+setMethod("calculatePeakQualities", "featureGroups", function(fGroups, flatnessFactor)
 {
     EICs <- getEICsForFGroups(fGroups, 0, 0, NULL, TRUE)
     ftind <- groupFeatIndex(fGroups)
     anas <- analyses(fGroups)
     gNames <- names(fGroups)
     
-    qualities <- c("ABR", "F2B")
-    calcQualities <- function(retmin, retmax, EIC)
+    qualities <- c("ABR", "F2B", "J", "M", "SY", "GS", "SH", "TPASR", "ZZ")
+    calcQualities <- function(ret, retmin, retmax, intensity, EIC)
     {
-        args <- list(c(rtmin = retmin, rtmax = retmax), as.matrix(EIC))
+        args <- list(c(rt = ret, rtmin = retmin, rtmax = retmax, maxo = intensity), as.matrix(EIC))
         return(list(ABR = do.call(MetaClean::calculateApexMaxBoundaryRatio, args),
-                    "F2B" = do.call(MetaClean::calculateFWHM, args)))
+                    "F2B" = do.call(MetaClean::calculateFWHM, args),
+                    J = do.call(MetaClean::calculateJaggedness, c(args, flatnessFactor)),
+                    M = do.call(MetaClean::calculateModality, c(args, flatnessFactor)),
+                    SY = do.call(MetaClean::calculateSymmetry, args),
+                    GS = do.call(MetaClean::calculateGaussianSimilarity, args), # BUG: doesn't work (missing SSgaus)
+                    SH = do.call(MetaClean::calculateSharpness, args),
+                    TPASR = do.call(MetaClean::calculateTPASR, args),
+                    ZZ = do.call(MetaClean::calculateZigZagIndex, args)))
     }
     
     for (ana in names(EICs))
@@ -1285,7 +1292,8 @@ setMethod("calculatePeakQualities", "featureGroups", function(fGroups)
         featInds <- unlist(ftind[anai])
         groups <- gNames[featInds != 0]
         featInds <- featInds[featInds != 0]
-        feat[featInds, (qualities) := rbindlist(Map(calcQualities, retmin, retmax, EICs[[ana]][groups]))]
+        feat[featInds, (qualities) := rbindlist(Map(calcQualities, ret, retmin, retmax,
+                                                    intensity, EICs[[ana]][groups]))]
         fGroups@features@features[[ana]] <- feat
     }
     

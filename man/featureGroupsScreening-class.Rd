@@ -156,7 +156,8 @@ in opposite manner.}
 }
 \value{
 \code{annotateSuspects} returns a \code{featureGroupsScreening}
-  object amended with annotation data.
+  object, which is a \code{\link{featureGroups}} object amended with
+  annotation data.
 
 \code{filter} returns a filtered \code{featureGroupsScreening}
   object.
@@ -261,6 +262,9 @@ The \code{relMinMSMSIntensity} filter argument to
   level rules} section below.
 
   }
+
+  Note that only columns are present is sufficient data is available for
+  their calculation.
 }
 
 \section{Identification level rules}{
@@ -354,8 +358,7 @@ The \code{relMinMSMSIntensity} filter argument to
 }
 
 \references{
-\insertAllCited{} \cr \cr
-  \insertRef{Stein1994}{patRoon}
+\insertAllCited{} \cr \cr \insertRef{Stein1994}{patRoon}
 }
 \seealso{
 \code{\link{featureGroups}}

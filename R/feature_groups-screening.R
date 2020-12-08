@@ -74,6 +74,9 @@ NULL
 #'
 #'   }
 #'
+#'   Note that only columns are present is sufficient data is available for
+#'   their calculation.
+#'
 #' @section Identification level rules: The estimation of identification levels
 #'   is configured through a YAML file which specifies the rules for each level.
 #'   The default file is shown below.
@@ -120,8 +123,7 @@ NULL
 #' @templateVar class featureGroupsScreening
 #' @template class-hierarchy
 #'
-#' @references \insertAllCited{} \cr \cr
-#'   \insertRef{Stein1994}{patRoon}
+#' @references \insertAllCited{} \cr \cr \insertRef{Stein1994}{patRoon}
 #'
 #' @seealso \code{\link{featureGroups}}
 #'
@@ -248,7 +250,8 @@ setMethod("as.data.table", "featureGroupsScreening",
 #'   details. If not specified then a default rules file will be used.
 #'
 #' @return \code{annotateSuspects} returns a \code{featureGroupsScreening}
-#'   object amended with annotation data.
+#'   object, which is a \code{\link{featureGroups}} object amended with
+#'   annotation data.
 #'
 #' @note The \code{relMinMSMSIntensity} filter argument to
 #'   \code{annotateSuspects} is applied \emph{after} removing the precursor ion

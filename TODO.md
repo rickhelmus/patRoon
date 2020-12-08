@@ -58,7 +58,7 @@
 - comparison(): support xcms3? (needs missing support for missing raw data)
 - Fix: blank filter with multiple replicate groups (and maybe others?)
 - Check: units of plotChord() rt/mz graphs seems off
-- plotEIC(): get mzWindow from features if possible to show more representative results (eg when OpenMS mz window is very small)
+- update docs and checkChromatograms() for mzWindow --> mzExpWindow
 
 
 ## MSPeakLists

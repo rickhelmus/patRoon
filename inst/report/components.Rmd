@@ -37,7 +37,7 @@ for (ci in indsWithFGroups)
     allPlots[curPlotInd] <- file.path(plotPathFull, sprintf("component_eic_%d.png", ci))
     makeCachedPlot(allPlots[curPlotInd], "plotChroms",
                    list(rmdVars$components, ci, rmdVars$fGroups, rtWindow = rmdVars$EICRtWindow,
-                        mzWindow = rmdVars$EICMzWindow, retMin = rmdVars$retMin, EICs = rmdVars$EICs),
+                        mzWindow = rmdVars$EICMzExpWindow, retMin = rmdVars$retMin, EICs = rmdVars$EICs),
                    7, 4.5, bg = NA, cacheDB = rmdVars$cacheDB)
     
     if (isHClust)

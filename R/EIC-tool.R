@@ -130,10 +130,10 @@ getEICUI <- function(rtRange, mzWindow)
 #' @rdname GUI-utils
 #' @aliases checkChromatograms
 #' @export
-setMethod("checkChromatograms", "featureGroups", function(fGroups, mzWindow, enabledFGroups)
+setMethod("checkChromatograms", "featureGroups", function(fGroups, mzExpWindow, enabledFGroups)
 {
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertNumber(mzWindow, lower = 0, finite = TRUE, add = ac)
+    checkmate::assertNumber(mzExpWindow, lower = 0, finite = TRUE, add = ac)
     checkmate::assertCharacter(enabledFGroups, null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
 
@@ -151,7 +151,7 @@ setMethod("checkChromatograms", "featureGroups", function(fGroups, mzWindow, ena
     # rtRange <- max(sapply(xrs, function(xr) xr@scantime[length(xr@scantime)]))
     rtRange <- 1
 
-    EICPreviews <- getEICsForFGroups(fGroups, 10, mzWindow, topMost = 1, onlyPresent = FALSE)
+    EICPreviews <- getEICsForFGroups(fGroups, 10, mzExpWindow, topMost = 1, onlyPresent = FALSE)
     # format is in [[ana]][[fGroup]], since we only took top most intensive we can throw away the ana dimension
     EICPreviews <- Reduce(modifyList, EICPreviews)
 

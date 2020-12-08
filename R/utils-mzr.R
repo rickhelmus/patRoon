@@ -45,7 +45,7 @@ getEIC <- function(spectra, rtRange, mzRange, MSLevel = 1, precursor = NULL, pre
                                          function(s) sum(s[numGTE(mz, mzRange[1]) & numLTE(mz, mzRange[2]), intensity]))))
 }
 
-getEICsForFGroups <- function(fGroups, rtWindow, mzWindow, topMost, onlyPresent)
+getEICsForFGroups <- function(fGroups, rtWindow, mzExpWindow, topMost, onlyPresent)
 {
     if (length(fGroups) == 0)
         return(list())
@@ -75,7 +75,10 @@ getEICsForFGroups <- function(fGroups, rtWindow, mzWindow, topMost, onlyPresent)
             fTable[[anaInfo$analysis[anai]]][ftind[[fg]][anai]][[col]]
     }
 
-    for (fg in gNames)
+    if (!is.null(topMost))
+        topMost <- min(topMost, nrow(anaInfo))
+    
+    EICInfo <- rbindlist(sapply(gNames, function(fg)
     {
         if (!is.null(topMost))
         {
@@ -88,65 +91,55 @@ getEICsForFGroups <- function(fGroups, rtWindow, mzWindow, topMost, onlyPresent)
         if (onlyPresent)
             topAnalysesInd <- topAnalysesInd[gTable[[fg]][topAnalysesInd] != 0]
 
-        rtrMins <- sapply(topAnalysesInd, function(anai) getFTCol(fg, anai, "retmin"))
-        rtrMins <- rtrMins[!is.na(rtrMins)]
-        rtrMaxs <- sapply(topAnalysesInd, function(anai) getFTCol(fg, anai, "retmax"))
-        rtrMaxs <- rtrMaxs[!is.na(rtrMaxs)]
+        rtMins <- sapply(topAnalysesInd, getFTCol, fg = fg, col = "retmin")
+        rtMaxs <- sapply(topAnalysesInd, getFTCol, fg = fg, col = "retmax")
+        rtMins[is.na(rtMins)] <- min(rtMins, na.rm = TRUE); rtMaxs[is.na(rtMaxs)] <- max(rtMaxs, na.rm = TRUE)
+        rtMins <- rtMins - rtWindow; rtMaxs <- rtMaxs + rtWindow
         
-        if (length(rtrMins) > 0 && length(rtrMaxs) > 0)
-            rtr <- c(min(rtrMins), max(rtrMaxs))
-        else
-            rtr <- gInfo[fg, "rts"]
+        mzMins <- sapply(topAnalysesInd, getFTCol, fg = fg, col = "mzmin")
+        mzMaxs <- sapply(topAnalysesInd, getFTCol, fg = fg, col = "mzmax")
+        mzMins[is.na(mzMins)] <- min(mzMins, na.rm = TRUE) - mzExpWindow
+        mzMaxs[is.na(mzMaxs)] <- max(mzMaxs, na.rm = TRUE) + mzExpWindow
         
-        rtr <- rtr + c(-rtWindow, rtWindow)
-
-        doEICs[[fg]] <- anaInfo$analysis[topAnalysesInd]
-        rtRanges[[fg]] <- rtr
-    }
-
-    if (!is.null(topMost))
-        topMost <- min(topMost, nrow(anaInfo))
-
+        return(data.table(analysis = anaInfo$analysis[topAnalysesInd],
+                          retmin = rtMins, retmax = rtMaxs,
+                          mzmin = mzMins, mzmax = mzMaxs))
+    }, simplify = FALSE), idcol = "group")
+    
     cacheDB <- openCacheDBScope()
 
-    EICs <- list()
-    for (anai in seq_len(nrow(anaInfo)))
+    EICs <- Map(anaInfo$analysis, anaInfo$path, f = function(ana, path)
     {
-        ana <- anaInfo$analysis[anai]
-        anaHash <- NULL
-        dfile <- getMzMLOrMzXMLAnalysisPath(ana, anaInfo$path[anai])
+        EICInfoAna <- EICInfo[analysis == ana]
+        if (nrow(EICInfoAna) == 0)
+            return(NULL)
+        
+        dfile <- getMzMLOrMzXMLAnalysisPath(ana, path)
+        anaHash <- makeFileHash(dfile)
+        
+        EICInfoAna[, hash := makeHash(anaHash, .SD), by = seq_len(nrow(EICInfoAna)),
+                   .SDcols = c("retmin", "retmax", "mzmin", "mzmax")]
 
-        doGroups <- gNames[sapply(gNames, function(fg) ana %in% doEICs[[fg]])]
-        rtr <- rtRanges[doGroups]
-        mzr <- sapply(doGroups, function(fg) gInfo[fg, "mzs"] + c(-mzWindow, mzWindow), simplify = FALSE)
-        names(mzr) <- doGroups
+        gEICs <- pruneList(setNames(lapply(EICInfoAna$hash, loadCacheData, category = "mzREIC", dbArg = cacheDB),
+                                    EICInfoAna$group))
 
-        EICHashes <- sapply(doGroups, function(fg)
-        {
-            if (is.null(anaHash))
-                anaHash <<- makeFileHash(dfile)
-            makeHash(anaHash, rtr[[fg]], mzr[[fg]])
-        })
-
-        gEICs <- pruneList(sapply(doGroups, function(fg) loadCacheData("mzREIC", EICHashes[[fg]], cacheDB),
-                                  simplify = FALSE))
-
-        EICGNames <- doGroups[!doGroups %in% names(gEICs)]
-        if (length(EICGNames) > 0)
+        EICInfoAnaTODO <- EICInfoAna[!group %in% names(gEICs)]
+        if (nrow(EICInfoAnaTODO) > 0)
         {
             spectra <- loadSpectra(dfile, verbose = FALSE, cacheDB = cacheDB)
-            rtr <- rtr[EICGNames]
-            mzr <- mzr[EICGNames]
-            gEICs <- c(gEICs, setNames(loadEICs(spectra, rtr, mzr), EICGNames))
+            eics <- setNames(loadEICs(spectra, EICInfoAnaTODO$retmin, EICInfoAnaTODO$retmax,
+                                      EICInfoAnaTODO$mzmin, EICInfoAnaTODO$mzmax), EICInfoAnaTODO$group)
 
-            for (fg in EICGNames)
-                saveCacheData("mzREIC", gEICs[[fg]], EICHashes[[fg]], cacheDB)
+            for (i in seq_along(eics))
+                saveCacheData("mzREIC", eics[[i]], EICInfoAnaTODO$hash[i], cacheDB)
+            
+            gEICs <- c(gEICs, eics)
         }
 
-        EICs[[ana]] <- gEICs
-    }
-
-    return(EICs)
+        return(gEICs)
+    })
+    
+    return(pruneList(EICs))
 }
 
 averageSpectraMZR <- function(spectra, hd, clusterMzWindow, topMost, minIntensityPre,

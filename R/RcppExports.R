@@ -17,8 +17,8 @@ loadEICIntensities <- function(spectra, featList, rtWindow) {
     .Call(`_patRoon_loadEICIntensities`, spectra, featList, rtWindow)
 }
 
-loadEICs <- function(spectra, rtRanges, mzRanges) {
-    .Call(`_patRoon_loadEICs`, spectra, rtRanges, mzRanges)
+loadEICs <- function(spectra, rtMins, rtMaxs, mzMins, mzMaxs) {
+    .Call(`_patRoon_loadEICs`, spectra, rtMins, rtMaxs, mzMins, mzMaxs)
 }
 
 makeSAFDInput <- function(spectra, mzRange) {

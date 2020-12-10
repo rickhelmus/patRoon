@@ -27,9 +27,9 @@ setMethod("initialize", "featureGroupsXCMS3",
 #'
 #' @rdname feature-grouping
 #' @export
-groupFeaturesXCMS3 <- function(feat, rtalign = TRUE, exportedData = TRUE,
-                               groupParam = xcms::PeakDensityParam(sampleGroups = analysisInfo(feat)$group),
-                               retAlignParam = xcms::ObiwarpParam(), verbose = TRUE)
+setMethod("groupFeaturesXCMS3", "features", function(feat, rtalign = TRUE, exportedData = TRUE,
+                                                     groupParam = xcms::PeakDensityParam(sampleGroups = analysisInfo(feat)$group),
+                                                     retAlignParam = xcms::ObiwarpParam(), verbose = TRUE)
 {
     # UNDONE: aligning gives XCMS errors when multithreading
 
@@ -85,7 +85,7 @@ groupFeaturesXCMS3 <- function(feat, rtalign = TRUE, exportedData = TRUE,
     if (verbose)
         cat("\n===========\nDone!\n")
     return(ret)
-}
+})
 
 getFeatIndicesFromXCMSnExp <- function(xdata)
 {

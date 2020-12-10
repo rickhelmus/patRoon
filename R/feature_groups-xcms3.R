@@ -87,6 +87,9 @@ setMethod("groupFeaturesXCMS3", "features", function(feat, rtalign = TRUE, expor
     return(ret)
 })
 
+#' @export
+setMethod("groupFeaturesXCMS3", "featuresSet", function(feat, ...) stop("Not yet supported for featuresSet"))
+
 getFeatIndicesFromXCMSnExp <- function(xdata)
 {
     plist <- as.data.table(xcms::chromPeaks(xdata))

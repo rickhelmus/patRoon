@@ -57,6 +57,7 @@
     - provide methods for non-implemented functionality
         - consensus()? (see above)
         - compoundViewer?
+        - groupFeaturesXCMS3?
 - misc
     - as.data.table() for formulas: average=T will now produce strange averaged ionized formula, for now simply remove this column...
         - also give a note in docs?
@@ -97,6 +98,9 @@
     - mention that set coverage/formula feature coverages do not consider sets/analyses without any results
         - put message() in sync function?
     - document for every object how consensus/merge is done
+    - improve docs for areas (only affects when features=FALSE) and average (different behavior when features=TRUE/FALSE) for as.data.table() of featureGroups
+    - update/check version nr mentioned in filter() for MSPeakLists
+    - explain xlim/ylim behavior for annotations/mols for plotSpec()
 - tests
     - handle/test empty objects
     - test DA algorithms

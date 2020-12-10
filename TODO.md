@@ -4,6 +4,7 @@
 - test negative subset indices
 - convertMSFiles()
     - Agilent .d is also a directory?
+    - Remove necessity to have different input/output formats? (at least OK for pwiz)
 
 
 ## docs

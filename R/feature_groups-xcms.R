@@ -29,8 +29,9 @@ setMethod("initialize", "featureGroupsXCMS",
 #'
 #' @rdname feature-grouping
 #' @export
-groupFeaturesXCMS <- function(feat, rtalign = TRUE, exportedData = TRUE, groupArgs = list(mzwid = 0.015),
-                              retcorArgs = list(method = "obiwarp"), verbose = TRUE)
+setMethod("groupFeaturesXCMS", "features", function(feat, rtalign = TRUE, exportedData = TRUE,
+                                                    groupArgs = list(mzwid = 0.015), 
+                                                    retcorArgs = list(method = "obiwarp"), verbose = TRUE)
 {
     # UNDONE: keep exportedData things? Or just require that it's exported? If keep document also for OpenMS and implications.
 
@@ -82,7 +83,7 @@ groupFeaturesXCMS <- function(feat, rtalign = TRUE, exportedData = TRUE, groupAr
     if (verbose)
         cat("\n===========\nDone!\n")
     return(ret)
-}
+})
 
 getFeatIndicesFromXS <- function(xs)
 {

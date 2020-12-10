@@ -42,8 +42,10 @@ setMethod("initialize", "featureGroupsOpenMS",
 #'
 #' @rdname feature-grouping
 #' @export
-groupFeaturesOpenMS <- function(feat, rtalign = TRUE, QT = FALSE, maxAlignRT = 30, maxAlignMZ = 0.005, maxGroupRT = 12,
-                                maxGroupMZ = 0.005, extraOptsRT = NULL, extraOptsGroup = NULL, verbose = TRUE)
+setMethod("groupFeaturesOpenMS", "features", function(feat, rtalign = TRUE, QT = FALSE, maxAlignRT = 30,
+                                                      maxAlignMZ = 0.005, maxGroupRT = 12,
+                                                      maxGroupMZ = 0.005, extraOptsRT = NULL,
+                                                      extraOptsGroup = NULL, verbose = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(feat, "features", add = ac)
@@ -79,7 +81,7 @@ groupFeaturesOpenMS <- function(feat, rtalign = TRUE, QT = FALSE, maxAlignRT = 3
         cat("\n===========\nDone!\n")
 
     return(ret)
-}
+})
 
 generateConsensusXML <- function(feat, out, rtalign, QT, maxAlignRT, maxAlignMZ, maxGroupRT,
                                  maxGroupMZ, extraOptsRT, extraOptsGroup, verbose)

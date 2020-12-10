@@ -14,12 +14,17 @@ setGeneric("unique", function(x, incomparables = FALSE, ...) standardGeneric("un
 setGeneric("overlap", function(fGroups, which, exclusive = FALSE) standardGeneric("overlap"))
 setGeneric("comparison", function(..., groupAlgo,
                                   groupArgs = list(rtalign = FALSE)) standardGeneric("comparison"), signature = "...")
-setGeneric("groupFeatures", function(feat, algorithm, ...) standardGeneric("groupFeatures"))
 setGeneric("replicateGroupSubtract", function(fGroups, rGroups, threshold = 0) standardGeneric("replicateGroupSubtract"))
 setGeneric("groupQualities", function(fGroups) standardGeneric("groupQualities"))
 setGeneric("groupScores", function(fGroups) standardGeneric("groupScores"))
 
 setGeneric("getPICSet", function(obj, ...) standardGeneric("getPICSet"))
+
+setGeneric("groupFeatures", function(feat, algorithm, ...) standardGeneric("groupFeatures"))
+setGeneric("groupFeaturesOpenMS", function(feat, ...) standardGeneric("groupFeaturesOpenMS"))
+setGeneric("groupFeaturesXCMS", function(feat, ...) standardGeneric("groupFeaturesXCMS"))
+setGeneric("groupFeaturesXCMS3", function(feat, ...) standardGeneric("groupFeaturesXCMS3"))
+
 
 ### utils (XCMS)
 

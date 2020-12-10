@@ -187,11 +187,12 @@ setMethod("filter", "featuresSet", function(obj, ..., negate = FALSE, sets = NUL
     return(obj)
 })
 
-# UNDONE: implement someday?
-fSetNotYetImplemented <- function() stop("This function is not yet implemented for featuresSet.", call. = FALSE)
+# UNDONE: mention that object will be unset
+#' @export
+setMethod("getXCMSSet", "featuresSet", function(obj, ..., sets = NULL) getXCMSSet(unset(obj, sets), ...))
 
-setMethod("getXCMSSet", "featuresSet", function(obj, verbose) fSetNotYetImplemented())
-setMethod("getXCMSnExp", "featuresSet", function(obj, verbose) fSetNotYetImplemented())
+# UNDONE: mention that object will be unset
+setMethod("getXCMSnExp", "featuresSet", function(obj, ..., sets = NULL) getXCMSnExp(unset(obj, sets), ...))
 
 featuresUnset <- setClass("featuresUnset", contains = "features")
 setMethod("unset", "featuresSet", function(obj, sets)

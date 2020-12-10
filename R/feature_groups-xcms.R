@@ -41,23 +41,45 @@ setMethod("groupFeaturesXCMS", "features", function(feat, rtalign = TRUE, export
     aapply(checkmate::assertList, . ~ groupArgs + retcorArgs, any.missing = FALSE, names = "unique", fixed = list(add = ac))
     checkmate::reportAssertions(ac)
 
+    xs <- getXCMSSet(feat, verbose = verbose, exportedData = exportedData)
+    return(doGroupFeaturesXCMS(xs, feat, rtalign, exportedData, groupArgs, retcorArgs, verbose))
+})
+
+setMethod("groupFeaturesXCMS", "features", function(feat, rtalign = TRUE, exportedData = TRUE,
+                                                    groupArgs = list(mzwid = 0.015), 
+                                                    retcorArgs = list(method = "obiwarp"), verbose = TRUE)
+{
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertClass(feat, "features", add = ac)
+    aapply(checkmate::assertFlag, . ~ rtalign + exportedData + verbose, fixed = list(add = ac))
+    aapply(checkmate::assertList, . ~ groupArgs + retcorArgs, any.missing = FALSE, names = "unique", fixed = list(add = ac))
+    checkmate::reportAssertions(ac)
+    
+    # HACK: force non-set features method to allow grouping of neutralized features
+    # UNDONE: or simply export this functionality with a flag?
+    xs <- selectMethod("getXCMSSet", "features")(feat, verbose = verbose, exportedData = exportedData)
+    
+    return(doGroupFeaturesXCMS(xs, feat, rtalign, exportedData, groupArgs, retcorArgs, verbose))
+})
+
+doGroupFeaturesXCMS <- function(xs, feat, rtalign, exportedData, groupArgs, retcorArgs, verbose)
+{
     if (length(feat) == 0)
         return(featureGroupsXCMS(analysisInfo = analysisInfo(feat), features = feat))
-
+    
     hash <- makeHash(feat, rtalign, exportedData, groupArgs, retcorArgs)
     cachefg <- loadCacheData("featureGroupsXCMS", hash)
     if (!is.null(cachefg))
         return(cachefg)
-
+    
     if (verbose)
         cat("Grouping features with XCMS...\n===========\n")
-
-    xs <- getXCMSSet(feat, verbose = verbose, exportedData = exportedData)
+    
     if (verbose)
         xs <- do.call(xcms::group, c(list(xs), groupArgs))
     else
         suppressMessages(invisible(utils::capture.output(xs <- do.call(xcms::group, c(list(xs), groupArgs)))))
-
+    
     if (!exportedData && rtalign)
     {
         if (verbose)
@@ -76,14 +98,14 @@ setMethod("groupFeaturesXCMS", "features", function(feat, rtalign = TRUE, export
             suppressMessages(invisible(utils::capture.output(xs <- do.call(xcms::group, c(list(xs), groupArgs)))))
         }
     }
-
+    
     ret <- importFeatureGroupsXCMSFromFeat(xs, analysisInfo(feat), feat)
     saveCacheData("featureGroupsXCMS", ret, hash)
-
+    
     if (verbose)
         cat("\n===========\nDone!\n")
     return(ret)
-})
+}
 
 getFeatIndicesFromXS <- function(xs)
 {

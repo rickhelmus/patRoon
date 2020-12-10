@@ -1,10 +1,8 @@
-getWorkPath <- function(file = "", ...) if (nzchar(file)) file.path("test_temp", file, ...) else "test_temp"
-getTestDataPath <- function() "test_data"
+testWithSets <- function() TRUE # UNDONE: check environment variable or something
+
 testFile <- function(f, ..., text = FALSE) file.path(getTestDataPath(), paste0(f, ..., if (!text) ".Rds" else ".txt", collapse = ""))
-getTestAnaInfo <- function(path = patRoonData::exampleDataPath()) generateAnalysisInfo(path,
-                                                                                       groups = c(rep("solvent", 3), rep("standard", 3)),
-                                                                                       blanks = "solvent")
-getTestFGroups <- function(anaInfo = getTestAnaInfo(), ...) groupFeatures(findFeatures(anaInfo, "openms", ...), "openms")
+getTestFGroups <- function(anaInfo = getTestAnaInfo(), ...) groupFeatures(getTestFeatures(anaInfo, ...), "openms")
+getEmptyFeatures <- function() getTestFeatures(getTestAnaInfo(), noiseThrInt = 1E9)
 getEmptyTestFGroups <- function() getTestFGroups()[, "none"]
 getEmptyPLists <- function() MSPeakLists(algorithm = "none")
 
@@ -16,13 +14,48 @@ getCompFGroups <- function()
     return(fGroups[, suspects = fread(getMFTestDBPath())$Name])
 }
 
-callMF <- function(fGroups, plists, scoreTypes = "fragScore", db = getMFTestDBPath(), to = 300)
+if (testWithSets())
 {
-    generateCompounds(fGroups, plists, "metfrag",
-                      adduct = "[M+H]+", timeout = to,
-                      database = "csv", scoreTypes = scoreTypes,
-                      extraOpts = list(LocalDatabasePath = db))
+    getWorkPath <- function(file = "", ...) if (nzchar(file)) file.path("test_temp_sets", file, ...) else "test_temp_sets"
+    getTestDataPath <- function() "test_data_sets"
+    getTestAnaInfo <- function(path = patRoonData::exampleDataPath()) generateAnalysisInfo(path,
+                                                                                           groups = c(rep("solvent", 3), rep("standard", 3)),
+                                                                                           blanks = "solvent")
+    # UNDONE: more sets
+    getTestFeatures <- function(anaInfo = getTestAnaInfo(), ...) featuresSet(positive = findFeatures(anaInfo, "openms", ...),
+                                                                             adducts = "[M+H]+")
+    
+    doExportXCMS <- function(x, ...) getXCMSSet(x, exportedData = FALSE, sets = "positive")
+    doExportXCMS3 <- function(x) getXCMSnExp(x, sets = "positive")
+    
+    callMF <- function(fGroups, plists, scoreTypes = "fragScore", db = getMFTestDBPath(), to = 300)
+    {
+        generateCompounds(fGroups, plists, "metfrag", timeout = to,
+                          database = "csv", scoreTypes = scoreTypes,
+                          extraOpts = list(LocalDatabasePath = db))
+    }
+    
+} else
+{
+    getWorkPath <- function(file = "", ...) if (nzchar(file)) file.path("test_temp", file, ...) else "test_temp"
+    getTestDataPath <- function() "test_data"
+    getTestAnaInfo <- function(path = patRoonData::exampleDataPath()) generateAnalysisInfo(path,
+                                                                                           groups = c(rep("solvent", 3), rep("standard", 3)),
+                                                                                           blanks = "solvent")
+    getTestFeatures <- function(anaInfo = getTestAnaInfo(), ...) findFeatures(anaInfo, "openms", ...)
+    
+    doExportXCMS <- function(x, ...) getXCMSSet(x, ...)
+    doExportXCMS3 <- function(x) getXCMSnExp(x)
+    
+    callMF <- function(fGroups, plists, scoreTypes = "fragScore", db = getMFTestDBPath(), to = 300)
+    {
+        generateCompounds(fGroups, plists, "metfrag",
+                          adduct = "[M+H]+", timeout = to,
+                          database = "csv", scoreTypes = scoreTypes,
+                          extraOpts = list(LocalDatabasePath = db))
+    }
 }
+
 
 # to make testing a bit easier: precursors don't have to follow filter rules
 removePrecursors <- function(plists)
@@ -179,7 +212,17 @@ expect_equal_scr <- function(object, expected, ...)
     invisible(act$val)
 }
 
-expect_doppel <- function(...) vdiffr::expect_doppelganger(..., path = getOption("patRoon.path.vdiffr"))
+expect_doppel <- function(...)
+{
+    # use different path for sets
+    if (testWithSets())
+    {
+        # from vdiffr::expect_doppelganger(): get current context
+        context <- get(".context", envir = testthat::get_reporter())
+        return(vdiffr::expect_doppelganger(..., path = paste0(context, "_set")))
+    }
+    return(vdiffr::expect_doppelganger(...))
+}
 
 # HACK: workaround for non imported checkmate namespace
 makeExpectation <- checkmate::makeExpectation

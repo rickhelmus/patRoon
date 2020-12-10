@@ -2,10 +2,11 @@ context("feature groups")
 
 initXCMS()
 
-fList <- findFeatures(getTestAnaInfo(), "openms")
+fList <- getTestFeatures()
 fgOpenMS <- groupFeatures(fList, "openms")
 fgXCMS <- groupFeatures(fList, "xcms")
-fgXCMS3 <- groupFeatures(fList, "xcms3")
+if (!testWithSets())
+    fgXCMS3 <- groupFeatures(fList, "xcms3")
 
 # fList with dummy concs
 anaInfoConc <- cbind(getTestAnaInfo(), list(conc = c(NA, NA, NA, 1, 2, 3)))
@@ -14,43 +15,52 @@ anaInfoConc$group[grepl("standard", anaInfoConc$group)] <- c("standard-1", "stan
 fListConc <- findFeatures(anaInfoConc, "openms")
 fgOpenMSConc <- groupFeatures(fListConc, "openms")
 
-fListEmpty <- findFeatures(getTestAnaInfo(), "openms", noiseThrInt = 1E9)
+fListEmpty <- getEmptyFeatures()
 fgOpenMSEmpty <- groupFeatures(fListEmpty, "openms")
 fgXCMSEmpty <- groupFeatures(fListEmpty, "xcms")
-fgXCMS3Empty <- groupFeatures(fListEmpty, "xcms3")
+if (!testWithSets())
+    fgXCMS3Empty <- groupFeatures(fListEmpty, "xcms3")
 
 test_that("verify feature grouping output", {
     expect_known_value(groupTable(fgOpenMS), testFile("fg-openms"))
     expect_known_value(groupTable(fgXCMS), testFile("fg-xcms"))
-    expect_known_value(groupTable(fgXCMS3), testFile("fg-xcms3"))
     
     # extraOpts
     expect_equal(fgOpenMS, groupFeatures(fList, "openms",
                                          extraOptsRT = list("-algorithm:pairfinder:distance_RT:max_difference" = 30)))
     expect_equal(fgOpenMS, groupFeatures(fList, "openms",
                                          extraOptsGroup = list("-algorithm:distance_RT:max_difference" = 12)))
+    skip_if(testWithSets())
+    expect_known_value(groupTable(fgXCMS3), testFile("fg-xcms3"))
 })
 
 test_that("verify show output", {
     expect_known_show(fgOpenMS, testFile("fg-show-openms", text = TRUE))
     expect_known_show(fgXCMS, testFile("fg-show-xcms", text = TRUE))
+    
+    skip_if(testWithSets())
     expect_known_show(fgXCMS3, testFile("fg-show-xcms3", text = TRUE))
 })
 
 test_that("empty objects work", {
     expect_length(fgOpenMSEmpty, 0)
     expect_length(fgXCMSEmpty, 0)
+    
+    skip_if(testWithSets())
     expect_length(fgXCMS3Empty, 0)
 })
+
+# to compare original anaInfo: ignore extra columns that may have been added afterwards
+getAnaInfo <- function(fg) analysisInfo(fg)[, c("path", "analysis", "group", "blank")]
 
 test_that("basic subsetting", {
     expect_length(fgOpenMS[, 1:50], 50)
     expect_length(fgOpenMS[, "nope"], 0)
     expect_length(fgOpenMS["nope"], 0)
-    expect_equivalent(analysisInfo(fgOpenMS[1:3]), getTestAnaInfo()[1:3, ])
-    expect_equivalent(analysisInfo(fgOpenMS[c(TRUE, TRUE, FALSE, TRUE, FALSE, TRUE)]),
-                     getTestAnaInfo()[c(TRUE, TRUE, FALSE, TRUE, FALSE, TRUE), ])
-    expect_equivalent(analysisInfo(fgOpenMS[getTestAnaInfo()$analysis[4:6]]), getTestAnaInfo()[4:6, ])
+    expect_equivalent(getAnaInfo(fgOpenMS[1:3]), getTestAnaInfo()[1:3, ])
+    expect_equivalent(getAnaInfo(fgOpenMS[c(TRUE, TRUE, FALSE, TRUE, FALSE, TRUE)]),
+                      getTestAnaInfo()[c(TRUE, TRUE, FALSE, TRUE, FALSE, TRUE), ])
+    expect_equivalent(getAnaInfo(fgOpenMS[getTestAnaInfo()$analysis[4:6]]), getTestAnaInfo()[4:6, ])
     expect_equal(length(fgOpenMS[FALSE]), 0)
     expect_length(fgOpenMSEmpty[, 1:50], 0)
 
@@ -70,44 +80,51 @@ test_that("exporting works", {
     expect_error(export(fgOpenMSEmpty, "brukerpa", expfile))
 })
 
-XCMSImpXCMS <- getXCMSSet(fgXCMS)
-XCMSImpXCMS3 <- getXCMSSet(fgXCMS3, exportedData = FALSE)
-XCMSImpOpenMS <- getXCMSSet(fgOpenMS, exportedData = FALSE)
+XCMSImpXCMS <- doExportXCMS(fgXCMS)
+if (!testWithSets())
+    XCMSImpXCMS3 <- doExportXCMS(fgXCMS3, exportedData = FALSE)
+XCMSImpOpenMS <- doExportXCMS(fgOpenMS, exportedData = FALSE)
 test_that("XCMS conversion", {
     expect_equal(nrow(xcms::groups(XCMSImpXCMS)), length(fgXCMS))
-    expect_equal(nrow(xcms::groups(XCMSImpXCMS3)), length(fgXCMS3))
     expect_equal(nrow(xcms::groups(XCMSImpOpenMS)), length(fgOpenMS))
     
     expect_known_value(xcms::groups(XCMSImpXCMS), testFile("fg-xcms_import_xcms"))
-    expect_known_value(xcms::groups(XCMSImpXCMS3), testFile("fg-xcms_import_xcms3"))
     expect_known_value(xcms::groups(XCMSImpOpenMS), testFile("fg-xcms_import_openms"))
     
     expect_equal(unname(groupTable(importFeatureGroupsXCMS(XCMSImpXCMS, getTestAnaInfo()))),
                  unname(groupTable(fgXCMS)))
-    expect_equal(unname(groupTable(importFeatureGroupsXCMS(XCMSImpXCMS3, getTestAnaInfo()))),
-                 unname(groupTable(fgXCMS3)))
     expect_equal(unname(groupTable(importFeatureGroupsXCMS(XCMSImpOpenMS, getTestAnaInfo()))),
                  unname(groupTable(fgOpenMS)))
+    
+    skip_if(testWithSets())
+    expect_equal(nrow(xcms::groups(XCMSImpXCMS3)), length(fgXCMS3))
+    expect_known_value(xcms::groups(XCMSImpXCMS3), testFile("fg-xcms_import_xcms3"))
+    expect_equal(unname(groupTable(importFeatureGroupsXCMS(XCMSImpXCMS3, getTestAnaInfo()))),
+                 unname(groupTable(fgXCMS3)))
 })
 
-XCMS3ImpXCMS <- getXCMSnExp(fgXCMS, exportedData = FALSE)
-XCMS3ImpXCMS3 <- getXCMSnExp(fgXCMS3)
-XCMS3ImpOpenMS <- getXCMSnExp(fgOpenMS, exportedData = FALSE)
+XCMS3ImpXCMS <- doExportXCMS3(fgXCMS)
+if (!testWithSets())
+    XCMS3ImpXCMS3 <- doExportXCMS3(fgXCMS3)
+XCMS3ImpOpenMS <- doExportXCMS3(fgOpenMS)
+
 test_that("XCMS3 conversion", {
     expect_equal(nrow(xcms::featureDefinitions(XCMS3ImpXCMS)), length(fgXCMS))
-    expect_equal(nrow(xcms::featureDefinitions(XCMS3ImpXCMS3)), length(fgXCMS3))
     expect_equal(nrow(xcms::featureDefinitions(XCMS3ImpOpenMS)), length(fgOpenMS))
     
     expect_known_value(xcms::featureDefinitions(XCMS3ImpXCMS), testFile("fg-xcms3_import_xcms"))
-    expect_known_value(xcms::featureDefinitions(XCMS3ImpXCMS3), testFile("fg-xcms3_import_xcms3"))
     expect_known_value(xcms::featureDefinitions(XCMS3ImpOpenMS), testFile("fg-xcms3_import_openms"))
     
     expect_equal(unname(groupTable(importFeatureGroupsXCMS3(XCMS3ImpXCMS, getTestAnaInfo()))),
                  unname(groupTable(fgXCMS)))
-    expect_equal(unname(groupTable(importFeatureGroupsXCMS3(XCMS3ImpXCMS3, getTestAnaInfo()))),
-                 unname(groupTable(fgXCMS3)))
     expect_equal(unname(groupTable(importFeatureGroupsXCMS3(XCMS3ImpOpenMS, getTestAnaInfo()))),
                  unname(groupTable(fgOpenMS)))
+    
+    skip_if(testWithSets())
+    expect_equal(nrow(xcms::featureDefinitions(XCMS3ImpXCMS3)), length(fgXCMS3))    
+    expect_known_value(xcms::featureDefinitions(XCMS3ImpXCMS3), testFile("fg-xcms3_import_xcms3"))
+    expect_equal(unname(groupTable(importFeatureGroupsXCMS3(XCMS3ImpXCMS3, getTestAnaInfo()))),
+                 unname(groupTable(fgXCMS3)))
 })
 
 regr <- as.data.table(fgOpenMSConc, features = TRUE, regression = TRUE)
@@ -115,7 +132,7 @@ test_that("as.data.table works", {
     expect_equal(nrow(as.data.table(fgOpenMS)), length(fgOpenMS))
 
     # first 3 cols contain general info, then rep group ints
-    expect_equal(ncol(as.data.table(fgOpenMS, average = TRUE)), 3 + length(unique(getTestAnaInfo()$group)))
+    expect_equal(ncol(as.data.table(fgOpenMS, average = TRUE)), 3 + length(replicateGroups(fgOpenMS)))
 
     # UNDONE: intensities are sometimes higher than areas?
     # expect_gt_or_zero(as.data.table(fgOpenMS, areas = TRUE), as.data.table(fgOpenMS, areas = FALSE))
@@ -264,7 +281,7 @@ subFGroups <- fgOpenMS[, 1:25]
 test_that("reporting works", {
     expect_file(reportCSV(subFGroups, getWorkPath(), reportFeatures = TRUE),
                 file.path(getWorkPath(), sprintf("%s.csv", class(subFGroups))))
-    for (ana in getTestAnaInfo()$analysis)
+    for (ana in analyses(subFGroups))
         checkmate::expect_file_exists(file.path(getWorkPath(), "features",
                                                 sprintf("%s-%s.csv", class(getFeatures(subFGroups)), ana)))
 

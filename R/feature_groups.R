@@ -1269,20 +1269,35 @@ setMethod("calculatePeakQualities", "featureGroups", function(fGroups, flatnessF
     ftind <- groupFeatIndex(fGroups)
     anas <- analyses(fGroups)
     gNames <- names(fGroups)
+
+    checkPackage("MetaClean")
     
-    qualities <- c("ABR", "F2B", "J", "M", "SY", "GS", "SH", "TPASR", "ZZ")
-    calcQualities <- function(ret, retmin, retmax, intensity, EIC)
+    # HACK HACK HACK: MetaClean::calculateGaussianSimilarity needs to have
+    # xcms::SSgauss attached
+    # based on https://stackoverflow.com/a/36611896
+    withr::local_environment(list(SSgauss = xcms::SSgauss))
+        
+    featQualityFuncs <- list(ApexBoundraryRatio = MetaClean::calculateApexMaxBoundaryRatio,
+                             FWHM2Base = MetaClean::calculateFWHM,
+                             Jaggedness = MetaClean::calculateJaggedness,
+                             Modality = MetaClean::calculateModality,
+                             Symmetry = MetaClean::calculateSymmetry,
+                             GaussianSimilarity = MetaClean::calculateGaussianSimilarity,
+                             PeakSignificance = MetaClean::calculatePeakSignificanceLevel,
+                             Sharpness = MetaClean::calculateSharpness,
+                             TPASR = MetaClean::calculateTPASR,
+                             ZigZag = MetaClean::calculateZigZagIndex)
+    
+    calcFeatQualities <- function(ret, retmin, retmax, intensity, EIC)
     {
         args <- list(c(rt = ret, rtmin = retmin, rtmax = retmax, maxo = intensity), as.matrix(EIC))
-        return(list(ABR = do.call(MetaClean::calculateApexMaxBoundaryRatio, args),
-                    "F2B" = do.call(MetaClean::calculateFWHM, args),
-                    J = do.call(MetaClean::calculateJaggedness, c(args, flatnessFactor)),
-                    M = do.call(MetaClean::calculateModality, c(args, flatnessFactor)),
-                    SY = do.call(MetaClean::calculateSymmetry, args),
-                    GS = do.call(MetaClean::calculateGaussianSimilarity, args), # BUG: doesn't work (missing SSgaus)
-                    SH = do.call(MetaClean::calculateSharpness, args),
-                    TPASR = do.call(MetaClean::calculateTPASR, args),
-                    ZZ = do.call(MetaClean::calculateZigZagIndex, args)))
+        return(sapply(names(featQualityFuncs), function(q)
+        {
+            a <- args
+            if (q %in% c("J", "M"))
+                a <- c(a, flatnessFactor)
+            return(do.call(featQualityFuncs[[q]], a))
+        }, simplify = FALSE))
     }
     
     for (ana in names(EICs))
@@ -1292,10 +1307,38 @@ setMethod("calculatePeakQualities", "featureGroups", function(fGroups, flatnessF
         featInds <- unlist(ftind[anai])
         groups <- gNames[featInds != 0]
         featInds <- featInds[featInds != 0]
-        feat[featInds, (qualities) := rbindlist(Map(calcQualities, ret, retmin, retmax,
-                                                    intensity, EICs[[ana]][groups]))]
+        feat[featInds, (names(featQualityFuncs)) := rbindlist(Map(calcFeatQualities, ret, retmin, retmax,
+                                                                  intensity, EICs[[ana]][groups]))]
         fGroups@features@features[[ana]] <- feat
     }
+    
+    groupQualityFuncs <- list(ElutionShift = MetaClean::calculateElutionShift,
+                              RetentionTimeCorrelation = MetaClean::calculateRetentionTimeConsistency)
+    
+    grpScores <- rbindlist(sapply(gNames, function(grp)
+    {
+        featInds <- ftind[[grp]]
+        doAna <- anas[featInds != 0]
+        featInds <- featInds[featInds != 0]
+        fList <- rbindlist(Map(doAna, featInds, f = function(ana, row) fGroups@features[[ana]][row]))
+        avgFeatScores <- sapply(names(featQualityFuncs), function(q)
+        {
+            if (all(is.na(fList[[q]])))
+                return(NA_real_)
+            # UNDONE: allow to specify average function?
+            return(mean(fList[[q]], na.rm = TRUE))
+        }, simplify = FALSE)
+        
+        pdata <- lapply(seq_len(nrow(fList)), function(fti) list(rtmin = fList$retmin[fti],
+                                                                 rtmax = fList$retmax[fti]))
+        eic <- lapply(doAna, function(a) EICs[[a]][[grp]])
+        
+        grpQualityScores <- sapply(groupQualityFuncs, do.call, list(pdata, eic), simplify = FALSE)
+        
+        return(c(avgFeatScores, grpQualityScores))
+    }, simplify = FALSE), idcol = "group")
+    
+    fGroups@groupInfo <- cbind(fGroups@groupInfo, grpScores)
     
     return(fGroups)
 })

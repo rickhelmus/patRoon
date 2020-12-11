@@ -813,6 +813,7 @@ setMethod("reportHTML", "featureGroups", function(fGroups, path, reportPlots, fo
     mkdirp(workPath)
 
     file.copy(system.file("report", "main.Rmd", package = "patRoon"), workPath)
+    file.copy(system.file("report", "featinfo.Rmd", package = "patRoon"), workPath)
     file.copy(system.file("report", "annotation.Rmd", package = "patRoon"), workPath)
     file.copy(system.file("report", "components.Rmd", package = "patRoon"), workPath)
 

@@ -143,6 +143,9 @@ for (grpi in seq_len(length(rmdVars$fGroups)))
 close(prog)
 ```
 
+```{r child="featinfo.Rmd", eval=doEICs}
+```
+
 
 ```{r child="components.Rmd", eval=!is.null(rmdVars$components) && length(rmdVars$components) > 0}
 ```

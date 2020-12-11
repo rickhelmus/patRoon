@@ -40,6 +40,7 @@
 ## docs
 - improve instructions for MF and SIRIUS installation?
 - ref docs and exports for getXCMSnSet
+- ffOpenMS etc: analyses also needs to be available for hashing
 
 
 ## features

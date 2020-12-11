@@ -1,3 +1,8 @@
+# patRoon 1.1.1
+
+* Fix: locating `SIRIUS` binary on `macOS` did not work properly
+
+
 # patRoon 1.1
 
 * **IMPORTANT**: The `plotEIC()`, `groups()` and `plotSpec()` methods were renamed to `plotChroms()`, `groupTable()` and `plotSpectrum()`. This was done to avoid name clashes with `XCMS` and `CAMERA`. The old functions still work (with a warning), but please update your scripts as these will be removed in the future.

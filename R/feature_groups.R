@@ -1277,26 +1277,33 @@ setMethod("calculatePeakQualities", "featureGroups", function(fGroups, flatnessF
     # based on https://stackoverflow.com/a/36611896
     withr::local_environment(list(SSgauss = xcms::SSgauss))
         
-    featQualityFuncs <- list(ApexBoundraryRatio = MetaClean::calculateApexMaxBoundaryRatio,
-                             FWHM2Base = MetaClean::calculateFWHM,
-                             Jaggedness = MetaClean::calculateJaggedness,
-                             Modality = MetaClean::calculateModality,
-                             Symmetry = MetaClean::calculateSymmetry,
-                             GaussianSimilarity = MetaClean::calculateGaussianSimilarity,
-                             PeakSignificance = MetaClean::calculatePeakSignificanceLevel,
-                             Sharpness = MetaClean::calculateSharpness,
-                             TPASR = MetaClean::calculateTPASR,
-                             ZigZag = MetaClean::calculateZigZagIndex)
+    featQualities <- list(
+        ApexBoundraryRatio = list(func = MetaClean::calculateApexMaxBoundaryRatio, HQ = "LV", range = c(0, 1)),
+        FWHM2Base = list(func = MetaClean::calculateFWHM, HQ = "HV", range = c(0, 1)),
+        Jaggedness = list(func = MetaClean::calculateJaggedness, HQ = "LV", range = Inf),
+        Modality = list(func = MetaClean::calculateModality, HQ = "LV", range = Inf),
+        Symmetry = list(func = MetaClean::calculateSymmetry, HQ = "HV", range = c(-1, 1)),
+        GaussianSimilarity = list(func = MetaClean::calculateGaussianSimilarity, HQ = "HV", range = c(0, 1)),
+        # UNDONE: check
+        PeakSignificance = list(func = MetaClean::calculatePeakSignificanceLevel, HQ = "HV", range = Inf),
+        Sharpness = list(func = MetaClean::calculateSharpness, HQ = "HV", range = Inf),
+        TPASR = list(func = MetaClean::calculateTPASR, HQ = "LV", range = Inf),
+        ZigZag = list(func = MetaClean::calculateZigZagIndex, HQ = "LV", range = Inf)
+    )
+    groupQualities <- list(
+        ElutionShift = list(func = MetaClean::calculateElutionShift, HQ = "LV", range = Inf),
+        RetentionTimeCorrelation = list(func = MetaClean::calculateRetentionTimeConsistency, HQ = "LV", range = Inf)
+    )
     
     calcFeatQualities <- function(ret, retmin, retmax, intensity, EIC)
     {
         args <- list(c(rt = ret, rtmin = retmin, rtmax = retmax, maxo = intensity), as.matrix(EIC))
-        return(sapply(names(featQualityFuncs), function(q)
+        return(sapply(names(featQualities), function(q)
         {
             a <- args
-            if (q %in% c("J", "M"))
+            if (q %in% c("Jaggedness", "Modality"))
                 a <- c(a, flatnessFactor)
-            return(do.call(featQualityFuncs[[q]], a))
+            return(do.call(featQualities[[q]]$func, a))
         }, simplify = FALSE))
     }
     
@@ -1307,21 +1314,18 @@ setMethod("calculatePeakQualities", "featureGroups", function(fGroups, flatnessF
         featInds <- unlist(ftind[anai])
         groups <- gNames[featInds != 0]
         featInds <- featInds[featInds != 0]
-        feat[featInds, (names(featQualityFuncs)) := rbindlist(Map(calcFeatQualities, ret, retmin, retmax,
-                                                                  intensity, EICs[[ana]][groups]))]
+        feat[featInds, (names(featQualities)) := rbindlist(Map(calcFeatQualities, ret, retmin, retmax,
+                                                               intensity, EICs[[ana]][groups]))]
         fGroups@features@features[[ana]] <- feat
     }
     
-    groupQualityFuncs <- list(ElutionShift = MetaClean::calculateElutionShift,
-                              RetentionTimeCorrelation = MetaClean::calculateRetentionTimeConsistency)
-    
-    grpScores <- rbindlist(sapply(gNames, function(grp)
+    grpScores <- rbindlist(lapply(gNames, function(grp)
     {
         featInds <- ftind[[grp]]
         doAna <- anas[featInds != 0]
         featInds <- featInds[featInds != 0]
         fList <- rbindlist(Map(doAna, featInds, f = function(ana, row) fGroups@features[[ana]][row]))
-        avgFeatScores <- sapply(names(featQualityFuncs), function(q)
+        avgFeatScores <- sapply(names(featQualities), function(q)
         {
             if (all(is.na(fList[[q]])))
                 return(NA_real_)
@@ -1333,10 +1337,30 @@ setMethod("calculatePeakQualities", "featureGroups", function(fGroups, flatnessF
                                                                  rtmax = fList$retmax[fti]))
         eic <- lapply(doAna, function(a) EICs[[a]][[grp]])
         
-        grpQualityScores <- sapply(groupQualityFuncs, do.call, list(pdata, eic), simplify = FALSE)
+        grpQualityScores <- sapply(lapply(groupQualities, "[[", "func"), do.call, list(pdata, eic), simplify = FALSE)
         
         return(c(avgFeatScores, grpQualityScores))
-    }, simplify = FALSE), idcol = "group")
+    }))
+    
+    # normalize, invert if necessary to get low (worst) to high (best) order
+    fixGroupQuality <- function(quality, values)
+    {
+        qi <- if (quality %in% names(featQualities)) featQualities[[quality]] else groupQualities[[quality]]
+        if (all(is.finite(qi$range)))
+        {
+            if (!isTRUE(all.equal(qi$range, c(0, 1)))) # no need to normalize 0-1
+                values <- normalize(values, minMax = qi$range[1] < 0, xrange = qi$range)
+        }
+        else
+            values <- normalize(values, TRUE)
+        
+        if (qi$HQ == "LV")
+            values <- 1 - values
+        
+        return(values)
+    }
+    grpScores[, (names(grpScores)) := Map(fixGroupQuality, names(.SD), .SD)]
+    grpScores[, Quality := rowSums(.SD, na.rm = TRUE)]
     
     fGroups@groupInfo <- cbind(fGroups@groupInfo, grpScores)
     

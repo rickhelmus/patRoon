@@ -173,6 +173,7 @@ Collate:
     'utils-bruker.R'
     'features-bruker.R'
     'features-envipick.R'
+    'features-kpic2.R'
     'features-openms.R'
     'features-optimize.R'
     'features-optimize-envipick.R'

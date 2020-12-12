@@ -1,24 +1,33 @@
 #' @include features.R
 NULL
 
+loadSIRFeat <- function(json, fileIndex)
+{
+    # assumptions: first isotope is our target monoisotopic mass
+    
+    iso <- json[["traceSets"]][[fileIndex]][["ionTrace"]][["isotopes"]][[1]]
+    
+    # NOTE: SIRIUS retention times are in milliseconds
+    eic <- data.table(time = unlist(json[["traceSets"]][[fileIndex]][["retentionTimes"]]) / 1000,
+                      intensity = unlist(iso[["intensities"]]))
+    mzs <- unlist(iso[["masses"]])
+    area <- json[["abundance"]][[fileIndex]]
+    ret <- eic$time[which.max(eic$intensity)] # UNDONE: verify
+    
+    return(data.table(ret = ret, mz = mean(mzs), mzmin = min(mzs), mzmax = max(mzs),
+                      retmin = min(eic$time), retmax = max(eic$time), area = area,
+                      intensity = max(eic$intensity)))
+}
+
 SIRFeatMPFinishHandler <- function(cmd)
 {
     pattern <- paste0("^[[:digit:]]+_", cmd$analysis, "_[[:digit:]]+$")
     resDirs <- list.files(cmd$outPath, pattern = pattern, full.names = TRUE)
     ret <- rbindlist(lapply(resDirs, function(dir)
     {
-        # assumptions: only one analysis, first isotope is our target monoisotopic mass
+        # assumptions: only one analysis
         json <- jsonlite::fromJSON(file.path(dir, "lcms.json.gz"), FALSE)
-        iso <- json[["traceSets"]][[1]][["ionTrace"]][["isotopes"]][[1]]
-        # NOTE: SIRIUS retention times are in milliseconds
-        eic <- data.table(time = unlist(json[["traceSets"]][[1]][["retentionTimes"]]) / 1000,
-                          intensity = unlist(iso[["intensities"]]))
-        mzs <- unlist(iso[["masses"]])
-        area <- json[["abundance"]][[1]]
-        ret <- eic$time[which.max(eic$intensity)] # UNDONE: verify
-        return(data.table(ret = ret, mz = mean(mzs), mzmin = min(mzs), mzmax = max(mzs),
-                          retmin = min(eic$time), retmax = max(eic$time), area = area,
-                          intensity = max(eic$intensity)))
+        return(patRoon:::loadSIRFeat(json, 1))
     }))
     
     ret[, ID := seq_len(nrow(..ret))]

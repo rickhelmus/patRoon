@@ -1284,8 +1284,6 @@ setMethod("calculatePeakQualities", "featureGroups", function(fGroups, flatnessF
         Modality = list(func = MetaClean::calculateModality, HQ = "LV", range = Inf),
         Symmetry = list(func = MetaClean::calculateSymmetry, HQ = "HV", range = c(-1, 1)),
         GaussianSimilarity = list(func = MetaClean::calculateGaussianSimilarity, HQ = "HV", range = c(0, 1)),
-        # UNDONE: check
-        PeakSignificance = list(func = MetaClean::calculatePeakSignificanceLevel, HQ = "HV", range = Inf),
         Sharpness = list(func = MetaClean::calculateSharpness, HQ = "HV", range = Inf),
         TPASR = list(func = MetaClean::calculateTPASR, HQ = "LV", range = Inf),
         ZigZag = list(func = MetaClean::calculateZigZagIndex, HQ = "LV", range = Inf)

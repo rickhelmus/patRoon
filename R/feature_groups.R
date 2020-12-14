@@ -589,17 +589,17 @@ setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas =
             doConc <- doConc && nrow(anaInfo) > 1
             if (doConc)
             {
-                ret[, c("RSQ", "intercept", "slope") :=
-                        {
-                            notna <- !is.na(conc)
-                            if (sum(notna) < 2)
-                                NA_real_
-                            else
-                            {
-                                reg <- summary(lm(intensity[notna] ~ conc[notna]))
-                                list(reg[["r.squared"]], reg[["coefficients"]][1, 1], reg[["coefficients"]][2, 1])
-                            }
-                        }, by = group]
+                ret[, c("RSQ", "intercept", "slope") := {
+                    notna <- !is.na(conc)
+                    if (!any(notna))
+                        NA_real_
+                    else
+                    {
+                        suppressWarnings(reg <- summary(lm(intensity[notna] ~ conc[notna])))
+                        slope <- if (nrow(reg[["coefficients"]]) > 1) reg[["coefficients"]][2, 1] else NA_real_
+                        list(reg[["r.squared"]], reg[["coefficients"]][1, 1], slope)
+                    }
+                }, by = group]
                 ret[, conc_reg := (intensity - intercept) / slope] # y = ax+b
             }
         }

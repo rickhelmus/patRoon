@@ -85,19 +85,19 @@ if (!testWithSets())
     XCMSImpXCMS3 <- doExportXCMS(fgXCMS3, exportedData = FALSE)
 XCMSImpOpenMS <- doExportXCMS(fgOpenMS, exportedData = FALSE)
 test_that("XCMS conversion", {
-    expect_equal(nrow(xcms::groups(XCMSImpXCMS)), length(fgXCMS))
-    expect_equal(nrow(xcms::groups(XCMSImpOpenMS)), length(fgOpenMS))
+    expect_equal(nrow(xcms::groups(XCMSImpXCMS)), length(getExpFG(fgXCMS)))
+    expect_equal(nrow(xcms::groups(XCMSImpOpenMS)), length(getExpFG(fgOpenMS)))
     
     expect_known_value(xcms::groups(XCMSImpXCMS), testFile("fg-xcms_import_xcms"))
     expect_known_value(xcms::groups(XCMSImpOpenMS), testFile("fg-xcms_import_openms"))
     
     expect_equal(unname(groupTable(importFeatureGroupsXCMS(XCMSImpXCMS, getTestAnaInfo()))),
-                 unname(groupTable(fgXCMS)))
+                 unname(groupTable(getExpFG(fgXCMS))))
     expect_equal(unname(groupTable(importFeatureGroupsXCMS(XCMSImpOpenMS, getTestAnaInfo()))),
-                 unname(groupTable(fgOpenMS)))
+                 unname(groupTable(getExpFG(fgOpenMS))))
     
     skip_if(testWithSets())
-    expect_equal(nrow(xcms::groups(XCMSImpXCMS3)), length(fgXCMS3))
+    expect_equal(nrow(xcms::groups(XCMSImpXCMS3)), length(getExpFG(fgXCMS3)))
     expect_known_value(xcms::groups(XCMSImpXCMS3), testFile("fg-xcms_import_xcms3"))
     expect_equal(unname(groupTable(importFeatureGroupsXCMS(XCMSImpXCMS3, getTestAnaInfo()))),
                  unname(groupTable(fgXCMS3)))
@@ -109,19 +109,19 @@ if (!testWithSets())
 XCMS3ImpOpenMS <- doExportXCMS3(fgOpenMS)
 
 test_that("XCMS3 conversion", {
-    expect_equal(nrow(xcms::featureDefinitions(XCMS3ImpXCMS)), length(fgXCMS))
-    expect_equal(nrow(xcms::featureDefinitions(XCMS3ImpOpenMS)), length(fgOpenMS))
+    expect_equal(nrow(xcms::featureDefinitions(XCMS3ImpXCMS)), length(getExpFG(fgXCMS)))
+    expect_equal(nrow(xcms::featureDefinitions(XCMS3ImpOpenMS)), length(getExpFG(fgOpenMS)))
     
     expect_known_value(xcms::featureDefinitions(XCMS3ImpXCMS), testFile("fg-xcms3_import_xcms"))
     expect_known_value(xcms::featureDefinitions(XCMS3ImpOpenMS), testFile("fg-xcms3_import_openms"))
     
     expect_equal(unname(groupTable(importFeatureGroupsXCMS3(XCMS3ImpXCMS, getTestAnaInfo()))),
-                 unname(groupTable(fgXCMS)))
+                 unname(groupTable(getExpFG(fgXCMS))))
     expect_equal(unname(groupTable(importFeatureGroupsXCMS3(XCMS3ImpOpenMS, getTestAnaInfo()))),
-                 unname(groupTable(fgOpenMS)))
+                 unname(groupTable(getExpFG(fgOpenMS))))
     
     skip_if(testWithSets())
-    expect_equal(nrow(xcms::featureDefinitions(XCMS3ImpXCMS3)), length(fgXCMS3))    
+    expect_equal(nrow(xcms::featureDefinitions(XCMS3ImpXCMS3)), length(getExpFG(fgXCMS3)))
     expect_known_value(xcms::featureDefinitions(XCMS3ImpXCMS3), testFile("fg-xcms3_import_xcms3"))
     expect_equal(unname(groupTable(importFeatureGroupsXCMS3(XCMS3ImpXCMS3, getTestAnaInfo()))),
                  unname(groupTable(fgXCMS3)))
@@ -161,19 +161,20 @@ test_that("unique works", {
     # note: only have two rep groups
 
     expect_equivalent(unique(fgOpenMS, which = "standard"),
-                      unique(fgOpenMS, which = "standard", relativeTo = "solvent"))
+                      unique(fgOpenMS, which = "standard",
+                             relativeTo = setdiff(replicateGroups(fgOpenMS), "standard")))
     expect_equivalent(unique(fgOpenMS, which = "standard"), unique(fgOpenMS, which = "standard", outer = TRUE))
     expect_lt(length(unique(fgOpenMS, which = "standard")), length(fgOpenMS))
-    expect_equal(length(unique(fgOpenMS, which = c("standard", "solvent"))), length(fgOpenMS))
-    expect_lt(length(unique(fgOpenMS, which = c("standard", "solvent"), outer = TRUE)), length(fgOpenMS))
-    expect_length(unique(fgOpenMSEmpty, which = c("standard", "solvent")), 0)
+    expect_equal(length(unique(fgOpenMS, which = replicateGroups(fgOpenMS))), length(fgOpenMS))
+    expect_lt(length(unique(fgOpenMS, which = replicateGroups(fgOpenMS), outer = TRUE)), length(fgOpenMS))
+    expect_length(unique(fgOpenMSEmpty, which = replicateGroups(fgOpenMS)), 0)
 })
 
 test_that("overlap works", {
     # note: only have two rep groups
 
-    expect_lt(length(overlap(fgOpenMS, which = c("standard", "solvent"))), length(fgOpenMS))
-    expect_length(overlap(fgOpenMSEmpty, which = c("standard", "solvent")), 0)
+    expect_lt(length(overlap(fgOpenMS, which = replicateGroups(fgOpenMS))), length(fgOpenMS))
+    expect_length(overlap(fgOpenMSEmpty, which = replicateGroups(fgOpenMS)), 0)
 })
 
 minInt <- function(fg, rel)
@@ -184,6 +185,8 @@ minInt <- function(fg, rel)
         return(min(g[g != 0]) / max(g))
     return(min(g[g != 0]))
 }
+
+stdRGs <- if (testWithSets()) c("standard", "standard-set2") else "standard"
 
 test_that("basic filtering", {
     expect_gte(minInt(filter(fgOpenMS, absMinIntensity = 1500), FALSE), 1500)
@@ -202,10 +205,10 @@ test_that("basic filtering", {
 
     expect_identical(replicateGroups(filter(fgOpenMS, rGroups = "standard")), "standard")
     expect_identical(replicateGroups(fgOpenMS[, rGroups = "standard"]), "standard")
-    expect_identical(replicateGroups(filter(fgOpenMS, removeBlanks = TRUE)), "standard")
-    expect_identical(replicateGroups(removeEmptyAnalyses(filter(fgOpenMS, relMinFeatures = 0.7))), "standard")
-    expect_identical(replicateGroups(removeEmptyAnalyses(filter(fgOpenMS, absMinFeatures = 400))), "standard")
-    expect_identical(replicateGroups(removeEmptyAnalyses(filter(fgOpenMS, blankThreshold = 1E6))), "standard")
+    expect_identical(replicateGroups(filter(fgOpenMS, removeBlanks = TRUE)), stdRGs)
+    expect_identical(replicateGroups(removeEmptyAnalyses(filter(fgOpenMS, relMinFeatures = 0.7))), stdRGs)
+    expect_identical(replicateGroups(removeEmptyAnalyses(filter(fgOpenMS, absMinFeatures = 400))), stdRGs)
+    expect_identical(replicateGroups(removeEmptyAnalyses(filter(fgOpenMS, blankThreshold = 1E6))), stdRGs)
 
     expect_known_output(filter(fgOpenMS, relMinAnalyses = 0.5), testFile("fgf-minana-rel", text = TRUE))
     expect_known_output(filter(fgOpenMS, absMinAnalyses = 3), testFile("fgf-minana-abs", text = TRUE))
@@ -228,9 +231,8 @@ test_that("basic filtering", {
 })
 
 test_that("replicate group subtraction", {
-    # should be as these are the only two rep groups
     expect_setequal(names(replicateGroupSubtract(fgOpenMS, "solvent")),
-                    names(unique(fgOpenMS, which = "standard")))
+                    names(unique(fgOpenMS, which = setdiff(replicateGroups(fgOpenMS), "solvent"))))
     expect_length(replicateGroupSubtract(fgOpenMSEmpty, "solvent"), 0)
 })
 
@@ -304,6 +306,15 @@ test_that("reporting with empty object works", {
     expect_error(makeReportHTML(fgOpenMSEmpty), NA)
 })
 
+chordGroups <- c("standard-1" = "grp1",
+                 "standard-2" = "grp2",
+                 "standard-3" = "grp2",
+                 "solvent-1" = "grp3",
+                 "solvent-2" = "grp4",
+                 "solvent-3" = "grp5")
+if (testWithSets())
+    chordGroups <- c(chordGroups, setNames(chordGroups, c(paste0("set2-", names(chordGroups)))))
+
 test_that("plotting works", {
     expect_doppel("retmz", function() plot(fgOpenMS, colourBy = "fGroups", showLegend = FALSE))
     expect_doppel("retmz-singlec", function() plot(fgOpenMS, colourBy = "none", col = "blue"))
@@ -316,13 +327,7 @@ test_that("plotting works", {
     expect_doppel("chord-def", function() plotChord(fgOpenMS))
     expect_doppel("chord-selflinks", function() plotChord(fgOpenMS, addSelfLinks = TRUE))
     expect_doppel("chord-nortmz", function() plotChord(fgOpenMS, addRetMzPlots = FALSE))
-    expect_doppel("chord-outer", function() plotChord(fgOpenMS,
-                                                      outerGroups = c("standard-1" = "grp1",
-                                                                      "standard-2" = "grp2",
-                                                                      "standard-3" = "grp2",
-                                                                      "solvent-1" = "grp3",
-                                                                      "solvent-2" = "grp4",
-                                                                      "solvent-3" = "grp5")))
+    expect_doppel("chord-outer", function() plotChord(fgOpenMS, outerGroups = chordGroups))
     expect_doppel("chord-comp", function() plotChord(fGCompOpenMS))
     expect_error(plotChord(unique(fgOpenMS, which = replicateGroups(fgOpenMS), outer = TRUE),
                            average = TRUE)) # stops with nothing to plot: no overlap

@@ -1,1 +1,1 @@
-Applying blank filter... Done! Filtered 471 (79.43%) groups. Remaining: 122.
+Applying blank filter... Done! Filtered 476 (79.73%) groups. Remaining: 121.

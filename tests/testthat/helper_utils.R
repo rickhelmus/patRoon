@@ -1,4 +1,4 @@
-testWithSets <- function() TRUE # UNDONE: check environment variable or something
+testWithSets <- function() FALSE # UNDONE: check environment variable or something
 
 testFile <- function(f, ..., text = FALSE) file.path(getTestDataPath(), paste0(f, ..., if (!text) ".Rds" else ".txt", collapse = ""))
 getTestFGroups <- function(anaInfo = getTestAnaInfo(), ...) groupFeatures(getTestFeatures(anaInfo, ...), "openms")
@@ -18,15 +18,30 @@ if (testWithSets())
 {
     getWorkPath <- function(file = "", ...) if (nzchar(file)) file.path("test_temp_sets", file, ...) else "test_temp_sets"
     getTestDataPath <- function() "test_data_sets"
-    getTestAnaInfo <- function(path = patRoonData::exampleDataPath()) generateAnalysisInfo(path,
-                                                                                           groups = c(rep("solvent", 3), rep("standard", 3)),
-                                                                                           blanks = "solvent")
-    # UNDONE: more sets
-    getTestFeatures <- function(anaInfo = getTestAnaInfo(), ...) featuresSet(positive = findFeatures(anaInfo, "openms", ...),
-                                                                             adducts = "[M+H]+")
+    getTestAnaInfo <- function()
+    {
+        ret <- generateAnalysisInfo(c(patRoonData::exampleDataPath(), file.path(getWorkPath(), "set2")))
+        isSet2 <- grepl("^set2", ret$analysis)
+        ret$group[!isSet2] <- c(rep("solvent", 3), rep("standard", 3))
+        ret$blank[!isSet2] <- "solvent"
+        ret$group[isSet2] <- c(rep("solvent-set2", 3), rep("standard-set2", 3))
+        ret$blank[isSet2] <- "solvent-set2"
+        return(ret)
+    }
+    getTestFeatures <- function(anaInfo = getTestAnaInfo(), ...)
+    {
+        isSet2 <- grepl("^set2", anaInfo$analysis)
+        if (any(isSet2))
+            return(featuresSet(set1 = findFeatures(anaInfo[!isSet2, ], "openms", ...),
+                               set2 = findFeatures(anaInfo[isSet2, ], "openms", ...),
+                               adducts = "[M+H]+"))
+        return(featuresSet(set1 = findFeatures(anaInfo[!isSet2, ], "openms", ...),
+                           adducts = "[M+H]+"))
+    }
     
-    doExportXCMS <- function(x, ...) getXCMSSet(x, exportedData = FALSE, sets = "positive")
-    doExportXCMS3 <- function(x) getXCMSnExp(x, sets = "positive")
+    doExportXCMS <- function(x, ...) getXCMSSet(x, exportedData = FALSE, sets = "set1")
+    doExportXCMS3 <- function(x) getXCMSnExp(x, sets = "set1")
+    getExpFG <- function(x) x[, sets = "set1"]
     
     callMF <- function(fGroups, plists, scoreTypes = "fragScore", db = getMFTestDBPath(), to = 300)
     {
@@ -39,13 +54,14 @@ if (testWithSets())
 {
     getWorkPath <- function(file = "", ...) if (nzchar(file)) file.path("test_temp", file, ...) else "test_temp"
     getTestDataPath <- function() "test_data"
-    getTestAnaInfo <- function(path = patRoonData::exampleDataPath()) generateAnalysisInfo(path,
-                                                                                           groups = c(rep("solvent", 3), rep("standard", 3)),
-                                                                                           blanks = "solvent")
+    getTestAnaInfo <- function() generateAnalysisInfo(patRoonData::exampleDataPath(),
+                                                      groups = c(rep("solvent", 3), rep("standard", 3)),
+                                                      blanks = "solvent")
     getTestFeatures <- function(anaInfo = getTestAnaInfo(), ...) findFeatures(anaInfo, "openms", ...)
     
     doExportXCMS <- function(x, ...) getXCMSSet(x, ...)
     doExportXCMS3 <- function(x) getXCMSnExp(x)
+    getExpFG <- function(x) x
     
     callMF <- function(fGroups, plists, scoreTypes = "fragScore", db = getMFTestDBPath(), to = 300)
     {

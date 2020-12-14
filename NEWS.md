@@ -1,7 +1,7 @@
 # patRoon 1.1.1
 
 * Fix: locating `SIRIUS` binary on `macOS` did not work properly
-
+* Fix: timeout warning for `GenForm` resulted in an error (https://github.com/rickhelmus/patRoon/issues/18)
 
 # patRoon 1.1
 

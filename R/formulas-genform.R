@@ -43,7 +43,7 @@ writeGenFormFiles <- function(MSPList, MSMSPList, MSFile, MSMSFile)
 }
 
 makeGenFormCmdQueue <- function(groupPeakLists, baseHash, MSMode, isolatePrec, adduct, topMost,
-                                mainArgs)
+                                mainArgs, ana)
 {
     pruneList(sapply(names(groupPeakLists), function(grp)
     {
@@ -66,7 +66,7 @@ makeGenFormCmdQueue <- function(groupPeakLists, baseHash, MSMode, isolatePrec, a
                
         return(list(args = mainArgs, PLMZ = plmz, MSPL = plms, MSMSPL = groupPeakLists[[grp]][["MSMS"]],
                     hash = hash, group = grp, isMSMS = hasMSMS, adduct = adduct,
-                    topMost = topMost, MSMode = MSMode))
+                    topMost = topMost, MSMode = MSMode, ana = ana))
     }, simplify = FALSE))
 }
 
@@ -87,7 +87,7 @@ GenFormMPFinishHandler <- function(cmd)
 GenFormMPTimeoutHandler <- function(cmd, retries)
 {
     warning(paste("Formula calculation timed out for", cmd$group,
-                  if (!is.null(ana)) sprintf("(analysis '%s')", ana) else ""),
+                  if (!is.null(cmd[["ana"]])) sprintf("(analysis '%s')", cmd$ana) else ""),
             call. = FALSE)
     return(FALSE)
 }
@@ -125,7 +125,7 @@ runGenForm <- function(mainArgs, groupPeakLists, MSMode, isolatePrec,
                        batchSize, timeout, ana)
 {
     cmdQueue <- makeGenFormCmdQueue(groupPeakLists, baseHash, MSMode, isolatePrec, adduct, topMost,
-                                    mainArgs)
+                                    mainArgs, ana)
 
     ret <- list()
     if (length(cmdQueue) > 0)

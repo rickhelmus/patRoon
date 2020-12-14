@@ -1,5 +1,5 @@
-Applying retention filter... Done! Filtered 97 (16.36%) groups. Remaining: 496.
-Applying replicate abundance filter... Done! Filtered 242 (48.79%) groups. Remaining: 254.
-Applying blank filter... Done! Filtered 89 (35.04%) groups. Remaining: 165.
-Applying intensity filter... Done! Filtered 164 (99.39%) groups. Remaining: 1.
+Applying retention filter... Done! Filtered 98 (16.42%) groups. Remaining: 499.
+Applying replicate abundance filter... Done! Filtered 242 (48.50%) groups. Remaining: 257.
+Applying blank filter... Done! Filtered 96 (37.35%) groups. Remaining: 161.
+Applying intensity filter... Done! Filtered 160 (99.38%) groups. Remaining: 1.
 Applying replicate abundance filter... Done! Filtered 0 (0.00%) groups. Remaining: 1.

@@ -1,1 +1,1 @@
-Applying minimum replicates filter... Done! Filtered 180 (30.35%) groups. Remaining: 413.
+Applying minimum replicates filter... Done! Filtered 5 (0.84%) groups. Remaining: 592.

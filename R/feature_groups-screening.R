@@ -717,7 +717,7 @@ genIDLevelRulesFile <- function(out, inLevels = NULL, exLevels = NULL)
     aapply(checkmate::assertCharacter, . ~ inLevels + exLevels, null.ok = TRUE)
     checkmate::assertPathForOutput(basename(out), overwrite = TRUE)
     
-    defFile <- system.file("inst", "misc", "IDLevelRules.yml", package = "patRoon")
+    defFile <- system.file("misc", "IDLevelRules.yml", package = "patRoon")
     
     if (is.null(inLevels) && is.null(exLevels))
         file.copy(defFile, out, overwrite = TRUE)

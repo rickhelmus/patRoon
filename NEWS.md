@@ -2,7 +2,7 @@
 
 This releases focuses on a significantly changed suspect screening interface, which brings several utilities to assist suspect annotation, prioritization, mixing of suspect and full NTA workflows and other general improvements.
 
-**IMPORTANT**: The suspect screening interface has changed slightly. Please read the documentation (`?screenSuspects` and the handbook) for more details. If you want to quickly update your code without using any new functionality:
+**IMPORTANT**: The suspect screening interface has changed significantly. Please read the documentation (`?screenSuspects` and the handbook) for more details. If you want to quickly update your code without using any new functionality:
 
 Change your existing code, e.g.
 

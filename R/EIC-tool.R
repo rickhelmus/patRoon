@@ -417,7 +417,7 @@ setMethod("checkChromatograms", "featureGroups", function(fGroups, mzExpWindow, 
 
                         if (!is.na(pmin))
                         {
-                            sdata <- pinfo$data[[i]][numGTE(pinfo$data[[i]]$time, pmin) & numGLE(pinfo$data[[i]]$time, pmax), ]
+                            sdata <- pinfo$data[[i]][numGTE(pinfo$data[[i]]$time, pmin) & numLTE(pinfo$data[[i]]$time, pmax), ]
                             polygon(c(sdata$time, rev(sdata$time)), c(sdata$intensity, rep(0, length(sdata$intensity))),
                                     col = anaColorsTrans[i], border = NA)
                         }
@@ -553,6 +553,138 @@ setMethod("checkChromatograms", "featureGroups", function(fGroups, mzExpWindow, 
         })
     }
 
-    runApp(shinyApp(getEICUI(rtRange, mzWindow), server))
+    runApp(shinyApp(getEICUI(rtRange, mzExpWindow), server))
     return(enabledFGroups)
 })
+
+getCheckFeatsUI <- function()
+{
+    showOpts <- c("Keep", "Don't keep")
+    
+    fillPage(
+        tags$head(includeScript(system.file("js", "utils-EIC.js", package = "patRoon"))),
+        
+        title = "Check features tool",
+        
+        fillCol(
+            flex = c(NA, 1, NA),
+            
+            fillRow(
+                height = 40,
+                flex = c(NA, NA, NA, 1),
+                
+                fillCol(
+                    width = 45,
+                    actionButton("previousGroup", "", icon("arrow-left"), onclick = "selectPrevFGroup();")
+                ),
+                fillCol(
+                    width = 45,
+                    actionButton("nextGroup", "", icon("arrow-right"), onclick = "selectNextFGroup();")
+                ),
+                fillCol(
+                    width = 100,
+                    actionButton("toggleGroup", "Toggle group", icon("toggle-on"))
+                ),
+                
+                fillCol(
+                    strong(style = "font-size: 200%; text-align: center;", textOutput("pageTitle"))
+                )
+            ),
+            
+            fillRow(
+                flex = c(NA, 1),
+                
+                fillCol(
+                    width = 160,
+                    
+                    wellPanel(
+                        style = "overflow-y: auto; height: 100%;",
+                        
+                        radioButtons("retUnit", "Retention unit", c("Seconds", "Minutes")),
+                        checkboxGroupInput("showWhat", "Show groups", showOpts, showOpts)
+                    )
+                ),
+                fillCol(
+                    plotOutput("plotChrom", width = "100%", height = "100%")
+                )
+            ),
+            fillRow(
+                height = 210,
+                rhandsontable::rHandsontableOutput("groupHot")
+            )
+        )
+    )
+}
+
+# setMethod("checkChromatograms", "featureGroups", function(fGroups, mzExpWindow, enabledFGroups)
+checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
+{
+    ac <- checkmate::makeAssertCollection()
+    aapply(checkmate::assertNumber, . ~ rtWindow + mzExpWindow, finite = TRUE, lower = 0,
+           fixed = list(add = ac))
+    checkmate::reportAssertions(ac)
+    
+    gNames <- names(fGroups)
+    gCount <- length(fGroups)
+    fTable <- featureTable(fGroups)
+    ftind <- groupFeatIndex(fGroups)
+    
+    # UNDONE: make topMost/onlyPresent optional/interactive
+    EICs <- getEICsForFGroups(fGroups, rtWindow, mzExpWindow, topMost = NULL, onlyPresent = FALSE)
+    # format is in [[ana]][[fGroup]], since we only took top most intensive we can throw away the ana dimension
+    EICPreviews <- getEICsForFGroups(fGroups, 0, mzExpWindow, topMost = 1, onlyPresent = TRUE)
+    EICPreviews <- Reduce(modifyList, EICPreviews)
+    
+    hotOpts <- list(rowHeaderWidth = 40, readOnly = TRUE, disableVisualSelection = "area",
+                    columnSorting = TRUE, sortIndicator = TRUE, selectCallback = TRUE,
+                    currentRowClassName = "currentRow", stretchH = "all",
+                    preventOverflow = "horizontal", multiSelect = FALSE,
+                    outsideClickDeselects = FALSE, manualColumnResize = TRUE,
+                    rowHeaders = NULL)
+    
+    enabledFGroups <- names(fGroups) # UNDONE
+    
+    server <- function(input, output, session)
+    {
+        rValues <- reactiveValues(enabledFGroups = enabledFGroups,
+                                  currentFGroup = 1)
+        
+        observeEvent(input$groupHot_select$select$r, {
+            rValues$currentFGroup <- input$groupHot_select$select$rAll[1]
+        })
+        
+        output$pageTitle <- renderText({
+            sprintf("Groups %s (%d/%d)", gNames[rValues$currentFGroup],
+                    rValues$currentFGroup, gCount)
+        })
+        
+        output$plotChrom <- renderPlot({
+            withr::with_par(list(mar = c(4, 4, 0.1, 1)), {
+                plotChroms(fGroups[, rValues$currentFGroup], EICs = EICs,
+                           colourBy = "rGroups", showPeakArea = TRUE,
+                           showFGroupRect = FALSE, title = "",
+                           retMin = input$retUnit == "Minutes")
+            })
+        })
+        
+        output$groupHot <- rhandsontable::renderRHandsontable({
+            gData <- as.data.table(fGroups)
+            gData[, EIC := sapply(gNames, function(g)
+            {
+                jsonlite::toJSON(list(values = EICPreviews[[g]]$intensity, xvalues = EICPreviews[[g]]$time,
+                                      options = list(type = "line", height = 50)))
+            })]
+            setcolorder(gData, c("group", "EIC"))
+            
+            hot <- do.call(rhandsontable::rhandsontable,
+                           c(list(gData, width = NULL, height = 200, maxRows = nrow(gData)),
+                             hotOpts)) %>%
+                rhandsontable::hot_rows(rowHeights = 50) %>%
+                rhandsontable::hot_col("EIC", renderer = htmlwidgets::JS("renderSparkline"))
+            return(hot)
+        })
+    }
+    
+    runApp(shinyApp(getCheckFeatsUI(), server))
+    return(enabledFGroups)
+}

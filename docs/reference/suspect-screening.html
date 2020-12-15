@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.0</span>
       </span>
     </div>
 
@@ -157,7 +157,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Target and suspect screening</h1>
-    <small class="dont-index">Source: <a href='https://github.com/rickhelmus/patRoon/blob/master/R/generics.R'><code>R/generics.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/features.R'><code>R/features.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/feature_groups.R'><code>R/feature_groups.R</code></a>, and 3 more</small>
+    <small class="dont-index">Source: <a href='https://github.com/rickhelmus/patRoon/blob/master/R/main.R'><code>R/main.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/feature_groups-screening.R'><code>R/feature_groups-screening.R</code></a>, <a href='https://github.com/rickhelmus/patRoon/blob/master/R/feature_groups-tasq.R'><code>R/feature_groups-tasq.R</code></a>, and 1 more</small>
     <div class="hidden name"><code>suspect-screening.Rd</code></div>
     </div>
 
@@ -165,37 +165,20 @@
     <p>Utilities to screen for analytes with known or suspected identity.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>screenSuspects</span><span class='op'>(</span>
-  <span class='va'>obj</span>,
-  <span class='va'>suspects</span>,
-  rtWindow <span class='op'>=</span> <span class='fl'>12</span>,
-  mzWindow <span class='op'>=</span> <span class='fl'>0.005</span>,
-  adduct <span class='op'>=</span> <span class='cn'>NULL</span>,
-  skipInvalid <span class='op'>=</span> <span class='cn'>TRUE</span>
-<span class='op'>)</span>
-
-<span class='co'># S4 method for features</span>
+    <pre class="usage"><span class='co'># S4 method for featureGroups</span>
 <span class='fu'>screenSuspects</span><span class='op'>(</span>
-  <span class='va'>obj</span>,
+  <span class='va'>fGroups</span>,
   <span class='va'>suspects</span>,
   rtWindow <span class='op'>=</span> <span class='fl'>12</span>,
   mzWindow <span class='op'>=</span> <span class='fl'>0.005</span>,
   adduct <span class='op'>=</span> <span class='cn'>NULL</span>,
-  skipInvalid <span class='op'>=</span> <span class='cn'>TRUE</span>
+  skipInvalid <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  onlyHits <span class='op'>=</span> <span class='cn'>FALSE</span>
 <span class='op'>)</span>
 
-<span class='co'># S4 method for featureGroups</span>
-<span class='fu'>screenSuspects</span><span class='op'>(</span>
-  <span class='va'>obj</span>,
-  <span class='va'>suspects</span>,
-  rtWindow <span class='op'>=</span> <span class='fl'>12</span>,
-  mzWindow <span class='op'>=</span> <span class='fl'>0.005</span>,
-  adduct <span class='op'>=</span> <span class='cn'>NULL</span>,
-  skipInvalid <span class='op'>=</span> <span class='cn'>TRUE</span>
-<span class='op'>)</span>
+<span class='fu'>numericIDLevel</span><span class='op'>(</span><span class='va'>level</span><span class='op'>)</span>
 
-<span class='co'># S4 method for featureGroups</span>
-<span class='fu'>groupFeaturesScreening</span><span class='op'>(</span><span class='va'>fGroups</span>, <span class='va'>scr</span><span class='op'>)</span>
+<span class='fu'>genIDLevelRulesFile</span><span class='op'>(</span><span class='va'>out</span>, inLevels <span class='op'>=</span> <span class='cn'>NULL</span>, exLevels <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span>
 
 <span class='fu'>importFeatureGroupsBrukerTASQ</span><span class='op'>(</span><span class='va'>path</span>, <span class='va'>analysisInfo</span>, clusterRTWindow <span class='op'>=</span> <span class='fl'>12</span><span class='op'>)</span></pre>
 
@@ -203,25 +186,14 @@
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>obj</th>
-      <td><p>The object that should be screened (<em>i.e.</em>
-<code><a href='features-class.html'>features</a></code> or <code><a href='featureGroups-class.html'>featureGroups</a></code>).</p></td>
+      <th>fGroups</th>
+      <td><p>The <code><a href='featureGroups-class.html'>featureGroups</a></code> object that should be
+screened.</p></td>
     </tr>
     <tr>
       <th>suspects</th>
-      <td><p>A <code>data.frame</code> that must contain a <code>"name"</code> column
-(the analyte name) and <em>at least</em> a <code>"mz"</code>, <code>"neutralMass"</code>,
-<code>"formula"</code>, <code>"SMILES"</code>, <code>"InChI"</code> column (with the ionized
-m/z value, the neutral monoisotopic mass or the chemical
-formula/SMILES/InChI character string for the molecule, respectively). If
-an ion mass needs to be calculated (<em>i.e.</em> no valid data is available
-in the <code>mz</code> column) then data is tried to be used from the columns in
-the aforementioned order. Furthermore, if ion masses need to be calculated
-then the adduct must be specified either with the <code>adduct</code> function
-argument or by an <code>"adduct"</code> column containing a <code>character</code> that
-can be converted with <code>as.adduct</code> (<em>e.g.</em> <code>"[M+H]+"</code>). In
-addition, a column <code>"rt"</code> can be included to specify the retention
-time (if unspecified no retention times are checked).</p></td>
+      <td><p>A <code>data.frame</code> with suspect information. See the
+<code>Suspect list format</code> section below.</p></td>
     </tr>
     <tr>
       <th>rtWindow, mzWindow</th>
@@ -233,8 +205,8 @@ data).</p></td>
       <th>adduct</th>
       <td><p>An <code><a href='adduct-class.html'>adduct</a></code> object (or something that can be
 converted to it with <code><a href='adduct-utils.html'>as.adduct</a></code>). Examples: <code>"[M-H]-"</code>,
-<code>"[M+Na]+"</code>. Can be <code>NULL</code> if either a <code>"mz"</code> or
-<code>"adduct"</code> column is present in the <code>suspects</code> argument.</p></td>
+<code>"[M+Na]+"</code>. May be <code>NULL</code>, see <code>Suspect list format</code>
+section below.</p></td>
     </tr>
     <tr>
       <th>skipInvalid</th>
@@ -245,13 +217,24 @@ warning. Similarly, any suspects for which mass calculation failed (when no
 invalid <code>SMILES</code>, will be ignored with a warning.</p></td>
     </tr>
     <tr>
-      <th>fGroups</th>
-      <td><p>The <code><a href='featureGroups-class.html'>featureGroups</a></code> object that should be
-transformed (and was used to obtain the screening results).</p></td>
+      <th>onlyHits</th>
+      <td><p>If <code>TRUE</code> then all feature groups not matched by any of
+the suspects will be removed.</p></td>
     </tr>
     <tr>
-      <th>scr</th>
-      <td><p>The screening results table returned by <code>screenSuspects</code>.</p></td>
+      <th>level</th>
+      <td><p>The identification level to be converted.</p></td>
+    </tr>
+    <tr>
+      <th>out</th>
+      <td><p>The file path to the target file.</p></td>
+    </tr>
+    <tr>
+      <th>inLevels, exLevels</th>
+      <td><p>A <a href='https://rdrr.io/r/base/regex.html'>regular expression</a> for the
+identification levels to include or exclude, respectively. For instance,
+<code>exLevels="4|5"</code> would exclude level 4 and 5 from the output file. Set
+to <code>NULL</code> to ignore.</p></td>
     </tr>
     <tr>
       <th>path</th>
@@ -272,37 +255,29 @@ group hits across analyses together. See also the details section.</p></td>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p><code>screenSuspects</code> will return a table (a
-  <code>data.table</code>) with detected suspects and details such as
-  retention and <em>m/z</em> values. If a suspect is matched on multiple
-  features/feature groups then each hit is reported as a separate row.</p>
-<p><code>groupFeaturesScreening</code> returns a modified <code>featureGroups</code>
-  object in which those feature groups that were not matched by any suspects
-  are removed and others renamed by the respective suspect name. In case of
-  duplicate suspect results, feature group names are made unique with
-  <code><a href='https://rdrr.io/r/base/make.unique.html'>make.unique</a></code>.</p>
+    <p><code>screenSuspects</code> returns a <code><a href='featureGroupsScreening-class.html'>featureGroupsScreening</a></code>
+  object, which is a copy of the input <code>fGroups</code> object amended with
+  additional screening information.</p>
 <p><code>importFeatureGroupsBrukerTASQ</code> returns a new
   <code>featureGroups</code> object containing converted screening results from
   Bruker TASQ.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>Besides 'full non-target analysis', where compounds may be identitified with
+    <p>Besides 'full non-target analysis', where compounds may be identified with
 little to no prior knowledge, a common strategy is to screen for compounds
-with known or suspected identity. This may be a generally favourable approach
+with known or suspected identity. This may be a generally favorable approach
 if possible, as it can significantly reduce the load on data interpretation.</p>
-<p><code>screenSuspects</code> will screen a set of suspects (provided as a
-  <code>data.frame</code>) within an <code><a href='features-class.html'>features</a></code> or
-  <code><a href='featureGroups-class.html'>featureGroups</a></code> object.</p>
-<p><code>groupFeaturesScreening</code> uses results from <code>screenSuspects</code>
-  to transform an existing <code><a href='featureGroups-class.html'>featureGroups</a></code> object by (1) renaming
-  any matched feature groups by the respective name of the suspect and (2)
-  filtering out any feature groups that were not matched. A common workflow
-  is to first obtain and group features (with <em>e.g.</em>
-  <code><a href='feature-finding.html'>findFeatures</a></code> and <code><a href='feature-grouping.html'>groupFeatures</a></code>), screen them
-  with <code>screenSuspects</code>, convert the <code>featureGroups</code> object that was
-  used for screening with this method function and continue any further
-  workflow steps such as compound identification as with 'regular'
-  <code>featureGroups</code>.</p>
+<p><code>screenSuspects</code> is used to perform suspect screening. The
+  input <code><a href='featureGroups-class.html'>featureGroups</a></code> object will be screened for suspects by
+  <em>m/z</em> values and optionally retention times. Afterwards, any feature
+  groups not matched may be kept or removed, depending whether a full
+  non-target analysis is desired.</p>
+<p><code>numericIDLevel</code> Extracts the numeric part of a given
+  identification level (<em>e.g.</em> <code>"3a"</code> becomes <samp>3</samp>).</p>
+<p><code>genIDLevelRulesFile</code> Generates a template YAML file that is
+  used to configure the rules for automatic estimation of identification
+  levels. This file can then be used as input for
+  <code><a href='featureGroupsScreening-class.html'>annotateSuspects</a></code>.</p>
 <p><code>importFeatureGroupsBrukerTASQ</code> will convert screening results
   from Bruker TASQ to a <code><a href='featureGroups-class.html'>featureGroups</a></code> object. The feature
   groups across analyses are formed based on the name of suspects and their
@@ -314,31 +289,60 @@ if possible, as it can significantly reduce the load on data interpretation.</p>
   the feature groups. The cut-off value for this is specified by the
   <code>clusterRTWindow</code> argument. The input for this function is obtained by
   generating an Excel export of the 'global' results and subsequently
-  converting the file to <code class="file">.csv</code> format. Similar to
-  <code>groupFeaturesScreening</code>, this method will return an object that is
-  suitable for any further workflow processes.</p>
+  converting the file to <code class="file">.csv</code> format.</p>
     <h2 class="hasAnchor" id="note"><a class="anchor" href="#note"></a>Note</h2>
 
-    <p>Both <code>groupFeaturesScreening</code> and
-  <code>importFeatureGroupsBrukerTASQ</code> use names from targets/suspects as
-  feature group names, therefore, it is important that these are
-  file-compatible names when <a href='reporting.html'>reporting data</a> <code class="file">csv</code> or
-  <code class="file">pdf</code> data.</p>
+    <p>Both <code>screenSuspects</code> and <code>importFeatureGroupsBrukerTASQ</code> may
+  use the suspect names to base file names used for reporting, logging etc.
+  Therefore, it is important that these are file-compatible names.</p>
 <p>For <code>screenSuspects</code> in some cases you may need to install
   <a href='http://openbabel.org/wiki/Main_Page'>OpenBabel</a> (<em>e.g.</em> when
   only InChI data is available for mass calculation).</p>
-<p>Please note that <code>groupFeaturesScreening</code> method can only
-  transform the <code>featureGroups</code> object that was used to obtain the given
-  screening results.</p>
 <p><code>importFeatureGroupsBrukerTASQ</code> will use estimated min/max values
   for retention times and dummy min/max <em>m/z</em> values for conversion to
   features, since this information is not (readily) available. Hence, when
   plotting, for instance, extracted ion chromatograms (with
   <code><a href='generics.html'>plotChroms</a></code>) the integrated chromatographic peak range shown
   is incorrect.</p>
+    <h2 class="hasAnchor" id="suspect-list-format"><a class="anchor" href="#suspect-list-format"></a>Suspect list format</h2>
+
+    <p>the <code>suspects</code> argument for
+  <code>screenSuspects</code> should be a <code>data.frame</code> with the following
+  mandatory and optional columns:</p>
+<p></p><ul>
+<li><p><code>name</code> The suspect name. Must be file-compatible.
+  (<strong>mandatory</strong>)</p></li>
+<li><p><code>rt</code> The retention time (in seconds) for the suspect. If
+  specified the suspect will only be matched if its retention matches the
+  experimental value (tolerance defined by the <code>rtWindow</code> argument).
+  (<strong>optional</strong>)</p></li>
+<li><p><code>neutralMass</code>,<code>formula</code>,<code>SMILES</code>,<code>InChI</code> The
+  neutral monoisotopic mass, chemical formula, SMILES or InChI for the
+  suspect. (data from one of these columns are <strong>mandatory</strong> in case no
+  value from the <code>mz</code> column is available for a suspect)</p></li>
+<li><p><code>mz</code> The ionized <em>m/z</em> of the suspect. (<strong>mandatory</strong>
+  unless it can be calculated from one of the aforementioned columns)</p></li>
+<li><p><code>adduct</code> A <code>character</code> that can be converted with
+  <code><a href='adduct-utils.html'>as.adduct</a></code>. (<strong>mandatory</strong> unless data from the <code>mz</code>
+  column is available or the <code>adduct</code> argument is set)</p></li>
+<li><p><code>fragments_mz</code>,<code>fragments_formula</code> One or more MS/MS
+  fragments (specified as <em>m/z</em> or formulae, respectively). Multiple
+  values can be specified by separating them with a semicolon (<code>;</code>).
+  This data is used by <code><a href='featureGroupsScreening-class.html'>annotateSuspects</a></code> to report detected
+  MS/MS fragments and calculate identification levels. (<strong>optional</strong>)</p></li>
+</ul>
+
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
-    <p>Daniel Müllner (2013). fastcluster: Fast Hierarchical, Agglomerative Clustering Routines for R and Python. Journal of Statistical Software, 53(9), 1-18. URL http://www.jstatsoft.org/v53/i09/.</p>
+    <p>OBoyle NM, Banck M, James CA, Morley C, Vandermeersch T, Hutchison GR (2011).
+&#8220;Open Babel: An open chemical toolbox.&#8221;
+<em>Journal of Cheminformatics</em>, <b>3</b>(1).
+doi: <a href='https://doi.org/10.1186/1758-2946-3-33'>10.1186/1758-2946-3-33</a>
+, <a href='https://doi.org/10.1186/1758-2946-3-33'>https://doi.org/10.1186/1758-2946-3-33</a>.</p>
+<p>Daniel Müllner (2013). fastcluster: Fast Hierarchical, Agglomerative Clustering Routines for R and Python. Journal of Statistical Software, 53(9), 1-18. URL http://www.jstatsoft.org/v53/i09/.</p>
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+
+    <div class='dont-index'><p><code>featureGroupsScreening</code></p></div>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

@@ -71,7 +71,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.0</span>
       </span>
     </div>
 
@@ -159,12 +159,59 @@
       <small>Source: <a href='https://github.com/rickhelmus/patRoon/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
-    <div id="patroon-111" class="section level1">
-<h1 class="page-header" data-toc-text="1.1.1">
-<a href="#patroon-111" class="anchor"></a>patRoon 1.1.1</h1>
+    <div id="patroon-120" class="section level1">
+<h1 class="page-header" data-toc-text="1.2.0">
+<a href="#patroon-120" class="anchor"></a>patRoon 1.2.0</h1>
+<p>This releases focuses on a significantly changed suspect screening interface, which brings several utilities to assist suspect annotation, prioritization, mixing of suspect and full NTA workflows and other general improvements.</p>
+<p><strong>IMPORTANT</strong>: The suspect screening interface has changed significantly. Please read the documentation (<code><a href="../reference/suspect-screening.html">?screenSuspects</a></code> and the handbook) for more details. If you want to quickly update your code without using any new functionality:</p>
+<p>Change your existing code, e.g.</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R">
+<span class="va">scr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/suspect-screening.html">screenSuspects</a></span><span class="op">(</span><span class="va">fGroups</span>, <span class="va">suspectList</span>, <span class="va">...</span><span class="op">)</span>
+<span class="va">fGroupsScr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/patRoon-defunct.html">groupFeaturesScreening</a></span><span class="op">(</span><span class="va">fGroups</span>, <span class="va">scr</span><span class="op">)</span></code></pre></div>
+<p>to</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R">
+<span class="va">fGroupsScr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/suspect-screening.html">screenSuspects</a></span><span class="op">(</span><span class="va">fGroups</span>, <span class="va">suspectList</span>, <span class="va">...</span>, onlyHits <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<p><strong>Major changes</strong></p>
 <ul>
+<li>New suspect screening interface
+<ul>
+<li>By default, feature groups without suspect hit are <em>not</em> removed (unless <code>onlyHits=TRUE</code>). This allows straightforward mixing of suspect and full non-target workflows.</li>
+<li>The feature groups are <em>not</em> renamed tot the suspect name anymore. If you quickly want to assess which suspects were found, use the <code>screenInfo()</code> or <code><a href="../reference/generics.html">as.data.table()</a></code> methods.</li>
+<li>Subsetting of suspsect screening results can be done with the <code>suspects</code> argument to <code><a href="../reference/generics.html">[</a></code>, e.g. <code>fGroupsScr[, suspects = "carbamazepine"]</code>
+</li>
+<li>A new method, <code><a href="../reference/featureGroupsScreening-class.html">annotateSuspects()</a></code>, allows combining the annotation workflow data (peak lists, formulas, compounds) to perform a detailed annotation for the suspects found during the workflow. This method calculates properties such as
+<ul>
+<li>Rankings: where is the suspect formula/compound ranked in the candidates from the workflow data</li>
+<li>Annotation similarity: how well does the MS/MS spectrum of the suspect matches with formula/compound annotations.</li>
+<li>An <em>estimation</em> of identification levels to assist in quickly evaluating how well the suspect was annotated. The rules for identification levels are fully configurable.</li>
+</ul>
+</li>
+<li>A dedicated <code><a href="../reference/generics.html">filter()</a></code> method for suspect screening results, which allows you to easily prioritize data, for instance, by selecting minimum annotation ranks and similarities, identification levels and automatically choosing the best match in case multiple suspects are assigned to one feature (and vice versa).</li>
+<li>A dedicated <code><a href="../reference/generics.html">as.data.table()</a></code> method and reporting functionality for suspect screening results to quickly inspect their annotation data.</li>
+<li>Please refer to the updated suspect screening sections in the handbook and <code><a href="../reference/suspect-screening.html">?screenSuspects</a></code> and <code><a href="../reference/featureGroupsScreening-class.html">?annotateSuspects</a></code> for more information.</li>
+</ul>
+</li>
+<li>Changes to suspect lists
+<ul>
+<li>Whenever possible, suspect information such as formulae, neutral masses, InChIKeys etc will be calculated for the input suspect list (obtainable afterwards with <code>screenInfo()</code>).</li>
+<li>The suspect names will be checked to be file compatible, and automatically adjusted if necessary.</li>
+<li>If MS/MS fragments are known for a suspect (formula or <code>m/z</code>), these can be included in the suspect list to improve suspect annotation.</li>
+<li>The old suspect screening support for <code>features</code> objects was removed. The same and much more functionality can be obtained by the workflow for feature groups.</li>
+</ul>
+</li>
+<li>The <code><a href="../reference/reporting.html">reportCSV()</a></code> function was simplified and uses <code><a href="../reference/generics.html">as.data.table()</a></code> to generate the CSV data. This should give more consistent results.</li>
+<li>The <code>individualMoNAScore</code> MetFrag scoring is now enabled by default.</li>
+</ul>
+<p>Other changes</p>
+<ul>
+<li>
+<code><a href="../reference/reporting.html">reportHTML()</a></code> now allows toggling visibility for the columns shown in the feature annotation table.</li>
+<li>The <code><a href="../reference/generics.html">plotVenn()</a></code> method for <code>featureGroups</code> now allows to compare combinations of multiple replicate groups with each other. See <code><a href="../reference/generics.html">?plotVenn</a></code> for more information.</li>
 <li>Fix: locating <code>SIRIUS</code> binary on <code>macOS</code> did not work properly</li>
 <li>Fix: timeout warning for <code>GenForm</code> resulted in an error (<a href="https://github.com/rickhelmus/patRoon/issues/18" class="uri">https://github.com/rickhelmus/patRoon/issues/18</a>)</li>
+<li>Fix: plotting structures resulted in a Java error on the RStudio Docker image (<a href="https://github.com/rickhelmus/patRoon/issues/18" class="uri">https://github.com/rickhelmus/patRoon/issues/18</a>)</li>
 </ul>
 </div>
     <div id="patroon-11" class="section level1">
@@ -527,7 +574,7 @@
 <li>
 <code>MetFrag</code>: for-ident database and new statistical scores are now supported</li>
 <li>
-<code><a href="../reference/generics.html">as.data.table()</a></code> / <code><a href="../reference/generics.html">as.data.frame()</a></code> for <code>featureGroups</code> now optionally reports regression information, which may be useful for quantitative purposes. This replaces the (defunct) <code>regression()</code> method and limited support from <code><a href="../reference/patRoon-deprecated.html">screenTargets()</a></code>.</li>
+<code><a href="../reference/generics.html">as.data.table()</a></code> / <code><a href="../reference/generics.html">as.data.frame()</a></code> for <code>featureGroups</code> now optionally reports regression information, which may be useful for quantitative purposes. This replaces the (defunct) <code>regression()</code> method and limited support from <code>screenTargets()</code>.</li>
 <li>
 <code><a href="../reference/componentsNT-class.html">plotGraph()</a></code> method to visually inspect linked homologous series.</li>
 </ul>

@@ -74,7 +74,7 @@ identified compounds." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.0</span>
       </span>
     </div>
 
@@ -173,9 +173,6 @@ identified compounds.</p>
 <span class='fu'>reportCSV</span><span class='op'>(</span>
   <span class='va'>fGroups</span>,
   path <span class='op'>=</span> <span class='st'>"report"</span>,
-  reportFGroupsAsRows <span class='op'>=</span> <span class='cn'>TRUE</span>,
-  reportFGroupsAnalysisInfo <span class='op'>=</span> <span class='cn'>TRUE</span>,
-  reportFGroupsRetMz <span class='op'>=</span> <span class='cn'>TRUE</span>,
   reportFeatures <span class='op'>=</span> <span class='cn'>FALSE</span>,
   formulas <span class='op'>=</span> <span class='cn'>NULL</span>,
   formulasNormalizeScores <span class='op'>=</span> <span class='st'>"max"</span>,
@@ -261,21 +258,6 @@ reporting data.</p></td>
 Will be generated if needed.</p></td>
     </tr>
     <tr>
-      <th>reportFGroupsAsRows</th>
-      <td><p>Report feature groups as rows (instead of columns)
-within the resulting <code class="file">.csv</code> file.</p></td>
-    </tr>
-    <tr>
-      <th>reportFGroupsAnalysisInfo</th>
-      <td><p>Include analyses information (reference and
-replicate groups) in the reported feature groups table <code class="file">.csv</code> file.</p></td>
-    </tr>
-    <tr>
-      <th>reportFGroupsRetMz</th>
-      <td><p>Include feature group information (retention time
-and <em>m/z</em>) within the reported feature groups table <code class="file">.csv</code> file.</p></td>
-    </tr>
-    <tr>
       <th>reportFeatures</th>
       <td><p>If set to <code>TRUE</code> then for each analysis a
 <code class="file">.csv</code> file will be generated with information about its detected
@@ -291,7 +273,8 @@ reported. Specify <code>NULL</code> to skip reporting a particular object.</p></
     <tr>
       <th>compoundsNormalizeScores, formulasNormalizeScores</th>
       <td><p>A <code>character</code> that specifies how normalization of
-compound scorings occurs. Either <code>"none"</code> (no normalization),
+annotation scorings occurs. Either
+<code>"none"</code> (no normalization),
 <code>"max"</code> (normalize to max value) or <code>"minmax"</code> (perform min-max
 normalization). Note that normalization of negative scores (e.g. output by
 <code class='command'>SIRIUS</code>) is always performed as min-max. Furthermore, currently
@@ -303,10 +286,11 @@ results were removed after they were generated (<em>e.g.</em> by use of
     </tr>
     <tr>
       <th>compoundsExclNormScores, formulasExclNormScores</th>
-      <td><p>A <code>character</code> vector specifying any compound
-  scoring names that should <em>not</em> be normalized. Set to <code>NULL</code> to
-  normalize all scorings. Note that whether any normalization occurs is set
-  by the <code>compoundsExclNormScores,formulasExclNormScores</code> argument.</p>
+      <td><p>A
+  <code>character</code> vector specifying any compound scoring names that
+  should <em>not</em> be normalized. Set to <code>NULL</code> to normalize all
+  scorings. Note that whether any normalization occurs is set by the
+  <code>compoundsExclNormScores,formulasExclNormScores</code> argument.</p>
 <p>For <code>compounds</code>: By default <code>score</code> and
   <code>individualMoNAScore</code> are set to mimic the behavior of the
   <code class='command'>MetFrag</code> web interface.</p></td>
@@ -314,7 +298,7 @@ results were removed after they were generated (<em>e.g.</em> by use of
     <tr>
       <th>retMin</th>
       <td><p>If <code>TRUE</code> then report retention times in minutes
-(otehrwise seconds).</p></td>
+(otherwise seconds).</p></td>
     </tr>
     <tr>
       <th>clearPath</th>

@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.0</span>
       </span>
     </div>
 
@@ -466,8 +466,15 @@ annotation.</p></td>
     </tr>
     <tr>
       <th>which</th>
-      <td><p>A character vector with replicate groups used for comparison.
-For plotting functions: set to <code>NULL</code> for all replicate groups.</p></td>
+      <td><p>A character vector with replicate groups used for comparison.</p>
+<p>For plotting functions: set to <code>NULL</code> for all replicate groups.</p>
+<p>For <code>plotVenn</code>: alternatively a named <code>list</code> containing elements
+of <code>character</code> vectors with replicate groups to compare. For instance,
+<code>which=list(infl = c("influent-A", "influent-B"), effl =
+c("effluent-A", "effluent-B"))</code>, will compare the features in replicate
+groups <samp>"influent-A/B"</samp> against those in <samp>"effluent-A/B"</samp>.
+The names of the list are used for labelling in the plot, and will be made
+automatically if not specified.</p></td>
     </tr>
     <tr>
       <th>nsets, nintersects</th>
@@ -596,7 +603,7 @@ row within the feature table of the analysis (see
 <li><p><code><a href='featureGroups-compare.html'>featureGroupsConsensus</a></code></p></li>
 <li><p><code>featureGroupsEnviMass</code></p></li>
 <li><p><code>featureGroupsOpenMS</code></p></li>
-<li><p><code><a href='suspect-screening.html'>featureGroupsScreening</a></code></p></li>
+<li><p><code><a href='featureGroupsScreening-class.html'>featureGroupsScreening</a></code></p></li>
 <li><p><code><a href='suspect-screening.html'>featureGroupsBrukerTASQ</a></code></p></li>
 <li><p><code>featureGroupsXCMS</code></p></li>
 <li><p><code>featureGroupsXCMS3</code></p></li>

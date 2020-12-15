@@ -24,7 +24,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2020-12-14" />
+<meta name="date" content="2020-12-15" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -166,12 +166,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="chapter" data-level="4.2" data-path="features.html"><a href="features.html"><i class="fa fa-check"></i><b>4.2</b> Features</a><ul>
 <li class="chapter" data-level="4.2.1" data-path="features.html"><a href="features.html#finding-and-grouping-features"><i class="fa fa-check"></i><b>4.2.1</b> Finding and grouping features</a></li>
-<li class="chapter" data-level="4.2.2" data-path="features.html"><a href="features.html#suspect-screening"><i class="fa fa-check"></i><b>4.2.2</b> Suspect screening</a></li>
+<li class="chapter" data-level="4.2.2" data-path="features.html"><a href="features.html#suspscr"><i class="fa fa-check"></i><b>4.2.2</b> Suspect screening</a></li>
 </ul></li>
 <li class="chapter" data-level="4.3" data-path="annotation.html"><a href="annotation.html"><i class="fa fa-check"></i><b>4.3</b> Annotation</a><ul>
 <li class="chapter" data-level="4.3.1" data-path="annotation.html"><a href="annotation.html#ms-peak-lists"><i class="fa fa-check"></i><b>4.3.1</b> MS peak lists</a></li>
 <li class="chapter" data-level="4.3.2" data-path="annotation.html"><a href="annotation.html#formulae"><i class="fa fa-check"></i><b>4.3.2</b> Formulae</a></li>
 <li class="chapter" data-level="4.3.3" data-path="annotation.html"><a href="annotation.html#compounds"><i class="fa fa-check"></i><b>4.3.3</b> Compounds</a></li>
+<li class="chapter" data-level="4.3.4" data-path="annotation.html"><a href="annotation.html#suspAnn"><i class="fa fa-check"></i><b>4.3.4</b> Suspect annotation</a></li>
 </ul></li>
 <li class="chapter" data-level="4.4" data-path="componentization.html"><a href="componentization.html"><i class="fa fa-check"></i><b>4.4</b> Componentization</a><ul>
 <li class="chapter" data-level="4.4.1" data-path="componentization.html"><a href="componentization.html#features-with-similar-chromatographic-behaviour"><i class="fa fa-check"></i><b>4.4.1</b> Features with similar chromatographic behaviour</a></li>
@@ -183,9 +184,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="5.1" data-path="inspecting-results.html"><a href="inspecting-results.html"><i class="fa fa-check"></i><b>5.1</b> Inspecting results</a></li>
 <li class="chapter" data-level="5.2" data-path="filtering.html"><a href="filtering.html"><i class="fa fa-check"></i><b>5.2</b> Filtering</a><ul>
 <li class="chapter" data-level="5.2.1" data-path="filtering.html"><a href="filtering.html#features-1"><i class="fa fa-check"></i><b>5.2.1</b> Features</a></li>
-<li class="chapter" data-level="5.2.2" data-path="filtering.html"><a href="filtering.html#annotation-1"><i class="fa fa-check"></i><b>5.2.2</b> Annotation</a></li>
-<li class="chapter" data-level="5.2.3" data-path="filtering.html"><a href="filtering.html#components"><i class="fa fa-check"></i><b>5.2.3</b> Components</a></li>
-<li class="chapter" data-level="5.2.4" data-path="filtering.html"><a href="filtering.html#negation"><i class="fa fa-check"></i><b>5.2.4</b> Negation</a></li>
+<li class="chapter" data-level="5.2.2" data-path="filtering.html"><a href="filtering.html#suspect-screening"><i class="fa fa-check"></i><b>5.2.2</b> Suspect screening</a></li>
+<li class="chapter" data-level="5.2.3" data-path="filtering.html"><a href="filtering.html#annotation-1"><i class="fa fa-check"></i><b>5.2.3</b> Annotation</a></li>
+<li class="chapter" data-level="5.2.4" data-path="filtering.html"><a href="filtering.html#components"><i class="fa fa-check"></i><b>5.2.4</b> Components</a></li>
+<li class="chapter" data-level="5.2.5" data-path="filtering.html"><a href="filtering.html#negation"><i class="fa fa-check"></i><b>5.2.5</b> Negation</a></li>
 </ul></li>
 <li class="chapter" data-level="5.3" data-path="subset.html"><a href="subset.html"><i class="fa fa-check"></i><b>5.3</b> Subsetting</a><ul>
 <li class="chapter" data-level="5.3.1" data-path="subset.html"><a href="subset.html#prioritization-workflow"><i class="fa fa-check"></i><b>5.3.1</b> Prioritization workflow</a></li>
@@ -292,13 +294,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </tbody>
 </table>
 <p>For objects that support two-dimensional subsetting (e.g. <code>featureGroups</code>, <code>MSPeakLists</code>), either the <code>i</code> or <code>j</code> argument is optional. Furthermore, unlike subsetting a <code>data.frame</code>, the position of <code>i</code> and <code>j</code> does not change when only one argument is specified:</p>
-<div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb62-1"><a href="subset.html#cb62-1"></a>df[<span class="dv">1</span>, <span class="dv">1</span>] <span class="co"># subset data.frame by first row/column</span></span>
-<span id="cb62-2"><a href="subset.html#cb62-2"></a>df[<span class="dv">1</span>] <span class="co"># subset by first column</span></span>
-<span id="cb62-3"><a href="subset.html#cb62-3"></a>df[<span class="dv">1</span>, ] <span class="co"># subset by first row</span></span>
-<span id="cb62-4"><a href="subset.html#cb62-4"></a></span>
-<span id="cb62-5"><a href="subset.html#cb62-5"></a>fGroups[<span class="dv">1</span>, <span class="dv">1</span>] <span class="co"># subset by first analysis/feature group</span></span>
-<span id="cb62-6"><a href="subset.html#cb62-6"></a>fGroups[, <span class="dv">1</span>] <span class="co"># subset by first feature group (i.e. column)</span></span>
-<span id="cb62-7"><a href="subset.html#cb62-7"></a>fGroups[<span class="dv">1</span>] <span class="co"># subset by first analysis (i.e. row)</span></span></code></pre></div>
+<div class="sourceCode" id="cb69"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb69-1"><a href="subset.html#cb69-1"></a>df[<span class="dv">1</span>, <span class="dv">1</span>] <span class="co"># subset data.frame by first row/column</span></span>
+<span id="cb69-2"><a href="subset.html#cb69-2"></a>df[<span class="dv">1</span>] <span class="co"># subset by first column</span></span>
+<span id="cb69-3"><a href="subset.html#cb69-3"></a>df[<span class="dv">1</span>, ] <span class="co"># subset by first row</span></span>
+<span id="cb69-4"><a href="subset.html#cb69-4"></a></span>
+<span id="cb69-5"><a href="subset.html#cb69-5"></a>fGroups[<span class="dv">1</span>, <span class="dv">1</span>] <span class="co"># subset by first analysis/feature group</span></span>
+<span id="cb69-6"><a href="subset.html#cb69-6"></a>fGroups[, <span class="dv">1</span>] <span class="co"># subset by first feature group (i.e. column)</span></span>
+<span id="cb69-7"><a href="subset.html#cb69-7"></a>fGroups[<span class="dv">1</span>] <span class="co"># subset by first analysis (i.e. row)</span></span></code></pre></div>
 <p>The subset operator allows three types of input:</p>
 <ul>
 <li>A logical vector: elements are selected if corresponding values are <code>TRUE</code>.</li>
@@ -306,52 +308,57 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li>A character vector: select elements by their name.</li>
 </ul>
 <p>When a logical vector is used as input it will be re-cycled if necessary. For instance, the following will select by the first, third, fifth, etc. analysis.</p>
-<div class="sourceCode" id="cb63"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb63-1"><a href="subset.html#cb63-1"></a>fGroups[<span class="kw">c</span>(<span class="ot">TRUE</span>, <span class="ot">FALSE</span>)]</span></code></pre></div>
+<div class="sourceCode" id="cb70"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb70-1"><a href="subset.html#cb70-1"></a>fGroups[<span class="kw">c</span>(<span class="ot">TRUE</span>, <span class="ot">FALSE</span>)]</span></code></pre></div>
 <p>In order to select by a <code>character</code> you will need to know the names for each element. These can, for instance, be obtained by the <code>groupNames()</code> (feature group names), <code>analyses()</code> (analysis names) and <code>names()</code> (names for components or feature groups for <code>featureGroups</code> objects) generic functions.</p>
 <p>Some more examples of common subsetting operations are shown below.</p>
-<div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb64-1"><a href="subset.html#cb64-1"></a><span class="co"># select first three analyses</span></span>
-<span id="cb64-2"><a href="subset.html#cb64-2"></a>fList[<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>]</span>
-<span id="cb64-3"><a href="subset.html#cb64-3"></a></span>
-<span id="cb64-4"><a href="subset.html#cb64-4"></a><span class="co"># select first three analyses and first 500 feature groups</span></span>
-<span id="cb64-5"><a href="subset.html#cb64-5"></a>fGroups[<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">500</span>]</span>
-<span id="cb64-6"><a href="subset.html#cb64-6"></a></span>
-<span id="cb64-7"><a href="subset.html#cb64-7"></a><span class="co"># select all feature groups from first component</span></span>
-<span id="cb64-8"><a href="subset.html#cb64-8"></a>fGroupsNT &lt;-<span class="st"> </span>fGroups[, componNT[[<span class="dv">1</span>]]<span class="op">$</span>group]</span>
-<span id="cb64-9"><a href="subset.html#cb64-9"></a></span>
-<span id="cb64-10"><a href="subset.html#cb64-10"></a><span class="co"># only keep feature groups with formula annotation results</span></span>
-<span id="cb64-11"><a href="subset.html#cb64-11"></a>fGroupsForms &lt;-<span class="st"> </span>fGroups[, <span class="kw">groupNames</span>(formulas)]</span>
-<span id="cb64-12"><a href="subset.html#cb64-12"></a></span>
-<span id="cb64-13"><a href="subset.html#cb64-13"></a><span class="co"># only keep feature groups with either formula or compound annotation results</span></span>
-<span id="cb64-14"><a href="subset.html#cb64-14"></a>fGroupsAnn &lt;-<span class="st"> </span>fGroups[, <span class="kw">union</span>(<span class="kw">groupNames</span>(formulas), <span class="kw">groupNames</span>(compounds))]</span>
-<span id="cb64-15"><a href="subset.html#cb64-15"></a></span>
-<span id="cb64-16"><a href="subset.html#cb64-16"></a><span class="co"># select first 15 components</span></span>
-<span id="cb64-17"><a href="subset.html#cb64-17"></a>components[<span class="dv">1</span><span class="op">:</span><span class="dv">15</span>]</span>
-<span id="cb64-18"><a href="subset.html#cb64-18"></a></span>
-<span id="cb64-19"><a href="subset.html#cb64-19"></a><span class="co"># select by name</span></span>
-<span id="cb64-20"><a href="subset.html#cb64-20"></a>components[<span class="kw">c</span>(<span class="st">&quot;CMP1&quot;</span>, <span class="st">&quot;CMP5&quot;</span>)]</span>
-<span id="cb64-21"><a href="subset.html#cb64-21"></a></span>
-<span id="cb64-22"><a href="subset.html#cb64-22"></a><span class="co"># only retain feature groups in components for which compound annotations are</span></span>
-<span id="cb64-23"><a href="subset.html#cb64-23"></a><span class="co"># available</span></span>
-<span id="cb64-24"><a href="subset.html#cb64-24"></a>components[, <span class="kw">groupNames</span>(compounds)]</span></code></pre></div>
+<div class="sourceCode" id="cb71"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb71-1"><a href="subset.html#cb71-1"></a><span class="co"># select first three analyses</span></span>
+<span id="cb71-2"><a href="subset.html#cb71-2"></a>fList[<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>]</span>
+<span id="cb71-3"><a href="subset.html#cb71-3"></a></span>
+<span id="cb71-4"><a href="subset.html#cb71-4"></a><span class="co"># select first three analyses and first 500 feature groups</span></span>
+<span id="cb71-5"><a href="subset.html#cb71-5"></a>fGroups[<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">500</span>]</span>
+<span id="cb71-6"><a href="subset.html#cb71-6"></a></span>
+<span id="cb71-7"><a href="subset.html#cb71-7"></a><span class="co"># select all feature groups from first component</span></span>
+<span id="cb71-8"><a href="subset.html#cb71-8"></a>fGroupsNT &lt;-<span class="st"> </span>fGroups[, componNT[[<span class="dv">1</span>]]<span class="op">$</span>group]</span>
+<span id="cb71-9"><a href="subset.html#cb71-9"></a></span>
+<span id="cb71-10"><a href="subset.html#cb71-10"></a><span class="co"># only keep feature groups with formula annotation results</span></span>
+<span id="cb71-11"><a href="subset.html#cb71-11"></a>fGroupsForms &lt;-<span class="st"> </span>fGroups[, <span class="kw">groupNames</span>(formulas)]</span>
+<span id="cb71-12"><a href="subset.html#cb71-12"></a></span>
+<span id="cb71-13"><a href="subset.html#cb71-13"></a><span class="co"># only keep feature groups with either formula or compound annotation results</span></span>
+<span id="cb71-14"><a href="subset.html#cb71-14"></a>fGroupsAnn &lt;-<span class="st"> </span>fGroups[, <span class="kw">union</span>(<span class="kw">groupNames</span>(formulas), <span class="kw">groupNames</span>(compounds))]</span>
+<span id="cb71-15"><a href="subset.html#cb71-15"></a></span>
+<span id="cb71-16"><a href="subset.html#cb71-16"></a><span class="co"># select first 15 components</span></span>
+<span id="cb71-17"><a href="subset.html#cb71-17"></a>components[<span class="dv">1</span><span class="op">:</span><span class="dv">15</span>]</span>
+<span id="cb71-18"><a href="subset.html#cb71-18"></a></span>
+<span id="cb71-19"><a href="subset.html#cb71-19"></a><span class="co"># select by name</span></span>
+<span id="cb71-20"><a href="subset.html#cb71-20"></a>components[<span class="kw">c</span>(<span class="st">&quot;CMP1&quot;</span>, <span class="st">&quot;CMP5&quot;</span>)]</span>
+<span id="cb71-21"><a href="subset.html#cb71-21"></a></span>
+<span id="cb71-22"><a href="subset.html#cb71-22"></a><span class="co"># only retain feature groups in components for which compound annotations are</span></span>
+<span id="cb71-23"><a href="subset.html#cb71-23"></a><span class="co"># available</span></span>
+<span id="cb71-24"><a href="subset.html#cb71-24"></a>components[, <span class="kw">groupNames</span>(compounds)]</span></code></pre></div>
+<p>In addition, feature groups can also be subset by given replicate groups (similar to <code>filter()</code>). Similarly, suspect screening results can also be subset by given suspect names.</p>
+<div class="sourceCode" id="cb72"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb72-1"><a href="subset.html#cb72-1"></a><span class="co"># equal as filter(fGroups, rGroups = ...)</span></span>
+<span id="cb72-2"><a href="subset.html#cb72-2"></a>fGroups[, rGroups =<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;repl1&quot;</span>, <span class="st">&quot;repl2&quot;</span>)]</span>
+<span id="cb72-3"><a href="subset.html#cb72-3"></a><span class="co"># only keep feature groups assigned to given suspects</span></span>
+<span id="cb72-4"><a href="subset.html#cb72-4"></a>fGroupsSusp[, suspects =<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;1H-benzotriazole&quot;</span>, <span class="st">&quot;2-quinolol&quot;</span>)]</span></code></pre></div>
 <div id="prioritization-workflow" class="section level3">
 <h3><span class="header-section-number">5.3.1</span> Prioritization workflow</h3>
 <p>An important use case of subsetting is prioritization of data. For instance, after statistical analysis only certain feature groups are deemed relevant for the rest of the workflow. A common prioritization workflow is illustrated below:</p>
-<div id="htmlwidget-1017d9d10381f4116833" style="width:500px;height:120px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-1017d9d10381f4116833">{"x":{"diagram":"\ndigraph Prioritization {\n  graph [ rankdir = LR ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.3,\n         height = 1,\n         fontsize = 18,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"Object conversion\" -> \"Prioritization\" -> Subsetting\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-61c1eda41841db9ccd67" style="width:500px;height:120px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-61c1eda41841db9ccd67">{"x":{"diagram":"\ndigraph Prioritization {\n  graph [ rankdir = LR ]\n  node [ shape = box,\n         fixedsize = true,\n         width = 2.3,\n         height = 1,\n         fontsize = 18,\n         fillcolor = darkseagreen1,\n         style = filled ]\n\n    \"Object conversion\" -> \"Prioritization\" -> Subsetting\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 <p>During the first step the workflow object is converted to a suitable format, most often using the <code>as.data.frame()</code> function. The converted data is then used as input for the prioritization strategy. Finally, these results are then used to select the data of interest in the original object.</p>
 <p>A very simplified example of such a process is shown below.</p>
-<div class="sourceCode" id="cb65"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb65-1"><a href="subset.html#cb65-1"></a>featTab &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(fGroups, <span class="dt">average =</span> <span class="ot">TRUE</span>)</span>
-<span id="cb65-2"><a href="subset.html#cb65-2"></a></span>
-<span id="cb65-3"><a href="subset.html#cb65-3"></a><span class="co"># prioritization: sort by (averaged) intensity of the &quot;sample&quot; replicate group</span></span>
-<span id="cb65-4"><a href="subset.html#cb65-4"></a><span class="co"># (from high to low) and then obtain the feature group identifiers of the top 5.</span></span>
-<span id="cb65-5"><a href="subset.html#cb65-5"></a>featTab &lt;-<span class="st"> </span>featTab[<span class="kw">order</span>(featTab<span class="op">$</span>standard, <span class="dt">decreasing =</span> <span class="ot">TRUE</span>), ]</span>
-<span id="cb65-6"><a href="subset.html#cb65-6"></a>groupsOfInterest &lt;-<span class="st"> </span>featTab<span class="op">$</span>group[<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>]</span>
-<span id="cb65-7"><a href="subset.html#cb65-7"></a></span>
-<span id="cb65-8"><a href="subset.html#cb65-8"></a><span class="co"># subset the original data</span></span>
-<span id="cb65-9"><a href="subset.html#cb65-9"></a>fGroups &lt;-<span class="st"> </span>fGroups[, groupsOfInterest]</span>
-<span id="cb65-10"><a href="subset.html#cb65-10"></a></span>
-<span id="cb65-11"><a href="subset.html#cb65-11"></a><span class="co"># fGroups now only contains the feature groups for which intensity values in the</span></span>
-<span id="cb65-12"><a href="subset.html#cb65-12"></a><span class="co"># &quot;sample&quot; replicate group were in the top 5</span></span></code></pre></div>
+<div class="sourceCode" id="cb73"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb73-1"><a href="subset.html#cb73-1"></a>featTab &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(fGroups, <span class="dt">average =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb73-2"><a href="subset.html#cb73-2"></a></span>
+<span id="cb73-3"><a href="subset.html#cb73-3"></a><span class="co"># prioritization: sort by (averaged) intensity of the &quot;sample&quot; replicate group</span></span>
+<span id="cb73-4"><a href="subset.html#cb73-4"></a><span class="co"># (from high to low) and then obtain the feature group identifiers of the top 5.</span></span>
+<span id="cb73-5"><a href="subset.html#cb73-5"></a>featTab &lt;-<span class="st"> </span>featTab[<span class="kw">order</span>(featTab<span class="op">$</span>standard, <span class="dt">decreasing =</span> <span class="ot">TRUE</span>), ]</span>
+<span id="cb73-6"><a href="subset.html#cb73-6"></a>groupsOfInterest &lt;-<span class="st"> </span>featTab<span class="op">$</span>group[<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>]</span>
+<span id="cb73-7"><a href="subset.html#cb73-7"></a></span>
+<span id="cb73-8"><a href="subset.html#cb73-8"></a><span class="co"># subset the original data</span></span>
+<span id="cb73-9"><a href="subset.html#cb73-9"></a>fGroups &lt;-<span class="st"> </span>fGroups[, groupsOfInterest]</span>
+<span id="cb73-10"><a href="subset.html#cb73-10"></a></span>
+<span id="cb73-11"><a href="subset.html#cb73-11"></a><span class="co"># fGroups now only contains the feature groups for which intensity values in the</span></span>
+<span id="cb73-12"><a href="subset.html#cb73-12"></a><span class="co"># &quot;sample&quot; replicate group were in the top 5</span></span></code></pre></div>
 </div>
 </div>
             </section>

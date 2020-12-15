@@ -73,7 +73,7 @@ future." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">patRoon</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.0</span>
       </span>
     </div>
 
@@ -168,7 +168,9 @@ future.</p>
     </div>
 
     <pre class="usage"><span class='co'># S4 method for featureGroups,MSPeakLists,compounds</span>
-<span class='fu'>compoundViewer</span><span class='op'>(</span><span class='va'>fGroups</span>, <span class='va'>MSPeakLists</span>, <span class='va'>compounds</span><span class='op'>)</span></pre>
+<span class='fu'>compoundViewer</span><span class='op'>(</span><span class='va'>fGroups</span>, <span class='va'>MSPeakLists</span>, <span class='va'>compounds</span><span class='op'>)</span>
+
+<span class='fu'>groupFeaturesScreening</span><span class='op'>(</span><span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -181,6 +183,10 @@ future.</p>
       <th>compounds</th>
       <td><p>A <code><a href='compounds-class.html'>compounds</a></code> object.</p></td>
     </tr>
+    <tr>
+      <th>...</th>
+      <td><p>Ignore.</p></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
@@ -189,6 +195,9 @@ future.</p>
   identification results. It will display available candidate information
   such as scorings and identifiers, MS/MS spectra with explained peaks and
   chemical structures.</p>
+<p><code>groupFeaturesScreening</code> was replaced by
+  <code><a href='suspect-screening.html'>screenSuspects</a></code>. Please refer to this function and the
+  handbook for the updated interface.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

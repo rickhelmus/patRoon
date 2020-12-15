@@ -4,8 +4,8 @@ function selectPrevFGroup()
     var ht = HTMLWidgets.getInstance(groupHot).hot;
     var nrow = ht.countRows();
     var r = Math.max(0, nrow - 1);
-    if (ht.getSelected() && ht.getSelected()[0] > 0)
-        r = ht.getSelected()[0] - 1;
+    if (ht.getSelected() && ht.getSelected()[0][0] > 0)
+        r = ht.getSelected()[0][0] - 1;
     ht.selectCell(r, 0, undefined, undefined, undefined, true);
 }
 
@@ -14,8 +14,8 @@ function selectNextFGroup()
     var ht = HTMLWidgets.getInstance(groupHot).hot;
     var nrow = ht.countRows();
     var r = 0;
-    if (ht.getSelected() && ht.getSelected()[0] < (nrow-1))
-        r = ht.getSelected()[0] + 1;
+    if (ht.getSelected() && ht.getSelected()[0][0] < (nrow-1))
+        r = ht.getSelected()[0][0] + 1;
     ht.selectCell(r, 0, undefined, undefined, undefined, true);
 }
 
@@ -179,5 +179,6 @@ function init()
 
 $(document).ready(function()
 {
-    setTimeout(init, 500); // HACK: wait a bit so that HTML instances are available
+    // UNDONE: disable for now
+    //setTimeout(init, 500); // HACK: wait a bit so that HTML instances are available
 });

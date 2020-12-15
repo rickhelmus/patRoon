@@ -44,6 +44,8 @@ Other changes
 * The `plotVenn()` method for `featureGroups` now allows to compare combinations of multiple replicate groups with each other. See `?plotVenn` for more information.
 * Fix: locating `SIRIUS` binary on `macOS` did not work properly
 * Fix: timeout warning for `GenForm` resulted in an error (https://github.com/rickhelmus/patRoon/issues/18)
+* Fix: plotting structures resulted in a Java error on the RStudio Docker image (https://github.com/rickhelmus/patRoon/issues/18)
+
             
 
 # patRoon 1.1

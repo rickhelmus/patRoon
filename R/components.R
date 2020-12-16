@@ -203,6 +203,7 @@ setMethod("as.data.table", "components", function(x)
 #'   minimum/maximum retention or mz increment of a homologous series. Set to
 #'   \code{NULL} to ignore.
 #' @param negate If \code{TRUE} then filters are applied in opposite manner.
+#' @param verbose If set to \code{FALSE} then no text output is shown.
 #'
 #' @note \code{filter} Applies only those filters for which a component has data
 #'   available. For instance, filtering by adduct will only filter any results
@@ -211,7 +212,8 @@ setMethod("as.data.table", "components", function(x)
 #' @export
 setMethod("filter", "components", function(obj, size = NULL, adducts = NULL,
                                            isotopes = NULL, rtIncrement = NULL,
-                                           mzIncrement = NULL, negate = FALSE)
+                                           mzIncrement = NULL, negate = FALSE,
+                                           verbose = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertIntegerish(size, lower = 0, any.missing = FALSE, len = 2, null.ok = TRUE, add = ac)
@@ -221,13 +223,16 @@ setMethod("filter", "components", function(obj, size = NULL, adducts = NULL,
     checkmate::assertNumeric(rtIncrement, lower = 0, any.missing = FALSE, len = 2, null.ok = TRUE, add = ac)
     checkmate::assertNumeric(mzIncrement, lower = 0, any.missing = FALSE, len = 2, null.ok = TRUE, add = ac)
     checkmate::assertFlag(negate, add = ac)
+    checkmate::assertFlag(verbose, add = ac)
     checkmate::reportAssertions(ac)
 
     if (!is.null(adducts) && !is.logical(adducts))
         adducts <- sapply(adducts, function(a) as.character(checkAndToAdduct(a)))
 
     oldn <- length(obj); oldresn <- if (oldn > 0) sum(sapply(obj@components, nrow)) else 0
-    cat("Filtering components... ")
+    
+    if (verbose)
+        cat("Filtering components... ")
 
     obj@components <- pruneList(lapply(obj@components, function(cmp)
     {
@@ -290,11 +295,14 @@ setMethod("filter", "components", function(obj, size = NULL, adducts = NULL,
         obj@components <- obj@components[names(obj@components) %in% obj@componentInfo$name]
     }
 
-    newn <- length(obj); newresn <- if (newn > 0) sum(sapply(obj@components, nrow)) else 0
-    printf("Done! Filtered %d (%.2f%%) components and %d (%.2f%%) feature groups. Remaining: %d components with %d feature groups\n",
-           oldn - newn, if (oldn == 0) 0 else (1-(newn/oldn))*100,
-           oldresn - newresn, if (oldresn == 0) 0 else (1-(newresn/oldresn))*100,
-           newn, newresn)
+    if (verbose)
+    {
+        newn <- length(obj); newresn <- if (newn > 0) sum(sapply(obj@components, nrow)) else 0
+        printf("Done! Filtered %d (%.2f%%) components and %d (%.2f%%) feature groups. Remaining: %d components with %d feature groups\n",
+               oldn - newn, if (oldn == 0) 0 else (1-(newn/oldn))*100,
+               oldresn - newresn, if (oldresn == 0) 0 else (1-(newresn/oldresn))*100,
+               newn, newresn)
+    }
 
     return(componentsReduced(components = obj@components, componentInfo = obj@componentInfo))
 })

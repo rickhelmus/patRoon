@@ -1533,6 +1533,74 @@ setMethod("calculatePeakQualities", "featureGroups", function(obj, weights, flat
     return(obj)
 })
 
+#' @export
+setMethod("mergeIons", "featureGroups", function(fGroups, components, selectIsoBy = "mono",
+                                                 prefAdduct)
+{
+    # UNDONE is intensity_rel a proper measure? ie does it allow comparison if
+    # isotopes/adducts are taken from different analyses?
+    # UNDONE: add logging to see what happens
+    # UNDONE: include isotope charge?
+    
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertClass(components, "components", add = ac)
+    checkmate::assertChoice(selectIsoBy, c("mono", "intensity"))
+    checkmate::reportAssertions(ac)
+    
+    prefAdduct <- as.character(checkAndToAdduct(prefAdduct))
+    
+    if (is.null(componentInfo(components)[["neutral_mass"]]))
+        stop("No adduct/isotope information available in given components!")
+    
+    cTab <- as.data.table(components)
+    cTab <- cTab[!is.na(isonr) | !is.na(adduct_ion)]
+    cTab[, remove := FALSE]
+    cTab[!is.na(isonr), remove := {
+        if (.N == 1)
+            FALSE
+        else if (selectIsoBy == "mono")
+            isonr != 0
+        else
+            !numEQ(intensity_rel, max(intensity_rel))
+    }, by = c("name", "isogroup")]
+    
+    cTab[!is.na(adduct_ion) & remove == FALSE, remove := {
+        if (.N == 1)
+            FALSE
+        # UNDONE: allow >1 pref adducts?
+        else if (prefAdduct %in% adduct_ion)
+            adduct_ion != prefAdduct
+        else # fall back to most intense
+            !numEQ(intensity_rel, max(intensity_rel))
+    }, by = "name"]
+    
+    # remove unwanted isotopes/adducts
+    fGroups <- fGroups[, setdiff(names(fGroups), cTab[remove == TRUE]$group)]
+    
+    # annotate remaining
+    
+    # clearout previous annotations
+    fGroups@groupInfo$isonr <- NA_integer_
+    fGroups@groupInfo$adduct <- NA_character_
+    
+    cTabIso <- cTab[!is.na(isonr) & !remove]
+    fGroups@groupInfo[cTabIso$group, "isonr"] <- cTabIso$isonr
+    fGroups@groupInfo[is.na(fGroups@groupInfo$isonr), "isonr"] <- 0
+    
+    cTabAdd <- cTab[!is.na(adduct_ion) & !remove]
+    fGroups@groupInfo[cTabAdd$group, "adduct"] <- cTabAdd$adduct_ion
+    fGroups@groupInfo[is.na(fGroups@groupInfo$adduct), "adduct"] <- prefAdduct
+    
+    printf("Removed %d features detected as unwanted adducts/isotopes\n", sum(cTab$remove))
+    printf("Annotated %d features with isotope information\n", nrow(cTabIso))
+    printf("\tRemaining %d features set as default isotope 0\n", length(fGroups) - nrow(cTabIso))
+    printf("Annotated %d features with adducts\n", nrow(cTabAdd))
+    printf("\tRemaining %d features set as default adduct %s\n", length(fGroups) - nrow(cTabAdd), prefAdduct)
+    
+    
+    return(fGroups)
+})
+
 #' @templateVar func groupFeatures
 #' @templateVar what group features
 #' @templateVar ex1 groupFeaturesOpenMS

@@ -175,6 +175,70 @@ setMethod("groupFeatures", "featuresSet", function(feat, algorithm, ..., verbose
                             algorithm = makeSetAlgorithm(list(fGroups))))
 })
 
+#' @export
+setMethod("makeSet", "featureGroups", function(obj, ..., groupAlgo, groupArgs = NULL, verbose = TRUE,
+                                               adducts, labels = NULL)
+{
+    fGroupsList <- list(obj, ...)
+    ac <- checkmate::makeAssertCollection()
+    
+    checkmate::assertList(fGroupsList, types = "featureGroups", any.missing = FALSE,
+                          unique = TRUE, .var.name = "...", min.len = 1, add = ac)
+    checkmate::assertList(groupArgs, null.ok = TRUE, add = ac)
+    checkmate::assert(checkmate::checkCharacter(adducts, any.missing = FALSE, min.len = 1,
+                                                max.len = length(fGroupsList)),
+                      checkmate::checkList(adducts, types = c("adduct", "character"), any.missing = FALSE,
+                                           min.len = 1, max.len = length(fGroupsList)),
+                      checkmate::checkNull(adducts),
+                      .var.name = "adducts")
+    checkmate::assertCharacter(labels, len = length(fGroupsList), min.chars = 1, unique = TRUE,
+                               null.ok = !is.null(adducts), add = ac)
+    checkmate::reportAssertions(ac)
+    
+    if (!is.null(adducts))
+    {
+        if (is.null(labels))
+            names(fGroupsList) <- make.unique(ifelse(sapply(adducts, "slot", "charge") < 0, "negative", "positive"))
+        adducts <- prepareMakeSetAdducts(fGroupsList, adducts)
+    }
+    else
+    {
+        names(fGroupsList) <- labels
+        for (i in seq_along(fGroupsList))
+        {
+            if (is.null(groupInfo(fGroupsList[[i]])[["adduct"]]))
+                stop("Missing feature ion annotations. Either set the adducts argument or run mergeIons()")
+        }
+        adducts <- setNames(rep(list(NULL), length(fGroupsList)), names(fGroupsList))
+    }
+    
+    # prepare features: add adducts needed for neutralization
+    fGroupsList <- Map(fGroupsList, adducts, f = function(fGroups, add)
+    {
+        ftindAna <- transpose(groupFeatIndex(fGroups))
+        gInfo <- groupInfo(fGroups)
+        
+        fGroups@features@features <- Map(featureTable(fGroups), ftindAna, f = function(ft, fti)
+        {
+            gInds <- which(fti != 0)
+            fti <- fti[fti != 0]
+            ft <- copy(ft)
+            if (!is.null(add))
+                ft[fti, adduct := add]
+            else
+                ft[fti, adduct := gInfo[gInds, "adduct"]]
+            return(ft)
+        })
+        return(fGroups)
+    })
+    
+    allFeats <- sapply(fGroupsList, getFeatures, simplify = FALSE)
+    featSet <- doMakeFeaturesSet(allFeats, adducts)
+    
+    return(do.call(groupFeatures, c(list(featSet, algorithm = groupAlgo, verbose = verbose), groupArgs)))
+})
+
+
 featureGroupsUnset <- setClass("featureGroupsUnset", contains = "featureGroups")
 setMethod("unset", "featureGroupsSet", function(obj, sets)
 {

@@ -101,6 +101,7 @@
     - improve docs for areas (only affects when features=FALSE) and average (different behavior when features=TRUE/FALSE) for as.data.table() of featureGroups
     - update/check version nr mentioned in filter() for MSPeakLists
     - explain xlim/ylim behavior for annotations/mols for plotSpec()
+    - update/add aliases
 - tests
     - handle/test empty objects
     - test DA algorithms

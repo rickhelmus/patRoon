@@ -538,6 +538,22 @@ assertAndGetMSPLSetsArgs <- function(fGroupsSet, MSPeakListsSet)
     return(lapply(unsetMSPeaksList, function(x) list(MSPeakLists = x)))
 }
 
+prepareMakeSetAdducts <- function(objects, adducts)
+{
+    adductNamed <- checkmate::testNames(names(adducts))
+    if (adductNamed)
+        checkmate::assertNames(names(adducts), type = "unique", must.include = names(objects))
+    adducts <- lapply(adducts, checkAndToAdduct, .var.name = "adducts")
+    adducts <- rep(adducts, length.out = length(objects))
+    
+    if (!adductNamed)
+        names(adducts) <- names(objects)
+    else
+        adducts <- adducts[names(objects)] # synchronize order
+    
+    return(adducts)
+}
+
 ReduceWithArgs <- function(f, x, ..., fixedArgs = list())
 {
     ret <- x[[1]]

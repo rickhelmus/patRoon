@@ -1541,6 +1541,7 @@ setMethod("mergeIons", "featureGroups", function(fGroups, components, selectIsoB
     # isotopes/adducts are taken from different analyses?
     # UNDONE: add logging to see what happens
     # UNDONE: include isotope charge?
+    # UNDONE: does it make sense to keep isotope other than mono? can't use it for annotation
     
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(components, "components", add = ac)

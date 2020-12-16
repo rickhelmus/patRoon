@@ -21,56 +21,6 @@ featuresSet <- setClass("featuresSet",
                         slots = c(ionizedFeatures = "list"),
                         contains = c("features", "workflowStepSet"))
 
-setMethod("initialize", "featuresSet", function(.Object, ..., adducts)
-{
-    # UNDONE: check anaInfos to be unique
-    # UNDONE: cache
-    
-    featuresList <- list(...)
-    
-    ac <- checkmate::makeAssertCollection()
-    checkmate::assertList(featuresList, types = "features", any.missing = FALSE,
-                          unique = TRUE, .var.name = "...", min.len = 1, add = ac)
-    checkmate::assert(checkmate::checkCharacter(adducts, any.missing = FALSE, min.len = 1,
-                                                max.len = length(featuresList)),
-                      checkmate::checkList(adducts, types = c("adduct", "character"), any.missing = FALSE,
-                                           min.len = 1, max.len = length(featuresList)),
-                      .var.name = "adducts")
-    checkmate::reportAssertions(ac)
-    
-    adductNamed <- checkmate::testNames(names(adducts))
-    if (adductNamed)
-        checkmate::assertNames(names(adducts), type = "unique", must.include = names(featuresList))
-    adducts <- lapply(adducts, checkAndToAdduct, .var.name = "adducts")
-    adducts <- rep(adducts, length.out = length(featuresList))
-    
-    n <- getArgNames(..., def = ifelse(sapply(adducts, "slot", "charge") < 0, "negative", "positive"))
-    names(featuresList) <- make.unique(n)
-    
-    if (!adductNamed)
-        names(adducts) <- names(featuresList)
-    else
-        adducts <- adducts[names(featuresList)] # synchronize order
-    
-    # neutralize features
-    neutralizedFeatures <- mapply(featuresList, adducts, FUN = neutralizeFeatures,
-                                  SIMPLIFY = FALSE, USE.NAMES = TRUE)
-    
-    # combine anaInfo and tag
-    combAnaInfo <- do.call(rbind, lapply(names(featuresList), function(set)
-    {
-        ret <- featuresList[[set]]@analysisInfo
-        ret$set <- set
-        return(ret)
-    }))
-    
-    # combine (neutralized) features
-    combFeatures <- Reduce(modifyList, lapply(neutralizedFeatures, featureTable))
-    combFeaturesIon <- Reduce(modifyList, lapply(featuresList, featureTable))
-    
-    return(callNextMethod(.Object, adducts = adducts, setObjects = featuresList, ionizedFeatures = combFeaturesIon,
-                          features = combFeatures, analysisInfo = combAnaInfo, algorithm = makeSetAlgorithm(featuresList)))
-})
 
 #' @describeIn featuresSet Shows summary information for this object.
 #' @export
@@ -192,7 +142,60 @@ setMethod("filter", "featuresSet", function(obj, ..., negate = FALSE, sets = NUL
 setMethod("getXCMSSet", "featuresSet", function(obj, ..., sets = NULL) getXCMSSet(unset(obj, sets), ...))
 
 # UNDONE: mention that object will be unset
+#' @export
 setMethod("getXCMSnExp", "featuresSet", function(obj, ..., sets = NULL) getXCMSnExp(unset(obj, sets), ...))
+
+#' @export
+setMethod("makeSet", "features", function(..., adducts)
+{
+    # UNDONE: check anaInfos to be unique
+    # UNDONE: cache
+    
+    featuresList <- list(...)
+    
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertList(featuresList, types = "features", any.missing = FALSE,
+                          unique = TRUE, .var.name = "...", min.len = 1, add = ac)
+    checkmate::assert(checkmate::checkCharacter(adducts, any.missing = FALSE, min.len = 1,
+                                                max.len = length(featuresList)),
+                      checkmate::checkList(adducts, types = c("adduct", "character"), any.missing = FALSE,
+                                           min.len = 1, max.len = length(featuresList)),
+                      .var.name = "adducts")
+    checkmate::reportAssertions(ac)
+    
+    adductNamed <- checkmate::testNames(names(adducts))
+    if (adductNamed)
+        checkmate::assertNames(names(adducts), type = "unique", must.include = names(featuresList))
+    adducts <- lapply(adducts, checkAndToAdduct, .var.name = "adducts")
+    adducts <- rep(adducts, length.out = length(featuresList))
+    
+    n <- getArgNames(..., def = ifelse(sapply(adducts, "slot", "charge") < 0, "negative", "positive"))
+    names(featuresList) <- make.unique(n)
+    
+    if (!adductNamed)
+        names(adducts) <- names(featuresList)
+    else
+        adducts <- adducts[names(featuresList)] # synchronize order
+    
+    # neutralize features
+    neutralizedFeatures <- mapply(featuresList, adducts, FUN = neutralizeFeatures,
+                                  SIMPLIFY = FALSE, USE.NAMES = TRUE)
+    
+    # combine anaInfo and tag
+    combAnaInfo <- do.call(rbind, lapply(names(featuresList), function(set)
+    {
+        ret <- featuresList[[set]]@analysisInfo
+        ret$set <- set
+        return(ret)
+    }))
+    
+    # combine (neutralized) features
+    combFeatures <- Reduce(modifyList, lapply(neutralizedFeatures, featureTable))
+    combFeaturesIon <- Reduce(modifyList, lapply(featuresList, featureTable))
+    
+    return(callNextMethod(.Object, adducts = adducts, setObjects = featuresList, ionizedFeatures = combFeaturesIon,
+                          features = combFeatures, analysisInfo = combAnaInfo, algorithm = makeSetAlgorithm(featuresList)))
+})
 
 featuresUnset <- setClass("featuresUnset", contains = "features")
 setMethod("unset", "featuresSet", function(obj, sets)

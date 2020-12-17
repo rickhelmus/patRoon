@@ -396,6 +396,21 @@ assertEqualAdducts <- function(adducts)
         stop("Selected sets must have have equal adducts")
 }
 
+assertMakeSetArgs <- function(objects, class, adducts, adductNullOK, labels, add = NULL)
+{
+    checkmate::assertList(objects, types = class, any.missing = FALSE,
+                          unique = TRUE, .var.name = "obj and ...", min.len = 1,
+                          add = add)
+    if (!adductNullOK || !is.null(adducts))
+        checkmate::assert(checkmate::checkCharacter(adducts, any.missing = FALSE, min.len = 1,
+                                                    max.len = length(objects)),
+                          checkmate::checkList(adducts, types = c("adduct", "character"), any.missing = FALSE,
+                                               min.len = 1, max.len = length(objects)),
+                          .var.name = "adducts")
+    checkmate::assertCharacter(labels, len = length(objects), min.chars = 1, unique = TRUE,
+                               null.ok = !is.null(adducts), add = add)
+}
+
 # from https://github.com/mllg/checkmate/issues/115
 aapply = function(fun, formula, ..., fixed = list())
 {

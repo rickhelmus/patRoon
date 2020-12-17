@@ -177,29 +177,23 @@ setMethod("groupFeatures", "featuresSet", function(feat, algorithm, ..., verbose
 
 #' @export
 setMethod("makeSet", "featureGroups", function(obj, ..., groupAlgo, groupArgs = NULL, verbose = TRUE,
-                                               adducts, labels = NULL)
+                                               adducts, labels)
 {
+    if (is.null(labels) && is.null(adducts))
+        stop("The labels and adducts arguments are not set (NULL). ",
+             "Please set the labels argument, as automatic labelling requires adducts.")
+    
     fGroupsList <- list(obj, ...)
     ac <- checkmate::makeAssertCollection()
-    
-    checkmate::assertList(fGroupsList, types = "featureGroups", any.missing = FALSE,
-                          unique = TRUE, .var.name = "...", min.len = 1, add = ac)
+    assertMakeSetArgs(fGroupsList, "featureGroups", adducts, TRUE, labels, ac)
     checkmate::assertList(groupArgs, null.ok = TRUE, add = ac)
-    checkmate::assert(checkmate::checkCharacter(adducts, any.missing = FALSE, min.len = 1,
-                                                max.len = length(fGroupsList)),
-                      checkmate::checkList(adducts, types = c("adduct", "character"), any.missing = FALSE,
-                                           min.len = 1, max.len = length(fGroupsList)),
-                      checkmate::checkNull(adducts),
-                      .var.name = "adducts")
-    checkmate::assertCharacter(labels, len = length(fGroupsList), min.chars = 1, unique = TRUE,
-                               null.ok = !is.null(adducts), add = ac)
     checkmate::reportAssertions(ac)
     
     if (!is.null(adducts))
     {
-        if (is.null(labels))
-            names(fGroupsList) <- make.unique(ifelse(sapply(adducts, "slot", "charge") < 0, "negative", "positive"))
-        adducts <- prepareMakeSetAdducts(fGroupsList, adducts)
+        adducts <- prepareMakeSetAdducts(fGroupsList, adducts, labels)
+        adductsChr <- lapply(adducts, as.character)
+        names(fGroupsList) <- names(adducts)
     }
     else
     {
@@ -209,11 +203,11 @@ setMethod("makeSet", "featureGroups", function(obj, ..., groupAlgo, groupArgs = 
             if (is.null(groupInfo(fGroupsList[[i]])[["adduct"]]))
                 stop("Missing feature ion annotations. Either set the adducts argument or run mergeIons()")
         }
-        adducts <- setNames(rep(list(NULL), length(fGroupsList)), names(fGroupsList))
+        adducts <- adductsChr <- setNames(rep(list(NULL), length(fGroupsList)), names(fGroupsList))
     }
     
     # prepare features: add adducts needed for neutralization
-    fGroupsList <- Map(fGroupsList, adducts, f = function(fGroups, add)
+    fGroupsList <- Map(fGroupsList, adductsChr, f = function(fGroups, add)
     {
         ftindAna <- transpose(groupFeatIndex(fGroups))
         gInfo <- groupInfo(fGroups)

@@ -206,7 +206,7 @@ setMethod("makeSet", "featureGroups", function(obj, ..., groupAlgo, groupArgs = 
         adducts <- adductsChr <- setNames(rep(list(NULL), length(fGroupsList)), names(fGroupsList))
     }
     
-    # prepare features: add adducts needed for neutralization
+    # prepare features: add adducts needed for neutralization and remove left-over features
     fGroupsList <- Map(fGroupsList, adductsChr, f = function(fGroups, add)
     {
         ftindAna <- transpose(groupFeatIndex(fGroups))
@@ -221,6 +221,9 @@ setMethod("makeSet", "featureGroups", function(obj, ..., groupAlgo, groupArgs = 
                 ft[fti, adduct := add]
             else
                 ft[fti, adduct := gInfo[gInds, "adduct"]]
+            
+            ft <- ft[fti] # remove features not in any group
+            
             return(ft)
         })
         return(fGroups)

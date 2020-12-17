@@ -5,7 +5,10 @@ NULL
 neutralizeFeatures <- function(feat, adduct)
 {
     if (!is.null(adduct))
+    {
+        adductChar <- as.character(adduct)
         adductMZ <- adductMZDelta(adduct)
+    }
     else
     {
         allAdducts <- unique(unlist(lapply(feat@features, "[[", "adduct")))
@@ -15,15 +18,23 @@ neutralizeFeatures <- function(feat, adduct)
     
     feat@features <- lapply(feat@features, function(fTab)
     {
-        if (!is.null(adduct))
-            mzd <- adductMZ
-        else
-            mzd <- ifelse(is.na(fTab$adduct), 0, adductMZ[fTab$adduct])
-        
         fTab <- copy(fTab)
+        
+        if (!is.null(adduct))
+        {
+            mzd <- adductMZ
+            fTab[, adduct := adductChar]
+        }
+        else
+        {
+            mzd <- adductMZ[fTab$adduct]
+            fTab[, adduct := fTab$adduct]
+        }
+        
         fTab[, mz := mz - mzd]
         fTab[, mzmin := mzmin - mzd]
         fTab[, mzmax := mzmax - mzd]
+        
         return(fTab)
     })
     return(feat)

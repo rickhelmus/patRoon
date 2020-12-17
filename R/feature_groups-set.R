@@ -170,9 +170,18 @@ setMethod("groupFeatures", "featuresSet", function(feat, algorithm, ..., verbose
     
     fGroups <- do.call(callNextMethod, c(list(feat = feat, algorithm = algorithm, verbose = verbose), otherArgs))
     
-    return(featureGroupsSet(groups = groupTable(fGroups), groupInfo = groupInfo(fGroups),
+    ret <- featureGroupsSet(groups = groupTable(fGroups), groupInfo = groupInfo(fGroups),
                             analysisInfo = analysisInfo(fGroups), features = feat, ftindex = groupFeatIndex(fGroups),
-                            algorithm = makeSetAlgorithm(list(fGroups))))
+                            algorithm = makeSetAlgorithm(list(fGroups)))
+    
+    # get group adducts: just take it from the first feature, as all should be equal
+    ret@groupInfo$adduct <- sapply(groupFeatIndex(ret), function(ftinds)
+    {
+        firstAna <- which(ftinds != 0)[1]
+        return(featureTable(ret)[[firstAna]]$adduct[ftinds[firstAna]])
+    })
+    
+    return(ret)
 })
 
 #' @export

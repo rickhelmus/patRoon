@@ -184,26 +184,19 @@ setMethod("getXCMSSet", "featuresSet", function(obj, ..., sets = NULL) getXCMSSe
 setMethod("getXCMSnExp", "featuresSet", function(obj, ..., sets = NULL) getXCMSnExp(unset(obj, sets), ...))
 
 #' @export
-setMethod("makeSet", "features", function(obj, ..., adducts)
+setMethod("makeSet", "features", function(obj, ..., adducts, labels)
 {
     # UNDONE: check anaInfos to be unique
     # UNDONE: cache
-    # UNDONE: update
     
     featuresList <- list(obj, ...)
-    checkmate::assertList(featuresList, types = "features", any.missing = FALSE,
-                          unique = TRUE, .var.name = "...", min.len = 1)
-    checkmate::assert(checkmate::checkCharacter(adducts, any.missing = FALSE, min.len = 1,
-                                                max.len = length(featuresList)),
-                      checkmate::checkList(adducts, types = c("adduct", "character"), any.missing = FALSE,
-                                           min.len = 1, max.len = length(featuresList)),
-                      .var.name = "adducts")
-    
-    n <- getArgNames(..., def = ifelse(sapply(adducts, "slot", "charge") < 0, "negative", "positive"))
-    names(featuresList) <- make.unique(n)
-    
-    adducts <- prepareMakeSetAdducts(featuresList, adducts)
-    
+    ac <- checkmate::makeAssertCollection()
+    assertMakeSetArgs(featuresList, "features", adducts, FALSE, labels, ac)
+    checkmate::reportAssertions(ac)
+
+    adducts <- prepareMakeSetAdducts(featuresList, adducts, labels)
+    names(featuresList) <- names(adducts)
+
     return(doMakeFeaturesSet(featuresList, adducts))
 })
 

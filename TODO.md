@@ -84,6 +84,29 @@
     - annotation columns not in report, fine? (there are many) If yes document
     - as.data.table(fGroupsScrSets, collapseSuspects=NULL): omits sets column
         - still true? check
+- neutralizing / ionization
+    - mergeIons()
+        - other name?
+        - makes sense to not choose monoisotopic mass? nor for annotation at least
+		- also method for fGroupsSets?
+			- do it per component set
+			- used to update adducts
+			- needs to re-group afterwards
+			    - make general reGroup() method, that uses stored settings from groupFeatures()?
+	    - prefer adducts based on MS/MS? eg handy for Na/K adducts
+	- remove adduct slots
+	- unset()
+	    - can now only work for 1 set?
+	    - update all methods
+	- formula/compounds: get adduct from gInfo if present
+		- also for screening? could (optionally) look for matches with neutralized fGroup/susp masses
+		- adduct arg still overrides?
+	- cliqueMS components
+	- component selection tool/function
+	    - otherwise perhaps make a fGroup remover function to help subsetting
+			- similarly as for feature remover in fGroups...
+			- del()/delete()/rmResult()/delResult() generic? could also be for other classes
+		- similarly: set() like method to change data, such as adduct annotations
 - NEWS
     - [..., reAverage = FALSE] and implications of filtering when setting it to TRUE
 - docs

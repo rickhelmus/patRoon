@@ -95,12 +95,15 @@
 			    - make general reGroup() method, that uses stored settings from groupFeatures()?
 	    - prefer adducts based on MS/MS? eg handy for Na/K adducts
 	- remove adduct slots
+	- makeSet()
+	    - fGroups: also support method via comparison?
 	- unset()
 	    - can now only work for 1 set?
 	    - update all methods
 	- formula/compounds: get adduct from gInfo if present
 		- also for screening? could (optionally) look for matches with neutralized fGroup/susp masses
 		- adduct arg still overrides?
+	- add annotations to as.data.table()
 	- cliqueMS components
 	- component selection tool/function
 	    - otherwise perhaps make a fGroup remover function to help subsetting

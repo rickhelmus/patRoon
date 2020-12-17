@@ -1592,12 +1592,11 @@ setMethod("mergeIons", "featureGroups", function(fGroups, components, selectIsoB
     fGroups@groupInfo[cTabAdd$group, "adduct"] <- cTabAdd$adduct_ion
     fGroups@groupInfo[is.na(fGroups@groupInfo$adduct), "adduct"] <- prefAdduct
     
-    printf("Removed %d features detected as unwanted adducts/isotopes\n", sum(cTab$remove))
-    printf("Annotated %d features with isotope information\n", nrow(cTabIso))
-    printf("\tRemaining %d features set as default isotope 0\n", length(fGroups) - nrow(cTabIso))
-    printf("Annotated %d features with adducts\n", nrow(cTabAdd))
-    printf("\tRemaining %d features set as default adduct %s\n", length(fGroups) - nrow(cTabAdd), prefAdduct)
-    
+    printf("Removed %d feature groups detected as unwanted adducts/isotopes\n", sum(cTab$remove))
+    printf("Annotated %d feature groups with isotope information\n", nrow(cTabIso))
+    printf("\tRemaining %d feature groups set as default isotope 0\n", length(fGroups) - nrow(cTabIso))
+    printf("Annotated %d feature groups with adducts\n", nrow(cTabAdd))
+    printf("\tRemaining %d feature groups set as default adduct %s\n", length(fGroups) - nrow(cTabAdd), prefAdduct)
     
     return(fGroups)
 })

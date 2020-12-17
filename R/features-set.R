@@ -12,7 +12,6 @@ neutralizeFeatures <- function(feat, adduct)
     else
     {
         allAdducts <- unique(unlist(lapply(feat@features, "[[", "adduct")))
-        allAdducts <- allAdducts[!is.na(allAdducts)]
         adductMZ <- sapply(allAdducts, function(a) adductMZDelta(as.adduct(a)))
     }
     
@@ -219,8 +218,6 @@ setMethod("unset", "featuresSet", function(obj, sets)
     if (!is.null(sets) && length(sets) > 0)
         obj <- obj[, sets = sets]
 
-    assertEqualAdducts(adducts(obj))
-    
     return(featuresUnset(features = obj@ionizedFeatures, analysisInfo = analysisInfo(obj),
                          algorithm = paste0(algorithm(obj), "_unset")))
 })

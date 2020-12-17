@@ -9,6 +9,21 @@ featureGroupsSet <- setClass("featureGroupsSet",
 setMethod("sets", "featureGroupsSet", function(obj) sets(getFeatures(obj)))
 setMethod("adducts", "featureGroupsSet", function(obj) adducts(getFeatures(obj)))
 
+setMethod("removeGroups", "featureGroupsSet", function(fGroups, indices)
+{
+    # HACK: subset annotations here as format with sets is different
+    ann <- fGroups@annotations
+    if (nrow(ann) > 0)
+        fGroups@annotations <- data.table() # disable subsetting in fGroups method
+    
+    fGroups <- callNextMethod()
+    
+    if (nrow(ann) > 0)
+        fGroups@annotations <- ann[set %in% sets(fGroups)]
+    
+    return(fGroups)
+})
+
 #' @describeIn featureGroupsSet Shows summary information for this object.
 #' @export
 setMethod("show", "featureGroupsSet", function(object)
@@ -32,8 +47,11 @@ setMethod("[", c("featureGroupsSet", "ANY", "ANY", "missing"), function(x, i, j,
     assertSets(x, sets)
     
     if (!is.null(sets) && length(sets) > 0)
+    {
         i <- mergeAnaSubsetArgWithSets(i, sets, analysisInfo(x))
-
+        x@annotations <- x@annotations[set %in% sets]
+    }
+    
     return(callNextMethod(x, i, j, ..., rGroups = rGroups))
 })
 
@@ -174,12 +192,23 @@ setMethod("groupFeatures", "featuresSet", function(feat, algorithm, ..., verbose
                             analysisInfo = analysisInfo(fGroups), features = feat, ftindex = groupFeatIndex(fGroups),
                             algorithm = makeSetAlgorithm(list(fGroups)))
     
-    # get group adducts: just take it from the first feature, as all should be equal
-    ret@groupInfo$adduct <- sapply(groupFeatIndex(ret), function(ftinds)
+    anaInfo <- analysisInfo(ret)
+    ftind <- groupFeatIndex(ret)
+    fTable <- featureTable(ret)
+    
+    ret@annotations <- rbindlist(sapply(sets(feat), function(s)
     {
-        firstAna <- which(ftinds != 0)[1]
-        return(featureTable(ret)[[firstAna]]$adduct[ftinds[firstAna]])
-    })
+        anaInds <- which(anaInfo$set == s)
+        grps <- names(ret)[sapply(ftind[anaInds], function(x) any(x != 0))]
+
+        firstFeats <- rbindlist(lapply(ftind[, grps, with = FALSE], function(x)
+        {
+            firstAna <- which(x != 0)[1]
+            return(featureTable(ret)[[firstAna]][x[firstAna]])
+        }))
+        
+        return(data.table(group = grps, adduct = firstFeats$adduct, isonr = firstFeats$isonr))
+    }, simplify = FALSE), idcol = "set")
     
     return(ret)
 })
@@ -209,7 +238,7 @@ setMethod("makeSet", "featureGroups", function(obj, ..., groupAlgo, groupArgs = 
         names(fGroupsList) <- labels
         for (i in seq_along(fGroupsList))
         {
-            if (is.null(groupInfo(fGroupsList[[i]])[["adduct"]]))
+            if (nrow(annotations(fGroupsList[[i]])) == 0)
                 stop("Missing feature ion annotations. Either set the adducts argument or run mergeIons()")
         }
         adducts <- adductsChr <- setNames(rep(list(NULL), length(fGroupsList)), names(fGroupsList))
@@ -219,7 +248,7 @@ setMethod("makeSet", "featureGroups", function(obj, ..., groupAlgo, groupArgs = 
     fGroupsList <- Map(fGroupsList, adductsChr, f = function(fGroups, add)
     {
         ftindAna <- transpose(groupFeatIndex(fGroups))
-        gInfo <- groupInfo(fGroups)
+        ann <- annotations(fGroups)
         
         fGroups@features@features <- Map(featureTable(fGroups), ftindAna, f = function(ft, fti)
         {
@@ -229,7 +258,7 @@ setMethod("makeSet", "featureGroups", function(obj, ..., groupAlgo, groupArgs = 
             if (!is.null(add))
                 ft[fti, adduct := add]
             else
-                ft[fti, adduct := gInfo[gInds, "adduct"]]
+                ft[fti, adduct := ann$adduct[gInds]]
             
             ft <- ft[fti] # remove features not in any group
             
@@ -248,20 +277,24 @@ setMethod("makeSet", "featureGroups", function(obj, ..., groupAlgo, groupArgs = 
 featureGroupsUnset <- setClass("featureGroupsUnset", contains = "featureGroups")
 setMethod("unset", "featureGroupsSet", function(obj, sets)
 {
-    assertSets(obj, sets)
-    
     # UNDONE: mention that group names remain the same and thus represent neutral masses
+    # UNDONE: or rename?
     
-    if (!is.null(sets) && length(sets) > 0)
-        obj <- obj[, sets = sets]
+    assertSets(obj, sets, FALSE)
     
-    assertEqualAdducts(adducts(obj))
+    # UNDONE: limitation?
+    if (length(sets) > 1)
+        stop("Please specify not more than one set")
     
-    addMZ <- adductMZDelta(adducts(obj)[[1]])
+    obj <- obj[, sets = sets]
+    
     gInfo <- groupInfo(obj)
-    gInfo$mzs <- gInfo$mzs + addMZ
+    ann <- annotations(obj)
+    adducts <- sapply(unique(ann$adduct), as.adduct)
+    addMZs <- sapply(adducts, adductMZDelta)
+    gInfo$mzs <- gInfo$mzs + addMZs[ann$adduct]
     
     return(featureGroupsUnset(groups = groupTable(obj), groupInfo = gInfo, analysisInfo = analysisInfo(obj),
                               features = unset(getFeatures(obj)), ftindex = groupFeatIndex(obj),
-                              algorithm = paste0(algorithm(obj), "_unset")))
+                              annotations = ann[, -"set"], algorithm = paste0(algorithm(obj), "_unset")))
 })

@@ -31,23 +31,23 @@ NULL
 #' @param col Colour(s) used. If \code{col=NULL} then colours are automatically
 #'   generated.
 #' @param which A character vector with replicate groups used for comparison.
-#'   
+#'
 #'   For plotting functions: set to \code{NULL} for all replicate groups.
-#'   
+#'
 #'   For \code{plotVenn}: alternatively a named \code{list} containing elements
 #'   of \code{character} vectors with replicate groups to compare. For instance,
 #'   \code{which=list(infl = c("influent-A", "influent-B"), effl =
 #'   c("effluent-A", "effluent-B"))}, will compare the features in replicate
-#'   groups \samp{"influent-A/B"} against those in \samp{"effluent-A/B"}.
-#'   The names of the list are used for labelling in the plot, and will be made
+#'   groups \samp{"influent-A/B"} against those in \samp{"effluent-A/B"}. The
+#'   names of the list are used for labelling in the plot, and will be made
 #'   automatically if not specified.
 #' @param colourBy Sets the automatic colour selection: \code{"none"} for a
 #'   single colour or \code{"rGroups"}/\code{"fGroups"} for a distinct colour
 #'   per replicate/feature group.
 #' @param showLegend If \code{TRUE} a legend will be shown with either replicate
 #'   groups (\code{colourBy == "rGroups"}) or feature groups (\code{colourBy ==
-#'   "fGroups"}, only for \code{plotChroms}). If \code{colourBy} is \code{"none"}
-#'   no legend will be shown.
+#'   "fGroups"}, only for \code{plotChroms}). If \code{colourBy} is
+#'   \code{"none"} no legend will be shown.
 #'
 #' @templateVar seli analyses
 #' @templateVar selOrderi analyses()
@@ -70,6 +70,8 @@ NULL
 #'   feature group (columns) per analysis (rows). Each index corresponds to the
 #'   row within the feature table of the analysis (see
 #'   \code{\link{featureTable}}).
+#' @slot annotations A (\code{\link{data.table}}) with adduct/isotope
+#'   annotations for each group (see \code{\link{mergeIons}}).
 #'
 #' @templateVar class featureGroups
 #' @template class-hierarchy
@@ -78,7 +80,7 @@ NULL
 featureGroups <- setClass("featureGroups",
                           slots = c(groups = "data.table", analysisInfo = "data.frame", groupInfo = "data.frame",
                                     features = "features", ftindex = "data.table", groupQualities = "data.table",
-                                    groupScores = "data.table"),
+                                    groupScores = "data.table", annotations = "data.table"),
                           contains = c("VIRTUAL", "workflowStep"))
 
 setMethod("initialize", "featureGroups", function(.Object, ...)
@@ -94,6 +96,8 @@ setMethod("initialize", "featureGroups", function(.Object, ...)
         args$groupQualities <- data.table()
     if (is.null(args[["groupScores"]]))
         args$groupScores <- data.table()
+    if (is.null(args[["annotations"]]))
+        args$annotations <- data.table()
     
     .Object <- do.call(callNextMethod, c(list(.Object), args))
     
@@ -219,6 +223,11 @@ setMethod("groupQualities", "featureGroups", function(fGroups) fGroups@groupQual
 #' @aliases groupScores
 #' @export
 setMethod("groupScores", "featureGroups", function(fGroups) fGroups@groupScores)
+
+#' @describeIn featureGroups Accessor for \code{annotations} slot.
+#' @aliases annotations
+#' @export
+setMethod("annotations", "featureGroups", function(fGroups) fGroups@annotations)
 
 #' @describeIn featureGroups Subset on analyses/feature groups.
 #' @param rGroups An optional \code{character} vector: if specified only keep
@@ -1580,23 +1589,43 @@ setMethod("mergeIons", "featureGroups", function(fGroups, components, selectIsoB
     
     # annotate remaining
     
-    # clearout previous annotations
-    fGroups@groupInfo$isonr <- NA_integer_
-    fGroups@groupInfo$adduct <- NA_character_
-    
     cTabIso <- cTab[!is.na(isonr) & !remove]
-    fGroups@groupInfo[cTabIso$group, "isonr"] <- cTabIso$isonr
-    fGroups@groupInfo[is.na(fGroups@groupInfo$isonr), "isonr"] <- 0
-    
     cTabAdd <- cTab[!is.na(adduct_ion) & !remove]
-    fGroups@groupInfo[cTabAdd$group, "adduct"] <- cTabAdd$adduct_ion
-    fGroups@groupInfo[is.na(fGroups@groupInfo$adduct), "adduct"] <- prefAdduct
     
-    printf("Removed %d feature groups detected as unwanted adducts/isotopes\n", sum(cTab$remove))
-    printf("Annotated %d feature groups with isotope information\n", nrow(cTabIso))
-    printf("\tRemaining %d feature groups set as default isotope 0\n", length(fGroups) - nrow(cTabIso))
-    printf("Annotated %d feature groups with adducts\n", nrow(cTabAdd))
-    printf("\tRemaining %d feature groups set as default adduct %s\n", length(fGroups) - nrow(cTabAdd), prefAdduct)
+    if (nrow(cTabIso) == 0 && nrow(cTabAdd) == 0)
+    {
+        fGroups@annotations <- data.table()
+        cat("No adduct or isotope annotations found!\n")
+    }
+    else
+    {
+        fGroups@annotations <- data.table(group = names(fGroups))
+
+        if (nrow(cTabIso) > 0)
+        {
+            fGroups@annotations <- merge(fGroups@annotations, cTabIso[, c("group", "isonr"), with = FALSE],
+                                         by = "group", all.x = TRUE)
+            fGroups@annotations[is.na(isonr), isonr := 0]
+        }
+        else
+            fGroups@annotations[, isonr := 0]
+        
+        if (nrow(cTabAdd) > 0)
+        {
+            setnames(cTabAdd, "adduct_ion", "adduct")
+            fGroups@annotations <- merge(fGroups@annotations, cTabAdd[, c("group", "adduct"), with = FALSE],
+                                         by = "group", all.x = TRUE)
+            fGroups@annotations[is.na(adduct), adduct := prefAdduct]
+        }
+        else
+            fGroups@annotations[, adduct := prefAdduct]
+        
+        printf("Removed %d feature groups detected as unwanted adducts/isotopes\n", sum(cTab$remove))
+        printf("Annotated %d feature groups with isotope information\n", nrow(cTabIso))
+        printf("\tRemaining %d feature groups set as default isotope 0\n", length(fGroups) - nrow(cTabIso))
+        printf("Annotated %d feature groups with adducts\n", nrow(cTabAdd))
+        printf("\tRemaining %d feature groups set as default adduct %s\n", length(fGroups) - nrow(cTabAdd), prefAdduct)
+    }
     
     return(fGroups)
 })

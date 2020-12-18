@@ -82,6 +82,26 @@ setMethod("as.character", "adduct", function(x, format = "generic", err = TRUE)
     checkmate::assertFlag(err, add = ac)
     checkmate::reportAssertions(ac)
 
+    getGFMFAdduct <- function()
+    {
+        simplifyAddSub <- function(x) if (length(x) == 0) "" else simplifyFormula(paste0(x, collapse = ""))
+        
+        tbl <- if (format == "genform") GenFormAdducts() else MetFragAdducts()
+        
+        adds <- tbl[add == simplifyAddSub(x@add) & sub == simplifyAddSub(x@sub) &
+                        charge == x@charge & molMult == x@molMult, adduct]
+        
+        if (length(adds) == 0)
+        {
+            if (err)
+                stop(sprintf("Invalid adduct for %s! See %s() for valid options.",
+                             format, if (format == "GenForm") "GenFormAdducts" else "MetFragAdducts"))
+            return(NA_character_)
+        }
+        
+        return(adds[1]) # return first one in case there are multiple hits
+    }
+    
     if (format == "sirius" || format == "generic")
     {
         if (format == "sirius")
@@ -103,38 +123,24 @@ setMethod("as.character", "adduct", function(x, format = "generic", err = TRUE)
         return(paste0("[", mult, "M", adds, subs, "]", charge))
     }
     else if (format == "genform")
-    {
-        # translate to GF adduct
-        gfadd <- if (length(x@add) == 0) "" else x@add
-        gfsub <- if (length(x@sub) == 0) "" else x@sub
-        gfadds <- GenFormAdducts()[add == gfadd & sub == gfsub & charge == x@charge & molMult == x@molMult, adduct]
-
-        if (length(gfadds) == 0)
-        {
-            if (err)
-                stop("Invalid adduct for GenForm! See GenFormAdducts() for valid options.")
-            return(NA_character_)
-        }
-        return(gfadds[1]) # return first one in case there are multiple hits
-    }
+        return(getGFMFAdduct())
     else if (format == "metfrag")
     {
         if (abs(x@charge) != 1)
-            stopOrEmpty("MetFrag only supports a charge of +/- 1")
-        if (x@molMult > 1)
-            stopOrEmpty("MetFrag only supports a molecular multiplier of 1")
-
-        mfadd <- if (length(x@add) == 0) "" else x@add
-        mfsub <- if (length(x@sub) == 0) "" else x@sub
-        mfadds <- MetFragAdducts()[add == mfadd & sub == mfsub & charge == x@charge, adduct_type]
-
-        if (length(mfadds) == 0)
         {
             if (err)
-                stop("Invalid adduct for MetFrag! See MetFragAdducts() for valid options.")
+                stop("MetFrag only supports a charge of +/- 1")
             return(NA_character_)
         }
-        return(mfadds[1]) # return first one in case there are multiple hits
+        
+        if (x@molMult > 1)
+        {
+            if (err)
+                stop("MetFrag only supports a molecular multiplier of 1")
+            return(character())
+        }
+
+        return(getGFMFAdduct())
     }
 })
 

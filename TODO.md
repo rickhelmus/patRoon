@@ -102,7 +102,9 @@
 	    - update all methods
 	- formula/compounds: get adduct from gInfo if present
 		- also for screening? could (optionally) look for matches with neutralized fGroup/susp masses
-		- adduct arg still overrides?
+		- fragment annotation with MF OK?
+		    - Also check GF
+		    - report 'neutral' fragments? Check what SIRIUS does.
 		- what to do with unsupported adducts?
 		    - skip calculation with a warning?
 		        - default toM+H/M-H for now with warning...

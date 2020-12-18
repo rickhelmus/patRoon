@@ -87,10 +87,10 @@ setMethod("as.character", "adduct", function(x, format = "generic", err = TRUE)
         simplifyAddSub <- function(x) if (length(x) == 0) "" else simplifyFormula(paste0(x, collapse = ""))
         
         tbl <- if (format == "genform") GenFormAdducts() else MetFragAdducts()
-        
+        colName <- if (format == "genform") "adduct" else "adduct_type"
         adds <- tbl[add == simplifyAddSub(x@add) & sub == simplifyAddSub(x@sub) &
-                        charge == x@charge & molMult == x@molMult, adduct]
-        
+                        charge == x@charge & molMult == x@molMult, colName, with = FALSE]
+
         if (length(adds) == 0)
         {
             if (err)

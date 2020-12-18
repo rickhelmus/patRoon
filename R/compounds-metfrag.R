@@ -154,20 +154,26 @@ unifyMFNames <- function(mfr)
 # For comparison with other results these should be converted to a simple formula format
 cleanFragFormulas <- function(forms)
 {
+    # get ionization adduct (if any)
+    plusminpat <- "[\\-\\+]"
+    addpat <- sprintf(".*\\]%s([[:alnum:]]+)%s", plusminpat, plusminpat)
+    adducts <- ifelse(grepl(addpat, forms), gsub(addpat, "\\1", forms), "")
+    
+    forms <- gsub(sprintf("%s([[:alnum:]]+)%s$", plusminpat, plusminpat), "", forms) # remove adducts and charge
     forms <- gsub("\\[|\\]", "", forms) # remove brackets
-    forms <- gsub("[-\\+]$", "", forms) # remove trailing charge
 
     # add single counts to hydrogen adducts without count (e.g. -H becomes -1H)
     forms <- gsub("([-\\+])H", "\\11H", forms)
 
-    adducts <- regmatches(forms, gregexpr("([-\\+][0-9]+)H", forms)) # get "-1H", "+2H" etc
+    protAdducts <- regmatches(forms, gregexpr("([-\\+][0-9]+)H", forms)) # get "-1H", "+2H" etc
 
-    # Get 'regular' part of formula and update H count
-    baseForms <- gsub("^([[:alnum:]]+)[-|\\+].*", "\\1", forms)
-
+    baseForms <- gsub("^([[:alnum:]]+)[-|\\+].*", "\\1", forms) # Get 'regular' part of formula
+    baseForms <- paste0(baseForms, adducts) # re-add adducts
+    
+    # handle protonation adducts
     return(sapply(seq_along(forms), function(fi)
     {
-        addHCount <- sum(as.integer(gsub("H", "", adducts[[fi]])))
+        addHCount <- sum(as.integer(gsub("H", "", protAdducts[[fi]])))
         flist <- splitFormulaToList(baseForms[[fi]])
 
         if (addHCount != 0)
@@ -266,7 +272,18 @@ generateMetFragRunData <- function(fGroups, MSPeakLists, mfSettings, extDB, topM
     if (!is.null(extDB))
         baseHash <- makeHash(baseHash, extDB)
 
-    ret <- sapply(gNames, function(grp)
+    if (!is.null(adduct))
+    {
+        grpAdducts <- rep(list(adduct), length(fGroups))
+        grpAdductsChr <- rep(as.character(adduct, format = "metfrag"), length(fGroups))
+    }
+    else
+    {
+        grpAdducts <- lapply(annotations(fGroups)$adduct, as.adduct)
+        grpAdductsChr <- makeAlgoAdducts(grpAdducts, gNames, "metfrag")
+    }
+    
+    ret <- Map(gNames, grpAdducts, grpAdductsChr, f = function(grp, add, addChr)
     {
         if (!is.null(identifiers) && is.null(identifiers[[grp]]))
             return(NULL)
@@ -276,20 +293,22 @@ generateMetFragRunData <- function(fGroups, MSPeakLists, mfSettings, extDB, topM
             return(NULL)
 
         mfSettings$IonizedPrecursorMass <- gInfo[grp, "mzs"]
+        mfSettings$PrecursorIonType <- addChr
+        # mfSettings$NeutralPrecursorMass <- gInfo[grp, "mzs"] - adductMZDelta(add)
         mfSettings$ExperimentalRetentionTimeValue <- gInfo[grp, "rts"] / 60
 
         if (!is.null(identifiers))
             mfSettings$PrecursorCompoundIDs <- identifiers[[grp]]
-
+        
         hash <- makeHash(baseHash, mfSettings, spec)
 
         logf <- paste0("mfcl-", grp, ".txt")
         
         return(list(hash = hash, gName = grp, spec = spec, mfSettings = mfSettings,
-                    adduct = adduct, database = database, topMost = topMost,
+                    adduct = add, database = database, topMost = topMost,
                     errorRetries = errorRetries, timeoutRetries = timeoutRetries,
                     logFile = logf))
-    }, simplify = FALSE)
+    })
 
     return(ret[!sapply(ret, is.null)])
 }
@@ -528,7 +547,7 @@ MFMPErrorHandler <- function(cmd, exitStatus, retries)
 #' @export
 setMethod("generateCompoundsMetFrag", "featureGroups", function(fGroups, MSPeakLists, method = "CL",
                                                                 timeout = 300, timeoutRetries = 2, errorRetries = 2, topMost = 100,
-                                                                dbRelMzDev = 5, fragRelMzDev = 5, fragAbsMzDev = 0.002, adduct,
+                                                                dbRelMzDev = 5, fragRelMzDev = 5, fragAbsMzDev = 0.002, adduct = NULL,
                                                                 database = "pubchem", extendedPubChem = "auto", chemSpiderToken = "",
                                                                 scoreTypes = compoundScorings("metfrag", database, onlyDefault = TRUE)$name,
                                                                 scoreWeights = 1.0,
@@ -568,7 +587,7 @@ setMethod("generateCompoundsMetFrag", "featureGroups", function(fGroups, MSPeakL
 
     checkmate::reportAssertions(ac)
 
-    adduct <- checkAndToAdduct(adduct)
+    adduct <- checkAndToAdduct(adduct, fGroups)
 
     anaInfo <- analysisInfo(fGroups)
     ftind <- groupFeatIndex(fGroups)
@@ -623,7 +642,6 @@ setMethod("generateCompoundsMetFrag", "featureGroups", function(fGroups, MSPeakL
     mfSettings <- list(DatabaseSearchRelativeMassDeviation = dbRelMzDev,
                        FragmentPeakMatchRelativeMassDeviation = fragRelMzDev,
                        FragmentPeakMatchAbsoluteMassDeviation = fragAbsMzDev,
-                       PrecursorIonType = as.character(adduct, format = "metfrag"),
                        MetFragDatabaseType = databaseMF, MetFragScoreTypes = scoreTypesMF,
                        MetFragScoreWeights = scoreWeights,
                        MetFragPreProcessingCandidateFilter = preProcessingFilters,

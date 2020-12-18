@@ -687,7 +687,8 @@ setMethod("screenSuspects", "featureGroups", function(fGroups, suspects, rtWindo
     
     ret <- featureGroupsScreening(screenInfo = scr, groups = copy(groupTable(fGroups)),
                                   analysisInfo = analysisInfo(fGroups), groupInfo = groupInfo(fGroups),
-                                  features = getFeatures(fGroups), ftindex = copy(groupFeatIndex(fGroups)))
+                                  features = getFeatures(fGroups), ftindex = copy(groupFeatIndex(fGroups)),
+                                  annotations = copy(annotations(fGroups)))
     
     saveCacheData("screenSuspects", ret, hash)
     

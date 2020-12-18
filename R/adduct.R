@@ -72,10 +72,15 @@ setMethod("show", "adduct", function(object)
 #' @describeIn adduct Converts an \code{adduct} object to a specified
 #'   \code{character} format.
 #' @inheritParams as.adduct
+#' @param err If \code{TRUE} then an error will be thrown if conversion fails,
+#'   otherwise returns \code{NA}.
 #' @export
-setMethod("as.character", "adduct", function(x, format = "generic")
+setMethod("as.character", "adduct", function(x, format = "generic", err = TRUE)
 {
-    checkmate::assertChoice(format, c("generic", "sirius", "genform", "metfrag"))
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertChoice(format, c("generic", "sirius", "genform", "metfrag"), add = ac)
+    checkmate::assertFlag(err, add = ac)
+    checkmate::reportAssertions(ac)
 
     if (format == "sirius" || format == "generic")
     {
@@ -105,22 +110,30 @@ setMethod("as.character", "adduct", function(x, format = "generic")
         gfadds <- GenFormAdducts()[add == gfadd & sub == gfsub & charge == x@charge & molMult == x@molMult, adduct]
 
         if (length(gfadds) == 0)
-            stop("Invalid adduct for GenForm! See GenFormAdducts() for valid options.")
+        {
+            if (err)
+                stop("Invalid adduct for GenForm! See GenFormAdducts() for valid options.")
+            return(NA_character_)
+        }
         return(gfadds[1]) # return first one in case there are multiple hits
     }
     else if (format == "metfrag")
     {
         if (abs(x@charge) != 1)
-            stop("MetFrag only supports a charge of +/- 1")
+            stopOrEmpty("MetFrag only supports a charge of +/- 1")
         if (x@molMult > 1)
-            stop("MetFrag only supports a molecular multiplier of 1")
+            stopOrEmpty("MetFrag only supports a molecular multiplier of 1")
 
         mfadd <- if (length(x@add) == 0) "" else x@add
         mfsub <- if (length(x@sub) == 0) "" else x@sub
         mfadds <- MetFragAdducts()[add == mfadd & sub == mfsub & charge == x@charge, adduct_type]
 
         if (length(mfadds) == 0)
-            stop("Invalid adduct for MetFrag! See MetFragAdducts() for valid options.")
+        {
+            if (err)
+                stop("Invalid adduct for MetFrag! See MetFragAdducts() for valid options.")
+            return(NA_character_)
+        }
         return(mfadds[1]) # return first one in case there are multiple hits
     }
 })

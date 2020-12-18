@@ -53,122 +53,17 @@ adductMZDelta <- function(adduct)
     return(ret)
 }
 
-# split from below exported functions to avoid recursion when setting
-# adduct_generic, which calls as.adduct(), which then would call XXXAdducts()
-getAdductTable <- function(format)
-{
-    if (format == "genform")
-    {
-        # adapted from GenForm/msaddion.cpp
-        ret <- rbindlist(list(
-            list("M+3H", "H3", "", "+3", 1),
-            list("M+2H+Na", "H2Na", "", "+3", 1),
-            list("M+H+2Na", "HNa2", "", "+3", 1),
-            list("M+3Na", "Na3", "", "+3", 1),
-            list("M+2H", "H2", "", "+2", 1),
-            list("M+H+NH4", "H5N", "", "+2", 1),
-            list("M+H+Na", " HNa", "", "+2", 1),
-            list("M+H+K", "HK", "", "+2", 1),
-            list("M+ACN+2H", "C2H5N", "", "+2", 1),# ACN=C2H3N
-            list("M+2Na", "Na2", "", "+2", 1),
-            list("M+2ACN+2H", "C4H8N2", "", "+2", 1),
-            list("M+3ACN+2H", "C6H11N3", "", "+2", 1),
-            list("M+H", "H", "", "+1", 1),
-            list("M+NH4", "H4N", "", "+1", 1),
-            list("M+Na", "Na", "", "+1", 1),
-            list("M+CH3OH+H", "CH5O", "", "+1", 1),
-            list("M+K", "K", "", "+1", 1),
-            list("M+ACN+H", "C2H4N", "", "+1", 1),
-            list("M+2Na-H", "Na2", "H", "+1", 1),
-            list("M+IsoProp+H", "C3H10O", "", "+1", 1), # IsoProp=C3H9O(?)
-            list("M+ACN+Na", "C2H3NNa", "", "+1", 1),
-            list("M+2K-H", "K2", "H", "+1", 1),
-            list("M+DMSO+H", "C2H7OS", "", "+1", 1), # DMSO=C2H6OS
-            list("M+2ACN+H", "C4H7N2", "", "+1", 1),
-            list("M+IsoProp+Na+H", "C3H10ONa", "", "+1", 1),
-            list("2M+H", "H", "", "+1", 2),
-            list("2M+NH4", "H4N", "", "+1", 2),
-            list("2M+Na", "Na", "", "+1", 2),
-            list("2M+K", "K", "", "+1", 2),
-            list("2M+ACN+H", "C2H4N", "", "+1", 2),
-            list("2M+ACN+Na", "C2H3NNa", "", "+1", 2),
-            
-            list("M-3H", "", "H3", "-3", 1),
-            list("M-2H", "", "H2", "-2", 1),
-            list("M-H2O-H", "", "H3O", "-1", 1),
-            list("M-H", "", "H", "-1", 1),
-            list("M+Na-2H", "Na", "H2", "-1", 1),
-            list("M+Cl", "Cl", "", "-1", 1),
-            list("M+K-2H", "K", "H2", "-1", 1),
-            list("M+FA-H", "CH2O2", "H", "-1", 1), # FA=CH2O2
-            list("M+Hac-H", "C2H4O2", "H", "-1", 1), # HAc=C2H4O2
-            list("M+Br", "Br", "", "-1", 1),
-            list("M+TFA-H", "C2HF3O2", "H", "-1", 1), # TFA=C2HF3O2
-            list("2M-H", "", "H", "-1", 2),
-            list("2M+FA-H", "", "H", "-1", 2),
-            list("2M+Hac-H", "C2H4O2", "H", "-1", 2),
-            list("3M-H", "", "H", "-1", 3),
-            
-            list("M-e", "", "", "+1", 1),
-            list("M+e", "", "H", "-1", 1),
-            
-            list("-e", "", "", "+1", 1),
-            list("+e", "", "", "-1", 1),
-            list("+H", "H", "", "+1", 1),
-            list("-H", "", "H", "-1", 1),
-            list("+Na", "Na", "", "+1", 1)
-        ))
-        
-        setnames(ret, c("adduct", "add", "sub", "charge", "molMult"))
-        ret[, charge := as.numeric(charge)]
-        return(ret)
-    }
-    else if (format == "metfrag")
-    {
-        # from http://ipb-halle.github.io/MetFrag/projects/metfragcl/ and Constants.java in MetFragLib
-        ret <- rbindlist(list(
-            list(1, "[M+H]+", "H", "", 1),
-            list(18, "[M+NH4]+", "NH4", "", 1),
-            list(23, "[M+Na]+", "Na", "", 1),
-            list(39, "[M+K]+", "K", "", 1),
-            list(33, "[M+CH3OH+H]+", "CH5O", "", 1), # MeOH+H
-            list(42, "[M+ACN+H]+", "C2H4N", "", 1), # ACN+H
-            list(64, "[M+ACN+Na]+", "C2H3NNa", "", 1), # ACN+Na
-            list(83, "[M+2ACN+H]+", "C4H7N2", "", 1), # 2ACN+H
-            list(0, "[M]+", "", "", 1),
-            
-            list(-1, "[M-H]-", "", "H", -1),
-            list(35, "[M+Cl]-", "Cl", "", -1),
-            list(45, "[M+HCOO]-", "CO2H", "", -1),
-            list(59, "[M+CH3COO]-", "C2H3O2", "", -1),
-            list(0, "[M]-", "", "", -1)
-        ))
-        setnames(ret, c("adduct_mode", "adduct_type", "add", "sub", "charge"))
-        return(ret)
-    }
-}
-
 #' @details \code{GenFormAdducts} returns a table with information on adducts
 #'   supported by \command{GenForm}.
 #' @rdname adduct-utils
 #' @export
-GenFormAdducts <- function()
-{
-    ret <- getAdductTable("genform")
-    ret[, adduct_generic := sapply(get("adduct"), function(add) as.character(as.adduct(add, format = "genform")))]
-    return(ret[])
-}
+GenFormAdducts <- function() adductsGF
 
 #' @details \code{MetFragAdducts} returns a table with information on adducts
 #'   supported by \command{MetFrag}.
 #' @rdname adduct-utils
 #' @export
-MetFragAdducts <- function()
-{
-    ret <- getAdductTable("metfrag")
-    ret[, adduct_generic := sapply(adduct_type, function(add) as.character(as.adduct(add, format = "metfrag")))]
-    return(ret[])
-}
+MetFragAdducts <- function() adductsMF
 
 #' @details \code{as.adduct} Converts an object in to an \code{\link{adduct}}
 #'   object.

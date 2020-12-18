@@ -1620,6 +1620,9 @@ setMethod("mergeIons", "featureGroups", function(fGroups, components, selectIsoB
         else
             fGroups@annotations[, adduct := prefAdduct]
         
+        # retain correct order
+        fGroups@annotations <- fGroups@annotations[match(names(fGroups), group)]
+        
         printf("Removed %d feature groups detected as unwanted adducts/isotopes\n", sum(cTab$remove))
         printf("Annotated %d feature groups with isotope information\n", nrow(cTabIso))
         printf("\tRemaining %d feature groups set as default isotope 0\n", length(fGroups) - nrow(cTabIso))

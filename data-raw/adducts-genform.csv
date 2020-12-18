@@ -5,7 +5,7 @@ M+H+2Na,HNa2,"",3,1,[M+HNa2]3+
 M+3Na,Na3,"",3,1,[M+Na3]3+
 M+2H,H2,"",2,1,[M+H2]2+
 M+H+NH4,H5N,"",2,1,[M+H5N]2+
-M+H+Na, HNa,"",2,1,[M+HNa]2+
+M+H+Na,HNa,"",2,1,[M+HNa]2+
 M+H+K,HK,"",2,1,[M+HK]2+
 M+ACN+2H,C2H5N,"",2,1,[M+C2H5N]2+
 M+2Na,Na2,"",2,1,[M+Na2]2+
@@ -23,7 +23,7 @@ M+ACN+Na,C2H3NNa,"",1,1,[M+C2H3NNa]+
 M+2K-H,K2,H,1,1,[M+K2-H]+
 M+DMSO+H,C2H7OS,"",1,1,[M+C2H7OS]+
 M+2ACN+H,C4H7N2,"",1,1,[M+C4H7N2]+
-M+IsoProp+Na+H,C3H10ONa,"",1,1,[M+C3H10NaO]+
+M+IsoProp+Na+H,C3H10NaO,"",1,1,[M+C3H10NaO]+
 2M+H,H,"",1,2,[2M+H]+
 2M+NH4,H4N,"",1,2,[2M+H4N]+
 2M+Na,Na,"",1,2,[2M+Na]+

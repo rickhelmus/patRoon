@@ -42,10 +42,23 @@ writeGenFormFiles <- function(MSPList, MSMSPList, MSFile, MSMSFile)
         writePList(MSMSFile, MSMSPList)
 }
 
-makeGenFormCmdQueue <- function(groupPeakLists, baseHash, MSMode, isolatePrec, adduct, topMost,
+makeGenFormCmdQueue <- function(groupPeakLists, annTable, baseHash, MSMode, isolatePrec, adduct, topMost,
                                 mainArgs, ana)
 {
-    pruneList(sapply(names(groupPeakLists), function(grp)
+    gNames <- names(groupPeakLists)
+    
+    if (!is.null(adduct))
+    {
+        grpAdducts <- rep(list(adduct), length(groupPeakLists))
+        grpAdductsChr <- rep(as.character(adduct, format = "genform"), length(groupPeakLists))
+    }
+    else
+    {
+        grpAdducts <- lapply(annTable$adduct, as.adduct)
+        grpAdductsChr <- makeAlgoAdducts(grpAdducts, gNames, "genform")
+    }
+    
+    pruneList(mapply(gNames, grpAdducts, grpAdductsChr, FUN = function(grp, add, addChr)
     {
         if (is.null(groupPeakLists[[grp]]) || is.null(groupPeakLists[[grp]][["MS"]]))
             return(NULL) # MS or MSMS spectrum probably filtered away
@@ -59,15 +72,23 @@ makeGenFormCmdQueue <- function(groupPeakLists, baseHash, MSMode, isolatePrec, a
         if (length(plmz) == 0)
             return(NULL) # no precursor
         
-        if (!is.logical(isolatePrec))
+        if (!isFALSE(isolatePrec))
+        {
+            if (is.logical(isolatePrec) && isolatePrec)
+                isolatePrec <- getDefIsolatePrecParams(z = abs(add@charge))
+            else
+                isolatePrec$z = abs(add@charge)
+            
             plms <- isolatePrecInMSPeakList(plms, isolatePrec, negate = FALSE)
- 
-        hash <- makeHash(groupPeakLists[[grp]], baseHash)
+        }
+
+        args <- c(mainArgs, paste0("ion=", addChr))
+        hash <- makeHash(groupPeakLists[[grp]], baseHash, isolatePrec, add)
                
-        return(list(args = mainArgs, PLMZ = plmz, MSPL = plms, MSMSPL = groupPeakLists[[grp]][["MSMS"]],
-                    hash = hash, group = grp, isMSMS = hasMSMS, adduct = adduct,
+        return(list(args = args, PLMZ = plmz, MSPL = plms, MSMSPL = groupPeakLists[[grp]][["MSMS"]],
+                    hash = hash, group = grp, isMSMS = hasMSMS, adduct = add,
                     topMost = topMost, MSMode = MSMode, ana = ana))
-    }, simplify = FALSE))
+    }, SIMPLIFY = FALSE))
 }
 
 GenFormMPFinishHandler <- function(cmd)
@@ -120,11 +141,11 @@ GenFormMPPrepareHandler <- function(cmd)
                        MSMSFile = MSMSFile, outFile = outFile)))
 }
 
-runGenForm <- function(mainArgs, groupPeakLists, MSMode, isolatePrec,
+runGenForm <- function(mainArgs, groupPeakLists, annTable, MSMode, isolatePrec,
                        baseHash, setHash, gNames, adduct, topMost,
                        batchSize, timeout, ana)
 {
-    cmdQueue <- makeGenFormCmdQueue(groupPeakLists, baseHash, MSMode, isolatePrec, adduct, topMost,
+    cmdQueue <- makeGenFormCmdQueue(groupPeakLists, annTable, baseHash, MSMode, isolatePrec, adduct, topMost,
                                     mainArgs, ana)
 
     ret <- list()
@@ -263,10 +284,11 @@ processGenFormResultFile <- function(file, isMSMS, adduct, topMost)
 #'   decrease the score. The value of \code{isolatePrec} should either be a
 #'   \code{list} with parameters (see the
 #'   \code{\link[=filter,MSPeakLists-method]{filter method}} for
-#'   \code{MSPeakLists} for more details), \code{TRUE} for default parameters
-#'   (the \code{z} parameter is automatically deduced from the \code{adduct}
-#'   argument) or \code{FALSE} for no isolation (\emph{e.g.} when you already
-#'   performed isolation with the \code{filter} method).
+#'   \code{MSPeakLists} for more details), \code{TRUE} for default parameters or
+#'   \code{FALSE} for no isolation (\emph{e.g.} when you already performed
+#'   isolation with the \code{filter} method). The \code{z} parameter (charge)
+#'   is automatically deduced from the adduct used for annotation (unless
+#'   \code{isolatePrec=FALSE}), hence any custom \code{z} setting is ignored.
 #' @param timeout Maximum time (in seconds) that a \command{GenForm} command is
 #'   allowed to execute. If this time is exceeded a warning is emitted and the
 #'   command is terminated. See the notes section for more information on the
@@ -276,12 +298,12 @@ processGenFormResultFile <- function(file, isMSMS, adduct, topMost)
 #'   runtimes (such as \command{GenForm}) can significantly increase parallel
 #'   performance. For more information see \code{\link{executeMultiProcess}}.
 #'   Note that this is ignored if \option{patRoon.MP.method="future"}.
-#' 
-#' @section Parallelization: When \code{futures} are used for parallel processing
-#'   (\code{patRoon.MP.method="future"}), calculations with \command{GenForm}
-#'   are done with batch mode is disabled (see \code{batchSize} argument), which
-#'   generally limit overall performance.
-#'   
+#'
+#' @section Parallelization: When \code{futures} are used for parallel
+#'   processing (\code{patRoon.MP.method="future"}), calculations with
+#'   \command{GenForm} are done with batch mode is disabled (see
+#'   \code{batchSize} argument), which generally limit overall performance.
+#'
 #' @note \code{generateFormulasGenForm} always sets the \option{exist} and
 #'   \option{oei} \command{GenForm} commandline options.
 #'
@@ -296,7 +318,7 @@ processGenFormResultFile <- function(file, isMSMS, adduct, topMost)
 #'
 #' @rdname formula-generation
 #' @export
-setMethod("generateFormulasGenForm", "featureGroups", function(fGroups, MSPeakLists, relMzDev = 5, adduct = "[M+H]+",
+setMethod("generateFormulasGenForm", "featureGroups", function(fGroups, MSPeakLists, relMzDev = 5, adduct = NULL,
                                                                elements = "CHNOP", hetero = TRUE, oc = FALSE, extraOpts = NULL,
                                                                calculateFeatures = TRUE, featThreshold = 0.75, MSMode = "both",
                                                                isolatePrec = TRUE, timeout = 120, topMost = 50,
@@ -319,17 +341,15 @@ setMethod("generateFormulasGenForm", "featureGroups", function(fGroups, MSPeakLi
 
     checkmate::reportAssertions(ac)
 
-    adduct <- checkAndToAdduct(adduct)
+    adduct <- checkAndToAdduct(adduct, fGroups)
 
-    if (is.logical(isolatePrec) && isolatePrec)
-        isolatePrec <- getDefIsolatePrecParams(z = abs(adduct@charge))
-    
     gInfo <- groupInfo(fGroups)
     anaInfo <- analysisInfo(fGroups)
     featIndex <- groupFeatIndex(fGroups)
     fTable <- featureTable(fGroups)
     gCount <- length(fGroups)
     gNames <- names(fGroups)
+    annTable <- annotations(fGroups)
 
     MSPeakLists <- MSPeakLists[, gNames] # only do relevant
     
@@ -338,7 +358,6 @@ setMethod("generateFormulasGenForm", "featureGroups", function(fGroups, MSPeakLi
                   "noref",
                   "dbe",
                   "cm",
-                  sprintf("ion=%s", as.character(adduct, format = "genform")),
                   sprintf("ppm=%f", relMzDev),
                   sprintf("el=%s", elements),
                   extraOpts)
@@ -360,8 +379,9 @@ setMethod("generateFormulasGenForm", "featureGroups", function(fGroups, MSPeakLi
         else
             printf("Loading all formulas...\n")
 
-        forms <- runGenForm(mainArgs, groupPeakLists, MSMode, isolatePrec,
-                            baseHash, setHash, gNames, adduct, topMost, batchSize, timeout, ana)
+        ann <- if (nrow(annTable) > 0) annTable[match(names(groupPeakLists), group)] else annTable
+        forms <- runGenForm(mainArgs, groupPeakLists, ann, MSMode, isolatePrec, baseHash,
+                            setHash, gNames, adduct, topMost, batchSize, timeout, ana)
 
         printf("Loaded %d formulas for %d %s (%.2f%%).\n", countUniqueFormulas(forms), length(forms),
                if (!is.null(ana)) "features" else "feature groups",

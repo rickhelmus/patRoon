@@ -53,6 +53,26 @@ adductMZDelta <- function(adduct)
     return(ret)
 }
 
+makeAlgoAdducts <- function(adducts, gNames, format)
+{
+    cat("Converting to algorithm specific adducts... ")
+    
+    ret <- (mapply(adducts, gNames, FUN = function(add, grp)
+    {
+        addChr <- as.character(add, format = format, err = FALSE)
+        if (is.na(addChr))
+        {
+            addChr <- if (add@charge < 0) "M-H" else "M+H"
+            warning(sprintf("Changing the adduct for group %s from %s to %s because it is not supported by GenForm",
+                            grp, as.character(add), if (add@charge < 0) "[M-H]-" else "[M+H]+"))
+        }
+        return(addChr)
+    }))
+    
+    cat("Done!\n")
+    return(ret)
+}
+
 #' @details \code{GenFormAdducts} returns a table with information on adducts
 #'   supported by \command{GenForm}.
 #' @rdname adduct-utils

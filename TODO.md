@@ -103,15 +103,27 @@
 	- formula/compounds: get adduct from gInfo if present
 		- also for screening? could (optionally) look for matches with neutralized fGroup/susp masses
 		- adduct arg still overrides?
+		- what to do with unsupported adducts?
+		    - skip calculation with a warning?
+		        - default toM+H/M-H for now with warning...
+		    - enforce adduct argument for these cases?
+		    - default mergeIons() to only consider 'common' adducts?
 	- add annotations to as.data.table()
 	- cliqueMS components
 	- component selection tool/function
 	    - otherwise perhaps make a fGroup remover function to help subsetting
 			- similarly as for feature remover in fGroups...
 			- del()/delete()/rmResult()/delResult() generic? could also be for other classes
+			    - or use regular R set like methods (<-())
 		- similarly: set() like method to change data, such as adduct annotations
 - NEWS
     - [..., reAverage = FALSE] and implications of filtering when setting it to TRUE
+    - adducts
+        - GenForm/MetFragAdducts()
+            - now report generic format
+            - load from cached R data --> faster as.adduct()
+        - adduct as.character: err argument
+        - fix: conversion of adducts with multiple additions/subtractions to GenForm/MetFrag format failed
 - docs
     - filter() for features/fGroups: apply to neutral masses
     - CAMERA/RAMClustR/nontarget components: clearly mention it is simply a merge between sets

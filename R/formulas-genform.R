@@ -83,7 +83,7 @@ makeGenFormCmdQueue <- function(groupPeakLists, annTable, baseHash, MSMode, isol
         }
 
         args <- c(mainArgs, paste0("ion=", addChr))
-        hash <- makeHash(groupPeakLists[[grp]], baseHash, isolatePrec, add)
+        hash <- makeHash(groupPeakLists[[grp]], baseHash, isolatePrec, addChr)
                
         return(list(args = args, PLMZ = plmz, MSPL = plms, MSMSPL = groupPeakLists[[grp]][["MSMS"]],
                     hash = hash, group = grp, isMSMS = hasMSMS, adduct = add,

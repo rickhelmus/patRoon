@@ -77,13 +77,13 @@ makeAlgoAdducts <- function(adducts, gNames, format)
 #'   supported by \command{GenForm}.
 #' @rdname adduct-utils
 #' @export
-GenFormAdducts <- function() adductsGF
+GenFormAdducts <- function() copy(adductsGF)
 
 #' @details \code{MetFragAdducts} returns a table with information on adducts
 #'   supported by \command{MetFrag}.
 #' @rdname adduct-utils
 #' @export
-MetFragAdducts <- function() adductsMF
+MetFragAdducts <- function() copy(adductsMF)
 
 #' @details \code{as.adduct} Converts an object in to an \code{\link{adduct}}
 #'   object.

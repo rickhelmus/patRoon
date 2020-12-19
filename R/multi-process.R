@@ -1,7 +1,7 @@
 defMultiProcErrorHandler <- function(cmd, exitStatus, ...)
 {
-    stop(sprintf("Failed to run command '%s' with args: '%s'. Exit code: %d",
-                 cmd$command, paste0(cmd$args, collapse = " "), exitStatus))
+    return(sprintf("Failed to run command '%s' with args: '%s'. Exit code: %d",
+                   cmd$command, paste0(cmd$args, collapse = " "), exitStatus))
 }
 
 #' Simultaneous execution of system commands.
@@ -46,7 +46,9 @@ defMultiProcErrorHandler <- function(cmd, exitStatus, ...)
 #'   command has failed. The signature should be \code{function(cmd, exitStatus,
 #'   retries)}. The \code{exitStatus} argument is the exit code of the command
 #'   (may be \code{NA} in rare cases this is unknown). Other arguments are as
-#'   \code{timeoutHandler}.
+#'   \code{timeoutHandler}. The return value should be as \code{timeoutHandler}
+#'   or a \code{character} with an error message which will be thrown with
+#'   \code{\link{stop}}.
 #' @param prepareHandler A function that is called prior to execution of the
 #'   command. The function signature should be \code{function(cmd)} where
 #'   \code{cmd} is the queue data (from \code{commandQueue}) of the command to

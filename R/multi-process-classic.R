@@ -110,6 +110,8 @@ maybeRestartCommand <- function(commandQueue, procInfo, sucDir, exitStatus, time
             # this process.
             retry <- errorHandler(cmd = commandQueue[[i]], exitStatus = exitStatus,
                                   retries = procInfo$noResRetries[i])
+            if (is.character(retry))
+                stop(retry) # special case: stop with error message given by the errorHandler
         }
         
         if (retry)
@@ -154,7 +156,7 @@ maybeRestartCommand <- function(commandQueue, procInfo, sucDir, exitStatus, time
 }
 
 executeMultiProcessClassic <- function(commandQueue, finishHandler,
-                                       timeoutHandler, errorHandler = defMultiProcErrorHandler,
+                                       timeoutHandler, errorHandler,
                                        prepareHandler, procTimeout,
                                        printOutput, printError,
                                        logSubDir, showProgress, waitTimeout,

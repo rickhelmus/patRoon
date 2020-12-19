@@ -8,6 +8,7 @@ executeFutureCmd <- function(cmd, finishHandler, timeoutHandler, errorHandler,
     {
         stat <- processx::run(cmd$command, cmd$args, error_on_status = FALSE,
                               timeout = procTimeout, cleanup_tree = TRUE)
+        stopMsg <- NULL
         
         if (stat$timeout)
         {
@@ -19,11 +20,14 @@ executeFutureCmd <- function(cmd, finishHandler, timeoutHandler, errorHandler,
         }
         else if (stat$status != 0)
         {
-            if (errorHandler(cmd = cmd, exitStatus = stat$status, retries = errorRetries))
+            eh <- errorHandler(cmd = cmd, exitStatus = stat$status, retries = errorRetries) 
+            if (isTRUE(eh))
             {
                 errorRetries <- errorRetries + 1
                 next
             }
+            else if (is.character(eh))
+                stopMsg <- eh
         }
         else # success
         {
@@ -33,7 +37,7 @@ executeFutureCmd <- function(cmd, finishHandler, timeoutHandler, errorHandler,
         }
         
         # failure
-        return(list(stdout = stat$stdout, stderr = stat$stderr, result = NULL))
+        return(list(stdout = stat$stdout, stderr = stat$stderr, result = NULL, stopMsg = stopMsg))
     }
 }
 
@@ -57,7 +61,7 @@ executeMultiProcessFuture <- function(commandQueue, finishHandler, timeoutHandle
     {
         logPath <- file.path(logPath, logSubDir)
         mkdirp(logPath)
-
+        
         for (i in seq_along(commandQueue))
         {
             if (!is.null(commandQueue[[i]]$logFile))
@@ -74,6 +78,12 @@ executeMultiProcessFuture <- function(commandQueue, finishHandler, timeoutHandle
         }
     }
     
-    ret <- sapply(results, "[[", "result", simplify = FALSE)
-    return(ret)
+    for (r in results)
+    {
+        # check for any errors thrown by errorHandler
+        if (!is.null(r[["stopMsg"]]))
+            stop(r$stopMsg)
+    }
+
+    return(sapply(results, "[[", "result", simplify = FALSE))
 }

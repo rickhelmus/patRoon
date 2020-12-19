@@ -13,7 +13,6 @@ function popArg()
 end
 
 inPath = popArg()
-outPath = popArg()
 filename = popArg()
 
 mz_thresh = [parse(Float64, popArg()), parse(Float64, popArg())]
@@ -27,6 +26,8 @@ min_int = parse(Int64, popArg())
 sig_inc_thresh = parse(Int64, popArg())
 S2N = parse(Int64, popArg())
 min_peak_w_s = parse(Int64, popArg())
+
+outPath = popArg()
 
 GC.gc()
 

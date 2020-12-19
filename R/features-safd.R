@@ -18,6 +18,14 @@ SAFDMPFinishHandler <- function(cmd)
     return(results[])
 }
 
+SAFDMPPrepareHandler <- function(cmd)
+{
+    outp <- tempfile("safd")
+    mkdirp(outp)
+    cmd$args <- c(cmd$args, outp)
+    return(c(cmd, list(outPath = outp)))
+}
+
 #' @rdname features-class
 #' @export
 featuresSAFD <- setClass("featuresSAFD", contains = "features")
@@ -25,16 +33,16 @@ featuresSAFD <- setClass("featuresSAFD", contains = "features")
 setMethod("initialize", "featuresSAFD",
           function(.Object, ...) callNextMethod(.Object, algorithm = "safd", ...))
 
-makeSAFDCommand <- function(inPath, outPath, fileName, mzRange, maxNumbIter, maxTPeakW, resolution,
+makeSAFDCommand <- function(inPath, fileName, mzRange, maxNumbIter, maxTPeakW, resolution,
                             minMSW, RThreshold, minInt, sigIncThreshold, S2N, minPeakWS)
 {
     # UNDONE: check if julia exists? allow to configure path?
     return(list(command = "julia", args = c(system.file("misc", "runSAFD.jl", package = "patRoon"),
-                                            inPath, outPath, fileName, mzRange[1], mzRange[2],
+                                            inPath, fileName, mzRange[1], mzRange[2],
                                             maxNumbIter, maxTPeakW, resolution,
                                             minMSW, RThreshold, minInt, sigIncThreshold, S2N,
                                             minPeakWS),
-                outPath = outPath, fileName = fileName))
+                fileName = fileName))
 }
 
 #' @details \code{findFeaturesSAFD} uses the
@@ -77,9 +85,6 @@ findFeaturesSAFD <- function(analysisInfo, profPath, mzRange = c(0, 400),
     if (verbose)
         printf("Finding features with SAFD for %d analyses ...\n", anaCount)
 
-    outp <- tempfile("safd")
-    mkdirp(outp)
-    
     cmdQueue <- Map(analysisInfo$analysis, profPath, f = function(ana, path)
     {
         fpMZXML <- getMzXMLAnalysisPath(ana, path)
@@ -96,12 +101,13 @@ findFeaturesSAFD <- function(analysisInfo, profPath, mzRange = c(0, 400),
         # UNDONE: really want to hash big files?
         hash <- makeHash(makeFileHash(fp), params)
         
-        cmd <- do.call(makeSAFDCommand, c(list(dirname(fp), outp, basename(fp)), params))
+        cmd <- do.call(makeSAFDCommand, c(list(dirname(fp), basename(fp)), params))
         
         return(c(cmd, list(inputPath = fp, hash = hash, logFile = paste0(ana, ".txt"))))
     })
     
     fts <- executeMultiProcess(cmdQueue, patRoon:::SAFDMPFinishHandler,
+                               prepareHandler = patRoon:::SAFDMPPrepareHandler,
                                cacheName = "featuresSAFD", logSubDir = "safd",
                                showProgress = verbose)
         

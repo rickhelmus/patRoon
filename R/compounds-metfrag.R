@@ -402,8 +402,8 @@ MFMPErrorHandler <- function(cmd, exitStatus, retries)
     }
     
     # some other error (e.g. java not present)
-    stop(sprintf("Fatal: Failed to execute MetFragCL for %s - exit code: %d - Log: %s",
-                 cmd$gName, exitStatus, cmd$logFile))
+    return(sprintf("Fatal: Failed to execute MetFragCL for %s - exit code: %d - Log: %s",
+                   cmd$gName, exitStatus, cmd$logFile))
 }
 
 #' @details \code{generateCompoundsMetFrag} uses the \pkg{metfRag} package or

@@ -1,3 +1,8 @@
+# patRoon 1.3.0
+
+* Future multiprocessing: make sure that logs are created even when an error occurs.
+
+
 # patRoon 1.2.1
 
 - Fixed: XCMS feature grouping didn't work when the `peakgroups` alignment method was used (fixes issue #22)

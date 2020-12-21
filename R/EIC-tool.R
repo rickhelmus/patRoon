@@ -723,6 +723,15 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
         observeEvent(input$groupHot_select$select$r, {
             rValues$currentFGroup <- input$groupHot_select$select$rAll[1]
         })
+
+        observeEvent(input$enableAllGroups, {
+            rValues$enabledFGroups <- gNames
+            rValues$triggerGroupHotUpdate <- rValues$triggerGroupHotUpdate + 1
+        })
+        observeEvent(input$disableAllGroups, {
+            rValues$enabledFGroups <- character()
+            rValues$triggerGroupHotUpdate <- rValues$triggerGroupHotUpdate + 1
+        })
         
         observeEvent(input$enableAllFeatures, {
             curFG <- gNames[rValues$currentFGroup]
@@ -762,7 +771,25 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
                              hotOpts)) %>%
                 rhandsontable::hot_rows(rowHeights = 50) %>%
                 rhandsontable::hot_col("keep", readOnly = FALSE, halign = "htCenter") %>%
-                rhandsontable::hot_col("EIC", renderer = htmlwidgets::JS("renderSparkline"))
+                rhandsontable::hot_col("EIC", renderer = htmlwidgets::JS("renderSparkline")) %>%
+                rhandsontable::hot_context_menu(allowRowEdit = FALSE, allowColEdit = FALSE, customOpts = list(
+                    enableAll = list(
+                        name = "Enable all",
+                        callback = htmlwidgets::JS(
+                            'function(key, options) { Shiny.onInputChange("enableAllGroups", Math.random()); }'
+                        )
+                    ),
+                    disableAll = list(
+                        name = "Disable all",
+                        callback = htmlwidgets::JS(
+                            'function(key, options) { Shiny.onInputChange("disableAllGroups", Math.random()); }'
+                        )
+                    )
+                ))
+            
+            # HACK: disable some default context options
+            hot$x$contextMenu$items[c("undo", "redo", "alignment")] <- NULL
+            
             return(hot)
         })
         

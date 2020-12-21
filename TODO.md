@@ -61,6 +61,19 @@
 - Check: units of plotChord() rt/mz graphs seems off
 - update docs and checkChromatograms() for mzWindow --> mzExpWindow
 - also subset features if fGroups are?
+- checkFeatures()
+    - decide on final function name (perhaps compatible for future component checker)
+    - report relevant group/feature info in tables
+        - group peak score so it can be used for sorting
+        - retention times should be linked to input unit
+    - save sessions & make filter
+    - mode: group (topMost=1), rGroup (topMostRGroup=1), feature (topMost=NULL, onlyPresent configurable)
+    - make show groups option work again
+    - buttons to reset all groups/features
+    - re-add context menu?
+        - maybe to disable all features from selected analysis?
+    - keyboard shortcuts (prev/next group and toggle group)
+    - enlarge legend size of plot
 
 
 ## MSPeakLists

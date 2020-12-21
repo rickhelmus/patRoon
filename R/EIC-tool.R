@@ -669,7 +669,8 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
         rValues <- reactiveValues(enabledFGroups = enabledFGroups,
                                   currentFGroup = 1,
                                   triggerGroupHotUpdate = 0,
-                                  enabledAnalyses = setNames(rep(list(rep(TRUE, nrow(anaInfo))), gCount), gNames))
+                                  triggerFeatHotUpdate = 0,
+                                  enabledFeatures = setNames(rep(list(rep(TRUE, nrow(anaInfo))), gCount), gNames))
         
         fGroupData <- reactive({
             gData <- as.data.table(fGroups)
@@ -715,12 +716,23 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
             {
                 printf("Sync EA\n")
                 df <- rhandsontable::hot_to_r(input$featuresHot)
-                rValues$enabledAnalyses[[rValues$currentFGroup]] <- df$keep
+                rValues$enabledFeatures[[rValues$currentFGroup]] <- df$keep
             }
         })
         
         observeEvent(input$groupHot_select$select$r, {
             rValues$currentFGroup <- input$groupHot_select$select$rAll[1]
+        })
+        
+        observeEvent(input$enableAllFeatures, {
+            curFG <- gNames[rValues$currentFGroup]
+            rValues$enabledFeatures[[curFG]] <- rep(TRUE, nrow(anaInfo))
+            rValues$triggerFeatHotUpdate <- rValues$triggerFeatHotUpdate + 1
+        })
+        observeEvent(input$disableAllFeatures, {
+            curFG <- gNames[rValues$currentFGroup]
+            rValues$enabledFeatures[[curFG]] <- rep(FALSE, nrow(anaInfo))
+            rValues$triggerFeatHotUpdate <- rValues$triggerFeatHotUpdate + 1
         })
         
         output$pageTitle <- renderText({
@@ -731,8 +743,8 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
         output$plotChrom <- renderPlot({
             printf("Plot chrom!\n")
             withr::with_par(list(mar = c(4, 4, 0.1, 1)), {
-                plotChroms(fGroups[, rValues$currentFGroup], EICs = EICs,
-                           colourBy = "rGroups", showPeakArea = TRUE,
+                plotChroms(fGroups[rValues$enabledFeatures[[rValues$currentFGroup]], rValues$currentFGroup],
+                           EICs = EICs, colourBy = "rGroups", showPeakArea = TRUE,
                            showFGroupRect = FALSE, title = "",
                            retMin = input$retUnit == "Minutes")
             })
@@ -756,14 +768,35 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
         
         output$featuresHot <- rhandsontable::renderRHandsontable({
             printf("Plot featHot!\n")
+            rValues$triggerFeatHotUpdate
+            
             fData <- featureData()
             curFG <- rValues$currentFGroup
-            isolate(fData[, keep := rValues$enabledAnalyses[[curFG]]])
+            isolate(fData[, keep := rValues$enabledFeatures[[curFG]]])
             setcolorder(fData, c("analysis", "keep"))
             
             hot <- do.call(rhandsontable::rhandsontable,
                            c(list(fData, height = 200, maxRows = nrow(fData)), hotOpts)) %>%
                 rhandsontable::hot_col("keep", readOnly = FALSE, halign = "htCenter") %>%
+                rhandsontable::hot_context_menu(allowRowEdit = FALSE, allowColEdit = FALSE,
+                                                customOpts = list(
+                    enableAll = list(
+                        name = "Enable all",
+                        callback = htmlwidgets::JS(
+                            'function(key, options) { Shiny.onInputChange("enableAllFeatures", Math.random()); }'
+                        )
+                    ),
+                    disableAll = list(
+                        name = "Disable all",
+                        callback = htmlwidgets::JS(
+                            'function(key, options) { Shiny.onInputChange("disableAllFeatures", Math.random()); }'
+                        )
+                    )
+                ))
+            
+            # HACK: disable some default context options
+            hot$x$contextMenu$items[c("undo", "redo", "alignment")] <- NULL
+            
             return(hot)
         })
     }

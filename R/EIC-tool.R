@@ -608,9 +608,28 @@ getCheckFeatsUI <- function()
                     plotOutput("plotChrom", width = "100%", height = "100%")
                 )
             ),
+            
             fillRow(
+                flex = c(1, NA, 1),
                 height = 210,
-                rhandsontable::rHandsontableOutput("groupHot")
+                
+                fillCol(
+                    div(
+                        style = "border: 1px solid black; margin: 5px;",
+                        rhandsontable::rHandsontableOutput("groupHot")
+                    )
+                ),
+                
+                fillCol(
+                    br()
+                ),
+                
+                fillCol(
+                    div(
+                        style = "border: 1px solid black; margin: 5px;",
+                        rhandsontable::rHandsontableOutput("featuresHot")
+                    )
+                )
             )
         )
     )
@@ -624,13 +643,14 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
            fixed = list(add = ac))
     checkmate::reportAssertions(ac)
     
+    anaInfo <- analysisInfo(fGroups)
     gNames <- names(fGroups)
     gCount <- length(fGroups)
     fTable <- featureTable(fGroups)
     ftind <- groupFeatIndex(fGroups)
     
     # UNDONE: make topMost/onlyPresent optional/interactive
-    EICs <- getEICsForFGroups(fGroups, rtWindow, mzExpWindow, topMost = NULL, onlyPresent = FALSE)
+    EICs <- getEICsForFGroups(fGroups, rtWindow, mzExpWindow, topMost = 1, onlyPresent = FALSE)
     # format is in [[ana]][[fGroup]], since we only took top most intensive we can throw away the ana dimension
     EICPreviews <- getEICsForFGroups(fGroups, 0, mzExpWindow, topMost = 1, onlyPresent = TRUE)
     EICPreviews <- Reduce(modifyList, EICPreviews)
@@ -647,7 +667,57 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
     server <- function(input, output, session)
     {
         rValues <- reactiveValues(enabledFGroups = enabledFGroups,
-                                  currentFGroup = 1)
+                                  currentFGroup = 1,
+                                  triggerGroupHotUpdate = 0,
+                                  enabledAnalyses = setNames(rep(list(rep(TRUE, nrow(anaInfo))), gCount), gNames))
+        
+        fGroupData <- reactive({
+            gData <- as.data.table(fGroups)
+            gData[, EIC := sapply(gNames, function(g)
+            {
+                jsonlite::toJSON(list(values = EICPreviews[[g]]$intensity, xvalues = EICPreviews[[g]]$time,
+                                      options = list(type = "line", height = 50)))
+            })]
+            setcolorder(gData, c("group", "EIC"))
+            return(gData)
+        })
+        
+        featureData <- reactive({
+            return(data.table(analysis = anaInfo$analysis,
+                              group = anaInfo$group, blank = anaInfo$blank))
+        })
+        
+        observeEvent(input$toggleGroup, {
+            printf("Toggle\n")
+            curFG <- gNames[rValues$currentFGroup]
+            if (curFG %in% rValues$enabledFGroups)
+                rValues$enabledFGroups <- setdiff(rValues$enabledFGroups, curFG)
+            else
+                rValues$enabledFGroups <- c(rValues$enabledFGroups, curFG)
+            rValues$triggerGroupHotUpdate <- rValues$triggerGroupHotUpdate + 1
+        })
+        
+        observeEvent(input$groupHot, {
+            # HACK: input$groupHot$params$maxRows: make sure we don't have empty table as hot_to_r errors otherwise
+            if (input$groupHot$params$maxRows > 0)
+            {
+                printf("Sync EG\n")
+                df <- rhandsontable::hot_to_r(input$groupHot)
+                eg <- gNames[df$keep]
+                if (!isTRUE(all.equal(eg, rValues$enabledFGroups)))
+                    rValues$enabledFGroups <- eg
+            }
+        })
+        
+        observeEvent(input$featuresHot, {
+            # HACK: input$featuresHot$params$maxRows: make sure we don't have empty table as hot_to_r errors otherwise
+            if (input$featuresHot$params$maxRows > 0)
+            {
+                printf("Sync EA\n")
+                df <- rhandsontable::hot_to_r(input$featuresHot)
+                rValues$enabledAnalyses[[rValues$currentFGroup]] <- df$keep
+            }
+        })
         
         observeEvent(input$groupHot_select$select$r, {
             rValues$currentFGroup <- input$groupHot_select$select$rAll[1]
@@ -659,6 +729,7 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
         })
         
         output$plotChrom <- renderPlot({
+            printf("Plot chrom!\n")
             withr::with_par(list(mar = c(4, 4, 0.1, 1)), {
                 plotChroms(fGroups[, rValues$currentFGroup], EICs = EICs,
                            colourBy = "rGroups", showPeakArea = TRUE,
@@ -668,19 +739,31 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
         })
         
         output$groupHot <- rhandsontable::renderRHandsontable({
-            gData <- as.data.table(fGroups)
-            gData[, EIC := sapply(gNames, function(g)
-            {
-                jsonlite::toJSON(list(values = EICPreviews[[g]]$intensity, xvalues = EICPreviews[[g]]$time,
-                                      options = list(type = "line", height = 50)))
-            })]
-            setcolorder(gData, c("group", "EIC"))
+            printf("Plot gHot!\n")
+            rValues$triggerGroupHotUpdate
             
+            gData <- fGroupData()
+            gData[, keep := group %in% isolate(rValues$enabledFGroups)]
+            setcolorder(gData, c("group", "keep"))
             hot <- do.call(rhandsontable::rhandsontable,
                            c(list(gData, width = NULL, height = 200, maxRows = nrow(gData)),
                              hotOpts)) %>%
                 rhandsontable::hot_rows(rowHeights = 50) %>%
+                rhandsontable::hot_col("keep", readOnly = FALSE, halign = "htCenter") %>%
                 rhandsontable::hot_col("EIC", renderer = htmlwidgets::JS("renderSparkline"))
+            return(hot)
+        })
+        
+        output$featuresHot <- rhandsontable::renderRHandsontable({
+            printf("Plot featHot!\n")
+            fData <- featureData()
+            curFG <- rValues$currentFGroup
+            isolate(fData[, keep := rValues$enabledAnalyses[[curFG]]])
+            setcolorder(fData, c("analysis", "keep"))
+            
+            hot <- do.call(rhandsontable::rhandsontable,
+                           c(list(fData, height = 200, maxRows = nrow(fData)), hotOpts)) %>%
+                rhandsontable::hot_col("keep", readOnly = FALSE, halign = "htCenter") %>%
             return(hot)
         })
     }

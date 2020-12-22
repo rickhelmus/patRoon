@@ -667,7 +667,7 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
     server <- function(input, output, session)
     {
         rValues <- reactiveValues(enabledFGroups = enabledFGroups,
-                                  currentFGroup = 1,
+                                  currentFGroup = enabledFGroups[1],
                                   triggerGroupHotUpdate = 0,
                                   triggerFeatHotUpdate = 0,
                                   enabledFeatures = setNames(rep(list(rep(TRUE, nrow(anaInfo))), gCount), gNames))
@@ -690,7 +690,7 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
         
         observeEvent(input$toggleGroup, {
             printf("Toggle\n")
-            curFG <- gNames[rValues$currentFGroup]
+            curFG <- rValues$currentFGroup
             if (curFG %in% rValues$enabledFGroups)
                 rValues$enabledFGroups <- setdiff(rValues$enabledFGroups, curFG)
             else
@@ -703,10 +703,8 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
             if (input$groupHot$params$maxRows > 0)
             {
                 printf("Sync EG\n")
-                df <- rhandsontable::hot_to_r(input$groupHot)
-                eg <- gNames[df$keep]
-                if (!isTRUE(all.equal(eg, rValues$enabledFGroups)))
-                    rValues$enabledFGroups <- eg
+                tbl <- rhandsontable::hot_to_r(input$groupHot)
+                rValues$enabledFGroups <- setdiff(rValues$enabledFGroups, tbl[keep == FALSE]$group)
             }
         })
         
@@ -714,14 +712,16 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
             # HACK: input$featuresHot$params$maxRows: make sure we don't have empty table as hot_to_r errors otherwise
             if (input$featuresHot$params$maxRows > 0)
             {
-                printf("Sync EA\n")
-                df <- rhandsontable::hot_to_r(input$featuresHot)
-                rValues$enabledFeatures[[rValues$currentFGroup]] <- df$keep
+                printf("Sync EF\n")
+                tbl <- rhandsontable::hot_to_r(input$featuresHot)
+                rValues$enabledFeatures[[rValues$currentFGroup]] <- tbl$keep
             }
         })
         
         observeEvent(input$groupHot_select$select$r, {
-            rValues$currentFGroup <- input$groupHot_select$select$rAll[1]
+            printf("fGroup row select\n")
+            tbl <- rhandsontable::hot_to_r(input$groupHot)
+            rValues$currentFGroup <- tbl$group[input$groupHot_select$select$rAll[1]]
         })
 
         observeEvent(input$enableAllGroups, {
@@ -734,19 +734,17 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
         })
         
         observeEvent(input$enableAllFeatures, {
-            curFG <- gNames[rValues$currentFGroup]
-            rValues$enabledFeatures[[curFG]] <- rep(TRUE, nrow(anaInfo))
+            rValues$enabledFeatures[[rValues$currentFGroup]] <- rep(TRUE, nrow(anaInfo))
             rValues$triggerFeatHotUpdate <- rValues$triggerFeatHotUpdate + 1
         })
         observeEvent(input$disableAllFeatures, {
-            curFG <- gNames[rValues$currentFGroup]
-            rValues$enabledFeatures[[curFG]] <- rep(FALSE, nrow(anaInfo))
+            rValues$enabledFeatures[[rValues$currentFGroup]] <- rep(FALSE, nrow(anaInfo))
             rValues$triggerFeatHotUpdate <- rValues$triggerFeatHotUpdate + 1
         })
         
         output$pageTitle <- renderText({
-            sprintf("Groups %s (%d/%d)", gNames[rValues$currentFGroup],
-                    rValues$currentFGroup, gCount)
+            sprintf("Groups %s (%d/%d)", rValues$currentFGroup,
+                    match(rValues$currentFGroup, gNames), gCount)
         })
         
         output$plotChrom <- renderPlot({
@@ -766,6 +764,13 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
             gData <- fGroupData()
             gData[, keep := group %in% isolate(rValues$enabledFGroups)]
             setcolorder(gData, c("group", "keep"))
+            
+            if (!"Keep" %in% input$showWhat)
+                gData <- gData[keep == FALSE, ]
+            if (!"Don't keep" %in% input$showWhat)
+                gData <- gData[keep == TRUE, ]
+            printf("nrow: %d\n", nrow(gData))
+            
             hot <- do.call(rhandsontable::rhandsontable,
                            c(list(gData, width = NULL, height = 200, maxRows = nrow(gData)),
                              hotOpts)) %>%
@@ -798,8 +803,7 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
             rValues$triggerFeatHotUpdate
             
             fData <- featureData()
-            curFG <- rValues$currentFGroup
-            isolate(fData[, keep := rValues$enabledFeatures[[curFG]]])
+            isolate(fData[, keep := rValues$enabledFeatures[[rValues$currentFGroup]]])
             setcolorder(fData, c("analysis", "keep"))
             
             hot <- do.call(rhandsontable::rhandsontable,

@@ -715,7 +715,7 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
             return(data.table(analysis = anaInfo$analysis,
                               group = anaInfo$group, blank = anaInfo$blank))
         })
-
+        
         observeEvent(input$previousGroup, {
             advanceFGroupSelection(-1)
         })
@@ -745,10 +745,24 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
                 oldeg <- rValues$enabledFGroups
                 rValues$enabledFGroups <- setdiff(union(rValues$enabledFGroups, keep), notkeep)
                 
-                # update table if filters are active
-                if (!isTRUE(all.equal(oldeg, rValues$enabledFGroups)) &&
-                    length(input$showWhat) < 2)
-                    rValues$triggerGroupHotUpdate <- rValues$triggerGroupHotUpdate + 1
+                # HACK: init selection
+                selr <- input$groupHot_select$select$rAll[1]
+                if (is.null(selr))
+                    session$sendCustomMessage("selectFGroupRow", 1)
+                
+                # filters are active?
+                if (length(input$showWhat) < 2)
+                {
+                    # update table
+                    if (!isTRUE(all.equal(oldeg, rValues$enabledFGroups)))
+                        rValues$triggerGroupHotUpdate <- rValues$triggerGroupHotUpdate + 1
+                    else
+                    {
+                        # update selection after table update was triggered
+                        if (!is.null(selr))
+                            updateFGroupRow(tbl$group[selr])
+                    }
+                }
             }
         })
         

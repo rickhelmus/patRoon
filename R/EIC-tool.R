@@ -575,11 +575,11 @@ getCheckFeatsUI <- function()
                 
                 fillCol(
                     width = 45,
-                    actionButton("previousGroup", "", icon("arrow-left"), onclick = "selectPrevFGroup();")
+                    actionButton("previousGroup", "", icon("arrow-left"))
                 ),
                 fillCol(
                     width = 45,
-                    actionButton("nextGroup", "", icon("arrow-right"), onclick = "selectNextFGroup();")
+                    actionButton("nextGroup", "", icon("arrow-right"))
                 ),
                 fillCol(
                     width = 100,
@@ -662,7 +662,6 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
                     outsideClickDeselects = FALSE, manualColumnResize = TRUE,
                     rowHeaders = NULL)
     
-
     server <- function(input, output, session)
     {
         rValues <- reactiveValues(enabledFGroups = gNames,
@@ -670,6 +669,36 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
                                   triggerGroupHotUpdate = 0,
                                   triggerFeatHotUpdate = 0,
                                   enabledFeatures = setNames(rep(list(rep(TRUE, nrow(anaInfo))), gCount), gNames))
+        
+        updateFGroupRow <- function(new)
+        {
+            old <- rValues$currentFGroup
+            rValues$currentFGroup <- new
+            
+            # # update feature selection if needed
+            if (!isTRUE(all.equal(rValues$enabledFeatures[[old]],
+                                  rValues$enabledFeatures[[new]])))
+                rValues$triggerFeatHotUpdate <- rValues$triggerFeatHotUpdate + 1
+        }
+        
+        advanceFGroupSelection <- function(dir)
+        {
+            tbl <- rhandsontable::hot_to_r(input$groupHot)
+            tblRow <- match(rValues$currentFGroup, tbl$group)
+            if (is.na(tblRow))
+                warning("Cannot find fgroup row!")
+            else
+            {
+                tblRow <- tblRow + dir
+                if (tblRow < 1)
+                    tblRow <- 1
+                else if (tblRow > nrow(tbl))
+                    tblRow <- nrow(tbl)
+                
+                updateFGroupRow(tbl$group[tblRow])
+                session$sendCustomMessage("selectFGroupRow", tblRow)
+            }
+        }
         
         fGroupData <- reactive({
             gData <- as.data.table(fGroups)
@@ -685,6 +714,14 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
         featureData <- reactive({
             return(data.table(analysis = anaInfo$analysis,
                               group = anaInfo$group, blank = anaInfo$blank))
+        })
+
+        observeEvent(input$previousGroup, {
+            advanceFGroupSelection(-1)
+        })
+        
+        observeEvent(input$nextGroup, {
+            advanceFGroupSelection(1)
         })
         
         observeEvent(input$toggleGroup, {
@@ -728,13 +765,7 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
         observeEvent(input$groupHot_select$select$r, {
             printf("fGroup row select\n")
             tbl <- rhandsontable::hot_to_r(input$groupHot)
-            oldfg <- rValues$currentFGroup
-            rValues$currentFGroup <- tbl$group[input$groupHot_select$select$rAll[1]]
-            
-            # update feature selection if needed
-            if (!isTRUE(all.equal(rValues$enabledFeatures[[oldfg]],
-                                  rValues$enabledFeatures[[rValues$currentFGroup]])))
-                rValues$triggerFeatHotUpdate <- rValues$triggerFeatHotUpdate + 1
+            updateFGroupRow(tbl$group[input$groupHot_select$select$rAll[1]])
         })
 
         observeEvent(input$enableAllGroups, {

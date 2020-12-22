@@ -721,7 +721,13 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
         observeEvent(input$groupHot_select$select$r, {
             printf("fGroup row select\n")
             tbl <- rhandsontable::hot_to_r(input$groupHot)
+            oldfg <- rValues$currentFGroup
             rValues$currentFGroup <- tbl$group[input$groupHot_select$select$rAll[1]]
+            
+            # update feature selection if needed
+            if (!isTRUE(all.equal(rValues$enabledFeatures[[oldfg]],
+                                  rValues$enabledFeatures[[rValues$currentFGroup]])))
+                rValues$triggerFeatHotUpdate <- rValues$triggerFeatHotUpdate + 1
         })
 
         observeEvent(input$enableAllGroups, {

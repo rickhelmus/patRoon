@@ -564,6 +564,9 @@ getCheckFeatsUI <- function()
     fillPage(
         tags$head(includeScript(system.file("js", "utils-EIC.js", package = "patRoon"))),
         
+        keys::useKeys(),
+        keys::keysInput("keys", c("p", "n", "t")),
+        
         title = "Check features tool",
         
         fillCol(
@@ -700,6 +703,17 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
             }
         }
         
+        toggleFGroup <- function()
+        {
+            printf("Toggle\n")
+            curFG <- rValues$currentFGroup
+            if (curFG %in% rValues$enabledFGroups)
+                rValues$enabledFGroups <- setdiff(rValues$enabledFGroups, curFG)
+            else
+                rValues$enabledFGroups <- c(rValues$enabledFGroups, curFG)
+            rValues$triggerGroupHotUpdate <- rValues$triggerGroupHotUpdate + 1
+        }
+        
         fGroupData <- reactive({
             gData <- as.data.table(fGroups)
             gData[, EIC := sapply(gNames, function(g)
@@ -716,6 +730,13 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
                               group = anaInfo$group, blank = anaInfo$blank))
         })
         
+        observeEvent(input$keys, {
+            switch(input$keys,
+                   p = advanceFGroupSelection(-1),
+                   n = advanceFGroupSelection(1),
+                   t = toggleFGroup())
+        })
+        
         observeEvent(input$previousGroup, {
             advanceFGroupSelection(-1)
         })
@@ -725,13 +746,7 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
         })
         
         observeEvent(input$toggleGroup, {
-            printf("Toggle\n")
-            curFG <- rValues$currentFGroup
-            if (curFG %in% rValues$enabledFGroups)
-                rValues$enabledFGroups <- setdiff(rValues$enabledFGroups, curFG)
-            else
-                rValues$enabledFGroups <- c(rValues$enabledFGroups, curFG)
-            rValues$triggerGroupHotUpdate <- rValues$triggerGroupHotUpdate + 1
+            toggleFGroup()
         })
         
         observeEvent(input$groupHot, {

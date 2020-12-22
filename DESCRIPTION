@@ -106,7 +106,8 @@ Imports:
     future.apply,
     progressr,
     fs,
-    yaml
+    yaml,
+    keys
 Suggests: 
     RDCOMClient,
     metfRag,

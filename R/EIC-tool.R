@@ -662,12 +662,11 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
                     outsideClickDeselects = FALSE, manualColumnResize = TRUE,
                     rowHeaders = NULL)
     
-    enabledFGroups <- names(fGroups) # UNDONE
-    
+
     server <- function(input, output, session)
     {
-        rValues <- reactiveValues(enabledFGroups = enabledFGroups,
-                                  currentFGroup = enabledFGroups[1],
+        rValues <- reactiveValues(enabledFGroups = gNames,
+                                  currentFGroup = gNames[1],
                                   triggerGroupHotUpdate = 0,
                                   triggerFeatHotUpdate = 0,
                                   enabledFeatures = setNames(rep(list(rep(TRUE, nrow(anaInfo))), gCount), gNames))
@@ -780,6 +779,7 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
             hot <- do.call(rhandsontable::rhandsontable,
                            c(list(gData, width = NULL, height = 200, maxRows = nrow(gData)),
                              hotOpts)) %>%
+                rhandsontable::hot_cols(valign = "htMiddle", fixedColumnsLeft = 2) %>%
                 rhandsontable::hot_rows(rowHeights = 50) %>%
                 rhandsontable::hot_col("keep", readOnly = FALSE, halign = "htCenter") %>%
                 rhandsontable::hot_col("EIC", renderer = htmlwidgets::JS("renderSparkline")) %>%

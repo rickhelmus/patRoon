@@ -703,7 +703,15 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
             {
                 printf("Sync EG\n")
                 tbl <- rhandsontable::hot_to_r(input$groupHot)
-                rValues$enabledFGroups <- setdiff(rValues$enabledFGroups, tbl[keep == FALSE]$group)
+                keep <- tbl[keep == TRUE]$group
+                notkeep <- tbl[keep == FALSE]$group
+                oldeg <- rValues$enabledFGroups
+                rValues$enabledFGroups <- setdiff(union(rValues$enabledFGroups, keep), notkeep)
+                
+                # update table if filters are active
+                if (!isTRUE(all.equal(oldeg, rValues$enabledFGroups)) &&
+                    length(input$showWhat) < 2)
+                    rValues$triggerGroupHotUpdate <- rValues$triggerGroupHotUpdate + 1
             }
         })
         

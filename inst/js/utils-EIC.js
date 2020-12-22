@@ -164,13 +164,13 @@ function setAnalysesHotContextMenu()
                 }
             }
         }
-    })
+    });
 }
 
 function init()
 {
-    setGroupHotContextMenu()
-    setAnalysesHotContextMenu()
+    setGroupHotContextMenu();
+    setAnalysesHotContextMenu();
     
     // HACK: use timeouts to make sure context menu is changed after everything has settled
     $('#groupHot').on('shiny:value', function(event) { setTimeout(setGroupHotContextMenu, 500); });

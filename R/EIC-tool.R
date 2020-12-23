@@ -613,25 +613,11 @@ getCheckFeatsUI <- function()
             ),
             
             fillRow(
-                flex = c(1, NA, 1),
-                height = 210,
+                height = 250,
                 
-                fillCol(
-                    div(
-                        style = "border: 1px solid black; margin: 5px;",
-                        rhandsontable::rHandsontableOutput("groupHot")
-                    )
-                ),
-                
-                fillCol(
-                    br()
-                ),
-                
-                fillCol(
-                    div(
-                        style = "border: 1px solid black; margin: 5px;",
-                        rhandsontable::rHandsontableOutput("featuresHot")
-                    )
+                tabsetPanel(
+                    tabPanel("Feature groups", rhandsontable::rHandsontableOutput("groupHot")),
+                    tabPanel("Features", rhandsontable::rHandsontableOutput("featuresHot"))
                 )
             )
         )

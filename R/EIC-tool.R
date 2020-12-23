@@ -659,12 +659,21 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
                                   triggerFeatHotUpdate = 0,
                                   enabledFeatures = setNames(rep(list(rep(TRUE, nrow(anaInfo))), gCount), gNames))
         
+        getCurFGroupRow <- function()
+        {
+            tbl <- rhandsontable::hot_to_r(input$groupHot)
+            tblRow <- match(rValues$currentFGroup, tbl$group)
+            if (is.na(tblRow))
+                warning("Cannot find fgroup row!")
+            return(tblRow)
+        }
+        
         updateFGroupRow <- function(new)
         {
             old <- rValues$currentFGroup
             rValues$currentFGroup <- new
             
-            # # update feature selection if needed
+            # update feature selection if needed
             if (!isTRUE(all.equal(rValues$enabledFeatures[[old]],
                                   rValues$enabledFeatures[[new]])))
                 rValues$triggerFeatHotUpdate <- rValues$triggerFeatHotUpdate + 1
@@ -673,10 +682,8 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
         advanceFGroupSelection <- function(dir)
         {
             tbl <- rhandsontable::hot_to_r(input$groupHot)
-            tblRow <- match(rValues$currentFGroup, tbl$group)
-            if (is.na(tblRow))
-                warning("Cannot find fgroup row!")
-            else
+            tblRow <- getCurFGroupRow()
+            if (!is.na(tblRow))
             {
                 tblRow <- tblRow + dir
                 if (tblRow < 1)
@@ -692,12 +699,9 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
         toggleFGroup <- function()
         {
             printf("Toggle\n")
-            curFG <- rValues$currentFGroup
-            if (curFG %in% rValues$enabledFGroups)
-                rValues$enabledFGroups <- setdiff(rValues$enabledFGroups, curFG)
-            else
-                rValues$enabledFGroups <- c(rValues$enabledFGroups, curFG)
-            rValues$triggerGroupHotUpdate <- rValues$triggerGroupHotUpdate + 1
+            tblRow <- getCurFGroupRow()
+            if (!is.na(tblRow))
+                session$sendCustomMessage("toggleFGroupRow", tblRow)
         }
         
         fGroupData <- reactive({

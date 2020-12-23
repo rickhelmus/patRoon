@@ -581,8 +581,7 @@ getCheckFeatsUI <- function()
                     wellPanel(
                         style = "overflow-y: auto; height: 100%;",
                         
-                        radioButtons("retUnit", "Retention unit", c("Seconds", "Minutes")),
-                        checkboxGroupInput("showWhat", "Show groups", showOpts, showOpts)
+                        radioButtons("retUnit", "Retention unit", c("Seconds", "Minutes"))
                     )
                 ),
                 fillCol(
@@ -605,7 +604,7 @@ getCheckFeatsUI <- function()
                         flex = c(NA, 1),
                         fillRow(
                             height = 40,
-                            flex = c(NA, NA, NA, 1),
+                            flex = c(NA, NA, NA, NA, 1),
                             
                             fillCol(
                                 width = 45,
@@ -617,16 +616,34 @@ getCheckFeatsUI <- function()
                             ),
                             fillCol(
                                 width = 100,
-                                actionButton("toggleGroup", "Toggle group", icon("toggle-on"))
+                                actionButton("toggleGroup", "Toggle", icon("toggle-on"))
                             ),
-                            div(style = "margin: 8px 0 12px; font-size: small; text-align: right;",
+                            fillCol(
+                                width = 200,
+                                div(style = "margin-top: 8px; margin-left: 5px",
+                                    checkboxGroupInput("showWhat", NULL, showOpts, showOpts,
+                                                       inline = TRUE))
+                            ),
+                            div(style = "margin: 8px 10px 12px; font-size: small; text-align: right;",
                                 HTML("<b>n</b>: next; <b>p</b>: previous; <b>t</b>: toggle"))
                         ),
                         fillRow(
                             rhandsontable::rHandsontableOutput("groupHot")
                         )
                     )),
-                    tabPanel("Features", rhandsontable::rHandsontableOutput("featuresHot"))
+                    tabPanel("Features", fillCol(
+                        flex = c(NA, 1),
+                        
+                        fillRow(
+                            height = 40,
+                            actionButton("resetFeatures", "Enable all features for all groups",
+                                         icon("check-square"))
+                        ),
+                        
+                        fillRow(
+                            rhandsontable::rHandsontableOutput("featuresHot")
+                        )
+                    ))
                 )
             )
         )
@@ -783,6 +800,26 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
                 }
             }
         })
+
+        observeEvent(input$groupHot_select$select$r, {
+            printf("fGroup row select\n")
+            tbl <- rhandsontable::hot_to_r(input$groupHot)
+            updateFGroupRow(tbl$group[input$groupHot_select$select$rAll[1]])
+        })
+        
+        observeEvent(input$enableAllGroups, {
+            rValues$enabledFGroups <- gNames
+            rValues$triggerGroupHotUpdate <- rValues$triggerGroupHotUpdate + 1
+        })
+        observeEvent(input$disableAllGroups, {
+            rValues$enabledFGroups <- character()
+            rValues$triggerGroupHotUpdate <- rValues$triggerGroupHotUpdate + 1
+        })
+        
+        observeEvent(input$resetFeatures, {
+            rValues$enabledFeatures <- setNames(rep(list(rep(TRUE, nrow(anaInfo))), gCount), gNames)
+            rValues$triggerFeatHotUpdate <- rValues$triggerFeatHotUpdate + 1
+        })
         
         observeEvent(input$featuresHot, {
             # HACK: input$featuresHot$params$maxRows: make sure we don't have empty table as hot_to_r errors otherwise
@@ -792,21 +829,6 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
                 tbl <- rhandsontable::hot_to_r(input$featuresHot)
                 rValues$enabledFeatures[[rValues$currentFGroup]] <- tbl$keep
             }
-        })
-        
-        observeEvent(input$groupHot_select$select$r, {
-            printf("fGroup row select\n")
-            tbl <- rhandsontable::hot_to_r(input$groupHot)
-            updateFGroupRow(tbl$group[input$groupHot_select$select$rAll[1]])
-        })
-
-        observeEvent(input$enableAllGroups, {
-            rValues$enabledFGroups <- gNames
-            rValues$triggerGroupHotUpdate <- rValues$triggerGroupHotUpdate + 1
-        })
-        observeEvent(input$disableAllGroups, {
-            rValues$enabledFGroups <- character()
-            rValues$triggerGroupHotUpdate <- rValues$triggerGroupHotUpdate + 1
         })
         
         observeEvent(input$enableAllFeatures, {
@@ -884,7 +906,7 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
             setcolorder(fData, c("analysis", "keep"))
             
             hot <- do.call(rhandsontable::rhandsontable,
-                           c(list(fData, height = 240, maxRows = nrow(fData)), hotOpts)) %>%
+                           c(list(fData, height = 200, maxRows = nrow(fData)), hotOpts)) %>%
                 rhandsontable::hot_col("keep", readOnly = FALSE, halign = "htCenter") %>%
                 rhandsontable::hot_context_menu(allowRowEdit = FALSE, allowColEdit = FALSE,
                                                 customOpts = list(

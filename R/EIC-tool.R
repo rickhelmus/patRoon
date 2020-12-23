@@ -570,32 +570,10 @@ getCheckFeatsUI <- function()
         title = "Check features tool",
         
         fillCol(
-            flex = c(NA, 1, NA),
+            flex = c(1, NA),
             
             fillRow(
-                height = 40,
-                flex = c(NA, NA, NA, 1),
-                
-                fillCol(
-                    width = 45,
-                    actionButton("previousGroup", "", icon("arrow-left"))
-                ),
-                fillCol(
-                    width = 45,
-                    actionButton("nextGroup", "", icon("arrow-right"))
-                ),
-                fillCol(
-                    width = 100,
-                    actionButton("toggleGroup", "Toggle group", icon("toggle-on"))
-                ),
-                
-                fillCol(
-                    strong(style = "font-size: 200%; text-align: center;", textOutput("pageTitle"))
-                )
-            ),
-            
-            fillRow(
-                flex = c(NA, 1),
+                flex = c(NA, 1, NA),
                 
                 fillCol(
                     width = 160,
@@ -608,15 +586,44 @@ getCheckFeatsUI <- function()
                     )
                 ),
                 fillCol(
-                    plotOutput("plotChrom", width = "100%", height = "100%")
+                    flex = c(NA, 1),
+                    fillCol(
+                        height = 40,
+                        strong(style = "font-size: 200%; text-align: center;", textOutput("pageTitle"))
+                    ),
+                    fillCol(
+                        plotOutput("plotChrom", width = "100%", height = "100%")
+                    )
                 )
             ),
             
             fillRow(
-                height = 250,
-                
+                height = 300,
+
                 tabsetPanel(
-                    tabPanel("Feature groups", rhandsontable::rHandsontableOutput("groupHot")),
+                    tabPanel("Feature groups", fillCol(
+                        flex = c(NA, 1),
+                        fillRow(
+                            height = 40,
+                            flex = c(NA, NA, NA, 1),
+                            
+                            fillCol(
+                                width = 45,
+                                actionButton("previousGroup", "", icon("arrow-left"))
+                            ),
+                            fillCol(
+                                width = 45,
+                                actionButton("nextGroup", "", icon("arrow-right"))
+                            ),
+                            fillCol(
+                                width = 100,
+                                actionButton("toggleGroup", "Toggle group", icon("toggle-on"))
+                            )
+                        ),
+                        fillRow(
+                            rhandsontable::rHandsontableOutput("groupHot")
+                        )
+                    )),
                     tabPanel("Features", rhandsontable::rHandsontableOutput("featuresHot"))
                 )
             )
@@ -872,7 +879,7 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
             setcolorder(fData, c("analysis", "keep"))
             
             hot <- do.call(rhandsontable::rhandsontable,
-                           c(list(fData, height = 200, maxRows = nrow(fData)), hotOpts)) %>%
+                           c(list(fData, height = 240, maxRows = nrow(fData)), hotOpts)) %>%
                 rhandsontable::hot_col("keep", readOnly = FALSE, halign = "htCenter") %>%
                 rhandsontable::hot_context_menu(allowRowEdit = FALSE, allowColEdit = FALSE,
                                                 customOpts = list(

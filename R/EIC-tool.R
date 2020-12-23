@@ -600,7 +600,7 @@ getCheckFeatsUI <- function()
             fillRow(
                 height = 300,
 
-                tabsetPanel(
+                tabsetPanel(id = "tabs",
                     tabPanel("Feature groups", fillCol(
                         flex = c(NA, 1),
                         fillRow(
@@ -728,10 +728,13 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
         })
         
         observeEvent(input$keys, {
-            switch(input$keys,
-                   p = advanceFGroupSelection(-1),
-                   n = advanceFGroupSelection(1),
-                   t = toggleFGroup())
+            if (input$tabs == "Feature groups")
+            {
+                switch(input$keys,
+                       p = advanceFGroupSelection(-1),
+                       n = advanceFGroupSelection(1),
+                       t = toggleFGroup())
+            }
         })
         
         observeEvent(input$previousGroup, {

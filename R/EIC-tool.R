@@ -618,7 +618,9 @@ getCheckFeatsUI <- function()
                             fillCol(
                                 width = 100,
                                 actionButton("toggleGroup", "Toggle group", icon("toggle-on"))
-                            )
+                            ),
+                            div(style = "margin: 8px 0 12px; font-size: small; text-align: right;",
+                                HTML("<b>n</b>: next; <b>p</b>: previous; <b>t</b>: toggle"))
                         ),
                         fillRow(
                             rhandsontable::rHandsontableOutput("groupHot")

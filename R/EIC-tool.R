@@ -750,8 +750,9 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
                 oldeg <- rValues$enabledFGroups
                 rValues$enabledFGroups <- setdiff(union(rValues$enabledFGroups, keep), notkeep)
                 
-                # HACK: init selection
                 selr <- input$groupHot_select$select$rAll[1]
+                
+                # HACK: init selection
                 if (is.null(selr))
                     session$sendCustomMessage("selectFGroupRow", 1)
                 
@@ -806,7 +807,7 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
         })
         
         output$pageTitle <- renderText({
-            sprintf("Groups %s (%d/%d)", rValues$currentFGroup,
+            sprintf("Group %s (%d/%d)", rValues$currentFGroup,
                     match(rValues$currentFGroup, gNames), gCount)
         })
         

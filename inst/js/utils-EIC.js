@@ -1,6 +1,16 @@
-Shiny.addCustomMessageHandler("selectFGroupRow", function(row)
+function getGroupHot()
 {
     // get rhot instance: https://github.com/jrowen/rhandsontable/issues/97
-    var ht = HTMLWidgets.getInstance(groupHot).hot;
-    ht.selectCell(row - 1, 0, undefined, undefined, undefined, true);
+    return HTMLWidgets.getInstance(groupHot).hot;
+}
+
+Shiny.addCustomMessageHandler("selectFGroupRow", function(row)
+{
+    getGroupHot().selectCell(row - 1, 0, undefined, undefined, undefined, true);
+});
+
+Shiny.addCustomMessageHandler("toggleFGroupRow", function(row)
+{
+    var ht = getGroupHot();
+    ht.setDataAtCell(row - 1, 1, !ht.getDataAtCell(row - 1, 1));
 });

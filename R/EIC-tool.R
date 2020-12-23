@@ -825,7 +825,7 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
         
         output$plotChrom <- renderPlot({
             printf("Plot chrom!\n")
-            withr::with_par(list(mar = c(4, 4, 0.1, 1)), {
+            withr::with_par(list(mar = c(4, 4, 0.1, 1), cex = 1.5), {
                 plotChroms(fGroups[rValues$enabledFeatures[[rValues$currentFGroup]], rValues$currentFGroup],
                            EICs = EICs, colourBy = "rGroups", showPeakArea = TRUE,
                            showFGroupRect = FALSE, title = "",

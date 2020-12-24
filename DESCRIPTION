@@ -107,7 +107,8 @@ Imports:
     progressr,
     fs,
     yaml,
-    keys
+    keys,
+    backports
 Suggests: 
     RDCOMClient,
     metfRag,

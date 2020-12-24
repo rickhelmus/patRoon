@@ -495,3 +495,10 @@ openProgBar <- function(min = 0, max, style = 3, ...)
 }
 
 verboseCall <- function(f, a, v) if (v) do.call(f, a) else suppressMessages(invisible(do.call(f, a)))
+
+RUserDir <- function(...)
+{
+    if (getRversion() >= "4.0.0")
+        return(tools::R_user_dir(...))
+    return(backports:::R_user_dir(...))
+}

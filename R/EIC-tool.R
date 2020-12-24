@@ -572,27 +572,14 @@ getCheckFeatsUI <- function()
         fillCol(
             flex = c(1, NA),
             
-            fillRow(
-                flex = c(NA, 1, NA),
-                
+            fillCol(
+                flex = c(NA, 1),
                 fillCol(
-                    width = 160,
-                    
-                    wellPanel(
-                        style = "overflow-y: auto; height: 100%;",
-                        
-                        radioButtons("retUnit", "Retention unit", c("Seconds", "Minutes"))
-                    )
+                    height = 40,
+                    strong(style = "font-size: 200%; text-align: center;", textOutput("pageTitle"))
                 ),
                 fillCol(
-                    flex = c(NA, 1),
-                    fillCol(
-                        height = 40,
-                        strong(style = "font-size: 200%; text-align: center;", textOutput("pageTitle"))
-                    ),
-                    fillCol(
-                        plotOutput("plotChrom", width = "100%", height = "100%")
-                    )
+                    plotOutput("plotChrom", width = "100%", height = "100%")
                 )
             ),
             
@@ -644,55 +631,38 @@ getCheckFeatsUI <- function()
                             rhandsontable::rHandsontableOutput("featuresHot")
                         )
                     )),
-                    tabPanel("Settings", fillRow(
-                        # flex = c(2, 4, 3),
+                    tabPanel("Settings", fillCol(
                         flex = NA,
-                        height = 275,
                         
                         fillRow(
-                            width = 150,
-                            radioButtons("retUnit", "Retention unit", c("Seconds", "Minutes"))
-                        ),
-                        fillRow(
-                            flex = NA,
-                            width = 500,
+                            flex = c(2, 3, 2),
+                            height = 200,
+                            
                             fillCol(
-                                width = 200,
-                                
-                                flex = c(NA, 1, 1),
-                                
-                                fillRow(
-                                    height = 20,
-                                    strong("Feature group table settings")
-                                ),
-                                checkboxGroupInput("fGroupSettings", NULL, c("Retention time", "m/z", "EIC preview")),
-                                selectInput("fGroupIntensitySettings", "Intensity", c("Max", "Replicate average", "all"),
-                                            multiple = FALSE, width = "75%")
+                                flex = NA,
+                                radioButtons("retUnit", "Retention unit", c("Seconds", "Minutes")),
+                                radioButtons("fGroupIntensitySettings", "Report feature group intensities",
+                                             c("Maximum", "Replicate averages", "All"))
                             ),
-                            fillCol(
-                                width = 300,
-                                
-                                checkboxGroupInput("fGroupSuspSettings", "Suspect annotation (if available)",
-                                                   c("Suspect properties (name, RT, m/z)",
-                                                     "Estimated identification level",
-                                                     "Other annotations")),
-                                checkboxGroupInput("fGroupPeakSettings", "Peak qualities",
-                                                   c("Overall", "Other qualities"))
+                            fillRow(
+                                checkboxGroupInput("fGroupSettings", "Feature groub table columns",
+                                                   c("Retention time & m/z", "EIC preview",
+                                                     "Suspect properties (name, RT, m/z)",
+                                                     "Estimated suspect identification level",
+                                                     "Other suspect annotations", "Overall peak quality",
+                                                     "Individual peak qualities"))
+                            ),
+                            fillRow(
+                                checkboxGroupInput("featureSettings", "Feature table columns",
+                                                   c("Retention time & m/z", "EIC preview", "Intensity/Area",
+                                                     "RT and m/z range", "Overall peak quality", "Individual peak qualities"))
                             )
                         ),
-                        fillCol(
-                            width = 200,
-                            flex = c(NA, 1, 1),
-                            
-                            fillRow(
-                                height = 20,
-                                strong("Feature table settings")
-                            ),
-                            checkboxGroupInput("featureSettings", NULL,
-                                               c("Retention time", "m/z", "EIC preview", "Intensity", "Area"),
-                                               width = "100%"),
-                            checkboxGroupInput("fGroupPeakSettings", "Peak qualities",
-                                               c("Overall", "Other qualities"), width = "100%")
+                        fillRow(
+                            height = 40,
+                            flex = NA,
+                            actionButton("saveSettings", "Save & Apply", icon = icon("save")),
+                            actionButton("ressetSettings", "Reset defaults", icon = icon("redo"))
                         )
                     ))
                 )

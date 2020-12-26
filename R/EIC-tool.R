@@ -557,9 +557,27 @@ setMethod("checkChromatograms", "featureGroups", function(fGroups, mzExpWindow, 
     return(enabledFGroups)
 })
 
+getUISettings <- function()
+{
+    dirPath <- RUserDir("patRoon", "config")
+    mkdirp(dirPath)
+    path <- file.path(dirPath, "EIC-ui.yml")
+    if (!file.exists(path))
+    {
+        ret <- list(retUnit = "sec", fGroupIntensity = "rGroup",
+                    fGroupColumns = c("retMZ", "EICPreview", "estIDLevel", "overallPeakQuality"),
+                    featureColumns = c("retMZ", "intensityArea", "overallPeakQuality"))
+        yaml::write_yaml(ret, path, indent = 4)
+    }
+    else
+        ret <- yaml::read_yaml(path, eval.expr = FALSE)
+    return(ret)
+}
+
 getCheckFeatsUI <- function()
 {
     showOpts <- c("Keep", "Don't keep")
+    settings <- getUISettings()
     
     fillPage(
         tags$head(includeScript(system.file("js", "utils-EIC.js", package = "patRoon"))),
@@ -640,22 +658,32 @@ getCheckFeatsUI <- function()
                             
                             fillCol(
                                 flex = NA,
-                                radioButtons("retUnit", "Retention unit", c("Seconds", "Minutes")),
-                                radioButtons("fGroupIntensitySettings", "Report feature group intensities",
-                                             c("Maximum", "Replicate averages", "All"))
+                                radioButtons("retUnit", "Retention unit", c("Seconds" = "sec", "Minutes" = "min"),
+                                             settings$retUnit),
+                                radioButtons("fGroupIntensity", "Report feature group intensities",
+                                             c("Maximum" = "max", "Replicate averages" = "rGroup", "All" = "all"),
+                                             settings$fGroupIntensity)
                             ),
                             fillRow(
-                                checkboxGroupInput("fGroupSettings", "Feature groub table columns",
-                                                   c("Retention time & m/z", "EIC preview",
-                                                     "Suspect properties (name, RT, m/z)",
-                                                     "Estimated suspect identification level",
-                                                     "Other suspect annotations", "Overall peak quality",
-                                                     "Individual peak qualities"))
+                                checkboxGroupInput("fGroupColumns", "Feature groub table columns",
+                                                   c("Retention time & m/z" = "retMZ",
+                                                     "EIC preview" = "EICPreview",
+                                                     "Suspect properties (name, RT, m/z)" = "suspProp",
+                                                     "Estimated suspect identification level" = "estIDLevel",
+                                                     "Other suspect annotations" = "suspOther",
+                                                     "Overall peak quality" = "overallPeakQuality",
+                                                     "Individual peak qualities" = "indivPeakQualities"),
+                                                   settings$fGroupColumns)
                             ),
                             fillRow(
-                                checkboxGroupInput("featureSettings", "Feature table columns",
-                                                   c("Retention time & m/z", "EIC preview", "Intensity/Area",
-                                                     "RT and m/z range", "Overall peak quality", "Individual peak qualities"))
+                                checkboxGroupInput("featureColumns", "Feature table columns",
+                                                   c("Retention time & m/z" = "retMZ",
+                                                     "EIC preview" = "EICPreview",
+                                                     "Intensity/Area" = "intensityArea",
+                                                     "RT and m/z range" = "rtMZRange",
+                                                     "Overall peak quality" = "overallPeakQuality",
+                                                     "Individual peak qualities" = "indivPeakQualities"),
+                                                   settings$featureColumns)
                             )
                         ),
                         fillRow(

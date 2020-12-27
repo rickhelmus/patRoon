@@ -82,7 +82,7 @@ NULL
 #'   The default file is shown below.
 #'
 #' @eval paste0("@@section Identification level rules: \\preformatted{",
-#'   patRoon:::readAllFile(system.file("misc", "idlevelrules.yml", package =
+#'   patRoon:::readAllFile(system.file("misc", "IDLevelRules.yml", package =
 #'   "patRoon")), "}")
 #'
 #' @section Identification level rules: Most of the file should be

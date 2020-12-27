@@ -51,7 +51,6 @@
     - get rid of getXCMSSet() calls?
 - suspect screening
     - rename patRoonData::targets?
-    - rename groupFeaturesScreening?
 - filter()
     - document which filters work on feature level (e.g. chromWidth)
     - remove zero values for maxReplicateIntRSD?
@@ -61,6 +60,11 @@
 - Check: units of plotChord() rt/mz graphs seems off
 - update docs and checkChromatograms() for mzWindow --> mzExpWindow
 - also subset features if fGroups are?
+- peak qualities
+    - check for final names and whether to keep them in gInfo
+    - include them in as.data.table (also with features=T)
+        - (re-)normalization
+    - add to EIC tool
 - checkFeatures()
     - decide on final function name (perhaps compatible for future component checker)
     - report relevant group/feature info in tables

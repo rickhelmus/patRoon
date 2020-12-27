@@ -564,7 +564,7 @@ getUISettings <- function()
     path <- file.path(dirPath, "EIC-ui.yml")
     if (!file.exists(path))
     {
-        ret <- list(retUnit = "sec", fGroupIntensity = "rGroup",
+        ret <- list(retUnit = "sec", fGroupIntensity = "average",
                     fGroupColumns = c("retMZ", "EICPreview", "estIDLevel", "overallPeakQuality"),
                     featureColumns = c("retMZ", "intensityArea", "overallPeakQuality"))
         yaml::write_yaml(ret, path, indent = 4)
@@ -633,7 +633,7 @@ getCheckFeatsUI <- function()
                                 HTML("<b>n</b>: next; <b>p</b>: previous; <b>t</b>: toggle"))
                         ),
                         fillRow(
-                            rhandsontable::rHandsontableOutput("groupHot")
+                            tags$div(id="hot_container", rhandsontable::rHandsontableOutput("groupHot"))
                         )
                     )),
                     tabPanel("Features", fillCol(
@@ -658,17 +658,17 @@ getCheckFeatsUI <- function()
                             
                             fillCol(
                                 flex = NA,
-                                radioButtons("retUnit", "Retention unit", c("Seconds" = "sec", "Minutes" = "min"),
+                                radioButtons("retUnit", "Retention time unit", c("Seconds" = "sec", "Minutes" = "min"),
                                              settings$retUnit),
                                 radioButtons("fGroupIntensity", "Report feature group intensities",
-                                             c("Maximum" = "max", "Replicate averages" = "rGroup", "All" = "all"),
+                                             c("Maximum" = "max", "Replicate averages" = "average", "All" = "all"),
                                              settings$fGroupIntensity)
                             ),
                             fillRow(
                                 checkboxGroupInput("fGroupColumns", "Feature groub table columns",
                                                    c("Retention time & m/z" = "retMZ",
                                                      "EIC preview" = "EICPreview",
-                                                     "Suspect properties (name, RT, m/z)" = "suspProp",
+                                                     "Suspect properties (RT, m/z, fragments)" = "suspProp",
                                                      "Estimated suspect identification level" = "estIDLevel",
                                                      "Other suspect annotations" = "suspOther",
                                                      "Overall peak quality" = "overallPeakQuality",
@@ -689,7 +689,7 @@ getCheckFeatsUI <- function()
                         fillRow(
                             height = 40,
                             flex = NA,
-                            actionButton("saveSettings", "Save & Apply", icon = icon("save")),
+                            actionButton("saveApplySettings", "Save & Apply", icon = icon("save")),
                             actionButton("ressetSettings", "Reset defaults", icon = icon("redo"))
                         )
                     ))
@@ -780,13 +780,41 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
         }
         
         fGroupData <- reactive({
-            gData <- as.data.table(fGroups)
-            gData[, EIC := sapply(gNames, function(g)
+            printf("make fGroupData\n")
+            # UNDONE: areas?
+            
+            args <- list(fGroups, average = input$fGroupIntensity == "average")
+            printf("avg: %d\n", args$average)
+            if (isScreening(fGroups) && any(c("suspProp", "estIDLevel", "suspOther") %in% input$fGroupColumns))
+                args <- c(args, list(collapseSuspects = NULL))
+            gData <- do.call(as.data.table, args)
+            
+            if ("EICPreview" %in% input$fGroupColumns)
             {
-                jsonlite::toJSON(list(values = EICPreviews[[g]]$intensity, xvalues = EICPreviews[[g]]$time,
-                                      options = list(type = "line", height = 50)))
-            })]
-            setcolorder(gData, c("group", "EIC"))
+                gData[, EIC := sapply(gNames, function(g)
+                {
+                    jsonlite::toJSON(list(values = EICPreviews[[g]]$intensity, xvalues = EICPreviews[[g]]$time,
+                                          options = list(type = "line", height = 50)))
+                })]
+                setcolorder(gData, c("group", "EIC"))
+            }
+
+            if (!"retMZ" %in% input$fGroupColumns)
+                gData[, c("ret", "mz") := NULL]
+            if (isScreening(fGroups))
+            {
+                if (!"suspProp" %in% input$fGroupColumns)
+                    gData[, (intersect(names(gData), c("susp_rt", "susp_mz", "fragments_mz", "fragments_formula"))) := NULL]
+                if (!"estIDLevel" %in% input$fGroupColumns && !is.null(gData[["estIDLevel"]]))
+                    gData[, "estIDLevel" := NULL]
+                if (!"suspOther" %in% input$fGroupColumns)
+                    gData[, (intersect(names(gData),
+                                       c("suspFormRank", "suspCompRank", "annSimForm", "annSimComp", "annSimBoth",
+                                         "maxFrags", "maxFragMatches", "maxFragMatchesRel"))) := NULL]
+            }
+            
+            # UNDONE: peak qualities
+            
             return(gData)
         })
         
@@ -889,6 +917,18 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
             rValues$triggerFeatHotUpdate <- rValues$triggerFeatHotUpdate + 1
         })
         
+        observeEvent({ input$fGroupIntensity; input$fGroupColumns }, {
+            printf("re-add group hot\n")
+            # BUG: avoid errors after adding/removing columns when column sorting is enabled.
+            # work-around from https://github.com/jrowen/rhandsontable/issues/303
+            removeUI(selector = "#groupHot")
+            insertUI(
+                selector = "#hot_container",
+                where = "afterEnd",
+                ui = rhandsontable::rHandsontableOutput("groupHot")
+            )
+        })
+        
         output$pageTitle <- renderText({
             sprintf("Group %s (%d/%d)", rValues$currentFGroup,
                     match(rValues$currentFGroup, gNames), gCount)
@@ -900,7 +940,7 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
                 plotChroms(fGroups[rValues$enabledFeatures[[rValues$currentFGroup]], rValues$currentFGroup],
                            EICs = EICs, colourBy = "rGroups", showPeakArea = TRUE,
                            showFGroupRect = FALSE, title = "",
-                           retMin = input$retUnit == "Minutes")
+                           retMin = input$retUnit == "min")
             })
         })
         
@@ -917,14 +957,14 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
             if (!"Don't keep" %in% input$showWhat)
                 gData <- gData[keep == TRUE, ]
             printf("nrow: %d\n", nrow(gData))
+            printf("ncol: %d\n", ncol(gData))
             
             hot <- do.call(rhandsontable::rhandsontable,
                            c(list(gData, width = NULL, height = 200, maxRows = nrow(gData)),
                              hotOpts)) %>%
+                # rhandsontable::hot_cols(valign = "htMiddle", fixedColumnsLeft = 2) %>%
                 rhandsontable::hot_cols(valign = "htMiddle", fixedColumnsLeft = 2) %>%
-                rhandsontable::hot_rows(rowHeights = 50) %>%
                 rhandsontable::hot_col("keep", readOnly = FALSE, halign = "htCenter") %>%
-                rhandsontable::hot_col("EIC", renderer = htmlwidgets::JS("renderSparkline")) %>%
                 rhandsontable::hot_context_menu(allowRowEdit = FALSE, allowColEdit = FALSE, customOpts = list(
                     enableAll = list(
                         name = "Enable all",
@@ -938,10 +978,28 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
                             'function(key, options) { Shiny.onInputChange("disableAllGroups", Math.random()); }'
                         )
                     )
-                ))
+                )) %>%
+                # BUG: table is messed up after tab switch
+                # work-around from https://github.com/jrowen/rhandsontable/issues/366
+                htmlwidgets::onRender("function(el, x){
+                  var hot = this.hot;
+                  $('a[data-value=\"Feature groups\"').on('click', function(){
+                    setTimeout(function(){hot.render();}, 0);
+                  });
+                }")
+            
+            if (!is.null(gData[["EIC"]]))
+            {
+                hot <- rhandsontable::hot_col(hot, "EIC", renderer = htmlwidgets::JS("renderSparkline")) %>%
+                    rhandsontable::hot_rows(rowHeights = 50)
+            }
             
             # HACK: disable some default context options
             hot$x$contextMenu$items[c("undo", "redo", "alignment")] <- NULL
+            
+            # BUG: table is messed up after tab switch
+            # work-around from https://github.com/jrowen/rhandsontable/issues/366
+            outputOptions(output, "groupHot", suspendWhenHidden = FALSE)
             
             return(hot)
         })

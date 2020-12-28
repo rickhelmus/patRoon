@@ -557,27 +557,41 @@ setMethod("checkChromatograms", "featureGroups", function(fGroups, mzExpWindow, 
     return(enabledFGroups)
 })
 
-getUISettings <- function()
+getUISettingsPath <- function()
 {
     dirPath <- RUserDir("patRoon", "config")
     mkdirp(dirPath)
-    path <- file.path(dirPath, "EIC-ui.yml")
+    return(file.path(dirPath, "EIC-ui.yml"))
+}
+
+getUISettings <- function()
+{
+    path <- getUISettingsPath()
     if (!file.exists(path))
     {
-        ret <- list(retUnit = "sec", fGroupIntensity = "average",
-                    fGroupColumns = c("retMZ", "EICPreview", "estIDLevel", "overallPeakQuality"),
-                    featureColumns = c("retMZ", "intensityArea", "overallPeakQuality"))
-        yaml::write_yaml(ret, path, indent = 4)
+        ret <- getDefaultUISettings()
+        saveUISettings(ret)
     }
     else
         ret <- yaml::read_yaml(path, eval.expr = FALSE)
     return(ret)
 }
 
-getCheckFeatsUI <- function()
+getDefaultUISettings <- function()
+{
+    return(list(retUnit = "sec", featQuantity = "intensity", fGroupQuantity = "average",
+                fGroupColumns = c("retMZ", "EICPreview", "estIDLevel", "overallPeakQuality"),
+                featureColumns = c("retMZ", "quantity", "overallPeakQuality")))
+}
+
+saveUISettings <- function(settings)
+{
+    yaml::write_yaml(settings, getUISettingsPath(), indent = 4)
+}
+
+getCheckFeatsUI <- function(settings)
 {
     showOpts <- c("Keep", "Don't keep")
-    settings <- getUISettings()
     
     fillPage(
         tags$head(includeScript(system.file("js", "utils-EIC.js", package = "patRoon"))),
@@ -633,7 +647,7 @@ getCheckFeatsUI <- function()
                                 HTML("<b>n</b>: next; <b>p</b>: previous; <b>t</b>: toggle"))
                         ),
                         fillRow(
-                            tags$div(id="hot_container", rhandsontable::rHandsontableOutput("groupHot"))
+                            tags$div(id = "fGroupHotContainer", rhandsontable::rHandsontableOutput("fGroupHot"))
                         )
                     )),
                     tabPanel("Features", fillCol(
@@ -646,23 +660,25 @@ getCheckFeatsUI <- function()
                         ),
                         
                         fillRow(
-                            rhandsontable::rHandsontableOutput("featuresHot")
+                            tags$div(id = "featuresHotContainer", rhandsontable::rHandsontableOutput("featuresHot"))
                         )
                     )),
                     tabPanel("Settings", fillCol(
                         flex = NA,
                         
                         fillRow(
-                            flex = c(2, 3, 2),
                             height = 200,
                             
                             fillCol(
                                 flex = NA,
                                 radioButtons("retUnit", "Retention time unit", c("Seconds" = "sec", "Minutes" = "min"),
-                                             settings$retUnit),
-                                radioButtons("fGroupIntensity", "Report feature group intensities",
-                                             c("Maximum" = "max", "Replicate averages" = "average", "All" = "all"),
-                                             settings$fGroupIntensity)
+                                             settings$retUnit, inline = TRUE),
+                                radioButtons("featQuantity", "Feature quantity", c("Peak intensity" = "intensity",
+                                                                                   "Peak area" = "area"),
+                                             settings$featQuantity, inline = TRUE),
+                                radioButtons("fGroupQuantity", "Reported feature group quantities",
+                                             c("Max" = "max", "Mean" = "average", "All" = "all"),
+                                             settings$fGroupQuantity, inline = TRUE)
                             ),
                             fillRow(
                                 checkboxGroupInput("fGroupColumns", "Feature groub table columns",
@@ -678,8 +694,9 @@ getCheckFeatsUI <- function()
                             fillRow(
                                 checkboxGroupInput("featureColumns", "Feature table columns",
                                                    c("Retention time & m/z" = "retMZ",
-                                                     "EIC preview" = "EICPreview",
-                                                     "Intensity/Area" = "intensityArea",
+                                                     "Replicate group" = "rGroup",
+                                                     "Blank" = "blank",
+                                                     "Quantity" = "quantity",
                                                      "RT and m/z range" = "rtMZRange",
                                                      "Overall peak quality" = "overallPeakQuality",
                                                      "Individual peak qualities" = "indivPeakQualities"),
@@ -690,7 +707,7 @@ getCheckFeatsUI <- function()
                             height = 40,
                             flex = NA,
                             actionButton("saveApplySettings", "Save & Apply", icon = icon("save")),
-                            actionButton("ressetSettings", "Reset defaults", icon = icon("redo"))
+                            actionButton("resetSettings", "Reset defaults", icon = icon("redo"))
                         )
                     ))
                 )
@@ -726,17 +743,20 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
                     outsideClickDeselects = FALSE, manualColumnResize = TRUE,
                     rowHeaders = NULL)
     
+    settings <- getUISettings()
+    
     server <- function(input, output, session)
     {
         rValues <- reactiveValues(enabledFGroups = gNames,
                                   currentFGroup = gNames[1],
-                                  triggerGroupHotUpdate = 0,
+                                  triggerFGroupHotUpdate = 0,
                                   triggerFeatHotUpdate = 0,
-                                  enabledFeatures = setNames(rep(list(rep(TRUE, nrow(anaInfo))), gCount), gNames))
+                                  enabledFeatures = setNames(rep(list(rep(TRUE, nrow(anaInfo))), gCount), gNames),
+                                  settings = settings)
         
         getCurFGroupRow <- function()
         {
-            tbl <- rhandsontable::hot_to_r(input$groupHot)
+            tbl <- rhandsontable::hot_to_r(input$fGroupHot)
             tblRow <- match(rValues$currentFGroup, tbl$group)
             if (is.na(tblRow))
                 warning("Cannot find fgroup row!")
@@ -756,7 +776,7 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
         
         advanceFGroupSelection <- function(dir)
         {
-            tbl <- rhandsontable::hot_to_r(input$groupHot)
+            tbl <- rhandsontable::hot_to_r(input$fGroupHot)
             tblRow <- getCurFGroupRow()
             if (!is.na(tblRow))
             {
@@ -779,17 +799,44 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
                 session$sendCustomMessage("toggleFGroupRow", tblRow)
         }
         
+        reAddHOT <- function(name)
+        {
+            printf("re-add hot: %s\n", name)
+            # BUG: avoid errors after adding/removing columns when column sorting is enabled.
+            # work-around from https://github.com/jrowen/rhandsontable/issues/303
+            removeUI(selector = paste0("#", name))
+            insertUI(selector = paste0("#", name, "Container"), where = "afterEnd", ui = rhandsontable::rHandsontableOutput(name))
+        }
+        
+        doApplySettings <- function(settings)
+        {
+            curSettings <- rValues$settings
+            rValues$settings <- settings
+            if (!isTRUE(all.equal(curSettings$fGroupColumns, settings$fGroupColumns)) ||
+                curSettings$featQuantity != settings$featQuantity ||
+                curSettings$fGroupQuantity != settings$fGroupQuantity)
+                reAddHOT("fGroupHot")
+            if (!isTRUE(all.equal(curSettings$featureColumns, settings$featureColumns)))
+                reAddHOT("featureHot")
+            saveUISettings(settings)
+        }
+        
         fGroupData <- reactive({
             printf("make fGroupData\n")
-            # UNDONE: areas?
             
-            args <- list(fGroups, average = input$fGroupIntensity == "average")
-            printf("avg: %d\n", args$average)
-            if (isScreening(fGroups) && any(c("suspProp", "estIDLevel", "suspOther") %in% input$fGroupColumns))
+            args <- list(fGroups, areas = rValues$settings$featQuantity == "area",
+                         average = rValues$settings$fGroupQuantity == "average")
+            if (isScreening(fGroups) && any(c("suspProp", "estIDLevel", "suspOther") %in% rValues$settings$fGroupColumns))
                 args <- c(args, list(collapseSuspects = NULL))
             gData <- do.call(as.data.table, args)
             
-            if ("EICPreview" %in% input$fGroupColumns)
+            if (rValues$settings$fGroupQuantity == "max")
+            {
+                gData[, max_intensity := rowSums(.SD) / nrow(anaInfo), .SDcols = anaInfo$analysis]
+                gData <- gData[, (anaInfo$analysis) := NULL]
+            }
+            
+            if ("EICPreview" %in% rValues$settings$fGroupColumns)
             {
                 gData[, EIC := sapply(gNames, function(g)
                 {
@@ -799,15 +846,15 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
                 setcolorder(gData, c("group", "EIC"))
             }
 
-            if (!"retMZ" %in% input$fGroupColumns)
+            if (!"retMZ" %in% rValues$settings$fGroupColumns)
                 gData[, c("ret", "mz") := NULL]
             if (isScreening(fGroups))
             {
-                if (!"suspProp" %in% input$fGroupColumns)
+                if (!"suspProp" %in% rValues$settings$fGroupColumns)
                     gData[, (intersect(names(gData), c("susp_rt", "susp_mz", "fragments_mz", "fragments_formula"))) := NULL]
-                if (!"estIDLevel" %in% input$fGroupColumns && !is.null(gData[["estIDLevel"]]))
+                if (!"estIDLevel" %in% rValues$settings$fGroupColumns && !is.null(gData[["estIDLevel"]]))
                     gData[, "estIDLevel" := NULL]
-                if (!"suspOther" %in% input$fGroupColumns)
+                if (!"suspOther" %in% rValues$settings$fGroupColumns)
                     gData[, (intersect(names(gData),
                                        c("suspFormRank", "suspCompRank", "annSimForm", "annSimComp", "annSimBoth",
                                          "maxFrags", "maxFragMatches", "maxFragMatchesRel"))) := NULL]
@@ -819,8 +866,27 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
         })
         
         featureData <- reactive({
-            return(data.table(analysis = anaInfo$analysis,
-                              group = anaInfo$group, blank = anaInfo$blank))
+            printf("make featureData\n")
+            
+            fti <- ftind[[rValues$currentFGroup]]
+            ft <- fTable[fti != 0]; ai <- anaInfo[fti != 0, ]; fti[fti != 0]
+            feat <- rbindlist(Map(ft, fti, f = function(f, i) f[i]))
+            
+            fData <- data.table(analysis = ai$analysis)
+            if ("retMZ" %in% rValues$settings$featureColumns)
+                fData[, c("ret", "mz") := .(feat$ret, feat$mz)]
+            if ("rGroup" %in% rValues$settings$featureColumns)
+                fData[, replicate_group := ai$group]
+            if ("blank" %in% rValues$settings$featureColumns)
+                fData[, replicate_group := ai$blank]
+            if ("quantity" %in% rValues$settings$featureColumns)
+                fData[, quantity := if (rValues$settings$featQuantity == "intensity") feat$intensity else feat$area]
+            if ("rtMZRange" %in% rValues$settings$featureColumns)
+                fData[, c("retmin", "retmax", "mzmin", "mzmax") := .(feat$retmin, feat$retmax, feat$mzmin, feat$mzmax)]
+            
+            # UNDONE: peak qualities
+
+            return(fData)            
         })
         
         observeEvent(input$keys, {
@@ -845,18 +911,18 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
             toggleFGroup()
         })
         
-        observeEvent(input$groupHot, {
-            # HACK: input$groupHot$params$maxRows: make sure we don't have empty table as hot_to_r errors otherwise
-            if (input$groupHot$params$maxRows > 0)
+        observeEvent(input$fGroupHot, {
+            # HACK: input$fGroupHot$params$maxRows: make sure we don't have empty table as hot_to_r errors otherwise
+            if (input$fGroupHot$params$maxRows > 0)
             {
                 printf("Sync EG\n")
-                tbl <- rhandsontable::hot_to_r(input$groupHot)
+                tbl <- rhandsontable::hot_to_r(input$fGroupHot)
                 keep <- tbl[keep == TRUE]$group
                 notkeep <- tbl[keep == FALSE]$group
                 oldeg <- rValues$enabledFGroups
                 rValues$enabledFGroups <- setdiff(union(rValues$enabledFGroups, keep), notkeep)
                 
-                selr <- input$groupHot_select$select$rAll[1]
+                selr <- input$fGroupHot_select$select$rAll[1]
                 
                 # HACK: init selection
                 if (is.null(selr))
@@ -867,7 +933,7 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
                 {
                     # update table
                     if (!isTRUE(all.equal(oldeg, rValues$enabledFGroups)))
-                        rValues$triggerGroupHotUpdate <- rValues$triggerGroupHotUpdate + 1
+                        rValues$triggerFGroupHotUpdate <- rValues$triggerFGroupHotUpdate + 1
                     else
                     {
                         # update selection after table update was triggered
@@ -878,19 +944,19 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
             }
         })
 
-        observeEvent(input$groupHot_select$select$r, {
+        observeEvent(input$fGroupHot_select$select$r, {
             printf("fGroup row select\n")
-            tbl <- rhandsontable::hot_to_r(input$groupHot)
-            updateFGroupRow(tbl$group[input$groupHot_select$select$rAll[1]])
+            tbl <- rhandsontable::hot_to_r(input$fGroupHot)
+            updateFGroupRow(tbl$group[input$fGroupHot_select$select$rAll[1]])
         })
         
         observeEvent(input$enableAllGroups, {
             rValues$enabledFGroups <- gNames
-            rValues$triggerGroupHotUpdate <- rValues$triggerGroupHotUpdate + 1
+            rValues$triggerFGroupHotUpdate <- rValues$triggerFGroupHotUpdate + 1
         })
         observeEvent(input$disableAllGroups, {
             rValues$enabledFGroups <- character()
-            rValues$triggerGroupHotUpdate <- rValues$triggerGroupHotUpdate + 1
+            rValues$triggerFGroupHotUpdate <- rValues$triggerFGroupHotUpdate + 1
         })
         
         observeEvent(input$resetFeatures, {
@@ -904,7 +970,7 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
             {
                 printf("Sync EF\n")
                 tbl <- rhandsontable::hot_to_r(input$featuresHot)
-                rValues$enabledFeatures[[rValues$currentFGroup]] <- tbl$keep
+                rValues$enabledFeatures[[rValues$currentFGroup]][match(tbl$analysis, anaInfo$analysis)] <- tbl$keep
             }
         })
         
@@ -917,16 +983,16 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
             rValues$triggerFeatHotUpdate <- rValues$triggerFeatHotUpdate + 1
         })
         
-        observeEvent({ input$fGroupIntensity; input$fGroupColumns }, {
-            printf("re-add group hot\n")
-            # BUG: avoid errors after adding/removing columns when column sorting is enabled.
-            # work-around from https://github.com/jrowen/rhandsontable/issues/303
-            removeUI(selector = "#groupHot")
-            insertUI(
-                selector = "#hot_container",
-                where = "afterEnd",
-                ui = rhandsontable::rHandsontableOutput("groupHot")
-            )
+        observeEvent(input$saveApplySettings, {
+            doApplySettings(sapply(names(rValues$settings), function(col) input[[col]], simplify = FALSE))
+        })
+        
+        observeEvent(input$resetSettings, {
+            doApplySettings(getDefaultUISettings())
+            for (s in c("retUnit", "featQuantity", "fGroupQuantity"))
+                updateRadioButtons(session, s, selected = rValues$settings[[s]])
+            for (s in c("fGroupColumns", "featureColumns"))
+                updateCheckboxGroupInput(session, s, selected = rValues$settings[[s]])
         })
         
         output$pageTitle <- renderText({
@@ -944,9 +1010,10 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
             })
         })
         
-        output$groupHot <- rhandsontable::renderRHandsontable({
+        output$fGroupHot <- rhandsontable::renderRHandsontable({
             printf("Plot gHot!\n")
-            rValues$triggerGroupHotUpdate
+            not <- showNotification("Updating feature group table...", duration = NULL, closeButton = FALSE, type = "message")
+            rValues$triggerFGroupHotUpdate
             
             gData <- fGroupData()
             gData[, keep := group %in% isolate(rValues$enabledFGroups)]
@@ -999,8 +1066,9 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
             
             # BUG: table is messed up after tab switch
             # work-around from https://github.com/jrowen/rhandsontable/issues/366
-            outputOptions(output, "groupHot", suspendWhenHidden = FALSE)
+            outputOptions(output, "fGroupHot", suspendWhenHidden = FALSE)
             
+            removeNotification(not)
             return(hot)
         })
         
@@ -1009,7 +1077,7 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
             rValues$triggerFeatHotUpdate
             
             fData <- featureData()
-            isolate(fData[, keep := rValues$enabledFeatures[[rValues$currentFGroup]]])
+            isolate(fData[, keep := rValues$enabledFeatures[[rValues$currentFGroup]][match(analysis, anaInfo$analysis)]])
             setcolorder(fData, c("analysis", "keep"))
             
             hot <- do.call(rhandsontable::rhandsontable,
@@ -1029,15 +1097,27 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
                             'function(key, options) { Shiny.onInputChange("disableAllFeatures", Math.random()); }'
                         )
                     )
-                ))
+                )) %>%
+                # BUG: table is messed up after tab switch
+                # work-around from https://github.com/jrowen/rhandsontable/issues/366
+                htmlwidgets::onRender("function(el, x){
+                  var hot = this.hot;
+                  $('a[data-value=\"Features\"').on('click', function(){
+                    setTimeout(function(){hot.render();}, 0);
+                  });
+                }")
             
             # HACK: disable some default context options
             hot$x$contextMenu$items[c("undo", "redo", "alignment")] <- NULL
+
+            # BUG: table is messed up after tab switch
+            # work-around from https://github.com/jrowen/rhandsontable/issues/366
+            outputOptions(output, "featuresHot", suspendWhenHidden = FALSE)
             
             return(hot)
         })
     }
     
-    runApp(shinyApp(getCheckFeatsUI(), server))
+    runApp(shinyApp(getCheckFeatsUI(settings), server))
     return(enabledFGroups)
 }

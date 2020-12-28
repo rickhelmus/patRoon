@@ -74,6 +74,7 @@
     - save sessions & make filter
     - mode: group (topMost=1), rGroup (topMostRGroup=1), feature (topMost=NULL, onlyPresent configurable)
     - buttons to reset all groups/features
+    - EIC preview dissabled by default? re-rendering table is slow...
 
 
 ## MSPeakLists

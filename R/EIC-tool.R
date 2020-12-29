@@ -595,6 +595,7 @@ getCheckFeatsUI <- function(settings)
     
     fillPage(
         tags$head(includeScript(system.file("js", "utils-EIC.js", package = "patRoon"))),
+        shinyjs::useShinyjs(),
         
         keys::useKeys(),
         keys::keysInput("keys", c("p", "n", "t")),
@@ -706,7 +707,7 @@ getCheckFeatsUI <- function(settings)
                         fillRow(
                             height = 40,
                             flex = NA,
-                            actionButton("saveApplySettings", "Save & Apply", icon = icon("save")),
+                            shinyjs::disabled(actionButton("saveApplySettings", "Save & Apply", icon = icon("save"))),
                             actionButton("resetSettings", "Reset defaults", icon = icon("redo"))
                         )
                     ))
@@ -984,6 +985,12 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
         observeEvent(input$disableAllFeatures, {
             rValues$enabledFeatures[[rValues$currentFGroup]] <- rep(FALSE, nrow(anaInfo))
             rValues$triggerFeatHotUpdate <- rValues$triggerFeatHotUpdate + 1
+        })
+        
+        observeEvent({ input$retUnit; input$featQuantity; input$fGroupQuantity; input$fGroupColumns; input$featureColumns }, {
+            printf("Setting changed\n")
+            set <- sapply(names(rValues$settings), function(col) input[[col]], simplify = FALSE)
+            shinyjs::toggleState("saveApplySettings", !isTRUE(all.equal(set, rValues$settings)))
         })
         
         observeEvent(input$saveApplySettings, {

@@ -809,6 +809,11 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
             insertUI(selector = paste0("#", name, "Container"), where = "afterEnd", ui = rhandsontable::rHandsontableOutput(name))
         }
         
+        getInputSettings <- function()
+        {
+            return(sapply(names(rValues$settings), function(col) input[[col]], simplify = FALSE))
+        }
+        
         doApplySettings <- function(settings)
         {
             curSettings <- rValues$settings
@@ -820,6 +825,14 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
             if (!isTRUE(all.equal(curSettings$featureColumns, settings$featureColumns)))
                 reAddHOT("featureHot")
             saveUISettings(settings)
+        }
+        
+        syncInputSettings <- function()
+        {
+            for (s in c("retUnit", "featQuantity", "fGroupQuantity"))
+                updateRadioButtons(session, s, selected = rValues$settings[[s]])
+            for (s in c("fGroupColumns", "featureColumns"))
+                updateCheckboxGroupInput(session, s, selected = rValues$settings[[s]])
         }
         
         fGroupData <- reactive({
@@ -901,6 +914,31 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
                        n = advanceFGroupSelection(1),
                        t = toggleFGroup())
             }
+        })
+        
+        observeEvent(input$tabs, {
+            if (input$tabs != "Settings")
+            {
+                set <- getInputSettings()
+                if (!isTRUE(all.equal(set, rValues$settings)))
+                {
+                    showModal(modalDialog("Settings were changed but not yet applied. Do you want to do so now?",
+                                          footer = tagList(actionButton("saveAndApplyModal", "Save & Apply", icon = icon("save")),
+                                                           actionButton("discardModal", "Discard changes", icon = icon("window-close")))))
+                }
+            }
+        })
+        
+        observeEvent(input$saveAndApplyModal, {
+            doApplySettings(getInputSettings())
+            shinyjs::disable("saveApplySettings")
+            removeModal()
+        })
+
+        observeEvent(input$discardModal, {
+            syncInputSettings()
+            shinyjs::disable("saveApplySettings")
+            removeModal()
         })
         
         observeEvent(input$previousGroup, {
@@ -989,20 +1027,17 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
         
         observeEvent({ input$retUnit; input$featQuantity; input$fGroupQuantity; input$fGroupColumns; input$featureColumns }, {
             printf("Setting changed\n")
-            set <- sapply(names(rValues$settings), function(col) input[[col]], simplify = FALSE)
-            shinyjs::toggleState("saveApplySettings", !isTRUE(all.equal(set, rValues$settings)))
+            shinyjs::toggleState("saveApplySettings", !isTRUE(all.equal(getInputSettings(), rValues$settings)))
         })
         
         observeEvent(input$saveApplySettings, {
-            doApplySettings(sapply(names(rValues$settings), function(col) input[[col]], simplify = FALSE))
+            doApplySettings(getInputSettings())
         })
         
         observeEvent(input$resetSettings, {
             doApplySettings(getDefaultUISettings())
-            for (s in c("retUnit", "featQuantity", "fGroupQuantity"))
-                updateRadioButtons(session, s, selected = rValues$settings[[s]])
-            for (s in c("fGroupColumns", "featureColumns"))
-                updateCheckboxGroupInput(session, s, selected = rValues$settings[[s]])
+            syncInputSettings()
+            shinyjs::disable("saveApplySettings")
         })
         
         output$pageTitle <- renderText({

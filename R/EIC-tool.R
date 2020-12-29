@@ -848,6 +848,9 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
 
             if (!"retMZ" %in% rValues$settings$fGroupColumns)
                 gData[, c("ret", "mz") := NULL]
+            else if (rValues$settings$retUnit == "min")
+                gData[, ret := ret / 60]
+            
             if (isScreening(fGroups))
             {
                 if (!"suspProp" %in% rValues$settings$fGroupColumns)
@@ -874,7 +877,7 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
             
             fData <- data.table(analysis = ai$analysis)
             if ("retMZ" %in% rValues$settings$featureColumns)
-                fData[, c("ret", "mz") := .(feat$ret, feat$mz)]
+                fData[, c("ret", "mz") := .(if (rValues$settings$retUnit == "min") feat$ret / 60 else feat$ret, feat$mz)]
             if ("rGroup" %in% rValues$settings$featureColumns)
                 fData[, replicate_group := ai$group]
             if ("blank" %in% rValues$settings$featureColumns)
@@ -1006,7 +1009,7 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
                 plotChroms(fGroups[rValues$enabledFeatures[[rValues$currentFGroup]], rValues$currentFGroup],
                            EICs = EICs, colourBy = "rGroups", showPeakArea = TRUE,
                            showFGroupRect = FALSE, title = "",
-                           retMin = input$retUnit == "min")
+                           retMin = rValues$settings$retUnit == "min")
             })
         })
         

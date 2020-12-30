@@ -45,7 +45,7 @@ getEIC <- function(spectra, rtRange, mzRange, MSLevel = 1, precursor = NULL, pre
                                          function(s) sum(s[numGTE(mz, mzRange[1]) & numLTE(mz, mzRange[2]), intensity]))))
 }
 
-getEICsForFGroups <- function(fGroups, rtWindow, mzExpWindow, topMost, onlyPresent)
+getEICsForFGroups <- function(fGroups, rtWindow, mzExpWindow, topMost, topMostByRGroup, onlyPresent)
 {
     if (length(fGroups) == 0)
         return(list())
@@ -82,8 +82,17 @@ getEICsForFGroups <- function(fGroups, rtWindow, mzExpWindow, topMost, onlyPrese
     {
         if (!is.null(topMost))
         {
-            oint <- order(-gTable[[fg]])
-            topAnalysesInd <- oint[seq_len(topMost)]
+            if (topMostByRGroup)
+            {
+                tbl <- data.table(int = gTable[[fg]], group = anaInfo$group, anaInd = seq_len(nrow(anaInfo)))
+                tbl[, rank := frank(-int, ties.method = "first"), by = "group"]
+                topAnalysesInd <- tbl[rank <= topMost]$anaInd
+            }
+            else
+            {
+                oint <- order(gTable[[fg]], decreasing = TRUE)
+                topAnalysesInd <- oint[seq_len(topMost)]
+            }
         }
         else
             topAnalysesInd <- seq_len(nrow(anaInfo))

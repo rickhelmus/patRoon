@@ -63,7 +63,7 @@ Summary {data-orientation=rows}
 ```{r obj-plot, fig.width=10, fig.height=4}
 par(mai = c(0.9, 0.8, 0.6, 0.1))
 plotChroms(rmdVars$fGroups, rmdVars$EICRtWindow, rmdVars$EICMzExpWindow,
-           rmdVars$retMin, 1, rmdVars$EICs, TRUE, FALSE, colourBy = "fGroups", showLegend = FALSE,
+           rmdVars$retMin, 1, FALSE, rmdVars$EICs, TRUE, FALSE, colourBy = "fGroups", showLegend = FALSE,
            onlyPresent = rmdVars$EICOnlyPresent)
 ```
 
@@ -136,7 +136,7 @@ for (grpi in seq_len(length(rmdVars$fGroups)))
 {
     setTxtProgressBar(prog, grpi)
     plotChroms(rmdVars$fGroups[, grpi], rmdVars$EICRtWindow, rmdVars$EICMzExpWindow,
-               rmdVars$retMin, rmdVars$EICTopMost, rmdVars$EICs, colourBy = "rGroup",
+               rmdVars$retMin, rmdVars$EICTopMost, rmdVars$EICTopMostByRGroup, rmdVars$EICs, colourBy = "rGroup",
                showLegend = TRUE, onlyPresent = rmdVars$EICOnlyPresent)
 }
 

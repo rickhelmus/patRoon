@@ -842,6 +842,10 @@ setMethod("plotChord", "featureGroups", function(obj, addSelfLinks = FALSE, addR
 #'   to a feature group \emph{m/z} value to determine the width of its EIC.
 #' @param topMost Only plot EICs from features within this number of top most
 #'   intense analyses. If \code{NULL} then all analyses are used for plotted.
+#' @param topMostByRGroup If set to \code{TRUE} and \code{topMost} is set: only
+#'   plot EICs for the top most features in each replicate group. For instance,
+#'   when \code{topMost=1} and \code{topMostByRGroup=TRUE}, then EICs will be
+#'   plotted for the most intense feature of each replicate group.
 #' @param EICs Internal parameter for now and should be kept at \code{NULL}
 #'   (default).
 #' @param showPeakArea Set to \code{TRUE} to display integrated chromatographic
@@ -864,15 +868,16 @@ setMethod("plotChord", "featureGroups", function(obj, addSelfLinks = FALSE, addR
 #'
 #' @export
 setMethod("plotChroms", "featureGroups", function(obj, rtWindow = 30, mzExpWindow = 0.001, retMin = FALSE, topMost = NULL,
-                                                  EICs = NULL, showPeakArea = FALSE, showFGroupRect = TRUE,
-                                                  title = NULL, colourBy = c("none", "rGroups", "fGroups"),
+                                                  topMostByRGroup = FALSE, EICs = NULL, showPeakArea = FALSE,
+                                                  showFGroupRect = TRUE, title = NULL,
+                                                  colourBy = c("none", "rGroups", "fGroups"),
                                                   showLegend = TRUE, onlyPresent = TRUE,
                                                   annotate = c("none", "ret", "mz"), showProgress = FALSE,
                                                   xlim = NULL, ylim = NULL, ...)
 {
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertNumber, . ~ rtWindow + mzExpWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
-    aapply(checkmate::assertFlag, . ~ retMin + showPeakArea + showFGroupRect + showLegend +
+    aapply(checkmate::assertFlag, . ~ retMin + topMostByRGroup + showPeakArea + showFGroupRect + showLegend +
                onlyPresent + showProgress,
            fixed = list(add = ac))
     checkmate::assertCount(topMost, positive = TRUE, null.ok = TRUE, add = ac)
@@ -1095,8 +1100,9 @@ setMethod("plotChroms", "featureGroups", function(obj, rtWindow = 30, mzExpWindo
     par(oldp)
 })
 
-setMethod("plotChromsHash", "featureGroups", function(obj, rtWindow = 30, mzExpWindow = 0.001, retMin = FALSE, topMost = NULL,
-                                                      EICs = NULL, showPeakArea = FALSE, showFGroupRect = TRUE,
+setMethod("plotChromsHash", "featureGroups", function(obj, rtWindow = 30, mzExpWindow = 0.001, retMin = FALSE,
+                                                      topMost = NULL, topMostByRGroup = FALSE, EICs = NULL,
+                                                      showPeakArea = FALSE, showFGroupRect = TRUE,
                                                       title = NULL, colourBy = c("none", "rGroups", "fGroups"),
                                                       showLegend = TRUE, onlyPresent = TRUE,
                                                       annotate = c("none", "ret", "mz"), showProgress = FALSE,
@@ -1265,7 +1271,7 @@ setMethod("overlap", "featureGroups", function(fGroups, which, exclusive)
 
 setMethod("calculatePeakQualities", "featureGroups", function(fGroups, flatnessFactor)
 {
-    EICs <- getEICsForFGroups(fGroups, 0, 0, NULL, TRUE)
+    EICs <- getEICsForFGroups(fGroups, 0, 0, NULL, FALSE, TRUE)
     ftind <- groupFeatIndex(fGroups)
     anas <- analyses(fGroups)
     gNames <- names(fGroups)

@@ -75,6 +75,13 @@
     - mode: group (topMost=1), rGroup (topMostRGroup=1), feature (topMost=NULL, onlyPresent configurable)
     - buttons to reset all groups/features
     - EIC preview dissabled by default? re-rendering table is slow...
+- topMostByRGroup: make default? or only for reporting?
+- NEWS
+    - topMostByRGroup/EICTopMostByRGroup
+- tests
+    - topMostByRGroup
+- docs
+    - topMostByRGroup: handbook?
 
 
 ## MSPeakLists

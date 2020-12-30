@@ -151,7 +151,7 @@ setMethod("checkChromatograms", "featureGroups", function(fGroups, mzExpWindow, 
     # rtRange <- max(sapply(xrs, function(xr) xr@scantime[length(xr@scantime)]))
     rtRange <- 1
 
-    EICPreviews <- getEICsForFGroups(fGroups, 10, mzExpWindow, topMost = 1, onlyPresent = FALSE)
+    EICPreviews <- getEICsForFGroups(fGroups, 10, mzExpWindow, topMost = 1, FALSE, onlyPresent = FALSE)
     # format is in [[ana]][[fGroup]], since we only took top most intensive we can throw away the ana dimension
     EICPreviews <- Reduce(modifyList, EICPreviews)
 
@@ -228,7 +228,7 @@ setMethod("checkChromatograms", "featureGroups", function(fGroups, mzExpWindow, 
                                                 anaInfo$analysis))
             fg <- removeGroups(fg, which(g != names(fGroups)))
 
-            EICs <- getEICsForFGroups(fg, rtwin, input$mzWindow, topMost = NULL, onlyPresent = FALSE)
+            EICs <- getEICsForFGroups(fg, rtwin, input$mzWindow, topMost = NULL, FALSE, onlyPresent = FALSE)
             # EICs are in [[ana]][[fgroup]] --> only have one fgroup so get rid of that dimension
             ret$data <- lapply(EICs, "[[", 1)
 
@@ -732,9 +732,9 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
     ftind <- groupFeatIndex(fGroups)
     
     # UNDONE: make topMost/onlyPresent optional/interactive
-    EICs <- getEICsForFGroups(fGroups, rtWindow, mzExpWindow, topMost = 1, onlyPresent = FALSE)
+    EICs <- getEICsForFGroups(fGroups, rtWindow, mzExpWindow, topMost = 1, FALSE, onlyPresent = FALSE)
     # format is in [[ana]][[fGroup]], since we only took top most intensive we can throw away the ana dimension
-    EICPreviews <- getEICsForFGroups(fGroups, 0, mzExpWindow, topMost = 1, onlyPresent = TRUE)
+    EICPreviews <- getEICsForFGroups(fGroups, 0, mzExpWindow, topMost = 1, FALSE, onlyPresent = TRUE)
     EICPreviews <- Reduce(modifyList, EICPreviews)
     
     hotOpts <- list(rowHeaderWidth = 40, readOnly = TRUE, disableVisualSelection = "area",

@@ -265,7 +265,8 @@ setGeneric("reportPDF", function(fGroups, path = "report", reportFGroups = TRUE,
                                  compoundsOnlyUsedScorings = TRUE, compoundsTopMost = 5,
                                  compsCluster = NULL, components = NULL, MSPeakLists = NULL, retMin = TRUE,
                                  EICGrid = c(2, 1), EICRtWindow = 20, EICMzExpWindow = 0.001, EICTopMost = NULL,
-                                 EICOnlyPresent = TRUE, clearPath = FALSE) standardGeneric("reportPDF"))
+                                 EICTopMostByRGroup = FALSE, EICOnlyPresent = TRUE,
+                                 clearPath = FALSE) standardGeneric("reportPDF"))
 setGeneric("reportHTML", function(fGroups, path = "report", reportPlots = c("chord", "venn", "upset", "eics", "formulas"),
                                   formulas = NULL, formulasTopMost = 5,
                                   formulasNormalizeScores = "max", formulasExclNormScores = NULL,
@@ -274,8 +275,9 @@ setGeneric("reportHTML", function(fGroups, path = "report", reportPlots = c("cho
                                   compoundsOnlyUsedScorings = TRUE, compoundsTopMost = 5, compsCluster = NULL,
                                   includeMFWebLinks = "compounds", components = NULL, interactiveHeat = FALSE,
                                   MSPeakLists = NULL, retMin = TRUE, EICRtWindow = 20, EICMzExpWindow = 0.001,
-                                  EICTopMost = NULL, EICOnlyPresent = TRUE, selfContained = TRUE, optimizePng = FALSE,
-                                  clearPath = FALSE, openReport = TRUE, noDate = FALSE) standardGeneric("reportHTML"))
+                                  EICTopMost = NULL, EICTopMostByRGroup = FALSE, EICOnlyPresent = TRUE,
+                                  selfContained = TRUE, optimizePng = FALSE, clearPath = FALSE, openReport = TRUE,
+                                  noDate = FALSE) standardGeneric("reportHTML"))
 
 # Used for reporting
 setGeneric("plotHash", function(x, ...) standardGeneric("plotHash"))

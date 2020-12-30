@@ -63,7 +63,7 @@ averageSpectra <- function(spectra, clusterMzWindow, topMost, minIntensityPre, m
 
         if (nrow(s) > topMost)
         {
-            ord <- order(-s$intensity)
+            ord <- order(s$intensity, decreasing = TRUE)
             keep <- ord[seq_len(topMost)]
             if (retainPrecursor)
                 keep <- unique(c(keep, s[precursor == TRUE, which = TRUE]))
@@ -246,10 +246,7 @@ doMSPeakListFilter <- function(pList, absIntThr, relIntThr, topMost, deIsotope, 
 
     if (!is.null(topMost) && nrow(ret) > topMost)
     {
-        if (negate)
-            ord <- order(ret$intensity)
-        else
-            ord <- order(-ret$intensity)
+        ord <- order(ret$intensity, decreasing = !negate)
         ret <- ret[ord[seq_len(topMost)]]
     }
 

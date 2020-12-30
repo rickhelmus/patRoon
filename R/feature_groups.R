@@ -910,7 +910,7 @@ setMethod("plotChroms", "featureGroups", function(obj, rtWindow = 30, mzExpWindo
     rGroups <- unique(anaInfo$group)
 
     if (is.null(EICs))
-        EICs <- getEICsForFGroups(obj, rtWindow, mzExpWindow, topMost, onlyPresent)
+        EICs <- getEICsForFGroups(obj, rtWindow, mzExpWindow, topMost, topMostByRGroup, onlyPresent)
     EICFGroups <- unique(unlist(sapply(EICs, names)))
 
     if (colourBy == "rGroups")

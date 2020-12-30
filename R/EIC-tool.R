@@ -905,7 +905,7 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
             printf("make featureData\n")
             
             fti <- ftind[[rValues$currentFGroup]]
-            ft <- fTable[fti != 0]; ai <- anaInfo[fti != 0, ]; fti[fti != 0]
+            ft <- fTable[fti != 0]; ai <- anaInfo[fti != 0, ]; fti <- fti[fti != 0]
             feat <- rbindlist(Map(ft, fti, f = function(f, i) f[i]))
             
             fData <- data.table(analysis = ai$analysis)

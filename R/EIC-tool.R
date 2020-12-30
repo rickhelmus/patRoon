@@ -607,9 +607,15 @@ getCheckFeatsUI <- function(settings)
             
             fillCol(
                 flex = c(NA, 1),
-                fillCol(
+                fillRow(
+                    flex = c(1, NA),
                     height = 40,
-                    strong(style = "font-size: 200%; text-align: center;", textOutput("pageTitle"))
+                    strong(style = "font-size: 200%; text-align: center;", textOutput("pageTitle")),
+                    fillRow(
+                        width = 130,
+                        height = 30,
+                        actionButton("saveSession", "Save session", icon("save"))
+                    )
                 ),
                 fillCol(
                     plotOutput("plotChrom", width = "100%", height = "100%")
@@ -729,12 +735,22 @@ getCheckFeatsUI <- function(settings)
 }
 
 # setMethod("checkChromatograms", "featureGroups", function(fGroups, mzExpWindow, enabledFGroups)
-checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
+checkFeatures <- function(fGroups, session, rtWindow = 30, mzExpWindow = 0.001, force = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
+    checkmate::assertString(session, min.chars = 1, add = ac)
     aapply(checkmate::assertNumber, . ~ rtWindow + mzExpWindow, finite = TRUE, lower = 0,
            fixed = list(add = ac))
+    checkmate::assertFlag(force, add = ac)
     checkmate::reportAssertions(ac)
+    
+    sessionPath <- paste0(session, ".Rds")
+    checkmate::assertPathForOutput(sessionPath, overwrite = TRUE, .var.name = "session")
+    
+    if (!force && file.exists(sessionPath))
+    {
+        # UNDONE: check compatibility
+    }
     
     anaInfo <- analysisInfo(fGroups)
     gNames <- names(fGroups)
@@ -764,13 +780,21 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
     
     settings <- getUISettings()
     
+    if (file.exists(sessionPath))
+        curSession <- readRDS(sessionPath)
+    else
+    {
+        curSession <- list(enabledFGroups = gNames,
+                           enabledFeatures = setNames(rep(list(rep(TRUE, nrow(anaInfo))), gCount), gNames))
+    }
+    
     server <- function(input, output, session)
     {
-        rValues <- reactiveValues(enabledFGroups = gNames,
-                                  currentFGroup = gNames[1],
+        rValues <- reactiveValues(currentFGroup = gNames[1],
                                   triggerFGroupHotUpdate = 0,
                                   triggerFeatHotUpdate = 0,
-                                  enabledFeatures = setNames(rep(list(rep(TRUE, nrow(anaInfo))), gCount), gNames),
+                                  enabledFGroups = curSession$enabledFGroups,
+                                  enabledFeatures = curSession$enabledFeatures,
                                   settings = settings,
                                   fGroupPlotMode = "topMost")
         
@@ -933,6 +957,11 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
                        n = advanceFGroupSelection(1),
                        t = toggleFGroup())
             }
+        })
+        
+        observeEvent(input$saveSession, {
+            saveRDS(list(enabledFGroups = rValues$enabledFGroups,
+                         enabledFeatures = rValues$enabledFeatures), sessionPath)
         })
         
         observeEvent(input$tabs, {

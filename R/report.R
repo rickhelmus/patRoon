@@ -39,9 +39,10 @@ NULL
 #'   reported.
 #' @param retMin If \code{TRUE} then report retention times in minutes
 #'   (otherwise seconds).
-#' @param EICRtWindow,EICMzExpWindow,EICTopMost,EICOnlyPresent Plotting parameters
-#'   passed to \code{\link{plotChroms}} (\emph{i.e.} \code{rtWindow},
-#'   \code{mzExpWindow}, \code{topMost} and \code{onlyPresent} arguments).
+#' @param EICRtWindow,EICMzExpWindow,EICTopMost,EICTopMostByRGroup,EICOnlyPresent
+#'   Plotting parameters passed to \code{\link{plotChroms}} (\emph{i.e.}
+#'   \code{rtWindow}, \code{mzExpWindow}, \code{topMost}, \code{topMostByRGroup}
+#'   and \code{onlyPresent} arguments).
 #' @param compoundsOnlyUsedScorings If \code{TRUE} then only scorings are plotted
 #'   that actually have been used to rank data (see the \code{scoreTypes}
 #'   argument to \code{\link{generateCompoundsMetFrag}} for more details).
@@ -149,7 +150,8 @@ reportFGroupTable <- function(fGroups, path, retMin)
     printf("Done!\n")
 }
 
-reportFGroupPlots <- function(fGroups, path, plotGrid, rtWindow, mzExpWindow, retMin, topMost, onlyPresent, EICs)
+reportFGroupPlots <- function(fGroups, path, plotGrid, rtWindow, mzExpWindow, retMin, topMost, topMostByRGroup,
+                              onlyPresent, EICs)
 {
     printf("Exporting feature group plots...\n")
 
@@ -168,7 +170,7 @@ reportFGroupPlots <- function(fGroups, path, plotGrid, rtWindow, mzExpWindow, re
     pdf(pdfFile, paper = "a4", pointsize = 10, width = 8, height = 11)
 
     # all feature groups
-    plotChroms(fGroups, rtWindow, mzExpWindow, retMin, 1, EICs, TRUE, FALSE)
+    plotChroms(fGroups, rtWindow, mzExpWindow, retMin, 1, FALSE, EICs, TRUE, FALSE)
 
     plotsPerPage <- plotGrid[1] * plotGrid[2]
     prog <- openProgBar(0, gCount)
@@ -186,8 +188,8 @@ reportFGroupPlots <- function(fGroups, path, plotGrid, rtWindow, mzExpWindow, re
         }
         
         screen(scr[scrInd])
-        plotChroms(fGroups[, grpi], rtWindow, mzExpWindow, retMin, topMost, EICs,
-                   onlyPresent = onlyPresent, colourBy = "rGroups")
+        plotChroms(fGroups[, grpi], rtWindow, mzExpWindow, retMin, topMost, topMostByRGroup,
+                   EICs, onlyPresent = onlyPresent, colourBy = "rGroups")
         setTxtProgressBar(prog, grpi)
     }
 
@@ -252,7 +254,8 @@ reportFormulaTable <- function(fGroups, path, formulas, normalizeScores, exclude
 }
 
 reportFormulaSpectra <- function(fGroups, path, formulas, topMost, normalizeScores, excludeNormScores,
-                                 MSPeakLists, EICRtWindow, EICMzExpWindow, retMin, EICTopMost, EICs)
+                                 MSPeakLists, EICRtWindow, EICMzExpWindow, retMin, EICTopMost,
+                                 EICTopMostByRGroup, EICs)
 {
     printf("Exporting formula MS/MS spectra...\n")
 
@@ -285,7 +288,7 @@ reportFormulaSpectra <- function(fGroups, path, formulas, topMost, normalizeScor
             # a4r: width=11.69, height=8.27
             pdf(out, paper = "a4r", pointsize = 10, width = 11, height = 8)
 
-            plotChroms(fGroups[, grp], EICRtWindow, EICMzExpWindow, retMin, EICTopMost, EICs)
+            plotChroms(fGroups[, grp], EICRtWindow, EICMzExpWindow, retMin, EICTopMost, EICTopMostByRGroup, EICs)
 
             for (precursor in unique(ft$formula))
             {
@@ -361,7 +364,8 @@ reportCompoundTable <- function(fGroups, path, compounds, normalizeScores, exclu
 
 reportCompoundSpectra <- function(fGroups, path, MSPeakLists, compounds, compsCluster,
                                   formulas, EICRtWindow, EICMzExpWindow, retMin,
-                                  EICTopMost, EICs, normalizeScores, exclNormScores, onlyUsedScorings, topMost)
+                                  EICTopMost, EICTopMostByRGroup, EICs, normalizeScores, exclNormScores,
+                                  onlyUsedScorings, topMost)
 {
     printf("Exporting compound identification MS/MS spectra...\n")
 
@@ -399,7 +403,7 @@ reportCompoundSpectra <- function(fGroups, path, MSPeakLists, compounds, compsCl
             # a4r: width=11.69, height=8.27
             pdf(out, paper = "a4r", pointsize = 10, width = 11, height = 8)
 
-            plotChroms(fGroups[, fgrpi], EICRtWindow, EICMzExpWindow, retMin, EICTopMost, EICs)
+            plotChroms(fGroups[, fgrpi], EICRtWindow, EICMzExpWindow, retMin, EICTopMost, EICTopMostByRGroup, EICs)
 
             for (idi in seq_len(nrow(compTable[[grp]])))
             {
@@ -639,12 +643,13 @@ setMethod("reportPDF", "featureGroups", function(fGroups, path, reportFGroups,
                                                  compounds, compoundsNormalizeScores, compoundsExclNormScores,
                                                  compoundsOnlyUsedScorings, compoundsTopMost, compsCluster,
                                                  components, MSPeakLists, retMin, EICGrid,
-                                                 EICRtWindow, EICMzExpWindow, EICTopMost, EICOnlyPresent, clearPath)
+                                                 EICRtWindow, EICMzExpWindow, EICTopMost, EICTopMostByRGroup,
+                                                 EICOnlyPresent, clearPath)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertPathForOutput(path, overwrite = TRUE, add = ac)
     aapply(checkmate::assertFlag, . ~ reportFGroups + reportFormulaSpectra +
-               compoundsOnlyUsedScorings + retMin + EICOnlyPresent + clearPath,
+               compoundsOnlyUsedScorings + retMin + EICTopMostByRGroup + EICOnlyPresent + clearPath,
            fixed = list(add = ac))
     aapply(checkmate::assertClass, . ~ formulas + compounds + compsCluster + components + MSPeakLists,
            c("formulas", "compounds", "compoundsCluster", "components", "MSPeakLists"),
@@ -673,12 +678,13 @@ setMethod("reportPDF", "featureGroups", function(fGroups, path, reportFGroups,
     if (reportFGroups || !is.null(formulas) || !is.null(compounds) || !is.null(components))
     {
         cat("Loading all EICs... ")
-        EICs <- getEICsForFGroups(fGroups, EICRtWindow, EICMzExpWindow, EICTopMost, EICOnlyPresent)
+        EICs <- getEICsForFGroups(fGroups, EICRtWindow, EICMzExpWindow, EICTopMost, EICTopMostByRGroup, EICOnlyPresent)
         cat("Done!\n")
     }
 
     if (reportFGroups)
-        reportFGroupPlots(fGroups, path, EICGrid, EICRtWindow, EICMzExpWindow, retMin, EICTopMost, EICOnlyPresent, EICs)
+        reportFGroupPlots(fGroups, path, EICGrid, EICRtWindow, EICMzExpWindow, retMin, EICTopMost,
+                          EICTopMostByRGroup, EICOnlyPresent, EICs)
 
     if (reportFormulaSpectra && !is.null(formulas))
     {
@@ -686,7 +692,7 @@ setMethod("reportPDF", "featureGroups", function(fGroups, path, reportFGroups,
         mkdirp(p)
         reportFormulaSpectra(fGroups, p, formulas, formulasTopMost, formulasNormalizeScores,
                              formulasExclNormScores, MSPeakLists,
-                             EICRtWindow, EICMzExpWindow, retMin, EICTopMost, EICs)
+                             EICRtWindow, EICMzExpWindow, retMin, EICTopMost, EICTopMostByRGroup, EICs)
     }
 
     if (!is.null(compounds))
@@ -694,8 +700,8 @@ setMethod("reportPDF", "featureGroups", function(fGroups, path, reportFGroups,
         p <- file.path(path, "compounds")
         mkdirp(p)
         reportCompoundSpectra(fGroups, p, MSPeakLists, compounds, compsCluster, formulas, EICRtWindow, EICMzExpWindow, retMin,
-                              EICTopMost, EICs, compoundsNormalizeScores, compoundsExclNormScores, compoundsOnlyUsedScorings,
-                              compoundsTopMost)
+                              EICTopMost, EICTopMostByRGroup, EICs, compoundsNormalizeScores,
+                              compoundsExclNormScores, compoundsOnlyUsedScorings, compoundsTopMost)
     }
 
     if (!is.null(compsCluster))
@@ -769,7 +775,7 @@ setMethod("reportHTML", "featureGroups", function(fGroups, path, reportPlots, fo
                                                   compoundsOnlyUsedScorings, compoundsTopMost,
                                                   compsCluster, includeMFWebLinks, components, interactiveHeat,
                                                   MSPeakLists, retMin, EICRtWindow, EICMzExpWindow,
-                                                  EICTopMost, EICOnlyPresent, selfContained,
+                                                  EICTopMost, EICTopMostByRGroup, EICOnlyPresent, selfContained,
                                                   optimizePng, clearPath, openReport, noDate)
 {
     # UNDONE: mention pandoc win limits
@@ -778,8 +784,8 @@ setMethod("reportHTML", "featureGroups", function(fGroups, path, reportPlots, fo
     checkmate::assertPathForOutput(path, overwrite = TRUE, add = ac)
     reportPlots <- checkmate::matchArg(reportPlots, c("none", "chord", "venn", "upset", "eics", "formulas"),
                                        several.ok = TRUE, add = ac)
-    aapply(checkmate::assertFlag, . ~ compoundsOnlyUsedScorings + interactiveHeat + retMin + EICOnlyPresent +
-               selfContained + optimizePng + clearPath + openReport + noDate,
+    aapply(checkmate::assertFlag, . ~ compoundsOnlyUsedScorings + interactiveHeat + retMin + EICTopMostByRGroup +
+               EICOnlyPresent + selfContained + optimizePng + clearPath + openReport + noDate,
            fixed = list(add = ac))
     aapply(checkmate::assertClass, . ~ formulas + compounds + components + MSPeakLists,
            c("formulas", "compounds", "components", "MSPeakLists"),
@@ -831,7 +837,7 @@ setMethod("reportHTML", "featureGroups", function(fGroups, path, reportPlots, fo
     #     !is.null(compounds) || !is.null(components))
     {
         cat("Loading all EICs... ")
-        EICs <- getEICsForFGroups(fGroups, EICRtWindow, EICMzExpWindow, EICTopMost, EICOnlyPresent)
+        EICs <- getEICsForFGroups(fGroups, EICRtWindow, EICMzExpWindow, EICTopMost, EICTopMostByRGroup, EICOnlyPresent)
         cat("Done!\n")
     }
 
@@ -842,8 +848,9 @@ setMethod("reportHTML", "featureGroups", function(fGroups, path, reportPlots, fo
 
     rmdVars <- list(outPath = path, fGroups = fGroups, groupNames = names(fGroups), gInfo = groupInfo(fGroups),
                     reportPlots = reportPlots, EICRtWindow = EICRtWindow, EICMzExpWindow = EICMzExpWindow,
-                    retMin = retMin, EICTopMost = EICTopMost, EICOnlyPresent = EICOnlyPresent, EICs = EICs,
-                    compounds = compounds, compsCluster = compsCluster, includeMFWebLinks = includeMFWebLinks,
+                    retMin = retMin, EICTopMost = EICTopMost, EICTopMostByRGroup = EICTopMostByRGroup,
+                    EICOnlyPresent = EICOnlyPresent, EICs = EICs, compounds = compounds,
+                    compsCluster = compsCluster, includeMFWebLinks = includeMFWebLinks,
                     MSPeakLists = MSPeakLists, formulas = formulas, formulasNormalizeScores = formulasNormalizeScores,
                     formulasExclNormScores = formulasExclNormScores, compoundsNormalizeScores = compoundsNormalizeScores,
                     compoundsExclNormScores = compoundsExclNormScores,

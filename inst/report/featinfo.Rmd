@@ -13,7 +13,7 @@ allPlots <- lapply(seq_len(length(rmdVars$fGroups)), function(grpi)
     makeCachedPlot(path, "plotChroms",
                    list(rmdVars$fGroups[, grpi], rmdVars$EICRtWindow,
                         rmdVars$EICMzExpWindow, rmdVars$retMin,
-                        rmdVars$EICTopMost, rmdVars$EICs, colourBy = "rGroup", title = ""),
+                        rmdVars$EICTopMost, rmdVars$EICTopMostByRGroup, rmdVars$EICs, colourBy = "rGroup", title = ""),
                    7, 4.5, bg = NA, cacheDB = rmdVars$cacheDB)
     setTxtProgressBar(prog, grpi)
     return(path)

@@ -624,7 +624,7 @@ getCheckFeatsUI <- function(settings)
                         flex = c(NA, 1),
                         fillRow(
                             height = 40,
-                            flex = c(NA, NA, NA, NA, 1),
+                            flex = c(NA, NA, NA, NA, NA, 1),
                             
                             fillCol(
                                 width = 45,
@@ -643,6 +643,17 @@ getCheckFeatsUI <- function(settings)
                                 div(style = "margin-top: 8px; margin-left: 5px",
                                     checkboxGroupInput("showWhat", NULL, showOpts, showOpts,
                                                        inline = TRUE))
+                            ),
+                            fillRow(
+                                width = 250,
+                                flex = c(NA, 1),
+                                fillRow(
+                                    width = 75,
+                                    div(style = "margin-top: 8px", HTML("<strong>Plot mode</strong>"))
+                                ),
+                                selectInput("fGroupPlotMode", NULL,
+                                            c("Top most group" = "topMost", "Top most replicates" = "topMostByRGroup",
+                                              "All" = "all"), "topMost")
                             ),
                             div(style = "margin: 8px 10px 12px; font-size: small; text-align: right;",
                                 HTML("<b>n</b>: next; <b>p</b>: previous; <b>t</b>: toggle"))
@@ -732,10 +743,17 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
     ftind <- groupFeatIndex(fGroups)
     
     # UNDONE: make topMost/onlyPresent optional/interactive
-    EICs <- getEICsForFGroups(fGroups, rtWindow, mzExpWindow, topMost = 1, FALSE, onlyPresent = FALSE)
+    EICsTopMost <- getEICsForFGroups(fGroups, rtWindow, mzExpWindow, topMost = 1, FALSE, onlyPresent = TRUE)
+    EICsTopMostRG <- EICsAll <- NULL
+    
     # format is in [[ana]][[fGroup]], since we only took top most intensive we can throw away the ana dimension
-    EICPreviews <- getEICsForFGroups(fGroups, 0, mzExpWindow, topMost = 1, FALSE, onlyPresent = TRUE)
-    EICPreviews <- Reduce(modifyList, EICPreviews)
+    EICPreviews <- Reduce(modifyList, EICsTopMost)
+    EICPreviews <- Map(EICPreviews, names(EICPreviews), f = function(eic, grp)
+    {
+        anai <- which.max(fGroups[[grp]])
+        return(eic[numGTE(eic$time, fTable[[anai]]$retmin[ftind[[grp]][anai]]) &
+                   numLTE(eic$time, fTable[[anai]]$retmax[ftind[[grp]][anai]]), ])
+    })
     
     hotOpts <- list(rowHeaderWidth = 40, readOnly = TRUE, disableVisualSelection = "area",
                     columnSorting = TRUE, sortIndicator = TRUE, selectCallback = TRUE,
@@ -753,7 +771,8 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
                                   triggerFGroupHotUpdate = 0,
                                   triggerFeatHotUpdate = 0,
                                   enabledFeatures = setNames(rep(list(rep(TRUE, nrow(anaInfo))), gCount), gNames),
-                                  settings = settings)
+                                  settings = settings,
+                                  fGroupPlotMode = "topMost")
         
         getCurFGroupRow <- function()
         {
@@ -926,6 +945,11 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
                                           footer = tagList(actionButton("saveAndApplyModal", "Save & Apply", icon = icon("save")),
                                                            actionButton("discardModal", "Discard changes", icon = icon("window-close")))))
                 }
+                
+                if (input$tabs == "Feature groups")
+                    rValues$fGroupPlotMode <- input$fGroupPlotMode
+                else
+                    rValues$fGroupPlotMode <- "all"
             }
         })
         
@@ -951,6 +975,20 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
         
         observeEvent(input$toggleGroup, {
             toggleFGroup()
+        })
+        
+        observeEvent(input$fGroupPlotMode, {
+            if ((input$fGroupPlotMode == "topMostByRGroup" && is.null(EICsTopMostRG)) ||
+                (input$fGroupPlotMode == "all" && is.null(EICsAll)))
+            {
+                not <- showNotification("Loading EICs...", duration = NULL, closeButton = FALSE, type = "message")
+                if (input$fGroupPlotMode == "topMostByRGroup")
+                    EICsTopMostRG <<- getEICsForFGroups(fGroups, rtWindow, mzExpWindow, 1, TRUE, TRUE)
+                else
+                    EICsAll <<- getEICsForFGroups(fGroups, rtWindow, mzExpWindow, NULL, FALSE, TRUE)
+                removeNotification(not)
+            }
+            rValues$fGroupPlotMode <- input$fGroupPlotMode
         })
         
         observeEvent(input$fGroupHot, {
@@ -1047,10 +1085,19 @@ checkFeatures <- function(fGroups, rtWindow = 30, mzExpWindow = 0.001)
         
         output$plotChrom <- renderPlot({
             printf("Plot chrom!\n")
+            
+            EICs <- switch(rValues$fGroupPlotMode,
+                topMost = EICsTopMost,
+                topMostByRGroup = EICsTopMostRG,
+                all = EICsAll
+            )
+            
             withr::with_par(list(mar = c(4, 4, 0.1, 1), cex = 1.5), {
                 plotChroms(fGroups[rValues$enabledFeatures[[rValues$currentFGroup]], rValues$currentFGroup],
                            EICs = EICs, colourBy = "rGroups", showPeakArea = TRUE,
                            showFGroupRect = FALSE, title = "",
+                           topMost = if (rValues$fGroupPlotMode == "all") NULL else 1,
+                           topMostByRGroup = rValues$fGroupPlotMode == "topMostByRGroup",
                            retMin = rValues$settings$retUnit == "min")
             })
         })

@@ -784,8 +784,9 @@ checkFeatures <- function(fGroups, session, rtWindow = 30, mzExpWindow = 0.001, 
         curSession <- readRDS(sessionPath)
     else
     {
-        curSession <- list(enabledFGroups = gNames,
-                           enabledFeatures = setNames(rep(list(rep(TRUE, nrow(anaInfo))), gCount), gNames))
+        ef <- data.frame(analysis = anaInfo$analysis)
+        ef[, gNames] <- TRUE
+        curSession <- list(enabledFGroups = gNames, enabledFeatures = ef)
     }
     
     server <- function(input, output, session)
@@ -794,6 +795,7 @@ checkFeatures <- function(fGroups, session, rtWindow = 30, mzExpWindow = 0.001, 
                                   triggerFGroupHotUpdate = 0,
                                   triggerFeatHotUpdate = 0,
                                   enabledFGroups = curSession$enabledFGroups,
+                                  # NOTE: should be data.frame not data.table, as Shiny doesn't register changes with the latter
                                   enabledFeatures = curSession$enabledFeatures,
                                   settings = settings,
                                   fGroupPlotMode = "topMost")
@@ -1069,7 +1071,7 @@ checkFeatures <- function(fGroups, session, rtWindow = 30, mzExpWindow = 0.001, 
         })
         
         observeEvent(input$resetFeatures, {
-            rValues$enabledFeatures <- setNames(rep(list(rep(TRUE, nrow(anaInfo))), gCount), gNames)
+            rValues$enabledFeatures[, gNames] <-TRUE
             rValues$triggerFeatHotUpdate <- rValues$triggerFeatHotUpdate + 1
         })
         
@@ -1079,16 +1081,18 @@ checkFeatures <- function(fGroups, session, rtWindow = 30, mzExpWindow = 0.001, 
             {
                 printf("Sync EF\n")
                 tbl <- rhandsontable::hot_to_r(input$featuresHot)
-                rValues$enabledFeatures[[rValues$currentFGroup]][match(tbl$analysis, anaInfo$analysis)] <- tbl$keep
+                rValues$enabledFeatures[match(tbl$analysis, rValues$enabledFeatures$analysis),
+                                        rValues$currentFGroup] <- tbl$keep
+                printf("EF: %s\n", paste0(rValues$enabledFeatures[[rValues$currentFGroup]], collapse = ", "))
             }
         })
         
         observeEvent(input$enableAllFeatures, {
-            rValues$enabledFeatures[[rValues$currentFGroup]] <- rep(TRUE, nrow(anaInfo))
+            rValues$enabledFeatures[, rValues$currentFGroup] <- TRUE
             rValues$triggerFeatHotUpdate <- rValues$triggerFeatHotUpdate + 1
         })
         observeEvent(input$disableAllFeatures, {
-            rValues$enabledFeatures[[rValues$currentFGroup]] <- rep(FALSE, nrow(anaInfo))
+            rValues$enabledFeatures[, rValues$currentFGroup] <- FALSE
             rValues$triggerFeatHotUpdate <- rValues$triggerFeatHotUpdate + 1
         })
         
@@ -1121,9 +1125,12 @@ checkFeatures <- function(fGroups, session, rtWindow = 30, mzExpWindow = 0.001, 
                 all = EICsAll
             )
             
+            fg <- fGroups[, rValues$currentFGroup]
+            if (rValues$fGroupPlotMode == "all") # UNDONE: also for rGroups top most somehow?
+                fg <- fg[rValues$enabledFeatures[[rValues$currentFGroup]]]
+            
             withr::with_par(list(mar = c(4, 4, 0.1, 1), cex = 1.5), {
-                plotChroms(fGroups[rValues$enabledFeatures[[rValues$currentFGroup]], rValues$currentFGroup],
-                           EICs = EICs, colourBy = "rGroups", showPeakArea = TRUE,
+                plotChroms(fg, EICs = EICs, colourBy = "rGroups", showPeakArea = TRUE,
                            showFGroupRect = FALSE, title = "",
                            topMost = if (rValues$fGroupPlotMode == "all") NULL else 1,
                            topMostByRGroup = rValues$fGroupPlotMode == "topMostByRGroup",
@@ -1198,7 +1205,8 @@ checkFeatures <- function(fGroups, session, rtWindow = 30, mzExpWindow = 0.001, 
             rValues$triggerFeatHotUpdate
             
             fData <- featureData()
-            isolate(fData[, keep := rValues$enabledFeatures[[rValues$currentFGroup]][match(analysis, anaInfo$analysis)]])
+            isolate(fData[, keep := rValues$enabledFeatures[match(analysis, rValues$enabledFeatures$analysis),
+                          rValues$currentFGroup]])
             setcolorder(fData, c("analysis", "keep"))
             
             hot <- do.call(rhandsontable::rhandsontable,

@@ -658,7 +658,7 @@ getCheckFeatsUI <- function(settings)
                     fillRow(
                         width = 130,
                         height = 30,
-                        actionButton("saveSession", "Save session", icon("save"))
+                        shinyjs::disabled(actionButton("saveSession", "Save session", icon("save")))
                     )
                 ),
                 fillCol(
@@ -825,6 +825,7 @@ checkFeatures <- function(fGroups, session, rtWindow = 30, mzExpWindow = 0.001, 
     settings <- getUISettings()
     
     curSession <- NULL
+    sessionChanged <- FALSE
     if (file.exists(sessionPath))
     {
         if (!is.null(fromSession))
@@ -939,6 +940,16 @@ checkFeatures <- function(fGroups, session, rtWindow = 30, mzExpWindow = 0.001, 
                 updateCheckboxGroupInput(session, s, selected = rValues$settings[[s]])
         }
         
+        setSessionChanged <- function(changed)
+        {
+            if (changed != sessionChanged)
+            {
+                printf("session changed: %d\n", changed)
+                sessionChanged <<- changed
+                shinyjs::toggleState("saveSession", condition = changed)
+            }
+        }
+        
         fGroupData <- reactive({
             printf("make fGroupData\n")
             
@@ -1023,6 +1034,7 @@ checkFeatures <- function(fGroups, session, rtWindow = 30, mzExpWindow = 0.001, 
         observeEvent(input$saveSession, {
             saveRDS(list(enabledFGroups = rValues$enabledFGroups,
                          enabledFeatures = rValues$enabledFeatures), sessionPath)
+            setSessionChanged(FALSE)
         })
         
         observeEvent(input$tabs, {
@@ -1091,6 +1103,9 @@ checkFeatures <- function(fGroups, session, rtWindow = 30, mzExpWindow = 0.001, 
                 notkeep <- tbl[keep == FALSE]$group
                 oldeg <- rValues$enabledFGroups
                 rValues$enabledFGroups <- setdiff(union(rValues$enabledFGroups, keep), notkeep)
+                egChanged <- !isTRUE(all.equal(oldeg, rValues$enabledFGroups))
+                if (egChanged)
+                    setSessionChanged(TRUE)
                 
                 selr <- input$fGroupHot_select$select$rAll[1]
                 
@@ -1102,7 +1117,7 @@ checkFeatures <- function(fGroups, session, rtWindow = 30, mzExpWindow = 0.001, 
                 if (length(input$showWhat) < 2)
                 {
                     # update table
-                    if (!isTRUE(all.equal(oldeg, rValues$enabledFGroups)))
+                    if (egChanged)
                         rValues$triggerFGroupHotUpdate <- rValues$triggerFGroupHotUpdate + 1
                     else
                     {
@@ -1123,15 +1138,18 @@ checkFeatures <- function(fGroups, session, rtWindow = 30, mzExpWindow = 0.001, 
         observeEvent(input$enableAllGroups, {
             rValues$enabledFGroups <- gNames
             rValues$triggerFGroupHotUpdate <- rValues$triggerFGroupHotUpdate + 1
+            setSessionChanged(TRUE)
         })
         observeEvent(input$disableAllGroups, {
             rValues$enabledFGroups <- character()
             rValues$triggerFGroupHotUpdate <- rValues$triggerFGroupHotUpdate + 1
+            setSessionChanged(TRUE)
         })
         
         observeEvent(input$resetFeatures, {
             rValues$enabledFeatures[, gNames] <-TRUE
             rValues$triggerFeatHotUpdate <- rValues$triggerFeatHotUpdate + 1
+            setSessionChanged(TRUE)
         })
         
         observeEvent(input$featuresHot, {
@@ -1140,19 +1158,23 @@ checkFeatures <- function(fGroups, session, rtWindow = 30, mzExpWindow = 0.001, 
             {
                 printf("Sync EF\n")
                 tbl <- rhandsontable::hot_to_r(input$featuresHot)
+                oldef <- rValues$enabledFeatures[[rValues$currentFGroup]]
                 rValues$enabledFeatures[match(tbl$analysis, rValues$enabledFeatures$analysis),
                                         rValues$currentFGroup] <- tbl$keep
-                printf("EF: %s\n", paste0(rValues$enabledFeatures[[rValues$currentFGroup]], collapse = ", "))
+                if (!isTRUE(all.equal(oldef, rValues$enabledFeatures[[rValues$currentFGroup]])))
+                    setSessionChanged(TRUE)
             }
         })
         
         observeEvent(input$enableAllFeatures, {
             rValues$enabledFeatures[, rValues$currentFGroup] <- TRUE
             rValues$triggerFeatHotUpdate <- rValues$triggerFeatHotUpdate + 1
+            setSessionChanged(TRUE)
         })
         observeEvent(input$disableAllFeatures, {
             rValues$enabledFeatures[, rValues$currentFGroup] <- FALSE
             rValues$triggerFeatHotUpdate <- rValues$triggerFeatHotUpdate + 1
+            setSessionChanged(TRUE)
         })
         
         observeEvent({ input$retUnit; input$featQuantity; input$fGroupQuantity; input$fGroupColumns; input$featureColumns }, {

@@ -947,6 +947,7 @@ checkFeatures <- function(fGroups, session, rtWindow = 30, mzExpWindow = 0.001, 
                 printf("session changed: %d\n", changed)
                 sessionChanged <<- changed
                 shinyjs::toggleState("saveSession", condition = changed)
+                session$sendCustomMessage("setSessionChanged", changed)
             }
         }
         

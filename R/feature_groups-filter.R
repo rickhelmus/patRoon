@@ -268,6 +268,25 @@ replicateGroupFilter <- function(fGroups, rGroups, negate = FALSE, verbose = TRU
     }, "replicate_group", verbose))
 }
 
+checkFeaturesFilter <- function(fGroups, checkFeaturesSession, negate)
+{
+    sessionPath <- paste0(checkFeaturesSession, ".Rds")
+    return(doFilter(fGroups, "checked features session", c(makeFileHash(sessionPath), negate), function(fGroups)
+    {
+        session <- readRDS(sessionPath)
+        if (negate)
+            fGroups <- fGroups[, setdiff(names(fGroups), session$enabledFGroups)]
+        else
+            fGroups <- fGroups[, session$enabledFGroups]
+        
+        gNames <- names(fGroups)
+        pred <- if (negate) function(ef) !ef else function(ef) ef
+        fGroups@groups[, (gNames) := Map(.SD, session$enabledFeatures[gNames],
+                                         f = function(fg, ef) ifelse(pred(ef), fg, 0))]
+        return(updateFeatIndex(removeEmptyGroups(fGroups)))
+    }, "checkedFeatures"))
+}
+
 #' @details \code{filter} performs common rule based filtering of feature groups
 #'   such as blank subtraction, minimum intensity and minimum replicate
 #'   abundance. Removing of features occurs by zeroing their intensity values.
@@ -370,7 +389,7 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
                                               maxReplicateIntRSD = NULL, blankThreshold = NULL,
                                               retentionRange = NULL, mzRange = NULL, mzDefectRange = NULL,
                                               chromWidthRange = NULL, rGroups = NULL, removeBlanks = FALSE,
-                                              negate = FALSE)
+                                              checkFeaturesSession = NULL, negate = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertNumber, . ~ absMinIntensity + relMinIntensity + preAbsMinIntensity + preRelMinIntensity +
@@ -381,6 +400,7 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
     aapply(assertRange, . ~ retentionRange + mzRange + mzDefectRange + chromWidthRange, null.ok = TRUE, fixed = list(add = ac))
     checkmate::assertCharacter(rGroups, min.chars = 1, min.len = 1, any.missing = FALSE, null.ok = TRUE, add = ac)
     aapply(checkmate::assertFlag, . ~ removeBlanks + negate, fixed = list(add = ac))
+    assertCheckFeaturesSession(checkFeaturesSession, obj, mustExist = TRUE, null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
 
     if (length(obj) == 0)
@@ -394,6 +414,8 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
         return(obj)
     }
 
+    obj <- maybeDoFilter(checkFeaturesFilter, checkFeaturesSession)
+    
     obj <- maybeDoFilter(intensityFilter, preAbsMinIntensity, preRelMinIntensity)
 
     obj <- maybeDoFilter(retentionMzFilter, retentionRange, otherArgs = list(what = "retention"))

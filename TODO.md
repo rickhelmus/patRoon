@@ -75,7 +75,7 @@
     - mode: group (topMost=1), rGroup (topMostRGroup=1), feature (topMost=NULL, onlyPresent configurable)
     - buttons to reset all groups/features
     - EIC preview dissabled by default? re-rendering table is slow...
-    - check session compat
+    - filter negate: don't remove kept fGroups if features were changed?  
 - topMostByRGroup: make default? or only for reporting?
 - NEWS
     - topMostByRGroup/EICTopMostByRGroup
@@ -83,6 +83,8 @@
     - topMostByRGroup
 - docs
     - topMostByRGroup: handbook?
+    - session filter: argument and its order
+    - importCheckFeaturesSession()
 
 
 ## MSPeakLists

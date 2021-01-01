@@ -589,14 +589,31 @@ saveUISettings <- function(settings)
     yaml::write_yaml(settings, getUISettingsPath(), indent = 4)
 }
 
-importCheckFeaturesSession <- function(fGroups, path)
+#' @export
+importCheckFeaturesSession <- function(sessionIn, sessionOut, fGroups, overWrite = FALSE)
 {
+    # UNDONE: docs
+    
+    checkmate::assertString(sessionIn, min.chars = 1)
+    pathIn <- paste0(sessionIn, ".Rds")
+    
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertFileExists(pathIn, "r", .var.name = "session", add = ac)
+    checkmate::assertString(sessionOut, min.chars = 1, add = ac)
+    checkmate::assertClass(fGroups, "featureGroups", add = ac)
+    checkmate::assertFlag(overWrite, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    pathOut <- paste0(sessionOut, ".Rds")
+    if (file.exists(pathOut) && !overWrite)
+        stop("Output session already exists. Set overWrite=TRUE to proceed anyway.")
+    
     # settings import:
     # - if file has analyses or feature groups not present in target fGroups: remove
     # - default for any missing features/feature groups 
     
     gNames <- names(fGroups)
-    settings <- readRDS(path)
+    settings <- readRDS(pathIn)
     otherGNames <- names(settings$enabledFeatures)
     commonGNames <- intersect(gNames, otherGNames)
     commonAnalyses <- intersect(analyses(fGroups), settings$enabledFeatures$analysis)
@@ -630,7 +647,7 @@ importCheckFeaturesSession <- function(fGroups, path)
     # match analysis order
     settings$enabledFeatures <- settings$enabledFeatures[match(analyses(fGroups), settings$enabledFeatures$analysis), ]
     
-    return(settings)
+    saveRDS(settings, pathOut)
 }
 
 getCheckFeatsUI <- function(settings)
@@ -779,22 +796,16 @@ getCheckFeatsUI <- function(settings)
 }
 
 # setMethod("checkChromatograms", "featureGroups", function(fGroups, mzExpWindow, enabledFGroups)
-checkFeatures <- function(fGroups, session, rtWindow = 30, mzExpWindow = 0.001, fromSession = NULL)
+checkFeatures <- function(fGroups, session, rtWindow = 30, mzExpWindow = 0.001)
 {
     ac <- checkmate::makeAssertCollection()
-    aapply(checkmate::assertString, . ~ session + fromSession, min.chars = 1, null.ok = c(FALSE, TRUE),
-           fixed = list(add = ac))
+    assertCheckFeaturesSession(session, fGroups, mustExist = FALSE, add = ac)
     aapply(checkmate::assertNumber, . ~ rtWindow + mzExpWindow, finite = TRUE, lower = 0,
            fixed = list(add = ac))
     checkmate::reportAssertions(ac)
     
     sessionPath <- paste0(session, ".Rds")
     checkmate::assertPathForOutput(sessionPath, overwrite = TRUE, .var.name = "session")
-    if (!is.null(fromSession))
-    {
-        fromSessionPath <- paste0(fromSession, ".Rds")
-        checkmate::assertFileExists(fromSessionPath, "r", .var.name = "fromSession")
-    }
     
     anaInfo <- analysisInfo(fGroups)
     gNames <- names(fGroups)
@@ -827,26 +838,12 @@ checkFeatures <- function(fGroups, session, rtWindow = 30, mzExpWindow = 0.001, 
     curSession <- NULL
     sessionChanged <- FALSE
     if (file.exists(sessionPath))
-    {
-        if (!is.null(fromSession))
-            stop(sprintf("Cannot import session %s from %s: already exists", session, fromSession))
-        
         curSession <- readRDS(sessionPath)
-        if (!setequal(c("analysis", gNames), names(curSession$enabledFeatures)))
-            stop("Session has different feature groups! Please set fromSession to import a session.")
-        if (!setequal(anaInfo$analysis, curSession$enabledFeatures$analysis))
-            stop("Session has different features! Please set fromSession to import a session.")
-    }
     else
     {
-        if (!is.null(fromSession))
-            curSession <- importCheckFeaturesSession(fGroups, fromSessionPath)
-        else
-        {
-            ef <- data.frame(analysis = anaInfo$analysis)
-            ef[, gNames] <- TRUE
-            curSession <- list(enabledFGroups = gNames, enabledFeatures = ef)
-        }
+        ef <- data.frame(analysis = anaInfo$analysis)
+        ef[, gNames] <- TRUE
+        curSession <- list(enabledFGroups = gNames, enabledFeatures = ef)
     }
     
     server <- function(input, output, session)

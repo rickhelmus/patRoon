@@ -324,6 +324,33 @@ assertPListIsolatePrecParams <- function(x, .var.name = checkmate::vname(x), add
     assertVal(checkmate::assertCount, "maxGap", positive = TRUE)
 }
 
+assertCheckFeaturesSession <- function(x, fGroups, mustExist, null.ok = FALSE,
+                                       .var.name = checkmate::vname(x), add = NULL)
+{
+    if (null.ok && is.null(x))
+        return(NULL)
+    
+    if (!is.null(add))
+        mc <- length(add$getMessages())
+    
+    checkmate::assertString(x, min.chars = 1, .var.name = .var.name, add = add)
+    if (is.null(add) || length(add$getMessages()) == mc)
+    {
+        sessionPath <- paste0(x, ".Rds")
+        if (mustExist)
+            checkmate::assertFileExists(sessionPath, "r", .var.name = .var.name, add = add)
+    
+        if (file.exists(sessionPath))
+        {
+            session <- readRDS(sessionPath)
+            if (!setequal(c("analysis", names(fGroups)), names(session$enabledFeatures)))
+                stop("Session has different feature groups! Please use importCheckFeaturesSession() to import.")
+            if (!setequal(analyses(fGroups), session$enabledFeatures$analysis))
+                stop("Session has different analyses! Please use importCheckFeaturesSession() to import.")
+        }
+    }
+}
+
 # from https://github.com/mllg/checkmate/issues/115
 aapply = function(fun, formula, ..., fixed = list())
 {

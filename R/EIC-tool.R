@@ -589,6 +589,50 @@ saveUISettings <- function(settings)
     yaml::write_yaml(settings, getUISettingsPath(), indent = 4)
 }
 
+importCheckFeaturesSession <- function(fGroups, path)
+{
+    # settings import:
+    # - if file has analyses or feature groups not present in target fGroups: remove
+    # - default for any missing features/feature groups 
+    
+    gNames <- names(fGroups)
+    settings <- readRDS(path)
+    otherGNames <- names(settings$enabledFeatures)
+    commonGNames <- intersect(gNames, otherGNames)
+    commonAnalyses <- intersect(analyses(fGroups), settings$enabledFeatures$analysis)
+    
+    if (length(commonGNames) == 0)
+        warning("Imported session doesn't contain any relevant feature groups!")
+    if (length(commonAnalyses) == 0)
+        warning("Imported session doesn't contain any relevant analyses!")
+
+    # only keep common
+    settings$enabledFGroups <- intersect(gNames, settings$enabledFGroups)
+    settings$enabledFeatures <- settings$enabledFeatures[, c("analysis", commonGNames), drop = FALSE]
+    settings$enabledFeatures <- settings$enabledFeatures[settings$enabledFeatures$analysis %in% commonAnalyses, ,
+                                                         drop = FALSE]
+    
+    # add missing
+    missingFGroups <- setdiff(gNames, otherGNames)
+    settings$enabledFGroups <- c(settings$enabledFGroups, missingFGroups)
+    if (length(missingFGroups) > 0 && nrow(settings$enabledFeatures) > 0)
+        settings$enabledFeatures[, missingFGroups] <- TRUE
+    missingTbl <- data.frame(analysis = setdiff(analyses(fGroups), settings$enabledFeatures$analysis))
+    if (nrow(missingTbl) > 0)
+    {
+        missingTbl[, gNames] <- TRUE
+        if (nrow(settings$enabledFeatures) > 0)
+            settings$enabledFeatures <- rbind(settings$enabledFeatures, missingTbl)
+        else
+            settings$enabledFeatures <- missingTbl
+    }
+    
+    # match analysis order
+    settings$enabledFeatures <- settings$enabledFeatures[match(analyses(fGroups), settings$enabledFeatures$analysis), ]
+    
+    return(settings)
+}
+
 getCheckFeatsUI <- function(settings)
 {
     showOpts <- c("Keep", "Don't keep")
@@ -735,21 +779,21 @@ getCheckFeatsUI <- function(settings)
 }
 
 # setMethod("checkChromatograms", "featureGroups", function(fGroups, mzExpWindow, enabledFGroups)
-checkFeatures <- function(fGroups, session, rtWindow = 30, mzExpWindow = 0.001, force = FALSE)
+checkFeatures <- function(fGroups, session, rtWindow = 30, mzExpWindow = 0.001, fromSession = NULL)
 {
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertString(session, min.chars = 1, add = ac)
+    aapply(checkmate::assertString, . ~ session + fromSession, min.chars = 1, null.ok = c(FALSE, TRUE),
+           fixed = list(add = ac))
     aapply(checkmate::assertNumber, . ~ rtWindow + mzExpWindow, finite = TRUE, lower = 0,
            fixed = list(add = ac))
-    checkmate::assertFlag(force, add = ac)
     checkmate::reportAssertions(ac)
     
     sessionPath <- paste0(session, ".Rds")
     checkmate::assertPathForOutput(sessionPath, overwrite = TRUE, .var.name = "session")
-    
-    if (!force && file.exists(sessionPath))
+    if (!is.null(fromSession))
     {
-        # UNDONE: check compatibility
+        fromSessionPath <- paste0(fromSession, ".Rds")
+        checkmate::assertFileExists(fromSessionPath, "r", .var.name = "fromSession")
     }
     
     anaInfo <- analysisInfo(fGroups)
@@ -780,13 +824,28 @@ checkFeatures <- function(fGroups, session, rtWindow = 30, mzExpWindow = 0.001, 
     
     settings <- getUISettings()
     
+    curSession <- NULL
     if (file.exists(sessionPath))
+    {
+        if (!is.null(fromSession))
+            stop(sprintf("Cannot import session %s from %s: already exists", session, fromSession))
+        
         curSession <- readRDS(sessionPath)
+        if (!setequal(c("analysis", gNames), names(curSession$enabledFeatures)))
+            stop("Session has different feature groups! Please set fromSession to import a session.")
+        if (!setequal(anaInfo$analysis, curSession$enabledFeatures$analysis))
+            stop("Session has different features! Please set fromSession to import a session.")
+    }
     else
     {
-        ef <- data.frame(analysis = anaInfo$analysis)
-        ef[, gNames] <- TRUE
-        curSession <- list(enabledFGroups = gNames, enabledFeatures = ef)
+        if (!is.null(fromSession))
+            curSession <- importCheckFeaturesSession(fGroups, fromSessionPath)
+        else
+        {
+            ef <- data.frame(analysis = anaInfo$analysis)
+            ef[, gNames] <- TRUE
+            curSession <- list(enabledFGroups = gNames, enabledFeatures = ef)
+        }
     }
     
     server <- function(input, output, session)

@@ -9,8 +9,8 @@ RUN --mount=type=cache,id=cache_apt,target=/var/cache/apt --mount=type=cache,id=
         libxml2-dev pngquant openjdk-11-jdk libmagick++-dev pandoc git pngquant texinfo libfribidi-dev \
         zlib1g-dev libxml2-dev libnetcdf-dev libglpk-dev tzdata libnetcdf-dev netcdf-bin ccache && \
     mkdir -p $SETUPDIR && \
-    wget -P $SETUPDIR https://github.com/OpenMS/OpenMS/releases/download/Release2.5.0/OpenMS-2.5.0-Debian-Linux-x86_64.deb && \
-    apt-get install -y --no-install-recommends $SETUPDIR/OpenMS-2.5.0-Debian-Linux-x86_64.deb && \
+    wget -P $SETUPDIR https://abibuilder.informatik.uni-tuebingen.de/archive/openms/OpenMSInstaller/release/2.6.0/OpenMS-2.6.0-Debian-Linux-x86_64.deb && \
+    apt-get install -y --no-install-recommends $SETUPDIR/OpenMS-2.6.0-Debian-Linux-x86_64.deb && \
     rm -rf $SETUPDIR && \
     apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
     echo 'PATH=/home/rstudio/bin:${PATH}' >> /usr/local/lib/R/etc/Renviron && R CMD javareconf
@@ -26,10 +26,10 @@ ENV R_REMOTES_NO_ERRORS_FROM_WARNINGS=true OPENMS_DATA_PATH=/usr/share/OpenMS _R
 
 RUN  mkdir deps && cd deps && \
     wget --progress=dot:mega http://msbi.ipb-halle.de/~cruttkie/metfrag/MetFrag2.4.5-CL.jar && \
-    wget --progress=dot:mega https://bio.informatik.uni-jena.de/repository/dist-release-local/de/unijena/bioinf/ms/sirius/4.5.1/sirius-4.5.1-linux64-headless.zip && \
+    wget --progress=dot:mega https://bio.informatik.uni-jena.de/repository/dist-release-local/de/unijena/bioinf/ms/sirius/4.5.3/sirius-4.5.3-linux64-headless.zip && \
     wget --progress=dot:mega https://zenodo.org/record/3611238/files/PubChemLite_14Jan2020_tier1.csv && \
     wget --progress=dot:mega ftp://newftp.epa.gov/COMPTOX/Sustainable_Chemistry_Data/Chemistry_Dashboard/MetFrag_metadata_files/CompTox_17March2019_SelectMetaData.csv && \
-    unzip sirius-4.5.1-linux64-headless.zip && rm sirius-4.5.1-linux64-headless.zip && cd ~ && \
+    unzip sirius-4.5.3-linux64-headless.zip && rm sirius-4.5.3-linux64-headless.zip && cd ~ && \
     echo 'options(patRoon.path.MetFragCL = "/home/rstudio/deps/MetFrag2.4.5-CL.jar")' >> .Rprofile && \
     echo 'options(patRoon.path.SIRIUS = "/home/rstudio/deps/sirius/bin")' >> .Rprofile && \
     echo 'options(patRoon.path.MetFragCompTox = "/home/rstudio/deps/CompTox_17March2019_SelectMetaData.csv")' >> .Rprofile && \

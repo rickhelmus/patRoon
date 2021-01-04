@@ -39,7 +39,7 @@
       <ul class="nav navbar-nav">
 <li>
   <a href="../index.html">
-    <span class="fa fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -98,7 +98,7 @@
 <ul class="nav navbar-nav navbar-right">
 <li>
   <a href="https://github.com/rickhelmus/patRoon">
-    <span class="fa fa-github fa-lg"></span>
+    <span class="fas fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -112,15 +112,14 @@
 
       
 
-      </header><script src="tutorial_files/accessible-code-block-0.0.1/empty-anchor.js"></script><link href="tutorial_files/anchor-sections-1.0/anchor-sections.css" rel="stylesheet">
-<script src="tutorial_files/anchor-sections-1.0/anchor-sections.js"></script><script src="tutorial_files/htmlwidgets-1.5.3/htmlwidgets.js"></script><script src="tutorial_files/viz-1.8.2/viz.js"></script><link href="tutorial_files/DiagrammeR-styles-0.2/styles.css" rel="stylesheet">
+      </header><script src="tutorial_files/accessible-code-block-0.0.1/empty-anchor.js"></script><script src="tutorial_files/htmlwidgets-1.5.3/htmlwidgets.js"></script><script src="tutorial_files/viz-1.8.2/viz.js"></script><link href="tutorial_files/DiagrammeR-styles-0.2/styles.css" rel="stylesheet">
 <script src="tutorial_files/grViz-binding-1.0.6.1/grViz.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>patRoon tutorial</h1>
                         <h4 class="author">Rick Helmus</h4>
             
-            <h4 class="date">2020-12-15</h4>
+            <h4 class="date">2021-01-04</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/rickhelmus/patRoon/blob/master/vignettes/tutorial.Rmd"><code>vignettes/tutorial.Rmd</code></a></small>
       <div class="hidden name"><code>tutorial.Rmd</code></div>
@@ -152,8 +151,8 @@ p.caption {
 <!-- UNDONE: link to advanced vignette -->
 <p>In this tutorial you will learn how to perform a simple non-target analysis with <code>patRoon</code>. This tutorial is not meant to give a detailed overview of <code>patRoon</code>. Instead, it serves as a quick introduction on how to use <code>patRoon</code> to setup and perform a full non-target analysis workflow.</p>
 <p>The workflow in this tutorial consists of the following steps:</p>
-<div id="htmlwidget-c85a16f1cde129d8a2be" style="width:750px;height:100px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-c85a16f1cde129d8a2be">{"x":{"diagram":"\ndigraph rmarkdown {\ngraph [ rankdir = LR ]\nnode [ shape = box,\n       fixedsize = true,\n       width = 2.2,\n       height = 1,\n       fontsize = 18,\n       fillcolor = darkseagreen1,\n       style = filled ]\n\"New project\" -> Features -> Annotation -> Reporting [ arrowhead = vee ]\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-753966486206f7e313ae" style="width:750px;height:100px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-753966486206f7e313ae">{"x":{"diagram":"\ndigraph rmarkdown {\ngraph [ rankdir = LR ]\nnode [ shape = box,\n       fixedsize = true,\n       width = 2.2,\n       height = 1,\n       fontsize = 18,\n       fillcolor = darkseagreen1,\n       style = filled ]\n\"New project\" -> Features -> Annotation -> Reporting [ arrowhead = vee ]\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 </div>
 <div id="data" class="section level1">
 <h1 class="hasAnchor">
@@ -602,11 +601,11 @@ p.caption {
 <div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/generics.html">as.data.table</a></span><span class="op">(</span><span class="va">compounds</span><span class="op">)</span><span class="op">[</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span> <span class="co"># only show first columns for clarity</span></code></pre></div>
 <pre><code>#&gt;               group explainedPeaks    score neutralMass                               SMILES
-#&gt;    1:  M109_R116_56              3 3.483028    108.0687                    C1=CC=C(C(=C1)N)N
-#&gt;    2:  M109_R116_56              3 3.479076    108.0687                      C1=CC(=CC=C1N)N
-#&gt;    3:  M109_R116_56              2 3.474735    108.0687                        CCC1=NC=CC=N1
-#&gt;    4:  M109_R116_56              2 3.296937    108.0687                        C=CN1CN=CC=C1
-#&gt;    5:  M109_R116_56              3 3.257105    108.0687                        C=CCC1=NC=CN1
+#&gt;    1:  M109_R116_56              3 4.483028    108.0687                    C1=CC=C(C(=C1)N)N
+#&gt;    2:  M109_R116_56              3 4.298278    108.0687                      C1=CC(=CC=C1N)N
+#&gt;    3:  M109_R116_56              3 3.796793    108.0687                      C1=CC=C(C=C1)NN
+#&gt;    4:  M109_R116_56              3 3.347722    108.0687                    C1=CC(=CC(=C1)N)N
+#&gt;    5:  M109_R116_56              3 3.018864    108.0687                      CC1=NC(=CC=C1)N
 #&gt;   ---                                                                                       
 #&gt; 2212: M254_R321_484              3 2.492790    253.0521 CC1=C(C=C(C=C1)S(=O)(=O)NC2=NOC=C2)N
 #&gt; 2213: M254_R321_484              3 2.492776    253.0521 CC1=C(C=CC(=C1)N)S(=O)(=O)NC2=NOC=C2

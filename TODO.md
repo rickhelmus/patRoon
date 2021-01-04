@@ -67,14 +67,8 @@
     - add to EIC tool
 - checkFeatures()
     - decide on final function name (perhaps compatible for future component checker)
-    - report relevant group/feature info in tables
-        - group peak score so it can be used for sorting
-        - retention times should be linked to input unit
-        - configurable columns?
-    - save sessions & make filter
-    - mode: group (topMost=1), rGroup (topMostRGroup=1), feature (topMost=NULL, onlyPresent configurable)
-    - buttons to reset all groups/features
-    - EIC preview dissabled by default? re-rendering table is slow...
+    - peak qualities
+    - EIC preview disabled by default? re-rendering table is slow...
     - filter negate: don't remove kept fGroups if features were changed?  
 - topMostByRGroup: make default? or only for reporting?
 - NEWS

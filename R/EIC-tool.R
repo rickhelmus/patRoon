@@ -580,7 +580,7 @@ getUISettings <- function()
 getDefaultUISettings <- function()
 {
     return(list(retUnit = "sec", featQuantity = "intensity", fGroupQuantity = "average",
-                fGroupColumns = c("retMZ", "EICPreview", "estIDLevel", "overallPeakQuality"),
+                fGroupColumns = c("retMZ", "estIDLevel", "overallPeakQuality"),
                 featureColumns = c("retMZ", "quantity", "overallPeakQuality")))
 }
 

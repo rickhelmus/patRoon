@@ -62,6 +62,7 @@ Imports:
     processx,
     tools,
     MSnbase,
+    Biobase,
     xcms,
     cluster,
     fastcluster,

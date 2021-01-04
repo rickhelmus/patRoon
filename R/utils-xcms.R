@@ -300,8 +300,8 @@ setMethod("getXCMSnExp", "featureGroupsXCMS3", function(obj, verbose)
 
     anaInfo <- analysisInfo(obj)
 
-    if (nrow(pData(obj@xdata)) != length(anaInfo$analysis) ||
-        !all(simplifyAnalysisNames(pData(obj@xdata)$sample_name) == anaInfo$analysis))
+    if (nrow(Biobase::pData(obj@xdata)) != length(anaInfo$analysis) ||
+        !all(simplifyAnalysisNames(Biobase::pData(obj@xdata)$sample_name) == anaInfo$analysis))
         return(callNextMethod(obj, verbose = verbose))
 
     return(obj@xdata)

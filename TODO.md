@@ -128,6 +128,7 @@
         - useSmiles=true
     - SIRIUS
         - Fixed: as.data.table() and possibly others didn't handle empty fragInfos from SIRIUS
+        - More fixes to correctly handle 'adduct fragments'
     - Fixed: as.data.table(compounds, fragments=TRUE) not output anything with missing fragInfo
     - adducts
         - GenForm/MetFragAdducts()

@@ -175,7 +175,7 @@ setMethod("as.data.table", "compounds", function(x, fGroups = NULL, fragments = 
             cnames <- setdiff(names(fragTab), "row")
             setnames(fragTab, cnames, paste0("frag_", cnames))
 
-            return(merge(ct, fragTab, by = "row")[, -"row"])
+            return(merge(ct, fragTab, by = "row", all.x = TRUE)[, -"row"])
         }), idcol = "group", fill = TRUE)
     }
     else

@@ -76,7 +76,10 @@ processSIRIUSCompounds <- function(msFName, outPath, MSMS, database, adduct, top
         if (is.null(results[["fragInfo"]]))
         {
             # warning(sprintf("no fragment info for %s", cmd$gName))
-            results[, fragInfo := list(rep(list(data.table()), nrow(results)))]
+            results[, fragInfo := list(rep(list(data.table(mz = numeric(0), formula = character(0),
+                                                           neutral_loss = character(0), intensity = numeric(0),
+                                                           score = numeric(0), PLIndex = numeric(0))),
+                    nrow(results)))]
             results[, explainedPeaks := 0]
         }
         

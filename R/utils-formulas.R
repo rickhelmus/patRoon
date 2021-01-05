@@ -100,12 +100,17 @@ sortFormula <- function(formula)
     fl <- splitFormulaToList(formula)
     el <- names(fl)
     hasC <- "C" %in% el; hasH <- "H" %in% el
-    el <- el[!el %in% c("C", "H")]
-    el <- el[order(el)]
-    if (hasH)
-        el <- c("H", el)
+    # Hill order: C and H first then alphabetical. If no C: all alphabetical
     if (hasC)
+    {
+        el <- el[!el %in% c("C", "H")]
+        el <- el[order(el)]
+        if (hasH)
+            el <- c("H", el)
         el <- c("C", el)
+    }
+    else
+        el <- el[order(el)]
     return(formulaListToString(fl[el]))
 }
 

@@ -124,6 +124,8 @@
     - MetFrag
         - formula_MF in MF FragInfo
         - useSmiles=true
+    - SIRIUS
+        - Fixed: as.data.table() and possibly others didn't handle empty fragInfos from SIRIUS
     - adducts
         - GenForm/MetFragAdducts()
             - now report generic format

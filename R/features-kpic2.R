@@ -36,12 +36,11 @@ findfeaturesKPIC2 <- function(analysisInfo, kmeans, level = 1000, ..., verbose =
     baseHash <- makeHash(kmeans, level, list(...))
     
     if (verbose)
-    {
         printf("Finding features with KPIC2 for %d analyses ...\n", nrow(analysisInfo))
-        prog <- openProgBar(0, nrow(analysisInfo))
-    }
 
-    allPics <- Map(analysisInfo$analysis, analysisInfo$path, f = function(ana, path)
+    prog <- progressr::progressor(steps = nrow(analysisInfo), enable = verbose)
+
+    allPics <- future.apply::future_Map(analysisInfo$analysis, analysisInfo$path, f = function(ana, path)
     {
         inFile <- getMzMLOrMzXMLAnalysisPath(ana, path)
         hash <- makeHash(baseHash, makeFileHash(inFile))
@@ -55,8 +54,7 @@ findfeaturesKPIC2 <- function(analysisInfo, kmeans, level = 1000, ..., verbose =
         pics <- KPIC::PICsplit(pics) # UNDONE: make optional?
         pics <- KPIC::getPeaks(pics)
         
-        if (verbose)
-            setTxtProgressBar(prog, match(ana, analysisInfo$analysis))
+        prog()
         
         return(pics)
     })
@@ -65,7 +63,6 @@ findfeaturesKPIC2 <- function(analysisInfo, kmeans, level = 1000, ..., verbose =
 
     if (verbose)
     {
-        close(prog)
         printf("Done!\n")
         printFeatStats(ret@features)
     }

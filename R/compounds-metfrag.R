@@ -646,7 +646,8 @@ setMethod("generateCompoundsMetFrag", "featureGroups", function(fGroups, MSPeakL
                        MetFragScoreWeights = scoreWeights,
                        MetFragPreProcessingCandidateFilter = preProcessingFilters,
                        MetFragPostProcessingCandidateFilter = postProcessingFilters,
-                       MaxCandidateLimitToStop = maxCandidatesToStop)
+                       MaxCandidateLimitToStop = maxCandidatesToStop,
+                       UseSmiles = "true")
 
     if (!is.null(chemSpiderToken) && nzchar(chemSpiderToken))
         mfSettings$ChemSpiderToken <- chemSpiderToken

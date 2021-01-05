@@ -121,7 +121,9 @@
 - NEWS
     - [..., reAverage = FALSE] and implications of filtering when setting it to TRUE
     - Fixed Hill ordering: H wasn't alphabetical if no C is present
-    - formula_MF in MF FragInfo
+    - MetFrag
+        - formula_MF in MF FragInfo
+        - useSmiles=true
     - adducts
         - GenForm/MetFragAdducts()
             - now report generic format

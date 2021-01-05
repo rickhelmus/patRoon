@@ -104,7 +104,7 @@ processSIRIUSFormulas <- function(msFName, outPath, adduct, ...)
 #' @rdname formula-generation
 #' @export
 setMethod("generateFormulasSIRIUS", "featureGroups", function(fGroups, MSPeakLists, relMzDev = 5,
-                                                              adduct = "[M+H]+", elements = "CHNOP",
+                                                              adduct = NULL, elements = "CHNOP",
                                                               profile = "qtof", database = NULL, noise = NULL,
                                                               cores = NULL, topMost = 100, extraOptsGeneral = NULL,
                                                               extraOptsFormula = NULL, calculateFeatures = TRUE,
@@ -127,7 +127,7 @@ setMethod("generateFormulasSIRIUS", "featureGroups", function(fGroups, MSPeakLis
     checkmate::assertFlag(splitBatches, add = ac)
     checkmate::reportAssertions(ac)
     
-    adduct <- checkAndToAdduct(adduct)
+    adduct <- checkAndToAdduct(adduct, fGroups)
     gNames <- names(fGroups)
     gCount <- length(fGroups)
     

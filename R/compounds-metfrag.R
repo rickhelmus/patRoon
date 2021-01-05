@@ -186,7 +186,7 @@ cleanFragFormulas <- function(forms)
             else
                 flist[["H"]] <- flist[["H"]] + addHCount
         }
-        return(formulaListToString(flist))
+        return(simplifyFormula(formulaListToString(flist)))
     }))
 }
 
@@ -200,14 +200,15 @@ getMFFragmentInfo <- function(spec, mfResult, adduct)
     fi <- unlist(strsplit(mfResult$FormulasOfExplPeaks, "[;:]")) # split into list with subsequent m/z / formula pairs
 
     ret <- data.table(mz = as.numeric(fi[c(TRUE, FALSE)]),
-                      formula = cleanFragFormulas(fi[c(FALSE, TRUE)]))
+                      formula = cleanFragFormulas(fi[c(FALSE, TRUE)]),
+                      formula_MF = fi[c(FALSE, TRUE)])
     if (!is.null(mfResult[["FragmenterScore_Values"]]))
         ret[, score := as.numeric(unlist(strsplit(mfResult$FragmenterScore_Values, ";")))]
     ionform <- calculateIonFormula(mfResult$MolecularFormula, adduct)
     ret[, neutral_loss := sapply(formula, subtractFormula, formula1 = ionform)]
     ret[, PLIndex := sapply(mz, function(omz) which.min(abs(omz - spec$mz)))]
     ret[, intensity := spec$intensity[PLIndex]]
-    setcolorder(ret, c("mz", "formula", "neutral_loss", "intensity"))
+    setcolorder(ret, c("mz", "formula", "formula_MF", "neutral_loss", "intensity"))
 
     return(ret)
 }
@@ -294,7 +295,6 @@ generateMetFragRunData <- function(fGroups, MSPeakLists, mfSettings, extDB, topM
 
         mfSettings$IonizedPrecursorMass <- gInfo[grp, "mzs"]
         mfSettings$PrecursorIonType <- addChr
-        # mfSettings$NeutralPrecursorMass <- gInfo[grp, "mzs"] - adductMZDelta(add)
         mfSettings$ExperimentalRetentionTimeValue <- gInfo[grp, "rts"] / 60
 
         if (!is.null(identifiers))

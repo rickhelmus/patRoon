@@ -106,24 +106,22 @@ SIRMPPrepareHandler <- function(cmd)
     return(utils::modifyList(cmd, list(command = command, args = bArgs, outPath = outPath, msFNames = msFNames)))
 }
 
-runSIRIUS <- function(precursorMZs, MSPLists, MSMSPLists, resNames, profile, adduct, ppmMax, elements,
+runSIRIUS <- function(precursorMZs, MSPLists, MSMSPLists, resNames, profile, adducts, adductsChr, ppmMax, elements,
                       database, noise, cores, withFingerID, fingerIDDatabase, topMost,
                       extraOptsGeneral, extraOptsFormula, verbose,
                       processFunc, processArgs, splitBatches)
 {
-    ionization <- as.character(adduct, format = "sirius")
-    
     mainArgs <- character()
     if (!is.null(cores))
         mainArgs <- c("--cores", cores)
     if (!is.null(extraOptsGeneral))
         mainArgs <- c(mainArgs, extraOptsGeneral)
     
-    formArgs <- c("-p", profile,
+    formArgs <- c("formula",
+                  "-p", profile,
                   "-e", elements,
                   "--ppm-max", ppmMax,
-                  "-c", topMost,
-                  "-i", ionization)
+                  "-c", topMost)
     
     if (!is.null(database))
         formArgs <- c(formArgs, "-d", database)
@@ -131,10 +129,8 @@ runSIRIUS <- function(precursorMZs, MSPLists, MSMSPLists, resNames, profile, add
         formArgs <- c(formArgs, "-n", noise)
     if (!is.null(extraOptsFormula))
         formArgs <- c(formArgs, extraOptsFormula)
-    
-    args <- c(mainArgs, "formula", formArgs)
-    if (withFingerID)
-        args <- c(args, "structure", "--database", fingerIDDatabase)
+
+    cmpArgs <- if (withFingerID) c("structure", "--database", fingerIDDatabase) else character()
 
     batchn <- 1
     if (splitBatches) 
@@ -142,23 +138,37 @@ runSIRIUS <- function(precursorMZs, MSPLists, MSMSPLists, resNames, profile, add
         mpm <- getOption("patRoon.MP.method", "classic")
         batchn <- if (mpm == "classic") getOption("patRoon.MP.maxProcs") else future::nbrOfWorkers()
     }
-    batches <- splitInNBatches(seq_along(precursorMZs), batchn)
     
-    cmdQueue <- lapply(seq_along(batches), function(bi)
+    # perform SIRIUS batches per adduct: we cannot specify multiple adducts per run
+    retAdduct <- sapply(unique(adductsChr), function(addChr)
     {
-        batch <- batches[[bi]]
-        return(list(args = args, precMZs = precursorMZs[batch], MSPL = MSPLists[batch], MSMSPL = MSMSPLists[batch],
-                    adduct = adduct, processFunc = processFunc, processArgs = processArgs,
-                    logFile = paste0("sirius-batch_", bi, ".txt")))
-    })
+        whichGrps <- which(adductsChr == addChr)
+        batches <- splitInNBatches(whichGrps, batchn)
+        add <- adducts[[match(addChr, adductsChr)]]
+        
+        printf("Annotating %d features with adduct %s...\n", length(whichGrps), addChr)
+        
+        cmdQueue <- lapply(seq_along(batches), function(bi)
+        {
+            batch <- batches[[bi]]
+            fArgs <- c(formArgs, "-i", addChr)
+            return(list(args = c(mainArgs, fArgs, cmpArgs), precMZs = precursorMZs[batch], MSPL = MSPLists[batch],
+                        MSMSPL = MSMSPLists[batch], adduct = add, processFunc = processFunc, processArgs = processArgs,
+                        logFile = paste0("sirius-batch_", bi, "-", addChr, ".txt")))
+        })
+        
+        singular <- length(cmdQueue) == 1
+        ret <- executeMultiProcess(cmdQueue, finishHandler = SIRMPFinishHandler,
+                                   prepareHandler = SIRMPPrepareHandler, printOutput = verbose && singular,
+                                   printError = verbose && singular, showProgress = !singular,
+                                   logSubDir = paste0("sirius_", if (withFingerID) "compounds" else "formulas"))
+        
+        return(setNames(unlist(ret, recursive = FALSE, use.names = FALSE), resNames[whichGrps]))
+    }, simplify = FALSE)
     
-    singular <- length(cmdQueue) == 1
-    ret <- executeMultiProcess(cmdQueue, finishHandler = SIRMPFinishHandler,
-                               prepareHandler = SIRMPPrepareHandler, printOutput = verbose && singular,
-                               printError = verbose && singular, showProgress = !singular,
-                               logSubDir = paste0("sirius_", if (withFingerID) "compounds" else "formulas"))
-
-    return(setNames(unlist(ret, recursive = FALSE, use.names = FALSE), resNames))
+    results <- Reduce(modifyList, retAdduct) # remove adduct dimension
+    results <- results[resNames] # and re-order
+    return(results)
 }
 
 doSIRIUS <- function(fGroups, MSPeakLists, doFeatures, profile, adduct, relMzDev, elements,
@@ -173,7 +183,7 @@ doSIRIUS <- function(fGroups, MSPeakLists, doFeatures, profile, adduct, relMzDev
         return(list())
     
     cacheDB <- openCacheDBScope() # open manually so caching code doesn't need to on each R/W access
-    baseHash <- makeHash(profile, adduct, relMzDev, elements, database, noise,
+    baseHash <- makeHash(profile, relMzDev, elements, database, noise,
                          withFingerID, fingerIDDatabase, topMost, extraOptsGeneral,
                          extraOptsFormula, processArgs)
     setHash <- makeHash(MSPeakLists, baseHash, doFeatures)
@@ -208,7 +218,19 @@ doSIRIUS <- function(fGroups, MSPeakLists, doFeatures, profile, adduct, relMzDev
     flattenedPLists <- flattenedPLists[sapply(flattenedPLists, validPL)]
     flPLMeta <- flPLMeta[name %in% names(flattenedPLists)]
     
-    flPLMeta[, hash := sapply(flattenedPLists, makeHash, baseHash)]
+    if (!is.null(adduct))
+    {
+        grpAdducts <- rep(list(adduct), length(flattenedPLists))
+        grpAdductsChr <- rep(as.character(adduct, format = "sirius"), length(flattenedPLists))
+    }
+    else
+    {
+        grpAdducts <- lapply(annotations(fGroups)[match(flPLMeta$group, group)]$adduct, as.adduct)
+        grpAdductsChr <- makeAlgoAdducts(grpAdducts, flPLMeta$group, "sirius")
+    }
+    names(grpAdducts) <- names(grpAdductsChr) <- flPLMeta$group
+    
+    flPLMeta[, hash := mapply(flattenedPLists, grpAdductsChr, FUN = makeHash, MoreArgs = list(baseHash))]
     if (is.null(cachedSet))
         saveCacheSet(cacheName, flPLMeta$hash, setHash, cacheDB)
     
@@ -225,15 +247,16 @@ doSIRIUS <- function(fGroups, MSPeakLists, doFeatures, profile, adduct, relMzDev
         }, simplify = FALSE))
         
         flPLMeta[, cached := hash %in% names(cachedResults)]
-        doPLists <- flattenedPLists[!flPLMeta$cached]
+        doWhich <- which(!flPLMeta$cached)
         
-        if (length(doPLists) > 0)
+        if (length(doWhich) > 0)
         {
+            doPLists <- flattenedPLists[doWhich]
             plmzs <- lapply(doPLists, function(pl) pl[["MS"]][precursor == TRUE, mz])
             mspls <- lapply(doPLists, "[[", "MS")
             msmspls <- lapply(doPLists, "[[", "MSMS")
-            
-            allResults <- runSIRIUS(plmzs, mspls, msmspls, flPLMeta[cached == FALSE]$name, profile, adduct,
+            gn <- flPLMeta$name[doWhich]
+            allResults <- runSIRIUS(plmzs, mspls, msmspls, gn, profile, grpAdducts[gn], grpAdductsChr[gn],
                                     relMzDev, elements, database, noise, cores, withFingerID, fingerIDDatabase, topMost,
                                     extraOptsGeneral, extraOptsFormula, verbose, processFunc, processArgs, splitBatches)
         }

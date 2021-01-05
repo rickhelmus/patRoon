@@ -153,6 +153,7 @@
     - update/check version nr mentioned in filter() for MSPeakLists
     - explain xlim/ylim behavior for annotations/mols for plotSpec()
     - update/add aliases
+    - SIRIUS: batch calculations done per adduct
 - tests
     - handle/test empty objects
     - test DA algorithms

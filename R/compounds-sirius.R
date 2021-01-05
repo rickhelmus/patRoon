@@ -111,7 +111,7 @@ processSIRIUSCompounds <- function(msFName, outPath, MSMS, database, adduct, top
 #'
 #' @rdname compound-generation
 #' @export
-setMethod("generateCompoundsSIRIUS", "featureGroups", function(fGroups, MSPeakLists, relMzDev = 5, adduct = "[M+H]+",
+setMethod("generateCompoundsSIRIUS", "featureGroups", function(fGroups, MSPeakLists, relMzDev = 5, adduct = NULL,
                                                                elements = "CHNOP",
                                                                profile = "qtof", formulaDatabase = NULL,
                                                                fingerIDDatabase = "pubchem", noise = NULL, errorRetries = 2,
@@ -134,7 +134,7 @@ setMethod("generateCompoundsSIRIUS", "featureGroups", function(fGroups, MSPeakLi
     checkmate::assertFlag(splitBatches, add = ac)
     checkmate::reportAssertions(ac)
 
-    adduct <- checkAndToAdduct(adduct)
+    adduct <- checkAndToAdduct(adduct, fGroups)
     if (is.null(fingerIDDatabase))
         fingerIDDatabase <- if (!is.null(formulaDatabase)) formulaDatabase else "pubchem"
 

@@ -10,7 +10,7 @@ processSIRIUSFormulas <- function(msFName, outPath, adduct, ...)
     noResult <- forms <- data.table(neutral_formula = character(0), formula = character(0),
                                     adduct = character(0), score = numeric(0), MSMSScore = numeric(0),
                                     isoScore = numeric(0), byMSMS = logical(0),
-                                    frag_neutral_formula = character(0), frag_formula = character(0),
+                                    frag_formula = character(0), frag_formula_SIR = character(0),
                                     frag_mz = numeric(0), frag_formula_mz = numeric(0), frag_intensity = numeric(0),
                                     neutral_loss = character(0), explainedPeaks = integer(0), explainedIntensity = numeric(0))
     
@@ -39,10 +39,27 @@ processSIRIUSFormulas <- function(msFName, outPath, adduct, ...)
                 fragInfo <- fread(ff)
                 setnames(fragInfo,
                          c("mz", "intensity", "exactmass", "formula"),
-                         c("frag_mz", "frag_intensity", "frag_formula_mz", "frag_neutral_formula"))
+                         c("frag_mz", "frag_intensity", "frag_formula_mz", "frag_formula_SIR"))
                 fragInfo[, rel.intensity := NULL]
-                fragInfo[, ionization := NULL]
+                fragInfo[, ionization := gsub(" ", "", ionization)]
                 fragInfo[, neutral_adduct_formula := getFormulaFromSiriusFragFile(ff)]
+                
+                # sirius neutralizes fragments, make them ion again
+                if (!is.null(fragInfo[["implicitAdduct"]]))
+                    ionImpAdducts <- ifelse(nzchar(fragInfo$implicitAdduct),
+                                            mapply(paste0("+", fragInfo$implicitAdduct, "]"), fragInfo$ionization,
+                                                   FUN = sub, MoreArgs = list(pattern = "\\]")),
+                                            fragInfo$ionization)
+                else
+                    ionImpAdducts <- fragInfo$ionization
+                ionImpAdducts <- lapply(ionImpAdducts, as.adduct, format = "sirius")
+                fragInfo[, frag_formula := mapply(frag_formula_SIR, ionImpAdducts, FUN = calculateIonFormula)]
+                if (!is.null(fragInfo[["implicitAdduct"]]))
+                {
+                    # 'correct' formula masses: SIRIUS subtract implicit adduct from it
+                    fragInfo[nzchar(implicitAdduct), frag_formula_mz := frag_formula_mz +
+                                 sapply(implicitAdduct, function(a) rcdk::get.formula(a)@mass)]
+                }
                 return(fragInfo)
             }))
             
@@ -50,7 +67,6 @@ processSIRIUSFormulas <- function(msFName, outPath, adduct, ...)
             forms <- merge(forms, frags, by = "neutral_adduct_formula")
             
             forms[, formula := calculateIonFormula(neutral_formula, ..adduct)]
-            forms[, frag_formula := calculateIonFormula(frag_neutral_formula, ..adduct)]
             forms[, neutral_loss := as.character(Vectorize(subtractFormula)(formula, frag_formula))]
             forms[, byMSMS := TRUE]
             forms[, rank := NULL]
@@ -62,10 +78,11 @@ processSIRIUSFormulas <- function(msFName, outPath, adduct, ...)
             forms <- forms[frag_intensity != 0 | formula != frag_formula]
             
             # set nice column order
-            setcolorder(forms, c("neutral_formula", "formula", "neutral_adduct_formula", "formula_mz", "error", "error_frag_median",
-                                 "error_frag_median_abs", "adduct", "score", "MSMSScore", "isoScore", "byMSMS",
-                                 "frag_neutral_formula", "frag_formula", "frag_mz", "frag_formula_mz", "frag_intensity", "neutral_loss",
-                                 "explainedPeaks", "explainedIntensity"))
+            setcolorder(forms, c("neutral_formula", "formula", "neutral_adduct_formula", "formula_mz", "error",
+                                 "error_frag_median", "error_frag_median_abs", "adduct", "score", "MSMSScore",
+                                 "isoScore", "byMSMS", "frag_formula", "frag_formula_SIR",
+                                 "frag_mz", "frag_formula_mz", "frag_intensity", "neutral_loss", "explainedPeaks",
+                                 "explainedIntensity"))
             
             forms <- rankFormulaTable(forms)
         }

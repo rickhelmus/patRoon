@@ -63,8 +63,8 @@ makeAlgoAdducts <- function(adducts, gNames, format)
         if (is.na(addChr))
         {
             addChr <- if (add@charge < 0) "M-H" else "M+H"
-            warning(sprintf("Changing the adduct for group %s from %s to %s because it is not supported by GenForm",
-                            grp, as.character(add), if (add@charge < 0) "[M-H]-" else "[M+H]+"))
+            warning(sprintf("Changing the adduct for group %s from %s to %s because it is not supported by %s",
+                            grp, as.character(add), if (add@charge < 0) "[M-H]-" else "[M+H]+", format))
         }
         return(addChr)
     }))
@@ -214,7 +214,7 @@ calculateIonFormula <- function(formula, adduct)
             f <- Reduce(addFormula, adduct@add, f)
         if (length(adduct@sub) > 0)
             f <- Reduce(subtractFormula, adduct@sub, f)
-        return(f)
+        return(simplifyFormula(f))
     }, USE.NAMES = FALSE)
 }
 
@@ -239,6 +239,6 @@ calculateNeutralFormula <- function(formula, adduct)
             fl <- fl / adduct@molMult
             f <- formulaListToString(fl)
         }
-        return(f)
+        return(simplifyFormula(f))
     }, USE.NAMES = FALSE)
 }

@@ -34,6 +34,7 @@ processSIRIUSFormulas <- function(msFName, outPath, adduct, ...)
                      c("neutral_formula", "neutral_adduct_formula", "score", "MSMSScore", "isoScore",
                        "explainedPeaks", "error_frag_median", "error_frag_median_abs", "error"))
             
+            ionImpAdductsCached <- makeEmptyListNamed(list())
             frags <- rbindlist(lapply(fragFiles, function(ff)
             {
                 fragInfo <- fread(ff)
@@ -52,7 +53,13 @@ processSIRIUSFormulas <- function(msFName, outPath, adduct, ...)
                                             fragInfo$ionization)
                 else
                     ionImpAdducts <- fragInfo$ionization
-                ionImpAdducts <- lapply(ionImpAdducts, as.adduct, format = "sirius")
+                
+                notCached <- setdiff(ionImpAdducts, names(ionImpAdductsCached))
+                if (length(notCached) > 0)
+                    ionImpAdductsCached <<- c(ionImpAdductsCached, sapply(notCached, as.adduct, format = "sirius",
+                                                                          simplify = FALSE))
+                ionImpAdducts <- ionImpAdductsCached[ionImpAdducts]
+
                 fragInfo[, frag_formula := mapply(frag_formula_SIR, ionImpAdducts, FUN = calculateIonFormula)]
                 if (!is.null(fragInfo[["implicitAdduct"]]))
                 {

@@ -1,3 +1,6 @@
+#' @include utils.R
+NULL
+
 #' Adduct utilities
 #'
 #' Several utility functions to work with adducts.
@@ -73,6 +76,133 @@ makeAlgoAdducts <- function(adducts, gNames, format)
     return(ret)
 }
 
+# NOTE: this and below two functions are split to separate memoised functions to retain proper ref docs
+doAsAdduct <- memoise(function(x, format, isPositive)
+{
+    if (is(x, "adduct"))
+        return(x)
+    if (is.na(x))
+        return(x)
+    
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertChoice(format, c("generic", "sirius", "genform", "metfrag")) # don't add: this should fail immediately
+    if (format == "metfrag")
+    {
+        checkmate::assert(checkmate::checkInt(x),
+                          checkmate::checkString(x, min.chars = 1),
+                          .var.name = "x")
+        if (is.numeric(x) && x == 0)
+            checkmate::assertFlag(isPositive, add = ac)
+    }
+    else
+        checkmate::assertString(x, min.chars = 1, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    if (format == "generic" || format == "sirius")
+    {
+        if (format == "generic" && x == "[M]") # special case
+        {
+            mult <- 1; charge <- 0; adds <- subs <- character()
+        }
+        else
+        {
+            if (!grepl("^\\[.+\\].*[\\+\\-]{1}", x))
+                stop("Wrong format! (forgot brackets or charge?)")
+            
+            if (format == "sirius")
+                mult <- charge <- 1
+            else
+            {
+                mult <- as.numeric(sub("^\\[([0-9]*)M.*", "\\1", x))
+                if (is.na(mult))
+                    mult <- 1
+                charge <- as.numeric(sub(".*\\]([0-9]*)[\\+\\-]{1}$", "\\1", x))
+                if (is.na(charge))
+                    charge <- 1
+            }
+            
+            adds <- sub("\\+", "", unlist(regmatches(x, gregexpr("[\\+]{1}[[:alnum:]]+", x))))
+            subs <- sub("\\-", "", unlist(regmatches(x, gregexpr("[\\-]{1}[[:alnum:]]+", x))))
+            if (endsWith(x, "-"))
+                charge <- -charge
+        }
+    }
+    else if (format == "genform")
+    {
+        gfadds <- getAdductTable("genform")[adduct == x]
+        if (nrow(gfadds) == 0)
+            stop("Invalid adduct for GenForm! See GenFormAdducts() for valid options.")
+        
+        gfadds <- gfadds[1] # in case there are multiple hits
+        adds <- gfadds$add; subs <- gfadds$sub; charge <- gfadds$charge; mult <- gfadds$molMult
+    }
+    else if (format == "metfrag")
+    {
+        mult <- 1
+        if (is.numeric(x))
+        {
+            if (x == 0)
+            {
+                # molecular ion is twice in the list (both polarities)
+                cha <- if (isPositive) 1 else -1
+                mfadds <- getAdductTable("metfrag")[adduct_mode == x & charge == cha]
+            }
+            else
+                mfadds <- getAdductTable("metfrag")[adduct_mode == x]
+        }
+        else
+            mfadds <- getAdductTable("metfrag")[adduct_type == x]
+        
+        if (nrow(mfadds) == 0)
+            stop("Invalid adduct for MetFrag! See MetFragAdducts() for valid options.")
+        
+        mfadds <- mfadds[1] # in case there are multiple hits
+        adds <- mfadds$add; subs <- mfadds$sub; charge <- mfadds$charge
+    }
+    
+    adds <- adds[nzchar(adds)]; subs <- subs[nzchar(subs)]
+    
+    return(adduct(add = adds, sub = subs, charge = charge, molMult = mult))
+})
+
+doCalculateIonFormula <- memoise(function(formula, adduct)
+{
+    checkmate::assertCharacter(formula, min.chars = 1)
+    adduct <- checkAndToAdduct(adduct)
+    
+    sapply(formula, function(f)
+    {
+        if (adduct@molMult > 1)
+            f <- Reduce(addFormula, rep(f, adduct@molMult-1), f)
+        if (length(adduct@add) > 0)
+            f <- Reduce(addFormula, adduct@add, f)
+        if (length(adduct@sub) > 0)
+            f <- Reduce(subtractFormula, adduct@sub, f)
+        return(simplifyFormula(f))
+    }, USE.NAMES = FALSE)
+})
+
+doCalculateNeutralFormula <- memoise(function(formula, adduct)
+{
+    checkmate::assertCharacter(formula, min.chars = 1)
+    adduct <- checkAndToAdduct(adduct)
+    
+    sapply(formula, function(f)
+    {
+        if (length(adduct@add) > 0)
+            f <- Reduce(subtractFormula, adduct@add, f)
+        if (length(adduct@sub) > 0)
+            f <- Reduce(addFormula, adduct@sub, f)
+        if (adduct@molMult > 1)
+        {
+            fl <- splitFormulaToList(f)
+            fl <- fl / adduct@molMult
+            f <- formulaListToString(fl)
+        }
+        return(simplifyFormula(f))
+    }, USE.NAMES = FALSE)
+})
+
 #' @details \code{GenFormAdducts} returns a table with information on adducts
 #'   supported by \command{GenForm}.
 #' @rdname adduct-utils
@@ -109,136 +239,16 @@ MetFragAdducts <- function() copy(adductsMF)
 #'   \code{numeric} identifier.
 #' @rdname adduct-utils
 #' @export
-as.adduct <- function(x, format = "generic", isPositive = NULL)
-{
-    if (is(x, "adduct"))
-        return(x)
-    if (is.na(x))
-        return(x)
-
-    ac <- checkmate::makeAssertCollection()
-    checkmate::assertChoice(format, c("generic", "sirius", "genform", "metfrag")) # don't add: this should fail immediately
-    if (format == "metfrag")
-    {
-        checkmate::assert(checkmate::checkInt(x),
-                          checkmate::checkString(x, min.chars = 1),
-                          .var.name = "x")
-        if (is.numeric(x) && x == 0)
-            checkmate::assertFlag(isPositive, add = ac)
-    }
-    else
-        checkmate::assertString(x, min.chars = 1, add = ac)
-    checkmate::reportAssertions(ac)
-
-    if (format == "generic" || format == "sirius")
-    {
-        if (format == "generic" && x == "[M]") # special case
-        {
-            mult <- 1; charge <- 0; adds <- subs <- character()
-        }
-        else
-        {
-            if (!grepl("^\\[.+\\].*[\\+\\-]{1}", x))
-                stop("Wrong format! (forgot brackets or charge?)")
-            
-            if (format == "sirius")
-                mult <- charge <- 1
-            else
-            {
-                mult <- as.numeric(sub("^\\[([0-9]*)M.*", "\\1", x))
-                if (is.na(mult))
-                    mult <- 1
-                charge <- as.numeric(sub(".*\\]([0-9]*)[\\+\\-]{1}$", "\\1", x))
-                if (is.na(charge))
-                    charge <- 1
-            }
-            
-            adds <- sub("\\+", "", unlist(regmatches(x, gregexpr("[\\+]{1}[[:alnum:]]+", x))))
-            subs <- sub("\\-", "", unlist(regmatches(x, gregexpr("[\\-]{1}[[:alnum:]]+", x))))
-            if (endsWith(x, "-"))
-                charge <- -charge
-        }
-    }
-    else if (format == "genform")
-    {
-        gfadds <- getAdductTable("genform")[adduct == x]
-        if (nrow(gfadds) == 0)
-            stop("Invalid adduct for GenForm! See GenFormAdducts() for valid options.")
-
-        gfadds <- gfadds[1] # in case there are multiple hits
-        adds <- gfadds$add; subs <- gfadds$sub; charge <- gfadds$charge; mult <- gfadds$molMult
-    }
-    else if (format == "metfrag")
-    {
-        mult <- 1
-        if (is.numeric(x))
-        {
-            if (x == 0)
-            {
-                # molecular ion is twice in the list (both polarities)
-                cha <- if (isPositive) 1 else -1
-                mfadds <- getAdductTable("metfrag")[adduct_mode == x & charge == cha]
-            }
-            else
-                mfadds <- getAdductTable("metfrag")[adduct_mode == x]
-        }
-        else
-            mfadds <- getAdductTable("metfrag")[adduct_type == x]
-
-        if (nrow(mfadds) == 0)
-            stop("Invalid adduct for MetFrag! See MetFragAdducts() for valid options.")
-
-        mfadds <- mfadds[1] # in case there are multiple hits
-        adds <- mfadds$add; subs <- mfadds$sub; charge <- mfadds$charge
-    }
-
-    adds <- adds[nzchar(adds)]; subs <- subs[nzchar(subs)]
-
-    return(adduct(add = adds, sub = subs, charge = charge, molMult = mult))
-}
+as.adduct <- function(x, format = "generic", isPositive = NULL) doAsAdduct(x, format, isPositive)
 
 #' @details \code{calculateIonFormula} Converts one or more neutral formulae to
 #'   adduct ions.
 #' @rdname adduct-utils
 #' @export
-calculateIonFormula <- function(formula, adduct)
-{
-    checkmate::assertCharacter(formula, min.chars = 1)
-    adduct <- checkAndToAdduct(adduct)
-
-    sapply(formula, function(f)
-    {
-        if (adduct@molMult > 1)
-            f <- Reduce(addFormula, rep(f, adduct@molMult-1), f)
-        if (length(adduct@add) > 0)
-            f <- Reduce(addFormula, adduct@add, f)
-        if (length(adduct@sub) > 0)
-            f <- Reduce(subtractFormula, adduct@sub, f)
-        return(simplifyFormula(f))
-    }, USE.NAMES = FALSE)
-}
+calculateIonFormula <- function(formula, adduct) doCalculateIonFormula(formula, adduct)
 
 #' @details \code{calculateNeutralFormula} Converts one or more adduct ions to
 #'   neutral formulae.
 #' @rdname adduct-utils
 #' @export
-calculateNeutralFormula <- function(formula, adduct)
-{
-    checkmate::assertCharacter(formula, min.chars = 1)
-    adduct <- checkAndToAdduct(adduct)
-
-    sapply(formula, function(f)
-    {
-        if (length(adduct@add) > 0)
-            f <- Reduce(subtractFormula, adduct@add, f)
-        if (length(adduct@sub) > 0)
-            f <- Reduce(addFormula, adduct@sub, f)
-        if (adduct@molMult > 1)
-        {
-            fl <- splitFormulaToList(f)
-            fl <- fl / adduct@molMult
-            f <- formulaListToString(fl)
-        }
-        return(simplifyFormula(f))
-    }, USE.NAMES = FALSE)
-}
+calculateNeutralFormula <- function(formula, adduct) doCalculateNeutralFormula(formula, adduct)

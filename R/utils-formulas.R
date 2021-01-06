@@ -1,33 +1,36 @@
-splitFormulaToList <- function(formula)
+#' @include utils.R
+NULL
+
+splitFormulaToList <- memoise(function(formula)
 {
     if (!nzchar(formula))
         return(numeric())
-    
+        
     # NOTE: dash ('-') added to [:digit:] to allow minus sign (which MF manages to report once in a while...)
-
+    
     # split string in pairs of elements+element counts (and optionally isotopic info), e.g.: { "C30", "^13C2" }
     spltform <- unlist(regmatches(formula, gregexpr("(\\^[[:digit:]-]+)?[[:upper:]]{1}[[:lower:]]?[[:digit:]-]*", formula)))
-
+    
     # add '1' to pairs without a count, e.g. "Br" --> "Br1"
     reglist <- regexpr("[[:digit:]-]+$", spltform)
     spltform[reglist == -1] <- paste0(spltform[reglist == -1], "1")
-
+    
     # extract all element counts
     ret <- as.numeric(unlist(regmatches(spltform, gregexpr("[[:digit:]-]+$", spltform))))
-
+    
     # extract all elements (ie remove all counts)
     names(ret) <- gsub("[[:digit:]-]+$", "", spltform)
-
-    if (any(duplicated(names(ret))))
+    
+    if (anyDuplicated(names(ret)) != 0)
     {
         unel <- unique(names(ret))
         sortedr <- numeric()
         sortedr[unel] <- sapply(unel, function(e) sum(ret[names(ret) == e]))
         ret <- sortedr
     }
-
+    
     return(ret)
-}
+})
 
 getElements <- function(formula, elements)
 {
@@ -49,8 +52,7 @@ formulaListToString <- function(formlist)
     el <- names(formlist)
 
     # make element - element count pairs (don't put element counts between 0-1)
-    l <- lapply(el, function(e) { if (formlist[e] < 0 || formlist[e] > 1) paste0(e, formlist[e]) else e })
-    return(do.call(paste0, l))
+    return(paste0(fifelse(formlist < 0 | formlist > 1, paste0(el, formlist), el), collapse = ""))
 }
 
 subtractFormula <- function(formula1, formula2)

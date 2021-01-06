@@ -25,7 +25,6 @@ syncFormulasSetObjects <- function(formulasSet, makeCons)
     }
     
     formulasSet@scoreRanges <- formulasSet@scoreRanges[groupNames(formulasSet)]
-    formulasSet@adducts <- formulasSet@adducts[sets(formulasSet)]
     
     return(formulasSet)
 }
@@ -147,9 +146,8 @@ generateFormulasSet <- function(fGroupsSet, generator, ..., setArgs, setThreshol
     # UNDONE: mention that adduct argument is automatically set
 
     unsetFGroupsList <- sapply(sets(fGroupsSet), unset, obj = fGroupsSet, simplify = FALSE)
-    setObjects <- mapply(unsetFGroupsList, adducts(fGroupsSet), setArgs,
-                         FUN = function(fg, a, sa) do.call(generator, c(list(fGroups = fg, adduct = a, ...), sa)),
-                         SIMPLIFY = FALSE)
+    setObjects <- Map(unsetFGroupsList, setArgs,
+                      f = function(fg, sa) do.call(generator, c(list(fGroups = fg, ...), sa)))
     
     combFormulas <- Reduce(modifyList, lapply(setObjects, formulaTable, features = TRUE))
     
@@ -157,12 +155,9 @@ generateFormulasSet <- function(fGroupsSet, generator, ..., setArgs, setThreshol
     groupForms <- generateGroupFormulasByConsensus(groupFormsList, setThreshold, names(fGroupsSet),
                                                    "set", "setCoverage")
     
-    ret <- formulasSet(adducts = adducts(fGroupsSet), setObjects = setObjects,
-                       origFGNames = names(fGroupsSet), setThreshold = setThreshold,
+    return(formulasSet(setObjects = setObjects, origFGNames = names(fGroupsSet), setThreshold = setThreshold,
                        formulas = groupForms, featureFormulas = combFormulas,
-                       algorithm = makeSetAlgorithm(setObjects))
-    
-    return(ret)
+                       algorithm = makeSetAlgorithm(setObjects)))
 }
 
 formulasUnset <- setClass("formulasUnset", contains = "formulas")

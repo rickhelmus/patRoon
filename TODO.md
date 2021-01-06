@@ -96,7 +96,6 @@
 			- needs to re-group afterwards
 			    - make general reGroup() method, that uses stored settings from groupFeatures()?
 	    - prefer adducts based on MS/MS? eg handy for Na/K adducts
-	- remove adduct slots
 	- makeSet()
 	    - fGroups: also support method via comparison?
 	- formula/compounds: get adduct from gInfo if present
@@ -243,6 +242,7 @@
 - do something about negative H explained fragments by MF?
 - SusDat MF support
 - MetFrag: auto-include suspect results if suspectListScore is selected?
+- SIRIUS: message/progress bar when processing a large batch in singular mode?
 
 
 ## formulas

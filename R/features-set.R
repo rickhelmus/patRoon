@@ -118,7 +118,7 @@ setMethod("as.data.table", "featuresSet", function(x, neutralized = TRUE)
 #' @export
 setMethod("[", c("featuresSet", "ANY", "missing", "missing"), function(x, i, ..., sets = NULL, drop = TRUE)
 {
-    assertSets(x, sets)
+    assertSets(x, sets, TRUE)
     
     if (!is.null(sets) && length(sets) > 0)
         i <- mergeAnaSubsetArgWithSets(i, sets, analysisInfo(x))
@@ -159,7 +159,7 @@ setMethod("filter", "featuresSet", function(obj, ..., negate = FALSE, sets = NUL
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertFlag(negate, add = ac)
-    assertSets(obj, sets, add = ac)
+    assertSets(obj, sets, TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
     if (!is.null(sets) && length(sets) > 0)
@@ -187,11 +187,11 @@ setMethod("filter", "featuresSet", function(obj, ..., negate = FALSE, sets = NUL
 
 # UNDONE: mention that object will be unset
 #' @export
-setMethod("getXCMSSet", "featuresSet", function(obj, ..., sets = NULL) getXCMSSet(unset(obj, sets), ...))
+setMethod("getXCMSSet", "featuresSet", function(obj, ..., set) getXCMSSet(unset(obj, set), ...))
 
 # UNDONE: mention that object will be unset
 #' @export
-setMethod("getXCMSnExp", "featuresSet", function(obj, ..., sets = NULL) getXCMSnExp(unset(obj, sets), ...))
+setMethod("getXCMSnExp", "featuresSet", function(obj, ..., set) getXCMSnExp(unset(obj, set), ...))
 
 #' @export
 setMethod("makeSet", "features", function(obj, ..., adducts, labels)
@@ -211,13 +211,10 @@ setMethod("makeSet", "features", function(obj, ..., adducts, labels)
 })
 
 featuresUnset <- setClass("featuresUnset", contains = "features")
-setMethod("unset", "featuresSet", function(obj, sets)
+setMethod("unset", "featuresSet", function(obj, set)
 {
-    assertSets(obj, sets)
-    
-    if (!is.null(sets) && length(sets) > 0)
-        obj <- obj[, sets = sets]
-
+    assertSets(obj, set, FALSE)
+    obj <- obj[, sets = set]
     return(featuresUnset(features = obj@ionizedFeatures, analysisInfo = analysisInfo(obj),
                          algorithm = paste0(algorithm(obj), "_unset")))
 })

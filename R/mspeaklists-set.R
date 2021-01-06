@@ -77,7 +77,7 @@ setMethod("[", c("MSPeakListsSet", "ANY", "ANY", "missing"), function(x, i, j, .
                                                                       sets = NULL, drop = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
-    assertSets(x, sets, add = ac)
+    assertSets(x, sets, TRUE, add = ac)
     checkmate::assertFlag(reAverage, add = ac)
     checkmate::reportAssertions(ac)
 
@@ -138,7 +138,7 @@ setMethod("filter", "MSPeakListsSet", function(obj, ..., negate = FALSE, sets = 
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertFlag(negate, add = ac)
-    assertSets(obj, sets, add = ac)
+    assertSets(obj, sets, TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
     if (!is.null(sets) && length(sets) > 0)
@@ -211,21 +211,18 @@ generateMSPeakListsSet <- function(fGroupsSet, generator, ...)
 }
 
 MSPeakListsUnset <- setClass("MSPeakListsUnset", contains = "MSPeakLists")
-setMethod("unset", "MSPeakListsSet", function(obj, sets)
+setMethod("unset", "MSPeakListsSet", function(obj, set)
 {
-    assertSets(obj, sets)
-    
-    if (!is.null(sets) && length(sets) > 0)
-        obj <- obj[, sets = sets]
-    
-    assertEqualAdducts(adducts(obj))
+    assertSets(obj, set, FALSE)
+    obj <- obj[, sets = set]
     
     avArgs <- if (length(obj@setObjects) > 0) obj@setObjects[[1]]@avgPeakListArgs else list()
     
-    # only re-average if >1 sets, otherwise just copy the setObject
-    if (length(obj@setObjects) > 1)
-        return(MSPeakListsUnset(peakLists = obj@peakLists, metadata = list(), avgPeakListArgs = avArgs,
-                                origFGNames = obj@origFGNames, algorithm = paste0(algorithm(obj), "_unset")))
+    # # only re-average if >1 sets, otherwise just copy the setObject
+    # UNDONE: re-enable if unset will support >1 sets again...
+    # if (length(obj@setObjects) > 1)
+    #     return(MSPeakListsUnset(peakLists = obj@peakLists, metadata = list(), avgPeakListArgs = avArgs,
+    #                             origFGNames = obj@origFGNames, algorithm = paste0(algorithm(obj), "_unset")))
     
     return(MSPeakListsUnset(peakLists = obj@setObjects[[1]]@peakLists,
                             averagedPeakLists = averagedPeakLists(obj@setObjects[[1]]),

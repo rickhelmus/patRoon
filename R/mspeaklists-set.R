@@ -10,7 +10,6 @@ syncMSPeakListsSetObjects <- function(MSPeakListsSet)
     
     MSPeakListsSet@analysisInfo <-
         MSPeakListsSet@analysisInfo[MSPeakListsSet@analysisInfo$analysis %in% names(peakLists(MSPeakListsSet)), ]
-    MSPeakListsSet@adducts <- MSPeakListsSet@adducts[names(MSPeakListsSet@setObjects)]
     
     return(MSPeakListsSet)
 }
@@ -201,7 +200,7 @@ generateMSPeakListsSet <- function(fGroupsSet, generator, ...)
     combPL <- Reduce(modifyList, lapply(setObjects, peakLists))
 
     # UNDONE: set metadata?
-    ret <- MSPeakListsSet(adducts = adducts(fGroupsSet), setObjects = setObjects,
+    ret <- MSPeakListsSet(setObjects = setObjects,
                           analysisInfo = analysisInfo(fGroupsSet),
                           peakLists = combPL, metadata = list(),
                           origFGNames = names(fGroupsSet),

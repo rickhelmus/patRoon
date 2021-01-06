@@ -193,6 +193,8 @@ setMethod("filter", "featureGroupsScreeningSet", function(obj, ..., onlyHits = N
 setMethod("screenSuspects", "featureGroupsSet", function(fGroups, suspects, rtWindow, mzWindow,
                                                          adduct, skipInvalid, onlyHits)
 {
+    # UNDONE: update
+    
     # UNDONE: remove argument (and from generic?)
     if (!is.null(adduct))
         stop("adduct argument not supported for sets!")

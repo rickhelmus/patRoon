@@ -7,7 +7,6 @@ featureGroupsSet <- setClass("featureGroupsSet",
                              contains = "featureGroups")
 
 setMethod("sets", "featureGroupsSet", function(obj) sets(getFeatures(obj)))
-setMethod("adducts", "featureGroupsSet", function(obj) adducts(getFeatures(obj)))
 
 setMethod("removeGroups", "featureGroupsSet", function(fGroups, indices)
 {
@@ -19,7 +18,7 @@ setMethod("removeGroups", "featureGroupsSet", function(fGroups, indices)
     fGroups <- callNextMethod()
     
     if (nrow(ann) > 0)
-        fGroups@annotations <- ann[set %in% sets(fGroups)]
+        fGroups@annotations <- ann[set %in% sets(fGroups) & group %in% names(fGroups)]
     
     return(fGroups)
 })
@@ -30,7 +29,6 @@ setMethod("show", "featureGroupsSet", function(object)
 {
     callNextMethod(object)
     printf("Sets: %s\n", paste0(sets(object), collapse = ", "))
-    printf("Adducts: %s\n", paste0(sapply(adducts(getFeatures(object)), as.character), collapse = ", "))
 })
 
 #' @describeIn featureGroupsSet Obtain feature information (see \code{\link{features}}).
@@ -284,6 +282,6 @@ setMethod("unset", "featureGroupsSet", function(obj, set)
     gInfo$mzs <- gInfo$mzs + addMZs[ann$adduct]
     
     return(featureGroupsUnset(groups = groupTable(obj), groupInfo = gInfo, analysisInfo = analysisInfo(obj),
-                              features = unset(getFeatures(obj, set)), ftindex = groupFeatIndex(obj),
+                              features = unset(getFeatures(obj), set), ftindex = groupFeatIndex(obj),
                               annotations = ann[, -"set"], algorithm = paste0(algorithm(obj), "_unset")))
 })

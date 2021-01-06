@@ -60,7 +60,7 @@ doMakeFeaturesSet <- function(featuresList, adducts)
     combFeatures <- Reduce(modifyList, lapply(neutralizedFeatures, featureTable))
     combFeaturesIon <- Reduce(modifyList, lapply(featuresList, featureTable))
     
-    return(featuresSet(adducts = adducts, setObjects = featuresList, ionizedFeatures = combFeaturesIon,
+    return(featuresSet(setObjects = featuresList, ionizedFeatures = combFeaturesIon,
                        features = combFeatures, analysisInfo = combAnaInfo, algorithm = makeSetAlgorithm(featuresList)))
 }
 
@@ -127,7 +127,6 @@ setMethod("[", c("featuresSet", "ANY", "missing", "missing"), function(x, i, ...
     if (!missing(i))
     {
         subSets <- unique(x@analysisInfo$set)
-        x@adducts <- x@adducts[subSets]
         # NOTE: assume that subsetting with non-existing analyses will not result in errors
         x@setObjects <- lapply(x@setObjects[subSets], "[", i = analyses(x))
         x@ionizedFeatures <- x@ionizedFeatures[x@analysisInfo$analysis]

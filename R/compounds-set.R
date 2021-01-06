@@ -117,7 +117,6 @@ syncCompoundsSetObjects <- function(compoundsSet, makeCons)
     }
     
     compoundsSet@scoreRanges <- compoundsSet@scoreRanges[groupNames(compoundsSet)]
-    compoundsSet@adducts <- compoundsSet@adducts[names(compoundsSet@setObjects)]
     
     # update scoreTypes/scoreRanges
     sc <- makeCompoundsSetScorings(setObjects(compoundsSet), compoundsSet@origFGNames)
@@ -279,9 +278,8 @@ generateCompoundsSet <- function(fGroupsSet, MSPeakListsSet, generator, ..., set
     msplArgs <- assertAndGetMSPLSetsArgs(fGroupsSet, MSPeakListsSet)
     
     unsetFGroupsList <- sapply(sets(fGroupsSet), unset, obj = fGroupsSet, simplify = FALSE)
-    setObjects <- mapply(unsetFGroupsList, msplArgs, adducts(fGroupsSet),
-                         FUN = function(fg, mspl, a) generator(fGroups = fg, MSPeakLists = mspl[[1]], adduct = a, ...),
-                         SIMPLIFY = FALSE)
+    setObjects <- Map(unsetFGroupsList, msplArgs,
+                      f = function(fg, mspl) generator(fGroups = fg, MSPeakLists = mspl[[1]], ...))
     
     # update fragInfos
     for (s in names(setObjects))
@@ -310,8 +308,7 @@ generateCompoundsSet <- function(fGroupsSet, MSPeakListsSet, generator, ..., set
     cons <- makeCompoundsSetConsensus(setObjects, names(fGroupsSet), setThreshold)
     sc <- makeCompoundsSetScorings(setObjects, names(fGroupsSet))
     
-    return(compoundsSet(adducts = adducts(fGroupsSet), setObjects = setObjects,
-                        setThreshold = setThreshold, origFGNames = names(fGroupsSet),
+    return(compoundsSet(setObjects = setObjects, setThreshold = setThreshold, origFGNames = names(fGroupsSet),
                         compounds = cons, scoreTypes = sc$scTypes, scoreRanges = sc$scRanges,
                         algorithm = makeSetAlgorithm(setObjects)))
 }

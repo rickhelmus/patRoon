@@ -82,17 +82,22 @@ setMethod("filter", "componentsSet", function(obj, ..., negate = FALSE, sets = N
 
 generateComponentsSet <- function(fGroupsSet, generator, ..., classGenerator = componentsSet)
 {
-    posneg <- function(add) if (add@charge < 0) "negative" else "positive"
+    annTable <- annotations(fGroupsSet)
+    ionizations <- sapply(sets(fGroupsSet), function(s)
+    {
+        at <- annTable[set == s]
+        if (nrow(at) == 0)
+            return("positive") # UNDONE: relevant?
+        return(if (as.adduct(at$adduct[1])@charge < 0) "negative" else "positive")
+    })
     
     unsetFGroupsList <- sapply(sets(fGroupsSet), unset, obj = fGroupsSet, simplify = FALSE)
-    setObjects <- mapply(unsetFGroupsList, adducts(fGroupsSet),
-                         FUN = function(fg, a) do.call(generator, list(fGroups = fg, ionization = posneg(a), ...)),
-                         SIMPLIFY = FALSE)
+    setObjects <- Map(unsetFGroupsList, ionizations,
+                      f = function(fg, i) do.call(generator, list(fGroups = fg, ionization = i, ...)))
     
     mcmp <- mergeComponents(setObjects, sets(fGroupsSet), "set")
     
-    return(classGenerator(adducts = adducts(fGroupsSet), setObjects = setObjects,
-                          components = mcmp$components, componentInfo = mcmp$componentInfo,
+    return(classGenerator(setObjects = setObjects, components = mcmp$components, componentInfo = mcmp$componentInfo,
                           algorithm = makeSetAlgorithm(setObjects)))
 }
 

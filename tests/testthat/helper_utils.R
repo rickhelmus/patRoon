@@ -39,9 +39,9 @@ if (testWithSets())
                            adducts = "[M+H]+"))
     }
     
-    doExportXCMS <- function(x, ...) getXCMSSet(x, exportedData = FALSE, sets = "set1")
-    doExportXCMS3 <- function(x) getXCMSnExp(x, sets = "set1")
-    getExpFG <- function(x) x[, sets = "set1"]
+    doExportXCMS <- function(x, ...) getXCMSSet(x, exportedData = FALSE, set = "set1")
+    doExportXCMS3 <- function(x) getXCMSnExp(x, set = "set1")
+    getExpFG <- function(x) x[, set = "set1"]
     
     callMF <- function(fGroups, plists, scoreTypes = "fragScore", db = getMFTestDBPath(), to = 300)
     {

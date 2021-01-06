@@ -109,9 +109,10 @@
 		    - report 'neutral' fragments? Check what SIRIUS does.
 		- what to do with unsupported adducts?
 		    - skip calculation with a warning?
-		        - default toM+H/M-H for now with warning...
+		        - default to M+H/M-H for now with warning...
 		    - enforce adduct argument for these cases?
 		    - default mergeIons() to only consider 'common' adducts?
+		    - check better for what is supported by SIRIUS?
 	- add annotations to as.data.table()
 	- cliqueMS components
 	- component selection tool/function

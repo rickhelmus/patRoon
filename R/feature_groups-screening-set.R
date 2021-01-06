@@ -163,7 +163,7 @@ setMethod("filter", "featureGroupsScreeningSet", function(obj, ..., onlyHits = N
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertFlag(negate, add = ac)
-    assertSets(obj, sets, add = ac)
+    assertSets(obj, sets, TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
     if (!is.null(sets) && length(sets) > 0)
@@ -226,14 +226,13 @@ setMethod("screenSuspects", "featureGroupsSet", function(fGroups, suspects, rtWi
 
 featureGroupsSetScreeningUnset <- setClass("featureGroupsSetScreeningUnset",
                                            contains = "featureGroupsScreening")
-setMethod("unset", "featureGroupsScreeningSet", function(obj, sets)
+setMethod("unset", "featureGroupsScreeningSet", function(obj, set)
 {
-    assertSets(obj, sets)
+    assertSets(obj, set, FALSE)
     
     uobj <- callNextMethod()
     
-    if (!is.null(sets))
-        obj <- obj[, sets = sets]
+    obj <- obj[, sets = set]
     sInfo <- mergeScreeningSetInfos(setObjects(obj), rmSetCols = FALSE, markSets = FALSE)
     
     ret <- featureGroupsSetScreeningUnset(screenInfo = sInfo, groups = groupTable(uobj),

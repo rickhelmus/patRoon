@@ -44,7 +44,7 @@ setMethod("featureTable", "featureGroupsSet", function(obj, neutralized = TRUE) 
 #' @export
 setMethod("[", c("featureGroupsSet", "ANY", "ANY", "missing"), function(x, i, j, ..., rGroups, sets = NULL, drop = TRUE)
 {
-    assertSets(x, sets)
+    assertSets(x, sets, TRUE)
     
     if (!is.null(sets) && length(sets) > 0)
     {
@@ -62,14 +62,14 @@ setMethod("[", c("featureGroupsSet", "ANY", "ANY", "missing"), function(x, i, j,
 #'   detection} functionality of \href{http://mzmine.github.io/}{MZmine}.
 #' @param out The destination file for the exported data.
 #' @export
-setMethod("export", "featureGroupsSet", function(obj, type, out, sets = NULL) export(unset(obj, sets), type, out))
+setMethod("export", "featureGroupsSet", function(obj, type, out, set) export(unset(obj, set), type, out))
 
 # UNDONE: mention that object will be unset
 #' @export
-setMethod("getXCMSSet", "featureGroupsSet", function(obj, ..., sets = NULL) getXCMSSet(unset(obj, sets), ...))
+setMethod("getXCMSSet", "featureGroupsSet", function(obj, ..., set) getXCMSSet(unset(obj, set), ...))
 
 # UNDONE: mention that object will be unset
-setMethod("getXCMSnExp", "featureGroupsSet", function(obj, ..., sets = NULL) getXCMSnExp(unset(obj, sets), ...))
+setMethod("getXCMSnExp", "featureGroupsSet", function(obj, ..., set) getXCMSnExp(unset(obj, set), ...))
 
 #' @describeIn featureGroupsSet Obtain a summary table (a \code{\link{data.table}})
 #'   with retention, \emph{m/z}, intensity and optionally other feature data.
@@ -87,17 +87,11 @@ setMethod("getXCMSnExp", "featureGroupsSet", function(obj, ..., sets = NULL) get
 #'   (\emph{i.e.} the minimum amount).
 #' @export
 setMethod("as.data.table", "featureGroupsSet", function(x, average = FALSE, areas = FALSE, features = FALSE,
-                                                        regression = FALSE, normFunc = NULL,
-                                                        neutralized = TRUE)
+                                                        regression = FALSE, normFunc = NULL)
 {
-    # UNDONE: also support reporting ionized features with different adducts?
     # NOTE keep args in sync with featureGroupsScreeningSet
     
-    checkmate::assertFlag(neutralized)
-    
-    anaInfo <- analysisInfo(x) # get before ionizing    
-    if (!neutralized)
-        x <- unset(x)
+    anaInfo <- analysisInfo(x)
     
     # NOTE: we normalize hereafter per set afterwards
     ret <- callNextMethod(x, average = average, areas = areas, features = features,
@@ -140,7 +134,7 @@ setMethod("filter", "featureGroupsSet", function(obj, ..., negate = FALSE, sets 
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertFlag(negate, add = ac)
-    assertSets(obj, sets, add = ac)
+    assertSets(obj, sets, TRUE, add = ac)
     checkmate::reportAssertions(ac)
 
     if (!is.null(sets) && length(sets) > 0)
@@ -275,18 +269,13 @@ setMethod("makeSet", "featureGroups", function(obj, ..., groupAlgo, groupArgs = 
 
 
 featureGroupsUnset <- setClass("featureGroupsUnset", contains = "featureGroups")
-setMethod("unset", "featureGroupsSet", function(obj, sets)
+setMethod("unset", "featureGroupsSet", function(obj, set)
 {
     # UNDONE: mention that group names remain the same and thus represent neutral masses
     # UNDONE: or rename?
     
-    assertSets(obj, sets, FALSE)
-    
-    # UNDONE: limitation?
-    if (length(sets) > 1)
-        stop("Please specify not more than one set")
-    
-    obj <- obj[, sets = sets]
+    assertSets(obj, set, FALSE)
+    obj <- obj[, sets = set]
     
     gInfo <- groupInfo(obj)
     ann <- annotations(obj)
@@ -295,6 +284,6 @@ setMethod("unset", "featureGroupsSet", function(obj, sets)
     gInfo$mzs <- gInfo$mzs + addMZs[ann$adduct]
     
     return(featureGroupsUnset(groups = groupTable(obj), groupInfo = gInfo, analysisInfo = analysisInfo(obj),
-                              features = unset(getFeatures(obj)), ftindex = groupFeatIndex(obj),
+                              features = unset(getFeatures(obj, set)), ftindex = groupFeatIndex(obj),
                               annotations = ann[, -"set"], algorithm = paste0(algorithm(obj), "_unset")))
 })

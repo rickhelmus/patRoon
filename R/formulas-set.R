@@ -43,7 +43,7 @@ setMethod("show", "formulasSet", function(object)
 
 setMethod("[", c("formulasSet", "ANY", "missing", "missing"), function(x, i, j, ..., sets = NULL, drop = TRUE)
 {
-    assertSets(x, sets)
+    assertSets(x, sets, TRUE)
     
     if (!is.null(sets))
         x@setObjects <- x@setObjects[sets]
@@ -75,7 +75,7 @@ setMethod("filter", "formulasSet", function(obj, ..., negate = FALSE, sets = NUL
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertFlag(negate, add = ac)
-    assertSets(obj, sets, add = ac)
+    assertSets(obj, sets, TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
     if (!is.null(sets) && length(sets) > 0)
@@ -166,17 +166,13 @@ generateFormulasSet <- function(fGroupsSet, generator, ..., setArgs, setThreshol
 }
 
 formulasUnset <- setClass("formulasUnset", contains = "formulas")
-setMethod("unset", "formulasSet", function(obj, sets)
+setMethod("unset", "formulasSet", function(obj, set)
 {
-    assertSets(obj, sets)
-    
-    if (!is.null(sets) && length(sets) > 0)
-        obj <- obj[, sets = sets]
-    
-    assertEqualAdducts(adducts(obj))
+    assertSets(obj, set, FALSE)
+    obj <- obj[, sets = set]
     
     groupForms <- lapply(formulaTable(obj), copy)
-    groupForms <- lapply(groupForms, set, j = c("set", "setCoverage"), value = NULL)
+    groupForms <- lapply(groupForms, data.table::set, j = c("set", "setCoverage"), value = NULL)
     
     return(formulasUnset(formulas = groupForms, featureFormulas = formulaTable(obj, features = TRUE),
                          algorithm = paste0(algorithm(obj), "_unset")))

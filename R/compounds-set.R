@@ -139,7 +139,7 @@ setMethod("show", "compoundsSet", function(object)
 
 setMethod("[", c("compoundsSet", "ANY", "missing", "missing"), function(x, i, j, ..., sets = NULL, drop = TRUE)
 {
-    assertSets(x, sets)
+    assertSets(x, sets, TRUE)
     
     if (!is.null(sets))
         x@setObjects <- x@setObjects[sets]
@@ -163,7 +163,7 @@ setMethod("filter", "compoundsSet", function(obj, ..., negate = FALSE, sets = NU
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertFlag(negate, add = ac)
-    assertSets(obj, sets, add = ac)
+    assertSets(obj, sets, TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
     if (!is.null(sets) && length(sets) > 0)
@@ -318,17 +318,13 @@ generateCompoundsSet <- function(fGroupsSet, MSPeakListsSet, generator, ..., set
 
 
 compoundsUnset <- setClass("compoundsUnset", contains = "compounds")
-setMethod("unset", "compoundsSet", function(obj, sets)
+setMethod("unset", "compoundsSet", function(obj, set)
 {
-    assertSets(obj, sets)
-    
-    if (!is.null(sets) && length(sets) > 0)
-        obj <- obj[, sets = sets]
-    
-    assertEqualAdducts(adducts(obj))
+    assertSets(obj, set, FALSE)
+    obj <- obj[, sets = set]
     
     cList <- lapply(compoundTable(obj), copy)
-    cList <- lapply(cList, set, j = c("set", "setCoverage"), value = NULL)
+    cList <- lapply(cList, data.table::set, j = c("set", "setCoverage"), value = NULL)
     
     return(compoundsUnset(compounds = cList, scoreTypes = obj@scoreTypes, scoreRanges = obj@scoreRanges,
                           algorithm = paste0(algorithm(obj), "_unset")))

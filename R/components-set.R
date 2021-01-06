@@ -27,7 +27,7 @@ setMethod("show", "componentsSet", function(object)
 
 setMethod("[", c("componentsSet", "ANY", "ANY", "missing"), function(x, i, j, ..., sets = NULL, drop = TRUE)
 {
-    assertSets(x, sets)
+    assertSets(x, sets, TRUE)
     if (!is.null(sets))
         x@setObjects <- x@setObjects[sets]
 
@@ -55,7 +55,7 @@ setMethod("filter", "componentsSet", function(obj, ..., negate = FALSE, sets = N
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertFlag(negate, add = ac)
-    assertSets(obj, sets, add = ac)
+    assertSets(obj, sets, TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
     if (!is.null(sets) && length(sets) > 0)
@@ -98,18 +98,10 @@ generateComponentsSet <- function(fGroupsSet, generator, ..., classGenerator = c
 
 
 componentsUnset <- setClass("componentsUnset", contains = "components")
-setMethod("unset", "componentsSet", function(obj, sets)
+setMethod("unset", "componentsSet", function(obj, set)
 {
-    assertSets(obj, sets, FALSE)
-    
-    # UNDONE: limitation?
-    if (length(sets) > 1)
-        stop("Please specify not more than one set")
-    
-    obj <- obj[, sets = sets]
-    
-    # assertEqualAdducts(adducts(obj))
-    
+    assertSets(obj, set, FALSE)
+    obj <- obj[, sets = set]
     return(componentsUnset(components = componentTable(obj), componentInfo = componentInfo(obj),
                            algorithm = paste0(algorithm(obj), "_unset")))
 })

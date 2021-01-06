@@ -142,11 +142,11 @@ runSIRIUS <- function(precursorMZs, MSPLists, MSMSPLists, resNames, profile, add
     # perform SIRIUS batches per adduct: we cannot specify multiple adducts per run
     retAdduct <- sapply(unique(adductsChr), function(addChr)
     {
-        whichGrps <- which(adductsChr == addChr)
-        batches <- splitInNBatches(whichGrps, batchn)
+        doWhich <- which(adductsChr == addChr)
+        batches <- splitInNBatches(doWhich, batchn)
         add <- adducts[[match(addChr, adductsChr)]]
         
-        printf("Annotating %d features with adduct %s...\n", length(whichGrps), addChr)
+        printf("Annotating %d features with adduct %s...\n", length(doWhich), addChr)
         
         cmdQueue <- lapply(seq_along(batches), function(bi)
         {
@@ -163,7 +163,7 @@ runSIRIUS <- function(precursorMZs, MSPLists, MSMSPLists, resNames, profile, add
                                    printError = verbose && singular, showProgress = !singular,
                                    logSubDir = paste0("sirius_", if (withFingerID) "compounds" else "formulas"))
         
-        return(setNames(unlist(ret, recursive = FALSE, use.names = FALSE), resNames[whichGrps]))
+        return(setNames(unlist(ret, recursive = FALSE, use.names = FALSE), resNames[doWhich]))
     }, simplify = FALSE)
     
     results <- Reduce(modifyList, retAdduct) # remove adduct dimension
@@ -218,19 +218,21 @@ doSIRIUS <- function(fGroups, MSPeakLists, doFeatures, profile, adduct, relMzDev
     flattenedPLists <- flattenedPLists[sapply(flattenedPLists, validPL)]
     flPLMeta <- flPLMeta[name %in% names(flattenedPLists)]
     
+    gNamesTBD <- unique(flPLMeta$group)
     if (!is.null(adduct))
     {
-        grpAdducts <- rep(list(adduct), length(flattenedPLists))
-        grpAdductsChr <- rep(as.character(adduct, format = "sirius"), length(flattenedPLists))
+        grpAdducts <- rep(list(adduct), length(gNamesTBD))
+        grpAdductsChr <- rep(as.character(adduct, format = "sirius"), length(gNamesTBD))
     }
     else
     {
-        grpAdducts <- lapply(annotations(fGroups)[match(flPLMeta$group, group)]$adduct, as.adduct)
-        grpAdductsChr <- makeAlgoAdducts(grpAdducts, flPLMeta$group, "sirius")
+        grpAdducts <- lapply(annotations(fGroups)[match(gNamesTBD, group)]$adduct, as.adduct)
+        grpAdductsChr <- makeAlgoAdducts(grpAdducts, gNamesTBD, "sirius")
     }
-    names(grpAdducts) <- names(grpAdductsChr) <- flPLMeta$group
+    names(grpAdducts) <- names(grpAdductsChr) <- gNamesTBD
+    flPLMeta[, c("adduct", "adductChr") := .(grpAdducts[group], grpAdductsChr[group])]
     
-    flPLMeta[, hash := mapply(flattenedPLists, grpAdductsChr, FUN = makeHash, MoreArgs = list(baseHash))]
+    flPLMeta[, hash := mapply(flattenedPLists, flPLMeta$adductChr, FUN = makeHash, MoreArgs = list(baseHash))]
     if (is.null(cachedSet))
         saveCacheSet(cacheName, flPLMeta$hash, setHash, cacheDB)
     
@@ -255,10 +257,10 @@ doSIRIUS <- function(fGroups, MSPeakLists, doFeatures, profile, adduct, relMzDev
             plmzs <- lapply(doPLists, function(pl) pl[["MS"]][precursor == TRUE, mz])
             mspls <- lapply(doPLists, "[[", "MS")
             msmspls <- lapply(doPLists, "[[", "MSMS")
-            gn <- flPLMeta$name[doWhich]
-            allResults <- runSIRIUS(plmzs, mspls, msmspls, gn, profile, grpAdducts[gn], grpAdductsChr[gn],
-                                    relMzDev, elements, database, noise, cores, withFingerID, fingerIDDatabase, topMost,
-                                    extraOptsGeneral, extraOptsFormula, verbose, processFunc, processArgs, splitBatches)
+            allResults <- runSIRIUS(plmzs, mspls, msmspls, flPLMeta$name[doWhich], profile, flPLMeta$adduct[doWhich],
+                                    flPLMeta$adductChr[doWhich], relMzDev, elements, database, noise, cores,
+                                    withFingerID, fingerIDDatabase, topMost, extraOptsGeneral, extraOptsFormula,
+                                    verbose, processFunc, processArgs, splitBatches)
         }
         else
             allResults <- list()

@@ -99,9 +99,6 @@
 	- remove adduct slots
 	- makeSet()
 	    - fGroups: also support method via comparison?
-	- unset()
-	    - can now only work for 1 set?
-	    - update all methods
 	- formula/compounds: get adduct from gInfo if present
 		- also for screening? could (optionally) look for matches with neutralized fGroup/susp masses
 		- fragment annotation with MF OK?
@@ -113,6 +110,14 @@
 		    - enforce adduct argument for these cases?
 		    - default mergeIons() to only consider 'common' adducts?
 		    - check better for what is supported by SIRIUS?
+	- suspect screening
+	    - update for old adducts() calls
+	    - update interface
+	        - split screening for suspects with ionized mass (mz) column and the rest?
+	            - mz: match suspects as usual
+	            - rest: match by neutral mass
+	                - get adduct from arg --> susp list --> annotations?
+                - make optional to always match by ionized mass?
 	- add annotations to as.data.table()
 	- cliqueMS components
 	- component selection tool/function

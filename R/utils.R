@@ -567,3 +567,18 @@ ReduceWithArgs <- function(f, x, ..., fixedArgs = list())
     
     return(ret)
 }
+
+# Based on https://www.inwt-statistics.com/read-blog/optimize-your-r-code-using-memoization.html
+memoise <- function(fun)
+{
+    memory <- list()
+    function(...)
+    {
+        valueName <- if (...length() == 1) as.character(..1) else makeHash(..., checkDT = FALSE)
+        if (!is.null(memory[[valueName]]))
+            return(memory[[valueName]])
+        res <- fun(...)
+        memory[[valueName]] <<- res
+        res
+    }
+}

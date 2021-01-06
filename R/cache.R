@@ -9,13 +9,16 @@ getCacheMode <- function()
 getCacheFile <- function() getOption("patRoon.cache.fileName")
 getMaxCacheEntries <- function() 100000 # UNDONE
 
-makeHash <- function(...)
+makeHash <- function(..., checkDT = TRUE)
 {
     args <- list(...)
 
-    # strip DT self refs as they sometimes mess up hashing
-    args <- recursiveApplyDT(args, function(dt) prepareDTForComparison(copy(dt)), sapply, simplify = FALSE)
-
+    if (checkDT)
+    {
+        # strip DT self refs as they sometimes mess up hashing
+        args <- recursiveApplyDT(args, function(dt) prepareDTForComparison(copy(dt)), sapply, simplify = FALSE)
+    }
+    
     return(digest::digest(args, algo = "xxhash64"))
 }
 

@@ -42,7 +42,7 @@ processSIRIUSFormulas <- function(msFName, outPath, adduct, ...)
                          c("mz", "intensity", "exactmass", "formula"),
                          c("frag_mz", "frag_intensity", "frag_formula_mz", "frag_formula_SIR"))
                 fragInfo[, rel.intensity := NULL]
-                fragInfo[, ionization := gsub(" ", "", ionization)]
+                fragInfo[, ionization := gsub(" ", "", ionization, fixed = TRUE)]
                 fragInfo[, neutral_adduct_formula := getFormulaFromSiriusFragFile(ff)]
                 
                 # sirius neutralizes fragments, make them ion again

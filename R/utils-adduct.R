@@ -44,7 +44,8 @@ adductMZDelta <- function(adduct)
     # NOTE: rcdk::get.formula (getFormulaMass()) makes elemental counts absolute
     ret <- 0
     if (length(adduct@add) > 0 && length(adduct@sub) > 0) # NOTE: add charge once
-        ret <- sum(sapply(adduct@add, getFormulaMass, c = adduct@charge)) - sum(sapply(adduct@sub, getMZ, charge = 0))
+        ret <- sum(sapply(adduct@add, getFormulaMass, c = adduct@charge)) -
+            sum(sapply(adduct@sub, getFormulaMass, c = 0))
     else if (length(adduct@add) > 0)
         ret <- sum(sapply(adduct@add, getFormulaMass, c = adduct@charge))
     else if (length(adduct@sub) > 0)

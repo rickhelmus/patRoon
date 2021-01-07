@@ -20,7 +20,7 @@ mergeScreeningSetInfos <- function(setObjects, sInfos = lapply(setObjects, scree
         
         getAllCols <- function(cols)
         {
-            cols <- unlist(lapply(cols, paste0, "-", sets(fGroups)))
+            cols <- unlist(lapply(cols, paste0, "-", sets))
             return(cols[sapply(cols, function(x) !is.null(scrInfo[[x]]))])
         }
         
@@ -45,18 +45,22 @@ mergeScreeningSetInfos <- function(setObjects, sInfos = lapply(setObjects, scree
                 scrInfo[, (allCols) := NULL]
             }
         }
-        
+
         if (rmSetCols)
-            scrInfo[, (getAllCols(rmCols)) := NULL]
+        {
+            rmc <- getAllCols(rmCols)
+            if (length(rmc) > 0)
+                scrInfo[, (rmc) := NULL]
+        }
     }
     else if (length(sInfos) == 1)
     {
         scrInfo <- copy(sInfos[[1]])
         if (rmSetCols)
         {
-            rmCols <- intersect(rmCols, names(scrInfo))
-            if (length(rmCols) > 0)
-                scrInfo[, (intersect(rmCols, names(scrInfo))) := NULL]
+            rmc <- intersect(rmCols, names(scrInfo))
+            if (length(rmc) > 0)
+                scrInfo[, (rmc) := NULL]
         }
     }
     else
@@ -193,15 +197,13 @@ setMethod("filter", "featureGroupsScreeningSet", function(obj, ..., onlyHits = N
 setMethod("screenSuspects", "featureGroupsSet", function(fGroups, suspects, rtWindow, mzWindow,
                                                          adduct, skipInvalid, onlyHits)
 {
-    # UNDONE: update
-    
     # UNDONE: remove argument (and from generic?)
     if (!is.null(adduct))
         stop("adduct argument not supported for sets!")
     
     if (checkmate::testDataFrame(suspects))
     {
-        assertSuspectList(suspects, adducts(fGroups)[1], skipInvalid)
+        assertSuspectList(suspects, TRUE, skipInvalid)
         suspects <- sapply(sets(fGroups), function(s) suspects, simplify = FALSE) # same for all set
     }
     else
@@ -215,14 +217,15 @@ setMethod("screenSuspects", "featureGroupsSet", function(fGroups, suspects, rtWi
     suspects <- suspects[sets(fGroups)]
     
     unsetFGroupsList <- sapply(sets(fGroups), unset, obj = fGroups, simplify = FALSE)
-    setObjects <- mapply(unsetFGroupsList, suspects, adducts(fGroups), SIMPLIFY = FALSE,
-                         FUN = function(fg, s, a) screenSuspects(fg, s, rtWindow, mzWindow, a,
-                                                                 skipInvalid, onlyHits))
+    setObjects <- Map(unsetFGroupsList, suspects,
+                      f = function(fg, s) screenSuspects(fg, s, rtWindow, mzWindow, skipInvalid = skipInvalid,
+                                                         onlyHits = onlyHits))
     
     return(featureGroupsScreeningSet(screenInfo = mergeScreeningSetInfos(setObjects), setObjects = setObjects,
                                      groups = copy(groupTable(fGroups)), analysisInfo = analysisInfo(fGroups),
                                      groupInfo = groupInfo(fGroups), features = getFeatures(fGroups),
-                                     ftindex = copy(groupFeatIndex(fGroups))))
+                                     ftindex = copy(groupFeatIndex(fGroups)),
+                                     annotations = copy(annotations(fGroups))))
 })
 
 

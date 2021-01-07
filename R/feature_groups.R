@@ -1543,8 +1543,7 @@ setMethod("calculatePeakQualities", "featureGroups", function(obj, weights, flat
 })
 
 #' @export
-setMethod("mergeIons", "featureGroups", function(fGroups, components, selectIsoBy = "mono",
-                                                 prefAdduct)
+setMethod("mergeIons", "featureGroups", function(fGroups, components, prefAdduct, selectIsoBy = "mono")
 {
     # UNDONE is intensity_rel a proper measure? ie does it allow comparison if
     # isotopes/adducts are taken from different analyses?

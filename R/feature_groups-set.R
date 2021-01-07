@@ -4,6 +4,7 @@
 NULL
 
 featureGroupsSet <- setClass("featureGroupsSet",
+                             slots = c(groupAlgo = "character", groupArgs = "list", groupVerbose = "logical"),
                              contains = "featureGroups")
 
 setMethod("sets", "featureGroupsSet", function(obj) sets(getFeatures(obj)))
@@ -169,6 +170,28 @@ setMethod("plotChroms", "featureGroupsSet", function(obj, ...)
     callNextMethod(obj, ...)
 })
 
+setMethod("mergeIons", "featureGroupsSet", function(fGroups, components, prefAdduct, ...)
+{
+    setLen <- length(sets(fGroups))
+    
+    checkmate::assertClass(components, "componentsSet")
+    checkmate::assert(checkmate::checkCharacter(prefAdduct, any.missing = FALSE, min.len = 1, max.len = setLen),
+                      checkmate::checkList(prefAdduct, types = c("adduct", "character"), any.missing = FALSE,
+                                           min.len = 1, max.len = setLen),
+                      .var.name = "prefAdduct")
+    prefAdduct <- rep(prefAdduct, length.out = setLen)
+    
+    # annotate and merge ions for all set objects
+    usFGroups <- sapply(sets(fGroups), unset, obj = fGroups, simplify = FALSE)
+    usComponents <- sapply(sets(components), unset, obj = components, simplify = FALSE)
+    usComponents <- usComponents[sets(fGroups)]
+    usFGroups <- Map(usFGroups, usComponents, prefAdduct, f = mergeIons, MoreArgs = list(...))
+    
+    # and re-group with new adduct information
+    return(do.call(makeSet, c(unname(usFGroups), list(groupAlgo = fGroups@groupAlgo, groupArgs = fGroups@groupArgs,
+                   verbose = fGroups@groupVerbose, labels = names(usFGroups), adducts = NULL))))
+})
+
 setMethod("groupFeatures", "featuresSet", function(feat, algorithm, ..., verbose = TRUE)
 {
     # UNDONE: xcms3 not yet supported
@@ -180,7 +203,8 @@ setMethod("groupFeatures", "featuresSet", function(feat, algorithm, ..., verbose
     
     fGroups <- do.call(callNextMethod, c(list(feat = feat, algorithm = algorithm, verbose = verbose), otherArgs))
     
-    ret <- featureGroupsSet(groups = groupTable(fGroups), groupInfo = groupInfo(fGroups),
+    ret <- featureGroupsSet(groupAlgo = algorithm, groupArgs = otherArgs, groupVerbose = verbose,
+                            groups = groupTable(fGroups), groupInfo = groupInfo(fGroups),
                             analysisInfo = analysisInfo(fGroups), features = feat, ftindex = groupFeatIndex(fGroups),
                             algorithm = makeSetAlgorithm(list(fGroups)))
     

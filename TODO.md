@@ -91,19 +91,10 @@
     - mergeIons()
         - other name?
         - makes sense to not choose monoisotopic mass? not for annotation at least
-		- also method for fGroupsSets?
-			- do it per component set
-			- used to update adducts
-			- needs to re-group afterwards
-			    - make general reGroup() method, that uses stored settings from groupFeatures()?
 	    - prefer adducts based on MS/MS? eg handy for Na/K adducts
 	- makeSet()
 	    - fGroups: also support method via comparison?
 	- formula/compounds: get adduct from gInfo if present
-		- also for screening? could (optionally) look for matches with neutralized fGroup/susp masses
-		- fragment annotation with MF OK?
-		    - Also check GF
-		    - report 'neutral' fragments? Check what SIRIUS does.
 		- what to do with unsupported adducts?
 		    - skip calculation with a warning?
 		        - default to M+H/M-H for now with warning...
@@ -155,6 +146,7 @@
     - suspect screening
         - explain three mass matching methods (see comments doScreenSuspects())
         - mention mz column can now be NA
+    - clearly document that mergeIons() for sets re-group --> new group names! (eg workflow objects now incompatible)
 - tests
     - handle/test empty objects
     - test DA algorithms

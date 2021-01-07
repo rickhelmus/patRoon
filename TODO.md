@@ -86,6 +86,7 @@
     - annotation columns not in report, fine? (there are many) If yes document
     - as.data.table(fGroupsScrSets, collapseSuspects=NULL): omits sets column
         - still true? check
+    - suspectScreening(): remove adduct argument from generic? otherwise doc its unsupoorted for sets
 - neutralizing / ionization
     - mergeIons()
         - other name?
@@ -109,14 +110,6 @@
 		    - enforce adduct argument for these cases?
 		    - default mergeIons() to only consider 'common' adducts?
 		    - check better for what is supported by SIRIUS?
-	- suspect screening
-	    - update for old adducts() calls
-	    - update interface
-	        - split screening for suspects with ionized mass (mz) column and the rest?
-	            - mz: match suspects as usual
-	            - rest: match by neutral mass
-	                - get adduct from arg --> susp list --> annotations?
-                - make optional to always match by ionized mass?
 	- add annotations to as.data.table()
 	- cliqueMS components
 	- component selection tool/function

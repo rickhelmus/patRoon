@@ -1,0 +1,21 @@
+cff-version: 1.0.3
+authors:
+  -
+    family-names: Helmus
+    given-names: Rick
+  -
+    family-names: 'ter Laak'
+    given-names: 'Thomas L.'
+  -
+    family-names: 'van Wezel'
+    given-names: 'Annemarie P.'
+  -
+    family-names: 'de Voogt'
+    given-names: Pim
+  -
+    family-names: Schymanski
+    given-names: 'Emma L.'
+date-released: 2021-01-06T00:00:00.000Z
+doi: 10.1186/s13321-020-00477-w
+title: 'patRoon: open source software platform for environmental mass spectrometry based non-target screening'
+url: 'http://dx.doi.org/10.1186/s13321-020-00477-w'

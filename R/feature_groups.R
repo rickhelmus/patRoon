@@ -1563,7 +1563,7 @@ setMethod("mergeIons", "featureGroups", function(fGroups, components, selectIsoB
         stop("No adduct/isotope information available in given components!")
     
     cTab <- as.data.table(components)
-    cTab <- cTab[!is.na(isonr) | !is.na(adduct_ion)]
+    cTab <- cTab[group %in% names(fGroups) & (!is.na(isonr) | !is.na(adduct_ion))]
     cTab[, remove := FALSE]
     cTab[!is.na(isonr), remove := {
         if (.N == 1)

@@ -134,6 +134,9 @@ setMethod("generateCompoundsSIRIUS", "featureGroups", function(fGroups, MSPeakLi
     checkmate::assertFlag(splitBatches, add = ac)
     checkmate::reportAssertions(ac)
 
+    if (length(fGroups) == 0)
+        return(compounds(algorithm = "sirius"))
+    
     adduct <- checkAndToAdduct(adduct, fGroups)
     if (is.null(fingerIDDatabase))
         fingerIDDatabase <- if (!is.null(formulaDatabase)) formulaDatabase else "pubchem"

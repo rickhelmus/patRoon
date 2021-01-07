@@ -587,6 +587,9 @@ setMethod("generateCompoundsMetFrag", "featureGroups", function(fGroups, MSPeakL
 
     checkmate::reportAssertions(ac)
 
+    if (length(fGroups) == 0)
+        return(compoundsMF())
+    
     adduct <- checkAndToAdduct(adduct, fGroups)
 
     anaInfo <- analysisInfo(fGroups)

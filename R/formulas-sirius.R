@@ -134,6 +134,9 @@ setMethod("generateFormulasSIRIUS", "featureGroups", function(fGroups, MSPeakLis
     checkmate::assertFlag(splitBatches, add = ac)
     checkmate::reportAssertions(ac)
     
+    if (length(fGroups) == 0)
+        return(formulas(algorithm = "sirius"))
+    
     adduct <- checkAndToAdduct(adduct, fGroups)
     gNames <- names(fGroups)
     gCount <- length(fGroups)

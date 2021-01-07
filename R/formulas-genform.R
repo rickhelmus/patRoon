@@ -341,6 +341,9 @@ setMethod("generateFormulasGenForm", "featureGroups", function(fGroups, MSPeakLi
 
     checkmate::reportAssertions(ac)
 
+    if (length(fGroups) == 0)
+        return(formulas(algorithm = "genform"))
+    
     adduct <- checkAndToAdduct(adduct, fGroups)
 
     gInfo <- groupInfo(fGroups)

@@ -222,9 +222,10 @@ setMethod("screenSuspects", "featureGroupsSet", function(fGroups, suspects, rtWi
                                                          onlyHits = onlyHits))
     
     return(featureGroupsScreeningSet(screenInfo = mergeScreeningSetInfos(setObjects), setObjects = setObjects,
-                                     groups = copy(groupTable(fGroups)), analysisInfo = analysisInfo(fGroups),
-                                     groupInfo = groupInfo(fGroups), features = getFeatures(fGroups),
-                                     ftindex = copy(groupFeatIndex(fGroups)),
+                                     groupAlgo = fGroups@groupAlgo, groupArgs = fGroups@groupArgs,
+                                     groupVerbose = fGroups@groupVerbose, groups = copy(groupTable(fGroups)),
+                                     analysisInfo = analysisInfo(fGroups), groupInfo = groupInfo(fGroups),
+                                     features = getFeatures(fGroups), ftindex = copy(groupFeatIndex(fGroups)),
                                      annotations = copy(annotations(fGroups))))
 })
 

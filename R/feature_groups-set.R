@@ -202,6 +202,7 @@ setMethod("groupFeatures", "featuresSet", function(feat, algorithm, ..., verbose
         
         return(data.table(group = grps, adduct = firstFeats$adduct, isonr = firstFeats$isonr))
     }, simplify = FALSE), idcol = "set")
+    ret@annotations[, neutralMass := groupInfo(ret)[ret@annotations$group, "mzs"]]
     
     return(ret)
 })

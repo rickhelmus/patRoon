@@ -1619,7 +1619,10 @@ setMethod("mergeIons", "featureGroups", function(fGroups, components, selectIsoB
         }
         else
             fGroups@annotations[, adduct := prefAdduct]
-        
+
+        fGroups@annotations[, neutralMass := groupInfo(fGroups)[group, "mzs"] -
+                                sapply(lapply(adduct, as.adduct), adductMZDelta)]
+                
         # retain correct order
         fGroups@annotations <- fGroups@annotations[match(names(fGroups), group)]
         

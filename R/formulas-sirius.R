@@ -65,7 +65,7 @@ processSIRIUSFormulas <- function(msFName, outPath, adduct, ...)
                 {
                     # 'correct' formula masses: SIRIUS subtract implicit adduct from it
                     fragInfo[nzchar(implicitAdduct), frag_formula_mz := frag_formula_mz +
-                                 sapply(implicitAdduct, function(a) rcdk::get.formula(a)@mass)]
+                                 sapply(implicitAdduct, getFormulaMass)]
                 }
                 return(fragInfo)
             }))

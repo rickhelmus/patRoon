@@ -493,3 +493,5 @@ getFormInfoList <- function(formTable, precursor, useHTML = FALSE)
 
     return(ret)
 }
+
+getFormulaMass <- memoise(function(f, c = 0) rcdk::get.formula(f, c)@mass)

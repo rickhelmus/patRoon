@@ -95,7 +95,7 @@ prepareSuspectList <- function(suspects, adduct, skipInvalid)
                 if (canUse(suspects[["neutralMass"]][i]))
                     ret <- suspects$neutralMass[i]
                 else if (canUse(suspects[["formula"]][i]))
-                    ret <- rcdk::get.formula(suspects$formula[i])@mass
+                    ret <- getFormulaMass(suspects$formula[i])
                 else if (canUse(suspects[["SMILES"]][i]))
                     ret <- getNeutralMassFromSMILES(suspects$SMILES[i], mustWork = FALSE)[[1]]
                 else

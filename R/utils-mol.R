@@ -40,7 +40,7 @@ getNeutralMassFromSMILES <- function(SMILES, mustWork = TRUE)
     # using rcdk::get.mol2formula() to get the mass. The latter could give
     # troubles in tryCatch() calls on Linux with certain JVMs.
     forms <- convertToFormulaBabel(SMILES, "smi", mustWork = mustWork)
-    return(sapply(forms, function(f) if (length(f) > 0) rcdk::get.formula(f)@mass else NA_character_,
+    return(sapply(forms, function(f) if (length(f) > 0) getFormulaMass(f) else NA_character_,
                   USE.NAMES = FALSE))
 }    
 

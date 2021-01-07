@@ -86,7 +86,7 @@ prepareSuspectList <- function(suspects, adduct, skipInvalid)
             neutralMasses <- suspects[["neutralMass"]]
         else
         {
-            printf("Calculating ion masses for each suspect...\n")
+            printf("Calculating neutral masses for each suspect...\n")
             prog <- openProgBar(0, nrow(suspects))
             
             canUse <- function(v) !is.null(v) && !is.na(v) && (!is.character(v) || nzchar(v))
@@ -108,15 +108,24 @@ prepareSuspectList <- function(suspects, adduct, skipInvalid)
             close(prog)
         }
         
-        if (!is.null(adduct))
-            addMZs <- adductMZDelta(adduct)
-        else
-            addMZs <- sapply(suspects[["adduct"]], function(a) adductMZDelta(as.adduct(a)))
-        
-        if (!is.null(suspects[["mz"]]))
-            suspects[, mz := ifelse(!is.na(suspects$mz), suspects$mz, neutralMasses + addMZs)]
-        else
-            suspects[, mz := neutralMasses + addMZs]
+        # calculate ionic masses if possible (not possible if no adducts are given and fGroups are annotated)
+        if ((!is.null(adduct) || !is.null(suspects[["adduct"]])))
+        {
+            if (!is.null(adduct))
+                addMZs <- adductMZDelta(adduct)
+            else
+                addMZs <- sapply(suspects[["adduct"]], function(a) adductMZDelta(as.adduct(a)))
+            
+            if (!is.null(suspects[["mz"]]))
+                suspects[, mz := ifelse(!is.na(suspects$mz), suspects$mz, neutralMasses + addMZs)]
+            else
+                suspects[, mz := neutralMasses + addMZs]
+        }
+        else if (is.null(suspects[["mz"]]))
+        {
+            # NOTE: if mz column is already available it either contains user values or already NAs
+            suspects[, mz := NA_real_]
+        }
         
         suspects[, neutralMass := neutralMasses]
         
@@ -124,7 +133,7 @@ prepareSuspectList <- function(suspects, adduct, skipInvalid)
     }        
     
     # check for any suspects without proper mass info
-    isNA <- is.na(suspects$mz)
+    isNA <- is.na(suspects$neutralMasses) & is.na(suspects$mz)
     if (any(isNA))
     {
         wrong <- paste0(sprintf("%s (line %d)", suspects$name[isNA], which(isNA)), collapse = "\n")
@@ -141,9 +150,10 @@ prepareSuspectList <- function(suspects, adduct, skipInvalid)
     return(suspects)
 }
 
-doScreenSuspects <- function(fGroups, suspects, rtWindow, mzWindow, adduct, skipInvalid)
+doScreenSuspects <- function(fGroups, suspects, rtWindow, mzWindow, skipInvalid)
 {
     gInfo <- groupInfo(fGroups)
+    annTbl <- annotations(fGroups)
     
     setMetaData <- function(t, suspRow)
     {
@@ -164,12 +174,26 @@ doScreenSuspects <- function(fGroups, suspects, rtWindow, mzWindow, adduct, skip
     {
         hasRT <- !is.null(suspects[["rt"]]) && !is.na(suspects$rt[ti])
         
-        # find related feature group(s)
         gi <- gInfo
+        
+        # only consider nearby eluting fGroups if RTs are available
         if (hasRT)
-            gi <- gInfo[numLTE(abs(gInfo$rts - suspects$rt[ti]), rtWindow) & numLTE(abs(gInfo$mzs - suspects$mz[ti]), mzWindow), ]
+            gi <- gInfo[numLTE(abs(gInfo$rts - suspects$rt[ti]), rtWindow), ]
+        
+        # match by mz, this is either done by...
+        #   - fGroup ionized mass and 'mz' column from suspect data if the latter is available
+        #   - fGroup ionized mass and calculated suspect ionized mass, only if adducts were specified
+        #     (mandatory if no adduct annotations available). Note that ionized masses are already calculated by
+        #     prepareSuspectList() and stored in the mz column.
+        #   - Neutralized fGroup/suspect mass (only if adduct annotations are available, this case mz column is NA)
+        
+        if (is.na(suspects$mz[ti])) # no ionized suspect available, must use annotation data to compare neutral masses
+        {
+            at <- annTbl[group %in% rownames(gi) & numLTE(abs(neutralMass - suspects[ti]$neutralMass), mzWindow)]
+            gi <- gi[at$group, ]
+        }
         else
-            gi <- gInfo[numLTE(abs(gInfo$mzs - suspects$mz[ti]), mzWindow), ]
+            gi <- gi[numLTE(abs(gInfo$mzs - suspects$mz[ti]), mzWindow), ]
         
         if (nrow(gi) == 0) # no results? --> add NA result
         {
@@ -183,7 +207,9 @@ doScreenSuspects <- function(fGroups, suspects, rtWindow, mzWindow, adduct, skip
         {
             ret <- data.table()
             setMetaData(ret, suspects[ti])
-            ret[, c("group", "d_rt", "d_mz") := .(g, d_rt = if (hasRT) gi[g, "rts"] - rt else NA, gi[g, "mzs"] - mz)]
+            ret[, c("group", "d_rt", "d_mz") := .(g, d_rt = if (hasRT) gi[g, "rts"] - rt else NA_real_,
+                                                  ifelse(is.na(mz), annTbl[group == g]$neutralMass - neutralMass,
+                                                         gi[g, "mzs"] - mz))]
             return(ret)
         }), fill = TRUE)
         

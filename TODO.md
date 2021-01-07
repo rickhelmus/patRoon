@@ -159,6 +159,9 @@
     - explain xlim/ylim behavior for annotations/mols for plotSpec()
     - update/add aliases
     - SIRIUS: batch calculations done per adduct
+    - suspect screening
+        - explain three mass matching methods (see comments doScreenSuspects())
+        - mention mz column can now be NA
 - tests
     - handle/test empty objects
     - test DA algorithms

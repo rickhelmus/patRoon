@@ -278,9 +278,12 @@ setMethod("unset", "featureGroupsSet", function(obj, set)
     
     gInfo <- groupInfo(obj)
     ann <- annotations(obj)
-    adducts <- sapply(unique(ann$adduct), as.adduct)
-    addMZs <- sapply(adducts, adductMZDelta)
-    gInfo$mzs <- gInfo$mzs + addMZs[ann$adduct]
+    if (nrow(gInfo) > 0)
+    {
+        adducts <- sapply(unique(ann$adduct), as.adduct)
+        addMZs <- sapply(adducts, adductMZDelta)
+        gInfo$mzs <- gInfo$mzs + addMZs[ann$adduct]
+    }
     
     return(featureGroupsUnset(groups = groupTable(obj), groupInfo = gInfo, analysisInfo = analysisInfo(obj),
                               features = unset(getFeatures(obj), set), ftindex = groupFeatIndex(obj),

@@ -6,12 +6,9 @@ NULL
 syncComponentsSetObjects <- function(componentsSet)
 {
     # re-generate
-    if (length(componentsSet@setObjects) > 1)
-    {
-        mcmp <- mergeComponents(componentsSet@setObjects, sets(componentsSet), "set")
-        componentsSet@components <- mcmp$components
-        componentsSet@componentInfo <- mcmp$componentInfo
-    }    
+    mcmp <- mergeComponents(componentsSet@setObjects, sets(componentsSet), "set")
+    componentsSet@components <- mcmp$components
+    componentsSet@componentInfo <- mcmp$componentInfo
     return(componentsSet)
 }
 

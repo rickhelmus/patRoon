@@ -191,12 +191,13 @@ setMethod("groupFeatures", "featuresSet", function(feat, algorithm, ..., verbose
     ret@annotations <- rbindlist(sapply(sets(feat), function(s)
     {
         anaInds <- which(anaInfo$set == s)
+        anas <- anaInfo[anaInds, "analysis"]
         grps <- names(ret)[sapply(ftind[anaInds], function(x) any(x != 0))]
 
-        firstFeats <- rbindlist(lapply(ftind[, grps, with = FALSE], function(x)
+        firstFeats <- rbindlist(lapply(ftind[anaInds, grps, with = FALSE], function(x)
         {
             firstAna <- which(x != 0)[1]
-            return(featureTable(ret)[[firstAna]][x[firstAna]])
+            return(featureTable(ret)[[anas[firstAna]]][x[firstAna]])
         }))
         
         return(data.table(group = grps, adduct = firstFeats$adduct, isonr = firstFeats$isonr))

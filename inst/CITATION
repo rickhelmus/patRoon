@@ -1,0 +1,20 @@
+citHeader("To cite patRoon in publications use:")
+
+citEntry(
+    entry    = "Article",
+    title    = "patRoon: open source software platform for environmental mass spectrometry based non-target screening",
+    author   = personList(person("Rick", "Helmus"),
+                          person("Thomas L.","ter Laak"),
+                          person("Annemarie P.", "van Wezel"),
+                          person("Pim", "de Voogt"),
+                          person("Emma L.", "Schymanski")),
+    journal  = "Journal of Cheminformatics",
+    year     = 2021,
+    volume   = 13,
+    number   = 1,
+    url      = "https://doi.org/10.1186/s13321-020-00477-w",
+    doi      = "10.1186/s13321-020-00477-w",
+    textVersion = paste("Helmus, R., ter Laak, T.L., van Wezel, A.P., de Voogt, P., Schymanski, E.L.",
+                        "patRoon: open source software platform for environmental mass spectrometry based non-target screening.",
+                        "J Cheminform 13, 1 (2021). https://doi.org/10.1186/s13321-020-00477-w")
+)

@@ -661,16 +661,17 @@ setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = NULL
 setMethod("screenSuspects", "featureGroups", function(fGroups, suspects, rtWindow, mzWindow,
                                                       adduct, skipInvalid, onlyHits)
 {
-    if (!is.null(adduct))
-        adduct <- checkAndToAdduct(adduct)
-    
     checkmate::assertFlag(skipInvalid) # not in assert collection, should fail before assertSuspectList
     
+    isAnnotated <- nrow(annotations(fGroups)) > 0
+    
     ac <- checkmate::makeAssertCollection()
-    assertSuspectList(suspects, adduct, skipInvalid, add = ac)
+    assertSuspectList(suspects, !is.null(adduct) || isAnnotated, skipInvalid, add = ac)
     aapply(checkmate::assertNumber, . ~ rtWindow + mzWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
     checkmate::assertFlag(onlyHits, add = ac)
     checkmate::reportAssertions(ac)
+
+    adduct <- checkAndToAdduct(adduct, fGroups)
     
     # do this before checking cache to ensure proper errors/warnings are thrown!
     suspects <- prepareSuspectList(suspects, adduct, skipInvalid)
@@ -680,7 +681,7 @@ setMethod("screenSuspects", "featureGroups", function(fGroups, suspects, rtWindo
     if (!is.null(cd))
         return(cd)
 
-    scr <- doScreenSuspects(fGroups, suspects, rtWindow, mzWindow, adduct, skipInvalid)
+    scr <- doScreenSuspects(fGroups, suspects, rtWindow, mzWindow, skipInvalid)
 
     if (onlyHits)
         fGroups <- fGroups[, scr$group]

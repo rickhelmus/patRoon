@@ -122,7 +122,7 @@ assertAndPrepareAnaInfo <- function(x, ..., add = NULL)
     return(x)
 }
 
-assertSuspectList <- function(x, adduct, skipInvalid, .var.name = checkmate::vname(x), add = NULL)
+assertSuspectList <- function(x, hasAdduct, skipInvalid, .var.name = checkmate::vname(x), add = NULL)
 {
     mzCols <- c("mz", "neutralMass", "SMILES", "InChI", "formula")
     allCols <- c("name", "adduct", "rt", mzCols)
@@ -158,7 +158,7 @@ assertSuspectList <- function(x, adduct, skipInvalid, .var.name = checkmate::vna
     }
     assertCharField("name", minChars = 1)
     assertCharField("SMILES"); assertCharField("InChI"); assertCharField("formula"); assertCharField("InChIKey")
-    assertCharField("adduct", null.ok = !is.null(adduct) || !is.null(x[["mz"]]))
+    assertCharField("adduct", null.ok = hasAdduct || !is.null(x[["mz"]]))
     assertCharField("fragments_mz"); assertCharField("fragments_formula")
 
     assertNumField <- function(f) checkmate::assertNumeric(x[[f]], .var.name = sprintf("%s[\"%s\"]", .var.name, f),

@@ -1,6 +1,7 @@
 # patRoon 1.3.0
 
 * Future multiprocessing: make sure that logs are created even when an error occurs.
+* Classic multiprocessing: intermediate results are cached again
 
 
 # patRoon 1.2.1

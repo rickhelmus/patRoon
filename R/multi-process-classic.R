@@ -157,13 +157,15 @@ maybeRestartCommand <- function(commandQueue, procInfo, sucDir, exitStatus, time
 
 executeMultiProcessClassic <- function(commandQueue, finishHandler,
                                        timeoutHandler, errorHandler,
-                                       prepareHandler, procTimeout,
+                                       prepareHandler, cacheName, procTimeout,
                                        printOutput, printError,
                                        logSubDir, showProgress, waitTimeout,
                                        batchSize, delayBetweenProc)
 {
     if (length(commandQueue) == 0)
         return(list())
+    
+    cacheDB <- openCacheDBScope()
     
     maxProcAmount <- getOption("patRoon.MP.maxProcs")
     runningProcs <- vector("list", maxProcAmount)
@@ -338,7 +340,14 @@ executeMultiProcessClassic <- function(commandQueue, finishHandler,
                 {
                     inds <- cmdInds[!finishedProcInfo$failed]
                     if (length(inds) > 0)
+                    {
                         ret[inds] <- lapply(inds, function(ci) finishHandler(cmd = commandQueue[[ci]]))
+                        if (!is.null(cacheName))
+                        {
+                            for (i in inds)
+                                saveCacheData(cacheName, ret[[i]], commandQueue[[i]]$hash, cacheDB)
+                        }
+                    }
                 }
                 
             }

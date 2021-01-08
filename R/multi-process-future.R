@@ -42,7 +42,7 @@ executeFutureCmd <- function(cmd, finishHandler, timeoutHandler, errorHandler,
 }
 
 executeMultiProcessFuture <- function(commandQueue, finishHandler, timeoutHandler, errorHandler,
-                                      prepareHandler, procTimeout, printOutput, printError, logSubDir,
+                                      prepareHandler, cacheName, procTimeout, printOutput, printError, logSubDir,
                                       ...)
 {
     if (is.null(procTimeout))
@@ -75,6 +75,16 @@ executeMultiProcessFuture <- function(commandQueue, finishHandler, timeoutHandle
                             results[[i]]$stdout, results[[i]]$stderr, append = TRUE)
                 }, error = function(e) "")
             }
+        }
+    }
+    
+    if (!is.null(cacheName))
+    {
+        cacheDB <- openCacheDBScope()
+        for (i in seq_along(commandQueue))
+        {
+            if (!is.null(results[[i]][["result"]]))
+                saveCacheData(cacheName, results[[i]]$result, commandQueue[[i]]$hash, cacheDB)
         }
     }
     

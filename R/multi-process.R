@@ -124,16 +124,10 @@ executeMultiProcess <- function(commandQueue, finishHandler,
             stop("Wrong value set for patRoon.MP.method! Should be \"classic\" or \"future\"")
         
         results <- f(commandQueue = commandQueue, finishHandler = finishHandler, timeoutHandler = timeoutHandler,
-                     errorHandler = errorHandler, prepareHandler = prepareHandler, procTimeout = procTimeout,
-                     printOutput = printOutput, printError = printError, logSubDir = logSubDir,
-                     showProgress = showProgress, waitTimeout = waitTimeout, batchSize = batchSize,
-                     delayBetweenProc = delayBetweenProc)
-        
-        if (!is.null(cacheName))
-        {
-            for (n in names(results))
-                saveCacheData(cacheName, results[[n]], commandQueue[[n]]$hash, cacheDB)
-        }
+                     errorHandler = errorHandler, prepareHandler = prepareHandler, cacheName = cacheName,
+                     procTimeout = procTimeout, printOutput = printOutput, printError = printError,
+                     logSubDir = logSubDir, showProgress = showProgress, waitTimeout = waitTimeout,
+                     batchSize = batchSize, delayBetweenProc = delayBetweenProc)
     }
     else
         results <- list()

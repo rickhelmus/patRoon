@@ -90,7 +90,22 @@ setMethod("initialize", "featureGroups", function(.Object, ...)
     if (is.null(args[["ftindex"]]))
         args$ftindex <- data.table()
 
-    do.call(callNextMethod, c(list(.Object), args))
+    .Object <- do.call(callNextMethod, c(list(.Object), args))
+    
+    if (nrow(.Object@ftindex) > 0)
+    {
+        ftitr <- transpose(.Object@ftindex)
+        gNames <- names(fGroups)
+        .Object@features@features <- Map(.Object@features@features, ftitr, f = function(feat, inds)
+        {
+            wh <- which(inds != 0)
+            feat <- copy(feat)
+            feat[inds[wh], group := gNames[wh]][]
+            return(feat)
+        })
+    }
+    
+    return(.Object)
 })
 
 #' @describeIn featureGroups Obtain feature group names.

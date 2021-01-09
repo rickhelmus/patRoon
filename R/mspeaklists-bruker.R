@@ -222,11 +222,12 @@ generateMSPeakListsDAFMF <- function(fGroups, minMSIntensity = 500, minMSMSInten
             if (is.null(results))
             {
                 results <- list()
+                fID <- fTable[[ana]][[fti, "ID"]]
 
-                results$MS <- getDAPeakList(findDA, fti, TRUE, FALSE, minMSIntensity)
+                results$MS <- getDAPeakList(findDA, fID, TRUE, FALSE, minMSIntensity)
 
-                if (cmpds[[fti]]$Count() > 1)
-                    results$MSMS <- getDAPeakList(findDA, fti, TRUE, TRUE, minMSMSIntensity)
+                if (cmpds[[fID]]$Count() > 1)
+                    results$MSMS <- getDAPeakList(findDA, fID, TRUE, TRUE, minMSMSIntensity)
 
                 results <- pruneList(results)
                 results <- lapply(results, assignPrecursorToMSPeakList,

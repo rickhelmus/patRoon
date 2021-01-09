@@ -158,6 +158,12 @@ setGeneric("consensus", function(obj, ...) standardGeneric("consensus"))
 #' @template generics
 setGeneric("featureTable", function(obj) standardGeneric("featureTable"))
 
+#' @templateVar func featureTable
+#' @templateVar desc updates feature information.
+#' @param fTable New value for the \code{features} slot: a \code{list} with \code{data.table} items for each analysis.
+#' @template generics
+setGeneric("featureTable<-", function(obj, value) standardGeneric("featureTable<-"))
+
 #' @templateVar func filter
 #' @templateVar desc provides various functionality to do post-filtering of data.
 #' @template generics

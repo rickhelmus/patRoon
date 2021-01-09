@@ -19,17 +19,13 @@ setMethod("[", c("featuresXCMS3", "ANY", "missing", "missing"), function(x, i, j
 
 #' @rdname features-class
 #' @export
-setMethod("filter", "featuresXCMS3", function(obj, ...)
+setReplaceMethod("featureTable", "featuresXCMS3", function(obj, value)
 {
-    obj <- callNextMethod(obj, ...)
+    obj <- callNextMethod()
 
-    # check if amount of features (peaks) changed (e.g. due to filtering), if so update
-    if (length(obj) != nrow(xcms::chromPeaks(obj@xdata)))
-    {
-        cat("Updating XCMS object...\n")
-        # NOTE: use base method to force update as overloaded method simply returns @xdata slot
-        obj@xdata <- selectMethod(getXCMSnExp, "features")(obj, TRUE)
-    }
+    cat("Updating XCMS object...\n")
+    # NOTE: use base method to force update as overloaded method simply returns @xdata slot
+    obj@xdata <- selectMethod(getXCMSnExp, "features")(obj, TRUE)
 
     return(obj)
 })

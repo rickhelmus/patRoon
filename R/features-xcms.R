@@ -10,28 +10,24 @@ setMethod("initialize", "featuresXCMS",
 
 #' @rdname features-class
 #' @export
+setReplaceMethod("featureTable", "featuresXCMS", function(obj, value)
+{
+    obj <- callNextMethod()
+
+    cat("Updating xcmsSet...\n")
+    # NOTE: use base method to force update as overloaded method simply returns @xs slot
+    obj@xs <- selectMethod(getXCMSSet, "features")(obj, exportedData = TRUE)
+
+    return(obj)
+})
+
+#' @rdname features-class
+#' @export
 setMethod("[", c("featuresXCMS", "ANY", "missing", "missing"), function(x, i, j, ..., drop = TRUE)
 {
     x <- callNextMethod(x, i, j, ..., drop = drop)
     x@xs <- x@xs[, analyses(x)]
     return(x)
-})
-
-#' @rdname features-class
-#' @export
-setMethod("filter", "featuresXCMS", function(obj, ...)
-{
-    obj <- callNextMethod(obj, ...)
-
-    # check if amount of features (peaks) changed (e.g. due to filtering), if so update
-    if (length(obj) != nrow(xcms::peaks(obj@xs)))
-    {
-        cat("Updating xcmsSet...\n")
-        # NOTE: use base method to force update as overloaded method simply returns @xs slot
-        obj@xs <- selectMethod(getXCMSSet, "features")(obj, exportedData = TRUE)
-    }
-
-    return(obj)
 })
 
 

@@ -75,6 +75,17 @@ setMethod("show", "features", function(object)
 #' @export
 setMethod("featureTable", "features", function(obj) obj@features)
 
+#' @describeIn features Set table with feature information
+#'
+#' @return \code{featureTable<-}: An updated \code{features} object.
+#'
+#' @export
+setReplaceMethod("featureTable", "features", function(obj, value)
+{
+    obj@features <- value
+    return(obj)
+})
+
 #' @describeIn features Get analysis information
 #' @return \code{analysisInfo}: A \code{data.frame} containing a column with
 #'   analysis name (\code{analysis}), its path (\code{path}), and other columns
@@ -138,30 +149,33 @@ setMethod("filter", "features", function(obj, absMinIntensity = NULL, relMinInte
         if (negate)
             rangePred <- Negate(rangePred)
 
+        fList <- obj@features
         for (ana in analyses(obj))
         {
             if (!is.null(absMinIntensity))
-                obj@features[[ana]] <- obj@features[[ana]][absIntPred(intensity)]
+                fList[[ana]] <- fList[[ana]][absIntPred(intensity)]
 
             if (!is.null(relMinIntensity))
             {
-                maxInt <- max(obj@features[[ana]]$intensity)
-                obj@features[[ana]] <- obj@features[[ana]][relIntPred(intensity, maxInt)]
+                maxInt <- max(fList[[ana]]$intensity)
+                fList[[ana]] <- fList[[ana]][relIntPred(intensity, maxInt)]
             }
 
             if (!is.null(retentionRange))
-                obj@features[[ana]] <- obj@features[[ana]][rangePred(ret, retentionRange)]
+                fList[[ana]] <- fList[[ana]][rangePred(ret, retentionRange)]
 
             if (!is.null(mzRange))
-                obj@features[[ana]] <- obj@features[[ana]][rangePred(mz, mzRange)]
+                fList[[ana]] <- fList[[ana]][rangePred(mz, mzRange)]
 
             if (!is.null(mzDefectRange))
-                obj@features[[ana]] <- obj@features[[ana]][rangePred(mz - floor(mz), mzDefectRange)]
+                fList[[ana]] <- fList[[ana]][rangePred(mz - floor(mz), mzDefectRange)]
 
             if (!is.null(chromWidthRange))
-                obj@features[[ana]] <- obj@features[[ana]][rangePred(retmax - retmin, chromWidthRange)]
+                fList[[ana]] <- fList[[ana]][rangePred(retmax - retmin, chromWidthRange)]
         }
 
+        featureTable(obj) <- fList
+        
         saveCacheData("filterFeatures", obj, hash)
     }
 

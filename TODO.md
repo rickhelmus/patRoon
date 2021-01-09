@@ -75,14 +75,18 @@
     - implement removeFeatures() method and use in filter method, move XCMS filter methods to removeFeatures()
     - update updateFeatIndex()
     - clarify reportCSV() now only reports remaining features?
+    - featureTable()<- fGroups method?
 - NEWS
     - topMostByRGroup/EICTopMostByRGroup
+    - featureTable()<-
 - tests
     - topMostByRGroup
+    - featureTable()<-
 - docs
     - topMostByRGroup: handbook?
     - session filter: argument and its order
     - importCheckFeaturesSession()
+    - featureTable()<-
 
 
 ## MSPeakLists

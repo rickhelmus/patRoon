@@ -71,6 +71,11 @@
     - EIC preview disabled by default? re-rendering table is slow...
     - filter negate: don't remove kept fGroups if features were changed?  
 - topMostByRGroup: make default? or only for reporting?
+- finish feature syncing
+    - update DA MS peaklists method for IDs
+    - implement removeFeatures() method and use in filter method, move XCMS filter methods to removeFeatures()
+    - update updateFeatIndex()
+    - clarify reportCSV() now only reports remaining features?
 - NEWS
     - topMostByRGroup/EICTopMostByRGroup
 - tests

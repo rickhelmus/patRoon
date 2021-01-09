@@ -201,6 +201,7 @@ Collate:
     'report.R'
     'utils-checkmate.R'
     'utils-exported.R'
+    'utils-features.R'
     'utils-formulas.R'
     'utils-mol.R'
     'utils-mspeaklists.R'

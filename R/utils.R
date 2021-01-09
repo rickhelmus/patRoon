@@ -29,8 +29,6 @@ getMzMLOrMzXMLAnalysisPath <- function(file, path)
     return(ret)
 }
 
-makeFGroupName <- function(id, ret, mz) sprintf("M%.0f_R%.0f_%d", mz, ret, id)
-
 mkdirp <- function(path)
 {
     for (p in path)
@@ -224,15 +222,6 @@ getStrListWithMax <- function(l, m, collapse)
         l[m + 1] <- "..."
     }
     paste0(l, collapse = collapse)
-}
-
-showAnaInfo <- function(anaInfo)
-{
-    rGroups <- unique(anaInfo$group)
-    blGroups <- unique(anaInfo$blank)
-    printf("Analyses: %s (%d total)\n", getStrListWithMax(anaInfo$analysis, 6, ", "), nrow(anaInfo))
-    printf("Replicate groups: %s (%d total)\n", getStrListWithMax(rGroups, 8, ", "), length(rGroups))
-    printf("Replicate groups used as blank: %s (%d total)\n", getStrListWithMax(blGroups, 8, ", "), length(blGroups))
 }
 
 showObjectSize <- function(object) printf("Object size (indication): %s\n", format(utils::object.size(object), "auto", "SI"))

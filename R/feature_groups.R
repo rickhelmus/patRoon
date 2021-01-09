@@ -217,6 +217,11 @@ setMethod("removeGroups", "featureGroups", function(fGroups, indices)
         {
             fGroups@groups <- fGroups@groups[, -indices, with = FALSE]
             fGroups@ftindex <- fGroups@ftindex[, -indices, with = FALSE]
+            
+            gn <- names(fGroups@ftindex)
+            fGroups@features@features <- lapply(fGroups@features@features, function(ft) ft[group %chin% gn])
+            # re-generate indices by matching group names
+            fGroups@ftindex <- setnames(rbindlist(lapply(fGroups@features@features, function(ft) as.list(chmatch(gn, ft$group, 0)))), gn)
         }
         fGroups@groupInfo <- fGroups@groupInfo[-indices, ]
     }

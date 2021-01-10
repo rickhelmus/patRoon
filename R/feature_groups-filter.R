@@ -70,7 +70,7 @@ intensityFilter <- function(fGroups, absThreshold, relThreshold, negate = FALSE)
         # use set to speed stuff up: http://stackoverflow.com/a/20545629
         for (v in seq_along(fGroups@groups))
             set(fGroups@groups, which(compF(fGroups@groups[[v]])), v, 0)
-        return(updateFeatIndex(removeEmptyGroups(fGroups)))
+        return(cleanGroups(fGroups, TRUE))
     }))
 }
 
@@ -112,7 +112,7 @@ blankFilter <- function(fGroups, threshold, negate = FALSE)
             fGroups@groups[, (gNames) := lapply(seq_along(.SD), function(n) ifelse(pred(.SD[[n]], thr[[n]]), .SD[[n]], 0))]
         }
 
-        return(updateFeatIndex(removeEmptyGroups(fGroups)))
+        return(cleanGroups(fGroups, TRUE))
     }))
 }
 
@@ -203,7 +203,7 @@ replicateAbundanceFilter <- function(fGroups, absThreshold, relThreshold, maxInt
                        by = group, .SDcols = gNames]
         fGroups@groups[, group := NULL]
 
-        return(updateFeatIndex(removeEmptyGroups(fGroups)))
+        return(cleanGroups(fGroups, TRUE))
     }, "replicateAbundance"))
 }
 
@@ -251,7 +251,7 @@ chromWidthFilter <- function(fGroups, range, negate)
 
         fGroups@groups[, (gNames) := lapply(seq_along(.SD), function(n) ifelse(pred(ftindex[[n]]), .SD[[n]], 0))]
 
-        return(updateFeatIndex(removeEmptyGroups(fGroups)))
+        return(cleanGroups(fGroups, TRUE))
     }))
 }
 
@@ -264,7 +264,7 @@ replicateGroupFilter <- function(fGroups, rGroups, negate = FALSE, verbose = TRU
             pred <- Negate(pred)
 
         fGroups <- removeAnalyses(fGroups, which(!pred(fGroups@analysisInfo$group)))
-        return(removeEmptyGroups(fGroups))
+        return(cleanGroups(fGroups, FALSE))
     }, "replicate_group", verbose))
 }
 
@@ -283,7 +283,7 @@ checkFeaturesFilter <- function(fGroups, checkFeaturesSession, negate)
         pred <- if (negate) function(ef) !ef else function(ef) ef
         fGroups@groups[, (gNames) := Map(.SD, session$enabledFeatures[gNames],
                                          f = function(fg, ef) ifelse(pred(ef), fg, 0))]
-        return(updateFeatIndex(removeEmptyGroups(fGroups)))
+        return(cleanGroups(fGroups, TRUE))
     }, "checkedFeatures"))
 }
 
@@ -492,5 +492,5 @@ setMethod("replicateGroupSubtract", "featureGroups", function(fGroups, rGroups, 
             fGroups@groups[, (b) := 0] # no threshold, zero-out everything
     }
 
-    return(replicateGroupFilter(updateFeatIndex(removeEmptyGroups(fGroups)), rGroups, negate = TRUE, verbose = FALSE))
+    return(replicateGroupFilter(cleanGroups(fGroups, TRUE), rGroups, negate = TRUE, verbose = FALSE))
 })

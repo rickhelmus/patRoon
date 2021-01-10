@@ -217,7 +217,7 @@ setMethod("removeAnalyses", "featureGroups", function(fGroups, indices)
     return(fGroups)
 })
 
-setMethod("removeGroups", "featureGroups", function(fGroups, indices)
+setMethod("removeGroups", "featureGroups", function(fGroups, indices, updateFeatures)
 {
     if (length(indices) > 0)
     {
@@ -226,10 +226,8 @@ setMethod("removeGroups", "featureGroups", function(fGroups, indices)
             fGroups@groups <- fGroups@groups[, -indices, with = FALSE]
             fGroups@ftindex <- fGroups@ftindex[, -indices, with = FALSE]
             
-            gn <- names(fGroups@ftindex)
-            fGroups@features@features <- lapply(fGroups@features@features, function(ft) ft[group %chin% gn])
-            # re-generate indices by matching group names
-            fGroups@ftindex <- setnames(rbindlist(lapply(fGroups@features@features, function(ft) as.list(chmatch(gn, ft$group, 0)))), gn)
+            if (updateFeatures)
+                fGroups <- updateFeatures(fGroups, FALSE)
         }
         fGroups@groupInfo <- fGroups@groupInfo[-indices, ]
     }
@@ -259,7 +257,7 @@ setMethod("[", c("featureGroups", "ANY", "ANY", "missing"), function(x, i, j, ..
     }
 
     if (!missing(i))
-        x <- removeEmptyGroups(x)
+        x <- cleanGroups(x, FALSE)
     
     return(x)
 })
@@ -286,14 +284,14 @@ setMethod("$", "featureGroups", function(x, name)
     eval(substitute(x@groups$NAME_ARG, list(NAME_ARG = name)))
 })
 
-setMethod("removeEmptyGroups", "featureGroups", function(fGroups)
+setMethod("cleanGroups", "featureGroups", function(fGroups, cleanUnassignedFeatures)
 {
     if (length(fGroups) > 0)
     {
         empty <- unlist(fGroups@groups[, lapply(.SD, function(x) sum(x) == 0)])
-
         if (any(empty))
-            fGroups <- removeGroups(fGroups, which(empty))
+            fGroups <- removeGroups(fGroups, which(empty), updateFeatures = FALSE)
+        fGroups <- updateFeatures(fGroups, cleanUnassignedFeatures)
     }
     return(fGroups)
 })
@@ -309,6 +307,30 @@ setMethod("removeEmptyAnalyses", "featureGroups", function(fGroups)
         if (any(empty))
             fGroups <- removeAnalyses(fGroups, which(empty))
     }
+    return(fGroups)
+})
+
+setMethod("updateFeatures", "featureGroups", function(fGroups, checkUnassigned)
+{
+    # remove feature indices from feature groups that were removed later (e.g. filtered out)
+    
+    gTable <- groupTable(fGroups)
+    gNames <- names(fGroups)
+    
+    # first update features: only keep those assigned to remaining groups and those not cleared out (zero intensity)
+    if (checkUnassigned)
+    {
+        gTableTR <- transpose(gTable)
+        featureTable(fGroups) <- Map(featureTable(fGroups), gTableTR,
+                                     f = function(ft, gttr) ft[group %chin% gNames[gttr != 0]])
+    }
+    else
+        featureTable(fGroups) <- lapply(featureTable(fGroups), function(ft) ft[group %chin% gNames])
+    
+    # re-generate indices by matching group names
+    fGroups@ftindex <- setnames(rbindlist(lapply(featureTable(fGroups),
+                                                 function(ft) as.list(chmatch(gNames, ft$group, 0)))), gNames)
+    
     return(fGroups)
 })
 
@@ -328,17 +350,6 @@ setMethod("averageGroups", "featureGroups", function(fGroups, areas)
     gTable[, sgroup := NULL]
 
     return(gTable[])
-})
-
-setMethod("updateFeatIndex", "featureGroups", function(fGroups)
-{
-    # remove feature indices from feature groups that were removed later (e.g. filtered out)
-
-    gTable <- groupTable(fGroups)
-    fGroups@ftindex <- copy(groupFeatIndex(fGroups))
-    for (i in seq_along(gTable))
-        set(fGroups@ftindex, which(gTable[[i]] == 0), i, 0)
-    return(fGroups)
 })
 
 #' @describeIn featureGroups Exports feature groups to a \file{.csv} file that

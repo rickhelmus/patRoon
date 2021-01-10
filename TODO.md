@@ -60,11 +60,13 @@
 - Check: units of plotChord() rt/mz graphs seems off
 - update docs and checkChromatograms() for mzWindow --> mzExpWindow
 - also subset features if fGroups are?
+- use fifelse etc for filters?
 - peak qualities
     - check for final names and whether to keep them in gInfo
     - include them in as.data.table (also with features=T)
         - (re-)normalization
     - add to EIC tool
+    - split in new slots and key tables
 - checkFeatures()
     - decide on final function name (perhaps compatible for future component checker)
     - peak qualities
@@ -73,7 +75,6 @@
 - topMostByRGroup: make default? or only for reporting?
 - finish feature syncing
     - implement removeFeatures() method and use in filter method, move XCMS filter methods to removeFeatures()
-    - update updateFeatIndex()
     - clarify reportCSV() now only reports remaining features?
 - NEWS
     - topMostByRGroup/EICTopMostByRGroup

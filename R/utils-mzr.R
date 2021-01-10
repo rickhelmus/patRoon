@@ -151,6 +151,44 @@ getEICsForFGroups <- function(fGroups, rtWindow, mzExpWindow, topMost, topMostBy
     return(pruneList(EICs))
 }
 
+getEICsForFeatures <- function(features)
+{
+    if (length(features) == 0)
+        return(list())
+    
+    fTable <- featureTable(features)
+    anaInfo <- analysisInfo(features)
+    
+    cacheDB <- openCacheDBScope()
+    
+    EICs <- Map(anaInfo$analysis, anaInfo$path, fTable, f = function(ana, path, ft)
+    {
+        dfile <- getMzMLOrMzXMLAnalysisPath(ana, path)
+        anaHash <- makeFileHash(dfile)
+        
+        hashes <- ft[, makeHash(anaHash, .SD), by = seq_len(nrow(ft)),
+                     .SDcols = c("retmin", "retmax", "mzmin", "mzmax")][[2]]
+        
+        fEICs <- lapply(hashes, loadCacheData, category = "mzREIC", dbArg = cacheDB)
+        isNotCached <- sapply(fEICs, is.null)
+        
+        if (any(isNotCached) > 0)
+        {
+            spectra <- loadSpectra(dfile, verbose = FALSE, cacheDB = cacheDB)
+            ftTODO <- ft[isNotCached]
+            fEICs[isNotCached] <- loadEICs(spectra, ftTODO$retmin, ftTODO$retmax,
+                                           ftTODO$mzmin, ftTODO$mzmax)
+            
+            for (i in which(isNotCached))
+                saveCacheData("mzREIC", fEICs[[i]], hashes[i], cacheDB)
+        }
+        
+        return(fEICs)
+    })
+    
+    return(pruneList(EICs))
+}
+
 averageSpectraMZR <- function(spectra, hd, clusterMzWindow, topMost, minIntensityPre,
                               minIntensityPost, avgFun, method, precursor,
                               pruneMissingPrecursor, retainPrecursor)

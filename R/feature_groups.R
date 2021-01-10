@@ -1311,67 +1311,44 @@ setMethod("overlap", "featureGroups", function(fGroups, which, exclusive)
     return(ret)
 })
 
-setMethod("calculatePeakQualities", "featureGroups", function(fGroups, flatnessFactor)
+setMethod("calculatePeakQualities", "featureGroups", function(obj, flatnessFactor, reCalculateFeatures = FALSE)
 {
-    EICs <- getEICsForFGroups(fGroups, 0, 0, NULL, FALSE, TRUE)
-    ftind <- groupFeatIndex(fGroups)
-    anas <- analyses(fGroups)
-    gNames <- names(fGroups)
-
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertNumber(flatnessFactor)
+    checkmate::assertFlag(reCalculateFeatures)
+    checkmate::reportAssertions(ac)
+    
     checkPackage("MetaClean")
     
-    # HACK HACK HACK: MetaClean::calculateGaussianSimilarity needs to have
-    # xcms::SSgauss attached
-    # based on https://stackoverflow.com/a/36611896
-    withr::local_environment(list(SSgauss = xcms::SSgauss))
-        
-    featQualities <- list(
-        ApexBoundraryRatio = list(func = MetaClean::calculateApexMaxBoundaryRatio, HQ = "LV", range = c(0, 1)),
-        FWHM2Base = list(func = MetaClean::calculateFWHM, HQ = "HV", range = c(0, 1)),
-        Jaggedness = list(func = MetaClean::calculateJaggedness, HQ = "LV", range = Inf),
-        Modality = list(func = MetaClean::calculateModality, HQ = "LV", range = Inf),
-        Symmetry = list(func = MetaClean::calculateSymmetry, HQ = "HV", range = c(-1, 1)),
-        GaussianSimilarity = list(func = MetaClean::calculateGaussianSimilarity, HQ = "HV", range = c(0, 1)),
-        Sharpness = list(func = MetaClean::calculateSharpness, HQ = "HV", range = Inf),
-        TPASR = list(func = MetaClean::calculateTPASR, HQ = "LV", range = Inf),
-        ZigZag = list(func = MetaClean::calculateZigZagIndex, HQ = "LV", range = Inf)
-    )
+    if (length(obj) == 0)
+        return(obj)
+    
+    if (reCalculateFeatures || is.null(featureTable(obj)[[1]][["peakScore"]]))
+        obj@features <- calculatePeakQualities(getFeatures(obj), flatnessFactor)
+    else
+        printf("Skipping feature calculation (already done)\n")
+    
+    ftind <- groupFeatIndex(obj)
+    anas <- analyses(obj)
+    gNames <- names(obj)
+    EICs <- getEICsForFGroups(fGroups, 0, 0.001, NULL, FALSE, TRUE)
+    featQualityNames <- featureQualityNames()
+    featScoreNames <- featureScoreNames()
+    
     groupQualities <- list(
         ElutionShift = list(func = MetaClean::calculateElutionShift, HQ = "LV", range = Inf),
         RetentionTimeCorrelation = list(func = MetaClean::calculateRetentionTimeConsistency, HQ = "LV", range = Inf)
     )
-    
-    calcFeatQualities <- function(ret, retmin, retmax, intensity, EIC)
-    {
-        args <- list(c(rt = ret, rtmin = retmin, rtmax = retmax, maxo = intensity), as.matrix(EIC))
-        return(sapply(names(featQualities), function(q)
-        {
-            a <- args
-            if (q %in% c("Jaggedness", "Modality"))
-                a <- c(a, flatnessFactor)
-            return(do.call(featQualities[[q]]$func, a))
-        }, simplify = FALSE))
-    }
-    
-    for (ana in names(EICs))
-    {
-        feat <- copy(featureTable(fGroups)[[ana]])
-        anai <- match(ana, anas)
-        featInds <- unlist(ftind[anai])
-        groups <- gNames[featInds != 0]
-        featInds <- featInds[featInds != 0]
-        feat[featInds, (names(featQualities)) := rbindlist(Map(calcFeatQualities, ret, retmin, retmax,
-                                                               intensity, EICs[[ana]][groups]))]
-        fGroups@features@features[[ana]] <- feat
-    }
+    groupQualityNames <- names(groupQualities)
+    groupScoreNames <- paste0(groupQualityNames, "Score")
     
     grpScores <- rbindlist(lapply(gNames, function(grp)
     {
         featInds <- ftind[[grp]]
         doAna <- anas[featInds != 0]
         featInds <- featInds[featInds != 0]
-        fList <- rbindlist(Map(doAna, featInds, f = function(ana, row) fGroups@features[[ana]][row]))
-        avgFeatScores <- sapply(names(featQualities), function(q)
+        fList <- rbindlist(Map(doAna, featInds, f = function(ana, row) obj@features[[ana]][row]))
+        featAvgs <- sapply(c(featQualityNames, featScoreNames), function(q)
         {
             if (all(is.na(fList[[q]])))
                 return(NA_real_)
@@ -1382,35 +1359,17 @@ setMethod("calculatePeakQualities", "featureGroups", function(fGroups, flatnessF
         pdata <- lapply(seq_len(nrow(fList)), function(fti) list(rtmin = fList$retmin[fti],
                                                                  rtmax = fList$retmax[fti]))
         eic <- lapply(doAna, function(a) EICs[[a]][[grp]])
-        
-        grpQualityScores <- sapply(lapply(groupQualities, "[[", "func"), do.call, list(pdata, eic), simplify = FALSE)
-        
-        return(c(avgFeatScores, grpQualityScores))
+        gq <- sapply(lapply(groupQualities, "[[", "func"), do.call, list(pdata, eic), simplify = FALSE)
+        gs <- setNames(Map(scoreFeatQuality, groupQualities, gq), groupScoreNames)
+        return(c(featAvgs, gq, gs))
     }))
     
-    # normalize, invert if necessary to get low (worst) to high (best) order
-    fixGroupQuality <- function(quality, values)
-    {
-        qi <- if (quality %in% names(featQualities)) featQualities[[quality]] else groupQualities[[quality]]
-        if (all(is.finite(qi$range)))
-        {
-            if (!isTRUE(all.equal(qi$range, c(0, 1)))) # no need to normalize 0-1
-                values <- normalize(values, minMax = qi$range[1] < 0, xrange = qi$range)
-        }
-        else
-            values <- normalize(values, TRUE)
-        
-        if (qi$HQ == "LV")
-            values <- 1 - values
-        
-        return(values)
-    }
-    grpScores[, (names(grpScores)) := Map(fixGroupQuality, names(.SD), .SD)]
-    grpScores[, Quality := rowSums(.SD, na.rm = TRUE)]
+    # UNDONE: weights
+    grpScores[, peakScore := rowSums(.SD, na.rm = TRUE), .SDcols = c(featScoreNames, groupScoreNames)]
     
-    fGroups@groupInfo <- cbind(fGroups@groupInfo, grpScores)
+    obj@groupInfo <- cbind(obj@groupInfo, grpScores)
     
-    return(fGroups)
+    return(obj)
 })
 
 #' @templateVar func groupFeatures

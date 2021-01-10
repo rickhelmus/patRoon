@@ -20,7 +20,6 @@ setGeneric("comparison", function(..., groupAlgo,
                                   groupArgs = list(rtalign = FALSE)) standardGeneric("comparison"), signature = "...")
 setGeneric("groupFeatures", function(feat, algorithm, ...) standardGeneric("groupFeatures"))
 setGeneric("replicateGroupSubtract", function(fGroups, rGroups, threshold = 0) standardGeneric("replicateGroupSubtract"))
-setGeneric("calculatePeakQualities", function(fGroups, flatnessFactor = 0.05) standardGeneric("calculatePeakQualities"))
 
 ### utils (XCMS)
 
@@ -132,6 +131,11 @@ setGeneric("analyses", function(obj) standardGeneric("analyses"))
 #' @templateVar desc returns an annotated MS peak list.
 #' @template generics
 setGeneric("annotatedPeakList", function(obj, ...) standardGeneric("annotatedPeakList"))
+
+#' @templateVar func calculatePeakQualities
+#' @templateVar desc calculates chromatographic peak qualities and scores.
+#' @template generics
+setGeneric("calculatePeakQualities", function(obj, flatnessFactor = 0.05, ...) standardGeneric("calculatePeakQualities"))
 
 #' @templateVar func clusterProperties
 #' @templateVar desc Obtain a list with properties of the generated cluster(s).

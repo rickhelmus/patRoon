@@ -243,6 +243,59 @@ setReplaceMethod("$", "features", function(x, name, value)
     return(x)
 })
 
+setMethod("calculatePeakQualities", "features", function(obj, flatnessFactor)
+{
+    # UNDONE: cache
+    
+    checkmate::assertNumber(flatnessFactor)
+    
+    EICs <- getEICsForFeatures(obj)
+    
+    checkPackage("MetaClean")
+    
+    # HACK HACK HACK: MetaClean::calculateGaussianSimilarity needs to have
+    # xcms::SSgauss attached
+    # based on https://stackoverflow.com/a/36611896
+    withr::local_environment(list(SSgauss = xcms::SSgauss))
+    
+    featQualities <- featureQualities()
+    featQualityNames <- featureQualityNames()
+    featScoreNames <- featureScoreNames()
+    
+    calcFeatQualities <- function(ret, retmin, retmax, intensity, EIC)
+    {
+        args <- list(c(rt = ret, rtmin = retmin, rtmax = retmax, maxo = intensity), as.matrix(EIC))
+        return(sapply(featQualityNames, function(q)
+        {
+            a <- args
+            if (q %in% c("Jaggedness", "Modality"))
+                a <- c(a, flatnessFactor)
+            return(do.call(featQualities[[q]]$func, a))
+        }, simplify = FALSE))
+    }
+    
+    printf("Calculating peak qualities and scores...\n")
+    prog <- openProgBar(0, length(EICs))
+    
+    fTable <- Map(featureTable(obj)[names(EICs)], EICs, seq_along(EICs), f = function(ft, eic, i)
+    {
+        ft <- copy(ft)
+        ft[, (featQualityNames) := rbindlist(Map(calcFeatQualities, ret, retmin, retmax, intensity, eic))]
+        ft[, (featScoreNames) := Map(scoreFeatQuality, featQualities, .SD), .SDcols = featQualityNames]
+        setTxtProgressBar(prog, i)
+        return(ft)
+    })
+    
+    # UNDONE: weights
+    fTable <- lapply(fTable, function(ft) set(ft, j = "peakScore", value = rowSums(ft[, featScoreNames, with = FALSE])))
+
+    setTxtProgressBar(prog, length(EICs))
+    
+    featureTable(obj) <- fTable    
+    return(obj)
+})
+
+
 #' @templateVar func findFeatures
 #' @templateVar what find features
 #' @templateVar ex1 findFeaturesOpenMS

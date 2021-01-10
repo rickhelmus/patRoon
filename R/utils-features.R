@@ -9,3 +9,35 @@ showAnaInfo <- function(anaInfo)
     printf("Replicate groups used as blank: %s (%d total)\n", getStrListWithMax(blGroups, 8, ", "), length(blGroups))
 }
 
+featureQualities <- function()
+{
+    list(ApexBoundraryRatio = list(func = MetaClean::calculateApexMaxBoundaryRatio, HQ = "LV", range = c(0, 1)),
+         FWHM2Base = list(func = MetaClean::calculateFWHM, HQ = "HV", range = c(0, 1)),
+         Jaggedness = list(func = MetaClean::calculateJaggedness, HQ = "LV", range = Inf),
+         Modality = list(func = MetaClean::calculateModality, HQ = "LV", range = Inf),
+         Symmetry = list(func = MetaClean::calculateSymmetry, HQ = "HV", range = c(-1, 1)),
+         GaussianSimilarity = list(func = MetaClean::calculateGaussianSimilarity, HQ = "HV", range = c(0, 1)),
+         Sharpness = list(func = MetaClean::calculateSharpness, HQ = "HV", range = Inf),
+         TPASR = list(func = MetaClean::calculateTPASR, HQ = "LV", range = Inf),
+         ZigZag = list(func = MetaClean::calculateZigZagIndex, HQ = "LV", range = Inf))
+}
+
+featureQualityNames <- function() names(featureQualities())
+featureScoreNames <- function() paste0(featureQualityNames(), "Score")
+
+# normalize, invert if necessary to get low (worst) to high (best) order
+scoreFeatQuality <- function(quality, values)
+{
+    if (all(is.finite(quality$range)))
+    {
+        if (!isTRUE(all.equal(quality$range, c(0, 1)))) # no need to normalize 0-1
+            values <- normalize(values, minMax = quality$range[1] < 0, xrange = quality$range)
+    }
+    else
+        values <- normalize(values, TRUE)
+    
+    if (quality$HQ == "LV")
+        values <- 1 - values
+    
+    return(values)
+}

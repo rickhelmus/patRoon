@@ -74,7 +74,6 @@
     - filter negate: don't remove kept fGroups if features were changed?  
 - topMostByRGroup: make default? or only for reporting?
 - finish feature syncing
-    - implement removeFeatures() method and use in filter method, move XCMS filter methods to removeFeatures()
     - clarify reportCSV() now only reports remaining features?
 - (finish) implement(ing) replace methods for setting feature(Group) data
     - verify user input

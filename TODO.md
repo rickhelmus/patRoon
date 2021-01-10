@@ -76,17 +76,18 @@
 - finish feature syncing
     - implement removeFeatures() method and use in filter method, move XCMS filter methods to removeFeatures()
     - clarify reportCSV() now only reports remaining features?
+- (finish) implement(ing) replace methods for setting feature(Group) data
+    - verify user input
+    - see if more object updates are needed
+    - docs (also check args in ref docs), tests, NEWS
 - NEWS
     - topMostByRGroup/EICTopMostByRGroup
-    - featureTable()<-
 - tests
     - topMostByRGroup
-    - featureTable()<-
 - docs
     - topMostByRGroup: handbook?
     - session filter: argument and its order
     - importCheckFeaturesSession()
-    - featureTable()<-
 
 
 ## MSPeakLists

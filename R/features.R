@@ -35,6 +35,8 @@ printFeatStats <- function(fList)
 #' @templateVar dollarOpName analysis
 #' @template sub_op-args
 #'
+#' @param \dots Ignored.
+#'
 #' @templateVar class features
 #' @template class-hierarchy
 #'
@@ -76,12 +78,11 @@ setMethod("show", "features", function(object)
 setMethod("featureTable", "features", function(obj) obj@features)
 
 #' @describeIn features Set table with feature information
-#'
 #' @return \code{featureTable<-}: An updated \code{features} object.
-#'
 #' @export
 setReplaceMethod("featureTable", "features", function(obj, value)
 {
+    # UNDONE: verify value
     obj@features <- value
     return(obj)
 })
@@ -186,7 +187,6 @@ setMethod("filter", "features", function(obj, absMinIntensity = NULL, relMinInte
 })
 
 #' @describeIn features Subset on analyses.
-#' @param \dots Ignored.
 #' @export
 setMethod("[", c("features", "ANY", "missing", "missing"), function(x, i, ...)
 {
@@ -200,6 +200,16 @@ setMethod("[", c("features", "ANY", "missing", "missing"), function(x, i, ...)
     return(x)
 })
 
+#' @describeIn features Sets feature data for a subset of the analyses.
+#' @export
+setReplaceMethod("[", c("features", "ANY", "missing"), function(x, i, j, value)
+{
+    # UNDONE: verify value
+    i <- assertSubsetArgAndToChr(i, analyses(x))
+    x@features[i] <- value
+    return(x)
+})
+
 #' @describeIn features Extract a feature table for an analysis.
 #' @export
 setMethod("[[", c("features", "ANY", "missing"), function(x, i)
@@ -208,11 +218,29 @@ setMethod("[[", c("features", "ANY", "missing"), function(x, i)
     return(x@features[[i]])
 })
 
+#' @describeIn features Sets feature table for an analysis.
+#' @export
+setReplaceMethod("[[", c("features", "ANY", "missing"), function(x, i, j, value)
+{
+    # UNDONE: verify value
+    assertExtractArg(i)
+    x@features[[i]] <- value
+    return(x)
+})
+
 #' @describeIn features Extract a feature table for an analysis.
 #' @export
 setMethod("$", "features", function(x, name)
 {
     eval(substitute(x@features$NAME_ARG, list(NAME_ARG = name)))
+})
+
+#' @describeIn features Sets feature table for an analysis.
+#' @export
+setReplaceMethod("$", "features", function(x, name, value)
+{
+    eval(substitute(x@features$NAME_ARG <- value, list(NAME_ARG = name)))
+    return(x)
 })
 
 #' @templateVar func findFeatures

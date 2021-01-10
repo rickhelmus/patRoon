@@ -1,12 +1,32 @@
 #' @include features.R
 NULL
 
+updateXData <- function(obj)
+{
+    # UNDONE: see if this could be done more efficient/selective...
+    
+    cat("Updating XCMS object...\n")
+    # NOTE: use base method to force update as overloaded method simply returns @xdata slot
+    obj@xdata <- selectMethod(getXCMSnExp, "features")(obj, TRUE)
+    return(obj)
+}
+
 #' @rdname features-class
 #' @export
 featuresXCMS3 <- setClass("featuresXCMS3", slots = list(xdata = "ANY"), contains = "features")
 
 setMethod("initialize", "featuresXCMS3",
           function(.Object, ...) callNextMethod(.Object, algorithm = "xcms3", ...))
+
+#' @rdname features-class
+#' @export
+setReplaceMethod("featureTable", "featuresXCMS3", function(obj, value)
+{
+    ret <- callNextMethod()
+    if (!all(mapply(featureTable(obj), featureTable(ret), FUN = XCMSFeatTblEqual)))
+        ret <- updateXData(ret)
+    return(ret)
+})
 
 #' @rdname features-class
 #' @export
@@ -19,15 +39,32 @@ setMethod("[", c("featuresXCMS3", "ANY", "missing", "missing"), function(x, i, j
 
 #' @rdname features-class
 #' @export
-setReplaceMethod("featureTable", "featuresXCMS3", function(obj, value)
+setReplaceMethod("[", c("featuresXCMS3", "ANY", "missing"), function(x, i, j, value)
 {
-    obj <- callNextMethod()
+    ret <- callNextMethod()
+    if (!all(mapply(featureTable(x), featureTable(ret), FUN = XCMSFeatTblEqual)))
+        ret <- updateXData(ret)
+    return(ret)
+})
 
-    cat("Updating XCMS object...\n")
-    # NOTE: use base method to force update as overloaded method simply returns @xdata slot
-    obj@xdata <- selectMethod(getXCMSnExp, "features")(obj, TRUE)
+#' @rdname features-class
+#' @export
+setReplaceMethod("[[", c("featuresXCMS3", "ANY", "missing"), function(x, i, j, value)
+{
+    ret <- callNextMethod()
+    if (!XCMSFeatTblEqual(x[[i]], value))
+        ret <- updateXData(ret)
+    return(ret)
+})
 
-    return(obj)
+#' @rdname features-class
+#' @export
+setReplaceMethod("$", "featuresXCMS3", function(x, name, value)
+{
+    ret <- callNextMethod()
+    if (!XCMSFeatTblEqual(`$`(ret, name), value))
+        ret <- updateXData(ret)
+    return(ret)
 })
 
 

@@ -27,6 +27,8 @@ XCMSInternal <- setRefClass("XCMSInternal", methods = list(
 
 ))()
 
+XCMSFeatCols <- function() c("mz", "mzmin", "mzmax", "ret", "retmin", "retmax", "intensity", "area", "sn", "ID")
+
 isXCMSClass <- function(cl, name) is(cl, getClass(name, where = "xcms"))
 
 readMSDataForXCMS3 <- function(anaInfo)
@@ -336,12 +338,17 @@ importXCMSPeaks <- function(peaks, analysisInfo)
         ret <- plist[sample == sind]
         ret[, ID := seq_len(nrow(ret))]
         setnames(ret, c("rt", "rtmin", "rtmax", "maxo", "into"), c("ret", "retmin", "retmax", "intensity", "area"))
-        keepCols <- c("mz", "mzmin", "mzmax", "ret", "retmin", "retmax", "intensity", "area", "sn", "ID")
-        return(ret[, intersect(keepCols, names(ret)), with = FALSE])
+        return(ret[, intersect(XCMSFeatCols(), names(ret)), with = FALSE])
     })
     names(feat) <- analysisInfo$analysis
 
     return(feat)
+}
+
+XCMSFeatTblEqual <- function(tbl1, tbl2)
+{
+    return(isTRUE(all.equal(tbl1[, intersect(XCMSFeatCols(), names(tbl1)), with = FALSE],
+                            tbl2[, intersect(XCMSFeatCols(), names(tbl2)), with = FALSE])))
 }
 
 # UNDONE: use with feature group plot EIC plotting

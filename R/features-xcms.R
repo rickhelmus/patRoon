@@ -1,6 +1,16 @@
 #' @include features.R
 NULL
 
+updateXS <- function(obj)
+{
+    # UNDONE: see if this could be done more efficient/selective...
+    
+    cat("Updating xcmsSet...\n")
+    # NOTE: use base method to force update as overloaded method simply returns @xs slot
+    obj@xs <- selectMethod(getXCMSSet, "features")(obj, exportedData = TRUE)
+    return(obj)
+}
+
 #' @rdname features-class
 #' @export
 featuresXCMS <- setClass("featuresXCMS", slots = list(xs = "ANY"), contains = "features")
@@ -12,12 +22,9 @@ setMethod("initialize", "featuresXCMS",
 #' @export
 setReplaceMethod("featureTable", "featuresXCMS", function(obj, value)
 {
-    obj <- callNextMethod()
-
-    cat("Updating xcmsSet...\n")
-    # NOTE: use base method to force update as overloaded method simply returns @xs slot
-    obj@xs <- selectMethod(getXCMSSet, "features")(obj, exportedData = TRUE)
-
+    ret <- callNextMethod()
+    if (!all(mapply(featureTable(obj), featureTable(ret), FUN = XCMSFeatTblEqual)))
+        ret <- updateXS(ret)
     return(obj)
 })
 
@@ -30,6 +37,35 @@ setMethod("[", c("featuresXCMS", "ANY", "missing", "missing"), function(x, i, j,
     return(x)
 })
 
+#' @rdname features-class
+#' @export
+setReplaceMethod("[", c("featuresXCMS", "ANY", "missing"), function(x, i, j, value)
+{
+    ret <- callNextMethod()
+    if (!all(mapply(featureTable(x), featureTable(ret), FUN = XCMSFeatTblEqual)))
+        ret <- updateXS(ret)
+    return(ret)
+})
+
+#' @rdname features-class
+#' @export
+setReplaceMethod("[[", c("featuresXCMS", "ANY", "missing"), function(x, i, j, value)
+{
+    ret <- callNextMethod()
+    if (!XCMSFeatTblEqual(x[[i]], value))
+        ret <- updateXS(ret)
+    return(ret)
+})
+
+#' @rdname features-class
+#' @export
+setReplaceMethod("$", "featuresXCMS", function(x, name, value)
+{
+    ret <- callNextMethod()
+    if (!XCMSFeatTblEqual(`$`(ret, name), value))
+        ret <- updateXS(ret)
+    return(ret)
+})
 
 #' @details \code{findFeaturesXCMS} uses the \code{\link[xcms]{xcmsSet}}
 #'   function from the \pkg{xcms} package to find features.

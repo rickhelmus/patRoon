@@ -185,6 +185,14 @@ setMethod("groupInfo", "featureGroups", function(fGroups) fGroups@groupInfo)
 #' @export
 setMethod("featureTable", "featureGroups", function(obj) featureTable(obj@features))
 
+#' @describeIn featureGroups Sets feature information (see \code{\link{features}}).
+#' @export
+setReplaceMethod("featureTable", "featureGroups", function(obj, value)
+{
+    featureTable(obj@features) <- value
+    return(obj)
+})
+
 #' @describeIn featureGroups Accessor for \code{features} slot.
 #' @export
 setMethod("getFeatures", "featureGroups", function(obj) obj@features)

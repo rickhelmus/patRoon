@@ -250,7 +250,10 @@ setMethod("[", c("featureGroups", "ANY", "ANY", "missing"), function(x, i, j, ..
         x <- removeGroups(x, which(!names(x) %in% j))
     }
 
-    return(removeEmptyGroups(x))
+    if (!missing(i))
+        x <- removeEmptyGroups(x)
+    
+    return(x)
 })
 
 #' @describeIn featureGroups Extract intensity values.

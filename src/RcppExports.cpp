@@ -5,6 +5,17 @@
 
 using namespace Rcpp;
 
+// parseAdductConsXMLFile
+Rcpp::List parseAdductConsXMLFile(Rcpp::CharacterVector file);
+RcppExport SEXP _patRoon_parseAdductConsXMLFile(SEXP fileSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::CharacterVector >::type file(fileSEXP);
+    rcpp_result_gen = Rcpp::wrap(parseAdductConsXMLFile(file));
+    return rcpp_result_gen;
+END_RCPP
+}
 // parseFeatureXMLFile
 Rcpp::DataFrame parseFeatureXMLFile(Rcpp::CharacterVector file);
 RcppExport SEXP _patRoon_parseFeatureXMLFile(SEXP fileSEXP) {
@@ -81,6 +92,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_patRoon_parseAdductConsXMLFile", (DL_FUNC) &_patRoon_parseAdductConsXMLFile, 1},
     {"_patRoon_parseFeatureXMLFile", (DL_FUNC) &_patRoon_parseFeatureXMLFile, 1},
     {"_patRoon_parseFeatConsXMLFile", (DL_FUNC) &_patRoon_parseFeatConsXMLFile, 2},
     {"_patRoon_writeFeatureXML", (DL_FUNC) &_patRoon_writeFeatureXML, 2},

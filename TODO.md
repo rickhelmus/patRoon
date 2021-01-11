@@ -86,7 +86,7 @@
     - annotation columns not in report, fine? (there are many) If yes document
     - as.data.table(fGroupsScrSets, collapseSuspects=NULL): omits sets column
         - still true? check
-    - suspectScreening(): remove adduct argument from generic? otherwise doc its unsupoorted for sets
+    - suspectScreening(): remove adduct argument from generic? otherwise doc its unsupported for sets
 - neutralizing / ionization
     - mergeIons()
         - other name?
@@ -102,13 +102,23 @@
 		    - default mergeIons() to only consider 'common' adducts?
 		    - check better for what is supported by SIRIUS?
 	- add annotations to as.data.table()
-	- cliqueMS components
 	- component selection tool/function
 	    - otherwise perhaps make a fGroup remover function to help subsetting
 			- similarly as for feature remover in fGroups...
 			- del()/delete()/rmResult()/delResult() generic? could also be for other classes
 			    - or use regular R set like methods (<-())
 		- similarly: set() like method to change data, such as adduct annotations
+	- feature components
+	    - algorithms: cliqueMS, OpenMS and maybe nontarget
+	    - conversion to components
+            - works only work with annotated features
+                - which is only applicable to cliqueMS (or also nontarget?)
+            - make subclass from components with extra slot for feature components
+        - consensus
+            - for cliqueMS: take best ranking across all analyses
+            - first filter out unwanted adducts to improve consensus
+            - filter out assignments with low abundance (eg outliers)
+            - final assignment only made if all candidates are equal or absent
 - NEWS
     - [..., reAverage = FALSE] and implications of filtering when setting it to TRUE
     - Fixed Hill ordering: H wasn't alphabetical if no C is present

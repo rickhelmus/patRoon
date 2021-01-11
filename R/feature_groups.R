@@ -1331,7 +1331,8 @@ setMethod("calculatePeakQualities", "featureGroups", function(obj, flatnessFacto
     ftind <- groupFeatIndex(obj)
     anas <- analyses(obj)
     gNames <- names(obj)
-    EICs <- getEICsForFGroups(fGroups, 0, 0.001, NULL, FALSE, TRUE)
+    gCount <- length(obj)
+    EICs <- getEICsForFGroups(obj, 0, 0.001, NULL, FALSE, TRUE)
     featQualityNames <- featureQualityNames()
     featScoreNames <- featureScoreNames()
     
@@ -1341,6 +1342,9 @@ setMethod("calculatePeakQualities", "featureGroups", function(obj, flatnessFacto
     )
     groupQualityNames <- names(groupQualities)
     groupScoreNames <- paste0(groupQualityNames, "Score")
+    
+    printf("Calculating group peak qualities and scores...\n")
+    prog <- openProgBar(0, gCount)
     
     grpScores <- rbindlist(lapply(gNames, function(grp)
     {
@@ -1358,14 +1362,21 @@ setMethod("calculatePeakQualities", "featureGroups", function(obj, flatnessFacto
         
         pdata <- lapply(seq_len(nrow(fList)), function(fti) list(rtmin = fList$retmin[fti],
                                                                  rtmax = fList$retmax[fti]))
-        eic <- lapply(doAna, function(a) EICs[[a]][[grp]])
+        # NOTE: MetaClean expects EIC matrices
+        eic <- lapply(doAna, function(a) as.matrix(EICs[[a]][[grp]]))
         gq <- sapply(lapply(groupQualities, "[[", "func"), do.call, list(pdata, eic), simplify = FALSE)
-        gs <- setNames(Map(scoreFeatQuality, groupQualities, gq), groupScoreNames)
-        return(c(featAvgs, gq, gs))
+        
+        setTxtProgressBar(prog, match(grp, gNames))
+        
+        return(c(featAvgs, gq))
     }))
+    
+    grpScores[, (groupScoreNames) := Map(scoreFeatQuality, groupQualities, .SD), .SDcols = groupQualityNames]
     
     # UNDONE: weights
     grpScores[, peakScore := rowSums(.SD, na.rm = TRUE), .SDcols = c(featScoreNames, groupScoreNames)]
+    
+    setTxtProgressBar(prog, gCount)
     
     obj@groupInfo <- cbind(obj@groupInfo, grpScores)
     

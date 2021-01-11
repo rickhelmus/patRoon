@@ -274,12 +274,13 @@ setMethod("calculatePeakQualities", "features", function(obj, flatnessFactor)
         }, simplify = FALSE))
     }
     
-    printf("Calculating peak qualities and scores...\n")
+    printf("Calculating feature peak qualities and scores...\n")
     prog <- openProgBar(0, length(EICs))
     
     fTable <- Map(featureTable(obj)[names(EICs)], EICs, seq_along(EICs), f = function(ft, eic, i)
     {
         ft <- copy(ft)
+        eic <- as.matrix(eic) # MetaClean expects matrices
         ft[, (featQualityNames) := rbindlist(Map(calcFeatQualities, ret, retmin, retmax, intensity, eic))]
         ft[, (featScoreNames) := Map(scoreFeatQuality, featQualities, .SD), .SDcols = featQualityNames]
         setTxtProgressBar(prog, i)

@@ -12,6 +12,7 @@ namespace {
 
 struct adductCons
 {
+    numType ret, mz;
     std::vector<int> charges;
     std::vector<std::string> featIDs, adducts;
 };
@@ -21,6 +22,11 @@ adductCons parseAddConsXMLBlock(pugi::xml_document &doc)
     pugi::xml_node consNode = doc.child("consensusElement");
     
     adductCons ret;
+    
+    auto centr = consNode.child("centroid");
+    ret.ret = getNumericFromXML(centr.attribute("rt"));
+    ret.mz = getNumericFromXML(centr.attribute("mz"));
+    
     for (auto el : consNode.child("groupedElementList").children("element"))
     {
         ret.featIDs.push_back(el.attribute("id").value());
@@ -65,9 +71,12 @@ Rcpp::List parseAdductConsXMLFile(Rcpp::CharacterVector file)
     Rcpp::List ret;
     for (auto ce : consElements)
     {
-        ret.push_back(Rcpp::DataFrame::create(Rcpp::Named("ID") = ce.featIDs,
+        ret.push_back(Rcpp::DataFrame::create(Rcpp::Named("avgRet") = ce.ret,
+                                              Rcpp::Named("neutralMass") = ce.mz,
+                                              Rcpp::Named("ID") = ce.featIDs,
                                               Rcpp::Named("charge") = ce.charges,
                                               Rcpp::Named("adduct") = ce.adducts));
     }
+    
     return ret;    
 }

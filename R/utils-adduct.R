@@ -77,15 +77,17 @@ makeAlgoAdducts <- function(adducts, gNames, format)
 }
 
 # NOTE: this and below two functions are split to separate memoised functions to retain proper ref docs
-doAsAdduct <- memoise(function(x, format, isPositive)
+doAsAdduct <- memoise(function(x, format, isPositive, charge)
 {
     if (is(x, "adduct"))
         return(x)
     if (is.na(x))
         return(x)
     
+    # check first: this should fail immediately
+    checkmate::assertChoice(format, c("generic", "sirius", "genform", "metfrag", "openms"))
+    
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertChoice(format, c("generic", "sirius", "genform", "metfrag")) # don't add: this should fail immediately
     if (format == "metfrag")
     {
         checkmate::assert(checkmate::checkInt(x),
@@ -158,6 +160,13 @@ doAsAdduct <- memoise(function(x, format, isPositive)
         
         mfadds <- mfadds[1] # in case there are multiple hits
         adds <- mfadds$add; subs <- mfadds$sub; charge <- mfadds$charge
+    }
+    else if (format == "openms")
+    {
+        fl <- splitFormulaToList(x)
+        adds <- formulaListToString(fl[fl > 0])
+        subs <- formulaListToString(abs(fl[fl < 0]))
+        mult <- 1 # UNDONE: always one for OpenMS?
     }
     
     adds <- adds[nzchar(adds)]; subs <- subs[nzchar(subs)]
@@ -234,12 +243,16 @@ MetFragAdducts <- function() copy(adductsMF)
 #'   \code{"genform"} and \code{"metfrag"} support fixed types of adducts
 #'   which can be obtained with the \code{GenFormAdducts} and
 #'   \code{MetFragAdducts} functions, respectively.
+#'   
+#'   \code{"openms"} is the format used by the \command{MetaboliteAdductDecharger} tool.
 #' @param isPositive A logical that specifies whether the adduct should be
 #'   positive. Should only be set when \code{format="metfrag"} and \code{x} is a
 #'   \code{numeric} identifier.
+#' @param charge The final charge. Only needs to be set when \code{format="openms"}.
+#' 
 #' @rdname adduct-utils
 #' @export
-as.adduct <- function(x, format = "generic", isPositive = NULL) doAsAdduct(x, format, isPositive)
+as.adduct <- function(x, format = "generic", isPositive = NULL, charge = NULL) doAsAdduct(x, format, isPositive, charge)
 
 #' @details \code{calculateIonFormula} Converts one or more neutral formulae to
 #'   adduct ions.

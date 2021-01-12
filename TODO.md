@@ -136,6 +136,7 @@
         - adduct as.character: err argument
         - fix: conversion of adducts with multiple additions/subtractions to GenForm/MetFrag format failed
         - Standardized GenForm/MetFrag addition/subtraction columns from their adduct tables to fix some conversions (eg NH4 --> H4N)
+    - OpenMS adducts?
 - docs
     - filter() for features/fGroups: apply to neutral masses
     - CAMERA/RAMClustR/nontarget components: clearly mention it is simply a merge between sets
@@ -157,9 +158,11 @@
         - explain three mass matching methods (see comments doScreenSuspects())
         - mention mz column can now be NA
     - clearly document that mergeIons() for sets re-group --> new group names! (eg workflow objects now incompatible)
+    - OpenMS adducts?
 - tests
     - handle/test empty objects
     - test DA algorithms
+    - OpenMS adducts?
     
 
 

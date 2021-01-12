@@ -78,7 +78,7 @@ setMethod("show", "adduct", function(object)
 setMethod("as.character", "adduct", function(x, format = "generic", err = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertChoice(format, c("generic", "sirius", "genform", "metfrag"), add = ac)
+    checkmate::assertChoice(format, c("generic", "sirius", "genform", "metfrag", "openms"), add = ac)
     checkmate::assertFlag(err, add = ac)
     checkmate::reportAssertions(ac)
 
@@ -141,6 +141,13 @@ setMethod("as.character", "adduct", function(x, format = "generic", err = TRUE)
         }
 
         return(getGFMFAdduct())
+    }
+    else if (format == "openms")
+    {
+        # NOTE that this format doesn't support charges/mults directly
+        subNeg <- formulaListToString(-(splitFormulaToList(x@sub))) # UNDONE: not very efficient?
+        fl <- splitFormulaToList(paste0(x@add, subNeg))
+        return(paste0(names(fl), fl, collapse = ""))
     }
 })
 

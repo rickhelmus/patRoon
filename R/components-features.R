@@ -21,11 +21,11 @@ setMethod("initialize", "componentsFeatures", function(.Object, fGroups, minSize
         # UNDONE: just handle by generator funcs?
         # fCmpL <- Filter(function(cmp) nrow(cmp) > 1 || nzchar(cmp$adduct), fCmpL)
         
-        # convert to data.tables, assign group names prune features without groups
+        # assign group names and prune features without groups
         fti <- unlist(fti)
         fCmpL <- lapply(fCmpL, function(cmp)
         {
-            set(setDT(cmp), j = "group", value = gNames[match(cmp$ID, fti)])
+            set(cmp, j = "group", value = gNames[match(cmp$ID, fti)])
             return(cmp[!is.na(group)])
         })
         fCmpL <- pruneList(fCmpL, checkZeroRows = TRUE)

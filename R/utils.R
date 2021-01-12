@@ -240,7 +240,7 @@ getStrListWithMax <- function(l, m, collapse)
 
 showObjectSize <- function(object) printf("Object size (indication): %s\n", format(utils::object.size(object), "auto", "SI"))
 
-allSame <- function(l)
+allSame <- function(l, func = identical)
 {
     if (length(l) > 1)
     {
@@ -249,7 +249,7 @@ allSame <- function(l)
         if (any(is.na(l)))
             return(FALSE)
 
-        return(all(sapply(l[-1], identical, l[[1]])))
+        return(all(sapply(l[-1], func, l[[1]])))
     }
 
     return(TRUE)

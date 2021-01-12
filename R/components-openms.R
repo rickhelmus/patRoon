@@ -11,14 +11,21 @@ setMethod("initialize", "componentsOpenMS",
 #' @rdname component-generation
 #' @export
 setMethod("generateComponentsOpenMS", "featureGroups", function(fGroups, ionization, chargeMax = 1,
-                                                                mzWindow = 0.005, extraOpts = NULL)
+                                                                mzWindow = 0.005, minSize = 2,
+                                                                relMinAdductAbundance = 0.75,
+                                                                extraOpts = NULL)
 {
     # UNDONE: all features are currently annotated (ie including not in a group), should be fine once featng is merged
     # UNDONE: convert adduct format
-    # UNDONE: get neutral masses
+    # UNDONE: more parameters and proper defaults
+    
     
     ac <- checkmate::makeAssertCollection()
     checkmate::assertChoice(ionization, c("positive", "negative"), add = ac)
+    aapply(checkmate::assertCount, . ~ chargeMax + minSize, positive = TRUE, fixed = list(add = ac))
+    aapply(checkmate::assertNumber, . ~ mzWindow + relMinAdductAbundance, finite = TRUE, lower = 0,
+           fixed = list(add = ac))
+    checkmate::assertList(extraOpts, any.missing = FALSE, names = "unique", null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
     anaInfo <- analysisInfo(fGroups)
@@ -43,6 +50,8 @@ setMethod("generateComponentsOpenMS", "featureGroups", function(fGroups, ionizat
     featComponents <- executeMultiProcess(cmdQueue, function(cmd, ...)
     {
         fcmp <- patRoon:::parseAdductConsXMLFile(cmd$outFile)
+        # prune unassigned features
+        fcmp <- Filter(function(cmp) nrow(cmp) > 1 || nzchar(cmp$adduct), fcmp)
         unlink(cmd[c("inFile", "outFile")]) # remove temporary files, as their size may be considerable
         return(fcmp)
     }, prepareHandler = function(cmd)
@@ -53,8 +62,9 @@ setMethod("generateComponentsOpenMS", "featureGroups", function(fGroups, ionizat
         cmdMAD <- do.call(patRoon:::getOpenMSMADCommand, c(list(inFile = inFile, outFile = outFile), params))
         return(c(cmd, list(outFile = outFile), cmdMAD))
     }, logSubDir = "openms", cacheName = "componentsOpenMS")
-        
-    return(componentsOpenMS(fGroups = fGroups, featureComponents = featComponents))
+    
+    return(componentsOpenMS(fGroups = fGroups, mzWindow = mzWindow, minSize = minSize,
+                            relMinAdductAbundance = relMinAdductAbundance, featureComponents = featComponents))
 })
 
 

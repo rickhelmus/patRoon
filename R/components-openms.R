@@ -34,11 +34,11 @@ setMethod("generateComponentsOpenMS", "featureGroups", function(fGroups, ionizat
     printf("Annotating all features with OpenMS for %d analyses ...\n", nrow(anaInfo))
     
     params <- list(ionization = ionization, chargeMax = chargeMax, mzWindow = mzWindow, extraOpts = extraOpts)
-    paramsHash <- makeHash(params)
+    baseHash <- makeHash(params, minSize, relMinAdductAbundance)
     
     cmdQueue <- lapply(seq_len(nrow(anaInfo)), function(anai)
     {
-        hash <- makeHash(featTable[[anai]], paramsHash)
+        hash <- makeHash(featTable[[anai]], baseHash)
         logf <- paste0("mad-", anaInfo$analysis[anai], ".txt")
         return(list(hash = hash, fTable = featTable[[anai]], logFile = logf))
     })

@@ -1392,7 +1392,7 @@ setMethod("calculatePeakQualities", "featureGroups", function(obj, flatnessFacto
     obj@groupQualities <- groupQualitiesScores[, c("group", featQualityNames, groupQualityNames), with = FALSE]
     obj@groupScores <- groupQualitiesScores[, c("group", featScoreNames, groupScoreNames), with = FALSE]
     # UNDONE: weights
-    obj@groupScores[, score := rowSums(.SD, na.rm = TRUE), .SDcols = c(featScoreNames, groupScoreNames)][]
+    obj@groupScores[, totalScore := rowSums(.SD, na.rm = TRUE), .SDcols = c(featScoreNames, groupScoreNames)][]
     
     setTxtProgressBar(prog, gCount)
     

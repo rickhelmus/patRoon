@@ -77,7 +77,8 @@ NULL
 #' @export
 featureGroups <- setClass("featureGroups",
                           slots = c(groups = "data.table", analysisInfo = "data.frame", groupInfo = "data.frame",
-                                    features = "features", ftindex = "data.table"),
+                                    features = "features", ftindex = "data.table", groupQualities = "data.table",
+                                    groupScores = "data.table"),
                           contains = c("VIRTUAL", "workflowStep"))
 
 setMethod("initialize", "featureGroups", function(.Object, ...)
@@ -89,13 +90,17 @@ setMethod("initialize", "featureGroups", function(.Object, ...)
         args$groups <- data.table()
     if (is.null(args[["ftindex"]]))
         args$ftindex <- data.table()
-
+    if (is.null(args[["groupQualities"]]))
+        args$groupQualities <- data.table()
+    if (is.null(args[["groupScores"]]))
+        args$groupScores <- data.table()
+    
     .Object <- do.call(callNextMethod, c(list(.Object), args))
     
     if (nrow(.Object@ftindex) > 0)
     {
         ftitr <- transpose(.Object@ftindex)
-        gNames <- names(fGroups)
+        gNames <- names(.Object)
         .Object@features@features <- Map(.Object@features@features, ftitr, f = function(feat, inds)
         {
             wh <- which(inds != 0)
@@ -201,6 +206,16 @@ setMethod("getFeatures", "featureGroups", function(obj) obj@features)
 #' @aliases groupFeatIndex
 #' @export
 setMethod("groupFeatIndex", "featureGroups", function(fGroups) fGroups@ftindex)
+
+#' @describeIn featureGroups Accessor for \code{groupQualities} slot.
+#' @aliases groupQualities
+#' @export
+setMethod("groupQualities", "featureGroups", function(fGroups) fGroups@groupQualities)
+
+#' @describeIn featureGroups Accessor for \code{groupScores} slot.
+#' @aliases groupScores
+#' @export
+setMethod("groupScores", "featureGroups", function(fGroups) fGroups@groupScores)
 
 setMethod("removeAnalyses", "featureGroups", function(fGroups, indices)
 {
@@ -1346,7 +1361,7 @@ setMethod("calculatePeakQualities", "featureGroups", function(obj, flatnessFacto
     printf("Calculating group peak qualities and scores...\n")
     prog <- openProgBar(0, gCount)
     
-    grpScores <- rbindlist(lapply(gNames, function(grp)
+    groupQualitiesScores <- rbindlist(sapply(gNames, function(grp)
     {
         featInds <- ftind[[grp]]
         doAna <- anas[featInds != 0]
@@ -1369,16 +1384,17 @@ setMethod("calculatePeakQualities", "featureGroups", function(obj, flatnessFacto
         setTxtProgressBar(prog, match(grp, gNames))
         
         return(c(featAvgs, gq))
-    }))
+    }, simplify = FALSE), idcol = "group")
     
-    grpScores[, (groupScoreNames) := Map(scoreFeatQuality, groupQualities, .SD), .SDcols = groupQualityNames]
+    groupQualitiesScores[, (groupScoreNames) := Map(scoreFeatQuality, groupQualities, .SD), .SDcols = groupQualityNames]
+    setkeyv(groupQualitiesScores, "group")
     
+    obj@groupQualities <- groupQualitiesScores[, c("group", featQualityNames, groupQualityNames), with = FALSE]
+    obj@groupScores <- groupQualitiesScores[, c("group", featScoreNames, groupScoreNames), with = FALSE]
     # UNDONE: weights
-    grpScores[, peakScore := rowSums(.SD, na.rm = TRUE), .SDcols = c(featScoreNames, groupScoreNames)]
+    obj@groupScores[, score := rowSums(.SD, na.rm = TRUE), .SDcols = c(featScoreNames, groupScoreNames)][]
     
     setTxtProgressBar(prog, gCount)
-    
-    obj@groupInfo <- cbind(obj@groupInfo, grpScores)
     
     return(obj)
 })

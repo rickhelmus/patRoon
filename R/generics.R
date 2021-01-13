@@ -20,6 +20,8 @@ setGeneric("comparison", function(..., groupAlgo,
                                   groupArgs = list(rtalign = FALSE)) standardGeneric("comparison"), signature = "...")
 setGeneric("groupFeatures", function(feat, algorithm, ...) standardGeneric("groupFeatures"))
 setGeneric("replicateGroupSubtract", function(fGroups, rGroups, threshold = 0) standardGeneric("replicateGroupSubtract"))
+setGeneric("groupQualities", function(fGroups) standardGeneric("groupQualities"))
+setGeneric("groupScores", function(fGroups) standardGeneric("groupScores"))
 
 ### utils (XCMS)
 

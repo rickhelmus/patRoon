@@ -87,6 +87,7 @@
     - topMostByRGroup: handbook?
     - session filter: argument and its order
     - importCheckFeaturesSession()
+    - groupQualities/Scores slots
 
 
 ## MSPeakLists

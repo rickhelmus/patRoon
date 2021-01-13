@@ -21,9 +21,18 @@ featureQualities <- function()
          TPASR = list(func = MetaClean::calculateTPASR, HQ = "LV", range = Inf),
          ZigZag = list(func = MetaClean::calculateZigZagIndex, HQ = "LV", range = Inf))
 }
-
 featureQualityNames <- function() names(featureQualities())
 featureScoreNames <- function() paste0(featureQualityNames(), "Score")
+
+featureGroupQualities <- function()
+{
+    list(
+    ElutionShift = list(func = MetaClean::calculateElutionShift, HQ = "LV", range = Inf),
+    RetentionTimeCorrelation = list(func = MetaClean::calculateRetentionTimeConsistency, HQ = "LV", range = Inf)
+    )
+}
+featureGroupQualityNames <- function() names(featureGroupQualities())
+featureGroupScoreNames <- function() paste0(featureGroupQualityNames(), "Score")
 
 # normalize, invert if necessary to get low (worst) to high (best) order
 scoreFeatQuality <- function(quality, values)
@@ -41,3 +50,5 @@ scoreFeatQuality <- function(quality, values)
     
     return(values)
 }
+
+hasFGroupScores <- function(fGroups) nrow(groupScores(fGroups)) > 0

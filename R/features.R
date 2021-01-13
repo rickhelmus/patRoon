@@ -243,11 +243,21 @@ setReplaceMethod("$", "features", function(x, name, value)
     return(x)
 })
 
-setMethod("calculatePeakQualities", "features", function(obj, flatnessFactor)
+setMethod("calculatePeakQualities", "features", function(obj, weights, flatnessFactor)
 {
     # UNDONE: cache
+ 
+    featQualities <- featureQualities()
+    featQualityNames <- featureQualityNames()
+    featScoreNames <- featureScoreNames()
     
-    checkmate::assertNumber(flatnessFactor)
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertNumeric(weights, finite = TRUE, any.missing = FALSE, min.len = 1, names = "unique",
+                             null.ok = TRUE, add = ac)
+    if (!is.null(weights))
+        checkmate::assertNames(names(weights), subset.of = featScoreNames, add = ac)
+    checkmate::assertNumber(flatnessFactor, add = ac)
+    checkmate::reportAssertions(ac)
     
     EICs <- getEICsForFeatures(obj)
     
@@ -257,10 +267,6 @@ setMethod("calculatePeakQualities", "features", function(obj, flatnessFactor)
     # xcms::SSgauss attached
     # based on https://stackoverflow.com/a/36611896
     withr::local_environment(list(SSgauss = xcms::SSgauss))
-    
-    featQualities <- featureQualities()
-    featQualityNames <- featureQualityNames()
-    featScoreNames <- featureScoreNames()
     
     calcFeatQualities <- function(ret, retmin, retmax, intensity, EIC)
     {
@@ -287,9 +293,19 @@ setMethod("calculatePeakQualities", "features", function(obj, flatnessFactor)
         return(ft)
     })
     
-    # UNDONE: weights
-    fTable <- lapply(fTable, function(ft) set(ft, j = "totalScore", value = rowSums(ft[, featScoreNames, with = FALSE],
-                                                                                    na.rm = TRUE)))
+    if (!is.null(weights))
+    {
+        weights[setdiff(featScoreNames, names(weights))] <- 1
+        weights <- weights[featScoreNames]
+    }
+    
+    fTable <- lapply(fTable, function(ft)
+    {
+        wft <- ft[, featScoreNames, with = FALSE]
+        if (!is.null(weights))
+            wft[, names(wft) := Map("*", .SD, weights)]
+        set(ft, j = "totalScore", value = rowSums(wft, na.rm = TRUE))
+    })
 
     setTxtProgressBar(prog, length(EICs))
     

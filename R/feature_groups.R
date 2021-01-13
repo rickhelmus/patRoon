@@ -1348,9 +1348,15 @@ setMethod("overlap", "featureGroups", function(fGroups, which, exclusive)
     return(ret)
 })
 
-setMethod("calculatePeakQualities", "featureGroups", function(obj, flatnessFactor, reCalculateFeatures = FALSE)
+setMethod("calculatePeakQualities", "featureGroups", function(obj, weights, flatnessFactor, reCalculateFeatures = FALSE)
 {
+    allScores <- c(featureScoreNames(), featureGroupScoreNames())
+    
     ac <- checkmate::makeAssertCollection()
+    checkmate::assertNumeric(weights, finite = TRUE, any.missing = FALSE, min.len = 1, names = "unique",
+                             null.ok = TRUE, add = ac)
+    if (!is.null(weights))
+        checkmate::assertNames(names(weights), subset.of = allScores, add = ac)
     checkmate::assertNumber(flatnessFactor)
     checkmate::assertFlag(reCalculateFeatures)
     checkmate::reportAssertions(ac)
@@ -1360,8 +1366,18 @@ setMethod("calculatePeakQualities", "featureGroups", function(obj, flatnessFacto
     if (length(obj) == 0)
         return(obj)
     
+    if (!is.null(weights))
+    {
+        weights[setdiff(allScores, names(weights))] <- 1
+        weights <- weights[allScores]
+    }
+    
     if (reCalculateFeatures || is.null(featureTable(obj)[[1]][["peakScore"]]))
-        obj@features <- calculatePeakQualities(getFeatures(obj), flatnessFactor)
+    {
+        w <- if (!is.null(weights) && any(names(weights) %in% featureScoreNames())) weights[featureScoreNames()] else NULL
+        obj@features <- calculatePeakQualities(getFeatures(obj), weights = w,
+                                               flatnessFactor = flatnessFactor)
+    }
     else
         printf("Skipping feature calculation (already done)\n")
     
@@ -1370,9 +1386,7 @@ setMethod("calculatePeakQualities", "featureGroups", function(obj, flatnessFacto
     gNames <- names(obj)
     gCount <- length(obj)
     EICs <- getEICsForFGroups(obj, 0, 0.001, NULL, FALSE, TRUE)
-    featQualityNames <- featureQualityNames()
-    featScoreNames <- featureScoreNames()
-    
+
     fgQualities <- list(
         ElutionShift = list(func = MetaClean::calculateElutionShift, HQ = "LV", range = Inf),
         RetentionTimeCorrelation = list(func = MetaClean::calculateRetentionTimeConsistency, HQ = "LV", range = Inf)
@@ -1387,7 +1401,7 @@ setMethod("calculatePeakQualities", "featureGroups", function(obj, flatnessFacto
         doAna <- anas[featInds != 0]
         featInds <- featInds[featInds != 0]
         fList <- rbindlist(Map(doAna, featInds, f = function(ana, row) obj@features[[ana]][row]))
-        featAvgs <- sapply(c(featQualityNames, featScoreNames), function(q)
+        featAvgs <- sapply(c(featureQualityNames(), featureScoreNames()), function(q)
         {
             if (all(is.na(fList[[q]])))
                 return(NA_real_)
@@ -1410,11 +1424,17 @@ setMethod("calculatePeakQualities", "featureGroups", function(obj, flatnessFacto
                          .SDcols = featureGroupQualityNames()]
     setkeyv(groupQualitiesScores, "group")
     
-    obj@groupQualities <- groupQualitiesScores[, c("group", featQualityNames, featureGroupQualityNames()), with = FALSE]
-    obj@groupScores <- groupQualitiesScores[, c("group", featScoreNames, featureGroupScoreNames()), with = FALSE]
-    # UNDONE: weights
-    obj@groupScores[, totalScore := rowSums(.SD, na.rm = TRUE),
-                    .SDcols = c(featScoreNames, featureGroupScoreNames())][]
+    obj@groupQualities <- groupQualitiesScores[, c("group", featureQualityNames(), featureGroupQualityNames()), with = FALSE]
+    obj@groupScores <- groupQualitiesScores[, c("group", allScores), with = FALSE]
+    
+    if (is.null(weights))
+        obj@groupScores[, totalScore := rowSums(.SD, na.rm = TRUE), .SDcols = allScores][]
+    else
+    {
+        wsc <- obj@groupScores[, allScores, with = FALSE]
+        wsc[, (names(wsc)) := Map("*", .SD, weights)]
+        set(obj@groupScores, j = "totalScore", value = rowSums(wsc, na.rm = TRUE))
+    }
     
     setTxtProgressBar(prog, gCount)
     

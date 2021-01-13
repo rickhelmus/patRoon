@@ -245,6 +245,11 @@ setMethod("removeGroups", "featureGroups", function(fGroups, indices, updateFeat
                 fGroups <- updateFeatures(fGroups, FALSE)
         }
         fGroups@groupInfo <- fGroups@groupInfo[-indices, ]
+        if (hasFGroupScores(fGroups))
+        {
+            fGroups@groupQualities <- setkey(fGroups@groupQualities[names(fGroups@groups)], "group")
+            fGroups@groupScores <- setkey(fGroups@groupScores[names(fGroups@groups)], "group")
+        }
     }
     return(fGroups)
 })

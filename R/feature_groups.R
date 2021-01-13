@@ -461,8 +461,8 @@ setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas =
     gNames <- names(x)
     gInfo <- groupInfo(x)
     doConc <- regression && !is.null(anaInfo[["conc"]]) && sum(!is.na(anaInfo[["conc"]]) > 1)
-    addQualities <- !isFALSE(qualities) && qualities %in% c("both", "quality") && nrow(groupQualities(x) > 0)
-    addScores <- !isFALSE(qualities) && qualities %in% c("both", "score") && nrow(groupScores(x) > 0)
+    addQualities <- !isFALSE(qualities) && qualities %in% c("both", "quality") && hasFGroupScores(x)
+    addScores <- !isFALSE(qualities) && qualities %in% c("both", "score") && hasFGroupScores(x)
 
     if (regression && is.null(anaInfo[["conc"]]))
         warning("No concentration information specified in the analysis information (i.e. conc column, see ?`analysis-information`)")
@@ -1368,12 +1368,10 @@ setMethod("calculatePeakQualities", "featureGroups", function(obj, flatnessFacto
     featQualityNames <- featureQualityNames()
     featScoreNames <- featureScoreNames()
     
-    groupQualities <- list(
+    fgQualities <- list(
         ElutionShift = list(func = MetaClean::calculateElutionShift, HQ = "LV", range = Inf),
         RetentionTimeCorrelation = list(func = MetaClean::calculateRetentionTimeConsistency, HQ = "LV", range = Inf)
     )
-    groupQualityNames <- names(groupQualities)
-    groupScoreNames <- paste0(groupQualityNames, "Score")
     
     printf("Calculating group peak qualities and scores...\n")
     prog <- openProgBar(0, gCount)
@@ -1396,20 +1394,22 @@ setMethod("calculatePeakQualities", "featureGroups", function(obj, flatnessFacto
                                                                  rtmax = fList$retmax[fti]))
         # NOTE: MetaClean expects EIC matrices
         eic <- lapply(doAna, function(a) as.matrix(EICs[[a]][[grp]]))
-        gq <- sapply(lapply(groupQualities, "[[", "func"), do.call, list(pdata, eic), simplify = FALSE)
+        gq <- sapply(lapply(fgQualities, "[[", "func"), do.call, list(pdata, eic), simplify = FALSE)
         
         setTxtProgressBar(prog, match(grp, gNames))
         
         return(c(featAvgs, gq))
     }, simplify = FALSE), idcol = "group")
     
-    groupQualitiesScores[, (groupScoreNames) := Map(scoreFeatQuality, groupQualities, .SD), .SDcols = groupQualityNames]
+    groupQualitiesScores[, (featureGroupScoreNames()) := Map(scoreFeatQuality, fgQualities, .SD),
+                         .SDcols = featureGroupQualityNames()]
     setkeyv(groupQualitiesScores, "group")
     
-    obj@groupQualities <- groupQualitiesScores[, c("group", featQualityNames, groupQualityNames), with = FALSE]
-    obj@groupScores <- groupQualitiesScores[, c("group", featScoreNames, groupScoreNames), with = FALSE]
+    obj@groupQualities <- groupQualitiesScores[, c("group", featQualityNames, featureGroupQualityNames()), with = FALSE]
+    obj@groupScores <- groupQualitiesScores[, c("group", featScoreNames, featureGroupScoreNames()), with = FALSE]
     # UNDONE: weights
-    obj@groupScores[, totalScore := rowSums(.SD, na.rm = TRUE), .SDcols = c(featScoreNames, groupScoreNames)][]
+    obj@groupScores[, totalScore := rowSums(.SD, na.rm = TRUE),
+                    .SDcols = c(featScoreNames, featureGroupScoreNames())][]
     
     setTxtProgressBar(prog, gCount)
     

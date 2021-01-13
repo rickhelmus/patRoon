@@ -63,7 +63,7 @@
 - use fifelse etc for filters?
 - peak qualities
     - caching (remove reCalculateFeatures option?)
-    - weights, averaging func
+    - averaging func
 - checkFeatures()
     - decide on final function name (perhaps compatible for future component checker)
     - EIC preview disabled by default? re-rendering table is slow...

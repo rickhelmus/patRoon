@@ -288,7 +288,7 @@ setMethod("calculatePeakQualities", "features", function(obj, flatnessFactor)
     })
     
     # UNDONE: weights
-    fTable <- lapply(fTable, function(ft) set(ft, j = "peakScore", value = rowSums(ft[, featScoreNames, with = FALSE])))
+    fTable <- lapply(fTable, function(ft) set(ft, j = "totalScore", value = rowSums(ft[, featScoreNames, with = FALSE])))
 
     setTxtProgressBar(prog, length(EICs))
     

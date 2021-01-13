@@ -62,16 +62,13 @@
 - also subset features if fGroups are?
 - use fifelse etc for filters?
 - peak qualities
-    - check for final names and whether to keep them in gInfo
-    - include them in as.data.table (also with features=T)
-        - (re-)normalization
-    - add to EIC tool
-    - split in new slots and key tables
+    - caching (remove reCalculateFeatures option?)
+    - weights, averaging func
 - checkFeatures()
     - decide on final function name (perhaps compatible for future component checker)
-    - peak qualities
     - EIC preview disabled by default? re-rendering table is slow...
-    - filter negate: don't remove kept fGroups if features were changed?  
+    - filter negate: don't remove kept fGroups if features were changed?
+    - remove printfs
 - topMostByRGroup: make default? or only for reporting?
 - finish feature syncing
     - clarify reportCSV() now only reports remaining features?

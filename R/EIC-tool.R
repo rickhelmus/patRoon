@@ -580,8 +580,8 @@ getUISettings <- function()
 getDefaultUISettings <- function()
 {
     return(list(retUnit = "sec", featQuantity = "intensity", fGroupQuantity = "average",
-                fGroupColumns = c("retMZ", "estIDLevel", "overallPeakQuality"),
-                featureColumns = c("retMZ", "quantity", "overallPeakQuality")))
+                fGroupColumns = c("retMZ", "estIDLevel", "totalScore"),
+                featureColumns = c("retMZ", "quantity", "totalScore")))
 }
 
 saveUISettings <- function(settings)
@@ -726,7 +726,7 @@ getCheckFeatsUI <- function(settings)
                                 HTML("<b>n</b>: next; <b>p</b>: previous; <b>t</b>: toggle"))
                         ),
                         fillRow(
-                            tags$div(id = "fGroupHotContainer", rhandsontable::rHandsontableOutput("fGroupHot"))
+                            tags$div(id = "fGroupsHotContainer", rhandsontable::rHandsontableOutput("fGroupsHot"))
                         )
                     )),
                     tabPanel("Features", fillCol(
@@ -766,8 +766,8 @@ getCheckFeatsUI <- function(settings)
                                                      "Suspect properties (RT, m/z, fragments)" = "suspProp",
                                                      "Estimated suspect identification level" = "estIDLevel",
                                                      "Other suspect annotations" = "suspOther",
-                                                     "Overall peak quality" = "overallPeakQuality",
-                                                     "Individual peak qualities" = "indivPeakQualities"),
+                                                     "Total score" = "totalScore",
+                                                     "Other scores" = "otherScores"),
                                                    settings$fGroupColumns)
                             ),
                             fillRow(
@@ -777,8 +777,8 @@ getCheckFeatsUI <- function(settings)
                                                      "Blank" = "blank",
                                                      "Quantity" = "quantity",
                                                      "RT and m/z range" = "rtMZRange",
-                                                     "Overall peak quality" = "overallPeakQuality",
-                                                     "Individual peak qualities" = "indivPeakQualities"),
+                                                     "Total score" = "totalScore",
+                                                     "Other scores" = "otherScores"),
                                                    settings$featureColumns)
                             )
                         ),
@@ -859,7 +859,7 @@ checkFeatures <- function(fGroups, session, rtWindow = 30, mzExpWindow = 0.001)
         
         getCurFGroupRow <- function()
         {
-            tbl <- rhandsontable::hot_to_r(input$fGroupHot)
+            tbl <- rhandsontable::hot_to_r(input$fGroupsHot)
             tblRow <- match(rValues$currentFGroup, tbl$group)
             if (is.na(tblRow))
                 warning("Cannot find fgroup row!")
@@ -879,7 +879,7 @@ checkFeatures <- function(fGroups, session, rtWindow = 30, mzExpWindow = 0.001)
         
         advanceFGroupSelection <- function(dir)
         {
-            tbl <- rhandsontable::hot_to_r(input$fGroupHot)
+            tbl <- rhandsontable::hot_to_r(input$fGroupsHot)
             tblRow <- getCurFGroupRow()
             if (!is.na(tblRow))
             {
@@ -923,9 +923,9 @@ checkFeatures <- function(fGroups, session, rtWindow = 30, mzExpWindow = 0.001)
             if (!isTRUE(all.equal(curSettings$fGroupColumns, settings$fGroupColumns)) ||
                 curSettings$featQuantity != settings$featQuantity ||
                 curSettings$fGroupQuantity != settings$fGroupQuantity)
-                reAddHOT("fGroupHot")
+                reAddHOT("fGroupsHot")
             if (!isTRUE(all.equal(curSettings$featureColumns, settings$featureColumns)))
-                reAddHOT("featureHot")
+                reAddHOT("featuresHot")
             saveUISettings(settings)
         }
         
@@ -951,8 +951,10 @@ checkFeatures <- function(fGroups, session, rtWindow = 30, mzExpWindow = 0.001)
         fGroupData <- reactive({
             printf("make fGroupData\n")
             
+            getScores <- any(c("totalScore", "otherScores") %in% rValues$settings$fGroupColumns)
             args <- list(fGroups, areas = rValues$settings$featQuantity == "area",
-                         average = rValues$settings$fGroupQuantity == "average")
+                         average = rValues$settings$fGroupQuantity == "average",
+                         qualities = if (getScores) "score" else FALSE)
             if (isScreening(fGroups) && any(c("suspProp", "estIDLevel", "suspOther") %in% rValues$settings$fGroupColumns))
                 args <- c(args, list(collapseSuspects = NULL))
             gData <- do.call(as.data.table, args)
@@ -990,7 +992,14 @@ checkFeatures <- function(fGroups, session, rtWindow = 30, mzExpWindow = 0.001)
                                          "maxFrags", "maxFragMatches", "maxFragMatchesRel"))) := NULL]
             }
             
-            # UNDONE: peak qualities
+            if (getScores && hasFGroupScores(fGroups))
+            {
+                # scores were added by as.data.table(). Remove those we don't want.
+                if (!"totalScore" %in% rValues$settings$fGroupColumns)
+                    gData[, totalScore := NULL]
+                if (!"otherScores" %in% rValues$settings$fGroupColumns)
+                    gData[, (c(featureScoreNames(), featureGroupScoreNames())) := NULL]
+            }
             
             return(gData)
         })
@@ -1008,15 +1017,20 @@ checkFeatures <- function(fGroups, session, rtWindow = 30, mzExpWindow = 0.001)
             if ("rGroup" %in% rValues$settings$featureColumns)
                 fData[, replicate_group := ai$group]
             if ("blank" %in% rValues$settings$featureColumns)
-                fData[, replicate_group := ai$blank]
+                fData[, blank := ai$blank]
             if ("quantity" %in% rValues$settings$featureColumns)
                 fData[, quantity := if (rValues$settings$featQuantity == "intensity") feat$intensity else feat$area]
             if ("rtMZRange" %in% rValues$settings$featureColumns)
                 fData[, c("retmin", "retmax", "mzmin", "mzmax") := .(feat$retmin, feat$retmax, feat$mzmin, feat$mzmax)]
-            
-            # UNDONE: peak qualities
+            if (hasFGroupScores(fGroups))
+            {
+                if ("otherScores" %in% rValues$settings$featureColumns)
+                    fData[, (featureScoreNames()) := feat[, featureScoreNames(), with = FALSE]]
+                if ("totalScore" %in% rValues$settings$featureColumns)
+                    fData[, totalScore := feat$totalScore]
+            }
 
-            return(fData)            
+            return(fData)
         })
         
         observeEvent(input$keys, {
@@ -1091,12 +1105,12 @@ checkFeatures <- function(fGroups, session, rtWindow = 30, mzExpWindow = 0.001)
             rValues$fGroupPlotMode <- input$fGroupPlotMode
         })
         
-        observeEvent(input$fGroupHot, {
-            # HACK: input$fGroupHot$params$maxRows: make sure we don't have empty table as hot_to_r errors otherwise
-            if (input$fGroupHot$params$maxRows > 0)
+        observeEvent(input$fGroupsHot, {
+            # HACK: input$fGroupsHot$params$maxRows: make sure we don't have empty table as hot_to_r errors otherwise
+            if (input$fGroupsHot$params$maxRows > 0)
             {
                 printf("Sync EG\n")
-                tbl <- rhandsontable::hot_to_r(input$fGroupHot)
+                tbl <- rhandsontable::hot_to_r(input$fGroupsHot)
                 keep <- tbl[keep == TRUE]$group
                 notkeep <- tbl[keep == FALSE]$group
                 oldeg <- rValues$enabledFGroups
@@ -1105,7 +1119,7 @@ checkFeatures <- function(fGroups, session, rtWindow = 30, mzExpWindow = 0.001)
                 if (egChanged)
                     setSessionChanged(TRUE)
                 
-                selr <- input$fGroupHot_select$select$rAll[1]
+                selr <- input$fGroupsHot_select$select$rAll[1]
                 
                 # HACK: init selection
                 if (is.null(selr))
@@ -1127,10 +1141,10 @@ checkFeatures <- function(fGroups, session, rtWindow = 30, mzExpWindow = 0.001)
             }
         })
 
-        observeEvent(input$fGroupHot_select$select$r, {
+        observeEvent(input$fGroupsHot_select$select$r, {
             printf("fGroup row select\n")
-            tbl <- rhandsontable::hot_to_r(input$fGroupHot)
-            updateFGroupRow(tbl$group[input$fGroupHot_select$select$rAll[1]])
+            tbl <- rhandsontable::hot_to_r(input$fGroupsHot)
+            updateFGroupRow(tbl$group[input$fGroupsHot_select$select$rAll[1]])
         })
         
         observeEvent(input$enableAllGroups, {
@@ -1217,7 +1231,7 @@ checkFeatures <- function(fGroups, session, rtWindow = 30, mzExpWindow = 0.001)
             })
         })
         
-        output$fGroupHot <- rhandsontable::renderRHandsontable({
+        output$fGroupsHot <- rhandsontable::renderRHandsontable({
             printf("Plot gHot!\n")
             not <- showNotification("Updating feature group table...", duration = NULL, closeButton = FALSE, type = "message")
             rValues$triggerFGroupHotUpdate
@@ -1273,7 +1287,7 @@ checkFeatures <- function(fGroups, session, rtWindow = 30, mzExpWindow = 0.001)
             
             # BUG: table is messed up after tab switch
             # work-around from https://github.com/jrowen/rhandsontable/issues/366
-            outputOptions(output, "fGroupHot", suspendWhenHidden = FALSE)
+            outputOptions(output, "fGroupsHot", suspendWhenHidden = FALSE)
             
             removeNotification(not)
             return(hot)

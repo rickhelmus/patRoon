@@ -81,6 +81,7 @@
     - docs (also check args in ref docs), tests, NEWS
 - NEWS
     - topMostByRGroup/EICTopMostByRGroup
+    - as.data.table: qualities argument (and potentially faster now with features=T?)
 - tests
     - topMostByRGroup
 - docs
@@ -88,6 +89,7 @@
     - session filter: argument and its order
     - importCheckFeaturesSession()
     - groupQualities/Scores slots
+    - as.data.table: qualities argument
 
 
 ## MSPeakLists

@@ -437,7 +437,8 @@ setMethod("export", "featureGroups", function(fGroups, type, out)
 #'   the analysis information or when less than two concentrations are specified
 #'   (\emph{i.e.} the minimum amount).
 #' @export
-setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas = FALSE, features = FALSE, regression = FALSE)
+setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas = FALSE, features = FALSE,
+                                                     qualities = FALSE, regression = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertFlag(average, add = ac)
@@ -446,6 +447,10 @@ setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas =
     checkmate::assertFlag(regression, add = ac)
     checkmate::reportAssertions(ac)
 
+    checkmate::assert(checkmate::checkFALSE(qualities),
+                      checkmate::checkChoice(qualities, c("quality", "score", "both")),
+                      .var.name = "qualities")
+    
     if (length(x) == 0)
         return(data.table(mz = numeric(), ret = numeric(), group = character()))
 
@@ -456,6 +461,8 @@ setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas =
     gNames <- names(x)
     gInfo <- groupInfo(x)
     doConc <- regression && !is.null(anaInfo[["conc"]]) && sum(!is.na(anaInfo[["conc"]]) > 1)
+    addQualities <- !isFALSE(qualities) && qualities %in% c("both", "quality") && nrow(groupQualities(x) > 0)
+    addScores <- !isFALSE(qualities) && qualities %in% c("both", "score") && nrow(groupScores(x) > 0)
 
     if (regression && is.null(anaInfo[["conc"]]))
         warning("No concentration information specified in the analysis information (i.e. conc column, see ?`analysis-information`)")
@@ -464,22 +471,27 @@ setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas =
     {
         ftindex <- groupFeatIndex(x)
         fTable <- featureTable(x)
-        snames <- anaInfo$analysis
-
-        ret <- rbindlist(lapply(gNames, function(grp)
-        {
-            rbindlist(lapply(snames, function(s)
-            {
-                fTable[[s]][ftindex[[grp]][match(s, snames)]]
-            }), idcol = "analysis")
-        }), idcol = "group")
-
+        
+        ret <- rbindlist(fTable, idcol = "analysis")
+        setorder(ret, "group")
         if (doConc)
-            ret[, conc := anaInfo$conc[analysis]]
+            ret[, conc := anaInfo$conc[match(analysis, anaInfo$analysis)]]
 
-        ret[, analysis := snames[analysis]]
-        ret[, group := gNames[group]]
-
+        if (addQualities)
+        {
+            gq <- groupQualities(x)[ret$group, -"group"]
+            ret[, (paste0("group_", names(gq))) := gq]
+        }
+        else
+            ret[, (intersect(featureQualityNames(), names(ret))) := NULL]
+        if (addScores)
+        {
+            gs <- groupScores(x)[ret$group, -"group"]
+            ret[, (paste0("group_", names(gs))) := gs]
+        }
+        else
+            ret[, (intersect(c(featureScoreNames(), "totalScore"), names(ret))) := NULL]
+        
         if (average)
         {
             ret <- ret[, -c("isocount", "analysis", "ID")]
@@ -545,6 +557,11 @@ setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas =
 
         ret[, c("group", "ret", "mz") := .(gNames, gInfo$rts, gInfo$mzs)]
         setcolorder(ret, c("group", "ret", "mz"))
+        
+        if (addQualities)
+            ret <- cbind(ret, groupQualities(x)[ret$group, -"group"])
+        if (addScores)
+            ret <- cbind(ret, groupScores(x)[ret$group, -"group"])
     }
 
     return(ret[])

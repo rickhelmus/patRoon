@@ -137,7 +137,8 @@ setGeneric("annotatedPeakList", function(obj, ...) standardGeneric("annotatedPea
 #' @templateVar func calculatePeakQualities
 #' @templateVar desc calculates chromatographic peak qualities and scores.
 #' @template generics
-setGeneric("calculatePeakQualities", function(obj, weights = NULL, flatnessFactor = 0.05, ...) standardGeneric("calculatePeakQualities"))
+setGeneric("calculatePeakQualities", function(obj, weights = NULL,
+                                              flatnessFactor = 0.05, ...) standardGeneric("calculatePeakQualities"))
 
 #' @templateVar func clusterProperties
 #' @templateVar desc Obtain a list with properties of the generated cluster(s).

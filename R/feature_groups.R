@@ -1348,7 +1348,8 @@ setMethod("overlap", "featureGroups", function(fGroups, which, exclusive)
     return(ret)
 })
 
-setMethod("calculatePeakQualities", "featureGroups", function(obj, weights, flatnessFactor, reCalculateFeatures = FALSE)
+setMethod("calculatePeakQualities", "featureGroups", function(obj, weights, flatnessFactor, avgFunc = mean,
+                                                              reCalculateFeatures = FALSE)
 {
     allScores <- c(featureScoreNames(), featureGroupScoreNames())
     
@@ -1357,7 +1358,8 @@ setMethod("calculatePeakQualities", "featureGroups", function(obj, weights, flat
                              null.ok = TRUE, add = ac)
     if (!is.null(weights))
         checkmate::assertNames(names(weights), subset.of = allScores, add = ac)
-    checkmate::assertNumber(flatnessFactor)
+    checkmate::assertNumber(flatnessFactor, add = ac)
+    checkmate::assertFunction(avgFunc, add = ac)
     checkmate::assertFlag(reCalculateFeatures)
     checkmate::reportAssertions(ac)
     
@@ -1405,8 +1407,7 @@ setMethod("calculatePeakQualities", "featureGroups", function(obj, weights, flat
         {
             if (all(is.na(fList[[q]])))
                 return(NA_real_)
-            # UNDONE: allow to specify average function?
-            return(mean(fList[[q]], na.rm = TRUE))
+            return(avgFunc(fList[[q]], na.rm = TRUE))
         }, simplify = FALSE)
         
         pdata <- lapply(seq_len(nrow(fList)), function(fti) list(rtmin = fList$retmin[fti],

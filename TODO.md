@@ -87,6 +87,7 @@
     - importCheckFeaturesSession()
     - groupQualities/Scores slots
     - as.data.table: qualities argument
+    - calculatePeakQualities(), also generic
 
 
 ## MSPeakLists

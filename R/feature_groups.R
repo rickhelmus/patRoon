@@ -1385,11 +1385,7 @@ setMethod("calculatePeakQualities", "featureGroups", function(obj, weights, flat
     gNames <- names(obj)
     gCount <- length(obj)
     EICs <- getEICsForFGroups(obj, 0, 0.001, NULL, FALSE, TRUE)
-
-    fgQualities <- list(
-        ElutionShift = list(func = MetaClean::calculateElutionShift, HQ = "LV", range = Inf),
-        RetentionTimeCorrelation = list(func = MetaClean::calculateRetentionTimeConsistency, HQ = "LV", range = Inf)
-    )
+    fgQualities <- featureGroupQualities()
     
     printf("Calculating group peak qualities and scores...\n")
     prog <- openProgBar(0, gCount)

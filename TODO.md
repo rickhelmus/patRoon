@@ -59,7 +59,6 @@
 - Fix: blank filter with multiple replicate groups (and maybe others?)
 - Check: units of plotChord() rt/mz graphs seems off
 - update docs and checkChromatograms() for mzWindow --> mzExpWindow
-- also subset features if fGroups are?
 - use fifelse etc for filters?
 - checkFeatures()
     - decide on final function name (perhaps compatible for future component checker)

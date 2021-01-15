@@ -27,8 +27,8 @@ featureScoreNames <- function() paste0(featureQualityNames(), "Score")
 featureGroupQualities <- function()
 {
     list(
-    ElutionShift = list(func = MetaClean::calculateElutionShift, HQ = "LV", range = Inf),
-    RetentionTimeCorrelation = list(func = MetaClean::calculateRetentionTimeConsistency, HQ = "LV", range = Inf)
+        ElutionShift = list(func = MetaClean::calculateElutionShift, HQ = "LV", range = Inf),
+        RetentionTimeCorrelation = list(func = MetaClean::calculateRetentionTimeConsistency, HQ = "LV", range = Inf)
     )
 }
 featureGroupQualityNames <- function() names(featureGroupQualities())

@@ -100,16 +100,18 @@ blankFilter <- function(fGroups, threshold, negate = FALSE)
         for (bl in allBlanks)
         {
             blAnalyses <- which(anaInfo$group == bl)
-            thr <- fGroups@groups[blAnalyses, lapply(.SD, function(x)
+            avg <- sapply(fGroups@groups[blAnalyses], function(x)
             {
                 m <- mean(x[x > 0])
                 if (is.na(m))
                     return(0)
                 else
-                    return(m * threshold)
-            })]
+                    return(m)
+            })
+            thr <- avg * threshold
 
-            fGroups@groups[, (gNames) := lapply(seq_along(.SD), function(n) ifelse(pred(.SD[[n]], thr[[n]]), .SD[[n]], 0))]
+            for (j in seq_along(fGroups@groups))
+                set(fGroups@groups, j = j, value = fifelse(pred(fGroups@groups[[j]], thr[[j]]), fGroups@groups[[j]], 0))
         }
 
         return(cleanGroups(fGroups, TRUE))

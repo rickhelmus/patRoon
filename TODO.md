@@ -59,7 +59,6 @@
 - Fix: blank filter with multiple replicate groups (and maybe others?)
 - Check: units of plotChord() rt/mz graphs seems off
 - update docs and checkChromatograms() for mzWindow --> mzExpWindow
-- use fifelse etc for filters?
 - checkFeatures()
     - decide on final function name (perhaps compatible for future component checker)
     - EIC preview disabled by default? re-rendering table is slow...
@@ -75,6 +74,7 @@
 - NEWS
     - topMostByRGroup/EICTopMostByRGroup
     - as.data.table: qualities argument (and potentially faster now with features=T?)
+    - optimized feature group filters
 - tests
     - topMostByRGroup
 - docs

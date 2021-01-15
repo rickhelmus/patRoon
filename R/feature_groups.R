@@ -308,7 +308,7 @@ setMethod("cleanGroups", "featureGroups", function(fGroups, cleanUnassignedFeatu
 {
     if (length(fGroups) > 0)
     {
-        empty <- unlist(fGroups@groups[, lapply(.SD, function(x) sum(x) == 0)])
+        empty <- sapply(fGroups@groups, function(x) all(x == 0))
         if (any(empty))
             fGroups <- removeGroups(fGroups, which(empty), updateFeatures = FALSE)
         fGroups <- updateFeatures(fGroups, cleanUnassignedFeatures)

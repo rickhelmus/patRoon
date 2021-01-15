@@ -245,8 +245,6 @@ setReplaceMethod("$", "features", function(x, name, value)
 
 setMethod("calculatePeakQualities", "features", function(obj, weights, flatnessFactor)
 {
-    # UNDONE: cache
- 
     featQualities <- featureQualities()
     featQualityNames <- featureQualityNames()
     featScoreNames <- featureScoreNames()
@@ -258,6 +256,11 @@ setMethod("calculatePeakQualities", "features", function(obj, weights, flatnessF
         checkmate::assertNames(names(weights), subset.of = featScoreNames, add = ac)
     checkmate::assertNumber(flatnessFactor, add = ac)
     checkmate::reportAssertions(ac)
+    
+    hash <- makeHash(obj, weights, flatnessFactor)
+    cd <- loadCacheData("calculatePeakQualities", hash)
+    if (!is.null(cd))
+        return(cd)
     
     EICs <- getEICsForFeatures(obj)
     
@@ -309,7 +312,10 @@ setMethod("calculatePeakQualities", "features", function(obj, weights, flatnessF
 
     setTxtProgressBar(prog, length(EICs))
     
-    featureTable(obj) <- fTable    
+    featureTable(obj) <- fTable
+    
+    saveCacheData("calculatePeakQualities", obj, hash)
+    
     return(obj)
 })
 

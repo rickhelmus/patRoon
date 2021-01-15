@@ -40,13 +40,13 @@ eicpaths <- file.path(plotPathLink, sprintf("ftinfo_eic_%d.png", seq_len(length(
 if (rmdVars$selfContained)
     eicpaths <- sapply(eicpaths, knitr::image_uri)
 
-table <- data.table(group = rmdVars$groupNames, EIC = imgTags(eicpaths))
-table <- cbind(table, rmdVars$gInfo)
+table <- as.data.table(rmdVars$fGroups, qualities = "score")
+table[, EIC := imgTags(eicpaths)]
+setcolorder(table, c("group", "EIC"))
 if (rmdVars$retMin)
-    table[, rts := rts / 60]
-for (col in names(rmdVars$gInfo))
-    set(table, j = col, value = round(table[[col]], if (col == "mzs") 5 else 2))
-setnames(table, c("rts", "mzs"), c("ret", "mz"))
+    table[, ret := ret / 60]
+for (col in c("ret", "mz")) # UNDONE
+    set(table, j = col, value = round(table[[col]], if (col == "mz") 5 else 2))
 
 initDT <- DT::JS("function(settings, json) {",
                  "setTimeout(function() {",

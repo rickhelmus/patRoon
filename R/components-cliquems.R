@@ -35,7 +35,7 @@ setMethod("generateComponentsCliqueMS", "featureGroups", function(fGroups, ioniz
     anas <- analyses(fGroups)
     fList <- getFeatures(fGroups)
     
-    printf("Annotating all features with CliqueMS for %d analyses ...\n", nrow(anaInfo))
+    printf("Annotating all features with CliqueMS for %d analyses ...\n", length(anas))
     
     hash <- makeHash(fList, ionization, mzWindow, minSize, relMinAdductAbundance, extraOpts)
     
@@ -58,14 +58,28 @@ setMethod("generateComponentsCliqueMS", "featureGroups", function(fGroups, ioniz
                                            adinfo = if (ionization == "positive") positive.adinfo else negative.adinfo,
                                            polarity = ionization, normalizeScore = TRUE)
 
-        peakTab <- as.data.table(cliqueMS::getPeaklistanClique(cliques))
-        setnames(peakTab, "rt", "ret")
-        peakTab[, ID := seq_len(.N)]
-        peakTab <- peakTab[, c("ID", "ret", "mz", "cliqueGroup", "isotope", paste0("an", seq_len(5)),
-                               paste0("score", seq_len(5)), paste0("mass", seq_len(5)))]
-        setTxtProgressBar(prog, i)
+        # For now we just take the highest ranking annotation. To further simplify, each clique is further separated per
+        # neutral mass.
         
-        return(split(peakTab, by = "cliqueGroup", keep.by = FALSE))
+        peakTab <- as.data.table(cliqueMS::getPeaklistanClique(cliques))
+        setnames(peakTab,
+                 c("rt", "an1", "score1", "mass1"),
+                 c("ret", "adduct", "score", "neutralMass"))
+        peakTab[, ID := seq_len(.N)]
+        
+        # split isotope annotations in groups and clusters (similar to CAMERA/RAMClustR), remove defaulted annotations
+        
+        
+        peakTab <- peakTab[, c("ID", "ret", "mz", "cliqueGroup", "isotope", "adduct", "score", "neutralMass"),
+                           with = FALSE]
+        
+        # UNDONE: split works fine with (equal) numerics?
+        ret <- split(peakTab, by = c("cliqueGroup", "neutralMass"), keep.by = FALSE)
+        
+        browser()
+        
+        setTxtProgressBar(prog, i)
+        return(ret)
     }), anas)
     
     close(prog)

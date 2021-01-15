@@ -1348,8 +1348,7 @@ setMethod("overlap", "featureGroups", function(fGroups, which, exclusive)
     return(ret)
 })
 
-setMethod("calculatePeakQualities", "featureGroups", function(obj, weights, flatnessFactor, avgFunc = mean,
-                                                              reCalculateFeatures = FALSE)
+setMethod("calculatePeakQualities", "featureGroups", function(obj, weights, flatnessFactor, avgFunc = mean)
 {
     allScores <- c(featureScoreNames(), featureGroupScoreNames())
     
@@ -1360,8 +1359,12 @@ setMethod("calculatePeakQualities", "featureGroups", function(obj, weights, flat
         checkmate::assertNames(names(weights), subset.of = allScores, add = ac)
     checkmate::assertNumber(flatnessFactor, add = ac)
     checkmate::assertFunction(avgFunc, add = ac)
-    checkmate::assertFlag(reCalculateFeatures)
     checkmate::reportAssertions(ac)
+    
+    hash <- makeHash(obj, weights, flatnessFactor, avgFunc)
+    cd <- loadCacheData("calculatePeakQualities", hash)
+    if (!is.null(cd))
+        return(cd)
     
     checkPackage("MetaClean")
     
@@ -1374,14 +1377,8 @@ setMethod("calculatePeakQualities", "featureGroups", function(obj, weights, flat
         weights <- weights[allScores]
     }
     
-    if (reCalculateFeatures || is.null(featureTable(obj)[[1]][["peakScore"]]))
-    {
-        w <- if (!is.null(weights) && any(names(weights) %in% featureScoreNames())) weights[featureScoreNames()] else NULL
-        obj@features <- calculatePeakQualities(getFeatures(obj), weights = w,
-                                               flatnessFactor = flatnessFactor)
-    }
-    else
-        printf("Skipping feature calculation (already done)\n")
+    w <- if (!is.null(weights) && any(names(weights) %in% featureScoreNames())) weights[featureScoreNames()] else NULL
+    obj@features <- calculatePeakQualities(getFeatures(obj), weights = w, flatnessFactor = flatnessFactor)
     
     ftind <- groupFeatIndex(obj)
     anas <- analyses(obj)
@@ -1438,6 +1435,8 @@ setMethod("calculatePeakQualities", "featureGroups", function(obj, weights, flat
     }
     
     setTxtProgressBar(prog, gCount)
+    
+    saveCacheData("calculatePeakQualities", obj, hash)
     
     return(obj)
 })

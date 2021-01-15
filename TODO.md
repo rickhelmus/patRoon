@@ -61,9 +61,6 @@
 - update docs and checkChromatograms() for mzWindow --> mzExpWindow
 - also subset features if fGroups are?
 - use fifelse etc for filters?
-- peak qualities
-    - caching (remove reCalculateFeatures option?)
-    - averaging func
 - checkFeatures()
     - decide on final function name (perhaps compatible for future component checker)
     - EIC preview disabled by default? re-rendering table is slow...

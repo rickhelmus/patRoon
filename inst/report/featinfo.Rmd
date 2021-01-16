@@ -40,7 +40,7 @@ eicpaths <- file.path(plotPathLink, sprintf("ftinfo_eic_%d.png", seq_len(length(
 if (rmdVars$selfContained)
     eicpaths <- sapply(eicpaths, knitr::image_uri)
 
-table <- as.data.table(rmdVars$fGroups, qualities = "score")
+table <- as.data.table(rmdVars$fGroups, qualities = "score", average = TRUE)
 table[, EIC := imgTags(eicpaths)]
 setcolorder(table, c("group", "EIC"))
 if (rmdVars$retMin)
@@ -52,8 +52,33 @@ initDT <- DT::JS("function(settings, json) {",
                  "setTimeout(function() {",
                  "$(\"#ftInfoTable .dataTable\").DataTable().columns.adjust().draw(); }",
                  ", 25); }")
-DT::datatable(table, options = list(scrollX = TRUE, scrollY = "600px", deferRender = TRUE,
-                                    paging = FALSE, autoWidth = TRUE,
-                                    initComplete = initDT, order = list(list(0, "asc"))),
-              elementId = "ftInfoTable", escape = FALSE)
+buttonFunc <- function(cols)
+{
+    cols <- match(cols, names(table))
+    DT::JS(paste("function (e, dt, node, config) {",
+                 paste0(sprintf("dt.column(%d).visible(!dt.column(%d).visible());", cols, cols), collapse = "\n"),
+                 "}"))
+}
+
+bts <- list(list(text = "Intensities", action = buttonFunc(replicateGroups(rmdVars$fGroups))))
+hiddenCols <- integer()
+if (hasFGroupScores(rmdVars$fGroups))
+{
+    setnames(table, "totalScore", "Total score")
+    otherSc <- c(featureScoreNames(), featureGroupScoreNames())
+    bts <- c(bts, list(list(text = "Total score", action = buttonFunc("Total score")),
+                       list(text = "Other scores", action = buttonFunc(otherSc))))
+    hiddenCols <- match(otherSc, names(table))
+}
+
+tabOpts <- list(dom = "Bfrtip", scrollX = TRUE, scrollY = "600px", deferRender = TRUE,
+                paging = FALSE, autoWidth = TRUE,
+                initComplete = initDT, order = list(list(0, "asc")),
+                buttons = list(list(extend = "colvis", text = "Columns",
+                                    background = FALSE, collectionLayout = "three-column",
+                                    buttons = bts)))
+if (length(hiddenCols))
+    tabOpts <- c(tabOpts, list(columnDefs = list(list(visible = FALSE, targets = hiddenCols))))
+
+DT::datatable(table, extensions = "Buttons", options = tabOpts, elementId = "ftInfoTable", escape = FALSE)
 ```

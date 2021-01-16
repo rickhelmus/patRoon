@@ -50,8 +50,8 @@ for (col in c("ret", "mz")) # UNDONE
 
 initDT <- DT::JS("function(settings, json) {",
                  "setTimeout(function() {",
-                 "$(\"#ftInfoTable .dataTable\").DataTable().columns.adjust().draw(); }",
-                 ", 25); }")
+                 "$(\".dataTable\").DataTable().columns.adjust().draw(); }",
+                 ", 100); }")
 buttonFunc <- function(cols)
 {
     cols <- match(cols, names(table))
@@ -61,6 +61,7 @@ buttonFunc <- function(cols)
 }
 
 bts <- list(list(text = "Intensities", action = buttonFunc(replicateGroups(rmdVars$fGroups))))
+
 hiddenCols <- integer()
 if (hasFGroupScores(rmdVars$fGroups))
 {
@@ -71,12 +72,17 @@ if (hasFGroupScores(rmdVars$fGroups))
     hiddenCols <- match(otherSc, names(table))
 }
 
+if (isScreening(rmdVars$fGroups))
+{
+    setnames(table, "name", "suspect")
+    bts <- c(bts, list(list(text = "Suspect name", action = buttonFunc("suspect"))))
+}
+
 tabOpts <- list(dom = "Bfrtip", scrollX = TRUE, scrollY = "600px", deferRender = TRUE,
                 paging = FALSE, autoWidth = TRUE,
                 initComplete = initDT, order = list(list(0, "asc")),
                 buttons = list(list(extend = "colvis", text = "Columns",
-                                    background = FALSE, collectionLayout = "three-column",
-                                    buttons = bts)))
+                                    background = TRUE, buttons = bts)))
 if (length(hiddenCols))
     tabOpts <- c(tabOpts, list(columnDefs = list(list(visible = FALSE, targets = hiddenCols))))
 

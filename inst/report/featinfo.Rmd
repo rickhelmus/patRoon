@@ -1,30 +1,3 @@
-```{r echo=FALSE}
-message("Making plots for feature info table...")
-
-allPlots <- vector("character", length(rmdVars$components) * 4)
-curPlotInd <- 0
-plotPathFull <- getPlotPath(FALSE)
-plotPathLink <- getPlotPath(TRUE)
-
-prog <- openProgBar(0, length(rmdVars$fGroups))
-allPlots <- lapply(seq_len(length(rmdVars$fGroups)), function(grpi)
-{
-    path <- file.path(plotPathFull, sprintf("ftinfo_eic_%d.png", grpi))
-    makeCachedPlot(path, "plotChroms",
-                   list(rmdVars$fGroups[, grpi], rmdVars$EICRtWindow,
-                        rmdVars$EICMzExpWindow, rmdVars$retMin,
-                        rmdVars$EICTopMost, rmdVars$EICTopMostByRGroup, rmdVars$EICs, colourBy = "rGroup", title = ""),
-                   7, 4.5, bg = NA, cacheDB = rmdVars$cacheDB)
-    setTxtProgressBar(prog, grpi)
-    return(path)
-})
-close(prog)
-
-if (rmdVars$optimizePng && length(allPlots) > 0)
-    optimizePngPlots(allPlots)
-```
-
-
 Feature info {data-orientation=rows}
 ===
 
@@ -35,13 +8,8 @@ Feature info {data-orientation=rows}
 <style> .ftInfo { overflow-x: auto; } </style>
 
 ```{r echo=FALSE}
-eicpaths <- file.path(plotPathLink, sprintf("ftinfo_eic_%d.png", seq_len(length(rmdVars$fGroups))))
-
-if (rmdVars$selfContained)
-    eicpaths <- sapply(eicpaths, knitr::image_uri)
-
 table <- as.data.table(rmdVars$fGroups, qualities = "score", average = TRUE)
-table[, EIC := imgTags(eicpaths)]
+table[, EIC := imgTags(chromPaths)]
 setcolorder(table, c("group", "EIC"))
 if (rmdVars$retMin)
     table[, ret := ret / 60]

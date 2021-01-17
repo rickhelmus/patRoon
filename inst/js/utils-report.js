@@ -7,7 +7,8 @@ function showEICs(group)
 {
     el = document.getElementById("EIC");
     el.style.display = "flex";
-    el.src = EICPaths[parseInt(group) - 1];
+    el.style.maxWidth = "100%";
+    el.src = chromPaths[parseInt(group) - 1];
     document.getElementById("noAnnotationSelected").style.display = 'none';
 }
 

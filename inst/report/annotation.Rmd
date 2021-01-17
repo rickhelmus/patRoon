@@ -106,7 +106,7 @@ if (rmdVars$retMin)
 
 fGroupsSpecDT[, c("ret", "mz") := .(round(ret, 2), round(mz, 5))]
 fGroupsSpecDT <- fGroupsSpecDT[, intersect(c("group", "ret", "mz", keepSuspCols), names(fGroupsSpecDT)), with = FALSE]
-fGroupsSpecDT[, groupInd := match(group, allGroups)]
+fGroupsSpecDT[, groupInd := match(group, names(rmdVars$fGroups))]
 setcolorder(fGroupsSpecDT, "groupInd")
 
 showButton <- function(title, jsFunc, ...)
@@ -117,16 +117,15 @@ showButton <- function(title, jsFunc, ...)
 maybeAddButton <- function(g, subGroups, ...) if (g %in% subGroups) showButton(...) else "^"
 
 compButtons <- sapply(fGroupsSpecDT$group, function(g) maybeAddButton(g, compFGroups, "compounds", "showAnnotation",
-                                                                      match(g, allGroups), "compounds"))
+                                                                      match(g, names(rmdVars$fGroups)), "compounds"))
 compCLButtons <- sapply(fGroupsSpecDT$group, function(g) maybeAddButton(g, compsClustFGroups,
                                                                         "compounds clust", "showCompoundsCluster",
-                                                                        match(g, allGroups)))
+                                                                        match(g, names(rmdVars$fGroups))))
 formButtons <- sapply(fGroupsSpecDT$group, function(g) maybeAddButton(g, formFGroups, "formulas",
-                                                                      "showAnnotation", match(g, allGroups),
+                                                                      "showAnnotation", match(g, names(rmdVars$fGroups)),
                                                                       "formulas"))
 mfWebButtons <- sapply(fGroupsSpecDT$group, function(g) maybeAddButton(g, mfWebFGroups, "MetFrag web",
-                                                                       "window.open",
-                                                                       mfWebLinks[allGroups[match(g, allGroups)]],
+                                                                       "window.open", mfWebLinks[g],
                                                                        "_blank"))
 
 sp <- paste0(rep("&nbsp;", 4), collapse = "")
@@ -205,18 +204,11 @@ prog <- openProgBar(0, length(plotGroups))
 plotPathFull <- getPlotPath(FALSE)
 plotPathLink <- getPlotPath(TRUE)
 
-allPlots <- lapply(seq_along(plotGroups), function(grpi)
+allPlots <- setNames(lapply(seq_along(plotGroups), function(i)
 {
+    grp <- plotGroups[i]
+    grpi <- match(grp, names(rmdVars$fGroups))
     grpPlots <- list()
-    
-    grp <- plotGroups[grpi]
-    plotf <- file.path(plotPathFull, sprintf("eic_%i.png", grpi))
-    grpPlots[["EIC"]] <- plotf
-    makeCachedPlot(plotf, "plotChroms", list(rmdVars$fGroups[, plotGroups[grpi]], rmdVars$EICRtWindow,
-                                             rmdVars$EICMzExpWindow, rmdVars$retMin,
-                                             rmdVars$EICTopMost, rmdVars$EICTopMostByRGroup, rmdVars$EICs,
-                                             colourBy = "rGroup", title = ""),
-                   5, 4, parSettings = list(mar = c(4, 4, 0.1, 2)), cacheDB = rmdVars$cacheDB)
     
     if (grp %in% compFGroups)
     {
@@ -293,10 +285,10 @@ allPlots <- lapply(seq_along(plotGroups), function(grpi)
         })
     }
     
-    setTxtProgressBar(prog, grpi)
+    setTxtProgressBar(prog, i)
     
     return(grpPlots)
-})
+}), plotGroups)
 close(prog)
 
 ap <- unlist(allPlots); ap <- ap[nzchar(ap)]
@@ -304,21 +296,8 @@ if (rmdVars$optimizePng && length(ap > 0))
     optimizePngPlots(ap)
 
 if (rmdVars$selfContained)
-{
     allPlots <- rapply(allPlots, function(ap) sapply(ap, function(p) if (nzchar(p)) knitr::image_uri(p) else ""), how = "replace")
-    EICPaths <- sapply(allPlots, "[[", "EIC")
-} else
-{
-    EICPaths <- file.path(plotPathLink, basename(sapply(allPlots, "[[", "EIC")))
-}
-
-# stuff everything together: https://stackoverflow.com/a/21730473
-rmdText <- sprintf("<script>var EICPaths = [ %s ];</script>",
-                   paste0("'", EICPaths, "'", collapse = ", "))
 ```
-
-
-`r if (length(plotGroups) > 0) rmdText`
 
 
 ## { .annotationClass .compounds }
@@ -330,7 +309,6 @@ rmdText <- sprintf("<script>var EICPaths = [ %s ];</script>",
 ```{r echo=FALSE, eval=length(compFGroups) > 0}
 compoundsDT <- rbindlist(lapply(compFGroups, function(grp)
 {
-    grpi <- which(plotGroups == grp)
     mn <- mergedCompoundNames(rmdVars$compounds)
 
     ct <- compTable[[grp]]
@@ -367,11 +345,11 @@ compoundsDT <- rbindlist(lapply(compFGroups, function(grp)
                            kableExtra::scroll_box(extra_css = "overflow: auto; height: 125px;")
     })
     
-    return(data.table(group = grpi,
+    return(data.table(group = match(grp, names(rmdVars$fGroups)),
                       "#" = seq_len(nrow(ct)),
-                      compound = paste0(imgTags(allPlots[[grpi]]$compoundStructs), "<br>", infoTexts),
-                      spectrum = paste0(imgTags(allPlots[[grpi]]$compoundSpectra), "<br>", fiTables),
-                      scores = imgTags(allPlots[[grpi]]$compoundScores)))
+                      compound = paste0(imgTags(allPlots[[grp]]$compoundStructs), "<br>", infoTexts),
+                      spectrum = paste0(imgTags(allPlots[[grp]]$compoundSpectra), "<br>", fiTables),
+                      scores = imgTags(allPlots[[grp]]$compoundScores)))
 }))
 
 DT::datatable(compoundsDT, options = list(scrollX = TRUE, scrollY = "600px", deferRender = TRUE,
@@ -391,7 +369,6 @@ DT::datatable(compoundsDT, options = list(scrollX = TRUE, scrollY = "600px", def
 ```{r echo=FALSE, eval=length(formFGroups) > 0}
 formulasDT <- rbindlist(lapply(formFGroups, function(grp)
 {
-    grpi <- which(plotGroups == grp)
     precursors <- unique(rmdVars$formulas[[grp]][["formula"]])
     
     infoTexts <- sapply(seq_along(precursors), function(preci)
@@ -425,10 +402,10 @@ formulasDT <- rbindlist(lapply(formFGroups, function(grp)
             kableExtra::scroll_box(extra_css = "overflow: auto; height: 125px;")
     })
     
-    ret <- data.table(group = grpi,
+    ret <- data.table(group = match(grp, names(rmdVars$fGroups)),
                       formula = subscriptFormulaHTML(precursors),
-                      spectrum = paste0(imgTags(allPlots[[grpi]]$formulaSpecs), "<br>", fiTables),
-                      scores = paste0(imgTags(allPlots[[grpi]]$formulaScores), "<br>", infoTexts))
+                      spectrum = paste0(imgTags(allPlots[[grp]]$formulaSpecs), "<br>", fiTables),
+                      scores = paste0(imgTags(allPlots[[grp]]$formulaScores), "<br>", infoTexts))
 
     return(ret)
 }))
@@ -453,15 +430,16 @@ compClustTempl <- readAllFile(system.file("templates", "comp-cluster.Rmd", packa
 cutcl <- cutClusters(rmdVars$compsCluster)
 for (i in seq_along(compsClustFGroups))
 {
-    grpi <- which(plotGroups == compsClustFGroups[i])
+    grp <- compsClustFGroups[i]
+    grpi <- match(grp, names(rmdVars$fGroups))
     
-    ct <- cutcl[[plotGroups[grpi]]]
+    ct <- cutcl[[grp]]
     rmdTexts[i] <-
         paste0(glue::glue(compClustTempl,
                           grpi = grpi,
-                          grp = plotGroups[grpi],
-                          dendro = allPlots[[grpi]]$compClustDendro,
-                          mcs = paste0(sprintf("![](%s)", allPlots[[grpi]]$compClustMCS),
+                          grp = grp,
+                          dendro = allPlots[[grp]]$compClustDendro,
+                          mcs = paste0(sprintf("![](%s)", allPlots[[grp]]$compClustMCS),
                                        collapse = "\n")),
                collapse = "\n")
 }

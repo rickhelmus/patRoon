@@ -52,6 +52,38 @@ pre, code {
 }
 </style>
 
+```{r echo=FALSE}
+message("Generating chromatograms...")
+
+plotPathFull <- getPlotPath(FALSE)
+
+prog <- openProgBar(0, length(rmdVars$fGroups))
+allPlots <- lapply(seq_len(length(rmdVars$fGroups)), function(grpi)
+{
+    path <- file.path(plotPathFull, sprintf("chrom_%d.png", grpi))
+    makeCachedPlot(path, "plotChroms",
+                   list(rmdVars$fGroups[, grpi], rmdVars$EICRtWindow,
+                        rmdVars$EICMzExpWindow, rmdVars$retMin,
+                        rmdVars$EICTopMost, rmdVars$EICTopMostByRGroup, rmdVars$EICs, colourBy = "rGroup"),
+                   7, 4.5, bg = NA, cacheDB = rmdVars$cacheDB)
+    setTxtProgressBar(prog, grpi)
+    return(path)
+})
+close(prog)
+
+if (rmdVars$optimizePng && length(allPlots) > 0)
+    optimizePngPlots(allPlots)
+
+chromPaths <- file.path(getPlotPath(TRUE), sprintf("chrom_%d.png", seq_len(length(rmdVars$fGroups))))
+chromPathsFull <- file.path(plotPathFull, sprintf("chrom_%d.png", seq_len(length(rmdVars$fGroups))))
+if (rmdVars$selfContained)
+    chromPaths <- sapply(chromPaths, knitr::image_uri)
+
+# stuff everything together: https://stackoverflow.com/a/21730473
+rmdText <- sprintf("<script>var chromPaths = [ %s ];</script>",
+                   paste0("'", chromPaths, "'", collapse = ", "))
+```
+`r rmdText`
 
 Summary {data-orientation=rows}
 ================
@@ -128,20 +160,10 @@ plotUpSet(rmdVars$fGroups)
 ```
 
 `r if (doEICs) "EICs\n===\n"`
-```{r eval=doEICs}
-message("Plotting EICs...")
-prog <- openProgBar(0, length(rmdVars$fGroups))
-
-for (grpi in seq_len(length(rmdVars$fGroups)))
-{
-    setTxtProgressBar(prog, grpi)
-    plotChroms(rmdVars$fGroups[, grpi], rmdVars$EICRtWindow, rmdVars$EICMzExpWindow,
-               rmdVars$retMin, rmdVars$EICTopMost, rmdVars$EICTopMostByRGroup, rmdVars$EICs, colourBy = "rGroup",
-               showLegend = TRUE, onlyPresent = rmdVars$EICOnlyPresent)
-}
-
-close(prog)
+```{r results='asis', eval=doEICs}
+cat(sprintf("![%s](%s)", names(rmdVars$fGroups), chromPaths), sep = "\n")
 ```
+
 
 ```{r child="featinfo.Rmd", eval=doEICs}
 ```

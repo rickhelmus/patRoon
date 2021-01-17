@@ -41,6 +41,22 @@ imgTags <- function(img)
     }
     return(ifelse(nzchar(img), ret, ""))
 }
+
+rGroupLenNonEmpty <- length(unique(analysisInfo(removeEmptyAnalyses(rmdVars$fGroups))$group))
+rGroupLen <- length(replicateGroups(rmdVars$fGroups))
+anyOverlap <- rGroupLen > 1 &&
+    length(unique(rmdVars$fGroups, which = replicateGroups(rmdVars$fGroups), outer = TRUE)) < length(rmdVars$fGroups)
+if (length(rmdVars$fGroups) > 0 && anyOverlap && rGroupLenNonEmpty > 1)
+{
+    doPlotChord <- "chord" %in% rmdVars$reportPlots && rGroupLenNonEmpty > 2
+    doPlotVenn <- "venn" %in% rmdVars$reportPlots && rGroupLen < 6
+    doPlotUpSet <- "upset" %in% rmdVars$reportPlots
+} else
+    doPlotChord <- doPlotVenn <- doPlotUpSet <- FALSE
+doAnnotation <- !is.null(rmdVars$compounds) || !is.null(rmdVars$compsCluster) || !is.null(rmdVars$formulas) ||
+    !is.null(rmdVars$components) || inherits(rmdVars$fGroups, "featureGroupsScreening")
+doEICs <- length(rmdVars$fGroups) > 0 && "eics" %in% rmdVars$reportPlots
+rmdText <- NULL
 ```
 
 <style>
@@ -52,7 +68,7 @@ pre, code {
 }
 </style>
 
-```{r echo=FALSE}
+```{r echo=FALSE,eval=doEICs || doAnnotation}
 message("Generating chromatograms...")
 
 plotPathFull <- getPlotPath(FALSE)
@@ -83,7 +99,7 @@ if (rmdVars$selfContained)
 rmdText <- sprintf("<script>var chromPaths = [ %s ];</script>",
                    paste0("'", chromPaths, "'", collapse = ", "))
 ```
-`r rmdText`
+`r if (!is.null(rmdText)) rmdText`
 
 Summary {data-orientation=rows}
 ================
@@ -124,22 +140,6 @@ selectMethod("plot", class(rmdVars$fGroups))(rmdVars$fGroups, colourBy = "fGroup
 ```
 
 
-```{r}
-rGroupLenNonEmpty <- length(unique(analysisInfo(removeEmptyAnalyses(rmdVars$fGroups))$group))
-rGroupLen <- length(replicateGroups(rmdVars$fGroups))
-anyOverlap <- rGroupLen > 1 &&
-    length(unique(rmdVars$fGroups, which = replicateGroups(rmdVars$fGroups), outer = TRUE)) < length(rmdVars$fGroups)
-if (length(rmdVars$fGroups) > 0 && anyOverlap && rGroupLenNonEmpty > 1)
-{
-    doPlotChord <- "chord" %in% rmdVars$reportPlots && rGroupLenNonEmpty > 2
-    doPlotVenn <- "venn" %in% rmdVars$reportPlots && rGroupLen < 6
-    doPlotUpSet <- "upset" %in% rmdVars$reportPlots
-} else
-    doPlotChord <- doPlotVenn <- doPlotUpSet <- FALSE
-doEICs <- length(rmdVars$fGroups) > 0 && "eics" %in% rmdVars$reportPlots
-```
-
-
 `r if (doPlotChord || doPlotVenn || doPlotUpSet) "## { data-height=425 } \n"`
 
 `r if (doPlotChord) "### Chord diagram\n"`
@@ -173,5 +173,5 @@ cat(sprintf("![%s](%s)", names(rmdVars$fGroups), chromPaths), sep = "\n")
 ```
 
 
-```{r child="annotation.Rmd", eval=!is.null(rmdVars$compounds) || !is.null(rmdVars$compsCluster) || !is.null(rmdVars$formulas) || !is.null(rmdVars$components) || inherits(rmdVars$fGroups, "featureGroupsScreening") }
+```{r child="annotation.Rmd", eval=doAnnotation }
 ```

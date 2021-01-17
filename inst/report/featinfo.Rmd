@@ -13,7 +13,7 @@ table[, EIC := imgTags(chromPaths)]
 setcolorder(table, c("group", "EIC"))
 if (rmdVars$retMin)
     table[, ret := ret / 60]
-for (col in c("ret", "mz")) # UNDONE
+for (col in names(table)[(sapply(table, is.numeric))])
     set(table, j = col, value = round(table[[col]], if (col == "mz") 5 else 2))
 
 initDT <- DT::JS("function(settings, json) {",
@@ -47,7 +47,7 @@ if (isScreening(rmdVars$fGroups))
 }
 
 tabOpts <- list(dom = "Bfrtip", scrollX = TRUE, scrollY = "600px", deferRender = TRUE,
-                paging = FALSE, autoWidth = TRUE,
+                paging = FALSE, autoWidth = FALSE,
                 initComplete = initDT, order = list(list(0, "asc")),
                 buttons = list(list(extend = "colvis", text = "Columns",
                                     background = TRUE, buttons = bts)))

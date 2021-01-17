@@ -71,7 +71,6 @@
     - verify user input
     - see if more object updates are needed
     - docs (also check args in ref docs), tests, NEWS
-- remove doEICs option from reportHTML? otherwise need to disable it for pre-generation in main.Rmd and annotation
 - NEWS
     - topMostByRGroup/EICTopMostByRGroup
     - as.data.table: qualities argument (and potentially faster now with features=T?)
@@ -86,6 +85,7 @@
     - groupQualities/Scores slots
     - as.data.table: qualities argument
     - calculatePeakQualities(), also generic
+    - reportHTML: EICs made if annotations, even if not specified in reportPlots
 
 
 ## MSPeakLists

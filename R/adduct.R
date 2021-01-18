@@ -78,7 +78,7 @@ setMethod("show", "adduct", function(object)
 setMethod("as.character", "adduct", function(x, format = "generic", err = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertChoice(format, c("generic", "sirius", "genform", "metfrag", "openms"), add = ac)
+    checkmate::assertChoice(format, c("generic", "sirius", "genform", "metfrag", "openms", "cliquems"), add = ac)
     checkmate::assertFlag(err, add = ac)
     checkmate::reportAssertions(ac)
 
@@ -102,7 +102,7 @@ setMethod("as.character", "adduct", function(x, format = "generic", err = TRUE)
         return(adds[1]) # return first one in case there are multiple hits
     }
     
-    if (format == "sirius" || format == "generic")
+    if (format == "sirius" || format == "cliquems" || format == "generic")
     {
         if (format == "sirius")
         {

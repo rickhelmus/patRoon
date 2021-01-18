@@ -3,7 +3,8 @@
 NULL
 
 #' @export
-componentsCliqueMS <- setClass("componentsCliqueMS", contains = "componentsFeatures")
+componentsCliqueMS <- setClass("componentsCliqueMS", slots = c(cliques = "list"),
+                               contains = "componentsFeatures")
 
 setMethod("initialize", "componentsCliqueMS",
           function(.Object, ...) callNextMethod(.Object, algorithm = "openms", ...))
@@ -17,6 +18,8 @@ setMethod("generateComponentsCliqueMS", "featureGroups", function(fGroups, ioniz
     # UNDONE: all features are currently annotated (ie including not in a group), should be fine once featng is merged
     # UNDONE: more parameters and proper defaults
     # UNDONE: parallel?
+    # UNDONE: verify adduct and isotope charge afterwards? let user decide what to clear if mismatch (eg isotope, adduct, both)
+    
     
     checkPackage("cliqueMS", "https://github.com/rickhelmus/cliqueMS") # UNDONE
     
@@ -45,31 +48,50 @@ setMethod("generateComponentsCliqueMS", "featureGroups", function(fGroups, ioniz
     
     prog <- openProgBar(0, length(anas))
     
-    featComponents <- setNames(lapply(seq_along(anas), function(i)
+    allCliques <- setNames(lapply(seq_along(anas), function(i)
     {
         hash <- makeHash(fList[[i]], baseHash)
-        ret <- loadCacheData("componentsCliqueMS", hash, db)
-        if (is.null(ret))
+        cliques <- loadCacheData("componentsCliqueMS", hash, db)
+        if (!is.null(cliques))
+            return(cliques)
+
+        xdata <- getXCMSnExp(fList[i], verbose = FALSE)
+        
+        suppressMessages(invisible(utils::capture.output({
+            cliques <- cliqueMS::getCliques(xdata, filter = TRUE)
+            cliques <- cliqueMS::getIsotopes(cliques, ppm = 10)
+            cliques <- cliqueMS::getAnnotation(cliques, ppm = 10,
+                                               adinfo = if (ionization == "positive") positive.adinfo else negative.adinfo,
+                                               polarity = ionization, normalizeScore = TRUE)
+        })))
+        
+        saveCacheData("componentsCliqueMS", cliques, hash, db)
+        setTxtProgressBar(prog, i)
+        
+        return(cliques)
+    }), anas)
+    
+    close(prog)
+    
+    featComponents <- list()
+    if (length(allCliques) > 0)
+    {
+        # UNDONE also cache?
+        
+        printf("Processing %d cliques... ",
+               sum(sapply(allCliques, function(cl) length(cliqueMS::getlistofCliques(cl)))))
+    
+        featComponents <- sapply(allCliques, function(cl)
         {
-            xdata <- getXCMSnExp(fList[i], verbose = FALSE)
-            
-            suppressMessages(invisible(utils::capture.output({
-                cliques <- cliqueMS::getCliques(xdata, filter = TRUE)
-                cliques <- cliqueMS::getIsotopes(cliques, ppm = 10)
-                cliques <- cliqueMS::getAnnotation(cliques, ppm = 10,
-                                                   adinfo = if (ionization == "positive") positive.adinfo else negative.adinfo,
-                                                   polarity = ionization, normalizeScore = TRUE)
-            })))
-            
             # For now we just take the highest ranking annotation. To further simplify, each clique is further separated per
             # neutral mass.
-            
-            peakTab <- as.data.table(cliqueMS::getPeaklistanClique(cliques))
+            peakTab <- as.data.table(cliqueMS::getPeaklistanClique(cl))
             setnames(peakTab,
                      c("rt", "an1", "score1", "mass1"),
                      c("ret", "adduct", "score", "neutralMass"))
             peakTab[, ID := seq_len(.N)]
-            peakTab[!is.na(adduct) & nzchar(adduct),
+            peakTab[!nzchar(adduct), adduct := NA_character_] # BUG: sometimes adducts are empty instead of NA?
+            peakTab[!is.na(adduct),
                     adduct := sapply(adduct, function(a) as.character(as.adduct(a, format = "cliquems")))]
             
             # remove defaulted isotope annotations (eg w/out cluster)
@@ -80,7 +102,7 @@ setMethod("generateComponentsCliqueMS", "featureGroups", function(fGroups, ioniz
             peakTab[!is.na(isotope), isonr := sub("M([[:digit:]]+).*", "\\1", isotope)]
             
             # get charges
-            isoTab <- as.data.table(cliqueMS::getIsolistanClique(cliques))
+            isoTab <- as.data.table(cliqueMS::getIsolistanClique(cl))
             # only keep isotope annotations with equal charge as M0, see https://github.com/osenan/cliqueMS/issues/7
             isoTab[, keep := charge == .SD[grade == 0]$charge, by = "cluster"]
             isoTab <- isoTab[keep == TRUE]
@@ -89,22 +111,22 @@ setMethod("generateComponentsCliqueMS", "featureGroups", function(fGroups, ioniz
             isoTab <- isoTab[keep == TRUE]
             peakTab[!is.na(isotope), charge := isoTab[match(ID, feature)]$charge]
             
+            # unassign removed clusters
+            peakTab[!is.na(isotope) & !isogroup %in% isoTab$cluster, c("isogroup", "isonr") := NA]
+            
             peakTab <- peakTab[, c("ID", "ret", "mz", "cliqueGroup", "isogroup", "isonr", "charge", "adduct",
                                    "score", "neutralMass"),
                                with = FALSE]
             
             # UNDONE: split works fine with (equal) numerics?
-            ret <- split(peakTab, by = c("cliqueGroup", "neutralMass"), keep.by = TRUE)
-        }
+            ret <- unname(split(peakTab, by = c("cliqueGroup", "neutralMass"), keep.by = TRUE))
+            
+            return(ret)
+        }, simplify = FALSE)
         
-        saveCacheData("componentsCliqueMS", ret, hash, db)
-        
-        setTxtProgressBar(prog, i)
-        return(ret)
-    }), anas)
+        printf("Done!\n")
+    }
     
-    close(prog)
-    
-    return(componentsCliqueMS(fGroups = fGroups, mzWindow = mzWindow, minSize = minSize,
+    return(componentsCliqueMS(cliques = allCliques, fGroups = fGroups, mzWindow = mzWindow, minSize = minSize,
                               relMinAdductAbundance = relMinAdductAbundance, featureComponents = featComponents))
 })

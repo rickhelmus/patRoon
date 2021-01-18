@@ -37,15 +37,15 @@ setMethod("initialize", "componentsFeatures", function(.Object, fGroups, minSize
     cmpTab[, fCMPID := paste0(match(analysis, analyses(fGroups)), "-", fCMP)]
 
     # NOTE: abundance only takes assigned features into account, as unassigned won't be present
-    cmpTab[, abundance := sapply(adduct, function(a) sum(a == adduct)) / .N, by = "group"]
+    cmpTab[!is.na(adduct), abundance := sapply(adduct, function(a) sum(a == adduct)) / .N, by = "group"]
     
     # Filter adducts not abundantly assigned to same feature group
-    cmpTab <- cmpTab[numGTE(abundance, relMinAdductAbundance)]
+    cmpTab <- cmpTab[is.na(abundance) | numGTE(abundance, relMinAdductAbundance)]
     
     # Only keep the most abundantly assigned adduct for each feature group
     # UNDONE: handle ties?
-    cmpTab[, keep := adduct == adduct[which.max(abundance)], by = "group"]
-    cmpTab <- cmpTab[keep == TRUE][, keep := NULL]
+    cmpTab[!is.na(adduct), keep := adduct == adduct[which.max(abundance)], by = "group"]
+    cmpTab <- cmpTab[is.na(adduct) | keep == TRUE][, keep := NULL]
 
     # Start making group components; for each feature group:
     # - find all feature components that this "parent group" is in
@@ -86,14 +86,19 @@ setMethod("initialize", "componentsFeatures", function(.Object, fGroups, minSize
     linkedFGs <- linkedFGs[!group %chin% dups(group)]
     
     # prepare for components
-    linkedFGs <- linkedFGs[, c("parentGroup", "group", "neutralMass", "charge", "adduct"), with = FALSE]
+    cols <- intersect(c("parentGroup", "group", "neutralMass", "isogroup", "isonr", "charge", "adduct"),
+                      names(linkedFGs))
+    linkedFGs <- linkedFGs[, cols, with = FALSE]
     linkedFGs[, c("ret", "mz") := gInfo[group, c("rts", "mzs")]]
     setcolorder(linkedFGs, c("group", "ret", "mz"))
     
     comps <- split(linkedFGs, by = "parentGroup", keep.by = FALSE)
     
-    # Remove any fGroups from components with equal adducts
-    comps <- lapply(comps, function(ct) ct[!adduct %chin% dups(adduct)])
+    # Remove any fGroups from components with equal adducts (unless assigned to different isotope)
+    if (!is.null(linkedFGs[["isogroup"]]))
+        comps <- lapply(comps, function(ct) ct[is.na(adduct) | !paste0(adduct, isonr) %chin% dups(paste0(adduct, isonr))])
+    else
+        comps <- lapply(comps, function(ct) ct[is.na(adduct) | !adduct %chin% dups(adduct)])
     
     # NOTE: minSize should be >= 1 to filter out empty components
     comps <- comps[sapply(comps, nrow) >= minSize]

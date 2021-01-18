@@ -31,9 +31,9 @@ outPath = popArg()
 
 GC.gc()
 
-mz_vals, mz_int, t0, t_end, m, pathin = import_files_MS1(inPath, filename, mz_thresh)
+mz_vals, mz_int, t0, t_end, m, pathin, msModel, msIonisation, msManufacturer, polarity, Rt = import_files_MS1(inPath, filename, mz_thresh)
 
 GC.gc()
 
-rep_table, final_table = safd_s3D(mz_vals, mz_int, t0, t_end, filename, outPath, max_numb_iter,
+rep_table, final_table = safd_s3D(mz_vals, mz_int, Rt, filename, outPath, max_numb_iter,
     max_t_peak_w, res, min_ms_w, r_thresh, min_int, sig_inc_thresh, S2N, min_peak_w_s)

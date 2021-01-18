@@ -16,7 +16,6 @@ setMethod("generateComponentsOpenMS", "featureGroups", function(fGroups, ionizat
                                                                 extraOpts = NULL)
 {
     # UNDONE: all features are currently annotated (ie including not in a group), should be fine once featng is merged
-    # UNDONE: keep charge column?
     # UNDONE: more parameters and proper defaults
     
     
@@ -58,6 +57,7 @@ setMethod("generateComponentsOpenMS", "featureGroups", function(fGroups, ionizat
             setDT(cmp)
             cmp[, adduct := mapply(adduct, charge,
                                    FUN = function(a, c) as.character(as.adduct(a, format = "openms", charge = c)))]
+            cmp[, charge := NULL]
         })
         unlink(cmd[c("inFile", "outFile")]) # remove temporary files, as their size may be considerable
         return(fcmp)

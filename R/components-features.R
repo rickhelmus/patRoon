@@ -101,7 +101,7 @@ setMethod("initialize", "componentsFeatures", function(.Object, fGroups, minSize
     names(comps) <- paste0("CMP", seq_along(comps))
     
     cInfo <- data.table(name = names(comps), cmp_ret = sapply(comps, function(cmp) mean(cmp$ret)),
-                        cmp_ret = sapply(comps, function(cmp) sd(cmp$ret)),
+                        cmp_retsd = sapply(comps, function(cmp) sd(cmp$ret)),
                         neutral_mass = sapply(comps, function(cmp) mean(cmp$neutralMass)),
                         size = sapply(comps, nrow))
     

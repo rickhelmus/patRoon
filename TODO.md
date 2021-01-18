@@ -119,6 +119,8 @@
             - first filter out unwanted adducts to improve consensus
             - filter out assignments with low abundance (eg outliers)
             - final assignment only made if all candidates are equal or absent
+        - CliqueMS adducts: current conversion to this format doesn't mimic Cat and 2H/2Na etc
+            - Perhaps just document limitation?
 - NEWS
     - [..., reAverage = FALSE] and implications of filtering when setting it to TRUE
     - Fixed Hill ordering: H wasn't alphabetical if no C is present

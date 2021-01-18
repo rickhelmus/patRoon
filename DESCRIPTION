@@ -149,6 +149,7 @@ Collate:
     'components.R'
     'components-camera.R'
     'components-features.R'
+    'components-cliquems.R'
     'components-intclust.R'
     'components-set.R'
     'components-nontarget.R'

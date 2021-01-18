@@ -145,8 +145,18 @@ setMethod("as.character", "adduct", function(x, format = "generic", err = TRUE)
     else if (format == "openms")
     {
         # NOTE that this format doesn't support charges/mults directly
-        subNeg <- formulaListToString(-(splitFormulaToList(x@sub))) # UNDONE: not very efficient?
-        fl <- splitFormulaToList(paste0(x@add, subNeg))
+        
+        adds <- if (length(x@add)) paste0(x@add, collapse = "") else character()
+        subs <- if (length(x@sub)) paste0(x@sub, collapse = "") else character()
+        
+        if (length(subs) > 0)
+            subs <- formulaListToString(-(splitFormulaToList(subs))) # UNDONE: not very efficient?
+        
+        if (length(adds) > 0)
+            fl <- splitFormulaToList(paste0(adds, subs))
+        else if (length(subs) > 0)
+            fl <- splitFormulaToList(subs)
+        
         return(paste0(names(fl), fl, collapse = ""))
     }
 })

@@ -10,30 +10,34 @@ setMethod("initialize", "componentsOpenMS",
 
 #' @rdname component-generation
 #' @export
-setMethod("generateComponentsOpenMS", "featureGroups", function(fGroups, ionization, chargeMax = 1,
-                                                                mzWindow = 0.005, minSize = 2,
+setMethod("generateComponentsOpenMS", "featureGroups", function(fGroups, ionization, chargeMin = 1,
+                                                                chargeMax = 1, chargeSpan = 3,
+                                                                qTry = "feature",
+                                                                potentialAdducts = defaultOpenMSAdducts(ionization),
+                                                                retWindow = 1, mzWindow = 0.005, minSize = 2,
                                                                 relMinAdductAbundance = 0.75,
                                                                 extraOpts = NULL)
 {
-    # UNDONE: all features are currently annotated (ie including not in a group), should be fine once featng is merged
-    # UNDONE: more parameters and proper defaults
-    
-    
     ac <- checkmate::makeAssertCollection()
     checkmate::assertChoice(ionization, c("positive", "negative"), add = ac)
-    aapply(checkmate::assertCount, . ~ chargeMax + minSize, positive = TRUE, fixed = list(add = ac))
-    aapply(checkmate::assertNumber, . ~ mzWindow + relMinAdductAbundance, finite = TRUE, lower = 0,
+    aapply(checkmate::assertCount, . ~ chargeMin + chargeMax + chargeSpan + minSize,
+           positive = TRUE, fixed = list(add = ac))
+    checkmate::assertChoice(qTry, c("feature", "heuristic", "all"))
+    checkmate::assertNumeric(potentialAdducts, lower = 0, upper = 1, any.missing = FALSE, min.len = 2,
+                             names = "unique", add = ac)
+    aapply(checkmate::assertNumber, . ~ retWindow + mzWindow + relMinAdductAbundance, finite = TRUE, lower = 0,
            fixed = list(add = ac))
     checkmate::assertList(extraOpts, any.missing = FALSE, names = "unique", null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
     anaInfo <- analysisInfo(fGroups)
     featTable <- featureTable(fGroups)
+    params <- list(ionization = ionization, chargeMin = chargeMin, chargeMax = chargeMax, chargeSpan = chargeSpan,
+                   qTry = qTry, potentialAdducts = potentialAdducts, retWindow = retWindow, mzWindow = mzWindow,
+                   extraOpts = extraOpts)
+    baseHash <- makeHash(params, minSize, relMinAdductAbundance)
     
     printf("Annotating all features with OpenMS for %d analyses ...\n", nrow(anaInfo))
-    
-    params <- list(ionization = ionization, chargeMax = chargeMax, mzWindow = mzWindow, extraOpts = extraOpts)
-    baseHash <- makeHash(params, minSize, relMinAdductAbundance)
     
     cmdQueue <- lapply(seq_len(nrow(anaInfo)), function(anai)
     {
@@ -74,18 +78,44 @@ setMethod("generateComponentsOpenMS", "featureGroups", function(fGroups, ionizat
                             relMinAdductAbundance = relMinAdductAbundance, featureComponents = featComponents))
 })
 
-
-getOpenMSMADCommand <- function(inFile, outFile, ionization, chargeMax, mzWindow, extraOpts)
+getOpenMSMADCommand <- function(inFile, outFile, ionization, chargeMin, chargeMax, chargeSpan, qTry,
+                                potentialAdducts, retWindow, mzWindow, extraOpts)
 {
     boolToChr <- function(b) if (b) "true" else "false"
     
+    oadds <- sapply(names(potentialAdducts), function(a) as.character(as.adduct(a), format = "openms"))
+    pa <- sprintf("%s:%s:%f", oadds, if (ionization == "positive") "+" else "-", potentialAdducts)
+    
     settings <- list("-algorithm:MetaboliteFeatureDeconvolution:negative_mode" = boolToChr(ionization == "negative"),
+                     "-algorithm:MetaboliteFeatureDeconvolution:charge_min" = chargeMin,
                      "-algorithm:MetaboliteFeatureDeconvolution:charge_max" = chargeMax,
+                     "-algorithm:MetaboliteFeatureDeconvolution:charge_span_max" = chargeSpan,
+                     "-algorithm:MetaboliteFeatureDeconvolution:q_try" = qTry,
+                     "-algorithm:MetaboliteFeatureDeconvolution:retention_max_diff" = retWindow,
                      "-algorithm:MetaboliteFeatureDeconvolution:mass_max_diff" = mzWindow)
     
     if (!is.null(extraOpts))
         settings <- modifyList(settings, extraOpts)
     
+    settingsArgs <- OpenMSArgListToOpts(settings)
+    # add potential adducts later as OpenMSArgListToOpts() doesn't handle this currently...
+    settingsArgs <- c(settingsArgs, "-algorithm:MetaboliteFeatureDeconvolution:potential_adducts", pa)
+    
     return(list(command = getCommandWithOptPath("MetaboliteAdductDecharger", "OpenMS"),
-                args = c(OpenMSArgListToOpts(settings), "-in", inFile, "-out_cm", outFile)))
+                args = c(settingsArgs, "-in", inFile, "-out_cm", outFile)))
+}
+
+#' @rdname component-generation
+#' @export
+defaultOpenMSAdducts <- function(ionization)
+{
+    checkmate::assertChoice(ionization, c("positive", "negative"))
+    if (ionization == "positive")
+        return(c("[M+H]+" = 0.5,
+                 "[M+Na]+" = 0.2,
+                 "[M+NH4]+" = 0.2,
+                 "[M+K]+" = 0.1))
+    # UNDONE: more for neg?
+    return(c("[M-H]-" = 0.8,
+             "[M-H2O-H]-" = 0.2))
 }

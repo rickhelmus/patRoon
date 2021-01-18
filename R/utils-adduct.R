@@ -85,7 +85,7 @@ doAsAdduct <- memoise(function(x, format, isPositive, charge)
         return(x)
     
     # check first: this should fail immediately
-    checkmate::assertChoice(format, c("generic", "sirius", "genform", "metfrag", "openms"))
+    checkmate::assertChoice(format, c("generic", "sirius", "genform", "metfrag", "openms", "cliquems"))
     
     ac <- checkmate::makeAssertCollection()
     if (format == "metfrag")
@@ -100,7 +100,7 @@ doAsAdduct <- memoise(function(x, format, isPositive, charge)
         checkmate::assertString(x, min.chars = 1, add = ac)
     checkmate::reportAssertions(ac)
     
-    if (format == "generic" || format == "sirius")
+    if (format == "generic" || format == "sirius" || format == "cliquems")
     {
         if (format == "generic" && x == "[M]") # special case
         {
@@ -110,6 +110,9 @@ doAsAdduct <- memoise(function(x, format, isPositive, charge)
         {
             if (!grepl("^\\[.+\\].*[\\+\\-]{1}", x))
                 stop("Wrong format! (forgot brackets or charge?)")
+            
+            if (format == "cliquems")
+                x <- sub("Cat", "M", x, fixed = TRUE)
             
             if (format == "sirius")
                 mult <- charge <- 1
@@ -122,6 +125,11 @@ doAsAdduct <- memoise(function(x, format, isPositive, charge)
                 if (is.na(charge))
                     charge <- 1
             }
+            
+            # CliqueMS sometimes adds amount of addition/subtraction elements before the element (eg 2H instead of H2)
+            # --> swap
+            if (format == "cliquems")
+                x <- gsub("([\\+\\-])([[:digit:]]+)([[:alpha:]]+)", "\\1\\3\\2", x)
             
             adds <- sub("\\+", "", unlist(regmatches(x, gregexpr("[\\+]{1}[[:alnum:]]+", x))))
             subs <- sub("\\-", "", unlist(regmatches(x, gregexpr("[\\-]{1}[[:alnum:]]+", x))))
@@ -245,6 +253,8 @@ MetFragAdducts <- function() copy(adductsMF)
 #'   \code{MetFragAdducts} functions, respectively.
 #'   
 #'   \code{"openms"} is the format used by the \command{MetaboliteAdductDecharger} tool.
+#'   
+#'   \code{"cliquems"} is the format used by \pkg{\link{cliqueMS}}.
 #' @param isPositive A logical that specifies whether the adduct should be
 #'   positive. Should only be set when \code{format="metfrag"} and \code{x} is a
 #'   \code{numeric} identifier.

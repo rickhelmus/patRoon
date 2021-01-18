@@ -53,11 +53,13 @@ setMethod("generateComponentsCliqueMS", "featureGroups", function(fGroups, ioniz
         {
             xdata <- getXCMSnExp(fList[i], verbose = FALSE)
             
-            cliques <- cliqueMS::getCliques(xdata, filter = TRUE)
-            cliques <- cliqueMS::getIsotopes(cliques, ppm = 10)
-            cliques <- cliqueMS::getAnnotation(cliques, ppm = 10,
-                                               adinfo = if (ionization == "positive") positive.adinfo else negative.adinfo,
-                                               polarity = ionization, normalizeScore = TRUE)
+            suppressMessages(invisible(utils::capture.output({
+                cliques <- cliqueMS::getCliques(xdata, filter = TRUE)
+                cliques <- cliqueMS::getIsotopes(cliques, ppm = 10)
+                cliques <- cliqueMS::getAnnotation(cliques, ppm = 10,
+                                                   adinfo = if (ionization == "positive") positive.adinfo else negative.adinfo,
+                                                   polarity = ionization, normalizeScore = TRUE)
+            })))
             
             # For now we just take the highest ranking annotation. To further simplify, each clique is further separated per
             # neutral mass.

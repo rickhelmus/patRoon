@@ -109,18 +109,21 @@
 			    - or use regular R set like methods (<-())
 		- similarly: set() like method to change data, such as adduct annotations
 	- feature components
-	    - algorithms: cliqueMS, OpenMS and maybe nontarget
-	    - conversion to components
-            - works only work with annotated features
-                - which is only applicable to cliqueMS (or also nontarget?)
-            - make subclass from components with extra slot for feature components
-        - consensus
-            - for cliqueMS: take best ranking across all analyses
-            - first filter out unwanted adducts to improve consensus
-            - filter out assignments with low abundance (eg outliers)
-            - final assignment only made if all candidates are equal or absent
-        - CliqueMS adducts: current conversion to this format doesn't mimic Cat and 2H/2Na etc
-            - Perhaps just document limitation?
+	    - add to generateComponents()
+	    - all features are currently annotated (ie including not in a group)
+	        - should be fine once featng is merged --> verify
+	    - add more function argument for cliqueMS parameters
+	    - OpenMS
+	        - minRTOverlap option? needs convex hull export, which needs feature EICs (featng)
+	    - cliqueMS
+	        - parallelization?
+	        - change checkPackage GH link once PR is merged
+	        - verify adduct and isotope charge afterwards? let user decide what to clear if mismatch (eg isotope, adduct, both)
+            - current adduct conversion to this format doesn't mimic Cat and 2H/2Na etc
+                - Perhaps just document limitation?
+        - minimal abundance of adduct across analyses (ie not necessarily limited to annotated features)?
+        - sets support
+        
 - NEWS
     - [..., reAverage = FALSE] and implications of filtering when setting it to TRUE
     - Fixed Hill ordering: H wasn't alphabetical if no C is present

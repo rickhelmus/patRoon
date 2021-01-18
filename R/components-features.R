@@ -9,8 +9,6 @@ componentsFeatures <- setClass("componentsFeatures", slots = c(featureComponents
 setMethod("initialize", "componentsFeatures", function(.Object, fGroups, minSize, mzWindow, relMinAdductAbundance,
                                                        featureComponents = list(), ...)
 {
-    # UNDONE: minimal abundance of adduct across analyses (ie not necessarily annotations)?
-    
     ftindex <- groupFeatIndex(fGroups)
     gNames <- names(fGroups)
     gInfo <- groupInfo(fGroups)

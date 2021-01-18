@@ -15,12 +15,6 @@ setMethod("generateComponentsCliqueMS", "featureGroups", function(fGroups, ioniz
                                                                   mzWindow = 0.005, minSize = 2,
                                                                   relMinAdductAbundance = 0.75)
 {
-    # UNDONE: all features are currently annotated (ie including not in a group), should be fine once featng is merged
-    # UNDONE: more parameters and proper defaults
-    # UNDONE: parallel?
-    # UNDONE: verify adduct and isotope charge afterwards? let user decide what to clear if mismatch (eg isotope, adduct, both)
-    
-    
     checkPackage("cliqueMS", "https://github.com/rickhelmus/cliqueMS") # UNDONE
     
     ac <- checkmate::makeAssertCollection()

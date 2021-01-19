@@ -191,8 +191,7 @@ setMethod("[", c("featureGroupsScreening", "ANY", "ANY", "missing"), function(x,
 #'   enabled.
 #'
 #' @export
-setMethod("as.data.table", "featureGroupsScreening",
-          function(x, ..., collapseSuspects = ",", onlyHits = FALSE)
+setMethod("as.data.table", "featureGroupsScreening", function(x, ..., collapseSuspects = ",", onlyHits = FALSE)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertString(collapseSuspects, null.ok = TRUE, add = ac)
@@ -201,20 +200,8 @@ setMethod("as.data.table", "featureGroupsScreening",
     
     ret <- callNextMethod(x, ...)
     if (nrow(ret) > 0)
-    {
-        si <- copy(screenInfo(x))
-        setnames(si, c("rt", "mz"), c("susp_rt", "susp_mz"))
-        
-        if (!is.null(collapseSuspects))
-        {
-            si[, name := paste0(name, collapse = collapseSuspects), by = "group"]
-            # only keep unique and remove suspect specific columns
-            # UNDONE: keep specific columns if only one suspect?
-            si <- unique(si[, c("group", "name"), with = FALSE], by = "group")
-        }
-        
-        ret <- merge(ret, si, by = "group", all.x = !onlyHits, sort = FALSE)
-    }
+        ret <- mergeScreenInfoWithDT(ret, screenInfo(x), collapseSuspects, onlyHits)
+
     return(ret)
 })
 

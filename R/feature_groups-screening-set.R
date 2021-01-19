@@ -131,16 +131,9 @@ setMethod("as.data.table", "featureGroupsScreeningSet", function(x, ..., collaps
     checkmate::assertFlag(onlyHits, add = ac)
     
     ret <- callNextMethod(x, ...)
-    
-    # get tables from setObjects. Note that we only want to get the screenInfo per group, so other arguments from
-    # ... can be ignored.
-    dtSets <- mergeScreeningSetInfos(x@setObjects, lapply(x@setObjects, as.data.table,
-                                                          collapseSuspects = collapseSuspects,
-                                                          onlyHits = onlyHits),
-                                     markSets = is.null(collapseSuspects))
-    dtSets <- dtSets[, c("group", setdiff(names(dtSets), names(ret))), with = FALSE] # only keep unique columns (and group)
-    
-    return(merge(ret, dtSets, by = "group", all.x = !onlyHits))
+    if (nrow(ret) > 0)
+        ret <- mergeScreenInfoWithDT(ret, screenInfo(x), collapseSuspects, onlyHits)
+    return(ret)    
 })
 
 setMethod("annotateSuspects", "featureGroupsScreeningSet", function(fGroups, MSPeakLists, formulas,

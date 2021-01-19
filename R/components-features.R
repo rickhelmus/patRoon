@@ -58,6 +58,11 @@ setMethod("initialize", "componentsFeatures", function(.Object, fGroups, minSize
             return(NULL)
         IDs <- unique(cmpTab[group == gn]$fCMPID)
         ct <- cmpTab[fCMPID %chin% IDs]
+        
+        # special case: if parent has NA neutralMass, ensure all others also have and vice versa. This ensures a split
+        # between those with NAs and those without. If the parentGroup has mixed NAs, the ones with NA will be ignored.
+        ct <- if (any(!is.na(ct[group == gn]$neutralMass))) ct[!is.na(neutralMass)] else ct[is.na(neutralMass)]
+        
         usedGroups[ct$group] <<- TRUE
         
         if (!allSame(ct$neutralMass, function(x1, x2) numLTE(abs(x1 - x2), mzWindow)))

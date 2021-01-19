@@ -491,3 +491,19 @@ estimateIdentificationLevel <- function(suspectName, suspectFGroup, suspectRTDev
     
     return(NA_character_)
 }
+
+mergeScreenInfoWithDT <- function(tab, scrInfo, collapseSuspects, onlyHits)
+{
+    scrInfo <- copy(scrInfo)
+    setnames(scrInfo, names(scrInfo), paste0("susp_", names(scrInfo))) # add susp_ column prefixes
+    
+    if (!is.null(collapseSuspects))
+    {
+        scrInfo[, susp_name := paste0(susp_name, collapse = collapseSuspects), by = "susp_group"]
+        # only keep unique and remove suspect specific columns
+        # UNDONE: keep specific columns if only one suspect?
+        scrInfo <- unique(scrInfo[, c("susp_group", "susp_name"), with = FALSE], by = "susp_group")
+    }
+    
+    return(merge(tab, scrInfo, by.x = "group", by.y = "susp_group", all.x = !onlyHits, sort = FALSE))
+}

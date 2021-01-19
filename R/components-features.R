@@ -30,8 +30,14 @@ setMethod("initialize", "componentsFeatures", function(.Object, fGroups, minSize
         return(fCmpL)
     })
     
-    # fCMP: unique feature component ID within an analysis, fCMPID: unique identifier throughout all analyses
+    # fCMP: unique feature component ID within an analysis
     cmpTab <- rbindlist(lapply(featureComponents, rbindlist, idcol = "fCMP"), idcol = "analysis")
+    
+    if (nrow(cmpTab) == 0)
+        return(callNextMethod(.Object, featureComponents = featureComponents, components = list(),
+                              componentInfo = data.table(), ...))
+    
+    # fCMPID: unique identifier throughout all analyses
     cmpTab[, fCMPID := paste0(match(analysis, analyses(fGroups)), "-", fCMP)]
 
     # NOTE: abundance only takes assigned features into account, as unassigned won't be present

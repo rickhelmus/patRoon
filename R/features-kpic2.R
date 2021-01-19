@@ -99,3 +99,48 @@ importfeaturesKPIC2 <- function(picsList, analysisInfo)
     
     return(featuresKPIC2(picsList = picsList, features = feat, analysisInfo = analysisInfo))
 }
+
+setMethod("getPICSet", "featuresKPIC2", function(obj)
+{
+    # UNDONE: ensure object is synced
+    return(unname(obj@picsList))
+})
+
+#' @export
+setMethod("getPICSet", "features", function(obj)
+{
+    anaInfo <- analysisInfo(obj)
+    fTable <- featureTable(obj)
+    EICs <- getEICsForFeatures(obj)
+    return(lapply(seq_along(fTable), function(anai)
+    {
+        ret <- list(path = getMzMLOrMzXMLAnalysisPath(anaInfo$analysis[anai], anaInfo$path[anai]))
+        ret$scantime <- loadSpectra(ret$path, verbose = FALSE)$header$retentionTime
+        ret$pics <- Map(EICs[[anai]], fTable[[anai]]$mz, f = function(eic, mz)
+        {
+            setDT(eic)
+            setnames(eic, "intensity", "int")
+            eic[, mz := mz] # UNDONE? Could add actual m/z for each scan...
+            eic[, scan := sapply(time, function(t) which.min(abs(t - ret$scantime)))]
+            return(as.matrix(eic[, c("scan", "int", "mz"), with = FALSE]))
+        })
+        ret$peaks <- Map(ret$pics, fTable[[anai]]$intensity, f = function(pic, int)
+        {
+            # UNDONE: some dummy values here
+            return(list(peakIndex = which.min(abs(pic[, "int"] - int)),
+                        snr = NA_real_,
+                        signals = int,
+                        peakScale = 10))
+        })
+        ret$peakinfo <- fList[[anai]][, c("ret", "retmin", "retmax", "mz", "mzmin", "mzmax", "intensity",
+                                          "area")]
+        setnames(ret$peakinfo,
+                 c("ret", "retmin", "retmax", "intensity"),
+                 c("rt", "rtmin", "rtmax", "maxo"))
+        ret$peakinfo[, c("mzrsd", "snr") := NA_real_] # UNDONE: might be there for XCMS?
+        setcolorder(ret$peakinfo, c("rt", "rtmin", "rtmax", "mz", "mzmin", "mzmax", "mzrsd", "maxo", "area", "snr"))
+        ret$peakinfo <- as.matrix(ret$peakinfo)
+        
+        return(ret)
+    }))
+})

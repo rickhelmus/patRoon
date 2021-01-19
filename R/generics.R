@@ -23,6 +23,8 @@ setGeneric("replicateGroupSubtract", function(fGroups, rGroups, threshold = 0) s
 setGeneric("groupQualities", function(fGroups) standardGeneric("groupQualities"))
 setGeneric("groupScores", function(fGroups) standardGeneric("groupScores"))
 
+setGeneric("getPICSet", function(obj, ...) standardGeneric("getPICSet"))
+
 ### utils (XCMS)
 
 #' Conversion to XCMS objects

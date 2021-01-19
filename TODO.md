@@ -71,6 +71,8 @@
     - update docs and checkChromatograms() for mzWindow --> mzExpWindow
     - XCMS3 grouping without analyses
     - IPO with KPIC
+    - getEICsForFeatures method for kpic2?
+    - KPIC2 grouping
 - finish feature syncing
     - clarify reportCSV() now only reports remaining features?
 - (finish) implement(ing) replace methods for setting feature(Group) data
@@ -78,19 +80,7 @@
     - see if more object updates are needed
     - docs (also check args in ref docs), tests, NEWS
 - export KPIC2 features?
-    - fields
-        - path: full file path
-        - scantime: vector of retention times for each scan
-        - pics: list of matrix EICs (scan, int, mz)
-        - peaks: list with peak info for each pic (can contain multiple), fields;
-            - peakIndex: index in pic with highest intensity
-            - peakScale: ??? something from algo
-            - snr
-            - signals: max intensity
-        - peakinfo: xcms like peak table
-    - scantime: build up from unique(rbindlist(eics))$time and which()/which.min()?
-        - or fill in from mzR and find closest RT to fill in scans
-    - only peakinfo necessary for grouping
+    - allow without analyses (eg exportedData=F)
 - NEWS
     - topMostByRGroup/EICTopMostByRGroup
     - as.data.table: qualities argument (and potentially faster now with features=T?)

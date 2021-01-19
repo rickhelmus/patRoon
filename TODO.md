@@ -58,13 +58,19 @@
 - comparison(): support xcms3? (needs missing support for missing raw data)
 - Fix: blank filter with multiple replicate groups (and maybe others?)
 - Check: units of plotChord() rt/mz graphs seems off
-- update docs and checkChromatograms() for mzWindow --> mzExpWindow
 - checkFeatures()
     - decide on final function name (perhaps compatible for future component checker)
     - EIC preview disabled by default? re-rendering table is slow...
     - filter negate: don't remove kept fGroups if features were changed?
     - remove printfs
-- topMostByRGroup: make default? or only for reporting?
+- misc
+    - topMostByRGroup: make default? or only for reporting?
+    - quality/score filters
+    - MetaClean model import/export
+    - KPIC2: sync object? otherwise document
+    - update docs and checkChromatograms() for mzWindow --> mzExpWindow
+    - XCMS3 grouping without analyses
+    - IPO with KPIC
 - finish feature syncing
     - clarify reportCSV() now only reports remaining features?
 - (finish) implement(ing) replace methods for setting feature(Group) data

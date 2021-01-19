@@ -109,7 +109,6 @@
 			    - or use regular R set like methods (<-())
 		- similarly: set() like method to change data, such as adduct annotations
 	- feature components
-	    - add to generateComponents()
 	    - all features are currently annotated (ie including not in a group)
 	        - should be fine once featng is merged --> verify
 	    - cliqueMS
@@ -118,7 +117,7 @@
 	        - verify adduct and isotope charge afterwards? let user decide what to clear if mismatch (eg isotope, adduct, both)
             - current adduct conversion to this format doesn't mimic Cat and 2H/2Na etc
                 - Perhaps just document limitation?
-        - minimal abundance of adduct across analyses (ie not necessarily limited to annotated features)?
+        - minimal annotation abundance across analyses (eg adduct must be annotated in >=X analyses)?
         - sets support
         
 - NEWS

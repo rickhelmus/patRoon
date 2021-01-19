@@ -111,6 +111,9 @@
 	- feature components
 	    - all features are currently annotated (ie including not in a group)
 	        - should be fine once featng is merged --> verify
+	    - OpenMS
+	        - clearly doc that maxCharge should follow specified adducts
+	        - force qTry to be not feature?
 	    - cliqueMS
 	        - parallelization?
 	        - change checkPackage GH link once PR is merged

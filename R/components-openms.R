@@ -85,6 +85,12 @@ getOpenMSMADCommand <- function(inFile, outFile, ionization, chargeMin, chargeMa
 {
     boolToChr <- function(b) if (b) "true" else "false"
     
+    if (ionization == "negative")
+    {
+        # ensure they are negative
+        chargeMin <- -abs(chargeMin); chargeMax <- -abs(chargeMax)
+    }
+    
     oadds <- sapply(names(potentialAdducts), function(a) as.character(as.adduct(a), format = "openms"))
     pa <- sprintf("%s:%s:%f", oadds, if (ionization == "positive") "+" else "-", potentialAdducts)
     

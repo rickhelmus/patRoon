@@ -243,7 +243,8 @@ setMethod("unset", "featureGroupsScreeningSet", function(obj, set)
     
     ret <- featureGroupsSetScreeningUnset(screenInfo = sInfo, groups = groupTable(uobj),
                                           groupInfo = groupInfo(uobj), analysisInfo = analysisInfo(uobj),
-                                          features = getFeatures(uobj), ftindex = groupFeatIndex(uobj))
+                                          features = getFeatures(uobj), ftindex = groupFeatIndex(uobj),
+                                          annotations = annotations(uobj))
     # override after constructing: parent constructor already sets algorithm,
     # which results in error about double assignment
     ret@algorithm <- paste0(algorithm(obj), "_unset")

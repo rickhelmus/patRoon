@@ -564,6 +564,9 @@ setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas =
         if (doConc)
             ret[, conc := anaInfo$conc[match(analysis, anaInfo$analysis)]]
 
+        if (!is.null(ret[["adduct"]]))
+            ret[, adduct := NULL] # we already include group annotations below
+
         if (addQualities)
         {
             gq <- groupQualities(x)[ret$group, -"group"]
@@ -669,6 +672,10 @@ setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas =
             ret <- cbind(ret, groupScores(x)[ret$group, -"group"])
     }
 
+    annTable <- annotations(x)
+    if (nrow(ret) > 0 && nrow(annTable) > 0)
+        ret <- merge(ret, annTable)
+    
     return(ret[])
 })
 

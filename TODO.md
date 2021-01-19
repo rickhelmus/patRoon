@@ -91,6 +91,8 @@
     - mergeIons()
         - other name? selectIons()?
         - makes sense to not choose monoisotopic mass? not for annotation at least
+            - if keep: add isonr to default set annotations table and as.data.table()/reportHTML()
+            - If not: remove isonr from set/non-set annotations table
 	    - prefer adducts based on MS/MS? eg handy for Na/K adducts
 	- makeSet()
 	    - fGroups: also support method via comparison?
@@ -101,7 +103,7 @@
 		    - enforce adduct argument for these cases?
 		    - default mergeIons() to only consider 'common' adducts? or change default adducts for componentization algos?
 		    - check better for what is supported by SIRIUS?
-	- add annotations to as.data.table()/reportHTML()
+	- add annotations to reportHTML()
 	- component selection tool/function
 	    - otherwise perhaps make a fGroup remover function to help subsetting
 			- similarly as for feature remover in fGroups...

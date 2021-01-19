@@ -62,13 +62,12 @@ allGroups <- unique(c(plotGroups, componentFGroups, mfWebFGroups))
 
 # UNDONE: replace by proper inheritance
 isSusp <- isScreening(rmdVars$fGroups)
-keepSuspCols <- c("suspect", "d_rt", "d_mz", "sets", "estIDLevel")
+keepSuspCols <- c("susp_name", "susp_d_rt", "susp_d_mz", "susp_sets", "susp_estIDLevel")
 if (isSusp)
 {
     fGroupsSpecDT <- as.data.table(rmdVars$fGroups, collapseSuspects = NULL)
-    setnames(fGroupsSpecDT, "name", "suspect")
-    fGroupsSpecDT[, c("d_rt", "d_mz") := .(round(d_rt, 2), round(d_mz, 5))]
-    for (col in c("annSimForm", "annSimComp", "annSimBoth"))
+    fGroupsSpecDT[, c("susp_d_rt", "susp_d_mz") := .(round(susp_d_rt, 2), round(susp_d_mz, 5))]
+    for (col in c("susp_annSimForm", "susp_annSimComp", "susp_annSimBoth", "susp_maxFragMatchesRel"))
     {
         if (!is.null(fGroupsSpecDT[[col]]))
             fGroupsSpecDT[, (col) := round(get(col), 2)]
@@ -88,15 +87,15 @@ if (isSusp)
         return(fg)
     }
 
-    fGroupsSpecDT <- mergeCols(fGroupsSpecDT, c("suspFormRank", "suspCompRank"), c("form", "comp"), "rank")
-    fGroupsSpecDT <- mergeCols(fGroupsSpecDT, c("annSimForm", "annSimComp", "annSimBoth"),
+    fGroupsSpecDT <- mergeCols(fGroupsSpecDT, c("susp_suspFormRank", "susp_suspCompRank"), c("form", "comp"), "rank")
+    fGroupsSpecDT <- mergeCols(fGroupsSpecDT, c("susp_annSimForm", "susp_annSimComp", "susp_annSimBoth"),
                                c("form", "comp", "both"), "annotated sim")
-    fGroupsSpecDT <- mergeCols(fGroupsSpecDT, c("maxFrags", "maxFragMatches", "maxFragMatchesRel"),
+    fGroupsSpecDT <- mergeCols(fGroupsSpecDT, c("susp_maxFrags", "susp_maxFragMatches", "susp_maxFragMatchesRel"),
                                c("suspect", "max matches", "max matches rel"), "fragments")
     
     # keep ID level as last column
-    IDLevInd <- which(keepSuspCols == "estIDLevel")
-    keepSuspCols <- c(keepSuspCols[-IDLevInd], "estIDLevel")
+    IDLevInd <- which(keepSuspCols == "susp_estIDLevel")
+    keepSuspCols <- c(keepSuspCols[-IDLevInd], "susp_estIDLevel")
 } else
     fGroupsSpecDT <- as.data.table(rmdVars$fGroups)
 
@@ -105,7 +104,8 @@ if (rmdVars$retMin)
     fGroupsSpecDT[, ret := ret / 60]
 
 fGroupsSpecDT[, c("ret", "mz") := .(round(ret, 2), round(mz, 5))]
-fGroupsSpecDT <- fGroupsSpecDT[, intersect(c("group", "ret", "mz", keepSuspCols), names(fGroupsSpecDT)), with = FALSE]
+fGroupsSpecDT <- fGroupsSpecDT[, intersect(c("group", "ret", "mz", "adduct", "neutralMass", keepSuspCols),
+                                           names(fGroupsSpecDT)), with = FALSE]
 fGroupsSpecDT[, groupInd := match(group, names(rmdVars$fGroups))]
 setcolorder(fGroupsSpecDT, "groupInd")
 

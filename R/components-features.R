@@ -124,3 +124,11 @@ setMethod("initialize", "componentsFeatures", function(.Object, fGroups, minSize
                           componentInfo = cInfo, ...))
 })
 
+#' @export
+setMethod("show", "componentsFeatures", function(object)
+{
+    callNextMethod()
+    
+    printf("Feature components: %d total\n",
+           if (length(object@featureComponents) == 0) 0 else sum(lengths(object@featureComponents)))
+})

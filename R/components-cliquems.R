@@ -144,3 +144,11 @@ setMethod("generateComponentsCliqueMS", "featureGroups", function(fGroups, ioniz
     return(componentsCliqueMS(cliques = allCliques, fGroups = fGroups, mzWindow = mzWindow, minSize = minSize,
                               relMinAdductAbundance = relMinAdductAbundance, featureComponents = featComponents))
 })
+
+#' @rdname component-generation
+#' @export
+setMethod("generateComponentsCliqueMS", "featureGroupsSet", function(fGroups, ...)
+{
+    generateComponentsSet(fGroups, generateComponentsCliqueMS, ...)
+})
+

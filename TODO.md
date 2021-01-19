@@ -89,7 +89,7 @@
     - suspectScreening(): remove adduct argument from generic? otherwise doc its unsupported for sets
 - neutralizing / ionization
     - mergeIons()
-        - other name?
+        - other name? selectIons()?
         - makes sense to not choose monoisotopic mass? not for annotation at least
 	    - prefer adducts based on MS/MS? eg handy for Na/K adducts
 	- makeSet()
@@ -101,7 +101,7 @@
 		    - enforce adduct argument for these cases?
 		    - default mergeIons() to only consider 'common' adducts? or change default adducts for componentization algos?
 		    - check better for what is supported by SIRIUS?
-	- add annotations to as.data.table()
+	- add annotations to as.data.table()/reportHTML()
 	- component selection tool/function
 	    - otherwise perhaps make a fGroup remover function to help subsetting
 			- similarly as for feature remover in fGroups...
@@ -115,10 +115,10 @@
 	        - parallelization?
 	        - change checkPackage GH link once PR is merged
 	        - verify adduct and isotope charge afterwards? let user decide what to clear if mismatch (eg isotope, adduct, both)
+	            - or in constructor? or in mergeIons?
             - current adduct conversion to this format doesn't mimic Cat and 2H/2Na etc
                 - Perhaps just document limitation?
         - minimal annotation abundance across analyses (eg adduct must be annotated in >=X analyses)?
-        - sets support
         
 - NEWS
     - [..., reAverage = FALSE] and implications of filtering when setting it to TRUE

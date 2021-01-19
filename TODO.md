@@ -84,8 +84,6 @@
     - consensus?
         - or just new set filter described above?
     - annotation columns not in report, fine? (there are many) If yes document
-    - as.data.table(fGroupsScrSets, collapseSuspects=NULL): omits sets column
-        - still true? check
     - suspectScreening(): remove adduct argument from generic? otherwise doc its unsupported for sets
 - neutralizing / ionization
     - mergeIons()
@@ -141,6 +139,8 @@
         - fix: conversion of adducts with multiple additions/subtractions to GenForm/MetFrag format failed
         - Standardized GenForm/MetFrag addition/subtraction columns from their adduct tables to fix some conversions (eg NH4 --> H4N)
     - OpenMS adducts?
+    - susp_ prefix in as.data.table
+    - suspFormRank/suspCompRank --> formRank/compRank
 - docs
     - filter() for features/fGroups: apply to neutral masses
     - CAMERA/RAMClustR/nontarget components: clearly mention it is simply a merge between sets

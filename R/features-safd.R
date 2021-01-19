@@ -5,14 +5,11 @@ SAFDMPFinishHandler <- function(cmd)
 {
     results <- fread(file.path(cmd$outPath, paste0(cmd$fileName, "_report.csv")))
     setnames(results,
-             c("Nr", "Rt", "MeasMass", "MinMass", "MaxMass", "Area", "Int",
+             c("Nr", "Rt", "MeasMass", "RtStart", "RtEnd", "MinMass", "MaxMass", "Area", "Int",
                "FeatPurity", "MediRes"),
-             c("ID", "ret", "mz", "mzmin", "mzmax", "area", "intensity",
+             c("ID", "ret", "mz", "retmin", "retmax", "mzmin", "mzmax", "area", "intensity",
                "purity", "mediRes"))
-    results[, ret := ret * 60] # min --> sec
-    # UNDONE
-    results[, retmin := ret - (SecInPeak / 2)]
-    results[, retmax := ret + (SecInPeak / 2)]
+    results[, c("ret", "retmin", "retmax") := .(ret * 60, retmin * 60, retmax * 60)] # min --> sec
     results[, c("SecInPeak", "ScanNum", "ScanInPeak") := NULL]
     
     return(results[])

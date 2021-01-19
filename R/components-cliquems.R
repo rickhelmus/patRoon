@@ -63,22 +63,23 @@ setMethod("generateComponentsCliqueMS", "featureGroups", function(fGroups, ioniz
     {
         hash <- makeHash(fList[[i]], baseHash)
         cliques <- loadCacheData("componentsCliqueMS", hash, db)
-        if (!is.null(cliques))
-            return(cliques)
-
-        xdata <- getXCMSnExp(fList[i], verbose = FALSE)
+        if (is.null(cliques))
+        {
+            xdata <- getXCMSnExp(fList[i], verbose = FALSE)
+            
+            suppressMessages(invisible(utils::capture.output({
+                cliques <- do.call(cliqueMS::getCliques, c(list(xdata), extraOptsCli))
+                isoArgs <- c(list(cliques, maxCharge = maxCharge, maxGrade = maxGrade, ppm = ppm), extraOptsIso)
+                cliques <- do.call(cliqueMS::getIsotopes,
+                                   c(list(cliques, maxCharge = maxCharge, maxGrade = maxGrade, ppm = ppm), extraOptsIso))
+                cliques <- do.call(cliqueMS::getAnnotation,
+                                   c(list(cliques, ppm = ppm, adinfo = adductInfo, polarity = ionization,
+                                          normalizeScore = TRUE), extraOptsAnn))
+            })))
+            
+            saveCacheData("componentsCliqueMS", cliques, hash, db)
+        }
         
-        suppressMessages(invisible(utils::capture.output({
-            cliques <- do.call(cliqueMS::getCliques, c(list(xdata), extraOptsCli))
-            isoArgs <- c(list(cliques, maxCharge = maxCharge, maxGrade = maxGrade, ppm = ppm), extraOptsIso)
-            cliques <- do.call(cliqueMS::getIsotopes,
-                               c(list(cliques, maxCharge = maxCharge, maxGrade = maxGrade, ppm = ppm), extraOptsIso))
-            cliques <- do.call(cliqueMS::getAnnotation,
-                               c(list(cliques, ppm = ppm, adinfo = adductInfo, polarity = ionization,
-                                      normalizeScore = TRUE), extraOptsAnn))
-        })))
-        
-        saveCacheData("componentsCliqueMS", cliques, hash, db)
         setTxtProgressBar(prog, i)
         
         return(cliques)

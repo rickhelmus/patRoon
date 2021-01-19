@@ -103,7 +103,6 @@
 		    - enforce adduct argument for these cases?
 		    - default mergeIons() to only consider 'common' adducts? or change default adducts for componentization algos?
 		    - check better for what is supported by SIRIUS?
-	- add annotations to reportHTML()
 	- component selection tool/function
 	    - otherwise perhaps make a fGroup remover function to help subsetting
 			- similarly as for feature remover in fGroups...

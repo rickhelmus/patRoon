@@ -87,7 +87,7 @@ if (isSusp)
         return(fg)
     }
 
-    fGroupsSpecDT <- mergeCols(fGroupsSpecDT, c("susp_suspFormRank", "susp_suspCompRank"), c("form", "comp"), "rank")
+    fGroupsSpecDT <- mergeCols(fGroupsSpecDT, c("susp_formRank", "susp_compRank"), c("form", "comp"), "rank")
     fGroupsSpecDT <- mergeCols(fGroupsSpecDT, c("susp_annSimForm", "susp_annSimComp", "susp_annSimBoth"),
                                c("form", "comp", "both"), "annotated sim")
     fGroupsSpecDT <- mergeCols(fGroupsSpecDT, c("susp_maxFrags", "susp_maxFragMatches", "susp_maxFragMatchesRel"),
@@ -320,8 +320,8 @@ compoundsDT <- rbindlist(lapply(compFGroups, function(grp)
         {
             # insert suspect names (if any)
             tbl <- as.data.table(rmdVars$fGroups, collapseSuspects = NULL)[group == grp]
-            if (!is.null(tbl[["suspCompRank"]]) && any(tbl$suspCompRank == compi, na.rm = TRUE))
-                it <- paste(paste("<strong>Suspect(s):</strong>", paste0(tbl[suspCompRank == compi]$name, collapse = ", ")),
+            if (!is.null(tbl[["susp_compRank"]]) && any(tbl$susp_compRank == compi, na.rm = TRUE))
+                it <- paste(paste("<strong>Suspect(s):</strong>", paste0(tbl[susp_compRank == compi]$name, collapse = ", ")),
                              it, sep = "<br>")
         }
         return(it)
@@ -379,8 +379,8 @@ formulasDT <- rbindlist(lapply(formFGroups, function(grp)
         {
             # insert suspect names (if any)
             tbl <- as.data.table(rmdVars$fGroups, collapseSuspects = NULL)[group == grp]
-            if (!is.null(tbl[["suspFormRank"]]) && any(tbl$suspFormRank == preci, na.rm = TRUE))
-                it <- paste(paste("<strong>Suspect(s):</strong>", paste0(tbl[suspFormRank == preci]$name, collapse = ", ")),
+            if (!is.null(tbl[["susp_formRank"]]) && any(tbl$susp_formRank == preci, na.rm = TRUE))
+                it <- paste(paste("<strong>Suspect(s):</strong>", paste0(tbl[susp_formRank == preci]$name, collapse = ", ")),
                              it, sep = "<br>")
         }
         return(it)

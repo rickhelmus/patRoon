@@ -155,8 +155,8 @@ test_that("Screen filters", {
     expect_lt(length(selectedFGroupsLev), nrow(screenInfo(fGroupsAnnNoRT)))
     
     expect_equal(maxIDLevel(filter(fGroupsAnnNoRT, maxLevel = 3)), 3)
-    expect_equal(getMaxScrCol(filter(fGroupsAnnNoRT, maxFormRank = 3), "suspFormRank"), 1) # UNDONE: all are one or NA
-    expect_lte(getMaxScrCol(filter(fGroupsAnnNoRT, maxCompRank = 3), "suspCompRank"), 3)
+    expect_equal(getMaxScrCol(filter(fGroupsAnnNoRT, maxFormRank = 3), "formRank"), 1) # UNDONE: all are one or NA
+    expect_lte(getMaxScrCol(filter(fGroupsAnnNoRT, maxCompRank = 3), "compRank"), 3)
     expect_gte(getMinScrCol(filter(fGroupsAnnNoRT, minAnnSimForm = 0.9), "annSimForm"), 0.9)
     expect_gte(getMinScrCol(filter(fGroupsAnnNoRT, minAnnSimComp = 0.9), "annSimComp"), 0.9)
     expect_gte(getMinScrCol(filter(fGroupsAnnNoRT, minAnnSimBoth = 0.9), "annSimBoth"), 0.9)

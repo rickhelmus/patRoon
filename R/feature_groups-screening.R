@@ -42,7 +42,7 @@ screeningSlots <- c(screenInfo = "data.table")
 #'
 #'   \itemize{
 #'
-#'   \item \code{suspFormRank},\code{suspCompRank} The rank of the suspect
+#'   \item \code{formRank},\code{compRank} The rank of the suspect
 #'   within the formula/compound annotation results.
 #'
 #'   \item \code{annSimForm},\code{annSimComp},\code{annSimBoth} A similarity
@@ -305,7 +305,7 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
     mzWithin <- function(mz1, mz2) abs(mz1 - mz2) <= absMzDev
 
     si <- copy(screenInfo(fGroups))
-    annCols <- c("suspFormRank", "suspCompRank", "annSimForm", "annSimComp", "annSimBoth", "maxFrags", "maxFragMatches",
+    annCols <- c("formRank", "compRank", "annSimForm", "annSimComp", "annSimBoth", "maxFrags", "maxFragMatches",
                  "maxFragMatchesRel", "estIDLevel")
     si <- si[, setdiff(names(si), annCols), with = FALSE] # remove any previous results
     
@@ -321,34 +321,34 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
         cTable <- if (!is.null(compounds)) compounds[[gName]] else NULL
         cScRanges <- if (!is.null(compounds)) compounds@scoreRanges[[gName]] else NULL
         
-        suspFormRank <- NA_integer_; annSimForm <- annSimBoth <- NA_real_
+        formRank <- NA_integer_; annSimForm <- annSimBoth <- NA_real_
         if (!is.null(fTable) && !is.null(si[["formula"]]) && !is.na(si$formula[i]))
         {
             unFTable <- unique(fTable, by = "formula")
-            suspFormRank <- which(si$formula[i] == unFTable$neutral_formula)
-            suspFormRank <- if (length(suspFormRank) > 0) suspFormRank[1] else NA_integer_
-            if (!is.na(suspFormRank))
+            formRank <- which(si$formula[i] == unFTable$neutral_formula)
+            formRank <- if (length(formRank) > 0) formRank[1] else NA_integer_
+            if (!is.na(formRank))
                 annSimForm <- annSimBoth <- annotatedMSMSSimilarity(annotatedPeakList(formulas,
-                                                                                      precursor = unFTable$neutral_formula[suspFormRank],
+                                                                                      precursor = unFTable$neutral_formula[formRank],
                                                                                       groupName = gName, MSPeakLists = MSPeakLists),
                                                                     absMzDev, relMinMSMSIntensity, simMSMSMethod)
         }
         
         suspIK1 <- if (!is.null(si[["InChIKey"]]) && !is.na(si$InChIKey[i])) getIKBlock1(si$InChIKey[i]) else NULL
-        annSimComp <- NA_real_; suspCompRank <- NA_integer_
+        annSimComp <- NA_real_; compRank <- NA_integer_
         if (!is.null(MSMSList) && !is.null(cTable) && !is.null(suspIK1))
         {
-            suspCompRank <- which(suspIK1 == cTable$InChIKey1)
-            suspCompRank <- if (length(suspCompRank) > 0) suspCompRank[1] else NA_integer_
+            compRank <- which(suspIK1 == cTable$InChIKey1)
+            compRank <- if (length(compRank) > 0) compRank[1] else NA_integer_
             
-            if (!is.na(suspCompRank) && !is.null(cTable[["fragInfo"]][[suspCompRank]]))
+            if (!is.na(compRank) && !is.null(cTable[["fragInfo"]][[compRank]]))
             {
-                annSimComp <- annotatedMSMSSimilarity(annotatedPeakList(compounds, index = suspCompRank,
+                annSimComp <- annotatedMSMSSimilarity(annotatedPeakList(compounds, index = compRank,
                                                                         groupName = gName, MSPeakLists = MSPeakLists),
                                                       absMzDev, relMinMSMSIntensity, simMSMSMethod)
                 
-                if (!is.na(suspFormRank))
-                    annSimBoth <- annotatedMSMSSimilarity(annotatedPeakList(compounds, index = suspCompRank,
+                if (!is.na(formRank))
+                    annSimBoth <- annotatedMSMSSimilarity(annotatedPeakList(compounds, index = compRank,
                                                                             groupName = gName, MSPeakLists = MSPeakLists,
                                                                             formulas = formulas),
                                                           absMzDev, relMinMSMSIntensity, simMSMSMethod)
@@ -384,9 +384,9 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
                 }
             }
             
-            if (!is.null(cTable) && "compound" %in% checkFragments && !is.na(suspCompRank) &&
-                !is.null(cTable[["fragInfo"]][[suspCompRank]]))
-                maxFragMatches <- max(NAToZero(maxFragMatches), sum(fragForms %in% cTable[["fragInfo"]][[suspCompRank]]$formula))
+            if (!is.null(cTable) && "compound" %in% checkFragments && !is.na(compRank) &&
+                !is.null(cTable[["fragInfo"]][[compRank]]))
+                maxFragMatches <- max(NAToZero(maxFragMatches), sum(fragForms %in% cTable[["fragInfo"]][[compRank]]$formula))
         }
 
         maxFragMatchesRel <- NA_real_
@@ -395,15 +395,15 @@ setMethod("annotateSuspects", "featureGroupsScreening", function(fGroups, MSPeak
         
         estIDLevel <- estimateIdentificationLevel(si$name[i], si$group[i], si$d_rt[i], suspIK1, si$formula[i],
                                                   annSimForm, annSimComp, annSimBoth,
-                                                  maxSuspFrags, maxFragMatches, fTable, suspFormRank, fScRanges,
-                                                  formulasNormalizeScores, cTable, suspCompRank,
+                                                  maxSuspFrags, maxFragMatches, fTable, formRank, fScRanges,
+                                                  formulasNormalizeScores, cTable, compRank,
                                                   mCompNames = if (!is.null(compounds)) mergedCompoundNames(compounds) else NULL,
                                                   cScRanges, compoundsNormalizeScores, absMzDev, IDLevelRules)
         
         set(si, i,
-            c("suspFormRank", "suspCompRank", "annSimForm", "annSimComp", "annSimBoth",
+            c("formRank", "compRank", "annSimForm", "annSimComp", "annSimBoth",
               "maxFrags", "maxFragMatches", "maxFragMatchesRel", "estIDLevel"),
-            list(suspFormRank, suspCompRank, annSimForm, annSimComp, annSimBoth, maxSuspFrags, maxFragMatches,
+            list(formRank, compRank, annSimForm, annSimComp, annSimBoth, maxSuspFrags, maxFragMatches,
                  maxFragMatchesRel, estIDLevel))
         
         setTxtProgressBar(prog, i)
@@ -506,8 +506,8 @@ setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = NULL
         levPred <- function(x, v) maxPred(numericIDLevel(x), v)
         
         obj <- colFilter(levPred, "maxLevel", "estIDLevel")
-        obj <- colFilter(maxPred, "maxFormRank", "suspFormRank")
-        obj <- colFilter(maxPred, "maxCompRank", "suspCompRank")
+        obj <- colFilter(maxPred, "maxFormRank", "formRank")
+        obj <- colFilter(maxPred, "maxCompRank", "compRank")
         obj <- colFilter(minPred, "minAnnSimForm", "annSimForm")
         obj <- colFilter(minPred, "minAnnSimComp", "annSimComp")
         obj <- colFilter(minPred, "minAnnSimBoth", "annSimBoth")

@@ -99,8 +99,11 @@ getOpenMSMADCommand <- function(inFile, outFile, ionization, chargeMin, chargeMa
         chargeMin <- -abs(chargeMin); chargeMax <- -abs(chargeMax)
     }
     
-    oadds <- sapply(names(potentialAdducts), function(a) as.character(as.adduct(a), format = "openms"))
-    pa <- sprintf("%s:%s:%f", oadds, if (ionization == "positive") "+" else "-", potentialAdducts)
+    padds <- sapply(names(potentialAdducts), as.adduct, simplify = FALSE)
+    oadds <- sapply(padds, as.character, format = "openms")
+    charges <- sapply(padds, slot, "charge")
+    chsign <- if (ionization == "positive") "+" else "-"
+    pa <- sprintf("%s:%s:%f", oadds, strrep(chsign, abs(charges)), potentialAdducts)
     
     settings <- list("-algorithm:MetaboliteFeatureDeconvolution:negative_mode" = boolToChr(ionization == "negative"),
                      "-algorithm:MetaboliteFeatureDeconvolution:charge_min" = chargeMin,

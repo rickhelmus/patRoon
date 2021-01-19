@@ -16,7 +16,6 @@ mergeScreeningSetInfos <- function(setObjects, sInfos = lapply(setObjects, scree
         scrInfo <- ReduceWithArgs(x = sInfos, paste0("-", names(setObjects)),
                                   f = function(l, r, sl, sr) merge(l, r, suffixes = c(sl, sr),
                                                                    by = c("name", "group"), all = TRUE))
-        unCols <- c("rt", "formula", "SMILES", "InChI", "InChIKey", "neutralMass", "d_rt", "d_mz", "fragments_formula")
         
         getAllCols <- function(cols)
         {
@@ -24,28 +23,34 @@ mergeScreeningSetInfos <- function(setObjects, sInfos = lapply(setObjects, scree
             return(cols[sapply(cols, function(x) !is.null(scrInfo[[x]]))])
         }
         
-        for (col in unCols)
+        if (nrow(scrInfo) > 0)
         {
-            allCols <- getAllCols(col)
-            if (length(allCols) > 0)
+            unCols <- c("rt", "formula", "SMILES", "InChI", "InChIKey", "neutralMass",  "d_rt", "d_mz", "fragments_formula")
+        
+            
+            for (col in unCols)
             {
-                # take first non NA value
-                scrInfo[, (col) := {
-                    ret <- .SD[[1]] # set to first by default: in case all are NA and to ensure correct type
-                    for (v in .SD)
-                    {
-                        if (!is.na(v))
+                allCols <- getAllCols(col)
+                if (length(allCols) > 0)
+                {
+                    # take first non NA value
+                    scrInfo[, (col) := {
+                        ret <- .SD[[1]] # set to first by default: in case all are NA and to ensure correct type
+                        for (v in .SD)
                         {
-                            ret <- v
-                            break
+                            if (!is.na(v))
+                            {
+                                ret <- v
+                                break
+                            }
                         }
-                    }
-                    ret
-                }, by = seq_len(nrow(scrInfo)), .SDcols = allCols]
-                scrInfo[, (allCols) := NULL]
+                        ret
+                    }, by = seq_len(nrow(scrInfo)), .SDcols = allCols]
+                    scrInfo[, (allCols) := NULL]
+                }
             }
         }
-
+        
         if (rmSetCols)
         {
             rmc <- getAllCols(rmCols)

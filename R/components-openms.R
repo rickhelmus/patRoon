@@ -14,7 +14,8 @@ setMethod("generateComponentsOpenMS", "featureGroups", function(fGroups, ionizat
                                                                 chargeMax = 1, chargeSpan = 3,
                                                                 qTry = "feature",
                                                                 potentialAdducts = defaultOpenMSAdducts(ionization),
-                                                                retWindow = 1, mzWindow = 0.005, minSize = 2,
+                                                                minRTOverlap = 0.66, retWindow = 1,
+                                                                mzWindow = 0.005, minSize = 2,
                                                                 relMinAdductAbundance = 0.75,
                                                                 extraOpts = NULL)
 {
@@ -27,14 +28,15 @@ setMethod("generateComponentsOpenMS", "featureGroups", function(fGroups, ionizat
                              names = "unique", add = ac)
     aapply(checkmate::assertNumber, . ~ retWindow + mzWindow + relMinAdductAbundance, finite = TRUE, lower = 0,
            fixed = list(add = ac))
+    checkmate::assertNumber(minRTOverlap, lower = 0, upper = 1, add = ac)
     checkmate::assertList(extraOpts, any.missing = FALSE, names = "unique", null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
     anaInfo <- analysisInfo(fGroups)
     featTable <- featureTable(fGroups)
     params <- list(ionization = ionization, chargeMin = chargeMin, chargeMax = chargeMax, chargeSpan = chargeSpan,
-                   qTry = qTry, potentialAdducts = potentialAdducts, retWindow = retWindow, mzWindow = mzWindow,
-                   extraOpts = extraOpts)
+                   qTry = qTry, potentialAdducts = potentialAdducts, minRTOverlap = minRTOverlap,
+                   retWindow = retWindow, mzWindow = mzWindow, extraOpts = extraOpts)
     baseHash <- makeHash(params, minSize, relMinAdductAbundance)
     
     printf("Annotating all features with OpenMS for %d analyses ...\n", nrow(anaInfo))
@@ -68,7 +70,7 @@ setMethod("generateComponentsOpenMS", "featureGroups", function(fGroups, ionizat
     }, prepareHandler = function(cmd)
     {
         inFile <- tempfile(fileext = ".featureXML")
-        writeFeatureXML(cmd$fTable, inFile)
+        writeFeatureXML(cmd$fTable, inFile, TRUE)
         outFile <- tempfile(fileext = ".consensusXML")
         cmdMAD <- do.call(patRoon:::getOpenMSMADCommand, c(list(inFile = inFile, outFile = outFile), params))
         return(c(cmd, list(outFile = outFile), cmdMAD))
@@ -79,7 +81,7 @@ setMethod("generateComponentsOpenMS", "featureGroups", function(fGroups, ionizat
 })
 
 getOpenMSMADCommand <- function(inFile, outFile, ionization, chargeMin, chargeMax, chargeSpan, qTry,
-                                potentialAdducts, retWindow, mzWindow, extraOpts)
+                                potentialAdducts, minRTOverlap, retWindow, mzWindow, extraOpts)
 {
     boolToChr <- function(b) if (b) "true" else "false"
     
@@ -92,7 +94,8 @@ getOpenMSMADCommand <- function(inFile, outFile, ionization, chargeMin, chargeMa
                      "-algorithm:MetaboliteFeatureDeconvolution:charge_span_max" = chargeSpan,
                      "-algorithm:MetaboliteFeatureDeconvolution:q_try" = qTry,
                      "-algorithm:MetaboliteFeatureDeconvolution:retention_max_diff" = retWindow,
-                     "-algorithm:MetaboliteFeatureDeconvolution:mass_max_diff" = mzWindow)
+                     "-algorithm:MetaboliteFeatureDeconvolution:mass_max_diff" = mzWindow,
+                     "-algorithm:MetaboliteFeatureDeconvolution:min_rt_overlap" = minRTOverlap)
     
     if (!is.null(extraOpts))
         settings <- modifyList(settings, extraOpts)

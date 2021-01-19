@@ -92,6 +92,11 @@ setMethod("as.data.table", "featureGroupsSet", function(x, average = FALSE, area
     
     anaInfo <- analysisInfo(x)
     
+    # HACK: add annotations later as format with sets is different
+    ann <- fGroups@annotations
+    if (nrow(ann) > 0)
+        x@annotations <- data.table()
+    
     # NOTE: we normalize hereafter per set afterwards
     ret <- callNextMethod(x, average = average, areas = areas, features = features,
                           regression = regression, normFunc = NULL)
@@ -123,6 +128,20 @@ setMethod("as.data.table", "featureGroupsSet", function(x, average = FALSE, area
                     if (all(v == 0)) .SD else as.list(v / normFunc(v))
                 }, by = rowSeq, .SDcols = intCols]
             }
+        }
+    }
+    
+    if (nrow(ann) > 0)
+    {
+        if (features)
+            ret <- merge(ret, ann, by = c("group", "set"))
+        else
+        {
+            # collapse annotation info for each group
+            ann <- copy(ann)
+            ann[, adduct := paste0(adduct, collapse = ","), by = "group"]
+            ann <- unique(ann, by = "group")[, -"set"]
+            ret <- merge(ret, ann, by = "group")
         }
     }
     

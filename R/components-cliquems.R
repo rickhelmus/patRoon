@@ -7,7 +7,7 @@ componentsCliqueMS <- setClass("componentsCliqueMS", slots = c(cliques = "list")
                                contains = "componentsFeatures")
 
 setMethod("initialize", "componentsCliqueMS",
-          function(.Object, ...) callNextMethod(.Object, algorithm = "openms", ...))
+          function(.Object, ...) callNextMethod(.Object, algorithm = "cliquems", ...))
 
 #' @rdname component-generation
 #' @export

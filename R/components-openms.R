@@ -80,6 +80,14 @@ setMethod("generateComponentsOpenMS", "featureGroups", function(fGroups, ionizat
                             relMinAdductAbundance = relMinAdductAbundance, featureComponents = featComponents))
 })
 
+#' @rdname component-generation
+#' @export
+setMethod("generateComponentsOpenMS", "featureGroupsSet", function(fGroups, ...)
+{
+    generateComponentsSet(fGroups, generateComponentsOpenMS, ...)
+})
+
+
 getOpenMSMADCommand <- function(inFile, outFile, ionization, chargeMin, chargeMax, chargeSpan, qTry,
                                 potentialAdducts, minRTOverlap, retWindow, mzWindow, extraOpts)
 {

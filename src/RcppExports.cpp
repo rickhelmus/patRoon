@@ -40,13 +40,14 @@ BEGIN_RCPP
 END_RCPP
 }
 // writeFeatureXML
-void writeFeatureXML(Rcpp::DataFrame featList, Rcpp::CharacterVector out);
-RcppExport SEXP _patRoon_writeFeatureXML(SEXP featListSEXP, SEXP outSEXP) {
+void writeFeatureXML(Rcpp::DataFrame featList, Rcpp::CharacterVector out, Rcpp::LogicalVector hulls);
+RcppExport SEXP _patRoon_writeFeatureXML(SEXP featListSEXP, SEXP outSEXP, SEXP hullsSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::DataFrame >::type featList(featListSEXP);
     Rcpp::traits::input_parameter< Rcpp::CharacterVector >::type out(outSEXP);
-    writeFeatureXML(featList, out);
+    Rcpp::traits::input_parameter< Rcpp::LogicalVector >::type hulls(hullsSEXP);
+    writeFeatureXML(featList, out, hulls);
     return R_NilValue;
 END_RCPP
 }
@@ -95,7 +96,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_parseAdductConsXMLFile", (DL_FUNC) &_patRoon_parseAdductConsXMLFile, 1},
     {"_patRoon_parseFeatureXMLFile", (DL_FUNC) &_patRoon_parseFeatureXMLFile, 1},
     {"_patRoon_parseFeatConsXMLFile", (DL_FUNC) &_patRoon_parseFeatConsXMLFile, 2},
-    {"_patRoon_writeFeatureXML", (DL_FUNC) &_patRoon_writeFeatureXML, 2},
+    {"_patRoon_writeFeatureXML", (DL_FUNC) &_patRoon_writeFeatureXML, 3},
     {"_patRoon_loadEICIntensities", (DL_FUNC) &_patRoon_loadEICIntensities, 3},
     {"_patRoon_loadEICs", (DL_FUNC) &_patRoon_loadEICs, 5},
     {"_patRoon_makeSAFDInput", (DL_FUNC) &_patRoon_makeSAFDInput, 2},

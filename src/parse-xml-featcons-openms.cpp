@@ -77,13 +77,18 @@ Rcpp::List parseFeatConsXMLFile(Rcpp::CharacterVector file, Rcpp::IntegerVector 
 // generating XML via package is too slow...http://r.789695.n4.nabble.com/Creating-XML-document-extremely-slow-td4376088.html
 // generate by simply writing text to file instead
 // [[Rcpp::export]]
-void writeFeatureXML(Rcpp::DataFrame featList, Rcpp::CharacterVector out)
+void writeFeatureXML(Rcpp::DataFrame featList, Rcpp::CharacterVector out, Rcpp::LogicalVector hulls)
 {
     const char *outStr = Rcpp::as<const char *>(out);
     const Rcpp::NumericVector rets = featList["ret"];
     const Rcpp::NumericVector mzs = featList["mz"];
     const Rcpp::NumericVector areas = featList["area"];
+    const Rcpp::NumericVector retmins = featList["retmin"];
+    const Rcpp::NumericVector retmaxs = featList["retmax"];
+    const Rcpp::NumericVector mzmins = featList["mzmin"];
+    const Rcpp::NumericVector mzmaxs = featList["mzmax"];
     const int ftCount = rets.length();
+    const bool doHulls = Rcpp::as<bool>(hulls);
     
     std::ofstream ofile(outStr);
     ofile << "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n"
@@ -106,6 +111,16 @@ void writeFeatureXML(Rcpp::DataFrame featList, Rcpp::CharacterVector out)
         ofile << indent(3) << "<quality dim=\"1\">0</quality>\n";
         ofile << indent(3) << "<overallquality>0</overallquality>\n";
         ofile << indent(3) << "<charge>0</charge>\n";
+        
+        if (doHulls)
+        {
+            // NOTE: for now just include min/max RT and m/z, as this is sufficient for
+            // MetaboliteAdductDecharger...
+            ofile << indent(3) << "<convexhull nr=\"0\">\n";
+            ofile << indent(4) << "<pt x=\"" << retmins[fti] << "\" y=\"" << mzmins[fti] << "\" />\n";
+            ofile << indent(4) << "<pt x=\"" << retmaxs[fti] << "\" y=\"" << mzmaxs[fti] << "\" />\n";
+            ofile << indent(3) << "</convexhull>\n";
+        }
         
         ofile << indent(2) << "</feature>\n";
     }

@@ -99,7 +99,7 @@
 		    - skip calculation with a warning?
 		        - default to M+H/M-H for now with warning...
 		    - enforce adduct argument for these cases?
-		    - default mergeIons() to only consider 'common' adducts?
+		    - default mergeIons() to only consider 'common' adducts? or change default adducts for componentization algos?
 		    - check better for what is supported by SIRIUS?
 	- add annotations to as.data.table()
 	- component selection tool/function
@@ -113,8 +113,6 @@
 	    - all features are currently annotated (ie including not in a group)
 	        - should be fine once featng is merged --> verify
 	    - add more function argument for cliqueMS parameters
-	    - OpenMS
-	        - minRTOverlap option? needs convex hull export, which needs feature EICs (featng)
 	    - cliqueMS
 	        - parallelization?
 	        - change checkPackage GH link once PR is merged

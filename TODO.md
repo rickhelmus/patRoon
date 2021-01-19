@@ -112,7 +112,6 @@
 	    - add to generateComponents()
 	    - all features are currently annotated (ie including not in a group)
 	        - should be fine once featng is merged --> verify
-	    - add more function argument for cliqueMS parameters
 	    - cliqueMS
 	        - parallelization?
 	        - change checkPackage GH link once PR is merged

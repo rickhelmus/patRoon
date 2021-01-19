@@ -11,17 +11,24 @@ setMethod("initialize", "componentsCliqueMS",
 
 #' @rdname component-generation
 #' @export
-setMethod("generateComponentsCliqueMS", "featureGroups", function(fGroups, ionization,
+setMethod("generateComponentsCliqueMS", "featureGroups", function(fGroups, ionization, maxCharge = 3,
+                                                                  maxGrade = 2, ppm = 10,
+                                                                  adductInfo = NULL,
                                                                   mzWindow = 0.005, minSize = 2,
-                                                                  relMinAdductAbundance = 0.75)
+                                                                  relMinAdductAbundance = 0.75,
+                                                                  extraOptsCli = NULL, extraOptsIso = NULL,
+                                                                  extraOptsAnn = NULL)
 {
     checkPackage("cliqueMS", "https://github.com/rickhelmus/cliqueMS") # UNDONE
     
     ac <- checkmate::makeAssertCollection()
     checkmate::assertChoice(ionization, c("positive", "negative"), add = ac)
-    checkmate::assertCount(minSize, positive = TRUE, add = ac)
-    aapply(checkmate::assertNumber, . ~ mzWindow + relMinAdductAbundance, finite = TRUE, lower = 0,
+    aapply(checkmate::assertCount, . ~ maxCharge + maxGrade + minSize, positive = TRUE, fixed = list(add = ac))
+    aapply(checkmate::assertNumber, . ~ ppm + mzWindow + relMinAdductAbundance, finite = TRUE, lower = 0,
            fixed = list(add = ac))
+    checkmate::assertDataFrame(adductInfo, any.missing = FALSE, col.names = "unique", null.ok = TRUE, add = ac)
+    aapply(checkmate::assertList, . ~ extraOptsCli + extraOptsIso + extraOptsAnn, any.missing = FALSE,
+           names = "unique", null.ok = TRUE, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
 
     if (length(fGroups) == 0)
@@ -31,14 +38,24 @@ setMethod("generateComponentsCliqueMS", "featureGroups", function(fGroups, ioniz
     fList <- getFeatures(fGroups)
     
     printf("Annotating all features with CliqueMS for %d analyses ...\n", length(anas))
-    
-    if (ionization == "positive")
-        data(positive.adinfo, package = "cliqueMS", envir = environment())
-    else
-        data(negative.adinfo, package = "cliqueMS", envir = environment())
+
+    if (is.null(adductInfo))
+    {
+        if (ionization == "positive")
+        {
+            data(positive.adinfo, package = "cliqueMS", envir = environment())
+            adductInfo <- positive.adinfo
+        }
+        else
+        {
+            data(negative.adinfo, package = "cliqueMS", envir = environment())
+            adductInfo <- negative.adinfo
+        }
+    }
 
     db <- openCacheDBScope()
-    baseHash <- makeHash(ionization, mzWindow, minSize, relMinAdductAbundance)
+    baseHash <- makeHash(ionization, maxCharge, maxGrade, ppm, adductInfo, mzWindow, minSize, relMinAdductAbundance,
+                         extraOptsCli, extraOptsIso, extraOptsAnn)
     
     prog <- openProgBar(0, length(anas))
     
@@ -52,11 +69,13 @@ setMethod("generateComponentsCliqueMS", "featureGroups", function(fGroups, ioniz
         xdata <- getXCMSnExp(fList[i], verbose = FALSE)
         
         suppressMessages(invisible(utils::capture.output({
-            cliques <- cliqueMS::getCliques(xdata, filter = TRUE)
-            cliques <- cliqueMS::getIsotopes(cliques, ppm = 10)
-            cliques <- cliqueMS::getAnnotation(cliques, ppm = 10,
-                                               adinfo = if (ionization == "positive") positive.adinfo else negative.adinfo,
-                                               polarity = ionization, normalizeScore = TRUE)
+            cliques <- do.call(cliqueMS::getCliques, c(list(xdata), extraOptsCli))
+            isoArgs <- c(list(cliques, maxCharge = maxCharge, maxGrade = maxGrade, ppm = ppm), extraOptsIso)
+            cliques <- do.call(cliqueMS::getIsotopes,
+                               c(list(cliques, maxCharge = maxCharge, maxGrade = maxGrade, ppm = ppm), extraOptsIso))
+            cliques <- do.call(cliqueMS::getAnnotation,
+                               c(list(cliques, ppm = ppm, adinfo = adductInfo, polarity = ionization,
+                                      normalizeScore = TRUE), extraOptsAnn))
         })))
         
         saveCacheData("componentsCliqueMS", cliques, hash, db)

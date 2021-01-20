@@ -176,8 +176,16 @@ setMethod("unset", "featuresSet", function(obj, set)
     ionizedFTable <- lapply(featureTable(obj), function(ft)
     {
         ft <- copy(ft)
-        ft[, mz := mz + sapply(lapply(adduct, as.adduct), adductMZDelta)]
+        
+        adducts <- sapply(unique(ft$adduct), as.adduct)
+        addMZs <- sapply(adducts, adductMZDelta)
+        addMZs <- addMZs[ft$adduct]
+        
+        set(ft, j = c("mz", "mzmin", "mzmax"),
+            value = list(ft$mz + addMZs, ft$mzmin + addMZs, ft$mzmax + addMZs))
+        
         ft[, adduct := NULL] # UNDONE: keep?
+        
         return(ft[])
     })
     

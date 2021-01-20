@@ -369,7 +369,6 @@ setMethod("checkFeatures", "featureGroups", function(fGroups, session, rtWindow,
         
         toggleFGroup <- function()
         {
-            printf("Toggle\n")
             tblRow <- getCurFGroupRow()
             if (!is.na(tblRow))
                 session$sendCustomMessage("toggleFGroupRow", tblRow)
@@ -377,7 +376,6 @@ setMethod("checkFeatures", "featureGroups", function(fGroups, session, rtWindow,
         
         reAddHOT <- function(name)
         {
-            printf("re-add hot: %s\n", name)
             # BUG: avoid errors after adding/removing columns when column sorting is enabled.
             # work-around from https://github.com/jrowen/rhandsontable/issues/303
             removeUI(selector = paste0("#", name))
@@ -414,7 +412,6 @@ setMethod("checkFeatures", "featureGroups", function(fGroups, session, rtWindow,
         {
             if (changed != sessionChanged)
             {
-                printf("session changed: %d\n", changed)
                 sessionChanged <<- changed
                 shinyjs::toggleState("saveSession", condition = changed)
                 session$sendCustomMessage("setSessionChanged", changed)
@@ -422,8 +419,6 @@ setMethod("checkFeatures", "featureGroups", function(fGroups, session, rtWindow,
         }
         
         fGroupData <- reactive({
-            printf("make fGroupData\n")
-            
             getScores <- any(c("totalScore", "otherScores") %in% rValues$settings$fGroupColumns)
             args <- list(fGroups, areas = rValues$settings$featQuantity == "area",
                          average = rValues$settings$fGroupQuantity == "average",
@@ -478,8 +473,6 @@ setMethod("checkFeatures", "featureGroups", function(fGroups, session, rtWindow,
         })
         
         featureData <- reactive({
-            printf("make featureData\n")
-            
             fti <- ftind[[rValues$currentFGroup]]
             ft <- fTable[fti != 0]; ai <- anaInfo[fti != 0, ]; fti <- fti[fti != 0]
             feat <- rbindlist(Map(ft, fti, f = function(f, i) f[i]))
@@ -582,7 +575,6 @@ setMethod("checkFeatures", "featureGroups", function(fGroups, session, rtWindow,
             # HACK: input$fGroupsHot$params$maxRows: make sure we don't have empty table as hot_to_r errors otherwise
             if (input$fGroupsHot$params$maxRows > 0)
             {
-                printf("Sync EG\n")
                 tbl <- rhandsontable::hot_to_r(input$fGroupsHot)
                 keep <- tbl[keep == TRUE]$group
                 notkeep <- tbl[keep == FALSE]$group
@@ -615,7 +607,6 @@ setMethod("checkFeatures", "featureGroups", function(fGroups, session, rtWindow,
         })
 
         observeEvent(input$fGroupsHot_select$select$r, {
-            printf("fGroup row select\n")
             tbl <- rhandsontable::hot_to_r(input$fGroupsHot)
             updateFGroupRow(tbl$group[input$fGroupsHot_select$select$rAll[1]])
         })
@@ -641,7 +632,6 @@ setMethod("checkFeatures", "featureGroups", function(fGroups, session, rtWindow,
             # HACK: input$featuresHot$params$maxRows: make sure we don't have empty table as hot_to_r errors otherwise
             if (input$featuresHot$params$maxRows > 0)
             {
-                printf("Sync EF\n")
                 tbl <- rhandsontable::hot_to_r(input$featuresHot)
                 oldef <- rValues$enabledFeatures[[rValues$currentFGroup]]
                 rValues$enabledFeatures[match(tbl$analysis, rValues$enabledFeatures$analysis),
@@ -663,7 +653,6 @@ setMethod("checkFeatures", "featureGroups", function(fGroups, session, rtWindow,
         })
         
         observeEvent({ input$retUnit; input$featQuantity; input$fGroupQuantity; input$fGroupColumns; input$featureColumns }, {
-            printf("Setting changed\n")
             shinyjs::toggleState("saveApplySettings", !isTRUE(all.equal(getInputSettings(), rValues$settings)))
         })
         
@@ -683,8 +672,6 @@ setMethod("checkFeatures", "featureGroups", function(fGroups, session, rtWindow,
         })
         
         output$plotChrom <- renderPlot({
-            printf("Plot chrom!\n")
-            
             EICs <- switch(rValues$fGroupPlotMode,
                 topMost = EICsTopMost,
                 topMostByRGroup = EICsTopMostRG,
@@ -705,7 +692,6 @@ setMethod("checkFeatures", "featureGroups", function(fGroups, session, rtWindow,
         })
         
         output$fGroupsHot <- rhandsontable::renderRHandsontable({
-            printf("Plot gHot!\n")
             not <- showNotification("Updating feature group table...", duration = NULL, closeButton = FALSE, type = "message")
             rValues$triggerFGroupHotUpdate
             
@@ -717,8 +703,6 @@ setMethod("checkFeatures", "featureGroups", function(fGroups, session, rtWindow,
                 gData <- gData[keep == FALSE, ]
             if (!"Don't keep" %in% input$showWhat)
                 gData <- gData[keep == TRUE, ]
-            printf("nrow: %d\n", nrow(gData))
-            printf("ncol: %d\n", ncol(gData))
             
             hot <- do.call(rhandsontable::rhandsontable,
                            c(list(gData, width = NULL, height = 200, maxRows = nrow(gData)),
@@ -767,7 +751,6 @@ setMethod("checkFeatures", "featureGroups", function(fGroups, session, rtWindow,
         })
         
         output$featuresHot <- rhandsontable::renderRHandsontable({
-            printf("Plot featHot!\n")
             rValues$triggerFeatHotUpdate
             
             fData <- featureData()

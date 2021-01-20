@@ -34,7 +34,7 @@ setMethod("show", "featureGroupsSet", function(object)
 
 #' @describeIn featureGroupsSet Obtain feature information (see \code{\link{features}}).
 #' @export
-setMethod("featureTable", "featureGroupsSet", function(obj, neutralized = TRUE) featureTable(obj@features, neutralized = neutralized))
+setMethod("featureTable", "featureGroupsSet", function(obj) featureTable(obj@features))
 
 #' @describeIn featureGroupsSet Subset on analyses/feature groups.
 #' @param rGroups An optional \code{character} vector: if specified only keep

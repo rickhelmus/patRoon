@@ -58,16 +58,13 @@ doMakeFeaturesSet <- function(featuresList, adducts)
     
     # combine (neutralized) features
     combFeatures <- Reduce(modifyList, lapply(neutralizedFeatures, featureTable))
-    combFeaturesIon <- Reduce(modifyList, lapply(featuresList, featureTable))
     
-    return(featuresSet(setObjects = featuresList, ionizedFeatures = combFeaturesIon,
-                       features = combFeatures, analysisInfo = combAnaInfo, algorithm = makeSetAlgorithm(featuresList)))
+    return(featuresSet(setObjects = featuresList, features = combFeatures, analysisInfo = combAnaInfo,
+                       algorithm = makeSetAlgorithm(featuresList)))
 }
 
 #' @export
-featuresSet <- setClass("featuresSet",
-                        slots = c(ionizedFeatures = "list"),
-                        contains = c("features", "workflowStepSet"))
+featuresSet <- setClass("featuresSet", contains = c("features", "workflowStepSet"))
 
 
 #' @describeIn featuresSet Shows summary information for this object.
@@ -104,7 +101,6 @@ setMethod("[", c("featuresSet", "ANY", "missing", "missing"), function(x, i, ...
         subSets <- unique(x@analysisInfo$set)
         # NOTE: assume that subsetting with non-existing analyses will not result in errors
         x@setObjects <- lapply(x@setObjects[subSets], "[", i = analyses(x))
-        x@ionizedFeatures <- x@ionizedFeatures[x@analysisInfo$analysis]
     }
     return(x)
 })
@@ -138,7 +134,6 @@ setMethod("filter", "featuresSet", function(obj, ..., negate = FALSE, sets = NUL
         # synchronize other features objects by remaining IDs
         cat("Synchronizing feature set objects...")
         remainingIDsPerAna <- sapply(obj@features, "[[", "ID", simplify = FALSE)
-        obj@ionizedFeatures <- lapply(analyses(obj), function(ana) obj@ionizedFeatures[[ana]][ID %in% remainingIDsPerAna[[ana]]])
         obj@setObjects <- lapply(obj@setObjects, function(so) lapply(names(so),
                                                                      function(ana) featureTable(so)[[ana]][ID %in% remainingIDsPerAna]))
         cat("Done!\n")
@@ -177,6 +172,15 @@ setMethod("unset", "featuresSet", function(obj, set)
 {
     assertSets(obj, set, FALSE)
     obj <- obj[, sets = set]
-    return(featuresUnset(features = obj@ionizedFeatures, analysisInfo = analysisInfo(obj),
+    
+    ionizedFTable <- lapply(featureTable(obj), function(ft)
+    {
+        ft <- copy(ft)
+        ft[, mz := mz + sapply(lapply(adduct, as.adduct), adductMZDelta)]
+        ft[, adduct := NULL] # UNDONE: keep?
+        return(ft[])
+    })
+    
+    return(featuresUnset(features = ionizedFTable, analysisInfo = analysisInfo(obj),
                          algorithm = paste0(algorithm(obj), "_unset")))
 })

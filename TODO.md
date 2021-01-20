@@ -76,8 +76,6 @@
     - verify user input
     - see if more object updates are needed
     - docs (also check args in ref docs), tests, NEWS
-- export KPIC2 features?
-    - allow without analyses (eg exportedData=F)
 - NEWS
     - topMostByRGroup/EICTopMostByRGroup
     - as.data.table: qualities argument (and potentially faster now with features=T?)

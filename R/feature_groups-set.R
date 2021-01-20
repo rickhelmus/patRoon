@@ -9,7 +9,7 @@ featureGroupsSet <- setClass("featureGroupsSet",
 
 setMethod("sets", "featureGroupsSet", function(obj) sets(getFeatures(obj)))
 
-setMethod("removeGroups", "featureGroupsSet", function(fGroups, indices)
+setMethod("removeGroups", "featureGroupsSet", function(fGroups, indices, updateFeatures)
 {
     # HACK: subset annotations here as format with sets is different
     ann <- fGroups@annotations

@@ -348,8 +348,11 @@ setMethod("updateFeatures", "featureGroups", function(fGroups, checkUnassigned)
         featureTable(fGroups) <- lapply(featureTable(fGroups), function(ft) ft[group %chin% gNames])
     
     # re-generate indices by matching group names
-    fGroups@ftindex <- setnames(rbindlist(lapply(featureTable(fGroups),
-                                                 function(ft) as.list(chmatch(gNames, ft$group, 0)))), gNames)
+    if (length(featureTable(fGroups)) > 0)
+        fGroups@ftindex <- setnames(rbindlist(lapply(featureTable(fGroups),
+                                                     function(ft) as.list(chmatch(gNames, ft$group, 0)))), gNames)
+    else
+        fGroups@ftindex <- fGroups@ftindex[0]
     
     return(fGroups)
 })

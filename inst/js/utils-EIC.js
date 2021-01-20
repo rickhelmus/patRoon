@@ -1,7 +1,7 @@
 function getGroupHot()
 {
     // get rhot instance: https://github.com/jrowen/rhandsontable/issues/97
-    return HTMLWidgets.getInstance(fGroupHot).hot;
+    return HTMLWidgets.getInstance(fGroupsHot).hot;
 }
 
 Shiny.addCustomMessageHandler("selectFGroupRow", function(row)

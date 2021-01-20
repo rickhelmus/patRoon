@@ -129,16 +129,16 @@ LinkingTo:
 RdMacros:
     Rdpack
 Collate: 
-    'generics.R'
+    'RcppExports.R'
+    'utils-adduct.R'
+    'adduct.R'
     'cache.R'
+    'generics.R'
     'main.R'
     'workflow-step.R'
     'features.R'
     'feature_groups.R'
-    'EIC-tool.R'
-    'RcppExports.R'
-    'utils-adduct.R'
-    'adduct.R'
+    'check_features.R'
     'components.R'
     'components-camera.R'
     'components-intclust.R'

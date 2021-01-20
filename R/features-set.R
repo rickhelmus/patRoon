@@ -77,40 +77,15 @@ setMethod("show", "featuresSet", function(object)
     callAllNextMethods(object, show, firstClass = "features", startFrom = "featuresSet")
 })
 
-#' @describeIn featuresSet Get table with feature information
-#'
-#' @return \code{featureTable}: A \code{list} containing a
-#'   \code{\link{data.table}} for each analysis with feature data
-#'
-#' @export
-setMethod("featureTable", "featuresSet", function(obj, neutralized = TRUE)
-{
-    checkmate::assertFlag(neutralized)
-    
-    if (neutralized)
-        return(callNextMethod(obj))
-    
-    return(obj@ionizedFeatures)
-})
-
 
 #' @describeIn featuresSet Returns all feature data in a table.
 #' @export
-setMethod("as.data.table", "featuresSet", function(x, neutralized = TRUE)
+setMethod("as.data.table", "featuresSet", function(x)
 {
-    checkmate::assertFlag(neutralized)
-    
-    if (neutralized)
-    {
-        ret <- callNextMethod(x)
-        ret[, set := rep.int(sets(x), times = sapply(x@setObjects, length))]
-        setcolorder(ret, "set")
-        return(ret[])
-    }
-    
-    # return original ionized features
-    return(rbindlist(lapply(lapply(x@setObjects, featureTable), rbindlist, idcol = "analysis", fill = TRUE),
-                     idcol = "set", fill = TRUE))
+    ret <- callNextMethod(x)
+    ret[, set := rep.int(sets(x), times = sapply(x@setObjects, length))]
+    setcolorder(ret, "set")
+    return(ret[])
 })
 
 #' @describeIn featuresSet Subset on analyses.
@@ -132,18 +107,6 @@ setMethod("[", c("featuresSet", "ANY", "missing", "missing"), function(x, i, ...
         x@ionizedFeatures <- x@ionizedFeatures[x@analysisInfo$analysis]
     }
     return(x)
-})
-
-#' @describeIn features Extract a feature table for an analysis.
-#' @export
-setMethod("[[", c("featuresSet", "ANY", "missing"), function(x, i, neutralized = TRUE)
-{
-    ac <- checkmate::makeAssertCollection()
-    assertExtractArg(i, add = ac)
-    checkmate::assertFlag(neutralized, add = ac)
-    checkmate::reportAssertions(ac)
-    
-    return(if (neutralized) x@features[[i]] else x@ionizedFeatures[[i]])
 })
 
 #' @describeIn features Performs common rule based filtering of features. Note

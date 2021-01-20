@@ -41,10 +41,7 @@ if (hasFGroupScores(rmdVars$fGroups))
 }
 
 if (isScreening(rmdVars$fGroups))
-{
-    setnames(table, "name", "suspect")
-    bts <- c(bts, list(list(text = "Suspect name", action = buttonFunc("suspect"))))
-}
+    bts <- c(bts, list(list(text = "Suspect name", action = buttonFunc("susp_name"))))
 
 tabOpts <- list(dom = "Bfrtip", scrollX = TRUE, scrollY = "600px", deferRender = TRUE,
                 paging = FALSE, autoWidth = FALSE,

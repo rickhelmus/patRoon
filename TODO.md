@@ -69,6 +69,7 @@
         - mergeScreeningSetInfos()
     - fix empty MS(MS) peaklists if unavailable during merging sets
         - already fixed?
+    - calculatePeakQualities() sets method?
 - merging setObjects
     - check if more has to be cached and may need status messages
     - filter features, annotation results on minimum abundance amongst different setObjects

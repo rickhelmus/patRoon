@@ -150,7 +150,7 @@ setMethod("show", "featureGroupsScreening", function(object)
     callNextMethod(object)
     printf("Suspects: %s (%d hits total)\n", getStrListWithMax(unique(screenInfo(object)$name), 6, ", "),
            nrow(screenInfo(object)))
-    printf("Annotated: %s\n", if (!is.null(screenInfo(object)[["estIDLevel"]])) "yes" else "no")
+    printf("Suspects annotated: %s\n", if (!is.null(screenInfo(object)[["estIDLevel"]])) "yes" else "no")
 })
 
 #' @describeIn featureGroupsScreening Subset on analyses, feature groups and/or

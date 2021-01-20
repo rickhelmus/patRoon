@@ -99,7 +99,7 @@ getCheckFeatsUI <- function(settings)
     showOpts <- c("Keep", "Don't keep")
     
     fillPage(
-        tags$head(includeScript(system.file("js", "utils-EIC.js", package = "patRoon"))),
+        tags$head(includeScript(system.file("js", "utils-checkUI.js", package = "patRoon"))),
         shinyjs::useShinyjs(),
         
         keys::useKeys(),

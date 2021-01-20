@@ -170,15 +170,25 @@ setMethod("getEICsForFGroups", "featureGroupsSet", function(fGroups, rtWindow, m
         topMost <- min(topMost, nrow(analysisInfo(fGroups)))
         gTable <- groupTable(fGroups)
         gNames <- names(fGroups)
-        anas <- analyses(fGroups)
-        
+        anaInfo <- analysisInfo(fGroups)
+
         for (fg in gNames)
         {
-            oint <- order(-gTable[[fg]])
-            topAnalysesInd <- oint[seq_len(topMost)]
-            topAnalyses <- anas[topAnalysesInd]
+            if (topMostByRGroup)
+            {
+                tbl <- data.table(int = gTable[[fg]], group = anaInfo$group, anaInd = seq_len(nrow(anaInfo)))
+                tbl[, rank := frank(-int, ties.method = "first"), by = "group"]
+                topAnalysesInd <- tbl[rank <= topMost]$anaInd
+            }
+            else
+            {
+                oint <- order(gTable[[fg]], decreasing = TRUE)
+                topAnalysesInd <- oint[seq_len(topMost)]
+            }
+            
+            topAnalyses <- anaInfo$analysis[topAnalysesInd]
             # clearout any analysis results not being in topMost
-            otherAnas <- setdiff(anas, topAnalyses)
+            otherAnas <- setdiff(anaInfo$analysis, topAnalyses)
             EICs[otherAnas] <- lapply(EICs[otherAnas], function(e) e[setdiff(names(e), fg)])
         }
     }

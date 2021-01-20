@@ -86,7 +86,7 @@ setMethod("getXCMSnExp", "featureGroupsSet", function(obj, ..., set) getXCMSnExp
 #'   (\emph{i.e.} the minimum amount).
 #' @export
 setMethod("as.data.table", "featureGroupsSet", function(x, average = FALSE, areas = FALSE, features = FALSE,
-                                                        regression = FALSE, normFunc = NULL)
+                                                        qualities = FALSE, regression = FALSE, normFunc = NULL)
 {
     # NOTE keep args in sync with featureGroupsScreeningSet
     
@@ -98,7 +98,7 @@ setMethod("as.data.table", "featureGroupsSet", function(x, average = FALSE, area
         x@annotations <- data.table()
     
     # NOTE: we normalize hereafter per set afterwards
-    ret <- callNextMethod(x, average = average, areas = areas, features = features,
+    ret <- callNextMethod(x, average = average, areas = areas, features = features, qualities = qualities,
                           regression = regression, normFunc = NULL)
     
     if (!is.null(ret[["analysis"]])) # add set column if feature data is present

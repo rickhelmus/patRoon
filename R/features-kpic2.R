@@ -107,31 +107,44 @@ setMethod("getPICSet", "featuresKPIC2", function(obj)
 })
 
 #' @export
-setMethod("getPICSet", "features", function(obj)
+setMethod("getPICSet", "features", function(obj, exportedData = TRUE)
 {
+    checkmate::assertFlag(exportedData)
+    
     anaInfo <- analysisInfo(obj)
     fTable <- featureTable(obj)
-    EICs <- getEICsForFeatures(obj)
+    EICs <- if (exportedData) getEICsForFeatures(obj) else NULL
     return(lapply(seq_along(fTable), function(anai)
     {
-        ret <- list(path = getMzMLOrMzXMLAnalysisPath(anaInfo$analysis[anai], anaInfo$path[anai]))
-        ret$scantime <- loadSpectra(ret$path, verbose = FALSE)$header$retentionTime
-        ret$pics <- Map(EICs[[anai]], fTable[[anai]]$mz, f = function(eic, mz)
+        ret <- list()
+        if (exportedData)
         {
-            setDT(eic)
-            setnames(eic, "intensity", "int")
-            eic[, mz := mz] # UNDONE? Could add actual m/z for each scan...
-            eic[, scan := sapply(time, function(t) which.min(abs(t - ret$scantime)))]
-            return(as.matrix(eic[, c("scan", "int", "mz"), with = FALSE]))
-        })
-        ret$peaks <- Map(ret$pics, fTable[[anai]]$intensity, f = function(pic, int)
+            ret$path = getMzMLOrMzXMLAnalysisPath(anaInfo$analysis[anai], anaInfo$path[anai])
+            ret$scantime <- loadSpectra(ret$path, verbose = FALSE)$header$retentionTime
+            ret$pics <- Map(EICs[[anai]], fTable[[anai]]$mz, f = function(eic, mz)
+            {
+                setDT(eic)
+                setnames(eic, "intensity", "int")
+                eic[, mz := mz] # UNDONE? Could add actual m/z for each scan...
+                eic[, scan := sapply(time, function(t) which.min(abs(t - ret$scantime)))]
+                return(as.matrix(eic[, c("scan", "int", "mz"), with = FALSE]))
+            })
+            ret$peaks <- Map(ret$pics, fTable[[anai]]$intensity, f = function(pic, int)
+            {
+                # UNDONE: some dummy values here
+                return(list(peakIndex = which.min(abs(pic[, "int"] - int)),
+                            snr = NA_real_,
+                            signals = int,
+                            peakScale = 10))
+            })
+        }
+        else
         {
-            # UNDONE: some dummy values here
-            return(list(peakIndex = which.min(abs(pic[, "int"] - int)),
-                        snr = NA_real_,
-                        signals = int,
-                        peakScale = 10))
-        })
+            ret$path <- anaInfo$analysis[anai]
+            ret$scantime <- integer()
+            ret$pics <- ret$peaks <- list()
+        }
+        
         ret$peakinfo <- fList[[anai]][, c("ret", "retmin", "retmax", "mz", "mzmin", "mzmax", "intensity",
                                           "area")]
         setnames(ret$peakinfo,

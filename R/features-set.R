@@ -59,28 +59,31 @@ doMakeFeaturesSet <- function(featuresList, adducts)
     # combine (neutralized) features
     combFeatures <- Reduce(modifyList, lapply(neutralizedFeatures, featureTable))
     
-    return(featuresSet(setObjects = featuresList, features = combFeatures, analysisInfo = combAnaInfo,
+    return(featuresSet(features = combFeatures, analysisInfo = combAnaInfo,
                        algorithm = makeSetAlgorithm(featuresList)))
 }
 
 #' @export
-featuresSet <- setClass("featuresSet", contains = c("features", "workflowStepSet"))
+featuresSet <- setClass("featuresSet", contains = "features")
 
+#' @export
+setMethod("sets", "featuresSet", function(obj) unique(analysisInfo(obj)$set))
 
 #' @describeIn featuresSet Shows summary information for this object.
 #' @export
 setMethod("show", "featuresSet", function(object)
 {
-    callAllNextMethods(object, show, firstClass = "features", startFrom = "featuresSet")
+    callNextMethod()
+    printf("Sets: %s\n", paste0(sets(object), collapse = ", "))
 })
-
 
 #' @describeIn featuresSet Returns all feature data in a table.
 #' @export
 setMethod("as.data.table", "featuresSet", function(x)
 {
     ret <- callNextMethod(x)
-    ret[, set := rep.int(sets(x), times = sapply(x@setObjects, length))]
+    anaInfo <- analysisInfo(x)
+    ret[, set := anaInfo$set[match(analysis, anaInfo$analysis)]]
     setcolorder(ret, "set")
     return(ret[])
 })
@@ -96,12 +99,7 @@ setMethod("[", c("featuresSet", "ANY", "missing", "missing"), function(x, i, ...
         i <- mergeAnaSubsetArgWithSets(i, sets, analysisInfo(x))
         
     x <- callNextMethod(x, i, ...)
-    if (!missing(i))
-    {
-        subSets <- unique(x@analysisInfo$set)
-        # NOTE: assume that subsetting with non-existing analyses will not result in errors
-        x@setObjects <- lapply(x@setObjects[subSets], "[", i = analyses(x))
-    }
+    
     return(x)
 })
 
@@ -127,17 +125,8 @@ setMethod("filter", "featuresSet", function(obj, ..., negate = FALSE, sets = NUL
         obj <- obj[, sets = sets]
     }
     
-    if (length(list(...)) > 0)
-    {
+    if (...length() > 0)
         obj <- callNextMethod(obj, ..., negate = negate)
-        
-        # synchronize other features objects by remaining IDs
-        cat("Synchronizing feature set objects...")
-        remainingIDsPerAna <- sapply(obj@features, "[[", "ID", simplify = FALSE)
-        obj@setObjects <- lapply(obj@setObjects, function(so) lapply(names(so),
-                                                                     function(ana) featureTable(so)[[ana]][ID %in% remainingIDsPerAna]))
-        cat("Done!\n")
-    }
     
     return(obj)
 })

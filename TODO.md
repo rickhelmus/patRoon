@@ -96,6 +96,8 @@
     - as.data.table: qualities argument
     - calculatePeakQualities(), also generic
     - reportHTML: EICs made if annotations, even if not specified in reportPlots
+    - handbook
+        - checkFeatures()
 
 
 ## MSPeakLists

@@ -986,9 +986,11 @@ checkFeaturesInterface$methods(
         ft <- featureTable(fGroups)[fti != 0]; ai <- analysisInfo(fGroups)[fti != 0, ]; fti <- fti[fti != 0]
         feat <- rbindlist(Map(ft, fti, f = function(f, i) f[i]))
         
+        divret <- if (rValues$settings$retUnit == "min") 60 else 1
+        
         fData <- data.table(analysis = ai$analysis)
         if ("retMZ" %in% rValues$settings$featureColumns)
-            fData[, c("ret", "mz") := .(if (rValues$settings$retUnit == "min") feat$ret / 60 else feat$ret, feat$mz)]
+            fData[, c("ret", "mz") := .(feat$ret / divret, feat$mz)]
         if ("rGroup" %in% rValues$settings$featureColumns)
             fData[, replicate_group := ai$group]
         if ("blank" %in% rValues$settings$featureColumns)
@@ -996,7 +998,8 @@ checkFeaturesInterface$methods(
         if ("quantity" %in% rValues$settings$featureColumns)
             fData[, quantity := if (rValues$settings$featQuantity == "intensity") feat$intensity else feat$area]
         if ("rtMZRange" %in% rValues$settings$featureColumns)
-            fData[, c("retmin", "retmax", "mzmin", "mzmax") := .(feat$retmin, feat$retmax, feat$mzmin, feat$mzmax)]
+            fData[, c("retmin", "retmax", "mzmin", "mzmax") := .(feat$retmin / divret, feat$retmax / divret,
+                                                                 feat$mzmin, feat$mzmax)]
         if (hasFGroupScores(fGroups))
         {
             if ("otherScores" %in% rValues$settings$featureColumns)
@@ -1026,16 +1029,16 @@ checkFeaturesInterface$methods(
             {
                 not <- showNotification("Loading EICs...", duration = NULL, closeButton = FALSE, type = "message")
                 if (input$fGroupPlotMode == "topMostByRGroup")
-                    EICsTopMostRG <<- getEICsForFGroups(fGroups, rtWindow, mzExpWindow, 1, TRUE, TRUE)
+                    EICsTopMostRG <<- getEICsForFGroups(fGroups, rtWindow, 0.001, 1, TRUE, TRUE)
                 else
-                    EICsAll <<- getEICsForFGroups(fGroups, rtWindow, mzExpWindow, NULL, FALSE, TRUE)
+                    EICsAll <<- getEICsForFGroups(fGroups, rtWindow, 0.001, NULL, FALSE, TRUE)
                 removeNotification(not)
             }
             rValues$fGroupPlotMode <- input$fGroupPlotMode
         })
     },
     
-    plotChrom = function(rValues)
+    plotMain = function(input, rValues)
     {
         EICs <- switch(rValues$fGroupPlotMode,
                        topMost = EICsTopMost,
@@ -1080,15 +1083,13 @@ importCheckFeaturesSession <- function(sessionIn, sessionOut, fGroups, overWrite
                          overWrite = overWrite)
 }
 
-checkFeatures2 <- function(fGroups, session, rtWindow, mzExpWindow)
+checkFeatures2 <- function(fGroups, session, rtWindow)
 {
     # UNDONE: update docs
-    # UNDONE: remove mzExpWindow
     
     ac <- checkmate::makeAssertCollection()
     assertCheckFeaturesSession(session, fGroups, mustExist = FALSE, add = ac)
-    aapply(checkmate::assertNumber, . ~ rtWindow + mzExpWindow, finite = TRUE, lower = 0,
-           fixed = list(add = ac))
+    checkmate::assertNumber(rtWindow, finite = TRUE, lower = 0, add = ac)
     checkmate::reportAssertions(ac)
     
     sessionPath <- paste0(session, ".Rds")
@@ -1099,7 +1100,8 @@ checkFeatures2 <- function(fGroups, session, rtWindow, mzExpWindow)
     ftind <- groupFeatIndex(fGroups)
     
     # UNDONE: make topMost/onlyPresent optional/interactive
-    EICsTopMost <- getEICsForFGroups(fGroups, rtWindow, mzExpWindow, topMost = 1, FALSE, onlyPresent = TRUE)
+    EICsTopMost <- getEICsForFGroups(fGroups, rtWindow, 0.001, topMost = 1, getEICsForFGroups = FALSE,
+                                     onlyPresent = TRUE)
     EICsTopMostRG <- EICsAll <- list()
     
     # format is in [[ana]][[fGroup]], since we only took top most intensive we can throw away the ana dimension

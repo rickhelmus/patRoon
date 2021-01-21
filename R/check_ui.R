@@ -1,17 +1,25 @@
 #' @include main.R
 
 checkUIInterface <- setRefClass("checkUIInterface", contains = "VIRTUAL",
-                                fields = list(primarySelections = "character", curSession = "list"))
+                                fields = list(primarySelections = "character", curSession = "list",
+                                              sessionPath = "character"))
 
 checkUIInterface$methods(
 
+    UITitle = function() stop("VIRTUAL"),
     resetSecondaryUITitle = function() stop("VIRTUAL"),
-    settingsTabUI = function() stop("VIRTUAL"),
+    primaryTabTopUI = function() "",
+    settingsTabUI = function(settings) stop("VIRTUAL"),
     
     primaryTab = function() stop("VIRTUAL"),
     secondaryTab = function() stop("VIRTUAL"),
+    
+    defaultUISettings = function() stop("VIRTUAL"),
     UISettingsFileName = function() stop("VIRTUAL"),
     
+    initReactiveValues = function(rValues) rValues,
+    
+    settingsChangedExpression = function(input) stop("VIRTUAL"),
     primarySettingsChanged = function(cur, new) stop("VIRTUAL"),
     secondarySettingsChanged = function(cur, new) stop("VIRTUAL"),
     syncInputSettings = function(session, settings) stop("VIRTUAL"),
@@ -19,7 +27,7 @@ checkUIInterface$methods(
     primaryTableData = function(rValues) stop("VIRTUAL"),
     secondaryTableData = function(rValues) stop("VIRTUAL"),
     
-    doObserveEvents = function(input) NULL,
+    doObserveEvents = function(input, rValues) NULL,
     
     plotChrom = function(rValues) stop("VIRTUAL")
 )
@@ -31,24 +39,17 @@ getUISettingsPath <- function(fileName)
     return(file.path(dirPath, fileName))
 }
 
-getUISettings <- function(fileName)
+getUISettings <- function(fileName, default)
 {
     path <- getUISettingsPath(fileName)
     if (!file.exists(path))
     {
-        ret <- getDefaultUISettings()
-        saveUISettings(ret)
+        ret <- default
+        saveUISettings(fileName, ret)
     }
     else
         ret <- yaml::read_yaml(path, eval.expr = FALSE)
     return(ret)
-}
-
-getDefaultUISettings <- function()
-{
-    return(list(retUnit = "sec", featQuantity = "intensity", fGroupQuantity = "average",
-                fGroupColumns = c("retMZ", "estIDLevel", "totalScore"),
-                featureColumns = c("retMZ", "quantity", "totalScore")))
 }
 
 saveUISettings <- function(fileName, settings)
@@ -56,70 +57,55 @@ saveUISettings <- function(fileName, settings)
     yaml::write_yaml(settings, getUISettingsPath(fileName), indent = 4)
 }
 
-# UNDONE
-if (FALSE) {
-importCheckFeaturesSession <- function(sessionIn, sessionOut, fGroups, overWrite = FALSE)
+importCheckUISession <- function(pathIn, pathOut, primaryName, secondaryName,
+                                 primarySelections, secondaryRowNames, overWrite = FALSE)
 {
-    # UNDONE: docs
-    
-    checkmate::assertString(sessionIn, min.chars = 1)
-    pathIn <- paste0(sessionIn, ".Rds")
-    
-    ac <- checkmate::makeAssertCollection()
-    checkmate::assertFileExists(pathIn, "r", .var.name = "session", add = ac)
-    checkmate::assertString(sessionOut, min.chars = 1, add = ac)
-    checkmate::assertClass(fGroups, "featureGroups", add = ac)
-    checkmate::assertFlag(overWrite, add = ac)
-    checkmate::reportAssertions(ac)
-    
-    pathOut <- paste0(sessionOut, ".Rds")
     if (file.exists(pathOut) && !overWrite)
         stop("Output session already exists. Set overWrite=TRUE to proceed anyway.")
     
     # settings import:
-    # - if file has analyses or feature groups not present in target fGroups: remove
-    # - default for any missing features/feature groups 
+    # - remove any primary/secondary selections (eg feature groups/analyses)not present in target object
+    # - default missing values
     
-    gNames <- names(fGroups)
     settings <- readRDS(pathIn)
-    otherGNames <- names(settings$enabledFeatures)
-    commonGNames <- intersect(gNames, otherGNames)
-    commonAnalyses <- intersect(analyses(fGroups), settings$enabledFeatures$analysis)
+    otherPrimSelections <- names(settings$secondarySelections)
+    commonPrimSelections <- intersect(primarySelections, otherPrimSelections)
+    commonSecNames <- intersect(secondaryRowNames, settings$secondarySelections$name)
     
-    if (length(commonGNames) == 0)
-        warning("Imported session doesn't contain any relevant feature groups!")
-    if (length(commonAnalyses) == 0)
-        warning("Imported session doesn't contain any relevant analyses!")
+    if (length(commonPrimSelections) == 0)
+        warning(sprintf("Imported session doesn't contain any relevant %s!", primaryName), call. = FALSE)
+    if (length(commonSecNames) == 0)
+        warning(sprintf("Imported session doesn't contain any relevant %s!", secondaryName), call. = FALSE)
     
     # only keep common
-    settings$enabledFGroups <- intersect(gNames, settings$enabledFGroups)
-    settings$enabledFeatures <- settings$enabledFeatures[, c("analysis", commonGNames), drop = FALSE]
-    settings$enabledFeatures <- settings$enabledFeatures[settings$enabledFeatures$analysis %in% commonAnalyses, ,
+    settings$primarySelections <- intersect(primarySelections, settings$primarySelections)
+    settings$secondarySelections <- settings$secondarySelections[, c("name", commonPrimSelections), drop = FALSE]
+    settings$secondarySelections <- settings$secondarySelections[settings$secondarySelections$name %in% commonSecNames, ,
                                                          drop = FALSE]
     
     # add missing
-    missingFGroups <- setdiff(gNames, otherGNames)
-    settings$enabledFGroups <- c(settings$enabledFGroups, missingFGroups)
-    if (length(missingFGroups) > 0 && nrow(settings$enabledFeatures) > 0)
-        settings$enabledFeatures[, missingFGroups] <- TRUE
-    missingTbl <- data.frame(analysis = setdiff(analyses(fGroups), settings$enabledFeatures$analysis))
+    missingPrimSelections <- setdiff(primarySelections, otherPrimSelections)
+    settings$primarySelections <- c(settings$primarySelections, missingPrimSelections)
+    if (length(missingPrimSelections) > 0 && nrow(settings$secondarySelections) > 0)
+        settings$secondarySelections[, missingPrimSelections] <- TRUE
+    missingTbl <- data.frame(name = setdiff(secondaryRowNames, settings$secondarySelections$name))
     if (nrow(missingTbl) > 0)
     {
-        missingTbl[, gNames] <- TRUE
-        if (nrow(settings$enabledFeatures) > 0)
-            settings$enabledFeatures <- rbind(settings$enabledFeatures, missingTbl)
+        missingTbl[, primarySelections] <- TRUE
+        if (nrow(settings$secondarySelections) > 0)
+            settings$secondarySelections <- rbind(settings$secondarySelections, missingTbl)
         else
-            settings$enabledFeatures <- missingTbl
+            settings$secondarySelections <- missingTbl
     }
     
-    # match analysis order
-    settings$enabledFeatures <- settings$enabledFeatures[match(analyses(fGroups), settings$enabledFeatures$analysis), ]
+    # match secondary name order
+    settings$secondarySelections <- settings$secondarySelections[match(secondaryRowNames,
+                                                                       settings$secondarySelections$name), ]
     
     saveRDS(settings, pathOut)
 }
-}
 
-getCheckUI <- function(title, primaryTab, secondaryTab, resetSecondaryTitle, settingsTab)
+getCheckUI <- function(UIInterface, settings)
 {
     showOpts <- c("Keep", "Don't keep")
     
@@ -130,7 +116,7 @@ getCheckUI <- function(title, primaryTab, secondaryTab, resetSecondaryTitle, set
         keys::useKeys(),
         keys::keysInput("keys", c("p", "n", "t")),
         
-        title = title,
+        title = UIInterface$UITitle(),
         
         fillCol(
             flex = c(1, NA),
@@ -155,73 +141,66 @@ getCheckUI <- function(title, primaryTab, secondaryTab, resetSecondaryTitle, set
             fillRow(
                 height = 300,
                 
-                tabsetPanel(id = "tabs", tabPanel(primaryTab, fillCol(
-                    flex = c(NA, 1),
-                    fillRow(
-                        height = 40,
-                        flex = c(NA, NA, NA, NA, NA, 1),
-                        
-                        fillCol(
-                            width = 45,
-                            actionButton("previousRow", "", icon("arrow-left"))
-                        ),
-                        fillCol(
-                            width = 45,
-                            actionButton("nextRow", "", icon("arrow-right"))
-                        ),
-                        fillCol(
-                            width = 100,
-                            actionButton("toggleRow", "Toggle", icon("toggle-on"))
-                        ),
-                        fillCol(
-                            width = 200,
-                            div(style = "margin-top: 8px; margin-left: 5px",
-                                checkboxGroupInput("showWhat", NULL, showOpts, showOpts,
-                                                   inline = TRUE))
-                        ),
-                        fillRow(
-                            width = 250,
-                            flex = c(NA, 1),
-                            fillRow(
-                                width = 75,
-                                div(style = "margin-top: 8px", HTML("<strong>Plot mode</strong>"))
-                            ),
-                            # UNDONE: disable for components somehow
-                            selectInput("fGroupPlotMode", NULL,
-                                        c("Top most group" = "topMost", "Top most replicates" = "topMostByRGroup",
-                                          "All" = "all"), "topMost")
-                        ),
-                        div(style = "margin: 8px 10px 12px; font-size: small; text-align: right;",
-                            HTML("<b>n</b>: next; <b>p</b>: previous; <b>t</b>: toggle"))
-                    ),
-                    fillRow(
-                        tags$div(id = "primaryHotContainer", rhandsontable::rHandsontableOutput("primaryHot"))
-                    )
-                )),
-                tabPanel(secondaryTab, fillCol(
-                    flex = c(NA, 1),
-                    
-                    fillRow(
-                        height = 40,
-                        actionButton("resetAllSecondary", resetSecondaryTitle, icon("check-square"))
-                    ),
-                    
-                    fillRow(
-                        tags$div(id = "secondaryHotContainer", rhandsontable::rHandsontableOutput("secondaryHot"))
-                    )
-                )),
-                tabPanel("Settings", fillCol(
-                    flex = NA,
-                    
-                    settingsTab,
-                    
-                    fillRow(
-                        height = 40,
-                        flex = NA,
-                        shinyjs::disabled(actionButton("saveApplySettings", "Save & Apply", icon = icon("save"))),
-                        actionButton("resetSettings", "Reset defaults", icon = icon("redo"))
-                    )
-                ))
+                tabsetPanel(id = "tabs",
+                            tabPanel(UIInterface$primaryTab(), fillCol(
+                                flex = c(NA, 1),
+                                fillRow(
+                                    height = 40,
+                                    flex = c(NA, NA, NA, NA, NA, 1),
+                                    
+                                    fillCol(
+                                        width = 45,
+                                        actionButton("previousRow", "", icon("arrow-left"))
+                                    ),
+                                    fillCol(
+                                        width = 45,
+                                        actionButton("nextRow", "", icon("arrow-right"))
+                                    ),
+                                    fillCol(
+                                        width = 100,
+                                        actionButton("toggleRow", "Toggle", icon("toggle-on"))
+                                    ),
+                                    fillCol(
+                                        width = 200,
+                                        div(style = "margin-top: 8px; margin-left: 5px",
+                                            checkboxGroupInput("showWhat", NULL, showOpts, showOpts,
+                                                               inline = TRUE))
+                                    ),
+                                    UIInterface$primaryTabTopUI(),
+                                    div(style = "margin: 8px 10px 12px; font-size: small; text-align: right;",
+                                        HTML("<b>n</b>: next; <b>p</b>: previous; <b>t</b>: toggle"))
+                                ),
+                                fillRow(
+                                    tags$div(id = "primaryHotContainer",
+                                             rhandsontable::rHandsontableOutput("primaryHot"))
+                                )
+                            )),
+                            tabPanel(UIInterface$secondaryTab(), fillCol(
+                                flex = c(NA, 1),
+                                
+                                fillRow(
+                                    height = 40,
+                                    actionButton("resetAllSecondary", UIInterface$resetSecondaryUITitle(),
+                                                 icon("check-square"))
+                                ),
+                                
+                                fillRow(
+                                    tags$div(id = "secondaryHotContainer",
+                                             rhandsontable::rHandsontableOutput("secondaryHot"))
+                                )
+                            )),
+                            tabPanel("Settings", fillCol(
+                                flex = NA,
+                                
+                                UIInterface$settingsTabUI(settings),
+                                
+                                fillRow(
+                                    height = 40,
+                                    flex = NA,
+                                    shinyjs::disabled(actionButton("saveApplySettings", "Save & Apply", icon = icon("save"))),
+                                    actionButton("resetSettings", "Reset defaults", icon = icon("redo"))
+                                )
+                            ))
                 )
             )
         )
@@ -237,8 +216,6 @@ runCheckUI <- function(UIInterface)
                     outsideClickDeselects = FALSE, manualColumnResize = TRUE,
                     rowHeaders = NULL)
     
-    settings <- getUISettings(UIInterface$UISettingsFileName())
-    
     hotRenderJSFunc <- function(tab) sprintf("function(el, x) {
                   var hot = this.hot;
                   $('a[data-value=\"%s\"').on('click', function(){
@@ -246,24 +223,24 @@ runCheckUI <- function(UIInterface)
                   });
                 }", tab)
     
-    primarySelections <- UIInterface$primarySelections
-    curSession <- UIInterface$curSession
+    settings <- getUISettings(UIInterface$UISettingsFileName(), UIInterface$defaultSettings())
+    sessionChanged <- FALSE
     
     server <- function(input, output, session)
     {
-        rValues <- reactiveValues(currentPrimSel = primarySelections[1],
+        rValues <- reactiveValues(currentPrimSel = UIInterface$primarySelections[1],
                                   triggerPrimaryHotUpdate = 0,
                                   triggerSecondaryHotUpdate = 0,
-                                  primarySelections = curSession$primarySelections,
+                                  primarySelections = UIInterface$curSession$primarySelections,
                                   # NOTE: should be data.frame not data.table, as Shiny doesn't register changes with the latter
-                                  secondarySelections = curSession$secondarySelections,
+                                  secondarySelections = UIInterface$curSession$secondarySelections,
                                   settings = settings)
-                                  # UNDONE fGroupPlotMode = "topMost")
+        rValues <- UIInterface$initReactiveValues(rValues)
         
         getCurPrimaryRow <- function()
         {
             tbl <- rhandsontable::hot_to_r(input$primaryHot)
-            tblRow <- match(rValues$currentPrimSel, tbl$name)
+            tblRow <- match(rValues$currentPrimSel, tbl[[1]])
             if (is.na(tblRow))
                 warning("Cannot find fgroup row!")
             return(tblRow)
@@ -328,7 +305,7 @@ runCheckUI <- function(UIInterface)
             if (UIInterface$secondarySettingsChanged(curSettings, settings))
                 reAddHOT("secondaryHot")
             
-            saveUISettings(settings)
+            saveUISettings(UIInterface$UISettingsFileName(), settings)
         }
         
         setSessionChanged <- function(changed)
@@ -356,7 +333,7 @@ runCheckUI <- function(UIInterface)
         
         observeEvent(input$saveSession, {
             saveRDS(list(primarySelections = rValues$primarySelections,
-                         secondarySelections = rValues$secondarySelections), sessionPath)
+                         secondarySelections = rValues$secondarySelections), UIInterface$sessionPath)
             setSessionChanged(FALSE)
         })
         
@@ -402,8 +379,8 @@ runCheckUI <- function(UIInterface)
             if (input$primaryHot$params$maxRows > 0)
             {
                 tbl <- rhandsontable::hot_to_r(input$primaryHot)
-                keep <- tbl[keep == TRUE]$name
-                notkeep <- tbl[keep == FALSE]$name
+                keep <- tbl[keep == TRUE][[1]]
+                notkeep <- tbl[keep == FALSE][[1]]
                 oldsel <- rValues$primarySelections
                 rValues$primarySelections <- setdiff(union(rValues$primarySelections, keep), notkeep)
                 selChanged <- !isTRUE(all.equal(oldsel, rValues$primarySelections))
@@ -438,7 +415,7 @@ runCheckUI <- function(UIInterface)
         })
         
         observeEvent(input$enableAllPrimary, {
-            rValues$primarySelections <- primarySelections
+            rValues$primarySelections <- UIInterface$primarySelections
             rValues$triggerPrimaryHotUpdate <- rValues$triggerPrimaryHotUpdate + 1
             setSessionChanged(TRUE)
         })
@@ -449,7 +426,7 @@ runCheckUI <- function(UIInterface)
         })
         
         observeEvent(input$resetAllSecondary, {
-            rValues$secondarySelections[, primarySelections] <-TRUE
+            rValues$secondarySelections[, UIInterface$primarySelections] <-TRUE
             rValues$triggerSecondaryHotUpdate <- rValues$triggerSecondaryHotUpdate + 1
             setSessionChanged(TRUE)
         })
@@ -460,7 +437,7 @@ runCheckUI <- function(UIInterface)
             {
                 tbl <- rhandsontable::hot_to_r(input$secondaryHot)
                 oldsel <- rValues$secondarySelections[[rValues$currentPrimSel]]
-                rValues$secondarySelections[match(tbl$name, rValues$secondarySelections$name),
+                rValues$secondarySelections[match(tbl[[1]], rValues$secondarySelections$name),
                                             rValues$currentPrimSel] <- tbl$keep
                 if (!isTRUE(all.equal(oldsel, rValues$secondarySelections[[rValues$currentPrimSel]])))
                     setSessionChanged(TRUE)
@@ -478,39 +455,38 @@ runCheckUI <- function(UIInterface)
             setSessionChanged(TRUE)
         })
         
-        # UNDONE
-        if (FALSE){
-        observeEvent({ input$retUnit; input$featQuantity; input$fGroupQuantity; input$fGroupColumns; input$featureColumns }, {
+        observeEvent(UIInterface$settingsChangedExpression(input), {
             shinyjs::toggleState("saveApplySettings", !isTRUE(all.equal(getInputSettings(), rValues$settings)))
-        })}
+        })
         
         observeEvent(input$saveApplySettings, {
             doApplySettings(getInputSettings())
+            shinyjs::disable("saveApplySettings")
         })
         
         observeEvent(input$resetSettings, {
-            doApplySettings(getDefaultUISettings())
+            doApplySettings(UIInterface$defaultUISettings())
             UIInterface$syncInputSettings(session, rValues$settings)
             shinyjs::disable("saveApplySettings")
         })
 
-        UIInterface$doObserveEvents(input)
+        UIInterface$doObserveEvents(input, rValues)
         
         output$pageTitle <- renderText({
-            sprintf("Selection %s (%d/%d)", rValues$currentPrimSel,
-                    match(rValues$currentPrimSel, primarySelections), length(primarySelections))
+            sprintf("%s (%d/%d)", rValues$currentPrimSel,
+                    match(rValues$currentPrimSel, UIInterface$primarySelections), length(UIInterface$primarySelections))
         })
         
         output$plotChrom <- renderPlot({ UIInterface$plotChrom(rValues) })
 
         output$primaryHot <- rhandsontable::renderRHandsontable({
-            not <- showNotification(sprintf("Updating %s table...", primaryTabName), duration = NULL,
+            not <- showNotification(sprintf("Updating %s table...", UIInterface$primaryTab()), duration = NULL,
                                     closeButton = FALSE, type = "message")
             rValues$triggerPrimaryHotUpdate
             
             tabData <- primaryTable()
             tabData[, keep := group %in% isolate(rValues$primarySelections)]
-            setcolorder(tabData, c("name", "keep"))
+            setcolorder(tabData, c(names(tabData)[1], "keep"))
             
             if (!"Keep" %in% input$showWhat)
                 tabData <- tabData[keep == FALSE, ]
@@ -539,7 +515,7 @@ runCheckUI <- function(UIInterface)
                 )) %>%
                 # BUG: table is messed up after tab switch
                 # work-around from https://github.com/jrowen/rhandsontable/issues/366
-                htmlwidgets::onRender(hotRenderJSFunc(primaryTabName))
+                htmlwidgets::onRender(hotRenderJSFunc(UIInterface$primaryTab()))
             
             if (!is.null(tabData[["EIC"]]))
             {
@@ -562,9 +538,10 @@ runCheckUI <- function(UIInterface)
             rValues$triggerSecondaryHotUpdate
             
             tabData <- secondaryTable()
-            isolate(tabData[, keep := rValues$secondarySelections[match(analysis, rValues$secondarySelections$analysis),
+            isolate(tabData[, keep := rValues$secondarySelections[match(names(tabData)[1],
+                                                                        rValues$secondarySelections$name),
                                                                   rValues$currentPrimSel]])
-            setcolorder(tabData, c("name", "keep"))
+            setcolorder(tabData, c(names(tabData)[1], "keep"))
             
             hot <- do.call(rhandsontable::rhandsontable,
                            c(list(tabData, height = 200, maxRows = nrow(tabData)), hotOpts)) %>%
@@ -585,7 +562,7 @@ runCheckUI <- function(UIInterface)
                 )) %>%
                 # BUG: table is messed up after tab switch
                 # work-around from https://github.com/jrowen/rhandsontable/issues/366
-                htmlwidgets::onRender(hotRenderJSFunc(secondaryTabName))
+                htmlwidgets::onRender(hotRenderJSFunc(UIInterface$secondaryTab()))
             
             # HACK: disable some default context options
             hot$x$contextMenu$items[c("undo", "redo", "alignment")] <- NULL
@@ -598,6 +575,5 @@ runCheckUI <- function(UIInterface)
         })
     }
     
-    runApp(shinyApp(getCheckUI(settings, UIInterface$primaryTab(), UIInterface$secondaryTab(),
-                               UIInterface$resetSecondaryUITitle(), UIInterface$settingsTabUI()), server))
+    runApp(shinyApp(getCheckUI(UIInterface, settings), server))
 }

@@ -64,7 +64,7 @@
     - topMostByRGroup: make default? or only for reporting?
     - quality/score filters
     - MetaClean model import/export
-    - KPIC2: sync object? otherwise document
+    - updatePICSet(): also sync feat values? otherwise doc
     - update docs and checkChromatograms() for mzWindow --> mzExpWindow
     - XCMS3 grouping without analyses
     - IPO with KPIC

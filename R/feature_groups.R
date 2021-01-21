@@ -674,7 +674,7 @@ setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas =
 
     annTable <- annotations(x)
     if (nrow(ret) > 0 && nrow(annTable) > 0)
-        ret <- merge(ret, annTable)
+        ret <- merge(ret, annTable, sort = FALSE)
     
     return(ret[])
 })

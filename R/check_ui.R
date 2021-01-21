@@ -29,7 +29,7 @@ checkUIInterface$methods(
     
     doObserveEvents = function(input, rValues) NULL,
     
-    plotChrom = function(rValues) stop("VIRTUAL")
+    plotMain = function(input, rValues) stop("VIRTUAL")
 )
 
 getUISettingsPath <- function(fileName)
@@ -134,7 +134,7 @@ getCheckUI <- function(UIInterface, settings)
                     )
                 ),
                 fillCol(
-                    plotOutput("plotChrom", width = "100%", height = "100%")
+                    plotOutput("plotMain", width = "100%", height = "100%")
                 )
             ),
             
@@ -223,7 +223,7 @@ runCheckUI <- function(UIInterface)
                   });
                 }", tab)
     
-    settings <- getUISettings(UIInterface$UISettingsFileName(), UIInterface$defaultSettings())
+    settings <- getUISettings(UIInterface$UISettingsFileName(), UIInterface$defaultUISettings())
     sessionChanged <- FALSE
     
     server <- function(input, output, session)
@@ -242,7 +242,7 @@ runCheckUI <- function(UIInterface)
             tbl <- rhandsontable::hot_to_r(input$primaryHot)
             tblRow <- match(rValues$currentPrimSel, tbl[[1]])
             if (is.na(tblRow))
-                warning("Cannot find fgroup row!")
+                warning("Cannot find row!")
             return(tblRow)
         }
         
@@ -251,7 +251,7 @@ runCheckUI <- function(UIInterface)
             old <- rValues$currentPrimSel
             rValues$currentPrimSel <- new
             
-            # update feature selection if needed
+            # update secondary selection if needed
             if (!isTRUE(all.equal(rValues$secondarySelections[[old]],
                                   rValues$secondarySelections[[new]])))
                 rValues$triggerSecondaryHotUpdate <- rValues$triggerSecondaryHotUpdate + 1
@@ -269,7 +269,7 @@ runCheckUI <- function(UIInterface)
                 else if (tblRow > nrow(tbl))
                     tblRow <- nrow(tbl)
                 
-                updatePrimaryRow(tbl$group[tblRow])
+                updatePrimaryRow(tbl[[1]][tblRow])
                 session$sendCustomMessage("selectPrimaryRow", tblRow)
             }
         }
@@ -322,7 +322,7 @@ runCheckUI <- function(UIInterface)
         secondaryTable <- reactive({ UIInterface$secondaryTableData(rValues) })
         
         observeEvent(input$keys, {
-            if (input$tabs == "Feature groups")
+            if (input$tabs == UIInterface$primaryTab())
             {
                 switch(input$keys,
                        p = advancePrimaryRow(-1),
@@ -403,7 +403,7 @@ runCheckUI <- function(UIInterface)
                     {
                         # update selection after table update was triggered
                         if (!is.null(selr))
-                            updatePrimaryRow(tbl$group[selr])
+                            updatePrimaryRow(tbl[[1]][selr])
                     }
                 }
             }
@@ -411,7 +411,7 @@ runCheckUI <- function(UIInterface)
         
         observeEvent(input$primaryHot_select$select$r, {
             tbl <- rhandsontable::hot_to_r(input$primaryHot)
-            updatePrimaryRow(tbl$group[input$primaryHot_select$select$rAll[1]])
+            updatePrimaryRow(tbl[[1]][input$primaryHot_select$select$rAll[1]])
         })
         
         observeEvent(input$enableAllPrimary, {
@@ -438,7 +438,7 @@ runCheckUI <- function(UIInterface)
                 tbl <- rhandsontable::hot_to_r(input$secondaryHot)
                 oldsel <- rValues$secondarySelections[[rValues$currentPrimSel]]
                 rValues$secondarySelections[match(tbl[[1]], rValues$secondarySelections$name),
-                                            rValues$currentPrimSel] <- tbl$keep
+                                            rValues$currentPrimSel] <- tbl$keep[!is.na(tbl$keep)]
                 if (!isTRUE(all.equal(oldsel, rValues$secondarySelections[[rValues$currentPrimSel]])))
                     setSessionChanged(TRUE)
             }
@@ -477,7 +477,7 @@ runCheckUI <- function(UIInterface)
                     match(rValues$currentPrimSel, UIInterface$primarySelections), length(UIInterface$primarySelections))
         })
         
-        output$plotChrom <- renderPlot({ UIInterface$plotChrom(rValues) })
+        output$plotMain <- renderPlot({ UIInterface$plotMain(input, rValues) })
 
         output$primaryHot <- rhandsontable::renderRHandsontable({
             not <- showNotification(sprintf("Updating %s table...", UIInterface$primaryTab()), duration = NULL,
@@ -485,7 +485,7 @@ runCheckUI <- function(UIInterface)
             rValues$triggerPrimaryHotUpdate
             
             tabData <- primaryTable()
-            tabData[, keep := group %in% isolate(rValues$primarySelections)]
+            tabData[, keep := .SD[[1]] %in% isolate(rValues$primarySelections)]
             setcolorder(tabData, c(names(tabData)[1], "keep"))
             
             if (!"Keep" %in% input$showWhat)
@@ -538,7 +538,7 @@ runCheckUI <- function(UIInterface)
             rValues$triggerSecondaryHotUpdate
             
             tabData <- secondaryTable()
-            isolate(tabData[, keep := rValues$secondarySelections[match(names(tabData)[1],
+            isolate(tabData[, keep := rValues$secondarySelections[match(.SD[[1]],
                                                                         rValues$secondarySelections$name),
                                                                   rValues$currentPrimSel]])
             setcolorder(tabData, c(names(tabData)[1], "keep"))

@@ -1,6 +1,31 @@
 #' @include features.R
 NULL
 
+updatePICSet <- function(old, new)
+{
+    new@picsList <- Map(new@picsList, featureTable(old), featureTable(new), f = function(pics, oft, nft)
+    {
+        removed <- oft[!ID %in% nft$ID]$ID
+        if (length(removed) > 0)
+        {
+            pics$pics <- pics$pics[-removed]
+            pics$peaks <- pics$peaks[-removed]
+            pics$peakinfo <- pics$peakinfo[-removed, ]
+        }
+        return(pics)
+    })
+    
+    # ensure IDs equal row counts in case features were removed
+    new@features <- lapply(new@features, function(ft)
+    {
+        if (nrow(ft) < last(ft$ID))
+            set(ft, j = "ID", value = seq_len(nrow(ft)))
+        return(ft)
+    })
+    
+    return(new)
+}
+
 #' @rdname features-class
 #' @export
 featuresKPIC2 <- setClass("featuresKPIC2", slots = list(picsList = "ANY"), contains = "features")
@@ -10,11 +35,47 @@ setMethod("initialize", "featuresKPIC2",
 
 #' @rdname features-class
 #' @export
+setReplaceMethod("featureTable", "featuresKPIC2", function(obj, value)
+{
+    ret <- callNextMethod()
+    ret <- updatePICSet(obj, ret)
+    return(ret)
+})
+
+#' @rdname features-class
+#' @export
 setMethod("[", c("featuresKPIC2", "ANY", "missing", "missing"), function(x, i, j, ..., drop = TRUE)
 {
     x <- callNextMethod(x, i, j, ..., drop = drop)
     x@picsList <- x@picsList[names(x@features)]
     return(x)
+})
+
+#' @rdname features-class
+#' @export
+setReplaceMethod("[", c("featuresKPIC2", "ANY", "missing"), function(x, i, j, value)
+{
+    ret <- callNextMethod()
+    ret <- updatePICSet(x, ret)
+    return(ret)
+})
+
+#' @rdname features-class
+#' @export
+setReplaceMethod("[[", c("featuresKPIC2", "ANY", "missing"), function(x, i, j, value)
+{
+    ret <- callNextMethod()
+    ret <- updatePICSet(x, ret)
+    return(ret)
+})
+
+#' @rdname features-class
+#' @export
+setReplaceMethod("$", "featuresKPIC2", function(x, name, value)
+{
+    ret <- callNextMethod()
+    ret <- updatePICSet(x, ret)
+    return(ret)
 })
 
 
@@ -102,7 +163,6 @@ importfeaturesKPIC2 <- function(picsList, analysisInfo)
 
 setMethod("getPICSet", "featuresKPIC2", function(obj)
 {
-    # UNDONE: ensure object is synced
     return(unname(obj@picsList))
 })
 

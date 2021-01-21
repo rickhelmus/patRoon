@@ -70,6 +70,11 @@
     - fix empty MS(MS) peaklists if unavailable during merging sets
         - already fixed?
     - calculatePeakQualities() sets method?
+    - checkFeatures: annotation column setting
+    - backport checkFeatures things to featng
+        - no return value
+        - filename ui settings
+        - disable save settings button after clicking it
 - merging setObjects
     - check if more has to be cached and may need status messages
     - filter features, annotation results on minimum abundance amongst different setObjects

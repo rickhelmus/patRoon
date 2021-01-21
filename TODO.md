@@ -75,6 +75,10 @@
         - no return value
         - filename ui settings
         - disable save settings button after clicking it
+        - minutes for retmin/retmax
+        - remove mzExpWindow
+    - add to checkFeatures and backport
+        - remove existing session in case its incompatible
 - merging setObjects
     - check if more has to be cached and may need status messages
     - filter features, annotation results on minimum abundance amongst different setObjects

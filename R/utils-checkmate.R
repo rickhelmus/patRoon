@@ -388,6 +388,33 @@ assertCheckFeaturesSession <- function(x, fGroups, mustExist, canClearSession, d
     }
 }
 
+assertCheckComponentsSession <- function(x, components, mustExist, null.ok = FALSE,
+                                         .var.name = checkmate::vname(x), add = NULL)
+{
+    if (null.ok && is.null(x))
+        return(NULL)
+    
+    if (!is.null(add))
+        mc <- length(add$getMessages())
+    
+    checkmate::assertString(x, min.chars = 1, .var.name = .var.name, add = add)
+    if (is.null(add) || length(add$getMessages()) == mc)
+    {
+        sessionPath <- paste0(x, ".Rds")
+        if (mustExist)
+            checkmate::assertFileExists(sessionPath, "r", .var.name = .var.name, add = add)
+        
+        if (file.exists(sessionPath))
+        {
+            session <- readRDS(sessionPath)
+            if (!setequal(c("name", names(components)), names(session$secondarySelections)))
+                stop("Session has different components! Please use importCheckComponentsSession() to import.")
+            if (!setequal(groupNames(components), session$secondarySelections$name))
+                stop("Session has different feature groups! Please use importCheckComponentsSession() to import.")
+        }
+    }
+}
+
 assertSets <- function(obj, s, multiple, null.ok = multiple, add = NULL)
 {
     if (multiple)

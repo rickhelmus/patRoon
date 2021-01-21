@@ -1,0 +1,181 @@
+#' @include main.R
+#' @include components.R
+#' @include feature_groups.R
+#' @include check_ui.R
+
+# UNDONE: can't make components field type components?
+checkComponentsInterface <- setRefClass("checkComponentsInterface", contains = "checkUIInterface",
+                                        fields = c(components = "ANY", fGroups = "featureGroups", EICs = "list"))
+
+checkComponentsInterface$methods(
+    
+    UITitle = function() "Check components tool",
+    resetSecondaryUITitle = function() "Enable all feature groups for all components",
+    primaryTabTopUI = function()
+    {
+        fillRow(
+            width = 150,
+            div(style = "margin-top: 8px; margin-left: 0px",
+                checkboxGroupInput("plotSpec", NULL, c("Plot spectrum" = "plotSpec"), inline = TRUE))
+        )        
+    },
+    settingsTabUI = function(settings)
+    {
+        # UNDONE
+        
+        fillRow(
+            height = 200,
+            fillCol(
+                flex = NA,
+                radioButtons("retUnit", "Retention time unit", c("Seconds" = "sec", "Minutes" = "min"),
+                             settings$retUnit, inline = TRUE)
+            )
+        )
+    },
+    
+    primaryTab = function() "Components",
+    secondaryTab = function() "Feature groups",
+    
+    defaultUISettings = function()
+    {
+        # UNDONE
+        return(list(retUnit = "sec"))
+    },
+    UISettingsFileName = function() "check_components.yml",
+    
+    settingsChangedExpression = function(input)
+    {
+        # UNDONE
+        input$retUnit
+    },
+    primarySettingsChanged = function(cur, new)
+    {
+        # UNDONE
+        FALSE
+    },
+    secondarySettingsChanged = function(cur, new) FALSE, # UNDONE
+    syncInputSettings = function(session, settings)
+    {
+        updateRadioButtons(session, "retUnit", selected = rValues$settings[["retUnit"]])
+    },
+    
+    primaryTableData = function(rValues)
+    {
+        # UNDONE: settings?
+        # UNDONE: change column names?
+
+        # make sure that right copy() is called... https://stackoverflow.com/a/16566247
+        tab <- data.table::copy(componentInfo(components))
+        if (rValues$settings$retUnit == "min")
+        {
+            if (!is.null(tab[["cmp_ret"]]))
+                tab[, cmp_ret := cmp_ret / 60]
+            if (!is.null(tab[["cmp_retsd"]]))
+                tab[, cmp_retsd := cmp_retsd / 60]
+        }
+        
+        return(tab)
+    },
+    secondaryTableData = function(rValues)
+    {
+        # UNDONE: settings?
+        # UNDONE: change column names?
+        
+        tab <- data.table::copy(components[[rValues$currentPrimSel]])
+        if (rValues$settings$retUnit == "min")
+            tab[, rt := rt / 60]
+        
+        # NOTE: group names (ie secondary names) should be first column
+        setcolorder(tab, "group")
+        
+        return(tab)
+    },
+    
+    plotMain = function(input, rValues)
+    {
+        enFGroups <- rValues$secondarySelections$name[rValues$secondarySelections[[rValues$currentPrimSel]]]
+        cmp <- components[, enFGroups]
+        
+        withr::with_par(list(mar = c(4, 4, 0.1, 1), cex = 1.5), {
+            if ("plotSpec" %in% input$plotSpec)
+            {
+                scr <- split.screen(c(2, 1))
+                screen(scr[1])
+            }
+            
+            plotChroms(cmp, index = rValues$currentPrimSel, fGroups = fGroups, EICs = EICs,
+                       title = "", retMin = rValues$settings$retUnit == "min")
+
+            if ("plotSpec" %in% input$plotSpec)
+            {
+                screen(scr[2])
+                plotSpectrum(cmp, index = rValues$currentPrimSel)
+                
+                close.screen(scr)
+            }
+        })
+    }
+)
+
+#' @export
+importCheckComponentsSession <- function(sessionIn, sessionOut, components, overWrite = FALSE)
+{
+    # UNDONE: docs
+    
+    checkmate::assertString(sessionIn, min.chars = 1)
+    pathIn <- paste0(sessionIn, ".Rds")
+    
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertFileExists(pathIn, "r", .var.name = "session", add = ac)
+    checkmate::assertString(sessionOut, min.chars = 1, add = ac)
+    checkmate::assertClass(components, "components", add = ac)
+    checkmate::assertFlag(overWrite, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    pathOut <- paste0(sessionOut, ".Rds")
+    
+    importCheckUISession(pathIn, pathOut, "components", "feature groups", names(components), groupNames(components),
+                         overWrite = overWrite)
+}
+
+#' @rdname GUI-utils
+#' @aliases checkComponents
+#' @export
+setMethod("checkComponents", "components", function(components, fGroups, session, rtWindow)
+{
+    # UNDONE: update docs
+    
+    checkmate::assertClass(fGroups, "featureGroups") # do first so we can sync
+
+    fGroups <- fGroups[, groupNames(components)] # remove any fGroups not in components
+    components <- components[, names(fGroups)] # remove any fGroups not in fGroups
+    
+    ac <- checkmate::makeAssertCollection()
+    assertCheckComponentsSession(session, components, mustExist = FALSE, add = ac)
+    checkmate::assertNumber(rtWindow, finite = TRUE, lower = 0, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    # UNDONE: sessions unique for components/fGroups and version info
+    sessionPath <- paste0(session, ".Rds")
+    checkmate::assertPathForOutput(sessionPath, overwrite = TRUE, .var.name = "session")
+    
+    cmpNames <- names(components)
+    
+    EICs <- getEICsForFGroups(fGroups, rtWindow = rtWindow, mzExpWindow = 0.001, topMost = 1,
+                              topMostByRGroup = FALSE, onlyPresent = TRUE)
+    
+    curSession <- NULL
+    if (file.exists(sessionPath))
+        curSession <- readRDS(sessionPath)
+    else
+    {
+        eg <- data.frame(name = names(fGroups))
+        eg[, cmpNames] <- TRUE
+        curSession <- list(primarySelections = cmpNames, secondarySelections = eg)
+    }
+    
+    int <- checkComponentsInterface$new(components = components, fGroups = fGroups, EICs = EICs,
+                                        primarySelections = cmpNames, curSession = curSession,
+                                        sessionPath = sessionPath)
+    return(runCheckUI(int))
+})

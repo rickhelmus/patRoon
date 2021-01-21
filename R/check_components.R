@@ -21,8 +21,6 @@ checkComponentsInterface$methods(
     },
     settingsTabUI = function(settings)
     {
-        # UNDONE
-        
         fillRow(
             height = 200,
             fillCol(
@@ -38,22 +36,16 @@ checkComponentsInterface$methods(
     
     defaultUISettings = function()
     {
-        # UNDONE
         return(list(retUnit = "sec"))
     },
     UISettingsFileName = function() "check_components.yml",
     
     settingsChangedExpression = function(input)
     {
-        # UNDONE
         input$retUnit
     },
-    primarySettingsChanged = function(cur, new)
-    {
-        # UNDONE
-        FALSE
-    },
-    secondarySettingsChanged = function(cur, new) FALSE, # UNDONE
+    primarySettingsChanged = function(cur, new) FALSE,
+    secondarySettingsChanged = function(cur, new) FALSE,
     syncInputSettings = function(session, settings)
     {
         updateRadioButtons(session, "retUnit", selected = rValues$settings[["retUnit"]])
@@ -61,9 +53,6 @@ checkComponentsInterface$methods(
     
     primaryTableData = function(rValues)
     {
-        # UNDONE: settings?
-        # UNDONE: change column names?
-
         # make sure that right copy() is called... https://stackoverflow.com/a/16566247
         tab <- data.table::copy(componentInfo(components))
         if (rValues$settings$retUnit == "min")
@@ -78,9 +67,6 @@ checkComponentsInterface$methods(
     },
     secondaryTableData = function(rValues)
     {
-        # UNDONE: settings?
-        # UNDONE: change column names?
-        
         tab <- data.table::copy(components[[rValues$currentPrimSel]])
         if (rValues$settings$retUnit == "min")
             tab[, rt := rt / 60]
@@ -155,7 +141,6 @@ setMethod("checkComponents", "components", function(components, fGroups, session
     checkmate::assertNumber(rtWindow, finite = TRUE, lower = 0, add = ac)
     checkmate::reportAssertions(ac)
     
-    # UNDONE: sessions unique for components/fGroups and version info
     sessionPath <- paste0(session, ".Rds")
     checkmate::assertPathForOutput(sessionPath, overwrite = TRUE, .var.name = "session")
     

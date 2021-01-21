@@ -1099,7 +1099,6 @@ checkFeatures2 <- function(fGroups, session, rtWindow)
     fTable <- featureTable(fGroups)
     ftind <- groupFeatIndex(fGroups)
     
-    # UNDONE: make topMost/onlyPresent optional/interactive
     EICsTopMost <- getEICsForFGroups(fGroups, rtWindow, 0.001, topMost = 1, getEICsForFGroups = FALSE,
                                      onlyPresent = TRUE)
     EICsTopMostRG <- EICsAll <- list()

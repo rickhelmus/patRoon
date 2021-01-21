@@ -60,6 +60,23 @@
         - consensus()? (see above)
         - compoundViewer?
         - groupFeaturesXCMS3?
+- check UIs
+    - checkFeatures: annotation column setting
+    - checkComponents
+        - more settings?
+        - test session import
+        - distinguish between features/components sessions (file name prefix/postfix?)
+        - change column names for both tables?
+        - filters
+    - backport checkFeatures things to featng
+        - no return value
+        - filename ui settings
+        - disable save settings button after clicking it
+        - minutes for retmin/retmax
+        - remove mzExpWindow
+    - add to checkFeatures and backport
+        - allow to remove existing session in case its incompatible
+        - versioning settings/sessions
 - misc
     - as.data.table() for formulas: average=T will now produce strange averaged ionized formula, for now simply remove this column...
         - also give a note in docs?
@@ -70,15 +87,6 @@
     - fix empty MS(MS) peaklists if unavailable during merging sets
         - already fixed?
     - calculatePeakQualities() sets method?
-    - checkFeatures: annotation column setting
-    - backport checkFeatures things to featng
-        - no return value
-        - filename ui settings
-        - disable save settings button after clicking it
-        - minutes for retmin/retmax
-        - remove mzExpWindow
-    - add to checkFeatures and backport
-        - remove existing session in case its incompatible
 - merging setObjects
     - check if more has to be cached and may need status messages
     - filter features, annotation results on minimum abundance amongst different setObjects
@@ -123,6 +131,7 @@
 	    - OpenMS
 	        - clearly doc that maxCharge should follow specified adducts
 	        - force qTry to be not feature?
+	        - fix adduct specification (https://github.com/OpenMS/OpenMS/issues/5133)
 	    - cliqueMS
 	        - parallelization?
 	        - change checkPackage GH link once PR is merged

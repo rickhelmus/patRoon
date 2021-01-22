@@ -1,6 +1,23 @@
 #' @include features.R
 NULL
 
+makeKPIC2PeakInfo <- function(ft)
+{
+    cols <- intersect(names(ft), c("ret", "retmin", "retmax", "mz", "mzmin", "mzmax", "intensity", "area", "sn"))
+    ret <- ft[, cols, with = FALSE]
+    setnames(ret,
+             c("ret", "retmin", "retmax", "intensity"),
+             c("rt", "rtmin", "rtmax", "maxo"))
+    if (!is.null(ret[["sn"]]))
+        setnames(ret, "sn", "snr")
+    else
+        ret[, snr := NA_real_]
+    ret[, mzrsd := NA_real_]
+    setcolorder(ret, c("rt", "rtmin", "rtmax", "mz", "mzmin", "mzmax", "mzrsd", "maxo", "area", "snr"))
+    ret <- as.matrix(ret)
+    return(ret)
+}
+
 updatePICSet <- function(old, new)
 {
     new@picsList <- Map(new@picsList, featureTable(old), featureTable(new), f = function(pics, oft, nft)
@@ -12,10 +29,14 @@ updatePICSet <- function(old, new)
             pics$peaks <- pics$peaks[-removed]
             pics$peakinfo <- pics$peakinfo[-removed, ]
         }
+
+        # update peakinfo
+        pics$peakinfo <- makeKPIC2PeakInfo(nft)
+        
         return(pics)
     })
     
-    # ensure IDs equal row counts in case features were removed
+    # ensure IDs are along rows in case features were removed
     new@features <- lapply(new@features, function(ft)
     {
         if (nrow(ft) < last(ft$ID))
@@ -152,8 +173,8 @@ importfeaturesKPIC2 <- function(picsList, analysisInfo)
     feat <- setNames(lapply(picsList, function(pics)
     {
         ret <- as.data.table(pics$peakinfo)
-        setnames(ret, c("rt", "rtmin", "rtmax", "maxo"),
-                 c("ret", "retmin", "retmax", "intensity"))
+        setnames(ret, c("rt", "rtmin", "rtmax", "maxo", "snr"),
+                 c("ret", "retmin", "retmax", "intensity", "sn"))
         ret[, ID := seq_len(.N)][]
         return(ret)
     }), analysisInfo$analysis)
@@ -205,15 +226,8 @@ setMethod("getPICSet", "features", function(obj, exportedData = TRUE)
             ret$pics <- ret$peaks <- list()
         }
         
-        ret$peakinfo <- fList[[anai]][, c("ret", "retmin", "retmax", "mz", "mzmin", "mzmax", "intensity",
-                                          "area")]
-        setnames(ret$peakinfo,
-                 c("ret", "retmin", "retmax", "intensity"),
-                 c("rt", "rtmin", "rtmax", "maxo"))
-        ret$peakinfo[, c("mzrsd", "snr") := NA_real_] # UNDONE: might be there for XCMS?
-        setcolorder(ret$peakinfo, c("rt", "rtmin", "rtmax", "mz", "mzmin", "mzmax", "mzrsd", "maxo", "area", "snr"))
-        ret$peakinfo <- as.matrix(ret$peakinfo)
-        
+        ret$peakinfo <- makeKPIC2PeakInfo(fList[[anai]])
+
         return(ret)
     }))
 })

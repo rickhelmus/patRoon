@@ -69,7 +69,7 @@
     - XCMS3 grouping without analyses
     - IPO with KPIC
     - getEICsForFeatures method for kpic2?
-    - KPIC2 grouping
+    - optimize hashing? Or further avoid hashing big objects/objects with lists?
 - finish feature syncing
     - clarify reportCSV() now only reports remaining features?
 - (finish) implement(ing) replace methods for setting feature(Group) data

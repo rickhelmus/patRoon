@@ -1194,7 +1194,8 @@ setMethod("plotChromsHash", "featureGroups", function(obj, rtWindow = 30, mzExpW
     annotate <- checkmate::matchArg(annotate, c("none", "ret", "mz"), several.ok = TRUE)
     if ("none" %in% annotate)
         annotate <- "none"
-    makeHash(allArgs(FALSE))
+    args <- allArgs(FALSE)
+    makeHash(args[setdiff(names(args), "obj")], featureTable(obj), groupInfo(obj), analysisInfo(obj))
 })
 
 #' @describeIn featureGroups plots a Venn diagram (using

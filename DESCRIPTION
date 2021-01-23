@@ -160,6 +160,7 @@ Collate:
     'feature_groups-comparison.R'
     'feature_groups-envimass.R'
     'feature_groups-filter.R'
+    'feature_groups-kpic2.R'
     'feature_groups-openms.R'
     'feature_groups-optimize.R'
     'feature_groups-optimize-openms.R'

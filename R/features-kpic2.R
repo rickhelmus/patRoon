@@ -39,7 +39,7 @@ updatePICSet <- function(old, new)
     # ensure IDs are along rows in case features were removed
     new@features <- lapply(new@features, function(ft)
     {
-        if (nrow(ft) < last(ft$ID))
+        if (nrow(ft) > 0 && nrow(ft) < last(ft$ID))
             set(ft, j = "ID", value = seq_len(nrow(ft)))
         return(ft)
     })
@@ -182,7 +182,8 @@ importfeaturesKPIC2 <- function(picsList, analysisInfo)
     return(featuresKPIC2(picsList = picsList, features = feat, analysisInfo = analysisInfo))
 }
 
-setMethod("getPICSet", "featuresKPIC2", function(obj)
+#' @export
+setMethod("getPICSet", "featuresKPIC2", function(obj, ...)
 {
     return(unname(obj@picsList))
 })

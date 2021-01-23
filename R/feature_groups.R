@@ -1445,7 +1445,7 @@ setMethod("calculatePeakQualities", "featureGroups", function(obj, weights, flat
 #' @templateVar what group features
 #' @templateVar ex1 groupFeaturesOpenMS
 #' @templateVar ex2 groupFeaturesXCMS3
-#' @templateVar algos openms,xcms,xcms3
+#' @templateVar algos openms,xcms,xcms3,kpic2
 #' @template generic-algo
 #'
 #' @rdname feature-grouping
@@ -1454,14 +1454,15 @@ setMethod("calculatePeakQualities", "featureGroups", function(obj, weights, flat
 setMethod("groupFeatures", "features", function(feat, algorithm, ..., verbose = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertChoice(algorithm, c("openms", "xcms", "xcms3"), add = ac)
+    checkmate::assertChoice(algorithm, c("openms", "xcms", "xcms3", "kpic2"), add = ac)
     checkmate::assertFlag(verbose, add = ac)
     checkmate::reportAssertions(ac)
     
     f <- switch(algorithm,
                 openms = groupFeaturesOpenMS,
                 xcms = groupFeaturesXCMS,
-                xcms3 = groupFeaturesXCMS3)
+                xcms3 = groupFeaturesXCMS3,
+                kpic2 = groupFeaturesKPIC2)
 
     f(feat, ..., verbose = verbose)
 })

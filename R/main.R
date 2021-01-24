@@ -341,7 +341,7 @@ NULL
 #'   
 #'   \strong{NOTE:} For XCMS3, which normally uses parameter classes for
 #'   settings its options, the parameters must be defined in a named list like
-#'   any other algorithm. The set parameters are then used to automatically
+#'   any other algorithm. The set parameters are then used passed to the
 #'   constructor of the right parameter class object (e.g.
 #'   \code{\link{CentWaveParam}}, \code{\link{ObiwarpParam}}). For
 #'   grouping/alignment sets, these parameters need to be specified in nested

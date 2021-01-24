@@ -93,14 +93,15 @@ optimizeFeatureGrouping <- function(features, algorithm, ..., templateParams = l
 
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(features, "features", add = ac)
-    checkmate::assertChoice(algorithm, c("openms", "xcms", "xcms3"), add = ac)
+    checkmate::assertChoice(algorithm, c("openms", "xcms", "xcms3", "kpic2"), add = ac)
     assertOptimArgs(params, templateParams, paramRanges, maxIterations, maxModelDeviation, ac)
     checkmate::reportAssertions(ac)
 
     go <- switch(algorithm,
                  openms = featureGroupsOptimizerOpenMS,
                  xcms = featureGroupsOptimizerXCMS,
-                 xcms3 = featureGroupsOptimizerXCMS3)
+                 xcms3 = featureGroupsOptimizerXCMS3,
+                 kpic2 = featureGroupsOptimizerKPIC2)
 
     go <- go$new(features = features, algorithm = algorithm)
     result <- go$optimize(params, templateParams, paramRanges, maxIterations, maxModelDeviation)
@@ -113,12 +114,13 @@ optimizeFeatureGrouping <- function(features, algorithm, ..., templateParams = l
 #' @export
 generateFGroupsOptPSet <- function(algorithm, ...)
 {
-    checkmate::assertChoice(algorithm, c("openms", "xcms", "xcms3"))
+    checkmate::assertChoice(algorithm, c("openms", "xcms", "xcms3", "kpic2"))
 
     f <- switch(algorithm,
                 openms = generateFGroupsOptPSetOpenMS,
                 xcms = generateFGroupsOptPSetXCMS,
-                xcms3 = generateFGroupsOptPSetXCMS3)
+                xcms3 = generateFGroupsOptPSetXCMS3,
+                kpic2 = generateFGroupsOptPSetKPIC2)
 
     defs <- f(...)
     return(modifyList(defs, list(...)))
@@ -128,12 +130,14 @@ generateFGroupsOptPSet <- function(algorithm, ...)
 #' @export
 getDefFGroupsOptParamRanges <- function(algorithm)
 {
-    checkmate::assertChoice(algorithm, c("openms", "xcms", "xcms3"))
+    checkmate::assertChoice(algorithm, c("openms", "xcms", "xcms3", "kpic2"))
 
     if (algorithm == "openms")
         return(getDefFGroupsOptParamRangesOpenMS())
     if (algorithm == "xcms")
         return(getDefFGroupsOptParamRangesXCMS())
-    # if (algorithm == "xcms3")
-    return(getDefFGroupsOptParamRangesXCMS3())
+    if (algorithm == "xcms3")
+        return(getDefFGroupsOptParamRangesXCMS3())
+    # if (algorithm == "kpic2")
+    return(getDefFGroupsOptParamRangesKPIC2())
 }

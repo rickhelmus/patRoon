@@ -67,7 +67,7 @@
     - updatePICSet(): also sync peaks list? otherwise doc
     - update docs and checkChromatograms() for mzWindow --> mzExpWindow
     - XCMS3 grouping without analyses
-    - IPO with KPIC
+    - newProject(): new algorithms
     - getEICsForFeatures method for kpic2?
     - optimize hashing? Or further avoid hashing big objects/objects with lists?
 - finish feature syncing
@@ -93,6 +93,7 @@
     - reportHTML: EICs made if annotations, even if not specified in reportPlots
     - handbook
         - checkFeatures()
+    - update IPO docs for kpic2 (and mention min/max_width split and others)
 
 
 ## MSPeakLists

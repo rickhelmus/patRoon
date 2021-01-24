@@ -149,7 +149,7 @@ optimizeFeatureFinding <- function(anaInfo, algorithm, ..., templateParams = lis
 
     ac <- checkmate::makeAssertCollection()
     anaInfo <- assertAndPrepareAnaInfo(anaInfo, add = ac)
-    checkmate::assertChoice(algorithm, c("openms", "xcms", "xcms3", "envipick"), add = ac)
+    checkmate::assertChoice(algorithm, c("openms", "xcms", "xcms3", "envipick", "kpic2"), add = ac)
     assertOptimArgs(params, templateParams, paramRanges, maxIterations, maxModelDeviation, ac)
     checkmate::assertChoice(isoIdent, c("IPO", "CAMERA", "OpenMS"), add = ac)
     checkmate::assertChoice(checkPeakShape, c("none", "borderIntensity", "sinusCurve", "normalDistr"), add = ac)
@@ -163,7 +163,8 @@ optimizeFeatureFinding <- function(anaInfo, algorithm, ..., templateParams = lis
                  openms = featuresOptimizerOpenMS,
                  xcms = featuresOptimizerXCMS,
                  xcms3 = featuresOptimizerXCMS3,
-                 envipick = featuresOptimizerEnviPick)
+                 envipick = featuresOptimizerEnviPick,
+                 kpic2 = featuresOptimizerKPIC2)
 
     fo <- fo$new(anaInfo = anaInfo, algorithm = algorithm, isoIdent = isoIdent,
                  checkPeakShape = checkPeakShape, CAMERAOpts = CAMERAOpts)
@@ -178,13 +179,14 @@ optimizeFeatureFinding <- function(anaInfo, algorithm, ..., templateParams = lis
 #' @export
 generateFeatureOptPSet <- function(algorithm, ...)
 {
-    checkmate::assertChoice(algorithm, c("openms", "xcms", "xcms3", "envipick"))
+    checkmate::assertChoice(algorithm, c("openms", "xcms", "xcms3", "envipick", "kpic2"))
 
     f <- switch(algorithm,
                 openms = generateFeatureOptPSetOpenMS,
                 xcms = generateFeatureOptPSetXCMS,
                 xcms3 = generateFeatureOptPSetXCMS3,
-                envipick = generateFeatureOptPSetEnviPick)
+                envipick = generateFeatureOptPSetEnviPick,
+                kpic2 = generateFeatureOptPSetKPIC2)
 
     defs <- f(...)
     return(modifyList(defs, list(...)))
@@ -194,7 +196,7 @@ generateFeatureOptPSet <- function(algorithm, ...)
 #' @export
 getDefFeaturesOptParamRanges <- function(algorithm, method = "centWave")
 {
-    checkmate::assertChoice(algorithm, c("openms", "xcms", "xcms3", "envipick"))
+    checkmate::assertChoice(algorithm, c("openms", "xcms", "xcms3", "envipick", "kpic2"))
 
     if (algorithm == "openms")
         return(getDefFeaturesOptParamRangesOpenMS())
@@ -202,5 +204,7 @@ getDefFeaturesOptParamRanges <- function(algorithm, method = "centWave")
         return(getDefFeaturesOptParamRangesXCMS(method))
     else if (algorithm == "xcms3")
         return(getDefFeaturesOptParamRangesXCMS3(method))
-    return(getDefFeaturesOptParamRangesEnviPick())
+    else if (algorithm == "envipick")
+        return(getDefFeaturesOptParamRangesEnviPick())
+    return(getDefFeaturesOptParamRangesKPIC2())
 }

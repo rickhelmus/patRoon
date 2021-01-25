@@ -796,5 +796,4 @@ setMethod("checkFeatures", "featureGroups", function(fGroups, session, rtWindow)
     }
     
     runApp(shinyApp(getCheckFeatsUI(settings), server))
-    return(enabledFGroups)
 })

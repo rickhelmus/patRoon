@@ -666,6 +666,7 @@ setMethod("checkFeatures", "featureGroups", function(fGroups, session, rtWindow)
         
         observeEvent(input$saveApplySettings, {
             doApplySettings(getInputSettings())
+            shinyjs::disable("saveApplySettings")
         })
         
         observeEvent(input$resetSettings, {

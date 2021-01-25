@@ -5,7 +5,7 @@ getUISettingsPath <- function()
 {
     dirPath <- RUserDir("patRoon", "config")
     mkdirp(dirPath)
-    return(file.path(dirPath, "EIC-ui.yml"))
+    return(file.path(dirPath, "check_features.yml"))
 }
 
 getUISettings <- function()

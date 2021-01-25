@@ -267,18 +267,18 @@ replicateGroupFilter <- function(fGroups, rGroups, negate = FALSE, verbose = TRU
 
 checkFeaturesFilter <- function(fGroups, checkFeaturesSession, negate)
 {
-    sessionPath <- getCheckFeaturesSessionPath(checkFeaturesSession)
+    sessionPath <- getCheckSessionPath(checkFeaturesSession, "features")
     return(doFilter(fGroups, "checked features session", c(makeFileHash(sessionPath), negate), function(fGroups)
     {
         session <- readRDS(sessionPath)
         if (negate)
-            fGroups <- fGroups[, setdiff(names(fGroups), session$enabledFGroups)]
+            fGroups <- fGroups[, setdiff(names(fGroups), session$primarySelections)]
         else
-            fGroups <- fGroups[, session$enabledFGroups]
+            fGroups <- fGroups[, session$primarySelections]
         
         gNames <- names(fGroups)
         pred <- if (negate) function(ef) !ef else function(ef) ef
-        fGroups@groups[, (gNames) := Map(.SD, session$enabledFeatures[gNames],
+        fGroups@groups[, (gNames) := Map(.SD, session$secondarySelections[gNames],
                                          f = function(fg, ef) ifelse(pred(ef), fg, 0))]
         return(cleanGroups(fGroups, TRUE))
     }, "checkedFeatures"))

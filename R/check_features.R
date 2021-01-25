@@ -1067,20 +1067,18 @@ importCheckFeaturesSession <- function(sessionIn, sessionOut, fGroups, overWrite
 {
     # UNDONE: docs
     
-    checkmate::assertString(sessionIn, min.chars = 1)
-    pathIn <- paste0(sessionIn, ".Rds")
+    aapply(checkmate::assertString, . ~ sessionIn + sessionOut, min.chars = 1)
+    pathIn <- getCheckSessionPath(sessionIn, "features"); pathOut <- getCheckSessionPath(sessionOut, "features")
     
     ac <- checkmate::makeAssertCollection()
     checkmate::assertFileExists(pathIn, "r", .var.name = "session", add = ac)
-    checkmate::assertString(sessionOut, min.chars = 1, add = ac)
+    checkmate::assertPathForOutput(pathOut, overwrite = TRUE, .var.name = "sessionOut", add = ac)
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
     checkmate::assertFlag(overWrite, add = ac)
     checkmate::reportAssertions(ac)
     
-    pathOut <- paste0(sessionOut, ".Rds")
-    
-    importCheckUISession(pathIn, pathOut, "feature groups", "analyses", names(fGroups), analyses(fGroups),
-                         overWrite = overWrite)
+    importCheckUISession(pathIn, pathOut, "feature groups", "analyses", names(fGroups),
+                         analyses(fGroups), overWrite = overWrite)
 }
 
 checkFeatures2 <- function(fGroups, session, rtWindow)
@@ -1092,14 +1090,14 @@ checkFeatures2 <- function(fGroups, session, rtWindow)
     checkmate::assertNumber(rtWindow, finite = TRUE, lower = 0, add = ac)
     checkmate::reportAssertions(ac)
     
-    sessionPath <- paste0(session, ".Rds")
+    sessionPath <- getCheckSessionPath(session, "features")
     checkmate::assertPathForOutput(sessionPath, overwrite = TRUE, .var.name = "session")
     
     gNames <- names(fGroups)
     fTable <- featureTable(fGroups)
     ftind <- groupFeatIndex(fGroups)
     
-    EICsTopMost <- getEICsForFGroups(fGroups, rtWindow, 0.001, topMost = 1, getEICsForFGroups = FALSE,
+    EICsTopMost <- getEICsForFGroups(fGroups, rtWindow, 0.001, topMost = 1, topMostByRGroup = FALSE,
                                      onlyPresent = TRUE)
     EICsTopMostRG <- EICsAll <- list()
     

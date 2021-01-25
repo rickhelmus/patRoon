@@ -57,6 +57,13 @@ saveUISettings <- function(fileName, settings)
     yaml::write_yaml(settings, getUISettingsPath(fileName), indent = 4)
 }
 
+getCheckSessionPath <- function(session, what)
+{
+    outp <- file.path("sessions", what)
+    mkdirp(outp)
+    return(file.path(outp, paste0(session, ".Rds")))
+}
+
 importCheckUISession <- function(pathIn, pathOut, primaryName, secondaryName,
                                  primarySelections, secondaryRowNames, overWrite = FALSE)
 {

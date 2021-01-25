@@ -1085,6 +1085,9 @@ checkFeatures2 <- function(fGroups, session, rtWindow)
 {
     # UNDONE: update docs
     
+    if (length(fGroups) == 0)
+        stop("No feature groups, nothing to check...")
+    
     ac <- checkmate::makeAssertCollection()
     assertCheckFeaturesSession(session, fGroups, mustExist = FALSE, add = ac)
     checkmate::assertNumber(rtWindow, finite = TRUE, lower = 0, add = ac)

@@ -74,6 +74,7 @@
         - disable save settings button after clicking it
         - minutes for retmin/retmax
         - remove mzExpWindow
+        - check for empty fGroups
     - add to checkFeatures and backport
         - allow to remove existing session in case its incompatible
         - versioning settings/sessions

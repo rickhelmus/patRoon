@@ -125,7 +125,7 @@ importCheckComponentsSession <- function(sessionIn, sessionOut, components, over
 #' @rdname GUI-utils
 #' @aliases checkComponents
 #' @export
-setMethod("checkComponents", "components", function(components, fGroups, session, rtWindow)
+setMethod("checkComponents", "components", function(components, fGroups, session, rtWindow, clearSession)
 {
     # UNDONE: update docs
     
@@ -139,13 +139,18 @@ setMethod("checkComponents", "components", function(components, fGroups, session
              "You may need to sync the components object, eg: components <- components[, names(fGroups)]")
     
     ac <- checkmate::makeAssertCollection()
-    assertCheckComponentsSession(session, components, mustExist = FALSE, add = ac)
+    assertCheckComponentsSession(session, components, mustExist = FALSE, canClearSession = TRUE,
+                                 didClearSession = clearSession, add = ac)
     checkmate::assertNumber(rtWindow, finite = TRUE, lower = 0, add = ac)
+    checkmate::assertFlag(clearSession, add = ac)
     checkmate::reportAssertions(ac)
     
     sessionPath <- getCheckSessionPath(session, "components")
     checkmate::assertPathForOutput(sessionPath, overwrite = TRUE, .var.name = "session")
 
+    if (clearSession && file.exists(sessionPath))
+        file.remove(sessionPath)
+    
     fGroups <- fGroups[, groupNames(components)] # remove any fGroups not in components
     
     cmpNames <- names(components)

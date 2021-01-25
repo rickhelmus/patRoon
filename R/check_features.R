@@ -1109,7 +1109,7 @@ importCheckFeaturesSession <- function(sessionIn, sessionOut, fGroups, overWrite
 #' @rdname GUI-utils
 #' @aliases checkFeatures
 #' @export
-setMethod("checkFeatures", "featureGroups", function(fGroups, session, rtWindow)
+setMethod("checkFeatures", "featureGroups", function(fGroups, session, rtWindow, clearSession)
 {
     # UNDONE: update docs
     
@@ -1117,12 +1117,17 @@ setMethod("checkFeatures", "featureGroups", function(fGroups, session, rtWindow)
         stop("No feature groups, nothing to check...")
     
     ac <- checkmate::makeAssertCollection()
-    assertCheckFeaturesSession(session, fGroups, mustExist = FALSE, add = ac)
+    assertCheckFeaturesSession(session, fGroups, mustExist = FALSE, canClearSession = TRUE,
+                               didClearSession = clearSession, add = ac)
     checkmate::assertNumber(rtWindow, finite = TRUE, lower = 0, add = ac)
+    checkmate::assertFlag(clearSession, add = ac)
     checkmate::reportAssertions(ac)
     
     sessionPath <- getCheckSessionPath(session, "features")
     checkmate::assertPathForOutput(sessionPath, overwrite = TRUE, .var.name = "session")
+    
+    if (clearSession && file.exists(sessionPath))
+        file.remove(sessionPath)
     
     gNames <- names(fGroups)
     fTable <- featureTable(fGroups)

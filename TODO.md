@@ -65,9 +65,7 @@
     - checkComponents
         - more settings?
         - test session import
-        - distinguish between features/components sessions (file name prefix/postfix?)
         - change column names for both tables?
-        - filters
     - backport checkFeatures things to featng
         - no return value
         - filename ui settings
@@ -76,8 +74,7 @@
         - remove mzExpWindow
         - check for empty fGroups
         - versioning settings/sessions
-    - add to checkFeatures and backport
-        - allow to remove existing session in case its incompatible
+        - clearSession
 - misc
     - as.data.table() for formulas: average=T will now produce strange averaged ionized formula, for now simply remove this column...
         - also give a note in docs?

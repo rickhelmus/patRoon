@@ -263,8 +263,7 @@ setGeneric("treeCutDynamic", function(obj, maxTreeHeight = 1, deepSplit = TRUE,
                                       minModuleSize = 1, ...) standardGeneric("treeCutDynamic"))
 
 
-setGeneric("checkFeatures", function(fGroups, session, rtWindow = 30,
-                                     mzExpWindow = 0.001) standardGeneric("checkFeatures"))
+setGeneric("checkFeatures", function(fGroups, session, rtWindow = 30) standardGeneric("checkFeatures"))
 setGeneric("compoundViewer", function(fGroups, MSPeakLists, compounds) standardGeneric("compoundViewer"))
 setGeneric("reportCSV", function(fGroups, path = "report", reportFeatures = FALSE, formulas = NULL,
                                  formulasNormalizeScores = "max", formulasExclNormScores = NULL,

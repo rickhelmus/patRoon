@@ -267,14 +267,13 @@ getCheckFeatsUI <- function(settings)
 #' @rdname GUI-utils
 #' @aliases checkFeatures
 #' @export
-setMethod("checkFeatures", "featureGroups", function(fGroups, session, rtWindow, mzExpWindow)
+setMethod("checkFeatures", "featureGroups", function(fGroups, session, rtWindow)
 {
     # UNDONE: update docs
     
     ac <- checkmate::makeAssertCollection()
     assertCheckFeaturesSession(session, fGroups, mustExist = FALSE, add = ac)
-    aapply(checkmate::assertNumber, . ~ rtWindow + mzExpWindow, finite = TRUE, lower = 0,
-           fixed = list(add = ac))
+    checkmate::assertNumber(rtWindow, finite = TRUE, lower = 0, add = ac)
     checkmate::reportAssertions(ac)
     
     sessionPath <- paste0(session, ".Rds")
@@ -287,7 +286,7 @@ setMethod("checkFeatures", "featureGroups", function(fGroups, session, rtWindow,
     ftind <- groupFeatIndex(fGroups)
     
     # UNDONE: make topMost/onlyPresent optional/interactive
-    EICsTopMost <- getEICsForFGroups(fGroups, rtWindow, mzExpWindow, topMost = 1, FALSE, onlyPresent = TRUE)
+    EICsTopMost <- getEICsForFGroups(fGroups, rtWindow, 0.001, topMost = 1, FALSE, onlyPresent = TRUE)
     EICsTopMostRG <- EICsAll <- NULL
     
     # format is in [[ana]][[fGroup]], since we only took top most intensive we can throw away the ana dimension
@@ -563,9 +562,9 @@ setMethod("checkFeatures", "featureGroups", function(fGroups, session, rtWindow,
             {
                 not <- showNotification("Loading EICs...", duration = NULL, closeButton = FALSE, type = "message")
                 if (input$fGroupPlotMode == "topMostByRGroup")
-                    EICsTopMostRG <<- getEICsForFGroups(fGroups, rtWindow, mzExpWindow, 1, TRUE, TRUE)
+                    EICsTopMostRG <<- getEICsForFGroups(fGroups, rtWindow, 0.001, 1, TRUE, TRUE)
                 else
-                    EICsAll <<- getEICsForFGroups(fGroups, rtWindow, mzExpWindow, NULL, FALSE, TRUE)
+                    EICsAll <<- getEICsForFGroups(fGroups, rtWindow, 0.001, NULL, FALSE, TRUE)
                 removeNotification(not)
             }
             rValues$fGroupPlotMode <- input$fGroupPlotMode

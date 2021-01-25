@@ -48,6 +48,9 @@ importCheckFeaturesSession <- function(sessionIn, sessionOut, fGroups, overWrite
     checkmate::assertFlag(overWrite, add = ac)
     checkmate::reportAssertions(ac)
     
+    if (length(fGroups) == 0)
+        stop("No feature groups, nothing to do...")
+    
     pathOut <- paste0(sessionOut, ".Rds")
     if (file.exists(pathOut) && !overWrite)
         stop("Output session already exists. Set overWrite=TRUE to proceed anyway.")
@@ -270,6 +273,9 @@ getCheckFeatsUI <- function(settings)
 setMethod("checkFeatures", "featureGroups", function(fGroups, session, rtWindow)
 {
     # UNDONE: update docs
+    
+    if (length(fGroups) == 0)
+        stop("No feature groups, nothing to check...")
     
     ac <- checkmate::makeAssertCollection()
     assertCheckFeaturesSession(session, fGroups, mustExist = FALSE, add = ac)

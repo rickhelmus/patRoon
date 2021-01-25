@@ -166,12 +166,15 @@ setMethod("unset", "featuresSet", function(obj, set)
     {
         ft <- copy(ft)
         
-        adducts <- sapply(unique(ft$adduct), as.adduct)
-        addMZs <- sapply(adducts, adductMZDelta)
-        addMZs <- addMZs[ft$adduct]
-        
-        set(ft, j = c("mz", "mzmin", "mzmax"),
-            value = list(ft$mz + addMZs, ft$mzmin + addMZs, ft$mzmax + addMZs))
+        if (nrow(ft) > 0)
+        {
+            adducts <- sapply(unique(ft$adduct), as.adduct)
+            addMZs <- sapply(adducts, adductMZDelta)
+            addMZs <- addMZs[ft$adduct]
+            
+            set(ft, j = c("mz", "mzmin", "mzmax"),
+                value = list(ft$mz + addMZs, ft$mzmin + addMZs, ft$mzmax + addMZs))
+        }
         
         ft[, adduct := NULL] # UNDONE: keep?
         

@@ -118,6 +118,9 @@ importCheckComponentsSession <- function(sessionIn, sessionOut, components, over
     checkmate::assertFlag(overWrite, add = ac)
     checkmate::reportAssertions(ac)
     
+    if (length(components) == 0)
+        stop("No components, nothing to do...")
+    
     importCheckUISession(pathIn, pathOut, "components", "feature groups", names(components), groupNames(components),
                          overWrite = overWrite)
 }

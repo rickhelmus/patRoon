@@ -158,6 +158,7 @@
     - OpenMS adducts?
     - susp_ prefix in as.data.table
     - suspFormRank/suspCompRank --> formRank/compRank
+    - RC components: ensure that columns are the right type if all values are NA
 - docs
     - filter() for features/fGroups: apply to neutral masses
     - CAMERA/RAMClustR/nontarget components: clearly mention it is simply a merge between sets

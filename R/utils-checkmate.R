@@ -373,9 +373,9 @@ assertCheckFeaturesSession <- function(x, fGroups, mustExist, canClearSession, d
         {
             session <- readRDS(sessionPath)
             msg <- character()
-            if (!setequal(c("analysis", names(fGroups)), names(session$enabledFeatures)))
+            if (!setequal(c("name", names(fGroups)), names(session$secondarySelections)))
                 msg <- "Session has different feature groups! Please use importCheckFeaturesSession() to import."
-            if (!setequal(analyses(fGroups), session$enabledFeatures$analysis))
+            if (!setequal(analyses(fGroups), session$secondarySelections$name))
                 msg <- "Session has different analyses! Please use importCheckFeaturesSession() to import."
             if (length(msg) > 0)
             {
@@ -388,7 +388,7 @@ assertCheckFeaturesSession <- function(x, fGroups, mustExist, canClearSession, d
     }
 }
 
-assertCheckComponentsSession <- function(x, components, mustExist, null.ok = FALSE,
+assertCheckComponentsSession <- function(x, components, mustExist, canClearSession, didClearSession, null.ok = FALSE,
                                          .var.name = checkmate::vname(x), add = NULL)
 {
     if (null.ok && is.null(x))
@@ -398,7 +398,7 @@ assertCheckComponentsSession <- function(x, components, mustExist, null.ok = FAL
         mc <- length(add$getMessages())
     
     checkmate::assertString(x, min.chars = 1, .var.name = .var.name, add = add)
-    if (is.null(add) || length(add$getMessages()) == mc)
+    if (!didClearSession && (is.null(add) || length(add$getMessages()) == mc))
     {
         sessionPath <- getCheckSessionPath(x, "components")
         if (mustExist)
@@ -408,9 +408,16 @@ assertCheckComponentsSession <- function(x, components, mustExist, null.ok = FAL
         {
             session <- readRDS(sessionPath)
             if (!setequal(c("name", names(components)), names(session$secondarySelections)))
-                stop("Session has different components! Please use importCheckComponentsSession() to import.")
+                msg <- "Session has different components! Please use importCheckComponentsSession() to import."
             if (!setequal(groupNames(components), session$secondarySelections$name))
-                stop("Session has different feature groups! Please use importCheckComponentsSession() to import.")
+                msg <- "Session has different feature groups! Please use importCheckComponentsSession() to import."
+            if (length(msg) > 0)
+            {
+                if (canClearSession)
+                    msg <- paste0(msg, " Alternatively, set clearSession=TRUE to remove the session and ",
+                                  "start with a new one.")
+                stop(msg)
+            }
         }
     }
 }

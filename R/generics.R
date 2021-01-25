@@ -306,7 +306,8 @@ setGeneric("checkFeatures", function(fGroups, session, rtWindow = 30,
                                      clearSession = FALSE) standardGeneric("checkFeatures"))
 setGeneric("getEICsForFGroups", function(fGroups, rtWindow, mzExpWindow, topMost, topMostByRGroup,
                                          onlyPresent) standardGeneric("getEICsForFGroups"))
-setGeneric("checkComponents", function(components, fGroups, session, rtWindow = 30) standardGeneric("checkComponents"))
+setGeneric("checkComponents", function(components, fGroups, session, rtWindow = 30,
+                                       clearSession = FALSE) standardGeneric("checkComponents"))
 setGeneric("compoundViewer", function(fGroups, MSPeakLists, compounds) standardGeneric("compoundViewer"))
 setGeneric("reportCSV", function(fGroups, path = "report", reportFeatures = FALSE, formulas = NULL,
                                  formulasNormalizeScores = "max", formulasExclNormScores = NULL,

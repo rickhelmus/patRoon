@@ -1077,6 +1077,9 @@ importCheckFeaturesSession <- function(sessionIn, sessionOut, fGroups, overWrite
     checkmate::assertFlag(overWrite, add = ac)
     checkmate::reportAssertions(ac)
     
+    if (length(fGroups) == 0)
+        stop("No feature groups, nothing to do...")
+    
     importCheckUISession(pathIn, pathOut, "feature groups", "analyses", names(fGroups),
                          analyses(fGroups), overWrite = overWrite)
 }

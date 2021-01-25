@@ -108,17 +108,15 @@ importCheckComponentsSession <- function(sessionIn, sessionOut, components, over
 {
     # UNDONE: docs
     
-    checkmate::assertString(sessionIn, min.chars = 1)
-    pathIn <- paste0(sessionIn, ".Rds")
+    aapply(checkmate::assertString, . ~ sessionIn + sessionOut, min.chars = 1)
+    pathIn <- getCheckSessionPath(sessionIn, "components"); pathOut <- getCheckSessionPath(sessionOut, "components")
     
     ac <- checkmate::makeAssertCollection()
     checkmate::assertFileExists(pathIn, "r", .var.name = "session", add = ac)
-    checkmate::assertString(sessionOut, min.chars = 1, add = ac)
+    checkmate::assertPathForOutput(pathOut, overwrite = TRUE, .var.name = "sessionOut", add = ac)
     checkmate::assertClass(components, "components", add = ac)
     checkmate::assertFlag(overWrite, add = ac)
     checkmate::reportAssertions(ac)
-    
-    pathOut <- paste0(sessionOut, ".Rds")
     
     importCheckUISession(pathIn, pathOut, "components", "feature groups", names(components), groupNames(components),
                          overWrite = overWrite)
@@ -141,7 +139,7 @@ setMethod("checkComponents", "components", function(components, fGroups, session
     checkmate::assertNumber(rtWindow, finite = TRUE, lower = 0, add = ac)
     checkmate::reportAssertions(ac)
     
-    sessionPath <- paste0(session, ".Rds")
+    sessionPath <- getCheckSessionPath(session, "components")
     checkmate::assertPathForOutput(sessionPath, overwrite = TRUE, .var.name = "session")
     
     cmpNames <- names(components)

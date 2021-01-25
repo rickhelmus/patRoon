@@ -400,7 +400,7 @@ assertCheckComponentsSession <- function(x, components, mustExist, null.ok = FAL
     checkmate::assertString(x, min.chars = 1, .var.name = .var.name, add = add)
     if (is.null(add) || length(add$getMessages()) == mc)
     {
-        sessionPath <- paste0(x, ".Rds")
+        sessionPath <- getCheckSessionPath(x, "components")
         if (mustExist)
             checkmate::assertFileExists(sessionPath, "r", .var.name = .var.name, add = add)
         

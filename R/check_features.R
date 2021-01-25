@@ -1081,7 +1081,35 @@ importCheckFeaturesSession <- function(sessionIn, sessionOut, fGroups, overWrite
                          analyses(fGroups), overWrite = overWrite)
 }
 
-checkFeatures2 <- function(fGroups, session, rtWindow)
+#' @details \code{checkFeatures} is used to review chromatographic
+#'   information for feature groups. This is especially useful to get a visual
+#'   impression of the quality of detected features. In addition, this function
+#'   may be used to remove unwanted (\emph{e.g.} outlier) features. Better
+#'   performance is often obtained when an external browser is used to use this
+#'   Shiny application. Furthermore, when a large \code{featureGroups} object is
+#'   used it is recommended to limit the number of analyses/feature groups by
+#'   subsetting the object.
+#'
+#' @param mzWindow Default \emph{m/z} window to be used for creating extracted
+#'   ion chromatograms (EICs).
+#' @param enabledFGroups A logical vector that states for each feature group
+#'   whether it should be kept (\code{TRUE}) or not (\code{FALSE}). The order is
+#'   the same as the \code{fGroups} parameter. If \code{NULL} then all feature
+#'   groups are considered to be kept.
+#'
+#' @return \code{checkFeatures} returns a logical vector for all feature
+#'   groups that were selected to be kept (\code{TRUE}) or not (\code{FALSE}).
+#'   This result can be passed to the \code{enabledFGroups} parameter for
+#'   subsequent calls to \code{checkFeatures} in order to restore the
+#'   keep/not keep state from a previous call. To actually remove unwanted
+#'   feature groups the object should be subset by the subsetting
+#'   (\code{\link{[}}) operator to which the return value should be passed as
+#'   the second parameter.
+#'
+#' @rdname GUI-utils
+#' @aliases checkFeatures
+#' @export
+setMethod("checkFeatures", "featureGroups", function(fGroups, session, rtWindow)
 {
     # UNDONE: update docs
     
@@ -1128,7 +1156,7 @@ checkFeatures2 <- function(fGroups, session, rtWindow)
                                       EICPreviews = EICPreviews, primarySelections = gNames,
                                       curSession = curSession, sessionPath = sessionPath)
     return(runCheckUI(int))
-}
+})
 
 convertQualitiesToMCData <- function(fGroups)
 {

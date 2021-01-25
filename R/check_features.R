@@ -482,9 +482,11 @@ setMethod("checkFeatures", "featureGroups", function(fGroups, session, rtWindow)
             ft <- fTable[fti != 0]; ai <- anaInfo[fti != 0, ]; fti <- fti[fti != 0]
             feat <- rbindlist(Map(ft, fti, f = function(f, i) f[i]))
             
+            divret <- if (rValues$settings$retUnit == "min") 60 else 1
+            
             fData <- data.table(analysis = ai$analysis)
             if ("retMZ" %in% rValues$settings$featureColumns)
-                fData[, c("ret", "mz") := .(if (rValues$settings$retUnit == "min") feat$ret / 60 else feat$ret, feat$mz)]
+                fData[, c("ret", "mz") := .(feat$ret / divret, feat$mz)]
             if ("rGroup" %in% rValues$settings$featureColumns)
                 fData[, replicate_group := ai$group]
             if ("blank" %in% rValues$settings$featureColumns)
@@ -492,7 +494,8 @@ setMethod("checkFeatures", "featureGroups", function(fGroups, session, rtWindow)
             if ("quantity" %in% rValues$settings$featureColumns)
                 fData[, quantity := if (rValues$settings$featQuantity == "intensity") feat$intensity else feat$area]
             if ("rtMZRange" %in% rValues$settings$featureColumns)
-                fData[, c("retmin", "retmax", "mzmin", "mzmax") := .(feat$retmin, feat$retmax, feat$mzmin, feat$mzmax)]
+                fData[, c("retmin", "retmax", "mzmin", "mzmax") := .(feat$retmin / divret, feat$retmax / divret,
+                                                                     feat$mzmin, feat$mzmax)]
             if (hasFGroupScores(fGroups))
             {
                 if ("otherScores" %in% rValues$settings$featureColumns)

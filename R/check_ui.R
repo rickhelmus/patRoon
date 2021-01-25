@@ -49,11 +49,13 @@ getUISettings <- function(fileName, default)
     }
     else
         ret <- yaml::read_yaml(path, eval.expr = FALSE)
+    ret <- ret[setdiff(names(ret), "version")]
     return(ret)
 }
 
 saveUISettings <- function(fileName, settings)
 {
+    settings$version <- 1 # just store for now, in case if ever needed in the future
     yaml::write_yaml(settings, getUISettingsPath(fileName), indent = 4)
 }
 
@@ -71,7 +73,7 @@ importCheckUISession <- function(pathIn, pathOut, primaryName, secondaryName,
         stop("Output session already exists. Set overWrite=TRUE to proceed anyway.")
     
     # settings import:
-    # - remove any primary/secondary selections (eg feature groups/analyses)not present in target object
+    # - remove any primary/secondary selections (eg feature groups/analyses) not present in target object
     # - default missing values
     
     settings <- readRDS(pathIn)
@@ -340,7 +342,8 @@ runCheckUI <- function(UIInterface)
         
         observeEvent(input$saveSession, {
             saveRDS(list(primarySelections = rValues$primarySelections,
-                         secondarySelections = rValues$secondarySelections), UIInterface$sessionPath)
+                         secondarySelections = rValues$secondarySelections,
+                         version = 1), UIInterface$sessionPath)
             setSessionChanged(FALSE)
         })
         

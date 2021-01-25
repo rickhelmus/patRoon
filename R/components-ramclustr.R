@@ -118,7 +118,8 @@ setMethod("generateComponentsRAMClustR", "featureGroups", function(fGroups, st =
     printf("Annotating components...\n")
 
     # UNDONE: make optional?
-    RC <- do.call(RAMClustR::do.findmain, c(list(ramclustObj = RC, plot.findmain = FALSE, writeMat = FALSE, writeMS = FALSE), FMMainArgs))
+    RC <- do.call(RAMClustR::do.findmain, c(list(ramclustObj = RC, plot.findmain = FALSE, writeMat = FALSE,
+                                                 writeMS = FALSE), FMMainArgs))
 
     comps <- lapply(RC$M.ann, as.data.table)
 
@@ -139,6 +140,12 @@ setMethod("generateComponentsRAMClustR", "featureGroups", function(fGroups, st =
                  c("intensity_rel", "isogroup", "isonr", "adduct_ion"))
         setcolorder(comps[[cmi]], c("rt", "mz", "intensity", "intensity_rel", "group",
                                     "isogroup", "isonr", "charge", "adduct_ion", "ppm"))
+        
+        # may be converted to logical if all NA
+        comps[[cmi]][, c("isogroup", "isonr", "charge") := .(as.integer(isogroup), as.integer(isonr),
+                                                             as.integer(charge))]
+        comps[[cmi]][, adduct_ion := as.character(adduct_ion)]
+        comps[[cmi]][, ppm := as.numeric(ppm)]
     })
     names(comps) <- paste0("CMP", seq_along(comps))
     

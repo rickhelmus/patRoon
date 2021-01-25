@@ -131,8 +131,12 @@ setMethod("checkComponents", "components", function(components, fGroups, session
     
     checkmate::assertClass(fGroups, "featureGroups") # do first so we can sync
 
-    fGroups <- fGroups[, groupNames(components)] # remove any fGroups not in components
-    components <- components[, names(fGroups)] # remove any fGroups not in fGroups
+    if (length(components) == 0 || length(fGroups) == 0)
+        stop("No components or feature groups, nothing to check...")
+    
+    if (!all(groupNames(components) %in% names(fGroups)))
+        stop("The components object contains results for feature groups not present in the given featureGroups object. ",
+             "You may need to sync the components object, eg: components <- components[, names(fGroups)]")
     
     ac <- checkmate::makeAssertCollection()
     assertCheckComponentsSession(session, components, mustExist = FALSE, add = ac)
@@ -141,6 +145,8 @@ setMethod("checkComponents", "components", function(components, fGroups, session
     
     sessionPath <- getCheckSessionPath(session, "components")
     checkmate::assertPathForOutput(sessionPath, overwrite = TRUE, .var.name = "session")
+
+    fGroups <- fGroups[, groupNames(components)] # remove any fGroups not in components
     
     cmpNames <- names(components)
     

@@ -305,8 +305,8 @@ setMethod("filter", "components", function(obj, size = NULL, adducts = NULL, iso
             csize <- size # rename for DT
             obj@componentInfo <- obj@componentInfo[inRange(size, csize)]
         }
-        if (!is.null(rtIncrement) && !is.null(obj@componentInfo[["rt_increment"]]))
-            obj@componentInfo <- obj@componentInfo[inRange(rt_increment, rtIncrement)]
+        if (!is.null(rtIncrement) && !is.null(obj@componentInfo[["ret_increment"]]))
+            obj@componentInfo <- obj@componentInfo[inRange(ret_increment, rtIncrement)]
         if (!is.null(mzIncrement) && !is.null(obj@componentInfo[["mz_increment"]]))
             obj@componentInfo <- obj@componentInfo[inRange(mz_increment, mzIncrement)]
 

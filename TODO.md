@@ -62,19 +62,16 @@
         - groupFeaturesXCMS3?
 - check UIs
     - checkFeatures: annotation column setting
+        - requires version bump...
     - checkComponents
         - more settings?
         - test session import
         - change column names for both tables?
     - backport checkFeatures things to featng
-        - no return value
-        - filename ui settings
         - disable save settings button after clicking it
-        - minutes for retmin/retmax
-        - remove mzExpWindow
-        - check for empty fGroups
         - versioning settings/sessions
         - clearSession
+        - session subdirs
 - misc
     - as.data.table() for formulas: average=T will now produce strange averaged ionized formula, for now simply remove this column...
         - also give a note in docs?
@@ -159,6 +156,7 @@
     - susp_ prefix in as.data.table
     - suspFormRank/suspCompRank --> formRank/compRank
     - RC components: ensure that columns are the right type if all values are NA
+    - change "rt" to "ret" for component columns for consistency
 - docs
     - filter() for features/fGroups: apply to neutral masses
     - CAMERA/RAMClustR/nontarget components: clearly mention it is simply a merge between sets

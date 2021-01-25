@@ -136,9 +136,9 @@ setMethod("generateComponentsRAMClustR", "featureGroups", function(fGroups, st =
         comps[[cmi]][, rt := gInfo[group, "rts"]]
         comps[[cmi]][, intensity := RC$msint[RC$featclus == cmi][psorder[[cmi]]]]
         setnames(comps[[cmi]],
-                 c("int", "isogr", "iso", "adduct"),
-                 c("intensity_rel", "isogroup", "isonr", "adduct_ion"))
-        setcolorder(comps[[cmi]], c("rt", "mz", "intensity", "intensity_rel", "group",
+                 c("rt", "int", "isogr", "iso", "adduct"),
+                 c("ret", "intensity_rel", "isogroup", "isonr", "adduct_ion"))
+        setcolorder(comps[[cmi]], c("ret", "mz", "intensity", "intensity_rel", "group",
                                     "isogroup", "isonr", "charge", "adduct_ion", "ppm"))
         
         # may be converted to logical if all NA

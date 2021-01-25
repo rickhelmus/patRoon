@@ -64,6 +64,7 @@ setMethod("generateComponentsCAMERA", "featureGroups", function(fGroups, ionizat
     anPList <- anPList[, c("rt", "mz", "isotopes", "adduct", "pcgroup")]
     anPList[, pcgroup := as.numeric(pcgroup)] # why is this a character? Convert to numeric for sorting.
     anPList[, group := names(fGroups)]
+    setnames(anPList, "rt", "ret")
 
     # get isotope information
     isoTab <- NULL

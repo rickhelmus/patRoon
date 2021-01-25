@@ -80,11 +80,11 @@ setMethod("plotGraph", "componentsNT", function(obj, onlyLinked)
     
     nodes[, shape := "circle"]
 
-    infos <- obj@componentInfo[match(nodes$id, name), c("rt_increment", "mz_increment", "size"), with = FALSE]
+    infos <- obj@componentInfo[match(nodes$id, name), c("ret_increment", "mz_increment", "size"), with = FALSE]
     hsFGroups <- sapply(nodes$id, function(cmp) paste0(unique(obj[[cmp]]$group), collapse = ", "))
     hsRGroups <- sapply(nodes$id, function(cmp) paste0(unique(obj[[cmp]]$rGroup), collapse = ", "))
     nodes[, title := sprintf("<b>%s</b> (RT: %.2f; m/z: %.4f; #%d)<br>fGroups: <i>%s</i><br>rGroups: <i>%s</i>",
-                             nodes$label, infos$rt_increment, infos$mz_increment, infos$size, hsFGroups, hsRGroups)]
+                             nodes$label, infos$ret_increment, infos$mz_increment, infos$size, hsFGroups, hsRGroups)]
     
     visNetwork::visNetwork(nodes = nodes, edges = edges)
 })
@@ -350,7 +350,7 @@ setMethod("generateComponentsNontarget", "featureGroups", function(fGroups, ioni
     cInfo[, c("groups", "HS cluster") := NULL]
     setnames(cInfo,
              c("m/z increment", "RT increment", "min. RT in series", "max. RT in series", "max.-min. RT"),
-             c("mz_increment", "rt_increment", "rt_min", "rt_max", "rt_range"))
+             c("mz_increment", "ret_increment", "ret_min", "ret_max", "ret_range"))
     cInfo[, name := names(comps)]
     cInfo[, size := sapply(comps, nrow)]
 

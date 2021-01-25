@@ -57,11 +57,16 @@ checkComponentsInterface$methods(
         tab <- data.table::copy(componentInfo(components))
         if (rValues$settings$retUnit == "min")
         {
-            if (!is.null(tab[["cmp_ret"]]))
-                tab[, cmp_ret := cmp_ret / 60]
-            if (!is.null(tab[["cmp_retsd"]]))
-                tab[, cmp_retsd := cmp_retsd / 60]
+            for (col in c("cmp_ret", "cmp_retsd", "ret_increment", "ret_min", "ret_max", "ret_range"))
+            {
+                if (!is.null(tab[[col]]))
+                    set(tab, j = col, value = tab[[col]] / 60)
+            }
         }
+        
+        setcolorder(tab, "name")
+        if (!is.null(tab[["links"]]))
+            tab[, links := NULL]
         
         return(tab)
     },
@@ -69,7 +74,7 @@ checkComponentsInterface$methods(
     {
         tab <- data.table::copy(components[[rValues$currentPrimSel]])
         if (rValues$settings$retUnit == "min")
-            tab[, rt := rt / 60]
+            tab[, ret := ret / 60]
         
         # NOTE: group names (ie secondary names) should be first column
         setcolorder(tab, "group")

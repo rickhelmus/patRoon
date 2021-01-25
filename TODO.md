@@ -75,9 +75,9 @@
         - minutes for retmin/retmax
         - remove mzExpWindow
         - check for empty fGroups
+        - versioning settings/sessions
     - add to checkFeatures and backport
         - allow to remove existing session in case its incompatible
-        - versioning settings/sessions
 - misc
     - as.data.table() for formulas: average=T will now produce strange averaged ionized formula, for now simply remove this column...
         - also give a note in docs?

@@ -68,7 +68,6 @@
         - test session import
         - change column names for both tables?
     - backport checkFeatures things to featng
-        - disable save settings button after clicking it
         - versioning settings/sessions
         - clearSession
         - session subdirs

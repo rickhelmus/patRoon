@@ -210,9 +210,8 @@ setMethod("as.data.table", "components", function(x)
 #'   within a component if that component contains adduct information.
 #'
 #' @export
-setMethod("filter", "components", function(obj, size = NULL, adducts = NULL,
-                                           isotopes = NULL, rtIncrement = NULL,
-                                           mzIncrement = NULL, negate = FALSE,
+setMethod("filter", "components", function(obj, size = NULL, adducts = NULL, isotopes = NULL, rtIncrement = NULL,
+                                           mzIncrement = NULL, checkComponentsSession = NULL, negate = FALSE,
                                            verbose = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
@@ -222,6 +221,7 @@ setMethod("filter", "components", function(obj, size = NULL, adducts = NULL,
                       .var.name = isotopes)
     checkmate::assertNumeric(rtIncrement, lower = 0, any.missing = FALSE, len = 2, null.ok = TRUE, add = ac)
     checkmate::assertNumeric(mzIncrement, lower = 0, any.missing = FALSE, len = 2, null.ok = TRUE, add = ac)
+    assertCheckComponentsSession(checkComponentsSession, obj, mustExist = TRUE, null.ok = TRUE, add = ac)
     checkmate::assertFlag(negate, add = ac)
     checkmate::assertFlag(verbose, add = ac)
     checkmate::reportAssertions(ac)
@@ -234,6 +234,24 @@ setMethod("filter", "components", function(obj, size = NULL, adducts = NULL,
     if (verbose)
         cat("Filtering components... ")
 
+    if (!is.null(checkComponentsSession))
+    {
+        session <- readRDS(getCheckSessionPath(checkComponentsSession, "components"))
+        if (negate)
+            obj <- obj[, setdiff(names(obj), session$primarySelections)]
+        else
+            obj <- obj[session$primarySelections]
+
+        cNames <- names(obj)
+        obj@components <- pruneList(Map(obj@components, session$secondarySelections[cNames], f = function(cmp, ec)
+        {
+            wh <- ec[match(cmp$group, session$secondarySelections$name)]
+            if (negate)
+                return(cmp[!wh])
+            return(cmp[wh])
+        }))
+    }
+    
     obj@components <- pruneList(lapply(obj@components, function(cmp)
     {
         if (!is.null(adducts) && !is.null(cmp[["adduct_ion"]]))

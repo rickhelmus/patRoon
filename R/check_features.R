@@ -944,7 +944,7 @@ checkFeaturesInterface$methods(
         
         if ("EICPreview" %in% rValues$settings$fGroupColumns)
         {
-            gData[, EIC := sapply(gNames, function(g)
+            gData[, EIC := sapply(names(fGroups), function(g)
             {
                 jsonlite::toJSON(list(values = EICPreviews[[g]]$intensity, xvalues = EICPreviews[[g]]$time,
                                       options = list(type = "line", height = 50)))

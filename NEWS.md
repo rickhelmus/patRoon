@@ -1,3 +1,8 @@
+# patRoon 1.2.1
+
+- Fixed: XCMS feature grouping didn't work when the `peakgroups` alignment method was used (fixes issue #22)
+
+
 # patRoon 1.2.0
 
 This releases focuses on a significantly changed suspect screening interface, which brings several utilities to assist suspect annotation, prioritization, mixing of suspect and full NTA workflows and other general improvements.

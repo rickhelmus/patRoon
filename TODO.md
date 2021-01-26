@@ -70,6 +70,7 @@
     - newProject(): new algorithms
     - getEICsForFeatures method for kpic2?
     - optimize hashing? Or further avoid hashing big objects/objects with lists?
+    - make parallel flag and switch to old prog bar if not set
 - finish feature syncing
     - clarify reportCSV() now only reports remaining features?
 - (finish) implement(ing) replace methods for setting feature(Group) data

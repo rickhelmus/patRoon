@@ -105,7 +105,7 @@ setGeneric("unset", function(obj, set) standardGeneric("unset"))
 ### suspect screening
 
 setGeneric("screenSuspects", function(fGroups, suspects, rtWindow = 12, mzWindow = 0.005, adduct = NULL,
-                                      skipInvalid = TRUE, onlyHits = FALSE) standardGeneric("screenSuspects"))
+                                      skipInvalid = TRUE, onlyHits = FALSE, ...) standardGeneric("screenSuspects"))
 setGeneric("screenInfo", function(obj) standardGeneric("screenInfo"))
 setGeneric("annotateSuspects", function(fGroups, MSPeakLists = NULL, formulas = NULL,
                                         compounds = NULL, ...) standardGeneric("annotateSuspects"))

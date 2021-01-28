@@ -324,7 +324,7 @@ assertPListIsolatePrecParams <- function(x, .var.name = checkmate::vname(x), add
     assertVal(checkmate::assertCount, "maxGap", positive = TRUE)
 }
 
-assertCheckFeaturesSession <- function(x, fGroups, mustExist, null.ok = FALSE,
+assertCheckFeaturesSession <- function(x, fGroups, mustExist, canClearSession, didClearSession, null.ok = FALSE,
                                        .var.name = checkmate::vname(x), add = NULL)
 {
     if (null.ok && is.null(x))
@@ -334,7 +334,7 @@ assertCheckFeaturesSession <- function(x, fGroups, mustExist, null.ok = FALSE,
         mc <- length(add$getMessages())
     
     checkmate::assertString(x, min.chars = 1, .var.name = .var.name, add = add)
-    if (is.null(add) || length(add$getMessages()) == mc)
+    if (!didClearSession && (is.null(add) || length(add$getMessages()) == mc))
     {
         sessionPath <- paste0(x, ".Rds")
         if (mustExist)
@@ -343,10 +343,18 @@ assertCheckFeaturesSession <- function(x, fGroups, mustExist, null.ok = FALSE,
         if (file.exists(sessionPath))
         {
             session <- readRDS(sessionPath)
+            msg <- character()
             if (!setequal(c("analysis", names(fGroups)), names(session$enabledFeatures)))
-                stop("Session has different feature groups! Please use importCheckFeaturesSession() to import.")
+                msg <- "Session has different feature groups! Please use importCheckFeaturesSession() to import."
             if (!setequal(analyses(fGroups), session$enabledFeatures$analysis))
-                stop("Session has different analyses! Please use importCheckFeaturesSession() to import.")
+                msg <- "Session has different analyses! Please use importCheckFeaturesSession() to import."
+            if (length(msg) > 0)
+            {
+                if (canClearSession)
+                    msg <- paste0(msg, " Alternatively, set clearSession=TRUE to remove the session and ",
+                                  "start with a new one.")
+                stop(msg)
+            }
         }
     }
 }

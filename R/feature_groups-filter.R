@@ -402,7 +402,8 @@ setMethod("filter", "featureGroups", function(obj, absMinIntensity = NULL, relMi
     aapply(assertRange, . ~ retentionRange + mzRange + mzDefectRange + chromWidthRange, null.ok = TRUE, fixed = list(add = ac))
     checkmate::assertCharacter(rGroups, min.chars = 1, min.len = 1, any.missing = FALSE, null.ok = TRUE, add = ac)
     aapply(checkmate::assertFlag, . ~ removeBlanks + negate, fixed = list(add = ac))
-    assertCheckFeaturesSession(checkFeaturesSession, obj, mustExist = TRUE, null.ok = TRUE, add = ac)
+    assertCheckFeaturesSession(checkFeaturesSession, obj, mustExist = TRUE, canClearSession = FALSE, didClearSession = FALSE,
+                               null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
 
     if (length(obj) == 0)

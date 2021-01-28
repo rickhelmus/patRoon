@@ -272,20 +272,26 @@ getCheckFeatsUI <- function(settings)
 #' @rdname GUI-utils
 #' @aliases checkFeatures
 #' @export
-setMethod("checkFeatures", "featureGroups", function(fGroups, session, rtWindow)
+setMethod("checkFeatures", "featureGroups", function(fGroups, session, rtWindow, clearSession)
 {
     # UNDONE: update docs
     
     if (length(fGroups) == 0)
         stop("No feature groups, nothing to check...")
     
+    checkmate::assertFlag(clearSession)
+    
     ac <- checkmate::makeAssertCollection()
-    assertCheckFeaturesSession(session, fGroups, mustExist = FALSE, add = ac)
+    assertCheckFeaturesSession(session, fGroups, mustExist = FALSE, canClearSession = TRUE,
+                               didClearSession = clearSession, add = ac)
     checkmate::assertNumber(rtWindow, finite = TRUE, lower = 0, add = ac)
     checkmate::reportAssertions(ac)
     
     sessionPath <- paste0(session, ".Rds")
     checkmate::assertPathForOutput(sessionPath, overwrite = TRUE, .var.name = "session")
+    
+    if (clearSession && file.exists(sessionPath))
+        file.remove(sessionPath)
     
     anaInfo <- analysisInfo(fGroups)
     gNames <- names(fGroups)

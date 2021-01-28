@@ -29,38 +29,31 @@ findFeaturesEnviPick <- function(analysisInfo, ..., verbose = TRUE)
     ret <- featuresEnviPick(analysisInfo = analysisInfo)
 
     if (verbose)
-    {
         printf("Finding features with enviPick for %d analyses ...\n", anaCount)
-        prog <- openProgBar(0, anaCount)
-    }
 
-    fts <- list()
-    for (i in seq_len(anaCount))
+    prog <- progressr::progressor(steps = anaCount, enable = verbose)
+    ret@features <- future.apply::future_Map(analysisInfo$analysis, analysisInfo$path, f = function(ana, path)
     {
-        fp <- getMzXMLAnalysisPath(analysisInfo$analysis[i], analysisInfo$path[i])
+        fp <- getMzXMLAnalysisPath(ana, path)
         hash <- makeHash(makeFileHash(fp), list(...))
         f <- loadCacheData("featuresEnviPick", hash)
-
+        
         if (is.null(f))
         {
             invisible(utils::capture.output(ep <- enviPick::enviPickwrap(fp, ...)))
             f <- importEnviPickPeakList(ep$Peaklist)
             saveCacheData("featuresEnviPick", f, hash)
         }
-
-        fts[[analysisInfo$analysis[i]]] <- f
-
-        if (verbose)
-            setTxtProgressBar(prog, i)
-    }
-
-    ret@features <- fts
+        
+        prog()
+        
+        return(f)
+    })
 
     if (verbose)
     {
-        close(prog)
         printf("Done!\n")
-        printFeatStats(fts)
+        printFeatStats(ret@features)
     }
 
     return(ret)

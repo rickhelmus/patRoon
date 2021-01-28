@@ -53,7 +53,7 @@ mslists <- generateMSPeakLists(fGroups, "mzr", maxMSRtWindow = 5, precursorMzWin
 # Calculate formula candidates
 formulas <- generateFormulas(fGroups, "genform", mslists, relMzDev = 5,
                              adduct = "[M+H]+", elements = "CHNOP",
-                             calculateFeatures = TRUE, featThreshold = 0.75)
+                             calculateFeatures = TRUE, featThresholdAnn = 0.75)
 
 # Find compound structure candidates
 compounds <- generateCompounds(fGroups, mslists, "metfrag", method = "CL", dbRelMzDev = 5,

@@ -55,7 +55,7 @@ if (runData)
     mslists <- filter(mslists, relMSMSIntThr = 0.02, topMSMSPeaks = 10)
     formulas <- formsGF <- generateFormulas(fGroupsAnn, "genform", mslists, relMzDev = 5,
                                             adduct = "[M+H]+", elements = "CHNOPSCl",
-                                            calculateFeatures = TRUE, featThreshold = 0.75)
+                                            calculateFeatures = TRUE, featThresholdAnn = 0.75)
     formsSIR <- generateFormulas(fGroupsAnn, "sirius", mslists, elements = "CHNOPSCl",
                                  calculateFeatures = FALSE)
 

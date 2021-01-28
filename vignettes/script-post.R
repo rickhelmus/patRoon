@@ -50,7 +50,7 @@ mslists <- filter(mslists, relMSMSIntThr = 0.02, topMSMSPeaks = 10)
 # Calculate formula candidates
 formulas <- generateFormulas(fGroups, "genform", mslists, relMzDev = 5,
                              adduct = "[M+H]+", elements = "CHNOPSCl",
-                             calculateFeatures = TRUE, featThreshold = 0.75)
+                             calculateFeatures = TRUE, featThresholdAnn = 0.75)
 
 # Find compound structure candidates
 compounds <- generateCompounds(fGroups, mslists, "metfrag", method = "CL", dbRelMzDev = 5,

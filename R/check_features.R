@@ -1119,11 +1119,12 @@ setMethod("checkFeatures", "featureGroups", function(fGroups, session, rtWindow,
     if (length(fGroups) == 0)
         stop("No feature groups, nothing to check...")
     
+    checkmate::assertFlag(clearSession)
+    
     ac <- checkmate::makeAssertCollection()
     assertCheckFeaturesSession(session, fGroups, mustExist = FALSE, canClearSession = TRUE,
                                didClearSession = clearSession, add = ac)
     checkmate::assertNumber(rtWindow, finite = TRUE, lower = 0, add = ac)
-    checkmate::assertFlag(clearSession, add = ac)
     checkmate::reportAssertions(ac)
     
     sessionPath <- getCheckSessionPath(session, "features")

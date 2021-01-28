@@ -221,7 +221,8 @@ setMethod("filter", "components", function(obj, size = NULL, adducts = NULL, iso
                       .var.name = isotopes)
     checkmate::assertNumeric(rtIncrement, lower = 0, any.missing = FALSE, len = 2, null.ok = TRUE, add = ac)
     checkmate::assertNumeric(mzIncrement, lower = 0, any.missing = FALSE, len = 2, null.ok = TRUE, add = ac)
-    assertCheckComponentsSession(checkComponentsSession, obj, mustExist = TRUE, null.ok = TRUE, add = ac)
+    assertCheckComponentsSession(checkComponentsSession, obj, mustExist = TRUE, canClearSession = FALSE,
+                                 didClearSession = FALSE, null.ok = TRUE, add = ac)
     checkmate::assertFlag(negate, add = ac)
     checkmate::assertFlag(verbose, add = ac)
     checkmate::reportAssertions(ac)

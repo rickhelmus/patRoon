@@ -138,7 +138,8 @@ setMethod("checkComponents", "components", function(components, fGroups, session
     # UNDONE: update docs
     
     checkmate::assertClass(fGroups, "featureGroups") # do first so we can sync
-
+    checkmate::assertFlag(clearSession)
+    
     if (length(components) == 0 || length(fGroups) == 0)
         stop("No components or feature groups, nothing to check...")
     
@@ -150,7 +151,6 @@ setMethod("checkComponents", "components", function(components, fGroups, session
     assertCheckComponentsSession(session, components, mustExist = FALSE, canClearSession = TRUE,
                                  didClearSession = clearSession, add = ac)
     checkmate::assertNumber(rtWindow, finite = TRUE, lower = 0, add = ac)
-    checkmate::assertFlag(clearSession, add = ac)
     checkmate::reportAssertions(ac)
     
     sessionPath <- getCheckSessionPath(session, "components")

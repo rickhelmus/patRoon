@@ -35,17 +35,24 @@ saveUISettings <- function(settings)
     yaml::write_yaml(settings, getUISettingsPath(), indent = 4)
 }
 
+getCheckFeaturesSessionPath <- function(session)
+{
+    outp <- file.path("sessions", "features")
+    mkdirp(outp)
+    return(file.path(outp, paste0(session, ".Rds")))
+}
+
 #' @export
 importCheckFeaturesSession <- function(sessionIn, sessionOut, fGroups, overWrite = FALSE)
 {
     # UNDONE: docs
     
-    checkmate::assertString(sessionIn, min.chars = 1)
-    pathIn <- paste0(sessionIn, ".Rds")
+    aapply(checkmate::assertString, . ~ sessionIn + sessionOut, min.chars = 1)
+    pathIn <- getCheckFeaturesSessionPath(sessionIn); pathOut <- getCheckSessionPath(sessionOut, "features")
     
     ac <- checkmate::makeAssertCollection()
     checkmate::assertFileExists(pathIn, "r", .var.name = "session", add = ac)
-    checkmate::assertString(sessionOut, min.chars = 1, add = ac)
+    checkmate::assertPathForOutput(pathOut, overwrite = TRUE, .var.name = "sessionOut", add = ac)
     checkmate::assertClass(fGroups, "featureGroups", add = ac)
     checkmate::assertFlag(overWrite, add = ac)
     checkmate::reportAssertions(ac)
@@ -53,7 +60,6 @@ importCheckFeaturesSession <- function(sessionIn, sessionOut, fGroups, overWrite
     if (length(fGroups) == 0)
         stop("No feature groups, nothing to do...")
     
-    pathOut <- paste0(sessionOut, ".Rds")
     if (file.exists(pathOut) && !overWrite)
         stop("Output session already exists. Set overWrite=TRUE to proceed anyway.")
     
@@ -287,7 +293,7 @@ setMethod("checkFeatures", "featureGroups", function(fGroups, session, rtWindow,
     checkmate::assertNumber(rtWindow, finite = TRUE, lower = 0, add = ac)
     checkmate::reportAssertions(ac)
     
-    sessionPath <- paste0(session, ".Rds")
+    sessionPath <- getCheckFeaturesSessionPath(session)
     checkmate::assertPathForOutput(sessionPath, overwrite = TRUE, .var.name = "session")
     
     if (clearSession && file.exists(sessionPath))
@@ -300,7 +306,7 @@ setMethod("checkFeatures", "featureGroups", function(fGroups, session, rtWindow,
     ftind <- groupFeatIndex(fGroups)
     
     # UNDONE: make topMost/onlyPresent optional/interactive
-    EICsTopMost <- getEICsForFGroups(fGroups, rtWindow, 0.001, topMost = 1, FALSE, onlyPresent = TRUE)
+    EICsTopMost <- getEICsForFGroups(fGroups, rtWindow, 0.001, topMost = 1, topMostByRGroup = FALSE, onlyPresent = TRUE)
     EICsTopMostRG <- EICsAll <- NULL
     
     # format is in [[ana]][[fGroup]], since we only took top most intensive we can throw away the ana dimension

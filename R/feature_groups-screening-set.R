@@ -222,8 +222,11 @@ setMethod("screenSuspects", "featureGroupsSet", function(fGroups, suspects, rtWi
                       f = function(fg, s) screenSuspects(fg, s, rtWindow = rtWindow, mzWindow = mzWindow,
                                                          adduct = NULL, skipInvalid = skipInvalid, onlyHits = onlyHits))
     
-    return(featureGroupsScreeningSet(screenInfo = mergeScreeningSetInfos(setObjects, setThreshold),
-                                     setThreshold = setThreshold, setObjects = setObjects,
+    scr <- mergeScreeningSetInfos(setObjects, setThreshold)
+    if (onlyHits)
+        fGroups <- fGroups[, scr$group]
+    
+    return(featureGroupsScreeningSet(screenInfo = scr, setThreshold = setThreshold, setObjects = setObjects,
                                      groupAlgo = fGroups@groupAlgo, groupArgs = fGroups@groupArgs,
                                      groupVerbose = fGroups@groupVerbose, groups = copy(groupTable(fGroups)),
                                      analysisInfo = analysisInfo(fGroups), groupInfo = groupInfo(fGroups),

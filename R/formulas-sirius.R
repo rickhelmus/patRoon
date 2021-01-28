@@ -185,8 +185,10 @@ setMethod("generateFormulasSIRIUS", "featureGroups", function(fGroups, MSPeakLis
     return(formulas(formulas = groupFormulas, featureFormulas = formTable, algorithm = "sirius"))
 })
 
-setMethod("generateFormulasSIRIUS", "featureGroupsSet", function(fGroups, MSPeakLists, ..., setThreshold = 0.75)
+setMethod("generateFormulasSIRIUS", "featureGroupsSet", function(fGroups, MSPeakLists, ..., setThreshold = 0,
+                                                                 setThresholdAnn = 0.75)
 {
     setArgs <- assertAndGetMSPLSetsArgs(fGroups, MSPeakLists)
-    generateFormulasSet(fGroups, generateFormulasSIRIUS, ..., setArgs = setArgs, setThreshold = setThreshold)
+    generateFormulasSet(fGroups, generateFormulasSIRIUS, ..., setArgs = setArgs, setThreshold = setThreshold,
+                        setThresholdAnn = setThresholdAnn)
 })

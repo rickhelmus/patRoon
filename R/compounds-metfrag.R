@@ -768,7 +768,9 @@ setMethod("generateCompoundsMetFrag", "featureGroups", function(fGroups, MSPeakL
                        settings = mfSettings))
 })
 
-setMethod("generateCompoundsMetFrag", "featureGroupsSet", function(fGroups, MSPeakLists, ..., setThreshold = 0.75)
+setMethod("generateCompoundsMetFrag", "featureGroupsSet", function(fGroups, MSPeakLists, ..., setThreshold = 0,
+                                                                   setThresholdAnn = 0.75)
 {
-    generateCompoundsSet(fGroups, MSPeakLists, generateCompoundsMetFrag, ..., setThreshold = setThreshold)
+    generateCompoundsSet(fGroups, MSPeakLists, generateCompoundsMetFrag, ..., setThreshold = setThreshold,
+                         setThresholdAnn = setThresholdAnn)
 })

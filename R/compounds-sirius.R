@@ -167,7 +167,9 @@ setMethod("generateCompoundsSIRIUS", "featureGroups", function(fGroups, MSPeakLi
                      algorithm = "sirius"))
 })
 
-setMethod("generateCompoundsSIRIUS", "featureGroupsSet", function(fGroups, MSPeakLists, ..., setThreshold = 0.75)
+setMethod("generateCompoundsSIRIUS", "featureGroupsSet", function(fGroups, MSPeakLists, ..., setThreshold = 0,
+                                                                  setThresholdAnn = 0.75)
 {
-    generateCompoundsSet(fGroups, MSPeakLists, generateCompoundsSIRIUS, ..., setThreshold = setThreshold)
+    generateCompoundsSet(fGroups, MSPeakLists, generateCompoundsSIRIUS, ..., setThreshold = setThreshold,
+                         setThresholdAnn = setThresholdAnn)
 })

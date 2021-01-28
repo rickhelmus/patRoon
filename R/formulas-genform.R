@@ -320,7 +320,8 @@ processGenFormResultFile <- function(file, isMSMS, adduct, topMost)
 #' @export
 setMethod("generateFormulasGenForm", "featureGroups", function(fGroups, MSPeakLists, relMzDev = 5, adduct = NULL,
                                                                elements = "CHNOP", hetero = TRUE, oc = FALSE, extraOpts = NULL,
-                                                               calculateFeatures = TRUE, featThreshold = 0.75, MSMode = "both",
+                                                               calculateFeatures = TRUE, featThreshold = 0,
+                                                               featThresholdAnn = 0.75, MSMode = "both",
                                                                isolatePrec = TRUE, timeout = 120, topMost = 50,
                                                                batchSize = 8)
 {
@@ -330,7 +331,7 @@ setMethod("generateFormulasGenForm", "featureGroups", function(fGroups, MSPeakLi
     aapply(checkmate::assertNumber, . ~ relMzDev + timeout, lower = 0, finite = TRUE, fixed = list(add = ac))
     aapply(checkmate::assertString, . ~ elements, fixed = list(add = ac))
     aapply(checkmate::assertFlag, . ~ hetero + oc + calculateFeatures, fixed = list(add = ac))
-    checkmate::assertNumber(featThreshold, lower = 0, finite = TRUE, add = ac)
+    aapply(checkmate::assertNumber, . ~ featThreshold + featThresholdAnn, lower = 0, upper = 1, fixed = list(add = ac))
     checkmate::assertChoice(MSMode, c("ms", "msms", "both"), add = ac)
     checkmate::assertCharacter(extraOpts, null.ok = TRUE, add = ac)
     checkmate::assertCount(topMost, positive = TRUE, add = ac)
@@ -413,7 +414,9 @@ setMethod("generateFormulasGenForm", "featureGroups", function(fGroups, MSPeakLi
         formTable <- pruneList(formTable, TRUE)
 
         if (length(formTable) > 0)
-            groupFormulas <- generateGroupFormulasByConsensus(formTable, featThreshold, gNames, "analysis", "anaCoverage")
+            groupFormulas <- generateGroupFormulasByConsensus(formTable, lapply(featIndex, function(x) sum(x > 0)),
+                                                              featThreshold, featThresholdAnn,
+                                                              gNames, "analysis", "featCoverage", "featCoverageAnn")
         else
             groupFormulas <- list()
     }

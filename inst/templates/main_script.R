@@ -132,16 +132,16 @@ mslists <- generateMSPeakLists(fGroups, "brukerfmf", avgFGroupParams = avgPListP
 {{ optionalCodeBlock(formulaOpts$algo == "GenForm") }}
 formulas <- generateFormulas(fGroups, "genform", mslists, relMzDev = 5,
                              adduct = "{{ if (polarity == 'positive') '[M+H]+' else '[M-H]-' }}", elements = "CHNOP",
-                             calculateFeatures = TRUE, featThreshold = 0.75)
+                             calculateFeatures = TRUE, featThresholdAnn = 0.75)
 {{ endCodeBlock() }}
 {{ optionalCodeBlock(formulaOpts$algo == "Bruker") }}
-formulas <- generateFormulas(fGroups, "bruker", precursorMzSearchWindow = 0.002, featThreshold = 0.75,
+formulas <- generateFormulas(fGroups, "bruker", precursorMzSearchWindow = 0.002, featThresholdAnn = 0.75,
                              adduct = "{{ if (polarity == 'positive') '[M+H]+' else '[M-H]-' }}")
 {{ endCodeBlock() }}
 {{ optionalCodeBlock(formulaOpts$algo == "SIRIUS") }}
 formulas <- generateFormulas(fGroups, "sirius", mslists, relMzDev = 5,
                              adduct = "{{ if (polarity == 'positive') '[M+H]+' else '[M-H]-' }}", elements = "CHNOP",
-                             profile = "qtof", calculateFeatures = TRUE, featThreshold = 0.75)
+                             profile = "qtof", calculateFeatures = TRUE, featThresholdAnn = 0.75)
 {{ endCodeBlock() }}
 {{ optionalCodeBlock(nzchar(identOpts$algo)) }}
 

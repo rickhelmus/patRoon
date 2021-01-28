@@ -542,73 +542,59 @@ NULL
 
 #' Automatic chemical formula generation
 #'
-#' Functionality to automatically calculate chemical formulae for all feature
-#' groups.
+#' Functionality to automatically calculate chemical formulae for all feature groups.
 #'
-#' Several algorithms are provided to automatically generate formulae for given
-#' feature groups. All tools use the accurate mass of a feature to
-#' back-calculate candidate formulae. Depending on the algorithm and data
-#' availability, other data such as isotopic pattern and MS/MS fragments may be
-#' used to further improve formula assignment and ranking.
+#' Several algorithms are provided to automatically generate formulae for given feature groups. All tools use the
+#' accurate mass of a feature to back-calculate candidate formulae. Depending on the algorithm and data availability,
+#' other data such as isotopic pattern and MS/MS fragments may be used to further improve formula assignment and
+#' ranking.
 #'
-#' When DataAnalysis is used for formula generation or
-#' \code{calculateFeatures=TRUE} formulae are first calculated for each feature.
-#' The results are then combined for final assignment of candidate formulae for
-#' each feature group. If a formula was found in multiple features within the
-#' group, the reported scorings and mass errors are averaged and other numeric
-#' values are those from the feature in the analysis of the \code{"analysis"}
-#' column. The calculation of formulae on 'feature level' might result in a
-#' more thorough formula search and better removal of outliers (controlled by
-#' \code{featThreshold} argument). In contrast, when calculations occur on
-#' 'feature group level' (\emph{i.e.} \code{calculateFeatures=FALSE}), formulae
-#' are directly assigned to each feature group (by using group averaged peak MS
-#' lists), which significantly reduces processing time is, especially with many
-#' analyses. Note that in both situations subsequent algorithms that use formula
-#' data (\emph{e.g.} \code{\link{addFormulaScoring}} and \link{reporting}
-#' functions) only use formula data that was eventually assigned to feature
-#' groups. Furthermore, please note that calculation of formulae with
-#' DataAnalysis always occurs on 'feature level'.
+#' When DataAnalysis is used for formula generation or \code{calculateFeatures=TRUE} formulae are first calculated for
+#' each feature. The results are then combined for final assignment of candidate formulae for each feature group. If a
+#' formula was found in multiple features within the group, the reported scorings and mass errors are averaged and other
+#' numeric values are those from the feature in the analysis of the \code{"analysis"} column. The calculation of
+#' formulae on 'feature level' might result in a more thorough formula search and better removal of outliers (controlled
+#' by \code{featThreshold} and \code{featThresholdAnn} arguments). In contrast, when calculations occur on 'feature group
+#' level' (\emph{i.e.} \code{calculateFeatures=FALSE}), formulae are directly assigned to each feature group (by using
+#' group averaged peak MS lists), which significantly reduces processing time is, especially with many analyses. Note
+#' that in both situations subsequent algorithms that use formula data (\emph{e.g.} \code{\link{addFormulaScoring}} and
+#' \link{reporting} functions) only use formula data that was eventually assigned to feature groups. Furthermore, please
+#' note that calculation of formulae with DataAnalysis always occurs on 'feature level'.
 #'
-#' @param fGroups \code{\link{featureGroups}} object for which formulae should
-#'   be generated. This should be the same or a subset of the object that was
-#'   used to create the specified \code{MSPeakLists} (only relevant for
-#'   algorithms using \code{MSPeakLists}). In the case of a subset only the
-#'   remaining feature groups in the subset are considered.
-#' @param MSPeakLists An \code{\link{MSPeakLists}} object that was generated for
-#'   the supplied \code{fGroups}.
-#' @param MSMode Whether formulae should be generated only from MS data
-#'   (\code{"ms"}), MS/MS data (\code{"msms"}) or both (\code{"both"}).
+#' @param fGroups \code{\link{featureGroups}} object for which formulae should be generated. This should be the same or
+#'   a subset of the object that was used to create the specified \code{MSPeakLists} (only relevant for algorithms using
+#'   \code{MSPeakLists}). In the case of a subset only the remaining feature groups in the subset are considered.
+#' @param MSPeakLists An \code{\link{MSPeakLists}} object that was generated for the supplied \code{fGroups}.
+#' @param MSMode Whether formulae should be generated only from MS data (\code{"ms"}), MS/MS data (\code{"msms"}) or
+#'   both (\code{"both"}).
 #'
-#'   For \command{GenForm} selecting \code{"both"} will fall back to formula
-#'   calculation with only MS data in case no MS/MS data is available.
+#'   For \command{GenForm} selecting \code{"both"} will fall back to formula calculation with only MS data in case no
+#'   MS/MS data is available.
 #'
-#'   For calulation with Bruker DataAnalysis selecting \code{"both"} will
-#'   calculate formulae from MS data \emph{and} MS/MS data and combines the
-#'   results (duplicated formulae are removed). This is useful when poor MS/MS
-#'   data would exclude proper candidates.
-#' @param calculateFeatures If \code{TRUE} fomulae are first calculated for all
-#'   features prior to feature group assignment (see details).
-#' @param featThreshold If \code{calculateFeatures=TRUE}: minimum presence
-#'   (\samp{0-1}) of a formula in all features before it is considered as a
-#'   candidate for a feature group. For instance, \code{featThreshold} dictates
-#'   that a formula should be present in at least 75% of the features inside a
-#'   feature group.
-#' @param extraOpts An optional character vector with any other commandline
-#'   options that will be passed to \command{GenForm} or \command{SIRIUS}. See
-#'   the \verb{GenForm options} section/SIRIUS manual for all available
+#'   For calulation with Bruker DataAnalysis selecting \code{"both"} will calculate formulae from MS data \emph{and}
+#'   MS/MS data and combines the results (duplicated formulae are removed). This is useful when poor MS/MS data would
+#'   exclude proper candidates.
+#' @param calculateFeatures If \code{TRUE} fomulae are first calculated for all features prior to feature group
+#'   assignment (see details).
+#' @param featThreshold If \code{calculateFeatures=TRUE}: minimum presence (\samp{0-1}) of a formula in all features
+#'   before it is considered as a candidate for a feature group. For instance, \code{featThreshold=0.75} dictates that a
+#'   formula should be present in at least 75% of the features inside a feature group.
+#' @param featThresholdAnn As \code{featThreshold}, but only considers features with annotations. For instance,
+#'   \code{featThresholdAnn=0.75} dictates that a formula should be present in at least 75% of the features with
+#'   annotations inside a feature group.
+#' @param extraOpts An optional character vector with any other commandline options that will be passed to
+#'   \command{GenForm} or \command{SIRIUS}. See the \verb{GenForm options} section/SIRIUS manual for all available
 #'   commandline options.
-#' @param topMost Only keep this number of candidates (per feature group) with
-#'   highest score. For \command{SIRIUS}: Sets the \option{--candidates}
-#'   commandline option.
-#' 
+#' @param topMost Only keep this number of candidates (per feature group) with highest score. For \command{SIRIUS}: Sets
+#'   the \option{--candidates} commandline option.
+#'
 #' @templateVar genForm TRUE
 #' @template form-args
 #'
 #' @template adduct-arg
 #'
-#' @section Scorings: Each algorithm implements their own scoring system. Their
-#'   names have been harmonized where possible. An overview is obtained with the
-#'   \code{formulaScorings} function:
+#' @section Scorings: Each algorithm implements their own scoring system. Their names have been harmonized where
+#'   possible. An overview is obtained with the \code{formulaScorings} function:
 #'   \Sexpr[results=rd,echo=FALSE,stage=build]{patRoon:::tabularRD(patRoon::formulaScorings())}
 #'
 #' @templateVar what \code{generateFormulasGenForm} and \code{generateFormulasSIRIUS}
@@ -617,8 +603,8 @@ NULL
 #' @return A \code{\link{formulas}} object containing all generated formulae.
 #'
 #' @seealso \code{\link{formulas-class}}. The
-#'   \href{https://www.researchgate.net/publication/307964728_MOLGEN-MSMS_Software_User_Manual}{GenForm
-#'    manual} (also known as MOLGEN-MSMS).
+#'   \href{https://www.researchgate.net/publication/307964728_MOLGEN-MSMS_Software_User_Manual}{GenForm manual} (also
+#'   known as MOLGEN-MSMS).
 #' @name formula-generation
 NULL
 

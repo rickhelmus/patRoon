@@ -326,7 +326,8 @@ calculateFormScoreRanges <- function(formTable)
                     scoreCols))
 }
 
-generateFormConsensusForGroup <- function(formList, formThreshold, mergeCol, mergeCovCol)
+generateFormConsensusForGroup <- function(formList, mergeCount, formThreshold, formThresholdAnn, mergeCol, mergeCovCol,
+                                          mergeCovAnnCol)
 {
     # merge all together
     formTable <- rbindlist(formList, fill = TRUE, idcol = mergeCol)
@@ -335,10 +336,12 @@ generateFormConsensusForGroup <- function(formList, formThreshold, mergeCol, mer
     if (nrow(formTable) > 0)
     {
         # Determine coverage of precursor formulas.
-        formTable[, (mergeCovCol) := uniqueN(get(mergeCol)) / length(formList), by = "neutral_formula"]
+        formTable[, (mergeCovCol) := uniqueN(get(mergeCol)) / mergeCount, by = "neutral_formula"]
+        formTable[, (mergeCovAnnCol) := uniqueN(get(mergeCol)) / length(formList), by = "neutral_formula"]
 
-        if (formThreshold > 0)
-            formTable <- formTable[get(mergeCovCol) >= formThreshold] # Apply coverage filter
+        # Apply coverage filters
+        if (formThreshold > 0 || formThresholdAnn > 0)
+            formTable <- formTable[get(mergeCovCol) >= formThreshold & get(mergeCovAnnCol) >= formThresholdAnn]
 
         # remove MS only formulas if MS/MS candidate is also present (do after
         # coverage filter).
@@ -364,37 +367,39 @@ generateFormConsensusForGroup <- function(formList, formThreshold, mergeCol, mer
     return(formTable)
 }
 
-generateGroupFormulasByConsensus <- function(formList, formThreshold, origGNames, mergeCol, mergeCovCol)
+generateGroupFormulasByConsensus <- function(formList, mergeCounts, formThreshold, formThresholdAnn, origGNames, mergeCol,
+                                             mergeCovCol, mergeCovAnnCol)
 {
-    cat("Generating feature group formula consensus...\n")
+    cat("Generating formula consensus...\n")
 
-    hash <- makeHash(formList, formThreshold)
+    hash <- makeHash(formList, formThreshold, formThresholdAnn)
     formCons <- loadCacheData("formulasFGroupConsensus", hash)
 
-    # figure out feature groups
-    gNames <- unique(unlist(sapply(formList, names, simplify = FALSE), use.names = FALSE))
-    gCount <- length(gNames)
+    # figure out names
+    resNames <- unique(unlist(lapply(formList, names)))
+    resCount <- length(resNames)
 
-    if (gCount == 0)
+    if (resCount == 0)
         formCons <- list()
     else if (is.null(formCons))
     {
-        prog <- openProgBar(0, gCount)
+        prog <- openProgBar(0, resCount)
 
-        formCons <- lapply(seq_len(gCount), function(grpi)
+        formCons <- lapply(seq_len(resCount), function(i)
         {
-            fl <- pruneList(lapply(formList, "[[", gNames[[grpi]]))
-            ret <- generateFormConsensusForGroup(fl, formThreshold, mergeCol, mergeCovCol)
-            setTxtProgressBar(prog, grpi)
+            fl <- pruneList(lapply(formList, "[[", resNames[[i]]))
+            ret <- generateFormConsensusForGroup(fl, mergeCounts[[resNames[[i]]]], formThreshold, formThresholdAnn,
+                                                 mergeCol, mergeCovCol, mergeCovAnnCol)
+            setTxtProgressBar(prog, i)
             return(ret)
         })
-        names(formCons) <- gNames
+        names(formCons) <- resNames
         formCons <- pruneList(formCons, checkZeroRows = TRUE)
         
         # fix order
         formCons <- formCons[intersect(origGNames, names(formCons))]
 
-        setTxtProgressBar(prog, gCount)
+        setTxtProgressBar(prog, resCount)
         close(prog)
 
         saveCacheData("formulasFGroupConsensus", formCons, hash)

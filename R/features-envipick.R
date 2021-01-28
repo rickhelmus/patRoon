@@ -18,11 +18,11 @@ setMethod("initialize", "featuresEnviPick",
 #'
 #' @rdname feature-finding
 #' @export
-findFeaturesEnviPick <- function(analysisInfo, ..., verbose = TRUE)
+findFeaturesEnviPick <- function(analysisInfo, ..., parallel = TRUE, verbose = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
     analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, "mzXML")
-    checkmate::assertFlag(verbose, add = ac)
+    apply(checkmate::assertFlag, . ~ parallel + verbose, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
 
     anaCount <- nrow(analysisInfo)
@@ -32,7 +32,8 @@ findFeaturesEnviPick <- function(analysisInfo, ..., verbose = TRUE)
         printf("Finding features with enviPick for %d analyses ...\n", anaCount)
 
     prog <- progressr::progressor(steps = anaCount, enable = verbose)
-    ret@features <- future.apply::future_Map(analysisInfo$analysis, analysisInfo$path, f = function(ana, path)
+    
+    doFP <- function(ana, path)
     {
         fp <- getMzXMLAnalysisPath(ana, path)
         hash <- makeHash(makeFileHash(fp), list(...))
@@ -48,7 +49,12 @@ findFeaturesEnviPick <- function(analysisInfo, ..., verbose = TRUE)
         prog()
         
         return(f)
-    })
+    }
+    
+    if (parallel)
+        ret@features <- future.apply::future_Map(doFP, analysisInfo$analysis, analysisInfo$path)
+    else
+        ret@features <- Map(doFP, analysisInfo$analysis, analysisInfo$path)
 
     if (verbose)
     {

@@ -102,7 +102,7 @@ setReplaceMethod("$", "featuresKPIC2", function(x, name, value)
 
 #' @rdname feature-finding
 #' @export
-findfeaturesKPIC2 <- function(analysisInfo, kmeans, level = 1000, ..., verbose = TRUE)
+findfeaturesKPIC2 <- function(analysisInfo, kmeans, level = 1000, ..., parallel = TRUE, verbose = TRUE)
 {
     # UNDONE: docs
     #   - mention that filter() doesn't alter KPIC object, but IDs can be used to retrace
@@ -112,7 +112,7 @@ findfeaturesKPIC2 <- function(analysisInfo, kmeans, level = 1000, ..., verbose =
     
     ac <- checkmate::makeAssertCollection()
     analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, c("mzXML", "mzML"), add = ac)
-    aapply(checkmate::assertFlag, . ~ kmeans + verbose, fixed = list(add = ac))
+    aapply(checkmate::assertFlag, . ~ kmeans + parallel + verbose, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
 
     baseHash <- makeHash(kmeans, level, list(...))
@@ -122,7 +122,7 @@ findfeaturesKPIC2 <- function(analysisInfo, kmeans, level = 1000, ..., verbose =
 
     prog <- progressr::progressor(steps = nrow(analysisInfo), enable = verbose)
 
-    allPics <- future.apply::future_Map(analysisInfo$analysis, analysisInfo$path, f = function(ana, path)
+    doKP <- function(ana, path)
     {
         inFile <- getMzMLOrMzXMLAnalysisPath(ana, path)
         hash <- makeHash(baseHash, makeFileHash(inFile))
@@ -139,7 +139,12 @@ findfeaturesKPIC2 <- function(analysisInfo, kmeans, level = 1000, ..., verbose =
         prog()
         
         return(pics)
-    })
+    }
+    
+    if (parallel)
+        allPics <- future.apply::future_Map(doKP, analysisInfo$analysis, analysisInfo$path)
+    else
+        allPics <- Map(doKP, analysisInfo$analysis, analysisInfo$path)
     
     ret <- importfeaturesKPIC2(allPics, analysisInfo)
 

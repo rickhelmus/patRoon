@@ -3,10 +3,10 @@
 #' @include workflow-step-set.R
 NULL
 
-makeCompoundsSetConsensus <- function(setObjects, origFGNames, setThreshold)
+makeCompoundsSetConsensus <- function(setObjects, origFGNames, setThreshold, setThresholdAnn)
 {
     # generate consensus by...
-    # - checking setThreshold
+    # - checking setThreshold/setThresholdAnn
     # - merging by identifier
     # - average scores
     # - merge fragInfos and update PLIndex
@@ -14,11 +14,13 @@ makeCompoundsSetConsensus <- function(setObjects, origFGNames, setThreshold)
     # get all annotated fGroup names with original order
     allAnnGNames <- intersect(origFGNames, unique(unlist(lapply(setObjects, groupNames))))
     
+    sCount <- length(setObjects)
+    
     cons <- sapply(allAnnGNames, function(gName)
     {
         allResults <- pruneList(sapply(setObjects, "[[", gName, simplify = FALSE))
         if (length(allResults) == 1)
-            return(copy(allResults[[1]])[, c("setCoverage", "set", "setCount") := .(1, names(allResults)[1], 1)])
+            return(copy(allResults[[1]])[, c("set", "setCoverage", "setCoverageAnn") := .(names(allResults)[1], 1, 1)])
         
         allResults <- lapply(allResults, copy)
         
@@ -31,7 +33,7 @@ makeCompoundsSetConsensus <- function(setObjects, origFGNames, setThreshold)
             merged <- copy(left)
             
             if (is.null(merged[["setCoverage"]]))
-                merged[, c("setCoverage", "setCount") := .(1, 1)]
+                merged[, c("setCoverage", "setCoverageAnn") := .(1, 1)]
             
             # UNDONE: assume score cols are same for left/right, should always be the case?
 
@@ -46,8 +48,8 @@ makeCompoundsSetConsensus <- function(setObjects, origFGNames, setThreshold)
             # add missing candidates from right
             merged <- rbind(merged, right[!identifier %in% merged$identifier], fill = TRUE)
             
-            merged[identifier %in% right$identifier, setCoverage := setCoverage + 1]
-            merged[, setCount := setCount + 1]
+            merged[, setCoverage := setCoverage + 1]
+            merged[identifier %in% right$identifier, setCoverageAnn := setCoverageAnn + 1]
             
             # re-sort
             setorderv(merged, "score", order = -1)
@@ -59,12 +61,15 @@ makeCompoundsSetConsensus <- function(setObjects, origFGNames, setThreshold)
     }, simplify = FALSE)
     
     # convert absolute merge counts to coverage
-    cons <- lapply(cons, function(ct) ct[, c("setCoverage", "setCount") := .(setCoverage / setCount, NULL)])
-    
-    if (setThreshold > 0)
-        cons <- pruneList(lapply(cons, function(ct) ct[setCoverage >= setThreshold]), checkZeroRows = TRUE)
+    cons <- lapply(cons, function(ct) ct[, c("setCoverageAnn", "setCoverage") :=
+                                             .(setCoverageAnn / setCoverage, setCoverage / sCount)])
+
+    if (setThreshold > 0 || setThresholdAnn > 0)
+        cons <- pruneList(lapply(cons,
+                                 function(ct) ct[setCoverage >= setThreshold & setCoverageAnn >= setThresholdAnn]),
+                          checkZeroRows = TRUE)
  
-    return(cons)   
+    return(cons)
 }
 
 makeCompoundsSetScorings <- function(setObjects, origFGNames)
@@ -105,7 +110,7 @@ syncCompoundsSetObjects <- function(compoundsSet, makeCons)
 {
     if (makeCons)
         compoundsSet@compounds <- makeCompoundsSetConsensus(compoundsSet@setObjects, compoundsSet@origFGNames,
-                                                            compoundsSet@setThreshold)
+                                                            compoundsSet@setThreshold, compoundsSet@setThresholdAnn)
     else
     {
         # sync available feature groups
@@ -126,7 +131,8 @@ syncCompoundsSetObjects <- function(compoundsSet, makeCons)
     return(compoundsSet)
 }
 
-compoundsSet <- setClass("compoundsSet", slots = c(setThreshold = "numeric", origFGNames = "character"),
+compoundsSet <- setClass("compoundsSet", slots = c(setThreshold = "numeric", setThresholdAnn = "numeric",
+                                                   origFGNames = "character"),
                         contains = c("compounds", "workflowStepSet"))
 
 #' @describeIn compoundsSet Shows summary information for this object.
@@ -272,9 +278,9 @@ setMethod("addFormulaScoring", "compoundsSet", function(compounds, formulas, upd
     return(compounds)
 })
 
-generateCompoundsSet <- function(fGroupsSet, MSPeakListsSet, generator, ..., setThreshold)
+generateCompoundsSet <- function(fGroupsSet, MSPeakListsSet, generator, ..., setThreshold, setThresholdAnn)
 {
-    checkmate::assertNumber(setThreshold, lower = 0, finite = TRUE)
+    aapply(checkmate::assertNumber, . ~ setThreshold + setThresholdAnn, lower = 0, upper = 1.0, finite = TRUE)
     msplArgs <- assertAndGetMSPLSetsArgs(fGroupsSet, MSPeakListsSet)
     
     unsetFGroupsList <- sapply(sets(fGroupsSet), unset, obj = fGroupsSet, simplify = FALSE)
@@ -305,12 +311,12 @@ generateCompoundsSet <- function(fGroupsSet, MSPeakListsSet, generator, ..., set
         }
     }
     
-    cons <- makeCompoundsSetConsensus(setObjects, names(fGroupsSet), setThreshold)
+    cons <- makeCompoundsSetConsensus(setObjects, names(fGroupsSet), setThreshold, setThresholdAnn)
     sc <- makeCompoundsSetScorings(setObjects, names(fGroupsSet))
     
-    return(compoundsSet(setObjects = setObjects, setThreshold = setThreshold, origFGNames = names(fGroupsSet),
-                        compounds = cons, scoreTypes = sc$scTypes, scoreRanges = sc$scRanges,
-                        algorithm = makeSetAlgorithm(setObjects)))
+    return(compoundsSet(setObjects = setObjects, setThreshold = setThreshold, setThresholdAnn = setThresholdAnn,
+                        origFGNames = names(fGroupsSet), compounds = cons, scoreTypes = sc$scTypes,
+                        scoreRanges = sc$scRanges, algorithm = makeSetAlgorithm(setObjects)))
 }
 
 
@@ -321,7 +327,7 @@ setMethod("unset", "compoundsSet", function(obj, set)
     obj <- obj[, sets = set]
     
     cList <- lapply(compoundTable(obj), copy)
-    cList <- lapply(cList, data.table::set, j = c("set", "setCoverage"), value = NULL)
+    cList <- lapply(cList, data.table::set, j = c("set", "setCoverage", "setCoverageAnn"), value = NULL)
     
     return(compoundsUnset(compounds = cList, scoreTypes = obj@scoreTypes, scoreRanges = obj@scoreRanges,
                           algorithm = paste0(algorithm(obj), "_unset")))

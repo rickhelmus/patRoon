@@ -11,8 +11,11 @@ syncFormulasSetObjects <- function(formulasSet, makeCons)
     if (makeCons)
     {
         groupFormsList <- sapply(formulasSet@setObjects, formulaTable, features = FALSE, simplify = FALSE)
-        formulasSet@formulas <- generateGroupFormulasByConsensus(groupFormsList, formulasSet@setThreshold,
-                                                                 formulasSet@origFGNames, "set", "setCoverage")
+        mc <- setNames(rep(length(setObjects), length(groupFormsList)), names(groupFormsList))
+        formulasSet@formulas <- generateGroupFormulasByConsensus(groupFormsList, mc, formulasSet@setThreshold,
+                                                                 formulasSet@setThresholdAnn,
+                                                                 formulasSet@origFGNames, "set", "setCoverage",
+                                                                 "setCoverageAnn")
     }
     else
     {
@@ -30,6 +33,7 @@ syncFormulasSetObjects <- function(formulasSet, makeCons)
 }
 
 formulasSet <- setClass("formulasSet", slots = c(setThreshold = "numeric",
+                                                 setThresholdAnn = "numeric",
                                                  origFGNames = "character"),
                         contains = c("formulas", "workflowStepSet"))
 
@@ -139,9 +143,9 @@ setMethod("plotSpectrumHash", "formulasSet", function(obj, precursor, groupName,
 })
 
 
-generateFormulasSet <- function(fGroupsSet, generator, ..., setArgs, setThreshold)
+generateFormulasSet <- function(fGroupsSet, generator, ..., setArgs, setThreshold, setThresholdAnn)
 {
-    checkmate::assertNumber(setThreshold, lower = 0, finite = TRUE)
+    aapply(checkmate::assertNumber, . ~ setThreshold + setThresholdAnn, lower = 0, upper = 1, finite = TRUE)
     
     # UNDONE: mention that adduct argument is automatically set
 
@@ -152,11 +156,12 @@ generateFormulasSet <- function(fGroupsSet, generator, ..., setArgs, setThreshol
     combFormulas <- Reduce(modifyList, lapply(setObjects, formulaTable, features = TRUE))
     
     groupFormsList <- sapply(setObjects, formulaTable, features = FALSE, simplify = FALSE)
-    groupForms <- generateGroupFormulasByConsensus(groupFormsList, setThreshold, names(fGroupsSet),
-                                                   "set", "setCoverage")
+    mc <- setNames(rep(length(setObjects), length(fGroupsSet)), names(fGroupsSet))
+    groupForms <- generateGroupFormulasByConsensus(groupFormsList, mc, setThreshold, setThresholdAnn, names(fGroupsSet),
+                                                   "set", "setCoverage", "setCoverageAnn")
     
     return(formulasSet(setObjects = setObjects, origFGNames = names(fGroupsSet), setThreshold = setThreshold,
-                       formulas = groupForms, featureFormulas = combFormulas,
+                       setThresholdAnn = setThresholdAnn, formulas = groupForms, featureFormulas = combFormulas,
                        algorithm = makeSetAlgorithm(setObjects)))
 }
 

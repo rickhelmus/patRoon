@@ -258,7 +258,8 @@ setMethod("generateFormulasDA", "featureGroups", function(fGroups, precursorMzSe
     return(formulas(formulas = groupFormulas, featureFormulas = fTable, algorithm = "bruker"))
 })
 
-setMethod("generateFormulasDA", "featureGroupsSet", function(fGroups, ..., setThreshold = 0.75)
+setMethod("generateFormulasDA", "featureGroupsSet", function(fGroups, ..., setThreshold = 0, setThresholdAnn = 0.75)
 {
-    generateFormulasSet(fGroups, generateFormulasDA, ..., setThreshold = setThreshold)
+    generateFormulasSet(fGroups, generateFormulasDA, ..., setThreshold = setThreshold,
+                        setThresholdAnn = setThresholdAnn)
 })

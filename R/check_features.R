@@ -18,6 +18,7 @@ getUISettings <- function()
     }
     else
         ret <- yaml::read_yaml(path, eval.expr = FALSE)
+    ret <- ret[setdiff(names(ret), "version")]
     return(ret)
 }
 
@@ -30,6 +31,7 @@ getDefaultUISettings <- function()
 
 saveUISettings <- function(settings)
 {
+    settings$version <- 1 # just store for now, in case if ever needed in the future
     yaml::write_yaml(settings, getUISettingsPath(), indent = 4)
 }
 
@@ -519,7 +521,8 @@ setMethod("checkFeatures", "featureGroups", function(fGroups, session, rtWindow)
         
         observeEvent(input$saveSession, {
             saveRDS(list(enabledFGroups = rValues$enabledFGroups,
-                         enabledFeatures = rValues$enabledFeatures), sessionPath)
+                         enabledFeatures = rValues$enabledFeatures,
+                         version = 1), sessionPath)
             setSessionChanged(FALSE)
         })
         

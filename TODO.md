@@ -43,9 +43,6 @@
 - improve instructions for MF and SIRIUS installation?
 - ref docs and exports for getXCMSnSet
 - ffOpenMS etc: analyses also needs to be available for hashing
-- improve docs for areas (only affects when features=FALSE) and average (different behavior when features=TRUE/FALSE) for as.data.table() of featureGroups
-- update/check version nr mentioned in filter() for MSPeakLists
-- explain xlim/ylim behavior for annotations/mols for plotSpec()
 
 
 ## sets
@@ -56,21 +53,19 @@
         - or for later?
     - more sub class specific methods
         - compoundsSetMF sub-class (for settings slot)?
+        - --> or just doc that setObjects() can be used
     - provide methods for non-implemented functionality
         - consensus()? (see above)
-        - compoundViewer?
         - groupFeaturesXCMS3?
 - check UIs
-    - checkFeatures: annotation column setting
-        - requires version bump...
+    - checkFeatures:
+        - requires version bump of session
+        - annotation column setting
+            - requires version bump for settings
     - checkComponents
         - more settings?
         - test session import
         - change column names for both tables?
-    - backport checkFeatures things to featng
-        - versioning settings/sessions
-        - clearSession
-        - session subdirs
 - misc
     - as.data.table() for formulas: average=T will now produce strange averaged ionized formula, for now simply remove this column...
         - also give a note in docs?
@@ -81,22 +76,17 @@
     - fix empty MS(MS) peaklists if unavailable during merging sets
         - already fixed?
     - calculatePeakQualities() sets method?
+        - requires feature EIC method
+    - overlap(), plotUpSet(), plotVenn() method for sets
+        - needs setAbundance filter, so add that too
 - merging setObjects
     - check if more has to be cached and may need status messages
-    - filter features, annotation results on minimum abundance amongst different setObjects
-        - (unlike setThreshold also take objects without results in to account)
-        - add new filter()?
     - compound set consensus: scoreRanges should be re-determined from annotation results?
-- setThreshold
-    - filter() argument
-    - keep/change default setThreshold?
-        - or remove argument from generators?
 - suspect screening
     - implement TASQ?
     - consensus?
         - or just new set filter described above?
     - annotation columns not in report, fine? (there are many) If yes document
-    - suspectScreening(): remove adduct argument from generic? otherwise doc its unsupported for sets
 - neutralizing / ionization
     - mergeIons()
         - other name? selectIons()?
@@ -106,19 +96,12 @@
 	    - prefer adducts based on MS/MS? eg handy for Na/K adducts
 	- makeSet()
 	    - fGroups: also support method via comparison?
-	- formula/compounds: get adduct from gInfo if present
-		- what to do with unsupported adducts?
-		    - skip calculation with a warning?
-		        - default to M+H/M-H for now with warning...
-		    - enforce adduct argument for these cases?
-		    - default mergeIons() to only consider 'common' adducts? or change default adducts for componentization algos?
-		    - check better for what is supported by SIRIUS?
-	- component selection tool/function
-	    - otherwise perhaps make a fGroup remover function to help subsetting
-			- similarly as for feature remover in fGroups...
-			- del()/delete()/rmResult()/delResult() generic? could also be for other classes
-			    - or use regular R set like methods (<-())
-		- similarly: set() like method to change data, such as adduct annotations
+    - what to do with unsupported adducts for annotation?
+	    - skip calculation with a warning?
+		    - default to M+H/M-H for now with warning...
+	    - default mergeIons() to only consider 'common' adducts? or change default adducts for componentization algos?
+	    - check better for what is supported by SIRIUS?
+	- replacement method for adducts, and possibly others (anaInfo, fGroups etc)
 	- feature components
 	    - all features are currently annotated (ie including not in a group)
 	        - should be fine once featng is merged --> verify
@@ -155,7 +138,12 @@
     - susp_ prefix in as.data.table
     - suspFormRank/suspCompRank --> formRank/compRank
     - RC components: ensure that columns are the right type if all values are NA
-    - change "rt" to "ret" for component columns for consistency
+    - changed "rt" to "ret" for component columns for consistency
+    - changed formula feature consensus thresholding
+        - featThreshold and featThresholdAnn
+        - former follows original definition but is now actually working properly, as pruning before could lead too high abundances
+        - latter only takes annotated features into account
+        - defaults changed: featThreshold=0, replaced by featThresholdAnn=0.75
 - docs
     - filter() for features/fGroups: apply to neutral masses
     - CAMERA/RAMClustR/nontarget components: clearly mention it is simply a merge between sets
@@ -178,6 +166,12 @@
         - mention mz column can now be NA
     - clearly document that mergeIons() for sets re-group --> new group names! (eg workflow objects now incompatible)
     - OpenMS adducts?
+    - improve docs for areas (only affects when features=FALSE) and average (different behavior when features=TRUE/FALSE) for as.data.table() of featureGroups
+    - update/check version nr mentioned in filter() for MSPeakLists
+    - explain xlim/ylim behavior for annotations/mols for plotSpec()
+    - update for featThreshold and featThresholdAnn
+        - put featThreshold in common arguments handbook table?
+    - remove some aliases for generics now not unique to one class (eg unique/overlap)
 - tests
     - handle/test empty objects
     - test DA algorithms

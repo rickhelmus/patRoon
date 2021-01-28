@@ -4,8 +4,7 @@
 NULL
 
 # merges screening info from screenInfo slots or as.data.table() tables
-mergeScreeningSetInfos <- function(setObjects, sInfos = lapply(setObjects, screenInfo),
-                                   rmSetCols = TRUE, markSets = TRUE)
+mergeScreeningSetInfos <- function(setObjects, setThreshold, sInfos = lapply(setObjects, screenInfo), rmSetCols = TRUE)
 {
     rmCols <- c("mz", "fragments_mz")
 
@@ -71,7 +70,7 @@ mergeScreeningSetInfos <- function(setObjects, sInfos = lapply(setObjects, scree
     else
         scrInfo <- data.table()
     
-    if (nrow(scrInfo) > 0 && markSets)
+    if (nrow(scrInfo) > 0)
     {
         # add set presence
         scrInfo[, sets := mapply(name, group, FUN = function(n, g) {
@@ -79,6 +78,9 @@ mergeScreeningSetInfos <- function(setObjects, sInfos = lapply(setObjects, scree
             return(paste0(ret[sapply(setObjects, function(so) screenInfo(so)[name == n & group == g, .N] > 0)],
                           collapse = ","))
         })]
+        scrInfo[, setCoverage := (sapply(sets, countCharInStr, ch = ",") + 1) / length(setObjects)]
+        if (setThreshold > 0)
+            scrInfo <- scrInfo[setCoverage >= setThreshold]
     }
     
     return(scrInfo[])
@@ -90,12 +92,12 @@ syncScreeningSetObjects <- function(obj)
     # obj@setObjects <- lapply(obj@setObjects, "[", i = analyses(obj), j = groupNames(obj))
     obj@setObjects <- lapply(obj@setObjects, function(x) x[analyses(obj), groupNames(obj)])
     obj@setObjects <- pruneList(obj@setObjects, checkEmptyElements = TRUE)
-    obj@screenInfo <- mergeScreeningSetInfos(obj@setObjects)
+    obj@screenInfo <- mergeScreeningSetInfos(obj@setObjects, obj@setThreshold)
     return(obj)
 }
 
 featureGroupsScreeningSet <- setClass("featureGroupsScreeningSet",
-                                      slots = c(screenInfo = "data.table"),
+                                      slots = c(screenInfo = "data.table", setThreshold = "numeric"),
                                       contains = c("featureGroupsSet", "workflowStepSet"))
 
 setMethod("initialize", "featureGroupsScreeningSet",
@@ -193,9 +195,9 @@ setMethod("filter", "featureGroupsScreeningSet", function(obj, ..., onlyHits = N
 })
 
 setMethod("screenSuspects", "featureGroupsSet", function(fGroups, suspects, rtWindow, mzWindow,
-                                                         adduct, skipInvalid, onlyHits)
+                                                         adduct, skipInvalid, onlyHits,
+                                                         setThreshold = 0)
 {
-    # UNDONE: remove argument (and from generic?)
     if (!is.null(adduct))
         stop("adduct argument not supported for sets!")
     
@@ -210,16 +212,18 @@ setMethod("screenSuspects", "featureGroupsSet", function(fGroups, suspects, rtWi
                               len = length(sets(fGroups)), names = "unique")
         checkmate::assertSubset(names(suspects), sets(fGroups), empty.ok = FALSE)
     }
+    checkmate::assertNumber(setThreshold, lower = 0, upper = 1)
     
     # sync order
     suspects <- suspects[sets(fGroups)]
     
     unsetFGroupsList <- sapply(sets(fGroups), unset, obj = fGroups, simplify = FALSE)
     setObjects <- Map(unsetFGroupsList, suspects,
-                      f = function(fg, s) screenSuspects(fg, s, rtWindow, mzWindow, skipInvalid = skipInvalid,
-                                                         onlyHits = onlyHits))
+                      f = function(fg, s) screenSuspects(fg, s, rtWindow = rtWindow, mzWindow = mzWindow,
+                                                         adduct = NULL, skipInvalid = skipInvalid, onlyHits = onlyHits))
     
-    return(featureGroupsScreeningSet(screenInfo = mergeScreeningSetInfos(setObjects), setObjects = setObjects,
+    return(featureGroupsScreeningSet(screenInfo = mergeScreeningSetInfos(setObjects, setThreshold),
+                                     setThreshold = setThreshold, setObjects = setObjects,
                                      groupAlgo = fGroups@groupAlgo, groupArgs = fGroups@groupArgs,
                                      groupVerbose = fGroups@groupVerbose, groups = copy(groupTable(fGroups)),
                                      analysisInfo = analysisInfo(fGroups), groupInfo = groupInfo(fGroups),
@@ -237,7 +241,8 @@ setMethod("unset", "featureGroupsScreeningSet", function(obj, set)
     uobj <- callNextMethod()
     
     obj <- obj[, sets = set]
-    sInfo <- mergeScreeningSetInfos(setObjects(obj), rmSetCols = FALSE, markSets = FALSE)
+    sInfo <- mergeScreeningSetInfos(setObjects(obj), obj@setThreshold, rmSetCols = FALSE)
+    sInfo[, c("sets", "setCoverage") := NULL]
     
     ret <- featureGroupsSetScreeningUnset(screenInfo = sInfo, groups = groupTable(uobj),
                                           groupInfo = groupInfo(uobj), analysisInfo = analysisInfo(uobj),

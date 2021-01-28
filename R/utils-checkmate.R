@@ -336,7 +336,7 @@ assertCheckFeaturesSession <- function(x, fGroups, mustExist, canClearSession, d
     checkmate::assertString(x, min.chars = 1, .var.name = .var.name, add = add)
     if (!didClearSession && (is.null(add) || length(add$getMessages()) == mc))
     {
-        sessionPath <- paste0(x, ".Rds")
+        sessionPath <- getCheckFeaturesSessionPath(x)
         if (mustExist)
             checkmate::assertFileExists(sessionPath, "r", .var.name = .var.name, add = add)
     

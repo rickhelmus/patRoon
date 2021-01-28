@@ -272,7 +272,7 @@ replicateGroupFilter <- function(fGroups, rGroups, negate = FALSE, verbose = TRU
 
 checkFeaturesFilter <- function(fGroups, checkFeaturesSession, negate)
 {
-    sessionPath <- paste0(checkFeaturesSession, ".Rds")
+    sessionPath <- getCheckFeaturesSessionPath(checkFeaturesSession)
     return(doFilter(fGroups, "checked features session", c(makeFileHash(sessionPath), negate), function(fGroups)
     {
         session <- readRDS(sessionPath)

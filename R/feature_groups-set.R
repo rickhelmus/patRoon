@@ -189,6 +189,18 @@ setMethod("plotChroms", "featureGroupsSet", function(obj, ...)
     callNextMethod(obj, ...)
 })
 
+#' @export
+setMethod("unique", "featureGroupsSet", function(x, which, ..., sets = NULL)
+{
+    assertSets(x, sets, TRUE)
+    if (!is.null(sets))
+    {
+        ai <- analysisInfo(x)
+        which <- unique(ai[ai$set %in% sets, "group"])
+    }
+    callNextMethod(x, which = which, ...)
+})
+
 setMethod("mergeIons", "featureGroupsSet", function(fGroups, components, prefAdduct, ...)
 {
     setLen <- length(sets(fGroups))

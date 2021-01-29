@@ -112,6 +112,8 @@ setMethod("initialize", "componentsFeatures", function(.Object, fGroups, minSize
     # NOTE: minSize should be >= 1 to filter out empty components
     comps <- comps[sapply(comps, nrow) >= minSize]
     
+    comps <- calculateComponentIntensities(comps, fGroups)
+    
     names(comps) <- paste0("CMP", seq_along(comps))
     
     cInfo <- data.table(name = names(comps), cmp_ret = sapply(comps, function(cmp) mean(cmp$ret)),

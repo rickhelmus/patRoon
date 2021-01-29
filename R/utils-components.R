@@ -34,3 +34,19 @@ mergeComponents <- function(compList, compNames, nameColumn)
     
     return(list(components = retCTable, componentInfo = retCInfo))
 }
+
+calculateComponentIntensities <- function(comps, fGroups)
+{
+    getGroupInt <- function(grp)
+    {
+        ints <- fGroups[[grp]]
+        return(mean(ints[ints != 0]))
+    }
+    return(lapply(comps, function(cmp)
+    {
+        cmp <- copy(cmp)
+        cmp[, intensity := sapply(group, getGroupInt)]
+        cmp[, intensity_rel := intensity / max(intensity)]
+        return(cmp[])
+    }))
+}

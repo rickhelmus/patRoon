@@ -24,7 +24,7 @@
 <meta name="author" content="Rick Helmus" />
 
 
-<meta name="date" content="2021-01-26" />
+<meta name="date" content="2021-01-29" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -33,7 +33,8 @@
   
 <link rel="prev" href="consensus.html"/>
 <link rel="next" href="basic-quantitative-and-regression-analysis.html"/>
-<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<script src="libs/header-attrs-2.6/header-attrs.js"></script>
+<script src="libs/jquery-3.5.1/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
@@ -50,7 +51,6 @@
 
 
 
-<script src="libs/accessible-code-block-0.0.1/empty-anchor.js"></script>
 <script src="libs/htmlwidgets-1.5.3/htmlwidgets.js"></script>
 <script src="libs/viz-1.8.2/viz.js"></script>
 <link href="libs/DiagrammeR-styles-0.2/styles.css" rel="stylesheet" />
@@ -60,27 +60,26 @@
 <link href="libs/vis-4.20.1/vis.css" rel="stylesheet" />
 <script src="libs/vis-4.20.1/vis.min.js"></script>
 <script src="libs/visNetwork-binding-2.0.9/visNetwork.js"></script>
-<script src="libs/plotly-binding-4.9.2.2/plotly.js"></script>
+<script src="libs/plotly-binding-4.9.3/plotly.js"></script>
 <script src="libs/typedarray-0.1/typedarray.min.js"></script>
-<link href="libs/crosstalk-1.1.0.1/css/crosstalk.css" rel="stylesheet" />
-<script src="libs/crosstalk-1.1.0.1/js/crosstalk.min.js"></script>
-<link href="libs/plotly-htmlwidgets-css-1.52.2/plotly-htmlwidgets.css" rel="stylesheet" />
-<script src="libs/plotly-main-1.52.2/plotly-latest.min.js"></script>
+<link href="libs/crosstalk-1.1.1/css/crosstalk.css" rel="stylesheet" />
+<script src="libs/crosstalk-1.1.1/js/crosstalk.min.js"></script>
+<link href="libs/plotly-htmlwidgets-css-1.57.1/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="libs/plotly-main-1.57.1/plotly-latest.min.js"></script>
 
 
 <style type="text/css">
-code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
-code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode { white-space: pre; position: relative; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
 }
 @media print {
-code.sourceCode { white-space: pre-wrap; }
-code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
   { counter-reset: source-line 0; }
@@ -100,7 +99,7 @@ pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-le
 div.sourceCode
   {   }
 @media screen {
-code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 code span.al { color: #ff0000; font-weight: bold; } /* Alert */
 code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
@@ -146,52 +145,63 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <ul class="summary">
 <li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Introduction</a></li>
-<li class="chapter" data-level="2" data-path="installation.html"><a href="installation.html"><i class="fa fa-check"></i><b>2</b> Installation</a><ul>
+<li class="chapter" data-level="2" data-path="installation.html"><a href="installation.html"><i class="fa fa-check"></i><b>2</b> Installation</a>
+<ul>
 <li class="chapter" data-level="2.1" data-path="automatic-installation-windows-only.html"><a href="automatic-installation-windows-only.html"><i class="fa fa-check"></i><b>2.1</b> Automatic installation (Windows only)</a></li>
 <li class="chapter" data-level="2.2" data-path="docker-image-experimental.html"><a href="docker-image-experimental.html"><i class="fa fa-check"></i><b>2.2</b> Docker image (experimental)</a></li>
-<li class="chapter" data-level="2.3" data-path="manual-installation.html"><a href="manual-installation.html"><i class="fa fa-check"></i><b>2.3</b> Manual installation</a><ul>
+<li class="chapter" data-level="2.3" data-path="manual-installation.html"><a href="manual-installation.html"><i class="fa fa-check"></i><b>2.3</b> Manual installation</a>
+<ul>
 <li class="chapter" data-level="2.3.1" data-path="manual-installation.html"><a href="manual-installation.html#r-prerequisites"><i class="fa fa-check"></i><b>2.3.1</b> R prerequisites</a></li>
 <li class="chapter" data-level="2.3.2" data-path="manual-installation.html"><a href="manual-installation.html#other-dependencies"><i class="fa fa-check"></i><b>2.3.2</b> Other dependencies</a></li>
 <li class="chapter" data-level="2.3.3" data-path="manual-installation.html"><a href="manual-installation.html#patroon-installation"><i class="fa fa-check"></i><b>2.3.3</b> patRoon installation</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="3" data-path="workflow-concepts.html"><a href="workflow-concepts.html"><i class="fa fa-check"></i><b>3</b> Workflow concepts</a></li>
-<li class="chapter" data-level="4" data-path="generating-workflow-data.html"><a href="generating-workflow-data.html"><i class="fa fa-check"></i><b>4</b> Generating workflow data</a><ul>
-<li class="chapter" data-level="4.1" data-path="preparations.html"><a href="preparations.html"><i class="fa fa-check"></i><b>4.1</b> Preparations</a><ul>
+<li class="chapter" data-level="4" data-path="generating-workflow-data.html"><a href="generating-workflow-data.html"><i class="fa fa-check"></i><b>4</b> Generating workflow data</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="preparations.html"><a href="preparations.html"><i class="fa fa-check"></i><b>4.1</b> Preparations</a>
+<ul>
 <li class="chapter" data-level="4.1.1" data-path="preparations.html"><a href="preparations.html#data-pre-treatment"><i class="fa fa-check"></i><b>4.1.1</b> Data pre-treatment</a></li>
 <li class="chapter" data-level="4.1.2" data-path="preparations.html"><a href="preparations.html#anaInfo"><i class="fa fa-check"></i><b>4.1.2</b> Analysis information</a></li>
 <li class="chapter" data-level="4.1.3" data-path="preparations.html"><a href="preparations.html#automatic-project-generation-with-newproject"><i class="fa fa-check"></i><b>4.1.3</b> Automatic project generation with newProject()</a></li>
 </ul></li>
-<li class="chapter" data-level="4.2" data-path="features.html"><a href="features.html"><i class="fa fa-check"></i><b>4.2</b> Features</a><ul>
+<li class="chapter" data-level="4.2" data-path="features.html"><a href="features.html"><i class="fa fa-check"></i><b>4.2</b> Features</a>
+<ul>
 <li class="chapter" data-level="4.2.1" data-path="features.html"><a href="features.html#finding-and-grouping-features"><i class="fa fa-check"></i><b>4.2.1</b> Finding and grouping features</a></li>
 <li class="chapter" data-level="4.2.2" data-path="features.html"><a href="features.html#suspscr"><i class="fa fa-check"></i><b>4.2.2</b> Suspect screening</a></li>
 </ul></li>
-<li class="chapter" data-level="4.3" data-path="annotation.html"><a href="annotation.html"><i class="fa fa-check"></i><b>4.3</b> Annotation</a><ul>
+<li class="chapter" data-level="4.3" data-path="annotation.html"><a href="annotation.html"><i class="fa fa-check"></i><b>4.3</b> Annotation</a>
+<ul>
 <li class="chapter" data-level="4.3.1" data-path="annotation.html"><a href="annotation.html#ms-peak-lists"><i class="fa fa-check"></i><b>4.3.1</b> MS peak lists</a></li>
 <li class="chapter" data-level="4.3.2" data-path="annotation.html"><a href="annotation.html#formulae"><i class="fa fa-check"></i><b>4.3.2</b> Formulae</a></li>
 <li class="chapter" data-level="4.3.3" data-path="annotation.html"><a href="annotation.html#compounds"><i class="fa fa-check"></i><b>4.3.3</b> Compounds</a></li>
 <li class="chapter" data-level="4.3.4" data-path="annotation.html"><a href="annotation.html#suspAnn"><i class="fa fa-check"></i><b>4.3.4</b> Suspect annotation</a></li>
 </ul></li>
-<li class="chapter" data-level="4.4" data-path="componentization.html"><a href="componentization.html"><i class="fa fa-check"></i><b>4.4</b> Componentization</a><ul>
+<li class="chapter" data-level="4.4" data-path="componentization.html"><a href="componentization.html"><i class="fa fa-check"></i><b>4.4</b> Componentization</a>
+<ul>
 <li class="chapter" data-level="4.4.1" data-path="componentization.html"><a href="componentization.html#features-with-similar-chromatographic-behaviour"><i class="fa fa-check"></i><b>4.4.1</b> Features with similar chromatographic behaviour</a></li>
 <li class="chapter" data-level="4.4.2" data-path="componentization.html"><a href="componentization.html#homologues-series"><i class="fa fa-check"></i><b>4.4.2</b> Homologues series</a></li>
 <li class="chapter" data-level="4.4.3" data-path="componentization.html"><a href="componentization.html#intclust"><i class="fa fa-check"></i><b>4.4.3</b> Intensity clustering</a></li>
 </ul></li>
 </ul></li>
-<li class="chapter" data-level="5" data-path="processing-workflow-data.html"><a href="processing-workflow-data.html"><i class="fa fa-check"></i><b>5</b> Processing workflow data</a><ul>
+<li class="chapter" data-level="5" data-path="processing-workflow-data.html"><a href="processing-workflow-data.html"><i class="fa fa-check"></i><b>5</b> Processing workflow data</a>
+<ul>
 <li class="chapter" data-level="5.1" data-path="inspecting-results.html"><a href="inspecting-results.html"><i class="fa fa-check"></i><b>5.1</b> Inspecting results</a></li>
-<li class="chapter" data-level="5.2" data-path="filtering.html"><a href="filtering.html"><i class="fa fa-check"></i><b>5.2</b> Filtering</a><ul>
+<li class="chapter" data-level="5.2" data-path="filtering.html"><a href="filtering.html"><i class="fa fa-check"></i><b>5.2</b> Filtering</a>
+<ul>
 <li class="chapter" data-level="5.2.1" data-path="filtering.html"><a href="filtering.html#features-1"><i class="fa fa-check"></i><b>5.2.1</b> Features</a></li>
 <li class="chapter" data-level="5.2.2" data-path="filtering.html"><a href="filtering.html#suspect-screening"><i class="fa fa-check"></i><b>5.2.2</b> Suspect screening</a></li>
 <li class="chapter" data-level="5.2.3" data-path="filtering.html"><a href="filtering.html#annotation-1"><i class="fa fa-check"></i><b>5.2.3</b> Annotation</a></li>
 <li class="chapter" data-level="5.2.4" data-path="filtering.html"><a href="filtering.html#components"><i class="fa fa-check"></i><b>5.2.4</b> Components</a></li>
 <li class="chapter" data-level="5.2.5" data-path="filtering.html"><a href="filtering.html#negation"><i class="fa fa-check"></i><b>5.2.5</b> Negation</a></li>
 </ul></li>
-<li class="chapter" data-level="5.3" data-path="subset.html"><a href="subset.html"><i class="fa fa-check"></i><b>5.3</b> Subsetting</a><ul>
+<li class="chapter" data-level="5.3" data-path="subset.html"><a href="subset.html"><i class="fa fa-check"></i><b>5.3</b> Subsetting</a>
+<ul>
 <li class="chapter" data-level="5.3.1" data-path="subset.html"><a href="subset.html#prioritization-workflow"><i class="fa fa-check"></i><b>5.3.1</b> Prioritization workflow</a></li>
 </ul></li>
 <li class="chapter" data-level="5.4" data-path="unOv.html"><a href="unOv.html"><i class="fa fa-check"></i><b>5.4</b> Unique and overlapping features</a></li>
-<li class="chapter" data-level="5.5" data-path="visualization.html"><a href="visualization.html"><i class="fa fa-check"></i><b>5.5</b> Visualization</a><ul>
+<li class="chapter" data-level="5.5" data-path="visualization.html"><a href="visualization.html"><i class="fa fa-check"></i><b>5.5</b> Visualization</a>
+<ul>
 <li class="chapter" data-level="5.5.1" data-path="visualization.html"><a href="visualization.html#vis_feat_ann"><i class="fa fa-check"></i><b>5.5.1</b> Features and annatation data</a></li>
 <li class="chapter" data-level="5.5.2" data-path="visualization.html"><a href="visualization.html#visComp"><i class="fa fa-check"></i><b>5.5.2</b> Comparing data</a></li>
 <li class="chapter" data-level="5.5.3" data-path="visualization.html"><a href="visualization.html#plotClust"><i class="fa fa-check"></i><b>5.5.3</b> Hierarchical clustering results</a></li>
@@ -200,9 +210,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="chapter" data-level="5.6" data-path="report.html"><a href="report.html"><i class="fa fa-check"></i><b>5.6</b> Reporting</a></li>
 </ul></li>
-<li class="chapter" data-level="6" data-path="advanced-usage.html"><a href="advanced-usage.html"><i class="fa fa-check"></i><b>6</b> Advanced usage</a><ul>
+<li class="chapter" data-level="6" data-path="advanced-usage.html"><a href="advanced-usage.html"><i class="fa fa-check"></i><b>6</b> Advanced usage</a>
+<ul>
 <li class="chapter" data-level="6.1" data-path="adducts.html"><a href="adducts.html"><i class="fa fa-check"></i><b>6.1</b> Adducts</a></li>
-<li class="chapter" data-level="6.2" data-path="fOpt.html"><a href="fOpt.html"><i class="fa fa-check"></i><b>6.2</b> Feature parameter optimization</a><ul>
+<li class="chapter" data-level="6.2" data-path="fOpt.html"><a href="fOpt.html"><i class="fa fa-check"></i><b>6.2</b> Feature parameter optimization</a>
+<ul>
 <li class="chapter" data-level="6.2.1" data-path="fOpt.html"><a href="fOpt.html#parameter-sets"><i class="fa fa-check"></i><b>6.2.1</b> Parameter sets</a></li>
 <li class="chapter" data-level="6.2.2" data-path="fOpt.html"><a href="fOpt.html#processing-optmization-results"><i class="fa fa-check"></i><b>6.2.2</b> Processing optmization results</a></li>
 </ul></li>
@@ -211,7 +223,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="6.5" data-path="compclust.html"><a href="compclust.html"><i class="fa fa-check"></i><b>6.5</b> Compound clustering</a></li>
 <li class="chapter" data-level="6.6" data-path="basic-quantitative-and-regression-analysis.html"><a href="basic-quantitative-and-regression-analysis.html"><i class="fa fa-check"></i><b>6.6</b> Basic quantitative and regression analysis</a></li>
 <li class="chapter" data-level="6.7" data-path="caching.html"><a href="caching.html"><i class="fa fa-check"></i><b>6.7</b> Caching</a></li>
-<li class="chapter" data-level="6.8" data-path="parallelization.html"><a href="parallelization.html"><i class="fa fa-check"></i><b>6.8</b> Parallelization</a><ul>
+<li class="chapter" data-level="6.8" data-path="parallelization.html"><a href="parallelization.html"><i class="fa fa-check"></i><b>6.8</b> Parallelization</a>
+<ul>
 <li class="chapter" data-level="6.8.1" data-path="parallelization.html"><a href="parallelization.html#classic-parallelization-method"><i class="fa fa-check"></i><b>6.8.1</b> Classic parallelization method</a></li>
 <li class="chapter" data-level="6.8.2" data-path="parallelization.html"><a href="parallelization.html#future-parallelization-method"><i class="fa fa-check"></i><b>6.8.2</b> Future parallelization method</a></li>
 <li class="chapter" data-level="6.8.3" data-path="parallelization.html"><a href="parallelization.html#logging"><i class="fa fa-check"></i><b>6.8.3</b> Logging</a></li>
@@ -234,12 +247,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="compclust" class="section level2">
+<div id="compclust" class="section level2" number="6.5">
 <h2><span class="header-section-number">6.5</span> Compound clustering</h2>
 <p>When large databases such as <a href="https://pubchem.ncbi.nlm.nih.gov/">PubChem</a> or <a href="http://www.chemspider.com/">ChemSpider</a> are used for compound annotation, it is common to find <em>many</em> candidate structures for even a single feature. While choosing the right scoring settings can significantly improve their ranking, it is still very much possible that many candidates of potential interest remain. In this situation it might help to perform <em>compound clustering</em>. During this process, all candidates for a feature are clustered hierarchically on basis of similar chemical structure. From the resulting cluster the <em>maximum common substructure</em> (MCS) can be derived, which represents the largest possible substructure that ‘fit’ in all candidates. By visual inspection of the MCS it may be possible to identify likely common structural properties of a feature.</p>
 <p>In order to perform compound clustering the <code>makeHCluster()</code> generic function should be used. This function heavily relies on chemical fingerprinting functionality provided by <a href="https://github.com/CDK-R/cdkr">rcdk</a>.</p>
-<div class="sourceCode" id="cb132"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb132-1"><a href="compclust.html#cb132-1"></a>compounds &lt;-<span class="st"> </span><span class="kw">generateCompounds</span>(...) <span class="co"># get our compounds</span></span>
-<span id="cb132-2"><a href="compclust.html#cb132-2"></a>compsClust &lt;-<span class="st"> </span><span class="kw">makeHCluster</span>(compounds)</span></code></pre></div>
+<div class="sourceCode" id="cb132"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb132-1"><a href="compclust.html#cb132-1" aria-hidden="true" tabindex="-1"></a>compounds <span class="ot">&lt;-</span> <span class="fu">generateCompounds</span>(...) <span class="co"># get our compounds</span></span>
+<span id="cb132-2"><a href="compclust.html#cb132-2" aria-hidden="true" tabindex="-1"></a>compsClust <span class="ot">&lt;-</span> <span class="fu">makeHCluster</span>(compounds)</span></code></pre></div>
 <p>This function accepts several arguments to fine tune the clustering process:</p>
 <ul>
 <li><code>method</code>: the clustering method (e.g. <code>"complete"</code> (default), <code>"ward.D2"</code>), see <code>?hclust</code> for options</li>
@@ -248,16 +261,16 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul>
 <p>For all arguments see the reference manual (<code>?makeHClust</code>).</p>
 <p>The resulting object is of type <code>compoundsCluster</code>. Several methods are defined to modify and inspect these results:</p>
-<div class="sourceCode" id="cb133"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb133-1"><a href="compclust.html#cb133-1"></a><span class="co"># plot MCS of first cluster from candidates of M109_R116_61</span></span>
-<span id="cb133-2"><a href="compclust.html#cb133-2"></a><span class="kw">plotStructure</span>(compsClust, <span class="dt">groupName =</span> <span class="st">&quot;M109_R116_61&quot;</span>, <span class="dv">1</span>)</span>
-<span id="cb133-3"><a href="compclust.html#cb133-3"></a></span>
-<span id="cb133-4"><a href="compclust.html#cb133-4"></a><span class="co"># plot dendrogram</span></span>
-<span id="cb133-5"><a href="compclust.html#cb133-5"></a><span class="kw">plot</span>(compsClust, <span class="dt">groupName =</span> <span class="st">&quot;M109_R116_61&quot;</span>)</span>
-<span id="cb133-6"><a href="compclust.html#cb133-6"></a></span>
-<span id="cb133-7"><a href="compclust.html#cb133-7"></a><span class="co"># re-assign clusters for a feature group</span></span>
-<span id="cb133-8"><a href="compclust.html#cb133-8"></a>compsClust &lt;-<span class="st"> </span><span class="kw">treeCut</span>(compsClust, <span class="dt">k =</span> <span class="dv">5</span>, <span class="dt">groupName =</span> <span class="st">&quot;M109_R116_61&quot;</span>)</span>
-<span id="cb133-9"><a href="compclust.html#cb133-9"></a><span class="co"># ditto, but automatic cluster determination</span></span>
-<span id="cb133-10"><a href="compclust.html#cb133-10"></a>compsClust &lt;-<span class="st"> </span><span class="kw">treeCutDynamic</span>(compsClust, <span class="dt">minModuleSize =</span> <span class="dv">3</span>, <span class="dt">groupName =</span> <span class="st">&quot;M109_R116_61&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb133"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb133-1"><a href="compclust.html#cb133-1" aria-hidden="true" tabindex="-1"></a><span class="co"># plot MCS of first cluster from candidates of M109_R116_61</span></span>
+<span id="cb133-2"><a href="compclust.html#cb133-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plotStructure</span>(compsClust, <span class="at">groupName =</span> <span class="st">&quot;M109_R116_61&quot;</span>, <span class="dv">1</span>)</span>
+<span id="cb133-3"><a href="compclust.html#cb133-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb133-4"><a href="compclust.html#cb133-4" aria-hidden="true" tabindex="-1"></a><span class="co"># plot dendrogram</span></span>
+<span id="cb133-5"><a href="compclust.html#cb133-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(compsClust, <span class="at">groupName =</span> <span class="st">&quot;M109_R116_61&quot;</span>)</span>
+<span id="cb133-6"><a href="compclust.html#cb133-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb133-7"><a href="compclust.html#cb133-7" aria-hidden="true" tabindex="-1"></a><span class="co"># re-assign clusters for a feature group</span></span>
+<span id="cb133-8"><a href="compclust.html#cb133-8" aria-hidden="true" tabindex="-1"></a>compsClust <span class="ot">&lt;-</span> <span class="fu">treeCut</span>(compsClust, <span class="at">k =</span> <span class="dv">5</span>, <span class="at">groupName =</span> <span class="st">&quot;M109_R116_61&quot;</span>)</span>
+<span id="cb133-9"><a href="compclust.html#cb133-9" aria-hidden="true" tabindex="-1"></a><span class="co"># ditto, but automatic cluster determination</span></span>
+<span id="cb133-10"><a href="compclust.html#cb133-10" aria-hidden="true" tabindex="-1"></a>compsClust <span class="ot">&lt;-</span> <span class="fu">treeCutDynamic</span>(compsClust, <span class="at">minModuleSize =</span> <span class="dv">3</span>, <span class="at">groupName =</span> <span class="st">&quot;M109_R116_61&quot;</span>)</span></code></pre></div>
 <p>For a complete overview see the reference manual (<code>?compoundsCluster</code>).</p>
 </div>
             </section>

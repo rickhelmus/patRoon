@@ -69,7 +69,6 @@ setMethod("generateComponentsCliqueMS", "featureGroups", function(fGroups, ioniz
             
             suppressMessages(invisible(utils::capture.output({
                 cliques <- do.call(cliqueMS::getCliques, c(list(xdata), extraOptsCli))
-                isoArgs <- c(list(cliques, maxCharge = maxCharge, maxGrade = maxGrade, ppm = ppm), extraOptsIso)
                 cliques <- do.call(cliqueMS::getIsotopes,
                                    c(list(cliques, maxCharge = maxCharge, maxGrade = maxGrade, ppm = ppm), extraOptsIso))
                 cliques <- do.call(cliqueMS::getAnnotation,

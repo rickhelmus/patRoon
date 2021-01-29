@@ -262,6 +262,7 @@
 ## components
 - RC: check spearmans correlation
 - NT: minimum size argument, combine rows for multiple rGroups?
+- int: also use calculateComponentIntensities() for intensities?
 
 
 ## reporting

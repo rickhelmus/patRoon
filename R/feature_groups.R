@@ -1567,21 +1567,19 @@ setMethod("selectIons", "featureGroups", function(fGroups, components, prefAdduc
         stop("No adduct/isotope information available in given components!")
     
     cTab <- as.data.table(components)
-    cTab <- cTab[group %in% names(fGroups) & (!is.na(isonr) | !is.na(adduct_ion))]
+    cTab <- cTab[group %in% names(fGroups)]
+    if (!is.null(cTab[["isonr"]]))
+        cTab <- cTab[!is.na(isonr) | !is.na(adduct_ion)]
+    else
+        cTab <- cTab[!is.na(adduct_ion)]
+    
     cTab[, remove := FALSE]
     if (onlyMonoIso)
     {
-        if (all(is.na(cTab$isonr)))
+        if (is.null(cTab[["isonr"]]) || all(is.na(cTab$isonr)))
             cat("No isotope annotations available!\n")
         else
-        {
-            cTab[!is.na(isonr), remove := {
-                if (.N == 1)
-                    FALSE
-                else
-                    isonr != 0
-            }, by = c("name", "isogroup")]
-        }
+            cTab[!is.na(isonr), remove := isonr != 0]
     }
     
     cTab[!is.na(adduct_ion) & remove == FALSE, remove := {

@@ -95,7 +95,7 @@ setMethod("initialize", "componentsFeatures", function(.Object, fGroups, minSize
     linkedFGs <- linkedFGs[!group %chin% dups(group)]
     
     # prepare for components
-    cols <- intersect(c("parentGroup", "group", "neutralMass", "isogroup", "isonr", "charge", "adduct"),
+    cols <- intersect(c("parentGroup", "group", "neutralMass", "isonr", "charge", "adduct"),
                       names(linkedFGs))
     linkedFGs <- linkedFGs[, cols, with = FALSE]
     linkedFGs[, c("ret", "mz") := gInfo[group, c("rts", "mzs")]]
@@ -104,7 +104,7 @@ setMethod("initialize", "componentsFeatures", function(.Object, fGroups, minSize
     comps <- split(linkedFGs, by = "parentGroup", keep.by = FALSE)
     
     # Remove any fGroups from components with equal adducts (unless assigned to different isotope)
-    if (!is.null(linkedFGs[["isogroup"]]))
+    if (!is.null(linkedFGs[["isonr"]]))
         comps <- lapply(comps, function(ct) ct[is.na(adduct) | !paste0(adduct, isonr) %chin% dups(paste0(adduct, isonr))])
     else
         comps <- lapply(comps, function(ct) ct[is.na(adduct) | !adduct %chin% dups(adduct)])

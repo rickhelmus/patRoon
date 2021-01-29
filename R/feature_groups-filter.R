@@ -1,12 +1,6 @@
 #' @include main.R
 NULL
 
-getHighestAbsValue <- function(abs, rel, size)
-{
-    abs <- NULLToZero(abs); rel <- NULLToZero(rel)
-    return(max(abs, rel * size))
-}
-
 #' Filtering of grouped features
 #'
 #' Basic rule based filtering of feature groups.
@@ -26,34 +20,6 @@ getHighestAbsValue <- function(abs, rel, size)
 #' @seealso \code{\link{feature-grouping}}
 NULL
 
-doFilter <- function(fGroups, what, hashParam, func, cacheCateg = what, verbose = TRUE)
-{
-    if (verbose)
-    {
-        printf("Applying %s filter... ", what)
-        oldn <- ncol(fGroups@groups)
-    }
-
-    cacheName <- sprintf("filterFGroups_%s", cacheCateg)
-    hash <- makeHash(fGroups, hashParam)
-    ret <- loadCacheData(cacheName, hash)
-    if (is.null(ret))
-    {
-        fGroups@groups <- copy(fGroups@groups)
-        ret <- if (length(fGroups) > 0) func(fGroups) else fGroups
-        saveCacheData(cacheName, ret, hash)
-    }
-
-    if (verbose)
-    {
-        newn <- ncol(ret@groups)
-        printf("Done! Filtered %d (%.2f%%) groups. Remaining: %d.\n", oldn - newn,
-               if (oldn > 0) (1-(newn/oldn))*100 else 0, newn)
-    }
-
-    return(ret)
-}
-
 intensityFilter <- function(fGroups, absThreshold, relThreshold, negate = FALSE)
 {
     if (length(fGroups) == 0)
@@ -63,7 +29,7 @@ intensityFilter <- function(fGroups, absThreshold, relThreshold, negate = FALSE)
     if (threshold == 0)
         return(fGroups)
 
-    return(doFilter(fGroups, "intensity", c(threshold, negate), function(fGroups)
+    return(doFGroupsFilter(fGroups, "intensity", c(threshold, negate), function(fGroups)
     {
         compF <- if (negate) function(x) x >= threshold else function(x) x < threshold
         delGroups <- setnames(as.data.table(matrix(FALSE, length(analyses(fGroups)), length(fGroups))),
@@ -91,7 +57,7 @@ blankFilter <- function(fGroups, threshold, negate = FALSE)
         return(fGroups)
     }
 
-    return(doFilter(fGroups, "blank", c(threshold, negate), function(fGroups)
+    return(doFGroupsFilter(fGroups, "blank", c(threshold, negate), function(fGroups)
     {
         pred <- function(x, t) x < t
         if (negate)
@@ -120,7 +86,7 @@ minAnalysesFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, negat
     threshold <- getHighestAbsValue(absThreshold, relThreshold, length(analyses(fGroups)))
     if (threshold == 0)
         return(fGroups)
-    return(doFilter(fGroups, "minimum analyses", c(threshold, negate), verbose = verbose, function(fGroups)
+    return(doFGroupsFilter(fGroups, "minimum analyses", c(threshold, negate), verbose = verbose, function(fGroups)
     {
         pred <- function(x) sum(x > 0) >= threshold
         if (negate)
@@ -137,7 +103,7 @@ minReplicatesFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, neg
 
     rGroupsAna <- analysisInfo(fGroups)$group
 
-    return(doFilter(fGroups, "minimum replicates", c(threshold, negate), function(fGroups)
+    return(doFGroupsFilter(fGroups, "minimum replicates", c(threshold, negate), function(fGroups)
     {
         pred <- function(x) length(unique(rGroupsAna[x > 0])) >= threshold
         if (negate)
@@ -153,7 +119,7 @@ minFeaturesFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, negat
     if (threshold == 0)
         return(fGroups)
 
-    return(doFilter(fGroups, "minimum features", c(threshold, negate), function(fGroups)
+    return(doFGroupsFilter(fGroups, "minimum features", c(threshold, negate), function(fGroups)
     {
         pred <- function(x) sum(x > 0) >= threshold
         if (negate)
@@ -186,7 +152,7 @@ replicateAbundanceFilter <- function(fGroups, absThreshold, relThreshold, maxInt
     
     maxIntRSD <- NULLToZero(maxIntRSD)
 
-    return(doFilter(fGroups, "replicate abundance", c(absThreshold, relThreshold, maxIntRSD, negate), function(fGroups)
+    return(doFGroupsFilter(fGroups, "replicate abundance", c(absThreshold, relThreshold, maxIntRSD, negate), function(fGroups)
     {
         pred <- function(x, n, rg)
         {
@@ -207,7 +173,7 @@ replicateAbundanceFilter <- function(fGroups, absThreshold, relThreshold, maxInt
 
 retentionMzFilter <- function(fGroups, range, negate, what)
 {
-    return(doFilter(fGroups, what, c(range, negate), function(fGroups)
+    return(doFGroupsFilter(fGroups, what, c(range, negate), function(fGroups)
     {
         pred <- function(x) numGTE(x, range[1]) & numLTE(x, range[2])
 
@@ -230,7 +196,7 @@ chromWidthFilter <- function(fGroups, range, negate)
     anas <- analyses(fGroups)
     gNames <- names(fGroups)
 
-    return(doFilter(fGroups, "chromwidth", c(range, negate), function(fGroups)
+    return(doFGroupsFilter(fGroups, "chromwidth", c(range, negate), function(fGroups)
     {
         pred <- function(finds)
         {
@@ -256,7 +222,7 @@ chromWidthFilter <- function(fGroups, range, negate)
 
 replicateGroupFilter <- function(fGroups, rGroups, negate = FALSE, verbose = TRUE)
 {
-    return(doFilter(fGroups, "replicate group", c(rGroups, negate), function(fGroups)
+    return(doFGroupsFilter(fGroups, "replicate group", c(rGroups, negate), function(fGroups)
     {
         pred <- function(g) !g %chin% rGroups
         if (negate)
@@ -268,7 +234,7 @@ replicateGroupFilter <- function(fGroups, rGroups, negate = FALSE, verbose = TRU
 checkFeaturesFilter <- function(fGroups, checkFeaturesSession, negate)
 {
     sessionPath <- getCheckSessionPath(checkFeaturesSession, "features")
-    return(doFilter(fGroups, "checked features session", c(makeFileHash(sessionPath), negate), function(fGroups)
+    return(doFGroupsFilter(fGroups, "checked features session", c(makeFileHash(sessionPath), negate), function(fGroups)
     {
         session <- readRDS(sessionPath)
         if (negate)

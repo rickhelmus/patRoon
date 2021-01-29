@@ -582,3 +582,9 @@ memoise <- function(fun)
         res
     }
 }
+
+getHighestAbsValue <- function(abs, rel, size)
+{
+    abs <- NULLToZero(abs); rel <- NULLToZero(rel)
+    return(max(abs, rel * size))
+}

@@ -56,13 +56,13 @@ setMethod("generateComponentsOpenMS", "featureGroups", function(fGroups, ionizat
     {
         fcmp <- patRoon:::parseAdductConsXMLFile(cmd$outFile)
         # prune unassigned features
-        fcmp <- Filter(function(cmp) nrow(cmp) > 1 || nzchar(cmp$adduct), fcmp)
+        fcmp <- Filter(function(cmp) nrow(cmp) > 1 || nzchar(cmp$adduct_ion), fcmp)
         # convert to data.tables and fix adducts
         fcmp <- lapply(fcmp, function(cmp)
         {
             setDT(cmp)
-            cmp[, adduct := mapply(adduct, charge,
-                                   FUN = function(a, c) as.character(as.adduct(a, format = "openms", charge = c)))]
+            cmp[, adduct_ion := mapply(adduct_ion, charge,
+                                       FUN = function(a, c) as.character(as.adduct(a, format = "openms", charge = c)))]
             cmp[, charge := NULL]
         })
         unlink(cmd[c("inFile", "outFile")]) # remove temporary files, as their size may be considerable

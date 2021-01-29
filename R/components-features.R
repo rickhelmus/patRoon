@@ -15,10 +15,6 @@ setMethod("initialize", "componentsFeatures", function(.Object, fGroups, minSize
     
     featureComponents <- Map(featureComponents, split(ftindex, seq_len(nrow(ftindex))), f = function(fCmpL, fti)
     {
-        # prune unassigned features
-        # UNDONE: just handle by generator funcs?
-        # fCmpL <- Filter(function(cmp) nrow(cmp) > 1 || nzchar(cmp$adduct), fCmpL)
-        
         # assign group names and prune features without groups
         fti <- unlist(fti)
         fCmpL <- lapply(fCmpL, function(cmp)
@@ -41,15 +37,15 @@ setMethod("initialize", "componentsFeatures", function(.Object, fGroups, minSize
     cmpTab[, fCMPID := paste0(match(analysis, analyses(fGroups)), "-", fCMP)]
 
     # NOTE: abundance only takes assigned features into account, as unassigned won't be present
-    cmpTab[!is.na(adduct), abundance := sapply(adduct, function(a) sum(a == adduct)) / .N, by = "group"]
+    cmpTab[!is.na(adduct_ion), abundance := sapply(adduct_ion, function(a) sum(a == adduct_ion)) / .N, by = "group"]
     
     # Filter adducts not abundantly assigned to same feature group
     cmpTab <- cmpTab[is.na(abundance) | numGTE(abundance, relMinAdductAbundance)]
     
     # Only keep the most abundantly assigned adduct for each feature group
     # UNDONE: handle ties?
-    cmpTab[!is.na(adduct), keep := adduct == adduct[which.max(abundance)], by = "group"]
-    cmpTab <- cmpTab[is.na(adduct) | keep == TRUE][, keep := NULL]
+    cmpTab[!is.na(adduct_ion), keep := adduct_ion == adduct_ion[which.max(abundance)], by = "group"]
+    cmpTab <- cmpTab[is.na(adduct_ion) | keep == TRUE][, keep := NULL]
 
     # Start making group components; for each feature group:
     # - find all feature components that this "parent group" is in
@@ -95,7 +91,7 @@ setMethod("initialize", "componentsFeatures", function(.Object, fGroups, minSize
     linkedFGs <- linkedFGs[!group %chin% dups(group)]
     
     # prepare for components
-    cols <- intersect(c("parentGroup", "group", "neutralMass", "isonr", "charge", "adduct"),
+    cols <- intersect(c("parentGroup", "group", "neutralMass", "isonr", "charge", "adduct_ion"),
                       names(linkedFGs))
     linkedFGs <- linkedFGs[, cols, with = FALSE]
     linkedFGs[, c("ret", "mz") := gInfo[group, c("rts", "mzs")]]
@@ -105,9 +101,9 @@ setMethod("initialize", "componentsFeatures", function(.Object, fGroups, minSize
     
     # Remove any fGroups from components with equal adducts (unless assigned to different isotope)
     if (!is.null(linkedFGs[["isonr"]]))
-        comps <- lapply(comps, function(ct) ct[is.na(adduct) | !paste0(adduct, isonr) %chin% dups(paste0(adduct, isonr))])
+        comps <- lapply(comps, function(ct) ct[is.na(adduct_ion) | !paste0(adduct_ion, isonr) %chin% dups(paste0(adduct_ion, isonr))])
     else
-        comps <- lapply(comps, function(ct) ct[is.na(adduct) | !adduct %chin% dups(adduct)])
+        comps <- lapply(comps, function(ct) ct[is.na(adduct_ion) | !adduct_ion %chin% dups(adduct_ion)])
     
     # NOTE: minSize should be >= 1 to filter out empty components
     comps <- comps[sapply(comps, nrow) >= minSize]

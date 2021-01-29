@@ -101,11 +101,11 @@ setMethod("generateComponentsCliqueMS", "featureGroups", function(fGroups, ioniz
             peakTab <- as.data.table(cliqueMS::getPeaklistanClique(cl))
             setnames(peakTab,
                      c("rt", "an1", "score1", "mass1"),
-                     c("ret", "adduct", "score", "neutralMass"))
+                     c("ret", "adduct_ion", "score", "neutralMass"))
             peakTab[, ID := seq_len(.N)]
-            peakTab[!nzchar(adduct), adduct := NA_character_] # BUG: sometimes adducts are empty instead of NA?
-            peakTab[!is.na(adduct),
-                    adduct := sapply(adduct, function(a) as.character(as.adduct(a, format = "cliquems")))]
+            peakTab[!nzchar(adduct_ion), adduct_ion := NA_character_] # BUG: sometimes adducts are empty instead of NA?
+            peakTab[!is.na(adduct_ion),
+                    adduct_ion := sapply(adduct_ion, function(a) as.character(as.adduct(a, format = "cliquems")))]
             
             # remove defaulted isotope annotations (eg w/out cluster)
             peakTab[!grepl("[", isotope, fixed = TRUE ), isotope := NA_character_]
@@ -127,7 +127,7 @@ setMethod("generateComponentsCliqueMS", "featureGroups", function(fGroups, ioniz
             # unassign removed clusters
             peakTab[!is.na(isotope) & !isogroup %in% isoTab$cluster, c("isogroup", "isonr") := NA]
             
-            peakTab <- peakTab[, c("ID", "ret", "mz", "cliqueGroup", "isogroup", "isonr", "charge", "adduct",
+            peakTab <- peakTab[, c("ID", "ret", "mz", "cliqueGroup", "isogroup", "isonr", "charge", "adduct_ion",
                                    "score", "neutralMass"),
                                with = FALSE]
             

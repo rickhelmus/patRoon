@@ -75,7 +75,7 @@ Rcpp::List parseAdductConsXMLFile(Rcpp::CharacterVector file)
                                               Rcpp::Named("neutralMass") = ce.mz,
                                               Rcpp::Named("ID") = ce.featIDs,
                                               Rcpp::Named("charge") = ce.charges,
-                                              Rcpp::Named("adduct") = ce.adducts));
+                                              Rcpp::Named("adduct_ion") = ce.adducts));
     }
     
     return ret;    

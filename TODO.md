@@ -105,13 +105,10 @@
 	        - fix adduct specification (https://github.com/OpenMS/OpenMS/issues/5133)
 	    - cliqueMS
 	        - parallelization?
-	        - change checkPackage GH link once PR is merged
-	        - verify adduct and isotope charge afterwards? let user decide what to clear if mismatch (eg isotope, adduct, both)
-	            - or in constructor? or in selectIons?
+	        - change checkPackage GH link once PRs are merged
             - current adduct conversion to this format doesn't mimic Cat and 2H/2Na etc
                 - Perhaps just document limitation?
         - minimal annotation abundance across analyses (eg adduct must be annotated in >=X analyses)?
-        - add intensity_rel column (needed by selectIons())
 - NEWS
     - [..., reAverage = FALSE] and implications of filtering when setting it to TRUE
     - Fixed Hill ordering: H wasn't alphabetical if no C is present

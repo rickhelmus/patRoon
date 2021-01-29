@@ -60,3 +60,31 @@ scoreFeatQuality <- function(quality, values)
 }
 
 hasFGroupScores <- function(fGroups) nrow(groupScores(fGroups)) > 0
+
+doFGroupsFilter <- function(fGroups, what, hashParam, func, cacheCateg = what, verbose = TRUE)
+{
+    if (verbose)
+    {
+        printf("Applying %s filter... ", what)
+        oldn <- ncol(fGroups@groups)
+    }
+    
+    cacheName <- sprintf("filterFGroups_%s", cacheCateg)
+    hash <- makeHash(fGroups, hashParam)
+    ret <- loadCacheData(cacheName, hash)
+    if (is.null(ret))
+    {
+        fGroups@groups <- copy(fGroups@groups)
+        ret <- if (length(fGroups) > 0) func(fGroups) else fGroups
+        saveCacheData(cacheName, ret, hash)
+    }
+    
+    if (verbose)
+    {
+        newn <- ncol(ret@groups)
+        printf("Done! Filtered %d (%.2f%%) groups. Remaining: %d.\n", oldn - newn,
+               if (oldn > 0) (1-(newn/oldn))*100 else 0, newn)
+    }
+    
+    return(ret)
+}

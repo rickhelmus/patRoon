@@ -6,6 +6,12 @@ featuresOptimizerEnviPick <- setRefClass("featuresOptimizerEnviPick", contains =
 
 featuresOptimizerEnviPick$methods(
 
+    checkInitialParams = function(params)
+    {
+        params[["parallel"]] <- !parallel
+        return(params)
+    },
+    
     fixDesignParam = function(param, value) if (param %in% c("minpeak", "ended", "recurs")) round(value) else value,
     
     fixOptParamBounds = function(param, bounds)

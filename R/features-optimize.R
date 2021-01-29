@@ -143,14 +143,15 @@ featuresOptimizer$methods(
 optimizeFeatureFinding <- function(anaInfo, algorithm, ..., templateParams = list(),
                                    paramRanges = list(),
                                    isoIdent = if (algorithm == "openms") "OpenMS" else "IPO",
-                                   checkPeakShape = "none", CAMERAOpts = list(), maxIterations = 50, maxModelDeviation = 0.1)
+                                   checkPeakShape = "none", CAMERAOpts = list(), maxIterations = 50,
+                                   maxModelDeviation = 0.1, parallel = TRUE)
 {
     params <- list(...)
 
     ac <- checkmate::makeAssertCollection()
     anaInfo <- assertAndPrepareAnaInfo(anaInfo, add = ac)
     checkmate::assertChoice(algorithm, c("openms", "xcms", "xcms3", "envipick", "kpic2"), add = ac)
-    assertOptimArgs(params, templateParams, paramRanges, maxIterations, maxModelDeviation, ac)
+    assertOptimArgs(params, templateParams, paramRanges, maxIterations, maxModelDeviation, parallel, ac)
     checkmate::assertChoice(isoIdent, c("IPO", "CAMERA", "OpenMS"), add = ac)
     checkmate::assertChoice(checkPeakShape, c("none", "borderIntensity", "sinusCurve", "normalDistr"), add = ac)
     checkmate::assertList(CAMERAOpts, add = ac)
@@ -166,7 +167,7 @@ optimizeFeatureFinding <- function(anaInfo, algorithm, ..., templateParams = lis
                  envipick = featuresOptimizerEnviPick,
                  kpic2 = featuresOptimizerKPIC2)
 
-    fo <- fo$new(anaInfo = anaInfo, algorithm = algorithm, isoIdent = isoIdent,
+    fo <- fo$new(anaInfo = anaInfo, algorithm = algorithm, parallel = parallel, isoIdent = isoIdent,
                  checkPeakShape = checkPeakShape, CAMERAOpts = CAMERAOpts)
     result <- fo$optimize(params, templateParams, paramRanges, maxIterations, maxModelDeviation)
 

@@ -3,7 +3,8 @@
 NULL
 
 DoEOptimizer <- setRefClass("DoEOptimizer", contains = "VIRTUAL",
-                            fields = list(algorithm = "character", maxModelDeviation = "numeric"))
+                            fields = list(algorithm = "character", maxModelDeviation = "numeric",
+                                          parallel = "logical"))
 
 DoEOptimizer$methods(
 
@@ -77,9 +78,9 @@ DoEOptimizer$methods(
         designParams <- combineParams(designParams, typParams$no_optimization)
         tasks <- seq_len(nrow(design))
 
-        prog <- openProgBar(0, length(tasks))
+        prog <- progressr::progressor(steps = length(tasks))
 
-        response <- rbindlist(lapply(tasks, function(task)
+        doExp <- function(task)
         {
             # simplified optimizeSlaveCluster() from IPO
 
@@ -89,13 +90,15 @@ DoEOptimizer$methods(
             result <- calculateResponse(runParams, task, FALSE)
             result$experiment <- task
 
-            setTxtProgressBar(prog, task)
+            prog()
 
             return(result)
-        }))
-
-        setTxtProgressBar(prog, length(tasks))
-        close(prog)
+        }
+        
+        if (parallel)
+            response <- rbindlist(future.apply::future_lapply(tasks, doExp))
+        else
+            response <- rbindlist(lapply(tasks, doExp))
 
         ret <- list()
         ret$params <- typParams

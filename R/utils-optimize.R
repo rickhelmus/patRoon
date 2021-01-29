@@ -33,13 +33,14 @@ fixOptParamRange <- function(params, paramPairs)
     return(params)
 }
 
-assertOptimArgs <- function(params, templateParams, paramRanges, maxIterations, maxModelDeviation, ac)
+assertOptimArgs <- function(params, templateParams, paramRanges, maxIterations, maxModelDeviation, parallel, ac)
 {
     aapply(checkmate::assertList, ~ templateParams + paramRanges, names = "unique",
            fixed = list(add = ac))
     checkmate::assertList(params, min.len = 1, add = ac)
     checkmate::assertCount(maxIterations, positive = TRUE, add = ac)
     checkmate::assertNumber(maxModelDeviation, finite = TRUE, add = ac)
+    checkmate::assertFlag(parallel, add = ac)
 
     checkmate::qassertr(params, "l+", "...")
 }

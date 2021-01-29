@@ -6,6 +6,12 @@ featuresOptimizerKPIC2 <- setRefClass("featuresOptimizerKPIC2", contains = "feat
 
 featuresOptimizerKPIC2$methods(
     
+    checkInitialParams = function(params)
+    {
+        params[["parallel"]] <- !parallel
+        return(params)
+    },
+    
     fixOptParamBounds = function(param, bounds)
     {
         if (param == "gap")

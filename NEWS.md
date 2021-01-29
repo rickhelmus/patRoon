@@ -1,6 +1,7 @@
 # patRoon 1.2.1
 
 - Fixed: XCMS feature grouping didn't work when the `peakgroups` alignment method was used (fixes issue #22)
+- Fixed: (harmless) `mapply` warning was shown with `newProject()`
 
 
 # patRoon 1.2.0

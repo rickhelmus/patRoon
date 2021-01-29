@@ -156,7 +156,7 @@ getNewProjectUI <- function(destPath)
                 "Analyses", icon = icon("folder-open"),
                 miniUI::miniContentPanel(
                     fillCol(
-                        flex = c(NA, NA, 1),
+                        flex = c(NA, NA, 1, NA),
                         fillRow(
                             height = 120,
                             radioButtons("generateAnaInfo", "Generate analysis information",

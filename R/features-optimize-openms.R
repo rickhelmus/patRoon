@@ -34,8 +34,11 @@ featuresOptimizerOpenMS$methods(
     
     calculateResponse = function(params, task, keepObject)
     {
-        # disable (excessive) logging
-        withOpt(MP.logPath = FALSE, callSuper(params, task, keepObject))
+        # disable (excessive) logging and parallelization if necessary
+        opts <- list(patRoon.MP.logPath = FALSE)
+        if (parallel)
+            opts[c("patRoon.MP.method", "patRoon.MP.maxProcs")] <- list("classic", 1)
+        withr::with_options(opts, callSuper(params, task, keepObject))
     }
 )
 

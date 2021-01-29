@@ -17,6 +17,13 @@ featuresOptimizerXCMS3$methods(
             return(list(param = do.call(xcms::CentWaveParam, params)))
         # if (method == "matchedFilter")
         return(list(param = do.call(xcms::MatchedFilterParam, params)))
+    },
+    
+    calculateResponse = function(params, task, keepObject)
+    {
+        if (parallel)
+            params$BPPARAM <- BiocParallel::SerialParam()
+        callSuper(params, task, keepObject)
     }
 )
 

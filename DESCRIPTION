@@ -63,6 +63,7 @@ Imports:
     tools,
     MSnbase,
     Biobase,
+    BiocParallel,
     xcms,
     cluster,
     fastcluster,

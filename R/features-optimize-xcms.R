@@ -97,6 +97,13 @@ featuresOptimizerXCMS$methods(
             params$value_of_prefilter <- NULL
         }
         return(params)
+    },
+    
+    calculateResponse = function(params, task, keepObject)
+    {
+        if (parallel)
+            params$BPPARAM <- BiocParallel::SerialParam()
+        callSuper(params, task, keepObject)
     }
 )
 

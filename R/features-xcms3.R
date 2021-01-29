@@ -79,7 +79,7 @@ setReplaceMethod("$", "featuresXCMS3", function(x, name, value)
 #'
 #' @rdname feature-finding
 #' @export
-findFeaturesXCMS3 <- function(analysisInfo, param = xcms::CentWaveParam(), verbose = TRUE)
+findFeaturesXCMS3 <- function(analysisInfo, param = xcms::CentWaveParam(), ..., verbose = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
     analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, c("mzXML", "mzML"), add = ac)
@@ -104,9 +104,9 @@ findFeaturesXCMS3 <- function(analysisInfo, param = xcms::CentWaveParam(), verbo
     rawData <- readMSDataForXCMS3(analysisInfo)
 
     if (verbose)
-        xdata <- xcms::findChromPeaks(rawData, param = param)
+        xdata <- xcms::findChromPeaks(rawData, param = param, ...)
     else
-        suppressMessages(xdata <- xcms::findChromPeaks(rawData, param = param))
+        suppressMessages(xdata <- xcms::findChromPeaks(rawData, param = param, ...))
 
     ret <- importFeaturesXCMS3(xdata, analysisInfo)
 

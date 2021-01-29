@@ -71,6 +71,7 @@
     - getEICsForFeatures method for kpic2?
     - optimize hashing? Or further avoid hashing big objects/objects with lists?
     - make parallel flag and switch to old prog bar if not set
+    - test parallel IPO
 - finish feature syncing
     - clarify reportCSV() now only reports remaining features?
 - (finish) implement(ing) replace methods for setting feature(Group) data
@@ -82,6 +83,7 @@
     - as.data.table: qualities argument (and potentially faster now with features=T?)
     - optimized feature group filters
     - reportHTML: EICs shared amongst EIC and annotation tab, annotation EIC now scaled
+    - ... for findFeaturesXCMS3
 - tests
     - topMostByRGroup
 - docs
@@ -95,6 +97,7 @@
     - handbook
         - checkFeatures()
     - update IPO docs for kpic2 (and mention min/max_width split and others)
+    - ... for findFeaturesXCMS3
 
 
 ## MSPeakLists

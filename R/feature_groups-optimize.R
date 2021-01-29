@@ -87,14 +87,15 @@ featureGroupsOptimizer$methods(
 #'   be used to optimize grouping.
 #' @export
 optimizeFeatureGrouping <- function(features, algorithm, ..., templateParams = list(),
-                                    paramRanges = list(), maxIterations = 50, maxModelDeviation = 0.1)
+                                    paramRanges = list(), maxIterations = 50, maxModelDeviation = 0.1,
+                                    parallel = TRUE)
 {
     params <- list(...)
 
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(features, "features", add = ac)
     checkmate::assertChoice(algorithm, c("openms", "xcms", "xcms3", "kpic2"), add = ac)
-    assertOptimArgs(params, templateParams, paramRanges, maxIterations, maxModelDeviation, ac)
+    assertOptimArgs(params, templateParams, paramRanges, maxIterations, maxModelDeviation, parallel, ac)
     checkmate::reportAssertions(ac)
 
     go <- switch(algorithm,
@@ -103,8 +104,9 @@ optimizeFeatureGrouping <- function(features, algorithm, ..., templateParams = l
                  xcms3 = featureGroupsOptimizerXCMS3,
                  kpic2 = featureGroupsOptimizerKPIC2)
 
-    go <- go$new(features = features, algorithm = algorithm)
-    result <- go$optimize(params, templateParams, paramRanges, maxIterations, maxModelDeviation)
+    go <- go$new(features = features, algorithm = algorithm, parallel = parallel)
+    result <- go$optimize(params, templateParams, paramRanges, maxIterations, maxModelDeviation,
+                          parallel)
 
     return(optimizationResult(algorithm = algorithm, paramSets = result$paramSets,
                               bestParamSet = result$bestParamSet))

@@ -130,6 +130,8 @@ getNewProjectUI <- function(destPath)
     }
 
     miniUI::miniPage(
+        shinyjs::useShinyjs(),
+        
         miniUI::gadgetTitleBar("Create project tool", right = miniUI::miniTitleBarButton("create", "Create", TRUE)),
 
         miniUI::miniTabstripPanel(
@@ -453,6 +455,10 @@ newProject <- function(destPath = NULL)
                 updateTextInput(session, "destinationPath", value = dest)
         })
 
+        observeEvent(input$generateAnaInfo, {
+            shinyjs::toggle("removeAnalyses", condition = input$generateAnaInfo == "table")
+        })
+        
         observeEvent(input$analysesHot, {
             # HACK: input$analysesHot$params$maxRows: make sure we don't have empty table as hot_to_r errors otherwise
             if (input$analysesHot$params$maxRows > 0)

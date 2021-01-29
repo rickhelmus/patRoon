@@ -83,6 +83,7 @@ Imports:
     rstudioapi,
     htmlwidgets,
     shiny,
+    shinyjs,
     templates,
     CAMERA,
     enviPat,

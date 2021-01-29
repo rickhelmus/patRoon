@@ -77,8 +77,6 @@
         - already fixed?
     - calculatePeakQualities() sets method?
         - requires feature EIC method
-    - overlap(), plotUpSet(), plotVenn() method for sets
-        - needs setAbundance filter, so add that too
 - merging setObjects
     - check if more has to be cached and may need status messages
     - compound set consensus: scoreRanges should be re-determined from annotation results?
@@ -172,6 +170,7 @@
     - update for featThreshold and featThresholdAnn
         - put featThreshold in common arguments handbook table?
     - remove some aliases for generics now not unique to one class (eg unique/overlap)
+    - overlap/unique/plotVenn for sets: sets arg overrides which
 - tests
     - handle/test empty objects
     - test DA algorithms

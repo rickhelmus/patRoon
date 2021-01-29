@@ -214,6 +214,19 @@ setMethod("plotChroms", "featureGroupsSet", function(obj, ...)
 })
 
 #' @export
+setMethod("plotVenn", "featureGroupsSet", function(obj, which = NULL, ..., sets = FALSE)
+{
+    checkmate::assertFlag(sets)
+    if (sets)
+    {
+        mySets <- get("sets", pos = 2)(fGroups)
+        ai <- analysisInfo(obj)
+        which = sapply(mySets, function(s) ai[ai$set == s, "group"], simplify = FALSE)
+    }
+    callNextMethod(obj, which = which, ...)
+})
+
+#' @export
 setMethod("unique", "featureGroupsSet", function(x, which, ..., sets = FALSE)
 {
     checkmate::assertFlag(sets)

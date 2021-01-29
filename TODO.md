@@ -86,9 +86,7 @@
     - annotation columns not in report, fine? (there are many) If yes document
 - neutralizing / ionization
     - selectIons()
-        - makes sense to not choose monoisotopic mass? not for annotation at least
-            - if keep: add isonr to default set annotations table and as.data.table()/reportHTML()
-            - If not: remove isonr from set/non-set annotations table
+        - verify adduct and isotope charge and handle mismatch based on user input
 	    - prefer adducts based on MS/MS? eg handy for Na/K adducts
 	- makeSet()
 	    - fGroups: also support method via comparison?
@@ -113,6 +111,7 @@
             - current adduct conversion to this format doesn't mimic Cat and 2H/2Na etc
                 - Perhaps just document limitation?
         - minimal annotation abundance across analyses (eg adduct must be annotated in >=X analyses)?
+        - add intensity_rel column (needed by selectIons())
 - NEWS
     - [..., reAverage = FALSE] and implications of filtering when setting it to TRUE
     - Fixed Hill ordering: H wasn't alphabetical if no C is present

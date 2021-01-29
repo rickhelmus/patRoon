@@ -1550,17 +1550,15 @@ setMethod("calculatePeakQualities", "featureGroups", function(obj, weights, flat
 })
 
 #' @export
-setMethod("selectIons", "featureGroups", function(fGroups, components, prefAdduct, selectIsoBy = "mono")
+setMethod("selectIons", "featureGroups", function(fGroups, components, prefAdduct, onlyMonoIso = TRUE)
 {
     # UNDONE is intensity_rel a proper measure? ie does it allow comparison if
     # isotopes/adducts are taken from different analyses?
     # UNDONE: add logging to see what happens
-    # UNDONE: include isotope charge?
-    # UNDONE: does it make sense to keep isotope other than mono? can't use it for annotation
     
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(components, "components", add = ac)
-    checkmate::assertChoice(selectIsoBy, c("mono", "intensity"))
+    checkmate::assertFlag(onlyMonoIso, add = ac)
     checkmate::reportAssertions(ac)
     
     prefAdduct <- as.character(checkAndToAdduct(prefAdduct))
@@ -1571,14 +1569,20 @@ setMethod("selectIons", "featureGroups", function(fGroups, components, prefAdduc
     cTab <- as.data.table(components)
     cTab <- cTab[group %in% names(fGroups) & (!is.na(isonr) | !is.na(adduct_ion))]
     cTab[, remove := FALSE]
-    cTab[!is.na(isonr), remove := {
-        if (.N == 1)
-            FALSE
-        else if (selectIsoBy == "mono")
-            isonr != 0
+    if (onlyMonoIso)
+    {
+        if (all(is.na(cTab$isonr)))
+            cat("No isotope annotations available!\n")
         else
-            !numEQ(intensity_rel, max(intensity_rel))
-    }, by = c("name", "isogroup")]
+        {
+            cTab[!is.na(isonr), remove := {
+                if (.N == 1)
+                    FALSE
+                else
+                    isonr != 0
+            }, by = c("name", "isogroup")]
+        }
+    }
     
     cTab[!is.na(adduct_ion) & remove == FALSE, remove := {
         if (.N == 1)
@@ -1595,26 +1599,16 @@ setMethod("selectIons", "featureGroups", function(fGroups, components, prefAdduc
     
     # annotate remaining
     
-    cTabIso <- cTab[!is.na(isonr) & !remove]
     cTabAdd <- cTab[!is.na(adduct_ion) & !remove]
-    
-    if (nrow(cTabIso) == 0 && nrow(cTabAdd) == 0)
+
+    if (nrow(cTabAdd) == 0)
     {
         fGroups@annotations <- data.table()
-        cat("No adduct or isotope annotations found!\n")
+        cat("No adduct annotations found!\n")
     }
     else
     {
         fGroups@annotations <- data.table(group = names(fGroups))
-
-        if (nrow(cTabIso) > 0)
-        {
-            fGroups@annotations <- merge(fGroups@annotations, cTabIso[, c("group", "isonr"), with = FALSE],
-                                         by = "group", all.x = TRUE)
-            fGroups@annotations[is.na(isonr), isonr := 0]
-        }
-        else
-            fGroups@annotations[, isonr := 0]
         
         if (nrow(cTabAdd) > 0)
         {
@@ -1633,8 +1627,6 @@ setMethod("selectIons", "featureGroups", function(fGroups, components, prefAdduc
         fGroups@annotations <- fGroups@annotations[match(names(fGroups), group)]
         
         printf("Removed %d feature groups detected as unwanted adducts/isotopes\n", sum(cTab$remove))
-        printf("Annotated %d feature groups with isotope information\n", nrow(cTabIso))
-        printf("\tRemaining %d feature groups set as default isotope 0\n", length(fGroups) - nrow(cTabIso))
         printf("Annotated %d feature groups with adducts\n", nrow(cTabAdd))
         printf("\tRemaining %d feature groups set as default adduct %s\n", length(fGroups) - nrow(cTabAdd), prefAdduct)
     }

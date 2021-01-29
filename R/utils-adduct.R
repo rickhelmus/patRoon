@@ -29,7 +29,7 @@ checkAndToAdduct <- function(adduct, fGroups = NULL, .var.name = "adduct")
     {
         if (nrow(annotations(fGroups)) == 0)
             stop("The input feature groups are not annotated and no adduct is specified. ",
-                 "Please either perform annotations (eg with mergeIons()) or specify an adduct.")
+                 "Please either perform annotations (eg with selectIons()) or specify an adduct.")
         return(NULL) # NULL adduct is fine
     }
     

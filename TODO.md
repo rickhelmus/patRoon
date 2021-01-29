@@ -75,8 +75,7 @@
         - mergeScreeningSetInfos()
     - fix empty MS(MS) peaklists if unavailable during merging sets
         - already fixed?
-    - calculatePeakQualities() sets method?
-        - requires feature EIC method
+    - calculatePeakQualities() --> seems fine now
 - merging setObjects
     - check if more has to be cached and may need status messages
     - compound set consensus: scoreRanges should be re-determined from annotation results?

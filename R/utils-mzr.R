@@ -196,7 +196,7 @@ setMethod("getEICsForFGroups", "featureGroupsSet", function(fGroups, rtWindow, m
     return(EICs)
 })
 
-getEICsForFeatures <- function(features)
+setMethod("getEICsForFeatures", "features", function(features)
 {
     if (length(features) == 0)
         return(list())
@@ -232,7 +232,17 @@ getEICsForFeatures <- function(features)
     })
     
     return(pruneList(EICs))
-}
+})
+
+setMethod("getEICsForFeatures", "featuresSet", function(features)
+{
+    unsetFeatList <- sapply(sets(features), unset, obj = features, simplify = FALSE)
+    EICList <- sapply(unsetFeatList, getEICsForFeatures, simplify = FALSE)
+    EICs <- unlist(EICList, recursive = FALSE, use.names = FALSE) # use.names gives combined set/ana name, we just want ana
+    names(EICs) <- unlist(lapply(EICList, names))
+    EICs <- EICs[intersect(analyses(features), names(EICs))] # sync order
+    return(EICs)
+})
 
 averageSpectraMZR <- function(spectra, hd, clusterMzWindow, topMost, minIntensityPre,
                               minIntensityPost, avgFun, method, precursor,

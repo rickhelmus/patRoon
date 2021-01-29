@@ -13,7 +13,7 @@ setGeneric("averageGroups", function(fGroups, areas = FALSE) standardGeneric("av
 setGeneric("export", function(fGroups, type, out) standardGeneric("export"))
 setGeneric("unique", function(x, incomparables = FALSE, ...) standardGeneric("unique"))
 setGeneric("overlap", function(fGroups, which, exclusive = FALSE, ...) standardGeneric("overlap"))
-setGeneric("mergeIons", function(fGroups, components, prefAdduct, ...) standardGeneric("mergeIons"))
+setGeneric("selectIons", function(fGroups, components, prefAdduct, ...) standardGeneric("selectIons"))
 setGeneric("comparison", function(..., groupAlgo,
                                   groupArgs = list(rtalign = FALSE)) standardGeneric("comparison"), signature = "...")
 setGeneric("replicateGroupSubtract", function(fGroups, rGroups, threshold = 0) standardGeneric("replicateGroupSubtract"))

@@ -71,7 +71,7 @@ NULL
 #'   row within the feature table of the analysis (see
 #'   \code{\link{featureTable}}).
 #' @slot annotations A (\code{\link{data.table}}) with adduct/isotope
-#'   annotations for each group (see \code{\link{mergeIons}}).
+#'   annotations for each group (see \code{\link{selectIons}}).
 #'
 #' @templateVar class featureGroups
 #' @template class-hierarchy
@@ -1550,7 +1550,7 @@ setMethod("calculatePeakQualities", "featureGroups", function(obj, weights, flat
 })
 
 #' @export
-setMethod("mergeIons", "featureGroups", function(fGroups, components, prefAdduct, selectIsoBy = "mono")
+setMethod("selectIons", "featureGroups", function(fGroups, components, prefAdduct, selectIsoBy = "mono")
 {
     # UNDONE is intensity_rel a proper measure? ie does it allow comparison if
     # isotopes/adducts are taken from different analyses?

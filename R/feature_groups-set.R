@@ -272,7 +272,7 @@ setMethod("overlap", "featureGroupsSet", function(fGroups, which, exclusive, set
     return(ret)
 })
 
-setMethod("mergeIons", "featureGroupsSet", function(fGroups, components, prefAdduct, ...)
+setMethod("selectIons", "featureGroupsSet", function(fGroups, components, prefAdduct, ...)
 {
     setLen <- length(sets(fGroups))
     
@@ -287,7 +287,7 @@ setMethod("mergeIons", "featureGroupsSet", function(fGroups, components, prefAdd
     usFGroups <- sapply(sets(fGroups), unset, obj = fGroups, simplify = FALSE)
     usComponents <- sapply(sets(components), unset, obj = components, simplify = FALSE)
     usComponents <- usComponents[sets(fGroups)]
-    usFGroups <- Map(usFGroups, usComponents, prefAdduct, f = mergeIons, MoreArgs = list(...))
+    usFGroups <- Map(usFGroups, usComponents, prefAdduct, f = selectIons, MoreArgs = list(...))
     
     # and re-group with new adduct information
     return(do.call(makeSet, c(unname(usFGroups), list(groupAlgo = fGroups@groupAlgo, groupArgs = fGroups@groupArgs,
@@ -359,7 +359,7 @@ setMethod("makeSet", "featureGroups", function(obj, ..., groupAlgo, groupArgs = 
         for (i in seq_along(fGroupsList))
         {
             if (nrow(annotations(fGroupsList[[i]])) == 0)
-                stop("Missing feature ion annotations. Either set the adducts argument or run mergeIons()")
+                stop("Missing feature ion annotations. Either set the adducts argument or run selectIons()")
         }
         adducts <- adductsChr <- setNames(rep(list(NULL), length(fGroupsList)), names(fGroupsList))
     }

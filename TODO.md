@@ -85,8 +85,7 @@
         - or just new set filter described above?
     - annotation columns not in report, fine? (there are many) If yes document
 - neutralizing / ionization
-    - mergeIons()
-        - other name? selectIons()?
+    - selectIons()
         - makes sense to not choose monoisotopic mass? not for annotation at least
             - if keep: add isonr to default set annotations table and as.data.table()/reportHTML()
             - If not: remove isonr from set/non-set annotations table
@@ -96,7 +95,7 @@
     - what to do with unsupported adducts for annotation?
 	    - skip calculation with a warning?
 		    - default to M+H/M-H for now with warning...
-	    - default mergeIons() to only consider 'common' adducts? or change default adducts for componentization algos?
+	    - default selectIons() to only consider 'common' adducts? or change default adducts for componentization algos?
 	    - check better for what is supported by SIRIUS?
 	- replacement method for adducts, and possibly others (anaInfo, fGroups etc)
 	- feature components
@@ -110,7 +109,7 @@
 	        - parallelization?
 	        - change checkPackage GH link once PR is merged
 	        - verify adduct and isotope charge afterwards? let user decide what to clear if mismatch (eg isotope, adduct, both)
-	            - or in constructor? or in mergeIons?
+	            - or in constructor? or in selectIons?
             - current adduct conversion to this format doesn't mimic Cat and 2H/2Na etc
                 - Perhaps just document limitation?
         - minimal annotation abundance across analyses (eg adduct must be annotated in >=X analyses)?
@@ -161,7 +160,7 @@
     - suspect screening
         - explain three mass matching methods (see comments doScreenSuspects())
         - mention mz column can now be NA
-    - clearly document that mergeIons() for sets re-group --> new group names! (eg workflow objects now incompatible)
+    - clearly document that selectIons() for sets re-group --> new group names! (eg workflow objects now incompatible)
     - OpenMS adducts?
     - improve docs for areas (only affects when features=FALSE) and average (different behavior when features=TRUE/FALSE) for as.data.table() of featureGroups
     - update/check version nr mentioned in filter() for MSPeakLists

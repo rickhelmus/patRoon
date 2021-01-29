@@ -3,6 +3,23 @@
 #' @include features-set.R
 NULL
 
+minSetsFGroupsFilter <- function(fGroups, absThreshold = 0, relThreshold = 0, negate = FALSE, verbose = TRUE)
+{
+    threshold <- getHighestAbsValue(absThreshold, relThreshold, length(sets(fGroups)))
+    if (threshold == 0)
+        return(fGroups)
+    
+    setsAna <- analysisInfo(fGroups)$set
+    return(doFGroupsFilter(fGroups, "minimum sets", c(threshold, negate), function(fGroups)
+    {
+        pred <- function(x) length(unique(setsAna[x > 0])) >= threshold
+        if (negate)
+            pred <- Negate(pred)
+        
+        return(fGroups[, sapply(groupTable(fGroups), pred, USE.NAMES = FALSE)])
+    }, "minSets", verbose))
+}
+
 featureGroupsSet <- setClass("featureGroupsSet",
                              slots = c(groupAlgo = "character", groupArgs = "list", groupVerbose = "logical"),
                              contains = "featureGroups")
@@ -148,11 +165,14 @@ setMethod("as.data.table", "featureGroupsSet", function(x, average = FALSE, area
     return(ret[])
 })
 
-setMethod("filter", "featureGroupsSet", function(obj, ..., negate = FALSE, sets = NULL)
+setMethod("filter", "featureGroupsSet", function(obj, ..., negate = FALSE, sets = NULL, absMinSets = NULL,
+                                                 relMinSets = NULL)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertFlag(negate, add = ac)
     assertSets(obj, sets, TRUE, add = ac)
+    aapply(checkmate::assertNumber, . ~ absMinSets + relMinSets, lower = 0, finite = TRUE, null.ok = TRUE,
+           fixed = list(add = ac))
     checkmate::reportAssertions(ac)
 
     if (!is.null(sets) && length(sets) > 0)
@@ -163,7 +183,11 @@ setMethod("filter", "featureGroupsSet", function(obj, ..., negate = FALSE, sets 
     }
 
     if (...length() > 0)
-        return(callNextMethod(obj, ..., negate = negate))
+        obj <- callNextMethod(obj, ..., negate = negate)
+    
+    if (!is.null(absMinSets) || !is.null(relMinSets))
+        obj <- minSetsFGroupsFilter(absMinSets, relMinSets, negate = negate)
+
     return(obj)
 })
 
@@ -190,15 +214,49 @@ setMethod("plotChroms", "featureGroupsSet", function(obj, ...)
 })
 
 #' @export
-setMethod("unique", "featureGroupsSet", function(x, which, ..., sets = NULL)
+setMethod("unique", "featureGroupsSet", function(x, which, ..., sets = FALSE)
 {
-    assertSets(x, sets, TRUE)
-    if (!is.null(sets))
+    checkmate::assertFlag(sets)
+    if (sets)
     {
         ai <- analysisInfo(x)
-        which <- unique(ai[ai$set %in% sets, "group"])
+        which <- unique(ai[ai$set %in% which, "group"])
     }
     callNextMethod(x, which = which, ...)
+})
+
+#' @export
+setMethod("overlap", "featureGroupsSet", function(fGroups, which, exclusive, sets = FALSE)
+{
+    mySets <- get("sets", pos = 2)(fGroups)
+    
+    checkmate::assertFlag(sets)
+    
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertCharacter(which, min.len = 2, min.chars = 1, any.missing = FALSE, add = ac)
+    checkmate::assertSubset(which, if (sets) mySets else replicateGroups(fGroups),
+                            empty.ok = FALSE, add = ac)
+    checkmate::assertFlag(exclusive, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    if (sets)
+    {
+        anaInfo <- analysisInfo(fGroups)
+        
+        if (length(which) < 2 || length(fGroups) == 0)
+            return(fGroups) # nothing to do...
+        
+        if (exclusive)
+            ret <- unique(fGroups, which = which, sets = TRUE)
+        else
+            ret <- fGroups[, sets = which]
+        
+        ret <- minSetsFGroupsFilter(ret, relThreshold = 1, verbose = FALSE)
+    }
+    else
+        ret <- callNextMethod(fGroups, which = which, exclusive = exclusive)
+    
+    return(ret)
 })
 
 setMethod("mergeIons", "featureGroupsSet", function(fGroups, components, prefAdduct, ...)

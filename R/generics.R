@@ -12,7 +12,7 @@ setGeneric("removeEmptyAnalyses", function(fGroups) standardGeneric("removeEmpty
 setGeneric("averageGroups", function(fGroups, areas = FALSE) standardGeneric("averageGroups"))
 setGeneric("export", function(fGroups, type, out) standardGeneric("export"))
 setGeneric("unique", function(x, incomparables = FALSE, ...) standardGeneric("unique"))
-setGeneric("overlap", function(fGroups, which, exclusive = FALSE) standardGeneric("overlap"))
+setGeneric("overlap", function(fGroups, which, exclusive = FALSE, ...) standardGeneric("overlap"))
 setGeneric("mergeIons", function(fGroups, components, prefAdduct, ...) standardGeneric("mergeIons"))
 setGeneric("comparison", function(..., groupAlgo,
                                   groupArgs = list(rtalign = FALSE)) standardGeneric("comparison"), signature = "...")

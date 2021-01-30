@@ -66,24 +66,27 @@
     - MetaClean model import/export
     - updatePICSet(): also sync peaks list? otherwise doc
     - update docs and checkChromatograms() for mzWindow --> mzExpWindow
-    - XCMS3 grouping without analyses
     - newProject(): new algorithms
     - getEICsForFeatures method for kpic2?
     - optimize hashing? Or further avoid hashing big objects/objects with lists?
     - make parallel flag and switch to old prog bar if not set
     - test parallel IPO
+    - rename exportedData, update docs (also handbook)
+    - remove featuresOpenMS method for getXCMSSet(), update docs
 - finish feature syncing
     - clarify reportCSV() now only reports remaining features?
 - (finish) implement(ing) replace methods for setting feature(Group) data
     - verify user input
     - see if more object updates are needed
     - docs (also check args in ref docs), tests, NEWS
+    - or just not export for now...
 - NEWS
     - topMostByRGroup/EICTopMostByRGroup
     - as.data.table: qualities argument (and potentially faster now with features=T?)
     - optimized feature group filters
     - reportHTML: EICs shared amongst EIC and annotation tab, annotation EIC now scaled
     - ... for findFeaturesXCMS3
+    - XCMS3 grouping/import with exportedData and comparison() supports xcms3
 - tests
     - topMostByRGroup
 - docs

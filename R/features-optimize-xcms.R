@@ -68,6 +68,8 @@ featuresOptimizerXCMS$methods(
         return(params_1)
     },
 
+    fixDesignParam = function(param, value) if (param %in% c("steps", "prefilter")) round(value) else value,
+    
     fixOptParamBounds = function(param, bounds)
     {
         if (param == "steps" || param == "prefilter")

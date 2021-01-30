@@ -4,6 +4,7 @@
 - Fixed: (harmless) `mapply` warning was shown with `newProject()`
 - `newProject()`: don't show _Remove_ button in analyses select screen when the script option is selected, as this will not work properly.
 - `IPO`: add default limits for OpenMS `traceTermOutliers`
+- `IPO` optimization fix: integer parameters are properly rounded
 
 
 # patRoon 1.2.0

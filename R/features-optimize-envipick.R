@@ -6,6 +6,8 @@ featuresOptimizerEnviPick <- setRefClass("featuresOptimizerEnviPick", contains =
 
 featuresOptimizerEnviPick$methods(
 
+    fixDesignParam = function(param, value) if (param %in% c("minpeak", "ended", "recurs")) round(value) else value,
+    
     fixOptParamBounds = function(param, bounds)
     {
         if (param %in% c("minpeak", "ended", "recurs"))

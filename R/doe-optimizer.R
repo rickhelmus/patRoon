@@ -11,6 +11,7 @@ DoEOptimizer$methods(
     checkInitialParams = function(params) params,
     defaultParamRanges = function(params) list(),
     convertOptToCallParams = function(params) params,
+    fixDesignParam = function(param, value) value,
     fixOptParamBounds = function(params, bounds) bounds,
     fixOptParams = function(params) params,
 
@@ -65,6 +66,9 @@ DoEOptimizer$methods(
                                     max(typParams$to_optimize[[1]]),
                                     diff(typParams$to_optimize[[1]]) / 8)
         }
+        
+        for (col in names(typParams$to_optimize))
+            designParams[[col]] <- sapply(designParams[[col]], .self$fixDesignParam, param = col)
 
         printf("---\nDesign:\n")
         print(designParams)
@@ -117,6 +121,7 @@ DoEOptimizer$methods(
         if (!is.list(runParams))
             runParams <- as.list(runParams)
 
+        runParams <- Map(.self$fixDesignParam, names(runParams), runParams)
         runParams <- convertOptToCallParams(runParams)
         result$finalResult <- calculateResponse(runParams, 1, TRUE)
         result$finalResult$parameters <- runParams
@@ -147,6 +152,7 @@ DoEOptimizer$methods(
             }
 
             runParams <- runParamsNoCall <- utilsIPO$decodeAll(vals, params$to_optimize)
+            runParams <- Map(.self$fixDesignParam, names(runParams), runParams)
             runParams <- combineParams(runParams, params$no_optimization)
 
             # re-run as object wasn't stored

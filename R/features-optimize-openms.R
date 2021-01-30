@@ -16,6 +16,8 @@ featuresOptimizerOpenMS$methods(
         return(params)
     },
 
+    fixDesignParam = function(param, value) if (param == "traceTermOutliers") round(value) else value,
+    
     fixOptParamBounds = function(param, bounds)
     {
         if (param == "traceTermOutliers")

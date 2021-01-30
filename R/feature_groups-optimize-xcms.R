@@ -34,6 +34,8 @@ featureGroupsOptimizerXCMS$methods(
     checkInitialParams = function(params) flattenParams(params, TRUE),
     getOptSettingRange = function(settingName, params, paramRanges) callSuper(settingName, params, flattenParams(paramRanges, FALSE)),
     
+    fixDesignParam = function(param, value) if (param %in% c("extra", "missing")) round(value) else value,
+    
     fixOptParamBounds = function(param, bounds)
     {
         if (param %in% c("extra", "missing"))

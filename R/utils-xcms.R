@@ -207,9 +207,25 @@ setMethod("getXCMSSet", "featureGroupsXCMS", function(obj, verbose, exportedData
 
 #' @rdname xcms-conv
 #' @export
-setMethod("getXCMSnExp", "features", function(obj, verbose)
+setMethod("getXCMSnExp", "features", function(obj, verbose, exportedData)
 {
-    rawData <- readMSDataForXCMS3(analysisInfo(obj))
+    checkmate::assertFlag(exportedData)
+    
+    rawData <- NULL
+    if (exportedData)
+        rawData <- readMSDataForXCMS3(analysisInfo(obj))
+    else
+    {
+        # create a dummy MSnExp object
+        
+        anaInfo <- analysisInfo(obj)
+        rawData <- new("OnDiskMSnExp", processingData = new("MSnProcess",
+                                                            files = anaInfo$analysis))
+        xcms::phenoData(rawData) <- new("NAnnotatedDataFrame",
+                                        data.frame(sample_name = anaInfo$analysis,
+                                                   sample_group = anaInfo$group,
+                                                   stringsAsFactors = FALSE))
+    }
 
     msLevel = 1L # UNDONE?
 
@@ -256,21 +272,23 @@ setMethod("getXCMSnExp", "features", function(obj, verbose)
 
 #' @rdname xcms-conv
 #' @export
-setMethod("getXCMSnExp", "featuresXCMS3", function(obj, verbose)
+setMethod("getXCMSnExp", "featuresXCMS3", function(obj, ...)
 {
     return(obj@xdata)
 })
 
 #' @rdname xcms-conv
 #' @export
-setMethod("getXCMSnExp", "featureGroups", function(obj, verbose)
+setMethod("getXCMSnExp", "featureGroups", function(obj, verbose, exportedData)
 {
+    checkmate::assertFlag(verbose)
+    
     if (verbose)
         cat("Getting ungrouped XCMSnExp...\n")
 
     msLevel = 1L # UNDONE?
 
-    xdata <- getXCMSnExp(getFeatures(obj), verbose = verbose)
+    xdata <- getXCMSnExp(getFeatures(obj), verbose = verbose, exportedData = exportedData)
 
     xsgrps <- makeXCMSGroups(obj, verbose)
     xsgrps$groups[, peakidx := list(xsgrps$idx)]
@@ -295,7 +313,7 @@ setMethod("getXCMSnExp", "featureGroups", function(obj, verbose)
 
 #' @rdname xcms-conv
 #' @export
-setMethod("getXCMSnExp", "featureGroupsXCMS3", function(obj, verbose)
+setMethod("getXCMSnExp", "featureGroupsXCMS3", function(obj, verbose, exportedData)
 {
     # first see if we can just return the embedded xcms object
     # NOTE: we can't do this if analyses have been subset
@@ -304,7 +322,7 @@ setMethod("getXCMSnExp", "featureGroupsXCMS3", function(obj, verbose)
 
     if (nrow(Biobase::pData(obj@xdata)) != length(anaInfo$analysis) ||
         !all(simplifyAnalysisNames(Biobase::pData(obj@xdata)$sample_name) == anaInfo$analysis))
-        return(callNextMethod(obj, verbose = verbose))
+        return(callNextMethod(obj, verbose = verbose, exportedData = exportedData))
 
     return(obj@xdata)
 })

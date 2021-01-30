@@ -27,7 +27,7 @@ setMethod("initialize", "featureGroupsXCMS3",
 #'
 #' @rdname feature-grouping
 #' @export
-groupFeaturesXCMS3 <- function(feat, rtalign = TRUE,
+groupFeaturesXCMS3 <- function(feat, rtalign = TRUE, exportedData = TRUE,
                                groupParam = xcms::PeakDensityParam(sampleGroups = analysisInfo(feat)$group),
                                retAlignParam = xcms::ObiwarpParam(), verbose = TRUE)
 {
@@ -35,7 +35,7 @@ groupFeaturesXCMS3 <- function(feat, rtalign = TRUE,
 
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(feat, "features", add = ac)
-    aapply(checkmate::assertFlag, . ~ rtalign + verbose, fixed = list(add = ac))
+    aapply(checkmate::assertFlag, . ~ rtalign + exportedData + verbose, fixed = list(add = ac))
     assertS4(groupParam, add = ac)
     assertS4(retAlignParam, add = ac)
     checkmate::reportAssertions(ac)
@@ -45,7 +45,7 @@ groupFeaturesXCMS3 <- function(feat, rtalign = TRUE,
     if (length(feat) == 0)
         return(featureGroupsXCMS(analysisInfo = anaInfo, features = feat))
 
-    hash <- makeHash(feat, rtalign, groupParam, retAlignParam)
+    hash <- makeHash(feat, rtalign, exportedData, groupParam, retAlignParam)
     cachefg <- loadCacheData("featureGroupsXCMS3", hash)
     if (!is.null(cachefg))
         return(cachefg)
@@ -53,9 +53,14 @@ groupFeaturesXCMS3 <- function(feat, rtalign = TRUE,
     if (verbose)
         cat("Grouping features with XCMS...\n===========\n")
 
-    xdata <- getXCMSnExp(feat)
+    xdata <- getXCMSnExp(feat, verbose = verbose, exportedData = exportedData)
 
-    if (rtalign)
+    if (!exportedData && rtalign)
+    {
+        if (verbose)
+            cat("Skipping RT alignment: no raw data\n")
+    }
+    else if (rtalign)
     {
         # group prior to alignment when using the peaks group algorithm
         if (isXCMSClass(retAlignParam, "PeakGroupsParam"))

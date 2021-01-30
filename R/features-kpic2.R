@@ -232,7 +232,7 @@ setMethod("getPICSet", "features", function(obj, exportedData = TRUE)
             ret$pics <- ret$peaks <- list()
         }
         
-        ret$peakinfo <- makeKPIC2PeakInfo(fList[[anai]])
+        ret$peakinfo <- makeKPIC2PeakInfo(fTable[[anai]])
 
         return(ret)
     }))

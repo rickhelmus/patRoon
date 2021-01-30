@@ -45,4 +45,5 @@ generateFeatureOptPSetOpenMS <- function(...)
                 maxFWHM = c(35, 65)))
 }
 
-getDefFeaturesOptParamRangesOpenMS <- function(params) list(localMZRange = c(0.00001, Inf))
+getDefFeaturesOptParamRangesOpenMS <- function(params) list(localMZRange = c(0.00001, Inf),
+                                                            traceTermOutliers = c(1, Inf))

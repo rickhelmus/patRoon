@@ -3,6 +3,7 @@
 - Fixed: XCMS feature grouping didn't work when the `peakgroups` alignment method was used (fixes issue #22)
 - Fixed: (harmless) `mapply` warning was shown with `newProject()`
 - `newProject()`: don't show _Remove_ button in analyses select screen when the script option is selected, as this will not work properly.
+- `IPO`: add default limits for OpenMS `traceTermOutliers`
 
 
 # patRoon 1.2.0

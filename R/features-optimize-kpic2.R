@@ -12,6 +12,8 @@ featuresOptimizerKPIC2$methods(
         return(params)
     },
     
+    fixDesignParam = function(param, value) if (param == "gap") round(value) else value,
+    
     fixOptParamBounds = function(param, bounds)
     {
         if (param == "gap")

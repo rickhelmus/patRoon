@@ -20,5 +20,11 @@ featuresOptimizerXCMS3$methods(
     }
 )
 
-generateFeatureOptPSetXCMS3 <- generateFeatureOptPSetXCMS
+generateFeatureOptPSetXCMS3 <- function(...)
+{
+    ret <- generateFeatureOptPSetXCMS(...)
+    if (!is.null(ret[["step"]]))
+        names(ret)[which(names(ret) == "step")] <- "binSize"
+    return(ret)
+}
 getDefFeaturesOptParamRangesXCMS3 <- getDefFeaturesOptParamRangesXCMS

@@ -5,6 +5,7 @@
 - `newProject()`: don't show _Remove_ button in analyses select screen when the script option is selected, as this will not work properly.
 - `IPO`: add default limits for OpenMS `traceTermOutliers`
 - `IPO` optimization fix: integer parameters are properly rounded
+- Fixed: `generateFeatureOptPSet("xcms3", method="matchedFilter")` would return a parameter set with `step` instead of `binSize` (issue #23)
 
 
 # patRoon 1.2.0

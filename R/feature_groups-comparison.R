@@ -169,8 +169,7 @@ convertFeatureGroupsToFeatures <- function(fGroupsList)
 #'
 #' @param groupAlgo The \code{\link[=feature-grouping]{feature grouping
 #'   algorithm}} that should be used for grouping \emph{pseudo} features (see
-#'   details). Valid values are: \code{"xcms"} or \code{"openms"}. Note:
-#'   \code{xcms3} is not (yet) supported.
+#'   details). Valid values are: \code{"xcms"}, \code{xcms3} or \code{"openms"}.
 #' @param groupArgs A \code{list} containing further parameters for
 #'   \code{\link[=feature-grouping]{feature grouping}}.
 #' @param x,obj The \code{featureGroupsComparison} object.
@@ -186,7 +185,7 @@ setMethod("comparison", "featureGroups", function(..., groupAlgo, groupArgs = li
     fGroupsList <- list(...)
 
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertChoice(groupAlgo, c("xcms", "openms"), add = ac)
+    checkmate::assertChoice(groupAlgo, c("xcms", "xcms3", "openms"), add = ac)
     checkmate::assertList(groupArgs, any.missing = FALSE, names = "unique", add = ac)
     checkmate::assertList(fGroupsList, types = "featureGroups", min.len = 2, any.missing = FALSE,
                           unique = TRUE, .var.name = "...", add = ac)
@@ -198,7 +197,7 @@ setMethod("comparison", "featureGroups", function(..., groupAlgo, groupArgs = li
     # convert feature groups to features
     featsFromGroups <- convertFeatureGroupsToFeatures(fGroupsList)
 
-    if (groupAlgo == "xcms")
+    if (groupAlgo == "xcms" || groupAlgo == "xcms3")
         groupArgs <- c(list(exportedData = FALSE), groupArgs)
     compGroups <- do.call(groupFeatures, c(list(featsFromGroups, groupAlgo), groupArgs))
 

@@ -41,7 +41,7 @@ setGeneric("getPICSet", function(obj, ...) standardGeneric("getPICSet"))
 setGeneric("getXCMSSet", function(obj, verbose = TRUE, ...) standardGeneric("getXCMSSet"))
 
 #' @rdname xcms-conv
-setGeneric("getXCMSnExp", function(obj, verbose = TRUE) standardGeneric("getXCMSnExp"))
+setGeneric("getXCMSnExp", function(obj, verbose = TRUE, ...) standardGeneric("getXCMSnExp"))
 
 ### MS Peak Lists
 

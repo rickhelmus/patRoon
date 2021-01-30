@@ -7,7 +7,7 @@ updateXData <- function(obj)
     
     cat("Updating XCMS object...\n")
     # NOTE: use base method to force update as overloaded method simply returns @xdata slot
-    obj@xdata <- selectMethod(getXCMSnExp, "features")(obj, TRUE)
+    obj@xdata <- selectMethod(getXCMSnExp, "features")(obj, exportedData = TRUE)
     return(obj)
 }
 

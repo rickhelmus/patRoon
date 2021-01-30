@@ -59,6 +59,7 @@
 - Check: units of plotChord() rt/mz graphs seems off
 - checkFeatures()
     - filter negate: don't remove kept fGroups if features were changed?
+    - remove plotly (and others) from DESCRIPTION
 - misc
     - topMostByRGroup: make default? or only for reporting?
     - quality/score filters

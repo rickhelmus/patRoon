@@ -86,7 +86,7 @@ doCreateProject <- function(input, analyses)
         write.csv(analyses[, c("path", "analysis", "group", "blank")],
                   file.path(input$destinationPath, input$analysisTableFile), row.names = FALSE)
 
-    if (input$genIDLevelFile)
+    if (nzchar(input$suspectList) && input$annotateSus && input$genIDLevelFile)
         genIDLevelRulesFile(file.path(input$destinationPath, "idlevelrules.yml"))
     
     code <- getScriptCode(input, analyses)

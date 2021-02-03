@@ -6,6 +6,8 @@
 - `IPO`: add default limits for OpenMS `traceTermOutliers`
 - `IPO` optimization fix: integer parameters are properly rounded
 - Fixed: `generateFeatureOptPSet("xcms3", method="matchedFilter")` would return a parameter set with `step` instead of `binSize` (issue #23)
+- Fixed: `newProject()` would generate an ID levels configuration file even when no suspect list was selected.
+
 
 
 # patRoon 1.2.0

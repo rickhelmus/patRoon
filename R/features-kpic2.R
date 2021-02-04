@@ -120,8 +120,6 @@ findfeaturesKPIC2 <- function(analysisInfo, kmeans, level = 1000, ..., parallel 
     if (verbose)
         printf("Finding features with KPIC2 for %d analyses ...\n", nrow(analysisInfo))
 
-    prog <- progressr::progressor(steps = nrow(analysisInfo), enable = verbose)
-
     doKP <- function(ana, path)
     {
         inFile <- getMzMLOrMzXMLAnalysisPath(ana, path)
@@ -136,15 +134,16 @@ findfeaturesKPIC2 <- function(analysisInfo, kmeans, level = 1000, ..., parallel 
         pics <- KPIC::PICsplit(pics) # UNDONE: make optional?
         pics <- KPIC::getPeaks(pics)
         
-        prog()
+        patRoon:::doProgress()
         
         return(pics)
     }
     
     if (parallel)
-        allPics <- future.apply::future_Map(doKP, analysisInfo$analysis, analysisInfo$path)
+        allPics <- withProg(nrow(analysisInfo), future.apply::future_Map(doKP, analysisInfo$analysis,
+                                                                          analysisInfo$path))
     else
-        allPics <- Map(doKP, analysisInfo$analysis, analysisInfo$path)
+        allPics <- withProg(nrow(analysisInfo), Map(doKP, analysisInfo$analysis, analysisInfo$path))
     
     ret <- importfeaturesKPIC2(allPics, analysisInfo)
 

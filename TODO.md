@@ -87,6 +87,7 @@
     - reportHTML: EICs shared amongst EIC and annotation tab, annotation EIC now scaled
     - ... for findFeaturesXCMS3
     - XCMS3 grouping/import with exportedData and comparison() supports xcms3
+    - progressr
 - tests
     - topMostByRGroup
 - docs
@@ -101,6 +102,7 @@
         - checkFeatures()
     - update IPO docs for kpic2 (and mention min/max_width split and others)
     - ... for findFeaturesXCMS3
+    - progressr
 
 
 ## MSPeakLists

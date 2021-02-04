@@ -229,6 +229,16 @@ setMethod("groupScores", "featureGroups", function(fGroups) fGroups@groupScores)
 #' @export
 setMethod("annotations", "featureGroups", function(fGroups) fGroups@annotations)
 
+#' @describeIn featureGroups Returns a named \code{character} with annotated adducts for each feature group.
+#' @aliases adducts
+#' @export
+setMethod("adducts", "featureGroups", function(fGroups)
+{
+    if (nrow(annotations(fGroups)) == 0)
+        return(character())
+    return(setNames(annotations(fGroups)$adduct, annotations(fGroups)$group))
+})
+
 #' @describeIn featureGroups Subset on analyses/feature groups.
 #' @param rGroups An optional \code{character} vector: if specified only keep
 #'   results for the given replicate groups (equivalent to the \code{rGroups}

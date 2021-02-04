@@ -88,3 +88,31 @@ doFGroupsFilter <- function(fGroups, what, hashParam, func, cacheCateg = what, v
     
     return(ret)
 }
+
+# used by adducts()<- methods
+updateAnnAdducts <- function(annTable, gInfo, adducts)
+{
+    if (nrow(annTable) > 0)
+    {
+        # only consider changed
+        adducts <- adducts[adducts != annTable$adduct]
+        
+        if (length(adducts) == 0)
+            return(annTable) # nothing changed
+    }
+    
+    adducts <- sapply(adducts, checkAndToAdduct, .var.name = "value", simplify = FALSE)
+    adductsChr <- sapply(adducts, as.character) # re-make characters: standardize format
+    nm <- gInfo[names(adducts), "mzs"] - sapply(adducts, adductMZDelta)
+    
+    if (nrow(annTable) > 0)
+    {
+        # update table
+        annTable <- copy(annTable)
+        annTable[match(names(adducts), group), c("adduct", "neutralMass") := .(adductsChr, nm)][]
+    }
+    else # initialize table
+        annTable <- data.table(group = names(adducts), adduct = adductsChr, neutralMass = nm)
+    
+    return(annTable)
+}

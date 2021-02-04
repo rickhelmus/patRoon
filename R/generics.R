@@ -141,6 +141,15 @@ setGeneric("experimentInfo", function(object, paramSet, DoEIteration) standardGe
 #' @name generics
 NULL
 
+#' @templateVar func adducts
+#' @templateVar desc returns assigned adducts of the object.
+#' @template generics
+setGeneric("adducts", function(obj, ...) standardGeneric("adducts"))
+
+#' @templateVar func adducts<-
+#' @templateVar desc sets adducts of the object.
+#' @template generics
+setGeneric("adducts<-", function(obj, value, ...) standardGeneric("adducts<-"))
 
 #' @templateVar func algorithm
 #' @templateVar desc returns the algorithm that was used to generate the object.

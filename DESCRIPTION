@@ -211,6 +211,7 @@ Collate:
     'utils-mspeaklists.R'
     'utils-optimize.R'
     'utils-plot.R'
+    'utils-progress.R'
     'utils-xcms.R'
     'zzz.R'
 VignetteBuilder: knitr

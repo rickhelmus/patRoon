@@ -364,24 +364,20 @@ setMethod("makeSet", "featureGroups", function(obj, ..., groupAlgo, groupArgs = 
         adducts <- adductsChr <- setNames(rep(list(NULL), length(fGroupsList)), names(fGroupsList))
     }
     
-    # prepare features: add adducts needed for neutralization and remove left-over features
+    # prepare features: add adducts needed for neutralization and clearout group assignments
     fGroupsList <- Map(fGroupsList, adductsChr, f = function(fGroups, add)
     {
         ftindAna <- transpose(groupFeatIndex(fGroups))
         ann <- annotations(fGroups)
         
-        fGroups@features@features <- Map(featureTable(fGroups), ftindAna, f = function(ft, fti)
+        fGroups@features@features <- lapply(featureTable(fGroups), function(ft)
         {
-            gInds <- which(fti != 0)
-            fti <- fti[fti != 0]
             ft <- copy(ft)
             if (!is.null(add))
-                ft[fti, adduct := add]
+                ft[, adduct := add]
             else
-                ft[fti, adduct := ann$adduct[gInds]]
-            
-            ft <- ft[fti] # remove features not in any group
-            
+                ft[, adduct := ann[match(ft$group, group)]$adduct]
+            ft[, group := NULL]
             return(ft)
         })
         return(fGroups)

@@ -55,7 +55,6 @@
     - document which filters work on feature level (e.g. chromWidth)
     - remove zero values for maxReplicateIntRSD?
 - importFeaturesXCMS/importFeaturesXCMS3/importFeatureGroupsXCMS: get rid of anaInfo arg requirement? (or make import func?)
-- comparison(): support xcms3? (needs missing support for missing raw data)
 - Fix: blank filter with multiple replicate groups (and maybe others?)
 - Check: units of plotChord() rt/mz graphs seems off
 - checkFeatures()
@@ -69,7 +68,6 @@
     - newProject(): new algorithms
     - getEICsForFeatures method for kpic2?
     - optimize hashing? Or further avoid hashing big objects/objects with lists?
-    - make parallel flag and switch to old prog bar if not set
     - test parallel IPO
     - rename exportedData, update docs (also handbook)
     - remove featuresOpenMS method for getXCMSSet(), update docs

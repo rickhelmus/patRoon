@@ -404,12 +404,12 @@ assertCheckComponentsSession <- function(x, components, mustExist, canClearSessi
                        .var.name, add)
 }
 
-assertSets <- function(obj, s, multiple, null.ok = multiple, add = NULL)
+assertSets <- function(obj, s, multiple, null.ok = multiple, .var.name = checkmate::vname(s), add = NULL)
 {
     if (multiple)
-        checkmate::assertSubset(s, sets(obj), empty.ok = null.ok, add = add)
+        checkmate::assertSubset(s, sets(obj), empty.ok = null.ok, .var.name = .var.name, add = add)
     else
-        checkmate::assertChoice(s, sets(obj), null.ok = null.ok, add = add)
+        checkmate::assertChoice(s, sets(obj), null.ok = null.ok, .var.name = .var.name, add = add)
 }
 
 assertMakeSetArgs <- function(objects, class, adducts, adductNullOK, labels, add = NULL)

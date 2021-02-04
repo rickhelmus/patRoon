@@ -165,6 +165,7 @@
         - put featThreshold in common arguments handbook table?
     - remove some aliases for generics now not unique to one class (eg unique/overlap)
     - overlap/unique/plotVenn for sets: sets arg overrides which
+    - adducts<-
 - tests
     - handle/test empty objects
     - test DA algorithms

@@ -166,6 +166,8 @@
     - remove some aliases for generics now not unique to one class (eg unique/overlap)
     - overlap/unique/plotVenn for sets: sets arg overrides which
     - adducts<-
+        - for sets: make clear that order/names are taken from annTab[set == s]
+        - for sets: example with reGroup
 - tests
     - handle/test empty objects
     - test DA algorithms

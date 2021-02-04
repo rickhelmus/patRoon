@@ -26,6 +26,51 @@ featureGroupsSet <- setClass("featureGroupsSet",
 
 setMethod("sets", "featureGroupsSet", function(obj) sets(getFeatures(obj)))
 
+#' @export
+setMethod("adducts", "featureGroupsSet", function(obj, set)
+{
+    assertSets(obj, set, FALSE)
+    s <- set # workaround for below to distinguish between DT and parent set
+    ann <- annotations(obj)[set == s]
+    return(setNames(ann$adduct, ann$group))
+})
+
+#' @export
+setReplaceMethod("adducts", "featureGroupsSet", function(obj, value, set, reGroup = TRUE)
+{
+    assertSets(obj, set, FALSE)
+    
+    s <- set
+    ann <- annotations(obj)[set == s]
+    
+    checkmate::assertCharacter(value, min.chars = 1, any.missing = FALSE, len = nrow(ann))
+    
+    if (checkmate::testNamed(value))
+    {
+        checkmate::assertNames(names(value), permutation.of = ann$group, .var.name = "value")
+        value <- value[ann$group] # ensure correct order
+    }
+    else
+        names(value) <- ann$group
+
+    updatedAnn <- updateAnnAdducts(ann, groupInfo(obj), value)
+    
+    if (!isTRUE(all.equal(annotations(obj), updatedAnn)))
+    {
+        obj@annotations <- rbind(obj@annotations[set != s], updatedAnn)
+        
+        if (reGroup)
+        {
+            usFGroups <- sapply(sets(obj), unset, obj = obj, simplify = FALSE)
+            obj <- do.call(makeSet, c(unname(usFGroups), list(groupAlgo = obj@groupAlgo, groupArgs = obj@groupArgs,
+                                                              verbose = obj@groupVerbose, labels = names(usFGroups),
+                                                              adducts = NULL)))
+        }
+    }
+    
+    return(obj)
+})
+
 setMethod("removeGroups", "featureGroupsSet", function(fGroups, indices, updateFeatures)
 {
     # HACK: subset annotations here as format with sets is different

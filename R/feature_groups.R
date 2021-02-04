@@ -225,60 +225,36 @@ setMethod("groupQualities", "featureGroups", function(fGroups) fGroups@groupQual
 setMethod("groupScores", "featureGroups", function(fGroups) fGroups@groupScores)
 
 #' @describeIn featureGroups Accessor for \code{annotations} slot.
-#' @aliases annotations
 #' @export
 setMethod("annotations", "featureGroups", function(fGroups) fGroups@annotations)
 
 #' @describeIn featureGroups Returns a named \code{character} with adducts assigned to each feature group.
-#' @aliases adducts
 #' @export
-setMethod("adducts", "featureGroups", function(fGroups)
+setMethod("adducts", "featureGroups", function(obj)
 {
-    if (nrow(annotations(fGroups)) == 0)
+    if (nrow(annotations(obj)) == 0)
         return(character())
-    return(setNames(annotations(fGroups)$adduct, annotations(fGroups)$group))
+    return(setNames(annotations(obj)$adduct, annotations(obj)$group))
 })
 
 #' @describeIn featureGroups Sets adducts for feature groups.
 #' @aliases adducts<-
 #' @export
-setReplaceMethod("adducts", "featureGroups", function(fGroups, value)
+setReplaceMethod("adducts", "featureGroups", function(obj, value)
 {
-    checkmate::assertCharacter(value, min.chars = 1, any.missing = FALSE, len = length(fGroups))
+    checkmate::assertCharacter(value, min.chars = 1, any.missing = FALSE, len = length(obj))
     
     if (checkmate::testNamed(value))
     {
-        checkmate::assertNames(names(value), permutation.of = names(fGroups), .var.name = "value")
-        value <- value[names(fGroups)] # ensure correct order
+        checkmate::assertNames(names(value), permutation.of = names(obj), .var.name = "value")
+        value <- value[names(obj)] # ensure correct order
     }
     else
-        names(value) <- names(fGroups)
-
-    curAnn <- annotations(fGroups)
-        
-    if (nrow(curAnn) > 0)
-    {
-        # only consider changed
-        value <- value[value != curAnn$adduct]
-        
-        if (length(value) == 0)
-            return(fGroups) # nothing changed
-    }
+        names(value) <- names(obj)
     
-    adducts <- sapply(value, checkAndToAdduct, .var.name = "value", simplify = FALSE)
-    adductsChr <- sapply(value, as.character) # re-make characters: standardize format
-    nm <- groupInfo(fGroups)[names(adducts), "mzs"] - sapply(adducts, adductMZDelta)
+    obj@annotations <- updateAnnAdducts(annotations(obj), groupInfo(obj), value)
     
-    if (nrow(curAnn) > 0)
-    {
-        # update table
-        fGroups@annotations <- copy(fGroups@annotations)
-        fGroups@annotations[match(names(adducts), group), c("adduct", "neutralMass") := .(adductsChr, nm)][]
-    }
-    else # initialize table
-        fGroups@annotations <- data.table(group = names(adducts), adduct = adductsChr, neutralMass = nm)
-
-    return(fGroups)
+    return(obj)
 })
 
 #' @describeIn featureGroups Subset on analyses/feature groups.

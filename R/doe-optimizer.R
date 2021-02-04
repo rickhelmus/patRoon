@@ -78,8 +78,6 @@ DoEOptimizer$methods(
         designParams <- combineParams(designParams, typParams$no_optimization)
         tasks <- seq_len(nrow(design))
 
-        prog <- progressr::progressor(steps = length(tasks))
-
         doExp <- function(task)
         {
             # simplified optimizeSlaveCluster() from IPO
@@ -90,15 +88,15 @@ DoEOptimizer$methods(
             result <- calculateResponse(runParams, task, FALSE)
             result$experiment <- task
 
-            prog()
-
+            patRoon:::doProgress()
+            
             return(result)
         }
         
         if (parallel)
-            response <- rbindlist(future.apply::future_lapply(tasks, doExp))
+            response <- withProg(length(tasks), rbindlist(future.apply::future_lapply(tasks, doExp)))
         else
-            response <- rbindlist(lapply(tasks, doExp))
+            response <- withProg(length(tasks), rbindlist(lapply(tasks, doExp)))
 
         ret <- list()
         ret$params <- typParams

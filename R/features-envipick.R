@@ -31,8 +31,6 @@ findFeaturesEnviPick <- function(analysisInfo, ..., parallel = TRUE, verbose = T
     if (verbose)
         printf("Finding features with enviPick for %d analyses ...\n", anaCount)
 
-    prog <- progressr::progressor(steps = anaCount, enable = verbose)
-    
     doFP <- function(ana, path)
     {
         fp <- getMzXMLAnalysisPath(ana, path)
@@ -46,15 +44,16 @@ findFeaturesEnviPick <- function(analysisInfo, ..., parallel = TRUE, verbose = T
             saveCacheData("featuresEnviPick", f, hash)
         }
         
-        prog()
+        patRoon:::doProgress()
         
         return(f)
     }
     
     if (parallel)
-        ret@features <- future.apply::future_Map(doFP, analysisInfo$analysis, analysisInfo$path)
+        ret@features <- withProg(nrow(analysisInfo), future.apply::future_Map(doFP, analysisInfo$analysis,
+                                                                              analysisInfo$path))
     else
-        ret@features <- Map(doFP, analysisInfo$analysis, analysisInfo$path)
+        ret@features <- withProg(nrow(analysisInfo), Map(doFP, analysisInfo$analysis, analysisInfo$path))
 
     if (verbose)
     {

@@ -7,14 +7,11 @@ NULL
 mergeScreeningSetInfos <- function(setObjects, setThreshold, sInfos = lapply(setObjects, screenInfo), rmSetCols = TRUE)
 {
     rmCols <- c("mz", "fragments_mz")
-
+    unCols <- c("rt", "formula", "SMILES", "InChI", "InChIKey", "neutralMass",  "d_rt", "d_mz", "fragments_formula")
+    
     if (length(setObjects) > 1)
     {
         sets <- names(setObjects)
-        
-        scrInfo <- ReduceWithArgs(x = sInfos, paste0("-", names(setObjects)),
-                                  f = function(l, r, sl, sr) merge(l, r, suffixes = c(sl, sr),
-                                                                   by = c("name", "group"), all = TRUE))
         
         getAllCols <- function(cols)
         {
@@ -22,11 +19,28 @@ mergeScreeningSetInfos <- function(setObjects, setThreshold, sInfos = lapply(set
             return(cols[sapply(cols, function(x) !is.null(scrInfo[[x]]))])
         }
         
+        renameDupCols <- function(si, suf)
+        {
+            cols <- setdiff(names(si), c("name", "group", unCols))
+            if (length(cols) > 0)
+            {
+                si <- copy(si)
+                setnames(si, cols, paste0(cols, suf))
+            }
+            return(si)
+        }
+        
+        scrInfo <- ReduceWithArgs(x = sInfos, paste0("-", names(setObjects)), f = function(l, r, sl, sr)
+        {
+            # suffix non-unique columns columns
+            l <- copy(l); r <- copy(r)
+            
+            merge(renameDupCols(l, sl), renameDupCols(r, sr), suffixes = c(sl, sr), by = c("name", "group"),
+                  all = TRUE)
+        })
+        
         if (nrow(scrInfo) > 0)
         {
-            unCols <- c("rt", "formula", "SMILES", "InChI", "InChIKey", "neutralMass",  "d_rt", "d_mz", "fragments_formula")
-        
-            
             for (col in unCols)
             {
                 allCols <- getAllCols(col)

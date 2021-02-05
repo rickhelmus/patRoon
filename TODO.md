@@ -75,10 +75,11 @@
     - calculatePeakQualities() --> seems fine now
     - sets methods for KPIC2, SAFD and SIRIUS features
         - no fGroups for SIRIUS
-    - min font size for plotSpec?
+        - only change needed is for groupFeaturesKPIC2()?
 - merging setObjects
     - check if more has to be cached and may need status messages
     - compound set consensus: scoreRanges should be re-determined from annotation results?
+        - ??
 - suspect screening
     - implement TASQ?
 - neutralizing / ionization

@@ -107,8 +107,8 @@ setMethod("filter", "formulasSet", function(obj, ..., negate = FALSE, sets = NUL
 
 #' @export
 setMethod("plotSpectrum", "formulasSet", function(obj, precursor, groupName, analysis = NULL, MSPeakLists,
-                                                  title = NULL, useGGPlot2 = FALSE, xlim = NULL, ylim = NULL,
-                                                  perSet = TRUE, mirror = TRUE, ...)
+                                                  title = NULL, useGGPlot2 = FALSE, mincex = 0.9, xlim = NULL,
+                                                  ylim = NULL, perSet = TRUE, mirror = TRUE, ...)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertString(precursor, min.chars = 1, add = ac)
@@ -116,13 +116,14 @@ setMethod("plotSpectrum", "formulasSet", function(obj, precursor, groupName, ana
     checkmate::assertString(analysis, min.chars = 1, null.ok = TRUE, add = ac)
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
     checkmate::assertString(title, null.ok = TRUE, add = ac)
+    checkmate::assertNumber(mincex, lower = 0, finite = TRUE, add = ac)
     assertXYLim(xlim, ylim, add = ac)
     aapply(checkmate::assertFlag, . ~ useGGPlot2 + perSet + mirror, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
     
     if (!perSet || length(sets(obj)) == 1 || !is.null(analysis))
         return(callNextMethod(obj, precursor, groupName, analysis, MSPeakLists, title,
-                              useGGPlot2, xlim, ylim, ...))
+                              useGGPlot2, mincex, xlim, ylim, ...))
     
     spec <- annotatedPeakList(obj, precursor, groupName, analysis, MSPeakLists)
     if (is.null(spec))
@@ -131,15 +132,15 @@ setMethod("plotSpectrum", "formulasSet", function(obj, precursor, groupName, ana
     if (is.null(title))
         title <- subscriptFormula(precursor)
     
-    return(makeMSPlotSets(spec, title, mirror, sets(obj), xlim, ylim, useGGPlot2, ...))
+    return(makeMSPlotSets(spec, title, mirror, sets(obj), mincex, xlim, ylim, useGGPlot2, ...))
 })
 
 setMethod("plotSpectrumHash", "formulasSet", function(obj, precursor, groupName, analysis = NULL, MSPeakLists,
-                                                      title = NULL, useGGPlot2 = FALSE, xlim = NULL, ylim = NULL,
-                                                      perSet = TRUE, mirror = TRUE, ...)
+                                                      title = NULL, useGGPlot2 = FALSE, mincex = 0.9,
+                                                      xlim = NULL, ylim = NULL, perSet = TRUE, mirror = TRUE, ...)
 {
     return(makeHash(callNextMethod(obj, precursor, groupName, analysis, MSPeakLists,
-                                   title, useGGPlot2, xlim, ylim, ...),
+                                   title, useGGPlot2, mincex, xlim, ylim, ...),
                     perSet, mirror))
 })
 

@@ -196,9 +196,9 @@ setMethod("filter", "compoundsSet", function(obj, ..., negate = FALSE, sets = NU
 
 #' @export
 setMethod("plotSpectrum", "compoundsSet", function(obj, index, groupName, MSPeakLists, formulas = NULL,
-                                                   plotStruct = TRUE, title = NULL, useGGPlot2 = FALSE, xlim = NULL,
-                                                   ylim = NULL, maxMolSize = c(0.2, 0.4), molRes = c(100, 100),
-                                                   perSet = TRUE, mirror = TRUE, ...)
+                                                   plotStruct = TRUE, title = NULL, useGGPlot2 = FALSE, mincex = 0.9,
+                                                   xlim = NULL, ylim = NULL, maxMolSize = c(0.2, 0.4),
+                                                   molRes = c(100, 100), perSet = TRUE, mirror = TRUE, ...)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertCount(index, positive = TRUE, add = ac)
@@ -206,13 +206,14 @@ setMethod("plotSpectrum", "compoundsSet", function(obj, index, groupName, MSPeak
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
     checkmate::assertClass(formulas, "formulas", null.ok = TRUE, add = ac)
     aapply(checkmate::assertFlag, . ~ plotStruct + useGGPlot2 + perSet + mirror, fixed = list(add = ac))
+    checkmate::assertNumber(mincex, lower = 0, finite = TRUE, add = ac)
     assertXYLim(xlim, ylim, add = ac)
     aapply(checkmate::assertNumeric, . ~ maxMolSize + molRes, finite = TRUE, len = 2, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
     
     if (!perSet || length(sets(obj)) == 1)
         return(callNextMethod(obj, index, groupName, MSPeakLists, formulas,
-                              plotStruct, title, useGGPlot2, xlim, ylim, maxMolSize, molRes, ...))
+                              plotStruct, title, useGGPlot2, mincex, xlim, ylim, maxMolSize, molRes, ...))
     
     spec <- annotatedPeakList(obj, index, groupName, MSPeakLists, formulas)
     if (is.null(spec))
@@ -230,17 +231,18 @@ setMethod("plotSpectrum", "compoundsSet", function(obj, index, groupName, MSPeak
     if (is.null(title))
         title <- getCompoundsSpecPlotTitle(compr$compoundName, compr$formula)
     
-    return(makeMSPlotSets(spec, title, mirror, sets(obj), xlim, ylim, useGGPlot2, ..., mol = mol,
+    return(makeMSPlotSets(spec, title, mirror, sets(obj), mincex, xlim, ylim, useGGPlot2, ..., mol = mol,
                           maxMolSize = maxMolSize, molRes = molRes))
 })
 
 setMethod("plotSpectrumHash", "compoundsSet", function(obj, index, groupName, MSPeakLists, formulas = NULL,
-                                                       plotStruct = TRUE, title = NULL, useGGPlot2 = FALSE, xlim = NULL,
-                                                       ylim = NULL, maxMolSize = c(0.2, 0.4), molRes = c(100, 100),
+                                                       plotStruct = TRUE, title = NULL, useGGPlot2 = FALSE,
+                                                       mincex = 0.9, xlim = NULL, ylim = NULL,
+                                                       maxMolSize = c(0.2, 0.4), molRes = c(100, 100),
                                                        perSet = TRUE, mirror = TRUE, ...)
 {
     return(makeHash(callNextMethod(obj, index, groupName, MSPeakLists, formulas,
-                                   plotStruct, title, useGGPlot2, xlim,
+                                   plotStruct, title, useGGPlot2, mincex, xlim,
                                    ylim, maxMolSize, molRes, ...),
                     perSet, mirror))
 })

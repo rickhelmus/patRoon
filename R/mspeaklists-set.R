@@ -163,19 +163,20 @@ setMethod("filter", "MSPeakListsSet", function(obj, ..., negate = FALSE, sets = 
 
 #' @export
 setMethod("plotSpectrum", "MSPeakListsSet", function(obj, groupName, analysis = NULL, MSLevel = 1, title = NULL,
-                                                     useGGPlot2 = FALSE, xlim = NULL, ylim = NULL, perSet = TRUE,
-                                                     mirror = TRUE, ...)
+                                                     useGGPlot2 = FALSE, mincex = 0.9, xlim = NULL,
+                                                     ylim = NULL, perSet = TRUE, mirror = TRUE, ...)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertString(groupName, min.chars = 1, add = ac)
     checkmate::assertString(analysis, min.chars = 1, null.ok = TRUE, add = ac)
     checkmate::assertChoice(MSLevel, 1:2, add = ac)
+    checkmate::assertNumber(mincex, lower = 0, finite = TRUE, add = ac)
     assertXYLim(xlim, ylim, add = ac)
     aapply(checkmate::assertFlag, . ~ useGGPlot2 + perSet, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
     
     if (!perSet || length(sets(obj)) == 1 || !is.null(analysis))
-        return(callNextMethod(obj, groupName, analysis, MSLevel, title, useGGPlot2, xlim, ylim, ...))
+        return(callNextMethod(obj, groupName, analysis, MSLevel, title, useGGPlot2, mincex, xlim, ylim, ...))
     
     spec <- getSpec(obj, groupName, MSLevel, NULL)
     if (is.null(spec))
@@ -184,7 +185,7 @@ setMethod("plotSpectrum", "MSPeakListsSet", function(obj, groupName, analysis = 
     if (is.null(title))
         title <- getMSPeakListPlotTitle(MSLevel, analysis, groupName)
     
-    return(makeMSPlotSets(spec, title, mirror, sets(obj), xlim, ylim, useGGPlot2, ...))
+    return(makeMSPlotSets(spec, title, mirror, sets(obj), mincex, xlim, ylim, useGGPlot2, ...))
 })
 
 generateMSPeakListsSet <- function(fGroupsSet, generator, ...)

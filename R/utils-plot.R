@@ -203,7 +203,7 @@ makeScoresPlot <- function(scoreTable, mcn, useGGPlot2)
 }
 
 # spec may be annotated
-makeMSPlot <- function(plotData, xlim, ylim, ylab = "Intensity", ..., mol = NULL, maxMolSize, molRes)
+makeMSPlot <- function(plotData, mincex, xlim, ylim, ylab = "Intensity", ..., mol = NULL, maxMolSize, molRes)
 {
     if (is.null(xlim))
         xlim <- range(plotData$mz) * c(0.9, 1.1)
@@ -265,7 +265,7 @@ makeMSPlot <- function(plotData, xlim, ylim, ylab = "Intensity", ..., mol = NULL
                              ylim[2] - max(annPlotData$intensity)) * 0.98
             
             # scale cex if necessary
-            cex <- min(curcex, curcex * (maxHeight / maxFormHeight))
+            cex <- max(min(curcex, curcex * (maxHeight / maxFormHeight)), mincex)
             
             if (cex > 0)
             {
@@ -371,7 +371,7 @@ makeMSPlotGG <- function(plotData, ..., mol = NULL)
     return(ret)
 }
 
-makeMSPlotSets <- function(spec, title, mirror, sets, xlim, ylim, useGGPlot2, ..., mol = NULL,
+makeMSPlotSets <- function(spec, title, mirror, sets, mincex, xlim, ylim, useGGPlot2, ..., mol = NULL,
                            maxMolSize = NULL, molRes = NULL)
 {
     spec <- copy(spec)
@@ -392,7 +392,7 @@ makeMSPlotSets <- function(spec, title, mirror, sets, xlim, ylim, useGGPlot2, ..
                    ggplot2::scale_y_continuous(labels = abs(ticks)))
     }
     
-    makeMSPlot(plotData, xlim, ylim, ylab = "Normalized intensity",
+    makeMSPlot(plotData, mincex, xlim, ylim, ylab = "Normalized intensity",
                main = title, yaxt = "n", ..., mol = mol, maxMolSize = maxMolSize,
                molRes = molRes)
     axis(2, at = ticks, labels = abs(ticks))

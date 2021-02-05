@@ -36,7 +36,6 @@ setMethod("groupFeaturesXCMS", "features", function(feat, rtalign = TRUE, export
     # UNDONE: keep exportedData things? Or just require that it's exported? If keep document also for OpenMS and implications.
 
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertClass(feat, "features", add = ac)
     aapply(checkmate::assertFlag, . ~ rtalign + exportedData + verbose, fixed = list(add = ac))
     aapply(checkmate::assertList, . ~ groupArgs + retcorArgs, any.missing = FALSE, names = "unique", fixed = list(add = ac))
     checkmate::reportAssertions(ac)
@@ -45,21 +44,18 @@ setMethod("groupFeaturesXCMS", "features", function(feat, rtalign = TRUE, export
     return(doGroupFeaturesXCMS(xs, feat, rtalign, exportedData, groupArgs, retcorArgs, verbose))
 })
 
-setMethod("groupFeaturesXCMS", "featuresSet", function(feat, rtalign = TRUE, exportedData = TRUE,
-                                                       groupArgs = list(mzwid = 0.015), 
-                                                       retcorArgs = list(method = "obiwarp"), verbose = TRUE)
+setMethod("groupFeaturesXCMS", "featuresSet", function(feat, groupArgs = list(mzwid = 0.015), verbose = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertClass(feat, "features", add = ac)
-    aapply(checkmate::assertFlag, . ~ rtalign + exportedData + verbose, fixed = list(add = ac))
-    aapply(checkmate::assertList, . ~ groupArgs + retcorArgs, any.missing = FALSE, names = "unique", fixed = list(add = ac))
+    checkmate::assertFlag(verbose, add = ac)
+    checkmate::assertList(groupArgs, any.missing = FALSE, names = "unique", add = ac)
     checkmate::reportAssertions(ac)
     
     # HACK: force non-set features method to allow grouping of neutralized features
     # UNDONE: or simply export this functionality with a flag?
-    xs <- selectMethod("getXCMSSet", "features")(feat, verbose = verbose, exportedData = exportedData)
+    xs <- selectMethod("getXCMSSet", "features")(feat, verbose = verbose, exportedData = FALSE)
     
-    return(doGroupFeaturesXCMS(xs, feat, rtalign, exportedData, groupArgs, retcorArgs, verbose))
+    return(doGroupFeaturesXCMS(xs, feat, rtalign = FALSE, exportedData = FALSE, groupArgs, list(), verbose))
 })
 
 doGroupFeaturesXCMS <- function(xs, feat, rtalign, exportedData, groupArgs, retcorArgs, verbose)

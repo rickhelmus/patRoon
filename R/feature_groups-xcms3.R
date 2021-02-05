@@ -40,21 +40,43 @@ setMethod("groupFeaturesXCMS3", "features", function(feat, rtalign = TRUE, expor
     assertS4(retAlignParam, add = ac)
     checkmate::reportAssertions(ac)
 
-    anaInfo <- analysisInfo(feat)
+    xdata <- getXCMSnExp(feat, verbose = verbose, exportedData = exportedData)
+    return(doGroupFeaturesXCMS3(xdata, feat, exportedData, groupParam, retAlignParam, verbose))
+})
 
+#' @export
+setMethod("groupFeaturesXCMS3", "featuresSet", function(feat,
+                                                        groupParam = xcms::PeakDensityParam(sampleGroups = analysisInfo(feat)$group),
+                                                        verbose = TRUE)
+{
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertFlag(verbose, add = ac)
+    assertS4(groupParam, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    # HACK: force non-set features method to allow grouping of neutralized features
+    # UNDONE: or simply export this functionality with a flag?
+    xdata <- selectMethod("getXCMSnExp", "features")(feat, verbose = verbose, exportedData = FALSE)
+    
+    return(doGroupFeaturesXCMS3(xdata, feat, rtalign = FALSE, exportedData = FALSE, groupParam, xcms::ObiwarpParam(),
+                                verbose))
+})
+
+doGroupFeaturesXCMS3 <- function(xdata, feat, rtalign, exportedData, groupParam, retAlignParam, verbose)
+{
+    anaInfo <- analysisInfo(feat)
+    
     if (length(feat) == 0)
         return(featureGroupsXCMS(analysisInfo = anaInfo, features = feat))
-
+    
     hash <- makeHash(feat, rtalign, exportedData, groupParam, retAlignParam)
     cachefg <- loadCacheData("featureGroupsXCMS3", hash)
     if (!is.null(cachefg))
         return(cachefg)
-
+    
     if (verbose)
         cat("Grouping features with XCMS...\n===========\n")
-
-    xdata <- getXCMSnExp(feat, verbose = verbose, exportedData = exportedData)
-
+    
     if (!exportedData && rtalign)
     {
         if (verbose)
@@ -69,26 +91,23 @@ setMethod("groupFeaturesXCMS3", "features", function(feat, rtalign = TRUE, expor
                 cat("Performing grouping prior to retention time alignment...\n")
             xdata <- verboseCall(xcms::groupChromPeaks, list(xdata, groupParam), verbose)
         }
-
+        
         if (verbose)
             cat("Performing retention time alignment...\n")
         xdata <- verboseCall(xcms::adjustRtime, list(xdata, retAlignParam), verbose)
     }
-
+    
     if (verbose)
         cat("Performing grouping...\n")
     xdata <- verboseCall(xcms::groupChromPeaks, list(xdata, groupParam), verbose)
-
+    
     ret <- importFeatureGroupsXCMS3FromFeat(xdata, anaInfo, feat)
     saveCacheData("featureGroupsXCMS3", ret, hash)
-
+    
     if (verbose)
         cat("\n===========\nDone!\n")
     return(ret)
-})
-
-#' @export
-setMethod("groupFeaturesXCMS3", "featuresSet", function(feat, ...) stop("Not yet supported for featuresSet"))
+}
 
 getFeatIndicesFromXCMSnExp <- function(xdata)
 {

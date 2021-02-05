@@ -56,7 +56,6 @@
         - --> or just doc that setObjects() can be used
     - provide methods for non-implemented functionality
         - consensus()/comparison()? (see above)
-        - groupFeaturesXCMS3?
         - IPO
 - check UIs
     - checkFeatures:
@@ -77,6 +76,8 @@
     - fix empty MS(MS) peaklists if unavailable during merging sets
         - already fixed?
     - calculatePeakQualities() --> seems fine now
+    - sets methods for KPIC2, SAFD and SIRIUS features
+        - no fGroups for SIRIUS
 - merging setObjects
     - check if more has to be cached and may need status messages
     - compound set consensus: scoreRanges should be re-determined from annotation results?

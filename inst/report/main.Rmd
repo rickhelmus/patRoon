@@ -74,7 +74,7 @@ message("Generating chromatograms...")
 plotPathFull <- getPlotPath(FALSE)
 
 prog <- openProgBar(0, length(rmdVars$fGroups))
-allPlots <- lapply(seq_len(length(rmdVars$fGroups)), function(grpi)
+allPlots <- sapply(seq_len(length(rmdVars$fGroups)), function(grpi)
 {
     path <- file.path(plotPathFull, sprintf("chrom_%d.png", grpi))
     makeCachedPlot(path, "plotChroms",

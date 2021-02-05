@@ -90,6 +90,7 @@
     - progressr
 - tests
     - topMostByRGroup
+    - xcms3 comparison
 - docs
     - topMostByRGroup: handbook?
     - session filter: argument and its order

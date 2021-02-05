@@ -490,14 +490,14 @@ setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas =
             gq <- groupQualities(x)[ret$group, -"group"]
             ret[, (paste0("group_", names(gq))) := gq]
         }
-        else
+        else if (hasFGroupScores(x))
             ret[, (intersect(featureQualityNames(), names(ret))) := NULL]
         if (addScores)
         {
             gs <- groupScores(x)[ret$group, -"group"]
             ret[, (paste0("group_", names(gs))) := gs]
         }
-        else
+        else if (hasFGroupScores(x))
             ret[, (intersect(c(featureScoreNames(), "totalScore"), names(ret))) := NULL]
         
         if (average)
@@ -509,7 +509,7 @@ setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas =
         }
         else
         {
-            doConc <- doConc && length(snames) > 1
+            doConc <- doConc && nrow(anaInfo) > 1
             if (doConc)
             {
                 ret[, c("RSQ", "intercept", "slope") :=

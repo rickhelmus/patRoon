@@ -45,9 +45,9 @@ setMethod("groupFeaturesXCMS", "features", function(feat, rtalign = TRUE, export
     return(doGroupFeaturesXCMS(xs, feat, rtalign, exportedData, groupArgs, retcorArgs, verbose))
 })
 
-setMethod("groupFeaturesXCMS", "features", function(feat, rtalign = TRUE, exportedData = TRUE,
-                                                    groupArgs = list(mzwid = 0.015), 
-                                                    retcorArgs = list(method = "obiwarp"), verbose = TRUE)
+setMethod("groupFeaturesXCMS", "featuresSet", function(feat, rtalign = TRUE, exportedData = TRUE,
+                                                       groupArgs = list(mzwid = 0.015), 
+                                                       retcorArgs = list(method = "obiwarp"), verbose = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(feat, "features", add = ac)

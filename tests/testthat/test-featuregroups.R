@@ -90,9 +90,9 @@ test_that("XCMS conversion", {
                  unname(groupTable(fgOpenMS)))
 })
 
-XCMS3ImpXCMS <- getXCMSnExp(fgXCMS)
+XCMS3ImpXCMS <- getXCMSnExp(fgXCMS, exportedData = FALSE)
 XCMS3ImpXCMS3 <- getXCMSnExp(fgXCMS3)
-XCMS3ImpOpenMS <- getXCMSnExp(fgOpenMS)
+XCMS3ImpOpenMS <- getXCMSnExp(fgOpenMS, exportedData = FALSE)
 test_that("XCMS3 conversion", {
     expect_equal(nrow(xcms::featureDefinitions(XCMS3ImpXCMS)), length(fgXCMS))
     expect_equal(nrow(xcms::featureDefinitions(XCMS3ImpXCMS3)), length(fgXCMS3))

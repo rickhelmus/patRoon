@@ -96,7 +96,6 @@
 	    - check better for what is supported by SIRIUS?
 	- feature components
 	    - cliqueMS
-	        - parallelization?
 	        - change checkPackage GH link once PRs are merged
             - current adduct conversion to this format doesn't mimic Cat and 2H/2Na etc
                 - Perhaps just document limitation?

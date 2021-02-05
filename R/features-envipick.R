@@ -22,7 +22,7 @@ findFeaturesEnviPick <- function(analysisInfo, ..., parallel = TRUE, verbose = T
 {
     ac <- checkmate::makeAssertCollection()
     analysisInfo <- assertAndPrepareAnaInfo(analysisInfo, "mzXML")
-    apply(checkmate::assertFlag, . ~ parallel + verbose, fixed = list(add = ac))
+    aapply(checkmate::assertFlag, . ~ parallel + verbose, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
 
     anaCount <- nrow(analysisInfo)

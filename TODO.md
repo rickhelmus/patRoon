@@ -95,14 +95,9 @@
 		    - default to M+H/M-H for now with warning...
 	    - default selectIons() to only consider 'common' adducts? or change default adducts for componentization algos?
 	    - check better for what is supported by SIRIUS?
-	- replacement method for adducts, and possibly others (anaInfo, fGroups etc)
 	- feature components
 	    - all features are currently annotated (ie including not in a group)
 	        - should be fine once featng is merged --> verify
-	    - OpenMS
-	        - clearly doc that maxCharge should follow specified adducts
-	        - force qTry to be not feature?
-	        - fix adduct specification (https://github.com/OpenMS/OpenMS/issues/5133)
 	    - cliqueMS
 	        - parallelization?
 	        - change checkPackage GH link once PRs are merged
@@ -168,6 +163,10 @@
     - adducts<-
         - for sets: make clear that order/names are taken from annTab[set == s]
         - for sets: example with reGroup
+    - OpenMS components
+        - qTry == "feature" currently not supported
+        - adduct specification: molMult must be one, multiple additions (eg Na2) is controlled by chargeMin/max
+
 - tests
     - handle/test empty objects
     - test DA algorithms

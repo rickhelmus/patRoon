@@ -70,7 +70,7 @@ setMethod("as.data.table", "formulasSet", function(x, fGroups = NULL, average = 
 {
     ret <- callNextMethod(x, fGroups = fGroups, average = average, ...)
     if (average)
-        ret[, formula := NULL] # doesn't make a lot of sense anymore with different adducts
+        ret[, c("formula", "set") := NULL] # formula column doesn't make sense anymore, set column is left-over
     return(ret[])
 })
 

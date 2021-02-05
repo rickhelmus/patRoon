@@ -67,9 +67,6 @@
         - test session import
         - change column names for both tables?
 - misc
-    - as.data.table() for formulas: average=T will now produce strange averaged ionized formula, for now simply remove this column...
-        - also give a note in docs?
-        - or maybe only remove is not all adducts are equal?
     - handle errors when object has <=1 set
         - groupFeaturesScreening()
         - mergeScreeningSetInfos()
@@ -164,7 +161,7 @@
         - qTry == "feature" currently not supported
         - adduct specification: molMult must be one, multiple additions (eg Na2) is controlled by chargeMin/max
     - selectIons: chargeMismatch --> note that OpenMS findFeatures removes isotopes, hence, adducts more reliable
-
+    - as.data.table() for formulas: formula column removed if average=T
 - tests
     - handle/test empty objects
     - test DA algorithms

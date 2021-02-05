@@ -568,7 +568,8 @@ setMethod("plotScoresHash", "formulas", function(obj, precursor, groupName, anal
 #'
 #' @export
 setMethod("plotSpectrum", "formulas", function(obj, precursor, groupName, analysis = NULL, MSPeakLists,
-                                               title = NULL, useGGPlot2 = FALSE, xlim = NULL, ylim = NULL, ...)
+                                               title = NULL, useGGPlot2 = FALSE, mincex = 0.9, xlim = NULL,
+                                               ylim = NULL, ...)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertString(precursor, min.chars = 1, add = ac)
@@ -577,6 +578,7 @@ setMethod("plotSpectrum", "formulas", function(obj, precursor, groupName, analys
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
     checkmate::assertString(title, null.ok = TRUE, add = ac)
     checkmate::assertFlag(useGGPlot2, add = ac)
+    checkmate::assertNumber(mincex, lower = 0, finite = TRUE, add = ac)
     assertXYLim(xlim, ylim, add = ac)
     checkmate::reportAssertions(ac)
 
@@ -590,14 +592,15 @@ setMethod("plotSpectrum", "formulas", function(obj, precursor, groupName, analys
     if (useGGPlot2)
         return(makeMSPlotGG(getMSPlotData(spec, 2)) + ggtitle(title))
 
-    makeMSPlot(getMSPlotData(spec, 2), xlim, ylim, ..., main = title)
+    makeMSPlot(getMSPlotData(spec, 2), mincex, xlim, ylim, ..., main = title)
 })
 
 setMethod("plotSpectrumHash", "formulas", function(obj, precursor, groupName, analysis = NULL, MSPeakLists,
-                                                   title = NULL, useGGPlot2 = FALSE, xlim = NULL, ylim = NULL, ...)
+                                                   title = NULL, useGGPlot2 = FALSE, mincex = 0.9, xlim = NULL,
+                                                   ylim = NULL, ...)
 {
     return(makeHash(precursor, annotatedPeakList(obj, precursor, groupName, analysis, MSPeakLists),
-                    title, useGGPlot2, xlim, ylim, ...))
+                    title, useGGPlot2, mincex, xlim, ylim, ...))
 })
 
 #' @describeIn formulas plots a Venn diagram (using \pkg{\link{VennDiagram}})

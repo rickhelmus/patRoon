@@ -506,13 +506,14 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
 #'
 #' @export
 setMethod("plotSpectrum", "MSPeakLists", function(obj, groupName, analysis = NULL, MSLevel = 1, title = NULL,
-                                                  useGGPlot2 = FALSE, xlim = NULL, ylim = NULL, ...)
+                                                  useGGPlot2 = FALSE, mincex = 0.9, xlim = NULL, ylim = NULL, ...)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertString(groupName, min.chars = 1, add = ac)
     checkmate::assertString(analysis, min.chars = 1, null.ok = TRUE, add = ac)
     checkmate::assertChoice(MSLevel, 1:2, add = ac)
     checkmate::assertFlag(useGGPlot2, add = ac)
+    checkmate::assertNumber(mincex, lower = 0, finite = TRUE, add = ac)
     assertXYLim(xlim, ylim, add = ac)
     checkmate::reportAssertions(ac)
 
@@ -529,7 +530,7 @@ setMethod("plotSpectrum", "MSPeakLists", function(obj, groupName, analysis = NUL
     if (useGGPlot2)
         return(makeMSPlotGG(getMSPlotData(spec, 2)) + ggtitle(title))
 
-    makeMSPlot(getMSPlotData(spec, 2), xlim, ylim, main = title, ...)
+    makeMSPlot(getMSPlotData(spec, 2), mincex, xlim, ylim, main = title, ...)
 })
 
 

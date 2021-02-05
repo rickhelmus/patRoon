@@ -657,8 +657,9 @@ setMethod("annotatedPeakList", "compounds", function(obj, index, groupName, MSPe
 #'
 #' @export
 setMethod("plotSpectrum", "compounds", function(obj, index, groupName, MSPeakLists, formulas = NULL,
-                                            plotStruct = TRUE, title = NULL, useGGPlot2 = FALSE, xlim = NULL,
-                                            ylim = NULL, maxMolSize = c(0.2, 0.4), molRes = c(100, 100), ...)
+                                                plotStruct = TRUE, title = NULL, useGGPlot2 = FALSE,
+                                                mincex = 0.9, xlim = NULL, ylim = NULL, maxMolSize = c(0.2, 0.4),
+                                                molRes = c(100, 100), ...)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertCount(index, positive = TRUE, add = ac)
@@ -666,6 +667,7 @@ setMethod("plotSpectrum", "compounds", function(obj, index, groupName, MSPeakLis
     checkmate::assertClass(MSPeakLists, "MSPeakLists", add = ac)
     checkmate::assertClass(formulas, "formulas", null.ok = TRUE, add = ac)
     aapply(checkmate::assertFlag, . ~ plotStruct + useGGPlot2, fixed = list(add = ac))
+    checkmate::assertNumber(mincex, lower = 0, finite = TRUE, add = ac)
     assertXYLim(xlim, ylim, add = ac)
     aapply(checkmate::assertNumeric, . ~ maxMolSize + molRes, finite = TRUE, len = 2, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
@@ -687,20 +689,21 @@ setMethod("plotSpectrum", "compounds", function(obj, index, groupName, MSPeakLis
         title <- getCompoundsSpecPlotTitle(compr$compoundName, compr$formula)
 
     if (!useGGPlot2)
-        makeMSPlot(getMSPlotData(spec, 2), xlim, ylim, main = title, ..., mol = mol,
+        makeMSPlot(getMSPlotData(spec, 2), mincex, xlim, ylim, main = title, ..., mol = mol,
                    maxMolSize = maxMolSize, molRes = molRes)
     else
         return(makeMSPlotGG(getMSPlotData(spec, 2), mol = mol) + ggtitle(title))
 })
 
 setMethod("plotSpectrumHash", "compounds", function(obj, index, groupName, MSPeakLists, formulas = NULL,
-                                                plotStruct = TRUE, title = NULL, useGGPlot2 = FALSE, xlim = NULL,
-                                                ylim = NULL, maxMolSize = c(0.2, 0.4), molRes = c(100, 100), ...)
+                                                    plotStruct = TRUE, title = NULL, useGGPlot2 = FALSE,
+                                                    mincex = 0.9, xlim = NULL, ylim = NULL,
+                                                    maxMolSize = c(0.2, 0.4), molRes = c(100, 100), ...)
 {
     compTable <- compoundTable(obj)[[groupName]]
     cRow <- if (is.null(compTable) || nrow(compTable) == 0) NULL else compTable[index, ]
     return(makeHash(cRow, annotatedPeakList(obj, index, groupName, MSPeakLists, formulas),
-                    plotStruct, title, useGGPlot2, xlim, ylim, ...))
+                    plotStruct, title, useGGPlot2, mincex, xlim, ylim, ...))
 })
 
 #' @describeIn compounds plots a Venn diagram (using \pkg{\link{VennDiagram}})

@@ -16,6 +16,7 @@ reGenerateFTIndex <- function(fGroups)
                                                  function(ft) as.list(chmatch(gNames, ft$group, 0)))), gNames)
     return(fGroups)
 }
+isFGSet <- function(fGroups) inherits(fGroups, "featureGroupsSet")
 
 featureQualities <- function()
 {

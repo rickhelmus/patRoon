@@ -78,12 +78,12 @@
     - calculatePeakQualities() --> seems fine now
     - sets methods for KPIC2, SAFD and SIRIUS features
         - no fGroups for SIRIUS
+    - min font size for plotSpec?
 - merging setObjects
     - check if more has to be cached and may need status messages
     - compound set consensus: scoreRanges should be re-determined from annotation results?
 - suspect screening
     - implement TASQ?
-    - annotation columns not in report, fine? (there are many) If yes document
 - neutralizing / ionization
     - selectIons()
 	    - prefer adducts based on MS/MS? eg handy for Na/K adducts

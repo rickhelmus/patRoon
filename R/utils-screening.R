@@ -4,6 +4,13 @@ NULL
 
 isScreening <- function(fGroups) inherits(fGroups, c("featureGroupsScreening", "featureGroupsScreeningSet"))
 
+getAllSuspSetCols <- function(targetCols, allCols, sets)
+{
+    targetCols <- c(targetCols, sapply(targetCols, function(cl) paste0(cl, "-", sets),
+                                       USE.NAMES = FALSE))
+    return(intersect(targetCols, allCols))
+}
+
 convertSuspDataIfNeeded <- function(scr, destFormat, destCol, fromFormats, fromCols)
 {
     hasData <- function(x) !is.na(x) & nzchar(x)

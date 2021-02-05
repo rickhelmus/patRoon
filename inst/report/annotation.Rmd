@@ -62,20 +62,32 @@ allGroups <- unique(c(plotGroups, componentFGroups, mfWebFGroups))
 
 # UNDONE: replace by proper inheritance
 isSusp <- isScreening(rmdVars$fGroups)
-keepSuspCols <- c("susp_name", "susp_d_rt", "susp_d_mz", "susp_sets", "susp_estIDLevel")
+keepSuspCols <- character()
+colsRound5 <- "mz"
 if (isSusp)
 {
     fGroupsSpecDT <- as.data.table(rmdVars$fGroups, collapseSuspects = NULL)
-    fGroupsSpecDT[, c("susp_d_rt", "susp_d_mz") := .(round(susp_d_rt, 2), round(susp_d_mz, 5))]
-    for (col in c("susp_annSimForm", "susp_annSimComp", "susp_annSimBoth", "susp_maxFragMatchesRel"))
-    {
-        if (!is.null(fGroupsSpecDT[[col]]))
-            fGroupsSpecDT[, (col) := round(get(col), 2)]
-    }
-       
+    
+    isSet <- isFGSet(rmdVars$fGroups)
+    keepSuspCols <- c("susp_name", "susp_d_rt", "susp_d_mz")
+
+    clR2 <- c("susp_d_rt", "susp_annSimForm", "susp_annSimComp", "susp_annSimBoth", "susp_maxFragMatchesRel")
+    if (isSet)
+        clR2 <- getAllSuspSetCols(clR2, names(fGroupsSpecDT), sets(rmdVars$fGroups))
+    fGroupsSpecDT[, (clR2) := lapply(mget(clR2), round, 2)]
+
+    colsRound5 <- c(colsRound5, "susp_d_mz")
+
     # NOTE: all cols must be same type
-    mergeCols <- function(fg, curColNames, parColNames, mergedName)
+    mergeCols <- function(fg, curColNames, parColNames, mergedName, is = isSet)
     {
+        if (is)
+        {
+            for (s in sets(rmdVars$fGroups))
+                fg <- mergeCols(fg, paste0(curColNames, "-", s), parColNames, paste0(mergedName, "-", s), FALSE)
+            return(fg)
+        }
+        
         present <- which(curColNames %in% names(fg))
         if (length(present) == 0)
             return(fg)
@@ -93,9 +105,11 @@ if (isSusp)
     fGroupsSpecDT <- mergeCols(fGroupsSpecDT, c("susp_maxFrags", "susp_maxFragMatches", "susp_maxFragMatchesRel"),
                                c("suspect", "max matches", "max matches rel"), "fragments")
     
-    # keep ID level as last column
-    IDLevInd <- which(keepSuspCols == "susp_estIDLevel")
-    keepSuspCols <- c(keepSuspCols[-IDLevInd], "susp_estIDLevel")
+    if (isSet)
+        keepSuspCols <- c(keepSuspCols, "susp_sets", getAllSuspSetCols("susp_estIDLevel", names(fGroupsSpecDT),
+                                                                       sets(rmdVars$fGroups)))
+    else
+        keepSuspCols <- c(keepSuspCols, "susp_estIDLevel")
 } else
     fGroupsSpecDT <- as.data.table(rmdVars$fGroups)
 
@@ -103,11 +117,15 @@ fGroupsSpecDT <- fGroupsSpecDT[group %in% allGroups]
 if (rmdVars$retMin)
     fGroupsSpecDT[, ret := ret / 60]
 
-fGroupsSpecDT[, c("ret", "mz") := .(round(ret, 2), round(mz, 5))]
+if (!is.null(fGroupsSpecDT[["neutralMass"]]))
+    colsRound5 <- c(colsRound5, "neutralMass")
+
+fGroupsSpecDT[, ret := round(ret, 2)]
+fGroupsSpecDT[, (colsRound5) := lapply(mget(colsRound5), round, 5)]
+
 fGroupsSpecDT <- fGroupsSpecDT[, intersect(c("group", "ret", "mz", "adduct", "neutralMass", keepSuspCols),
                                            names(fGroupsSpecDT)), with = FALSE]
 fGroupsSpecDT[, groupInd := match(group, names(rmdVars$fGroups))]
-setcolorder(fGroupsSpecDT, "groupInd")
 
 showButton <- function(title, jsFunc, ...)
 {
@@ -132,6 +150,7 @@ sp <- paste0(rep("&nbsp;", 4), collapse = "")
 buttons <- paste(compButtons, compCLButtons, formButtons, mfWebButtons, sep = sp)
 buttons <- gsub("\\^(&nbsp;)*", "", buttons) # remove placeholder (^) with accompanying spaces
 fGroupsSpecDT[, show := buttons]
+setcolorder(fGroupsSpecDT, c("groupInd", "group", "ret", "mz", "show"))
 
 if (!is.null(rmdVars$components))
 {
@@ -182,9 +201,12 @@ DT::datatable(fGroupsSpecDT,
                              initComplete = DT::JS("function(settings, json)",
                                                    "{ setTimeout(initAnnotation, 25); }"),
                              order = list(list(1, "asc")),
-                             columnDefs = list(list(visible = FALSE, targets = 0)),
+                             columnDefs = list(list(visible = FALSE, targets = 0),
+                                               list(className = "dt-nowrap", targets = 4),
+                                               list(className = "dt-center",
+                                                    targets = (seq_len(ncol(fGroupsSpecDT))[-5])-1)),
                              buttons = list(list(extend = "colvis", background = FALSE,
-                                                 columns = seq(2, ncol(fGroupsSpecDT)-1) - 1,
+                                                 columns = seq(5, ncol(fGroupsSpecDT)-1),
                                                  collectionLayout = "three-column"))),
               escape = FALSE, rownames = FALSE, elementId = "fGroupsTable")
 ```

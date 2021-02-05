@@ -71,6 +71,7 @@
     - test parallel IPO
     - rename exportedData, update docs (also handbook)
     - remove featuresOpenMS method for getXCMSSet(), update docs
+    - groupFeatures(algorithm="sirius")
 - finish feature syncing
     - clarify reportCSV() now only reports remaining features?
 - (finish) implement(ing) replace methods for setting feature(Group) data
@@ -78,6 +79,7 @@
     - see if more object updates are needed
     - docs (also check args in ref docs), tests, NEWS
     - or just not export for now...
+    - caching for findFeaturesKPIC2, move caching out of future.apply for enviPick
 - NEWS
     - topMostByRGroup/EICTopMostByRGroup
     - as.data.table: qualities argument (and potentially faster now with features=T?)

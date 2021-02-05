@@ -338,8 +338,6 @@ setMethod("groupFeatures", "featuresSet", function(feat, algorithm, ..., verbose
     checkmate::assertChoice(algorithm, c("openms", "xcms"))
     
     otherArgs <- list(...)
-    if (algorithm == "xcms")
-        otherArgs <- modifyList(otherArgs, list(exportedData = FALSE))
     
     fGroups <- do.call(callNextMethod, c(list(feat = feat, algorithm = algorithm, verbose = verbose), otherArgs))
     

@@ -12,7 +12,7 @@ setMethod("initialize", "componentsOpenMS",
 #' @export
 setMethod("generateComponentsOpenMS", "featureGroups", function(fGroups, ionization, chargeMin = 1,
                                                                 chargeMax = 1, chargeSpan = 3,
-                                                                qTry = "feature",
+                                                                qTry = "heuristic",
                                                                 potentialAdducts = defaultOpenMSAdducts(ionization),
                                                                 minRTOverlap = 0.66, retWindow = 1,
                                                                 mzWindow = 0.005, minSize = 2,
@@ -23,7 +23,7 @@ setMethod("generateComponentsOpenMS", "featureGroups", function(fGroups, ionizat
     checkmate::assertChoice(ionization, c("positive", "negative"), add = ac)
     aapply(checkmate::assertCount, . ~ chargeMin + chargeMax + chargeSpan + minSize,
            positive = TRUE, fixed = list(add = ac))
-    checkmate::assertChoice(qTry, c("feature", "heuristic", "all"))
+    checkmate::assertChoice(qTry, c("heuristic", "all"))
     checkmate::assertNumeric(potentialAdducts, lower = 0, upper = 1, any.missing = FALSE, min.len = 2,
                              names = "unique", add = ac)
     aapply(checkmate::assertNumber, . ~ retWindow + mzWindow + relMinAdductAbundance, finite = TRUE, lower = 0,
@@ -32,10 +32,24 @@ setMethod("generateComponentsOpenMS", "featureGroups", function(fGroups, ionizat
     checkmate::assertList(extraOpts, any.missing = FALSE, names = "unique", null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
+    if (!numEQ(sum(potentialAdducts), 1))
+        stop("The sum of all adduct probabilities should be one.")
+    
     anaInfo <- analysisInfo(fGroups)
     featTable <- featureTable(fGroups)
+    
+    padds <- sapply(names(potentialAdducts), as.adduct, simplify = FALSE)
+    
+    if (any(sapply(padds, slot, "molMult") > 1))
+        stop("Molecule multiplier of potential adducts should not be >1")
+    
+    oadds <- sapply(padds, as.character, format = "openms")
+    charges <- sapply(padds, slot, "charge")
+    chsign <- if (ionization == "positive") "+" else "-"
+    pa <- sprintf("%s:%s:%f", oadds, strrep(chsign, abs(charges)), potentialAdducts)
+    
     params <- list(ionization = ionization, chargeMin = chargeMin, chargeMax = chargeMax, chargeSpan = chargeSpan,
-                   qTry = qTry, potentialAdducts = potentialAdducts, minRTOverlap = minRTOverlap,
+                   qTry = qTry, potentialAdducts = pa, minRTOverlap = minRTOverlap,
                    retWindow = retWindow, mzWindow = mzWindow, extraOpts = extraOpts)
     baseHash <- makeHash(params, minSize, relMinAdductAbundance)
     
@@ -99,12 +113,6 @@ getOpenMSMADCommand <- function(inFile, outFile, ionization, chargeMin, chargeMa
         chargeMin <- -abs(chargeMin); chargeMax <- -abs(chargeMax)
     }
     
-    padds <- sapply(names(potentialAdducts), as.adduct, simplify = FALSE)
-    oadds <- sapply(padds, as.character, format = "openms")
-    charges <- sapply(padds, slot, "charge")
-    chsign <- if (ionization == "positive") "+" else "-"
-    pa <- sprintf("%s:%s:%f", oadds, strrep(chsign, abs(charges)), potentialAdducts)
-    
     settings <- list("-algorithm:MetaboliteFeatureDeconvolution:negative_mode" = boolToChr(ionization == "negative"),
                      "-algorithm:MetaboliteFeatureDeconvolution:charge_min" = chargeMin,
                      "-algorithm:MetaboliteFeatureDeconvolution:charge_max" = chargeMax,
@@ -119,7 +127,7 @@ getOpenMSMADCommand <- function(inFile, outFile, ionization, chargeMin, chargeMa
     
     settingsArgs <- OpenMSArgListToOpts(settings)
     # add potential adducts later as OpenMSArgListToOpts() doesn't handle this currently...
-    settingsArgs <- c(settingsArgs, "-algorithm:MetaboliteFeatureDeconvolution:potential_adducts", pa)
+    settingsArgs <- c(settingsArgs, "-algorithm:MetaboliteFeatureDeconvolution:potential_adducts", potentialAdducts)
     
     return(list(command = getCommandWithOptPath("MetaboliteAdductDecharger", "OpenMS"),
                 args = c(settingsArgs, "-in", inFile, "-out_cm", outFile)))

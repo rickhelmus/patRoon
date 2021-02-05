@@ -131,14 +131,6 @@ setMethod("filter", "featuresSet", function(obj, ..., negate = FALSE, sets = NUL
     return(obj)
 })
 
-# UNDONE: mention that object will be unset
-#' @export
-setMethod("getXCMSSet", "featuresSet", function(obj, ..., set) getXCMSSet(unset(obj, set), ...))
-
-# UNDONE: mention that object will be unset
-#' @export
-setMethod("getXCMSnExp", "featuresSet", function(obj, ..., set) getXCMSnExp(unset(obj, set), ...))
-
 #' @export
 setMethod("makeSet", "features", function(obj, ..., adducts, labels)
 {

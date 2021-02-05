@@ -334,8 +334,7 @@ setMethod("selectIons", "featureGroupsSet", function(fGroups, components, prefAd
 
 setMethod("groupFeatures", "featuresSet", function(feat, algorithm, ..., verbose = TRUE)
 {
-    # UNDONE: xcms3 not yet supported
-    checkmate::assertChoice(algorithm, c("openms", "xcms"))
+    checkmate::assertChoice(algorithm, c("openms", "xcms", "xcms3"))
     
     otherArgs <- list(...)
     

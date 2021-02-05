@@ -259,7 +259,8 @@ setMethod("unset", "featureGroupsScreeningSet", function(obj, set)
     
     obj <- obj[, sets = set]
     sInfo <- mergeScreeningSetInfos(setObjects(obj), obj@setThreshold, rmSetCols = FALSE)
-    sInfo[, c("sets", "setCoverage") := NULL]
+    if (length(sInfo) > 0)
+        sInfo[, c("sets", "setCoverage") := NULL]
     
     ret <- featureGroupsSetScreeningUnset(screenInfo = sInfo, groups = groupTable(uobj),
                                           groupInfo = groupInfo(uobj), analysisInfo = analysisInfo(uobj),

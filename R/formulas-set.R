@@ -11,7 +11,8 @@ syncFormulasSetObjects <- function(formulasSet, makeCons)
     if (makeCons)
     {
         groupFormsList <- sapply(formulasSet@setObjects, formulaTable, features = FALSE, simplify = FALSE)
-        mc <- setNames(rep(length(setObjects), length(groupFormsList)), names(groupFormsList))
+        gNames <- groupNames(formulasSet)
+        mc <- setNames(rep(length(groupFormsList), length(gNames)), gNames)
         formulasSet@formulas <- generateGroupFormulasByConsensus(groupFormsList, mc, formulasSet@setThreshold,
                                                                  formulasSet@setThresholdAnn,
                                                                  formulasSet@origFGNames, "set", "setCoverage",

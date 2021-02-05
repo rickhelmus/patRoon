@@ -55,8 +55,9 @@
         - compoundsSetMF sub-class (for settings slot)?
         - --> or just doc that setObjects() can be used
     - provide methods for non-implemented functionality
-        - consensus()? (see above)
+        - consensus()/comparison()? (see above)
         - groupFeaturesXCMS3?
+        - IPO
 - check UIs
     - checkFeatures:
         - requires version bump of session
@@ -81,12 +82,9 @@
     - compound set consensus: scoreRanges should be re-determined from annotation results?
 - suspect screening
     - implement TASQ?
-    - consensus?
-        - or just new set filter described above?
     - annotation columns not in report, fine? (there are many) If yes document
 - neutralizing / ionization
     - selectIons()
-        - verify adduct and isotope charge and handle mismatch based on user input
 	    - prefer adducts based on MS/MS? eg handy for Na/K adducts
 	- makeSet()
 	    - fGroups: also support method via comparison?
@@ -96,8 +94,6 @@
 	    - default selectIons() to only consider 'common' adducts? or change default adducts for componentization algos?
 	    - check better for what is supported by SIRIUS?
 	- feature components
-	    - all features are currently annotated (ie including not in a group)
-	        - should be fine once featng is merged --> verify
 	    - cliqueMS
 	        - parallelization?
 	        - change checkPackage GH link once PRs are merged
@@ -135,6 +131,7 @@
     - filter() for features/fGroups: apply to neutral masses
     - CAMERA/RAMClustR/nontarget components: clearly mention it is simply a merge between sets
     - intclust is not a componentsSet
+    - XCMS(3) grouping: exportedData/rtalign/retcorArgs not supported
     - find nice way to re-use docs
     - mention that setObjects are _not_ filtered by setThreshold for formulas/compounds
     - mention that new consensus for formulas/compounds is made after filter() and addFormulaScoring()
@@ -166,6 +163,7 @@
     - OpenMS components
         - qTry == "feature" currently not supported
         - adduct specification: molMult must be one, multiple additions (eg Na2) is controlled by chargeMin/max
+    - selectIons: chargeMismatch --> note that OpenMS findFeatures removes isotopes, hence, adducts more reliable
 
 - tests
     - handle/test empty objects

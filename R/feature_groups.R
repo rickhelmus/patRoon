@@ -1578,7 +1578,8 @@ setMethod("calculatePeakQualities", "featureGroups", function(obj, weights, flat
 })
 
 #' @export
-setMethod("selectIons", "featureGroups", function(fGroups, components, prefAdduct, onlyMonoIso = TRUE)
+setMethod("selectIons", "featureGroups", function(fGroups, components, prefAdduct, onlyMonoIso = TRUE,
+                                                  chargeMismatch = "adduct")
 {
     # UNDONE is intensity_rel a proper measure? ie does it allow comparison if
     # isotopes/adducts are taken from different analyses?
@@ -1587,6 +1588,7 @@ setMethod("selectIons", "featureGroups", function(fGroups, components, prefAdduc
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(components, "components", add = ac)
     checkmate::assertFlag(onlyMonoIso, add = ac)
+    checkmate::assertChoice(chargeMismatch, c("isotope", "adduct", "none", "ignore"))
     checkmate::reportAssertions(ac)
     
     prefAdduct <- as.character(checkAndToAdduct(prefAdduct))
@@ -1596,18 +1598,32 @@ setMethod("selectIons", "featureGroups", function(fGroups, components, prefAdduc
     
     cTab <- as.data.table(components)
     cTab <- cTab[group %in% names(fGroups)]
-    if (!is.null(cTab[["isonr"]]))
+    hasIsos <- !is.null(cTab[["isonr"]]) & !all(is.na(cTab$isonr))
+    if (hasIsos)
         cTab <- cTab[!is.na(isonr) | !is.na(adduct_ion)]
     else
         cTab <- cTab[!is.na(adduct_ion)]
     
     cTab[, remove := FALSE]
+    
+    if (hasIsos && chargeMismatch != "ignore")
+    {
+        cTab[!is.na(charge) & !is.na(adduct_ion),
+             chMismatch := charge != sapply(lapply(adduct_ion, as.adduct), slot, "charge")]
+        if (chargeMismatch == "isotope")
+            cTab[chMismatch == TRUE, adduct_ion := NA_character_]
+        else if (chargeMismatch == "adduct")
+            cTab[chMismatch == TRUE, isonr := NA_integer_]
+        else # "none"
+            cTab[chMismatch == TRUE, remove := TRUE]
+    }
+    
     if (onlyMonoIso)
     {
-        if (is.null(cTab[["isonr"]]) || all(is.na(cTab$isonr)))
+        if (!hasIsos)
             cat("No isotope annotations available!\n")
         else
-            cTab[!is.na(isonr), remove := isonr != 0]
+            cTab[remove == FALSE & !is.na(isonr), remove := isonr != 0]
     }
     
     cTab[!is.na(adduct_ion) & remove == FALSE, remove := {

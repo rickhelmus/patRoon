@@ -17,7 +17,7 @@ setMethod("generateComponentsCliqueMS", "featureGroups", function(fGroups, ioniz
                                                                   mzWindow = 0.005, minSize = 2,
                                                                   relMinAdductAbundance = 0.75,
                                                                   extraOptsCli = NULL, extraOptsIso = NULL,
-                                                                  extraOptsAnn = NULL)
+                                                                  extraOptsAnn = NULL, parallel = TRUE)
 {
     checkPackage("cliqueMS", "https://github.com/rickhelmus/cliqueMS") # UNDONE
     
@@ -29,6 +29,7 @@ setMethod("generateComponentsCliqueMS", "featureGroups", function(fGroups, ioniz
     checkmate::assertDataFrame(adductInfo, any.missing = FALSE, col.names = "unique", null.ok = TRUE, add = ac)
     aapply(checkmate::assertList, . ~ extraOptsCli + extraOptsIso + extraOptsAnn, any.missing = FALSE,
            names = "unique", null.ok = TRUE, fixed = list(add = ac))
+    checkmate::assertFlag(parallel, add = ac)
     checkmate::reportAssertions(ac)
 
     if (length(fGroups) == 0)
@@ -56,36 +57,46 @@ setMethod("generateComponentsCliqueMS", "featureGroups", function(fGroups, ioniz
     db <- openCacheDBScope()
     baseHash <- makeHash(ionization, maxCharge, maxGrade, ppm, adductInfo, mzWindow, minSize, relMinAdductAbundance,
                          extraOptsCli, extraOptsIso, extraOptsAnn)
+    hashes <- sapply(featureTable(fGroups), makeHash, baseHash)
+    cachedCliques <- sapply(hashes, loadCacheData, category = "componentsCliqueMS", dbArg = db, simplify = FALSE)
+    cachedCliques <- pruneList(cachedCliques)
     
-    prog <- openProgBar(0, length(anas))
-    
-    allCliques <- setNames(lapply(seq_along(anas), function(i)
+    getCliques <- function(xdata)
     {
-        hash <- makeHash(fList[[i]], baseHash)
-        cliques <- loadCacheData("componentsCliqueMS", hash, db)
-        if (is.null(cliques))
-        {
-            xdata <- getXCMSnExp(fList[i], verbose = FALSE)
-            
-            suppressMessages(invisible(utils::capture.output({
-                cliques <- do.call(cliqueMS::getCliques, c(list(xdata), extraOptsCli))
-                cliques <- do.call(cliqueMS::getIsotopes,
-                                   c(list(cliques, maxCharge = maxCharge, maxGrade = maxGrade, ppm = ppm), extraOptsIso))
-                cliques <- do.call(cliqueMS::getAnnotation,
-                                   c(list(cliques, ppm = ppm, adinfo = adductInfo, polarity = ionization,
-                                          normalizeScore = TRUE), extraOptsAnn))
-            })))
-            
-            saveCacheData("componentsCliqueMS", cliques, hash, db)
-        }
-        
-        setTxtProgressBar(prog, i)
-        
+        suppressMessages(invisible(utils::capture.output({
+            cliques <- do.call(cliqueMS::getCliques, c(list(xdata), extraOptsCli))
+            cliques <- do.call(cliqueMS::getIsotopes,
+                               c(list(cliques, maxCharge = maxCharge, maxGrade = maxGrade, ppm = ppm), extraOptsIso))
+            cliques <- do.call(cliqueMS::getAnnotation,
+                               c(list(cliques, ppm = ppm, adinfo = adductInfo, polarity = ionization,
+                                      normalizeScore = TRUE), extraOptsAnn))
+        })))
+        patRoon:::doProgress()
         return(cliques)
-    }), anas)
-    
-    close(prog)
-    
+    }
+
+    anasTBD <- setdiff(anas, names(cachedCliques))
+    if (length(anasTBD) > 0)
+    {
+        cat("Exporting to XCMS features... ")
+        xds <- sapply(anasTBD, function(a) getXCMSnExp(fList[a], verbose = FALSE, exportedData = TRUE),
+                      simplify = FALSE)
+        cat("Done!\n")
+        
+        if (parallel)
+            allCliques <- withProg(length(xds), future.apply::future_sapply(xds, getCliques, simplify = FALSE))
+        else
+            allCliques <- withProg(length(xds), sapply(xds, getCliques, simplify = FALSE))
+        
+        for (a in anasTBD)
+            saveCacheData("componentsCliqueMS", allCliques[[a]], hashes[[a]], db)
+        
+        if (length(cachedCliques) > 0)
+            allCliques <- c(allCliques, cachedCliques)[anas] # merge and re-order
+    }
+    else
+        allCliques <- cachedCliques
+        
     featComponents <- list()
     if (length(allCliques) > 0)
     {

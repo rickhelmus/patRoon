@@ -822,3 +822,26 @@ setMethod("checkFeatures", "featureGroups", function(fGroups, session, rtWindow,
     
     runApp(shinyApp(getCheckFeatsUI(settings), server))
 })
+
+getMCTrainData <- function(fGroups, session)
+{
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertClass(fGroups, "featureGroups")
+    assertCheckFeaturesSession(session, fGroups, mustExist = TRUE, canClearSession = FALSE, didClearSession = FALSE,
+                               null.ok = FALSE, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    if (!hasFGroupScores(fGroups))
+        stop("No feature qualities were calculated. Please run calculatePeakQualities() first.")
+    
+    session <- readRDS(getCheckFeaturesSessionPath(session))
+    
+    ret <- copy(fGroups@groupQualities)
+    ret[, EICNo := match(group, names(fGroups))]
+    qcols <- c(featureQualityNames(), featureGroupQualityNames())
+    setnames(ret, qcols, paste0(qcols, "_mean"))
+    ret[, Class := fifelse(group %in% session$enabledFGroups, "GOOD", "BAD")]
+    ret[, group := NULL]
+    
+    return(as.data.frame(ret))
+}

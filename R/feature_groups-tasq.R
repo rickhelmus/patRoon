@@ -54,6 +54,7 @@ importFeatureGroupsBrukerTASQ <- function(path, analysisInfo, clusterRTWindow = 
 
     fts <- importFeaturesBrukerTASQ(analysisInfo, path)
     fTable <- featureTable(fts)
+    analysisInfo <- fts@analysisInfo # may have been updated
     
     tExport <- fread(path, select = selCols)
     tExport <- tExport[!is.na(`RT [min]`) & `Data Set` %in% analysisInfo$analysis] # skip empty/other results

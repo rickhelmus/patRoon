@@ -31,36 +31,43 @@ findFeaturesEnviPick <- function(analysisInfo, ..., parallel = TRUE, verbose = T
     if (verbose)
         printf("Finding features with enviPick for %d analyses ...\n", anaCount)
 
-    doFP <- function(ana, path)
+    filePaths <- mapply(getMzXMLAnalysisPath, analysisInfo$analysis, analysisInfo$path)
+    baseHash <- makeHash(list(...))
+    hashes <- sapply(filePaths, function(fp) makeHash(baseHash, makeFileHash(fp)))
+    cachedData <- pruneList(sapply(hashes, loadCacheData, category = "featuresEnviPick", simplify = FALSE))
+    
+    doFP <- function(fp)
     {
-        fp <- getMzXMLAnalysisPath(ana, path)
-        hash <- makeHash(makeFileHash(fp), list(...))
-        f <- loadCacheData("featuresEnviPick", hash)
-        
-        if (is.null(f))
-        {
-            invisible(utils::capture.output(ep <- enviPick::enviPickwrap(fp, ...)))
-            f <- importEnviPickPeakList(ep$Peaklist)
-            saveCacheData("featuresEnviPick", f, hash)
-        }
-        
+        invisible(utils::capture.output(ep <- enviPick::enviPickwrap(fp, ...)))
+        f <- importEnviPickPeakList(ep$Peaklist)
         patRoon:::doProgress()
-        
         return(f)
     }
-    
-    if (parallel)
-        ret@features <- withProg(nrow(analysisInfo), future.apply::future_Map(doFP, analysisInfo$analysis,
-                                                                              analysisInfo$path))
-    else
-        ret@features <- withProg(nrow(analysisInfo), Map(doFP, analysisInfo$analysis, analysisInfo$path))
 
+    fpsTBD <- setdiff(filePaths, names(cachedData))
+    if (length(fpsTBD) > 0)
+    {
+        if (parallel)
+            feats <- withProg(nrow(analysisInfo), future.apply::future_lapply(fpsTBD, doFP))
+        else
+            feats <- withProg(nrow(analysisInfo), lapply(fpsTBD, doFP))
+        names(feats) <- analysisInfo$analysis
+        for (a in analysisInfo$analysis)
+            saveCacheData("featuresEnviPick", feats[[a]], hashes[[a]])
+        
+        if (length(cachedData) > 0)
+            feats <- c(feats, cachedData)[analysisInfo$analysis] # merge and re-order
+    }
+    else
+        feats <- cachedData
+    
     if (verbose)
     {
         printf("Done!\n")
-        printFeatStats(ret@features)
+        printFeatStats(feats)
     }
 
+    ret@features <- feats
     return(ret)
 }
 

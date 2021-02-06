@@ -127,9 +127,9 @@ test_that("XCMS conversion", {
     expect_equal(featMZs(importFeatures(epAnaInfo, "xcms", XCMSImpEP)), featMZs(ffEP))
 })
 
-XCMS3ImpXCMS <- getXCMSnExp(ffXCMS)
+XCMS3ImpXCMS <- getXCMSnExp(ffXCMS, exportedData = FALSE)
 XCMS3ImpXCMS3 <- getXCMSnExp(ffXCMS3)
-XCMS3ImpOpenMS <- getXCMSnExp(ffOpenMS)
+XCMS3ImpOpenMS <- getXCMSnExp(ffOpenMS, exportedData = FALSE)
 # XCMS3ImpEP <- getXCMSnExp(ffEP) XCMS3/MSnbase doesn't like mzXMLs generated for EnviPick
 test_that("XCMS3 conversion", {
     expect_equal(nrow(xcms::chromPeaks(XCMS3ImpXCMS)), length(ffXCMS))

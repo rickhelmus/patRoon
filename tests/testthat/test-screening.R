@@ -245,7 +245,6 @@ test_that("reporting works", {
 TQFile <- file.path(getTestDataPath(), "GlobalResults-TASQ.csv")
 TQRes <- fread(TQFile)
 fGroupsTQ <- importFeatureGroupsBrukerTASQ(TQFile, getTestAnaInfo())
-fGroupsTQ <- filter(fGroupsTQ, blankThreshold = 5, removeBlanks = TRUE)
 TQFileNoRT <- file.path(getTestDataPath(), "GlobalResults_noRT-TASQ.csv")
 TQResNoRT <- fread(TQFileNoRT)
 fGroupsTQNoRT <- importFeatureGroupsBrukerTASQ(TQFileNoRT, getTestAnaInfo())

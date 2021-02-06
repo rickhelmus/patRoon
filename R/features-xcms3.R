@@ -18,8 +18,6 @@ featuresXCMS3 <- setClass("featuresXCMS3", slots = list(xdata = "ANY"), contains
 setMethod("initialize", "featuresXCMS3",
           function(.Object, ...) callNextMethod(.Object, algorithm = "xcms3", ...))
 
-#' @rdname features-class
-#' @export
 setReplaceMethod("featureTable", "featuresXCMS3", function(obj, value)
 {
     ret <- callNextMethod()
@@ -37,8 +35,6 @@ setMethod("[", c("featuresXCMS3", "ANY", "missing", "missing"), function(x, i, j
     return(x)
 })
 
-#' @rdname features-class
-#' @export
 setReplaceMethod("[", c("featuresXCMS3", "ANY", "missing"), function(x, i, j, value)
 {
     ret <- callNextMethod()
@@ -47,8 +43,6 @@ setReplaceMethod("[", c("featuresXCMS3", "ANY", "missing"), function(x, i, j, va
     return(ret)
 })
 
-#' @rdname features-class
-#' @export
 setReplaceMethod("[[", c("featuresXCMS3", "ANY", "missing"), function(x, i, j, value)
 {
     ret <- callNextMethod()
@@ -57,8 +51,6 @@ setReplaceMethod("[[", c("featuresXCMS3", "ANY", "missing"), function(x, i, j, v
     return(ret)
 })
 
-#' @rdname features-class
-#' @export
 setReplaceMethod("$", "featuresXCMS3", function(x, name, value)
 {
     ret <- callNextMethod()

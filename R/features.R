@@ -77,9 +77,6 @@ setMethod("show", "features", function(object)
 #' @export
 setMethod("featureTable", "features", function(obj) obj@features)
 
-#' @describeIn features Set table with feature information
-#' @return \code{featureTable<-}: An updated \code{features} object.
-#' @export
 setReplaceMethod("featureTable", "features", function(obj, value)
 {
     # UNDONE: verify value
@@ -200,8 +197,6 @@ setMethod("[", c("features", "ANY", "missing", "missing"), function(x, i, ...)
     return(x)
 })
 
-#' @describeIn features Sets feature data for a subset of the analyses.
-#' @export
 setReplaceMethod("[", c("features", "ANY", "missing"), function(x, i, j, value)
 {
     # UNDONE: verify value
@@ -218,8 +213,6 @@ setMethod("[[", c("features", "ANY", "missing"), function(x, i)
     return(x@features[[i]])
 })
 
-#' @describeIn features Sets feature table for an analysis.
-#' @export
 setReplaceMethod("[[", c("features", "ANY", "missing"), function(x, i, j, value)
 {
     # UNDONE: verify value
@@ -235,8 +228,6 @@ setMethod("$", "features", function(x, name)
     eval(substitute(x@features$NAME_ARG, list(NAME_ARG = name)))
 })
 
-#' @describeIn features Sets feature table for an analysis.
-#' @export
 setReplaceMethod("$", "features", function(x, name, value)
 {
     eval(substitute(x@features$NAME_ARG <- value, list(NAME_ARG = name)))

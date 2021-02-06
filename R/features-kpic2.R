@@ -54,8 +54,6 @@ featuresKPIC2 <- setClass("featuresKPIC2", slots = list(picsList = "ANY"), conta
 setMethod("initialize", "featuresKPIC2",
           function(.Object, ...) callNextMethod(.Object, algorithm = "kpic2", ...))
 
-#' @rdname features-class
-#' @export
 setReplaceMethod("featureTable", "featuresKPIC2", function(obj, value)
 {
     ret <- callNextMethod()
@@ -72,8 +70,6 @@ setMethod("[", c("featuresKPIC2", "ANY", "missing", "missing"), function(x, i, j
     return(x)
 })
 
-#' @rdname features-class
-#' @export
 setReplaceMethod("[", c("featuresKPIC2", "ANY", "missing"), function(x, i, j, value)
 {
     ret <- callNextMethod()
@@ -81,8 +77,6 @@ setReplaceMethod("[", c("featuresKPIC2", "ANY", "missing"), function(x, i, j, va
     return(ret)
 })
 
-#' @rdname features-class
-#' @export
 setReplaceMethod("[[", c("featuresKPIC2", "ANY", "missing"), function(x, i, j, value)
 {
     ret <- callNextMethod()
@@ -90,8 +84,6 @@ setReplaceMethod("[[", c("featuresKPIC2", "ANY", "missing"), function(x, i, j, v
     return(ret)
 })
 
-#' @rdname features-class
-#' @export
 setReplaceMethod("$", "featuresKPIC2", function(x, name, value)
 {
     ret <- callNextMethod()

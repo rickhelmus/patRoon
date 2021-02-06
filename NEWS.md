@@ -3,6 +3,7 @@
 * Future multiprocessing: make sure that logs are created even when an error occurs.
 * Classic multiprocessing: intermediate results are cached again
 * Fixed: `generateMSPeakListsDAFMF()` potentially used wrong DA compound data in case features were filtered
+* `importFeatureGroupsBrukerTASQ()`: Improved handling of absent analyses in imported results files
 
 
 # patRoon 1.2.1

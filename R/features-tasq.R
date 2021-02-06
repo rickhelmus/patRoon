@@ -21,10 +21,11 @@ importFeaturesBrukerTASQ <- function(analysisInfo, TASQExportFile)
 
     tAnalyses <- unique(tExport$analysis)
     tAnalyses <- tAnalyses[tAnalyses %in% analysisInfo$analysis]
+    analysisInfo <- analysisInfo[analysisInfo$analysis %in% tAnalyses, ]
 
     ret <- featuresBrukerTASQ(analysisInfo = analysisInfo)
 
-    ret@features <- sapply(tAnalyses, function(ana)
+    ret@features <- sapply(analysisInfo$analysis, function(ana)
     {
         ft <- tExport[analysis == ana]
         ft[, analysis := NULL]
@@ -40,7 +41,7 @@ importFeaturesBrukerTASQ <- function(analysisInfo, TASQExportFile)
 
         return(ft[, -c("FWHM", "s")])
     }, simplify = FALSE)
-
+    
     cat("Done!\n")
 
     return(ret)

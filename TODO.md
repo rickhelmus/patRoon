@@ -71,7 +71,7 @@
     - rename exportedData, update docs (also handbook)
     - remove featuresOpenMS method for getXCMSSet(), update docs
     - groupFeatures(algorithm="sirius")
-    - caching for findFeaturesKPIC2, move caching out of future.apply for enviPick
+    - caching for findFeaturesKPIC2
 - NEWS
     - topMostByRGroup/EICTopMostByRGroup
     - as.data.table: qualities argument (and potentially faster now with features=T?)

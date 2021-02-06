@@ -105,8 +105,7 @@ optimizeFeatureGrouping <- function(features, algorithm, ..., templateParams = l
                  kpic2 = featureGroupsOptimizerKPIC2)
 
     go <- go$new(features = features, algorithm = algorithm, parallel = parallel)
-    result <- go$optimize(params, templateParams, paramRanges, maxIterations, maxModelDeviation,
-                          parallel)
+    result <- go$optimize(params, templateParams, paramRanges, maxIterations, maxModelDeviation)
 
     return(optimizationResult(algorithm = algorithm, paramSets = result$paramSets,
                               bestParamSet = result$bestParamSet))

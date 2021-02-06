@@ -116,19 +116,22 @@ Rcpp::List loadEICs(Rcpp::List spectra, Rcpp::NumericVector rtMins, Rcpp::Numeri
                       EICIntensities.push_back(getTotMZIntFromSpec(peakMZs, peakInts, mzMin, mzMax));
                   });
 
-        // compress data by removing any zero intensity datapoints that are inbetween two other zero intensity points.
-        for (size_t ind=0; ind<(EICTimes.size()-2); )
+        if (EICTimes.size() > 2)
         {
-            if (EICIntensities[ind+2] != 0)
-                ind += 3;
-            else if (EICIntensities[ind+1] != 0)
-                ind += 2;
-            else if (EICIntensities[ind] != 0)
-                ++ind;
-            else // all zero
+            // compress data by removing any zero intensity datapoints that are inbetween two other zero intensity points.
+            for (size_t ind=0; ind<(EICTimes.size()-2); )
             {
-                EICTimes.erase(EICTimes.begin() + (ind + 1));
-                EICIntensities.erase(EICIntensities.begin() + (ind + 1));
+                if (EICIntensities[ind+2] != 0)
+                    ind += 3;
+                else if (EICIntensities[ind+1] != 0)
+                    ind += 2;
+                else if (EICIntensities[ind] != 0)
+                    ++ind;
+                else // all zero
+                {
+                    EICTimes.erase(EICTimes.begin() + (ind + 1));
+                    EICIntensities.erase(EICIntensities.begin() + (ind + 1));
+                }
             }
         }
         

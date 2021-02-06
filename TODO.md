@@ -72,6 +72,7 @@
     - remove featuresOpenMS method for getXCMSSet(), update docs
     - groupFeatures(algorithm="sirius")
     - caching for findFeaturesKPIC2
+    - don't key quality/score tables?
 - NEWS
     - topMostByRGroup/EICTopMostByRGroup
     - as.data.table: qualities argument (and potentially faster now with features=T?)

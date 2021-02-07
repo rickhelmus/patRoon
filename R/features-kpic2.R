@@ -91,6 +91,30 @@ setReplaceMethod("$", "featuresKPIC2", function(x, name, value)
     return(ret)
 })
 
+#' @rdname features-class
+#' @export
+setMethod("delete", "featuresKPIC2", function(obj, i = NULL, j = NULL)
+{
+    old <- obj
+    obj <- callNextMethod()
+    if (!is.null(j)) # sync features
+    {
+        if (is.null(i))
+            i <- analyses(obj)
+        
+        obj@picsList[i] <- lapply(obj@picsList[i], function(pics)
+        {
+            pics$pics <- pics$pics[-j]
+            pics$peaks <- pics$peaks[-j]
+            pics$peakinfo <- pics$peakinfo[-j, , drop = FALSE]
+            return(pics)
+        })
+        
+        # ensure IDs are along rows in case features were removed
+        obj@features[i] <- lapply(obj@features[i], function(ft) set(ft, j = "ID", value = seq_len(nrow(ft))))
+    }
+    return(obj)
+})
 
 #' @rdname feature-finding
 #' @export

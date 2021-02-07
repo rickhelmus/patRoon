@@ -244,6 +244,11 @@ setGeneric("plotVenn", function(obj, ...) standardGeneric("plotVenn"))
 #' @template generics
 setGeneric("plotUpSet", function(obj, ...) standardGeneric("plotUpSet"))
 
+#' @templateVar func delete
+#' @templateVar desc Deletes results.
+#' @template generics
+setGeneric("delete", function(obj, ...) standardGeneric("delete"))
+
 #' @templateVar func replicateGroups
 #' @templateVar desc returns a \code{character} vector with the analyses for which data is present in this object.
 #' @template generics

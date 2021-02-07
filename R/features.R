@@ -234,6 +234,35 @@ setReplaceMethod("$", "features", function(x, name, value)
     return(x)
 })
 
+#' @describeIn features Completely deletes specified features.
+#' @export
+setMethod("delete", "features", function(obj, i = NULL, j = NULL)
+{
+    if (is.null(i) && is.null(j))
+        stop("Specify at least either i or j")
+    
+    if (!is.null(i))
+        i <- assertSubsetArgAndToChr(i, analyses(obj))
+    
+    checkmate::assertCount(j, positive = TRUE, null.ok = TRUE)
+    
+    # i = NULL: remove from all analyses
+    # j = NULL: remove specified analyses
+    
+    if (is.null(i))
+        i <- analyses(obj)
+    else if (is.null(j))
+        return(obj[i])
+    
+    obj@features[i] <- Map(obj@features[i], i, f = function(ft, ana)
+    {
+        if (j > nrow(ft))
+            stop("Specified j out of range for analysis ", ana)
+        return(ft[-j])
+    })
+    return(obj)
+})
+
 setMethod("calculatePeakQualities", "features", function(obj, weights, flatnessFactor, parallel = TRUE)
 {
     featQualities <- featureQualities()

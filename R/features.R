@@ -234,7 +234,7 @@ setReplaceMethod("$", "features", function(x, name, value)
     return(x)
 })
 
-setMethod("calculatePeakQualities", "features", function(obj, weights, flatnessFactor)
+setMethod("calculatePeakQualities", "features", function(obj, weights, flatnessFactor, parallel = TRUE)
 {
     featQualities <- featureQualities()
     featQualityNames <- featureQualityNames()
@@ -246,6 +246,7 @@ setMethod("calculatePeakQualities", "features", function(obj, weights, flatnessF
     if (!is.null(weights))
         checkmate::assertNames(names(weights), subset.of = featScoreNames, add = ac)
     checkmate::assertNumber(flatnessFactor, add = ac)
+    checkmate::assertFlag(parallel, add = ac)
     checkmate::reportAssertions(ac)
     
     hash <- makeHash(obj, weights, flatnessFactor)
@@ -277,18 +278,22 @@ setMethod("calculatePeakQualities", "features", function(obj, weights, flatnessF
         }, simplify = FALSE))
     }
     
-    printf("Calculating feature peak qualities and scores...\n")
-    prog <- openProgBar(0, length(EICs))
-    
-    fTable <- Map(featureTable(obj)[names(EICs)], EICs, seq_along(EICs), f = function(ft, eic, i)
+    doCalcs <- function(ft, eic)
     {
         ft <- copy(ft)
         eic <- as.matrix(eic) # MetaClean expects matrices
         ft[, (featQualityNames) := rbindlist(Map(calcFeatQualities, ret, retmin, retmax, intensity, eic))]
-        ft[, (featScoreNames) := Map(scoreFeatQuality, featQualities, .SD), .SDcols = featQualityNames]
-        setTxtProgressBar(prog, i)
+        ft[, (featScoreNames) := Map(patRoon:::scoreFeatQuality, featQualities, .SD), .SDcols = featQualityNames]
+        patRoon:::doProgress()
         return(ft)
-    })
+    }
+    
+    printf("Calculating feature peak qualities and scores...\n")
+
+    if (parallel)
+        fTable <- withProg(length(EICs), future.apply::future_Map(doCalcs, featureTable(obj)[names(EICs)], EICs))
+    else
+        fTable <- withProg(length(EICs), Map(doCalcs, featureTable(obj)[names(EICs)], EICs))
     
     if (!is.null(weights))
     {
@@ -301,11 +306,12 @@ setMethod("calculatePeakQualities", "features", function(obj, weights, flatnessF
         wft <- ft[, featScoreNames, with = FALSE]
         if (!is.null(weights))
             wft[, names(wft) := Map("*", .SD, weights)]
+      
+        if (parallel)
+            setDT(ft)
         set(ft, j = "totalScore", value = rowSums(wft, na.rm = TRUE))
     })
 
-    setTxtProgressBar(prog, length(EICs))
-    
     featureTable(obj) <- fTable
     
     saveCacheData("calculatePeakQualities", obj, hash)

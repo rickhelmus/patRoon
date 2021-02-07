@@ -11,7 +11,7 @@ showAnaInfo <- function(anaInfo)
 
 featureQualities <- function()
 {
-    list(ApexBoundraryRatio = list(func = MetaClean::calculateApexMaxBoundaryRatio, HQ = "LV", range = c(0, 1)),
+    list(ApexBoundaryRatio = list(func = MetaClean::calculateApexMaxBoundaryRatio, HQ = "LV", range = c(0, 1)),
          FWHM2Base = list(func = MetaClean::calculateFWHM, HQ = "HV", range = c(0, 1)),
          Jaggedness = list(func = MetaClean::calculateJaggedness, HQ = "LV", range = Inf),
          Modality = list(func = MetaClean::calculateModality, HQ = "LV", range = Inf),

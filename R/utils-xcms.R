@@ -115,7 +115,9 @@ setMethod("getXCMSSet", "features", function(obj, verbose, exportedData)
     xcms::phenoData(xs) <- data.frame(class = anaInfo$group, row.names = anaInfo$analysis)
 
     if (exportedData)
-        xcms::filepaths(xs) <- sapply(seq_len(nrow(anaInfo)), function(i) getMzMLOrMzXMLAnalysisPath(anaInfo$analysis[i], anaInfo$path[i]), USE.NAMES = F)
+        xcms::filepaths(xs) <- sapply(seq_len(nrow(anaInfo)),
+                                      function(i) getMzMLOrMzXMLAnalysisPath(anaInfo$analysis[i], anaInfo$path[i]),
+                                      USE.NAMES = FALSE)
     else
         xcms::filepaths(xs) <- anaInfo$analysis # dummy paths
 
@@ -131,14 +133,12 @@ setMethod("getXCMSSet", "features", function(obj, verbose, exportedData)
         {
             plist[[i]] <- data.frame(mz = ft$mz, mzmin = ft$mzmin, mzmax = ft$mzmax, rt = ft$ret,
                                      rtmin = ft$retmin, rtmax = ft$retmax, maxo = ft$intensity, into = ft$area,
-                                     sample = i, stringsAsFactors = F)
-            if (!is.null(ft[["sn"]]))
-                plist[[i]]$sn <- ft$sn
+                                     sample = i, sn = if (!is.null(ft[["sn"]])) ft$sn else NA_real_)
         }
         else
             plist[[i]] <- data.frame(mz = numeric(), mzmin = numeric(), mzmax = numeric(), rt = numeric(),
                                      rtmin = numeric(), rtmax = numeric(), maxo = numeric(), into = numeric(),
-                                     sample = numeric())
+                                     sample = numeric(), sn = numeric())
         
         if (exportedData)
         {
@@ -148,7 +148,7 @@ setMethod("getXCMSSet", "features", function(obj, verbose, exportedData)
         }
     }
 
-    xcms::peaks(xs) <- as.matrix(do.call(function(...) rbind(..., make.row.names=F), plist))
+    xcms::peaks(xs) <- as.matrix(do.call(function(...) rbind(..., make.row.names = FALSE), plist))
     xs@rt <- rlist
     xcms::profinfo(xs) <- list(method = "bin", step = 0.1)
 
@@ -247,14 +247,13 @@ setMethod("getXCMSnExp", "features", function(obj, verbose, exportedData)
             if (nrow(ft) > 0)
             {
                 ret <- data.table(mz = ft$mz, mzmin = ft$mzmin, mzmax = ft$mzmax, rt = ft$ret,
-                           rtmin = ft$retmin, rtmax = ft$retmax, maxo = ft$intensity, into = ft$area)
-                if (!is.null(ft[["sn"]]))
-                    ret$sn <- ft$sn
+                                  rtmin = ft$retmin, rtmax = ft$retmax, maxo = ft$intensity, into = ft$area,
+                                  sn = if (!is.null(ft[["sn"]])) ft$sn else NA_real_)
             }
             else
                 ret <- data.table(mz = numeric(), mzmin = numeric(), mzmax = numeric(), rt = numeric(),
                                   rtmin = numeric(), rtmax = numeric(), maxo = numeric(), into = numeric(),
-                                  sample = numeric())
+                                  sn = numeric())
             return(ret)
         }), idcol = "sample")
         setcolorder(allFeats, setdiff(names(allFeats), "sample")) # move sample col to end

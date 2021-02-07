@@ -1350,7 +1350,8 @@ setMethod("overlap", "featureGroups", function(fGroups, which, exclusive)
     return(ret)
 })
 
-setMethod("calculatePeakQualities", "featureGroups", function(obj, weights, flatnessFactor, avgFunc = mean)
+setMethod("calculatePeakQualities", "featureGroups", function(obj, weights, flatnessFactor, avgFunc = mean,
+                                                              parallel = TRUE)
 {
     allScores <- c(featureScoreNames(), featureGroupScoreNames())
     
@@ -1361,6 +1362,7 @@ setMethod("calculatePeakQualities", "featureGroups", function(obj, weights, flat
         checkmate::assertNames(names(weights), subset.of = allScores, add = ac)
     checkmate::assertNumber(flatnessFactor, add = ac)
     checkmate::assertFunction(avgFunc, add = ac)
+    checkmate::assertFlag(parallel, add = ac)
     checkmate::reportAssertions(ac)
     
     hash <- makeHash(obj, weights, flatnessFactor, avgFunc)
@@ -1380,7 +1382,8 @@ setMethod("calculatePeakQualities", "featureGroups", function(obj, weights, flat
     }
     
     w <- if (!is.null(weights) && any(names(weights) %in% featureScoreNames())) weights[featureScoreNames()] else NULL
-    obj@features <- calculatePeakQualities(getFeatures(obj), weights = w, flatnessFactor = flatnessFactor)
+    obj@features <- calculatePeakQualities(getFeatures(obj), weights = w, flatnessFactor = flatnessFactor,
+                                           parallel = parallel)
     
     ftind <- groupFeatIndex(obj)
     anas <- analyses(obj)

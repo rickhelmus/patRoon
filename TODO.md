@@ -62,7 +62,6 @@
 - misc
     - topMostByRGroup: make default? or only for reporting?
     - quality/score filters
-    - MetaClean model import/export
     - updatePICSet(): also sync peaks list? otherwise doc
     - update docs and checkChromatograms() for mzWindow --> mzExpWindow
     - newProject(): new algorithms
@@ -73,6 +72,8 @@
     - groupFeatures(algorithm="sirius")
     - caching for findFeaturesKPIC2
     - don't key quality/score tables?
+    - rmResult for features and fGroups
+    - filterFile, [ also for XCMS fGroups?
 - NEWS
     - topMostByRGroup/EICTopMostByRGroup
     - as.data.table: qualities argument (and potentially faster now with features=T?)

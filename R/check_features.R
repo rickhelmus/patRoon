@@ -823,6 +823,20 @@ setMethod("checkFeatures", "featureGroups", function(fGroups, session, rtWindow,
     runApp(shinyApp(getCheckFeatsUI(settings), server))
 })
 
+convertQualitiesToMCData <- function(fGroups)
+{
+    if (!hasFGroupScores(fGroups))
+        stop("No feature qualities were calculated. Please run calculatePeakQualities() first.")
+
+    ret <- copy(groupQualities(fGroups))
+    ret[, EICNo := match(group, names(fGroups))]
+    setcolorder(ret, "EICNo")
+    qcols <- c(featureQualityNames(), featureGroupQualityNames())
+    setnames(ret, qcols, paste0(qcols, "_mean"))
+    ret[, group := NULL][]
+    return(ret)
+}
+
 getMCTrainData <- function(fGroups, session)
 {
     ac <- checkmate::makeAssertCollection()
@@ -831,17 +845,44 @@ getMCTrainData <- function(fGroups, session)
                                null.ok = FALSE, add = ac)
     checkmate::reportAssertions(ac)
     
-    if (!hasFGroupScores(fGroups))
-        stop("No feature qualities were calculated. Please run calculatePeakQualities() first.")
-    
     session <- readRDS(getCheckFeaturesSessionPath(session))
-    
-    ret <- copy(fGroups@groupQualities)
-    ret[, EICNo := match(group, names(fGroups))]
-    qcols <- c(featureQualityNames(), featureGroupQualityNames())
-    setnames(ret, qcols, paste0(qcols, "_mean"))
-    ret[, Class := fifelse(group %in% session$enabledFGroups, "GOOD", "BAD")]
-    ret[, group := NULL]
+    ret <- convertQualitiesToMCData(fGroups)
+    gNames <- names(fGroups)
+    ret[, Class := fifelse(gNames[EICNo] %in% session$enabledFGroups, "GOOD", "BAD")]
     
     return(as.data.frame(ret))
+}
+
+predictCheckFeaturesSession <- function(fGroups, session, model, overWrite = FALSE)
+{
+    checkPackage("MetaClean")
+
+    checkmate::assertString(session, min.chars = 1)
+    path <- getCheckFeaturesSessionPath(session)
+    
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertClass(fGroups, "featureGroups")
+    checkmate::assertClass(model, "train", add = ac)
+    checkmate::assertPathForOutput(path, overwrite = TRUE, .var.name = "session", add = ac)
+    checkmate::assertFlag(overWrite, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    if (length(fGroups) == 0)
+        stop("No feature groups, nothing to do...")
+    
+    if (file.exists(path) && !overWrite)
+        stop("Output session already exists. Set overWrite=TRUE to proceed anyway.")
+    
+    testd <- convertQualitiesToMCData(fGroups)
+    browser()
+    preds <- MetaClean::getPredicitons(model = model, testData = testd, eicColumn = "EICNo")
+    
+    gNames <- names(fGroups)
+    ef <- data.frame(analysis = analyses(fGroups))
+    ef[, gNames] <- TRUE
+    # UNDONE: when is it GOOD/BAD or Pass/Fail?
+    saveRDS(list(enabledFGroups = gNames[preds[preds$Pred_Class %in% c("GOOD", "Pass"), "EIC"]], enabledFeatures = ef,
+                 version = 1), path)
+    
+    invisible(NULL)
 }

@@ -829,6 +829,15 @@ convertQualitiesToMCData <- function(fGroups)
         stop("No feature qualities were calculated. Please run calculatePeakQualities() first.")
 
     ret <- copy(groupQualities(fGroups))
+    
+    hasNA <- unique(unlist(lapply(ret, function(x) which(is.na(x)))))
+    if (length(hasNA) > 0)
+    {
+        warning("The following feature groups have one or more NA peak qualities and will be omitted: ",
+                paste0(ret$group[hasNA], collapse = ", "))
+        ret <- ret[-hasNA]
+    }
+    
     ret[, EICNo := match(group, names(fGroups))]
     setcolorder(ret, "EICNo")
     qcols <- c(featureQualityNames(), featureGroupQualityNames())
@@ -874,7 +883,6 @@ predictCheckFeaturesSession <- function(fGroups, session, model, overWrite = FAL
         stop("Output session already exists. Set overWrite=TRUE to proceed anyway.")
     
     testd <- convertQualitiesToMCData(fGroups)
-    browser()
     preds <- MetaClean::getPredicitons(model = model, testData = testd, eicColumn = "EICNo")
     
     gNames <- names(fGroups)

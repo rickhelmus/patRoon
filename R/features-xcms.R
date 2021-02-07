@@ -59,6 +59,17 @@ setReplaceMethod("$", "featuresXCMS", function(x, name, value)
     return(ret)
 })
 
+#' @rdname features-class
+#' @export
+setMethod("delete", "featuresXCMS", function(obj, i = NULL, j = NULL)
+{
+    old <- obj
+    obj <- callNextMethod()
+    if (!is.null(j)) # sync features
+        xcms::peaks(obj@xs) <- xcms::peaks(obj@xs)[getKeptXCMSPeakInds(i, j, old, obj), , drop = FALSE]
+    return(obj)
+})
+
 #' @details \code{findFeaturesXCMS} uses the \code{\link[xcms]{xcmsSet}}
 #'   function from the \pkg{xcms} package to find features.
 #'

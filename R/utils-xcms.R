@@ -368,6 +368,21 @@ XCMSFeatTblEqual <- function(tbl1, tbl2)
                             tbl2[, intersect(XCMSFeatCols(), names(tbl2)), with = FALSE])))
 }
 
+# used by delete()
+getKeptXCMSPeakInds <- function(i, j, old, new)
+{
+    anas <- analyses(new)
+    if (is.null(i))
+        i <- anas
+    else if (!is.character(i))
+        i <- anas[i]
+    xcmsInds <- rbindlist(Map(featureTable(old), anas,
+                              f = function(ft, ana) data.table(row = seq_len(nrow(ft)), analysis = ana)))
+    xcmsInds[, inds := seq_len(nrow(xcmsInds))]
+    xcmsInds[, remove := analysis %in% i & row %in% j]
+    return(xcmsInds[remove == FALSE]$inds)
+}
+
 # UNDONE: use with feature group plot EIC plotting
 # UNDONE: update, some day...
 # plotXCMSEIC <- function(EIC, rtRange = NULL, intRange = NULL, fillRange = NULL, retMin = FALSE,

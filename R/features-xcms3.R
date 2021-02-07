@@ -59,6 +59,19 @@ setReplaceMethod("$", "featuresXCMS3", function(x, name, value)
     return(ret)
 })
 
+#' @rdname features-class
+#' @export
+setMethod("delete", "featuresXCMS3", function(obj, i = NULL, j = NULL)
+{
+    old <- obj
+    obj <- callNextMethod()
+    if (!is.null(j)) # sync features
+    {
+        # UNDONE: ask for exported method...
+        obj@xdata@msFeatureData <- xcms:::.filterChromPeaks(obj@xdata, getKeptXCMSPeakInds(i, j, old, obj))
+    }
+    return(obj)
+})
 
 #' @details \code{findFeaturesXCMS3} uses the new \code{xcms3} interface from
 #'   the \pkg{xcms} package to find features.

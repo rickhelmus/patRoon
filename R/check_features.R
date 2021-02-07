@@ -48,7 +48,7 @@ importCheckFeaturesSession <- function(sessionIn, sessionOut, fGroups, overWrite
     # UNDONE: docs
     
     aapply(checkmate::assertString, . ~ sessionIn + sessionOut, min.chars = 1)
-    pathIn <- getCheckFeaturesSessionPath(sessionIn); pathOut <- getCheckSessionPath(sessionOut, "features")
+    pathIn <- getCheckFeaturesSessionPath(sessionIn); pathOut <- getCheckFeaturesSessionPath(sessionOut, "features")
     
     ac <- checkmate::makeAssertCollection()
     checkmate::assertFileExists(pathIn, "r", .var.name = "session", add = ac)

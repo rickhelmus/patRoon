@@ -238,13 +238,16 @@ setReplaceMethod("$", "features", function(x, name, value)
 #' @export
 setMethod("delete", "features", function(obj, i = NULL, j = NULL)
 {
+    if (length(i) == 0)
+        i <- NULL
+        
     if (is.null(i) && is.null(j))
         stop("Specify at least either i or j")
     
     if (!is.null(i))
         i <- assertSubsetArgAndToChr(i, analyses(obj))
     
-    checkmate::assertCount(j, positive = TRUE, null.ok = TRUE)
+    checkmate::assertIntegerish(j, lower = 1, min.len = 1, any.missing = FALSE, null.ok = TRUE)
     
     # i = NULL: remove from all analyses
     # j = NULL: remove specified analyses

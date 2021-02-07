@@ -270,7 +270,10 @@ setMethod("calculatePeakQualities", "features", function(obj, weights, flatnessF
             a <- args
             if (q %in% c("Jaggedness", "Modality"))
                 a <- c(a, flatnessFactor)
-            return(do.call(featQualities[[q]]$func, a))
+            qual <- do.call(featQualities[[q]]$func, a)
+            if (q == "GaussianSimilarity" && is.na(qual))
+                qual <- 0
+            return(qual)
         }, simplify = FALSE))
     }
     

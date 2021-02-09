@@ -1,38 +1,42 @@
 context("formulas")
 
-fGroups <- getTestFGroups(getTestAnaInfo()[4:5, ])
+fGroups <- getTestFGroupsAnn()
 # convert to screening results to simplify things a bit
-fGroups <- screenSuspects(fGroups, patRoonData::targets, onlyHits = TRUE)
+if (testWithSets())
+{
+    fGroups <- screenSuspects(fGroups, patRoonData::targets[, -2], onlyHits = TRUE) # omit mz column
+} else
+    fGroups <- screenSuspects(fGroups, patRoonData::targets, onlyHits = TRUE, adduct = "[M+H]+")
 
 fGroupsEmpty <- getEmptyTestFGroups()
 plists <- generateMSPeakLists(fGroups, "mzr")
-plistsEmpty <- getEmptyPLists()
+plistsEmpty <- plists[FALSE]
 plistsEmptyMS <- removeMSPlists(plists, "MS")
 plistsEmptyMSMS <- removeMSPlists(plists, "MSMS")
 
 doSIRIUS <- !is.null(getOption("patRoon.path.SIRIUS")) && nzchar(getOption("patRoon.path.SIRIUS"))
 
-formsGF <- generateFormulas(fGroups, "genform", plists)
-formsGFEmpty <- generateFormulas(fGroupsEmpty, "genform", plistsEmpty)
-formsGFEmptyPL <- generateFormulas(fGroups, "genform", plistsEmpty)
-formsGFEmptyPLMS <- generateFormulas(fGroups, "genform", plistsEmptyMS)
+formsGF <- doGenForms(fGroups, "genform", plists)
+formsGFEmpty <- doGenForms(fGroupsEmpty, "genform", plistsEmpty)
+formsGFEmptyPL <- doGenForms(fGroups, "genform", plistsEmpty)
+formsGFEmptyPLMS <- doGenForms(fGroups, "genform", plistsEmptyMS)
 formsGFWithMSMS <- filter(formsGF, minExplainedPeaks = 1)
-formsGFOC <- generateFormulas(fGroups, "genform", plists, oc = TRUE)
-formsGFMS <- generateFormulas(fGroups, "genform", plists, MSMode = "ms")
+formsGFOC <- doGenForms(fGroups, "genform", plists, oc = TRUE)
+formsGFMS <- doGenForms(fGroups, "genform", plists, MSMode = "ms")
 
 if (doSIRIUS)
 {
-    formsSIR <- generateFormulas(fGroups, "sirius", plists, calculateFeatures = FALSE)
-    formsSIREmpty <- generateFormulas(fGroupsEmpty, "sirius", plistsEmpty)
-    formsSIREmptyPL <- generateFormulas(fGroups, "sirius", plistsEmpty)
-    formsSIREmptyPLMS <- generateFormulas(fGroups, "sirius", plistsEmptyMS)
+    formsSIR <- doGenForms(fGroups, "sirius", plists, calculateFeatures = FALSE)
+    formsSIREmpty <- doGenForms(fGroupsEmpty, "sirius", plistsEmpty)
+    formsSIREmptyPL <- doGenForms(fGroups, "sirius", plistsEmpty)
+    formsSIREmptyPLMS <- doGenForms(fGroups, "sirius", plistsEmptyMS)
 }
 
 if (doDATests())
 {
     # HACK: use first standard as its compounds are not touched by MS peak lists
     fgDA <- groupFeatures(findFeatures(getDAAnaInfo()[1, ], "bruker"), "openms")
-    formsDA <- generateFormulas(fgDA, "bruker", adduct = "[M+H]+")
+    formsDA <- doGenForms(fgDA, "bruker")
 }
 
 test_that("verify formula generation", {
@@ -40,9 +44,9 @@ test_that("verify formula generation", {
     expect_length(formsGFEmpty, 0)
     expect_length(formsGFEmptyPL, 0)
     expect_length(formsGFEmptyPLMS, 0)
-    expect_equal(generateFormulas(fGroups, "genform", plistsEmptyMSMS), formsGFMS)
+    expect_equal(doGenForms(fGroups, "genform", plistsEmptyMSMS), formsGFMS)
 
-    expect_gt(length(generateFormulas(fGroups, "genform", plists, featThreshold = 0)),
+    expect_gt(length(doGenForms(fGroups, "genform", plists, featThresholdAnn = 0)),
               length(formsGF))
 
     skip_if_not(doSIRIUS)
@@ -188,10 +192,12 @@ test_that("as.data.table() works", {
     checkmate::expect_character(OMTab[["classification"]], min.chars = 1, any.missing = FALSE, len = nrow(OMTab))
 })
 
-if (doSIRIUS)
+if (doSIRIUS && !testWithSets())
     fCons <- consensus(formsGF, formsSIR)
 
 test_that("consensus works", {
+    skip_if(testWithSets())
+    
     expect_length(consensus(formsGF, formsGFEmpty), length(formsGF))
 
     skip_if_not(doSIRIUS)
@@ -212,12 +218,13 @@ test_that("consensus works", {
     expect_length(consensus(formsGFEmpty, formsSIREmpty, uniqueFrom = 1, uniqueOuter = TRUE), 0)
 })
 
-if (doSIRIUS)
-{
-    anPL <- annotatedPeakList(fCons, precursor = "C9H7NO", groupName = groupNames(fCons)[6], MSPeakLists = plists)
-    anPLOnly <- annotatedPeakList(fCons, precursor = "C9H7NO", groupName = groupNames(fCons)[6],
+anPL <- annotatedPeakList(formsGF, precursor = "C9H7NO", groupName = groupNames(formsGF)[6], MSPeakLists = plists)
+anPLOnly <- annotatedPeakList(formsGF, precursor = "C9H7NO", groupName = groupNames(formsGF)[6],
+                              MSPeakLists = plists, onlyAnnotated = TRUE)
+
+if (doSIRIUS && !testWithSets())
+    anPLCons <- annotatedPeakList(fCons, precursor = "C9H7NO", groupName = groupNames(fCons)[6],
                                   MSPeakLists = plists, onlyAnnotated = TRUE)
-}
 
 test_that("annotation works", {
     skip_if_not(doSIRIUS)
@@ -225,9 +232,11 @@ test_that("annotation works", {
     expect_lt(nrow(anPLOnly), nrow(anPL))
     expect_true(any(is.na(anPL$formula)))
     expect_false(any(is.na(anPLOnly$formula)))
-    expect_true(all(fCons[[4]][formula == "C9H8NO", frag_formula] %in% anPLOnly$formula))
-    expect_true(any(grepl("genform", anPLOnly$mergedBy)))
-    expect_true(any(grepl("sirius", anPLOnly$mergedBy)))
+    expect_true(all(formsGF[[4]][formula == "C9H8NO", frag_formula] %in% anPLOnly$formula))
+    
+    skip_if(!doSIRIUS || testWithSets())
+    expect_true(any(grepl("genform", anPLCons$mergedBy)))
+    expect_true(any(grepl("sirius", anPLCons$mergedBy)))
 })
 
 test_that("reporting works", {
@@ -278,11 +287,13 @@ test_that("plotting works", {
     expect_equal(expect_plot(plotVenn(formsGF, formsSIR))$areas[2], length(formsSIR))
     expect_equal(expect_plot(plotVenn(formsGF, formsSIREmpty))$areas[1], length(formsGF))
     expect_equal(expect_plot(plotVenn(formsGFEmpty, formsSIR))$areas[2], length(formsSIR))
-    expect_equal(expect_plot(plotVenn(formsGF, formsSIR))$intersectionCounts,
-                 length(consensus(formsGF, formsSIR, relMinAbundance = 1)))
     expect_equal(expect_plot(plotVenn(formsGF, formsSIREmpty))$intersectionCounts, 0)
 
     expect_ggplot(plotUpSet(formsGF, formsSIR))
     expect_error(plotUpSet(formsGFEmpty, formsSIREmpty))
     expect_error(plotUpSet(formsGF, formsSIREmpty))
+    
+    skip_if(testWithSets())
+    expect_equal(expect_plot(plotVenn(formsGF, formsSIR))$intersectionCounts,
+                 length(consensus(formsGF, formsSIR, relMinAbundance = 1)))
 })

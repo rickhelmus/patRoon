@@ -154,7 +154,6 @@ setMethod("[", c("compoundsSet", "ANY", "missing", "missing"), function(x, i, j,
         # NOTE: assume that subsetting with non-existing i will not result in errors
         i <- assertSubsetArgAndToChr(i, groupNames(x))
         x@setObjects <- lapply(x@setObjects, "[", i = i)
-        x@setObjects <- pruneList(x@setObjects, checkEmptyElements = TRUE)
     }
     
     if (!is.null(sets) || !missing(i))

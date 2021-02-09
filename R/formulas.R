@@ -815,7 +815,7 @@ setMethod("consensus", "formulas", function(obj, ..., absMinAbundance = NULL,
     for (grpi in seq_along(consFormulaList))
     {
         # fix up de-duplicated column names
-        deDupCols <- c(uniqueCols, "neutral_formula", "byMSMS", "frag_formula", "mergedBy")
+        deDupCols <- c(uniqueCols, "byMSMS", "frag_formula", "mergedBy")
         leftCols <- paste0(deDupCols, "-", leftName)
         deDupCols <- deDupCols[leftCols %in% names(consFormulaList[[grpi]])]
         leftCols <- leftCols[leftCols %in% names(consFormulaList[[grpi]])]

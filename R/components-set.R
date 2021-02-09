@@ -38,7 +38,6 @@ setMethod("[", c("componentsSet", "ANY", "ANY", "missing"), function(x, i, j, ..
         
         # NOTE: assume that subsetting with non-existing i/j will not result in errors
         x@setObjects <- lapply(x@setObjects, function(o) do.call("[", args = c(list(x = o), args)))
-        x@setObjects <- pruneList(x@setObjects, checkEmptyElements = TRUE)
     }
     
     if (!is.null(sets) || !missing(i) || !missing(j))

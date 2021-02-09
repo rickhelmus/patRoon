@@ -3,7 +3,7 @@ context("compounds")
 fGroups <- getCompFGroups()
 
 plists <- generateMSPeakLists(fGroups, "mzr")
-plistsEmpty <- getEmptyPLists()
+plistsEmpty <- plists[FALSE]
 plistsEmptyMS <- removeMSPlists(plists, "MS")
 fGroupsEmpty <- getEmptyTestFGroups()
 

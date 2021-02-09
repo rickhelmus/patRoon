@@ -404,10 +404,12 @@ setMethod("generateFormulasGenForm", "featureGroups", function(fGroups, MSPeakLi
             if (is.null(pLists[[ana]]))
                 return(NULL)
             
+            pl <- pLists[[ana]]
             ftinds <- sapply(gNames, function(grp) featIndex[[grp]][anai])
             doFGroups <- gNames[ftinds != 0] # prune missing
+            doFGroups <- intersect(doFGroups, names(pl))
             
-            return(doGenForm(pLists[[ana]][doFGroups], ana))
+            return(doGenForm(pl[doFGroups], ana))
         }, simplify = FALSE)
         
         names(formTable) <- anaInfo$analysis

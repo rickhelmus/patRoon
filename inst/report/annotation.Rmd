@@ -74,7 +74,11 @@ if (isSusp)
     clR2 <- c("susp_d_rt", "susp_annSimForm", "susp_annSimComp", "susp_annSimBoth", "susp_maxFragMatchesRel")
     if (isSet)
         clR2 <- getAllSuspSetCols(clR2, names(fGroupsSpecDT), sets(rmdVars$fGroups))
-    fGroupsSpecDT[, (clR2) := lapply(mget(clR2), round, 2)]
+    else
+        clR2 <- intersect(clR2, names(fGroupsSpecDT))
+    
+    if (length(clR2) > 0)
+        fGroupsSpecDT[, (clR2) := lapply(mget(clR2), round, 2)]
 
     colsRound5 <- c(colsRound5, "susp_d_mz")
 

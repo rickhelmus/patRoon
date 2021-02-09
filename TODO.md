@@ -51,6 +51,7 @@
         - could first make consensus of setObjects and then make new set object from that
         - for compounds (and formulas?) need proper way to average scorings
         - or for later?
+            - if not add tests
     - more sub class specific methods
         - compoundsSetMF sub-class (for settings slot)?
         - --> or just doc that setObjects() can be used
@@ -78,6 +79,7 @@
         - no fGroups for SIRIUS
         - only change needed is for groupFeaturesKPIC2()?
     - import XCMS features: verify anaInfo (or remove necessity)
+    - plotSpectrum(): show horizontal line in mirrored plot?
 - merging setObjects
     - check if more has to be cached and may need status messages
     - compound set consensus: scoreRanges should be re-determined from annotation results?

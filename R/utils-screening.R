@@ -200,7 +200,7 @@ doScreenSuspects <- function(fGroups, suspects, rtWindow, mzWindow, skipInvalid)
             gi <- gi[at$group, ]
         }
         else
-            gi <- gi[numLTE(abs(gInfo$mzs - suspects$mz[ti]), mzWindow), ]
+            gi <- gi[numLTE(abs(gi$mzs - suspects$mz[ti]), mzWindow), ]
         
         if (nrow(gi) == 0) # no results? --> add NA result
         {

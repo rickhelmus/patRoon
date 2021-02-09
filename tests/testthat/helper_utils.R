@@ -4,7 +4,6 @@ testFile <- function(f, ..., text = FALSE) file.path(getTestDataPath(), paste0(f
 getTestFGroups <- function(anaInfo = getTestAnaInfo(), ...) groupFeatures(getTestFeatures(anaInfo, ...), "openms")
 getEmptyFeatures <- function() getTestFeatures(getTestAnaInfo(), noiseThrInt = 1E9)
 getEmptyTestFGroups <- function() getTestFGroups()[, "none"]
-getEmptyPLists <- function() MSPeakLists(algorithm = "none")
 
 getMFTestDBPath <- function() file.path(getTestDataPath(), "test-mf-db.csv")
 getCompFGroups <- function()
@@ -38,13 +37,16 @@ if (testWithSets())
         return(makeSet(findFeatures(anaInfo[!isSet2, ], "openms", ...),
                        adducts = "[M+H]+", labels = "set1"))
     }
-    getTestFGroupsAnn <- function() getTestFGroups(getTestAnaInfo()[grepl("standard-1", getTestAnaInfo()$analysis, fixed = TRUE), ])
     
     doExportXCMS <- function(x, ...) getXCMSSet(x, exportedData = FALSE, set = "set1")
     doExportXCMS3 <- function(x, ...) getXCMSnExp(x, exportedData = FALSE, set = "set1")
     getExpAnaInfo <- function() getTestAnaInfo()[!grepl("^set2", getTestAnaInfo()$analysis), ]
     getExpFG <- function(x) x[, sets = "set1"]
     doExport <- function(x, ...) export(x, ..., set = "set1")
+
+    getTestFGroupsAnn <- function() getTestFGroups(getTestAnaInfo()[grepl("standard\\-[2-3]", getTestAnaInfo()$analysis), ])
+    
+    doGenForms <- function(...) generateFormulas(...)
     
     callMF <- function(fGroups, plists, scoreTypes = "fragScore", db = getMFTestDBPath(), to = 300)
     {
@@ -61,13 +63,16 @@ if (testWithSets())
                                                       groups = c(rep("solvent", 3), rep("standard", 3)),
                                                       blanks = "solvent")
     getTestFeatures <- function(anaInfo = getTestAnaInfo(), ...) findFeatures(anaInfo, "openms", ...)
-    getTestFGroupsAnn <- function() getTestFGroups(getTestAnaInfo()[4:5, ])
     
     doExportXCMS <- function(x, ...) getXCMSSet(x, ...)
     doExportXCMS3 <- function(x, ...) getXCMSnExp(x, ...)
     getExpAnaInfo <- function() getTestAnaInfo()
     getExpFG <- function(x) x
     doExport <- function(x, ...) export(x, ...)
+
+    getTestFGroupsAnn <- function() getTestFGroups(getTestAnaInfo()[4:5, ])    
+    
+    doGenForms <- function(...) generateFormulas(..., adduct = "[M+H]+")
     
     callMF <- function(fGroups, plists, scoreTypes = "fragScore", db = getMFTestDBPath(), to = 300)
     {

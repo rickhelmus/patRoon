@@ -5,28 +5,36 @@ NULL
 
 syncFormulasSetObjects <- function(formulasSet, makeCons)
 {
-    # re-generate
-    formulasSet@featureFormulas <- Reduce(modifyList, lapply(formulasSet@setObjects, formulaTable, features = TRUE))
-    
-    if (makeCons)
+    # update/initialize from setObjects
+    if (length(setObjects(formulasSet)) >= 1)
     {
-        groupFormsList <- sapply(formulasSet@setObjects, formulaTable, features = FALSE, simplify = FALSE)
-        gNames <- groupNames(formulasSet)
-        mc <- setNames(rep(length(groupFormsList), length(gNames)), gNames)
-        formulasSet@formulas <- generateGroupFormulasByConsensus(groupFormsList, mc, formulasSet@setThreshold,
-                                                                 formulasSet@setThresholdAnn,
-                                                                 formulasSet@origFGNames, "set", "setCoverage",
-                                                                 "setCoverageAnn")
+        if (length(setObjects(formulasSet)) > 1)
+            formulasSet@featureFormulas <- Reduce(modifyList, lapply(formulasSet@setObjects, formulaTable, features = TRUE))
+        else
+            formulasSet@featureFormulas <- formulaTable(setObjects(formulasSet)[[1]], features = TRUE)
+        
+        if (makeCons)
+        {
+            groupFormsList <- sapply(formulasSet@setObjects, formulaTable, features = FALSE, simplify = FALSE)
+            gNames <- groupNames(formulasSet)
+            mc <- setNames(rep(length(groupFormsList), length(gNames)), gNames)
+            formulasSet@formulas <- generateGroupFormulasByConsensus(groupFormsList, mc, formulasSet@setThreshold,
+                                                                     formulasSet@setThresholdAnn,
+                                                                     formulasSet@origFGNames, "set", "setCoverage",
+                                                                     "setCoverageAnn")
+        }
+        else
+        {
+            # sync available feature groups
+            allFGroups <- unique(unlist(lapply(setObjects(formulasSet), groupNames)))
+            formulasSet@formulas <- formulasSet@formulas[intersect(groupNames(formulasSet), allFGroups)]
+            
+            # only keep results from sets still present
+            formulasSet@formulas <- lapply(formulasSet@formulas, function(ft) ft[set %in% sets(formulasSet)])
+        }
     }
     else
-    {
-        # sync available feature groups
-        allFGroups <- unique(sapply(setObjects(formulasSet), groupNames))
-        formulasSet@formulas <- formulasSet@formulas[intersect(groupNames(formulasSet), allFGroups)]
-        
-        # only keep results from sets still present
-        formulasSet@formulas <- lapply(formulasSet@formulas, function(ft) ft[set %in% sets(formulasSet)])
-    }
+        formulasSet@featureFormulas <- formulasSet@formulas <- list()
     
     formulasSet@scoreRanges <- formulasSet@scoreRanges[groupNames(formulasSet)]
     
@@ -57,7 +65,6 @@ setMethod("[", c("formulasSet", "ANY", "missing", "missing"), function(x, i, j, 
         i <- assertSubsetArgAndToChr(i, groupNames(x))
         # NOTE: assume that subsetting with non-existing i will not result in errors
         x@setObjects <- lapply(x@setObjects, "[", i = i)
-        x@setObjects <- pruneList(x@setObjects, checkEmptyElements = TRUE)
     }
 
     if (!is.null(sets) || !missing(i))

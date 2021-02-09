@@ -105,9 +105,11 @@ setMethod("[", c("MSPeakListsSet", "ANY", "ANY", "missing"), function(x, i, j, .
         if (!missing(j))
             args <- c(args, list(j = assertSubsetArgAndToChr(j, groupNames(x))))
         
+        if (!is.null(sets))
+            x@setObjects <- x@setObjects[sets]
+        
         # NOTE: assume that subsetting with non-existing i/j will not result in errors
         x@setObjects <- lapply(x@setObjects, function(o) do.call("[", args = c(list(x = o), args)))
-        x@setObjects <- pruneList(x@setObjects, checkEmptyElements = TRUE)
         
         x <- syncMSPeakListsSetObjects(x)
     }
@@ -225,8 +227,9 @@ setMethod("unset", "MSPeakListsSet", function(obj, set)
 {
     assertSets(obj, set, FALSE)
     obj <- obj[, sets = set]
-    
-    avArgs <- if (length(obj@setObjects) > 0) obj@setObjects[[1]]@avgPeakListArgs else list()
+
+    hasSO <- length(obj@setObjects) > 0    
+    avArgs <- if (hasSO) obj@setObjects[[1]]@avgPeakListArgs else list()
     
     # # only re-average if >1 sets, otherwise just copy the setObject
     # UNDONE: re-enable if unset will support >1 sets again...
@@ -234,8 +237,8 @@ setMethod("unset", "MSPeakListsSet", function(obj, set)
     #     return(MSPeakListsUnset(peakLists = obj@peakLists, metadata = list(), avgPeakListArgs = avArgs,
     #                             origFGNames = obj@origFGNames, algorithm = paste0(algorithm(obj), "_unset")))
     
-    return(MSPeakListsUnset(peakLists = obj@setObjects[[1]]@peakLists,
-                            averagedPeakLists = averagedPeakLists(obj@setObjects[[1]]),
+    return(MSPeakListsUnset(peakLists = if (hasSO) obj@setObjects[[1]]@peakLists else list(),
+                            averagedPeakLists = if (hasSO) averagedPeakLists(obj@setObjects[[1]]) else list(),
                             metadata = list(), avgPeakListArgs = avArgs,
                             origFGNames = obj@origFGNames, algorithm = paste0(algorithm(obj), "_unset")))
 })

@@ -27,7 +27,7 @@ checkAndToAdduct <- function(adduct, fGroups = NULL, .var.name = "adduct")
     # if fGroups != NULL and the fGroups are annotated then adducts may be optional
     if (!is.null(fGroups) && is.null(adduct))
     {
-        if (nrow(annotations(fGroups)) == 0)
+        if (length(fGroups) > 0 && nrow(annotations(fGroups)) == 0)
             stop("The input feature groups are not annotated and no adduct is specified. ",
                  "Please either perform annotations (eg with selectIons()) or specify an adduct.")
         return(NULL) # NULL adduct is fine

@@ -1,0 +1,1 @@
+A formulasSet objectHierarchy:formulas,workflowStepSet    |-- formulasSet---Algorithm: genform-setFormulas assigned to features:  - Total formula count: 162  - Average formulas per analysis: 1.8  - Average formulas per feature: 1.8Formulas assigned to feature groups:  - Total formula count: 39  - Average formulas per feature group: 1.7Sets: set1, set2

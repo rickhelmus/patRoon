@@ -1,0 +1,1 @@
+A formulasSet objectHierarchy:formulas,workflowStepSet    |-- formulasSet---Algorithm: sirius-setFormulas assigned to features:  - Total formula count: 0  - Average formulas per analysis: 0.0  - Average formulas per feature: 0.0Formulas assigned to feature groups:  - Total formula count: 83  - Average formulas per feature group: 3.8Sets: set1, set2

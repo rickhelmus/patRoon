@@ -41,7 +41,7 @@ setMethod("groupFeaturesXCMS3", "features", function(feat, rtalign = TRUE, expor
     checkmate::reportAssertions(ac)
 
     xdata <- getXCMSnExp(feat, verbose = verbose, exportedData = exportedData)
-    return(doGroupFeaturesXCMS3(xdata, feat, exportedData, groupParam, retAlignParam, verbose))
+    return(doGroupFeaturesXCMS3(xdata, feat, rtalign, exportedData, groupParam, retAlignParam, verbose))
 })
 
 #' @export

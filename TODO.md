@@ -62,6 +62,7 @@
         - requires version bump of session
         - annotation column setting
             - requires version bump for settings
+        - update code for MC import/export
     - checkComponents
         - more settings?
         - test session import
@@ -76,6 +77,7 @@
     - sets methods for KPIC2, SAFD and SIRIUS features
         - no fGroups for SIRIUS
         - only change needed is for groupFeaturesKPIC2()?
+    - import XCMS features: verify anaInfo (or remove necessity)
 - merging setObjects
     - check if more has to be cached and may need status messages
     - compound set consensus: scoreRanges should be re-determined from annotation results?
@@ -167,6 +169,7 @@
     - handle/test empty objects
     - test DA algorithms
     - OpenMS adducts?
+    - fGroups: disable comparison/consensus?
     
 
 

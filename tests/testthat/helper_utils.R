@@ -1,4 +1,4 @@
-testWithSets <- function() FALSE # UNDONE: check environment variable or something
+testWithSets <- function() T # UNDONE: check environment variable or something
 
 testFile <- function(f, ..., text = FALSE) file.path(getTestDataPath(), paste0(f, ..., if (!text) ".Rds" else ".txt", collapse = ""))
 getTestFGroups <- function(anaInfo = getTestAnaInfo(), ...) groupFeatures(getTestFeatures(anaInfo, ...), "openms")
@@ -32,16 +32,18 @@ if (testWithSets())
     {
         isSet2 <- grepl("^set2", anaInfo$analysis)
         if (any(isSet2))
-            return(featuresSet(set1 = findFeatures(anaInfo[!isSet2, ], "openms", ...),
-                               set2 = findFeatures(anaInfo[isSet2, ], "openms", ...),
-                               adducts = "[M+H]+"))
-        return(featuresSet(set1 = findFeatures(anaInfo[!isSet2, ], "openms", ...),
-                           adducts = "[M+H]+"))
+            return(makeSet(findFeatures(anaInfo[!isSet2, ], "openms", ...),
+                           findFeatures(anaInfo[isSet2, ], "openms", ...),
+                           adducts = "[M+H]+", labels = c("set1", "set2")))
+        return(makeSet(findFeatures(anaInfo[!isSet2, ], "openms", ...),
+                       adducts = "[M+H]+", labels = "set1"))
     }
     
     doExportXCMS <- function(x, ...) getXCMSSet(x, exportedData = FALSE, set = "set1")
-    doExportXCMS3 <- function(x) getXCMSnExp(x, set = "set1")
-    getExpFG <- function(x) x[, set = "set1"]
+    doExportXCMS3 <- function(x, ...) getXCMSnExp(x, exportedData = FALSE, set = "set1")
+    getExpAnaInfo <- function() getTestAnaInfo()[!grepl("^set2", getTestAnaInfo()$analysis), ]
+    getExpFG <- function(x) x[, sets = "set1"]
+    doExport <- function(x, ...) export(x, ..., set = "set1")
     
     callMF <- function(fGroups, plists, scoreTypes = "fragScore", db = getMFTestDBPath(), to = 300)
     {
@@ -60,8 +62,10 @@ if (testWithSets())
     getTestFeatures <- function(anaInfo = getTestAnaInfo(), ...) findFeatures(anaInfo, "openms", ...)
     
     doExportXCMS <- function(x, ...) getXCMSSet(x, ...)
-    doExportXCMS3 <- function(x) getXCMSnExp(x)
+    doExportXCMS3 <- function(x, ...) getXCMSnExp(x, ...)
+    getExpAnaInfo <- function() getTestAnaInfo()
     getExpFG <- function(x) x
+    doExport <- function(x, ...) export(x, ...)
     
     callMF <- function(fGroups, plists, scoreTypes = "fragScore", db = getMFTestDBPath(), to = 300)
     {

@@ -1,6 +1,6 @@
 context("MS peak lists")
 
-fGroups <- getTestFGroups()[4:5, 1:100]
+fGroups <- getTestFGroupsAnn()[, 1:100]
 plists <- generateMSPeakLists(fGroups, "mzr")
 plistsMSMS <- filter(plists, withMSMS = TRUE)
 

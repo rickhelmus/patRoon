@@ -463,7 +463,7 @@ setMethod("getMCS", "compounds", function(obj, index, groupName)
 
             # might fail if there is no overlap...
             tryCatch(mcons <- rcdk::get.mcs(mcons, mols[[i]]), error = function(e) FALSE)
-            if (mcons == FALSE)
+            if (is.null(mcons) || mcons == FALSE)
                 return(emptyMol())
         }
     }

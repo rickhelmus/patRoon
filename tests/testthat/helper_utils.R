@@ -38,6 +38,7 @@ if (testWithSets())
         return(makeSet(findFeatures(anaInfo[!isSet2, ], "openms", ...),
                        adducts = "[M+H]+", labels = "set1"))
     }
+    getTestFGroupsAnn <- function() getTestFGroups(getTestAnaInfo()[grepl("standard-1", getTestAnaInfo()$analysis, fixed = TRUE), ])
     
     doExportXCMS <- function(x, ...) getXCMSSet(x, exportedData = FALSE, set = "set1")
     doExportXCMS3 <- function(x, ...) getXCMSnExp(x, exportedData = FALSE, set = "set1")
@@ -60,6 +61,7 @@ if (testWithSets())
                                                       groups = c(rep("solvent", 3), rep("standard", 3)),
                                                       blanks = "solvent")
     getTestFeatures <- function(anaInfo = getTestAnaInfo(), ...) findFeatures(anaInfo, "openms", ...)
+    getTestFGroupsAnn <- function() getTestFGroups(getTestAnaInfo()[4:5, ])
     
     doExportXCMS <- function(x, ...) getXCMSSet(x, ...)
     doExportXCMS3 <- function(x, ...) getXCMSnExp(x, ...)
@@ -80,23 +82,44 @@ if (testWithSets())
 # to make testing a bit easier: precursors don't have to follow filter rules
 removePrecursors <- function(plists)
 {
-    plists@peakLists <- pruneList(lapply(plists@peakLists,
-                                         function(pa) pruneList(lapply(pa, function(pg)
-                                             pruneList(lapply(pg, function(pl) pl[precursor == FALSE]), checkZeroRows = TRUE)),
-                                             checkEmptyElements = TRUE)), checkEmptyElements = TRUE)
-    plists@averagedPeakLists <- pruneList(lapply(plists@averagedPeakLists,
-                                                 function(pg) pruneList(lapply(pg, function(pl) pl[precursor == FALSE]),
-                                                                        checkZeroRows = TRUE)),
-                                          checkEmptyElements = TRUE)
+    doRmPrecs <- function(obj)
+    {
+        obj@peakLists <- pruneList(lapply(obj@peakLists,
+                                             function(pa) pruneList(lapply(pa, function(pg)
+                                                 pruneList(lapply(pg, function(pl) pl[precursor == FALSE]), checkZeroRows = TRUE)),
+                                                 checkEmptyElements = TRUE)), checkEmptyElements = TRUE)
+        obj@averagedPeakLists <- pruneList(lapply(obj@averagedPeakLists,
+                                                     function(pg) pruneList(lapply(pg, function(pl) pl[precursor == FALSE]),
+                                                                            checkZeroRows = TRUE)),
+                                              checkEmptyElements = TRUE)
+        return(obj)
+    }
+    
+    plists <- doRmPrecs(plists)
+    
+    if (testWithSets())
+        plists@setObjects <- lapply(plists@setObjects, doRmPrecs)
+    
     return(plists)
 }
 
 removeMSPlists <- function(plists, type)
 {
     clearpl <- function(pl) { pl[[type]] <- NULL; return(pl) }
-    plists@peakLists <- lapply(plists@peakLists,
-                               function(pa) pruneList(lapply(pa, clearpl), checkEmptyElements = TRUE))
-    plists@averagedPeakLists <- pruneList(lapply(plists@averagedPeakLists, clearpl), checkEmptyElements = TRUE)
+    
+    doRemove <- function(obj)
+    {
+        obj@peakLists <- lapply(obj@peakLists,
+                                function(pa) pruneList(lapply(pa, clearpl), checkEmptyElements = TRUE))
+        obj@averagedPeakLists <- pruneList(lapply(obj@averagedPeakLists, clearpl), checkEmptyElements = TRUE)
+        return(obj)
+    }
+    
+    plists <- doRemove(plists)
+    
+    if (testWithSets())
+        plists@setObjects <- lapply(plists@setObjects, doRemove)
+    
     return(plists)
 }
 

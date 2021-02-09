@@ -5,8 +5,18 @@ NULL
 syncMSPeakListsSetObjects <- function(MSPeakListsSet)
 {
     # update/initialize from setObjects
-    MSPeakListsSet@peakLists <- Reduce(modifyList, lapply(MSPeakListsSet@setObjects, peakLists))
-    MSPeakListsSet@averagedPeakLists <- averageMSPeakLists(MSPeakListsSet)
+    if (length(setObjects(MSPeakListsSet)) >= 2)
+    {
+        MSPeakListsSet@peakLists <- Reduce(modifyList, lapply(MSPeakListsSet@setObjects, peakLists))
+        MSPeakListsSet@averagedPeakLists <- averageMSPeakLists(MSPeakListsSet)
+    }
+    else if (length(setObjects(MSPeakListsSet)) == 1)
+    {
+        MSPeakListsSet@peakLists <- peakLists(MSPeakListsSet@setObjects[[1]])
+        MSPeakListsSet@averagedPeakLists <- averagedPeakLists(MSPeakListsSet@setObjects[[1]])
+    }
+    else
+        MSPeakListsSet@peakLists <- MSPeakListsSet@averagedPeakLists <- list()
     
     MSPeakListsSet@analysisInfo <-
         MSPeakListsSet@analysisInfo[MSPeakListsSet@analysisInfo$analysis %in% names(peakLists(MSPeakListsSet)), ]

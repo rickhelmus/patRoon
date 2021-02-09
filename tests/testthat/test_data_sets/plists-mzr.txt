@@ -1,0 +1,1 @@
+A MSPeakListsSet objectHierarchy:MSPeakLists,workflowStepSet    |-- MSPeakListsSet---Algorithm: mzr-setTotal peak count: 18410 (MS: 18298 - MS/MS: 112)Average peak count/analysis: 9205 (MS: 9149 - MS/MS: 56)Total peak lists: 218 (MS: 200 - MS/MS: 18)Average peak lists/analysis: 109 (MS: 100 - MS/MS: 9)Sets: set1, set2

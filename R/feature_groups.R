@@ -302,6 +302,43 @@ setMethod("$", "featureGroups", function(x, name)
     eval(substitute(x@groups$NAME_ARG, list(NAME_ARG = name)))
 })
 
+#' @export
+setMethod("delete", "featureGroups", function(obj, i = NULL, j = NULL)
+{
+    # UNDONE: asserts (new utils?)
+    
+    # cases:
+    # i = vector; j = NULL: subset analyses
+    # i = NULL; j = vector: subset groups
+    # i = list; j = NULL: remove different features from given analyses --> ex: list(ana1 = 1:2, ana2 = 2:3)
+    # i = NULL; j = list: remove different features from given groups --> ex: list(group1 = 1:2, group2 = 2:3)
+    # i = vector; j = vector: remove the same features from analyses i in groups j
+    
+    if (is.list(i) && !is.null(j))
+        stop("Only i should be specified if it is a list")
+    if (is.list(j) && !is.null(i))
+        stop("Only j should be specified if it is a list")
+    if (is.null(i) && is.null(j))
+        stop("Specify i and/or j")
+    
+    if (is.null(i) && !is.list(j))
+        NULL # subset groups
+    else if (!is.list(i) && is.null(j))
+        NULL # subset analyses
+    else
+    {
+        if (!is.list(i) && !is.list(j))
+            NULL # convert i to list
+        
+        if (is.list(i))
+            NULL # delete feats from analyses
+        else
+            NULL # delete feats from groups
+    }
+    
+    return(obj)
+})
+
 setMethod("cleanGroups", "featureGroups", function(fGroups, cleanUnassignedFeatures)
 {
     if (length(fGroups) > 0)

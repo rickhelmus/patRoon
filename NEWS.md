@@ -9,7 +9,7 @@
 - Fixed: `newProject()` would generate an ID levels configuration file even when no suspect list was selected.
 - MCS calculation: handle `NULL` values that may occasionally be returned by `rcdk::get.mcs`
 - Fixed: intensity filter failed if previous filters lead to zero feature groups.
-
+- Fixed: `reportHTML()` annotation table was paged.
 
 
 # patRoon 1.2.0

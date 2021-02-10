@@ -131,19 +131,18 @@ findfeaturesKPIC2 <- function(analysisInfo, kmeans, level = 1000, ..., parallel 
     aapply(checkmate::assertFlag, . ~ kmeans + parallel + verbose, fixed = list(add = ac))
     checkmate::reportAssertions(ac)
 
-    baseHash <- makeHash(kmeans, level, list(...))
+    anas <- analysisInfo$analysis
+    filePaths <- mapply(getMzMLOrMzXMLAnalysisPath, anas, analysisInfo$path)
+    baseHash <- makeHash(list(...))
+    hashes <- setNames(sapply(filePaths, function(fp) makeHash(baseHash, makeFileHash(fp))), anas)
+    cachedData <- lapply(hashes, loadCacheData, category = "featuresKPIC2")
+    cachedData <- pruneList(setNames(cachedData, anas))
     
     if (verbose)
         printf("Finding features with KPIC2 for %d analyses ...\n", nrow(analysisInfo))
 
-    doKP <- function(ana, path)
+    doKP <- function(inFile)
     {
-        inFile <- getMzMLOrMzXMLAnalysisPath(ana, path)
-        hash <- makeHash(baseHash, makeFileHash(inFile))
-        cachef <- loadCacheData("featuresKPIC2", hash)
-        if (!is.null(cachef))
-            return(cachef)
-        
         raw <- KPIC::LoadData(inFile)
         pics <- do.call(if (kmeans) KPIC::getPIC.kmeans else KPIC::getPIC,
                         c(list(raw = raw, level = level), ...), verbose)
@@ -154,12 +153,23 @@ findfeaturesKPIC2 <- function(analysisInfo, kmeans, level = 1000, ..., parallel 
         
         return(pics)
     }
-    
-    if (parallel)
-        allPics <- withProg(nrow(analysisInfo), future.apply::future_Map(doKP, analysisInfo$analysis,
-                                                                          analysisInfo$path))
+
+    anasTBD <- setdiff(anas, names(cachedData))
+    if (length(anasTBD) > 0)
+    {
+        if (parallel)
+            allPics <- withProg(length(anasTBD), future.apply::future_lapply(filePaths[anasTBD], doKP))
+        else
+            allPics <- withProg(length(anasTBD), lapply(filePaths[anasTBD], doKP))
+        
+        for (a in anasTBD)
+            saveCacheData("featuresKPIC2", allPics[[a]], hashes[[a]])
+        
+        if (length(cachedData) > 0)
+            allPics <- c(allPics, cachedData)[anas] # merge and re-order
+    }
     else
-        allPics <- withProg(nrow(analysisInfo), Map(doKP, analysisInfo$analysis, analysisInfo$path))
+        allPics <- cachedData
     
     ret <- importfeaturesKPIC2(allPics, analysisInfo)
 

@@ -70,7 +70,6 @@
     - rename exportedData, update docs (also handbook)
     - remove featuresOpenMS method for getXCMSSet(), update docs
     - groupFeatures(algorithm="sirius")
-    - caching for findFeaturesKPIC2
     - don't key quality/score tables?
     - rmResult for features and fGroups
     - filterFile, [ also for XCMS fGroups?

@@ -31,10 +31,12 @@ findFeaturesEnviPick <- function(analysisInfo, ..., parallel = TRUE, verbose = T
     if (verbose)
         printf("Finding features with enviPick for %d analyses ...\n", anaCount)
 
-    filePaths <- mapply(getMzXMLAnalysisPath, analysisInfo$analysis, analysisInfo$path)
+    anas <- analysisInfo$analysis
+    filePaths <- mapply(getMzXMLAnalysisPath, anas, analysisInfo$path)
     baseHash <- makeHash(list(...))
-    hashes <- sapply(filePaths, function(fp) makeHash(baseHash, makeFileHash(fp)))
-    cachedData <- pruneList(sapply(hashes, loadCacheData, category = "featuresEnviPick", simplify = FALSE))
+    hashes <- setNames(sapply(filePaths, function(fp) makeHash(baseHash, makeFileHash(fp))), anas)
+    cachedData <- lapply(hashes, loadCacheData, category = "featuresEnviPick")
+    cachedData <- pruneList(setNames(cachedData, anas))
     
     doFP <- function(fp)
     {
@@ -44,19 +46,19 @@ findFeaturesEnviPick <- function(analysisInfo, ..., parallel = TRUE, verbose = T
         return(f)
     }
 
-    fpsTBD <- setdiff(filePaths, names(cachedData))
-    if (length(fpsTBD) > 0)
+    anasTBD <- setdiff(anas, names(cachedData))
+    if (length(anasTBD) > 0)
     {
         if (parallel)
-            feats <- withProg(nrow(analysisInfo), future.apply::future_lapply(fpsTBD, doFP))
+            feats <- withProg(length(anasTBD), future.apply::future_lapply(filePaths[anasTBD], doFP))
         else
-            feats <- withProg(nrow(analysisInfo), lapply(fpsTBD, doFP))
-        names(feats) <- analysisInfo$analysis
-        for (a in analysisInfo$analysis)
+            feats <- withProg(length(anasTBD), lapply(filePaths[anasTBD], doFP))
+        names(feats) <- anasTBD
+        for (a in anasTBD)
             saveCacheData("featuresEnviPick", feats[[a]], hashes[[a]])
         
         if (length(cachedData) > 0)
-            feats <- c(feats, cachedData)[analysisInfo$analysis] # merge and re-order
+            feats <- c(feats, cachedData)[anas] # merge and re-order
     }
     else
         feats <- cachedData

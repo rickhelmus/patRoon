@@ -56,6 +56,9 @@ doFilter <- function(fGroups, what, hashParam, func, cacheCateg = what, verbose 
 
 intensityFilter <- function(fGroups, absThreshold, relThreshold, negate = FALSE)
 {
+    if (length(fGroups) == 0)
+        return(fGroups)
+    
     threshold <- getHighestAbsValue(absThreshold, relThreshold, max(groupTable(fGroups)))
     if (threshold == 0)
         return(fGroups)

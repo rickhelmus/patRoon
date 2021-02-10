@@ -8,6 +8,7 @@
 - Fixed: `generateFeatureOptPSet("xcms3", method="matchedFilter")` would return a parameter set with `step` instead of `binSize` (issue #23)
 - Fixed: `newProject()` would generate an ID levels configuration file even when no suspect list was selected.
 - MCS calculation: handle `NULL` values that may occasionally be returned by `rcdk::get.mcs`
+- Fixed: intensity filter failed if previous filters lead to zero feature groups.
 
 
 

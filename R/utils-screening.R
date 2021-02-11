@@ -140,7 +140,7 @@ prepareSuspectList <- function(suspects, adduct, skipInvalid)
     }        
     
     # check for any suspects without proper mass info
-    isNA <- is.na(suspects$neutralMasses) & is.na(suspects$mz)
+    isNA <- is.na(suspects$neutralMass) & is.na(suspects$mz)
     if (any(isNA))
     {
         wrong <- paste0(sprintf("%s (line %d)", suspects$name[isNA], which(isNA)), collapse = "\n")

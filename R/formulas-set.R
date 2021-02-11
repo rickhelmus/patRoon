@@ -30,7 +30,8 @@ syncFormulasSetObjects <- function(formulasSet, makeCons)
             formulasSet@formulas <- formulasSet@formulas[intersect(groupNames(formulasSet), allFGroups)]
             
             # only keep results from sets still present
-            formulasSet@formulas <- lapply(formulasSet@formulas, function(ft) ft[set %in% sets(formulasSet)])
+            spat <- paste0(sets(formulasSet), collapse = "|")
+            formulasSet@formulas <- lapply(formulasSet@formulas, function(ft) ft[grepl(spat, set)])
         }
     }
     else

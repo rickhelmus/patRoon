@@ -63,7 +63,6 @@
         - requires version bump of session
         - annotation column setting
             - requires version bump for settings
-        - update code for MC import/export
     - checkComponents
         - more settings?
         - test session import

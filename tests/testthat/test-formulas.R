@@ -4,9 +4,9 @@ fGroups <- getTestFGroupsAnn()
 # convert to screening results to simplify things a bit
 if (testWithSets())
 {
-    fGroups <- screenSuspects(fGroups, patRoonData::targets[, -2], onlyHits = TRUE) # omit mz column
+    fGroups <- doScreen(fGroups, patRoonData::targets[, -2], onlyHits = TRUE) # omit mz column
 } else
-    fGroups <- screenSuspects(fGroups, patRoonData::targets, onlyHits = TRUE, adduct = "[M+H]+")
+    fGroups <- doScreen(fGroups, patRoonData::targets, onlyHits = TRUE)
 
 fGroupsEmpty <- getEmptyTestFGroups()
 plists <- generateMSPeakLists(fGroups, "mzr")

@@ -525,6 +525,14 @@ setMethod("filter", "featureGroupsScreening", function(obj, ..., onlyHits = NULL
                 else
                 {
                     gTab <- as.data.table(obj, collapseSuspects = NULL, onlyHits = TRUE)
+                    # equalize names with screenInfo
+                    if (!is.null(gTab[["adduct"]]))
+                    {
+                        # may be there if adduct annotations are available, remove to not interfere with susp_adduct
+                        gTab[, adduct := NULL]
+                    }
+                    suspnames <- grep("^susp_", names(gTab), value = TRUE)
+                    setnames(gTab, suspnames, sub("^susp_", "", suspnames))
                     
                     if (by == "intensity")
                     {
@@ -658,7 +666,8 @@ setMethod("screenSuspects", "featureGroups", function(fGroups, suspects, rtWindo
     checkmate::assertFlag(onlyHits, add = ac)
     checkmate::reportAssertions(ac)
 
-    adduct <- checkAndToAdduct(adduct, fGroups)
+    if (!is.null(adduct))
+        adduct <- checkAndToAdduct(adduct, fGroups)
     
     # do this before checking cache to ensure proper errors/warnings are thrown!
     suspects <- prepareSuspectList(suspects, adduct, skipInvalid)

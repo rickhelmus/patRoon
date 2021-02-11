@@ -96,6 +96,8 @@ mergeScreeningSetInfos <- function(setObjects, setThreshold, sInfos = lapply(set
         if (setThreshold > 0)
             scrInfo <- scrInfo[setCoverage >= setThreshold]
     }
+    else
+        scrInfo[, c("sets", "setCoverage") := .(character(), numeric())]
     
     return(scrInfo[])
 }

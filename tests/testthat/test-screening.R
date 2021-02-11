@@ -9,9 +9,9 @@ susps[, adduct := "[M+H]+"]
 susps[name %in% c("TBA", "TPA"), adduct := "[M]+"]
 
 fGroups <- getTestFGroups()
-fGroupsScr <- screenSuspects(fGroups, susps, onlyHits = TRUE)
-fGroupsScrNoRT <- screenSuspects(fGroups, susps[, -"rt"], onlyHits = TRUE)
-getScrInfo <- function(susps, ...) screenInfo(screenSuspects(fGroups, susps, onlyHits = TRUE, ...))
+fGroupsScr <- doScreen(fGroups, susps, onlyHits = TRUE)
+fGroupsScrNoRT <- doScreen(fGroups, susps[, -"rt"], onlyHits = TRUE)
+getScrInfo <- function(susps, ...) screenInfo(doScreen(fGroups, susps, onlyHits = TRUE, ...))
 
 scr <- getScrInfo(susps)
 scrSMI <- getScrInfo(susps[, c("name", "rt", "adduct", "SMILES")])
@@ -33,15 +33,15 @@ suspsFragForm[name == "1H-benzotriazole", fragments_formula := "C6H6N"] # UNDONE
 test_that("suspect screening is OK", {
     expect_equal(nrow(scr), nrow(susps))
     expect_known_value(scr, testFile("screening"))
-    expect_length(screenSuspects(fGroups, susps, onlyHits = TRUE), nrow(susps))
+    expect_length(doScreen(fGroups, susps, onlyHits = TRUE), nrow(susps))
 
     # check suspects without retention
     expect_gte(nrow(getScrInfo(susps[, -3])), nrow(scr))
     
     # valid suspect names
     withr::with_options(list(patRoon.cache.mode = "none"), {
-        expect_warning(screenSuspects(fGroups, data.table(name = "test.", mz = 100)))
-        expect_error(screenSuspects(fGroups, data.table(name = "", mz = 100)))
+        expect_warning(doScreen(fGroups, data.table(name = "test.", mz = 100)))
+        expect_error(doScreen(fGroups, data.table(name = "", mz = 100)))
     })
     
     # alternative ion mass calculations
@@ -52,17 +52,13 @@ test_that("suspect screening is OK", {
 
     # same, with missing data (having 2 options for ion mass calculation should be sufficient)
     expect_equal_scr(scrSMI, getScrInfo(suspsMissing[, c("name", "rt", "adduct", "mz", "neutralMass")]),
-                 tolerance = 1E-3)
+                     tolerance = 1E-3)
     expect_equal_scr(scrSMI, getScrInfo(suspsMissing[, c("name", "rt", "adduct", "neutralMass", "formula")]))
     expect_equal_scr(scrSMI, getScrInfo(suspsMissing[, c("name", "rt", "adduct", "formula", "SMILES")]))
     expect_equal_scr(scrSMI, getScrInfo(suspsMissing[, c("name", "rt", "adduct", "SMILES", "InChI")]))
     
-    # adduct argument
-    expect_equal_scr(getScrInfo(susps[name %in% c("TBA", "TPA")]),
-                     getScrInfo(susps[name %in% c("TBA", "TPA"), -"adduct"], adduct = "[M]+"))
-
-    expect_warning(screenSuspects(fGroups, suspsMissingRow, skipInvalid = TRUE))
-    expect_error(screenSuspects(fGroups, suspsMissingRow, skipInvalid = FALSE))
+    expect_warning(doScreen(fGroups, suspsMissingRow, skipInvalid = TRUE))
+    expect_error(doScreen(fGroups, suspsMissingRow, skipInvalid = FALSE))
     
     # subsetting
     expect_length(fGroupsScr[, suspects = susps$name], nrow(susps))
@@ -71,6 +67,13 @@ test_that("suspect screening is OK", {
     
     expect_equal(nrow(as.data.table(fGroupsScr, collapseSuspects = ",")), nrow(susps))
     expect_gt(nrow(as.data.table(fGroupsScrNoRT, collapseSuspects = ",")), nrow(susps))
+    
+    # adduct argument
+    # UNDONE: do something with selectIons?
+    skip_if(testWithSets())
+    expect_equal_scr(getScrInfo(susps[name %in% c("TBA", "TPA")]),
+                     getScrInfo(susps[name %in% c("TBA", "TPA"), -"adduct"], adduct = "[M]+"))
+    
 })
 
 # NOTE: try keep this in sync with MF tests for caching purposes
@@ -81,7 +84,7 @@ if (hasMF)
     compsMF <- callMF(fGroupsScr, plists, db = file.path(getTestDataPath(), "test-mf-db-isomers.csv"))
     compsMFMoNa <- callMF(fGroupsScr, plists, scoreTypes = c("fragScore", "individualMoNAScore"),
                           db = file.path(getTestDataPath(), "test-mf-db-isomers.csv"))
-    forms <- generateFormulas(fGroupsScr, "genform", plists, calculateFeatures = FALSE)
+    forms <- doGenForms(fGroupsScr, "genform", plists, calculateFeatures = FALSE)
     
     fGroupsAnnNothing <- annotateSuspects(fGroupsScr)
     fGroupsAnnMF <- annotateSuspects(fGroupsScr, MSPeakLists = plists, formulas = forms, compounds = compsMF)
@@ -91,19 +94,34 @@ if (hasMF)
     fGroupsOnlyForms <- annotateSuspects(fGroupsScr, MSPeakLists = plists, formulas = forms)
     fGroupsAnnNoRT <- annotateSuspects(fGroupsScrNoRT, MSPeakLists = plists, formulas = forms, compounds = compsMFMoNa)
     
-    fGroupsAnnFragNoRT <- screenSuspects(fGroupsScr, suspsFrag[, -"rt"], onlyHits = TRUE)
+    fGroupsAnnFragNoRT <- doScreen(fGroupsScr, suspsFrag[, -"rt"], onlyHits = TRUE)
     fGroupsAnnFragNoRT <- annotateSuspects(fGroupsAnnFragNoRT, MSPeakLists = plists)
-    fGroupsAnnFrag <- screenSuspects(fGroupsScr, suspsFrag, onlyHits = TRUE)
+    fGroupsAnnFrag <- doScreen(fGroupsScr, suspsFrag, onlyHits = TRUE)
     fGroupsAnnFrag <- annotateSuspects(fGroupsAnnFrag, MSPeakLists = plists)
     
     idlFrag <- getWorkPath("fragtest.yml")
     genIDLevelRulesFile(idlFrag, exLevels = "3a|c")
-    fGroupsAnnFragFormNoRT <- screenSuspects(fGroups, suspsFragForm[, -"rt"], onlyHits = TRUE)
+    fGroupsAnnFragFormNoRT <- doScreen(fGroups, suspsFragForm[, -"rt"], onlyHits = TRUE)
     fGroupsAnnFragForm <- annotateSuspects(fGroupsAnnFragFormNoRT, MSPeakLists = plists, formulas = forms,
                                            compounds = compsMF, IDFile = idlFrag)
 }
 
-minIDLevel <- function(ann) min(numericIDLevel(screenInfo(ann)$estIDLevel))
+if (testWithSets())
+{
+    getAllSuspVals <- function(ann, col)
+    {
+        unlist(screenInfo(ann)[, getAllSuspSetCols(col, names(screenInfo(ann)), sets(ann)), with = FALSE])
+    }
+} else
+{
+    getAllSuspVals <- function(ann, col) screenInfo(ann)[[col]]
+}
+
+minIDLevel <- function(ann) min(numericIDLevel(getAllSuspVals(ann, "estIDLevel")))
+maxIDLevel <- function(ann) max(numericIDLevel(getAllSuspVals(ann, "estIDLevel")))
+getMinScrCol <- function(ann, col) min(getAllSuspVals(ann, col), na.rm = TRUE)
+getMaxScrCol <- function(ann, col) max(getAllSuspVals(ann, col), na.rm = TRUE)
+
 test_that("Suspect annotation works", {
     skip_if_not(hasMF)
     
@@ -129,23 +147,20 @@ selectedHitsInt <- filter(fGroupsAnnNoRT, selectHitsBy = "intensity", onlyHits =
 selectedHitsLev <- filter(fGroupsAnnNoRT, selectHitsBy = "level", onlyHits = TRUE)
 selectedFGroupsLev <- filter(fGroupsAnnNoRT, selectBestFGroups = TRUE, onlyHits = TRUE)
 
-maxIDLevel <- function(ann) max(numericIDLevel(screenInfo(ann)$estIDLevel))
-getMinScrCol <- function(fgAnn, col) min(screenInfo(fgAnn)[[col]], na.rm = TRUE)
-getMaxScrCol <- function(fgAnn, col) max(screenInfo(fgAnn)[[col]], na.rm = TRUE)
 test_that("Screen filters", {
     expect_known_value(as.data.table(selectedHitsInt, collapseSuspects = NULL), testFile("screen-ann-sel-hits_int"))
     expect_known_value(as.data.table(selectedHitsLev, collapseSuspects = NULL), testFile("screen-ann-sel-hits_lev"))
     expect_known_value(as.data.table(selectedFGroupsLev, collapseSuspects = NULL), testFile("screen-ann-sel-groups"))
     
     # mean intensities should be increased when selecting a group for this suspect
-    expect_lt(mean(as.matrix(as.data.table(fGroupsAnnNoRT, collapseSuspects = NULL)[name == "2-quinolol",
+    expect_lt(mean(as.matrix(as.data.table(fGroupsAnnNoRT, collapseSuspects = NULL)[susp_name == "2-quinolol",
                                                                                     analyses(fGroupsAnnNoRT),
                                                                                     with = FALSE])),
-              mean(as.matrix(as.data.table(selectedHitsInt, collapseSuspects = NULL)[name == "2-quinolol",
+              mean(as.matrix(as.data.table(selectedHitsInt, collapseSuspects = NULL)[susp_name == "2-quinolol",
                                                                                      analyses(selectedHitsInt),
                                                                                      with = FALSE])))
-    expect_gt(max(numericIDLevel(screenInfo(fGroupsAnnNoRT)[name == "2-quinolol"]$estIDLevel)),
-              max(numericIDLevel(screenInfo(selectedHitsLev)[name == "2-quinolol"]$estIDLevel)))
+    expect_gt(maxIDLevel(fGroupsAnnNoRT[, suspects = "2-quinolol"]),
+              maxIDLevel(selectedHitsLev[, suspects = "2-quinolol"]))
     # UNDONE: these are not really good examples as the ID level is the same for all duplicates...
     # for now just verify that all groups are assigned to first quinolol (2-quinolol)
     expect_true(all(screenInfo(selectedFGroupsLev)[grepl("quinolol", name)]$name == "2-quinolol"))
@@ -175,14 +190,14 @@ test_that("Negated screen filters", {
     expect_known_value(as.data.table(selectedNegFGroupsLev, collapseSuspects = NULL), testFile("screen-ann-sel-neg-groups"))
     
     # as above, but opposite
-    expect_gt(mean(as.matrix(as.data.table(fGroupsAnnNoRT, collapseSuspects = NULL)[name == "2-quinolol",
+    expect_gt(mean(as.matrix(as.data.table(fGroupsAnnNoRT, collapseSuspects = NULL)[susp_name == "2-quinolol",
                                                                                     analyses(fGroupsAnnNoRT),
                                                                                     with = FALSE])),
-              mean(as.matrix(as.data.table(selectedNegHitsInt, collapseSuspects = NULL)[name == "2-quinolol",
+              mean(as.matrix(as.data.table(selectedNegHitsInt, collapseSuspects = NULL)[susp_name == "2-quinolol",
                                                                                      analyses(selectedNegHitsInt),
                                                                                      with = FALSE])))
-    expect_lt(min(numericIDLevel(screenInfo(fGroupsAnnNoRT)[name == "2-quinolol"]$estIDLevel)),
-              min(numericIDLevel(screenInfo(selectedNegHitsLev)[name == "2-quinolol"]$estIDLevel)))
+    expect_lt(minIDLevel(fGroupsAnnNoRT[, suspects = "2-quinolol"]),
+              minIDLevel(selectedNegHitsLev[, suspects = "2-quinolol"]))
     # UNDONE: these are not really good examples as the ID level is the same for all duplicates...
     # for now just verify that all groups are assigned to first quinolol (2-quinolol)
     expect_true(all(screenInfo(selectedFGroupsLev)[grepl("quinolol", name)]$name == "2-quinolol"))
@@ -192,8 +207,8 @@ test_that("Negated screen filters", {
     expect_equal(nrow(screenInfo(selectedNegFGroupsLev)), nrow(screenInfo(selectedFGroupsLev)))
     
     expect_gt(maxIDLevel(filter(fGroupsAnnNoRT, maxLevel = 3, negate = TRUE)), 3)
-    expect_true(all(is.na(screenInfo(filter(fGroupsAnnNoRT, maxFormRank = 3, negate = TRUE))$suspFormRank)))
-    expect_gt(getMaxScrCol(filter(fGroupsAnnNoRT, maxCompRank = 3, negate = TRUE), "suspCompRank"), 3)
+    expect_true(all(is.na(screenInfo(filter(fGroupsAnnNoRT, maxFormRank = 3, negate = TRUE))$formRank)))
+    expect_gt(getMaxScrCol(filter(fGroupsAnnNoRT, maxCompRank = 3, negate = TRUE), "compRank"), 3)
     expect_lt(getMinScrCol(filter(fGroupsAnnNoRT, minAnnSimForm = 0.9, negate = TRUE), "annSimForm"), 0.9)
     expect_lt(getMinScrCol(filter(fGroupsAnnNoRT, minAnnSimComp = 0.9, negate = TRUE), "annSimComp"), 0.9)
     expect_lt(getMinScrCol(filter(fGroupsAnnNoRT, minAnnSimBoth = 0.9, negate = TRUE), "annSimBoth"), 0.9)
@@ -204,13 +219,13 @@ test_that("Negated screen filters", {
 
 fGroupsEmpty <- groupFeatures(findFeatures(getTestAnaInfo(), "openms", noiseThrInt = 1E9), "openms")
 suspsEmpty <- data.table(name = "doesnotexist", mz = 1E5)
-fGroupsScrEmpty <- screenSuspects(fGroups, suspsEmpty, adduct = "[M+H]+")
+fGroupsScrEmpty <- doScreen(fGroups, suspsEmpty)
 
 if (hasMF)
     fGroupsScrAnnEmpty <- annotateSuspects(fGroupsScrEmpty, MSPeakLists = plists, formulas = forms, compounds = compsMF)
 
 test_that("Empty objects", {
-    expect_length(screenSuspects(fGroupsEmpty, suspsEmpty, adduct = "[M+H]+"), 0)
+    expect_length(doScreen(fGroupsEmpty, suspsEmpty), 0)
     expect_length(fGroupsScrEmpty, length(fGroups))
     expect_equal(nrow(as.data.table(fGroupsScrEmpty, onlyHits = TRUE)), 0)
     
@@ -226,13 +241,17 @@ test_that("Empty objects", {
     expect_length(filter(fGroupsScrAnnEmpty, minAnnSimForm = 0.0, onlyHits = TRUE), 0)
 })
 
+csvSuspCols <- c("susp_name", "susp_compRank", "susp_annSimBoth", "susp_estIDLevel")
+if (testWithSets())
+    csvSuspCols <- getAllSuspSetCols(csvSuspCols, names(screenInfo(fGroupsAnnNoRT)), sets(fGroupsAnnNoRT))
+
 test_that("reporting works", {
     skip_if_not(hasMF)
     
     expect_file(reportCSV(fGroupsAnnNoRT, getWorkPath()),
                 getWorkPath(paste0(class(fGroupsAnnNoRT), ".csv")))
     checkmate::expect_names(names(fread(getWorkPath(paste0(class(fGroupsAnnNoRT), ".csv")))),
-                            must.include = c("name", "suspCompRank", "annSimBoth", "estIDLevel"))
+                            must.include = csvSuspCols)
     expect_file(reportPDF(fGroupsAnnNoRT, getWorkPath()), getWorkPath(paste0(class(fGroupsAnnNoRT), ".pdf")))
     expect_reportHTML(makeReportHTML(fGroupsAnnNoRT))
 
@@ -240,7 +259,6 @@ test_that("reporting works", {
     expect_error(reportPDF(fGroupsScrAnnEmpty[, 1:10], getWorkPath()), NA)
     expect_error(makeReportHTML(fGroupsScrAnnEmpty[, 1:10]), NA)
 })
-
 
 TQFile <- file.path(getTestDataPath(), "GlobalResults-TASQ.csv")
 TQRes <- fread(TQFile)

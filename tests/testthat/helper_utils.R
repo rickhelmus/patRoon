@@ -1,4 +1,4 @@
-testWithSets <- function() F # UNDONE: check environment variable or something
+testWithSets <- function() T # UNDONE: check environment variable or something
 
 testFile <- function(f, ..., text = FALSE) file.path(getTestDataPath(), paste0(f, ..., if (!text) ".Rds" else ".txt", collapse = ""))
 getTestFGroups <- function(anaInfo = getTestAnaInfo(), ...) groupFeatures(getTestFeatures(anaInfo, ...), "openms")
@@ -8,10 +8,7 @@ getEmptyTestFGroups <- function() getTestFGroups()[, "none"]
 getMFTestDBPath <- function() file.path(getTestDataPath(), "test-mf-db.csv")
 getCompFGroups <- function()
 {
-    if (testWithSets())
-        fGroups <- screenSuspects(getTestFGroupsAnn(), patRoonData::targets, onlyHits = TRUE)
-    else
-        fGroups <- screenSuspects(getTestFGroupsAnn(), patRoonData::targets, onlyHits = TRUE, adduct = "[M+H]+")
+    fGroups <- doScreen(getTestFGroupsAnn(), patRoonData::targets, onlyHits = TRUE)
     # just focus on 5 targets, these are named exactly the same as in the MetFrag test DB
     return(fGroups[, suspects = fread(getMFTestDBPath())$Name])
 }
@@ -55,8 +52,10 @@ if (testWithSets())
 
     getTestFGroupsAnn <- function() getTestFGroups(getTestAnaInfo()[grepl("standard\\-[2-3]", getTestAnaInfo()$analysis), ])
     
+    doScreen <- function(...) screenSuspects(...)
     doGenForms <- function(...) generateFormulas(...)
     doGenComps <- function(...) generateCompounds(...)
+    doGenComponents <- function(...) generateComponents(...)
 } else
 {
     getWorkPath <- function(file = "", ...) if (nzchar(file)) file.path("test_temp", file, ...) else "test_temp"
@@ -74,8 +73,16 @@ if (testWithSets())
 
     getTestFGroupsAnn <- function() getTestFGroups(getTestAnaInfo()[4:5, ])    
     
+    doScreen <- function(...) screenSuspects(...)
     doGenForms <- function(...) generateFormulas(..., adduct = "[M+H]+")
     doGenComps <- function(...) generateCompounds(..., adduct = "[M+H]+")
+    doGenComponents <- function(fGroups, algorithm, ...)
+    {
+        args <- c(list(fGroups, algorithm), list(...))
+        if (algorithm != "intclust")
+            args <- c(args, list(ionization = "positive"))
+        do.call(generateComponents, args)
+    }
 }
 
 

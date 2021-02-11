@@ -120,7 +120,8 @@ syncCompoundsSetObjects <- function(compoundsSet, makeCons)
             compoundsSet@compounds <- compoundsSet@compounds[intersect(groupNames(compoundsSet), allFGroups)]
             
             # only keep results from sets still present
-            compoundsSet@compounds <- lapply(compoundsSet@compounds, function(ct) ct[set %in% sets(compoundsSet)])
+            spat <- paste0(sets(compoundsSet), collapse = "|")
+            compoundsSet@compounds <- lapply(compoundsSet@compounds, function(ct) ct[grepl(spat, set)])
         }
     }
     else

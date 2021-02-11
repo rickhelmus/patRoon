@@ -1,1 +1,1 @@
-A componentsRC object (derived from components -> workflowStep)Algorithm: ramclustrComponents: CMP1, CMP2, CMP3, CMP4, CMP5, CMP6, ... (7 total)Number of feature groups in components: 47 (total), 6.7 (mean), 2 - 21 (min - max)
+A componentsRC objectHierarchy:components    |-- componentsRC---Algorithm: ramclustrComponents: CMP1, CMP2, CMP3, CMP4, CMP5, CMP6, ... (7 total)Number of feature groups in components: 47 (total), 6.7 (mean), 2 - 21 (min - max)

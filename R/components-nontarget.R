@@ -140,7 +140,8 @@ setMethod("generateComponentsNontarget", "featureGroups", function(fGroups, ioni
     checkmate::reportAssertions(ac)
 
     if (length(fGroups) == 0)
-        return(componentsNT(homol = list(), componentInfo = data.table(), components = list()))
+        return(componentsNT(homol = list(), componentInfo = data.table(), components = list(),
+                            algorithm = "nontarget"))
 
     hash <- makeHash(fGroups, ionization, rtRange, mzRange, elements, rtDev, absMzDev, absMzDevLink, extraOpts)
     cd <- loadCacheData("componentsNontarget", hash)

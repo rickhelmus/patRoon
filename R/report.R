@@ -489,7 +489,7 @@ reportComponentTable <- function(components, path, retMin)
         cTable <- rbindlist(componentTable(components), idcol = "component")
 
         if (retMin)
-            cTable[, rt := rt / 60]
+            cTable[, ret := ret / 60]
         write.csv(cTable, file.path(path, "components.csv"))
 
         printf("Done!\n")

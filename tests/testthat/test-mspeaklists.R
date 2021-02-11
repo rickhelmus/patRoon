@@ -159,7 +159,7 @@ test_that("basic functionality", {
     expect_equivalent(groupNames(plists[, 1:2]), groupNames(plists)[1:2])
     expect_equivalent(groupNames(plists[, groupNames(plists)[2:3]]), groupNames(plists)[2:3])
     expect_equivalent(groupNames(plists[, c(FALSE, TRUE)]), groupNames(plists)[c(FALSE, TRUE)])
-    expect_equal(length(plists[FALSE]), 0)
+    expect_equal(length(plists[FALSE, reAverage = TRUE]), 0)
     expect_length(plistsEmpty[1:5], 0)
 
     expect_equivalent(plists[[2, 15]], peakLists(plists)[[2]][[groupNames(plists)[15]]])

@@ -3,7 +3,7 @@ context("compounds")
 fGroups <- getCompFGroups()
 
 plists <- generateMSPeakLists(fGroups, "mzr")
-plistsEmpty <- plists[FALSE]
+plistsEmpty <- plists[FALSE, reAverage = TRUE]
 plistsEmptyMS <- removeMSPlists(plists, "MS")
 fGroupsEmpty <- getEmptyTestFGroups()
 
@@ -20,9 +20,9 @@ if (doMetFrag)
 
 if (doSIRIUS)
 {
-    compsSIR <- generateCompounds(fGroups, plists, "sirius")
-    compsSIREmpty <- generateCompounds(fGroupsEmpty, plistsEmpty, "sirius")
-    compsSIREmptyPL <- generateCompounds(fGroups, plistsEmpty, "sirius")
+    compsSIR <- doGenComps(fGroups, plists, "sirius")
+    compsSIREmpty <- doGenComps(fGroupsEmpty, plistsEmpty, "sirius")
+    compsSIREmptyPL <- doGenComps(fGroups, plistsEmpty, "sirius")
 }
 
 test_that("verify MetFragCL compound generation", {
@@ -42,7 +42,7 @@ test_that("verify SIRIUS compound generation", {
     expect_known_show(compsSIR, testFile("compounds-sir", text = TRUE))
     expect_length(compsSIREmpty, 0)
     expect_length(compsSIREmptyPL, 0)
-    expect_length(generateCompounds(fGroups, plistsEmptyMS, "sirius"), 0)
+    expect_length(doGenComps(fGroups, plistsEmptyMS, "sirius"), 0)
 })
 
 hasCompounds <- doMetFrag || doSIRIUS
@@ -149,7 +149,7 @@ test_that("basic usage", {
 
 if (doMetFrag)
 {
-    forms <- generateFormulas(fGroups, "genform", plists)
+    forms <- doGenForms(fGroups, "genform", plists)
     compsMFIsoF <- addFormulaScoring(compsMFIso, forms)
 }
 

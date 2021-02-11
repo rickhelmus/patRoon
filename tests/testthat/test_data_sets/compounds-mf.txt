@@ -1,0 +1,1 @@
+A compoundsSet objectHierarchy:compounds,workflowStepSet    |-- compoundsSet---Algorithm: metfrag-setNumber of feature groups with compounds in this object: 5Number of compounds: 5 (total), 1.0 (mean), 1 - 1 (min - max)Sets: set1, set2

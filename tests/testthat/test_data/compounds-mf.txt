@@ -1,1 +1,1 @@
-A compoundsMF object (derived from compounds -> workflowStep)Algorithm: metfragNumber of feature groups with compounds in this object: 5Number of compounds: 5 (total), 1.0 (mean), 1 - 1 (min - max)
+A compoundsMF objectHierarchy:compounds    |-- compoundsMF---Algorithm: metfragNumber of feature groups with compounds in this object: 5Number of compounds: 5 (total), 1.0 (mean), 1 - 1 (min - max)

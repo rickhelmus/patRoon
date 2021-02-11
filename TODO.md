@@ -79,6 +79,7 @@
         - only change needed is for groupFeaturesKPIC2()?
     - import XCMS features: verify anaInfo (or remove necessity)
     - plotSpectrum(): show horizontal line in mirrored plot?
+    - ggplot: remove? Otherwise fix plotSpectrum() for title and possibly others
 - merging setObjects
     - check if more has to be cached and may need status messages
     - compound set consensus: scoreRanges should be re-determined from annotation results?

@@ -4,12 +4,9 @@ hasMetfrag <- !is.null(getOption("patRoon.path.MetFragCL")) && nzchar(getOption(
 
 if (hasMetfrag)
 {
-    fGroups <- getTestFGroups(getTestAnaInfo()[4, ])
-    fGroups <- screenSuspects(fGroups, patRoonData::targets, onlyHits = TRUE)[1:5]
+    fGroups <- getCompFGroups()
     plists <- generateMSPeakLists(fGroups, "mzr")
-    compounds <- generateCompounds(fGroups, plists, "metfrag", adduct = "[M+H]+",
-                                   database = "csv", scoreTypes = "fragScore",
-                                   extraOpts = list(LocalDatabasePath = file.path(getTestDataPath(), "test-mf-db-isomers.csv")))
+    compounds <- callMF(fGroups, plists, db = file.path(getTestDataPath(), "test-mf-db-isomers.csv"))
     compsClust <- makeHCluster(compounds)
     firstGroup <- names(clusters(compsClust))[1]
 

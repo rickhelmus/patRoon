@@ -379,7 +379,7 @@ getMCTrainData <- function(fGroups, session)
     session <- readRDS(getCheckFeaturesSessionPath(session))
     ret <- convertQualitiesToMCData(fGroups)
     gNames <- names(fGroups)
-    ret[, Class := fifelse(gNames[EICNo] %in% session$enabledFGroups, "GOOD", "BAD")]
+    ret[, Class := fifelse(gNames[EICNo] %in% session$primarySelections, "GOOD", "BAD")]
     
     return(as.data.frame(ret))
 }
@@ -411,8 +411,8 @@ predictCheckFeaturesSession <- function(fGroups, session, model, overWrite = FAL
     ef <- data.frame(analysis = analyses(fGroups))
     ef[, gNames] <- TRUE
     # UNDONE: when is it GOOD/BAD or Pass/Fail?
-    saveRDS(list(enabledFGroups = gNames[preds[preds$Pred_Class %in% c("GOOD", "Pass"), "EIC"]], enabledFeatures = ef,
-                 version = 1), path)
+    saveRDS(list(primarySelections = gNames[preds[preds$Pred_Class %in% c("GOOD", "Pass"), "EIC"]],
+                 secondarySelections = ef, version = 1), path)
     
     invisible(NULL)
 }

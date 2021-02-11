@@ -1,0 +1,1 @@
+A componentsSet objectHierarchy:components,workflowStepSet    |-- componentsSet      |-- componentsNTSet---Algorithm: camera-setComponents: CMP1-set1, CMP2-set1, CMP3-set1, CMP4-set1, CMP5-set1, CMP6-set1, ... (7 total)Number of feature groups in components: 32 (total), 4.6 (mean), 2 - 9 (min - max)Sets: set1

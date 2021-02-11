@@ -8,17 +8,16 @@ fGroupsSimple <- fGroups[, 1:50]
 
 
 # fix seed for reproducible clustering, suppress warnings about <5 samples
-withr::with_seed(20, suppressWarnings(compsRC <- generateComponents(fGroupsSimple, "ramclustr", ionization = "positive")))
-withr::with_seed(20, suppressWarnings(compsRCMR <- generateComponents(fGroupsSimple, "ramclustr",
-                                                                      ionization = "positive", relMinReplicates = 1)))
+withr::with_seed(20, suppressWarnings(compsRC <- doGenComponents(fGroupsSimple, "ramclustr")))
+withr::with_seed(20, suppressWarnings(compsRCMR <- doGenComponents(fGroupsSimple, "ramclustr", relMinReplicates = 1)))
 # UNDONE: getting unknown NaN warnings here...
-suppressWarnings(compsCAM <- generateComponents(fGroupsSimple, "camera", ionization = "positive"))
-suppressWarnings(compsCAMMR <- generateComponents(fGroupsSimple, "camera", ionization = "positive", relMinReplicates = 1))
-suppressWarnings(compsCAMSize <- generateComponents(fGroupsSimple, "camera", ionization = "positive", minSize = 3))
-compsNT <- generateComponents(fGroups, "nontarget", ionization = "positive")
-compsInt <- generateComponents(fGroupsSimple, "intclust", average = FALSE) # no averaging: only one rep group
+suppressWarnings(compsCAM <- doGenComponents(fGroupsSimple, "camera"))
+suppressWarnings(compsCAMMR <- doGenComponents(fGroupsSimple, "camera", relMinReplicates = 1))
+suppressWarnings(compsCAMSize <- doGenComponents(fGroupsSimple, "camera", minSize = 3))
+compsNT <- doGenComponents(fGroups, "nontarget")
+compsInt <- doGenComponents(fGroupsSimple, "intclust", average = FALSE) # no averaging: only one rep group
 fGroupsEmpty <- getEmptyTestFGroups()
-compsEmpty <- components()
+compsEmpty <- components(algorithm = "none", componentInfo = data.table())
 
 test_that("components generation works", {
     # For RC/CAM: don't store their internal objects as they contain irreproducible file names
@@ -29,9 +28,9 @@ test_that("components generation works", {
     expect_known_value(compsInt, testFile("components-int"))
 
     expect_length(compsEmpty, 0)
-    expect_length(generateComponents(fGroupsEmpty, "ramclustr", ionization = "positive"), 0)
-    expect_length(generateComponents(fGroupsEmpty, "camera", ionization = "positive"), 0)
-    expect_length(generateComponents(fGroupsEmpty, "intclust"), 0)
+    expect_length(doGenComponents(fGroupsEmpty, "ramclustr"), 0)
+    expect_length(doGenComponents(fGroupsEmpty, "camera"), 0)
+    expect_length(doGenComponents(fGroupsEmpty, "intclust"), 0)
 
     expect_lt(length(compsRCMR), length(compsRC))
     expect_lt(length(compsCAMMR), length(compsCAM))
@@ -39,7 +38,7 @@ test_that("components generation works", {
 
     skip_if(length(compsNT) == 0)
     expect_known_value(compsNT, testFile("components-nt"))
-    expect_length(generateComponents(fGroupsEmpty, "nontarget", ionization = "positive"), 0)
+    expect_length(doGenComponents(fGroupsEmpty, "nontarget"), 0)
 })
 
 test_that("verify components show", {

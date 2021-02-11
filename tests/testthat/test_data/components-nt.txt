@@ -1,1 +1,1 @@
-A componentsNT object (derived from components -> workflowStep)Algorithm: nontargetComponents: CMP1, CMP2, CMP3 (3 total)Number of feature groups in components: 34 (total), 11.3 (mean), 10 - 14 (min - max)
+A componentsNT objectHierarchy:components    |-- componentsNT      |-- componentsNTUnset---Algorithm: nontargetComponents: CMP1, CMP2, CMP3 (3 total)Number of feature groups in components: 34 (total), 11.3 (mean), 10 - 14 (min - max)

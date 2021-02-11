@@ -367,10 +367,8 @@ makeMSPlotGG <- function(plotData, ..., mol = NULL)
         img <- getRCDKStructurePlot(mol[[1]], 100, 100, transparent = FALSE)
         
         pos <- 0.8; size <- 1 - pos
-        ret <- ret +
-            ylim(0, max(plotData$intensity) * (1 + size + 0.1)) # add a bit of space between most intense point+label
-        ret <- cowplot::ggdraw(ret) +
-            cowplot::draw_image(img, pos, pos, size, size)
+        ret <- ret + scale_y_continuous(expand = expansion(c(0.1, size + 0.1))) # add space for image
+        ret <- cowplot::ggdraw(ret) + cowplot::draw_image(img, pos, pos, size, size)
     }
     
     return(ret)
@@ -393,8 +391,9 @@ makeMSPlotSets <- function(spec, title, mirror, sets, mincex, xlim, ylim, useGGP
     ticks <- pretty(c(-spec$intensity, spec$intensity))
     if (useGGPlot2)
     {
-        return(makeMSPlotGG(plotData, mol = mol) + ggtitle(title) +
-                   ggplot2::scale_y_continuous(labels = abs(ticks)))
+        # NOTE: suppress message about replacing y axis
+        return(suppressMessages(makeMSPlotGG(plotData, mol = mol) + ggtitle(title) +
+                                    ggplot2::scale_y_continuous(labels = abs(ticks))))
     }
     
     makeMSPlot(plotData, mincex, xlim, ylim, ylab = "Normalized intensity",

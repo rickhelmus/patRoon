@@ -1,1 +1,1 @@
-A compoundsConsensus object (derived from compounds -> workflowStep)Algorithm: metfrag, siriusMerged: metfrag, siriusNumber of feature groups with compounds in this object: 5Number of compounds: 302 (total), 60.4 (mean), 1 - 100 (min - max)
+A compoundsConsensus objectHierarchy:compounds    |-- compoundsConsensus---Algorithm: metfrag, siriusMerged: metfrag, siriusNumber of feature groups with compounds in this object: 5Number of compounds: 302 (total), 60.4 (mean), 1 - 100 (min - max)

@@ -10,7 +10,7 @@ if (testWithSets())
 
 fGroupsEmpty <- getEmptyTestFGroups()
 plists <- generateMSPeakLists(fGroups, "mzr")
-plistsEmpty <- plists[FALSE]
+plistsEmpty <- plists[FALSE, reAverage = TRUE]
 plistsEmptyMS <- removeMSPlists(plists, "MS")
 plistsEmptyMSMS <- removeMSPlists(plists, "MSMS")
 

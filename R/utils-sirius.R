@@ -176,9 +176,11 @@ doSIRIUS <- function(fGroups, MSPeakLists, doFeatures, profile, adduct, relMzDev
                      extraOptsGeneral, extraOptsFormula, verbose, cacheName, processFunc, processArgs,
                      splitBatches)
 {
+    if (length(MSPeakLists) == 0)
+        return(list())
+    
     # only do relevant feature groups
     MSPeakLists <- MSPeakLists[, intersect(names(fGroups), groupNames(MSPeakLists))]
-    
     if (length(MSPeakLists) == 0)
         return(list())
     

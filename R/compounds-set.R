@@ -108,18 +108,23 @@ makeCompoundsSetScorings <- function(setObjects, origFGNames)
 
 syncCompoundsSetObjects <- function(compoundsSet, makeCons)
 {
-    if (makeCons)
-        compoundsSet@compounds <- makeCompoundsSetConsensus(compoundsSet@setObjects, compoundsSet@origFGNames,
-                                                            compoundsSet@setThreshold, compoundsSet@setThresholdAnn)
-    else
+    if (length(setObjects(compoundsSet)) >= 1)
     {
-        # sync available feature groups
-        allFGroups <- unique(sapply(setObjects(compoundsSet), groupNames))
-        compoundsSet@compounds <- compoundsSet@compounds[intersect(groupNames(compoundsSet), allFGroups)]
-        
-        # only keep results from sets still present
-        compoundsSet@compounds <- lapply(compoundsSet@compounds, function(ct) ct[set %in% sets(compoundsSet)])
+        if (makeCons)
+            compoundsSet@compounds <- makeCompoundsSetConsensus(compoundsSet@setObjects, compoundsSet@origFGNames,
+                                                                compoundsSet@setThreshold, compoundsSet@setThresholdAnn)
+        else
+        {
+            # sync available feature groups
+            allFGroups <- unique(unlist(lapply(setObjects(compoundsSet), groupNames)))
+            compoundsSet@compounds <- compoundsSet@compounds[intersect(groupNames(compoundsSet), allFGroups)]
+            
+            # only keep results from sets still present
+            compoundsSet@compounds <- lapply(compoundsSet@compounds, function(ct) ct[set %in% sets(compoundsSet)])
+        }
     }
+    else
+        compoundsSet@compounds <- list()
     
     compoundsSet@scoreRanges <- compoundsSet@scoreRanges[groupNames(compoundsSet)]
     

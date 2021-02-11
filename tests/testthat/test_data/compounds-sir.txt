@@ -1,1 +1,1 @@
-A compounds object (derived from workflowStep)Algorithm: siriusNumber of feature groups with compounds in this object: 3Number of compounds: 300 (total), 100.0 (mean), 100 - 100 (min - max)
+A compounds objectHierarchy:workflowStep    |-- compounds      |-- compoundsConsensus      |-- compoundsMF      |-- compoundsSet      |-- compoundsUnset---Algorithm: siriusNumber of feature groups with compounds in this object: 3Number of compounds: 300 (total), 100.0 (mean), 100 - 100 (min - max)

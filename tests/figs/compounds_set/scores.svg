@@ -1,0 +1,39 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' viewBox='0 0 720.00 576.00'>
+<defs>
+  <style type='text/css'><![CDATA[
+    line, polyline, polygon, path, rect, circle {
+      fill: none;
+      stroke: #000000;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-miterlimit: 10.00;
+    }
+  ]]></style>
+</defs>
+<rect width='100%' height='100%' style='stroke: none; fill: #FFFFFF;'/>
+<rect x='61.33' y='59.04' width='287.88' height='429.86' style='stroke-width: 0.75; stroke: #A6CEE3; fill: #A6CEE3;' />
+<rect x='406.79' y='59.04' width='287.88' height='429.86' style='stroke-width: 0.75; stroke: #1F78B4; fill: #1F78B4;' />
+<text transform='translate(209.40,536.95) rotate(-90)' style='font-size: 12.00px; font-family: Liberation Sans;' textLength='29.34px' lengthAdjust='spacingAndGlyphs'>score</text>
+<text transform='translate(554.85,559.62) rotate(-90)' style='font-size: 12.00px; font-family: Liberation Sans;' textLength='52.02px' lengthAdjust='spacingAndGlyphs'>fragScore</text>
+<line x1='36.00' y1='488.90' x2='36.00' y2='59.04' style='stroke-width: 0.75;' />
+<line x1='36.00' y1='488.90' x2='28.80' y2='488.90' style='stroke-width: 0.75;' />
+<line x1='36.00' y1='402.93' x2='28.80' y2='402.93' style='stroke-width: 0.75;' />
+<line x1='36.00' y1='316.96' x2='28.80' y2='316.96' style='stroke-width: 0.75;' />
+<line x1='36.00' y1='230.99' x2='28.80' y2='230.99' style='stroke-width: 0.75;' />
+<line x1='36.00' y1='145.01' x2='28.80' y2='145.01' style='stroke-width: 0.75;' />
+<line x1='36.00' y1='59.04' x2='28.80' y2='59.04' style='stroke-width: 0.75;' />
+<text x='6.60' y='492.62' style='font-size: 10.80px; font-family: Liberation Sans;' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>0.0</text>
+<text x='6.60' y='406.64' style='font-size: 10.80px; font-family: Liberation Sans;' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>0.2</text>
+<text x='6.60' y='320.67' style='font-size: 10.80px; font-family: Liberation Sans;' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>0.4</text>
+<text x='6.60' y='234.70' style='font-size: 10.80px; font-family: Liberation Sans;' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>0.6</text>
+<text x='6.60' y='148.72' style='font-size: 10.80px; font-family: Liberation Sans;' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>0.8</text>
+<text x='6.60' y='62.75' style='font-size: 10.80px; font-family: Liberation Sans;' textLength='15.00px' lengthAdjust='spacingAndGlyphs'>1.0</text>
+<text x='202.61' y='51.84' style='font-size: 9.60px; font-family: Liberation Sans;' textLength='5.33px' lengthAdjust='spacingAndGlyphs'>1</text>
+<text x='548.06' y='51.84' style='font-size: 9.60px; font-family: Liberation Sans;' textLength='5.33px' lengthAdjust='spacingAndGlyphs'>1</text>
+<defs>
+  <clipPath id='cpNTkuMDR8Njg5Ljc2fDUwMi41Nnw1OS4wNA=='>
+    <rect x='59.04' y='59.04' width='630.72' height='443.52' />
+  </clipPath>
+</defs>
+</svg>

@@ -334,7 +334,7 @@ setMethod("selectIons", "featureGroupsSet", function(fGroups, components, prefAd
 
 setMethod("groupFeatures", "featuresSet", function(feat, algorithm, ..., verbose = TRUE)
 {
-    checkmate::assertChoice(algorithm, c("openms", "xcms", "xcms3"))
+    checkmate::assertChoice(algorithm, c("openms", "xcms", "xcms3", "kpic2"))
     
     otherArgs <- list(...)
     

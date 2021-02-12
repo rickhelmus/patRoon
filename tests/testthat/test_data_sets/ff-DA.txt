@@ -1,0 +1,1 @@
+A featuresBruker object (derived from features -> workflowStep)Algorithm: bruker_daTotal feature count: 329Average feature count/analysis: 329Analyses: 20180305-ECROS_STD_10_1-pos_1-38_01_15151 (1 total)Replicate groups: standard (1 total)Replicate groups used as blank: solvent (1 total)

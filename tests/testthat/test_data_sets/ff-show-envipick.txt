@@ -1,0 +1,1 @@
+A featuresEnviPick object (derived from features -> workflowStep)Algorithm: envipickTotal feature count: 23Average feature count/analysis: 23Analyses: standard-1 (1 total)Replicate groups: standard (1 total)Replicate groups used as blank: solvent (1 total)

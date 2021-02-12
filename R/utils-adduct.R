@@ -139,7 +139,7 @@ doAsAdduct <- memoise(function(x, format, isPositive, charge)
     }
     else if (format == "genform")
     {
-        gfadds <- getAdductTable("genform")[adduct == x]
+        gfadds <- GenFormAdducts()[adduct == x]
         if (nrow(gfadds) == 0)
             stop("Invalid adduct for GenForm! See GenFormAdducts() for valid options.")
         
@@ -155,13 +155,13 @@ doAsAdduct <- memoise(function(x, format, isPositive, charge)
             {
                 # molecular ion is twice in the list (both polarities)
                 cha <- if (isPositive) 1 else -1
-                mfadds <- getAdductTable("metfrag")[adduct_mode == x & charge == cha]
+                mfadds <- MetFragAdducts()[adduct_mode == x & charge == cha]
             }
             else
-                mfadds <- getAdductTable("metfrag")[adduct_mode == x]
+                mfadds <- MetFragAdducts()[adduct_mode == x]
         }
         else
-            mfadds <- getAdductTable("metfrag")[adduct_type == x]
+            mfadds <- MetFragAdducts()[adduct_type == x]
         
         if (nrow(mfadds) == 0)
             stop("Invalid adduct for MetFrag! See MetFragAdducts() for valid options.")

@@ -15,6 +15,7 @@
 !tests/figs/*
 !tests/testthat/*.R
 !tests/testthat/test_data/*
+!tests/testthat/test_data_sets/*
 !vignettes/*
 !DESCRIPTION
 !NAMESPACE

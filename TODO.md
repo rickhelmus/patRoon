@@ -74,9 +74,6 @@
     - fix empty MS(MS) peaklists if unavailable during merging sets
         - already fixed?
     - calculatePeakQualities() --> seems fine now
-    - sets methods for KPIC2, SAFD and SIRIUS features
-        - no fGroups for SIRIUS
-        - only change needed is for groupFeaturesKPIC2()?
     - import XCMS features: verify anaInfo (or remove necessity)
     - plotSpectrum(): show horizontal line in mirrored plot?
     - ggplot: remove? Otherwise fix plotSpectrum() for title and possibly others
@@ -132,6 +129,7 @@
         - defaults changed: featThreshold=0, replaced by featThresholdAnn=0.75
     - renamed analysis column from feature consensus formulae results to analysis_from
     - added analyses column in feature consensus formulae results
+    - formulas as.data.table(average=TRUE): remove analysis_from column
 - docs
     - filter() for features/fGroups: apply to neutral masses
     - CAMERA/RAMClustR/nontarget components: clearly mention it is simply a merge between sets

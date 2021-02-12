@@ -12,19 +12,42 @@ setMethod("initialize", "featureGroupsKPIC2",
 
 #' @rdname feature-grouping
 #' @export
-groupFeaturesKPIC2 <- function(feat, rtalign = TRUE, exportedData = TRUE,
-                               groupArgs = list(tolerance = c(0.005, 12)),
-                               alignArgs = list(), verbose = TRUE)
+setMethod("groupFeaturesKPIC2", "features", function(feat, rtalign = TRUE, exportedData = TRUE,
+                                                     groupArgs = list(tolerance = c(0.005, 12)),
+                                                     alignArgs = list(), verbose = TRUE)
 {
     checkPackage("KPIC", "https://github.com/hcji/KPIC2")
     
     ac <- checkmate::makeAssertCollection()
-    checkmate::assertClass(feat, "features", add = ac)
     aapply(checkmate::assertFlag, . ~ rtalign + exportedData + verbose, fixed = list(add = ac))
     aapply(checkmate::assertList, . ~ groupArgs + alignArgs, any.missing = FALSE, names = "unique",
            fixed = list(add = ac))
     checkmate::reportAssertions(ac)
     
+    picsSet <- getPICSet(feat, exportedData = exportedData)
+    return(doGroupFeaturesKPIC2(picsSet, feat, rtalign, exportedData, groupArgs, alignArgs, verbose))
+})
+
+#' @export
+setMethod("groupFeaturesKPIC2", "featuresSet", function(feat, groupArgs = list(tolerance = c(0.005, 12)),
+                                                        verbose = TRUE)
+{
+    checkPackage("KPIC", "https://github.com/hcji/KPIC2")
+    
+    ac <- checkmate::makeAssertCollection()
+    checkmate::assertFlag(verbose, add = ac)
+    checkmate::assertList(groupArgs, any.missing = FALSE, names = "unique", add = ac)
+    checkmate::reportAssertions(ac)
+    
+    # HACK: force non-set features method to allow grouping of neutralized features
+    # UNDONE: or simply export this functionality with a flag?
+    picsSet <- selectMethod("getPICSet", "features")(feat, exportedData = FALSE)
+    return(doGroupFeaturesKPIC2(picsSet, feat, rtalign = FALSE, exportedData = FALSE, groupArgs = groupArgs,
+                                alignArgs = list(), verbose = verbose))
+})
+
+doGroupFeaturesKPIC2 <- function(picsSet, feat, rtalign, exportedData, groupArgs, alignArgs, verbose)
+{
     if (length(feat) == 0)
         return(featureGroupsKPIC2(analysisInfo = analysisInfo(feat), features = feat))
     
@@ -36,7 +59,6 @@ groupFeaturesKPIC2 <- function(feat, rtalign = TRUE, exportedData = TRUE,
     if (verbose)
         cat("Grouping features with KPIC2... ")
     
-    picsSet <- getPICSet(feat, exportedData = exportedData)
     picsSetGrouped <- do.call(KPIC::PICset.group, c(list(picsSet), groupArgs))
     
     if (!exportedData && rtalign)
@@ -55,6 +77,7 @@ groupFeaturesKPIC2 <- function(feat, rtalign = TRUE, exportedData = TRUE,
     
     if (verbose)
         cat("Done!\n")
+    
     return(ret)
 }
 

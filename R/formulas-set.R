@@ -20,8 +20,8 @@ syncFormulasSetObjects <- function(formulasSet, makeCons)
             mc <- setNames(rep(length(groupFormsList), length(gNames)), gNames)
             formulasSet@formulas <- generateGroupFormulasByConsensus(groupFormsList, mc, formulasSet@setThreshold,
                                                                      formulasSet@setThresholdAnn,
-                                                                     formulasSet@origFGNames, "set", "setCoverage",
-                                                                     "setCoverageAnn")
+                                                                     formulasSet@origFGNames, "set_from", "sets",
+                                                                     "setCoverage", "setCoverageAnn")
         }
         else
         {
@@ -31,7 +31,7 @@ syncFormulasSetObjects <- function(formulasSet, makeCons)
             
             # only keep results from sets still present
             spat <- paste0(sets(formulasSet), collapse = "|")
-            formulasSet@formulas <- lapply(formulasSet@formulas, function(ft) ft[grepl(spat, set)])
+            formulasSet@formulas <- lapply(formulasSet@formulas, function(ft) ft[grepl(spat, sets)])
         }
     }
     else
@@ -168,7 +168,7 @@ generateFormulasSet <- function(fGroupsSet, generator, ..., setArgs, setThreshol
     groupFormsList <- sapply(setObjects, formulaTable, features = FALSE, simplify = FALSE)
     mc <- setNames(rep(length(setObjects), length(fGroupsSet)), names(fGroupsSet))
     groupForms <- generateGroupFormulasByConsensus(groupFormsList, mc, setThreshold, setThresholdAnn, names(fGroupsSet),
-                                                   "set", "setCoverage", "setCoverageAnn")
+                                                   "set_from", "sets", "setCoverage", "setCoverageAnn")
     
     return(formulasSet(setObjects = setObjects, origFGNames = names(fGroupsSet), setThreshold = setThreshold,
                        setThresholdAnn = setThresholdAnn, formulas = groupForms, featureFormulas = combFormulas,
@@ -182,7 +182,7 @@ setMethod("unset", "formulasSet", function(obj, set)
     obj <- obj[, sets = set]
     
     groupForms <- lapply(formulaTable(obj), copy)
-    groupForms <- lapply(groupForms, data.table::set, j = c("set", "setCoverage"), value = NULL)
+    groupForms <- lapply(groupForms, data.table::set, j = c("sets", "setCoverage"), value = NULL)
     
     return(formulasUnset(formulas = groupForms, featureFormulas = formulaTable(obj, features = TRUE),
                          algorithm = paste0(algorithm(obj), "_unset")))

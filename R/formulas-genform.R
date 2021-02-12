@@ -418,7 +418,8 @@ setMethod("generateFormulasGenForm", "featureGroups", function(fGroups, MSPeakLi
         if (length(formTable) > 0)
             groupFormulas <- generateGroupFormulasByConsensus(formTable, lapply(featIndex, function(x) sum(x > 0)),
                                                               featThreshold, featThresholdAnn,
-                                                              gNames, "analysis", "featCoverage", "featCoverageAnn")
+                                                              gNames, "analysis_from", "analyses", "featCoverage",
+                                                              "featCoverageAnn")
         else
             groupFormulas <- list()
     }

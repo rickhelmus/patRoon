@@ -1,0 +1,1 @@
+An optimization result object ('optimizationResult')Algorithm: openmsParameter set 1/1 (BEST):    Experimental designs tested: 2    Starting params:    - maxGroupMZ: c(0.002, 0.007)    Optimized params:    - maxGroupMZ: 0.007    Best results: exp_index: 1; good_groups: 274; bad_groups: 138; GS: 544.028985507246; RCS: 50.3075017271818; retcor_done: 1Best parameter set: 1

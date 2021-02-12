@@ -154,8 +154,8 @@ setMethod("generateFormulasSIRIUS", "featureGroups", function(fGroups, MSPeakLis
             formTable <- lapply(formTable, pruneList, checkZeroRows = TRUE)
             groupFormulas <- generateGroupFormulasByConsensus(formTable,
                                                               lapply(groupFeatIndex(fGroups), function(x) sum(x > 0)),
-                                                              featThreshold, featThresholdAnn, gNames, "analysis",
-                                                              "featCoverage", "featCoverageAnn")
+                                                              featThreshold, featThresholdAnn, gNames, "analysis_from",
+                                                              "analyses", "featCoverage", "featCoverageAnn")
         }
         else
             groupFormulas <- list()

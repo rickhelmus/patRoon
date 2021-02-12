@@ -130,6 +130,8 @@
         - former follows original definition but is now actually working properly, as pruning before could lead too high abundances
         - latter only takes annotated features into account
         - defaults changed: featThreshold=0, replaced by featThresholdAnn=0.75
+    - renamed analysis column from feature consensus formulae results to analysis_from
+    - added analyses column in feature consensus formulae results
 - docs
     - filter() for features/fGroups: apply to neutral masses
     - CAMERA/RAMClustR/nontarget components: clearly mention it is simply a merge between sets

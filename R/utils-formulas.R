@@ -326,19 +326,22 @@ calculateFormScoreRanges <- function(formTable)
                     scoreCols))
 }
 
-generateFormConsensusForGroup <- function(formList, mergeCount, formThreshold, formThresholdAnn, mergeCol, mergeCovCol,
-                                          mergeCovAnnCol)
+generateFormConsensusForGroup <- function(formList, mergeCount, formThreshold, formThresholdAnn, fromCol, mergedAllCol,
+                                          mergeCovCol, mergeCovAnnCol)
 {
     # merge all together
-    formTable <- rbindlist(formList, fill = TRUE, idcol = mergeCol)
+    formTable <- rbindlist(formList, fill = TRUE, idcol = fromCol)
     haveMSMS <- "frag_formula" %in% colnames(formTable)
 
     if (nrow(formTable) > 0)
     {
         # Determine coverage of precursor formulas.
-        formTable[, (mergeCovCol) := uniqueN(get(mergeCol)) / mergeCount, by = "neutral_formula"]
-        formTable[, (mergeCovAnnCol) := uniqueN(get(mergeCol)) / length(formList), by = "neutral_formula"]
+        formTable[, (mergeCovCol) := uniqueN(get(fromCol)) / mergeCount, by = "neutral_formula"]
+        formTable[, (mergeCovAnnCol) := uniqueN(get(fromCol)) / length(formList), by = "neutral_formula"]
 
+        # add column that specifies of which datasets its merged from
+        formTable[, (mergedAllCol) := paste0(unique(get(fromCol)), collapse = ","), by = neutral_formula]
+        
         # Apply coverage filters
         if (formThreshold > 0 || formThresholdAnn > 0)
             formTable <- formTable[get(mergeCovCol) >= formThreshold & get(mergeCovAnnCol) >= formThresholdAnn]
@@ -355,8 +358,8 @@ generateFormConsensusForGroup <- function(formList, mergeCount, formThreshold, f
             formTable[, frag_error := mean(frag_error), by = c("neutral_formula", "frag_formula")]
         
         avCols <- intersect(c(formulaScorings()$name, "error", "error_median"), names(formTable))
-        formTable[, (avCols) := lapply(unique(.SD, by = mergeCol)[, avCols, with = FALSE], mean),
-                  by = "neutral_formula", .SDcols = c(avCols, mergeCol)]
+        formTable[, (avCols) := lapply(unique(.SD, by = fromCol)[, avCols, with = FALSE], mean),
+                  by = "neutral_formula", .SDcols = c(avCols, fromCol)]
         
         # Remove duplicate entries (do this after coverage!)
         formTable <- unique(formTable, by = intersect(c("neutral_formula", "frag_formula"), names(formTable)))
@@ -367,8 +370,8 @@ generateFormConsensusForGroup <- function(formList, mergeCount, formThreshold, f
     return(formTable)
 }
 
-generateGroupFormulasByConsensus <- function(formList, mergeCounts, formThreshold, formThresholdAnn, origGNames, mergeCol,
-                                             mergeCovCol, mergeCovAnnCol)
+generateGroupFormulasByConsensus <- function(formList, mergeCounts, formThreshold, formThresholdAnn, origGNames,
+                                             fromCol, mergedAllCol, mergeCovCol, mergeCovAnnCol)
 {
     cat("Generating formula consensus...\n")
 
@@ -389,7 +392,7 @@ generateGroupFormulasByConsensus <- function(formList, mergeCounts, formThreshol
         {
             fl <- pruneList(lapply(formList, "[[", resNames[[i]]))
             ret <- generateFormConsensusForGroup(fl, mergeCounts[[resNames[[i]]]], formThreshold, formThresholdAnn,
-                                                 mergeCol, mergeCovCol, mergeCovAnnCol)
+                                                 fromCol, mergedAllCol, mergeCovCol, mergeCovAnnCol)
             setTxtProgressBar(prog, i)
             return(ret)
         })

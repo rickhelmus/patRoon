@@ -260,7 +260,7 @@ setMethod("as.data.table", "formulas", function(x, fGroups = NULL, average = FAL
 
         # remove columns which don't really make sense anymore
         rmCols <- c("neutral_loss", "error", "error_median", "formula_mz", "dbe", "featCoverage", "featCoverageAnn",
-                    "adduct", "rank", "explainedPeaks", "explainedIntensity",
+                    "adduct", "rank", "explainedPeaks", "explainedIntensity", "analysis_from",
                     # add any fragment columns
                     grep("^frag_", names(ret), value = TRUE),
                     formulaScorings()$name)

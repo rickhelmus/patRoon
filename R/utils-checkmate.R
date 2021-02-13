@@ -285,6 +285,32 @@ checkExtractArg <- function(x)
 }
 assertExtractArg <- checkmate::makeAssertionFunction(checkExtractArg)
 
+checkDeleteArg <- function(x)
+{
+    ret <- checkmate::checkNull(x)
+    if (!isTRUE(ret))
+        ret <- checkmate::checkIntegerish(x, any.missing = FALSE)
+    if (!isTRUE(ret))
+        ret <- checkmate::checkCharacter(x, any.missing = FALSE)
+    if (!isTRUE(ret))
+        ret <- checkmate::checkLogical(x, any.missing = FALSE)
+    if (!isTRUE(ret))
+        ret <- "Should be NULL, valid numeric, character or logical"
+    return(ret)
+}
+assertDeleteArg <- checkmate::makeAssertionFunction(checkDeleteArg)
+
+assertDeleteArgAndToChr <- function(x, choices, .var.name = checkmate::vname(x), add = NULL)
+{
+    assertDeleteArg(x, .var.name = .var.name, add = add)
+    if (is.null(x))
+        x <- choices
+    else if (!is.character(x))
+        x <- choices[x]
+    x <- intersect(x, choices)
+    return(x)
+}
+
 assertNormalizationMethod <- function(x, withNone = TRUE, .var.name = checkmate::vname(x), add = NULL)
 {
     ch <- c("max", "minmax")

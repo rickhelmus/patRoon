@@ -236,42 +236,44 @@ setReplaceMethod("$", "features", function(x, name, value)
 
 #' @describeIn features Completely deletes specified features.
 #' @export
-setMethod("delete", "features", function(obj, i = NULL, j = NULL)
+setMethod("delete", "features", function(obj, i = NULL, j = NULL, ...)
 {
-    if (length(i) == 0)
-        i <- NULL
-        
-    if (is.null(i) && is.null(j))
-        stop("Specify at least either i or j")
-    
-    # UNDONE: more/better checks
-    if (!is.null(i) && !is.list(i))
-        i <- assertSubsetArgAndToChr(i, analyses(obj))
-    else
-        checkmate::assertList(i, c("numeric", "integer"), any.missing = FALSE, names = "unique", null.ok = TRUE)
-    
-    checkmate::assertIntegerish(j, lower = 1, min.len = 1, any.missing = FALSE, null.ok = TRUE)
+    ac <- checkmate::makeAssertCollection()
+    i <- assertDeleteArgAndToChr(i, analyses(obj), add = ac)
+    checkmate::assert(
+        checkmate::checkIntegerish(j, any.missing = FALSE, null.ok = TRUE),
+        checkmate::checkFunction(j, null.ok = TRUE)
+    )
+    checkmate::reportAssertions(ac)
+
+    # UNDONE: NULL for i and j will remove all?
     
     # i = NULL; j = vector: remove from all analyses
-    # j = NULL; i = vector: remove specified analyses
-    # i = list; j = NULL: remove specific features from given analyses
+    # i = vector; j = NULL: remove specified analyses
+    # j = function: remove specific features from given analyses (or all analyses if i=NULL)
     
-    if (!is.list(i))
+    if (!is.function(j))
     {
-        if (is.null(i))
-            i <- analyses(obj)
-        else if (is.null(j))
+        if (is.null(j))
             return(obj[setdiff(analyses(obj), i)])
-        i <- setNames(rep(list(j), length(i)), i)
+        else if (length(i) == 0 || length(j) == 0)
+            return(obj) # nothing to remove...
+        obj@features[i] <- lapply(obj@features[i], function(ft)
+        {
+            inds <- j[j <= nrow(ft)]
+            return(if (length(inds) > 0) ft[-inds] else ft)
+        })
     }
-    else if (!is.null(j))
-        stop("Cannot specify j if i is a list")
-    
-    obj@features[names(i)] <- Map(obj@features[names(i)], i, f = function(ft, inds)
+    else
     {
-        inds <- inds[inds <= nrow(ft)]
-        return(if (length(inds) > 0) ft[-inds] else ft)
-    })
+        obj@features[i] <- Map(obj@features[i], i, f = function(ft, ana)
+        {
+            rm <- j(ft, ana, ...)
+            if (is.logical(rm))
+                return(ft[!rm])
+            return(ft[setdiff(seq_len(nrow(ft)), rm)])
+        })
+    }
     return(obj)
 })
 

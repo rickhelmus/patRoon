@@ -305,7 +305,7 @@ setMethod("$", "featureGroups", function(x, name)
 #' @export
 setMethod("delete", "featureGroups", function(obj, i = NULL, j = NULL)
 {
-    # UNDONE: asserts (new utils?)
+    # UNDONE: asserts and convert i/j to chars if they're vectors (new utils?)
     
     # cases:
     # i = vector; j = NULL: subset analyses
@@ -321,17 +321,36 @@ setMethod("delete", "featureGroups", function(obj, i = NULL, j = NULL)
     if (is.null(i) && is.null(j))
         stop("Specify i and/or j")
     
+    # delete(obj@features, i, j)
+    # remove deleted analyses: subset groups, ftindex, anaInfo slots
+    #   - eg check analyses(feats)
+    # remove deleted groups: subset all slots, update algo groups
+    #   - if not subsetting groups: find removed groups from features object else take directly from j
+    #       - eg get affected analyses from i/j
+    #   - this essentially removes empty groups
+    # remove deleted features in remaining groups: zero groups/ftindex slots
+    #   - figure out affected groups from i/j
+    # when finished: remove removeGroups(), removeAnalyses()(, removeEmptyAnalyses()), removeEmtptyGroups(), updateFeatures(), cleanGroups()
+    
     if (is.null(i) && !is.list(j))
-        NULL # subset groups
+        return(removeGroups(obj, which(!names(obj) %in% j)))
     else if (!is.list(i) && is.null(j))
-        NULL # subset analyses
+        return(cleanGroups(removeAnalyses(obj, which(!analyses(obj) %in% i))))
     else
     {
         if (!is.list(i) && !is.list(j))
-            NULL # convert i to list
+        {
+            # convert i to list format
+            i <- setNames(rep(list(j), length(i)), i)
+        }
+        
+        obj@features <- delete(obj@features, i, j)
         
         if (is.list(i))
-            NULL # delete feats from analyses
+        {
+            # delete feats from analyses
+            
+        }
         else
             NULL # delete feats from groups
     }

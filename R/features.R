@@ -244,24 +244,33 @@ setMethod("delete", "features", function(obj, i = NULL, j = NULL)
     if (is.null(i) && is.null(j))
         stop("Specify at least either i or j")
     
-    if (!is.null(i))
+    # UNDONE: more/better checks
+    if (!is.null(i) && !is.list(i))
         i <- assertSubsetArgAndToChr(i, analyses(obj))
+    else
+        checkmate::assertList(i, c("numeric", "integer"), any.missing = FALSE, names = "unique", null.ok = TRUE)
     
     checkmate::assertIntegerish(j, lower = 1, min.len = 1, any.missing = FALSE, null.ok = TRUE)
     
-    # i = NULL: remove from all analyses
-    # j = NULL: remove specified analyses
+    # i = NULL; j = vector: remove from all analyses
+    # j = NULL; i = vector: remove specified analyses
+    # i = list; j = NULL: remove specific features from given analyses
     
-    if (is.null(i))
-        i <- analyses(obj)
-    else if (is.null(j))
-        return(obj[i])
-    
-    obj@features[i] <- Map(obj@features[i], i, f = function(ft, ana)
+    if (!is.list(i))
     {
-        if (j > nrow(ft))
-            stop("Specified j out of range for analysis ", ana)
-        return(ft[-j])
+        if (is.null(i))
+            i <- analyses(obj)
+        else if (is.null(j))
+            return(obj[setdiff(analyses(obj), i)])
+        i <- setNames(rep(list(j), length(i)), i)
+    }
+    else if (!is.null(j))
+        stop("Cannot specify j if i is a list")
+    
+    obj@features[names(i)] <- Map(obj@features[names(i)], i, f = function(ft, inds)
+    {
+        inds <- inds[inds <= nrow(ft)]
+        return(if (length(inds) > 0) ft[-inds] else ft)
     })
     return(obj)
 })

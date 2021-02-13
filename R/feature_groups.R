@@ -303,23 +303,108 @@ setMethod("$", "featureGroups", function(x, name)
 })
 
 #' @export
-setMethod("delete", "featureGroups", function(obj, i = NULL, j = NULL)
+setMethod("delete", "featureGroups", function(obj, i = NULL, j = NULL, ...)
 {
-    # UNDONE: asserts and convert i/j to chars if they're vectors (new utils?)
+    anas <- analyses(obj)
+    gNames <- names(obj)
+    
+    ac <- checkmate::makeAssertCollection()
+    i <- assertDeleteArgAndToChr(i, anas, add = ac)
+    if (!is.function(j))
+        j <- assertDeleteArgAndToChr(j, gNames, add = ac)
+    checkmate::reportAssertions(ac)
     
     # cases:
     # i = vector; j = NULL: subset analyses
     # i = NULL; j = vector: subset groups
-    # i = list; j = NULL: remove different features from given analyses --> ex: list(ana1 = 1:2, ana2 = 2:3)
-    # i = NULL; j = list: remove different features from given groups --> ex: list(group1 = 1:2, group2 = 2:3)
     # i = vector; j = vector: remove the same features from analyses i in groups j
+    # i = NULL/vector; j = function: use supplied function to remove specific features from each group
+
+    if (length(i) == 0 || length(j) == 0)
+        return(obj) # nothing to remove...
     
-    if (is.list(i) && !is.null(j))
-        stop("Only i should be specified if it is a list")
-    if (is.list(j) && !is.null(i))
-        stop("Only j should be specified if it is a list")
-    if (is.null(i) && is.null(j))
-        stop("Specify i and/or j")
+    ftind <- groupFeatIndex(obj)
+    gTable <- groupTable(obj)
+    
+    # remove features first
+    if (!is.function(j))
+    {
+        obj@features <- delete(getFeatures(obj), i = i,
+                               j = function(ft, ...) which(ft$group %chin% j))
+    }
+    else
+    {
+        featsToRemove <- mapply(j, gTable[chmatch(i, anas)], gNames, MoreArgs = list(...))
+        obj@features <- delete(getFeatures(obj), i = i, j = function(ft, ana)
+        {
+            gn <- names(featsToRemove[sapply(featsToRemove, function(x)
+            {
+                if (!is.character(x))
+                    x <- anas[x]
+                return(x %in% ana)
+            })])
+            if (length(gn) == 0)
+                return(ft)
+            return(which(ft$group %chin% gn))
+        })
+    }
+    
+    if (length(getFeatures(obj)) == 0)
+    {
+        # all features were removed, just clear out slots
+        obj@groups <- obj@ftindex <- obj@groupQualities <- obj@groupScores <- data.table()
+        obj@groupInfo <- obj@groupInfo[FALSE, ]
+        obj@analysisInfo <- obj@analysisInfo[FALSE, ]
+    }
+    else
+    {
+        # remove analyses
+        removedAnas <- setdiff(anas, analyses(getFeatures(obj)))
+        if (length(removedAnas) > 0)
+        {
+            ainds <- chmatch(removedAnas, anas)
+            if (length(obj) > 0)
+            {
+                obj@groups <- obj@groups[-ainds]
+                obj@ftindex <- obj@ftindex[-ainds]
+            }
+            obj@analysisInfo <- obj@analysisInfo[-ainds, , drop = FALSE]
+        }
+        
+        # remove deleted and empty groups
+        removedGroups <- character()
+        if (is.null(i) && !is.function(j)) # removing complete groups?
+            removedGroups <- j
+        else
+            removedGroups <- setdiff(gNames, unique(unlist(lapply(featureTable(obj), "[[", "group"))))
+        if (length(removedGroups) > 0)
+        {
+            ginds <- chmatch(removedGroups, gNames)
+            if (length(obj) > 0)
+            {
+                obj@groups <- obj@groups[, -indices, with = FALSE]
+                obj@ftindex <- obj@ftindex[, -indices, with = FALSE]
+            }
+            obj@groupInfo <- obj@groupInfo[-indices, ]
+            if (hasFGroupScores(obj))
+            {
+                obj@groupQualities <- setkey(obj@groupQualities[names(obj@groups)], "group")
+                obj@groupScores <- setkey(obj@groupScores[names(obj@groups)], "group")
+            }
+        }
+        
+        # re-generate feat index table by matching group names
+        # UNDONE: can we skip updating things based on i/j?
+        gNames <- names(obj) # update
+        obj@ftindex <- setnames(rbindlist(lapply(featureTable(obj),
+                                                 function(ft) as.list(chmatch(gNames, ft$group, 0)))), gNames)
+        
+        # update group intensities: zero missing features
+        # UNDONE: can we skip updating things based on i/j?
+        obj@groups <- Map(obj@groups, obj@ftindex, f = function(g, i) fifelse(i != 0, g, 0))
+    }
+    
+    return(obj)
     
     # delete(obj@features, i, j)
     # remove deleted analyses: subset groups, ftindex, anaInfo slots
@@ -331,31 +416,6 @@ setMethod("delete", "featureGroups", function(obj, i = NULL, j = NULL)
     # remove deleted features in remaining groups: zero groups/ftindex slots
     #   - figure out affected groups from i/j
     # when finished: remove removeGroups(), removeAnalyses()(, removeEmptyAnalyses()), removeEmtptyGroups(), updateFeatures(), cleanGroups()
-    
-    if (is.null(i) && !is.list(j))
-        return(removeGroups(obj, which(!names(obj) %in% j)))
-    else if (!is.list(i) && is.null(j))
-        return(cleanGroups(removeAnalyses(obj, which(!analyses(obj) %in% i))))
-    else
-    {
-        if (!is.list(i) && !is.list(j))
-        {
-            # convert i to list format
-            i <- setNames(rep(list(j), length(i)), i)
-        }
-        
-        obj@features <- delete(obj@features, i, j)
-        
-        if (is.list(i))
-        {
-            # delete feats from analyses
-            
-        }
-        else
-            NULL # delete feats from groups
-    }
-    
-    return(obj)
 })
 
 setMethod("cleanGroups", "featureGroups", function(fGroups, cleanUnassignedFeatures)

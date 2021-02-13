@@ -56,6 +56,7 @@
     - remove zero values for maxReplicateIntRSD?
 - importFeaturesXCMS/importFeaturesXCMS3/importFeatureGroupsXCMS: get rid of anaInfo arg requirement? (or make import func?)
 - Fix: blank filter with multiple replicate groups (and maybe others?)
+    - don't subtract blanks from each other?
 - Check: units of plotChord() rt/mz graphs seems off
 - checkFeatures()
     - filter negate: don't remove kept fGroups if features were changed?

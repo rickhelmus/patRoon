@@ -125,7 +125,7 @@ setMethod("[", c("MSPeakListsSet", "ANY", "ANY", "missing"), function(x, i, j, .
 #' @template as_data_table-args
 #'
 #' @export
-setMethod("as.data.table", "MSPeakListsSet", function(x, fGroups = NULL, averaged = TRUE, sets = NULL)
+setMethod("as.data.table", "MSPeakListsSet", function(x, fGroups = NULL, averaged = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
     checkmate::assertClass(fGroups, "featureGroupsSet", null.ok = TRUE, add = ac)

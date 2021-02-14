@@ -327,8 +327,8 @@ setMethod("delete", "featureGroups", function(obj, i = NULL, j = NULL, ...)
     
     ftind <- groupFeatIndex(obj)
     gTable <- groupTable(obj)
-    isAnaSubSet <- isTRUE(all.equal(j, gNames))
-    isGrpSubSet <- isTRUE(all.equal(i, anas)) && !is.function(j)
+    isAnaSubSet <- !is.function(j) && setequal(j, gNames)
+    isGrpSubSet <- setequal(i, anas) && !is.function(j)
     
     # remove features first
     if (!is.function(j))
@@ -336,17 +336,19 @@ setMethod("delete", "featureGroups", function(obj, i = NULL, j = NULL, ...)
     else
     {
         featsToRemove <- Map(j, gTable[chmatch(i, anas)], gNames, MoreArgs = list(...))
+        # convert to logical matrix
+        featsToRemove <- lapply(featsToRemove, function(x)
+        {
+            if (!is.character(x))
+                x <- anas[x]
+            return(as.list(anas %chin% x))
+        })
+        featsToRemove <- setnames(rbindlist(featsToRemove), anas)
+        set(featsToRemove, j = "group", value = gNames)
+        
         obj@features <- delete(getFeatures(obj), i = i, j = function(ft, ana)
         {
-            gn <- names(which(sapply(featsToRemove, function(x)
-            {
-                if (!is.character(x))
-                    x <- anas[x]
-                return(length(x) > 0 && ana %in% x)
-            })))
-            if (length(gn) == 0)
-                return(FALSE)
-            return(ft$group %chin% gn)
+            return(ft$group %chin% featsToRemove[get(ana) == TRUE]$group)
         })
     }
     

@@ -173,6 +173,8 @@ replicateAbundanceFilter <- function(fGroups, absThreshold, relThreshold, maxInt
 
     gNames <- names(fGroups)
     rGroupsAna <- fGroups@analysisInfo$group
+    rGroups <- replicateGroups(fGroups)
+    rGroupLens <- table(rGroupsAna)
 
     doThr <- !is.null(absThreshold) || !is.null(relThreshold)
     if (doThr)
@@ -186,6 +188,27 @@ replicateAbundanceFilter <- function(fGroups, absThreshold, relThreshold, maxInt
 
     return(doFilter(fGroups, "replicate abundance", c(absThreshold, relThreshold, maxIntRSD, negate), function(fGroups)
     {
+        if (T)
+        {
+        pred <- function(x, n, rg)
+        {
+            ret <- TRUE
+            if (doThr)
+                ret <- sum(x > 0) >= thresholds[[rg]]
+            if (ret && length(x) > 1 && NULLToZero(maxIntRSD) != 0 && any(x > 0))
+                ret <- (sd(x) / mean(x)) < maxIntRSD # UNDONE: remove zero's?
+            return(ret)
+        }
+        if (negate)
+            pred <- Negate(pred)
+        
+        return(delete(fGroups, j = function(x, gn, ...)
+        {
+            rgRem <- rGroups[sapply(rGroups, function(rg) !pred(x[rGroupsAna == rg], rGroupLens[rg], rg))]
+            return(rGroupsAna %chin% rgRem)
+        }))
+        }
+        
         # add replicate groups temporarily
         fGroups@groups[, group := rGroupsAna]
 

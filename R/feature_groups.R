@@ -339,8 +339,10 @@ setMethod("delete", "featureGroups", function(obj, i = NULL, j = NULL, ...)
         # convert to logical matrix
         featsToRemove <- lapply(featsToRemove, function(x)
         {
-            if (!is.character(x))
-                x <- anas[x]
+            if (is.logical(x))
+                return(as.list(rep(x, len.out = length(anas))))
+            if (is.numeric(x))
+                return(seq_along(anas) %in% x)
             return(as.list(anas %chin% x))
         })
         featsToRemove <- setnames(rbindlist(featsToRemove), anas)
@@ -410,8 +412,9 @@ setMethod("delete", "featureGroups", function(obj, i = NULL, j = NULL, ...)
             # NOTE: if j is a function it's assumed that all groups are affected
             affectedGrps <- if (!is.function(j)) j else gNames
             obj@groups <- copy(obj@groups)
-            for (g in affectedGrps)
-                set(obj@groups, which(ftind[[g]] == 0), j = g, value = 0)
+            # NOTE: assignment with by seems to be the fastest, as it allows some DT optimizations apparently...
+            obj@groups[, (affectedGrps) := lapply(.SD, function(x) x), by = rep(1, nrow(obj@groups)),
+                       .SDcols = affectedGrps]
         }
     }
     

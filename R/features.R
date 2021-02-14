@@ -246,6 +246,9 @@ setMethod("delete", "features", function(obj, i = NULL, j = NULL, ...)
     )
     checkmate::reportAssertions(ac)
 
+    if (length(i) == 0 || (!is.null(j) && length(j) == 0) || length(obj) == 0)
+      return(obj) # nothing to remove...
+    
     # UNDONE: NULL for i and j will remove all?
     
     # i = NULL; j = vector: remove from all analyses

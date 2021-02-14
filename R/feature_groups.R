@@ -108,6 +108,8 @@ setMethod("initialize", "featureGroups", function(.Object, ...)
             feat[inds[wh], group := gNames[wh]][]
             return(feat)
         })
+        # remove unassigned features (eg in case the grouping algorithm already did some cleanup)
+        .Object@features <- delete(getFeatures(.Object), j = function(ft, ...) is.na(ft$group))
     }
     
     return(.Object)
@@ -320,7 +322,7 @@ setMethod("delete", "featureGroups", function(obj, i = NULL, j = NULL, ...)
     # i = vector; j = vector: remove the same features from analyses i in groups j
     # i = NULL/vector; j = function: use supplied function to remove specific features from each group
 
-    if (length(i) == 0 || length(j) == 0)
+    if (length(i) == 0 || length(j) == 0 || length(obj) == 0)
         return(obj) # nothing to remove...
     
     ftind <- groupFeatIndex(obj)
@@ -330,24 +332,21 @@ setMethod("delete", "featureGroups", function(obj, i = NULL, j = NULL, ...)
     
     # remove features first
     if (!is.function(j))
-    {
-        obj@features <- delete(getFeatures(obj), i = i,
-                               j = function(ft, ...) which(ft$group %chin% j))
-    }
+        obj@features <- delete(getFeatures(obj), i = i, j = function(ft, ...) which(ft$group %chin% j))
     else
     {
-        featsToRemove <- mapply(j, gTable[chmatch(i, anas)], gNames, MoreArgs = list(...))
+        featsToRemove <- Map(j, gTable[chmatch(i, anas)], gNames, MoreArgs = list(...))
         obj@features <- delete(getFeatures(obj), i = i, j = function(ft, ana)
         {
-            gn <- names(featsToRemove[sapply(featsToRemove, function(x)
+            gn <- names(which(sapply(featsToRemove, function(x)
             {
                 if (!is.character(x))
                     x <- anas[x]
-                return(x %in% ana)
-            })])
+                return(length(x) > 0 && ana %in% x)
+            })))
             if (length(gn) == 0)
-                return(ft)
-            return(which(ft$group %chin% gn))
+                return(FALSE)
+            return(ft$group %chin% gn)
         })
     }
     
@@ -384,10 +383,10 @@ setMethod("delete", "featureGroups", function(obj, i = NULL, j = NULL, ...)
             ginds <- chmatch(removedGroups, gNames)
             if (length(obj) > 0)
             {
-                obj@groups <- obj@groups[, -indices, with = FALSE]
-                obj@ftindex <- obj@ftindex[, -indices, with = FALSE]
+                obj@groups <- obj@groups[, -ginds, with = FALSE]
+                obj@ftindex <- obj@ftindex[, -ginds, with = FALSE]
             }
-            obj@groupInfo <- obj@groupInfo[-indices, ]
+            obj@groupInfo <- obj@groupInfo[-ginds, ]
             if (hasFGroupScores(obj))
             {
                 obj@groupQualities <- setkey(obj@groupQualities[names(obj@groups)], "group")
@@ -400,6 +399,7 @@ setMethod("delete", "featureGroups", function(obj, i = NULL, j = NULL, ...)
             # UNDONE: can we skip updating things based on i/j?
             
             # re-generate feat index table by matching group names
+            gNames <- names(obj) # update var
             obj@ftindex <- setnames(rbindlist(lapply(featureTable(obj),
                                                      function(ft) as.list(chmatch(gNames, ft$group, 0)))), gNames)
             
@@ -407,23 +407,13 @@ setMethod("delete", "featureGroups", function(obj, i = NULL, j = NULL, ...)
             ftind <- groupFeatIndex(obj) # update var
             # NOTE: if j is a function it's assumed that all groups are affected
             affectedGrps <- if (!is.function(j)) j else gNames
+            obj@groups <- copy(obj@groups)
             for (g in affectedGrps)
                 set(obj@groups, which(ftind[[g]] == 0), j = g, value = 0)
         }
     }
     
     return(obj)
-    
-    # delete(obj@features, i, j)
-    # remove deleted analyses: subset groups, ftindex, anaInfo slots
-    #   - eg check analyses(feats)
-    # remove deleted groups: subset all slots, update algo groups
-    #   - if not subsetting groups: find removed groups from features object else take directly from j
-    #       - eg get affected analyses from i/j
-    #   - this essentially removes empty groups
-    # remove deleted features in remaining groups: zero groups/ftindex slots
-    #   - figure out affected groups from i/j
-    # when finished: remove removeGroups(), removeAnalyses()(, removeEmptyAnalyses()), removeEmtptyGroups(), updateFeatures(), cleanGroups()
 })
 
 setMethod("cleanGroups", "featureGroups", function(fGroups, cleanUnassignedFeatures)

@@ -72,7 +72,10 @@
     - remove featuresOpenMS method for getXCMSSet(), update docs
     - groupFeatures(algorithm="sirius")
     - don't key quality/score tables?
-    - rmResult for features and fGroups
+    - delete for features and fGroups
+        - XCMS: replace [ by delete()
+        - XCMS: also update groups data?
+        - remove removeGroups(), removeAnalyses()(, removeEmptyAnalyses()), removeEmtptyGroups(), updateFeatures(), cleanGroups()
     - filterFile, [ also for XCMS fGroups?
 - NEWS
     - topMostByRGroup/EICTopMostByRGroup

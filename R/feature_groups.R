@@ -325,6 +325,8 @@ setMethod("delete", "featureGroups", function(obj, i = NULL, j = NULL, ...)
     
     ftind <- groupFeatIndex(obj)
     gTable <- groupTable(obj)
+    isAnaSubSet <- isTRUE(all.equal(j, gNames))
+    isGrpSubSet <- isTRUE(all.equal(i, anas)) && !is.function(j)
     
     # remove features first
     if (!is.function(j))
@@ -373,7 +375,7 @@ setMethod("delete", "featureGroups", function(obj, i = NULL, j = NULL, ...)
         
         # remove deleted and empty groups
         removedGroups <- character()
-        if (is.null(i) && !is.function(j)) # removing complete groups?
+        if (isGrpSubSet)
             removedGroups <- j
         else
             removedGroups <- setdiff(gNames, unique(unlist(lapply(featureTable(obj), "[[", "group"))))
@@ -393,15 +395,21 @@ setMethod("delete", "featureGroups", function(obj, i = NULL, j = NULL, ...)
             }
         }
         
-        # re-generate feat index table by matching group names
-        # UNDONE: can we skip updating things based on i/j?
-        gNames <- names(obj) # update
-        obj@ftindex <- setnames(rbindlist(lapply(featureTable(obj),
-                                                 function(ft) as.list(chmatch(gNames, ft$group, 0)))), gNames)
-        
-        # update group intensities: zero missing features
-        # UNDONE: can we skip updating things based on i/j?
-        obj@groups <- Map(obj@groups, obj@ftindex, f = function(g, i) fifelse(i != 0, g, 0))
+        if (!isAnaSubSet)
+        {
+            # UNDONE: can we skip updating things based on i/j?
+            
+            # re-generate feat index table by matching group names
+            obj@ftindex <- setnames(rbindlist(lapply(featureTable(obj),
+                                                     function(ft) as.list(chmatch(gNames, ft$group, 0)))), gNames)
+            
+            # update group intensities: zero missing features
+            ftind <- groupFeatIndex(obj) # update var
+            # NOTE: if j is a function it's assumed that all groups are affected
+            affectedGrps <- if (!is.function(j)) j else gNames
+            for (g in affectedGrps)
+                set(obj@groups, which(ftind[[g]] == 0), j = g, value = 0)
+        }
     }
     
     return(obj)

@@ -313,7 +313,12 @@ setMethod("delete", "featureGroups", function(obj, i = NULL, j = NULL, ...)
     
     ac <- checkmate::makeAssertCollection()
     i <- assertDeleteArgAndToChr(i, anas, add = ac)
-    if (!is.function(j))
+    if (is.data.table(j))
+    {
+        # checkmate::assertDataTable(j, types = c("logical", "numeric"), col.names = "unique", add = ac)
+        checkmate::assertNames(names(j), identical.to = gNames, what = "colnames", add = ac)
+    }
+    else if (!is.function(j))
         j <- assertDeleteArgAndToChr(j, gNames, add = ac)
     checkmate::reportAssertions(ac)
     
@@ -328,34 +333,43 @@ setMethod("delete", "featureGroups", function(obj, i = NULL, j = NULL, ...)
     
     ftind <- groupFeatIndex(obj)
     gTable <- groupTable(obj)
-    isAnaSubSet <- !is.function(j) && setequal(j, gNames)
-    isGrpSubSet <- setequal(i, anas) && !is.function(j)
+    jByIndex <- !is.function(j) && !is.data.table(j)
+    isAnaSubSet <- jByIndex && setequal(j, gNames)
+    isGrpSubSet <- jByIndex && setequal(i, anas)
     
     # remove features first
-    if (!is.function(j))
+    if (jByIndex)
         obj@features <- delete(getFeatures(obj), i = i, j = function(ft, ...) which(ft$group %chin% j))
     else
     {
-        gt <- gTable[chmatch(i, anas)]
-        
-        featsToRemove <- Map(j, gt, gNames, MoreArgs = list(...))
-        # equalize lengths
-        ol <- length(i)
-        featsToRemove <- lapply(featsToRemove, function(x)
+        if (is.data.table(j))
         {
-            # use as.vector(.., "list") as it's a bit faster than as.list
-            if (is.logical(x))
-                return(as.vector(rep(x, length.out = ol), "list"))
-            if (is.numeric(x))
-                return(as.vector(seq_along(anas) %in% x, "list"))
-            return(as.vector(anas %chin% x, "list"))
-        })
-        featsToRemove <- setnames(rbindlist(featsToRemove), i)
-        set(featsToRemove, j = "group", value = gNames)
+            featsToRemove <- setnames(transpose(j), i)
+            set(featsToRemove, j = "group", value = names(j))
+        }
+        else
+        {
+            gt <- gTable[chmatch(i, anas)]
+            
+            featsToRemove <- Map(j, gt, gNames, MoreArgs = list(...))
+            # equalize lengths
+            ol <- length(i)
+            featsToRemove <- lapply(featsToRemove, function(x)
+            {
+                # use as.vector(.., "list") as it's a bit faster than as.list
+                if (is.logical(x))
+                    return(as.vector(rep(x, length.out = ol), "list"))
+                if (is.numeric(x))
+                    return(as.vector(seq_along(anas) %in% x, "list"))
+                return(as.vector(anas %chin% x, "list"))
+            })
+            featsToRemove <- setnames(rbindlist(featsToRemove), i)
+            set(featsToRemove, j = "group", value = gNames)
+        }
         
         obj@features <- delete(getFeatures(obj), i = i, j = function(ft, ana)
         {
-            return(featsToRemove[chmatch(ft$group, group), ana, with = FALSE][[1]])
+            return(featsToRemove[chmatch(ft$group, group), ana, with = FALSE][[1]] != 0)
         })
     }
     
@@ -415,7 +429,7 @@ setMethod("delete", "featureGroups", function(obj, i = NULL, j = NULL, ...)
             # update group intensities: zero missing features
             ftind <- groupFeatIndex(obj) # update var
             # NOTE: if j is a function it's assumed that all groups are affected
-            affectedGrps <- if (!is.function(j)) j else gNames
+            affectedGrps <- if (jByIndex) j else gNames
             obj@groups <- copy(obj@groups)
             # NOTE: assignment with by seems to be the fastest, as it allows some DT optimizations apparently...
             obj@groups[, (affectedGrps) := lapply(.SD, function(x) x), by = rep(1, nrow(obj@groups)),

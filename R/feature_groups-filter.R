@@ -195,27 +195,18 @@ replicateAbundanceFilter <- function(fGroups, absThreshold, relThreshold, maxInt
         {
         pred <- function(x, n, rg)
         {
-            ret <- FALSE
-            lx <- length(x)
-            if (doThr)
-                ret <- sum(x > 0) < thresholds[[rg]]
-            if (ret && maxIntRSD != 0 && lx > 1 && any(x > 0))
-                ret <- (sd(x) / (sum(x) / lx)) > maxIntRSD # UNDONE: remove zero's?
-            return(ret)
+            if (doThr && sum(x > 0) < thresholds[[rg]])
+                return(TRUE)
+            return(maxIntRSD != 0 && length(x) > 1 && any(x > 0) && (sd(x) / mean(x)) > maxIntRSD) # UNDONE: remove zeros?
         }
+        
         if (negate)
             pred <- Negate(pred)
 
-        return(delete(fGroups, j = function(x, ...)
-        {
-            del <- logical(length(x))
-            for (rg in rGroups)
-            {
-                inds <- rGroupInds[[rg]]
-                del[inds] <- pred(x[inds], rGroupLens[rg], rg)
-            }
-            return(del)
-        }))
+        delGroups <- copy(fGroups@groups)
+        delGroups[, group := rGroupsAna]
+        delGroups[, (gNames) := lapply(.SD, function(x) if (pred(x, .N, group)) x else 0), by = group, .SDcols = gNames]
+        return(delete(fGroups, j = delGroups[, -"group"]))
         }
         
         # add replicate groups temporarily

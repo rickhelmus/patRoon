@@ -10,6 +10,7 @@
 - MCS calculation: handle `NULL` values that may occasionally be returned by `rcdk::get.mcs`
 - Fixed: intensity filter failed if previous filters lead to zero feature groups.
 - Fixed: `reportHTML()` annotation table was paged.
+- Fixed: Check final path lengths of log files and truncate where necessary (reported by Corey Griffith)
 
 
 # patRoon 1.2.0

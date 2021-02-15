@@ -320,7 +320,18 @@ estimateIdentificationLevel <- function(suspectName, suspectFGroup, suspectRTDev
         return(TRUE)            
     }
 
-    logOut <- file.path("log", "ident", paste0(suspectName, "-", suspectFGroup, ".txt"))
+    logDir <- R.utils::getAbsolutePath(file.path("log", "ident")) # take absolute path for length calculation below
+    logFile <- paste0(suspectName, "-", suspectFGroup, ".txt")
+    
+    # check if path would be too long for e.g Windows systems, which may happen with very long suspect names
+    pathLen <- nchar(logDir) + nchar(logFile) + 1 # +1: path separator
+    if (pathLen > 255)
+    {
+        # truncate end part of suspect name
+        logFile <- paste0(substr(suspectName, 1, nchar(suspectName) - (pathLen - 255)), "-", suspectFGroup, ".txt")
+    }
+    logOut <- file.path(logDir, logFile)
+    
     mkdirp(dirname(logOut))
     logFile <- withr::local_connection(file(logOut, "w"))
     doLog <- function(indent, s, ...) fprintf(logFile, paste0(strrep(" ", indent * 4), s), ...)

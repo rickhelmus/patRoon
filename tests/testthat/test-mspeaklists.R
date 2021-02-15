@@ -24,6 +24,8 @@ if (doDATests())
 # remove Ion Mobility data as it inconsistently is present or not
 plistsNoIM <- plists
 plistsNoIM@metadata <- lapply(plistsNoIM@metadata, function(mda) lapply(mda, function(mdf) lapply(mdf, function(mds) mds[, setdiff(names(mds), "ionMobilityDriftTime"), with = FALSE])))
+if (testWithSets())
+    plistsNoIM@analysisInfo <- data.frame() # remove as it is system dependent
 
 test_that("verify generation of MS peak lists", {
     expect_known_value(plistsNoIM, testFile("plists-mzr"))

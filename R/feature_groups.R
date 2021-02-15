@@ -109,6 +109,7 @@ setMethod("initialize", "featureGroups", function(.Object, ...)
             return(feat)
         })
         # remove unassigned features (eg in case the grouping algorithm already did some cleanup)
+        # UNDONE: sync ftindex afterwards!!
         .Object@features <- delete(getFeatures(.Object), j = function(ft, ...) is.na(ft$group))
     }
     
@@ -335,22 +336,26 @@ setMethod("delete", "featureGroups", function(obj, i = NULL, j = NULL, ...)
         obj@features <- delete(getFeatures(obj), i = i, j = function(ft, ...) which(ft$group %chin% j))
     else
     {
-        featsToRemove <- Map(j, gTable[chmatch(i, anas)], gNames, MoreArgs = list(...))
-        # convert to logical matrix
+        gt <- gTable[chmatch(i, anas)]
+        
+        featsToRemove <- Map(j, gt, gNames, MoreArgs = list(...))
+        # equalize lengths
+        ol <- length(i)
         featsToRemove <- lapply(featsToRemove, function(x)
         {
+            # use as.vector(.., "list") as it's a bit faster than as.list
             if (is.logical(x))
-                return(as.list(rep(x, len.out = length(anas))))
+                return(as.vector(rep(x, length.out = ol), "list"))
             if (is.numeric(x))
-                return(seq_along(anas) %in% x)
-            return(as.list(anas %chin% x))
+                return(as.vector(seq_along(anas) %in% x, "list"))
+            return(as.vector(anas %chin% x, "list"))
         })
-        featsToRemove <- setnames(rbindlist(featsToRemove), anas)
+        featsToRemove <- setnames(rbindlist(featsToRemove), i)
         set(featsToRemove, j = "group", value = gNames)
         
         obj@features <- delete(getFeatures(obj), i = i, j = function(ft, ana)
         {
-            return(ft$group %chin% featsToRemove[get(ana) == TRUE]$group)
+            return(featsToRemove[chmatch(ft$group, group), ana, with = FALSE][[1]])
         })
     }
     

@@ -1,1 +1,1 @@
-A featuresOpenMS object (derived from features -> workflowStep)Algorithm: openmsTotal feature count: 1133Average feature count/analysis: 378Analyses: solvent-1, solvent-2, solvent-3 (3 total)Replicate groups: solvent (1 total)Replicate groups used as blank: solvent (1 total)
+A featuresOpenMS objectHierarchy:features    |-- featuresOpenMS---Algorithm: openmsTotal feature count: 1133Average feature count/analysis: 378Analyses: solvent-1, solvent-2, solvent-3 (3 total)Replicate groups: solvent (1 total)Replicate groups used as blank: solvent (1 total)

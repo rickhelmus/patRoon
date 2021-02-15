@@ -1,1 +1,1 @@
-A featuresXCMS object (derived from features -> workflowStep)Algorithm: xcmsTotal feature count: 107Average feature count/analysis: 107Analyses: standard-1 (1 total)Replicate groups: standard (1 total)Replicate groups used as blank: solvent (1 total)
+A featuresXCMS objectHierarchy:features    |-- featuresXCMS---Algorithm: xcmsTotal feature count: 107Average feature count/analysis: 107Analyses: standard-1 (1 total)Replicate groups: standard (1 total)Replicate groups used as blank: solvent (1 total)

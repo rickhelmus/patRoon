@@ -186,6 +186,8 @@ replicateAbundanceFilter <- function(fGroups, absThreshold, relThreshold, maxInt
         else
             thresholds <- setNames(rep(absThreshold, length(replicateGroups(fGroups))), replicateGroups(fGroups))
     }
+    
+    maxIntRSD <- NULLToZero(maxIntRSD)
 
     return(doFilter(fGroups, "replicate abundance", c(absThreshold, relThreshold, maxIntRSD, negate), function(fGroups)
     {
@@ -193,20 +195,26 @@ replicateAbundanceFilter <- function(fGroups, absThreshold, relThreshold, maxInt
         {
         pred <- function(x, n, rg)
         {
-            ret <- TRUE
+            ret <- FALSE
+            lx <- length(x)
             if (doThr)
-                ret <- sum(x > 0) >= thresholds[[rg]]
-            if (ret && length(x) > 1 && NULLToZero(maxIntRSD) != 0 && any(x > 0))
-                ret <- (sd(x) / mean(x)) < maxIntRSD # UNDONE: remove zero's?
+                ret <- sum(x > 0) < thresholds[[rg]]
+            if (ret && maxIntRSD != 0 && lx > 1 && any(x > 0))
+                ret <- (sd(x) / (sum(x) / lx)) > maxIntRSD # UNDONE: remove zero's?
             return(ret)
         }
         if (negate)
             pred <- Negate(pred)
-        
+
         return(delete(fGroups, j = function(x, ...)
         {
-            rgRem <- rGroups[sapply(rGroups, function(rg) !pred(x[rGroupInds[[rg]]], rGroupLens[rg], rg))]
-            return(rGroupsAna %in% rgRem)
+            del <- logical(length(x))
+            for (rg in rGroups)
+            {
+                inds <- rGroupInds[[rg]]
+                del[inds] <- pred(x[inds], rGroupLens[rg], rg)
+            }
+            return(del)
         }))
         }
         

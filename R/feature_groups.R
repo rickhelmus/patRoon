@@ -369,7 +369,7 @@ setMethod("delete", "featureGroups", function(obj, i = NULL, j = NULL, ...)
         
         obj@features <- delete(getFeatures(obj), i = i, j = function(ft, ana)
         {
-            return(featsToRemove[chmatch(ft$group, group), ana, with = FALSE][[1]] != 0)
+            return(featsToRemove[chmatch(ft$group, group), ana, with = FALSE][[1]] == TRUE)
         })
     }
     

@@ -93,10 +93,34 @@ blankFilter <- function(fGroups, threshold, negate = FALSE)
 
     return(doFilter(fGroups, "blank", c(threshold, negate), function(fGroups)
     {
-        pred <- function(x, t) x >= t
+        pred <- function(x, t) x < t
         if (negate)
             pred <- Negate(pred)
 
+        if (T)
+        {
+        blAnaInds <- anaInfo$group %chin% allBlanks
+        avgBls <- groupTable(fGroups)[blAnaInds]
+        set(avgBls, j = "group", value = anaInfo$group[blAnaInds])
+        avgBls[, (gNames) := lapply(.SD, function(x) mean(x[x > 0])), by = "group", .SDcols = gNames]
+        set(avgBls, j = "group", value = NULL) # don't need it anymore
+        setnafill(avgBls, fill = 0)
+        minInts <- sapply(avgBls, max) * threshold
+
+        
+        delGroups <- copy(fGroups@groups)
+        
+        for (j in seq_along(delGroups))
+            set(delGroups, j = j, value = fifelse(pred(fGroups@groups[[j]], minInts[[j]]), 1, 0))
+        return(delete(fGroups, j = delGroups))
+        
+        return(delete(fGroups, j = function(x, grp) !pred(x, minInts[[grp]])))
+        }
+
+        pred <- function(x, t) x >= t
+        if (negate)
+            pred <- Negate(pred)
+        
         for (bl in allBlanks)
         {
             blAnalyses <- which(anaInfo$group == bl)

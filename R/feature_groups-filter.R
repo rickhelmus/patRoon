@@ -191,6 +191,7 @@ replicateAbundanceFilter <- function(fGroups, absThreshold, relThreshold, maxInt
 
     return(doFilter(fGroups, "replicate abundance", c(absThreshold, relThreshold, maxIntRSD, negate), function(fGroups)
     {
+        # UNDONE
         if (T)
         {
         pred <- function(x, n, rg)
@@ -204,8 +205,8 @@ replicateAbundanceFilter <- function(fGroups, absThreshold, relThreshold, maxInt
             pred <- Negate(pred)
 
         delGroups <- copy(fGroups@groups)
-        delGroups[, group := rGroupsAna]
-        delGroups[, (gNames) := lapply(.SD, function(x) if (pred(x, .N, group)) x else 0), by = group, .SDcols = gNames]
+        set(delGroups, j = "group", value = rGroupsAna)
+        delGroups[, (gNames) := lapply(.SD, function(x) if (pred(x, .N, group)) 1 else 0), by = group, .SDcols = gNames]
         return(delete(fGroups, j = delGroups[, -"group"]))
         }
         

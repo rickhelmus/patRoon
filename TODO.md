@@ -60,6 +60,7 @@
 - Check: units of plotChord() rt/mz graphs seems off
 - checkFeatures()
     - filter negate: don't remove kept fGroups if features were changed?
+    - update filter for delete()
 - misc
     - topMostByRGroup: make default? or only for reporting?
     - quality/score filters

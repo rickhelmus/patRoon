@@ -289,11 +289,34 @@ chromWidthFilter <- function(fGroups, range, negate)
 {
     ftindex <- groupFeatIndex(fGroups)
     fTable <- featureTable(fGroups)
-    anaInfo <- analysisInfo(fGroups)
+    anas <- analyses(fGroups)
     gNames <- names(fGroups)
 
     return(doFilter(fGroups, "chromwidth", c(range, negate), function(fGroups)
     {
+        if (T)
+        {
+        pred <- function(finds)
+        {
+            cwidths <- sapply(seq_along(finds), function(i)
+            {
+                if (finds[i] == 0)
+                    return(0)
+                else
+                    return(fTable[[anas[i]]][["retmax"]][finds[i]] - fTable[[anas[i]]][["retmin"]][finds[i]])
+            }, USE.NAMES = FALSE)
+            return(cwidths < range[1] | cwidths > range[2])
+        }
+        
+        if (negate)
+            pred <- Negate(pred)
+        
+            delGroups <- setnames(as.data.table(matrix(FALSE, length(analyses(fGroups)), length(fGroups))),
+                                  names(fGroups))
+            delGroups[, (names(delGroups)) := lapply(ftindex, pred), by = rep(1, nrow(delGroups))]
+            return(delete(fGroups, j = delGroups))
+        }
+        
         pred <- function(finds)
         {
             cwidths <- sapply(seq_along(finds), function(i)
@@ -301,7 +324,7 @@ chromWidthFilter <- function(fGroups, range, negate)
                 if (finds[i] == 0)
                     0
                 else
-                    diff(unlist(fTable[[anaInfo$analysis[i]]][finds[i], c("retmin", "retmax")]))
+                    diff(unlist(fTable[[anas[i]]][finds[i], c("retmin", "retmax")]))
             }, USE.NAMES = FALSE)
             return(numGTE(cwidths, range[1]) & numLTE(cwidths, range[2]))
         }
@@ -319,6 +342,14 @@ replicateGroupFilter <- function(fGroups, rGroups, negate = FALSE, verbose = TRU
 {
     return(doFilter(fGroups, "replicate group", c(rGroups, negate), function(fGroups)
     {
+        if (T)
+        {
+        pred <- function(g) !g %chin% rGroups
+        if (negate)
+            pred <- Negate(pred)
+        return(delete(fGroups, pred(analysisInfo(fGroups)$group)))
+        }
+        
         pred <- function(g) g %in% rGroups
         if (negate)
             pred <- Negate(pred)
@@ -534,7 +565,7 @@ setMethod("replicateGroupSubtract", "featureGroups", function(fGroups, rGroups, 
     fGroups@groups <- copy(fGroups@groups)
 
     filteredGroups <- replicateGroupFilter(fGroups, rGroups, verbose = FALSE)
-    sharedGroups <- gNames[gNames %in% names(filteredGroups)]
+    sharedGroups <- intersect(gNames, names(filteredGroups))
 
     if (length(sharedGroups) == 0)
         return(fGroups)
@@ -545,6 +576,24 @@ setMethod("replicateGroupSubtract", "featureGroups", function(fGroups, rGroups, 
         thrs <- sapply(avgGroups, max) * threshold
     }
 
+    if (T)
+    {
+    if (!checkIntensities)
+        fGroups <- delete(fGroups, j = sharedGroups)
+    else
+    {
+        delGroups <- setnames(as.data.table(matrix(FALSE, length(analyses(fGroups)), length(fGroups))),
+                              names(fGroups))
+        delGroups[, (sharedGroups) := Map(fGroups@groups[, sharedGroups, with = FALSE], sharedGroups,
+                                          f = function(x, grp) x < thrs[grp]),
+                  by = rep(1, nrow(delGroups))]
+        # fGroups <- delete(fGroups, j = function(x, grp) grp %chin% sharedGroups & x < thrs[grp])
+        fGroups <- delete(fGroups, j = delGroups)
+    }
+    
+    return(replicateGroupFilter(fGroups, rGroups, negate = TRUE, verbose = FALSE))
+    }
+    
     for (b in sharedGroups)
     {
         if (checkIntensities)

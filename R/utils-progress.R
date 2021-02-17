@@ -5,7 +5,7 @@
 withProg <- function(end, expr)
 {
     prog <- 0
-    pb <- txtProgressBar(0, end, file = stderr(), style = 3)
+    pb <- openProgBar(0, end, file = stderr())
 
     # from https://stackoverflow.com/questions/56038299/in-r-how-do-i-evaluate-an-expression-in-a-specific-environment-within-a-functio
     ret <- withCallingHandlers(withVisible(expr), doProg = function(...)

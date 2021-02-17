@@ -76,6 +76,7 @@
         - XCMS: replace [ by delete()
         - XCMS: also update groups data?
         - remove removeGroups(), removeAnalyses()(, removeEmptyAnalyses()), removeEmtptyGroups(), updateFeatures(), cleanGroups()
+        - remove copy(fGroups@groups) in doFilter
     - filterFile, [ also for XCMS fGroups?
 - NEWS
     - topMostByRGroup/EICTopMostByRGroup
@@ -88,6 +89,7 @@
 - tests
     - topMostByRGroup
     - xcms3 comparison
+    - new multiple blank filtering
 - docs
     - clarify reportCSV() now only reports remaining features?
     - topMostByRGroup: handbook?

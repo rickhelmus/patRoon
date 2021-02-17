@@ -429,7 +429,7 @@ setMethod("delete", "featureGroups", function(obj, i = NULL, j = NULL, ...)
             # update group intensities: zero missing features
             ftind <- groupFeatIndex(obj) # update var
             # NOTE: if j is a function it's assumed that all groups are affected
-            affectedGrps <- if (jByIndex) j else gNames
+            affectedGrps <- if (jByIndex) intersect(j, gNames) else gNames
             obj@groups <- copy(obj@groups)
             # NOTE: assignment with by seems to be the fastest, as it allows some DT optimizations apparently...
             obj@groups[, (affectedGrps) := lapply(.SD, function(x) x), by = rep(1, nrow(obj@groups)),

@@ -59,12 +59,21 @@ intensityFilter <- function(fGroups, absThreshold, relThreshold, negate = FALSE)
     if (length(fGroups) == 0)
         return(fGroups)
     
-    threshold <- getHighestAbsValue(absThreshold, relThreshold, max(groupTable(fGroups)))
+    threshold <- getHighestAbsValue(absThreshold, relThreshold, max(sapply(groupTable(fGroups), max)))
     if (threshold == 0)
         return(fGroups)
 
     return(doFilter(fGroups, "intensity", c(threshold, negate), function(fGroups)
     {
+        if (T)
+        {
+        compF <- if (negate) function(x) x >= threshold else function(x) x < threshold
+        delGroups <- setnames(as.data.table(matrix(FALSE, length(analyses(fGroups)), length(fGroups))),
+                              names(fGroups))
+        delGroups[, (names(delGroups)) := lapply(fGroups@groups, compF), by = rep(1, nrow(delGroups))]
+        return(delete(fGroups, j = delGroups))
+        }
+        
         compF <- if (negate) function(x) x >= threshold else function(x) x < threshold
 
         # use set to speed stuff up: http://stackoverflow.com/a/20545629
@@ -84,7 +93,8 @@ blankFilter <- function(fGroups, threshold, negate = FALSE)
     blankGroups <- sapply(anaInfo$blank, function(rg) strsplit(rg, ","), USE.NAMES = FALSE)
     allBlanks <- unique(unlist(blankGroups))
     allBlanks <- allBlanks[allBlanks %in% rGroups]
-
+    blAnaInds <- anaInfo$group %chin% allBlanks
+    
     if (length(allBlanks) == 0)
     {
         warning("No suitable blank analyses found, skipping blank filter...")
@@ -99,22 +109,22 @@ blankFilter <- function(fGroups, threshold, negate = FALSE)
 
         if (T)
         {
-        blAnaInds <- anaInfo$group %chin% allBlanks
-        avgBls <- groupTable(fGroups)[blAnaInds]
-        set(avgBls, j = "group", value = anaInfo$group[blAnaInds])
-        avgBls[, (gNames) := lapply(.SD, function(x) mean(x[x > 0])), by = "group", .SDcols = gNames]
-        set(avgBls, j = "group", value = NULL) # don't need it anymore
-        setnafill(avgBls, fill = 0)
+            
+        avgBls <- lapply(allBlanks, function(bl)
+        {
+            avg <- vapply(fGroups@groups[anaInfo$group == bl], function(x) mean(x[x > 0]), FUN.VALUE = numeric(1),
+                          USE.NAMES = FALSE)
+            avg[is.na(avg)] <- 0
+            return(avg)
+        })
+        avgBls <- transpose(avgBls)
         minInts <- sapply(avgBls, max) * threshold
 
-        
         delGroups <- copy(fGroups@groups)
         
         for (j in seq_along(delGroups))
             set(delGroups, j = j, value = fifelse(pred(fGroups@groups[[j]], minInts[[j]]), 1, 0))
         return(delete(fGroups, j = delGroups))
-        
-        return(delete(fGroups, j = function(x, grp) !pred(x, minInts[[grp]])))
         }
 
         pred <- function(x, t) x >= t

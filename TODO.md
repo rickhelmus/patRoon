@@ -55,8 +55,6 @@
     - document which filters work on feature level (e.g. chromWidth)
     - remove zero values for maxReplicateIntRSD?
 - importFeaturesXCMS/importFeaturesXCMS3/importFeatureGroupsXCMS: get rid of anaInfo arg requirement? (or make import func?)
-- Fix: blank filter with multiple replicate groups (and maybe others?)
-    - don't subtract blanks from each other?
 - Check: units of plotChord() rt/mz graphs seems off
 - checkFeatures()
     - filter negate: don't remove kept fGroups if features were changed?
@@ -76,7 +74,8 @@
     - delete for features and fGroups
         - XCMS: replace [ by delete()
         - XCMS: also update groups data?
-    - filterFile, [ also for XCMS fGroups?
+        - update delete() for XCMS/XCMS3/KPIC2
+        - get rid of replacement methods (except features' featureTable)
 - NEWS
     - topMostByRGroup/EICTopMostByRGroup
     - as.data.table: qualities argument (and potentially faster now with features=T?)
@@ -85,6 +84,7 @@
     - ... for findFeaturesXCMS3
     - XCMS3 grouping/import with exportedData and comparison() supports xcms3
     - progressr
+    - don't subtract blanks from each other
 - tests
     - topMostByRGroup
     - xcms3 comparison

@@ -201,9 +201,7 @@ test_that("plotting works", {
 
 if (testWithSets())
 {
-    fgEmpty <- getEmptyTestFGroups(getTestAnaInfoAnn())[, sets = "set2"]
-    fgOneEmptySet <- makeSet(unset(fGroups, "set1"), fgEmpty, groupAlgo = "openms",
-                             adducts = NULL, labels = c("set1", "set2"))
+    fgOneEmptySet <- getTestFGroupsOneEmptySet(getTestAnaInfoAnn())[, 1:25]
     plistsOneEmptySet <- generateMSPeakLists(fgOneEmptySet, "mzr")
 }
 

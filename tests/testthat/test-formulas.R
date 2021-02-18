@@ -297,3 +297,31 @@ test_that("plotting works", {
     expect_equal(expect_plot(plotVenn(formsGF, formsSIR))$intersectionCounts,
                  length(consensus(formsGF, formsSIR, relMinAbundance = 1)))
 })
+
+if (testWithSets())
+{
+    fgOneEmptySet <- getTestFGroupsOneEmptySet(getTestAnaInfoAnn())
+    formsGFOneEmptySet <- doGenForms(fgOneEmptySet, "genform", plists)
+}
+
+test_that("sets functionality", {
+    skip_if_not(testWithSets())
+    
+    expect_equal(formsGF, formsGF[, sets = sets(formsGF)])
+    expect_length(formsGF[, sets = character()], 0)
+    expect_equal(sets(filter(formsGF, sets = "set1", negate = TRUE)), "set2")
+    expect_setequal(groupNames(formsGF), unique(sapply(setObjects(formsGF), groupNames)))
+    expect_setequal(groupNames(unset(formsGF, "set1")), groupNames(setObjects(formsGF)[[1]]))
+    expect_setequal(groupNames(unset(formsGFOneEmptySet, "set1")), groupNames(setObjects(formsGFOneEmptySet)[[1]]))
+    expect_length(unset(formsGFOneEmptySet, "set2"), 0)
+    
+    expect_lt(length(doGenForms(fgOneEmptySet, "genform", plists, setThreshold = 1)), length(formsGFOneEmptySet))
+    expect_length(doGenForms(fgOneEmptySet, "genform", plists, setThresholdAnn = 0), length(formsGFOneEmptySet))
+    
+    expect_doppel("form-spec-set", function() plotSpectrum(formsGFWithMSMS, plotPrec, groupNames(formsGFWithMSMS)[2],
+                                                           MSPeakLists = plists, perSet = FALSE))
+    expect_doppel("form-spec-set-perset", function() plotSpectrum(formsGFWithMSMS, plotPrec, groupNames(formsGFWithMSMS)[2],
+                                                                  MSPeakLists = plists, perSet = TRUE, mirror = FALSE))
+    expect_doppel("form-spec-set-mirror", function() plotSpectrum(formsGFWithMSMS, plotPrec, groupNames(formsGFWithMSMS)[2],
+                                                                  MSPeakLists = plists, perSet = TRUE, mirror = TRUE))
+})

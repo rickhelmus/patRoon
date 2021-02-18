@@ -155,7 +155,7 @@ if (doMetFrag)
 
 test_that("formula scoring works", {
     skip_if_not(doMetFrag)
-    expect_lt(length(filter(compsMFIsoF, minFormulaScore = 3)), length(compsMFIsoF))
+    expect_lt(length(filter(compsMFIsoF, minFormulaScore = 0.5)), length(compsMFIsoF))
     expect_error(addFormulaScoring(compsMFEmptyPL, forms), NA)
 })
 
@@ -290,4 +290,37 @@ test_that("plotting works", {
     expect_ggplot(plotUpSet(compsMF, compsSIR))
     expect_error(plotUpSet(compsMFEmpty, compsSIREmpty))
     expect_error(plotUpSet(compsMF, compsSIREmpty))
+})
+
+if (testWithSets())
+{
+    fgOneEmptySet <- getTestFGroupsOneEmptySet(getTestAnaInfoAnn())
+    compsOneEmptySet <- callMF(fgOneEmptySet, plists)
+}
+
+test_that("sets functionality", {
+    skip_if_not(testWithSets())
+    skip_if_not(doMetFrag)
+    
+    expect_equal(comps, comps[, sets = sets(comps)])
+    expect_length(comps[, sets = character()], 0)
+    expect_equal(sets(filter(comps, sets = "set1", negate = TRUE)), "set2")
+    expect_setequal(groupNames(comps), unique(sapply(setObjects(comps), groupNames)))
+    expect_setequal(groupNames(unset(comps, "set1")), groupNames(setObjects(comps)[[1]]))
+    expect_setequal(groupNames(unset(compsOneEmptySet, "set1")), groupNames(setObjects(compsOneEmptySet)[[1]]))
+    expect_length(unset(compsOneEmptySet, "set2"), 0)
+    
+    expect_lt(length(callMF(fgOneEmptySet, plists, setThreshold = 1)), length(compsOneEmptySet))
+    expect_length(callMF(fgOneEmptySet, plists, setThresholdAnn = 0), length(compsOneEmptySet))
+    
+    expect_doppel("compound-spec-set", function() plotSpectrum(compsMFIso, 1, names(compoundTable(compsMFIso))[2],
+                                                               plists, plotStruct = FALSE, perSet = FALSE))
+    expect_doppel("compound-spec-set-perset", function() plotSpectrum(compsMFIso, 1,
+                                                                      names(compoundTable(compsMFIso))[2],
+                                                                      plists, plotStruct = FALSE, perSet = TRUE,
+                                                                      mirror = FALSE))
+    expect_doppel("compound-spec-set-mirror", function() plotSpectrum(compsMFIso, 1,
+                                                                      names(compoundTable(compsMFIso))[2],
+                                                                      plists, plotStruct = FALSE, perSet = TRUE,
+                                                                      mirror = TRUE))
 })

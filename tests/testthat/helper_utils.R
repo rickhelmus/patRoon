@@ -8,15 +8,15 @@ getEmptyTestFGroups <- function(anaInfo = getTestAnaInfo()) getTestFGroups(anaIn
 getMFTestDBPath <- function() file.path(getTestDataPath(), "test-mf-db.csv")
 getCompFGroups <- function()
 {
-    fGroups <- doScreen(getTestFGroupsAnn(), patRoonData::targets, onlyHits = TRUE)
+    fGroups <- doScreen(getTestFGroups(getTestAnaInfoAnn()), patRoonData::targets, onlyHits = TRUE)
     # just focus on 5 targets, these are named exactly the same as in the MetFrag test DB
     return(fGroups[, suspects = fread(getMFTestDBPath())$Name])
 }
 
-callMF <- function(fGroups, plists, scoreTypes = "fragScore", db = getMFTestDBPath(), to = 300)
+callMF <- function(fGroups, plists, scoreTypes = "fragScore", db = getMFTestDBPath(), to = 300, ...)
 {
     doGenComps(fGroups, plists, "metfrag", timeout = to, database = "csv", scoreTypes = scoreTypes,
-               extraOpts = list(LocalDatabasePath = db))
+               extraOpts = list(LocalDatabasePath = db), ...)
 }
 
 if (testWithSets())

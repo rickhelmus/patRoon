@@ -1,6 +1,6 @@
 context("MS peak lists")
 
-fGroups <- getTestFGroupsAnn()[, 1:100]
+fGroups <- getTestFGroups(getTestAnaInfoAnn())[, 1:100]
 plists <- generateMSPeakLists(fGroups, "mzr")
 plistsMSMS <- filter(plists, withMSMS = TRUE)
 
@@ -197,4 +197,32 @@ test_that("plotting works", {
                                useGGPlot2 = TRUE))
     expect_ggplot(plotSpectrum(plistsMSMS, groupName = groupNames(plistsMSMS)[2], MSLevel = 2,
                                useGGPlot2 = TRUE))
+})
+
+if (testWithSets())
+{
+    fgEmpty <- getEmptyTestFGroups(getTestAnaInfoAnn())[, sets = "set2"]
+    fgOneEmptySet <- makeSet(unset(fGroups, "set1"), fgEmpty, groupAlgo = "openms",
+                             adducts = NULL, labels = c("set1", "set2"))
+    plistsOneEmptySet <- generateMSPeakLists(fgOneEmptySet, "mzr")
+}
+
+test_that("sets functionality", {
+    skip_if_not(testWithSets())
+    
+    expect_equal(analysisInfo(plists[, sets = "set1"])[, 1:4], getTestAnaInfoSet1(getTestAnaInfoAnn()))
+    expect_equal(plists, plists[, sets = sets(plists)])
+    expect_length(plists[, sets = character()], 0)
+    expect_equal(sets(filter(plists, sets = "set1", negate = TRUE)), "set2")
+    expect_setequal(groupNames(plists), unique(sapply(setObjects(plists), groupNames)))
+    expect_setequal(groupNames(unset(plists, "set1")), groupNames(setObjects(plists)[[1]]))
+    expect_setequal(groupNames(unset(plistsOneEmptySet, "set1")), groupNames(setObjects(plistsOneEmptySet)[[1]]))
+    expect_length(unset(plistsOneEmptySet, "set2"), 0)
+    
+    expect_doppel("mspl-spec-set", function() plotSpectrum(plistsMSMS, groupName = groupNames(plistsMSMS)[2],
+                                                           MSLevel = 2, perSet = FALSE))
+    expect_doppel("mspl-spec-set-perset", function() plotSpectrum(plistsMSMS, groupName = groupNames(plistsMSMS)[2],
+                                                                  MSLevel = 2, perSet = TRUE, mirror = FALSE))
+    expect_doppel("mspl-spec-set-mirror", function() plotSpectrum(plistsMSMS, groupName = groupNames(plistsMSMS)[2],
+                                                                  MSLevel = 2, perSet = TRUE, mirror = TRUE))
 })

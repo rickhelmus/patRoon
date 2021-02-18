@@ -2,8 +2,8 @@ testWithSets <- function() T # UNDONE: check environment variable or something
 
 testFile <- function(f, ..., text = FALSE) file.path(getTestDataPath(), paste0(f, ..., if (!text) ".Rds" else ".txt", collapse = ""))
 getTestFGroups <- function(anaInfo = getTestAnaInfo(), ...) groupFeatures(getTestFeatures(anaInfo, ...), "openms")
-getEmptyFeatures <- function() getTestFeatures(getTestAnaInfo(), noiseThrInt = 1E9)
-getEmptyTestFGroups <- function() getTestFGroups()[, "none"]
+getEmptyFeatures <- function(anaInfo = getTestAnaInfo()) getTestFeatures(anaInfo, noiseThrInt = 1E9)
+getEmptyTestFGroups <- function(anaInfo = getTestAnaInfo()) getTestFGroups(anaInfo)[, "none"]
 
 getMFTestDBPath <- function() file.path(getTestDataPath(), "test-mf-db.csv")
 getCompFGroups <- function()
@@ -33,7 +33,7 @@ if (testWithSets())
         ret$blank[isSet2] <- "solvent-set2"
         return(ret)
     }
-    getTestAnaInfoSet1 <- function() getTestAnaInfo()[!grepl("^set2", getTestAnaInfo()$analysis), ]
+    getTestAnaInfoSet1 <- function(anaInfo = getTestAnaInfo()) anaInfo[!grepl("^set2", anaInfo$analysis), ]
     getTestFeatures <- function(anaInfo = getTestAnaInfo(), ...)
     {
         isSet2 <- grepl("^set2", anaInfo$analysis)
@@ -52,7 +52,7 @@ if (testWithSets())
     getExpFG <- function(x) x[, sets = "set1"]
     doExport <- function(x, ...) export(x, ..., set = "set1")
 
-    getTestFGroupsAnn <- function() getTestFGroups(getTestAnaInfo()[grepl("standard\\-[2-3]", getTestAnaInfo()$analysis), ])
+    getTestAnaInfoAnn <- function() getTestAnaInfo()[grepl("standard\\-[2-3]", getTestAnaInfo()$analysis), ]
     
     doScreen <- function(...) screenSuspects(...)
     doGenForms <- function(...) generateFormulas(...)
@@ -74,7 +74,7 @@ if (testWithSets())
     getExpFG <- function(x) x
     doExport <- function(x, ...) export(x, ...)
 
-    getTestFGroupsAnn <- function() getTestFGroups(getTestAnaInfo()[4:5, ])    
+    getTestAnaInfoAnn <- function() getTestAnaInfo()[4:5, ]
     
     doScreen <- function(...) screenSuspects(...)
     doGenForms <- function(...) generateFormulas(..., adduct = "[M+H]+")

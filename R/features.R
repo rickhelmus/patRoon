@@ -190,8 +190,7 @@ setMethod("[", c("features", "ANY", "missing", "missing"), function(x, i, ...)
     if (!missing(i))
     {
         i <- assertSubsetArgAndToChr(i, analyses(x))
-        x@features <- x@features[i]
-        x@analysisInfo <- x@analysisInfo[x@analysisInfo$analysis %in% i, ]
+        x <- delete(x, setdiff(analyses(x), i))
     }
 
     return(x)
@@ -258,7 +257,7 @@ setMethod("delete", "features", function(obj, i = NULL, j = NULL, ...)
     if (!is.function(j))
     {
         if (is.null(j))
-            return(obj[setdiff(analyses(obj), i)])
+            obj@features <- obj@features[setdiff(analyses(obj), i)]
         else if (length(i) == 0 || length(j) == 0)
             return(obj) # nothing to remove...
         obj@features[i] <- lapply(obj@features[i], function(ft)
@@ -277,6 +276,9 @@ setMethod("delete", "features", function(obj, i = NULL, j = NULL, ...)
             return(ft[setdiff(seq_len(nrow(ft)), rm)])
         })
     }
+    obj@features <- pruneList(obj@features, checkZeroRows = TRUE)
+    obj@analysisInfo <- obj@analysisInfo[obj@analysisInfo$analysis %in% names(obj@features), ]
+    
     return(obj)
 })
 

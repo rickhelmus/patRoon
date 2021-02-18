@@ -468,7 +468,6 @@ setMethod("replicateGroupSubtract", "featureGroups", function(fGroups, rGroups, 
 
     checkIntensities <- threshold > 0
     gNames <- names(fGroups)
-    fGroups@groups <- copy(fGroups@groups)
 
     filteredGroups <- replicateGroupFilter(fGroups, rGroups, verbose = FALSE)
     sharedGroups <- intersect(gNames, names(filteredGroups))

@@ -65,21 +65,11 @@ intensityFilter <- function(fGroups, absThreshold, relThreshold, negate = FALSE)
 
     return(doFilter(fGroups, "intensity", c(threshold, negate), function(fGroups)
     {
-        if (T)
-        {
         compF <- if (negate) function(x) x >= threshold else function(x) x < threshold
         delGroups <- setnames(as.data.table(matrix(FALSE, length(analyses(fGroups)), length(fGroups))),
                               names(fGroups))
         delGroups[, (names(delGroups)) := lapply(fGroups@groups, compF), by = rep(1, nrow(delGroups))]
         return(delete(fGroups, j = delGroups))
-        }
-        
-        compF <- if (negate) function(x) x >= threshold else function(x) x < threshold
-
-        # use set to speed stuff up: http://stackoverflow.com/a/20545629
-        for (v in seq_along(fGroups@groups))
-            set(fGroups@groups, which(compF(fGroups@groups[[v]])), v, 0)
-        return(cleanGroups(fGroups, TRUE))
     }))
 }
 
@@ -107,9 +97,6 @@ blankFilter <- function(fGroups, threshold, negate = FALSE)
         if (negate)
             pred <- Negate(pred)
 
-        if (T)
-        {
-            
         avgBls <- lapply(allBlanks, function(bl)
         {
             avg <- vapply(fGroups@groups[anaInfo$group == bl], function(x) mean(x[x > 0]), FUN.VALUE = numeric(1),
@@ -125,30 +112,6 @@ blankFilter <- function(fGroups, threshold, negate = FALSE)
         for (j in seq_along(delGroups))
             set(delGroups, j = j, value = fifelse(pred(fGroups@groups[[j]], minInts[[j]]), 1, 0))
         return(delete(fGroups, j = delGroups))
-        }
-
-        pred <- function(x, t) x >= t
-        if (negate)
-            pred <- Negate(pred)
-        
-        for (bl in allBlanks)
-        {
-            blAnalyses <- which(anaInfo$group == bl)
-            avg <- sapply(fGroups@groups[blAnalyses], function(x)
-            {
-                m <- mean(x[x > 0])
-                if (is.na(m))
-                    return(0)
-                else
-                    return(m)
-            })
-            thr <- avg * threshold
-
-            for (j in seq_along(fGroups@groups))
-                set(fGroups@groups, j = j, value = fifelse(pred(fGroups@groups[[j]], thr[[j]]), fGroups@groups[[j]], 0))
-        }
-
-        return(cleanGroups(fGroups, TRUE))
     }))
 }
 
@@ -225,9 +188,6 @@ replicateAbundanceFilter <- function(fGroups, absThreshold, relThreshold, maxInt
 
     return(doFilter(fGroups, "replicate abundance", c(absThreshold, relThreshold, maxIntRSD, negate), function(fGroups)
     {
-        # UNDONE
-        if (T)
-        {
         pred <- function(x, n, rg)
         {
             if (doThr && sum(x > 0) < thresholds[[rg]])
@@ -242,28 +202,6 @@ replicateAbundanceFilter <- function(fGroups, absThreshold, relThreshold, maxInt
         set(delGroups, j = "group", value = rGroupsAna)
         delGroups[, (gNames) := lapply(.SD, function(x) if (pred(x, .N, group)) 1 else 0), by = group, .SDcols = gNames]
         return(delete(fGroups, j = delGroups[, -"group"]))
-        }
-        
-        # add replicate groups temporarily
-        fGroups@groups[, group := rGroupsAna]
-
-        pred <- function(x, n, rg)
-        {
-            ret <- TRUE
-            if (doThr)
-                ret <- sum(x > 0) >= thresholds[[rg]]
-            if (ret && length(x) > 1 && NULLToZero(maxIntRSD) != 0 && any(x > 0))
-                ret <- (sd(x) / mean(x)) < maxIntRSD # UNDONE: remove zero's?
-            return(ret)
-        }
-        if (negate)
-            pred <- Negate(pred)
-
-        fGroups@groups[, (gNames) := lapply(.SD, function(x) if (pred(x, .N, group)) x else 0),
-                       by = group, .SDcols = gNames]
-        fGroups@groups[, group := NULL]
-
-        return(cleanGroups(fGroups, TRUE))
     }, "replicateAbundance"))
 }
 
@@ -294,8 +232,6 @@ chromWidthFilter <- function(fGroups, range, negate)
 
     return(doFilter(fGroups, "chromwidth", c(range, negate), function(fGroups)
     {
-        if (T)
-        {
         pred <- function(finds)
         {
             cwidths <- sapply(seq_along(finds), function(i)
@@ -311,30 +247,10 @@ chromWidthFilter <- function(fGroups, range, negate)
         if (negate)
             pred <- Negate(pred)
         
-            delGroups <- setnames(as.data.table(matrix(FALSE, length(analyses(fGroups)), length(fGroups))),
-                                  names(fGroups))
-            delGroups[, (names(delGroups)) := lapply(ftindex, pred), by = rep(1, nrow(delGroups))]
-            return(delete(fGroups, j = delGroups))
-        }
-        
-        pred <- function(finds)
-        {
-            cwidths <- sapply(seq_along(finds), function(i)
-            {
-                if (finds[i] == 0)
-                    0
-                else
-                    diff(unlist(fTable[[anas[i]]][finds[i], c("retmin", "retmax")]))
-            }, USE.NAMES = FALSE)
-            return(numGTE(cwidths, range[1]) & numLTE(cwidths, range[2]))
-        }
-
-        if (negate)
-            pred <- Negate(pred)
-
-        fGroups@groups[, (gNames) := lapply(seq_along(.SD), function(n) ifelse(pred(ftindex[[n]]), .SD[[n]], 0))]
-
-        return(cleanGroups(fGroups, TRUE))
+        delGroups <- setnames(as.data.table(matrix(FALSE, length(analyses(fGroups)), length(fGroups))),
+                              names(fGroups))
+        delGroups[, (names(delGroups)) := lapply(ftindex, pred), by = rep(1, nrow(delGroups))]
+        return(delete(fGroups, j = delGroups))
     }))
 }
 
@@ -342,20 +258,10 @@ replicateGroupFilter <- function(fGroups, rGroups, negate = FALSE, verbose = TRU
 {
     return(doFilter(fGroups, "replicate group", c(rGroups, negate), function(fGroups)
     {
-        if (T)
-        {
         pred <- function(g) !g %chin% rGroups
         if (negate)
             pred <- Negate(pred)
         return(delete(fGroups, pred(analysisInfo(fGroups)$group)))
-        }
-        
-        pred <- function(g) g %in% rGroups
-        if (negate)
-            pred <- Negate(pred)
-
-        fGroups <- removeAnalyses(fGroups, which(!pred(fGroups@analysisInfo$group)))
-        return(cleanGroups(fGroups, FALSE))
     }, "replicate_group", verbose))
 }
 
@@ -576,8 +482,6 @@ setMethod("replicateGroupSubtract", "featureGroups", function(fGroups, rGroups, 
         thrs <- sapply(avgGroups, max) * threshold
     }
 
-    if (T)
-    {
     if (!checkIntensities)
         fGroups <- delete(fGroups, j = sharedGroups)
     else
@@ -592,15 +496,4 @@ setMethod("replicateGroupSubtract", "featureGroups", function(fGroups, rGroups, 
     }
     
     return(replicateGroupFilter(fGroups, rGroups, negate = TRUE, verbose = FALSE))
-    }
-    
-    for (b in sharedGroups)
-    {
-        if (checkIntensities)
-            set(fGroups@groups, which(fGroups@groups[[b]] < thrs[b]), b, 0)
-        else
-            fGroups@groups[, (b) := 0] # no threshold, zero-out everything
-    }
-
-    return(replicateGroupFilter(cleanGroups(fGroups, TRUE), rGroups, negate = TRUE, verbose = FALSE))
 })

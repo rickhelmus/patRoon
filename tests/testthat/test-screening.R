@@ -260,6 +260,19 @@ test_that("reporting works", {
     expect_error(makeReportHTML(fGroupsScrAnnEmpty[, 1:10]), NA)
 })
 
+test_that("sets functionality", {
+    skip_if_not(testWithSets())
+    
+    # some tests from feature groups to ensure proper subsetting/unsetting
+    expect_equal(analysisInfo(unset(fGroupsScr, "set1")), getTestAnaInfoSet1())
+    expect_equal(analysisInfo(fGroupsScr[, sets = "set1"])[, 1:4], getTestAnaInfoSet1())
+    expect_equal(unique(annotations(fGroupsScr)$adduct), "[M+H]+")
+    expect_equal(fGroupsScr, fGroupsScr[, sets = sets(fGroupsScr)])
+    expect_length(fGroupsScr[, sets = character()], 0)
+    expect_equal(sets(filter(fGroupsScr, sets = "set1", negate = TRUE)), "set2")
+})
+
+
 TQFile <- file.path(getTestDataPath(), "GlobalResults-TASQ.csv")
 TQRes <- fread(TQFile)
 fGroupsTQ <- importFeatureGroupsBrukerTASQ(TQFile, getTestAnaInfo())

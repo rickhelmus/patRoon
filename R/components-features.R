@@ -9,6 +9,10 @@ componentsFeatures <- setClass("componentsFeatures", slots = c(featureComponents
 setMethod("initialize", "componentsFeatures", function(.Object, fGroups, minSize, mzWindow, relMinAdductAbundance,
                                                        featureComponents = list(), ...)
 {
+    if (length(fGroups) == 0)
+        return(callNextMethod(.Object, featureComponents = data.table(), components = list(),
+                              componentInfo = data.table(), ...))
+    
     ftindex <- groupFeatIndex(fGroups)
     gNames <- names(fGroups)
     gInfo <- groupInfo(fGroups)

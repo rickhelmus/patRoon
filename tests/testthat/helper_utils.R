@@ -60,6 +60,7 @@ if (testWithSets())
     doExport <- function(x, ...) export(x, ..., set = "set1")
 
     getTestAnaInfoAnn <- function() getTestAnaInfo()[grepl("standard\\-[2-3]", getTestAnaInfo()$analysis), ]
+    getTestAnaInfoComponents <- function() getTestAnaInfo()[grepl("(solvent|standard)\\-1", getTestAnaInfo()$analysis), ]
     
     doScreen <- function(...) screenSuspects(...)
     doGenForms <- function(...) generateFormulas(...)

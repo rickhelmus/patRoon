@@ -11,7 +11,7 @@ setMethod("initialize", "componentsCliqueMS",
 
 #' @rdname component-generation
 #' @export
-setMethod("generateComponentsCliqueMS", "featureGroups", function(fGroups, ionization, maxCharge = 3,
+setMethod("generateComponentsCliqueMS", "featureGroups", function(fGroups, ionization, maxCharge = 1,
                                                                   maxGrade = 2, ppm = 10,
                                                                   adductInfo = NULL,
                                                                   mzWindow = 0.005, minSize = 2,
@@ -33,7 +33,8 @@ setMethod("generateComponentsCliqueMS", "featureGroups", function(fGroups, ioniz
     checkmate::reportAssertions(ac)
 
     if (length(fGroups) == 0)
-        return(componentsCliqueMS())
+        return(componentsCliqueMS(fGroups = fGroups, mzWindow = mzWindow, minSize = minSize,
+                                  relMinAdductAbundance = relMinAdductAbundance))
         
     anas <- analyses(fGroups)
     fList <- getFeatures(fGroups)

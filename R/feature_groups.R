@@ -338,7 +338,9 @@ setMethod("delete", "featureGroups", function(obj, i = NULL, j = NULL, ...)
     isGrpSubSet <- jByIndex && setequal(i, anas)
     
     # remove features first
-    if (jByIndex)
+    if (isAnaSubSet)
+        obj@features <- delete(getFeatures(obj), i = i)
+    else if (jByIndex)
         obj@features <- delete(getFeatures(obj), i = i, j = function(ft, ...) which(ft$group %chin% j))
     else
     {

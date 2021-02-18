@@ -1,6 +1,6 @@
 context("formulas")
 
-fGroups <- getTestFGroupsAnn()
+fGroups <- getTestFGroups(getTestAnaInfoAnn())
 # convert to screening results to simplify things a bit
 if (testWithSets())
 {

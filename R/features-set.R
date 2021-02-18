@@ -139,7 +139,6 @@ setMethod("filter", "featuresSet", function(obj, ..., negate = FALSE, sets = NUL
 #' @export
 setMethod("makeSet", "features", function(obj, ..., adducts, labels)
 {
-    # UNDONE: check anaInfos to be unique
     # UNDONE: cache
     
     featuresList <- list(obj, ...)
@@ -147,6 +146,10 @@ setMethod("makeSet", "features", function(obj, ..., adducts, labels)
     assertMakeSetArgs(featuresList, "features", adducts, FALSE, labels, ac)
     checkmate::reportAssertions(ac)
 
+    allAnas <- unlist(lapply(featuresList, analyses))
+    if (anyDuplicated(allAnas))
+        stop("Some objects have non-unique analyses: ", paste0(unique(allAnas[duplicated(allAnas)]), collapse = ","))
+    
     adducts <- prepareMakeSetAdducts(featuresList, adducts, labels)
     names(featuresList) <- names(adducts)
 

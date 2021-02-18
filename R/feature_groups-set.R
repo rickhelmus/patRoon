@@ -391,6 +391,10 @@ setMethod("makeSet", "featureGroups", function(obj, ..., groupAlgo, groupArgs = 
     if (all(lengths(fGroupsList) == 0))
         stop("Cannot make set if all feature groups objects are empty")
     
+    allAnas <- unlist(lapply(fGroupsList, analyses))
+    if (anyDuplicated(allAnas))
+        stop("Some objects have non-unique analyses: ", paste0(unique(allAnas[duplicated(allAnas)]), collapse = ","))
+    
     if (!is.null(adducts))
     {
         adducts <- prepareMakeSetAdducts(fGroupsList, adducts, labels)

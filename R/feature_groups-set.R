@@ -448,7 +448,8 @@ setMethod("unset", "featureGroupsSet", function(obj, set)
         gInfo$mzs <- gInfo$mzs + addMZs[ann$adduct]
     }
     
-    return(featureGroupsUnset(groups = groupTable(obj), groupInfo = gInfo, analysisInfo = analysisInfo(obj),
+    return(featureGroupsUnset(groups = groupTable(obj), groupInfo = gInfo,
+                              analysisInfo = unSetAnaInfo(analysisInfo(obj)),
                               features = unset(getFeatures(obj), set), ftindex = groupFeatIndex(obj),
                               annotations = ann[, -"set"], algorithm = paste0(algorithm(obj), "_unset")))
 })

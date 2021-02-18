@@ -448,6 +448,8 @@ setMethod("filter", "formulas", function(obj, minExplainedPeaks = NULL, elements
 setMethod("annotatedPeakList", "formulas", function(obj, precursor, groupName, analysis = NULL, MSPeakLists,
                                                     onlyAnnotated = FALSE)
 {
+    # NOTE: keep args in sync with sets method
+    
     ac <- checkmate::makeAssertCollection()
     checkmate::assertString(precursor, min.chars = 1, add = ac)
     assertChoiceSilent(groupName, groupNames(obj), add = ac)

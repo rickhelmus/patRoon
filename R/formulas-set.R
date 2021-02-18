@@ -114,6 +114,23 @@ setMethod("filter", "formulasSet", function(obj, ..., negate = FALSE, sets = NUL
 })
 
 #' @export
+setMethod("annotatedPeakList", "formulasSet", function(obj, precursor, groupName, analysis = NULL, MSPeakLists,
+                                                       onlyAnnotated = FALSE)
+{
+    ac <- checkmate::makeAssertCollection()
+    assertChoiceSilent(groupName, groupNames(obj), add = ac)
+    checkmate::assertString(analysis, min.chars = 1, null.ok = TRUE, add = ac)
+    checkmate::reportAssertions(ac)
+    
+    return(rbindlist(Map(setObjects(obj), lapply(sets(obj), unset, obj = MSPeakLists), f = function(so, mspl)
+    {
+        if (!groupName %in% groupNames(so) || (!is.null(analysis) && !analysis %in% analyses(so)))
+            return(data.table())
+        annotatedPeakList(so, precursor, groupName, analysis, mspl, onlyAnnotated)
+    }), fill = TRUE, idcol = "set"))
+})
+
+#' @export
 setMethod("plotSpectrum", "formulasSet", function(obj, precursor, groupName, analysis = NULL, MSPeakLists,
                                                   title = NULL, useGGPlot2 = FALSE, mincex = 0.9, xlim = NULL,
                                                   ylim = NULL, perSet = TRUE, mirror = TRUE, ...)

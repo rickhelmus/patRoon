@@ -340,7 +340,7 @@ generateFormConsensusForGroup <- function(formList, mergeCount, formThreshold, f
         formTable[, (mergeCovAnnCol) := uniqueN(get(fromCol)) / length(formList), by = "neutral_formula"]
 
         # add column that specifies of which datasets its merged from
-        formTable[, (mergedAllCol) := paste0(unique(get(fromCol)), collapse = ","), by = neutral_formula]
+        formTable[, (mergedAllCol) := paste0(unique(get(fromCol)), collapse = ","), by = "neutral_formula"]
         
         # Apply coverage filters
         if (formThreshold > 0 || formThresholdAnn > 0)

@@ -2,7 +2,7 @@ testWithSets <- function() T # UNDONE: check environment variable or something
 
 testFile <- function(f, ..., text = FALSE) file.path(getTestDataPath(), paste0(f, ..., if (!text) ".Rds" else ".txt", collapse = ""))
 getTestFGroups <- function(anaInfo = getTestAnaInfo(), ...) groupFeatures(getTestFeatures(anaInfo, ...), "openms")
-getEmptyFeatures <- function(anaInfo = getTestAnaInfo()) getTestFeatures(anaInfo, noiseThrInt = 1E9)
+getEmptyFeatures <- function(anaInfo = getTestAnaInfo(), ...) getTestFeatures(anaInfo, noiseThrInt = 1E9, ...)
 getEmptyTestFGroups <- function(anaInfo = getTestAnaInfo()) getTestFGroups(anaInfo)[, "none"]
 
 getMFTestDBPath <- function() file.path(getTestDataPath(), "test-mf-db.csv")
@@ -41,8 +41,15 @@ if (testWithSets())
             return(makeSet(findFeatures(anaInfo[!isSet2, ], "openms", ...),
                            findFeatures(anaInfo[isSet2, ], "openms", ...),
                            adducts = "[M+H]+", labels = c("set1", "set2")))
-        return(makeSet(findFeatures(anaInfo[!isSet2, ], "openms", ...),
-                       adducts = "[M+H]+", labels = "set1"))
+        return(makeSet(findFeatures(anaInfo, "openms", ...), adducts = "[M+H]+", labels = "set1"))
+    }
+    getTestFGroupsOneEmptySet <- function(anaInfo = getTestAnaInfo(), ...)
+    {
+        isSet2 <- grepl("^set2", anaInfo$analysis)
+        fSet <- makeSet(findFeatures(anaInfo[!isSet2, ], "openms", ...),
+                        findFeatures(anaInfo[isSet2, ], "openms", noiseThrInt = 1E9, ...),
+                        adducts = "[M+H]+", labels = c("set1", "set2"))
+        return(groupFeatures(fSet, "openms"))
     }
     
     doExportXCMS <- function(x, ...) getXCMSSet(x, exportedData = FALSE, set = "set1")

@@ -31,6 +31,9 @@ getMzMLOrMzXMLAnalysisPath <- function(file, path)
 
 mergeAnaSubsetArgWithSets <- function(i, sets, anaInfo)
 {
+    if (length(sets) == 0)
+        return(character())
+    
     setAna <- anaInfo$analysis[anaInfo$set %in% sets]
     if (!missing(i))
     {

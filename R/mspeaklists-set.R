@@ -94,7 +94,7 @@ setMethod("[", c("MSPeakListsSet", "ANY", "ANY", "missing"), function(x, i, j, .
     # always be called and averaging for MSPeaksListSet actually only concerns
     # merging
 
-    if (!is.null(sets) && length(sets) > 0)
+    if (!is.null(sets))
         i <- mergeAnaSubsetArgWithSets(i, sets, analysisInfo(x))
     
     if (!missing(i) || !missing(j))

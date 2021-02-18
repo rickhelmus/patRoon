@@ -107,10 +107,11 @@ setMethod("[", c("featureGroupsSet", "ANY", "ANY", "missing"), function(x, i, j,
 {
     assertSets(x, sets, TRUE)
     
-    if (!is.null(sets) && length(sets) > 0)
+    if (!is.null(sets))
     {
         i <- mergeAnaSubsetArgWithSets(i, sets, analysisInfo(x))
-        x@annotations <- x@annotations[set %in% sets]
+        if (nrow(x@annotations) > 0)
+            x@annotations <- x@annotations[set %in% sets]
     }
     
     return(callNextMethod(x, i, j, ..., rGroups = rGroups))
@@ -224,7 +225,7 @@ setMethod("filter", "featureGroupsSet", function(obj, ..., negate = FALSE, sets 
         obj <- callNextMethod(obj, ..., negate = negate)
     
     if (!is.null(absMinSets) || !is.null(relMinSets))
-        obj <- minSetsFGroupsFilter(absMinSets, relMinSets, negate = negate)
+        obj <- minSetsFGroupsFilter(obj, absMinSets, relMinSets, negate = negate)
 
     return(obj)
 })
@@ -257,7 +258,7 @@ setMethod("plotVenn", "featureGroupsSet", function(obj, which = NULL, ..., sets 
     checkmate::assertFlag(sets)
     if (sets)
     {
-        mySets <- get("sets", pos = 2)(fGroups)
+        mySets <- get("sets", pos = 2)(obj)
         ai <- analysisInfo(obj)
         which = sapply(mySets, function(s) ai[ai$set == s, "group"], simplify = FALSE)
     }
@@ -364,7 +365,7 @@ setMethod("groupFeatures", "featuresSet", function(feat, algorithm, ..., verbose
             }))
             
             return(data.table(group = grps, adduct = firstFeats$adduct))
-        }, simplify = FALSE), idcol = "set")
+        }, simplify = FALSE), idcol = "set", fill = TRUE) # set fill for empty objects
         ret@annotations[, neutralMass := groupInfo(ret)[ret@annotations$group, "mzs"]]
     }
     else
@@ -387,6 +388,9 @@ setMethod("makeSet", "featureGroups", function(obj, ..., groupAlgo, groupArgs = 
     checkmate::assertList(groupArgs, null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
     
+    if (all(lengths(fGroupsList) == 0))
+        stop("Cannot make set if all feature groups objects are empty")
+    
     if (!is.null(adducts))
     {
         adducts <- prepareMakeSetAdducts(fGroupsList, adducts, labels)
@@ -398,7 +402,7 @@ setMethod("makeSet", "featureGroups", function(obj, ..., groupAlgo, groupArgs = 
         names(fGroupsList) <- labels
         for (i in seq_along(fGroupsList))
         {
-            if (nrow(annotations(fGroupsList[[i]])) == 0)
+            if (length(fGroupsList[[i]]) > 0 && nrow(annotations(fGroupsList[[i]])) == 0)
                 stop("Missing feature ion annotations. Either set the adducts argument or run selectIons()")
         }
         adducts <- adductsChr <- setNames(rep(list(NULL), length(fGroupsList)), names(fGroupsList))
@@ -407,13 +411,14 @@ setMethod("makeSet", "featureGroups", function(obj, ..., groupAlgo, groupArgs = 
     # prepare features: add adducts needed for neutralization and clearout group assignments
     fGroupsList <- Map(fGroupsList, adductsChr, f = function(fGroups, add)
     {
-        ftindAna <- transpose(groupFeatIndex(fGroups))
         ann <- annotations(fGroups)
         
         fGroups@features@features <- lapply(featureTable(fGroups), function(ft)
         {
             ft <- copy(ft)
-            if (!is.null(add))
+            if (nrow(ft) == 0)
+                ft[, adduct := character()]
+            else if (!is.null(add))
                 ft[, adduct := add]
             else
                 ft[, adduct := ann[match(ft$group, group)]$adduct]
@@ -446,10 +451,11 @@ setMethod("unset", "featureGroupsSet", function(obj, set)
         adducts <- sapply(unique(ann$adduct), as.adduct)
         addMZs <- sapply(adducts, adductMZDelta)
         gInfo$mzs <- gInfo$mzs + addMZs[ann$adduct]
+        ann <- ann[, -"set"]
     }
     
     return(featureGroupsUnset(groups = groupTable(obj), groupInfo = gInfo,
                               analysisInfo = unSetAnaInfo(analysisInfo(obj)),
                               features = unset(getFeatures(obj), set), ftindex = groupFeatIndex(obj),
-                              annotations = ann[, -"set"], algorithm = paste0(algorithm(obj), "_unset")))
+                              annotations = ann, algorithm = paste0(algorithm(obj), "_unset")))
 })

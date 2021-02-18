@@ -108,8 +108,9 @@ generateConsensusXML <- function(feat, out, rtalign, QT, maxAlignRT, maxAlignMZ,
         if (!is.null(extraOptsRT))
             settings <- modifyList(settings, extraOptsRT)
         
+        ftNonEmpty <- sapply(fts, nrow) > 0
         executeCommand(getCommandWithOptPath("MapAlignerPoseClustering", "OpenMS"),
-                       c(OpenMSArgListToOpts(settings), "-in", featFiles, "-out", featFiles),
+                       c(OpenMSArgListToOpts(settings), "-in", featFiles[ftNonEmpty], "-out", featFiles[ftNonEmpty]),
                        stdout = if (verbose) "" else FALSE,
                        stderr = if (verbose) "" else FALSE)
     }

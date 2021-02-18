@@ -60,6 +60,7 @@
         - IPO
         - importFeatures()
             - or make method with set arg? --> re-enable tests then
+        - makeSet()
 - check UIs
     - checkFeatures:
         - requires version bump of session
@@ -80,6 +81,7 @@
     - plotSpectrum(): show horizontal line in mirrored plot?
     - ggplot: remove? Otherwise fix plotSpectrum() for title and possibly others
     - formulas/compounds: update set column when subsetting on sets?
+    - makeSet(fGroups): default adducts to NULL?
 - merging setObjects
     - check if more has to be cached and may need status messages
     - compound set consensus: scoreRanges should be re-determined from annotation results?
@@ -170,6 +172,7 @@
         - adduct specification: molMult must be one, multiple additions (eg Na2) is controlled by chargeMin/max
     - selectIons: chargeMismatch --> note that OpenMS findFeatures removes isotopes, hence, adducts more reliable
     - as.data.table() for formulas: formula column removed if average=T
+    - unset(fGroups) will get adduct annotated fGroups
 - tests
     - handle/test empty objects
     - test DA algorithms

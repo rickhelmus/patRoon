@@ -58,6 +58,8 @@
     - provide methods for non-implemented functionality
         - consensus()/comparison()? (see above)
         - IPO
+        - importFeatures()
+            - or make method with set arg? --> re-enable tests then
 - check UIs
     - checkFeatures:
         - requires version bump of session

@@ -117,3 +117,5 @@ updateAnnAdducts <- function(annTable, gInfo, adducts)
     
     return(annTable)
 }
+
+unSetAnaInfo <- function(anaInfo) anaInfo[, setdiff(names(anaInfo), "set")]

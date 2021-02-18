@@ -2,10 +2,10 @@ context("features")
 
 initXCMS()
 
-anaInfo <- getTestAnaInfo()[1:3, ]
+anaInfo <- getTestAnaInfo()
 anaInfoOne <- getTestAnaInfo()[4, ]
 
-ffOpenMS <- findFeatures(anaInfo, "openms")
+ffOpenMS <- getTestFeatures(anaInfo)
 ffXCMS <- findFeatures(anaInfoOne, "xcms")
 ffXCMS3 <- findFeatures(anaInfoOne, "xcms3")
 
@@ -17,7 +17,7 @@ exDataFiles <- list.files(patRoonData::exampleDataPath(), "\\.mzML$", full.names
 epAnaInfo <- makeMZXMLs(anaInfoOne)
 ffEP <- findFeatures(epAnaInfo, "envipick")
 
-ffEmpty <- findFeatures(anaInfoOne, "openms", noiseThrInt = 1E9)
+ffEmpty <- getTestFeatures(anaInfoOne, noiseThrInt = 1E9)
 
 if (doDATests())
 {
@@ -39,8 +39,8 @@ test_that("verify feature finder output", {
     
     # extraOpts
     expect_equal(OpenMSFTable(ffOpenMS),
-                 OpenMSFTable(findFeatures(anaInfo, "openms",
-                                           extraOpts = list("-algorithm:common:noise_threshold_int" = 1000))))
+                 OpenMSFTable(getTestFeatures(anaInfo,
+                                              extraOpts = list("-algorithm:common:noise_threshold_int" = 1000))))
 
     skip_if_not(doDATests())
     expect_known_value(featureTable(ffDA), testFile("ff-DA"))
@@ -69,7 +69,7 @@ test_that("basic subsetting", {
     expect_length(ffOpenMS["nope"], 0)
     expect_equivalent(analyses(ffOpenMS[1:2]), anaInfo$analysis[1:2])
     expect_equivalent(analyses(ffOpenMS[anaInfo$analysis[2:3]]), anaInfo$analysis[2:3])
-    expect_equivalent(analyses(ffOpenMS[c(FALSE, TRUE, FALSE)]), anaInfo$analysis[2])
+    expect_equivalent(analyses(ffOpenMS[c(TRUE, FALSE)]), anaInfo$analysis[c(TRUE, FALSE)])
     expect_equal(length(ffOpenMS[FALSE]), 0)
     expect_length(ffEmpty[1:5], 0)
 
@@ -107,13 +107,13 @@ test_that("basic usage", {
 
 XCMSImpXCMS <- getXCMSSet(ffXCMS)
 XCMSImpXCMS3 <- getXCMSSet(ffXCMS3, exportedData = FALSE)
-XCMSImpOpenMS <- getXCMSSet(ffOpenMS, exportedData = FALSE)
+XCMSImpOpenMS <- doExportXCMS(ffOpenMS, exportedData = FALSE)
 XCMSImpEP <- getXCMSSet(ffEP, exportedData = FALSE)
 featMZs <- function(f) lapply(featureTable(f), "[[", "mz")
 test_that("XCMS conversion", {
     expect_equal(nrow(xcms::peaks(XCMSImpXCMS)), length(ffXCMS))
     expect_equal(nrow(xcms::peaks(XCMSImpXCMS3)), length(ffXCMS3))
-    expect_equal(nrow(xcms::peaks(XCMSImpOpenMS)), length(ffOpenMS))
+    expect_equal(nrow(xcms::peaks(XCMSImpOpenMS)), length(getExpFeats(ffOpenMS)))
     expect_equal(nrow(xcms::peaks(XCMSImpEP)), length(ffEP))
     
     expect_known_value(xcms::peaks(XCMSImpXCMS), testFile("ff-xcms_import_xcms"))
@@ -123,27 +123,42 @@ test_that("XCMS conversion", {
     
     expect_equal(featMZs(importFeatures(anaInfoOne, "xcms", XCMSImpXCMS)), featMZs(ffXCMS))
     expect_equal(featMZs(importFeatures(anaInfoOne, "xcms", XCMSImpXCMS3)), featMZs(ffXCMS3))
-    expect_equal(featMZs(importFeatures(anaInfo, "xcms", XCMSImpOpenMS)), featMZs(ffOpenMS))
     expect_equal(featMZs(importFeatures(epAnaInfo, "xcms", XCMSImpEP)), featMZs(ffEP))
+    
+    skip_if(testWithSets())
+    expect_equal(featMZs(importFeatures(anaInfo, "xcms", XCMSImpOpenMS)), featMZs(ffOpenMS))    
 })
 
 XCMS3ImpXCMS <- getXCMSnExp(ffXCMS, exportedData = FALSE)
 XCMS3ImpXCMS3 <- getXCMSnExp(ffXCMS3)
-XCMS3ImpOpenMS <- getXCMSnExp(ffOpenMS, exportedData = FALSE)
-# XCMS3ImpEP <- getXCMSnExp(ffEP) XCMS3/MSnbase doesn't like mzXMLs generated for EnviPick
+XCMS3ImpOpenMS <- doExportXCMS3(ffOpenMS, exportedData = FALSE)
+XCMS3ImpEP <- getXCMSnExp(ffEP, exportedData = FALSE)
 test_that("XCMS3 conversion", {
     expect_equal(nrow(xcms::chromPeaks(XCMS3ImpXCMS)), length(ffXCMS))
     expect_equal(nrow(xcms::chromPeaks(XCMS3ImpXCMS3)), length(ffXCMS3))
-    expect_equal(nrow(xcms::chromPeaks(XCMS3ImpOpenMS)), length(ffOpenMS))
-    # expect_equal(nrow(xcms::chromPeaks(XCMS3ImpEP)), length(ffEP))
+    expect_equal(nrow(xcms::chromPeaks(XCMS3ImpOpenMS)), length(getExpFeats(ffOpenMS)))
+    expect_equal(nrow(xcms::chromPeaks(XCMS3ImpEP)), length(ffEP))
     
     expect_known_value(xcms::chromPeaks(XCMS3ImpXCMS), testFile("ff-xcms3_import_xcms"))
     expect_known_value(xcms::chromPeaks(XCMS3ImpXCMS3), testFile("ff-xcms3_import_xcms3"))
     expect_known_value(xcms::chromPeaks(XCMS3ImpOpenMS), testFile("ff-xcms3_import_openms"))
-    # expect_known_value(xcms::chromPeaks(XCMS3ImpEP), testFile("ff-xcms3_import_ep"))
+    expect_known_value(xcms::chromPeaks(XCMS3ImpEP), testFile("ff-xcms3_import_ep"))
     
     expect_equal(featMZs(importFeatures(anaInfoOne, "xcms3", XCMS3ImpXCMS)), featMZs(ffXCMS))
     expect_equal(featMZs(importFeatures(anaInfoOne, "xcms3", XCMS3ImpXCMS3)), featMZs(ffXCMS3))
+    expect_equal(featMZs(importFeatures(epAnaInfo, "xcms3", XCMS3ImpEP)), featMZs(ffEP))
+    
+    skip_if(testWithSets())
     expect_equal(featMZs(importFeatures(anaInfo, "xcms3", XCMS3ImpOpenMS)), featMZs(ffOpenMS))
-    # expect_equal(featMZs(importFeatures(epAnaInfo, "xcms3", XCMSImpEP)), featMZs(ffEP))
+})
+
+test_that("Sets functionality", {
+    skip_if_not(testWithSets())
+    
+    # proper (de)neutralization
+    expect_equal(mean(unset(ffOpenMS, "set1")[[1]]$mz) - mean(ffOpenMS[[1]]$mz),
+                 patRoon:::adductMZDelta(as.adduct("[M+H]+")))
+    expect_equal(analysisInfo(unset(ffOpenMS, "set1")), getTestAnaInfoSet1())
+    expect_equal(analysisInfo(ffOpenMS[, sets = "set1"])[, 1:4], getTestAnaInfoSet1())
+    expect_equal(unique(ffOpenMS[[1]]$adduct), "[M+H]+")
 })

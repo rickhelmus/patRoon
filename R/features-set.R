@@ -173,6 +173,6 @@ setMethod("unset", "featuresSet", function(obj, set)
         return(ft[])
     })
     
-    return(featuresUnset(features = ionizedFTable, analysisInfo = analysisInfo(obj),
+    return(featuresUnset(features = ionizedFTable, analysisInfo = unSetAnaInfo(analysisInfo(obj)),
                          algorithm = paste0(algorithm(obj), "_unset")))
 })

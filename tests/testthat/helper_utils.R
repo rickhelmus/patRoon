@@ -33,6 +33,7 @@ if (testWithSets())
         ret$blank[isSet2] <- "solvent-set2"
         return(ret)
     }
+    getTestAnaInfoSet1 <- function() getTestAnaInfo()[!grepl("^set2", getTestAnaInfo()$analysis), ]
     getTestFeatures <- function(anaInfo = getTestAnaInfo(), ...)
     {
         isSet2 <- grepl("^set2", anaInfo$analysis)
@@ -46,7 +47,8 @@ if (testWithSets())
     
     doExportXCMS <- function(x, ...) getXCMSSet(x, exportedData = FALSE, set = "set1")
     doExportXCMS3 <- function(x, ...) getXCMSnExp(x, exportedData = FALSE, set = "set1")
-    getExpAnaInfo <- function() getTestAnaInfo()[!grepl("^set2", getTestAnaInfo()$analysis), ]
+    getExpAnaInfo <- function() getTestAnaInfoSet1()
+    getExpFeats <- function(x) x[, sets = "set1"]
     getExpFG <- function(x) x[, sets = "set1"]
     doExport <- function(x, ...) export(x, ..., set = "set1")
 
@@ -68,6 +70,7 @@ if (testWithSets())
     doExportXCMS <- function(x, ...) getXCMSSet(x, ...)
     doExportXCMS3 <- function(x, ...) getXCMSnExp(x, ...)
     getExpAnaInfo <- function() getTestAnaInfo()
+    getExpFeats <- function(x) x
     getExpFG <- function(x) x
     doExport <- function(x, ...) export(x, ...)
 

@@ -218,43 +218,6 @@ setMethod("groupQualities", "featureGroups", function(fGroups) fGroups@groupQual
 #' @export
 setMethod("groupScores", "featureGroups", function(fGroups) fGroups@groupScores)
 
-setMethod("removeAnalyses", "featureGroups", function(fGroups, indices)
-{
-    if (length(indices) > 0)
-    {
-        if (length(fGroups@groups) > 0)
-        {
-            fGroups@groups <- fGroups@groups[-indices]
-            fGroups@ftindex <- fGroups@ftindex[-indices]
-        }
-        fGroups@analysisInfo <- fGroups@analysisInfo[-indices, ]
-        fGroups@features <- fGroups@features[-indices]
-    }
-    return(fGroups)
-})
-
-setMethod("removeGroups", "featureGroups", function(fGroups, indices, updateFeatures)
-{
-    if (length(indices) > 0)
-    {
-        if (length(fGroups@groups) > 0)
-        {
-            fGroups@groups <- fGroups@groups[, -indices, with = FALSE]
-            fGroups@ftindex <- fGroups@ftindex[, -indices, with = FALSE]
-            
-            if (updateFeatures)
-                fGroups <- updateFeatures(fGroups, FALSE)
-        }
-        fGroups@groupInfo <- fGroups@groupInfo[-indices, ]
-        if (hasFGroupScores(fGroups))
-        {
-            fGroups@groupQualities <- setkey(fGroups@groupQualities[names(fGroups@groups)], "group")
-            fGroups@groupScores <- setkey(fGroups@groupScores[names(fGroups@groups)], "group")
-        }
-    }
-    return(fGroups)
-})
-
 #' @describeIn featureGroups Subset on analyses/feature groups.
 #' @param rGroups An optional \code{character} vector: if specified only keep
 #'   results for the given replicate groups (equivalent to the \code{rGroups}
@@ -268,18 +231,15 @@ setMethod("[", c("featureGroups", "ANY", "ANY", "missing"), function(x, i, j, ..
     if (!missing(i))
     {
         i <- assertSubsetArgAndToChr(i, analyses(x))
-        x <- removeAnalyses(x, which(!analyses(x) %in% i))
+        x <- delete(x, setdiff(analyses(x), i))
     }
 
     if (!missing(j))
     {
         j <- assertSubsetArgAndToChr(j, names(x))
-        x <- removeGroups(x, which(!names(x) %in% j))
+        x <- delete(x, j = setdiff(names(x), j))
     }
 
-    if (!missing(i))
-        x <- cleanGroups(x, FALSE)
-    
     return(x)
 })
 
@@ -442,18 +402,6 @@ setMethod("delete", "featureGroups", function(obj, i = NULL, j = NULL, ...)
     return(obj)
 })
 
-setMethod("cleanGroups", "featureGroups", function(fGroups, cleanUnassignedFeatures)
-{
-    if (length(fGroups) > 0)
-    {
-        empty <- sapply(fGroups@groups, function(x) all(x == 0))
-        if (any(empty))
-            fGroups <- removeGroups(fGroups, which(empty), updateFeatures = FALSE)
-        fGroups <- updateFeatures(fGroups, cleanUnassignedFeatures)
-    }
-    return(fGroups)
-})
-
 # UNDONE: make this public?
 setMethod("removeEmptyAnalyses", "featureGroups", function(fGroups)
 {
@@ -463,35 +411,8 @@ setMethod("removeEmptyAnalyses", "featureGroups", function(fGroups)
 
         empty <- trGT[, sapply(.SD, sum) == 0]
         if (any(empty))
-            fGroups <- removeAnalyses(fGroups, which(empty))
+            fGroups <- delete(fGroups, empty)
     }
-    return(fGroups)
-})
-
-setMethod("updateFeatures", "featureGroups", function(fGroups, checkUnassigned)
-{
-    # remove feature indices from feature groups that were removed later (e.g. filtered out)
-    
-    gTable <- groupTable(fGroups)
-    gNames <- names(fGroups)
-    
-    # first update features: only keep those assigned to remaining groups and those not cleared out (zero intensity)
-    if (checkUnassigned)
-    {
-        gTableTR <- transpose(gTable)
-        featureTable(fGroups) <- Map(featureTable(fGroups), gTableTR,
-                                     f = function(ft, gttr) ft[group %chin% gNames[gttr != 0]])
-    }
-    else
-        featureTable(fGroups) <- lapply(featureTable(fGroups), function(ft) ft[group %chin% gNames])
-    
-    # re-generate indices by matching group names
-    if (length(featureTable(fGroups)) > 0)
-        fGroups@ftindex <- setnames(rbindlist(lapply(featureTable(fGroups),
-                                                     function(ft) as.list(chmatch(gNames, ft$group, 0)))), gNames)
-    else
-        fGroups@ftindex <- fGroups@ftindex[0]
-    
     return(fGroups)
 })
 

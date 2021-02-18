@@ -109,11 +109,11 @@ importFeatureGroupsKPIC2 <- function(picsSetGrouped, analysisInfo)
     return(importFeatureGroupsKPIC2FromFeat(picsSetGrouped, analysisInfo, feat))
 }
 
-setMethod("removeGroups", "featureGroupsKPIC2", function(fGroups, indices)
+setMethod("delete", "featureGroupsKPIC2", function(obj, ...)
 {
-    fGroups <- callNextMethod(fGroups, indices)
+    obj <- callNextMethod(f)
     
     # UNDONE: sync picsSetGroups slot?
     
-    return(fGroups)
+    return(obj)
 })

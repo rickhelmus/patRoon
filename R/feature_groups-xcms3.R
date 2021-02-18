@@ -141,14 +141,19 @@ importFeatureGroupsXCMS3 <- function(xdata, analysisInfo)
     return(importFeatureGroupsXCMS3FromFeat(xdata, analysisInfo, feat))
 }
 
-setMethod("removeGroups", "featureGroupsXCMS3", function(fGroups, indices)
+setMethod("delete", "featureGroupsXCMS3", function(obj, ...)
 {
-    keep <- setdiff(seq_len(length(fGroups)), indices)
-    fGroups <- callNextMethod(fGroups, indices)
+    # UNDONE: update individual features somehow too?
+    
+    old <- obj
+    obj <- callNextMethod()
 
-    # update XCMSnExp
-    if (length(indices) > 0)
-        fGroups@xdata <- xcms::filterFeatureDefinitions(fGroups@xdata, keep)
-
-    return(fGroups)
+    if (length(old) > length(obj))
+        obj@xdata <- xcms::filterFeatureDefinitions(obj@xdata, names(old) %chin% names(obj))
+    
+    # UNDONE: enable when we can update features (or mark dirty so that getXCMSnExp knows when to update)
+    # if (length(analyses(old)) > length(analyses(obj)))
+    #     obj@xdata <- xcms::filterFile(obj@xdata, analyses(obj), keepFeatures = TRUE)
+    
+    return(obj)
 })

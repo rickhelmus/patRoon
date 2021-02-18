@@ -76,7 +76,6 @@
     - delete for features and fGroups
         - XCMS: replace [ by delete()
         - XCMS: also update groups data?
-        - remove removeGroups(), removeAnalyses()(, removeEmptyAnalyses()), removeEmtptyGroups(), updateFeatures(), cleanGroups()
         - remove copy(fGroups@groups) in doFilter
     - filterFile, [ also for XCMS fGroups?
 - NEWS

@@ -138,16 +138,19 @@ importFeatureGroupsXCMS <- function(xs, analysisInfo)
     return(importFeatureGroupsXCMSFromFeat(xs, analysisInfo, feat))
 }
 
-setMethod("removeGroups", "featureGroupsXCMS", function(fGroups, indices)
+setMethod("delete", "featureGroupsXCMS", function(obj, ...)
 {
-    fGroups <- callNextMethod(fGroups, indices)
-
-    # update xcmsSet
-    if (length(indices) > 0)
+    # UNDONE: update individual features somehow too?
+    
+    old <- obj
+    obj <- callNextMethod()
+    
+    if (length(old) > length(obj))
     {
-        xcms::groups(fGroups@xs) <- xcms::groups(fGroups@xs)[-indices, , drop = FALSE]
-        xcms::groupidx(fGroups@xs) <- xcms::groupidx(fGroups@xs)[-indices]
+        keep <- names(old) %chin% names(obj)
+        xcms::groups(obj@xs) <- xcms::groups(obj@xs)[keep, , drop = FALSE]
+        xcms::groupidx(obj@xs) <- xcms::groupidx(obj@xs)[keep]
     }
 
-    return(fGroups)
+    return(obj)
 })

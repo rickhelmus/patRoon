@@ -368,3 +368,61 @@ test_that("plotting empty objects works", {
     expect_ggplot(plotUpSet(fGConsOneEmpty))
     expect_error(plotUpSet(fgCompBothEmpty))
 })
+
+if (testWithSets())
+{
+    fgOpenMSOneEmptySet <- makeSet(unset(fgOpenMS, "set1"), unset(fgOpenMSEmpty, "set2"), groupAlgo = "openms",
+                                   adducts = NULL, labels = c("set1", "set2"))
+    
+    fgUn1 <- unset(fgOpenMS, "set1"); fgUn2 <- unset(fgOpenMS, "set2")
+    fgUn2 <- filter(fgUn2, absMinIntensity = 1E5)
+    fgOpenMSDiffSet <- makeSet(fgUn1, fgUn2, groupAlgo = "openms", adducts = NULL, labels = c("set1", "set2"))
+    
+    fgUn2 <- unset(fgOpenMS, "set2")
+    adducts(fgUn2) <- rep("[M-H]-", length(fgUn2))
+    fgOpenMSDiffAdductSet <- makeSet(fgUn1, fgUn2, groupAlgo = "openms", adducts = NULL, labels = c("set1", "set2"))
+    
+    fgUniqueSet2 <- unique(fgOpenMS, which = "set2", sets = TRUE)
+}
+
+test_that("sets functionality", {
+    skip_if_not(testWithSets())
+    
+    # proper (de)neutralization
+    expect_equal(mean(groupInfo(unset(fgOpenMS, "set1"))$mzs) - mean(groupInfo(fgOpenMS[, sets = "set1"])$mzs),
+                 patRoon:::adductMZDelta(as.adduct("[M+H]+")))
+    expect_equal(analysisInfo(unset(fgOpenMS, "set1")), getTestAnaInfoSet1())
+    expect_equal(analysisInfo(fgOpenMS[, sets = "set1"])[, 1:4], getTestAnaInfoSet1())
+    expect_equal(unique(annotations(fgOpenMS)$adduct), "[M+H]+")
+    expect_equal(fgOpenMS, fgOpenMS[, sets = sets(fgOpenMS)])
+    expect_length(fgOpenMS[, sets = character()], 0)
+    expect_length(fgOpenMS[, sets = "set1"], length(fgOpenMS) - length(fgUniqueSet2))
+    expect_length(unset(fgOpenMS, set = "set1"), length(fgOpenMS) - length(fgUniqueSet2))
+    expect_equal(sets(filter(fgOpenMS, sets = "set1", negate = TRUE)), "set2")
+    
+    # can't make empty sets from fGroups atm
+    expect_error(makeSet(unset(fgOpenMSEmpty, "set1"), unset(fgOpenMSEmpty, "set2"),
+                         adducts = NULL, labels = c("set1", "set2")))
+    
+    expect_length(fgOpenMSOneEmptySet, length(fgOpenMS) - length(fgUniqueSet2))
+    expect_length(filter(fgOpenMSOneEmptySet, absMinSets = 1), length(fgOpenMS) - length(fgUniqueSet2))
+    expect_length(filter(fgOpenMSOneEmptySet, absMinSets = 2), 0)
+    expect_length(filter(fgOpenMSOneEmptySet, relMinSets = 1), 0)
+    
+    expect_length(filter(fgOpenMSDiffSet, absMinSets = 1), length(fgOpenMSDiffSet))
+    expect_lt(length(filter(fgOpenMSDiffSet, absMinSets = 2)), length(fgOpenMSDiffSet))
+    expect_lt(length(filter(fgOpenMSDiffSet, relMinSets = 1)), length(fgOpenMSDiffSet))
+    expect_setequal(adducts(fgOpenMSDiffAdductSet, set = "set2"), "[M-H]-")
+    expect_gt(length(fgOpenMSDiffAdductSet), length(fgOpenMS)) # different adducts: less grouping
+    
+    expect_length(filter(fgOpenMSEmpty, relMinSets = 1), 0)
+    
+    expect_lt(length(fgUniqueSet2), length(fgOpenMS))
+    expect_equal(length(unique(fgOpenMS, which = sets(fgOpenMS), sets = TRUE)), length(fgOpenMS))
+    expect_length(unique(fgOpenMSEmpty, which = sets(fgOpenMSEmpty), sets = TRUE), 0)
+    
+    expect_lt(length(overlap(fgOpenMSDiffSet, which = sets(fgOpenMSDiffSet), sets = TRUE)), length(fgOpenMSDiffSet))
+    expect_length(overlap(fgOpenMSEmpty, which = sets(fgOpenMSDiffSet), sets = TRUE), 0)
+    
+    expect_doppel("venn-sets", function() plotVenn(fgOpenMS, sets = TRUE))
+})

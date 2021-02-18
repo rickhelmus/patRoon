@@ -161,4 +161,8 @@ test_that("Sets functionality", {
     expect_equal(analysisInfo(unset(ffOpenMS, "set1")), getTestAnaInfoSet1())
     expect_equal(analysisInfo(ffOpenMS[, sets = "set1"])[, 1:4], getTestAnaInfoSet1())
     expect_equal(unique(ffOpenMS[[1]]$adduct), "[M+H]+")
+    expect_equal(sets(filter(ffOpenMS, sets = "set1", negate = TRUE)), "set2")
+    expect_length(ffOpenMS[, sets = character()], 0)
+    expect_length(makeSet(ffXCMS3, ffXCMS3[FALSE], adducts = "[M+H]+"), length(ffXCMS3))
+    expect_length(makeSet(ffXCMS3[FALSE], ffXCMS3[FALSE], adducts = "[M+H]+"), 0)
 })

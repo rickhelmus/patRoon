@@ -118,6 +118,14 @@ setMethod("initialize", "featureGroups", function(.Object, ...)
         if (oldfn != length(.Object@features))
             .Object <- reGenerateFTIndex(.Object)
     }
+    else
+    {
+        .Object@features@features <- lapply(.Object@features@features, function(feat)
+        {
+            feat <- copy(feat)
+            feat[, group := character()]
+        })
+    }
     
     return(.Object)
 })

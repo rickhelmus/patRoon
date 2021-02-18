@@ -19,20 +19,25 @@ neutralizeFeatures <- function(feat, adduct)
     {
         fTab <- copy(fTab)
         
-        if (!is.null(adduct))
-        {
-            mzd <- adductMZ
-            fTab[, adduct := adductChar]
-        }
+        if (nrow(fTab) == 0)
+            fTab[, adduct := character()]
         else
         {
-            mzd <- adductMZ[fTab$adduct]
-            fTab[, adduct := fTab$adduct]
+            if (!is.null(adduct))
+            {
+                mzd <- adductMZ
+                fTab[, adduct := adductChar]
+            }
+            else
+            {
+                mzd <- adductMZ[fTab$adduct]
+                fTab[, adduct := fTab$adduct]
+            }
+            
+            fTab[, mz := mz - mzd]
+            fTab[, mzmin := mzmin - mzd]
+            fTab[, mzmax := mzmax - mzd]
         }
-        
-        fTab[, mz := mz - mzd]
-        fTab[, mzmin := mzmin - mzd]
-        fTab[, mzmax := mzmax - mzd]
         
         return(fTab)
     })
@@ -52,7 +57,7 @@ doMakeFeaturesSet <- function(featuresList, adducts)
     combAnaInfo <- do.call(rbind, lapply(names(featuresList), function(set)
     {
         ret <- featuresList[[set]]@analysisInfo
-        ret$set <- set
+        ret$set <- if (nrow(ret) == 0) character() else set
         return(ret)
     }))
     
@@ -95,7 +100,7 @@ setMethod("[", c("featuresSet", "ANY", "missing", "missing"), function(x, i, ...
 {
     assertSets(x, sets, TRUE)
     
-    if (!is.null(sets) && length(sets) > 0)
+    if (!is.null(sets))
         i <- mergeAnaSubsetArgWithSets(i, sets, analysisInfo(x))
         
     x <- callNextMethod(x, i, ...)
@@ -121,7 +126,7 @@ setMethod("filter", "featuresSet", function(obj, ..., negate = FALSE, sets = NUL
     if (!is.null(sets) && length(sets) > 0)
     {
         if (negate)
-            sets <- setdiff(obj@sets, sets)
+            sets <- setdiff(get("sets", pos = 2)(obj), sets)
         obj <- obj[, sets = sets]
     }
     

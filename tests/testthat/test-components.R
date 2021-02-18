@@ -2,20 +2,24 @@ context("components")
 
 # take a blank and standard to have two different replicate groups
 # set localMZRange=0 to keep isotopes
-fGroups <- getTestFGroups(getTestAnaInfo()[3:4, ], localMZRange = 0)
-# reduced set for CAMERA/RAMClustR; for nontarget we keep all to get less common homologues
-fGroupsSimple <- fGroups[, 1:50]
+fGroups <- getTestFGroups(getTestAnaInfoComponents(), localMZRange = 0)
+# reduced set for CAMERA/RAMClustR/intensity; for the others we keep all to have sufficient data for good results
+fGroupsSimple <- filter(fGroups, mzRange = c(150, 200))
 
 
 # fix seed for reproducible clustering, suppress warnings about <5 samples
 withr::with_seed(20, suppressWarnings(compsRC <- doGenComponents(fGroupsSimple, "ramclustr")))
-withr::with_seed(20, suppressWarnings(compsRCMR <- doGenComponents(fGroupsSimple, "ramclustr", relMinReplicates = 1)))
+withr::with_seed(20, suppressWarnings(compsRCMR <- doGenComponents(fGroupsSimple, "ramclustr", relMinReplicates = 0)))
 # UNDONE: getting unknown NaN warnings here...
 suppressWarnings(compsCAM <- doGenComponents(fGroupsSimple, "camera"))
 suppressWarnings(compsCAMMR <- doGenComponents(fGroupsSimple, "camera", relMinReplicates = 1))
 suppressWarnings(compsCAMSize <- doGenComponents(fGroupsSimple, "camera", minSize = 3))
 compsNT <- doGenComponents(fGroups, "nontarget")
 compsInt <- doGenComponents(fGroupsSimple, "intclust", average = FALSE) # no averaging: only one rep group
+compsOpenMS <- doGenComponents(fGroups, "openms")
+compsOpenMSMS <- doGenComponents(fGroups, "openms", minSize = 3)
+compsClMS <- doGenComponents(fGroups, "cliquems")
+compsClMSNoAB <- doGenComponents(fGroups, "cliquems", relMinAdductAbundance = 0)
 fGroupsEmpty <- getEmptyTestFGroups()
 compsEmpty <- components(algorithm = "none", componentInfo = data.table())
 
@@ -25,28 +29,34 @@ test_that("components generation works", {
     expect_known_value(list(componentTable(compsRC), componentInfo(compsRC)), testFile("components-rc"),
                        check.attributes = FALSE)
     expect_known_value(list(componentTable(compsCAM), componentInfo(compsCAM)), testFile("components-cam"))
+    expect_known_value(compsNT, testFile("components-nt"))
     expect_known_value(compsInt, testFile("components-int"))
+    expect_known_value(compsOpenMS, testFile("components-om"))
+    expect_known_value(compsClMS, testFile("components-cm"))
 
     expect_length(compsEmpty, 0)
     expect_length(doGenComponents(fGroupsEmpty, "ramclustr"), 0)
     expect_length(doGenComponents(fGroupsEmpty, "camera"), 0)
     expect_length(doGenComponents(fGroupsEmpty, "intclust"), 0)
+    expect_length(doGenComponents(fGroupsEmpty, "nontarget"), 0)
+    expect_length(doGenComponents(fGroupsEmpty, "openms"), 0)
+    expect_length(doGenComponents(fGroupsEmpty, "cliquems"), 0)
 
     expect_lt(length(compsRCMR), length(compsRC))
     expect_lt(length(compsCAMMR), length(compsCAM))
     expect_gte(min(componentInfo(compsCAMSize)$size), 3)
-
-    skip_if(length(compsNT) == 0)
-    expect_known_value(compsNT, testFile("components-nt"))
-    expect_length(doGenComponents(fGroupsEmpty, "nontarget"), 0)
+    
+    expect_equal(min(componentInfo(compsOpenMSMS)$size), 3)
+    expect_gt(length(unique(as.data.table(compsClMSNoAB)$adduct_ion)),
+              length(unique(as.data.table(compsClMS)$adduct_ion)))
 })
 
 test_that("verify components show", {
     expect_known_show(compsRC, testFile("components-rc", text = TRUE))
     expect_known_show(compsCAM, testFile("components-cam", text = TRUE))
     expect_known_show(compsInt, testFile("components-int", text = TRUE))
-    skip_if(length(compsNT) == 0)
-    expect_known_show(compsNT, testFile("components-nt", text = TRUE))
+    expect_known_show(compsOpenMS, testFile("components-om", text = TRUE))
+    expect_known_show(compsClMS, testFile("components-cm", text = TRUE))
 })
 
 test_that("basic subsetting", {
@@ -111,7 +121,6 @@ test_that("filtering works", {
     expect_true(all(sapply(componentTable(filter(compsRC, isotopes = 0, negate = TRUE)),
                            function(cmp) all(is.na(cmp$isonr) | cmp$isonr != 0))))
 
-    skip_if(length(compsNT) == 0)
     expect_length(filter(compsNT, rtIncrement = c(0, 1000)), length(compsNT))
     expect_length(filter(compsNT, rtIncrement = c(100, 1000)), 0)
     expect_length(filter(compsNT, mzIncrement = c(0, 1000)), length(compsNT))
@@ -125,7 +134,7 @@ test_that("filtering works", {
 test_that("basic usage works", {
     expect_equal(length(unique(as.data.table(compsCAM)$name)), length(compsCAM))
 
-    expect_equivalent(findFGroup(compsCAM, compsCAM[[3]]$group[3]), 3)
+    expect_equivalent(findFGroup(compsCAM, compsCAM[[3]]$group[3])[1], 3) # take element [1]: sets give 2 results
     expect_length(findFGroup(compsCAM, "none"), 0)
     expect_length(findFGroup(compsEmpty, "1"), 0)
 })

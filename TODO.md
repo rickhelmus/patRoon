@@ -177,7 +177,7 @@
     - handle/test empty objects
     - test DA algorithms
     - OpenMS adducts?
-    - fGroups: disable comparison/consensus?
+    - fGroups/components: disable comparison/consensus?
     
 
 

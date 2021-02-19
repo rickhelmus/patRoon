@@ -11,6 +11,7 @@
     - `show()` methods now print class inheritance tree
     - `calculateIonFormula()` and `calculateNeutralFormula()` now Hill sort their result
     - Intensity clusters now use `fastcluster` for hierarchical clustering
+    - Components for homologous series new report links as character string indices instead of numeric indices.
 
 
 
@@ -272,11 +273,7 @@ Other changes
     * Better algorithm to detect conflicting series
     * Fixed bug when updating removed links
 * `concs` option for `generateAnalysisInfo()` to set concentration data
-* Components for homologous series new report links as character string indices instead of numeric indices.
 
-## October 2019
-
-* Components for homologous series new report links as character string indices instead of numeric indices.
 
 ## September 2019
 

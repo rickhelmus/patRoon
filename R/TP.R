@@ -1,4 +1,5 @@
 #' @include main.R
+#' @include workflow-step.R
 NULL
 
 # UNDONE: precursor/suspect --> parent?

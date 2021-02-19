@@ -61,14 +61,18 @@ setReplaceMethod("$", "featuresXCMS3", function(x, name, value)
 
 #' @rdname features-class
 #' @export
-setMethod("delete", "featuresXCMS3", function(obj, i = NULL, j = NULL)
+setMethod("delete", "featuresXCMS3", function(obj, i = NULL, j = NULL, ...)
 {
     old <- obj
     obj <- callNextMethod()
+    
+    if (!setequal(analyses(old), analyses(obj)))
+        obj@xdata <- xcms::filterFile(obj@xdata, analyses(obj))
+    
     if (!is.null(j)) # sync features
     {
         # UNDONE: ask for exported method...
-        obj@xdata@msFeatureData <- xcms:::.filterChromPeaks(obj@xdata, getKeptXCMSPeakInds(i, j, old, obj))
+        obj@xdata@msFeatureData <- xcms:::.filterChromPeaks(obj@xdata, getKeptXCMSPeakInds(old, obj))
     }
     return(obj)
 })

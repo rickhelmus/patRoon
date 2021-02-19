@@ -61,12 +61,17 @@ setReplaceMethod("$", "featuresXCMS", function(x, name, value)
 
 #' @rdname features-class
 #' @export
-setMethod("delete", "featuresXCMS", function(obj, i = NULL, j = NULL)
+setMethod("delete", "featuresXCMS", function(obj, i = NULL, j = NULL, ...)
 {
     old <- obj
     obj <- callNextMethod()
+    
+    if (!setequal(analyses(old), analyses(obj)))
+        obj@xs <- obj@xs[, analyses(obj)]
+    
     if (!is.null(j)) # sync features
-        xcms::peaks(obj@xs) <- xcms::peaks(obj@xs)[getKeptXCMSPeakInds(i, j, old, obj), , drop = FALSE]
+        xcms::peaks(obj@xs) <- xcms::peaks(obj@xs)[getKeptXCMSPeakInds(old, obj), , drop = FALSE]
+    
     return(obj)
 })
 

@@ -18,9 +18,9 @@ makeKPIC2PeakInfo <- function(ft)
     return(ret)
 }
 
-updatePICSet <- function(old, new)
+updatePICSet <- function(old, new, analyses)
 {
-    new@picsList <- Map(new@picsList, featureTable(old), featureTable(new), f = function(pics, oft, nft)
+    new@picsList[analyses] <- Map(new@picsList[analyses], featureTable(old)[analyses], featureTable(new)[analyses], f = function(pics, oft, nft)
     {
         removed <- oft[!ID %in% nft$ID]$ID
         if (length(removed) > 0)
@@ -37,7 +37,7 @@ updatePICSet <- function(old, new)
     })
     
     # ensure IDs are along rows in case features were removed
-    new@features <- lapply(new@features, function(ft)
+    new@features[analyses] <- lapply(new@features[analyses], function(ft)
     {
         if (nrow(ft) > 0 && nrow(ft) < last(ft$ID))
             set(ft, j = "ID", value = seq_len(nrow(ft)))
@@ -93,26 +93,17 @@ setReplaceMethod("$", "featuresKPIC2", function(x, name, value)
 
 #' @rdname features-class
 #' @export
-setMethod("delete", "featuresKPIC2", function(obj, i = NULL, j = NULL)
+setMethod("delete", "featuresKPIC2", function(obj, i = NULL, j = NULL, ...)
 {
     old <- obj
     obj <- callNextMethod()
+    
+    if (!setequal(analyses(old), analyses(obj)))
+        obj@picsList <- obj@picsList[analyses(obj)]
+    
     if (!is.null(j)) # sync features
-    {
-        if (is.null(i))
-            i <- analyses(obj)
-        
-        obj@picsList[i] <- lapply(obj@picsList[i], function(pics)
-        {
-            pics$pics <- pics$pics[-j]
-            pics$peaks <- pics$peaks[-j]
-            pics$peakinfo <- pics$peakinfo[-j, , drop = FALSE]
-            return(pics)
-        })
-        
-        # ensure IDs are along rows in case features were removed
-        obj@features[i] <- lapply(obj@features[i], function(ft) set(ft, j = "ID", value = seq_len(nrow(ft))))
-    }
+        obj <- updatePICSet(old, obj, if (is.null(i)) analyses(obj) else intersect(i, analyses(obj)))
+    
     return(obj)
 })
 

@@ -369,7 +369,7 @@ XCMSFeatTblEqual <- function(tbl1, tbl2)
 }
 
 # used by delete()
-getKeptXCMSPeakInds <- function(i, j, old, new)
+getKeptXCMSPeakInds <- function(old, new)
 {
     newft <- featureTable(new)
     oldXCMSInds <- rbindlist(Map(featureTable(old), analyses(old), f = function(ft, ana)

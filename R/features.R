@@ -147,32 +147,34 @@ setMethod("filter", "features", function(obj, absMinIntensity = NULL, relMinInte
         if (negate)
             rangePred <- Negate(rangePred)
 
-        fList <- obj@features
-        for (ana in analyses(obj))
+        obj <- delete(obj, j = function(ft, ...)
         {
+            ft <- copy(ft)
+            ft[, keep := TRUE]
+            
             if (!is.null(absMinIntensity))
-                fList[[ana]] <- fList[[ana]][absIntPred(intensity)]
-
+                ft[, keep := absIntPred(intensity)]
+            
             if (!is.null(relMinIntensity))
             {
-                maxInt <- max(fList[[ana]]$intensity)
-                fList[[ana]] <- fList[[ana]][relIntPred(intensity, maxInt)]
+                maxInt <- max(ft$intensity)
+                ft[keep = TRUE, keep := relIntPred(intensity, maxInt)]
             }
-
+            
             if (!is.null(retentionRange))
-                fList[[ana]] <- fList[[ana]][rangePred(ret, retentionRange)]
-
+                ft[keep = TRUE, keep := rangePred(ret, retentionRange)]
+            
             if (!is.null(mzRange))
-                fList[[ana]] <- fList[[ana]][rangePred(mz, mzRange)]
-
+                ft[keep = TRUE, keep := rangePred(mz, mzRange)]
+            
             if (!is.null(mzDefectRange))
-                fList[[ana]] <- fList[[ana]][rangePred(mz - floor(mz), mzDefectRange)]
-
+                ft[keep = TRUE, keep := rangePred(mz - floor(mz), mzDefectRange)]
+            
             if (!is.null(chromWidthRange))
-                fList[[ana]] <- fList[[ana]][rangePred(retmax - retmin, chromWidthRange)]
-        }
-
-        featureTable(obj) <- fList
+                ft[keep = TRUE, keep := rangePred(retmax - retmin, chromWidthRange)]
+            
+            return(!ft$keep)
+        })
         
         saveCacheData("filterFeatures", obj, hash)
     }

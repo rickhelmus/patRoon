@@ -109,8 +109,10 @@ setMethod("initialize", "featureGroups", function(.Object, ...)
             return(feat)
         })
         # remove unassigned features (eg in case the grouping algorithm already did some cleanup)
-        # UNDONE: sync ftindex afterwards!!
+        oldfn <- length(.Object@features)
         .Object@features <- delete(getFeatures(.Object), j = function(ft, ...) is.na(ft$group))
+        if (oldfn != length(.Object@features))
+            .Object <- reGenerateFTIndex(.Object)
     }
     
     return(.Object)
@@ -384,12 +386,11 @@ setMethod("delete", "featureGroups", function(obj, i = NULL, j = NULL, ...)
             # UNDONE: can we skip updating things based on i/j?
             
             # re-generate feat index table by matching group names
-            gNames <- names(obj) # update var
-            obj@ftindex <- setnames(rbindlist(lapply(featureTable(obj),
-                                                     function(ft) as.list(chmatch(gNames, ft$group, 0)))), gNames)
+            obj@ftindex <- reGenerateFTIndex(obj)
             
             # update group intensities: zero missing features
             ftind <- groupFeatIndex(obj) # update var
+            gNames <- names(obj) # update var
             # NOTE: if j is a function it's assumed that all groups are affected
             affectedGrps <- if (jByIndex) intersect(j, gNames) else gNames
             obj@groups <- copy(obj@groups)

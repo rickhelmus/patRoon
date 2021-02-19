@@ -71,7 +71,6 @@
     - remove featuresOpenMS method for getXCMSSet(), update docs
     - groupFeatures(algorithm="sirius")
     - don't key quality/score tables?
-    - sync ftindex in initialize()
     - print feature counts in show(fGroups) and filter()
     - delete for features and fGroups
         - XCMS: also update groups data?

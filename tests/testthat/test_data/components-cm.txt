@@ -1,1 +1,1 @@
-A componentsCliqueMS objectHierarchy:componentsFeatures    |-- componentsCliqueMS---Algorithm: cliquemsComponents: CMP1, CMP2, CMP3, CMP4, CMP5, CMP6, ... (102 total)Number of feature groups in components: 335 (total), 3.3 (mean), 2 - 24 (min - max)Feature components: 296 total
+A componentsCliqueMS objectHierarchy:componentsFeatures    |-- componentsCliqueMS---Algorithm: cliquemsComponents: CMP1, CMP2, CMP3, CMP4, CMP5, CMP6, ... (104 total)Number of feature groups in components: 366 (total), 3.5 (mean), 2 - 39 (min - max)Feature components: 300 total

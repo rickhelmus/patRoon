@@ -18,10 +18,10 @@ compsNT <- doGenComponents(fGroups, "nontarget")
 compsInt <- doGenComponents(fGroupsSimple, "intclust", average = FALSE) # no averaging: only one rep group
 compsOpenMS <- doGenComponents(fGroups, "openms")
 compsOpenMSMS <- doGenComponents(fGroups, "openms", minSize = 3)
-compsClMS <- doGenComponents(fGroups, "cliquems")
-compsClMSNoAB <- doGenComponents(fGroups, "cliquems", relMinAdductAbundance = 0)
+withr::with_seed(20, compsClMS <- doGenComponents(fGroups, "cliquems", parallel = FALSE))
+withr::with_seed(20, compsClMSNoAB <- doGenComponents(fGroups, "cliquems", relMinAdductAbundance = 0, parallel = FALSE))
 fGroupsEmpty <- getEmptyTestFGroups()
-compsEmpty <- components(algorithm = "none", componentInfo = data.table())
+compsEmpty <- do.call(if (testWithSets()) componentsSet else components, list(algorithm = "none", componentInfo = data.table()))
 
 test_that("components generation works", {
     # For RC/CAM: don't store their internal objects as they contain irreproducible file names
@@ -32,7 +32,8 @@ test_that("components generation works", {
     expect_known_value(compsNT, testFile("components-nt"))
     expect_known_value(compsInt, testFile("components-int"))
     expect_known_value(compsOpenMS, testFile("components-om"))
-    expect_known_value(compsClMS, testFile("components-cm"))
+    # can't compare cliqueMS data as it has environments in them that change
+    expect_known_value(list(componentTable(compsClMS), componentInfo(compsClMS)), testFile("components-cm"))
 
     expect_length(compsEmpty, 0)
     expect_length(doGenComponents(fGroupsEmpty, "ramclustr"), 0)
@@ -185,5 +186,76 @@ test_that("plotting works", {
     expect_doppel("component-ic-sil", function() plotSilhouettes(compsInt, 2:6))
     expect_doppel("component-ic-heat", function() plotHeatMap(compsInt, interactive = FALSE))
 
-    # UNDONE: test plotGraph, when vdiffr supports it (https://github.com/r-lib/vdiffr/issues/60)
+    skip_if(testWithSets())
+    expect_HTML(plotGraph(compsNT, onlyLinked = FALSE))
+})
+
+fGroupsSI <- selectIons(fGroups, compsRC, prefAdduct = "[M+H]+", onlyMonoIso = TRUE)
+
+test_that("selectIons works", {
+    expect_lt(length(fGroupsSI), length(fGroups))
+    expect_setequal(annotations(fGroupsSI)$group, names(fGroupsSI))
+    
+    # expect pref adduct is most abundant
+    expect_gt(sum(annotations(fGroupsSI)$adduct == "[M+H]+"), 0.5 * length(fGroupsSI))
+    expect_gt(sum(annotations(selectIons(fGroups, compsRC, prefAdduct = "[M+Na]+"))$adduct == "[M+Na]+"),
+              sum(annotations(fGroupsSI)$adduct == "[M+Na]+"))
+    
+    expect_gt(length(selectIons(fGroups, compsRC, prefAdduct = "[M+H]+", onlyMonoIso = FALSE)), length(fGroupsSI))
+    
+    # stop()s with empty components
+    expect_error(selectIons(fGroups, compsEmpty, prefAdduct = "[M+H]+", onlyMonoIso = TRUE))
+    # ... and components without annotations in general
+    expect_error(selectIons(fGroups, compsInt, prefAdduct = "[M+H]+", onlyMonoIso = TRUE))
+    
+    skip_if(testWithSets())
+    
+    checkmate::expect_subset(names(fGroupsSI), names(fGroups))
+    expect_equal(nrow(annotations(fGroupsSI)), length(fGroupsSI))
+    
+    # verify neutral masses
+    expect_true(all(sapply(seq_len(nrow(annotations(fGroupsSI))), function(i)
+    {
+        ann <- annotations(fGroupsSI)[i]
+        return(isTRUE(all.equal(ann$neutralMass + adductMZDelta(as.adduct(ann$adduct)),
+                                groupInfo(fGroupsSI)[ann$group, "mzs"])))
+    })))
+})
+
+if (testWithSets())
+{
+    fgOneEmptySet <- getTestFGroupsOneEmptySet(getTestAnaInfoComponents())[, 1:50]
+    compsRCOneEmptySet <- withr::with_seed(20, suppressWarnings(doGenComponents(fgOneEmptySet, "ramclustr")))
+    
+    getSetCompNames <- function(cmp, set) grep(paste0("\\-", set), names(cmp), value = TRUE)
+}
+
+test_that("sets functionality", {
+    skip_if_not(testWithSets())
+    
+    # components should be just a combination of the set specific components
+    expect_setequal(getSetCompNames(compsRC, "set1"), names(unset(compsRC, "set1")))
+    expect_setequal(getSetCompNames(compsRC, "set2"), names(unset(compsRC, "set2")))
+    expect_equal(length(compsRC), length(unset(compsRC, "set1")) + length(unset(compsRC, "set2")))
+    
+    expect_equal(compsRC, compsRC[, sets = sets(compsRC)])
+    expect_length(compsRC[, sets = character()], 0)
+    expect_equal(sets(filter(compsRC, sets = "set1", negate = TRUE)), "set2")
+    expect_setequal(groupNames(compsRC), unique(sapply(setObjects(compsRC), groupNames)))
+    expect_setequal(groupNames(unset(compsRC, "set1")), groupNames(setObjects(compsRC)[[1]]))
+    expect_setequal(groupNames(unset(compsRCOneEmptySet, "set1")), groupNames(setObjects(compsRCOneEmptySet)[[1]]))
+    expect_length(unset(compsRCOneEmptySet, "set2"), 0)
+
+    expect_HTML(plotGraph(compsNT, set = "set1", onlyLinked = FALSE))
+        
+    expect_false(checkmate::testSubset(names(fGroupsSI), names(fGroups))) # should re-group --> new group names
+    expect_equal(nrow(annotations(fGroupsSI)), 2 * length(fGroupsSI)) # annotations stored per set
+    
+    # verify neutral masses
+    expect_true(all(sapply(seq_len(nrow(annotations(fGroupsSI))), function(i)
+    {
+        ann <- annotations(fGroupsSI)[i]
+        # neutral mass equals neutralized group mass
+        return(isTRUE(all.equal(ann$neutralMass, groupInfo(fGroupsSI)[ann$group, "mzs"])))
+    })))
 })

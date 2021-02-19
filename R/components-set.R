@@ -24,6 +24,9 @@ setMethod("show", "componentsSet", function(object)
 
 setMethod("[", c("componentsSet", "ANY", "ANY", "missing"), function(x, i, j, ..., sets = NULL, drop = TRUE)
 {
+    if (length(x) == 0)
+        return(x)
+    
     assertSets(x, sets, TRUE)
     if (!is.null(sets))
         x@setObjects <- x@setObjects[sets]

@@ -265,6 +265,19 @@ expect_reportHTML <- function(object)
     invisible(act$val)
 }
 
+expect_HTML <- function(object)
+{
+    # UNDONE: use vdiffr when it supports it (https://github.com/r-lib/vdiffr/issues/60)
+    
+    out <- tempfile(fileext = ".html")
+    htmlwidgets::saveWidget({
+        act <- quasi_label(rlang::enquo(object))
+        act$val
+    }, out)
+    expect(file.exists(out), "failed to plot HTML widget")
+    invisible(act$val)
+}
+
 expect_equal_scr <- function(object, expected, ...)
 {
     act <- quasi_label(rlang::enquo(object))

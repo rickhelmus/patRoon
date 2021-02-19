@@ -63,10 +63,10 @@ setMethod("delete", "featuresKPIC2", function(obj, i = NULL, j = NULL, ...)
     old <- obj
     obj <- callNextMethod()
     
-    if (!setequal(analyses(old), analyses(obj)))
+    # simple ana subset
+    if (is.null(j) && !setequal(analyses(old), analyses(obj)))
         obj@picsList <- obj@picsList[analyses(obj)]
-    
-    if (!is.null(j)) # sync features
+    else if (!is.null(j)) # sync features
         obj <- updatePICSet(old, obj, i)
     
     return(obj)

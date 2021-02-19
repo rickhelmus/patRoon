@@ -71,10 +71,10 @@
     - remove featuresOpenMS method for getXCMSSet(), update docs
     - groupFeatures(algorithm="sirius")
     - don't key quality/score tables?
+    - sync ftindex in initialize()
     - delete for features and fGroups
         - XCMS: replace [ by delete()
         - XCMS: also update groups data?
-        - update delete() for XCMS/XCMS3/KPIC2
         - get rid of replacement methods (except features' featureTable)
 - NEWS
     - topMostByRGroup/EICTopMostByRGroup

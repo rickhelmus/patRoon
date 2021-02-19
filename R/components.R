@@ -1,4 +1,5 @@
 #' @include main.R
+#' @include feature_groups.R
 #' @include workflow-step.R
 #' @include utils-components.R
 NULL

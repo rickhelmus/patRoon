@@ -72,19 +72,19 @@ setMethod("adducts<-", "featureGroupsSet", function(obj, value, set, reGroup = T
     return(obj)
 })
 
-setMethod("removeGroups", "featureGroupsSet", function(fGroups, indices, updateFeatures)
+setMethod("delete", "featureGroupsSet", function(obj, ...)
 {
     # HACK: subset annotations here as format with sets is different
-    ann <- fGroups@annotations
+    ann <- annotations(obj)
     if (nrow(ann) > 0)
-        fGroups@annotations <- data.table() # disable subsetting in fGroups method
+        obj@annotations <- data.table() # disable subsetting in parent method
     
-    fGroups <- callNextMethod()
+    obj <- callNextMethod()
     
     if (nrow(ann) > 0)
-        fGroups@annotations <- ann[set %in% sets(fGroups) & group %in% names(fGroups)]
+        obj@annotations <- ann[set %in% sets(obj) & group %in% names(obj)]
     
-    return(fGroups)
+    return(obj)
 })
 
 #' @describeIn featureGroupsSet Shows summary information for this object.

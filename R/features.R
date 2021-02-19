@@ -54,7 +54,12 @@ setMethod("initialize", "features", function(.Object, ...)
 
 #' @describeIn features Obtain total number of features.
 #' @export
-setMethod("length", "features", function(x) if (length(x@features) > 0) sum(sapply(x@features, nrow)) else 0)
+setMethod("length", "features", function(x)
+{
+    if (length(x@features) == 0 || !any(lengths(x@features) != 0))
+        return(0)
+    return(sum(sapply(x@features[lengths(x@features) > 0], nrow)))
+})
 
 #' @describeIn features Shows summary information for this object.
 #' @export
@@ -240,11 +245,14 @@ setMethod("delete", "features", function(obj, i = NULL, j = NULL, ...)
             obj@features <- obj@features[setdiff(analyses(obj), i)]
         else if (length(i) == 0 || length(j) == 0)
             return(obj) # nothing to remove...
-        obj@features[i] <- lapply(obj@features[i], function(ft)
+        else
         {
-            inds <- j[j <= nrow(ft)]
-            return(if (length(inds) > 0) ft[-inds] else ft)
-        })
+            obj@features[i] <- lapply(obj@features[i], function(ft)
+            {
+                inds <- j[j <= nrow(ft)]
+                return(if (length(inds) > 0) ft[-inds] else ft)
+            })
+        }
     }
     else
     {
@@ -256,7 +264,6 @@ setMethod("delete", "features", function(obj, i = NULL, j = NULL, ...)
             return(ft[setdiff(seq_len(nrow(ft)), rm)])
         })
     }
-    obj@features <- pruneList(obj@features, checkZeroRows = TRUE)
     obj@analysisInfo <- obj@analysisInfo[obj@analysisInfo$analysis %in% names(obj@features), ]
     
     return(obj)

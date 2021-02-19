@@ -9,6 +9,14 @@ showAnaInfo <- function(anaInfo)
     printf("Replicate groups used as blank: %s (%d total)\n", getStrListWithMax(blGroups, 8, ", "), length(blGroups))
 }
 
+reGenerateFTIndex <- function(fGroups)
+{
+    gNames <- names(fGroups)
+    fGroups@ftindex <- setnames(rbindlist(lapply(featureTable(fGroups),
+                                                 function(ft) as.list(chmatch(gNames, ft$group, 0)))), gNames)
+    return(fGroups)
+}
+
 featureQualities <- function()
 {
     list(ApexBoundaryRatio = list(func = MetaClean::calculateApexMaxBoundaryRatio, HQ = "LV", range = c(0, 1)),

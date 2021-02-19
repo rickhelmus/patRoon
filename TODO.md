@@ -84,10 +84,13 @@
     - XCMS3 grouping/import with exportedData and comparison() supports xcms3
     - progressr
     - don't subtract blanks from each other
+    - syncing XCMS objects
 - tests
     - topMostByRGroup
     - xcms3 comparison
     - new multiple blank filtering
+    - syncing of XCMS/KPIC2 objects
+    - delete()
 - docs
     - clarify reportCSV() now only reports remaining features?
     - topMostByRGroup: handbook?

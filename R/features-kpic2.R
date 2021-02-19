@@ -58,6 +58,8 @@ setMethod("initialize", "featuresKPIC2",
 #' @export
 setMethod("delete", "featuresKPIC2", function(obj, i = NULL, j = NULL, ...)
 {
+    i <- assertDeleteArgAndToChr(i, analyses(obj), add = ac)
+    
     old <- obj
     obj <- callNextMethod()
     
@@ -65,7 +67,7 @@ setMethod("delete", "featuresKPIC2", function(obj, i = NULL, j = NULL, ...)
         obj@picsList <- obj@picsList[analyses(obj)]
     
     if (!is.null(j)) # sync features
-        obj <- updatePICSet(old, obj, if (is.null(i)) analyses(obj) else intersect(i, analyses(obj)))
+        obj <- updatePICSet(old, obj, i)
     
     return(obj)
 })

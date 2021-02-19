@@ -16,7 +16,7 @@ setMethod("delete", "featuresXCMS", function(obj, i = NULL, j = NULL, ...)
     obj <- callNextMethod()
     
     if (!setequal(analyses(old), analyses(obj)))
-        obj@xs <- obj@xs[, analyses(obj)]
+        obj@xs <- obj@xs[, analyses(old) %in% analyses(obj)]
     
     if (!is.null(j)) # sync features
         xcms::peaks(obj@xs) <- xcms::peaks(obj@xs)[getKeptXCMSPeakInds(old, obj), , drop = FALSE]

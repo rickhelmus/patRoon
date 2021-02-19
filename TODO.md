@@ -134,6 +134,7 @@
     - renamed analysis column from feature consensus formulae results to analysis_from
     - added analyses column in feature consensus formulae results
     - formulas as.data.table(average=TRUE): remove analysis_from column
+    - plotGraph: better error if if object is empty
 - docs
     - filter() for features/fGroups: apply to neutral masses
     - CAMERA/RAMClustR/nontarget components: clearly mention it is simply a merge between sets

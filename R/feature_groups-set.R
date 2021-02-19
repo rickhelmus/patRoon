@@ -27,7 +27,7 @@ featureGroupsSet <- setClass("featureGroupsSet",
 setMethod("sets", "featureGroupsSet", function(obj) sets(getFeatures(obj)))
 
 #' @export
-setMethod("adducts", "featureGroupsSet", function(obj, set)
+setMethod("adducts", "featureGroupsSet", function(obj, set, ...)
 {
     assertSets(obj, set, FALSE)
     s <- set # workaround for below to distinguish between DT and parent set
@@ -36,9 +36,10 @@ setMethod("adducts", "featureGroupsSet", function(obj, set)
 })
 
 #' @export
-setReplaceMethod("adducts", "featureGroupsSet", function(obj, value, set, reGroup = TRUE)
+setMethod("adducts<-", "featureGroupsSet", function(obj, value, set, reGroup = TRUE)
 {
     assertSets(obj, set, FALSE)
+    checkmate::assertFlag(reGroup)
     
     s <- set
     ann <- annotations(obj)[set == s]

@@ -45,6 +45,32 @@ test_that("empty objects work", {
     expect_length(fgXCMS3Empty, 0)
 })
 
+if (!testWithSets())
+{
+    fgOpenMSAnn <- fgOpenMS
+    adducts(fgOpenMSAnn) <- rep("[M+H]+", length(fgOpenMSAnn))
+    fgOpenMSAnn2 <- fgOpenMSAnn
+    adducts(fgOpenMSAnn2)[3] <- "[M+K]+"
+}
+
+test_that("adducts setting", {
+    skip_if(testWithSets()) # sets tests done below
+    
+    expect_length(adducts(fgOpenMS), 0)
+    expect_length(adducts(fgOpenMSAnn), length(fgOpenMSAnn))
+    expect_length(adducts(fgOpenMSAnn2), length(fgOpenMSAnn2))
+    expect_setequal(adducts(fgOpenMSAnn), "[M+H]+")
+    expect_equal(adducts(fgOpenMSAnn2)[3], "[M+K]+", check.attributes = FALSE)
+    
+    # verify neutral masses
+    expect_true(all(sapply(seq_len(nrow(annotations(fgOpenMSAnn2))), function(i)
+    {
+        ann <- annotations(fgOpenMSAnn2)[i]
+        return(isTRUE(all.equal(ann$neutralMass + adductMZDelta(as.adduct(ann$adduct)),
+                                groupInfo(fgOpenMSAnn2)[ann$group, "mzs"])))
+    })))
+})
+
 # to compare original anaInfo: ignore extra columns that may have been added afterwards
 getAnaInfo <- function(fg) analysisInfo(fg)[, c("path", "analysis", "group", "blank")]
 
@@ -382,6 +408,11 @@ if (testWithSets())
     adducts(fgUn2) <- rep("[M-H]-", length(fgUn2))
     fgOpenMSDiffAdductSet <- makeSet(fgUn1, fgUn2, groupAlgo = "openms", adducts = NULL, labels = c("set1", "set2"))
     
+    fgOpenMSDiffAdduct <- fgOpenMS
+    adducts(fgOpenMSDiffAdduct, reGroup = FALSE, set = "set1")[names(fgOpenMSDiffAdduct)[3]] <- "[M+K]+"
+    fgOpenMSDiffAdductRG <- fgOpenMS
+    adducts(fgOpenMSDiffAdductRG, reGroup = TRUE, set = "set1")[names(fgOpenMSDiffAdduct)[3]] <- "[M+K]+"
+    
     fgUniqueSet2 <- unique(fgOpenMS, which = "set2", sets = TRUE)
 }
 
@@ -414,6 +445,19 @@ test_that("sets functionality", {
     expect_lt(length(filter(fgOpenMSDiffSet, relMinSets = 1)), length(fgOpenMSDiffSet))
     expect_setequal(adducts(fgOpenMSDiffAdductSet, set = "set2"), "[M-H]-")
     expect_gt(length(fgOpenMSDiffAdductSet), length(fgOpenMS)) # different adducts: less grouping
+    
+    expect_equal(adducts(fgOpenMSDiffAdduct, set = "set1")[names(fgOpenMSDiffAdduct)[3]], "[M+K]+",
+                 check.attributes = FALSE)
+    expect_true(any(adducts(fgOpenMSDiffAdductRG, set = "set1") == "[M+K]+"))
+    expect_setequal(names(fgOpenMSDiffAdduct), names(fgOpenMS))
+    # should re-group --> new group names
+    expect_false(checkmate::testSubset(names(fgOpenMSDiffAdductRG), names(fgOpenMS)))
+    expect_true(all(sapply(seq_len(nrow(annotations(fgOpenMSDiffAdductRG))), function(i)
+    {
+        ann <- annotations(fgOpenMSDiffAdductRG)[i]
+        # neutral mass equals neutralized group mass
+        return(isTRUE(all.equal(ann$neutralMass, groupInfo(fgOpenMSDiffAdductRG)[ann$group, "mzs"])))
+    })))
     
     expect_length(filter(fgOpenMSEmpty, relMinSets = 1), 0)
     

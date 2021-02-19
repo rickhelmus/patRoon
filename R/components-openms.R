@@ -98,7 +98,7 @@ setMethod("generateComponentsOpenMS", "featureGroups", function(fGroups, ionizat
 #' @export
 setMethod("generateComponentsOpenMS", "featureGroupsSet", function(fGroups, ...)
 {
-    generateComponentsSet(fGroups, generateComponentsOpenMS, ...)
+    generateComponentsSet(fGroups, generateComponentsOpenMS, setIonization = TRUE, ...)
 })
 
 

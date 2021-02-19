@@ -94,5 +94,5 @@ makeGraph <- function(components, onlyLinked, titles)
     nodes[, shape := "circle"]
     nodes[, title := titles[match(id, names(components))]]
     
-    visNetwork::visNetwork(nodes = nodes, edges = data$edges)
+    visNetwork::visNetwork(nodes = nodes, edges = edges)
 }

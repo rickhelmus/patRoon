@@ -431,7 +431,7 @@ setMethod("delete", "featureGroups", function(obj, i = NULL, j = NULL, ...)
             # UNDONE: can we skip updating things based on i/j?
             
             # re-generate feat index table by matching group names
-            obj@ftindex <- reGenerateFTIndex(obj)
+            obj <- reGenerateFTIndex(obj)
             
             # update group intensities: zero missing features
             ftind <- groupFeatIndex(obj) # update var
@@ -683,7 +683,7 @@ setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas =
     else
     {
         gTableAvg <- averageGroups(x, areas, func = averageFunc)
-        gTableNonAvg <- groups(x, areas)
+        gTableNonAvg <- groupTable(x, areas)
 
         if (!is.null(normFunc))
         {

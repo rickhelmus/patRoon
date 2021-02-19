@@ -42,6 +42,9 @@ setMethod("plotGraph", "componentsNT", function(obj, onlyLinked)
 {
     checkmate::assertFlag(onlyLinked)
     
+    if (length(obj) == 0)
+        stop("No components to plot", call. = FALSE)
+    
     cInfo <- copy(obj@componentInfo)
     cInfo[, id := .I]
     cInfo[, linksIDs := lapply(links, match, table = names(obj))]

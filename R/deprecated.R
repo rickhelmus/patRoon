@@ -1,3 +1,5 @@
+# nocov start
+
 #' Deprecated and renamed functions.
 #'
 #' Please do not use these functions anymore since they may be removed in the
@@ -112,3 +114,5 @@ plotSpec <- function(obj, ...)
     .Deprecated("plotSpectrum")
     plotSpectrum(obj, ...)
 }
+
+# nocov end

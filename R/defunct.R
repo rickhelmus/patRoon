@@ -421,7 +421,6 @@ setMethod("compoundViewer", c("featureGroups", "MSPeakLists", "compounds"), func
     
     runApp(shinyApp(getCompViewerUI(generatePageLabels(names(fGroups)[1], 50)), server))
 })
-# nocov end
 
 #' @details \code{groupFeaturesScreening} was replaced by
 #'   \code{\link{screenSuspects}}. Please refer to this function and the
@@ -444,3 +443,5 @@ groupFeaturesScreening <- function(...) stop("This function was replaced by scre
 #' @export
 checkChromatograms <- function(...) stop("This function was replaced by checkFeatures(). ",
                                          "Please see ?checkFeatures and the handbook for the updated interface.")
+
+# nocov end

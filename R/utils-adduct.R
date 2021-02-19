@@ -86,6 +86,8 @@ doAsAdduct <- memoise(function(x, format, isPositive, charge)
     
     # check first: this should fail immediately
     checkmate::assertChoice(format, c("generic", "sirius", "genform", "metfrag", "openms", "cliquems"))
+    if (format == "openms")
+        checkmate::assertInt(charge)
     
     ac <- checkmate::makeAssertCollection()
     if (format == "metfrag")

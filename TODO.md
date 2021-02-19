@@ -72,10 +72,9 @@
     - groupFeatures(algorithm="sirius")
     - don't key quality/score tables?
     - sync ftindex in initialize()
+    - print feature counts in show(fGroups) and filter()
     - delete for features and fGroups
-        - XCMS: replace [ by delete()
         - XCMS: also update groups data?
-        - get rid of replacement methods (except features' featureTable)
 - NEWS
     - topMostByRGroup/EICTopMostByRGroup
     - as.data.table: qualities argument (and potentially faster now with features=T?)

@@ -16,7 +16,7 @@ setMethod("delete", "featuresXCMS3", function(obj, i = NULL, j = NULL, ...)
     obj <- callNextMethod()
     
     if (!setequal(analyses(old), analyses(obj)))
-        obj@xdata <- xcms::filterFile(obj@xdata, analyses(obj))
+        obj@xdata <- xcms::filterFile(obj@xdata, which(analyses(old) %in% analyses(obj)))
     
     if (!is.null(j)) # sync features
     {

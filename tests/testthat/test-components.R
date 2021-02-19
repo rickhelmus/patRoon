@@ -4,12 +4,12 @@ context("components")
 # set localMZRange=0 to keep isotopes
 fGroups <- getTestFGroups(getTestAnaInfoComponents(), localMZRange = 0)
 # reduced set for CAMERA/RAMClustR/intensity; for the others we keep all to have sufficient data for good results
-fGroupsSimple <- filter(fGroups, mzRange = c(150, 200))
+fGroupsSimple <- fGroups[, 1:50]
 
 
 # fix seed for reproducible clustering, suppress warnings about <5 samples
 withr::with_seed(20, suppressWarnings(compsRC <- doGenComponents(fGroupsSimple, "ramclustr")))
-withr::with_seed(20, suppressWarnings(compsRCMR <- doGenComponents(fGroupsSimple, "ramclustr", relMinReplicates = 0)))
+withr::with_seed(20, suppressWarnings(compsRCMR <- doGenComponents(fGroupsSimple, "ramclustr", relMinReplicates = 1)))
 # UNDONE: getting unknown NaN warnings here...
 suppressWarnings(compsCAM <- doGenComponents(fGroupsSimple, "camera"))
 suppressWarnings(compsCAMMR <- doGenComponents(fGroupsSimple, "camera", relMinReplicates = 1))
@@ -42,8 +42,8 @@ test_that("components generation works", {
     expect_length(doGenComponents(fGroupsEmpty, "openms"), 0)
     expect_length(doGenComponents(fGroupsEmpty, "cliquems"), 0)
 
-    expect_lt(length(compsRCMR), length(compsRC))
-    expect_lt(length(compsCAMMR), length(compsCAM))
+    expect_lt(length(groupNames(compsRCMR)), length(groupNames(compsRC)))
+    expect_lt(length(groupNames(compsCAMMR)), length(groupNames(compsCAM)))
     expect_gte(min(componentInfo(compsCAMSize)$size), 3)
     
     expect_equal(min(componentInfo(compsOpenMSMS)$size), 3)

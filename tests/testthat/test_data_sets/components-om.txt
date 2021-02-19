@@ -1,0 +1,1 @@
+A componentsSet objectHierarchy:components,workflowStepSet    |-- componentsSet      |-- componentsNTSet---Algorithm: openms-setComponents: CMP1-set1, CMP2-set1, CMP3-set1, CMP4-set1, CMP5-set1, CMP6-set1, ... (66 total)Number of feature groups in components: 134 (total), 2.0 (mean), 2 - 3 (min - max)Sets: set1, set2

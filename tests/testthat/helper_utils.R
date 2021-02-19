@@ -82,6 +82,7 @@ if (testWithSets())
     getExpFG <- function(x) x
     doExport <- function(x, ...) export(x, ...)
 
+    getTestAnaInfoComponents <- function() getTestAnaInfo()[3:4, ]
     getTestAnaInfoAnn <- function() getTestAnaInfo()[4:5, ]
     
     doScreen <- function(...) screenSuspects(...)

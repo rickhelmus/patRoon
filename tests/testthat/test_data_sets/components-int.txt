@@ -1,1 +1,1 @@
-A componentsIntClust objectHierarchy:components    |-- componentsIntClust---Algorithm: intclustComponents: CMP1, CMP2, CMP3, CMP4, CMP5, CMP6, ... (7 total)Number of feature groups in components: 50 (total), 7.1 (mean), 2 - 17 (min - max)
+A componentsIntClust objectHierarchy:components    |-- componentsIntClust---Algorithm: intclustComponents: CMP1, CMP2, CMP3, CMP4, CMP5, CMP6, ... (8 total)Number of feature groups in components: 50 (total), 6.2 (mean), 3 - 13 (min - max)

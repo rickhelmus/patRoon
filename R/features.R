@@ -196,14 +196,6 @@ setMethod("[", c("features", "ANY", "missing", "missing"), function(x, i, ...)
     return(x)
 })
 
-setReplaceMethod("[", c("features", "ANY", "missing"), function(x, i, j, value)
-{
-    # UNDONE: verify value
-    i <- assertSubsetArgAndToChr(i, analyses(x))
-    x@features[i] <- value
-    return(x)
-})
-
 #' @describeIn features Extract a feature table for an analysis.
 #' @export
 setMethod("[[", c("features", "ANY", "missing"), function(x, i)
@@ -212,25 +204,11 @@ setMethod("[[", c("features", "ANY", "missing"), function(x, i)
     return(x@features[[i]])
 })
 
-setReplaceMethod("[[", c("features", "ANY", "missing"), function(x, i, j, value)
-{
-    # UNDONE: verify value
-    assertExtractArg(i)
-    x@features[[i]] <- value
-    return(x)
-})
-
 #' @describeIn features Extract a feature table for an analysis.
 #' @export
 setMethod("$", "features", function(x, name)
 {
     eval(substitute(x@features$NAME_ARG, list(NAME_ARG = name)))
-})
-
-setReplaceMethod("$", "features", function(x, name, value)
-{
-    eval(substitute(x@features$NAME_ARG <- value, list(NAME_ARG = name)))
-    return(x)
 })
 
 #' @describeIn features Completely deletes specified features.

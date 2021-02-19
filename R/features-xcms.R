@@ -1,63 +1,12 @@
 #' @include features.R
 NULL
 
-updateXS <- function(obj)
-{
-    # UNDONE: see if this could be done more efficient/selective...
-    
-    cat("Updating xcmsSet...\n")
-    # NOTE: use base method to force update as overloaded method simply returns @xs slot
-    obj@xs <- selectMethod(getXCMSSet, "features")(obj, exportedData = TRUE)
-    return(obj)
-}
-
 #' @rdname features-class
 #' @export
 featuresXCMS <- setClass("featuresXCMS", slots = list(xs = "ANY"), contains = "features")
 
 setMethod("initialize", "featuresXCMS",
           function(.Object, ...) callNextMethod(.Object, algorithm = "xcms", ...))
-
-setReplaceMethod("featureTable", "featuresXCMS", function(obj, value)
-{
-    ret <- callNextMethod()
-    if (!all(mapply(featureTable(obj), featureTable(ret), FUN = XCMSFeatTblEqual)))
-        ret <- updateXS(ret)
-    return(obj)
-})
-
-#' @rdname features-class
-#' @export
-setMethod("[", c("featuresXCMS", "ANY", "missing", "missing"), function(x, i, j, ..., drop = TRUE)
-{
-    x <- callNextMethod(x, i, j, ..., drop = drop)
-    x@xs <- x@xs[, analyses(x)]
-    return(x)
-})
-
-setReplaceMethod("[", c("featuresXCMS", "ANY", "missing"), function(x, i, j, value)
-{
-    ret <- callNextMethod()
-    if (!all(mapply(featureTable(x), featureTable(ret), FUN = XCMSFeatTblEqual)))
-        ret <- updateXS(ret)
-    return(ret)
-})
-
-setReplaceMethod("[[", c("featuresXCMS", "ANY", "missing"), function(x, i, j, value)
-{
-    ret <- callNextMethod()
-    if (!XCMSFeatTblEqual(x[[i]], value))
-        ret <- updateXS(ret)
-    return(ret)
-})
-
-setReplaceMethod("$", "featuresXCMS", function(x, name, value)
-{
-    ret <- callNextMethod()
-    if (!XCMSFeatTblEqual(`$`(ret, name), value))
-        ret <- updateXS(ret)
-    return(ret)
-})
 
 #' @rdname features-class
 #' @export

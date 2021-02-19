@@ -83,6 +83,7 @@
     - ggplot: remove? Otherwise fix plotSpectrum() for title and possibly others
     - formulas/compounds: update set column when subsetting on sets?
     - makeSet(fGroups): default adducts to NULL?
+    - fix MapAligner exception with test-components
 - merging setObjects
     - check if more has to be cached and may need status messages
     - compound set consensus: scoreRanges should be re-determined from annotation results?
@@ -232,6 +233,7 @@
     - finish new minMSMSPeaks filter (apply always after averaging?)
     - log2fc: median also possible?
     - more logic reactions?
+    - setwd for BT (if still needed) --> do in prepareHandler
 - NEWS
     - as.data.table(fGroups): normalization, FC, averageFunc
 
@@ -267,6 +269,7 @@
     - print feature counts in show(fGroups) and filter()
     - delete for features and fGroups
         - XCMS: also update groups data?
+        - remove [ for fGroupsScreening
 - NEWS
     - topMostByRGroup/EICTopMostByRGroup
     - as.data.table: qualities argument (and potentially faster now with features=T?)

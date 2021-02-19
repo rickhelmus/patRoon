@@ -72,14 +72,14 @@ setMethod("adducts<-", "featureGroupsSet", function(obj, value, set, reGroup = T
     return(obj)
 })
 
-setMethod("delete", "featureGroupsSet", function(obj, ...)
+setMethod("delete", "featureGroupsSet", function(obj, i = NULL, j = NULL, ...)
 {
     # HACK: subset annotations here as format with sets is different
     ann <- annotations(obj)
     if (nrow(ann) > 0)
         obj@annotations <- data.table() # disable subsetting in parent method
     
-    obj <- callNextMethod()
+    obj <- callNextMethod(obj, i, j, ...)
     
     if (nrow(ann) > 0)
         obj@annotations <- ann[set %in% sets(obj) & group %in% names(obj)]
@@ -107,13 +107,8 @@ setMethod("featureTable", "featureGroupsSet", function(obj) featureTable(obj@fea
 setMethod("[", c("featureGroupsSet", "ANY", "ANY", "missing"), function(x, i, j, ..., rGroups, sets = NULL, drop = TRUE)
 {
     assertSets(x, sets, TRUE)
-    
     if (!is.null(sets))
-    {
         i <- mergeAnaSubsetArgWithSets(i, sets, analysisInfo(x))
-        if (nrow(x@annotations) > 0)
-            x@annotations <- x@annotations[set %in% sets]
-    }
     
     return(callNextMethod(x, i, j, ..., rGroups = rGroups))
 })

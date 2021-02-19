@@ -160,6 +160,6 @@ setMethod("generateComponentsCliqueMS", "featureGroups", function(fGroups, ioniz
 #' @export
 setMethod("generateComponentsCliqueMS", "featureGroupsSet", function(fGroups, ...)
 {
-    generateComponentsSet(fGroups, generateComponentsCliqueMS, ...)
+    generateComponentsSet(fGroups, generateComponentsCliqueMS, setIonization = TRUE, ...)
 })
 

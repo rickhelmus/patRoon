@@ -112,6 +112,7 @@ setMethod("initialize", "featureGroups", function(.Object, ...)
             feat[inds[wh], group := gNames[wh]][]
             return(feat)
         })
+
         # remove unassigned features (eg in case the grouping algorithm already did some cleanup)
         oldfn <- length(.Object@features)
         .Object@features <- delete(getFeatures(.Object), j = function(ft, ...) is.na(ft$group))
@@ -336,7 +337,7 @@ setMethod("delete", "featureGroups", function(obj, i = NULL, j = NULL, ...)
     # i = vector; j = vector: remove the same features from analyses i in groups j
     # i = NULL/vector; j = function/data.table: remove specific features from each group (all analyses if i=NULL)
 
-    if (length(i) == 0 || length(j) == 0 || length(obj) == 0)
+    if ((!iNULL && length(i) == 0) || (!jNULL && length(j) == 0))
         return(obj) # nothing to remove...
     
     ftind <- groupFeatIndex(obj)

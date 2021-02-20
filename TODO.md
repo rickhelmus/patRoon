@@ -182,8 +182,8 @@
 - tests
     - handle/test empty objects
     - test DA algorithms
-    - OpenMS adducts?
     - fGroups/components: disable comparison/consensus?
+    - MSPeakLists and others?: also test object that is fully empty (now still has analyses)
     
     
 ## TPs

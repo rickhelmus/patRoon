@@ -163,20 +163,20 @@ setMethod("filter", "features", function(obj, absMinIntensity = NULL, relMinInte
             if (!is.null(relMinIntensity))
             {
                 maxInt <- max(ft$intensity)
-                ft[keep = TRUE, keep := relIntPred(intensity, maxInt)]
+                ft[keep == TRUE, keep := relIntPred(intensity, maxInt)]
             }
             
             if (!is.null(retentionRange))
-                ft[keep = TRUE, keep := rangePred(ret, retentionRange)]
+                ft[keep == TRUE, keep := rangePred(ret, retentionRange)]
             
             if (!is.null(mzRange))
-                ft[keep = TRUE, keep := rangePred(mz, mzRange)]
+                ft[keep == TRUE, keep := rangePred(mz, mzRange)]
             
             if (!is.null(mzDefectRange))
-                ft[keep = TRUE, keep := rangePred(mz - floor(mz), mzDefectRange)]
+                ft[keep == TRUE, keep := rangePred(mz - floor(mz), mzDefectRange)]
             
             if (!is.null(chromWidthRange))
-                ft[keep = TRUE, keep := rangePred(retmax - retmin, chromWidthRange)]
+                ft[keep == TRUE, keep := rangePred(retmax - retmin, chromWidthRange)]
             
             return(!ft$keep)
         })

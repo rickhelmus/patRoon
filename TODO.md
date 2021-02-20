@@ -84,6 +84,8 @@
     - formulas/compounds: update set column when subsetting on sets?
     - makeSet(fGroups): default adducts to NULL?
     - fix MapAligner exception with test-components
+    - load OpenMS intensities in parallel
+        - either with futures or with MP and cache intensities afterwards
 - merging setObjects
     - check if more has to be cached and may need status messages
     - compound set consensus: scoreRanges should be re-determined from annotation results?
@@ -236,6 +238,8 @@
     - setwd for BT (if still needed) --> do in prepareHandler
 - NEWS
     - as.data.table(fGroups): normalization, FC, averageFunc
+- tests
+    - FC, plotVolcano
 
 
 ## features

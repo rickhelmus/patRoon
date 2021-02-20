@@ -317,6 +317,7 @@ setMethod("delete", "featureGroups", function(obj, i = NULL, j = NULL, ...)
 {
     anas <- analyses(obj)
     gNames <- names(obj)
+    iNULL <- is.null(i); jNULL <- is.null(j)
     
     ac <- checkmate::makeAssertCollection()
     i <- assertDeleteArgAndToChr(i, anas, add = ac)
@@ -333,7 +334,7 @@ setMethod("delete", "featureGroups", function(obj, i = NULL, j = NULL, ...)
     # i = vector; j = NULL: subset analyses
     # i = NULL; j = vector: subset groups
     # i = vector; j = vector: remove the same features from analyses i in groups j
-    # i = NULL/vector; j = function: use supplied function to remove specific features from each group
+    # i = NULL/vector; j = function/data.table: remove specific features from each group (all analyses if i=NULL)
 
     if (length(i) == 0 || length(j) == 0 || length(obj) == 0)
         return(obj) # nothing to remove...
@@ -341,8 +342,8 @@ setMethod("delete", "featureGroups", function(obj, i = NULL, j = NULL, ...)
     ftind <- groupFeatIndex(obj)
     gTable <- groupTable(obj)
     jByIndex <- !is.function(j) && !is.data.table(j)
-    isAnaSubSet <- jByIndex && setequal(j, gNames)
-    isGrpSubSet <- jByIndex && setequal(i, anas)
+    isAnaSubSet <- jNULL
+    isGrpSubSet <- jByIndex && iNULL
     
     # remove features first
     if (isAnaSubSet)
@@ -382,67 +383,57 @@ setMethod("delete", "featureGroups", function(obj, i = NULL, j = NULL, ...)
         })
     }
     
-    if (length(getFeatures(obj)) == 0)
+    # remove analyses
+    removedAnas <- setdiff(anas, analyses(getFeatures(obj)))
+    if (length(removedAnas) > 0)
     {
-        # all features were removed, just clear out slots
-        obj@groups <- obj@ftindex <- obj@groupQualities <- obj@groupScores <- data.table()
-        obj@groupInfo <- obj@groupInfo[FALSE, ]
-        obj@analysisInfo <- obj@analysisInfo[FALSE, ]
+        ainds <- chmatch(removedAnas, anas)
+        if (length(obj) > 0)
+        {
+            obj@groups <- obj@groups[-ainds]
+            obj@ftindex <- obj@ftindex[-ainds]
+        }
+        obj@analysisInfo <- obj@analysisInfo[-ainds, , drop = FALSE]
     }
+    
+    # remove deleted and empty groups
+    removedGroups <- character()
+    if (isGrpSubSet)
+        removedGroups <- j
     else
+        removedGroups <- setdiff(gNames, unique(unlist(lapply(featureTable(obj), "[[", "group"))))
+    if (length(removedGroups) > 0)
     {
-        # remove analyses
-        removedAnas <- setdiff(anas, analyses(getFeatures(obj)))
-        if (length(removedAnas) > 0)
+        ginds <- chmatch(removedGroups, gNames)
+        if (length(obj) > 0)
         {
-            ainds <- chmatch(removedAnas, anas)
-            if (length(obj) > 0)
-            {
-                obj@groups <- obj@groups[-ainds]
-                obj@ftindex <- obj@ftindex[-ainds]
-            }
-            obj@analysisInfo <- obj@analysisInfo[-ainds, , drop = FALSE]
+            obj@groups <- obj@groups[, -ginds, with = FALSE]
+            obj@ftindex <- obj@ftindex[, -ginds, with = FALSE]
         }
+        obj@groupInfo <- obj@groupInfo[-ginds, ]
+        if (hasFGroupScores(obj))
+        {
+            obj@groupQualities <- setkey(obj@groupQualities[names(obj@groups)], "group")
+            obj@groupScores <- setkey(obj@groupScores[names(obj@groups)], "group")
+        }
+    }
+    
+    if (!isAnaSubSet)
+    {
+        # UNDONE: can we skip updating things based on i/j?
         
-        # remove deleted and empty groups
-        removedGroups <- character()
-        if (isGrpSubSet)
-            removedGroups <- j
-        else
-            removedGroups <- setdiff(gNames, unique(unlist(lapply(featureTable(obj), "[[", "group"))))
-        if (length(removedGroups) > 0)
-        {
-            ginds <- chmatch(removedGroups, gNames)
-            if (length(obj) > 0)
-            {
-                obj@groups <- obj@groups[, -ginds, with = FALSE]
-                obj@ftindex <- obj@ftindex[, -ginds, with = FALSE]
-            }
-            obj@groupInfo <- obj@groupInfo[-ginds, ]
-            if (hasFGroupScores(obj))
-            {
-                obj@groupQualities <- setkey(obj@groupQualities[names(obj@groups)], "group")
-                obj@groupScores <- setkey(obj@groupScores[names(obj@groups)], "group")
-            }
-        }
+        # re-generate feat index table by matching group names
+        obj <- reGenerateFTIndex(obj)
         
-        if (!isAnaSubSet)
-        {
-            # UNDONE: can we skip updating things based on i/j?
-            
-            # re-generate feat index table by matching group names
-            obj <- reGenerateFTIndex(obj)
-            
-            # update group intensities: zero missing features
-            ftind <- groupFeatIndex(obj) # update var
-            gNames <- names(obj) # update var
-            # NOTE: if j is a function it's assumed that all groups are affected
-            affectedGrps <- if (jByIndex) intersect(j, gNames) else gNames
-            obj@groups <- copy(obj@groups)
-            # NOTE: assignment with by seems to be the fastest, as it allows some DT optimizations apparently...
-            obj@groups[, (affectedGrps) := lapply(.SD, function(x) x), by = rep(1, nrow(obj@groups)),
-                       .SDcols = affectedGrps]
-        }
+        # update group intensities: zero missing features
+        ftind <- groupFeatIndex(obj) # update var
+        gNames <- names(obj) # update var
+        # NOTE: if j is a function it's assumed that all groups are affected
+        affectedGrps <- if (jByIndex) intersect(j, gNames) else gNames
+        obj@groups <- copy(obj@groups)
+        # NOTE: assignment with by seems to be the fastest, as it allows some DT optimizations apparently...
+        obj@groups[, (affectedGrps) := Map(.SD, affectedGrps, f = function(x, g) fifelse(ftind[[g]] == 0, 0, x)),
+                   by = rep(1, nrow(obj@groups)), .SDcols = affectedGrps]
     }
     
     return(obj)
@@ -602,7 +593,7 @@ setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas =
         stop("Cannot add regression data for averaged features.")
     if (features && average && !is.null(normFunc))
         stop("Cannot normalize data for averaged features.")
-    if (features && !is.null(FC))
+    if (features && !is.null(FCParams))
         stop("Cannot calculate fold-changes with features=TRUE")
     
     anaInfo <- analysisInfo(x)

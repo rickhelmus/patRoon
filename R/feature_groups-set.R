@@ -337,6 +337,7 @@ setMethod("groupFeatures", "featuresSet", function(feat, algorithm, ..., verbose
     otherArgs <- list(...)
     
     fGroups <- do.call(callNextMethod, c(list(feat = feat, algorithm = algorithm, verbose = verbose), otherArgs))
+    feat <- getFeatures(fGroups) # may have been changed (eg in initialize())
     
     ret <- featureGroupsSet(groupAlgo = algorithm, groupArgs = otherArgs, groupVerbose = verbose,
                             groups = groupTable(fGroups), groupInfo = groupInfo(fGroups),

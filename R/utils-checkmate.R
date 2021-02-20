@@ -302,7 +302,14 @@ assertDeleteArg <- checkmate::makeAssertionFunction(checkDeleteArg)
 
 assertDeleteArgAndToChr <- function(x, choices, .var.name = checkmate::vname(x), add = NULL)
 {
+    if (!is.null(add))
+        mc <- length(add$getMessages())
+    
     assertDeleteArg(x, .var.name = .var.name, add = add)
+    
+    if (!is.null(add) && length(add$getMessages()) != mc)
+        return(x) # assert failed
+
     if (is.null(x))
         x <- choices
     else
@@ -311,6 +318,7 @@ assertDeleteArgAndToChr <- function(x, choices, .var.name = checkmate::vname(x),
             x <- choices[x]
         x <- intersect(x, choices)
     }
+    
     return(x)
 }
 

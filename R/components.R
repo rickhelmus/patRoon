@@ -170,6 +170,67 @@ setMethod("$", "components", function(x, name)
     eval(substitute(x@components$NAME_ARG, list(NAME_ARG = name)))
 })
 
+#' @describeIn components Deletes (parts of) components
+#' @export
+setMethod("delete", "components", function(obj, i = NULL, j = NULL, ...)
+{
+    gNames <- groupNames(obj)
+    
+    ac <- checkmate::makeAssertCollection()
+    i <- assertDeleteArgAndToChr(i, names(obj), add = ac)
+    checkmate::assert(
+        checkmate::checkFunction(j, null.ok = TRUE),
+        checkmate::checkIntegerish(j, any.missing = FALSE, null.ok = TRUE),
+        checkmate::checkSubset(j, gNames, empty.ok = TRUE),
+        .var.name = "j"
+    )
+    checkmate::reportAssertions(ac)
+    
+    if (length(i) > 0 && (is.null(j) || length(j) > 0))
+    {
+        # i = NULL; j = vector: remove from all components
+        # i = vector; j = NULL: remove specified components
+        # j = function: remove specific feature groups from given components (or all components if i=NULL)
+        
+        if (!is.function(j))
+        {
+            if (is.null(j))
+                obj@components <- obj@components[setdiff(names(obj), i)]
+            else
+            {
+                obj@components[i] <- lapply(obj@components[i], function(ct)
+                {
+                    if (is.character(j))
+                        return(ct[!group %chin% j])
+                    inds <- j[j <= nrow(ct)]
+                    return(if (length(inds) > 0) ct[-inds] else ct)
+                })
+            }
+        }
+        else
+        {
+            obj@components[i] <- Map(obj@components[i], i, f = function(ct, cmp)
+            {
+                rm <- j(ct, cmp, ...)
+                if (is.logical(rm))
+                    return(ct[!rm])
+                else if (is.character(rm))
+                    return(ct[!group %chin% rm])
+                return(ct[setdiff(seq_len(nrow(ct)), rm)])
+            })
+        }
+        
+        obj@components <- pruneList(obj@components, checkZeroRows = TRUE) # remove empty components
+        # update infos
+        obj@componentInfo <- obj@componentInfo[name %in% names(obj@components)]
+        
+        if (!is.null(j))
+            obj@componentInfo[, size := sapply(obj@components, nrow)][] # update
+    }
+    
+    return(componentsReduced(components = obj@components, componentInfo = obj@componentInfo))
+})
+
 #' @describeIn components Returns all component data in a table.
 #' @export
 setMethod("as.data.table", "components", function(x)

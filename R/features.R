@@ -226,7 +226,8 @@ setMethod("delete", "features", function(obj, i = NULL, j = NULL, ...)
     i <- assertDeleteArgAndToChr(i, analyses(obj), add = ac)
     checkmate::assert(
         checkmate::checkIntegerish(j, any.missing = FALSE, null.ok = TRUE),
-        checkmate::checkFunction(j, null.ok = TRUE)
+        checkmate::checkFunction(j, null.ok = TRUE),
+        .var.name = "j"
     )
     checkmate::reportAssertions(ac)
 
@@ -243,8 +244,6 @@ setMethod("delete", "features", function(obj, i = NULL, j = NULL, ...)
     {
         if (is.null(j))
             obj@features <- obj@features[setdiff(analyses(obj), i)]
-        else if (length(i) == 0 || length(j) == 0)
-            return(obj) # nothing to remove...
         else
         {
             obj@features[i] <- lapply(obj@features[i], function(ft)

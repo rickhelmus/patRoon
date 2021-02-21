@@ -173,8 +173,15 @@ setMethod("[", c("featureGroupsScreening", "ANY", "ANY", "missing"), function(x,
     if (!is.null(suspects))
         x <- x[, x@screenInfo[name %in% suspects]$group]
     
-    x@screenInfo <- x@screenInfo[group %in% names(x)]
     return(x)
+})
+
+#' @export
+setMethod("delete", "featureGroupsScreening", function(obj, i = NULL, j = NULL, ...)
+{
+    obj <- callNextMethod()
+    obj@screenInfo <- obj@screenInfo[group %in% names(obj)]
+    return(obj)
 })
 
 #' @describeIn featureGroupsScreening Obtain a summary table (a

@@ -273,7 +273,6 @@
     - print feature counts in show(fGroups) and filter()
     - delete for features and fGroups
         - XCMS: also update groups data?
-        - remove [ for fGroupsScreening
 - NEWS
     - topMostByRGroup/EICTopMostByRGroup
     - as.data.table: qualities argument (and potentially faster now with features=T?)
@@ -290,6 +289,7 @@
     - new multiple blank filtering
     - syncing of XCMS/KPIC2 objects
     - delete()
+    - check if featindex and groups slots are in sync with features
 - docs
     - clarify reportCSV() now only reports remaining features?
     - topMostByRGroup: handbook?

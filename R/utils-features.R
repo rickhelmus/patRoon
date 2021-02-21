@@ -67,7 +67,7 @@ doFGroupsFilter <- function(fGroups, what, hashParam, func, cacheCateg = what, v
     if (verbose)
     {
         printf("Applying %s filter... ", what)
-        oldn <- ncol(fGroups@groups)
+        oldFCount <- length(getFeatures(fGroups)); oldGCount <- length(fGroups)
     }
     
     cacheName <- sprintf("filterFGroups_%s", cacheCateg)
@@ -82,9 +82,12 @@ doFGroupsFilter <- function(fGroups, what, hashParam, func, cacheCateg = what, v
     
     if (verbose)
     {
-        newn <- ncol(ret@groups)
-        printf("Done! Filtered %d (%.2f%%) groups. Remaining: %d.\n", oldn - newn,
-               if (oldn > 0) (1-(newn/oldn))*100 else 0, newn)
+        newFCount <- length(getFeatures(ret)); newGCount <- length(ret)
+        newn <- length(ret)
+        printf("Done! Filtered %d (%.2f%%) features and %d (%.2f%%) feature groups. Remaining: %d features in %d groups.\n",
+               oldFCount - newFCount, if (oldFCount > 0) (1 - (newFCount / oldFCount)) * 100,
+               oldGCount - newGCount, if (oldGCount > 0) (1 - (newGCount / oldGCount)) * 100,
+               newFCount, newGCount)
     }
     
     return(ret)

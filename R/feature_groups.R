@@ -161,8 +161,9 @@ setMethod("show", "featureGroups", function(object)
 {
     callNextMethod(object)
     anaInfo <- analysisInfo(object)
-    printf("Feature groups: %s (%d total)\n", getStrListWithMax(names(object), 6, ", "),
-           ncol(groupTable(object)))
+    fCount <- length(getFeatures(object)); gCount <- length(object)
+    printf("Feature groups: %s (%d total)\n", getStrListWithMax(names(object), 6, ", "), gCount)
+    printf("Features: %d (%.1f per group)\n", fCount, if (gCount > 0) fCount / gCount)
     showAnaInfo(analysisInfo(object))
 })
 

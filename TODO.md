@@ -270,7 +270,6 @@
     - remove featuresOpenMS method for getXCMSSet(), update docs
     - groupFeatures(algorithm="sirius")
     - don't key quality/score tables?
-    - print feature counts in show(fGroups) and filter()
     - delete for features and fGroups
         - XCMS: also update groups data?
 - NEWS
@@ -283,6 +282,7 @@
     - progressr
     - don't subtract blanks from each other
     - syncing XCMS objects
+    - print feature counts in show(fGroups) and filter()
 - tests
     - topMostByRGroup
     - xcms3 comparison

@@ -75,7 +75,6 @@ doFGroupsFilter <- function(fGroups, what, hashParam, func, cacheCateg = what, v
     ret <- loadCacheData(cacheName, hash)
     if (is.null(ret))
     {
-        fGroups@groups <- copy(fGroups@groups)
         ret <- if (length(fGroups) > 0) func(fGroups) else fGroups
         saveCacheData(cacheName, ret, hash)
     }

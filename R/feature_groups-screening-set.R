@@ -107,7 +107,6 @@ syncScreeningSetObjects <- function(obj)
     # BUG? can't call "[" directly here to subset??
     # obj@setObjects <- lapply(obj@setObjects, "[", i = analyses(obj), j = groupNames(obj))
     obj@setObjects <- lapply(obj@setObjects, function(x) x[analyses(obj), groupNames(obj)])
-    obj@setObjects <- pruneList(obj@setObjects, checkEmptyElements = TRUE)
     obj@screenInfo <- mergeScreeningSetInfos(obj@setObjects, obj@setThreshold)
     return(obj)
 }

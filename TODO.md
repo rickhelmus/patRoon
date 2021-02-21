@@ -84,8 +84,6 @@
     - formulas/compounds: update set column when subsetting on sets?
     - makeSet(fGroups): default adducts to NULL?
     - fix MapAligner exception with test-components
-    - load OpenMS intensities in parallel
-        - either with futures or with MP and cache intensities afterwards
 - merging setObjects
     - check if more has to be cached and may need status messages
     - compound set consensus: scoreRanges should be re-determined from annotation results?
@@ -258,6 +256,8 @@
 - checkFeatures()
     - filter negate: don't remove kept fGroups if features were changed?
     - update filter for delete()
+    - yml file format
+        - include feature properties to allow file import with different group names?
 - misc
     - topMostByRGroup: make default? or only for reporting?
     - quality/score filters
@@ -269,9 +269,13 @@
     - rename exportedData, update docs (also handbook)
     - remove featuresOpenMS method for getXCMSSet(), update docs
     - groupFeatures(algorithm="sirius")
+        - need to rename first argument of methods to something more generic (now feat)
+        - or different function name? Also needed for future CSV/DF import
     - don't key quality/score tables?
     - delete for features and fGroups
         - XCMS: also update groups data?
+    - load OpenMS intensities in parallel
+        - either with futures or with MP and cache intensities afterwards
 - NEWS
     - topMostByRGroup/EICTopMostByRGroup
     - as.data.table: qualities argument (and potentially faster now with features=T?)

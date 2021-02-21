@@ -127,17 +127,23 @@ setMethod("[", c("featureGroupsScreeningSet", "ANY", "ANY", "missing"), function
     checkmate::assertCharacter(suspects, null.ok = TRUE)
     
     x <- callNextMethod(x, i, j, ..., rGroups = rGroups, sets = sets, drop = drop)
-    x <- syncScreeningSetObjects(x)
     
     if (!is.null(suspects))
     {
         x@setObjects <- lapply(x@setObjects, "[", suspects = suspects)
         # --> groups may have been removed
-        x <- x[, unique(unlist(sapply(x@setObjects, groupNames)))]
-        x <- syncScreeningSetObjects(x)
+        x <- x[, unique(unlist(lapply(x@setObjects, groupNames)))]
     }    
     
     return(x)
+})
+
+#' @export
+setMethod("delete", "featureGroupsScreeningSet", function(obj, i = NULL, j = NULL, ...)
+{
+    obj <- callNextMethod()
+    obj <- syncScreeningSetObjects(obj)
+    return(obj)
 })
 
 setMethod("as.data.table", "featureGroupsScreeningSet", function(x, ..., collapseSuspects = ",",

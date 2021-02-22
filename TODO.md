@@ -84,10 +84,12 @@
     - formulas/compounds: update set column when subsetting on sets?
     - makeSet(fGroups): default adducts to NULL?
     - fix MapAligner exception with test-components
+    - delete(, sets)?
 - merging setObjects
     - check if more has to be cached and may need status messages
     - compound set consensus: scoreRanges should be re-determined from annotation results?
         - ??
+    -componentsSetReduced necessary? eg for NT components with plotGraph
 - suspect screening
     - implement TASQ?
     - support recursive screening? or throw error otherwise

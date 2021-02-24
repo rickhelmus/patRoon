@@ -48,12 +48,13 @@ executeMultiProcessFuture <- function(commandQueue, finishHandler, timeoutHandle
     if (is.null(procTimeout))
         procTimeout <- Inf
     
-    results <- future.apply::future_lapply(commandQueue, patRoon:::executeFutureCmd,
-                                           finishHandler = finishHandler, timeoutHandler = timeoutHandler,
-                                           errorHandler = errorHandler, prepareHandler = prepareHandler,
-                                           procTimeout = procTimeout, logSubDir = logSubDir,
-                                           future.scheduling = getOption("patRoon.MP.futureSched",  1.0))
-
+    results <- withProg(length(commandQueue),
+                        future.apply::future_lapply(commandQueue, patRoon:::executeFutureCmd,
+                                                    finishHandler = finishHandler, timeoutHandler = timeoutHandler,
+                                                    errorHandler = errorHandler, prepareHandler = prepareHandler,
+                                                    procTimeout = procTimeout, logSubDir = logSubDir,
+                                                    future.scheduling = getOption("patRoon.MP.futureSched",  1.0)))
+                        
     logPath <- getOption("patRoon.MP.logPath", FALSE)
     if (!is.null(logSubDir) && !isFALSE(logPath))
     {

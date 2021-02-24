@@ -198,9 +198,6 @@
     - convertToMFDB: no need to calculate InChIs etc?
     - filter on stability/persistence/toxicity of TP?
     - Include BT in installation script and verifyDependencies()
-    - compound similarities
-        - cache
-        - parallel?
     - do we still need to check for non-calculated formulae?
 - metabolic logic
     - more logic reactions?

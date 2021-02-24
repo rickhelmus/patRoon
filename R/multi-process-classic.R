@@ -53,10 +53,13 @@ makeCommandList <- function(commandQueue, cmdInds, sucDir)
     return(ret)
 }
 
-initCommand <- function(commandQueue, cmdInds, sucDir, printOutput, printError)
+initCommand <- function(commandQueue, cmdInds, workDir, sucDir, printOutput, printError)
 {
     procArgs <- makeCommandList(commandQueue, cmdInds, sucDir)
     procArgs <- c(procArgs, list(cleanup_tree = TRUE, supervise = TRUE))
+    
+    if (!is.null(workDir))
+        procArgs <- c(procArgs, list(wd = workDir))
     
     if (printOutput)
         procArgs[["stdout"]] <- "|"
@@ -173,6 +176,10 @@ executeMultiProcessClassic <- function(commandQueue, finishHandler,
     
     if (!is.null(prepareHandler))
         commandQueue <- lapply(commandQueue, prepareHandler)
+    
+    workDir <- unique(unlist(lapply(commandQueue, "[[", "workDir")))
+    if (length(workDir) > 1)
+        stop("Different work directories not yet supported")
     
     totCmdCount <- length(commandQueue)
     
@@ -316,7 +323,7 @@ executeMultiProcessClassic <- function(commandQueue, finishHandler,
                     }
                     
                     cs <- seq(nextCommand, nextCommand + (ncmd - 1))
-                    runningProcInfo[[pi]] <- initCommand(commandQueue[cs], cs, sucDir, printOutput, printError)
+                    runningProcInfo[[pi]] <- initCommand(commandQueue[cs], cs, workDir, sucDir, printOutput, printError)
                     runningProcs[[pi]] <- do.call(processx::process$new, runningProcInfo[[pi]]$procArgs)
                     
                     # printf("started %d-%d on slot %d\n", nextCommand, runningProcInfo[[pi]]$cmdIndRange[2], pi)

@@ -6,7 +6,8 @@ executeFutureCmd <- function(cmd, finishHandler, timeoutHandler, errorHandler,
     timeoutRetries <- errorRetries <- 0
     while (TRUE)
     {
-        stat <- processx::run(cmd$command, cmd$args, error_on_status = FALSE,
+        # NOTE: cmd$workDir might be NULL
+        stat <- processx::run(cmd$command, cmd$args, wd = cmd[["workDir"]], error_on_status = FALSE,
                               timeout = procTimeout, cleanup_tree = TRUE)
         stopMsg <- NULL
         
@@ -42,8 +43,7 @@ executeFutureCmd <- function(cmd, finishHandler, timeoutHandler, errorHandler,
 }
 
 executeMultiProcessFuture <- function(commandQueue, finishHandler, timeoutHandler, errorHandler,
-                                      prepareHandler, cacheName, procTimeout, printOutput, printError, logSubDir,
-                                      ...)
+                                      prepareHandler, cacheName, procTimeout, printOutput, printError, logSubDir, ...)
 {
     if (is.null(procTimeout))
         procTimeout <- Inf

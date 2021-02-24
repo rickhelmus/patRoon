@@ -224,7 +224,7 @@ setMethod("screenSuspects", "featureGroupsSet", function(fGroups, suspects, rtWi
     
     if (checkmate::testDataFrame(suspects))
     {
-        assertSuspectList(suspects, TRUE, skipInvalid)
+        assertSuspectList(suspects, FALSE, skipInvalid)
         suspects <- sapply(sets(fGroups), function(s) suspects, simplify = FALSE) # same for all set
     }
     else

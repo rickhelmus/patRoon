@@ -190,18 +190,15 @@ setMethod("convertToMFDB", "TPPredictionsBT", function(pred, out, includePrec)
 
     if (includePrec)
     {
+        # NOTE: we can assume that InChIs, formulas etc are available as input suspect list must have SMILES
+        
         cat("Adding and calculating precursor information... ")
 
         precs <- copy(suspects(pred))
-        setnames(precs, "name", "Identifier")
+        setnames(precs,
+                 c("name", "formula", "neutralMass"),
+                 c("Identifier", "MolecularFormula", "MonoisotopicMass"))
         precs[, CompoundName := Identifier]
-
-        mols <- getMoleculesFromSMILES(precs$SMILES, doTyping = TRUE, doIsotopes = TRUE)
-        precs[, MolecularFormula := sapply(mols, function(m) rcdk::get.mol2formula(m)@string)]
-        precs[, MonoisotopicMass := sapply(mols, rcdk::get.exact.mass)]
-
-        precs[, InChI := babelConvert(SMILES, "smi", "inchi")]
-        precs[, InChIKey := babelConvert(SMILES, "smi", "inchikey", )]
 
         predAll <- rbind(precs, predAll, fill = TRUE)
 

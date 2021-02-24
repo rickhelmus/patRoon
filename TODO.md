@@ -197,9 +197,7 @@
     - allow fGroupsScreening for input
     - convertToMFDB: no need to calculate InChIs etc?
     - filter on stability/persistence/toxicity of TP?
-    - setwd for BT (if still needed) --> do in prepareHandler
     - Include BT in installation script and verifyDependencies()
-    - update with new MP interface (eg caching)
     - compound similarities
         - cache
         - parallel?

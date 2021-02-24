@@ -2,9 +2,6 @@
 #' @include TP.R
 NULL
 
-# UNDONE: precursor --> parent?
-# UNDONE: finalize new patRoon path options for BT and obabel (docs, verifyDependencies())
-
 #' @export
 TPPredictionsBT <- setClass("TPPredictionsBT", contains = "TPPredictions")
 
@@ -12,65 +9,16 @@ setMethod("initialize", "TPPredictionsBT",
           function(.Object, ...) callNextMethod(.Object, algorithm = "biotransformer", ...))
 
 
-getBTBin <- function()
+getBaseBTCmd <- function(precursor, SMILES, type, steps, extraOpts, baseHash)
 {
-    ret <- path.expand(getOption("patRoon.path.BioTransformer", ""))
-    if (is.null(ret) || !nzchar(ret) || !file.exists(ret))
-        stop("Please set the 'biotransformer' option with a (correct) path to the BioTransformer JAR file. Example: options(patRoon.path.BioTransformer = \"C:/biotransformerjar/biotransformer-1-0-8.jar\")")
-
-    if (!nzchar(Sys.which("java")))
-        stop("Please make sure that java is installed and its location is correctly set in PATH.")
-
-    return(ret)
-}
-
-initBTCommand <- function(precursor, SMILES, type, steps, extraOpts, btBin, logFile)
-{
-    outFile <- tempfile("btresults", fileext = ".csv")
-
-    args <- c("-b", type,
-              "-k", "pred",
-              "-ismi", SMILES,
-              "-s", as.character(steps),
-              "-ocsv", outFile,
-              extraOpts)
-
-    return(list(command = "java", args = c("-jar", btBin, args), logFile = logFile, outFile = outFile, precursor = precursor, SMILES = SMILES))
-}
-
-processBTResults <- function(cmd)
-{
-    if (!file.exists(cmd$outFile))
-        return(data.table()) # no results
-
-    ret <- fread(cmd$outFile, colClasses = c("Precursor ID" = "character", Synonyms = "character",
-                                             "Molecular formula" = "character"))
-
-    # UNDONE: transform column names, more?
-
-    # Simplify/harmonize columns a bit
-    setnames(ret,
-             c("Molecular formula", "Major Isotope Mass"),
-             c("formula", "neutralMass"))
-
-    # No need for these...
-    # NOTE: cdk:Title seems the same as "Metabolite ID" column(?)
-    ret[, c("Synonyms", "PUBCHEM_CID", "cdk:Title") := NULL]
-
-    # BUG: BT sometimes doesn't fill in the formula. Calculate them manually
-    ret[!nzchar(formula), formula :=
-    {
-        SMI <- babelConvert(InChI, "inchi", "smi")
-        mols <- getMoleculesFromSMILES(SMI)
-        return(sapply(mols, function(m) rcdk::get.mol2formula(m)@string))
-    }]
-
-    # Assign some unique identifier
-    ret[, name := paste0(cmd$precursor, "-TP", seq_len(nrow(ret)))]
-
-    ret[, RTDir := ifelse(ALogP < `Precursor ALogP`, -1, 1)]
-
-    return(ret)
+    mainArgs <- c("-b", type,
+                  "-k", "pred",
+                  "-ismi", SMILES,
+                  "-s", as.character(steps),
+                  extraOpts)
+    
+    return(list(command = "java", args = mainArgs, logFile = paste0("biotr-", precursor, ".txt"), precursor = precursor,
+                SMILES = SMILES, hash = makeHash(SMILES, baseHash)))
 }
 
 collapseBTResults <- function(pred)
@@ -102,28 +50,75 @@ collapseBTResults <- function(pred)
     return(predAll)
 }
 
+BTMPFinishHandler <- function(cmd)
+{
+    if (!file.exists(cmd$outFile))
+        return(data.table()) # no results
+    
+    ret <- fread(cmd$outFile, colClasses = c("Precursor ID" = "character", Synonyms = "character",
+                                             "Molecular formula" = "character"))
+    
+    # UNDONE: transform column names, more?
+    
+    # Simplify/harmonize columns a bit
+    setnames(ret,
+             c("Molecular formula", "Major Isotope Mass"),
+             c("formula", "neutralMass"))
+    
+    # No need for these...
+    # NOTE: cdk:Title seems the same as "Metabolite ID" column(?)
+    ret[, c("Synonyms", "PUBCHEM_CID", "cdk:Title") := NULL]
+    
+    # BUG: BT sometimes doesn't fill in the formula. Calculate them manually
+    ret[!nzchar(formula), formula :=
+            {
+                SMI <- babelConvert(InChI, "inchi", "smi")
+                mols <- getMoleculesFromSMILES(SMI)
+                return(sapply(mols, function(m) rcdk::get.mol2formula(m)@string))
+            }]
+    
+    # Assign some unique identifier
+    ret[, name := paste0(cmd$precursor, "-TP", seq_len(nrow(ret)))]
+    
+    ret[, RTDir := ifelse(ALogP < `Precursor ALogP`, -1, 1)]
+    
+    return(ret)
+}
+
+BTMPPrepareHandler <- function(cmd)
+{
+    btBin <- path.expand(getOption("patRoon.path.BioTransformer", ""))
+    if (is.null(btBin) || !nzchar(btBin) || !file.exists(btBin))
+        stop("Please set the 'biotransformer' option with a (correct) path to the BioTransformer JAR file. Example: options(patRoon.path.BioTransformer = \"C:/biotransformerjar/biotransformer-2.0.3.jar\")")
+    
+    if (!nzchar(Sys.which("java")))
+        stop("Please make sure that java is installed and its location is correctly set in PATH.")
+    
+    outFile <- tempfile("btresults", fileext = ".csv")
+    
+    cmd$args <- c("-jar", btBin, cmd$args, "-ocsv", outFile)
+    cmd$outFile <- outFile
+    cmd$workDir <- dirname(btBin)
+    return(cmd)
+}
+
 #' @export
 predictTPsBioTransformer <- function(suspects = NULL, compounds = NULL, type = "env", steps = 2,
                                      extraOpts = NULL, skipInvalid = TRUE,
-                                     fpType = "extended", fpSimMethod = "tanimoto",
-                                     logPath = file.path("log", "biotransformer"),
-                                     maxProcAmount = getOption("patRoon.maxProcAmount"))
+                                     fpType = "extended", fpSimMethod = "tanimoto")
 {
-    # UNDONE: citations, also EnviPath
-    
     if (is.null(suspects) && is.null(compounds))
         stop("Specify at least either the suspects or compounds argument.")
     
     checkmate::assertFlag(skipInvalid)
 
     ac <- checkmate::makeAssertCollection()
-    assertSuspectList(suspects, adduct = NULL, skipInvalid = TRUE, checkAdduct = FALSE, add = ac)
+    assertSuspectList(suspects, needsAdduct = FALSE, skipInvalid = TRUE, add = ac)
     checkmate::assertClass(compounds, "compounds", null.ok = TRUE, add = ac)
     checkmate::assertChoice(type, c("ecbased", "cyp450", "phaseII", "hgut", "superbio", "allHuman", "env"), add = ac)
     checkmate::assertCount(steps, positive = TRUE, add = ac)
     checkmate::assertCharacter(extraOpts, null.ok = TRUE, add = ac)
     aapply(checkmate::assertString, . ~ fpType + fpSimMethod, min.chars = 1, fixed = list(add = ac))
-    assertMultiProcArgs(logPath, maxProcAmount, add = ac)
     checkmate::reportAssertions(ac)
 
     if (!is.null(suspects))
@@ -145,55 +140,21 @@ predictTPsBioTransformer <- function(suspects = NULL, compounds = NULL, type = "
         suspects <- rbind(suspects, compTab[, c("name", "SMILES"), with = FALSE])
     }
 
-    # UNDONE: move to suspect lists checks
-    if (any(!nzchar(suspects$name)))
-        stop("'name' column contains one or more empty values")
-
-    cacheDB <- openCacheDBScope()
     baseHash <- makeHash(type, steps, extraOpts)
     setHash <- makeHash(suspects, baseHash)
-    hashes <- sapply(suspects$SMILES, makeHash, baseHash)
-    cachedSet <- loadCacheSet("predictTPsBT", setHash, cacheDB)
-
-    btBin <- getBTBin()
-    btPath <- dirname(btBin) # BT has to be executed from its own directory
-
-    if (!is.null(logPath))
+    
+    cmdQueue <- Map(suspects$name, suspects$SMILES, f = function(n, sm)
     {
-        mkdirp(logPath)
-        logPath <- normalizePath(logPath) # need full path since we will temporarily change the working directory.
-    }
-
-    cachedResults <- sapply(hashes, function(hash)
-    {
-        ret <- NULL
-        if (!is.null(cachedSet))
-            ret <- cachedSet[[hash]]
-        if (is.null(ret))
-            ret <- loadCacheData("predictTPsBT", hash, cacheDB)
-        return(ret)
-    }, simplify = FALSE)
-    names(cachedResults) <- suspects$name
-    cachedResults <- pruneList(cachedResults)
-
-    doSuspects <- suspects[!name %in% names(cachedResults)]
-    cmdQueue <- mapply(doSuspects$name, doSuspects$SMILES, SIMPLIFY = FALSE, FUN = function(n, sm)
-    {
-        logf <- if (!is.null(logPath)) file.path(logPath, paste0("biotr-", n, ".txt")) else NULL
-        initBTCommand(n, sm, type = type, steps = steps, extraOpts = extraOpts, btBin = btBin, logFile = logf)
+        getBaseBTCmd(n, sm, type = type, steps = steps, extraOpts = extraOpts, baseHash)
     })
-    names(cmdQueue) <- doSuspects$name
 
     results <- list()
 
     if (length(cmdQueue) > 0)
     {
-        results <- executeMultiProcess(cmdQueue, function(cmd)
-        {
-            res <- processBTResults(cmd)
-            saveCacheData("predictTPsBT", res, hashes[[cmd$SMILES]], cacheDB)
-            return(res)
-        }, workDir = btPath, maxProcAmount = maxProcAmount)
+        results <- executeMultiProcess(cmdQueue, finishHandler = patRoon:::BTMPFinishHandler,
+                                       prepareHandler = patRoon:::BTMPPrepareHandler,
+                                       cacheName = "predictTPsBT", setHash = setHash, logSubDir = "biotransformer")
 
         cat("Calculating compound similarities... ")
         results <- lapply(results, function(res)
@@ -204,15 +165,6 @@ predictTPsBioTransformer <- function(suspects = NULL, compounds = NULL, type = "
             return(res)
         })
         cat("Done!\n")
-        
-        if (is.null(cachedSet))
-            saveCacheSet("predictTPsBT", hashes, setHash, cacheDB)
-    }
-
-    if (length(cachedResults) > 0)
-    {
-        results <- c(results, cachedResults)
-        results <- results[intersect(suspects$name, names(results))] # re-order
     }
 
     results <- pruneList(results, checkZeroRows = TRUE)

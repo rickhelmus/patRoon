@@ -210,8 +210,10 @@
 - log2fc
     - mention Bas
     - as.data.table() fGroupsScreening: can't combine normalizing and FC at the moment --> notify user
-    - as.data.table/plotVolcano: docs and assertions
-    - plotVolcano(): move legend outside graph
+    - plotVolcano()
+        - more plot parameters?
+        - move legend outside graph
+    - P values are calculated properly?
     - workflow: first do log2fc subsetting, then clustering
 - spectrumSimilarity
     - sets
@@ -235,6 +237,7 @@
         - citations, also EnviPath
         - compound similarities
     - minMSMSPeaks filter
+    - FCParams/plotVolcano
 - NEWS
     - as.data.table(fGroups): normalization, FC, averageFunc
     - minMSMSPeaks filter

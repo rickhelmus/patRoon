@@ -330,6 +330,25 @@ assertNormalizationMethod <- function(x, withNone = TRUE, .var.name = checkmate:
     checkmate::assertChoice(x, ch, .var.name = .var.name, add = add)
 }
 
+assertFCParams <- function(x, fGroups, null.ok = FALSE, .var.name = checkmate::vname(x), add = NULL)
+{
+    if (null.ok && is.null(x))
+        return(NULL)
+    
+    checkmate::assertList(x, names = "unique", .var.name = .var.name) # no add: should fail
+    
+    assertVal <- function(f, v, ...) f(x[[v]], ..., .var.name = paste0(.var.name, "$", v), add = add)
+    
+    assertVal(checkmate::assertCharacter, "rGroups", any.missing = FALSE, len = 2)
+    assertVal(checkmate::assertSubset, "rGroups", choices = replicateGroups(fGroups))
+    assertVal(checkmate::assertNumber, "thresholdFC", lower = 0, finite = TRUE)
+    assertVal(checkmate::assertNumber, "thresholdPV", lower = 0, finite = TRUE)
+    assertVal(checkmate::assertNumber, "zeroValue", lower = 0, finite = TRUE)
+    assertVal(checkmate::assertChoice, "zeroMethod", choices = c("add", "fixed", "omit"))
+    assertVal(checkmate::assertFunction, "PVTestFunc")
+    assertVal(checkmate::assertFunction, "PVAdjFunc")
+}
+
 assertAvgPListParams <- function(x, .var.name = checkmate::vname(x), add = NULL)
 {
     checkmate::assertList(x, names = "unique", .var.name = .var.name) # no add: should fail

@@ -582,6 +582,7 @@ setMethod("as.data.table", "featureGroups", function(x, average = FALSE, areas =
     checkmate::assertFlag(regression, add = ac)
     checkmate::assertFunction(averageFunc, add = ac)
     checkmate::assertFunction(normFunc, null.ok = TRUE, add = ac)
+    assertFCParams(FCParams, x, null.ok = TRUE, add = ac)
     checkmate::reportAssertions(ac)
 
     checkmate::assert(checkmate::checkFALSE(qualities),
@@ -1474,7 +1475,10 @@ setMethod("plotUpSet", "featureGroups", function(obj, which = NULL, nsets = leng
 #' @export
 setMethod("plotVolcano", "featureGroups", function(obj, FCParams, averageFunc = mean, col = NULL, pch = 19, ...)
 {
-    # UNDONE: docs, assertions, more plot parameters?
+    ac <- checkmate::makeAssertCollection()
+    assertFCParams(FCParams, x, null.ok = FALSE, add = ac)
+    checkmate::assertFunction(averageFunc, add = ac)
+    checkmate::reportAssertions(ac)
     
     ac <- checkmate::makeAssertCollection()
     checkmate::reportAssertions(ac)

@@ -187,11 +187,6 @@
     
     
 ## TPs
-- Suspects --> BT --> MF DB/suspect list (opt combine with precursors)
-- Make sure hash takes into account parent names
-- Update...
-    - suspect lists for TPs: use new assert/prepare functions
-        - remove mz column and warn about it?
 - componentsTP
     - allow input of new spectral similarity clustered components/predictions class
     - include precursor_formula in compInfo
@@ -202,6 +197,8 @@
     - allow fGroupsScreening for input
     - convertToMFDB: no need to calculate InChIs etc?
     - filter on stability/persistence/toxicity of TP?
+    - setwd for BT (if still needed) --> do in prepareHandler
+    - Include BT in installation script and verifyDependencies()
 - metabolic logic
     - more logic reactions?
     - make configurable?
@@ -209,33 +206,34 @@
     - componentsSpecClust --> works?
         - sets
     - fix if empty cTab for MSMS components
-- subsetting/componentization based on log2fc
+- new componentization method which links all parent fGroups with TP fGroups based on min spec similarity
+- log2fc
+    - mention Bas
     - as.data.table() fGroupsScreening: can't combine normalizing and FC at the moment --> notify user
-    - as.data.table/plotVolcano: docs and assertions; mention Bas
+    - as.data.table/plotVolcano: docs and assertions
     - plotVolcano(): move legend outside graph
     - workflow: first do log2fc subsetting, then clustering
-        - somehow ensure that parents always end up in clusters??
-- convertToSuspects(): fill in missing info (eg neutralMass)?
+    - median also possible?
 - spectrumSimilarity
     - sets
         - custom weights per set? specify methods/parameters for averaging?
         - missing values? somehow compare between spectra from sets? or just use merged?
-    - plotting? could extend plotSpec() by allowing selection of two spectra and using sets code for mirroring
+    - plotting? could extend plotSpectrum() by allowing selection of two spectra and using sets code for mirroring
     - update MSPeakLists method and/or export new functions?
     - remove OrgMassSpecR and proxy dependency
-    - show method for new components classes
     - use neutral_formula for annotated similarity calculation for formulas
         - still relevant?
-- Include BT in installation script and verifyDependencies()
 - Naming
     - More generic naming for predict etc to accommodate other sources for TPs
     - consistency for precursor/parent/suspect
     - consistency for spectrum/peaklist
 - misc
+    - Make sure hash takes into account parent names
     - finish new minMSMSPeaks filter (apply always after averaging?)
-    - log2fc: median also possible?
-    - more logic reactions?
-    - setwd for BT (if still needed) --> do in prepareHandler
+    - show method for new components classes
+    - suspect lists for TPs: use new assert/prepare functions
+        - remove mz column and warn about it?
+        - fill in missing info (eg neutralMass)?
 - NEWS
     - as.data.table(fGroups): normalization, FC, averageFunc
 - tests

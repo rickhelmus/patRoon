@@ -302,7 +302,7 @@ setMethod("generateComponentsTPs", "featureGroupsSet", function(fGroups, fGroups
     
     # UNDONE: more efficient method to get set specific fGroups?
     gNamesTPsSets <- sapply(sets(fGroupsTPs), function(s) names(fGroupsTPs[, sets = s]), simplify = FALSE)
-    ionizedMSPeaksLists <- sapply(sets(MSPeakLists), ionize, obj = MSPeakLists, simplify = FALSE)
+    unsetMSPeaksLists <- sapply(sets(MSPeakLists), unset, obj = MSPeakLists, simplify = FALSE)
     ret@components <- Map(ret@components, ret@componentInfo$precursor_group, f = function(cmp, precFG)
     {
         for (s in sets(fGroupsTPs))
@@ -313,15 +313,15 @@ setMethod("generateComponentsTPs", "featureGroupsSet", function(fGroups, fGroups
             # calculate per set spectrum similarities
             simColNames <- paste0(c("specSimilarity", "specSimilarityPrec", "specSimilarityBoth"), "-", s)
             # if (any(!is.na(cmp$specSimilarity))) browser()
-            precMSMS <- ionizedMSPeaksLists[[s]][[precFG]][["MSMS"]]
+            precMSMS <- unsetMSPeaksLists[[s]][[precFG]][["MSMS"]]
             if (!is.null(precMSMS))
             {
                 sims <- rbindlist(Map(cmp$group, cmp$mzDiff, f = function(g, mzd)
                 {
-                    genTPSpecSimilarities(precMSMS, ionizedMSPeaksLists[[s]][[g]][["MSMS"]], method = simMethod,
+                    genTPSpecSimilarities(precMSMS, unsetMSPeaksLists[[s]][[g]][["MSMS"]], method = simMethod,
                                           precDiff = -mzd, removePrecursor = removePrecursor,
                                           mzWeight = mzWeight, intWeight = intWeight, absMzDev = absMzDev,
-                                          relMinIntensity = relMinIntensity)
+                                          relMinIntensity = relMinIntensity, minPeaks = minSimMSMSPeaks)
                 }))
                 cmp <- cbind(cmp, setnames(sims, simColNames))
             }

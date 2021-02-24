@@ -108,8 +108,9 @@ setMethod("convertToSuspects", "TPPredictions", function(pred, includePrec)
     checkmate::reportAssertions(ac)
     
     predAll <- rbindlist(predictions(pred))
-    keepCols <- c("name", "mz", "SMILES", "InChI", "formula", "neutralMass")
+    keepCols <- c("name", "SMILES", "InChI", "InChIKey", "formula", "neutralMass")
     predAll <- predAll[, intersect(keepCols, names(predAll)), with = FALSE]
+    predAll <- prepareSuspectList(predAll, NULL, FALSE, FALSE)
     
     if (includePrec)
         predAll <- rbind(suspects(pred), predAll, fill = TRUE)

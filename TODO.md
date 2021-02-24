@@ -232,9 +232,6 @@
     - Make sure hash takes into account parent names
     - finish new minMSMSPeaks filter (apply always after averaging?)
     - show method for new components classes
-    - suspect lists for TPs: use new assert/prepare functions
-        - remove mz column and warn about it?
-        - fill in missing info (eg neutralMass)?
     - truncate MP logfiles like with suspects, eg for long suspect names with BT
 - document
     - predictTPsBioTransformer

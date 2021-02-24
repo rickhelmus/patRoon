@@ -199,13 +199,21 @@
     - filter on stability/persistence/toxicity of TP?
     - setwd for BT (if still needed) --> do in prepareHandler
     - Include BT in installation script and verifyDependencies()
+    - update with new MP interface (eg caching)
+    - compound similarities
+        - cache
+        - parallel?
+    - do we still need to check for non-calculated formulae?
 - metabolic logic
     - more logic reactions?
     - make configurable?
-- predictTPsMSMS()
+    - use adduct annotations if present
+- predictTPsComponents
     - componentsSpecClust --> works?
         - sets
     - fix if empty cTab for MSMS components
+    - doc that precursor should not occur in multiple components (is this relevant for users?)
+    - caching
 - new componentization method which links all parent fGroups with TP fGroups based on min spec similarity
 - log2fc
     - mention Bas
@@ -234,6 +242,13 @@
     - suspect lists for TPs: use new assert/prepare functions
         - remove mz column and warn about it?
         - fill in missing info (eg neutralMass)?
+    - truncate MP logfiles like with suspects, eg for long suspect names with BT
+- document
+    - predictTPsBioTransformer
+        - use identifier as fallback for naming when no compoundName is present
+        - citations, also EnviPath
+        - compound similarities
+
 - NEWS
     - as.data.table(fGroups): normalization, FC, averageFunc
 - tests

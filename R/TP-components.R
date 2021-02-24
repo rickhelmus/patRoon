@@ -27,10 +27,6 @@ setMethod("linkTPsToFGroups", "TPPredictionsComponents", function(pred, fGroups)
 #' @export
 setMethod("predictTPsComponents", "components", function(components, fGroupsPrecursors, fGroupsTPs)
 {
-    # UNDONE: mention this only works for components where a precursor
-    # occurs not more than once in a component
-    # UNDONE: cache
-    
     ac <- checkmate::makeAssertCollection()
     aapply(checkmate::assertClass, . ~ fGroupsPrecursors + fGroupsTPs, "featureGroups", fixed = list(add = ac))
     checkmate::reportAssertions(ac)

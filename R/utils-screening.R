@@ -82,12 +82,6 @@ prepareSuspectList <- function(suspects, adduct, skipInvalid, calcMZs = TRUE)
         suspects <- convertSuspDataIfNeeded(suspects, destFormat = "formula", destCol = "formula",
                                             fromFormats = c("smi", "inchi"), fromCols = c("SMILES", "InChI"))
         
-        if (!calcMZs || !is.null(suspects[["mz"]]) && !any(is.na(suspects[["mz"]])))
-        {
-            saveCacheData("screenSuspectsPrepList", suspects, hash)
-            return(suspects) # no further need for calculation of ion masses
-        }
-        
         # neutral masses given for all?
         if (!is.null(suspects[["neutralMass"]]) && !any(is.na(suspects[["neutralMass"]])))
             neutralMasses <- suspects[["neutralMass"]]
@@ -114,9 +108,10 @@ prepareSuspectList <- function(suspects, adduct, skipInvalid, calcMZs = TRUE)
             
             close(prog)
         }
-        
+
         # calculate ionic masses if possible (not possible if no adducts are given and fGroups are annotated)
-        if ((!is.null(adduct) || !is.null(suspects[["adduct"]])))
+        if (calcMZs && (is.null(suspects[["mz"]]) || !any(is.na(suspects[["mz"]]))) &&
+            (!is.null(adduct) || !is.null(suspects[["adduct"]])))
         {
             if (!is.null(adduct))
                 addMZs <- adductMZDelta(adduct)
@@ -139,19 +134,22 @@ prepareSuspectList <- function(suspects, adduct, skipInvalid, calcMZs = TRUE)
         saveCacheData("screenSuspectsPrepList", suspects, hash)
     }        
     
-    # check for any suspects without proper mass info
-    isNA <- is.na(suspects$neutralMass) & is.na(suspects$mz)
-    if (any(isNA))
+    if (!calcMZs)
     {
-        wrong <- paste0(sprintf("%s (line %d)", suspects$name[isNA], which(isNA)), collapse = "\n")
-        if (skipInvalid)
+        # check for any suspects without proper mass info
+        isNA <- is.na(suspects$neutralMass) & is.na(suspects$mz)
+        if (any(isNA))
         {
-            warning(paste("Ignored following suspects for which no mass could be calculated:",
-                          wrong))
-            suspects <- suspects[!isNA]
+            wrong <- paste0(sprintf("%s (line %d)", suspects$name[isNA], which(isNA)), collapse = "\n")
+            if (skipInvalid)
+            {
+                warning(paste("Ignored following suspects for which no mass could be calculated:",
+                              wrong))
+                suspects <- suspects[!isNA]
+            }
+            else
+                stop(paste("Could not calculate ion masses for the following suspects: "), wrong)
         }
-        else
-            stop(paste("Could not calculate ion masses for the following suspects: "), wrong)
     }
     
     return(suspects)

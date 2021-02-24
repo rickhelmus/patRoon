@@ -668,7 +668,7 @@ setMethod("screenSuspects", "featureGroups", function(fGroups, suspects, rtWindo
     isAnnotated <- nrow(annotations(fGroups)) > 0
     
     ac <- checkmate::makeAssertCollection()
-    assertSuspectList(suspects, !is.null(adduct) || isAnnotated, skipInvalid, add = ac)
+    assertSuspectList(suspects, is.null(adduct) && !isAnnotated, skipInvalid, add = ac)
     aapply(checkmate::assertNumber, . ~ rtWindow + mzWindow, lower = 0, finite = TRUE, fixed = list(add = ac))
     checkmate::assertFlag(onlyHits, add = ac)
     checkmate::reportAssertions(ac)

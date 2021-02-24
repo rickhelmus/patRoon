@@ -114,30 +114,30 @@ setMethod("delete", "componentsSet", function(obj, i = NULL, j = NULL, ...)
     return(obj)
 })
 
-generateComponentsSet <- function(fGroupsSet, generator, setIonization, ..., classGenerator = componentsSet)
+generateComponentsSet <- function(fGroupsSet, generator, setIonization, ..., setArgs = list(),
+                                  classGenerator = componentsSet)
 {
     annTable <- annotations(fGroupsSet)
     unsetFGroupsList <- sapply(sets(fGroupsSet), unset, obj = fGroupsSet, simplify = FALSE)
     
+    if (length(setArgs) == 0)
+        setArgs <- vector("list", length(unsetFGroupsList))
+    
     if (setIonization)
     {
-        ionizations <- sapply(sets(fGroupsSet), function(s)
+        for (i in seq_along(unsetFGroupsList))
         {
+            s <- sets(fGroupsSet)[i]
             at <- annTable[set == s]
-            if (nrow(at) == 0)
-                return("positive") # UNDONE: relevant?
-            return(if (as.adduct(at$adduct[1])@charge < 0) "negative" else "positive")
-        })
+            # UNDONE: default to positive OK?
+            ion <- if (nrow(at) == 0 || as.adduct(at$adduct[1])@charge >= 0) "positive" else "negative"
+            setArgs[[i]]$ionization <- ion
+        }
+    }
         
-        setObjects <- Map(unsetFGroupsList, ionizations,
-                          f = function(fg, i) do.call(generator, list(fGroups = fg, ionization = i, ...)))
-    }
-    else
-    {
-        setObjects <- sapply(unsetFGroupsList, function(fg) do.call(generator, list(fGroups = fg, ...)),
-                             simplify = FALSE)
-    }
-    
+    setObjects <- Map(unsetFGroupsList, setArgs,
+                      f = function(fg, sa) do.call(generator, c(list(fGroups = fg, ...), sa)))
+
     mcmp <- mergeComponents(setObjects, sets(fGroupsSet), "set")
     
     return(classGenerator(setObjects = setObjects, components = mcmp$components, componentInfo = mcmp$componentInfo,

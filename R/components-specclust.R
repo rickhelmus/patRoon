@@ -81,10 +81,11 @@ setMethod("generateComponentsSpecClust", "featureGroups", function(fGroups, MSPe
 componentsSpecClustSet <- setClass("componentsSpecClustSet", contains = "componentsClustSet")
 
 #' @export
-setMethod("generateComponentsSpecClust", "featureGroupsSet", function(fGroups, ...)
+setMethod("generateComponentsSpecClust", "featureGroupsSet", function(fGroups, MSPeakLists, ...)
 {
-    cset <- generateComponentsSet(fGroups, generateComponentsSpecClust, setIonization = FALSE, ...)
-    return(componentsSpecClustSet(adducts = adducts(cset), setObjects = setObjects(cset),
-                                  components = componentTable(cset), componentInfo = componentInfo(cset),
-                                  algorithm = "specclust-set"))
+    msplArgs <- assertAndGetMSPLSetsArgs(fGroups, MSPeakLists)
+    cset <- generateComponentsSet(fGroups, generateComponentsSpecClust, setIonization = FALSE, ...,
+                                  setArgs = msplArgs)
+    return(componentsSpecClustSet(setObjects = setObjects(cset), components = componentTable(cset),
+                                  componentInfo = componentInfo(cset), algorithm = "specclust-set"))
 })

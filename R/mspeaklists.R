@@ -432,14 +432,6 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
         pln <- names(pl)
         pl <- lapply(seq_along(pl), function(grpi)
         {
-            if (withMSMS)
-            {
-                if (!negate && is.null(pl[[grpi]][["MSMS"]]))
-                    return(list())
-                if (negate && !is.null(pl[[grpi]][["MSMS"]]))
-                    return(list())
-            }
-
             ret <- list()
             if (!is.null(pl[[grpi]][["MS"]]))
                 ret$MS <- doMSPeakListFilter(pl[[grpi]]$MS, absMSIntThr, relMSIntThr, topMSPeaks, NULL,
@@ -451,9 +443,20 @@ setMethod("filter", "MSPeakLists", function(obj, absMSIntThr = NULL, absMSMSIntT
             if (!is.null(isolatePrec))
                 ret$MS <- isolatePrecInMSPeakList(ret$MS, isolatePrec, negate)
 
+            ret <- pruneList(ret, checkZeroRows = TRUE)
+            
+            # apply after other filters as these may have removed all MSMS peaks
+            if (withMSMS)
+            {
+                if (!negate && is.null(ret[["MSMS"]]))
+                    return(list())
+                if (negate && !is.null(ret[["MSMS"]]))
+                    return(list())
+            }
+            
             setTxtProgressBar(prog, grpi)
 
-            return(pruneList(ret, checkZeroRows = TRUE))
+            return(ret)
         })
         names(pl) <- pln
 

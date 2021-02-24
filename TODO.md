@@ -213,7 +213,6 @@
     - as.data.table/plotVolcano: docs and assertions
     - plotVolcano(): move legend outside graph
     - workflow: first do log2fc subsetting, then clustering
-    - median also possible?
 - spectrumSimilarity
     - sets
         - custom weights per set? specify methods/parameters for averaging?
@@ -221,8 +220,6 @@
     - plotting? could extend plotSpectrum() by allowing selection of two spectra and using sets code for mirroring
     - update MSPeakLists method and/or export new functions?
     - remove OrgMassSpecR and proxy dependency
-    - use neutral_formula for annotated similarity calculation for formulas
-        - still relevant?
 - Naming
     - More generic naming for predict etc to accommodate other sources for TPs
     - consistency for precursor/parent/suspect
@@ -230,7 +227,6 @@
     - suspects() --> parents()?
 - misc
     - Make sure hash takes into account parent names
-    - finish new minMSMSPeaks filter (apply always after averaging?)
     - show method for new components classes
     - truncate MP logfiles like with suspects, eg for long suspect names with BT
 - document
@@ -238,9 +234,11 @@
         - use identifier as fallback for naming when no compoundName is present
         - citations, also EnviPath
         - compound similarities
-
+    - minMSMSPeaks filter
 - NEWS
     - as.data.table(fGroups): normalization, FC, averageFunc
+    - minMSMSPeaks filter
+    - fixed: withMSMS now applied after all other filters
 - tests
     - FC, plotVolcano
 

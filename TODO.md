@@ -195,10 +195,10 @@
 - predictTPsBioTransformer()
     - allow usage of compoundsSet (if not already working)
     - allow fGroupsScreening for input
-    - convertToMFDB: no need to calculate InChIs etc?
     - filter on stability/persistence/toxicity of TP?
     - Include BT in installation script and verifyDependencies()
     - do we still need to check for non-calculated formulae?
+    - ensure all input parent rows have SMILES
 - metabolic logic
     - more logic reactions?
     - make configurable?
@@ -230,6 +230,7 @@
     - More generic naming for predict etc to accommodate other sources for TPs
     - consistency for precursor/parent/suspect
     - consistency for spectrum/peaklist
+    - suspects() --> parents()?
 - misc
     - Make sure hash takes into account parent names
     - finish new minMSMSPeaks filter (apply always after averaging?)

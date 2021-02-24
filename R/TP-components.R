@@ -90,11 +90,11 @@ setMethod("predictTPsComponents", "componentsSet", function(components, fGroupsP
     
     theSets <- names(fGroupsPrecursors)
     
-    ionizedFGroupsPrec <- Map(ionize, fGroupsPrecursors, names(fGroupsPrecursors))
-    ionizedFGroupsTPs <- Map(ionize, fGroupsTPs, names(fGroupsTPs))
+    unsetFGroupsPrec <- Map(unset, fGroupsPrecursors, names(fGroupsPrecursors))
+    unsetFGroupsTPs <- Map(unset, fGroupsTPs, names(fGroupsTPs))
     
     # first calculate for each set
-    predictSets <- Map(predictTPsComponents, setObjects(components)[theSets], ionizedFGroupsPrec, ionizedFGroupsTPs)
+    predictSets <- Map(predictTPsComponents, setObjects(components)[theSets], unsetFGroupsPrec, unsetFGroupsTPs)
     TPListSets <- Map(predictSets, theSets, f = function(p, s)
     {
         ret <- lapply(predictions(p), function(tps)

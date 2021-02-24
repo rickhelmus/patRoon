@@ -9,7 +9,7 @@ setMethod("initialize", "TPPredictionsBT",
           function(.Object, ...) callNextMethod(.Object, algorithm = "biotransformer", ...))
 
 
-getBaseBTCmd <- function(precursor, SMILES, type, steps, extraOpts, baseHash)
+getBaseBTCmd <- function(precursor, SMILES, type, steps, fpType, fpSimMethod, extraOpts, baseHash)
 {
     mainArgs <- c("-b", type,
                   "-k", "pred",
@@ -18,7 +18,7 @@ getBaseBTCmd <- function(precursor, SMILES, type, steps, extraOpts, baseHash)
                   extraOpts)
     
     return(list(command = "java", args = mainArgs, logFile = paste0("biotr-", precursor, ".txt"), precursor = precursor,
-                SMILES = SMILES, hash = makeHash(SMILES, baseHash)))
+                SMILES = SMILES, fpType = fpType, fpSimMethod = fpSimMethod, hash = makeHash(SMILES, baseHash)))
 }
 
 collapseBTResults <- function(pred)
@@ -72,15 +72,18 @@ BTMPFinishHandler <- function(cmd)
     # BUG: BT sometimes doesn't fill in the formula. Calculate them manually
     ret[!nzchar(formula), formula :=
             {
-                SMI <- babelConvert(InChI, "inchi", "smi")
-                mols <- getMoleculesFromSMILES(SMI)
+                SMI <- patRoon:::babelConvert(InChI, "inchi", "smi")
+                mols <- patRoon:::getMoleculesFromSMILES(SMI)
                 return(sapply(mols, function(m) rcdk::get.mol2formula(m)@string))
             }]
     
     # Assign some unique identifier
     ret[, name := paste0(cmd$precursor, "-TP", seq_len(nrow(ret)))]
     
-    ret[, RTDir := ifelse(ALogP < `Precursor ALogP`, -1, 1)]
+    ret[, RTDir := fifelse(ALogP < `Precursor ALogP`, -1, 1)]
+    
+    ret[, similarity := mapply(`Precursor SMILES`, SMILES, FUN = patRoon:::distSMILES,
+                               MoreArgs = list(fpType = cmd$fpType, fpSimMethod = cmd$fpSimMethod))][]
     
     return(ret)
 }
@@ -143,10 +146,8 @@ predictTPsBioTransformer <- function(suspects = NULL, compounds = NULL, type = "
     baseHash <- makeHash(type, steps, extraOpts)
     setHash <- makeHash(suspects, baseHash)
     
-    cmdQueue <- Map(suspects$name, suspects$SMILES, f = function(n, sm)
-    {
-        getBaseBTCmd(n, sm, type = type, steps = steps, extraOpts = extraOpts, baseHash)
-    })
+    cmdQueue <- Map(suspects$name, suspects$SMILES, f = getBaseBTCmd,
+                    MoreArgs = list(type = type, steps = steps, extraOpts = extraOpts, fpType, fpSimMethod, baseHash))
 
     results <- list()
 
@@ -155,16 +156,6 @@ predictTPsBioTransformer <- function(suspects = NULL, compounds = NULL, type = "
         results <- executeMultiProcess(cmdQueue, finishHandler = patRoon:::BTMPFinishHandler,
                                        prepareHandler = patRoon:::BTMPPrepareHandler,
                                        cacheName = "predictTPsBT", setHash = setHash, logSubDir = "biotransformer")
-
-        cat("Calculating compound similarities... ")
-        results <- lapply(results, function(res)
-        {
-            if (nrow(res) > 0)
-                res[, similarity := mapply(`Precursor SMILES`, SMILES, SIMPLIFY = TRUE, FUN = distSMILES,
-                                           MoreArgs = list(fpType = fpType, fpSimMethod = fpSimMethod))][]
-            return(res)
-        })
-        cat("Done!\n")
     }
 
     results <- pruneList(results, checkZeroRows = TRUE)

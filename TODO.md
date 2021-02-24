@@ -201,8 +201,6 @@
     - make configurable?
     - use adduct annotations if present
 - predictTPsComponents
-    - componentsSpecClust --> works?
-        - sets
     - fix if empty cTab for MSMS components
     - doc that precursor should not occur in multiple components (is this relevant for users?)
     - caching

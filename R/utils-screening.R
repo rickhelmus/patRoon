@@ -110,7 +110,7 @@ prepareSuspectList <- function(suspects, adduct, skipInvalid, calcMZs = TRUE)
         }
 
         # calculate ionic masses if possible (not possible if no adducts are given and fGroups are annotated)
-        if (calcMZs && (is.null(suspects[["mz"]]) || !any(is.na(suspects[["mz"]]))) &&
+        if (calcMZs && (is.null(suspects[["mz"]]) || any(is.na(suspects[["mz"]]))) &&
             (!is.null(adduct) || !is.null(suspects[["adduct"]])))
         {
             if (!is.null(adduct))

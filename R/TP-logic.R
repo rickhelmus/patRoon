@@ -60,8 +60,6 @@ doPredictTPsLogic <- function(fGroups, minMass, adduct)
                           RTDir = transformations$RTDir)
         ret <- ret[neutralMass >= minMass]
         
-        # UNDONE: more checks (e.g. formulas)
-        
         setTxtProgressBar(prog, si)
         
         return(ret)

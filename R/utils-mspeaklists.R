@@ -265,6 +265,7 @@ getMSPeakListPlotTitle <- function(MSLevel, analysis, groupName)
     return(paste(groupName, MSInd))
 }
 
+# NOTE: This function is mainly for debugging the C++ version
 binPeakLists <- function(pl1, pl2, shift, absMzDev)
 {
     prep <- function(pl)
@@ -318,6 +319,7 @@ binPeakLists <- function(pl1, pl2, shift, absMzDev)
     return(ret)
 }
 
+# NOTE: This function is mainly for debugging the C++ version
 specSimilarityR <- function(pl1, pl2, method, shift = "none", removePrecursor = FALSE, mzWeight = 0, intWeight = 1,
                            absMzDev = 0.005, relMinIntensity = 0.1)
 {
@@ -352,6 +354,33 @@ specSimilarityR <- function(pl1, pl2, method, shift = "none", removePrecursor = 
                   jaccard = binnedPL[intensity_1 != 0 & intensity_2 != 0, .N] / nrow(binnedPL)))
 }
 
+prepSpecSimilarity <- function(pl1, pl2, removePrecursor, relMinIntensity, minPeaks)
+{
+    if (removePrecursor)
+    {
+        pl1 <- pl1[precursor == FALSE]
+        pl2 <- pl2[precursor == FALSE]
+    }
+    
+    if (relMinIntensity > 0)
+    {
+        filterPL <- function(pl)
+        {
+            minInt <- relMinIntensity * max(pl$intensity)
+            return(pl[numGTE(intensity, minInt)])
+        }
+        pl1 <- filterPL(pl1); pl2 <- filterPL(pl2)
+    }
+    
+    if (nrow(pl1) == 0 || nrow(pl2) == 0)
+        return(list())
+    
+    if (nrow(pl1) < minPeaks || nrow(pl2) < minPeaks)
+        return(list())
+    
+    return(list(pl1 = pl1, pl2 = pl2))
+}
+
 specSimilarity <- function(pl1, pl2, method, shift = "none", precDiff = 0, removePrecursor = FALSE,
                            mzWeight = 0, intWeight = 1, absMzDev = 0.005, relMinIntensity = 0.1,
                            minPeaks = 0)
@@ -362,47 +391,37 @@ specSimilarity <- function(pl1, pl2, method, shift = "none", precDiff = 0, remov
     # code contributed by Bas van de Velde
     # cosine similarity from OrgMassSpecR
 
-    if (removePrecursor)
-    {
-        pl1 <- pl1[precursor == FALSE]
-        pl2 <- pl2[precursor == FALSE]
-    }
+    prep <- prepSpecSimilarity(pl1, pl2, removePrecursor, relMinIntensity, minPeaks)
+    if (length(prep) == 0)
+        return(0)
+    
+    return(calcSpecSimilarity(prep$pl1, prep$pl2, method, shift, precDiff, mzWeight, intWeight, absMzDev))
+}
 
-    if (relMinIntensity > 0)
-    {
-        filterPL <- function(pl)
-        {
-            minInt <- relMinIntensity * max(pl$intensity)
-            return(pl[intensity >= minInt])
-        }
-        pl1 <- filterPL(pl1); pl2 <- filterPL(pl2)
-    }
+specSimilaritySets <- function(pl1, pl2, method, shift = "none", precDiff = 0, removePrecursor = FALSE,
+                               mzWeight = 0, intWeight = 1, absMzDev = 0.005, relMinIntensity = 0.1,
+                               minPeaks = 0)
+{
+    # UNDONE: refs
+    # UNDONE: export? add asserts if yes
     
-    if (nrow(pl1) == 0 || nrow(pl2) == 0)
+    # code contributed by Bas van de Velde
+    # cosine similarity from OrgMassSpecR
+
+    prep <- prepSpecSimilarity(pl1, pl2, removePrecursor, relMinIntensity, minPeaks)
+    if (length(prep) == 0)
         return(0)
+    pl1 <- prep$pl1; pl2 <- prep$pl2
     
-    if (nrow(pl1) < minPeaks || nrow(pl2) < minPeaks)
-        return(0)
-    
-    # UNDONE: use inheritance instead?
-    # UNDONE: parameters for weighing? other approaches, eg if peaklists are missing in a set?
-    if (!is.null(pl1[["set"]]) || !is.null(pl2[["set"]]))
+    allSets <- union(prep$pl1$set, prep$pl2$set)
+    sims <- sapply(allSets, function(s)
     {
-        if (is.null(pl1[["set"]]) != is.null(pl2[["set"]]))
-            stop("Either none or both peaklists need to contain set data")
-        
-        allSets <- unique(c(pl1$set, pl2$set))
-        sims <- sapply(allSets, function(s)
-        {
-            spl1 <- pl1[set == s]; spl2 <- pl2[set == s]
-            if (nrow(spl1) == 0 || nrow(spl2) == 0)
-                return(NA)
-            return(calcSpecSimilarity(spl1, spl2, method, shift, precDiff, mzWeight, intWeight, absMzDev))
-        })
-        if (all(is.na(sims)))
+        spl1 <- prep$pl1[set == s]; spl2 <- prep$pl2[set == s]
+        if (nrow(spl1) == 0 || nrow(spl2) == 0)
             return(NA)
-        return(mean(sims, na.rm = TRUE))
-    }
-
-    return(calcSpecSimilarity(pl1, pl2, method, shift, precDiff, mzWeight, intWeight, absMzDev))
+        return(calcSpecSimilarity(spl1, spl2, method, shift, precDiff, mzWeight, intWeight, absMzDev))
+    })
+    if (all(is.na(sims)))
+        return(NA_real_)
+    return(mean(sims, na.rm = TRUE))
 }

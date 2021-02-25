@@ -5,17 +5,18 @@
 #' @include feature_groups-screening-set.R
 NULL
 
-genTPSpecSimilarities <- function(pl1, pl2, method, precDiff, removePrecursor,
-                                  mzWeight, intWeight, absMzDev, relMinIntensity, minPeaks)
+genTPSpecSimilarities <- function(pl1, pl2, method, precDiff, removePrecursor, mzWeight, intWeight, absMzDev,
+                                  relMinIntensity, minPeaks, withSets)
 {
+    func <- if (withSets) specSimilaritySets else specSimilarity
+    
     getSim <- function(shift)
     {
         if (!is.null(pl2))
         {
-            return(specSimilarity(pl1, pl2, method = method, shift = shift,
-                                  precDiff = precDiff, removePrecursor = removePrecursor, mzWeight = mzWeight,
-                                  intWeight = intWeight, absMzDev = absMzDev,
-                                  relMinIntensity = relMinIntensity, minPeaks = minPeaks))
+            return(func(pl1, pl2, method = method, shift = shift, precDiff = precDiff,
+                        removePrecursor = removePrecursor, mzWeight = mzWeight, intWeight = intWeight,
+                        absMzDev = absMzDev, relMinIntensity = relMinIntensity, minPeaks = minPeaks))
         }
         return(NA)
     }
@@ -96,7 +97,8 @@ doGenComponentsTPs <- function(fGroups, fGroupsTPs, pred, MSPeakLists, minRTDiff
                     genTPSpecSimilarities(precMSMS, MSPeakLists[[g]][["MSMS"]], method = simMethod,
                                           precDiff = -mzd, removePrecursor = removePrecursor,
                                           mzWeight = mzWeight, intWeight = intWeight, absMzDev = absMzDev,
-                                          relMinIntensity = relMinIntensity, minPeaks = minSimMSMSPeaks)
+                                          relMinIntensity = relMinIntensity, minPeaks = minSimMSMSPeaks,
+                                          withSets = FALSE)
                 }))
                 ret <- cbind(ret, sims)
             }
@@ -321,7 +323,8 @@ setMethod("generateComponentsTPs", "featureGroupsSet", function(fGroups, fGroups
                     genTPSpecSimilarities(precMSMS, unsetMSPeaksLists[[s]][[g]][["MSMS"]], method = simMethod,
                                           precDiff = -mzd, removePrecursor = removePrecursor,
                                           mzWeight = mzWeight, intWeight = intWeight, absMzDev = absMzDev,
-                                          relMinIntensity = relMinIntensity, minPeaks = minSimMSMSPeaks)
+                                          relMinIntensity = relMinIntensity, minPeaks = minSimMSMSPeaks,
+                                          withSets = TRUE)
                 }))
                 cmp <- cbind(cmp, setnames(sims, simColNames))
             }

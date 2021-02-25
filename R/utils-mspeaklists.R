@@ -191,7 +191,7 @@ doMSPeakListFilter <- function(pList, absIntThr, relIntThr, topMost, minPeaks, d
     if (!is.null(topMost) && nrow(ret) > topMost)
     {
         ord <- order(ret$intensity, decreasing = !negate)
-        ret <- ret[ord[seq_len(topMost)]]
+        ret <- ret[seq_len(.N) %in% ord[seq_len(topMost)]] # NOTE: keep order
     }
 
     if (deIsotope)

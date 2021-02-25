@@ -245,6 +245,7 @@
     - as.data.table(fGroups): normalization, FC, averageFunc
     - minMSMSPeaks filter
     - fixed: withMSMS now applied after all other filters
+    - fixed: topX peaks for MSPeakLists would re-order peaklists
 - tests
     - FC, plotVolcano
 

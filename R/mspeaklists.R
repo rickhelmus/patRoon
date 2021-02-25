@@ -541,9 +541,8 @@ setMethod("plotSpectrum", "MSPeakLists", function(obj, groupName, analysis = NUL
     makeMSPlot(getMSPlotData(spec, 2), mincex, xlim, ylim, main = title, ...)
 })
 
-#' @describeIn MSPeakLists Calculates and plots the spectral similarity between
-#'   two spectra. For this the \code{\link{SpectrumSimilarity}} function is used
-#'   of the \CRANpkg{OrgMassSpecR} package.
+#' @describeIn MSPeakLists Calculates the spectral similarity between
+#'   two spectra.
 #'
 #' @param groupName1,groupName2 The names of the feature groups for which the
 #'   comparison should be made.
@@ -563,55 +562,93 @@ setMethod("plotSpectrum", "MSPeakLists", function(obj, groupName, analysis = NUL
 #' @return \code{spectrumSimilarity} returns the same as
 #'   \code{\link{SpectrumSimilarity}}.
 
-#' @aliases spectrumSimilarity
 #' @export
-setMethod("spectrumSimilarity", "MSPeakLists", function(obj, groupName1, groupName2,
-                                                        analysis1, analysis2,
-                                                        MSLevel, doPlot = TRUE, absMzDev = 0.002,
-                                                        relMinIntensity = 10, omitPrecursor = FALSE,
-                                                        mzShift = 0, xlim = NULL, ylim = c(0, 100), ...)
+setMethod("spectrumSimilarity", "MSPeakLists", function(obj, groupName1, groupName2, analysis1, analysis2, MSLevel, 
+                                                        method, shift = "none", removePrecursor = FALSE, mzWeight = 0,
+                                                        intWeight = 1, absMzDev = 0.005, relMinIntensity = 0.1,
+                                                        minPeaks = 0, drop = TRUE)
 {
     ac <- checkmate::makeAssertCollection()
-    aapply(checkmate::assertChoice, . ~ groupName1 + groupName2,
+    aapply(checkmate::assertSubset, . ~ groupName1 + groupName2, empty.ok = FALSE,
            fixed = list(choices = groupNames(obj), add = ac))
-    aapply(checkmate::assertChoice, . ~ analysis1 + analysis2, null.ok = TRUE,
+    aapply(checkmate::assertSubset, . ~ analysis1 + analysis2, empty.ok = TRUE,
            fixed = list(choices = analyses(obj), add = ac))
     checkmate::assertChoice(MSLevel, 1:2, add = ac)
-    aapply(checkmate::assertFlag, . ~ doPlot + omitPrecursor, fixed = list(add = ac))
-    aapply(checkmate::assertNumber, . ~ absMzDev + relMinIntensity, lower = 0, finite = TRUE,
+    checkmate::assertChoice(method, c("cosine", "jaccard"), add = ac)
+    checkmate::assertChoice(shift, c("none", "precursor", "both"), add = ac)
+    aapply(checkmate::assertFlag, . ~ removePrecursor + drop, fixed = list(add = ac))
+    aapply(checkmate::assertNumber, . ~ mzWeight + intWeight + absMzDev + relMinIntensity, lower = 0, finite = TRUE,
            fixed = list(add = ac))
-    checkmate::assertNumber(mzShift, finite = TRUE, add = ac)
-    assertXYLim(xlim, ylim, add = ac)
+    checkmate::assertCount(minPeaks, add = ac)
     checkmate::reportAssertions(ac)
     
     if (length(obj) == 0)
         return(NULL)
     
-    spec1 <- getSpec(obj, groupName1, MSLevel, analysis1)
-    spec2 <- getSpec(obj, groupName2, MSLevel, analysis2)
-    if (is.null(spec1) || is.null(spec2))
+    if (!is.null(analysis1) && length(analysis1) != length(groupName1))
+        stop("Length of analysis1 must equal the length of groupName1")
+    if (!is.null(analysis2) && length(analysis2) != length(groupName1))
+        stop("Length of analysis2 must equal the length of groupName2")
+    
+    checkAndPrepAnaArg <- function(gn, ana, nr)
+    {
+        if (is.null(ana))
+            return(rep(list(NULL), length(gn)))
+        
+        if (!is.null(analysis1) && length(analysis1) != length(groupName1))
+            stop(sprintf("Length of analysis%d must equal the length of groupName%d", nr))
+        return(ana)
+    }
+    
+    analysis1 <- checkAndPrepAnaArg(groupName1, analysis1, 1)
+    analysis2 <- checkAndPrepAnaArg(groupName2, analysis2, 2)
+    
+    specs1 <- pruneList(Map(getSpec, groupName1, analysis1, MoreArgs = list(MSPeakLists = obj, MSLevel = MSLevel)))
+    specs2 <- pruneList(Map(getSpec, groupName2, analysis2, MoreArgs = list(MSPeakLists = obj, MSLevel = MSLevel)))
+    
+    specs1 <- pruneList(lapply(specs1, prepSpecSimilarityPL, removePrecursor = removePrecursor,
+                               relMinIntensity = relMinIntensity, minPeaks = minPeaks), checkZeroRows = TRUE)
+    specs2 <- pruneList(lapply(specs2, prepSpecSimilarityPL, removePrecursor = removePrecursor,
+                               relMinIntensity = relMinIntensity, minPeaks = minPeaks), checkZeroRows = TRUE)
+    
+    if (length(specs1) == 0 || length(specs2) == 0)
         return(NULL)
     
-    if (omitPrecursor)
+    precs1 <- precs2 <- 0
+    if (shift != "none")
     {
-        spec1 <- spec1[precursor == FALSE]
-        spec2 <- spec2[precursor == FALSE]
-    }
-    
-    if (mzShift != 0)
-    {
-        spec2 <- copy(spec2)
-        spec2[, mz := mz + mzShift]
-    }
-    
-    if (is.null(xlim))
-        xlim <- c(min(spec1$mz, spec2$mz), max(spec1$mz, spec2$mz)) + 10
-    
-    ret <- OrgMassSpecR::SpectrumSimilarity(spec1, spec2, t = absMzDev, b = relMinIntensity,
-                                            print.graphic = doPlot, xlim = xlim, ylim, ...)
-    return(if (is.nan(ret)) 0 else ret)
-})
+        # get precursor ions: if MSLevel==2 try MSLevel==1 as fallback
+        getPrecMZ <- function(spec, gn, ana)
+        {
+            ret <- spec[precursor == TRUE]$mz
+            if (length(ret) == 0)
+            {
+                if (MSLevel == 2)
+                {
+                    precSpec <- getSpec(obj, gn, 1, ana)
+                    ret <- precSpec[precursor == TRUE]$mz
+                }
+            }
+            return(if (length(ret) == 0) NA else ret)
+        }
 
+        precs1 <- mapply(getPrecMZ, specs1, groupName1, analysis1)
+        precs2 <- mapply(getPrecMZ, specs2, groupName2, analysis2)
+        precs1NA <- names(which(is.na(prec1))); precs2NA <- names(which(is.na(prec2)))
+        if (length(precs1NA) != 0 || length(precs1NA) != 0)
+            warning("Some pecursor ions are unknown, returning NAs")
+        wh1 <- setdiff(names(precs1), precs1NA); wh2 <- setdiff(names(precs2), precs2NA)
+        precs1 <- precs1[wh1]; specs1 <- specs1[wh1]
+        precs2 <- precs2[wh2]; specs2 <- specs1[wh2]
+    }
+
+    sims <- specDistRect(specs1, specs2, method, shift, precs1, precs2, mzWeight, intWeight, absMzDev)
+    rownames(sims) <- names(specs1); colnames(sims) <- names(specs2)
+    
+    sims <- expandFillSpecSimilarities(sims, groupName1, groupName2)
+    
+    return(if (drop && length(sims) == 1) drop(sims) else sims)
+})
 
 #' @templateVar func generateMSPeakLists
 #' @templateVar what generate MS peak lists

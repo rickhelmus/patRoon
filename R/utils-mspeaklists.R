@@ -440,3 +440,44 @@ specSimilaritySets <- function(pl1, pl2, method, shift = "none", precDiff = 0, r
     
     return(calcSpecSimilarity(prep$pl1, prep$pl2, method, shift, precDiff, mzWeight, intWeight, absMzDev))
 }
+
+prepSpecSimilarityPL <- function(pl, removePrecursor, relMinIntensity, minPeaks)
+{
+    if (removePrecursor)
+        pl <- pl[precursor == FALSE]
+    
+    if (relMinIntensity > 0)
+    {
+        minInt <- relMinIntensity * max(pl$intensity)
+        pl <- pl[numGTE(intensity, minInt)]
+    }
+    
+    if (nrow(pl) < minPeaks)
+        return(pl[FALSE])
+    
+    return(pl)
+}
+
+expandFillSpecSimilarities <- function(sims, groupName1, groupName2)
+{
+    nMissing <- length(groupName1) - nrow(sims)
+    if (length(nMissing) == 0) browser()
+    if (nMissing > 0)
+    {
+        # add missing rows
+        sims <- do.call(rbind, c(list(sims), setNames(as.list(rep(NA_real_, nMissing)),
+                                                      setdiff(groupName1, rownames(sims)))))
+        sims <- sims[groupName1, , drop = FALSE]
+    }
+    
+    nMissing <- length(groupName2) - ncol(sims)
+    if (nMissing > 0)
+    {
+        # add missing columns
+        sims <- do.call(cbind, c(list(sims), setNames(as.list(rep(NA_real_, nMissing)),
+                                                      setdiff(groupName2, colnames(sims)))))
+        sims <- sims[, groupName2, drop = FALSE]
+    }
+    
+    return(sims)
+}

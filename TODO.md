@@ -71,6 +71,7 @@
         - more settings?
         - test session import
         - change column names for both tables?
+        - update filter
 - misc
     - handle errors when object has <=1 set
         - groupFeaturesScreening()

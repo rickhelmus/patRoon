@@ -301,67 +301,51 @@ setMethod("filter", "components", function(obj, size = NULL, adducts = NULL, iso
         }))
     }
     
-    obj@components <- pruneList(lapply(obj@components, function(cmp)
+    inRange <- function(x, range) x >= range[1] & x <= range[2]
+    mark <- if (negate) function(x) !x else function(x) x
+
+    cInfo <- componentInfo(obj)
+    
+    obj <- delete(obj, j = function(cmp, cname, ...)
     {
+        cmp <- copy(cmp)
+        cmp[, keep := TRUE]
         if (!is.null(adducts) && !is.null(cmp[["adduct_ion"]]))
         {
             # NOTE: RAMClustR and CAMERA follow the generic adduct format
             # applied here, hence we can simply call as.adduct w/out specific
             # formatting.
-
-            if (is.logical(adducts) && adducts)
-                keep <- !is.na(cmp$adduct_ion)
-            else if (is.logical(adducts) && !adducts)
-                keep <- is.na(cmp$adduct_ion)
-            else
-                keep <- cmp$adduct_ion %in% adducts
             
-            if (negate)
-                keep <- !keep
-            cmp <- cmp[keep]
+            if (is.logical(adducts) && adducts)
+                cmp[, keep := mark(!is.na(adduct_ion))]
+            else if (is.logical(adducts) && !adducts)
+                cmp[, keep := mark(is.na(adduct_ion))]
+            else
+                cmp[, keep := mark(adduct_ion %in% adducts)]
+            
         }
-
+        
         if (!is.null(isotopes) && !is.null(cmp[["isonr"]]))
         {
             if (is.logical(isotopes) && isotopes)
-                keep <- !is.na(cmp$isonr)
+                cmp[keep == TRUE, keep := mark(!is.na(isonr))]
             else if (is.logical(isotopes) && !isotopes)
-                keep <- is.na(cmp$isonr)
+                cmp[keep == TRUE, keep := mark(is.na(isonr))]
             else
-                keep <- cmp$isonr %in% isotopes
-            
-            if (negate)
-                keep <- !keep
-            cmp <- cmp[keep]
+                cmp[keep == TRUE, keep := mark(isonr %in% isotopes)]
         }
-
-        return(cmp)
-    }), checkZeroRows = TRUE)
-
-    if (length(obj) == 0)
-        obj@componentInfo <- data.table()
-    else
-    {
-        obj@componentInfo <- obj@componentInfo[name %in% names(obj@components)]
-        obj@componentInfo[, size := sapply(obj@components, nrow)] # update in case groups were filtered away
-
-        inRange <- function(x, range) x >= range[1] & x <= range[2]
-        if (negate)
-            inRange <- Negate(inRange)
         
+        ci <- cInfo[name == cname]
         if (!is.null(size))
-        {
-            csize <- size # rename for DT
-            obj@componentInfo <- obj@componentInfo[inRange(size, csize)]
-        }
-        if (!is.null(rtIncrement) && !is.null(obj@componentInfo[["ret_increment"]]))
-            obj@componentInfo <- obj@componentInfo[inRange(ret_increment, rtIncrement)]
-        if (!is.null(mzIncrement) && !is.null(obj@componentInfo[["mz_increment"]]))
-            obj@componentInfo <- obj@componentInfo[inRange(mz_increment, mzIncrement)]
-
-        obj@components <- obj@components[names(obj@components) %in% obj@componentInfo$name]
-    }
-
+            cmp[keep == TRUE, keep := mark(inRange(ci$size, ..size))]
+        if (!is.null(rtIncrement) && !is.null(ci[["ret_increment"]]))
+            cmp[keep == TRUE, keep := mark(inRange(ci$ret_increment, rtIncrement))]
+        if (!is.null(mzIncrement) && !is.null(ci[["mz_increment"]]))
+            cmp[keep == TRUE, keep := mark(inRange(ci$mz_increment, mzIncrement))]
+        
+        return(!cmp$keep)
+    })
+    
     if (verbose)
     {
         newn <- length(obj); newresn <- if (newn > 0) sum(sapply(obj@components, nrow)) else 0

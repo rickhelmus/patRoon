@@ -120,32 +120,18 @@ setMethod("show", "components", function(object)
 setMethod("[", c("components", "ANY", "ANY", "missing"), function(x, i, j, ...)
 {
     if (!missing(i))
+    {
         i <- assertSubsetArgAndToChr(i, names(x))
+        x <- delete(x, setdiff(names(x), i))
+    }
+    
     if (!missing(j))
+    {
         j <- assertSubsetArgAndToChr(j, groupNames(x))
-
-    # non-existing indices result in NULL values --> prune
-
-    # for some reason we need to explicitly give a data.table() as otherwise it complains componentInfo was assigned a list()
-    if (length(x) == 0)
-        return(componentsReduced(components = list(), componentInfo = data.table()))
-
-    if (!missing(i))
-    {
-        x@components <- pruneList(x@components[i])
-        x@componentInfo <- x@componentInfo[name %in% i]
+        x <- delete(x, j = setdiff(groupNames(x), j))
     }
-
-    if (!missing(j))
-    {
-        x@components <- sapply(x@components, function(cmp) cmp[group %in% j],
-                               simplify = FALSE)
-        x@components <- x@components[sapply(x@components, nrow) > 0]
-        x@componentInfo <- x@componentInfo[name %in% names(x@components)]
-        x@componentInfo[, size := sapply(x@components, nrow)] # update in case groups were filtered away
-    }
-
-    return(componentsReduced(components = x@components, componentInfo = x@componentInfo))
+    
+    return(x)
 })
 
 #' @describeIn components Extracts a component table, optionally filtered by a feature group.

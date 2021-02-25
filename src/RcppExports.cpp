@@ -68,6 +68,25 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// specDistRect
+Rcpp::NumericMatrix specDistRect(Rcpp::List specList1, Rcpp::List specList2, Rcpp::CharacterVector method, Rcpp::CharacterVector shift, Rcpp::NumericVector precMZs1, Rcpp::NumericVector precMZs2, Rcpp::NumericVector mzWeight, Rcpp::NumericVector intWeight, Rcpp::NumericVector mzWindow);
+RcppExport SEXP _patRoon_specDistRect(SEXP specList1SEXP, SEXP specList2SEXP, SEXP methodSEXP, SEXP shiftSEXP, SEXP precMZs1SEXP, SEXP precMZs2SEXP, SEXP mzWeightSEXP, SEXP intWeightSEXP, SEXP mzWindowSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::List >::type specList1(specList1SEXP);
+    Rcpp::traits::input_parameter< Rcpp::List >::type specList2(specList2SEXP);
+    Rcpp::traits::input_parameter< Rcpp::CharacterVector >::type method(methodSEXP);
+    Rcpp::traits::input_parameter< Rcpp::CharacterVector >::type shift(shiftSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type precMZs1(precMZs1SEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type precMZs2(precMZs2SEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type mzWeight(mzWeightSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type intWeight(intWeightSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type mzWindow(mzWindowSEXP);
+    rcpp_result_gen = Rcpp::wrap(specDistRect(specList1, specList2, method, shift, precMZs1, precMZs2, mzWeight, intWeight, mzWindow));
+    return rcpp_result_gen;
+END_RCPP
+}
 // loadEICIntensities
 Rcpp::NumericVector loadEICIntensities(Rcpp::List spectra, Rcpp::DataFrame featList, Rcpp::NumericVector rtWindow);
 RcppExport SEXP _patRoon_loadEICIntensities(SEXP spectraSEXP, SEXP featListSEXP, SEXP rtWindowSEXP) {
@@ -147,6 +166,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_patRoon_parseFeatConsXMLFile", (DL_FUNC) &_patRoon_parseFeatConsXMLFile, 2},
     {"_patRoon_writeFeatureXML", (DL_FUNC) &_patRoon_writeFeatureXML, 3},
     {"_patRoon_specDistMatrix", (DL_FUNC) &_patRoon_specDistMatrix, 7},
+    {"_patRoon_specDistRect", (DL_FUNC) &_patRoon_specDistRect, 9},
     {"_patRoon_loadEICIntensities", (DL_FUNC) &_patRoon_loadEICIntensities, 3},
     {"_patRoon_loadEICs", (DL_FUNC) &_patRoon_loadEICs, 5},
     {"_patRoon_makeSAFDInput", (DL_FUNC) &_patRoon_makeSAFDInput, 2},

@@ -54,8 +54,7 @@ setMethod("generateComponentsSpecClust", "featureGroups", function(fGroups, MSPe
     
     gInfo <- groupInfo(fGroups)[names(allMSMS), ] # make sure to subset!
     
-    precMZs <- sapply(names(allMSMS), function(g) gInfo[g, "mzs"])
-    
+    precMZs <- gInfo[names(allMSMS), "mzs"]
     cat("Calculating distance matrix... ")
     
     if (F)

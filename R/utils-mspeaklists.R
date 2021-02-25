@@ -386,7 +386,7 @@ specSimilarity <- function(pl1, pl2, method, shift = "none", precDiff = 0, remov
                            minPeaks = 0)
 {
     # UNDONE: refs
-    # UNDONE: export? add asserts if yes
+    # UNDONE: export? add asserts if yes, otherwise remove defaults
     
     # code contributed by Bas van de Velde
     # cosine similarity from OrgMassSpecR
@@ -400,7 +400,7 @@ specSimilarity <- function(pl1, pl2, method, shift = "none", precDiff = 0, remov
 
 specSimilaritySets <- function(pl1, pl2, method, shift = "none", precDiff = 0, removePrecursor = FALSE,
                                mzWeight = 0, intWeight = 1, absMzDev = 0.005, relMinIntensity = 0.1,
-                               minPeaks = 0)
+                               minPeaks = 0, combMethod)
 {
     # UNDONE: refs
     # UNDONE: export? add asserts if yes
@@ -408,20 +408,35 @@ specSimilaritySets <- function(pl1, pl2, method, shift = "none", precDiff = 0, r
     # code contributed by Bas van de Velde
     # cosine similarity from OrgMassSpecR
 
-    prep <- prepSpecSimilarity(pl1, pl2, removePrecursor, relMinIntensity, minPeaks)
+    if (combMethod == "average")
+    {
+        allSets <- union(pl1$set, pl2$set)
+        sims <- sapply(allSets, function(s)
+        {
+            spl1 <- pl1[set == s]; spl2 <- pl2[set == s]
+            if (nrow(spl1) == 0 || nrow(spl2) == 0)
+                return(NA)
+            
+            prep <- prepSpecSimilarity(spl1, spl2, removePrecursor, relMinIntensity, minPeaks)
+            if (length(prep) == 0)
+                return(0)
+            
+            return(calcSpecSimilarity(prep$pl1, prep$pl2, method, shift, precDiff, mzWeight, intWeight, absMzDev))
+        })
+        if (all(is.na(sims)))
+            return(NA_real_)
+        return(mean(sims, na.rm = TRUE))
+    }
+    
+    # combMethod == "merge"
+    setsBoth <- intersect(pl1$set, pl2$set) # only consider data from sets present in both peaklists
+    spl1 <- pl1[set %in% setsBoth]; spl2 <- pl2[set %in% setsBoth]
+    if (nrow(spl1) == 0 || nrow(spl2) == 0)
+        return(NA)
+    
+    prep <- prepSpecSimilarity(spl1, spl2, removePrecursor, relMinIntensity, minPeaks)
     if (length(prep) == 0)
         return(0)
-    pl1 <- prep$pl1; pl2 <- prep$pl2
     
-    allSets <- union(prep$pl1$set, prep$pl2$set)
-    sims <- sapply(allSets, function(s)
-    {
-        spl1 <- prep$pl1[set == s]; spl2 <- prep$pl2[set == s]
-        if (nrow(spl1) == 0 || nrow(spl2) == 0)
-            return(NA)
-        return(calcSpecSimilarity(spl1, spl2, method, shift, precDiff, mzWeight, intWeight, absMzDev))
-    })
-    if (all(is.na(sims)))
-        return(NA_real_)
-    return(mean(sims, na.rm = TRUE))
+    return(calcSpecSimilarity(prep$pl1, prep$pl2, method, shift, precDiff, mzWeight, intWeight, absMzDev))
 }

@@ -216,7 +216,12 @@
 - spectrumSimilarity
     - sets
         - custom weights per set? specify methods/parameters for averaging?
+            - or maybe some kind of auto weighing based on explained intensity/peak count?
+                - could be achieved by just using the merged spectra?
+                    - but then only if set is present in both to avoid false penalizing
+                    - perhaps as an option: "average" or "merged"
         - missing values? somehow compare between spectra from sets? or just use merged?
+        - NOTE: at the moment only used for componentsTPs
     - plotting? could extend plotSpectrum() by allowing selection of two spectra and using sets code for mirroring
     - update MSPeakLists method and/or export new functions?
     - remove OrgMassSpecR and proxy dependency

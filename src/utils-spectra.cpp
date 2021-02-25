@@ -409,10 +409,10 @@ Rcpp::NumericVector calcSpecSimilarity(Rcpp::DataFrame sp1, Rcpp::DataFrame sp2,
                                        Rcpp::CharacterVector shift, Rcpp::NumericVector precDiff,
                                        Rcpp::NumericVector mzWeight, Rcpp::NumericVector intWeight, Rcpp::NumericVector mzWindow)
 {
-    Spectrum specLeft{ sp1["mz"], sp1["intensity"] };
-    Spectrum specRight{ sp2["mz"], sp2["intensity"] };
-    
-    return Rcpp::NumericVector::create(doCalcSpecSimilarity(Spectrum{ sp1["mz"], sp1["intensity"] }, Spectrum{ sp2["mz"], sp2["intensity"] },
-                                                            Rcpp::as<std::string>(method), Rcpp::as<std::string>(shift), Rcpp::as<double>(precDiff),
-                                                            Rcpp::as<double>(mzWeight), Rcpp::as<double>(intWeight), Rcpp::as<double>(mzWindow)));
+    const Spectrum specLeft{ sp1["mz"], sp1["intensity"] };
+    const Spectrum specRight{ sp2["mz"], sp2["intensity"] };
+    return Rcpp::NumericVector::create(doCalcSpecSimilarity(specLeft, specRight, Rcpp::as<std::string>(method),
+                                                            Rcpp::as<std::string>(shift), Rcpp::as<double>(precDiff),
+                                                            Rcpp::as<double>(mzWeight), Rcpp::as<double>(intWeight),
+                                                            Rcpp::as<double>(mzWindow)));
 }
